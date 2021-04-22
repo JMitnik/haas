@@ -643,6 +643,8 @@ export type JobProcessLocation = {
   id: Scalars['String'];
   name: Scalars['String'];
   path: Scalars['String'];
+  xMaterialDimension: Scalars['Int'];
+  yMaterialDimension: Scalars['Int'];
   type: JobProcessLocationType;
   customFields?: Maybe<Array<CustomFieldType>>;
 };
@@ -721,6 +723,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createJobProcessLocation: JobProcessLocation;
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
+  retryAutodeckJob?: Maybe<CreateWorkspaceJobType>;
   confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
   whitifyImage?: Maybe<AwsImageType>;
   removePixelRange?: Maybe<AwsImageType>;
@@ -777,6 +780,11 @@ export type MutationCreateJobProcessLocationArgs = {
 
 export type MutationGenerateAutodeckArgs = {
   input?: Maybe<GenerateAutodeckInput>;
+};
+
+
+export type MutationRetryAutodeckJobArgs = {
+  jobId?: Maybe<Scalars['String']>;
 };
 
 
@@ -1793,6 +1801,19 @@ export type UploadJobImageMutation = (
   )> }
 );
 
+export type RetryAutodeckJobMutationVariables = Exact<{
+  jobId?: Maybe<Scalars['String']>;
+}>;
+
+
+export type RetryAutodeckJobMutation = (
+  { __typename?: 'Mutation' }
+  & { retryAutodeckJob?: Maybe<(
+    { __typename?: 'CreateWorkspaceJobType' }
+    & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
+  )> }
+);
+
 export type GetAdjustedLogoQueryVariables = Exact<{
   input?: Maybe<AdjustedImageInput>;
 }>;
@@ -2163,6 +2184,40 @@ export function useUploadJobImageMutation(baseOptions?: Apollo.MutationHookOptio
 export type UploadJobImageMutationHookResult = ReturnType<typeof useUploadJobImageMutation>;
 export type UploadJobImageMutationResult = Apollo.MutationResult<UploadJobImageMutation>;
 export type UploadJobImageMutationOptions = Apollo.BaseMutationOptions<UploadJobImageMutation, UploadJobImageMutationVariables>;
+export const RetryAutodeckJobDocument = gql`
+    mutation retryAutodeckJob($jobId: String) {
+  retryAutodeckJob(jobId: $jobId) {
+    id
+    name
+    status
+  }
+}
+    `;
+export type RetryAutodeckJobMutationFn = Apollo.MutationFunction<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>;
+
+/**
+ * __useRetryAutodeckJobMutation__
+ *
+ * To run a mutation, you first call `useRetryAutodeckJobMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRetryAutodeckJobMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [retryAutodeckJobMutation, { data, loading, error }] = useRetryAutodeckJobMutation({
+ *   variables: {
+ *      jobId: // value for 'jobId'
+ *   },
+ * });
+ */
+export function useRetryAutodeckJobMutation(baseOptions?: Apollo.MutationHookOptions<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>) {
+        return Apollo.useMutation<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>(RetryAutodeckJobDocument, baseOptions);
+      }
+export type RetryAutodeckJobMutationHookResult = ReturnType<typeof useRetryAutodeckJobMutation>;
+export type RetryAutodeckJobMutationResult = Apollo.MutationResult<RetryAutodeckJobMutation>;
+export type RetryAutodeckJobMutationOptions = Apollo.BaseMutationOptions<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>;
 export const GetAdjustedLogoDocument = gql`
     query getAdjustedLogo($input: AdjustedImageInput) {
   getAdjustedLogo(input: $input) {

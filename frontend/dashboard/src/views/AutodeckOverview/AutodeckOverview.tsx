@@ -1,10 +1,10 @@
 import * as UI from '@haas/ui';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { Plus, Download } from 'react-feather';
+import { Plus, Download, RefreshCcw } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
-import { PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation, JobStatusType } from 'types/generated-types';
+import { PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation, JobStatusType, useRetryAutodeckJobMutation } from 'types/generated-types';
 import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
 import { ProcessingStatus, DateLabel } from './Components';
 
@@ -32,6 +32,16 @@ export const AutodeckOverview = () => {
   const { t } = useTranslation();
 
   const [paginationState, setPaginationState] = useState(paginationFilter);
+
+  const [retryJob, { loading: retryLoading }] = useRetryAutodeckJobMutation({
+    onCompleted: () => {
+      setIsOpenDetailModel(false);
+      setActiveJob(null);
+      refetchAutodeckJobs({
+        filter: paginationState,
+      })
+    }
+  })
 
   const [createJob, { loading }] = useCreateWorkspaceJobMutation({
     onCompleted: () => {
@@ -204,17 +214,35 @@ export const AutodeckOverview = () => {
                     <UI.Helper mb={1}>{t('status')}</UI.Helper>
                     {activeJob?.status}
                   </UI.Div>
-                  <UI.Button
-                    leftIcon={Download}
-                    isDisabled={activeJob?.status !== 'COMPLETED' || !activeJob.resourcesUrl}
-                    size="sm"
-                    variantColor="green">{activeJob?.resourcesUrl ?
-                      <a style={{ color: 'white', textDecoration: 'none' }} href={activeJob?.resourcesUrl} download>
-                        {t('autodeck:download_result')}
-                      </a> :
-                      t('autodeck:download_result')
-                    }
-                  </UI.Button>
+                  {activeJob?.status !== JobStatusType.Failed &&
+                    <UI.Button
+                      leftIcon={Download}
+                      isDisabled={activeJob?.status !== JobStatusType.Completed || !activeJob.resourcesUrl}
+                      size="sm"
+                      variantColor="green">{activeJob?.resourcesUrl ?
+                        <a style={{ color: 'white', textDecoration: 'none' }} href={activeJob?.resourcesUrl} download>
+                          {t('autodeck:download_result')}
+                        </a> :
+                        t('autodeck:download_result')
+                      }
+                    </UI.Button>
+                  }
+
+                  {activeJob?.status === JobStatusType.Failed &&
+                    <UI.Button
+                      isDisabled={retryLoading}
+                      onClick={() => retryJob({
+                        variables: {
+                          jobId: activeJob?.id
+                        }
+                      })}
+                      leftIcon={RefreshCcw}
+                      size="sm"
+                      variantColor="red">
+                        Retry
+                    </UI.Button>
+                  }
+
                 </UI.Div>
               </UI.Stack>
             </UI.CardBody>

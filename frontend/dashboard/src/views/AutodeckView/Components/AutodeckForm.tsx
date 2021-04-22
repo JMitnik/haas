@@ -12,8 +12,8 @@ import React, { useState, useEffect } from 'react';
 import cuid from 'cuid';
 import Select from 'react-select';
 import { yupResolver } from '@hookform/resolvers';
-
 import boolToInt from 'utils/booleanToNumber';
+
 import WebsiteScreenshotFragment from '../Fragments/WebsiteScreenshot';
 import PrimaryColourFragment from '../Fragments/PrimaryColor';
 import CustomerLogoFormFragment from '../Fragments/CustomerLogoFragment';
@@ -50,23 +50,19 @@ const AutodeckForm = ({
     resolver: yupResolver(schema)
   });
 
-  const { fields } = useFieldArray(
-    {
-      control: form.control,
-      name: "customFields",
-      keyName: 'arrayKey'
-    }
-  );
+  const { fields } = useFieldArray({
+    control: form.control,
+    name: "customFields",
+    keyName: 'arrayKey'
+  });
 
-  const { fields: newCustomFields, append, remove } = useFieldArray(
-    {
-      control: form.control,
-      name: "newCustomFields",
-      keyName: 'arrayKey'
-    }
-  );
+  const { fields: newCustomFields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "newCustomFields",
+    keyName: 'arrayKey'
+  });
 
-  const { setValue } = form
+  const { setValue } = form;
 
   const onFormSubmit = (data: FormDataProps) => {
     const requiresRembgLambda = data?.useRembg === 1 ? true : false;
@@ -145,14 +141,14 @@ const AutodeckForm = ({
         id: jobId,
       }
     });
-  }, [job, fetchPreviewData])
+  }, [job, fetchPreviewData]);
 
   useEffect(() => {
     if (!previewData) return;
     setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
     setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
-    setValue('primaryColour', previewData?.getPreviewData?.colors[0])
-  }, [previewData, setValue])
+    setValue('primaryColour', previewData?.getPreviewData?.colors[0]);
+  }, [previewData, setValue]);
 
   const mappedJobLocations = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations
     .map((jobLocation) => ({ label: `${jobLocation.name} - ${jobLocation.path}`, value: jobLocation.id }))
@@ -160,9 +156,9 @@ const AutodeckForm = ({
   const activeJobLocation = isInEditing && job?.processLocation ? { label: `${job?.processLocation?.name} - ${job?.processLocation?.path}`, value: job?.processLocation?.id } : null
 
   const handleJobLocationChange = (id: string) => {
-    const jobLocation = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations.find((location) => location.id === id)
-    form.setValue('customFields', jobLocation?.customFields || [])
-    return setActiveTemplateType(jobLocation?.type)
+    const jobLocation = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations.find((location) => location.id === id);
+    form.setValue('customFields', jobLocation?.customFields || []);
+    return setActiveTemplateType(jobLocation?.type);
   }
 
   return (
@@ -234,8 +230,6 @@ const AutodeckForm = ({
                 </>
               }
 
-
-
               <FormControl isInvalid={!!form.errors.jobLocation} isRequired>
                 <FormLabel htmlFor="jobLocation">{t('process_location')}</FormLabel>
                 <InputHelper>{t('process_location_helper')}</InputHelper>
@@ -306,10 +300,10 @@ const AutodeckForm = ({
         </FormSection>
       </>
 
-      {((job?.processLocation?.type === "PITCHDECK" 
-      || job?.processLocation?.type === "BROCHURE"  
+      {((job?.processLocation?.type === "PITCHDECK"
+      || job?.processLocation?.type === "BROCHURE"
       || activeTemplateType === JobProcessLocationType.Pitchdeck
-      || activeTemplateType === JobProcessLocationType.Brochure) 
+      || activeTemplateType === JobProcessLocationType.Brochure)
       && (isInEditing
         || (form.watch('useRembg') === 0
           && form.watch('useWebsiteUrl') === 0
@@ -378,6 +372,7 @@ const AutodeckForm = ({
         </>
       }
 
+      {/* If not removing background, not processing website screenshot, and not colour palette, then show fields */}
       {(isInEditing
         || (form.watch('useRembg') === 0
           && form.watch('useWebsiteUrl') === 0
@@ -455,7 +450,6 @@ const AutodeckForm = ({
           </FormSection>
         </>
       }
-
 
       <ButtonGroup>
         <Button

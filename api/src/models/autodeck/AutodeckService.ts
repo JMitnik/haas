@@ -129,6 +129,52 @@ class AutodeckService {
     return mappedKeyValuePairs
   }
 
+  static usesAdjustedLogo = async (id: string) => {
+    const params = {
+      Bucket: 'haas-autodeck-logos',
+      Prefix: `${id}/`
+    };
+  
+    return await new Promise((resolve, reject) => {
+      s3.listObjectsV2(params, (err, data) => {
+        if (err) return reject(err);
+        const fileWithAdjusted = data.Contents?.find((file) => file.Key?.includes('/adjusted'))
+        if (!fileWithAdjusted) {
+         resolve(false)
+        }
+        resolve(true);
+      })
+    });
+  }
+  
+
+  static retryJob = async (jobId: string) => {
+    const updatedWorkspaceJob = await prisma.createWorkspaceJob.update({
+      where: {
+        id: jobId,
+      },
+      data: {
+        status: 'IN_PHOTOSHOP_QUEUE'
+      },
+      include: {
+        processLocation: true,
+      }
+    });
+    const usesAdjustedLogo = await AutodeckService.usesAdjustedLogo(jobId);
+    console.log('usesAdjustedLogo: ', usesAdjustedLogo)
+    const photoshopInput = { jobId, usesAdjustedLogo, rootFolder: updatedWorkspaceJob.processLocation.path };
+    const strEvent = JSON.stringify(photoshopInput, null, 2);
+    const sNSParams = {
+      Message: strEvent,
+      // TODO: Track this as dependency
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel"
+    }
+    sns.publish(sNSParams, (err, data) => {
+      if (err) console.log('ERROR: ', err);
+    });
+    return updatedWorkspaceJob;
+  }
+
   static confirmWorkspaceJob = async (input: NexusGenInputs['GenerateAutodeckInput'], userId?: string) => {
     const csvData = { 'colour-0': input.primaryColour };
     const csv = papaparse.unparse([csvData]);
@@ -163,10 +209,10 @@ class AutodeckService {
 
     const processLocationId = updatedWorkspaceJob.jobProcessLocationId
     await AutodeckService.addNewCustomFieldsToTemplate(input, processLocationId)
-    
+
     const mappedCustomFields = AutodeckService.generateKeyValuePair(input)
 
-    const pitchdeckData: any = { 
+    const pitchdeckData: any = {
       ...mappedCustomFields,
       rootPath: updatedWorkspaceJob.processLocation.path,
       // companyName: input.companyName || 'Company X',
@@ -182,7 +228,7 @@ class AutodeckService {
       // emailContent: input.emailContent || '',
       // textMessage: input.textMessage || '',
     };
-    
+
 
     const pitchdeckCSV = papaparse.unparse([pitchdeckData]);
     const pitchdeckCSVPath = `${input.id}/pitchdeck_input.csv`;
@@ -192,6 +238,7 @@ class AutodeckService {
     const strEvent = JSON.stringify(photoshopInput, null, 2);
     const sNSParams = {
       Message: strEvent,
+      // TODO: Track this as dependency
       TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel"
     }
     sns.publish(sNSParams, (err, data) => {
@@ -202,7 +249,7 @@ class AutodeckService {
       try {
         if (!updatedWorkspaceJob.name || !input.primaryColour || !input.slug) throw 'No unsufficent input data to generate workspace'
         const workspaceInput: NexusGenInputs['CreateWorkspaceInput'] = {
-          name: updatedWorkspaceJob.name, 
+          name: updatedWorkspaceJob.name,
           primaryColour: input.primaryColour,
           slug: input.slug,
           isSeed: true,
@@ -213,10 +260,7 @@ class AutodeckService {
       } catch (e) {
         console.log('Something went wrong: ', e)
       }
-
     }
-
-
 
     return updatedWorkspaceJob;
   }
@@ -326,10 +370,10 @@ class AutodeckService {
     }
 
     if (input.requiresRembg || input.requiresColorExtraction) {
-      console.log('going to run lamba for logo manipulation');
       const fileKey = input?.logoUrl?.split('.com/')[1]
       const logoManipulationEvent = {
         key: fileKey,
+        // TODO: Track this as dependency
         bucket: 'haas-autodeck-logos',
         requiresRembg: input.requiresRembg,
         requiresScreenshot: input.requiresWebsiteScreenshot,
@@ -338,6 +382,7 @@ class AutodeckService {
       const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
       const logoManipulationSNSParams = {
         Message: strLogoManipulationEvent,
+        // TODO: Track this as dependency
         TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
       }
       sns.publish(logoManipulationSNSParams, (err, data) => {
@@ -346,9 +391,9 @@ class AutodeckService {
     }
 
     if (input.requiresWebsiteScreenshot) {
-      console.log('going to run lamba for website screenshot');
       const screenshotEvent: ScreenshotProps = {
         websiteUrl: input.websiteUrl || '',
+        // TODO: Track this as dependency
         bucket: 'haas-autodeck-logos',
         jobId: input.id || '',
         requiresRembg: input.requiresRembg,
@@ -358,6 +403,7 @@ class AutodeckService {
       const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
       const screenshotSNSParams = {
         Message: strScreenshotEvent,
+        // TODO: Track this as dependency
         TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
       };
       sns.publish(screenshotSNSParams, (err, data) => {

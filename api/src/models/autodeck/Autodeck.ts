@@ -19,7 +19,7 @@ export const CustomFieldType = objectType({
     t.string('value', { nullable: true })
     t.string('jobProcessLocationId')
   }
-})
+});
 
 export const JobProcessLocation = objectType({
   name: 'JobProcessLocation',
@@ -202,7 +202,7 @@ export const GenerateAutodeckInput = inputObjectType({
     // Generate workspace
     t.string('slug', { required: false });
     t.boolean('isGenerateWorkspace', { required: false });
-    
+
     t.list.field('standardFields', {
       type: CustomFieldInputType,
     })
@@ -241,10 +241,10 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       return null;
     }
     const jobInput = {
-      id: input.id, 
-      name: input.name, 
-      websiteUrl: input.website, 
-      logoUrl: input.logo, 
+      id: input.id,
+      name: input.name,
+      websiteUrl: input.website,
+      logoUrl: input.logo,
       requiresRembg: input.requiresRembgLambda,
       requiresWebsiteScreenshot: input.requiresWebsiteScreenshot,
       requiresColorExtraction: input.requiresColorExtraction,
@@ -252,8 +252,25 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       jobLocationId: input.jobLocationId,
     }
 
-    console.log('Job input: ', jobInput);
     const job = await AutodeckService.createWorkspaceJob(jobInput);
+
+    return job ? job as any : null;
+  },
+});
+
+export const RetryAutodeckJobMutation = mutationField('retryAutodeckJob', {
+  type: CreateWorkspaceJobType,
+  nullable: true,
+  args: { jobId: 'String' },
+
+  async resolve(parent, args) {
+    const { jobId } = args;
+
+    if (!jobId) {
+      return null;
+    }
+    
+    const job = await AutodeckService.retryJob(jobId);
 
     return job ? job as any : null;
   },
@@ -380,7 +397,7 @@ export const RemovePixelRangeMutation = mutationField('removePixelRange', {
   args: { input: RemovePixelRangeInput },
   async resolve(parent, args) {
     if (!args.input) return null;
-    
+
     AutodeckService.removePixelRange(args.input)
 
     return { url: 'succesfully start lambda i guess'};
