@@ -21,6 +21,7 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="companyName"
           ref={form.register()}
         />
+        {form.errors.companyName?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.companyName?.message}</span>}
       </FormControl>
 
       <FormControl isInvalid={!!form.errors.answer1} isRequired>
@@ -32,6 +33,7 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="answer1"
           ref={form.register()}
         />
+        {form.errors.answer1?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.answer1?.message}</span>}
       </FormControl>
 
       <FormControl isInvalid={!!form.errors.answer2} isRequired>
@@ -43,6 +45,7 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="answer2"
           ref={form.register()}
         />
+        {form.errors.answer2?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.answer2?.message}</span>}
       </FormControl>
 
       <FormControl isInvalid={!!form.errors.answer3} isRequired>
@@ -54,6 +57,7 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="answer3"
           ref={form.register()}
         />
+        {form.errors.answer3?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.answer3?.message}</span>}
       </FormControl>
 
       <FormControl isInvalid={!!form.errors.answer4} isRequired>
@@ -65,6 +69,7 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="answer4"
           ref={form.register()}
         />
+        {form.errors.answer4?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.answer4?.message}</span>}
       </FormControl>
 
       <FormControl isInvalid={!!form.errors.sorryAboutX} isRequired>
@@ -76,6 +81,7 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="sorryAboutX"
           ref={form.register()}
         />
+        {form.errors.sorryAboutX?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.sorryAboutX?.message}</span>}
       </FormControl>
 
       <FormControl isInvalid={!!form.errors.youLoveX} isRequired>
@@ -87,6 +93,7 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="youLoveX"
           ref={form.register()}
         />
+        {form.errors.youLoveX?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.youLoveX?.message}</span>}
       </FormControl>
 
       <FormControl isInvalid={!!form.errors.reward} isRequired>
@@ -98,6 +105,7 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="reward"
           ref={form.register()}
         />
+        {form.errors.reward?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.reward?.message}</span>}
       </FormControl>
 
       <FormControl isInvalid={!!form.errors.emailContent} isRequired>
@@ -109,6 +117,7 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="emailContent"
           ref={form.register()}
         />
+        {form.errors.emailContent?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.emailContent?.message}</span>}
       </FormControl>
 
       <FormControl isInvalid={!!form.errors.textMessage} isRequired>
@@ -120,6 +129,7 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="textMessage"
           ref={form.register()}
         />
+        {form.errors.textMessage?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.textMessage?.message}</span>}
       </FormControl>
     </>
   );

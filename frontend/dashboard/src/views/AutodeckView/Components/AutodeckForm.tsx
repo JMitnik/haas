@@ -327,9 +327,9 @@ const AutodeckForm = ({
                     // eslint-disable-next-line jsx-a11y/anchor-is-valid
                     leftEl={<Link />}
                     name="firstName"
-                    // isInvalid={!!form.errors.logo}
                     ref={form.register()}
                   />
+                  {form.errors.firstName?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.firstName?.message}</span>}
                 </FormControl>
                 <PitchdeckFragment form={form} />
               </InputGrid>
@@ -390,6 +390,9 @@ const AutodeckForm = ({
             <Div>
               <InputGrid>
                 {fields.map((customField, index) => {
+                  const error: any = form.errors.customFields?.[index]
+                  const errorTwo = error?.value?.message
+                  console.log('err: ', error, 'errTwo: ', errorTwo)
                   return (
                     <>
                       <input type="hidden" name={`customFields[${index}].key`} defaultValue={fields[index]?.key} ref={form.register()} />
@@ -405,6 +408,7 @@ const AutodeckForm = ({
                           ref={form.register()}
                         />
                       </FormControl>
+                      {errorTwo && <span style={{ marginTop: '5px', color: 'red' }}>{errorTwo}</span>}
                     </>
                   )
                 })}
@@ -412,6 +416,7 @@ const AutodeckForm = ({
                 {newCustomFields.map((newCustomField, index) => {
                   const error: any = form.errors.newCustomFields?.[index]
                   const errorTwo = error?.key?.message
+                  const errorValue = error?.value?.message
                   return (
                     <Div key={newCustomField.arrayKey} position="relative" borderBottom="1px solid #4f5d6e" borderTop="1px solid #4f5d6e" padding="1em 0">
                       <Div marginBottom="24px">
@@ -424,7 +429,7 @@ const AutodeckForm = ({
                           <Input
                             // eslint-disable-next-line jsx-a11y/anchor-is-valid
                             leftEl={<Link />}
-                            name={`newCustomFields[${index}].key`}
+                            name={`newCustomFields[${index}].key`} // TODO: CHeck this newCustomFields[${index}].value
                             ref={form.register()}
                           />
                           {errorTwo && <span style={{ marginTop: '5px', color: 'red' }}>{errorTwo}</span>}
@@ -439,6 +444,7 @@ const AutodeckForm = ({
                           name={`newCustomFields[${index}].value`}
                           ref={form.register({ required: false })}
                         />
+                        {errorValue && <span style={{ marginTop: '5px', color: 'red' }}>{errorValue}</span>}
                       </FormControl>
                     </Div>
                   )
