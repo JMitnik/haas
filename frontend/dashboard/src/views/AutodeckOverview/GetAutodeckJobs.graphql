@@ -1,0 +1,34 @@
+query getAutodeckJobs($filter: PaginationWhereInput) {
+  getAutodeckJobs(filter: $filter) {
+    jobs {
+      id
+      name
+      createdAt
+      updatedAt
+      referenceId
+      errorMessage
+      message
+      status
+      resourcesUrl
+      referenceType
+      requiresColorExtraction
+      requiresRembg
+      requiresScreenshot
+      processLocation {
+        id
+        name
+        path
+        type
+        customFields {
+          id
+          key
+          value
+        }
+      }
+    }
+    pageInfo {
+      nrPages
+      pageIndex
+    }
+  }
+}

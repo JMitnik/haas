@@ -1,0 +1,5 @@
+  mutation whitifyImage($input: AdjustedImageInput) {
+    whitifyImage(input: $input) {
+        url
+    }
+  }

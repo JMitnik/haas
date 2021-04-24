@@ -1,0 +1,5 @@
+  query getAdjustedLogo($input: AdjustedImageInput) {
+    getAdjustedLogo(input: $input) {
+        url
+    }
+  }

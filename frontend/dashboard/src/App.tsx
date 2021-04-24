@@ -7,11 +7,13 @@ import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-d
 import React, { FC } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
+import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DefaultThemeProviders } from 'providers/ThemeProvider';
 import { DialogueProvider } from 'providers/DialogueProvider';
 import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/globalTypes';
 import ActionsPage from 'pages/dashboard/actions';
+import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview'
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
@@ -49,7 +51,6 @@ import UsersOverview from 'views/UsersOverview/UsersOverview';
 import VerifyTokenPage from 'pages/verify_token';
 import client from 'config/apollo';
 import lang from 'config/i18n-config';
-import { CampaignView } from 'views/CampaignView/CampaignView';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
@@ -231,6 +232,12 @@ const AppRoutes = () => (
       <Route
         path="/dashboard/b/:customerSlug"
         render={() => <CustomerRoutes />}
+      />
+
+      <GuardedRoute
+        allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
+        path={ROUTES.AUTODECK_OVERVIEW}
+        render={() => <AutodeckOverview />}
       />
 
       <GuardedRoute

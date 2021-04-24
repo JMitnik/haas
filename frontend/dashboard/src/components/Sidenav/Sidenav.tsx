@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, useToast } from '@chakra-ui/core';
 import { Div, Flex, Text } from '@haas/ui';
-import { ExternalLink, LogOut } from 'react-feather';
+import { ExternalLink, LogOut, Book } from 'react-feather';
 import { Link, LinkProps, NavLink, useHistory } from 'react-router-dom';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -148,6 +148,10 @@ export const UsernavDropdown = () => {
     history.push('/dashboard');
   };
 
+  const goToAutodeckOverview = () => {
+    history.push('/dashboard/autodeck-overview');
+  };
+
   const switchToGerman = () => {
     i18n.changeLanguage('de');
     localStorage.setItem('language', 'de');
@@ -210,6 +214,11 @@ export const UsernavDropdown = () => {
         </Div>
       </ListItem>
       <Div>
+      {((canAccessAdmin) && (
+          <ListItem renderLeftIcon={<Book />} onClick={goToAutodeckOverview}>
+            <Text>Autodeck Overview</Text>
+          </ListItem>
+        ))}
         <ListItem onClick={switchToEnglish}>
           <Text>
             {t('english')}

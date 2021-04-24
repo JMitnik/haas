@@ -1,0 +1,14 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateEnum",
+      "enum": "JobStatusType",
+      "createdValues": [
+        "TRANSFORMING_PSDS_TO_PNGS",
+        "STITCHING_SLIDES",
+        "COMPRESSING_SALES_MATERIAL"
+      ]
+    }
+  ]
+}

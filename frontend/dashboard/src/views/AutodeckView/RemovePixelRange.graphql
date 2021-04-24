@@ -1,0 +1,5 @@
+  mutation removePixelRange($input: RemovePixelRangeInput) {
+    removePixelRange(input: $input) {
+        url
+    }
+  }

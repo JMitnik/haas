@@ -1,0 +1,7 @@
+  mutation retryAutodeckJob($jobId: String) {
+    retryAutodeckJob(jobId: $jobId) {
+      id
+      name
+      status
+    }
+  }

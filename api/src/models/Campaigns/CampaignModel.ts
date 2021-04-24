@@ -3,7 +3,6 @@ import { ApolloError } from 'apollo-server';
 import { CustomerType } from '../customer/Customer';
 import { DialogueType } from '../questionnaire/Dialogue';
 
-
 export const CampaignVariantEnum = enumType({
   name: 'CampaignVariantEnum',
 
