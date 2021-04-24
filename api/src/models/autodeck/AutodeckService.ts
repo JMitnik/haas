@@ -23,7 +23,11 @@ type ScreenshotProps = {
   requiresColorExtraction: boolean | null | undefined;
 };
 
-const s3 = new AWS.S3({ accessKeyId: config.autodeckAwsAccessKeyId, secretAccessKey: config.autodeckAwsSecretAccessKey, region: 'eu-central-1' });
+const s3 = new AWS.S3({
+  accessKeyId: config.autodeckAwsAccessKeyId,
+  secretAccessKey: config.autodeckAwsSecretAccessKey,
+  region: 'eu-central-1'
+});
 const sns = new AWS.SNS({
   region: 'eu-central-1',
   accessKeyId: config.autodeckAwsAccessKeyId,
@@ -139,7 +143,7 @@ class AutodeckService {
       Bucket: 'haas-autodeck-logos',
       Prefix: `${id}/`
     };
-  
+
     return await new Promise((resolve, reject) => {
       s3.listObjectsV2(params, (err, data) => {
         if (err) return reject(err);
@@ -151,7 +155,7 @@ class AutodeckService {
       })
     });
   }
-  
+
 
   static retryJob = async (jobId: string) => {
     const updatedWorkspaceJob = await prisma.createWorkspaceJob.update({
