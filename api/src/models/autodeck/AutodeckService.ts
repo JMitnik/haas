@@ -9,7 +9,7 @@ import request from 'request';
 import config from '../../config/config';
 import prisma from '../../config/prisma';
 import { NexusGenInputs } from '../../generated/nexus';
-import { FindManyTriggerArgs } from '@prisma/client';
+import { FindManyCreateWorkspaceJobArgs } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import CustomerService from '../customer/CustomerService';
 
@@ -74,17 +74,22 @@ class AutodeckService {
   static paginatedAutodeckJobs = async (
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const findManyTriggerArgs: FindManyTriggerArgs = {
+    const findManyTriggerArgs: FindManyCreateWorkspaceJobArgs = {
       where: {
         id: {
           not: undefined
         }
       },
+      orderBy: {
+        updatedAt: 'desc'
+      }
     };
 
     const findManyTriggers = async (
       { props: findManyArgs }: FindManyCallBackProps,
-    ) => prisma.createWorkspaceJob.findMany(findManyArgs);
+    ) => {
+      return prisma.createWorkspaceJob.findMany(findManyArgs)
+    };
 
     const countTriggers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.createWorkspaceJob.count(countArgs);
 
@@ -92,7 +97,7 @@ class AutodeckService {
       findManyArgs: {
         findArgs: findManyTriggerArgs,
         searchFields: ['name'],
-        orderFields: ['medium', 'type', 'name'],
+        orderFields: ['updatedAt'],
         findManyCallBack: findManyTriggers,
       },
       countArgs: {
