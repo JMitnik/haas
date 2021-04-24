@@ -2011,7 +2011,7 @@ export type RequestInviteMutation = (
   { __typename?: 'Mutation' }
   & { requestInvite: (
     { __typename?: 'RequestInviteOutput' }
-    & Pick<RequestInviteOutput, 'didInvite'>
+    & Pick<RequestInviteOutput, 'didInvite' | 'userExists'>
   ) }
 );
 
@@ -2649,6 +2649,7 @@ export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {
     didInvite
+    userExists
   }
 }
     `;
