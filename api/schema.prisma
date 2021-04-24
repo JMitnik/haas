@@ -190,7 +190,7 @@ model SliderNode {
   markers      SliderNodeMarker[]
   QuestionNode QuestionNode[]
 
-  earlyReleaseText  String?
+  earlyReleaseText String?
 }
 
 model QuestionNode {
@@ -221,7 +221,7 @@ model QuestionNode {
 
   QuestionOption   QuestionOption[] @relation("QuestionNodeOptions")
   triggers         Trigger[]
-  overridesChoices QuestionOption[]   @relation("ChoiceCTANode")
+  overridesChoices QuestionOption[] @relation("ChoiceCTANode")
 
   // Node-types
   share      Share?
@@ -537,6 +537,87 @@ model QuestionOfTrigger {
   createdAt DateTime @default(now())
 
   @@id([questionId, triggerId])
+}
+
+enum JobType {
+  CREATE_WORKSPACE_JOB
+}
+
+model Job {
+  id                   String              @id @default(cuid())
+  createdAt            DateTime?           @default(now())
+  updatedAt            DateTime?           @updatedAt
+  type                 JobType
+  createWorkspaceJob   CreateWorkspaceJob? @relation(references: [id], fields: [createWorkspaceJobId])
+  createWorkspaceJobId String?
+}
+
+enum CloudReferenceType {
+  AWS
+  GCP
+  Azure
+  IBM
+}
+
+enum JobStatusType {
+  PRE_PROCESSING
+  PRE_PROCESSING_LOGO
+  PRE_PROCESSING_WEBSITE_SCREENSHOT
+  READY_FOR_PROCESSING
+  IN_PHOTOSHOP_QUEUE
+  PHOTOSHOP_PROCESSING
+  PROCESSING
+  WRAPPING_UP
+  PENDING
+  COMPLETED
+  FAILED
+  TRANSFORMING_PSDS_TO_PNGS
+  STITCHING_SLIDES
+  COMPRESSING_SALES_MATERIAL
+}
+
+model JobProcessLocation {
+  id                 String                 @id @default(cuid())
+  name               String
+  path               String
+  xMaterialDimension Int                    @default(0)
+  yMaterialDimension Int                    @default(0)
+  type               JobProcessLocationType
+  job                CreateWorkspaceJob[]
+  fields             CustomField[]
+}
+
+model CustomField {
+  id                   String             @id @default(cuid())
+  key                  String
+  value                String
+  jobProcessLocation   JobProcessLocation @relation(fields: [jobProcessLocationId], references: [id])
+  jobProcessLocationId String
+}
+
+enum JobProcessLocationType {
+  ONE_PAGER
+  PITCHDECK
+  BROCHURE
+}
+
+model CreateWorkspaceJob {
+  id                      String             @id @default(cuid())
+  createdAt               DateTime?          @default(now())
+  updatedAt               DateTime?          @updatedAt
+  name                    String?
+  referenceId             String?
+  message                 String?
+  errorMessage            String?
+  referenceType           CloudReferenceType
+  status                  JobStatusType      @default(PENDING)
+  resourcesUrl            String?
+  requiresRembg           Boolean            @default(true)
+  requiresScreenshot      Boolean            @default(true)
+  requiresColorExtraction Boolean            @default(true)
+  Job                     Job
+  processLocation         JobProcessLocation @relation(fields: [jobProcessLocationId], references: [id])
+  jobProcessLocationId    String
 }
 
 // Campaigns

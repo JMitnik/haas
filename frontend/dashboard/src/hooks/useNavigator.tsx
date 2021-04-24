@@ -6,6 +6,7 @@ export const ROUTES = {
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
   CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
+  AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
 };
 
 interface DashboardParams {

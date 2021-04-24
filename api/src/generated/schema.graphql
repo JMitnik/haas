@@ -2,12 +2,35 @@
 ### Do not make changes to this file directly
 
 
+input AdjustedImageInput {
+  bucket: String
+  id: String
+  key: String
+  reset: Boolean
+}
+
 """Append new data to an uploaded session"""
 input AppendToInteractionInput {
   data: NodeEntryDataInput
   edgeId: String
   nodeId: String
   sessionId: ID
+}
+
+type AutodeckConnectionType implements ConnectionInterface {
+  endDate: String
+  jobs: [CreateWorkspaceJobType!]!
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
+  startDate: String
+}
+
+type AWSImageType {
+  encoding: String
+  filename: String
+  mimetype: String
+  url: String
 }
 
 """Campaign"""
@@ -39,6 +62,13 @@ type CampaignVariantType {
 """Input type for a choice node"""
 input ChoiceNodeEntryInput {
   value: String
+}
+
+enum CloudReferenceType {
+  AWS
+  Azure
+  GCP
+  IBM
 }
 
 type ColourSettings {
@@ -132,6 +162,20 @@ input CreateWorkspaceInput {
   primaryColour: String!
   slug: String!
   willGenerateFakeData: Boolean = false
+}
+
+type CreateWorkspaceJobType {
+  createdAt: String!
+  id: String!
+  name: String!
+  referenceId: String
+  referenceType: CloudReferenceType!
+  requiresColorExtraction: Boolean!
+  requiresRembg: Boolean!
+  requiresScreenshot: Boolean!
+  resourcesUrl: String
+  status: JobStatusType!
+  updatedAt: String
 }
 
 input CTALinkInputObjectType {
@@ -416,6 +460,30 @@ type FormNodeType {
   id: String
 }
 
+"""Generate sales documents"""
+input GenerateAutodeckInput {
+  answer1: String
+  answer2: String
+  answer3: String
+  answer4: String
+  companyName: String
+  emailContent: String
+  firstName: String
+  id: String!
+  logo: String
+  name: String
+  primaryColour: String
+  requiresColorExtraction: Boolean!
+  requiresRembgLambda: Boolean!
+  requiresWebsiteScreenshot: Boolean!
+  reward: String
+  sorryAboutX: String
+  textMessage: String
+  usesAdjustedLogo: Boolean!
+  website: String
+  youLoveX: String
+}
+
 input GetCampaignsInput {
   customerSlug: String
 }
@@ -436,6 +504,28 @@ input InviteUserInput {
 type InviteUserOutput {
   didAlreadyExist: Boolean!
   didInvite: Boolean!
+}
+
+type JobObjectType {
+  createdAt: String!
+  createWorkspaceJob: CreateWorkspaceJobType
+  createWorkspaceJobId: String!
+  id: String!
+  updatedAt: String!
+}
+
+enum JobStatusType {
+  COMPLETED
+  FAILED
+  IN_PHOTOSHOP_QUEUE
+  PENDING
+  PHOTOSHOP_PROCESSING
+  PRE_PROCESSING
+  PRE_PROCESSING_LOGO
+  PRE_PROCESSING_WEBSITE_SCREENSHOT
+  PROCESSING
+  READY_FOR_PROCESSING
+  WRAPPING_UP
 }
 
 type lineChartDataType {
@@ -480,6 +570,7 @@ type LoginOutput {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
   createCampaign(input: CreateCampaignInputType): CampaignType!
@@ -506,6 +597,7 @@ type Mutation {
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
+  generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
 
   """Invite a user to a particular customer domain, given an email and role"""
   inviteUser(input: InviteUserInput): InviteUserOutput!
@@ -513,17 +605,22 @@ type Mutation {
   """Logs a user out by removing their refresh token"""
   logout: String!
   register(input: RegisterInput): String
+  removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   singleUpload(file: Upload): ImageType!
+  updateCreateWorkspaceJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
+  updateJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
+  uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
 
   """
   Given a token, checks in the database whether token has been set and has not expired yet
   """
   verifyUserToken(token: String): VerifyUserTokenOutput!
+  whitifyImage(input: AdjustedImageInput): AWSImageType
 }
 
 type NodeEntry {
@@ -644,6 +741,12 @@ type PermssionType {
   name: String!
 }
 
+type PreviewDataType {
+  colors: [String!]!
+  rembgLogoUrl: String!
+  websiteScreenshotUrl: String!
+}
+
 type Query {
   customer(id: ID, slug: String): Customer
   customers: [Customer!]!
@@ -651,6 +754,10 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
+  getAdjustedLogo(input: AdjustedImageInput): AWSImageType
+  getAutodeckJobs(filter: PaginationWhereInput): AutodeckConnectionType!
+  getJob(id: String): CreateWorkspaceJobType
+  getPreviewData(id: String): PreviewDataType
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   me: UserType!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode
@@ -743,6 +850,15 @@ input RegisterInput {
 """Input type for a register node"""
 input RegisterNodeEntryInput {
   value: String
+}
+
+input RemovePixelRangeInput {
+  blue: Int
+  bucket: String
+  green: Int
+  key: String
+  range: Int
+  red: Int
 }
 
 input RequestInviteInput {
@@ -1020,6 +1136,11 @@ input UpdateQuestionNodeInputType {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+enum UploadImageEnumType {
+  LOGO
+  WEBSITE_SCREENSHOT
+}
 
 type UserConnection implements ConnectionInterface {
   endDate: String

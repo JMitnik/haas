@@ -18,8 +18,9 @@ const getDropColor = (props: any) => {
   return '#eeeeee';
 };
 
-const DropContainer = styled.div`
+const DropContainer = styled.div<{disabled?: boolean}>`
   flex: 1;
+  pointer-events: ${props => props.disabled ? 'none' : 'auto'};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -40,12 +41,12 @@ const UploadPreviewContainer = styled(Div)`
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
     height: 100%;
     display: flex;
-    background: ${theme.colors.primaries[500]};
+    background: transparent;
     padding: ${theme.gutter / 2}px;
     
     img {
-      max-width: 150px;
-      max-height: 150px;
+      max-width: 800px;
+      max-height: 400px;
       border-radius: 10px;
       height: 100%;
       width: 100%;
@@ -55,7 +56,7 @@ const UploadPreviewContainer = styled(Div)`
 `;
 
 const FileDropInput = (props: any) => {
-  const { onDrop, isLoading, value } = props;
+  const { onDrop, isLoading, value, isInEditing } = props;
 
   const {
     acceptedFiles,
@@ -77,7 +78,7 @@ const FileDropInput = (props: any) => {
   return (
     <section className="container">
       {/* @ts-ignore */}
-      <DropContainer {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
+      <DropContainer disabled={isInEditing} {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
         {value && (
           <UploadPreviewContainer mb={2}>
             <Div>
