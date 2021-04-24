@@ -1,12 +1,13 @@
 import * as UI from '@haas/ui';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { Plus, Download, RefreshCcw } from 'react-feather';
+import { Plus, Download, RefreshCcw, ArrowLeft } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
 import { PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation, JobStatusType, useRetryAutodeckJobMutation } from 'types/generated-types';
 import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
 import { ProcessingStatus, DateLabel } from './Components';
+import { useHistory } from 'react-router';
 
 export const paginationFilter: PaginationWhereInput = {
   limit: 5,
@@ -30,6 +31,7 @@ export const AutodeckOverview = () => {
   const [isOpenDetailModel, setIsOpenDetailModel] = useState(false);
   const [activeJob, setActiveJob] = useState<DeepPartial<CreateWorkspaceJobType> | null>(null);
   const { t } = useTranslation();
+  const history = useHistory();
 
   const [paginationState, setPaginationState] = useState(paginationFilter);
 
@@ -89,6 +91,9 @@ export const AutodeckOverview = () => {
       <UI.ViewHeading>
         <UI.Stack>
           <UI.Stack isInline alignItems="center" spacing={4}>
+            <UI.Div style={{ cursor: 'pointer' }} onClick={() => history.goBack()}>
+              <ArrowLeft />
+            </UI.Div>
             <UI.PageTitle>{'Autodeck overview'}</UI.PageTitle>
             <UI.Button
               leftIcon={Plus}
