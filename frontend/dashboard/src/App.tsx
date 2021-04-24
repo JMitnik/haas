@@ -235,7 +235,7 @@ const AppRoutes = () => (
       />
 
       <GuardedRoute
-        // allowedPermission={SystemPermission.CAN_CREATE_DELIVERIES}
+        allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
         path={ROUTES.AUTODECK_OVERVIEW}
         render={() => <AutodeckOverview />}
       />
