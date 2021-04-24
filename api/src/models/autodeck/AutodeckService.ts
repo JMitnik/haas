@@ -463,7 +463,7 @@ class AutodeckService {
       .pipe(new StringStream())
       .CSVParse({ delimiter: ',' })
       .toArray()
-      .catch((err) => {
+      .catch((err: any) => {
         console.log('Something went wrong retrieving dominant colors CSV: ', err)
         return [];
       })
@@ -540,8 +540,9 @@ class AutodeckService {
     return new Promise((resolve, reject) => {
       archive
         .directory(source, false)
-        .on('error', (err) => reject(err))
+        .on('error', (err: any) => reject(err))
         .pipe(stream);
+      // @ts-ignore
       stream.on('close', () => resolve());
       archive.finalize();
     });
