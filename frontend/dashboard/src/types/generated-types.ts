@@ -613,12 +613,12 @@ export type Mutation = {
   createSession: Session;
   appendToInteraction: Session;
   deleteQuestion: QuestionNode;
-  updateQuestion: QuestionNode;
   createQuestion?: Maybe<QuestionNode>;
   deleteCTA: QuestionNode;
   /** Create Call to Actions */
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
+  updateQuestion: QuestionNode;
   debugMutation?: Maybe<Scalars['String']>;
 };
 
@@ -790,11 +790,6 @@ export type MutationDeleteQuestionArgs = {
 };
 
 
-export type MutationUpdateQuestionArgs = {
-  input?: Maybe<UpdateQuestionNodeInputType>;
-};
-
-
 export type MutationCreateQuestionArgs = {
   input?: Maybe<CreateQuestionNodeInputType>;
 };
@@ -812,6 +807,11 @@ export type MutationCreateCtaArgs = {
 
 export type MutationUpdateCtaArgs = {
   input?: Maybe<UpdateCtaInputType>;
+};
+
+
+export type MutationUpdateQuestionArgs = {
+  input?: Maybe<UpdateQuestionNodeInputType>;
 };
 
 export type NodeEntry = {
@@ -857,6 +857,7 @@ export type OptionInputType = {
   id?: Maybe<Scalars['Int']>;
   value?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
+  overrideLeafId?: Maybe<Scalars['String']>;
 };
 
 export type OptionsInputType = {
@@ -1110,6 +1111,7 @@ export type QuestionOption = {
   value: Scalars['String'];
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
+  overrideLeaf?: Maybe<QuestionNode>;
 };
 
 export type RecipientsInputType = {
@@ -1412,7 +1414,7 @@ export type UpdateCtaInputType = {
 };
 
 export type UpdateQuestionNodeInputType = {
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   customerId?: Maybe<Scalars['ID']>;
   overrideLeafId?: Maybe<Scalars['ID']>;
   edgeId?: Maybe<Scalars['ID']>;
@@ -1605,7 +1607,7 @@ export type RequestInviteMutation = (
   { __typename?: 'Mutation' }
   & { requestInvite: (
     { __typename?: 'RequestInviteOutput' }
-    & Pick<RequestInviteOutput, 'didInvite'>
+    & Pick<RequestInviteOutput, 'didInvite' | 'userExists'>
   ) }
 );
 
@@ -1858,6 +1860,7 @@ export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {
     didInvite
+    userExists
   }
 }
     `;
