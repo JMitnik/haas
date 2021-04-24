@@ -8,9 +8,10 @@ import { PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, Cr
 import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
 import { ProcessingStatus, DateLabel } from './Components';
 import { useHistory } from 'react-router';
+import styled, { css } from 'styled-components';
 
 export const paginationFilter: PaginationWhereInput = {
-  limit: 5,
+  limit: 15,
   startDate: undefined,
   endDate: undefined,
   pageIndex: 0,
@@ -22,6 +23,22 @@ export const paginationFilter: PaginationWhereInput = {
     },
   ],
 };
+
+const BackButtonContainer = styled(UI.Div)`
+  cursor: pointer;
+  ${({ theme }) => css`
+    
+    color: ${theme.colors.gray[600]};
+    svg {
+      width: 32px;
+      height: auto;
+    }
+
+    :hover {
+      color: ${theme.colors.gray[900]};
+    }
+  `}
+`
 
 const POLL_INTERVAL_SECONDS = 20;
 const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
@@ -91,9 +108,9 @@ export const AutodeckOverview = () => {
       <UI.ViewHeading>
         <UI.Stack>
           <UI.Stack isInline alignItems="center" spacing={4}>
-            <UI.Div style={{ cursor: 'pointer' }} onClick={() => history.goBack()}>
+            <BackButtonContainer onClick={() => history.goBack()}>
               <ArrowLeft />
-            </UI.Div>
+            </BackButtonContainer>
             <UI.PageTitle>{'Autodeck overview'}</UI.PageTitle>
             <UI.Button
               leftIcon={Plus}
