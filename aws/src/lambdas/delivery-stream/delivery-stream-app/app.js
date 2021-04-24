@@ -6,6 +6,8 @@ const sesClient = new AWS.SES();
 const snsClient = new AWS.SNS();
 const sqsClient = new AWS.SQS();
 
+const accountId = '649621042808';
+
 snsClient.setSMSAttributes({
   attributes: {
     DefaultSMSType: 'Transactional',
@@ -21,18 +23,18 @@ exports.lambdaHandler = async (event, context, callback) => {
       oldStatus: record.dynamodb.OldImage.DeliveryStatus.S,
       newStatus: record.dynamodb.NewImage.DeliveryStatus.S,
     }));
-    
+
     const sharedCallbackUrl = event.Records[0].dynamodb.NewImage.callback.S;
-    
+
     try {
       await sendToCallbackUrl(sharedCallbackUrl, updates);
     } catch(error) {
       console.error(`Unable to send update to callback url at ${sharedCallbackUrl}. Will still send SMS`);
     }
-    
+
     await Promise.all(event.Records.map((record) => {
       const row = record.dynamodb.NewImage;
-      
+
       if (
         record.eventName === 'MODIFY'
           && record.dynamodb.NewImage.DeliveryStatus.S !== record.dynamodb.OldImage.DeliveryStatus.S
@@ -50,6 +52,11 @@ exports.lambdaHandler = async (event, context, callback) => {
           );
 
         } else if (row.DeliveryType.S === 'SMS') {
+          // return sendSNSMessage(
+          //   row.DeliveryRecipient.S,
+          //   row.DeliveryBody.S,
+          //   row.DeliveryDate_DeliveryID.S
+          // );
           return sendRecordSMS(
             row.DeliveryRecipient.S,
             row.DeliveryBody.S
@@ -93,6 +100,12 @@ const sendRecordSMS = (
   body,
 ) => {
   return snsClient.publish({
+    MessageAttributes: {
+      'AWS.SNS.SMS.SenderID': {
+        'DataType': 'String',
+        'StringValue': 'haas'
+      }
+    },
     PhoneNumber: recipient,
     Message: body,
   }).promise().catch((err) => {
@@ -103,9 +116,29 @@ const sendRecordSMS = (
   });
 };
 
+const sendSNSMessage = (
+  recipient,
+  body,
+  deliveryId
+) => {
+  return snsClient.publish({
+    TopicArn: `arn:aws:sns:eu-central-1:${accountId}:twilioSMSTopic`,
+    Message: JSON.stringify({
+      PhoneNumber: recipient,
+      body,
+      deliveryId
+    })
+  }).promise().catch((err) => {
+    console.error('Error:', err);
+  }).then((data) => {
+    console.log('Sent SMS!');
+    console.log(data);
+  });
+};
+
 const sendToCallbackUrl = async (callbackUrl, payload) => {
   const {hostname, pathname} = URL.parse(callbackUrl);
-  
+
     return new Promise((resolve, reject) => {
         const req = https.request({
           hostname,

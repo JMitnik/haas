@@ -63,16 +63,18 @@ const SocialShareNode = ({ node, onQueueOnlyStore }: SocialShareNodeProps) => {
   return (
     <SocialShareNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>
-      <Flex justifyContent="center" alignItems="center">
+      <Flex data-testid="shareitems" justifyContent="center" alignItems="center">
         {node.links.length === 0 && <DefaultSocialItems />}
         {node.links.map((link, index) => (
           <ShareItem
+            title={link.title || undefined}
+            data-testid={link.type}
             href={link.url}
             onClick={handleLinkClick}
             target="__blank"
             key={index}
             rel="noopener noreferrer"
-            bg={link.backgroundColor || '#007bb5'}
+            backgroundColor={link.backgroundColor || '#007bb5'}
           >
             {link.type === 'TWITTER' && <Twitter stroke="none" fill="white" />}
             {link.type === 'FACEBOOK' && <Facebook stroke="none" fill="white" />}
@@ -81,7 +83,7 @@ const SocialShareNode = ({ node, onQueueOnlyStore }: SocialShareNodeProps) => {
             {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && link.iconUrl)
               && <CustomIcon logo={link.iconUrl} />}
             {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && !link.iconUrl)
-              && <Globe stroke="white" />}
+              && <Globe data-testid="globe" stroke="white" />}
           </ShareItem>
         ))}
 

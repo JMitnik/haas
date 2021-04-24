@@ -123,8 +123,6 @@ const AddDialogueView = () => {
         position: 'bottom-right',
         isClosable: true,
       });
-      // TODO: Use toast here + Sentry or so?
-      console.log(`Error Name: ${error.name} \n`);
     },
   });
 
