@@ -8,7 +8,6 @@ import * as ecs from '@aws-cdk/aws-ecs';
 import * as route53 from '@aws-cdk/aws-route53';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
-import { TwilioHandlerService } from './lambdas/twilio-handler/twilio-handler-service';
 import { Duration } from '@aws-cdk/core';
 
 
