@@ -1,9 +1,16 @@
 {
-    "compilerOptions": {
-      "allowJs": true,
-      "baseUrl": "../node_modules",
-      "types": ["cypress"],
-      "esModuleInterop": true
-    },
-    "include": ["**/*.*"]
-  }
+  "compilerOptions": {
+      "target": "es5",
+      "lib": [
+          "es5",
+          "dom"
+      ],
+      "types": [
+          "cypress",
+          "@testing-library/cypress",
+      ]
+  },
+  "include": [
+      "**/*.ts"
+  ]
+}

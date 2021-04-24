@@ -20,8 +20,6 @@ const CTA_B_text = /thank you for your feedback on our website./i;
 const secondLayerChoice_noCTA = /informative/i;
 const CTA_0_text = /we are happy about your positive feedback./i;
 
-
-
 // This goes: Neutral => Website/Mobile App => Design (+Choice overrideCTA)
 beforeEach(() => {
   cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {

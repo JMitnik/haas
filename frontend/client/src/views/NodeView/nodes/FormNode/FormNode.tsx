@@ -104,6 +104,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                     <UI.FormControl isRequired={field.isRequired}>
                       <UI.FormLabel htmlFor={`fields[${index}].value`}>{field.label}</UI.FormLabel>
                       <UI.Input
+                        id={`fields[${index}].value`}
                         variant="outline"
                         leftEl={mapIcon[field?.type] || <Type />}
                         type={mapFieldType[field?.type] || 'text'}

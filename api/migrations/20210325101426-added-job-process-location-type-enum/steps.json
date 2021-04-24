@@ -1,0 +1,21 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateEnum",
+      "enum": "JobProcessLocationType",
+      "values": [
+        "ONE_PAGER",
+        "PITCHDECK",
+        "BROCHURE"
+      ]
+    },
+    {
+      "tag": "CreateField",
+      "model": "JobProcessLocation",
+      "field": "type",
+      "type": "JobProcessLocationType",
+      "arity": "Required"
+    }
+  ]
+}

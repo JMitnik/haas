@@ -17,12 +17,37 @@ export type Scalars = {
   Upload: any;
 };
 
+export type AdjustedImageInput = {
+  id?: Maybe<Scalars['String']>;
+  key?: Maybe<Scalars['String']>;
+  bucket?: Maybe<Scalars['String']>;
+  reset?: Maybe<Scalars['Boolean']>;
+};
+
 /** Append new data to an uploaded session */
 export type AppendToInteractionInput = {
   sessionId?: Maybe<Scalars['ID']>;
   nodeId?: Maybe<Scalars['String']>;
   edgeId?: Maybe<Scalars['String']>;
   data?: Maybe<NodeEntryDataInput>;
+};
+
+export type AutodeckConnectionType = ConnectionInterface & {
+  __typename?: 'AutodeckConnectionType';
+  offset: Scalars['Int'];
+  limit: Scalars['Int'];
+  pageInfo: PaginationPageInfo;
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  jobs: Array<CreateWorkspaceJobType>;
+};
+
+export type AwsImageType = {
+  __typename?: 'AWSImageType';
+  filename?: Maybe<Scalars['String']>;
+  mimetype?: Maybe<Scalars['String']>;
+  encoding?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
 };
 
 /** Campaign */
@@ -63,6 +88,13 @@ export type CampaignVariantType = {
 export type ChoiceNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
+
+export enum CloudReferenceType {
+  Aws = 'AWS',
+  Gcp = 'GCP',
+  Azure = 'Azure',
+  Ibm = 'IBM'
+}
 
 export type ColourSettings = {
   __typename?: 'ColourSettings';
@@ -132,6 +164,12 @@ export type CreateDialogueInputType = {
   tags?: Maybe<TagsInputObjectType>;
 };
 
+export type CreateJobProcessLocationInput = {
+  name?: Maybe<Scalars['String']>;
+  path?: Maybe<Scalars['String']>;
+  type?: Maybe<JobProcessLocationType>;
+};
+
 export type CreateQuestionNodeInputType = {
   customerId?: Maybe<Scalars['ID']>;
   overrideLeafId?: Maybe<Scalars['ID']>;
@@ -157,6 +195,24 @@ export type CreateWorkspaceInput = {
   primaryColour: Scalars['String'];
   isSeed?: Maybe<Scalars['Boolean']>;
   willGenerateFakeData?: Maybe<Scalars['Boolean']>;
+};
+
+export type CreateWorkspaceJobType = {
+  __typename?: 'CreateWorkspaceJobType';
+  id: Scalars['String'];
+  createdAt: Scalars['String'];
+  name: Scalars['String'];
+  status: JobStatusType;
+  requiresColorExtraction: Scalars['Boolean'];
+  requiresRembg: Scalars['Boolean'];
+  requiresScreenshot: Scalars['Boolean'];
+  resourcesUrl?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['String']>;
+  referenceId?: Maybe<Scalars['String']>;
+  errorMessage?: Maybe<Scalars['String']>;
+  message?: Maybe<Scalars['String']>;
+  referenceType: CloudReferenceType;
+  processLocation: JobProcessLocation;
 };
 
 export type CtaLinkInputObjectType = {
@@ -232,11 +288,19 @@ export type CustomerWhereUniqueInput = {
   id: Scalars['ID'];
 };
 
-
-export type Debug = {
-  __typename?: 'Debug';
-  debugResolver?: Maybe<Scalars['String']>;
+export type CustomFieldInputType = {
+  key?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
 };
+
+export type CustomFieldType = {
+  __typename?: 'CustomFieldType';
+  id: Scalars['String'];
+  key: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
+  jobProcessLocationId: Scalars['String'];
+};
+
 
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
@@ -511,6 +575,36 @@ export type FormNodeType = {
   fields: Array<FormNodeField>;
 };
 
+/** Generate savales documents */
+export type GenerateAutodeckInput = {
+  id: Scalars['String'];
+  requiresRembgLambda: Scalars['Boolean'];
+  requiresWebsiteScreenshot: Scalars['Boolean'];
+  requiresColorExtraction: Scalars['Boolean'];
+  usesAdjustedLogo: Scalars['Boolean'];
+  jobLocationId?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  website?: Maybe<Scalars['String']>;
+  logo?: Maybe<Scalars['String']>;
+  primaryColour?: Maybe<Scalars['String']>;
+  firstName?: Maybe<Scalars['String']>;
+  companyName?: Maybe<Scalars['String']>;
+  answer1?: Maybe<Scalars['String']>;
+  answer2?: Maybe<Scalars['String']>;
+  answer3?: Maybe<Scalars['String']>;
+  answer4?: Maybe<Scalars['String']>;
+  sorryAboutX?: Maybe<Scalars['String']>;
+  youLoveX?: Maybe<Scalars['String']>;
+  reward?: Maybe<Scalars['String']>;
+  emailContent?: Maybe<Scalars['String']>;
+  textMessage?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
+  isGenerateWorkspace?: Maybe<Scalars['Boolean']>;
+  standardFields?: Maybe<Array<CustomFieldInputType>>;
+  customFields?: Maybe<Array<CustomFieldInputType>>;
+  newCustomFields?: Maybe<Array<CustomFieldInputType>>;
+};
+
 export type GetCampaignsInput = {
   customerSlug?: Maybe<Scalars['String']>;
 };
@@ -534,6 +628,54 @@ export type InviteUserOutput = {
   didInvite: Scalars['Boolean'];
   didAlreadyExist: Scalars['Boolean'];
 };
+
+export type JobObjectType = {
+  __typename?: 'JobObjectType';
+  id: Scalars['String'];
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+  createWorkspaceJobId: Scalars['String'];
+  createWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
+};
+
+export type JobProcessLocation = {
+  __typename?: 'JobProcessLocation';
+  id: Scalars['String'];
+  name: Scalars['String'];
+  path: Scalars['String'];
+  xMaterialDimension: Scalars['Int'];
+  yMaterialDimension: Scalars['Int'];
+  type: JobProcessLocationType;
+  customFields?: Maybe<Array<CustomFieldType>>;
+};
+
+export type JobProcessLocations = {
+  __typename?: 'JobProcessLocations';
+  jobProcessLocations: Array<JobProcessLocation>;
+};
+
+export enum JobProcessLocationType {
+  OnePager = 'ONE_PAGER',
+  Pitchdeck = 'PITCHDECK',
+  Brochure = 'BROCHURE'
+}
+
+export enum JobStatusType {
+  Pending = 'PENDING',
+  PreProcessing = 'PRE_PROCESSING',
+  InPhotoshopQueue = 'IN_PHOTOSHOP_QUEUE',
+  PreProcessingLogo = 'PRE_PROCESSING_LOGO',
+  PreProcessingWebsiteScreenshot = 'PRE_PROCESSING_WEBSITE_SCREENSHOT',
+  PhotoshopProcessing = 'PHOTOSHOP_PROCESSING',
+  Processing = 'PROCESSING',
+  WrappingUp = 'WRAPPING_UP',
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  ReadyForProcessing = 'READY_FOR_PROCESSING',
+  TransformingPsdsToPngs = 'TRANSFORMING_PSDS_TO_PNGS',
+  StitchingSlides = 'STITCHING_SLIDES',
+  CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL'
+}
 
 export type LineChartDataType = {
   __typename?: 'lineChartDataType';
@@ -579,6 +721,15 @@ export type LoginOutput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createJobProcessLocation: JobProcessLocation;
+  generateAutodeck?: Maybe<CreateWorkspaceJobType>;
+  retryAutodeckJob?: Maybe<CreateWorkspaceJobType>;
+  confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
+  whitifyImage?: Maybe<AwsImageType>;
+  removePixelRange?: Maybe<AwsImageType>;
+  uploadJobImage?: Maybe<AwsImageType>;
+  updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
+  updateJob?: Maybe<JobObjectType>;
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
@@ -619,7 +770,62 @@ export type Mutation = {
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
-  debugMutation?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationCreateJobProcessLocationArgs = {
+  input?: Maybe<CreateJobProcessLocationInput>;
+};
+
+
+export type MutationGenerateAutodeckArgs = {
+  input?: Maybe<GenerateAutodeckInput>;
+};
+
+
+export type MutationRetryAutodeckJobArgs = {
+  jobId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationConfirmCreateWorkspaceJobArgs = {
+  input?: Maybe<GenerateAutodeckInput>;
+};
+
+
+export type MutationWhitifyImageArgs = {
+  input?: Maybe<AdjustedImageInput>;
+};
+
+
+export type MutationRemovePixelRangeArgs = {
+  input?: Maybe<RemovePixelRangeInput>;
+};
+
+
+export type MutationUploadJobImageArgs = {
+  file?: Maybe<Scalars['Upload']>;
+  jobId?: Maybe<Scalars['String']>;
+  type?: Maybe<UploadImageEnumType>;
+  disapproved?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationUpdateCreateWorkspaceJobArgs = {
+  id?: Maybe<Scalars['String']>;
+  status?: Maybe<JobStatusType>;
+  resourceUrl?: Maybe<Scalars['String']>;
+  referenceId?: Maybe<Scalars['String']>;
+  errorMessage?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateJobArgs = {
+  id?: Maybe<Scalars['String']>;
+  status?: Maybe<JobStatusType>;
+  resourceUrl?: Maybe<Scalars['String']>;
+  referenceId?: Maybe<Scalars['String']>;
+  errorMessage?: Maybe<Scalars['String']>;
 };
 
 
@@ -935,8 +1141,20 @@ export type PermssionType = {
   customer?: Maybe<Customer>;
 };
 
+export type PreviewDataType = {
+  __typename?: 'PreviewDataType';
+  colors: Array<Scalars['String']>;
+  rembgLogoUrl: Scalars['String'];
+  websiteScreenshotUrl: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
+  getJobProcessLocations: JobProcessLocations;
+  getPreviewData?: Maybe<PreviewDataType>;
+  getJob?: Maybe<CreateWorkspaceJobType>;
+  getAutodeckJobs: AutodeckConnectionType;
+  getAdjustedLogo?: Maybe<AwsImageType>;
   tags: Array<Tag>;
   delivery?: Maybe<DeliveryType>;
   triggerConnection?: Maybe<TriggerConnectionType>;
@@ -959,6 +1177,26 @@ export type Query = {
   questionNode?: Maybe<QuestionNode>;
   questionNodes: Array<QuestionNode>;
   edge?: Maybe<Edge>;
+};
+
+
+export type QueryGetPreviewDataArgs = {
+  id?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryGetJobArgs = {
+  id?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryGetAutodeckJobsArgs = {
+  filter?: Maybe<PaginationWhereInput>;
+};
+
+
+export type QueryGetAdjustedLogoArgs = {
+  input?: Maybe<AdjustedImageInput>;
 };
 
 
@@ -1136,6 +1374,15 @@ export type RegisterInput = {
 /** Input type for a register node */
 export type RegisterNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
+};
+
+export type RemovePixelRangeInput = {
+  key?: Maybe<Scalars['String']>;
+  bucket?: Maybe<Scalars['String']>;
+  red?: Maybe<Scalars['Int']>;
+  green?: Maybe<Scalars['Int']>;
+  blue?: Maybe<Scalars['Int']>;
+  range?: Maybe<Scalars['Int']>;
 };
 
 export type RequestInviteInput = {
@@ -1426,6 +1673,11 @@ export type UpdateQuestionNodeInputType = {
 };
 
 
+export enum UploadImageEnumType {
+  Logo = 'LOGO',
+  WebsiteScreenshot = 'WEBSITE_SCREENSHOT'
+}
+
 export type UserConnection = ConnectionInterface & {
   __typename?: 'UserConnection';
   offset: Scalars['Int'];
@@ -1479,6 +1731,158 @@ export type VerifyUserTokenOutput = {
   accessTokenExpiry: Scalars['Int'];
   userData: UserType;
 };
+
+export type ConfirmWorkspaceJobMutationVariables = Exact<{
+  input?: Maybe<GenerateAutodeckInput>;
+}>;
+
+
+export type ConfirmWorkspaceJobMutation = (
+  { __typename?: 'Mutation' }
+  & { confirmCreateWorkspaceJob?: Maybe<(
+    { __typename?: 'CreateWorkspaceJobType' }
+    & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
+  )> }
+);
+
+export type CreateWorkspaceJobMutationVariables = Exact<{
+  input?: Maybe<GenerateAutodeckInput>;
+}>;
+
+
+export type CreateWorkspaceJobMutation = (
+  { __typename?: 'Mutation' }
+  & { generateAutodeck?: Maybe<(
+    { __typename?: 'CreateWorkspaceJobType' }
+    & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
+  )> }
+);
+
+export type GetAutodeckJobsQueryVariables = Exact<{
+  filter?: Maybe<PaginationWhereInput>;
+}>;
+
+
+export type GetAutodeckJobsQuery = (
+  { __typename?: 'Query' }
+  & { getAutodeckJobs: (
+    { __typename?: 'AutodeckConnectionType' }
+    & { jobs: Array<(
+      { __typename?: 'CreateWorkspaceJobType' }
+      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'errorMessage' | 'message' | 'status' | 'resourcesUrl' | 'referenceType' | 'requiresColorExtraction' | 'requiresRembg' | 'requiresScreenshot'>
+      & { processLocation: (
+        { __typename?: 'JobProcessLocation' }
+        & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
+        & { customFields?: Maybe<Array<(
+          { __typename?: 'CustomFieldType' }
+          & Pick<CustomFieldType, 'id' | 'key' | 'value'>
+        )>> }
+      ) }
+    )>, pageInfo: (
+      { __typename?: 'PaginationPageInfo' }
+      & Pick<PaginationPageInfo, 'nrPages' | 'pageIndex'>
+    ) }
+  ) }
+);
+
+export type UploadJobImageMutationVariables = Exact<{
+  file: Scalars['Upload'];
+  jobId?: Maybe<Scalars['String']>;
+  type?: Maybe<UploadImageEnumType>;
+  disapproved?: Maybe<Scalars['Boolean']>;
+}>;
+
+
+export type UploadJobImageMutation = (
+  { __typename?: 'Mutation' }
+  & { uploadJobImage?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
+);
+
+export type RetryAutodeckJobMutationVariables = Exact<{
+  jobId?: Maybe<Scalars['String']>;
+}>;
+
+
+export type RetryAutodeckJobMutation = (
+  { __typename?: 'Mutation' }
+  & { retryAutodeckJob?: Maybe<(
+    { __typename?: 'CreateWorkspaceJobType' }
+    & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
+  )> }
+);
+
+export type GetAdjustedLogoQueryVariables = Exact<{
+  input?: Maybe<AdjustedImageInput>;
+}>;
+
+
+export type GetAdjustedLogoQuery = (
+  { __typename?: 'Query' }
+  & { getAdjustedLogo?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
+);
+
+export type GetJobProcessLocationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetJobProcessLocationsQuery = (
+  { __typename?: 'Query' }
+  & { getJobProcessLocations: (
+    { __typename?: 'JobProcessLocations' }
+    & { jobProcessLocations: Array<(
+      { __typename?: 'JobProcessLocation' }
+      & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
+      & { customFields?: Maybe<Array<(
+        { __typename?: 'CustomFieldType' }
+        & Pick<CustomFieldType, 'id' | 'key' | 'value'>
+      )>> }
+    )> }
+  ) }
+);
+
+export type GetPreviewDataQueryVariables = Exact<{
+  id?: Maybe<Scalars['String']>;
+}>;
+
+
+export type GetPreviewDataQuery = (
+  { __typename?: 'Query' }
+  & { getPreviewData?: Maybe<(
+    { __typename?: 'PreviewDataType' }
+    & Pick<PreviewDataType, 'colors' | 'rembgLogoUrl' | 'websiteScreenshotUrl'>
+  )> }
+);
+
+export type RemovePixelRangeMutationVariables = Exact<{
+  input?: Maybe<RemovePixelRangeInput>;
+}>;
+
+
+export type RemovePixelRangeMutation = (
+  { __typename?: 'Mutation' }
+  & { removePixelRange?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
+);
+
+export type WhitifyImageMutationVariables = Exact<{
+  input?: Maybe<AdjustedImageInput>;
+}>;
+
+
+export type WhitifyImageMutation = (
+  { __typename?: 'Mutation' }
+  & { whitifyImage?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
+);
 
 export type CreateBatchDeliveriesMutationVariables = Exact<{
   input?: Maybe<CreateBatchDeliveriesInputType>;
@@ -1612,6 +2016,391 @@ export type RequestInviteMutation = (
 );
 
 
+export const ConfirmWorkspaceJobDocument = gql`
+    mutation confirmWorkspaceJob($input: GenerateAutodeckInput) {
+  confirmCreateWorkspaceJob(input: $input) {
+    id
+    name
+    status
+  }
+}
+    `;
+export type ConfirmWorkspaceJobMutationFn = Apollo.MutationFunction<ConfirmWorkspaceJobMutation, ConfirmWorkspaceJobMutationVariables>;
+
+/**
+ * __useConfirmWorkspaceJobMutation__
+ *
+ * To run a mutation, you first call `useConfirmWorkspaceJobMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmWorkspaceJobMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [confirmWorkspaceJobMutation, { data, loading, error }] = useConfirmWorkspaceJobMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useConfirmWorkspaceJobMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmWorkspaceJobMutation, ConfirmWorkspaceJobMutationVariables>) {
+        return Apollo.useMutation<ConfirmWorkspaceJobMutation, ConfirmWorkspaceJobMutationVariables>(ConfirmWorkspaceJobDocument, baseOptions);
+      }
+export type ConfirmWorkspaceJobMutationHookResult = ReturnType<typeof useConfirmWorkspaceJobMutation>;
+export type ConfirmWorkspaceJobMutationResult = Apollo.MutationResult<ConfirmWorkspaceJobMutation>;
+export type ConfirmWorkspaceJobMutationOptions = Apollo.BaseMutationOptions<ConfirmWorkspaceJobMutation, ConfirmWorkspaceJobMutationVariables>;
+export const CreateWorkspaceJobDocument = gql`
+    mutation createWorkspaceJob($input: GenerateAutodeckInput) {
+  generateAutodeck(input: $input) {
+    id
+    name
+    status
+  }
+}
+    `;
+export type CreateWorkspaceJobMutationFn = Apollo.MutationFunction<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>;
+
+/**
+ * __useCreateWorkspaceJobMutation__
+ *
+ * To run a mutation, you first call `useCreateWorkspaceJobMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateWorkspaceJobMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createWorkspaceJobMutation, { data, loading, error }] = useCreateWorkspaceJobMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateWorkspaceJobMutation(baseOptions?: Apollo.MutationHookOptions<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>) {
+        return Apollo.useMutation<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>(CreateWorkspaceJobDocument, baseOptions);
+      }
+export type CreateWorkspaceJobMutationHookResult = ReturnType<typeof useCreateWorkspaceJobMutation>;
+export type CreateWorkspaceJobMutationResult = Apollo.MutationResult<CreateWorkspaceJobMutation>;
+export type CreateWorkspaceJobMutationOptions = Apollo.BaseMutationOptions<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>;
+export const GetAutodeckJobsDocument = gql`
+    query getAutodeckJobs($filter: PaginationWhereInput) {
+  getAutodeckJobs(filter: $filter) {
+    jobs {
+      id
+      name
+      createdAt
+      updatedAt
+      referenceId
+      errorMessage
+      message
+      status
+      resourcesUrl
+      referenceType
+      requiresColorExtraction
+      requiresRembg
+      requiresScreenshot
+      processLocation {
+        id
+        name
+        path
+        type
+        customFields {
+          id
+          key
+          value
+        }
+      }
+    }
+    pageInfo {
+      nrPages
+      pageIndex
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAutodeckJobsQuery__
+ *
+ * To run a query within a React component, call `useGetAutodeckJobsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAutodeckJobsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAutodeckJobsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetAutodeckJobsQuery(baseOptions?: Apollo.QueryHookOptions<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>) {
+        return Apollo.useQuery<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>(GetAutodeckJobsDocument, baseOptions);
+      }
+export function useGetAutodeckJobsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>) {
+          return Apollo.useLazyQuery<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>(GetAutodeckJobsDocument, baseOptions);
+        }
+export type GetAutodeckJobsQueryHookResult = ReturnType<typeof useGetAutodeckJobsQuery>;
+export type GetAutodeckJobsLazyQueryHookResult = ReturnType<typeof useGetAutodeckJobsLazyQuery>;
+export type GetAutodeckJobsQueryResult = Apollo.QueryResult<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>;
+export function refetchGetAutodeckJobsQuery(variables?: GetAutodeckJobsQueryVariables) {
+      return { query: GetAutodeckJobsDocument, variables: variables }
+    }
+export const UploadJobImageDocument = gql`
+    mutation uploadJobImage($file: Upload!, $jobId: String, $type: UploadImageEnumType, $disapproved: Boolean) {
+  uploadJobImage(file: $file, jobId: $jobId, type: $type, disapproved: $disapproved) {
+    url
+  }
+}
+    `;
+export type UploadJobImageMutationFn = Apollo.MutationFunction<UploadJobImageMutation, UploadJobImageMutationVariables>;
+
+/**
+ * __useUploadJobImageMutation__
+ *
+ * To run a mutation, you first call `useUploadJobImageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadJobImageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadJobImageMutation, { data, loading, error }] = useUploadJobImageMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *      jobId: // value for 'jobId'
+ *      type: // value for 'type'
+ *      disapproved: // value for 'disapproved'
+ *   },
+ * });
+ */
+export function useUploadJobImageMutation(baseOptions?: Apollo.MutationHookOptions<UploadJobImageMutation, UploadJobImageMutationVariables>) {
+        return Apollo.useMutation<UploadJobImageMutation, UploadJobImageMutationVariables>(UploadJobImageDocument, baseOptions);
+      }
+export type UploadJobImageMutationHookResult = ReturnType<typeof useUploadJobImageMutation>;
+export type UploadJobImageMutationResult = Apollo.MutationResult<UploadJobImageMutation>;
+export type UploadJobImageMutationOptions = Apollo.BaseMutationOptions<UploadJobImageMutation, UploadJobImageMutationVariables>;
+export const RetryAutodeckJobDocument = gql`
+    mutation retryAutodeckJob($jobId: String) {
+  retryAutodeckJob(jobId: $jobId) {
+    id
+    name
+    status
+  }
+}
+    `;
+export type RetryAutodeckJobMutationFn = Apollo.MutationFunction<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>;
+
+/**
+ * __useRetryAutodeckJobMutation__
+ *
+ * To run a mutation, you first call `useRetryAutodeckJobMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRetryAutodeckJobMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [retryAutodeckJobMutation, { data, loading, error }] = useRetryAutodeckJobMutation({
+ *   variables: {
+ *      jobId: // value for 'jobId'
+ *   },
+ * });
+ */
+export function useRetryAutodeckJobMutation(baseOptions?: Apollo.MutationHookOptions<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>) {
+        return Apollo.useMutation<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>(RetryAutodeckJobDocument, baseOptions);
+      }
+export type RetryAutodeckJobMutationHookResult = ReturnType<typeof useRetryAutodeckJobMutation>;
+export type RetryAutodeckJobMutationResult = Apollo.MutationResult<RetryAutodeckJobMutation>;
+export type RetryAutodeckJobMutationOptions = Apollo.BaseMutationOptions<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>;
+export const GetAdjustedLogoDocument = gql`
+    query getAdjustedLogo($input: AdjustedImageInput) {
+  getAdjustedLogo(input: $input) {
+    url
+  }
+}
+    `;
+
+/**
+ * __useGetAdjustedLogoQuery__
+ *
+ * To run a query within a React component, call `useGetAdjustedLogoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdjustedLogoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdjustedLogoQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetAdjustedLogoQuery(baseOptions?: Apollo.QueryHookOptions<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>) {
+        return Apollo.useQuery<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>(GetAdjustedLogoDocument, baseOptions);
+      }
+export function useGetAdjustedLogoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>) {
+          return Apollo.useLazyQuery<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>(GetAdjustedLogoDocument, baseOptions);
+        }
+export type GetAdjustedLogoQueryHookResult = ReturnType<typeof useGetAdjustedLogoQuery>;
+export type GetAdjustedLogoLazyQueryHookResult = ReturnType<typeof useGetAdjustedLogoLazyQuery>;
+export type GetAdjustedLogoQueryResult = Apollo.QueryResult<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>;
+export function refetchGetAdjustedLogoQuery(variables?: GetAdjustedLogoQueryVariables) {
+      return { query: GetAdjustedLogoDocument, variables: variables }
+    }
+export const GetJobProcessLocationsDocument = gql`
+    query getJobProcessLocations {
+  getJobProcessLocations {
+    jobProcessLocations {
+      id
+      name
+      path
+      type
+      customFields {
+        id
+        key
+        value
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetJobProcessLocationsQuery__
+ *
+ * To run a query within a React component, call `useGetJobProcessLocationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetJobProcessLocationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetJobProcessLocationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetJobProcessLocationsQuery(baseOptions?: Apollo.QueryHookOptions<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>) {
+        return Apollo.useQuery<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>(GetJobProcessLocationsDocument, baseOptions);
+      }
+export function useGetJobProcessLocationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>) {
+          return Apollo.useLazyQuery<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>(GetJobProcessLocationsDocument, baseOptions);
+        }
+export type GetJobProcessLocationsQueryHookResult = ReturnType<typeof useGetJobProcessLocationsQuery>;
+export type GetJobProcessLocationsLazyQueryHookResult = ReturnType<typeof useGetJobProcessLocationsLazyQuery>;
+export type GetJobProcessLocationsQueryResult = Apollo.QueryResult<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>;
+export function refetchGetJobProcessLocationsQuery(variables?: GetJobProcessLocationsQueryVariables) {
+      return { query: GetJobProcessLocationsDocument, variables: variables }
+    }
+export const GetPreviewDataDocument = gql`
+    query getPreviewData($id: String) {
+  getPreviewData(id: $id) {
+    colors
+    rembgLogoUrl
+    websiteScreenshotUrl
+  }
+}
+    `;
+
+/**
+ * __useGetPreviewDataQuery__
+ *
+ * To run a query within a React component, call `useGetPreviewDataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPreviewDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPreviewDataQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetPreviewDataQuery(baseOptions?: Apollo.QueryHookOptions<GetPreviewDataQuery, GetPreviewDataQueryVariables>) {
+        return Apollo.useQuery<GetPreviewDataQuery, GetPreviewDataQueryVariables>(GetPreviewDataDocument, baseOptions);
+      }
+export function useGetPreviewDataLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPreviewDataQuery, GetPreviewDataQueryVariables>) {
+          return Apollo.useLazyQuery<GetPreviewDataQuery, GetPreviewDataQueryVariables>(GetPreviewDataDocument, baseOptions);
+        }
+export type GetPreviewDataQueryHookResult = ReturnType<typeof useGetPreviewDataQuery>;
+export type GetPreviewDataLazyQueryHookResult = ReturnType<typeof useGetPreviewDataLazyQuery>;
+export type GetPreviewDataQueryResult = Apollo.QueryResult<GetPreviewDataQuery, GetPreviewDataQueryVariables>;
+export function refetchGetPreviewDataQuery(variables?: GetPreviewDataQueryVariables) {
+      return { query: GetPreviewDataDocument, variables: variables }
+    }
+export const RemovePixelRangeDocument = gql`
+    mutation removePixelRange($input: RemovePixelRangeInput) {
+  removePixelRange(input: $input) {
+    url
+  }
+}
+    `;
+export type RemovePixelRangeMutationFn = Apollo.MutationFunction<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>;
+
+/**
+ * __useRemovePixelRangeMutation__
+ *
+ * To run a mutation, you first call `useRemovePixelRangeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemovePixelRangeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removePixelRangeMutation, { data, loading, error }] = useRemovePixelRangeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRemovePixelRangeMutation(baseOptions?: Apollo.MutationHookOptions<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>) {
+        return Apollo.useMutation<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>(RemovePixelRangeDocument, baseOptions);
+      }
+export type RemovePixelRangeMutationHookResult = ReturnType<typeof useRemovePixelRangeMutation>;
+export type RemovePixelRangeMutationResult = Apollo.MutationResult<RemovePixelRangeMutation>;
+export type RemovePixelRangeMutationOptions = Apollo.BaseMutationOptions<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>;
+export const WhitifyImageDocument = gql`
+    mutation whitifyImage($input: AdjustedImageInput) {
+  whitifyImage(input: $input) {
+    url
+  }
+}
+    `;
+export type WhitifyImageMutationFn = Apollo.MutationFunction<WhitifyImageMutation, WhitifyImageMutationVariables>;
+
+/**
+ * __useWhitifyImageMutation__
+ *
+ * To run a mutation, you first call `useWhitifyImageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWhitifyImageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [whitifyImageMutation, { data, loading, error }] = useWhitifyImageMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useWhitifyImageMutation(baseOptions?: Apollo.MutationHookOptions<WhitifyImageMutation, WhitifyImageMutationVariables>) {
+        return Apollo.useMutation<WhitifyImageMutation, WhitifyImageMutationVariables>(WhitifyImageDocument, baseOptions);
+      }
+export type WhitifyImageMutationHookResult = ReturnType<typeof useWhitifyImageMutation>;
+export type WhitifyImageMutationResult = Apollo.MutationResult<WhitifyImageMutation>;
+export type WhitifyImageMutationOptions = Apollo.BaseMutationOptions<WhitifyImageMutation, WhitifyImageMutationVariables>;
 export const CreateBatchDeliveriesDocument = gql`
     mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
   createBatchDeliveries(input: $input) {
