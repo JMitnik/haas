@@ -31,7 +31,7 @@ export class TwilioHandlerService extends core.Construct {
         // Define the `handler` lambda (receiving end)
         const callbackHandler = new lambda.NodejsFunction(this, 'twilio-handler', {
             entry: 'lib/lambdas/twilio-handler/twilio-handler.ts',
-            handler: 'main',
+            handler: 'twilioHandler',
         });
 
         // Wrap lambda in an API-Gateway integration
@@ -42,7 +42,7 @@ export class TwilioHandlerService extends core.Construct {
         // Define the `sender` lambda (sending end), and pass the relevant params.
         const senderHandler = new lambda.NodejsFunction(this, 'twilio-sender', {
             entry: 'lib/lambdas/twilio-handler/twilio-sender.ts',
-            handler: 'main',
+            handler: 'twilioHandler',
             environment: {
                 TWILIO_ACCOUNT_SID: twilioSecret.secretValueFromJson('TWILIO_ACCOUNT_SID').toString(),
                 TWILIO_AUTH_TOKEN: twilioSecret.secretValueFromJson('TWILIO_AUTH_TOKEN').toString(),
@@ -65,7 +65,7 @@ export class TwilioHandlerService extends core.Construct {
             resources: [`arn:aws:dynamodb:eu-central-1:${props.accountId}:table/CampaignDeliveries`],
             effect: iam.Effect.ALLOW,
             actions: ['dynamodb:UpdateItem']
-        }))
+        }));
 
         // Define a dead-letter-queue for the SMS
         const dlq = new sqs.Queue(this, 'Twilio_SMS_DLQ', {
