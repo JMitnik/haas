@@ -1,0 +1,15 @@
+  query getJobProcessLocations {
+    getJobProcessLocations {
+      jobProcessLocations {
+        id
+        name
+        path
+        type
+        customFields {
+          id
+          key
+          value
+        }
+      } 
+    }
+  }

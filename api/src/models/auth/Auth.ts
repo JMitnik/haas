@@ -291,7 +291,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
 
     const [user] = users;
 
-    // Case 2: If user-customer relation already exists, 
+    // Case 2: If user-customer relation already exists,
     // just update the role itself
     if (user.customers.length) {
       await UserService.updateUserRole(user.id, roleId, customerId);

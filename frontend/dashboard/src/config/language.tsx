@@ -1,6 +1,54 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    general: {
+      en: 'General',
+      de: 'General',
+    },
+    process_location: {
+      en: 'Process type & location',
+      de: 'Process type & location',
+    },
+    process_location_helper: {
+      en: 'What kind of job are you trying to run',
+      de: 'What kind of job are you trying to run',
+    },
+    job_name: {
+      en: 'Job name',
+      de: 'Job name',
+    },
+    job_name_helper: {
+      en: 'What is the name you want to refer to for this Autodeck job',
+      de: 'What is the name you want to refer to for this Autodeck job',
+    },
+    website_screenshot: {
+      en: 'Website screenshot',
+      de: 'Website screenshot',
+    },
+    website_screenshot_subtext: {
+      en: 'Choose between uploading your website screenshot or inserting an existing URL.',
+      de: 'Choose between uploading your website screenshot or inserting an existing URL.',
+    },
+    website_screenshot_helper: {
+      en: 'Tell whether you want Autodeck to take a screenshot for you',
+      de: 'Tell whether you want Autodeck to take a screenshot for you',
+    },
+    logo_manipulation: {
+      en: 'Logo manipulation',
+      de: 'Logo manipulation',
+    },
+    logo_manipulation_helper: {
+      en: 'Describe what logo-manipulating tasks should be executed by Autodeck before generation personalized content',
+      de: 'Describe what logo-manipulating tasks should be executed by Autodeck before generation personalized content',
+    },
+    created_at: {
+      en: 'Created at',
+      de: 'Hergestellt in',
+    },
+    updated_at: {
+      en: 'Updated at',
+      de: 'Aktualisiert am',
+    },
     add_choice: {
       en: 'Add choice',
       de: 'Wahl hinzufügen'
@@ -844,6 +892,172 @@ const language = {
       de: 'Dein Einladungstoken kann nicht gefunden werden. Versuche einen erneuten Login.',
     },
   },
+  autodeck: {
+    custom_fields: {
+      en: 'Custom fields',
+      de: 'Custom fields',
+    },
+    custom_fields_helper: {
+      en: 'Add custom fields to an existing template',
+      de: 'Add custom fields to an existing template'
+    },
+    company_name: {
+      en: 'Company name',
+      de: '',
+    },
+    company_name_helper: {
+      en: 'The name of the target company',
+      de: '',
+    },
+    sorry_about_x: {
+      en: 'Sorry about X',
+      de: 'Entschuldigung für X',
+    },
+    sorry_about_x_helper: {
+      en: 'Something the target user did not like',
+      de: 'Something the target user did not like',
+    },
+    you_love_x: {
+      en: 'You love X',
+      de: 'Du liebst X', 
+    },
+    you_love_x_helper: {
+      en: 'Something the target user loves',
+      de: 'The "You love X" message', 
+    },
+    reward: {
+      en: 'Reward',
+      de: '',
+    },
+    reward_helper: {
+      en: 'The reward the target user will receive',
+      de: '',
+    },
+    email_content: {
+      en: 'Email content',
+      de: '',
+    },
+    email_content_helper: {
+      en: 'The content of the email sent to the target user',
+      de: '',
+    },
+    text_content: {
+      en: 'SMS content',
+      de: '',
+    },
+    text_content_helper: {
+      en: 'The content of the SMS sent to the target user',
+      de: '',
+    },
+    use_rembg: {
+      en: 'Remove background',
+      de: 'Hintergrund entfernen',
+    },
+    use_rembg_helper: {
+      en: 'Remove background from logo',
+      de: 'Entfernen Sie den Hintergrund vom Logo',
+    },
+    original_image: {
+      en: 'Original image',
+      de: 'Originales Logo',
+    },
+    original_image_helper: {
+      en: 'Use original logo',
+      de: 'Verwenden Sie das Original-Logo',
+    },
+    download_result: {
+      en: 'Download result',
+      de: 'Download result'
+    },
+    primary_color: {
+      en: 'Primary color',
+      de: 'Primary color',
+    },
+    primary_color_helper: {
+      en: 'Choose between extracting the primary color from the logo or selecting a customer color',
+      de: 'Choose between extracting the primary color from the logo or selecting a customer color',
+    },
+    logo_color: {
+      en: 'Logo color',
+      de: 'Logo color',
+    },
+    logo_color_helper: {
+      en: 'Color from logo',
+      de: 'Color from logo',
+    },
+    custom_color: {
+      en: 'Custom color',
+      de: 'Custom color',
+    },
+    custom_color_helper: {
+      en: 'Select custom color',
+      de: 'Select custom color',
+    },
+    create_job: {
+      en: 'Create job',
+      de: 'Aufgabe erstellen',
+    },
+    job_name: {
+      en: 'Name',
+      de: 'Name',
+    },
+    dialogue: {
+      en: 'Dialogue',
+      de: 'Dialog',
+    },
+    dialogue_helper: {
+      en: 'Personalize the content of the example dialogue on the sales material.',
+      de: 'Personalize the content of the example dialogue on the sales material.',
+    },
+    client_first_name: {
+      en: 'Client first name',
+      de: 'Client first name',
+    },
+    client_first_name_helper: {
+      en: 'Fill in the first name of the client targeted by the sales documents',
+      de: 'Fill in the first name of the client targeted by the sales documents',
+    },
+    answer_1: {
+      en: 'Answer 1',
+      de: 'Answer 1',
+    },
+    answer_1_helper: {
+      en: 'What is the first answer of the multi-choice example?',
+      de: 'What is the first answer of the multi-choice example?',
+    },
+    answer_2: {
+      en: 'Answer 2',
+      de: 'Answer 2',
+    },
+    answer_2_helper: {
+      en: 'What is the second answer of the multi-choice example?',
+      de: 'What is the second answer of the multi-choice example?',
+    },
+    answer_3: {
+      en: 'Answer 3',
+      de: 'Answer 3',
+    },
+    answer_3_helper: {
+      en: 'What is the third answer of the multi-choice example?',
+      de: 'What is the third answer of the multi-choice example?',
+    },
+    answer_4: {
+      en: 'Answer 4',
+      de: 'Answer 4',
+    },
+    answer_4_helper: {
+      en: 'What is the fourth answer of the multi-choice example?',
+      de: 'What is the fourth answer of the multi-choice example?',
+    },
+    website: {
+      en: 'Website URL',
+      de: 'Website URL',
+    },
+    website_helper: {
+      en: 'What is the website of the target company?',
+      de: 'What is the website of the target company?',
+    },
+  },
   customer: {
     fake_data: {
       en: 'Placeholder data',
@@ -1651,6 +1865,7 @@ const language = {
       en: 'What text should be matched to trigger the alert?',
       de: 'Welche Textübereinstimmung soll die Push-Benachrichtigung auslösen?',
     },
+
   },
 };
 
