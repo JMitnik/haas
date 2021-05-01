@@ -18,8 +18,3 @@ const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
     db: api.db,
     rdsSecurityGroup: api.rdsSecurityGroup
 });
-
-// // Campaign stack
-// const campaign = new HaasCampaignStack(app, 'HAASCampaign', {
-//     accountId: '649621042808'
-// });
