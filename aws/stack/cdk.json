@@ -9,7 +9,12 @@
     "@aws-cdk/aws-kms:defaultKeyPolicies": true,
     "dev": {
       "accountId": "649621042808",
-      "region": "eu-central-1"
+      "region": "eu-central-1",
+      "services": {
+        "campaign": {
+          "deliveryTableName": "CampaignDeliveries-Dev"
+        }
+      }
     }
   }
 }
