@@ -1,6 +1,7 @@
 import * as AWS from 'aws-sdk';
 import * as https from 'https';
 import * as URL from 'url';
+import { Context, DynamoDBStreamEvent } from 'aws-lambda';
 
 const sesClient = new AWS.SES();
 const snsClient = new AWS.SNS();
@@ -14,8 +15,10 @@ snsClient.setSMSAttributes({
   },
 });
 
-exports.lambdaHandler = async (event: any, context: any, callback: any) => {
+exports.lambdaHandler = async (event: DynamoDBStreamEvent, context: Context, callback: any) => {
   console.log(JSON.stringify(event, null, 4));
+
+  if (!event.Records) return;
 
   try {
     const updates = event.Records.map((record: any) => ({
@@ -24,12 +27,14 @@ exports.lambdaHandler = async (event: any, context: any, callback: any) => {
       newStatus: record.dynamodb.NewImage.DeliveryStatus.S,
     }));
 
-    const sharedCallbackUrl = event.Records[0].dynamodb.NewImage.callback.S;
+    const sharedCallbackUrl = event.Records?.[0].dynamodb?.NewImage?.callback.S;
 
-    try {
-      await sendToCallbackUrl(sharedCallbackUrl, updates);
-    } catch(error) {
-      console.error(`Unable to send update to callback url at ${sharedCallbackUrl}. Will still send SMS`);
+    if (sharedCallbackUrl && updates.length) {
+      try {
+        await sendToCallbackUrl(sharedCallbackUrl, updates);
+      } catch(error) {
+        console.error(`Unable to send update to callback url at ${sharedCallbackUrl}. Will still send SMS`);
+      }
     }
 
     await Promise.all(event.Records.map((record: any) => {
@@ -138,7 +143,7 @@ const sendSNSMessage = (
   });
 };
 
-const sendToCallbackUrl = async (callbackUrl: string, payload: string) => {
+const sendToCallbackUrl = async (callbackUrl: string, payload: any[]) => {
   const {hostname, pathname} = URL.parse(callbackUrl);
 
     return new Promise((resolve, reject) => {
