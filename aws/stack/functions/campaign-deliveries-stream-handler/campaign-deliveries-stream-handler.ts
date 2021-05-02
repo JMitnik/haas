@@ -15,7 +15,7 @@ snsClient.setSMSAttributes({
   },
 });
 
-exports.lambdaHandler = async (event: DynamoDBStreamEvent, context: Context, callback: any) => {
+export const lambdaHandler = async (event: DynamoDBStreamEvent, context: Context, callback: any) => {
   console.log(JSON.stringify(event, null, 4));
 
   if (!event.Records) return;
@@ -167,3 +167,5 @@ const sendToCallbackUrl = async (callbackUrl: string, payload: any[]) => {
         req.end();
     });
 };
+
+exports.lambdaHandler = lambdaHandler;

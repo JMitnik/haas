@@ -2,19 +2,20 @@ import * as AWS from 'aws-sdk';
 import { format } from 'date-fns';
 import { Context, ScheduledEvent } from 'aws-lambda';
 
-const dbClient = new AWS.DynamoDB.DocumentClient({
-  endpoint: process.env.AWS_SAM_LOCAL ? 'http://host.docker.internal:8000' : undefined,
-});
 
 const deliveryTableName = process.env.deliveryTableName as string;
 
-exports.lambdaHandler = async (event: ScheduledEvent, context: Context) => {
+export const lambdaHandler = async (event?: ScheduledEvent, context?: Context) => {
+  const dbClient = new AWS.DynamoDB.DocumentClient({
+    endpoint: process.env.AWS_SAM_LOCAL ? 'http://host.docker.internal:8000' : undefined,
+  });
+
   try {
     const now = Date.now();
     const date = format(now, 'ddMMyyyy');
 
     const params = {
-      TableName: deliveryTableName,
+      TableName: deliveryTableName || '',
       KeyConditionExpression: 'DeliveryDate = :date AND DeliveryDate_DeliveryID < :now',
       FilterExpression: 'DeliveryStatus = :deployedStatus',
       ExpressionAttributeValues: {
@@ -28,7 +29,8 @@ exports.lambdaHandler = async (event: ScheduledEvent, context: Context) => {
 
     try {
       const dataResults = await dbClient.query(params).promise();
-      if (!dataResults.Items?.length) {return;}
+      console.log(dataResults);
+      if (!dataResults?.Items?.length) {return;}
       items = dataResults.Items;
     } catch (error) {
       console.error(`Erroring when querying the database: ${error}`);
@@ -55,3 +57,5 @@ exports.lambdaHandler = async (event: ScheduledEvent, context: Context) => {
     return err;
   }
 };
+
+exports.lambdaHandler = lambdaHandler;
