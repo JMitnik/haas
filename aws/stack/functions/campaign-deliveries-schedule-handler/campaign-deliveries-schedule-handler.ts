@@ -2,6 +2,10 @@ import * as AWS from 'aws-sdk';
 import { format } from 'date-fns';
 import { Context, ScheduledEvent } from 'aws-lambda';
 
+export interface DeliveryItem {
+  DeliveryDate: string;
+  DeliveryDate_DeliveryID: string;
+}
 
 const deliveryTableName = process.env.deliveryTableName as string;
 
@@ -14,7 +18,7 @@ export const lambdaHandler = async (event?: ScheduledEvent, context?: Context) =
     const now = Date.now();
     const date = format(now, 'ddMMyyyy');
 
-    const params = {
+    const queryParams = {
       TableName: deliveryTableName || '',
       KeyConditionExpression: 'DeliveryDate = :date AND DeliveryDate_DeliveryID < :now',
       FilterExpression: 'DeliveryStatus = :deployedStatus',
@@ -25,13 +29,12 @@ export const lambdaHandler = async (event?: ScheduledEvent, context?: Context) =
       },
     };
 
-    let items: AWS.DynamoDB.DocumentClient.ItemList = [];
+    let items: DeliveryItem[] = [];
 
     try {
-      const dataResults = await dbClient.query(params).promise();
-      console.log(dataResults);
+      const dataResults = await dbClient.query(queryParams).promise();
       if (!dataResults?.Items?.length) {return;}
-      items = dataResults.Items;
+      items = dataResults.Items as DeliveryItem[];
     } catch (error) {
       console.error(`Erroring when querying the database: ${error}`);
       throw error;

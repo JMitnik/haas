@@ -1,4 +1,4 @@
-import { lambdaHandler } from '../campaign-deliveries-schedule-handler/campaign-deliveries-schedule-handler';
+import { lambdaHandler, DeliveryItem } from '../campaign-deliveries-schedule-handler/campaign-deliveries-schedule-handler';
 import * as AWS from 'aws-sdk';
 import * as AWSMock from 'aws-sdk-mock';
 
@@ -6,11 +6,14 @@ test('test', async () => {
   AWSMock.setSDKInstance(AWS);
 
   AWSMock.mock('DynamoDB.DocumentClient', 'query', (params: any, callback: Function) => {
-    console.log('I queried!');
-    callback(null, { Items: [] });
+    let items: DeliveryItem[] = [{
+      DeliveryDate: '01012020',
+      DeliveryDate_DeliveryID: '01012020'
+    }]
+    callback(null, { Items: items });
   });
+
   AWSMock.mock('DynamoDB.DocumentClient', 'update', (params: any, callback: Function) => {
-    console.log('I queried!');
     callback(null);
   });
 
