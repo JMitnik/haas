@@ -36,10 +36,9 @@
         "__typename": "UserCustomer"
       }
     ],
-      "customer": {
-        "id": "ckm7af2gj0050yfr5ykrvzyvf",
-        "slug": "lufthansa"
-      }
+    "customer": {
+      "id": "ckm7af2gj0050yfr5ykrvzyvf",
+      "slug": "lufthansa"
     }
   }
 }

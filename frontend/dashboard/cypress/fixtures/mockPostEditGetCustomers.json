@@ -1,0 +1,25 @@
+{
+  "data": {
+    "user": {
+      "customers": [
+        {
+          "id": "ckm7af2gj0050yfr5ykrvzyvf",
+          "name": "Starbucks",
+          "slug": "starbucks",
+          "settings": {
+            "logoUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/1024px-Starbucks_Corporation_Logo_2011.svg.png",
+            "colourSettings": {
+              "primary": "#DC143C",
+              "secondary": null,
+              "__typename": "ColourSettings"
+            },
+            "__typename": "CustomerSettings"
+          },
+          "dialogues": [],
+          "__typename": "Customer"
+        }
+      ],
+      "__typename": "UserType"
+    }
+  }
+}
