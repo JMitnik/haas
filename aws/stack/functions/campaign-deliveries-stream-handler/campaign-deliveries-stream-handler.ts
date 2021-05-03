@@ -1,11 +1,22 @@
 import * as AWS from 'aws-sdk';
 import * as https from 'https';
 import * as URL from 'url';
-import { Context, DynamoDBStreamEvent } from 'aws-lambda';
+import { Context, DynamoDBStreamEvent, DynamoDBRecord } from 'aws-lambda';
 
 const sesClient = new AWS.SES();
 const snsClient = new AWS.SNS();
 const sqsClient = new AWS.SQS();
+
+type UpdateStatus = 'DEPLOYED' | 'SENT' | 'FAILED';
+
+interface UpdatingDeliveryRow {
+  eventName: DynamoDBRecord['eventName'];
+  dateId?: string;
+  oldStatus?: UpdateStatus;
+  newStatus?: UpdateStatus;
+  deliveryRecipient?: string;
+  campaignId?: string;
+}
 
 const accountId = '649621042808';
 
@@ -21,29 +32,29 @@ export const lambdaHandler = async (event: DynamoDBStreamEvent, context: Context
   if (!event.Records) return;
 
   try {
-    const updates = event.Records.map((record: any) => ({
-      dateId: record.dynamodb.NewImage.DeliveryDate_DeliveryID.S,
-      oldStatus: record.dynamodb.OldImage.DeliveryStatus.S,
-      newStatus: record.dynamodb.NewImage.DeliveryStatus.S,
+    const updatingRows: UpdatingDeliveryRow[] = event.Records.map((record) => ({
+      dateId: record?.dynamodb?.NewImage?.DeliveryDate_DeliveryID.S,
+      oldStatus: record?.dynamodb?.OldImage?.DeliveryStatus.S as UpdateStatus,
+      newStatus: record?.dynamodb?.NewImage?.DeliveryStatus.S as UpdateStatus,
+      eventName: record?.eventName,
+      deliveryRecipient: record?.dynamodb?.NewImage?.campaignId.S,
     }));
 
     const sharedCallbackUrl = event.Records?.[0].dynamodb?.NewImage?.callback.S;
 
-    if (sharedCallbackUrl && updates.length) {
+    if (sharedCallbackUrl && updatingRows.length) {
       try {
-        await sendToCallbackUrl(sharedCallbackUrl, updates);
+        await sendToCallbackUrl(sharedCallbackUrl, updatingRows);
       } catch(error) {
         console.error(`Unable to send update to callback url at ${sharedCallbackUrl}. Will still send SMS`);
       }
     }
 
-    await Promise.all(event.Records.map((record: any) => {
-      const row = record.dynamodb.NewImage;
-
+    await Promise.all(updatingRows.map((row) => {
       if (
-        record.eventName === 'MODIFY'
-          && record.dynamodb.NewImage.DeliveryStatus.S !== record.dynamodb.OldImage.DeliveryStatus.S
-          && row.DeliveryStatus.S === 'DEPLOYED'
+        row.eventName === 'MODIFY'
+          && row.oldStatus !== row.newStatus
+          && row.newStatus === 'DEPLOYED'
           && row.DeliveryRecipient.S
           && row.DeliveryBody.S
       ) {
