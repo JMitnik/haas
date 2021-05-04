@@ -118,6 +118,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
                         </PopoverBody>
                         <PopoverFooter>
                           <Button
+                            data-testid="DeleteWorkspaceButton"
                             variantColor="red"
                             onClick={() => handleDeleteCustomer(customer.id, onClose)}
                           >
