@@ -86,7 +86,6 @@ describe("Workspace logic", () => {
       }
     })
 
-    // cy.wait('@getCustomers');
     cy.findByTestId('CustomerCard').should('exist');
     cy.findByText(CREATE_WORKSPACE_INPUT.workspaceName).should('exist');
 
