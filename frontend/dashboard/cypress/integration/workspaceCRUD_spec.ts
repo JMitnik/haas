@@ -84,9 +84,9 @@ describe("Workspace logic", () => {
       if (req.body.operationName === 'getCustomers') {
         req.reply({ fixture: 'mockGetCustomers.json' });
       }
-    }).as('getCustomers');
+    })
 
-    cy.wait('@getCustomers');
+    // cy.wait('@getCustomers');
     cy.findByTestId('CustomerCard').should('exist');
     cy.findByText(CREATE_WORKSPACE_INPUT.workspaceName).should('exist');
 
