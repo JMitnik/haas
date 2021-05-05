@@ -2,7 +2,10 @@ import { orderBy } from 'lodash';
 import { useQuery } from '@apollo/client';
 import React from 'react';
 
-import { EdgeChildProps, QuestionEntryProps } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
+import {
+  EdgeChildProps,
+  QuestionEntryProps,
+} from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import { Loader } from '@haas/ui';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
@@ -23,6 +26,8 @@ const initializeQuestionType = (type?: string) => {
 };
 
 const initializeCTAType = (type?: string) => {
+  let test;
+
   if (type === 'TEXTBOX') {
     return 'Opinion';
   }
@@ -56,37 +61,58 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
   let questions = nodes?.filter((node) => !node.isLeaf);
   questions = orderBy(questions, (question) => question.creationDate, ['asc']);
 
-  return questions?.map(({ id, title, isRoot, isLeaf, type, overrideLeaf, options, children, updatedAt, sliderNode }) => ({
-    id,
-    updatedAt,
-    title,
-    isRoot,
-    isLeaf,
-    type: initializeQuestionType(type),
-    sliderNode,
-    icon: type === 'CHOICE' ? MultiChoiceBuilderIcon : HaasNodeIcon,
-    overrideLeaf: !overrideLeaf
-      ? undefined
-      : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: initializeCTAType(overrideLeaf?.type) },
-    options: options?.map((option) => ({
-      id: option.id,
-      value: option.value,
-      publicValue: option.publicValue,
-      overrideLeaf: option.overrideLeaf,
-    })),
-    children: children?.map((edge: EdgeChildProps) => ({
-      id: edge.id,
-      parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },
-      conditions: [{
-        id: edge?.conditions?.[0]?.id,
-        conditionType: edge?.conditions?.[0]?.conditionType,
-        matchValue: edge?.conditions?.[0]?.matchValue,
-        renderMin: edge?.conditions?.[0]?.renderMin,
-        renderMax: edge?.conditions?.[0]?.renderMax,
-      }],
-      childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title },
-    })),
-  })) || [];
+  return (
+    questions?.map(
+      ({
+        id,
+        title,
+        isRoot,
+        isLeaf,
+        type,
+        overrideLeaf,
+        options,
+        children,
+        updatedAt,
+        sliderNode,
+      }) => ({
+        id,
+        updatedAt,
+        title,
+        isRoot,
+        isLeaf,
+        type: initializeQuestionType(type),
+        sliderNode,
+        icon: type === 'CHOICE' ? MultiChoiceBuilderIcon : HaasNodeIcon,
+        overrideLeaf: !overrideLeaf
+          ? undefined
+          : {
+              id: overrideLeaf?.id,
+              title: overrideLeaf?.title,
+              type: initializeCTAType(overrideLeaf?.type),
+            },
+        options: options?.map((option) => ({
+          id: option.id,
+          value: option.value,
+          publicValue: option.publicValue,
+          overrideLeaf: option.overrideLeaf,
+        })),
+        children: children?.map((edge: EdgeChildProps) => ({
+          id: edge.id,
+          parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },
+          conditions: [
+            {
+              id: edge?.conditions?.[0]?.id,
+              conditionType: edge?.conditions?.[0]?.conditionType,
+              matchValue: edge?.conditions?.[0]?.matchValue,
+              renderMin: edge?.conditions?.[0]?.renderMin,
+              renderMax: edge?.conditions?.[0]?.renderMax,
+            },
+          ],
+          childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title },
+        })),
+      })
+    ) || []
+  );
 };
 
 const DialogueBuilderPage = () => {

@@ -4,9 +4,17 @@ import { Plus } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
-
+import { useHistory } from 'react-router';
 import {
-  AddCard, Container, Flex, Grid, H4, PageHeading,
+  AddCard,
+  Container,
+  Flex,
+  Grid,
+  H4,
+  PageHeading,
+  Button,
+  ButtonGroup,
+  Span,
 } from '@haas/ui';
 import { Skeleton } from '@chakra-ui/core';
 import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
@@ -41,15 +49,34 @@ const cardItemAnimation: Variants = {
 
 const MotionGrid = motion.custom(Grid);
 
-const CustomerOverview = ({ customers, isLoading }: { customers: any[], isLoading: boolean }) => {
+const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoading: boolean }) => {
   const { t } = useTranslation();
-  const { canCreateCustomers } = useAuth();
+  const { canCreateCustomers, canAccessAdmin } = useAuth();
+  const history = useHistory();
+  const goToAdminPanel = (e: any) => {
+    // console.log('clicked' + e);
+
+    history.push('/dashboard/admin');
+  };
 
   return (
     <CustomerOverviewContainer>
       <Container>
         <PageHeading>{t('projects')}</PageHeading>
-        <H4 mb={2} color="gray.500">{t('active_projects')}</H4>
+        <H4 mb={2} color="gray.500">
+          {t('active_projects')}
+        </H4>
+
+        {canAccessAdmin && (
+          <Span>
+            <ButtonGroup zIndex={150} ml={900}>
+              <Button size="sm" variant="outline" onClick={goToAdminPanel}>
+                {/* {t('adminpanel')} */}
+                <Link to="dashboard/">{t('adminpanel')}</Link>
+              </Button>
+            </ButtonGroup>
+          </Span>
+        )}
         <MotionGrid
           gridGap={4}
           gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
@@ -66,13 +93,16 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[], isLoadin
             </>
           ) : (
             <>
-              {customers?.map((customer: any, index: any) => customer && (
-                <motion.div style={{ height: '100%' }} key={index} variants={cardItemAnimation}>
-                  <ErrorBoundary key={index} FallbackComponent={() => (<></>)}>
-                    <CustomerCard key={index} customer={customer} />
-                  </ErrorBoundary>
-                </motion.div>
-              ))}
+              {customers?.map(
+                (customer: any, index: any) =>
+                  customer && (
+                    <motion.div style={{ height: '100%' }} key={index} variants={cardItemAnimation}>
+                      <ErrorBoundary key={index} FallbackComponent={() => <></>}>
+                        <CustomerCard key={index} customer={customer} />
+                      </ErrorBoundary>
+                    </motion.div>
+                  )
+              )}
 
               {canCreateCustomers && (
                 <AddCard>
@@ -82,9 +112,7 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[], isLoadin
                     <TranslatedPlus>
                       <Plus strokeWidth="3px" />
                     </TranslatedPlus>
-                    <H4 color="default.dark">
-                      {t('customer:create_customer')}
-                    </H4>
+                    <H4 color="default.dark">{t('customer:create_customer')}</H4>
                   </Flex>
                 </AddCard>
               )}

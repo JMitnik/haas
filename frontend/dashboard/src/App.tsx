@@ -13,7 +13,7 @@ import { DialogueProvider } from 'providers/DialogueProvider';
 import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/globalTypes';
 import ActionsPage from 'pages/dashboard/actions';
-import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview'
+import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
@@ -48,6 +48,7 @@ import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UserProvider, { useUser } from 'providers/UserProvider';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
+import AdminOverview from 'views/AdminOverview/AdminOverview';
 import VerifyTokenPage from 'pages/verify_token';
 import client from 'config/apollo';
 import lang from 'config/i18n-config';
@@ -92,7 +93,6 @@ const CustomerRoutes = () => (
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                       render={() => <DialoguePage />}
                     />
-
                   </Switch>
                 </DialogueLayout>
               )}
@@ -109,6 +109,11 @@ const CustomerRoutes = () => (
               path={ROUTES.CAMPAIGN_VIEW}
               render={() => <CampaignView />}
             />
+            {/* <GuardedRoute
+              allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
+              path="/dashboard/b/:customerSlug/admin"
+              render={() => <AdminOverview />}
+            /> */}
 
             <CustomerRoute
               path="/dashboard/b/:customerSlug"
@@ -117,25 +122,19 @@ const CustomerRoutes = () => (
                   <Switch>
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/analytics/"
-                      render={() => (
-                        <AnalyticsPage />
-                      )}
+                      render={() => <AnalyticsPage />}
                     />
 
                     <GuardedRoute
                       allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
                       path="/dashboard/b/:customerSlug/triggers/add"
-                      render={() => (
-                        <AddTriggerView />
-                      )}
+                      render={() => <AddTriggerView />}
                     />
 
                     <GuardedRoute
                       allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
                       path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
-                      render={() => (
-                        <EditTriggerView />
-                      )}
+                      render={() => <EditTriggerView />}
                     />
 
                     <GuardedRoute
@@ -153,17 +152,13 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/u/:userId/edit"
                       allowedPermission={SystemPermission.CAN_EDIT_USERS}
-                      render={() => (
-                        <EditUserView />
-                      )}
+                      render={() => <EditUserView />}
                     />
 
                     <GuardedRoute
                       allowedPermission={SystemPermission.CAN_ADD_USERS}
                       path="/dashboard/b/:customerSlug/users/invite"
-                      render={() => (
-                        <InviteUserView />
-                      )}
+                      render={() => <InviteUserView />}
                     />
 
                     <GuardedRoute
@@ -172,6 +167,17 @@ const CustomerRoutes = () => (
                       render={() => <UsersOverview />}
                     />
 
+                    {/* <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
+                      path="/dashboard/b/:customerSlug/admin"
+                      render={() => <AdminOverview />}
+                    /> */}
+
+                    {/* <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
+                      path="/dashboard/b/admin"
+                      render={() => <AdminOverview />}
+                    /> */}
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/dialogue/add"
                       render={() => <AddDialogueView />}
@@ -198,13 +204,13 @@ const CustomerRoutes = () => (
 
 const PublicRoutes = () => (
   <Switch>
-    <Route
-      path="/public/login"
-    >
+    <Route path="/public/login">
       <LoginPage />
     </Route>
 
-    <Route path="/public"><Redirect to="/public/login" /></Route>
+    <Route path="/public">
+      <Redirect to="/public/login" />
+    </Route>
   </Switch>
 );
 
@@ -218,7 +224,6 @@ const RootAppRoute = () => {
 
 const AppRoutes = () => (
   <RootApp>
-
     <Switch>
       <Route
         path="/dashboard/b/add"
@@ -229,10 +234,7 @@ const AppRoutes = () => (
         )}
       />
 
-      <Route
-        path="/dashboard/b/:customerSlug"
-        render={() => <CustomerRoutes />}
-      />
+      <Route path="/dashboard/b/:customerSlug" render={() => <CustomerRoutes />} />
 
       <GuardedRoute
         allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
@@ -240,6 +242,11 @@ const AppRoutes = () => (
         render={() => <AutodeckOverview />}
       />
 
+      <GuardedRoute
+        allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
+        path={ROUTES.ADMIN_OVERVIEW}
+        render={() => <AdminOverview />}
+      />
       <GuardedRoute
         path="/dashboard/b/"
         render={() => (
