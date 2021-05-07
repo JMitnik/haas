@@ -15,6 +15,7 @@
         "@typescript-eslint/no-unused-vars": "error",
         "react/jsx-props-no-spreading": "off",
         "react/no-array-index-key": "off",
+        "no-console": "off",
         "react/no-this-in-sfc": "off", // Bugged, gets triggered by non-SFC functions
         "no-param-reassign": "off",
         "sort-imports-es6-autofix/sort-imports-es6": "error",
