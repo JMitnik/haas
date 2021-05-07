@@ -33,13 +33,6 @@
         "browser": true
     },
     "parserOptions": {
-        "project": "frontend/client/tsconfig.json"
-    },
-    "settings": {
-        "import/resolver": {
-            "typescript": {
-                "directory": "frontend/*/tsconfig.json"
-            }
-        }
+        "project": "tsconfig.json"
     }
 }

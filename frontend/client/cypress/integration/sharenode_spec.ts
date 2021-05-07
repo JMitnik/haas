@@ -1,8 +1,7 @@
 // Layer 1 Choice
 const firstLayerProductServicesButtonText = /Product\/Services/i;
 
-const CTA_Share_Node_text = /Share with your friends/i;
-const shareText = /(Get 90% of your next purchase!*)|(https:\/\/www.linkedin.com\/company\/haas-happiness-as-a-service\/)/gi;
+const CTAShareNodeText = /Share with your friends/i;
 
 beforeEach(() => {
   cy.graphql('getDialogue', (req) => {
@@ -16,7 +15,7 @@ beforeEach(() => {
   cy.graphql('createSession', (req) => {
     req.reply({ fixture: 'mockCreateSession.json' });
   }, 'createUserMockSession');
-})
+});
 
 it('Custom link CTA', () => {
   cy.visit('http://localhost:3000/test/test').then((win) => {
@@ -39,20 +38,20 @@ it('Custom link CTA', () => {
     });
 
     // Expect to arrive at share CTA with this text
-    cy.findByText(CTA_Share_Node_text).should('exist');
+    cy.findByText(CTAShareNodeText).should('exist');
     cy.findByText('Delen').click();
 
     // Test share function is called with following parameters
     const shareParameter = {
       text:
-        `Get 90% of your next purchase! 
- https://www.linkedin.com/company/haas-happiness-as-a-service/`
+        `Get 90% of your next purchase!
+ https://www.linkedin.com/company/haas-happiness-as-a-service/`,
     };
     cy.get('@share').should('be.calledWith', shareParameter);
 
     cy.reload();
     cy.wait('@getDialogue');
     cy.wait('@getCustomer');
-    cy.findByText(CTA_Share_Node_text).should('exist');
+    cy.findByText(CTAShareNodeText).should('exist');
   });
 });
