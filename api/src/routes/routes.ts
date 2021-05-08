@@ -13,6 +13,6 @@ export const routes = (app: Express) => {
   app.get('/health', healthRoute);
 
   // Webhook routes
-  app.get('/webhooks/delivery', bodyParser.json(), webhookRoute);
+  app.get('/webhooks', bodyParser.json(), webhookRoute);
   app.get('/webhooks/delivery', bodyParser.json(), webhookDeliveryRoute);
 }
