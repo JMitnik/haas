@@ -1,0 +1,293 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateModel",
+      "model": "Topic"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Topic",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Topic",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Topic",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Topic",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Topic",
+      "field": "label",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Topic",
+      "field": "values",
+      "type": "TopicValue",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Topic",
+      "field": "relatedQuestions",
+      "type": "QuestionNode",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "TopicValue"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TopicValue",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TopicValue",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TopicValue",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TopicValue",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TopicValue",
+      "field": "label",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TopicValue",
+      "field": "parentTopicId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TopicValue",
+      "field": "parentTopic",
+      "type": "Topic",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TopicValue",
+          "field": "parentTopic"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TopicValue",
+          "field": "parentTopic"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[parentTopicId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TopicValue",
+          "field": "parentTopic"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TopicValue",
+      "field": "relatedChoices",
+      "type": "QuestionOption",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "relatedTopicId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "relatedTopic",
+      "type": "Topic",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "relatedTopic"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "relatedTopic"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[relatedTopicId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "relatedTopic"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionOption",
+      "field": "relatedTopicValueId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionOption",
+      "field": "relatedTopicValue",
+      "type": "TopicValue",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionOption",
+          "field": "relatedTopicValue"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionOption",
+          "field": "relatedTopicValue"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[relatedTopicValueId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionOption",
+          "field": "relatedTopicValue"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    }
+  ]
+}
