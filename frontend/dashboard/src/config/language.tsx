@@ -5,6 +5,18 @@ const language = {
       en: 'General',
       de: 'General',
     },
+    topic_placeholder: {
+      en: 'Opinion about customer support',
+      de: 'Meinung zum Kundensupport'
+    },
+    save_topic: {
+      en: 'Save topic',
+      de: 'Thema speichern'
+    },
+    create_topic: {
+      en: 'Create topic',
+      de: 'Thema erstellen'
+    },
     process_location: {
       en: 'Process type & location',
       de: 'Process type & location',
@@ -919,11 +931,11 @@ const language = {
     },
     you_love_x: {
       en: 'You love X',
-      de: 'Du liebst X', 
+      de: 'Du liebst X',
     },
     you_love_x_helper: {
       en: 'Something the target user loves',
-      de: 'The "You love X" message', 
+      de: 'The "You love X" message',
     },
     reward: {
       en: 'Reward',
@@ -1201,6 +1213,10 @@ const language = {
       en: 'Users and roles',
       de: 'Benutzer und Rollen',
     },
+    topic_view: {
+      en: 'Topics',
+      de: 'Themen'
+    }
   },
   user: {
     roles_helper: {

@@ -13,6 +13,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { NavItem, NavItems, Usernav } from 'components/Sidenav/Sidenav';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification.svg';
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog.svg';
+import { ReactComponent as CollectionIcon } from 'assets/icons/icon-collection-open.svg';
 import { ReactComponent as SliderIcon } from 'assets/icons/icon-slider.svg';
 import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey.svg';
 import { ReactComponent as TableIcon } from 'assets/icons/icon-table.svg';
@@ -37,11 +38,11 @@ const CustomerLayoutContainer = styled(Div) <{ isMobile?: boolean }>`
     min-height: 100vh;
 
     ${isMobile ? css`
-      grid-template-columns: '1fr';      
+      grid-template-columns: '1fr';
     ` : css`
       grid-template-columns: ${theme.sidenav.width}px 1fr;
     `}
-    
+
   `}
 `;
 
@@ -105,11 +106,6 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
                 {dialogueMatch && (
                   <motion.div>
                     <SubNav>
-                      {/* <li>
-                        <UI.Label size="sm" fontSize="0.5rem" variantColor="gray">
-                          {activeDialogue?.title}
-                        </UI.Label>
-                      </li> */}
                       <SubNavItem>
                         <NavLink exact strict to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}`}>
                           <UI.Icon mr={2} as={ChartIcon} />
@@ -123,11 +119,16 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
                         </NavLink>
                       </SubNavItem>
                       <SubNavItem>
+                        <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/topics`}>
+                          <UI.Icon mr={2} as={CollectionIcon} />
+                          {t('views:topic_view')}
+                        </NavLink>
+                      </SubNavItem>
+                      <SubNavItem>
                         <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions`}>
                           <UI.Icon mr={2} as={CursorClickIcon} />
                           {t('views:cta_view')}
                         </NavLink>
-
                       </SubNavItem>
                       <SubNavItem>
                         <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder`}>

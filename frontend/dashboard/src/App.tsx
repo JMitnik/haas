@@ -51,6 +51,7 @@ import UsersOverview from 'views/UsersOverview/UsersOverview';
 import VerifyTokenPage from 'pages/verify_token';
 import client from 'config/apollo';
 import lang from 'config/i18n-config';
+import TopicsOverview from 'views/TopicsOverview';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
@@ -73,6 +74,12 @@ const CustomerRoutes = () => (
                       allowedPermission={SystemPermission.CAN_EDIT_DIALOGUE}
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
                       render={() => <EditDialogueView />}
+                    />
+
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_EDIT_DIALOGUE}
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/topics"
+                      render={() => <TopicsOverview />}
                     />
 
                     <GuardedRoute
