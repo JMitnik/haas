@@ -27,7 +27,7 @@ export const paginationFilter: PaginationWhereInput = {
 const BackButtonContainer = styled(UI.Div)`
   cursor: pointer;
   ${({ theme }) => css`
-    
+
     color: ${theme.colors.gray[600]};
     svg {
       width: 32px;

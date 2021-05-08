@@ -269,7 +269,7 @@ export const RetryAutodeckJobMutation = mutationField('retryAutodeckJob', {
     if (!jobId) {
       return null;
     }
-    
+
     const job = await AutodeckService.retryJob(jobId);
 
     return job ? job as any : null;

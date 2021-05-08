@@ -310,6 +310,25 @@ model QuestionOption {
 
   questionNodeId String?
   QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
+
+  relatedTopicValueId String?
+  relatedTopicValue TopicValue? @relation(fields: [relatedTopicValueId], references: [id])
+}
+
+model Topic {
+  id  String  @id @default(cuid())
+  label String
+  values  TopicValue[]
+}
+
+model TopicValue {
+  id  String  @id @default(cuid())
+  label String
+
+  parentTopicId String
+  parentTopic Topic @relation(fields: [parentTopicId], references: [id])
+  // REMINDME: Explain final step to alice
+  // relatedChoices  QuestionOption[]
 }
 
 model Session {

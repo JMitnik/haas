@@ -65,6 +65,7 @@
         "test:watch": "jest test --watch --maxWorkers=0",
         "test:cypress": "(DEBUG=cypress:* && cypress open)",
         "gen": "graphql-codegen",
+        "gen:watch": "graphql-codegen --watch",
         "eject": "react-scripts eject",
         "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
     },
