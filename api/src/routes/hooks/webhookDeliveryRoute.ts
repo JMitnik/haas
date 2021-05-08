@@ -1,4 +1,4 @@
-import { NextFunction, Response, Request } from 'express';
+import { Response, Request } from 'express';
 import { CampaignService, DeliveryUpdateItemProps } from '../../models/Campaigns/CampaignService';
 
 export const webhookDeliveryRoute = async (req: Request, res: Response) => {
