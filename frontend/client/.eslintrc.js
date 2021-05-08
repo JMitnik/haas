@@ -1,4 +1,4 @@
-{
+module.exports = {
     "extends": [
         "airbnb-typescript",
         "plugin:@typescript-eslint/eslint-recommended"
@@ -33,6 +33,7 @@
         "browser": true
     },
     "parserOptions": {
-        "project": "tsconfig.json"
+        project: './tsconfig.json',
+        tsconfigRootDir: __dirname,
     }
 }
