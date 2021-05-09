@@ -26,18 +26,6 @@ import '@testing-library/cypress/add-commands'
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-/**
- * Wraps around Graphql
- */
-Cypress.Commands.add('graphql', (operationName, callback, alias) => {
-  cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-    console.log('operation name: ', req.body.operationName)
-    if (req.body.operationName === operationName) {
-      callback(req);
-    }
-  }).as(alias);
-});
-
 Cypress.Commands.add('login', () => {
   cy.visit('http://localhost:3002/verify_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNrbTc5ejdmaTAwMDAwMW1oZjhwdzl3a3EiLCJleHAiOjE2MTU4NzI4MzgsImlhdCI6MTYxNTYxMzYzOH0.Zuxda8KPUC7Hw12hcvFgDNtO6AxyZZfiyy0fZ5GhUwc')
   cy.getLocalStorage("access_token").should("exist");

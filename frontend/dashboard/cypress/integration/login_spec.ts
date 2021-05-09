@@ -10,6 +10,6 @@ describe("Login logic", () => {
 
   it("Login and fetch customers", () => {
     cy.login();
-    cy.findByText(getCustomers.data.user.customers[0].name).should('exist')
+    cy.findByText(getCustomers.data.user.customers[0].name).should('exist');
   });
 });

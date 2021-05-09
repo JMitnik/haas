@@ -1,13 +1,12 @@
 import "cypress-localstorage-commands";
 import getCustomers from '../../src/mocks/fixtures/mockGetCustomers'
-import editWorkspace from '../../src/mocks/fixtures/mockEditWorkspace'
 import getQuestionnairesOfCustomer from '../../src/mocks/fixtures/mockAdminUserPostWorkspaceEdit'
+
 const CREATE_WORKSPACE_INPUT = {
   workspaceName: 'Lufthansa',
   workspaceSlug: 'lufthansa',
   primaryColor: '#BEE3F8',
   logoUrl: 'https://www.vakantie-krant.nl/wp-content/uploads/2014/03/lufthansa-logo.jpg'
-
 }
 
 const UPDATE_WORKSPACE_INPUT = {
@@ -36,7 +35,7 @@ describe("Workspace DELETE logic", () => {
               "customers": [],
               "__typename": "UserType"
             }
-          }))
+          }));
         }),
       );
     }).then(() => {
@@ -58,7 +57,7 @@ describe("Workspace CREATE logic", () => {
   it('CREATE workspace data', () => {
     cy.window().then((window: any) => {
       // Reference global instances set in "src/mocks.js".
-      const { worker, graphql } = window.msw
+      const { worker, graphql } = window.msw;
       worker.use(
         graphql.query('getCustomers', (req: any, res: any, ctx: any) => {
           return res(ctx.data({
@@ -66,7 +65,7 @@ describe("Workspace CREATE logic", () => {
               "customers": [],
               "__typename": "UserType"
             }
-          }))
+          }));
         }),
       );
 
@@ -156,8 +155,6 @@ describe("Workspace UPDATE logic", () => {
     cy.get('@logoUrl').clear().type(UPDATE_WORKSPACE_INPUT.logoUrl);
     cy.get('@logoUrl').should('have.value', UPDATE_WORKSPACE_INPUT.logoUrl);
 
-
-
     cy.window().then((window: any) => {
       // Reference global instances set in "src/mocks.js".
       const { worker, graphql } = window.msw
@@ -185,10 +182,10 @@ describe("Workspace UPDATE logic", () => {
                 ],
                 "__typename": "UserType"
               }
-          }))
+          }));
         },
         graphql.query('getQuestionnairesOfCustomer', (req, res, ctx) => {
-          return res(ctx.data(getQuestionnairesOfCustomer.data))
+          return res(ctx.data(getQuestionnairesOfCustomer.data));
         }),)
       );
     }).then(() => {
