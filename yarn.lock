@@ -3071,6 +3071,24 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
+"@mswjs/cookies@^0.1.4":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@mswjs/cookies/-/cookies-0.1.5.tgz#4631f69a1a5c0c7db2b944004081ce35d4255ea9"
+  integrity sha512-sUPoK1JriT0XGGh9j060lsXl4iRlvPfgEU4qc3thGtVYXlKN8G3Xrc7wBgfJy51NOrtLrDwcmpriB8ppHXgAXw==
+  dependencies:
+    "@types/set-cookie-parser" "^2.4.0"
+    set-cookie-parser "^2.4.6"
+
+"@mswjs/interceptors@^0.8.0":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@mswjs/interceptors/-/interceptors-0.8.1.tgz#8ef43a8b7b25c7b9a2bac67b3702167e25e5fc07"
+  integrity sha512-OI9FYmtURESZG3QDNz4Yt3osy3HY4T3FjlRw+AG4QS1UDdTSZ0tuPFAkp23nGR9ojmbSSj4gSMjf5+R8Oi/qtQ==
+  dependencies:
+    "@open-draft/until" "^1.0.3"
+    debug "^4.3.0"
+    headers-utils "^3.0.2"
+    strict-event-emitter "^0.2.0"
+
 "@nexus/schema@^0.13.1":
   version "0.13.1"
   resolved "https://registry.yarnpkg.com/@nexus/schema/-/schema-0.13.1.tgz#02dadf66b121b3c270659479f2410b7023fcc4a6"
@@ -10182,6 +10200,11 @@ dotenv@^6.2.0:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.2.0.tgz#941c0410535d942c8becf28d3f357dbd9d476064"
   integrity sha512-HygQCKUBSFl8wKQZBSemMywRWcEDNidvNbjGVyZu3nbZ8qq9ubiPoGLMdRDpfSrpkkm9BXYFkpKxxFX38o/76w==
 
+dotenv@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.1.tgz#a889a28a3a515812dde1e7f8183ef5cdf3186b97"
+  integrity sha512-W8FNeNnnvJoYfgkFRKzp8kTgz0T2YY4TJ9xy1Ma0hSebPTK8iquRtpG12TUrSTX5zIN9D/wSLEEuI+Ad35tlyw==
+
 duplexer3@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/duplexer3/-/duplexer3-0.1.4.tgz#ee01dd1cac0ed3cbc7fdbea37dc0a8f1ce002ce2"
@@ -10970,6 +10993,11 @@ events@^3.0.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.2.0.tgz#93b87c18f8efcd4202a461aec4dfc0556b639379"
   integrity sha512-/46HWwbfCX2xTawVfkKLGxMifJYQBWMwY1mjywRtb4c9x8l5NP3KoJtnIOiL1hfdRkIuYhETxQlo62IF8tcnlg==
+
+events@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
+  integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
 
 eventsource@1.0.7, eventsource@^1.0.7:
   version "1.0.7"
@@ -12560,6 +12588,11 @@ headers-utils@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/headers-utils/-/headers-utils-1.2.0.tgz#5e10d1bc9d2bccf789547afca5b991a3167241e8"
   integrity sha512-4/BMXcWrJErw7JpM87gF8MNEXcIMLzepYZjNRv/P9ctgupl2Ywa3u1PgHtNhSRq84bHH9Ndlkdy7bSi+bZ9I9A==
+
+headers-utils@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/headers-utils/-/headers-utils-3.0.2.tgz#dfc65feae4b0e34357308aefbcafa99c895e59ef"
+  integrity sha512-xAxZkM1dRyGV2Ou5bzMxBPNLoRCjcX+ya7KSWybQD2KwLphxsapUVK6x/02o7f4VU6GPSXch9vNY2+gkU8tYWQ==
 
 hex-color-regex@^1.1.0:
   version "1.1.0"
@@ -16765,6 +16798,30 @@ msw@^0.27.0:
     statuses "^2.0.0"
     strict-event-emitter "^0.1.0"
     virtual-cookies "^0.1.2"
+    yargs "^16.2.0"
+
+msw@^0.28.2:
+  version "0.28.2"
+  resolved "https://registry.yarnpkg.com/msw/-/msw-0.28.2.tgz#5179df2c2f8c65e31b2043b8ec9cbe245ad0bd48"
+  integrity sha512-WHfRd+Zwfy8yNPAx4PDJ0PnaEqUw5QOjWbCk5MmgpHMl51R3FJ2yIC694RdqR1bInqoaV94wW9Irv9eSyh65lQ==
+  dependencies:
+    "@mswjs/cookies" "^0.1.4"
+    "@mswjs/interceptors" "^0.8.0"
+    "@open-draft/until" "^1.0.3"
+    "@types/cookie" "^0.4.0"
+    "@types/inquirer" "^7.3.1"
+    "@types/js-levenshtein" "^1.1.0"
+    chalk "^4.1.0"
+    chokidar "^3.4.2"
+    cookie "^0.4.1"
+    graphql "^15.4.0"
+    headers-utils "^3.0.2"
+    inquirer "^7.3.3"
+    js-levenshtein "^1.1.6"
+    node-fetch "^2.6.1"
+    node-match-path "^0.6.1"
+    statuses "^2.0.0"
+    strict-event-emitter "^0.2.0"
     yargs "^16.2.0"
 
 multicast-dns-service-types@^1.1.0:
@@ -21882,6 +21939,13 @@ strict-event-emitter@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/strict-event-emitter/-/strict-event-emitter-0.1.0.tgz#fd742c1fb7e3852f0b964ecdae2d7666a6fb7ef8"
   integrity sha512-8hSYfU+WKLdNcHVXJ0VxRXiPESalzRe7w1l8dg9+/22Ry+iZQUoQuoJ27R30GMD1TiyYINWsIEGY05WrskhSKw==
+
+strict-event-emitter@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/strict-event-emitter/-/strict-event-emitter-0.2.0.tgz#78e2f75dc6ea502e5d8a877661065a1e2deedecd"
+  integrity sha512-zv7K2egoKwkQkZGEaH8m+i2D0XiKzx5jNsiSul6ja2IYFvil10A59Z9Y7PPAAe5OW53dQUf9CfsHKzjZzKkm1w==
+  dependencies:
+    events "^3.3.0"
 
 strict-uri-encode@^1.0.0:
   version "1.1.0"

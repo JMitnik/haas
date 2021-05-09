@@ -1,5 +1,7 @@
 import "cypress-localstorage-commands";
-
+import getCustomers from '../../src/mocks/fixtures/mockGetCustomers'
+import editWorkspace from '../../src/mocks/fixtures/mockEditWorkspace'
+import getQuestionnairesOfCustomer from '../../src/mocks/fixtures/mockAdminUserPostWorkspaceEdit'
 const CREATE_WORKSPACE_INPUT = {
   workspaceName: 'Lufthansa',
   workspaceSlug: 'lufthansa',
@@ -15,29 +17,38 @@ const UPDATE_WORKSPACE_INPUT = {
   logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/1024px-Starbucks_Corporation_Logo_2011.svg.png'
 }
 
-describe("Workspace logic", () => {
-
+describe("Workspace DELETE logic", () => {
   beforeEach(() => {
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getCustomerOfUser') {
-        req.reply({ fixture: 'mockWorkspaceOfUserWithAdminRights.json' });
-      }
-    }).as('getCustomerOfUser');
-
-    cy.graphql('me', (req) => {
-      req.reply({ fixture: 'mockAdminUser.json' });
-    }, 'me');
-
-    cy.graphql('refreshAccessToken', (req) => {
-      req.reply({ fixture: 'mockRefreshActionToken.json' });
-    }, 'refreshAccessToken');
-
-
-    cy.graphql('editWorkspace', (req) => {
-      req.reply({ fixture: 'mockEditWorkspace.json' });
-    }, 'editWorkspace');
-
+    cy.setLocalStorage("access_token", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNrbTc5ejdmaTAwMDAwMW1oZjhwdzl3a3EiLCJleHAiOjE2MTU4NzI4MzgsImlhdCI6MTYxNTYxMzYzOH0.Zuxda8KPUC7Hw12hcvFgDNtO6AxyZZfiyy0fZ5GhUwc');
+    cy.saveLocalStorage();
   });
+
+  it('DELETE workspace data', () => {
+    cy.login();
+    cy.wait(5000); // Necessary to wait for all animations to settle on laggy computer :') 
+    cy.window().then((window: any) => {
+      // Reference global instances set in "src/mocks.js".
+      const { worker, graphql } = window.msw
+      worker.use(
+        graphql.query('getCustomers', (req: any, res: any, ctx: any) => {
+          return res(ctx.data({
+            "user": {
+              "customers": [],
+              "__typename": "UserType"
+            }
+          }))
+        }),
+      );
+    }).then(() => {
+      cy.findByText(/Delete/gi).click({ force: true });
+      cy.findByTestId('DeleteWorkspaceButton').click({ force: true });
+      cy.findByTestId('CustomerCard').should('not.exist');
+      cy.findByText(/Your session has expired/gi).should('not.exist');
+    })
+  });
+});
+
+describe("Workspace CREATE logic", () => {
 
   beforeEach(() => {
     cy.setLocalStorage("access_token", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNrbTc5ejdmaTAwMDAwMW1oZjhwdzl3a3EiLCJleHAiOjE2MTU4NzI4MzgsImlhdCI6MTYxNTYxMzYzOH0.Zuxda8KPUC7Hw12hcvFgDNtO6AxyZZfiyy0fZ5GhUwc');
@@ -45,120 +56,60 @@ describe("Workspace logic", () => {
   });
 
   it('CREATE workspace data', () => {
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'createWorkspace') {
-        req.reply({ "data": { "createWorkspace": { "name": "Lufthansa", "__typename": "Customer" } } }
-        );
-      }
-    }).as('createWorkspace');
+    cy.window().then((window: any) => {
+      // Reference global instances set in "src/mocks.js".
+      const { worker, graphql } = window.msw
+      worker.use(
+        graphql.query('getCustomers', (req: any, res: any, ctx: any) => {
+          return res(ctx.data({
+            "user": {
+              "customers": [],
+              "__typename": "UserType"
+            }
+          }))
+        }),
+      );
 
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getCustomers') {
-        req.reply({ fixture: 'mockNoWorkspaces.json' });
-      }
-    }).as('getCustomers');
+      cy.login();
+      cy.findByText('Create workspace').parent().siblings('a').click();
+      cy.url().should('eq', 'http://localhost:3002/dashboard/b/add');
 
-    cy.login();
+      // remove runtime-set getCustomers handler to avoid having no workspaces
+      worker.resetHandlers();
 
-    cy.wait('@getCustomers');
+      cy.get('form').within(() => {
+        cy.findByLabelText(/Name./gi).type(CREATE_WORKSPACE_INPUT.workspaceName);
+        cy.findByLabelText(/URL extension./gi).type(CREATE_WORKSPACE_INPUT.workspaceSlug);
+        cy.findByLabelText(/Logo: existing URL*/gi).type(CREATE_WORKSPACE_INPUT.logoUrl);
+        cy.findByText('Create').click({ force: true });
+      })
 
-    cy.findByText('Create workspace').parent().siblings('a').click();
-    cy.url().should('eq', 'http://localhost:3002/dashboard/b/add');
+      cy.findByText(getCustomers.data.user.customers[0].name).should('exist')
 
-    cy.get('form').within(() => {
-      cy.findByLabelText(/Name./gi).type(CREATE_WORKSPACE_INPUT.workspaceName);
-      cy.findByLabelText(/URL extension./gi).type(CREATE_WORKSPACE_INPUT.workspaceSlug);
-      cy.findByLabelText(/Logo: existing URL*/gi).type(CREATE_WORKSPACE_INPUT.logoUrl);
-      cy.findByText('Create').click({ force: true });
     })
-
-
-    cy.wait('@createWorkspace').its('request.body.variables.input').then(input => {
-      cy.wrap(input.name).should('equal', CREATE_WORKSPACE_INPUT.workspaceName);
-      cy.wrap(input.slug).should('equal', CREATE_WORKSPACE_INPUT.workspaceSlug);
-      cy.wrap(input.logo).should('equal', CREATE_WORKSPACE_INPUT.logoUrl);
-      cy.wrap(input.primaryColour).should('equal', CREATE_WORKSPACE_INPUT.primaryColor);
-    })
-
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getCustomers') {
-        req.reply({ fixture: 'mockGetCustomers.json' });
-      }
-    })
-
-    cy.findByTestId('CustomerCard').should('exist');
-    cy.findByText(CREATE_WORKSPACE_INPUT.workspaceName).should('exist');
-
-    // Test logo is displayed on workspace card
-    cy.get('img').should('have.attr', 'src', CREATE_WORKSPACE_INPUT.logoUrl);
-
-    cy.findByTestId('CustomerCard').as('card').should('have.css', 'background-color', 'rgb(190, 227, 248)');
-
   });
+});
 
-  it('DELETE workspace data', () => {
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'deleteFullCustomer' || req.body.operationName === 'deleteCustomer') {
-        req.reply({ fixture: 'mockDeleteWorkspace.json' });
-      }
-    }).as('deleteFullCustomer');
+describe("Workspace READ logic", () => {
 
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getCustomers') {
-        req.reply({ fixture: 'mockGetCustomers.json' });
-      }
-    }).as('getCustomers');
-
-    cy.login();
-
-    cy.wait('@getCustomers');
-
-    cy.findByText(/Delete/gi).click();
-
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getCustomers') {
-        req.reply({ fixture: 'mockNoWorkspaces.json' });
-      }
-    }).as('getCustomers');
-
-    cy.findByTestId('DeleteWorkspaceButton').click();
-    cy.wait('@deleteFullCustomer');
-
-    cy.wait(['@me', '@refreshAccessToken', '@getCustomers']);
-    cy.findByTestId('CustomerCard').should('not.exist');
-    cy.findByText(/Your session has expired/gi).should('not.exist');
+  beforeEach(() => {
+    cy.setLocalStorage("access_token", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNrbTc5ejdmaTAwMDAwMW1oZjhwdzl3a3EiLCJleHAiOjE2MTU4NzI4MzgsImlhdCI6MTYxNTYxMzYzOH0.Zuxda8KPUC7Hw12hcvFgDNtO6AxyZZfiyy0fZ5GhUwc');
+    cy.saveLocalStorage();
   });
 
   it("READ workspace data", () => {
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getQuestionnairesOfCustomer') {
-        req.reply({ fixture: 'mockGetDialoguesOfWorkspace.json' });
-      }
-    }).as('getQuestionnairesOfCustomer');
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getCustomers') {
-        req.reply({ fixture: 'mockGetCustomers.json' });
-      }
-    }).as('getCustomers');
-
     cy.login();
-    cy.wait('@getCustomers');
 
     // Test READ workspace
     cy.findByText('Lufthansa').should('exist');
 
-    // Test logo is displayed on workspace card
     cy.get('img').should('have.attr', 'src', 'https://www.vakantie-krant.nl/wp-content/uploads/2014/03/lufthansa-logo.jpg');
 
     cy.findByTestId('CustomerCard').as('card').should('have.css', 'background-color', 'rgb(190, 227, 248)');
 
     // TEST READ edit workspace form
     cy.get('@card').click();
-    cy.wait('@getCustomerOfUser');
-    cy.wait('@getQuestionnairesOfCustomer');
     cy.findByText('Settings').as('settings').should('exist').click();
-    cy.wait('@me');
-    cy.wait('@refreshAccessToken');
 
     cy.get('form').findByLabelText(/(Name.)/gi).as('nameField').should('exist');
     cy.get('@nameField').should('have.value', 'Lufthansa');
@@ -175,39 +126,23 @@ describe("Workspace logic", () => {
     cy.findByLabelText(/Logo: existing URL/gi).as('logoUrl').should('exist');
     cy.get('@logoUrl').should('have.value', 'https://www.vakantie-krant.nl/wp-content/uploads/2014/03/lufthansa-logo.jpg');
   });
+});
+
+describe("Workspace UPDATE logic", () => {
+  beforeEach(() => {
+    cy.setLocalStorage("access_token", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNrbTc5ejdmaTAwMDAwMW1oZjhwdzl3a3EiLCJleHAiOjE2MTU4NzI4MzgsImlhdCI6MTYxNTYxMzYzOH0.Zuxda8KPUC7Hw12hcvFgDNtO6AxyZZfiyy0fZ5GhUwc');
+    cy.saveLocalStorage();
+  });
 
   it('UPDATE workspace data', () => {
     cy.login();
 
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getQuestionnairesOfCustomer') {
-        req.reply({ fixture: 'mockGetDialoguesOfWorkspace.json' });
-      }
-    }).as('getQuestionnairesOfCustomer');
-
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getCustomerOfUser') {
-        req.reply({ fixture: 'mockWorkspaceOfUserWithAdminRights.json' });
-      }
-    }).as('getCustomerOfUser');
-
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getCustomers') {
-        req.reply({ fixture: 'mockGetCustomers.json' });
-      }
-    }).as('getCustomers');
-
-
-    cy.wait('@getCustomers');
     // Access workspace
     cy.findByTestId('CustomerCard').as('card');
     cy.get('@card').click({ force: true });
-    cy.wait(['@getCustomerOfUser', '@getQuestionnairesOfCustomer']);
 
     // Enter new data
     cy.findByText('Settings').as('settings').should('exist').click();
-    cy.wait('@refreshAccessToken');
-    cy.wait(1000);
     cy.get('form').findByLabelText(/(Name.)/gi).as('nameField').should('exist');
     cy.get('@nameField').clear().type(UPDATE_WORKSPACE_INPUT.workspaceName);
 
@@ -221,40 +156,48 @@ describe("Workspace logic", () => {
     cy.get('@logoUrl').clear().type(UPDATE_WORKSPACE_INPUT.logoUrl);
     cy.get('@logoUrl').should('have.value', UPDATE_WORKSPACE_INPUT.logoUrl);
 
-    cy.findByText('Edit').click();
 
-    cy.graphql('editWorkspace', (req) => {
-      req.reply({ fixture: 'mockEditWorkspace.json' });
-    }, 'editWorkspace');
 
-    cy.wait('@editWorkspace', { log: true })
-      .its('request.body.variables.input').then((input) => {
-        cy.wrap(input.name).should('equal', UPDATE_WORKSPACE_INPUT.workspaceName);
-        cy.wrap(input.logo).should('equal', UPDATE_WORKSPACE_INPUT.logoUrl);
-        cy.wrap(input.primaryColour).should('equal', UPDATE_WORKSPACE_INPUT.primaryColor.toLowerCase());
-      })
-
-    cy.wait(['@me', '@refreshAccessToken']);
-
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getCustomers') {
-        req.reply({ fixture: 'mockPostEditGetCustomers.json' });
-      }
-    }).as('getEditedCustomers');
-
-    cy.visit('http://localhost:3002/dashboard/b');
-
-    cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-      if (req.body.operationName === 'getCustomers') {
-        req.reply({ fixture: 'mockPostEditGetCustomers.json' });
-      }
-    }).as('getEditedCustomers');
-
-    cy.wait('@getEditedCustomers', { log: true });
-
-    cy.findByText('Starbucks').should('exist');
-    cy.get('img').should('have.attr', 'src', UPDATE_WORKSPACE_INPUT.logoUrl);
-    cy.findByTestId('CustomerCard').as('card').should('have.css', 'background-color', 'rgb(220, 20, 60)');
-
+    cy.window().then((window: any) => {
+      // Reference global instances set in "src/mocks.js".
+      const { worker, graphql } = window.msw
+      worker.use(
+        graphql.query('getCustomers', (req: any, res: any, ctx: any) => {
+          return res(ctx.data({
+              "user": {
+                "customers": [
+                  {
+                    "id": "ckm7af2gj0050yfr5ykrvzyvf",
+                    "name": "Starbucks",
+                    "slug": "starbucks",
+                    "settings": {
+                      "logoUrl": UPDATE_WORKSPACE_INPUT.logoUrl,
+                      "colourSettings": {
+                        "primary": UPDATE_WORKSPACE_INPUT.primaryColor,
+                        "secondary": null,
+                        "__typename": "ColourSettings"
+                      },
+                      "__typename": "CustomerSettings"
+                    },
+                    "dialogues": [],
+                    "__typename": "Customer"
+                  }
+                ],
+                "__typename": "UserType"
+              }
+          }))
+        },
+        graphql.query('getQuestionnairesOfCustomer', (req, res, ctx) => {
+          return res(ctx.data(getQuestionnairesOfCustomer.data))
+        }),)
+      );
+    }).then(() => {
+      cy.findByText('Edit').click();
+      cy.findByText('DH').click();
+      cy.findByText('Switch workspace').click();
+      cy.findByText(UPDATE_WORKSPACE_INPUT.workspaceName).should('exist');
+      cy.get('img').should('have.attr', 'src', UPDATE_WORKSPACE_INPUT.logoUrl);
+      cy.findByTestId('CustomerCard').as('card').should('have.css', 'background-color', 'rgb(220, 20, 60)');
+    });
   })
 });

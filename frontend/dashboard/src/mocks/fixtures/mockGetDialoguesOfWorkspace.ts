@@ -1,4 +1,4 @@
-{
+export default {
   "data": {
     "customer": {
       "id": "ckmrc2c3q6230z2r5zogzu5k0",

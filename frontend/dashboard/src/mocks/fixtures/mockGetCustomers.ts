@@ -1,15 +1,15 @@
-{
+export default {
   "data": {
     "user": {
       "customers": [
         {
-          "id": "ckm7af2gj0050yfr5ykrvzyvf",
-          "name": "Starbucks",
-          "slug": "starbucks",
+          "id": "ckmrc2c3q6230z2r5zogzu5k0",
+          "name": "Lufthansa",
+          "slug": "lufthansa",
           "settings": {
-            "logoUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/1024px-Starbucks_Corporation_Logo_2011.svg.png",
+            "logoUrl": "https://www.vakantie-krant.nl/wp-content/uploads/2014/03/lufthansa-logo.jpg",
             "colourSettings": {
-              "primary": "#DC143C",
+              "primary": "#BEE3F8",
               "secondary": null,
               "__typename": "ColourSettings"
             },

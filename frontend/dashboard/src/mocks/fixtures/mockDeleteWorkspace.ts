@@ -1,7 +1,7 @@
-{
+export default {
   "data": {
     "deleteCustomer": {
-      "id": "cknpq37hf15135mzr540dnpxa0",
+      "id": "ckmrc2c3q6230z2r5zogzu5k0",
       "__typename": "Customer"
     }
   }
