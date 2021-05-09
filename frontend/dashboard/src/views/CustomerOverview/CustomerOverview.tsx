@@ -10,7 +10,7 @@ import {
 } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Link } from 'react-router-dom';
-import { Plus } from 'react-feather';
+import { Plus, UserCheck } from 'react-feather';
 import { Skeleton } from '@chakra-ui/core';
 import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
 import { Variants, motion } from 'framer-motion';
@@ -72,8 +72,12 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
           </H4>
           {canAccessAdmin && (
           <Span>
-            <UI.Button bg="gray.200" mb={2} size="sm" variant="outline" onClick={goToAdminPanel}>
-              <Link to="dashboard/">{t('adminpanel')}</Link>
+            <UI.Button bg="gray.200" mb={2} size="sm" variant="outline" leftIcon={UserCheck} onClick={goToAdminPanel}>
+              <Link to="dashboard/">
+
+                {t('adminpanel')}
+
+              </Link>
             </UI.Button>
           </Span>
           )}
