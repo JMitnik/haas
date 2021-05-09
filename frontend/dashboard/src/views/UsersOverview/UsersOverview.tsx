@@ -21,9 +21,9 @@ import {
   PopoverTrigger,
   useToast,
 } from '@chakra-ui/core';
-import { Plus } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
+import { Plus } from 'react-feather';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
 import ShowMoreButton from 'components/ShowMoreButton';
@@ -70,11 +70,10 @@ const UsersOverview = () => {
     sortBy: [{ by: 'email', desc: true }],
   });
 
-  const tableData: any =
-    data?.customer?.usersConnection?.userCustomers?.map((userCustomer: any) => ({
-      ...userCustomer.user,
-      role: userCustomer.role,
-    })) || [];
+  const tableData: any = data?.customer?.usersConnection?.userCustomers?.map((userCustomer: any) => ({
+    ...userCustomer.user,
+    role: userCustomer.role,
+  })) || [];
 
   useEffect(() => {
     const {
@@ -161,7 +160,7 @@ const UsersOverview = () => {
     debounce((newSearchTerm: string) => {
       setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
     }, 250),
-    []
+    [],
   );
 
   const pageCount = data?.userTable?.pageInfo?.nrPages || 1;
@@ -206,7 +205,7 @@ const UsersOverview = () => {
               <>
                 {canDeleteUsers && (
                   <ShowMoreButton
-                    renderMenu={
+                    renderMenu={(
                       <UI.List>
                         <UI.ListHeader>{t('edit_user')}</UI.ListHeader>
                         {canDeleteUsers && (
@@ -244,7 +243,7 @@ const UsersOverview = () => {
                           </>
                         )}
                       </UI.List>
-                    }
+                    )}
                   />
                 )}
               </>

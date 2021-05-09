@@ -546,7 +546,7 @@ const language = {
     },
     adminpanel: {
       en: 'Admin Panel',
-      de: 'Administratie Paneel',
+      de: 'Admin Bereich',
     },
     stay_tuned: {
       en: 'Stay tuned',

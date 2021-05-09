@@ -7,11 +7,11 @@ import {
   QuestionEntryProps,
 } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import { Loader } from '@haas/ui';
+import { useNavigator } from 'hooks/useNavigator';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 import MultiChoiceBuilderIcon from 'components/Icons/MultiChoiceBuilderIcon';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
-import { useNavigator } from 'hooks/useNavigator';
 
 const initializeQuestionType = (type?: string) => {
   if (type === 'SLIDER') {
@@ -26,8 +26,6 @@ const initializeQuestionType = (type?: string) => {
 };
 
 const initializeCTAType = (type?: string) => {
-  let test;
-
   if (type === 'TEXTBOX') {
     return 'Opinion';
   }
@@ -86,10 +84,10 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
         overrideLeaf: !overrideLeaf
           ? undefined
           : {
-              id: overrideLeaf?.id,
-              title: overrideLeaf?.title,
-              type: initializeCTAType(overrideLeaf?.type),
-            },
+            id: overrideLeaf?.id,
+            title: overrideLeaf?.title,
+            type: initializeCTAType(overrideLeaf?.type),
+          },
         options: options?.map((option) => ({
           id: option.id,
           value: option.value,
@@ -110,7 +108,7 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
           ],
           childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title },
         })),
-      })
+      }),
     ) || []
   );
 };

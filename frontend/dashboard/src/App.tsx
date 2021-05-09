@@ -13,11 +13,12 @@ import { DialogueProvider } from 'providers/DialogueProvider';
 import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/globalTypes';
 import ActionsPage from 'pages/dashboard/actions';
-import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
+import AdminOverview from 'views/AdminOverview/AdminOverview';
 import AnalyticsPage from 'pages/dashboard/analytics';
+import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
 import CampaignsView from 'views/CampaignsView/CampaignsView';
 import CustomerLayout from 'layouts/CustomerLayout';
 import CustomerPage from 'pages/dashboard/customer';
@@ -48,7 +49,6 @@ import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UserProvider, { useUser } from 'providers/UserProvider';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
-import AdminOverview from 'views/AdminOverview/AdminOverview';
 import VerifyTokenPage from 'pages/verify_token';
 import client from 'config/apollo';
 import lang from 'config/i18n-config';
@@ -109,11 +109,6 @@ const CustomerRoutes = () => (
               path={ROUTES.CAMPAIGN_VIEW}
               render={() => <CampaignView />}
             />
-            {/* <GuardedRoute
-              allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
-              path="/dashboard/b/:customerSlug/admin"
-              render={() => <AdminOverview />}
-            /> */}
 
             <CustomerRoute
               path="/dashboard/b/:customerSlug"
@@ -167,17 +162,6 @@ const CustomerRoutes = () => (
                       render={() => <UsersOverview />}
                     />
 
-                    {/* <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
-                      path="/dashboard/b/:customerSlug/admin"
-                      render={() => <AdminOverview />}
-                    /> */}
-
-                    {/* <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
-                      path="/dashboard/b/admin"
-                      render={() => <AdminOverview />}
-                    /> */}
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/dialogue/add"
                       render={() => <AddDialogueView />}

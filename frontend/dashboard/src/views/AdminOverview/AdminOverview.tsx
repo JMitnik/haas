@@ -1,47 +1,22 @@
 import * as UI from '@haas/ui';
+import { ArrowLeft, Plus } from 'react-feather';
+import { Div, Flex, PageTitle } from '@haas/ui';
 import { debounce } from 'lodash';
-import { useHistory } from 'react-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigator } from 'hooks/useNavigator';
-import { Div, Flex, PageTitle, Text } from '@haas/ui';
-import { Plus, ArrowLeft } from 'react-feather';
-import { useTranslation } from 'react-i18next';
-import { useGetWorkspaceAdminsQuery } from 'types/generated-types';
 import styled, { css } from 'styled-components';
+
+import { useHistory } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
+
+import { useGetWorkspaceAdminsQuery } from 'types/generated-types';
 import SearchBar from 'components/SearchBar/SearchBar';
 
 const TableHeaderContainer = styled(UI.TableHeading)`
-  background: red;
+  background: grey !important;
+  color: white !important
 `;
 
-const AdminOverview = () => {
-  const { t } = useTranslation();
-  const history = useHistory();
-  //const { customerSlug } = useNavigator();
-
-  const customerSlug = 'nullinc';
-  const { data } = useGetWorkspaceAdminsQuery({
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      customerSlug,
-    },
-  });
-  console.log(data?.users);
-
-  const test = () => {
-    let gp;
-    data?.users?.map((it) => {
-      console.log(it.id + '  ID');
-      console.log(it.firstName + ' FIRST NAME');
-      console.log(it.globalPermissions);
-      gp = it.globalPermissions;
-    });
-    console.log(typeof gp);
-    let vals = [];
-  };
-  test();
-
-  const BackButtonContainer = styled(UI.Div)`
+const BackButtonContainer = styled(UI.Div)`
     cursor: pointer;
     ${({ theme }) => css`
       color: ${theme.colors.gray[600]};
@@ -56,14 +31,22 @@ const AdminOverview = () => {
     `}
   `;
 
+const AdminOverview = () => {
+  const { t } = useTranslation();
+  const history = useHistory();
+  const customerSlug = 'nullinc';
+  const { data } = useGetWorkspaceAdminsQuery({
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      customerSlug,
+    },
+  });
+
   const [activeSearchTerm, setActiveSearchTerm] = useState('');
-  const [debouncedState, setDebouncedState] = useState('');
   const handleChange = (e: any) => {
     setActiveSearchTerm(e.target.value);
     debounce(e.target.value);
   };
-
-  
 
   return (
     <>
@@ -75,13 +58,19 @@ const AdminOverview = () => {
             </BackButtonContainer>
 
             <PageTitle>{t('views:admin_overview')}</PageTitle>
-            <Flex flexDirection="row" justifyContent="space-between" alignItems="center">
+            <Flex
+              flexDirection="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <UI.Button leftIcon={Plus} size="sm" variantColor="teal">
-                {/* {t('adminpanel:editpermission')} */}
                 Edit Permission
               </UI.Button>
               <Div ml={500}>
-                <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleChange} />
+                <SearchBar
+                  activeSearchTerm={activeSearchTerm}
+                  onSearchTermChange={handleChange}
+                />
               </Div>
             </Flex>
           </UI.Stack>
@@ -94,9 +83,15 @@ const AdminOverview = () => {
             <UI.Table width="100%">
               <TableHeaderContainer>
                 <UI.TableHeadingCell>{t('admin:userId')}</UI.TableHeadingCell>
-                <UI.TableHeadingCell>{t('admin:userFName')}</UI.TableHeadingCell>
-                <UI.TableHeadingCell>{t('admin:userLName')}</UI.TableHeadingCell>
-                <UI.TableHeadingCell>{t('admin:userPermissions')}</UI.TableHeadingCell>
+                <UI.TableHeadingCell>
+                  {t('admin:userFName')}
+                </UI.TableHeadingCell>
+                <UI.TableHeadingCell>
+                  {t('admin:userLName')}
+                </UI.TableHeadingCell>
+                <UI.TableHeadingCell>
+                  {t('admin:userPermissions')}
+                </UI.TableHeadingCell>
               </TableHeaderContainer>
 
               <UI.TableBody>
@@ -105,13 +100,9 @@ const AdminOverview = () => {
                     <UI.TableCell>{item?.id || ''}</UI.TableCell>
                     <UI.TableCell>{item?.firstName || ''}</UI.TableCell>
                     <UI.TableCell>{item?.lastName || ''}</UI.TableCell>
-                    {/* <UI.TableCell>Dummy Data</UI.TableCell> */}
-                    <UI.TableCell
-                      style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    >
-                      CAN_ACCESS_ADMIN_PANEL
+                    <UI.TableCell>
+                      {item?.globalPermissions || ''}
                     </UI.TableCell>
-                    {/* <UI.TableCell>{item?.globalPermissions || ''}</UI.TableCell> */}
                   </UI.TableRow>
                 ))}
               </UI.TableBody>
@@ -130,7 +121,7 @@ const AdminOverview = () => {
             </UI.Div>
             <UI.Div>
               <UI.Stack isInline>
-                <UI.Button size="sm" variant="outline" isDisabled={true}>
+                <UI.Button size="sm" variant="outline" isDisabled>
                   Previous
                 </UI.Button>
                 <UI.Span ml={1} mt={1} fontWeight="light">
