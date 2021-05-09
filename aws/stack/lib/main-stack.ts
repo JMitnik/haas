@@ -8,7 +8,6 @@ import * as ecs from '@aws-cdk/aws-ecs';
 import * as route53 from '@aws-cdk/aws-route53';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
-import { TwilioHandlerService } from './lambdas/twilio-handler/twilio-handler-service';
 import { Duration } from '@aws-cdk/core';
 
 
@@ -128,7 +127,12 @@ export class APIStack extends cdk.Stack {
       }
     });
 
-    const awsSecret = secretsmanager.Secret.fromSecretNameV2(this, 'API_KEY', 'ProdAwsKey');
+    const awsSecret = secretsmanager.Secret.fromSecretNameV2(
+      this, 'API_KEY', 'ProdAwsKey'
+    );
+    const autodeckAWSSecret = secretsmanager.Secret.fromSecretNameV2(
+      this, 'AUTODECK_API_KEY', 'prod/AutoDeckAWSKeys'
+    );
 
     // Our main API service; we will adjust this as necessary to deal with more load.
     const apiService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "API_SERVICE", {
@@ -157,6 +161,8 @@ export class APIStack extends cdk.Stack {
           // TODO: Use IAM Roles instead, this is not reliable
           AWS_ACCESS_KEY_ID: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_ACCESS_KEY_ID'),
           AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_SECRET_ACCESS_KEY'),
+          AUTODECK_AWS_ACCESS_KEY_ID: ecs.Secret.fromSecretsManager(autodeckAWSSecret, 'AUTODECK_AWS_ACCESS_KEY_ID'),
+          AUTODECK_AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(autodeckAWSSecret, 'AUTODECK_AWS_SECRET_ACCESS_KEY'),
         },
       },
     });

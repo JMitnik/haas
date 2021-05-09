@@ -1,0 +1,7 @@
+query getPreviewData($id: String) {
+  getPreviewData(id: $id) {
+    colors
+    rembgLogoUrl
+    websiteScreenshotUrl
+  }
+}

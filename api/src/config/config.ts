@@ -18,6 +18,8 @@ export interface ConfigProps {
   mailSender: string;
   awsAccessKeyId: string;
   awsSecretAccessKey: string;
+  autodeckAwsAccessKeyId: string;
+  autodeckAwsSecretAccessKey: string;
   prismaServiceSecret: string;
   twilioAccountSid: string;
   twilioAuthToken: string;
@@ -45,6 +47,8 @@ const config: ConfigProps = {
   mailSender: process.env.MAIL_SENDER || '',
   awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
   awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+  autodeckAwsAccessKeyId: process.env.AUTODECK_AWS_ACCESS_KEY_ID || '',
+  autodeckAwsSecretAccessKey: process.env.AUTODECK_AWS_SECRET_ACCESS_KEY || '',
   prismaServiceSecret: process.env.PRISMA_SERVICE_SECRET || '',
   twilioAccountSid: process.env.SMS_ACCOUNT_SID || '',
   twilioAuthToken: process.env.SMS_AUTH_TOKEN || '',

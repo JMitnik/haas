@@ -1,5 +1,6 @@
 mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {
     didInvite
+    userExists
   }
 }

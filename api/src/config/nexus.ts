@@ -1,4 +1,5 @@
 import * as AuthAPI from '../models/auth/Auth';
+import * as AutodeckAPI from '../models/autodeck/Autodeck';
 import * as CampaignAPI from '../models/Campaigns';
 import * as DebugAPI from '../models/debug/Debug';
 import * as InteractionAPI from '../models/session/Session';
@@ -18,6 +19,7 @@ import tagNexus from '../models/tag/Tag';
 import triggerNexus from '../models/trigger/Trigger';
 
 const nexus = [
+  ...Array(AutodeckAPI),
   ...linkNexus,
   ...tagNexus,
   ...Array(CampaignAPI),

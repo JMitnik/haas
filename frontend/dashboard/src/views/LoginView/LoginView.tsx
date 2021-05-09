@@ -33,15 +33,20 @@ const LoginView = () => {
   });
 
   const [requestInvite, { error: loginServerError, loading: isRequestingInvite }] = useRequestInviteMutation({
-    onCompleted: () => {
-      toast({
-        title: 'Invite has been sent in case the mail matches!',
-        description: 'Check your email for your invitation',
-        status: 'success',
-        position: 'bottom-right',
-        isClosable: true,
-      });
-      history.push(`${baseRoute}/waiting`);
+    onCompleted: (data) => {
+      if (data.requestInvite.didInvite) {
+        toast({
+          title: 'Invite has been sent in case the mail matches!',
+          description: 'Check your email for your invitation',
+          status: 'success',
+          position: 'bottom-right',
+          isClosable: true,
+        });
+
+        history.push(`${baseRoute}/waiting`);
+      } else {
+        history.push(`${baseRoute}/not-exist`);
+      }
     },
     onError: (error) => {
       toast({
@@ -147,6 +152,33 @@ const LoginView = () => {
                       You should receive an invitation link very soon!
                       </>
                     </Text>
+                  </UI.Div>
+                </UI.Flex>
+              </AnimatedRoute>
+              <AnimatedRoute path={`${baseRoute}/not-exist`}>
+                <UI.Flex height="100%" alignItems="center" justifyContent="center">
+                  <UI.Div>
+                    <Text fontSize="1.8rem" color="gray.600" textAlign="left">
+                      User not found!
+                    </Text>
+                    { }
+                    <Text textAlign="left" fontSize="1rem" fontWeight="300" color="gray.500">
+                      <>
+                          {sentEmail && (
+                            <>
+                              We cannot find an email by <UI.Span fontWeight="700">{sentEmail}</UI.Span>.
+                              <br />
+                            </>
+                          )}
+                          Please check if the mail is correct, and otherwise reach us for more help.
+                      </>
+                    </Text>
+                    <UI.Button
+                      mt={3}
+                      onClick={() => history.push(baseRoute)}
+                    >
+                      Go back
+                    </UI.Button>
                   </UI.Div>
                 </UI.Flex>
               </AnimatedRoute>

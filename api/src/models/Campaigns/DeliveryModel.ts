@@ -12,9 +12,9 @@ export const DeliveryStatusEnum = enumType({
   members: ['SCHEDULED', 'DEPLOYED', 'SENT', 'OPENED', 'FINISHED'],
 });
 
-/**
- * Data model for a Delivery
- */
+// /**
+//  * Data model for a Delivery
+//  */
 export const DeliveryModel = objectType({
   name: 'DeliveryType',
   description: 'Delivery',
@@ -67,9 +67,9 @@ export const DeliveryConnectionFilterInput = inputObjectType({
   }
 })
 
-/**
- * Access pattern to access Delivery by itself
- */
+// /**
+//  * Access pattern to access Delivery by itself
+//  */
 export const GetDelivery = extendType({
   type: 'Query',
 
