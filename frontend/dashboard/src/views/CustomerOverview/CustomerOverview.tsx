@@ -54,8 +54,6 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
   const { canCreateCustomers, canAccessAdmin } = useAuth();
   const history = useHistory();
   const goToAdminPanel = (e: any) => {
-    // console.log('clicked' + e);
-
     history.push('/dashboard/admin');
   };
 
@@ -70,8 +68,7 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
         {canAccessAdmin && (
           <Span>
             <ButtonGroup zIndex={150} ml={900}>
-              <Button size="sm" variant="outline" onClick={goToAdminPanel}>
-                {/* {t('adminpanel')} */}
+              <Button bg="gray.200" mb={2} size="sm" variant="outline" onClick={goToAdminPanel}>
                 <Link to="dashboard/">{t('adminpanel')}</Link>
               </Button>
             </ButtonGroup>

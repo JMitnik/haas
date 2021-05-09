@@ -1252,6 +1252,24 @@ const language = {
       de: 'Erzählen Sie uns etwas über den Benutzer.',
     },
   },
+  admin: {
+    userId: {
+      en: 'User Id',
+      de: 'Benutzeridentifikation',
+    },
+    userFName: {
+      en: 'First Name',
+      de: 'Vorname',
+    },
+    userLName: {
+      en: 'Last Name',
+      de: 'Nachname',
+    },
+    userPermissions: {
+      en: 'Permission',
+      de: 'Genehmigung',
+    },
+  },
   dialogue: {
     choices: {
       en: 'Choices',
