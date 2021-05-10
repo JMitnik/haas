@@ -32,7 +32,7 @@ const ColorPickerInput = ({ onChange, value }: any) => {
           Primary
         </Button>
 
-        <ColorPickerContainer ref={pickerRef}>
+        <ColorPickerContainer data-testid="colorPicker" ref={pickerRef}>
           {isOpenPicker && (
           <BlockPicker color={value} onChange={(e) => handlePickerChange(e)} />
           )}

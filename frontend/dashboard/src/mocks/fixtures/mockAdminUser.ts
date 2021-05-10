@@ -1,4 +1,4 @@
-{
+export default {
   "data": {
     "me": {
       "id": "ckm79z7fi000001mhf8pw9wkq",
