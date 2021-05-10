@@ -302,6 +302,11 @@ export type CustomFieldType = {
 };
 
 
+export type Debug = {
+  __typename?: 'Debug';
+  debugResolver?: Maybe<Scalars['String']>;
+};
+
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
   customerSlug?: Maybe<Scalars['String']>;
@@ -770,6 +775,7 @@ export type Mutation = {
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
+  debugMutation?: Maybe<Scalars['String']>;
 };
 
 
