@@ -51,16 +51,13 @@ export const CustomerType = objectType({
       nullable: true,
 
       async resolve(parent, args) {
-        const users = await UserService.paginatedUsers(
-          parent.slug,
-          {
+        const users = await UserService.paginatedUsers({
             pageIndex: args.filter?.pageIndex,
             offset: args.filter?.offset,
             limit: args.filter?.limit,
             orderBy: args.filter?.orderBy,
             searchTerm: args.filter?.searchTerm,
-          },
-
+          }, parent.slug
         );
 
         return users as any;

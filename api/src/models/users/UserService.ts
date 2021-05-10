@@ -233,12 +233,12 @@ class UserService {
   };
 
   static paginatedUsers = async (
-    customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
+    customerSlug?: string,
   ) => {
     const userOfCustomerFindManyArgs: FindManyUserOfCustomerArgs = {
       where: {
-        customer: { slug: customerSlug },
+        customer: customerSlug ? { slug: customerSlug }: undefined,
       },
       include: {
         customer: true,

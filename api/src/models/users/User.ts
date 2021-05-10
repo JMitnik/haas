@@ -314,6 +314,25 @@ export const RootUserQueries = extendType({
         return user || null;
       },
     });
+
+    t.field('usersConnection', {
+      type: UserConnection,
+      args: { filter: PaginationWhereInput },
+      nullable: true,
+
+      async resolve(parent, args) {
+        const users = await UserService.paginatedUsers({
+          pageIndex: args.filter?.pageIndex,
+          offset: args.filter?.offset,
+          limit: args.filter?.limit,
+          orderBy: args.filter?.orderBy,
+          searchTerm: args.filter?.searchTerm,
+        });
+
+        return users as any;
+      },
+    });
+
   },
 });
 
