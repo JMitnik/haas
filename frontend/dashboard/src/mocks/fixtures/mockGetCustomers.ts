@@ -1,9 +1,9 @@
-{
+export default {
   "data": {
     "user": {
       "customers": [
         {
-          "id": "ckm7af2gj0050yfr5ykrvzyvf",
+          "id": "ckmrc2c3q6230z2r5zogzu5k0",
           "name": "Lufthansa",
           "slug": "lufthansa",
           "settings": {

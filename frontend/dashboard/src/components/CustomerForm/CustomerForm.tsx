@@ -104,6 +104,7 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
           <FormLabel htmlFor="logo">{t('logo_existing_url')}</FormLabel>
           <InputHelper>{t('logo_existing_url_helper')}</InputHelper>
           <Input
+            id="logo"
             // eslint-disable-next-line jsx-a11y/anchor-is-valid
             leftEl={<Link />}
             name="logo"
@@ -167,6 +168,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
               <FormLabel htmlFor="name">{t('name')}</FormLabel>
               <InputHelper>{t('customer:name_helper')}</InputHelper>
               <Input
+                id="name"
                 placeholder="Peach inc."
                 leftEl={<Briefcase />}
                 name="name"
@@ -175,9 +177,10 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
             </FormControl>
 
             <FormControl isInvalid={!!form.errors.slug} isRequired>
-              <FormLabel htmlFor="name">{t('slug')}</FormLabel>
+              <FormLabel htmlFor="slug">{t('slug')}</FormLabel>
               <InputHelper>{t('customer:slug_helper')}</InputHelper>
               <Input
+                id="slug"
                 placeholder="peach"
                 leftAddOn="https://client.haas.live/"
                 name="slug"

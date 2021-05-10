@@ -26,37 +26,11 @@ import '@testing-library/cypress/add-commands'
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-/**
- * Wraps around Graphql
- */
-Cypress.Commands.add('graphql', (operationName, callback, alias) => {
-  cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-    if (req.body.operationName === operationName) {
-      callback(req);
-    }
-  }).as(alias);
-});
-
 Cypress.Commands.add('login', () => {
-  cy.graphql('me', (req) => {
-    req.reply({ fixture: 'mockAdminUser.json' });
-  }, 'me');
-
-  cy.graphql('refreshAccessToken', (req) => {
-    req.reply({ fixture: 'mockRefreshActionToken.json' });
-  }, 'refreshAccessToken');
-
   cy.visit('http://localhost:3002/verify_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNrbTc5ejdmaTAwMDAwMW1oZjhwdzl3a3EiLCJleHAiOjE2MTU4NzI4MzgsImlhdCI6MTYxNTYxMzYzOH0.Zuxda8KPUC7Hw12hcvFgDNtO6AxyZZfiyy0fZ5GhUwc')
-
-  cy.graphql('refreshAccessToken', (req) => {
-    req.reply({ fixture: 'verifyUserToken.json' });
-  }, 'refreshAccessToken');
-
   cy.getLocalStorage("access_token").should("exist");
   cy.getLocalStorage("access_token").then(token => {
     console.log("Identity token", token);
   });
 
-  cy.wait('@me')
-  cy.wait('@refreshAccessToken')
 });
