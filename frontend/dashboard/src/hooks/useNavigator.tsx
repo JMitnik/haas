@@ -7,7 +7,7 @@ export const ROUTES = {
   CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
   AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
-  ADMIN_OVERVIEW: '/dashboard/b/admin',
+  ADMIN_OVERVIEW: '/dashboard/admin',
 };
 
 interface DashboardParams {

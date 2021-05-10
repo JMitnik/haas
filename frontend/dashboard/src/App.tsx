@@ -231,6 +231,7 @@ const AppRoutes = () => (
         path={ROUTES.ADMIN_OVERVIEW}
         render={() => <AdminOverview />}
       />
+
       <GuardedRoute
         path="/dashboard/b/"
         render={() => (

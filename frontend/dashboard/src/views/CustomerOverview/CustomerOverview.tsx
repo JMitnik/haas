@@ -73,10 +73,8 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
           {canAccessAdmin && (
           <Span>
             <UI.Button bg="gray.200" mb={2} size="sm" variant="outline" leftIcon={UserCheck} onClick={goToAdminPanel}>
-              <Link to="dashboard/">
-
+              <Link to="/dashboard/b/admin">
                 {t('adminpanel')}
-
               </Link>
             </UI.Button>
           </Span>
