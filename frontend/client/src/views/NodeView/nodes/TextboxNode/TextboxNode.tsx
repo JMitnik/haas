@@ -10,12 +10,10 @@ import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { GenericNodeProps } from '../types';
 import { TextboxContainer } from './TextboxStyles';
 
-interface TextboxNodeProps extends GenericNodeProps {
-  isLeaf?: boolean;
-}
+interface TextboxNodeProps extends GenericNodeProps {}
 
 const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
-  const { register, getValues, formState } = useForm<{textbox: string}>({
+  const { register, getValues, formState } = useForm<{ textbox: string }>({
     mode: 'onChange',
   });
 

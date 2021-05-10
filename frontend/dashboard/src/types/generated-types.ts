@@ -302,6 +302,11 @@ export type CustomFieldType = {
 };
 
 
+export type Debug = {
+  __typename?: 'Debug';
+  debugResolver?: Maybe<Scalars['String']>;
+};
+
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
   customerSlug?: Maybe<Scalars['String']>;
@@ -770,6 +775,7 @@ export type Mutation = {
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
+  debugMutation?: Maybe<Scalars['String']>;
 };
 
 
@@ -1732,6 +1738,19 @@ export type VerifyUserTokenOutput = {
   userData: UserType;
 };
 
+export type GetWorkspaceAdminsQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+}>;
+
+
+export type GetWorkspaceAdminsQuery = (
+  { __typename?: 'Query' }
+  & { users: Array<(
+    { __typename?: 'UserType' }
+    & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'globalPermissions'>
+  )> }
+);
+
 export type ConfirmWorkspaceJobMutationVariables = Exact<{
   input?: Maybe<GenerateAutodeckInput>;
 }>;
@@ -2016,6 +2035,45 @@ export type RequestInviteMutation = (
 );
 
 
+export const GetWorkspaceAdminsDocument = gql`
+    query GetWorkspaceAdmins($customerSlug: String!) {
+  users(customerSlug: $customerSlug) {
+    id
+    firstName
+    lastName
+    globalPermissions
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceAdminsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceAdminsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceAdminsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceAdminsQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *   },
+ * });
+ */
+export function useGetWorkspaceAdminsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>) {
+        return Apollo.useQuery<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>(GetWorkspaceAdminsDocument, baseOptions);
+      }
+export function useGetWorkspaceAdminsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>) {
+          return Apollo.useLazyQuery<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>(GetWorkspaceAdminsDocument, baseOptions);
+        }
+export type GetWorkspaceAdminsQueryHookResult = ReturnType<typeof useGetWorkspaceAdminsQuery>;
+export type GetWorkspaceAdminsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceAdminsLazyQuery>;
+export type GetWorkspaceAdminsQueryResult = Apollo.QueryResult<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>;
+export function refetchGetWorkspaceAdminsQuery(variables?: GetWorkspaceAdminsQueryVariables) {
+      return { query: GetWorkspaceAdminsDocument, variables: variables }
+    }
 export const ConfirmWorkspaceJobDocument = gql`
     mutation confirmWorkspaceJob($input: GenerateAutodeckInput) {
   confirmCreateWorkspaceJob(input: $input) {
