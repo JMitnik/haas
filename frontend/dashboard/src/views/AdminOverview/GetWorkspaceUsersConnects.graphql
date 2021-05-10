@@ -1,0 +1,13 @@
+query GetWorkspaceUsersConnects($filter: PaginationWhereInput){
+  usersConnection(filter:$filter)
+   {
+    userCustomers {
+      user {
+        id
+        firstName
+        lastName
+        globalPermissions
+      }
+    }
+  }
+}

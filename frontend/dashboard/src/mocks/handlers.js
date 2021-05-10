@@ -7,7 +7,7 @@ import getCustomerOfUser from './fixtures/mockWorkspaceOfUserWithAdminRights'
 import getQuestionnairesOfCustomer from './fixtures/mockGetDialoguesOfWorkspace'
 import editWorkspace from './fixtures/mockEditWorkspace'
 import createWorkspace from './fixtures/mockCreateWorkspace'
-
+import GetWorkspaceUsersConnects from "./fixtures/mockGetWorkspaceUsersConnects"
 export const handlers = [
   
   graphql.query('me', (req, res, ctx) => {
@@ -29,6 +29,10 @@ export const handlers = [
 
   graphql.query('getQuestionnairesOfCustomer', (req, res, ctx) => {
     return res(ctx.data(getQuestionnairesOfCustomer.data))
+  }),
+
+  graphql.query('GetWorkspaceUsersConnects',(req,res,ctx)=>{
+    return res(ctx.data(GetWorkspaceUsersConnects.data))
   }),
 
   graphql.mutation('deleteFullCustomer', (req, res, ctx) => {

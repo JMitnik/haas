@@ -8,7 +8,9 @@ import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { useGetWorkspaceAdminsQuery } from 'types/generated-types';
+import { PaginationSortByEnum, PaginationWhereInput,
+  useGetWorkspaceAdminsQuery, useGetWorkspaceUsersConnectsQuery } from 'types/generated-types';
+
 import SearchBar from 'components/SearchBar/SearchBar';
 
 const TableHeaderContainer = styled(UI.TableHeading)`
@@ -31,14 +33,26 @@ const BackButtonContainer = styled(UI.Div)`
     `}
   `;
 
+export const paginationFilter: PaginationWhereInput = {
+  startDate: null,
+  endDate: null,
+  searchTerm: '',
+  offset: 0,
+  limit: 8,
+  pageIndex: 0,
+  orderBy: [{ by: PaginationSortByEnum.Email, desc: true }],
+};
+
 const AdminOverview = () => {
   const { t } = useTranslation();
   const history = useHistory();
-  const customerSlug = 'nullinc';
-  const { data } = useGetWorkspaceAdminsQuery({
+
+  const [paginationState, setPaginationState] = useState(paginationFilter);
+
+  const { data } = useGetWorkspaceUsersConnectsQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
-      customerSlug,
+      filter: paginationState,
     },
   });
 
@@ -95,13 +109,13 @@ const AdminOverview = () => {
               </TableHeaderContainer>
 
               <UI.TableBody>
-                {data?.users?.map((item) => (
-                  <UI.TableRow hasHover key={item.id}>
-                    <UI.TableCell>{item?.id || ''}</UI.TableCell>
-                    <UI.TableCell>{item?.firstName || ''}</UI.TableCell>
-                    <UI.TableCell>{item?.lastName || ''}</UI.TableCell>
+                {data?.usersConnection?.userCustomers?.map((item) => (
+                  <UI.TableRow hasHover key={item.user.id}>
+                    <UI.TableCell>{item?.user.id || ''}</UI.TableCell>
+                    <UI.TableCell>{item?.user.firstName || ''}</UI.TableCell>
+                    <UI.TableCell>{item?.user.lastName || ''}</UI.TableCell>
                     <UI.TableCell>
-                      {item?.globalPermissions || ''}
+                      {item?.user.globalPermissions || ''}
                     </UI.TableCell>
                   </UI.TableRow>
                 ))}
