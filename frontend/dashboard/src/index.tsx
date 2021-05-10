@@ -10,7 +10,7 @@ import App from './App';
 
 require('dotenv').config();
 
-if (process.env.REACT_APP_IS_MSW) {
+if (process.env.REACT_APP_IS_MSW === 'true') {
   const { worker } = require('./mocks/browser');
   worker.start();
 }
