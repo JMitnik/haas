@@ -1,6 +1,6 @@
 /**
  * Settings
-**/
+ */
 
 interface FormNodeEntry {
   relatedFieldId: string;
@@ -14,7 +14,7 @@ interface FormNodeEntry {
 // Layer 1 Choice
 const firstLayerFacilityButtonText = /facilities/i;
 
-const CTA_Form_Node_text = /Thank you for your feedback/i;
+const CTAFormNodeText = /Thank you for your feedback/i;
 
 const FORM_VALUES = {
   shortText: 'Short',
@@ -41,7 +41,7 @@ beforeEach(() => {
   cy.graphql('appendToInteraction', (req) => {
     req.reply({ fixture: 'mockAppendToInteraction.json' });
   }, 'appendToInteraction');
-})
+});
 
 it('Fill in content of form node, check appendToInteraction mutation input', () => {
   cy.visit('http://localhost:3000/test/test');
@@ -55,11 +55,11 @@ it('Fill in content of form node, check appendToInteraction mutation input', () 
   cy.get('@websiteButton').click();
 
   // Expect to arrive at a form with this text
-  cy.findByText(CTA_Form_Node_text);
+  cy.findByText(CTAFormNodeText);
 
   cy.findByText(/leave your details/i);
 
-  // First request to create session 
+  // First request to create session
   cy.wait('@createUserMockSession');
 
   // Fill in content
@@ -90,10 +90,10 @@ it('Fill in content of form node, check appendToInteraction mutation input', () 
   cy.get('@submit').click();
 
   cy.wait('@appendToInteraction').its('request.body.variables').then((variables) => {
-    // Session id should equal to the one generated in createSesion mutation 
-    const sessionId = variables.input.sessionId;
+    // Session id should equal to the one generated in createSesion mutation
+    const { sessionId } = variables.input;
     cy.wrap(sessionId).should('equal', 'cknifl3dh2630v0r5vj8x41a2');
-    
+
     // Should contain 6 objects (equal to amount of fields on form node)
     const formNodeEntries: Array<FormNodeEntry> = variables.input.data.form.values;
     cy.wrap(formNodeEntries).should('have.length', 6);

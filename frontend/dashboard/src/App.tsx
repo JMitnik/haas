@@ -13,11 +13,12 @@ import { DialogueProvider } from 'providers/DialogueProvider';
 import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/globalTypes';
 import ActionsPage from 'pages/dashboard/actions';
-import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview'
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
+import AdminOverview from 'views/AdminOverview/AdminOverview';
 import AnalyticsPage from 'pages/dashboard/analytics';
+import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
 import CampaignsView from 'views/CampaignsView/CampaignsView';
 import CustomerLayout from 'layouts/CustomerLayout';
 import CustomerPage from 'pages/dashboard/customer';
@@ -92,7 +93,6 @@ const CustomerRoutes = () => (
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                       render={() => <DialoguePage />}
                     />
-
                   </Switch>
                 </DialogueLayout>
               )}
@@ -117,25 +117,19 @@ const CustomerRoutes = () => (
                   <Switch>
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/analytics/"
-                      render={() => (
-                        <AnalyticsPage />
-                      )}
+                      render={() => <AnalyticsPage />}
                     />
 
                     <GuardedRoute
                       allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
                       path="/dashboard/b/:customerSlug/triggers/add"
-                      render={() => (
-                        <AddTriggerView />
-                      )}
+                      render={() => <AddTriggerView />}
                     />
 
                     <GuardedRoute
                       allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
                       path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
-                      render={() => (
-                        <EditTriggerView />
-                      )}
+                      render={() => <EditTriggerView />}
                     />
 
                     <GuardedRoute
@@ -153,17 +147,13 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/u/:userId/edit"
                       allowedPermission={SystemPermission.CAN_EDIT_USERS}
-                      render={() => (
-                        <EditUserView />
-                      )}
+                      render={() => <EditUserView />}
                     />
 
                     <GuardedRoute
                       allowedPermission={SystemPermission.CAN_ADD_USERS}
                       path="/dashboard/b/:customerSlug/users/invite"
-                      render={() => (
-                        <InviteUserView />
-                      )}
+                      render={() => <InviteUserView />}
                     />
 
                     <GuardedRoute
@@ -198,13 +188,13 @@ const CustomerRoutes = () => (
 
 const PublicRoutes = () => (
   <Switch>
-    <Route
-      path="/public/login"
-    >
+    <Route path="/public/login">
       <LoginPage />
     </Route>
 
-    <Route path="/public"><Redirect to="/public/login" /></Route>
+    <Route path="/public">
+      <Redirect to="/public/login" />
+    </Route>
   </Switch>
 );
 
@@ -218,7 +208,6 @@ const RootAppRoute = () => {
 
 const AppRoutes = () => (
   <RootApp>
-
     <Switch>
       <Route
         path="/dashboard/b/add"
@@ -229,10 +218,7 @@ const AppRoutes = () => (
         )}
       />
 
-      <Route
-        path="/dashboard/b/:customerSlug"
-        render={() => <CustomerRoutes />}
-      />
+      <Route path="/dashboard/b/:customerSlug" render={() => <CustomerRoutes />} />
 
       <GuardedRoute
         allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
@@ -240,6 +226,11 @@ const AppRoutes = () => (
         render={() => <AutodeckOverview />}
       />
 
+      <GuardedRoute
+        allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
+        path={ROUTES.ADMIN_OVERVIEW}
+        render={() => <AdminOverview />}
+      />
       <GuardedRoute
         path="/dashboard/b/"
         render={() => (
