@@ -7,13 +7,12 @@ import ReactDOM from 'react-dom';
 
 import * as serviceWorker from './serviceWorker';
 import App from './App';
+
 require('dotenv').config();
 
-console.log('process.env: ', process.env)
-
 if (process.env.REACT_APP_IS_MSW) {
-  const { worker } = require('./mocks/browser')
-  worker.start()
+  const { worker } = require('./mocks/browser');
+  worker.start();
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
@@ -32,5 +31,4 @@ if (process.env.NODE_ENV === 'production') {
       }
     },
   });
-
 }
