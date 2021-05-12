@@ -15,7 +15,7 @@ import SearchBar from 'components/SearchBar/SearchBar';
 
 const TableHeaderContainer = styled(UI.TableHeading)`
   background: grey !important;
-  color: white !important
+  color: white !important;
 `;
 
 const BackButtonContainer = styled(UI.Div)`
@@ -45,14 +45,11 @@ const BackButtonContainer = styled(UI.Div)`
 
 
 const AdminOverview = () => {
-
-  
   const { t } = useTranslation();
   const history = useHistory();
 
   const [paginationState, setPaginationState] = useState(paginationFilter);
   const [activeSearchTerm, setActiveSearchTerm] = useState('');
-
 
   const { data } = useGetWorkspaceUsersConnectsQuery({
     fetchPolicy: 'cache-and-network',
@@ -60,6 +57,7 @@ const AdminOverview = () => {
       filter: paginationState,
     },
   });
+
   const handleChange = (e: any) => {
     setActiveSearchTerm(e.target.value);
     debounce(e.target.value);
@@ -139,7 +137,7 @@ const AdminOverview = () => {
             </UI.Div>
             <UI.Div>
               <UI.Stack isInline>
-                <UI.Button size="sm" variant="outline" 
+                <UI.Button size="sm" variant="outline"
                 onClick={() => setPaginationState(state => ({
                       ...state,
 
@@ -156,7 +154,6 @@ const AdminOverview = () => {
 
                       pageIndex: (state.pageIndex || 0) + 1,
                       offset: (state.offset || 0) + (state.limit || 0)
-                      
                     }))}
                     isDisabled={(paginationState.pageIndex || 0) + 1 === data?.usersConnection?.pageInfo.nrPages}>Next</UI.Button>
               </UI.Stack>
