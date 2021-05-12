@@ -33,7 +33,7 @@ const BackButtonContainer = styled(UI.Div)`
     `}
   `;
 
-export const paginationFilter: PaginationWhereInput = {
+const paginationFilter: PaginationWhereInput = {
   startDate: null,
   endDate: null,
   searchTerm: '',
