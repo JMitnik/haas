@@ -33,10 +33,6 @@ const BackButtonContainer = styled(UI.Div)`
     `}
   `;
 
-
-
-const AdminOverview = () => {
-
   const paginationFilter: PaginationWhereInput = {
   startDate: null,
   endDate: null,
@@ -46,6 +42,11 @@ const AdminOverview = () => {
   pageIndex: 0,
   orderBy: [{ by: PaginationSortByEnum.Email, desc: true }],
  };
+
+
+const AdminOverview = () => {
+
+  
   const { t } = useTranslation();
   const history = useHistory();
 
