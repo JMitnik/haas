@@ -1767,7 +1767,10 @@ export type GetWorkspaceUsersConnectsQuery = (
         { __typename?: 'UserType' }
         & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'globalPermissions'>
       ) }
-    )> }
+    )>, pageInfo: (
+      { __typename?: 'PaginationPageInfo' }
+      & Pick<PaginationPageInfo, 'nrPages' | 'pageIndex'>
+    ) }
   )> }
 );
 
@@ -2106,6 +2109,10 @@ export const GetWorkspaceUsersConnectsDocument = gql`
         lastName
         globalPermissions
       }
+    }
+    pageInfo {
+      nrPages
+      pageIndex
     }
   }
 }

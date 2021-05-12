@@ -9,5 +9,9 @@ query GetWorkspaceUsersConnects($filter: PaginationWhereInput){
         globalPermissions
       }
     }
+    pageInfo {
+      nrPages
+      pageIndex
+    }
   }
 }

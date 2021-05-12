@@ -33,7 +33,11 @@ const BackButtonContainer = styled(UI.Div)`
     `}
   `;
 
-const paginationFilter: PaginationWhereInput = {
+
+
+const AdminOverview = () => {
+
+  const paginationFilter: PaginationWhereInput = {
   startDate: null,
   endDate: null,
   searchTerm: '',
@@ -41,13 +45,13 @@ const paginationFilter: PaginationWhereInput = {
   limit: 8,
   pageIndex: 0,
   orderBy: [{ by: PaginationSortByEnum.Email, desc: true }],
-};
-
-const AdminOverview = () => {
+ };
   const { t } = useTranslation();
   const history = useHistory();
 
   const [paginationState, setPaginationState] = useState(paginationFilter);
+  const [activeSearchTerm, setActiveSearchTerm] = useState('');
+
 
   const { data } = useGetWorkspaceUsersConnectsQuery({
     fetchPolicy: 'cache-and-network',
@@ -55,8 +59,6 @@ const AdminOverview = () => {
       filter: paginationState,
     },
   });
-
-  const [activeSearchTerm, setActiveSearchTerm] = useState('');
   const handleChange = (e: any) => {
     setActiveSearchTerm(e.target.value);
     debounce(e.target.value);
@@ -122,29 +124,44 @@ const AdminOverview = () => {
               </UI.TableBody>
             </UI.Table>
           </UI.Div>
-          <UI.PaginationFooter>
+         {(data?.usersConnection?.pageInfo.nrPages || 0)>1 &&(
+            <UI.PaginationFooter>
             <UI.Div style={{ lineHeight: 'normal' }}>
               Showing page
               <UI.Span ml={1} fontWeight="bold">
-                1
+                {(paginationState.pageIndex || 0) + 1}
               </UI.Span>
               <UI.Span ml={1}>out of</UI.Span>
               <UI.Span ml={1} fontWeight="bold">
-                22
+                {(data?.usersConnection?.pageInfo.nrPages || 0) + 1}
               </UI.Span>
             </UI.Div>
             <UI.Div>
               <UI.Stack isInline>
-                <UI.Button size="sm" variant="outline" isDisabled>
+                <UI.Button size="sm" variant="outline" 
+                onClick={() => setPaginationState(state => ({
+                      ...state,
+
+                      pageIndex: (state.pageIndex || 0) - 1,
+                      offset: (state.offset || 0) - (state.limit || 0)
+
+                    }))}
+                isDisabled={paginationState.pageIndex === 0}>
                   Previous
                 </UI.Button>
-                <UI.Span ml={1} mt={1} fontWeight="light">
-                  1
-                </UI.Span>
-                <UI.Button size="sm">Next</UI.Button>
+                <UI.Button size="sm" variant="outline"
+                 onClick={() => setPaginationState(state => ({
+                      ...state,
+
+                      pageIndex: (state.pageIndex || 0) + 1,
+                      offset: (state.offset || 0) + (state.limit || 0)
+                      
+                    }))}
+                    isDisabled={(paginationState.pageIndex || 0) + 1 === data?.usersConnection?.pageInfo.nrPages}>Next</UI.Button>
               </UI.Stack>
             </UI.Div>
           </UI.PaginationFooter>
+         )}
         </UI.Card>
       </UI.ViewContainer>
     </>

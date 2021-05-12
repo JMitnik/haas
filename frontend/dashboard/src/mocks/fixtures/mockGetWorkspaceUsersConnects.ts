@@ -67,7 +67,11 @@ export default{
             ]
           }
         }
-      ]
+      ],
+       "pageInfo": {
+        "nrPages": 4,
+        "pageIndex": 1
+      }
     }
  }
 }
