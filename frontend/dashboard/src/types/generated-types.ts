@@ -183,6 +183,8 @@ export type CreateQuestionNodeInputType = {
 
 export type CreateTopicInput = {
   label: Scalars['String'];
+  customerId: Scalars['String'];
+  relatedDialogueSlug: Scalars['String'];
 };
 
 export type CreateTopicOutput = {
@@ -411,6 +413,7 @@ export type Dialogue = {
   questions: Array<QuestionNode>;
   sessions: Array<Session>;
   leafs: Array<QuestionNode>;
+  topics: Array<TopicModel>;
 };
 
 
@@ -1596,6 +1599,12 @@ export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+export type TopicModel = {
+  __typename?: 'TopicModel';
+  id: Scalars['ID'];
+  label: Scalars['String'];
+};
+
 export type TopPathType = {
   __typename?: 'topPathType';
   answer?: Maybe<Scalars['String']>;
@@ -2047,6 +2056,28 @@ export type CreateTopicMutation = (
     { __typename?: 'CreateTopicOutput' }
     & Pick<CreateTopicOutput, 'id'>
   ) }
+);
+
+export type GetTopicsOfDialogueQueryVariables = Exact<{
+  dialogueSlug: Scalars['String'];
+  customerId: Scalars['ID'];
+}>;
+
+
+export type GetTopicsOfDialogueQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id'>
+      & { topics: Array<(
+        { __typename?: 'TopicModel' }
+        & Pick<TopicModel, 'id' | 'label'>
+      )> }
+    )> }
+  )> }
 );
 
 
@@ -2744,3 +2775,47 @@ export function useCreateTopicMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CreateTopicMutationHookResult = ReturnType<typeof useCreateTopicMutation>;
 export type CreateTopicMutationResult = Apollo.MutationResult<CreateTopicMutation>;
 export type CreateTopicMutationOptions = Apollo.BaseMutationOptions<CreateTopicMutation, CreateTopicMutationVariables>;
+export const GetTopicsOfDialogueDocument = gql`
+    query GetTopicsOfDialogue($dialogueSlug: String!, $customerId: ID!) {
+  customer(id: $customerId) {
+    id
+    dialogue(where: {slug: $dialogueSlug}) {
+      id
+      topics {
+        id
+        label
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetTopicsOfDialogueQuery__
+ *
+ * To run a query within a React component, call `useGetTopicsOfDialogueQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTopicsOfDialogueQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTopicsOfDialogueQuery({
+ *   variables: {
+ *      dialogueSlug: // value for 'dialogueSlug'
+ *      customerId: // value for 'customerId'
+ *   },
+ * });
+ */
+export function useGetTopicsOfDialogueQuery(baseOptions: Apollo.QueryHookOptions<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>) {
+        return Apollo.useQuery<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>(GetTopicsOfDialogueDocument, baseOptions);
+      }
+export function useGetTopicsOfDialogueLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>) {
+          return Apollo.useLazyQuery<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>(GetTopicsOfDialogueDocument, baseOptions);
+        }
+export type GetTopicsOfDialogueQueryHookResult = ReturnType<typeof useGetTopicsOfDialogueQuery>;
+export type GetTopicsOfDialogueLazyQueryHookResult = ReturnType<typeof useGetTopicsOfDialogueLazyQuery>;
+export type GetTopicsOfDialogueQueryResult = Apollo.QueryResult<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>;
+export function refetchGetTopicsOfDialogueQuery(variables?: GetTopicsOfDialogueQueryVariables) {
+      return { query: GetTopicsOfDialogueDocument, variables: variables }
+    }

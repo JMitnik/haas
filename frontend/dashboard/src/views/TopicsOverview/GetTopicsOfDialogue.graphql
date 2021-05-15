@@ -1,0 +1,12 @@
+query GetTopicsOfDialogue($dialogueSlug: String!, $customerId: ID!) {
+  customer(id: $customerId) {
+    id
+    dialogue(where: { slug: $dialogueSlug }) {
+      id
+      topics {
+        id
+        label
+      }
+    }
+  }
+}

@@ -2,12 +2,20 @@ import * as UI from '@haas/ui';
 import React, { useState } from 'react'
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { useGetTopicsOfDialogueQuery } from 'types/generated-types';
 
 import CreateTopicForm from './CreateTopicForm';
 
 const TopicsOverview = () => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const { t } = useTranslation();
+
+  // TODO: Query the backend
+  // const {} = useGetTopicsOfDialogueQuery({
+  //   variables: {
+
+  //   }
+  // });
 
   return (
       <>

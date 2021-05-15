@@ -5,6 +5,8 @@ export const CreateTopicInput = inputObjectType({
   name: 'CreateTopicInput',
   definition(t) {
     t.string('label', { required: true });
+    t.string('customerId', { required: true });
+    t.string('relatedDialogueSlug', { required: true });
   },
 });
 
@@ -26,11 +28,17 @@ export const CreateTopicMutation = mutationField('createTopic', {
     // Create new topic (no topic values yet) in database.
     const topic = await ctx.prisma.topic.create({
       data: {
-        label: args.input.label
+        label: args.input.label,
+        relatedDialogue: {
+          connect: {
+            slug_customerId: {
+              customerId: args.input.customerId,
+              slug: args.input.relatedDialogueSlug
+            }
+          }
+        }
       }
     });
-
-    console.log(args.input.label);
 
     return {
       id: topic.id

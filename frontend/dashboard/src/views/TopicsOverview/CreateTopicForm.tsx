@@ -1,4 +1,6 @@
 import * as UI from '@haas/ui';
+import { useNavigator } from 'hooks/useNavigator';
+import { useCustomer } from 'providers/CustomerProvider';
 import React from 'react'
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +14,8 @@ import { useCreateTopicMutation } from 'types/generated-types';
 const CreateTopicForm = ({ onCloseModal }: { onCloseModal: Function }) => {
   const form = useForm();
   const { t } = useTranslation();
+  const { dialogueSlug } = useNavigator();
+  const { activeCustomer } = useCustomer();
 
   const [createTopic, { loading }] = useCreateTopicMutation({
     onCompleted: () => {
@@ -23,7 +27,9 @@ const CreateTopicForm = ({ onCloseModal }: { onCloseModal: Function }) => {
     createTopic({
       variables: {
         input: {
-          label
+          label,
+          relatedDialogueSlug: dialogueSlug,
+          customerId: activeCustomer?.id || ''
         }
       }
     });
