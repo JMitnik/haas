@@ -8,6 +8,7 @@ import * as PaginationAPI from '../models/general/Pagination';
 import * as QuestionNodeAPI from '../models/QuestionNode';
 import * as UserAPI from '../models/users/User';
 import * as WorkspaceAPI from '../models/customer/Customer';
+import * as TopicAPI from '../models/topics';
 import config from './config';
 import customerSettingsNexus from '../models/settings/CustomerSettings';
 import dialogueNexus from '../models/questionnaire/Dialogue';
@@ -36,6 +37,7 @@ const nexus = [
   ...Array(NodeEntryAPI),
   ...Array(InteractionAPI),
   ...Array(QuestionNodeAPI),
+  ...Array(TopicAPI),
   ...edgeNexus,
   ...(config.isDebug ? Array(DebugAPI) : []),
 ];

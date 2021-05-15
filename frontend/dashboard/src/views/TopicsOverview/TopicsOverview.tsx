@@ -26,7 +26,7 @@ const TopicsOverview = () => {
           <UI.Modal isOpen={isOpenModal} onClose={() => setIsOpenModal(false)}>
             <UI.Card bg="white" noHover width={700}>
               <UI.CardBody>
-                <CreateTopicForm />
+                <CreateTopicForm onCloseModal={() => setIsOpenModal(false)} />
               </UI.CardBody>
             </UI.Card>
           </UI.Modal>

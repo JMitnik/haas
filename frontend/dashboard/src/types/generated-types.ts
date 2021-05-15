@@ -181,6 +181,15 @@ export type CreateQuestionNodeInputType = {
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
 
+export type CreateTopicInput = {
+  label: Scalars['String'];
+};
+
+export type CreateTopicOutput = {
+  __typename?: 'CreateTopicOutput';
+  id: Scalars['String'];
+};
+
 export type CreateTriggerInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   recipients?: Maybe<RecipientsInputType>;
@@ -775,6 +784,7 @@ export type Mutation = {
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
+  createTopic: CreateTopicOutput;
   debugMutation?: Maybe<Scalars['String']>;
 };
 
@@ -1024,6 +1034,11 @@ export type MutationUpdateCtaArgs = {
 
 export type MutationUpdateQuestionArgs = {
   input?: Maybe<UpdateQuestionNodeInputType>;
+};
+
+
+export type MutationCreateTopicArgs = {
+  input?: Maybe<CreateTopicInput>;
 };
 
 export type NodeEntry = {
@@ -2021,6 +2036,19 @@ export type RequestInviteMutation = (
   ) }
 );
 
+export type CreateTopicMutationVariables = Exact<{
+  input?: Maybe<CreateTopicInput>;
+}>;
+
+
+export type CreateTopicMutation = (
+  { __typename?: 'Mutation' }
+  & { createTopic: (
+    { __typename?: 'CreateTopicOutput' }
+    & Pick<CreateTopicOutput, 'id'>
+  ) }
+);
+
 
 export const ConfirmWorkspaceJobDocument = gql`
     mutation confirmWorkspaceJob($input: GenerateAutodeckInput) {
@@ -2684,3 +2712,35 @@ export function useRequestInviteMutation(baseOptions?: Apollo.MutationHookOption
 export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInviteMutation>;
 export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
 export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;
+export const CreateTopicDocument = gql`
+    mutation CreateTopic($input: CreateTopicInput) {
+  createTopic(input: $input) {
+    id
+  }
+}
+    `;
+export type CreateTopicMutationFn = Apollo.MutationFunction<CreateTopicMutation, CreateTopicMutationVariables>;
+
+/**
+ * __useCreateTopicMutation__
+ *
+ * To run a mutation, you first call `useCreateTopicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTopicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTopicMutation, { data, loading, error }] = useCreateTopicMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateTopicMutation(baseOptions?: Apollo.MutationHookOptions<CreateTopicMutation, CreateTopicMutationVariables>) {
+        return Apollo.useMutation<CreateTopicMutation, CreateTopicMutationVariables>(CreateTopicDocument, baseOptions);
+      }
+export type CreateTopicMutationHookResult = ReturnType<typeof useCreateTopicMutation>;
+export type CreateTopicMutationResult = Apollo.MutationResult<CreateTopicMutation>;
+export type CreateTopicMutationOptions = Apollo.BaseMutationOptions<CreateTopicMutation, CreateTopicMutationVariables>;

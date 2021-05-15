@@ -30,6 +30,8 @@ export const CreateTopicMutation = mutationField('createTopic', {
       }
     });
 
+    console.log(args.input.label);
+
     return {
       id: topic.id
     }
