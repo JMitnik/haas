@@ -325,6 +325,9 @@ model Session {
   originUrl      String?
   totalTimeInSec Int?
   device         String?
+
+  consumerId  String?
+  consumer  Consumer? @relation(fields: [consumerId], references: [id])
 }
 
 // Node-entry types
@@ -461,6 +464,8 @@ model User {
   refreshToken       String?
   refreshTokenExpiry DateTime?
   lastActivity       DateTime?
+
+  campaignVariantSubscriptions CampaignVariantSubscription[]
 }
 
 model UserOfCustomer {
@@ -620,13 +625,37 @@ model CreateWorkspaceJob {
   jobProcessLocationId    String
 }
 
+// Consumer: Consumers
+model Consumer {
+  id String @id @default(cuid())
+
+  campaignVariantSubscriptions CampaignVariantSubscription[]
+
+  // Personal data of consumer
+  firstName   String?
+  lastName    String?
+  email       String?
+  phoneNumber String?
+
+  // What is the source of this? Can be manual
+  createdSource String?
+
+  // All interactions consumer had with dialogue
+  interactions Session[]
+}
+
+// **************
 // Campaigns
+// **************
+
+// CampaignVariantTypeEnum: The type of medium for the campaign variant
 enum CampaignVariantTypeEnum {
   EMAIL
   SMS
   QUEUE
 }
 
+// Campaign: The global setup for an entire network of campaigns.
 model Campaign {
   id            String                      @id @default(cuid())
   label         String
@@ -640,6 +669,7 @@ model Campaign {
   updatedAt DateTime @updatedAt
 }
 
+// CampaignVariantToCampaign: Top-level connection between campaign-variants and campaign.
 model CampaignVariantToCampaign {
   campaignId String
   campaign   Campaign @relation(fields: [campaignId], references: [id])
@@ -653,6 +683,18 @@ model CampaignVariantToCampaign {
   @@id([campaignId, campaignVariantId])
 }
 
+// CampaignVariantScheduleTypeEnum: Defines the scheduling behind a campaign
+// - STANDARD is the default: this assumes a one-off campaign-variant, potentially with follow-ups
+// - RECURRING: this assumes a schedule with every X seconds
+// - FOLLOW_UP: this follows a STANDARD campaign-variant, and when the job timestamp is met, checks if the
+//      CampaignVariantEdgeCondition is met.
+enum CampaignVariantScheduleTypeEnum {
+  GENERAL
+  RECURRING
+  FOLLOW_UP
+}
+
+// CampaignVariant: Definition of what the Deliveries will look like
 model CampaignVariant {
   id    String @id @default(cuid())
   label String
@@ -667,8 +709,38 @@ model CampaignVariant {
   Delivery                  Delivery[]
   customerId                String
   dialogueId                String
+
+  // Children define potential follow-up Campaign-Variants
+  children CampaignVariantEdge[] @relation("CampaignVariantEdge_ToParentCampaignVariant")
+  parent CampaignVariantEdge? @relation("CampaignVariantEdge_ToChildCampaignVariant")
+
+  // Depth of campaign-variant: this increases in case we have follow-ups
+  depth Int @default(value: 0)
+
+  scheduleType CampaignVariantScheduleTypeEnum @default(value: GENERAL)
+
+  subscriptions CampaignVariantSubscription[]
 }
 
+enum CampaignVariantEdgeConditionEnum {
+  ON_NOT_FINISHED
+  ON_NOT_OPENED
+}
+
+model CampaignVariantEdge {
+  id String @id @default(cuid())
+
+  // A next campaign variant might be triggered based on if this edge has a certain condition
+  condition CampaignVariantEdgeConditionEnum?
+
+  parentCampaignVariantId String
+  parentCampaignVariant   CampaignVariant @relation("CampaignVariantEdge_ToParentCampaignVariant", fields: [parentCampaignVariantId], references: [id])
+
+  childCampaignVariantId String
+  childCampaignVariant   CampaignVariant @relation("CampaignVariantEdge_ToChildCampaignVariant", fields: [parentCampaignVariantId], references: [id])
+}
+
+// DeliveryStatusTypeEnum: Status of a delivery
 enum DeliveryStatusTypeEnum {
   SCHEDULED
   DEPLOYED
@@ -677,18 +749,22 @@ enum DeliveryStatusTypeEnum {
   FINISHED
 }
 
+// Delivery: Dispatchable job sent to a particular subscriber
 model Delivery {
   // We generated the ID ourselves
   id String @id
 
-  deliveryRecipientFirstName String?
-  deliveryRecipientLastName  String?
-  deliveryRecipientEmail     String?
-  deliveryRecipientPhone     String?
+  // DEPRECATED: We will not use this; instead, we will link to the subscription, and infer
+  // the name/email/phone/etc from there.
+  deliveryRecipientFirstName String? // DEPRECATED
+  deliveryRecipientLastName  String? // DEPRECATED
+  deliveryRecipientEmail     String? // DEPRECATED
+  deliveryRecipientPhone     String? // DEPRECATED
 
   campaignId String
   campaign   Campaign @relation(fields: [campaignId], references: [id])
 
+  // Variant: The template dictating how to generate the next delivery
   campaignVariantId String
   campaignVariant   CampaignVariant @relation(fields: [campaignVariantId], references: [id])
 
@@ -700,6 +776,35 @@ model Delivery {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
   Session     Session[]
+
+  // Subscription: What is the related subscription?
+  relatedSubscriptionId String?
+  relatedSubscription   CampaignVariantSubscription? @relation(fields: [relatedSubscriptionId], references: [id])
+
+  // Any messages related to the delivery (such as success, failures)?
+  message      String?
+  errorMessage String?
+}
+
+// DeliverySubscription: Subscriber to a delivery (can be a consumer or user)
+model CampaignVariantSubscription {
+  id String @id @default(cuid())
+
+  // A subscriber is either a user or consumer
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id])
+  consumerId String?
+  consumer   Consumer? @relation(fields: [consumerId], references: [id])
+
+  // A subscription is made at the the start of a campaign-variant: what is the root-campaign variant?
+  rootCampaignVariantId String
+  rootCampaignVariant   CampaignVariant @relation(fields: [rootCampaignVariantId], references: [id])
+
+  // What are the deliveries made to this campaign variant?
+  deliveries Delivery[]
+
+  // Is this subscription still active?
+  isActive Boolean @default(true)
 }
 
 model DeliveryEvents {
