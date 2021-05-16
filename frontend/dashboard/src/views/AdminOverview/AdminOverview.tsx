@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { ArrowLeft, Plus } from 'react-feather';
-import { Div, Flex, PageTitle } from '@haas/ui';
+import { Div, Flex, PageTitle} from '@haas/ui';
 import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 
@@ -12,6 +12,7 @@ import { PaginationSortByEnum, PaginationWhereInput,
   useGetWorkspaceAdminsQuery, useGetWorkspaceUsersConnectsQuery } from 'types/generated-types';
 
 import SearchBar from 'components/SearchBar/SearchBar';
+import { findRenderedComponentWithType } from 'react-dom/test-utils';
 
 const TableHeaderContainer = styled(UI.TableHeading)`
   background: grey !important;
@@ -33,6 +34,16 @@ const BackButtonContainer = styled(UI.Div)`
     `}
   `;
 
+  interface TableProps{
+    startDate: Date | null,
+    endDate: Date | null,
+    searchTerm: string,
+    offset: number,
+    limit: number,
+    pageIndex: number,
+    orderBy: { by: string ; desc: boolean },
+  }
+
   const paginationFilter: PaginationWhereInput = {
   startDate: null,
   endDate: null,
@@ -52,7 +63,7 @@ const AdminOverview = () => {
   const [activeSearchTerm, setActiveSearchTerm] = useState('');
 
   const { data } = useGetWorkspaceUsersConnectsQuery({
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: "cache-and-network",
     variables: {
       filter: paginationState,
     },
@@ -63,6 +74,11 @@ const AdminOverview = () => {
     debounce(e.target.value);
   };
 
+  const renderClickDropdown = ()=>{
+    console.log("cell clicked");
+    
+  }
+  
   return (
     <>
       <UI.ViewHeading>
@@ -113,7 +129,7 @@ const AdminOverview = () => {
                 {data?.usersConnection?.userCustomers?.map((item) => (
                   <UI.TableRow hasHover key={item.user.id}>
                     <UI.TableCell>{item?.user.id || ''}</UI.TableCell>
-                    <UI.TableCell>{item?.user.firstName || ''}</UI.TableCell>
+                    <UI.TableCell onClick={renderClickDropdown}>{item?.user.firstName || ''}</UI.TableCell>
                     <UI.TableCell>{item?.user.lastName || ''}</UI.TableCell>
                     <UI.TableCell>
                       {item?.user.globalPermissions || ''}
