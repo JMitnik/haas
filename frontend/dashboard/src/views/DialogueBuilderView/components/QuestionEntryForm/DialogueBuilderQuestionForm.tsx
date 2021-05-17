@@ -3,12 +3,12 @@ import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
   Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
-  PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+  PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { Trash } from 'react-feather';
 import { debounce } from 'lodash';
-import { useMutation, gql } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -16,20 +16,20 @@ import Select from 'react-select';
 
 import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, Hr, Input, InputGrid, InputHelper, Span, Text
+  FormSection, Hr, Input, InputGrid, InputHelper, Span, Text,
 } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
+import { useNavigator } from 'hooks/useNavigator';
 import {
   CTANode,
   EdgeConditionProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps
 } from '../../DialogueBuilderInterfaces';
-import SliderNodeForm from './SliderNodeForm';
 import { ChoiceNodeForm } from './ChoiceNodeForm';
-import { useNavigator } from 'hooks/useNavigator';
+import SliderNodeForm from './SliderNodeForm';
 
 interface SliderNodeMarkerProps {
   id: string;
@@ -85,7 +85,7 @@ const schema = yup.object().shape({
   optionsFull: yup.array().when(['questionType'], {
     is: (questionType: string) => isChoiceType(questionType),
     then: yup.array().min(1).of(yup.object({
-      value: yup.string().required('form.value_required')
+      value: yup.string().required('form.value_required'),
     })),
     otherwise: yup.array().notRequired(),
   }),
@@ -168,15 +168,15 @@ const DialogueBuilderQuestionForm = ({
     defaultValues: {
       parentQuestionType,
       sliderNode,
-      optionsFull: options.map(option => ({
+      optionsFull: options.map((option) => ({
         value: option.value,
         publicValue: option.publicValue,
         overrideLeaf: {
           label: option.overrideLeaf?.title,
           value: option.overrideLeaf?.id,
-          type: option.overrideLeaf?.type
-        }
-      }))
+          type: option.overrideLeaf?.type,
+        },
+      })),
     },
   });
 
@@ -383,12 +383,12 @@ const DialogueBuilderQuestionForm = ({
             title,
             type,
             optionEntries: {
-              options: values.optionsFull?.map(option => ({
+              options: values.optionsFull?.map((option) => ({
                 id: option?.id,
                 value: option?.value,
                 publicValue: option?.value,
-                overrideLeafId: option?.overrideLeaf?.value
-              }))
+                overrideLeafId: option?.overrideLeaf?.value,
+              })),
             },
             edgeCondition,
             sliderNode: isSlider ? {
@@ -415,12 +415,12 @@ const DialogueBuilderQuestionForm = ({
             overrideLeafId: overrideLeafId || 'None',
             parentQuestionId,
             optionEntries: {
-              options: values.optionsFull?.map(option => ({
+              options: values.optionsFull?.map((option) => ({
                 id: option?.id,
                 value: option?.value,
                 publicValue: option?.value,
-                overrideLeafId: option?.overrideLeaf?.value
-              }))
+                overrideLeafId: option?.overrideLeaf?.value,
+              })),
             },
             edgeCondition,
             sliderNode: isSlider ? {
@@ -462,6 +462,7 @@ const DialogueBuilderQuestionForm = ({
                   defaultValue={title}
                   render={({ value, onChange }) => (
                     <UI.MarkdownEditor
+                      id="title"
                       value={value}
                       onChange={onChange}
                     />
@@ -493,6 +494,7 @@ const DialogueBuilderQuestionForm = ({
                         {t('dialogue:min_value_helper')}
                       </InputHelper>
                       <Input
+                        id="minValue"
                         name="minValue"
                         ref={form.register({ required: false })}
                         defaultValue={condition?.renderMin}
@@ -509,6 +511,7 @@ const DialogueBuilderQuestionForm = ({
                         {t('dialogue:max_value_helper')}
                       </InputHelper>
                       <Input
+                        id="maxValue"
                         name="maxValue"
                         ref={form.register({ required: false })}
                         defaultValue={condition?.renderMax}
@@ -536,7 +539,7 @@ const DialogueBuilderQuestionForm = ({
                 <Div>
                   <InputGrid>
                     <FormControl isRequired isInvalid={!!form.errors.matchText}>
-                      <FormLabel htmlFor="matchText">{t('match_value')}</FormLabel>
+                      <FormLabel id="matchText">{t('match_value')}</FormLabel>
                       <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
 
                       <Controller
@@ -546,6 +549,7 @@ const DialogueBuilderQuestionForm = ({
                         defaultValue={activeMatchValue}
                         render={({ onChange, onBlur, value }) => (
                           <Select
+                            aria-labelledby="matchText"
                             options={parentOptionsSelect}
                             value={activeMatchValue}
                             onChange={(opt: any) => {
@@ -576,19 +580,19 @@ const DialogueBuilderQuestionForm = ({
             <Div>
               <InputGrid>
                 <FormControl isRequired isInvalid={!!form.errors.questionType}>
-                  <FormLabel htmlFor="questionType">
+                  <FormLabel id="questionType">
                     {t('dialogue:question_type')}
                   </FormLabel>
                   <InputHelper>
                     {t('dialogue:question_type_helper')}
                   </InputHelper>
                   <Controller
-                    id="question-type-select"
                     name="questionType"
                     control={form.control}
                     defaultValue={activeQuestionType}
                     render={({ onChange, onBlur, value }) => (
                       <Select
+                        aria-labelledby="questionType"
                         options={questionTypes}
                         value={activeQuestionType}
                         onChange={(opt: any) => {

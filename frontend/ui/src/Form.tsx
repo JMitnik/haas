@@ -682,6 +682,7 @@ const defaultMarkdownEditorOptions: MarkdownEditorOptions = {
 }
 
 interface MarkdownEditorProps {
+  id?: string;
   value: string;
   onChange: (val: string) => void;
   options?: MarkdownEditorOptions;
@@ -713,9 +714,10 @@ export const MarkdownEditorContainer = styled(Div)`
   `}
 `;
 
-export const MarkdownEditor = ({ value, onChange, options = defaultMarkdownEditorOptions }: MarkdownEditorProps) => (
+export const MarkdownEditor = ({ id, value, onChange, options = defaultMarkdownEditorOptions }: MarkdownEditorProps) => (
   <MarkdownEditorContainer>
     <SimpleMDE
+      id={id}
       value={value}
       onChange={onChange}
       options={{

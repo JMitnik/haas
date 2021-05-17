@@ -1,13 +1,13 @@
 import * as UI from '@haas/ui';
-import Dropdown from 'components/Dropdown';
-import React from 'react'
-import { PlusCircle, ArrowUp, ArrowDown, Trash } from 'react-feather';
-import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
-import { Controller, useFieldArray, UseFormMethods } from 'react-hook-form';
-import { useTranslation } from 'react-i18next/';
+import { ArrowDown, ArrowUp, PlusCircle, Trash } from 'react-feather';
 import { CTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
-import { NodePicker } from 'components/NodePicker';
+import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
+import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodeCell } from 'components/NodeCell';
+import { NodePicker } from 'components/NodePicker';
+import { useTranslation } from 'react-i18next/';
+import Dropdown from 'components/Dropdown';
+import React from 'react';
 
 export interface ChoiceProps {
   id: string;
@@ -30,7 +30,7 @@ const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
       </UI.ListItem>
     </UI.List>
   );
-}
+};
 
 export interface ChoiceNodeFormProps {
   ctaNodes: CTANode[];
@@ -43,21 +43,21 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
   const choicesForm = useFieldArray({
     name: 'optionsFull',
     control: form.control,
-    keyName: 'fieldIndex'
+    keyName: 'fieldIndex',
   });
 
-  const formattedCtaNodes = ctaNodes.map(ctaNode => ({
+  const formattedCtaNodes = ctaNodes.map((ctaNode) => ({
     value: ctaNode.id,
     label: ctaNode.title,
-    type: ctaNode.type
+    type: ctaNode.type,
   }));
 
   const handleAddNewChoice = () => {
     choicesForm.append({
       value: '',
-      overrideLeaf: null
-    })
-  }
+      overrideLeaf: null,
+    });
+  };
 
   return (
     <UI.Div>
@@ -88,6 +88,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
               </UI.Grid>
               {choicesForm.fields.map((choice, index) => (
                 <UI.Grid
+                  data-testid="choiceOption"
                   key={choice.fieldIndex}
                   p={2}
                   borderBottom="1px solid #edf2f7"
@@ -105,13 +106,16 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                       defaultValue={choice.value}
                       control={form.control}
                       render={({ value, onChange }) => (
-                        <Dropdown placement="left-start" renderOverlay={({ onClose }) => (
-                          <ChoiceDropdown
-                            value={value}
-                            onChange={onChange}
-                            onClose={onClose}
-                          />
-                        )}>
+                        <Dropdown
+                          placement="left-start"
+                          renderOverlay={({ onClose }) => (
+                            <ChoiceDropdown
+                              value={value}
+                              onChange={onChange}
+                              onClose={onClose}
+                            />
+                          )}
+                        >
                           {({ onOpen, containerRef }) => (
                             <>
                               {value ? (
@@ -122,8 +126,8 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                                 <UI.Button
                                   size="sm"
                                   variantColor={
-                                    form.errors?.optionsFull?.[index].value ? "red" : "altGray"
-                                  }
+                                      form.errors?.optionsFull?.[index].value ? 'red' : 'altGray'
+                                    }
                                   variant="outline"
                                   onClick={onOpen}
                                 >
@@ -151,7 +155,8 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                             onClose={onClose}
                             onChange={onChange}
                           />
-                        )}>
+                        )}
+                        >
                           {({ onOpen }) => (
                             <UI.Div
                               width="100%"
@@ -173,7 +178,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                                   </UI.Icon>
                                   {t('add_call_to_action')}
                                 </UI.Button>
-                              )}
+                                )}
                             </UI.Div>
                           )}
                         </Dropdown>
@@ -236,5 +241,5 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
         </UI.Div>
       </UI.Flex>
     </UI.Div>
-  )
+  );
 };
