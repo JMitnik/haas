@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    continue: {
+      en: 'Continue',
+      de: 'Fortsetzen'
+    },
     general: {
       en: 'General',
       de: 'General',
@@ -919,11 +923,11 @@ const language = {
     },
     you_love_x: {
       en: 'You love X',
-      de: 'Du liebst X', 
+      de: 'Du liebst X',
     },
     you_love_x_helper: {
       en: 'Something the target user loves',
-      de: 'The "You love X" message', 
+      de: 'The "You love X" message',
     },
     reward: {
       en: 'Reward',

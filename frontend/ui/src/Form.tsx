@@ -137,6 +137,7 @@ interface InputProps extends ChakraInputProps {
   rightEl?: ReactNode;
   leftAddOn?: ReactNode;
   rightAddOn?: ReactNode;
+  _size?: Size;
 }
 
 export const Textarea = forwardRef(
@@ -571,6 +572,8 @@ export const FormSectionHeader = styled(Text)`
     color: ${theme.colors.default.text};
     font-weight: 700;
     margin-bottom: ${theme.gutter / 4}px;
+    padding-bottom: ${theme.gutter / 2}px;
+    border-bottom: 1px solid ${theme.colors.gray[200]};
   `}
 `;
 
@@ -762,7 +765,7 @@ export const DatePickerContainer = styled.div`
 
 export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
   <AntdDatepicker
-    // @ts-ignore 
+    // @ts-ignore
     getPopupContainer={triggerNode => triggerNode.parentNode}
     {...props}
   />
@@ -810,7 +813,7 @@ export const SwitchItem = styled.button.attrs({ type: 'button' }) <SwitchItemPro
     padding: 4px 8px;
     border-radius: 10px;
     margin-right: 12px;
-    
+
     &:active, &:focus {
       outline: none;
     }

@@ -13,3 +13,4 @@ export * from './Nav';
 export * from './Lists';
 export * from './Type';
 export * from './Special';
+export * from './Tabs';

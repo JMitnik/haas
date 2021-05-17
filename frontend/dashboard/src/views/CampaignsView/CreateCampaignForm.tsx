@@ -6,13 +6,15 @@ import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 
 import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
-import { Mail, Smartphone } from 'react-feather';
+import { ArrowLeft, ArrowRight, Check, Mail, Smartphone } from 'react-feather';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast, CircularProgress, CircularProgressLabel } from '@chakra-ui/core';
 import Select from 'react-select';
 
 import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum, refetchGetWorkspaceCampaignsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
+import styled, { css } from 'styled-components';
+import { useEffect } from 'react';
 
 type InputEvent = React.FormEvent<HTMLInputElement>;
 
@@ -73,12 +75,6 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
 
   return (
     <UI.CardBody id="subForm">
-      <UI.Div mb={2} borderBottom="1px solid #fff" borderColor="gray.300" pb={2}>
-        <UI.Text fontWeight={700} color="gray.500" fontSize="0.9rem">
-          {`${t('edit_variant')} ${mapVariantIndexToLabel[activeVariantIndex]}`}
-        </UI.Text>
-      </UI.Div>
-
       <UI.InputGrid>
         <UI.FormControl isRequired>
           <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].label`}>{t('variant_label')}</UI.FormLabel>
@@ -169,6 +165,90 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
   );
 };
 
+enum CampaignStep {
+  CREATE,
+  VARIANT,
+  IMPORT
+}
+
+interface FooterLegendStepProps {
+  children: React.ReactNode;
+  index?: number;
+  isActive?: boolean;
+  isFinished?: boolean;
+  onClick?: () => void;
+}
+
+const FooterLegendStepContainer = styled.div<FooterLegendStepProps>`
+  ${({ theme, isActive, isFinished }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: ${theme.gutter}px;
+    font-weight: 500;
+    color: ${theme.colors.gray[500]};
+
+    ${FooterLegendStepIndex} {
+      margin-right: ${theme.gutter / 4}px;
+    }
+
+    ${isActive && css`
+      color: ${theme.colors.blue[500]};
+
+      ${FooterLegendStepIndex} {
+        margin-left: ${theme.gutter / 4}px;
+        background: ${theme.colors.blue[100]};
+        color: ${theme.colors.blue[500]};
+      }
+    `}
+
+    ${isFinished && css`
+      ${FooterLegendStepIndex} {
+        margin-left: ${theme.gutter / 4}px;
+        background: ${theme.colors.green[100]};
+        color: ${theme.colors.green[500]};
+
+        svg {
+          width: 75%;
+          margin: 0 auto;
+        }
+      }
+    `}
+  `}
+`;
+
+const FooterLegendStepIndex = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    height: 17px;
+    width: 17px;
+    font-weight: 600;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    font-size: 0.6rem;
+    background: ${theme.colors.gray[200]};
+    color: ${theme.colors.gray[400]};
+  `}
+`;
+
+const FooterLegendStep = ({ index, isActive, isFinished, children, onClick }: FooterLegendStepProps) => {
+  return (
+    <FooterLegendStepContainer isActive={isActive} isFinished={isFinished} onClick={onClick}>
+      <FooterLegendStepIndex>
+        {!isFinished ? (
+          <>{index}</>
+        ) : (
+          <UI.Icon><Check /></UI.Icon>
+        )}
+      </FooterLegendStepIndex>
+      {children}
+    </FooterLegendStepContainer>
+  )
+};
+
+const possibleVariants = ['A', 'B', 'C', 'D', 'E'];
+
 const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
   const { activeCustomer } = useCustomer();
   const toast = useToast();
@@ -179,17 +259,10 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
       label: '',
       variants: [
         {
-          label: '',
+          label: 'A',
           type: 'EMAIL',
           body: createCampaignBodyPlaceholder,
-          weight: 50,
-          dialogue: undefined,
-        },
-        {
-          label: '',
-          type: 'EMAIL',
-          body: createCampaignBodyPlaceholder,
-          weight: 50,
+          weight: 100,
           dialogue: undefined,
         },
       ],
@@ -244,17 +317,9 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
     },
   });
 
-  const [activeVariantIndex, setActiveVariantIndex] = useState<number | null>(null);
+  const [activeVariantIndex, setActiveVariantIndex] = useState<number>(0);
 
-  const switchActiveVariant = (index: number) => {
-    if (activeVariantIndex === index) {
-      setActiveVariantIndex(null);
-    } else {
-      setActiveVariantIndex(index);
-    }
-  };
-
-  const { fields: variants } = useFieldArray({
+  const { fields: variants, append } = useFieldArray({
     name: 'variants',
     control: form.control,
     keyName: 'variantIndex',
@@ -273,75 +338,99 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
     form.setValue(`variants.${currentItemIndex}.weight`, value);
   };
 
+  const addVariant = () => {
+    const currentItemIndex: number = variants.length;
+
+    append({
+      label: possibleVariants[currentItemIndex],
+      type: 'EMAIL',
+      body: createCampaignBodyPlaceholder,
+      weight: 100,
+      dialogue: undefined,
+    });
+  }
+
   const handleSubmit = () => {
     createCampaign();
   };
 
+  const [activeStep, setActiveStep] = useState<CampaignStep>(CampaignStep.CREATE);
+
   return (
     <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
-      <UI.Grid gridTemplateColumns={['1fr', '1fr 2fr']}>
-        <UI.Stack spacing={4}>
+      <UI.Div py={2}>
+        {activeStep === CampaignStep.CREATE && (
           <UI.FormControl isRequired>
             <UI.FormLabel htmlFor="label">{t('campaign_label')}</UI.FormLabel>
             <UI.Input name="label" id="label" ref={form.register} />
           </UI.FormControl>
+        )}
+        {activeStep === CampaignStep.VARIANT && (
           <UI.Div>
             <UI.InputHeader>{t('variants')}</UI.InputHeader>
             <UI.InputHelper>{t('variants_helper')}</UI.InputHelper>
-            <UI.Stack spacing={2}>
+            <UI.Tabs>
               {variants.map((variant, index) => (
-                <UI.Flex
-                  key={variant.variantIndex}
-                >
-                  <UI.ButtonCard
-                    onClick={() => switchActiveVariant(index)}
-                    isActive={activeVariantIndex === index}
-                    bg="white"
-                  >
-                    {`${t('variant')} ${mapVariantIndexToLabel[index]}`}
-                  </UI.ButtonCard>
-                  <UI.Div ml={2} maxWidth={100}>
-                    <Controller
-                      defaultValue={variant.weight}
-                      name={`variants.${index}.weight`}
-                      control={form.control}
-                      render={({ value, onBlur }) => (
-                        <UI.Input
-                          value={value}
-                          onChange={(e: InputEvent) => {
-                            handleVariantWeightChange(e, index);
-                          }}
-                          onBlur={onBlur}
-                          type="number"
-                          rightAddOn="%"
-                        />
-                      )}
-                    />
-                  </UI.Div>
-                </UI.Flex>
+                <UI.Tab onClick={() => setActiveVariantIndex(index)} isActive={activeVariantIndex===index} key={index}>
+                  <UI.Flex alignItems="center">
+                    <UI.Span mr={2}>
+                      Variant {variant.label}
+                    </UI.Span>
+                    <UI.Div maxWidth={100}>
+                      <Controller
+                        defaultValue={variant.weight}
+                        name={`variants.${index}.weight`}
+                        control={form.control}
+                        render={({ value, onBlur }) => (
+                          <UI.Input
+                            value={value}
+                            onChange={(e: InputEvent) => {
+                              handleVariantWeightChange(e, index);
+                            }}
+                            onBlur={onBlur}
+                            type="number"
+                            size="sm"
+                            rightAddOn="%"
+                          />
+                        )}
+                      />
+                      </UI.Div>
+                  </UI.Flex>
+                </UI.Tab>
               ))}
-            </UI.Stack>
+              <UI.AddTabButton onClick={addVariant}>Add variant</UI.AddTabButton>
+            </UI.Tabs>
+            <ActiveVariantForm form={form} activeVariantIndex={activeVariantIndex} variant={variants[activeVariantIndex]} />
           </UI.Div>
-        </UI.Stack>
-        <UI.Card isFlat noHover bg="gray.100">
-          {(activeVariantIndex === 0 || activeVariantIndex) ? (
-            <ActiveVariantForm
-              variant={variants[activeVariantIndex]}
-              activeVariantIndex={activeVariantIndex}
-              form={form}
-            />
-          ) : (
-              <UI.IllustrationCard
-                svg={<DecideIll />}
-                text={t('select_a_variant')}
-                isFlat
-              />
-            )}
-        </UI.Card>
-        <UI.Button type="submit" isDisabled={!form.formState.isValid}>
-          {t('save')}
+        )}
+      </UI.Div>
+      <UI.Stack isInline spacing={2} py={4} justifyContent="center" alignItems="center">
+        <FooterLegendStep
+          onClick={() => setActiveStep(CampaignStep.CREATE)}
+          index={1} isActive={activeStep === CampaignStep.CREATE}
+          >
+          Create a campaign
+        </FooterLegendStep>
+        <FooterLegendStep
+          index={2}
+          onClick={() => setActiveStep(CampaignStep.VARIANT)}
+          isActive={activeStep === CampaignStep.VARIANT}
+          >
+          Design a campaign variant
+        </FooterLegendStep>
+        <FooterLegendStep
+          index={3}
+          onClick={() => setActiveStep(CampaignStep.IMPORT)}
+          isActive={activeStep === CampaignStep.IMPORT}
+        >
+          Import your first delivery
+        </FooterLegendStep>
+      </UI.Stack>
+      {activeStep === CampaignStep.CREATE && (
+        <UI.Button rightIcon={ArrowRight} type="submit">
+          {t('continue')}
         </UI.Button>
-      </UI.Grid>
+      )}
     </UI.Form>
   );
 };
