@@ -25,7 +25,7 @@ const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
       <UI.ListItem hasNoSelect width="100%">
         <UI.FormControl width="100%" isRequired>
           <UI.FormLabel htmlFor="value">{t('choice')}</UI.FormLabel>
-          <UI.Textarea width="100%" name="value" defaultValue={value} onChange={onChange} />
+          <UI.Textarea data-testid="choice-input-area" width="100%" name="value" defaultValue={value} onChange={onChange} />
         </UI.FormControl>
       </UI.ListItem>
     </UI.List>

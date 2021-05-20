@@ -543,12 +543,12 @@ const DialogueBuilderQuestionForm = ({
                       <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
 
                       <Controller
-                        id="question-match-select"
                         name="matchText"
                         control={form.control}
                         defaultValue={activeMatchValue}
                         render={({ onChange, onBlur, value }) => (
                           <Select
+                            id="question-match-select"
                             aria-labelledby="matchText"
                             options={parentOptionsSelect}
                             value={activeMatchValue}
@@ -592,6 +592,7 @@ const DialogueBuilderQuestionForm = ({
                     defaultValue={activeQuestionType}
                     render={({ onChange, onBlur, value }) => (
                       <Select
+                        id="question-type-select"
                         aria-labelledby="questionType"
                         options={questionTypes}
                         value={activeQuestionType}
@@ -606,19 +607,20 @@ const DialogueBuilderQuestionForm = ({
                 </FormControl>
 
                 <FormControl isInvalid={!!form.errors.activeLeaf}>
-                  <FormLabel htmlFor="questionType">
+                  <FormLabel id="ctaType">
                     {t('call_to_action')}
                   </FormLabel>
                   <InputHelper>
                     {t('dialogue:cta_helper')}
                   </InputHelper>
                   <Controller
-                    id="question-type-select"
                     name="activeLeaf"
                     control={form.control}
                     defaultValue={(activeLeaf?.value && activeLeaf) || leafs[0]}
                     render={({ onChange, onBlur, value }) => (
                       <Select
+                        id="cta-type-select"
+                        aria-labelledby="ctaType"
                         options={leafs}
                         // @ts-ignore
                         value={(activeLeaf?.value && activeLeaf) || leafs[0] || ''}
@@ -698,7 +700,7 @@ const DialogueBuilderQuestionForm = ({
                       {t('delete')}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent zIndex={4}>
+                  <PopoverContent data-testid="delete-popover" zIndex={4}>
                     <PopoverArrow />
                     <PopoverHeader>{t('delete')}</PopoverHeader>
                     <PopoverCloseButton />

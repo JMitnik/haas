@@ -145,7 +145,7 @@ const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
 `;
 
 export const CloseButton = ({ onClose }: any) => (
-  <CloseButtonContainer onClick={onClose}>
+  <CloseButtonContainer data-testid="close-button" onClick={onClose}>
     <CloseIcon />
   </CloseButtonContainer>
 )

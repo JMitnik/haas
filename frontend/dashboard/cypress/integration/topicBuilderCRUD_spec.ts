@@ -1,6 +1,9 @@
 import "cypress-localstorage-commands";
 import getTopicBuilder from '../../src/mocks/fixtures/topic-builder/mockGetTopicBuilder';
+import getPostUpdateGetTopicBuilder from '../../src/mocks/fixtures/topic-builder/mockPostEditGetTopicBuilder';
 import getDialoguesOfWorkspace from '../../src/mocks/fixtures/mockGetDialoguesOfWorkspace';
+import getPostDeleteGetTopicBuilder from '../../src/mocks/fixtures/topic-builder/mockPostDeleteGetTopicBuilder';
+import getPreAddGetTopicBuilder from '../../src/mocks/fixtures/topic-builder/mockPreAddGetTopicBuilder'
 
 describe("Login logic", () => {
 
@@ -114,7 +117,156 @@ describe("Login logic", () => {
         cy.wrap(div).should('have.text', 'Facilities');
       })
     })
+  });
 
+  it('Update topic builder question', () => {
+    cy.login();
+    cy.findByText('Lufthansa').should('exist');
+    cy.findByTestId('CustomerCard').as('card');
+    cy.get('@card').click();
+    cy.findByText(getDialoguesOfWorkspace.data.customer.dialogues[0].title).click();
+    cy.findByText('Dialogue Builder').should('exist').click();
+
+
+    // Root question (SLIDER) READ
+    cy.findByText(getTopicBuilder.data.customer.dialogue.questions[0].title).as('rootQuestionTitle').should('exist');
+    cy.get('@rootQuestionTitle').parent().parent().parent().parent().parent().parent().as('rootQuestion').within(() => {
+      cy.findByText('Slider').should('exist');
+      cy.findByText('None').should('exist');
+      cy.findByText('Edit').should('exist').click();
+    });
+
+    cy.window().then((window: any) => {
+      // Reference global instances set in "src/mocks.js".
+      const { worker, graphql } = window.msw;
+      worker.use(
+        graphql.query('getTopicBuilder', (req: any, res: any, ctx: any) => {
+          return res(ctx.data(getPostUpdateGetTopicBuilder.data));
+        }),
+      );
+    });
+
+    cy.get('form').within(() => {
+      cy.get('span[role]').invoke('text', 'New question title');
+      // Change from slider to choice
+      cy.get('#question-type-select').type('Choice{enter}');
+
+      cy.findByLabelText(/Call-to-Action/gi).as('ctaType').should('exist');
+      cy.get('@ctaType').parent().parent().siblings('div').then((div) => {
+        cy.wrap(div).should('have.text', 'None');
+      });
+      // Already found the select normally so do it by dataid now
+      // Change from no CTA to a CTA
+      cy.get('#cta-type-select').type('come{enter}');
+      cy.findByText('Save').should('exist').click()
+    });
+
+    cy.findByText('New question title').as('rootQuestionTitle').should('exist');
+
+    cy.get('@rootQuestionTitle').parent().parent().parent().parent().parent().parent().as('rootQuestion').within(() => {
+      cy.findByText('Choice').should('exist');
+      cy.findByText('Form').should('exist');
+    });
+  });
+
+  it('Delete topic builder question', () => {
+    cy.login();
+    cy.findByText('Lufthansa').should('exist');
+    cy.findByTestId('CustomerCard').as('card');
+    cy.get('@card').click();
+    cy.findByText(getDialoguesOfWorkspace.data.customer.dialogues[0].title).click();
+    cy.findByText('Dialogue Builder').should('exist').click();
+
+
+    // Root question (SLIDER) READ
+    cy.findByText('What did you like?').as('questionTitle').should('exist');
+    cy.get('@questionTitle').parent().parent().parent().parent().parent().parent().as('rootQuestion').within(() => {
+      cy.findByText('Edit').should('exist').click();
+    });
+
+    cy.window().then((window: any) => {
+      // Reference global instances set in "src/mocks.js".
+      const { worker, graphql } = window.msw;
+      worker.use(
+        graphql.query('getTopicBuilder', (req: any, res: any, ctx: any) => {
+          return res(ctx.data(getPostDeleteGetTopicBuilder.data));
+        }),
+      );
+    });
+
+    cy.get('form').within(() => {
+      cy.findByText('Delete').should('exist').click();
+    });
+
+    cy.findByTestId('delete-popover').within(() => {
+      cy.get('button').contains('Delete').as('deleteButton').should('exist');
+      cy.get('@deleteButton').click();
+    })
+
+    cy.findByText('What did you like?').should('not.exist');
+
+  });
+
+  it('Create topic builder question', () => {
+    cy.login();
+
+    cy.window().then((window: any) => {
+      // Reference global instances set in "src/mocks.js".
+      const { worker, graphql } = window.msw;
+      worker.use(
+        graphql.query('getTopicBuilder', (req: any, res: any, ctx: any) => {
+          return res(ctx.data(getPreAddGetTopicBuilder.data));
+        }),
+      );
+    });
+
+    cy.findByText('Lufthansa').should('exist');
+    cy.findByTestId('CustomerCard').as('card');
+    cy.get('@card').click();
+    cy.findByText(getDialoguesOfWorkspace.data.customer.dialogues[0].title).click();
+    cy.findByText('Dialogue Builder').should('exist').click();
+
+
+    // Root question (SLIDER) READ
+    cy.findByText('What did you like?').should('not.exist');
+    cy.findByText('Add question').should('exist').click();
+
+    cy.window().then((window: any) => {
+      // Reference global instances set in "src/mocks.js".
+      const { worker, graphql } = window.msw;
+      worker.use(
+        graphql.query('getTopicBuilder', (req: any, res: any, ctx: any) => {
+          return res(ctx.data(getTopicBuilder.data));
+        }),
+      );
+    });
+
+    cy.get('form').within(() => {
+      cy.get('.CodeMirror textarea');
+      // we use `force: true` below because the textarea is hidden
+      // and by default Cypress won't interact with hidden elements
+        .type('What did you like?', { force: true });
+
+      cy.findByLabelText(/Minimum value*/).should('exist').type('70');
+      cy.findByLabelText(/Maximum value*/).should('exist').type('100');
+
+      // Change from slider to choice
+      cy.get('#question-type-select').type('Choice{enter}');
+
+      // Already found the select normally so do it by dataid now
+      // Change from no CTA to a CTA
+      cy.get('#cta-type-select').type('Instagram{enter}');
+      cy.findByText('Add choice').should('exist').click();
+      cy.findByText(/Set your choice/).click();
+    });
+
+    cy.findByTestId('choice-input-area').should('exist').type('Facilities');
+
+    cy.get('form').within(() => {
+      cy.findByText('Save').should('exist').click();
+    })
+    
+    cy.findByText('What did you like?').should('exist');
 
   });
 
