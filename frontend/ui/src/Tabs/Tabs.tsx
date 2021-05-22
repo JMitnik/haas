@@ -2,7 +2,7 @@ import React from 'react';
 import { Plus } from 'react-feather';
 import styled, { css } from 'styled-components';
 
-import { Button } from '../Buttons';
+import { Button } from '../Buttons/Buttons';
 import { Span } from '../Span';
 
 

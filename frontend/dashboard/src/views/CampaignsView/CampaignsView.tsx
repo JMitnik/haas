@@ -85,8 +85,9 @@ const CampaignsView = () => {
           willCloseOnOutsideClick={false}
           isOpen={openedModal}
           onClose={() => setIsOpenedModal(false)}
+          width="90%"
         >
-          <UI.Card width={900} noHover bg="white">
+          <UI.Card  noHover bg="white">
             <UI.CardBody>
               <UI.FormSectionHeader>{t('create_campaign')}</UI.FormSectionHeader>
               <CreateCampaignForm onClose={() => setIsOpenedModal(false)} />

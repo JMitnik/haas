@@ -3,7 +3,7 @@ export * from './Table';
 export * from './Generics';
 export * from './Form';
 export * from './Container';
-export * from './Buttons';
+export * from './Buttons/Buttons';
 export * from './Cards';
 export * from './Span';
 export * from './Icon';

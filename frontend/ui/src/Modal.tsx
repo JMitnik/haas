@@ -58,13 +58,15 @@ interface ModalProps {
   children: React.ReactNode;
   onClose: any;
   willCloseOnOutsideClick?: boolean;
+  width?: string;
 }
 
 export const Modal = ({
   isOpen,
   children,
   onClose,
-  willCloseOnOutsideClick = true
+  willCloseOnOutsideClick = true,
+  width
 }: ModalProps) => {
   const ref = useRef<any>(null);
   useOnClickOutside(ref, () => {
@@ -111,7 +113,7 @@ export const Modal = ({
       <CloseIconWrapper aria-label="closeModal" onClick={onClose}>
         <X />
       </CloseIconWrapper>
-      <Div ref={ref}>
+      <Div width={width} ref={ref}>
         <motion.div animate={{ y: 0, opacity: 1 }} initial={{ y: 200, opacity: 0 }}>
           {children}
         </motion.div>

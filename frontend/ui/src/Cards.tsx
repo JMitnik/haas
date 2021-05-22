@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 import { Div } from './Generics';
 import { Flex } from './Container';
 import { Span } from './Span';
-import { Button } from './Buttons';
+import { Button } from './Buttons/Buttons';
 
 type BoxShadowSize = 'sm' | 'md' | 'lg';
 

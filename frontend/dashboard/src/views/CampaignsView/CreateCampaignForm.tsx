@@ -15,6 +15,7 @@ import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVaria
 import { useNavigator } from 'hooks/useNavigator';
 import styled, { css } from 'styled-components';
 import { useEffect } from 'react';
+import CampaignVariantsBuilder from './CampaignVariantsBuilder/CampaignVariantsBuilder';
 
 type InputEvent = React.FormEvent<HTMLInputElement>;
 
@@ -75,7 +76,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
 
   return (
     <UI.CardBody id="subForm">
-      <UI.InputGrid>
+      {/* <UI.InputGrid>
         <UI.FormControl isRequired>
           <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].label`}>{t('variant_label')}</UI.FormLabel>
           <UI.Input
@@ -160,7 +161,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
             )}
           />
         </UI.FormControl>
-      </UI.InputGrid>
+      </UI.InputGrid> */}
     </UI.CardBody>
   );
 };
@@ -354,7 +355,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
     createCampaign();
   };
 
-  const [activeStep, setActiveStep] = useState<CampaignStep>(CampaignStep.CREATE);
+  const [activeStep, setActiveStep] = useState<CampaignStep>(CampaignStep.VARIANT);
 
   return (
     <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
@@ -369,7 +370,8 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
           <UI.Div>
             <UI.InputHeader>{t('variants')}</UI.InputHeader>
             <UI.InputHelper>{t('variants_helper')}</UI.InputHelper>
-            <UI.Tabs>
+            <CampaignVariantsBuilder />
+            {/* <UI.Tabs>
               {variants.map((variant, index) => (
                 <UI.Tab onClick={() => setActiveVariantIndex(index)} isActive={activeVariantIndex===index} key={index}>
                   <UI.Flex alignItems="center">
@@ -399,7 +401,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
                 </UI.Tab>
               ))}
               <UI.AddTabButton onClick={addVariant}>Add variant</UI.AddTabButton>
-            </UI.Tabs>
+            </UI.Tabs> */}
             <ActiveVariantForm form={form} activeVariantIndex={activeVariantIndex} variant={variants[activeVariantIndex]} />
           </UI.Div>
         )}
