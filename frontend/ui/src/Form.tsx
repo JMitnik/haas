@@ -137,7 +137,6 @@ interface InputProps extends ChakraInputProps {
   rightEl?: ReactNode;
   leftAddOn?: ReactNode;
   rightAddOn?: ReactNode;
-  _size?: Size;
 }
 
 export const Textarea = forwardRef(
@@ -826,7 +825,7 @@ export const SwitchItem = styled.button.attrs({ type: 'button' }) <SwitchItemPro
   `}
 `
 
-type ReactSelectProps = ReactSelect<T>['props'];
+type ReactSelectProps = ReactSelect['props'];
 
 interface SelectContainerProps {
   menuIsOpen?: boolean;

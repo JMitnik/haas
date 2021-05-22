@@ -167,11 +167,11 @@ export const CampaignVariantsBuilder = () => {
     id: 'TEST_FOLLOW',
     source: 'VARIANT_1',
     target: 'VARIANT_2',
-    label: 'Follow-up if not opened in 3 days',
+    label: 'Follow-up if not opened in days',
     animated: false
   },
   {
-    id: 'TEST_FOLLOW',
+    id: 'TESTFOLLOW',
     source: 'VARIANT_2',
     target: 'VARIANT_MEDIUM_2',
     label: 'Send via medium',

@@ -3,7 +3,7 @@ import Color from 'color';
 import { ChevronRight } from 'react-feather';
 import styled, { css } from 'styled-components';
 
-import { ReactComponent as CloseIcon } from './assets/icon-close.svg';
+import { CloseIcon } from './assets/icon-close';
 import { Div, SelectContainer } from '.';
 
 import { Span } from './Span';
@@ -12,7 +12,7 @@ import { Text } from './Type';
 
 export const List = styled(Div)`
   ${({ theme }) => css`
-    
+
   `}
 `;
 
@@ -56,7 +56,7 @@ export const ListItem = styled(Div) <ListItemProps>`
 
     ${!hasNoSelect && css`
       border-left: 2px solid transparent;
-    
+
       &:hover {
         border-left: 2px solid ${accent || theme.colors.primary};
         background: ${Color(accent).mix(Color('white'), 0.95).hex()};

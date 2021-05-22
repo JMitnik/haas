@@ -6,6 +6,7 @@
     "@apollo/client": "^3.3.6",
     "@babel/helper-builder-react-jsx": "^7.10.4",
     "@chakra-ui/core": "^0.8.0",
+    "@craco/craco": "^6.1.2",
     "@emotion/core": "^10.0.28",
     "@emotion/styled": "^10.0.27",
     "@haas/ui": "*",
@@ -13,7 +14,6 @@
     "@hookform/resolvers": "^0.1.0",
     "@nivo/line": "^0.61.1",
     "@popperjs/core": "^2.5.3",
-    "@react-workspaces/react-scripts": "^3.3.0-alpha-08",
     "@sentry/apm": "^5.21.3",
     "@sentry/react": "^5.21.3",
     "@vx/group": "^0.0.198",
@@ -54,6 +54,7 @@
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
     "react-select": "^3.1.0",
+    "react-scripts": "4.0.3",
     "react-simplemde-editor": "^4.1.3",
     "styled-components": "^5.2.1",
     "styled-system": "^5.1.4",
@@ -61,8 +62,8 @@
     "yup": "^0.29.1"
   },
   "scripts": {
-    "start": "cra-workspaces start",
-    "build": "cra-workspaces build",
+    "start": "craco start",
+    "build": "craco build",
     "test": "react-scripts test",
     "test:watch": "jest test --watch --maxWorkers=0",
     "test:cypress": "(DEBUG=cypress:* && cypress open)",
@@ -134,7 +135,8 @@
     "eslint-plugin-react-hooks": "^4.0.4",
     "jest-svg-transformer": "^1.0.0",
     "mutationobserver-shim": "^0.3.7",
-    "ts-jest": "^26.4.4"
+    "ts-jest": "^26.4.4",
+    "ts-loader": "8.2.0"
   },
   "eslintConfig": {
     "overrides": [
