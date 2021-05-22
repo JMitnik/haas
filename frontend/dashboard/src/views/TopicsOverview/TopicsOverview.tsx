@@ -1,4 +1,6 @@
 import * as UI from '@haas/ui';
+import { useNavigator } from 'hooks/useNavigator';
+import { useCustomer } from 'providers/CustomerProvider';
 import React, { useState } from 'react'
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -9,13 +11,18 @@ import CreateTopicForm from './CreateTopicForm';
 const TopicsOverview = () => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const { t } = useTranslation();
+  const { dialogueSlug } = useNavigator();
+  const { activeCustomer } = useCustomer();
 
   // TODO: Query the backend
-  // const {} = useGetTopicsOfDialogueQuery({
-  //   variables: {
+  const { data, loading } = useGetTopicsOfDialogueQuery({
+    variables: {
+      customerId: activeCustomer?.id || '',
+      dialogueSlug
+    }
+  });
 
-  //   }
-  // });
+  const topics = data?.customer?.dialogue?.topics || [];
 
   return (
       <>
@@ -38,6 +45,21 @@ const TopicsOverview = () => {
               </UI.CardBody>
             </UI.Card>
           </UI.Modal>
+
+          <UI.Div>
+            {/* list.map means to transform every item in list to something else (like HTML) */}
+            <UI.Div maxWidth="600px">
+              <UI.Stack spacing={4}>
+                {topics.map(topic => (
+                  <UI.Card key={topic.id}>
+                    <UI.CardBody>
+                      <UI.Text>{topic.label}</UI.Text>
+                    </UI.CardBody>
+                  </UI.Card>
+                ))}
+              </UI.Stack>
+            </UI.Div>
+          </UI.Div>
         </UI.ViewContainer>
     </>
   );
