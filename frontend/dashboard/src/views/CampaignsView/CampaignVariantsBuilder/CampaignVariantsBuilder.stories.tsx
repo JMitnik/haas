@@ -2,6 +2,8 @@ import React from 'react';
 import { Story, Meta } from '@storybook/react';
 
 import { CampaignVariantsBuilder } from './CampaignVariantsBuilder';
+import { ThemeProvider } from '@chakra-ui/core';
+import DefaultThemeProviders from 'providers/ThemeProvider';
 
 export default {
   title: 'Campaign/CampaignVariantsBuilder',
@@ -11,7 +13,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story = (args) => <CampaignVariantsBuilder {...args} />;
+const Template: Story = (args) => <DefaultThemeProviders><CampaignVariantsBuilder {...args} /></DefaultThemeProviders>;
 
 export const Primary = Template.bind({});
 Primary.args = {

@@ -28,6 +28,7 @@
     "date-fns": "^2.13.0",
     "emotion-theming": "^10.0.27",
     "eslint": "^6.8.0",
+    "eslint-webpack-plugin": "2.5.4",
     "faker": "^4.1.0",
     "framer-motion": "^2.3.0",
     "i18next": "^19.6.3",

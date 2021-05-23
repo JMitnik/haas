@@ -17,6 +17,9 @@ import CampaignVariantMediumNode from '../CampaignVariantMediumNode';
 import { useEffect } from 'react';
 import Select from 'react-select';
 import { useTranslation } from 'react-i18next';
+
+import { ReactComponent as DoubleChevronIcon } from 'assets/icons/icon-chevron-double.svg';
+
 import CampaignVariantFollowupNode from '../CampaignVariantFollowupNode';
 
 
@@ -35,18 +38,20 @@ const CampaignVariantsBuilderContainer = styled.div`
 
 const CampaignVariantCardContainer = styled.div`
   ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
     position: absolute;
     background: white;
     z-index: 1000;
+    width: 350px;
     right: 0;
     top: 0;
     bottom: 0;
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.075), 0 4px 24px rgba(0, 0, 0, 0.1);
-    padding: ${theme.gutter}px;
   `}
 `;
 
-const CampaignVariantCard = ({ activeVariant, onUpdate }: { activeVariant: any, onUpdate: (variant: any) => void }) => {
+const CampaignVariantCard = ({ activeVariant, onUpdate, onClose }: { activeVariant: any, onUpdate: (variant: any) => void, onClose: () => void }) => {
   const [clonedVariant, setClonedVariant] = useState(() => clone(activeVariant));
   const form = useForm();
 
@@ -76,30 +81,50 @@ const CampaignVariantCard = ({ activeVariant, onUpdate }: { activeVariant: any, 
 
   return (
     <CampaignVariantCardContainer>
-      <UI.Input ref={form.register()} name="label" defaultValue={clonedVariant.data.label} />
-      <UI.Button onClick={handleUpdate}>Save</UI.Button>
+      <UI.CardHeader>
+        <UI.Flex justifyContent="space-between">
+          <UI.Helper>Edit campaign-variant</UI.Helper>
 
-      <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor={`dialogue`}>{t('dialogue')}</UI.FormLabel>
-          <Controller
-            name={`dialogue`}
-            control={form.control}
-            defaultValue={activeVariant.dialogue || null}
-            render={({ value, onChange, onBlur }) => (
-              <Select
-                placeholder="Select a dialogue"
-                id={`dialogue`}
-                classNamePrefix="select"
-                className="select"
-                defaultOptions
-                options={dialogues}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-              />
-            )}
+          <UI.IconButton
+            onClick={onClose}
+            variant="outline"
+            width="10px"
+            height="10px"
+            aria-label="Fold"
+            icon={() => <DoubleChevronIcon width="10px" />}
           />
-        </UI.FormControl>
+        </UI.Flex>
+      </UI.CardHeader>
+      <UI.CardBody>
+        <UI.Stack spacing={4}>
+          <UI.Input ref={form.register()} name="label" defaultValue={clonedVariant.data.label} />
+          <UI.FormControl isRequired>
+              <UI.FormLabel htmlFor={`dialogue`}>{t('dialogue')}</UI.FormLabel>
+              <Controller
+                name={`dialogue`}
+                control={form.control}
+                defaultValue={activeVariant.dialogue || null}
+                render={({ value, onChange, onBlur }) => (
+                  <Select
+                    placeholder="Select a dialogue"
+                    id={`dialogue`}
+                    classNamePrefix="select"
+                    className="select"
+                    defaultOptions
+                    options={dialogues}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                  />
+                )}
+              />
+          </UI.FormControl>
+
+        </UI.Stack>
+      </UI.CardBody>
+      <UI.CardFooter>
+        <UI.Button onClick={handleUpdate}>Save</UI.Button>
+      </UI.CardFooter>
     </CampaignVariantCardContainer>
   )
 }
@@ -122,7 +147,7 @@ export const CampaignVariantsBuilder = () => {
     type: 'input'
   }, {
     id: 'VARIANT_1',
-    data: { label: 'Campaign Variant A' },
+    data: { label: 'Campaign Variant AC' },
     targetPosition: 'right',
     type: 'campaignVariantSchedule',
     sourcePosition: 'left',
@@ -224,6 +249,8 @@ export const CampaignVariantsBuilder = () => {
     setActiveVariant(null);
   }
 
+  const closePanel = () => setActiveVariant(null);
+
   useEffect(() => {
     let els = getLayoutElements() as any || [];
     setElements(els);
@@ -242,10 +269,10 @@ export const CampaignVariantsBuilder = () => {
           size={2}
           gap={12}
         />
-        {activeVariant && (
-          <CampaignVariantCard activeVariant={activeVariant} onUpdate={updateCampaignVariant} />
-        )}
       </ReactFlow>
+      {activeVariant && (
+        <CampaignVariantCard onClose={closePanel} activeVariant={activeVariant} onUpdate={updateCampaignVariant} />
+      )}
     </CampaignVariantsBuilderContainer>
   )
 }

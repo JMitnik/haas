@@ -113,6 +113,13 @@ export const AddCard = styled(Card)`
   `}
 `;
 
+export const CardHeader = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter / 2}px ${theme.gutter}px;
+    border-bottom: 1px solid ${theme.colors.gray[200]};
+  `}
+`
+
 export const CardBody = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter * 0.75}px;
