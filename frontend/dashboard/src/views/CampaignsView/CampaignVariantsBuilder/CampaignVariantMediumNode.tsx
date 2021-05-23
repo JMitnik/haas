@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
-import React, { memo } from 'react';
-import { MessageCircle, Repeat } from 'react-feather';
+import { memo } from 'react';
+import { MessageCircle } from 'react-feather';
 
 import { Handle, Position } from 'react-flow-renderer';
 import styled from 'styled-components';
@@ -31,7 +31,6 @@ const VariantLabelContainer = styled.div`
 `;
 
 export default memo(({ data }: { data: any }) => {
-  console.log(data);
   return (
     <VariantBox>
       <VariantLabelContainer>

@@ -1,20 +1,17 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-form';
+import { UseFormMethods, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 
-import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
-import { ArrowLeft, ArrowRight, Check, Mail, Smartphone } from 'react-feather';
+import { ArrowRight, Check } from 'react-feather';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useToast, CircularProgress, CircularProgressLabel } from '@chakra-ui/core';
-import Select from 'react-select';
+import { useToast } from '@chakra-ui/core';
 
 import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum, refetchGetWorkspaceCampaignsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 import styled, { css } from 'styled-components';
-import { useEffect } from 'react';
 import CampaignVariantsBuilder from './CampaignVariantsBuilder/CampaignVariantsBuilder';
 
 type InputEvent = React.FormEvent<HTMLInputElement>;

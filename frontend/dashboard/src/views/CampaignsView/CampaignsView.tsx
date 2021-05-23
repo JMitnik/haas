@@ -2,15 +2,15 @@ import * as UI from '@haas/ui';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
+import Select from 'react-select';
 
 import { ReactComponent as EmptyIll } from 'assets/images/undraw_empty.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
-
-import CreateCampaignForm from './CreateCampaignForm';
-import Select from 'react-select';
 import { useNavigator } from 'hooks/useNavigator';
 import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
 import useAuth from 'hooks/useAuth';
+
+import CreateCampaignForm from './CreateCampaignForm';
 
 const CampaignsView = () => {
   const { t } = useTranslation();

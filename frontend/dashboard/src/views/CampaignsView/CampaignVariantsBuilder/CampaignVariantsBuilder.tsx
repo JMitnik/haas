@@ -1,26 +1,23 @@
 import * as UI from '@haas/ui';
-import React, { useState } from 'react'
+import { useState } from 'react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
-  ReactFlowProvider,
-  addEdge,
-  removeElements,
   isNode,
 } from 'react-flow-renderer';
 import styled, { css } from 'styled-components';
 import dagre from 'dagre';
-import CampaignVariantScheduleNode from '../CampaignVariantScheduleNode';
+import CampaignVariantScheduleNode from './CampaignVariantScheduleNode';
 import { clone } from 'lodash';
 import { Controller, useForm } from 'react-hook-form';
-import CampaignVariantMediumNode from '../CampaignVariantMediumNode';
+import CampaignVariantMediumNode from './CampaignVariantMediumNode';
 import { useEffect } from 'react';
 import Select from 'react-select';
 import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as DoubleChevronIcon } from 'assets/icons/icon-chevron-double.svg';
 
-import CampaignVariantFollowupNode from '../CampaignVariantFollowupNode';
+import CampaignVariantFollowupNode from './CampaignVariantFollowupNode';
 
 
 const dagreGraph = new dagre.graphlib.Graph();

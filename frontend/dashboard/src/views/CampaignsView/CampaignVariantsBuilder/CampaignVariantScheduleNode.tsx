@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { Repeat } from 'react-feather';
 
 import { Handle, Position } from 'react-flow-renderer';
