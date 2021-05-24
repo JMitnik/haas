@@ -10,6 +10,7 @@ export const GetCampaignVariantOfDelivery = extendType({
     t.field('campaignVariant', {
       type: CampaignVariantModel,
       nullable: true,
+      // @ts-ignore
       resolve: async (parent, args, ctx) => {
         if (!parent.id) throw new ApolloError('Cant find matching delivery');
 

@@ -122,6 +122,7 @@ class AutodeckService {
       },
       data: {
         fields: {
+          // @ts-ignore
           create: input.newCustomFields.map(({key, value}) => ({ key, value }))
         }
       }
@@ -129,9 +130,11 @@ class AutodeckService {
   }
 
   static generateKeyValuePair = (input: NexusGenInputs['GenerateAutodeckInput']) => {
+    // @ts-ignore
     const mergedCustomFields = input.customFields.concat(input.newCustomFields).concat(input.standardFields)
     let mappedKeyValuePairs = {}
     mergedCustomFields.forEach(({ key, value }) => {
+      // @ts-ignore
       Object.assign(mappedKeyValuePairs, { [key]: value })
     })
 

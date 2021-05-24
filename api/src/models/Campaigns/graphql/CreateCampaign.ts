@@ -2,11 +2,26 @@ import { UserInputError } from 'apollo-server';
 import { inputObjectType, mutationField } from '@nexus/schema';
 import { isPresent } from 'ts-is-present';
 
-import { CampaignModel, CampaignScheduleEnum, CampaignVariantEnum } from './CampaignModel';
+import {
+  CampaignModel,
+  CampaignScheduleEnum,
+  CampaignVariantEdgeConditionEnumType,
+  CampaignVariantEnum
+} from './CampaignModel';
 import { NexusGenInputs } from '../../../generated/nexus';
 
-export const CreateCampaignVariantInputType = inputObjectType({
-  name: 'CreateCampaignVariantInputType',
+export const CampaignVariantEdgeInputType = inputObjectType({
+  name: 'CampaignVariantEdgeInputType',
+
+  definition(t) {
+    t.field('childVariant', { required: false, type: CampaignVariantInputType });
+    t.field('condition', { type: CampaignVariantEdgeConditionEnumType });
+  }
+});
+
+export const CampaignVariantInputType = inputObjectType({
+  name: 'CampaignVariantInputType',
+
   definition(t) {
     t.string('label');
 
@@ -15,11 +30,20 @@ export const CreateCampaignVariantInputType = inputObjectType({
 
     t.int('depth');
     t.string('body');
-    t.float('weight');
+    t.float('weight', { required: false });
     t.string('subject', { required: false });
 
     t.field('scheduleType', { type: CampaignScheduleEnum, required: true });
     t.field('type', { type: CampaignVariantEnum, required: true });
+
+    t.list.field('children', { type: CampaignVariantEdgeInputType })
+  }
+});
+
+export const CreateCampaignVariantInputType = inputObjectType({
+  name: 'CreateCampaignVariantInputType',
+  definition(t) {
+    t.field('data', { type: CampaignVariantInputType, required: true });
   },
 });
 
@@ -33,7 +57,7 @@ export const CreateCampaignInputType = inputObjectType({
 });
 
 const validateProbabilityEdges = (input: NexusGenInputs['CreateCampaignInputType']) => {
-  const weights = input.variants?.map((variant) => variant.weight).filter(isPresent) || [];
+  const weights = input.variants?.map((variant) => variant.data?.weight).filter(isPresent) || [];
 
   const totalWeight = weights?.reduce((total, weight) => total + weight);
 

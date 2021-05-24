@@ -1,3 +1,6 @@
 # Prisma Migrate lockfile v1
 
 20210516202212-fresh-start-v3
+20210524122147-swap-relation
+20210524132732-fix-relation
+20210524132949-fix-again

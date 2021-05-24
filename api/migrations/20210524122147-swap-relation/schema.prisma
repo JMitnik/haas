@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -734,10 +734,10 @@ model CampaignVariantEdge {
   condition CampaignVariantEdgeConditionEnum?
 
   parentCampaignVariantId String
-  parentCampaignVariant   CampaignVariant @relation("CampaignVariantEdge_ToParentCampaignVariant", fields: [parentCampaignVariantId], references: [id])
+  parentCampaignVariant   CampaignVariant @relation("CampaignVariantEdge_ToChildCampaignVariant", fields: [parentCampaignVariantId], references: [id])
 
   childCampaignVariantId String
-  childCampaignVariant   CampaignVariant @relation("CampaignVariantEdge_ToChildCampaignVariant", fields: [childCampaignVariantId], references: [id])
+  childCampaignVariant   CampaignVariant @relation("CampaignVariantEdge_ToParentCampaignVariant", fields: [parentCampaignVariantId], references: [id])
 }
 
 // DeliveryStatusTypeEnum: Status of a delivery

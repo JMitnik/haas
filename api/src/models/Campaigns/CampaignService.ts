@@ -1,10 +1,11 @@
 import { addDays } from 'date-fns';
 import { uniqueId } from 'lodash';
-import { PrismaClient } from '@prisma/client';
+import { CampaignVariantEdgeCreateInput, CampaignVariantEdgeCreateWithoutParentCampaignVariantInput, CampaignVariantTypeEnum, PrismaClient } from '@prisma/client';
 import AWS from '../../config/aws';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
-import { CampaignCreateInput, DeliveryStatusTypeEnum, FindManyDeliveryArgs } from '@prisma/client';
+import { DeliveryStatusTypeEnum, FindManyDeliveryArgs } from '@prisma/client';
+import { CampaignPrismaAdapter } from './CampaignPrismaAdapter';
 
 interface DeliveryOptionsProps {
   status?: DeliveryStatusTypeEnum;
@@ -29,7 +30,7 @@ export class CampaignService {
    */
   async createCampaign(campaignInput: NexusGenInputs['CreateCampaignInputType']) {
     const campaign = await this.prisma.campaign.create({
-      data: this.saveCampaignInput(campaignInput),
+      data: CampaignPrismaAdapter.parseCreateCampaignInput(campaignInput),
       include: {
         variantsEdges: {
           include: {
@@ -45,6 +46,41 @@ export class CampaignService {
     });
 
     return campaign;
+  }
+
+  /**
+   * Get a campaign-variant.
+   * @param campaignVariantId
+   * @returns
+   */
+  async getCampaignVariant(campaignVariantId: string) {
+    const campaignVariant = await this.prisma.campaignVariant.findFirst({
+      where: { id: campaignVariantId },
+      include: {
+        parent: true,
+        children: true,
+      }
+    });
+
+    return campaignVariant;
+  }
+
+
+  /**
+   * Get a campaign-variant edge with children and parent.
+   * @param campaignVariantId
+   * @returns
+   */
+   async getCampaignVariantEdge(campaignVariantEdgeId: string) {
+    const campaignVariantEdge = await this.prisma.campaignVariantEdge.findFirst({
+      where: { id: campaignVariantEdgeId },
+      include: {
+        childCampaignVariant: true,
+        parentCampaignVariant: true
+      }
+    });
+
+    return campaignVariantEdge;
   }
 
   /**
@@ -76,6 +112,7 @@ export class CampaignService {
         }
       })
     );
+
     const countDeliveriesCallback = async ({ props: countArgs }: FindManyCallBackProps) => (
       this.prisma.delivery.count(countArgs)
     );
@@ -139,40 +176,5 @@ export class CampaignService {
 
     // @ts-ignore
     return await this.prisma.$transaction(deliveries);
-  }
-
-  /**
-   * Saves campaign-input to prisma-ready format.
-   * @param campaignInput
-   * @returns
-   */
-  private saveCampaignInput(campaignInput: NexusGenInputs['CreateCampaignInputType']): CampaignCreateInput {
-    return {
-      label: campaignInput.label || '',
-      workspace: {
-        connect: {
-          id: campaignInput.workspaceId,
-        },
-      },
-      variantsEdges: {
-        create: campaignInput.variants?.map((variant) => ({
-          weight: variant.weight || 50,
-          campaignVariant: {
-            create: {
-              label: variant.label || '',
-              subject: variant.subject,
-              type: variant.type,
-              body: variant.body || '',
-              dialogue: {
-                connect: { id: variant.dialogueId },
-              },
-              workspace: {
-                connect: { id: variant.workspaceId },
-              },
-            },
-          },
-        })),
-      },
-    }
   }
 }

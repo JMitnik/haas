@@ -49,6 +49,8 @@ export const SessionType = objectType({
 
     t.field('delivery', { type: 'DeliveryType', nullable: true });
 
+    t.string('consumerId', { resolve: (parent) => parent.consumerId || '' });
+
     t.string('device', { nullable: true });
 
     t.list.field('nodeEntries', {

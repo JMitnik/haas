@@ -355,7 +355,7 @@ class SessionService {
     };
 
     return {
-      sessions: entries as NexusGenFieldTypes['Session'][],
+      sessions: entries as any[],
       offset: paginationOpts?.offset || 0,
       limit: paginationOpts?.limit || 0,
       startDate: paginationOpts?.startDate?.toString(),

@@ -3,6 +3,8 @@ import path from 'path';
 
 import nexus from './nexus';
 
+
+console.log(process.env.NODE_ENV);
 const schema = makeSchema({
   shouldGenerateArtifacts: process.env.NODE_ENV === "development",
   types: [
