@@ -45,7 +45,7 @@ export const DeliveryEventModel = objectType({
 
 export const DeliveryConnectionModel = objectType({
   name: 'DeliveryConnectionType',
-  
+
   definition(t) {
     t.implements('ConnectionInterface');
     t.list.field('deliveries', { type: DeliveryModel });
@@ -74,13 +74,13 @@ export const GetDelivery = extendType({
   type: 'Query',
 
   definition(t) {
-    t.field('delivery', { 
+    t.field('delivery', {
       type: DeliveryModel,
       nullable: true,
       args: { deliveryId: 'String' },
       resolve: async (parent, args, ctx) => {
         if (!args.deliveryId) throw new UserInputError('You forgot the delivery id');
-        
+
         const delivery = await ctx.prisma.delivery.findFirst({
           where: { id: args.deliveryId || '' },
           include: {
@@ -107,8 +107,8 @@ export const GetDeliveryConnectionOfCampaign = extendType({
   type: 'CampaignType',
 
   definition(t) {
-    t.field('deliveryConnection', { 
-      type: DeliveryConnectionModel, 
+    t.field('deliveryConnection', {
+      type: DeliveryConnectionModel,
       nullable: true,
       args: { filter: DeliveryConnectionFilterInput },
 
@@ -116,7 +116,7 @@ export const GetDeliveryConnectionOfCampaign = extendType({
         const campaignId = parent.id || args?.filter?.campaignId;
         if (!campaignId) throw new UserInputError('No campaign ID was provided');
 
-        const deliveriesPaginated = await CampaignService.getPaginatedDeliveries<NexusGenFieldTypes['DeliveryType']>(
+        const deliveriesPaginated = await ctx.services.campaignService.getPaginatedDeliveries<NexusGenFieldTypes['DeliveryType']>(
           campaignId,
           args?.filter?.paginationFilter || undefined,
           {
@@ -125,7 +125,9 @@ export const GetDeliveryConnectionOfCampaign = extendType({
           }
         );
 
-        const { nrFinished, nrOpened, nrSent, nrTotal } = CampaignService.getStatisticsFromDeliveries(deliveriesPaginated.entries);
+        const { nrFinished, nrOpened, nrSent, nrTotal } = ctx.services.campaignService.getStatisticsFromDeliveries(
+          deliveriesPaginated.entries
+        );
 
         return {
           deliveries: deliveriesPaginated.entries,

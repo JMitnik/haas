@@ -43,7 +43,6 @@ const handleError = (ctx: any, error: GraphQLError) => {
   });
 }
 
-
 const makeApollo = async () => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
 
@@ -53,7 +52,7 @@ const makeApollo = async () => {
       ...ctx,
       session: await constructSession(ctx),
       prisma,
-      services: bootstrapServices(),
+      services: bootstrapServices(prisma),
     }),
     plugins: [
       {

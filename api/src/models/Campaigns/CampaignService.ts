@@ -1,6 +1,6 @@
 import { addDays } from 'date-fns';
 import { uniqueId } from 'lodash';
-import prisma from '../../config/prisma';
+import { PrismaClient } from '@prisma/client';
 import AWS from '../../config/aws';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
@@ -18,13 +18,20 @@ export interface DeliveryUpdateItemProps {
 }
 
 export class CampaignService {
+  prisma: PrismaClient;
+
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
+
+
   /**
    * Gets paginated deliveries given a `campaignId`, generic `paginationOptions` and specific
    * delivery-centric access options.
    * @param campaignId
    * @param paginationOptions
    */
-  static getPaginatedDeliveries<GenericModelType>(
+  async getPaginatedDeliveries<GenericModelType>(
     campaignId: string,
     paginationOptions?: NexusGenInputs['PaginationWhereInput'],
     deliveryOptions?: DeliveryOptionsProps
@@ -39,13 +46,17 @@ export class CampaignService {
       },
     };
 
-    const findManyDeliveriesCallback = ({ props: findManyArgs }: FindManyCallBackProps) => prisma.delivery.findMany({
-      ...findManyArgs,
-      include: {
-        events: true
-      }
-    });
-    const countDeliveriesCallback = async ({ props: countArgs }: FindManyCallBackProps) => prisma.delivery.count(countArgs);
+    const findManyDeliveriesCallback = ({ props: findManyArgs }: FindManyCallBackProps) => (
+      this.prisma.delivery.findMany({
+        ...findManyArgs,
+        include: {
+          events: true
+        }
+      })
+    );
+    const countDeliveriesCallback = async ({ props: countArgs }: FindManyCallBackProps) => (
+      this.prisma.delivery.count(countArgs)
+    );
 
     const deliveryPaginationOptions: PaginateProps = {
       findManyArgs: {
@@ -69,9 +80,7 @@ export class CampaignService {
    * Fetches general statistics about a specific collection
    * @param deliveries
    */
-  static getStatisticsFromDeliveries(
-    deliveries: NexusGenFieldTypes['DeliveryType'][],
-  ) {
+  getStatisticsFromDeliveries(deliveries: NexusGenFieldTypes['DeliveryType'][]) {
     return {
       nrTotal: deliveries.length,
       nrFinished: deliveries.filter(entry => entry.currentStatus === 'FINISHED').length,
@@ -83,19 +92,18 @@ export class CampaignService {
   /**
    * Update a batch of deliveries
    */
-  static async updateBatchDeliveries(updatedDeliveries: DeliveryUpdateItemProps[]) {
-
+  async updateBatchDeliveries(updatedDeliveries: DeliveryUpdateItemProps[]) {
     const deliveryUpdates = updatedDeliveries.map(delivery => {
       const id = delivery.dateId.slice(delivery.dateId.length - 10);
 
-      const updateDelivery = prisma.delivery.update({
+      const updateDelivery = this.prisma.delivery.update({
         where: { id },
         data: {
           currentStatus: delivery.newStatus,
         }
       });
 
-      const newEvent = prisma.deliveryEvents.create({
+      const newEvent = this.prisma.deliveryEvents.create({
         data: {
           status: delivery.newStatus,
           Delivery: { connect: { id } }
@@ -108,6 +116,6 @@ export class CampaignService {
     const deliveries = deliveryUpdates.flat();
 
     // @ts-ignore
-    return await prisma.$transaction(deliveries);
+    return await this.prisma.$transaction(deliveries);
   }
 }

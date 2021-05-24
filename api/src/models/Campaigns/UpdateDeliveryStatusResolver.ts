@@ -7,34 +7,33 @@ import prisma from "../../config/prisma";
  * Resolver for updating current delivery. Will not update once 'Finished'.
  */
 export const UpdateDeliveryStatusResolver = mutationField('updateDeliveryStatus', {
-    type: 'String',
-    args: { deliveryId: 'String', status: 'DeliveryStatusEnum' },
-  
-    async resolve(parent, args, ctx) {
-      if (!args.deliveryId) throw new UserInputError('No delivery ID provided');
-      if (!args.status) throw new UserInputError('No status provided');
+  type: 'String',
+  args: { deliveryId: 'String', status: 'DeliveryStatusEnum' },
 
-      const currentDelivery = await ctx.prisma.delivery.findOne({ where: { id: args.deliveryId } });
+  async resolve(parent, args, ctx) {
+    if (!args.deliveryId) throw new UserInputError('No delivery ID provided');
+    if (!args.status) throw new UserInputError('No status provided');
 
-      if (currentDelivery?.currentStatus === 'FINISHED') return 'Already finished';
+    const currentDelivery = await ctx.prisma.delivery.findOne({ where: { id: args.deliveryId } });
 
-      const updateDelivery = ctx.prisma.delivery.update({
-        where: { id: args.deliveryId },
-        data: {
-          currentStatus: args.status,
-        }
-      });
+    if (currentDelivery?.currentStatus === 'FINISHED') return 'Already finished';
 
-      const createUpdateEvent = ctx.prisma.deliveryEvents.create({
-        data: {
-          status: args.status,
-          Delivery: { connect: { id: args.deliveryId } },
-        }
-      })
+    const updateDelivery = ctx.prisma.delivery.update({
+      where: { id: args.deliveryId },
+      data: {
+        currentStatus: args.status,
+      }
+    });
 
-      await prisma.$transaction([updateDelivery, createUpdateEvent]);
-  
-      return 'Okay';
-    },
-  });
-  
+    const createUpdateEvent = ctx.prisma.deliveryEvents.create({
+      data: {
+        status: args.status,
+        Delivery: { connect: { id: args.deliveryId } },
+      }
+    })
+
+    await prisma.$transaction([updateDelivery, createUpdateEvent]);
+
+    return 'Okay';
+  },
+});
