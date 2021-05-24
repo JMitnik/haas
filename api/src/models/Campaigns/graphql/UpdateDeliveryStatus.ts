@@ -1,6 +1,6 @@
 import { mutationField } from "@nexus/schema";
 import { UserInputError } from "apollo-server";
-import prisma from "../../config/prisma";
+import prisma from "../../../config/prisma";
 
 
 /**

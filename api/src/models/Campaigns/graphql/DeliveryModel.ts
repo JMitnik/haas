@@ -1,9 +1,9 @@
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { UserInputError } from 'apollo-server';
-import { NexusGenFieldTypes } from '../../generated/nexus';
-import { PaginationWhereInput } from '../general/Pagination';
+import { NexusGenFieldTypes } from '../../../generated/nexus';
+import { PaginationWhereInput } from '../../general/Pagination';
 import { CampaignVariantModel } from './CampaignModel';
-import { CampaignService } from './CampaignService';
+import { CampaignService } from '../CampaignService';
 
 
 export const DeliveryStatusEnum = enumType({

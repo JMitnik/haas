@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import AWS from '../../config/aws';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
-import { DeliveryStatusTypeEnum, FindManyDeliveryArgs } from '@prisma/client';
+import { CampaignCreateInput, DeliveryStatusTypeEnum, FindManyDeliveryArgs } from '@prisma/client';
 
 interface DeliveryOptionsProps {
   status?: DeliveryStatusTypeEnum;
@@ -24,6 +24,28 @@ export class CampaignService {
     this.prisma = prisma;
   }
 
+  /**
+   * Create a campaign.
+   */
+  async createCampaign(campaignInput: NexusGenInputs['CreateCampaignInputType']) {
+    const campaign = await this.prisma.campaign.create({
+      data: this.saveCampaignInput(campaignInput),
+      include: {
+        variantsEdges: {
+          include: {
+            campaignVariant: {
+              include: {
+                dialogue: true,
+                workspace: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    return campaign;
+  }
 
   /**
    * Gets paginated deliveries given a `campaignId`, generic `paginationOptions` and specific
@@ -117,5 +139,40 @@ export class CampaignService {
 
     // @ts-ignore
     return await this.prisma.$transaction(deliveries);
+  }
+
+  /**
+   * Saves campaign-input to prisma-ready format.
+   * @param campaignInput
+   * @returns
+   */
+  private saveCampaignInput(campaignInput: NexusGenInputs['CreateCampaignInputType']): CampaignCreateInput {
+    return {
+      label: campaignInput.label || '',
+      workspace: {
+        connect: {
+          id: campaignInput.workspaceId,
+        },
+      },
+      variantsEdges: {
+        create: campaignInput.variants?.map((variant) => ({
+          weight: variant.weight || 50,
+          campaignVariant: {
+            create: {
+              label: variant.label || '',
+              subject: variant.subject,
+              type: variant.type,
+              body: variant.body || '',
+              dialogue: {
+                connect: { id: variant.dialogueId },
+              },
+              workspace: {
+                connect: { id: variant.workspaceId },
+              },
+            },
+          },
+        })),
+      },
+    }
   }
 }

@@ -2,21 +2,24 @@ import { UserInputError } from 'apollo-server';
 import { inputObjectType, mutationField } from '@nexus/schema';
 import { isPresent } from 'ts-is-present';
 
-import { CampaignCreateInput } from '@prisma/client';
-import { CampaignModel, CampaignVariantEnum } from './CampaignModel';
-import { NexusGenInputs } from '../../generated/nexus';
-import prisma from '../../config/prisma';
+import { CampaignModel, CampaignScheduleEnum, CampaignVariantEnum } from './CampaignModel';
+import { NexusGenInputs } from '../../../generated/nexus';
 
 export const CreateCampaignVariantInputType = inputObjectType({
   name: 'CreateCampaignVariantInputType',
   definition(t) {
     t.string('label');
+
     t.id('workspaceId', { required: true });
     t.id('dialogueId', { required: true });
-    t.field('type', { type: CampaignVariantEnum, required: true });
+
+    t.int('depth');
     t.string('body');
     t.float('weight');
     t.string('subject', { required: false });
+
+    t.field('scheduleType', { type: CampaignScheduleEnum, required: true });
+    t.field('type', { type: CampaignVariantEnum, required: true });
   },
 });
 
@@ -40,57 +43,15 @@ const validateProbabilityEdges = (input: NexusGenInputs['CreateCampaignInputType
   }
 };
 
-const saveCampaign = (input: NexusGenInputs['CreateCampaignInputType']): CampaignCreateInput => ({
-  label: input.label || '',
-  workspace: {
-    connect: {
-      id: input.workspaceId,
-    },
-  },
-  variantsEdges: {
-    create: input.variants?.map((variant) => ({
-      weight: variant.weight || 50,
-      campaignVariant: {
-        create: {
-          label: variant.label || '',
-          subject: variant.subject,
-          type: variant.type,
-          body: variant.body || '',
-          dialogue: {
-            connect: { id: variant.dialogueId },
-          },
-          workspace: {
-            connect: { id: variant.workspaceId },
-          },
-        },
-      },
-    })),
-  },
-});
-
 export const CreateCampaignResolver = mutationField('createCampaign', {
   type: CampaignModel,
   args: { input: CreateCampaignInputType },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('Empty input!');
     validateProbabilityEdges(args?.input);
 
-    const campaign = await prisma.campaign.create({
-      data: saveCampaign(args.input),
-      include: {
-        variantsEdges: {
-          include: {
-            campaignVariant: {
-              include: {
-                dialogue: true,
-                workspace: true
-              }
-            }
-          }
-        }
-      }
-    });
+    const campaign = await ctx.services.campaignService.createCampaign(args.input);
 
     return {
       ...campaign,
