@@ -1,36 +1,48 @@
-import { FindManyUserOfCustomerArgs, UserOfCustomer } from '@prisma/client';
+import { FindManyUserOfCustomerArgs, UserOfCustomer, PrismaClient, PrismaClientOptions } from '@prisma/client';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import _ from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
-import { mailService } from '../../services/mailings/MailService';
+import { mailService } from '../mailings/MailService';
 
-import AuthService from '../auth/AuthService';
-import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
+import AuthService from '../../models/auth/AuthService';
+import makeInviteTemplate from '../mailings/templates/makeInviteTemplate';
 import prisma from '../../config/prisma';
-import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
+import makeRoleUpdateTemplate from '../mailings/templates/makeRoleUpdateTemplate';
+import { UserServiceType } from './UserServiceTypes';
 
-class UserService {
-  static async createUser(userInput: NexusGenInputs['UserInput']) {
-    const user = await prisma.user.create({
+class UserService implements UserServiceType {
+  prisma: PrismaClient<PrismaClientOptions, never>;
+
+  constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
+    this.prisma = prismaClient;
+  }
+
+  // TODO: Remove as this function is not used anymore (apparently haha XD)
+  async createUser(userInput: NexusGenInputs['UserInput']) {
+    return this.prisma.user.create({
       data: {
         email: userInput.email,
-        password: userInput.password || '',
-        firstName: userInput.firstName || 'Anonymous',
-        lastName: userInput.lastName || 'User',
-        phone: userInput.phone || '000',
+        firstName: userInput.firstName,
+        password: (userInput.password || ''),
+        lastName: userInput.lastName,
+        phone: userInput.phone,
+        customers: {
+          create: {
+            customer: { connect: { id: userInput.customerId || undefined } },
+            role: { connect: { id: userInput.roleId || undefined } },
+          },
+        },
       },
     });
-
-    return user;
   }
 
   /**
    * Invites a new user to a current customer, and mails them with a login-token.
    */
-  static async inviteNewUserToCustomer(email: string, customerId: string, roleId: string) {
-    const createdUser = await prisma.user.create({
+  async inviteNewUserToCustomer(email: string, customerId: string, roleId: string) {
+    const createdUser = await this.prisma.user.create({
       data: {
         email,
         customers: {

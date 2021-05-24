@@ -14,7 +14,7 @@ import CustomerService from './CustomerService';
 import { PaginationWhereInput } from '../general/Pagination';
 import { UserConnection, UserCustomerType } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
-import UserService from '../users/UserService';
+import UserService from '../../services/user/UserService';
 import isValidColor from '../../utils/isValidColor';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {

@@ -5,7 +5,7 @@ import { extendType, inputObjectType, objectType, queryField, scalarType } from 
 import { ConnectionInterface, PaginationWhereInput } from '../general/Pagination';
 import { Kind } from 'graphql';
 import { RoleType, SystemPermission } from '../role/Role';
-import UserService from './UserService';
+import UserService from '../../services/user/UserService';
 
 export const UserCustomerType = objectType({
   name: 'UserCustomer',
@@ -328,26 +328,10 @@ export const UserMutations = extendType({
         if (!args.customerSlug) throw new UserInputError('No customer scope provided');
         if (!args.input) throw new UserInputError('No input provided');
 
-        const { firstName, lastName, email, password, phone, roleId } = args.input;
+        const { email } = args.input;
 
         if (!email) throw new UserInputError('No valid email provided');
-        // if (!password) throw new UserInputError('No password provided');
-
-        return ctx.prisma.user.create({
-          data: {
-            email,
-            firstName,
-            password: (password || ''),
-            lastName,
-            phone,
-            customers: {
-              create: {
-                customer: { connect: { id: args.input.customerId || undefined } },
-                role: { connect: { id: roleId || undefined } },
-              },
-            },
-          },
-        });
+        return ctx.services.userService.createUser(args.input);
       },
     });
 

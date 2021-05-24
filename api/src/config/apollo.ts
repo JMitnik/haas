@@ -53,7 +53,7 @@ const makeApollo = async () => {
       ...ctx,
       session: await constructSession(ctx),
       prisma,
-      services: bootstrapServices(),
+      services: bootstrapServices(prisma),
     }),
     plugins: [
       {

@@ -4,10 +4,11 @@ import { ApolloError, AuthenticationError, UserInputError } from 'apollo-server-
 import { UserInput, UserType } from '../users/User';
 import { mailService } from '../../services/mailings/MailService';
 import AuthService from './AuthService';
-import UserService from '../users/UserService';
+import UserService from '../../services/user/UserService';
 import makeSignInTemplate from '../../services/mailings/templates/makeSignInTemplate';
 import prisma from '../../config/prisma';
 import verifyAndDecodeToken from './verifyAndDecodeToken';
+import { APIContext } from '../../types/APIContext';
 
 export const RegisterInput = inputObjectType({
   name: 'RegisterInput',
@@ -260,7 +261,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
   type: InviteUserOutput,
   args: { input: InviteUserInput },
 
-  async resolve(parent, args, ctx) {
+  async resolve(parent, args, ctx: APIContext) {
     if (!args.input) throw new UserInputError('No input provided');
     const { customerId, email, roleId } = args.input;
 
@@ -281,7 +282,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
     // Case 1: If user completely does not exist in our database yet,
     //  create a new entry and login-token
     if (!users.length) {
-      await UserService.inviteNewUserToCustomer(email, customerId, roleId);
+      await ctx.services.userService.inviteNewUserToCustomer(email, customerId, roleId);
 
       return {
         didAlreadyExist: false,
