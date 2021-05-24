@@ -4,8 +4,6 @@ import { NexusGenInputs } from '../../generated/nexus';
 export class CampaignPrismaAdapter {
   /**
    * Parses create campaign-variant.
-   * @param campaignVariantInput
-   * @returns
    */
  static parseCreateCampaignInput(campaignInput: NexusGenInputs['CreateCampaignInputType']): CampaignCreateInput {
   return {
@@ -42,8 +40,6 @@ export class CampaignPrismaAdapter {
 
   /**
    * Recursively parses nested campaign-variants.
-   * @param campaignVariantInput
-   * @returns
    */
   static parseCreateChildrenCampaignVariantInput(campaignVariantInput: NexusGenInputs['CampaignVariantEdgeInputType']): CampaignVariantEdgeCreateWithoutParentCampaignVariantInput {
     return {
