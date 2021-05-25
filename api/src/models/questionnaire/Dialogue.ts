@@ -272,8 +272,8 @@ export const DialogueType = objectType({
     t.list.field('questions', {
       type: QuestionNodeType,
 
-      resolve(parent, args, ctx) {
-        const questions = ctx.prisma.questionNode.findMany({
+      async resolve(parent, args, ctx) {
+        const questions = await ctx.prisma.questionNode.findMany({
           where: {
             AND: [
               { questionDialogueId: parent.id },
@@ -302,7 +302,7 @@ export const DialogueType = objectType({
             },
           },
         });
-
+        console.log('questions: ', questions.find((question) => question.title === 'GOON'))
         return questions;
       },
     });

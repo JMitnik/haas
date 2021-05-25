@@ -60,7 +60,7 @@ export const QuestionNodeTypeEnum = enumType({
   name: 'QuestionNodeTypeEnum',
   description: 'The different types a node can assume',
 
-  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'FORM', 'TEXTBOX', 'LINK', 'SHARE'],
+  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'FORM', 'TEXTBOX', 'LINK', 'SHARE', 'VIDEO_EMBEDDED'],
 });
 
 export const ShareNodeType = objectType({
@@ -178,9 +178,15 @@ export const QuestionNodeType = objectType({
     t.boolean('isRoot');
     t.string('title');
     t.string('updatedAt');
+
+    t.string('extraContent', {
+      nullable: true,
+      resolve: (parent) => parent.extraContent || 'None' 
+     });
     t.string('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
     t.string('overrideLeafId', { nullable: true });
+
     t.string('updatedAt', {
       nullable: true,
       resolve: (parent) => parent.updatedAt?.toString() || '',
@@ -430,6 +436,7 @@ export const CreateQuestionNodeInputType = inputObjectType({
     t.string('dialogueSlug');
     t.string('title');
     t.string('type');
+    t.string('extraContent', { nullable: true }) 
 
     t.field('optionEntries', { type: OptionsInputType });
     t.field('edgeCondition', { type: EdgeConditionInputType });

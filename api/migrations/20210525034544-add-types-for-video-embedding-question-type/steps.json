@@ -1,0 +1,19 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateEnum",
+      "enum": "NodeType",
+      "createdValues": [
+        "VIDEO_EMBEDDED"
+      ]
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "extraContent",
+      "type": "String",
+      "arity": "Optional"
+    }
+  ]
+}

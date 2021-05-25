@@ -17,6 +17,7 @@ export const UpdateQuestionNodeInputType = inputObjectType({
 
     t.string('title');
     t.string('type');
+    t.string('extraContent', { required: false })
 
     t.field('sliderNode', { type: SliderNodeInputType });
 

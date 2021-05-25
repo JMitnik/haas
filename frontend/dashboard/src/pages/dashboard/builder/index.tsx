@@ -7,10 +7,12 @@ import {
   QuestionEntryProps,
 } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import { Loader } from '@haas/ui';
+import { Video } from 'react-feather';
 import { useNavigator } from 'hooks/useNavigator';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 import MultiChoiceBuilderIcon from 'components/Icons/MultiChoiceBuilderIcon';
+import VideoIcon from 'components/Icons/VideoIcon';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
 const initializeQuestionType = (type?: string) => {
@@ -20,6 +22,10 @@ const initializeQuestionType = (type?: string) => {
 
   if (type === 'CHOICE') {
     return 'Choice';
+  }
+
+  if (type === 'VIDEO_EMBEDDED') {
+    return 'Video embedded';
   }
 
   return 'Unknown';
@@ -55,6 +61,17 @@ const findLeafs = (nodes: QuestionEntryProps[]) => {
   return selectLeafs;
 };
 
+const getIcon = (questionType: string) => {
+  switch (questionType) {
+    case 'CHOICE':
+      return MultiChoiceBuilderIcon;
+    case 'VIDEO_EMBEDDED':
+      return VideoIcon;
+    default:
+      return HaasNodeIcon;
+  }
+};
+
 const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
   let questions = nodes?.filter((node) => !node.isLeaf);
   questions = orderBy(questions, (question) => question.creationDate, ['asc']);
@@ -72,15 +89,17 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
         children,
         updatedAt,
         sliderNode,
+        extraContent,
       }) => ({
         id,
         updatedAt,
         title,
         isRoot,
         isLeaf,
+        extraContent,
         type: initializeQuestionType(type),
         sliderNode,
-        icon: type === 'CHOICE' ? MultiChoiceBuilderIcon : HaasNodeIcon,
+        icon: getIcon(type),
         overrideLeaf: !overrideLeaf
           ? undefined
           : {
