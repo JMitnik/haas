@@ -1,6 +1,5 @@
 import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
 import { CampaignPrismaAdapter } from "../CampaignPrismaAdapter";
-import { CampaignService } from "../CampaignService";
 import { cleanCampaignDatabase, seedWorkspace } from "./testUtils";
 
 const prisma = makeTestPrisma();
@@ -9,7 +8,7 @@ const campaignPrismaAdapter = new CampaignPrismaAdapter(prisma);
 const workspaceId = 'WORKSPACE_123';
 const dialogueId = 'DIALOGUE_123';
 
-describe('CampaignService tests', () => {
+describe('CampaignPrismaAdapter', () => {
   beforeEach(async () => {
     await seedWorkspace(prisma, workspaceId, dialogueId);
   });
@@ -19,10 +18,8 @@ describe('CampaignService tests', () => {
     prisma.$disconnect();
   });
 
-  test('Creates Nested Variants', async () => {
-    const campaignService = new CampaignService(prisma, campaignPrismaAdapter);
-
-    await campaignService.createCampaign({
+  test('creates campaign in database', async () => {
+    const campaign = await campaignPrismaAdapter.createCampaign({
       workspaceId,
       label: 'Test',
       variants: [{
@@ -45,4 +42,34 @@ describe('CampaignService tests', () => {
     const allCampaigns = await prisma.campaignVariant.findMany({});
     expect(allCampaigns.length).toBe(2);
   });
-});
+
+  test.only('edits existing campaign in database', async () => {
+    // First write a campaign to the database.
+    const campaign = await campaignPrismaAdapter.createCampaign({
+      workspaceId,
+      label: 'Test',
+      variants: [{
+        dialogueId,
+        workspaceId,
+        scheduleType: 'GENERAL',
+        type: 'EMAIL',
+        body: 'Test',
+        children: [{
+          childVariant: {
+            dialogueId,
+            workspaceId,
+            scheduleType: 'FOLLOW_UP',
+            type: 'EMAIL'
+          }
+        }]
+      }]
+    });
+
+    const allCampaigns = await prisma.campaignVariant.findMany({});
+    expect(allCampaigns.length).toBe(2);
+
+    const campaign = await campaignPrismaAdapter.editCampaign({
+      
+    })
+  });
+})

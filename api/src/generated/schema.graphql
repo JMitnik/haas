@@ -52,11 +52,6 @@ enum CampaignVariantEdgeConditionEnumType {
   ON_NOT_OPENED
 }
 
-input CampaignVariantEdgeInputType {
-  childVariant: CampaignVariantInputType
-  condition: CampaignVariantEdgeConditionEnumType
-}
-
 """Connects a campaign variant to the next campaign variant"""
 type CampaignVariantEdgeType {
   childCampaignVariant: CampaignVariantType
@@ -69,19 +64,6 @@ enum CampaignVariantEnum {
   EMAIL
   QUEUE
   SMS
-}
-
-input CampaignVariantInputType {
-  body: String
-  children: [CampaignVariantEdgeInputType!]
-  depth: Int
-  dialogueId: ID!
-  label: String
-  scheduleType: CampaignScheduleEnum!
-  subject: String
-  type: CampaignVariantEnum!
-  weight: Float
-  workspaceId: ID!
 }
 
 """Variant of campaign"""
@@ -141,13 +123,30 @@ type CreateBatchDeliveriesOutputType {
 }
 
 input CreateCampaignInputType {
+  id: ID
   label: String
   variants: [CreateCampaignVariantInputType!]
   workspaceId: ID!
 }
 
+input CreateCampaignVariantEdgeInputType {
+  childVariant: CreateCampaignVariantInputType
+  condition: CampaignVariantEdgeConditionEnumType
+  parentVariant: CreateCampaignVariantInputType
+}
+
 input CreateCampaignVariantInputType {
-  data: CampaignVariantInputType!
+  body: String
+  children: [CreateCampaignVariantEdgeInputType!]
+  depth: Int
+  dialogueId: ID!
+  id: ID
+  label: String
+  scheduleType: CampaignScheduleEnum!
+  subject: String
+  type: CampaignVariantEnum!
+  weight: Float
+  workspaceId: ID!
 }
 
 input CreateCTAInputType {
@@ -425,6 +424,33 @@ input EdgeConditionInputType {
   renderMin: Int
 }
 
+input EditCampaignInputType {
+  id: ID!
+  label: String
+  variants: [EditCampaignVariantInputType!]
+  workspaceId: ID!
+}
+
+input EditCampaignVariantEdgeInputType {
+  childVariant: EditCampaignVariantInputType
+  condition: CampaignVariantEdgeConditionEnumType
+  parentVariant: EditCampaignVariantInputType!
+}
+
+input EditCampaignVariantInputType {
+  body: String
+  children: [EditCampaignVariantEdgeInputType!]
+  depth: Int
+  dialogueId: ID!
+  id: ID!
+  label: String
+  scheduleType: CampaignScheduleEnum!
+  subject: String
+  type: CampaignVariantEnum!
+  weight: Float
+  workspaceId: ID!
+}
+
 input EditUserInput {
   customerId: String
   email: String!
@@ -680,6 +706,7 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
+  editCampaign(input: EditCampaignInputType): CampaignType!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!

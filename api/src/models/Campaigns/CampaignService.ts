@@ -20,32 +20,27 @@ export interface DeliveryUpdateItemProps {
 
 export class CampaignService {
   prisma: PrismaClient;
+  prismaAdapter: CampaignPrismaAdapter;
 
-  constructor(prisma: PrismaClient) {
+  constructor(prisma: PrismaClient, prismaAdapter: CampaignPrismaAdapter) {
     this.prisma = prisma;
+    this.prismaAdapter = prismaAdapter;
   }
 
   /**
    * Create a campaign.
    */
   async createCampaign(campaignInput: NexusGenInputs['CreateCampaignInputType']) {
-    const campaign = await this.prisma.campaign.create({
-      data: CampaignPrismaAdapter.parseCreateCampaignInput(campaignInput),
-      include: {
-        variantsEdges: {
-          include: {
-            campaignVariant: {
-              include: {
-                dialogue: true,
-                workspace: true
-              }
-            }
-          }
-        }
-      }
-    });
-
+    const campaign = await this.prismaAdapter.createCampaign(campaignInput);
     return campaign;
+  }
+
+  /**
+   * Edit a campaign.
+   */
+  async editCampaign(campaignInput: NexusGenInputs['EditCampaignInputType']) {
+    const editedCampaign = await this.prismaAdapter.editCampaign(campaignInput);
+    return editedCampaign;
   }
 
   /**
