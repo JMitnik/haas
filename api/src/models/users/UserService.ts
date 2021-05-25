@@ -4,12 +4,12 @@ import { NexusGenInputs } from '../../generated/nexus';
 import _ from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
-import { mailService } from '../mailings/MailService';
+import { mailService } from '../../services/mailings/MailService';
 
-import AuthService from '../../models/auth/AuthService';
-import makeInviteTemplate from '../mailings/templates/makeInviteTemplate';
+import AuthService from '../auth/AuthService';
+import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import prisma from '../../config/prisma';
-import makeRoleUpdateTemplate from '../mailings/templates/makeRoleUpdateTemplate';
+import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
 import { UserServiceType } from './UserServiceTypes';
 
 class UserService implements UserServiceType {

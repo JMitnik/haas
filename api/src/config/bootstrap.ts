@@ -1,6 +1,6 @@
 import { mailService } from "../services/mailings/MailService"
 import { LoginService } from "../models/auth/LoginService"
-import UserService from "../services/user/UserService"
+import UserService from "../models/users/UserService"
 import { APIServiceContainer } from "../types/APIContext"
 import { PrismaClient } from "@prisma/client"
 import { PrismaClientOptions } from "@prisma/client/runtime"

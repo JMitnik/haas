@@ -4,7 +4,7 @@ import { ApolloError, AuthenticationError, UserInputError } from 'apollo-server-
 import { UserInput, UserType } from '../users/User';
 import { mailService } from '../../services/mailings/MailService';
 import AuthService from './AuthService';
-import UserService from '../../services/user/UserService';
+import UserService from '../users/UserService';
 import makeSignInTemplate from '../../services/mailings/templates/makeSignInTemplate';
 import prisma from '../../config/prisma';
 import verifyAndDecodeToken from './verifyAndDecodeToken';

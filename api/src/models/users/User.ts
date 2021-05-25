@@ -5,7 +5,7 @@ import { extendType, inputObjectType, objectType, queryField, scalarType } from 
 import { ConnectionInterface, PaginationWhereInput } from '../general/Pagination';
 import { Kind } from 'graphql';
 import { RoleType, SystemPermission } from '../role/Role';
-import UserService from '../../services/user/UserService';
+import UserService from './UserService';
 
 export const UserCustomerType = objectType({
   name: 'UserCustomer',
