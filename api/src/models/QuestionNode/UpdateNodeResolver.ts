@@ -39,7 +39,7 @@ export const UpdateQuestionNode = mutationField('updateQuestion', {
   resolve(parent, args) {
     if (!args?.input) throw new UserInputError('No input provided');
     validateUpdateQuestion(args.input);
-
+    console.log('args input: ', args.input);
     return NodeService.updateQuestionFromBuilder(
       args.input.id as string,
       args.input.title as string,

@@ -639,6 +639,14 @@ const language = {
       en: 'Minimum value',
       de: 'Minimalwert',
     },
+    video_embedded: {
+      en: 'Embedded video',
+      de: 'Embedded video',
+    },
+    video_embedded_helper: {
+      en: 'The video you want to display at the question',
+      de: 'The video you want to display at the question',
+    },
     max_value: {
       en: 'Maximum value',
       de: 'Maximalwert',

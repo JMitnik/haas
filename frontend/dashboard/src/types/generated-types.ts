@@ -1308,10 +1308,10 @@ export type QuestionNode = {
   isRoot: Scalars['Boolean'];
   title: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
+  extraContent?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   type: QuestionNodeTypeEnum;
   overrideLeafId?: Maybe<Scalars['String']>;
-  extraContent?: Maybe<Scalars['String']>;
   /** Slidernode resolver */
   sliderNode?: Maybe<SliderNodeType>;
   /** FormNode resolver */

@@ -517,7 +517,7 @@ export const QuestionNodeMutations = extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         // eslint-disable-next-line max-len
-        const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition } = args.input;
+        const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition, extraContent } = args.input;
         const { options } = optionEntries;
 
         const customer = await prisma.customer.findOne({
@@ -536,9 +536,11 @@ export const QuestionNodeMutations = extendType({
         const dialogue = customer?.dialogues[0];
         const dialogueId = dialogue?.id;
 
+        console.log('extra content create: ', extraContent)
+
         if (dialogueId) {
           return NodeService.createQuestionFromBuilder(
-            dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition,
+            dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition, extraContent
           );
         }
 

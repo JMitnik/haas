@@ -399,12 +399,14 @@ class NodeService {
       renderMax: number | null,
       matchValue: string | null
     },
+    extraContent: string | null,
   ) => {
     const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
     const newQuestion = await prisma.questionNode.create({
       data: {
         title,
         type,
+        extraContent,
         overrideLeaf: leaf || undefined,
         options: {
           create: options.map((option) => ({

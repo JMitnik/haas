@@ -6,7 +6,7 @@ import {
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import { Trash } from 'react-feather';
+import { Trash, Youtube } from 'react-feather';
 import { debounce } from 'lodash';
 import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +45,7 @@ interface FormDataProps {
   title: string;
   minValue: string;
   maxValue: string;
+  videoEmbedded: string;
   questionType: string;
   matchText: string;
   activeLeaf: string;
@@ -67,6 +68,14 @@ const isChoiceType = (questionType: string) => {
 const schema = yup.object().shape({
   title: yup.string().required(),
   questionType: yup.string().required(),
+  videoEmbedded: yup.string().when(['questionType'], {
+    is: (questionType: string) => {
+      console.log(questionType === 'VIDEO_EMBEDDED');
+      return questionType === 'VIDEO_EMBEDDED';
+    },
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
   minValue: yup.string().when(['parentQuestionType'], {
     is: (parentQuestionType: string) => parentQuestionType === 'Slider',
     then: yup.string().required(),
@@ -182,7 +191,6 @@ const DialogueBuilderQuestionForm = ({
   });
 
   const toast = useToast();
-  console.log('TYPE:', type);
   const [activeQuestionType, setActiveQuestionType] = useState(type);
 
   const matchValue = condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null;
@@ -376,11 +384,14 @@ const DialogueBuilderQuestionForm = ({
     const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
     const values = form.getValues();
 
+    console.log('extraContent: ', formData.videoEmbedded);
+
     if (question.id !== '-1') {
       updateQuestion({
         variables: {
           input: {
             id,
+            extraContent: formData.videoEmbedded,
             customerId: activeCustomer?.id,
             overrideLeafId: overrideLeafId || '',
             edgeId: edgeId || '-1',
@@ -416,6 +427,7 @@ const DialogueBuilderQuestionForm = ({
             dialogueSlug,
             title,
             type,
+            extraContent: formData.videoEmbedded,
             overrideLeafId: overrideLeafId || 'None',
             parentQuestionId,
             optionEntries: {
@@ -605,6 +617,25 @@ const DialogueBuilderQuestionForm = ({
                   <FormErrorMessage>{form.errors.questionType?.message}</FormErrorMessage>
                 </FormControl>
 
+                {form.watch('questionType') === 'VIDEO_EMBEDDED' && (
+                  <FormControl isRequired isInvalid={!!form.errors.videoEmbedded}>
+                    <FormLabel htmlFor="videoEmbedded">
+                      {t('video_embedded')}
+                    </FormLabel>
+                    <InputHelper>
+                      {t('video_embedded_helper')}
+                    </InputHelper>
+                    <Input
+                      name="videoEmbedded"
+                      placeholder="https://www.youtube.com/watch?..."
+                      leftEl={<Youtube />}
+                      ref={form.register()}
+                      defaultValue={question.extraContent || undefined}
+                    />
+                    <FormErrorMessage>{form.errors.videoEmbedded?.message}</FormErrorMessage>
+                  </FormControl>
+                )}
+
                 <FormControl isInvalid={!!form.errors.activeLeaf}>
                   <FormLabel htmlFor="questionType">
                     {t('call_to_action')}
@@ -652,7 +683,7 @@ const DialogueBuilderQuestionForm = ({
             </>
           )}
 
-          {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
+          {activeQuestionType && (activeQuestionType.value === 'CHOICE' || activeQuestionType.value === 'VIDEO_EMBEDDED') && (
             <>
               <UI.Hr />
               <UI.FormSection>
