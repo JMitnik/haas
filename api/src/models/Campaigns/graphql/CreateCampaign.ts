@@ -4,7 +4,7 @@ import { isPresent } from 'ts-is-present';
 
 import { CampaignModel } from './CampaignModel';
 import { NexusGenInputs } from '../../../generated/nexus';
-import { saveCampaignInputFactory } from './SaveCampaignFactory';
+import { saveCampaignInputFactory } from './SaveCampaignInputFactory';
 
 export const {
   CampaignInput: CreateCampaignInput,
