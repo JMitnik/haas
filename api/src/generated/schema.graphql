@@ -129,6 +129,16 @@ input CreateCampaignInputType {
   workspaceId: ID!
 }
 
+union CreateCampaignOutputType = CreateCampaignProblemType | CreateCampaignSuccessType
+
+type CreateCampaignProblemType {
+  problemMessage: String!
+}
+
+type CreateCampaignSuccessType {
+  campaign: CampaignType!
+}
+
 input CreateCampaignVariantEdgeInputType {
   childVariant: CreateCampaignVariantInputType
   condition: CampaignVariantEdgeConditionEnumType
@@ -684,7 +694,7 @@ type Mutation {
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
-  createCampaign(input: CreateCampaignInputType): CampaignType!
+  createCampaign(input: CreateCampaignInputType): CreateCampaignOutputType!
 
   """Create Call to Actions"""
   createCTA(input: CreateCTAInputType): QuestionNode!

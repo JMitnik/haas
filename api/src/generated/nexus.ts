@@ -519,6 +519,12 @@ export interface NexusGenRootTypes {
     failedDeliveries: NexusGenRootTypes['FailedDeliveryModel'][]; // [FailedDeliveryModel!]!
     nrDeliveries: number; // Int!
   }
+  CreateCampaignProblemType: { // root type
+    problemMessage: string; // String!
+  }
+  CreateCampaignSuccessType: { // root type
+    campaign: NexusGenRootTypes['CampaignType']; // CampaignType!
+  }
   CreateWorkspaceJobType: { // root type
     createdAt: string; // String!
     errorMessage?: string | null; // String
@@ -797,6 +803,7 @@ export interface NexusGenRootTypes {
   ID: string;
   Date: any;
   Upload: any;
+  CreateCampaignOutputType: NexusGenRootTypes['CreateCampaignProblemType'] | NexusGenRootTypes['CreateCampaignSuccessType'];
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
@@ -940,6 +947,12 @@ export interface NexusGenFieldTypes {
   CreateBatchDeliveriesOutputType: { // field return type
     failedDeliveries: NexusGenRootTypes['FailedDeliveryModel'][]; // [FailedDeliveryModel!]!
     nrDeliveries: number; // Int!
+  }
+  CreateCampaignProblemType: { // field return type
+    problemMessage: string; // String!
+  }
+  CreateCampaignSuccessType: { // field return type
+    campaign: NexusGenRootTypes['CampaignType']; // CampaignType!
   }
   CreateWorkspaceJobType: { // field return type
     createdAt: string; // String!
@@ -1145,7 +1158,7 @@ export interface NexusGenFieldTypes {
     confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     copyDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     createBatchDeliveries: NexusGenRootTypes['CreateBatchDeliveriesOutputType']; // CreateBatchDeliveriesOutputType!
-    createCampaign: NexusGenRootTypes['CampaignType']; // CampaignType!
+    createCampaign: NexusGenRootTypes['CreateCampaignOutputType']; // CreateCampaignOutputType!
     createCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     createDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     createJobProcessLocation: NexusGenRootTypes['JobProcessLocation']; // JobProcessLocation!
@@ -1712,12 +1725,13 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
+  CreateCampaignOutputType: "CreateCampaignProblemType" | "CreateCampaignSuccessType"
   ConnectionInterface: "DeliveryConnectionType" | "SessionConnection" | "UserConnection" | "AutodeckConnectionType" | "RoleConnection" | "TriggerConnectionType"
 }
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "AWSImageType" | "AutodeckConnectionType" | "CampaignType" | "CampaignVariantEdgeType" | "CampaignVariantType" | "ColourSettings" | "CreateBatchDeliveriesOutputType" | "CreateWorkspaceJobType" | "CustomFieldType" | "Customer" | "CustomerSettings" | "Debug" | "DeleteUserOutput" | "DeliveryConnectionType" | "DeliveryEventType" | "DeliveryType" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "JobObjectType" | "JobProcessLocation" | "JobProcessLocations" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "PreviewDataType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "AWSImageType" | "AutodeckConnectionType" | "CampaignType" | "CampaignVariantEdgeType" | "CampaignVariantType" | "ColourSettings" | "CreateBatchDeliveriesOutputType" | "CreateCampaignProblemType" | "CreateCampaignSuccessType" | "CreateWorkspaceJobType" | "CustomFieldType" | "Customer" | "CustomerSettings" | "Debug" | "DeleteUserOutput" | "DeliveryConnectionType" | "DeliveryEventType" | "DeliveryType" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "JobObjectType" | "JobProcessLocation" | "JobProcessLocations" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "PreviewDataType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "AdjustedImageInput" | "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignInputType" | "CreateCampaignVariantEdgeInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomFieldInputType" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DeliveryConnectionFilter" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditCampaignInputType" | "EditCampaignVariantEdgeInputType" | "EditCampaignVariantInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GenerateAutodeckInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RemovePixelRangeInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput" | "createJobProcessLocationInput";
 
@@ -1727,7 +1741,7 @@ export type NexusGenInterfaceNames = "ConnectionInterface";
 
 export type NexusGenScalarNames = "Boolean" | "Date" | "Float" | "ID" | "Int" | "String" | "Upload";
 
-export type NexusGenUnionNames = never;
+export type NexusGenUnionNames = "CreateCampaignOutputType";
 
 export interface NexusGenTypes {
   context: APIContext.APIContext;

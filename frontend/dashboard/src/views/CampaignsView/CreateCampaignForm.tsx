@@ -291,14 +291,22 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
         customerSlug: activeCustomer?.slug || ''
       })
     ],
-    onCompleted: () => {
-      toast({
-        title: t('toast:campaign_created'),
-        description: t('toast:campaign_created_helper'),
-        status: 'success',
-        position: 'bottom-right',
-        duration: 1500,
-      });
+    onCompleted: (output) => {
+      if (output.createCampaign.__typename === 'CreateCampaignProblemType') {
+        // TODO: Do something with these errors
+        console.log(output.createCampaign.problemMessage);
+      }
+
+      if (output.createCampaign.__typename === 'CreateCampaignSuccessType') {
+        // TODO: Do something with these errors
+        toast({
+          title: t('toast:campaign_created'),
+          description: t('toast:campaign_created_helper'),
+          status: 'success',
+          position: 'bottom-right',
+          duration: 1500,
+        });
+      }
 
       onClose?.();
     },

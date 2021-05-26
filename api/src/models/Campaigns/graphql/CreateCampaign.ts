@@ -9,7 +9,10 @@ import { saveCampaignInputFactory } from './SaveCampaignInputFactory';
 export const {
   CampaignInput: CreateCampaignInput,
   CampaignVariantEdgeInputType: CreateCampaignVariantEdgeInputType,
-  CampaignVariantInputType: CreateCampaignVariantInputType
+  CampaignVariantInputType: CreateCampaignVariantInputType,
+  CampaignOutputProblem: CreateCampaignOutputProblemType,
+  CampaignOutputSuccessType: CreateCampaignOutputSuccessType,
+  CampaignOutputType: CreateCampaignOutputType
 } = saveCampaignInputFactory('Create');
 
 const validateProbabilityEdges = (input: NexusGenInputs['CreateCampaignInputType']) => {
@@ -24,22 +27,31 @@ const validateProbabilityEdges = (input: NexusGenInputs['CreateCampaignInputType
 };
 
 export const CreateCampaignResolver = mutationField('createCampaign', {
-  type: CampaignModel,
+  type: CreateCampaignOutputType,
   args: { input: CreateCampaignInput },
 
   async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('Empty input!');
-    validateProbabilityEdges(args?.input);
+
+    try {
+      validateProbabilityEdges(args?.input);
+    } catch (error) {
+      return {
+        problemMessage: 'Input is not correct!'
+      }
+    }
 
     const campaign = await ctx.services.campaignService.createCampaign(args.input);
 
     return {
-      ...campaign,
-      deliveries: [],
-      variants: campaign.variantsEdges.map(variantEdge => ({
-        weight: variantEdge.weight,
-        ...variantEdge.campaignVariant,
-      }))
+      campaign: {
+        ...campaign,
+        deliveries: [],
+        variants: campaign.variantsEdges.map(variantEdge => ({
+          weight: variantEdge.weight,
+          ...variantEdge.campaignVariant,
+        }))
+      }
     };
   },
 });

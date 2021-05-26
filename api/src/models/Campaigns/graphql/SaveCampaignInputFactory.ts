@@ -1,5 +1,6 @@
-import { inputObjectType } from "@nexus/schema";
-import { CampaignScheduleEnum, CampaignVariantEdgeConditionEnumType, CampaignVariantEnum } from "./CampaignModel";
+import { inputObjectType, objectType, unionType } from "@nexus/schema";
+import { isDefinitionNode } from "graphql";
+import { CampaignModel, CampaignScheduleEnum, CampaignVariantEdgeConditionEnumType, CampaignVariantEnum } from "./CampaignModel";
 
 type Operation = 'Create' | 'Edit';
 
@@ -54,9 +55,41 @@ export const saveCampaignInputFactory = (operation: Operation) => {
     }
   });
 
+  const CampaignOutputSuccessType = objectType({
+    name: `${operation}CampaignSuccessType`,
+
+    definition(t) {
+      t.field('campaign', { type: CampaignModel });
+    }
+  });
+
+  const CampaignOutputProblem = objectType({
+    name: `${operation}CampaignProblemType`,
+
+    definition(t) {
+      t.string('problemMessage');
+    }
+  })
+
+  const CampaignOutputType = unionType({
+    name: `${operation}CampaignOutputType`,
+
+    definition(t) {
+      t.members(CampaignOutputSuccessType, CampaignOutputProblem);
+      t.resolveType(t => {
+        if (t.problemMessage) return `${operation}CampaignProblemType`;
+
+        return `${operation}CampaignSuccessType`;
+      })
+    }
+  })
+
   return {
     CampaignVariantInputType,
     CampaignInput,
-    CampaignVariantEdgeInputType
+    CampaignVariantEdgeInputType,
+    CampaignOutputSuccessType,
+    CampaignOutputProblem,
+    CampaignOutputType
   }
 };

@@ -16,11 +16,26 @@ export class CampaignPrismaAdapter {
           include: {
             campaignVariant: {
               include: {
-                children: true
+                children: true,
+                CampaignVariantToCampaign: {
+                  include: {
+                    campaign: true
+                  }
+                }
               }
             }
           }
         }
+      }
+    });
+  }
+
+  async getCampaignVariantById(id: string) {
+    return this.prisma.campaignVariant.findOne({
+      where: { id },
+      include: {
+        children: true,
+        parent: true,
       }
     });
   }
@@ -34,7 +49,12 @@ export class CampaignPrismaAdapter {
             campaignVariant: {
               include: {
                 dialogue: true,
-                workspace: true
+                workspace: true,
+                CampaignVariantToCampaign: {
+                  include: {
+                    campaign: true
+                  }
+                }
               }
             }
           }
@@ -46,25 +66,34 @@ export class CampaignPrismaAdapter {
   }
 
   async editCampaign(campaignInput: NexusGenInputs['EditCampaignInputType']) {
-    const existingCampaign = await this.getCampaignById(campaignInput.id);
+    // Edit campaign details
+    // Let's pretend these are ALL variants
+    const campaignVariantEdges = campaignInput.variants?.map(parentVariant => {
+      return parentVariant.children?.map(childEdge => ({
+        parent: parentVariant,
+        child: childEdge.childVariant,
+        condition: childEdge.condition
+      }))
+    }).flat();
 
-    const editedCampaign = await this.prisma.campaign.create({
-      data: CampaignPrismaAdapter.parseCreateCampaignInput(campaignInput),
-      include: {
-        variantsEdges: {
-          include: {
-            campaignVariant: {
-              include: {
-                dialogue: true,
-                workspace: true
-              }
-            }
-          }
-        }
-      }
-    });
+    console.log(campaignInput.variants)
 
-    return editedCampaign;
+    console.log(campaignVariantEdges);
+
+    // Look at campaign direct children (variantEdges)
+
+    // Extract from input nested campaignVariant
+    // const editedCampaign = await this.prisma.campaign.update({
+    //   where: { id: campaignInput.id },
+    //   data: {
+    //     label: campaignInput.label,
+    //     variantsEdges: {
+
+    //     }
+    //   }
+    // });
+
+    // return editedCampaign;
   }
 
   /**
@@ -72,6 +101,7 @@ export class CampaignPrismaAdapter {
    */
  static parseCreateCampaignInput(campaignInput: NexusGenInputs['CreateCampaignInputType']): CampaignCreateInput {
   return {
+    id: campaignInput.id || undefined,
     label: campaignInput.label || '',
     workspace: {
       connect: {
@@ -83,6 +113,7 @@ export class CampaignPrismaAdapter {
         weight: variant.weight || 0,
         campaignVariant: {
           create: {
+            id: variant.id || undefined,
             label: variant.label || '',
             subject: variant.subject,
             type: variant.type,
@@ -110,6 +141,7 @@ export class CampaignPrismaAdapter {
     return {
       childCampaignVariant: {
         create: {
+          id: campaignVariantInput.childVariant?.id || undefined,
           label: campaignVariantInput?.childVariant?.label || '',
           subject: campaignVariantInput?.childVariant?.subject,
           type: campaignVariantInput?.childVariant?.type as CampaignVariantTypeEnum,
