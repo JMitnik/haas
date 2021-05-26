@@ -67,9 +67,5 @@ describe('CampaignPrismaAdapter', () => {
 
     const allCampaigns = await prisma.campaignVariant.findMany({});
     expect(allCampaigns.length).toBe(2);
-
-    const campaign = await campaignPrismaAdapter.editCampaign({
-      
-    })
   });
 })
