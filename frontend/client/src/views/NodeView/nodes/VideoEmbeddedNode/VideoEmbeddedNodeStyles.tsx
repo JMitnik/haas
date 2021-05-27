@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import Color from 'color';
 import styled, { css } from 'styled-components';
 
-import { Div, Flex } from '@haas/ui';
+import { Flex } from '@haas/ui';
 
 export const VideoEmbeddedNodeContainer = styled(Flex)`
   flex-direction: column;

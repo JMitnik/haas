@@ -640,12 +640,14 @@ const language = {
       de: 'Minimalwert',
     },
     video_embedded: {
-      en: 'Embedded video',
-      de: 'Embedded video',
+      en: 'Embedded video ID',
+      de: 'Embedded video ID',
     },
     video_embedded_helper: {
-      en: 'The video you want to display at the question',
-      de: 'The video you want to display at the question',
+      en: `What is the ID of the video you want to display at the question? 
+      This ID can be found in the URL of the video.`,
+      de:`What is the ID of the video you want to display at the question? 
+      This ID can be found in the URL of the video.`,
     },
     max_value: {
       en: 'Maximum value',
