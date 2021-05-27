@@ -37,9 +37,10 @@ const IframeContainer = styled.div`
   }
 `;
 
+type MyProps = { videoId: string };
 type MyState = { isVideoReady: boolean };
 
-class YoutubeEmbed extends React.Component<any, MyState> {
+class YoutubeEmbed extends React.Component<MyProps, MyState> {
   constructor(props: any) {
     super(props);
     this.state = { isVideoReady: false };
@@ -62,14 +63,15 @@ class YoutubeEmbed extends React.Component<any, MyState> {
       width: '480',
     };
 
-    const isReady = this.state.isVideoReady;
+    const { isVideoReady } = this.state;
+    const { videoId } = this.props;
 
     return (
       <DrawerContainer>
         <IframeContainer>
-          <YouTube videoId="2g811Eo7K8U" opts={opts} onReady={this.onReady} />
+          <YouTube videoId={videoId} opts={opts} onReady={this.onReady} />
         </IframeContainer>
-        {!isReady && <LoadingContainer><Spinner /></LoadingContainer>}
+        {!isVideoReady && <LoadingContainer><Spinner /></LoadingContainer>}
       </DrawerContainer>
     );
   }

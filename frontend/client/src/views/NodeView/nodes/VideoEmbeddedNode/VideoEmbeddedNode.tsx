@@ -59,7 +59,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
       </Div>
 
       <Div width="100%">
-        {node.extraContent ? <YoutubeEmbed youtubeEmbeddedUrl={node.extraContent} /> : 'No youtube URL provided'}
+        {node.extraContent ? <YoutubeEmbed videoId={node.extraContent} /> : 'No youtube URL provided'}
       </Div>
 
       <Div width="100%">
