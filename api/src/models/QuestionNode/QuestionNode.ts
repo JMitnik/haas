@@ -181,7 +181,7 @@ export const QuestionNodeType = objectType({
 
     t.string('extraContent', {
       nullable: true,
-      resolve: (parent) => parent.extraContent || 'None' 
+      resolve: (parent) => parent.extraContent || null,
      });
     t.string('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
