@@ -40,7 +40,6 @@ const multiChoiceItemAnimation: Variants = {
 };
 
 const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
-  const { store } = useDialogueTree();
   const handleSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
     const entry: SessionEntryDataProps = {
       choice: { value: multiChoiceOption.value },
@@ -59,7 +58,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
       </Div>
 
       <Div width="100%">
-        {node.extraContent ? <YoutubeEmbed videoId={node.extraContent} /> : 'No youtube URL provided'}
+        <YoutubeEmbed videoId={node.extraContent} />
       </Div>
 
       <Div width="100%">

@@ -37,7 +37,7 @@ const IframeContainer = styled.div`
   }
 `;
 
-type MyProps = { videoId: string };
+type MyProps = { videoId: string | null };
 type MyState = { isVideoReady: boolean };
 
 class YoutubeEmbed extends React.Component<MyProps, MyState> {
