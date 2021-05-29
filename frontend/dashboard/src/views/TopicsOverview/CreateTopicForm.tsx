@@ -5,7 +5,7 @@ import React from 'react'
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { useCreateTopicMutation } from 'types/generated-types';
+import { GetTopicsOfDialogueDocument, useCreateTopicMutation } from 'types/generated-types';
 
 
 /**
@@ -21,6 +21,13 @@ const CreateTopicForm = ({ onCloseModal }: { onCloseModal: Function }) => {
     onCompleted: () => {
       onCloseModal();
     },
+    refetchQueries: [{
+      query: GetTopicsOfDialogueDocument,
+      variables: {
+        customerId: activeCustomer?.id || '',
+        dialogueSlug
+      }
+    }]
   });
 
   const handleFormSubmit = ({ label }: { label: string }) => {
