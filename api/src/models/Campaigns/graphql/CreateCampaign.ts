@@ -43,15 +43,14 @@ export const CreateCampaignResolver = mutationField('createCampaign', {
 
     const campaign = await ctx.services.campaignService.createCampaign(args.input);
 
-    return {
-      campaign: {
-        ...campaign,
-        deliveries: [],
-        variants: campaign.variantsEdges.map(variantEdge => ({
-          weight: variantEdge.weight,
-          ...variantEdge.campaignVariant,
-        }))
+    if (!campaign) {
+      return {
+        problemMessage: 'A difficulty was held with campaign, try again!'
       }
-    };
+    }
+
+    return {
+      campaign
+    } as any;
   },
 });

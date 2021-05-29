@@ -49,7 +49,8 @@ export const saveCampaignInputFactory = (operation: Operation) => {
     name: `${operation}CampaignVariantEdgeInputType`,
 
     definition(t) {
-      t.field('parentVariant', { required: operation === 'Edit' ? true: false, type: CampaignVariantInputType });
+      t.string('id', { required: operation === 'Edit' ? true: false });
+      t.string('parentVariantId', { required: operation === 'Edit' ? true: false });
       t.field('childVariant', { required: false, type: CampaignVariantInputType });
       t.field('condition', { type: CampaignVariantEdgeConditionEnumType });
     }

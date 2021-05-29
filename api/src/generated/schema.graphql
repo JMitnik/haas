@@ -142,7 +142,8 @@ type CreateCampaignSuccessType {
 input CreateCampaignVariantEdgeInputType {
   childVariant: CreateCampaignVariantInputType
   condition: CampaignVariantEdgeConditionEnumType
-  parentVariant: CreateCampaignVariantInputType
+  id: String
+  parentVariantId: String
 }
 
 input CreateCampaignVariantInputType {
@@ -444,7 +445,8 @@ input EditCampaignInputType {
 input EditCampaignVariantEdgeInputType {
   childVariant: EditCampaignVariantInputType
   condition: CampaignVariantEdgeConditionEnumType
-  parentVariant: EditCampaignVariantInputType!
+  id: String!
+  parentVariantId: String!
 }
 
 input EditCampaignVariantInputType {

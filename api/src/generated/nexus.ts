@@ -81,7 +81,8 @@ export interface NexusGenInputs {
   CreateCampaignVariantEdgeInputType: { // input type
     childVariant?: NexusGenInputs['CreateCampaignVariantInputType'] | null; // CreateCampaignVariantInputType
     condition?: NexusGenEnums['CampaignVariantEdgeConditionEnumType'] | null; // CampaignVariantEdgeConditionEnumType
-    parentVariant?: NexusGenInputs['CreateCampaignVariantInputType'] | null; // CreateCampaignVariantInputType
+    id?: string | null; // String
+    parentVariantId?: string | null; // String
   }
   CreateCampaignVariantInputType: { // input type
     body?: string | null; // String
@@ -181,7 +182,8 @@ export interface NexusGenInputs {
   EditCampaignVariantEdgeInputType: { // input type
     childVariant?: NexusGenInputs['EditCampaignVariantInputType'] | null; // EditCampaignVariantInputType
     condition?: NexusGenEnums['CampaignVariantEdgeConditionEnumType'] | null; // CampaignVariantEdgeConditionEnumType
-    parentVariant: NexusGenInputs['EditCampaignVariantInputType']; // EditCampaignVariantInputType!
+    id: string; // String!
+    parentVariantId: string; // String!
   }
   EditCampaignVariantInputType: { // input type
     body?: string | null; // String

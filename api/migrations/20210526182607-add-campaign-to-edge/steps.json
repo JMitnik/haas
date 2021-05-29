@@ -1,0 +1,65 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Campaign",
+      "field": "nestedVariantEdges",
+      "type": "CampaignVariantEdge",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdge",
+      "field": "campaignId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdge",
+      "field": "campaign",
+      "type": "Campaign",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "campaign"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "campaign"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[campaignId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "campaign"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    }
+  ]
+}

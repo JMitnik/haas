@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -660,8 +660,7 @@ model Campaign {
   id            String                      @id @default(cuid())
   label         String
   deliveries    Delivery[]
-  variantsEdges CampaignVariantToCampaign[] // TODO: Rename to directVariantEdges
-  nestedVariantEdges CampaignVariantEdge[]
+  variantsEdges CampaignVariantToCampaign[]
   variants      CampaignVariant[] @relation
 
   workspaceId String
@@ -669,7 +668,6 @@ model Campaign {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
 
 // CampaignVariantToCampaign: Top-level connection between campaign-variants and campaign.
@@ -735,9 +733,6 @@ enum CampaignVariantEdgeConditionEnum {
 
 model CampaignVariantEdge {
   id String @id @default(cuid())
-
-  campaignId  String
-  campaign    Campaign  @relation(fields: [campaignId], references: [id])
 
   // A next campaign variant might be triggered based on if this edge has a certain condition
   condition CampaignVariantEdgeConditionEnum?
