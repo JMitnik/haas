@@ -115,6 +115,7 @@ export class CampaignPrismaAdapter {
     await this.prisma.$transaction(disconnectActions);
 
     const variantsUpdateActions = variants.map(variant => {
+      const isDirectVariant = campaignVariantInputs.filter(directVariant => directVariant.id === variant.id).length > 0;
       return this.prisma.campaignVariant.upsert({
         create: {
           id: variant.id || undefined,
@@ -124,6 +125,12 @@ export class CampaignPrismaAdapter {
           type: variant.type,
           workspace: { connect: { id: variant.workspaceId } },
           campaign: { connect: { id: campaign.id } },
+          CampaignVariantToCampaign: isDirectVariant ? {
+            create: {
+              campaign: { connect: {id: campaignId } },
+              weight: variant.weight || 0
+            },
+          }: undefined
         },
         where: {
           id: variant.id
@@ -135,6 +142,18 @@ export class CampaignPrismaAdapter {
           campaign: { connect: { id: campaign.id } },
           type: variant.type,
           workspace: { connect: { id: variant.workspaceId } },
+          CampaignVariantToCampaign: isDirectVariant ? {
+            update: {
+              data: {
+                weight: variant.weight || 0,
+              },
+              where: { campaignId_campaignVariantId: {
+                campaignId,
+                campaignVariantId: variant.id
+              },
+              }
+            }
+          }: undefined
         }
       });
     });

@@ -483,6 +483,8 @@ describe('CampaignPrismaAdapter', () => {
     const grandChild = newCampaign?.variants.find(variant => variant.id === 'GRAND_CHILD_VARIANT_1');
     expect(grandChild?.children).toHaveLength(0);
     expect(grandChild?.parent?.id).toEqual('NESTED_PARENT_TO_CHILD_1');
+
+    expect(newCampaign?.variantsEdges).toHaveLength(2);
   });
 
   test('can extract all variants from editCampaignInput', async () => {
