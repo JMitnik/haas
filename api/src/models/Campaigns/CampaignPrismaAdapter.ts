@@ -1,4 +1,5 @@
 import { Campaign, CampaignCreateInput, CampaignVariantEdgeCreateWithoutParentCampaignVariantInput, CampaignVariantToCampaignCreateInput, CampaignVariantTypeEnum, PrismaClient } from '@prisma/client';
+import { UserInputError } from 'apollo-server-errors';
 import { difference } from 'lodash';
 import { isPresent } from 'ts-is-present';
 
@@ -78,6 +79,7 @@ export class CampaignPrismaAdapter {
 
   async editCampaignVariants(campaignId: string, campaignVariantInputs: NexusGenInputs['EditCampaignVariantInputType'][]) {
     const campaign = await this.getCampaignById(campaignId);
+    if (!campaign) throw new UserInputError('Campaign cannot be found');
 
     // Find which variants are to be removed.
     const variants = CampaignPrismaAdapter.parseVariantsFromEditCampaignVariantInputs(campaignVariantInputs);
@@ -111,6 +113,61 @@ export class CampaignPrismaAdapter {
 
     // @ts-ignore
     await this.prisma.$transaction(disconnectActions);
+
+    const variantsUpdateActions = variants.map(variant => {
+      return this.prisma.campaignVariant.upsert({
+        create: {
+          id: variant.id || undefined,
+          body: variant.body || '',
+          dialogue: { connect: { id: variant.dialogueId } },
+          label: variant.label || '',
+          type: variant.type,
+          workspace: { connect: { id: variant.workspaceId } },
+          campaign: { connect: { id: campaign.id } },
+        },
+        where: {
+          id: variant.id
+        },
+        update: {
+          body: variant.body || '',
+          dialogue: { connect: { id: variant.dialogueId } },
+          label: variant.label || '',
+          campaign: { connect: { id: campaign.id } },
+          type: variant.type,
+          workspace: { connect: { id: variant.workspaceId } },
+        }
+      });
+    });
+
+    await this.prisma.$transaction(variantsUpdateActions);
+    const refreshedCampaign = await this.getCampaignById(campaignId);
+
+    // Find which variants are to be removed.
+    const variantEdges = CampaignPrismaAdapter.parseVariantEdgesFromEditCampaignInputs(campaignVariantInputs);
+
+    const variantsEdgesUpdateActions = variantEdges.map(variantEdge => {
+      if (variantEdge.childVariant && variantEdge.parentVariantId) {
+        return this.prisma.campaignVariantEdge.upsert({
+          create: {
+            id: variantEdge.id || undefined,
+            campaign: { connect: { id: campaign.id } },
+            childCampaignVariant: { connect: { id: variantEdge.childVariant?.id || undefined } },
+            parentCampaignVariant: { connect: { id: variantEdge.parentVariantId } },
+            condition: variantEdge.condition
+          },
+          where: {
+            id: variantEdge.id || ''
+          },
+          update: {
+            condition: variantEdge.condition
+          }
+        });
+      }
+
+      return undefined;
+    }).filter(isPresent);
+
+    await this.prisma.$transaction(variantsEdgesUpdateActions);
 
     return (await this.getCampaignById(campaignId))?.variants;
   }
@@ -231,8 +288,8 @@ export class CampaignPrismaAdapter {
     return variants.filter(isPresent);
   }
 
-  static parseVariantEdgesFromEditCampaignInput(editCampaignInput: NexusGenInputs['EditCampaignInputType']): NexusGenInputs['EditCampaignVariantEdgeInputType'][] {
-    const edges = editCampaignInput.variants?.map(directVariant => {
+  static parseVariantEdgesFromEditCampaignInputs(editCampaignVariantInputs: NexusGenInputs['EditCampaignVariantInputType'][]): NexusGenInputs['EditCampaignVariantEdgeInputType'][] {
+    const edges = editCampaignVariantInputs.map(directVariant => {
       return this.parseVariantEdgesFromEditCampaignVariantInput(directVariant);
     }).filter(isPresent).flat() || [];
 
