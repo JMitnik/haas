@@ -21,6 +21,7 @@
         "migrate:create": "npx prisma migrate save --experimental",
         "migrate": "prisma migrate up --experimental --verbose",
         "gen": "prisma generate && ts-node ./src/config/schema.ts",
+        "gen:prisma": "prisma generate",
         "seed": "ts-node --transpile-only src/data/main-seed.ts",
         "prisma": "prisma"
     },

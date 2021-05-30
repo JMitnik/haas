@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { NexusGenInputs } from "../../../generated/nexus";
 
 export const seedWorkspace = async (prisma: PrismaClient, workspaceId: string, dialogueId: string) => {
   const createWorkspace = await prisma.customer.create({
@@ -34,3 +35,29 @@ export const cleanCampaignDatabase = async (prisma: PrismaClient) => {
     deleteWorkspaces
   ]);
 }
+
+export const workspaceId = 'WORKSPACE_123';
+export const dialogueId = 'DIALOGUE_123';
+
+export const defaultWorkspaceInput: NexusGenInputs['CreateCampaignInputType'] = {
+  id: 'CAMPAIGN_1',
+  workspaceId,
+  label: 'Test',
+  variants: [{
+    id: 'PARENT_VARIANT',
+    dialogueId,
+    workspaceId,
+    scheduleType: 'GENERAL',
+    type: 'EMAIL',
+    body: 'Test',
+    children: [{
+      childVariant: {
+        id: 'CHILD_VARIANT',
+        dialogueId,
+        workspaceId,
+        scheduleType: 'FOLLOW_UP',
+        type: 'EMAIL'
+      }
+    }]
+  }]
+};

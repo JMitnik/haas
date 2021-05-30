@@ -76,6 +76,45 @@ export class CampaignPrismaAdapter {
     return campaign;
   }
 
+  async editCampaignVariants(campaignId: string, campaignVariantInputs: NexusGenInputs['EditCampaignVariantInputType'][]) {
+    const campaign = await this.getCampaignById(campaignId);
+
+    // Find which variants are to be removed.
+    const variants = CampaignPrismaAdapter.parseVariantsFromEditCampaignVariantInputs(campaignVariantInputs);
+    const disconnectedVariantIds = difference(campaign?.variants.map(variant => variant.id), variants.map(variant => variant.id));
+
+    // Find which variants are direct descendants of the campaign
+    const directVariantIds = campaign?.variantsEdges.map(edge => edge.campaignVariantId);
+
+    // Return a list of disconnects
+    const disconnectActions = disconnectedVariantIds.map(variantId => {
+      const isDirectVariant = directVariantIds?.includes(variantId);
+      const deleteVariantToCampaign = isDirectVariant ? this.prisma.campaignVariantToCampaign.delete({
+        where: {
+          campaignId_campaignVariantId: {
+            campaignId,
+            campaignVariantId: variantId
+          }
+        }
+      }) : undefined;
+
+      const disconnectVariant = this.prisma.campaignVariant.update({
+        where: { id: variantId },
+        data: {
+          parent: !isDirectVariant ? { delete: true }: undefined,
+          campaign: { disconnect: true },
+        }
+      });
+
+      return [deleteVariantToCampaign, disconnectVariant];
+    }).flat().filter(isPresent);
+
+    // @ts-ignore
+    await this.prisma.$transaction(disconnectActions);
+
+    return (await this.getCampaignById(campaignId))?.variants;
+  }
+
   async editCampaign(campaignInput: NexusGenInputs['EditCampaignInputType']) {
     // Edit campaign details
     const editedCampaign = await this.prisma.campaign.update({
@@ -89,63 +128,63 @@ export class CampaignPrismaAdapter {
       }
     });
 
-    const variants = CampaignPrismaAdapter.parseVariantsFromEditCampaignInput(campaignInput);
-    const variantEdges = CampaignPrismaAdapter.parseVariantEdgesFromEditCampaignInput(campaignInput);
+    // const variants = CampaignPrismaAdapter.parseVariantsFromEditCampaignInput(campaignInput);
+    // const variantEdges = CampaignPrismaAdapter.parseVariantEdgesFromEditCampaignInput(campaignInput);
 
-    const variantsUpdates = variants.map(variant => {
-      return this.prisma.campaignVariant.upsert({
-        create: {
-          id: variant.id || undefined,
-          body: variant.body || '',
-          dialogue: { connect: { id: variant.dialogueId } },
-          label: variant.label || '',
-          type: variant.type,
-          workspace: { connect: { id: variant.workspaceId } },
-          campaign: { connect: { id: editedCampaign.id } },
-        },
-        where: {
-          id: variant.id
-        },
-        update: {
-          body: variant.body || '',
-          dialogue: { connect: { id: variant.dialogueId } },
-          label: variant.label || '',
-          campaign: { connect: { id: editedCampaign.id } },
-          type: variant.type,
-          workspace: { connect: { id: variant.workspaceId } },
-        }
-      });
-    });
-    await this.prisma.$transaction(variantsUpdates);
+    // const variantsUpdates = variants.map(variant => {
+    //   return this.prisma.campaignVariant.upsert({
+    //     create: {
+    //       id: variant.id || undefined,
+    //       body: variant.body || '',
+    //       dialogue: { connect: { id: variant.dialogueId } },
+    //       label: variant.label || '',
+    //       type: variant.type,
+    //       workspace: { connect: { id: variant.workspaceId } },
+    //       campaign: { connect: { id: editedCampaign.id } },
+    //     },
+    //     where: {
+    //       id: variant.id
+    //     },
+    //     update: {
+    //       body: variant.body || '',
+    //       dialogue: { connect: { id: variant.dialogueId } },
+    //       label: variant.label || '',
+    //       campaign: { connect: { id: editedCampaign.id } },
+    //       type: variant.type,
+    //       workspace: { connect: { id: variant.workspaceId } },
+    //     }
+    //   });
+    // });
+    // await this.prisma.$transaction(variantsUpdates);
 
-    const variantEdgeUpdates = variantEdges.map(edge => {
-      return this.prisma.campaignVariantEdge.upsert({
-        create: {
-          campaign: { connect: { id: editedCampaign.id } },
-          childCampaignVariant: { connect: { id: edge.childVariant?.id  } },
-          parentCampaignVariant: { connect: { id: edge.parentVariantId } },
-          condition: edge.condition,
-        },
-        where: { id: edge.id },
-        update: {
-          condition: edge.condition,
-        }
-      })
-    });
+    // const variantEdgeUpdates = variantEdges.map(edge => {
+    //   return this.prisma.campaignVariantEdge.upsert({
+    //     create: {
+    //       campaign: { connect: { id: editedCampaign.id } },
+    //       childCampaignVariant: { connect: { id: edge.childVariant?.id  } },
+    //       parentCampaignVariant: { connect: { id: edge.parentVariantId } },
+    //       condition: edge.condition,
+    //     },
+    //     where: { id: edge.id },
+    //     update: {
+    //       condition: edge.condition,
+    //     }
+    //   })
+    // });
 
-    await this.prisma.$transaction(variantEdgeUpdates);
+    // await this.prisma.$transaction(variantEdgeUpdates);
 
-    const disconnectedVariants = difference(editedCampaign?.variants.map(variant => variant.id), variants.map(variant => variant.id));
-    const disconnects = disconnectedVariants.map(variantId => {
-      return this.prisma.campaignVariant.update({
-        where: {id: variantId },
-        data: {
-          campaign: { disconnect: true },
-          // parent: { delete: true }
-        }
-      })
-    });
-    await this.prisma.$transaction(disconnects);
+    // const disconnectedVariants = difference(editedCampaign?.variants.map(variant => variant.id), variants.map(variant => variant.id));
+    // const disconnects = disconnectedVariants.map(variantId => {
+    //   return this.prisma.campaignVariant.update({
+    //     where: {id: variantId },
+    //     data: {
+    //       campaign: { disconnect: true },
+    //       // parent: { delete: true }
+    //     }
+    //   })
+    // });
+    // await this.prisma.$transaction(disconnects);
 
     // console.log(campaignInput.variants);
     // const campaignDirectEdges = campaignInput.variants?.map(directVariant => {
@@ -169,8 +208,8 @@ export class CampaignPrismaAdapter {
     return editedCampaign;
   }
 
-  static parseVariantsFromEditCampaignInput(editCampaignInput: NexusGenInputs['EditCampaignInputType']) {
-    const variants = editCampaignInput.variants?.map(directVariant => {
+  static parseVariantsFromEditCampaignVariantInputs(editCampaignVariantInputs: NexusGenInputs['EditCampaignVariantInputType'][]) {
+    const variants = editCampaignVariantInputs?.map(directVariant => {
       return [directVariant, ...this.parseVariantsFromEditCampaignVariantInput(directVariant)].flat();
     }).filter(isPresent).flat() || [];
 
@@ -265,6 +304,7 @@ export class CampaignPrismaAdapter {
    */
   static parseCreateChildrenCampaignVariantInput(campaignId: string, depth: number, campaignVariantInput: NexusGenInputs['CreateCampaignVariantEdgeInputType']): CampaignVariantEdgeCreateWithoutParentCampaignVariantInput {
     return {
+      id: campaignVariantInput.id || undefined,
       campaign: {
         connect: {
           id: campaignId
