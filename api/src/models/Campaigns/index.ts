@@ -1,5 +1,4 @@
 export * from './graphql/CampaignModel';
-// export * from './graphql/SaveCampaign';
 export * from './graphql/CreateCampaign';
 export * from './graphql/EditCampaign';
 export * from './graphql/DeliveryModel';

@@ -132,6 +132,7 @@ input CreateCampaignInputType {
 union CreateCampaignOutputType = CreateCampaignProblemType | CreateCampaignSuccessType
 
 type CreateCampaignProblemType {
+  fields: [ProblemFieldType!]!
   problemMessage: String!
 }
 
@@ -442,6 +443,17 @@ input EditCampaignInputType {
   workspaceId: ID!
 }
 
+union EditCampaignOutputType = EditCampaignProblemType | EditCampaignSuccessType
+
+type EditCampaignProblemType {
+  fields: [ProblemFieldType!]!
+  problemMessage: String!
+}
+
+type EditCampaignSuccessType {
+  campaign: CampaignType!
+}
+
 input EditCampaignVariantEdgeInputType {
   childVariant: EditCampaignVariantInputType
   condition: CampaignVariantEdgeConditionEnumType
@@ -718,7 +730,7 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
-  editCampaign(input: EditCampaignInputType): CampaignType!
+  editCampaign(input: EditCampaignInputType): EditCampaignOutputType!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
@@ -872,6 +884,11 @@ type PreviewDataType {
   colors: [String!]!
   rembgLogoUrl: String!
   websiteScreenshotUrl: String!
+}
+
+type ProblemFieldType {
+  field: String!
+  problem: String!
 }
 
 type Query {

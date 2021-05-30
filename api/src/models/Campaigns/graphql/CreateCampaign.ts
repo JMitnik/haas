@@ -7,10 +7,10 @@ import { NexusGenInputs } from '../../../generated/nexus';
 import { saveCampaignInputFactory } from './SaveCampaignInputFactory';
 
 export const {
-  CampaignInput: CreateCampaignInput,
+  CampaignInputType: CreateCampaignInput,
   CampaignVariantEdgeInputType: CreateCampaignVariantEdgeInputType,
   CampaignVariantInputType: CreateCampaignVariantInputType,
-  CampaignOutputProblem: CreateCampaignOutputProblemType,
+  CampaignOutputProblemType: CreateCampaignOutputProblemType,
   CampaignOutputSuccessType: CreateCampaignOutputSuccessType,
   CampaignOutputType: CreateCampaignOutputType
 } = saveCampaignInputFactory('Create');
@@ -32,12 +32,22 @@ export const CreateCampaignResolver = mutationField('createCampaign', {
 
   async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('Empty input!');
+    let problems = await ctx.services.campaignValidator.validateCreateCampaignInput(
+      args.input
+    );
+
+    if (problems.length) {
+      return {
+        problemMessage: 'Input problems encountered!',
+        fields: problems
+      }
+    }
 
     try {
       validateProbabilityEdges(args?.input);
     } catch (error) {
       return {
-        problemMessage: 'Input is not correct!'
+        problemMessage: 'Weights are not correct!'
       }
     }
 

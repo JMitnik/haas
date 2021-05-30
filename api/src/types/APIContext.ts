@@ -5,11 +5,16 @@ import { ContextSessionType } from '../models/auth/ContextSessionType';
 import { MailServiceType } from '../services/mailings/MailServiceTypes';
 import { LoginServiceType } from '../models/auth/LoginServiceType';
 import { CampaignService } from '../models/Campaigns/CampaignService';
+import { CampaignValidator } from '../models/Campaigns/CampaignValidator';
 
 export interface APIServiceContainer {
   mailService: MailServiceType;
   loginService: LoginServiceType;
   campaignService: CampaignService;
+  campaignValidator: CampaignValidator;
+}
+
+export interface APIValidators {
 }
 
 export interface APIContext extends ExpressContext {
