@@ -163,6 +163,7 @@ export type CreateCampaignOutputType = CreateCampaignSuccessType | CreateCampaig
 export type CreateCampaignProblemType = {
   __typename?: 'CreateCampaignProblemType';
   problemMessage: Scalars['String'];
+  fields: Array<ProblemFieldType>;
 };
 
 export type CreateCampaignSuccessType = {
@@ -171,7 +172,8 @@ export type CreateCampaignSuccessType = {
 };
 
 export type CreateCampaignVariantEdgeInputType = {
-  parentVariant?: Maybe<CreateCampaignVariantInputType>;
+  id?: Maybe<Scalars['String']>;
+  parentVariantId?: Maybe<Scalars['String']>;
   childVariant?: Maybe<CreateCampaignVariantInputType>;
   condition?: Maybe<CampaignVariantEdgeConditionEnumType>;
 };
@@ -534,8 +536,22 @@ export type EditCampaignInputType = {
   variants?: Maybe<Array<EditCampaignVariantInputType>>;
 };
 
+export type EditCampaignOutputType = EditCampaignSuccessType | EditCampaignProblemType;
+
+export type EditCampaignProblemType = {
+  __typename?: 'EditCampaignProblemType';
+  problemMessage: Scalars['String'];
+  fields: Array<ProblemFieldType>;
+};
+
+export type EditCampaignSuccessType = {
+  __typename?: 'EditCampaignSuccessType';
+  campaign: CampaignType;
+};
+
 export type EditCampaignVariantEdgeInputType = {
-  parentVariant: EditCampaignVariantInputType;
+  id: Scalars['String'];
+  parentVariantId: Scalars['String'];
   childVariant?: Maybe<EditCampaignVariantInputType>;
   condition?: Maybe<CampaignVariantEdgeConditionEnumType>;
 };
@@ -810,7 +826,7 @@ export type Mutation = {
   createTag: Tag;
   deleteTag: Tag;
   createCampaign: CreateCampaignOutputType;
-  editCampaign: CampaignType;
+  editCampaign: EditCampaignOutputType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
   updateDeliveryStatus: Scalars['String'];
   deleteTrigger?: Maybe<TriggerType>;
@@ -1229,6 +1245,12 @@ export type PreviewDataType = {
   colors: Array<Scalars['String']>;
   rembgLogoUrl: Scalars['String'];
   websiteScreenshotUrl: Scalars['String'];
+};
+
+export type ProblemFieldType = {
+  __typename?: 'ProblemFieldType';
+  field: Scalars['String'];
+  problem: Scalars['String'];
 };
 
 export type Query = {

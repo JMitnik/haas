@@ -4,6 +4,7 @@ export const ROUTES = {
   WORKSPACE_ROOT: '/dashboard/b/:customerSlug',
   DIALOGUES_VIEW: '/dashboard/b/:customerSlug/d',
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
+  CREATE_CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns/create',
   CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
   AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
@@ -27,11 +28,12 @@ export const useNavigator = () => {
       customerSlug,
       campaignId
     });
-    
+
     history.push(path);
   };
 
   const getCampaignsPath = () => generatePath(ROUTES.CAMPAIGNS_VIEW, { customerSlug, campaignId });
+  const getCreateCampaignsPath = () => generatePath(ROUTES.CREATE_CAMPAIGNS_VIEW, { customerSlug });
 
   const dialoguesMatch = useRouteMatch({
     path: ROUTES.DIALOGUES_VIEW,
@@ -44,6 +46,7 @@ export const useNavigator = () => {
   return {
     goToCampaignView,
     getCampaignsPath,
+    getCreateCampaignsPath,
     dialoguesMatch,
     dialogueMatch,
     customerSlug,

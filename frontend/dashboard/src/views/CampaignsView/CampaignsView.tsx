@@ -3,18 +3,20 @@ import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import Select from 'react-select';
+import { useHistory } from 'react-router';
 
 import { ReactComponent as EmptyIll } from 'assets/images/undraw_empty.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
-import { useNavigator } from 'hooks/useNavigator';
+import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
 import useAuth from 'hooks/useAuth';
 
 import CreateCampaignForm from './CreateCampaignForm';
 
 const CampaignsView = () => {
+  const history = useHistory();
   const { t } = useTranslation();
-  const { customerSlug, goToCampaignView } = useNavigator();
+  const { customerSlug, goToCampaignView, getCreateCampaignsPath } = useNavigator();
   const [openedModal, setIsOpenedModal] = useState(false);
   const { canCreateCampaigns } = useAuth();
 
@@ -38,7 +40,7 @@ const CampaignsView = () => {
         {canCreateCampaigns && (
           <UI.Button
             size="sm"
-            onClick={() => setIsOpenedModal(true)}
+            onClick={() => history.push(getCreateCampaignsPath())}
             variantColor="teal"
             leftIcon={Plus}
           >
@@ -56,7 +58,7 @@ const CampaignsView = () => {
           >
             <UI.Button
               size="sm"
-              onClick={() => setIsOpenedModal(true)}
+              onClick={() => history.push(getCreateCampaignsPath())}
               variantColor="teal"
               leftIcon={Plus}
             >

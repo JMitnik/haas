@@ -12,15 +12,20 @@ interface CardProps {
   outline?: boolean;
   boxShadow?: BoxShadowSize;
   willFocusWithin?: boolean;
+  isActive?: boolean;
 }
 
-export const Card = styled(Div) <CardProps>`
-  ${({ theme, noHover, boxShadow, outline, isFlat, willFocusWithin }) => css`
+export const Card = styled(Div)<CardProps>`
+  ${({ theme, noHover, isActive, boxShadow, outline, isFlat, willFocusWithin }) => css`
     position: relative;
     display: flex;
     flex-direction: column;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
     box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+
+    ${isActive && css`
+      border: 2px solid ${theme.colors.blue[300]};
+    `}
 
     ${willFocusWithin && css`
       &:focus-within {

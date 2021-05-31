@@ -9,7 +9,7 @@ import { ArrowRight, Check } from 'react-feather';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
 
-import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum, refetchGetWorkspaceCampaignsQuery } from 'types/generated-types';
+import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum, refetchGetWorkspaceCampaignsQuery, CampaignScheduleEnum } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 import styled, { css } from 'styled-components';
 import CampaignVariantsBuilder from './CampaignVariantsBuilder/CampaignVariantsBuilder';
@@ -282,6 +282,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
           subject: '',
           weight: variant.weight,
           type: variant.type as CampaignVariantEnum,
+          scheduleType: 'GENERAL' as CampaignScheduleEnum,
           workspaceId: activeCustomer?.id || '',
         })),
       },
