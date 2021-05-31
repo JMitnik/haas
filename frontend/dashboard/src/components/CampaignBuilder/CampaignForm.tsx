@@ -1,5 +1,6 @@
 import * as UI from '@haas/ui';
 import { yupResolver } from '@hookform/resolvers';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -8,9 +9,10 @@ import { campaignFormSchema } from './CampaignFormSchema';
 
 interface CampaignFormProps {
   label?: string | null;
+  onChange: (formValues: any) => void;
 }
 
-export const CampaignForm = ({ label }: CampaignFormProps) => {
+export const CampaignForm = ({ label, onChange }: CampaignFormProps) => {
   const { t } = useTranslation();
   const form = useForm({
     resolver: yupResolver(campaignFormSchema),
@@ -18,6 +20,12 @@ export const CampaignForm = ({ label }: CampaignFormProps) => {
       label
     }
   });
+
+  const formValues = form.watch();
+
+  useEffect(() => {
+    onChange(formValues);
+  }, [formValues]);
 
   return (
     <UI.Stack>

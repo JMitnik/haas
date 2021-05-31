@@ -27,6 +27,8 @@ interface CampaignState extends EditCampaignInputType {
   activeForm?: ActiveFormProps | undefined;
   setActiveForm: (activeFormType: ActiveFormType, activeDirectVariantIndex?: number) => void;
   initializeCampaign: () => void;
+  editCampaignVariant: (input: any, index: number) => void;
+  editCampaign: any;
 }
 
 const useCampaignStore = create<CampaignState>(immer((set: SetState<CampaignState>) => ({
@@ -37,11 +39,22 @@ const useCampaignStore = create<CampaignState>(immer((set: SetState<CampaignStat
   activeForm: undefined,
 
   initializeCampaign: () => set(state => {
-    state.label = 'My first campaign'
+    state.label = 'My first campaign';
+    state.activeForm = {
+      type: 'CampaignForm'
+    };
   }),
   editCampaign: (campaignFormInputs: CampaignFormType) => set(state => {
     // @ts-ignore
     state.label = campaignFormInputs?.label;
+  }),
+  editCampaignVariant: (input: any, activeDirectVariantIndex: number) => set(state => {
+    // @ts-ignore
+    let variant = state.variants[activeDirectVariantIndex];
+    state.variants[activeDirectVariantIndex] = {
+      label: input.label,
+      ...variant,
+    }
   }),
   setActiveForm: (activeFormType: ActiveFormType, activeDirectVariantIndex?: number) => set(state => {
     state.activeForm = {
@@ -66,9 +79,9 @@ const useCampaignStore = create<CampaignState>(immer((set: SetState<CampaignStat
   },
 })));
 
+type EdgeType = 'Weights' | 'Normal'
 
-
-export const AddCampaignEdge = ({ onClick }: { onClick?: () => void }) => (
+export const AddCampaignEdge = ({ onClick, type = 'Normal' }: { onClick?: () => void, type?: EdgeType }) => (
   <LS.BuilderEdgeContainer>
     <LS.BuilderEdge />
     {onClick && (
@@ -84,6 +97,11 @@ export const AddCampaignEdge = ({ onClick }: { onClick?: () => void }) => (
         />
       </LS.BuilderAddContainer>
     )}
+    {type === 'Weights' && (
+      <LS.BuilderEdgeLabel>
+        100%
+      </LS.BuilderEdgeLabel>
+    )}
     <LS.EdgeFoot>
       <UI.Icon>
         <ChevronDown />
@@ -93,7 +111,16 @@ export const AddCampaignEdge = ({ onClick }: { onClick?: () => void }) => (
 )
 
 export const CampaignBuilder = () => {
-  const { variants, label, initializeCampaign, setActiveForm, activeForm, addEmptyVariant } = useCampaignStore();
+  const {
+    variants,
+    label,
+    initializeCampaign,
+    setActiveForm,
+    activeForm,
+    addEmptyVariant,
+    editCampaign,
+    editCampaignVariant
+  } = useCampaignStore();
   const { t } = useTranslation();
 
   console.log(activeForm);
@@ -105,7 +132,7 @@ export const CampaignBuilder = () => {
           <UI.Div minWidth="500px">
             <UI.Div bg="white">
               <UI.IllustrationCard text="Get started with your campaign" svg={<SelectIll />}>
-                <UI.Button onClick={initializeCampaign}>Initialize campaign</UI.Button>
+                <UI.Button onClick={initializeCampaign}>Start your new campaign</UI.Button>
               </UI.IllustrationCard>
             </UI.Div>
           </UI.Div>
@@ -137,7 +164,7 @@ export const CampaignBuilder = () => {
             {variants.map((variant, index) => (
               <UI.Div key={index}>
                 <UI.Flex justifyContent="center">
-                  <AddCampaignEdge />
+                  <AddCampaignEdge type={index==0 ? 'Weights': 'Normal'} />
                 </UI.Flex>
                 <CampaignStep
                   label={label}
@@ -161,6 +188,9 @@ export const CampaignBuilder = () => {
                     </>
                   )}
                 </CampaignStep>
+                <UI.Flex alignItems="center" justifyContent="center">
+                  <AddCampaignEdge onClick={() => addEmptyVariant()} />
+                </UI.Flex>
               </UI.Div>
             ))}
           </UI.Div>
@@ -168,10 +198,14 @@ export const CampaignBuilder = () => {
       </LS.BuilderCanvas>
       <LS.BuilderEditPane>
         {activeForm?.type === 'CampaignForm' && (
-          <CampaignForm label={label} />
+          <CampaignForm label={label} onChange={editCampaign} />
         )}
         {activeForm?.type === 'CampaignVariantForm' && activeForm.activeDirectVariantIndex != undefined && (
-          <CampaignVariantForm variant={variants[activeForm.activeDirectVariantIndex]} />
+          <CampaignVariantForm
+            variantIndex={activeForm.activeDirectVariantIndex}
+            variant={variants[activeForm.activeDirectVariantIndex]}
+            onChange={editCampaignVariant}
+          />
         )}
       </LS.BuilderEditPane>
     </LS.BuilderContainer>

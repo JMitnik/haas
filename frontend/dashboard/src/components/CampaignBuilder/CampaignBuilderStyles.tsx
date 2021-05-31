@@ -41,6 +41,23 @@ export const BuilderEdge = styled(UI.Grid)`
   `}
 `;
 
+export const BuilderEdgeLabel = styled(UI.Grid)`
+  ${({ theme }) => css`
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    padding: 4px 8px;
+    font-weight: 700;
+    line-height: 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: ${theme.colors.gray[200]};
+    color: ${theme.colors.gray[500]};
+  `}
+`;
+
 export const EdgeFoot = styled.div`
   ${({ theme }) => css`
     position: absolute;
@@ -119,6 +136,7 @@ export const BuilderInputRadioGroup = styled.div`
 
 export const BuilderEditCard = styled.div`
   ${({ theme }) => css`
+    position: relative;
     padding: ${theme.gutter}px;
     border: 1px solid ${theme.colors.gray[400]};
     border-radius: 10px;

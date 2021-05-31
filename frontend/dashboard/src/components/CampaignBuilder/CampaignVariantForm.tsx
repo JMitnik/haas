@@ -1,14 +1,16 @@
 import * as UI from '@haas/ui';
 import { yupResolver } from '@hookform/resolvers';
-import { ArrowRight, Mail, Repeat, Send, Smartphone } from 'react-feather';
+import { ArrowRight, Mail, PenTool, Repeat, Send, Smartphone } from 'react-feather';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { CampaignScheduleEnum, CampaignVariantEnum } from 'types/generated-types';
+import { CircularProgress, CircularProgressLabel } from '@chakra-ui/core'
 
 import { ReactComponent as SlackIcon } from 'assets/icons/icon-slack.svg';
 
 import * as LS from './CampaignBuilderStyles';
 import { VariantType } from './CampaignBuilderTypes';
+import { useEffect } from 'react';
 
 const SlackIconContainer = () => (
   <UI.Icon width="20px" mr={2}>
@@ -21,13 +23,16 @@ const SlackIconContainer = () => (
 type FollowUpMetric = 'days' | 'hours';
 
 interface CampaignVariantFormProps {
+  variantIndex: number;
   variant: VariantType;
+  onChange: any;
 }
 
-export const CampaignVariantForm = ({ variant }: CampaignVariantFormProps) => {
+export const CampaignVariantForm = ({ variant, onChange, variantIndex }: CampaignVariantFormProps) => {
   const { t } = useTranslation();
   const form = useForm({
     defaultValues: {
+      body: variant.body,
       type: variant.type,
       scheduleType: variant.scheduleType,
       followUpMetric: 'days',
@@ -37,9 +42,11 @@ export const CampaignVariantForm = ({ variant }: CampaignVariantFormProps) => {
     }
   });
 
-  const scheduleType: CampaignScheduleEnum = form.watch('scheduleType');
+  const formValues = form.watch();
 
-  console.log(variant);
+  const percentageFull = Math.min(Math.floor(((variant?.body?.length || 160) / 160) * 100), 100);
+
+  const scheduleType: CampaignScheduleEnum = form.watch('scheduleType');
 
   return (
     <UI.Form>
@@ -137,7 +144,6 @@ export const CampaignVariantForm = ({ variant }: CampaignVariantFormProps) => {
           </UI.FormControl>
           )}
         </LS.BuilderEditCard>
-
         <LS.BuilderEditCard>
           <UI.Flex mb={2} alignItems="center">
             <UI.Icon color="gray.500" mr={1}>
@@ -166,6 +172,43 @@ export const CampaignVariantForm = ({ variant }: CampaignVariantFormProps) => {
             />
           </UI.FormControl>
         </LS.BuilderEditCard>
+        <LS.BuilderEditCard>
+          {formValues.type === 'SMS' && (
+              <UI.Div mb={2} style={{ top: 12 ,right: 12 , position: 'absolute' }}>
+                <UI.ColumnFlex alignItems="flex-end">
+                  <CircularProgress
+                    mt={2} color={(variant?.body?.length || 160) <= 160 ? 'green' : 'red'} value={percentageFull}>
+                    <CircularProgressLabel>{variant?.body?.length}</CircularProgressLabel>
+                  </CircularProgress>
+                </UI.ColumnFlex>
+              </UI.Div>
+            )}
+          <UI.Flex mb={2} alignItems="center">
+            <UI.Icon color="gray.500" mr={1}>
+              <PenTool width="16px"/>
+            </UI.Icon>
+            <UI.Helper>
+              Content
+            </UI.Helper>
+          </UI.Flex>
+          <UI.FormControl isRequired>
+            <UI.FormLabel>Message body</UI.FormLabel>
+          <Controller
+            name={`body`}
+            id={`body`}
+            control={form.control}
+            defaultValue={variant.body}
+            render={({ value, onChange }) => (
+              <UI.MarkdownEditor
+                value={value}
+                onChange={onChange}
+              />
+            )}
+          />
+          </UI.FormControl>
+        </LS.BuilderEditCard>
+
+
       </UI.Stack>
     </UI.Form>
   )
