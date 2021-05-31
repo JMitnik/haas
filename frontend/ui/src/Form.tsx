@@ -308,20 +308,49 @@ export const DeprecatedInputContainer = styled.div`
   }
 `;
 
-const ButtonRadioContainer = styled.div`
-  button {
-    display: flex;
-    align-items: flex-start;
-  }
+interface ButtonRadioContainerProps {
+  isDisabled?: boolean;
+}
 
-  button svg {
-    vertical-align: baseline;
-    margin-top: 6px;
-  }
+const ButtonRadioContainer = styled.div<ButtonRadioContainerProps>`
+  ${({ theme, isDisabled }) => css`
 
-  button + div {
-    margin-left: 4px;
-  }
+
+    button {
+      display: flex;
+      align-items: flex-start;
+
+      ${isDisabled && css`
+        &:after {
+          content: 'DISABLED';
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          line-height: 1rem;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.8);
+          color: white;
+        }
+      `}
+    }
+
+    button svg {
+      vertical-align: baseline;
+      margin-top: 6px;
+    }
+
+    button + div {
+      margin-left: 4px;
+    }
+  `}
 `;
 
 interface RadioButtonProps {
@@ -331,6 +360,8 @@ interface RadioButtonProps {
   text?: string;
   description?: string;
   icon?: any;
+  size?: any;
+  fontSize?: any;
   mr?: any;
   ml?: any;
   mb?: any;
@@ -341,7 +372,7 @@ export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
   const { isChecked, isDisabled, value, text, description, icon, ...rest } = props;
 
   return (
-    <ButtonRadioContainer>
+    <ButtonRadioContainer isDisabled={isDisabled}>
       <Button
         variant="outline"
         ref={ref}
@@ -357,17 +388,19 @@ export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
         {...rest}
       >
         <Div>
-          <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">
+          <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize={props.fontSize ? props.fontSize:  "0.9rem"}>
             {text}
           </Paragraph>
-          <Paragraph
-            color={!isChecked ? 'gray.500' : 'auto'}
-            fontWeight={400}
-            mt={2}
-            fontSize="0.7rem"
-          >
-            {description}
-          </Paragraph>
+          {!! description && (
+            <Paragraph
+              color={!isChecked ? 'gray.500' : 'auto'}
+              fontWeight={400}
+              mt={2}
+              fontSize="0.7rem"
+            >
+              {description}
+            </Paragraph>
+          )}
         </Div>
       </Button>
     </ButtonRadioContainer>

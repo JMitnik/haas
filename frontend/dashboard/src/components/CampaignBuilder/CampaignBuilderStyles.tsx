@@ -33,6 +33,35 @@ export const CampaignStepContainer = styled(UI.Grid)`
   `}
 `;
 
+export const BuilderEdge = styled(UI.Grid)`
+  ${({ theme }) => css`
+    height: 100px;
+    width: 2px;
+    background: ${theme.colors.gray[400]};
+  `}
+`;
+
+export const EdgeFoot = styled.div`
+  ${({ theme }) => css`
+    position: absolute;
+    color: ${theme.colors.gray[500]};
+    left: -11px;
+    bottom: -10px;
+  `}
+`;
+
+export const BuilderAddContainer = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+`;
+
+export const BuilderEdgeContainer = styled.div`
+  position: relative;
+  max-width: 30px;
+`;
+
 interface BuilderLabelProps {
   isActive?: boolean;
 }
@@ -63,6 +92,40 @@ export const BuilderEditPane = styled.div`
     width: 100%;
     background: white;
     padding: ${theme.gutter}px;
+  `}
+`;
+
+export const BuilderInputRadioGroup = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    border: 1px solid ${theme.colors.gray[100]};
+    padding: 4px 8px;
+    align-items: center;
+
+    input {
+      /* border: 0; */
+      width: 3em;
+      text-align: center;
+      padding: 4px;
+      margin-right: ${theme.gutter / 2}px;
+    }
+
+    > div:nth-child(2) {
+      padding-left: ${theme.gutter / 2}px;
+      border-left: 1px solid ${theme.colors.gray[300]};
+    }
+  `}
+`;
+
+export const BuilderEditCard = styled.div`
+  ${({ theme }) => css`
+    padding: ${theme.gutter}px;
+    border: 1px solid ${theme.colors.gray[400]};
+    border-radius: 10px;
+
+    & + & {
+      margin-top: ${theme.gutter / 2}px;
+    }
   `}
 `;
 

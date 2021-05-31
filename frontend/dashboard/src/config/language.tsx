@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    slack: {
+      en: 'Slack',
+      de: 'Slack'
+    },
     continue: {
       en: 'Continue',
       de: 'Fortsetzen'
@@ -176,6 +180,34 @@ const language = {
     edit_variant: {
       en: 'Edit variant',
       de: 'Variante bearbeiten:',
+    },
+    recurring: {
+      en: 'Recurring',
+      de: 'Wiederkehrend'
+    },
+    campaign_recurring_helper: {
+      en: 'Send deliveries on an interval',
+      de: 'Senden Sie Lieferungen in ein Intervall'
+    },
+    campaign_general: {
+      en: 'One-off',
+      de: 'Einmalig'
+    },
+    follow_up: {
+      en: 'Follow-up',
+      de: 'Nachverfolgen'
+    },
+    campaign_follow_up_helper: {
+      en: 'Send a follow-up after a while',
+      de: 'Senden Sie nach einer Weile ein Follow-up'
+    },
+    campaign_general_helper: {
+      en: 'Send one-off deliveries',
+      de: 'Senden Sie einmalige Lieferungen'
+    },
+    campaign_slack_helper: {
+      en: 'Send to a Slack channel',
+      de: 'Übersetzen An einen Slack-Kanal senden',
     },
     campaign_email_helper: {
       en: 'Send campaign via email',

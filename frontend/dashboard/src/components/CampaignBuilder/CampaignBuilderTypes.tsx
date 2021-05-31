@@ -8,5 +8,5 @@ export interface VariantType extends EditCampaignVariantInputType {
 
 export interface ActiveFormProps {
   type: ActiveFormType;
-  activeId?: string;
+  activeDirectVariantIndex?: number;
 }
