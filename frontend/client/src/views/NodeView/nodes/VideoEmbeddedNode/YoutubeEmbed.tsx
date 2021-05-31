@@ -46,12 +46,7 @@ class YoutubeEmbed extends React.Component<MyProps, MyState> {
     this.state = { isVideoReady: false };
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  onReady = (event: any) => {
-    // access to player in all event handlers via event.target
-    console.log('Youtube ready');
-    event.target.pauseVideo();
-
+  onReady = () => {
     this.setState({
       isVideoReady: true,
     });
@@ -69,7 +64,7 @@ class YoutubeEmbed extends React.Component<MyProps, MyState> {
     return (
       <DrawerContainer>
         <IframeContainer>
-          <YouTube videoId={videoId} opts={opts} onReady={this.onReady} />
+          <YouTube videoId={videoId || undefined} opts={opts} onReady={this.onReady} />
         </IframeContainer>
         {!isVideoReady && <LoadingContainer><Spinner /></LoadingContainer>}
       </DrawerContainer>

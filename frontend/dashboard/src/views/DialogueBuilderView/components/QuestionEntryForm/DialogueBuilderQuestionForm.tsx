@@ -69,10 +69,7 @@ const schema = yup.object().shape({
   title: yup.string().required(),
   questionType: yup.string().required(),
   videoEmbedded: yup.string().when(['questionType'], {
-    is: (questionType: string) => {
-      console.log(questionType === 'VIDEO_EMBEDDED');
-      return questionType === 'VIDEO_EMBEDDED';
-    },
+    is: (questionType: string) => questionType === 'VIDEO_EMBEDDED',
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
@@ -383,8 +380,6 @@ const DialogueBuilderQuestionForm = ({
 
     const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
     const values = form.getValues();
-
-    console.log('extraContent: ', formData.videoEmbedded);
 
     if (question.id !== '-1') {
       updateQuestion({

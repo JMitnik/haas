@@ -302,7 +302,6 @@ export const DialogueType = objectType({
             },
           },
         });
-        console.log('questions: ', questions.find((question) => question.title === 'GOON'))
         return questions;
       },
     });
