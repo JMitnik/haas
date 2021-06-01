@@ -11,4 +11,5 @@ export interface CustomerServiceType {
   getDialogueById(customerId: string, dialogueId: string): Promise<Dialogue | undefined>;
   deleteWorkspace(customerId: string): Promise<(Customer & { settings: (CustomerSettings & { colourSettings: ColourSettings | null; fontSettings: FontSettings | null; }) | null; }) | null>;
   seedByTemplate(customer: Customer, template?: WorkspaceTemplate, willGenerateFakeData?: boolean): Promise<void>;
+  delete(customerId: string): Promise<Customer>;
 }

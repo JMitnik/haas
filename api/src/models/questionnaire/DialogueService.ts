@@ -37,7 +37,11 @@ class DialogueService implements DialogueServiceType {
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
   }
-  
+
+  async delete(dialogueId: string) {
+    return this.dialoguePrismaAdapter.delete(dialogueId);
+  }
+
   async findDialogueIdsByCustomerId(customerId: string) {
     const dialogueIdObjects = await this.dialoguePrismaAdapter.findDialogueIdsOfCustomer(customerId);
     const dialogueIds = dialogueIdObjects.map((dialogue) => dialogue.id);
@@ -321,29 +325,8 @@ class DialogueService implements DialogueServiceType {
     };
   };
 
-  static deleteDialogue = async (dialogueId: string) => {
-    const dialogue = await prisma.dialogue.findOne({
-      where: {
-        id: dialogueId,
-      },
-      include: {
-        questions: {
-          select: {
-            id: true,
-          },
-        },
-        edges: {
-          select: {
-            id: true,
-          },
-        },
-        sessions: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
+  deleteDialogue = async (dialogueId: string) => {
+    const dialogue = await this.dialoguePrismaAdapter.read(dialogueId);
 
     const sessionIds = dialogue?.sessions.map((session) => session.id);
     const nodeEntries = await prisma.nodeEntry.findMany({

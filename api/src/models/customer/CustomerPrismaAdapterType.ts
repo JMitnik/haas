@@ -13,4 +13,5 @@ export interface CustomerPrismaAdapterType {
   getCustomer(customerId: string): Promise<(Customer & {
     settings: (CustomerSettings & { colourSettings: ColourSettings | null; fontSettings: FontSettings | null; }) | null;
   }) | null>;
+  delete(customerId: string): Promise<Customer>;
 }

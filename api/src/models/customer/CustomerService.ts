@@ -34,6 +34,11 @@ class CustomerService implements CustomerServiceType {
     this.dialogueService = new DialogueService(prismaClient);
   }
 
+
+  async delete(customerId: string): Promise<Customer> {
+    return this.customerPrismaAdapter.delete(customerId);
+  }
+
   seedByTemplate = async (customer: Customer, template: WorkspaceTemplate = defaultWorkspaceTemplate, willGenerateFakeData: boolean = false) => {
     // Step 1: Make dialogue
     const dialogue = await prisma.dialogue.create({
@@ -155,7 +160,8 @@ class CustomerService implements CustomerServiceType {
 
     if (dialogueIds.length > 0) {
       await Promise.all(dialogueIds.map(async (dialogueId) => {
-        await DialogueService.deleteDialogue(dialogueId);
+        // TODO: Rewrite this function so it uses adapter
+        await this.dialogueService.deleteDialogue(dialogueId);
       }));
     }
 
@@ -169,7 +175,7 @@ class CustomerService implements CustomerServiceType {
     });
 
     const deletionOfRoles = prisma.role.deleteMany({ where: { customerId } });
-    const deletionOfCustomer = prisma.customer.delete({ where: { id: customerId } });
+    const deletionOfCustomer = this.customerPrismaAdapter.delete(customerId);
 
     await prisma.$transaction([
       deletionOfTags,

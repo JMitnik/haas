@@ -9,6 +9,11 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
+
+  delete(customerId: string): Promise<Customer> {
+    return this.prisma.customer.delete({ where: { id: customerId } });
+  }
+  
   async getDialogueById(customerId: string, dialogueId: string): Promise<Dialogue | undefined> {
     const customerWithDialogue = await this.prisma.customer.findOne({
       where: { id: customerId },

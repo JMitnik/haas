@@ -452,12 +452,12 @@ export const DialogueMutations = extendType({
       type: DialogueType,
       args: { input: DeleteDialogueInputType },
 
-      resolve(parent, args) {
+      resolve(parent, args, ctx) {
         if (!args.input?.id) {
           throw new Error('Unable to find dialogue to delete');
         }
 
-        return DialogueService.deleteDialogue(args.input?.id);
+        return ctx.services.dialogueService.deleteDialogue(args.input?.id);
       },
     });
   },
