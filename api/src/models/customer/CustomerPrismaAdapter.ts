@@ -1,4 +1,4 @@
-import { PrismaClient, Dialogue, CustomerUpdateInput, Customer } from '@prisma/client';
+import { PrismaClient, Dialogue, CustomerUpdateInput, Customer, Tag } from '@prisma/client';
 import { CustomerPrismaAdapterType } from './CustomerPrismaAdapterType';
 import { NexusGenInputs } from '../../generated/nexus';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
@@ -8,6 +8,26 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
+  }
+ 
+  async getDialogueTags(customerSlug: string, dialogueSlug: string) {
+    const customer = await this.prisma.customer.findOne({
+      where: {
+        slug: customerSlug,
+      },
+      select: {
+        dialogues: {
+          where: {
+            slug: dialogueSlug,
+          },
+          include: {
+            tags: true,
+          },
+        },
+      },
+    });
+    const dbDialogue = customer?.dialogues[0];
+    return dbDialogue;
   }
 
   delete(customerId: string): Promise<Customer> {

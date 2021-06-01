@@ -18,12 +18,15 @@ import { ColourSettingsPrismaAdapterType } from '../settings/ColourSettingsPrism
 import { FontSettingsPrismaAdapterType } from '../settings/FontSettingsPrismaAdapterType';
 import FontSettingsPrismaAdapter from '../settings/FontSettingsPrismaAdapter';
 import { DialogueServiceType } from '../questionnaire/DialogueServiceType';
+import { TagPrismaAdapterType } from '../tag/TagPrismaAdapterType';
+import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 
 class CustomerService implements CustomerServiceType {
   customerPrismaAdapter: CustomerPrismaAdapterType;
   customerSettingsPrismaAdapter: CustomerSettingsPrismaAdapterType;
   colourSettingsPrismaAdater: ColourSettingsPrismaAdapterType;
   fontSettingsPrismaAdapter: FontSettingsPrismaAdapterType;
+  tagPrismaAdapter: TagPrismaAdapterType;
   dialogueService: DialogueServiceType;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
@@ -32,6 +35,7 @@ class CustomerService implements CustomerServiceType {
     this.colourSettingsPrismaAdater = new ColourSettingsPrismaAdapter(prismaClient);
     this.fontSettingsPrismaAdapter = new FontSettingsPrismaAdapter(prismaClient);
     this.dialogueService = new DialogueService(prismaClient);
+    this.tagPrismaAdapter = new TagPrismaAdapter(prismaClient);
   }
 
 
@@ -165,6 +169,8 @@ class CustomerService implements CustomerServiceType {
       }));
     }
 
+    // FIXME: Makes this somehow part of the transaction. How to return Promise instead of resolved value (=object)? @JMitnik
+    const deleteTagsTest = this.tagPrismaAdapter.deleteAllByCustomerId(customerId);
     const deletionOfTags = prisma.tag.deleteMany({ where: { customerId } });
     const deletionOfTriggers = prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
     const deletionOfPermissions = prisma.permission.deleteMany({ where: { customerId } });

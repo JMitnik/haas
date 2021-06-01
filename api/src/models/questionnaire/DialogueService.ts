@@ -27,15 +27,19 @@ import prisma from '../../config/prisma';
 import { DialogueServiceType } from './DialogueServiceType';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { DialoguePrismaAdapterType } from './DialoguePrismaAdapterType';
+import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
+import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
 class DialogueService implements DialogueServiceType {
   dialoguePrismaAdapter: DialoguePrismaAdapterType;
+  customerPrismaAdapter: CustomerPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
+    this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
   }
 
   async delete(dialogueId: string) {
@@ -97,6 +101,7 @@ class DialogueService implements DialogueServiceType {
     updateDialogueArgs: DialogueUpdateInput,
   ) => {
     const newTagObjects = newTags.map((tag) => ({ id: tag }));
+    console.log('new tags: ',newTags);
 
     const deleteTagObjects: TagWhereUniqueInput[] = [];
     dbTags.forEach((tag) => {
@@ -114,12 +119,13 @@ class DialogueService implements DialogueServiceType {
       tagUpdateArgs.disconnect = deleteTagObjects;
     }
     updateDialogueArgs.tags = tagUpdateArgs;
+    console.log('updateTags: ', updateDialogueArgs.tags);
     return updateDialogueArgs;
   };
 
-  static editDialogue = async (args: any) => {
+   editDialogue = async (args: any) => {
     const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData } = args;
-
+    console.log('Tags: ', tags);
     const customer = await prisma.customer.findOne({
       where: {
         slug: customerSlug,
@@ -141,6 +147,8 @@ class DialogueService implements DialogueServiceType {
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
     }
+
+    console.log('updated dialogue args: ', updateDialogueArgs.tags);
 
     return prisma.dialogue.update({
       where: {

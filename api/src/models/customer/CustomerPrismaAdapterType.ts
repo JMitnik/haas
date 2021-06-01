@@ -1,4 +1,4 @@
-import { CustomerSettings, Customer, Role, Dialogue, CustomerUpdateInput, ColourSettings, FontSettings } from "@prisma/client";
+import { CustomerSettings, Customer, Role, Dialogue, CustomerUpdateInput, ColourSettings, FontSettings, Tag } from "@prisma/client";
 
 import { NexusGenInputs } from "../../generated/nexus";
 
@@ -14,4 +14,7 @@ export interface CustomerPrismaAdapterType {
     settings: (CustomerSettings & { colourSettings: ColourSettings | null; fontSettings: FontSettings | null; }) | null;
   }) | null>;
   delete(customerId: string): Promise<Customer>;
+  getDialogueTags(customerSlug: string, dialogueSlug: string): Promise<(Dialogue & {
+    tags: Tag[];
+  }) | undefined>;
 }

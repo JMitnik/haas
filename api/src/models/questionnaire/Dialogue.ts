@@ -443,8 +443,8 @@ export const DialogueMutations = extendType({
         isWithoutGenData: 'Boolean',
         tags: TagsInputType,
       },
-      resolve(parent, args) {
-        return DialogueService.editDialogue(args);
+      resolve(parent, args, ctx) {
+        return ctx.services.dialogueService.editDialogue(args);
       },
     });
 
