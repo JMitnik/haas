@@ -6,7 +6,7 @@ import { ApolloError, UserInputError } from 'apollo-server-express';
 import {
   Dialogue, DialogueCreateInput, DialogueUpdateInput,
   NodeType,
-  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput
+  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, PrismaClient
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import NodeService from '../QuestionNode/NodeService';
@@ -24,11 +24,26 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 import SessionService from '../session/SessionService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
+import { DialogueServiceType } from './DialogueServiceType';
+import DialoguePrismaAdapter from './DialoguePrismaAdapter';
+import { DialoguePrismaAdapterType } from './DialoguePrismaAdapterType';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
-class DialogueService {
+class DialogueService implements DialogueServiceType {
+  dialoguePrismaAdapter: DialoguePrismaAdapterType;
+
+  constructor(prismaClient: PrismaClient) {
+    this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
+  }
+  
+  async findDialogueIdsByCustomerId(customerId: string) {
+    const dialogueIdObjects = await this.dialoguePrismaAdapter.findDialogueIdsOfCustomer(customerId);
+    const dialogueIds = dialogueIdObjects.map((dialogue) => dialogue.id);
+    return dialogueIds;
+  }
+
   static constructDialogue(
     customerId: string,
     title: string,

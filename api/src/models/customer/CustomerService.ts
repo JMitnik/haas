@@ -17,18 +17,21 @@ import ColourSettingsPrismaAdapter from '../settings/ColourSettingsPrismaAdapter
 import { ColourSettingsPrismaAdapterType } from '../settings/ColourSettingsPrismaAdapterType';
 import { FontSettingsPrismaAdapterType } from '../settings/FontSettingsPrismaAdapterType';
 import FontSettingsPrismaAdapter from '../settings/FontSettingsPrismaAdapter';
+import { DialogueServiceType } from '../questionnaire/DialogueServiceType';
 
 class CustomerService implements CustomerServiceType {
   customerPrismaAdapter: CustomerPrismaAdapterType;
   customerSettingsPrismaAdapter: CustomerSettingsPrismaAdapterType;
   colourSettingsPrismaAdater: ColourSettingsPrismaAdapterType;
   fontSettingsPrismaAdapter: FontSettingsPrismaAdapterType;
+  dialogueService: DialogueServiceType;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.customerSettingsPrismaAdapter = new CustomerSettingsPrismaAdapter(prismaClient)
     this.colourSettingsPrismaAdater = new ColourSettingsPrismaAdapter(prismaClient);
     this.fontSettingsPrismaAdapter = new FontSettingsPrismaAdapter(prismaClient);
+    this.dialogueService = new DialogueService(prismaClient);
   }
 
   seedByTemplate = async (customer: Customer, template: WorkspaceTemplate = defaultWorkspaceTemplate, willGenerateFakeData: boolean = false) => {
@@ -148,18 +151,11 @@ class CustomerService implements CustomerServiceType {
       await this.customerSettingsPrismaAdapter.deleteByCustomerId(customerId);
     }
 
-    const dialogueIds = await prisma.dialogue.findMany({
-      where: {
-        customerId,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const dialogueIds = await this.dialogueService.findDialogueIdsByCustomerId(customerId);
 
     if (dialogueIds.length > 0) {
       await Promise.all(dialogueIds.map(async (dialogueId) => {
-        await DialogueService.deleteDialogue(dialogueId.id);
+        await DialogueService.deleteDialogue(dialogueId);
       }));
     }
 
