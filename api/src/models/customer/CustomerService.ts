@@ -1,4 +1,4 @@
-import { Customer } from '@prisma/client';
+import { Customer, PrismaClient, PrismaClientOptions } from '@prisma/client';
 
 import { UserInputError } from 'apollo-server-express';
 // eslint-disable-next-line import/no-cycle
@@ -8,8 +8,17 @@ import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
+import { CustomerServiceType } from './CustomerServiceType';
+import { CustomerPrismaAdapterType } from './CustomerPrismaAdapterType';
+import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
 
-class CustomerService {
+class CustomerService implements CustomerServiceType {
+  customerPrismaAdapter: CustomerPrismaAdapterType;
+
+  constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
+    this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
+  }
+  
   static customers = async () => {
     const customers = prisma.customer.findMany();
     return customers;
@@ -92,6 +101,7 @@ class CustomerService {
     return customer;
   };
 
+  // TODO: Add constructor to AutodeckService so the non-static version can be called instead of this one.
   static createWorkspace = async (input: NexusGenInputs['CreateWorkspaceInput'], createdUserId?: string) => {
     try {
       const customer = await prisma.customer.create({
@@ -116,6 +126,37 @@ class CustomerService {
           roles: true,
         },
       });
+
+      if (input.isSeed) {
+        await CustomerService.seedByTemplate(customer, defaultWorkspaceTemplate, input.willGenerateFakeData || false);
+      }
+
+      // If customer is created by user, make them an "Admin"
+      if (createdUserId) {
+        const adminRole = customer.roles.find((role) => role.type === 'ADMIN');
+
+        await prisma.userOfCustomer.create({
+          data: {
+            customer: { connect: { id: customer.id } },
+            role: { connect: { id: adminRole?.id } },
+            user: { connect: { id: createdUserId } },
+          },
+        });
+      }
+
+      return customer;
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new UserInputError('customer:existing_slug');
+      }
+
+      return null;
+    }
+  };
+
+  createWorkspace = async (input: NexusGenInputs['CreateWorkspaceInput'], createdUserId?: string) => {
+    try {
+      const customer = await this.customerPrismaAdapter.createWorkspace(input);
 
       if (input.isSeed) {
         await CustomerService.seedByTemplate(customer, defaultWorkspaceTemplate, input.willGenerateFakeData || false);

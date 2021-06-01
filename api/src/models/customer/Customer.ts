@@ -287,7 +287,7 @@ export const WorkspaceMutations = Upload && extendType({
           }
         }
 
-        const workspace = CustomerService.createWorkspace(args?.input, ctx.session?.user?.id);
+        const workspace = ctx.services.customerService.createWorkspace(args?.input, ctx.session?.user?.id);
 
         return workspace as any;
       },
