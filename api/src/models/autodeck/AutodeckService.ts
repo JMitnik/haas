@@ -9,9 +9,12 @@ import request from 'request';
 import config from '../../config/config';
 import prisma from '../../config/prisma';
 import { NexusGenInputs } from '../../generated/nexus';
-import { FindManyCreateWorkspaceJobArgs } from '@prisma/client';
+import { FindManyCreateWorkspaceJobArgs, PrismaClient, PrismaClientOptions } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import CustomerService from '../customer/CustomerService';
+import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
+import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
+import { CustomerServiceType } from '../customer/CustomerServiceType';
 
 
 type ScreenshotProps = {
@@ -53,6 +56,12 @@ export interface CreateWorkspaceJobProps {
 }
 
 class AutodeckService {
+
+  customerService: CustomerServiceType;
+
+  constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
+    this.customerService = new CustomerService(prismaClient);
+  }
 
   static getJobProcessLocations = async () => {
     return prisma.jobProcessLocation.findMany({
@@ -184,7 +193,7 @@ class AutodeckService {
     return updatedWorkspaceJob;
   }
 
-  static confirmWorkspaceJob = async (input: NexusGenInputs['GenerateAutodeckInput'], userId?: string) => {
+  confirmWorkspaceJob = async (input: NexusGenInputs['GenerateAutodeckInput'], userId?: string) => {
     const csvData = { 'colour-0': input.primaryColour };
     const csv = papaparse.unparse([csvData]);
     const csvPath = `${input.id}/dominant_colours.csv`;
@@ -265,7 +274,7 @@ class AutodeckService {
           logo: pitchdeckData?.uploadLogo,
           willGenerateFakeData: true
         }
-        await CustomerService.createWorkspace(workspaceInput, userId)
+        await this.customerService.createWorkspace(workspaceInput, userId)
       } catch (e) {
         console.log('Something went wrong: ', e)
       }

@@ -94,59 +94,6 @@ class CustomerService implements CustomerServiceType {
     return customer;
   };
 
-  // TODO: Add constructor to AutodeckService so the non-static version can be called instead of this one.
-  static createWorkspace = async (input: NexusGenInputs['CreateWorkspaceInput'], createdUserId?: string) => {
-    try {
-      const customer = await prisma.customer.create({
-        data: {
-          name: input.name,
-          slug: input.slug,
-          tags: { create: defaultWorkspaceTemplate.tags },
-          settings: {
-            create: {
-              logoUrl: input.logo,
-              colourSettings: {
-                create: {
-                  primary: input.primaryColour || defaultWorkspaceTemplate.primaryColor,
-                },
-              },
-            },
-          },
-          roles: { create: defaultWorkspaceTemplate.roles },
-          dialogues: { create: [] },
-        },
-        include: {
-          roles: true,
-        },
-      });
-
-      if (input.isSeed) {
-        await CustomerService.seedByTemplate(customer, defaultWorkspaceTemplate, input.willGenerateFakeData || false);
-      }
-
-      // If customer is created by user, make them an "Admin"
-      if (createdUserId) {
-        const adminRole = customer.roles.find((role) => role.type === 'ADMIN');
-
-        await prisma.userOfCustomer.create({
-          data: {
-            customer: { connect: { id: customer.id } },
-            role: { connect: { id: adminRole?.id } },
-            user: { connect: { id: createdUserId } },
-          },
-        });
-      }
-
-      return customer;
-    } catch (error) {
-      if (error.code === 'P2002') {
-        throw new UserInputError('customer:existing_slug');
-      }
-
-      return null;
-    }
-  };
-
   createWorkspace = async (input: NexusGenInputs['CreateWorkspaceInput'], createdUserId?: string) => {
     try {
       const customer = await this.customerPrismaAdapter.createWorkspace(input);

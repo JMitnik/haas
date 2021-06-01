@@ -287,7 +287,7 @@ export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWor
       return null;
     }
 
-    return AutodeckService.confirmWorkspaceJob(input, userId) as any;
+    return ctx.services.autodeckService.confirmWorkspaceJob(input, userId) as any;
   }
 })
 
