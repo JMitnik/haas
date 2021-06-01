@@ -69,7 +69,7 @@ class CustomerService implements CustomerServiceType {
     }
   };
 
-  static editWorkspace = async (input: NexusGenInputs['EditWorkspaceInput']) => {
+  editWorkspace = async (input: NexusGenInputs['EditWorkspaceInput']) => {
     const customerSettings = await prisma.customerSettings.update({
       where: {
         customerId: input.id,
@@ -88,15 +88,8 @@ class CustomerService implements CustomerServiceType {
       },
     });
 
-    const customer = await prisma.customer.update({
-      where: {
-        id: input.id,
-      },
-      data: {
-        slug: input.slug,
-        name: input.name,
-      },
-    });
+    const { id, ...data} = input;
+    const customer = await this.customerPrismaAdapter.updateCustomer(input.id, data)
 
     return customer;
   };
@@ -190,33 +183,17 @@ class CustomerService implements CustomerServiceType {
    * @param customerId
    * @param dialogueSlug
    */
-  static async getDialogueFromCustomerBySlug(customerId: string, dialogueSlug: string) {
-    const customerWithDialogue = await prisma.customer.findOne({
-      where: { id: customerId },
-      include: {
-        dialogues: {
-          where: { slug: dialogueSlug },
-        },
-      },
-    });
-
-    return customerWithDialogue?.dialogues?.[0];
+  async getDialogueBySlug(customerId: string, dialogueSlug: string) {
+    const dialogueOfWorkspace = await this.customerPrismaAdapter.getDialogueBySlug(customerId, dialogueSlug);
+    return dialogueOfWorkspace;
   }
 
-  static async deleteCustomer(customerId: string) {
+
+  // TODO: Use adapters for everything but Customer
+  async deleteWorkspace(customerId: string) {
     if (!customerId) return null;
 
-    const customer = await prisma.customer.findOne({
-      where: { id: customerId },
-      include: {
-        settings: {
-          include: {
-            colourSettings: true,
-            fontSettings: true,
-          },
-        },
-      },
-    });
+    const customer = await this.customerPrismaAdapter.getCustomer(customerId);
 
     if (!customer) return null;
 
@@ -292,17 +269,8 @@ class CustomerService implements CustomerServiceType {
    * @param customerId
    * @param dialogueSlug
    */
-  static async getDialogueFromCustomerById(customerId: string, dialogueId: string) {
-    const customerWithDialogue = await prisma.customer.findOne({
-      where: { id: customerId },
-      include: {
-        dialogues: {
-          where: { id: dialogueId },
-        },
-      },
-    });
-
-    return customerWithDialogue?.dialogues?.[0];
+  async getDialogueById(customerId: string, dialogueId: string) {
+    return this.customerPrismaAdapter.getDialogueById(customerId, dialogueId);
   }
 }
 

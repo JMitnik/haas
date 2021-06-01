@@ -72,18 +72,18 @@ export const CustomerType = objectType({
       nullable: true,
       args: { where: DialogueWhereUniqueInput },
 
-      async resolve(parent, args) {
+      async resolve(parent, args, ctx) {
         if (args?.where?.slug) {
           const dialogueSlug: string = args.where.slug;
 
-          const customer = await CustomerService.getDialogueFromCustomerBySlug(parent.id, dialogueSlug);
+          const customer = await ctx.services.customerService.getDialogueBySlug(parent.id, dialogueSlug);
           return customer || null as any;
         }
 
         if (args?.where?.id) {
           const dialogueId: string = args.where.id;
 
-          const customer = await CustomerService.getDialogueFromCustomerById(parent.id, dialogueId);
+          const customer = await ctx.services.customerService.getDialogueById(parent.id, dialogueId);
           return customer || null as any;
         }
 
@@ -297,7 +297,7 @@ export const WorkspaceMutations = Upload && extendType({
       type: CustomerType,
       args: { input: EditWorkspaceInput },
 
-      resolve(parent, args) {
+      resolve(parent, args, ctx) {
         if (!args.input) throw new UserInputError('No input provided');
         const primaryColor = args?.input?.primaryColour;
 
@@ -309,7 +309,7 @@ export const WorkspaceMutations = Upload && extendType({
           }
         }
 
-        return CustomerService.editWorkspace(args.input);
+        return ctx.services.customerService.editWorkspace(args.input);
       },
     });
   },
@@ -320,14 +320,14 @@ export const DeleteCustomerMutation = mutationField('deleteCustomer', {
   nullable: true,
   args: { where: CustomerWhereUniqueInput },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     const customerId = args?.where?.id;
 
     if (!customerId) {
       return null;
     }
 
-    const deletedCustomer = CustomerService.deleteCustomer(customerId);
+    const deletedCustomer = ctx.services.customerService.deleteWorkspace(customerId);
 
     return deletedCustomer;
   },
