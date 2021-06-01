@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, PrismaClientOptions } from '@prisma/client';
+import { Customer, PrismaClient, PrismaClientOptions, prismaVersion, CustomerSettingsUpdateInput, CustomerUpdateInput } from '@prisma/client';
 
 import { UserInputError } from 'apollo-server-express';
 // eslint-disable-next-line import/no-cycle
@@ -11,35 +11,27 @@ import prisma from '../../config/prisma';
 import { CustomerServiceType } from './CustomerServiceType';
 import { CustomerPrismaAdapterType } from './CustomerPrismaAdapterType';
 import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
+import { CustomerSettingsPrismaAdapterType } from '../settings/CustomerSettingsPrismaAdapterType';
+import CustomerSettingsPrismaAdapter from '../settings/CustomerSettingsPrismaAdapter';
+import ColourSettingsPrismaAdapter from '../settings/ColourSettingsPrismaAdapter';
+import { ColourSettingsPrismaAdapterType } from '../settings/ColourSettingsPrismaAdapterType';
+import { FontSettingsPrismaAdapterType } from '../settings/FontSettingsPrismaAdapterType';
+import FontSettingsPrismaAdapter from '../settings/FontSettingsPrismaAdapter';
 
 class CustomerService implements CustomerServiceType {
   customerPrismaAdapter: CustomerPrismaAdapterType;
+  customerSettingsPrismaAdapter: CustomerSettingsPrismaAdapterType;
+  colourSettingsPrismaAdater: ColourSettingsPrismaAdapterType;
+  fontSettingsPrismaAdapter: FontSettingsPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
+    this.customerSettingsPrismaAdapter = new CustomerSettingsPrismaAdapter(prismaClient)
+    this.colourSettingsPrismaAdater = new ColourSettingsPrismaAdapter(prismaClient);
+    this.fontSettingsPrismaAdapter = new FontSettingsPrismaAdapter(prismaClient);
   }
-  
-  static customers = async () => {
-    const customers = prisma.customer.findMany();
-    return customers;
-  };
 
-  static customerSettings = async (parent: Customer) => {
-    const customerSettings = prisma.customerSettings.findOne({ where: { customerId: parent.id } });
-    return customerSettings;
-  };
-
-  static customerBySlug = async (customerSlug: string) => {
-    const customer = await prisma.customer.findOne({ where: { slug: customerSlug } });
-
-    if (!customer) {
-      throw new Error(`Unable to find customer ${customerSlug}!`);
-    }
-
-    return customer;
-  };
-
-  static seedByTemplate = async (customer: Customer, template: WorkspaceTemplate = defaultWorkspaceTemplate, willGenerateFakeData: boolean = false) => {
+  seedByTemplate = async (customer: Customer, template: WorkspaceTemplate = defaultWorkspaceTemplate, willGenerateFakeData: boolean = false) => {
     // Step 1: Make dialogue
     const dialogue = await prisma.dialogue.create({
       data: {
@@ -70,26 +62,22 @@ class CustomerService implements CustomerServiceType {
   };
 
   editWorkspace = async (input: NexusGenInputs['EditWorkspaceInput']) => {
-    const customerSettings = await prisma.customerSettings.update({
-      where: {
-        customerId: input.id,
-      },
-      data: {
-        logoUrl: input.logo,
-      },
-    });
-
-    await prisma.colourSettings.update({
-      where: {
-        id: customerSettings.colourSettingsId || undefined,
-      },
-      data: {
-        primary: input.primaryColour,
-      },
-    });
-
-    const { id, ...data} = input;
-    const customer = await this.customerPrismaAdapter.updateCustomer(input.id, data)
+    const { id, name, slug, primaryColour, logo} = input;
+    const customerInputData: CustomerUpdateInput = {
+      name,
+      slug,
+      settings: {
+        update: {
+          logoUrl: logo,
+          colourSettings: {
+            update: {
+              primary: primaryColour
+            }
+          }
+        }
+      }
+    };
+    const customer = await this.customerPrismaAdapter.updateCustomer(id, customerInputData);
 
     return customer;
   };
@@ -99,7 +87,7 @@ class CustomerService implements CustomerServiceType {
       const customer = await this.customerPrismaAdapter.createWorkspace(input);
 
       if (input.isSeed) {
-        await CustomerService.seedByTemplate(customer, defaultWorkspaceTemplate, input.willGenerateFakeData || false);
+        await this.seedByTemplate(customer, defaultWorkspaceTemplate, input.willGenerateFakeData || false);
       }
 
       // If customer is created by user, make them an "Admin"
@@ -149,27 +137,15 @@ class CustomerService implements CustomerServiceType {
 
     // //// Settings-related
     if (fontSettingsId) {
-      await prisma.fontSettings.delete({
-        where: {
-          id: fontSettingsId,
-        },
-      });
+      await this.fontSettingsPrismaAdapter.delete(fontSettingsId);
     }
 
     if (colourSettingsId) {
-      await prisma.colourSettings.delete({
-        where: {
-          id: colourSettingsId,
-        },
-      });
+      await this.colourSettingsPrismaAdater.delete(colourSettingsId);
     }
 
     if (customer?.settings) {
-      await prisma.customerSettings.delete({
-        where: {
-          customerId,
-        },
-      });
+      await this.customerSettingsPrismaAdapter.deleteByCustomerId(customerId);
     }
 
     const dialogueIds = await prisma.dialogue.findMany({

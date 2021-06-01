@@ -11,6 +11,7 @@ export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, neve
   const loginService = new LoginService(mailService);
   const userService = new UserService(prisma);
   const customerService = new CustomerService(prisma);
+  // TODO: Dependency injection of customer service into autodeck service as paramater?
   const autodeckService = new AutodeckService(prisma);
   return {
     autodeckService,
