@@ -31,6 +31,8 @@ import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import { SessionPrismaAdapterType } from '../session/SessionPrismaAdapterType';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
+import { NodeEntryPrismaAdapterType } from '../node-entry/NodeEntryPrismaAdapterType';
+import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -39,11 +41,13 @@ class DialogueService implements DialogueServiceType {
   dialoguePrismaAdapter: DialoguePrismaAdapterType;
   customerPrismaAdapter: CustomerPrismaAdapterType;
   sessionPrismaAdapter: SessionPrismaAdapterType;
+  nodeEntryPrismaAdapter: NodeEntryPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
+    this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
   }
 
   async delete(dialogueId: string) {
@@ -286,45 +290,21 @@ class DialogueService implements DialogueServiceType {
     const dialogue = await this.dialoguePrismaAdapter.read(dialogueId);
 
     const sessionIds = dialogue?.sessions.map((session) => session.id);
-    const nodeEntries = await prisma.nodeEntry.findMany({
-      where: {
-        sessionId: {
-          in: sessionIds,
-        },
-      },
-    });
+    const nodeEntries = await this.nodeEntryPrismaAdapter.getNodeEntriesBySessionIds(sessionIds || []);
 
     const nodeEntryIds = nodeEntries.map((nodeEntry) => nodeEntry.id);
     if (nodeEntryIds.length > 0) {
-      await prisma.sliderNodeEntry.deleteMany(
-        { where: { nodeEntryId: { in: nodeEntryIds } } },
-      );
+      await this.nodeEntryPrismaAdapter.deleteManySliderNodeEntries(nodeEntryIds);
 
-      await prisma.textboxNodeEntry.deleteMany(
-        { where: { nodeEntryId: { in: nodeEntryIds } } },
-      );
+      await this.nodeEntryPrismaAdapter.deleteManyTextBoxNodeEntries(nodeEntryIds);
 
-      await prisma.registrationNodeEntry.deleteMany(
-        { where: { nodeEntryId: { in: nodeEntryIds } } },
-      );
+      await this.nodeEntryPrismaAdapter.deleteManyRegistrationNodeEntries(nodeEntryIds);
 
-      await prisma.linkNodeEntry.deleteMany(
-        { where: { nodeEntryId: { in: nodeEntryIds } } },
-      );
+      await this.nodeEntryPrismaAdapter.deleteManyLinkNodeEntries(nodeEntryIds);
 
-      await prisma.choiceNodeEntry.deleteMany(
-        { where: { nodeEntryId: { in: nodeEntryIds } } },
-      );
+      await this.nodeEntryPrismaAdapter.deleteManyChoiceNodeEntries(nodeEntryIds);
 
-      await prisma.nodeEntry.deleteMany(
-        {
-          where: {
-            sessionId: {
-              in: sessionIds,
-            },
-          },
-        },
-      );
+      await this.nodeEntryPrismaAdapter.deleteManyNodeEntries(sessionIds || []);
     }
 
     if (sessionIds && sessionIds.length > 0) {
@@ -379,11 +359,8 @@ class DialogueService implements DialogueServiceType {
       );
     }
 
-    const deletedDialogue = await prisma.dialogue.delete({
-      where: {
-        id: dialogueId,
-      },
-    });
+    const deletedDialogue = await this.dialoguePrismaAdapter.delete(dialogueId);
+
     return deletedDialogue;
   };
 
@@ -570,7 +547,7 @@ class DialogueService implements DialogueServiceType {
           childNode: edge.childNode,
         })),
       },
-    }); 
+    });
 
     return updatedEdgesDialogue;
   };
@@ -648,7 +625,7 @@ class DialogueService implements DialogueServiceType {
         },
       },
     })
-   
+
     // TODO: Make this dependent on input "template"
     await NodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
 
