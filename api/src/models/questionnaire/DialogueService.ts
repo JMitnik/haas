@@ -125,37 +125,15 @@ class DialogueService implements DialogueServiceType {
 
    editDialogue = async (args: any) => {
     const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData } = args;
-    console.log('Tags: ', tags);
-    const customer = await prisma.customer.findOne({
-      where: {
-        slug: customerSlug,
-      },
-      select: {
-        dialogues: {
-          where: {
-            slug: dialogueSlug,
-          },
-          include: {
-            tags: true,
-          },
-        },
-      },
-    });
-    const dbDialogue = customer?.dialogues[0];
+
+    const dbDialogue = await this.customerPrismaAdapter.getDialogueTags(customerSlug, dialogueSlug);
 
     let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle, isWithoutGenData };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
     }
 
-    console.log('updated dialogue args: ', updateDialogueArgs.tags);
-
-    return prisma.dialogue.update({
-      where: {
-        id: dbDialogue?.id,
-      },
-      data: updateDialogueArgs,
-    });
+    return this.dialoguePrismaAdapter.update(dbDialogue?.id || '-1', updateDialogueArgs);
   };
 
   /**

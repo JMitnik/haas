@@ -1,4 +1,4 @@
-import { PrismaClient, Dialogue } from "@prisma/client";
+import { PrismaClient, Dialogue, DialogueUpdateInput } from "@prisma/client";
 import { DialoguePrismaAdapterType } from "./DialoguePrismaAdapterType";
 
 class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
@@ -7,6 +7,16 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
+
+  update(dialogueId: string, updateArgs: DialogueUpdateInput): Promise<Dialogue> {
+    return this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: updateArgs,
+    });
+  }
+  
   async read(dialogueId: string){
     return this.prisma.dialogue.findOne({
       where: {
