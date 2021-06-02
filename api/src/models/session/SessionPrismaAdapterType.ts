@@ -1,4 +1,4 @@
-import { SessionCreateInput, Session } from "@prisma/client";
+import { SessionCreateInput, Session, BatchPayload } from "@prisma/client";
 
 export interface SessionPrismaAdapterType {
   createFakeSession(data: (
@@ -11,4 +11,6 @@ export interface SessionPrismaAdapterType {
       simulatedChoiceEdgeId?: string,
       simulatedChoice: string,
     })): Promise<Session>;
+
+    deleteMany(sessionIds: string[]): Promise<BatchPayload>;
 }

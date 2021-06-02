@@ -328,15 +328,7 @@ class DialogueService implements DialogueServiceType {
     }
 
     if (sessionIds && sessionIds.length > 0) {
-      await prisma.session.deleteMany(
-        {
-          where: {
-            id: {
-              in: sessionIds,
-            },
-          },
-        },
-      );
+      await this.sessionPrismaAdapter.deleteMany(sessionIds);
     }
 
     // //// Edge-related

@@ -8,6 +8,16 @@ class SessionPrismaAdapter implements SessionPrismaAdapterType {
     this.prisma = prismaClient;
   }
 
+  async deleteMany(sessionIds: string[]) {
+    return this.prisma.session.deleteMany({
+      where: {
+        id: {
+          in: sessionIds,
+        }
+      }
+    })
+  }
+
   createFakeSession(data: (
     {
       createdAt: Date,
