@@ -33,6 +33,8 @@ import { SessionPrismaAdapterType } from '../session/SessionPrismaAdapterType';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import { NodeEntryPrismaAdapterType } from '../node-entry/NodeEntryPrismaAdapterType';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
+import { QuestionConditionPrismaAdapterType } from '../QuestionNode/QuestionConditionPrismaAdapterType';
+import QuestionConditionPrismaAdapter from '../QuestionNode/QuestionConditionPrismaAdapter';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -42,12 +44,14 @@ class DialogueService implements DialogueServiceType {
   customerPrismaAdapter: CustomerPrismaAdapterType;
   sessionPrismaAdapter: SessionPrismaAdapterType;
   nodeEntryPrismaAdapter: NodeEntryPrismaAdapterType;
+  questionConditionPrismaAdapter: QuestionConditionPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
+    this.questionConditionPrismaAdapter = new QuestionConditionPrismaAdapter(prismaClient);
   }
 
   async delete(dialogueId: string) {
@@ -314,15 +318,7 @@ class DialogueService implements DialogueServiceType {
     // //// Edge-related
     const edgeIds = dialogue?.edges && dialogue?.edges.map((edge) => edge.id);
     if (edgeIds && edgeIds.length > 0) {
-      await prisma.questionCondition.deleteMany(
-        {
-          where: {
-            edgeId: {
-              in: edgeIds,
-            },
-          },
-        },
-      );
+      await this.questionConditionPrismaAdapter.deleteManyByEdgeIds(edgeIds);
 
       await prisma.edge.deleteMany(
         {
