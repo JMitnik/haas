@@ -23,7 +23,7 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 // eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
-import prisma from '../../config/prisma';
+
 import { DialogueServiceType } from './DialogueServiceType';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { DialoguePrismaAdapterType } from './DialoguePrismaAdapterType';

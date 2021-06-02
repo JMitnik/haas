@@ -20,6 +20,10 @@ import FontSettingsPrismaAdapter from '../settings/FontSettingsPrismaAdapter';
 import { DialogueServiceType } from '../questionnaire/DialogueServiceType';
 import { TagPrismaAdapterType } from '../tag/TagPrismaAdapterType';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
+import { DialoguePrismaAdapterType } from '../questionnaire/DialoguePrismaAdapterType';
+import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
+import { UserOfCustomerPrismaAdapterType } from '../users/UserOfCustomerPrismaAdapterType';
+import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 
 class CustomerService implements CustomerServiceType {
   customerPrismaAdapter: CustomerPrismaAdapterType;
@@ -28,6 +32,8 @@ class CustomerService implements CustomerServiceType {
   fontSettingsPrismaAdapter: FontSettingsPrismaAdapterType;
   tagPrismaAdapter: TagPrismaAdapterType;
   dialogueService: DialogueServiceType;
+  dialoguePrismaAdapter: DialoguePrismaAdapterType;
+  userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -36,6 +42,8 @@ class CustomerService implements CustomerServiceType {
     this.fontSettingsPrismaAdapter = new FontSettingsPrismaAdapter(prismaClient);
     this.dialogueService = new DialogueService(prismaClient);
     this.tagPrismaAdapter = new TagPrismaAdapter(prismaClient);
+    this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
+    this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
   }
 
 
@@ -45,7 +53,7 @@ class CustomerService implements CustomerServiceType {
 
   seedByTemplate = async (customer: Customer, template: WorkspaceTemplate = defaultWorkspaceTemplate, willGenerateFakeData: boolean = false) => {
     // Step 1: Make dialogue
-    const dialogue = await prisma.dialogue.create({
+    const dialogue = await this.dialoguePrismaAdapter.create({
       data: {
         customer: {
           connect: {
@@ -59,7 +67,7 @@ class CustomerService implements CustomerServiceType {
           create: [],
         },
       },
-    });
+    })
 
     // Step 2: Make the leafs
     const leafs = await NodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
@@ -74,7 +82,7 @@ class CustomerService implements CustomerServiceType {
   };
 
   editWorkspace = async (input: NexusGenInputs['EditWorkspaceInput']) => {
-    const { id, name, slug, primaryColour, logo} = input;
+    const { id, name, slug, primaryColour, logo } = input;
     const customerInputData: CustomerUpdateInput = {
       name,
       slug,
@@ -106,13 +114,13 @@ class CustomerService implements CustomerServiceType {
       if (createdUserId) {
         const adminRole = customer.roles.find((role) => role.type === 'ADMIN');
 
-        await prisma.userOfCustomer.create({
-          data: {
+        await this.userOfCustomerPrismaAdapter.create(
+          {
             customer: { connect: { id: customer.id } },
             role: { connect: { id: adminRole?.id } },
             user: { connect: { id: createdUserId } },
           },
-        });
+        );
       }
 
       return customer;
