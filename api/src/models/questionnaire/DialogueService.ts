@@ -37,6 +37,10 @@ import { QuestionConditionPrismaAdapterType } from '../QuestionNode/QuestionCond
 import QuestionConditionPrismaAdapter from '../QuestionNode/QuestionConditionPrismaAdapter';
 import { EdgePrismaAdapterType } from '../edge/EdgePrismaAdapterType';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
+import { QuestionOptionPrismaAdapterType } from '../QuestionNode/QuestionOptionPrismaAdapterType';
+import QuestionOptionPrismaAdapter from '../QuestionNode/QuestionOptionPrismaAdapter';
+import { QuestionNodePrismaAdapterType } from '../QuestionNode/QuestionNodePrismaAdapterType';
+import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -48,6 +52,8 @@ class DialogueService implements DialogueServiceType {
   nodeEntryPrismaAdapter: NodeEntryPrismaAdapterType;
   questionConditionPrismaAdapter: QuestionConditionPrismaAdapterType;
   edgePrismaAdapter: EdgePrismaAdapterType;
+  questionOptionPrismaAdapter: QuestionOptionPrismaAdapterType;
+  questionNodePrismaAdapter: QuestionNodePrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
@@ -56,6 +62,8 @@ class DialogueService implements DialogueServiceType {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
     this.questionConditionPrismaAdapter = new QuestionConditionPrismaAdapter(prismaClient);
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
+    this.questionOptionPrismaAdapter = new QuestionOptionPrismaAdapter(prismaClient);
+    this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
   }
 
   async delete(dialogueId: string) {
@@ -329,27 +337,10 @@ class DialogueService implements DialogueServiceType {
     // //// Question-related
     const questionIds = dialogue?.questions.map((question) => question.id);
     if (questionIds && questionIds.length > 0) {
-      await prisma.questionOption.deleteMany(
-        {
-          where: {
-            questionNodeId: {
-              in: questionIds,
-            },
-          },
-        },
-      );
+      await this.questionOptionPrismaAdapter.deleteManyByQuestionIds(questionIds);
 
-      await prisma.questionNode.deleteMany(
-        {
-          where: {
-            id: {
-              in: questionIds,
-            },
-          },
-        },
-      );
+      await this.questionNodePrismaAdapter.deleteMany(questionIds);
     }
-
     const deletedDialogue = await this.dialoguePrismaAdapter.delete(dialogueId);
 
     return deletedDialogue;
