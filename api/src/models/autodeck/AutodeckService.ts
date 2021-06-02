@@ -7,14 +7,16 @@ import fetch from 'node-fetch';
 import request from 'request';
 
 import config from '../../config/config';
-import prisma from '../../config/prisma';
 import { NexusGenInputs } from '../../generated/nexus';
 import { FindManyCreateWorkspaceJobArgs, PrismaClient, PrismaClientOptions } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import CustomerService from '../customer/CustomerService';
-import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
-import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import { CustomerServiceType } from '../customer/CustomerServiceType';
+import { AutodeckServiceType } from './AutodeckServiceType';
+import { JobProcessLocationPrismaAdapterType } from './JobProcessLocationPrismaAdapterType';
+import JobProcessLocationPrismaAdapter from './JobProcessLocationPrismaAdapter';
+import { CreateWorkspaceJobPrismaAdapterType } from './CreateWorkspaceJobPrismaAdapterType';
+import CreateWorkspaceJobPrismaAdapter from './CreateWorkspaceJobPrismaAdapter';
 
 
 type ScreenshotProps = {
@@ -55,36 +57,28 @@ export interface CreateWorkspaceJobProps {
   jobLocationId?: string | null;
 }
 
-class AutodeckService {
+class AutodeckService implements AutodeckServiceType {
 
   customerService: CustomerServiceType;
+  jobProcessLocationPrismaAdapter: JobProcessLocationPrismaAdapterType;
+  createWorkspaceJobPrismaAdapter: CreateWorkspaceJobPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.customerService = new CustomerService(prismaClient);
+    this.jobProcessLocationPrismaAdapter = new JobProcessLocationPrismaAdapter(prismaClient);
+    this.createWorkspaceJobPrismaAdapter = new CreateWorkspaceJobPrismaAdapter(prismaClient);
   }
 
-  static getJobProcessLocations = async () => {
-    return prisma.jobProcessLocation.findMany({
-      include: {
-        fields: true,
-      }
-    })
+  getJobProcessLocations = async () => {
+    return this.jobProcessLocationPrismaAdapter.findAll();
   }
 
-  static createJobProcessLocation = async (input: any) => {
-    return prisma.jobProcessLocation.create({
-      data: {
-        name: input.name,
-        path: input.path,
-        type: input.type,
-      },
-      include: {
-        fields: true,
-      }
-    })
+  createJobProcessLocation = async (input: any) => {
+    const data = { name: input.name, path: input.path, type: input.type };
+    return this.jobProcessLocationPrismaAdapter.create(data);
   }
 
-  static paginatedAutodeckJobs = async (
+  paginatedAutodeckJobs = async (
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
     const findManyTriggerArgs: FindManyCreateWorkspaceJobArgs = {
@@ -101,10 +95,10 @@ class AutodeckService {
     const findManyTriggers = async (
       { props: findManyArgs }: FindManyCallBackProps,
     ) => {
-      return prisma.createWorkspaceJob.findMany(findManyArgs)
+      return this.createWorkspaceJobPrismaAdapter.findMany(findManyArgs);
     };
 
-    const countTriggers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.createWorkspaceJob.count(countArgs);
+    const countTriggers = async ({ props: countArgs }: FindManyCallBackProps) => this.createWorkspaceJobPrismaAdapter.count(countArgs);
 
     const paginateProps: PaginateProps = {
       findManyArgs: {
@@ -123,18 +117,12 @@ class AutodeckService {
     return paginate(paginateProps);
   };
 
-  static addNewCustomFieldsToTemplate = async (input: NexusGenInputs['GenerateAutodeckInput'], processLocationId: string) => {
-
-    return prisma.jobProcessLocation.update({
-      where: {
-        id: processLocationId,
-      },
-      data: {
-        fields: {
-          create: input.newCustomFields?.map(({key, value}) => ({ key: key || '', value: value || '' })) || [],
-        }
+  addNewCustomFieldsToTemplate = async (input: NexusGenInputs['GenerateAutodeckInput'], processLocationId: string) => {
+    return this.jobProcessLocationPrismaAdapter.update(processLocationId, {
+      fields: {
+        create: input.newCustomFields?.map(({ key, value }) => ({ key: key || '', value: value || '' })) || [],
       }
-    })
+    });
   }
 
   static generateKeyValuePair = (input: NexusGenInputs['GenerateAutodeckInput']) => {
@@ -158,7 +146,7 @@ class AutodeckService {
         if (err) return reject(err);
         const fileWithAdjusted = data.Contents?.find((file) => file.Key?.includes('/adjusted'))
         if (!fileWithAdjusted) {
-         resolve(false)
+          resolve(false)
         }
         resolve(true);
       })
@@ -166,21 +154,13 @@ class AutodeckService {
   }
 
 
-  static retryJob = async (jobId: string) => {
-    const updatedWorkspaceJob = await prisma.createWorkspaceJob.update({
-      where: {
-        id: jobId,
-      },
-      data: {
-        status: 'IN_PHOTOSHOP_QUEUE'
-      },
-      include: {
-        processLocation: true,
-      }
+  retryJob = async (jobId: string) => {
+    const updatedWorkspaceJob = await this.createWorkspaceJobPrismaAdapter.update(jobId, {
+      status: 'IN_PHOTOSHOP_QUEUE'
     });
+
     const usesAdjustedLogo = await AutodeckService.usesAdjustedLogo(jobId);
-    console.log('usesAdjustedLogo: ', usesAdjustedLogo)
-    const photoshopInput = { jobId, usesAdjustedLogo, rootFolder: updatedWorkspaceJob.processLocation.path };
+    const photoshopInput = { jobId, usesAdjustedLogo, rootFolder: updatedWorkspaceJob?.processLocation?.path };
     const strEvent = JSON.stringify(photoshopInput, null, 2);
     const sNSParams = {
       Message: strEvent,
@@ -199,52 +179,31 @@ class AutodeckService {
     const csvPath = `${input.id}/dominant_colours.csv`;
     await AutodeckService.uploadDataToS3('haas-autodeck-logos', csvPath, csv, 'text/csv')
 
-    const updatedWorkspaceJob = await prisma.createWorkspaceJob.upsert({
-      where: {
-        id: input.id || '-1',
-      },
-      include: {
-        processLocation: true,
-      },
-      create: {
-        id: input.id || '',
-        name: input.name || '',
-        status: 'IN_PHOTOSHOP_QUEUE',
-        referenceType: 'AWS',
-        requiresColorExtraction: false,
-        requiresRembg: false,
-        requiresScreenshot: false,
-        processLocation: {
-          connect: {
-            id: input.jobLocationId || '-1',
-          },
-        }
-      },
-      update: {
-        status: 'IN_PHOTOSHOP_QUEUE',
+    const updatedWorkspaceJob = await this.createWorkspaceJobPrismaAdapter.upsert(input.id, {
+      id: input.id || '',
+      name: input.name || '',
+      status: 'IN_PHOTOSHOP_QUEUE',
+      referenceType: 'AWS',
+      requiresColorExtraction: false,
+      requiresRembg: false,
+      requiresScreenshot: false,
+      processLocation: {
+        connect: {
+          id: input.jobLocationId || '-1',
+        },
       }
-    })
+    }, {
+      status: 'IN_PHOTOSHOP_QUEUE',
+    } ); 
 
     const processLocationId = updatedWorkspaceJob.jobProcessLocationId
-    await AutodeckService.addNewCustomFieldsToTemplate(input, processLocationId)
+    await this.addNewCustomFieldsToTemplate(input, processLocationId)
 
     const mappedCustomFields = AutodeckService.generateKeyValuePair(input)
 
     const pitchdeckData: any = {
       ...mappedCustomFields,
       rootPath: updatedWorkspaceJob.processLocation.path,
-      // companyName: input.companyName || 'Company X',
-      // firstName: input.firstName || 'Mike',
-      // primaryColour: input.primaryColour || '#426b3a',
-      // answer1: input.answer1 || '',
-      // answer2: input.answer2 || '',
-      // answer3: input.answer3 || '',
-      // answer4: input.answer4 || '',
-      // sorryAboutX: input.sorryAboutX || '',
-      // youLoveX: input.youLoveX || '',
-      // reward: input.reward || '',
-      // emailContent: input.emailContent || '',
-      // textMessage: input.textMessage || '',
     };
 
 
@@ -362,23 +321,21 @@ class AutodeckService {
     });
   }
 
-  static createWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
-    const workspaceJob = await prisma.createWorkspaceJob.create({
-      data: {
-        id: input.id || '',
-        name: input.name,
-        status: 'PRE_PROCESSING',
-        referenceType: 'AWS',
-        requiresRembg: input.requiresRembg || false,
-        requiresScreenshot: input.requiresWebsiteScreenshot || false,
-        requiresColorExtraction: input.requiresColorExtraction || false,
-        processLocation: {
-          connect: {
-            id: input.jobLocationId || '-1'
-          }
+  createWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
+    const workspaceJob = await this.createWorkspaceJobPrismaAdapter.create({
+      id: input.id || '',
+      name: input.name,
+      status: 'PRE_PROCESSING',
+      referenceType: 'AWS',
+      requiresRembg: input.requiresRembg || false,
+      requiresScreenshot: input.requiresWebsiteScreenshot || false,
+      requiresColorExtraction: input.requiresColorExtraction || false,
+      processLocation: {
+        connect: {
+          id: input.jobLocationId || '-1'
         }
-      },
-    })
+      }
+    });
 
     if (!input.requiresColorExtraction) {
       const csvData = { 'colour-0': input.primaryColour };
@@ -499,43 +456,6 @@ class AutodeckService {
       stream.pipe(file);
     });
   }
-
-  // static createJob = async (input: InputProps) => {
-  //   const job = await prisma.job.create({
-  //     data: {
-  //       type: 'CREATE_WORKSPACE_JOB',
-  //       createWorkspaceJob: {
-  //         create: {
-  //           referenceType: 'AWS',
-  //           status: 'PENDING',
-  //           processLocation: {
-  //             connect: {
-  //               id: 'TODO' //TODO: Need to add actual value from dashboard PROCESS_LOCATION
-  //             }
-  //           }
-  //         },
-  //       },
-  //     },
-  //     include: {
-  //       createWorkspaceJob: true,
-  //     },
-  //   });
-
-  //   const csvInput = { ...input, jobId: job.id };
-  //   const csv = papaparse.unparse([csvInput]);
-  //   const date = new Date();
-  //   const tempDir = `/tmp/autodeck-${date.getTime()}/`;
-  //   fs.mkdirSync(tempDir);
-  //   fs.writeFileSync(`${tempDir}input.csv`, csv);
-
-  //   await AutodeckService.fetchImage(input.logo, `${tempDir}logo.jpg`);
-  //   await AutodeckService.zipDirectory(tempDir, `/home/daan/Desktop/autodeck-input-${date.getTime()}.zip`);
-
-  //   if (fs.existsSync(`/home/daan/Desktop/autodeck-input-${date.getTime()}.zip`)) {
-  //     await AutodeckService.uploadFileToS3('haas-autodeck-input', `${input.name}.zip`, `/home/daan/Desktop/autodeck-input-${date.getTime()}.zip`);
-  //     return job;
-  //   }
-  // };
 
   /**
  * @param {String} source

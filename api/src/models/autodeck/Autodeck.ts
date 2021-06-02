@@ -58,8 +58,8 @@ export const JobProcessLocations = objectType({
 
 export const GetJobProcessLocationQuery = queryField('getJobProcessLocations', {
   type: JobProcessLocations,
-  async resolve() {
-    const jobProcessLocations = await AutodeckService.getJobProcessLocations()
+  async resolve(parent, args, ctx) {
+  const jobProcessLocations = await ctx.services.autodeckService.getJobProcessLocations()
     return { jobProcessLocations: jobProcessLocations || [] };
   }
 })
@@ -78,8 +78,8 @@ export const createJobProcessLocationInput = inputObjectType({
 export const CreateJobProcessLocationMutation = mutationField('createJobProcessLocation', {
   type: JobProcessLocation,
   args: {input : createJobProcessLocationInput},
-  resolve(parent, args) {
-    return AutodeckService.createJobProcessLocation(args.input)
+  resolve(parent, args, ctx) {
+    return ctx.services.autodeckService.createJobProcessLocation(args.input);
   }
 
 })
@@ -234,7 +234,7 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
   nullable: true,
   args: { input: GenerateAutodeckInput },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     const { input } = args;
 
     if (!input) {
@@ -252,7 +252,7 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       jobLocationId: input.jobLocationId,
     }
 
-    const job = await AutodeckService.createWorkspaceJob(jobInput);
+    const job = await ctx.services.autodeckService.createWorkspaceJob(jobInput);
 
     return job ? job as any : null;
   },
@@ -263,14 +263,14 @@ export const RetryAutodeckJobMutation = mutationField('retryAutodeckJob', {
   nullable: true,
   args: { jobId: 'String' },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     const { jobId } = args;
 
     if (!jobId) {
       return null;
     }
     
-    const job = await AutodeckService.retryJob(jobId);
+    const job = await ctx.services.autodeckService.retryJob(jobId);
 
     return job ? job as any : null;
   },
@@ -321,8 +321,8 @@ export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
   type: AutodeckConnectionModel,
   args: { filter: PaginationWhereInput },
 
-  async resolve(parent, args) {
-    const { entries, pageInfo } = await AutodeckService.paginatedAutodeckJobs({
+  async resolve(parent, args, ctx) {
+    const { entries, pageInfo } = await ctx.services.autodeckService.paginatedAutodeckJobs({
       limit: args.filter?.limit,
       offset: args.filter?.offset,
       orderBy: args.filter?.orderBy,
