@@ -17,4 +17,5 @@ export interface CustomerPrismaAdapterType {
   getDialogueTags(customerSlug: string, dialogueSlug: string): Promise<(Dialogue & {
     tags: Tag[];
   }) | undefined>;
+  getAllCustomersBySlug(customerSlug?: string | null): Promise<Customer[]>;
 }

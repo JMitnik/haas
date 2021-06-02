@@ -398,7 +398,7 @@ export const DialogueMutations = extendType({
       type: DialogueType,
       args: { input: CreateDialogueInputType },
 
-      async resolve(parent, args: any, ctx: any) {
+      async resolve(parent, args: any, ctx) {
         const {
           input: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
         } = args;
@@ -413,7 +413,7 @@ export const DialogueMutations = extendType({
 
         if (!customer) throw new Error('Cant find customer related');
 
-        return DialogueService.copyDialogue(
+        return ctx.services.dialogueService.copyDialogue(
           templateDialogueId, customer?.id, title, dialogueSlug, description, publicTitle, dialogueTags,
         );
       },
@@ -423,12 +423,12 @@ export const DialogueMutations = extendType({
       type: DialogueType,
       args: { input: CreateDialogueInputType },
 
-      async resolve(parent, args) {
+      async resolve(parent, args, ctx) {
         if (!args.input) {
           throw new Error('Unable to find any input data');
         }
 
-        return DialogueService.createDialogue(args.input);
+        return ctx.services.dialogueService.createDialogue(args.input);
       },
     });
 

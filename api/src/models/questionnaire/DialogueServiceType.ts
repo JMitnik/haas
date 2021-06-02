@@ -1,5 +1,6 @@
 import { Dialogue } from "@prisma/client";
 import { WorkspaceTemplate } from "../templates/defaultWorkspaceTemplate";
+import { NexusGenInputs } from "../../generated/nexus";
 
 export interface DialogueServiceType {
   findDialogueIdsByCustomerId(customerId: string): Promise<Array<string>>;
@@ -23,4 +24,11 @@ export interface DialogueServiceType {
     tags?: any,
   }): Promise<Dialogue>;
   generateFakeData: (dialogueId: string, template: WorkspaceTemplate) => Promise<void>;
+  initDialogue: (customerId: string, title: string, dialogueSlug: string, description: string, publicTitle?: string, tags?: Array<{
+    id: string;
+  }>) => Promise<Dialogue | null>;
+  copyDialogue: (templateId: string, customerId: string, title: string, dialogueSlug: string, description: string, publicTitle?: string, tags?: Array<{
+    id: string;
+  }>) => Promise<Dialogue>;
+  createDialogue: (input: NexusGenInputs['CreateDialogueInputType']) => Promise<Dialogue>;
 }

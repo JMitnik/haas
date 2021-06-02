@@ -9,6 +9,14 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
+
+  async getAllCustomersBySlug(customerSlug?: string | null) {
+    return this.prisma.customer.findMany({
+      where: {
+        slug: customerSlug || undefined
+      }
+    })
+  }
  
   async getDialogueTags(customerSlug: string, dialogueSlug: string) {
     const customer = await this.prisma.customer.findOne({
