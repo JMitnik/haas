@@ -1,0 +1,14 @@
+import { SessionCreateInput, Session } from "@prisma/client";
+
+export interface SessionPrismaAdapterType {
+  createFakeSession(data: (
+    {
+      createdAt: Date,
+      dialogueId: string,
+      rootNodeId: string,
+      simulatedRootVote: number,
+      simulatedChoiceNodeId: string,
+      simulatedChoiceEdgeId?: string,
+      simulatedChoice: string,
+    })): Promise<Session>;
+}

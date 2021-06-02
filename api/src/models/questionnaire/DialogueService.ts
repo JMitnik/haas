@@ -6,7 +6,7 @@ import { ApolloError, UserInputError } from 'apollo-server-express';
 import {
   Dialogue, DialogueCreateInput, DialogueUpdateInput,
   NodeType,
-  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, PrismaClient
+  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, PrismaClient, SessionCreateInput
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import NodeService from '../QuestionNode/NodeService';
@@ -29,6 +29,8 @@ import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { DialoguePrismaAdapterType } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
+import { SessionPrismaAdapterType } from '../session/SessionPrismaAdapterType';
+import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -36,10 +38,12 @@ function getRandomInt(max: number) {
 class DialogueService implements DialogueServiceType {
   dialoguePrismaAdapter: DialoguePrismaAdapterType;
   customerPrismaAdapter: CustomerPrismaAdapterType;
+  sessionPrismaAdapter: SessionPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
+    this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
   }
 
   async delete(dialogueId: string) {
@@ -101,7 +105,7 @@ class DialogueService implements DialogueServiceType {
     updateDialogueArgs: DialogueUpdateInput,
   ) => {
     const newTagObjects = newTags.map((tag) => ({ id: tag }));
-    console.log('new tags: ',newTags);
+    console.log('new tags: ', newTags);
 
     const deleteTagObjects: TagWhereUniqueInput[] = [];
     dbTags.forEach((tag) => {
@@ -123,7 +127,7 @@ class DialogueService implements DialogueServiceType {
     return updateDialogueArgs;
   };
 
-   editDialogue = async (args: any) => {
+  editDialogue = async (args: any) => {
     const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData } = args;
 
     const dbDialogue = await this.customerPrismaAdapter.getDialogueTags(customerSlug, dialogueSlug);
@@ -189,28 +193,14 @@ class DialogueService implements DialogueServiceType {
     return values;
   };
 
-  static generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {
+  generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {
     const currentDate = new Date();
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
 
-    const dialogueWithNodes = await prisma.dialogue.findOne({
-      where: { id: dialogueId },
-      include: {
-        questions: true,
-        edges: {
-          include: {
-            conditions: true,
-            childNode: true,
-          },
-        },
-      },
-    });
+    const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
 
-    await prisma.dialogue.update({
-      where: { id: dialogueId },
-      data: { wasGeneratedWithGenData: true },
-    });
+    await this.dialoguePrismaAdapter.update(dialogueId, { wasGeneratedWithGenData: true });
 
     const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
     const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
@@ -233,37 +223,18 @@ class DialogueService implements DialogueServiceType {
       const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
 
       if (!simulatedChoiceNodeId) return;
+      const fakeSessionInputArgs: (
+        {
+          createdAt: Date,
+          dialogueId: string,
+          rootNodeId: string,
+          simulatedRootVote: number,
+          simulatedChoiceNodeId: string,
+          simulatedChoiceEdgeId?: string,
+          simulatedChoice: string,
+        }) = { dialogueId, createdAt: backDate, rootNodeId: rootNode.id, simulatedRootVote, simulatedChoiceNodeId, simulatedChoiceEdgeId: simulatedChoiceEdge?.id, simulatedChoice }
 
-      await prisma.session.create({
-        data: {
-          nodeEntries: {
-            create: [{
-              depth: 0,
-              creationDate: backDate,
-              relatedNode: {
-                connect: { id: rootNode.id },
-              },
-              sliderNodeEntry: {
-                create: { value: simulatedRootVote },
-              },
-              inputSource: 'INIT_GENERATED',
-            },
-            {
-              depth: 1,
-              creationDate: backDate,
-              relatedNode: { connect: { id: simulatedChoiceNodeId } },
-              relatedEdge: { connect: { id: simulatedChoiceEdge?.id } },
-              choiceNodeEntry: {
-                create: { value: simulatedChoice },
-              },
-            },
-            ],
-          },
-          dialogue: {
-            connect: { id: dialogueId },
-          },
-        },
-      });
+      await this.sessionPrismaAdapter.createFakeSession(fakeSessionInputArgs);
     }));
   };
 

@@ -1,4 +1,5 @@
 import { Dialogue } from "@prisma/client";
+import { WorkspaceTemplate } from "../templates/defaultWorkspaceTemplate";
 
 export interface DialogueServiceType {
   findDialogueIdsByCustomerId(customerId: string): Promise<Array<string>>;
@@ -21,4 +22,5 @@ export interface DialogueServiceType {
     isWithoutGenData?: boolean | null | undefined,
     tags?: any,
   }): Promise<Dialogue>;
+  generateFakeData: (dialogueId: string, template: WorkspaceTemplate) => Promise<void>;
 }

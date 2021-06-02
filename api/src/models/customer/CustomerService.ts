@@ -69,7 +69,7 @@ class CustomerService implements CustomerServiceType {
 
     // Step 4: possibly
     if (willGenerateFakeData) {
-      await DialogueService.generateFakeData(dialogue.id, template);
+      await this.dialogueService.generateFakeData(dialogue.id, template);
     }
   };
 

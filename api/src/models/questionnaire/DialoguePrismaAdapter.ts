@@ -1,4 +1,4 @@
-import { PrismaClient, Dialogue, DialogueUpdateInput } from "@prisma/client";
+import { PrismaClient, Dialogue, DialogueUpdateInput, QuestionNode, Edge } from "@prisma/client";
 import { DialoguePrismaAdapterType } from "./DialoguePrismaAdapterType";
 
 class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
@@ -7,8 +7,22 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
+  async getDialogueWithNodesAndEdges(dialogueId: string) {
+    return this.prisma.dialogue.findOne({
+      where: { id: dialogueId },
+      include: {
+        questions: true,
+        edges: {
+          include: {
+            conditions: true,
+            childNode: true,
+          },
+        },
+      },
+    });
+  }
 
-  update(dialogueId: string, updateArgs: DialogueUpdateInput): Promise<Dialogue> {
+  async update(dialogueId: string, updateArgs: DialogueUpdateInput): Promise<Dialogue> {
     return this.prisma.dialogue.update({
       where: {
         id: dialogueId,
@@ -23,21 +37,12 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
         id: dialogueId,
       },
       include: {
-        questions: {
-          select: {
-            id: true,
-          },
-        },
-        edges: {
-          select: {
-            id: true,
-          },
-        },
-        sessions: {
-          select: {
-            id: true,
-          },
-        },
+        CampaignVariant: true,
+        customer: true,
+        tags: true,
+        questions: true,
+        edges: true,
+        sessions: true,
       },
     });
   }
