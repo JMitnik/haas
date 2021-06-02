@@ -622,8 +622,7 @@ const DialogueBuilderQuestionForm = ({
                     </InputHelper>
                     <Input
                       name="videoEmbedded"
-                      placeholder="https://www.youtube.com/watch?..."
-                      leftEl={<Youtube />}
+                      leftAddOn="https://www.youtube.com/watch?v="
                       ref={form.register()}
                       defaultValue={question.extraContent || undefined}
                     />

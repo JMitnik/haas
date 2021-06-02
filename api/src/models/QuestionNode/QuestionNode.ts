@@ -181,7 +181,17 @@ export const QuestionNodeType = objectType({
 
     t.string('extraContent', {
       nullable: true,
-      resolve: (parent) => parent.extraContent || null,
+      resolve: async (parent, args, ctx) => {
+        const videoEmbeddedNode = parent.videoEmbeddedNodeId ? await ctx.prisma.videoEmbeddedNode.findOne({
+          where: {
+            id: parent.videoEmbeddedNodeId,
+          },
+           select: {
+             videoUrl: true
+           }
+        }) : null;
+        return videoEmbeddedNode?.videoUrl ||  null;
+      },
      });
     t.string('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
