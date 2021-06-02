@@ -1,4 +1,4 @@
-import { JobProcessLocation, CustomField, JobProcessLocationCreateInput, JobProcessLocationUpdateInput } from "@prisma/client";
+import { JobProcessLocation, CustomField, JobProcessLocationCreateInput, JobProcessLocationUpdateInput, FindFirstJobProcessLocationArgs } from "@prisma/client";
 
 export interface JobProcessLocationPrismaAdapterType {
   findAll(): Promise<(JobProcessLocation & {
@@ -8,6 +8,9 @@ export interface JobProcessLocationPrismaAdapterType {
     fields: CustomField[];
   })>;
   update(JobProcessLocationId: string, data: JobProcessLocationUpdateInput): Promise<(JobProcessLocation & {
+    fields: CustomField[];
+  })>;
+  findFirst(args: FindFirstJobProcessLocationArgs): Promise<(JobProcessLocation & {
     fields: CustomField[];
   })>;
 }

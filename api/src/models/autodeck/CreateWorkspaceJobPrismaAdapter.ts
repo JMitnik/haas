@@ -1,11 +1,15 @@
 import { CreateWorkspaceJobPrismaAdapterType } from "./CreateWorkspaceJobPrismaAdapterType";
-import { PrismaClient, FindManyCreateWorkspaceJobArgs, CreateWorkspaceJobUpdateInput, CreateWorkspaceJobInclude, CreateWorkspaceJob, CreateWorkspaceJobCreateInput } from "@prisma/client";
+import { PrismaClient, FindManyCreateWorkspaceJobArgs, CreateWorkspaceJobUpdateInput, CreateWorkspaceJobInclude, CreateWorkspaceJob, CreateWorkspaceJobCreateInput, FindOneCreateWorkspaceJobArgs } from "@prisma/client";
 
 class CreateWorkspaceJobPrismaAdapter implements CreateWorkspaceJobPrismaAdapterType {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
+  }
+
+  async findOne(args: FindOneCreateWorkspaceJobArgs) {
+    return this.prisma.createWorkspaceJob.findOne(args);
   }
   create(data: CreateWorkspaceJobCreateInput) {
     return this.prisma.createWorkspaceJob.create({

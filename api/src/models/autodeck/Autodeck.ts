@@ -5,6 +5,9 @@ import AutodeckService from './AutodeckService';
 import { PaginationWhereInput } from '../general/Pagination';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import { Upload } from '../customer/Customer';
+import CustomFieldPrismaAdapter from './CustomFieldPrismaAdapter';
+import JobProcessLocationPrismaAdapter from './JobProcessLocationPrismaAdapter';
+import CreateWorkspaceJobPrismaAdapter from './CreateWorkspaceJobPrismaAdapter';
 
 export const JobProcessLocationType = enumType({
   name: 'JobProcessLocationType',
@@ -37,7 +40,8 @@ export const JobProcessLocation = objectType({
       type: CustomFieldType,
       nullable: true,
       resolve(parent, args, ctx) {
-        return ctx.prisma.customField.findMany({
+        const customFieldPrismaAdapter = new CustomFieldPrismaAdapter(ctx.prisma);
+        return customFieldPrismaAdapter.findMany({
           where: {
             jobProcessLocationId: parent.id,
           }
@@ -131,8 +135,9 @@ export const CreateWorkspaceJobType = objectType({
 
     t.field('processLocation', {
       type: JobProcessLocation,
-      resolve(parent, args, ctx) {
-        return ctx.prisma.jobProcessLocation.findFirst({
+      async resolve(parent, args, ctx) {
+        const jobProcessLocationPrismaAdapter = new JobProcessLocationPrismaAdapter(ctx.prisma);
+        return jobProcessLocationPrismaAdapter.findFirst({
           where: {
             job: {
               some: {
@@ -140,9 +145,6 @@ export const CreateWorkspaceJobType = objectType({
               }
             }
           },
-          include: {
-            fields: true,
-          }
         })
       }
     })
@@ -297,8 +299,8 @@ export const GetJobQuery = queryField('getJob', {
   args: { id: 'String' },
   async resolve(parent, args, ctx) {
     if (!args.id) return null;
-
-    const job = await ctx.prisma.createWorkspaceJob.findOne({
+    const createWorkspaceJobPrismaAdapter = new CreateWorkspaceJobPrismaAdapter(ctx.prisma)
+    const job = await createWorkspaceJobPrismaAdapter.findOne({
       where: {
         id: args.id,
       },
@@ -459,49 +461,13 @@ export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorksp
       return null;
     }
 
-    return ctx.prisma.createWorkspaceJob.update({
-      where: {
-        id: id || undefined,
-      },
-      data: {
+    const createWorkspaceJobPrismaAdapter = new CreateWorkspaceJobPrismaAdapter(ctx.prisma);
+
+    return createWorkspaceJobPrismaAdapter.update(args.id, {
         resourcesUrl: resourceUrl,
         status: status || undefined,
         errorMessage
-      },
-
-    }) as any;
-  },
-
-});
-
-export const UpdateJobMutation = mutationField('updateJob', {
-  type: JobObjectType,
-  nullable: true,
-  args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String', errorMessage: 'String' },
-  resolve(parent, args, ctx) {
-    const { id, resourceUrl, status, errorMessage } = args;
-
-    if (!args.id) {
-      return null;
-    }
-
-    return ctx.prisma.job.update({
-      where: {
-        id: id || undefined,
-      },
-      data: {
-        createWorkspaceJob: {
-          update: {
-            resourcesUrl: resourceUrl,
-            status: status || undefined,
-            errorMessage: errorMessage
-          },
-        },
-      },
-      include: {
-        createWorkspaceJob: true,
-      },
-    }) as any;
+      }) as any;
   },
 
 });

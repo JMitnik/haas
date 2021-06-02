@@ -1,4 +1,4 @@
-import { CreateWorkspaceJob, FindManyCreateWorkspaceJobArgs, CreateWorkspaceJobUpdateInput, JobProcessLocation, CreateWorkspaceJobCreateInput } from "@prisma/client";
+import { CreateWorkspaceJob, FindManyCreateWorkspaceJobArgs, CreateWorkspaceJobUpdateInput, JobProcessLocation, CreateWorkspaceJobCreateInput, FindOneCreateWorkspaceJobArgs } from "@prisma/client";
 import { NexusGenInputs } from "../../generated/nexus";
 
 export interface CreateWorkspaceJobPrismaAdapterType {
@@ -13,4 +13,5 @@ export interface CreateWorkspaceJobPrismaAdapterType {
   create(data: CreateWorkspaceJobCreateInput): Promise<CreateWorkspaceJob & {
     processLocation: JobProcessLocation;
   }>;
+  findOne(args: FindOneCreateWorkspaceJobArgs): Promise<CreateWorkspaceJob | null>;
 }

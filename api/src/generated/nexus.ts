@@ -1120,7 +1120,6 @@ export interface NexusGenFieldTypes {
     updateCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     updateCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateDeliveryStatus: string; // String!
-    updateJob: NexusGenRootTypes['JobObjectType'] | null; // JobObjectType
     updateQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
     uploadJobImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
@@ -1538,13 +1537,6 @@ export interface NexusGenArgTypes {
     updateDeliveryStatus: { // args
       deliveryId?: string | null; // String
       status?: NexusGenEnums['DeliveryStatusEnum'] | null; // DeliveryStatusEnum
-    }
-    updateJob: { // args
-      errorMessage?: string | null; // String
-      id?: string | null; // String
-      referenceId?: string | null; // String
-      resourceUrl?: string | null; // String
-      status?: NexusGenEnums['JobStatusType'] | null; // JobStatusType
     }
     updateQuestion: { // args
       input?: NexusGenInputs['UpdateQuestionNodeInputType'] | null; // UpdateQuestionNodeInputType
