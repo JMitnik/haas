@@ -1,7 +1,6 @@
 import { TreeStoreModelProps } from 'models/TreeStoreModel';
 import { useQuery } from '@apollo/client';
 import { useRouteMatch } from 'react-router-dom';
-import { useTimer } from 'use-timer';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { Customer, Dialogue } from 'types/generic';
