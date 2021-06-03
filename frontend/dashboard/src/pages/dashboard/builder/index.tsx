@@ -7,7 +7,6 @@ import {
   QuestionEntryProps,
 } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import { Loader } from '@haas/ui';
-import { Video } from 'react-feather';
 import { useNavigator } from 'hooks/useNavigator';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import HaasNodeIcon from 'components/Icons/HaasNodeIcon';

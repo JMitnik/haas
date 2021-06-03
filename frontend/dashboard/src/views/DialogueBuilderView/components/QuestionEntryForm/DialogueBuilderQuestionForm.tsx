@@ -6,7 +6,7 @@ import {
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import { Trash, Youtube } from 'react-feather';
+import { Trash } from 'react-feather';
 import { debounce } from 'lodash';
 import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
