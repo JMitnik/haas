@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import create, { SetState } from 'zustand';
 import produce from 'immer';
+import { devtools } from 'zustand/middleware'
 
 // @ts-ignore
 const immer = config => (set, get) => config(fn => set(produce(fn)), get);
@@ -31,7 +32,7 @@ interface CampaignState extends EditCampaignInputType {
   editCampaign: any;
 }
 
-const useCampaignStore = create<CampaignState>(immer((set: SetState<CampaignState>) => ({
+const useCampaignStore = create<CampaignState>(devtools(immer((set: SetState<CampaignState>) => ({
   id: '',
   label: '',
   variants: [],
@@ -50,10 +51,13 @@ const useCampaignStore = create<CampaignState>(immer((set: SetState<CampaignStat
   }),
   editCampaignVariant: (input: any, activeDirectVariantIndex: number) => set(state => {
     // @ts-ignore
+    console.log(input);
     let variant = state.variants[activeDirectVariantIndex];
     state.variants[activeDirectVariantIndex] = {
-      label: input.label,
       ...variant,
+      label: input.label,
+      type: input.type,
+      scheduleType: input.scheduleType,
     }
   }),
   setActiveForm: (activeFormType: ActiveFormType, activeDirectVariantIndex?: number) => set(state => {
@@ -77,9 +81,34 @@ const useCampaignStore = create<CampaignState>(immer((set: SetState<CampaignStat
       });
     })
   },
-})));
+}))));
 
-type EdgeType = 'Weights' | 'Normal'
+type EdgeType = 'Weights' | 'Normal';
+
+interface IncomingCampaignEdgeProps {
+  type?: EdgeType;
+  isActive?: boolean;
+}
+
+export const IncomingCampaignEdge = ({ type, isActive }: IncomingCampaignEdgeProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <LS.BuilderEdgeContainer isActive={isActive}>
+      <LS.BuilderEdge />
+      {type === 'Weights' && (
+        <LS.BuilderEdgeLabel>
+          100%
+        </LS.BuilderEdgeLabel>
+      )}
+      <LS.EdgeFoot>
+        <UI.Icon>
+          <ChevronDown />
+        </UI.Icon>
+      </LS.EdgeFoot>
+    </LS.BuilderEdgeContainer>
+  )
+};
 
 export const AddCampaignEdge = ({ onClick, type = 'Normal' }: { onClick?: () => void, type?: EdgeType }) => (
   <LS.BuilderEdgeContainer>
@@ -122,8 +151,7 @@ export const CampaignBuilder = () => {
     editCampaignVariant
   } = useCampaignStore();
   const { t } = useTranslation();
-
-  console.log(activeForm);
+  console.log(variants);
 
   return (
     <LS.BuilderContainer>
@@ -164,7 +192,7 @@ export const CampaignBuilder = () => {
             {variants.map((variant, index) => (
               <UI.Div key={index}>
                 <UI.Flex justifyContent="center">
-                  <AddCampaignEdge type={index==0 ? 'Weights': 'Normal'} />
+                  <IncomingCampaignEdge isActive={index === activeForm?.activeDirectVariantIndex} type={index==0 ? 'Weights': 'Normal'} />
                 </UI.Flex>
                 <CampaignStep
                   label={label}
@@ -181,6 +209,7 @@ export const CampaignBuilder = () => {
                       <UI.Div gridColumn="5 / 9">
                         <UI.Card isActive={isActive} bg="white" onClick={onFormChange}>
                           <UI.CardBody>
+                            <UI.Helper mb={2}>{variant.scheduleType}</UI.Helper>
                             {variant.label}
                           </UI.CardBody>
                         </UI.Card>
@@ -188,9 +217,11 @@ export const CampaignBuilder = () => {
                     </>
                   )}
                 </CampaignStep>
-                <UI.Flex alignItems="center" justifyContent="center">
-                  <AddCampaignEdge onClick={() => addEmptyVariant()} />
-                </UI.Flex>
+                {index + 1 == variants.length && (
+                  <UI.Flex alignItems="center" justifyContent="center">
+                    <AddCampaignEdge onClick={() => addEmptyVariant()} />
+                  </UI.Flex>
+                )}
               </UI.Div>
             ))}
           </UI.Div>
@@ -202,6 +233,7 @@ export const CampaignBuilder = () => {
         )}
         {activeForm?.type === 'CampaignVariantForm' && activeForm.activeDirectVariantIndex != undefined && (
           <CampaignVariantForm
+            key={activeForm.activeDirectVariantIndex}
             variantIndex={activeForm.activeDirectVariantIndex}
             variant={variants[activeForm.activeDirectVariantIndex]}
             onChange={editCampaignVariant}

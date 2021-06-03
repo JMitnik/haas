@@ -11,6 +11,8 @@ import { ReactComponent as SlackIcon } from 'assets/icons/icon-slack.svg';
 import * as LS from './CampaignBuilderStyles';
 import { VariantType } from './CampaignBuilderTypes';
 import { useEffect } from 'react';
+import useDebounce from 'hooks/useDebounce';
+import getCustomersOfUser from 'queries/getCustomersOfUser';
 
 const SlackIconContainer = () => (
   <UI.Icon width="20px" mr={2}>
@@ -31,7 +33,9 @@ interface CampaignVariantFormProps {
 export const CampaignVariantForm = ({ variant, onChange, variantIndex }: CampaignVariantFormProps) => {
   const { t } = useTranslation();
   const form = useForm({
+    shouldUnregister: true,
     defaultValues: {
+      label: variant.label,
       body: variant.body,
       type: variant.type,
       scheduleType: variant.scheduleType,
@@ -42,11 +46,17 @@ export const CampaignVariantForm = ({ variant, onChange, variantIndex }: Campaig
     }
   });
 
-  const formValues = form.watch();
+  const { label, type, scheduleType } = form.watch();
+  const debouncedLabel = useDebounce(label || '', 300);
+  const debouncedScheduleType = useDebounce(scheduleType || CampaignScheduleEnum.General, 300);
+  const debouncedType = useDebounce(type || CampaignVariantEnum.Email, 300);
+
+  useEffect(() => {
+    onChange({ label: debouncedLabel, scheduleType: debouncedScheduleType, type: debouncedType }, variantIndex);
+  }, [debouncedLabel, debouncedScheduleType, debouncedType]);
+
 
   const percentageFull = Math.min(Math.floor(((variant?.body?.length || 160) / 160) * 100), 100);
-
-  const scheduleType: CampaignScheduleEnum = form.watch('scheduleType');
 
   return (
     <UI.Form>
@@ -60,6 +70,11 @@ export const CampaignVariantForm = ({ variant, onChange, variantIndex }: Campaig
               Campaign step
             </UI.Helper>
           </UI.Flex>
+          <UI.FormControl isRequired>
+            <UI.FormLabel>Label</UI.FormLabel>
+            <UI.Input name="label" ref={form.register()} defaultValue={variant.label || ''} />
+          </UI.FormControl>
+
           <UI.FormControl isRequired>
             <UI.FormLabel>Step type</UI.FormLabel>
             <Controller
@@ -173,7 +188,7 @@ export const CampaignVariantForm = ({ variant, onChange, variantIndex }: Campaig
           </UI.FormControl>
         </LS.BuilderEditCard>
         <LS.BuilderEditCard>
-          {formValues.type === 'SMS' && (
+          {type === 'SMS' && (
               <UI.Div mb={2} style={{ top: 12 ,right: 12 , position: 'absolute' }}>
                 <UI.ColumnFlex alignItems="flex-end">
                   <CircularProgress

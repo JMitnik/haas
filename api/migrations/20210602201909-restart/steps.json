@@ -7427,6 +7427,31 @@
     {
       "tag": "CreateField",
       "model": "Campaign",
+      "field": "nestedVariantEdges",
+      "type": "CampaignVariantEdge",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Campaign",
+      "field": "variants",
+      "type": "CampaignVariant",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Campaign",
+          "field": "variants"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Campaign",
       "field": "workspaceId",
       "type": "String",
       "arity": "Required"
@@ -7823,6 +7848,59 @@
     {
       "tag": "CreateField",
       "model": "CampaignVariant",
+      "field": "campaignId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
+      "field": "campaign",
+      "type": "Campaign",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "campaign"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "campaign"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[campaignId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "campaign"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
       "field": "subject",
       "type": "String",
       "arity": "Optional"
@@ -8047,6 +8125,59 @@
     {
       "tag": "CreateField",
       "model": "CampaignVariantEdge",
+      "field": "campaignId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdge",
+      "field": "campaign",
+      "type": "Campaign",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "campaign"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "campaign"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[campaignId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "campaign"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdge",
       "field": "condition",
       "type": "CampaignVariantEdgeConditionEnum",
       "arity": "Optional"
@@ -8169,7 +8300,7 @@
         "directive": "relation"
       },
       "argument": "fields",
-      "value": "[parentCampaignVariantId]"
+      "value": "[childCampaignVariantId]"
     },
     {
       "tag": "CreateArgument",

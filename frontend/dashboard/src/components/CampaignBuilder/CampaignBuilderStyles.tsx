@@ -74,9 +74,16 @@ export const BuilderAddContainer = styled.div`
   transform: translateX(-50%) translateY(-50%);
 `;
 
-export const BuilderEdgeContainer = styled.div`
-  position: relative;
-  max-width: 30px;
+
+export const BuilderEdgeContainer = styled.div<{ isActive?: boolean }>`
+  ${({ theme, isActive }) => css`
+    position: relative;
+    max-width: 30px;
+
+    ${isActive && css`
+      color: ${theme.colors.blue[500]};
+    `}
+  `}
 `;
 
 interface BuilderLabelProps {
