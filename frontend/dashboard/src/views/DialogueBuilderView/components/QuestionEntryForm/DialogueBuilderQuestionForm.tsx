@@ -534,7 +534,7 @@ const DialogueBuilderQuestionForm = ({
             </>
           )}
 
-          {parentQuestionType === 'Choice' || parentQuestionType === 'Video embedded' && (
+          {(parentQuestionType === 'Choice' || parentQuestionType === 'Video embedded') && (
             <>
               <Hr />
               <FormSection>

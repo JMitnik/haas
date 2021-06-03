@@ -1,4 +1,4 @@
-import { allow, or, rule, shield } from 'graphql-shield';
+import { allow, deny , or, rule, shield } from 'graphql-shield';
 
 import { ApolloError } from 'apollo-server-express';
 import { SystemPermissionEnum } from '@prisma/client';
@@ -63,6 +63,13 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
 );
 
 const authShield = shield({
+  Query: {
+    users: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS),
+    user: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS),
+  },
+  Customer: {
+    usersConnection: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)
+  },
   Dialogue: {
     // Write this up
     // statistics: canAccessCompany,
