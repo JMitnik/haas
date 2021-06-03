@@ -8,15 +8,14 @@ import CustomerPage from 'pages/[customer]';
 import CustomersPage from 'pages/customers';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
-import NodePage from './[customer]/[dialogue]/[node]';
 import { CampaignRedirect } from './campaign';
+import NodePage from './[customer]/[dialogue]/[node]';
 
 const ErrorPage = () => (
   <div>
     Something went wrong, we will fix it right away!
   </div>
 );
-
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -31,7 +30,7 @@ const AppRoutes = () => {
           '/:customerSlug/:dialogueSlug/n/:nodeId',
           '/:customerSlug/:dialogueSlug/:edgeId',
           '/:customerSlug/:dialogueSlug',
-          ]}
+        ]}
         >
           <NodePage />
         </Route>

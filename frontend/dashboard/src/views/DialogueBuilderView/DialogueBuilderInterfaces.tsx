@@ -26,6 +26,7 @@ export interface QuestionEntryProps {
   updatedAt?: string;
   creationDate?: string;
   title: string;
+  extraContent?: string | null;
   isRoot: boolean;
   isLeaf: boolean;
   type: string;

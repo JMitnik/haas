@@ -112,6 +112,7 @@ enum NodeType {
   TEXTBOX
   LINK
   SHARE
+  VIDEO_EMBEDDED
 }
 
 // NodeType: Form
@@ -193,6 +194,12 @@ model SliderNode {
   earlyReleaseText String?
 }
 
+model VideoEmbeddedNode {
+  id           String         @id @default(cuid())
+  videoUrl     String?
+  QuestionNode QuestionNode[]
+}
+
 model QuestionNode {
   id           String           @id @default(cuid())
   creationDate DateTime         @default(now())
@@ -224,14 +231,16 @@ model QuestionNode {
   overridesChoices QuestionOption[] @relation("ChoiceCTANode")
 
   // Node-types
-  share      Share?
-  sliderNode SliderNode? @relation(fields: [sliderNodeId], references: [id])
-  form       FormNode?   @relation(fields: [formNodeId], references: [id])
+  share             Share?
+  videoEmbeddedNode VideoEmbeddedNode? @relation(fields: [videoEmbeddedNodeId], references: [id])
+  sliderNode        SliderNode?        @relation(fields: [sliderNodeId], references: [id])
+  form              FormNode?          @relation(fields: [formNodeId], references: [id])
 
-  links             Link[]
-  QuestionOfTrigger QuestionOfTrigger[]
-  sliderNodeId      String?
-  formNodeId        String?
+  links               Link[]
+  QuestionOfTrigger   QuestionOfTrigger[]
+  videoEmbeddedNodeId String?
+  sliderNodeId        String?
+  formNodeId          String?
 }
 
 enum LinkTypeEnum {
@@ -571,15 +580,20 @@ enum JobStatusType {
   PENDING
   COMPLETED
   FAILED
+  TRANSFORMING_PSDS_TO_PNGS
+  STITCHING_SLIDES
+  COMPRESSING_SALES_MATERIAL
 }
 
 model JobProcessLocation {
-  id     String                 @id @default(cuid())
-  name   String
-  path   String
-  type   JobProcessLocationType
-  job    CreateWorkspaceJob[]
-  fields CustomField[]
+  id                 String                 @id @default(cuid())
+  name               String
+  path               String
+  xMaterialDimension Int                    @default(0)
+  yMaterialDimension Int                    @default(0)
+  type               JobProcessLocationType
+  job                CreateWorkspaceJob[]
+  fields             CustomField[]
 }
 
 model CustomField {

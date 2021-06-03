@@ -639,6 +639,16 @@ const language = {
       en: 'Minimum value',
       de: 'Minimalwert',
     },
+    video_embedded: {
+      en: 'Embedded video ID',
+      de: 'Eingebettete Video-ID',
+    },
+    video_embedded_helper: {
+      en: `What is the ID of the video you want to display at the question? 
+This ID can be found in the URL of the video. Currently only youtube is supported.`,
+      de: `Wie lautet die ID des Videos, das Sie anzeigen möchten? 
+Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt.`,
+    },
     max_value: {
       en: 'Maximum value',
       de: 'Maximalwert',

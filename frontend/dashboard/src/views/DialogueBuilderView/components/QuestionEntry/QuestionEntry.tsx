@@ -41,6 +41,17 @@ interface QuestionEntryItemProps {
   ctaNodes: CTANode[];
 }
 
+const getSelectEntry = (type: string) => {
+  switch (type) {
+    case 'Choice':
+      return { label: type, value: 'CHOICE' };
+    case 'Video embedded':
+      return { label: type, value: 'VIDEO_EMBEDDED' };
+    default:
+      return { label: type, value: 'SLIDER' };
+  }
+};
+
 const QuestionEntryItem = ({ depth,
   parentQuestionType,
   question,
@@ -56,7 +67,7 @@ const QuestionEntryItem = ({ depth,
   parentQuestionId,
   ctaNodes,
   onAddExpandChange }
-  : QuestionEntryItemProps) => {
+: QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { t } = useTranslation();
@@ -99,9 +110,7 @@ const QuestionEntryItem = ({ depth,
     },
   });
 
-  const activeType = question.type === 'Choice'
-    ? { label: question.type, value: 'CHOICE' }
-    : { label: 'Slider', value: 'SLIDER' };
+  const activeType = getSelectEntry(question.type);
 
   const handleScroll = () => {
     questionRef.current?.scrollIntoView({ behavior: 'smooth' });
