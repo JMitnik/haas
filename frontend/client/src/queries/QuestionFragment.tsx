@@ -10,6 +10,7 @@ export const QuestionFragment = gql`
     isRoot
     isLeaf
     type
+    extraContent
     sliderNode {
       id
       markers {

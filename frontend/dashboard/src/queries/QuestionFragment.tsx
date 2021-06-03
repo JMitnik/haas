@@ -8,6 +8,7 @@ const QuestionFragment = gql`
     updatedAt
     isRoot
     isLeaf
+    extraContent
     overrideLeaf {
       id
       type

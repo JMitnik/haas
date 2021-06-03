@@ -13,7 +13,7 @@ import Slider from './Slider';
 type SliderNodeProps = GenericNodeProps;
 
 const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
-  const form = useForm<{slider: number}>({
+  const form = useForm<{ slider: number }>({
     defaultValues: {
       slider: 50.01,
     },
@@ -40,9 +40,13 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
         <NodeTitle>{node.title}</NodeTitle>
       </Div>
       <Div>
-        <Slider markers={node?.sliderNode?.markers || []} form={form} onSubmit={handleSubmit} register={form.register} />
+        <Slider
+          markers={node?.sliderNode?.markers || []}
+          form={form}
+          onSubmit={handleSubmit}
+          register={form.register}
+        />
       </Div>
-
     </SliderNodeContainer>
   );
 };

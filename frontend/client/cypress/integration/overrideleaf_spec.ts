@@ -1,6 +1,6 @@
 /**
  * Settings
-**/
+* */
 
 // Neutral path with Node-CTA: Form (we are happy about your positive feedback)
 const sliderScore = 60;
@@ -9,16 +9,16 @@ const sliderScore = 60;
 const firstLayerButtonText = /website\/mobile app/i;
 
 // Layer 2 Choice with Choice-CTA:Form (we are happy about your positive feedback)
-const secondLayerChoice_A = /design/i;
-const CTA_A_text = /we are happy about your positive feedback/i;
+const secondLayerChoiceA = /design/i;
+const CTAAText = /we are happy about your positive feedback/i;
 
 // Layer 2 Choice with Choice-CTA:Link (thank you for your feedback)
-const secondLayerChoice_B = /other/i;
-const CTA_B_text = /thank you for your feedback on our website./i;
+const secondLayerChoiceB = /other/i;
+const CTABText = /thank you for your feedback on our website./i;
 
 // Layer 2 Choice with no-CTA (so previous Node-CTA)
-const secondLayerChoice_noCTA = /informative/i;
-const CTA_0_text = /we are happy about your positive feedback./i;
+const secondLayerChoiceNoCTA = /informative/i;
+const CTA0Text = /we are happy about your positive feedback./i;
 
 // This goes: Neutral => Website/Mobile App => Design (+Choice overrideCTA)
 beforeEach(() => {
@@ -33,7 +33,7 @@ beforeEach(() => {
       req.reply({ fixture: 'mockGetCustomer.json' });
     }
   }).as('getCustomer');
-})
+});
 
 it('neutral test, set overrideLeaf on Design', () => {
   cy.visit('http://localhost:3000/test/test');
@@ -56,10 +56,10 @@ it('neutral test, set overrideLeaf on Design', () => {
   cy.get('@websiteButton').click();
 
   // Design should lead to a Form CTA
-  cy.findByRole('button', { name: secondLayerChoice_A }).click();
+  cy.findByRole('button', { name: secondLayerChoiceA }).click();
 
   // Expect to arrive at a form with this text
-  cy.findByText(CTA_A_text);
+  cy.findByText(CTAAText);
   // TODO: Replace with form that is based on their language
   cy.findByText(/leave your details/i);
 });
@@ -86,11 +86,11 @@ it('neutral test, set overrideLeaf on Other', () => {
   cy.get('@websiteButton').click();
 
   // Other should lead to a Link CTA
-  cy.findByRole('button', { name: secondLayerChoice_B }).click();
+  cy.findByRole('button', { name: secondLayerChoiceB }).click();
 
   // Expect to arrive at a form with this text
-  cy.findByText(CTA_B_text);
-})
+  cy.findByText(CTABText);
+});
 
 // This goes: Neutral => Website/Mobile App => No overrideleaf
 it('neutral test, set no overrideLeaf', () => {
@@ -114,10 +114,10 @@ it('neutral test, set no overrideLeaf', () => {
   cy.get('@websiteButton').click();
 
   // Informative should lead to a CTA on level 2 (also Form)
-  cy.findByRole('button', { name: secondLayerChoice_noCTA }).click();
+  cy.findByRole('button', { name: secondLayerChoiceNoCTA }).click();
 
   // Expect to arrive at a form with this text
-  cy.findByText(CTA_0_text);
+  cy.findByText(CTA0Text);
 
   cy.findByText(/leave your details/i);
-})
+});
