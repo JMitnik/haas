@@ -78,7 +78,7 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
 const authShield = shield({
   Query: {
     users: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS),
-    user: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS),
+    user: or(isSelf, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
   },
   Customer: {
     usersConnection: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)
