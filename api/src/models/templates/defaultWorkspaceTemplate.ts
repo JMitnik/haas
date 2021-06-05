@@ -121,6 +121,7 @@ const defaultWorkspaceTemplate: WorkspaceTemplate = {
         set: [
           'CAN_VIEW_DIALOGUE',
           'CAN_VIEW_DIALOGUE_ANALYTICS',
+          'CAN_VIEW_USERS',
         ],
       },
     },

@@ -122,20 +122,17 @@ class AutodeckService {
       },
       data: {
         fields: {
-          // @ts-ignore
-          create: input.newCustomFields.map(({key, value}) => ({ key, value }))
+          create: input?.newCustomFields?.map(({ key, value }) => ({ key: key || '', value: value || '' }))
         }
       }
     })
   }
 
   static generateKeyValuePair = (input: NexusGenInputs['GenerateAutodeckInput']) => {
-    // @ts-ignore
-    const mergedCustomFields = input.customFields.concat(input.newCustomFields).concat(input.standardFields)
+    const mergedCustomFields = input?.customFields?.concat(input?.newCustomFields || []).concat(input.standardFields || []) || []
     let mappedKeyValuePairs = {}
     mergedCustomFields.forEach(({ key, value }) => {
-      // @ts-ignore
-      Object.assign(mappedKeyValuePairs, { [key]: value })
+      if (key) Object.assign(mappedKeyValuePairs, { [key]: value })
     })
 
     return mappedKeyValuePairs
@@ -152,7 +149,7 @@ class AutodeckService {
         if (err) return reject(err);
         const fileWithAdjusted = data.Contents?.find((file) => file.Key?.includes('/adjusted'))
         if (!fileWithAdjusted) {
-         resolve(false)
+          resolve(false)
         }
         resolve(true);
       })

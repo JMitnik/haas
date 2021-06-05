@@ -6,8 +6,10 @@ import { MailServiceType } from '../services/mailings/MailServiceTypes';
 import { LoginServiceType } from '../models/auth/LoginServiceType';
 import { CampaignService } from '../models/Campaigns/CampaignService';
 import { CampaignValidator } from '../models/Campaigns/CampaignValidator';
+import { UserServiceType } from '../models/users/UserServiceTypes';
 
 export interface APIServiceContainer {
+  userService: UserServiceType;
   mailService: MailServiceType;
   loginService: LoginServiceType;
   campaignService: CampaignService;

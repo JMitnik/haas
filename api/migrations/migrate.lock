@@ -1,3 +1,7 @@
 # Prisma Migrate lockfile v1
 
+<<<<<<< HEAD
 20210602201909-restart
+=======
+20210603185651-prisma-refresh
+>>>>>>> dev
