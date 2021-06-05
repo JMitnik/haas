@@ -64,7 +64,6 @@
         "zustand": "3.5.1"
     },
     "scripts": {
-        "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src",
         "start": "craco start",
         "start:msw": "REACT_APP_IS_MSW=true craco start",
         "test:watch": "jest test --watch --maxWorkers=0",
