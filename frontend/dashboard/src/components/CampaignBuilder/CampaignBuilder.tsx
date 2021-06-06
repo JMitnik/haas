@@ -17,71 +17,9 @@ import { ActiveFormProps, ActiveFormType, VariantType } from './CampaignBuilderT
 import { CampaignStep } from './CampaignStep';
 import { ChevronDown, Plus } from 'react-feather';
 import { CampaignVariantForm } from './CampaignVariantForm';
-
-interface VariantFormProblems {
-
-}
-
-interface CampaignState extends EditCampaignInputType {
-  variants: VariantType[];
-  addEmptyVariant: () => void;
-  activeForm?: ActiveFormProps | undefined;
-  setActiveForm: (activeFormType: ActiveFormType, activeDirectVariantIndex?: number) => void;
-  initializeCampaign: () => void;
-  editCampaignVariant: (input: any, index: number) => void;
-  editCampaign: any;
-}
-
-const useCampaignStore = create<CampaignState>(devtools(immer((set: SetState<CampaignState>) => ({
-  id: '',
-  label: '',
-  variants: [],
-  workspaceId: '',
-  activeForm: undefined,
-
-  initializeCampaign: () => set(state => {
-    state.label = 'My first campaign';
-    state.activeForm = {
-      type: 'CampaignForm'
-    };
-  }),
-  editCampaign: (campaignFormInputs: CampaignFormType) => set(state => {
-    // @ts-ignore
-    state.label = campaignFormInputs?.label;
-  }),
-  editCampaignVariant: (input: any, activeDirectVariantIndex: number) => set(state => {
-    // @ts-ignore
-    console.log(input);
-    let variant = state.variants[activeDirectVariantIndex];
-    state.variants[activeDirectVariantIndex] = {
-      ...variant,
-      label: input.label,
-      type: input.type,
-      scheduleType: input.scheduleType,
-    }
-  }),
-  setActiveForm: (activeFormType: ActiveFormType, activeDirectVariantIndex?: number) => set(state => {
-    state.activeForm = {
-      activeDirectVariantIndex,
-      type: activeFormType
-    };
-  }),
-
-  addEmptyVariant: () => {
-    set(state => {
-      state.variants?.push({
-        dialogueId: '',
-        id: '',
-        scheduleType:
-          CampaignScheduleEnum.General,
-        body: '',
-        hasProblem: false,
-        type: CampaignVariantEnum.Email,
-        workspaceId: '',
-      });
-    })
-  },
-}))));
+import { useCampaignStore } from './CampaignStore';
+import { RecursiveCampaignStep } from './RecursiveCampaignStep';
+import { get } from 'lodash';
 
 type EdgeType = 'Weights' | 'Normal';
 
@@ -90,7 +28,7 @@ interface IncomingCampaignEdgeProps {
   isActive?: boolean;
 }
 
-export const IncomingCampaignEdge = ({ type, isActive }: IncomingCampaignEdgeProps) => {
+export const IncomingCampaignEdge = ({ type = 'Weights', isActive }: IncomingCampaignEdgeProps) => {
   const { t } = useTranslation();
 
   return (
@@ -139,6 +77,26 @@ export const AddCampaignEdge = ({ onClick, type = 'Normal' }: { onClick?: () => 
   </LS.BuilderEdgeContainer>
 )
 
+const getParentIndex = (variantIndex: string): string | undefined => {
+  const possibleVariantIndex = variantIndex.lastIndexOf('.children[0].childVariant');
+
+  if (possibleVariantIndex) {
+    return variantIndex.slice(0, possibleVariantIndex);
+  }
+
+  return undefined;
+}
+
+const getParentEdgeIndex = (variantIndex: string): string | undefined => {
+  const possibleVariantIndex = variantIndex.lastIndexOf('.childVariant');
+
+  if (possibleVariantIndex) {
+    return variantIndex.slice(0, possibleVariantIndex);
+  }
+
+  return undefined;
+}
+
 export const CampaignBuilder = () => {
   const {
     variants,
@@ -152,6 +110,18 @@ export const CampaignBuilder = () => {
   } = useCampaignStore();
   const { t } = useTranslation();
   console.log(variants);
+
+  const activeVariant = activeForm?.activeDirectVariantIndex ?
+    get(variants, activeForm?.activeDirectVariantIndex, undefined) : undefined;
+
+  const parentVariantIndex = activeForm?.activeDirectVariantIndex ?
+    getParentIndex(activeForm?.activeDirectVariantIndex): undefined;
+  const parentActiveVariant = parentVariantIndex ? get(variants, parentVariantIndex, undefined): undefined;
+
+
+  const parentVariantEdgeIndex = activeForm?.activeDirectVariantIndex ?
+    getParentEdgeIndex(activeForm?.activeDirectVariantIndex): undefined;
+  const parentVariantEdge = parentVariantEdgeIndex ? get(variants, parentVariantEdgeIndex, undefined): undefined;
 
   return (
     <LS.BuilderContainer>
@@ -191,37 +161,13 @@ export const CampaignBuilder = () => {
             )}
             {variants.map((variant, index) => (
               <UI.Div key={index}>
-                <UI.Flex justifyContent="center">
-                  <IncomingCampaignEdge isActive={index === activeForm?.activeDirectVariantIndex} type={index==0 ? 'Weights': 'Normal'} />
-                </UI.Flex>
-                <CampaignStep
-                  label={label}
+                <RecursiveCampaignStep
                   activeForm={activeForm}
-                  type="CampaignVariantForm"
-                  directVariantIndex={index}
-                  onStepClick={setActiveForm}
-                >
-                  {({ isActive, onFormChange }) => (
-                    <>
-                      <UI.Div gridColumn="4/5">
-                        <LS.BuilderLabel isActive={isActive}>{index + 1}</LS.BuilderLabel>
-                      </UI.Div>
-                      <UI.Div gridColumn="5 / 9">
-                        <UI.Card isActive={isActive} bg="white" onClick={onFormChange}>
-                          <UI.CardBody>
-                            <UI.Helper mb={2}>{variant.scheduleType}</UI.Helper>
-                            {variant.label}
-                          </UI.CardBody>
-                        </UI.Card>
-                      </UI.Div>
-                    </>
-                  )}
-                </CampaignStep>
-                {index + 1 == variants.length && (
-                  <UI.Flex alignItems="center" justifyContent="center">
-                    <AddCampaignEdge onClick={() => addEmptyVariant()} />
-                  </UI.Flex>
-                )}
+                  addEmptyVariant={addEmptyVariant}
+                  setActiveForm={setActiveForm}
+                  rootIndex={`${index}`}
+                  variant={variant}
+                />
               </UI.Div>
             ))}
           </UI.Div>
@@ -231,11 +177,13 @@ export const CampaignBuilder = () => {
         {activeForm?.type === 'CampaignForm' && (
           <CampaignForm label={label} onChange={editCampaign} />
         )}
-        {activeForm?.type === 'CampaignVariantForm' && activeForm.activeDirectVariantIndex != undefined && (
+        {activeForm?.type === 'CampaignVariantForm' && activeVariant && activeForm.activeDirectVariantIndex != undefined && (
           <CampaignVariantForm
             key={activeForm.activeDirectVariantIndex}
             variantIndex={activeForm.activeDirectVariantIndex}
-            variant={variants[activeForm.activeDirectVariantIndex]}
+            variant={activeVariant}
+            pariantVariantEdgeIndex={parentVariantEdgeIndex}
+            parentVariantEdge={parentVariantEdge}
             onChange={editCampaignVariant}
           />
         )}

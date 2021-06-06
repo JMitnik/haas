@@ -7,7 +7,7 @@ import * as LS from './CampaignBuilderStyles';
 interface CampaignStepProps {
   onStepClick: any;
   children?: ({ isActive, onFormChange }: any) => React.ReactNode;
-  directVariantIndex?: number;
+  directVariantIndex?: string;
   activeForm?: ActiveFormProps;
   label?: string;
   type?: ActiveFormType;
@@ -17,7 +17,6 @@ interface CampaignStepProps {
 export const BaseCampaignStep = ({ activeForm, onStepClick, label, children }: CampaignStepProps) => {
   const handleActiveForm = () => onStepClick('CampaignForm');
   const isActive = activeForm?.type === 'CampaignForm';
-  console.log(activeForm);
 
   return (
     <LS.CampaignStepContainer>

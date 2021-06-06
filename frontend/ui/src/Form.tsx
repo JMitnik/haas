@@ -354,6 +354,7 @@ const ButtonRadioContainer = styled.div<ButtonRadioContainerProps>`
 `;
 
 interface RadioButtonProps {
+  onClick?: any;
   isChecked?: boolean;
   isDisabled?: boolean;
   value?: any;
