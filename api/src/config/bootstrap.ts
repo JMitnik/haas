@@ -7,6 +7,7 @@ import { PrismaClientOptions } from "@prisma/client/runtime"
 import CustomerService from "../models/customer/CustomerService"
 import AutodeckService from "../models/autodeck/AutodeckService"
 import DialogueService from "../models/questionnaire/DialogueService"
+import AuthService from "../models/auth/AuthService"
 
 export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -15,7 +16,9 @@ export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, neve
   // TODO: Dependency injection of customer service into autodeck service as paramater?
   const autodeckService = new AutodeckService(prisma);
   const dialogueService = new DialogueService(prisma);
+  const authService = new AuthService(prisma);
   return {
+    authService,
     dialogueService,
     autodeckService,
     customerService,

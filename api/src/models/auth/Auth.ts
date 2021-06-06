@@ -30,9 +30,9 @@ export const RegisterMutation = mutationField('register', {
   nullable: true,
   args: { input: RegisterInput },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     if (!args.input) throw new ApolloError('Input information required');
-    const user = await AuthService.registerUser(args.input);
+    const user = await ctx.services.authService.registerUser(args.input);
 
     return {
 
@@ -79,25 +79,7 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
   async resolve(parent, args, ctx) {
     if (!args.token) throw new UserInputError('No token could be found');
     const decodedToken = verifyAndDecodeToken(args.token) as any;
-
-    const validUsers = await ctx.prisma.user.findMany({
-      where: {
-        AND: {
-          loginToken: {
-            equals: args.token,
-          },
-          id: { equals: decodedToken?.id },
-        }
-      },
-      include: {
-        customers: {
-          include: {
-            customer: true,
-            role: true,
-          },
-        },
-      },
-    });
+    const validUsers = await ctx.services.userService.getValidUsers(args.token, decodedToken?.id)
 
     // Check edge cases
     if (!validUsers.length) throw new ApolloError('No token has been found for this user');
@@ -115,13 +97,7 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
     const accessTokenExpiry = AuthService.getExpiryTimeFromToken(accessToken);
 
     // It seems all is good now. We can remove the token from the database, and set a refresh token on the user
-    await prisma.user.update({
-      where: { id: validUser.id },
-      data: {
-        refreshToken,
-        loginToken: null,
-      },
-    });
+    await ctx.services.userService.setRefreshToken(validUser.id, refreshToken);
 
     ctx.res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
@@ -177,23 +153,12 @@ export const RequestInviteMutation = mutationField('requestInvite', {
   async resolve(parent, args, ctx) {
     if (!args?.input?.email) throw new UserInputError('No email provided');
 
-    const user = await ctx.prisma.user.findFirst({
-      where: {
-        email: {
-          equals: args.input.email,
-          mode: 'insensitive',
-        },
-      },
-    });
+    const user = await ctx.services.userService.getUserByEmail(args.input.email);
 
     if (!user) return { didInvite: false, userExists: false };
 
     const loginToken = AuthService.createUserToken(user.id);
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { loginToken },
-    });
+    await ctx.services.userService.setLoginToken(user.id, loginToken);
 
     const loginBody = makeSignInTemplate({
       recipientMail: user.email,
@@ -226,7 +191,7 @@ export const RefreshAccessTokenQuery = queryField('refreshAccessToken', {
 
   async resolve(parent, args, ctx) {
     if (!ctx.session?.user?.id) throw new ApolloError('No verified user');
-    const refreshTokenIsValid = await AuthService.verifyUserRefreshToken(ctx.session.user?.id);
+    const refreshTokenIsValid = await ctx.services.authService.verifyUserRefreshToken(ctx.session.user?.id);
 
     if (!refreshTokenIsValid) {
       throw new ApolloError('Unauthenticated', 'UNAUTHENTICATED');
@@ -247,10 +212,7 @@ export const LogoutMutation = mutationField('logout', {
   async resolve(parent, args, ctx) {
     if (!ctx.session?.user?.id) throw new ApolloError('No user found');
     ctx.res.cookie('refresh_token', null);
-    await ctx.prisma.user.update({
-      where: { id: ctx.session.user.id },
-      data: { refreshToken: null },
-    });
+    await ctx.services.userService.logout(ctx.session.user.id);
 
     return 'Logged out';
   },
@@ -266,22 +228,11 @@ export const InviteUserMutation = mutationField('inviteUser', {
     const { customerId, email, roleId } = args.input;
 
     // Check if email already has been created
-    const users = await ctx.prisma.user.findMany({
-      where: { email },
-      include: {
-        customers: {
-          where: { customerId },
-          include: {
-            customer: true,
-            role: true,
-          },
-        },
-      },
-    });
+    const user = await ctx.services.userService.findEmailWithinWorkspace(email, customerId);
 
     // Case 1: If user completely does not exist in our database yet,
     //  create a new entry and login-token
-    if (!users.length) {
+    if (!user) {
       await ctx.services.userService.inviteNewUserToCustomer(email, customerId, roleId);
 
       return {
@@ -290,7 +241,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
       };
     }
 
-    const [user] = users;
+    // const [user] = users;
 
     // Case 2: If user-customer relation already exists,
     // just update the role itself

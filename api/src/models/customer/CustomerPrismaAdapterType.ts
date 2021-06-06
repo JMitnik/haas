@@ -18,4 +18,6 @@ export interface CustomerPrismaAdapterType {
     tags: Tag[];
   }) | undefined>;
   getAllCustomersBySlug(customerSlug?: string | null): Promise<Customer[]>;
+  exists(customerId: string): Promise<Boolean>;
+  findWorkspaceBySlugs(slugs: Array<string | undefined>): Promise<Customer | null>;
 }

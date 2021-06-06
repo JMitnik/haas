@@ -5,7 +5,7 @@ import { GraphQLError } from 'graphql';
 import { APIContext } from '../types/APIContext';
 import Sentry from './sentry';
 import authShield from './auth';
-import constructSession from '../models/auth/constructContextSession';
+import ContextSessionService from '../models/auth/ContextSessionService';
 import prisma from './prisma';
 import schema from './schema';
 import { bootstrapServices } from './bootstrap';
@@ -51,7 +51,7 @@ const makeApollo = async () => {
     schema: applyMiddleware(schema, authShield),
     context: async (ctx): Promise<APIContext> => ({
       ...ctx,
-      session: await constructSession(ctx),
+      session: await new ContextSessionService(ctx, prisma).constructContextSession(),
       prisma,
       services: bootstrapServices(prisma),
     }),

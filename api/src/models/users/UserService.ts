@@ -11,12 +11,50 @@ import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemp
 import prisma from '../../config/prisma';
 import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
 import { UserServiceType } from './UserServiceTypes';
+import { UserPrismaAdapterType } from './UserPrismaAdapterType';
+import UserPrismaAdapter from './UserPrismaAdapter';
 
 class UserService implements UserServiceType {
   prisma: PrismaClient<PrismaClientOptions, never>;
+  userPrismaAdapter: UserPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.prisma = prismaClient;
+    this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
+  }
+  findEmailWithinWorkspace(emailAddress: string, workspaceId: string) {
+    return this.userPrismaAdapter.findUserWithinWorkspace(emailAddress, workspaceId);
+  }
+
+  logout(userId: string): Promise<import("@prisma/client").User> {
+    return this.userPrismaAdapter.update(userId, { refreshToken: null });
+  }
+
+  setLoginToken(userId: string, loginToken: string): Promise<import("@prisma/client").User> {
+    return this.userPrismaAdapter.update(userId, { loginToken });
+  }
+
+  async getUserById(userId: string) {
+    return this.userPrismaAdapter.findFirst({
+      id: userId
+    });
+  }
+
+  async getUserByEmail(emailAddress: string): Promise<import("@prisma/client").User | null> {
+    return this.userPrismaAdapter.findFirst({
+      email: {
+        equals: emailAddress,
+        mode: 'insensitive',
+      }
+    })
+  };
+
+  async setRefreshToken(userId: string, refreshToken: string): Promise<import("@prisma/client").User> {
+    return this.userPrismaAdapter.update(userId, { refreshToken, loginToken: null });
+  };
+
+  async getValidUsers(loginToken: string, userId: string | undefined): Promise<(import("@prisma/client").User & { customers: (UserOfCustomer & { customer: import("@prisma/client").Customer; role: import("@prisma/client").Role; })[]; })[]> {
+    return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   }
 
   // TODO: Remove as this function is not used anymore (apparently haha XD)

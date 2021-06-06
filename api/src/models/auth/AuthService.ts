@@ -1,37 +1,43 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
+import { PrismaClientOptions } from '@prisma/client/runtime';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import RoleService from '../role/RoleService';
 import config from '../../config/config';
 import prisma from '../../config/prisma';
 
-class AuthService {
-  static async registerUser(userInput: NexusGenInputs['RegisterInput']) {
-    const customerExists = prisma.customer.findFirst({
-      where: { id: userInput.customerId }
-    });
+import { UserPrismaAdapterType, RegisterUserInput } from '../users/UserPrismaAdapterType';
+import UserPrismaAdapter from '../users/UserPrismaAdapter';
+import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
+import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
+import { AuthServiceType } from './AuthServiceType';
+import UserService from '../users/UserService';
+import { UserServiceType } from '../users/UserServiceTypes';
+
+class AuthService implements AuthServiceType {
+  prisma: PrismaClient<PrismaClientOptions, never>;
+  customerPrismaAdapter: CustomerPrismaAdapterType;
+  userPrismaAdapter: UserPrismaAdapterType;
+  userService: UserServiceType;
+
+  constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
+    this.prisma = prismaClient;
+    this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
+    this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
+    this.userService = new UserService(prisma);
+  }
+  
+  async registerUser(userInput: NexusGenInputs['RegisterInput']) {
+    const customerExists = await this.customerPrismaAdapter.exists(userInput.customerId);
 
     if (!customerExists) throw new UserInputError('Customer does not exist');
 
-    const userExists = await prisma.user.findMany({
-      where: {
-        customers: {
-          some: {
-            AND: [{
-              customerId: userInput.customerId,
-            }, {
-              user: {
-                email: userInput.email,
-              },
-            }],
-          },
-        },
-      },
-    });
+    const userExists = await this.userPrismaAdapter.existsWithinWorkspace(userInput.email, userInput.customerId);
 
-    if (userExists.length) throw new UserInputError('User already exists');
+    if (userExists) throw new UserInputError('User already exists');
 
     const hashedPassword = await AuthService.generatePassword(userInput.password);
 
@@ -39,39 +45,24 @@ class AuthService {
       RoleService.fetchDefaultRoleForCustomer(userInput.customerId);
     }
 
-    const user = await prisma.user.create({
-      data: {
-        email: userInput.email,
-        firstName: userInput.firstName,
-        lastName: userInput.lastName,
-        password: hashedPassword,
-        customers: {
-          create: {
-            customer: { connect: { id: userInput.customerId || undefined } },
-            role: { connect: { id: (await RoleService.fetchDefaultRoleForCustomer(userInput.customerId)).id || undefined } },
-          },
-        },
-      },
-      include: {
-        customers: {
-          include: {
-            role: true,
-            customer: true,
-          },
-        },
-      },
-    });
+    const registerUserInput: RegisterUserInput = { 
+      email: userInput.email, 
+      firstName: userInput.firstName, 
+      lastName: userInput.lastName, 
+      password: hashedPassword, 
+      workspaceId: userInput.customerId
+    }
+
+    const user = await this.userPrismaAdapter.registerUser(registerUserInput);
 
     if (!user) throw new Error('Unable to make user');
 
     return user;
   }
 
-  static async verifyUserRefreshToken(userId: string): Promise<boolean> {
+  async verifyUserRefreshToken(userId: string): Promise<boolean> {
     try {
-      const user = await prisma.user.findOne({
-        where: { id: userId },
-      });
+      const user = await this.userService.getUserById(userId);
 
       if (!user?.refreshToken) return false;
       jwt.verify(user?.refreshToken, config.jwtSecret);
