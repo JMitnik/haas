@@ -23,6 +23,7 @@ export const TreeNodeModel = types
   .model('TreeNode', {
     id: types.identifier,
     title: types.string,
+    extraContent: types.maybeNull(types.string),
     isRoot: types.optional(types.boolean, false),
     isLeaf: types.optional(types.boolean, false),
     isPostLeaf: types.optional(types.boolean, false),

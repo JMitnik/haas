@@ -158,7 +158,7 @@ const QuestionSection = ({
             index={0}
             questionsQ={questionsQ}
             question={{
-              id: '-1', title: '', icon: Icon, isRoot: false, isLeaf: false, type: 'Multi-Choice',
+              id: '-1', title: '', icon: Icon, isRoot: false, isLeaf: false, type: 'Multi-Choice', extraContent: '',
             }}
             Icon={Icon}
             leafs={leafs}

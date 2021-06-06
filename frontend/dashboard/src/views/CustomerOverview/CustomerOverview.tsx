@@ -70,15 +70,17 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
           <H4 mb={2} color="gray.500">
             {t('active_projects')}
           </H4>
-          {canAccessAdmin && (
-          <Span>
-            <UI.Button bg="gray.200" mb={2} size="sm" variant="outline" leftIcon={UserCheck} onClick={goToAdminPanel}>
-              <Link to="/dashboard/b/admin">
-                {t('adminpanel')}
-              </Link>
-            </UI.Button>
-          </Span>
-          )}
+
+          {/* TEMPORARY Disabled */}
+          {/* {canAccessAdmin && (
+            <Span>
+              <UI.Button bg="gray.200" mb={2} size="sm" variant="outline" leftIcon={UserCheck} onClick={goToAdminPanel}>
+                <Link to="/dashboard/b/admin">
+                  {t('adminpanel')}
+                </Link>
+              </UI.Button>
+            </Span>
+          )} */}
         </Flex>
 
         <MotionGrid

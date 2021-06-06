@@ -6,7 +6,7 @@ import { ApolloError, UserInputError } from 'apollo-server-express';
 import {
   Dialogue, DialogueCreateInput, DialogueUpdateInput,
   NodeType,
-  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, PrismaClient, SessionCreateInput
+  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, PrismaClient, SessionCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import NodeService from '../QuestionNode/NodeService';
@@ -410,11 +410,15 @@ class DialogueService implements DialogueServiceType {
 
       const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
       const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
+      const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId 
+      ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } 
+      : undefined
       const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
       const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
       const mappedObject = {
         ...question,
         id: mappedId,
+        videoEmbeddedNode: mappedVideoEmbeddedNode,
         questionDialogueId: mappedDialogueId,
         links: { create: mappedLinks },
         options: mappedOptions,
@@ -484,6 +488,7 @@ class DialogueService implements DialogueServiceType {
             }
           } : undefined,
           type: leaf.type,
+          videoEmbeddedNode: leaf.videoEmbeddedNode,
           sliderNode: leaf.sliderNode ? {
             create: {
               markers: {

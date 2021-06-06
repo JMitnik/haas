@@ -178,6 +178,7 @@ export type CreateQuestionNodeInputType = {
   dialogueSlug?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
+  extraContent?: Maybe<Scalars['String']>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
@@ -1291,6 +1292,7 @@ export type QuestionNode = {
   isRoot: Scalars['Boolean'];
   title: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
+  extraContent?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   type: QuestionNodeTypeEnum;
   overrideLeafId?: Maybe<Scalars['String']>;
@@ -1316,7 +1318,8 @@ export enum QuestionNodeTypeEnum {
   Form = 'FORM',
   Textbox = 'TEXTBOX',
   Link = 'LINK',
-  Share = 'SHARE'
+  Share = 'SHARE',
+  VideoEmbedded = 'VIDEO_EMBEDDED'
 }
 
 export type QuestionNodeWhereInputType = {
@@ -1652,6 +1655,7 @@ export type UpdateQuestionNodeInputType = {
   edgeId?: Maybe<Scalars['ID']>;
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
+  extraContent?: Maybe<Scalars['String']>;
   sliderNode?: Maybe<SliderNodeInputType>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;

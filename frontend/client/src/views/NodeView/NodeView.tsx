@@ -18,10 +18,12 @@ import ShareNode from './nodes/ShareNode/ShareNode';
 import SliderNode from './nodes/SliderNode/SliderNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
 import TextboxNode from './nodes/TextboxNode/TextboxNode';
+import VideoEmbeddedNode from './nodes/VideoEmbeddedNode/VideoEmbeddedNode';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
   CHOICE: MultiChoiceNode,
+  VIDEO_EMBEDDED: VideoEmbeddedNode,
   TEXTBOX: TextboxNode,
   FORM: FormNode,
   LINK: SocialShareNode,
@@ -62,7 +64,6 @@ const NodeView = ({ node }: NodeViewProps) => {
     if (overrideLeaf) {
       store.tree?.setOverrideLeaf(overrideLeaf);
     }
-
 
     // Use current condition to decide next Edge (or if we are at leaf, we will do something else)
     const { edgeId, goesToLeaf, goesToPostLeaf, nextNode } = node.getNextEdgeIdFromKey(edgeKey);
