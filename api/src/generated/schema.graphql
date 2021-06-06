@@ -217,7 +217,6 @@ type Customer {
   name: String!
   settings: CustomerSettings
   slug: String!
-  userCustomer(userId: String): UserCustomer
   users: [UserType!]
   usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
 }

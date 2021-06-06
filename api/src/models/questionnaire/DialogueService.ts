@@ -66,6 +66,10 @@ class DialogueService implements DialogueServiceType {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
   }
 
+  findDialoguesByCustomerId(customerId: string) {
+    return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId);
+  }
+
   async delete(dialogueId: string) {
     return this.dialoguePrismaAdapter.delete(dialogueId);
   }

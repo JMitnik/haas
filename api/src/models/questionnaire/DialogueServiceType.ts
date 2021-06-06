@@ -1,8 +1,9 @@
-import { Dialogue } from "@prisma/client";
+import { Dialogue, Tag } from "@prisma/client";
 import { WorkspaceTemplate } from "../templates/defaultWorkspaceTemplate";
 import { NexusGenInputs } from "../../generated/nexus";
 
 export interface DialogueServiceType {
+  findDialoguesByCustomerId(customerId: string): Promise<(Dialogue & { tags: Tag[]; })[]>;
   findDialogueIdsByCustomerId(customerId: string): Promise<Array<string>>;
   delete(dialogueId: string): Promise<Dialogue>;
   deleteDialogue(dialogueId: string): Promise<Dialogue>

@@ -88,48 +88,31 @@ export const CustomerType = objectType({
       },
     });
 
-    t.field('userCustomer', {
-      type: UserCustomerType,
-      args: { userId: 'String' },
-      nullable: true,
+    // t.field('userCustomer', {
+    //   type: UserCustomerType,
+    //   args: { userId: 'String' },
+    //   nullable: true,
 
-      async resolve(parent, args, ctx) {
-        if (!args.userId) throw new UserInputError('No valid user id provided');
+    //   async resolve(parent, args, ctx) {
+    //     if (!args.userId) throw new UserInputError('No valid user id provided');
 
-        const customerWithUsers = await ctx.prisma.customer.findOne({
-          where: { id: parent.id },
-          include: {
-            users: {
-              where: {
-                userId: args.userId,
-              },
-              include: {
-                user: true,
-                role: true,
-                customer: true,
-              },
-            },
-          },
-        });
+    //     const user2 = await ctx.prisma.userOfCustomer.findFirst({
+    //       where: {
+    //         customerId: parent.id,
+    //         userId: args.userId,
+    //       },
+    //       include: {
+    //         customer: true,
+    //         user: true,
+    //         role: true,
+    //       }
+    //     });
+    //     console.log( 'user2: ', user2);
+    //     if (!user2) throw new UserInputError('Cant find user with this ID');
 
-        const user = customerWithUsers?.users[0];
-        const user2 = await ctx.prisma.userOfCustomer.findFirst({
-          where: {
-            customerId: parent.id,
-            userId: args.userId,
-          },
-          include: {
-            customer: true,
-            user: true,
-            role: true,
-          }
-        });
-        console.log('user1: ', user, 'user2: ', user2);
-        if (!user) throw new UserInputError('Cant find user with this ID');
-
-        return user as any;
-      },
-    });
+    //     return user2 as any;
+    //   },
+    // });
 
     t.list.field('dialogues', {
       type: DialogueType,
@@ -140,14 +123,7 @@ export const CustomerType = objectType({
       async resolve(parent: Customer, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
-        let dialogues = await prisma.dialogue.findMany({
-          where: {
-            customerId: parent.id,
-          },
-          include: {
-            tags: true,
-          },
-        });
+        let dialogues = await ctx.services.dialogueService.findDialoguesByCustomerId(parent.id);
 
         if (args.filter && args.filter.searchTerm) {
           dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);

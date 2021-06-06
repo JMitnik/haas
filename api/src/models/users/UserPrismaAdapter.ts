@@ -68,6 +68,15 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
   async findFirst(where: UserWhereInput): Promise<import("@prisma/client").User | null> {
     return this.prisma.user.findFirst({
       where: where,
+      include: {
+        customers: {
+          include: {
+            customer: true,
+            role: true,
+            user: true,
+          }
+        }
+      }
     })
   }
 

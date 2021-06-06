@@ -918,7 +918,6 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
     slug: string; // String!
-    userCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     users: NexusGenRootTypes['UserType'][] | null; // [UserType!]
     usersConnection: NexusGenRootTypes['UserConnection'] | null; // UserConnection
   }
@@ -1380,9 +1379,6 @@ export interface NexusGenArgTypes {
     }
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
-    }
-    userCustomer: { // args
-      userId?: string | null; // String
     }
     usersConnection: { // args
       customerSlug?: string | null; // String

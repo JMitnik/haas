@@ -121,6 +121,17 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
     });
   };
 
+  async findDialoguesByCustomerId(customerId: string) {
+    return this.prisma.dialogue.findMany({
+      where: {
+        customerId,
+      },
+      include: {
+        tags: true,
+      },
+    });
+  };
+
   async findDialogueIdsOfCustomer(customerId: string): Promise<Array<{id: string}>> {
     return this.prisma.dialogue.findMany({
       where: {
