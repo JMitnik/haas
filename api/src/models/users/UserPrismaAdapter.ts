@@ -9,6 +9,22 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     this.prisma = prismaClient;
   }
 
+  findUserContext(userId: string) {
+    return this.prisma.user.findOne({
+      where: {
+        id: userId,
+      },
+      include: {
+        customers: {
+          include: {
+            customer: true,
+            role: true,
+          },
+        },
+      },
+    });
+  }
+
   async registerUser(registerUserInput: RegisterUserInput) {
     return this.prisma.user.create({
       data: {
@@ -80,7 +96,7 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     })
   }
 
-  async update(userId: string | undefined, data: UserUpdateInput ): Promise<import("@prisma/client").User> {
+  async update(userId: string | undefined, data: UserUpdateInput): Promise<import("@prisma/client").User> {
     return this.prisma.user.update({
       where: { id: userId },
       data,

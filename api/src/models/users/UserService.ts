@@ -22,6 +22,11 @@ class UserService implements UserServiceType {
     this.prisma = prismaClient;
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
   }
+
+  findUserContext(userId: string) {
+    return this.userPrismaAdapter.findUserContext(userId);
+  }
+
   findEmailWithinWorkspace(emailAddress: string, workspaceId: string) {
     return this.userPrismaAdapter.findUserWithinWorkspace(emailAddress, workspaceId);
   }

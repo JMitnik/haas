@@ -14,5 +14,7 @@ export interface CustomerServiceType {
   delete(customerId: string): Promise<Customer>;
   findWorkspaceBySlugs(slugs: Array<string | undefined>): Promise<Customer | null>;
   getCustomerSettingsByCustomerId(customerId: string): Promise<CustomerSettings | null>;
-    
+  findAll(): Promise<Customer[]>;
+  findWorkspaceBySlug(slug: string): Promise<Customer|null>;
+  findWorkspaceById(id: string): Promise<Customer|null>;
 }

@@ -11,14 +11,19 @@ import { fetchTunnelUrl } from '../../utils/fetchTunnelUrl';
 import { PrismaClient } from '@prisma/client';
 import CustomerService from '../customer/CustomerService';
 import { ContextSessionServiceType } from './ContextSessionServiceType';
+import { UserServiceType } from '../users/UserServiceTypes';
+import { CustomerServiceType } from '../customer/CustomerServiceType';
+import UserService from '../users/UserService';
 
 
 class ContextSessionService implements ContextSessionServiceType{
-  customerService: CustomerService;
+  customerService: CustomerServiceType;
+  userService: UserServiceType;
   context: ExpressContext
 
   constructor(context: ExpressContext, prismaClient: PrismaClient) {
     this.customerService = new CustomerService(prismaClient);
+    this.userService = new UserService(prismaClient);
     this.context = context;
   }
 
@@ -71,19 +76,7 @@ class ContextSessionService implements ContextSessionServiceType{
     if (!decodedUserId) return null;
     if (!decodedExpAt) return null;
   
-    const user = await prisma.user.findOne({
-      where: {
-        id: decodedUserId,
-      },
-      include: {
-        customers: {
-          include: {
-            customer: true,
-            role: true,
-          },
-        },
-      },
-    });
+    const user = await this.userService.findUserContext(decodedUserId);
   
     const customersAndPermissions = user?.customers.map((customer) => ({
       permissions: customer.role.permissions,

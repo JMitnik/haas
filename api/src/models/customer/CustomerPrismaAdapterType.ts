@@ -20,4 +20,7 @@ export interface CustomerPrismaAdapterType {
   getAllCustomersBySlug(customerSlug?: string | null): Promise<Customer[]>;
   exists(customerId: string): Promise<Boolean>;
   findWorkspaceBySlugs(slugs: Array<string | undefined>): Promise<Customer | null>;
+  findAll(): Promise<Customer[]>;
+  findWorkspaceBySlug(slug: string): Promise<Customer|null>;
+  findWorkspaceById(id: string): Promise<Customer|null>;
 }

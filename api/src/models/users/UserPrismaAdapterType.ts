@@ -1,4 +1,4 @@
-import { User, UserOfCustomer, Customer, Role, UserUpdateInput, UserWhereUniqueInput, UserWhereInput } from "@prisma/client";
+import { User, UserOfCustomer, Customer, Role, UserUpdateInput, UserWhereUniqueInput, UserWhereInput, UserInclude } from "@prisma/client";
 
 export interface RegisterUserInput {
   email: string,
@@ -24,5 +24,11 @@ export interface UserPrismaAdapterType {
       role: Role;
       customer: Customer;
     })[];
-  } | null>
+  } | null>;
+  findUserContext(userId: string): Promise<(User & {
+    customers: (UserOfCustomer & {
+      customer: Customer;
+      role: Role;
+    })[];
+  }) | null>
 }

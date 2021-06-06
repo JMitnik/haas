@@ -88,32 +88,6 @@ export const CustomerType = objectType({
       },
     });
 
-    // t.field('userCustomer', {
-    //   type: UserCustomerType,
-    //   args: { userId: 'String' },
-    //   nullable: true,
-
-    //   async resolve(parent, args, ctx) {
-    //     if (!args.userId) throw new UserInputError('No valid user id provided');
-
-    //     const user2 = await ctx.prisma.userOfCustomer.findFirst({
-    //       where: {
-    //         customerId: parent.id,
-    //         userId: args.userId,
-    //       },
-    //       include: {
-    //         customer: true,
-    //         user: true,
-    //         role: true,
-    //       }
-    //     });
-    //     console.log( 'user2: ', user2);
-    //     if (!user2) throw new UserInputError('Cant find user with this ID');
-
-    //     return user2 as any;
-    //   },
-    // });
-
     t.list.field('dialogues', {
       type: DialogueType,
       nullable: true,
@@ -324,7 +298,7 @@ export const CustomersQuery = extendType({
     t.list.field('customers', {
       type: CustomerType,
       async resolve(parent, args, ctx) {
-        const customers = await ctx.prisma.customer.findMany();
+        const customers = await ctx.services.customerService.findAll();
         return customers;
       },
     });
@@ -343,12 +317,12 @@ export const CustomerQuery = extendType({
       nullable: true,
       async resolve(parent, args, ctx) {
         if (args.slug) {
-          const customer = await ctx.prisma.customer.findOne({ where: { slug: args.slug } });
+          const customer = await ctx.services.customerService.findWorkspaceBySlug(args.slug);
           return customer;
         }
 
         if (args.id) {
-          const customer = await ctx.prisma.customer.findOne({ where: { id: args.id } });
+          const customer = await ctx.services.customerService.findWorkspaceById(args.id);
           return customer;
         }
 

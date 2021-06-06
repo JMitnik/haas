@@ -10,8 +10,20 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
     this.prisma = prisma;
   }
 
+  findWorkspaceBySlug(slug: string): Promise<Customer | null> {
+    return this.prisma.customer.findOne({ where: { slug } });
+  }
+
+  findWorkspaceById(id: string): Promise<Customer | null> {
+    return this.prisma.customer.findOne({ where: { id } });
+  }
+
+  async findAll() {
+    return this.prisma.customer.findMany();
+  }
+
   
-  findWorkspaceBySlugs(slugs: Array<string|undefined>): Promise<Customer | null> {
+  async findWorkspaceBySlugs(slugs: Array<string|undefined>): Promise<Customer | null> {
     const filteredSlugs: any = slugs.filter((slug) => slug);
     return this.prisma.customer.findFirst({
       where: {
