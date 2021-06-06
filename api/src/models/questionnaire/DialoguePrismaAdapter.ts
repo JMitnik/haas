@@ -32,6 +32,7 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
         questions: {
           include: {
             links: true,
+            videoEmbeddedNode: true,
             sliderNode: {
               include: {
                 markers: {

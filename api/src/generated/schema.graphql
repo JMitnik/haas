@@ -248,10 +248,6 @@ type CustomFieldType {
 """Date custom scalar type"""
 scalar Date
 
-type Debug {
-  debugResolver: String
-}
-
 input DeleteDialogueInputType {
   customerSlug: String
   id: ID
@@ -642,7 +638,6 @@ type Mutation {
   createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
-  debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!
@@ -669,10 +664,6 @@ type Mutation {
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
-<<<<<<< HEAD
-=======
-  updateJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
->>>>>>> dev
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType

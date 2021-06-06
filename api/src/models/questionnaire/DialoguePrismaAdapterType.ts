@@ -1,4 +1,4 @@
-import { Dialogue, DialogueUpdateInput, QuestionNode, Edge, QuestionCondition, DialogueCreateInput, Subset, DialogueCreateArgs, Link, SliderNode, SliderNodeMarker, SliderNodeRange, FormNode, FormNodeField, DialogueInclude } from "@prisma/client";
+import { Dialogue, DialogueUpdateInput, QuestionNode, Edge, QuestionCondition, DialogueCreateInput, Subset, DialogueCreateArgs, Link, SliderNode, SliderNodeMarker, SliderNodeRange, FormNode, FormNodeField, DialogueInclude, VideoEmbeddedNode } from "@prisma/client";
 import { AnyKindOfDictionary } from "lodash";
 export interface DialoguePrismaAdapterType {
   getTemplateDialogue(dialogueId: string): Promise<(Dialogue & {
@@ -13,6 +13,7 @@ export interface DialoguePrismaAdapterType {
     })[];
     questions: (QuestionNode & {
         links: Link[];
+        videoEmbeddedNode: VideoEmbeddedNode | null;
         sliderNode: (SliderNode & { markers: (SliderNodeMarker & { range: SliderNodeRange; })[]; }) | null;
         form: (FormNode & { fields: FormNodeField[]; }) | null;
         options: any;
