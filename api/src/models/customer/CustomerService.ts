@@ -46,6 +46,10 @@ class CustomerService implements CustomerServiceType {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
   }
 
+  getCustomerSettingsByCustomerId(customerId: string): Promise<import("@prisma/client").CustomerSettings | null> {
+    return this.customerSettingsPrismaAdapter.getCustomerSettingsByCustomerId(customerId);
+  }
+
   findWorkspaceBySlugs(slugs: (string | undefined)[]) {
     return this.customerPrismaAdapter.findWorkspaceBySlugs(slugs);
   }

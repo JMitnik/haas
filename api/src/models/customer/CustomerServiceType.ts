@@ -13,4 +13,6 @@ export interface CustomerServiceType {
   seedByTemplate(customer: Customer, template?: WorkspaceTemplate, willGenerateFakeData?: boolean): Promise<void>;
   delete(customerId: string): Promise<Customer>;
   findWorkspaceBySlugs(slugs: Array<string | undefined>): Promise<Customer | null>;
+  getCustomerSettingsByCustomerId(customerId: string): Promise<CustomerSettings | null>;
+    
 }

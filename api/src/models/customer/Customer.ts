@@ -37,11 +37,8 @@ export const CustomerType = objectType({
       nullable: true,
 
       async resolve(parent: Customer, args, ctx) {
-        const customerSettings = await ctx.prisma.customerSettings.findOne({
-          where: { customerId: parent.id },
-        });
-
-        return customerSettings as any;
+        const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
+        return customerSettings;
       },
     });
 
@@ -116,7 +113,18 @@ export const CustomerType = objectType({
         });
 
         const user = customerWithUsers?.users[0];
-
+        const user2 = await ctx.prisma.userOfCustomer.findFirst({
+          where: {
+            customerId: parent.id,
+            userId: args.userId,
+          },
+          include: {
+            customer: true,
+            user: true,
+            role: true,
+          }
+        });
+        console.log('user1: ', user, 'user2: ', user2);
         if (!user) throw new UserInputError('Cant find user with this ID');
 
         return user as any;
@@ -256,11 +264,11 @@ export const WorkspaceMutations = Upload && extendType({
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
           },
-          (error, result: UploadApiResponse | undefined) => {
-            if (result) return resolve(result);
+            (error, result: UploadApiResponse | undefined) => {
+              if (result) return resolve(result);
 
-            return reject(error);
-          });
+              return reject(error);
+            });
 
           return createReadStream().pipe(cld_upload_stream);
         });

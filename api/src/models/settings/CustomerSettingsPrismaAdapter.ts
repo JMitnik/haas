@@ -8,6 +8,12 @@ class CustomerSettingsPrismaAdapter implements CustomerSettingsPrismaAdapterType
     this.prisma = prismaClient;
   }
 
+  async getCustomerSettingsByCustomerId(customerId: string) {
+    return this.prisma.customerSettings.findOne({
+      where: { customerId },
+    });
+  }
+
   async deleteByCustomerId(customerId: string): Promise<CustomerSettings> {
     return this.prisma.customerSettings.delete({
       where: {
