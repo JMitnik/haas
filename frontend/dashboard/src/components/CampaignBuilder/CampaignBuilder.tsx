@@ -78,17 +78,7 @@ export const AddCampaignEdge = ({ onClick, type = 'Normal' }: { onClick?: () => 
 )
 
 const getParentIndex = (variantIndex: string): string | undefined => {
-  const possibleVariantIndex = variantIndex.lastIndexOf('.children[0].childVariant');
-
-  if (possibleVariantIndex) {
-    return variantIndex.slice(0, possibleVariantIndex);
-  }
-
-  return undefined;
-}
-
-const getParentEdgeIndex = (variantIndex: string): string | undefined => {
-  const possibleVariantIndex = variantIndex.lastIndexOf('.childVariant');
+  const possibleVariantIndex = variantIndex.lastIndexOf('.children[0]');
 
   if (possibleVariantIndex) {
     return variantIndex.slice(0, possibleVariantIndex);
@@ -99,7 +89,7 @@ const getParentEdgeIndex = (variantIndex: string): string | undefined => {
 
 export const CampaignBuilder = () => {
   const {
-    variants,
+    variantEdges,
     label,
     initializeCampaign,
     setActiveForm,
@@ -109,19 +99,13 @@ export const CampaignBuilder = () => {
     editCampaignVariant
   } = useCampaignStore();
   const { t } = useTranslation();
-  console.log(variants);
 
-  const activeVariant = activeForm?.activeDirectVariantIndex ?
-    get(variants, activeForm?.activeDirectVariantIndex, undefined) : undefined;
+  const activeVariantEdge = activeForm?.activeVariantEdgeIndex ?
+    get(variantEdges, `${activeForm?.activeVariantEdgeIndex}`, undefined) : undefined;
 
-  const parentVariantIndex = activeForm?.activeDirectVariantIndex ?
-    getParentIndex(activeForm?.activeDirectVariantIndex): undefined;
-  const parentActiveVariant = parentVariantIndex ? get(variants, parentVariantIndex, undefined): undefined;
-
-
-  const parentVariantEdgeIndex = activeForm?.activeDirectVariantIndex ?
-    getParentEdgeIndex(activeForm?.activeDirectVariantIndex): undefined;
-  const parentVariantEdge = parentVariantEdgeIndex ? get(variants, parentVariantEdgeIndex, undefined): undefined;
+  const parentVariantIndex = activeForm?.activeVariantEdgeIndex ?
+    getParentIndex(activeForm?.activeVariantEdgeIndex): undefined;
+  const parentActiveVariant = parentVariantIndex ? get(variantEdges, parentVariantIndex, undefined): undefined;
 
   return (
     <LS.BuilderContainer>
@@ -154,19 +138,19 @@ export const CampaignBuilder = () => {
                 </>
               )}
             </CampaignStep>
-            {variants.length === 0 && (
+            {variantEdges.length === 0 && (
               <UI.Flex alignItems="center" justifyContent="center">
                 <AddCampaignEdge onClick={() => addEmptyVariant()} />
               </UI.Flex>
             )}
-            {variants.map((variant, index) => (
+            {variantEdges.map((variantEdge, index) => (
               <UI.Div key={index}>
                 <RecursiveCampaignStep
                   activeForm={activeForm}
                   addEmptyVariant={addEmptyVariant}
                   setActiveForm={setActiveForm}
                   rootIndex={`${index}`}
-                  variant={variant}
+                  variantEdge={variantEdge}
                 />
               </UI.Div>
             ))}
@@ -177,13 +161,11 @@ export const CampaignBuilder = () => {
         {activeForm?.type === 'CampaignForm' && (
           <CampaignForm label={label} onChange={editCampaign} />
         )}
-        {activeForm?.type === 'CampaignVariantForm' && activeVariant && activeForm.activeDirectVariantIndex != undefined && (
+        {activeForm?.type === 'CampaignVariantForm' && activeVariantEdge && activeForm.activeVariantEdgeIndex != undefined && (
           <CampaignVariantForm
-            key={activeForm.activeDirectVariantIndex}
-            variantIndex={activeForm.activeDirectVariantIndex}
-            variant={activeVariant}
-            pariantVariantEdgeIndex={parentVariantEdgeIndex}
-            parentVariantEdge={parentVariantEdge}
+            key={activeForm.activeVariantEdgeIndex}
+            variantEdge={activeVariantEdge}
+            variantEdgeIndex={activeForm.activeVariantEdgeIndex}
             onChange={editCampaignVariant}
           />
         )}

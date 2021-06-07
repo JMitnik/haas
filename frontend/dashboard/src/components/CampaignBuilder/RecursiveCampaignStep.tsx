@@ -79,7 +79,6 @@ export const IncomingCampaignEdge = ({ type, isActive, variantEdge }: IncomingCa
 
 interface RecursiveCampaignStepProps {
   rootIndex: string;
-  variant: VariantType;
   parentVariant?: VariantType | undefined;
   variantEdge?: VariantEdgeType | undefined;
   activeForm: any;
@@ -89,13 +88,14 @@ interface RecursiveCampaignStepProps {
 
 export const RecursiveCampaignStep = ({
   rootIndex,
-  variant,
-  parentVariant,
   variantEdge,
   setActiveForm,
   activeForm,
   addEmptyVariant
 }: RecursiveCampaignStepProps) => {
+  const variant = variantEdge?.childVariant;
+  console.log(rootIndex);
+
   return (
     <>
       <UI.Flex justifyContent="center">
@@ -105,7 +105,7 @@ export const RecursiveCampaignStep = ({
         label=''
         activeForm={activeForm}
         type="CampaignVariantForm"
-        directVariantIndex={rootIndex}
+        variantEdgeIndex={rootIndex}
         onStepClick={() => setActiveForm('CampaignVariantForm', rootIndex)}
       >
         {({ isActive, onFormChange }) => (
@@ -116,8 +116,8 @@ export const RecursiveCampaignStep = ({
             <UI.Div gridColumn="5 / 9">
               <UI.Card isActive={isActive} bg="white" onClick={onFormChange}>
                 <UI.CardBody>
-                  <UI.Helper mb={2}>{variant.scheduleType}</UI.Helper>
-                  {variant.label}
+                  <UI.Helper mb={2}>{variant?.scheduleType}</UI.Helper>
+                  {variant?.label}
                 </UI.CardBody>
               </UI.Card>
             </UI.Div>
@@ -127,10 +127,9 @@ export const RecursiveCampaignStep = ({
       {!!variant?.children?.length && variant?.children?.map((childVariantEdge, index) => (
         <UI.Div key={index}>
           <RecursiveCampaignStep
-            rootIndex={`${rootIndex}.children[${index}].childVariant`}
+            rootIndex={`${rootIndex}.childVariant.children[${index}]`}
             parentVariant={variant}
             variantEdge={childVariantEdge}
-            variant={childVariantEdge.childVariant as VariantType}
             activeForm={activeForm}
             addEmptyVariant={addEmptyVariant}
             setActiveForm={setActiveForm}

@@ -8,13 +8,13 @@ const immer = config => (set, get) => config(fn => set(produce(fn)), get);
 import { CampaignScheduleEnum, CampaignVariantEdgeConditionEnumType, CampaignVariantEnum, EditCampaignInputType } from 'types/generated-types';
 
 import { CampaignFormType } from './CampaignFormSchema';
-import { ActiveFormProps, ActiveFormType, VariantType } from './CampaignBuilderTypes';
+import { ActiveFormProps, ActiveFormType, VariantEdgeType, VariantType } from './CampaignBuilderTypes';
 
 interface CampaignState extends EditCampaignInputType {
-  variants: VariantType[];
+  variantEdges: VariantEdgeType[];
   addEmptyVariant: (rootIndex?: string) => void;
   activeForm?: ActiveFormProps | undefined;
-  setActiveForm: (activeFormType: ActiveFormType, activeDirectVariantIndex?: number) => void;
+  setActiveForm: (activeFormType: ActiveFormType, activeVariantEdgeIndex?: number) => void;
   initializeCampaign: () => void;
   editCampaignVariant: (input: any, index: number) => void;
   editCampaign: any;
@@ -23,7 +23,7 @@ interface CampaignState extends EditCampaignInputType {
 export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetState<CampaignState>) => ({
   id: '',
   label: '',
-  variants: [],
+  variantEdges: [],
   workspaceId: '',
   activeForm: undefined,
 
@@ -39,9 +39,9 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
   }),
   editCampaignVariant: (input: any, index: number, edgeIndex?: string) => set(state => {
     if (edgeIndex) {
-      let variantEdge = LGet(state.variants, edgeIndex) as any;
+      let variantEdge = LGet(state.variantEdges, edgeIndex) as any;
 
-      LSet(state, `variants.${edgeIndex}`, {
+      LSet(state, `variantEdges.${edgeIndex}`, {
         ...variantEdge,
         condition: input.condition,
         childVariant: {
@@ -52,18 +52,24 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
         }
       })
     } else {
-      let variant = LGet(state.variants, input) as any;
-      LSet(state, `variants.${index}`, {
-        ...variant,
-        label: input.label,
-        type: input.type,
-        scheduleType: input.scheduleType,
+      let variantEdge = LGet(state.variantEdges, index) as any;
+      console.log(variantEdge);
+
+      LSet(state, `variantEdges.${index}`, {
+        ...variantEdge,
+        // condition: input.condition,
+        childVariant: {
+          ...variantEdge?.childVariant,
+          label: input.label,
+          type: input.type,
+          scheduleType: input.scheduleType,
+        }
       });
     }
   }),
-  setActiveForm: (activeFormType: ActiveFormType, activeDirectVariantIndex?: string) => set(state => {
+  setActiveForm: (activeFormType: ActiveFormType, activeVariantEdgeIndex?: string) => set(state => {
     state.activeForm = {
-      activeDirectVariantIndex,
+      activeVariantEdgeIndex,
       type: activeFormType
     };
   }),
@@ -71,8 +77,11 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
   addEmptyVariant: (rootIndex?: string, parentVariantId?: string) => {
     set(state => {
       if (!rootIndex) {
-        LSet(state, `variants.0`, {
-          dialogueId: '',
+        LSet(state, `variantEdges.0`, {
+          parentVariantId: null,
+          condition: null,
+          childVariant: {
+            dialogueId: '',
             id: '',
             scheduleType: CampaignScheduleEnum.General,
             body: '',
@@ -81,10 +90,11 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
             workspaceId: '',
             label: '',
             children: []
+          }
         });
       } else {
 
-        LSet(state, `variants.${rootIndex}.children.0`, {
+        LSet(state, `variantEdges.${rootIndex}.childVariant.children.0`, {
           parentVariantId,
           condition: CampaignVariantEdgeConditionEnumType.OnNotFinished,
           childVariant: {

@@ -10,5 +10,5 @@ export interface VariantEdgeType extends EditCampaignVariantEdgeInputType {}
 
 export interface ActiveFormProps {
   type: ActiveFormType;
-  activeDirectVariantIndex?: string;
+  activeVariantEdgeIndex?: string;
 }

@@ -9,7 +9,7 @@ import { CircularProgress, CircularProgressLabel } from '@chakra-ui/core'
 import { ReactComponent as SlackIcon } from 'assets/icons/icon-slack.svg';
 
 import * as LS from './CampaignBuilderStyles';
-import { VariantType } from './CampaignBuilderTypes';
+import { VariantEdgeType, VariantType } from './CampaignBuilderTypes';
 import { useEffect } from 'react';
 import useDebounce from 'hooks/useDebounce';
 import getCustomersOfUser from 'queries/getCustomersOfUser';
@@ -25,15 +25,14 @@ const SlackIconContainer = () => (
 type FollowUpMetric = 'days' | 'hours';
 
 interface CampaignVariantFormProps {
-  variantIndex: string;
-  variant: VariantType;
+  variantEdgeIndex: string;
+  variantEdge: VariantEdgeType;
   onChange: any;
   pariantVariantEdgeIndex?: string;
-  parentVariantEdge?: CampaignVariantEdgeType;
   parentVariant?: VariantType;
 }
 
-export const CampaignVariantForm = ({ variant, parentVariantEdge, pariantVariantEdgeIndex, onChange, variantIndex, parentVariant }: CampaignVariantFormProps) => {
+export const CampaignVariantForm = ({ variantEdge, pariantVariantEdgeIndex, onChange, variantEdgeIndex, parentVariant }: CampaignVariantFormProps) => {
   const { t } = useTranslation();
   const form = useForm({
     shouldUnregister: true,
@@ -46,15 +45,15 @@ export const CampaignVariantForm = ({ variant, parentVariantEdge, pariantVariant
         repeatAmount: 0,
       },
       variant: {
-        label: variant.label,
-        body: variant.body,
-        type: variant.type,
-        scheduleType: variant.scheduleType,
+        label: variantEdge?.childVariant?.label,
+        body: variantEdge?.childVariant?.body,
+        type: variantEdge?.childVariant?.type,
+        scheduleType: variantEdge?.childVariant?.scheduleType,
       }
     }
   });
 
-  const { variant: { label , type, scheduleType } } = form.watch();
+  const { variant: { label , type, scheduleType }, edge: { condition } = {} } = form.watch();
   const debouncedLabel = useDebounce(label || '', 300);
   const debouncedScheduleType = useDebounce(scheduleType || CampaignScheduleEnum.General, 300);
   const debouncedType = useDebounce(type || CampaignVariantEnum.Email, 300);
@@ -64,10 +63,10 @@ export const CampaignVariantForm = ({ variant, parentVariantEdge, pariantVariant
       label: debouncedLabel,
       scheduleType: debouncedScheduleType,
       type: debouncedType
-    }, variantIndex, pariantVariantEdgeIndex);
+    }, variantEdgeIndex, pariantVariantEdgeIndex);
   }, [debouncedLabel, debouncedScheduleType, debouncedType]);
 
-  const percentageFull = Math.min(Math.floor(((variant?.body?.length || 160) / 160) * 100), 100);
+  const percentageFull = Math.min(Math.floor(((variantEdge?.childVariant?.body?.length || 160) / 160) * 100), 100);
 
   return (
     <UI.Form>
@@ -83,15 +82,15 @@ export const CampaignVariantForm = ({ variant, parentVariantEdge, pariantVariant
           </UI.Flex>
           <UI.FormControl isRequired>
             <UI.FormLabel>Label</UI.FormLabel>
-            <UI.Input name="variant.label" ref={form.register()} defaultValue={variant.label || ''} />
+            <UI.Input name="variant.label" ref={form.register()} defaultValue={variantEdge?.childVariant?.label || ''} />
           </UI.FormControl>
 
           <UI.FormControl isRequired>
             <UI.FormLabel>Step type</UI.FormLabel>
             <Controller
               control={form.control}
-              defaultValue={variant.scheduleType}
-              name="edge.scheduleType"
+              defaultValue={variantEdge?.childVariant?.scheduleType}
+              name="variant.scheduleType"
               render={({ onChange, value, onBlur }) => (
                 <UI.RadioButtons
                   value={value}
@@ -113,7 +112,7 @@ export const CampaignVariantForm = ({ variant, parentVariantEdge, pariantVariant
                     mt={2}
                     icon={Repeat}
                     value={CampaignScheduleEnum.Recurring}
-                    isDisabled={!!variant?.children?.length}
+                    isDisabled={!!variantEdge?.childVariant?.children?.length}
                     text={t('recurring')}
                     description={t('campaign_recurring_helper')}
                   />
@@ -198,7 +197,7 @@ export const CampaignVariantForm = ({ variant, parentVariantEdge, pariantVariant
           <UI.FormControl isRequired>
             <Controller
               control={form.control}
-              defaultValue={variant.type}
+              defaultValue={variantEdge?.childVariant?.type}
               name="variant.type"
               render={({ onChange, value, onBlur }) => (
                 <UI.RadioButtons
@@ -219,8 +218,8 @@ export const CampaignVariantForm = ({ variant, parentVariantEdge, pariantVariant
             <UI.Div mb={2} style={{ top: 12, right: 12, position: 'absolute' }}>
               <UI.ColumnFlex alignItems="flex-end">
                 <CircularProgress
-                  mt={2} color={(variant?.body?.length || 160) <= 160 ? 'green' : 'red'} value={percentageFull}>
-                  <CircularProgressLabel>{variant?.body?.length}</CircularProgressLabel>
+                  mt={2} color={(variantEdge?.childVariant?.body?.length || 160) <= 160 ? 'green' : 'red'} value={percentageFull}>
+                  <CircularProgressLabel>{variantEdge?.childVariant?.body?.length}</CircularProgressLabel>
                 </CircularProgress>
               </UI.ColumnFlex>
             </UI.Div>
@@ -239,7 +238,7 @@ export const CampaignVariantForm = ({ variant, parentVariantEdge, pariantVariant
               name={`body`}
               id={`body`}
               control={form.control}
-              defaultValue={variant.body}
+              defaultValue={variantEdge?.childVariant?.body}
               render={({ value, onChange }) => (
                 <UI.MarkdownEditor
                   value={value}
