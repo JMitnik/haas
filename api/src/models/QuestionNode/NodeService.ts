@@ -1,7 +1,11 @@
-import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput } from '@prisma/client';
+import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, PrismaClient } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
+import { NodeServiceType } from './NodeServiceType';
+import { QuestionNodePrismaAdapterType } from './QuestionNodePrismaAdapterType';
+import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
+import { EdgeServiceType } from '../edge/EdgeServiceType';
 
 interface LeafNodeDataEntryProps {
   title: string;
@@ -67,7 +71,19 @@ const productServicesOptions = [{ value: 'Quality' },
 { value: 'Friendliness' },
 { value: 'Other' }];
 
-class NodeService {
+class NodeService implements NodeServiceType {
+  questionNodePrismaAdapter: QuestionNodePrismaAdapterType;
+  edgeService: EdgeServiceType;
+
+  constructor(prismaClient: PrismaClient) {
+    this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
+    this.edgeService = new EdgeService(prismaClient);
+  }
+
+  getNodeById(parentNodeId: string) {
+    return this.questionNodePrismaAdapter.getNodeById(parentNodeId);
+  }
+
   static removeNonExistingLinks = async (
     existingLinks: Array<Link>,
     newLinks: NexusGenInputs['CTALinkInputObjectType'][],
@@ -694,7 +710,7 @@ class NodeService {
     }
   };
 
-  static createTemplateNodes = async (
+  createTemplateNodes = async (
     dialogueId: string,
     workspaceName: string,
     leafs: QuestionNode[],
@@ -814,13 +830,13 @@ class NodeService {
     // ################################### EDGES ################################
 
     // Positive edges
-    await EdgeService.createEdge(rootQuestion, rootToWhatDidYou,
+    await this.edgeService.createEdge(rootQuestion, rootToWhatDidYou,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 70, renderMax: 100 });
 
-    await EdgeService.createEdge(rootToWhatDidYou, whatDidYouToFacilities,
+    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToFacilities,
       { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
 
-    await EdgeService.createEdge(rootToWhatDidYou, whatDidYouToWebsite,
+    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToWebsite,
       {
         conditionType: 'match',
         matchValue: 'Website/Mobile app',
@@ -828,20 +844,20 @@ class NodeService {
         renderMax: null,
       });
 
-    await EdgeService.createEdge(rootToWhatDidYou, whatDidYouToProduct,
+    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToProduct,
       { conditionType: 'match', matchValue: 'Product/Services', renderMin: null, renderMax: null });
 
-    await EdgeService.createEdge(rootToWhatDidYou, whatDidYouToCustomerSupport,
+    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToCustomerSupport,
       { conditionType: 'match', matchValue: 'Customer Support', renderMin: null, renderMax: null });
 
     // Neutral edges
-    await EdgeService.createEdge(rootQuestion, rootToWhatWouldYouLikeToTalkAbout,
+    await this.edgeService.createEdge(rootQuestion, rootToWhatWouldYouLikeToTalkAbout,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 50, renderMax: 70 });
 
-    await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout, whatWouldYouLikeToTalkAboutToFacilities,
+    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout, whatWouldYouLikeToTalkAboutToFacilities,
       { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
 
-    await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
+    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToWebsite,
       {
         conditionType: 'match',
@@ -850,7 +866,7 @@ class NodeService {
         renderMax: null,
       });
 
-    await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
+    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToProduct, {
       conditionType: 'match',
       matchValue: 'Product/Services',
@@ -858,7 +874,7 @@ class NodeService {
       renderMax: null,
     });
 
-    await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
+    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToCustomerSupport, {
       conditionType: 'match',
       matchValue: 'Customer Support',
@@ -867,13 +883,13 @@ class NodeService {
     });
 
     // Negative edges
-    await EdgeService.createEdge(rootQuestion, rootToWeAreSorryToHearThat,
+    await this.edgeService.createEdge(rootQuestion, rootToWeAreSorryToHearThat,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 50 });
 
-    await EdgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToFacilities,
+    await this.edgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToFacilities,
       { conditionType: 'match', matchValue: 'Facilities', renderMax: null, renderMin: null });
 
-    await EdgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToWebsite,
+    await this.edgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToWebsite,
       {
         conditionType: 'match',
         matchValue: 'Website/Mobile app',
@@ -881,10 +897,10 @@ class NodeService {
         renderMin: null,
       });
 
-    await EdgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToProduct,
+    await this.edgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToProduct,
       { conditionType: 'match', matchValue: 'Product/Services', renderMax: null, renderMin: null });
 
-    await EdgeService.createEdge(rootToWeAreSorryToHearThat,
+    await this.edgeService.createEdge(rootToWeAreSorryToHearThat,
       weAreSorryToHearThatToCustomerSupport, {
       conditionType: 'match',
       matchValue: 'Customer Support',

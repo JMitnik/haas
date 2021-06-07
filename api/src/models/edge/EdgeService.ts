@@ -1,5 +1,10 @@
-import { EdgeCreateInput, QuestionNode } from '@prisma/client';
+import { EdgeCreateInput, QuestionNode, PrismaClient } from '@prisma/client';
 import prisma from '../../config/prisma';
+import { EdgeServiceType } from './EdgeServiceType';
+import { EdgePrismaAdapterType } from './EdgePrismaAdapterType';
+import EdgePrismaAdapter from './EdgePrismaAdapter';
+import { QuestionNodePrismaAdapterType } from '../QuestionNode/QuestionNodePrismaAdapterType';
+import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
 
 interface QuestionConditionProps {
   id?: number;
@@ -21,7 +26,22 @@ interface EdgeChildProps {
   childNode: EdgeNodeProps;
 }
 
-class EdgeResolver {
+class EdgeService implements EdgeServiceType {
+  edgePrismaAdapter: EdgePrismaAdapterType;
+  questionNodePrismaAdapter: QuestionNodePrismaAdapterType;
+
+  constructor(prismaClient: PrismaClient) {
+    this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
+    this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
+  }
+  getEdgeById(edgeId: string) {
+    return this.edgePrismaAdapter.getEdgeById(edgeId);
+  }
+
+  async getConditionsById(edgeId: string): Promise<import("@prisma/client").QuestionCondition[]> {
+    return this.edgePrismaAdapter.getConditionsById(edgeId);
+  }
+
   static constructEdge(
     parentNodeEntry: QuestionNode,
     childNodeEntry: QuestionNode,
@@ -49,19 +69,12 @@ class EdgeResolver {
     };
   }
 
-  static createEdge = async (parent: QuestionNode, child: QuestionNode, conditions: any) => {
-    const edge = await prisma.edge.create(
-      { data: EdgeResolver.constructEdge(parent, child, conditions) },
-    );
-
-    await prisma.questionNode.update({
-      where: {
-        id: parent.id,
-      },
-      data: {
-        children: {
-          connect: [{ id: edge.id }],
-        },
+  createEdge = async (parent: QuestionNode, child: QuestionNode, conditions: any) => {
+    const edge = await this.edgePrismaAdapter.create(EdgeService.constructEdge(parent, child, conditions));
+    
+    await this.questionNodePrismaAdapter.update(parent.id, {
+      children: {
+        connect: [{ id: edge.id }],
       },
     });
   };
@@ -78,4 +91,4 @@ class EdgeResolver {
   };
 }
 
-export default EdgeResolver;
+export default EdgeService;

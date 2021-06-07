@@ -41,6 +41,7 @@ import { QuestionOptionPrismaAdapterType } from '../QuestionNode/QuestionOptionP
 import QuestionOptionPrismaAdapter from '../QuestionNode/QuestionOptionPrismaAdapter';
 import { QuestionNodePrismaAdapterType } from '../QuestionNode/QuestionNodePrismaAdapterType';
 import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
+import { NodeServiceType } from '../QuestionNode/NodeServiceType';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -54,6 +55,7 @@ class DialogueService implements DialogueServiceType {
   edgePrismaAdapter: EdgePrismaAdapterType;
   questionOptionPrismaAdapter: QuestionOptionPrismaAdapterType;
   questionNodePrismaAdapter: QuestionNodePrismaAdapterType;
+  nodeService: NodeServiceType;
 
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
@@ -64,6 +66,7 @@ class DialogueService implements DialogueServiceType {
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.questionOptionPrismaAdapter = new QuestionOptionPrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
+    this.nodeService = new NodeService(prismaClient);
   }
 
   findDialoguesByCustomerId(customerId: string) {
@@ -639,7 +642,7 @@ class DialogueService implements DialogueServiceType {
 
     // TODO: Make this dependent on input "template"
     const leafs = await NodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
-    await NodeService.createTemplateNodes(dialogue.id, customerName, leafs);
+    await this.nodeService.createTemplateNodes(dialogue.id, customerName, leafs);
 
     return dialogue;
   };

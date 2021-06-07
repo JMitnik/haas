@@ -9,6 +9,8 @@ import { CustomerServiceType } from '../models/customer/CustomerServiceType';
 import { AutodeckServiceType } from '../models/autodeck/AutodeckServiceType';
 import { DialogueServiceType } from '../models/questionnaire/DialogueServiceType';
 import { AuthServiceType } from '../models/auth/AuthServiceType';
+import { NodeServiceType } from '../models/QuestionNode/NodeServiceType';
+import { EdgeServiceType } from '../models/edge/EdgeServiceType';
 
 export interface APIServiceContainer {
   userService: UserServiceType;
@@ -18,6 +20,8 @@ export interface APIServiceContainer {
   autodeckService: AutodeckServiceType;
   dialogueService: DialogueServiceType;
   authService: AuthServiceType;
+  nodeService: NodeServiceType;
+  edgeService: EdgeServiceType;
 }
 
 export interface APIContext extends ExpressContext {

@@ -8,6 +8,8 @@ import CustomerService from "../models/customer/CustomerService"
 import AutodeckService from "../models/autodeck/AutodeckService"
 import DialogueService from "../models/questionnaire/DialogueService"
 import AuthService from "../models/auth/AuthService"
+import NodeService from "../models/QuestionNode/NodeService"
+import EdgeService from "../models/edge/EdgeService"
 
 export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -17,7 +19,12 @@ export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, neve
   const autodeckService = new AutodeckService(prisma);
   const dialogueService = new DialogueService(prisma);
   const authService = new AuthService(prisma);
+  const nodeService = new NodeService(prisma);
+  const edgeService = new EdgeService(prisma); 
+
   return {
+    edgeService,
+    nodeService,
     authService,
     dialogueService,
     autodeckService,

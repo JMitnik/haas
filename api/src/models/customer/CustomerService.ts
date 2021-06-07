@@ -24,6 +24,7 @@ import { DialoguePrismaAdapterType } from '../questionnaire/DialoguePrismaAdapte
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { UserOfCustomerPrismaAdapterType } from '../users/UserOfCustomerPrismaAdapterType';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
+import { NodeServiceType } from '../QuestionNode/NodeServiceType';
 
 class CustomerService implements CustomerServiceType {
   customerPrismaAdapter: CustomerPrismaAdapterType;
@@ -34,6 +35,7 @@ class CustomerService implements CustomerServiceType {
   dialogueService: DialogueServiceType;
   dialoguePrismaAdapter: DialoguePrismaAdapterType;
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapterType;
+  nodeService: NodeServiceType;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -44,6 +46,7 @@ class CustomerService implements CustomerServiceType {
     this.tagPrismaAdapter = new TagPrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
+    this.nodeService = new NodeService(prismaClient);
   }
 
   findWorkspaceBySlug(slug: string): Promise<Customer | null> {
@@ -93,7 +96,7 @@ class CustomerService implements CustomerServiceType {
     const leafs = await NodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
 
     // Step 3: Make nodes
-    await NodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
+    await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
 
     // Step 4: possibly
     if (willGenerateFakeData) {
