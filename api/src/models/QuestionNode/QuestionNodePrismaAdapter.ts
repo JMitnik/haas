@@ -9,6 +9,16 @@ class QuestionNodePrismaAdapter implements QuestionNodePrismaAdapterType {
   }
 
 
+  async getNodeByLinkId(linkId: string) {
+    const link = await this.prisma.link.findOne({
+      where: { id: linkId },
+      include: { questionNode: true },
+    });
+
+    return link?.questionNode;
+  }
+
+
   update(nodeId: string, data: QuestionNodeUpdateInput): Promise<import("@prisma/client").QuestionNode> {
     return this.prisma.questionNode.update({
       where: {

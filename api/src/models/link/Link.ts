@@ -52,14 +52,11 @@ export const LinkType = objectType({
     t.field('questionNode', {
       type: QuestionNodeType,
       async resolve(parent, args, ctx) {
-        const link = await ctx.prisma.link.findOne({
-          where: { id: parent.id },
-          include: { questionNode: true },
-        });
+        const questionNode = await ctx.services.nodeService.getNodeByLinkId(parent.id);
 
-        if (!link?.questionNode) throw new Error('Unable to find related node');
+        if (!questionNode) throw new Error('Unable to find related node');
 
-        return link?.questionNode as any;
+        return questionNode as any;
       },
     });
   },

@@ -79,13 +79,13 @@ class EdgeService implements EdgeServiceType {
     });
   };
 
-  static removeNonExistingEdges = async (activeEdges: Array<string>,
+  removeNonExistingEdges = async (activeEdges: Array<string>,
     newEdges: Array<EdgeChildProps>, questionId: any) => {
     if (questionId) {
       const newEdgeIds = newEdges.map(({ id }) => id);
       const removeEdgeChildIds = activeEdges?.filter((id) => (!newEdgeIds.includes(id) && id));
       if (removeEdgeChildIds?.length > 0) {
-        await prisma.edge.deleteMany({ where: { id: { in: removeEdgeChildIds } } });
+        await this.edgePrismaAdapter.deleteMany(removeEdgeChildIds);
       }
     }
   };

@@ -80,6 +80,10 @@ class NodeService implements NodeServiceType {
     this.edgeService = new EdgeService(prismaClient);
   }
 
+  getNodeByLinkId(linkId: string) {
+    return this.questionNodePrismaAdapter.getNodeByLinkId(linkId);
+  }
+
   getNodeById(parentNodeId: string) {
     return this.questionNodePrismaAdapter.getNodeById(parentNodeId);
   }
