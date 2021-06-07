@@ -2,7 +2,7 @@ import { ChoiceNodeEntry,
   FormNodeEntryGetPayload,
   LinkNodeEntry, NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
   QuestionNode, RegistrationNodeEntry,
-  SliderNodeEntry, TextboxNodeEntry } from '@prisma/client';
+  SliderNodeEntry, TextboxNodeEntry, PrismaClient } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
@@ -11,6 +11,8 @@ import { NexusGenInputs } from '../../generated/nexus';
 import { OrderByProps } from '../../types/generic';
 import { pickProperties } from '../../utils/pickProperties';
 import prisma from '../../config/prisma';
+import { NodeEntryPrismaAdapterType } from './NodeEntryPrismaAdapterType';
+import NodeEntryPrismaAdapter from './NodeEntryPrismaAdapter';
 
 export interface NodeEntryWithTypes extends NodeEntry {
   session?: {
@@ -27,6 +29,25 @@ export interface NodeEntryWithTypes extends NodeEntry {
 }
 
 class NodeEntryService {
+  nodeEntryPrismaAdapter: NodeEntryPrismaAdapterType;
+
+  constructor(prismaClient: PrismaClient) {
+    this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
+  }
+
+  async getNodeEntryValues(id: string) {
+    const nodeEntry = await this.nodeEntryPrismaAdapter.getChildNodeEntriesById(id);
+
+    return {
+      choiceNodeEntry: nodeEntry?.choiceNodeEntry?.value,
+      linkNodeEntry: nodeEntry?.linkNodeEntry?.value?.toString(),
+      registrationNodeEntry: nodeEntry?.registrationNodeEntry?.value?.toString(),
+      sliderNodeEntry: nodeEntry?.sliderNodeEntry?.value,
+      textboxNodeEntry: nodeEntry?.textboxNodeEntry?.value,
+      formNodeEntry: nodeEntry?.formNodeEntry,
+    };
+  }
+
   static constructCreateNodeEntryFragment = (nodeEntryInput: NexusGenInputs['NodeEntryInput']): NodeEntryCreateWithoutSessionInput => ({
     relatedNode: (nodeEntryInput.nodeId && { connect: { id: nodeEntryInput.nodeId } }) || undefined,
     relatedEdge: (nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } }) || undefined,

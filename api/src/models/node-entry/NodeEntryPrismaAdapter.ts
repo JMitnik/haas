@@ -8,6 +8,28 @@ class NodeEntryPrismaAdapter implements NodeEntryPrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
+  async getChildNodeEntriesById(nodeId: string) {
+    const nodeEntry = await this.prisma.nodeEntry.findOne({
+      where: { id: nodeId },
+      include: {
+        choiceNodeEntry: true,
+        linkNodeEntry: true,
+        registrationNodeEntry: true,
+        sliderNodeEntry: true,
+        textboxNodeEntry: true,
+        formNodeEntry: {
+          include: {
+            values: {
+              include: {
+                relatedField: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return nodeEntry;
+  }
   
   async deleteManyNodeEntries(sessionIds: string[]): Promise<import("@prisma/client").BatchPayload> {
     return  this.prisma.nodeEntry.deleteMany(
