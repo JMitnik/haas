@@ -8,6 +8,119 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
     this.prisma = prismaClient;
   }
 
+  getAllDialoguesWithTags() {
+    return this.prisma.dialogue.findMany({
+      include: {
+        tags: true,
+      },
+    });
+  }
+
+  getDialogueById(dialogueId: string): Promise<Dialogue | null> {
+    return this.prisma.dialogue.findOne({
+      where: { id: dialogueId },
+    });
+  }
+
+  getCTAsByDialogueId(dialogueId: string) {
+    return this.prisma.questionNode.findMany({
+      where: {
+        AND: [
+          { questionDialogueId: dialogueId },
+          { isLeaf: true },
+        ],
+      },
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        form: {
+          include: {
+            fields: true,
+          },
+        },
+      },
+    });
+  }
+
+  getQuestionsByDialogueId(dialogueId: string) {
+    return this.prisma.questionNode.findMany({
+      where: {
+        AND: [
+          { questionDialogueId: dialogueId },
+          {
+            isLeaf: false,
+          },
+        ],
+      },
+      orderBy: {
+        creationDate: 'asc',
+      },
+      include: {
+        form: {
+          include: {
+            fields: true,
+          },
+        },
+        sliderNode: {
+          include: {
+            markers: {
+              include: {
+                range: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getEdgesByDialogueId(dialogueId: string): Promise<Edge[]> {
+    const dialogue = await this.prisma.dialogue.findOne({
+      where: {
+        id: dialogueId,
+      },
+      include: {
+        edges: true,
+      },
+    });
+
+    const edges = dialogue?.edges;
+
+    return edges || [];
+  }
+  async getRootQuestionByDialogueId(dialogueId: string) {
+    return this.prisma.questionNode.findFirst({
+      where: {
+        questionDialogueId: dialogueId,
+        isRoot: true,
+      },
+      include: {
+        form: {
+          include: {
+            fields: true,
+          },
+        },
+        sliderNode: {
+          include: {
+            markers: {
+              include: {
+                range: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getTagsByDialogueId(dialogueId: string) {
+    const dialogue = await this.prisma.dialogue.findOne({
+      where: { id: dialogueId },
+      include: { tags: true },
+    });
+
+    return dialogue?.tags || [];
+  }
+
   async getTemplateDialogue(dialogueId: string) {
     return this.prisma.dialogue.findOne({
       where: {
@@ -96,8 +209,8 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
       include,
     });
   }
-  
-  async read(dialogueId: string){
+
+  async read(dialogueId: string) {
     return this.prisma.dialogue.findOne({
       where: {
         id: dialogueId,
@@ -132,7 +245,7 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
     });
   };
 
-  async findDialogueIdsOfCustomer(customerId: string): Promise<Array<{id: string}>> {
+  async findDialogueIdsOfCustomer(customerId: string): Promise<Array<{ id: string }>> {
     return this.prisma.dialogue.findMany({
       where: {
         customerId,

@@ -12,6 +12,7 @@ import { AuthServiceType } from '../models/auth/AuthServiceType';
 import { NodeServiceType } from '../models/QuestionNode/NodeServiceType';
 import { EdgeServiceType } from '../models/edge/EdgeServiceType';
 import { NodeEntryServiceType } from '../models/node-entry/NodeEntryServiceType';
+import { PermissionServiceType } from '../models/permission/PermissionServiceType';
 
 export interface APIServiceContainer {
   userService: UserServiceType;
@@ -24,6 +25,7 @@ export interface APIServiceContainer {
   nodeService: NodeServiceType;
   edgeService: EdgeServiceType;
   nodeEntryService: NodeEntryServiceType;
+  permissionService: PermissionServiceType;
 }
 
 export interface APIContext extends ExpressContext {

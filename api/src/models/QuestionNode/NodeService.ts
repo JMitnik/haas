@@ -6,6 +6,8 @@ import { NodeServiceType } from './NodeServiceType';
 import { QuestionNodePrismaAdapterType } from './QuestionNodePrismaAdapterType';
 import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
 import { EdgeServiceType } from '../edge/EdgeServiceType';
+import { LinkPrismaAdapterType } from '../link/LinkPrismaAdapterType';
+import LinkPrismaAdapter from '../link/LinkPrismaAdapter';
 
 interface LeafNodeDataEntryProps {
   title: string;
@@ -74,10 +76,12 @@ const productServicesOptions = [{ value: 'Quality' },
 class NodeService implements NodeServiceType {
   questionNodePrismaAdapter: QuestionNodePrismaAdapterType;
   edgeService: EdgeServiceType;
+  linkPrismaAdapter: LinkPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.edgeService = new EdgeService(prismaClient);
+    this.linkPrismaAdapter = new LinkPrismaAdapter(prismaClient);
   }
 
   getNodeByLinkId(linkId: string) {
@@ -88,7 +92,7 @@ class NodeService implements NodeServiceType {
     return this.questionNodePrismaAdapter.getNodeById(parentNodeId);
   }
 
-  static removeNonExistingLinks = async (
+  removeNonExistingLinks = async (
     existingLinks: Array<Link>,
     newLinks: NexusGenInputs['CTALinkInputObjectType'][],
   ) => {
@@ -96,7 +100,7 @@ class NodeService implements NodeServiceType {
     const removeLinkIds = existingLinks?.filter(({ id }) => (!newLinkIds?.includes(id) && id)).map(({ id }) => id);
 
     if (removeLinkIds?.length > 0) {
-      await prisma.link.deleteMany({ where: { id: { in: removeLinkIds } } });
+      await this.linkPrismaAdapter.deleteMany(removeLinkIds);
     }
   };
 

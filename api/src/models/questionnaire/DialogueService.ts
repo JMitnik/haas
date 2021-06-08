@@ -24,7 +24,7 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 import SessionService from '../session/SessionService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 
-import { DialogueServiceType } from './DialogueServiceType';
+import { DialogueServiceType, CopyDialogueInputType } from './DialogueServiceType';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { DialoguePrismaAdapterType } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
@@ -67,6 +67,42 @@ class DialogueService implements DialogueServiceType {
     this.questionOptionPrismaAdapter = new QuestionOptionPrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
+  }
+  async getFilteredDialogues(searchTerm?: string | null | undefined) {
+    let dialogues = await this.dialoguePrismaAdapter.getAllDialoguesWithTags();
+
+    if (searchTerm) {
+      dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, searchTerm);
+    }
+
+    return dialogues;
+  }
+  getDialogueById(dialogueId: string): Promise<Dialogue | null> {
+    return this.dialoguePrismaAdapter.getDialogueById(dialogueId);
+  }
+  async getCTAsByDialogueId(dialogueId: string, searchTerm?: string | null | undefined) {
+    const leafs = await this.dialoguePrismaAdapter.getCTAsByDialogueId(dialogueId);
+
+    if (searchTerm) {
+      const lowerCasedSearch = searchTerm.toLowerCase();
+      return leafs.filter((leaf) => leaf.title.toLowerCase().includes(lowerCasedSearch));
+    }
+
+    return leafs;
+  }
+
+  getQuestionsByDialogueId(dialogueId: string) {
+    return this.dialoguePrismaAdapter.getQuestionsByDialogueId(dialogueId);
+  }
+  getEdgesByDialogueId(dialogueId: string): Promise<import("@prisma/client").Edge[]> {
+    return this.dialoguePrismaAdapter.getEdgesByDialogueId(dialogueId);
+  }
+  getRootQuestionByDialogueId(dialogueId: string) {
+    return this.dialoguePrismaAdapter.getRootQuestionByDialogueId(dialogueId);
+  }
+
+  getTagsByDialogueId(dialogueId: string) {
+    return this.dialoguePrismaAdapter.getTagsByDialogueId(dialogueId);
   }
 
   findDialoguesByCustomerId(customerId: string) {
@@ -132,7 +168,6 @@ class DialogueService implements DialogueServiceType {
     updateDialogueArgs: DialogueUpdateInput,
   ) => {
     const newTagObjects = newTags.map((tag) => ({ id: tag }));
-    console.log('new tags: ', newTags);
 
     const deleteTagObjects: TagWhereUniqueInput[] = [];
     dbTags.forEach((tag) => {
@@ -150,7 +185,7 @@ class DialogueService implements DialogueServiceType {
       tagUpdateArgs.disconnect = deleteTagObjects;
     }
     updateDialogueArgs.tags = tagUpdateArgs;
-    console.log('updateTags: ', updateDialogueArgs.tags);
+
     return updateDialogueArgs;
   };
 
@@ -379,18 +414,22 @@ class DialogueService implements DialogueServiceType {
   };
 
   copyDialogue = async (
-    templateId: string,
-    customerId: string,
-    title: string,
-    dialogueSlug: string,
-    description: string,
-    publicTitle: string = '',
-    tags: Array<{ id: string }> = []) => {
-    const templateDialogue = await this.dialoguePrismaAdapter.getTemplateDialogue(templateId)
+    input: CopyDialogueInputType,
+  ) => {
+
+    const tags = input?.dialogueTags?.entries && input?.dialogueTags?.entries?.length > 0
+      ? input.dialogueTags?.entries?.map((tag: string) => ({ id: tag }))
+      : [];
+
+    const customer = await this.customerPrismaAdapter.findWorkspaceBySlug(input.customerSlug);
+
+    if (!customer) throw new Error('Cant find customer related');
+
+    const templateDialogue = await this.dialoguePrismaAdapter.getTemplateDialogue(input.templateId)
 
     const idMap: IdMapProps = {};
     const dialogue = await this.initDialogue(
-      customerId, title, dialogueSlug, description, publicTitle, tags,
+      customer.id, input.title, input.dialogueSlug, input.description, input.publicTitle, tags,
     );
 
     if (!dialogue) throw new Error('Dialogue not copied');
@@ -417,9 +456,9 @@ class DialogueService implements DialogueServiceType {
 
       const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
       const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
-      const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId 
-      ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } 
-      : undefined
+      const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId
+        ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } }
+        : undefined
       const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
       const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
       const mappedObject = {
@@ -587,15 +626,18 @@ class DialogueService implements DialogueServiceType {
     }
 
     if (input.contentType === 'TEMPLATE' && input.templateDialogueId) {
-      return this.copyDialogue(
-        input.templateDialogueId,
-        customer.id,
-        input.title,
-        input.dialogueSlug,
-        input.description,
-        input.publicTitle || '',
-        [],
-      );
+      // FIXME: Tags are not copied over
+  
+      const copyDialogueInput: CopyDialogueInputType = {
+        customerSlug: customer.slug,
+        description: input.description,
+        dialogueSlug: input.dialogueSlug,
+        dialogueTags: input.tags,
+        publicTitle: input.publicTitle || '',
+        templateId: input.templateDialogueId,
+        title: input.title,
+      }
+      return this.copyDialogue(copyDialogueInput);
     }
 
     const dialogue = await this.initDialogue(

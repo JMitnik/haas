@@ -1,6 +1,16 @@
-import { Dialogue, Tag } from "@prisma/client";
+import { Dialogue, Tag, QuestionNode, FormNode, FormNodeField, SliderNode, SliderNodeMarker, SliderNodeRange, Edge } from "@prisma/client";
 import { WorkspaceTemplate } from "../templates/defaultWorkspaceTemplate";
 import { NexusGenInputs } from "../../generated/nexus";
+
+export interface CopyDialogueInputType {
+  customerSlug: string;
+  dialogueSlug: string;
+  templateId: string;
+  title: string;
+  publicTitle: string;
+  description: string;
+  dialogueTags: { entries?: string[] | null | undefined; } | null | undefined;
+}
 
 export interface DialogueServiceType {
   findDialoguesByCustomerId(customerId: string): Promise<(Dialogue & { tags: Tag[]; })[]>;
@@ -28,8 +38,37 @@ export interface DialogueServiceType {
   initDialogue: (customerId: string, title: string, dialogueSlug: string, description: string, publicTitle?: string, tags?: Array<{
     id: string;
   }>) => Promise<Dialogue | null>;
-  copyDialogue: (templateId: string, customerId: string, title: string, dialogueSlug: string, description: string, publicTitle?: string, tags?: Array<{
-    id: string;
-  }>) => Promise<Dialogue>;
+  copyDialogue: (input: CopyDialogueInputType) => Promise<Dialogue>;
   createDialogue: (input: NexusGenInputs['CreateDialogueInputType']) => Promise<Dialogue>;
+  getTagsByDialogueId(dialogueId: string): Promise<Tag[]>;
+  getRootQuestionByDialogueId(dialogueId: string): Promise<(QuestionNode & {
+    form: (FormNode & {
+      fields: FormNodeField[];
+    }) | null;
+    sliderNode: (SliderNode & {
+      markers: (SliderNodeMarker & {
+        range: SliderNodeRange;
+      })[];
+    }) | null;
+  })>
+  getEdgesByDialogueId(dialogueId: string): Promise<Edge[]>;
+  getQuestionsByDialogueId(dialogueId: string): Promise<(QuestionNode & {
+    form: (FormNode & {
+      fields: FormNodeField[];
+    }) | null;
+    sliderNode: (SliderNode & {
+      markers: (SliderNodeMarker & {
+        range: SliderNodeRange;
+      })[];
+    }) | null;
+  })[]>;
+  getCTAsByDialogueId(dialogueId: string, searchTerm?: string | null | undefined): Promise<(QuestionNode & {
+    form: (FormNode & {
+      fields: FormNodeField[];
+    }) | null;
+  })[]>;
+  getDialogueById(dialogueId: string): Promise<Dialogue | null>;
+  getFilteredDialogues(searchTerm?: string | null | undefined): Promise<(Dialogue & {
+    tags: Tag[];
+  })[]>
 }

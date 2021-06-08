@@ -1,32 +1,30 @@
 import { PrismaClient } from '@prisma/client';
 import prisma from '../../config/prisma';
+import { PermissionPrismaAdapterType } from './PermissionPrismaAdapterType';
+import PermissionPrismaAdapter from './PermissionPrismaAdapter';
+import { PermissionServiceType } from './PermissionServiceType';
 
-class PermissionService {
-  static deletePermissions = async (permissionIds: Array<string>) => {
-    prisma.permission.deleteMany({
-      where: {
-        id: {
-          in: permissionIds,
-        },
-      },
-    });
+class PermissionService implements PermissionServiceType {
+  permissionPrismaAdapter: PermissionPrismaAdapterType;
+
+  constructor(prismaClient: PrismaClient) {
+    this.permissionPrismaAdapter = new PermissionPrismaAdapter(prismaClient);
+  }
+
+  deletePermissions = async (permissionIds: Array<string>) => {
+   return this.permissionPrismaAdapter.deleteMany(permissionIds);
   };
 
-  static createPermission = async (name: string, customerId: string, description?: string | null | undefined) => {
-    const newPermissions = await prisma.permission.create({
-      data: {
-        name,
-        description,
-        Customer: {
-          connect: { id: customerId },
-        },
-      },
-      include: {
-        Customer: true,
+  createPermission = async (name: string, customerId: string, description?: string | null | undefined) => {
+    const permission = await this.permissionPrismaAdapter.create({
+      name,
+      description,
+      Customer: {
+        connect: { id: customerId },
       },
     });
 
-    return newPermissions;
+    return permission;
   };
 }
 export default PermissionService;

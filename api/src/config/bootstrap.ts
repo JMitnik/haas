@@ -11,6 +11,7 @@ import AuthService from "../models/auth/AuthService"
 import NodeService from "../models/QuestionNode/NodeService"
 import EdgeService from "../models/edge/EdgeService"
 import NodeEntryService from "../models/node-entry/NodeEntryService"
+import PermissionService from "../models/permission/PermissionService"
 
 export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -23,8 +24,10 @@ export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, neve
   const nodeService = new NodeService(prisma);
   const edgeService = new EdgeService(prisma); 
   const nodeEntryService = new NodeEntryService(prisma);
+  const permissionService = new PermissionService(prisma);
 
   return {
+    permissionService,
     nodeEntryService,
     edgeService,
     nodeService,

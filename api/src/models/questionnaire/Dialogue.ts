@@ -24,6 +24,7 @@ import PaginationService from '../general/PaginationService';
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
 import isValidDate from '../../utils/isValidDate';
+import { CopyDialogueInputType } from './DialogueServiceType';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -191,12 +192,7 @@ export const DialogueType = objectType({
           return [];
         }
 
-        const dialogue = await ctx.prisma.dialogue.findOne({
-          where: { id: parent.id },
-          include: { tags: true },
-        });
-
-        return dialogue?.tags || [];
+        return ctx.services.dialogueService.getTagsByDialogueId(parent.id);
       },
     });
 
@@ -209,10 +205,7 @@ export const DialogueType = objectType({
         if (!parent.customerId) {
           throw new Error('Cant find associated customer of dialogue');
         }
-
-        const customer = await ctx.prisma.customer.findOne({
-          where: { id: parent.customerId },
-        });
+        const customer = await ctx.services.customerService.findWorkspaceById(parent.customerId);
 
         if (!customer) {
           throw new Error('Unable to find associated customer of dialogue.');
@@ -225,47 +218,16 @@ export const DialogueType = objectType({
     t.field('rootQuestion', {
       type: QuestionNodeType,
       async resolve(parent, args, ctx) {
-        const rootQuestions = await ctx.prisma.questionNode.findMany({
-          where: {
-            isRoot: true,
-          },
-          include: {
-            form: {
-              include: {
-                fields: true,
-              },
-            },
-            sliderNode: {
-              include: {
-                markers: {
-                  include: {
-                    range: true,
-                  },
-                },
-              },
-            },
-          },
-        });
+        const rootQuestion = await ctx.services.dialogueService.getRootQuestionByDialogueId(parent.id);
 
-        return rootQuestions[0];
+        return rootQuestion;
       },
     });
 
     t.list.field('edges', {
       type: EdgeType,
       async resolve(parent, args, ctx) {
-        const dialogue = await ctx.prisma.dialogue.findOne({
-          where: {
-            id: parent.id,
-          },
-          include: {
-            edges: {},
-          },
-        });
-
-        const edges = dialogue?.edges;
-
-        return edges || [];
+       return ctx.services.dialogueService.getEdgesByDialogueId(parent.id);
       },
     });
 
@@ -273,35 +235,7 @@ export const DialogueType = objectType({
       type: QuestionNodeType,
 
       async resolve(parent, args, ctx) {
-        const questions = await ctx.prisma.questionNode.findMany({
-          where: {
-            AND: [
-              { questionDialogueId: parent.id },
-              {
-                isLeaf: false,
-              },
-            ],
-          },
-          orderBy: {
-            creationDate: 'asc',
-          },
-          include: {
-            form: {
-              include: {
-                fields: true,
-              },
-            },
-            sliderNode: {
-              include: {
-                markers: {
-                  include: {
-                    range: true,
-                  },
-                },
-              },
-            },
-          },
-        });
+        const questions = await ctx.services.dialogueService.getQuestionsByDialogueId(parent.id);
         return questions;
       },
     });
@@ -327,29 +261,7 @@ export const DialogueType = objectType({
         searchTerm: 'String',
       },
       async resolve(parent, args, ctx) {
-        const leafs = await ctx.prisma.questionNode.findMany({
-          where: {
-            AND: [
-              { questionDialogueId: parent.id },
-              { isLeaf: true },
-            ],
-          },
-          orderBy: { updatedAt: 'desc' },
-          include: {
-            form: {
-              include: {
-                fields: true,
-              },
-            },
-          },
-        });
-
-        if (args.searchTerm) {
-          const lowerCasedSearch = args.searchTerm.toLowerCase();
-          return leafs.filter((leaf) => leaf.title.toLowerCase().includes(lowerCasedSearch));
-        }
-
-        return leafs;
+        return ctx.services.dialogueService.getCTAsByDialogueId(parent.id, args.searchTerm);
       },
     });
   },
@@ -401,20 +313,9 @@ export const DialogueMutations = extendType({
         const {
           input: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
         } = args;
-        const { prisma }: { prisma: PrismaClient } = ctx;
+        const copyDialogueInput: CopyDialogueInputType = { customerSlug, dialogueSlug, templateId: templateDialogueId, title, publicTitle, description, dialogueTags: tags };
 
-        const dialogueTags = tags?.entries?.length > 0
-          ? tags?.entries?.map((tag: string) => ({ id: tag }))
-          : [];
-
-        const customers = await prisma.customer.findMany({ where: { slug: customerSlug } });
-        const customer = customers?.[0];
-
-        if (!customer) throw new Error('Cant find customer related');
-
-        return ctx.services.dialogueService.copyDialogue(
-          templateDialogueId, customer?.id, title, dialogueSlug, description, publicTitle, dialogueTags,
-        );
+        return ctx.services.dialogueService.copyDialogue(copyDialogueInput);
       },
     });
 
@@ -426,7 +327,6 @@ export const DialogueMutations = extendType({
         if (!args.input) {
           throw new Error('Unable to find any input data');
         }
-
         return ctx.services.dialogueService.createDialogue(args.input);
       },
     });
@@ -498,9 +398,7 @@ export const DialogueRootQuery = extendType({
           throw new Error('No valid id supplied');
         }
 
-        const dialogue = await ctx.prisma.dialogue.findOne({
-          where: { id: args.where.id },
-        });
+        const dialogue = await ctx.services.dialogueService.getDialogueById(args.where.id);
 
         if (!dialogue) {
           throw new Error('Unable to find dialogue with supplied id');
@@ -515,21 +413,8 @@ export const DialogueRootQuery = extendType({
       args: {
         filter: DialogueFilterInputType,
       },
-      async resolve(parent, args, ctx) {
-        let dialogues = await ctx.prisma.dialogue.findMany({
-          include: {
-            tags: true,
-          },
-        });
-
-        // TODO: Put this in a single service
-        if (args.filter) {
-          if (args.filter.searchTerm) {
-            dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
-          }
-        }
-
-        return dialogues;
+      async resolve(parent, args, ctx) {        
+        return ctx.services.dialogueService.getFilteredDialogues(args.filter?.searchTerm);
       },
     });
   },

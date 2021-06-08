@@ -96,7 +96,7 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
 
     // If we have links associated, remove "non-existing links"
     if (existingNode?.links && args?.input?.links?.linkTypes?.length) {
-      await NodeService.removeNonExistingLinks(existingNode?.links, args?.input?.links?.linkTypes);
+      await ctx.services.nodeService.removeNonExistingLinks(existingNode?.links, args?.input?.links?.linkTypes);
     }
 
     // Upsert links in g eneral

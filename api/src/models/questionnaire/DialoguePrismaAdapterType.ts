@@ -32,8 +32,39 @@ export interface DialoguePrismaAdapterType {
   findDialoguesByCustomerId(customerId: string): Promise<(Dialogue & {
     tags: Tag[];
   })[]>;
+  getAllDialoguesWithTags(): Promise<(Dialogue & {
+    tags: Tag[];
+  })[]>
+  getTagsByDialogueId(dialogueId: string): Promise<Tag[]>;
   create(input: Subset<DialogueCreateArgs, DialogueCreateArgs>): Promise<Dialogue>;
   delete(dialogueId: string): Promise<Dialogue>;
   read(dialogueId: string): Promise<(Dialogue & { questions: { id: string; }[]; edges: { id: string; }[]; sessions: { id: string; }[]; }) | null>;
   update(dialogueId: string, updateArgs: DialogueUpdateInput, include?: DialogueInclude | null | undefined): Promise<Dialogue>;
+  getRootQuestionByDialogueId(dialogueId: string): Promise<QuestionNode & {
+    form: (FormNode & {
+      fields: FormNodeField[];
+    }) | null;
+    sliderNode: (SliderNode & {
+      markers: (SliderNodeMarker & {
+        range: SliderNodeRange;
+      })[];
+    }) | null;
+  }>;
+  getEdgesByDialogueId(dialogueId: string): Promise<Edge[]>;
+  getQuestionsByDialogueId(dialogueId: string): Promise<(QuestionNode & {
+    form: (FormNode & {
+      fields: FormNodeField[];
+    }) | null;
+    sliderNode: (SliderNode & {
+      markers: (SliderNodeMarker & {
+        range: SliderNodeRange;
+      })[];
+    }) | null;
+  })[]>;
+  getCTAsByDialogueId(dialogueId: string): Promise<(QuestionNode & {
+    form: (FormNode & {
+      fields: FormNodeField[];
+    }) | null;
+  })[]>;
+  getDialogueById(dialogueId: string): Promise<Dialogue | null>;
 }
