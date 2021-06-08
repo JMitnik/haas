@@ -22,23 +22,31 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
     return this.prisma.customer.findMany();
   }
 
-  
-  async findWorkspaceBySlugs(slugs: Array<string|undefined>): Promise<Customer | null> {
+
+  async findWorkspaceBySlugs(slugs: Array<string | undefined>): Promise<Customer | null> {
     const filteredSlugs: any = slugs.filter((slug) => slug);
     return this.prisma.customer.findFirst({
       where: {
-        slug: {
-          in: filteredSlugs,
+        OR: [{
+          slug: {
+            in: filteredSlugs,
+          },
         },
+      {
+        id: {
+          in: filteredSlugs,
+        }
+      }]
+
       },
     });
   }
-  
+
   async exists(customerId: string): Promise<Boolean> {
     const customerExists = await this.prisma.customer.findFirst({
       where: { id: customerId }
     });
-    
+
     return customerExists ? true : false;
   }
 
@@ -49,7 +57,7 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
       }
     })
   }
- 
+
   async getDialogueTags(customerSlug: string, dialogueSlug: string) {
     const customer = await this.prisma.customer.findOne({
       where: {
@@ -73,7 +81,7 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
   delete(customerId: string): Promise<Customer> {
     return this.prisma.customer.delete({ where: { id: customerId } });
   }
-  
+
   async getDialogueById(customerId: string, dialogueId: string): Promise<Dialogue | undefined> {
     const customerWithDialogue = await this.prisma.customer.findOne({
       where: { id: customerId },
@@ -86,7 +94,7 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
 
     return customerWithDialogue?.dialogues?.[0];
   }
-  async getCustomer(customerId: string){
+  async getCustomer(customerId: string) {
     return this.prisma.customer.findOne({
       where: { id: customerId },
       include: {
@@ -125,12 +133,12 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
     return customerWithDialogue?.dialogues?.[0];
   }
 
- async findWorkspaceSettings(customerId: string) {
+  async findWorkspaceSettings(customerId: string) {
     return this.prisma.customerSettings.findOne({ where: { customerId } });
   }
 
   async createWorkspace(input: NexusGenInputs['CreateWorkspaceInput']) {
-   return this.prisma.customer.create({
+    return this.prisma.customer.create({
       data: {
         name: input.name,
         slug: input.slug,

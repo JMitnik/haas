@@ -1,4 +1,4 @@
-import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, PrismaClient } from '@prisma/client';
+import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, PrismaClient, FormNodeFieldUpsertArgs } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
@@ -8,6 +8,9 @@ import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
 import { EdgeServiceType } from '../edge/EdgeServiceType';
 import { LinkPrismaAdapterType } from '../link/LinkPrismaAdapterType';
 import LinkPrismaAdapter from '../link/LinkPrismaAdapter';
+import { findDifference } from '../../utils/findDifference';
+import { ShareNodePrismaAdapterType } from './adapters/ShareNodePrismaAdapterType';
+import ShareNodePrismaAdapter from './adapters/ShareNodePrismaAdapter';
 
 interface LeafNodeDataEntryProps {
   title: string;
@@ -74,15 +77,123 @@ const productServicesOptions = [{ value: 'Quality' },
 { value: 'Other' }];
 
 class NodeService implements NodeServiceType {
+  prisma: PrismaClient;
   questionNodePrismaAdapter: QuestionNodePrismaAdapterType;
   edgeService: EdgeServiceType;
   linkPrismaAdapter: LinkPrismaAdapterType;
+  shareNodePrismaAdapter: ShareNodePrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.edgeService = new EdgeService(prismaClient);
     this.linkPrismaAdapter = new LinkPrismaAdapter(prismaClient);
+    this.shareNodePrismaAdapter = new ShareNodePrismaAdapter(prismaClient);
+    this.prisma = prismaClient;
   }
+
+  saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeFieldUpsertArgs[] | undefined => (
+    input.fields?.map((field) => ({
+      create: {
+        type: field.type || 'shortText',
+        label: field.label || 'Generic',
+        position: field.position || -1,
+        isRequired: field.isRequired || false,
+      },
+      update: {
+        type: field.type || 'shortText',
+        label: field.label || 'Generic',
+        position: field.position || -1,
+        isRequired: field.isRequired || false,
+      },
+      where: {
+        id: field.id || '-1',
+      },
+    })) || undefined
+  );
+
+  async updateCTA(input: NexusGenInputs['UpdateCTAInputType']) {
+    if (!input.id) {
+      throw new Error('No ID Found');
+    }
+
+    const existingNode = await this.questionNodePrismaAdapter.getCTANode(input.id);
+
+    // If a share was previously on the node, but not any longer the case, disconnect it.
+    if (existingNode?.share && (!input?.share || input?.type !== 'SHARE')) {
+      await this.shareNodePrismaAdapter.delete(existingNode.share.id);
+    }
+
+    // If type is share, create a share connection (or update it)
+    if (input?.share && input?.share.id && input?.type === 'SHARE') {
+      await this.shareNodePrismaAdapter.upsert(input?.share.id, {
+        title: input?.share.title || '',
+        url: input?.share.url || '',
+        tooltip: input?.share.tooltip,
+        questionNode: {
+          connect: {
+            id: existingNode?.id,
+          },
+        },
+      },
+        {
+          title: input?.share.title || '',
+          url: input?.share.url || '',
+          tooltip: input?.share.tooltip,
+        },
+      )
+    }
+
+    // If we have links associated, remove "non-existing links"
+    if (existingNode?.links && input?.links?.linkTypes?.length) {
+      await this.removeNonExistingLinks(existingNode?.links, input?.links?.linkTypes);
+    }
+
+    // Upsert links in g eneral
+    if (input?.links?.linkTypes?.length) {
+      await NodeService.upsertLinks(input?.links?.linkTypes, input?.id);
+    }
+
+    // If form is passed
+    if (input?.form && input.id) {
+      const removedFields = findDifference(existingNode?.form?.fields, input?.form?.fields);
+
+      if (removedFields.length) {
+        await this.questionNodePrismaAdapter.update(input.id, {
+          form: {
+            update: {
+              fields: {
+                disconnect: removedFields.map((field) => ({ id: field?.id?.toString() || '' })),
+              },
+            },
+          },
+        });
+      }
+
+      if (existingNode?.form) {
+        await this.questionNodePrismaAdapter.update(input.id, {
+          form: {
+            update: {
+              fields: {
+                upsert: this.saveEditFormNodeInput(input.form),
+              },
+            },
+          },
+        });
+      } else {
+        await this.questionNodePrismaAdapter.update(input?.id, {
+          form: {
+            create: NodeService.saveCreateFormNodeInput(input.form),
+          },
+        });
+      };
+    };
+
+    // Finally, update question-node
+    return this.questionNodePrismaAdapter.update(input.id, {
+      title: input?.title || '',
+      type: input.type || 'GENERIC',
+    });
+  };
 
   getNodeByLinkId(linkId: string) {
     return this.questionNodePrismaAdapter.getNodeByLinkId(linkId);
@@ -544,20 +655,20 @@ class NodeService implements NodeServiceType {
 
     const dbEdgeCondition = dbEdge?.conditions && dbEdge.conditions[0];
 
+
     try {
       await NodeService.removeNonExistingQOptions(activeOptions, options, questionId);
     } catch (e) {
       console.log('Something went wrong removing options: ', e);
     }
 
-    try {
-      if (dbEdgeCondition) {
+    // Updating any question except root question should have this edge
+    if (dbEdgeCondition) {
+      try {
         await NodeService.updateEdge(dbEdgeCondition, edgeCondition);
-      } else {
-        throw Error;
+      } catch (e) {
+        console.log('something went wrong updating edges: ', e.stack);
       }
-    } catch (e) {
-      console.log('something went wrong updating edges: ', e);
     }
 
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);

@@ -8,6 +8,22 @@ class QuestionNodePrismaAdapter implements QuestionNodePrismaAdapterType {
     this.prisma = prismaClient;
   }
 
+  async getCTANode(nodeId: string) {
+    const existingNode = await this.prisma.questionNode.findOne({
+      where: { id: nodeId },
+      include: {
+        links: true,
+        share: true,
+        form: {
+          include: {
+            fields: true,
+          },
+        },
+      },
+    });
+    return existingNode;
+  }
+
 
   async getNodeByLinkId(linkId: string) {
     const link = await this.prisma.link.findOne({

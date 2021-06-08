@@ -45,116 +45,118 @@ const saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Form
   })) || undefined
 );
 
+
 export const UpdateCTAResolver = mutationField('updateCTA', {
   type: QuestionNodeType,
   args: { input: UpdateCTAInputType },
 
   async resolve(parent, args, ctx) {
     if (!args.input?.id) throw new UserInputError('No ID Found');
+    return ctx.services.nodeService.updateCTA(args.input);
 
-    const existingNode = await ctx.prisma.questionNode.findOne({
-      where: { id: args?.input?.id || undefined },
-      include: {
-        links: true,
-        share: true,
-        form: {
-          include: {
-            fields: true,
-          },
-        },
-      },
-    });
+    // const existingNode = await ctx.prisma.questionNode.findOne({
+    //   where: { id: args?.input?.id || undefined },
+    //   include: {
+    //     links: true,
+    //     share: true,
+    //     form: {
+    //       include: {
+    //         fields: true,
+    //       },
+    //     },
+    //   },
+    // });
 
-    // If a share was previously on the node, but not any longer the case, disconnect it.
-    if (existingNode?.share && (!args?.input?.share || args?.input?.type !== 'SHARE')) {
-      await ctx.prisma.share.delete({ where: { id: existingNode.share.id } });
-    }
+    // // If a share was previously on the node, but not any longer the case, disconnect it.
+    // if (existingNode?.share && (!args?.input?.share || args?.input?.type !== 'SHARE')) {
+    //   await ctx.prisma.share.delete({ where: { id: existingNode.share.id } });
+    // }
 
-    // If type is share, create a share connection (or update it)
-    if (args?.input?.share && args?.input?.type === 'SHARE') {
-      await prisma.share.upsert({
-        where: {
-          id: args?.input?.share.id || '-1',
-        },
-        create: {
-          title: args?.input?.share.title || '',
-          url: args?.input?.share.url || '',
-          tooltip: args?.input?.share.tooltip,
-          questionNode: {
-            connect: {
-              id: existingNode?.id,
-            },
-          },
-        },
-        update: {
-          title: args?.input?.share.title || '',
-          url: args?.input?.share.url || '',
-          tooltip: args?.input?.share.tooltip,
-        },
-      });
-    }
+    // // If type is share, create a share connection (or update it)
+    // if (args?.input?.share && args?.input?.type === 'SHARE') {
+    //   await prisma.share.upsert({
+    //     where: {
+    //       id: args?.input?.share.id || '-1',
+    //     },
+    //     create: {
+    //       title: args?.input?.share.title || '',
+    //       url: args?.input?.share.url || '',
+    //       tooltip: args?.input?.share.tooltip,
+    //       questionNode: {
+    //         connect: {
+    //           id: existingNode?.id,
+    //         },
+    //       },
+    //     },
+    //     update: {
+    //       title: args?.input?.share.title || '',
+    //       url: args?.input?.share.url || '',
+    //       tooltip: args?.input?.share.tooltip,
+    //     },
+    //   });
+    // }
 
-    // If we have links associated, remove "non-existing links"
-    if (existingNode?.links && args?.input?.links?.linkTypes?.length) {
-      await ctx.services.nodeService.removeNonExistingLinks(existingNode?.links, args?.input?.links?.linkTypes);
-    }
+    // // If we have links associated, remove "non-existing links"
+    // if (existingNode?.links && args?.input?.links?.linkTypes?.length) {
+    //   await ctx.services.nodeService.removeNonExistingLinks(existingNode?.links, args?.input?.links?.linkTypes);
+    // }
 
-    // Upsert links in g eneral
-    if (args?.input?.links?.linkTypes?.length) {
-      await NodeService.upsertLinks(args?.input?.links?.linkTypes, args?.input?.id);
-    }
+    // // Upsert links in g eneral
+    // if (args?.input?.links?.linkTypes?.length) {
+    //   await NodeService.upsertLinks(args?.input?.links?.linkTypes, args?.input?.id);
+    // }
 
-    // If form is passed
-    if (args?.input?.form) {
-      const removedFields = findDifference(existingNode?.form?.fields, args?.input?.form?.fields);
+    // // If form is passed
+    // if (args?.input?.form) {
+    //   const removedFields = findDifference(existingNode?.form?.fields, args?.input?.form?.fields);
 
-      if (removedFields.length) {
-        await prisma.questionNode.update({
-          where: { id: args?.input?.id },
-          data: {
-            form: {
-              update: {
-                fields: {
-                  disconnect: removedFields.map((field) => ({ id: field?.id?.toString() || '' })),
-                },
-              },
-            },
-          },
-        });
-      }
+    //   if (removedFields.length) {
+    //     await prisma.questionNode.update({
+    //       where: { id: args?.input?.id },
+    //       data: {
+    //         form: {
+    //           update: {
+    //             fields: {
+    //               disconnect: removedFields.map((field) => ({ id: field?.id?.toString() || '' })),
+    //             },
+    //           },
+    //         },
+    //       },
+    //     });
+    //   }
 
-      if (existingNode?.form) {
-        await prisma.questionNode.update({
-          where: { id: args?.input?.id },
-          data: {
-            form: {
-              update: {
-                fields: {
-                  upsert: saveEditFormNodeInput(args.input.form),
-                },
-              },
-            },
-          },
-        });
-      } else {
-        await prisma.questionNode.update({
-          where: { id: args?.input?.id },
-          data: {
-            form: {
-              create: NodeService.saveCreateFormNodeInput(args.input.form),
-            },
-          },
-        });
-      }
-    }
+    //   if (existingNode?.form) {
+    //     await prisma.questionNode.update({
+    //       where: { id: args?.input?.id },
+    //       data: {
+    //         form: {
+    //           update: {
+    //             fields: {
+    //               upsert: saveEditFormNodeInput(args.input.form),
+    //             },
+    //           },
+    //         },
+    //       },
+    //     });
+    //   } else {
+    //     await prisma.questionNode.update({
+    //       where: { id: args?.input?.id },
+    //       data: {
+    //         form: {
+    //           create: NodeService.saveCreateFormNodeInput(args.input.form),
+    //         },
+    //       },
+    //     });
+    //   }
+    // }
 
-    // Finally, update question-node
-    return prisma.questionNode.update({
-      where: { id: args?.input?.id },
-      data: {
-        title: args?.input?.title || '',
-        type: args.input.type || 'GENERIC',
-      },
-    });
+    // // Finally, update question-node
+    // return prisma.questionNode.update({
+    //   where: { id: args?.input?.id },
+    //   data: {
+    //     title: args?.input?.title || '',
+    //     type: args.input.type || 'GENERIC',
+    //   },
+    // });
   },
 });

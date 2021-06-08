@@ -32,7 +32,6 @@ class ContextSessionService implements ContextSessionServiceType{
     
     if (vars?.customerSlug || vars?.input?.customerSlug) {
       const customer = await this.customerService.findWorkspaceBySlugs([vars?.customerSlug, vars?.input?.customerSlug])
-  
       return customer;
     }
   
