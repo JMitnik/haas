@@ -16,7 +16,10 @@ class EdgePrismaAdapter implements EdgePrismaAdapterType {
   }
 
   async getEdgeById(edgeId: string) {
-    return this.prisma.edge.findOne({ where: { id: edgeId} });;
+    return this.prisma.edge.findOne({
+      where: { id: edgeId },
+      include: { conditions: true }
+    });
   }
 
   async getConditionsById(edgeId: string): Promise<import("@prisma/client").QuestionCondition[]> {

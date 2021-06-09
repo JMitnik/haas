@@ -4,7 +4,7 @@ import { EdgeServiceType } from './EdgeServiceType';
 import { EdgePrismaAdapterType } from './EdgePrismaAdapterType';
 import EdgePrismaAdapter from './EdgePrismaAdapter';
 import { QuestionNodePrismaAdapterType } from '../QuestionNode/QuestionNodePrismaAdapterType';
-import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
+import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
 
 interface QuestionConditionProps {
   id?: number;

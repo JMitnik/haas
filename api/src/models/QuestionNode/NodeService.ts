@@ -2,28 +2,25 @@ import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, Quest
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
-import { NodeServiceType } from './NodeServiceType';
-import { QuestionNodePrismaAdapterType } from './QuestionNodePrismaAdapterType';
-import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
+import { NodeServiceType, QuestionOptionProps } from './NodeServiceType';
+import { QuestionNodePrismaAdapterType } from './adapters/QuestionNode/QuestionNodePrismaAdapterType';
+import QuestionNodePrismaAdapter from './adapters/QuestionNode/QuestionNodePrismaAdapter';
 import { EdgeServiceType } from '../edge/EdgeServiceType';
 import { LinkPrismaAdapterType } from '../link/LinkPrismaAdapterType';
 import LinkPrismaAdapter from '../link/LinkPrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
-import { ShareNodePrismaAdapterType } from './adapters/ShareNodePrismaAdapterType';
-import ShareNodePrismaAdapter from './adapters/ShareNodePrismaAdapter';
+import { ShareNodePrismaAdapterType } from './adapters/ShareNode/ShareNodePrismaAdapterType';
+import ShareNodePrismaAdapter from './adapters/ShareNode/ShareNodePrismaAdapter';
+import { QuestionConditionPrismaAdapterType } from './adapters/QuestionCondition/QuestionConditionPrismaAdapterType';
+import QuestionConditionPrismaAdapter from './adapters/QuestionCondition/QuestionConditionPrismaAdapter';
+import { VideoNodePrismaAdapterType } from './adapters/VideoNode/VideoNodePrismaAdapterType';
+import VideoNodePrismaAdapter from './adapters/VideoNode/VideoNodePrismaAdapter';
 
 interface LeafNodeDataEntryProps {
   title: string;
   type: NodeType;
   links: LinkGenericInputProps[];
   form?: NexusGenInputs['FormNodeInputType'];
-}
-
-interface QuestionOptionProps {
-  id?: number;
-  value: string;
-  publicValue?: string;
-  overrideLeafId?: string;
 }
 
 interface EdgeChildProps {
@@ -82,12 +79,16 @@ class NodeService implements NodeServiceType {
   edgeService: EdgeServiceType;
   linkPrismaAdapter: LinkPrismaAdapterType;
   shareNodePrismaAdapter: ShareNodePrismaAdapterType;
+  questionConditionAdapter: QuestionConditionPrismaAdapterType;
+  videoNodePrismaAdapter: VideoNodePrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.edgeService = new EdgeService(prismaClient);
     this.linkPrismaAdapter = new LinkPrismaAdapter(prismaClient);
     this.shareNodePrismaAdapter = new ShareNodePrismaAdapter(prismaClient);
+    this.questionConditionAdapter = new QuestionConditionPrismaAdapter(prismaClient);
+    this.videoNodePrismaAdapter = new VideoNodePrismaAdapter(prismaClient);
     this.prisma = prismaClient;
   }
 
@@ -150,7 +151,7 @@ class NodeService implements NodeServiceType {
 
     // Upsert links in g eneral
     if (input?.links?.linkTypes?.length) {
-      await NodeService.upsertLinks(input?.links?.linkTypes, input?.id);
+      await this.upsertLinks(input?.links?.linkTypes, input?.id);
     }
 
     // If form is passed
@@ -229,35 +230,31 @@ class NodeService implements NodeServiceType {
     },
   });
 
-  static upsertLinks = async (
+  upsertLinks = async (
     newLinks: NexusGenInputs['CTALinkInputObjectType'][],
     questionId: string,
   ) => {
     newLinks?.forEach(async (link) => {
-      await prisma.link.upsert({
-        where: {
-          id: link.id || '-1',
-        },
-        create: {
-          title: link.title,
-          url: link.url || '',
-          type: link.type || 'API',
-          backgroundColor: link.backgroundColor,
-          iconUrl: link.iconUrl || '',
-          questionNode: {
-            connect: {
-              id: questionId,
-            },
+      await this.linkPrismaAdapter.upsert(link.id, {
+        title: link.title,
+        url: link.url || '',
+        type: link.type || 'API',
+        backgroundColor: link.backgroundColor,
+        iconUrl: link.iconUrl || '',
+        questionNode: {
+          connect: {
+            id: questionId,
           },
         },
-        update: {
+      },
+        {
           title: link.title,
           url: link.url || '',
           type: link.type || 'API',
           backgroundColor: link.backgroundColor,
           iconUrl: link.iconUrl || '',
         },
-      });
+      )
     });
   };
 
@@ -291,7 +288,7 @@ class NodeService implements NodeServiceType {
     };
   }
 
-  static createQuestionNode = async (
+  createQuestionNode = async (
     title: string,
     questionnaireId: string,
     type: NodeType,
@@ -309,7 +306,7 @@ class NodeService implements NodeServiceType {
       ...options,
     ] : [];
 
-    const params = override ? {
+    const params: QuestionNodeCreateInput = override ? {
       title,
       questionDialogue: {
         connect: {
@@ -338,41 +335,37 @@ class NodeService implements NodeServiceType {
         },
       };
 
-    return prisma.questionNode.create({
-      data: params,
-    });
+    return this.questionNodePrismaAdapter.create(params);
   };
 
-  static createTemplateLeafNodes = async (
+  createTemplateLeafNodes = async (
     leafNodesArray: LeafNodeDataEntryProps[],
     dialogueId: string,
   ) => {
     // Make leafs based on array
     const leafs = await Promise.all(
-      leafNodesArray.map(async ({ title, type, links, form }) => prisma.questionNode.create({
-        data: {
-          title,
-          questionDialogue: { connect: { id: dialogueId } },
-          type,
-          isRoot: false,
-          isLeaf: true,
-          links: links.length ? {
-            create: links,
+      leafNodesArray.map(async ({ title, type, links, form }) => this.questionNodePrismaAdapter.create({
+        title,
+        questionDialogue: { connect: { id: dialogueId } },
+        type,
+        isRoot: false,
+        isLeaf: true,
+        links: links.length ? {
+          create: links,
+        } : undefined,
+        form: {
+          create: form?.fields ? {
+            fields: {
+              create: form?.fields?.length > 0 ? form.fields.map((field) => ({
+                label: field.label || '',
+                position: field.position || -1,
+                isRequired: field.isRequired || false,
+                type: field.type || 'shortText',
+              })) : undefined,
+            },
           } : undefined,
-          form: {
-            create: form?.fields ? {
-              fields: {
-                create: form?.fields?.length > 0 ? form.fields.map((field) => ({
-                  label: field.label || '',
-                  position: field.position || -1,
-                  isRequired: field.isRequired || false,
-                  type: field.type || 'shortText',
-                })) : undefined,
-              },
-            } : undefined,
-          },
         },
-      })),
+      }))
     );
 
     return leafs;
@@ -423,7 +416,7 @@ class NodeService implements NodeServiceType {
     return null;
   };
 
-  static updateEdge = async (
+  updateEdge = async (
     dbEdgeCondition: QuestionCondition,
     newEdgeCondition: {
       id: number | null,
@@ -432,16 +425,11 @@ class NodeService implements NodeServiceType {
       renderMax: number | null,
       matchValue: string | null
     },
-  ) => prisma.questionCondition.update({
-    where: {
-      id: dbEdgeCondition.id || undefined,
-    },
-    data: {
-      conditionType: newEdgeCondition.conditionType,
-      matchValue: newEdgeCondition.matchValue,
-      renderMin: newEdgeCondition.renderMin,
-      renderMax: newEdgeCondition.renderMax,
-    },
+  ) => this.questionConditionAdapter.update(dbEdgeCondition.id, {
+    conditionType: newEdgeCondition.conditionType,
+    matchValue: newEdgeCondition.matchValue,
+    renderMin: newEdgeCondition.renderMin,
+    renderMax: newEdgeCondition.renderMax,
   });
 
   static getDeleteIDs = (
@@ -604,7 +592,7 @@ class NodeService implements NodeServiceType {
     return newQuestion;
   };
 
-  static updateQuestionFromBuilder = async (
+  updateQuestionFromBuilder = async (
     questionId: string,
     title: string,
     type: NodeType,
@@ -621,33 +609,9 @@ class NodeService implements NodeServiceType {
     sliderNode: NexusGenInputs['SliderNodeInputType'],
     extraContent: string | null | undefined,
   ) => {
-    const activeQuestion = await prisma.questionNode.findOne({
-      where: { id: questionId },
-      include: {
-        videoEmbeddedNode: true,
-        children: true,
-        options: true,
-        questionDialogue: {
-          select: {
-            id: true,
-          },
-        },
-        overrideLeaf: {
-          select: {
-            id: true,
-          },
-        },
-      }
-    });
+    const activeQuestion = await this.questionNodePrismaAdapter.getDialogueBuilderNode(questionId);
 
-    const dbEdge = await prisma.edge.findOne({
-      where: {
-        id: edgeId,
-      },
-      include: {
-        conditions: true,
-      },
-    });
+    const dbEdge = await this.edgeService.getEdgeById(edgeId || '-1');
 
     const activeOptions = activeQuestion ? activeQuestion?.options?.map((option) => option.id) : [];
     const currentOverrideLeafId = activeQuestion?.overrideLeafId || null;
@@ -665,7 +629,7 @@ class NodeService implements NodeServiceType {
     // Updating any question except root question should have this edge
     if (dbEdgeCondition) {
       try {
-        await NodeService.updateEdge(dbEdgeCondition, edgeCondition);
+        await this.updateEdge(dbEdgeCondition, edgeCondition);
       } catch (e) {
         console.log('something went wrong updating edges: ', e.stack);
       }
@@ -679,56 +643,38 @@ class NodeService implements NodeServiceType {
       embedVideoInput = { delete: true };
     }
 
-    const updatedNode = leaf ? await prisma.questionNode.update({
-      where: { id: questionId },
-      data: {
-        videoEmbeddedNode: embedVideoInput,
-        title,
-        overrideLeaf: leaf,
-        type,
-        options: {
-          connect: updatedOptionIds,
-        },
+    const updatedNode = leaf ? await this.questionNodePrismaAdapter.updateDialogueBuilderNode(questionId, {
+      videoEmbeddedNode: embedVideoInput,
+      title,
+      overrideLeaf: leaf,
+      type,
+      options: {
+        connect: updatedOptionIds,
       },
-      include: {
-        videoEmbeddedNode: true,
-      }
-    }) : await prisma.questionNode.update({
-      where: { id: questionId },
-      data: {
-        videoEmbeddedNode: embedVideoInput,
-        title,
-        type,
-        options: {
-          connect: updatedOptionIds,
-        },
+    }) : await this.questionNodePrismaAdapter.updateDialogueBuilderNode(questionId, {
+      videoEmbeddedNode: embedVideoInput,
+      title,
+      type,
+      options: {
+        connect: updatedOptionIds,
       },
-      include: {
-        videoEmbeddedNode: true,
-      }
-    });
+    })
 
     if (type === NodeType.VIDEO_EMBEDDED) {
-      if (updatedNode.videoEmbeddedNodeId) {
-
-        await prisma.videoEmbeddedNode.update({
-          where: { id: updatedNode.videoEmbeddedNodeId },
-          data: {
-            videoUrl: extraContent,
-          }
-        })
+      if (updatedNode?.videoEmbeddedNodeId) {
+        await this.videoNodePrismaAdapter.update(updatedNode.videoEmbeddedNodeId, {
+          videoUrl: extraContent,
+        });
       } else {
-        await prisma.videoEmbeddedNode.create({
-          data: {
-            QuestionNode: {
-              connect: { id: questionId },
-            },
-            videoUrl: extraContent,
-          }
+        await this.videoNodePrismaAdapter.create({
+          videoUrl: extraContent,
+          QuestionNode: {
+            connect: { id: questionId },
+          },
         })
       }
     } else if (type === NodeType.SLIDER) {
-      if (updatedNode.sliderNodeId) {
+      if (updatedNode?.sliderNodeId) {
         await prisma.sliderNode.update({
           where: { id: updatedNode.sliderNodeId },
           data: {
@@ -835,14 +781,14 @@ class NodeService implements NodeServiceType {
     leafs: QuestionNode[],
   ) => {
     // Root question (How do you feel about?)
-    const rootQuestion = await NodeService.createQuestionNode(
+    const rootQuestion = await this.createQuestionNode(
       `How do you feel about ${workspaceName}?`,
       dialogueId, NodeType.SLIDER, standardOptions, true,
     );
 
     // Positive Sub child 1 (What did you like?)
     const instagramNodeId = NodeService.getCorrectLeaf(leafs, 'Follow us on Instagram and stay');
-    const rootToWhatDidYou = await NodeService.createQuestionNode(
+    const rootToWhatDidYou = await this.createQuestionNode(
       'What did you like?', dialogueId, NodeType.CHOICE, standardOptions, false,
       instagramNodeId,
     );
@@ -850,13 +796,13 @@ class NodeService implements NodeServiceType {
     // Positive Sub sub child 1 (Facilities)
     const comeAndJoin1stAprilId = NodeService.getCorrectLeaf(leafs,
       'Come and join us on 1st April for our great event');
-    const whatDidYouToFacilities = await NodeService.createQuestionNode(
+    const whatDidYouToFacilities = await this.createQuestionNode(
       'What exactly did you like about the facilities?', dialogueId,
       NodeType.CHOICE, facilityOptions, false, comeAndJoin1stAprilId,
     );
 
     // Positive Sub sub child 2 (Website)
-    const whatDidYouToWebsite = await NodeService.createQuestionNode(
+    const whatDidYouToWebsite = await this.createQuestionNode(
       'What exactly did you like about the website?', dialogueId,
       NodeType.CHOICE, websiteOptions, false, instagramNodeId,
     );
@@ -867,7 +813,7 @@ class NodeService implements NodeServiceType {
       'We think you might like this as',
     );
 
-    const whatDidYouToProduct = await NodeService.createQuestionNode(
+    const whatDidYouToProduct = await this.createQuestionNode(
       'What exactly did you like about the product / services?',
       dialogueId,
       NodeType.CHOICE,
@@ -879,7 +825,7 @@ class NodeService implements NodeServiceType {
     // Positive Sub sub child 4 (Customer Support)
     const yourEmailBelowForNewsletter = NodeService.getCorrectLeaf(leafs,
       'your email below to receive our newsletter');
-    const whatDidYouToCustomerSupport = await NodeService.createQuestionNode(
+    const whatDidYouToCustomerSupport = await this.createQuestionNode(
       'What exactly did you like about the customer support?', dialogueId,
       NodeType.CHOICE, customerSupportOptions, false, yourEmailBelowForNewsletter,
     );
@@ -887,53 +833,53 @@ class NodeService implements NodeServiceType {
     // Neutral Sub child 2
     const leaveYourEmailBelowToReceive = NodeService.getCorrectLeaf(leafs,
       'Leave your email below to receive our');
-    const rootToWhatWouldYouLikeToTalkAbout = await NodeService.createQuestionNode(
+    const rootToWhatWouldYouLikeToTalkAbout = await this.createQuestionNode(
       'What would you like to talk about?', dialogueId, NodeType.CHOICE,
       standardOptions, false, leaveYourEmailBelowToReceive,
     );
 
     // Neutral Sub sub child 1 (Facilities)
-    const whatWouldYouLikeToTalkAboutToFacilities = await NodeService.createQuestionNode('Please specify.',
+    const whatWouldYouLikeToTalkAboutToFacilities = await this.createQuestionNode('Please specify.',
       dialogueId, NodeType.CHOICE, facilityOptions);
 
     // Neutral Sub sub child 2 (Website)
-    const whatWouldYouLikeToTalkAboutToWebsite = await NodeService.createQuestionNode(
+    const whatWouldYouLikeToTalkAboutToWebsite = await this.createQuestionNode(
       'Please specify.', dialogueId, NodeType.CHOICE, websiteOptions,
     );
 
     // Neutral Sub sub child 3 (Product/Services)
-    const whatWouldYouLikeToTalkAboutToProduct = await NodeService.createQuestionNode(
+    const whatWouldYouLikeToTalkAboutToProduct = await this.createQuestionNode(
       'Please specify.', dialogueId, NodeType.CHOICE, productServicesOptions,
     );
 
     // Neutral Sub sub child 4 (Customer Support)
-    const whatWouldYouLikeToTalkAboutToCustomerSupport = await NodeService.createQuestionNode(
+    const whatWouldYouLikeToTalkAboutToCustomerSupport = await this.createQuestionNode(
       'Please specify.', dialogueId, NodeType.CHOICE, customerSupportOptions,
     );
 
     // Negative Sub child 3
-    const rootToWeAreSorryToHearThat = await NodeService.createQuestionNode(
+    const rootToWeAreSorryToHearThat = await this.createQuestionNode(
       'We are sorry to hear that! Where can we improve?', dialogueId,
       NodeType.CHOICE, standardOptions,
     );
 
     // Negative Sub sub child 1 (Facilities)
     const ourTeamIsOnIt = NodeService.getCorrectLeaf(leafs, 'Our team is on it');
-    const weAreSorryToHearThatToFacilities = await NodeService.createQuestionNode(
+    const weAreSorryToHearThatToFacilities = await this.createQuestionNode(
       'Please elaborate.', dialogueId, NodeType.CHOICE, facilityOptions, false, ourTeamIsOnIt,
     );
 
     // Negative Sub sub child 2 (Website)
     const pleaseClickWhatsappLink = NodeService.getCorrectLeaf(leafs,
       'Please click on the Whatsapp link below so our service');
-    const weAreSorryToHearThatToWebsite = await NodeService.createQuestionNode(
+    const weAreSorryToHearThatToWebsite = await this.createQuestionNode(
       'Please elaborate.', dialogueId, NodeType.CHOICE, websiteOptions,
       false, pleaseClickWhatsappLink,
     );
 
     // Negative Sub sub child 3 (Product/Services)
     const clickBelowForRefund = NodeService.getCorrectLeaf(leafs, 'Click below for your refund');
-    const weAreSorryToHearThatToProduct = await NodeService.createQuestionNode(
+    const weAreSorryToHearThatToProduct = await this.createQuestionNode(
       'Please elaborate.', dialogueId, NodeType.CHOICE, productServicesOptions,
       false, clickBelowForRefund,
     );
@@ -941,7 +887,7 @@ class NodeService implements NodeServiceType {
     // Negative Sub sub child 4 (Customer Support)
     const ourCustomerExperienceSupervisor = NodeService.getCorrectLeaf(leafs,
       'Our customer experience supervisor is');
-    const weAreSorryToHearThatToCustomerSupport = await NodeService.createQuestionNode(
+    const weAreSorryToHearThatToCustomerSupport = await this.createQuestionNode(
       'Please elaborate', dialogueId, NodeType.CHOICE, customerSupportOptions,
       false, ourCustomerExperienceSupervisor,
     );

@@ -34,13 +34,13 @@ import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import { NodeEntryPrismaAdapterType } from '../node-entry/NodeEntryPrismaAdapterType';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
 import { QuestionConditionPrismaAdapterType } from '../QuestionNode/QuestionConditionPrismaAdapterType';
-import QuestionConditionPrismaAdapter from '../QuestionNode/QuestionConditionPrismaAdapter';
+import QuestionConditionPrismaAdapter from '../QuestionNode/adapters/QuestionCondition/QuestionConditionPrismaAdapter';
 import { EdgePrismaAdapterType } from '../edge/EdgePrismaAdapterType';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 import { QuestionOptionPrismaAdapterType } from '../QuestionNode/QuestionOptionPrismaAdapterType';
-import QuestionOptionPrismaAdapter from '../QuestionNode/QuestionOptionPrismaAdapter';
+import QuestionOptionPrismaAdapter from '../QuestionNode/adapters/QuestionOption/QuestionOptionPrismaAdapter';
 import { QuestionNodePrismaAdapterType } from '../QuestionNode/QuestionNodePrismaAdapterType';
-import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
+import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
 import { NodeServiceType } from '../QuestionNode/NodeServiceType';
 
 function getRandomInt(max: number) {
