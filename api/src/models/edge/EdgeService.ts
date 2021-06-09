@@ -1,9 +1,8 @@
 import { EdgeCreateInput, QuestionNode, PrismaClient } from '@prisma/client';
-import prisma from '../../config/prisma';
 import { EdgeServiceType } from './EdgeServiceType';
 import { EdgePrismaAdapterType } from './EdgePrismaAdapterType';
 import EdgePrismaAdapter from './EdgePrismaAdapter';
-import { QuestionNodePrismaAdapterType } from '../QuestionNode/QuestionNodePrismaAdapterType';
+import { QuestionNodePrismaAdapterType } from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapterType';
 import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
 
 interface QuestionConditionProps {

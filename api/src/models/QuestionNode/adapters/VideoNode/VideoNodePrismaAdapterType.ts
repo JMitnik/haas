@@ -3,4 +3,5 @@ import { VideoEmbeddedNodeUpdateInput, VideoEmbeddedNode, VideoEmbeddedNodeCreat
 export interface VideoNodePrismaAdapterType {
   update(nodeId: string, data: VideoEmbeddedNodeUpdateInput): Promise<VideoEmbeddedNode>;
   create(data: VideoEmbeddedNodeCreateInput): Promise<VideoEmbeddedNode>;
+  delete(id: string): Promise<VideoEmbeddedNode>;
 }

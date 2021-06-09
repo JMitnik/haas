@@ -33,13 +33,13 @@ import { SessionPrismaAdapterType } from '../session/SessionPrismaAdapterType';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import { NodeEntryPrismaAdapterType } from '../node-entry/NodeEntryPrismaAdapterType';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
-import { QuestionConditionPrismaAdapterType } from '../QuestionNode/QuestionConditionPrismaAdapterType';
+import { QuestionConditionPrismaAdapterType } from '../QuestionNode/adapters/QuestionCondition/QuestionConditionPrismaAdapterType';
 import QuestionConditionPrismaAdapter from '../QuestionNode/adapters/QuestionCondition/QuestionConditionPrismaAdapter';
 import { EdgePrismaAdapterType } from '../edge/EdgePrismaAdapterType';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
-import { QuestionOptionPrismaAdapterType } from '../QuestionNode/QuestionOptionPrismaAdapterType';
+import { QuestionOptionPrismaAdapterType } from '../QuestionNode/adapters/QuestionOption/QuestionOptionPrismaAdapterType';
 import QuestionOptionPrismaAdapter from '../QuestionNode/adapters/QuestionOption/QuestionOptionPrismaAdapter';
-import { QuestionNodePrismaAdapterType } from '../QuestionNode/QuestionNodePrismaAdapterType';
+import { QuestionNodePrismaAdapterType } from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapterType';
 import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
 import { NodeServiceType } from '../QuestionNode/NodeServiceType';
 
@@ -663,7 +663,7 @@ class DialogueService implements DialogueServiceType {
     })
 
     // TODO: Make this dependent on input "template"
-    await NodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
+    await this.nodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
 
     return dialogue;
   };
@@ -683,13 +683,13 @@ class DialogueService implements DialogueServiceType {
     if (!dialogue) throw new Error('Dialogue not seeded');
 
     // TODO: Make this dependent on input "template"
-    const leafs = await NodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
+    const leafs = await this.nodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
     await this.nodeService.createTemplateNodes(dialogue.id, customerName, leafs);
 
     return dialogue;
   };
 
-  static uuidToPrismaIds = async (questions: Array<QuestionProps>, dialogueId: string) => {
+  uuidToPrismaIds = async (questions: Array<QuestionProps>, dialogueId: string) => {
     const v4 = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
     const newQuestions = questions.filter(({ id }) => {
       const matchResult = id.match(v4);
@@ -698,7 +698,7 @@ class DialogueService implements DialogueServiceType {
 
     const newMappedQuestions = await Promise.all(newQuestions.map(
       async ({ id, title, type }) => {
-        const question = await NodeService.createQuestionNode(title, dialogueId, type);
+        const question = await this.nodeService.createQuestionNode(title, dialogueId, type);
         return { [id]: question.id };
       },
     ));

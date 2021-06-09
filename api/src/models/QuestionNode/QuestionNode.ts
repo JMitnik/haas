@@ -472,7 +472,7 @@ export const QuestionNodeMutations = extendType({
       args: { input: DeleteNodeInputType },
       // TODO: Remove the any
       // @ts-ignore
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx) {
         const { id, customerId, dialogueSlug } = args.input;
         const { prisma }: { prisma: PrismaClient } = ctx;
 
@@ -509,7 +509,7 @@ export const QuestionNodeMutations = extendType({
           throw new Error('No dialogue found to be removed');
         }
 
-        const deletedDialogues = await NodeService.deleteQuestionFromBuilder(id, dialogue);
+        const deletedDialogues = await ctx.services.nodeService.deleteQuestionFromBuilder(id, dialogue);
 
         if (!deletedDialogues) throw new Error('Unable to delete dialogue');
 
@@ -524,7 +524,7 @@ export const QuestionNodeMutations = extendType({
         input: CreateQuestionNodeInputType,
       },
       // TODO: Remove the any
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         // eslint-disable-next-line max-len
         const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition, extraContent } = args.input;
@@ -549,7 +549,7 @@ export const QuestionNodeMutations = extendType({
         console.log('extra content create: ', extraContent)
 
         if (dialogueId) {
-          return NodeService.createQuestionFromBuilder(
+          return ctx.services.nodeService.createQuestionFromBuilder(
             dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition, extraContent
           );
         }

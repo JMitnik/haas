@@ -93,7 +93,7 @@ class CustomerService implements CustomerServiceType {
     })
 
     // Step 2: Make the leafs
-    const leafs = await NodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
+    const leafs = await this.nodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
 
     // Step 3: Make nodes
     await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);

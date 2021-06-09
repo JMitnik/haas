@@ -7,6 +7,13 @@ class VideoNodePrismaAdapter implements VideoNodePrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
+  delete(id: string): Promise<import("@prisma/client").VideoEmbeddedNode> {
+    return this.prisma.videoEmbeddedNode.delete({
+      where: {
+        id,
+      }
+    });
+  };
   
   create(data: VideoEmbeddedNodeCreateInput): Promise<import("@prisma/client").VideoEmbeddedNode> {
     return this.prisma.videoEmbeddedNode.create({

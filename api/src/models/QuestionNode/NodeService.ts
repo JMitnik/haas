@@ -2,7 +2,7 @@ import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, Quest
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
-import { NodeServiceType, QuestionOptionProps } from './NodeServiceType';
+import { NodeServiceType, QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps } from './NodeServiceType';
 import { QuestionNodePrismaAdapterType } from './adapters/QuestionNode/QuestionNodePrismaAdapterType';
 import QuestionNodePrismaAdapter from './adapters/QuestionNode/QuestionNodePrismaAdapter';
 import { EdgeServiceType } from '../edge/EdgeServiceType';
@@ -15,38 +15,13 @@ import { QuestionConditionPrismaAdapterType } from './adapters/QuestionCondition
 import QuestionConditionPrismaAdapter from './adapters/QuestionCondition/QuestionConditionPrismaAdapter';
 import { VideoNodePrismaAdapterType } from './adapters/VideoNode/VideoNodePrismaAdapterType';
 import VideoNodePrismaAdapter from './adapters/VideoNode/VideoNodePrismaAdapter';
+import { SliderNodePrismaAdapterType } from './adapters/SliderNode/SliderNodePrismaAdapterType';
+import SliderNodePrismaAdapter from './adapters/SliderNode/SliderNodePrismaAdapter';
+import { QuestionOptionPrismaAdapterType } from './adapters/QuestionOption/QuestionOptionPrismaAdapterType';
+import QuestionOptionPrismaAdapter from './adapters/QuestionOption/QuestionOptionPrismaAdapter';
+import { EdgePrismaAdapterType } from '../edge/EdgePrismaAdapterType';
+import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 
-interface LeafNodeDataEntryProps {
-  title: string;
-  type: NodeType;
-  links: LinkGenericInputProps[];
-  form?: NexusGenInputs['FormNodeInputType'];
-}
-
-interface EdgeChildProps {
-  id?: string;
-  conditions: [QuestionConditionProps];
-  parentNode: EdgeNodeProps;
-  childNode: EdgeNodeProps;
-}
-
-interface QuestionConditionProps {
-  id?: number;
-  conditionType: string;
-  renderMin: number;
-  renderMax: number;
-  matchValue: string;
-}
-
-interface EdgeNodeProps {
-  id: string;
-  title: string;
-}
-
-interface LinkGenericInputProps {
-  type: 'SOCIAL' | 'API' | 'FACEBOOK' | 'LINKEDIN' | 'WHATSAPP' | 'INSTAGRAM' | 'TWITTER';
-  url: string;
-}
 
 const standardOptions = [{ value: 'Facilities' },
 { value: 'Website/Mobile app' },
@@ -81,6 +56,9 @@ class NodeService implements NodeServiceType {
   shareNodePrismaAdapter: ShareNodePrismaAdapterType;
   questionConditionAdapter: QuestionConditionPrismaAdapterType;
   videoNodePrismaAdapter: VideoNodePrismaAdapterType;
+  sliderNodePrismaAdapter: SliderNodePrismaAdapterType;
+  questionOptionPrismaAdapter: QuestionOptionPrismaAdapterType;
+  edgePrismaAdapter: EdgePrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
@@ -89,6 +67,9 @@ class NodeService implements NodeServiceType {
     this.shareNodePrismaAdapter = new ShareNodePrismaAdapter(prismaClient);
     this.questionConditionAdapter = new QuestionConditionPrismaAdapter(prismaClient);
     this.videoNodePrismaAdapter = new VideoNodePrismaAdapter(prismaClient);
+    this.sliderNodePrismaAdapter = new SliderNodePrismaAdapter(prismaClient);
+    this.questionOptionPrismaAdapter = new QuestionOptionPrismaAdapter(prismaClient);
+    this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.prisma = prismaClient;
   }
 
@@ -462,7 +443,7 @@ class NodeService implements NodeServiceType {
     return { edgeIds: foundEdgeIds, questionIds: foundQuestionIds };
   };
 
-  static deleteQuestionFromBuilder = async (id: string, dialogue: Dialogue & {
+  deleteQuestionFromBuilder = async (id: string, dialogue: Dialogue & {
     questions: {
       id: string;
     }[];
@@ -482,48 +463,24 @@ class NodeService implements NodeServiceType {
     }
 
     const { edgeIds, questionIds } = NodeService.getDeleteIDs(edges, questions, foundEdgeIds, foundQuestionIds);
-    await prisma.edge.deleteMany({
-      where: {
-        id: {
-          in: edgeIds,
-        },
-      },
-    });
+  
+    await this.edgePrismaAdapter.deleteMany(edgeIds);
 
-    const deletedQuestion = await prisma.questionNode.findOne({
-      where: {
-        id,
-      }
-    })
-
-    await prisma.share.deleteMany({
-      where: {
-        questionNodeId: id,
-      },
-    });
+    const deletedQuestion = await this.questionNodePrismaAdapter.getNodeById(id);
+    
+    await this.shareNodePrismaAdapter.deleteManyByParentQuestionId(id);
 
     if (deletedQuestion?.videoEmbeddedNodeId) {
-      await prisma.videoEmbeddedNode.delete({
-        where: {
-          id: deletedQuestion?.videoEmbeddedNodeId,
-        }
-      })
+      await this.videoNodePrismaAdapter.delete(deletedQuestion?.videoEmbeddedNodeId);
     }
 
-
-    await prisma.questionNode.deleteMany({
-      where: {
-        id: {
-          in: questionIds,
-        },
-      },
-    });
+    await this.questionNodePrismaAdapter.deleteMany(questionIds);
 
     const questionToDelete = questions.find((question) => id === question.id);
     return questionToDelete;
   };
 
-  static createQuestionFromBuilder = async (
+  createQuestionFromBuilder = async (
     dialogueId: string,
     title: string,
     type: NodeType,
@@ -541,54 +498,51 @@ class NodeService implements NodeServiceType {
   ) => {
     const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
     const videoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = extraContent ? { create: { videoUrl: extraContent } } : undefined;
-    const newQuestion = await prisma.questionNode.create({
-      data: {
-        title,
-        type,
-        videoEmbeddedNode,
-        overrideLeaf: leaf || undefined,
-        options: {
-          create: options.map((option) => ({
-            value: option.value,
-            publicValue: option.publicValue,
-            overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
-          })),
-        },
-        questionDialogue: {
-          connect: {
-            id: dialogueId,
-          },
+    const newQuestion = await this.questionNodePrismaAdapter.create({
+      title,
+      type,
+      videoEmbeddedNode,
+      overrideLeaf: leaf || undefined,
+      options: {
+        create: options.map((option) => ({
+          value: option.value,
+          publicValue: option.publicValue,
+          overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
+        })),
+      },
+      questionDialogue: {
+        connect: {
+          id: dialogueId,
         },
       },
     });
-
-    await prisma.edge.create({
-      data: {
-        dialogue: {
-          connect: {
-            id: dialogueId,
-          },
+    
+    await this.edgePrismaAdapter.create({
+      dialogue: {
+        connect: {
+          id: dialogueId,
         },
-        parentNode: {
-          connect: {
-            id: parentQuestionId,
-          },
+      },
+      parentNode: {
+        connect: {
+          id: parentQuestionId,
         },
-        conditions: {
-          create: {
-            renderMin: edgeCondition.renderMin,
-            renderMax: edgeCondition.renderMax,
-            matchValue: edgeCondition.matchValue,
-            conditionType: edgeCondition.conditionType,
-          },
+      },
+      conditions: {
+        create: {
+          renderMin: edgeCondition.renderMin,
+          renderMax: edgeCondition.renderMax,
+          matchValue: edgeCondition.matchValue,
+          conditionType: edgeCondition.conditionType,
         },
-        childNode: {
-          connect: {
-            id: newQuestion.id,
-          },
+      },
+      childNode: {
+        connect: {
+          id: newQuestion.id,
         },
       },
     });
+   
     return newQuestion;
   };
 
@@ -621,7 +575,7 @@ class NodeService implements NodeServiceType {
 
 
     try {
-      await NodeService.removeNonExistingQOptions(activeOptions, options, questionId);
+      await this.removeNonExistingQOptions(activeOptions, options, questionId);
     } catch (e) {
       console.log('Something went wrong removing options: ', e);
     }
@@ -635,7 +589,7 @@ class NodeService implements NodeServiceType {
       }
     }
 
-    const updatedOptionIds = await NodeService.updateQuestionOptions(options);
+    const updatedOptionIds = await this.updateQuestionOptions(options);
 
     // Remove videoEmbeddedNode if updated to different type
     let embedVideoInput: VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput | undefined;
@@ -675,94 +629,65 @@ class NodeService implements NodeServiceType {
       }
     } else if (type === NodeType.SLIDER) {
       if (updatedNode?.sliderNodeId) {
-        await prisma.sliderNode.update({
-          where: { id: updatedNode.sliderNodeId },
-          data: {
-            markers: {
-              update: sliderNode?.markers?.map((marker) => ({
-                where: { id: marker?.id || undefined },
-                data: {
-                  label: marker.label,
-                  subLabel: marker.subLabel,
-                },
-              })),
-            },
+        await this.sliderNodePrismaAdapter.update(updatedNode.sliderNodeId, {
+          markers: {
+            update: sliderNode?.markers?.map((marker) => ({
+              where: { id: marker?.id || undefined },
+              data: {
+                label: marker.label,
+                subLabel: marker.subLabel,
+              },
+            })),
           },
         });
       } else {
-        await prisma.sliderNode.create({
-          data: {
-            QuestionNode: {
-              connect: { id: questionId },
-            },
-            markers: {
-              create: sliderNode?.markers?.map((marker) => ({
-                label: marker.label || '',
-                subLabel: marker.subLabel || '',
-                range: {
-                  create: {
-                    start: marker?.range?.start || undefined,
-                    end: marker?.range?.end || undefined,
-                  },
+        await this.sliderNodePrismaAdapter.create({
+          QuestionNode: {
+            connect: { id: questionId },
+          },
+          markers: {
+            create: sliderNode?.markers?.map((marker) => ({
+              label: marker.label || '',
+              subLabel: marker.subLabel || '',
+              range: {
+                create: {
+                  start: marker?.range?.start || undefined,
+                  end: marker?.range?.end || undefined,
                 },
-              })),
-            },
+              },
+            })),
           },
         });
-      }
-    }
+      };
+    };
 
     return updatedNode;
   };
 
-  static updateQuestionOptions = async (options: QuestionOptionProps[]) => Promise.all(
+  updateQuestionOptions = async (options: QuestionOptionProps[]) => Promise.all(
     options?.map(async (option) => {
-      const updatedQOption = await prisma.questionOption.upsert(
-        {
-          where: { id: option.id ? option.id : -1 },
-          create: {
-            value: option.value,
-            publicValue: option.publicValue,
-            overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
-          },
-          update: {
-            value: option.value,
-            publicValue: option.publicValue,
-            overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
-          },
-        },
-      );
+      const optionId = option.id ? option.id : -1
+      const optionUpsertInput = {
+        value: option.value,
+        publicValue: option.publicValue,
+        overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
+      }
+      const updatedQOption = await this.questionOptionPrismaAdapter.upsert(optionId, optionUpsertInput, optionUpsertInput);
+      
       return { id: updatedQOption.id };
     }),
   );
 
-  static updateNewQConditions = async (edge: EdgeChildProps) => {
+  updateNewQConditions = async (edge: EdgeChildProps) => {
     const { conditionType, renderMax, renderMin, matchValue } = edge.conditions[0];
-    const condition = await prisma.questionCondition.upsert(
-      {
-        where:
-        {
-          id: edge?.conditions?.[0]?.id ? edge?.conditions?.[0]?.id : -1,
-        },
-        create: {
-          conditionType,
-          renderMax,
-          renderMin,
-          matchValue,
-        },
-        update: {
-          conditionType,
-          renderMax,
-          renderMin,
-          matchValue,
-        },
-      },
-    );
+    const conditionUpsertAgs = { conditionType, renderMax, renderMin, matchValue };
+    const conditionId = edge?.conditions?.[0]?.id ? edge?.conditions?.[0]?.id : -1
+    const condition = await this.questionConditionAdapter.upsert(conditionId, conditionUpsertAgs, conditionUpsertAgs);
 
     return { id: condition.id };
   };
 
-  static removeNonExistingQOptions = async (
+  removeNonExistingQOptions = async (
     activeOptions: Array<number>,
     newOptions: Array<QuestionOptionProps>,
     questionId: string) => {
@@ -770,7 +695,7 @@ class NodeService implements NodeServiceType {
       const newOptioIds = newOptions?.map(({ id }) => id);
       const removeQOptionsIds = activeOptions?.filter((id) => (!newOptioIds.includes(id) && id));
       if (removeQOptionsIds?.length > 0) {
-        await prisma.questionOption.deleteMany({ where: { id: { in: removeQOptionsIds } } });
+        await this.questionOptionPrismaAdapter.deleteMany(removeQOptionsIds);
       }
     }
   };
