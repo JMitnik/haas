@@ -5,6 +5,7 @@ import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema
 import { CustomerType } from '../customer/Customer';
 // eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
+import { TagEnum } from '@prisma/client';
 
 export const TagTypeEnum = enumType({
   name: 'TagTypeEnum',
@@ -36,24 +37,15 @@ export const TagQueries = extendType({
 
       async resolve(parent, args, ctx) {
         if (args.dialogueId) {
-          const tags = await ctx.prisma.tag.findMany({
-            where: {
-              isTagOf: { some: { id: args.dialogueId } },
-            },
-          });
+          const tags = await ctx.services.tagService.getAllTagsOfDialogue(args.dialogueId);
 
           return tags;
         }
 
         if (args.customerSlug) {
-          const customer = await ctx.prisma.customer.findOne({
-            where: { slug: args.customerSlug },
-            include: {
-              tags: true,
-            },
-          });
+          const tags = await ctx.services.tagService.getAllTagsByCustomerSlug(args.customerSlug);
 
-          return customer?.tags || [];
+          return tags || [];
         }
 
         throw new UserInputError('Provide a dialogue id or customer slug to find tags');
@@ -80,19 +72,7 @@ export const TagMutations = extendType({
       },
       resolve(parent, args, ctx) {
         if (!args.dialogueId) throw new UserInputError('No dialogue provided to assign to tags');
-
-        const tags = args.tags?.entries?.map((entryId) => ({ id: entryId })) || [];
-
-        return ctx.prisma.dialogue.update({
-          where: {
-            id: args.dialogueId,
-          },
-          data: {
-            tags: {
-              connect: tags,
-            },
-          },
-        });
+        return ctx.services.dialogueService.updateTags(args.dialogueId, args.tags?.entries);
       },
     });
 
@@ -104,23 +84,9 @@ export const TagMutations = extendType({
         type: TagTypeEnum,
       },
       async resolve(parent, args, ctx) {
-        if (!args.customerSlug) throw new UserInputError('No customer slug provided for which tag to create');
-
-        const customer = await ctx.prisma.customer.findOne({
-          where: { slug: args.customerSlug },
-        });
-
-        return ctx.prisma.tag.create({
-          data: {
-            name: args.name || '',
-            type: args.type || 'DEFAULT',
-            customer: {
-              connect: {
-                id: customer?.id,
-              },
-            },
-          },
-        });
+        const validatedType = Object.values(TagEnum).find((tagType) => tagType === args.type);
+        if (!args.customerSlug || !args.name || !validatedType) throw new UserInputError('Not enough inpt data to create tag!');
+        return ctx.services.tagService.createTag(args.customerSlug, args.name, validatedType);
       },
     });
 
@@ -132,7 +98,7 @@ export const TagMutations = extendType({
       resolve(parent, args, ctx) {
         if (!args.tagId) throw new UserInputError('No valid tag id provided');
 
-        return ctx.prisma.tag.delete({ where: { id: args.tagId } });
+        return ctx.services.tagService.deleteTag(args.tagId);
       },
     });
   },

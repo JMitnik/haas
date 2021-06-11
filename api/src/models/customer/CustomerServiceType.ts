@@ -17,4 +17,6 @@ export interface CustomerServiceType {
   findAll(): Promise<Customer[]>;
   findWorkspaceBySlug(slug: string): Promise<Customer|null>;
   findWorkspaceById(id: string): Promise<Customer|null>;
+  getColourSettings(colourSettingsId: number): Promise<ColourSettings|null>;
+  getFontSettings(fontSettingsId: number): Promise<FontSettings|null>;
 }

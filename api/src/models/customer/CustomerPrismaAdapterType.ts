@@ -23,4 +23,5 @@ export interface CustomerPrismaAdapterType {
   findAll(): Promise<Customer[]>;
   findWorkspaceBySlug(slug: string): Promise<Customer|null>;
   findWorkspaceById(id: string): Promise<Customer|null>;
+  findManyTagsByCustomerSlug(customerSlug: string): Promise<Tag[]>;
 }

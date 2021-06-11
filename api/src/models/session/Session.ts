@@ -19,7 +19,7 @@ export const SessionType = objectType({
     // t.int('index');
     t.int('paths', {
       async resolve(parent, args, ctx) {
-        const entryCount = await ctx.prisma.nodeEntry.count({ where: { sessionId: parent.id } });
+        const entryCount = await ctx.services.nodeEntryService.getAmountOfPaths(parent.id);
         return entryCount;
       },
     });
@@ -55,21 +55,7 @@ export const SessionType = objectType({
       type: NodeEntryType,
 
       async resolve(parent, args, ctx) {
-        const nodeEntries = await ctx.prisma.nodeEntry.findMany({
-          where: { sessionId: parent.id },
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            sliderNodeEntry: true,
-            textboxNodeEntry: true,
-          },
-          orderBy: {
-            depth: 'asc',
-          },
-        });
-
-        return nodeEntries;
+        return ctx.services.nodeEntryService.getNodeEntriesBySessionId(parent.id);
       },
     });
   },
@@ -125,11 +111,7 @@ export const SessionQuery = extendType({
           return null;
         }
 
-        const session = await ctx.prisma.session.findOne({
-          where: {
-            id: args.where.id,
-          },
-        });
+        const session = await ctx.services.sessionService.getSessionById(args.where.id);
 
         return session;
       },
@@ -187,17 +169,12 @@ export const AppendToInteractionMutation = mutationField('appendToInteraction', 
   type: SessionType,
   args: { input: AppendToInteractionInput },
 
-  resolve(parent, args, ctx) {
+  async resolve(parent, args, ctx) {
     if (!args?.input) throw new UserInputError('No valid new interaction data provided');
     if (!args?.input.sessionId) throw new UserInputError('No valid existing interaction found');
 
-    const updatedInteraction = ctx.prisma.nodeEntry.create({
-      data: {
-        session: { connect: { id: args.input.sessionId } },
-        ...NodeEntryService.constructCreateNodeEntryFragment(args.input),
-      },
-    });
-
+    const updatedInteraction = await ctx.services.nodeEntryService.createNodeEntry(args.input.sessionId, args.input);
+   
     return updatedInteraction as any;
   },
 });

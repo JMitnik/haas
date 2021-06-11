@@ -14,6 +14,8 @@ import { EdgeServiceType } from '../models/edge/EdgeServiceType';
 import { NodeEntryServiceType } from '../models/node-entry/NodeEntryServiceType';
 import { PermissionServiceType } from '../models/permission/PermissionServiceType';
 import { RoleServiceType } from '../models/role/RoleServiceType';
+import { SessionServiceType } from '../models/session/SessionTypes';
+import { TagServiceType } from '../models/tag/TagServiceType';
 
 export interface APIServiceContainer {
   userService: UserServiceType;
@@ -28,6 +30,8 @@ export interface APIServiceContainer {
   nodeEntryService: NodeEntryServiceType;
   permissionService: PermissionServiceType;
   roleService: RoleServiceType;
+  sessionService: SessionServiceType;
+  tagService: TagServiceType;
 }
 
 export interface APIContext extends ExpressContext {

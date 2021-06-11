@@ -71,4 +71,5 @@ export interface DialogueServiceType {
   getFilteredDialogues(searchTerm?: string | null | undefined): Promise<(Dialogue & {
     tags: Tag[];
   })[]>;
+  updateTags(dialogueId: string, entries?: string[] | null | undefined): Promise<Dialogue>;
 }

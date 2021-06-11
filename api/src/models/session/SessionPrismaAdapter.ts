@@ -7,6 +7,13 @@ class SessionPrismaAdapter implements SessionPrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
+  getSessionById(sessionId: string): Promise<import("@prisma/client").Session | null> {
+    return this.prisma.session.findOne({
+      where: {
+        id: sessionId,
+      },
+    });
+  }
 
   async deleteMany(sessionIds: string[]) {
     return this.prisma.session.deleteMany({

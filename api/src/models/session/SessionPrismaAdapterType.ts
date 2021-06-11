@@ -13,4 +13,5 @@ export interface SessionPrismaAdapterType {
     })): Promise<Session>;
 
     deleteMany(sessionIds: string[]): Promise<BatchPayload>;
+    getSessionById(sessionId: string): Promise<Session|null>;
 }

@@ -10,6 +10,17 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
     this.prisma = prisma;
   }
 
+  async findManyTagsByCustomerSlug(customerSlug: string): Promise<Tag[]> {
+    const customer = await this.prisma.customer.findOne({
+      where: { slug: customerSlug },
+      include: {
+        tags: true,
+      },
+    });
+
+    return customer?.tags || [];
+  }
+
   findWorkspaceBySlug(slug: string): Promise<Customer | null> {
     return this.prisma.customer.findOne({ where: { slug } });
   }
@@ -32,11 +43,11 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
             in: filteredSlugs,
           },
         },
-      {
-        id: {
-          in: filteredSlugs,
-        }
-      }]
+        {
+          id: {
+            in: filteredSlugs,
+          }
+        }]
 
       },
     });

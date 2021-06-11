@@ -68,7 +68,17 @@ class DialogueService implements DialogueServiceType {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
   }
-  
+
+  updateTags(dialogueId: string, entries?: string[] | null | undefined): Promise<Dialogue> {
+    const tags = entries?.map((entryId) => ({ id: entryId })) || [];
+    
+    return this.dialoguePrismaAdapter.update(dialogueId, {
+      tags: {
+        connect: tags,
+      },
+    });
+  }
+
   async getFilteredDialogues(searchTerm?: string | null | undefined) {
     let dialogues = await this.dialoguePrismaAdapter.getAllDialoguesWithTags();
 
@@ -628,7 +638,7 @@ class DialogueService implements DialogueServiceType {
 
     if (input.contentType === 'TEMPLATE' && input.templateDialogueId) {
       // FIXME: Tags are not copied over
-  
+
       const copyDialogueInput: CopyDialogueInputType = {
         customerSlug: customer.slug,
         description: input.description,

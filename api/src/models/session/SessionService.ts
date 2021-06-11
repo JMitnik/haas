@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import {
-  NodeEntry, Session, SessionOrderByInput, SessionWhereInput,
+  NodeEntry, Session, SessionOrderByInput, SessionWhereInput, PrismaClient,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 
@@ -14,12 +14,23 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 // eslint-disable-next-line import/no-cycle
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionWithEntries } from './SessionTypes';
+import { SessionWithEntries, SessionServiceType } from './SessionTypes';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
+import { SessionPrismaAdapterType } from './SessionPrismaAdapterType';
+import SessionPrismaAdapter from './SessionPrismaAdapter';
 
-class SessionService {
+class SessionService implements SessionServiceType {
+  sessionPrismaAdapter: SessionPrismaAdapterType;
+
+  constructor(prismaClient: PrismaClient) {
+    this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
+  }
+
+  getSessionById(sessionId: string): Promise<Session | null> {
+    return this.sessionPrismaAdapter.getSessionById(sessionId);
+  }
   /**
    * Create a user-session from the client
    * @param obj

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, NodeEntryWhereInput, NodeEntryCreateInput } from "@prisma/client";
 
 import { NodeEntryPrismaAdapterType } from "./NodeEntryPrismaAdapterType";
 
@@ -8,6 +8,35 @@ class NodeEntryPrismaAdapter implements NodeEntryPrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
+  create(data: NodeEntryCreateInput){
+    return this.prisma.nodeEntry.create({
+      data,
+    });
+  }
+
+
+  async findManyNodeEntriesBySessionId(sessionId: string): Promise<(import("@prisma/client").NodeEntry & { choiceNodeEntry: import("@prisma/client").ChoiceNodeEntry | null; linkNodeEntry: import("@prisma/client").LinkNodeEntry | null; registrationNodeEntry: import("@prisma/client").RegistrationNodeEntry | null; sliderNodeEntry: import("@prisma/client").SliderNodeEntry | null; textboxNodeEntry: import("@prisma/client").TextboxNodeEntry | null; })[]> {
+    const nodeEntries = await this.prisma.nodeEntry.findMany({
+          where: { sessionId: sessionId },
+          include: {
+            // TODO: Add videoEmbeddedNodeValue here as well or is this one saved as choiceNodeEntry? Add FormNode?
+            choiceNodeEntry: true,
+            linkNodeEntry: true,
+            registrationNodeEntry: true,
+            sliderNodeEntry: true,
+            textboxNodeEntry: true,
+          },
+          orderBy: {
+            depth: 'asc',
+          },
+        });
+
+        return nodeEntries;
+  }
+  count(where: NodeEntryWhereInput): Promise<number> {
+    return this.prisma.nodeEntry.count({ where, });
+  }
+  
   async getChildNodeEntriesById(nodeId: string) {
     const nodeEntry = await this.prisma.nodeEntry.findOne({
       where: { id: nodeId },

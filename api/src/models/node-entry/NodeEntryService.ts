@@ -13,6 +13,7 @@ import { pickProperties } from '../../utils/pickProperties';
 import prisma from '../../config/prisma';
 import { NodeEntryPrismaAdapterType } from './NodeEntryPrismaAdapterType';
 import NodeEntryPrismaAdapter from './NodeEntryPrismaAdapter';
+import { NodeEntryServiceType } from './NodeEntryServiceType';
 
 export interface NodeEntryWithTypes extends NodeEntry {
   session?: {
@@ -28,11 +29,24 @@ export interface NodeEntryWithTypes extends NodeEntry {
   linkNodeEntry?: LinkNodeEntry | undefined | null;
 }
 
-class NodeEntryService {
+class NodeEntryService implements NodeEntryServiceType {
   nodeEntryPrismaAdapter: NodeEntryPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
+  }
+  createNodeEntry(sessionId: string, nodeEntryInput: { data?: { choice?: { value?: string | null | undefined; } | null | undefined; form?: { values?: { email?: string | null | undefined; longText?: string | null | undefined; number?: number | null | undefined; phoneNumber?: string | null | undefined; relatedFieldId?: string | null | undefined; shortText?: string | null | undefined; url?: string | null | undefined; }[] | null | undefined; } | null | undefined; register?: { value?: string | null | undefined; } | null | undefined; slider?: { value?: number | null | undefined; } | null | undefined; textbox?: { value?: string | null | undefined; } | null | undefined; } | null | undefined; depth?: number | null | undefined; edgeId?: string | null | undefined; nodeId?: string | null | undefined; }): Promise<NodeEntry> {
+    return this.nodeEntryPrismaAdapter.create({
+      session: { connect: { id: sessionId } },
+      ...NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput),
+    })
+  }
+
+  getNodeEntriesBySessionId(sessionId: string): Promise<(NodeEntry & { choiceNodeEntry: ChoiceNodeEntry | null; linkNodeEntry: LinkNodeEntry | null; registrationNodeEntry: RegistrationNodeEntry | null; sliderNodeEntry: SliderNodeEntry | null; textboxNodeEntry: TextboxNodeEntry | null; })[]> {
+    return this.nodeEntryPrismaAdapter.findManyNodeEntriesBySessionId(sessionId);
+  }
+  getAmountOfPaths(sessionId: string): Promise<number> {
+    return this.nodeEntryPrismaAdapter.count({ sessionId });
   }
 
   async getNodeEntryValues(id: string) {
