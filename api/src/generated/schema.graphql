@@ -812,8 +812,6 @@ type Query {
   getPreviewData(id: String): PreviewDataType
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   me: UserType!
-  questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode
-  questionNodes: [QuestionNode!]!
   refreshAccessToken: RefreshAccessTokenOutput!
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
   roles(customerSlug: String): [RoleType!]

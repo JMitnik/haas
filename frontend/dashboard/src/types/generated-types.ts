@@ -1160,8 +1160,6 @@ export type Query = {
   refreshAccessToken: RefreshAccessTokenOutput;
   sessions: Array<Session>;
   session?: Maybe<Session>;
-  questionNode?: Maybe<QuestionNode>;
-  questionNodes: Array<QuestionNode>;
   edge?: Maybe<Edge>;
 };
 
@@ -1273,11 +1271,6 @@ export type QuerySessionsArgs = {
 
 export type QuerySessionArgs = {
   where?: Maybe<SessionWhereUniqueInput>;
-};
-
-
-export type QueryQuestionNodeArgs = {
-  where?: Maybe<QuestionNodeWhereUniqueInput>;
 };
 
 

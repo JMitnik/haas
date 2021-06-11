@@ -9,6 +9,14 @@ class EdgePrismaAdapter implements EdgePrismaAdapterType {
     this.prisma = prismaClient;
   }
 
+  findManyByParentId(parentId: string): Promise<import("@prisma/client").Edge[]> {
+   return this.prisma.edge.findMany({
+      where: {
+        parentNodeId: parentId,
+      },
+    });
+  }
+
   create(data: EdgeCreateInput): Promise<import("@prisma/client").Edge> {
     return this.prisma.edge.create({
       data

@@ -6,6 +6,14 @@ class LinkPrismaAdapter implements LinkPrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
+
+  findManyByParentId(parentId: string): Promise<import("@prisma/client").Link[]> {
+    return this.prisma.link.findMany({
+      where: {
+        questionNodeId: parentId,
+      },
+    });
+  }
   upsert(id: string | null | undefined, create: LinkCreateInput, update: LinkUpdateInput) {
     return this.prisma.link.upsert({
       where: { id: id || '-1' },

@@ -8,6 +8,14 @@ class ShareNodePrismaAdapter implements ShareNodePrismaAdapterType {
     this.prisma = prismaClient;
   }
 
+  async getNodeByParentId(parentId: string) {
+    return this.prisma.share.findFirst({
+      where: {
+        questionNodeId: parentId,
+      },
+    });
+  }
+
   deleteManyByParentQuestionId(parentId: string): Promise<import("@prisma/client").BatchPayload> {
     return this.prisma.share.deleteMany({
       where: {

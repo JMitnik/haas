@@ -183,15 +183,9 @@ export const QuestionNodeType = objectType({
     t.string('extraContent', {
       nullable: true,
       resolve: async (parent, args, ctx) => {
-        const videoEmbeddedNode = parent.videoEmbeddedNodeId ? await ctx.prisma.videoEmbeddedNode.findOne({
-          where: {
-            id: parent.videoEmbeddedNodeId,
-          },
-          select: {
-            videoUrl: true
-          }
-        }) : null;
-        return videoEmbeddedNode?.videoUrl || null;
+        if (!parent.videoEmbeddedNodeId) return null;
+        const node = await ctx.services.nodeService.getVideoEmbeddedNode(parent.videoEmbeddedNodeId);
+        return node?.videoUrl || null;
       },
     });
     t.string('creationDate', { nullable: true });
@@ -241,12 +235,8 @@ export const QuestionNodeType = objectType({
         if (!parent.isLeaf || !parent.id) {
           return null;
         }
-
-        const [share] = await ctx.prisma.share.findMany({
-          where: {
-            questionNodeId: parent.id,
-          },
-        });
+        
+        const share = await ctx.services.nodeService.getShareNode(parent.id);
 
         if (!share) return null;
 
@@ -273,11 +263,7 @@ export const QuestionNodeType = objectType({
       type: LinkType,
       async resolve(parent, args, ctx) {
         if (parent.isLeaf) {
-          const links = await ctx.prisma.link.findMany({
-            where: {
-              questionNodeId: parent.id,
-            },
-          });
+          const links = await ctx.services.nodeService.getLinksByParentId(parent.id);
 
           return links as any;
         }
@@ -292,11 +278,7 @@ export const QuestionNodeType = objectType({
 
       resolve(parent, args, ctx) {
         if (parent.questionDialogueId) {
-          return ctx.prisma.dialogue.findOne({
-            where: {
-              id: parent.questionDialogueId,
-            },
-          });
+          return ctx.services.dialogueService.getDialogueById(parent.questionDialogueId);
         }
 
         return null;
@@ -307,10 +289,9 @@ export const QuestionNodeType = objectType({
       type: QuestionNodeType,
       nullable: true,
 
-      resolve(parent, args, ctx) {
-        const overrideLeaf = ctx.prisma.questionNode.findOne({
-          where: { id: parent.id },
-        }).overrideLeaf();
+      async resolve(parent, args, ctx) {
+        if(!parent.overrideLeafId) return null
+        const overrideLeaf = await ctx.services.nodeService.getNodeById(parent.overrideLeafId);
 
         return overrideLeaf;
       },
@@ -320,26 +301,14 @@ export const QuestionNodeType = objectType({
       type: QuestionOptionType,
 
       resolve(parent, args, ctx) {
-        const options = ctx.prisma.questionOption.findMany({
-          where: { questionNodeId: parent.id },
-          include: {
-            overrideLeaf: true
-          }
-        });
-
-        return options;
+        return ctx.services.nodeService.getOptionsByParentId(parent.id);
       },
     });
 
     t.list.field('children', {
       type: EdgeType,
       resolve(parent, args, ctx) {
-        const children = ctx.prisma.edge.findMany({
-          where: {
-            parentNodeId: parent.id,
-          },
-        });
-        return children;
+        return ctx.services.nodeService.getEdgesOfQuestion(parent.id);
       },
     });
   },
@@ -575,9 +544,7 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: CreateCTAInputType },
 
-      async resolve(parent: any, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-
+      async resolve(parent, args, ctx) {
         const links = args.input?.links;
 
         const validatedType = Object.values(NodeType).find((type) => type === args.input?.type);
@@ -620,36 +587,6 @@ export const QuestionNodeMutations = extendType({
         }
         
         return ctx.services.nodeService.createCTA(createCTAInput);
-      },
-    });
-  },
-});
-
-export const getQuestionNodeQuery = extendType({
-  type: 'Query',
-
-  definition(t) {
-    t.field('questionNode', {
-      type: QuestionNodeType,
-      args: {
-        where: QuestionNodeInput,
-      },
-      nullable: true,
-      async resolve(parent, args, ctx) {
-        if (!args.where?.id) return null;
-
-        const questionNode = await ctx.prisma.questionNode.findOne({
-          where: { id: args.where.id },
-        });
-
-        return questionNode;
-      },
-    });
-
-    t.list.field('questionNodes', {
-      type: QuestionNodeType,
-      resolve(parent, args, ctx) {
-        return ctx.prisma.questionNode.findMany();
       },
     });
   },

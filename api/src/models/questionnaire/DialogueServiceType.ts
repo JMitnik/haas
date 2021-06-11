@@ -70,5 +70,5 @@ export interface DialogueServiceType {
   getDialogueById(dialogueId: string): Promise<Dialogue | null>;
   getFilteredDialogues(searchTerm?: string | null | undefined): Promise<(Dialogue & {
     tags: Tag[];
-  })[]>
+  })[]>;
 }

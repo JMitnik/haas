@@ -1,9 +1,10 @@
-import { CreateWorkspaceJob, JobProcessLocation, CustomField } from "@prisma/client";
+import { CreateWorkspaceJob, JobProcessLocation, CustomField, JobStatusType } from "@prisma/client";
 
 import { NexusGenInputs } from "../../generated/nexus";
 import { CreateWorkspaceJobProps } from "./AutodeckService";
 
 export interface AutodeckServiceType {
+  getJobById(jobId: string): Promise<CreateWorkspaceJob | null>;
   confirmWorkspaceJob: (input: NexusGenInputs['GenerateAutodeckInput'], userId?: string | undefined) => Promise<CreateWorkspaceJob & {
     processLocation: JobProcessLocation;
   }>;
@@ -24,4 +25,12 @@ export interface AutodeckServiceType {
       pageIndex: number;
     };
   }>;
+  getCustomFieldsOfJobProcessLocation(jobProcessLocationId: string): Promise<CustomField[]>;
+  getJobProcessLocationOfJob(createWorkspaceJobId: string): Promise<JobProcessLocation>;
+  update(input: {
+    id: string;
+    resourceUrl: string | null | undefined;
+    status: JobStatusType;
+    errorMessage: string | undefined;
+  }): Promise<CreateWorkspaceJob>
 } 

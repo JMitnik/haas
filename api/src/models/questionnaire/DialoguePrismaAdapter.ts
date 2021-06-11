@@ -8,6 +8,18 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
     this.prisma = prismaClient;
   }
 
+  getDialogueByQuestionNodeId(nodeId: string): Promise<Dialogue | null> {
+    return this.prisma.dialogue.findFirst({
+      where: {
+        questions: {
+          some: {
+            id: nodeId,
+          },
+        }
+      },
+    });
+  }
+
   async getDialogueBySlugs(customerSlug: string, dialogueSlug: string): Promise<Dialogue | null> {
     const customer = await this.prisma.customer.findOne({
       where: {

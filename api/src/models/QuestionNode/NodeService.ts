@@ -77,6 +77,26 @@ class NodeService implements NodeServiceType {
     this.prisma = prismaClient;
   }
 
+  getEdgesOfQuestion(nodeId: string) {
+    return this.edgePrismaAdapter.findManyByParentId(nodeId);
+  }
+
+  getOptionsByParentId(parentId: string) {
+    return this.questionOptionPrismaAdapter.findOptionsByParentId(parentId);
+  }
+
+  getLinksByParentId(parentId: string): Promise<Link[]> {
+    return this.linkPrismaAdapter.findManyByParentId(parentId);
+  }
+
+  async getShareNode(parentId: string): Promise<import("@prisma/client").Share> {
+    return this.shareNodePrismaAdapter.getNodeByParentId(parentId);
+  }
+
+  getVideoEmbeddedNode(nodeId: string) {
+    return this.videoNodePrismaAdapter.getNodeById(nodeId);
+  }
+
   async createCTA(input: {
     dialogueSlug: string,
     customerSlug: string,

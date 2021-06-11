@@ -1,4 +1,4 @@
-import { QuestionNode, Link, FormNode, FormNodeField, Share, NodeType, VideoEmbeddedNode, Dialogue } from "@prisma/client";
+import { QuestionNode, Link, FormNode, FormNodeField, Share, NodeType, VideoEmbeddedNode, Dialogue, QuestionOption, Edge } from "@prisma/client";
 import { NexusGenInputs } from "../../generated/nexus";
 import { QuestionConditionProps } from "../questionnaire/DialogueTypes";
 
@@ -33,6 +33,13 @@ export interface LeafNodeDataEntryProps {
 }
 
 export interface NodeServiceType {
+  getEdgesOfQuestion(nodeId: string): Promise<Edge[]>;
+  getOptionsByParentId(parentId: string): Promise<(QuestionOption & {
+    overrideLeaf: QuestionNode | null;
+  })[]>;
+  getLinksByParentId(parentId: string): Promise<Link[]>;
+  getShareNode(parentId: string): Promise<Share>;
+  getVideoEmbeddedNode(nodeId: string): Promise<VideoEmbeddedNode | null>;
   getNodeById(parentNodeId: string): Promise<QuestionNode | null>;
   createTemplateNodes(dialogueId: string, workspaceName: string, leafs: QuestionNode[]): Promise<void>;
   getNodeByLinkId(linkId: string): Promise<QuestionNode | null | undefined>;
@@ -54,7 +61,7 @@ export interface NodeServiceType {
     share: {
       id: string | undefined;
       title: string;
-      tooltip: string | undefined; 
+      tooltip: string | undefined;
       url: string;
     } | undefined,
   }): Promise<QuestionNode>;

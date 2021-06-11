@@ -1173,8 +1173,6 @@ export interface NexusGenFieldTypes {
     getPreviewData: NexusGenRootTypes['PreviewDataType'] | null; // PreviewDataType
     lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     me: NexusGenRootTypes['UserType']; // UserType!
-    questionNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
-    questionNodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     refreshAccessToken: NexusGenRootTypes['RefreshAccessTokenOutput']; // RefreshAccessTokenOutput!
     roleConnection: NexusGenRootTypes['RoleConnection']; // RoleConnection!
     roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
@@ -1591,9 +1589,6 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       numberOfDaysBack?: number | null; // Int
       offset?: number | null; // Int
-    }
-    questionNode: { // args
-      where?: NexusGenInputs['QuestionNodeWhereUniqueInput'] | null; // QuestionNodeWhereUniqueInput
     }
     roleConnection: { // args
       customerId?: string | null; // String

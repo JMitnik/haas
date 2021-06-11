@@ -17,6 +17,8 @@ import { JobProcessLocationPrismaAdapterType } from './JobProcessLocationPrismaA
 import JobProcessLocationPrismaAdapter from './JobProcessLocationPrismaAdapter';
 import { CreateWorkspaceJobPrismaAdapterType } from './CreateWorkspaceJobPrismaAdapterType';
 import CreateWorkspaceJobPrismaAdapter from './CreateWorkspaceJobPrismaAdapter';
+import { CustomFieldPrismaAdapterType } from './CustomFieldPrismaAdapterType';
+import CustomFieldPrismaAdapter from './CustomFieldPrismaAdapter';
 
 
 type ScreenshotProps = {
@@ -58,7 +60,7 @@ export interface CreateWorkspaceJobProps {
 }
 
 class AutodeckService implements AutodeckServiceType {
-
+  customFieldPrismaAdapter: CustomFieldPrismaAdapterType;
   customerService: CustomerServiceType;
   jobProcessLocationPrismaAdapter: JobProcessLocationPrismaAdapterType;
   createWorkspaceJobPrismaAdapter: CreateWorkspaceJobPrismaAdapterType;
@@ -67,6 +69,43 @@ class AutodeckService implements AutodeckServiceType {
     this.customerService = new CustomerService(prismaClient);
     this.jobProcessLocationPrismaAdapter = new JobProcessLocationPrismaAdapter(prismaClient);
     this.createWorkspaceJobPrismaAdapter = new CreateWorkspaceJobPrismaAdapter(prismaClient);
+    this.customFieldPrismaAdapter = new CustomFieldPrismaAdapter(prismaClient)
+  }
+
+  update(input: { id: string; resourceUrl: string | null | undefined; status: "PRE_PROCESSING" | "PRE_PROCESSING_LOGO" | "PRE_PROCESSING_WEBSITE_SCREENSHOT" | "READY_FOR_PROCESSING" | "IN_PHOTOSHOP_QUEUE" | "PHOTOSHOP_PROCESSING" | "PROCESSING" | "WRAPPING_UP" | "PENDING" | "COMPLETED" | "FAILED" | "TRANSFORMING_PSDS_TO_PNGS" | "STITCHING_SLIDES" | "COMPRESSING_SALES_MATERIAL"; errorMessage: string | undefined; }) {
+    return  this.createWorkspaceJobPrismaAdapter.update(input.id, {
+      resourcesUrl: input.resourceUrl,
+      status: input.status,
+      errorMessage: input.errorMessage
+    });
+  }
+
+  getJobById(jobId: string) {
+    return this.createWorkspaceJobPrismaAdapter.findOne({
+      where: {
+        id: jobId,
+      },
+    });
+  }
+
+  getJobProcessLocationOfJob(createWorkspaceJobId: string): Promise<import("@prisma/client").JobProcessLocation> {
+    return this.jobProcessLocationPrismaAdapter.findFirst({
+      where: {
+        job: {
+          some: {
+            id: createWorkspaceJobId,
+          },
+        },
+      },
+    });
+  }
+
+  getCustomFieldsOfJobProcessLocation(jobProcessLocationId: string): Promise<import("@prisma/client").CustomField[]> {
+    return this.customFieldPrismaAdapter.findMany({
+      where: {
+        jobProcessLocationId: jobProcessLocationId,
+      }
+    })
   }
 
   getJobProcessLocations = async () => {
@@ -194,7 +233,7 @@ class AutodeckService implements AutodeckServiceType {
       }
     }, {
       status: 'IN_PHOTOSHOP_QUEUE',
-    } ); 
+    });
 
     const processLocationId = updatedWorkspaceJob.jobProcessLocationId
     await this.addNewCustomFieldsToTemplate(input, processLocationId)

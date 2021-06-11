@@ -8,6 +8,15 @@ class QuestionOptionPrismaAdapter implements QuestionOptionPrismaAdapterType {
     this.prisma = prismaClient;
   }
 
+  findOptionsByParentId(parentId: string) {
+    return this.prisma.questionOption.findMany({
+      where: { questionNodeId: parentId },
+      include: {
+        overrideLeaf: true
+      }
+    }); 
+  }
+
   deleteMany(optionIds: number[]): Promise<import("@prisma/client").BatchPayload> {
     return this.prisma.questionOption.deleteMany({ where: { id: { in: optionIds } } });
   }

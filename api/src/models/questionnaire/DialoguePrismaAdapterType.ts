@@ -69,4 +69,5 @@ export interface DialoguePrismaAdapterType {
   getDialogueById(dialogueId: string): Promise<Dialogue | null>;
   getDialogueBySlug(customerId: string, dialogueSlug: string): Promise<Dialogue | null>;
   getDialogueBySlugs(customerSlug: string, dialogueSlug: string): Promise<Dialogue | null>;
+  getDialogueByQuestionNodeId(nodeId: string): Promise<Dialogue|null>;
 }

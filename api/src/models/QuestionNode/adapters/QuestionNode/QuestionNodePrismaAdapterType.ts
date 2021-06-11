@@ -27,5 +27,5 @@ export interface QuestionNodePrismaAdapterType {
   }) | null>
   updateDialogueBuilderNode(nodeId: string, data: QuestionNodeUpdateInput): Promise<(QuestionNode & {
     videoEmbeddedNode: VideoEmbeddedNode | null;
-  }) | null>
+  }) | null>;
 }

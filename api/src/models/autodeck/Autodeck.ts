@@ -40,12 +40,7 @@ export const JobProcessLocation = objectType({
       type: CustomFieldType,
       nullable: true,
       resolve(parent, args, ctx) {
-        const customFieldPrismaAdapter = new CustomFieldPrismaAdapter(ctx.prisma);
-        return customFieldPrismaAdapter.findMany({
-          where: {
-            jobProcessLocationId: parent.id,
-          }
-        })
+        return ctx.services.autodeckService.getCustomFieldsOfJobProcessLocation(parent.id);
       }
     })
   }
@@ -136,16 +131,7 @@ export const CreateWorkspaceJobType = objectType({
     t.field('processLocation', {
       type: JobProcessLocation,
       async resolve(parent, args, ctx) {
-        const jobProcessLocationPrismaAdapter = new JobProcessLocationPrismaAdapter(ctx.prisma);
-        return jobProcessLocationPrismaAdapter.findFirst({
-          where: {
-            job: {
-              some: {
-                id: parent.id
-              }
-            }
-          },
-        })
+        return ctx.services.autodeckService.getJobProcessLocationOfJob(parent.id);
       }
     })
   },
@@ -299,14 +285,7 @@ export const GetJobQuery = queryField('getJob', {
   args: { id: 'String' },
   async resolve(parent, args, ctx) {
     if (!args.id) return null;
-    const createWorkspaceJobPrismaAdapter = new CreateWorkspaceJobPrismaAdapter(ctx.prisma)
-    const job = await createWorkspaceJobPrismaAdapter.findOne({
-      where: {
-        id: args.id,
-      },
-    });
-
-    return job ? job as any : null;
+    return ctx.services.autodeckService.getJobById(args.id) as any;
   },
 });
 
@@ -461,13 +440,9 @@ export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorksp
       return null;
     }
 
-    const createWorkspaceJobPrismaAdapter = new CreateWorkspaceJobPrismaAdapter(ctx.prisma);
+    const updateInput = {id: args.id, resourceUrl, status: status || 'PENDING', errorMessage: errorMessage || undefined };
 
-    return createWorkspaceJobPrismaAdapter.update(args.id, {
-        resourcesUrl: resourceUrl,
-        status: status || undefined,
-        errorMessage
-      }) as any;
+    return ctx.services.autodeckService.update(updateInput) as any;
   },
 
 });

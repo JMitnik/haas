@@ -7,4 +7,5 @@ export interface EdgePrismaAdapterType {
     conditions: QuestionCondition[];
   }) | null>
   create(data: EdgeCreateInput): Promise<Edge>;
+  findManyByParentId(parentId: string): Promise<Edge[]>;
 }
