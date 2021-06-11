@@ -1175,7 +1175,6 @@ export interface NexusGenFieldTypes {
     me: NexusGenRootTypes['UserType']; // UserType!
     refreshAccessToken: NexusGenRootTypes['RefreshAccessTokenOutput']; // RefreshAccessTokenOutput!
     roleConnection: NexusGenRootTypes['RoleConnection']; // RoleConnection!
-    roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     session: NexusGenRootTypes['Session'] | null; // Session
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     tags: NexusGenRootTypes['Tag'][]; // [Tag!]!
@@ -1593,9 +1592,6 @@ export interface NexusGenArgTypes {
     roleConnection: { // args
       customerId?: string | null; // String
       filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
-    }
-    roles: { // args
-      customerSlug?: string | null; // String
     }
     session: { // args
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput

@@ -16,18 +16,21 @@ import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import { AuthServiceType } from './AuthServiceType';
 import UserService from '../users/UserService';
 import { UserServiceType } from '../users/UserServiceTypes';
+import { RoleServiceType } from '../role/RoleServiceType';
 
 class AuthService implements AuthServiceType {
   prisma: PrismaClient<PrismaClientOptions, never>;
   customerPrismaAdapter: CustomerPrismaAdapterType;
   userPrismaAdapter: UserPrismaAdapterType;
   userService: UserServiceType;
+  roleService: RoleServiceType;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.prisma = prismaClient;
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
-    this.userService = new UserService(prisma);
+    this.userService = new UserService(prismaClient);
+    this.roleService = new RoleService(prismaClient);
   }
   
   async registerUser(userInput: NexusGenInputs['RegisterInput']) {
@@ -42,7 +45,7 @@ class AuthService implements AuthServiceType {
     const hashedPassword = await AuthService.generatePassword(userInput.password);
 
     if (!userInput.roleId) {
-      RoleService.fetchDefaultRoleForCustomer(userInput.customerId);
+      this.roleService.fetchDefaultRoleForCustomer(userInput.customerId);
     }
 
     const registerUserInput: RegisterUserInput = { 

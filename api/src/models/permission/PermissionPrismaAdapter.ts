@@ -8,6 +8,10 @@ class PermissionPrismaAdapter implements PermissionPrismaAdapterType {
     this.prisma = prismaClient;
   }
 
+  findManyByCustomerId(customerId: string): Promise<import("@prisma/client").Permission[]> {
+    return this.prisma.permission.findMany({ where: { customerId } });
+  }
+
   async create(data: PermissionCreateInput) {
     return this.prisma.permission.create({
       data,

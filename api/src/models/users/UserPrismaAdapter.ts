@@ -1,12 +1,15 @@
 import { UserPrismaAdapterType, RegisterUserInput } from "./UserPrismaAdapterType";
 import { PrismaClient, UserUpdateInput, UserWhereUniqueInput, UserWhereInput } from "@prisma/client";
 import RoleService from '../role/RoleService';
+import { RoleServiceType } from "../role/RoleServiceType";
 
 class UserPrismaAdapter implements UserPrismaAdapterType {
   prisma: PrismaClient;
+  roleService: RoleServiceType;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
+    this.roleService = new RoleService(prismaClient);
   }
 
   findUserContext(userId: string) {
@@ -35,7 +38,7 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
         customers: {
           create: {
             customer: { connect: { id: registerUserInput.workspaceId || undefined } },
-            role: { connect: { id: (await RoleService.fetchDefaultRoleForCustomer(registerUserInput.workspaceId)).id || undefined } },
+            role: { connect: { id: (await this.roleService.fetchDefaultRoleForCustomer(registerUserInput.workspaceId)).id || undefined } },
           },
         },
       },

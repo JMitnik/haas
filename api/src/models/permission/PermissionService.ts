@@ -11,6 +11,10 @@ class PermissionService implements PermissionServiceType {
     this.permissionPrismaAdapter = new PermissionPrismaAdapter(prismaClient);
   }
 
+  getPermissionsOfCustomer(customerId: string): Promise<import("@prisma/client").Permission[]> {
+    return this.permissionPrismaAdapter.findManyByCustomerId(customerId);
+  }
+
   deletePermissions = async (permissionIds: Array<string>) => {
    return this.permissionPrismaAdapter.deleteMany(permissionIds);
   };
