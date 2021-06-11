@@ -21,6 +21,8 @@ import { QuestionOptionPrismaAdapterType } from './adapters/QuestionOption/Quest
 import QuestionOptionPrismaAdapter from './adapters/QuestionOption/QuestionOptionPrismaAdapter';
 import { EdgePrismaAdapterType } from '../edge/EdgePrismaAdapterType';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
+import { DialoguePrismaAdapterType } from '../questionnaire/DialoguePrismaAdapterType';
+import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 
 
 const standardOptions = [{ value: 'Facilities' },
@@ -59,6 +61,7 @@ class NodeService implements NodeServiceType {
   sliderNodePrismaAdapter: SliderNodePrismaAdapterType;
   questionOptionPrismaAdapter: QuestionOptionPrismaAdapterType;
   edgePrismaAdapter: EdgePrismaAdapterType;
+  dialoguePrismaAdapter: DialoguePrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
@@ -70,7 +73,56 @@ class NodeService implements NodeServiceType {
     this.sliderNodePrismaAdapter = new SliderNodePrismaAdapter(prismaClient);
     this.questionOptionPrismaAdapter = new QuestionOptionPrismaAdapter(prismaClient);
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
+    this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.prisma = prismaClient;
+  }
+
+  async createCTA(input: {
+    dialogueSlug: string,
+    customerSlug: string,
+    title: string,
+    type?: "GENERIC" | "SLIDER" | "FORM" | "CHOICE" | "REGISTRATION" | "TEXTBOX" | "LINK" | "SHARE" | "VIDEO_EMBEDDED" | undefined,
+    form?: NexusGenInputs['FormNodeInputType'] | null, // FormNodeInputType
+    links: {
+      id: string | undefined;
+      backgroundColor: string | undefined;
+      iconUrl: string | undefined;
+      title: string | undefined;
+      type: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP";
+      url: string;
+    }[],
+    share: {
+      id: string;
+      title: string;
+      tooltip: string | undefined;
+      url: string;
+    } | undefined,
+  }) {
+    const { customerSlug, dialogueSlug, title, type, links, share, form } = input;
+    const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(customerSlug, dialogueSlug);
+    return this.questionNodePrismaAdapter.create({
+      title,
+      type,
+      isLeaf: true,
+      links: {
+        create: links,
+      },
+      share: {
+        create: share,
+      },
+      form: {
+        create: form ? NodeService.saveCreateFormNodeInput(form) : undefined,
+      },
+      questionDialogue: {
+        connect: {
+          id: dialogue?.id,
+        },
+      },
+    })
+  }
+
+  delete(id: string): Promise<QuestionNode> {
+    return this.questionNodePrismaAdapter.delete(id);
   }
 
   saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeFieldUpsertArgs[] | undefined => (
@@ -463,11 +515,11 @@ class NodeService implements NodeServiceType {
     }
 
     const { edgeIds, questionIds } = NodeService.getDeleteIDs(edges, questions, foundEdgeIds, foundQuestionIds);
-  
+
     await this.edgePrismaAdapter.deleteMany(edgeIds);
 
     const deletedQuestion = await this.questionNodePrismaAdapter.getNodeById(id);
-    
+
     await this.shareNodePrismaAdapter.deleteManyByParentQuestionId(id);
 
     if (deletedQuestion?.videoEmbeddedNodeId) {
@@ -516,7 +568,7 @@ class NodeService implements NodeServiceType {
         },
       },
     });
-    
+
     await this.edgePrismaAdapter.create({
       dialogue: {
         connect: {
@@ -542,7 +594,7 @@ class NodeService implements NodeServiceType {
         },
       },
     });
-   
+
     return newQuestion;
   };
 
@@ -673,7 +725,7 @@ class NodeService implements NodeServiceType {
         overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
       }
       const updatedQOption = await this.questionOptionPrismaAdapter.upsert(optionId, optionUpsertInput, optionUpsertInput);
-      
+
       return { id: updatedQOption.id };
     }),
   );

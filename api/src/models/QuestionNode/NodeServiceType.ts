@@ -37,7 +37,29 @@ export interface NodeServiceType {
   createTemplateNodes(dialogueId: string, workspaceName: string, leafs: QuestionNode[]): Promise<void>;
   getNodeByLinkId(linkId: string): Promise<QuestionNode | null | undefined>;
   removeNonExistingLinks(existingLinks: Array<Link>, newLinks: NexusGenInputs['CTALinkInputObjectType'][]): Promise<void>;
+  createCTA(input: {
+    dialogueSlug: string,
+    customerSlug: string,
+    title: string,
+    type?: "GENERIC" | "SLIDER" | "FORM" | "CHOICE" | "REGISTRATION" | "TEXTBOX" | "LINK" | "SHARE" | "VIDEO_EMBEDDED" | undefined,
+    form?: NexusGenInputs['FormNodeInputType'] | null, // FormNodeInputType
+    links: {
+      id: string | undefined;
+      backgroundColor: string | undefined;
+      iconUrl: string | undefined;
+      title: string | undefined;
+      type: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP";
+      url: string;
+    }[],
+    share: {
+      id: string | undefined;
+      title: string;
+      tooltip: string | undefined; 
+      url: string;
+    } | undefined,
+  }): Promise<QuestionNode>;
   updateCTA(input: NexusGenInputs['UpdateCTAInputType']): Promise<QuestionNode>;
+  delete(id: string): Promise<QuestionNode>
   createQuestionNode: (title: string, questionnaireId: string, type: NodeType, options?: Array<any>, isRoot?: boolean, overrideLeafId?: string, isLeaf?: boolean) => Promise<QuestionNode>;
   updateQuestionFromBuilder: (
     questionId: string,

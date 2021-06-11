@@ -68,6 +68,7 @@ class DialogueService implements DialogueServiceType {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
   }
+  
   async getFilteredDialogues(searchTerm?: string | null | undefined) {
     let dialogues = await this.dialoguePrismaAdapter.getAllDialoguesWithTags();
 

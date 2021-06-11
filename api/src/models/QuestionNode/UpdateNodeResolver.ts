@@ -50,6 +50,6 @@ export const UpdateQuestionNode = mutationField('updateQuestion', {
       args.input.edgeCondition as any,
       args.input.sliderNode as any,
       args.input.extraContent,
-    );
+    ) as any;
   },
 })

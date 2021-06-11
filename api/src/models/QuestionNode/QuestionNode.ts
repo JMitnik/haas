@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, NodeType } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -11,6 +11,7 @@ import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
 import prisma from '../../config/prisma';
+import { UserInputError } from 'apollo-server';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -41,8 +42,8 @@ export const QuestionOptionType = objectType({
 
     t.string('publicValue', { nullable: true });
 
-    t.field('overrideLeaf', { 
-      type: 'QuestionNode', 
+    t.field('overrideLeaf', {
+      type: 'QuestionNode',
       nullable: true,
 
       resolve: async (parent, ctx) => {
@@ -186,13 +187,13 @@ export const QuestionNodeType = objectType({
           where: {
             id: parent.videoEmbeddedNodeId,
           },
-           select: {
-             videoUrl: true
-           }
+          select: {
+            videoUrl: true
+          }
         }) : null;
-        return videoEmbeddedNode?.videoUrl ||  null;
+        return videoEmbeddedNode?.videoUrl || null;
       },
-     });
+    });
     t.string('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
     t.string('overrideLeafId', { nullable: true });
@@ -204,7 +205,8 @@ export const QuestionNodeType = objectType({
 
     // Node-types
     // TODO: Remove `any` once we figure out how to not make prisma the backing-type
-    t.field('sliderNode', { description: 'Slidernode resolver',
+    t.field('sliderNode', {
+      description: 'Slidernode resolver',
       type: SliderNodeType,
       nullable: true,
       resolve: (parent: any) => {
@@ -213,21 +215,24 @@ export const QuestionNodeType = objectType({
         }
 
         return null;
-      } });
+      }
+    });
 
     // Node-types
     // TODO: Remove `any` once we figure out how to not make prisma the backing-type
-    t.field('form', { description: 'FormNode resolver',
+    t.field('form', {
+      description: 'FormNode resolver',
       type: FormNodeType,
       nullable: true,
       resolve: (parent: any) => {
         if (parent.type === 'FORM') {
-          console.log(parent.form);
+          // console.log(parent.form);
           return parent.form;
         }
 
         return null;
-      } });
+      }
+    });
 
     t.field('share', {
       type: ShareNodeType,
@@ -446,7 +451,7 @@ export const CreateQuestionNodeInputType = inputObjectType({
     t.string('dialogueSlug');
     t.string('title');
     t.string('type');
-    t.string('extraContent', { nullable: true }) 
+    t.string('extraContent', { nullable: true })
 
     t.field('optionEntries', { type: OptionsInputType });
     t.field('edgeCondition', { type: EdgeConditionInputType });
@@ -546,8 +551,6 @@ export const QuestionNodeMutations = extendType({
         const dialogue = customer?.dialogues[0];
         const dialogueId = dialogue?.id;
 
-        console.log('extra content create: ', extraContent)
-
         if (dialogueId) {
           return ctx.services.nodeService.createQuestionFromBuilder(
             dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition, extraContent
@@ -562,18 +565,8 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: DeleteNodeInputType },
 
-      async resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-
-        await prisma.share.deleteMany({ where: {
-          questionNodeId: args?.input?.id,
-        } });
-
-        return prisma.questionNode.delete({
-          where: {
-            id: args?.input?.id,
-          },
-        });
+      async resolve(parent: any, args: any, ctx) {
+        return ctx.services.nodeService.delete(args?.input?.id);
       },
     });
 
@@ -582,47 +575,51 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: CreateCTAInputType },
 
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const { customerSlug, dialogueSlug, title, type, links, share } = args.input;
 
-        const customer = await prisma.customer.findOne({
-          where: {
-            slug: customerSlug,
-          },
-          include: {
-            dialogues: {
-              where: {
-                slug: dialogueSlug,
-              },
-              select: {
-                id: true,
-              },
-            },
-          },
-        });
+        const links = args.input?.links;
 
-        return prisma.questionNode.create({
-          data: {
-            title,
-            type,
-            isLeaf: true,
-            links: {
-              create: [...links?.linkTypes],
-            },
-            share: {
-              create: share,
-            },
-            form: {
-              create: args.input.form ? NodeService.saveCreateFormNodeInput(args.input.form) : undefined,
-            },
-            questionDialogue: {
-              connect: {
-                id: customer?.dialogues[0].id,
-              },
-            },
-          },
-        });
+        const validatedType = Object.values(NodeType).find((type) => type === args.input?.type);
+
+        if (!args.input?.customerSlug
+          || !args.input?.dialogueSlug
+          || !args.input?.title
+          || typeof validatedType === undefined
+          || (args.input.type === NodeType.LINK && links?.linkTypes?.length === 0)
+          || (args.input.type === NodeType.SHARE && !args.input?.share?.title)
+          || (args.input.type === NodeType.FORM && args.input.form?.fields?.length === 0))
+          throw new UserInputError(`Input data is unsufficient: ${args.input}`);
+
+
+        const share = args.input?.share?.title ? {
+          id: args.input?.share?.id || undefined,
+          title: args.input?.share?.title,
+          tooltip: args.input?.share?.tooltip || undefined,
+          url: args.input?.share?.url || '',
+        } : undefined;
+
+       
+        const mappedLinks = links?.linkTypes?.map(({backgroundColor, iconUrl, id, title, type, url }) => ({
+          id: id  || undefined,
+          backgroundColor: backgroundColor || undefined,
+          iconUrl: iconUrl || undefined,
+          title: title || undefined,
+          type: type || 'SOCIAL',
+          url: url || '',
+        })) || [];
+
+        const createCTAInput = {
+          form: args.input.form,
+          share,
+          customerSlug: args.input?.customerSlug,
+          dialogueSlug: args.input?.dialogueSlug,
+          title: args.input?.title,
+          type: validatedType,
+          links: mappedLinks,
+        }
+        
+        return ctx.services.nodeService.createCTA(createCTAInput);
       },
     });
   },

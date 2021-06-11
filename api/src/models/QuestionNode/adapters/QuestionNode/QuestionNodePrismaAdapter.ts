@@ -8,6 +8,14 @@ class QuestionNodePrismaAdapter implements QuestionNodePrismaAdapterType {
     this.prisma = prismaClient;
   }
 
+  delete(id: string): Promise<import("@prisma/client").QuestionNode> {
+    return this.prisma.questionNode.delete({
+      where: {
+        id,
+      }
+    });
+  };
+
   async updateDialogueBuilderNode(nodeId: string, data: QuestionNodeUpdateInput) {
     return this.prisma.questionNode.update({
       where: { id: nodeId },

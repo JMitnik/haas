@@ -1,6 +1,7 @@
 import { BatchPayload, QuestionNode, QuestionNodeUpdateInput, FormNode, FormNodeField, Link, Share, QuestionNodeCreateInput, VideoEmbeddedNode, Edge, QuestionOption } from "@prisma/client";
 
 export interface QuestionNodePrismaAdapterType {
+  delete(id: string): Promise<QuestionNode>;
   create(data: QuestionNodeCreateInput): Promise<QuestionNode>;
   deleteMany(questionIds: string[]): Promise<BatchPayload>;
   getNodeById(nodeId: string): Promise<QuestionNode | null>;
