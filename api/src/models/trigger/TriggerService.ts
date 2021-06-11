@@ -6,6 +6,7 @@ import {
   TriggerWhereInput,
   User,
   UserWhereUniqueInput,
+  PrismaClient,
 } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
 import { isPresent } from 'ts-is-present';
@@ -23,6 +24,9 @@ import { smsService } from '../../services/sms/SmsService';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import makeTriggerMailTemplate from '../../services/mailings/templates/makeTriggerMailTemplate';
 import prisma from '../../config/prisma';
+import { TriggerServiceType } from './TriggerServiceType';
+import { TriggerPrismaAdapterType } from './TriggerPrismaAdapterType';
+import TriggerPrismaAdapter from './TriggerPrismaAdapter';
 
 interface TriggerWithSendData extends Trigger {
   recipients: User[];
@@ -35,7 +39,13 @@ interface TriggerWithSendData extends Trigger {
   } | null;
 }
 
-class TriggerService {
+class TriggerService implements TriggerServiceType {
+  triggerPrismaAdapter: TriggerPrismaAdapterType;
+
+  constructor(prismaClient: PrismaClient) {
+    this.triggerPrismaAdapter = new TriggerPrismaAdapter(prismaClient);
+  }
+  
   static getSearchTermFilter = (searchTerm: string) => {
     if (!searchTerm) {
       return [];

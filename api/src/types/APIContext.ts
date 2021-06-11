@@ -16,6 +16,7 @@ import { PermissionServiceType } from '../models/permission/PermissionServiceTyp
 import { RoleServiceType } from '../models/role/RoleServiceType';
 import { SessionServiceType } from '../models/session/SessionTypes';
 import { TagServiceType } from '../models/tag/TagServiceType';
+import { TriggerServiceType } from '../models/trigger/TriggerServiceType';
 
 export interface APIServiceContainer {
   userService: UserServiceType;
@@ -32,6 +33,7 @@ export interface APIServiceContainer {
   roleService: RoleServiceType;
   sessionService: SessionServiceType;
   tagService: TagServiceType;
+  triggerService: TriggerServiceType;
 }
 
 export interface APIContext extends ExpressContext {

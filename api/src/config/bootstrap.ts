@@ -15,6 +15,7 @@ import PermissionService from "../models/permission/PermissionService"
 import RoleService from "../models/role/RoleService"
 import SessionService from "../models/session/SessionService"
 import TagService from "../models/tag/TagService"
+import TriggerService from "../models/trigger/TriggerService"
 
 export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -31,8 +32,10 @@ export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, neve
   const roleService = new RoleService(prisma);
   const sessionService = new SessionService(prisma);
   const tagService = new TagService(prisma);
+  const triggerService = new TriggerService(prisma);
 
   return {
+    triggerService,
     tagService,
     sessionService,
     roleService,
