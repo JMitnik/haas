@@ -26,7 +26,9 @@ import makeTriggerMailTemplate from '../../services/mailings/templates/makeTrigg
 import prisma from '../../config/prisma';
 import { TriggerServiceType } from './TriggerServiceType';
 import { TriggerPrismaAdapterType } from './TriggerPrismaAdapterType';
-import TriggerPrismaAdapter from './TriggerPrismaAdapter';
+import TriggerPrismaAdapter from './adapters/Trigger/TriggerPrismaAdapter';
+import { QuestionOfTriggerPrismaAdapterType } from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapterType';
+import QuestionOfTriggerPrismaAdapter from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapter';
 
 interface TriggerWithSendData extends Trigger {
   recipients: User[];
@@ -41,11 +43,13 @@ interface TriggerWithSendData extends Trigger {
 
 class TriggerService implements TriggerServiceType {
   triggerPrismaAdapter: TriggerPrismaAdapterType;
+  questionOfTriggerPrismaAdapter: QuestionOfTriggerPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.triggerPrismaAdapter = new TriggerPrismaAdapter(prismaClient);
+    this.questionOfTriggerPrismaAdapter = new QuestionOfTriggerPrismaAdapter(prismaClient);
   }
-  
+
   static getSearchTermFilter = (searchTerm: string) => {
     if (!searchTerm) {
       return [];
