@@ -7,6 +7,7 @@ import {
   User,
   UserWhereUniqueInput,
   PrismaClient,
+  TriggerCreateInput,
 } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
 import { isPresent } from 'ts-is-present';
@@ -25,10 +26,12 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 import makeTriggerMailTemplate from '../../services/mailings/templates/makeTriggerMailTemplate';
 import prisma from '../../config/prisma';
 import { TriggerServiceType } from './TriggerServiceType';
-import { TriggerPrismaAdapterType } from './TriggerPrismaAdapterType';
+import { TriggerPrismaAdapterType } from './adapters/Trigger/TriggerPrismaAdapterType';
 import TriggerPrismaAdapter from './adapters/Trigger/TriggerPrismaAdapter';
 import { QuestionOfTriggerPrismaAdapterType } from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapterType';
 import QuestionOfTriggerPrismaAdapter from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapter';
+import { TriggerConditionPrismaAdapterType } from './adapters/TriggerCondition/TriggerConditionPrismaAdapterType';
+import TriggerConditionPrismaAdapter from './adapters/TriggerCondition/TriggerConditionPrismaAdapter';
 
 interface TriggerWithSendData extends Trigger {
   recipients: User[];
@@ -44,10 +47,84 @@ interface TriggerWithSendData extends Trigger {
 class TriggerService implements TriggerServiceType {
   triggerPrismaAdapter: TriggerPrismaAdapterType;
   questionOfTriggerPrismaAdapter: QuestionOfTriggerPrismaAdapterType;
+  triggerConditionPrismaAdapter: TriggerConditionPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient) {
     this.triggerPrismaAdapter = new TriggerPrismaAdapter(prismaClient);
     this.questionOfTriggerPrismaAdapter = new QuestionOfTriggerPrismaAdapter(prismaClient);
+    this.triggerConditionPrismaAdapter = new TriggerConditionPrismaAdapter(prismaClient);
+  }
+
+  getTriggerById(triggerId: string): Promise<Trigger | null> {
+    return this.triggerPrismaAdapter.getById(triggerId);
+  }
+
+  async createTrigger(triggerCreateArgs: TriggerCreateInput, conditions: { id?: number | null | undefined; maxValue?: number | null | undefined; minValue?: number | null | undefined; questionId?: string | null | undefined; textValue?: string | null | undefined; type?: "LOW_THRESHOLD" | "HIGH_THRESHOLD" | "INNER_RANGE" | "OUTER_RANGE" | "TEXT_MATCH" | null | undefined; }[]): Promise<Trigger> {
+    const trigger = await this.triggerPrismaAdapter.create(triggerCreateArgs);
+
+    conditions?.forEach(async (condition: any) => await this.questionOfTriggerPrismaAdapter.create({
+      question: {
+        connect: {
+          id: condition?.questionId || undefined,
+        },
+      },
+      trigger: {
+        connect: {
+          id: trigger.id,
+        },
+      },
+      triggerCondition: {
+        create: {
+          type: condition.type || 'TEXT_MATCH',
+          maxValue: condition.maxValue,
+          minValue: condition.minValue,
+          textValue: condition.textValue,
+          trigger: {
+            connect: {
+              id: trigger.id,
+            },
+          },
+        },
+      },
+    }));
+
+    return trigger;
+  }
+
+  async editTrigger(triggerId: string, triggerUpdateInput: TriggerUpdateInput, recipientIds: string[], conditions: Array<NexusGenInputs['TriggerConditionInputType']>) {
+    let updateTriggerArgs = triggerUpdateInput;
+    const dbTrigger = await this.triggerPrismaAdapter.getById(triggerId);
+
+    if (!dbTrigger) throw new Error('Unable to find trigger with given ID');
+
+    if (dbTrigger?.recipients) {
+      updateTriggerArgs = TriggerService.updateRecipients(
+        dbTrigger.recipients, (recipientIds || []), triggerUpdateInput,
+      );
+    }
+
+    if (dbTrigger?.conditions) {
+      await TriggerService.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
+    }
+
+    return this.triggerPrismaAdapter.update(dbTrigger?.id, updateTriggerArgs);
+  }
+
+  async deleteTrigger(triggerId: string) {
+    await this.questionOfTriggerPrismaAdapter.deleteManyByTriggerId(triggerId);
+    await this.triggerConditionPrismaAdapter.deleteManyByTriggerId(triggerId);
+    return this.triggerPrismaAdapter.delete(triggerId);
+  }
+
+  getConditionsOfTrigger(triggerId: string): Promise<TriggerCondition[]> {
+    return this.triggerConditionPrismaAdapter.findManyByTriggerId(triggerId);
+  }
+  getDialogueOfTrigger(triggerId: string): Promise<import("@prisma/client").Dialogue | null> {
+    return this.questionOfTriggerPrismaAdapter.findDialogueByTriggerId(triggerId);
+  }
+
+  getQuestionOfTrigger(triggerId: string, triggerConditionId: number) {
+    return this.questionOfTriggerPrismaAdapter.findOneQuestion(triggerId, triggerConditionId);
   }
 
   static getSearchTermFilter = (searchTerm: string) => {
@@ -69,9 +146,9 @@ class TriggerService implements TriggerServiceType {
     const findManyTriggerArgs: FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
 
     const findManyTriggers = async (
-      { props: findManyArgs } : FindManyCallBackProps,
+      { props: findManyArgs }: FindManyCallBackProps,
     ) => prisma.trigger.findMany(findManyArgs);
-    const countTriggers = async ({ props: countArgs } : FindManyCallBackProps) => prisma.trigger.count(countArgs);
+    const countTriggers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.trigger.count(countArgs);
 
     const paginateProps: PaginateProps = {
       findManyArgs: {
@@ -106,7 +183,7 @@ class TriggerService implements TriggerServiceType {
   static sendSmsTrigger(
     trigger: TriggerWithSendData,
     recipient: User, session: SessionWithEntries,
-    values: Array<{value: string | number | undefined, type: string}>,
+    values: Array<{ value: string | number | undefined, type: string }>,
   ) {
     if (!recipient.phone) return;
 

@@ -2,7 +2,7 @@ import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import prisma from '../../config/prisma';
 import { RoleServiceType } from './RoleServiceType';
 import { PrismaClient } from '@prisma/client';
-import { RolePrismaAdapterType } from './RolePrismaAdapterType';
+import { RolePrismaAdapterType } from './adapters/Role/RolePrismaAdapterType';
 import RolePrismaAdapter from './adapters/Role/RolePrismaAdapter';
 
 class RoleService implements RoleServiceType {

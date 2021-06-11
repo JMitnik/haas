@@ -16,7 +16,13 @@ export interface UserPrismaAdapterType {
     })[];
   })[]>;
   update(userId: string, data: UserUpdateInput): Promise<User>;
-  findFirst(where: UserWhereInput): Promise<User | null>;
+  findFirst(where: UserWhereInput): Promise<User & {
+    customers: (UserOfCustomer & {
+      customer: Customer;
+      role: Role;
+      user: User;
+    })[];
+  }>;
   findUserWithinWorkspace(email: string, workspaceId: string): Promise<User & { customers: UserOfCustomer[]; } | null>;
   existsWithinWorkspace(email: string, workspaceId: string): Promise<Boolean>;
   registerUser(registerUserInput: RegisterUserInput): Promise<User & {
@@ -31,4 +37,7 @@ export interface UserPrismaAdapterType {
       role: Role;
     })[];
   }) | null>
+  findManyByTriggerId(triggerId: string): Promise<User[]>;
+  findManyByCustomerSlug(customerSlug: string): Promise<User[]>;
+  emailExists(email: string, userId: string): Promise<Boolean>;
 }

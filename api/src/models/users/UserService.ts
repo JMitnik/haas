@@ -1,4 +1,4 @@
-import { FindManyUserOfCustomerArgs, UserOfCustomer, PrismaClient, PrismaClientOptions } from '@prisma/client';
+import { FindManyUserOfCustomerArgs, UserOfCustomer, PrismaClient, PrismaClientOptions, UserUpdateInput } from '@prisma/client';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import _ from 'lodash';
@@ -13,14 +13,104 @@ import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUp
 import { UserServiceType } from './UserServiceTypes';
 import { UserPrismaAdapterType } from './UserPrismaAdapterType';
 import UserPrismaAdapter from './UserPrismaAdapter';
+import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
+import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
+import { UserOfCustomerPrismaAdapterType } from './UserOfCustomerPrismaAdapterType';
+import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
+import { UserInputError } from 'apollo-server';
 
 class UserService implements UserServiceType {
   prisma: PrismaClient<PrismaClientOptions, never>;
   userPrismaAdapter: UserPrismaAdapterType;
+  customerPrismaAdapter: CustomerPrismaAdapterType;
+  userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapterType;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.prisma = prismaClient;
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
+    this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
+    this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
+  }
+
+  async deleteUser(userId: string, customerId: string): Promise<{ deletedUser: boolean; }> {
+    const removedUser = await this.userOfCustomerPrismaAdapter.delete(userId, customerId);
+    if (removedUser) return { deletedUser: true };
+
+    return { deletedUser: false };
+  }
+
+  async editUser(userUpdateInput: UserUpdateInput, email: string, userId: string, customerId: string | null | undefined, roleId: string | null | undefined) {
+    const emailExists = await this.userPrismaAdapter.emailExists(email, userId);
+
+    if (emailExists) throw new UserInputError('Email is already taken');
+
+    if (!email) throw new UserInputError('No valid email provided');
+
+    if (customerId) {
+      await this.userOfCustomerPrismaAdapter.update(userId, customerId, {
+        role: {
+          connect: {
+            id: roleId || undefined,
+          },
+        },
+      });
+    };
+
+    return this.userPrismaAdapter.update(userId, userUpdateInput);
+  }
+
+  getAllUsersByCustomerSlug(customerSlug: string): Promise<import("@prisma/client").User[]> {
+    return this.userPrismaAdapter.findManyByCustomerSlug(customerSlug);
+  }
+
+  async getRoleOfUser(userId: string, customerSlug: string) {
+    const user = await this.userPrismaAdapter.findFirst({ id: userId });
+
+    const userCustomer = user.customers.find((cus: any) => (
+      cus.customer.slug === customerSlug
+    ));
+
+    const role = userCustomer?.role || null;
+    return role;
+  }
+
+  async getCustomersOfUser(userId: string): Promise<import("@prisma/client").Customer[]> {
+    const user = await this.userPrismaAdapter.findFirst({ id: userId });
+    return user?.customers.map((customerOfUser) => customerOfUser.customer) || [];
+  }
+
+  async getUserCustomers(userId: string) {
+    const user = await this.userPrismaAdapter.findFirst({ id: userId });
+    const { customers, ...rest } = user;
+
+    return customers?.map((customerOfUser) => ({
+      customer: customerOfUser.customer,
+      role: customerOfUser.role,
+      user: rest, //TODO: check if changes to rest covers user: parent from resolver (parent === User),
+    })) || [];
+  }
+
+  async getGlobalPermissions(userId: string) {
+    const user = await this.userPrismaAdapter.findFirst({ id: userId });
+    return user?.globalPermissions || [];
+  }
+
+  async getUserOfCustomer(workspaceId: string | null | undefined, customerSlug: string | null | undefined, userId: string) {
+    let customerId = '';
+    if (!workspaceId && customerSlug) {
+      const customer = await this.customerPrismaAdapter.findWorkspaceBySlug(customerSlug)
+      customerId = customer?.id || '';
+    } else {
+      customerId = workspaceId || '';
+    }
+
+    const userWithCustomer = await this.userOfCustomerPrismaAdapter.getByIds(customerId, userId);
+    if (!userWithCustomer) return null;
+    return userWithCustomer;
+  };
+
+  getRecipientsOfTrigger(triggerId: string): Promise<import("@prisma/client").User[]> {
+    return this.userPrismaAdapter.findManyByTriggerId(triggerId);
   }
 
   findUserContext(userId: string) {

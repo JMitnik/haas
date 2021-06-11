@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, TriggerUpdateInput, TriggerCreateInput } from "@prisma/client";
 import { TriggerPrismaAdapterType } from "./TriggerPrismaAdapterType";
 
 class TriggerPrismaAdapter implements TriggerPrismaAdapterType {
@@ -6,6 +6,36 @@ class TriggerPrismaAdapter implements TriggerPrismaAdapterType {
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
+  }
+
+  create(data: TriggerCreateInput): Promise<import("@prisma/client").Trigger> {
+    return this.prisma.trigger.create({
+      data,
+    });
+  };
+  
+  update(triggerId: string, data: TriggerUpdateInput): Promise<import("@prisma/client").Trigger | null> {
+    return this.prisma.trigger.update({
+      where: {
+        id: triggerId,
+      },
+      data,
+    });
+  };
+
+  getById(triggerId: string) {
+    return this.prisma.trigger.findOne({
+      where: { id: triggerId },
+      include: {
+        conditions: true,
+        recipients: true,
+        relatedNode: true,
+      },
+    });
+  };
+
+  delete(triggerId: string): Promise<import("@prisma/client").Trigger | null> {
+    return this.prisma.trigger.delete({ where: { id: triggerId } });
   }
 }
 

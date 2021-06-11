@@ -11,6 +11,38 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
   }
+  /**
+   *  Checks if email address already exists (not belonging to userId)
+   * @email the email to look for
+   * @userId the userId to ignore when it comes to looking for the email address
+   */
+  async emailExists(email: string, userId: string): Promise<Boolean> {
+    const otherMails = await this.prisma.user.findFirst({
+      where: {
+        AND: {
+          email: { equals: email },
+          id: { not: userId },
+        },
+      },
+    });
+    return otherMails ? true : false;
+  }
+
+  findManyByCustomerSlug(customerSlug: string): Promise<import("@prisma/client").User[]> {
+    return this.prisma.user.findMany({
+      where: {
+        customers: {
+          every: { customer: { slug: customerSlug } },
+        }
+      }
+    });
+  }
+
+  findManyByTriggerId(triggerId: string): Promise<import("@prisma/client").User[]> {
+    return this.prisma.user.findMany({
+      where: { triggers: { some: { id: triggerId } } },
+    });;
+  }
 
   findUserContext(userId: string) {
     return this.prisma.user.findOne({
@@ -84,7 +116,7 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     });;
   }
 
-  async findFirst(where: UserWhereInput): Promise<import("@prisma/client").User | null> {
+  async findFirst(where: UserWhereInput) {
     return this.prisma.user.findFirst({
       where: where,
       include: {
