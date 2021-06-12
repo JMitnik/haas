@@ -50,8 +50,10 @@ const language = {
       de: 'Logo manipulation',
     },
     logo_manipulation_helper: {
-      en: 'Describe what logo-manipulating tasks should be executed by Autodeck before generation personalized content',
-      de: 'Describe what logo-manipulating tasks should be executed by Autodeck before generation personalized content',
+      en:
+        'Describe what logo-manipulating tasks should be executed by Autodeck before generation personalized content',
+      de:
+        'Describe what logo-manipulating tasks should be executed by Autodeck before generation personalized content',
     },
     created_at: {
       en: 'Created at',
@@ -63,19 +65,19 @@ const language = {
     },
     add_choice: {
       en: 'Add choice',
-      de: 'Wahl hinzufügen'
+      de: 'Wahl hinzufügen',
     },
     no_choices: {
       en: 'You have no choices yet',
-      de: 'Sie haben noch keine Auswahlmöglichkeiten'
+      de: 'Sie haben noch keine Auswahlmöglichkeiten',
     },
     edit_dialogue: {
       en: 'Edit dialogue',
-      de: 'Dialog bearbeiten'
+      de: 'Dialog bearbeiten',
     },
     all: {
       en: 'All',
-      de: 'Alle'
+      de: 'Alle',
     },
     link: {
       en: 'Link',
@@ -87,99 +89,103 @@ const language = {
     },
     choice: {
       en: 'Choice',
-      de: 'Wahl'
+      de: 'Wahl',
     },
     set_your_choice: {
       en: 'Set your choice',
-      de: 'Stellen Sie Ihre Wahl ein'
+      de: 'Stellen Sie Ihre Wahl ein',
     },
     delivery_recipient: {
       en: 'Related delivery',
-      de: 'Verwandte Lieferung.'
+      de: 'Verwandte Lieferung.',
     },
     origin_url: {
       en: 'Originating url',
-      de: 'Ursprungs-URL'
+      de: 'Ursprungs-URL',
     },
     duration: {
       en: 'Duration',
-      de: 'Dauer'
+      de: 'Dauer',
     },
     seconds: {
       en: 'Seconds',
-      de: 'Sekunden'
+      de: 'Sekunden',
     },
     device: {
       en: 'Device',
-      de: 'Gerät'
+      de: 'Gerät',
     },
     events: {
       en: 'Events',
-      de: 'Veranstaltungen'
+      de: 'Veranstaltungen',
     },
     scheduled_event: {
       en: 'Delivery was scheduled',
-      de: 'Die Lieferung war geplant'
+      de: 'Die Lieferung war geplant',
     },
     deployed_event: {
       en: 'Delivery was sent',
-      de: 'Die Lieferung wurde gesendet'
+      de: 'Die Lieferung wurde gesendet',
     },
     opened_event: {
       en: 'Delivery was opened',
-      de: 'Lieferung wurde eröffnet'
+      de: 'Lieferung wurde eröffnet',
     },
     finished_event: {
-      en: 'Delivery\'s dialogue was finished',
-      de: 'Der Dialog der Lieferung wurde abgeschlossen'
+      en: "Delivery's dialogue was finished",
+      de: 'Der Dialog der Lieferung wurde abgeschlossen',
     },
     details: {
       en: 'Details',
-      de: 'Detail'
+      de: 'Detail',
     },
     upload_deliveries: {
       en: 'Upload deliveries',
-      de: 'Lieferungen hochladen.'
+      de: 'Lieferungen hochladen.',
     },
     upload_deliveries_helper: {
-      en: 'Upload a CSV file with details about your recipients. \n - The appropriate format is to use ";" as delimiter \n - Use firstName;lastName;email;phone as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
-      de: 'Laden Sie eine CSV-Datei mit Details zu Ihren Empfängern hoch. \n - Das entsprechende Format ist ";" als Trennzeichen \n - Verwenden Sie firstName;lastName;email;phone als Spalten. \n - Stellen Sie den Telefonnummern ihre Landesvorwahl voran, z. B. +49 30901820',
+      en:
+        'Upload a CSV file with details about your recipients. \n - The appropriate format is to use ";" as delimiter \n - Use firstName;lastName;email;phone as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+      de:
+        'Laden Sie eine CSV-Datei mit Details zu Ihren Empfängern hoch. \n - Das entsprechende Format ist ";" als Trennzeichen \n - Verwenden Sie firstName;lastName;email;phone als Spalten. \n - Stellen Sie den Telefonnummern ihre Landesvorwahl voran, z. B. +49 30901820',
     },
     scheduled_at: {
       en: 'Schedule for when to send',
-      de: 'Zeitplan'
+      de: 'Zeitplan',
     },
     scheduled_at_helper: {
-      en: 'Set a date and time for when to send out these deliveries. \n - By default we will send out deliveries immediately. \n - Note that distribution channels like SMS may have a 5-10 minute delay.',
-      de: 'Legen Sie ein Datum und eine Uhrzeit für den Versand dieser Lieferungen fest. \n - Standardmäßig versenden wir Lieferungen sofort. \n - Beachten Sie, dass Vertriebskanäle wie SMS eine Verzögerung von 5-10 Minuten haben können.',
+      en:
+        'Set a date and time for when to send out these deliveries. \n - By default we will send out deliveries immediately. \n - Note that distribution channels like SMS may have a 5-10 minute delay.',
+      de:
+        'Legen Sie ein Datum und eine Uhrzeit für den Versand dieser Lieferungen fest. \n - Standardmäßig versenden wir Lieferungen sofort. \n - Beachten Sie, dass Vertriebskanäle wie SMS eine Verzögerung von 5-10 Minuten haben können.',
     },
     character_limit: {
       en: 'Character limit',
-      de: 'Zeichenlimit'
+      de: 'Zeichenlimit',
     },
     recipient_adress: {
       en: 'Recipient adres',
-      de: 'Empfänger adres.'
+      de: 'Empfänger adres.',
     },
     import_deliveries: {
       en: 'Import deliveries',
-      de: 'Lieferungen importieren'
+      de: 'Lieferungen importieren',
     },
     back_to_campaigns: {
       en: 'Back to campaigns',
-      de: 'Zurück zu den Kampagnen'
+      de: 'Zurück zu den Kampagnen',
     },
     select_campaign: {
       en: 'Select campaign',
-      de: 'Kampagne auswählen'
+      de: 'Kampagne auswählen',
     },
     select_campaign_text: {
       en: 'Select one of the created campaigns',
-      de: 'Wählen Sie eine der erstellten Kampagnen aus'
+      de: 'Wählen Sie eine der erstellten Kampagnen aus',
     },
     no_campaigns: {
       en: 'No campaigns have been created yet.',
-      de: 'Es wurden noch keine Kampagnen erstellt.'
+      de: 'Es wurden noch keine Kampagnen erstellt.',
     },
     edit_variant: {
       en: 'Edit variant',
@@ -222,8 +228,10 @@ const language = {
       de: 'Varianten',
     },
     variants_helper: {
-      en: 'Variants allow you to specify an A/B test for your campaign. You can specify different distribution channels (such as Email or SMS), by setting the probability of the different variants.',
-      de: 'Mit Varianten können Sie einen A / B-Test für Ihre Kampagne angeben. Sie können verschiedene Vertriebskanäle (wie E-Mail oder SMS) angeben, indem Sie die Wahrscheinlichkeit der verschiedenen Varianten festlegen.',
+      en:
+        'Variants allow you to specify an A/B test for your campaign. You can specify different distribution channels (such as Email or SMS), by setting the probability of the different variants.',
+      de:
+        'Mit Varianten können Sie einen A / B-Test für Ihre Kampagne angeben. Sie können verschiedene Vertriebskanäle (wie E-Mail oder SMS) angeben, indem Sie die Wahrscheinlichkeit der verschiedenen Varianten festlegen.',
     },
     variant_label: {
       en: 'Variant label',
@@ -258,8 +266,10 @@ const language = {
       de: 'Felder',
     },
     about_fields_helper: {
-      en: 'With fields, you can request various types of data from your visitor. For example, you are only interested in a visitor\'s phone number, or perhaps a simple nickname will do.',
-      de: 'Mit Feldern können Sie verschiedene Arten von Daten von Ihrem Besucher anfordern. Zum Beispiel interessieren Sie sich nur für die Telefonnummer eines Besuchers, oder vielleicht reicht ein einfacher Spitzname.',
+      en:
+        "With fields, you can request various types of data from your visitor. For example, you are only interested in a visitor's phone number, or perhaps a simple nickname will do.",
+      de:
+        'Mit Feldern können Sie verschiedene Arten von Daten von Ihrem Besucher anfordern. Zum Beispiel interessieren Sie sich nur für die Telefonnummer eines Besuchers, oder vielleicht reicht ein einfacher Spitzname.',
     },
     empty_field_helper: {
       en: 'Select at least a type',
@@ -435,7 +445,8 @@ const language = {
     },
     register_helper: {
       en: 'Welcome to haas! Finish your registration by filling in some last details.',
-      de: 'Willkommen! Wir brauchen nur noch ein paar letzte Informationen zum Abschließen der Registration.',
+      de:
+        'Willkommen! Wir brauchen nur noch ein paar letzte Informationen zum Abschließen der Registration.',
     },
     description: {
       en: 'Description',
@@ -545,6 +556,10 @@ const language = {
       en: 'Actions',
       de: 'Aktionen',
     },
+    adminpanel: {
+      en: 'Admin Panel',
+      de: 'Admin Bereich',
+    },
     stay_tuned: {
       en: 'Stay tuned',
       de: 'Bleib dabei',
@@ -575,7 +590,8 @@ const language = {
     },
     logo_existing_url_helper: {
       en: 'Use the URL of an existing logo. We recommend one with no background colors.',
-      de: 'Verwenden Sie die URL eines vorhandenen Logos. Am besten klappt es wenn es keine Hintergrundfarbe hat.',
+      de:
+        'Verwenden Sie die URL eines vorhandenen Logos. Am besten klappt es wenn es keine Hintergrundfarbe hat.',
     },
     logo_upload: {
       en: 'Logo: Drag and Drop',
@@ -594,8 +610,10 @@ const language = {
       de: 'Willkommen bei haas!',
     },
     welcome_to_haas_helper: {
-      en: 'It seems like this is your first time using haas. For starters, feel free to fill in the following information get set-up.',
-      de: 'Es scheint so als würdest du haas zum ersten Mal verwenden. Für den Anfang, kannst du die folgenden Informationen eingeben, um die Einrichtung zu erleichtern.',
+      en:
+        'It seems like this is your first time using haas. For starters, feel free to fill in the following information get set-up.',
+      de:
+        'Es scheint so als würdest du haas zum ersten Mal verwenden. Für den Anfang, kannst du die folgenden Informationen eingeben, um die Einrichtung zu erleichtern.',
     },
     stay_tuned_helper: {
       en: 'A new feature is coming soon.',
@@ -633,6 +651,16 @@ const language = {
       en: 'Minimum value',
       de: 'Minimalwert',
     },
+    video_embedded: {
+      en: 'Embedded video ID',
+      de: 'Eingebettete Video-ID',
+    },
+    video_embedded_helper: {
+      en: `What is the ID of the video you want to display at the question?
+This ID can be found in the URL of the video. Currently only youtube is supported.`,
+      de: `Wie lautet die ID des Videos, das Sie anzeigen möchten?
+Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt.`,
+    },
     max_value: {
       en: 'Maximum value',
       de: 'Maximalwert',
@@ -666,28 +694,37 @@ const language = {
       de: 'Besuchen',
     },
     delete_dialogue_popover: {
-      en: 'You are about to delete a dialogue and all related data. This cannot be undone! Are you sure?',
-      de: 'Du bist dabei ein Dialog mit allen dazugehörigen data zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      en:
+        'You are about to delete a dialogue and all related data. This cannot be undone! Are you sure?',
+      de:
+        'Du bist dabei ein Dialog mit allen dazugehörigen data zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_customer_popover: {
-      en: 'You are about to delete a workspace and all related questions. This cannot be undone! Are you sure?',
-      de: 'Du bist dabei ein Projekt mit allen dazugehörigen Fragen zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      en:
+        'You are about to delete a workspace and all related questions. This cannot be undone! Are you sure?',
+      de:
+        'Du bist dabei ein Projekt mit allen dazugehörigen Fragen zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_question_popover: {
-      en: 'You are about to delete a question and all attached sub-questions. This cannot be undone! Are you sure?',
-      de: 'Du bist dabei eine Frage und alle dazugehörigen Unterfragen zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      en:
+        'You are about to delete a question and all attached sub-questions. This cannot be undone! Are you sure?',
+      de:
+        'Du bist dabei eine Frage und alle dazugehörigen Unterfragen zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_cta_popover: {
       en: 'You are about to delete a Call-to-Action. This cannot be undone! Are you sure?',
-      de: 'Du bist dabei einen Call-To-Action zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      de:
+        'Du bist dabei einen Call-To-Action zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_trigger_popover: {
       en: 'You are about to delete an alert. This cannot be undone! Are you sure?',
-      de: 'Du bist dabei eine Push-Benachrichtugung zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      de:
+        'Du bist dabei eine Push-Benachrichtugung zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_user_popover: {
       en: 'You are about to delete a user. This cannot be undone! Are you sure?',
-      de: 'Du bist dabei einen Benutzer zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      de:
+        'Du bist dabei einen Benutzer zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     create_trigger: {
       en: 'Create alert',
@@ -822,7 +859,7 @@ const language = {
       de: 'Vorname',
     },
     first_name_helper: {
-      en: 'What is the user\'s first name?',
+      en: "What is the user's first name?",
       de: 'Wie lautet der Vorname des Benutzers?',
     },
     last_name: {
@@ -830,7 +867,7 @@ const language = {
       de: 'Nachname',
     },
     last_name_helper: {
-      en: 'What is the user\'s last name?',
+      en: "What is the user's last name?",
       de: 'Wie lautet der Nachname des Benutzers?',
     },
     email: {
@@ -838,7 +875,7 @@ const language = {
       de: 'Emailadresse',
     },
     email_helper: {
-      en: 'What is the user\'s email address?',
+      en: "What is the user's email address?",
       de: 'Was lautet die E-Mail?',
     },
     phone: {
@@ -850,8 +887,9 @@ const language = {
       de: 'Das letzte Update war vor: {{date}}',
     },
     phone_helper: {
-      en: 'What is the user\'s phone number? Start with the country code. Example: +316123456',
-      de: 'Wie lautet die Telefonnummer des Benutzers? Beginne mit der Landesvorwahl. Beispiel: +496123456',
+      en: "What is the user's phone number? Start with the country code. Example: +316123456",
+      de:
+        'Wie lautet die Telefonnummer des Benutzers? Beginne mit der Landesvorwahl. Beispiel: +496123456',
     },
     name_helper: {
       en: 'What is the name of your workspace?',
@@ -862,7 +900,7 @@ const language = {
       de: 'Benutzerrolle',
     },
     role_selector_helper: {
-      en: 'What will be the user\'s role?',
+      en: "What will be the user's role?",
       de: 'Welche Rolle soll der Benutzer haben?',
     },
     slug: {
@@ -911,7 +949,7 @@ const language = {
     },
     custom_fields_helper: {
       en: 'Add custom fields to an existing template',
-      de: 'Add custom fields to an existing template'
+      de: 'Add custom fields to an existing template',
     },
     company_name: {
       en: 'Company name',
@@ -979,7 +1017,7 @@ const language = {
     },
     download_result: {
       en: 'Download result',
-      de: 'Download result'
+      de: 'Download result',
     },
     primary_color: {
       en: 'Primary color',
@@ -1108,7 +1146,7 @@ const language = {
       de: 'Erzähle uns etwas zu deinem Unternehmen. Wie sollen der Name und die URL lauten.',
     },
     branding_color_helper: {
-      en: 'What is the company\'s main brand color?',
+      en: "What is the company's main brand color?",
       de: 'Was ist die Hauptfarbe deiner Marke?',
     },
     branding_helper: {
@@ -1216,7 +1254,11 @@ const language = {
     topic_view: {
       en: 'Topics',
       de: 'Themen'
-    }
+    },
+    admin_overview: {
+      en: 'Admin Panel',
+      de: 'Administratie Paneel',
+    },
   },
   user: {
     roles_helper: {
@@ -1236,22 +1278,44 @@ const language = {
       de: 'Erzählen Sie uns etwas über den Benutzer.',
     },
   },
+  admin: {
+    userId: {
+      en: 'User Id',
+      de: 'Benutzeridentifikation',
+    },
+    userFName: {
+      en: 'First Name',
+      de: 'Vorname',
+    },
+    userLName: {
+      en: 'Last Name',
+      de: 'Nachname',
+    },
+    userPermissions: {
+      en: 'Permission',
+      de: 'Genehmigung',
+    },
+  },
   dialogue: {
     choices: {
       en: 'Choices',
-      de: 'Entscheidungen'
+      de: 'Entscheidungen',
     },
     choices_helper: {
-      en: 'Choices of this question define what potential answer a visitor can give. Furthermore, it is also possible to optionally connect a Call-to-Action to the option the user selects. Note: if a Call-to-Action further in the journey is setup, this one will be overriden.',
-      de: 'Die Auswahl dieser Frage definiert, welche potenzielle Antwort ein Besucher geben kann. Darüber hinaus ist es auch möglich, optional eine Handlungsaufforderung mit der vom Benutzer ausgewählten Option zu verbinden. Hinweis: Wenn eine Handlungsaufforderung weiter unten auf der Reise eingerichtet wird, wird diese überschrieben.',
+      en:
+        'Choices of this question define what potential answer a visitor can give. Furthermore, it is also possible to optionally connect a Call-to-Action to the option the user selects. Note: if a Call-to-Action further in the journey is setup, this one will be overriden.',
+      de:
+        'Die Auswahl dieser Frage definiert, welche potenzielle Antwort ein Besucher geben kann. Darüber hinaus ist es auch möglich, optional eine Handlungsaufforderung mit der vom Benutzer ausgewählten Option zu verbinden. Hinweis: Wenn eine Handlungsaufforderung weiter unten auf der Reise eingerichtet wird, wird diese überschrieben.',
     },
     markers: {
       en: 'Markers',
       de: 'Marker',
     },
     markers_helper: {
-      en: 'Markers are points in the slider of particular significance for the end-user. You can edit the relevant texts, or leave them as we defined originally. An additional helper label can be used to help your customer express themselves better.',
-      de: 'Marker sind Punkte in Ihrem Schieberegler, die für den Endbenutzer von besonderer Bedeutung sind. Sie können die relevanten Texte anhand unserer (derzeit vordefinierten) Texte bearbeiten oder sie ursprünglich definiert lassen. Ein zusätzliches Unteretikett kann verwendet werden, damit sich Ihre Kunden besser ausdrücken können.',
+      en:
+        'Markers are points in the slider of particular significance for the end-user. You can edit the relevant texts, or leave them as we defined originally. An additional helper label can be used to help your customer express themselves better.',
+      de:
+        'Marker sind Punkte in Ihrem Schieberegler, die für den Endbenutzer von besonderer Bedeutung sind. Sie können die relevanten Texte anhand unserer (derzeit vordefinierten) Texte bearbeiten oder sie ursprünglich definiert lassen. Ein zusätzliches Unteretikett kann verwendet werden, damit sich Ihre Kunden besser ausdrücken können.',
     },
     data_helper: {
       en: 'Your data settings, such as data-sources, will be set here.',
@@ -1259,11 +1323,11 @@ const language = {
     },
     about_choice: {
       en: 'About the choices',
-      de: 'Über die Auswahl'
+      de: 'Über die Auswahl',
     },
     about_choice_helper: {
       en: 'Define the different choices a user can select.',
-      de: 'Definieren Sie die verschiedenen Auswahlmöglichkeiten, die ein Benutzer auswählen kann'
+      de: 'Definieren Sie die verschiedenen Auswahlmöglichkeiten, die ein Benutzer auswählen kann',
     },
     hide_fake_data: {
       en: 'Hide placeholder data',
@@ -1274,7 +1338,7 @@ const language = {
       de: 'Entscheiden Sie, ob Platzhalterdaten in Ihrer Analyse verwendet werden sollen',
     },
     do_hide_fake_data_helper: {
-      en: 'Don\'t include placeholder data in the analytics.',
+      en: "Don't include placeholder data in the analytics.",
       de: 'Platzhalterdaten nicht in die Analyse einbeziehen.',
     },
     no_hide_fake_data: {
@@ -1483,14 +1547,15 @@ const language = {
     },
     qr_download_helper: {
       en: 'Give access to the dialogue by sharing the QR code. It can be copied or downloaded.',
-      de: 'Teile den QR-Code, um Zugang zu dem Dialog zu geben. Er steht zum kopieren oder downloaded bereit.',
+      de:
+        'Teile den QR-Code, um Zugang zu dem Dialog zu geben. Er steht zum kopieren oder downloaded bereit.',
     },
     last_week: {
       en: 'Last 7 days',
       de: 'Letzten 7 Tage',
     },
     last_week_summary: {
-      en: 'This week\'s summary',
+      en: "This week's summary",
       de: 'Wochenansicht',
     },
     last_month: {
@@ -1498,7 +1563,7 @@ const language = {
       de: 'Im vergangenen Monat',
     },
     last_month_summary: {
-      en: 'This month\'s summary',
+      en: "This month's summary",
       de: 'Monat Zusammenfassung',
     },
     last_day: {
@@ -1506,7 +1571,7 @@ const language = {
       de: 'Letzte 24 Stunden',
     },
     last_day_summary: {
-      en: 'Today\'s summary',
+      en: "Today's summary",
       de: 'Heuete Zusammenfassung',
     },
     last_hour: {
@@ -1514,7 +1579,7 @@ const language = {
       de: 'Letzte Stunde',
     },
     last_hour_summary: {
-      en: 'Hourly\'s summary',
+      en: "Hourly's summary",
       de: 'Stündliche Zusammenfassung',
     },
   },
@@ -1528,7 +1593,7 @@ const language = {
       de: 'Benutzerinformation',
     },
     watch_journey_heading: {
-      en: 'Follow a user\'s journey',
+      en: "Follow a user's journey",
       de: 'Folge eine Benutzererfahrung',
     },
     you_asked: {
@@ -1600,8 +1665,10 @@ const language = {
       de: 'Über den Anteil',
     },
     about_share_helper: {
-      en: 'Configure the share button, what the end-user gets to share, and what the button displays.',
-      de: 'Konfigurieren Sie die Schaltfläche "Teilen", was der Endbenutzer freigeben darf und was auf der Schaltfläche angezeigt wird.',
+      en:
+        'Configure the share button, what the end-user gets to share, and what the button displays.',
+      de:
+        'Konfigurieren Sie die Schaltfläche "Teilen", was der Endbenutzer freigeben darf und was auf der Schaltfläche angezeigt wird.',
     },
     text: {
       en: 'Text to share',
@@ -1628,8 +1695,10 @@ const language = {
       de: 'Der Call-to-Action wurde bearbeitet.',
     },
     information_header: {
-      en: 'Configure general information about this Call-to-Action, such as the text displayed, and the "type".',
-      de: 'Konfigurieren Sie allgemeine Informationen zu dieser Handlungsaufforderung, z. B. den angezeigten Text und den "Typ".',
+      en:
+        'Configure general information about this Call-to-Action, such as the text displayed, and the "type".',
+      de:
+        'Konfigurieren Sie allgemeine Informationen zu dieser Handlungsaufforderung, z. B. den angezeigten Text und den "Typ".',
     },
     title_helper: {
       en: 'What is the header text of the Call-to-Action?',
@@ -1803,7 +1872,8 @@ const language = {
     },
     low_threshold_helper: {
       en: 'Set a low threshold: if a score underneath is recorded, an alert will be sent.',
-      de: 'Festlegen eines unteren Schwellenwerts: Eine Aufzeichnung unter diesem Wert löst eine Push-Benachrichtigung aus.',
+      de:
+        'Festlegen eines unteren Schwellenwerts: Eine Aufzeichnung unter diesem Wert löst eine Push-Benachrichtigung aus.',
     },
     high_threshold: {
       en: 'High Threshold',
@@ -1811,23 +1881,28 @@ const language = {
     },
     high_threshold_helper: {
       en: 'Set a high threshold: if a score above is recorded, an alert will be sent',
-      de: 'Festlegen eines oberen Schwellenwerts: Eine Aufzeichung über diesem Wert löst eine Push-Benachrichtigung aus.',
+      de:
+        'Festlegen eines oberen Schwellenwerts: Eine Aufzeichung über diesem Wert löst eine Push-Benachrichtigung aus.',
     },
     outer_range: {
       en: 'Outer range',
       de: 'äußerer Bereich',
     },
     outer_range_helper: {
-      en: 'Set an outer range threshold: if a score outside the range is recorded, an alert will be sent',
-      de: 'Festlegen eines Schwellenwerts für den äußeren Bereich: Wenn eine Punktzahl außerhalb des Bereichs aufgezeichnet wird, wird eine Warnung gesendet',
+      en:
+        'Set an outer range threshold: if a score outside the range is recorded, an alert will be sent',
+      de:
+        'Festlegen eines Schwellenwerts für den äußeren Bereich: Wenn eine Punktzahl außerhalb des Bereichs aufgezeichnet wird, wird eine Warnung gesendet',
     },
     inner_range: {
       en: 'Inner range',
       de: 'Innerer Bereich',
     },
     inner_range_helper: {
-      en: 'Set an inner range threshold: if a score within the range is recorded, an alert will be sent',
-      de: 'Festlegen eines Schwellenwerts für den inneren Bereich: Wenn eine Punktzahl innerhalb des Bereichs aufgezeichnet wird, wird eine Warnung gesendet',
+      en:
+        'Set an inner range threshold: if a score within the range is recorded, an alert will be sent',
+      de:
+        'Festlegen eines Schwellenwerts für den inneren Bereich: Wenn eine Punktzahl innerhalb des Bereichs aufgezeichnet wird, wird eine Warnung gesendet',
     },
     delivery_helper: {
       en: 'Shall this alert be deliver via email or text message?',
@@ -1838,8 +1913,10 @@ const language = {
       de: 'Art des Versandts',
     },
     medium_helper: {
-      en: 'Which delivery method is preferred for this alert? Note: additional costs may occur for text messages.',
-      de: 'Welche Versandart wird für diese Push-Benachrichtigung bevorzugt? Hinweis: Für SMS können zusätzliche Kosten anfallen.',
+      en:
+        'Which delivery method is preferred for this alert? Note: additional costs may occur for text messages.',
+      de:
+        'Welche Versandart wird für diese Push-Benachrichtigung bevorzugt? Hinweis: Für SMS können zusätzliche Kosten anfallen.',
     },
     question: {
       en: 'Selected question',
@@ -1881,7 +1958,6 @@ const language = {
       en: 'What text should be matched to trigger the alert?',
       de: 'Welche Textübereinstimmung soll die Push-Benachrichtigung auslösen?',
     },
-
   },
 };
 

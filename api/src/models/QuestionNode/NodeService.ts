@@ -1,4 +1,4 @@
-import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
+import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
@@ -189,19 +189,19 @@ class NodeService {
         create: qOptions,
       },
     } : {
-      title,
-      questionDialogue: {
-        connect: {
-          id: questionnaireId,
+        title,
+        questionDialogue: {
+          connect: {
+            id: questionnaireId,
+          },
         },
-      },
-      type,
-      isRoot,
-      isLeaf,
-      options: {
-        create: qOptions,
-      },
-    };
+        type,
+        isRoot,
+        isLeaf,
+        options: {
+          create: qOptions,
+        },
+      };
 
     return prisma.questionNode.create({
       data: params,
@@ -367,11 +367,26 @@ class NodeService {
       },
     });
 
+    const deletedQuestion = await prisma.questionNode.findOne({
+      where: {
+        id,
+      }
+    })
+
     await prisma.share.deleteMany({
       where: {
         questionNodeId: id,
       },
     });
+
+    if (deletedQuestion?.videoEmbeddedNodeId) {
+      await prisma.videoEmbeddedNode.delete({
+        where: {
+          id: deletedQuestion?.videoEmbeddedNodeId,
+        }
+      })
+    }
+
 
     await prisma.questionNode.deleteMany({
       where: {
@@ -399,12 +414,15 @@ class NodeService {
       renderMax: number | null,
       matchValue: string | null
     },
+    extraContent: string | null,
   ) => {
     const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
+    const videoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = extraContent ? { create: { videoUrl: extraContent } } : undefined;
     const newQuestion = await prisma.questionNode.create({
       data: {
         title,
         type,
+        videoEmbeddedNode,
         overrideLeaf: leaf || undefined,
         options: {
           create: options.map((option) => ({
@@ -466,10 +484,12 @@ class NodeService {
       matchValue: string | null
     },
     sliderNode: NexusGenInputs['SliderNodeInputType'],
+    extraContent: string | null | undefined,
   ) => {
     const activeQuestion = await prisma.questionNode.findOne({
       where: { id: questionId },
       include: {
+        videoEmbeddedNode: true,
         children: true,
         options: true,
         questionDialogue: {
@@ -518,9 +538,16 @@ class NodeService {
 
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);
 
+    // Remove videoEmbeddedNode if updated to different type
+    let embedVideoInput: VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput | undefined;
+    if (activeQuestion?.type !== NodeType.VIDEO_EMBEDDED && activeQuestion?.videoEmbeddedNodeId) {
+      embedVideoInput = { delete: true };
+    }
+
     const updatedNode = leaf ? await prisma.questionNode.update({
       where: { id: questionId },
       data: {
+        videoEmbeddedNode: embedVideoInput,
         title,
         overrideLeaf: leaf,
         type,
@@ -528,18 +555,44 @@ class NodeService {
           connect: updatedOptionIds,
         },
       },
+      include: {
+        videoEmbeddedNode: true,
+      }
     }) : await prisma.questionNode.update({
       where: { id: questionId },
       data: {
+        videoEmbeddedNode: embedVideoInput,
         title,
         type,
         options: {
           connect: updatedOptionIds,
         },
       },
+      include: {
+        videoEmbeddedNode: true,
+      }
     });
 
-    if (type === NodeType.SLIDER) {
+    if (type === NodeType.VIDEO_EMBEDDED) {
+      if (updatedNode.videoEmbeddedNodeId) {
+
+        await prisma.videoEmbeddedNode.update({
+          where: { id: updatedNode.videoEmbeddedNodeId },
+          data: {
+            videoUrl: extraContent,
+          }
+        })
+      } else {
+        await prisma.videoEmbeddedNode.create({
+          data: {
+            QuestionNode: {
+              connect: { id: questionId },
+            },
+            videoUrl: extraContent,
+          }
+        })
+      }
+    } else if (type === NodeType.SLIDER) {
       if (updatedNode.sliderNodeId) {
         await prisma.sliderNode.update({
           where: { id: updatedNode.sliderNodeId },

@@ -4,7 +4,7 @@ const getPaginatedUsers = gql`
   query getPaginatedUsers($customerSlug: String!, $filter: PaginationWhereInput) {
     customer(slug: $customerSlug) {
       id
-      
+
       usersConnection(filter: $filter) {
         userCustomers {
           user {
@@ -21,7 +21,7 @@ const getPaginatedUsers = gql`
         pageInfo {
           nrPages
           pageIndex
-        }  
+        }
       }
     }
   }

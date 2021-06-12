@@ -21,7 +21,8 @@
         "REGISTRATION",
         "TEXTBOX",
         "LINK",
-        "SHARE"
+        "SHARE",
+        "VIDEO_EMBEDDED"
       ]
     },
     {
@@ -2195,6 +2196,67 @@
     },
     {
       "tag": "CreateModel",
+      "model": "VideoEmbeddedNode"
+    },
+    {
+      "tag": "CreateField",
+      "model": "VideoEmbeddedNode",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "VideoEmbeddedNode",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "VideoEmbeddedNode",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "VideoEmbeddedNode",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "VideoEmbeddedNode",
+      "field": "videoUrl",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "VideoEmbeddedNode",
+      "field": "QuestionNode",
+      "type": "QuestionNode",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateModel",
       "model": "QuestionNode"
     },
     {
@@ -2778,6 +2840,52 @@
     {
       "tag": "CreateField",
       "model": "QuestionNode",
+      "field": "videoEmbeddedNode",
+      "type": "VideoEmbeddedNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "videoEmbeddedNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "videoEmbeddedNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[videoEmbeddedNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "videoEmbeddedNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
       "field": "sliderNode",
       "type": "SliderNode",
       "arity": "Optional"
@@ -2880,6 +2988,13 @@
       "field": "QuestionOfTrigger",
       "type": "QuestionOfTrigger",
       "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "videoEmbeddedNodeId",
+      "type": "String",
+      "arity": "Optional"
     },
     {
       "tag": "CreateField",

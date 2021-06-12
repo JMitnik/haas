@@ -1,4 +1,4 @@
-import { allow, or, rule, shield } from 'graphql-shield';
+import { allow, deny , or, rule, shield } from 'graphql-shield';
 
 import { ApolloError } from 'apollo-server-express';
 import { SystemPermissionEnum } from '@prisma/client';
@@ -36,6 +36,19 @@ const isFromClient = rule({ cache: 'contextual' })(
   },
 )
 
+const belongsToWorkspace = rule({ cache: 'no_cache' })(
+  async (parent, args, ctx: APIContext) => {
+    if (!ctx.session?.user?.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
+    if (!ctx.session?.activeWorkspace) return false;
+
+    if (ctx.session.user.customers.find(workspace => workspace.customerId === ctx.session?.activeWorkspace?.id)) {
+      return true;
+    }
+
+    return false;
+  },
+);
+
 const isLocal = rule({ cache: 'no_cache' })(
   async () => config.env === 'local',
 );
@@ -63,6 +76,13 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
 );
 
 const authShield = shield({
+  Query: {
+    users: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS),
+    user: or(isSelf, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
+  },
+  Customer: {
+    usersConnection: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)
+  },
   Dialogue: {
     // Write this up
     // statistics: canAccessCompany,

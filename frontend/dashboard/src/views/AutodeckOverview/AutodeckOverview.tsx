@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+
 import * as UI from '@haas/ui';
 import React, { useState } from 'react';
 import { useEffect } from 'react';

@@ -115,6 +115,7 @@ enum NodeType {
   TEXTBOX
   LINK
   SHARE
+  VIDEO_EMBEDDED
 }
 
 // NodeType: Form
@@ -196,7 +197,16 @@ model SliderNode {
   earlyReleaseText String?
 }
 
+<<<<<<< HEAD:api/migrations/20210522092029-fresh-start-v4/schema.prisma
 // This is the same as a Question
+=======
+model VideoEmbeddedNode {
+  id           String         @id @default(cuid())
+  videoUrl     String?
+  QuestionNode QuestionNode[]
+}
+
+>>>>>>> dev:api/migrations/20210603185651-prisma-refresh/schema.prisma
 model QuestionNode {
   id           String           @id @default(cuid())
   creationDate DateTime         @default(now())
@@ -227,6 +237,7 @@ model QuestionNode {
   overridesChoices QuestionOption[] @relation("ChoiceCTANode")
 
   // Node-types
+<<<<<<< HEAD:api/migrations/20210522092029-fresh-start-v4/schema.prisma
   share      Share?
   sliderNode SliderNode? @relation(fields: [sliderNodeId], references: [id])
   form       FormNode?   @relation(fields: [formNodeId], references: [id])
@@ -238,6 +249,18 @@ model QuestionNode {
 
   relatedTopicId  String?
   relatedTopic  Topic? @relation(fields: [relatedTopicId], references: [id])
+=======
+  share             Share?
+  videoEmbeddedNode VideoEmbeddedNode? @relation(fields: [videoEmbeddedNodeId], references: [id])
+  sliderNode        SliderNode?        @relation(fields: [sliderNodeId], references: [id])
+  form              FormNode?          @relation(fields: [formNodeId], references: [id])
+
+  links               Link[]
+  QuestionOfTrigger   QuestionOfTrigger[]
+  videoEmbeddedNodeId String?
+  sliderNodeId        String?
+  formNodeId          String?
+>>>>>>> dev:api/migrations/20210603185651-prisma-refresh/schema.prisma
 }
 
 enum LinkTypeEnum {

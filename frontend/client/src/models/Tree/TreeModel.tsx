@@ -23,13 +23,14 @@ const TreeModel = types
         id: node.id,
         isRoot: node.isRoot,
         title: node.title,
+        extraContent: node.extraContent,
         children: node.children.map((edge) => edge.id),
         type: node.type,
-        options: node.options.map(option => ({
+        options: node.options.map((option) => ({
           id: option.id,
           value: option.value,
           publicValue: option.publicValue,
-          overrideLeaf: option.overrideLeaf?.id
+          overrideLeaf: option.overrideLeaf?.id,
         })),
         overrideLeaf: node.overrideLeaf?.id,
         sliderNode: node.sliderNode,
@@ -131,7 +132,7 @@ const TreeModel = types
      */
     setOverrideLeaf(overrideLeaf: TreeNodeProps): void {
       self.activeLeaf = overrideLeaf;
-    }
+    },
   }))
   .views((self) => ({
     get rootNode(): TreeNodeProps {

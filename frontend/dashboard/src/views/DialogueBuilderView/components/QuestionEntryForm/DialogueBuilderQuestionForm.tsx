@@ -3,12 +3,12 @@ import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
   Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
-  PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+  PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { Trash } from 'react-feather';
 import { debounce } from 'lodash';
-import { useMutation, gql } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -16,20 +16,20 @@ import Select from 'react-select';
 
 import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, Hr, Input, InputGrid, InputHelper, Span, Text
+  FormSection, Hr, Input, InputGrid, InputHelper, Span, Text,
 } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useNavigator } from 'hooks/useNavigator';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
 import {
   CTANode,
   EdgeConditionProps,
-  OverrideLeafProps, QuestionEntryProps, QuestionOptionProps
+  OverrideLeafProps, QuestionEntryProps, QuestionOptionProps,
 } from '../../DialogueBuilderInterfaces';
-import SliderNodeForm from './SliderNodeForm';
 import { ChoiceNodeForm } from './ChoiceNodeForm';
-import { useNavigator } from 'hooks/useNavigator';
+import SliderNodeForm from './SliderNodeForm';
 
 interface SliderNodeMarkerProps {
   id: string;
@@ -45,6 +45,7 @@ interface FormDataProps {
   title: string;
   minValue: string;
   maxValue: string;
+  videoEmbedded: string;
   questionType: string;
   matchText: string;
   activeLeaf: string;
@@ -67,6 +68,11 @@ const isChoiceType = (questionType: string) => {
 const schema = yup.object().shape({
   title: yup.string().required(),
   questionType: yup.string().required(),
+  videoEmbedded: yup.string().when(['questionType'], {
+    is: (questionType: string) => questionType === 'VIDEO_EMBEDDED',
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
   minValue: yup.string().when(['parentQuestionType'], {
     is: (parentQuestionType: string) => parentQuestionType === 'Slider',
     then: yup.string().required(),
@@ -85,7 +91,7 @@ const schema = yup.object().shape({
   optionsFull: yup.array().when(['questionType'], {
     is: (questionType: string) => isChoiceType(questionType),
     then: yup.array().min(1).of(yup.object({
-      value: yup.string().required('form.value_required')
+      value: yup.string().required('form.value_required'),
     })),
     otherwise: yup.array().notRequired(),
   }),
@@ -115,6 +121,7 @@ interface QuestionEntryFormProps {
 const questionTypes = [
   { value: 'SLIDER', label: 'Slider' },
   { value: 'CHOICE', label: 'Choice' },
+  { value: 'VIDEO_EMBEDDED', label: 'Video embedded' },
 ];
 
 const createQuestionMutation = gql`
@@ -168,15 +175,15 @@ const DialogueBuilderQuestionForm = ({
     defaultValues: {
       parentQuestionType,
       sliderNode,
-      optionsFull: options.map(option => ({
+      optionsFull: options.map((option) => ({
         value: option.value,
         publicValue: option.publicValue,
         overrideLeaf: {
           label: option.overrideLeaf?.title,
           value: option.overrideLeaf?.id,
-          type: option.overrideLeaf?.type
-        }
-      }))
+          type: option.overrideLeaf?.type,
+        },
+      })),
     },
   });
 
@@ -192,7 +199,9 @@ const DialogueBuilderQuestionForm = ({
       label: condition.conditionType,
     } : null,
   );
-  const [activeCondition, setActiveCondition] = useState<null | EdgeConditionProps>(condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' });
+  const [activeCondition, setActiveCondition] = useState<null | EdgeConditionProps>(
+    condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' },
+  );
 
   const setConditionType = useCallback((conditionOption: any) => {
     setActiveConditionSelect(conditionOption);
@@ -377,18 +386,19 @@ const DialogueBuilderQuestionForm = ({
         variables: {
           input: {
             id,
+            extraContent: formData.videoEmbedded,
             customerId: activeCustomer?.id,
             overrideLeafId: overrideLeafId || '',
             edgeId: edgeId || '-1',
             title,
             type,
             optionEntries: {
-              options: values.optionsFull?.map(option => ({
+              options: values.optionsFull?.map((option) => ({
                 id: option?.id,
                 value: option?.value,
                 publicValue: option?.value,
-                overrideLeafId: option?.overrideLeaf?.value
-              }))
+                overrideLeafId: option?.overrideLeaf?.value,
+              })),
             },
             edgeCondition,
             sliderNode: isSlider ? {
@@ -412,15 +422,16 @@ const DialogueBuilderQuestionForm = ({
             dialogueSlug,
             title,
             type,
+            extraContent: formData.videoEmbedded,
             overrideLeafId: overrideLeafId || 'None',
             parentQuestionId,
             optionEntries: {
-              options: values.optionsFull?.map(option => ({
+              options: values.optionsFull?.map((option) => ({
                 id: option?.id,
                 value: option?.value,
                 publicValue: option?.value,
-                overrideLeafId: option?.overrideLeaf?.value
-              }))
+                overrideLeafId: option?.overrideLeaf?.value,
+              })),
             },
             edgeCondition,
             sliderNode: isSlider ? {
@@ -523,7 +534,7 @@ const DialogueBuilderQuestionForm = ({
             </>
           )}
 
-          {parentQuestionType === 'Choice' && (
+          {(parentQuestionType === 'Choice' || parentQuestionType === 'Video embedded') && (
             <>
               <Hr />
               <FormSection>
@@ -601,6 +612,24 @@ const DialogueBuilderQuestionForm = ({
                   <FormErrorMessage>{form.errors.questionType?.message}</FormErrorMessage>
                 </FormControl>
 
+                {form.watch('questionType') === 'VIDEO_EMBEDDED' && (
+                  <FormControl isRequired isInvalid={!!form.errors.videoEmbedded}>
+                    <FormLabel htmlFor="videoEmbedded">
+                      {t('video_embedded')}
+                    </FormLabel>
+                    <InputHelper>
+                      {t('video_embedded_helper')}
+                    </InputHelper>
+                    <Input
+                      name="videoEmbedded"
+                      leftAddOn="https://www.youtube.com/watch?v="
+                      ref={form.register()}
+                      defaultValue={question.extraContent || undefined}
+                    />
+                    <FormErrorMessage>{form.errors.videoEmbedded?.message}</FormErrorMessage>
+                  </FormControl>
+                )}
+
                 <FormControl isInvalid={!!form.errors.activeLeaf}>
                   <FormLabel htmlFor="questionType">
                     {t('call_to_action')}
@@ -648,7 +677,7 @@ const DialogueBuilderQuestionForm = ({
             </>
           )}
 
-          {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
+          {activeQuestionType && (activeQuestionType.value === 'CHOICE' || activeQuestionType.value === 'VIDEO_EMBEDDED') && (
             <>
               <UI.Hr />
               <UI.FormSection>

@@ -147,6 +147,7 @@ input CreateQuestionNodeInputType {
   customerId: ID
   dialogueSlug: String
   edgeCondition: EdgeConditionInputType
+  extraContent: String
   optionEntries: OptionsInputType
   overrideLeafId: ID
   parentQuestionId: ID
@@ -849,6 +850,7 @@ type Query {
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
+  extraContent: String
 
   """FormNode resolver"""
   form: FormNodeType
@@ -880,6 +882,7 @@ enum QuestionNodeTypeEnum {
   SHARE
   SLIDER
   TEXTBOX
+  VIDEO_EMBEDDED
 }
 
 input QuestionNodeWhereInputType {
@@ -1201,6 +1204,7 @@ input UpdateQuestionNodeInputType {
   customerId: ID
   edgeCondition: EdgeConditionInputType
   edgeId: ID
+  extraContent: String
   id: ID!
   optionEntries: OptionsInputType
   overrideLeafId: ID

@@ -14,6 +14,7 @@ const CustomersPage = () => {
   const { canAccessAdmin } = useAuth();
 
   const { loading, error, data } = useQuery<CustomerData>(getCustomersOfUser, {
+    fetchPolicy: "network-only",
     variables: {
       userId: user?.id,
     },

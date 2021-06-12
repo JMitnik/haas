@@ -115,6 +115,7 @@ enum NodeType {
   TEXTBOX
   LINK
   SHARE
+  VIDEO_EMBEDDED
 }
 
 // NodeType: Form
@@ -196,7 +197,12 @@ model SliderNode {
   earlyReleaseText String?
 }
 
-// This is the same as a Question
+model VideoEmbeddedNode {
+  id           String         @id @default(cuid())
+  videoUrl     String?
+  QuestionNode QuestionNode[]
+}
+
 model QuestionNode {
   id           String           @id @default(cuid())
   creationDate DateTime         @default(now())
@@ -230,14 +236,18 @@ model QuestionNode {
   share      Share?
   sliderNode SliderNode? @relation(fields: [sliderNodeId], references: [id])
   form       FormNode?   @relation(fields: [formNodeId], references: [id])
+  videoEmbeddedNode VideoEmbeddedNode? @relation(fields: [videoEmbeddedNodeId], references: [id])
 
   links             Link[]
   QuestionOfTrigger QuestionOfTrigger[]
-  sliderNodeId      String?
-  formNodeId        String?
 
+  // Topics
   relatedTopicId  String?
   relatedTopic  Topic? @relation(fields: [relatedTopicId], references: [id])
+
+  videoEmbeddedNodeId String?
+  sliderNodeId        String?
+  formNodeId          String?
 }
 
 enum LinkTypeEnum {
