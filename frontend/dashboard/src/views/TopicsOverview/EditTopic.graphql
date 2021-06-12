@@ -1,0 +1,5 @@
+mutation EditTopic($input: EditTopicInput) {
+  editTopic(input: $input) {
+    id
+  }
+}

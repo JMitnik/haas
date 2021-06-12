@@ -17,7 +17,7 @@ const CreateTopicForm = ({ onCloseModal }: { onCloseModal: Function }) => {
   const { dialogueSlug } = useNavigator();
   const { activeCustomer } = useCustomer();
 
-  const [createTopic, { loading }] = useCreateTopicMutation({
+  const [createTopic, { loading, error }] = useCreateTopicMutation({
     onCompleted: () => {
       onCloseModal();
     },

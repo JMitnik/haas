@@ -493,6 +493,16 @@ export type EdgeConditionInputType = {
   matchValue?: Maybe<Scalars['String']>;
 };
 
+export type EditTopicInput = {
+  label: Scalars['String'];
+  topicId: Scalars['String'];
+};
+
+export type EditTopicOutput = {
+  __typename?: 'EditTopicOutput';
+  id: Scalars['String'];
+};
+
 export type EditUserInput = {
   email: Scalars['String'];
   roleId?: Maybe<Scalars['String']>;
@@ -790,6 +800,7 @@ export type Mutation = {
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
   createTopic: CreateTopicOutput;
+  editTopic: EditTopicOutput;
   debugMutation?: Maybe<Scalars['String']>;
 };
 
@@ -1044,6 +1055,11 @@ export type MutationUpdateQuestionArgs = {
 
 export type MutationCreateTopicArgs = {
   input?: Maybe<CreateTopicInput>;
+};
+
+
+export type MutationEditTopicArgs = {
+  input?: Maybe<EditTopicInput>;
 };
 
 export type NodeEntry = {
@@ -2076,6 +2092,19 @@ export type CreateTopicMutation = (
   ) }
 );
 
+export type EditTopicMutationVariables = Exact<{
+  input?: Maybe<EditTopicInput>;
+}>;
+
+
+export type EditTopicMutation = (
+  { __typename?: 'Mutation' }
+  & { editTopic: (
+    { __typename?: 'EditTopicOutput' }
+    & Pick<EditTopicOutput, 'id'>
+  ) }
+);
+
 export type GetTopicsOfDialogueQueryVariables = Exact<{
   dialogueSlug: Scalars['String'];
   customerId: Scalars['ID'];
@@ -2852,11 +2881,45 @@ export type CreateTopicMutationFn = Apollo.MutationFunction<CreateTopicMutation,
  * });
  */
 export function useCreateTopicMutation(baseOptions?: Apollo.MutationHookOptions<CreateTopicMutation, CreateTopicMutationVariables>) {
-        return Apollo.useMutation<CreateTopicMutation, CreateTopicMutationVariables>(CreateTopicDocument, baseOptions);
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateTopicMutation, CreateTopicMutationVariables>(CreateTopicDocument, options);
       }
 export type CreateTopicMutationHookResult = ReturnType<typeof useCreateTopicMutation>;
 export type CreateTopicMutationResult = Apollo.MutationResult<CreateTopicMutation>;
 export type CreateTopicMutationOptions = Apollo.BaseMutationOptions<CreateTopicMutation, CreateTopicMutationVariables>;
+export const EditTopicDocument = gql`
+    mutation EditTopic($input: EditTopicInput) {
+  editTopic(input: $input) {
+    id
+  }
+}
+    `;
+export type EditTopicMutationFn = Apollo.MutationFunction<EditTopicMutation, EditTopicMutationVariables>;
+
+/**
+ * __useEditTopicMutation__
+ *
+ * To run a mutation, you first call `useEditTopicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditTopicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editTopicMutation, { data, loading, error }] = useEditTopicMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useEditTopicMutation(baseOptions?: Apollo.MutationHookOptions<EditTopicMutation, EditTopicMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EditTopicMutation, EditTopicMutationVariables>(EditTopicDocument, options);
+      }
+export type EditTopicMutationHookResult = ReturnType<typeof useEditTopicMutation>;
+export type EditTopicMutationResult = Apollo.MutationResult<EditTopicMutation>;
+export type EditTopicMutationOptions = Apollo.BaseMutationOptions<EditTopicMutation, EditTopicMutationVariables>;
 export const GetTopicsOfDialogueDocument = gql`
     query GetTopicsOfDialogue($dialogueSlug: String!, $customerId: ID!) {
   customer(id: $customerId) {
@@ -2890,10 +2953,12 @@ export const GetTopicsOfDialogueDocument = gql`
  * });
  */
 export function useGetTopicsOfDialogueQuery(baseOptions: Apollo.QueryHookOptions<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>) {
-        return Apollo.useQuery<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>(GetTopicsOfDialogueDocument, baseOptions);
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>(GetTopicsOfDialogueDocument, options);
       }
 export function useGetTopicsOfDialogueLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>) {
-          return Apollo.useLazyQuery<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>(GetTopicsOfDialogueDocument, baseOptions);
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>(GetTopicsOfDialogueDocument, options);
         }
 export type GetTopicsOfDialogueQueryHookResult = ReturnType<typeof useGetTopicsOfDialogueQuery>;
 export type GetTopicsOfDialogueLazyQueryHookResult = ReturnType<typeof useGetTopicsOfDialogueLazyQuery>;

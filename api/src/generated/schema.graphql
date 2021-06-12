@@ -402,6 +402,15 @@ input EdgeConditionInputType {
   renderMin: Int
 }
 
+input EditTopicInput {
+  label: String!
+  topicId: String!
+}
+
+type EditTopicOutput {
+  id: String!
+}
+
 input EditUserInput {
   customerId: String
   email: String!
@@ -663,6 +672,7 @@ type Mutation {
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editTopic(input: EditTopicInput): EditTopicOutput!
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!

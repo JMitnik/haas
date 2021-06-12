@@ -5,7 +5,7 @@ import React from 'react'
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { GetTopicsOfDialogueDocument, useCreateTopicMutation } from 'types/generated-types';
+import { GetTopicsOfDialogueDocument, useCreateTopicMutation, useEditTopicMutation } from 'types/generated-types';
 
 
 /**
@@ -21,30 +21,28 @@ const EditTopicForm = ({ topic, onCloseModal }: { topic: any, onCloseModal: Func
   const { dialogueSlug } = useNavigator();
   const { activeCustomer } = useCustomer();
 
-  // const [createTopic, { loading }] = useCreateTopicMutation({
-  //   onCompleted: () => {
-  //     onCloseModal();
-  //   },
-  //   refetchQueries: [{
-  //     query: GetTopicsOfDialogueDocument,
-  //     variables: {
-  //       customerId: activeCustomer?.id || '',
-  //       dialogueSlug
-  //     }
-  //   }]
-  // });
+  const [editTopic, { loading, error }] = useEditTopicMutation({
+    onCompleted: () => {
+      onCloseModal();
+    },
+    refetchQueries: [{
+      query: GetTopicsOfDialogueDocument,
+      variables: {
+        customerId: activeCustomer?.id || '',
+        dialogueSlug
+      }
+    }]
+  })
 
   const handleFormSubmit = ({ label }: { label: string }) => {
-    console.log(label);
-    // createTopic({
-    //   variables: {
-    //     input: {
-    //       label,
-    //       relatedDialogueSlug: dialogueSlug,
-    //       customerId: activeCustomer?.id || ''
-    //     }
-    //   }
-    // });
+    editTopic({
+      variables: {
+        input: {
+          topicId: topic.id,
+          label,
+        }
+      }
+    })
   }
 
   return (
