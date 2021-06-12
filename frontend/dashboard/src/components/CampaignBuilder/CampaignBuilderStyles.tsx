@@ -25,6 +25,7 @@ export const BuilderCanvas = styled.div`
 
 export const CampaignStepContainer = styled(UI.Grid)`
   ${({ theme }) => css`
+    position: relative;
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     grid-auto-rows: 100px;
@@ -38,6 +39,24 @@ export const BuilderEdge = styled(UI.Grid)`
     height: 100px;
     width: 2px;
     background: ${theme.colors.gray[400]};
+  `}
+`;
+
+export const BuilderStepProblem = styled.div`
+  ${({ theme }) => css`
+    position: absolute;
+    top: ${theme.gutter / 4}px;
+    padding: 4px;
+    border-radius: 10px;
+    right: ${theme.gutter / 4}px;
+    background: ${theme.colors.red[100]};
+    color: ${theme.colors.red[500]};
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
   `}
 `;
 
@@ -55,6 +74,7 @@ export const BuilderEdgeLabel = styled(UI.Grid)`
     letter-spacing: 0.05em;
     background: ${theme.colors.gray[200]};
     color: ${theme.colors.gray[500]};
+    white-space: nowrap;
   `}
 `;
 

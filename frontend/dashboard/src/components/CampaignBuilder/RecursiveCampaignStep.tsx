@@ -53,20 +53,27 @@ export const AddCampaignEdge = ({ onClick, type = 'Normal' }: { onClick?: () => 
 
 export const IncomingCampaignEdge = ({ type, isActive, variantEdge }: IncomingCampaignEdgeProps) => {
   const { t } = useTranslation();
-  console.log(variantEdge);
 
   return (
     <LS.BuilderEdgeContainer isActive={isActive}>
       <LS.BuilderEdge />
-      {type === 'Weights' && (
+      {type === 'Weights' ? (
         <LS.BuilderEdgeLabel>
           100%
         </LS.BuilderEdgeLabel>
-      )}
-      {variantEdge?.condition === CampaignVariantEdgeConditionEnumType.OnNotFinished && (
-        <LS.BuilderEdgeLabel>
-          Not finished!
-        </LS.BuilderEdgeLabel>
+      ) : (
+        <>
+          {variantEdge?.condition === CampaignVariantEdgeConditionEnumType.OnNotFinished && (
+            <LS.BuilderEdgeLabel>
+              Not finished after {variantEdge.childVariant?.followUpAmount} {variantEdge.childVariant?.followUpMetric}
+            </LS.BuilderEdgeLabel>
+          )}
+          {variantEdge?.condition === CampaignVariantEdgeConditionEnumType.OnNotOpened && (
+            <LS.BuilderEdgeLabel>
+              Not opened after {variantEdge.childVariant?.followUpAmount} {variantEdge.childVariant?.followUpMetric}
+            </LS.BuilderEdgeLabel>
+          )}
+        </>
       )}
       <LS.EdgeFoot>
         <UI.Icon>
@@ -94,7 +101,6 @@ export const RecursiveCampaignStep = ({
   addEmptyVariant
 }: RecursiveCampaignStepProps) => {
   const variant = variantEdge?.childVariant;
-  console.log(rootIndex);
 
   return (
     <>
@@ -119,6 +125,7 @@ export const RecursiveCampaignStep = ({
                   <UI.Helper mb={2}>{variant?.scheduleType}</UI.Helper>
                   {variant?.label}
                 </UI.CardBody>
+                {!!variantEdge?.childVariant?.hasProblem && <LS.BuilderStepProblem>!</LS.BuilderStepProblem>}
               </UI.Card>
             </UI.Div>
           </>

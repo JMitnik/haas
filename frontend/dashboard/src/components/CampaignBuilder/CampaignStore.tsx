@@ -43,9 +43,10 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
 
       LSet(state, `variantEdges.${edgeIndex}`, {
         ...variantEdge,
-        condition: input.condition,
+        condition: input.condition || undefined,
         childVariant: {
           ...input.childVariant,
+          hasProblem: input.hasProblem,
           label: input.label,
           type: input.type,
           scheduleType: input.scheduleType,
@@ -53,14 +54,16 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
       })
     } else {
       let variantEdge = LGet(state.variantEdges, index) as any;
-      console.log(variantEdge);
 
       LSet(state, `variantEdges.${index}`, {
         ...variantEdge,
-        // condition: input.condition,
+        condition: input.condition || undefined,
         childVariant: {
           ...variantEdge?.childVariant,
           label: input.label,
+          hasProblem: input.hasProblem,
+          followUpAmount: input.followUpAmount,
+          followUpMetric: input.followUpMetric,
           type: input.type,
           scheduleType: input.scheduleType,
         }
@@ -100,8 +103,7 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
           childVariant: {
             dialogueId: '',
             id: '',
-            scheduleType:
-              CampaignScheduleEnum.General,
+            scheduleType: CampaignScheduleEnum.FollowUp,
             body: '',
             hasProblem: false,
             type: CampaignVariantEnum.Email,

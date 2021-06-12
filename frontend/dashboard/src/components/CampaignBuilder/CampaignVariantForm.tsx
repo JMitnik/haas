@@ -13,6 +13,7 @@ import { VariantEdgeType, VariantType } from './CampaignBuilderTypes';
 import { useEffect } from 'react';
 import useDebounce from 'hooks/useDebounce';
 import getCustomersOfUser from 'queries/getCustomersOfUser';
+import { campaignFormSchema } from './CampaignFormSchema';
 
 const SlackIconContainer = () => (
   <UI.Icon width="20px" mr={2}>
@@ -36,11 +37,13 @@ export const CampaignVariantForm = ({ variantEdge, pariantVariantEdgeIndex, onCh
   const { t } = useTranslation();
   const form = useForm({
     shouldUnregister: true,
+    mode: 'onChange',
+    resolver: yupResolver(campaignFormSchema),
     defaultValues: {
       edge: {
-        condition: CampaignVariantEdgeConditionEnumType.OnNotFinished,
-        followUpMetric: 'days',
-        followUpAmount: 0,
+        condition: variantEdge?.condition || undefined,
+        followUpMetric: variantEdge?.childVariant?.followUpMetric || undefined,
+        followUpAmount: variantEdge?.childVariant?.followUpAmount || undefined,
         repeatMetric: 'days',
         repeatAmount: 0,
       },
@@ -53,18 +56,33 @@ export const CampaignVariantForm = ({ variantEdge, pariantVariantEdgeIndex, onCh
     }
   });
 
-  const { variant: { label , type, scheduleType }, edge: { condition } = {} } = form.watch();
+  const {
+    variant: { label , type, scheduleType },
+    edge: { condition, followUpAmount, followUpMetric } = {}
+  } = form.watch();
+
   const debouncedLabel = useDebounce(label || '', 300);
   const debouncedScheduleType = useDebounce(scheduleType || CampaignScheduleEnum.General, 300);
   const debouncedType = useDebounce(type || CampaignVariantEnum.Email, 300);
+  const debouncedCondition = useDebounce(condition || undefined, 300);
+  const debouncedFollowupAmount = useDebounce(followUpAmount || '', 300);
+  const debouncedFollowupMetric = useDebounce(followUpMetric || '', 300);
+
+  const isValid = form.formState.isValid;
+
+  console.log(isValid);
 
   useEffect(() => {
     onChange({
       label: debouncedLabel,
       scheduleType: debouncedScheduleType,
-      type: debouncedType
+      type: debouncedType,
+      condition: debouncedCondition,
+      followUpAmount: debouncedFollowupAmount,
+      followUpMetric: debouncedFollowupMetric,
+      hasProblem: !isValid,
     }, variantEdgeIndex, pariantVariantEdgeIndex);
-  }, [debouncedLabel, debouncedScheduleType, debouncedType]);
+  }, [debouncedLabel, debouncedScheduleType, debouncedType, debouncedCondition, debouncedFollowupAmount, debouncedFollowupMetric, isValid]);
 
   const percentageFull = Math.min(Math.floor(((variantEdge?.childVariant?.body?.length || 160) / 160) * 100), 100);
 
@@ -82,7 +100,7 @@ export const CampaignVariantForm = ({ variantEdge, pariantVariantEdgeIndex, onCh
           </UI.Flex>
           <UI.FormControl isRequired>
             <UI.FormLabel>Label</UI.FormLabel>
-            <UI.Input name="variant.label" ref={form.register()} defaultValue={variantEdge?.childVariant?.label || ''} />
+            <UI.Input name="variant.label" isInvalid={!!form.errors.variant?.label} ref={form.register()} defaultValue={variantEdge?.childVariant?.label || ''} />
           </UI.FormControl>
 
           <UI.FormControl isRequired>
@@ -121,6 +139,36 @@ export const CampaignVariantForm = ({ variantEdge, pariantVariantEdgeIndex, onCh
             />
           </UI.FormControl>
 
+          {scheduleType !== CampaignScheduleEnum.General  && (
+            <UI.FormControl isRequired>
+              <UI.FormLabel>Step condition</UI.FormLabel>
+              <Controller
+                control={form.control}
+                defaultValue={variantEdge?.condition}
+                name="edge.condition"
+                render={({ onChange, value, onBlur }) => (
+                  <UI.RadioButtons
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                  >
+                    <UI.RadioButton
+                      value={CampaignVariantEdgeConditionEnumType.OnNotFinished}
+                      text={t('not_finished')}
+                      description={t('campaign_not_finished_helper')}
+                    />
+                    <UI.RadioButton
+                      icon={ArrowRight}
+                      value={CampaignVariantEdgeConditionEnumType.OnNotOpened}
+                      text={t('not_opened')}
+                      description={t('campaign_not_opened_helper')}
+                    />
+                  </UI.RadioButtons>
+                )}
+              />
+            </UI.FormControl>
+          )}
+
           {scheduleType === CampaignScheduleEnum.FollowUp && (
             <UI.FormControl isRequired mt={2}>
               <UI.FormLabel>Follow-up after</UI.FormLabel>
@@ -129,7 +177,7 @@ export const CampaignVariantForm = ({ variantEdge, pariantVariantEdgeIndex, onCh
               </UI.Div>
               <LS.BuilderInputRadioGroup>
                 <UI.Div>
-                  <UI.Input name="edge.followUpAmount" variant="outline" placeholder="7" />
+                  <UI.Input name="edge.followUpAmount" ref={form.register} variant="outline" placeholder="7" />
                 </UI.Div>
                 <UI.Div>
 
