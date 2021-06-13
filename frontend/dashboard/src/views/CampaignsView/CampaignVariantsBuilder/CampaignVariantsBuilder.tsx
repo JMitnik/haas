@@ -6,7 +6,7 @@ import ReactFlow, {
   isNode,
 } from 'react-flow-renderer';
 import styled, { css } from 'styled-components';
-import dagre from 'dagre';
+// import dagre from 'dagre';
 import CampaignVariantScheduleNode from './CampaignVariantScheduleNode';
 import { clone } from 'lodash';
 import { Controller, useForm } from 'react-hook-form';
@@ -20,8 +20,8 @@ import { ReactComponent as DoubleChevronIcon } from 'assets/icons/icon-chevron-d
 import CampaignVariantFollowupNode from './CampaignVariantFollowupNode';
 
 
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
+// const dagreGraph = new dagre.graphlib.Graph();
+// dagreGraph.setDefaultEdgeLabel(() => ({}));
 
 const nodeWidth = 172;
 const nodeHeight = 36;
@@ -134,143 +134,129 @@ const nodeTypes = {
 }
 
 export const CampaignVariantsBuilder = () => {
-  const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
-  const [activeVariant, setActiveVariant] = useState<any>(null);
-  const [variants, setVariants] = useState([{
-    id: 'ELDER_ROOT',
-    data: { label: 'Campaign' },
-    sourcePosition: 'right',
-    type: 'input'
-  }, {
-    id: 'VARIANT_1',
-    data: { label: 'Campaign Variant AC' },
-    targetPosition: 'right',
-    type: 'campaignVariantSchedule',
-    sourcePosition: 'left',
-  }, {
-    id: 'VARIANT_2',
-    data: { label: 'Campaign Variant: Follow-up A' },
-    targetPosition: 'right',
-    type: 'followUp',
-    sourcePosition: 'left',
-  },
-  {
-    id: 'VARIANT_MEDIUM',
-    data: { label: 'SMS' },
-    type: 'mediumTarget',
-    sourcePosition: 'top'
-  },
-  {
-    id: 'VARIANT_MEDIUM_2',
-    data: { label: 'SMS' },
-    type: 'mediumTarget',
-    sourcePosition: 'top'
-  },
-]);
+  // const dagreGraph = new dagre.graphlib.Graph();
+  // dagreGraph.setDefaultEdgeLabel(() => ({}));
+//   const [activeVariant, setActiveVariant] = useState<any>(null);
+//   const [variants, setVariants] = useState([{
+//     id: 'ELDER_ROOT',
+//     data: { label: 'Campaign' },
+//     sourcePosition: 'right',
+//     type: 'input'
+//   }, {
+//     id: 'VARIANT_1',
+//     data: { label: 'Campaign Variant AC' },
+//     targetPosition: 'right',
+//     type: 'campaignVariantSchedule',
+//     sourcePosition: 'left',
+//   }, {
+//     id: 'VARIANT_2',
+//     data: { label: 'Campaign Variant: Follow-up A' },
+//     targetPosition: 'right',
+//     type: 'followUp',
+//     sourcePosition: 'left',
+//   },
+//   {
+//     id: 'VARIANT_MEDIUM',
+//     data: { label: 'SMS' },
+//     type: 'mediumTarget',
+//     sourcePosition: 'top'
+//   },
+//   {
+//     id: 'VARIANT_MEDIUM_2',
+//     data: { label: 'SMS' },
+//     type: 'mediumTarget',
+//     sourcePosition: 'top'
+//   },
+// ]);
 
-  const [variantEdges, setVariantEdges] = useState([{
-    id: 'GENERAL_ROUTE',
-    source: 'ELDER_ROOT',
-    target: 'VARIANT_1',
-    label: '100%',
-    animated: true
-  },
-  {
-    id: 'TEST_MEDIUM',
-    source: 'VARIANT_1',
-    target: 'VARIANT_MEDIUM',
-    sourceHandle: 'medium',
-    targetHandle: 'mediumTarget',
-    label: 'Sends via medium',
-    animated: false
-  },
-  {
-    id: 'TEST_FOLLOW',
-    source: 'VARIANT_1',
-    target: 'VARIANT_2',
-    label: 'Follow-up if not opened in days',
-    animated: false
-  },
-  {
-    id: 'TESTFOLLOW',
-    source: 'VARIANT_2',
-    target: 'VARIANT_MEDIUM_2',
-    label: 'Send via medium',
-    animated: false
-  },
-  ]);
+//   const [variantEdges, setVariantEdges] = useState([{
+//     id: 'GENERAL_ROUTE',
+//     source: 'ELDER_ROOT',
+//     target: 'VARIANT_1',
+//     label: '100%',
+//     animated: true
+//   },
+//   {
+//     id: 'TEST_MEDIUM',
+//     source: 'VARIANT_1',
+//     target: 'VARIANT_MEDIUM',
+//     sourceHandle: 'medium',
+//     targetHandle: 'mediumTarget',
+//     label: 'Sends via medium',
+//     animated: false
+//   },
+//   {
+//     id: 'TEST_FOLLOW',
+//     source: 'VARIANT_1',
+//     target: 'VARIANT_2',
+//     label: 'Follow-up if not opened in days',
+//     animated: false
+//   },
+//   {
+//     id: 'TESTFOLLOW',
+//     source: 'VARIANT_2',
+//     target: 'VARIANT_MEDIUM_2',
+//     label: 'Send via medium',
+//     animated: false
+//   },
+//   ]);
 
-  const [elements, setElements] = useState([]);
+//   const [elements, setElements] = useState([]);
 
-  const getLayoutElements = () => {
-    variants.forEach((variant: any) => {
-      dagreGraph.setNode(variant?.id || '', { width: 150, height: 80 });
-    });
+//   const getLayoutElements = () => {
+//     variants.forEach((variant: any) => {
+//       dagreGraph.setNode(variant?.id || '', { width: 150, height: 80 });
+//     });
 
-    dagreGraph.setGraph({ rankdir: "LR", edgesep: 120, nodesep: 150, ranksep: 150 });
+//     dagreGraph.setGraph({ rankdir: "LR", edgesep: 120, nodesep: 150, ranksep: 150 });
 
-    variantEdges.forEach((variantEdge: any) => {
-      dagreGraph.setEdge((variantEdge?.source || ''), variantEdge.target || '');
-    });
+//     variantEdges.forEach((variantEdge: any) => {
+//       dagreGraph.setEdge((variantEdge?.source || ''), variantEdge.target || '');
+//     });
 
-    dagre.layout(dagreGraph);
+//     dagre.layout(dagreGraph);
 
-    return [...variants, ...variantEdges].map((el) => {
-      // @ts-ignore
-      if (isNode(el)) {
-        const nodeWithPosition = dagreGraph.node(el.id);
-        // unfortunately we need this little hack to pass a slighltiy different position
-        // in order to notify react flow about the change
-        el.position = {
-          x: nodeWithPosition.x + Math.random() / 1000,
-          y: nodeWithPosition.y
-        };
-      }
-      return el;
-    });
-  };
+//     return [...variants, ...variantEdges].map((el) => {
+//       // @ts-ignore
+//       if (isNode(el)) {
+//         const nodeWithPosition = dagreGraph.node(el.id);
+//         // unfortunately we need this little hack to pass a slighltiy different position
+//         // in order to notify react flow about the change
+//         el.position = {
+//           x: nodeWithPosition.x + Math.random() / 1000,
+//           y: nodeWithPosition.y
+//         };
+//       }
+//       return el;
+//     });
+//   };
 
-  const updateCampaignVariant = (campaignVariant: any) => {
-    setVariants((variants) => variants.map(variant => {
-      if (variant.id === campaignVariant.id) {
-        variant.data = {
-          ...variant.data,
-          ...campaignVariant.data
-        }
-      }
+//   const updateCampaignVariant = (campaignVariant: any) => {
+//     setVariants((variants) => variants.map(variant => {
+//       if (variant.id === campaignVariant.id) {
+//         variant.data = {
+//           ...variant.data,
+//           ...campaignVariant.data
+//         }
+//       }
 
-      return variant;
-    }));
+//       return variant;
+//     }));
 
-    setActiveVariant(null);
-  }
+//     setActiveVariant(null);
+//   }
 
-  const closePanel = () => setActiveVariant(null);
+//   const closePanel = () => setActiveVariant(null);
 
-  useEffect(() => {
-    let els = getLayoutElements() as any || [];
-    setElements(els);
-  }, [variants]);
+//   useEffect(() => {
+//     let els = getLayoutElements() as any || [];
+//     setElements(els);
+//   }, [variants]);
 
   return (
-    <CampaignVariantsBuilderContainer>
-      <ReactFlow
-        elements={elements}
-        onSelectionChange={(elements) => setActiveVariant(elements?.[0])}
-        nodeTypes={nodeTypes}
-      >
-        <Background
-          variant={BackgroundVariant.Dots}
-          color="#f7f8fb"
-          size={2}
-          gap={12}
-        />
-      </ReactFlow>
-      {activeVariant && (
-        <CampaignVariantCard onClose={closePanel} activeVariant={activeVariant} onUpdate={updateCampaignVariant} />
-      )}
-    </CampaignVariantsBuilderContainer>
+    <>
+      <div>test</div>
+    </>
   )
 }
 

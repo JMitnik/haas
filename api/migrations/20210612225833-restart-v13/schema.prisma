@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -772,8 +772,6 @@ model CampaignVariantEdge {
   childCampaignVariant   CampaignVariant @relation("CampaignVariantEdge_ToChildCampaignVariant", fields: [childCampaignVariantId], references: [id])
 
   scheduleType CampaignVariantScheduleTypeEnum @default(value: GENERAL)
-  scheduleMetric CampaignScheduleMetric?
-  scheduleAmount  Int?
 
   subscriptions CampaignVariantSubscription[]
 }

@@ -48,7 +48,7 @@ describe('CampaignPrismaAdapter', () => {
             scheduleType: 'FOLLOW_UP',
             type: 'EMAIL',
             children: [{
-              condition: 'ON_NOT_FINISHED',
+              conditionType: 'ON_NOT_FINISHED',
               childVariant: {
                 id: 'DEEPLY_NESTED_CHILD_VARIANT',
                 dialogueId,
@@ -57,7 +57,7 @@ describe('CampaignPrismaAdapter', () => {
                 type: 'EMAIL',
               }
             }, {
-              condition: 'ON_NOT_OPENED',
+              conditionType: 'ON_NOT_OPENED',
               childVariant: {
                 id: 'DEEPLY_NESTED_CHILD_VARIANT_SIBLING',
                 dialogueId,
@@ -394,16 +394,15 @@ describe('CampaignPrismaAdapter', () => {
         id: 'PARENT_VARIANT',
         dialogueId,
         workspaceId,
-        scheduleType: 'GENERAL',
         type: 'EMAIL',
         body: 'Test',
         children: [{
           id: 'FIRST_PARENT_TO_CHILD',
+          scheduleType: 'FOLLOW_UP',
           childVariant: {
             id: 'CHILD_VARIANT',
             dialogueId,
             workspaceId,
-            scheduleType: 'FOLLOW_UP',
             type: 'EMAIL'
           }
         }]
@@ -411,16 +410,15 @@ describe('CampaignPrismaAdapter', () => {
         id: 'PARENT_VARIANT_FIRST_SIBLING',
         dialogueId,
         workspaceId,
-        scheduleType: 'GENERAL',
         type: 'EMAIL',
         body: 'Test',
         children: [{
           id: 'SECOND_PARENT_TO_CHILD',
+          scheduleType: 'FOLLOW_UP',
           childVariant: {
             id: 'CHILD_VARIANT_COUSIN',
             dialogueId,
             workspaceId,
-            scheduleType: 'FOLLOW_UP',
             type: 'EMAIL'
           }
         }]
@@ -448,7 +446,7 @@ describe('CampaignPrismaAdapter', () => {
             {
               id: 'NESTED_PARENT_TO_CHILD_1',
               parentVariantId: 'CHILD_VARIANT',
-              condition: 'ON_NOT_FINISHED',
+              conditionType: 'ON_NOT_FINISHED',
               childVariant: {
                 id: 'GRAND_CHILD_VARIANT_1',
                 dialogueId,

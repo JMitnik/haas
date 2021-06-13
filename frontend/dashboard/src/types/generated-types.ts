@@ -2066,25 +2066,6 @@ export type GetWorkspaceCampaignQuery = (
   )> }
 );
 
-export type CreateCampaignMutationVariables = Exact<{
-  input?: Maybe<CreateCampaignInputType>;
-}>;
-
-
-export type CreateCampaignMutation = (
-  { __typename?: 'Mutation' }
-  & { createCampaign: (
-    { __typename?: 'CreateCampaignSuccessType' }
-    & { campaign: (
-      { __typename?: 'CampaignType' }
-      & Pick<CampaignType, 'id'>
-    ) }
-  ) | (
-    { __typename?: 'CreateCampaignProblemType' }
-    & Pick<CreateCampaignProblemType, 'problemMessage'>
-  ) }
-);
-
 export type GetWorkspaceCampaignsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
 }>;
@@ -2129,6 +2110,29 @@ export type GetWorkspaceDialoguesQuery = (
       )>> }
     )>> }
   )> }
+);
+
+export type CreateCampaignMutationVariables = Exact<{
+  input?: Maybe<CreateCampaignInputType>;
+}>;
+
+
+export type CreateCampaignMutation = (
+  { __typename?: 'Mutation' }
+  & { createCampaign: (
+    { __typename?: 'CreateCampaignSuccessType' }
+    & { campaign: (
+      { __typename?: 'CampaignType' }
+      & Pick<CampaignType, 'id'>
+    ) }
+  ) | (
+    { __typename?: 'CreateCampaignProblemType' }
+    & Pick<CreateCampaignProblemType, 'problemMessage'>
+    & { fields: Array<(
+      { __typename?: 'ProblemFieldType' }
+      & Pick<ProblemFieldType, 'field' | 'problem'>
+    )> }
+  ) }
 );
 
 export type RequestInviteMutationVariables = Exact<{
@@ -2701,46 +2705,6 @@ export type GetWorkspaceCampaignQueryResult = Apollo.QueryResult<GetWorkspaceCam
 export function refetchGetWorkspaceCampaignQuery(variables?: GetWorkspaceCampaignQueryVariables) {
       return { query: GetWorkspaceCampaignDocument, variables: variables }
     }
-export const CreateCampaignDocument = gql`
-    mutation CreateCampaign($input: CreateCampaignInputType) {
-  createCampaign(input: $input) {
-    ... on CreateCampaignSuccessType {
-      campaign {
-        id
-      }
-    }
-    ... on CreateCampaignProblemType {
-      problemMessage
-    }
-  }
-}
-    `;
-export type CreateCampaignMutationFn = Apollo.MutationFunction<CreateCampaignMutation, CreateCampaignMutationVariables>;
-
-/**
- * __useCreateCampaignMutation__
- *
- * To run a mutation, you first call `useCreateCampaignMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateCampaignMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createCampaignMutation, { data, loading, error }] = useCreateCampaignMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateCampaignMutation(baseOptions?: Apollo.MutationHookOptions<CreateCampaignMutation, CreateCampaignMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateCampaignMutation, CreateCampaignMutationVariables>(CreateCampaignDocument, options);
-      }
-export type CreateCampaignMutationHookResult = ReturnType<typeof useCreateCampaignMutation>;
-export type CreateCampaignMutationResult = Apollo.MutationResult<CreateCampaignMutation>;
-export type CreateCampaignMutationOptions = Apollo.BaseMutationOptions<CreateCampaignMutation, CreateCampaignMutationVariables>;
 export const GetWorkspaceCampaignsDocument = gql`
     query GetWorkspaceCampaigns($customerSlug: String!) {
   customer(slug: $customerSlug) {
@@ -2844,6 +2808,50 @@ export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDi
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
     }
+export const CreateCampaignDocument = gql`
+    mutation CreateCampaign($input: CreateCampaignInputType) {
+  createCampaign(input: $input) {
+    ... on CreateCampaignSuccessType {
+      campaign {
+        id
+      }
+    }
+    ... on CreateCampaignProblemType {
+      problemMessage
+      fields {
+        field
+        problem
+      }
+    }
+  }
+}
+    `;
+export type CreateCampaignMutationFn = Apollo.MutationFunction<CreateCampaignMutation, CreateCampaignMutationVariables>;
+
+/**
+ * __useCreateCampaignMutation__
+ *
+ * To run a mutation, you first call `useCreateCampaignMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCampaignMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCampaignMutation, { data, loading, error }] = useCreateCampaignMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateCampaignMutation(baseOptions?: Apollo.MutationHookOptions<CreateCampaignMutation, CreateCampaignMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateCampaignMutation, CreateCampaignMutationVariables>(CreateCampaignDocument, options);
+      }
+export type CreateCampaignMutationHookResult = ReturnType<typeof useCreateCampaignMutation>;
+export type CreateCampaignMutationResult = Apollo.MutationResult<CreateCampaignMutation>;
+export type CreateCampaignMutationOptions = Apollo.BaseMutationOptions<CreateCampaignMutation, CreateCampaignMutationVariables>;
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {

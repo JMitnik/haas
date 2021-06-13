@@ -732,14 +732,27 @@ model CampaignVariant {
   // Depth of campaign-variant: this increases in case we have follow-ups
   depth Int @default(value: 0)
 
-  scheduleType CampaignVariantScheduleTypeEnum @default(value: GENERAL)
-
   subscriptions CampaignVariantSubscription[]
 }
 
 enum CampaignVariantEdgeConditionEnum {
+  AB_SAMPLING
   ON_NOT_FINISHED
   ON_NOT_OPENED
+}
+
+enum CampaignScheduleMetric {
+  MONTH
+  WEEK
+  DAY
+  HOUR
+}
+
+model CampaignVariantEdgeCondition {
+  id String @id @default(cuid())
+  campaignVariantEdgeId String @unique
+  campaignVariantEdge CampaignVariantEdge @relation(fields: [campaignVariantEdgeId], references: [id])
+  AB__Weight Int?
 }
 
 model CampaignVariantEdge {
@@ -750,12 +763,19 @@ model CampaignVariantEdge {
 
   // A next campaign variant might be triggered based on if this edge has a certain condition
   condition CampaignVariantEdgeConditionEnum?
+  conditionValue  CampaignVariantEdgeCondition?
 
   parentCampaignVariantId String
   parentCampaignVariant   CampaignVariant @relation("CampaignVariantEdge_ToParentCampaignVariant", fields: [parentCampaignVariantId], references: [id])
 
   childCampaignVariantId String
   childCampaignVariant   CampaignVariant @relation("CampaignVariantEdge_ToChildCampaignVariant", fields: [childCampaignVariantId], references: [id])
+
+  scheduleType CampaignVariantScheduleTypeEnum @default(value: GENERAL)
+  scheduleMetric CampaignScheduleMetric?
+  scheduleAmount  Int?
+
+  subscriptions CampaignVariantSubscription[]
 }
 
 // DeliveryStatusTypeEnum: Status of a delivery

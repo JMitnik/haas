@@ -1,4 +1,4 @@
-import { Campaign, CampaignCreateInput, CampaignVariantEdgeCreateWithoutParentCampaignVariantInput, CampaignVariantToCampaignCreateInput, CampaignVariantTypeEnum, PrismaClient } from '@prisma/client';
+import { Campaign, CampaignCreateInput, CampaignVariantEdgeCreateWithoutParentCampaignVariantInput, CampaignVariantScheduleTypeEnum, CampaignVariantToCampaignCreateInput, CampaignVariantTypeEnum, PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-errors';
 import { difference } from 'lodash';
 import { isPresent } from 'ts-is-present';
@@ -172,13 +172,13 @@ export class CampaignPrismaAdapter {
             campaign: { connect: { id: campaign.id } },
             childCampaignVariant: { connect: { id: variantEdge.childVariant?.id || undefined } },
             parentCampaignVariant: { connect: { id: variantEdge.parentVariantId } },
-            condition: variantEdge.condition
+            condition: variantEdge.conditionType
           },
           where: {
             id: variantEdge.id || ''
           },
           update: {
-            condition: variantEdge.condition
+            condition: variantEdge.conditionType
           }
         });
       }
@@ -247,7 +247,8 @@ export class CampaignPrismaAdapter {
         id: childEdge.id,
         parentVariantId: editCampaignVariantInput.id,
         childVariant: childEdge.childVariant,
-        condition: childEdge.condition
+        condition: childEdge.conditionType,
+        scheduleType: CampaignVariantScheduleTypeEnum.GENERAL,
       }
 
       let nestedEdges: NexusGenInputs['EditCampaignVariantEdgeInputType'][] = [];
@@ -312,7 +313,7 @@ export class CampaignPrismaAdapter {
           id: campaignId
         }
       },
-      condition: campaignVariantInput.condition,
+      condition: campaignVariantInput.conditionType,
       childCampaignVariant: {
         create: {
           id: campaignVariantInput.childVariant?.id || undefined,

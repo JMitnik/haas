@@ -1,12 +1,16 @@
 mutation CreateCampaign($input: CreateCampaignInputType) {
   createCampaign(input: $input) {
-     ... on CreateCampaignSuccessType {
+    ... on CreateCampaignSuccessType {
       campaign {
         id
       }
     }
     ... on CreateCampaignProblemType {
       problemMessage
+      fields {
+        field
+        problem
+      }
     }
   }
 }

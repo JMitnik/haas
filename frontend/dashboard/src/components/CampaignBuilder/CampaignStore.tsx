@@ -10,14 +10,19 @@ import { CampaignScheduleEnum, CampaignVariantEdgeConditionEnumType, CampaignVar
 import { CampaignFormType } from './CampaignFormSchema';
 import { ActiveFormProps, ActiveFormType, VariantEdgeType, VariantType } from './CampaignBuilderTypes';
 
-interface CampaignState extends EditCampaignInputType {
+export interface CampaignState extends EditCampaignInputType {
   variantEdges: VariantEdgeType[];
-  addEmptyVariant: (rootIndex?: string) => void;
   activeForm?: ActiveFormProps | undefined;
+  editCampaign: any;
+  addEmptyVariant: (rootIndex?: string) => void;
   setActiveForm: (activeFormType: ActiveFormType, activeVariantEdgeIndex?: number) => void;
   initializeCampaign: () => void;
   editCampaignVariant: (input: any, index: number) => void;
-  editCampaign: any;
+}
+
+export interface CampaignType {
+  label?: string;
+  variantEdges?: VariantEdgeType[];
 }
 
 export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetState<CampaignState>) => ({

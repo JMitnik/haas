@@ -80,9 +80,10 @@ export interface NexusGenInputs {
   }
   CreateCampaignVariantEdgeInputType: { // input type
     childVariant?: NexusGenInputs['CreateCampaignVariantInputType'] | null; // CreateCampaignVariantInputType
-    condition?: NexusGenEnums['CampaignVariantEdgeConditionEnumType'] | null; // CampaignVariantEdgeConditionEnumType
+    conditionType?: NexusGenEnums['CampaignVariantEdgeConditionEnumType'] | null; // CampaignVariantEdgeConditionEnumType
     id?: string | null; // String
     parentVariantId?: string | null; // String
+    scheduleType: NexusGenEnums['CampaignScheduleEnum']; // CampaignScheduleEnum!
   }
   CreateCampaignVariantInputType: { // input type
     body?: string | null; // String
@@ -91,7 +92,6 @@ export interface NexusGenInputs {
     dialogueId: string; // ID!
     id?: string | null; // ID
     label?: string | null; // String
-    scheduleType: NexusGenEnums['CampaignScheduleEnum']; // CampaignScheduleEnum!
     subject?: string | null; // String
     type: NexusGenEnums['CampaignVariantEnum']; // CampaignVariantEnum!
     weight?: number | null; // Float
@@ -182,9 +182,10 @@ export interface NexusGenInputs {
   }
   EditCampaignVariantEdgeInputType: { // input type
     childVariant?: NexusGenInputs['EditCampaignVariantInputType'] | null; // EditCampaignVariantInputType
-    condition?: NexusGenEnums['CampaignVariantEdgeConditionEnumType'] | null; // CampaignVariantEdgeConditionEnumType
+    conditionType?: NexusGenEnums['CampaignVariantEdgeConditionEnumType'] | null; // CampaignVariantEdgeConditionEnumType
     id: string; // String!
     parentVariantId: string; // String!
+    scheduleType: NexusGenEnums['CampaignScheduleEnum']; // CampaignScheduleEnum!
   }
   EditCampaignVariantInputType: { // input type
     body?: string | null; // String
@@ -193,7 +194,6 @@ export interface NexusGenInputs {
     dialogueId: string; // ID!
     id: string; // ID!
     label?: string | null; // String
-    scheduleType: NexusGenEnums['CampaignScheduleEnum']; // CampaignScheduleEnum!
     subject?: string | null; // String
     type: NexusGenEnums['CampaignVariantEnum']; // CampaignVariantEnum!
     weight?: number | null; // Float

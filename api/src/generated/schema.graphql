@@ -142,9 +142,10 @@ type CreateCampaignSuccessType {
 
 input CreateCampaignVariantEdgeInputType {
   childVariant: CreateCampaignVariantInputType
-  condition: CampaignVariantEdgeConditionEnumType
+  conditionType: CampaignVariantEdgeConditionEnumType
   id: String
   parentVariantId: String
+  scheduleType: CampaignScheduleEnum!
 }
 
 input CreateCampaignVariantInputType {
@@ -154,7 +155,6 @@ input CreateCampaignVariantInputType {
   dialogueId: ID!
   id: ID
   label: String
-  scheduleType: CampaignScheduleEnum!
   subject: String
   type: CampaignVariantEnum!
   weight: Float
@@ -457,9 +457,10 @@ type EditCampaignSuccessType {
 
 input EditCampaignVariantEdgeInputType {
   childVariant: EditCampaignVariantInputType
-  condition: CampaignVariantEdgeConditionEnumType
+  conditionType: CampaignVariantEdgeConditionEnumType
   id: String!
   parentVariantId: String!
+  scheduleType: CampaignScheduleEnum!
 }
 
 input EditCampaignVariantInputType {
@@ -469,7 +470,6 @@ input EditCampaignVariantInputType {
   dialogueId: ID!
   id: ID!
   label: String
-  scheduleType: CampaignScheduleEnum!
   subject: String
   type: CampaignVariantEnum!
   weight: Float

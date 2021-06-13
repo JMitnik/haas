@@ -270,59 +270,59 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
     mode: 'onChange',
   });
 
-  const [createCampaign] = useCreateCampaignMutation({
-    variables: {
-      input: {
-        label: form.getValues().label,
-        workspaceId: activeCustomer?.id || '',
-        variants: form.getValues().variants?.map((variant) => ({
-          dialogueId: variant.dialogue?.value || '',
-          body: variant.body,
-          label: variant.label,
-          subject: '',
-          weight: variant.weight,
-          type: variant.type as CampaignVariantEnum,
-          scheduleType: 'GENERAL' as CampaignScheduleEnum,
-          workspaceId: activeCustomer?.id || '',
-        })),
-      },
-    },
-    refetchQueries: [
-      refetchGetWorkspaceCampaignsQuery({
-        customerSlug: activeCustomer?.slug || ''
-      })
-    ],
-    onCompleted: (output) => {
-      if (output.createCampaign.__typename === 'CreateCampaignProblemType') {
-        // TODO: Do something with these errors
-        console.log(output.createCampaign.problemMessage);
-      }
+  // const [createCampaign] = useCreateCampaignMutation({
+  //   variables: {
+  //     input: {
+  //       label: form.getValues().label,
+  //       workspaceId: activeCustomer?.id || '',
+  //       variants: form.getValues().variants?.map((variant) => ({
+  //         dialogueId: variant.dialogue?.value || '',
+  //         body: variant.body,
+  //         label: variant.label,
+  //         subject: '',
+  //         weight: variant.weight,
+  //         type: variant.type as CampaignVariantEnum,
+  //         scheduleType: 'GENERAL' as CampaignScheduleEnum,
+  //         workspaceId: activeCustomer?.id || '',
+  //       })),
+  //     },
+  //   },
+  //   refetchQueries: [
+  //     refetchGetWorkspaceCampaignsQuery({
+  //       customerSlug: activeCustomer?.slug || ''
+  //     })
+  //   ],
+  //   onCompleted: (output) => {
+  //     if (output.createCampaign.__typename === 'CreateCampaignProblemType') {
+  //       // TODO: Do something with these errors
+  //       console.log(output.createCampaign.problemMessage);
+  //     }
 
-      if (output.createCampaign.__typename === 'CreateCampaignSuccessType') {
-        // TODO: Do something with these errors
-        toast({
-          title: t('toast:campaign_created'),
-          description: t('toast:campaign_created_helper'),
-          status: 'success',
-          position: 'bottom-right',
-          duration: 1500,
-        });
-      }
+  //     if (output.createCampaign.__typename === 'CreateCampaignSuccessType') {
+  //       // TODO: Do something with these errors
+  //       toast({
+  //         title: t('toast:campaign_created'),
+  //         description: t('toast:campaign_created_helper'),
+  //         status: 'success',
+  //         position: 'bottom-right',
+  //         duration: 1500,
+  //       });
+  //     }
 
-      onClose?.();
-    },
-    onError: () => {
-      toast({
-        title: 'Something went wrong!',
-        description: 'Currently unable to edit your detail. Please try again.',
-        status: 'error',
-        position: 'bottom-right',
-        duration: 1500,
-      });
+  //     onClose?.();
+  //   },
+  //   onError: () => {
+  //     toast({
+  //       title: 'Something went wrong!',
+  //       description: 'Currently unable to edit your detail. Please try again.',
+  //       status: 'error',
+  //       position: 'bottom-right',
+  //       duration: 1500,
+  //     });
 
-      onClose?.();
-    },
-  });
+  //     onClose?.();
+  //   },
+  // });
 
   const [activeVariantIndex, setActiveVariantIndex] = useState<number>(0);
 
@@ -358,7 +358,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
   }
 
   const handleSubmit = () => {
-    createCampaign();
+    // createCampaign();
   };
 
   const [activeStep, setActiveStep] = useState<CampaignStep>(CampaignStep.VARIANT);

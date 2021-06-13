@@ -188,8 +188,19 @@
       "tag": "CreateEnum",
       "enum": "CampaignVariantEdgeConditionEnum",
       "values": [
+        "AB_SAMPLING",
         "ON_NOT_FINISHED",
         "ON_NOT_OPENED"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
+      "enum": "CampaignScheduleMetric",
+      "values": [
+        "MONTH",
+        "WEEK",
+        "DAY",
+        "HOUR"
       ]
     },
     {
@@ -8154,8 +8165,19 @@
     {
       "tag": "CreateField",
       "model": "CampaignVariant",
-      "field": "scheduleType",
-      "type": "CampaignVariantScheduleTypeEnum",
+      "field": "subscriptions",
+      "type": "CampaignVariantSubscription",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "CampaignVariantEdgeCondition"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdgeCondition",
+      "field": "id",
+      "type": "String",
       "arity": "Required"
     },
     {
@@ -8163,8 +8185,19 @@
       "location": {
         "path": {
           "tag": "Field",
-          "model": "CampaignVariant",
-          "field": "scheduleType"
+          "model": "CampaignVariantEdgeCondition",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdgeCondition",
+          "field": "id"
         },
         "directive": "default"
       }
@@ -8175,20 +8208,84 @@
         "tag": "Directive",
         "path": {
           "tag": "Field",
-          "model": "CampaignVariant",
-          "field": "scheduleType"
+          "model": "CampaignVariantEdgeCondition",
+          "field": "id"
         },
         "directive": "default"
       },
-      "argument": "value",
-      "value": "GENERAL"
+      "argument": "",
+      "value": "cuid()"
     },
     {
       "tag": "CreateField",
-      "model": "CampaignVariant",
-      "field": "subscriptions",
-      "type": "CampaignVariantSubscription",
-      "arity": "List"
+      "model": "CampaignVariantEdgeCondition",
+      "field": "campaignVariantEdgeId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdgeCondition",
+          "field": "campaignVariantEdgeId"
+        },
+        "directive": "unique"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdgeCondition",
+      "field": "campaignVariantEdge",
+      "type": "CampaignVariantEdge",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdgeCondition",
+          "field": "campaignVariantEdge"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdgeCondition",
+          "field": "campaignVariantEdge"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[campaignVariantEdgeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdgeCondition",
+          "field": "campaignVariantEdge"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdgeCondition",
+      "field": "AB__Weight",
+      "type": "Int",
+      "arity": "Optional"
     },
     {
       "tag": "CreateModel",
@@ -8295,6 +8392,13 @@
       "model": "CampaignVariantEdge",
       "field": "condition",
       "type": "CampaignVariantEdgeConditionEnum",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdge",
+      "field": "conditionValue",
+      "type": "CampaignVariantEdgeCondition",
       "arity": "Optional"
     },
     {
@@ -8430,6 +8534,45 @@
       },
       "argument": "references",
       "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdge",
+      "field": "scheduleType",
+      "type": "CampaignVariantScheduleTypeEnum",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "scheduleType"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "scheduleType"
+        },
+        "directive": "default"
+      },
+      "argument": "value",
+      "value": "GENERAL"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdge",
+      "field": "subscriptions",
+      "type": "CampaignVariantSubscription",
+      "arity": "List"
     },
     {
       "tag": "CreateModel",

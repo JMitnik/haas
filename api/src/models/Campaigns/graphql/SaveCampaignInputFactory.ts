@@ -28,7 +28,6 @@ export const saveCampaignInputFactory = (operation: Operation) => {
       t.float('weight', { required: false });
       t.string('subject', { required: false });
 
-      t.field('scheduleType', { type: CampaignScheduleEnum, required: true });
       t.field('type', { type: CampaignVariantEnum, required: true });
 
       t.list.field('children', { type: CampaignVariantEdgeInputType })
@@ -53,7 +52,9 @@ export const saveCampaignInputFactory = (operation: Operation) => {
       t.string('id', { required: operation === 'Edit' ? true: false });
       t.string('parentVariantId', { required: operation === 'Edit' ? true: false });
       t.field('childVariant', { required: false, type: CampaignVariantInputType });
-      t.field('condition', { type: CampaignVariantEdgeConditionEnumType });
+      t.field('scheduleType', { type: CampaignScheduleEnum, required: true });
+      t.field('conditionType', { type: CampaignVariantEdgeConditionEnumType });
+      // t.field('condition');
     }
   });
 
