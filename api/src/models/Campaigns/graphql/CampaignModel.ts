@@ -114,5 +114,9 @@ export const CampaignModel = objectType({
     t.id('id');
     t.string('label');
     t.list.field('variantEdges', { type: CampaignVariantEdgeModel });
+
+    // Flattened instead of nested
+    t.list.field('flatVariantEdges', { type: CampaignVariantEdgeModel });
+    t.list.field('flatVariants', { type: CampaignVariantModel });
   },
 });

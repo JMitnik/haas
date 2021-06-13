@@ -505,6 +505,8 @@ export interface NexusGenRootTypes {
     startDate?: string | null; // String
   }
   CampaignType: { // root type
+    flatVariantEdges: NexusGenRootTypes['CampaignVariantEdgeType'][]; // [CampaignVariantEdgeType!]!
+    flatVariants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
     id: string; // ID!
     label: string; // String!
     variantEdges: NexusGenRootTypes['CampaignVariantEdgeType'][]; // [CampaignVariantEdgeType!]!
@@ -945,6 +947,8 @@ export interface NexusGenFieldTypes {
   }
   CampaignType: { // field return type
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
+    flatVariantEdges: NexusGenRootTypes['CampaignVariantEdgeType'][]; // [CampaignVariantEdgeType!]!
+    flatVariants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
     id: string; // ID!
     label: string; // String!
     variantEdges: NexusGenRootTypes['CampaignVariantEdgeType'][]; // [CampaignVariantEdgeType!]!

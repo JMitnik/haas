@@ -63,6 +63,8 @@ export type CampaignType = {
   id: Scalars['ID'];
   label: Scalars['String'];
   variantEdges: Array<CampaignVariantEdgeType>;
+  flatVariantEdges: Array<CampaignVariantEdgeType>;
+  flatVariants: Array<CampaignVariantType>;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
@@ -2076,6 +2078,20 @@ export type GetWorkspaceCampaignQuery = (
           { __typename?: 'PaginationPageInfo' }
           & Pick<PaginationPageInfo, 'nrPages'>
         ) }
+      )>, flatVariantEdges: Array<(
+        { __typename?: 'CampaignVariantEdgeType' }
+        & Pick<CampaignVariantEdgeType, 'id'>
+        & { childCampaignVariant?: Maybe<(
+          { __typename?: 'CampaignVariantType' }
+          & Pick<CampaignVariantType, 'id' | 'label'>
+        )> }
+      )>, flatVariants: Array<(
+        { __typename?: 'CampaignVariantType' }
+        & Pick<CampaignVariantType, 'id' | 'label'>
+        & { children?: Maybe<Array<(
+          { __typename?: 'CampaignVariantEdgeType' }
+          & Pick<CampaignVariantEdgeType, 'id'>
+        )>> }
       )>, variantEdges: Array<(
         { __typename?: 'CampaignVariantEdgeType' }
         & Pick<CampaignVariantEdgeType, 'id'>
@@ -2684,6 +2700,20 @@ export const GetWorkspaceCampaignDocument = gql`
         }
         pageInfo {
           nrPages
+        }
+      }
+      flatVariantEdges {
+        id
+        childCampaignVariant {
+          id
+          label
+        }
+      }
+      flatVariants {
+        id
+        label
+        children {
+          id
         }
       }
       variantEdges {

@@ -5,46 +5,36 @@ import { CampaignModel, CampaignVariantEdgeConditionEnumType } from "./CampaignM
 /**
  * Access pattern for fetching a single campaign.
  */
- export const GetCampaignOfWorkspace = extendType({
-    type: 'Customer',
+export const GetCampaignOfWorkspace = extendType({
+  type: 'Customer',
 
-    definition(t) {
-      t.field('campaign', {
-        type: CampaignModel,
-        args: { campaignId: 'String' },
-        resolve: async (parent, args, ctx) => {
-          const workspaceWithCampaign = await ctx.prisma.campaign.findFirst({
-            where: {
-              AND: [
-                { workspaceId: parent.id },
-                { id: args.campaignId || '' },
-              ]
-            },
-            include: {
-              deliveries: true,
-              variantsEdges: {
-                include: {
-                  campaignVariant: {
-                    include: {
-                      dialogue: true,
-                      workspace: true,
-                    }
-                  },
-                }
-              }
-            }
-          });
+  definition(t) {
+    t.field('campaign', {
+      type: CampaignModel,
+      args: { campaignId: 'String' },
+      resolve: async (parent, args, ctx) => {
+        const workspaceWithCampaign = await ctx.prisma.campaign.findFirst({
+          where: {
+            AND: [
+              { workspaceId: parent.id },
+              { id: args.campaignId || '' },
+            ]
+          },
+          include: {
+            deliveries: true,
+            directVariantEdges: { include: { conditionValue: true } },
+            variants: { include: { children: true } },
+            nestedVariantEdges: { include: { conditionValue: true } },
+          }
+        });
 
-          return {
-            ...workspaceWithCampaign,
-            variantEdges: workspaceWithCampaign.variantsEdges.map(variantEdge => ({
-              scheduleType: 'GENERAL',
-              conditionType: 'AB_SAMPLING',
-              condition: { AB__weight: variantEdge.weight },
-              childCampaignVariant: variantEdge.campaignVariant,
-            }))
-          };
-        }
-      })
-    }
-  })
+        return {
+          ...workspaceWithCampaign,
+          flatVariantEdges: workspaceWithCampaign.nestedVariantEdges,
+          flatVariants: workspaceWithCampaign.variants,
+          variantEdges: workspaceWithCampaign.directVariantEdges
+        } as any;
+      }
+    })
+  }
+})

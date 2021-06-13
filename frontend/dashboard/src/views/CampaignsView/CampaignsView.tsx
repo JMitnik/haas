@@ -16,7 +16,7 @@ import CreateCampaignForm from './CreateCampaignForm';
 const CampaignsView = () => {
   const history = useHistory();
   const { t } = useTranslation();
-  const { customerSlug, goToCampaignView, getCreateCampaignsPath } = useNavigator();
+  const { customerSlug, goToCampaignView, getCreateCampaignsPath, getEditCampaignsPath } = useNavigator();
   const [openedModal, setIsOpenedModal] = useState(false);
   const { canCreateCampaigns } = useAuth();
 
@@ -30,7 +30,7 @@ const CampaignsView = () => {
   const campaigns = data?.customer?.campaigns || [];
 
   const handleSelectCampaign = ({ value }: any) => {
-    goToCampaignView(value);
+    history.push(getEditCampaignsPath(value));
   }
 
   return (

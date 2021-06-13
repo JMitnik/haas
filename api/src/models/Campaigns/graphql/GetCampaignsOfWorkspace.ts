@@ -30,10 +30,7 @@ export const GetCampaignsOfWorkspace = extendType({
 
         return workspaceWithCampaigns.campaigns.map(campaign => ({
           ...campaign,
-          variants: campaign.variantsEdges.map((variantEdge) => ({
-            weight: variantEdge.weight,
-            ...variantEdge.campaignVariant
-          }))
+          variantEdges: campaign.variantsEdges
         })) || [] as any;
       },
     });

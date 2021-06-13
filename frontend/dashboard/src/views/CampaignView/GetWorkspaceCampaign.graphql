@@ -45,6 +45,22 @@ query GetWorkspaceCampaign(
         }
       }
 
+      flatVariantEdges {
+        id
+        childCampaignVariant {
+          id
+          label
+        }
+      }
+
+      flatVariants {
+        id
+        label
+        children {
+          id
+        }
+      }
+
       variantEdges {
         id
         childCampaignVariant {

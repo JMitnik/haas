@@ -42,6 +42,8 @@ enum CampaignScheduleEnum {
 """Campaign"""
 type CampaignType {
   deliveryConnection(filter: DeliveryConnectionFilter): DeliveryConnectionType
+  flatVariantEdges: [CampaignVariantEdgeType!]!
+  flatVariants: [CampaignVariantType!]!
   id: ID!
   label: String!
   variantEdges: [CampaignVariantEdgeType!]!

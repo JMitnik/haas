@@ -16,6 +16,7 @@ import { useCampaignStore } from './CampaignStore';
 import { RecursiveCampaignStep } from './RecursiveCampaignStep';
 import { get } from 'lodash';
 import { CampaignType } from 'types/generated-types';
+import { useEffect } from 'react';
 
 type EdgeType = 'Weights' | 'Normal';
 
@@ -85,9 +86,10 @@ const getParentIndex = (variantIndex: string): string | undefined => {
 
 interface CampaignBuilderProps {
   onSave: (campaign: any) => void;
+  campaign?: any;
 }
 
-export const CampaignBuilder = ({ onSave }: CampaignBuilderProps) => {
+export const CampaignBuilder = ({ onSave, campaign }: CampaignBuilderProps) => {
   const {
     id,
     variantEdges,
@@ -97,9 +99,17 @@ export const CampaignBuilder = ({ onSave }: CampaignBuilderProps) => {
     activeForm,
     addEmptyVariant,
     editCampaign,
-    editCampaignVariant
+    editCampaignVariant,
+    setEntireVariantTree
   } = useCampaignStore();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (campaign) {
+      editCampaign({label: campaign.label});
+      setEntireVariantTree(campaign.variantEdges);
+    }
+  }, [campaign, setEntireVariantTree]);
 
   const activeVariantEdge = activeForm?.activeVariantEdgeIndex ?
     get(variantEdges, `${activeForm?.activeVariantEdgeIndex}`, undefined) : undefined;

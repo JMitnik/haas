@@ -14,6 +14,7 @@ export interface CampaignState extends EditCampaignInputType {
   variantEdges: VariantEdgeType[];
   activeForm?: ActiveFormProps | undefined;
   editCampaign: any;
+  setEntireVariantTree: any;
   addEmptyVariant: (rootIndex?: string) => void;
   setActiveForm: (activeFormType: ActiveFormType, activeVariantEdgeIndex?: number) => void;
   initializeCampaign: () => void;
@@ -84,6 +85,10 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
     };
   }),
 
+  setEntireVariantTree: (variantEdges: any) => set(state => {
+    console.log(variantEdges);
+    LSet(state, 'variantEdges', variantEdges)
+  }),
   addEmptyVariant: (rootIndex?: string, parentVariantId?: string) => {
     set(state => {
       if (!rootIndex) {

@@ -53,6 +53,7 @@ import VerifyTokenPage from 'pages/verify_token';
 import client from 'config/apollo';
 import lang from 'config/i18n-config';
 import { CreateCampaignView } from 'views/CreateCampaignView';
+import { EditCampaignView } from 'views/EditCampaignView';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
@@ -103,6 +104,12 @@ const CustomerRoutes = () => (
               allowedPermission={SystemPermission.CAN_VIEW_CAMPAIGNS}
               path={ROUTES.CREATE_CAMPAIGNS_VIEW}
               render={() => <CreateCampaignView />}
+            />
+
+            <GuardedRoute
+              allowedPermission={SystemPermission.CAN_VIEW_CAMPAIGNS}
+              path={ROUTES.EDIT_CAMPAIGNS_VIEW}
+              render={() => <EditCampaignView />}
             />
 
             <GuardedRoute
