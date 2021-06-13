@@ -1,55 +1,53 @@
-export default{
- "data":{
-      "usersConnection": {
+export default {
+  "data": {
+    "usersConnection": {
       "userCustomers": [
         {
           "user": {
             "id": "12",
-            "firstName": "A",
-            "lastName": "E",
+            "firstName": "Foo",
+            "lastName": "Bar",
             "globalPermissions": [
               "CAN_ACCESS_ADMIN_PANEL",
               "CAN_VIEW_CAMPAIGNS",
-              "CAN_CREATE_CAMPAIGNS",
-              "CAN_CREATE_DELIVERIES"
             ]
           }
         },
         {
           "user": {
             "id": "13",
-            "firstName": "B",
-            "lastName": "D",
+            "firstName": "Cliff",
+            "lastName": "Douglas",
             "globalPermissions": [
-              "CAN_ACCESS_ADMIN_PANEL",
               "CAN_VIEW_CAMPAIGNS",
+              "CAN_DELETE_USERS", 
               "CAN_CREATE_CAMPAIGNS",
-              "CAN_CREATE_DELIVERIES"
+              "CAN_VIEW_DIALOGUE_ANALYTICS",
             ]
           }
         },
         {
           "user": {
             "id": "14",
-            "firstName": "B",
-            "lastName": "C",
+            "firstName": "Stef",
+            "lastName": "Anoo",
             "globalPermissions": [
+              "CAN_CREATE_DELIVERIES",
               "CAN_ACCESS_ADMIN_PANEL",
-              "CAN_VIEW_CAMPAIGNS",
               "CAN_CREATE_CAMPAIGNS",
-              "CAN_CREATE_DELIVERIES"
+             
             ]
           }
         },
         {
           "user": {
             "id": "15",
-            "firstName": "D",
-            "lastName": "B",
+            "firstName": "Tony",
+            "lastName": "Hearn",
             "globalPermissions": [
-              "CAN_ACCESS_ADMIN_PANEL",
+              "CAN_CREATE_TRIGGERS",
               "CAN_VIEW_CAMPAIGNS",
-              "CAN_CREATE_CAMPAIGNS",
+              "CAN_ADD_USERS",
               "CAN_CREATE_DELIVERIES"
             ]
           }
@@ -57,21 +55,22 @@ export default{
         {
           "user": {
             "id": "16",
-            "firstName": "E",
-            "lastName": "A",
+            "firstName": "Ken",
+            "lastName": "Harlow",
             "globalPermissions": [
-              "CAN_ACCESS_ADMIN_PANEL",
-              "CAN_VIEW_CAMPAIGNS",
-              "CAN_CREATE_CAMPAIGNS",
-              "CAN_CREATE_DELIVERIES"
+              "CAN_EDIT_WORKSPACE",
+              "CAN_BUILD_DIALOGUE",
+              "CAN_DELETE_USERS",
+              "CAN_VIEW_DIALOGUE_ANALYTICS",
+              "CAN_CREATE_TRIGGERS"
             ]
           }
         }
       ],
-       "pageInfo": {
+      "pageInfo": {
         "nrPages": 4,
         "pageIndex": 1
       }
     }
- }
+  }
 }

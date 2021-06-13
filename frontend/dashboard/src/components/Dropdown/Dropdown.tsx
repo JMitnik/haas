@@ -11,7 +11,7 @@ import { DropdownOverlayContainer } from './DropdownStyles';
 
 interface DropdownProps {
   renderOverlay?: ({ onClose }: any) => React.ReactNode;
-  children?: ({ onOpen, onClose }: any) => React.ReactNode;
+  children?: ({ onOpen, onClose, onDirectOpen }: any) => React.ReactNode;
   placement?: Placement;
   offset?: [number, number];
   minWidth?: number;
@@ -39,6 +39,11 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
   const handleToggleDropdown = (event: any) => {
     event.stopPropagation();
     setIsOpen((isOpen) => !isOpen);
+  };
+
+  const handleDirectDropdown = () => {
+    if (isOpen === false)
+      setIsOpen((isOpen) => !isOpen);
   };
 
   const handleClose = () => setIsOpen(false);
@@ -79,7 +84,7 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
         ref={setToggleRef}
       >
         <>
-          {children?.({ onOpen: handleToggleDropdown, onClose: handleClose })}
+          {children?.({ onOpen: handleToggleDropdown, onClose: handleClose, onDirectOpen: handleDirectDropdown })}
         </>
       </Div>
     </>

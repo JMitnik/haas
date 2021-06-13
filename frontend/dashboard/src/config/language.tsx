@@ -457,7 +457,7 @@ const language = {
       de: 'Hoppla! Es gab ein Problem mit dem Server.',
     },
     server_down_helper: {
-      en: 'Try again in a second while we take care of the proble.',
+      en: 'Try again in a second while we take care of the problem.',
       de: 'Versuchen Sie es gleich erneut. Wir kümmern uns um das Problem.',
     },
     add_recipient: {

@@ -3,7 +3,7 @@ import React from "react";
 import styled, { css } from "styled-components";
 import Card, { CardBody } from "./Cards";
 import { IconCheck } from "./assets/icon-check";
-import {Dropdown} from "./Dropdown";
+import { Dropdown } from "./Dropdown";
 
 interface TableRowProps {
   hasHover?: boolean;
@@ -54,7 +54,7 @@ export const TableHeadingContainer = styled.thead`
     color: ${theme.colors.gray[600]};
     font-weight: 700;
     line-height: 1rem;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     border-bottom: 1px solid ${theme.colors.gray[200]};
@@ -64,7 +64,8 @@ export const TableHeadingContainer = styled.thead`
 
 export const TableHeadingCell = styled.th`
   padding: 0.75rem 1.5rem;
-`; 
+  cursor:pointer;
+`;
 
 export const TableHeading = ({ children, ...props }: any) => (
   <TableHeadingContainer {...props}>
@@ -75,13 +76,20 @@ export const TableHeading = ({ children, ...props }: any) => (
 export const TableBody = styled.tbody``;
 
 interface TableCellProps {
+  children?: React.ReactNode;
   isNumeric?: boolean;
   center?: boolean;
   onClick?: () => void;
   isSelected?: boolean;
 }
+interface TableCellContainerProps {
+  isNumeric?: boolean;
+  center?: boolean;
+  isSelected?: boolean;
+  onClick?: () => void;
+}
 
-export const TableCellContainer = styled.td<TableCellProps>`
+export const TableCellContainer = styled.td<TableCellContainerProps>`
   ${({ isNumeric, center }) => css`
     padding: 0.5rem 1.5rem;
 
@@ -97,18 +105,25 @@ export const TableCellContainer = styled.td<TableCellProps>`
   `}
 `;
 
+
 export const TableCell = ({
   onClick,
   isSelected,
+  children
 }: TableCellProps) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onClick?.();
-    console.log("Clicked!");
+    //console.log("Clicked!");
+    // console.log(event.currentTarget.innerText)
+    children = event.currentTarget.innerText
+    // console.log(children)
+    return event.currentTarget.innerHTML
   };
-  return(
-    <TableCellContainer>
-    <Dropdown></Dropdown>
+  return (
+    <TableCellContainer onClick={handleClick}>
+      {isSelected}
+      {children}
     </TableCellContainer>
   )
 
