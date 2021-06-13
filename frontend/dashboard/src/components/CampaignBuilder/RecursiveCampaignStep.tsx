@@ -20,7 +20,6 @@ interface IncomingCampaignEdgeProps {
   variantEdge?: VariantEdgeType;
 }
 
-
 export const AddCampaignEdge = ({ onClick, type = 'Normal' }: { onClick?: () => void, type?: EdgeType }) => (
   <LS.BuilderEdgeContainer>
     <LS.BuilderEdge />
@@ -122,10 +121,10 @@ export const RecursiveCampaignStep = ({
             <UI.Div gridColumn="5 / 9">
               <UI.Card isActive={isActive} bg="white" onClick={onFormChange}>
                 <UI.CardBody>
-                  <UI.Helper mb={2}>{variant?.scheduleType}</UI.Helper>
+                  <UI.Helper mb={2}>{variantEdge?.scheduleType}</UI.Helper>
                   {variant?.label}
                 </UI.CardBody>
-                {!!variantEdge?.childVariant?.hasProblem && <LS.BuilderStepProblem>!</LS.BuilderStepProblem>}
+                {!!variantEdge?.hasProblem && <LS.BuilderStepProblem>!</LS.BuilderStepProblem>}
               </UI.Card>
             </UI.Div>
           </>
@@ -143,7 +142,7 @@ export const RecursiveCampaignStep = ({
           />
         </UI.Div>
       ))}
-      {!variant?.children?.length && variant?.scheduleType !== CampaignScheduleEnum.Recurring && (
+      {!variant?.children?.length && variantEdge?.scheduleType !== CampaignScheduleEnum.Recurring && (
         <UI.Flex alignItems="center" justifyContent="center">
           <AddCampaignEdge
             onClick={() => addEmptyVariant(rootIndex)}

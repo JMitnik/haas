@@ -62,7 +62,7 @@ export type CampaignType = {
   __typename?: 'CampaignType';
   id: Scalars['ID'];
   label: Scalars['String'];
-  variants: Array<CampaignVariantType>;
+  variantEdges: Array<CampaignVariantEdgeType>;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
@@ -74,14 +74,23 @@ export type CampaignTypeDeliveryConnectionArgs = {
 
 export enum CampaignVariantEdgeConditionEnumType {
   OnNotFinished = 'ON_NOT_FINISHED',
-  OnNotOpened = 'ON_NOT_OPENED'
+  OnNotOpened = 'ON_NOT_OPENED',
+  AbSampling = 'AB_SAMPLING'
 }
+
+/** Condition which decides whether campaign variant gets executed. */
+export type CampaignVariantEdgeConditionType = {
+  __typename?: 'CampaignVariantEdgeConditionType';
+  AB__weight?: Maybe<Scalars['Int']>;
+};
 
 /** Connects a campaign variant to the next campaign variant */
 export type CampaignVariantEdgeType = {
   __typename?: 'CampaignVariantEdgeType';
   id: Scalars['ID'];
-  condition?: Maybe<CampaignVariantEdgeConditionEnumType>;
+  scheduleType: CampaignScheduleEnum;
+  condition: CampaignVariantEdgeConditionType;
+  conditionType?: Maybe<CampaignVariantEdgeConditionEnumType>;
   parentCampaignVariant: CampaignVariantType;
   childCampaignVariant?: Maybe<CampaignVariantType>;
 };
@@ -101,7 +110,6 @@ export type CampaignVariantType = {
   body: Scalars['String'];
   depth: Scalars['Int'];
   type: CampaignVariantEnum;
-  scheduleType: CampaignScheduleEnum;
   workspace: Customer;
   dialogue: Dialogue;
   parent?: Maybe<CampaignVariantEdgeType>;
@@ -151,11 +159,15 @@ export type CreateBatchDeliveriesOutputType = {
   nrDeliveries: Scalars['Int'];
 };
 
+export type CreateCampaignEdgeConditionInputType = {
+  AB__weight?: Maybe<Scalars['Int']>;
+};
+
 export type CreateCampaignInputType = {
   id?: Maybe<Scalars['ID']>;
   label?: Maybe<Scalars['String']>;
   workspaceId: Scalars['ID'];
-  variants?: Maybe<Array<CreateCampaignVariantInputType>>;
+  variantEdges?: Maybe<Array<CreateCampaignVariantEdgeInputType>>;
 };
 
 export type CreateCampaignOutputType = CreateCampaignSuccessType | CreateCampaignProblemType;
@@ -175,7 +187,9 @@ export type CreateCampaignVariantEdgeInputType = {
   id?: Maybe<Scalars['String']>;
   parentVariantId?: Maybe<Scalars['String']>;
   childVariant?: Maybe<CreateCampaignVariantInputType>;
-  condition?: Maybe<CampaignVariantEdgeConditionEnumType>;
+  scheduleType: CampaignScheduleEnum;
+  conditionType?: Maybe<CampaignVariantEdgeConditionEnumType>;
+  condition?: Maybe<CreateCampaignEdgeConditionInputType>;
 };
 
 export type CreateCampaignVariantInputType = {
@@ -187,7 +201,6 @@ export type CreateCampaignVariantInputType = {
   body?: Maybe<Scalars['String']>;
   weight?: Maybe<Scalars['Float']>;
   subject?: Maybe<Scalars['String']>;
-  scheduleType: CampaignScheduleEnum;
   type: CampaignVariantEnum;
   children?: Maybe<Array<CreateCampaignVariantEdgeInputType>>;
 };
@@ -530,11 +543,15 @@ export type EdgeConditionInputType = {
   matchValue?: Maybe<Scalars['String']>;
 };
 
+export type EditCampaignEdgeConditionInputType = {
+  AB__weight?: Maybe<Scalars['Int']>;
+};
+
 export type EditCampaignInputType = {
   id: Scalars['ID'];
   label?: Maybe<Scalars['String']>;
   workspaceId: Scalars['ID'];
-  variants?: Maybe<Array<EditCampaignVariantInputType>>;
+  variantEdges?: Maybe<Array<EditCampaignVariantEdgeInputType>>;
 };
 
 export type EditCampaignOutputType = EditCampaignSuccessType | EditCampaignProblemType;
@@ -552,9 +569,11 @@ export type EditCampaignSuccessType = {
 
 export type EditCampaignVariantEdgeInputType = {
   id: Scalars['String'];
-  parentVariantId: Scalars['String'];
+  parentVariantId?: Maybe<Scalars['String']>;
   childVariant?: Maybe<EditCampaignVariantInputType>;
-  condition?: Maybe<CampaignVariantEdgeConditionEnumType>;
+  scheduleType: CampaignScheduleEnum;
+  conditionType?: Maybe<CampaignVariantEdgeConditionEnumType>;
+  condition?: Maybe<EditCampaignEdgeConditionInputType>;
 };
 
 export type EditCampaignVariantInputType = {
@@ -566,7 +585,6 @@ export type EditCampaignVariantInputType = {
   body?: Maybe<Scalars['String']>;
   weight?: Maybe<Scalars['Float']>;
   subject?: Maybe<Scalars['String']>;
-  scheduleType: CampaignScheduleEnum;
   type: CampaignVariantEnum;
   children?: Maybe<Array<EditCampaignVariantEdgeInputType>>;
 };
@@ -2058,9 +2076,13 @@ export type GetWorkspaceCampaignQuery = (
           { __typename?: 'PaginationPageInfo' }
           & Pick<PaginationPageInfo, 'nrPages'>
         ) }
-      )>, variants: Array<(
-        { __typename?: 'CampaignVariantType' }
-        & Pick<CampaignVariantType, 'id' | 'label'>
+      )>, variantEdges: Array<(
+        { __typename?: 'CampaignVariantEdgeType' }
+        & Pick<CampaignVariantEdgeType, 'id'>
+        & { childCampaignVariant?: Maybe<(
+          { __typename?: 'CampaignVariantType' }
+          & Pick<CampaignVariantType, 'id' | 'label'>
+        )> }
       )> }
     ) }
   )> }
@@ -2079,9 +2101,9 @@ export type GetWorkspaceCampaignsQuery = (
     & { campaigns: Array<(
       { __typename?: 'CampaignType' }
       & Pick<CampaignType, 'id' | 'label'>
-      & { variants: Array<(
-        { __typename?: 'CampaignVariantType' }
-        & Pick<CampaignVariantType, 'id' | 'label'>
+      & { variantEdges: Array<(
+        { __typename?: 'CampaignVariantEdgeType' }
+        & Pick<CampaignVariantEdgeType, 'id'>
       )> }
     )> }
   )> }
@@ -2664,9 +2686,12 @@ export const GetWorkspaceCampaignDocument = gql`
           nrPages
         }
       }
-      variants {
+      variantEdges {
         id
-        label
+        childCampaignVariant {
+          id
+          label
+        }
       }
     }
   }
@@ -2712,9 +2737,8 @@ export const GetWorkspaceCampaignsDocument = gql`
     campaigns {
       id
       label
-      variants {
+      variantEdges {
         id
-        label
       }
     }
   }

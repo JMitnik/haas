@@ -5,9 +5,8 @@ query GetWorkspaceCampaigns($customerSlug: String!) {
       id
       label
 
-      variants {
+      variantEdges {
         id
-        label
       }
     }
   }

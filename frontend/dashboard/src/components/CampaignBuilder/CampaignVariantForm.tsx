@@ -41,7 +41,8 @@ export const CampaignVariantForm = ({ variantEdge, pariantVariantEdgeIndex, onCh
     resolver: yupResolver(campaignFormSchema),
     defaultValues: {
       edge: {
-        condition: variantEdge?.condition || undefined,
+        conditionType: variantEdge?.conditionType || undefined,
+        scheduleType: variantEdge?.scheduleType || undefined,
         followUpMetric: variantEdge?.childVariant?.followUpMetric || undefined,
         followUpAmount: variantEdge?.childVariant?.followUpAmount || undefined,
         repeatMetric: 'days',
@@ -51,38 +52,35 @@ export const CampaignVariantForm = ({ variantEdge, pariantVariantEdgeIndex, onCh
         label: variantEdge?.childVariant?.label,
         body: variantEdge?.childVariant?.body,
         type: variantEdge?.childVariant?.type,
-        scheduleType: variantEdge?.childVariant?.scheduleType,
       }
     }
   });
 
   const {
-    variant: { label , type, scheduleType },
-    edge: { condition, followUpAmount, followUpMetric } = {}
+    variant: { label , type },
+    edge: { conditionType, followUpAmount, followUpMetric, scheduleType  } = {}
   } = form.watch();
 
   const debouncedLabel = useDebounce(label || '', 300);
   const debouncedScheduleType = useDebounce(scheduleType || CampaignScheduleEnum.General, 300);
   const debouncedType = useDebounce(type || CampaignVariantEnum.Email, 300);
-  const debouncedCondition = useDebounce(condition || undefined, 300);
+  const debouncedConditionType = useDebounce(conditionType || undefined, 300);
   const debouncedFollowupAmount = useDebounce(followUpAmount || '', 300);
   const debouncedFollowupMetric = useDebounce(followUpMetric || '', 300);
 
   const isValid = form.formState.isValid;
-
-  console.log(isValid);
 
   useEffect(() => {
     onChange({
       label: debouncedLabel,
       scheduleType: debouncedScheduleType,
       type: debouncedType,
-      condition: debouncedCondition,
+      conditionType: debouncedConditionType,
       followUpAmount: debouncedFollowupAmount,
       followUpMetric: debouncedFollowupMetric,
       hasProblem: !isValid,
     }, variantEdgeIndex, pariantVariantEdgeIndex);
-  }, [debouncedLabel, debouncedScheduleType, debouncedType, debouncedCondition, debouncedFollowupAmount, debouncedFollowupMetric, isValid]);
+  }, [debouncedLabel, debouncedScheduleType, debouncedType, debouncedConditionType, debouncedFollowupAmount, debouncedFollowupMetric, isValid]);
 
   const percentageFull = Math.min(Math.floor(((variantEdge?.childVariant?.body?.length || 160) / 160) * 100), 100);
 
@@ -107,8 +105,7 @@ export const CampaignVariantForm = ({ variantEdge, pariantVariantEdgeIndex, onCh
             <UI.FormLabel>Step type</UI.FormLabel>
             <Controller
               control={form.control}
-              defaultValue={variantEdge?.childVariant?.scheduleType}
-              name="variant.scheduleType"
+              name="edge.scheduleType"
               render={({ onChange, value, onBlur }) => (
                 <UI.RadioButtons
                   value={value}

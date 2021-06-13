@@ -185,3 +185,17 @@ export const BuilderEditPaneFooter = styled.div`
     border-top: 1px solid ${theme.colors.gray[100]};
   `}
 `;
+
+export const BuilderControls = styled.div`
+  ${({ theme }) => css`
+    position: fixed;
+    bottom: ${theme.gutter}px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075), 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-radius: 5px;
+    z-index: 100;
+    padding: 4px 8px;
+  `}
+`;

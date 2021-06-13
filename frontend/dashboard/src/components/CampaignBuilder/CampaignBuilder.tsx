@@ -84,11 +84,12 @@ const getParentIndex = (variantIndex: string): string | undefined => {
 }
 
 interface CampaignBuilderProps {
-  onSave: (campaign: CampaignType) => void;
+  onSave: (campaign: any) => void;
 }
 
-export const CampaignBuilder = () => {
+export const CampaignBuilder = ({ onSave }: CampaignBuilderProps) => {
   const {
+    id,
     variantEdges,
     label,
     initializeCampaign,
@@ -99,8 +100,6 @@ export const CampaignBuilder = () => {
     editCampaignVariant
   } = useCampaignStore();
   const { t } = useTranslation();
-
-
 
   const activeVariantEdge = activeForm?.activeVariantEdgeIndex ?
     get(variantEdges, `${activeForm?.activeVariantEdgeIndex}`, undefined) : undefined;
@@ -172,6 +171,12 @@ export const CampaignBuilder = () => {
           />
         )}
       </LS.BuilderEditPane>
+
+      <LS.BuilderControls>
+        <UI.Flex>
+          <UI.Button onClick={() => onSave({ id, label: (label || ''), variantEdges })}>Save</UI.Button>
+        </UI.Flex>
+      </LS.BuilderControls>
     </LS.BuilderContainer>
   )
 };

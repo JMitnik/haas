@@ -8,11 +8,11 @@ export interface VariantType extends EditCampaignVariantInputType {
   repeatMetric?: string;
   repeatAmount?: number;
   variantEdge?: VariantEdgeType | null;
-  hasProblem?: boolean;
 }
 
 export interface VariantEdgeType extends EditCampaignVariantEdgeInputType {
   childVariant?: VariantType | null;
+  hasProblem?: boolean;
 }
 
 export interface ActiveFormProps {

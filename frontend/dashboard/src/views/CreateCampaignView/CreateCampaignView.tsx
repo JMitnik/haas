@@ -5,11 +5,28 @@ import { CampaignType } from 'components/CampaignBuilder/CampaignStore';
 
 import { useNavigator } from 'hooks/useNavigator';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useDialogue } from 'providers/DialogueProvider';
 import { useTranslation } from 'react-i18next';
 import { useCreateCampaignMutation } from 'types/generated-types';
 
+const recursiveCreateCampaignVariant = (edge: any, dialogueId: string, workspaceId: string) => {
+  const {hasProblem, ...restChildEdge} = edge;
+
+  return {
+    ...restChildEdge,
+    childVariant: {
+      ...restChildEdge.childVariant,
+      // TODO: Uniquely encode dialogueId
+      dialogueId: 'ckpvikr5m00952u110cuwel42',
+      workspaceId,
+      children: restChildEdge.childVariant.children.map((childEdge: any) => recursiveCreateCampaignVariant(childEdge, dialogueId, workspaceId))
+    }
+  }
+};
+
 export const CreateCampaignView = () => {
   const { activeCustomer: activeWorkspace } = useCustomer();
+  const { activeDialogue } = useDialogue();
   const { getCampaignsPath } = useNavigator();
   const toast = useToast();
   const campaignsPath = getCampaignsPath();
@@ -37,14 +54,15 @@ export const CreateCampaignView = () => {
     }
   });
 
+  console.log(activeDialogue);
 
-  const handleSave = (campaign: CampaignType) => {
+  const handleSave = (campaign: any) => {
     createCampaign({
       variables: {
         input: {
           workspaceId: activeWorkspace?.id || '',
           label: campaign.label,
-          variants: campaign.variantEdges
+          variantEdges: campaign.variantEdges.map((edge: any) => recursiveCreateCampaignVariant(edge, activeDialogue?.id || '', activeWorkspace?.id || ''))
         }
       }
     })
@@ -61,7 +79,7 @@ export const CreateCampaignView = () => {
         </UI.Stack>
       </UI.ViewHeading>
       <UI.ViewContainer>
-        <CampaignBuilder />
+        <CampaignBuilder onSave={handleSave} />
       </UI.ViewContainer>
     </>
   )

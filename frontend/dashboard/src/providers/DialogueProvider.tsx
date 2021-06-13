@@ -11,8 +11,6 @@ interface DialogueContextProps {
 export const DialogueProvider = ({ children }: {children: React.ReactNode }) => {
   const [activeDialogue, setActiveDialogue] = useState<null | Dialogue>(null);
 
-  console.log(activeDialogue);
-
   return (
     <DialogueContext.Provider value={{ activeDialogue, setActiveDialogue }}>
       {children}

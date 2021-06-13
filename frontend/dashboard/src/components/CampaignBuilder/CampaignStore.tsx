@@ -30,6 +30,7 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
   label: '',
   variantEdges: [],
   workspaceId: '',
+  dialogueId: '',
   activeForm: undefined,
 
   initializeCampaign: () => set(state => {
@@ -49,9 +50,10 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
       LSet(state, `variantEdges.${edgeIndex}`, {
         ...variantEdge,
         condition: input.condition || undefined,
+        scheduleType: input.scheduleType,
+        hasProblem: input.hasProblem,
         childVariant: {
           ...input.childVariant,
-          hasProblem: input.hasProblem,
           label: input.label,
           type: input.type,
           scheduleType: input.scheduleType,
@@ -63,14 +65,14 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
       LSet(state, `variantEdges.${index}`, {
         ...variantEdge,
         condition: input.condition || undefined,
+        scheduleType: input.scheduleType,
+        hasProblem: input.hasProblem,
         childVariant: {
           ...variantEdge?.childVariant,
           label: input.label,
-          hasProblem: input.hasProblem,
-          followUpAmount: input.followUpAmount,
-          followUpMetric: input.followUpMetric,
+          // followUpAmount: input.followUpAmount,
+          // followUpMetric: input.followUpMetric,
           type: input.type,
-          scheduleType: input.scheduleType,
         }
       });
     }
@@ -88,12 +90,12 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
         LSet(state, `variantEdges.0`, {
           parentVariantId: null,
           condition: null,
+          scheduleType: CampaignScheduleEnum.General,
+          hasProblem: false,
           childVariant: {
             dialogueId: '',
             id: '',
-            scheduleType: CampaignScheduleEnum.General,
             body: '',
-            hasProblem: false,
             type: CampaignVariantEnum.Email,
             workspaceId: '',
             label: '',
@@ -105,12 +107,12 @@ export const useCampaignStore = create<CampaignState>(devtools(immer((set: SetSt
         LSet(state, `variantEdges.${rootIndex}.childVariant.children.0`, {
           parentVariantId,
           condition: CampaignVariantEdgeConditionEnumType.OnNotFinished,
+          scheduleType: CampaignScheduleEnum.FollowUp,
+          hasProblem: false,
           childVariant: {
             dialogueId: '',
             id: '',
-            scheduleType: CampaignScheduleEnum.FollowUp,
             body: '',
-            hasProblem: false,
             type: CampaignVariantEnum.Email,
             workspaceId: '',
             children: [],

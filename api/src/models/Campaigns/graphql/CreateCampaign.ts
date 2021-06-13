@@ -43,13 +43,13 @@ export const CreateCampaignResolver = mutationField('createCampaign', {
       }
     }
 
-    try {
-      validateProbabilityEdges(args?.input);
-    } catch (error) {
-      return {
-        problemMessage: 'Weights are not correct!'
-      }
-    }
+    // try {
+    //   validateProbabilityEdges(args?.input);
+    // } catch (error) {
+    //   return {
+    //     problemMessage: 'Weights are not correct!'
+    //   }
+    // }
 
     const campaign = await ctx.services.campaignService.createCampaign(args.input);
 

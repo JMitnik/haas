@@ -45,9 +45,12 @@ query GetWorkspaceCampaign(
         }
       }
 
-      variants {
+      variantEdges {
         id
-        label
+        childCampaignVariant {
+          id
+          label
+        }
       }
     }
   }

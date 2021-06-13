@@ -21,6 +21,7 @@ export class CampaignValidator {
       }
     });
 
+
     if (!workspaceWithDialogues) {
       problems.push({
         field: 'workspaceId',
@@ -29,6 +30,7 @@ export class CampaignValidator {
     }
 
     const dialogue = workspaceWithDialogues?.dialogues.find(dialogue => dialogue.id === dialogueId);
+    console.log(dialogueId);
 
     if (!dialogue) {
       problems.push({
@@ -48,7 +50,7 @@ export class CampaignValidator {
       problems.push(
         ...(await this.validateWorkspaceAndDialogueExists(
           createCampaignInput.workspaceId,
-          createCampaignInput?.variants?.[0].dialogueId || ''
+          createCampaignInput?.variantEdges?.[0].childVariant?.dialogueId || ''
         ))
       );
 
