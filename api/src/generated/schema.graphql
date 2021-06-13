@@ -44,20 +44,28 @@ type CampaignType {
   deliveryConnection(filter: DeliveryConnectionFilter): DeliveryConnectionType
   id: ID!
   label: String!
-  variants: [CampaignVariantType!]!
+  variantEdges: [CampaignVariantEdgeType!]!
 }
 
 enum CampaignVariantEdgeConditionEnumType {
+  AB_SAMPLING
   ON_NOT_FINISHED
   ON_NOT_OPENED
+}
+
+"""Condition which decides whether campaign variant gets executed."""
+type CampaignVariantEdgeConditionType {
+  AB__weight: Int
 }
 
 """Connects a campaign variant to the next campaign variant"""
 type CampaignVariantEdgeType {
   childCampaignVariant: CampaignVariantType
-  condition: CampaignVariantEdgeConditionEnumType
+  condition: CampaignVariantEdgeConditionType!
+  conditionType: CampaignVariantEdgeConditionEnumType
   id: ID!
   parentCampaignVariant: CampaignVariantType!
+  scheduleType: CampaignScheduleEnum!
 }
 
 enum CampaignVariantEnum {
@@ -76,7 +84,6 @@ type CampaignVariantType {
   id: ID!
   label: String!
   parent: CampaignVariantEdgeType
-  scheduleType: CampaignScheduleEnum!
   type: CampaignVariantEnum!
   weight: Int!
   workspace: Customer!
@@ -122,10 +129,14 @@ type CreateBatchDeliveriesOutputType {
   nrDeliveries: Int!
 }
 
+input CreateCampaignEdgeConditionInputType {
+  AB__weight: Int
+}
+
 input CreateCampaignInputType {
   id: ID
   label: String
-  variants: [CreateCampaignVariantInputType!]
+  variantEdges: [CreateCampaignVariantEdgeInputType!]
   workspaceId: ID!
 }
 
@@ -142,6 +153,7 @@ type CreateCampaignSuccessType {
 
 input CreateCampaignVariantEdgeInputType {
   childVariant: CreateCampaignVariantInputType
+  condition: CreateCampaignEdgeConditionInputType
   conditionType: CampaignVariantEdgeConditionEnumType
   id: String
   parentVariantId: String
@@ -437,10 +449,14 @@ input EdgeConditionInputType {
   renderMin: Int
 }
 
+input EditCampaignEdgeConditionInputType {
+  AB__weight: Int
+}
+
 input EditCampaignInputType {
   id: ID!
   label: String
-  variants: [EditCampaignVariantInputType!]
+  variantEdges: [EditCampaignVariantEdgeInputType!]
   workspaceId: ID!
 }
 
@@ -457,9 +473,10 @@ type EditCampaignSuccessType {
 
 input EditCampaignVariantEdgeInputType {
   childVariant: EditCampaignVariantInputType
+  condition: EditCampaignEdgeConditionInputType
   conditionType: CampaignVariantEdgeConditionEnumType
   id: String!
-  parentVariantId: String!
+  parentVariantId: String
   scheduleType: CampaignScheduleEnum!
 }
 

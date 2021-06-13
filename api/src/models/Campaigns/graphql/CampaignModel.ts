@@ -18,7 +18,16 @@ export const CampaignScheduleEnum = enumType({
 export const CampaignVariantEdgeConditionEnumType = enumType({
   name: 'CampaignVariantEdgeConditionEnumType',
 
-  members: ['ON_NOT_FINISHED', 'ON_NOT_OPENED']
+  members: ['ON_NOT_FINISHED', 'ON_NOT_OPENED', 'AB_SAMPLING']
+});
+
+export const CampaignVariantEdgeConditionModel = objectType({
+  name: 'CampaignVariantEdgeConditionType',
+  description: 'Condition which decides whether campaign variant gets executed.',
+
+  definition(t) {
+    t.int('AB__weight', { nullable: true });
+  }
 });
 
 export const CampaignVariantEdgeModel = objectType({
@@ -27,8 +36,11 @@ export const CampaignVariantEdgeModel = objectType({
 
   definition(t) {
     t.id('id');
+    t.field('scheduleType', { type: CampaignScheduleEnum });
 
-    t.field('condition', {
+    t.field('condition', { type: CampaignVariantEdgeConditionModel });
+
+    t.field('conditionType', {
       type: CampaignVariantEdgeConditionEnumType,
       nullable: true,
       // @ts-ignore
@@ -39,7 +51,7 @@ export const CampaignVariantEdgeModel = objectType({
 
         return condition;
       }
-    })
+    });
 
     t.field('parentCampaignVariant', {
       type: CampaignVariantModel,
@@ -81,7 +93,6 @@ export const CampaignVariantModel = objectType({
 
     // Types
     t.field('type', { type: CampaignVariantEnum });
-    t.field('scheduleType', { type: CampaignScheduleEnum });
 
     // Related 1:many relations
     t.field('workspace', { type: CustomerType });
@@ -102,6 +113,6 @@ export const CampaignModel = objectType({
   definition(t) {
     t.id('id');
     t.string('label');
-    t.list.field('variants', { type: CampaignVariantModel });
+    t.list.field('variantEdges', { type: CampaignVariantEdgeModel });
   },
 });

@@ -1,0 +1,104 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Campaign",
+      "field": "directVariantEdges",
+      "type": "CampaignVariantEdge",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Campaign",
+          "field": "directVariantEdges"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Campaign",
+          "field": "directVariantEdges"
+        },
+        "directive": "relation"
+      },
+      "argument": "",
+      "value": "\"DirectVariantEdges\""
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdge",
+      "field": "directCampaignId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariantEdge",
+      "field": "directCampaign",
+      "type": "Campaign",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "directCampaign"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "directCampaign"
+        },
+        "directive": "relation"
+      },
+      "argument": "",
+      "value": "\"DirectVariantEdges\""
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "directCampaign"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[directCampaignId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariantEdge",
+          "field": "directCampaign"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    }
+  ]
+}

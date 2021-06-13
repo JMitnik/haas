@@ -41,7 +41,16 @@ export const saveCampaignInputFactory = (operation: Operation) => {
       t.id('id', { required: operation === 'Edit' ? true: false });
       t.string('label');
       t.id('workspaceId', { required: true });
-      t.list.field('variants', { type: CampaignVariantInputType });
+      // t.list.field('variants', { type: CampaignVariantInputType });
+      t.list.field('variantEdges', { type: CampaignVariantEdgeInputType });
+    }
+  });
+
+  const CampaignEdgeConditionInputType = inputObjectType({
+    name: `${operation}CampaignEdgeConditionInputType`,
+
+    definition(t) {
+      t.int('AB__weight', { required: false });
     }
   });
 
@@ -50,11 +59,11 @@ export const saveCampaignInputFactory = (operation: Operation) => {
 
     definition(t) {
       t.string('id', { required: operation === 'Edit' ? true: false });
-      t.string('parentVariantId', { required: operation === 'Edit' ? true: false });
+      t.string('parentVariantId', { required: false });
       t.field('childVariant', { required: false, type: CampaignVariantInputType });
       t.field('scheduleType', { type: CampaignScheduleEnum, required: true });
       t.field('conditionType', { type: CampaignVariantEdgeConditionEnumType });
-      // t.field('condition');
+      t.field('condition', { type: CampaignEdgeConditionInputType });
     }
   });
 

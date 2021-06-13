@@ -16,7 +16,7 @@ export const {
 } = saveCampaignInputFactory('Create');
 
 const validateProbabilityEdges = (input: NexusGenInputs['CreateCampaignInputType']) => {
-  const weights = input.variants?.map((variant) => variant?.weight).filter(isPresent) || [];
+  const weights = input.variantEdges?.map((variantEdge) => variantEdge.condition?.AB__weight).filter(isPresent) || [];
 
   const totalWeight = weights?.reduce((total, weight) => total + weight);
 

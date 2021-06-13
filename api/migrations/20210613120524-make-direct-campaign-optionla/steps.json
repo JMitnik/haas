@@ -1,0 +1,17 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateField",
+      "model": "CampaignVariantEdge",
+      "field": "directCampaignId",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "CampaignVariantEdge",
+      "field": "directCampaign",
+      "arity": "Optional"
+    }
+  ]
+}

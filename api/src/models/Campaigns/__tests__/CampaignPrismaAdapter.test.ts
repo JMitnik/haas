@@ -24,6 +24,7 @@ describe('CampaignPrismaAdapter', () => {
     const campaign = await campaignPrismaAdapter.createCampaign(defaultWorkspaceInput);
 
     const allCampaigns = await prisma.campaignVariant.findMany({});
+    console.log(campaign);
     expect(allCampaigns.length).toBe(2);
   });
 
@@ -33,41 +34,45 @@ describe('CampaignPrismaAdapter', () => {
       id: 'CAMPAIGN_1',
       workspaceId,
       label: 'Test',
-      variants: [{
-        id: 'PARENT_VARIANT',
-        dialogueId,
-        workspaceId,
+      variantEdges: [{
+        id: 'PARENT_VARIANT_EDGE',
         scheduleType: 'GENERAL',
-        type: 'EMAIL',
-        body: 'Test',
-        children: [{
-          childVariant: {
-            id: 'CHILD_VARIANT',
-            dialogueId,
-            workspaceId,
+        childVariant: {
+          id: 'PARENT_VARIANT',
+          dialogueId,
+          workspaceId,
+          type: 'EMAIL',
+          body: 'Test',
+          children: [{
+            conditionType: 'ON_NOT_FINISHED',
             scheduleType: 'FOLLOW_UP',
-            type: 'EMAIL',
-            children: [{
-              conditionType: 'ON_NOT_FINISHED',
-              childVariant: {
-                id: 'DEEPLY_NESTED_CHILD_VARIANT',
-                dialogueId,
-                workspaceId,
-                scheduleType: 'FOLLOW_UP',
-                type: 'EMAIL',
-              }
-            }, {
-              conditionType: 'ON_NOT_OPENED',
-              childVariant: {
-                id: 'DEEPLY_NESTED_CHILD_VARIANT_SIBLING',
-                dialogueId,
-                workspaceId,
-                scheduleType: 'FOLLOW_UP',
-                type: 'EMAIL',
-              }
-            }]
-          }
-        }]
+            childVariant: {
+              id: 'CHILD_VARIANT',
+              dialogueId,
+              workspaceId,
+              type: 'EMAIL',
+              children: [{
+                conditionType: 'ON_NOT_FINISHED',
+                scheduleType: 'GENERAL',
+                childVariant: {
+                  id: 'DEEPLY_NESTED_CHILD_VARIANT',
+                  dialogueId,
+                  workspaceId,
+                  type: 'EMAIL',
+                }
+              }, {
+                conditionType: 'ON_NOT_OPENED',
+                scheduleType: 'GENERAL',
+                childVariant: {
+                  id: 'DEEPLY_NESTED_CHILD_VARIANT_SIBLING',
+                  dialogueId,
+                  workspaceId,
+                  type: 'EMAIL',
+                }
+              }]
+            }
+          }]
+        }
       }]
     });
 
@@ -75,12 +80,12 @@ describe('CampaignPrismaAdapter', () => {
 
     // Variants
     expect(campaign?.variants).toHaveLength(4);
-    expect(campaign?.nestedVariantEdges).toHaveLength(3);
+    expect(campaign?.nestedVariantEdges).toHaveLength(4);
 
     //Relation: PARENT_VARIANT => CHILD_VARIANT
     expect(campaign?.nestedVariantEdges[0].parentCampaignVariantId).toBe('PARENT_VARIANT');
     expect(campaign?.nestedVariantEdges[0].childCampaignVariantId).toBe('CHILD_VARIANT');
-    expect(campaign?.nestedVariantEdges[0].condition).toBe(null);
+    expect(campaign?.nestedVariantEdges[0].condition).toBe('ON_NOT_FINISHED');
 
     // Relation: CHILD_VARIANT => DEEPLY_NESTED_CHILD_VARIANT
     expect(campaign?.nestedVariantEdges[1].parentCampaignVariantId).toBe('CHILD_VARIANT');
@@ -94,67 +99,73 @@ describe('CampaignPrismaAdapter', () => {
 
   });
 
-  test('can extract all variant edges from editCampaignInput', async () => {
-    const editCampaignInput: NexusGenInputs['EditCampaignVariantInputType'][] = [{
+  test('can extract all variant edges from editCampaignVariantEdgeInput', async () => {
+    const editCampaignInput: NexusGenInputs['EditCampaignVariantEdgeInputType'][] = [{
+      id: '',
+      scheduleType: 'GENERAL',
+      childVariant: {
         id: 'PARENT_VARIANT',
         dialogueId,
         workspaceId,
-        scheduleType: 'GENERAL',
         type: 'EMAIL',
         body: 'Test',
         children: [{
           id: '',
           parentVariantId: '',
+          scheduleType: 'FOLLOW_UP',
           childVariant: {
             id: 'CHILD_VARIANT_NEW',
             dialogueId,
             workspaceId,
-            scheduleType: 'FOLLOW_UP',
             type: 'SMS',
             label: 'New SMS follow up one!',
             children: [{
               id: '',
               parentVariantId: 'CHILD_VARIANT_NEW_NESTED',
+              scheduleType: 'FOLLOW_UP',
               childVariant: {
                 id: '',
                 dialogueId,
                 workspaceId,
-                scheduleType: 'FOLLOW_UP',
-                type: 'SMS',
-                label: 'New SMS follow up one!',
-              }
-            }]
-          }
-        }, {
-          id: '',
-          parentVariantId: '',
-          childVariant: {
-            id: 'CHILD_VARIANT_NEW_2',
-            dialogueId,
-            workspaceId,
-            scheduleType: 'FOLLOW_UP',
-            type: 'SMS',
-            label: 'New SMS follow up one!',
-            children: [{
-              id: '',
-              parentVariantId: 'CHILD_VARIANT_NEW_NESTED_2',
-              childVariant: {
-                id: '',
-                dialogueId,
-                workspaceId,
-                scheduleType: 'FOLLOW_UP',
                 type: 'SMS',
                 label: 'New SMS follow up one!',
               }
             }]
           }
         }]
-      }];
+      },
+    },
+    {
+      id: '',
+      parentVariantId: '',
+      scheduleType: 'FOLLOW_UP',
+      childVariant: {
+        id: 'CHILD_VARIANT_NEW_2',
+        dialogueId,
+        workspaceId,
+        type: 'SMS',
+        label: 'New SMS follow up one!',
+        children: [{
+          id: '',
+          parentVariantId: 'CHILD_VARIANT_NEW_NESTED_2',
+          scheduleType: 'FOLLOW_UP',
+          childVariant: {
+            id: '',
+            dialogueId,
+            workspaceId,
+            type: 'SMS',
+            label: 'New SMS follow up one!',
+          }
+        }]
+      }
+    }
+    ];
+
     const edges = CampaignPrismaAdapter.parseVariantEdgesFromEditCampaignInputs(
       editCampaignInput
     );
 
-    expect(edges).toHaveLength(4);
+    expect(edges).toHaveLength(5);
   });
 
   test('can disconnect an unknown campaign variant root campaign edge', async () => {
@@ -162,76 +173,85 @@ describe('CampaignPrismaAdapter', () => {
       id: 'CAMPAIGN_1',
       workspaceId,
       label: 'Test',
-      variants: [{
-        id: 'PARENT_VARIANT',
-        dialogueId,
-        workspaceId,
+      variantEdges: [{
+        id: 'RERER',
         scheduleType: 'GENERAL',
-        type: 'EMAIL',
-        body: 'Test',
-        children: [{
-          id: 'FIRST_PARENT_TO_CHILD',
-          childVariant: {
-            id: 'CHILD_VARIANT',
-            dialogueId,
-            workspaceId,
+        childVariant: {
+          id: 'PARENT_VARIANT',
+          type: 'EMAIL',
+          body: 'Test',
+          dialogueId,
+          workspaceId,
+          children: [{
+            id: 'FIRST_PARENT_TO_CHILD',
             scheduleType: 'FOLLOW_UP',
-            type: 'EMAIL'
-          }
-        }]
+            childVariant: {
+              id: 'CHILD_VARIANT',
+              dialogueId,
+              workspaceId,
+              type: 'EMAIL'
+            }
+          }]
+        }
       }, {
-        id: 'PARENT_VARIANT_FIRST_SIBLING',
-        dialogueId,
-        workspaceId,
-        scheduleType: 'GENERAL',
-        type: 'EMAIL',
-        body: 'Test',
-        children: [{
-          id: 'SECOND_PARENT_TO_CHILD',
-          childVariant: {
-            id: 'CHILD_VARIANT_COUSIN',
-            dialogueId,
-            workspaceId,
+        id: 'DDADD',
+        scheduleType: 'RECURRING',
+        childVariant: {
+          id: 'PARENT_VARIANT_FIRST_SIBLING',
+          type: 'EMAIL',
+          body: 'Test',
+          dialogueId,
+          workspaceId,
+          children: [{
+            id: 'SECOND_PARENT_TO_CHILD',
             scheduleType: 'FOLLOW_UP',
-            type: 'EMAIL'
-          }
-        }]
-      }]
+            childVariant: {
+              id: 'CHILD_VARIANT_COUSIN',
+              dialogueId,
+              workspaceId,
+              type: 'EMAIL'
+            }
+          }]
+        }
+      }],
     });
 
     await campaignPrismaAdapter.editCampaignVariants(createdCampaign?.id || '', [
       {
-        id: 'PARENT_VARIANT',
-        dialogueId,
-        workspaceId,
+        id: 'RERER',
         scheduleType: 'GENERAL',
-        type: 'EMAIL',
-        body: 'Test',
-        children: [{
-          id: '',
-          parentVariantId: 'PARENT_VARIANT',
-          childVariant: {
-            id: 'CHILD_VARIANT_NEW',
-            dialogueId,
-            workspaceId,
+        conditionType: 'ON_NOT_OPENED',
+        childVariant: {
+          id: 'PARENT_VARIANT',
+          dialogueId,
+          workspaceId,
+          type: 'EMAIL',
+          body: 'Test',
+          children: [{
+            id: '',
+            parentVariantId: 'PARENT_VARIANT',
             scheduleType: 'FOLLOW_UP',
-            type: 'SMS',
-            label: 'New SMS follow up one!',
-            children: [{
-              id: '',
-              parentVariantId: 'CHILD_VARIANT_NEW',
-              childVariant: {
-                id: 'GRAND__PARENT_VARIANT',
-                dialogueId,
-                workspaceId,
+            childVariant: {
+              id: 'CHILD_VARIANT_NEW',
+              dialogueId,
+              workspaceId,
+              type: 'SMS',
+              label: 'New SMS follow up one!',
+              children: [{
+                id: '',
+                parentVariantId: 'CHILD_VARIANT_NEW',
                 scheduleType: 'FOLLOW_UP',
-                type: 'SMS',
-                label: 'New SMS follow up one!',
-              }
-            }]
-          }
-        },
-        ]
+                childVariant: {
+                  id: 'GRAND__PARENT_VARIANT',
+                  dialogueId,
+                  workspaceId,
+                  type: 'SMS',
+                  label: 'New SMS follow up one!',
+                }
+              }]
+            }
+          }]
+        }
       }
     ]);
 
@@ -240,9 +260,10 @@ describe('CampaignPrismaAdapter', () => {
     const newCampaign = await campaignPrismaAdapter.getCampaignById(createdCampaign?.id || '');
 
     // Ensure the direct variants are removed from the campaign
-    expect(newCampaign?.variantsEdges).toHaveLength(1);
-    expect(newCampaign?.variantsEdges.filter(variant => variant.campaignVariantId === 'PARENT_VARIANT_FIRST_SIBLING')).toHaveLength(0);
+    expect(newCampaign?.directVariantEdges).toHaveLength(1);
+    expect(newCampaign?.directVariantEdges.filter(variantEdge => variantEdge.childCampaignVariant?.id === 'PARENT_VARIANT_FIRST_SIBLING')).toHaveLength(0);
 
+    expect(newCampaign?.nestedVariantEdges).toHaveLength(3);
     // Ensure the removed variants are actually not in the campaign any longer
     expect(intersection(
       newCampaign?.variants.map(variant => variant.id),
@@ -273,104 +294,112 @@ describe('CampaignPrismaAdapter', () => {
       id: 'CAMPAIGN_1',
       workspaceId,
       label: 'Test',
-      variants: [{
-        id: 'PARENT_VARIANT',
-        dialogueId,
-        workspaceId,
+      variantEdges: [{
+        id: 'EDGE_GRAND_MASTER',
         scheduleType: 'GENERAL',
-        type: 'EMAIL',
-        body: 'Test',
-        children: [{
-          id: 'FIRST_PARENT_TO_CHILD',
-          childVariant: {
-            id: 'CHILD_VARIANT',
-            dialogueId,
-            workspaceId,
+        childVariant: {
+          id: 'PARENT_VARIANT',
+          dialogueId,
+          workspaceId,
+          type: 'EMAIL',
+          body: 'Test',
+          children: [{
+            id: 'FIRST_PARENT_TO_CHILD',
             scheduleType: 'FOLLOW_UP',
-            type: 'EMAIL',
-            children: [
-              {
-                id: 'NESTED_PARENT_TO_CHILD_1',
-                childVariant: {
-                  id: 'GRAND_CHILD_VARIANT_1',
-                  dialogueId,
-                  workspaceId,
+            childVariant: {
+              id: 'CHILD_VARIANT',
+              dialogueId,
+              workspaceId,
+              type: 'EMAIL',
+              children: [
+                {
+                  id: 'NESTED_PARENT_TO_CHILD_1',
                   scheduleType: 'FOLLOW_UP',
-                  type: 'EMAIL',
-                }
-              },
-              {
-                id: 'NESTED_PARENT_TO_CHILD_2',
-                childVariant: {
-                  id: 'GRAND_CHILD_VARIANT_2',
-                  dialogueId,
-                  workspaceId,
+                  childVariant: {
+                    id: 'GRAND_CHILD_VARIANT_1',
+                    dialogueId,
+                    workspaceId,
+                    type: 'EMAIL',
+                  }
+                },
+                {
+                  id: 'NESTED_PARENT_TO_CHILD_2',
                   scheduleType: 'FOLLOW_UP',
-                  type: 'EMAIL',
+                  childVariant: {
+                    id: 'GRAND_CHILD_VARIANT_2',
+                    dialogueId,
+                    workspaceId,
+                    type: 'EMAIL',
+                  }
                 }
-              }
-            ]
-          }
-        }]
+              ]
+            }
+          }]
+        }
       }, {
-        id: 'PARENT_VARIANT_FIRST_SIBLING',
-        dialogueId,
-        workspaceId,
+        id: 'EDGE_GRAND_MASTER_SIBLING',
         scheduleType: 'GENERAL',
-        type: 'EMAIL',
-        body: 'Test',
-        children: [{
-          id: 'SECOND_PARENT_TO_CHILD',
-          childVariant: {
-            id: 'CHILD_VARIANT_COUSIN',
-            dialogueId,
-            workspaceId,
+        childVariant: {
+          id: 'PARENT_VARIANT_FIRST_SIBLING',
+          dialogueId,
+          workspaceId,
+          type: 'EMAIL',
+          body: 'Test',
+          children: [{
+            id: 'SECOND_PARENT_TO_CHILD',
             scheduleType: 'FOLLOW_UP',
-            type: 'EMAIL'
-          }
-        }]
+            childVariant: {
+              id: 'CHILD_VARIANT_COUSIN',
+              dialogueId,
+              workspaceId,
+              type: 'EMAIL'
+            }
+          }]
+        }
       }]
     });
 
     await campaignPrismaAdapter.editCampaignVariants(createdCampaign?.id || '', [{
-      id: 'PARENT_VARIANT',
-      dialogueId,
-      workspaceId,
+      id: 'EDGE_GRAND_MASTER',
       scheduleType: 'GENERAL',
-      type: 'EMAIL',
-      body: 'Test',
-      children: [{
-        id: 'FIRST_PARENT_TO_CHILD',
-        parentVariantId: 'PARENT_VARIANT',
-        childVariant: {
-          id: 'CHILD_VARIANT',
-          dialogueId,
-          workspaceId,
+      childVariant: {
+        id: 'PARENT_VARIANT',
+        dialogueId,
+        workspaceId,
+        type: 'EMAIL',
+        body: 'Test',
+        children: [{
+          id: 'FIRST_PARENT_TO_CHILD',
+          parentVariantId: 'PARENT_VARIANT',
           scheduleType: 'FOLLOW_UP',
-          type: 'EMAIL',
-          children: [
-            {
-              id: 'NESTED_PARENT_TO_CHILD_1',
-              parentVariantId: 'CHILD_VARIANT',
-              childVariant: {
-                id: 'GRAND_CHILD_VARIANT_1',
-                dialogueId,
-                workspaceId,
+          childVariant: {
+            id: 'CHILD_VARIANT',
+            dialogueId,
+            workspaceId,
+            type: 'EMAIL',
+            children: [
+              {
+                id: 'NESTED_PARENT_TO_CHILD_1',
                 scheduleType: 'FOLLOW_UP',
-                type: 'EMAIL',
-              }
-            },
-          ]
-        }
-      }]
+                childVariant: {
+                  id: 'GRAND_CHILD_VARIANT_1',
+                  dialogueId,
+                  workspaceId,
+                  type: 'EMAIL',
+                }
+              },
+            ]
+          }
+        }]
+      }
     }]);
 
     const newCampaign = await campaignPrismaAdapter.getCampaignById(createdCampaign?.id || '');
 
     // Ensure on the campaign-level, the right structure is intact
-    expect(newCampaign?.variantsEdges).toHaveLength(1);
+    expect(newCampaign?.directVariantEdges).toHaveLength(1);
     expect(newCampaign?.variants).toHaveLength(3);
-    expect(newCampaign?.nestedVariantEdges).toHaveLength(2);
+    expect(newCampaign?.nestedVariantEdges).toHaveLength(3);
 
     // Ensure on the variant-level, the structure is intact
     const parentVariant = newCampaign?.variants.find(variant => variant.id === 'PARENT_VARIANT');
@@ -390,88 +419,101 @@ describe('CampaignPrismaAdapter', () => {
       id: 'CAMPAIGN_1',
       workspaceId,
       label: 'Test',
-      variants: [{
-        id: 'PARENT_VARIANT',
-        dialogueId,
-        workspaceId,
-        type: 'EMAIL',
-        body: 'Test',
-        children: [{
-          id: 'FIRST_PARENT_TO_CHILD',
-          scheduleType: 'FOLLOW_UP',
-          childVariant: {
-            id: 'CHILD_VARIANT',
-            dialogueId,
-            workspaceId,
-            type: 'EMAIL'
-          }
-        }]
-      }, {
-        id: 'PARENT_VARIANT_FIRST_SIBLING',
-        dialogueId,
-        workspaceId,
-        type: 'EMAIL',
-        body: 'Test',
-        children: [{
-          id: 'SECOND_PARENT_TO_CHILD',
-          scheduleType: 'FOLLOW_UP',
-          childVariant: {
-            id: 'CHILD_VARIANT_COUSIN',
-            dialogueId,
-            workspaceId,
-            type: 'EMAIL'
-          }
-        }]
+      variantEdges: [{
+        id: 'GRAND_PARENT_EDGE',
+        scheduleType: 'GENERAL',
+        childVariant: {
+          id: 'PARENT_VARIANT',
+          dialogueId,
+          workspaceId,
+          type: 'EMAIL',
+          body: 'Test',
+          children: [{
+            id: 'FIRST_PARENT_TO_CHILD',
+            scheduleType: 'FOLLOW_UP',
+            childVariant: {
+              id: 'CHILD_VARIANT',
+              dialogueId,
+              workspaceId,
+              type: 'EMAIL'
+            }
+          }]
+        }
+      },
+      {
+        id: 'GRAND_PARENT_UNCLE_EDGE',
+        scheduleType: 'GENERAL',
+        childVariant: {
+          id: 'PARENT_VARIANT_FIRST_SIBLING',
+          dialogueId,
+          workspaceId,
+          type: 'EMAIL',
+          body: 'Test',
+          children: [{
+            id: 'SECOND_PARENT_TO_CHILD',
+            scheduleType: 'FOLLOW_UP',
+            childVariant: {
+              id: 'CHILD_VARIANT_COUSIN',
+              dialogueId,
+              workspaceId,
+              type: 'EMAIL'
+            }
+          }]
+        }
       }]
     });
 
     await campaignPrismaAdapter.editCampaignVariants(createdCampaign?.id || '', [
       {
-      id: 'PARENT_VARIANT',
-      dialogueId,
-      workspaceId,
-      scheduleType: 'GENERAL',
-      type: 'EMAIL',
-      body: 'Test',
-      children: [{
-        id: 'FIRST_PARENT_TO_CHILD',
-        parentVariantId: 'PARENT_VARIANT',
+        id: 'GRAND_PARENT_EDGE',
+        scheduleType: 'GENERAL',
         childVariant: {
-          id: 'CHILD_VARIANT',
+          id: 'PARENT_VARIANT',
           dialogueId,
           workspaceId,
-          scheduleType: 'FOLLOW_UP',
           type: 'EMAIL',
-          children: [
-            {
-              id: 'NESTED_PARENT_TO_CHILD_1',
-              parentVariantId: 'CHILD_VARIANT',
-              conditionType: 'ON_NOT_FINISHED',
-              childVariant: {
-                id: 'GRAND_CHILD_VARIANT_1',
-                dialogueId,
-                workspaceId,
-                scheduleType: 'FOLLOW_UP',
-                type: 'EMAIL',
-              }
-            },
-          ]
+          body: 'Test',
+          children: [{
+            id: 'FIRST_PARENT_TO_CHILD',
+            scheduleType: 'FOLLOW_UP',
+            childVariant: {
+              id: 'CHILD_VARIANT',
+              dialogueId,
+              workspaceId,
+              type: 'EMAIL',
+              children: [
+                {
+                  id: 'NESTED_PARENT_TO_CHILD_1',
+                  conditionType: 'ON_NOT_FINISHED',
+                  scheduleType: 'FOLLOW_UP',
+                  childVariant: {
+                    id: 'GRAND_CHILD_VARIANT_1',
+                    dialogueId,
+                    workspaceId,
+                    type: 'EMAIL',
+                  }
+                },
+              ]
+            }
+          }]
         }
-      }]
-    },
-    {
-      id: 'UNCLE_VARIANT',
-      dialogueId,
-      workspaceId,
-      scheduleType: 'GENERAL',
-      type: 'EMAIL',
-      body: 'Test',
-    }
+      },
+      {
+        id: 'GRAND_PARENT_UNCLE_EDGE',
+        scheduleType: 'GENERAL',
+        childVariant: {
+          id: 'PARENT_VARIANT_FIRST_SIBLING',
+          dialogueId,
+          workspaceId,
+          type: 'EMAIL',
+          body: 'Test',
+        }
+      }
     ]);
 
     const newCampaign = await campaignPrismaAdapter.getCampaignById(createdCampaign?.id || '');
     expect(newCampaign?.variants).toHaveLength(4);
-    expect(newCampaign?.variantsEdges).toHaveLength(2);
+    expect(newCampaign?.directVariantEdges).toHaveLength(2);
 
     const newChildParent = newCampaign?.variants.find(variant => variant.id === 'CHILD_VARIANT');
     expect(newChildParent?.children).toHaveLength(1);
@@ -482,64 +524,66 @@ describe('CampaignPrismaAdapter', () => {
     expect(grandChild?.children).toHaveLength(0);
     expect(grandChild?.parent?.id).toEqual('NESTED_PARENT_TO_CHILD_1');
 
-    expect(newCampaign?.variantsEdges).toHaveLength(2);
+    expect(newCampaign?.nestedVariantEdges).toHaveLength(4);
   });
 
   test('can extract all variants from editCampaignInput', async () => {
-    const editCampaignInput: any = [{
-      id: 'PARENT_VARIANT',
-      dialogueId,
-      workspaceId,
+    const variants = CampaignPrismaAdapter.parseVariantsFromEditCampaignVariantInputs([{
+      id: '',
       scheduleType: 'GENERAL',
-      type: 'EMAIL',
-      body: 'Test',
-      children: [{
-        parentVariantId: '',
-        childVariant: {
-          id: 'CHILD_VARIANT_NEW',
-          dialogueId,
-          workspaceId,
+      childVariant: {
+        id: 'PARENT_VARIANT',
+        dialogueId,
+        workspaceId,
+        type: 'EMAIL',
+        body: 'Test',
+        children: [{
+          id: '',
           scheduleType: 'FOLLOW_UP',
-          type: 'SMS',
-          label: 'New SMS follow up one!',
-          children: [{
-            parentVariantId: 'CHILD_VARIANT_NEW_NESTED',
-            childVariant: {
+          childVariant: {
+            id: 'CHILD_VARIANT_NEW',
+            dialogueId,
+            workspaceId,
+            type: 'SMS',
+            label: 'New SMS follow up one!',
+            children: [{
               id: '',
-              dialogueId,
-              workspaceId,
               scheduleType: 'FOLLOW_UP',
-              type: 'SMS',
-              label: 'New SMS follow up one!',
-            }
-          }]
-        }
-      }, {
-        parentVariantId: '',
-        childVariant: {
-          id: 'CHILD_VARIANT_NEW_2',
-          dialogueId,
-          workspaceId,
+              childVariant: {
+                id: '',
+                dialogueId,
+                workspaceId,
+                type: 'SMS',
+                label: 'New SMS follow up one!',
+              }
+            }]
+          }
+        }]
+      }
+    }, {
+      id: '',
+      parentVariantId: '',
+      scheduleType: 'FOLLOW_UP',
+      childVariant: {
+        id: 'CHILD_VARIANT_NEW_2',
+        dialogueId,
+        workspaceId,
+        type: 'SMS',
+        label: 'New SMS follow up one!',
+        children: [{
+          id: '',
+          parentVariantId: 'CHILD_VARIANT_NEW_NESTED_2',
           scheduleType: 'FOLLOW_UP',
-          type: 'SMS',
-          label: 'New SMS follow up one!',
-          children: [{
-            parentVariantId: 'CHILD_VARIANT_NEW_NESTED_2',
-            childVariant: {
-              id: '',
-              dialogueId,
-              workspaceId,
-              scheduleType: 'FOLLOW_UP',
-              type: 'SMS',
-              label: 'New SMS follow up one!',
-            }
-          }]
-        }
-      }]
-    }];
-    const variants = CampaignPrismaAdapter.parseVariantsFromEditCampaignVariantInputs(
-      editCampaignInput
-    );
+          childVariant: {
+            id: '',
+            dialogueId,
+            workspaceId,
+            type: 'SMS',
+            label: 'New SMS follow up one!',
+          }
+        }]
+      }
+    }]);
 
     expect(variants).toHaveLength(5);
   });

@@ -1,6 +1,6 @@
 import { extendType } from "@nexus/schema";
 
-import { CampaignModel } from "./CampaignModel";
+import { CampaignModel, CampaignVariantEdgeConditionEnumType } from "./CampaignModel";
 
 /**
  * Access pattern for fetching a single campaign.
@@ -37,15 +37,12 @@ import { CampaignModel } from "./CampaignModel";
 
           return {
             ...workspaceWithCampaign,
-            deliveries: [],
-            variants: [
-              ...workspaceWithCampaign.variantsEdges.map(variantEdge => ({
-                ...variantEdge.campaignVariant,
-                weight: variantEdge.weight,
-                dialogue: variantEdge.campaignVariant.dialogue,
-                workspace: variantEdge.campaignVariant.workspace,
-              }))
-            ]
+            variantEdges: workspaceWithCampaign.variantsEdges.map(variantEdge => ({
+              scheduleType: 'GENERAL',
+              conditionType: 'AB_SAMPLING',
+              condition: { AB__weight: variantEdge.weight },
+              childCampaignVariant: variantEdge.campaignVariant,
+            }))
           };
         }
       })

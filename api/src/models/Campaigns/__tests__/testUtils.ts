@@ -23,10 +23,12 @@ export const cleanCampaignDatabase = async (prisma: PrismaClient) => {
   const deleteCampaignsCampainVariantEdge = prisma.campaignVariantEdge.deleteMany({});
   const deleteCampaignsVariants = prisma.campaignVariant.deleteMany({});
   const deleteCampaignVariantToCampaigns = prisma.campaignVariantToCampaign.deleteMany({});
+  const deleteCampaignVariantConditions = prisma.campaignVariantEdgeCondition.deleteMany({});
   const deleteCampaigns = prisma.campaign.deleteMany({});
   const deleteDialogues = prisma.dialogue.deleteMany({});
   const deleteWorkspaces = prisma.customer.deleteMany({});
   await prisma.$transaction([
+    deleteCampaignVariantConditions,
     deleteCampaignsCampainVariantEdge,
     deleteCampaignVariantToCampaigns,
     deleteCampaignsVariants,
@@ -43,21 +45,24 @@ export const defaultWorkspaceInput: NexusGenInputs['CreateCampaignInputType'] = 
   id: 'CAMPAIGN_1',
   workspaceId,
   label: 'Test',
-  variants: [{
-    id: 'PARENT_VARIANT',
-    dialogueId,
-    workspaceId,
+  variantEdges: [{
+    id: 'PARENT_VARIANT_EDGE',
     scheduleType: 'GENERAL',
-    type: 'EMAIL',
-    body: 'Test',
-    children: [{
-      childVariant: {
-        id: 'CHILD_VARIANT',
-        dialogueId,
-        workspaceId,
+    childVariant: {
+      id: 'PARENT_VARIANT',
+      dialogueId,
+      workspaceId,
+      type: 'EMAIL',
+      body: 'Test',
+      children: [{
         scheduleType: 'FOLLOW_UP',
-        type: 'EMAIL'
-      }
-    }]
+        childVariant: {
+          id: 'CHILD_VARIANT',
+          dialogueId,
+          workspaceId,
+          type: 'EMAIL'
+        }
+      }]
+    }
   }]
 };
