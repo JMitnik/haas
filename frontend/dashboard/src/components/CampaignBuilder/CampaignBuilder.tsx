@@ -1,25 +1,21 @@
 import * as UI from '@haas/ui';
 import { useTranslation } from 'react-i18next';
-import create, { SetState } from 'zustand';
 import produce from 'immer';
-import { devtools } from 'zustand/middleware'
 
 // @ts-ignore
 const immer = config => (set, get) => config(fn => set(produce(fn)), get);
 
-import { CampaignScheduleEnum, CampaignVariantEnum, EditCampaignInputType } from 'types/generated-types';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 
 import * as LS from './CampaignBuilderStyles';
 import { CampaignForm } from './CampaignForm';
-import { CampaignFormType } from './CampaignFormSchema';
-import { ActiveFormProps, ActiveFormType, VariantType } from './CampaignBuilderTypes';
 import { CampaignStep } from './CampaignStep';
 import { ChevronDown, Plus } from 'react-feather';
 import { CampaignVariantForm } from './CampaignVariantForm';
 import { useCampaignStore } from './CampaignStore';
 import { RecursiveCampaignStep } from './RecursiveCampaignStep';
 import { get } from 'lodash';
+import { CampaignType } from 'types/generated-types';
 
 type EdgeType = 'Weights' | 'Normal';
 
@@ -87,6 +83,10 @@ const getParentIndex = (variantIndex: string): string | undefined => {
   return undefined;
 }
 
+interface CampaignBuilderProps {
+  onSave: (campaign: CampaignType) => void;
+}
+
 export const CampaignBuilder = () => {
   const {
     variantEdges,
@@ -99,6 +99,8 @@ export const CampaignBuilder = () => {
     editCampaignVariant
   } = useCampaignStore();
   const { t } = useTranslation();
+
+
 
   const activeVariantEdge = activeForm?.activeVariantEdgeIndex ?
     get(variantEdges, `${activeForm?.activeVariantEdgeIndex}`, undefined) : undefined;
