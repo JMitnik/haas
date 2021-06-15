@@ -174,3 +174,5 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
   }
 
 }
+
+export default CustomerPrismaAdapter;

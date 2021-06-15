@@ -21,7 +21,8 @@
     },
     "resolutions": {
         "**/@typescript-eslint/eslint-plugin": "^4.1.1",
-        "**/@typescript-eslint/parser": "^4.1.1"
+        "**/@typescript-eslint/parser": "^4.1.1",
+        "jest-environment-jsdom": "^26.0.1"
       },
     "scripts": {
         "aws:deploy-pipeline": "cd aws/stack && cdk deploy haasSvcPipeline --profile haas",
@@ -52,7 +53,10 @@
         "test:watch:dashboard": "yarn workspace @haas/dashboard test:watch",
         "test:cypress-dashboard": "yarn workspace @haas/dashboard cypress open",
         "test:cypress-client": "yarn workspace @haas/client cypress open",
-        "restart:api": "yarn kill:api && yarn start:api"
+        "restart:api": "yarn kill:api && yarn start:api",
+        "dock:test:start-db": "(cd container/test && docker-compose up -d) && sleep 10 && (export DB_STRING=postgresql://prisma:prisma@localhost:5431/postgres?schema=public && yarn migrate)",
+        "dock:test:restart-db": "yarn dock:test:end-db  && yarn dock:test:start-db ",
+        "dock:test:end-db": "(cd container/test && docker-compose down)"
     },
     "devDependencies": {
         "concurrently": "^5.1.0",
