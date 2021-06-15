@@ -1,9 +1,10 @@
 import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
 import { CustomerPrismaAdapter } from "../CustomerPrismaAdapter";
-import { CustomerCreateInput } from "@prisma/client";
+import { CustomerCreateInput, CustomerUpdateInput } from "@prisma/client";
 import { NexusGenInputs } from "../../../generated/nexus";
 import CustomerService from "../CustomerService";
 import { clearCustomerDatabase } from './testUtils';
+import { tags } from "mustache";
 
 const prisma = makeTestPrisma();
 const customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
@@ -180,6 +181,162 @@ describe('CustomerPrismaAdapter', () => {
 
     const settingsFound = await customerPrismaAdapter.findWorkspaceSettings(createdCustomer.id);
     expect(settingsFound).not.toBeNull();
-  })
+  });
+
+  test('customerPrismaAdapter.getCustomer', async () => {
+    const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
+    const customerNotFound = await customerPrismaAdapter.getCustomer('NOT_FOUND');
+
+    expect(customerNotFound).toBeNull();
+
+    const customerFound = await customerPrismaAdapter.getCustomer(createdCustomer.id);
+    expect(customerFound).not.toBeNull();
+  });
+
+  test('customerPrismaAdapter.getDialogueById', async () => {
+    const customer = await prisma.customer.create({
+      data: {
+        name: 'workspace',
+        slug: 'sluggy',
+        dialogues: {
+          create: [
+            {
+              title: 'dialogueOne',
+              slug: 'dialogueOneSlug',
+              description: 'description #1'
+            },
+            {
+              title: 'dialogueTwo',
+              slug: 'dialogueTwoSlug',
+              description: 'description #1'
+            }
+          ]
+        }
+      },
+      include: {
+        dialogues: true,
+      },
+    });
+
+    expect(customer.dialogues).toHaveLength(2);
+
+    const dialogueId = customer.dialogues[0].id;
+
+    const notFoundDialogue = await customerPrismaAdapter.getDialogueById(customer.id, '-1');
+    expect(notFoundDialogue).toBeUndefined();
+
+    const foundDialogue = await customerPrismaAdapter.getDialogueById(customer.id, dialogueId);
+    expect(foundDialogue).not.toBeUndefined();
+  });
+
+  test('customerPrismaAdapter.getDialogueBySlug', async () => {
+    const customer = await prisma.customer.create({
+      data: {
+        name: 'workspace',
+        slug: 'sluggy',
+        dialogues: {
+          create: [
+            {
+              title: 'dialogueOne',
+              slug: 'dialogueOneSlug',
+              description: 'description #1'
+            },
+            {
+              title: 'dialogueTwo',
+              slug: 'dialogueTwoSlug',
+              description: 'description #1'
+            }
+          ]
+        }
+      },
+      include: {
+        dialogues: true,
+      },
+    });
+
+    const dialogueSlug = customer.dialogues[0].slug;
+
+    const notFoundDialogue = await customerPrismaAdapter.getDialogueBySlug(customer.id, '-1');
+    expect(notFoundDialogue).toBeUndefined();
+
+    const foundDialogue = await customerPrismaAdapter.getDialogueBySlug(customer.id, dialogueSlug);
+    expect(foundDialogue).not.toBeUndefined();
+  });
+
+  test('customerPrismaAdapter.getDialogueTags', async () => {
+    const customer = await prisma.customer.create({
+      data: {
+        name: 'workspace',
+        slug: 'sluggy',
+        dialogues: {
+          create: [
+            {
+              title: 'dialogueOne',
+              slug: 'dialogueOneSlug',
+              description: 'description #1',
+              tags: {
+                create: [
+                  {
+                    name: 'tag1',
+                    type: 'AGENT',
+                    customer: {
+                      connect: {
+                        slug: 'sluggy',
+                      },
+                    },
+                  },
+                  {
+                    name: 'tag2',
+                    type: 'DEFAULT',
+                    customer: {
+                      connect: {
+                        slug: 'sluggy',
+                      },
+                    },
+                  },
+                  {
+                    name: 'tag3',
+                    type: 'LOCATION',
+                    customer: {
+                      connect: {
+                        slug: 'sluggy',
+                      },
+                    },
+                  }
+                ]
+              }
+            },
+            {
+              title: 'dialogueTwo',
+              slug: 'dialogueTwoSlug',
+              description: 'description #1',
+            }
+          ]
+        }
+      },
+      include: {
+        dialogues: true,
+      },
+    });
+
+    const dialogueSlugOne = customer.dialogues[0].slug;
+    const dialogueSlugTwo = customer.dialogues[1].slug;
+
+    // no tags
+    const dialogueWithoutTags = await customerPrismaAdapter.getDialogueTags(customer.slug, dialogueSlugTwo);
+    expect(dialogueWithoutTags?.tags).toHaveLength(0);
+
+    const dialogueWithTags = await customerPrismaAdapter.getDialogueTags(customer.slug, dialogueSlugOne);
+    expect(dialogueWithTags?.tags).toHaveLength(3);
+  });
+
+  test('customerPrismaAdapter.updateCustomer', async () => {
+    const customer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
+    const customerUpdateInput: CustomerUpdateInput = { name: 'newName', slug: 'newSlug', }
+    const updatedCustomer = await customerPrismaAdapter.updateCustomer(customer.id, customerUpdateInput);
+    expect(updatedCustomer.name).toBe(customerUpdateInput.name);
+    expect(updatedCustomer.slug).toBe(customerUpdateInput.slug);
+  });
+
 
 });
