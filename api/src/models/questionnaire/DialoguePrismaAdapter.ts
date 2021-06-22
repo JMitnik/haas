@@ -233,6 +233,7 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
         questions: true,
         edges: {
           include: {
+            parentNode: true,
             conditions: true,
             childNode: true,
           },

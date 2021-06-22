@@ -1,10 +1,8 @@
 import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
 import { CustomerPrismaAdapter } from "../CustomerPrismaAdapter";
-import { CustomerCreateInput, CustomerUpdateInput } from "@prisma/client";
+import { CustomerUpdateInput } from "@prisma/client";
 import { NexusGenInputs } from "../../../generated/nexus";
-import CustomerService from "../CustomerService";
 import { clearCustomerDatabase } from './testUtils';
-import { tags } from "mustache";
 
 const prisma = makeTestPrisma();
 const customerPrismaAdapter = new CustomerPrismaAdapter(prisma);

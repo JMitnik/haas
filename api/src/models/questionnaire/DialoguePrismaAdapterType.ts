@@ -24,6 +24,7 @@ export interface DialoguePrismaAdapterType {
   getDialogueWithNodesAndEdges(dialogueId: string): Promise<(Dialogue & {
     questions: QuestionNode[];
     edges: (Edge & {
+      parentNode: QuestionNode;
       conditions: QuestionCondition[];
       childNode: QuestionNode;
     })[];
