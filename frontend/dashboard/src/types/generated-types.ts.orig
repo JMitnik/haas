@@ -302,6 +302,11 @@ export type CustomFieldType = {
 };
 
 
+export type Debug = {
+  __typename?: 'Debug';
+  debugResolver?: Maybe<Scalars['String']>;
+};
+
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
   customerSlug?: Maybe<Scalars['String']>;
@@ -770,6 +775,7 @@ export type Mutation = {
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
+  debugMutation?: Maybe<Scalars['String']>;
 };
 
 
@@ -1334,6 +1340,14 @@ export enum QuestionNodeTypeEnum {
   Share = 'SHARE'
 }
 
+export enum SystemPermissionTypeEnum{
+  Create="CREATE",
+  View="VIEW",
+  Edit="EDIT",
+  Delete="DELETE"
+}
+
+
 export type QuestionNodeWhereInputType = {
   isRoot?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['ID']>;
@@ -1745,6 +1759,31 @@ export type GetWorkspaceAdminsQuery = (
   )> }
 );
 
+<<<<<<< Updated upstream
+=======
+export type GetWorkspaceUsersConnectsQueryVariables = Exact<{
+  filter?: Maybe<PaginationWhereInput>;
+}>;
+
+
+export type GetWorkspaceUsersConnectsQuery = (
+  { __typename?: 'Query' }
+  & { usersConnection?: Maybe<(
+    { __typename?: 'UserConnection' }
+    & { userCustomers: Array<(
+      { __typename?: 'UserCustomer' }
+      & { user: (
+        { __typename?: 'UserType' }
+        & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'email' | 'globalPermissions'>
+      ) }
+    )>, pageInfo: (
+      { __typename?: 'PaginationPageInfo' }
+      & Pick<PaginationPageInfo, 'nrPages' | 'pageIndex'>
+    ) }
+  )> }
+);
+
+>>>>>>> Stashed changes
 export type ConfirmWorkspaceJobMutationVariables = Exact<{
   input?: Maybe<GenerateAutodeckInput>;
 }>;
@@ -2068,6 +2107,59 @@ export type GetWorkspaceAdminsQueryResult = Apollo.QueryResult<GetWorkspaceAdmin
 export function refetchGetWorkspaceAdminsQuery(variables?: GetWorkspaceAdminsQueryVariables) {
       return { query: GetWorkspaceAdminsDocument, variables: variables }
     }
+<<<<<<< Updated upstream
+=======
+export const GetWorkspaceUsersConnectsDocument = gql`
+    query GetWorkspaceUsersConnects($filter: PaginationWhereInput) {
+  usersConnection(filter: $filter) {
+    userCustomers {
+      user {
+        id
+        firstName
+        lastName
+        email
+        globalPermissions
+      }
+    }
+    pageInfo {
+      nrPages
+      pageIndex
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceUsersConnectsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceUsersConnectsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceUsersConnectsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceUsersConnectsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetWorkspaceUsersConnectsQuery(baseOptions?: Apollo.QueryHookOptions<GetWorkspaceUsersConnectsQuery, GetWorkspaceUsersConnectsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceUsersConnectsQuery, GetWorkspaceUsersConnectsQueryVariables>(GetWorkspaceUsersConnectsDocument, options);
+      }
+export function useGetWorkspaceUsersConnectsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceUsersConnectsQuery, GetWorkspaceUsersConnectsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceUsersConnectsQuery, GetWorkspaceUsersConnectsQueryVariables>(GetWorkspaceUsersConnectsDocument, options);
+        }
+export type GetWorkspaceUsersConnectsQueryHookResult = ReturnType<typeof useGetWorkspaceUsersConnectsQuery>;
+export type GetWorkspaceUsersConnectsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceUsersConnectsLazyQuery>;
+export type GetWorkspaceUsersConnectsQueryResult = Apollo.QueryResult<GetWorkspaceUsersConnectsQuery, GetWorkspaceUsersConnectsQueryVariables>;
+export function refetchGetWorkspaceUsersConnectsQuery(variables?: GetWorkspaceUsersConnectsQueryVariables) {
+      return { query: GetWorkspaceUsersConnectsDocument, variables: variables }
+    }
+>>>>>>> Stashed changes
 export const ConfirmWorkspaceJobDocument = gql`
     mutation confirmWorkspaceJob($input: GenerateAutodeckInput) {
   confirmCreateWorkspaceJob(input: $input) {

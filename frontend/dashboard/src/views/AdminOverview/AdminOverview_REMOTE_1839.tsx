@@ -1,21 +1,3 @@
-<<<<<<< Updated upstream
-import * as UI from '@haas/ui';
-import { ArrowLeft, Plus } from 'react-feather';
-import { Div, Flex, PageTitle } from '@haas/ui';
-import { debounce } from 'lodash';
-import styled, { css } from 'styled-components';
-
-import { useHistory } from 'react-router';
-import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
-
-import { useGetWorkspaceAdminsQuery } from 'types/generated-types';
-import SearchBar from 'components/SearchBar/SearchBar';
-
-const TableHeaderContainer = styled(UI.TableHeading)`
-  background: grey !important;
-  color: white !important
-=======
 import * as UI from "@haas/ui";
 import {
   ArrowLeft,
@@ -68,7 +50,6 @@ import { useNavigator } from "hooks/useNavigator";
 const TableHeaderContainer = styled(UI.TableHeading)`
   background: #e6ecf4 !important;
   color: #4a5568 !important;
->>>>>>> Stashed changes
 `;
 
 const BackButtonContainer = styled(UI.Div)`
@@ -86,14 +67,6 @@ const BackButtonContainer = styled(UI.Div)`
   `}
 `;
 
-<<<<<<< Updated upstream
-const AdminOverview = () => {
-  const { t } = useTranslation();
-  const history = useHistory();
-  const customerSlug = 'nullinc';
-  const { data } = useGetWorkspaceAdminsQuery({
-    fetchPolicy: 'cache-and-network',
-=======
 const CellContainer = styled(UI.Div)`
   cursor: pointer;
   text-align: center;
@@ -166,18 +139,14 @@ const AdminOverview = () => {
 
   const { data, loading } = useGetWorkspaceUsersConnectsQuery({
     fetchPolicy: "cache-and-network",
->>>>>>> Stashed changes
     variables: {
-      customerSlug,
+      filter: paginationState,
     },
   });
     
   const {getWorkspacePath } = useNavigator();
   const workspacePath = getWorkspacePath();
 
-<<<<<<< Updated upstream
-  const [activeSearchTerm, setActiveSearchTerm] = useState('');
-=======
 
   let listOfPermission: any[] = new Array();
   const mapPermissionsToIcons = (userPerm: any) => {
@@ -263,14 +232,11 @@ const AdminOverview = () => {
     );
   };
 
->>>>>>> Stashed changes
   const handleChange = (e: any) => {
     setActiveSearchTerm(e.target.value);
     debounce(e.target.value);
   };
 
-<<<<<<< Updated upstream
-=======
   const SelectStyle = {
     option: (styles: any) => {
       return {
@@ -428,7 +394,6 @@ const AdminOverview = () => {
     return <></>;
   };
 
->>>>>>> Stashed changes
   return (
     <>
       <UI.ViewHeading>
@@ -470,64 +435,6 @@ const AdminOverview = () => {
         </UI.Stack>
       </UI.ViewHeading>
 
-<<<<<<< Updated upstream
-      <UI.ViewContainer>
-        <UI.Card noHover>
-          <UI.Div p={2}>
-            <UI.Table width="100%">
-              <TableHeaderContainer>
-                <UI.TableHeadingCell>{t('admin:userId')}</UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('admin:userFName')}
-                </UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('admin:userLName')}
-                </UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('admin:userPermissions')}
-                </UI.TableHeadingCell>
-              </TableHeaderContainer>
-
-              <UI.TableBody>
-                {data?.users?.map((item) => (
-                  <UI.TableRow hasHover key={item.id}>
-                    <UI.TableCell>{item?.id || ''}</UI.TableCell>
-                    <UI.TableCell>{item?.firstName || ''}</UI.TableCell>
-                    <UI.TableCell>{item?.lastName || ''}</UI.TableCell>
-                    <UI.TableCell>
-                      {item?.globalPermissions || ''}
-                    </UI.TableCell>
-                  </UI.TableRow>
-                ))}
-              </UI.TableBody>
-            </UI.Table>
-          </UI.Div>
-          <UI.PaginationFooter>
-            <UI.Div style={{ lineHeight: 'normal' }}>
-              Showing page
-              <UI.Span ml={1} fontWeight="bold">
-                1
-              </UI.Span>
-              <UI.Span ml={1}>out of</UI.Span>
-              <UI.Span ml={1} fontWeight="bold">
-                22
-              </UI.Span>
-            </UI.Div>
-            <UI.Div>
-              <UI.Stack isInline>
-                <UI.Button size="sm" variant="outline" isDisabled>
-                  Previous
-                </UI.Button>
-                <UI.Span ml={1} mt={1} fontWeight="light">
-                  1
-                </UI.Span>
-                <UI.Button size="sm">Next</UI.Button>
-              </UI.Stack>
-            </UI.Div>
-          </UI.PaginationFooter>
-        </UI.Card>
-      </UI.ViewContainer>
-=======
       <div>
         <UI.ViewContainer>
           <UI.Card noHover>
@@ -964,7 +871,6 @@ const AdminOverview = () => {
           </UI.Card>
         </UI.ViewContainer>
       </div>
->>>>>>> Stashed changes
     </>
   );
 };

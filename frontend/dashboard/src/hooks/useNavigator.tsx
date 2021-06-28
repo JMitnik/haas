@@ -8,6 +8,7 @@ export const ROUTES = {
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
   AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
   ADMIN_OVERVIEW: '/dashboard/admin',
+  HOME_ROOT: '/dashboard/b/',
 };
 
 interface DashboardParams {
@@ -34,6 +35,8 @@ export const useNavigator = () => {
 
   const getCampaignsPath = () => generatePath(ROUTES.CAMPAIGNS_VIEW, { customerSlug, campaignId });
 
+  const getWorkspacePath = () => generatePath(ROUTES.HOME_ROOT, { customerSlug, campaignId })
+
   const dialoguesMatch = useRouteMatch({
     path: ROUTES.DIALOGUES_VIEW,
   });
@@ -45,6 +48,7 @@ export const useNavigator = () => {
   return {
     goToCampaignView,
     getCampaignsPath,
+    getWorkspacePath,
     dialoguesMatch,
     dialogueMatch,
     customerSlug,

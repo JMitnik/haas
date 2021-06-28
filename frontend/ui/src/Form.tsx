@@ -829,6 +829,10 @@ interface SelectContainerProps {
   menuIsOpen?: boolean;
 }
 
+interface SelectProps extends ReactSelectProps {
+  isMulti?: boolean;
+}
+
 export const SelectContainer = styled(Div) <SelectContainerProps>`
   ${({ theme, menuIsOpen }) => css`
     ${menuIsOpen && css`
@@ -862,7 +866,7 @@ export const SelectContainer = styled(Div) <SelectContainerProps>`
   `}
 `;
 
-export const Select = (props: ReactSelectProps) => (
+export const Select = (props: SelectProps) => (
   <SelectContainer menuIsOpen={props.menuIsOpen}>
     <ReactSelect {...props} classNamePrefix="select" />
   </SelectContainer>
