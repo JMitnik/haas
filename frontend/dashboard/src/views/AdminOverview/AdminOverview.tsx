@@ -117,16 +117,6 @@ interface IconContainerProps {
   iconColor?: string;
 }
 
-const paginationFilter: PaginationWhereInput = {
-  startDate: null,
-  endDate: null,
-  searchTerm: "",
-  offset: 0,
-  limit: 8,
-  pageIndex: 0,
-  orderBy: [{ by: PaginationSortByEnum.Email, desc: true }],
-};
-
   interface TableProps{
     startDate: Date | null,
     endDate: Date | null,

@@ -99,22 +99,22 @@ export const TableCell = styled.td<TableCellProps>`
   `}
 `;
 
-export const TableCell = ({
-  onClick,
-  isSelected,
-}: TableCellProps) => {
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    onClick?.();
-    console.log("Clicked!");
-  };
-  return(
-    <TableCellContainer>
-    <Dropdown></Dropdown>
-    </TableCellContainer>
-  )
+// export const TableCell = ({
+//   onClick,
+//   isSelected,
+// }: TableCellProps) => {
+//   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+//     event.stopPropagation();
+//     onClick?.();
+//     console.log("Clicked!");
+//   };
+//   return(
+//     <TableCellContainer>
+//     <Dropdown></Dropdown>
+//     </TableCellContainer>
+//   )
 
-};
+// };
 
 
 export const TableSelectContainer = styled.button`
