@@ -1257,6 +1257,10 @@ const language = {
       en: 'User Id',
       de: 'Benutzeridentifikation',
     },
+     email: {
+      en: 'Email',
+      de: 'Email',
+    },
     userFName: {
       en: 'First Name',
       de: 'Vorname',
@@ -1266,9 +1270,17 @@ const language = {
       de: 'Nachname',
     },
     userPermissions: {
-      en: 'Permission',
+      en: 'Permissions',
       de: 'Genehmigung',
     },
+    workspace:{
+      en:"Workspace",
+      de:"Arbeitsplatz"
+    },
+    back_to_workspace:{
+      en:"Back To Workspace",
+      de:"Zurück zum Arbeitsbereich"
+    }
   },
   dialogue: {
     choices: {

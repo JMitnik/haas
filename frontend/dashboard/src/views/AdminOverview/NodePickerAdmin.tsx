@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 
-import { SystemPermissionTypeEnum } from 'types/generated-types';
+import { SystemPermissionTypeEnum } from './AdminOverviewTypes';
 import { NodeCellContainer } from 'components/NodeCell/NodeCell';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
 import { SystemPermission } from 'types/globalTypes';
@@ -74,13 +74,13 @@ export const NodePickerAdmin = ({ onChange, onClose, items, SelectOptions }: any
   return (
     <UI.List maxWidth={300}>
       <UI.CloseButton onClose={onClose} />
-      <UI.ListHeader>{"Permission List"}</UI.ListHeader>
+      <UI.ListHeader >{"Permission List"}</UI.ListHeader>
       <UI.ListItem
         variant="gray"
         hasNoSelect
-        width="100%"
+        width="115%"
       >
-        <UI.Div width="100%">
+        <UI.Div width="115%">
           <UI.Div mb={2}>
             <UI.Text fontWeight="">Filter by type</UI.Text>
             <UI.Switch>

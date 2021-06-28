@@ -79,9 +79,11 @@ interface TableCellProps {
 }
 
 export const TableCell = styled.td<TableCellProps>`
-  ${({ isNumeric, center }) => css`
+  ${({ isNumeric, center , theme}) => css`
     padding: 0.5rem 1.5rem;
-
+    border: 1px solid ${theme.colors.gray[200]};
+    font-weight: 500;
+    font-size:0.9rem;
     ${isNumeric &&
     css`
       text-align: right;

@@ -1,30 +1,9 @@
-<<<<<<< Updated upstream
-import * as UI from '@haas/ui';
-import { ArrowLeft, Plus } from 'react-feather';
-import { Div, Flex, PageTitle } from '@haas/ui';
-import { debounce } from 'lodash';
-import styled, { css } from 'styled-components';
-
-import { useHistory } from 'react-router';
-import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
-
-import { useGetWorkspaceAdminsQuery } from 'types/generated-types';
-import SearchBar from 'components/SearchBar/SearchBar';
-
-const TableHeaderContainer = styled(UI.TableHeading)`
-  background: grey !important;
-  color: white !important
-=======
 import * as UI from "@haas/ui";
 import {
   ArrowLeft,
-  User,
   Plus,
-  Briefcase,
-  AlignLeft,
-  PhoneIncoming,
-  Edit,
+  ChevronUp,
+  ChevronDown
 } from "react-feather";
 import Select, { components } from "react-select";
 
@@ -58,6 +37,7 @@ import {
   Badge,
   theme,
   InputRightElement,
+  Spinner,
 } from "@chakra-ui/core";
 import { GlobalPermissionList } from "./GlobalPermissionList";
 import { OptionsOfPermissions } from "./OptionsOfPermissions";
@@ -66,9 +46,8 @@ import { NodePickerAdmin } from "./NodePickerAdmin";
 import { useNavigator } from "hooks/useNavigator";
 
 const TableHeaderContainer = styled(UI.TableHeading)`
-  background: #e6ecf4 !important;
-  color: #4a5568 !important;
->>>>>>> Stashed changes
+  background: #f1f1f1 !important;
+  color: #706c6c !important;
 `;
 
 const BackButtonContainer = styled(UI.Div)`
@@ -86,14 +65,6 @@ const BackButtonContainer = styled(UI.Div)`
   `}
 `;
 
-<<<<<<< Updated upstream
-const AdminOverview = () => {
-  const { t } = useTranslation();
-  const history = useHistory();
-  const customerSlug = 'nullinc';
-  const { data } = useGetWorkspaceAdminsQuery({
-    fetchPolicy: 'cache-and-network',
-=======
 const CellContainer = styled(UI.Div)`
   cursor: pointer;
   text-align: center;
@@ -111,6 +82,12 @@ const CellContainer = styled(UI.Div)`
 
 const TableHeadingCellContainer = styled(UI.TableHeadingCell)`
   text-align: center;
+`;
+
+const TableCellSelected = styled(UI.Div)`
+  cursor: pointer;
+  font-weight: 600;
+  float:left;
 `;
 
 interface TableProps {
@@ -161,23 +138,21 @@ const AdminOverview = () => {
   const [cellValue, setCellValue] = useState("placeholder");
   const [fName, setFName] = useState("");
   const [lName, setLName] = useState("");
-  const [editing, setEditing] = useState(false)
+  const [editing, setEditing] = useState(false);
   var temp: any;
 
   const { data, loading } = useGetWorkspaceUsersConnectsQuery({
     fetchPolicy: "cache-and-network",
->>>>>>> Stashed changes
     variables: {
-      customerSlug,
+      filter: paginationState,
     },
   });
-    
-  const {getWorkspacePath } = useNavigator();
-  const workspacePath = getWorkspacePath();
 
-<<<<<<< Updated upstream
-  const [activeSearchTerm, setActiveSearchTerm] = useState('');
-=======
+  {
+    console.log(data);
+  }
+  const { getWorkspacePath } = useNavigator();
+  const workspacePath = getWorkspacePath();
 
   let listOfPermission: any[] = new Array();
   const mapPermissionsToIcons = (userPerm: any) => {
@@ -207,9 +182,9 @@ const AdminOverview = () => {
     `
     
  ${({ theme, iconColor }) => css`
- ${UI.Icon} svg {
-   fill: currentColor;
- }
+   ${UI.Icon} svg {
+     fill: currentColor;
+   }
    ${iconColor &&
    css`
      color: iconColor;
@@ -220,18 +195,67 @@ const AdminOverview = () => {
   const displayPermissionsToIcons = (userPerm: any) => {
     let copy_userPerm = userPerm;
     mapPermissionsToIcons(copy_userPerm);
-
+    let copy_listOfPermission: any[] = listOfPermission.slice(0,2);
+    let moreLeftOverPermissions=listOfPermission.length
+    let maxLen= copy_listOfPermission.length-1
     return (
       <div>
         <UI.Div style={{ display: "flex", flexWrap: "wrap" }}>
-          {listOfPermission?.map((item) => {
+          {copy_listOfPermission?.map((item,index) => {
             let domain = item.domain.charAt(0);
             let labelBgColor;
             if (domain === "C") labelBgColor = "green";
             else if (domain === "D") labelBgColor = "red";
             else if (domain === "E") labelBgColor = "purple";
             else labelBgColor = "yellow";
+
             return (
+              <div>
+                {maxLen==index ? <IconContainer>
+                <Tag rounded="full" size="sm" mt={1}>
+                  <Tooltip
+                    aria-label="test"
+                    label={item.label}
+                    key={item.label}
+                  >
+                    <UI.Icon
+                      // bg={item.bg}
+                      color={item.color}
+                      height="2rem"
+                      width="2rem"
+                      stroke={item.stroke || undefined}
+                      style={{ flexShrink: 0 }}
+                      
+                    >
+                      <item.icon />
+                   
+                    </UI.Icon>
+                  </Tooltip>
+                  <Badge variantColor={labelBgColor} fontSize="0.8em">
+                    {item.domain.charAt(0).toUpperCase()}
+                  </Badge>
+                </Tag>
+                <Tag rounded="full" size="sm" mt={1}>
+                 
+                    <UI.Icon
+                      // bg={item.bg}
+                      
+                      height="2rem"
+                      width="2rem"
+                      
+                      mt={1}
+                      mr={-2}
+                    >
+                      <Plus />
+                      
+                    </UI.Icon>
+                  
+                  <Badge fontSize="0.8em">
+                    {moreLeftOverPermissions}
+                  </Badge>
+                </Tag>
+              </IconContainer>
+              :
               <IconContainer>
                 <Tag rounded="full" size="sm" mt={1}>
                   <Tooltip
@@ -245,10 +269,11 @@ const AdminOverview = () => {
                       height="2rem"
                       width="2rem"
                       stroke={item.stroke || undefined}
-                      style={{ flexShrink: 0,  }}
-                      mr={3}
+                      style={{ flexShrink: 0 }}
+                      
                     >
                       <item.icon />
+                      
                     </UI.Icon>
                   </Tooltip>
                   <Badge variantColor={labelBgColor} fontSize="0.8em">
@@ -256,6 +281,9 @@ const AdminOverview = () => {
                   </Badge>
                 </Tag>
               </IconContainer>
+              }
+              </div>
+              
             );
           })}
         </UI.Div>
@@ -263,14 +291,11 @@ const AdminOverview = () => {
     );
   };
 
->>>>>>> Stashed changes
   const handleChange = (e: any) => {
     setActiveSearchTerm(e.target.value);
     debounce(e.target.value);
   };
 
-<<<<<<< Updated upstream
-=======
   const SelectStyle = {
     option: (styles: any) => {
       return {
@@ -329,7 +354,7 @@ const AdminOverview = () => {
 
     return (
       <>
-        <UI.Div style={{ width: "298px" }}>
+        <UI.Div style={{ width: "345px" }}>
           {options.map((op) => {
             list += op.label + ",";
             ar = list.split(",");
@@ -359,42 +384,41 @@ const AdminOverview = () => {
     );
   };
 
-  const DropdownInputValue = ({ dropdownName,placeholderValue,  onClose }: DropdownInputComponentProps) => {
-
-
+  const DropdownInputValue = ({
+    dropdownName,
+    placeholderValue,
+    onClose,
+  }: DropdownInputComponentProps) => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
 
-    const [innerEdit, setInnerEdit] = useState(false)
-
+    const [innerEdit, setInnerEdit] = useState(false);
 
     const handleInnerInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const tempVal = e.target.value;
       setFirstName(tempVal);
       console.log(firstName);
-      
+
       // const showEditing = setInterval(()=>{
       //   setInnerEdit(innerEdit => innerEdit= false)
       // },3000)
 
-      console.log(editing)
-       setInnerEdit(innerEdit => innerEdit=true)
-       setEditing(editing => editing=true)
-  };
+      console.log(editing);
+      setInnerEdit((innerEdit) => (innerEdit = true));
+      setEditing((editing) => (editing = true));
+    };
 
     return (
       <>
         <UI.Div>
           <Dropdown placement="bottom-end">
             {({ onOpen }) => (
-              <InputGroup>
-                <InputLeftElement
-                  pointerEvents="none"
-                  children={<Edit color="teal" />}
-                />
+              <Div style={{ backgroundColor:"white"}}>
+              <InputGroup> 
                 <Input
+                size="sm"
                   focusBorderColor="teal"
-                  style={{ color: "maroon" }}
+                  style={{ backgroundColor:"#EAE7E7" , width:"230px", marginLeft:"4px", borderRadius:"10px"}}
                   value={firstName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     handleInnerInputChange(e);
@@ -402,16 +426,23 @@ const AdminOverview = () => {
                     console.log(changeval);
                   }}
                 />
+              
                 <InputRightElement
-                 children={<UI.CloseButton 
-                   onClose={()=>{setEditing(false)
-                  //console.log(editing) 
-                  }}
-                  />}
+                  children={
+                    // <UI.CloseButton
+                    //   onClose={() => {
+                    //     setEditing(false);
+                    //     //console.log(editing)
+                    //   }}
+                    // />
+                    <UI.Button size="sm" style={{color:"white", backgroundColor:"teal", marginLeft:"-22px"}}>
+                      Save
+                    </UI.Button>
+                  }
                   onClick={onClose}
-                   
                 />
               </InputGroup>
+              </Div>
             )}
           </Dropdown>
         </UI.Div>
@@ -428,12 +459,13 @@ const AdminOverview = () => {
     return <></>;
   };
 
->>>>>>> Stashed changes
   return (
     <>
       <UI.ViewHeading>
         <UI.Stack>
-           <UI.Breadcrumb to={workspacePath}>{t('back_to_campaigns')}</UI.Breadcrumb>
+          <UI.Breadcrumb to={workspacePath}>
+            {t("admin:back_to_workspace")}
+          </UI.Breadcrumb>
           <UI.Stack isInline alignItems="center" spacing={4}>
             {/* <BackButtonContainer onClick={() => history.goBack()}>
               <ArrowLeft />
@@ -445,21 +477,7 @@ const AdminOverview = () => {
               justifyContent="space-between"
               alignItems="center"
             >
-              {/* <UI.Button leftIcon={Plus} size="sm" variantColor="teal">
-                Edit Permission
-                
-              </UI.Button> */}
-              {editing ?
-              <Div>
-                <img
-                src="https://i.pinimg.com/originals/65/ba/48/65ba488626025cff82f091336fbf94bb.gif"
-                width="70px"
-                >
-                </img>
-              </Div>:<Div ></Div>
-
-            }
-              <Div ml={500}>
+              <Div ml={850}>
                 <SearchBar
                   activeSearchTerm={activeSearchTerm}
                   onSearchTermChange={handleChange}
@@ -470,64 +488,6 @@ const AdminOverview = () => {
         </UI.Stack>
       </UI.ViewHeading>
 
-<<<<<<< Updated upstream
-      <UI.ViewContainer>
-        <UI.Card noHover>
-          <UI.Div p={2}>
-            <UI.Table width="100%">
-              <TableHeaderContainer>
-                <UI.TableHeadingCell>{t('admin:userId')}</UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('admin:userFName')}
-                </UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('admin:userLName')}
-                </UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('admin:userPermissions')}
-                </UI.TableHeadingCell>
-              </TableHeaderContainer>
-
-              <UI.TableBody>
-                {data?.users?.map((item) => (
-                  <UI.TableRow hasHover key={item.id}>
-                    <UI.TableCell>{item?.id || ''}</UI.TableCell>
-                    <UI.TableCell>{item?.firstName || ''}</UI.TableCell>
-                    <UI.TableCell>{item?.lastName || ''}</UI.TableCell>
-                    <UI.TableCell>
-                      {item?.globalPermissions || ''}
-                    </UI.TableCell>
-                  </UI.TableRow>
-                ))}
-              </UI.TableBody>
-            </UI.Table>
-          </UI.Div>
-          <UI.PaginationFooter>
-            <UI.Div style={{ lineHeight: 'normal' }}>
-              Showing page
-              <UI.Span ml={1} fontWeight="bold">
-                1
-              </UI.Span>
-              <UI.Span ml={1}>out of</UI.Span>
-              <UI.Span ml={1} fontWeight="bold">
-                22
-              </UI.Span>
-            </UI.Div>
-            <UI.Div>
-              <UI.Stack isInline>
-                <UI.Button size="sm" variant="outline" isDisabled>
-                  Previous
-                </UI.Button>
-                <UI.Span ml={1} mt={1} fontWeight="light">
-                  1
-                </UI.Span>
-                <UI.Button size="sm">Next</UI.Button>
-              </UI.Stack>
-            </UI.Div>
-          </UI.PaginationFooter>
-        </UI.Card>
-      </UI.ViewContainer>
-=======
       <div>
         <UI.ViewContainer>
           <UI.Card noHover>
@@ -535,49 +495,41 @@ const AdminOverview = () => {
               <UI.Table width="100%">
                 <TableHeaderContainer>
                   <TableHeadingCellContainer style={{ textAlign: "center" }}>
-                    <span style={{ display: "inline-block" }}>
-                      {t("admin:userId")}
-                      <User
-                        color="teal"
-                        size={16}
-                        style={{ float: "left", marginRight: "2px" }}
-                      />
-                     
-                    </span>
+                    <Flex justifyContent="space-between">
+                      <Div mt={1}>{t("admin:email")}</Div>
+                      <Stack>
+                        <ChevronUp size="12" strokeWidth="5"/>
+                        <ChevronDown size="12"  strokeWidth="5"/>
+                      </Stack>
+                    </Flex>
                   </TableHeadingCellContainer>
                   <TableHeadingCellContainer style={{ textAlign: "center" }}>
-                    <span style={{ display: "inline-block" }}>
-                      {t("admin:userFName")}
-                      <AlignLeft
-                        color="teal"
-                        size={18}
-                        style={{ float: "left", marginRight: "2px" }}
-                      />
-                    </span>
+                    <Flex justifyContent="space-between">
+                      <Div mt={1}>{t("admin:userFName")}</Div>
+                       <Stack>
+                        <ChevronUp size="12" strokeWidth="5"/>
+                        <ChevronDown size="12"  strokeWidth="5"/>
+                      </Stack>
+                    </Flex>
                   </TableHeadingCellContainer>
                   <TableHeadingCellContainer style={{ textAlign: "center" }}>
-                    <span style={{ display: "inline-block" }}>
-                      {t("admin:userLName")}
-                      <AlignLeft
-                        color="teal"
-                        size={18}
-                        style={{ float: "left", marginRight: "2px" }}
-                      />
-                    </span>
+                    <Flex justifyContent="space-between">
+                      <Div mt={1}>{t("admin:userLName")}</Div>
+                       <Stack>
+                        <ChevronUp size="12" strokeWidth="5"/>
+                        <ChevronDown size="12"  strokeWidth="5"/>
+                      </Stack>
+                    </Flex>
                   </TableHeadingCellContainer>
                   <TableHeadingCellContainer style={{ textAlign: "center" }}>
-                    <span style={{ display: "inline-block" }}>
-                      {t("admin:userPermissions")}
-                      <Briefcase
-                        color="teal"
-                        size={18}
-                        style={{
-                          float: "left",
-                          marginRight: "2px",
-                          marginTop: "-3px",
-                        }}
-                      />
-                    </span>
+                    <Flex>
+                      <Div>{t("admin:userPermissions")}</Div>
+                    </Flex>
+                  </TableHeadingCellContainer>
+                  <TableHeadingCellContainer style={{ textAlign: "center" }}>
+                    <Flex>
+                      <Div>{t("admin:workspace")}</Div>
+                    </Flex>
                   </TableHeadingCellContainer>
                 </TableHeaderContainer>
                 <UI.TableBody>
@@ -634,27 +586,33 @@ const AdminOverview = () => {
                     </UI.Stack>
                   ) : (
                     <>
-                       {console.log(data)}
                       {data?.usersConnection?.userCustomers?.map(
                         (item, index) => (
-                          <UI.TableRow key={item.user.id}>
+                          <UI.TableRow key={item.user.email}>
                             <UI.TableCell>
                               {cellClicked === false ? (
                                 coordinate.col === index &&
                                 coordinate.row === 0 ? (
                                   <UI.Div
-                                    style={{ textAlign: "center" }}
+                                   
                                     onClick={() => {
-                                      setCellValue(item.user.id);
+                                      setCellValue(item.user.email);
                                       setCellClicked(true);
                                     }}
                                   >
-                                 
-                                   {item?.user.id}
+                                    <Tag size="sm" borderRadius="full">
+                                      <Avatar
+                                        src="https://www.pngkit.com/png/full/302-3022217_roger-berry-avatar-placeholder.png"
+                                        size="xs"
+                                        name={item?.user.email}
+                                        mr={4}
+                                      ></Avatar>
+                                      <TagLabel>{item?.user.email || ""}</TagLabel>
+                                    </Tag>
                                   </UI.Div>
                                 ) : (
                                   <UI.Div
-                                    style={{ textAlign: "center" }}
+                               
                                     onClick={() =>
                                       setCoordinate({ row: 0, col: index })
                                     }
@@ -664,15 +622,15 @@ const AdminOverview = () => {
                                         mr={4}
                                         src="https://www.pngkit.com/png/full/302-3022217_roger-berry-avatar-placeholder.png"
                                         size="xs"
-                                        name={item?.user.id}
+                                        name={item?.user.email}
                                       ></Avatar>
-                                      <TagLabel>{item?.user.id || ""}</TagLabel>
+                                      <TagLabel>{item?.user.email || ""}</TagLabel>
                                     </Tag>
                                   </UI.Div>
                                 )
                               ) : (
                                 <UI.Div
-                                  style={{ textAlign: "center" }}
+                              
                                   onClick={() => setCellClicked(false)}
                                 >
                                   <Tag size="sm" borderRadius="full">
@@ -680,9 +638,9 @@ const AdminOverview = () => {
                                       mr={4}
                                       src="https://www.pngkit.com/png/full/302-3022217_roger-berry-avatar-placeholder.png"
                                       size="xs"
-                                      name={item?.user.id}
+                                      name={item?.user.email}
                                     ></Avatar>
-                                    <TagLabel>{item?.user.id || ""}</TagLabel>
+                                    <TagLabel>{item?.user.email || ""}</TagLabel>
                                   </Tag>
                                 </UI.Div>
                               )}
@@ -693,6 +651,7 @@ const AdminOverview = () => {
                                 coordinate.col === index &&
                                 coordinate.row === 1 ? (
                                   <UI.Div
+                                
                                     onClick={() => {
                                       setCellClicked(true);
                                     }}
@@ -708,32 +667,29 @@ const AdminOverview = () => {
                                         )}
                                       >
                                         {({ onOpen, onClose }) => (
-                                          <>
-                                            <UI.Div
-                                              style={{
-                                                backgroundColor: "#FFEFD5",
-                                                border: "2px solid #ECC94B",
-                                                textAlign: "center",
-                                                cursor: "pointer",
-                                                borderRadius: "4px",
-                                                fontStyle: "italic",
-                                                color: "#3182CE",
-                                                boxShadow:
-                                                  "4px 2px 12px 6px #FFEFD5",
-                                                fontWeight: "bold",
-                                              }}
-                                              onClick={onOpen}
-                                            >
+                                          < >
+                                          
+                                            <TableCellSelected onClick={onOpen}>
                                               {item?.user.firstName || ""}
-                                            </UI.Div>
-                                            <UI.Button
+                                            </TableCellSelected>
+                                          
+                                            {/* <UI.Button
                                               onClick={() => {
                                                 onClose();
                                                 console.log("closed");
                                               }}
                                             >
                                               Close
-                                            </UI.Button>
+                                            </UI.Button> */}
+                                            
+                                              {/* <Spinner
+                                                thickness="4px"
+                                                speed="0.65s"
+                                                emptyColor="gray.200"
+                                                color="blue.500"
+                                             
+                                              />
+                                            */}
                                           </>
                                         )}
                                       </Dropdown>
@@ -742,7 +698,6 @@ const AdminOverview = () => {
                                 ) : (
                                   <UI.Div
                                     style={{
-                                      textAlign: "center",
                                       cursor: "pointer",
                                     }}
                                     onClick={() =>
@@ -755,7 +710,6 @@ const AdminOverview = () => {
                               ) : (
                                 <UI.Div
                                   style={{
-                                    textAlign: "center",
                                     cursor: "pointer",
                                   }}
                                   onClick={() => setCellClicked(false)}
@@ -784,7 +738,7 @@ const AdminOverview = () => {
                                             style={{
                                               backgroundColor: "#e6ecf4",
                                               border: "2px solid #3182CE",
-                                              textAlign: "center",
+
                                               cursor: "pointer",
                                               borderRadius: "4px",
                                               fontStyle: "italic",
@@ -804,7 +758,6 @@ const AdminOverview = () => {
                                 ) : (
                                   <UI.Div
                                     style={{
-                                      textAlign: "center",
                                       cursor: "pointer",
                                     }}
                                     onClick={() =>
@@ -817,7 +770,6 @@ const AdminOverview = () => {
                               ) : (
                                 <UI.Div
                                   style={{
-                                    textAlign: "center",
                                     cursor: "pointer",
                                   }}
                                   onClick={() => setCellClicked(false)}
@@ -852,7 +804,7 @@ const AdminOverview = () => {
                                             style={{
                                               backgroundColor: "#e6ecf4",
                                               border: "2px solid #319795",
-                                              textAlign: "center",
+
                                               cursor: "pointer",
                                               width: "250px",
                                               borderRadius: "4px",
@@ -900,6 +852,47 @@ const AdminOverview = () => {
                                   {nullMaker()}
                                   {PermissionList()}
                                 </CellContainer>
+                              )}
+                            </UI.TableCell>
+                            <UI.TableCell>
+                              {cellClicked === false ? (
+                                coordinate.col === index &&
+                                coordinate.row === 0 ? (
+                                  <Flex
+                                    flexDirection="row"
+                                    justifyContent="space-evenly"
+                                    style={{ fontWeight: "bold" }}
+                                    onClick={() => {
+                                      setCellValue(item.user.email);
+                                      setCellClicked(true);
+                                    }}
+                                  >
+                                    <Div>TO BE CONTINUED</Div>
+                                    <Div>...</Div>
+                                  </Flex>
+                                ) : (
+                                  <Flex
+                                    flexDirection="row"
+                                    justifyContent="space-evenly"
+                                    style={{ fontWeight: "bold" }}
+                                    onClick={() =>
+                                      setCoordinate({ row: 0, col: index })
+                                    }
+                                  >
+                                    <Div>TO BE CONTINUED</Div>
+                                    <Div>...</Div>
+                                  </Flex>
+                                )
+                              ) : (
+                                <Flex
+                                  flexDirection="row"
+                                  justifyContent="space-evenly"
+                                  style={{ fontWeight: "bold" }}
+                                  onClick={() => setCellClicked(false)}
+                                >
+                                  <Div>TO BE CONTINUED</Div>
+                                  <Div style={{fontSize:"0.9rem"}}>...</Div>
+                                </Flex>
                               )}
                             </UI.TableCell>
                           </UI.TableRow>
@@ -964,7 +957,6 @@ const AdminOverview = () => {
           </UI.Card>
         </UI.ViewContainer>
       </div>
->>>>>>> Stashed changes
     </>
   );
 };
