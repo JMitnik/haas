@@ -25,6 +25,7 @@
         "start:api": "yarn workspace @haas/api start",
         "start:client": "yarn workspace @haas/client start",
         "start:dashboard": "yarn workspace @haas/dashboard start",
+        "start:dashboard:msw": "yarn workspace @haas/dashboard start:msw",
         "dock:start-db": "cd container/api && docker-compose up -d",
         "dock:test": "bash scripts/dock-test.sh",
         "dev": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn dev:api\"",

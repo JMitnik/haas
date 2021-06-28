@@ -21,7 +21,7 @@ export const paginationFilter: PaginationWhereInput = {
       by: PaginationSortByEnum.UpdatedAt,
       desc: true
     },
-  ],
+  ],  
 };
 
 const BackButtonContainer = styled(UI.Div)`
@@ -176,7 +176,7 @@ export const AutodeckOverview = () => {
                   {data?.getAutodeckJobs?.pageInfo?.nrPages}
                 </UI.Span>
               </UI.Div>
-
+ 
               <UI.Div>
                 <UI.Stack isInline>
                   <UI.Button

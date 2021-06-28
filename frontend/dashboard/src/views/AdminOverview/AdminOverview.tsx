@@ -127,6 +127,27 @@ const paginationFilter: PaginationWhereInput = {
   orderBy: [{ by: PaginationSortByEnum.Email, desc: true }],
 };
 
+  interface TableProps{
+    startDate: Date | null,
+    endDate: Date | null,
+    searchTerm: string,
+    offset: number,
+    limit: number,
+    pageIndex: number,
+    orderBy: { by: string ; desc: boolean },
+  }
+
+  const paginationFilter: PaginationWhereInput = {
+  startDate: null,
+  endDate: null,
+  searchTerm: '',
+  offset: 0,
+  limit: 8,
+  pageIndex: 0,
+  orderBy: [{ by: PaginationSortByEnum.Email, desc: true }],
+ };
+
+
 const AdminOverview = () => {
   const { t } = useTranslation();
   const history = useHistory();

@@ -3,6 +3,7 @@ import React from "react";
 import styled, { css } from "styled-components";
 import Card, { CardBody } from "./Cards";
 import { IconCheck } from "./assets/icon-check";
+import {Dropdown} from "./Dropdown";
 
 interface TableRowProps {
   hasHover?: boolean;
@@ -76,6 +77,8 @@ export const TableBody = styled.tbody``;
 interface TableCellProps {
   isNumeric?: boolean;
   center?: boolean;
+  onClick?: () => void;
+  isSelected?: boolean;
 }
 
 export const TableCell = styled.td<TableCellProps>`
@@ -95,6 +98,24 @@ export const TableCell = styled.td<TableCellProps>`
     `}
   `}
 `;
+
+export const TableCell = ({
+  onClick,
+  isSelected,
+}: TableCellProps) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onClick?.();
+    console.log("Clicked!");
+  };
+  return(
+    <TableCellContainer>
+    <Dropdown></Dropdown>
+    </TableCellContainer>
+  )
+
+};
+
 
 export const TableSelectContainer = styled.button`
   ${({ theme }) => css`
