@@ -416,6 +416,7 @@ class NodeService {
     },
     extraContent: string | null,
   ) => {
+    // TODO: Add sliderNode when a new sliderNode is created (doesn't happen now because only root slider node)
     const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
     const videoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = extraContent ? { create: { videoUrl: extraContent } } : undefined;
     const newQuestion = await prisma.questionNode.create({
