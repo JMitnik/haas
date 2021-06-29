@@ -1291,6 +1291,30 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de:
         'Die Auswahl dieser Frage definiert, welche potenzielle Antwort ein Besucher geben kann. Darüber hinaus ist es auch möglich, optional eine Handlungsaufforderung mit der vom Benutzer ausgewählten Option zu verbinden. Hinweis: Wenn eine Handlungsaufforderung weiter unten auf der Reise eingerichtet wird, wird diese überschrieben.',
     },
+    satisfaction_texts: {
+      en: 'Satisfaction texts',
+      de: 'Satisfaction texts',
+    },
+    satisfaction_texts_helper: {
+      en: 'Satisfaction texts are the texts shown on both sides of the slider. You can edit the relevant texts, or leave them as we defined originally. ',
+      de: 'Legen Sie die Zufriedenheitstexte fest, die auf beiden Seiten des Schiebereglers angezeigt werden',
+    },
+    happyText: {
+      en: 'Happy text',
+      de: 'Fröhlicher Text',
+    },
+    happyText_helper: {
+      en: 'What will be the text on the right side of the slider indicating a very satisfied user?',
+      de: 'Welcher Text auf der rechten Seite des Schiebereglers weist auf einen sehr zufriedenen Benutzer hin?',
+    },
+    unhappyText: {
+      en: 'Unhappy text',
+      de: 'Unglücklicher Text',
+    },
+    unhappyText_helper: {
+      en: 'What will be the text on the left side of the slider indicating a very dissatisfied user?',
+      de: 'Welcher Text auf der linken Seite des Schiebereglers weist auf einen sehr unzufriedenen Benutzer hin?',
+    },
     markers: {
       en: 'Markers',
       de: 'Marker',

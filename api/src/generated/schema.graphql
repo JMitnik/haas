@@ -148,11 +148,13 @@ input CreateQuestionNodeInputType {
   dialogueSlug: String
   edgeCondition: EdgeConditionInputType
   extraContent: String
+  happyText: String
   optionEntries: OptionsInputType
   overrideLeafId: ID
   parentQuestionId: ID
   title: String
   type: String
+  unhappyText: String
 }
 
 input CreateTriggerInputType {
@@ -247,10 +249,6 @@ type CustomFieldType {
 
 """Date custom scalar type"""
 scalar Date
-
-type Debug {
-  debugResolver: String
-}
 
 input DeleteDialogueInputType {
   customerSlug: String
@@ -642,7 +640,6 @@ type Mutation {
   createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
-  debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!
@@ -1051,8 +1048,10 @@ type SliderNodeRangeType {
 }
 
 type SliderNodeType {
+  happyText: String
   id: ID
   markers: [SliderNodeMarkerType!]
+  unhappyText: String
 }
 
 """Details regarding interaction with social node"""
@@ -1188,12 +1187,14 @@ input UpdateQuestionNodeInputType {
   edgeCondition: EdgeConditionInputType
   edgeId: ID
   extraContent: String
+  happyText: String
   id: ID!
   optionEntries: OptionsInputType
   overrideLeafId: ID
   sliderNode: SliderNodeInputType
   title: String
   type: String
+  unhappyText: String
 }
 
 """The `Upload` scalar type represents a file upload."""

@@ -179,6 +179,8 @@ export type CreateQuestionNodeInputType = {
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
   extraContent?: Maybe<Scalars['String']>;
+  unhappyText?: Maybe<Scalars['String']>;
+  happyText?: Maybe<Scalars['String']>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
@@ -1672,6 +1674,8 @@ export type UpdateQuestionNodeInputType = {
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
   extraContent?: Maybe<Scalars['String']>;
+  unhappyText?: Maybe<Scalars['String']>;
+  happyText?: Maybe<Scalars['String']>;
   sliderNode?: Maybe<SliderNodeInputType>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;

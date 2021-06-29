@@ -1,5 +1,8 @@
 import * as UI from '@haas/ui';
-import { useFieldArray } from 'react-hook-form';
+import { Controller, useFieldArray } from 'react-hook-form';
+import { FormControl, FormLabel, RadioButton } from '@haas/ui';
+import { FormErrorMessage, RadioButtonGroup } from '@chakra-ui/core';
+import { Frown, Smile, ThumbsDown, ThumbsUp, Type } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
@@ -17,10 +20,75 @@ const SliderNodeForm = ({ form }: { form: any }) => {
     keyName: 'fieldIndex',
   });
 
+  const hasCustomerSatisfactionTexts = form.watch('happyText') ? 1 : 0;
+
   const sliderNodeMarkers = form.watch('sliderNode.markers');
 
   return (
     <UI.Div>
+      <UI.InputGrid>
+        <UI.FormControl isRequired isInvalid={!!form.errors.videoEmbedded}>
+          <UI.FormLabel htmlFor="useCustomerSatisfactionTexts">
+            {t('dialogue:satisfaction_texts')}
+          </UI.FormLabel>
+          <UI.InputHelper>
+            {t('dialogue:satisfaction_texts_helper')}
+          </UI.InputHelper>
+          <Controller
+            control={form.control}
+            name="useCustomerSatisfactionTexts"
+            defaultValue={hasCustomerSatisfactionTexts}
+            render={({ onChange, value }) => (
+              <RadioButtonGroup
+                value={value}
+                isInline
+                onChange={onChange}
+                display="flex"
+              >
+                <RadioButton icon={ThumbsUp} value={1} text="Yes" description="Use custom texts" />
+                <RadioButton icon={ThumbsDown} value={0} text="No" description="Do not use customs text" />
+              </RadioButtonGroup>
+            )}
+          />
+          <FormErrorMessage>{form.errors.videoEmbedded?.message}</FormErrorMessage>
+        </UI.FormControl>
+        {form.watch('useCustomerSatisfactionTexts') === 1 && (
+        <>
+          <UI.FormControl isRequired isInvalid={!!form.errors.unhappyText}>
+            <UI.FormLabel htmlFor="unhappyText">
+              {t('dialogue:unhappyText')}
+            </UI.FormLabel>
+            <UI.InputHelper>
+              {t('dialogue:unhappyText_helper')}
+            </UI.InputHelper>
+            <UI.Input
+              name="unhappyText"
+              leftEl={<Frown />}
+              ref={form.register()}
+              defaultValue={undefined} // TODO: Add unhappy text default value
+            />
+            <FormErrorMessage>{form.errors.unhappyText?.message}</FormErrorMessage>
+          </UI.FormControl>
+
+          <UI.FormControl isRequired isInvalid={!!form.errors.happyText}>
+            <UI.FormLabel htmlFor="happyText">
+              {t('dialogue:happyText')}
+            </UI.FormLabel>
+            <UI.InputHelper>
+              {t('dialogue:happyText_helper')}
+            </UI.InputHelper>
+            <UI.Input
+              name="happyText"
+              leftEl={<Smile />}
+              ref={form.register()}
+              defaultValue={undefined} // TODO: Add unhappy text default value
+            />
+            <FormErrorMessage>{form.errors.happyText?.message}</FormErrorMessage>
+          </UI.FormControl>
+        </>
+        )}
+      </UI.InputGrid>
+
       <UI.InputHeader>{t('dialogue:markers')}</UI.InputHeader>
       <UI.InputHelper>
         {t('dialogue:markers_helper')}
