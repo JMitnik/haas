@@ -644,9 +644,9 @@ const language = {
       de: 'Eingebettete Video-ID',
     },
     video_embedded_helper: {
-      en: `What is the ID of the video you want to display at the question? 
+      en: `What is the ID of the video you want to display at the question?
 This ID can be found in the URL of the video. Currently only youtube is supported.`,
-      de: `Wie lautet die ID des Videos, das Sie anzeigen möchten? 
+      de: `Wie lautet die ID des Videos, das Sie anzeigen möchten?
 Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt.`,
     },
     max_value: {
@@ -1296,16 +1296,16 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Überschrift des Dialog-Finishers',
     },
     dialogue_finisher_heading_helper: {
-      en: 'What is the heading of the dialogue finisher. Leaving this one open will resort to the current default heading.',
-      de: 'Wie lautet die Überschrift des Dialog-Finishers. Wenn Sie diese geöffnet lassen, wird auf die aktuelle Standardüberschrift zurückgegriffen.',
+      en: 'What is the main heading at the top of the dialogue finish?',
+      de: 'Was ist die Hauptüberschrift an der Spitze des Dialogs?',
     },
     dialogue_finisher_subheading: {
       en: 'Dialogue finisher subheading',
       de: 'Zwischenüberschrift des Dialog-Finishers',
     },
     dialogue_finisher_subheading_helper: {
-      en: 'What is the subheading of the dialogue finisher. Leaving this one open will resort to the current default subheading.',
-      de: 'Was ist die Unterüberschrift des Dialogfinishers. Wenn Sie diese geöffnet lassen, wird auf die aktuelle Standardunterüberschrift zurückgegriffen.',
+      en: 'What is the sub-heading at the bottom of the dialogue finish?',
+      de: 'Was ist die Subüberschrift am Boden des Dialogs?',
     },
     dialogue_finisher: {
       en: 'Dialogue finisher',
@@ -1359,15 +1359,15 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
     about_choice_helper: {
       en: 'Define the different choices a user can select.',
-      de: 'Definieren Sie die verschiedenen Auswahlmöglichkeiten, die ein Benutzer auswählen kann',
+      de: 'Definieren Sie die verschiedenen Auswahlmöglichkeiten, die ein Benutzer auswählen kann.',
     },
     hide_fake_data: {
       en: 'Hide placeholder data',
       de: 'Ausblenden Platzhalter-Daten',
     },
     hide_fake_data_helper: {
-      en: 'Decide whether to use placeholder data in your analytics',
-      de: 'Entscheiden Sie, ob Platzhalterdaten in Ihrer Analyse verwendet werden sollen',
+      en: 'Decide whether to use placeholder data in your analytics.',
+      de: 'Entscheiden Sie, ob Platzhalterdaten in Ihrer Analyse verwendet werden sollen.',
     },
     do_hide_fake_data_helper: {
       en: "Don't include placeholder data in the analytics.",
@@ -1406,8 +1406,8 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Beschreibung',
     },
     about_helper: {
-      de: 'Beschreibe deinen Dialog',
-      en: 'Tell us about the dialogue',
+      en: 'General information about your dialogue, such as its general title, at what URL it can be found, and a readable description.',
+      de: 'Allgemeine Informationen zu Ihrem Dialog, z. B. seines allgemeinen Titels, in welcher URL ermittelt, und eine lesbare Beschreibung.',
     },
     title_helper: {
       en: 'What is the name of the dialogue?',
