@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
-  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { Link, PlusCircle, Trash, Type } from 'react-feather';
@@ -18,10 +18,9 @@ import cuid from 'cuid';
 
 import {
   Div, Flex, Form, FormContainer,
-  FormControl, FormLabel, FormSection, Grid, H4, Hr, Input, InputGrid, InputHelper, Span, Text
+  FormControl, FormLabel, FormSection, Grid, H4, Hr, Input, InputGrid, InputHelper, Span, Text,
 } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
-
 import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -135,7 +134,17 @@ const LINK_TYPES = [
   { label: 'WHATSAPP', value: 'WHATSAPP' },
 ];
 
-const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTAChange, onDeleteCTA, form: formNode }: CTAFormProps) => {
+const CTAForm = ({
+  id,
+  title,
+  type,
+  links,
+  share,
+  onActiveCTAChange,
+  onNewCTAChange,
+  onDeleteCTA,
+  form: formNode,
+}: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
   const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
 
@@ -254,7 +263,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
         linkTypes: activeLinks.map((link) => {
           const { id, ...linkData } = link;
           return { ...linkData, type: linkData.type?.value };
-        })
+        }),
       };
 
       addCTA({
