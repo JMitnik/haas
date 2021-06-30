@@ -329,6 +329,7 @@ type Dialogue {
   id: ID!
   isWithoutGenData: Boolean!
   leafs(searchTerm: String): [QuestionNode!]!
+  postLeafNode: DialogueFinisherObjectType
   publicTitle: String
   questions: [QuestionNode!]!
   rootQuestion: QuestionNode!
@@ -346,6 +347,12 @@ input DialogueFilterInputType {
   endDate: String
   searchTerm: String
   startDate: String
+}
+
+type DialogueFinisherObjectType {
+  header: String!
+  id: ID!
+  subtext: String!
 }
 
 type DialogueStatistics {
@@ -647,7 +654,7 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
-  editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editDialogue(customerSlug: String, description: String, dialogueFinisherHeading: String, dialogueFinisherSubheading: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!

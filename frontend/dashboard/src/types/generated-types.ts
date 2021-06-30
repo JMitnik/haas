@@ -390,6 +390,7 @@ export type Dialogue = {
   publicTitle?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
+  postLeafNode?: Maybe<DialogueFinisherObjectType>;
   averageScore: Scalars['Float'];
   statistics?: Maybe<DialogueStatistics>;
   sessionConnection?: Maybe<SessionConnection>;
@@ -432,6 +433,13 @@ export type DialogueFilterInputType = {
   searchTerm?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
+};
+
+export type DialogueFinisherObjectType = {
+  __typename?: 'DialogueFinisherObjectType';
+  id: Scalars['ID'];
+  header: Scalars['String'];
+  subtext: Scalars['String'];
 };
 
 export type DialogueStatistics = {
@@ -957,6 +965,8 @@ export type MutationEditDialogueArgs = {
   publicTitle?: Maybe<Scalars['String']>;
   isWithoutGenData?: Maybe<Scalars['Boolean']>;
   tags?: Maybe<TagsInputObjectType>;
+  dialogueFinisherHeading?: Maybe<Scalars['String']>;
+  dialogueFinisherSubheading?: Maybe<Scalars['String']>;
 };
 
 
@@ -1530,6 +1540,8 @@ export type SliderNodeRangeType = {
 export type SliderNodeType = {
   __typename?: 'SliderNodeType';
   id?: Maybe<Scalars['ID']>;
+  happyText?: Maybe<Scalars['String']>;
+  unhappyText?: Maybe<Scalars['String']>;
   markers?: Maybe<Array<SliderNodeMarkerType>>;
 };
 

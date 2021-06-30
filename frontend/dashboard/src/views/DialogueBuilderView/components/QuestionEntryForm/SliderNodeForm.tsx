@@ -27,7 +27,7 @@ const SliderNodeForm = ({ form }: { form: any }) => {
   return (
     <UI.Div>
       <UI.InputGrid>
-        <UI.FormControl isRequired isInvalid={!!form.errors.videoEmbedded}>
+        <UI.FormControl isRequired isInvalid={!!form.errors.useCustomerSatisfactionTexts}>
           <UI.FormLabel htmlFor="useCustomerSatisfactionTexts">
             {t('dialogue:satisfaction_texts')}
           </UI.FormLabel>
@@ -50,7 +50,7 @@ const SliderNodeForm = ({ form }: { form: any }) => {
               </RadioButtonGroup>
             )}
           />
-          <FormErrorMessage>{form.errors.videoEmbedded?.message}</FormErrorMessage>
+          <FormErrorMessage>{form.errors.useCustomerSatisfactionTexts?.message}</FormErrorMessage>
         </UI.FormControl>
         {form.watch('useCustomerSatisfactionTexts') === 1 && (
         <>

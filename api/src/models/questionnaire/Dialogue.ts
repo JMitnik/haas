@@ -88,6 +88,15 @@ export const DialogueFilterInputType = inputObjectType({
   },
 });
 
+export const DialogueFinisherType = objectType({
+  name: 'DialogueFinisherObjectType',
+  definition(t) {
+    t.id('id');
+    t.string('header');
+    t.string('subtext');
+  }
+})
+
 export const DialogueType = objectType({
   name: 'Dialogue',
 
@@ -101,9 +110,25 @@ export const DialogueType = objectType({
     t.boolean('isWithoutGenData');
     t.boolean('wasGeneratedWithGenData');
 
+
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+
+    t.field('postLeafNode', {
+      type: DialogueFinisherType,
+      nullable: true,
+      resolve(parent, args, ctx) {
+        if (!parent.postLeafNodeId) {
+          return null
+        };
+        return ctx.prisma.postLeafNode.findFirst({
+          where: {
+            id: parent.postLeafNodeId,
+          }
+        });
+      }
+    })
 
     t.field('averageScore', {
       type: 'Float',
@@ -441,6 +466,8 @@ export const DialogueMutations = extendType({
         publicTitle: 'String',
         isWithoutGenData: 'Boolean',
         tags: TagsInputType,
+        dialogueFinisherHeading: 'String',
+        dialogueFinisherSubheading: 'String',
       },
       resolve(parent, args) {
         return DialogueService.editDialogue(args);

@@ -1,6 +1,6 @@
 import { Instance, applySnapshot, getSnapshot, types } from 'mobx-state-tree';
 
-import { Dialogue } from 'types/generic';
+import { Dialogue, PostLeafNode } from 'types/generic';
 import { createDefaultPostLeafNode } from './Tree/TreeNodeModel';
 import CustomerModel, { CustomerModelProps } from './Customer/CustomerModel';
 import SessionModel from './Session/SessionModel';
@@ -50,6 +50,7 @@ const TreeStoreModel = types
           title: dialogue.title,
           publicTitle: dialogue.publicTitle,
           activeLeaf: defaultPostLeafNode.id,
+          dialogueFinisher: dialogue.postLeafNode || undefined,
         });
 
         self.tree.setInitialNodes(dialogue.questions);
@@ -129,6 +130,6 @@ const TreeStoreModel = types
     },
   }));
 
-export interface TreeStoreModelProps extends Instance<typeof TreeStoreModel>{}
+export interface TreeStoreModelProps extends Instance<typeof TreeStoreModel> { }
 
 export default TreeStoreModel;

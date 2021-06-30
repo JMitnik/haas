@@ -1,7 +1,10 @@
 import { Instance, types } from 'mobx-state-tree';
+import { PostLeafNode } from 'types/generic';
+
 import { SpecialEdge, TreeNodeModel, TreeNodeProps, createDefaultPostLeafNode } from './TreeNodeModel';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 import { TreeNodeOptionProps } from './TreeNodeOptionModel';
+import TreeDialogueFinisherModel from './TreeDialogueFinisherModel';
 
 const TreeModel = types
   .model({
@@ -13,6 +16,7 @@ const TreeModel = types
     edges: types.array(TreeEdgeModel),
     leaves: types.array(TreeNodeModel),
     activeLeaf: types.reference(TreeNodeModel),
+    dialogueFinisher: types.maybe(TreeDialogueFinisherModel),
   })
   .actions((self) => ({
     /**
@@ -140,6 +144,6 @@ const TreeModel = types
     },
   }));
 
-export interface TreeModelProps extends Instance<typeof TreeModel>{}
+export interface TreeModelProps extends Instance<typeof TreeModel> { }
 
 export default TreeModel;

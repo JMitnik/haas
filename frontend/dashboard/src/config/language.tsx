@@ -1291,6 +1291,30 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de:
         'Die Auswahl dieser Frage definiert, welche potenzielle Antwort ein Besucher geben kann. Darüber hinaus ist es auch möglich, optional eine Handlungsaufforderung mit der vom Benutzer ausgewählten Option zu verbinden. Hinweis: Wenn eine Handlungsaufforderung weiter unten auf der Reise eingerichtet wird, wird diese überschrieben.',
     },
+    dialogue_finisher_heading: {
+      en: 'Dialogue finisher heading',
+      de: 'Überschrift des Dialog-Finishers',
+    },
+    dialogue_finisher_heading_helper: {
+      en: 'What is the heading of the dialogue finisher. Leaving this one open will resort to the current default heading.',
+      de: 'Wie lautet die Überschrift des Dialog-Finishers. Wenn Sie diese geöffnet lassen, wird auf die aktuelle Standardüberschrift zurückgegriffen.',
+    },
+    dialogue_finisher_subheading: {
+      en: 'Dialogue finisher subheading',
+      de: 'Zwischenüberschrift des Dialog-Finishers',
+    },
+    dialogue_finisher_subheading_helper: {
+      en: 'What is the subheading of the dialogue finisher. Leaving this one open will resort to the current default subheading.',
+      de: 'Was ist die Unterüberschrift des Dialogfinishers. Wenn Sie diese geöffnet lassen, wird auf die aktuelle Standardunterüberschrift zurückgegriffen.',
+    },
+    dialogue_finisher: {
+      en: 'Dialogue finisher',
+      de: 'Dialogue-Finisher',
+    },
+    dialogue_finisher_helper: {
+      en: 'The dialogue finisher is the very last page shown after finalizing a CTA. In this section you can adjust the heading and subheading of this page.',
+      de: 'Der Dialog-Finisher ist die letzte Seite, die nach dem Abschluss eines CTA angezeigt wird. In diesem Abschnitt können Sie die Überschrift und Unterüberschrift dieser Seite anpassen.',
+    },
     satisfaction_texts: {
       en: 'Satisfaction texts',
       de: 'Satisfaction texts',
