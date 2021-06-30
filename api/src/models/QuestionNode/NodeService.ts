@@ -534,7 +534,7 @@ class NodeService {
     const existingEdgeCondition = existingEdge?.conditions && existingEdge.conditions[0];
 
     try {
-      await NodeService.removeNonExistingQuestionOptions(existingOptions, options, questionId);
+      await NodeService.removeNonExistingQuestionOptions(existingOptions, options);
     } catch (e) {
       console.log('Something went wrong removing options: ', e);
     }
