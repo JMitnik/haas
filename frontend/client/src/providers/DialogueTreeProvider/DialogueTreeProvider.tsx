@@ -70,8 +70,6 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     },
   });
 
-  console.log(dialogueData?.customer.dialogue);
-
   // When dialogue changes, set initial nodes and initial edges
   useEffect(() => {
     if (customerData?.customer) {

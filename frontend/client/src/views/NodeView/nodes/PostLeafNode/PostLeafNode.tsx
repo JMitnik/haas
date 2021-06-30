@@ -8,8 +8,6 @@ import { PostLeafNodeContainer } from './PostLeafNodeStyles';
 const PostLeafNode = () => {
   const { store } = useDialogueTree();
 
-  console.log('dialogue finisher', store.tree?.dialogueFinisher);
-
   return (
     <PostLeafNodeContainer>
       <H2 color="white">{store.tree?.dialogueFinisher?.header || 'Thank you for participating!'}</H2>
@@ -25,7 +23,6 @@ const PostLeafNode = () => {
             <i>happier.</i>
           </H4>
         )}
-
     </PostLeafNodeContainer>
   );
 };

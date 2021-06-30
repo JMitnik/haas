@@ -105,7 +105,6 @@ class DialogueService {
     heading: string | null | undefined,
     subHeading: string | null | undefined,
   ): PostLeafNodeUpdateOneWithoutDialogueInput | undefined {
-    // Scenario #1 no post leaf and no headings
     if (!dbPostLeaf && !heading && !subHeading) {
       return undefined;
     } else if (dbPostLeaf && !heading && !subHeading) {
@@ -149,10 +148,7 @@ class DialogueService {
     });
     const dbDialogue = customer?.dialogues[0];
 
-    // handle post leaf node adjustments
-
-    const postLeafNode = DialogueService.updatePostLeafNode(dbDialogue?.postLeafNode, dialogueFinisherHeading, dialogueFinisherSubheading)
-    console.log('post leaf node: ', postLeafNode);
+    const postLeafNode = DialogueService.updatePostLeafNode(dbDialogue?.postLeafNode, dialogueFinisherHeading, dialogueFinisherSubheading);
 
     let updateDialogueArgs: DialogueUpdateInput = {
       title, description, publicTitle, isWithoutGenData, postLeafNode,

@@ -389,8 +389,6 @@ const DialogueBuilderQuestionForm = ({
     const unhappyText = formData.useCustomerSatisfactionTexts === 1 ? formData.unhappyText : null;
     const happyText = formData.useCustomerSatisfactionTexts === 1 ? formData.happyText : null;
 
-    console.log('VALUES: ', values);
-
     if (question.id !== '-1') {
       updateQuestion({
         variables: {

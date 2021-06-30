@@ -92,8 +92,6 @@ const EditDialogueView = () => {
 
   if (editDialogueData.loading || tagsLoading) return null;
 
-  console.log('edit dialogue data: ', editDialogueData?.data);
-
   const tagOptions: Array<{ label: string, value: string }> = tagsData?.tags && tagsData?.tags?.map((tag: any) => (
     { label: tag?.name, value: tag?.id }));
 
@@ -149,7 +147,6 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
     const tagIds = formData.tags?.map((tag) => tag?.value) || [];
     const tagEntries = { entries: tagIds };
 
-    console.log('FORM DATA: ', formData);
     // TODO: Ensure we can edit the dialogue slug (uneditable atm)
     editDialogue({
       variables: {
