@@ -722,6 +722,7 @@ type NodeEntryValue {
 input OptionInputType {
   id: Int
   overrideLeafId: String
+  position: Int!
   publicValue: String
   value: String
 }
@@ -885,6 +886,7 @@ input QuestionNodeWhereUniqueInput {
 type QuestionOption {
   id: Int!
   overrideLeaf: QuestionNode
+  position: Int
   publicValue: String
   questionId: String
   value: String!
