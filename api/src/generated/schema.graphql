@@ -250,6 +250,10 @@ type CustomFieldType {
 """Date custom scalar type"""
 scalar Date
 
+type Debug {
+  debugResolver: String
+}
+
 input DeleteDialogueInputType {
   customerSlug: String
   id: ID
@@ -647,6 +651,7 @@ type Mutation {
   createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
+  debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!
@@ -726,6 +731,7 @@ type NodeEntryValue {
 input OptionInputType {
   id: Int
   overrideLeafId: String
+  position: Int!
   publicValue: String
   value: String
 }
@@ -889,6 +895,7 @@ input QuestionNodeWhereUniqueInput {
 type QuestionOption {
   id: Int!
   overrideLeaf: QuestionNode
+  position: Int
   publicValue: String
   questionId: String
   value: String!

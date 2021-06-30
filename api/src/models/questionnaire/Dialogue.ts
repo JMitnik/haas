@@ -316,6 +316,9 @@ export const DialogueType = objectType({
                 fields: true,
               },
             },
+            options: {
+              orderBy: { position: 'asc' },
+            },
             sliderNode: {
               include: {
                 markers: {
@@ -327,6 +330,7 @@ export const DialogueType = objectType({
             },
           },
         });
+
         return questions;
       },
     });

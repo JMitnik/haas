@@ -1,0 +1,12 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "QuestionOption",
+      "field": "position",
+      "type": "Int",
+      "arity": "Optional"
+    }
+  ]
+}

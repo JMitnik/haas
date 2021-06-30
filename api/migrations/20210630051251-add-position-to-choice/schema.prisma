@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -79,33 +79,22 @@ model Tag {
   customerId String
 }
 
-model PostLeafNode {
-  id      String @id @default(cuid())
-  header  String
-  subtext String
-
-  Dialogue Dialogue[]
-}
-
 model Dialogue {
-  id             String         @id @default(cuid())
-  title          String
-  slug           String
-  description    String
-  creationDate   DateTime       @default(now())
-  updatedAt      DateTime?      @updatedAt
-  publicTitle    String?
-  customerId     String
-  postLeafNodeId String?
-  customer       Customer       @relation(fields: [customerId], references: [id])
-  edges          Edge[]
-  questions      QuestionNode[]
-  sessions       Session[]
-  tags           Tag[]
-  postLeafNode   PostLeafNode?  @relation(fields: [postLeafNodeId], references: [id])
-
-  isOnline         Boolean @default(value: false)
-  isWithoutGenData Boolean @default(value: false)
+  id               String         @id @default(cuid())
+  title            String
+  slug             String
+  description      String
+  creationDate     DateTime       @default(now())
+  updatedAt        DateTime?      @updatedAt
+  publicTitle      String?
+  customerId       String
+  customer         Customer       @relation(fields: [customerId], references: [id])
+  edges            Edge[]
+  questions        QuestionNode[]
+  sessions         Session[]
+  tags             Tag[]
+  isOnline         Boolean        @default(value: false)
+  isWithoutGenData Boolean        @default(value: false)
 
   endScreenText String?
 
@@ -198,11 +187,10 @@ model SliderNodeMarker {
 }
 
 model SliderNode {
-  id               String             @id @default(cuid())
-  markers          SliderNodeMarker[]
-  QuestionNode     QuestionNode[]
-  unhappyText      String?
-  happyText        String?
+  id           String             @id @default(cuid())
+  markers      SliderNodeMarker[]
+  QuestionNode QuestionNode[]
+
   earlyReleaseText String?
 }
 
