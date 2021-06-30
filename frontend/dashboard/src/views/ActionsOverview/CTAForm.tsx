@@ -132,6 +132,7 @@ const LINK_TYPES = [
   { label: 'INSTAGRAM', value: 'INSTAGRAM' },
   { label: 'LINKEDIN', value: 'LINKEDIN' },
   { label: 'TWITTER', value: 'TWITTER' },
+  { label: 'WHATSAPP', value: 'WHATSAPP' },
 ];
 
 const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTAChange, onDeleteCTA, form: formNode }: CTAFormProps) => {
