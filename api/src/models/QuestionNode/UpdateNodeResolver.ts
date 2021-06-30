@@ -1,7 +1,7 @@
 import { inputObjectType, mutationField } from "@nexus/schema";
 import { NodeType } from "@prisma/client";
 import { UserInputError } from "apollo-server";
-import { NexusGenFieldTypes, NexusGenInputNames, NexusGenInputs } from "../../generated/nexus";
+import { NexusGenInputs } from "../../generated/nexus";
 
 import NodeService from "./NodeService";
 import { EdgeConditionInputType, OptionsInputType, QuestionNodeType, SliderNodeInputType } from "./QuestionNode";
@@ -30,12 +30,12 @@ export const validateUpdateQuestion = (input: NexusGenInputs['UpdateQuestionNode
   if (!input?.id) throw new UserInputError('No ID provided');
   if (!input?.title) throw new UserInputError('No title provided');
   if (!input?.type) throw new UserInputError('Type is invalid or not given');
-}
+};
 
 export const UpdateQuestionNode = mutationField('updateQuestion', {
   type: QuestionNodeType,
   args: { input: UpdateQuestionNodeInputType },
-  
+
   resolve(parent, args) {
     if (!args?.input) throw new UserInputError('No input provided');
     validateUpdateQuestion(args.input);
@@ -52,4 +52,4 @@ export const UpdateQuestionNode = mutationField('updateQuestion', {
       args.input.extraContent,
     );
   },
-})
+});

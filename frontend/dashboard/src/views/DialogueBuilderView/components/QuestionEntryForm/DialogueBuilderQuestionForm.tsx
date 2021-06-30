@@ -176,6 +176,8 @@ const DialogueBuilderQuestionForm = ({
       parentQuestionType,
       sliderNode,
       optionsFull: options.map((option) => ({
+        id: option.id,
+        position: option.position,
         value: option.value,
         publicValue: option.publicValue,
         overrideLeaf: {
@@ -393,11 +395,12 @@ const DialogueBuilderQuestionForm = ({
             title,
             type,
             optionEntries: {
-              options: values.optionsFull?.map((option) => ({
+              options: values.optionsFull?.map((option, index) => ({
                 id: option?.id,
                 value: option?.value,
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
+                position: index + 1,
               })),
             },
             edgeCondition,
@@ -426,11 +429,12 @@ const DialogueBuilderQuestionForm = ({
             overrideLeafId: overrideLeafId || 'None',
             parentQuestionId,
             optionEntries: {
-              options: values.optionsFull?.map((option) => ({
+              options: values.optionsFull?.map((option, index) => ({
                 id: option?.id,
                 value: option?.value,
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
+                position: index + 1,
               })),
             },
             edgeCondition,
