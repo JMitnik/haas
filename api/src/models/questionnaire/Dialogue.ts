@@ -95,7 +95,7 @@ export const DialogueFinisherType = objectType({
     t.string('header');
     t.string('subtext');
   }
-})
+});
 
 export const DialogueType = objectType({
   name: 'Dialogue',
@@ -109,7 +109,6 @@ export const DialogueType = objectType({
     // Placeholder data related properties
     t.boolean('isWithoutGenData');
     t.boolean('wasGeneratedWithGenData');
-
 
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
@@ -128,7 +127,7 @@ export const DialogueType = objectType({
           }
         });
       }
-    })
+    });
 
     t.field('averageScore', {
       type: 'Float',
@@ -462,6 +461,7 @@ export const DialogueMutations = extendType({
 
     t.field('editDialogue', {
       type: DialogueType,
+      // TODO: Move args to their own InputType
       args: {
         customerSlug: 'String',
         dialogueSlug: 'String',

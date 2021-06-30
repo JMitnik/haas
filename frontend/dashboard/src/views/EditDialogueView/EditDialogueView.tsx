@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Activity, Check, Edit, Minus, Plus, ThumbsUp, Type } from 'react-feather';
+import { Activity, Minus, Plus, Type } from 'react-feather';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -345,43 +345,47 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
             </FormSection>
 
             {dialogue.wasGeneratedWithGenData && (
-              <FormSection id="data">
-                <Div>
-                  <H3 color="default.text" fontWeight={500} pb={2}>{t('data')}</H3>
-                  <Muted color="gray.600">
-                    {t('dialogue:data_helper')}
-                  </Muted>
-                </Div>
-                <Div>
-                  <InputGrid gridTemplateColumns="1fr">
-                    <FormControl>
-                      <FormLabel>{t('dialogue:hide_fake_data')}</FormLabel>
-                      <InputHelper>{t('dialogue:hide_fake_data_helper')}</InputHelper>
-                      <Controller
-                        name="isWithoutGenData"
-                        control={form.control}
-                        render={({ onChange, onBlur, value }) => (
-                          <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
-                            <RadioButton
-                              icon={Minus}
-                              value={1}
-                              mr={2}
-                              text={(t('dialogue:hide_fake_data'))}
-                              description={t('dialogue:do_hide_fake_data_helper')}
-                            />
-                            <RadioButton
-                              icon={Activity}
-                              value={0}
-                              text={(t('dialogue:no_hide_fake_data'))}
-                              description={t('dialogue:no_hide_fake_data_helper')}
-                            />
-                          </RadioButtonGroup>
-                        )}
-                      />
-                    </FormControl>
-                  </InputGrid>
-                </Div>
-              </FormSection>
+              <>
+                <Hr />
+
+                <FormSection id="data">
+                  <Div>
+                    <H3 color="default.text" fontWeight={500} pb={2}>{t('data')}</H3>
+                    <Muted color="gray.600">
+                      {t('dialogue:data_helper')}
+                    </Muted>
+                  </Div>
+                  <Div>
+                    <InputGrid gridTemplateColumns="1fr">
+                      <FormControl>
+                        <FormLabel>{t('dialogue:hide_fake_data')}</FormLabel>
+                        <InputHelper>{t('dialogue:hide_fake_data_helper')}</InputHelper>
+                        <Controller
+                          name="isWithoutGenData"
+                          control={form.control}
+                          render={({ onChange, onBlur, value }) => (
+                            <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
+                              <RadioButton
+                                icon={Minus}
+                                value={1}
+                                mr={2}
+                                text={(t('dialogue:hide_fake_data'))}
+                                description={t('dialogue:do_hide_fake_data_helper')}
+                              />
+                              <RadioButton
+                                icon={Activity}
+                                value={0}
+                                text={(t('dialogue:no_hide_fake_data'))}
+                                description={t('dialogue:no_hide_fake_data_helper')}
+                              />
+                            </RadioButtonGroup>
+                          )}
+                        />
+                      </FormControl>
+                    </InputGrid>
+                  </Div>
+                </FormSection>
+              </>
             )}
 
             <ButtonGroup>

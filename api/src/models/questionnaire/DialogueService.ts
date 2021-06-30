@@ -128,7 +128,17 @@ class DialogueService {
   }
 
   static editDialogue = async (args: any) => {
-    const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData, dialogueFinisherHeading, dialogueFinisherSubheading } = args;
+    const {
+      customerSlug,
+      dialogueSlug,
+      title,
+      description,
+      publicTitle,
+      tags,
+      isWithoutGenData,
+      dialogueFinisherHeading,
+      dialogueFinisherSubheading
+    } = args;
 
     const customer = await prisma.customer.findOne({
       where: {
@@ -148,7 +158,11 @@ class DialogueService {
     });
     const dbDialogue = customer?.dialogues[0];
 
-    const postLeafNode = DialogueService.updatePostLeafNode(dbDialogue?.postLeafNode, dialogueFinisherHeading, dialogueFinisherSubheading);
+    const postLeafNode = DialogueService.updatePostLeafNode(
+      dbDialogue?.postLeafNode,
+      dialogueFinisherHeading,
+      dialogueFinisherSubheading
+    );
 
     let updateDialogueArgs: DialogueUpdateInput = {
       title, description, publicTitle, isWithoutGenData, postLeafNode,

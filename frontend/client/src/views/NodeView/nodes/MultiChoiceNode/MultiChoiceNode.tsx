@@ -39,7 +39,7 @@ const multiChoiceItemAnimation: Variants = {
 };
 
 const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
-  const { store } = useDialogueTree();
+  useDialogueTree();
   const handleSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
     const entry: SessionEntryDataProps = {
       choice: { value: multiChoiceOption.value },

@@ -1,6 +1,7 @@
 import { Instance, applySnapshot, getSnapshot, types } from 'mobx-state-tree';
 
-import { Dialogue, PostLeafNode } from 'types/generic';
+import { Dialogue } from 'types/generic';
+
 import { createDefaultPostLeafNode } from './Tree/TreeNodeModel';
 import CustomerModel, { CustomerModelProps } from './Customer/CustomerModel';
 import SessionModel from './Session/SessionModel';
@@ -68,7 +69,8 @@ const TreeStoreModel = types
         self.hasStarted = true;
       },
       /**
-       * Reach the final state: dont store anymore session information, and if user goes "back", it bring them back to the start
+       * Reach the final state: dont store anymore session information, and if user goes "back",
+       * it bring them back to the start
        */
       finalize: () => {
         self.session.reset();
@@ -125,7 +127,7 @@ const TreeStoreModel = types
       }
 
       result.reverse();
-      const resultWithDepth = result.map((result, index) => ({ ...result, depth: index }));
+      const resultWithDepth = result.map((resultItem, index) => ({ ...resultItem, depth: index }));
       return resultWithDepth;
     },
   }));
