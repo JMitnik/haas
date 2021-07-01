@@ -8,12 +8,12 @@ export interface HAASNodeConditions {
 }
 
 export type HAASQuestionType =
-| 'SLIDER'
-| 'CHOICE'
-| 'TEXTBOX'
-| 'LINK'
-| 'REGISTRATION'
-| 'FINISH';
+  | 'SLIDER'
+  | 'CHOICE'
+  | 'TEXTBOX'
+  | 'LINK'
+  | 'REGISTRATION'
+  | 'FINISH';
 
 export interface MultiChoiceOption {
   value: string;
@@ -65,6 +65,7 @@ export interface Dialogue {
   slug: string;
   title: string;
   publicTitle: string;
+  language: string;
   questions: TreeNodeProps[];
   edges: TreeEdgeProps[];
   leafs: TreeNodeProps[];

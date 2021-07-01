@@ -9,6 +9,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { GenericNodeProps } from '../types';
+import { useTranslation } from 'react-i18next';
 
 type FormNodeProps = GenericNodeProps;
 
@@ -18,7 +19,7 @@ interface FormNodeFormProps {
   }[]
 }
 
-const mapFieldType: {[key: string]: string} = {
+const mapFieldType: { [key: string]: string } = {
   email: 'email',
   number: 'number',
   phoneNumber: 'tel',
@@ -55,6 +56,7 @@ const getFieldValue = (field: any, relatedField: any) => {
 };
 
 const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
+  const { t } = useTranslation();
   const { register, getValues, formState } = useForm<FormNodeFormProps>({
     mode: 'onChange',
     reValidateMode: 'onChange',
@@ -130,7 +132,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                     Submit
                   </ClientButton>
                   <UI.Button size="sm" variant="ghost" onClick={(e) => handleSubmit(e)}>
-                    Do not share
+                    {t('do_not_share')}
                   </UI.Button>
                 </UI.Flex>
               </UI.Div>
