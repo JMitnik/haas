@@ -95,7 +95,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
             fontSize="1.2rem"
             mb={2}
           >
-            Leave your details
+            {t('leave_your_details')}
           </UI.Text>
           <UI.Hr />
           <UI.Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { handleSubmit(e); return false; }}>
@@ -129,7 +129,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                     isDisabled={!isValid}
                     isActive={isValid}
                   >
-                    Submit
+                    {t('submit')}
                   </ClientButton>
                   <UI.Button size="sm" variant="ghost" onClick={(e) => handleSubmit(e)}>
                     {t('do_not_share')}
