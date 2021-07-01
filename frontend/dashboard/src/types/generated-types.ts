@@ -973,12 +973,9 @@ export type MutationEditDialogueArgs = {
   publicTitle?: Maybe<Scalars['String']>;
   isWithoutGenData?: Maybe<Scalars['Boolean']>;
   tags?: Maybe<TagsInputObjectType>;
-<<<<<<< HEAD
   language?: Maybe<LanguageEnumType>;
-=======
   dialogueFinisherHeading?: Maybe<Scalars['String']>;
   dialogueFinisherSubheading?: Maybe<Scalars['String']>;
->>>>>>> dev
 };
 
 
@@ -1090,6 +1087,7 @@ export type OptionInputType = {
   value?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
   overrideLeafId?: Maybe<Scalars['String']>;
+  position: Scalars['Int'];
 };
 
 export type OptionsInputType = {
@@ -1378,6 +1376,7 @@ export type QuestionOption = {
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
+  position?: Maybe<Scalars['Int']>;
 };
 
 export type RecipientsInputType = {
