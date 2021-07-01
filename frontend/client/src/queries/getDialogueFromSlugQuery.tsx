@@ -14,6 +14,10 @@ const getDialogueFromSlug = gql`
         publicTitle
         creationDate
         updatedAt
+        postLeafNode {
+          header
+          subtext
+        }
         leafs {
           id
           title

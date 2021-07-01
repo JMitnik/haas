@@ -1,15 +1,16 @@
+import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Activity, Minus, Plus, Type } from 'react-feather';
-import { gql } from '@apollo/client';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel, FormSection,
-  H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, RadioButton, Textarea
+  H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, RadioButton, Textarea,
 } from '@haas/ui';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/client';
+
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
@@ -40,7 +41,10 @@ const getEditDialogueQuery = gql`
         description
         isWithoutGenData
         wasGeneratedWithGenData
-        
+        postLeafNode {
+          header
+          subtext
+        }
         tags {
           id
           name
@@ -58,6 +62,8 @@ interface FormDataProps {
   slug: string;
   tags: Array<{ label: string, value: string }>;
   isWithoutGenData: number;
+  postLeafHeading: string | null | undefined;
+  postLeafSubheading: string | null | undefined;
 }
 
 const schema = yup.object().shape({
@@ -113,6 +119,8 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
       isWithoutGenData: boolToInt(dialogue.isWithoutGenData || false),
       publicTitle: dialogue.publicTitle,
       slug: dialogue.slug,
+      postLeafHeading: dialogue.postLeafNode?.header,
+      postLeafSubheading: dialogue.postLeafNode?.subtext,
     },
   });
 
@@ -126,7 +134,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
       query: getQuestionnairesCustomerQuery,
       variables: {
         customerSlug,
-      }
+      },
     }],
     onError: (serverError: any) => {
       console.log(serverError);
@@ -149,6 +157,8 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
         description: formData.description,
         tags: tagEntries,
         isWithoutGenData: intToBool(formData.isWithoutGenData),
+        dialogueFinisherHeading: formData.postLeafHeading,
+        dialogueFinisherSubheading: formData.postLeafSubheading,
       },
     });
   };
@@ -230,7 +240,52 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                     />
                     <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
                   </FormControl>
+                </InputGrid>
+              </Div>
+            </FormSection>
 
+            <Hr />
+
+            <FormSection>
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:dialogue_finisher')}</H3>
+                <Muted color="gray.600">
+                  {t('dialogue:dialogue_finisher_helper')}
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid>
+                  <UI.FormControl isInvalid={!!form.errors.postLeafHeading}>
+                    <UI.FormLabel htmlFor="postLeafHeading">
+                      {t('dialogue:finisher_heading')}
+                    </UI.FormLabel>
+                    <UI.InputHelper>
+                      {t('dialogue:finisher_heading_helper')}
+                    </UI.InputHelper>
+                    <UI.Input
+                      name="postLeafHeading"
+                      leftEl={<Type />}
+                      ref={form.register()}
+                      placeholder="Thank you for participating!"
+                    />
+                    <FormErrorMessage>{form.errors.postLeafHeading?.message}</FormErrorMessage>
+                  </UI.FormControl>
+
+                  <UI.FormControl isInvalid={!!form.errors.postLeafSubheading}>
+                    <UI.FormLabel htmlFor="postLeafSubheading">
+                      {t('dialogue:finisher_subheading')}
+                    </UI.FormLabel>
+                    <UI.InputHelper>
+                      {t('dialogue:finisher_subheading_helper')}
+                    </UI.InputHelper>
+                    <UI.Input
+                      name="postLeafSubheading"
+                      leftEl={<Type />}
+                      placeholder="We will strive towards making you happier."
+                      ref={form.register()}
+                    />
+                    <FormErrorMessage>{form.errors.postLeafSubheading?.message}</FormErrorMessage>
+                  </UI.FormControl>
                 </InputGrid>
               </Div>
             </FormSection>
@@ -290,43 +345,47 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
             </FormSection>
 
             {dialogue.wasGeneratedWithGenData && (
-              <FormSection id="data">
-                <Div>
-                  <H3 color="default.text" fontWeight={500} pb={2}>{t('data')}</H3>
-                  <Muted color="gray.600">
-                    {t('dialogue:data_helper')}
-                  </Muted>
-                </Div>
-                <Div>
-                  <InputGrid gridTemplateColumns="1fr">
-                    <FormControl>
-                      <FormLabel>{t('dialogue:hide_fake_data')}</FormLabel>
-                      <InputHelper>{t('dialogue:hide_fake_data_helper')}</InputHelper>
-                      <Controller
-                        name="isWithoutGenData"
-                        control={form.control}
-                        render={({ onChange, onBlur, value }) => (
-                          <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
-                            <RadioButton
-                              icon={Minus}
-                              value={1}
-                              mr={2}
-                              text={(t('dialogue:hide_fake_data'))}
-                              description={t('dialogue:do_hide_fake_data_helper')}
-                            />
-                            <RadioButton
-                              icon={Activity}
-                              value={0}
-                              text={(t('dialogue:no_hide_fake_data'))}
-                              description={t('dialogue:no_hide_fake_data_helper')}
-                            />
-                          </RadioButtonGroup>
-                        )}
-                      />
-                    </FormControl>
-                  </InputGrid>
-                </Div>
-              </FormSection>
+              <>
+                <Hr />
+
+                <FormSection id="data">
+                  <Div>
+                    <H3 color="default.text" fontWeight={500} pb={2}>{t('data')}</H3>
+                    <Muted color="gray.600">
+                      {t('dialogue:data_helper')}
+                    </Muted>
+                  </Div>
+                  <Div>
+                    <InputGrid gridTemplateColumns="1fr">
+                      <FormControl>
+                        <FormLabel>{t('dialogue:hide_fake_data')}</FormLabel>
+                        <InputHelper>{t('dialogue:hide_fake_data_helper')}</InputHelper>
+                        <Controller
+                          name="isWithoutGenData"
+                          control={form.control}
+                          render={({ onChange, onBlur, value }) => (
+                            <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
+                              <RadioButton
+                                icon={Minus}
+                                value={1}
+                                mr={2}
+                                text={(t('dialogue:hide_fake_data'))}
+                                description={t('dialogue:do_hide_fake_data_helper')}
+                              />
+                              <RadioButton
+                                icon={Activity}
+                                value={0}
+                                text={(t('dialogue:no_hide_fake_data'))}
+                                description={t('dialogue:no_hide_fake_data_helper')}
+                              />
+                            </RadioButtonGroup>
+                          )}
+                        />
+                      </FormControl>
+                    </InputGrid>
+                  </Div>
+                </FormSection>
+              </>
             )}
 
             <ButtonGroup>

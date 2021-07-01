@@ -73,14 +73,14 @@ const QuestionSection = ({
   return (
     <Flex data-cy="QuestionSection" paddingTop="10px" paddingBottom="10px" flexDirection="column" paddingLeft={`${depth * 10}px`}>
       {depth > 1 && index === 0 && (
-      <Flex marginBottom="15px" alignItems="center">
-        <SplitArrowIcon />
-        <DepthSpan fontSize="0.9em">
-          {t('depth')}
-          {' '}
-          {depth}
-        </DepthSpan>
-      </Flex>
+        <Flex marginBottom="15px" alignItems="center">
+          <SplitArrowIcon />
+          <DepthSpan fontSize="0.9em">
+            {t('depth')}
+            {' '}
+            {depth}
+          </DepthSpan>
+        </Flex>
       )}
 
       <QuestionEntry
@@ -158,7 +158,7 @@ const QuestionSection = ({
             index={0}
             questionsQ={questionsQ}
             question={{
-              id: '-1', title: '', icon: Icon, isRoot: false, isLeaf: false, type: 'Multi-Choice', extraContent: '',
+              id: '-1', title: '', icon: Icon, isRoot: false, isLeaf: false, type: 'Choice', extraContent: '',
             }}
             Icon={Icon}
             leafs={leafs}

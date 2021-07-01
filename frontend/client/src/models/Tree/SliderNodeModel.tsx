@@ -3,6 +3,8 @@ import SliderNodeMarkersModel from './SliderNodeMarkersModel';
 
 const SliderNodeModel = types
   .model({
+    happyText: types.maybeNull(types.string),
+    unhappyText: types.maybeNull(types.string),
     markers: types.array(SliderNodeMarkersModel),
   });
 

@@ -15,6 +15,8 @@ const QuestionFragment = gql`
       title
     }
     sliderNode {
+      happyText
+      unhappyText
       markers {
         id
         label

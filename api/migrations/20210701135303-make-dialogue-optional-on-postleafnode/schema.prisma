@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -84,7 +84,7 @@ model PostLeafNode {
   header  String
   subtext String
 
-  dialogue Dialogue?
+  Dialogue Dialogue?
 }
 
 model Dialogue {

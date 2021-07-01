@@ -18,6 +18,8 @@ export const UpdateQuestionNodeInputType = inputObjectType({
     t.string('title');
     t.string('type');
     t.string('extraContent');
+    t.string('unhappyText');
+    t.string('happyText');
 
     t.field('sliderNode', { type: SliderNodeInputType });
 
@@ -50,6 +52,8 @@ export const UpdateQuestionNode = mutationField('updateQuestion', {
       args.input.edgeCondition as any,
       args.input.sliderNode as any,
       args.input.extraContent,
+      args.input.happyText,
+      args.input.unhappyText,
     );
   },
 });

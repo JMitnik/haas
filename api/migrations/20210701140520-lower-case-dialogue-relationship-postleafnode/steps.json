@@ -1,0 +1,17 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "PostLeafNode",
+      "field": "dialogue",
+      "type": "Dialogue",
+      "arity": "Optional"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "PostLeafNode",
+      "field": "Dialogue"
+    }
+  ]
+}

@@ -166,6 +166,9 @@ export const SliderNodeType = objectType({
 
   definition(t) {
     t.id('id', { nullable: true });
+    t.string('happyText', { nullable: true });
+    t.string('unhappyText', { nullable:  true });
+
     t.list.field('markers', {
       type: SliderNodeMarkerType,
       nullable: true,
@@ -452,6 +455,8 @@ export const CreateQuestionNodeInputType = inputObjectType({
     t.string('title');
     t.string('type');
     t.string('extraContent', { nullable: true });
+    t.string('unhappyText');
+    t.string('happyText');
 
     t.field('optionEntries', { type: OptionsInputType });
     t.field('edgeCondition', { type: EdgeConditionInputType });
