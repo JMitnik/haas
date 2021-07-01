@@ -773,8 +773,6 @@ class DialogueService {
       throw new Error(`Customer not found with slug ${input.customerSlug}`);
     }
 
-    console.log('content type: ', input.contentType);
-
     // TODO: Rename seeddialogue to something like createFromTemplate, add to slug a -1 iterator
     if (input.contentType === 'SEED' && customer?.name) {
       return DialogueService.seedQuestionnare(

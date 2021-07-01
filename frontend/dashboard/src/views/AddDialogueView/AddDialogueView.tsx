@@ -154,7 +154,7 @@ const AddDialogueView = () => {
     const tagIds = activeTags.map((tag) => tag?.value);
     const tagEntries = { entries: tagIds };
     const language = formData.languageOption.value;
-    console.log('FORM DATA DIALOGUE: ', formData);
+
     addDialogue({
       variables: {
         input: {
