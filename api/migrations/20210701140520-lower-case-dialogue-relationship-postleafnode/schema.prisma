@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -79,12 +79,6 @@ model Tag {
   customerId String
 }
 
-enum LanguageEnum {
-  DUTCH
-  GERMAN
-  ENGLISH
-}
-
 model PostLeafNode {
   id      String @id @default(cuid())
   header  String
@@ -109,7 +103,6 @@ model Dialogue {
   sessions       Session[]
   tags           Tag[]
   postLeafNode   PostLeafNode?  @relation(fields: [postLeafNodeId], references: [id])
-  language       LanguageEnum   @default(ENGLISH)
 
   isOnline         Boolean @default(value: false)
   isWithoutGenData Boolean @default(value: false)
@@ -645,7 +638,7 @@ model CreateWorkspaceJob {
   requiresRembg           Boolean            @default(true)
   requiresScreenshot      Boolean            @default(true)
   requiresColorExtraction Boolean            @default(true)
-  Job                     Job?
+  Job                     Job
   processLocation         JobProcessLocation @relation(fields: [jobProcessLocationId], references: [id])
   jobProcessLocationId    String
 }

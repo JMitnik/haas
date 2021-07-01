@@ -15,6 +15,11 @@ export type HAASQuestionType =
   | 'REGISTRATION'
   | 'FINISH';
 
+export interface PostLeafNode {
+  header: string;
+  subtext: string;
+}
+
 export interface MultiChoiceOption {
   value: string;
   publicValue?: string;
@@ -70,6 +75,7 @@ export interface Dialogue {
   edges: TreeEdgeProps[];
   leafs: TreeNodeProps[];
   rootQuestion: TreeNodeProps;
+  postLeafNode: PostLeafNode | null;
 }
 
 interface DialogueContextProps {

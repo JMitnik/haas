@@ -56,6 +56,9 @@ interface FormDataProps {
   };
   options: string[];
   optionsFull: any[];
+  unhappyText: string;
+  happyText: string;
+  useCustomerSatisfactionTexts: number;
 }
 
 const isChoiceType = (questionType: string) => {
@@ -175,6 +178,8 @@ const DialogueBuilderQuestionForm = ({
     defaultValues: {
       parentQuestionType,
       sliderNode,
+      unhappyText: question.sliderNode?.unhappyText,
+      happyText: question.sliderNode?.happyText,
       optionsFull: options.map((option) => ({
         id: option.id,
         position: option.position,
@@ -383,11 +388,16 @@ const DialogueBuilderQuestionForm = ({
     const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
     const values = form.getValues();
 
+    const unhappyText = formData.useCustomerSatisfactionTexts === 1 ? formData.unhappyText : null;
+    const happyText = formData.useCustomerSatisfactionTexts === 1 ? formData.happyText : null;
+
     if (question.id !== '-1') {
       updateQuestion({
         variables: {
           input: {
             id,
+            unhappyText,
+            happyText,
             extraContent: formData.videoEmbedded,
             customerId: activeCustomer?.id,
             overrideLeafId: overrideLeafId || '',
@@ -425,6 +435,8 @@ const DialogueBuilderQuestionForm = ({
             dialogueSlug,
             title,
             type,
+            unhappyText,
+            happyText,
             extraContent: formData.videoEmbedded,
             overrideLeafId: overrideLeafId || 'None',
             parentQuestionId,

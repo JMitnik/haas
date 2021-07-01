@@ -7,6 +7,8 @@ import {
   Dialogue, DialogueCreateInput, DialogueUpdateInput,
   LanguageEnum,
   NodeType,
+  PostLeafNode,
+  PostLeafNodeUpdateOneWithoutDialogueInput,
   QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
@@ -101,8 +103,46 @@ class DialogueService {
     return updateDialogueArgs;
   };
 
+  static updatePostLeafNode(
+    dbPostLeaf: PostLeafNode | null | undefined,
+    heading: string | null | undefined,
+    subHeading: string | null | undefined,
+  ): PostLeafNodeUpdateOneWithoutDialogueInput | undefined {
+    if (!dbPostLeaf && !heading && !subHeading) {
+      return undefined;
+    } else if (dbPostLeaf && !heading && !subHeading) {
+      return { disconnect: true };
+    } else if (dbPostLeaf && (heading || subHeading)) {
+      return {
+        update: {
+          header: heading || '',
+          subtext: subHeading || '',
+        }
+      };
+    } else if (!dbPostLeaf && (heading || subHeading)) {
+      return {
+        create: {
+          header: heading || '',
+          subtext: subHeading || '',
+        }
+      }
+    }
+    return undefined;
+  }
+
   static editDialogue = async (args: any) => {
-    const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData, language } = args;
+    const {
+      customerSlug,
+      dialogueSlug,
+      title,
+      description,
+      publicTitle,
+      tags,
+      isWithoutGenData,
+      dialogueFinisherHeading,
+      dialogueFinisherSubheading,
+      language
+    } = args;
 
     const customer = await prisma.customer.findOne({
       where: {
@@ -115,13 +155,22 @@ class DialogueService {
           },
           include: {
             tags: true,
+            postLeafNode: true,
           },
         },
       },
     });
     const dbDialogue = customer?.dialogues[0];
 
-    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle, isWithoutGenData, language };
+    const postLeafNode = DialogueService.updatePostLeafNode(
+      dbDialogue?.postLeafNode,
+      dialogueFinisherHeading,
+      dialogueFinisherSubheading
+    );
+
+    let updateDialogueArgs: DialogueUpdateInput = {
+      title, description, publicTitle, isWithoutGenData, postLeafNode, language
+    };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
     }

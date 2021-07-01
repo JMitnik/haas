@@ -149,11 +149,13 @@ input CreateQuestionNodeInputType {
   dialogueSlug: String
   edgeCondition: EdgeConditionInputType
   extraContent: String
+  happyText: String
   optionEntries: OptionsInputType
   overrideLeafId: ID
   parentQuestionId: ID
   title: String
   type: String
+  unhappyText: String
 }
 
 input CreateTriggerInputType {
@@ -329,6 +331,7 @@ type Dialogue {
   isWithoutGenData: Boolean!
   language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
+  postLeafNode: DialogueFinisherObjectType
   publicTitle: String
   questions: [QuestionNode!]!
   rootQuestion: QuestionNode!
@@ -346,6 +349,12 @@ input DialogueFilterInputType {
   endDate: String
   searchTerm: String
   startDate: String
+}
+
+type DialogueFinisherObjectType {
+  header: String!
+  id: ID!
+  subtext: String!
 }
 
 type DialogueStatistics {
@@ -653,7 +662,7 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
-  editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, language: LanguageEnumType, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editDialogue(customerSlug: String, description: String, dialogueFinisherHeading: String, dialogueFinisherSubheading: String, dialogueSlug: String, isWithoutGenData: Boolean, language: LanguageEnumType, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
@@ -1056,8 +1065,10 @@ type SliderNodeRangeType {
 }
 
 type SliderNodeType {
+  happyText: String
   id: ID
   markers: [SliderNodeMarkerType!]
+  unhappyText: String
 }
 
 """Details regarding interaction with social node"""
@@ -1193,12 +1204,14 @@ input UpdateQuestionNodeInputType {
   edgeCondition: EdgeConditionInputType
   edgeId: ID
   extraContent: String
+  happyText: String
   id: ID!
   optionEntries: OptionsInputType
   overrideLeafId: ID
   sliderNode: SliderNodeInputType
   title: String
   type: String
+  unhappyText: String
 }
 
 """The `Upload` scalar type represents a file upload."""

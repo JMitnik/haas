@@ -427,6 +427,7 @@ class NodeService {
     },
     extraContent: string | null,
   ) => {
+    // TODO: Add sliderNode when a new sliderNode is created (doesn't happen now because only root slider node)
     const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
     const videoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = extraContent ? {
       create: { videoUrl: extraContent }
@@ -500,6 +501,8 @@ class NodeService {
     },
     sliderNode: NexusGenInputs['SliderNodeInputType'],
     extraContent: string | null | undefined,
+    happyText: string | null | undefined,
+    unhappyText: string | null | undefined,
   ) => {
     const existingQuestion = await prisma.questionNode.findOne({
       where: { id: questionId },
@@ -610,6 +613,8 @@ class NodeService {
         await prisma.sliderNode.update({
           where: { id: updatedNode.sliderNodeId },
           data: {
+            happyText: happyText || null,
+            unhappyText: unhappyText || null,
             markers: {
               update: sliderNode?.markers?.map((marker) => ({
                 where: { id: marker?.id || undefined },
@@ -624,6 +629,8 @@ class NodeService {
       } else {
         await prisma.sliderNode.create({
           data: {
+            happyText: happyText || null,
+            unhappyText: unhappyText || null,
             QuestionNode: {
               connect: { id: questionId },
             },
