@@ -163,6 +163,7 @@ export type CreateDialogueInputType = {
   templateDialogueId?: Maybe<Scalars['String']>;
   publicTitle?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
+  language?: Maybe<LanguageEnumType>;
 };
 
 export type CreateJobProcessLocationInput = {
@@ -385,6 +386,7 @@ export type Dialogue = {
   description: Scalars['String'];
   isWithoutGenData: Scalars['Boolean'];
   wasGeneratedWithGenData: Scalars['Boolean'];
+  language: LanguageEnumType;
   publicTitle?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
@@ -679,6 +681,12 @@ export enum JobStatusType {
   CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL'
 }
 
+export enum LanguageEnumType {
+  English = 'ENGLISH',
+  Dutch = 'DUTCH',
+  German = 'GERMAN'
+}
+
 export type LineChartDataType = {
   __typename?: 'lineChartDataType';
   x?: Maybe<Scalars['String']>;
@@ -955,6 +963,7 @@ export type MutationEditDialogueArgs = {
   publicTitle?: Maybe<Scalars['String']>;
   isWithoutGenData?: Maybe<Scalars['Boolean']>;
   tags?: Maybe<TagsInputObjectType>;
+  language?: Maybe<LanguageEnumType>;
 };
 
 

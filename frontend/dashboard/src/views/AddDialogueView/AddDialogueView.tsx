@@ -28,11 +28,20 @@ const DIALOGUE_CONTENT_TYPES = [
   { label: 'From other dialogue', value: 'TEMPLATE' },
 ];
 
+const LANGUAGE_OPTIONS = [
+  { label: 'English', value: 'ENGLISH' },
+  { label: 'Dutch', value: 'DUTCH' },
+  { label: 'German', value: 'GERMAN' },
+];
+
 const schema = yup.object({
   title: yup.string().required('Title is required'),
   publicTitle: yup.string().notRequired(),
   description: yup.string().required('Description is required'),
   slug: yup.string().required('Slug is required'),
+  languageOption: yup.object().nullable(true).shape(
+    { label: yup.string().required(), value: yup.string().required() },
+  ).required('Content option is required'),
   contentOption: yup.object().nullable(true).shape(
     { label: yup.string().required(), value: yup.string().required() },
   ).required('Content option is required'),
@@ -115,7 +124,7 @@ const AddDialogueView = () => {
         variables: { customerSlug },
       },
     ],
-    onError: (error: any) => {
+    onError: () => {
       toast({
         title: 'Something went wrong',
         description: 'There was a problem in adding the dialogue. Please try again',
@@ -144,11 +153,13 @@ const AddDialogueView = () => {
   const onSubmit = (formData: FormDataProps) => {
     const tagIds = activeTags.map((tag) => tag?.value);
     const tagEntries = { entries: tagIds };
-
+    const language = formData.languageOption.value;
+    console.log('FORM DATA DIALOGUE: ', formData);
     addDialogue({
       variables: {
         input: {
           customerSlug,
+          language,
           dialogueSlug: formData.slug,
           title: formData.title,
           publicTitle: formData.publicTitle,
@@ -233,6 +244,22 @@ const AddDialogueView = () => {
                       ref={form.register({ required: false })}
                     />
                     <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isRequired>
+                    <FormLabel htmlFor="languageOption">
+                      {t('dialogue:use_template')}
+                    </FormLabel>
+                    <InputHelper>
+                      {t('dialogue:use_template_helper')}
+                    </InputHelper>
+                    <Controller
+                      name="languageOption"
+                      control={form.control}
+                      as={Select}
+                      options={LANGUAGE_OPTIONS}
+                      defaultValue={{ label: 'English', value: 'ENGLISH' }}
+                    />
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.description}>

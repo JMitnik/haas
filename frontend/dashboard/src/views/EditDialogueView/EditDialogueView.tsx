@@ -28,6 +28,12 @@ interface EditDialogueFormProps {
   tagOptions: Array<{ label: string, value: string }>;
 }
 
+const LANGUAGE_OPTIONS = [
+  { label: 'English', value: 'ENGLISH' },
+  { label: 'Dutch', value: 'DUTCH' },
+  { label: 'German', value: 'GERMAN' },
+];
+
 const getEditDialogueQuery = gql`
   query getEditDialogue($customerSlug: String!, $dialogueSlug: String!) {
     customer(slug: $customerSlug) {
@@ -36,6 +42,7 @@ const getEditDialogueQuery = gql`
         id
         title
         slug
+        language
         publicTitle
         description
         isWithoutGenData
@@ -57,6 +64,7 @@ interface FormDataProps {
   description: string;
   slug: string;
   tags: Array<{ label: string, value: string }>;
+  languageOption: { label: string, value: string };
   isWithoutGenData: number;
 }
 
@@ -65,6 +73,9 @@ const schema = yup.object().shape({
   slug: yup.string().required('Slug is required'),
   publicTitle: yup.string().notRequired(),
   description: yup.string().required(),
+  languageOption: yup.object().nullable(true).shape(
+    { label: yup.string().required(), value: yup.string().required() },
+  ).required('Content option is required'),
   tags: yup.array().of(yup.object().shape({
     label: yup.string().required(),
     value: yup.string().required(),
@@ -104,12 +115,14 @@ const EditDialogueView = () => {
 
 const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFormProps) => {
   const history = useHistory();
+  const language = LANGUAGE_OPTIONS.find((option) => option.value === dialogue?.language);
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
       title: dialogue.title,
       description: dialogue.description,
+      languageOption: language,
       isWithoutGenData: boolToInt(dialogue.isWithoutGenData || false),
       publicTitle: dialogue.publicTitle,
       slug: dialogue.slug,
@@ -126,7 +139,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
       query: getQuestionnairesCustomerQuery,
       variables: {
         customerSlug,
-      }
+      },
     }],
     onError: (serverError: any) => {
       console.log(serverError);
@@ -138,6 +151,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
   const onSubmit = (formData: FormDataProps) => {
     const tagIds = formData.tags?.map((tag) => tag?.value) || [];
     const tagEntries = { entries: tagIds };
+    const language = formData.languageOption.value;
 
     // TODO: Ensure we can edit the dialogue slug (uneditable atm)
     editDialogue({
@@ -149,6 +163,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
         description: formData.description,
         tags: tagEntries,
         isWithoutGenData: intToBool(formData.isWithoutGenData),
+        language,
       },
     });
   };
@@ -204,6 +219,21 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                       ref={form.register({ required: false })}
                     />
                     <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isRequired>
+                    <FormLabel htmlFor="languageOption">
+                      {t('dialogue:use_template')}
+                    </FormLabel>
+                    <InputHelper>
+                      {t('dialogue:use_template_helper')}
+                    </InputHelper>
+                    <Controller
+                      name="languageOption"
+                      control={form.control}
+                      as={Select}
+                      options={LANGUAGE_OPTIONS}
+                    />
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.description}>

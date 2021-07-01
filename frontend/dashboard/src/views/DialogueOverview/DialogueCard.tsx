@@ -4,14 +4,16 @@ import { formatDistance } from 'date-fns';
 
 import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/client';
+
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import {
   Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
-  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
+
 import { deleteDialogueMutation } from 'mutations/deleteDialogue';
 import { useTranslation } from 'react-i18next';
 import ShowMoreButton from 'components/ShowMoreButton';
@@ -19,6 +21,8 @@ import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
+
+const Flag = require('react-flagpack');
 
 interface DialogueCardOptionsOverlayProps {
   onDelete: (e: React.MouseEvent<HTMLElement>) => void;
@@ -120,6 +124,42 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
     history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}/edit`);
   };
 
+  const renderFlag = (language: string): JSX.Element => {
+    const DEFAULT_FLAG = (
+      <Flag
+        code="GBR"
+        gradient="real-linear"
+        size="m"
+        hasDropShadow
+      />
+    );
+
+    switch (language) {
+      case 'ENGLISH':
+        return DEFAULT_FLAG;
+      case 'DUTCH':
+        return (
+          <Flag
+            code="NL"
+            gradient="real-linear"
+            size="m"
+            hasDropShadow
+          />
+        );
+      case 'GERMAN':
+        return (
+          <Flag
+            code="DE"
+            gradient="real-linear"
+            size="m"
+            hasDropShadow
+          />
+        );
+      default:
+        return DEFAULT_FLAG;
+    }
+  };
+
   const lastUpdated = dialogue.updatedAt ? new Date(Number.parseInt(dialogue.updatedAt, 10)) : null;
 
   return (
@@ -134,9 +174,15 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
       <CardBody flex="100%">
         <ColumnFlex justifyContent="space-between" height="100%">
           <Div>
-            <Text fontSize={isCompact ? '1.1rem' : '1.4rem'} color="app.onWhite" mb={2} fontWeight={500}>
-              {dialogue.title}
-            </Text>
+            <Flex justifyContent="space-between" alignItems="center">
+              <Text fontSize={isCompact ? '1.1rem' : '1.4rem'} color="app.onWhite" mb={2} fontWeight={500}>
+                {dialogue.title}
+              </Text>
+              <Div marginBottom="12px">
+                {renderFlag(dialogue.language)}
+              </Div>
+
+            </Flex>
 
             {!isCompact && (
               <Paragraph fontSize="0.8rem" color="app.mutedOnWhite" fontWeight="100">
@@ -163,7 +209,7 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
                     {t('last_updated', {
                       date: formatDistance(lastUpdated, new Date(), {
                         locale: getLocale(),
-                      })
+                      }),
                     })}
                   </Text>
                 )}

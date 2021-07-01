@@ -131,6 +131,7 @@ input CreateDialogueInputType {
   description: String
   dialogueSlug: String
   isSeed: Boolean
+  language: LanguageEnumType
   publicTitle: String
   tags: TagsInputObjectType
   templateDialogueId: String
@@ -248,10 +249,6 @@ type CustomFieldType {
 """Date custom scalar type"""
 scalar Date
 
-type Debug {
-  debugResolver: String
-}
-
 input DeleteDialogueInputType {
   customerSlug: String
   id: ID
@@ -330,6 +327,7 @@ type Dialogue {
   edges: [Edge!]!
   id: ID!
   isWithoutGenData: Boolean!
+  language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
   publicTitle: String
   questions: [QuestionNode!]!
@@ -583,6 +581,12 @@ enum JobStatusType {
   WRAPPING_UP
 }
 
+enum LanguageEnumType {
+  DUTCH
+  ENGLISH
+  GERMAN
+}
+
 type lineChartDataType {
   entryId: String
   x: String
@@ -642,7 +646,6 @@ type Mutation {
   createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
-  debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!
@@ -650,7 +653,7 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
-  editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, language: LanguageEnumType, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
