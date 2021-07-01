@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -79,12 +79,6 @@ model Tag {
   customerId String
 }
 
-enum LanguageEnum {
-  DUTCH
-  GERMAN
-  ENGLISH
-}
-
 model Dialogue {
   id               String         @id @default(cuid())
   title            String
@@ -99,7 +93,6 @@ model Dialogue {
   questions        QuestionNode[]
   sessions         Session[]
   tags             Tag[]
-  language         LanguageEnum   @default(ENGLISH)
   isOnline         Boolean        @default(value: false)
   isWithoutGenData Boolean        @default(value: false)
 
