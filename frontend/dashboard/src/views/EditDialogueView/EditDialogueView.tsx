@@ -257,10 +257,10 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                 <InputGrid>
                   <UI.FormControl isInvalid={!!form.errors.postLeafHeading}>
                     <UI.FormLabel htmlFor="postLeafHeading">
-                      {t('dialogue:dialogue_finisher_heading')}
+                      {t('dialogue:finisher_heading')}
                     </UI.FormLabel>
                     <UI.InputHelper>
-                      {t('dialogue:dialogue_finisher_heading_helper')}
+                      {t('dialogue:finisher_heading_helper')}
                     </UI.InputHelper>
                     <UI.Input
                       name="postLeafHeading"
@@ -273,10 +273,10 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
 
                   <UI.FormControl isInvalid={!!form.errors.postLeafSubheading}>
                     <UI.FormLabel htmlFor="postLeafSubheading">
-                      {t('dialogue:dialogue_finisher_subheading')}
+                      {t('dialogue:finisher_subheading')}
                     </UI.FormLabel>
                     <UI.InputHelper>
-                      {t('dialogue:dialogue_finisher_subheading_helper')}
+                      {t('dialogue:finisher_subheading_helper')}
                     </UI.InputHelper>
                     <UI.Input
                       name="postLeafSubheading"

@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    yes: {
+      en: 'Yes',
+      de: 'Ja',
+    },
+    no: {
+      en: 'No',
+      de: 'Nein',
+    },
     general: {
       en: 'General',
       de: 'General',
@@ -1291,19 +1299,19 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de:
         'Die Auswahl dieser Frage definiert, welche potenzielle Antwort ein Besucher geben kann. Darüber hinaus ist es auch möglich, optional eine Handlungsaufforderung mit der vom Benutzer ausgewählten Option zu verbinden. Hinweis: Wenn eine Handlungsaufforderung weiter unten auf der Reise eingerichtet wird, wird diese überschrieben.',
     },
-    dialogue_finisher_heading: {
+    finisher_heading: {
       en: 'Dialogue finisher heading',
       de: 'Überschrift des Dialog-Finishers',
     },
-    dialogue_finisher_heading_helper: {
+    finisher_heading_helper: {
       en: 'What is the main heading at the top of the dialogue finish?',
       de: 'Was ist die Hauptüberschrift an der Spitze des Dialogs?',
     },
-    dialogue_finisher_subheading: {
+    finisher_subheading: {
       en: 'Dialogue finisher subheading',
       de: 'Zwischenüberschrift des Dialog-Finishers',
     },
-    dialogue_finisher_subheading_helper: {
+    finisher_subheading_helper: {
       en: 'What is the sub-heading at the bottom of the dialogue finish?',
       de: 'Was ist die Subüberschrift am Boden des Dialogs?',
     },
@@ -1338,6 +1346,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     unhappyText_helper: {
       en: 'What will be the text on the left side of the slider indicating a very dissatisfied user?',
       de: 'Welcher Text auf der linken Seite des Schiebereglers weist auf einen sehr unzufriedenen Benutzer hin?',
+    },
+    use_custom_satisfaction_text: {
+      en: 'Use custom text',
+      de: 'Benutzerdefinierten Text verwenden',
+    },
+    do_not_use_custom_satisfaction_text: {
+      en: 'Do not use custom text',
+      de: 'Verwenden Sie keinen benutzerdefinierten Text',
     },
     markers: {
       en: 'Markers',

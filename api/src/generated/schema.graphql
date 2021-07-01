@@ -250,10 +250,6 @@ type CustomFieldType {
 """Date custom scalar type"""
 scalar Date
 
-type Debug {
-  debugResolver: String
-}
-
 input DeleteDialogueInputType {
   customerSlug: String
   id: ID
@@ -651,7 +647,6 @@ type Mutation {
   createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
-  debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!

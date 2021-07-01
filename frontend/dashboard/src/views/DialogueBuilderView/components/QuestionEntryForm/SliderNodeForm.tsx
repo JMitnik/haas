@@ -46,8 +46,8 @@ const SliderNodeForm = ({ form }: { form: any }) => {
                 onChange={onChange}
                 display="flex"
               >
-                <RadioButton icon={Edit} value={1} text="Yes" description="Use custom texts" />
-                <RadioButton icon={CheckSquare} value={0} text="No" description="Do not use customs text" />
+                <RadioButton icon={Edit} value={1} text={t('yes')} description={t('dialogue:use_custom_satisfaction_text')} />
+                <RadioButton icon={CheckSquare} value={0} text={t('no')} description={t('dialogue:do_not_use_custom_satisfaction_text')} />
               </RadioButtonGroup>
             )}
           />
