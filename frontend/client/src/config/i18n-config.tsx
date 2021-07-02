@@ -3,10 +3,10 @@ import i18n from 'i18next';
 
 import language, { parseLanguages } from './language';
 
-let storedLanguage = localStorage.getItem('language');
-if (!storedLanguage) {
-  storedLanguage = 'en';
-}
+// let storedLanguage = localStorage.getItem('language');
+// if (!storedLanguage) {
+//   storedLanguage = 'en';
+// }
 
 const lang = i18n.use(initReactI18next);
 lang.init({
@@ -22,7 +22,7 @@ lang.init({
     },
   },
   fallbackLng: 'en',
-  lng: storedLanguage,
+  // lng: storedLanguage,
   ns: ['general', 'customer'],
   defaultNS: 'general',
 

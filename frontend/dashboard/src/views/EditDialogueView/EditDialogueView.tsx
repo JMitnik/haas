@@ -233,10 +233,10 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
 
                   <FormControl isRequired>
                     <FormLabel htmlFor="languageOption">
-                      {t('dialogue:use_template')}
+                      {t('language')}
                     </FormLabel>
                     <InputHelper>
-                      {t('dialogue:use_template_helper')}
+                      {t('dialogue:language_helper')}
                     </InputHelper>
                     <Controller
                       name="languageOption"

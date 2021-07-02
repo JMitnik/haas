@@ -40,19 +40,15 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     switch (language) {
       case 'ENGLISH':
         i18n.changeLanguage('en');
-        localStorage.setItem('language', 'en');
         break;
       case 'GERMAN':
         i18n.changeLanguage('de');
-        localStorage.setItem('language', 'de');
         break;
       case 'DUTCH':
         i18n.changeLanguage('nl');
-        localStorage.setItem('language', 'nl');
         break;
       default:
         i18n.changeLanguage('en');
-        localStorage.setItem('language', 'en');
         break;
     }
   };

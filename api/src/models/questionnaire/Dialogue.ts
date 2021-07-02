@@ -111,7 +111,7 @@ export const DialogueType = objectType({
     t.boolean('wasGeneratedWithGenData');
     t.field('language', {
       type: LanguageEnumType,
-    })
+    });
 
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
@@ -404,8 +404,8 @@ export const DeleteDialogueInputType = inputObjectType({
 
 export const LanguageEnumType = enumType({
   name: 'LanguageEnumType',
-  members: ['ENGLISH', 'DUTCH', 'GERMAN']
-})
+  members: ['ENGLISH', 'DUTCH', 'GERMAN'],
+});
 
 export const CreateDialogueInputType = inputObjectType({
   name: 'CreateDialogueInputType',
@@ -467,8 +467,6 @@ export const DialogueMutations = extendType({
           throw new Error('Unable to find any input data');
         }
 
-        console.log('CREATE DIALOGUE INPUT: ', args.input)
-
         return DialogueService.createDialogue(args.input);
       },
     });
@@ -489,7 +487,6 @@ export const DialogueMutations = extendType({
         dialogueFinisherSubheading: 'String',
       },
       resolve(parent, args) {
-        console.log('edit dialogue args: ', args);
         return DialogueService.editDialogue(args);
       },
     });

@@ -153,13 +153,12 @@ const AddDialogueView = () => {
   const onSubmit = (formData: FormDataProps) => {
     const tagIds = activeTags.map((tag) => tag?.value);
     const tagEntries = { entries: tagIds };
-    const language = formData.languageOption.value;
 
     addDialogue({
       variables: {
         input: {
           customerSlug,
-          language,
+          language: formData.languageOption.value,
           dialogueSlug: formData.slug,
           title: formData.title,
           publicTitle: formData.publicTitle,
@@ -248,10 +247,10 @@ const AddDialogueView = () => {
 
                   <FormControl isRequired>
                     <FormLabel htmlFor="languageOption">
-                      {t('dialogue:use_template')}
+                      {t('language')}
                     </FormLabel>
                     <InputHelper>
-                      {t('dialogue:use_template_helper')}
+                      {t('dialogue:language_helper')}
                     </InputHelper>
                     <Controller
                       name="languageOption"

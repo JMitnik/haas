@@ -1289,6 +1289,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   dialogue: {
+    language_helper: {
+      en: 'Choose in which language the dialogue should be shown',
+      de: 'Wählen Sie aus, in welcher Sprache der Dialog angezeigt werden soll',
+    },
     choices: {
       en: 'Choices',
       de: 'Entscheidungen',
@@ -1298,6 +1302,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
         'Choices of this question define what potential answer a visitor can give. Furthermore, it is also possible to optionally connect a Call-to-Action to the option the user selects. Note: if a Call-to-Action further in the journey is setup, this one will be overriden.',
       de:
         'Die Auswahl dieser Frage definiert, welche potenzielle Antwort ein Besucher geben kann. Darüber hinaus ist es auch möglich, optional eine Handlungsaufforderung mit der vom Benutzer ausgewählten Option zu verbinden. Hinweis: Wenn eine Handlungsaufforderung weiter unten auf der Reise eingerichtet wird, wird diese überschrieben.',
+    },
+    language: {
+      en: '',
+      de: ''
     },
     finisher_heading: {
       en: 'Dialogue finisher heading',
