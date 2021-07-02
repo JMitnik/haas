@@ -70,6 +70,7 @@ export interface Dialogue {
   slug: string;
   title: string;
   publicTitle: string;
+  language: string;
   questions: TreeNodeProps[];
   edges: TreeEdgeProps[];
   leafs: TreeNodeProps[];

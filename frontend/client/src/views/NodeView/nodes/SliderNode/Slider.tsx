@@ -4,6 +4,7 @@ import {
 } from 'framer-motion';
 import { usePopper } from 'react-popper';
 import { useTimer } from 'use-timer';
+import { useTranslation } from 'react-i18next';
 import Color from 'color';
 import Lottie from 'react-lottie';
 import React, { useEffect, useReducer, useState } from 'react';
@@ -98,6 +99,7 @@ const endTime = 40;
 const initialWindUpSec = 2;
 
 const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: SliderProps) => {
+  const { t } = useTranslation();
   const [isValid, setIsValid] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [showIsEarly, setShowIsEarly] = useState(false);
@@ -251,12 +253,12 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
           >
             <UnhappyIcon />
             <Text fontSize="0.8rem">
-              {unhappyText || 'Unhappy'}
+              {unhappyText || t('unhappy')}
             </Text>
           </Flex>
           <Flex alignItems="center" data-testid="happy">
             <Text mr={1} fontSize="0.8rem">
-              {happyText || 'Happy'}
+              {happyText || t('happy')}
             </Text>
             <HappyIcon />
           </Flex>

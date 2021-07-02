@@ -12,6 +12,7 @@ const getDialogueFromSlug = gql`
         title
         slug
         publicTitle
+        language
         creationDate
         updatedAt
         postLeafNode {

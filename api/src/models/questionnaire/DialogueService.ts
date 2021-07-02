@@ -5,6 +5,7 @@ import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import {
   Dialogue, DialogueCreateInput, DialogueUpdateInput,
+  LanguageEnum,
   NodeType,
   PostLeafNode,
   PostLeafNodeUpdateOneWithoutDialogueInput,
@@ -38,10 +39,12 @@ class DialogueService {
     description: string,
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
+    language: LanguageEnum,
   ): DialogueCreateInput {
     const constructDialogueFragment = {
       customer: { connect: { id: customerId } },
       title,
+      language,
       slug: dialogueSlug,
       description,
       publicTitle,
@@ -137,7 +140,8 @@ class DialogueService {
       tags,
       isWithoutGenData,
       dialogueFinisherHeading,
-      dialogueFinisherSubheading
+      dialogueFinisherSubheading,
+      language
     } = args;
 
     const customer = await prisma.customer.findOne({
@@ -165,7 +169,7 @@ class DialogueService {
     );
 
     let updateDialogueArgs: DialogueUpdateInput = {
-      title, description, publicTitle, isWithoutGenData, postLeafNode,
+      title, description, publicTitle, isWithoutGenData, postLeafNode, language
     };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
@@ -500,11 +504,12 @@ class DialogueService {
     description: string,
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
+    language: LanguageEnum,
   ) => {
     try {
       const dialogue = await prisma.dialogue.create({
         data: DialogueService.constructDialogue(
-          customerId, title, dialogueSlug, description, publicTitle, tags,
+          customerId, title, dialogueSlug, description, publicTitle, tags, language,
         ),
       });
 
@@ -525,7 +530,8 @@ class DialogueService {
     dialogueSlug: string,
     description: string,
     publicTitle: string = '',
-    tags: Array<{ id: string }> = []) => {
+    tags: Array<{ id: string }> = [],
+    language: LanguageEnum = 'ENGLISH') => {
     const templateDialogue = await prisma.dialogue.findOne({
       where: {
         id: templateId,
@@ -587,7 +593,7 @@ class DialogueService {
 
     const idMap: IdMapProps = {};
     const dialogue = await DialogueService.initDialogue(
-      customerId, title, dialogueSlug, description, publicTitle, tags,
+      customerId, title, dialogueSlug, description, publicTitle, tags, language,
     );
 
     if (!dialogue) throw new Error('Dialogue not copied');
@@ -802,6 +808,10 @@ class DialogueService {
       throw new Error('Description required, not found!');
     }
 
+    if (!input.language) {
+      throw new Error('Language required, not found!');
+    }
+
     if (customers.length > 1) {
       // TODO: Make this a logger or something
       console.warn(`Multiple customers found with slug ${input.customerSlug}`);
@@ -821,6 +831,7 @@ class DialogueService {
         input.title,
         input.description,
         dialogueTags,
+        input.language,
       );
     }
 
@@ -833,6 +844,7 @@ class DialogueService {
         input.description,
         input.publicTitle || '',
         [],
+        input.language,
       );
     }
 
@@ -843,6 +855,7 @@ class DialogueService {
       input.description,
       input.publicTitle || '',
       dialogueTags,
+      input.language,
     );
 
     if (!dialogue) throw new ApolloError('customer:unable_to_create');
@@ -876,9 +889,10 @@ class DialogueService {
     dialogueTitle: string = 'Default dialogue',
     dialogueDescription: string = 'Default questions',
     tags: Array<{ id: string }>,
+    language: LanguageEnum = 'ENGLISH',
   ): Promise<Dialogue> => {
     const dialogue = await DialogueService.initDialogue(
-      customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags,
+      customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags, language,
     );
 
     if (!dialogue) throw new Error('Dialogue not seeded');

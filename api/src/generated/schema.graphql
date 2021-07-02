@@ -131,6 +131,7 @@ input CreateDialogueInputType {
   description: String
   dialogueSlug: String
   isSeed: Boolean
+  language: LanguageEnumType
   publicTitle: String
   tags: TagsInputObjectType
   templateDialogueId: String
@@ -328,6 +329,7 @@ type Dialogue {
   edges: [Edge!]!
   id: ID!
   isWithoutGenData: Boolean!
+  language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
   postLeafNode: DialogueFinisherObjectType
   publicTitle: String
@@ -588,6 +590,12 @@ enum JobStatusType {
   WRAPPING_UP
 }
 
+enum LanguageEnumType {
+  DUTCH
+  ENGLISH
+  GERMAN
+}
+
 type lineChartDataType {
   entryId: String
   x: String
@@ -654,7 +662,7 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
-  editDialogue(customerSlug: String, description: String, dialogueFinisherHeading: String, dialogueFinisherSubheading: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editDialogue(customerSlug: String, description: String, dialogueFinisherHeading: String, dialogueFinisherSubheading: String, dialogueSlug: String, isWithoutGenData: Boolean, language: LanguageEnumType, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!

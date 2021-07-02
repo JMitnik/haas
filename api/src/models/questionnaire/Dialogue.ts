@@ -1,7 +1,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { subDays } from 'date-fns';
 
 // eslint-disable-next-line import/no-cycle
@@ -109,6 +109,9 @@ export const DialogueType = objectType({
     // Placeholder data related properties
     t.boolean('isWithoutGenData');
     t.boolean('wasGeneratedWithGenData');
+    t.field('language', {
+      type: LanguageEnumType,
+    });
 
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
@@ -399,6 +402,11 @@ export const DeleteDialogueInputType = inputObjectType({
   },
 });
 
+export const LanguageEnumType = enumType({
+  name: 'LanguageEnumType',
+  members: ['ENGLISH', 'DUTCH', 'GERMAN'],
+});
+
 export const CreateDialogueInputType = inputObjectType({
   name: 'CreateDialogueInputType',
   definition(t) {
@@ -415,6 +423,9 @@ export const CreateDialogueInputType = inputObjectType({
     t.field('tags', {
       type: TagsInputType,
     });
+    t.field('language', {
+      type: LanguageEnumType,
+    });
   },
 });
 
@@ -429,6 +440,7 @@ export const DialogueMutations = extendType({
         const {
           input: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
         } = args;
+        // TODO: Add language option to copy function
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         const dialogueTags = tags?.entries?.length > 0
@@ -470,6 +482,7 @@ export const DialogueMutations = extendType({
         publicTitle: 'String',
         isWithoutGenData: 'Boolean',
         tags: TagsInputType,
+        language: LanguageEnumType,
         dialogueFinisherHeading: 'String',
         dialogueFinisherSubheading: 'String',
       },

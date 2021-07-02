@@ -8,6 +8,7 @@ import getCustomerFromSlug from 'queries/getCustomerFromSluqQuery';
 import getDialogueFromSlug from 'queries/getDialogueFromSlugQuery';
 
 import treeStore from './DialogueTreeStore';
+import { useTranslation } from 'react-i18next';
 
 interface DialogueTreeContextType {
   store: TreeStoreModelProps;
@@ -33,6 +34,24 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
   const [originUrl, setOriginUrl] = useState<string | null>(null);
   const [device] = useState<string | null>(navigator.platform);
   const [startTime] = useState(Date.now());
+  const { i18n } = useTranslation();
+
+  const initLanguage = (language: string | undefined) => {
+    switch (language) {
+      case 'ENGLISH':
+        i18n.changeLanguage('en');
+        break;
+      case 'GERMAN':
+        i18n.changeLanguage('de');
+        break;
+      case 'DUTCH':
+        i18n.changeLanguage('nl');
+        break;
+      default:
+        i18n.changeLanguage('en');
+        break;
+    }
+  };
 
   useEffect(() => {
     if (!originUrl) {
@@ -81,6 +100,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (dialogueData?.customer) {
       treeStore.initTree(dialogueData?.customer?.dialogue);
+      initLanguage(dialogueData?.customer?.dialogue.language);
     }
   }, [dialogueData]);
 
