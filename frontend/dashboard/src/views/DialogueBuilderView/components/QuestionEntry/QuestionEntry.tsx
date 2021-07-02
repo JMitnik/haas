@@ -1,15 +1,17 @@
 import * as UI from '@haas/ui';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Flex, Span } from '@haas/ui';
 import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router';
-import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
+import ShowMoreButton from 'components/ShowMoreButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
+import useAuth from 'hooks/useAuth';
 
 import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
@@ -41,6 +43,23 @@ interface QuestionEntryItemProps {
   ctaNodes: CTANode[];
 }
 
+interface QuestionOptionsOverlayProps {
+  onClone: (e: React.MouseEvent<HTMLElement>) => void;
+}
+
+const QuestionOptionsOverlay = ({ onClone }: QuestionOptionsOverlayProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <UI.List>
+      <UI.ListHeader>{t('edit_question')}</UI.ListHeader>
+      <UI.ListItem onClick={onClone}>
+        {t('clone')}
+      </UI.ListItem>
+    </UI.List>
+  );
+};
+
 const getSelectEntry = (type: string) => {
   switch (type) {
     case 'Choice':
@@ -67,9 +86,10 @@ const QuestionEntryItem = ({ depth,
   parentQuestionId,
   ctaNodes,
   onAddExpandChange }
-: QuestionEntryItemProps) => {
+  : QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
+  const { canAccessAdmin } = useAuth();
   const { t } = useTranslation();
   const toast = useToast();
   const questionRef = useRef<HTMLDivElement | null>(null);
@@ -116,6 +136,10 @@ const QuestionEntryItem = ({ depth,
     questionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleClone = (questionId: string) => {
+    console.log('Clone action!');
+  };
+
   return (
     <Flex
       ref={questionRef}
@@ -157,6 +181,18 @@ const QuestionEntryItem = ({ depth,
               </UI.Button>
             </Flex>
 
+            <UI.Div alignSelf="center">
+              {canAccessAdmin && (
+                <ShowMoreButton
+                  renderMenu={(
+                    <QuestionOptionsOverlay
+                      onClone={() => handleClone(question.id)}
+                    />
+                  )}
+                />
+              )}
+            </UI.Div>
+
           </Flex>
           {activeQuestion === question.id && (
             <DialogueBuilderQuestionForm
@@ -181,7 +217,6 @@ const QuestionEntryItem = ({ depth,
               onScroll={handleScroll}
             />
           )}
-
         </QuestionEntryContainer>
       </QuestionEntryViewContainer>
 

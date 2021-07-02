@@ -783,6 +783,7 @@ export type Mutation = {
   inviteUser: InviteUserOutput;
   createSession: Session;
   appendToInteraction: Session;
+  cloneQuestion?: Maybe<QuestionNode>;
   deleteQuestion: QuestionNode;
   createQuestion?: Maybe<QuestionNode>;
   deleteCTA: QuestionNode;
@@ -1011,6 +1012,11 @@ export type MutationCreateSessionArgs = {
 
 export type MutationAppendToInteractionArgs = {
   input?: Maybe<AppendToInteractionInput>;
+};
+
+
+export type MutationCloneQuestionArgs = {
+  questionId?: Maybe<Scalars['String']>;
 };
 
 

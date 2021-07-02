@@ -67,6 +67,10 @@ const language = {
       en: 'You have no choices yet',
       de: 'Sie haben noch keine Auswahlmöglichkeiten',
     },
+    edit_question: {
+      en: 'Edit question',
+      de: 'Question bearbeiten',
+    },
     edit_dialogue: {
       en: 'Edit dialogue',
       de: 'Dialog bearbeiten',
@@ -672,6 +676,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     date: {
       en: 'Date',
       de: 'Datum',
+    },
+    clone: {
+      en: 'Clone',
+      de: 'Klon',
     },
     delete: {
       en: 'Delete',

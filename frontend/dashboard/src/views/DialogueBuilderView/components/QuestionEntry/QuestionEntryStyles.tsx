@@ -99,7 +99,7 @@ export const QuestionEntryViewContainer = styled(Card) <{ activeCTA: string | nu
  `} 
 `;
 
-export const AddChildContainer = styled(Flex) <{isDisabled?: Boolean}>`
+export const AddChildContainer = styled(Flex) <{ isDisabled?: Boolean }>`
   ${({ theme, isDisabled }) => css`
     position: absolute; 
     flex-direction: row;
@@ -176,6 +176,7 @@ export const DepthSpan = styled(Span)`
 
 export const QuestionEntryContainer = styled(Flex)`
  ${({ theme }) => css`
+    position: relative;
     flex-direction: column;
     color: ${theme.colors.default.muted};
  `}

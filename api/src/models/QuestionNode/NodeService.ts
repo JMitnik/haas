@@ -1,4 +1,4 @@
-import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput } from '@prisma/client';
+import { Dialogue, Edge, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionOptionCreateManyWithoutQuestionNodeInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
@@ -78,7 +78,84 @@ const productServicesOptions = [
   { value: 'Other', position: 4 }
 ];
 
+export interface IdMapProps {
+  [details: string]: string;
+}
+
 class NodeService {
+  static getChildQuestionIds = (edges: Edge[], questionIds: string[], questionId: string) => {
+    const targetEdge = edges.find((edge) => edge.parentNodeId === questionId);
+    const childQuestionNodeId = targetEdge?.childNodeId;
+    if (childQuestionNodeId) {
+      questionIds.push(childQuestionNodeId);
+      NodeService.getChildQuestionIds(edges, questionIds, childQuestionNodeId)
+    }
+    return questionIds;
+  }
+
+  /**
+   * Clones the question and all its child questions 
+   * @questionId the parent question id used to generate a cloned question and child questions
+   */
+  static cloneQuestion = async (questionId: string) => {
+    const idMap: IdMapProps = {};
+
+    const mappedId = idMap[questionId];
+
+    const question = await prisma.questionNode.findFirst({
+      where: {
+        id: questionId,
+      },
+      include: {
+        links: true,
+        options: true,
+        videoEmbeddedNode: true,
+        isOverrideLeafOf: true,
+        Edge: true,
+      }
+    });
+
+    const edges = await prisma.edge.findMany({
+      where: {
+        dialogueId: question.questionDialogueId,
+      },
+    });
+
+    const childQuestionIds = NodeService.getChildQuestionIds(edges, [], questionId);
+    console.log('Child question Ids: ', childQuestionIds);
+    return null;
+
+    // TODO: Find all question ids which are child of parameter question id and add to idMap
+    // TODO: Remember to link cloned parent id question to their 
+    // parent question (should always exist cus slider node shouldn't be allowed to be cloned)
+    // TODO: Map over above ids in idMap with below piece of code AS WELL AS 
+
+    // const mappedLinks = question && question.links.map((link) => {
+    //   const { id, ...linkData } = link;
+    //   const updateLink = { ...linkData, questionNodeId: idMap[mappedId] };
+    //   return updateLink;
+    // });
+
+    // const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
+    // const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
+    // const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
+    // const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
+    // const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
+    // const mappedObject = {
+    //   ...question,
+    //   id: mappedId,
+    //   videoEmbeddedNode: mappedVideoEmbeddedNode,
+    //   questionDialogueId: question.questionDialogueId,
+    //   links: { create: mappedLinks },
+    //   options: mappedOptions,
+    //   overrideLeafId: mappedOverrideLeafId,
+    //   overrideLeaf: mappedOverrideLeaf,
+    //   isOverrideLeafOf: mappedIsOverrideLeafOf,
+    // };
+
+    // TODO: Create edges based on targetEdge Ids found through getChildQuestionIds (?)
+  }
+
   static removeNonExistingLinks = async (
     existingLinks: Array<Link>,
     newLinks: NexusGenInputs['CTALinkInputObjectType'][],
@@ -198,21 +275,21 @@ class NodeService {
         ] : [],
       },
     } : {
-        title,
-        questionDialogue: {
-          connect: {
-            id: questionnaireId,
-          },
+      title,
+      questionDialogue: {
+        connect: {
+          id: questionnaireId,
         },
-        type,
-        isRoot,
-        isLeaf,
-        options: {
-          create: options.length > 0 ? [
-            ...options,
-          ] : [],
-        },
-      };
+      },
+      type,
+      isRoot,
+      isLeaf,
+      options: {
+        create: options.length > 0 ? [
+          ...options,
+        ] : [],
+      },
+    };
 
     return prisma.questionNode.create({
       data: params,
