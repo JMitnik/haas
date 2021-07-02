@@ -2007,6 +2007,20 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Welche Textübereinstimmung soll die Push-Benachrichtigung auslösen?',
     },
   },
+  languages: {
+    english: {
+      en: 'English',
+      de: 'Englisch',
+    },
+    german: {
+      en: 'German',
+      de: 'Deutsche',
+    },
+    dutch: {
+      en: 'Dutch',
+      de: 'Niederländisch',
+    },
+  },
 };
 
 export const parseLanguages = (language: string, input: any, output?: any) => {
