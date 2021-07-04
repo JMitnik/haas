@@ -12,6 +12,15 @@
     },
     {
       "tag": "CreateEnum",
+      "enum": "LanguageEnum",
+      "values": [
+        "DUTCH",
+        "GERMAN",
+        "ENGLISH"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
       "enum": "NodeType",
       "values": [
         "GENERIC",
@@ -974,6 +983,74 @@
     },
     {
       "tag": "CreateModel",
+      "model": "PostLeafNode"
+    },
+    {
+      "tag": "CreateField",
+      "model": "PostLeafNode",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "PostLeafNode",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "PostLeafNode",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "PostLeafNode",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "PostLeafNode",
+      "field": "header",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "PostLeafNode",
+      "field": "subtext",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "PostLeafNode",
+      "field": "dialogue",
+      "type": "Dialogue",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateModel",
       "model": "Dialogue"
     },
     {
@@ -1107,6 +1184,13 @@
     {
       "tag": "CreateField",
       "model": "Dialogue",
+      "field": "postLeafNodeId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
       "field": "customer",
       "type": "Customer",
       "arity": "Required"
@@ -1177,6 +1261,84 @@
       "field": "tags",
       "type": "Tag",
       "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "postLeafNode",
+      "type": "PostLeafNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "postLeafNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "postLeafNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[postLeafNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "postLeafNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "language",
+      "type": "LanguageEnum",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "language"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "language"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "ENGLISH"
     },
     {
       "tag": "CreateField",
@@ -2179,6 +2341,20 @@
       "field": "QuestionNode",
       "type": "QuestionNode",
       "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNode",
+      "field": "unhappyText",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNode",
+      "field": "happyText",
+      "type": "String",
+      "arity": "Optional"
     },
     {
       "tag": "CreateField",
@@ -4117,6 +4293,13 @@
       },
       "argument": "references",
       "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionOption",
+      "field": "position",
+      "type": "Int",
+      "arity": "Optional"
     },
     {
       "tag": "CreateModel",
@@ -7243,7 +7426,7 @@
       "model": "CreateWorkspaceJob",
       "field": "Job",
       "type": "Job",
-      "arity": "Required"
+      "arity": "Optional"
     },
     {
       "tag": "CreateField",
