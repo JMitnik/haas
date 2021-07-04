@@ -8,10 +8,10 @@ import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 
 import { GenericNodeProps } from '../types';
 import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
-import useDialogueTree from 'providers/DialogueTreeProvider';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
@@ -39,7 +39,7 @@ const multiChoiceItemAnimation: Variants = {
 };
 
 const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
-  const { store } = useDialogueTree();
+  useDialogueTree();
   const handleSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
     const entry: SessionEntryDataProps = {
       choice: { value: multiChoiceOption.value },

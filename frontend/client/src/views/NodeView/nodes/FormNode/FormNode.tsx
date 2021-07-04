@@ -5,6 +5,7 @@ import { Div } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -18,7 +19,7 @@ interface FormNodeFormProps {
   }[]
 }
 
-const mapFieldType: {[key: string]: string} = {
+const mapFieldType: { [key: string]: string } = {
   email: 'email',
   number: 'number',
   phoneNumber: 'tel',
@@ -55,6 +56,7 @@ const getFieldValue = (field: any, relatedField: any) => {
 };
 
 const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
+  const { t } = useTranslation();
   const { register, getValues, formState } = useForm<FormNodeFormProps>({
     mode: 'onChange',
     reValidateMode: 'onChange',
@@ -93,7 +95,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
             fontSize="1.2rem"
             mb={2}
           >
-            Leave your details
+            {t('leave_your_details')}
           </UI.Text>
           <UI.Hr />
           <UI.Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { handleSubmit(e); return false; }}>
@@ -127,10 +129,10 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                     isDisabled={!isValid}
                     isActive={isValid}
                   >
-                    Submit
+                    {t('submit')}
                   </ClientButton>
                   <UI.Button size="sm" variant="ghost" onClick={(e) => handleSubmit(e)}>
-                    Do not share
+                    {t('do_not_share')}
                   </UI.Button>
                 </UI.Flex>
               </UI.Div>

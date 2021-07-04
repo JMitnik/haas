@@ -214,7 +214,7 @@ export const UsernavDropdown = () => {
         </Div>
       </ListItem>
       <Div>
-      {((canAccessAdmin) && (
+        {((canAccessAdmin) && (
           <ListItem renderLeftIcon={<Book />} onClick={goToAutodeckOverview}>
             <Text>Autodeck Overview</Text>
           </ListItem>
