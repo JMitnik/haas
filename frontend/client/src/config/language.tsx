@@ -12,9 +12,9 @@ const language = {
       nl: 'Ontevreden',
     },
     leave_your_details: {
-      en: 'Leave your details',
-      de: 'Hinterlassen Sie Ihre Daten',
-      nl: 'Laat uw gegevens achter',
+      en: 'Let us know',
+      de: 'Lass uns wissen',
+      nl: 'Laat het ons weten',
     },
     first_name: {
       en: 'First name',
