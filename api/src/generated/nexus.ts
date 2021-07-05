@@ -203,6 +203,7 @@ export interface NexusGenInputs {
   }
   FormNodeInputType: { // input type
     fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
+    helperText?: string | null; // String
     id?: string | null; // String
   }
   GenerateAutodeckInput: { // input type
@@ -586,6 +587,7 @@ export interface NexusGenRootTypes {
   FormNodeField: prisma.FormNodeField;
   FormNodeType: { // root type
     fields: NexusGenRootTypes['FormNodeField'][]; // [FormNodeField!]!
+    helperText?: string | null; // String
     id?: string | null; // String
   }
   ImageType: { // root type
@@ -1062,6 +1064,7 @@ export interface NexusGenFieldTypes {
   }
   FormNodeType: { // field return type
     fields: NexusGenRootTypes['FormNodeField'][]; // [FormNodeField!]!
+    helperText: string | null; // String
     id: string | null; // String
   }
   ImageType: { // field return type

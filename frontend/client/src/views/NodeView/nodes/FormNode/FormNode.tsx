@@ -96,7 +96,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
             fontSize="1.2rem"
             mb={2}
           >
-            {t('leave_your_details')}
+            {node.form?.helperText || t('leave_your_details')}
           </UI.Text>
           <UI.Hr />
           <UI.Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { handleSubmit(e); return false; }}>

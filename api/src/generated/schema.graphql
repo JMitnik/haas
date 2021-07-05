@@ -489,11 +489,13 @@ enum FormNodeFieldTypeEnum {
 
 input FormNodeInputType {
   fields: [FormNodeFieldInput!]
+  helperText: String
   id: String
 }
 
 type FormNodeType {
   fields: [FormNodeField!]!
+  helperText: String
   id: String
 }
 
