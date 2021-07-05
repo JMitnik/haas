@@ -98,7 +98,7 @@ class NodeService {
     fields: {
       create: input.fields?.map((field) => ({
         type: field.type || 'shortText',
-        label: field.label || 'Generic',
+        label: field.label || '',
         position: field.position || -1,
         isRequired: field.isRequired || false,
       })),

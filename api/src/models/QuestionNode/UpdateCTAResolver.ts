@@ -29,13 +29,13 @@ const saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Form
   input.fields?.map((field) => ({
     create: {
       type: field.type || 'shortText',
-      label: field.label || 'Generic',
+      label: field.label || '',
       position: field.position || -1,
       isRequired: field.isRequired || false,
     },
     update: {
       type: field.type || 'shortText',
-      label: field.label || 'Generic',
+      label: field.label || '',
       position: field.position || -1,
       isRequired: field.isRequired || false,
     },
