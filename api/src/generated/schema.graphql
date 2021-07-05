@@ -137,6 +137,12 @@ input CreateDialogueInputType {
   title: String
 }
 
+input createJobProcessLocationInput {
+  name: String
+  path: String
+  type: JobProcessLocationType
+}
+
 input CreateQuestionNodeInputType {
   customerId: ID
   dialogueSlug: String
@@ -166,8 +172,11 @@ input CreateWorkspaceInput {
 
 type CreateWorkspaceJobType {
   createdAt: String!
+  errorMessage: String
   id: String!
+  message: String
   name: String!
+  processLocation: JobProcessLocation!
   referenceId: String
   referenceType: CloudReferenceType!
   requiresColorExtraction: Boolean!
@@ -223,8 +232,24 @@ input CustomerWhereUniqueInput {
   id: ID!
 }
 
+input CustomFieldInputType {
+  key: String
+  value: String
+}
+
+type CustomFieldType {
+  id: String!
+  jobProcessLocationId: String!
+  key: String!
+  value: String
+}
+
 """Date custom scalar type"""
 scalar Date
+
+type Debug {
+  debugResolver: String
+}
 
 input DeleteDialogueInputType {
   customerSlug: String
@@ -460,24 +485,30 @@ type FormNodeType {
   id: String
 }
 
-"""Generate sales documents"""
+"""Generate savales documents"""
 input GenerateAutodeckInput {
   answer1: String
   answer2: String
   answer3: String
   answer4: String
   companyName: String
+  customFields: [CustomFieldInputType!]
   emailContent: String
   firstName: String
   id: String!
+  isGenerateWorkspace: Boolean
+  jobLocationId: String
   logo: String
   name: String
+  newCustomFields: [CustomFieldInputType!]
   primaryColour: String
   requiresColorExtraction: Boolean!
   requiresRembgLambda: Boolean!
   requiresWebsiteScreenshot: Boolean!
   reward: String
+  slug: String
   sorryAboutX: String
+  standardFields: [CustomFieldInputType!]
   textMessage: String
   usesAdjustedLogo: Boolean!
   website: String
@@ -514,8 +545,29 @@ type JobObjectType {
   updatedAt: String!
 }
 
+type JobProcessLocation {
+  customFields: [CustomFieldType!]
+  id: String!
+  name: String!
+  path: String!
+  type: JobProcessLocationType!
+  xMaterialDimension: Int!
+  yMaterialDimension: Int!
+}
+
+type JobProcessLocations {
+  jobProcessLocations: [JobProcessLocation!]!
+}
+
+enum JobProcessLocationType {
+  BROCHURE
+  ONE_PAGER
+  PITCHDECK
+}
+
 enum JobStatusType {
   COMPLETED
+  COMPRESSING_SALES_MATERIAL
   FAILED
   IN_PHOTOSHOP_QUEUE
   PENDING
@@ -525,6 +577,8 @@ enum JobStatusType {
   PRE_PROCESSING_WEBSITE_SCREENSHOT
   PROCESSING
   READY_FOR_PROCESSING
+  STITCHING_SLIDES
+  TRANSFORMING_PSDS_TO_PNGS
   WRAPPING_UP
 }
 
@@ -578,6 +632,7 @@ type Mutation {
   """Create Call to Actions"""
   createCTA(input: CreateCTAInputType): QuestionNode!
   createDialogue(input: CreateDialogueInputType): Dialogue!
+  createJobProcessLocation(input: createJobProcessLocationInput): JobProcessLocation!
   createPermission(data: PermissionInput): PermssionType
   createQuestion(input: CreateQuestionNodeInputType): QuestionNode
   createRole(data: RoleInput): RoleType!
@@ -586,6 +641,7 @@ type Mutation {
   createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
+  debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!
@@ -607,11 +663,12 @@ type Mutation {
   register(input: RegisterInput): String
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
+  retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   singleUpload(file: Upload): ImageType!
-  updateCreateWorkspaceJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
+  updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
-  updateJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
+  updateJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
@@ -757,6 +814,7 @@ type Query {
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
   getAutodeckJobs(filter: PaginationWhereInput): AutodeckConnectionType!
   getJob(id: String): CreateWorkspaceJobType
+  getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   me: UserType!
@@ -774,6 +832,7 @@ type Query {
   user(userId: String): UserType
   UserOfCustomer(input: UserOfCustomerInput): UserCustomer
   users(customerSlug: String): [UserType!]!
+  usersConnection(filter: PaginationWhereInput): UserConnection
 }
 
 type QuestionNode {

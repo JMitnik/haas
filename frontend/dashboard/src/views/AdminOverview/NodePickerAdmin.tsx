@@ -1,22 +1,34 @@
 import * as UI from '@haas/ui';
-import React, { useState, useEffect } from "react";
 import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
+import React, { useEffect, useState } from 'react';
 
-import { SystemPermissionTypeEnum } from './AdminOverviewTypes';
-import { NodeCellContainer } from 'components/NodeCell/NodeCell';
-import { MapNodeToProperties } from 'components/MapNodeToProperties';
-import { SystemPermission } from 'types/globalTypes';
 import { GlobalPermissionList } from './GlobalPermissionList';
+import { MapNodeToProperties } from 'components/MapNodeToProperties';
+import { NodeCellContainer } from 'components/NodeCell/NodeCell';
+import { OptionProps } from 'react-select/src/types';
+import { SystemPermission } from 'types/globalTypes';
+import { SystemPermissionTypeEnum } from './AdminOverviewTypes';
 
-const DropdownOption = (props: any) => {
-  const nodeProps = GlobalPermissionList(props.data);
-  
+interface DropdownOptionProps extends OptionProps {
+  label: string;
+  data: {
+    key: SystemPermission;
+    value: SystemPermission;
+    label: SystemPermission;
+    domain: SystemPermissionTypeEnum;
+  }
+}
+
+const DropdownOption = ({ data, label, ...props }: DropdownOptionProps) => {
+  const nodeProps = GlobalPermissionList(data.key);
+
   return (
     <NodeCellContainer>
+      {/* @ts-ignore */}
       <components.Option {...props}>
         <UI.Flex>
-           {console.log(nodeProps)}
+          {console.log(nodeProps)}
           <UI.Icon
             bg={nodeProps.bg}
             color={nodeProps.color}
@@ -25,16 +37,16 @@ const DropdownOption = (props: any) => {
             stroke={nodeProps.stroke || undefined}
             style={{ flexShrink: 0 }}
             mr={3}
-          > 
+          >
             <nodeProps.icon />
           </UI.Icon>
           <UI.Div>
-           
+
             <UI.Text>
-              {props.label}
+              {label}
             </UI.Text>
             <UI.MicroLabel bg={nodeProps.bg} color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}>
-              {props.data.type}
+              {data.domain}
             </UI.MicroLabel>
           </UI.Div>
         </UI.Flex>
@@ -43,25 +55,23 @@ const DropdownOption = (props: any) => {
   );
 };
 
-const DropdownSingleValue = (props: any) => {
-  return (
-    <components.SingleValue {...props}>
-      <UI.Flex>
-        <UI.Span color="gray.300">
-          {props?.data?.label}
-        </UI.Span>
-      </UI.Flex>
-    </components.SingleValue>
-  )
-};
+const DropdownSingleValue = (props: any) => (
+  <components.SingleValue {...props}>
+    <UI.Flex>
+      <UI.Span color="gray.300">
+        {props?.data?.label}
+      </UI.Span>
+    </UI.Flex>
+  </components.SingleValue>
+);
 
 export const NodePickerAdmin = ({ onChange, onClose, items, SelectOptions }: any) => {
   const [filteredState, setFilteredState] = useState<SystemPermissionTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
   const { t } = useTranslation();
-  
+
   useEffect(() => {
-    console.log(filteredState)
+    console.log(filteredState);
     if (!filteredState) {
       setFilteredItems(items);
     } else {
@@ -77,7 +87,7 @@ export const NodePickerAdmin = ({ onChange, onClose, items, SelectOptions }: any
   return (
     <UI.List maxWidth={300}>
       <UI.CloseButton onClose={onClose} />
-      <UI.ListHeader >{"Permission List"}</UI.ListHeader>
+      <UI.ListHeader>Permission List</UI.ListHeader>
       <UI.ListItem
         variant="gray"
         hasNoSelect
@@ -89,32 +99,33 @@ export const NodePickerAdmin = ({ onChange, onClose, items, SelectOptions }: any
             <UI.Switch>
               <UI.SwitchItem
                 isActive={!filteredState}
-                onClick={() => setFilteredState(null)}>
+                onClick={() => setFilteredState(null)}
+              >
                 {t('all')}
               </UI.SwitchItem>
               <UI.SwitchItem
                 isActive={filteredState === SystemPermissionTypeEnum.Create}
                 onClick={() => setFilteredState(SystemPermissionTypeEnum.Create)}
               >
-                {'Create'}
+                Create
               </UI.SwitchItem>
               <UI.SwitchItem
                 isActive={filteredState === SystemPermissionTypeEnum.View}
                 onClick={() => setFilteredState(SystemPermissionTypeEnum.View)}
               >
-                {'View'}
+                View
               </UI.SwitchItem>
               <UI.SwitchItem
                 isActive={filteredState === SystemPermissionTypeEnum.Edit}
                 onClick={() => setFilteredState(SystemPermissionTypeEnum.Edit)}
               >
-                {'Edit'}
+                Edit
               </UI.SwitchItem>
-               <UI.SwitchItem
+              <UI.SwitchItem
                 isActive={filteredState === SystemPermissionTypeEnum.Delete}
                 onClick={() => setFilteredState(SystemPermissionTypeEnum.Delete)}
               >
-                {'Delete'}
+                Delete
               </UI.SwitchItem>
             </UI.Switch>
           </UI.Div>
@@ -127,6 +138,7 @@ export const NodePickerAdmin = ({ onChange, onClose, items, SelectOptions }: any
               options={filteredItems}
               onChange={onChange}
               components={{
+                // @ts-ignore
                 Option: DropdownOption,
                 SingleValue: DropdownSingleValue,
               }}
@@ -134,18 +146,18 @@ export const NodePickerAdmin = ({ onChange, onClose, items, SelectOptions }: any
               classNamePrefix="select"
               styles={{
                 menu: () => ({
-                  marginTop: 0
+                  marginTop: 0,
                 }),
                 control: (provided) => ({
                   ...provided,
                   borderWidth: 1,
-                })
+                }),
               }}
             />
           </UI.Div>
         </UI.Div>
       </UI.ListItem>
     </UI.List>
-  )
+  );
 };
 
