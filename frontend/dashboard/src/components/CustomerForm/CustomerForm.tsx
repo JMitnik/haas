@@ -90,7 +90,6 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
   const { t } = useTranslation();
 
   const logoOpacity = form.watch('logoOpacity') ?? 0.3;
-  console.log(logoOpacity);
   const overrideColor = form.watch('primaryColour') || undefined;
 
   return (
