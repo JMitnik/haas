@@ -38,12 +38,15 @@ import {
   theme,
   InputRightElement,
   Spinner,
+   Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Button, Text
 } from "@chakra-ui/core";
 import { GlobalPermissionList } from "./GlobalPermissionList";
 import { OptionsOfPermissions } from "./OptionsOfPermissions";
 import { NodePicker } from "components/NodePicker";
 import { NodePickerAdmin } from "./NodePickerAdmin";
 import { useNavigator } from "hooks/useNavigator";
+import ShowMoreButton from "components/ShowMoreButton";
 
 const TableHeaderContainer = styled(UI.TableHeading)`
   background: #f1f1f1 !important;
@@ -137,6 +140,52 @@ interface IconContainerProps {
   orderBy: [{ by: PaginationSortByEnum.Email, desc: true }],
  };
 
+interface DialogueCardOptionsOverlayProps {
+  onDelete: (e: React.MouseEvent<HTMLElement>) => void;
+  onEdit: (e: React.MouseEvent<HTMLElement>) => void;
+}
+
+
+ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <UI.List>
+      <UI.ListHeader>{t('admin:editPermissions')}</UI.ListHeader>
+      <Popover>
+        {() => (
+          <>
+            <PopoverTrigger>
+              <UI.ListItem>
+                {t('delete')}
+              </UI.ListItem>
+            </PopoverTrigger>
+            <PopoverContent zIndex={4}>
+              <PopoverArrow />
+              <PopoverHeader>{t('delete')}</PopoverHeader>
+              <PopoverCloseButton />
+              <PopoverBody>
+                <Text>{t('delete_dialogue_popover')}</Text>
+              </PopoverBody>
+              <PopoverFooter>
+                <Button
+                  variantColor="red"
+                  onClick={onDelete}
+                >
+                  {t('delete')}
+                </Button>
+              </PopoverFooter>
+            </PopoverContent>
+          </>
+        )}
+      </Popover>
+      <UI.ListItem onClick={onEdit}>
+        {t('edit')}
+      </UI.ListItem>
+    </UI.List>
+  );
+};
+
 
 const AdminOverview = () => {
   const { t } = useTranslation();
@@ -211,7 +260,10 @@ const AdminOverview = () => {
     let maxLen= copy_listOfPermission.length-1
     return (
       <div>
-        <UI.Div style={{ display: "flex", flexWrap: "wrap" }}>
+        <UI.Div style={{ display: "flex", flexWrap: "wrap",    border:"1px solid#BABABA",
+                boxSizing:"border-box",
+                borderRadius:"10px",
+                width:"185px" }}>
           {copy_listOfPermission?.map((item,index) => {
             let domain = item.domain.charAt(0);
             let labelBgColor;
@@ -221,7 +273,9 @@ const AdminOverview = () => {
             else labelBgColor = "yellow";
 
             return (
-              <div>
+              <div className="groupTrack" style={{
+             
+              }}>
                 {maxLen==index ? <IconContainer>
                 <Tag rounded="full" size="sm" mt={1}>
                   <Tooltip
@@ -470,6 +524,27 @@ const AdminOverview = () => {
     return <></>;
   };
 
+
+  
+  const handleDeleteDialogue = async (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+
+    // deleteDialogue({
+    //   variables: {
+    //     input: {
+    //       id: dialogue.id,
+    //       customerSlug,
+    //     },
+    //   },
+    // });
+  };
+
+  // TODO: Move this url to a constant or so
+  const goToEditDialogue = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    // history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}/edit`);
+  };
+
   return (
     <>
       <UI.ViewHeading>
@@ -550,49 +625,49 @@ const AdminOverview = () => {
                         height="20px"
                         colorStart="grey"
                         colorEnd="teal"
-                        width="468%"
+                        width="639%"
                       />
                       <Skeleton
                         height="20px"
                         colorStart="grey"
                         colorEnd="turquoise"
-                        width="468%"
+                        width="639%"
                       />
                       <Skeleton
                         height="20px"
                         colorStart="grey"
                         colorEnd="teal"
-                        width="468%"
+                        width="639%"
                       />
                       <Skeleton
                         height="20px"
                         colorStart="grey"
                         colorEnd="turquoise"
-                        width="468%"
+                        width="639%"
                       />
                       <Skeleton
                         height="20px"
                         colorStart="grey"
                         colorEnd="teal"
-                        width="468%"
+                        width="639%"
                       />
                       <Skeleton
                         height="20px"
                         colorStart="grey"
                         colorEnd="turquoise"
-                        width="468%"
+                        width="639%"
                       />
                       <Skeleton
                         height="20px"
                         colorStart="grey"
                         colorEnd="teal"
-                        width="468%"
+                        width="639%"
                       />
                       <Skeleton
                         height="20px"
                         colorStart="grey"
                         colorEnd="turquoise"
-                        width="468%"
+                        width="639%"
                       />
                     </UI.Stack>
                   ) : (
@@ -678,7 +753,7 @@ const AdminOverview = () => {
                                         )}
                                       >
                                         {({ onOpen, onClose }) => (
-                                          < >
+                                          <Flex  justifyContent="space-between">
                                           
                                             <TableCellSelected onClick={onOpen}>
                                               {item?.user.firstName || ""}
@@ -693,15 +768,15 @@ const AdminOverview = () => {
                                               Close
                                             </UI.Button> */}
                                             
-                                              {/* <Spinner
+                                              <Spinner
                                                 thickness="4px"
                                                 speed="0.65s"
                                                 emptyColor="gray.200"
                                                 color="blue.500"
                                              
                                               />
-                                            */}
-                                          </>
+                                           
+                                          </Flex>
                                         )}
                                       </Dropdown>
                                     </>
@@ -737,31 +812,39 @@ const AdminOverview = () => {
                                   <UI.Div onClick={() => setCellClicked(true)}>
                                     <>
                                       <Dropdown
-                                        renderOverlay={() => (
+                                        renderOverlay={(onClose) => (
                                           <DropdownInputValue
                                             dropdownName="singleValue"
                                             placeholderValue={cellValue}
+                                             onClose={onClose}
                                           />
                                         )}
                                       >
                                         {({ onOpen }) => (
-                                          <CellContainer
-                                            style={{
-                                              backgroundColor: "#e6ecf4",
-                                              border: "2px solid #3182CE",
-
-                                              cursor: "pointer",
-                                              borderRadius: "4px",
-                                              fontStyle: "italic",
-                                              color: "#ECC94B",
-                                              boxShadow:
-                                                "4px 2px 12px 6px #bfd8f0",
-                                              fontWeight: "bold",
-                                            }}
-                                            onClick={onOpen}
-                                          >
-                                            {item?.user.lastName || ""}
-                                          </CellContainer>
+                                        <Flex  justifyContent="space-between">
+                                          
+                                            <TableCellSelected onClick={onOpen}>
+                                              {item?.user.lastName || ""}
+                                            </TableCellSelected>
+                                          
+                                            {/* <UI.Button
+                                              onClick={() => {
+                                                onClose();
+                                                console.log("closed");
+                                              }}
+                                            >
+                                              Close
+                                            </UI.Button> */}
+                                            
+                                              <Spinner
+                                                thickness="4px"
+                                                speed="0.65s"
+                                                emptyColor="gray.200"
+                                                color="blue.500"
+                                             
+                                              />
+                                           
+                                          </Flex>
                                         )}
                                       </Dropdown>
                                     </>
@@ -790,7 +873,7 @@ const AdminOverview = () => {
                               )}
                             </UI.TableCell>
 
-                            <UI.TableCell>
+                            <UI.TableCell style={{}}>
                               {cellClicked === false ? (
                                 coordinate.col === index &&
                                 coordinate.row === 3 ? (
@@ -813,15 +896,9 @@ const AdminOverview = () => {
                                           <CellContainer
                                             onClick={onOpen}
                                             style={{
-                                              backgroundColor: "#e6ecf4",
-                                              border: "2px solid #319795",
-
+                                              border: "1px solid #F1F1F1",
                                               cursor: "pointer",
-                                              width: "250px",
-                                              borderRadius: "4px",
-                                              fontStyle: "italic",
-                                              color: "#6C7A89",
-                                              boxShadow: "1px 1px 5px 5px #ccc",
+                                              width: "168px",
                                               marginRight: "-163px",
                                             }}
                                           >
@@ -879,7 +956,15 @@ const AdminOverview = () => {
                                     }}
                                   >
                                     <Div>TO BE CONTINUED</Div>
-                                    <Div>...</Div>
+                                    <Div> 
+                                      <ShowMoreButton
+                                        renderMenu={(
+                                          <DialogueCardOptionsOverlay
+                                            onDelete={handleDeleteDialogue}
+                                            onEdit={goToEditDialogue}
+                                          />
+                                        )}
+                                      /></Div>
                                   </Flex>
                                 ) : (
                                   <Flex
@@ -891,7 +976,17 @@ const AdminOverview = () => {
                                     }
                                   >
                                     <Div>TO BE CONTINUED</Div>
-                                    <Div>...</Div>
+                                    <Div>
+                                      
+                                      <ShowMoreButton
+                                        renderMenu={(
+                                          <DialogueCardOptionsOverlay
+                                            onDelete={handleDeleteDialogue}
+                                            onEdit={goToEditDialogue}
+                                          />
+                                        )}
+                                      />
+                                    </Div>
                                   </Flex>
                                 )
                               ) : (
@@ -902,7 +997,15 @@ const AdminOverview = () => {
                                   onClick={() => setCellClicked(false)}
                                 >
                                   <Div>TO BE CONTINUED</Div>
-                                  <Div style={{fontSize:"0.9rem"}}>...</Div>
+                                  <Div style={{fontSize:"0.9rem"}}> 
+                                      <ShowMoreButton
+                                        renderMenu={(
+                                          <DialogueCardOptionsOverlay
+                                            onDelete={handleDeleteDialogue}
+                                            onEdit={goToEditDialogue}
+                                          />
+                                        )}
+                                      /></Div>
                                 </Flex>
                               )}
                             </UI.TableCell>

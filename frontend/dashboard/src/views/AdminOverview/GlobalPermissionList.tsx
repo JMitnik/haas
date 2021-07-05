@@ -3,6 +3,8 @@ import { ReactComponent as ChatIcon } from 'assets/icons/icon-chat-group.svg';
 import { ReactComponent as CursorIcon } from 'assets/icons/icon-chat-group.svg';
 import { SystemPermission } from 'types/globalTypes';
 import { ReactComponent as EyeIcon } from 'assets/icons/icon-user.svg';
+import { ReactComponent as AddIcon } from 'assets/icons/icon-add.svg';
+import { ReactComponent as ViewIcon } from 'assets/icons/icon-view-visible.svg';
 import * as Rf from 'react-feather';
 
 interface GlobalPermissionListPropertiesOutput {
@@ -28,8 +30,8 @@ export const GlobalPermissionList = (type: any): GlobalPermissionListPropertiesO
         }
         case SystemPermission.CAN_ADD_USERS:{
             return {
-                icon: Rf.Plus,
-                bg:'',
+                icon: AddIcon,
+                bg:'#FB3318',
                 color: 'tertiary',
                 label:'CAN_ADD_USERS',
                 domain:''
@@ -136,9 +138,9 @@ export const GlobalPermissionList = (type: any): GlobalPermissionListPropertiesO
         }
         case SystemPermission.CAN_VIEW_CAMPAIGNS:{
             return {
-                icon: Rf.Grid,
+                icon: ViewIcon,
                 bg:'',
-                color: 'warning',
+                color: '#FFCC00',
                 label:'CAN_VIEW_CAMPAIGNS',
                 domain:'View'
             }

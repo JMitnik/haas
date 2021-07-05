@@ -86,6 +86,7 @@ export const TableCell = styled.td<TableCellProps>`
     padding: 0.5rem 1.5rem;
     border: 1px solid ${theme.colors.gray[200]};
     font-weight: 500;
+    width:248px;
     font-size:0.9rem;
     ${isNumeric &&
     css`

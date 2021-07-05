@@ -1280,7 +1280,11 @@ const language = {
     back_to_workspace:{
       en:"Back To Workspace",
       de:"Zurück zum Arbeitsbereich"
-    }
+    },
+    editPermissions:{
+      en:"Edit Permissions",
+      de:"Berechtigungen bearbeiten"
+    },
   },
   dialogue: {
     choices: {

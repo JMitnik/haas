@@ -7,14 +7,16 @@ import { SystemPermissionTypeEnum } from './AdminOverviewTypes';
 import { NodeCellContainer } from 'components/NodeCell/NodeCell';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
 import { SystemPermission } from 'types/globalTypes';
+import { GlobalPermissionList } from './GlobalPermissionList';
 
 const DropdownOption = (props: any) => {
-  const nodeProps = MapNodeToProperties(props.data.type);
-
+  const nodeProps = GlobalPermissionList(props.data);
+  
   return (
     <NodeCellContainer>
       <components.Option {...props}>
         <UI.Flex>
+           {console.log(nodeProps)}
           <UI.Icon
             bg={nodeProps.bg}
             color={nodeProps.color}
@@ -23,10 +25,11 @@ const DropdownOption = (props: any) => {
             stroke={nodeProps.stroke || undefined}
             style={{ flexShrink: 0 }}
             mr={3}
-          >
+          > 
             <nodeProps.icon />
           </UI.Icon>
           <UI.Div>
+           
             <UI.Text>
               {props.label}
             </UI.Text>
