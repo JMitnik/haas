@@ -8,6 +8,7 @@ export const CustomerFragment = gql`
     settings {
       id
       logoUrl
+      logoOpacity
       colourSettings {
         id
         primary

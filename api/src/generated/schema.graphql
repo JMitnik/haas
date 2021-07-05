@@ -168,6 +168,7 @@ input CreateTriggerInputType {
 input CreateWorkspaceInput {
   isSeed: Boolean = false
   logo: String
+  logoOpacity: Int
   name: String!
   primaryColour: String!
   slug: String!
@@ -229,6 +230,7 @@ type CustomerSettings {
   colourSettings: ColourSettings
   fontSettings: FontSettings
   id: ID!
+  logoOpacity: Int
   logoUrl: String
 }
 
@@ -250,6 +252,10 @@ type CustomFieldType {
 
 """Date custom scalar type"""
 scalar Date
+
+type Debug {
+  debugResolver: String
+}
 
 input DeleteDialogueInputType {
   customerSlug: String
@@ -412,6 +418,7 @@ input EditWorkspaceInput {
   customerSlug: String!
   id: ID!
   logo: String
+  logoOpacity: Int
   name: String!
   primaryColour: String!
   slug: String!
@@ -655,6 +662,7 @@ type Mutation {
   createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
+  debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!

@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods } from 'react-hook-form';
@@ -10,12 +11,13 @@ import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
-import intToBool from 'utils/intToBool';
+import styled, { css } from 'styled-components';
 
+import { UploadPreviewContainer } from 'components/FileDropInput/FileDropInput';
 import ColorPickerInput from 'components/ColorPicker';
-
 import FileDropInput from 'components/FileDropInput';
 import ServerError from 'components/ServerError';
+import intToBool from 'utils/intToBool';
 import useAuth from 'hooks/useAuth';
 
 import uploadSingleImage from '../../mutations/uploadSingleImage';
@@ -24,6 +26,7 @@ interface FormDataProps {
   name: string;
   slug: string;
   logo?: string;
+  logoOpacity?: number;
   primaryColour?: string;
   useCustomUrl?: number;
   willGenerateFakeData?: number,
@@ -31,7 +34,19 @@ interface FormDataProps {
   seed?: number;
 }
 
-const CustomerUploadLogoInput = ({ onChange, value }: any) => {
+const CustomerUploadContainer = styled.div<{overrideColor?: string, logoOpacity?: number}>`
+  ${({ theme, overrideColor, logoOpacity }) => css`
+    ${UploadPreviewContainer} {
+      background: ${overrideColor || theme.colors.primary};
+
+      img {
+        opacity: ${logoOpacity};
+      }
+    }
+  `}
+`;
+
+const CustomerUploadLogoInput = ({ onChange, value, logoOpacity, overrideColor }: any) => {
   const toast = useToast();
 
   const [uploadFile, { loading }] = useMutation(uploadSingleImage, {
@@ -65,14 +80,18 @@ const CustomerUploadLogoInput = ({ onChange, value }: any) => {
   };
 
   return (
-    <>
+    <CustomerUploadContainer logoOpacity={logoOpacity} overrideColor={overrideColor}>
       <FileDropInput value={value} onDrop={onDrop} isLoading={loading} />
-    </>
+    </CustomerUploadContainer>
   );
 };
 
 const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
   const { t } = useTranslation();
+
+  const logoOpacity = form.watch('logoOpacity') ?? 0.3;
+  console.log(logoOpacity);
+  const overrideColor = form.watch('primaryColour') || undefined;
 
   return (
     <>
@@ -112,24 +131,49 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
             ref={form.register()}
           />
         </FormControl>
-
       ) : (
-          <>
-            <FormControl>
-              <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
-              <InputHelper>{t('logo_upload_helper')}</InputHelper>
+        <>
+          <FormControl>
+            <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+            <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
-              <Controller
-                control={form.control}
-                name="uploadLogo"
-                defaultValue=""
-                render={({ onChange, value }) => (
-                  <CustomerUploadLogoInput value={value} onChange={onChange} />
-                )}
+            <Controller
+              control={form.control}
+              name="uploadLogo"
+              defaultValue=""
+              render={({ onChange, value }) => (
+                <CustomerUploadLogoInput
+                  value={value}
+                  onChange={onChange}
+                  logoOpacity={logoOpacity}
+                  overrideColor={overrideColor}
+                />
+              )}
+            />
+          </FormControl>
+        </>
+      )}
+
+      <UI.Div>
+        <UI.FormControl>
+          <UI.FormLabel htmlFor="logoOpacity">{t('logo_opacity')}</UI.FormLabel>
+          <UI.InputHelper>{t('logo_opacity_helper')}</UI.InputHelper>
+
+          <Controller
+            name="logoOpacity"
+            control={form.control}
+            render={({ value, onChange }) => (
+              <UI.FormSlider
+                defaultValue={value}
+                onChange={onChange}
+                stepSize={0.1}
+                min={0}
+                max={1}
               />
-            </FormControl>
-          </>
-        )}
+            )}
+          />
+        </UI.FormControl>
+      </UI.Div>
     </>
   );
 };

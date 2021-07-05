@@ -7,8 +7,8 @@ import { Customer, Dialogue } from 'types/generic';
 import getCustomerFromSlug from 'queries/getCustomerFromSluqQuery';
 import getDialogueFromSlug from 'queries/getDialogueFromSlugQuery';
 
-import treeStore from './DialogueTreeStore';
 import { useTranslation } from 'react-i18next';
+import treeStore from './DialogueTreeStore';
 
 interface DialogueTreeContextType {
   store: TreeStoreModelProps;

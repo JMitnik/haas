@@ -8,6 +8,7 @@ const getEditCustomerData = gql`
       slug
       settings {
         logoUrl
+        logoOpacity
         colourSettings {
           primary
         }
