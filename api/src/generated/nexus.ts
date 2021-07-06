@@ -119,6 +119,7 @@ export interface NexusGenInputs {
   CreateWorkspaceInput: { // input type
     isSeed?: boolean | null; // Boolean
     logo?: string | null; // String
+    logoOpacity?: number | null; // Int
     name: string; // String!
     primaryColour: string; // String!
     slug: string; // String!
@@ -178,6 +179,7 @@ export interface NexusGenInputs {
     customerSlug: string; // String!
     id: string; // ID!
     logo?: string | null; // String
+    logoOpacity?: number | null; // Int
     name: string; // String!
     primaryColour: string; // String!
     slug: string; // String!
@@ -941,6 +943,7 @@ export interface NexusGenFieldTypes {
     colourSettings: NexusGenRootTypes['ColourSettings'] | null; // ColourSettings
     fontSettings: NexusGenRootTypes['FontSettings'] | null; // FontSettings
     id: string; // ID!
+    logoOpacity: number | null; // Int
     logoUrl: string | null; // String
   }
   DeleteUserOutput: { // field return type

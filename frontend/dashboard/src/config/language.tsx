@@ -275,6 +275,14 @@ const language = {
       en: 'User can leave this empty',
       de: 'Benutzer kann dies leer lassen',
     },
+    logo_opacity_helper: {
+      en: 'Decide how opaque the logo will be in the dialogue.',
+      de: 'Entscheiden Sie, wie undurchsichtig das Logo im Dialog sein soll.',
+    },
+    logo_opacity: {
+      en: 'Logo opaqueness',
+      de: 'Logo Undurchsichtigkeit',
+    },
     required_helper: {
       en: 'User must fill this in.',
       de: 'Benutzer muss dies in füllen',
@@ -1305,7 +1313,7 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
     language: {
       en: '',
-      de: ''
+      de: '',
     },
     finisher_heading: {
       en: 'Dialogue finisher heading',

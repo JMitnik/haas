@@ -18,9 +18,9 @@ const getDropColor = (props: any) => {
   return '#eeeeee';
 };
 
-const DropContainer = styled.div<{disabled?: boolean}>`
+export const DropContainer = styled.div<{disabled?: boolean}>`
   flex: 1;
-  pointer-events: ${props => props.disabled ? 'none' : 'auto'};
+  pointer-events: ${(props) => (props.disabled ? 'none' : 'auto')};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,7 +35,7 @@ const DropContainer = styled.div<{disabled?: boolean}>`
   transition: border .24s ease-in-out;
 `;
 
-const UploadPreviewContainer = styled(Div)`
+export const UploadPreviewContainer = styled(Div)`
   ${({ theme }) => css`
     border-radius: 10px;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
@@ -43,7 +43,7 @@ const UploadPreviewContainer = styled(Div)`
     display: flex;
     background: transparent;
     padding: ${theme.gutter / 2}px;
-    
+
     img {
       max-width: 800px;
       max-height: 400px;

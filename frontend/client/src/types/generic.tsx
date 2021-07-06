@@ -78,16 +78,6 @@ export interface Dialogue {
   postLeafNode: PostLeafNode | null;
 }
 
-interface DialogueContextProps {
-  customer: any;
-  dialogue?: Dialogue | null;
-}
-
-interface ProjectParamProps {
-  customerId: string;
-  questionnaireId: string;
-}
-
 export interface CustomerProps {
   settings: CustomerSettingsProps;
 }
@@ -109,6 +99,7 @@ export interface CustomerColorSettingsProps {
 
 export interface CustomerSettingsProps {
   logoUrl: string;
+  logoOpacity: number | null;
   colourSettings: CustomerColorSettingsProps;
 }
 
