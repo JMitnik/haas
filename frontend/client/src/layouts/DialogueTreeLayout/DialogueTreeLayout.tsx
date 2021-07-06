@@ -57,7 +57,7 @@ const DialogueTreeLayout = ({ children, node, isAtLeaf }: { children: ReactNode,
         </Helmet>
       )}
 
-      {!!store.customer && <WatermarkLogo logoUrl={store.customer?.settings?.logoUrl} />}
+      {!!store.customer && <WatermarkLogo logoUrl={store.customer?.settings?.logoUrl} opacity={store.customer?.settings?.logoOpacity} />}
     </DialogueTreeContainer>
   );
 };

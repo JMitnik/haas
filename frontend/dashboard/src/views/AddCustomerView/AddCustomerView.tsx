@@ -2,14 +2,14 @@ import * as yup from 'yup';
 import {
   Container, FormContainer,
 } from '@haas/ui';
+import { gql, useMutation } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useMutation } from '@apollo/client';
+
 import { useToast } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
-import { gql } from '@apollo/client';
 
 import CustomerForm from 'components/CustomerForm';
 import intToBool from 'utils/intToBool';
@@ -29,6 +29,7 @@ const createWorkspaceMutation = gql`
 const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
   logo: yup.string().url('Url should be valid'),
+  logoOpacity: yup.number().min(0).max(1),
   slug: yup.string().required('Slug is required'),
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
@@ -49,6 +50,9 @@ const AddCustomerView = () => {
   const form = useForm<FormDataProps>({
     mode: 'onChange',
     resolver: yupResolver(schema),
+    defaultValues: {
+      logoOpacity: 0.3,
+    },
   });
 
   const [createWorkspace, { loading, error: serverErrors }] = useMutation<null, { input: CreateWorkspaceInput }>(createWorkspaceMutation, {
@@ -90,6 +94,7 @@ const AddCustomerView = () => {
         input: {
           name: formData.name,
           logo: intToBool(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
+          logoOpacity: (formData?.logoOpacity ?? 0.3) * 100,
           slug: formData.slug,
           isSeed: intToBool(formData.seed),
           willGenerateFakeData: intToBool(formData.willGenerateFakeData),
