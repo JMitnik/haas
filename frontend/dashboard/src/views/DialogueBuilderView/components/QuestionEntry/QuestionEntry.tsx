@@ -113,8 +113,8 @@ const QuestionEntryItem = ({ depth,
     }],
     onCompleted: () => {
       toast({
-        title: t('toast:delete_node'),
-        description: t('toast:delete_node_helper'),
+        title: t('toast:branch_cloned'),
+        description: t('toast:branch_clone_helper'),
         status: 'success',
         position: 'bottom-right',
         duration: 1500,

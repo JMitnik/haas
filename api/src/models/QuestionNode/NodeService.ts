@@ -84,22 +84,35 @@ export interface IdMapProps {
 }
 
 class NodeService {
+  /**
+   * Creates a key-value pair of an existing CUID (e.g. questionId or edgeId) and a newly generate CUID
+   * @param ids An array of existing CUIDs
+   */
+  static createCuidPairs = (idMap: IdMapProps, ids: string[]) => {
+    ids.forEach((oldId) => {
+      if (!Object.keys(idMap).find((id) => id === oldId)) {
+        idMap[oldId] = cuid();
+      }
+    });
+  }
+
   static getCloneIds = (edges: Edge[], edgeIds: string[], questionIds: string[], questionId: string) => {
     const targetEdges = edges.filter((edge) => edge.parentNodeId === questionId);
     if (targetEdges.length) {
       targetEdges.forEach((targetEdge) => {
-        console.log('targetEdge: ', targetEdge);
         const childQuestionNodeId = targetEdge?.childNodeId;
         const edgeId = targetEdge.id
+
         edgeIds.push(edgeId);
         questionIds.push(childQuestionNodeId);
+
         NodeService.getCloneIds(edges, edgeIds, questionIds, childQuestionNodeId)
-      })
-    }
-    // Add last childQuestion id as well even tho it doesn't serve as parent of an edge
+      });
+    };
 
     return { edgeIds, questionIds };
-  }
+  };
+
   static mapEdge(idMap: IdMapProps, edge: (Edge & {
     conditions: QuestionCondition[];
   })) {
@@ -129,10 +142,6 @@ class NodeService {
     isOverrideLeafOf: QuestionNode[];
   }) {
     const mappedId = idMap[question.id];
-
-    // TODO: Think whether override leaf needs to be mapped for clone function (I think it does not)
-    const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
-    const mappedOverrideLeaf = question.overrideLeafId ? { id: question.overrideLeafId } : null;
     const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
     const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id }));
     const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = {
@@ -150,6 +159,7 @@ class NodeService {
         }
       })
     };
+
     const mappedObject = {
       ...question,
       id: mappedId,
@@ -157,17 +167,16 @@ class NodeService {
       options: mappedOptions,
       isOverrideLeafOf: mappedIsOverrideLeafOf,
     };
+
     return mappedObject;
   }
 
   /**
    * Clones the question and all its child questions 
-   * @questionId the parent question id used to generate a cloned question and child questions
+   * @questionId the parent question id used to generate a cloned dialogue
    */
-  static cloneQuestion = async (questionId: string) => {
+  static cloneBranch = async (questionId: string) => {
     const idMap: IdMapProps = {};
-
-    const mappedId = idMap[questionId];
 
     const question = await prisma.questionNode.findFirst({
       where: {
@@ -190,25 +199,10 @@ class NodeService {
       }
     });
 
-    console.log('edges: ', edges);
-
     const { edgeIds, questionIds } = NodeService.getCloneIds(edges, [], [questionId], questionId);
-    console.log('Child question Ids: ', questionIds);
-    console.log('Edge question Ids: ', edgeIds);
 
-    [...questionIds, questionId].forEach((questionId) => {
-      if (!Object.keys(idMap).find((id) => id === questionId)) {
-        idMap[questionId] = cuid();
-      }
-    });
+    NodeService.createCuidPairs(idMap, [...questionIds, ...edgeIds, questionId]);
 
-    edgeIds.forEach((edgeId) => {
-      if (!Object.keys(idMap).find((id) => id === edgeId)) {
-        idMap[edgeId] = cuid();
-      }
-    })
-
-    console.log('ID MAP: ', idMap, 'length= ', Object.keys(idMap).length);
     const targetQuestions = await prisma.questionNode.findMany({
       where: {
         id: {
@@ -216,7 +210,6 @@ class NodeService {
         },
       },
       include: {
-        links: true,
         options: true,
         videoEmbeddedNode: true,
         isOverrideLeafOf: true,
@@ -230,17 +223,13 @@ class NodeService {
     });
 
     const targetEdges = edges.filter((edge) => edgeIds.includes(edge.id));
-
-    // TODO: Remember to link cloned parent id question to their 
-    // parent question (should always exist cus slider node shouldn't be allowed to be cloned)
     const parentQuestionEdge = edges.find((edge) => edge.childNodeId === questionId);
-    console.log('Edge connecting start branch with parent: ', parentQuestionEdge);
 
     if (!parentQuestionEdge) throw 'No edge exist to connect new branch to their parent'
 
     const updatedEdges: Enumerable<EdgeCreateWithoutDialogueInput> = [...targetEdges, parentQuestionEdge].map((edge) => {
       const mappedEdge = NodeService.mapEdge(idMap, edge);
-      console.log('mapped edge: ', mappedEdge.childNodeId, mappedEdge.parentNodeId, mappedEdge.conditions);
+
       return {
         parentNode: {
           connect: {
@@ -258,10 +247,6 @@ class NodeService {
 
       };
     });
-    console.log('target edges length: ', targetEdges.length);
-    console.log('updated edges: ', updatedEdges);
-
-    // console.log('question old id: ', targetQuestions[0].id, 'question new id: ', updatedQuestions[0].id);
 
     await prisma.dialogue.update({
       where: {
@@ -286,23 +271,14 @@ class NodeService {
               }
             } : undefined,
           })),
-        }
-      },
-    });
-
-    console.log('SUCCESFULLY CREATED QUESTIONS!')
-    await prisma.dialogue.update({
-      where: {
-        id: question.questionDialogueId || '-1',
-      },
-      data: {
+        },
         edges: {
           create: updatedEdges.map((edge) => ({
             childNode: edge.childNode,
             conditions: edge.conditions,
             parentNode: edge.parentNode,
           })),
-        },
+        }
       },
     });
 

@@ -1670,6 +1670,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
+    branch_cloned: {
+      en: 'Branch cloned!',
+      de: 'Zweig geklont',
+    },
+    branch_clone_helper: {
+      en: 'A new branch has succesfully been created.',
+      de: 'Eine neue Zweig wurde erfolgreich erstellt.',
+    },
     campaign_created: {
       en: 'Campaign created!',
       de: 'Kampagne erstellt!',
