@@ -225,7 +225,7 @@ const QuestionEntryItem = ({ depth,
             </Flex>
 
             <UI.Div alignSelf="center">
-              {canAccessAdmin && (
+              {canAccessAdmin && depth > 1 && (
                 <ShowMoreButton
                   renderMenu={(
                     <QuestionOptionsOverlay
