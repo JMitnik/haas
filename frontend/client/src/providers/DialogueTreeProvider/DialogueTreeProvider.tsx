@@ -1,13 +1,13 @@
 import { TreeStoreModelProps } from 'models/TreeStoreModel';
 import { useQuery } from '@apollo/client';
 import { useRouteMatch } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { Customer, Dialogue } from 'types/generic';
 import getCustomerFromSlug from 'queries/getCustomerFromSluqQuery';
 import getDialogueFromSlug from 'queries/getDialogueFromSlugQuery';
 
-import { useTranslation } from 'react-i18next';
 import treeStore from './DialogueTreeStore';
 
 interface DialogueTreeContextType {
