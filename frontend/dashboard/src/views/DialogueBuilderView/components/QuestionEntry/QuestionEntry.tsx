@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Flex, Span } from '@haas/ui';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
@@ -46,6 +46,15 @@ interface QuestionEntryItemProps {
 interface QuestionOptionsOverlayProps {
   onClone: (e: React.MouseEvent<HTMLElement>) => void;
 }
+
+const cloneQuestionMutation = gql`
+  mutation cloneQuestion($questionId: String) {
+    cloneQuestion(questionId: $questionId) {
+        id
+    }
+  }
+`;
+
 
 const QuestionOptionsOverlay = ({ onClone }: QuestionOptionsOverlayProps) => {
   const { t } = useTranslation();
@@ -94,6 +103,36 @@ const QuestionEntryItem = ({ depth,
   const toast = useToast();
   const questionRef = useRef<HTMLDivElement | null>(null);
 
+  const [cloneQuestion] = useMutation(cloneQuestionMutation, {
+    refetchQueries: [{
+      query: getTopicBuilderQuery,
+      variables: {
+        customerSlug: activeCustomer?.slug,
+        dialogueSlug,
+      },
+    }],
+    onCompleted: () => {
+      toast({
+        title: t('toast:delete_node'),
+        description: t('toast:delete_node_helper'),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+      onActiveQuestionChange(null);
+    },
+    onError: (err: Error) => {
+      console.log('Error: ', err);
+      toast({
+        title: t('toast:something_went_wrong'),
+        description: t('toast:delete_node_error_helper'),
+        status: 'error',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
+  });
+
   const [deleteQuestion] = useMutation(deleteQuestionMutation, {
     variables: {
       input: {
@@ -137,7 +176,11 @@ const QuestionEntryItem = ({ depth,
   };
 
   const handleClone = (questionId: string) => {
-    console.log('Clone action!');
+    cloneQuestion({
+      variables: {
+        questionId,
+      },
+    });
   };
 
   return (

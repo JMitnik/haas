@@ -1,7 +1,8 @@
-import { Dialogue, Edge, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionOptionCreateManyWithoutQuestionNodeInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput } from '@prisma/client';
+import { Dialogue, Edge, EdgeCreateWithoutDialogueInput, Enumerable, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionOption, QuestionOptionCreateManyWithoutQuestionNodeInput, VideoEmbeddedNode, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
+import cuid from 'cuid';
 
 interface LeafNodeDataEntryProps {
   title: string;
@@ -83,14 +84,80 @@ export interface IdMapProps {
 }
 
 class NodeService {
-  static getChildQuestionIds = (edges: Edge[], questionIds: string[], questionId: string) => {
-    const targetEdge = edges.find((edge) => edge.parentNodeId === questionId);
-    const childQuestionNodeId = targetEdge?.childNodeId;
-    if (childQuestionNodeId) {
-      questionIds.push(childQuestionNodeId);
-      NodeService.getChildQuestionIds(edges, questionIds, childQuestionNodeId)
+  static getCloneIds = (edges: Edge[], edgeIds: string[], questionIds: string[], questionId: string) => {
+    const targetEdges = edges.filter((edge) => edge.parentNodeId === questionId);
+    if (targetEdges.length) {
+      targetEdges.forEach((targetEdge) => {
+        console.log('targetEdge: ', targetEdge);
+        const childQuestionNodeId = targetEdge?.childNodeId;
+        const edgeId = targetEdge.id
+        edgeIds.push(edgeId);
+        questionIds.push(childQuestionNodeId);
+        NodeService.getCloneIds(edges, edgeIds, questionIds, childQuestionNodeId)
+      })
     }
-    return questionIds;
+    // Add last childQuestion id as well even tho it doesn't serve as parent of an edge
+
+    return { edgeIds, questionIds };
+  }
+  static mapEdge(idMap: IdMapProps, edge: (Edge & {
+    conditions: QuestionCondition[];
+  })) {
+    const mappedId = idMap[edge.id];
+    const { childNodeId, parentNodeId, conditions, } = edge;
+    // Should only not exist for the edge attaching start of branch to its parent
+    const mappedParentNodeId = idMap[parentNodeId] || parentNodeId;
+    const mappedChildNodeId = idMap[childNodeId];
+
+    const mappedConditions = conditions.map(condition => {
+      const { id, edgeId, ...rest } = condition;
+      return { ...rest };
+    });
+
+    return { ...edge, id: mappedId, parentNodeId: mappedParentNodeId, questionNodeId: mappedParentNodeId, childNodeId: mappedChildNodeId, conditions: mappedConditions }
+  }
+
+  /**
+   * Maps all existing ids of a prisma question to a new cuid  
+   * @param idMap A map containing the old cuid and a newly mapped cuid to it
+   * @param question A prisma question
+   * @returns A prisma question with new cuids 
+   */
+  static mapQuestion(idMap: IdMapProps, question: QuestionNode & {
+    options: QuestionOption[];
+    videoEmbeddedNode: VideoEmbeddedNode | null;
+    isOverrideLeafOf: QuestionNode[];
+  }) {
+    const mappedId = idMap[question.id];
+
+    // TODO: Think whether override leaf needs to be mapped for clone function (I think it does not)
+    const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
+    const mappedOverrideLeaf = question.overrideLeafId ? { id: question.overrideLeafId } : null;
+    const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
+    const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id }));
+    const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = {
+      create: question.options.map((option) => {
+        const { id, overrideLeafId, questionNodeId, questionId, ...rest } = option;
+        return {
+          position: rest.position,
+          value: rest.value,
+          publicValue: rest.publicValue,
+          overrideLeaf: overrideLeafId ? {
+            connect: {
+              id: overrideLeafId,
+            }
+          } : undefined,
+        }
+      })
+    };
+    const mappedObject = {
+      ...question,
+      id: mappedId,
+      videoEmbeddedNode: mappedVideoEmbeddedNode,
+      options: mappedOptions,
+      isOverrideLeafOf: mappedIsOverrideLeafOf,
+    };
+    return mappedObject;
   }
 
   /**
@@ -107,6 +174,48 @@ class NodeService {
         id: questionId,
       },
       include: {
+        // TODO: Add triggers and handle them in map function
+        options: true,
+        videoEmbeddedNode: true,
+        isOverrideLeafOf: true,
+      }
+    });
+
+    const edges = await prisma.edge.findMany({
+      where: {
+        dialogueId: question.questionDialogueId,
+      },
+      include: {
+        conditions: true,
+      }
+    });
+
+    console.log('edges: ', edges);
+
+    const { edgeIds, questionIds } = NodeService.getCloneIds(edges, [], [questionId], questionId);
+    console.log('Child question Ids: ', questionIds);
+    console.log('Edge question Ids: ', edgeIds);
+
+    [...questionIds, questionId].forEach((questionId) => {
+      if (!Object.keys(idMap).find((id) => id === questionId)) {
+        idMap[questionId] = cuid();
+      }
+    });
+
+    edgeIds.forEach((edgeId) => {
+      if (!Object.keys(idMap).find((id) => id === edgeId)) {
+        idMap[edgeId] = cuid();
+      }
+    })
+
+    console.log('ID MAP: ', idMap, 'length= ', Object.keys(idMap).length);
+    const targetQuestions = await prisma.questionNode.findMany({
+      where: {
+        id: {
+          in: questionIds,
+        },
+      },
+      include: {
         links: true,
         options: true,
         videoEmbeddedNode: true,
@@ -115,45 +224,89 @@ class NodeService {
       }
     });
 
-    const edges = await prisma.edge.findMany({
+    const updatedQuestions = targetQuestions.map((question) => {
+      const mappedObject = NodeService.mapQuestion(idMap, question);
+      return mappedObject;
+    });
+
+    const targetEdges = edges.filter((edge) => edgeIds.includes(edge.id));
+
+    // TODO: Remember to link cloned parent id question to their 
+    // parent question (should always exist cus slider node shouldn't be allowed to be cloned)
+    const parentQuestionEdge = edges.find((edge) => edge.childNodeId === questionId);
+    console.log('Edge connecting start branch with parent: ', parentQuestionEdge);
+
+    if (!parentQuestionEdge) throw 'No edge exist to connect new branch to their parent'
+
+    const updatedEdges: Enumerable<EdgeCreateWithoutDialogueInput> = [...targetEdges, parentQuestionEdge].map((edge) => {
+      const mappedEdge = NodeService.mapEdge(idMap, edge);
+      console.log('mapped edge: ', mappedEdge.childNodeId, mappedEdge.parentNodeId, mappedEdge.conditions);
+      return {
+        parentNode: {
+          connect: {
+            id: mappedEdge.parentNodeId,
+          },
+        },
+        childNode: {
+          connect: {
+            id: mappedEdge.childNodeId,
+          }
+        },
+        conditions: {
+          create: mappedEdge.conditions,
+        },
+
+      };
+    });
+    console.log('target edges length: ', targetEdges.length);
+    console.log('updated edges: ', updatedEdges);
+
+    // console.log('question old id: ', targetQuestions[0].id, 'question new id: ', updatedQuestions[0].id);
+
+    await prisma.dialogue.update({
       where: {
-        dialogueId: question.questionDialogueId,
+        id: question.questionDialogueId || '-1',
+      },
+      data: {
+        questions: {
+          create: updatedQuestions.map((question) => ({
+            id: question.id,
+            isRoot: question.isRoot,
+            isLeaf: question.isLeaf,
+            title: question.title,
+            type: question.type,
+            options: question.options,
+            videoEmbeddedNode: question.videoEmbeddedNode,
+            isOverrideLeafOf: {
+              connect: question.isOverrideLeafOf,
+            },
+            overrideLeaf: question.overrideLeafId ? {
+              connect: {
+                id: question.overrideLeafId,
+              }
+            } : undefined,
+          })),
+        }
       },
     });
 
-    const childQuestionIds = NodeService.getChildQuestionIds(edges, [], questionId);
-    console.log('Child question Ids: ', childQuestionIds);
+    console.log('SUCCESFULLY CREATED QUESTIONS!')
+    await prisma.dialogue.update({
+      where: {
+        id: question.questionDialogueId || '-1',
+      },
+      data: {
+        edges: {
+          create: updatedEdges.map((edge) => ({
+            childNode: edge.childNode,
+            conditions: edge.conditions,
+            parentNode: edge.parentNode,
+          })),
+        },
+      },
+    });
+
     return null;
-
-    // TODO: Find all question ids which are child of parameter question id and add to idMap
-    // TODO: Remember to link cloned parent id question to their 
-    // parent question (should always exist cus slider node shouldn't be allowed to be cloned)
-    // TODO: Map over above ids in idMap with below piece of code AS WELL AS 
-
-    // const mappedLinks = question && question.links.map((link) => {
-    //   const { id, ...linkData } = link;
-    //   const updateLink = { ...linkData, questionNodeId: idMap[mappedId] };
-    //   return updateLink;
-    // });
-
-    // const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
-    // const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
-    // const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
-    // const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
-    // const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
-    // const mappedObject = {
-    //   ...question,
-    //   id: mappedId,
-    //   videoEmbeddedNode: mappedVideoEmbeddedNode,
-    //   questionDialogueId: question.questionDialogueId,
-    //   links: { create: mappedLinks },
-    //   options: mappedOptions,
-    //   overrideLeafId: mappedOverrideLeafId,
-    //   overrideLeaf: mappedOverrideLeaf,
-    //   isOverrideLeafOf: mappedIsOverrideLeafOf,
-    // };
-
-    // TODO: Create edges based on targetEdge Ids found through getChildQuestionIds (?)
   }
 
   static removeNonExistingLinks = async (

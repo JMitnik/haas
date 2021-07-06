@@ -492,7 +492,8 @@ export const QuestionNodeMutations = extendType({
           throw new UserInputError('Question id is missing!');
         }
 
-        return NodeService.cloneQuestion(args.questionId);
+        await NodeService.cloneQuestion(args.questionId);
+        return null;
       },
     });
 
