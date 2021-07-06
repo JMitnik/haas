@@ -28,6 +28,7 @@ const getCTANodesOfDialogue = gql`
           }
           form {
             id
+            helperText
             fields {
               id
               label

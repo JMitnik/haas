@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -41,7 +41,6 @@ model FontSettings {
 model CustomerSettings {
   id               Int             @id @default(autoincrement())
   logoUrl          String?
-  logoOpacity      Int?            @default(30)
   colourSettingsId Int?
   colourSettings   ColourSettings? @relation(fields: [colourSettingsId], references: [id])
   fontSettingsId   Int?

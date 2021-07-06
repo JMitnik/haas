@@ -38,6 +38,7 @@ const getDialogueFromSlug = gql`
           }
           form {
             id
+            helperText
             fields {
               id
               label

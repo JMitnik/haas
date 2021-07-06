@@ -24,6 +24,7 @@ const mapFieldType: { [key: string]: string } = {
   number: 'number',
   phoneNumber: 'tel',
   url: 'url',
+  longText: '',
 };
 
 const mapIcon: any = {
@@ -95,26 +96,37 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
             fontSize="1.2rem"
             mb={2}
           >
-            {t('leave_your_details')}
+            {node.form?.helperText || t('leave_your_details')}
           </UI.Text>
           <UI.Hr />
           <UI.Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { handleSubmit(e); return false; }}>
             <Div>
               <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 {fields?.map((field, index) => (
-                  <UI.Div key={index}>
+                  <UI.Div key={index} gridColumn={field.type === 'longText' ? 'span 2' : '1fr'}>
                     <UI.FormControl isRequired={field.isRequired}>
                       <UI.FormLabel htmlFor={`fields[${index}].value`}>{field.label}</UI.FormLabel>
-                      <UI.Input
-                        id={`fields[${index}].value`}
-                        variant="outline"
-                        leftEl={mapIcon[field?.type] || <Type />}
-                        type={mapFieldType[field?.type] || 'text'}
-                        ref={register({ required: field.isRequired })}
-                        name={`fields[${index}].value`}
-                        placeholder={field.label}
-                        maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
-                      />
+                      {field.type === 'longText' ? (
+                        <UI.Textarea
+                          id={`fields[${index}].value`}
+                          variant="outline"
+                          ref={register({ required: field.isRequired })}
+                          name={`fields[${index}].value`}
+                          minHeight="150px"
+                          placeholder={field.label}
+                        />
+                      ) : (
+                        <UI.Input
+                          id={`fields[${index}].value`}
+                          variant="outline"
+                          leftEl={mapIcon[field?.type] || <Type />}
+                          type={mapFieldType[field?.type] || 'text'}
+                          ref={register({ required: field.isRequired })}
+                          name={`fields[${index}].value`}
+                          placeholder={field.label}
+                          maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
+                        />
+                      )}
                     </UI.FormControl>
                   </UI.Div>
                 ))}

@@ -17,6 +17,7 @@ export interface FormDataProps {
   share: { id?: string, tooltip: string, url: string, title: string };
   formNode?: {
     id?: string;
+    helperText?: string;
     fields: {
       id?: string;
       label: string;
