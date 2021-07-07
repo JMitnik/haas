@@ -124,8 +124,7 @@ const AddDialogueView = () => {
         variables: { customerSlug },
       },
     ],
-    onError: (err: Error) => {
-      console.log('Error: ', err);
+    onError: () => {
       toast({
         title: 'Something went wrong',
         description: 'There was a problem in adding the dialogue. Please try again',
