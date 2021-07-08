@@ -1,12 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
-// eslint-disable-next-line import/no-cycle
 import { CTALinksInputType, LinkType } from '../link/Link';
-// eslint-disable-next-line import/named
-// eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
-// eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
@@ -41,8 +37,8 @@ export const QuestionOptionType = objectType({
 
     t.string('publicValue', { nullable: true });
 
-    t.field('overrideLeaf', { 
-      type: 'QuestionNode', 
+    t.field('overrideLeaf', {
+      type: 'QuestionNode',
       nullable: true,
 
       resolve: async (parent, ctx) => {
@@ -52,6 +48,15 @@ export const QuestionOptionType = objectType({
 
         return cta as any;
       }
+    });
+
+    t.int('position', {
+      nullable: true,
+      resolve(parent) {
+        if (!parent.position) return null;
+
+        return parent.position;
+      },
     });
   },
 });
@@ -110,6 +115,8 @@ export const FormNodeInputType = inputObjectType({
 
   definition(t) {
     t.string('id', { nullable: true });
+    t.string('helperText', { nullable: true });
+
     t.list.field('fields', { type: FormNodeFieldInput });
   },
 });
@@ -131,6 +138,8 @@ export const FormNodeType = objectType({
 
   definition(t) {
     t.string('id', { nullable: true });
+    t.string('helperText', { nullable: true });
+
     t.list.field('fields', { type: FormNodeField });
   },
 });
@@ -161,6 +170,9 @@ export const SliderNodeType = objectType({
 
   definition(t) {
     t.id('id', { nullable: true });
+    t.string('happyText', { nullable: true });
+    t.string('unhappyText', { nullable:  true });
+
     t.list.field('markers', {
       type: SliderNodeMarkerType,
       nullable: true,
@@ -222,7 +234,6 @@ export const QuestionNodeType = objectType({
       nullable: true,
       resolve: (parent: any) => {
         if (parent.type === 'FORM') {
-          console.log(parent.form);
           return parent.form;
         }
 
@@ -317,9 +328,8 @@ export const QuestionNodeType = objectType({
       resolve(parent, args, ctx) {
         const options = ctx.prisma.questionOption.findMany({
           where: { questionNodeId: parent.id },
-          include: {
-            overrideLeaf: true
-          }
+          include: { overrideLeaf: true },
+          orderBy: { position: 'asc' },
         });
 
         return options;
@@ -363,6 +373,7 @@ export const OptionInputType = inputObjectType({
     t.string('value');
     t.string('publicValue', { nullable: true });
     t.string('overrideLeafId', { required: false });
+    t.int('position', { required: true });
   },
 });
 
@@ -446,7 +457,9 @@ export const CreateQuestionNodeInputType = inputObjectType({
     t.string('dialogueSlug');
     t.string('title');
     t.string('type');
-    t.string('extraContent', { nullable: true }) 
+    t.string('extraContent', { nullable: true });
+    t.string('unhappyText');
+    t.string('happyText');
 
     t.field('optionEntries', { type: OptionsInputType });
     t.field('edgeCondition', { type: EdgeConditionInputType });
@@ -545,8 +558,6 @@ export const QuestionNodeMutations = extendType({
 
         const dialogue = customer?.dialogues[0];
         const dialogueId = dialogue?.id;
-
-        console.log('extra content create: ', extraContent)
 
         if (dialogueId) {
           return NodeService.createQuestionFromBuilder(

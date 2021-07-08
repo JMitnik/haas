@@ -11,6 +11,7 @@ const FormNodeFieldModel = types.model({
 const FormNodeModel = types
   .model({
     id: types.string,
+    helperText: types.maybeNull(types.string),
     fields: types.array(FormNodeFieldModel),
   });
 

@@ -13,6 +13,8 @@ export const QuestionFragment = gql`
     extraContent
     sliderNode {
       id
+      happyText
+      unhappyText
       markers {
         id
         label

@@ -5,7 +5,10 @@ import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import {
   Dialogue, DialogueCreateInput, DialogueUpdateInput,
+  LanguageEnum,
   NodeType,
+  PostLeafNode,
+  PostLeafNodeUpdateOneWithoutDialogueInput,
   QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
@@ -36,10 +39,12 @@ class DialogueService {
     description: string,
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
+    language: LanguageEnum,
   ): DialogueCreateInput {
     const constructDialogueFragment = {
       customer: { connect: { id: customerId } },
       title,
+      language,
       slug: dialogueSlug,
       description,
       publicTitle,
@@ -98,8 +103,46 @@ class DialogueService {
     return updateDialogueArgs;
   };
 
+  static updatePostLeafNode(
+    dbPostLeaf: PostLeafNode | null | undefined,
+    heading: string | null | undefined,
+    subHeading: string | null | undefined,
+  ): PostLeafNodeUpdateOneWithoutDialogueInput | undefined {
+    if (!dbPostLeaf && !heading && !subHeading) {
+      return undefined;
+    } else if (dbPostLeaf && !heading && !subHeading) {
+      return { disconnect: true };
+    } else if (dbPostLeaf && (heading || subHeading)) {
+      return {
+        update: {
+          header: heading || '',
+          subtext: subHeading || '',
+        }
+      };
+    } else if (!dbPostLeaf && (heading || subHeading)) {
+      return {
+        create: {
+          header: heading || '',
+          subtext: subHeading || '',
+        }
+      }
+    }
+    return undefined;
+  }
+
   static editDialogue = async (args: any) => {
-    const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData } = args;
+    const {
+      customerSlug,
+      dialogueSlug,
+      title,
+      description,
+      publicTitle,
+      tags,
+      isWithoutGenData,
+      dialogueFinisherHeading,
+      dialogueFinisherSubheading,
+      language
+    } = args;
 
     const customer = await prisma.customer.findOne({
       where: {
@@ -112,13 +155,22 @@ class DialogueService {
           },
           include: {
             tags: true,
+            postLeafNode: true,
           },
         },
       },
     });
     const dbDialogue = customer?.dialogues[0];
 
-    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle, isWithoutGenData };
+    const postLeafNode = DialogueService.updatePostLeafNode(
+      dbDialogue?.postLeafNode,
+      dialogueFinisherHeading,
+      dialogueFinisherSubheading
+    );
+
+    let updateDialogueArgs: DialogueUpdateInput = {
+      title, description, publicTitle, isWithoutGenData, postLeafNode, language
+    };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
     }
@@ -452,11 +504,12 @@ class DialogueService {
     description: string,
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
+    language: LanguageEnum,
   ) => {
     try {
       const dialogue = await prisma.dialogue.create({
         data: DialogueService.constructDialogue(
-          customerId, title, dialogueSlug, description, publicTitle, tags,
+          customerId, title, dialogueSlug, description, publicTitle, tags, language,
         ),
       });
 
@@ -477,7 +530,8 @@ class DialogueService {
     dialogueSlug: string,
     description: string,
     publicTitle: string = '',
-    tags: Array<{ id: string }> = []) => {
+    tags: Array<{ id: string }> = [],
+    language: LanguageEnum = 'ENGLISH') => {
     const templateDialogue = await prisma.dialogue.findOne({
       where: {
         id: templateId,
@@ -539,7 +593,7 @@ class DialogueService {
 
     const idMap: IdMapProps = {};
     const dialogue = await DialogueService.initDialogue(
-      customerId, title, dialogueSlug, description, publicTitle, tags,
+      customerId, title, dialogueSlug, description, publicTitle, tags, language,
     );
 
     if (!dialogue) throw new Error('Dialogue not copied');
@@ -754,6 +808,10 @@ class DialogueService {
       throw new Error('Description required, not found!');
     }
 
+    if (!input.language) {
+      throw new Error('Language required, not found!');
+    }
+
     if (customers.length > 1) {
       // TODO: Make this a logger or something
       console.warn(`Multiple customers found with slug ${input.customerSlug}`);
@@ -773,6 +831,7 @@ class DialogueService {
         input.title,
         input.description,
         dialogueTags,
+        input.language,
       );
     }
 
@@ -785,6 +844,7 @@ class DialogueService {
         input.description,
         input.publicTitle || '',
         [],
+        input.language,
       );
     }
 
@@ -795,6 +855,7 @@ class DialogueService {
       input.description,
       input.publicTitle || '',
       dialogueTags,
+      input.language,
     );
 
     if (!dialogue) throw new ApolloError('customer:unable_to_create');
@@ -828,9 +889,10 @@ class DialogueService {
     dialogueTitle: string = 'Default dialogue',
     dialogueDescription: string = 'Default questions',
     tags: Array<{ id: string }>,
+    language: LanguageEnum = 'ENGLISH',
   ): Promise<Dialogue> => {
     const dialogue = await DialogueService.initDialogue(
-      customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags,
+      customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags, language,
     );
 
     if (!dialogue) throw new Error('Dialogue not seeded');

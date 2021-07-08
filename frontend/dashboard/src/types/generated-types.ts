@@ -227,6 +227,7 @@ export type CreateDialogueInputType = {
   templateDialogueId?: Maybe<Scalars['String']>;
   publicTitle?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
+  language?: Maybe<LanguageEnumType>;
 };
 
 export type CreateJobProcessLocationInput = {
@@ -243,6 +244,8 @@ export type CreateQuestionNodeInputType = {
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
   extraContent?: Maybe<Scalars['String']>;
+  unhappyText?: Maybe<Scalars['String']>;
+  happyText?: Maybe<Scalars['String']>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
@@ -454,9 +457,11 @@ export type Dialogue = {
   description: Scalars['String'];
   isWithoutGenData: Scalars['Boolean'];
   wasGeneratedWithGenData: Scalars['Boolean'];
+  language: LanguageEnumType;
   publicTitle?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
+  postLeafNode?: Maybe<DialogueFinisherObjectType>;
   averageScore: Scalars['Float'];
   statistics?: Maybe<DialogueStatistics>;
   sessionConnection?: Maybe<SessionConnection>;
@@ -499,6 +504,13 @@ export type DialogueFilterInputType = {
   searchTerm?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
+};
+
+export type DialogueFinisherObjectType = {
+  __typename?: 'DialogueFinisherObjectType';
+  id: Scalars['ID'];
+  header: Scalars['String'];
+  subtext: Scalars['String'];
 };
 
 export type DialogueStatistics = {
@@ -790,6 +802,12 @@ export enum JobStatusType {
   CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL'
 }
 
+export enum LanguageEnumType {
+  English = 'ENGLISH',
+  Dutch = 'DUTCH',
+  German = 'GERMAN'
+}
+
 export type LineChartDataType = {
   __typename?: 'lineChartDataType';
   x?: Maybe<Scalars['String']>;
@@ -1073,6 +1091,9 @@ export type MutationEditDialogueArgs = {
   publicTitle?: Maybe<Scalars['String']>;
   isWithoutGenData?: Maybe<Scalars['Boolean']>;
   tags?: Maybe<TagsInputObjectType>;
+  language?: Maybe<LanguageEnumType>;
+  dialogueFinisherHeading?: Maybe<Scalars['String']>;
+  dialogueFinisherSubheading?: Maybe<Scalars['String']>;
 };
 
 
@@ -1184,6 +1205,7 @@ export type OptionInputType = {
   value?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
   overrideLeafId?: Maybe<Scalars['String']>;
+  position: Scalars['Int'];
 };
 
 export type OptionsInputType = {
@@ -1478,6 +1500,7 @@ export type QuestionOption = {
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
+  position?: Maybe<Scalars['Int']>;
 };
 
 export type RecipientsInputType = {
@@ -1653,6 +1676,8 @@ export type SliderNodeRangeType = {
 export type SliderNodeType = {
   __typename?: 'SliderNodeType';
   id?: Maybe<Scalars['ID']>;
+  happyText?: Maybe<Scalars['String']>;
+  unhappyText?: Maybe<Scalars['String']>;
   markers?: Maybe<Array<SliderNodeMarkerType>>;
 };
 
@@ -1797,6 +1822,8 @@ export type UpdateQuestionNodeInputType = {
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
   extraContent?: Maybe<Scalars['String']>;
+  unhappyText?: Maybe<Scalars['String']>;
+  happyText?: Maybe<Scalars['String']>;
   sliderNode?: Maybe<SliderNodeInputType>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;

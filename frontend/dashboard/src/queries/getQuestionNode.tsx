@@ -8,6 +8,8 @@ const getQuestionNodeQuery = gql`
       type
       sliderNode {
         id
+        happyText
+        unhappyText
         markers {
           id
           label

@@ -107,6 +107,7 @@ export interface NexusGenInputs {
     description?: string | null; // String
     dialogueSlug?: string | null; // String
     isSeed?: boolean | null; // Boolean
+    language?: NexusGenEnums['LanguageEnumType'] | null; // LanguageEnumType
     publicTitle?: string | null; // String
     tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
     templateDialogueId?: string | null; // String
@@ -117,11 +118,13 @@ export interface NexusGenInputs {
     dialogueSlug?: string | null; // String
     edgeCondition?: NexusGenInputs['EdgeConditionInputType'] | null; // EdgeConditionInputType
     extraContent?: string | null; // String
+    happyText?: string | null; // String
     optionEntries?: NexusGenInputs['OptionsInputType'] | null; // OptionsInputType
     overrideLeafId?: string | null; // ID
     parentQuestionId?: string | null; // ID
     title?: string | null; // String
     type?: string | null; // String
+    unhappyText?: string | null; // String
   }
   CreateTriggerInputType: { // input type
     customerSlug?: string | null; // String
@@ -131,6 +134,7 @@ export interface NexusGenInputs {
   CreateWorkspaceInput: { // input type
     isSeed?: boolean | null; // Boolean
     logo?: string | null; // String
+    logoOpacity?: number | null; // Int
     name: string; // String!
     primaryColour: string; // String!
     slug: string; // String!
@@ -219,6 +223,7 @@ export interface NexusGenInputs {
     customerSlug: string; // String!
     id: string; // ID!
     logo?: string | null; // String
+    logoOpacity?: number | null; // Int
     name: string; // String!
     primaryColour: string; // String!
     slug: string; // String!
@@ -244,6 +249,7 @@ export interface NexusGenInputs {
   }
   FormNodeInputType: { // input type
     fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
+    helperText?: string | null; // String
     id?: string | null; // String
   }
   GenerateAutodeckInput: { // input type
@@ -298,6 +304,7 @@ export interface NexusGenInputs {
   OptionInputType: { // input type
     id?: number | null; // Int
     overrideLeafId?: string | null; // String
+    position: number; // Int!
     publicValue?: string | null; // String
     value?: string | null; // String
   }
@@ -440,12 +447,14 @@ export interface NexusGenInputs {
     edgeCondition?: NexusGenInputs['EdgeConditionInputType'] | null; // EdgeConditionInputType
     edgeId?: string | null; // ID
     extraContent?: string | null; // String
+    happyText?: string | null; // String
     id: string; // ID!
     optionEntries?: NexusGenInputs['OptionsInputType'] | null; // OptionsInputType
     overrideLeafId?: string | null; // ID
     sliderNode?: NexusGenInputs['SliderNodeInputType'] | null; // SliderNodeInputType
     title?: string | null; // String
     type?: string | null; // String
+    unhappyText?: string | null; // String
   }
   UserInput: { // input type
     customerId?: string | null; // String
@@ -477,6 +486,7 @@ export interface NexusGenEnums {
   FormNodeFieldTypeEnum: "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
+  LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
   LinkTypeEnumType: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP"
   PaginationSearchEnum: "email" | "firstName" | "lastName" | "name" | "publicTitle" | "title"
   PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "scheduledAt" | "score" | "type" | "updatedAt" | "user" | "when"
@@ -600,6 +610,11 @@ export interface NexusGenRootTypes {
     updatedAt?: string | null; // String
   }
   Dialogue: prisma.Dialogue;
+  DialogueFinisherObjectType: { // root type
+    header: string; // String!
+    id: string; // ID!
+    subtext: string; // String!
+  }
   DialogueStatistics: { // root type
     history?: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
     mostPopularPath?: NexusGenRootTypes['topPathType'] | null; // topPathType
@@ -644,6 +659,7 @@ export interface NexusGenRootTypes {
   FormNodeField: prisma.FormNodeField;
   FormNodeType: { // root type
     fields: NexusGenRootTypes['FormNodeField'][]; // [FormNodeField!]!
+    helperText?: string | null; // String
     id?: string | null; // String
   }
   ImageType: { // root type
@@ -763,7 +779,9 @@ export interface NexusGenRootTypes {
     start?: number | null; // Float
   }
   SliderNodeType: { // root type
+    happyText?: string | null; // String
     id?: string | null; // ID
+    unhappyText?: string | null; // String
   }
   Tag: prisma.Tag;
   TriggerConditionType: { // root type
@@ -918,6 +936,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   FormNodeFieldTypeEnum: NexusGenEnums['FormNodeFieldTypeEnum'];
   JobProcessLocationType: NexusGenEnums['JobProcessLocationType'];
   JobStatusType: NexusGenEnums['JobStatusType'];
+  LanguageEnumType: NexusGenEnums['LanguageEnumType'];
   LinkTypeEnumType: NexusGenEnums['LinkTypeEnumType'];
   PaginationSearchEnum: NexusGenEnums['PaginationSearchEnum'];
   PaginationSortByEnum: NexusGenEnums['PaginationSortByEnum'];
@@ -1033,6 +1052,7 @@ export interface NexusGenFieldTypes {
     colourSettings: NexusGenRootTypes['ColourSettings'] | null; // ColourSettings
     fontSettings: NexusGenRootTypes['FontSettings'] | null; // FontSettings
     id: string; // ID!
+    logoOpacity: number | null; // Int
     logoUrl: string | null; // String
   }
   Debug: { // field return type
@@ -1079,7 +1099,9 @@ export interface NexusGenFieldTypes {
     edges: NexusGenRootTypes['Edge'][]; // [Edge!]!
     id: string; // ID!
     isWithoutGenData: boolean; // Boolean!
+    language: NexusGenEnums['LanguageEnumType']; // LanguageEnumType!
     leafs: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
+    postLeafNode: NexusGenRootTypes['DialogueFinisherObjectType'] | null; // DialogueFinisherObjectType
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     rootQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
@@ -1091,6 +1113,11 @@ export interface NexusGenFieldTypes {
     title: string; // String!
     updatedAt: string | null; // String
     wasGeneratedWithGenData: boolean; // Boolean!
+  }
+  DialogueFinisherObjectType: { // field return type
+    header: string; // String!
+    id: string; // ID!
+    subtext: string; // String!
   }
   DialogueStatistics: { // field return type
     history: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
@@ -1153,6 +1180,7 @@ export interface NexusGenFieldTypes {
   }
   FormNodeType: { // field return type
     fields: NexusGenRootTypes['FormNodeField'][]; // [FormNodeField!]!
+    helperText: string | null; // String
     id: string | null; // String
   }
   ImageType: { // field return type
@@ -1336,6 +1364,7 @@ export interface NexusGenFieldTypes {
   QuestionOption: { // field return type
     id: number; // Int!
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
+    position: number | null; // Int
     publicValue: string | null; // String
     questionId: string | null; // String
     value: string; // String!
@@ -1405,8 +1434,10 @@ export interface NexusGenFieldTypes {
     start: number | null; // Float
   }
   SliderNodeType: { // field return type
+    happyText: string | null; // String
     id: string | null; // ID
     markers: NexusGenRootTypes['SliderNodeMarkerType'][] | null; // [SliderNodeMarkerType!]
+    unhappyText: string | null; // String
   }
   Tag: { // field return type
     customerId: string; // String!
@@ -1615,8 +1646,11 @@ export interface NexusGenArgTypes {
     editDialogue: { // args
       customerSlug?: string | null; // String
       description?: string | null; // String
+      dialogueFinisherHeading?: string | null; // String
+      dialogueFinisherSubheading?: string | null; // String
       dialogueSlug?: string | null; // String
       isWithoutGenData?: boolean | null; // Boolean
+      language?: NexusGenEnums['LanguageEnumType'] | null; // LanguageEnumType
       publicTitle?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
       title?: string | null; // String

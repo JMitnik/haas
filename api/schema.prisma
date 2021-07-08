@@ -41,6 +41,7 @@ model FontSettings {
 model CustomerSettings {
   id               Int             @id @default(autoincrement())
   logoUrl          String?
+  logoOpacity      Int?            @default(30)
   colourSettingsId Int?
   colourSettings   ColourSettings? @relation(fields: [colourSettingsId], references: [id])
   fontSettingsId   Int?
@@ -79,22 +80,40 @@ model Tag {
   customerId String
 }
 
+enum LanguageEnum {
+  DUTCH
+  GERMAN
+  ENGLISH
+}
+
+model PostLeafNode {
+  id      String @id @default(cuid())
+  header  String
+  subtext String
+
+  dialogue Dialogue?
+}
+
 model Dialogue {
-  id               String         @id @default(cuid())
-  title            String
-  slug             String
-  description      String
-  creationDate     DateTime       @default(now())
-  updatedAt        DateTime?      @updatedAt
-  publicTitle      String?
-  customerId       String
-  customer         Customer       @relation(fields: [customerId], references: [id])
-  edges            Edge[]
-  questions        QuestionNode[]
-  sessions         Session[]
-  tags             Tag[]
-  isOnline         Boolean        @default(value: false)
-  isWithoutGenData Boolean        @default(value: false)
+  id             String         @id @default(cuid())
+  title          String
+  slug           String
+  description    String
+  creationDate   DateTime       @default(now())
+  updatedAt      DateTime?      @updatedAt
+  publicTitle    String?
+  customerId     String
+  postLeafNodeId String?
+  customer       Customer       @relation(fields: [customerId], references: [id])
+  edges          Edge[]
+  questions      QuestionNode[]
+  sessions       Session[]
+  tags           Tag[]
+  postLeafNode   PostLeafNode?  @relation(fields: [postLeafNodeId], references: [id])
+  language       LanguageEnum   @default(ENGLISH)
+
+  isOnline         Boolean @default(value: false)
+  isWithoutGenData Boolean @default(value: false)
 
   endScreenText String?
 
@@ -138,6 +157,7 @@ model FormNodeField {
 
 model FormNode {
   id           String          @id @default(cuid())
+  helperText   String?
   createdAt    DateTime        @default(now())
   fields       FormNodeField[]
   QuestionNode QuestionNode[]
@@ -187,10 +207,11 @@ model SliderNodeMarker {
 }
 
 model SliderNode {
-  id           String             @id @default(cuid())
-  markers      SliderNodeMarker[]
-  QuestionNode QuestionNode[]
-
+  id               String             @id @default(cuid())
+  markers          SliderNodeMarker[]
+  QuestionNode     QuestionNode[]
+  unhappyText      String?
+  happyText        String?
   earlyReleaseText String?
 }
 
@@ -319,6 +340,8 @@ model QuestionOption {
 
   questionNodeId String?
   QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
+
+  position Int?
 }
 
 model Session {
@@ -629,7 +652,7 @@ model CreateWorkspaceJob {
   requiresRembg           Boolean            @default(true)
   requiresScreenshot      Boolean            @default(true)
   requiresColorExtraction Boolean            @default(true)
-  Job                     Job
+  Job                     Job?
   processLocation         JobProcessLocation @relation(fields: [jobProcessLocationId], references: [id])
   jobProcessLocationId    String
 }
