@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client';
-import qs from 'qs';
 import React, { useCallback, useContext, useRef } from 'react';
 import gql from 'graphql-tag';
+import qs from 'qs';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
 import { useCreateSessionMutation } from 'types/generated-types';
@@ -41,7 +41,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
             dialogueId: store.tree?.id || '',
             deliveryId: ref,
             totalTimeInSec: Math.min(600, Math.floor((Date.now() - startTime) / 1000)) || -1,
-            originUrl: originUrl,
+            originUrl,
             device,
             entries: uploadEntries.map((entry: any) => ({
               nodeId: entry.node.node.id,
@@ -78,7 +78,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
     })
       .catch((err) => console.error(err))
       .finally(() => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
         const [_, ...tempQueue] = queue.current;
         queue.current = tempQueue;
 
