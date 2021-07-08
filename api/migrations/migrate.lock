@@ -1,9 +1,5 @@
 # Prisma Migrate lockfile v1
 
-20210324100048-fresh-start
-20210325033216-add-job-process-location
-20210325101426-added-job-process-location-type-enum
-20210326111726-add-custom-question-field
-20210407073542-add-message---error-message-field-to-create-workspace-job
-20210419092626-added-more-job-status-types
-20210420044138-add-material-dimension-fields-to-job-process-location
+20210704193656-refresh-migrations-v20
+20210705145927-form-add-helper-text
+20210705154318-add-opacity-to-workspace

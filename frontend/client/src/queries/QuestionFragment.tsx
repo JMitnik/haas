@@ -10,8 +10,11 @@ export const QuestionFragment = gql`
     isRoot
     isLeaf
     type
+    extraContent
     sliderNode {
       id
+      happyText
+      unhappyText
       markers {
         id
         label

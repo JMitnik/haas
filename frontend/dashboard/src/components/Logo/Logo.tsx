@@ -45,12 +45,6 @@ export const FullLogoContainer = styled(Div) <GenericProps>`
   `}
 `;
 
-interface LogoProps {
-  isWithTitle?: boolean;
-  isWithSubtitle?: boolean;
-  fill?: string;
-}
-
 export const FullLogo = (props: any) => (
   <FullLogoContainer {...props}>
     <SVGLogo />

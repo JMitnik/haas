@@ -215,6 +215,7 @@ const EditWorkspaceInput = inputObjectType({
     t.string('slug', { required: true });
     t.string('name', { required: true });
     t.string('logo');
+    t.int('logoOpacity', { nullable: true });
     t.string('primaryColour', { required: true });
   },
 });
@@ -228,6 +229,7 @@ const CreateWorkspaceInput = inputObjectType({
     t.string('slug', { required: true });
     t.string('name', { required: true });
     t.string('logo');
+    t.int('logoOpacity');
     t.string('primaryColour', { required: true });
 
     // Creation specific data

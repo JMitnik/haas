@@ -1,7 +1,9 @@
 import { Instance, types } from 'mobx-state-tree';
+
 import { SpecialEdge, TreeNodeModel, TreeNodeProps, createDefaultPostLeafNode } from './TreeNodeModel';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 import { TreeNodeOptionProps } from './TreeNodeOptionModel';
+import TreeDialogueFinisherModel from './TreeDialogueFinisherModel';
 
 const TreeModel = types
   .model({
@@ -13,6 +15,7 @@ const TreeModel = types
     edges: types.array(TreeEdgeModel),
     leaves: types.array(TreeNodeModel),
     activeLeaf: types.reference(TreeNodeModel),
+    dialogueFinisher: types.maybe(TreeDialogueFinisherModel),
   })
   .actions((self) => ({
     /**
@@ -23,13 +26,14 @@ const TreeModel = types
         id: node.id,
         isRoot: node.isRoot,
         title: node.title,
+        extraContent: node.extraContent,
         children: node.children.map((edge) => edge.id),
         type: node.type,
-        options: node.options.map(option => ({
+        options: node.options.map((option) => ({
           id: option.id,
           value: option.value,
           publicValue: option.publicValue,
-          overrideLeaf: option.overrideLeaf?.id
+          overrideLeaf: option.overrideLeaf?.id,
         })),
         overrideLeaf: node.overrideLeaf?.id,
         sliderNode: node.sliderNode,
@@ -81,7 +85,7 @@ const TreeModel = types
     getChildNodeByEdge(edgeId: string | undefined): TreeNodeProps | null {
       if (!edgeId) return null;
 
-      const edge: TreeEdgeProps | null = self.edges.find((edge: TreeEdgeProps) => edge.id === edgeId);
+      const edge: TreeEdgeProps | null = self.edges.find((edgeItem: TreeEdgeProps) => edgeItem.id === edgeId);
 
       if (edgeId === SpecialEdge.POST_LEAF_EDGE_ID) {
         return createDefaultPostLeafNode();
@@ -101,8 +105,8 @@ const TreeModel = types
     getNodeById(nodeId: string | undefined): TreeNodeProps | null {
       if (!nodeId) return null;
 
-      const node = self.nodes.find((node) => node.id === nodeId);
-      const leaf = self.leaves.find((node) => node.id === nodeId);
+      const node = self.nodes.find((nodeItem) => nodeItem.id === nodeId);
+      const leaf = self.leaves.find((nodeItem) => nodeItem.id === nodeId);
 
       return node || leaf || null;
     },
@@ -131,7 +135,7 @@ const TreeModel = types
      */
     setOverrideLeaf(overrideLeaf: TreeNodeProps): void {
       self.activeLeaf = overrideLeaf;
-    }
+    },
   }))
   .views((self) => ({
     get rootNode(): TreeNodeProps {
@@ -139,6 +143,6 @@ const TreeModel = types
     },
   }));
 
-export interface TreeModelProps extends Instance<typeof TreeModel>{}
+export interface TreeModelProps extends Instance<typeof TreeModel> { }
 
 export default TreeModel;

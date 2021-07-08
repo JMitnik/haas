@@ -1,12 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
-// eslint-disable-next-line import/no-cycle
 import { CTALinksInputType, LinkType } from '../link/Link';
-// eslint-disable-next-line import/named
-// eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
-// eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
@@ -41,8 +37,8 @@ export const QuestionOptionType = objectType({
 
     t.string('publicValue', { nullable: true });
 
-    t.field('overrideLeaf', { 
-      type: 'QuestionNode', 
+    t.field('overrideLeaf', {
+      type: 'QuestionNode',
       nullable: true,
 
       resolve: async (parent, ctx) => {
@@ -53,6 +49,15 @@ export const QuestionOptionType = objectType({
         return cta as any;
       }
     });
+
+    t.int('position', {
+      nullable: true,
+      resolve(parent) {
+        if (!parent.position) return null;
+
+        return parent.position;
+      },
+    });
   },
 });
 
@@ -60,7 +65,7 @@ export const QuestionNodeTypeEnum = enumType({
   name: 'QuestionNodeTypeEnum',
   description: 'The different types a node can assume',
 
-  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'FORM', 'TEXTBOX', 'LINK', 'SHARE'],
+  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'FORM', 'TEXTBOX', 'LINK', 'SHARE', 'VIDEO_EMBEDDED'],
 });
 
 export const ShareNodeType = objectType({
@@ -110,6 +115,8 @@ export const FormNodeInputType = inputObjectType({
 
   definition(t) {
     t.string('id', { nullable: true });
+    t.string('helperText', { nullable: true });
+
     t.list.field('fields', { type: FormNodeFieldInput });
   },
 });
@@ -131,6 +138,8 @@ export const FormNodeType = objectType({
 
   definition(t) {
     t.string('id', { nullable: true });
+    t.string('helperText', { nullable: true });
+
     t.list.field('fields', { type: FormNodeField });
   },
 });
@@ -161,6 +170,9 @@ export const SliderNodeType = objectType({
 
   definition(t) {
     t.id('id', { nullable: true });
+    t.string('happyText', { nullable: true });
+    t.string('unhappyText', { nullable:  true });
+
     t.list.field('markers', {
       type: SliderNodeMarkerType,
       nullable: true,
@@ -178,9 +190,25 @@ export const QuestionNodeType = objectType({
     t.boolean('isRoot');
     t.string('title');
     t.string('updatedAt');
+
+    t.string('extraContent', {
+      nullable: true,
+      resolve: async (parent, args, ctx) => {
+        const videoEmbeddedNode = parent.videoEmbeddedNodeId ? await ctx.prisma.videoEmbeddedNode.findOne({
+          where: {
+            id: parent.videoEmbeddedNodeId,
+          },
+           select: {
+             videoUrl: true
+           }
+        }) : null;
+        return videoEmbeddedNode?.videoUrl ||  null;
+      },
+     });
     t.string('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
     t.string('overrideLeafId', { nullable: true });
+
     t.string('updatedAt', {
       nullable: true,
       resolve: (parent) => parent.updatedAt?.toString() || '',
@@ -206,7 +234,6 @@ export const QuestionNodeType = objectType({
       nullable: true,
       resolve: (parent: any) => {
         if (parent.type === 'FORM') {
-          console.log(parent.form);
           return parent.form;
         }
 
@@ -301,9 +328,8 @@ export const QuestionNodeType = objectType({
       resolve(parent, args, ctx) {
         const options = ctx.prisma.questionOption.findMany({
           where: { questionNodeId: parent.id },
-          include: {
-            overrideLeaf: true
-          }
+          include: { overrideLeaf: true },
+          orderBy: { position: 'asc' },
         });
 
         return options;
@@ -347,6 +373,7 @@ export const OptionInputType = inputObjectType({
     t.string('value');
     t.string('publicValue', { nullable: true });
     t.string('overrideLeafId', { required: false });
+    t.int('position', { required: true });
   },
 });
 
@@ -430,6 +457,9 @@ export const CreateQuestionNodeInputType = inputObjectType({
     t.string('dialogueSlug');
     t.string('title');
     t.string('type');
+    t.string('extraContent', { nullable: true });
+    t.string('unhappyText');
+    t.string('happyText');
 
     t.field('optionEntries', { type: OptionsInputType });
     t.field('edgeCondition', { type: EdgeConditionInputType });
@@ -510,7 +540,7 @@ export const QuestionNodeMutations = extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         // eslint-disable-next-line max-len
-        const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition } = args.input;
+        const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition, extraContent } = args.input;
         const { options } = optionEntries;
 
         const customer = await prisma.customer.findOne({
@@ -531,7 +561,7 @@ export const QuestionNodeMutations = extendType({
 
         if (dialogueId) {
           return NodeService.createQuestionFromBuilder(
-            dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition,
+            dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition, extraContent
           );
         }
 

@@ -26,6 +26,7 @@ export interface QuestionEntryProps {
   updatedAt?: string;
   creationDate?: string;
   title: string;
+  extraContent?: string | null;
   isRoot: boolean;
   isLeaf: boolean;
   type: string;
@@ -40,6 +41,7 @@ export interface QuestionOptionProps {
   value: string;
   publicValue?: string;
   overrideLeaf?: CTANode;
+  position?: number;
 }
 
 export interface ShallowQuestionEntryProps {

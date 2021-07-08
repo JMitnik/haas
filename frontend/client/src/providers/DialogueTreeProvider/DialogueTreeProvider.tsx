@@ -1,8 +1,8 @@
 import { TreeStoreModelProps } from 'models/TreeStoreModel';
-import React, { useContext, useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { useRouteMatch } from 'react-router-dom';
-import { useTimer } from 'use-timer';
+import { useTranslation } from 'react-i18next';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { Customer, Dialogue } from 'types/generic';
 import getCustomerFromSlug from 'queries/getCustomerFromSluqQuery';
@@ -34,6 +34,24 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
   const [originUrl, setOriginUrl] = useState<string | null>(null);
   const [device] = useState<string | null>(navigator.platform);
   const [startTime] = useState(Date.now());
+  const { i18n } = useTranslation();
+
+  const initLanguage = (language: string | undefined) => {
+    switch (language) {
+      case 'ENGLISH':
+        i18n.changeLanguage('en');
+        break;
+      case 'GERMAN':
+        i18n.changeLanguage('de');
+        break;
+      case 'DUTCH':
+        i18n.changeLanguage('nl');
+        break;
+      default:
+        i18n.changeLanguage('en');
+        break;
+    }
+  };
 
   useEffect(() => {
     if (!originUrl) {
@@ -71,7 +89,6 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     },
   });
 
-
   // When dialogue changes, set initial nodes and initial edges
   useEffect(() => {
     if (customerData?.customer) {
@@ -83,6 +100,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (dialogueData?.customer) {
       treeStore.initTree(dialogueData?.customer?.dialogue);
+      initLanguage(dialogueData?.customer?.dialogue.language);
     }
   }, [dialogueData]);
 
@@ -98,7 +116,6 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     } else {
       node = treeStore.tree.rootNode;
     }
-
     return node;
   };
 
@@ -108,7 +125,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
       getNode,
       device: device || '',
       startTime,
-      originUrl: originUrl || ''
+      originUrl: originUrl || '',
     }}
     >
       {children}

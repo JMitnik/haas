@@ -1,7 +1,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { subDays } from 'date-fns';
 
 // eslint-disable-next-line import/no-cycle
@@ -88,6 +88,15 @@ export const DialogueFilterInputType = inputObjectType({
   },
 });
 
+export const DialogueFinisherType = objectType({
+  name: 'DialogueFinisherObjectType',
+  definition(t) {
+    t.id('id');
+    t.string('header');
+    t.string('subtext');
+  }
+});
+
 export const DialogueType = objectType({
   name: 'Dialogue',
 
@@ -100,10 +109,28 @@ export const DialogueType = objectType({
     // Placeholder data related properties
     t.boolean('isWithoutGenData');
     t.boolean('wasGeneratedWithGenData');
+    t.field('language', {
+      type: LanguageEnumType,
+    });
 
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+
+    t.field('postLeafNode', {
+      type: DialogueFinisherType,
+      nullable: true,
+      resolve(parent, args, ctx) {
+        if (!parent.postLeafNodeId) {
+          return null
+        };
+        return ctx.prisma.postLeafNode.findFirst({
+          where: {
+            id: parent.postLeafNodeId,
+          }
+        });
+      }
+    });
 
     t.field('averageScore', {
       type: 'Float',
@@ -272,8 +299,8 @@ export const DialogueType = objectType({
     t.list.field('questions', {
       type: QuestionNodeType,
 
-      resolve(parent, args, ctx) {
-        const questions = ctx.prisma.questionNode.findMany({
+      async resolve(parent, args, ctx) {
+        const questions = await ctx.prisma.questionNode.findMany({
           where: {
             AND: [
               { questionDialogueId: parent.id },
@@ -290,6 +317,9 @@ export const DialogueType = objectType({
               include: {
                 fields: true,
               },
+            },
+            options: {
+              orderBy: { position: 'asc' },
             },
             sliderNode: {
               include: {
@@ -372,6 +402,11 @@ export const DeleteDialogueInputType = inputObjectType({
   },
 });
 
+export const LanguageEnumType = enumType({
+  name: 'LanguageEnumType',
+  members: ['ENGLISH', 'DUTCH', 'GERMAN'],
+});
+
 export const CreateDialogueInputType = inputObjectType({
   name: 'CreateDialogueInputType',
   definition(t) {
@@ -388,6 +423,9 @@ export const CreateDialogueInputType = inputObjectType({
     t.field('tags', {
       type: TagsInputType,
     });
+    t.field('language', {
+      type: LanguageEnumType,
+    });
   },
 });
 
@@ -402,6 +440,7 @@ export const DialogueMutations = extendType({
         const {
           input: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
         } = args;
+        // TODO: Add language option to copy function
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         const dialogueTags = tags?.entries?.length > 0
@@ -434,6 +473,7 @@ export const DialogueMutations = extendType({
 
     t.field('editDialogue', {
       type: DialogueType,
+      // TODO: Move args to their own InputType
       args: {
         customerSlug: 'String',
         dialogueSlug: 'String',
@@ -442,6 +482,9 @@ export const DialogueMutations = extendType({
         publicTitle: 'String',
         isWithoutGenData: 'Boolean',
         tags: TagsInputType,
+        language: LanguageEnumType,
+        dialogueFinisherHeading: 'String',
+        dialogueFinisherSubheading: 'String',
       },
       resolve(parent, args) {
         return DialogueService.editDialogue(args);

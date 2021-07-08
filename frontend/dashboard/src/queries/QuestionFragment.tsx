@@ -8,12 +8,15 @@ const QuestionFragment = gql`
     updatedAt
     isRoot
     isLeaf
+    extraContent
     overrideLeaf {
       id
       type
       title
     }
     sliderNode {
+      happyText
+      unhappyText
       markers {
         id
         label
@@ -47,6 +50,7 @@ const QuestionFragment = gql`
         id
         value
         publicValue
+        position
         overrideLeaf {
           id
           title

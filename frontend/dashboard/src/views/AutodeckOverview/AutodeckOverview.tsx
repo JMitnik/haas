@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+
 import * as UI from '@haas/ui';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
@@ -27,7 +29,7 @@ export const paginationFilter: PaginationWhereInput = {
 const BackButtonContainer = styled(UI.Div)`
   cursor: pointer;
   ${({ theme }) => css`
-    
+
     color: ${theme.colors.gray[600]};
     svg {
       width: 32px;

@@ -41,6 +41,7 @@ model FontSettings {
 model CustomerSettings {
   id               Int             @id @default(autoincrement())
   logoUrl          String?
+  logoOpacity      Int?            @default(30)
   colourSettingsId Int?
   colourSettings   ColourSettings? @relation(fields: [colourSettingsId], references: [id])
   fontSettingsId   Int?
@@ -79,22 +80,40 @@ model Tag {
   customerId String
 }
 
+enum LanguageEnum {
+  DUTCH
+  GERMAN
+  ENGLISH
+}
+
+model PostLeafNode {
+  id      String @id @default(cuid())
+  header  String
+  subtext String
+
+  dialogue Dialogue?
+}
+
 model Dialogue {
-  id               String         @id @default(cuid())
-  title            String
-  slug             String
-  description      String
-  creationDate     DateTime       @default(now())
-  updatedAt        DateTime?      @updatedAt
-  publicTitle      String?
-  customerId       String
-  customer         Customer       @relation(fields: [customerId], references: [id])
-  edges            Edge[]
-  questions        QuestionNode[]
-  sessions         Session[]
-  tags             Tag[]
-  isOnline         Boolean        @default(value: false)
-  isWithoutGenData Boolean        @default(value: false)
+  id             String         @id @default(cuid())
+  title          String
+  slug           String
+  description    String
+  creationDate   DateTime       @default(now())
+  updatedAt      DateTime?      @updatedAt
+  publicTitle    String?
+  customerId     String
+  postLeafNodeId String?
+  customer       Customer       @relation(fields: [customerId], references: [id])
+  edges          Edge[]
+  questions      QuestionNode[]
+  sessions       Session[]
+  tags           Tag[]
+  postLeafNode   PostLeafNode?  @relation(fields: [postLeafNodeId], references: [id])
+  language       LanguageEnum   @default(ENGLISH)
+
+  isOnline         Boolean @default(value: false)
+  isWithoutGenData Boolean @default(value: false)
 
   endScreenText String?
 
@@ -112,6 +131,7 @@ enum NodeType {
   TEXTBOX
   LINK
   SHARE
+  VIDEO_EMBEDDED
 }
 
 // NodeType: Form
@@ -186,11 +206,18 @@ model SliderNodeMarker {
 }
 
 model SliderNode {
-  id           String             @id @default(cuid())
-  markers      SliderNodeMarker[]
-  QuestionNode QuestionNode[]
-
+  id               String             @id @default(cuid())
+  markers          SliderNodeMarker[]
+  QuestionNode     QuestionNode[]
+  unhappyText      String?
+  happyText        String?
   earlyReleaseText String?
+}
+
+model VideoEmbeddedNode {
+  id           String         @id @default(cuid())
+  videoUrl     String?
+  QuestionNode QuestionNode[]
 }
 
 model QuestionNode {
@@ -224,14 +251,16 @@ model QuestionNode {
   overridesChoices QuestionOption[] @relation("ChoiceCTANode")
 
   // Node-types
-  share      Share?
-  sliderNode SliderNode? @relation(fields: [sliderNodeId], references: [id])
-  form       FormNode?   @relation(fields: [formNodeId], references: [id])
+  share             Share?
+  videoEmbeddedNode VideoEmbeddedNode? @relation(fields: [videoEmbeddedNodeId], references: [id])
+  sliderNode        SliderNode?        @relation(fields: [sliderNodeId], references: [id])
+  form              FormNode?          @relation(fields: [formNodeId], references: [id])
 
-  links             Link[]
-  QuestionOfTrigger QuestionOfTrigger[]
-  sliderNodeId      String?
-  formNodeId        String?
+  links               Link[]
+  QuestionOfTrigger   QuestionOfTrigger[]
+  videoEmbeddedNodeId String?
+  sliderNodeId        String?
+  formNodeId          String?
 }
 
 enum LinkTypeEnum {
@@ -310,6 +339,8 @@ model QuestionOption {
 
   questionNodeId String?
   QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
+
+  position Int?
 }
 
 model Session {
@@ -571,15 +602,20 @@ enum JobStatusType {
   PENDING
   COMPLETED
   FAILED
+  TRANSFORMING_PSDS_TO_PNGS
+  STITCHING_SLIDES
+  COMPRESSING_SALES_MATERIAL
 }
 
 model JobProcessLocation {
-  id     String                 @id @default(cuid())
-  name   String
-  path   String
-  type   JobProcessLocationType
-  job    CreateWorkspaceJob[]
-  fields CustomField[]
+  id                 String                 @id @default(cuid())
+  name               String
+  path               String
+  xMaterialDimension Int                    @default(0)
+  yMaterialDimension Int                    @default(0)
+  type               JobProcessLocationType
+  job                CreateWorkspaceJob[]
+  fields             CustomField[]
 }
 
 model CustomField {
@@ -610,7 +646,7 @@ model CreateWorkspaceJob {
   requiresRembg           Boolean            @default(true)
   requiresScreenshot      Boolean            @default(true)
   requiresColorExtraction Boolean            @default(true)
-  Job                     Job
+  Job                     Job?
   processLocation         JobProcessLocation @relation(fields: [jobProcessLocationId], references: [id])
   jobProcessLocationId    String
 }

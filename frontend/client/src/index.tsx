@@ -1,7 +1,6 @@
 import 'config/sentry';
 import 'mobx-react-lite/batchingForReactDom';
 
-import { worker } from 'mocks/browser';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'layouts/index.css';

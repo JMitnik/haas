@@ -91,12 +91,12 @@ const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean })
           </AddDialogueCard>
         </Grid>
       ) : (
-          <Grid gridRowGap={2}>
-            {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-              <DialogueCard isCompact key={index} dialogue={dialogue} />
-            ))}
-          </Grid>
-        )}
+        <Grid gridRowGap={2}>
+          {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
+          <DialogueCard isCompact key={index} dialogue={dialogue} />
+          ))}
+        </Grid>
+      )}
     </>
   );
 };

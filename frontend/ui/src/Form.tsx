@@ -651,6 +651,35 @@ interface RangeSliderProps {
   onChange?: (vals: [number, number] | number) => void;
 }
 
+interface FormSliderProps {
+  defaultValue?: number;
+  isDisabled?: boolean;
+  stepSize?: number;
+  min?: number;
+  max?: number;
+  onChange?: (vals: [number, number] | number) => void;
+}
+
+export const FormSlider = ({
+  defaultValue,
+  onChange,
+  stepSize = 0.5,
+  isDisabled = false,
+  min,
+  max
+}: FormSliderProps) => {
+  return (
+    <AntdSlider
+      min={min}
+      max={max}
+      disabled={isDisabled}
+      step={stepSize}
+      defaultValue={defaultValue}
+      onAfterChange={onChange}
+    />
+  );
+}
+
 export const RangeSlider = ({
   min = 0,
   max = 10,
@@ -762,7 +791,7 @@ export const DatePickerContainer = styled.div`
 
 export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
   <AntdDatepicker
-    // @ts-ignore 
+    // @ts-ignore
     getPopupContainer={triggerNode => triggerNode.parentNode}
     {...props}
   />
@@ -810,7 +839,7 @@ export const SwitchItem = styled.button.attrs({ type: 'button' }) <SwitchItemPro
     padding: 4px 8px;
     border-radius: 10px;
     margin-right: 12px;
-    
+
     &:active, &:focus {
       outline: none;
     }

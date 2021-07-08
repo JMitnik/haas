@@ -12,6 +12,15 @@
     },
     {
       "tag": "CreateEnum",
+      "enum": "LanguageEnum",
+      "values": [
+        "DUTCH",
+        "GERMAN",
+        "ENGLISH"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
       "enum": "NodeType",
       "values": [
         "GENERIC",
@@ -21,7 +30,8 @@
         "REGISTRATION",
         "TEXTBOX",
         "LINK",
-        "SHARE"
+        "SHARE",
+        "VIDEO_EMBEDDED"
       ]
     },
     {
@@ -150,7 +160,19 @@
         "WRAPPING_UP",
         "PENDING",
         "COMPLETED",
-        "FAILED"
+        "FAILED",
+        "TRANSFORMING_PSDS_TO_PNGS",
+        "STITCHING_SLIDES",
+        "COMPRESSING_SALES_MATERIAL"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
+      "enum": "JobProcessLocationType",
+      "values": [
+        "ONE_PAGER",
+        "PITCHDECK",
+        "BROCHURE"
       ]
     },
     {
@@ -961,6 +983,74 @@
     },
     {
       "tag": "CreateModel",
+      "model": "PostLeafNode"
+    },
+    {
+      "tag": "CreateField",
+      "model": "PostLeafNode",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "PostLeafNode",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "PostLeafNode",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "PostLeafNode",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "PostLeafNode",
+      "field": "header",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "PostLeafNode",
+      "field": "subtext",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "PostLeafNode",
+      "field": "dialogue",
+      "type": "Dialogue",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateModel",
       "model": "Dialogue"
     },
     {
@@ -1094,6 +1184,13 @@
     {
       "tag": "CreateField",
       "model": "Dialogue",
+      "field": "postLeafNodeId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
       "field": "customer",
       "type": "Customer",
       "arity": "Required"
@@ -1164,6 +1261,84 @@
       "field": "tags",
       "type": "Tag",
       "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "postLeafNode",
+      "type": "PostLeafNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "postLeafNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "postLeafNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[postLeafNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "postLeafNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "language",
+      "type": "LanguageEnum",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "language"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "language"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "ENGLISH"
     },
     {
       "tag": "CreateField",
@@ -2170,9 +2345,84 @@
     {
       "tag": "CreateField",
       "model": "SliderNode",
+      "field": "unhappyText",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNode",
+      "field": "happyText",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNode",
       "field": "earlyReleaseText",
       "type": "String",
       "arity": "Optional"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "VideoEmbeddedNode"
+    },
+    {
+      "tag": "CreateField",
+      "model": "VideoEmbeddedNode",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "VideoEmbeddedNode",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "VideoEmbeddedNode",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "VideoEmbeddedNode",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "VideoEmbeddedNode",
+      "field": "videoUrl",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "VideoEmbeddedNode",
+      "field": "QuestionNode",
+      "type": "QuestionNode",
+      "arity": "List"
     },
     {
       "tag": "CreateModel",
@@ -2759,6 +3009,52 @@
     {
       "tag": "CreateField",
       "model": "QuestionNode",
+      "field": "videoEmbeddedNode",
+      "type": "VideoEmbeddedNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "videoEmbeddedNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "videoEmbeddedNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[videoEmbeddedNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "videoEmbeddedNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
       "field": "sliderNode",
       "type": "SliderNode",
       "arity": "Optional"
@@ -2861,6 +3157,13 @@
       "field": "QuestionOfTrigger",
       "type": "QuestionOfTrigger",
       "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "videoEmbeddedNodeId",
+      "type": "String",
+      "arity": "Optional"
     },
     {
       "tag": "CreateField",
@@ -3990,6 +4293,13 @@
       },
       "argument": "references",
       "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionOption",
+      "field": "position",
+      "type": "Int",
+      "arity": "Optional"
     },
     {
       "tag": "CreateModel",
@@ -6586,6 +6896,266 @@
     },
     {
       "tag": "CreateModel",
+      "model": "JobProcessLocation"
+    },
+    {
+      "tag": "CreateField",
+      "model": "JobProcessLocation",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "JobProcessLocation",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "JobProcessLocation",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "JobProcessLocation",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "JobProcessLocation",
+      "field": "name",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "JobProcessLocation",
+      "field": "path",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "JobProcessLocation",
+      "field": "xMaterialDimension",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "JobProcessLocation",
+          "field": "xMaterialDimension"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "JobProcessLocation",
+          "field": "xMaterialDimension"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "0"
+    },
+    {
+      "tag": "CreateField",
+      "model": "JobProcessLocation",
+      "field": "yMaterialDimension",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "JobProcessLocation",
+          "field": "yMaterialDimension"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "JobProcessLocation",
+          "field": "yMaterialDimension"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "0"
+    },
+    {
+      "tag": "CreateField",
+      "model": "JobProcessLocation",
+      "field": "type",
+      "type": "JobProcessLocationType",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "JobProcessLocation",
+      "field": "job",
+      "type": "CreateWorkspaceJob",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "JobProcessLocation",
+      "field": "fields",
+      "type": "CustomField",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "CustomField"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CustomField",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CustomField",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CustomField",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CustomField",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CustomField",
+      "field": "key",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CustomField",
+      "field": "value",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CustomField",
+      "field": "jobProcessLocation",
+      "type": "JobProcessLocation",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CustomField",
+          "field": "jobProcessLocation"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CustomField",
+          "field": "jobProcessLocation"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[jobProcessLocationId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CustomField",
+          "field": "jobProcessLocation"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CustomField",
+      "field": "jobProcessLocationId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateModel",
       "model": "CreateWorkspaceJob"
     },
     {
@@ -6692,6 +7262,20 @@
       "tag": "CreateField",
       "model": "CreateWorkspaceJob",
       "field": "referenceId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "message",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "errorMessage",
       "type": "String",
       "arity": "Optional"
     },
@@ -6842,6 +7426,59 @@
       "model": "CreateWorkspaceJob",
       "field": "Job",
       "type": "Job",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "processLocation",
+      "type": "JobProcessLocation",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "processLocation"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "processLocation"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[jobProcessLocationId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "processLocation"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "jobProcessLocationId",
+      "type": "String",
       "arity": "Required"
     },
     {

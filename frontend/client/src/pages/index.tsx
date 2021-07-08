@@ -1,5 +1,6 @@
 import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
+import { I18nextProvider } from 'react-i18next';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import React, { useLayoutEffect } from 'react';
 
@@ -8,15 +9,15 @@ import CustomerPage from 'pages/[customer]';
 import CustomersPage from 'pages/customers';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
-import NodePage from './[customer]/[dialogue]/[node]';
 import { CampaignRedirect } from './campaign';
+import NodePage from './[customer]/[dialogue]/[node]';
+import lang from '../config/i18n-config';
 
 const ErrorPage = () => (
   <div>
     Something went wrong, we will fix it right away!
   </div>
 );
-
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -31,7 +32,7 @@ const AppRoutes = () => {
           '/:customerSlug/:dialogueSlug/n/:nodeId',
           '/:customerSlug/:dialogueSlug/:edgeId',
           '/:customerSlug/:dialogueSlug',
-          ]}
+        ]}
         >
           <NodePage />
         </Route>
@@ -60,13 +61,16 @@ const App = () => {
   }, []);
 
   return (
-    <AppProviders>
-      <GlobalAppLayout>
-        <ErrorBoundary FallbackComponent={ErrorPage}>
-          <AppRoutes />
-        </ErrorBoundary>
-      </GlobalAppLayout>
-    </AppProviders>
+    <I18nextProvider i18n={lang}>
+      <AppProviders>
+        <GlobalAppLayout>
+          <ErrorBoundary FallbackComponent={ErrorPage}>
+            <AppRoutes />
+          </ErrorBoundary>
+        </GlobalAppLayout>
+      </AppProviders>
+    </I18nextProvider>
+
   );
 };
 

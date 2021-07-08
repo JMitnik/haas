@@ -1,9 +1,10 @@
 import {
   AnimatePresence, Variants, motion, transform,
-  useAnimation, useMotionValue, useTransform
+  useAnimation, useMotionValue, useTransform,
 } from 'framer-motion';
 import { usePopper } from 'react-popper';
 import { useTimer } from 'use-timer';
+import { useTranslation } from 'react-i18next';
 import Color from 'color';
 import Lottie from 'react-lottie';
 import React, { useEffect, useReducer, useState } from 'react';
@@ -90,12 +91,15 @@ interface SliderProps {
   register: any;
   onSubmit: () => void;
   markers: SliderNodeMarkersProps[];
+  unhappyText: string | null | undefined;
+  happyText: string | null | undefined;
 }
 
 const endTime = 40;
 const initialWindUpSec = 2;
 
-const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
+const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: SliderProps) => {
+  const { t } = useTranslation();
   const [isValid, setIsValid] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [showIsEarly, setShowIsEarly] = useState(false);
@@ -245,15 +249,16 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
         <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
           <Flex
             data-testid="unhappy"
-            alignItems="center">
+            alignItems="center"
+          >
             <UnhappyIcon />
             <Text fontSize="0.8rem">
-              Unhappy
+              {unhappyText || t('unhappy')}
             </Text>
           </Flex>
           <Flex alignItems="center" data-testid="happy">
             <Text mr={1} fontSize="0.8rem">
-              Happy
+              {happyText || t('happy')}
             </Text>
             <HappyIcon />
           </Flex>

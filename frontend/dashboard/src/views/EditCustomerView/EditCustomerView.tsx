@@ -2,15 +2,15 @@ import * as yup from 'yup';
 import {
   FormContainer, PageTitle,
 } from '@haas/ui';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/client';
+
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
-import { gql } from '@apollo/client';
 
 import CustomerForm from 'components/CustomerForm';
 import boolToInt from 'utils/booleanToNumber';
@@ -26,6 +26,7 @@ const editWorkspaceMutation = gql`
         slug
         settings {
           logoUrl
+          logoOpacity
           colourSettings {
           primary
         }
@@ -38,6 +39,7 @@ const schema = yup.object().shape({
   name: yup.string().required(),
   logo: yup.string().url(),
   uploadLogo: yup.string().url(),
+  logoOpacity: yup.number().min(0).max(1),
   slug: yup.string().required(),
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
@@ -77,6 +79,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     defaultValues: {
       name: customer.name,
       logo: customer.settings?.logoUrl,
+      logoOpacity: (customer.settings?.logoOpacity !== undefined && customer.settings?.logoOpacity !== null)
+        ? Math.min(Math.max(0, customer.settings?.logoOpacity / 100), 1)
+        : 0.3,
       uploadLogo: customer.settings?.logoUrl,
       useCustomUrl: boolToInt(!startsWithCloudinary(customer.settings?.logoUrl)),
       primaryColour: customer.settings?.colourSettings?.primary,
@@ -117,6 +122,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
           id: customer?.id,
           customerSlug,
           logo: intToBool(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
+          logoOpacity: (formData.logoOpacity !== null && formData.logoOpacity !== undefined)
+            ? formData.logoOpacity * 100
+            : 0,
           slug: formData.slug,
           primaryColour: formData.primaryColour,
           name: formData.name,
