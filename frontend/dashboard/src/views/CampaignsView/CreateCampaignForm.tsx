@@ -1,17 +1,18 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
+import { CircularProgress, CircularProgressLabel, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-form';
+import { Mail, Smartphone } from 'react-feather';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
-
-import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
-import { Mail, Smartphone } from 'react-feather';
-import { useCustomer } from 'providers/CustomerProvider';
-import { useToast, CircularProgress, CircularProgressLabel } from '@chakra-ui/core';
 import Select from 'react-select';
 
-import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum, refetchGetWorkspaceCampaignsQuery } from 'types/generated-types';
+import { CampaignVariantEnum,
+  refetchGetWorkspaceCampaignsQuery,
+  useCreateCampaignMutation, useGetWorkspaceDialoguesQuery } from 'types/generated-types';
+import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
 import { useNavigator } from 'hooks/useNavigator';
 
 type InputEvent = React.FormEvent<HTMLInputElement>;
@@ -50,7 +51,13 @@ const schema = yup.object({
 type FormProps = yup.InferType<typeof schema>;
 type VariantFormProps = yup.InferType<typeof variantSchema>;
 
-const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFormMethods<FormProps>, activeVariantIndex: number, variant: any }) => {
+interface ActiveVariantFormProps {
+  form: UseFormMethods<FormProps>;
+  activeVariantIndex: number;
+  variant: any;
+}
+
+const ActiveVariantForm = ({ form, activeVariantIndex, variant }: ActiveVariantFormProps) => {
   const activeVariant = form.watch(`variants[${activeVariantIndex}]`) as VariantFormProps;
   const { t } = useTranslation();
 
@@ -58,14 +65,14 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
 
   const { data } = useGetWorkspaceDialoguesQuery({
     variables: {
-      customerSlug
+      customerSlug,
     },
-    fetchPolicy: 'cache-and-network'
+    fetchPolicy: 'cache-and-network',
   });
 
-  const dialogues = data?.customer?.dialogues?.map(dialogue => ({
+  const dialogues = data?.customer?.dialogues?.map((dialogue) => ({
     label: dialogue.title,
-    value: dialogue.id
+    value: dialogue.id,
   })) || [];
 
   console.log(data);
@@ -143,7 +150,10 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
                 <UI.ColumnFlex alignItems="flex-end">
                   <UI.Helper>{t('character_limit')}</UI.Helper>
                   <CircularProgress
-                    mt={2} color={activeVariant.body.length <= 160 ? 'green' : 'red'} value={percentageFull}>
+                    mt={2}
+                    color={activeVariant.body.length <= 160 ? 'green' : 'red'}
+                    value={percentageFull}
+                  >
                     <CircularProgressLabel>{activeVariant?.body?.length}</CircularProgressLabel>
                   </CircularProgress>
                 </UI.ColumnFlex>
@@ -217,8 +227,8 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
     },
     refetchQueries: [
       refetchGetWorkspaceCampaignsQuery({
-        customerSlug: activeCustomer?.slug || ''
-      })
+        customerSlug: activeCustomer?.slug || '',
+      }),
     ],
     onCompleted: () => {
       toast({
@@ -264,7 +274,10 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
     const maxValue = Math.min(event.target.value, 100);
     const value = Math.max(maxValue, 0);
 
-    const otherFields = variants.map((item, index) => ({ ...item, originalIndex: index })).filter((item, index) => index !== currentItemIndex);
+    const otherFields = variants.map((item, index) => ({
+      ...item,
+      originalIndex: index,
+    })).filter((item, index) => index !== currentItemIndex);
     const distributed = 100 - value;
     otherFields.forEach((field) => {
       form.setValue(`variants.${field.originalIndex}.weight`, distributed);
@@ -331,12 +344,12 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
               form={form}
             />
           ) : (
-              <UI.IllustrationCard
-                svg={<DecideIll />}
-                text={t('select_a_variant')}
-                isFlat
-              />
-            )}
+            <UI.IllustrationCard
+              svg={<DecideIll />}
+              text={t('select_a_variant')}
+              isFlat
+            />
+          )}
         </UI.Card>
         <UI.Button type="submit" isDisabled={!form.formState.isValid}>
           {t('save')}

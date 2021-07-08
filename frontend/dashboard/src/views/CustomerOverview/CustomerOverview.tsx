@@ -1,4 +1,3 @@
-import * as UI from '@haas/ui';
 import {
   AddCard,
   Container,
@@ -6,15 +5,14 @@ import {
   Grid,
   H4,
   PageHeading,
-  Span,
 } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Link } from 'react-router-dom';
-import { Plus, UserCheck } from 'react-feather';
+import { Plus } from 'react-feather';
 import { Skeleton } from '@chakra-ui/core';
 import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
 import { Variants, motion } from 'framer-motion';
-import { useHistory } from 'react-router';
+// import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
@@ -51,11 +49,14 @@ const MotionGrid = motion.custom(Grid);
 
 const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoading: boolean }) => {
   const { t } = useTranslation();
-  const { canCreateCustomers, canAccessAdmin } = useAuth();
-  const history = useHistory();
-  const goToAdminPanel = () => {
-    history.push('/dashboard/admin');
-  };
+  const {
+    canCreateCustomers,
+    // canAccessAdmin
+  } = useAuth();
+  // const history = useHistory();
+  // const goToAdminPanel = () => {
+  //   history.push('/dashboard/admin');
+  // };
 
   return (
     <CustomerOverviewContainer>

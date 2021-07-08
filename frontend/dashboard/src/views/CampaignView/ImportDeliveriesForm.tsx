@@ -1,30 +1,32 @@
-import * as yup from 'yup';
 import * as UI from '@haas/ui';
-import React from 'react'
+import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { refetchGetWorkspaceCampaignQuery, useCreateBatchDeliveriesMutation } from 'types/generated-types';
+import { useNavigator } from 'hooks/useNavigator';
+import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import FileDropInput from 'components/FileDropInput';
-import { useToast } from '@chakra-ui/core';
-import { useCreateBatchDeliveriesMutation, refetchGetWorkspaceCampaignQuery } from 'types/generated-types';
-import { useNavigator } from 'hooks/useNavigator';
-import { defaultCampaignViewFilter } from './CampaignView';
+import React, { useState } from 'react';
+
 import { useCustomer } from 'providers/CustomerProvider';
 import { useLogger } from 'hooks/useLogger';
 
+import { defaultCampaignViewFilter } from './CampaignView';
+
 const schema = yup.object({
-  batchScheduledAt: yup.date()
+  batchScheduledAt: yup.date(),
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
 
 export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
+  const { t } = useTranslation();
   const { campaignId, customerSlug } = useNavigator();
   const form = useForm<FormProps>({
     defaultValues: {
-      batchScheduledAt: new Date()
+      batchScheduledAt: new Date(),
     },
-    mode: 'all'
+    mode: 'all',
   });
   const { activeCustomer } = useCustomer();
   const logger = useLogger();
@@ -47,7 +49,7 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
     awaitRefetchQueries: true,
     onError: (error) => {
       logger.logError(error, {
-        tags: { section: 'campaign' }
+        tags: { section: 'campaign' },
       });
       toast({
         title: 'Something went wrong!',
@@ -59,11 +61,12 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
     },
     refetchQueries: [
       refetchGetWorkspaceCampaignQuery({
-        customerSlug, campaignId,
-        deliveryConnectionFilter: defaultCampaignViewFilter
-      })
-    ]
-  })
+        customerSlug,
+        campaignId,
+        deliveryConnectionFilter: defaultCampaignViewFilter,
+      }),
+    ],
+  });
 
   const handleDrop = (files: File[]) => {
     if (!files.length) return;
@@ -80,12 +83,10 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
           campaignId,
           batchScheduledAt: (formData.batchScheduledAt as Date).toISOString(),
           uploadedCsv: activeCSV,
-        }
-      }
-    })
-  }
-
-  const { t } = useTranslation();
+        },
+      },
+    });
+  };
 
   return (
     <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
@@ -113,7 +114,7 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
                   format="DD-MM-YYYY HH:mm"
                   onChange={onChange}
                   showTime={{
-                    format: "HH:mm",
+                    format: 'HH:mm',
                     hourStep: 1,
                     minuteStep: 15,
                   }}
@@ -127,7 +128,10 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
       <UI.Button
         type="submit"
         isDisabled={!form.formState.isValid}
-      >{t('save')}</UI.Button>
+      >
+        {t('save')}
+
+      </UI.Button>
     </UI.Form>
-  )
+  );
 };

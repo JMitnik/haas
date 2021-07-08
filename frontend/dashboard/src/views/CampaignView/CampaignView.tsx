@@ -1,18 +1,19 @@
 import * as UI from '@haas/ui';
+import { AtSign, Clock, Eye, Flag, Plus, Smartphone } from 'react-feather';
+import { ErrorBoundary } from 'react-error-boundary';
 import { format } from 'date-fns';
 import { useLogger } from 'hooks/useLogger';
 import { useNavigator } from 'hooks/useNavigator';
-import React, { useState } from 'react';
-import { useEffect } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { AtSign, Clock, Eye, Flag, Plus, Smartphone } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { DeepPartial } from 'types/customTypes';
+import React, { useEffect, useState } from 'react';
+
 import {
   CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType,
   GetWorkspaceCampaignQuery,
-  PaginationSortByEnum, useGetWorkspaceCampaignQuery
+  PaginationSortByEnum, useGetWorkspaceCampaignQuery,
 } from 'types/generated-types';
+import { DeepPartial } from 'types/customTypes';
+
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
 export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
@@ -29,7 +30,7 @@ export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
       },
       {
         by: PaginationSortByEnum.UpdatedAt,
-        desc: true
+        desc: true,
       },
     ],
   },
@@ -48,7 +49,7 @@ const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
       </UI.Icon>
       {format(date, 'MM/dd HH:mm')}
     </UI.Flex>
-  )
+  );
 };
 
 const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) => {
@@ -68,7 +69,7 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
         <UI.Label variantColor="blue">
           {status}
         </UI.Label>
-      )
+      );
     }
 
     case DeliveryStatusEnum.Scheduled: {
@@ -91,22 +92,22 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
             </UI.Div>
           </ErrorBoundary>
         </UI.Label>
-      )
+      );
     }
 
     case DeliveryStatusEnum.Opened: {
       return (
         <UI.Label variantColor="yellow">{status}</UI.Label>
-      )
+      );
     }
 
     default: {
       return (
         <UI.Label>{status}</UI.Label>
-      )
+      );
     }
   }
-}
+};
 
 export const CampaignView = () => {
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
@@ -133,8 +134,8 @@ export const CampaignView = () => {
     pollInterval: POLL_INTERVAL,
     onCompleted: (data) => setDataCache(data),
     onError: (error) => logger.logError(error, {
-      tags: { section: 'campaign' }
-    })
+      tags: { section: 'campaign' },
+    }),
   });
 
   // use-table-select placement
@@ -173,7 +174,13 @@ export const CampaignView = () => {
             <UI.PageTitle>{campaign?.label}</UI.PageTitle>
             <UI.Button
               leftIcon={Plus}
-              onClick={() => setIsOpenImportModal(true)} size="sm" variantColor="teal">{t('import_deliveries')}</UI.Button>
+              onClick={() => setIsOpenImportModal(true)}
+              size="sm"
+              variantColor="teal"
+            >
+              {t('import_deliveries')}
+
+            </UI.Button>
           </UI.Stack>
         </UI.Stack>
       </UI.ViewHeading>
@@ -200,9 +207,9 @@ export const CampaignView = () => {
               </UI.TableHeading>
 
               <UI.TableBody>
-                {deliveryConnection?.deliveries.map(delivery => (
+                {deliveryConnection?.deliveries.map((delivery) => (
                   <UI.TableRow
-                    // isSelected={selectedIds.includes(delivery.id)} 
+                    // isSelected={selectedIds.includes(delivery.id)}
                     hasHover
                     key={delivery.id}
                     onClick={() => setActiveDelivery(delivery)}
@@ -216,8 +223,8 @@ export const CampaignView = () => {
                       {delivery?.deliveryRecipientFirstName || ''}
                     </UI.TableCell>
                     <UI.TableCell>
-                      {delivery.campaignVariant?.type === CampaignVariantEnum.Email ?
-                        delivery?.deliveryRecipientEmail : delivery?.deliveryRecipientPhone}
+                      {delivery.campaignVariant?.type === CampaignVariantEnum.Email
+                        ? delivery?.deliveryRecipientEmail : delivery?.deliveryRecipientPhone}
                     </UI.TableCell>
                     <UI.TableCell>
                       {delivery?.campaignVariant?.label}
@@ -254,32 +261,43 @@ export const CampaignView = () => {
                   {deliveryConnection?.pageInfo.nrPages}
                 </UI.Span>
                 <UI.Span ml={3}>
-                  (Total deliveries: {data?.customer?.campaign.allDeliveryConnection?.nrTotal})
+                  (Total deliveries:
+                  {' '}
+                  {data?.customer?.campaign.allDeliveryConnection?.nrTotal}
+                  )
                 </UI.Span>
               </UI.Div>
 
               <UI.Div>
                 <UI.Stack isInline>
                   <UI.Button
-                    onClick={() => setPaginationState(state => ({
+                    onClick={() => setPaginationState((state) => ({
                       ...state,
                       paginationFilter: {
                         ...state.paginationFilter,
                         pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
                         offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
-                      }
+                      },
                     }))}
-                    isDisabled={paginationState.paginationFilter?.pageIndex === 0}>Previous</UI.Button>
+                    isDisabled={paginationState.paginationFilter?.pageIndex === 0}
+                  >
+                    Previous
+
+                  </UI.Button>
                   <UI.Button
-                    onClick={() => setPaginationState(state => ({
+                    onClick={() => setPaginationState((state) => ({
                       ...state,
                       paginationFilter: {
                         ...state.paginationFilter,
                         pageIndex: (state.paginationFilter?.pageIndex || 0) + 1,
                         offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
-                      }
+                      },
                     }))}
-                    isDisabled={(paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages}>Next</UI.Button>
+                    isDisabled={(paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages}
+                  >
+                    Next
+
+                  </UI.Button>
                 </UI.Stack>
               </UI.Div>
             </UI.PaginationFooter>
@@ -314,7 +332,7 @@ export const CampaignView = () => {
 
               <UI.FormSectionHeader>{t('events')}</UI.FormSectionHeader>
               <UI.Stack spacing={4}>
-                {activeDelivery?.events?.map(event => (
+                {activeDelivery?.events?.map((event) => (
                   <UI.Flex alignItems="center" justifyContent="space-between">
                     {event?.status === DeliveryStatusEnum.Scheduled && (
                       <UI.Flex alignItems="center">
@@ -357,7 +375,7 @@ export const CampaignView = () => {
                         <>
                           {format(
                             new Date(parseInt(event?.createdAt, 10)),
-                            'MMM do HH:mm'
+                            'MMM do HH:mm',
                           )}
                         </>
                       )}
@@ -373,11 +391,12 @@ export const CampaignView = () => {
           <UI.Card bg="white" noHover width={700}>
             <UI.CardBody>
               <ImportDeliveriesForm
-                onClose={() => setIsOpenImportModal(false)} />
+                onClose={() => setIsOpenImportModal(false)}
+              />
             </UI.CardBody>
           </UI.Card>
         </UI.Modal>
       </UI.ViewContainer>
     </>
-  )
+  );
 };

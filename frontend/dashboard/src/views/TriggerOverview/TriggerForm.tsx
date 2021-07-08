@@ -1,31 +1,30 @@
 /* eslint-disable radix */
+import 'antd/dist/antd.css';
 import * as UI from '@haas/ui';
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Tag, TagIcon } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
 import {
   CornerRightDown, CornerRightUp, Mail, Maximize2,
-  Minimize2, MousePointer, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch
+  Minimize2, MousePointer, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch,
 } from 'react-feather';
-import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
-import { ReactComponent as PaperIll } from 'assets/images/paper.svg';
-import { ReactComponent as SMSIll } from 'assets/images/sms.svg';
-import { Slider } from 'antd';
-import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useQuery } from '@apollo/client';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Select from 'react-select';
-import styled from 'styled-components';
-
-import 'antd/dist/antd.css'; // Slider,
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Tag, TagIcon } from '@chakra-ui/core';
 import {
   Div, Form, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Span,
 } from '@haas/ui';
+import { Slider } from 'antd';
+import { gql, useLazyQuery, useQuery } from '@apollo/client';
+import { useHistory, useParams } from 'react-router';
+import { useTranslation } from 'react-i18next'; // Slider
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import Select from 'react-select';
+import styled from 'styled-components';
+
+import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
+import { ReactComponent as PaperIll } from 'assets/images/paper.svg';
+import { ReactComponent as SMSIll } from 'assets/images/sms.svg';
 import { SelectType } from 'types/generic';
-import { useTranslation } from 'react-i18next';
 import ServerError from 'components/ServerError';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
-import { gql } from '@apollo/client';
 
 import { getCustomerTriggerData as CustomerTriggerData } from './__generated__/getCustomerTriggerData';
 
@@ -335,23 +334,23 @@ const FormConditionFragment = ({
                     />
                   </RadioButtonGroup>
                 ) : (
-                    <RadioButtonGroup
-                      display="flex"
-                      value={value}
-                      onChange={(val) => {
-                        onChange(val);
-                        onBlur();
-                      }}
-                    >
-                      <RadioButton
-                        mr={2}
-                        icon={Target}
-                        value="TEXT_MATCH"
-                        text="Match text"
-                        description="Match specific text"
-                      />
-                    </RadioButtonGroup>
-                  )}
+                  <RadioButtonGroup
+                    display="flex"
+                    value={value}
+                    onChange={(val) => {
+                      onChange(val);
+                      onBlur();
+                    }}
+                  >
+                    <RadioButton
+                      mr={2}
+                      icon={Target}
+                      value="TEXT_MATCH"
+                      text="Match text"
+                      description="Match specific text"
+                    />
+                  </RadioButtonGroup>
+                )}
               </>
             )}
           />
@@ -416,7 +415,7 @@ const FormConditionFragment = ({
                 step={0.5}
                 min={0}
                 max={10}
-                tipFormatter={(value) => (value ? `${10 - value}` : 10)}
+                tipFormatter={(tipVal) => (tipVal ? `${10 - tipVal}` : 10)}
                 defaultValue={value}
                 reverse
                 onAfterChange={(e: number) => {
@@ -456,8 +455,8 @@ const FormConditionFragment = ({
                     min={0}
                     max={10}
                     defaultValue={value}
-                    onAfterChange={(value) => {
-                      onChange(value);
+                    onAfterChange={(afterVal) => {
+                      onChange(afterVal);
                     }}
                   />
                 </OuterSliderContainer>
@@ -485,8 +484,8 @@ const FormConditionFragment = ({
                 step={0.5}
                 min={0}
                 max={10}
-                onAfterChange={(value) => {
-                  onChange(value);
+                onAfterChange={(afterVal) => {
+                  onChange(afterVal);
                 }}
               />
             )}
@@ -690,36 +689,36 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 </Button>
               </UI.IllustrationCard>
             ) : (
-                <>
-                  {fields.length === 0 ? (
-                    <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
-                      <Button
-                        leftIcon={PlusCircle}
-                        onClick={addCondition}
-                        isDisabled={!activeDialogue}
-                        size="sm"
-                        variant="outline"
-                        variantColor="teal"
-                      >
-                        {t('trigger:add_condition')}
-                      </Button>
-                    </UI.IllustrationCard>
-                  ) : (
-                      <UI.Div>
-                        <Button
-                          leftIcon={PlusCircle}
-                          onClick={addCondition}
-                          isDisabled={!activeDialogue}
-                          size="sm"
-                          variant="outline"
-                          variantColor="teal"
-                        >
-                          {t('trigger:add_condition')}
-                        </Button>
-                      </UI.Div>
-                    )}
-                </>
-              )}
+              <>
+                {fields.length === 0 ? (
+                  <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
+                    <Button
+                      leftIcon={PlusCircle}
+                      onClick={addCondition}
+                      isDisabled={!activeDialogue}
+                      size="sm"
+                      variant="outline"
+                      variantColor="teal"
+                    >
+                      {t('trigger:add_condition')}
+                    </Button>
+                  </UI.IllustrationCard>
+                ) : (
+                  <UI.Div>
+                    <Button
+                      leftIcon={PlusCircle}
+                      onClick={addCondition}
+                      isDisabled={!activeDialogue}
+                      size="sm"
+                      variant="outline"
+                      variantColor="teal"
+                    >
+                      {t('trigger:add_condition')}
+                    </Button>
+                  </UI.Div>
+                )}
+              </>
+            )}
 
           </InputGrid>
 
@@ -795,18 +794,18 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               </Button>
             </UI.IllustrationCard>
           ) : (
-              <Div>
-                <Button
-                  onClick={addRecipient}
-                  size="sm"
-                  variant="outline"
-                  variantColor="teal"
-                  leftIcon={UserPlus}
-                >
-                  {t('add_recipient')}
-                </Button>
-              </Div>
-            )}
+            <Div>
+              <Button
+                onClick={addRecipient}
+                size="sm"
+                variant="outline"
+                variantColor="teal"
+                leftIcon={UserPlus}
+              >
+                {t('add_recipient')}
+              </Button>
+            </Div>
+          )}
         </UI.InputGrid>
       </FormSection>
 

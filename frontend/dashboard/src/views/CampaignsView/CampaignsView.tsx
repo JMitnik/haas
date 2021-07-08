@@ -2,15 +2,15 @@ import * as UI from '@haas/ui';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
+import Select from 'react-select';
 
 import { ReactComponent as EmptyIll } from 'assets/images/undraw_empty.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
+import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
+import { useNavigator } from 'hooks/useNavigator';
+import useAuth from 'hooks/useAuth';
 
 import CreateCampaignForm from './CreateCampaignForm';
-import Select from 'react-select';
-import { useNavigator } from 'hooks/useNavigator';
-import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
-import useAuth from 'hooks/useAuth';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
@@ -21,15 +21,15 @@ const CampaignsView = () => {
   const { data } = useGetWorkspaceCampaignsQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
-      customerSlug
-    }
+      customerSlug,
+    },
   });
 
   const campaigns = data?.customer?.campaigns || [];
 
   const handleSelectCampaign = ({ value }: any) => {
     goToCampaignView(value);
-  }
+  };
 
   return (
     <>
@@ -64,23 +64,23 @@ const CampaignsView = () => {
             </UI.Button>
           </UI.IllustrationCard>
         ) : (
-            <UI.IllustrationCard
-              svg={<SelectIll />}
-              isFlat
-              text={t('select_campaign_text')}
-            >
-              <UI.Div style={{ fontSize: '1rem', textAlign: 'left' }} margin="0 auto" maxWidth="200px">
-                <Select
-                  options={campaigns.map((campaign: any) => ({
-                    label: campaign.label,
-                    value: campaign.id
-                  }))}
-                  onChange={(data) => handleSelectCampaign(data)}
-                  placeholder={t('select_campaign')}
-                />
-              </UI.Div>
-            </UI.IllustrationCard>
-          )}
+          <UI.IllustrationCard
+            svg={<SelectIll />}
+            isFlat
+            text={t('select_campaign_text')}
+          >
+            <UI.Div style={{ fontSize: '1rem', textAlign: 'left' }} margin="0 auto" maxWidth="200px">
+              <Select
+                options={campaigns.map((campaign: any) => ({
+                  label: campaign.label,
+                  value: campaign.id,
+                }))}
+                onChange={(changeData) => handleSelectCampaign(changeData)}
+                placeholder={t('select_campaign')}
+              />
+            </UI.Div>
+          </UI.IllustrationCard>
+        )}
         <UI.Modal
           willCloseOnOutsideClick={false}
           isOpen={openedModal}

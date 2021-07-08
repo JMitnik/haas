@@ -201,7 +201,7 @@ const UsersOverview = () => {
             paginationProps={{ ...paginationProps, pageCount, pageIndex }}
             onPaginationChange={setPaginationProps}
             data={tableData}
-            renderOptions={(data: any) => (
+            renderOptions={(optionData: any) => (
               <>
                 {canDeleteUsers && (
                   <ShowMoreButton
@@ -211,7 +211,7 @@ const UsersOverview = () => {
                         {canDeleteUsers && (
                           <>
                             {canEditUsers && (
-                              <UI.ListItem onClick={(e: any) => handleEditUser(e, data?.id)}>
+                              <UI.ListItem onClick={(e: any) => handleEditUser(e, optionData?.id)}>
                                 {t('edit_user')}
                               </UI.ListItem>
                             )}
@@ -231,7 +231,7 @@ const UsersOverview = () => {
                                     <PopoverFooter>
                                       <Button
                                         variantColor="red"
-                                        onClick={(e: any) => handleDeleteUser(e, data?.id)}
+                                        onClick={(e: any) => handleDeleteUser(e, optionData?.id)}
                                       >
                                         {t('delete')}
                                       </Button>

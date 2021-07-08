@@ -1,1 +1,1 @@
-export * from './CampaignsView';
+export { default } from './CampaignsView';

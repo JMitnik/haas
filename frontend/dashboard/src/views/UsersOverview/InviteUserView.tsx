@@ -1,21 +1,20 @@
 import * as yup from 'yup';
-import { gql } from '@apollo/client';
+import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
+import {
+  Div, Form, FormContainer, FormControl,
+  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle,
+} from '@haas/ui';
+import { Mail } from 'react-feather';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/client';
+import { useTranslation } from 'react-i18next';
+import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 import Select from 'react-select';
 
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
-import {
-  Div, Form, FormContainer, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle
-} from '@haas/ui';
-import { Mail } from 'react-feather';
-import { motion } from 'framer-motion';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
 import getRolesQuery from 'queries/getRoles';
 import getUsersQuery from 'queries/getUsers';
 
@@ -61,9 +60,9 @@ const InviteUserView = () => {
 
   const { data } = useQuery(getRolesQuery, { variables: { customerSlug } });
   const [addUser, { loading: isLoading }] = useMutation(inviteUserMutation, {
-    onCompleted: (data) => {
-      const userDidExist = data?.inviteUser?.didAlreadyExist;
-      const didInviteUser = data?.inviteUser?.didInvite;
+    onCompleted: (res) => {
+      const userDidExist = res?.inviteUser?.didAlreadyExist;
+      const didInviteUser = res?.inviteUser?.didInvite;
 
       if (!userDidExist && didInviteUser) {
         toast({

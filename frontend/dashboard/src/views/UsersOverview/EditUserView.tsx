@@ -1,22 +1,20 @@
 import * as yup from 'yup';
+import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
+import {
+  Div, Form, FormContainer, FormControl,
+  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Loader, Muted, PageTitle,
+} from '@haas/ui';
 import { Mail, Phone, User } from 'react-feather';
-import { gql } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/client';
+import { useTranslation } from 'react-i18next';
+import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 import Select from 'react-select';
 
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
-import {
-  Div, Form, FormContainer, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Loader, Muted, PageTitle
-} from '@haas/ui';
-
-import { motion } from 'framer-motion';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
 import getRolesQuery from 'queries/getRoles';
 import getUsersQuery from 'queries/getUsers';
 
@@ -53,28 +51,6 @@ const getUserFromCustomer = gql`
     }
   }
 `;
-
-const EditUserView = () => {
-  const { activeCustomer } = useCustomer();
-  const { userId } = useParams<{ userId: string }>();
-
-  const { data, loading } = useQuery(getUserFromCustomer, {
-    variables: {
-      customerId: activeCustomer?.id,
-      userId,
-    },
-  });
-
-  if (loading) return <Loader />;
-
-  if (data?.customer?.userCustomer) {
-    return (
-      <EditUserForm userCustomer={data?.customer?.userCustomer} />
-    );
-  }
-
-  return <Loader />;
-};
 
 const editUserMutation = gql`
   mutation editUser($userId: String!, $input: EditUserInput) {
@@ -272,6 +248,28 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
       </motion.div>
     </>
   );
+};
+
+const EditUserView = () => {
+  const { activeCustomer } = useCustomer();
+  const { userId } = useParams<{ userId: string }>();
+
+  const { data, loading } = useQuery(getUserFromCustomer, {
+    variables: {
+      customerId: activeCustomer?.id,
+      userId,
+    },
+  });
+
+  if (loading) return <Loader />;
+
+  if (data?.customer?.userCustomer) {
+    return (
+      <EditUserForm userCustomer={data?.customer?.userCustomer} />
+    );
+  }
+
+  return <Loader />;
 };
 
 export default EditUserView;

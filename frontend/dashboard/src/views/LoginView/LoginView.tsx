@@ -1,17 +1,17 @@
-import { useToast } from '@chakra-ui/core';
-import React from 'react';
 import * as UI from '@haas/ui';
 import { Div, Form, FormControl, InputGrid, Text } from '@haas/ui';
 import { Mail, Send } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
+import { useToast } from '@chakra-ui/core';
+import React from 'react';
 
-import Logo from 'components/Logo/Logo';
+import { useLogger } from 'hooks/useLogger';
+import { useRequestInviteMutation } from 'types/generated-types';
 import AnimatedRoute from 'components/Routes/AnimatedRoute';
 import AnimatedRoutes from 'components/Routes/AnimatedRoutes';
+import Logo from 'components/Logo/Logo';
 import ServerError from 'components/ServerError';
-import { useRequestInviteMutation } from 'types/generated-types';
-import { useLogger } from 'hooks/useLogger';
 
 import * as LS from './LoginViewStyles';
 
@@ -29,7 +29,7 @@ const LoginView = () => {
 
   const form = useForm<FormData>({
     mode: 'onChange',
-    shouldUnregister: false
+    shouldUnregister: false,
   });
 
   const [requestInvite, { error: loginServerError, loading: isRequestingInvite }] = useRequestInviteMutation({
@@ -62,8 +62,8 @@ const LoginView = () => {
           section: 'auth',
         },
         user: {
-          email: form.getValues().email
-        }
+          email: form.getValues().email,
+        },
       });
     },
   });
@@ -71,7 +71,7 @@ const LoginView = () => {
   const handleRequestInvite = async (data: FormData) => {
     requestInvite({
       variables: {
-        input: { email: data.email }
+        input: { email: data.email },
       },
     });
   };
@@ -87,7 +87,11 @@ const LoginView = () => {
         </UI.Text>
         <UI.Card minHeight="250px" width="100%" maxWidth={600} bg="white" noHover>
           <UI.CardBody
-            overflow="hidden" display="flex" alignItems="center" justifyContent="center">
+            overflow="hidden"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
             <AnimatedRoutes>
               <AnimatedRoute exact path={`${baseRoute}`}>
                 <Form onSubmit={form.handleSubmit(handleRequestInvite)}>
@@ -146,10 +150,17 @@ const LoginView = () => {
                     <Text textAlign="center" fontSize="1rem" fontWeight="300" color="gray.500">
                       <>
                         {sentEmail && (
-                          <UI.Span>We sent an email to <UI.Span fontWeight="700">{sentEmail}.</UI.Span></UI.Span>
+                          <UI.Span>
+                            We sent an email to
+                            {' '}
+                            <UI.Span fontWeight="700">
+                              {sentEmail}
+                              .
+                            </UI.Span>
+                          </UI.Span>
                         )}
                         <br />
-                      You should receive an invitation link very soon!
+                        You should receive an invitation link very soon!
                       </>
                     </Text>
                   </UI.Div>
@@ -164,13 +175,16 @@ const LoginView = () => {
                     { }
                     <Text textAlign="left" fontSize="1rem" fontWeight="300" color="gray.500">
                       <>
-                          {sentEmail && (
-                            <>
-                              We cannot find an email by <UI.Span fontWeight="700">{sentEmail}</UI.Span>.
-                              <br />
-                            </>
-                          )}
-                          Please check if the mail is correct, and otherwise reach us for more help.
+                        {sentEmail && (
+                        <>
+                          We cannot find an email by
+                          {' '}
+                          <UI.Span fontWeight="700">{sentEmail}</UI.Span>
+                          .
+                          <br />
+                        </>
+                        )}
+                        Please check if the mail is correct, and otherwise reach us for more help.
                       </>
                     </Text>
                     <UI.Button

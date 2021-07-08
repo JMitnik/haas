@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable radix */
 import * as UI from '@haas/ui';
 import * as lodash from 'lodash';
@@ -26,16 +27,16 @@ import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnect
 
 import {
   EntryBreadCrumbContainer,
-  NodeTypeIcon
+  NodeTypeIcon,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import { FormNodeEntry } from './FormNodeEntry';
 import {
   InteractionDateCell, InteractionPathCell,
-  InteractionUserCell, ScoreCell
+  InteractionUserCell, ScoreCell,
 } from './InteractionTableCells';
 import {
   InteractionDetailQuestionEntry,
-  InteractionsOverviewContainer
+  InteractionsOverviewContainer,
 } from './InteractionOverviewStyles';
 
 interface TableProps {
@@ -57,6 +58,39 @@ const tableHeaders = [
   { Header: 'score', accessor: 'score', Cell: ScoreCell },
 ];
 
+const FallbackNode = () => (
+  <UI.Div>
+    User kept it empty
+  </UI.Div>
+);
+
+const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
+  if (!entry) return <Div>test</Div>;
+
+  switch (entry.relatedNode?.type) {
+    case QuestionNodeTypeEnum.SLIDER:
+      return <>{entry.value?.sliderNodeEntry}</>;
+
+    case QuestionNodeTypeEnum.CHOICE:
+      return <>{entry.value?.choiceNodeEntry}</>;
+
+    case QuestionNodeTypeEnum.REGISTRATION:
+      return <>{entry.value?.registrationNodeEntry}</>;
+
+    case QuestionNodeTypeEnum.TEXTBOX:
+      return <>{entry.value?.textboxNodeEntry}</>;
+
+    case QuestionNodeTypeEnum.FORM:
+      if (!entry.value?.formNodeEntry) return <FallbackNode />;
+      return (
+        <FormNodeEntry nodeEntry={entry.value?.formNodeEntry} />
+      );
+
+    default:
+      return (<>N/A available</>);
+  }
+};
+
 const ExpandedInteractionRow = ({ data }: { data: any }) => {
   const { t } = useTranslation();
 
@@ -75,7 +109,7 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
                 <UI.Div>
                   <UI.Helper>{t('delivery_recipient')}</UI.Helper>
                   <UI.Label size="sm" mt={1} variantColor="cyan">
-                    <UI.Icon mr={2} ><User width="0.8rem" /></UI.Icon>
+                    <UI.Icon mr={2}><User width="0.8rem" /></UI.Icon>
                     {data.delivery.deliveryRecipientFirstName}
                     {data.delivery.deliveryRecipientLastName}
                   </UI.Label>
@@ -85,7 +119,7 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
                 <UI.Div>
                   <UI.Helper mb={1}>{t('device')}</UI.Helper>
                   <UI.Label mt={1} size="sm" variantColor="cyan">
-                    <UI.Icon mr={2} ><Monitor width="0.8rem" /></UI.Icon>
+                    <UI.Icon mr={2}><Monitor width="0.8rem" /></UI.Icon>
                     {data.device}
                   </UI.Label>
                 </UI.Div>
@@ -94,8 +128,10 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
                 <UI.Div>
                   <UI.Helper mb={1}>{t('duration')}</UI.Helper>
                   <UI.Label mt={1} size="sm" variantColor="cyan">
-                    <UI.Icon mr={2} ><Watch width="0.8rem" /></UI.Icon>
-                    {data.totalTimeInSec} {t('seconds')}
+                    <UI.Icon mr={2}><Watch width="0.8rem" /></UI.Icon>
+                    {data.totalTimeInSec}
+                    {' '}
+                    {t('seconds')}
                   </UI.Label>
                 </UI.Div>
               )}
@@ -103,7 +139,7 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
                 <UI.Div>
                   <UI.Helper>{t('origin_url')}</UI.Helper>
                   <UI.Label size="sm" mt={1} variantColor="cyan">
-                    <UI.Icon mr={2} ><Link width="0.8rem" /></UI.Icon>
+                    <UI.Icon mr={2}><Link width="0.8rem" /></UI.Icon>
                     {data.originUrl}
                   </UI.Label>
                 </UI.Div>
@@ -158,47 +194,15 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
     </Div>
   );
 };
-
-const FallbackNode = () => (
-  <UI.Div>
-    User kept it empty
-  </UI.Div>
-);
-
-const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
-  if (!entry) return <Div>test</Div>;
-
-  switch (entry.relatedNode?.type) {
-    case QuestionNodeTypeEnum.SLIDER:
-      return <>{entry.value?.sliderNodeEntry}</>;
-
-    case QuestionNodeTypeEnum.CHOICE:
-      return <>{entry.value?.choiceNodeEntry}</>;
-
-    case QuestionNodeTypeEnum.REGISTRATION:
-      return <>{entry.value?.registrationNodeEntry}</>;
-
-    case QuestionNodeTypeEnum.TEXTBOX:
-      return <>{entry.value?.textboxNodeEntry}</>;
-
-    case QuestionNodeTypeEnum.FORM:
-      if (!entry.value?.formNodeEntry) return <FallbackNode />;
-      return (
-        <FormNodeEntry nodeEntry={entry.value?.formNodeEntry} />
-      );
-
-    default:
-      return (<>N/A available</>);
-  }
-};
-
 const InteractionsOverview = () => {
   const { dialogueSlug, customerSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
-  const [fetchInteractions, { data, loading }] = useLazyQuery<CustomerSessionConnection>(getDialogueSessionConnectionQuery, {
-    fetchPolicy: 'cache-and-network',
-  });
+  const [fetchInteractions, { data, loading }] = useLazyQuery<CustomerSessionConnection>(
+    getDialogueSessionConnectionQuery, {
+      fetchPolicy: 'cache-and-network',
+    },
+  );
 
-  const handleExportCSV = (sessions: Array<Session> | undefined, customerSlug: string, dialogueSlug: string) => {
+  const handleExportCSV = (sessions: Array<Session> | undefined, relCustomerSlug: string, relDialogueSlug: string) => {
     if (!sessions) return;
     const mappedSessions = sessions.map((session) => {
       const { createdAt, nodeEntries } = session;
@@ -230,18 +234,20 @@ const InteractionsOverview = () => {
     const currDate = new Date().getTime();
 
     tempLink.href = csvUrl;
-    tempLink.setAttribute('download', `${currDate}-${customerSlug}-${dialogueSlug}.csv`);
+    tempLink.setAttribute('download', `${currDate}-${relCustomerSlug}-${relDialogueSlug}.csv`);
     tempLink.click();
     tempLink.remove();
   };
 
-  const [fetchCSVData, { loading: csvLoading }] = useLazyQuery<CustomerSessionConnection>(getDialogueSessionConnectionQuery, {
-    fetchPolicy: 'cache-and-network',
-    onCompleted: (csvData: any) => {
-      const sessions = csvData?.customer?.dialogue?.sessionConnection?.sessions;
-      handleExportCSV(sessions, customerSlug, dialogueSlug);
+  const [fetchCSVData, { loading: csvLoading }] = useLazyQuery<CustomerSessionConnection>(
+    getDialogueSessionConnectionQuery, {
+      fetchPolicy: 'cache-and-network',
+      onCompleted: (csvData: any) => {
+        const sessions = csvData?.customer?.dialogue?.sessionConnection?.sessions;
+        handleExportCSV(sessions, customerSlug, dialogueSlug);
+      },
     },
-  });
+  );
 
   const location = useLocation();
 
@@ -279,7 +285,12 @@ const InteractionsOverview = () => {
   }, 250), []);
 
   const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
-    setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate, pageIndex: 0 }));
+    setPaginationProps((prevValues) => ({
+      ...prevValues,
+      activeStartDate: startDate,
+      activeEndDate: endDate,
+      pageIndex: 0,
+    }));
   }, 250), []);
 
   const { t } = useTranslation();

@@ -1,6 +1,7 @@
 /* eslint-disable radix */
 import * as yup from 'yup';
 import { FormContainer, PageTitle } from '@haas/ui';
+import { max, min } from 'lodash';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
@@ -13,7 +14,6 @@ import React from 'react';
 import editTriggerMutation from 'mutations/editTrigger';
 import getTriggerQuery from 'queries/getTrigger';
 
-import { max, min } from 'lodash';
 import TriggerForm from './TriggerForm';
 
 interface FormDataProps {
@@ -112,24 +112,6 @@ const getConditionType = (type: string) => {
   return conditionTypeSelectOption;
 };
 
-const EditTriggerView = () => {
-  const { triggerId } = useParams<{ triggerId: string, customerSlug: string }>();
-
-  const { data: triggerData, error, loading } = useQuery(getTriggerQuery, {
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      id: triggerId,
-    },
-  });
-
-  if (loading) return null;
-  if (error) return <><p>{error.message}</p></>;
-
-  const trigger = triggerData?.trigger;
-
-  return <EditTriggerForm trigger={trigger} />;
-};
-
 const EditTriggerForm = ({ trigger }: { trigger: any }) => {
   const { triggerId, customerSlug } = useParams<{ triggerId: string, customerSlug: string }>();
   const history = useHistory();
@@ -219,7 +201,7 @@ const EditTriggerForm = ({ trigger }: { trigger: any }) => {
       textValue: condition?.matchText || null,
     })) || [];
 
-    const trigger = {
+    const triggerData = {
       name: formData.name,
       type: formData?.type,
       medium: formData?.medium,
@@ -230,7 +212,7 @@ const EditTriggerForm = ({ trigger }: { trigger: any }) => {
       variables: {
         customerSlug,
         triggerId,
-        trigger,
+        trigger: triggerData,
         recipients,
       },
     });
@@ -254,6 +236,24 @@ const EditTriggerForm = ({ trigger }: { trigger: any }) => {
       </motion.div>
     </>
   );
+};
+
+const EditTriggerView = () => {
+  const { triggerId } = useParams<{ triggerId: string, customerSlug: string }>();
+
+  const { data: triggerData, error, loading } = useQuery(getTriggerQuery, {
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      id: triggerId,
+    },
+  });
+
+  if (loading) return null;
+  if (error) return <><p>{error.message}</p></>;
+
+  const trigger = triggerData?.trigger;
+
+  return <EditTriggerForm trigger={trigger} />;
 };
 
 export default EditTriggerView;

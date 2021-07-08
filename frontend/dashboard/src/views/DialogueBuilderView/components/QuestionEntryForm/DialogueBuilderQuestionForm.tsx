@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
