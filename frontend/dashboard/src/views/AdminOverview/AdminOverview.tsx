@@ -675,7 +675,7 @@ const AdminOverview = () => {
                       {data?.usersConnection?.userCustomers?.map(
                         (item, index) => (
                           <UI.TableRow key={item.user.email}>
-                            <UI.TableCell>
+                            <UI.TableCell  >
                               {cellClicked === false ? (
                                 coordinate.col === index &&
                                 coordinate.row === 0 ? (

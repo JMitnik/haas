@@ -10,13 +10,13 @@ import { SystemPermission } from 'types/globalTypes';
 import { GlobalPermissionList } from './GlobalPermissionList';
 
 const DropdownOption = (props: any) => {
-  const nodeProps = GlobalPermissionList(props.data);
-  
+  const nodeProps = GlobalPermissionList(props.data.key);
+  // console.log(props)
   return (
     <NodeCellContainer>
       <components.Option {...props}>
         <UI.Flex>
-           {console.log(nodeProps)}
+           
           <UI.Icon
             bg={nodeProps.bg}
             color={nodeProps.color}
