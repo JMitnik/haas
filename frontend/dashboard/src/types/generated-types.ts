@@ -2053,6 +2053,19 @@ export type GetWorkspaceDialoguesQuery = (
   )> }
 );
 
+export type CloneQuestionMutationVariables = Exact<{
+  questionId?: Maybe<Scalars['String']>;
+}>;
+
+
+export type CloneQuestionMutation = (
+  { __typename?: 'Mutation' }
+  & { cloneQuestion?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id'>
+  )> }
+);
+
 export type RequestInviteMutationVariables = Exact<{
   input?: Maybe<RequestInviteInput>;
 }>;
@@ -2759,6 +2772,39 @@ export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDi
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
     }
+export const CloneQuestionDocument = gql`
+    mutation cloneQuestion($questionId: String) {
+  cloneQuestion(questionId: $questionId) {
+    id
+  }
+}
+    `;
+export type CloneQuestionMutationFn = Apollo.MutationFunction<CloneQuestionMutation, CloneQuestionMutationVariables>;
+
+/**
+ * __useCloneQuestionMutation__
+ *
+ * To run a mutation, you first call `useCloneQuestionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCloneQuestionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cloneQuestionMutation, { data, loading, error }] = useCloneQuestionMutation({
+ *   variables: {
+ *      questionId: // value for 'questionId'
+ *   },
+ * });
+ */
+export function useCloneQuestionMutation(baseOptions?: Apollo.MutationHookOptions<CloneQuestionMutation, CloneQuestionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CloneQuestionMutation, CloneQuestionMutationVariables>(CloneQuestionDocument, options);
+      }
+export type CloneQuestionMutationHookResult = ReturnType<typeof useCloneQuestionMutation>;
+export type CloneQuestionMutationResult = Apollo.MutationResult<CloneQuestionMutation>;
+export type CloneQuestionMutationOptions = Apollo.BaseMutationOptions<CloneQuestionMutation, CloneQuestionMutationVariables>;
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {

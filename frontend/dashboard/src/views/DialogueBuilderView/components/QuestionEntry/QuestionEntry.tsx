@@ -1,13 +1,14 @@
 import * as UI from '@haas/ui';
-import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Flex, Span } from '@haas/ui';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router';
+import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { useCloneQuestionMutation } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import ShowMoreButton from 'components/ShowMoreButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
@@ -46,15 +47,6 @@ interface QuestionEntryItemProps {
 interface QuestionOptionsOverlayProps {
   onClone: (e: React.MouseEvent<HTMLElement>) => void;
 }
-
-const cloneQuestionMutation = gql`
-  mutation cloneQuestion($questionId: String) {
-    cloneQuestion(questionId: $questionId) {
-        id
-    }
-  }
-`;
-
 
 const QuestionOptionsOverlay = ({ onClone }: QuestionOptionsOverlayProps) => {
   const { t } = useTranslation();
@@ -102,8 +94,7 @@ const QuestionEntryItem = ({ depth,
   const { t } = useTranslation();
   const toast = useToast();
   const questionRef = useRef<HTMLDivElement | null>(null);
-
-  const [cloneQuestion] = useMutation(cloneQuestionMutation, {
+  const [cloneQuestion] = useCloneQuestionMutation({
     refetchQueries: [{
       query: getTopicBuilderQuery,
       variables: {

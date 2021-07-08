@@ -1,0 +1,5 @@
+ mutation cloneQuestion($questionId: String) {
+    cloneQuestion(questionId: $questionId) {
+        id
+    }
+  }
