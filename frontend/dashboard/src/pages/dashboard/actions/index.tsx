@@ -33,6 +33,7 @@ const ActionsPage = () => {
   const mappedLeafs = leafs.map((leaf: any) => {
     if (leaf.type === 'LINK') {
       const mappedLinks = leaf.links?.map((link: any) => {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const { __typename, ...linkedData } = link;
         return { ...linkedData, type: { label: link.type, value: link.type } };
       });

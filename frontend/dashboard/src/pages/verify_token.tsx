@@ -1,15 +1,15 @@
 import * as qs from 'qs';
 import {
   Div,
-  Loader, PageContainer, SubtlePageHeading
+  Loader, PageContainer, SubtlePageHeading,
 } from '@haas/ui';
+import { gql, useMutation } from '@apollo/client';
 import { useHistory, useLocation } from 'react-router';
-import { useMutation } from '@apollo/client';
-import { useUser } from 'providers/UserProvider';
 import React, { useEffect, useRef } from 'react';
-import formatServerError from 'utils/formatServerError';
-import { gql } from '@apollo/client';
 import styled from 'styled-components';
+
+import { useUser } from 'providers/UserProvider';
+import formatServerError from 'utils/formatServerError';
 
 const verifyUserTokenQuery = gql`
   mutation verifyUserToken($token: String!) {

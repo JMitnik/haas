@@ -2,18 +2,18 @@ import { Button, ButtonGroup, useToast } from '@chakra-ui/core';
 import {
   Div, Form, FormContainer,
   FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
-  Muted, SubtlePageHeading, SubtlePageSubHeading, ViewContainer
+  Muted, SubtlePageHeading, SubtlePageSubHeading, ViewContainer,
 } from '@haas/ui';
 import { Mail, Phone, User } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
+import { gql, useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
-import { useUser } from 'providers/UserProvider';
 import React from 'react';
+
+import { useUser } from 'providers/UserProvider';
 import ServerError from 'components/ServerError';
-import { gql } from '@apollo/client';
 
 const FirstTimeOuterContainerAnimation: Variants = {
   initial: {

@@ -14,6 +14,7 @@ import {
 } from 'types/generated-types';
 import { DeepPartial } from 'types/customTypes';
 
+// eslint-disable-next-line import/no-cycle
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
 export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
@@ -132,7 +133,7 @@ export const CampaignView = () => {
       deliveryConnectionFilter: paginationState,
     },
     pollInterval: POLL_INTERVAL,
-    onCompleted: (data) => setDataCache(data),
+    onCompleted: (res) => setDataCache(res),
     onError: (error) => logger.logError(error, {
       tags: { section: 'campaign' },
     }),
@@ -293,7 +294,8 @@ export const CampaignView = () => {
                         offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
                       },
                     }))}
-                    isDisabled={(paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages}
+                    isDisabled={(
+                      paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages}
                   >
                     Next
 
@@ -356,7 +358,13 @@ export const CampaignView = () => {
                     )}
                     {event?.status === DeliveryStatusEnum.Opened && (
                       <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="yellow.200" padding="5px" color="yellow.500" style={{ borderRadius: '100%' }}>
+                        <UI.Div
+                          mr={2}
+                          bg="yellow.200"
+                          padding="5px"
+                          color="yellow.500"
+                          style={{ borderRadius: '100%' }}
+                        >
                           <Eye />
                         </UI.Div>
                         {t('opened_event')}

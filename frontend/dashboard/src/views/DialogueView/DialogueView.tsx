@@ -2,17 +2,16 @@ import * as UI from '@haas/ui';
 import * as qs from 'qs';
 import {
   Activity, Award, Clipboard, Download, MessageCircle,
-  ThumbsDown, ThumbsUp, TrendingDown, TrendingUp
+  ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
 } from 'react-feather';
 import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, Text } from '@haas/ui';
+import { gql, useQuery } from '@apollo/client';
 import { sub } from 'date-fns';
 import { useHistory, useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
 import React, { useContext, useReducer, useRef } from 'react';
-import { gql } from '@apollo/client';
 import styled, { ThemeContext, css } from 'styled-components';
 
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
@@ -48,12 +47,24 @@ interface ActiveDateAction {
   type: ActiveDateType;
 }
 
-const DatePickerExpanded = ({ activeLabel, dispatch }: { activeLabel: ActiveDateType, dispatch: React.Dispatch<ActiveDateAction> }) => {
+interface DatePickerExpandedProps {
+  activeLabel: ActiveDateType;
+  dispatch: React.Dispatch<ActiveDateAction>
+}
+
+const DatePickerExpanded = ({ activeLabel, dispatch }: DatePickerExpandedProps) => {
   const { t } = useTranslation();
+
   return (
     <Div>
       <Div>
-        <Button size="sm" isActive={activeLabel === 'last_hour'} onClick={() => dispatch({ type: 'last_hour' })}>{t('dialogue:last_hour')}</Button>
+        <Button
+          size="sm"
+          isActive={activeLabel === 'last_hour'}
+          onClick={() => dispatch({ type: 'last_hour' })}
+        >
+          {t('dialogue:last_hour')}
+        </Button>
         <Button
           ml={1}
           size="sm"
@@ -161,24 +172,24 @@ const getDialogueStatistics = gql`
             quantity
             basicSentiment
           }
-          
+
           mostPopularPath {
             answer
             quantity
             basicSentiment
           }
-          
+
           topNegativePath {
             quantity
             answer
             basicSentiment
           }
-          
+
           history {
             x
             y
           }
-        } 
+        }
       }
     }
   }
@@ -380,15 +391,15 @@ const DialogueView = () => {
                       </Text>
                     </>
                   ) : (
-                      <>
-                        <Icon size="22px" as={TrendingDown} color="red.200" />
-                        <Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
-                          {increaseInAverageScore.toFixed(2)}
-                          {' '}
+                    <>
+                      <Icon size="22px" as={TrendingDown} color="red.200" />
+                      <Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
+                        {increaseInAverageScore.toFixed(2)}
+                        {' '}
                         %
                       </Text>
-                      </>
-                    )}
+                    </>
+                  )}
                 </Flex>
               )}
             />
@@ -411,11 +422,11 @@ const DialogueView = () => {
                       <TagLabel color="green.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
                     </Tag>
                   ) : (
-                      <Tag size="sm" variantColor="red">
-                        <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
-                        <TagLabel color="red.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
-                      </Tag>
-                    )}
+                    <Tag size="sm" variantColor="red">
+                      <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
+                      <TagLabel color="red.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
+                    </Tag>
+                  )}
                 </>
               )}
             />
@@ -456,8 +467,8 @@ const DialogueView = () => {
           {dialogue.statistics?.history ? (
             <ScoreGraphModule chartData={dialogue.statistics?.history} />
           ) : (
-              <Div>{t('no_data')}</Div>
-            )}
+            <Div>{t('no_data')}</Div>
+          )}
         </Div>
 
         <InteractionFeedModule interactions={dialogue?.sessions} />

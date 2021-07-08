@@ -1,9 +1,9 @@
+import { gql, useQuery } from '@apollo/client';
 import { useHistory, useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
 import React, { useContext, useEffect, useState } from 'react';
-import { gql } from '@apollo/client';
 
 import { SystemPermission } from 'types/globalTypes';
+
 import {
   getCustomerOfUser_UserOfCustomer_customer as Customer,
   getCustomerOfUser_UserOfCustomer_role as Role,

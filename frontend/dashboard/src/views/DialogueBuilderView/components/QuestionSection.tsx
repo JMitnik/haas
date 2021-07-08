@@ -1,10 +1,10 @@
+import { Div, Flex, H4 } from '@haas/ui';
 import { Plus } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { Div, Flex, H4 } from '@haas/ui';
 import SplitArrowIcon from 'components/Icons/SplitIcon';
 
-import { useTranslation } from 'react-i18next';
 import { AddQuestionContainer, DepthSpan } from './QuestionEntry/QuestionEntryStyles';
 import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
@@ -52,7 +52,9 @@ const QuestionSection = ({
   };
 
   const activeChildrenIds = question.children?.map((child) => child.childNode.id);
-  const children: Array<QuestionEntryProps> = questionsQ.filter((question) => activeChildrenIds?.includes(question.id));
+  const children: Array<QuestionEntryProps> = questionsQ.filter((childQuestion) => activeChildrenIds?.includes(
+    childQuestion.id,
+  ));
   const parentOptions = question.options;
 
   const getConditionOfParentQuestion = (childNodeId: string) => {
@@ -104,28 +106,26 @@ const QuestionSection = ({
         ctaNodes={ctaNodes}
       />
 
-      {isQuestionExpanded && children.map(
-        (child, index) => (
-          <QuestionSection
-            edgeId={getEdgeIdfromParentQuestion(child.id)}
-            options={parentOptions}
-            parentQuestionType={question.type}
-            condition={getConditionOfParentQuestion(child.id)}
-            depth={depth + 1}
-            Icon={child.icon}
-            activeQuestion={activeQuestion}
-            index={index}
-            leafs={leafs}
-            ctaNodes={ctaNodes}
-            onActiveQuestionChange={onActiveQuestionChange}
-            question={child}
-            questionsQ={questionsQ}
-            key={`section-${child.id}-${child.updatedAt}`}
-            onAddQuestion={onAddQuestion}
-            onDeleteQuestion={onDeleteQuestion}
-          />
-        ),
-      )}
+      {isQuestionExpanded && children.map((child, childIndex) => (
+        <QuestionSection
+          edgeId={getEdgeIdfromParentQuestion(child.id)}
+          options={parentOptions}
+          parentQuestionType={question.type}
+          condition={getConditionOfParentQuestion(child.id)}
+          depth={depth + 1}
+          Icon={child.icon}
+          activeQuestion={activeQuestion}
+          index={childIndex}
+          leafs={leafs}
+          ctaNodes={ctaNodes}
+          onActiveQuestionChange={onActiveQuestionChange}
+          question={child}
+          questionsQ={questionsQ}
+          key={`section-${child.id}-${child.updatedAt}`}
+          onAddQuestion={onAddQuestion}
+          onDeleteQuestion={onDeleteQuestion}
+        />
+      ))}
 
       {(isQuestionExpanded && !isAddExpanded) && (
         <AddQuestionContainer onClick={() => handleAdd()}>

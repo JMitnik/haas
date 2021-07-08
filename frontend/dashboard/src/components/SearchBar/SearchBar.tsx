@@ -9,10 +9,11 @@ import { InputIcon, SearchbarInput, SearchbarInputContainer } from './SearchBarS
 interface SearchBarProps {
   activeSearchTerm: string;
   onSearchTermChange: (newSearchTerm: string) => void;
+  // eslint-disable-next-line react/no-unused-prop-types
   isSearching?: boolean;
 }
 
-const SearchBar = ({ activeSearchTerm, onSearchTermChange, isSearching }: SearchBarProps) => {
+const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
   const startedRef = useRef<boolean>();
 

@@ -1,4 +1,3 @@
-import { useHistory } from 'react-router-dom';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -34,29 +33,24 @@ const StatisticWidget = styled(Div)`
   }
 `;
 
-const DialogueInfo = ({
-  DialogueResultProps,
-}: { DialogueResultProps: DialogueResultProps, customerId: string, dialogueId: string }) => {
-  const history = useHistory();
-
-  return (
-    <TopicInfoView>
-      {DialogueResultProps && (
-        <StatisticWidget>
-          {DialogueResultProps?.average !== 'false' && (
-            <Score>
-              <div style={{ marginTop: '5px', alignSelf: 'centre' }}>
-                Average score:
-              </div>
-              <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
-                {parseFloat(DialogueResultProps?.average).toPrecision(4)}
-              </div>
-            </Score>
-          )}
-        </StatisticWidget>
+// TODO: Translation!
+const DialogueInfo = ({ DialogueResultProps }: { DialogueResultProps: DialogueResultProps }) => (
+  <TopicInfoView>
+    {DialogueResultProps && (
+    <StatisticWidget>
+      {DialogueResultProps?.average !== 'false' && (
+      <Score>
+        <div style={{ marginTop: '5px', alignSelf: 'centre' }}>
+          Average score:
+        </div>
+        <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
+          {parseFloat(DialogueResultProps?.average).toPrecision(4)}
+        </div>
+      </Score>
       )}
-    </TopicInfoView>
-  );
-};
+    </StatisticWidget>
+    )}
+  </TopicInfoView>
+);
 
 export default DialogueInfo;

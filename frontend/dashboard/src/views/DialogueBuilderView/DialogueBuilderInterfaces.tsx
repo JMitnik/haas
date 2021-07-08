@@ -6,7 +6,7 @@ enum QuestionNodeTypeEnum {
   Form = 'FORM',
   Textbox = 'TEXTBOX',
   Link = 'LINK',
-  Share = 'SHARE'
+  Share = 'SHARE',
 }
 
 export interface CTANode {

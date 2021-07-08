@@ -11,6 +11,7 @@ import React, { useState } from 'react';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useLogger } from 'hooks/useLogger';
 
+// eslint-disable-next-line import/no-cycle
 import { defaultCampaignViewFilter } from './CampaignView';
 
 const schema = yup.object({

@@ -10,7 +10,6 @@ import {
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
-
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
@@ -89,36 +88,6 @@ const schema = yup.object().shape({
   isWithoutGenData: yup.boolean(),
 });
 
-const EditDialogueView = () => {
-  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
-  const editDialogueData = useQuery(getEditDialogueQuery, {
-    variables: {
-      customerSlug,
-      dialogueSlug,
-    },
-    fetchPolicy: 'network-only',
-  });
-
-  const { data: tagsData, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerSlug } });
-
-  if (editDialogueData.loading || tagsLoading) return null;
-
-  const tagOptions: Array<{ label: string, value: string }> = tagsData?.tags && tagsData?.tags?.map((tag: any) => (
-    { label: tag?.name, value: tag?.id }));
-
-  const currentTags = editDialogueData.data?.customer?.dialogue?.tags
-    && editDialogueData.data?.customer?.dialogue?.tags?.map((tag: any) => (
-      { label: tag?.name, value: tag?.id }));
-
-  return (
-    <EditDialogueForm
-      dialogue={editDialogueData.data?.customer?.dialogue}
-      currentTags={currentTags}
-      tagOptions={tagOptions}
-    />
-  );
-};
-
 const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFormProps) => {
   const history = useHistory();
   const language = LANGUAGE_OPTIONS.find((option) => option.value === dialogue?.language);
@@ -149,9 +118,6 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
         customerSlug,
       },
     }],
-    onError: (serverError: any) => {
-      console.log(serverError);
-    },
   });
 
   const [activeTags, setActiveTags] = useState<Array<null | { label: string, value: string }>>(currentTags);
@@ -159,7 +125,6 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
   const onSubmit = (formData: FormDataProps) => {
     const tagIds = formData.tags?.map((tag) => tag?.value) || [];
     const tagEntries = { entries: tagIds };
-    const language = formData.languageOption.value;
 
     // TODO: Ensure we can edit the dialogue slug (uneditable atm)
     editDialogue({
@@ -171,7 +136,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
         description: formData.description,
         tags: tagEntries,
         isWithoutGenData: intToBool(formData.isWithoutGenData),
-        language,
+        language: formData.languageOption.value,
         dialogueFinisherHeading: formData.postLeafHeading,
         dialogueFinisherSubheading: formData.postLeafSubheading,
       },
@@ -433,6 +398,36 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
         </FormContainer>
       </motion.div>
     </Div>
+  );
+};
+
+const EditDialogueView = () => {
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
+  const editDialogueData = useQuery(getEditDialogueQuery, {
+    variables: {
+      customerSlug,
+      dialogueSlug,
+    },
+    fetchPolicy: 'network-only',
+  });
+
+  const { data: tagsData, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerSlug } });
+
+  if (editDialogueData.loading || tagsLoading) return null;
+
+  const tagOptions: Array<{ label: string, value: string }> = tagsData?.tags && tagsData?.tags?.map((tag: any) => (
+    { label: tag?.name, value: tag?.id }));
+
+  const currentTags = editDialogueData.data?.customer?.dialogue?.tags
+    && editDialogueData.data?.customer?.dialogue?.tags?.map((tag: any) => (
+      { label: tag?.name, value: tag?.id }));
+
+  return (
+    <EditDialogueForm
+      dialogue={editDialogueData.data?.customer?.dialogue}
+      currentTags={currentTags}
+      tagOptions={tagOptions}
+    />
   );
 };
 

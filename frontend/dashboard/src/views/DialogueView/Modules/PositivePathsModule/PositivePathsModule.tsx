@@ -11,10 +11,10 @@ import ModuleContainer from '../Module';
 
 const PostivePathsModuleList = styled.ol`
   ${({ theme }) => css`
-   list-style: none;
-   padding: 12px 0 0 0 !important;
-   counter-reset: item;
- 
+    list-style: none;
+    padding: 12px 0 0 0 !important;
+    counter-reset: item;
+
     li {
       counter-increment: item;
       color: ${theme.colors.default.darkest};
@@ -35,10 +35,15 @@ const PostivePathsModuleList = styled.ol`
         font-size: 0.7rem;
       }
     }
-  `} 
+  `}
 `;
 
-const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => {
+interface Path {
+  answer: string;
+  quantity: number;
+}
+
+const PositivePathsModule = ({ positivePaths }: { positivePaths: Path[] }) => {
   const { t } = useTranslation();
 
   return (
@@ -49,7 +54,7 @@ const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => {
           <Flex marginTop="10px" flexGrow={1} flexDirection="column">
             {positivePaths.length > 0 && (
               <PostivePathsModuleList>
-                {positivePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
+                {positivePaths.map(({ answer, quantity }) => (
                   <li key={`${answer}-${quantity}`}>
                     {`${answer}`}
                   </li>

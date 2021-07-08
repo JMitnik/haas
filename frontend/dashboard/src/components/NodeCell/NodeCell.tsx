@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { MapNodeToProperties } from "components/MapNodeToProperties";
+import { MapNodeToProperties } from 'components/MapNodeToProperties';
 
 export const NodeCellContainer = styled.div`
   ${({ theme }) => css`
@@ -42,7 +42,7 @@ export const NodeCell = ({ node, onClick }: { node: any, onClick?: () => void })
   const nodeProps = MapNodeToProperties(node.type);
 
   return (
-    <NodeCellContainer onClick={onClick} style={{ padding: '8px 12px', width: "100%" }}>
+    <NodeCellContainer onClick={onClick} style={{ padding: '8px 12px', width: '100%' }}>
       <UI.Flex width="100%">
         <UI.Icon
           bg={nodeProps.bg}
@@ -59,11 +59,14 @@ export const NodeCell = ({ node, onClick }: { node: any, onClick?: () => void })
           <UI.Text>
             {node.label}
           </UI.Text>
-          <UI.MicroLabel bg={nodeProps.bg} color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}>
+          <UI.MicroLabel
+            bg={nodeProps.bg}
+            color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}
+          >
             {node.type}
           </UI.MicroLabel>
         </UI.Div>
       </UI.Flex>
     </NodeCellContainer>
-  )
-}
+  );
+};

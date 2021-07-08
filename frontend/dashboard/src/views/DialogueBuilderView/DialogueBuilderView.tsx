@@ -3,8 +3,8 @@ import { Zap } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { DialogueBuilderContainer } from './DialogueBuilderStyles';
 import { CTANode, QuestionEntryProps } from './DialogueBuilderInterfaces';
+import { DialogueBuilderContainer } from './DialogueBuilderStyles';
 import QuestionSection from './components/QuestionSection';
 
 interface QuestionEntryExtendedProps extends QuestionEntryProps {
@@ -15,7 +15,8 @@ interface DialogueBuilderViewProps {
   nodes: Array<QuestionEntryExtendedProps>;
   root: QuestionEntryExtendedProps | undefined;
   ctaNodes: CTANode[];
-  selectLeafs: Array<{label: string | undefined, value: string}>;
+  selectLeafs: Array<{ label: string | undefined, value: string }>;
+  // eslint-disable-next-line react/no-unused-prop-types
   dialogueId: string;
 }
 

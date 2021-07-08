@@ -3,6 +3,7 @@ import React from 'react';
 
 import { Card, CardBody, Flex, H2, H3, Paragraph, Span } from '@haas/ui';
 
+// TODO: Translations!
 const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: number }) => {
   const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const history = useHistory();
@@ -13,25 +14,24 @@ const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: n
         <H3 color="tertiary">
           <Flex justifyContent="space-between" alignItems="center">
             <Span>Call to actions</Span>
-            {/* <ChevronRight /> */}
           </Flex>
         </H3>
         <Paragraph color="app.onWhite" mt={4}>
           {!callToActionCount ? (
             <H2 color="default.darkest" mb={2}>No call to actions yet</H2>
           ) : (
-              <p>
-                <H2 color="default.darkest">
-                  {callToActionCount}
-                </H2>
-                {' '}
-                <Span color="default.darker">
-                  user(s) have interacted with the call to actions
+            <p>
+              <H2 color="default.darkest">
+                {callToActionCount}
+              </H2>
+              {' '}
+              <Span color="default.darker">
+                user(s) have interacted with the call to actions
 
-                  is the score of this dialogue
+                is the score of this dialogue
               </Span>
-              </p>
-            )}
+            </p>
+          )}
         </Paragraph>
       </CardBody>
     </Card>

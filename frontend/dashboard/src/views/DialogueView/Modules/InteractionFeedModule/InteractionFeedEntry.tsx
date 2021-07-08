@@ -50,11 +50,11 @@ export const EntryBreadCrumbContainer = styled(Div)<{ score?: number | null, isI
       justify-content: center;
       border-radius: 100px !important;
       width: 40px;
-      
+
       ${isInline && css`
         margin-left: -8px;
       `}
-      
+
       &:first-of-type {
         border-top-left-radius: 30px;
         border-border-bottom-left-radius: 30px;

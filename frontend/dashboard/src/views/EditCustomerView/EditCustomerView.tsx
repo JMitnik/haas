@@ -49,23 +49,6 @@ const schema = yup.object().shape({
 
 type FormDataProps = yup.InferType<typeof schema>;
 
-const EditCustomerView = () => {
-  const { customerSlug } = useParams<{ customerSlug: string }>();
-
-  const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
-    variables: {
-      customerSlug,
-    },
-  });
-
-  if (loading) return null;
-  if (error) return <><p>{error.message}</p></>;
-
-  const customer = customerData?.customer;
-
-  return <EditCustomerForm customer={customer} />;
-};
-
 const startsWithCloudinary = (url: string) => url.includes('cloudinary');
 
 const EditCustomerForm = ({ customer }: { customer: any }) => {
@@ -92,9 +75,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
   const [editWorkspace, { loading: isLoading, error: serverErrors }] = useMutation(editWorkspaceMutation, {
     onCompleted: (result: any) => {
-      const customer: any = result.editCustomer;
-
-      localStorage.setItem('customer', JSON.stringify(customer));
+      localStorage.setItem('customer', JSON.stringify(result.editCustomer));
 
       toast({
         title: 'Your business edited',
@@ -165,6 +146,23 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
       </motion.div>
     </>
   );
+};
+
+const EditCustomerView = () => {
+  const { customerSlug } = useParams<{ customerSlug: string }>();
+
+  const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
+    variables: {
+      customerSlug,
+    },
+  });
+
+  if (loading) return null;
+  if (error) return <><p>{error.message}</p></>;
+
+  const customer = customerData?.customer;
+
+  return <EditCustomerForm customer={customer} />;
 };
 
 export default EditCustomerView;

@@ -1,21 +1,20 @@
 import * as UI from '@haas/ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, useToast } from '@chakra-ui/core';
+import { Book, ExternalLink, LogOut } from 'react-feather';
 import { Div, Flex, Text } from '@haas/ui';
-import { ExternalLink, LogOut, Book } from 'react-feather';
 import { Link, LinkProps, NavLink, useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useTranslation } from 'react-i18next';
 import { useUser } from 'providers/UserProvider';
-import useAuth from 'hooks/useAuth';
-
-import { AnimatePresence, motion } from 'framer-motion';
 import Dropdown from 'components/Dropdown';
 import List from 'components/List/List';
 import ListItem from 'components/List/ListItem';
+import useAuth from 'hooks/useAuth';
 
 interface NavItemProps extends LinkProps {
   renderSibling?: React.ReactNode;
@@ -26,12 +25,12 @@ interface NavItemProps extends LinkProps {
 export const NavItemContainer = styled.li<{ isSubchildActive?: boolean }>`
   ${({ theme, isSubchildActive }) => css`
     position: relative;
-    
+
     ${isSubchildActive && css`
       border-radius: 5px;
       border: 1px solid ${theme.colors.gray[200]};
       overflow: hidden;
-        
+
       &::before {
         content: '';
         top: 0;
@@ -46,17 +45,6 @@ export const NavItemContainer = styled.li<{ isSubchildActive?: boolean }>`
     `}
   `}
 `;
-
-export const NavItem = ({ children, renderSibling, isSubchildActive, ...props }: NavItemProps) => (
-  <NavItemContainer isSubchildActive={isSubchildActive}>
-    <NavLinkContainer {...props}>{children}</NavLinkContainer>
-    <motion.div layout animate={{ opacity: 1 }} initial={{ opacity: 0 }}>
-      <AnimatePresence>
-        {renderSibling}
-      </AnimatePresence>
-    </motion.div>
-  </NavItemContainer>
-);
 
 export const NavLinkContainer = styled(NavLink) <LinkProps>`
   ${({ theme }) => css`
@@ -93,6 +81,17 @@ export const NavLinkContainer = styled(NavLink) <LinkProps>`
     }
   `}
 `;
+
+export const NavItem = ({ children, renderSibling, isSubchildActive, ...props }: NavItemProps) => (
+  <NavItemContainer isSubchildActive={isSubchildActive}>
+    <NavLinkContainer {...props}>{children}</NavLinkContainer>
+    <motion.div layout animate={{ opacity: 1 }} initial={{ opacity: 0 }}>
+      <AnimatePresence>
+        {renderSibling}
+      </AnimatePresence>
+    </motion.div>
+  </NavItemContainer>
+);
 
 export const NavItems = styled.div`
   ${({ theme }) => css`
@@ -284,7 +283,7 @@ export const SidenavContainer = styled.div`
     height: 100vh;
     flex-direction: column;
     justify-content: space-between;
-    
+
     ${FullLogoContainer} {
       color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['300']};
     }
@@ -297,7 +296,7 @@ export const SidenavContainer = styled.div`
         height: 100%;
       }
     }
-    
+
     ${LogoContainer} + ${UI.Text} {
       color: ${theme.colors.strongPrimary};
       font-weight: 900;

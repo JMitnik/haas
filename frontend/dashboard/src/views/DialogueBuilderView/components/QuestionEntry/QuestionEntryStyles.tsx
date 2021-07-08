@@ -48,17 +48,17 @@ export const OverflowSpan = styled(Span)`
 `;
 
 export const AddQuestionContainer = styled(Flex)`
-   ${({ theme }) => css`
+  ${({ theme }) => css`
     flex-direction: row;
     align-self: center;
     cursor: pointer;
     min-width: 500px;
     max-width: 800px;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
     background-color: ${theme.colors.default.lightest};
     color: ${theme.colors.default.muted};
-   
+
     border: ${theme.colors.app.mutedOnDefault} 1px solid;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
     transition: all 0.2s ease-in;
@@ -69,7 +69,7 @@ export const AddQuestionContainer = styled(Flex)`
       background-color: ${theme.colors.white};
       box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
     }
- `}
+  `}
 `;
 
 export const QuestionEntryViewContainer = styled(Card) <{ activeCTA: string | null, id: string }>`
@@ -96,48 +96,48 @@ export const QuestionEntryViewContainer = styled(Card) <{ activeCTA: string | nu
       background-color: ${theme.colors.white};
       opacity: 0.5;
     `};
- `} 
+ `}
 `;
 
-export const AddChildContainer = styled(Flex) <{isDisabled?: Boolean}>`
+export const AddChildContainer = styled(Flex) <{ isDisabled?: Boolean }>`
   ${({ theme, isDisabled }) => css`
-    position: absolute; 
+    position: absolute;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    bottom: 0; 
+    bottom: 0;
     left: 50%;
     transform: translate(-50%, -10px);
 
     ${isDisabled && css`
       pointer-events: none;
-      
+
       div > button {
         background-color: ${theme.colors.white};
         opacity: 0.5;
       }
     `}
-    
+
  `}
 `;
 
 export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
   ${({ theme, hasCTA }) => css`
     flex-direction: column;
-    justify-content: center; 
+    justify-content: center;
     justify-items: center;
-    border-left: none; 
+    border-left: none;
     border-bottom-right-radius: ${theme.borderRadiuses.somewhatRounded};
     border-top-right-radius: ${theme.borderRadiuses.somewhatRounded};
     color: ${theme.colors.default.muted};
     margin-bottom: 25px;
-    
+
     ${!hasCTA && css`
       border-color: ${theme.colors.default.darkest};
       opacity: 0.4;
       border: 1px dashed;
     `}
-    
+
     ${hasCTA && css`
       border: none;
       background: ${theme.colors.default.dark};
@@ -202,7 +202,7 @@ export const DeleteQuestionOptionButtonContainer = styled.button`
   cursor: pointer;
   transition: all 0.2s ease-in;
   margin-left: 1%;
-  
+
   &:hover {
     transition: all 0.2s ease-in;
     opacity: 0.8;

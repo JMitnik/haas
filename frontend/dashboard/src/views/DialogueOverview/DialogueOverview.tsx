@@ -14,7 +14,7 @@ import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
-const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean }) => {
+const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
 
@@ -93,7 +93,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean })
       ) : (
         <Grid gridRowGap={2}>
           {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-          <DialogueCard isCompact key={index} dialogue={dialogue} />
+            <DialogueCard isCompact key={index} dialogue={dialogue} />
           ))}
         </Grid>
       )}

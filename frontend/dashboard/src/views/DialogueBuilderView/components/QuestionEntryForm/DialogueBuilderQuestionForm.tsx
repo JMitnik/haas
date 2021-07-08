@@ -104,7 +104,6 @@ interface QuestionEntryFormProps {
   id: string;
   title: string;
   overrideLeaf?: OverrideLeafProps;
-  isRoot: boolean;
   type: { label: string, value: string };
   options: QuestionOptionProps[];
   leafs: Array<{ label: string, value: string }>;
@@ -378,8 +377,6 @@ const DialogueBuilderQuestionForm = ({
   }, 250), []);
 
   const onSubmit = (formData: FormDataProps) => {
-    const { title } = formData;
-    const type = activeQuestionType?.value;
     const overrideLeafId = activeLeaf?.value;
     const edgeCondition = activeCondition;
     const sliderNodeData = formData.sliderNode || sliderNode;
@@ -401,8 +398,8 @@ const DialogueBuilderQuestionForm = ({
             customerId: activeCustomer?.id,
             overrideLeafId: overrideLeafId || '',
             edgeId: edgeId || '-1',
-            title,
-            type,
+            title: formData.title,
+            type: activeQuestionType?.value,
             optionEntries: {
               options: values.optionsFull?.map((option, index) => ({
                 id: option?.id,
@@ -432,8 +429,8 @@ const DialogueBuilderQuestionForm = ({
           input: {
             customerId: activeCustomer?.id,
             dialogueSlug,
-            title,
-            type,
+            title: formData.title,
+            type: activeQuestionType?.value,
             unhappyText,
             happyText,
             extraContent: formData.videoEmbedded,
@@ -570,7 +567,7 @@ const DialogueBuilderQuestionForm = ({
                         name="matchText"
                         control={form.control}
                         defaultValue={activeMatchValue}
-                        render={({ onChange, onBlur, value }) => (
+                        render={() => (
                           <Select
                             options={parentOptionsSelect}
                             value={activeMatchValue}
@@ -613,7 +610,7 @@ const DialogueBuilderQuestionForm = ({
                     name="questionType"
                     control={form.control}
                     defaultValue={activeQuestionType}
-                    render={({ onChange, onBlur, value }) => (
+                    render={({ onChange }) => (
                       <Select
                         options={questionTypes}
                         value={activeQuestionType}
@@ -657,7 +654,7 @@ const DialogueBuilderQuestionForm = ({
                     name="activeLeaf"
                     control={form.control}
                     defaultValue={(activeLeaf?.value && activeLeaf) || leafs[0]}
-                    render={({ onChange, onBlur, value }) => (
+                    render={({ onChange }) => (
                       <Select
                         options={leafs}
                         // @ts-ignore
@@ -692,23 +689,25 @@ const DialogueBuilderQuestionForm = ({
             </>
           )}
 
-          {activeQuestionType && (activeQuestionType.value === 'CHOICE' || activeQuestionType.value === 'VIDEO_EMBEDDED') && (
-            <>
-              <UI.Hr />
-              <UI.FormSection>
-                <UI.Div>
-                  <UI.FormSectionHeader>{t('dialogue:about_choice')}</UI.FormSectionHeader>
-                  <UI.FormSectionHelper>
-                    {t('dialogue:about_choice_helper')}
-                  </UI.FormSectionHelper>
-                </UI.Div>
-                <ChoiceNodeForm
-                  form={form}
-                  ctaNodes={ctaNodes}
-                />
-              </UI.FormSection>
-            </>
-          )}
+          {activeQuestionType
+            && (activeQuestionType.value === 'CHOICE' || activeQuestionType.value === 'VIDEO_EMBEDDED')
+            && (
+              <>
+                <UI.Hr />
+                <UI.FormSection>
+                  <UI.Div>
+                    <UI.FormSectionHeader>{t('dialogue:about_choice')}</UI.FormSectionHeader>
+                    <UI.FormSectionHelper>
+                      {t('dialogue:about_choice_helper')}
+                    </UI.FormSectionHelper>
+                  </UI.Div>
+                  <ChoiceNodeForm
+                    form={form}
+                    ctaNodes={ctaNodes}
+                  />
+                </UI.FormSection>
+              </>
+            )}
         </Div>
 
         <Flex justifyContent="space-between">
@@ -727,7 +726,7 @@ const DialogueBuilderQuestionForm = ({
             <Popover
               usePortal
             >
-              {({ onClose }) => (
+              {() => (
                 <>
                   <PopoverTrigger>
                     <Button

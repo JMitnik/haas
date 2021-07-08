@@ -7,3 +7,6 @@
 serviceWorker.ts
 src/serviceWorker.ts
 **/serviceWorker.ts
+src/types/generated-types.ts
+src/types.d.ts
+src/mocks/fixtures/**

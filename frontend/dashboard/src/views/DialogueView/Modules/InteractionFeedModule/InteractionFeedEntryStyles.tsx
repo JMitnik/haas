@@ -2,7 +2,7 @@ import scoreToColors from 'utils/scoreToColors';
 import styled, { css } from 'styled-components';
 
 export const InteractionFeedEntryContainer = styled.div`
-   ${() => css`
+  ${() => css`
     display: flex;
     flex-direction: column;
     font-size: 0.7rem;
@@ -19,7 +19,7 @@ export const InteractionFeedEntryContainer = styled.div`
   `}
 `;
 
-export const InteractionFeedEntryValueContainer = styled.div<{value: number}>`
+export const InteractionFeedEntryValueContainer = styled.div<{ value: number }>`
   ${({ value }) => css`
     border-radius: 10px;
     display: flex;

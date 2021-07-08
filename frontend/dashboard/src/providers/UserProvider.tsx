@@ -1,8 +1,6 @@
-import { useMutation, useQuery } from '@apollo/client';
-import React, { useContext, useEffect, useState } from 'react';
-
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { useHistory } from 'react-router';
-import { gql } from '@apollo/client';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { me as GetUserData, me_me as User } from './__generated__/me';
 
