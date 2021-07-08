@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unused-prop-types */
 import * as UI from '@haas/ui';
 import { Flex, Span } from '@haas/ui';
 import { useMutation } from '@apollo/client';
@@ -171,7 +172,6 @@ const QuestionEntryItem = ({ depth,
               condition={condition}
               id={question.id}
               title={question.title}
-              isRoot={question.isRoot}
               leafs={leafs}
               ctaNodes={ctaNodes}
               options={question?.options || []}
