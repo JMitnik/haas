@@ -197,6 +197,7 @@ export type CreateWorkspaceInput = {
   slug: Scalars['String'];
   name: Scalars['String'];
   logo?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   primaryColour: Scalars['String'];
   isSeed?: Maybe<Scalars['Boolean']>;
   willGenerateFakeData?: Maybe<Scalars['Boolean']>;
@@ -285,6 +286,7 @@ export type CustomerSettings = {
   __typename?: 'CustomerSettings';
   id: Scalars['ID'];
   logoUrl?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   colourSettings?: Maybe<ColourSettings>;
   fontSettings?: Maybe<FontSettings>;
 };
@@ -504,6 +506,7 @@ export type EditWorkspaceInput = {
   slug: Scalars['String'];
   name: Scalars['String'];
   logo?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   primaryColour: Scalars['String'];
 };
 
@@ -580,12 +583,14 @@ export enum FormNodeFieldTypeEnum {
 
 export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
+  helperText?: Maybe<Scalars['String']>;
   fields?: Maybe<Array<FormNodeFieldInput>>;
 };
 
 export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
+  helperText?: Maybe<Scalars['String']>;
   fields: Array<FormNodeField>;
 };
 

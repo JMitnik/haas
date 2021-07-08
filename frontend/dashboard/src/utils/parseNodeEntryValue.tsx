@@ -1,20 +1,20 @@
-import { TFunction } from 'i18next';
+import { NodeEntry, QuestionNodeTypeEnum } from 'types/generated-types';
 
-import {
-  dialogueStatistics_customer_dialogue_sessions_nodeEntries as NodeEntry,
-} from 'views/DialogueView/__generated__/dialogueStatistics';
+import { TFunction } from 'i18next';
 
 const parseNodeEntryValue = (nodeEntry: NodeEntry, t: TFunction) => {
   switch (nodeEntry.relatedNode?.type) {
-    case 'SLIDER':
+    case QuestionNodeTypeEnum.Slider:
       return nodeEntry.value?.sliderNodeEntry;
-    case 'CHOICE':
+    case QuestionNodeTypeEnum.Choice:
       return nodeEntry.value?.choiceNodeEntry;
-    case 'REGISTRATION':
+    case QuestionNodeTypeEnum.VideoEmbedded:
+      return nodeEntry.value?.choiceNodeEntry;
+    case QuestionNodeTypeEnum.Registration:
       return nodeEntry.value?.registrationNodeEntry;
-    case 'TEXTBOX':
+    case QuestionNodeTypeEnum.Textbox:
       return nodeEntry.value?.textboxNodeEntry;
-    case 'FORM':
+    case QuestionNodeTypeEnum.Form:
       return t('see_interactions');
     default:
       return '';

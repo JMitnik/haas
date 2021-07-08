@@ -1,24 +1,22 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable radix */
 import * as UI from '@haas/ui';
 import * as lodash from 'lodash';
 import * as qs from 'qs';
-import { debounce } from 'lodash';
-import { useLazyQuery } from '@apollo/client';
-import { useLocation, useParams } from 'react-router';
-import Papa from 'papaparse';
-import React, { useCallback, useEffect, useState } from 'react';
-
 import { Activity, Download, Link, Monitor, User, Watch } from 'react-feather';
 import { Button, Icon } from '@chakra-ui/core';
 import {
   getDialogueSessionConnection as CustomerSessionConnection,
-  getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries as NodeEntry,
   getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions as Session,
 } from 'queries/__generated__/getDialogueSessionConnection';
 import { Div, Flex, PageTitle, Span, Text } from '@haas/ui';
+import { debounce } from 'lodash';
+import { useLazyQuery } from '@apollo/client';
+import { useLocation, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import Papa from 'papaparse';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { QuestionNodeTypeEnum } from 'types/globalTypes';
 import DatePicker from 'components/DatePicker/DatePicker';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
@@ -26,16 +24,18 @@ import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnect
 
 import {
   EntryBreadCrumbContainer,
-  NodeTypeIcon
+  NodeTypeIcon,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
+import { NodeEntry, QuestionNodeTypeEnum } from 'types/generated-types';
+
 import { FormNodeEntry } from './FormNodeEntry';
 import {
   InteractionDateCell, InteractionPathCell,
-  InteractionUserCell, ScoreCell
+  InteractionUserCell, ScoreCell,
 } from './InteractionTableCells';
 import {
   InteractionDetailQuestionEntry,
-  InteractionsOverviewContainer
+  InteractionsOverviewContainer,
 } from './InteractionOverviewStyles';
 
 interface TableProps {
@@ -75,7 +75,7 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
                 <UI.Div>
                   <UI.Helper>{t('delivery_recipient')}</UI.Helper>
                   <UI.Label size="sm" mt={1} variantColor="cyan">
-                    <UI.Icon mr={2} ><User width="0.8rem" /></UI.Icon>
+                    <UI.Icon mr={2}><User width="0.8rem" /></UI.Icon>
                     {data.delivery.deliveryRecipientFirstName}
                     {data.delivery.deliveryRecipientLastName}
                   </UI.Label>
@@ -85,7 +85,7 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
                 <UI.Div>
                   <UI.Helper mb={1}>{t('device')}</UI.Helper>
                   <UI.Label mt={1} size="sm" variantColor="cyan">
-                    <UI.Icon mr={2} ><Monitor width="0.8rem" /></UI.Icon>
+                    <UI.Icon mr={2}><Monitor width="0.8rem" /></UI.Icon>
                     {data.device}
                   </UI.Label>
                 </UI.Div>
@@ -94,8 +94,10 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
                 <UI.Div>
                   <UI.Helper mb={1}>{t('duration')}</UI.Helper>
                   <UI.Label mt={1} size="sm" variantColor="cyan">
-                    <UI.Icon mr={2} ><Watch width="0.8rem" /></UI.Icon>
-                    {data.totalTimeInSec} {t('seconds')}
+                    <UI.Icon mr={2}><Watch width="0.8rem" /></UI.Icon>
+                    {data.totalTimeInSec}
+                    {' '}
+                    {t('seconds')}
                   </UI.Label>
                 </UI.Div>
               )}
@@ -103,7 +105,7 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
                 <UI.Div>
                   <UI.Helper>{t('origin_url')}</UI.Helper>
                   <UI.Label size="sm" mt={1} variantColor="cyan">
-                    <UI.Icon mr={2} ><Link width="0.8rem" /></UI.Icon>
+                    <UI.Icon mr={2}><Link width="0.8rem" /></UI.Icon>
                     {data.originUrl}
                   </UI.Label>
                 </UI.Div>
@@ -169,19 +171,22 @@ const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
   if (!entry) return <Div>test</Div>;
 
   switch (entry.relatedNode?.type) {
-    case QuestionNodeTypeEnum.SLIDER:
+    case QuestionNodeTypeEnum.Slider:
       return <>{entry.value?.sliderNodeEntry}</>;
 
-    case QuestionNodeTypeEnum.CHOICE:
+    case QuestionNodeTypeEnum.Choice:
       return <>{entry.value?.choiceNodeEntry}</>;
 
-    case QuestionNodeTypeEnum.REGISTRATION:
+    case QuestionNodeTypeEnum.VideoEmbedded:
+      return <>{entry.value?.choiceNodeEntry}</>;
+
+    case QuestionNodeTypeEnum.Registration:
       return <>{entry.value?.registrationNodeEntry}</>;
 
-    case QuestionNodeTypeEnum.TEXTBOX:
+    case QuestionNodeTypeEnum.Textbox:
       return <>{entry.value?.textboxNodeEntry}</>;
 
-    case QuestionNodeTypeEnum.FORM:
+    case QuestionNodeTypeEnum.Form:
       if (!entry.value?.formNodeEntry) return <FallbackNode />;
       return (
         <FormNodeEntry nodeEntry={entry.value?.formNodeEntry} />
