@@ -26,7 +26,13 @@ const routerNavigationAnimation: Variants = {
   },
 };
 
-const DialogueTreeLayout = ({ children, node, isAtLeaf }: { children: ReactNode, node: TreeNodeProps, isAtLeaf: boolean }) => {
+interface DialogueTreeLayoutProps {
+  children: ReactNode;
+  node: TreeNodeProps;
+  isAtLeaf: boolean;
+}
+
+const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProps) => {
   const history = useHistory();
   const { store } = useDialogueTree();
 
@@ -57,7 +63,12 @@ const DialogueTreeLayout = ({ children, node, isAtLeaf }: { children: ReactNode,
         </Helmet>
       )}
 
-      {!!store.customer && <WatermarkLogo logoUrl={store.customer?.settings?.logoUrl} opacity={store.customer?.settings?.logoOpacity} />}
+      {!!store.customer && (
+        <WatermarkLogo
+          logoUrl={store.customer?.settings?.logoUrl}
+          opacity={store.customer?.settings?.logoOpacity ?? undefined}
+        />
+      )}
     </DialogueTreeContainer>
   );
 };

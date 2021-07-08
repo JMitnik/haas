@@ -4,10 +4,10 @@ import React, { ReactNode } from 'react';
 
 import client from 'config/apollo';
 
+import { CampaignProvider } from './CampaignProvider';
 import { DialogueTreeProvider } from './DialogueTreeProvider';
 import { UploadQueueProvider } from './UploadQueueProvider';
 import ThemeProviders from './ThemeProviders';
-import { CampaignProvider } from './CampaignProvider';
 
 const AppProviders = ({ children }: { children: ReactNode }) => (
   <ApolloProvider client={client}>
