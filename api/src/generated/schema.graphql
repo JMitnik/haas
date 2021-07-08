@@ -772,12 +772,8 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
-<<<<<<< HEAD
   editCampaign(input: EditCampaignInputType): EditCampaignOutputType!
-  editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
-=======
   editDialogue(customerSlug: String, description: String, dialogueFinisherHeading: String, dialogueFinisherSubheading: String, dialogueSlug: String, isWithoutGenData: Boolean, language: LanguageEnumType, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
->>>>>>> dev
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!

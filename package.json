@@ -32,6 +32,8 @@
         "build:client": "yarn workspace @haas/client build",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
         "clean:npm": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+        "eslint":"yarn eslint:api && yarn eslint:client && yarn eslint:dashboard",
+        "eslint:api": "yarn workspace @haas/api eslint",
         "eslint:client": "yarn workspace @haas/client eslint",
         "eslint:dashboard": "yarn workspace @haas/dashboard eslint",
         "gen": "bash scripts/generate.sh",
