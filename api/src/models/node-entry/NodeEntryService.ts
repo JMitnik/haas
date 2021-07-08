@@ -190,6 +190,14 @@ class NodeEntryService {
           }
         },
         {
+          videoNodeEntry: {
+            value: {
+              contains: text,
+              mode: 'insensitive',
+            },
+          }
+        },
+        {
           choiceNodeEntry: {
             value: {
               contains: text,
