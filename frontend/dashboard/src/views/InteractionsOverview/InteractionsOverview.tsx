@@ -178,7 +178,7 @@ const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
       return <>{entry.value?.choiceNodeEntry}</>;
 
     case QuestionNodeTypeEnum.VideoEmbedded:
-      return <>{entry.value?.choiceNodeEntry}</>;
+      return <>{entry.value?.videoNodeEntry}</>;
 
     case QuestionNodeTypeEnum.Registration:
       return <>{entry.value?.registrationNodeEntry}</>;

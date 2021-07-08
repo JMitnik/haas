@@ -190,6 +190,7 @@ export const AppendToInteractionMutation = mutationField('appendToInteraction', 
   resolve(parent, args, ctx) {
     if (!args?.input) throw new UserInputError('No valid new interaction data provided');
     if (!args?.input.sessionId) throw new UserInputError('No valid existing interaction found');
+    console.log('Appendings: ', args.input.data);
 
     const updatedInteraction = ctx.prisma.nodeEntry.create({
       data: {

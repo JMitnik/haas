@@ -1066,6 +1066,7 @@ export type NodeEntryDataInput = {
   textbox?: Maybe<TextboxNodeEntryInput>;
   form?: Maybe<FormNodeEntryInput>;
   choice?: Maybe<ChoiceNodeEntryInput>;
+  video?: Maybe<VideoNodeEntryInput>;
   register?: Maybe<RegisterNodeEntryInput>;
 };
 
@@ -1084,6 +1085,7 @@ export type NodeEntryValue = {
   registrationNodeEntry?: Maybe<Scalars['String']>;
   choiceNodeEntry?: Maybe<Scalars['String']>;
   linkNodeEntry?: Maybe<Scalars['String']>;
+  videoNodeEntry?: Maybe<Scalars['String']>;
   formNodeEntry?: Maybe<FormNodeEntryType>;
 };
 
@@ -1767,6 +1769,11 @@ export type VerifyUserTokenOutput = {
   accessToken: Scalars['String'];
   accessTokenExpiry: Scalars['Int'];
   userData: UserType;
+};
+
+/** Input type for a video node */
+export type VideoNodeEntryInput = {
+  value?: Maybe<Scalars['String']>;
 };
 
 export type GetWorkspaceAdminsQueryVariables = Exact<{

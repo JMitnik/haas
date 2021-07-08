@@ -16,8 +16,6 @@ import { InteractionFeedEntryContainer, InteractionFeedEntryValueContainer } fro
 export const NodeTypeIcon = ({ node }: { node: QuestionNode | null }) => {
   if (!node?.type) return <Div />;
 
-  console.log('node type: ', node.type);
-
   switch (node.type) {
     case 'SLIDER':
       return <Logo />;

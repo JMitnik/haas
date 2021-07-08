@@ -9,7 +9,7 @@ const parseNodeEntryValue = (nodeEntry: NodeEntry, t: TFunction) => {
     case QuestionNodeTypeEnum.Choice:
       return nodeEntry.value?.choiceNodeEntry;
     case QuestionNodeTypeEnum.VideoEmbedded:
-      return nodeEntry.value?.choiceNodeEntry;
+      return nodeEntry.value?.videoNodeEntry;
     case QuestionNodeTypeEnum.Registration:
       return nodeEntry.value?.registrationNodeEntry;
     case QuestionNodeTypeEnum.Textbox:
