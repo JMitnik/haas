@@ -42,8 +42,8 @@ const RolesTableRow = ({ headers, data, index, permissions }: TableRowProps) => 
               </Div>
               {/* Grid with 4 columns */}
               <Grid gridTemplateColumns="22.5% 22.5% 22.5% 22.5%">
-                {permissions && permissions.map((permission, index) => (
-                  <Div useFlex flexDirection="row" key={index} alignItems="center" justifyContent="center">
+                {permissions && permissions.map((permission, permissionIndex) => (
+                  <Div useFlex flexDirection="row" key={permissionIndex} alignItems="center" justifyContent="center">
                     <input
                       type="checkbox"
                       disabled
