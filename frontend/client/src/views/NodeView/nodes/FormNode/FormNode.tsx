@@ -5,11 +5,11 @@ import { Div } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import { GenericNodeProps } from '../types';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled from 'styled-components';
 
-import { GenericNodeProps } from '../types';
 
 type FormNodeProps = GenericNodeProps;
 
