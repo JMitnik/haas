@@ -50,8 +50,7 @@ const NodeView = ({ node }: NodeViewProps) => {
   const { store } = useDialogueTree();
   const { uploadInteraction, queueEntry, reset } = useUploadQueue();
   const { routes, goToActiveLeaf, goToNodeByEdge, goToPostLeafByEdge, checkIfReset } = useNavigator();
-  console.log('hehe');
-  const kaas = '';
+
   /**
    * Stores entry and proceeds to next node
    * @param entry
