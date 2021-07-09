@@ -3,6 +3,7 @@ import { Container } from '@haas/ui';
 import { Helmet } from 'react-helmet';
 import { Variants } from 'framer-motion';
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import React, { ReactNode } from 'react';
 
 import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
@@ -35,6 +36,7 @@ interface DialogueTreeLayoutProps {
 const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProps) => {
   const history = useHistory();
   const { store } = useDialogueTree();
+  const { t } = useTranslation();
 
   return (
     <DialogueTreeContainer>
@@ -44,7 +46,7 @@ const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProp
           <GoBackButton onClick={() => history.goBack()}>
             <ChevronLeft />
           </GoBackButton>
-          <GoBackText>Go back</GoBackText>
+          <GoBackText>{t('go_back') || 'Go back'}</GoBackText>
         </GoBackContainer>
       )}
 
