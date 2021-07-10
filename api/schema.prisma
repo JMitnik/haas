@@ -413,6 +413,10 @@ model SliderNodeEntry {
 model ChoiceNodeEntry {
   id          Int       @id @default(autoincrement())
   value       String?
+
+//   TODO: Add a connection to Topic
+//   TODO: Add a connection to TopicValue
+//   TODO: Add a connection to ChoiceNode
   nodeEntryId String
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
