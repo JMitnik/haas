@@ -157,6 +157,7 @@ const CTAForm = ({
       share: { id: share?.id, title: share?.title, tooltip: share?.tooltip, url: share?.url },
       formNode: {
         id: formNode?.id,
+        helperText: formNode?.helperText || '',
         fields: formNode?.fields?.map((field: any) => ({
           id: field.id,
           label: field.label,

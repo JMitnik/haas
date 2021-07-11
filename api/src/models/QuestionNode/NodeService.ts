@@ -95,10 +95,11 @@ class NodeService {
    * Save FormNodeInput when `creating`
    */
   static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeCreateInput => ({
+    helperText: input.helperText,
     fields: {
       create: input.fields?.map((field) => ({
         type: field.type || 'shortText',
-        label: field.label || 'Generic',
+        label: field.label || '',
         position: field.position || -1,
         isRequired: field.isRequired || false,
       })),
@@ -237,6 +238,7 @@ class NodeService {
           } : undefined,
           form: {
             create: form?.fields ? {
+              helperText: '',
               fields: {
                 create: form?.fields?.length > 0 ? form.fields.map((field) => ({
                   label: field.label || '',

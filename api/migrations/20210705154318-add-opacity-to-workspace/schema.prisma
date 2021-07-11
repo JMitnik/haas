@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -157,7 +157,6 @@ model FormNodeField {
 
 model FormNode {
   id           String          @id @default(cuid())
-  helperText   String?
   createdAt    DateTime        @default(now())
   fields       FormNodeField[]
   QuestionNode QuestionNode[]

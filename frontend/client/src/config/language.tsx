@@ -11,6 +11,11 @@ const language = {
       de: 'Unzufrieden',
       nl: 'Ontevreden',
     },
+    go_back: {
+      en: 'Go back',
+      de: 'Geh zurück',
+      nl: 'Ga terug',
+    },
     leave_your_details: {
       en: 'Let us know',
       de: 'Lass uns wissen',

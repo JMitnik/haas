@@ -67,6 +67,7 @@ class CustomerService {
       },
       data: {
         logoUrl: input.logo,
+        logoOpacity: input.logoOpacity ?? 30,
       },
     });
 
@@ -102,6 +103,7 @@ class CustomerService {
           settings: {
             create: {
               logoUrl: input.logo,
+              logoOpacity: input.logoOpacity ?? 30,
               colourSettings: {
                 create: {
                   primary: input.primaryColour || defaultWorkspaceTemplate.primaryColor,

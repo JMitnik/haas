@@ -5,6 +5,7 @@ fragment CustomerFragment on Customer {
   settings {
     id
     logoUrl
+    logoOpacity
     colourSettings {
       id
       primary
