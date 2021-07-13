@@ -18,7 +18,29 @@ class UserOfCustomerPrismaAdapter implements UserOfCustomerPrismaAdapterType {
     });
   }
 
-  updateWorkspaceUserRole(userId: string, customerId: string, roleId: string | null | undefined): Promise<UserOfCustomer> {
+  createUserForInvitingWorkspace = (workspaceId: string, roleId: string, userId: string) => {
+    return this.prisma.userOfCustomer.create({
+      data: {
+        customer: { connect: { id: workspaceId } },
+        role: { connect: { id: roleId } },
+        user: { connect: { id: userId } },
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+          }
+        },
+        customer: {
+          include: {
+            settings: { include: { colourSettings: true } }
+          }
+        }
+      }
+    });
+  };
+
+  updateWorkspaceUserRole(userId: string, customerId: string, roleId: string | null | undefined) {
     return this.prisma.userOfCustomer.update({
       where: {
         userId_customerId: {
@@ -33,6 +55,23 @@ class UserOfCustomerPrismaAdapter implements UserOfCustomerPrismaAdapterType {
           },
         },
       },
+      include: {
+        role: {
+          select: {
+            name: true,
+          }
+        },
+        user: {
+          select: {
+            email: true,
+          }
+        },
+        customer: {
+          select: {
+            name: true
+          }
+        }
+      }
     })
   }
 

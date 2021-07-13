@@ -1097,7 +1097,6 @@ export interface NexusGenFieldTypes {
     createSession: NexusGenRootTypes['Session']; // Session!
     createTag: NexusGenRootTypes['Tag']; // Tag!
     createTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
-    createUser: NexusGenRootTypes['UserType']; // UserType!
     createWorkspace: NexusGenRootTypes['Customer']; // Customer!
     deleteCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     deleteCustomer: NexusGenRootTypes['Customer'] | null; // Customer
@@ -1447,10 +1446,6 @@ export interface NexusGenArgTypes {
     }
     createTrigger: { // args
       input?: NexusGenInputs['CreateTriggerInputType'] | null; // CreateTriggerInputType
-    }
-    createUser: { // args
-      customerSlug?: string | null; // String
-      input?: NexusGenInputs['UserInput'] | null; // UserInput
     }
     createWorkspace: { // args
       input?: NexusGenInputs['CreateWorkspaceInput'] | null; // CreateWorkspaceInput

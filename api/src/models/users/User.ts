@@ -95,7 +95,7 @@ export const UserType = objectType({
       type: UserCustomerType,
 
       async resolve(parent, args, ctx) {
-        return ctx.services.userService.getUserCustomers(parent.id); 
+        return ctx.services.userService.getUserCustomers(parent.id);
       },
     });
 
@@ -223,20 +223,20 @@ export const RootUserQueries = extendType({
 export const UserMutations = extendType({
   type: 'Mutation',
   definition(t) {
-    t.field('createUser', {
-      type: UserType,
-      args: { customerSlug: 'String', input: UserInput },
+    // t.field('createUser', {
+    //   type: UserType,
+    //   args: { customerSlug: 'String', input: UserInput },
 
-      resolve(parent, args, ctx) {
-        if (!args.customerSlug) throw new UserInputError('No customer scope provided');
-        if (!args.input) throw new UserInputError('No input provided');
+    //   resolve(parent, args, ctx) {
+    //     if (!args.customerSlug) throw new UserInputError('No customer scope provided');
+    //     if (!args.input) throw new UserInputError('No input provided');
 
-        const { email } = args.input;
+    //     const { email } = args.input;
 
-        if (!email) throw new UserInputError('No valid email provided');
-        return ctx.services.userService.createUser(args.input);
-      },
-    });
+    //     if (!email) throw new UserInputError('No valid email provided');
+    //     return ctx.services.userService.createUser(args.input);
+    //   },
+    // });
 
     t.field('editUser', {
       type: UserType,

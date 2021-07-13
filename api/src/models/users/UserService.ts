@@ -145,25 +145,6 @@ class UserService {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   }
 
-  // TODO: Remove as this function is not used anymore (apparently haha XD)
-  async createUser(userInput: NexusGenInputs['UserInput']) {
-    return this.prisma.user.create({
-      data: {
-        email: userInput.email,
-        firstName: userInput.firstName,
-        password: (userInput.password || ''),
-        lastName: userInput.lastName,
-        phone: userInput.phone,
-        customers: {
-          create: {
-            customer: { connect: { id: userInput.customerId || undefined } },
-            role: { connect: { id: userInput.roleId || undefined } },
-          },
-        },
-      },
-    });
-  }
-
   /**
    * Invites a new user to a current customer, and mails them with a login-token.
    */
@@ -197,14 +178,7 @@ class UserService {
 
     const inviteLoginToken = AuthService.createUserToken(createdUser.id);
 
-    await prisma.user.update({
-      where: {
-        id: createdUser.id,
-      },
-      data: {
-        loginToken: inviteLoginToken,
-      },
-    });
+    await this.userPrismaAdapter.setLoginToken(createdUser.id, inviteLoginToken);
 
     const emailBody = makeInviteTemplate({
       customerName: createdUser.customers[0].customer.name,
@@ -220,35 +194,8 @@ class UserService {
     });
   }
 
-  static async updateUserRole(userId: string, newRoleId: string, workspaceId: string) {
-    const updatedUser = await prisma.userOfCustomer.update({
-      where: {
-        userId_customerId: {
-          customerId: workspaceId,
-          userId: userId,
-        },
-      },
-      data: {
-        role: { connect: { id: newRoleId } },
-      },
-      include: {
-        role: {
-          select: {
-            name: true,
-          }
-        },
-        user: {
-          select: {
-            email: true,
-          }
-        },
-        customer: {
-          select: {
-            name: true
-          }
-        }
-      }
-    });
+  async updateUserRole(userId: string, newRoleId: string, workspaceId: string) {
+    const updatedUser = await this.userOfCustomerPrismaAdapter.updateWorkspaceUserRole(userId, workspaceId, newRoleId);
 
     const emailBody = makeRoleUpdateTemplate({
       customerName: updatedUser.customer.name,
@@ -263,37 +210,11 @@ class UserService {
     });
   }
 
-  static async inviteExistingUserToCustomer(userId: string, newRoleId: string, workspaceId: string) {
-    const invitedUser = await prisma.userOfCustomer.create({
-      data: {
-        customer: { connect: { id: workspaceId } },
-        role: { connect: { id: newRoleId } },
-        user: { connect: { id: userId } },
-      },
-      include: {
-        user: {
-          select: {
-            email: true,
-          }
-        },
-        customer: {
-          include: {
-            settings: { include: { colourSettings: true } }
-          }
-        }
-      }
-    });
+  async inviteExistingUserToCustomer(userId: string, newRoleId: string, workspaceId: string) {
+    const invitedUser = await this.userOfCustomerPrismaAdapter.createUserForInvitingWorkspace(workspaceId, newRoleId, userId);
 
     const inviteLoginToken = AuthService.createUserToken(userId);
-
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        loginToken: inviteLoginToken,
-      },
-    });
+    await this.userPrismaAdapter.setLoginToken(userId, inviteLoginToken);
 
     const emailBody = makeInviteTemplate({
       customerName: invitedUser.customer.name,
