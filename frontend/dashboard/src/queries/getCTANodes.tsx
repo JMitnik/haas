@@ -33,6 +33,7 @@ const getCTANodesOfDialogue = gql`
               id
               label
               type
+              placeholder
               isRequired
               position
             }

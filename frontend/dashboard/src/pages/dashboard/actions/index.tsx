@@ -51,7 +51,6 @@ const ActionsPage = () => {
     if (leaf.type === 'SHARE') {
       return { ...leaf, type: 'SHARE', icon: ShareIcon };
     }
-
     return { ...leaf, icon: RegisterIcon };
   });
 

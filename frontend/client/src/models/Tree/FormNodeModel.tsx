@@ -6,6 +6,7 @@ const FormNodeFieldModel = types.model({
   isRequired: types.boolean,
   type: types.string,
   position: types.number,
+  placeholder: types.maybeNull(types.string),
 });
 
 const FormNodeModel = types
@@ -15,6 +16,6 @@ const FormNodeModel = types
     fields: types.array(FormNodeFieldModel),
   });
 
-export interface FormNodeModelProps extends Instance<typeof FormNodeModel>{}
+export interface FormNodeModelProps extends Instance<typeof FormNodeModel> { }
 
 export default FormNodeModel;

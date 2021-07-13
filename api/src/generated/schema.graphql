@@ -464,6 +464,7 @@ type FormNodeField {
   id: ID!
   isRequired: Boolean!
   label: String!
+  placeholder: String
   position: Int!
   type: FormNodeFieldTypeEnum!
 }
@@ -472,6 +473,7 @@ input FormNodeFieldInput {
   id: ID
   isRequired: Boolean = false
   label: String
+  placeholder: String
   position: Int
   type: FormNodeFieldTypeEnum
 }
