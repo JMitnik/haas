@@ -200,6 +200,7 @@ export interface NexusGenInputs {
     id?: string | null; // ID
     isRequired?: boolean | null; // Boolean
     label?: string | null; // String
+    placeholder?: string | null; // String
     position?: number | null; // Int
     type?: NexusGenEnums['FormNodeFieldTypeEnum'] | null; // FormNodeFieldTypeEnum
   }
@@ -1058,6 +1059,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     isRequired: boolean; // Boolean!
     label: string; // String!
+    placeholder: string | null; // String
     position: number; // Int!
     type: NexusGenEnums['FormNodeFieldTypeEnum']; // FormNodeFieldTypeEnum!
   }

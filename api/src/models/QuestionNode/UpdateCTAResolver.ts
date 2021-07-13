@@ -31,12 +31,14 @@ const saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Form
       type: field.type || 'shortText',
       label: field.label || '',
       position: field.position || -1,
+      placeholder: field.placeholder || '',
       isRequired: field.isRequired || false,
     },
     update: {
       type: field.type || 'shortText',
       label: field.label || '',
       position: field.position || -1,
+      placeholder: field.placeholder || '',
       isRequired: field.isRequired || false,
     },
     where: {

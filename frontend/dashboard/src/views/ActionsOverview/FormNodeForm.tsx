@@ -246,6 +246,10 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                     <UI.Input ref={subform.register()} name="label" key={field.fieldIndex} />
                   </UI.FormControl>
                   <UI.FormControl>
+                    <UI.FormLabel htmlFor="placeholder">{t('placeholder')}</UI.FormLabel>
+                    <UI.Input ref={subform.register()} name="placeholder" key={field.fieldIndex} />
+                  </UI.FormControl>
+                  <UI.FormControl>
                     <UI.FormLabel htmlFor="isRequired">{t('is_required')}</UI.FormLabel>
                     <Controller
                       control={subform.control}

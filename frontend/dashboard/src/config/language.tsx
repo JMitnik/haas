@@ -241,6 +241,10 @@ const language = {
       en: 'Campaigns',
       de: 'Kampagnen',
     },
+    placeholder: {
+      en: 'Field placeholder',
+      de: 'Feldplatzhalter',
+    },
     is_required: {
       en: 'Is the field required?',
       de: 'Ist das Feld erforderlich?',

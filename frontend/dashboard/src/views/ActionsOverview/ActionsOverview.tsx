@@ -1,22 +1,21 @@
+import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
+import { Button, Icon } from '@chakra-ui/core';
+import { Div, Flex, PageTitle } from '@haas/ui';
 import { Mail, Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/client';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-import { Div, Flex, PageTitle } from '@haas/ui';
 import LinkIcon from 'components/Icons/LinkIcon';
-
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 import SearchBar from 'components/SearchBar/SearchBar';
+import ShareIcon from 'components/Icons/ShareIcon';
 import getCTANodesQuery from 'queries/getCTANodes';
 
-import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
-import { Button, Icon } from '@chakra-ui/core';
-import { useTranslation } from 'react-i18next';
-import ShareIcon from 'components/Icons/ShareIcon';
 import CTACard from './CTACard';
 
 interface ActionOverviewProps {
@@ -122,7 +121,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
         customerSlug,
         dialogueSlug,
         searchTerm: activeSearchTerm,
-      }
+      },
     });
   }, [activeSearchTerm, fetchActions, customerSlug, dialogueSlug]);
 
@@ -142,7 +141,13 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
         {t('views:cta_view')}
       </PageTitle>
       <Flex flexDirection="row" justifyContent="space-between" alignItems="center" mb={4}>
-        <Button size="sm" variant="outline" leftIcon={Plus} isDisabled={!!activeCTA || false} onClick={() => handleAddCTA()}>
+        <Button
+          size="sm"
+          variant="outline"
+          leftIcon={Plus}
+          isDisabled={!!activeCTA || false}
+          onClick={() => handleAddCTA()}
+        >
           {t('add_call_to_action')}
         </Button>
         <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />

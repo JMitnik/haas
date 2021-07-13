@@ -101,6 +101,7 @@ class NodeService {
         type: field.type || 'shortText',
         label: field.label || '',
         position: field.position || -1,
+        placeholder: field.placeholder || '',
         isRequired: field.isRequired || false,
       })),
     },
@@ -199,21 +200,21 @@ class NodeService {
         ] : [],
       },
     } : {
-        title,
-        questionDialogue: {
-          connect: {
-            id: questionnaireId,
-          },
+      title,
+      questionDialogue: {
+        connect: {
+          id: questionnaireId,
         },
-        type,
-        isRoot,
-        isLeaf,
-        options: {
-          create: options.length > 0 ? [
-            ...options,
-          ] : [],
-        },
-      };
+      },
+      type,
+      isRoot,
+      isLeaf,
+      options: {
+        create: options.length > 0 ? [
+          ...options,
+        ] : [],
+      },
+    };
 
     return prisma.questionNode.create({
       data: params,
