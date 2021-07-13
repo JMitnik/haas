@@ -188,7 +188,6 @@ interface FormNodeFieldFragmentProps {
 }
 
 const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeFieldFragmentProps) => {
-  console.log('Field: ', field);
   const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
 

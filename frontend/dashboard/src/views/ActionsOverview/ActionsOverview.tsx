@@ -37,7 +37,6 @@ const actionsAnimation: Variants = {
 const DialogueViewContainer = styled(Div)``;
 
 const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
-  console.log('LEAF: ', leaf);
   if (leaf.type === 'LINK') {
     const mappedLinks = leaf.links?.map((link: any) => {
       const { __typename, ...linkedData } = link;

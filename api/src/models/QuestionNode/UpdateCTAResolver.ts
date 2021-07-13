@@ -54,8 +54,6 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
   async resolve(parent, args, ctx) {
     if (!args.input?.id) throw new UserInputError('No ID Found');
 
-    console.log('placeholder: ', args.input.form?.fields);
-
     const existingNode = await ctx.prisma.questionNode.findOne({
       where: { id: args?.input?.id || undefined },
       include: {

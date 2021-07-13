@@ -99,7 +99,6 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
   // When dialogue changes, set initial nodes and initial edges
   useEffect(() => {
     if (dialogueData?.customer) {
-      console.log('Dialogue:', dialogueData?.customer?.dialogue.leafs);
       treeStore.initTree(dialogueData?.customer?.dialogue);
       initLanguage(dialogueData?.customer?.dialogue.language);
     }
