@@ -1,5 +1,5 @@
 import { CustomFieldPrismaAdapterType } from "./CustomFieldPrismaAdapterType";
-import { PrismaClient, FindManyCustomFieldArgs } from "@prisma/client";
+import { PrismaClient, FindManyCustomFieldArgs, CustomField } from "@prisma/client";
 
 class CustomFieldPrismaAdapter implements CustomFieldPrismaAdapterType {
   prisma: PrismaClient;
@@ -8,7 +8,7 @@ class CustomFieldPrismaAdapter implements CustomFieldPrismaAdapterType {
     this.prisma = prismaClient;
   }
 
-  findMany(args: FindManyCustomFieldArgs): Promise<import("@prisma/client").CustomField[]> {
+  findMany(args: FindManyCustomFieldArgs): Promise<CustomField[]> {
     return this.prisma.customField.findMany(args);
   }
 

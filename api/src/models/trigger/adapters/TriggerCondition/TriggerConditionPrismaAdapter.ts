@@ -1,5 +1,5 @@
 import { TriggerConditionPrismaAdapterType } from "./TriggerConditionPrismaAdapterType";
-import { PrismaClient } from "@prisma/client";
+import { BatchPayload, PrismaClient, TriggerCondition } from "@prisma/client";
 
 class TriggerConditionPrismaAdapter implements TriggerConditionPrismaAdapterType {
   prisma: PrismaClient;
@@ -7,11 +7,11 @@ class TriggerConditionPrismaAdapter implements TriggerConditionPrismaAdapterType
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
-  deleteManyByTriggerId(triggerId: string): Promise<import("@prisma/client").BatchPayload> {
+  deleteManyByTriggerId(triggerId: string): Promise<BatchPayload> {
     return this.prisma.triggerCondition.deleteMany({ where: { triggerId: triggerId } });;
   }
 
-  findManyByTriggerId(triggerId: string): Promise<import("@prisma/client").TriggerCondition[]> {
+  findManyByTriggerId(triggerId: string): Promise<TriggerCondition[]> {
     return this.prisma.triggerCondition.findMany({ where: { triggerId: triggerId }, orderBy: { createdAt: 'asc' } });
   };
 };

@@ -1,4 +1,4 @@
-import { PrismaClient, LinkCreateInput, LinkUpdateInput } from "@prisma/client";
+import { PrismaClient, LinkCreateInput, LinkUpdateInput, Link } from "@prisma/client";
 import { LinkPrismaAdapterType } from "./LinkPrismaAdapterType";
 
 class LinkPrismaAdapter implements LinkPrismaAdapterType {
@@ -7,7 +7,7 @@ class LinkPrismaAdapter implements LinkPrismaAdapterType {
     this.prisma = prismaClient;
   }
 
-  findManyByParentId(parentId: string): Promise<import("@prisma/client").Link[]> {
+  findManyByParentId(parentId: string): Promise<Link[]> {
     return this.prisma.link.findMany({
       where: {
         questionNodeId: parentId,
@@ -21,13 +21,13 @@ class LinkPrismaAdapter implements LinkPrismaAdapterType {
       update,
     })
   };
-  
+
   deleteMany(linkIds: string[]) {
     return this.prisma.link.deleteMany({ where: { id: { in: linkIds } } });
   }
 
-  
-  
+
+
 }
 
 export default LinkPrismaAdapter;

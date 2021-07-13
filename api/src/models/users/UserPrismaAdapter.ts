@@ -1,5 +1,5 @@
 import { UserPrismaAdapterType, RegisterUserInput } from "./UserPrismaAdapterType";
-import { PrismaClient, UserUpdateInput, UserWhereUniqueInput, UserWhereInput } from "@prisma/client";
+import { PrismaClient, UserUpdateInput, UserWhereUniqueInput, UserWhereInput, User } from "@prisma/client";
 import RoleService from '../role/RoleService';
 import { RoleServiceType } from "../role/RoleServiceType";
 
@@ -28,7 +28,7 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     return otherMails ? true : false;
   }
 
-  findManyByCustomerSlug(customerSlug: string): Promise<import("@prisma/client").User[]> {
+  findManyByCustomerSlug(customerSlug: string): Promise<User[]> {
     return this.prisma.user.findMany({
       where: {
         customers: {
@@ -38,7 +38,7 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     });
   }
 
-  findManyByTriggerId(triggerId: string): Promise<import("@prisma/client").User[]> {
+  findManyByTriggerId(triggerId: string): Promise<User[]> {
     return this.prisma.user.findMany({
       where: { triggers: { some: { id: triggerId } } },
     });;
@@ -116,6 +116,43 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     });;
   }
 
+  async getUserById(userId: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      include: {
+        customers: {
+          include: {
+            customer: true,
+            role: true,
+            user: true,
+          }
+        }
+      }
+    })
+  }
+
+  async getUserByEmail(email: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        email: {
+          equals: email,
+          mode: 'insensitive',
+        }
+      },
+      include: {
+        customers: {
+          include: {
+            customer: true,
+            role: true,
+            user: true,
+          }
+        }
+      }
+    })
+  }
+
   async findFirst(where: UserWhereInput) {
     return this.prisma.user.findFirst({
       where: where,
@@ -131,7 +168,35 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     })
   }
 
-  async update(userId: string | undefined, data: UserUpdateInput): Promise<import("@prisma/client").User> {
+  async logout(userId: string | undefined): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        refreshToken: null,
+      },
+    });
+  }
+
+  async setLoginToken(userId: string | undefined, loginToken: string | null): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        loginToken,
+      },
+    });
+  }
+
+  async login(userId: string | undefined, refreshToken: string): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        refreshToken,
+        loginToken: null,
+      },
+    });
+  }
+
+  async update(userId: string | undefined, data: UserUpdateInput): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
       data,

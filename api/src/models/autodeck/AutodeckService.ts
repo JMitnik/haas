@@ -8,7 +8,7 @@ import request from 'request';
 
 import config from '../../config/config';
 import { NexusGenInputs } from '../../generated/nexus';
-import { FindManyCreateWorkspaceJobArgs, PrismaClient, PrismaClientOptions } from '@prisma/client';
+import { CustomField, FindManyCreateWorkspaceJobArgs, JobProcessLocation, PrismaClient, PrismaClientOptions } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import CustomerService from '../customer/CustomerService';
 import { CustomerServiceType } from '../customer/CustomerServiceType';
@@ -73,7 +73,7 @@ class AutodeckService implements AutodeckServiceType {
   }
 
   update(input: { id: string; resourceUrl: string | null | undefined; status: "PRE_PROCESSING" | "PRE_PROCESSING_LOGO" | "PRE_PROCESSING_WEBSITE_SCREENSHOT" | "READY_FOR_PROCESSING" | "IN_PHOTOSHOP_QUEUE" | "PHOTOSHOP_PROCESSING" | "PROCESSING" | "WRAPPING_UP" | "PENDING" | "COMPLETED" | "FAILED" | "TRANSFORMING_PSDS_TO_PNGS" | "STITCHING_SLIDES" | "COMPRESSING_SALES_MATERIAL"; errorMessage: string | undefined; }) {
-    return  this.createWorkspaceJobPrismaAdapter.update(input.id, {
+    return this.createWorkspaceJobPrismaAdapter.update(input.id, {
       resourcesUrl: input.resourceUrl,
       status: input.status,
       errorMessage: input.errorMessage
@@ -88,7 +88,7 @@ class AutodeckService implements AutodeckServiceType {
     });
   }
 
-  getJobProcessLocationOfJob(createWorkspaceJobId: string): Promise<import("@prisma/client").JobProcessLocation> {
+  getJobProcessLocationOfJob(createWorkspaceJobId: string): Promise<JobProcessLocation> {
     return this.jobProcessLocationPrismaAdapter.findFirst({
       where: {
         job: {
@@ -100,7 +100,7 @@ class AutodeckService implements AutodeckServiceType {
     });
   }
 
-  getCustomFieldsOfJobProcessLocation(jobProcessLocationId: string): Promise<import("@prisma/client").CustomField[]> {
+  getCustomFieldsOfJobProcessLocation(jobProcessLocationId: string): Promise<CustomField[]> {
     return this.customFieldPrismaAdapter.findMany({
       where: {
         jobProcessLocationId: jobProcessLocationId,

@@ -97,7 +97,7 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
     const accessTokenExpiry = AuthService.getExpiryTimeFromToken(accessToken);
 
     // It seems all is good now. We can remove the token from the database, and set a refresh token on the user
-    await ctx.services.userService.setRefreshToken(validUser.id, refreshToken);
+    await ctx.services.userService.login(validUser.id, refreshToken);
 
     ctx.res.cookie('refresh_token', refreshToken, {
       httpOnly: true,

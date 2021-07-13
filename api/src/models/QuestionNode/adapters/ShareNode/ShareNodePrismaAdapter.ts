@@ -1,5 +1,5 @@
 import { ShareNodePrismaAdapterType } from "./ShareNodePrismaAdapterType";
-import { PrismaClient, ShareCreateInput, ShareUpdateInput } from "@prisma/client";
+import { BatchPayload, PrismaClient, Share, ShareCreateInput, ShareUpdateInput } from "@prisma/client";
 
 class ShareNodePrismaAdapter implements ShareNodePrismaAdapterType {
   prisma: PrismaClient;
@@ -16,7 +16,7 @@ class ShareNodePrismaAdapter implements ShareNodePrismaAdapterType {
     });
   }
 
-  deleteManyByParentQuestionId(parentId: string): Promise<import("@prisma/client").BatchPayload> {
+  deleteManyByParentQuestionId(parentId: string): Promise<BatchPayload> {
     return this.prisma.share.deleteMany({
       where: {
         questionNodeId: parentId,
@@ -24,7 +24,7 @@ class ShareNodePrismaAdapter implements ShareNodePrismaAdapterType {
     });
   };
 
-  upsert(id: string, create: ShareCreateInput, update: ShareUpdateInput): Promise<import("@prisma/client").Share> {
+  upsert(id: string, create: ShareCreateInput, update: ShareUpdateInput): Promise<Share> {
     return this.prisma.share.upsert({
       where: {
         id,

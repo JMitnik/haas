@@ -235,7 +235,7 @@ export const QuestionNodeType = objectType({
         if (!parent.isLeaf || !parent.id) {
           return null;
         }
-        
+
         const share = await ctx.services.nodeService.getShareNode(parent.id);
 
         if (!share) return null;
@@ -290,7 +290,7 @@ export const QuestionNodeType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        if(!parent.overrideLeafId) return null
+        if (!parent.overrideLeafId) return null
         const overrideLeaf = await ctx.services.nodeService.getNodeById(parent.overrideLeafId);
 
         return overrideLeaf;
@@ -566,9 +566,9 @@ export const QuestionNodeMutations = extendType({
           url: args.input?.share?.url || '',
         } : undefined;
 
-       
-        const mappedLinks = links?.linkTypes?.map(({backgroundColor, iconUrl, id, title, type, url }) => ({
-          id: id  || undefined,
+
+        const mappedLinks = links?.linkTypes?.map(({ backgroundColor, iconUrl, id, title, type, url }) => ({
+          id: id || undefined,
           backgroundColor: backgroundColor || undefined,
           iconUrl: iconUrl || undefined,
           title: title || undefined,
@@ -585,7 +585,7 @@ export const QuestionNodeMutations = extendType({
           type: validatedType,
           links: mappedLinks,
         }
-        
+
         return ctx.services.nodeService.createCTA(createCTAInput);
       },
     });

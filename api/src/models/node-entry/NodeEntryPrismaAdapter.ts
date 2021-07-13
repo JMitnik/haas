@@ -1,4 +1,4 @@
-import { PrismaClient, NodeEntryWhereInput, NodeEntryCreateInput } from "@prisma/client";
+import { PrismaClient, NodeEntryWhereInput, NodeEntryCreateInput, BatchPayload, ChoiceNodeEntry, LinkNodeEntry, NodeEntry, RegistrationNodeEntry, SliderNodeEntry, TextboxNodeEntry } from "@prisma/client";
 
 import { NodeEntryPrismaAdapterType } from "./NodeEntryPrismaAdapterType";
 
@@ -8,35 +8,35 @@ class NodeEntryPrismaAdapter implements NodeEntryPrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
-  create(data: NodeEntryCreateInput){
+  create(data: NodeEntryCreateInput) {
     return this.prisma.nodeEntry.create({
       data,
     });
   }
 
 
-  async findManyNodeEntriesBySessionId(sessionId: string): Promise<(import("@prisma/client").NodeEntry & { choiceNodeEntry: import("@prisma/client").ChoiceNodeEntry | null; linkNodeEntry: import("@prisma/client").LinkNodeEntry | null; registrationNodeEntry: import("@prisma/client").RegistrationNodeEntry | null; sliderNodeEntry: import("@prisma/client").SliderNodeEntry | null; textboxNodeEntry: import("@prisma/client").TextboxNodeEntry | null; })[]> {
+  async findManyNodeEntriesBySessionId(sessionId: string): Promise<(NodeEntry & { choiceNodeEntry: ChoiceNodeEntry | null; linkNodeEntry: LinkNodeEntry | null; registrationNodeEntry: RegistrationNodeEntry | null; sliderNodeEntry: SliderNodeEntry | null; textboxNodeEntry: TextboxNodeEntry | null; })[]> {
     const nodeEntries = await this.prisma.nodeEntry.findMany({
-          where: { sessionId: sessionId },
-          include: {
-            // TODO: Add videoEmbeddedNodeValue here as well or is this one saved as choiceNodeEntry? Add FormNode?
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            sliderNodeEntry: true,
-            textboxNodeEntry: true,
-          },
-          orderBy: {
-            depth: 'asc',
-          },
-        });
+      where: { sessionId: sessionId },
+      include: {
+        // TODO: Add videoEmbeddedNodeValue here as well or is this one saved as choiceNodeEntry? Add FormNode?
+        choiceNodeEntry: true,
+        linkNodeEntry: true,
+        registrationNodeEntry: true,
+        sliderNodeEntry: true,
+        textboxNodeEntry: true,
+      },
+      orderBy: {
+        depth: 'asc',
+      },
+    });
 
-        return nodeEntries;
+    return nodeEntries;
   }
   count(where: NodeEntryWhereInput): Promise<number> {
     return this.prisma.nodeEntry.count({ where, });
   }
-  
+
   async getChildNodeEntriesById(nodeId: string) {
     const nodeEntry = await this.prisma.nodeEntry.findOne({
       where: { id: nodeId },
@@ -59,9 +59,9 @@ class NodeEntryPrismaAdapter implements NodeEntryPrismaAdapterType {
     });
     return nodeEntry;
   }
-  
-  async deleteManyNodeEntries(sessionIds: string[]): Promise<import("@prisma/client").BatchPayload> {
-    return  this.prisma.nodeEntry.deleteMany(
+
+  async deleteManyNodeEntries(sessionIds: string[]): Promise<BatchPayload> {
+    return this.prisma.nodeEntry.deleteMany(
       {
         where: {
           sessionId: {
@@ -72,14 +72,14 @@ class NodeEntryPrismaAdapter implements NodeEntryPrismaAdapterType {
     );
   }
 
-  async deleteManyChoiceNodeEntries(nodeEntryIds: string[]): Promise<import("@prisma/client").BatchPayload> {
+  async deleteManyChoiceNodeEntries(nodeEntryIds: string[]): Promise<BatchPayload> {
     return this.prisma.choiceNodeEntry.deleteMany(
       { where: { nodeEntryId: { in: nodeEntryIds } } },
     );
   }
 
 
-  async deleteManyLinkNodeEntries(nodeEntryIds: string[]): Promise<import("@prisma/client").BatchPayload> {
+  async deleteManyLinkNodeEntries(nodeEntryIds: string[]): Promise<BatchPayload> {
     return this.prisma.linkNodeEntry.deleteMany(
       { where: { nodeEntryId: { in: nodeEntryIds } } },
     );
@@ -112,7 +112,7 @@ class NodeEntryPrismaAdapter implements NodeEntryPrismaAdapterType {
       },
     });
   };
-  
+
 };
 
 export default NodeEntryPrismaAdapter;

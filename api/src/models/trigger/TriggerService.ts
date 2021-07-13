@@ -8,6 +8,7 @@ import {
   UserWhereUniqueInput,
   PrismaClient,
   TriggerCreateInput,
+  Dialogue,
 } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
 import { isPresent } from 'ts-is-present';
@@ -119,7 +120,7 @@ class TriggerService implements TriggerServiceType {
   getConditionsOfTrigger(triggerId: string): Promise<TriggerCondition[]> {
     return this.triggerConditionPrismaAdapter.findManyByTriggerId(triggerId);
   }
-  getDialogueOfTrigger(triggerId: string): Promise<import("@prisma/client").Dialogue | null> {
+  getDialogueOfTrigger(triggerId: string): Promise<Dialogue | null> {
     return this.questionOfTriggerPrismaAdapter.findDialogueByTriggerId(triggerId);
   }
 

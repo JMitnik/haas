@@ -1,4 +1,4 @@
-import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, PrismaClient, FormNodeFieldUpsertArgs } from '@prisma/client';
+import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, PrismaClient, FormNodeFieldUpsertArgs, Share } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
@@ -89,7 +89,7 @@ class NodeService implements NodeServiceType {
     return this.linkPrismaAdapter.findManyByParentId(parentId);
   }
 
-  async getShareNode(parentId: string): Promise<import("@prisma/client").Share> {
+  async getShareNode(parentId: string): Promise<Share> {
     return this.shareNodePrismaAdapter.getNodeByParentId(parentId);
   }
 
@@ -112,7 +112,7 @@ class NodeService implements NodeServiceType {
       url: string;
     }[],
     share: {
-      id: string;
+      id: string | undefined;
       title: string;
       tooltip: string | undefined;
       url: string;
@@ -374,19 +374,19 @@ class NodeService implements NodeServiceType {
         create: qOptions,
       },
     } : {
-        title,
-        questionDialogue: {
-          connect: {
-            id: questionnaireId,
-          },
+      title,
+      questionDialogue: {
+        connect: {
+          id: questionnaireId,
         },
-        type,
-        isRoot,
-        isLeaf,
-        options: {
-          create: qOptions,
-        },
-      };
+      },
+      type,
+      isRoot,
+      isLeaf,
+      options: {
+        create: qOptions,
+      },
+    };
 
     return this.questionNodePrismaAdapter.create(params);
   };

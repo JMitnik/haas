@@ -1,4 +1,4 @@
-import { PrismaClient, EdgeCreateInput } from "@prisma/client";
+import { PrismaClient, EdgeCreateInput, BatchPayload, Edge, QuestionCondition } from "@prisma/client";
 
 import { EdgePrismaAdapterType } from "./EdgePrismaAdapterType";
 
@@ -9,15 +9,15 @@ class EdgePrismaAdapter implements EdgePrismaAdapterType {
     this.prisma = prismaClient;
   }
 
-  findManyByParentId(parentId: string): Promise<import("@prisma/client").Edge[]> {
-   return this.prisma.edge.findMany({
+  findManyByParentId(parentId: string): Promise<Edge[]> {
+    return this.prisma.edge.findMany({
       where: {
         parentNodeId: parentId,
       },
     });
   }
 
-  create(data: EdgeCreateInput): Promise<import("@prisma/client").Edge> {
+  create(data: EdgeCreateInput): Promise<Edge> {
     return this.prisma.edge.create({
       data
     })
@@ -30,13 +30,13 @@ class EdgePrismaAdapter implements EdgePrismaAdapterType {
     });
   }
 
-  async getConditionsById(edgeId: string): Promise<import("@prisma/client").QuestionCondition[]> {
+  async getConditionsById(edgeId: string): Promise<QuestionCondition[]> {
     return this.prisma.questionCondition.findMany({
       where: { edgeId },
     });
   }
 
-  async deleteMany(edgeIds: string[]): Promise<import("@prisma/client").BatchPayload> {
+  async deleteMany(edgeIds: string[]): Promise<BatchPayload> {
     return this.prisma.edge.deleteMany(
       {
         where: {

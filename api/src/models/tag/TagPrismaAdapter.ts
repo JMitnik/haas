@@ -1,5 +1,5 @@
 import { TagPrismaAdapterType } from "./TagPrismaAdapterType";
-import { PrismaClient, TagCreateInput } from "@prisma/client";
+import { PrismaClient, Tag, TagCreateInput } from "@prisma/client";
 
 class TagPrismaAdapter implements TagPrismaAdapterType {
   prisma: PrismaClient;
@@ -7,21 +7,21 @@ class TagPrismaAdapter implements TagPrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
-  delete(tagId: string): Promise<import("@prisma/client").Tag> {
+  delete(tagId: string): Promise<Tag> {
     return this.prisma.tag.delete({
       where: {
         id: tagId,
       }
     })
   }
-  
-  create(data: TagCreateInput): Promise<import("@prisma/client").Tag> {
+
+  create(data: TagCreateInput): Promise<Tag> {
     return this.prisma.tag.create({
       data,
     });
   };
 
-  findManyByDialogueId(dialogueId: string): Promise<import("@prisma/client").Tag[]> {
+  findManyByDialogueId(dialogueId: string): Promise<Tag[]> {
     return this.prisma.tag.findMany({
       where: {
         isTagOf: { some: { id: dialogueId } },
@@ -34,7 +34,7 @@ class TagPrismaAdapter implements TagPrismaAdapterType {
     return this.prisma.tag.deleteMany({ where: { customerId } });
   }
 
-  
+
 }
 
 export default TagPrismaAdapter;

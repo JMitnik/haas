@@ -1,4 +1,4 @@
-import { EdgeCreateInput, QuestionNode, PrismaClient } from '@prisma/client';
+import { EdgeCreateInput, QuestionNode, PrismaClient, QuestionCondition } from '@prisma/client';
 import { EdgeServiceType } from './EdgeServiceType';
 import { EdgePrismaAdapterType } from './EdgePrismaAdapterType';
 import EdgePrismaAdapter from './EdgePrismaAdapter';
@@ -37,7 +37,7 @@ class EdgeService implements EdgeServiceType {
     return this.edgePrismaAdapter.getEdgeById(edgeId);
   }
 
-  async getConditionsById(edgeId: string): Promise<import("@prisma/client").QuestionCondition[]> {
+  async getConditionsById(edgeId: string): Promise<QuestionCondition[]> {
     return this.edgePrismaAdapter.getConditionsById(edgeId);
   }
 
@@ -45,7 +45,7 @@ class EdgeService implements EdgeServiceType {
     parentNodeEntry: QuestionNode,
     childNodeEntry: QuestionNode,
     conditions: any,
-  ) : EdgeCreateInput {
+  ): EdgeCreateInput {
     return {
       dialogue: {
         connect: {
@@ -70,7 +70,7 @@ class EdgeService implements EdgeServiceType {
 
   createEdge = async (parent: QuestionNode, child: QuestionNode, conditions: any) => {
     const edge = await this.edgePrismaAdapter.create(EdgeService.constructEdge(parent, child, conditions));
-    
+
     await this.questionNodePrismaAdapter.update(parent.id, {
       children: {
         connect: [{ id: edge.id }],

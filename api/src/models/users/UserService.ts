@@ -1,4 +1,4 @@
-import { FindManyUserOfCustomerArgs, UserOfCustomer, PrismaClient, PrismaClientOptions, UserUpdateInput } from '@prisma/client';
+import { FindManyUserOfCustomerArgs, UserOfCustomer, PrismaClient, PrismaClientOptions, UserUpdateInput, Customer, Role, User } from '@prisma/client';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import _ from 'lodash';
@@ -19,11 +19,11 @@ import { UserOfCustomerPrismaAdapterType } from './UserOfCustomerPrismaAdapterTy
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
 import { UserInputError } from 'apollo-server';
 
-class UserService implements UserServiceType {
+class UserService {
   prisma: PrismaClient<PrismaClientOptions, never>;
-  userPrismaAdapter: UserPrismaAdapterType;
-  customerPrismaAdapter: CustomerPrismaAdapterType;
-  userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapterType;
+  userPrismaAdapter: UserPrismaAdapter;
+  customerPrismaAdapter: CustomerPrismaAdapter;
+  userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.prisma = prismaClient;
@@ -39,7 +39,13 @@ class UserService implements UserServiceType {
     return { deletedUser: false };
   }
 
-  async editUser(userUpdateInput: UserUpdateInput, email: string, userId: string, customerId: string | null | undefined, roleId: string | null | undefined) {
+  async editUser(
+    userUpdateInput: UserUpdateInput,
+    email: string,
+    userId: string,
+    customerId: string | null | undefined,
+    roleId: string | null | undefined
+  ) {
     const emailExists = await this.userPrismaAdapter.emailExists(email, userId);
 
     if (emailExists) throw new UserInputError('Email is already taken');
@@ -47,19 +53,13 @@ class UserService implements UserServiceType {
     if (!email) throw new UserInputError('No valid email provided');
 
     if (customerId) {
-      await this.userOfCustomerPrismaAdapter.update(userId, customerId, {
-        role: {
-          connect: {
-            id: roleId || undefined,
-          },
-        },
-      });
+      await this.userOfCustomerPrismaAdapter.updateWorkspaceUserRole(userId, customerId, roleId);
     };
 
     return this.userPrismaAdapter.update(userId, userUpdateInput);
   }
 
-  getAllUsersByCustomerSlug(customerSlug: string): Promise<import("@prisma/client").User[]> {
+  getAllUsersByCustomerSlug(customerSlug: string): Promise<User[]> {
     return this.userPrismaAdapter.findManyByCustomerSlug(customerSlug);
   }
 
@@ -74,7 +74,7 @@ class UserService implements UserServiceType {
     return role;
   }
 
-  async getCustomersOfUser(userId: string): Promise<import("@prisma/client").Customer[]> {
+  async getCustomersOfUser(userId: string): Promise<Customer[]> {
     const user = await this.userPrismaAdapter.findFirst({ id: userId });
     return user?.customers.map((customerOfUser) => customerOfUser.customer) || [];
   }
@@ -109,7 +109,7 @@ class UserService implements UserServiceType {
     return userWithCustomer;
   };
 
-  getRecipientsOfTrigger(triggerId: string): Promise<import("@prisma/client").User[]> {
+  getRecipientsOfTrigger(triggerId: string): Promise<User[]> {
     return this.userPrismaAdapter.findManyByTriggerId(triggerId);
   }
 
@@ -121,34 +121,27 @@ class UserService implements UserServiceType {
     return this.userPrismaAdapter.findUserWithinWorkspace(emailAddress, workspaceId);
   }
 
-  logout(userId: string): Promise<import("@prisma/client").User> {
-    return this.userPrismaAdapter.update(userId, { refreshToken: null });
+  logout(userId: string): Promise<User> {
+    return this.userPrismaAdapter.logout(userId);
   }
 
-  setLoginToken(userId: string, loginToken: string): Promise<import("@prisma/client").User> {
-    return this.userPrismaAdapter.update(userId, { loginToken });
+  setLoginToken(userId: string, loginToken: string): Promise<User> {
+    return this.userPrismaAdapter.setLoginToken(userId, loginToken);
   }
 
   async getUserById(userId: string) {
-    return this.userPrismaAdapter.findFirst({
-      id: userId
-    });
+    return this.userPrismaAdapter.getUserById(userId);
   }
 
-  async getUserByEmail(emailAddress: string): Promise<import("@prisma/client").User | null> {
-    return this.userPrismaAdapter.findFirst({
-      email: {
-        equals: emailAddress,
-        mode: 'insensitive',
-      }
-    })
+  async getUserByEmail(emailAddress: string): Promise<User | null> {
+    return this.userPrismaAdapter.getUserByEmail(emailAddress);
   };
 
-  async setRefreshToken(userId: string, refreshToken: string): Promise<import("@prisma/client").User> {
-    return this.userPrismaAdapter.update(userId, { refreshToken, loginToken: null });
+  async login(userId: string, refreshToken: string): Promise<User> {
+    return this.userPrismaAdapter.login(userId, refreshToken);
   };
 
-  async getValidUsers(loginToken: string, userId: string | undefined): Promise<(import("@prisma/client").User & { customers: (UserOfCustomer & { customer: import("@prisma/client").Customer; role: import("@prisma/client").Role; })[]; })[]> {
+  async getValidUsers(loginToken: string, userId: string | undefined): Promise<(User & { customers: (UserOfCustomer & { customer: Customer; role: Role; })[]; })[]> {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   }
 

@@ -1,5 +1,5 @@
 import { QuestionNodePrismaAdapterType } from "./QuestionNodePrismaAdapterType";
-import { PrismaClient, QuestionNodeUpdateInput, QuestionNodeCreateInput } from "@prisma/client";
+import { PrismaClient, QuestionNodeUpdateInput, QuestionNodeCreateInput, BatchPayload, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode } from "@prisma/client";
 
 class QuestionNodePrismaAdapter implements QuestionNodePrismaAdapterType {
   prisma: PrismaClient;
@@ -8,7 +8,7 @@ class QuestionNodePrismaAdapter implements QuestionNodePrismaAdapterType {
     this.prisma = prismaClient;
   }
 
-  delete(id: string): Promise<import("@prisma/client").QuestionNode> {
+  delete(id: string): Promise<QuestionNode> {
     return this.prisma.questionNode.delete({
       where: {
         id,
@@ -26,7 +26,7 @@ class QuestionNodePrismaAdapter implements QuestionNodePrismaAdapterType {
     })
   }
 
-  getDialogueBuilderNode(nodeId: string): Promise<(import("@prisma/client").QuestionNode & { videoEmbeddedNode: import("@prisma/client").VideoEmbeddedNode | null; children: import("@prisma/client").Edge[]; options: import("@prisma/client").QuestionOption[]; questionDialogue: { id: string; } | null; overrideLeaf: { id: string; } | null; }) | null> {
+  getDialogueBuilderNode(nodeId: string): Promise<(QuestionNode & { videoEmbeddedNode: VideoEmbeddedNode | null; children: Edge[]; options: QuestionOption[]; questionDialogue: { id: string; } | null; overrideLeaf: { id: string; } | null; }) | null> {
     return this.prisma.questionNode.findOne({
       where: { id: nodeId },
       include: {
@@ -47,7 +47,7 @@ class QuestionNodePrismaAdapter implements QuestionNodePrismaAdapterType {
     });
   }
 
-  create(data: QuestionNodeCreateInput): Promise<import("@prisma/client").QuestionNode> {
+  create(data: QuestionNodeCreateInput): Promise<QuestionNode> {
     return this.prisma.questionNode.create({
       data,
     });
@@ -80,7 +80,7 @@ class QuestionNodePrismaAdapter implements QuestionNodePrismaAdapterType {
   }
 
 
-  update(nodeId: string, data: QuestionNodeUpdateInput): Promise<import("@prisma/client").QuestionNode> {
+  update(nodeId: string, data: QuestionNodeUpdateInput): Promise<QuestionNode> {
     return this.prisma.questionNode.update({
       where: {
         id: nodeId,
@@ -90,13 +90,13 @@ class QuestionNodePrismaAdapter implements QuestionNodePrismaAdapterType {
   }
 
 
-  async getNodeById(nodeId: string): Promise<import("@prisma/client").QuestionNode | null> {
+  async getNodeById(nodeId: string): Promise<QuestionNode | null> {
     return this.prisma.questionNode.findOne({
       where: { id: nodeId },
     });
   }
 
-  async deleteMany(questionIds: string[]): Promise<import("@prisma/client").BatchPayload> {
+  async deleteMany(questionIds: string[]): Promise<BatchPayload> {
     return this.prisma.questionNode.deleteMany(
       {
         where: {

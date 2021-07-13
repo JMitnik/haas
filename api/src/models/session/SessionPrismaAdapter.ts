@@ -1,5 +1,5 @@
 import { SessionPrismaAdapterType } from "./SessionPrismaAdapterType";
-import { PrismaClient, SessionCreateInput } from "@prisma/client";
+import { PrismaClient, Session, SessionCreateInput } from "@prisma/client";
 
 class SessionPrismaAdapter implements SessionPrismaAdapterType {
   prisma: PrismaClient;
@@ -7,7 +7,7 @@ class SessionPrismaAdapter implements SessionPrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
-  getSessionById(sessionId: string): Promise<import("@prisma/client").Session | null> {
+  getSessionById(sessionId: string): Promise<Session | null> {
     return this.prisma.session.findOne({
       where: {
         id: sessionId,

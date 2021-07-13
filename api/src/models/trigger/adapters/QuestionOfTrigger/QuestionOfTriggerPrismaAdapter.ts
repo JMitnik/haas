@@ -1,5 +1,5 @@
 import { QuestionOfTriggerPrismaAdapterType } from "./QuestionOfTriggerPrismaAdapterType";
-import { PrismaClient, QuestionOfTriggerCreateInput } from "@prisma/client";
+import { BatchPayload, Dialogue, PrismaClient, QuestionNode, QuestionOfTrigger, QuestionOfTriggerCreateInput } from "@prisma/client";
 
 class QuestionOfTriggerPrismaAdapter implements QuestionOfTriggerPrismaAdapterType {
   prisma: PrismaClient;
@@ -7,16 +7,16 @@ class QuestionOfTriggerPrismaAdapter implements QuestionOfTriggerPrismaAdapterTy
     this.prisma = prismaClient;
   }
 
-  create(data: QuestionOfTriggerCreateInput): Promise<import("@prisma/client").QuestionOfTrigger> {
+  create(data: QuestionOfTriggerCreateInput): Promise<QuestionOfTrigger> {
     return this.prisma.questionOfTrigger.create({
       data,
     });
   };
-  
-  deleteManyByTriggerId(triggerId: string): Promise<import("@prisma/client").BatchPayload> {
+
+  deleteManyByTriggerId(triggerId: string): Promise<BatchPayload> {
     return this.prisma.questionOfTrigger.deleteMany({ where: { triggerId: triggerId } });
   }
-  async findDialogueByTriggerId(triggerId: string): Promise<import("@prisma/client").Dialogue | null> {
+  async findDialogueByTriggerId(triggerId: string): Promise<Dialogue | null> {
     const questionsOfTrigger = await this.prisma.questionOfTrigger.findMany({
       where: {
         triggerId: triggerId,
@@ -34,7 +34,7 @@ class QuestionOfTriggerPrismaAdapter implements QuestionOfTriggerPrismaAdapterTy
 
     return questionsOfTrigger[0].question.questionDialogue;
   }
-  async findOneQuestion(triggerId: string, triggerConditionId: number): Promise<import("@prisma/client").QuestionNode | null> {
+  async findOneQuestion(triggerId: string, triggerConditionId: number): Promise<QuestionNode | null> {
     const questionOfTrigger = await this.prisma.questionOfTrigger.findMany({
       where: {
         triggerId: triggerId,

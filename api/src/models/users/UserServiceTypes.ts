@@ -29,10 +29,10 @@ export interface UserServiceType {
     role: Role;
   }) | null>
   getGlobalPermissions(userId: string): Promise<SystemPermissionEnum[]>;
-  getUserCustomers(userId: string): Promise<Array<{customer: Customer, role: Role, user: User}>>;
+  getUserCustomers(userId: string): Promise<Array<{ customer: Customer, role: Role, user: User }>>;
   getCustomersOfUser(userId: string): Promise<Array<Customer>>;
   getRoleOfUser(userId: string, customerSlug: string): Promise<Role | null>;
   getAllUsersByCustomerSlug(customerSlug: string): Promise<User[]>;
   editUser(userUpdateInput: UserUpdateInput, email: string, userId: string, customerId: string | null | undefined, roleId: string | null | undefined): Promise<User>;
-  deleteUser(userId: string, customerId: string): Promise<{deletedUser: boolean}>
+  deleteUser(userId: string, customerId: string): Promise<{ deletedUser: boolean }>
 }

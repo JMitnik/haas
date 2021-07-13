@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, PrismaClientOptions, prismaVersion, CustomerSettingsUpdateInput, CustomerUpdateInput } from '@prisma/client';
+import { Customer, PrismaClient, PrismaClientOptions, prismaVersion, CustomerSettingsUpdateInput, CustomerUpdateInput, CustomerSettings } from '@prisma/client';
 
 import { UserInputError } from 'apollo-server-express';
 // eslint-disable-next-line import/no-cycle
@@ -60,14 +60,14 @@ class CustomerService implements CustomerServiceType {
   }
 
   findWorkspaceById(id: string): Promise<Customer | null> {
-   return this.customerPrismaAdapter.findWorkspaceById(id);
+    return this.customerPrismaAdapter.findWorkspaceById(id);
   }
 
   async findAll() {
     return this.customerPrismaAdapter.findAll();
   }
 
-  getCustomerSettingsByCustomerId(customerId: string): Promise<import("@prisma/client").CustomerSettings | null> {
+  getCustomerSettingsByCustomerId(customerId: string): Promise<CustomerSettings | null> {
     return this.customerSettingsPrismaAdapter.getCustomerSettingsByCustomerId(customerId);
   }
 

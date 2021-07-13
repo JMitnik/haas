@@ -1,7 +1,7 @@
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import prisma from '../../config/prisma';
 import { RoleServiceType } from './RoleServiceType';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import { RolePrismaAdapterType } from './adapters/Role/RolePrismaAdapterType';
 import RolePrismaAdapter from './adapters/Role/RolePrismaAdapter';
 
@@ -26,7 +26,7 @@ class RoleService implements RoleServiceType {
     })
   }
 
-  createRole(customerId: string, roleName: string): Promise<import("@prisma/client").Role> {
+  createRole(customerId: string, roleName: string): Promise<Role> {
     return this.rolePrismaAdapter.create({
       name: roleName,
       permissions: {

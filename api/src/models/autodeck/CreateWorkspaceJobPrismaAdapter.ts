@@ -1,5 +1,5 @@
 import { CreateWorkspaceJobPrismaAdapterType } from "./CreateWorkspaceJobPrismaAdapterType";
-import { PrismaClient, FindManyCreateWorkspaceJobArgs, CreateWorkspaceJobUpdateInput, CreateWorkspaceJobInclude, CreateWorkspaceJob, CreateWorkspaceJobCreateInput, FindOneCreateWorkspaceJobArgs } from "@prisma/client";
+import { PrismaClient, FindManyCreateWorkspaceJobArgs, CreateWorkspaceJobUpdateInput, CreateWorkspaceJobInclude, CreateWorkspaceJob, CreateWorkspaceJobCreateInput, FindOneCreateWorkspaceJobArgs, JobProcessLocation } from "@prisma/client";
 
 class CreateWorkspaceJobPrismaAdapter implements CreateWorkspaceJobPrismaAdapterType {
   prisma: PrismaClient;
@@ -19,7 +19,11 @@ class CreateWorkspaceJobPrismaAdapter implements CreateWorkspaceJobPrismaAdapter
       }
     })
   }
-  upsert(jobId: string | undefined, create: CreateWorkspaceJobCreateInput, update: CreateWorkspaceJobUpdateInput): Promise<CreateWorkspaceJob & { processLocation: import("@prisma/client").JobProcessLocation; }> {
+  upsert(
+    jobId: string | undefined,
+    create: CreateWorkspaceJobCreateInput,
+    update: CreateWorkspaceJobUpdateInput
+  ): Promise<CreateWorkspaceJob & { processLocation: JobProcessLocation; }> {
     return this.prisma.createWorkspaceJob.upsert({
       where: {
         id: jobId || '-1',
@@ -50,7 +54,7 @@ class CreateWorkspaceJobPrismaAdapter implements CreateWorkspaceJobPrismaAdapter
     return this.prisma.createWorkspaceJob.count(args);
   }
 
-  
+
 }
 
 export default CreateWorkspaceJobPrismaAdapter;

@@ -1,5 +1,5 @@
 import { RolePrismaAdapterType } from "./RolePrismaAdapterType";
-import { PrismaClient, RoleWhereInput, RoleCreateInput, RoleUpdateInput } from "@prisma/client";
+import { PrismaClient, RoleWhereInput, RoleCreateInput, RoleUpdateInput, BatchPayload, Role } from "@prisma/client";
 
 class RolePrismaAdapter implements RolePrismaAdapterType {
   prisma: PrismaClient;
@@ -9,7 +9,7 @@ class RolePrismaAdapter implements RolePrismaAdapterType {
   }
 
 
-  getRoleById(roleId: string){
+  getRoleById(roleId: string) {
     return this.prisma.role.findOne({
       where: {
         id: roleId,
@@ -17,7 +17,7 @@ class RolePrismaAdapter implements RolePrismaAdapterType {
     })
   }
 
-  update(roleId: string, data: RoleUpdateInput): Promise<import("@prisma/client").Role> {
+  update(roleId: string, data: RoleUpdateInput): Promise<Role> {
     return this.prisma.role.update({
       where: {
         id: roleId,
@@ -26,13 +26,13 @@ class RolePrismaAdapter implements RolePrismaAdapterType {
     });
   }
 
-  create(data: RoleCreateInput): Promise<import("@prisma/client").Role> {
+  create(data: RoleCreateInput): Promise<Role> {
     return this.prisma.role.create({
       data,
     })
   }
 
-  deleteMany(roleIds: string[]): Promise<import("@prisma/client").BatchPayload> {
+  deleteMany(roleIds: string[]): Promise<BatchPayload> {
     return this.prisma.role.deleteMany({
       where: {
         id: { in: roleIds },
@@ -56,7 +56,7 @@ class RolePrismaAdapter implements RolePrismaAdapterType {
     })
   }
 
-  findManyPaginated(where: RoleWhereInput, take?: number | undefined, skip?: number | undefined): Promise<import("@prisma/client").Role[]> {
+  findManyPaginated(where: RoleWhereInput, take?: number | undefined, skip?: number | undefined): Promise<Role[]> {
     return this.prisma.role.findMany({
       where,
       take,

@@ -6,7 +6,7 @@ import { ApolloError, UserInputError } from 'apollo-server-express';
 import {
   Dialogue, DialogueCreateInput, DialogueUpdateInput,
   NodeType,
-  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, PrismaClient, SessionCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
+  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, PrismaClient, SessionCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, Edge
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import NodeService from '../QuestionNode/NodeService';
@@ -71,7 +71,7 @@ class DialogueService implements DialogueServiceType {
 
   updateTags(dialogueId: string, entries?: string[] | null | undefined): Promise<Dialogue> {
     const tags = entries?.map((entryId) => ({ id: entryId })) || [];
-    
+
     return this.dialoguePrismaAdapter.update(dialogueId, {
       tags: {
         connect: tags,
@@ -105,7 +105,7 @@ class DialogueService implements DialogueServiceType {
   getQuestionsByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getQuestionsByDialogueId(dialogueId);
   }
-  getEdgesByDialogueId(dialogueId: string): Promise<import("@prisma/client").Edge[]> {
+  getEdgesByDialogueId(dialogueId: string): Promise<Edge[]> {
     return this.dialoguePrismaAdapter.getEdgesByDialogueId(dialogueId);
   }
   getRootQuestionByDialogueId(dialogueId: string) {

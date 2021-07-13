@@ -1,5 +1,5 @@
 import { QuestionOptionPrismaAdapterType } from "./QuestionOptionPrismaAdapterType";
-import { PrismaClient, QuestionOptionCreateInput, QuestionOptionUpdateInput } from "@prisma/client";
+import { BatchPayload, PrismaClient, QuestionOption, QuestionOptionCreateInput, QuestionOptionUpdateInput } from "@prisma/client";
 
 class QuestionOptionPrismaAdapter implements QuestionOptionPrismaAdapterType {
   prisma: PrismaClient;
@@ -14,14 +14,14 @@ class QuestionOptionPrismaAdapter implements QuestionOptionPrismaAdapterType {
       include: {
         overrideLeaf: true
       }
-    }); 
+    });
   }
 
-  deleteMany(optionIds: number[]): Promise<import("@prisma/client").BatchPayload> {
+  deleteMany(optionIds: number[]): Promise<BatchPayload> {
     return this.prisma.questionOption.deleteMany({ where: { id: { in: optionIds } } });
   }
 
-  upsert(id: number, create: QuestionOptionCreateInput, update: QuestionOptionUpdateInput): Promise<import("@prisma/client").QuestionOption> {
+  upsert(id: number, create: QuestionOptionCreateInput, update: QuestionOptionUpdateInput): Promise<QuestionOption> {
     return this.prisma.questionOption.upsert({
       where: { id },
       create,
@@ -29,7 +29,7 @@ class QuestionOptionPrismaAdapter implements QuestionOptionPrismaAdapterType {
     })
   }
 
-  deleteManyByQuestionIds(questionIds: string[]): Promise<import("@prisma/client").BatchPayload> {
+  deleteManyByQuestionIds(questionIds: string[]): Promise<BatchPayload> {
     return this.prisma.questionOption.deleteMany(
       {
         where: {
