@@ -31,12 +31,14 @@ const saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Form
       type: field.type || 'shortText',
       label: field.label || '',
       position: field.position || -1,
+      placeholder: field.placeholder || '',
       isRequired: field.isRequired || false,
     },
     update: {
       type: field.type || 'shortText',
       label: field.label || '',
       position: field.position || -1,
+      placeholder: field.placeholder || '',
       isRequired: field.isRequired || false,
     },
     where: {
@@ -51,6 +53,8 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
 
   async resolve(parent, args, ctx) {
     if (!args.input?.id) throw new UserInputError('No ID Found');
+
+    console.log('placeholder: ', args.input.form?.fields);
 
     const existingNode = await ctx.prisma.questionNode.findOne({
       where: { id: args?.input?.id || undefined },

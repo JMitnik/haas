@@ -104,6 +104,7 @@ export const FormNodeFieldInput = inputObjectType({
   definition(t) {
     t.id('id', { required: false });
     t.string('label');
+    t.string('placeholder');
     t.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired', { default: false });
     t.int('position');
@@ -130,6 +131,12 @@ export const FormNodeField = objectType({
     t.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired');
     t.int('position');
+    t.string('placeholder', {
+      nullable: true,
+      resolve(root) {
+        return root.placeholder;
+      },
+    })
   },
 });
 
@@ -171,7 +178,7 @@ export const SliderNodeType = objectType({
   definition(t) {
     t.id('id', { nullable: true });
     t.string('happyText', { nullable: true });
-    t.string('unhappyText', { nullable:  true });
+    t.string('unhappyText', { nullable: true });
 
     t.list.field('markers', {
       type: SliderNodeMarkerType,
@@ -198,13 +205,13 @@ export const QuestionNodeType = objectType({
           where: {
             id: parent.videoEmbeddedNodeId,
           },
-           select: {
-             videoUrl: true
-           }
+          select: {
+            videoUrl: true
+          }
         }) : null;
-        return videoEmbeddedNode?.videoUrl ||  null;
+        return videoEmbeddedNode?.videoUrl || null;
       },
-     });
+    });
     t.string('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
     t.string('overrideLeafId', { nullable: true });
@@ -216,7 +223,8 @@ export const QuestionNodeType = objectType({
 
     // Node-types
     // TODO: Remove `any` once we figure out how to not make prisma the backing-type
-    t.field('sliderNode', { description: 'Slidernode resolver',
+    t.field('sliderNode', {
+      description: 'Slidernode resolver',
       type: SliderNodeType,
       nullable: true,
       resolve: (parent: any) => {
@@ -225,11 +233,13 @@ export const QuestionNodeType = objectType({
         }
 
         return null;
-      } });
+      }
+    });
 
     // Node-types
     // TODO: Remove `any` once we figure out how to not make prisma the backing-type
-    t.field('form', { description: 'FormNode resolver',
+    t.field('form', {
+      description: 'FormNode resolver',
       type: FormNodeType,
       nullable: true,
       resolve: (parent: any) => {
@@ -238,7 +248,8 @@ export const QuestionNodeType = objectType({
         }
 
         return null;
-      } });
+      }
+    });
 
     t.field('share', {
       type: ShareNodeType,
@@ -576,9 +587,11 @@ export const QuestionNodeMutations = extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
-        await prisma.share.deleteMany({ where: {
-          questionNodeId: args?.input?.id,
-        } });
+        await prisma.share.deleteMany({
+          where: {
+            questionNodeId: args?.input?.id,
+          }
+        });
 
         return prisma.questionNode.delete({
           where: {

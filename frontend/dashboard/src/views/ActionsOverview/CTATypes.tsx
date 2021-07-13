@@ -7,19 +7,22 @@ export interface CTANodeFormProps {
 export interface FormDataProps {
   title: string;
   ctaType: { label: string, value: string };
-  links: Array<{id?: string | null;
+  links: Array<{
+    id?: string | null;
     title: string;
     type?: string;
     url: string;
     tooltip?: string;
     iconUrl?: string;
-    backgroundColor?: string;}>;
+    backgroundColor?: string;
+  }>;
   share: { id?: string, tooltip: string, url: string, title: string };
   formNode?: {
     id?: string;
     helperText?: string;
     fields: {
       id?: string;
+      placeholder: string;
       label: string;
       type: string;
       isRequired: boolean;
