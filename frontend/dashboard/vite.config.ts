@@ -7,6 +7,9 @@ export default defineConfig({
   server: {
     port: 3002
   },
+  build: {
+    outDir: 'build',
+  },
   logLevel: 'info',
   plugins: [tsconfigPaths(), reactRefresh(), svgr()],
 })
