@@ -11,13 +11,8 @@ import { NexusGenInputs } from '../../generated/nexus';
 import { CustomField, FindManyCreateWorkspaceJobArgs, JobProcessLocation, PrismaClient, PrismaClientOptions } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import CustomerService from '../customer/CustomerService';
-import { CustomerServiceType } from '../customer/CustomerServiceType';
-import { AutodeckServiceType } from './AutodeckServiceType';
-import { JobProcessLocationPrismaAdapterType } from './JobProcessLocationPrismaAdapterType';
 import JobProcessLocationPrismaAdapter from './JobProcessLocationPrismaAdapter';
-import { CreateWorkspaceJobPrismaAdapterType } from './CreateWorkspaceJobPrismaAdapterType';
 import CreateWorkspaceJobPrismaAdapter from './CreateWorkspaceJobPrismaAdapter';
-import { CustomFieldPrismaAdapterType } from './CustomFieldPrismaAdapterType';
 import CustomFieldPrismaAdapter from './CustomFieldPrismaAdapter';
 
 
@@ -59,11 +54,11 @@ export interface CreateWorkspaceJobProps {
   jobLocationId?: string | null;
 }
 
-class AutodeckService implements AutodeckServiceType {
-  customFieldPrismaAdapter: CustomFieldPrismaAdapterType;
-  customerService: CustomerServiceType;
-  jobProcessLocationPrismaAdapter: JobProcessLocationPrismaAdapterType;
-  createWorkspaceJobPrismaAdapter: CreateWorkspaceJobPrismaAdapterType;
+class AutodeckService {
+  customFieldPrismaAdapter: CustomFieldPrismaAdapter;
+  customerService: CustomerService;
+  jobProcessLocationPrismaAdapter: JobProcessLocationPrismaAdapter;
+  createWorkspaceJobPrismaAdapter: CreateWorkspaceJobPrismaAdapter;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.customerService = new CustomerService(prismaClient);
@@ -81,31 +76,15 @@ class AutodeckService implements AutodeckServiceType {
   }
 
   getJobById(jobId: string) {
-    return this.createWorkspaceJobPrismaAdapter.findOne({
-      where: {
-        id: jobId,
-      },
-    });
+    return this.createWorkspaceJobPrismaAdapter.getJobById(jobId);
   }
 
   getJobProcessLocationOfJob(createWorkspaceJobId: string): Promise<JobProcessLocation> {
-    return this.jobProcessLocationPrismaAdapter.findFirst({
-      where: {
-        job: {
-          some: {
-            id: createWorkspaceJobId,
-          },
-        },
-      },
-    });
+    return this.jobProcessLocationPrismaAdapter.getJobProcessLocationByJobId(createWorkspaceJobId);
   }
 
   getCustomFieldsOfJobProcessLocation(jobProcessLocationId: string): Promise<CustomField[]> {
-    return this.customFieldPrismaAdapter.findMany({
-      where: {
-        jobProcessLocationId: jobProcessLocationId,
-      }
-    })
+    return this.customFieldPrismaAdapter.getCustomFieldsByJobProcessLocationId(jobProcessLocationId);
   }
 
   getJobProcessLocations = async () => {
@@ -157,11 +136,8 @@ class AutodeckService implements AutodeckServiceType {
   };
 
   addNewCustomFieldsToTemplate = async (input: NexusGenInputs['GenerateAutodeckInput'], processLocationId: string) => {
-    return this.jobProcessLocationPrismaAdapter.update(processLocationId, {
-      fields: {
-        create: input.newCustomFields?.map(({ key, value }) => ({ key: key || '', value: value || '' })) || [],
-      }
-    });
+    const newCustomFields = input.newCustomFields?.map(({ key, value }) => ({ key: key || '', value: value || '' })) || []
+    return this.jobProcessLocationPrismaAdapter.addNewCustomFields(processLocationId, newCustomFields);
   }
 
   static generateKeyValuePair = (input: NexusGenInputs['GenerateAutodeckInput']) => {
@@ -194,9 +170,7 @@ class AutodeckService implements AutodeckServiceType {
 
 
   retryJob = async (jobId: string) => {
-    const updatedWorkspaceJob = await this.createWorkspaceJobPrismaAdapter.update(jobId, {
-      status: 'IN_PHOTOSHOP_QUEUE'
-    });
+    const updatedWorkspaceJob = await this.createWorkspaceJobPrismaAdapter.updateStatus(jobId, 'IN_PHOTOSHOP_QUEUE');
 
     const usesAdjustedLogo = await AutodeckService.usesAdjustedLogo(jobId);
     const photoshopInput = { jobId, usesAdjustedLogo, rootFolder: updatedWorkspaceJob?.processLocation?.path };
@@ -226,11 +200,7 @@ class AutodeckService implements AutodeckServiceType {
       requiresColorExtraction: false,
       requiresRembg: false,
       requiresScreenshot: false,
-      processLocation: {
-        connect: {
-          id: input.jobLocationId || '-1',
-        },
-      }
+      processLocationId: input.jobLocationId || '-1',
     }, {
       status: 'IN_PHOTOSHOP_QUEUE',
     });
@@ -369,11 +339,7 @@ class AutodeckService implements AutodeckServiceType {
       requiresRembg: input.requiresRembg || false,
       requiresScreenshot: input.requiresWebsiteScreenshot || false,
       requiresColorExtraction: input.requiresColorExtraction || false,
-      processLocation: {
-        connect: {
-          id: input.jobLocationId || '-1'
-        }
-      }
+      processLocationId: input.jobLocationId || '-1'
     });
 
     if (!input.requiresColorExtraction) {

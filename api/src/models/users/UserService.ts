@@ -1,23 +1,18 @@
 import { FindManyUserOfCustomerArgs, UserOfCustomer, PrismaClient, PrismaClientOptions, UserUpdateInput, Customer, Role, User } from '@prisma/client';
-
-import { NexusGenInputs } from '../../generated/nexus';
+import { UserInputError } from 'apollo-server';
 import _ from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
-
+import { NexusGenInputs } from '../../generated/nexus';
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import prisma from '../../config/prisma';
 import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
-import { UserServiceType } from './UserServiceTypes';
-import { UserPrismaAdapterType } from './UserPrismaAdapterType';
 import UserPrismaAdapter from './UserPrismaAdapter';
-import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
-import { UserOfCustomerPrismaAdapterType } from './UserOfCustomerPrismaAdapterType';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
-import { UserInputError } from 'apollo-server';
+
 
 class UserService {
   prisma: PrismaClient<PrismaClientOptions, never>;
@@ -60,11 +55,11 @@ class UserService {
   }
 
   getAllUsersByCustomerSlug(customerSlug: string): Promise<User[]> {
-    return this.userPrismaAdapter.findManyByCustomerSlug(customerSlug);
+    return this.userPrismaAdapter.getAllUsersByCustomerSlug(customerSlug);
   }
 
   async getRoleOfUser(userId: string, customerSlug: string) {
-    const user = await this.userPrismaAdapter.findFirst({ id: userId });
+    const user = await this.userPrismaAdapter.getUserById(userId);
 
     const userCustomer = user.customers.find((cus: any) => (
       cus.customer.slug === customerSlug

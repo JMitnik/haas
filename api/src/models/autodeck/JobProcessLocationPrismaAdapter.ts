@@ -3,11 +3,26 @@ import { PrismaClient, JobProcessLocationCreateInput, JobProcessLocationUpdateIn
 import { JobProcessLocationPrismaAdapterType } from "./JobProcessLocationPrismaAdapterType";
 
 
-class JobProcessLocationPrismaAdapter implements JobProcessLocationPrismaAdapterType {
+class JobProcessLocationPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
+  }
+
+  getJobProcessLocationByJobId = (jobId: string) => {
+    return this.prisma.jobProcessLocation.findFirst({
+      where: {
+        job: {
+          some: {
+            id: jobId,
+          },
+        },
+      },
+      include: {
+        fields: true,
+      }
+    })
   }
 
   findFirst(args: FindFirstJobProcessLocationArgs): Promise<JobProcessLocation & { fields: CustomField[]; }> {
@@ -17,6 +32,25 @@ class JobProcessLocationPrismaAdapter implements JobProcessLocationPrismaAdapter
       }
     });
   }
+
+  addNewCustomFields = (
+    jobProcessLocationId: string,
+    newCustomFields: {
+      key: string;
+      value: string;
+    }[]) => {
+    return this.prisma.jobProcessLocation.update({
+      where: {
+        id: jobProcessLocationId,
+      },
+      data: {
+        fields: {
+          create: newCustomFields,
+        }
+      }
+    })
+  }
+
   update(jobProcessLocationId: string, data: JobProcessLocationUpdateInput) {
     return this.prisma.jobProcessLocation.update({
       where: {

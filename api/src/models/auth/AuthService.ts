@@ -7,23 +7,19 @@ import { PrismaClientOptions } from '@prisma/client/runtime';
 import { NexusGenInputs } from '../../generated/nexus';
 import RoleService from '../role/RoleService';
 import config from '../../config/config';
-import prisma from '../../config/prisma';
-
-import { UserPrismaAdapterType, RegisterUserInput } from '../users/UserPrismaAdapterType';
+import { RegisterUserInput } from '../users/UserPrismaAdapterType';
 import UserPrismaAdapter from '../users/UserPrismaAdapter';
-import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import { AuthServiceType } from './AuthServiceType';
 import UserService from '../users/UserService';
-import { UserServiceType } from '../users/UserServiceTypes';
-import { RoleServiceType } from '../role/RoleServiceType';
+
 
 class AuthService implements AuthServiceType {
   prisma: PrismaClient<PrismaClientOptions, never>;
-  customerPrismaAdapter: CustomerPrismaAdapterType;
-  userPrismaAdapter: UserPrismaAdapterType;
+  customerPrismaAdapter: CustomerPrismaAdapter;
+  userPrismaAdapter: UserPrismaAdapter;
   userService: UserService;
-  roleService: RoleServiceType;
+  roleService: RoleService;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.prisma = prismaClient;

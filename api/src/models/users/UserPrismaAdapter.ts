@@ -11,6 +11,9 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
   }
+  findManyByCustomerSlug(customerSlug: string): Promise<User[]> {
+    throw new Error("Method not implemented.");
+  }
   /**
    *  Checks if email address already exists (not belonging to userId)
    * @email the email to look for
@@ -28,7 +31,7 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     return otherMails ? true : false;
   }
 
-  findManyByCustomerSlug(customerSlug: string): Promise<User[]> {
+  getAllUsersByCustomerSlug(customerSlug: string): Promise<User[]> {
     return this.prisma.user.findMany({
       where: {
         customers: {
