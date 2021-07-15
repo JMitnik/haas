@@ -1,51 +1,51 @@
-import * as UI from "@haas/ui";
+import * as UI from '@haas/ui';
 import {
   ArrowLeft,
-  Plus,
+  ChevronDown,
   ChevronUp,
-  ChevronDown
-} from "react-feather";
-import Select, { components } from "react-select";
+  Plus,
+} from 'react-feather';
+import Select, { components } from 'react-select';
 
-import { Div, Flex, Grid, PageTitle } from "@haas/ui";
-import Dropdown from "components/Dropdown";
-import { debounce } from "lodash";
-import styled, { css } from "styled-components";
+import { Div, Flex, Grid, PageTitle } from '@haas/ui';
+import { debounce } from 'lodash';
+import Dropdown from 'components/Dropdown';
+import styled, { css } from 'styled-components';
 
-import { useHistory } from "react-router";
-import { useTranslation } from "react-i18next";
-import React, { useState, useEffect } from "react";
 import {
   PaginationSortByEnum,
   PaginationWhereInput,
   SystemPermission,
   useGetWorkspaceAdminsQuery,
   useGetWorkspaceUsersConnectsQuery,
-} from "types/generated-types";
+} from 'types/generated-types';
+import { useHistory } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import React, { useEffect, useState } from 'react';
 
-import SearchBar from "components/SearchBar/SearchBar";
 import {
-  Stack,
-  Skeleton,
-  Tag,
   Avatar,
-  TagLabel,
+  Badge,
+  Button,
+  Input,
   InputGroup,
   InputLeftElement,
-  Input,
-  Tooltip,
-  Badge,
-  theme,
   InputRightElement,
-  Spinner,
-   Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
-  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Button, Text
-} from "@chakra-ui/core";
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverFooter,
+  PopoverHeader, PopoverTrigger, Skeleton, Spinner,
+  Stack, Tag, TagLabel, Text, Tooltip, theme,
+} from '@chakra-ui/core';
 import { GlobalPermissionList } from "./GlobalPermissionList";
-import { OptionsOfPermissions } from "./OptionsOfPermissions";
 import { NodePicker } from "components/NodePicker";
 import { NodePickerAdmin } from "./NodePickerAdmin";
+import { OptionsOfPermissions } from "./OptionsOfPermissions";
 import { useNavigator } from "hooks/useNavigator";
+import SearchBar from "components/SearchBar/SearchBar";
 import ShowMoreButton from "components/ShowMoreButton";
 
 const TableHeaderContainer = styled(UI.TableHeading)`
@@ -120,17 +120,17 @@ interface IconContainerProps {
   iconColor?: string;
 }
 
-  interface TableProps{
-    startDate: Date | null,
-    endDate: Date | null,
-    searchTerm: string,
-    offset: number,
-    limit: number,
-    pageIndex: number,
-    orderBy: { by: string ; desc: boolean },
-  }
+interface TableProps{
+  startDate: Date | null,
+  endDate: Date | null,
+  searchTerm: string,
+  offset: number,
+  limit: number,
+  pageIndex: number,
+  orderBy: { by: string ; desc: boolean },
+}
 
-  const paginationFilter: PaginationWhereInput = {
+const paginationFilter: PaginationWhereInput = {
   startDate: null,
   endDate: null,
   searchTerm: '',
@@ -138,15 +138,14 @@ interface IconContainerProps {
   limit: 8,
   pageIndex: 0,
   orderBy: [{ by: PaginationSortByEnum.Email, desc: true }],
- };
+};
 
 interface DialogueCardOptionsOverlayProps {
   onDelete: (e: React.MouseEvent<HTMLElement>) => void;
   onEdit: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
-
- const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => {
+const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => {
   const { t } = useTranslation();
 
   return (
@@ -186,23 +185,22 @@ interface DialogueCardOptionsOverlayProps {
   );
 };
 
-
 const AdminOverview = () => {
   const { t } = useTranslation();
   const history = useHistory();
 
   const [paginationState, setPaginationState] = useState(paginationFilter);
-  const [activeSearchTerm, setActiveSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState('');
   const [cellClicked, setCellClicked] = useState(false);
   const [coordinate, setCoordinate] = useState({ row: -1, col: -1 });
-  const [cellValue, setCellValue] = useState("placeholder");
-  const [fName, setFName] = useState("");
-  const [lName, setLName] = useState("");
+  const [cellValue, setCellValue] = useState('placeholder');
+  const [fName, setFName] = useState('');
+  const [lName, setLName] = useState('');
   const [editing, setEditing] = useState(false);
-  var temp: any;
+  let temp: any;
 
   const { data, loading } = useGetWorkspaceUsersConnectsQuery({
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: 'cache-and-network',
     variables: {
       filter: paginationState,
     },
@@ -214,17 +212,15 @@ const AdminOverview = () => {
   const { getWorkspacePath } = useNavigator();
   const workspacePath = getWorkspacePath();
 
-  let listOfPermission: any[] = new Array();
-  const mapPermissionsToIcons = (userPerm: any) => {
-    return (
-      <div>
-        {userPerm.user.globalPermissions?.map((perm: any) => {
-          const value = GlobalPermissionList(perm);
-          listOfPermission.push(value);
-        })}
-      </div>
-    );
-  };
+  let listOfPermission: any[] = [];
+  const mapPermissionsToIcons = (userPerm: any) => (
+    <div>
+      {userPerm.user.globalPermissions?.map((perm: any) => {
+        const value = GlobalPermissionList(perm);
+        listOfPermission.push(value);
+      })}
+    </div>
+  );
   const nullMaker = () => {
     listOfPermission = [];
   };
@@ -236,119 +232,125 @@ const AdminOverview = () => {
   //  `}
   // `
 
-  const IconContainer =
-    styled(UI.Div) <
-    IconContainerProps >
-    `
+  const IconContainer = styled(UI.Div) <
+  IconContainerProps >`
     
  ${({ theme, iconColor }) => css`
    ${UI.Icon} svg {
      fill: currentColor;
    }
-   ${iconColor &&
-   css`
+   ${iconColor
+   && css`
      color: iconColor;
    `}
  `}
 `;
 
   const displayPermissionsToIcons = (userPerm: any) => {
-    let copy_userPerm = userPerm;
+    const copy_userPerm = userPerm;
     mapPermissionsToIcons(copy_userPerm);
-    let copy_listOfPermission: any[] = listOfPermission.slice(0,2);
-    let moreLeftOverPermissions=listOfPermission.length
-    let maxLen= copy_listOfPermission.length-1
+    const copy_listOfPermission: any[] = listOfPermission.slice(0, 2);
+    const moreLeftOverPermissions = listOfPermission.length;
+    const maxLen = copy_listOfPermission.length - 1;
     return (
       <div>
-        <UI.Div style={{ display: "flex", flexWrap: "wrap",    border:"1px solid#BABABA",
-                boxSizing:"border-box",
-                borderRadius:"10px",
-                width:"185px" }}>
-          {copy_listOfPermission?.map((item,index) => {
-            let domain = item.domain.charAt(0);
+        <UI.Div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          border: '1px solid#BABABA',
+          boxSizing: 'border-box',
+          borderRadius: '10px',
+          width: '185px',
+        }}
+        >
+          {copy_listOfPermission?.map((item, index) => {
+            const domain = item.domain.charAt(0);
             let labelBgColor;
-            if (domain === "C") labelBgColor = "green";
-            else if (domain === "D") labelBgColor = "red";
-            else if (domain === "E") labelBgColor = "purple";
-            else labelBgColor = "yellow";
+            if (domain === 'C') labelBgColor = 'green';
+            else if (domain === 'D') labelBgColor = 'red';
+            else if (domain === 'E') labelBgColor = 'purple';
+            else labelBgColor = 'yellow';
 
             return (
-              <div className="groupTrack" style={{
-             
-              }}>
-                {maxLen==index ? <IconContainer>
-                <Tag rounded="full" size="sm" mt={1}>
-                  <Tooltip
-                    aria-label="test"
-                    label={item.label}
-                    key={item.label}
-                  >
-                    <UI.Icon
+              <div
+                className="groupTrack"
+                style={{
+
+                }}
+              >
+                {maxLen == index ? (
+                  <IconContainer>
+                    <Tag rounded="full" size="sm" mt={1}>
+                      <Tooltip
+                        aria-label="test"
+                        label={item.label}
+                        key={item.label}
+                      >
+                        <UI.Icon
                       // bg={item.bg}
-                      color={item.color}
-                      height="2rem"
-                      width="2rem"
-                      stroke={item.stroke || undefined}
-                      style={{ flexShrink: 0 }}
-                      
-                    >
-                      <item.icon />
-                   
-                    </UI.Icon>
-                  </Tooltip>
-                  <Badge variantColor={labelBgColor} fontSize="0.8em">
-                    {item.domain.charAt(0).toUpperCase()}
-                  </Badge>
-                </Tag>
-                <Tag rounded="full" size="sm" mt={1}>
-                 
-                    <UI.Icon
+                          color={item.color}
+                          height="2rem"
+                          width="2rem"
+                          stroke={item.stroke || undefined}
+                          style={{ flexShrink: 0 }}
+                        >
+                          <item.icon />
+
+                        </UI.Icon>
+                      </Tooltip>
+                      <Badge variantColor={labelBgColor} fontSize="0.8em">
+                        {item.domain.charAt(0).toUpperCase()}
+                      </Badge>
+                    </Tag>
+                    <Tag rounded="full" size="sm" mt={1}>
+
+                      <UI.Icon
                       // bg={item.bg}
-                      
-                      height="2rem"
-                      width="2rem"
-                      
-                      mt={1}
-                      mr={-2}
-                    >
-                      <Plus />
-                      
-                    </UI.Icon>
-                  
-                  <Badge fontSize="0.8em">
-                    {moreLeftOverPermissions}
-                  </Badge>
-                </Tag>
-              </IconContainer>
-              :
-              <IconContainer>
-                <Tag rounded="full" size="sm" mt={1}>
-                  <Tooltip
-                    aria-label="test"
-                    label={item.label}
-                    key={item.label}
-                  >
-                    <UI.Icon
+
+                        height="2rem"
+                        width="2rem"
+
+                        mt={1}
+                        mr={-2}
+                      >
+                        <Plus />
+
+                      </UI.Icon>
+
+                      <Badge fontSize="0.8em">
+                        {moreLeftOverPermissions}
+                      </Badge>
+                    </Tag>
+                  </IconContainer>
+                )
+                  : (
+                    <IconContainer>
+                      <Tag rounded="full" size="sm" mt={1}>
+                        <Tooltip
+                          aria-label="test"
+                          label={item.label}
+                          key={item.label}
+                        >
+                          <UI.Icon
                       // bg={item.bg}
-                      color={item.color}
-                      height="2rem"
-                      width="2rem"
-                      stroke={item.stroke || undefined}
-                      style={{ flexShrink: 0 }}
-                      
-                    >
-                      <item.icon />
-                      
-                    </UI.Icon>
-                  </Tooltip>
-                  <Badge variantColor={labelBgColor} fontSize="0.8em">
-                    {item.domain.charAt(0).toUpperCase()}
-                  </Badge>
-                </Tag>
-              </IconContainer>
-              }
+                            color={item.color}
+                            height="2rem"
+                            width="2rem"
+                            stroke={item.stroke || undefined}
+                            style={{ flexShrink: 0 }}
+                          >
+                            <item.icon />
+
+                          </UI.Icon>
+                        </Tooltip>
+                        <Badge variantColor={labelBgColor} fontSize="0.8em">
+                          {item.domain.charAt(0).toUpperCase()}
+                        </Badge>
+                      </Tag>
+                    </IconContainer>
+                  )}
               </div>
-              
+
             );
           })}
         </UI.Div>
@@ -362,15 +364,13 @@ const AdminOverview = () => {
   };
 
   const SelectStyle = {
-    option: (styles: any) => {
-      return {
-        ...styles,
-        color: "teal",
-      };
-    },
+    option: (styles: any) => ({
+      ...styles,
+      color: 'teal',
+    }),
   };
 
-  var options: any[] = new Array();
+  let options: any[] = [];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const tempVal = e.target.value;
@@ -389,24 +389,24 @@ const AdminOverview = () => {
       value: temp,
       label: temp,
     });
-    var list: String;
-    var ar: String[] = new Array();
+    let list: String;
+    let ar: String[] = [];
 
     function fillArray(ar: String[]) {
       let count = 0;
       ar[0] = ar[0].substring(9);
 
-      for (var i = 0; i < ar.length - 1; i++) {
+      for (let i = 0; i < ar.length - 1; i++) {
         options[count] = {
           value: ar[i],
           label: (
             <>
               {i % 2 == 0 ? (
-                <span style={{ backgroundColor: "#E5F8FB", color: "#00B8D9" }}>
+                <span style={{ backgroundColor: '#E5F8FB', color: '#00B8D9' }}>
                   {ar[i]}
                 </span>
               ) : (
-                <span style={{ backgroundColor: "#FFF3E5", color: "#FF8D00" }}>
+                <span style={{ backgroundColor: '#FFF3E5', color: '#FF8D00' }}>
                   {ar[i]}
                 </span>
               )}
@@ -419,10 +419,10 @@ const AdminOverview = () => {
 
     return (
       <>
-        <UI.Div style={{ width: "345px" }}>
+        <UI.Div style={{ width: '345px' }}>
           {options.map((op) => {
-            list += op.label + ",";
-            ar = list.split(",");
+            list += `${op.label},`;
+            ar = list.split(',');
           })}
 
           {fillArray(ar)}
@@ -454,8 +454,8 @@ const AdminOverview = () => {
     placeholderValue,
     onClose,
   }: DropdownInputComponentProps) => {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
 
     const [innerEdit, setInnerEdit] = useState(false);
 
@@ -478,35 +478,29 @@ const AdminOverview = () => {
         <UI.Div>
           <Dropdown placement="bottom-end">
             {({ onOpen }) => (
-              <Div style={{ backgroundColor:"white"}}>
-              <InputGroup> 
-                <Input
-                size="sm"
-                  focusBorderColor="teal"
-                  style={{ backgroundColor:"#EAE7E7" , width:"230px", marginLeft:"4px", borderRadius:"10px"}}
-                  value={firstName}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    handleInnerInputChange(e);
-                    const changeval = e.target.value;
-                    console.log(changeval);
-                  }}
-                />
-              
-                <InputRightElement
-                  children={
-                    // <UI.CloseButton
-                    //   onClose={() => {
-                    //     setEditing(false);
-                    //     //console.log(editing)
-                    //   }}
-                    // />
-                    <UI.Button size="sm" style={{color:"white", backgroundColor:"teal", marginLeft:"-22px"}}>
-                      Save
-                    </UI.Button>
-                  }
-                  onClick={onClose}
-                />
-              </InputGroup>
+              <Div style={{ backgroundColor: 'white' }}>
+                <InputGroup>
+                  <Input
+                    size="sm"
+                    focusBorderColor="teal"
+                    style={{ backgroundColor: '#EAE7E7', width: '230px', marginLeft: '4px', borderRadius: '10px' }}
+                    value={firstName}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      handleInnerInputChange(e);
+                      const changeval = e.target.value;
+                      console.log(changeval);
+                    }}
+                  />
+
+                  <InputRightElement
+                    children={(
+                      <UI.Button size="sm" style={{ color: 'white', backgroundColor: 'teal', marginLeft: '-22px' }}>
+                        Save
+                      </UI.Button>
+                  )}
+                    onClick={onClose}
+                  />
+                </InputGroup>
               </Div>
             )}
           </Dropdown>
@@ -515,7 +509,7 @@ const AdminOverview = () => {
     );
   };
 
-  //** ANCHOR REACT SELECT TO THE TABLE CELL */
+  //* * ANCHOR REACT SELECT TO THE TABLE CELL */
 
   const PermissionList = () => {
     data?.usersConnection?.userCustomers?.map((item) => {
@@ -524,8 +518,6 @@ const AdminOverview = () => {
     return <></>;
   };
 
-
-  
   const handleDeleteDialogue = async (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
 
@@ -550,14 +542,14 @@ const AdminOverview = () => {
       <UI.ViewHeading>
         <UI.Stack>
           <UI.Breadcrumb to={workspacePath}>
-            {t("admin:back_to_workspace")}
+            {t('admin:back_to_workspace')}
           </UI.Breadcrumb>
           <UI.Stack isInline alignItems="center" spacing={4}>
             {/* <BackButtonContainer onClick={() => history.goBack()}>
               <ArrowLeft />
             </BackButtonContainer> */}
 
-            <PageTitle>{t("views:admin_overview")}</PageTitle>
+            <PageTitle>{t('views:admin_overview')}</PageTitle>
             <Flex
               flexDirection="row"
               justifyContent="space-between"
@@ -580,41 +572,41 @@ const AdminOverview = () => {
             <UI.Div p={2}>
               <UI.Table width="100%">
                 <TableHeaderContainer>
-                  <TableHeadingCellContainer style={{ textAlign: "center" }}>
+                  <TableHeadingCellContainer style={{ textAlign: 'center' }}>
                     <Flex justifyContent="space-between">
-                      <Div mt={1}>{t("admin:email")}</Div>
+                      <Div mt={1}>{t('admin:email')}</Div>
                       <Stack>
-                        <ChevronUp size="12" strokeWidth="5"/>
-                        <ChevronDown size="12"  strokeWidth="5"/>
+                        <ChevronUp size="12" strokeWidth="5" />
+                        <ChevronDown size="12" strokeWidth="5" />
                       </Stack>
                     </Flex>
                   </TableHeadingCellContainer>
-                  <TableHeadingCellContainer style={{ textAlign: "center" }}>
+                  <TableHeadingCellContainer style={{ textAlign: 'center' }}>
                     <Flex justifyContent="space-between">
-                      <Div mt={1}>{t("admin:userFName")}</Div>
-                       <Stack>
-                        <ChevronUp size="12" strokeWidth="5"/>
-                        <ChevronDown size="12"  strokeWidth="5"/>
+                      <Div mt={1}>{t('admin:userFName')}</Div>
+                      <Stack>
+                        <ChevronUp size="12" strokeWidth="5" />
+                        <ChevronDown size="12" strokeWidth="5" />
                       </Stack>
                     </Flex>
                   </TableHeadingCellContainer>
-                  <TableHeadingCellContainer style={{ textAlign: "center" }}>
+                  <TableHeadingCellContainer style={{ textAlign: 'center' }}>
                     <Flex justifyContent="space-between">
-                      <Div mt={1}>{t("admin:userLName")}</Div>
-                       <Stack>
-                        <ChevronUp size="12" strokeWidth="5"/>
-                        <ChevronDown size="12"  strokeWidth="5"/>
+                      <Div mt={1}>{t('admin:userLName')}</Div>
+                      <Stack>
+                        <ChevronUp size="12" strokeWidth="5" />
+                        <ChevronDown size="12" strokeWidth="5" />
                       </Stack>
                     </Flex>
                   </TableHeadingCellContainer>
-                  <TableHeadingCellContainer style={{ textAlign: "center" }}>
+                  <TableHeadingCellContainer style={{ textAlign: 'center' }}>
                     <Flex>
-                      <Div>{t("admin:userPermissions")}</Div>
+                      <Div>{t('admin:userPermissions')}</Div>
                     </Flex>
                   </TableHeadingCellContainer>
-                  <TableHeadingCellContainer style={{ textAlign: "center" }}>
+                  <TableHeadingCellContainer style={{ textAlign: 'center' }}>
                     <Flex>
-                      <Div>{t("admin:workspace")}</Div>
+                      <Div>{t('admin:workspace')}</Div>
                     </Flex>
                   </TableHeadingCellContainer>
                 </TableHeaderContainer>
@@ -675,12 +667,12 @@ const AdminOverview = () => {
                       {data?.usersConnection?.userCustomers?.map(
                         (item, index) => (
                           <UI.TableRow key={item.user.email}>
-                            <UI.TableCell  >
+                            <UI.TableCell>
                               {cellClicked === false ? (
-                                coordinate.col === index &&
-                                coordinate.row === 0 ? (
+                                coordinate.col === index
+                                && coordinate.row === 0 ? (
                                   <UI.Div
-                                   
+
                                     onClick={() => {
                                       setCellValue(item.user.email);
                                       setCellClicked(true);
@@ -692,31 +684,29 @@ const AdminOverview = () => {
                                         size="xs"
                                         name={item?.user.email}
                                         mr={4}
-                                      ></Avatar>
-                                      <TagLabel>{item?.user.email || ""}</TagLabel>
+                                      />
+                                      <TagLabel>{item?.user.email || ''}</TagLabel>
                                     </Tag>
                                   </UI.Div>
-                                ) : (
-                                  <UI.Div
-                               
-                                    onClick={() =>
-                                      setCoordinate({ row: 0, col: index })
-                                    }
-                                  >
-                                    <Tag size="sm" borderRadius="full">
-                                      <Avatar
-                                        mr={4}
-                                        src="https://www.pngkit.com/png/full/302-3022217_roger-berry-avatar-placeholder.png"
-                                        size="xs"
-                                        name={item?.user.email}
-                                      ></Avatar>
-                                      <TagLabel>{item?.user.email || ""}</TagLabel>
-                                    </Tag>
-                                  </UI.Div>
-                                )
+                                  ) : (
+                                    <UI.Div
+
+                                      onClick={() => setCoordinate({ row: 0, col: index })}
+                                    >
+                                      <Tag size="sm" borderRadius="full">
+                                        <Avatar
+                                          mr={4}
+                                          src="https://www.pngkit.com/png/full/302-3022217_roger-berry-avatar-placeholder.png"
+                                          size="xs"
+                                          name={item?.user.email}
+                                        />
+                                        <TagLabel>{item?.user.email || ''}</TagLabel>
+                                      </Tag>
+                                    </UI.Div>
+                                  )
                               ) : (
                                 <UI.Div
-                              
+
                                   onClick={() => setCellClicked(false)}
                                 >
                                   <Tag size="sm" borderRadius="full">
@@ -725,8 +715,8 @@ const AdminOverview = () => {
                                       src="https://www.pngkit.com/png/full/302-3022217_roger-berry-avatar-placeholder.png"
                                       size="xs"
                                       name={item?.user.email}
-                                    ></Avatar>
-                                    <TagLabel>{item?.user.email || ""}</TagLabel>
+                                    />
+                                    <TagLabel>{item?.user.email || ''}</TagLabel>
                                   </Tag>
                                 </UI.Div>
                               )}
@@ -734,10 +724,10 @@ const AdminOverview = () => {
 
                             <UI.TableCell>
                               {cellClicked === false ? (
-                                coordinate.col === index &&
-                                coordinate.row === 1 ? (
+                                coordinate.col === index
+                                && coordinate.row === 1 ? (
                                   <UI.Div
-                                
+
                                     onClick={() => {
                                       setCellClicked(true);
                                     }}
@@ -753,12 +743,12 @@ const AdminOverview = () => {
                                         )}
                                       >
                                         {({ onOpen, onClose }) => (
-                                          <Flex  justifyContent="space-between">
-                                          
+                                          <Flex justifyContent="space-between">
+
                                             <TableCellSelected onClick={onOpen}>
-                                              {item?.user.firstName || ""}
+                                              {item?.user.firstName || ''}
                                             </TableCellSelected>
-                                          
+
                                             {/* <UI.Button
                                               onClick={() => {
                                                 onClose();
@@ -767,48 +757,46 @@ const AdminOverview = () => {
                                             >
                                               Close
                                             </UI.Button> */}
-                                            
-                                              <Spinner
-                                                thickness="4px"
-                                                speed="0.65s"
-                                                emptyColor="gray.200"
-                                                color="blue.500"
-                                             
-                                              />
-                                           
+
+                                            <Spinner
+                                              thickness="4px"
+                                              speed="0.65s"
+                                              emptyColor="gray.200"
+                                              color="blue.500"
+                                            />
+
                                           </Flex>
                                         )}
                                       </Dropdown>
                                     </>
                                   </UI.Div>
-                                ) : (
-                                  <UI.Div
-                                    style={{
-                                      cursor: "pointer",
-                                    }}
-                                    onClick={() =>
-                                      setCoordinate({ row: 1, col: index })
-                                    }
-                                  >
-                                    {item?.user.firstName || ""}
-                                  </UI.Div>
-                                )
+                                  ) : (
+                                    <UI.Div
+                                      style={{
+                                        cursor: 'pointer',
+                                      }}
+                                      onClick={() => setCoordinate({ row: 1, col: index })}
+                                    >
+                                      {item?.user.firstName || ''}
+                                    </UI.Div>
+                                  )
                               ) : (
                                 <UI.Div
                                   style={{
-                                    cursor: "pointer",
+                                    cursor: 'pointer',
                                   }}
                                   onClick={() => setCellClicked(false)}
                                 >
-                                  {item?.user.firstName || ""}{" "}
+                                  {item?.user.firstName || ''}
+                                  {' '}
                                 </UI.Div>
                               )}
                             </UI.TableCell>
 
                             <UI.TableCell>
                               {cellClicked === false ? (
-                                coordinate.col === index &&
-                                coordinate.row === 2 ? (
+                                coordinate.col === index
+                                && coordinate.row === 2 ? (
                                   <UI.Div onClick={() => setCellClicked(true)}>
                                     <>
                                       <Dropdown
@@ -816,17 +804,17 @@ const AdminOverview = () => {
                                           <DropdownInputValue
                                             dropdownName="singleValue"
                                             placeholderValue={cellValue}
-                                             onClose={onClose}
+                                            onClose={onClose}
                                           />
                                         )}
                                       >
                                         {({ onOpen }) => (
-                                        <Flex  justifyContent="space-between">
-                                          
+                                          <Flex justifyContent="space-between">
+
                                             <TableCellSelected onClick={onOpen}>
-                                              {item?.user.lastName || ""}
+                                              {item?.user.lastName || ''}
                                             </TableCellSelected>
-                                          
+
                                             {/* <UI.Button
                                               onClick={() => {
                                                 onClose();
@@ -835,52 +823,50 @@ const AdminOverview = () => {
                                             >
                                               Close
                                             </UI.Button> */}
-                                            
-                                              <Spinner
-                                                thickness="4px"
-                                                speed="0.65s"
-                                                emptyColor="gray.200"
-                                                color="blue.500"
-                                             
-                                              />
-                                           
+
+                                            <Spinner
+                                              thickness="4px"
+                                              speed="0.65s"
+                                              emptyColor="gray.200"
+                                              color="blue.500"
+                                            />
+
                                           </Flex>
                                         )}
                                       </Dropdown>
                                     </>
                                   </UI.Div>
-                                ) : (
-                                  <UI.Div
-                                    style={{
-                                      cursor: "pointer",
-                                    }}
-                                    onClick={() =>
-                                      setCoordinate({ row: 2, col: index })
-                                    }
-                                  >
-                                    {item?.user.lastName || ""}
-                                  </UI.Div>
-                                )
+                                  ) : (
+                                    <UI.Div
+                                      style={{
+                                        cursor: 'pointer',
+                                      }}
+                                      onClick={() => setCoordinate({ row: 2, col: index })}
+                                    >
+                                      {item?.user.lastName || ''}
+                                    </UI.Div>
+                                  )
                               ) : (
                                 <UI.Div
                                   style={{
-                                    cursor: "pointer",
+                                    cursor: 'pointer',
                                   }}
                                   onClick={() => setCellClicked(false)}
                                 >
-                                  {item?.user.lastName || ""}{" "}
+                                  {item?.user.lastName || ''}
+                                  {' '}
                                 </UI.Div>
                               )}
                             </UI.TableCell>
 
                             <UI.TableCell style={{}}>
                               {cellClicked === false ? (
-                                coordinate.col === index &&
-                                coordinate.row === 3 ? (
+                                coordinate.col === index
+                                && coordinate.row === 3 ? (
                                   <CellContainer
                                     onClick={() => setCellClicked(true)}
                                   >
-                                    {" "}
+                                    {' '}
                                     <>
                                       <Dropdown
                                         renderOverlay={({ onClose }) => (
@@ -896,10 +882,10 @@ const AdminOverview = () => {
                                           <CellContainer
                                             onClick={onOpen}
                                             style={{
-                                              border: "1px solid #F1F1F1",
-                                              cursor: "pointer",
-                                              width: "168px",
-                                              marginRight: "-163px",
+                                              border: '1px solid #F1F1F1',
+                                              cursor: 'pointer',
+                                              width: '168px',
+                                              marginRight: '-163px',
                                             }}
                                           >
                                             {/* {item?.user.globalPermissions || ''} */}
@@ -911,28 +897,26 @@ const AdminOverview = () => {
                                       </Dropdown>
                                     </>
                                   </CellContainer>
-                                ) : (
-                                  <CellContainer
-                                    style={{
-                                      marginRight: "-163px",
-                                      width: "250px",
-                                    }}
-                                    onClick={() =>
-                                      setCoordinate({ row: 3, col: index })
-                                    }
-                                  >
-                                    {/* {item?.user.globalPermissions || ''} */}
-                                    {displayPermissionsToIcons(item)}
-                                    {nullMaker()}
-                                    {PermissionList()}
-                                  </CellContainer>
-                                )
+                                  ) : (
+                                    <CellContainer
+                                      style={{
+                                        marginRight: '-163px',
+                                        width: '250px',
+                                      }}
+                                      onClick={() => setCoordinate({ row: 3, col: index })}
+                                    >
+                                      {/* {item?.user.globalPermissions || ''} */}
+                                      {displayPermissionsToIcons(item)}
+                                      {nullMaker()}
+                                      {PermissionList()}
+                                    </CellContainer>
+                                  )
                               ) : (
                                 <CellContainer
                                   onClick={() => setCellClicked(false)}
                                   style={{
-                                    marginRight: "-163px",
-                                    width: "250px",
+                                    marginRight: '-163px',
+                                    width: '250px',
                                   }}
                                 >
                                   {/* {item?.user.globalPermissions || ''}  */}
@@ -944,40 +928,19 @@ const AdminOverview = () => {
                             </UI.TableCell>
                             <UI.TableCell>
                               {cellClicked === false ? (
-                                coordinate.col === index &&
-                                coordinate.row === 0 ? (
+                                coordinate.col === index
+                                && coordinate.row === 0 ? (
                                   <Flex
                                     flexDirection="row"
                                     justifyContent="space-evenly"
-                                    style={{ fontWeight: "bold" }}
+                                    style={{ fontWeight: 'bold' }}
                                     onClick={() => {
                                       setCellValue(item.user.email);
                                       setCellClicked(true);
                                     }}
                                   >
                                     <Div>TO BE CONTINUED</Div>
-                                    <Div> 
-                                      <ShowMoreButton
-                                        renderMenu={(
-                                          <DialogueCardOptionsOverlay
-                                            onDelete={handleDeleteDialogue}
-                                            onEdit={goToEditDialogue}
-                                          />
-                                        )}
-                                      /></Div>
-                                  </Flex>
-                                ) : (
-                                  <Flex
-                                    flexDirection="row"
-                                    justifyContent="space-evenly"
-                                    style={{ fontWeight: "bold" }}
-                                    onClick={() =>
-                                      setCoordinate({ row: 0, col: index })
-                                    }
-                                  >
-                                    <Div>TO BE CONTINUED</Div>
                                     <Div>
-                                      
                                       <ShowMoreButton
                                         renderMenu={(
                                           <DialogueCardOptionsOverlay
@@ -986,31 +949,54 @@ const AdminOverview = () => {
                                           />
                                         )}
                                       />
+
                                     </Div>
                                   </Flex>
-                                )
+                                  ) : (
+                                    <Flex
+                                      flexDirection="row"
+                                      justifyContent="space-evenly"
+                                      style={{ fontWeight: 'bold' }}
+                                      onClick={() => setCoordinate({ row: 0, col: index })}
+                                    >
+                                      <Div>TO BE CONTINUED</Div>
+                                      <Div>
+
+                                        <ShowMoreButton
+                                          renderMenu={(
+                                            <DialogueCardOptionsOverlay
+                                              onDelete={handleDeleteDialogue}
+                                              onEdit={goToEditDialogue}
+                                            />
+                                        )}
+                                        />
+                                      </Div>
+                                    </Flex>
+                                  )
                               ) : (
                                 <Flex
                                   flexDirection="row"
                                   justifyContent="space-evenly"
-                                  style={{ fontWeight: "bold" }}
+                                  style={{ fontWeight: 'bold' }}
                                   onClick={() => setCellClicked(false)}
                                 >
                                   <Div>TO BE CONTINUED</Div>
-                                  <Div style={{fontSize:"0.9rem"}}> 
-                                      <ShowMoreButton
-                                        renderMenu={(
-                                          <DialogueCardOptionsOverlay
-                                            onDelete={handleDeleteDialogue}
-                                            onEdit={goToEditDialogue}
-                                          />
+                                  <Div style={{ fontSize: '0.9rem' }}>
+                                    <ShowMoreButton
+                                      renderMenu={(
+                                        <DialogueCardOptionsOverlay
+                                          onDelete={handleDeleteDialogue}
+                                          onEdit={goToEditDialogue}
+                                        />
                                         )}
-                                      /></Div>
+                                    />
+
+                                  </Div>
                                 </Flex>
                               )}
                             </UI.TableCell>
                           </UI.TableRow>
-                        )
+                        ),
                       )}
                     </>
                   )}
@@ -1019,7 +1005,7 @@ const AdminOverview = () => {
             </UI.Div>
             {(data?.usersConnection?.pageInfo.nrPages || 0) > 1 && (
               <UI.PaginationFooter>
-                <UI.Div style={{ lineHeight: "normal" }}>
+                <UI.Div style={{ lineHeight: 'normal' }}>
                   Showing page
                   <UI.Span ml={1} fontWeight="bold">
                     {(paginationState.pageIndex || 0) + 1}
@@ -1034,14 +1020,12 @@ const AdminOverview = () => {
                     <UI.Button
                       size="sm"
                       variant="outline"
-                      onClick={() =>
-                        setPaginationState((state) => ({
-                          ...state,
+                      onClick={() => setPaginationState((state) => ({
+                        ...state,
 
-                          pageIndex: (state.pageIndex || 0) - 1,
-                          offset: (state.offset || 0) - (state.limit || 0),
-                        }))
-                      }
+                        pageIndex: (state.pageIndex || 0) - 1,
+                        offset: (state.offset || 0) - (state.limit || 0),
+                      }))}
                       isDisabled={paginationState.pageIndex === 0}
                     >
                       Previous
@@ -1049,17 +1033,15 @@ const AdminOverview = () => {
                     <UI.Button
                       size="sm"
                       variant="outline"
-                      onClick={() =>
-                        setPaginationState((state) => ({
-                          ...state,
+                      onClick={() => setPaginationState((state) => ({
+                        ...state,
 
-                          pageIndex: (state.pageIndex || 0) + 1,
-                          offset: (state.offset || 0) + (state.limit || 0),
-                        }))
-                      }
+                        pageIndex: (state.pageIndex || 0) + 1,
+                        offset: (state.offset || 0) + (state.limit || 0),
+                      }))}
                       isDisabled={
-                        (paginationState.pageIndex || 0) + 1 ===
-                        data?.usersConnection?.pageInfo.nrPages
+                        (paginationState.pageIndex || 0) + 1
+                        === data?.usersConnection?.pageInfo.nrPages
                       }
                     >
                       Next

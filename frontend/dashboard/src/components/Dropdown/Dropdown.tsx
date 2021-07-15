@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import React, { useRef, useState } from 'react';
 
 import { Div } from '@haas/ui';
 import { Placement } from '@popperjs/core';
@@ -67,8 +67,9 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
                     {renderOverlay?.({ onClose: handleClose })}
                   </DropdownOverlayContainer>
                 </motion.div>
-              </Div>
-              , document.getElementById('popper_root') as HTMLElement)}
+              </Div>,
+              document.getElementById('popper_root') as HTMLElement,
+            )}
           </>
         ) : null}
       </AnimatePresence>

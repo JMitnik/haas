@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 
 import { Div } from '@haas/ui';
 import { Placement } from '@popperjs/core';
-import { usePopper } from 'react-popper';
+// import { usePopper } from 'react-popper';
 
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -24,17 +24,17 @@ export const Dropdown = ({ children, renderOverlay, placement = 'right-start', o
   const [isOpen, setIsOpen] = useState(false);
 
   useOnClickOutside(ref, () => setIsOpen(false));
-  const { styles, attributes } = usePopper(toggleRef, overlay, {
-    placement,
-    strategy: 'fixed',
-    modifiers: [{
-      name: 'offset',
-      options: {
-        offset,
-      },
-    },
-    ],
-  });
+  // const { styles, attributes } = usePopper(toggleRef, overlay, {
+  //   placement,
+  //   strategy: 'fixed',
+  //   modifiers: [{
+  //     name: 'offset',
+  //     options: {
+  //       offset,
+  //     },
+  //   },
+  //   ],
+  // });
 
   const handleToggleDropdown = (event: any) => {
     event.stopPropagation();
