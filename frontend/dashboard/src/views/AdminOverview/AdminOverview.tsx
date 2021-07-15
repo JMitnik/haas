@@ -40,13 +40,14 @@ import {
   PopoverHeader, PopoverTrigger, Skeleton, Spinner,
   Stack, Tag, TagLabel, Text, Tooltip, theme,
 } from '@chakra-ui/core';
+import { DropDownSingleValue } from './DropdownSingleValue';
 import { GlobalPermissionList } from "./GlobalPermissionList";
 import { NodePicker } from "components/NodePicker";
-import { NodePickerAdmin } from "./NodePickerAdmin";
-import { OptionsOfPermissions } from "./OptionsOfPermissions";
-import { useNavigator } from "hooks/useNavigator";
-import SearchBar from "components/SearchBar/SearchBar";
-import ShowMoreButton from "components/ShowMoreButton";
+import { NodePickerAdmin } from './NodePickerAdmin';
+import { OptionsOfPermissions } from './OptionsOfPermissions';
+import { useNavigator } from 'hooks/useNavigator';
+import SearchBar from 'components/SearchBar/SearchBar';
+import ShowMoreButton from 'components/ShowMoreButton';
 
 const TableHeaderContainer = styled(UI.TableHeading)`
   background: #f1f1f1 !important;
@@ -106,13 +107,6 @@ interface TableProps {
 interface DropdownInputComponentProps {
   dropdownName: string;
   placeholderValue: string;
-  onClose?: () => void;
-}
-
-interface DropdownSingleValueProps {
-  dropdownName: string;
-  placeholderValue: string;
-  row: number;
   onClose?: () => void;
 }
 
@@ -234,7 +228,7 @@ const AdminOverview = () => {
 
   const IconContainer = styled(UI.Div) <
   IconContainerProps >`
-    
+
  ${({ theme, iconColor }) => css`
    ${UI.Icon} svg {
      fill: currentColor;
@@ -370,83 +364,12 @@ const AdminOverview = () => {
     }),
   };
 
-  let options: any[] = [];
+  const options: any[] = [];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const tempVal = e.target.value;
     setFName(tempVal);
     console.log(fName);
-  };
-
-  const DropDownSingleValue = ({
-    dropdownName,
-    placeholderValue,
-    row,
-    onClose,
-  }: DropdownSingleValueProps) => {
-    temp = data?.usersConnection?.userCustomers[row].user.globalPermissions;
-    options.push({
-      value: temp,
-      label: temp,
-    });
-    let list: String;
-    let ar: String[] = [];
-
-    function fillArray(ar: String[]) {
-      let count = 0;
-      ar[0] = ar[0].substring(9);
-
-      for (let i = 0; i < ar.length - 1; i++) {
-        options[count] = {
-          value: ar[i],
-          label: (
-            <>
-              {i % 2 == 0 ? (
-                <span style={{ backgroundColor: '#E5F8FB', color: '#00B8D9' }}>
-                  {ar[i]}
-                </span>
-              ) : (
-                <span style={{ backgroundColor: '#FFF3E5', color: '#FF8D00' }}>
-                  {ar[i]}
-                </span>
-              )}
-            </>
-          ),
-        };
-        count++;
-      }
-    }
-
-    return (
-      <>
-        <UI.Div style={{ width: '345px' }}>
-          {options.map((op) => {
-            list += `${op.label},`;
-            ar = list.split(',');
-          })}
-
-          {fillArray(ar)}
-
-          <NodePickerAdmin
-            items={OptionsOfPermissions}
-            onClose={onClose}
-            SelectOptions={options}
-          />
-
-          {/* <Select
-            defaultValue={options}
-            options={OptionsOfPermissions}
-            isMulti
-            menuIsOpen
-            closeMenuOnSelect={true}
-            styles={SelectStyle}
-          /> */}
-          {(options = [])}
-
-          {(ar = [])}
-        </UI.Div>
-      </>
-    );
   };
 
   const DropdownInputValue = ({
@@ -871,9 +794,10 @@ const AdminOverview = () => {
                                       <Dropdown
                                         renderOverlay={({ onClose }) => (
                                           <DropDownSingleValue
-                                            dropdownName="singleValue"
-                                            placeholderValue={cellValue}
-                                            row={index}
+                                            globalPermissions={
+                                              // eslint-disable-next-line max-len
+                                              data?.usersConnection?.userCustomers[coordinate.row]?.user?.globalPermissions || []
+                                            }
                                             onClose={onClose}
                                           />
                                         )}
