@@ -1,6 +1,6 @@
 export enum SystemPermissionTypeEnum {
- Create="CREATE",
- View="VIEW",
- Edit="EDIT",
- Delete="DELETE"
+  Create='CREATE',
+  View='VIEW',
+  Edit='EDIT',
+  Delete='DELETE'
 }

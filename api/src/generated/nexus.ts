@@ -1222,6 +1222,7 @@ export interface NexusGenFieldTypes {
     user: NexusGenRootTypes['UserType'] | null; // UserType
     UserOfCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
+    usersConnection: NexusGenRootTypes['UserConnection'] | null; // UserConnection
   }
   QuestionNode: { // field return type
     children: NexusGenRootTypes['Edge'][]; // [Edge!]!
@@ -1684,6 +1685,9 @@ export interface NexusGenArgTypes {
     }
     users: { // args
       customerSlug?: string | null; // String
+    }
+    usersConnection: { // args
+      filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
     }
   }
 }

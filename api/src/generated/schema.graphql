@@ -856,6 +856,7 @@ type Query {
   user(userId: String): UserType
   UserOfCustomer(input: UserOfCustomerInput): UserCustomer
   users(customerSlug: String): [UserType!]!
+  usersConnection(filter: PaginationWhereInput): UserConnection
 }
 
 type QuestionNode {
