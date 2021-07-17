@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 
 import App from './pages';
 
-if (process.env.REACT_APP_ENV && process.env.REACT_APP_ENV === 'test') {
+if (import.meta.env.VITE_API_ENV && import.meta.env.VITE_API_ENV === 'test') {
   // TODO: Figure out how to get MSW working okay
   // worker.start({
   //   waitUntilReady: true,

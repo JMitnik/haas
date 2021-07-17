@@ -3,7 +3,7 @@ import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@a
 const cache: InMemoryCache = new InMemoryCache();
 
 const link = new HttpLink({
-  uri: process.env.REACT_APP_API_ENDPOINT || 'http://localhost:4000/graphql',
+  uri: import.meta.env.VITE_API_ENDPOINT?.toString() || 'http://localhost:4000/graphql',
 });
 
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
