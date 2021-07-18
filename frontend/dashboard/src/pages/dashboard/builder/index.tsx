@@ -76,58 +76,58 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
   questions = orderBy(questions, (question) => question.creationDate, ['asc']);
 
   return (
-    questions?.map(
-      ({
-        id,
-        title,
-        isRoot,
-        isLeaf,
-        type,
-        overrideLeaf,
-        options,
-        children,
-        updatedAt,
-        sliderNode,
-        extraContent,
-      }) => ({
-        id,
-        updatedAt,
-        title,
-        isRoot,
-        isLeaf,
-        extraContent,
-        type: initializeQuestionType(type),
-        sliderNode,
-        icon: getIcon(type),
-        overrideLeaf: !overrideLeaf
-          ? undefined
-          : {
-            id: overrideLeaf?.id,
-            title: overrideLeaf?.title,
-            type: initializeCTAType(overrideLeaf?.type),
+    questions?.map(({
+      id,
+      title,
+      isRoot,
+      isLeaf,
+      type,
+      overrideLeaf,
+      options,
+      children,
+      updatedAt,
+      sliderNode,
+      extraContent,
+      nrOfEntries,
+    }) => ({
+      id,
+      updatedAt,
+      title,
+      isRoot,
+      isLeaf,
+      extraContent,
+      nrOfEntries,
+      type: initializeQuestionType(type),
+      sliderNode,
+      icon: getIcon(type),
+      overrideLeaf: !overrideLeaf
+        ? undefined
+        : {
+          id: overrideLeaf?.id,
+          title: overrideLeaf?.title,
+          type: initializeCTAType(overrideLeaf?.type),
+        },
+      options: options?.map((option) => ({
+        id: option.id,
+        value: option.value,
+        publicValue: option.publicValue,
+        overrideLeaf: option.overrideLeaf,
+      })),
+      children: children?.map((edge: EdgeChildProps) => ({
+        id: edge.id,
+        parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },
+        conditions: [
+          {
+            id: edge?.conditions?.[0]?.id,
+            conditionType: edge?.conditions?.[0]?.conditionType,
+            matchValue: edge?.conditions?.[0]?.matchValue,
+            renderMin: edge?.conditions?.[0]?.renderMin,
+            renderMax: edge?.conditions?.[0]?.renderMax,
           },
-        options: options?.map((option) => ({
-          id: option.id,
-          value: option.value,
-          publicValue: option.publicValue,
-          overrideLeaf: option.overrideLeaf,
-        })),
-        children: children?.map((edge: EdgeChildProps) => ({
-          id: edge.id,
-          parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },
-          conditions: [
-            {
-              id: edge?.conditions?.[0]?.id,
-              conditionType: edge?.conditions?.[0]?.conditionType,
-              matchValue: edge?.conditions?.[0]?.matchValue,
-              renderMin: edge?.conditions?.[0]?.renderMin,
-              renderMax: edge?.conditions?.[0]?.renderMax,
-            },
-          ],
-          childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title },
-        })),
-      }),
-    ) || []
+        ],
+        childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title },
+      })),
+    })) || []
   );
 };
 
@@ -143,6 +143,7 @@ const DialogueBuilderPage = () => {
   const selectLeafs = findLeafs(dialogueData?.leafs);
   const questionsData = mapQuestionsInputData(dialogueData?.questions);
   const rootQuestionNode = questionsData.find((question) => question.isRoot);
+  const topics = data?.customer?.dialogue?.topics || [];
 
   return (
     <DialogueBuilderView
@@ -151,6 +152,7 @@ const DialogueBuilderPage = () => {
       selectLeafs={selectLeafs}
       ctaNodes={dialogueData?.leafs}
       nodes={questionsData}
+      topics={topics}
     />
   );
 };

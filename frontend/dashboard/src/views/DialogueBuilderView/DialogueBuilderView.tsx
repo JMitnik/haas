@@ -3,8 +3,8 @@ import { Zap } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { DialogueBuilderContainer } from './DialogueBuilderStyles';
 import { CTANode, QuestionEntryProps } from './DialogueBuilderInterfaces';
+import { DialogueBuilderContainer } from './DialogueBuilderStyles';
 import QuestionSection from './components/QuestionSection';
 
 interface QuestionEntryExtendedProps extends QuestionEntryProps {
@@ -15,11 +15,12 @@ interface DialogueBuilderViewProps {
   nodes: Array<QuestionEntryExtendedProps>;
   root: QuestionEntryExtendedProps | undefined;
   ctaNodes: CTANode[];
-  selectLeafs: Array<{label: string | undefined, value: string}>;
+  selectLeafs: Array<{ label: string | undefined, value: string }>;
   dialogueId: string;
+  topics: any[];
 }
 
-const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBuilderViewProps) => {
+const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root, topics }: DialogueBuilderViewProps) => {
   const [activeQuestion, setActiveQuestion] = useState<null | string>(null);
 
   const { t } = useTranslation();
@@ -52,6 +53,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
           questionsQ={nodes}
           question={root}
           Icon={root.icon}
+          topics={topics}
           leafs={selectLeafs}
           ctaNodes={ctaNodes}
         />

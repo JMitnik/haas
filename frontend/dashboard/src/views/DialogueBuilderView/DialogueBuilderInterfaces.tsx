@@ -6,7 +6,7 @@ enum QuestionNodeTypeEnum {
   Form = 'FORM',
   Textbox = 'TEXTBOX',
   Link = 'LINK',
-  Share = 'SHARE'
+  Share = 'SHARE',
 }
 
 export interface CTANode {
@@ -34,6 +34,7 @@ export interface QuestionEntryProps {
   children?: EdgeChildProps[];
   options?: QuestionOptionProps[];
   sliderNode?: any;
+  nrOfEntries?: number;
 }
 
 export interface QuestionOptionProps {

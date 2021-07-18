@@ -21,6 +21,11 @@ export const getTopicBuilderQuery = gql`
         questions {
           ...QuestionFragment
         }
+
+        topics {
+          id
+          label
+        }
       }
     }
   }

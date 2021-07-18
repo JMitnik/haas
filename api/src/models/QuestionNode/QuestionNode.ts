@@ -41,8 +41,8 @@ export const QuestionOptionType = objectType({
 
     t.string('publicValue', { nullable: true });
 
-    t.field('overrideLeaf', { 
-      type: 'QuestionNode', 
+    t.field('overrideLeaf', {
+      type: 'QuestionNode',
       nullable: true,
 
       resolve: async (parent, ctx) => {
@@ -178,6 +178,9 @@ export const QuestionNodeType = objectType({
     t.boolean('isRoot');
     t.string('title');
     t.string('updatedAt');
+
+    // @ts-ignore
+    t.int('nrOfEntries', { resolve: (parent) => parent.nrOfEntries || 0 });
 
     t.string('extraContent', {
       nullable: true,
@@ -446,7 +449,7 @@ export const CreateQuestionNodeInputType = inputObjectType({
     t.string('dialogueSlug');
     t.string('title');
     t.string('type');
-    t.string('extraContent', { nullable: true }) 
+    t.string('extraContent', { nullable: true })
 
     t.field('optionEntries', { type: OptionsInputType });
     t.field('edgeCondition', { type: EdgeConditionInputType });

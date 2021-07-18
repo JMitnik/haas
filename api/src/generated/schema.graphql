@@ -868,6 +868,7 @@ type QuestionNode {
   isLeaf: Boolean!
   isRoot: Boolean!
   links: [LinkType!]!
+  nrOfEntries: Int!
   options: [QuestionOption!]!
   overrideLeaf: QuestionNode
   overrideLeafId: String

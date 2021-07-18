@@ -25,6 +25,7 @@ interface QuestionSectionProps {
   depth: number;
   condition: EdgeConditionProps | undefined;
   edgeId: string | undefined;
+  topics: any[];
 }
 
 const QuestionSection = ({
@@ -43,6 +44,7 @@ const QuestionSection = ({
   options,
   edgeId,
   parentQuestionType,
+  topics,
 }: QuestionSectionProps) => {
   const { t } = useTranslation();
   const [isQuestionExpanded, setQuestionExpanded] = useState(depth === 1 || false);
@@ -102,6 +104,7 @@ const QuestionSection = ({
         Icon={Icon}
         leafs={leafs}
         ctaNodes={ctaNodes}
+        topics={topics}
       />
 
       {isQuestionExpanded && children.map(
@@ -123,6 +126,7 @@ const QuestionSection = ({
             key={`section-${child.id}-${child.updatedAt}`}
             onAddQuestion={onAddQuestion}
             onDeleteQuestion={onDeleteQuestion}
+            topics={topics}
           />
         ),
       )}
@@ -163,6 +167,7 @@ const QuestionSection = ({
             Icon={Icon}
             leafs={leafs}
             ctaNodes={ctaNodes}
+            topics={topics}
           />
         </Div>
       )}

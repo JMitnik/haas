@@ -1234,6 +1234,7 @@ export interface NexusGenFieldTypes {
     isLeaf: boolean; // Boolean!
     isRoot: boolean; // Boolean!
     links: NexusGenRootTypes['LinkType'][]; // [LinkType!]!
+    nrOfEntries: number; // Int!
     options: NexusGenRootTypes['QuestionOption'][]; // [QuestionOption!]!
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     overrideLeafId: string | null; // String

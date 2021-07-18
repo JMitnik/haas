@@ -54,6 +54,7 @@ interface FormDataProps {
     id: string;
     markers: SliderNodeMarkerProps[];
   };
+  topic: any;
   options: string[];
   optionsFull: any[];
 }
@@ -116,6 +117,7 @@ interface QuestionEntryFormProps {
   parentQuestionType: string;
   onDeleteEntry: any;
   onScroll: () => void;
+  topics: any[];
 }
 
 const questionTypes = [
@@ -150,6 +152,7 @@ const DialogueBuilderQuestionForm = ({
   edgeId,
   onDeleteEntry,
   onScroll,
+  topics,
 }: QuestionEntryFormProps) => {
   const { activeCustomer } = useCustomer();
   const { customerSlug, dialogueSlug } = useNavigator();
@@ -175,6 +178,7 @@ const DialogueBuilderQuestionForm = ({
     defaultValues: {
       parentQuestionType,
       sliderNode,
+      topic: undefined,
       optionsFull: options.map((option) => ({
         value: option.value,
         publicValue: option.publicValue,
@@ -450,6 +454,13 @@ const DialogueBuilderQuestionForm = ({
     }
   };
 
+  const dropdownTopics = topics.map((topic) => ({
+    value: topic.id,
+    label: topic.label,
+  }));
+
+  const { nrOfEntries } = question;
+
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
   return (
     <FormContainer expandedForm>
@@ -463,24 +474,62 @@ const DialogueBuilderQuestionForm = ({
                 {t('dialogue:about_question_helper')}
               </UI.FormSectionHelper>
             </Div>
-            <InputGrid>
-              <FormControl isRequired isInvalid={!!form.errors.title}>
-                <FormLabel htmlFor="title">{t('title')}</FormLabel>
-                <InputHelper>{t('dialogue:title_question_helper')}</InputHelper>
-                <Controller
-                  name="title"
-                  control={form.control}
-                  defaultValue={title}
-                  render={({ value, onChange }) => (
-                    <UI.MarkdownEditor
-                      value={value}
-                      onChange={onChange}
+            <UI.Div>
+              <UI.InputGrid>
+                <UI.FormControl isRequired isInvalid={!!form.errors.title}>
+                  <UI.FormLabel htmlFor="title">{t('title')}</UI.FormLabel>
+                  <UI.InputHelper>{t('dialogue:title_question_helper')}</UI.InputHelper>
+                  <Controller
+                    name="title"
+                    control={form.control}
+                    defaultValue={title}
+                    render={({ value, onChange }) => (
+                      <UI.MarkdownEditor
+                        value={value}
+                        onChange={onChange}
+                      />
+                    )}
+                  />
+                  <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                </UI.FormControl>
+                <UI.Grid gridTemplateColumns="2fr 1fr">
+                  <UI.FormControl>
+                    <UI.FormLabel>Topic</UI.FormLabel>
+                    <UI.InputHelper>Connect a relevant Topic</UI.InputHelper>
+                    <Controller
+                      name="topic"
+                      control={form.control}
+                      render={({ value, onChange }) => (
+                        <UI.Select
+                          value={value}
+                          onChange={onChange}
+                          options={dropdownTopics}
+                        />
+                      )}
                     />
-                  )}
-                />
-                <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
-              </FormControl>
-            </InputGrid>
+                  </UI.FormControl>
+
+                  <UI.Div>
+                    {/* If nr entries > 0, then show it. */}
+                    {/* TODO: Ensure we also only show this if we changed the TOPIC. */}
+                    {!!nrOfEntries && (
+                      <UI.Div bg="yellow.200" p={2}>
+                        Note: you currently have
+                        <UI.Span fontWeight={900}>
+                          {' '}
+                          {nrOfEntries}
+                          {' '}
+                          entries.
+                        </UI.Span>
+                        <br />
+                        By setting this topic, you will move the data to another topic,
+                        potentially sacrifing data integrity.
+                      </UI.Div>
+                    )}
+                  </UI.Div>
+                </UI.Grid>
+              </UI.InputGrid>
+            </UI.Div>
           </FormSection>
 
           {parentQuestionType === 'Slider' && (
@@ -747,7 +796,6 @@ const DialogueBuilderQuestionForm = ({
         </Flex>
       </Form>
     </FormContainer>
-
   );
 };
 

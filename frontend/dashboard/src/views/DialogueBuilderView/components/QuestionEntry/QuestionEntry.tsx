@@ -39,6 +39,7 @@ interface QuestionEntryItemProps {
   depth: number;
   parentQuestionType: string;
   ctaNodes: CTANode[];
+  topics: any[];
 }
 
 const getSelectEntry = (type: string) => {
@@ -66,8 +67,8 @@ const QuestionEntryItem = ({ depth,
   edgeId,
   parentQuestionId,
   ctaNodes,
-  onAddExpandChange }
-: QuestionEntryItemProps) => {
+  onAddExpandChange,
+  topics } : QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { t } = useTranslation();
@@ -179,6 +180,7 @@ const QuestionEntryItem = ({ depth,
               type={activeType}
               onActiveQuestionChange={onActiveQuestionChange}
               onScroll={handleScroll}
+              topics={topics}
             />
           )}
 

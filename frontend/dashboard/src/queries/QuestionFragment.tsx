@@ -9,6 +9,7 @@ const QuestionFragment = gql`
     isRoot
     isLeaf
     extraContent
+    nrOfEntries
     overrideLeaf {
       id
       type

@@ -286,6 +286,7 @@ export const DialogueType = objectType({
             creationDate: 'asc',
           },
           include: {
+            isRelatedNodeOfNodeEntries: true,
             form: {
               include: {
                 fields: true,
@@ -302,7 +303,11 @@ export const DialogueType = objectType({
             },
           },
         });
-        return questions;
+
+        return questions.map(question => ({
+          nrOfEntries: question.isRelatedNodeOfNodeEntries.length || 0,
+          ...question
+        }));
       },
     });
 
