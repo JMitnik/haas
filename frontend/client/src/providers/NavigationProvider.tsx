@@ -18,23 +18,23 @@ export const useNavigator = () => {
   const goToStart = () => {
     history.push({
       pathname: `/${store.customer?.slug}/${store.tree?.slug}`,
-      search: location.search
+      search: location.search,
     });
   };
 
   const goToActiveLeaf = () => history.push({
     pathname: `/${store.customer?.slug}/${store.tree?.slug}/n/${store.tree?.activeLeaf?.id}`,
-    search: location.search
+    search: location.search,
   });
 
   const goToNodeByEdge = (edgeId: string) => history.push({
-   pathname: `/${store.customer?.slug}/${store.tree?.slug}/${edgeId}`,
-   search: location.search
+    pathname: `/${store.customer?.slug}/${store.tree?.slug}/${edgeId}`,
+    search: location.search,
   });
 
   const goToPostLeafByEdge = (edgeId: string) => history.push({
     pathname: `/${store.customer?.slug}/${store.tree?.slug}/${edgeId}`,
-    search: location.search
+    search: location.search,
   });
 
   const checkIfReset = (currentNode: TreeNodeProps) => {

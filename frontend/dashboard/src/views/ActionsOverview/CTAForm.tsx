@@ -162,6 +162,7 @@ const CTAForm = ({
           id: field.id,
           label: field.label,
           type: field.type,
+          placeholder: field.placeholder,
           isRequired: boolToInt(field.isRequired),
           position: field.position,
         })),
@@ -278,7 +279,9 @@ const CTAForm = ({
             share: formData.share,
             form: {
               ...formData.formNode,
-              fields: formData.formNode?.fields?.map((field) => ({ ...field, isRequired: intToBool(field.isRequired) })),
+              fields: formData.formNode?.fields?.map(
+                (field) => ({ ...field, isRequired: intToBool(field.isRequired) }),
+              ),
             },
           },
         },
@@ -296,7 +299,9 @@ const CTAForm = ({
             share: formData.share,
             form: {
               ...formData.formNode,
-              fields: formData.formNode?.fields?.map((field) => ({ ...field, isRequired: intToBool(field.isRequired) })),
+              fields: formData.formNode?.fields?.map(
+                (field) => ({ ...field, isRequired: intToBool(field.isRequired) }),
+              ),
             },
           },
         },

@@ -43,6 +43,7 @@ const getDialogueFromSlug = gql`
               id
               label
               type
+              placeholder
               isRequired
               position
             }
