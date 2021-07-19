@@ -1,8 +1,10 @@
-import { ChoiceNodeEntry,
+import {
+  ChoiceNodeEntry,
   FormNodeEntryGetPayload,
   LinkNodeEntry, NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
   QuestionNode, RegistrationNodeEntry,
-  SliderNodeEntry, TextboxNodeEntry, PrismaClient } from '@prisma/client';
+  SliderNodeEntry, TextboxNodeEntry, PrismaClient
+} from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
@@ -10,10 +12,7 @@ import _ from 'lodash';
 import { NexusGenInputs } from '../../generated/nexus';
 import { OrderByProps } from '../../types/generic';
 import { pickProperties } from '../../utils/pickProperties';
-import prisma from '../../config/prisma';
-import { NodeEntryPrismaAdapterType } from './NodeEntryPrismaAdapterType';
 import NodeEntryPrismaAdapter from './NodeEntryPrismaAdapter';
-import { NodeEntryServiceType } from './NodeEntryServiceType';
 
 export interface NodeEntryWithTypes extends NodeEntry {
   session?: {
@@ -29,8 +28,8 @@ export interface NodeEntryWithTypes extends NodeEntry {
   linkNodeEntry?: LinkNodeEntry | undefined | null;
 }
 
-class NodeEntryService implements NodeEntryServiceType {
-  nodeEntryPrismaAdapter: NodeEntryPrismaAdapterType;
+class NodeEntryService {
+  nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
@@ -45,8 +44,9 @@ class NodeEntryService implements NodeEntryServiceType {
   getNodeEntriesBySessionId(sessionId: string): Promise<(NodeEntry & { choiceNodeEntry: ChoiceNodeEntry | null; linkNodeEntry: LinkNodeEntry | null; registrationNodeEntry: RegistrationNodeEntry | null; sliderNodeEntry: SliderNodeEntry | null; textboxNodeEntry: TextboxNodeEntry | null; })[]> {
     return this.nodeEntryPrismaAdapter.findManyNodeEntriesBySessionId(sessionId);
   }
+
   getAmountOfPaths(sessionId: string): Promise<number> {
-    return this.nodeEntryPrismaAdapter.count({ sessionId });
+    return this.nodeEntryPrismaAdapter.getAmountOfNodeEntriesBySessionId(sessionId);
   }
 
   async getNodeEntryValues(id: string) {
@@ -98,7 +98,6 @@ class NodeEntryService implements NodeEntryServiceType {
     } : undefined,
   });
 
-  // TODO: Test
   static isNodeEntryMatchText = (nodeEntry: NodeEntryWithTypes, searchTerm: string) => {
     const processedSearch = searchTerm.toLowerCase();
 
@@ -210,18 +209,22 @@ class NodeEntryService implements NodeEntryServiceType {
   static constructFindWhereTextNodeEntryFragment(text: string): NodeEntryWhereInput {
     return {
       OR: [
-        { textboxNodeEntry: {
-          value: {
-            contains: text,
-            mode: 'insensitive',
-          },
-        } },
-        { choiceNodeEntry: {
-          value: {
-            contains: text,
-            mode: 'insensitive',
-          },
-        } },
+        {
+          textboxNodeEntry: {
+            value: {
+              contains: text,
+              mode: 'insensitive',
+            },
+          }
+        },
+        {
+          choiceNodeEntry: {
+            value: {
+              contains: text,
+              mode: 'insensitive',
+            },
+          }
+        },
         // DEPRECATED (but still included)
         {
           registrationNodeEntry: {

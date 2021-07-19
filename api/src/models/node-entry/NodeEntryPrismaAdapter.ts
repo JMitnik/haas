@@ -33,6 +33,16 @@ class NodeEntryPrismaAdapter implements NodeEntryPrismaAdapterType {
 
     return nodeEntries;
   }
+
+  getAmountOfNodeEntriesBySessionId(sessionId: string) {
+    return this.prisma.nodeEntry.count(
+      {
+        where: {
+          sessionId,
+        }
+      });
+  }
+
   count(where: NodeEntryWhereInput): Promise<number> {
     return this.prisma.nodeEntry.count({ where, });
   }
