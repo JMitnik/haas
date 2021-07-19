@@ -1,23 +1,19 @@
-import { Clipboard, Clock, Link as LinkIcon, MessageCircle, Target } from 'react-feather';
+import { Clipboard, Clock, Link as LinkIcon, MessageCircle, Target, Video } from 'react-feather';
+import { Div, Flex, Span, Text } from '@haas/ui';
 import { Icon, Tooltip } from '@chakra-ui/core';
+import { NodeEntry, QuestionNode, Session } from 'types/generated-types';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Div, Flex, Span, Text } from '@haas/ui';
-import {
-  dialogueStatistics_customer_dialogue_sessions_nodeEntries_relatedNode as Node,
-  dialogueStatistics_customer_dialogue_sessions_nodeEntries as NodeEntry,
-  dialogueStatistics_customer_dialogue_sessions as Session,
-} from 'views/DialogueView/__generated__/dialogueStatistics';
 import Logo from 'components/Logo';
 import parseNodeEntryValue from 'utils/parseNodeEntryValue';
 import scoreToColors from 'utils/scoreToColors';
 
 import { InteractionFeedEntryContainer, InteractionFeedEntryValueContainer } from './InteractionFeedEntryStyles';
 
-export const NodeTypeIcon = ({ node }: { node: Node | null }) => {
+export const NodeTypeIcon = ({ node }: { node: QuestionNode | null }) => {
   if (!node?.type) return <Div />;
 
   switch (node.type) {
@@ -25,6 +21,8 @@ export const NodeTypeIcon = ({ node }: { node: Node | null }) => {
       return <Logo />;
     case 'CHOICE':
       return <Target />;
+    case 'VIDEO_EMBEDDED':
+      return <Video />;
     case 'LINK':
       return <LinkIcon />;
     case 'REGISTRATION':
@@ -38,7 +36,7 @@ export const NodeTypeIcon = ({ node }: { node: Node | null }) => {
   }
 };
 
-export const EntryBreadCrumbContainer = styled(Div)<{ score?: number | null, isInline?: boolean | null }>`
+export const EntryBreadCrumbContainer = styled(Div) <{ score?: number | null, isInline?: boolean | null }>`
   ${({ theme, score, isInline = false }) => css`
       display: flex;
       align-items: center;
@@ -102,7 +100,7 @@ export const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }
             zIndex={10 - index}
             score={entry.relatedNode?.type === 'SLIDER' ? entry.value?.sliderNodeEntry : null}
           >
-            <NodeTypeIcon node={entry.relatedNode} />
+            <NodeTypeIcon node={entry.relatedNode || null} />
           </EntryBreadCrumbContainer>
         </Tooltip>
       ))}

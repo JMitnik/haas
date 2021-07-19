@@ -34,7 +34,7 @@ interface FormDataProps {
   seed?: number;
 }
 
-const CustomerUploadContainer = styled.div<{overrideColor?: string, logoOpacity?: number}>`
+const CustomerUploadContainer = styled.div<{ overrideColor?: string, logoOpacity?: number }>`
   ${({ theme, overrideColor, logoOpacity }) => css`
     ${UploadPreviewContainer} {
       background: ${overrideColor || theme.colors.primary};

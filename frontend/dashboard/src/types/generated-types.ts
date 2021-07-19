@@ -197,6 +197,7 @@ export type CreateWorkspaceInput = {
   slug: Scalars['String'];
   name: Scalars['String'];
   logo?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   primaryColour: Scalars['String'];
   isSeed?: Maybe<Scalars['Boolean']>;
   willGenerateFakeData?: Maybe<Scalars['Boolean']>;
@@ -285,6 +286,7 @@ export type CustomerSettings = {
   __typename?: 'CustomerSettings';
   id: Scalars['ID'];
   logoUrl?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   colourSettings?: Maybe<ColourSettings>;
   fontSettings?: Maybe<FontSettings>;
 };
@@ -504,6 +506,7 @@ export type EditWorkspaceInput = {
   slug: Scalars['String'];
   name: Scalars['String'];
   logo?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   primaryColour: Scalars['String'];
 };
 
@@ -580,12 +583,14 @@ export enum FormNodeFieldTypeEnum {
 
 export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
+  helperText?: Maybe<Scalars['String']>;
   fields?: Maybe<Array<FormNodeFieldInput>>;
 };
 
 export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
+  helperText?: Maybe<Scalars['String']>;
   fields: Array<FormNodeField>;
 };
 
@@ -1061,6 +1066,7 @@ export type NodeEntryDataInput = {
   textbox?: Maybe<TextboxNodeEntryInput>;
   form?: Maybe<FormNodeEntryInput>;
   choice?: Maybe<ChoiceNodeEntryInput>;
+  video?: Maybe<VideoNodeEntryInput>;
   register?: Maybe<RegisterNodeEntryInput>;
 };
 
@@ -1079,6 +1085,7 @@ export type NodeEntryValue = {
   registrationNodeEntry?: Maybe<Scalars['String']>;
   choiceNodeEntry?: Maybe<Scalars['String']>;
   linkNodeEntry?: Maybe<Scalars['String']>;
+  videoNodeEntry?: Maybe<Scalars['String']>;
   formNodeEntry?: Maybe<FormNodeEntryType>;
 };
 
@@ -1762,6 +1769,11 @@ export type VerifyUserTokenOutput = {
   accessToken: Scalars['String'];
   accessTokenExpiry: Scalars['Int'];
   userData: UserType;
+};
+
+/** Input type for a video node */
+export type VideoNodeEntryInput = {
+  value?: Maybe<Scalars['String']>;
 };
 
 export type GetWorkspaceAdminsQueryVariables = Exact<{

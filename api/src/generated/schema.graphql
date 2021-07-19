@@ -719,6 +719,7 @@ input NodeEntryDataInput {
   register: RegisterNodeEntryInput
   slider: SliderNodeEntryInput
   textbox: TextboxNodeEntryInput
+  video: VideoNodeEntryInput
 }
 
 """Input type for node-entry metadata"""
@@ -736,6 +737,7 @@ type NodeEntryValue {
   registrationNodeEntry: String
   sliderNodeEntry: Int
   textboxNodeEntry: String
+  videoNodeEntry: String
 }
 
 input OptionInputType {
@@ -1277,4 +1279,9 @@ type VerifyUserTokenOutput {
   accessToken: String!
   accessTokenExpiry: Int!
   userData: UserType!
+}
+
+"""Input type for a video node"""
+input VideoNodeEntryInput {
+  value: String
 }
