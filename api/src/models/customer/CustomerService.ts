@@ -118,13 +118,7 @@ class CustomerService {
       if (createdUserId) {
         const adminRole = customer.roles.find((role) => role.type === 'ADMIN');
 
-        await this.userOfCustomerPrismaAdapter.create(
-          {
-            customer: { connect: { id: customer.id } },
-            role: { connect: { id: adminRole?.id } },
-            user: { connect: { id: createdUserId } },
-          },
-        );
+        await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(customer.id, adminRole?.id || '', createdUserId)
       }
 
       return customer;

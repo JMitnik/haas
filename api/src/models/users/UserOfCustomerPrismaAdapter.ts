@@ -103,6 +103,16 @@ class UserOfCustomerPrismaAdapter implements UserOfCustomerPrismaAdapterType {
     });;
   };
 
+  connectUserToWorkspace(customerId: string, roleId: string, userId: string) {
+    return this.prisma.userOfCustomer.create({
+      data: {
+        customer: { connect: { id: customerId } },
+        role: { connect: { id: roleId } },
+        user: { connect: { id: userId } },
+      },
+    });
+  }
+
   create(data: UserOfCustomerCreateInput): Promise<UserOfCustomer> {
     return this.prisma.userOfCustomer.create({
       data,
