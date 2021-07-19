@@ -1,5 +1,5 @@
 import { subDays } from 'date-fns';
-import _, { cloneDeep } from 'lodash';
+import _ from 'lodash';
 import cuid from 'cuid';
 
 import { ApolloError, UserInputError } from 'apollo-server-express';
@@ -10,7 +10,7 @@ import {
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import NodeService from '../QuestionNode/NodeService';
-import filterDate from '../../utils/filterDate';
+
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
@@ -24,31 +24,18 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 import SessionService from '../session/SessionService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 
-import { DialogueServiceType, CopyDialogueInputType } from './DialogueServiceType';
-import DialoguePrismaAdapter from './DialoguePrismaAdapter';
-import { DialoguePrismaAdapterType } from './DialoguePrismaAdapterType';
-import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
+import { CopyDialogueInputType } from './DialogueServiceType';
+import DialoguePrismaAdapter, { CreateQuestionsInput } from './DialoguePrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
-import { SessionPrismaAdapterType } from '../session/SessionPrismaAdapterType';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
-import { NodeEntryPrismaAdapterType } from '../node-entry/NodeEntryPrismaAdapterType';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
-import { QuestionConditionPrismaAdapterType } from '../QuestionNode/adapters/QuestionCondition/QuestionConditionPrismaAdapterType';
 import QuestionConditionPrismaAdapter from '../QuestionNode/adapters/QuestionCondition/QuestionConditionPrismaAdapter';
-import { EdgePrismaAdapterType } from '../edge/EdgePrismaAdapterType';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
-import { QuestionOptionPrismaAdapterType } from '../QuestionNode/adapters/QuestionOption/QuestionOptionPrismaAdapterType';
 import QuestionOptionPrismaAdapter from '../QuestionNode/adapters/QuestionOption/QuestionOptionPrismaAdapter';
-import { QuestionNodePrismaAdapterType } from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapterType';
 import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
-import { NodeServiceType } from '../QuestionNode/NodeServiceType';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
-}
-
-type CreateQuestionsInput = {
-
 }
 
 class DialogueService {
@@ -479,7 +466,7 @@ class DialogueService {
         videoEmbeddedNode: mappedVideoEmbeddedNode,
         questionDialogueId: mappedDialogueId,
         links: { create: mappedLinks },
-        options: mappedOptions,
+        options: question.options, // TODO: Check if normal options work if not switch back to mappedOptions
         overrideLeafId: mappedOverrideLeafId,
         overrideLeaf: mappedOverrideLeaf,
         isOverrideLeafOf: mappedIsOverrideLeafOf,
@@ -489,83 +476,65 @@ class DialogueService {
 
     // Create leaf nodes
     const leafs = updatedTemplateQuestions?.filter((question) => question.isLeaf);
-    await this.dialoguePrismaAdapter.update(dialogue.id, {
-      questions: {
-        create: leafs?.map((leaf) => ({
-          id: leaf.id,
-          isRoot: false,
-          isLeaf: leaf.isLeaf,
-          title: leaf.title,
-          links: leaf.links,
-          type: leaf.type,
-          form: leaf.form ? {
-            create: {
-              fields: {
-                create: leaf.form?.fields?.map((field) => ({
-                  label: field?.label,
-                  type: field?.type || 'shortText',
-                  isRequired: field?.isRequired || false,
-                  position: field?.position,
-                })),
-              },
-            },
-          } : undefined,
-          sliderNode: leaf.sliderNode ? {
-            create: {
-              markers: {
-                create: leaf?.sliderNode?.markers?.map((marker) => ({
-                  label: marker?.label,
-                  subLabel: marker?.subLabel,
-                  range: {
-                    create: {
-                      start: marker?.range?.start,
-                      end: marker?.range?.end,
-                    },
-                  },
-                })),
-              },
-            },
-          } : undefined,
-        })),
-      },
-    });
+    const mappedLeafs: CreateQuestionsInput = leafs?.map((leaf) => ({
+      id: leaf.id,
+      isRoot: false,
+      isLeaf: leaf.isLeaf,
+      title: leaf.title,
+      type: leaf.type,
+      links: leaf.links?.create?.map((link) => link) || [],
 
-    // Create questio nodes
+      form: leaf.form ? {
+        fields: leaf.form?.fields?.map((field) => ({
+          label: field?.label,
+          type: field?.type || 'shortText',
+          isRequired: field?.isRequired || false,
+          position: field?.position,
+        })),
+      } : undefined,
+      sliderNode: leaf.sliderNode ? {
+        markers: leaf?.sliderNode?.markers?.map((marker) => ({
+          label: marker?.label,
+          subLabel: marker?.subLabel,
+          range: {
+            start: marker?.range?.start,
+            end: marker?.range?.end,
+          },
+        })),
+      } : undefined,
+    })) || [];
+    await this.dialoguePrismaAdapter.createNodes(dialogue.id, mappedLeafs)
+
+    // Create question nodes
     const questions = updatedTemplateQuestions?.filter((question) => !question.isLeaf);
-    await this.dialoguePrismaAdapter.update(dialogue.id, {
-      questions: {
-        create: questions?.map((leaf) => ({
-          id: leaf.id,
-          isRoot: leaf.isRoot,
-          isLeaf: leaf.isLeaf,
-          title: leaf.title,
-          options: leaf.options,
-          overrideLeaf: leaf.overrideLeaf?.id ? {
-            connect: {
-              id: leaf.overrideLeaf.id,
-            }
-          } : undefined,
-          type: leaf.type,
-          videoEmbeddedNode: leaf.videoEmbeddedNode,
-          sliderNode: leaf.sliderNode ? {
-            create: {
-              markers: {
-                create: leaf?.sliderNode?.markers?.map((marker) => ({
-                  label: marker?.label,
-                  subLabel: marker?.subLabel,
-                  range: {
-                    create: {
-                      start: marker?.range?.start,
-                      end: marker?.range?.end,
-                    },
-                  },
-                })),
-              },
-            },
-          } : undefined,
-        })) || [],
-      },
-    });
+    const mappedQuestions: CreateQuestionsInput = questions?.map((leaf) => ({
+      id: leaf.id,
+      isRoot: leaf.isRoot,
+      isLeaf: leaf.isLeaf,
+      title: leaf.title,
+      type: leaf.type,
+      options: leaf.options,
+      overrideLeaf: leaf.overrideLeaf?.id ? {
+        connect: {
+          id: leaf.overrideLeaf.id,
+        }
+      } : undefined,
+      videoEmbeddedNode: leaf.videoEmbeddedNode?.create?.videoUrl
+        ? { videoUrl: leaf.videoEmbeddedNode?.create?.videoUrl }
+        : undefined,
+      sliderNode: leaf.sliderNode ? {
+        markers: leaf?.sliderNode?.markers?.map((marker) => ({
+          label: marker?.label,
+          subLabel: marker?.subLabel,
+          range: {
+            start: marker?.range?.start,
+            end: marker?.range?.end,
+          },
+        })),
+      } : undefined,
+    })) || [];
+
+    await this.dialoguePrismaAdapter.createNodes(dialogue.id, mappedQuestions);
 
     // Create edges
     const updatedTemplateEdges = templateDialogue?.edges.map((edge) => {

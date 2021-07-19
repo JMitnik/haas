@@ -1,4 +1,4 @@
-import { PrismaClient, Dialogue, DialogueUpdateInput, QuestionNode, Edge, DialogueCreateInput, DialogueInclude, DialogueSelect, Subset, DialogueCreateArgs, QuestionCondition } from "@prisma/client";
+import { PrismaClient, Dialogue, DialogueUpdateInput, QuestionNode, Edge, DialogueCreateInput, DialogueInclude, DialogueSelect, Subset, DialogueCreateArgs, QuestionCondition, LinkTypeEnum, NodeType, FormNodeFieldType, VideoEmbeddedNodeCreateWithoutQuestionNodeInput } from "@prisma/client";
 import { DialoguePrismaAdapterType } from "./DialoguePrismaAdapterType";
 
 export type CreateDialogueInput = {
@@ -16,12 +16,119 @@ export type CreateDialogueInput = {
   customerId: string
 };
 
+export type CreateQuestionsInput = Array<{
+  id?: string,
+  isRoot?: boolean,
+  isLeaf?: boolean,
+  title: string,
+  type: NodeType,
+  overrideLeafId?: string,
+  videoEmbeddedNode?: VideoEmbeddedNodeCreateWithoutQuestionNodeInput,
+  options?: {
+    publicValue: string | null;
+    value: string;
+  }[],
+  links?: Array<{
+    questionNodeId: string;
+    title: string | null;
+    type: LinkTypeEnum;
+    url: string;
+    iconUrl: string | null;
+    backgroundColor: string | null
+  }>,
+  form?: {
+    fields: Array<{
+      label: string,
+      type: FormNodeFieldType,
+      isRequired: boolean,
+      position: number,
+    }>,
+  },
+  sliderNode?: {
+    markers: Array<{
+      label: string,
+      subLabel: string,
+      range: { start: number | null, end: number | null },
+    }>
+  }
+}>;
+
 class DialoguePrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
+
+  async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
+
+    return this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: {
+        questions: {
+          create: questions.map((question) => ({
+            id: question.id,
+            isRoot: question.isRoot,
+            isLeaf: question.isLeaf,
+            title: question.title,
+            type: question.type,
+            videoEmbeddedNode: question.videoEmbeddedNode?.videoUrl ? {
+              create: {
+                videoUrl: question.videoEmbeddedNode.videoUrl,
+              }
+            } : undefined,
+            links: question.links?.length ? {
+              create: question.links,
+            } : undefined,
+            options: question.options?.length ? {
+              create: question.options,
+            } : undefined,
+            overrideLeaf: question.overrideLeafId ? {
+              connect: {
+                id: question.overrideLeafId,
+              }
+            } : undefined,
+            form: question.form ? {
+              create: {
+                fields: {
+                  create: question.form?.fields,
+                },
+              },
+            } : undefined,
+            sliderNode: question.sliderNode ? {
+              create: {
+                markers: {
+                  create: question?.sliderNode?.markers?.map((marker) => ({
+                    label: marker?.label,
+                    subLabel: marker?.subLabel,
+                    range: {
+                      create: {
+                        start: marker?.range?.start,
+                        end: marker?.range?.end,
+                      },
+                    },
+                  })),
+                },
+              },
+            } : undefined,
+          })),
+        }
+      },
+    });
+  }
+
+  async update(dialogueId: string, updateArgs: DialogueUpdateInput, include?: DialogueInclude | null | undefined): Promise<Dialogue> {
+    return this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: updateArgs,
+      include,
+    });
+  }
+
 
   getDialogueByQuestionNodeId(nodeId: string): Promise<Dialogue | null> {
     return this.prisma.dialogue.findFirst({
@@ -334,16 +441,6 @@ class DialoguePrismaAdapter {
         },
       }
     })
-  }
-
-  async update(dialogueId: string, updateArgs: DialogueUpdateInput, include?: DialogueInclude | null | undefined): Promise<Dialogue> {
-    return this.prisma.dialogue.update({
-      where: {
-        id: dialogueId,
-      },
-      data: updateArgs,
-      include,
-    });
   }
 
   async read(dialogueId: string) {
