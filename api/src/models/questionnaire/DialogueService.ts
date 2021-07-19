@@ -46,16 +46,21 @@ import { NodeServiceType } from '../QuestionNode/NodeServiceType';
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
-class DialogueService implements DialogueServiceType {
-  dialoguePrismaAdapter: DialoguePrismaAdapterType;
-  customerPrismaAdapter: CustomerPrismaAdapterType;
-  sessionPrismaAdapter: SessionPrismaAdapterType;
-  nodeEntryPrismaAdapter: NodeEntryPrismaAdapterType;
-  questionConditionPrismaAdapter: QuestionConditionPrismaAdapterType;
-  edgePrismaAdapter: EdgePrismaAdapterType;
-  questionOptionPrismaAdapter: QuestionOptionPrismaAdapterType;
-  questionNodePrismaAdapter: QuestionNodePrismaAdapterType;
-  nodeService: NodeServiceType;
+
+type CreateQuestionsInput = {
+
+}
+
+class DialogueService {
+  dialoguePrismaAdapter: DialoguePrismaAdapter;
+  customerPrismaAdapter: CustomerPrismaAdapter;
+  sessionPrismaAdapter: SessionPrismaAdapter;
+  nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;
+  questionConditionPrismaAdapter: QuestionConditionPrismaAdapter;
+  edgePrismaAdapter: EdgePrismaAdapter;
+  questionOptionPrismaAdapter: QuestionOptionPrismaAdapter;
+  questionNodePrismaAdapter: QuestionNodePrismaAdapter;
+  nodeService: NodeService;
 
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
@@ -72,11 +77,7 @@ class DialogueService implements DialogueServiceType {
   updateTags(dialogueId: string, entries?: string[] | null | undefined): Promise<Dialogue> {
     const tags = entries?.map((entryId) => ({ id: entryId })) || [];
 
-    return this.dialoguePrismaAdapter.update(dialogueId, {
-      tags: {
-        connect: tags,
-      },
-    });
+    return this.dialoguePrismaAdapter.connectTags(dialogueId, tags);
   }
 
   async getFilteredDialogues(searchTerm?: string | null | undefined) {
@@ -273,7 +274,7 @@ class DialogueService implements DialogueServiceType {
 
     const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
 
-    await this.dialoguePrismaAdapter.update(dialogueId, { wasGeneratedWithGenData: true });
+    await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueId, true);
 
     const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
     const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
@@ -576,24 +577,15 @@ class DialogueService implements DialogueServiceType {
       const mappedChildNode = { id: idMap[edge.childNodeId] };
       const mappedParentNode = { id: idMap[edge.parentNodeId] };
       const mappedObject = {
-        parentNode: { connect: mappedParentNode },
-        conditions: { create: mappedConditions },
-        childNode: { connect: mappedChildNode },
+        parentNodeId: mappedParentNode.id,
+        conditions: mappedConditions,
+        childNodeId: mappedChildNode.id,
       };
       return mappedObject;
-    });
+    }) || [];
 
-    const updatedEdgesDialogue = await this.dialoguePrismaAdapter.update(dialogue.id, {
-      edges: {
-        create: updatedTemplateEdges?.map((edge) => ({
-          parentNode: edge.parentNode,
-          conditions: edge.conditions,
-          childNode: edge.childNode,
-        })),
-      },
-    });
-
-    return updatedEdgesDialogue;
+    const updatedEdgesOfDialogue = await this.dialoguePrismaAdapter.createEdges(dialogue.id, updatedTemplateEdges);
+    return updatedEdgesOfDialogue;
   };
 
   createDialogue = async (input: NexusGenInputs['CreateDialogueInputType']): Promise<Dialogue> => {

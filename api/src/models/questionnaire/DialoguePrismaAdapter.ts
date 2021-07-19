@@ -1,4 +1,4 @@
-import { PrismaClient, Dialogue, DialogueUpdateInput, QuestionNode, Edge, DialogueCreateInput, DialogueInclude, DialogueSelect, Subset, DialogueCreateArgs } from "@prisma/client";
+import { PrismaClient, Dialogue, DialogueUpdateInput, QuestionNode, Edge, DialogueCreateInput, DialogueInclude, DialogueSelect, Subset, DialogueCreateArgs, QuestionCondition } from "@prisma/client";
 import { DialoguePrismaAdapterType } from "./DialoguePrismaAdapterType";
 
 export type CreateDialogueInput = {
@@ -273,6 +273,67 @@ class DialoguePrismaAdapter {
         },
       },
     });
+  }
+
+  async connectTags(dialogueId: string, tags: { id: string }[]) {
+    return this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: {
+        tags: {
+          connect: tags,
+        },
+      },
+      include: {
+        tags: true,
+      },
+    });
+  }
+
+  async setGeneratedWithGenData(dialogueId: string, isGeneratedWithGenData: boolean) {
+    return this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: {
+        wasGeneratedWithGenData: isGeneratedWithGenData,
+      },
+    });
+  }
+
+  async createEdges(
+    dialogueId: string,
+    edges: {
+      parentNodeId: string,
+      childNodeId: string,
+      conditions: Array<{ conditionType: string, matchValue: string | null, renderMin: number | null, renderMax: number | null }>
+    }[]
+  ) {
+    return this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: {
+        edges: {
+          create: edges?.map((edge) => ({
+            parentNode: {
+              connect: {
+                id: edge.parentNodeId,
+              }
+            },
+            conditions: {
+              create: edge.conditions,
+            },
+            childNode: {
+              connect: {
+                id: edge.childNodeId,
+              }
+            },
+          })),
+        },
+      }
+    })
   }
 
   async update(dialogueId: string, updateArgs: DialogueUpdateInput, include?: DialogueInclude | null | undefined): Promise<Dialogue> {
