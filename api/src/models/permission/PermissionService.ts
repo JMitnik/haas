@@ -1,11 +1,15 @@
 import { Permission, PrismaClient } from '@prisma/client';
-import prisma from '../../config/prisma';
-import { PermissionPrismaAdapterType } from './PermissionPrismaAdapterType';
 import PermissionPrismaAdapter from './PermissionPrismaAdapter';
-import { PermissionServiceType } from './PermissionServiceType';
 
-class PermissionService implements PermissionServiceType {
-  permissionPrismaAdapter: PermissionPrismaAdapterType;
+export type CreatePermissionInput = {
+  id?: string
+  name: string
+  description?: string | null
+  customerId?: string
+}
+
+class PermissionService {
+  permissionPrismaAdapter: PermissionPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.permissionPrismaAdapter = new PermissionPrismaAdapter(prismaClient);
@@ -20,14 +24,8 @@ class PermissionService implements PermissionServiceType {
   };
 
   createPermission = async (name: string, customerId: string, description?: string | null | undefined) => {
-    const permission = await this.permissionPrismaAdapter.create({
-      name,
-      description,
-      Customer: {
-        connect: { id: customerId },
-      },
-    });
-
+    const input: CreatePermissionInput = { name, description, customerId };
+    const permission = await this.permissionPrismaAdapter.createPermission(input);
     return permission;
   };
 }
