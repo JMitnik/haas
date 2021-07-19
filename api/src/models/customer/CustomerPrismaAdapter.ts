@@ -2,6 +2,8 @@ import { PrismaClient, Dialogue, CustomerUpdateInput, Customer, Tag } from '@pri
 import { CustomerPrismaAdapterType } from './CustomerPrismaAdapterType';
 import { NexusGenInputs } from '../../generated/nexus';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import { UpdateCustomerInput } from './CustomerService';
+import { inputObjectType } from '@nexus/schema';
 
 export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
   prisma: PrismaClient
@@ -119,13 +121,25 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
     });
   }
 
-  async updateCustomer(customerId: string, input: CustomerUpdateInput): Promise<Customer> {
-    console.log('updating through adapter');
+  async updateCustomer(customerId: string, input: UpdateCustomerInput): Promise<Customer> {
     const customer = await this.prisma.customer.update({
       where: {
         id: customerId,
       },
-      data: input,
+      data: {
+        name: input.name,
+        slug: input.slug,
+        settings: (input.primaryColour || input.logoUrl) ? {
+          update: {
+            logoUrl: input.logoUrl,
+            colourSettings: input.primaryColour ? {
+              update: {
+                primary: input.primaryColour,
+              }
+            } : undefined,
+          }
+        } : undefined
+      },
     });
 
     return customer;

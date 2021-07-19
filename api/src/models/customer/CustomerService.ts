@@ -16,7 +16,12 @@ import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 
-
+export type UpdateCustomerInput = {
+  name: string;
+  slug: string;
+  logoUrl?: string | null;
+  primaryColour?: string | null;
+};
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -90,19 +95,11 @@ class CustomerService {
 
   editWorkspace = async (input: NexusGenInputs['EditWorkspaceInput']) => {
     const { id, name, slug, primaryColour, logo } = input;
-    const customerInputData: CustomerUpdateInput = {
+    const customerInputData: UpdateCustomerInput = {
       name,
       slug,
-      settings: {
-        update: {
-          logoUrl: logo,
-          colourSettings: {
-            update: {
-              primary: primaryColour
-            }
-          }
-        }
-      }
+      logoUrl: logo,
+      primaryColour: primaryColour,
     };
     const customer = await this.customerPrismaAdapter.updateCustomer(id, customerInputData);
 

@@ -9,7 +9,6 @@ export interface CustomerPrismaAdapterType {
   })>;
   getDialogueBySlug(customerId: string, dialogueSlug: string): Promise<Dialogue | undefined>;
   getDialogueById(customerId: string, dialogueId: string): Promise<Dialogue | undefined>;
-  updateCustomer(customerId: string, input: CustomerUpdateInput): Promise<Customer>;
   getCustomer(customerId: string): Promise<(Customer & {
     settings: (CustomerSettings & { colourSettings: ColourSettings | null; fontSettings: FontSettings | null; }) | null;
   }) | null>;
@@ -21,7 +20,7 @@ export interface CustomerPrismaAdapterType {
   exists(customerId: string): Promise<Boolean>;
   findWorkspaceBySlugs(slugs: Array<string | undefined>): Promise<Customer | null>;
   findAll(): Promise<Customer[]>;
-  findWorkspaceBySlug(slug: string): Promise<Customer|null>;
-  findWorkspaceById(id: string): Promise<Customer|null>;
+  findWorkspaceBySlug(slug: string): Promise<Customer | null>;
+  findWorkspaceById(id: string): Promise<Customer | null>;
   findManyTagsByCustomerSlug(customerSlug: string): Promise<Tag[]>;
 }
