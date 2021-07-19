@@ -37,8 +37,7 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
   async resolve(parent, args, ctx) {
     if (!args.input?.userId) throw new UserInputError('User not provided');
     if (!args.input?.customerId && !args.input?.customerSlug) throw new UserInputError('Neither slug nor id of Customer was provided');
-
-    return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerId, args.input.userId);
+    return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId);
   },
 });
 

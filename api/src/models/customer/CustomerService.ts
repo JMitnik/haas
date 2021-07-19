@@ -8,34 +8,26 @@ import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
-import { CustomerServiceType } from './CustomerServiceType';
-import { CustomerPrismaAdapterType } from './CustomerPrismaAdapterType';
 import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
-import { CustomerSettingsPrismaAdapterType } from '../settings/CustomerSettingsPrismaAdapterType';
 import CustomerSettingsPrismaAdapter from '../settings/CustomerSettingsPrismaAdapter';
 import ColourSettingsPrismaAdapter from '../settings/ColourSettingsPrismaAdapter';
-import { ColourSettingsPrismaAdapterType } from '../settings/ColourSettingsPrismaAdapterType';
-import { FontSettingsPrismaAdapterType } from '../settings/FontSettingsPrismaAdapterType';
 import FontSettingsPrismaAdapter from '../settings/FontSettingsPrismaAdapter';
-import { DialogueServiceType } from '../questionnaire/DialogueServiceType';
-import { TagPrismaAdapterType } from '../tag/TagPrismaAdapterType';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
-import { DialoguePrismaAdapterType } from '../questionnaire/DialoguePrismaAdapterType';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
-import { UserOfCustomerPrismaAdapterType } from '../users/UserOfCustomerPrismaAdapterType';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
-import { NodeServiceType } from '../QuestionNode/NodeServiceType';
 
-class CustomerService implements CustomerServiceType {
-  customerPrismaAdapter: CustomerPrismaAdapterType;
-  customerSettingsPrismaAdapter: CustomerSettingsPrismaAdapterType;
-  colourSettingsPrismaAdater: ColourSettingsPrismaAdapterType;
-  fontSettingsPrismaAdapter: FontSettingsPrismaAdapterType;
-  tagPrismaAdapter: TagPrismaAdapterType;
-  dialogueService: DialogueServiceType;
-  dialoguePrismaAdapter: DialoguePrismaAdapterType;
-  userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapterType;
-  nodeService: NodeServiceType;
+
+
+class CustomerService {
+  customerPrismaAdapter: CustomerPrismaAdapter;
+  customerSettingsPrismaAdapter: CustomerSettingsPrismaAdapter;
+  colourSettingsPrismaAdater: ColourSettingsPrismaAdapter;
+  fontSettingsPrismaAdapter: FontSettingsPrismaAdapter;
+  tagPrismaAdapter: TagPrismaAdapter;
+  dialogueService: DialogueService;
+  dialoguePrismaAdapter: DialoguePrismaAdapter;
+  userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
+  nodeService: NodeService;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -82,22 +74,8 @@ class CustomerService implements CustomerServiceType {
 
   seedByTemplate = async (customer: Customer, template: WorkspaceTemplate = defaultWorkspaceTemplate, willGenerateFakeData: boolean = false) => {
     // Step 1: Make dialogue
-    const dialogue = await this.dialoguePrismaAdapter.create({
-      data: {
-        customer: {
-          connect: {
-            id: customer.id,
-          },
-        },
-        slug: template.slug,
-        title: template.title,
-        description: template.description,
-        questions: {
-          create: [],
-        },
-      },
-    })
-
+    const dialogueInput = { slug: template.slug, title: template.title, description: template.description, customerId: customer.id };
+    const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
     // Step 2: Make the leafs
     const leafs = await this.nodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
 

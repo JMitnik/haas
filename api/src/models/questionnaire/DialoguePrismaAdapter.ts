@@ -1,7 +1,22 @@
 import { PrismaClient, Dialogue, DialogueUpdateInput, QuestionNode, Edge, DialogueCreateInput, DialogueInclude, DialogueSelect, Subset, DialogueCreateArgs } from "@prisma/client";
 import { DialoguePrismaAdapterType } from "./DialoguePrismaAdapterType";
 
-class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
+export type CreateDialogueInput = {
+  id?: string
+  title: string
+  slug: string
+  description: string
+  creationDate?: Date | string
+  updatedAt?: Date | string | null
+  publicTitle?: string | null
+  isOnline?: boolean
+  isWithoutGenData?: boolean
+  endScreenText?: string | null
+  wasGeneratedWithGenData?: boolean
+  customerId: string
+};
+
+class DialoguePrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
@@ -226,6 +241,25 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
   async create(input: Subset<DialogueCreateArgs, DialogueCreateArgs>) {
     return this.prisma.dialogue.create(input);
   }
+
+  async createTemplate(input: CreateDialogueInput) {
+    return this.prisma.dialogue.create({
+      data: {
+        slug: input.slug,
+        title: input.title,
+        description: input.description,
+        customer: {
+          connect: {
+            id: input.customerId
+          }
+        },
+        questions: {
+          create: [],
+        }
+      }
+    });
+  }
+
   async getDialogueWithNodesAndEdges(dialogueId: string) {
     return this.prisma.dialogue.findOne({
       where: { id: dialogueId },
