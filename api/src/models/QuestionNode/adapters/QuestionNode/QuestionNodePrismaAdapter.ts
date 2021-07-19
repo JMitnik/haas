@@ -79,6 +79,19 @@ class QuestionNodePrismaAdapter implements QuestionNodePrismaAdapterType {
     return link?.questionNode;
   }
 
+  connectEdgeToQuestion(nodeId: string, edgeId: string) {
+    return this.prisma.questionNode.update({
+      where: {
+        id: nodeId,
+      },
+      data: {
+        children: {
+          connect: [{ id: edgeId }],
+        },
+      },
+    });
+  }
+
 
   update(nodeId: string, data: QuestionNodeUpdateInput): Promise<QuestionNode> {
     return this.prisma.questionNode.update({
