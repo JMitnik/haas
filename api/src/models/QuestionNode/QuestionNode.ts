@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { UserInputError } from 'apollo-server-express';
 
 import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
@@ -7,7 +8,6 @@ import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
 import prisma from '../../config/prisma';
-import { UserInputError } from 'apollo-server-express';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',

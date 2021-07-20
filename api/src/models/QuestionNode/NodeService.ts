@@ -96,6 +96,9 @@ class NodeService {
     });
   }
 
+  /**
+   * Recursively get ids of all edges and questions.
+   * */
   static getDuplicateIds = (edges: Edge[], edgeIds: string[], questionIds: string[], questionId: string) => {
     const targetEdges = edges.filter((edge) => edge.parentNodeId === questionId);
     if (targetEdges.length) {
