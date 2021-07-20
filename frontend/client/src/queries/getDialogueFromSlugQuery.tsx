@@ -38,10 +38,12 @@ const getDialogueFromSlug = gql`
           }
           form {
             id
+            helperText
             fields {
               id
               label
               type
+              placeholder
               isRequired
               position
             }

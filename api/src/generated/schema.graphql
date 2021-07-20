@@ -168,6 +168,7 @@ input CreateTriggerInputType {
 input CreateWorkspaceInput {
   isSeed: Boolean = false
   logo: String
+  logoOpacity: Int
   name: String!
   primaryColour: String!
   slug: String!
@@ -229,6 +230,7 @@ type CustomerSettings {
   colourSettings: ColourSettings
   fontSettings: FontSettings
   id: ID!
+  logoOpacity: Int
   logoUrl: String
 }
 
@@ -416,6 +418,7 @@ input EditWorkspaceInput {
   customerSlug: String!
   id: ID!
   logo: String
+  logoOpacity: Int
   name: String!
   primaryColour: String!
   slug: String!
@@ -465,6 +468,7 @@ type FormNodeField {
   id: ID!
   isRequired: Boolean!
   label: String!
+  placeholder: String
   position: Int!
   type: FormNodeFieldTypeEnum!
 }
@@ -473,6 +477,7 @@ input FormNodeFieldInput {
   id: ID
   isRequired: Boolean = false
   label: String
+  placeholder: String
   position: Int
   type: FormNodeFieldTypeEnum
 }
@@ -489,11 +494,13 @@ enum FormNodeFieldTypeEnum {
 
 input FormNodeInputType {
   fields: [FormNodeFieldInput!]
+  helperText: String
   id: String
 }
 
 type FormNodeType {
   fields: [FormNodeField!]!
+  helperText: String
   id: String
 }
 
@@ -718,6 +725,7 @@ input NodeEntryDataInput {
   register: RegisterNodeEntryInput
   slider: SliderNodeEntryInput
   textbox: TextboxNodeEntryInput
+  video: VideoNodeEntryInput
 }
 
 """Input type for node-entry metadata"""
@@ -735,6 +743,7 @@ type NodeEntryValue {
   registrationNodeEntry: String
   sliderNodeEntry: Int
   textboxNodeEntry: String
+  videoNodeEntry: String
 }
 
 input OptionInputType {
@@ -1276,4 +1285,9 @@ type VerifyUserTokenOutput {
   accessToken: String!
   accessTokenExpiry: Int!
   userData: UserType!
+}
+
+"""Input type for a video node"""
+input VideoNodeEntryInput {
+  value: String
 }

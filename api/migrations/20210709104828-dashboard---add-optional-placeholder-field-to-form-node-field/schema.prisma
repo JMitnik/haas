@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -382,20 +382,12 @@ model NodeEntry {
   sliderNodeEntry  SliderNodeEntry?
   choiceNodeEntry  ChoiceNodeEntry?
   textboxNodeEntry TextboxNodeEntry?
-  videoNodeEntry   VideoNodeEntry?
 
   // @Deprecated => FormNodeEntry
   registrationNodeEntry RegistrationNodeEntry?
 
   formNodeEntry FormNodeEntry?
   linkNodeEntry LinkNodeEntry?
-}
-
-model VideoNodeEntry {
-  id          Int       @id @default(autoincrement())
-  value       String?
-  nodeEntryId String
-  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model LinkNodeEntry {

@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -147,7 +147,6 @@ enum FormNodeFieldType {
 model FormNodeField {
   id                     String                   @id @default(cuid())
   label                  String
-  placeholder            String?
   type                   FormNodeFieldType        @default(shortText)
   isRequired             Boolean                  @default(false)
   position               Int

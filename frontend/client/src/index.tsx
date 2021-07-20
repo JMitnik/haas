@@ -1,13 +1,10 @@
 import 'config/sentry';
+import 'layouts/index.css';
 import 'mobx-react-lite/batchingForReactDom';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
-import 'layouts/index.css';
 
 import App from './pages';
-
-console.log(process.env.ENV);
 
 if (process.env.REACT_APP_ENV && process.env.REACT_APP_ENV === 'test') {
   // TODO: Figure out how to get MSW working okay

@@ -628,6 +628,7 @@ class DialogueService {
         create: question.options.map((option) => {
           const { overrideLeafId, position, publicValue, value } = option;
           const mappedOverrideLeafId = overrideLeafId && idMap[overrideLeafId];
+
           return {
             position,
             publicValue,

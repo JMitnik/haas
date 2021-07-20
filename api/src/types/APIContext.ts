@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { ContextSessionType } from '../models/auth/ContextSessionType';
 import { MailServiceType } from '../services/mailings/MailServiceTypes';
 import { LoginServiceType } from '../models/auth/LoginServiceType';
-import { UserServiceType } from '../services/user/UserServiceTypes';
+import { UserServiceType } from '../models/users/UserServiceTypes';
 
 export interface APIServiceContainer {
   userService: UserServiceType;

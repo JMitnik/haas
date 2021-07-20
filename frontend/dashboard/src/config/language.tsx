@@ -245,6 +245,10 @@ const language = {
       en: 'Campaigns',
       de: 'Kampagnen',
     },
+    placeholder: {
+      en: 'Field placeholder',
+      de: 'Feldplatzhalter',
+    },
     is_required: {
       en: 'Is the field required?',
       de: 'Ist das Feld erforderlich?',
@@ -260,6 +264,18 @@ const language = {
     empty_field: {
       en: 'Empty field',
       de: 'Leeres Feld',
+    },
+    form_helpertext_placeholder: {
+      en: 'Let us know',
+      de: 'Lass uns wissen',
+    },
+    about_form_helpertext_header: {
+      en: 'Helper text',
+      de: 'Helfertext',
+    },
+    about_form_helpertext_helper: {
+      en: 'Inspire your users to share their story with a helper text at the top.',
+      de: 'Inspirieren Sie Ihre Benutzer, ihre Geschichte mit einem Hilfstext oben zu teilen.',
     },
     about_fields_header: {
       en: 'Fields',
@@ -278,6 +294,14 @@ const language = {
     not_required_helper: {
       en: 'User can leave this empty',
       de: 'Benutzer kann dies leer lassen',
+    },
+    logo_opacity_helper: {
+      en: 'Decide how opaque the logo will be in the dialogue.',
+      de: 'Entscheiden Sie, wie undurchsichtig das Logo im Dialog sein soll.',
+    },
+    logo_opacity: {
+      en: 'Logo opaqueness',
+      de: 'Logo Undurchsichtigkeit',
     },
     required_helper: {
       en: 'User must fill this in.',

@@ -1,5 +1,7 @@
 import { IAnyModelType, Instance, types } from 'mobx-state-tree';
-import TreeNodeModel from './TreeNodeModel';
+
+// eslint-disable-next-line import/no-cycle
+import { TreeNodeModel } from './TreeNodeModel';
 
 const TreeNodeOptionModel = types
   .model({
