@@ -322,33 +322,30 @@ class NodeService {
     leafNodesArray: LeafNodeDataEntryProps[],
     dialogueId: string,
   ) => {
-    // Make leafs based on array
-    const leafs = await Promise.all(
-      leafNodesArray.map(async ({ title, type, links, form }) => this.questionNodePrismaAdapter.create({
-        title,
-        questionDialogue: { connect: { id: dialogueId } },
-        type,
+    const mappedLeafs: CreateQuestionsInput = leafNodesArray.map((leaf) => {
+      return ({
+        ...leaf,
+        title: leaf.title,
+        type: leaf.type,
+        dialogueId: dialogueId,
         isRoot: false,
         isLeaf: true,
-        links: links.length ? {
-          create: links,
-        } : undefined,
         form: {
-          create: form?.fields ? {
-            fields: {
-              create: form?.fields?.length > 0 ? form.fields.map((field) => ({
-                label: field.label || '',
-                position: field.position || -1,
-                isRequired: field.isRequired || false,
-                type: field.type || 'shortText',
-              })) : undefined,
-            },
-          } : undefined,
-        },
-      }))
-    );
+          fields: leaf?.form?.fields?.length ? leaf.form?.fields.map((field) => ({
+            label: field.label || '',
+            position: field.position || -1,
+            isRequired: field.isRequired || false,
+            type: field.type || 'shortText',
+          })) : [],
+        }
+      })
+    });
 
-    return leafs;
+    // Make leafs based on array
+    const updatedNodes = await this.dialoguePrismaAdapter.createNodes(dialogueId, mappedLeafs);
+    const finalLeafNodes = updatedNodes.filter((node) => node.isLeaf);
+
+    return finalLeafNodes;
   };
 
   static getCorrectLeaf = (leafs: QuestionNode[], titleSubset: string) => {

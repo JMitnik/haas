@@ -1,5 +1,16 @@
-import { PrismaClient, Dialogue, DialogueUpdateInput, QuestionNode, Edge, DialogueCreateInput, DialogueInclude, DialogueSelect, Subset, DialogueCreateArgs, QuestionCondition, LinkTypeEnum, NodeType, FormNodeFieldType, VideoEmbeddedNodeCreateWithoutQuestionNodeInput } from "@prisma/client";
-import { DialoguePrismaAdapterType } from "./DialoguePrismaAdapterType";
+import {
+  PrismaClient,
+  Dialogue,
+  DialogueUpdateInput,
+  Edge,
+  DialogueInclude,
+  Subset,
+  DialogueCreateArgs,
+  LinkTypeEnum,
+  NodeType,
+  FormNodeFieldType,
+  VideoEmbeddedNodeCreateWithoutQuestionNodeInput
+} from "@prisma/client";
 
 export type CreateDialogueInput = {
   id?: string
@@ -30,7 +41,6 @@ export type CreateQuestionInput = {
     value: string;
   }[],
   links?: Array<{
-    questionNodeId: string;
     title: string | null;
     type: LinkTypeEnum;
     url: string;
@@ -65,7 +75,7 @@ class DialoguePrismaAdapter {
 
   async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
 
-    return this.prisma.dialogue.update({
+    const dialogue = await this.prisma.dialogue.update({
       where: {
         id: dialogueId,
       },
@@ -119,7 +129,11 @@ class DialoguePrismaAdapter {
           })),
         }
       },
+      include: {
+        questions: true,
+      }
     });
+    return dialogue.questions;
   }
 
   async update(dialogueId: string, updateArgs: DialogueUpdateInput, include?: DialogueInclude | null | undefined): Promise<Dialogue> {
