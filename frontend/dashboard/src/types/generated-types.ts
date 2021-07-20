@@ -309,6 +309,11 @@ export type CustomFieldType = {
 };
 
 
+export type Debug = {
+  __typename?: 'Debug';
+  debugResolver?: Maybe<Scalars['String']>;
+};
+
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
   customerSlug?: Maybe<Scalars['String']>;
@@ -561,11 +566,13 @@ export type FormNodeField = {
   type: FormNodeFieldTypeEnum;
   isRequired: Scalars['Boolean'];
   position: Scalars['Int'];
+  placeholder?: Maybe<Scalars['String']>;
 };
 
 export type FormNodeFieldInput = {
   id?: Maybe<Scalars['ID']>;
   label?: Maybe<Scalars['String']>;
+  placeholder?: Maybe<Scalars['String']>;
   type?: Maybe<FormNodeFieldTypeEnum>;
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
@@ -788,7 +795,7 @@ export type Mutation = {
   inviteUser: InviteUserOutput;
   createSession: Session;
   appendToInteraction: Session;
-  cloneQuestion?: Maybe<QuestionNode>;
+  duplicateQuestion?: Maybe<QuestionNode>;
   deleteQuestion: QuestionNode;
   createQuestion?: Maybe<QuestionNode>;
   deleteCTA: QuestionNode;
@@ -796,6 +803,7 @@ export type Mutation = {
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
+  debugMutation?: Maybe<Scalars['String']>;
 };
 
 
@@ -1020,7 +1028,7 @@ export type MutationAppendToInteractionArgs = {
 };
 
 
-export type MutationCloneQuestionArgs = {
+export type MutationDuplicateQuestionArgs = {
   questionId?: Maybe<Scalars['String']>;
 };
 
@@ -2065,14 +2073,14 @@ export type GetWorkspaceDialoguesQuery = (
   )> }
 );
 
-export type CloneQuestionMutationVariables = Exact<{
+export type DuplicateQuestionMutationVariables = Exact<{
   questionId?: Maybe<Scalars['String']>;
 }>;
 
 
-export type CloneQuestionMutation = (
+export type DuplicateQuestionMutation = (
   { __typename?: 'Mutation' }
-  & { cloneQuestion?: Maybe<(
+  & { duplicateQuestion?: Maybe<(
     { __typename?: 'QuestionNode' }
     & Pick<QuestionNode, 'id'>
   )> }
@@ -2784,39 +2792,39 @@ export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDi
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
     }
-export const CloneQuestionDocument = gql`
-    mutation cloneQuestion($questionId: String) {
-  cloneQuestion(questionId: $questionId) {
+export const DuplicateQuestionDocument = gql`
+    mutation duplicateQuestion($questionId: String) {
+  duplicateQuestion(questionId: $questionId) {
     id
   }
 }
     `;
-export type CloneQuestionMutationFn = Apollo.MutationFunction<CloneQuestionMutation, CloneQuestionMutationVariables>;
+export type DuplicateQuestionMutationFn = Apollo.MutationFunction<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
 
 /**
- * __useCloneQuestionMutation__
+ * __useDuplicateQuestionMutation__
  *
- * To run a mutation, you first call `useCloneQuestionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCloneQuestionMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useDuplicateQuestionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDuplicateQuestionMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [cloneQuestionMutation, { data, loading, error }] = useCloneQuestionMutation({
+ * const [duplicateQuestionMutation, { data, loading, error }] = useDuplicateQuestionMutation({
  *   variables: {
  *      questionId: // value for 'questionId'
  *   },
  * });
  */
-export function useCloneQuestionMutation(baseOptions?: Apollo.MutationHookOptions<CloneQuestionMutation, CloneQuestionMutationVariables>) {
+export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CloneQuestionMutation, CloneQuestionMutationVariables>(CloneQuestionDocument, options);
+        return Apollo.useMutation<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>(DuplicateQuestionDocument, options);
       }
-export type CloneQuestionMutationHookResult = ReturnType<typeof useCloneQuestionMutation>;
-export type CloneQuestionMutationResult = Apollo.MutationResult<CloneQuestionMutation>;
-export type CloneQuestionMutationOptions = Apollo.BaseMutationOptions<CloneQuestionMutation, CloneQuestionMutationVariables>;
+export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
+export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
+export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {

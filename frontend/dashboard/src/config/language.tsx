@@ -701,9 +701,9 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Date',
       de: 'Datum',
     },
-    clone: {
-      en: 'Clone',
-      de: 'Klon',
+    duplicate: {
+      en: 'Duplicate branch',
+      de: 'Doppelzweig',
     },
     delete: {
       en: 'Delete',
@@ -1698,11 +1698,11 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
-    branch_cloned: {
-      en: 'Branch cloned!',
-      de: 'Zweig geklont',
+    branch_duplicated: {
+      en: 'Branch duplicated!',
+      de: 'Zweig dupliziert!',
     },
-    branch_clone_helper: {
+    branch_duplicated_helper: {
       en: 'A new branch has succesfully been created.',
       de: 'Eine neue Zweig wurde erfolgreich erstellt.',
     },

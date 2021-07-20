@@ -96,7 +96,7 @@ class NodeService {
     });
   }
 
-  static getCloneIds = (edges: Edge[], edgeIds: string[], questionIds: string[], questionId: string) => {
+  static getDuplicateIds = (edges: Edge[], edgeIds: string[], questionIds: string[], questionId: string) => {
     const targetEdges = edges.filter((edge) => edge.parentNodeId === questionId);
     if (targetEdges.length) {
       targetEdges.forEach((targetEdge) => {
@@ -106,7 +106,7 @@ class NodeService {
         edgeIds.push(edgeId);
         questionIds.push(childQuestionNodeId);
 
-        NodeService.getCloneIds(edges, edgeIds, questionIds, childQuestionNodeId)
+        NodeService.getDuplicateIds(edges, edgeIds, questionIds, childQuestionNodeId)
       });
     };
 
@@ -131,10 +131,10 @@ class NodeService {
   }
 
   /**
-   * Maps all existing ids of a prisma question to a new cuid  
+   * Maps all existing ids of a prisma question to a new cuid
    * @param idMap A map containing the old cuid and a newly mapped cuid to it
    * @param question A prisma question
-   * @returns A prisma question with new cuids 
+   * @returns A prisma question with new cuids
    */
   static mapQuestion(idMap: IdMapProps, question: QuestionNode & {
     options: QuestionOption[];
@@ -172,10 +172,10 @@ class NodeService {
   }
 
   /**
-   * Clones the question and all its child questions 
-   * @questionId the parent question id used to generate a cloned dialogue
+   * Duplicates the question and all its child questions
+   * @questionId the parent question id used to generate a duplicated dialogue
    */
-  static cloneBranch = async (questionId: string) => {
+  static duplicateBranch = async (questionId: string) => {
     const idMap: IdMapProps = {};
 
     const question = await prisma.questionNode.findFirst({
@@ -199,7 +199,7 @@ class NodeService {
       }
     });
 
-    const { edgeIds, questionIds } = NodeService.getCloneIds(edges, [], [questionId], questionId);
+    const { edgeIds, questionIds } = NodeService.getDuplicateIds(edges, [], [questionId], questionId);
 
     NodeService.createCuidPairs(idMap, [...questionIds, ...edgeIds, questionId]);
 

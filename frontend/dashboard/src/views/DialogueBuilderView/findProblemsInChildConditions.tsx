@@ -57,7 +57,7 @@ export const findProblemsInChildCondition = (
         return {
           originIndex: conditionIndex,
           problemWithCondition: {
-            renderMin: otherChild?.renderMax,
+            renderMin: otherChild?.renderMin,
             renderMax: otherChild?.renderMax,
           },
           problemWith: otherChildIndex,
@@ -70,7 +70,7 @@ export const findProblemsInChildCondition = (
         return {
           originIndex: conditionIndex,
           problemWithCondition: {
-            renderMin: otherChild?.renderMax,
+            renderMin: otherChild?.renderMin,
             renderMax: otherChild?.renderMax,
           },
           problemWith: otherChildIndex,

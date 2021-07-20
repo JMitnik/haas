@@ -1,5 +1,5 @@
- mutation cloneQuestion($questionId: String) {
-    cloneQuestion(questionId: $questionId) {
+ mutation duplicateQuestion($questionId: String) {
+    duplicateQuestion(questionId: $questionId) {
         id
     }
   }

@@ -492,7 +492,7 @@ export const DeleteNodeInputType = inputObjectType({
 export const QuestionNodeMutations = extendType({
   type: 'Mutation',
   definition(t) {
-    t.field('cloneQuestion', {
+    t.field('duplicateQuestion', {
       type: QuestionNodeType,
       nullable: true,
       args: { questionId: 'String' },
@@ -502,7 +502,7 @@ export const QuestionNodeMutations = extendType({
           throw new UserInputError('Question id is missing!');
         }
 
-        await NodeService.cloneBranch(args.questionId);
+        await NodeService.duplicateBranch(args.questionId);
         return null;
       },
     });

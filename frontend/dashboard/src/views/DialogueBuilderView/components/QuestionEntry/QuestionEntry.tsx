@@ -8,8 +8,8 @@ import React, { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
-import { useCloneQuestionMutation } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useDuplicateQuestionMutation } from 'types/generated-types';
 import ShowMoreButton from 'components/ShowMoreButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import useAuth from 'hooks/useAuth';
@@ -52,17 +52,17 @@ interface QuestionEntryItemProps {
 }
 
 interface QuestionOptionsOverlayProps {
-  onClone: (e: React.MouseEvent<HTMLElement>) => void;
+  onDuplicate: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
-const QuestionOptionsOverlay = ({ onClone }: QuestionOptionsOverlayProps) => {
+const QuestionOptionsOverlay = ({ onDuplicate }: QuestionOptionsOverlayProps) => {
   const { t } = useTranslation();
 
   return (
     <UI.List>
       <UI.ListHeader>{t('edit_question')}</UI.ListHeader>
-      <UI.ListItem onClick={onClone}>
-        {t('clone')}
+      <UI.ListItem onClick={onDuplicate}>
+        {t('duplicate')}
       </UI.ListItem>
     </UI.List>
   );
@@ -101,7 +101,7 @@ const QuestionEntryItem = ({ depth,
   const { t } = useTranslation();
   const toast = useToast();
   const questionRef = useRef<HTMLDivElement | null>(null);
-  const [cloneQuestion] = useCloneQuestionMutation({
+  const [duplicateQuestion] = useDuplicateQuestionMutation({
     refetchQueries: [{
       query: getTopicBuilderQuery,
       variables: {
@@ -111,8 +111,8 @@ const QuestionEntryItem = ({ depth,
     }],
     onCompleted: () => {
       toast({
-        title: t('toast:branch_cloned'),
-        description: t('toast:branch_clone_helper'),
+        title: t('toast:branch_duplicated'),
+        description: t('toast:branch_duplicated_helper'),
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
@@ -173,8 +173,8 @@ const QuestionEntryItem = ({ depth,
     questionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleClone = (questionId: string) => {
-    cloneQuestion({
+  const handleDuplicateQuestion = (questionId: string) => {
+    duplicateQuestion({
       variables: {
         questionId,
       },
@@ -232,7 +232,7 @@ const QuestionEntryItem = ({ depth,
                 <ShowMoreButton
                   renderMenu={(
                     <QuestionOptionsOverlay
-                      onClone={() => handleClone(question.id)}
+                      onDuplicate={() => handleDuplicateQuestion(question.id)}
                     />
                   )}
                 />
