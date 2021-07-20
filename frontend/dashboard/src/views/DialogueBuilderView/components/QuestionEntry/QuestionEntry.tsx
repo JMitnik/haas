@@ -14,6 +14,8 @@ import ShowMoreButton from 'components/ShowMoreButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import useAuth from 'hooks/useAuth';
 
+import { QuestionNodeProblem } from 'views/DialogueBuilderView/DialogueBuilderTypes';
+
 import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
 import BuilderIcon from './BuilderIcon';
@@ -26,13 +28,17 @@ interface QuestionEntryItemProps {
   onAddExpandChange?: React.Dispatch<React.SetStateAction<boolean>>;
   onExpandChange: () => void;
   isExpanded: Boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
   questionsQ: Array<QuestionEntryProps>;
   question: QuestionEntryProps;
   leafs: any;
+  // eslint-disable-next-line react/no-unused-prop-types
   index: number;
   Icon: (props: any) => JSX.Element;
   activeQuestion: string | null;
+  // eslint-disable-next-line react/no-unused-prop-types
   onAddQuestion?: (event: any, questionUUID: string) => void;
+  // eslint-disable-next-line react/no-unused-prop-types
   onDeleteQuestion?: (event: any, questionId: string) => void;
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
   condition: EdgeConditionProps | undefined;
@@ -42,6 +48,7 @@ interface QuestionEntryItemProps {
   depth: number;
   parentQuestionType: string;
   ctaNodes: CTANode[];
+  problems: (QuestionNodeProblem | undefined)[];
 }
 
 interface QuestionOptionsOverlayProps {
@@ -86,8 +93,8 @@ const QuestionEntryItem = ({ depth,
   edgeId,
   parentQuestionId,
   ctaNodes,
-  onAddExpandChange }
-  : QuestionEntryItemProps) => {
+  onAddExpandChange,
+  problems } : QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { canAccessAdmin } = useAuth();
@@ -184,7 +191,12 @@ const QuestionEntryItem = ({ depth,
       flexGrow={1}
     >
       {depth > 1 && (
-        <ConditionLabel activeCTA={activeQuestion} id={question.id} condition={condition} />
+        <ConditionLabel
+          activeCTA={activeQuestion}
+          id={question.id}
+          condition={condition}
+          problems={problems}
+        />
       )}
       <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>

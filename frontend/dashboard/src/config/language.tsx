@@ -886,6 +886,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Phone number',
       de: 'Telefonnummer',
     },
+    question_problem_range: {
+      en: 'Problem with question {{ problemIndex }} with range {{ problemRange }}: {{ problemType }}',
+      de: 'Problem mit Frage {{ problemIndex }} mit Reichweite {{ problemRange }}: {{ problemType }}',
+    },
     last_updated: {
       en: 'Last update {{date}} ago',
       de: 'Das letzte Update war vor: {{date}}',
@@ -1313,7 +1317,7 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
     language: {
       en: '',
-      de: ''
+      de: '',
     },
     finisher_heading: {
       en: 'Dialogue finisher heading',
