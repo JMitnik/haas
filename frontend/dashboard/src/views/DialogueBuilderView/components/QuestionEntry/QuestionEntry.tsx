@@ -7,14 +7,13 @@ import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 
+import { QuestionNodeProblem } from 'views/DialogueBuilderView/DialogueBuilderTypes';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useDuplicateQuestionMutation } from 'types/generated-types';
 import ShowMoreButton from 'components/ShowMoreButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import useAuth from 'hooks/useAuth';
-
-import { QuestionNodeProblem } from 'views/DialogueBuilderView/DialogueBuilderTypes';
 
 import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
