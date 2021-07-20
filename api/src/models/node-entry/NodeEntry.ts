@@ -39,6 +39,7 @@ export const NodeEntryValueType = objectType({
     t.string('registrationNodeEntry', { nullable: true });
     t.string('choiceNodeEntry', { nullable: true });
     t.string('linkNodeEntry', { nullable: true });
+    t.string('videoNodeEntry', { nullable: true });
     t.field('formNodeEntry', { type: FormNodeEntryType, nullable: true });
   },
 });
@@ -91,6 +92,7 @@ export const NodeEntryType = objectType({
             registrationNodeEntry: true,
             sliderNodeEntry: true,
             textboxNodeEntry: true,
+            videoNodeEntry: true,
             formNodeEntry: {
               include: {
                 values: {
@@ -105,6 +107,7 @@ export const NodeEntryType = objectType({
 
         return {
           choiceNodeEntry: nodeEntry?.choiceNodeEntry?.value,
+          videoNodeEntry: nodeEntry?.videoNodeEntry?.value,
           linkNodeEntry: nodeEntry?.linkNodeEntry?.value?.toString(),
           registrationNodeEntry: nodeEntry?.registrationNodeEntry?.value?.toString(),
           sliderNodeEntry: nodeEntry?.sliderNodeEntry?.value,
@@ -158,6 +161,15 @@ export const ChoiceNodeEntryInput = inputObjectType({
   },
 });
 
+export const VideoNodeEntryInput = inputObjectType({
+  name: 'VideoNodeEntryInput',
+  description: 'Input type for a video node',
+
+  definition(t) {
+    t.string('value');
+  },
+});
+
 export const TextboxNodeEntryInput = inputObjectType({
   name: 'TextboxNodeEntryInput',
   description: 'Input type for a textbox node',
@@ -194,6 +206,7 @@ export const NodeEntryDataInput = inputObjectType({
     t.field('textbox', { type: TextboxNodeEntryInput, nullable: true });
     t.field('form', { type: FormNodeEntryInput, nullable: true });
     t.field('choice', { type: ChoiceNodeEntryInput, nullable: true });
+    t.field('video', { type: VideoNodeEntryInput, nullable: true });
 
     // @deprecated
     t.field('register', { type: RegisterNodeEntryInput, nullable: true, deprecation: 'This will be deprectated from now on' });

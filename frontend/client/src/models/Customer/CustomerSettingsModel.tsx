@@ -4,6 +4,7 @@ import CustomerColorSettingsModel from './CustomerColorSettingsModel';
 const CustomerSettingsModel = types
   .model('CustomerSettingsModel', {
     logoUrl: types.string,
+    logoOpacity: types.maybeNull(types.number),
     colourSettings: CustomerColorSettingsModel,
   });
 

@@ -5,7 +5,13 @@ interface GenerIconContainerProps {
 }
 
 const CustomIcon = ({ logo }: GenerIconContainerProps) => (
-  <img alt="Icon" height="25px" width="25px" src={logo} />
+  <img
+    alt="Icon"
+    height="30px"
+    width="30px"
+    src={logo}
+    style={{ objectFit: 'cover', width: '30px', height: '30px' }}
+  />
 );
 
 export default CustomIcon;

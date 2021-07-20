@@ -1,8 +1,10 @@
-import { ChoiceNodeEntry,
+import {
+  ChoiceNodeEntry,
   FormNodeEntryGetPayload,
   LinkNodeEntry, NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
   QuestionNode, RegistrationNodeEntry,
-  SliderNodeEntry, TextboxNodeEntry } from '@prisma/client';
+  SliderNodeEntry, TextboxNodeEntry
+} from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
@@ -31,6 +33,10 @@ class NodeEntryService {
     relatedNode: (nodeEntryInput.nodeId && { connect: { id: nodeEntryInput.nodeId } }) || undefined,
     relatedEdge: (nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } }) || undefined,
     depth: nodeEntryInput?.depth,
+
+    videoNodeEntry: nodeEntryInput?.data?.video?.value ? {
+      create: { value: nodeEntryInput?.data?.video?.value },
+    } : undefined,
 
     choiceNodeEntry: nodeEntryInput?.data?.choice?.value ? {
       create: { value: nodeEntryInput?.data?.choice?.value },
@@ -175,18 +181,30 @@ class NodeEntryService {
   static constructFindWhereTextNodeEntryFragment(text: string): NodeEntryWhereInput {
     return {
       OR: [
-        { textboxNodeEntry: {
-          value: {
-            contains: text,
-            mode: 'insensitive',
-          },
-        } },
-        { choiceNodeEntry: {
-          value: {
-            contains: text,
-            mode: 'insensitive',
-          },
-        } },
+        {
+          textboxNodeEntry: {
+            value: {
+              contains: text,
+              mode: 'insensitive',
+            },
+          }
+        },
+        {
+          videoNodeEntry: {
+            value: {
+              contains: text,
+              mode: 'insensitive',
+            },
+          }
+        },
+        {
+          choiceNodeEntry: {
+            value: {
+              contains: text,
+              mode: 'insensitive',
+            },
+          }
+        },
         // DEPRECATED (but still included)
         {
           registrationNodeEntry: {

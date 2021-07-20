@@ -11,10 +11,15 @@ const language = {
       de: 'Unzufrieden',
       nl: 'Ontevreden',
     },
+    go_back: {
+      en: 'Go back',
+      de: 'Geh zurück',
+      nl: 'Ga terug',
+    },
     leave_your_details: {
-      en: 'Leave your details',
-      de: 'Hinterlassen Sie Ihre Daten',
-      nl: 'Laat uw gegevens achter',
+      en: 'Let us know',
+      de: 'Lass uns wissen',
+      nl: 'Laat het ons weten',
     },
     first_name: {
       en: 'First name',

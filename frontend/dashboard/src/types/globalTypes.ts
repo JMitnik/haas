@@ -187,6 +187,7 @@ export interface CreateTriggerInputType {
 export interface CreateWorkspaceInput {
   slug: string;
   name: string;
+  logoOpacity: number;
   logo?: string | null;
   primaryColour: string;
   isSeed?: boolean | null;

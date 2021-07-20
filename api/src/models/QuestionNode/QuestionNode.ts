@@ -105,6 +105,7 @@ export const FormNodeFieldInput = inputObjectType({
   definition(t) {
     t.id('id', { required: false });
     t.string('label');
+    t.string('placeholder');
     t.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired', { default: false });
     t.int('position');
@@ -116,6 +117,8 @@ export const FormNodeInputType = inputObjectType({
 
   definition(t) {
     t.string('id', { nullable: true });
+    t.string('helperText', { nullable: true });
+
     t.list.field('fields', { type: FormNodeFieldInput });
   },
 });
@@ -129,6 +132,12 @@ export const FormNodeField = objectType({
     t.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired');
     t.int('position');
+    t.string('placeholder', {
+      nullable: true,
+      resolve(root) {
+        return root.placeholder;
+      },
+    })
   },
 });
 
@@ -137,6 +146,8 @@ export const FormNodeType = objectType({
 
   definition(t) {
     t.string('id', { nullable: true });
+    t.string('helperText', { nullable: true });
+
     t.list.field('fields', { type: FormNodeField });
   },
 });
@@ -234,7 +245,6 @@ export const QuestionNodeType = objectType({
       nullable: true,
       resolve: (parent: any) => {
         if (parent.type === 'FORM') {
-          console.log(parent.form);
           return parent.form;
         }
 

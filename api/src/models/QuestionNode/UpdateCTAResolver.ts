@@ -3,7 +3,7 @@ import { UserInputError } from 'apollo-server-express';
 import { inputObjectType, mutationField } from '@nexus/schema';
 
 import { CTALinksInputType } from '../link/Link';
-import { FormNodeCreateInput, FormNodeFieldUpsertArgs, FormNodeUpdateInput, FormNodeUpsertWithoutQuestionNodeInput } from '@prisma/client';
+import { FormNodeFieldUpsertArgs } from '@prisma/client';
 import { FormNodeInputType, QuestionNodeType, ShareNodeInputType } from '.';
 import { NexusGenInputs } from '../../generated/nexus';
 import { QuestionNodeTypeEnum } from './QuestionNode';
@@ -29,14 +29,16 @@ const saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Form
   input.fields?.map((field) => ({
     create: {
       type: field.type || 'shortText',
-      label: field.label || 'Generic',
+      label: field.label || '',
       position: field.position || -1,
+      placeholder: field.placeholder || '',
       isRequired: field.isRequired || false,
     },
     update: {
       type: field.type || 'shortText',
-      label: field.label || 'Generic',
+      label: field.label || '',
       position: field.position || -1,
+      placeholder: field.placeholder || '',
       isRequired: field.isRequired || false,
     },
     where: {
@@ -129,6 +131,7 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
           data: {
             form: {
               update: {
+                helperText: args.input.form.helperText,
                 fields: {
                   upsert: saveEditFormNodeInput(args.input.form),
                 },
