@@ -1,7 +1,19 @@
-import { PrismaClient, LinkCreateInput, LinkUpdateInput, Link } from "@prisma/client";
-import { LinkPrismaAdapterType } from "./LinkPrismaAdapterType";
+import { PrismaClient, LinkCreateInput, LinkUpdateInput, Link, LinkTypeEnum } from "@prisma/client";
 
-class LinkPrismaAdapter implements LinkPrismaAdapterType {
+export interface UpdateLinkInput {
+  id?: string;
+  title: string;
+  url: string;
+  type: LinkTypeEnum;
+  backgroundColor: string;
+  iconUrl: string;
+}
+
+export interface CreateLinkInput extends UpdateLinkInput {
+  questionId: string;
+}
+
+class LinkPrismaAdapter {
   prisma: PrismaClient
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
@@ -14,6 +26,32 @@ class LinkPrismaAdapter implements LinkPrismaAdapterType {
       },
     });
   }
+
+  upsertLink(linkId: string, create: CreateLinkInput, update: UpdateLinkInput) {
+    return this.prisma.link.upsert({
+      where: { id: linkId },
+      create: {
+        title: create.title,
+        type: create.type,
+        url: create.url,
+        backgroundColor: create.backgroundColor,
+        iconUrl: create.iconUrl,
+        questionNode: {
+          connect: {
+            id: create.questionId,
+          }
+        }
+      },
+      update: {
+        title: update.title,
+        type: update.type,
+        url: update.url,
+        backgroundColor: update.backgroundColor,
+        iconUrl: update.iconUrl,
+      }
+    });
+  }
+
   upsert(id: string | null | undefined, create: LinkCreateInput, update: LinkUpdateInput) {
     return this.prisma.link.upsert({
       where: { id: id || '-1' },

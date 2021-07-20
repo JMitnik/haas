@@ -1,28 +1,17 @@
 import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, PrismaClient, FormNodeFieldUpsertArgs, Share } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
-import prisma from '../../config/prisma';
-import { NodeServiceType, QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps } from './NodeServiceType';
-import { QuestionNodePrismaAdapterType } from './adapters/QuestionNode/QuestionNodePrismaAdapterType';
-import QuestionNodePrismaAdapter from './adapters/QuestionNode/QuestionNodePrismaAdapter';
-import { EdgeServiceType } from '../edge/EdgeServiceType';
-import { LinkPrismaAdapterType } from '../link/LinkPrismaAdapterType';
+import { QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps } from './NodeServiceType';
+import QuestionNodePrismaAdapter, { CreateCTAInput } from './adapters/QuestionNode/QuestionNodePrismaAdapter';
 import LinkPrismaAdapter from '../link/LinkPrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
-import { ShareNodePrismaAdapterType } from './adapters/ShareNode/ShareNodePrismaAdapterType';
 import ShareNodePrismaAdapter from './adapters/ShareNode/ShareNodePrismaAdapter';
-import { QuestionConditionPrismaAdapterType } from './adapters/QuestionCondition/QuestionConditionPrismaAdapterType';
 import QuestionConditionPrismaAdapter from './adapters/QuestionCondition/QuestionConditionPrismaAdapter';
-import { VideoNodePrismaAdapterType } from './adapters/VideoNode/VideoNodePrismaAdapterType';
 import VideoNodePrismaAdapter from './adapters/VideoNode/VideoNodePrismaAdapter';
-import { SliderNodePrismaAdapterType } from './adapters/SliderNode/SliderNodePrismaAdapterType';
 import SliderNodePrismaAdapter from './adapters/SliderNode/SliderNodePrismaAdapter';
-import { QuestionOptionPrismaAdapterType } from './adapters/QuestionOption/QuestionOptionPrismaAdapterType';
 import QuestionOptionPrismaAdapter from './adapters/QuestionOption/QuestionOptionPrismaAdapter';
-import { EdgePrismaAdapterType } from '../edge/EdgePrismaAdapterType';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
-import { DialoguePrismaAdapterType } from '../questionnaire/DialoguePrismaAdapterType';
-import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
+import DialoguePrismaAdapter, { CreateQuestionInput, CreateQuestionsInput } from '../questionnaire/DialoguePrismaAdapter';
 
 
 const standardOptions = [{ value: 'Facilities' },
@@ -50,18 +39,18 @@ const productServicesOptions = [{ value: 'Quality' },
 { value: 'Friendliness' },
 { value: 'Other' }];
 
-class NodeService implements NodeServiceType {
+class NodeService {
   prisma: PrismaClient;
-  questionNodePrismaAdapter: QuestionNodePrismaAdapterType;
-  edgeService: EdgeServiceType;
-  linkPrismaAdapter: LinkPrismaAdapterType;
-  shareNodePrismaAdapter: ShareNodePrismaAdapterType;
-  questionConditionAdapter: QuestionConditionPrismaAdapterType;
-  videoNodePrismaAdapter: VideoNodePrismaAdapterType;
-  sliderNodePrismaAdapter: SliderNodePrismaAdapterType;
-  questionOptionPrismaAdapter: QuestionOptionPrismaAdapterType;
-  edgePrismaAdapter: EdgePrismaAdapterType;
-  dialoguePrismaAdapter: DialoguePrismaAdapterType;
+  questionNodePrismaAdapter: QuestionNodePrismaAdapter;
+  edgeService: EdgeService;
+  linkPrismaAdapter: LinkPrismaAdapter;
+  shareNodePrismaAdapter: ShareNodePrismaAdapter;
+  questionConditionAdapter: QuestionConditionPrismaAdapter;
+  videoNodePrismaAdapter: VideoNodePrismaAdapter;
+  sliderNodePrismaAdapter: SliderNodePrismaAdapter;
+  questionOptionPrismaAdapter: QuestionOptionPrismaAdapter;
+  edgePrismaAdapter: EdgePrismaAdapter;
+  dialoguePrismaAdapter: DialoguePrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
@@ -120,25 +109,9 @@ class NodeService implements NodeServiceType {
   }) {
     const { customerSlug, dialogueSlug, title, type, links, share, form } = input;
     const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(customerSlug, dialogueSlug);
-    return this.questionNodePrismaAdapter.create({
-      title,
-      type,
-      isLeaf: true,
-      links: {
-        create: links,
-      },
-      share: {
-        create: share,
-      },
-      form: {
-        create: form ? NodeService.saveCreateFormNodeInput(form) : undefined,
-      },
-      questionDialogue: {
-        connect: {
-          id: dialogue?.id,
-        },
-      },
-    })
+    if (!dialogue?.id) throw 'No Dialogue found to add CTA to!'
+    const ctaInput: CreateCTAInput = { title, type, links, share, form, dialogueId: dialogue.id }
+    return this.questionNodePrismaAdapter.createCTANode(ctaInput);
   }
 
   delete(id: string): Promise<QuestionNode> {
@@ -178,21 +151,18 @@ class NodeService implements NodeServiceType {
     }
 
     // If type is share, create a share connection (or update it)
-    if (input?.share && input?.share.id && input?.type === 'SHARE') {
-      await this.shareNodePrismaAdapter.upsert(input?.share.id, {
-        title: input?.share.title || '',
-        url: input?.share.url || '',
-        tooltip: input?.share.tooltip,
-        questionNode: {
-          connect: {
-            id: existingNode?.id,
-          },
-        },
-      },
+    if (input?.share && input?.share.id && input?.type === 'SHARE' && existingNode?.id) {
+      await this.shareNodePrismaAdapter.upsert(input?.share.id,
         {
           title: input?.share.title || '',
           url: input?.share.url || '',
-          tooltip: input?.share.tooltip,
+          tooltip: input?.share.tooltip || '',
+          questionId: existingNode?.id,
+        },
+        {
+          title: input?.share.title || '',
+          url: input?.share.url || '',
+          tooltip: input?.share.tooltip || '',
         },
       )
     }
@@ -212,33 +182,16 @@ class NodeService implements NodeServiceType {
       const removedFields = findDifference(existingNode?.form?.fields, input?.form?.fields);
 
       if (removedFields.length) {
-        await this.questionNodePrismaAdapter.update(input.id, {
-          form: {
-            update: {
-              fields: {
-                disconnect: removedFields.map((field) => ({ id: field?.id?.toString() || '' })),
-              },
-            },
-          },
-        });
+        const mappedFields = removedFields.map((field) => ({ id: field?.id?.toString() || '' }))
+        await this.questionNodePrismaAdapter.removeFormFields(input.id, mappedFields);
       }
 
       if (existingNode?.form) {
-        await this.questionNodePrismaAdapter.update(input.id, {
-          form: {
-            update: {
-              fields: {
-                upsert: this.saveEditFormNodeInput(input.form),
-              },
-            },
-          },
-        });
+        const fields = this.saveEditFormNodeInput(input.form) || [];
+        await this.questionNodePrismaAdapter.updateFieldsOfForm({ questionId: input.id, fields })
       } else {
-        await this.questionNodePrismaAdapter.update(input?.id, {
-          form: {
-            create: NodeService.saveCreateFormNodeInput(input.form),
-          },
-        });
+        const fields = NodeService.saveCreateFormNodeInput(input.form);
+        await this.questionNodePrismaAdapter.createFieldsOfForm({ questionId: input.id, fields });
       };
     };
 
@@ -288,26 +241,23 @@ class NodeService implements NodeServiceType {
     questionId: string,
   ) => {
     newLinks?.forEach(async (link) => {
-      await this.linkPrismaAdapter.upsert(link.id, {
-        title: link.title,
-        url: link.url || '',
-        type: link.type || 'API',
-        backgroundColor: link.backgroundColor,
-        iconUrl: link.iconUrl || '',
-        questionNode: {
-          connect: {
-            id: questionId,
-          },
-        },
-      },
+      await this.linkPrismaAdapter.upsertLink(link.id || '-1',
         {
-          title: link.title,
+          title: link.title || '',
           url: link.url || '',
           type: link.type || 'API',
-          backgroundColor: link.backgroundColor,
+          backgroundColor: link.backgroundColor || '',
           iconUrl: link.iconUrl || '',
+          questionId,
         },
-      )
+        {
+          title: link.title || '',
+          url: link.url || '',
+          type: link.type || 'API',
+          backgroundColor: link.backgroundColor || '',
+          iconUrl: link.iconUrl || '',
+        }
+      );
     });
   };
 
@@ -349,46 +299,23 @@ class NodeService implements NodeServiceType {
     isRoot: boolean = false,
     overrideLeafId: string = '',
     isLeaf: boolean = false) => {
-    const override = overrideLeafId ? {
-      connect: {
-        id: overrideLeafId,
-      },
-    } : null;
 
     const qOptions = options.length > 0 ? [
       ...options,
     ] : [];
 
-    const params: QuestionNodeCreateInput = override ? {
-      title,
-      questionDialogue: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: override,
-      type,
+    const params2: CreateQuestionInput =
+    {
       isRoot,
       isLeaf,
-      options: {
-        create: qOptions,
-      },
-    } : {
       title,
-      questionDialogue: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
       type,
-      isRoot,
-      isLeaf,
-      options: {
-        create: qOptions,
-      },
-    };
+      options: qOptions,
+      overrideLeafId,
+      dialogueId: questionnaireId,
+    }
 
-    return this.questionNodePrismaAdapter.create(params);
+    return this.questionNodePrismaAdapter.createQuestion(params2);
   };
 
   createTemplateLeafNodes = async (

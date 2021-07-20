@@ -16,13 +16,14 @@ export type CreateDialogueInput = {
   customerId: string
 };
 
-export type CreateQuestionsInput = Array<{
+export type CreateQuestionInput = {
   id?: string,
   isRoot?: boolean,
   isLeaf?: boolean,
   title: string,
   type: NodeType,
   overrideLeafId?: string,
+  dialogueId?: string,
   videoEmbeddedNode?: VideoEmbeddedNodeCreateWithoutQuestionNodeInput,
   options?: {
     publicValue: string | null;
@@ -51,7 +52,9 @@ export type CreateQuestionsInput = Array<{
       range: { start: number | null, end: number | null },
     }>
   }
-}>;
+}
+
+export type CreateQuestionsInput = Array<CreateQuestionInput>;
 
 class DialoguePrismaAdapter {
   prisma: PrismaClient;
