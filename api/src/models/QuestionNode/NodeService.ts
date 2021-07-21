@@ -13,31 +13,80 @@ import QuestionOptionPrismaAdapter from './adapters/QuestionOption/QuestionOptio
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter, { CreateQuestionInput, CreateQuestionsInput } from '../questionnaire/DialoguePrismaAdapter';
 
+interface LeafNodeDataEntryProps {
+  title: string;
+  type: NodeType;
+  links: any[];
+  form?: NexusGenInputs['FormNodeInputType'];
+}
 
-const standardOptions = [{ value: 'Facilities' },
-{ value: 'Website/Mobile app' },
-{ value: 'Product/Services' },
-{ value: 'Customer Support' }];
+interface QuestionOptionProps {
+  id?: number;
+  value: string;
+  publicValue?: string;
+  overrideLeafId?: string;
+  position: number;
+}
 
-const facilityOptions = [{ value: 'Cleanliness' },
-{ value: 'Atmosphere' },
-{ value: 'Location' },
-{ value: 'Other' }];
+interface EdgeChildProps {
+  id?: string;
+  conditions: [QuestionConditionProps];
+  parentNode: EdgeNodeProps;
+  childNode: EdgeNodeProps;
+}
 
-const websiteOptions = [{ value: 'Design' },
-{ value: 'Functionality' },
-{ value: 'Informative' },
-{ value: 'Other' }];
+interface QuestionConditionProps {
+  id?: number;
+  conditionType: string;
+  renderMin: number;
+  renderMax: number;
+  matchValue: string;
+}
 
-const customerSupportOptions = [{ value: 'Friendliness' },
-{ value: 'Competence' },
-{ value: 'Speed' },
-{ value: 'Other' }];
+interface EdgeNodeProps {
+  id: string;
+  title: string;
+}
 
-const productServicesOptions = [{ value: 'Quality' },
-{ value: 'Price' },
-{ value: 'Friendliness' },
-{ value: 'Other' }];
+interface LinkGenericInputProps {
+  type: 'SOCIAL' | 'API' | 'FACEBOOK' | 'LINKEDIN' | 'WHATSAPP' | 'INSTAGRAM' | 'TWITTER';
+  url: string;
+}
+
+const standardOptions = [
+  { value: 'Facilities', position: 1 },
+  { value: 'Website/Mobile app', position: 2 },
+  { value: 'Product/Services', position: 3 },
+  { value: 'Customer Support', position: 4 }
+];
+
+const facilityOptions = [
+  { value: 'Cleanliness', position: 1 },
+  { value: 'Atmosphere', position: 2 },
+  { value: 'Location', position: 3 },
+  { value: 'Other', position: 4 }
+];
+
+const websiteOptions = [
+  { value: 'Design', position: 1 },
+  { value: 'Functionality', position: 2 },
+  { value: 'Informative', position: 3 },
+  { value: 'Other', position: 4 }
+];
+
+const customerSupportOptions = [
+  { value: 'Friendliness', position: 1 },
+  { value: 'Competence', position: 2 },
+  { value: 'Speed', position: 3 },
+  { value: 'Other', position: 4 }
+];
+
+const productServicesOptions = [
+  { value: 'Quality', position: 1 },
+  { value: 'Price', position: 2 },
+  { value: 'Friendliness', position: 3 },
+  { value: 'Other', position: 4 }
+];
 
 class NodeService {
   prisma: PrismaClient;
@@ -226,11 +275,13 @@ class NodeService {
    * Save FormNodeInput when `creating`
    */
   static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeCreateInput => ({
+    helperText: input.helperText,
     fields: {
       create: input.fields?.map((field) => ({
         type: field.type || 'shortText',
-        label: field.label || 'Generic',
+        label: field.label || '',
         position: field.position || -1,
+        placeholder: field.placeholder || '',
         isRequired: field.isRequired || false,
       })),
     },
@@ -331,6 +382,7 @@ class NodeService {
         isRoot: false,
         isLeaf: true,
         form: {
+          helperText: '',
           fields: leaf?.form?.fields?.length ? leaf.form?.fields.map((field) => ({
             label: field.label || '',
             position: field.position || -1,
@@ -482,7 +534,7 @@ class NodeService {
     type: NodeType,
     overrideLeafId: string,
     parentQuestionId: string,
-    options: Array<QuestionOptionProps>,
+    options: QuestionOptionProps[],
     edgeCondition: {
       id: number | null,
       conditionType: string,
@@ -492,6 +544,7 @@ class NodeService {
     },
     extraContent: string | null,
   ) => {
+    // TODO: Add sliderNode when a new sliderNode is created (doesn't happen now because only root slider node)
     const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
     const videoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = extraContent ? { create: { videoUrl: extraContent } } : undefined;
     const newQuestion = await this.questionNodePrismaAdapter.create({
@@ -558,6 +611,8 @@ class NodeService {
     },
     sliderNode: NexusGenInputs['SliderNodeInputType'],
     extraContent: string | null | undefined,
+    happyText: string | null | undefined,
+    unhappyText: string | null | undefined,
   ) => {
     const activeQuestion = await this.questionNodePrismaAdapter.getDialogueBuilderNode(questionId);
 
@@ -567,19 +622,19 @@ class NodeService {
     const currentOverrideLeafId = activeQuestion?.overrideLeafId || null;
     const leaf = NodeService.getLeafState(currentOverrideLeafId, overrideLeafId);
 
-    const dbEdgeCondition = dbEdge?.conditions && dbEdge.conditions[0];
+    const existingEdgeCondition = dbEdge?.conditions && dbEdge.conditions[0];
 
 
     try {
-      await this.removeNonExistingQOptions(activeOptions, options, questionId);
+      await this.removeNonExistingQuestionOptions(activeOptions, options);
     } catch (e) {
       console.log('Something went wrong removing options: ', e);
     }
 
     // Updating any question except root question should have this edge
-    if (dbEdgeCondition) {
+    if (existingEdgeCondition) {
       try {
-        await this.updateEdge(dbEdgeCondition, edgeCondition);
+        await this.updateEdge(existingEdgeCondition, edgeCondition);
       } catch (e) {
         console.log('something went wrong updating edges: ', e.stack);
       }
@@ -626,6 +681,8 @@ class NodeService {
     } else if (type === NodeType.SLIDER) {
       if (updatedNode?.sliderNodeId) {
         await this.sliderNodePrismaAdapter.update(updatedNode.sliderNodeId, {
+          happyText: happyText || null,
+          unhappyText: unhappyText || null,
           markers: {
             update: sliderNode?.markers?.map((marker) => ({
               where: { id: marker?.id || undefined },
@@ -638,6 +695,8 @@ class NodeService {
         });
       } else {
         await this.sliderNodePrismaAdapter.create({
+          happyText: happyText || null,
+          unhappyText: unhappyText || null,
           QuestionNode: {
             connect: { id: questionId },
           },
@@ -660,13 +719,14 @@ class NodeService {
     return updatedNode;
   };
 
-  updateQuestionOptions = async (options: QuestionOptionProps[]) => Promise.all(
+  updateQuestionOptions = async (options: QuestionOptionProps[]): Promise<{ id: number }[]> => Promise.all(
     options?.map(async (option) => {
       const optionId = option.id ? option.id : -1
       const optionUpsertInput = {
         value: option.value,
         publicValue: option.publicValue,
-        overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
+        overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
+        position: option.position,
       }
       const updatedQOption = await this.questionOptionPrismaAdapter.upsert(optionId, optionUpsertInput, optionUpsertInput);
 
@@ -683,16 +743,17 @@ class NodeService {
     return { id: condition.id };
   };
 
-  removeNonExistingQOptions = async (
-    activeOptions: Array<number>,
-    newOptions: Array<QuestionOptionProps>,
-    questionId: string) => {
-    if (questionId) {
-      const newOptioIds = newOptions?.map(({ id }) => id);
-      const removeQOptionsIds = activeOptions?.filter((id) => (!newOptioIds.includes(id) && id));
-      if (removeQOptionsIds?.length > 0) {
-        await this.questionOptionPrismaAdapter.deleteMany(removeQOptionsIds);
-      }
+  removeNonExistingQuestionOptions = async (
+    existingOptions: number[],
+    newOptions: QuestionOptionProps[],
+  ) => {
+    // TODO: Eventually check if any existing entries exist (so that we can block removing interacted values).
+    const newOptionIds = newOptions?.map(({ id }) => id);
+
+    const removeQuestionOptionsIds = existingOptions?.filter((id) => (!newOptionIds.includes(id) && id));
+
+    if (removeQuestionOptionsIds?.length > 0) {
+      await this.questionOptionPrismaAdapter.deleteMany(removeQuestionOptionsIds);
     }
   };
 

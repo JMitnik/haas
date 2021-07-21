@@ -41,6 +41,8 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
       </Div>
       <Div>
         <Slider
+          happyText={node.sliderNode?.happyText}
+          unhappyText={node.sliderNode?.unhappyText}
           markers={node?.sliderNode?.markers || []}
           form={form}
           onSubmit={handleSubmit}

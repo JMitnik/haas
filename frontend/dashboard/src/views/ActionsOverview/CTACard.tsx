@@ -82,7 +82,9 @@ const OverflowSpan = styled(Span)`
   `}
 `;
 
-const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, Icon, onNewCTAChange, form }: CTACardProps) => {
+const CTACard = (
+  { id, activeCTA, onActiveCTAChange, title, type, links, share, Icon, onNewCTAChange, form }: CTACardProps,
+) => {
   const toast = useToast();
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();

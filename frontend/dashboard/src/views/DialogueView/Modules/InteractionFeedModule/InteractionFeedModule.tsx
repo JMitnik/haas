@@ -1,17 +1,14 @@
+import { Card, CardBody, Div, Flex, H4, Text } from '@haas/ui';
+import { Info } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-import { Card, CardBody, Div, Flex, H4, Text } from '@haas/ui';
-import { useTranslation } from 'react-i18next';
-
-import { Info } from 'react-feather';
-import {
-  dialogueStatistics_customer_dialogue_sessions as Session,
-} from 'views/DialogueView/__generated__/dialogueStatistics';
+import { Session } from 'types/generated-types';
 
 import { InteractionFeedEntriesContainer } from './InteractionFeedModuleStyles';
 import InteractionFeedEntry from './InteractionFeedEntry';
 
-const InteractionFeedModule = ({ interactions } : { interactions: Session[] }) => {
+const InteractionFeedModule = ({ interactions }: { interactions: Session[] }) => {
   const { t } = useTranslation();
 
   return (

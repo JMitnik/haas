@@ -3,6 +3,7 @@ import React from 'react';
 
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import { ReactComponent as Whatsapp } from 'assets/icons/icon-whatsapp.svg';
 import CustomIcon from 'components/Icons/CustomIcon';
 
 import { GenericNodeProps } from '../types';
@@ -54,7 +55,7 @@ const DefaultSocialItems = (handleLinkClick: any) => (
   </>
 );
 
-const SocialShareNode = ({ node, onQueueOnlyStore }: SocialShareNodeProps) => {
+const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   // TODO: Use the social capabilities of this event to enqueue
   const handleLinkClick = (event: any) => {
     console.log(event);
@@ -80,9 +81,10 @@ const SocialShareNode = ({ node, onQueueOnlyStore }: SocialShareNodeProps) => {
             {link.type === 'FACEBOOK' && <Facebook stroke="none" fill="white" />}
             {link.type === 'INSTAGRAM' && <Instagram stroke="white" />}
             {link.type === 'LINKEDIN' && <Linkedin stroke="none" fill="white" />}
-            {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && link.iconUrl)
+            {link.type === 'WHATSAPP' && <Whatsapp stroke="none" fill="white" />}
+            {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'WHATSAPP'].includes(link.type) && link.iconUrl)
               && <CustomIcon logo={link.iconUrl} />}
-            {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && !link.iconUrl)
+            {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'WHATSAPP'].includes(link.type) && !link.iconUrl)
               && <Globe data-testid="globe" stroke="white" />}
           </ShareItem>
         ))}

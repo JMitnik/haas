@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    yes: {
+      en: 'Yes',
+      de: 'Ja',
+    },
+    no: {
+      en: 'No',
+      de: 'Nein',
+    },
     general: {
       en: 'General',
       de: 'General',
@@ -233,6 +241,10 @@ const language = {
       en: 'Campaigns',
       de: 'Kampagnen',
     },
+    placeholder: {
+      en: 'Field placeholder',
+      de: 'Feldplatzhalter',
+    },
     is_required: {
       en: 'Is the field required?',
       de: 'Ist das Feld erforderlich?',
@@ -248,6 +260,18 @@ const language = {
     empty_field: {
       en: 'Empty field',
       de: 'Leeres Feld',
+    },
+    form_helpertext_placeholder: {
+      en: 'Let us know',
+      de: 'Lass uns wissen',
+    },
+    about_form_helpertext_header: {
+      en: 'Helper text',
+      de: 'Helfertext',
+    },
+    about_form_helpertext_helper: {
+      en: 'Inspire your users to share their story with a helper text at the top.',
+      de: 'Inspirieren Sie Ihre Benutzer, ihre Geschichte mit einem Hilfstext oben zu teilen.',
     },
     about_fields_header: {
       en: 'Fields',
@@ -266,6 +290,14 @@ const language = {
     not_required_helper: {
       en: 'User can leave this empty',
       de: 'Benutzer kann dies leer lassen',
+    },
+    logo_opacity_helper: {
+      en: 'Decide how opaque the logo will be in the dialogue.',
+      de: 'Entscheiden Sie, wie undurchsichtig das Logo im Dialog sein soll.',
+    },
+    logo_opacity: {
+      en: 'Logo opaqueness',
+      de: 'Logo Undurchsichtigkeit',
     },
     required_helper: {
       en: 'User must fill this in.',
@@ -644,9 +676,9 @@ const language = {
       de: 'Eingebettete Video-ID',
     },
     video_embedded_helper: {
-      en: `What is the ID of the video you want to display at the question? 
+      en: `What is the ID of the video you want to display at the question?
 This ID can be found in the URL of the video. Currently only youtube is supported.`,
-      de: `Wie lautet die ID des Videos, das Sie anzeigen möchten? 
+      de: `Wie lautet die ID des Videos, das Sie anzeigen möchten?
 Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt.`,
     },
     max_value: {
@@ -1281,6 +1313,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   dialogue: {
+    language_helper: {
+      en: 'Choose in which language the dialogue should be shown',
+      de: 'Wählen Sie aus, in welcher Sprache der Dialog angezeigt werden soll',
+    },
     choices: {
       en: 'Choices',
       de: 'Entscheidungen',
@@ -1290,6 +1326,66 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
         'Choices of this question define what potential answer a visitor can give. Furthermore, it is also possible to optionally connect a Call-to-Action to the option the user selects. Note: if a Call-to-Action further in the journey is setup, this one will be overriden.',
       de:
         'Die Auswahl dieser Frage definiert, welche potenzielle Antwort ein Besucher geben kann. Darüber hinaus ist es auch möglich, optional eine Handlungsaufforderung mit der vom Benutzer ausgewählten Option zu verbinden. Hinweis: Wenn eine Handlungsaufforderung weiter unten auf der Reise eingerichtet wird, wird diese überschrieben.',
+    },
+    language: {
+      en: '',
+      de: '',
+    },
+    finisher_heading: {
+      en: 'Dialogue finisher heading',
+      de: 'Überschrift des Dialog-Finishers',
+    },
+    finisher_heading_helper: {
+      en: 'What is the main heading at the top of the dialogue finish?',
+      de: 'Was ist die Hauptüberschrift an der Spitze des Dialogs?',
+    },
+    finisher_subheading: {
+      en: 'Dialogue finisher subheading',
+      de: 'Zwischenüberschrift des Dialog-Finishers',
+    },
+    finisher_subheading_helper: {
+      en: 'What is the sub-heading at the bottom of the dialogue finish?',
+      de: 'Was ist die Subüberschrift am Boden des Dialogs?',
+    },
+    dialogue_finisher: {
+      en: 'Dialogue finisher',
+      de: 'Dialogue-Finisher',
+    },
+    dialogue_finisher_helper: {
+      en: 'The dialogue finisher is the very last page shown after finalizing a CTA. In this section you can adjust the heading and subheading of this page.',
+      de: 'Der Dialog-Finisher ist die letzte Seite, die nach dem Abschluss eines CTA angezeigt wird. In diesem Abschnitt können Sie die Überschrift und Unterüberschrift dieser Seite anpassen.',
+    },
+    satisfaction_texts: {
+      en: 'Satisfaction texts',
+      de: 'Satisfaction texts',
+    },
+    satisfaction_texts_helper: {
+      en: 'Satisfaction texts are the texts shown on both sides of the slider. You can edit the relevant texts, or leave them as we defined originally. ',
+      de: 'Legen Sie die Zufriedenheitstexte fest, die auf beiden Seiten des Schiebereglers angezeigt werden',
+    },
+    happyText: {
+      en: 'Happy text',
+      de: 'Fröhlicher Text',
+    },
+    happyText_helper: {
+      en: 'What will be the text on the right side of the slider indicating a very satisfied user?',
+      de: 'Welcher Text auf der rechten Seite des Schiebereglers weist auf einen sehr zufriedenen Benutzer hin?',
+    },
+    unhappyText: {
+      en: 'Unhappy text',
+      de: 'Unglücklicher Text',
+    },
+    unhappyText_helper: {
+      en: 'What will be the text on the left side of the slider indicating a very dissatisfied user?',
+      de: 'Welcher Text auf der linken Seite des Schiebereglers weist auf einen sehr unzufriedenen Benutzer hin?',
+    },
+    use_custom_satisfaction_text: {
+      en: 'Use custom text',
+      de: 'Benutzerdefinierten Text verwenden',
+    },
+    do_not_use_custom_satisfaction_text: {
+      en: 'Do not use custom text',
+      de: 'Verwenden Sie keinen benutzerdefinierten Text',
     },
     markers: {
       en: 'Markers',
@@ -1311,15 +1407,15 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
     about_choice_helper: {
       en: 'Define the different choices a user can select.',
-      de: 'Definieren Sie die verschiedenen Auswahlmöglichkeiten, die ein Benutzer auswählen kann',
+      de: 'Definieren Sie die verschiedenen Auswahlmöglichkeiten, die ein Benutzer auswählen kann.',
     },
     hide_fake_data: {
       en: 'Hide placeholder data',
       de: 'Ausblenden Platzhalter-Daten',
     },
     hide_fake_data_helper: {
-      en: 'Decide whether to use placeholder data in your analytics',
-      de: 'Entscheiden Sie, ob Platzhalterdaten in Ihrer Analyse verwendet werden sollen',
+      en: 'Decide whether to use placeholder data in your analytics.',
+      de: 'Entscheiden Sie, ob Platzhalterdaten in Ihrer Analyse verwendet werden sollen.',
     },
     do_hide_fake_data_helper: {
       en: "Don't include placeholder data in the analytics.",
@@ -1358,8 +1454,8 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Beschreibung',
     },
     about_helper: {
-      de: 'Beschreibe deinen Dialog',
-      en: 'Tell us about the dialogue',
+      en: 'General information about your dialogue, such as its general title, at what URL it can be found, and a readable description.',
+      de: 'Allgemeine Informationen zu Ihrem Dialog, z. B. seines allgemeinen Titels, in welcher URL ermittelt, und eine lesbare Beschreibung.',
     },
     title_helper: {
       en: 'What is the name of the dialogue?',
@@ -1941,6 +2037,20 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     match_text_helper: {
       en: 'What text should be matched to trigger the alert?',
       de: 'Welche Textübereinstimmung soll die Push-Benachrichtigung auslösen?',
+    },
+  },
+  languages: {
+    english: {
+      en: 'English',
+      de: 'Englisch',
+    },
+    german: {
+      en: 'German',
+      de: 'Deutsche',
+    },
+    dutch: {
+      en: 'Dutch',
+      de: 'Niederländisch',
     },
   },
 };

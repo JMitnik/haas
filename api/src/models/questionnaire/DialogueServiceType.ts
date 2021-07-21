@@ -1,4 +1,4 @@
-import { Dialogue, Tag, QuestionNode, FormNode, FormNodeField, SliderNode, SliderNodeMarker, SliderNodeRange, Edge } from "@prisma/client";
+import { Dialogue, Tag, QuestionNode, FormNode, FormNodeField, SliderNode, SliderNodeMarker, SliderNodeRange, Edge, LanguageEnum } from "@prisma/client";
 import { WorkspaceTemplate } from "../templates/defaultWorkspaceTemplate";
 import { NexusGenInputs } from "../../generated/nexus";
 
@@ -10,6 +10,7 @@ export interface CopyDialogueInputType {
   publicTitle: string;
   description: string;
   dialogueTags: { entries?: string[] | null | undefined; } | null | undefined;
+  language: LanguageEnum;
 }
 
 export interface DialogueServiceType {

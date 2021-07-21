@@ -1,7 +1,9 @@
 import { Instance, types } from 'mobx-state-tree';
+
 import { SpecialEdge, TreeNodeModel, TreeNodeProps, createDefaultPostLeafNode } from './TreeNodeModel';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 import { TreeNodeOptionProps } from './TreeNodeOptionModel';
+import TreeDialogueFinisherModel from './TreeDialogueFinisherModel';
 
 const TreeModel = types
   .model({
@@ -13,6 +15,7 @@ const TreeModel = types
     edges: types.array(TreeEdgeModel),
     leaves: types.array(TreeNodeModel),
     activeLeaf: types.reference(TreeNodeModel),
+    dialogueFinisher: types.maybe(TreeDialogueFinisherModel),
   })
   .actions((self) => ({
     /**
@@ -82,7 +85,7 @@ const TreeModel = types
     getChildNodeByEdge(edgeId: string | undefined): TreeNodeProps | null {
       if (!edgeId) return null;
 
-      const edge: TreeEdgeProps | null = self.edges.find((edge: TreeEdgeProps) => edge.id === edgeId);
+      const edge: TreeEdgeProps | null = self.edges.find((edgeItem: TreeEdgeProps) => edgeItem.id === edgeId);
 
       if (edgeId === SpecialEdge.POST_LEAF_EDGE_ID) {
         return createDefaultPostLeafNode();
@@ -102,8 +105,8 @@ const TreeModel = types
     getNodeById(nodeId: string | undefined): TreeNodeProps | null {
       if (!nodeId) return null;
 
-      const node = self.nodes.find((node) => node.id === nodeId);
-      const leaf = self.leaves.find((node) => node.id === nodeId);
+      const node = self.nodes.find((nodeItem) => nodeItem.id === nodeId);
+      const leaf = self.leaves.find((nodeItem) => nodeItem.id === nodeId);
 
       return node || leaf || null;
     },
@@ -140,6 +143,6 @@ const TreeModel = types
     },
   }));
 
-export interface TreeModelProps extends Instance<typeof TreeModel>{}
+export interface TreeModelProps extends Instance<typeof TreeModel> { }
 
 export default TreeModel;

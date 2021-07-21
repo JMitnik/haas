@@ -25,6 +25,10 @@ export const CustomerSettingsType = objectType({
   definition(t) {
     t.id('id');
     t.string('logoUrl', { nullable: true });
+    t.string('logoUrl', { nullable: true });
+
+    // On a schale of 1-100
+    t.int('logoOpacity', { nullable: true, resolve: (parent) => parent.logoOpacity ?? 30 });
 
     t.field('colourSettings', {
       type: ColourSettingsType,

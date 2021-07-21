@@ -83,6 +83,7 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
           },
           include: {
             tags: true,
+            postLeafNode: true,
           },
         },
       },

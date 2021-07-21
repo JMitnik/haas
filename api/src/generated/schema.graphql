@@ -131,6 +131,7 @@ input CreateDialogueInputType {
   description: String
   dialogueSlug: String
   isSeed: Boolean
+  language: LanguageEnumType
   publicTitle: String
   tags: TagsInputObjectType
   templateDialogueId: String
@@ -148,11 +149,13 @@ input CreateQuestionNodeInputType {
   dialogueSlug: String
   edgeCondition: EdgeConditionInputType
   extraContent: String
+  happyText: String
   optionEntries: OptionsInputType
   overrideLeafId: ID
   parentQuestionId: ID
   title: String
   type: String
+  unhappyText: String
 }
 
 input CreateTriggerInputType {
@@ -165,6 +168,7 @@ input CreateTriggerInputType {
 input CreateWorkspaceInput {
   isSeed: Boolean = false
   logo: String
+  logoOpacity: Int
   name: String!
   primaryColour: String!
   slug: String!
@@ -225,6 +229,7 @@ type CustomerSettings {
   colourSettings: ColourSettings
   fontSettings: FontSettings
   id: ID!
+  logoOpacity: Int
   logoUrl: String
 }
 
@@ -325,7 +330,9 @@ type Dialogue {
   edges: [Edge!]!
   id: ID!
   isWithoutGenData: Boolean!
+  language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
+  postLeafNode: DialogueFinisherObjectType
   publicTitle: String
   questions: [QuestionNode!]!
   rootQuestion: QuestionNode!
@@ -343,6 +350,12 @@ input DialogueFilterInputType {
   endDate: String
   searchTerm: String
   startDate: String
+}
+
+type DialogueFinisherObjectType {
+  header: String!
+  id: ID!
+  subtext: String!
 }
 
 type DialogueStatistics {
@@ -400,6 +413,7 @@ input EditWorkspaceInput {
   customerSlug: String!
   id: ID!
   logo: String
+  logoOpacity: Int
   name: String!
   primaryColour: String!
   slug: String!
@@ -449,6 +463,7 @@ type FormNodeField {
   id: ID!
   isRequired: Boolean!
   label: String!
+  placeholder: String
   position: Int!
   type: FormNodeFieldTypeEnum!
 }
@@ -457,6 +472,7 @@ input FormNodeFieldInput {
   id: ID
   isRequired: Boolean = false
   label: String
+  placeholder: String
   position: Int
   type: FormNodeFieldTypeEnum
 }
@@ -473,11 +489,13 @@ enum FormNodeFieldTypeEnum {
 
 input FormNodeInputType {
   fields: [FormNodeFieldInput!]
+  helperText: String
   id: String
 }
 
 type FormNodeType {
   fields: [FormNodeField!]!
+  helperText: String
   id: String
 }
 
@@ -578,6 +596,12 @@ enum JobStatusType {
   WRAPPING_UP
 }
 
+enum LanguageEnumType {
+  DUTCH
+  ENGLISH
+  GERMAN
+}
+
 type lineChartDataType {
   entryId: String
   x: String
@@ -643,7 +667,7 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
-  editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editDialogue(customerSlug: String, description: String, dialogueFinisherHeading: String, dialogueFinisherSubheading: String, dialogueSlug: String, isWithoutGenData: Boolean, language: LanguageEnumType, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
@@ -692,6 +716,7 @@ input NodeEntryDataInput {
   register: RegisterNodeEntryInput
   slider: SliderNodeEntryInput
   textbox: TextboxNodeEntryInput
+  video: VideoNodeEntryInput
 }
 
 """Input type for node-entry metadata"""
@@ -709,11 +734,13 @@ type NodeEntryValue {
   registrationNodeEntry: String
   sliderNodeEntry: Int
   textboxNodeEntry: String
+  videoNodeEntry: String
 }
 
 input OptionInputType {
   id: Int
   overrideLeafId: String
+  position: Int!
   publicValue: String
   value: String
 }
@@ -874,6 +901,7 @@ input QuestionNodeWhereUniqueInput {
 type QuestionOption {
   id: Int!
   overrideLeaf: QuestionNode
+  position: Int
   publicValue: String
   questionId: String
   value: String!
@@ -1040,8 +1068,10 @@ type SliderNodeRangeType {
 }
 
 type SliderNodeType {
+  happyText: String
   id: ID
   markers: [SliderNodeMarkerType!]
+  unhappyText: String
 }
 
 """Details regarding interaction with social node"""
@@ -1177,12 +1207,14 @@ input UpdateQuestionNodeInputType {
   edgeCondition: EdgeConditionInputType
   edgeId: ID
   extraContent: String
+  happyText: String
   id: ID!
   optionEntries: OptionsInputType
   overrideLeafId: ID
   sliderNode: SliderNodeInputType
   title: String
   type: String
+  unhappyText: String
 }
 
 """The `Upload` scalar type represents a file upload."""
@@ -1241,4 +1273,9 @@ type VerifyUserTokenOutput {
   accessToken: String!
   accessTokenExpiry: Int!
   userData: UserType!
+}
+
+"""Input type for a video node"""
+input VideoNodeEntryInput {
+  value: String
 }

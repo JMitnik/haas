@@ -39,6 +39,8 @@ export type CreateQuestionInput = {
   options?: {
     publicValue: string | null;
     value: string;
+    position: number | null;
+    overrideLeafId?: string;
   }[],
   links?: Array<{
     title: string | null;
@@ -48,6 +50,7 @@ export type CreateQuestionInput = {
     backgroundColor: string | null
   }>,
   form?: {
+    helperText?: string;
     fields: Array<{
       label: string,
       type: FormNodeFieldType,
@@ -96,7 +99,16 @@ class DialoguePrismaAdapter {
               create: question.links,
             } : undefined,
             options: question.options?.length ? {
-              create: question.options,
+              create: question.options.map(({ overrideLeafId, position, publicValue, value }) => ({
+                value,
+                position,
+                publicValue,
+                overrideLeaf: overrideLeafId ? {
+                  connect: {
+                    id: overrideLeafId,
+                  }
+                } : undefined
+              })),
             } : undefined,
             overrideLeaf: question.overrideLeafId ? {
               connect: {
@@ -340,12 +352,7 @@ class DialoguePrismaAdapter {
                 fields: true,
               },
             },
-            options: {
-              select: {
-                publicValue: true,
-                value: true,
-              },
-            },
+            options: true,
             overrideLeaf: {
               select: {
                 id: true,

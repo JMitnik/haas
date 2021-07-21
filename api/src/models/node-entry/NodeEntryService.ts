@@ -67,6 +67,10 @@ class NodeEntryService {
     relatedEdge: (nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } }) || undefined,
     depth: nodeEntryInput?.depth,
 
+    videoNodeEntry: nodeEntryInput?.data?.video?.value ? {
+      create: { value: nodeEntryInput?.data?.video?.value },
+    } : undefined,
+
     choiceNodeEntry: nodeEntryInput?.data?.choice?.value ? {
       create: { value: nodeEntryInput?.data?.choice?.value },
     } : undefined,
@@ -211,6 +215,14 @@ class NodeEntryService {
       OR: [
         {
           textboxNodeEntry: {
+            value: {
+              contains: text,
+              mode: 'insensitive',
+            },
+          }
+        },
+        {
+          videoNodeEntry: {
             value: {
               contains: text,
               mode: 'insensitive',

@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import React from 'react';
 import Select from 'react-select';
 import styled, { css } from 'styled-components';
+
 import { CustomerCardEnqueteLabel, CustomerCardImage } from './CustomerCardStyles';
 
 // TODO: Reconcile with regular Card

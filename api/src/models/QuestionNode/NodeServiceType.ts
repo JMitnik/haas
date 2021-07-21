@@ -7,6 +7,7 @@ export interface QuestionOptionProps {
   value: string;
   publicValue?: string;
   overrideLeafId?: string;
+  position: number;
 }
 export interface LinkGenericInputProps {
   type: 'SOCIAL' | 'API' | 'FACEBOOK' | 'LINKEDIN' | 'WHATSAPP' | 'INSTAGRAM' | 'TWITTER';

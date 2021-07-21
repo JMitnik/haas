@@ -4,9 +4,17 @@ import cuid from 'cuid';
 
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import {
-  Dialogue, DialogueCreateInput, DialogueUpdateInput,
+  Dialogue,
+  DialogueCreateInput,
+  DialogueUpdateInput,
+  LanguageEnum,
   NodeType,
-  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, PrismaClient, SessionCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, Edge
+  PrismaClient,
+  SessionCreateInput,
+  Edge,
+  PostLeafNode,
+  PostLeafNodeUpdateOneWithoutDialogueInput,
+  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import NodeService from '../QuestionNode/NodeService';
@@ -125,10 +133,12 @@ class DialogueService {
     description: string,
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
+    language: LanguageEnum,
   ): DialogueCreateInput {
     const constructDialogueFragment = {
       customer: { connect: { id: customerId } },
       title,
+      language,
       slug: dialogueSlug,
       description,
       publicTitle,
@@ -188,12 +198,58 @@ class DialogueService {
     return updateDialogueArgs;
   };
 
+  static updatePostLeafNode(
+    dbPostLeaf: PostLeafNode | null | undefined,
+    heading: string | null | undefined,
+    subHeading: string | null | undefined,
+  ): PostLeafNodeUpdateOneWithoutDialogueInput | undefined {
+    if (!dbPostLeaf && !heading && !subHeading) {
+      return undefined;
+    } else if (dbPostLeaf && !heading && !subHeading) {
+      return { disconnect: true };
+    } else if (dbPostLeaf && (heading || subHeading)) {
+      return {
+        update: {
+          header: heading || '',
+          subtext: subHeading || '',
+        }
+      };
+    } else if (!dbPostLeaf && (heading || subHeading)) {
+      return {
+        create: {
+          header: heading || '',
+          subtext: subHeading || '',
+        }
+      }
+    }
+    return undefined;
+  }
+
   editDialogue = async (args: any) => {
-    const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData } = args;
+    const {
+      customerSlug,
+      dialogueSlug,
+      title,
+      description,
+      publicTitle,
+      tags,
+      isWithoutGenData,
+      dialogueFinisherHeading,
+      dialogueFinisherSubheading,
+      language
+    } = args;
 
     const dbDialogue = await this.customerPrismaAdapter.getDialogueTags(customerSlug, dialogueSlug);
 
-    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle, isWithoutGenData };
+    const postLeafNode = DialogueService.updatePostLeafNode(
+      dbDialogue?.postLeafNode,
+      dialogueFinisherHeading,
+      dialogueFinisherSubheading
+    );
+
+    let updateDialogueArgs: DialogueUpdateInput = {
+      title, description, publicTitle, isWithoutGenData, postLeafNode, language
+    };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
     }
@@ -394,11 +450,12 @@ class DialogueService {
     description: string,
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
+    language: LanguageEnum,
   ) => {
     try {
       const dialogue = await this.dialoguePrismaAdapter.create({
         data: DialogueService.constructDialogue(
-          customerId, title, dialogueSlug, description, publicTitle, tags,
+          customerId, title, dialogueSlug, description, publicTitle, tags, language,
         ),
       });
 
@@ -428,7 +485,7 @@ class DialogueService {
 
     const idMap: IdMapProps = {};
     const dialogue = await this.initDialogue(
-      customer.id, input.title, input.dialogueSlug, input.description, input.publicTitle, tags,
+      customer.id, input.title, input.dialogueSlug, input.description, input.publicTitle, tags, input.language,
     );
 
     if (!dialogue) throw new Error('Dialogue not copied');
@@ -459,14 +516,25 @@ class DialogueService {
         ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } }
         : undefined
       const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
-      const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
+      const mappedOptions = question.options.map((option) => {
+        const { overrideLeafId, position, publicValue, value } = option;
+        const mappedOverrideLeafId = overrideLeafId && idMap[overrideLeafId];
+
+        return {
+          position,
+          publicValue,
+          value,
+          overrideLeafId: mappedOverrideLeafId || undefined
+        };
+      });
+
       const mappedObject = {
         ...question,
         id: mappedId,
         videoEmbeddedNode: mappedVideoEmbeddedNode,
         questionDialogueId: mappedDialogueId,
         links: { create: mappedLinks },
-        options: question.options, // TODO: Check if normal options work if not switch back to mappedOptions
+        options: mappedOptions,
         overrideLeafId: mappedOverrideLeafId,
         overrideLeaf: mappedOverrideLeaf,
         isOverrideLeafOf: mappedIsOverrideLeafOf,
@@ -483,7 +551,6 @@ class DialogueService {
       title: leaf.title,
       type: leaf.type,
       links: leaf.links?.create?.map((link) => link) || [],
-
       form: leaf.form ? {
         fields: leaf.form?.fields?.map((field) => ({
           label: field?.label,
@@ -507,6 +574,7 @@ class DialogueService {
 
     // Create question nodes
     const questions = updatedTemplateQuestions?.filter((question) => !question.isLeaf);
+    // TODO: Check if this map still works with new createNodes function (I don't think it does...)
     const mappedQuestions: CreateQuestionsInput = questions?.map((leaf) => ({
       id: leaf.id,
       isRoot: leaf.isRoot,
@@ -514,11 +582,7 @@ class DialogueService {
       title: leaf.title,
       type: leaf.type,
       options: leaf.options,
-      overrideLeaf: leaf.overrideLeaf?.id ? {
-        connect: {
-          id: leaf.overrideLeaf.id,
-        }
-      } : undefined,
+      overrideLeafId: leaf.overrideLeaf?.id,
       videoEmbeddedNode: leaf.videoEmbeddedNode?.create?.videoUrl
         ? { videoUrl: leaf.videoEmbeddedNode?.create?.videoUrl }
         : undefined,
@@ -575,6 +639,10 @@ class DialogueService {
       throw new Error('Description required, not found!');
     }
 
+    if (!input.language) {
+      throw new Error('Language required, not found!');
+    }
+
     if (customers.length > 1) {
       // TODO: Make this a logger or something
       console.warn(`Multiple customers found with slug ${input.customerSlug}`);
@@ -594,12 +662,12 @@ class DialogueService {
         input.title,
         input.description,
         dialogueTags,
+        input.language,
       );
     }
 
     if (input.contentType === 'TEMPLATE' && input.templateDialogueId) {
       // FIXME: Tags are not copied over
-
       const copyDialogueInput: CopyDialogueInputType = {
         customerSlug: customer.slug,
         description: input.description,
@@ -608,6 +676,7 @@ class DialogueService {
         publicTitle: input.publicTitle || '',
         templateId: input.templateDialogueId,
         title: input.title,
+        language: input.language,
       }
       return this.copyDialogue(copyDialogueInput);
     }
@@ -619,6 +688,7 @@ class DialogueService {
       input.description,
       input.publicTitle || '',
       dialogueTags,
+      input.language,
     );
 
     if (!dialogue) throw new ApolloError('customer:unable_to_create');
@@ -647,9 +717,10 @@ class DialogueService {
     dialogueTitle: string = 'Default dialogue',
     dialogueDescription: string = 'Default questions',
     tags: Array<{ id: string }>,
+    language: LanguageEnum = 'ENGLISH',
   ): Promise<Dialogue> => {
     const dialogue = await this.initDialogue(
-      customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags,
+      customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags, language,
     );
 
     if (!dialogue) throw new Error('Dialogue not seeded');
