@@ -156,7 +156,14 @@ class QuestionNodePrismaAdapter {
           create: question.links,
         } : undefined,
         options: question.options?.length ? {
-          create: question.options,
+          create: question.options.map(({ value, overrideLeafId, publicValue, position }) => {
+            return {
+              value,
+              publicValue,
+              position,
+              overrideLeaf: overrideLeafId ? { connect: { id: overrideLeafId } } : undefined
+            }
+          }),
         } : undefined,
         overrideLeaf: question.overrideLeafId ? {
           connect: {

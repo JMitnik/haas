@@ -37,7 +37,7 @@ export type CreateQuestionInput = {
   dialogueId?: string,
   videoEmbeddedNode?: VideoEmbeddedNodeCreateWithoutQuestionNodeInput,
   options?: {
-    publicValue: string | null;
+    publicValue?: string | null;
     value: string;
     position: number | null;
     overrideLeafId?: string;

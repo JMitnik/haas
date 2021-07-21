@@ -315,7 +315,7 @@ class NodeService {
       ...options,
     ] : [];
 
-    const params2: CreateQuestionInput =
+    const params: CreateQuestionInput =
     {
       isRoot,
       isLeaf,
@@ -326,7 +326,7 @@ class NodeService {
       dialogueId: questionnaireId,
     }
 
-    return this.questionNodePrismaAdapter.createQuestion(params2);
+    return this.questionNodePrismaAdapter.createQuestion(params);
   };
 
   createTemplateLeafNodes = async (
@@ -505,26 +505,19 @@ class NodeService {
     extraContent: string | null,
   ) => {
     // TODO: Add sliderNode when a new sliderNode is created (doesn't happen now because only root slider node)
-    const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
-    const videoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = extraContent ? { create: { videoUrl: extraContent } } : undefined;
-    const newQuestion = await this.questionNodePrismaAdapter.create({
+    const params: CreateQuestionInput =
+    {
+      isRoot: false,
+      isLeaf: false,
       title,
       type,
-      videoEmbeddedNode,
-      overrideLeaf: leaf || undefined,
-      options: {
-        create: options.map((option) => ({
-          value: option.value,
-          publicValue: option.publicValue,
-          overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
-        })),
-      },
-      questionDialogue: {
-        connect: {
-          id: dialogueId,
-        },
-      },
-    });
+      options,
+      overrideLeafId,
+      dialogueId,
+      videoEmbeddedNode: extraContent ? { videoUrl: extraContent } : undefined,
+    }
+
+    const newQuestion = await this.questionNodePrismaAdapter.createQuestion(params);
 
     await this.edgePrismaAdapter.create({
       dialogue: {
