@@ -729,6 +729,10 @@ model Delivery {
 
   events DeliveryEvents[]
 
+  // Connection to subscription
+  subscriptionId  String?
+  subscription  Subscription? @relation(fields: [subscriptionId], references: [id])
+
   scheduledAt DateTime
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
@@ -741,4 +745,43 @@ model DeliveryEvents {
   createdAt  DateTime               @default(now())
   deliveryId String?
   Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
+}
+
+model Subscription {
+  id  String @id @default(cuid())
+
+  consumerId  String
+  consumer  Consumer @relation(fields: [consumerId], references: [id])
+
+  // State related properties
+  isDisabled  String?
+
+  // Context connections
+  deliveries  Delivery[]
+
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Consumer {
+  id  String  @id @default(cuid())
+
+  // For basic data
+  firstName String?
+  lastName String?
+  email     String?
+  phoneNumber   String?
+
+  // For properties related to external connections
+  externalId  String?
+  externalSource  String?
+
+  // State related properties
+  isDisabled  Boolean @default(false)
+
+  subscriptions Subscription[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
