@@ -60,6 +60,11 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
     });
   };
 
+  const topic = form.watch('topic');
+
+  const hasSelectedTopic = !!topic;
+  const choiceGridColumns = hasSelectedTopic ? '2fr 2fr 2fr 1fr' : '2fr 2fr 1fr';
+
   return (
     <UI.Div>
       <UI.InputHeader>{t('dialogue:choices')}</UI.InputHeader>
@@ -77,7 +82,10 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
         >
           {choicesForm.fields.length ? (
             <>
-              <UI.Grid gridTemplateColumns="2fr 2fr 1fr">
+              <UI.Grid gridTemplateColumns={choiceGridColumns}>
+                {hasSelectedTopic && (
+                  <UI.Helper>{t('topic_value')}</UI.Helper>
+                )}
                 <UI.FormControl isRequired>
                   <UI.FormLabel display="flex">
                     <UI.Helper>
@@ -92,8 +100,13 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                   key={choice.fieldIndex}
                   p={2}
                   borderBottom="1px solid #edf2f7"
-                  gridTemplateColumns="2fr 2fr 1fr"
+                  gridTemplateColumns={choiceGridColumns}
                 >
+                  {hasSelectedTopic && (
+                    <UI.Div>
+                      Topic value
+                    </UI.Div>
+                  )}
                   <UI.Div
                     display="flex"
                     alignItems="center"
