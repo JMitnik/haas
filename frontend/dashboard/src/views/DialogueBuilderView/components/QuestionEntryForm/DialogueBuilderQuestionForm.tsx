@@ -739,6 +739,7 @@ const DialogueBuilderQuestionForm = ({
                 <ChoiceNodeForm
                   form={form}
                   ctaNodes={ctaNodes}
+                  topics={topics}
                 />
               </UI.FormSection>
             </>

@@ -36,9 +36,10 @@ const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
 export interface ChoiceNodeFormProps {
   ctaNodes: CTANode[];
   form: UseFormMethods<any>;
+  topics: any[];
 }
 
-export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
+export const ChoiceNodeForm = ({ form, ctaNodes, topics }: ChoiceNodeFormProps) => {
   const { t } = useTranslation();
 
   const choicesForm = useFieldArray({
@@ -60,9 +61,12 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
     });
   };
 
-  const topic = form.watch('topic');
+  const activeFormTopic = form.watch('topic');
+  const activeTopic = topics.find((topic) => topic.id === activeFormTopic?.value);
+  const availableTopicValues = activeTopic?.topicValues || [];
+  console.log(availableTopicValues);
 
-  const hasSelectedTopic = !!topic;
+  const hasSelectedTopic = !!activeFormTopic;
   const choiceGridColumns = hasSelectedTopic ? '2fr 2fr 2fr 1fr' : '2fr 2fr 1fr';
 
   return (
