@@ -12,7 +12,7 @@ const IllustrationCardWrapper = styled.div`
       bottom: ${theme.gutter}px;
       font-weight: 200;
       font-size: 1.3rem;
-      text-align: center; 
+      text-align: center;
       transform: translateY(-35%);
       display: block;
       max-width: 80%;
@@ -54,18 +54,3 @@ export const Hr = styled.hr`
     padding: ${theme.gutter / 2}px 0;
   `}
 `;
-
-
-const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 1rem;
-  height: 1rem;
-`;
-
-export const CloseButton = ({ onClose }: any) => (
-  <CloseButtonContainer onClick={onClose}>
-    <CloseIcon />
-  </CloseButtonContainer>
-);

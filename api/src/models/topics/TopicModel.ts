@@ -1,4 +1,5 @@
 import { extendType, objectType } from "@nexus/schema";
+import { TopicValueModel } from "./TopicValueModel";
 
 export const TopicModel = objectType({
   name: 'TopicModel',
@@ -6,6 +7,7 @@ export const TopicModel = objectType({
   definition(t) {
     t.id('id');
     t.string('label');
+    t.list.field('topicValues', { type: TopicValueModel });
   }
 });
 
@@ -26,7 +28,11 @@ export const TopicModel = objectType({
         const dialogueWithTopics = await ctx.prisma.dialogue.findOne({
           where: { id: which_DialogueID_DoWeWant_AllTopics_From },
           include: {
-            topics: true
+            topics: {
+              include: {
+                values: true
+              }
+            }
           }
         });
 

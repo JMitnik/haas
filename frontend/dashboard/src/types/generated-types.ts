@@ -187,11 +187,16 @@ export type CreateTopicInput = {
   label: Scalars['String'];
   customerId: Scalars['String'];
   relatedDialogueSlug: Scalars['String'];
+  topicValues?: Maybe<Array<CreateTopicValueInput>>;
 };
 
 export type CreateTopicOutput = {
   __typename?: 'CreateTopicOutput';
   id: Scalars['String'];
+};
+
+export type CreateTopicValueInput = {
+  label?: Maybe<Scalars['String']>;
 };
 
 export type CreateTriggerInputType = {
@@ -1348,6 +1353,7 @@ export type QuestionNode = {
   isRoot: Scalars['Boolean'];
   title: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
+  nrOfEntries: Scalars['Int'];
   extraContent?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   type: QuestionNodeTypeEnum;

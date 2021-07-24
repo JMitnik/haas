@@ -460,6 +460,8 @@ const DialogueBuilderQuestionForm = ({
   }));
 
   const { nrOfEntries } = question;
+  // TODO: Test if works when working with a question with already a topic.
+  const topicIsChanged: boolean = form.formState.dirtyFields.topic;
 
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
   return (
@@ -510,9 +512,7 @@ const DialogueBuilderQuestionForm = ({
                   </UI.FormControl>
 
                   <UI.Div>
-                    {/* If nr entries > 0, then show it. */}
-                    {/* TODO: Ensure we also only show this if we changed the TOPIC. */}
-                    {!!nrOfEntries && (
+                    {topicIsChanged && !!nrOfEntries && (
                       <UI.Div bg="yellow.200" p={2}>
                         Note: you currently have
                         <UI.Span fontWeight={900}>

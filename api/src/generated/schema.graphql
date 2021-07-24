@@ -159,10 +159,15 @@ input CreateTopicInput {
   customerId: String!
   label: String!
   relatedDialogueSlug: String!
+  topicValues: [CreateTopicValueInput!]
 }
 
 type CreateTopicOutput {
   id: String!
+}
+
+input CreateTopicValueInput {
+  label: String
 }
 
 input CreateTriggerInputType {
@@ -1126,6 +1131,12 @@ input TextboxNodeEntryInput {
 }
 
 type TopicModel {
+  id: ID!
+  label: String!
+  topicValues: [TopicValueModel!]!
+}
+
+type TopicValueModel {
   id: ID!
   label: String!
 }

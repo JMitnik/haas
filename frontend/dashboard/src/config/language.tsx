@@ -7,15 +7,23 @@ const language = {
     },
     topic_placeholder: {
       en: 'Opinion about customer support',
-      de: 'Meinung zum Kundensupport'
+      de: 'Meinung zum Kundensupport',
+    },
+    topic_values: {
+      en: 'Topic values',
+      de: 'Themenwerte',
+    },
+    create_topic_value_placeholder: {
+      en: 'Write topic value',
+      de: 'Write topic value',
     },
     save_topic: {
       en: 'Save topic',
-      de: 'Thema speichern'
+      de: 'Thema speichern',
     },
     create_topic: {
       en: 'Create topic',
-      de: 'Thema erstellen'
+      de: 'Thema erstellen',
     },
     process_location: {
       en: 'Process type & location',
@@ -1253,7 +1261,7 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
     topic_view: {
       en: 'Topics',
-      de: 'Themen'
+      de: 'Themen',
     },
     admin_overview: {
       en: 'Admin Panel',

@@ -25,6 +25,11 @@ export const getTopicBuilderQuery = gql`
         topics {
           id
           label
+
+          topicValues {
+            id
+            label
+          }
         }
       }
     }

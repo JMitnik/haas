@@ -1,23 +1,33 @@
 import * as UI from '@haas/ui';
-import { useNavigator } from 'hooks/useNavigator';
 import { useCustomer } from 'providers/CustomerProvider';
-import React from 'react'
-import { useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
+import React from 'react';
 
 import { GetTopicsOfDialogueDocument, useCreateTopicMutation } from 'types/generated-types';
-
 
 /**
  * Form for creating a topic (usually in a modal).
  */
 const CreateTopicForm = ({ onCloseModal }: { onCloseModal: Function }) => {
-  const form = useForm();
+  const form = useForm({
+    defaultValues: {
+      topicValues: [],
+    },
+  });
+
+  const topicValuesForm = useFieldArray({
+    name: 'topicValues',
+    control: form.control,
+    keyName: 'childIndex',
+  });
+
   const { t } = useTranslation();
   const { dialogueSlug } = useNavigator();
   const { activeCustomer } = useCustomer();
 
-  const [createTopic, { loading, error }] = useCreateTopicMutation({
+  const [createTopic, { loading }] = useCreateTopicMutation({
     onCompleted: () => {
       onCloseModal();
     },
@@ -25,9 +35,9 @@ const CreateTopicForm = ({ onCloseModal }: { onCloseModal: Function }) => {
       query: GetTopicsOfDialogueDocument,
       variables: {
         customerId: activeCustomer?.id || '',
-        dialogueSlug
-      }
-    }]
+        dialogueSlug,
+      },
+    }],
   });
 
   const handleFormSubmit = ({ label }: { label: string }) => {
@@ -36,16 +46,17 @@ const CreateTopicForm = ({ onCloseModal }: { onCloseModal: Function }) => {
         input: {
           label,
           relatedDialogueSlug: dialogueSlug,
-          customerId: activeCustomer?.id || ''
-        }
-      }
+          customerId: activeCustomer?.id || '',
+          topicValues: form.getValues().topicValues,
+        },
+      },
     });
-  }
+  };
 
   return (
     <UI.Form onSubmit={form.handleSubmit(handleFormSubmit)}>
-      <UI.FormSection>
-        <UI.FormControl>
+      <UI.InputGrid>
+        <UI.FormControl isRequired>
           <UI.FormLabel>
             {t('label')}
           </UI.FormLabel>
@@ -56,11 +67,40 @@ const CreateTopicForm = ({ onCloseModal }: { onCloseModal: Function }) => {
             placeholder={t('topic_placeholder')}
           />
         </UI.FormControl>
-      </UI.FormSection>
 
-      <UI.Button isLoading={loading} type="submit">{t('save_topic')}</UI.Button>
+        <UI.FormControl>
+          <UI.FormLabel>
+            {t('topic_values')}
+          </UI.FormLabel>
+
+          {topicValuesForm.fields.map((topicValue, index) => (
+            <UI.Div key={topicValue.childIndex}>
+              <UI.Input
+                name={`topicValues.${index}.label`}
+                ref={form.register()}
+                defaultValue={topicValue.label}
+                placeholder={t('create_topic_value_placeholder')}
+                mb={2}
+              />
+            </UI.Div>
+          ))}
+
+          <UI.Flex mt={2}>
+
+            <UI.Button size="sm" onClick={() => topicValuesForm.append({ label: '' })}>
+              Add topic value
+            </UI.Button>
+          </UI.Flex>
+
+        </UI.FormControl>
+
+      </UI.InputGrid>
+
+      <UI.Hr />
+
+      <UI.Button background="teal" color="white" isLoading={loading} type="submit">{t('save_topic')}</UI.Button>
     </UI.Form>
   );
-}
+};
 
 export default CreateTopicForm;
