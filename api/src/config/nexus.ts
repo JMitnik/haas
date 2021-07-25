@@ -7,6 +7,7 @@ import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import * as QuestionNodeAPI from '../models/QuestionNode';
 import * as UserAPI from '../models/users/User';
+import * as SubscriptionAPI from '../models/Subscription';
 import * as WorkspaceAPI from '../models/customer/Customer';
 import config from './config';
 import customerSettingsNexus from '../models/settings/CustomerSettings';
@@ -36,6 +37,7 @@ const nexus = [
   ...Array(NodeEntryAPI),
   ...Array(InteractionAPI),
   ...Array(QuestionNodeAPI),
+  ...Array(SubscriptionAPI),
   ...edgeNexus,
   ...(config.isDebug ? Array(DebugAPI) : []),
 ];

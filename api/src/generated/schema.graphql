@@ -87,6 +87,15 @@ interface ConnectionInterface {
   startDate: String
 }
 
+"""
+A consumer defines a user as a single entity who can be tracked in the dialogue.
+"""
+type ConsumerModel {
+  id: ID!
+  isDisabled: Boolean!
+  subscriptions: [SubscriptionModel!]!
+}
+
 input CreateBatchDeliveriesInputType {
   batchScheduledAt: String
   campaignId: ID
@@ -1086,6 +1095,14 @@ type SliderNodeType {
 """Details regarding interaction with social node"""
 input SocialNodeEntryInput {
   visitedLink: String
+}
+
+"""
+A subscription defines the relationship between consumer and delivery-contexts (like Campaigns).
+"""
+type SubscriptionModel {
+  consumer: ConsumerModel
+  id: ID!
 }
 
 enum SystemPermission {

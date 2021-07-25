@@ -172,6 +172,13 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
     });
 
     const successes = await Promise.all(preprocessedRecords.map(async (record) => {
+      // - [] Batch check for each record if they exist in the consumer-database
+        // - [] If no, return a function that creates a consumer AND subscription
+        // - [] If yes, check also if delivery exists.
+          // - [] If yes, then add a dellivery to the current subscription
+          // - [] If no, then create a subscription with the delivery.
+
+
       const now = new Date().toISOString();
 
       try {

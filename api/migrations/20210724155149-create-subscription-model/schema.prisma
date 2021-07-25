@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -63,8 +63,6 @@ model Customer {
   tags            Tag[]
   campaigns       Campaign[]
   CampaignVariant CampaignVariant[]
-
-  consumers Consumer[]
 }
 
 enum TagEnum {
@@ -778,9 +776,6 @@ model Consumer {
   // For properties related to external connections
   externalId  String?
   externalSource  String?
-
-  workspaceId String
-  workspace Customer @relation(fields: [workspaceId], references: [id])
 
   // State related properties
   isDisabled  Boolean @default(false)

@@ -1,0 +1,65 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Customer",
+      "field": "consumers",
+      "type": "Consumer",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Consumer",
+      "field": "workspaceId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Consumer",
+      "field": "workspace",
+      "type": "Customer",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Consumer",
+          "field": "workspace"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Consumer",
+          "field": "workspace"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[workspaceId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Consumer",
+          "field": "workspace"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    }
+  ]
+}
