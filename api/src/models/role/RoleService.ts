@@ -1,45 +1,36 @@
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
-import prisma from '../../config/prisma';
-import { RoleServiceType } from './RoleServiceType';
-import { PrismaClient, Role } from '@prisma/client';
-import { RolePrismaAdapterType } from './adapters/Role/RolePrismaAdapterType';
+import { PrismaClient, Role, SystemPermissionEnum } from '@prisma/client';
 import RolePrismaAdapter from './adapters/Role/RolePrismaAdapter';
 
-class RoleService implements RoleServiceType {
-  rolePrismaAdapter: RolePrismaAdapterType;
+export interface CreateRoleInput {
+  permissions: SystemPermissionEnum[];
+  name: string;
+  customerId: string;
+}
+
+class RoleService {
+  rolePrismaAdapter: RolePrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.rolePrismaAdapter = new RolePrismaAdapter(prismaClient);
   }
 
-  async getPermissionsByRoleId(roleId: string): Promise<("CAN_ACCESS_ADMIN_PANEL" | "CAN_EDIT_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_VIEW_DIALOGUE" | "CAN_DELETE_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS" | "CAN_ADD_USERS" | "CAN_DELETE_USERS" | "CAN_EDIT_USERS" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_WORKSPACE" | "CAN_EDIT_WORKSPACE" | "CAN_VIEW_CAMPAIGNS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES")[]> {
+  async getPermissionsByRoleId(roleId: string): Promise<SystemPermissionEnum[]> {
     const role = await this.rolePrismaAdapter.getRoleById(roleId);
     return role?.permissions || [];
   }
 
-  updatePermissions(roleId: string, permissions: ("CAN_ACCESS_ADMIN_PANEL" | "CAN_EDIT_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_VIEW_DIALOGUE" | "CAN_DELETE_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS" | "CAN_ADD_USERS" | "CAN_DELETE_USERS" | "CAN_EDIT_USERS" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_WORKSPACE" | "CAN_EDIT_WORKSPACE" | "CAN_VIEW_CAMPAIGNS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES")[]) {
-    return this.rolePrismaAdapter.update(roleId, {
-      permissions: {
-        // TODO: Set to appropriate logic
-        set: permissions
-      },
-    })
+  updatePermissions(roleId: string, permissions: SystemPermissionEnum[]) {
+    return this.rolePrismaAdapter.updatePermissions(roleId, permissions);
   }
 
   createRole(customerId: string, roleName: string): Promise<Role> {
-    return this.rolePrismaAdapter.create({
+    const createInput: CreateRoleInput = {
       name: roleName,
-      permissions: {
-        set: [
-          'CAN_VIEW_DIALOGUE',
-        ],
-      },
-      Customer: {
-        connect: {
-          id: customerId,
-        },
-      },
-    })
+      permissions: ['CAN_VIEW_DIALOGUE'],
+      customerId,
+    }
+    return this.rolePrismaAdapter.createRole(createInput);
   }
 
   paginatedRoles = async (

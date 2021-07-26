@@ -1,5 +1,6 @@
 import { RolePrismaAdapterType } from "./RolePrismaAdapterType";
 import { PrismaClient, RoleWhereInput, RoleCreateInput, RoleUpdateInput, BatchPayload, Role } from "@prisma/client";
+import { CreateRoleInput } from "../../RoleService";
 
 class RolePrismaAdapter implements RolePrismaAdapterType {
   prisma: PrismaClient;
@@ -17,12 +18,43 @@ class RolePrismaAdapter implements RolePrismaAdapterType {
     })
   }
 
+  updatePermissions(roleId: string, permissions: ("CAN_ACCESS_ADMIN_PANEL" | "CAN_EDIT_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_VIEW_DIALOGUE" | "CAN_DELETE_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS" | "CAN_ADD_USERS" | "CAN_DELETE_USERS" | "CAN_EDIT_USERS" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_WORKSPACE" | "CAN_EDIT_WORKSPACE" | "CAN_VIEW_CAMPAIGNS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES")[]) {
+    return this.prisma.role.update({
+      where: {
+        id: roleId,
+      },
+      data: {
+        permissions: {
+          // TODO: Set to appropriate logic
+          set: permissions
+        },
+      }
+    })
+  }
+
   update(roleId: string, data: RoleUpdateInput): Promise<Role> {
     return this.prisma.role.update({
       where: {
         id: roleId,
       },
       data: data,
+    });
+  }
+
+  createRole(data: CreateRoleInput) {
+    const { customerId, permissions, name } = data;
+    return this.prisma.role.create({
+      data: {
+        name,
+        permissions: {
+          set: permissions,
+        },
+        Customer: {
+          connect: {
+            id: customerId,
+          },
+        },
+      },
     });
   }
 
