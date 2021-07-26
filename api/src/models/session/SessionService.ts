@@ -14,15 +14,14 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 // eslint-disable-next-line import/no-cycle
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionWithEntries, SessionServiceType } from './SessionTypes';
+import { SessionWithEntries } from './SessionTypes';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
-import { SessionPrismaAdapterType } from './SessionPrismaAdapterType';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 
-class SessionService implements SessionServiceType {
-  sessionPrismaAdapter: SessionPrismaAdapterType;
+class SessionService {
+  sessionPrismaAdapter: SessionPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
@@ -37,32 +36,14 @@ class SessionService implements SessionServiceType {
    * @param args
    * @param ctx
    */
-  static async createSession(sessionInput: any, ctx: any) {
+  async createSession(sessionInput: any, ctx: any) {
     const { dialogueId, entries } = sessionInput;
-
-    const session = await prisma.session.create({
-      data: {
-        dialogue: {
-          connect: { id: dialogueId },
-        },
-        nodeEntries: {
-          create: entries.map((entry: any) => NodeEntryService.constructCreateNodeEntryFragment(entry)),
-        },
-        originUrl: sessionInput.originUrl || '',
-        totalTimeInSec: sessionInput.totalTimeInSec,
-        device: sessionInput.device || '',
-      },
-      include: {
-        nodeEntries: {
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            relatedNode: true,
-            sliderNodeEntry: true,
-          },
-        },
-      },
+    const session = await this.sessionPrismaAdapter.createSession({
+      device: sessionInput.device || '',
+      totalTimeInSec: sessionInput.totalTimeInSec,
+      originUrl: sessionInput.originUrl || '',
+      entries,
+      dialogueId,
     });
 
     try {
@@ -87,12 +68,7 @@ class SessionService implements SessionServiceType {
 
     try {
       if (sessionInput.deliveryId) {
-        await prisma.session.update({
-          where: { id: session.id },
-          data: {
-            delivery: { connect: { id: sessionInput.deliveryId } }
-          }
-        })
+        await this.sessionPrismaAdapter.updateDelivery(session.id, sessionInput.deliveryId);
       }
     } catch (error) {
       Sentry.captureException(error);

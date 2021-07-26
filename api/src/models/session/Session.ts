@@ -144,7 +144,7 @@ export const CreateSessionMutation = mutationField('createSession', {
     }
 
     try {
-      const session = SessionService.createSession(args.input, ctx);
+      const session = ctx.services.sessionService.createSession(args.input, ctx);
       return session;
     } catch (error) {
       throw new Error(`Failed making a session due to ${error}`);
@@ -174,7 +174,7 @@ export const AppendToInteractionMutation = mutationField('appendToInteraction', 
     if (!args?.input.sessionId) throw new UserInputError('No valid existing interaction found');
 
     const updatedInteraction = await ctx.services.nodeEntryService.createNodeEntry(args.input.sessionId, args.input);
-   
+
     return updatedInteraction as any;
   },
 });

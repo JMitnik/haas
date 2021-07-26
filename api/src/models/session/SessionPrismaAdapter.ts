@@ -1,12 +1,64 @@
-import { SessionPrismaAdapterType } from "./SessionPrismaAdapterType";
-import { PrismaClient, Session, SessionCreateInput } from "@prisma/client";
+import { PrismaClient, Session } from "@prisma/client";
 
-class SessionPrismaAdapter implements SessionPrismaAdapterType {
+import { NexusGenInputs } from "../../generated/nexus";
+import NodeEntryService from "../node-entry/NodeEntryService";
+
+interface CreateSessionInput {
+  dialogueId: string;
+  originUrl: string;
+  totalTimeInSec: number;
+  device: string;
+  entries: NexusGenInputs['NodeEntryInput'][];
+}
+
+class SessionPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
+
+  updateDelivery(sessionId: string, deliveryId: string) {
+    return this.prisma.session.update({
+      where: {
+        id: sessionId,
+      },
+      data: {
+        delivery: { connect: { id: deliveryId } }
+      }
+    })
+  }
+
+  createSession(data: CreateSessionInput) {
+    const { device, originUrl, dialogueId, entries, totalTimeInSec } = data;
+    return this.prisma.session.create({
+      data: {
+        originUrl,
+        device,
+        totalTimeInSec,
+        nodeEntries: {
+          create: entries.map((entry) => NodeEntryService.constructCreateNodeEntryFragment(entry))
+        },
+        dialogue: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+      },
+      include: {
+        nodeEntries: {
+          include: {
+            choiceNodeEntry: true,
+            linkNodeEntry: true,
+            registrationNodeEntry: true,
+            relatedNode: true,
+            sliderNodeEntry: true,
+          },
+        },
+      },
+    });
+  };
+
   getSessionById(sessionId: string): Promise<Session | null> {
     return this.prisma.session.findOne({
       where: {
