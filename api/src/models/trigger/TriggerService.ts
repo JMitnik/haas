@@ -90,7 +90,7 @@ class TriggerService {
     }
 
     if (dbTrigger?.conditions) {
-      await TriggerService.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
+      await this.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
     }
 
     return this.triggerPrismaAdapter.update(dbTrigger?.id, updateTriggerArgs);
