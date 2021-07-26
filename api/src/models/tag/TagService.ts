@@ -1,5 +1,6 @@
 import { PrismaClient, Tag, TagCreateInput } from "@prisma/client";
-import TagPrismaAdapter, { CreateTagInput } from "./TagPrismaAdapter";
+import TagPrismaAdapter from "./TagPrismaAdapter";
+import { CreateTagInput } from "./TagPrismaAdapterType";
 import { CustomerPrismaAdapter } from "../customer/CustomerPrismaAdapter";
 
 class TagService {

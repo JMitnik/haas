@@ -1,7 +1,6 @@
-import { QuestionOptionPrismaAdapterType } from "./QuestionOptionPrismaAdapterType";
 import { BatchPayload, PrismaClient, QuestionOption, QuestionOptionCreateInput, QuestionOptionUpdateInput } from "@prisma/client";
 
-class QuestionOptionPrismaAdapter implements QuestionOptionPrismaAdapterType {
+class QuestionOptionPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {

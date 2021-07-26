@@ -1,13 +1,7 @@
-import { TagPrismaAdapterType } from "./TagPrismaAdapterType";
 import { PrismaClient, Tag, TagCreateInput, TagEnum } from "@prisma/client";
+import { CreateTagInput } from "./TagPrismaAdapterType";
 
-export interface CreateTagInput {
-  name: string;
-  type: TagEnum,
-  customerId: string;
-}
-
-class TagPrismaAdapter implements TagPrismaAdapterType {
+class TagPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {

@@ -1,28 +1,8 @@
 import { EdgeCreateInput, QuestionNode, PrismaClient, QuestionCondition } from '@prisma/client';
-import { EdgePrismaAdapterType } from './EdgePrismaAdapterType';
+
+import { EdgeChildProps } from './EdgeServiceType';
 import EdgePrismaAdapter from './EdgePrismaAdapter';
-import { QuestionNodePrismaAdapterType } from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapterType';
 import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
-
-interface QuestionConditionProps {
-  id?: number;
-  conditionType: string;
-  renderMin: number;
-  renderMax: number;
-  matchValue: string;
-}
-
-interface EdgeNodeProps {
-  id: string;
-  title: string;
-}
-
-interface EdgeChildProps {
-  id?: string;
-  conditions: [QuestionConditionProps];
-  parentNode: EdgeNodeProps;
-  childNode: EdgeNodeProps;
-}
 
 class EdgeService {
   edgePrismaAdapter: EdgePrismaAdapter;

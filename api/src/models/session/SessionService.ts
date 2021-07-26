@@ -10,7 +10,8 @@ import { TEXT_NODES } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 // eslint-disable-next-line import/no-cycle
 import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
-import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
+import NodeEntryService from '../node-entry/NodeEntryService';
+import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 // eslint-disable-next-line import/no-cycle
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { Nullable, PaginationProps } from '../../types/generic';

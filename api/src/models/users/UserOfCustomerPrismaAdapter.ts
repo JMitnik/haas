@@ -1,7 +1,6 @@
-import { UserOfCustomerPrismaAdapterType } from "./UserOfCustomerPrismaAdapterType";
 import { PrismaClient, UserOfCustomer, UserOfCustomerCreateInput, UserOfCustomerUpdateInput } from "@prisma/client";
 
-class UserOfCustomerPrismaAdapter implements UserOfCustomerPrismaAdapterType {
+class UserOfCustomerPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {

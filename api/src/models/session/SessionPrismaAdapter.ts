@@ -1,15 +1,7 @@
 import { PrismaClient, Session } from "@prisma/client";
 
-import { NexusGenInputs } from "../../generated/nexus";
 import NodeEntryService from "../node-entry/NodeEntryService";
-
-interface CreateSessionInput {
-  dialogueId: string;
-  originUrl: string;
-  totalTimeInSec: number;
-  device: string;
-  entries: NexusGenInputs['NodeEntryInput'][];
-}
+import { CreateSessionInput } from "./SessionPrismaAdapterType";
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;

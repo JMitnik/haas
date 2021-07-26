@@ -1,9 +1,6 @@
 import { PrismaClient, VideoEmbeddedNodeUpdateInput, VideoEmbeddedNodeCreateInput, VideoEmbeddedNode } from "@prisma/client";
 
-interface CreateVideoEmbeddedNodeInput {
-  parentNodeId: string;
-  videoUrl?: string | null;
-}
+import { CreateVideoEmbeddedNodeInput } from "./VideoNodePrismaAdapterType";
 
 class VideoNodePrismaAdapter {
   prisma: PrismaClient;

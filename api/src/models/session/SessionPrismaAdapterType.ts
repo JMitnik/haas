@@ -1,17 +1,9 @@
-import { SessionCreateInput, Session, BatchPayload } from "@prisma/client";
+import { NexusGenInputs } from "../../generated/nexus";
 
-export interface SessionPrismaAdapterType {
-  createFakeSession(data: (
-    {
-      createdAt: Date,
-      dialogueId: string,
-      rootNodeId: string,
-      simulatedRootVote: number,
-      simulatedChoiceNodeId: string,
-      simulatedChoiceEdgeId?: string,
-      simulatedChoice: string,
-    })): Promise<Session>;
-
-    deleteMany(sessionIds: string[]): Promise<BatchPayload>;
-    getSessionById(sessionId: string): Promise<Session|null>;
-}
+export interface CreateSessionInput {
+  dialogueId: string;
+  originUrl: string;
+  totalTimeInSec: number;
+  device: string;
+  entries: NexusGenInputs['NodeEntryInput'][];
+};

@@ -1,17 +1,6 @@
-import { PrismaClient, LinkCreateInput, LinkUpdateInput, Link, LinkTypeEnum } from "@prisma/client";
+import { PrismaClient, LinkCreateInput, LinkUpdateInput, Link } from "@prisma/client";
 
-export interface UpdateLinkInput {
-  id?: string;
-  title: string;
-  url: string;
-  type: LinkTypeEnum;
-  backgroundColor: string;
-  iconUrl: string;
-}
-
-export interface CreateLinkInput extends UpdateLinkInput {
-  questionId: string;
-}
+import { CreateLinkInput, UpdateLinkInput } from "./LinkPrismaAdapterType";
 
 class LinkPrismaAdapter {
   prisma: PrismaClient

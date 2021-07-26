@@ -10,11 +10,10 @@ import config from '../../config/config';
 import { RegisterUserInput } from '../users/UserPrismaAdapterType';
 import UserPrismaAdapter from '../users/UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
-import { AuthServiceType } from './AuthServiceType';
 import UserService from '../users/UserService';
 
 
-class AuthService implements AuthServiceType {
+class AuthService {
   prisma: PrismaClient<PrismaClientOptions, never>;
   customerPrismaAdapter: CustomerPrismaAdapter;
   userPrismaAdapter: UserPrismaAdapter;

@@ -1,6 +1,17 @@
-import { SliderNodeUpdateInput, SliderNode, SliderNodeCreateInput } from "@prisma/client";
+export interface UpdateSliderNodeInput {
+  happyText: string | null;
+  unhappyText: string | null;
+  markers?: {
+    id?: string | null | undefined;
+    label: string;
+    range?: {
+      end?: number | null | undefined;
+      start?: number | null | undefined;
+    } | null | undefined;
+    subLabel: string;
+  }[] | null | undefined;
+}
 
-export interface SliderNodePrismaAdapterType {
-  update(nodeId: string, data: SliderNodeUpdateInput): Promise<SliderNode>;
-  create(data: SliderNodeCreateInput): Promise<SliderNode>;
+export interface CreateSliderNodeInput extends UpdateSliderNodeInput {
+  parentNodeId: string;
 }

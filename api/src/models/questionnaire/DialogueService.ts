@@ -10,30 +10,28 @@ import {
   LanguageEnum,
   NodeType,
   PrismaClient,
-  SessionCreateInput,
   Edge,
   PostLeafNode,
   PostLeafNodeUpdateOneWithoutDialogueInput,
-  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
+  Tag, TagWhereUniqueInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import NodeService from '../QuestionNode/NodeService';
 
+import NodeService from '../QuestionNode/NodeService';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import {
   HistoryDataProps, HistoryDataWithEntry, IdMapProps,
-  PathFrequency, QuestionProps, StatisticsProps
+  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType
 } from './DialogueTypes';
 // eslint-disable-next-line import/no-cycle
-import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
+import NodeEntryService from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
-
-import { CopyDialogueInputType } from './DialogueServiceType';
-import DialoguePrismaAdapter, { CreateQuestionsInput } from './DialoguePrismaAdapter';
+import DialoguePrismaAdapter from './DialoguePrismaAdapter';
+import { CreateQuestionsInput } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';

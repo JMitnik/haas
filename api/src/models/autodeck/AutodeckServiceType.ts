@@ -1,36 +1,26 @@
-import { CreateWorkspaceJob, JobProcessLocation, CustomField, JobStatusType } from "@prisma/client";
+export type ScreenshotProps = {
+  websiteUrl: string;
+  bucket: string;
+  jobId: string;
+  requiresRembg: boolean | null | undefined;
+  requiresScreenshot: boolean | null | undefined;
+  requiresColorExtraction: boolean | null | undefined;
+};
 
-import { NexusGenInputs } from "../../generated/nexus";
-import { CreateWorkspaceJobProps } from "./AutodeckService";
-
-export interface AutodeckServiceType {
-  getJobById(jobId: string): Promise<CreateWorkspaceJob | null>;
-  confirmWorkspaceJob: (input: NexusGenInputs['GenerateAutodeckInput'], userId?: string | undefined) => Promise<CreateWorkspaceJob & {
-    processLocation: JobProcessLocation;
-  }>;
-  getJobProcessLocations(): Promise<JobProcessLocation[]>;
-  createJobProcessLocation: (input: any) => Promise<JobProcessLocation & {
-    fields: CustomField[];
-  }>;
-  createWorkspaceJob: (input: CreateWorkspaceJobProps) => Promise<CreateWorkspaceJob & {
-    processLocation: JobProcessLocation;
-  }>;
-  retryJob: (jobId: string) => Promise<CreateWorkspaceJob & {
-    processLocation: JobProcessLocation;
-  }>;
-  paginatedAutodeckJobs(paginationOpts: NexusGenInputs['PaginationWhereInput']): Promise<{
-    entries: any[];
-    pageInfo: {
-      nrPages: number;
-      pageIndex: number;
-    };
-  }>;
-  getCustomFieldsOfJobProcessLocation(jobProcessLocationId: string): Promise<CustomField[]>;
-  getJobProcessLocationOfJob(createWorkspaceJobId: string): Promise<JobProcessLocation>;
-  update(input: {
-    id: string;
-    resourceUrl: string | null | undefined;
-    status: JobStatusType;
-    errorMessage: string | undefined;
-  }): Promise<CreateWorkspaceJob>
-} 
+export interface CreateWorkspaceJobProps {
+  id?: string | null;
+  name?: string | null;
+  websiteUrl?: string | null;
+  logoUrl?: string | null;
+  answer1?: string | null;
+  answer2?: string | null;
+  answer3?: string | null;
+  answer4?: string | null;
+  firstName?: string | null;
+  primaryColour?: string | null;
+  requiresRembg?: boolean | null;
+  requiresWebsiteScreenshot?: boolean | null;
+  requiresColorExtraction?: boolean | null;
+  usesAdjustedLogo?: boolean | null;
+  jobLocationId?: string | null;
+}

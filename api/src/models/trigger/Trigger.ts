@@ -10,7 +10,8 @@ import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 import { UserType } from '../users/User';
 
-import TriggerService, { CreateTriggerInput } from './TriggerService';
+import TriggerService from './TriggerService';
+import { CreateTriggerInput } from './TriggerServiceType';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { UserInputError } from 'apollo-server-express';
 

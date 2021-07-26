@@ -1,26 +1,15 @@
-import { FormNodeEntry, FormNodeFieldEntryData, FormNodeField, NodeEntry, ChoiceNodeEntry, LinkNodeEntry, RegistrationNodeEntry, SliderNodeEntry, TextboxNodeEntry } from "@prisma/client";
-import { NexusGenInputs } from "../../generated/nexus";
+import { NodeEntry, QuestionNode, SliderNodeEntry, ChoiceNodeEntry, FormNodeEntryGetPayload, RegistrationNodeEntry, TextboxNodeEntry, LinkNodeEntry } from "@prisma/client";
 
-export interface NodeEntryServiceType {
-    getNodeEntryValues(nodeEntryId: string): Promise<{
-        choiceNodeEntry: string | null | undefined;
-        linkNodeEntry: string | undefined;
-        textboxNodeEntry: string | null | undefined;
-        registrationNodeEntry: string | undefined;
-        sliderNodeEntry: number | null | undefined;
-        formNodeEntry: (FormNodeEntry & {
-            values: (FormNodeFieldEntryData & {
-                relatedField: FormNodeField;
-            })[];
-        }) | null | undefined;
-    }>;
-    getAmountOfPaths(sessionId: string): Promise<number>;
-    getNodeEntriesBySessionId(sessionId: string): Promise<(NodeEntry & {
-        choiceNodeEntry: ChoiceNodeEntry | null;
-        linkNodeEntry: LinkNodeEntry | null;
-        registrationNodeEntry: RegistrationNodeEntry | null;
-        sliderNodeEntry: SliderNodeEntry | null;
-        textboxNodeEntry: TextboxNodeEntry | null;
-    })[]>;
-    createNodeEntry(sessionId: string, nodeEntryInput: NexusGenInputs['NodeEntryInput']): Promise<NodeEntry>;
+export interface NodeEntryWithTypes extends NodeEntry {
+    session?: {
+        id: String;
+        createdAt: Date;
+    } | undefined | null;
+    relatedNode?: QuestionNode | null;
+    sliderNodeEntry?: SliderNodeEntry | undefined | null;
+    choiceNodeEntry?: ChoiceNodeEntry | undefined | null;
+    formNodeEntry?: FormNodeEntryGetPayload<{ include: { values: true } }> | undefined | null;
+    registrationNodeEntry?: RegistrationNodeEntry | undefined | null;
+    textboxNodeEntry?: TextboxNodeEntry | undefined | null;
+    linkNodeEntry?: LinkNodeEntry | undefined | null;
 }

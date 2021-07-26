@@ -1,8 +1,10 @@
 import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, PrismaClient, FormNodeFieldUpsertArgs, Share } from '@prisma/client';
+
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import { QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps } from './NodeServiceType';
-import QuestionNodePrismaAdapter, { CreateCTAInput, UpdateQuestionInput } from './adapters/QuestionNode/QuestionNodePrismaAdapter';
+import QuestionNodePrismaAdapter from './adapters/QuestionNode/QuestionNodePrismaAdapter';
+import { CreateCTAInput, UpdateQuestionInput } from './adapters/QuestionNode/QuestionNodePrismaAdapterType';
 import LinkPrismaAdapter from '../link/LinkPrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
 import ShareNodePrismaAdapter from './adapters/ShareNode/ShareNodePrismaAdapter';
@@ -11,7 +13,8 @@ import VideoNodePrismaAdapter from './adapters/VideoNode/VideoNodePrismaAdapter'
 import SliderNodePrismaAdapter from './adapters/SliderNode/SliderNodePrismaAdapter';
 import QuestionOptionPrismaAdapter from './adapters/QuestionOption/QuestionOptionPrismaAdapter';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
-import DialoguePrismaAdapter, { CreateQuestionInput, CreateQuestionsInput } from '../questionnaire/DialoguePrismaAdapter';
+import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
+import { CreateQuestionsInput, CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 
 const standardOptions = [
   { value: 'Facilities', position: 1 },

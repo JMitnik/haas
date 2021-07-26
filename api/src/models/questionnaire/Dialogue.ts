@@ -1,5 +1,4 @@
 
-import { PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { subDays } from 'date-fns';
@@ -24,7 +23,7 @@ import PaginationService from '../general/PaginationService';
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
 import isValidDate from '../../utils/isValidDate';
-import { CopyDialogueInputType } from './DialogueServiceType';
+import { CopyDialogueInputType } from './DialogueTypes'
 
 export const TEXT_NODES = [
   'TEXTBOX',

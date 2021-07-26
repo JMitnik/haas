@@ -1,31 +1,39 @@
-import { BatchPayload, QuestionNode, QuestionNodeUpdateInput, FormNode, FormNodeField, Link, Share, QuestionNodeCreateInput, VideoEmbeddedNode, Edge, QuestionOption } from "@prisma/client";
+import { FormNodeFieldUpsertArgs, FormNodeCreateInput } from "@prisma/client"
 
-export interface QuestionNodePrismaAdapterType {
-  delete(id: string): Promise<QuestionNode>;
-  create(data: QuestionNodeCreateInput): Promise<QuestionNode>;
-  deleteMany(questionIds: string[]): Promise<BatchPayload>;
-  getNodeById(nodeId: string): Promise<QuestionNode | null>;
-  update(nodeId: string, data: QuestionNodeUpdateInput): Promise<QuestionNode>;
-  getNodeByLinkId(linkId: string): Promise<QuestionNode | null | undefined>;
-  getCTANode(nodeId: string): Promise<(QuestionNode & {
-    form: (FormNode & {
-      fields: FormNodeField[];
-    }) | null;
-    links: Link[];
-    share: Share | null;
-  }) | null>;
-  getDialogueBuilderNode(nodeId: string): Promise<(QuestionNode & {
-    videoEmbeddedNode: VideoEmbeddedNode | null;
-    children: Edge[];
-    options: QuestionOption[];
-    questionDialogue: {
-      id: string;
-    } | null;
-    overrideLeaf: {
-      id: string;
-    } | null;
-  }) | null>
-  updateDialogueBuilderNode(nodeId: string, data: QuestionNodeUpdateInput): Promise<(QuestionNode & {
-    videoEmbeddedNode: VideoEmbeddedNode | null;
-  }) | null>;
+import { NexusGenInputs } from "../../../../generated/nexus"
+import { CreateQuestionInput } from "../../../questionnaire/DialoguePrismaAdapterType"
+
+export type CreateCTAInput = {
+  title: string,
+  type?: "GENERIC" | "SLIDER" | "FORM" | "CHOICE" | "REGISTRATION" | "TEXTBOX" | "LINK" | "SHARE" | "VIDEO_EMBEDDED" | undefined,
+  form?: NexusGenInputs['FormNodeInputType'] | null, // FormNodeInputType
+  links: {
+    id: string | undefined;
+    backgroundColor: string | undefined;
+    iconUrl: string | undefined;
+    title: string | undefined;
+    type: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP";
+    url: string;
+  }[],
+  share: {
+    id: string | undefined;
+    title: string;
+    tooltip: string | undefined;
+    url: string;
+  } | undefined,
+  dialogueId: string,
+}
+
+export type UpdateFormFieldsInput = {
+  questionId: string;
+  fields: FormNodeFieldUpsertArgs[];
+}
+
+export type CreateFormFieldsInput = {
+  questionId: string;
+  fields: FormNodeCreateInput;
+}
+
+export interface UpdateQuestionInput extends CreateQuestionInput {
+  currentOverrideLeafId?: string | null;
 }

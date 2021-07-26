@@ -1,8 +1,5 @@
 import { PrismaClient, JobProcessLocationCreateInput, JobProcessLocationUpdateInput, FindFirstJobProcessLocationArgs, CustomField, JobProcessLocation } from "@prisma/client";
 
-import { JobProcessLocationPrismaAdapterType } from "./JobProcessLocationPrismaAdapterType";
-
-
 class JobProcessLocationPrismaAdapter {
   prisma: PrismaClient;
 

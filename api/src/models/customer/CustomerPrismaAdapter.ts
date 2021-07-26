@@ -1,9 +1,8 @@
 import { PrismaClient, Dialogue, CustomerUpdateInput, Customer, Tag } from '@prisma/client';
 import { CustomerPrismaAdapterType } from './CustomerPrismaAdapterType';
 import { NexusGenInputs } from '../../generated/nexus';
-import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
-import { UpdateCustomerInput } from './CustomerService';
-import { inputObjectType } from '@nexus/schema';
+import defaultWorkspaceTemplate from '../templates/defaultWorkspaceTemplate';
+import { UpdateCustomerInput } from './CustomerServiceType';
 
 export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
   prisma: PrismaClient

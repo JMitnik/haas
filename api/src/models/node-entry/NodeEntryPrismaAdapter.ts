@@ -1,8 +1,6 @@
 import { PrismaClient, NodeEntryWhereInput, NodeEntryCreateInput, BatchPayload, ChoiceNodeEntry, LinkNodeEntry, NodeEntry, RegistrationNodeEntry, SliderNodeEntry, TextboxNodeEntry } from "@prisma/client";
 
-import { NodeEntryPrismaAdapterType } from "./NodeEntryPrismaAdapterType";
-
-class NodeEntryPrismaAdapter implements NodeEntryPrismaAdapterType {
+class NodeEntryPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {

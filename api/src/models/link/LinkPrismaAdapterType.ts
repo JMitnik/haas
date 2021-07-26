@@ -1,7 +1,14 @@
-import { BatchPayload, LinkCreateInput, LinkUpdateInput, Link } from "@prisma/client";
+import { LinkTypeEnum } from "@prisma/client";
 
-export interface LinkPrismaAdapterType {
-  deleteMany(linkIds: string[]): Promise<BatchPayload>;
-  upsert(id: string | null | undefined, create: LinkCreateInput, update: LinkUpdateInput): Promise<Link>;
-  findManyByParentId(parentId: string): Promise<Link[]>;
+export interface UpdateLinkInput {
+  id?: string;
+  title: string;
+  url: string;
+  type: LinkTypeEnum;
+  backgroundColor: string;
+  iconUrl: string;
+}
+
+export interface CreateLinkInput extends UpdateLinkInput {
+  questionId: string;
 }

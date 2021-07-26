@@ -1,25 +1,6 @@
-import { PrismaClient, FindManyCreateWorkspaceJobArgs, CreateWorkspaceJobUpdateInput, CreateWorkspaceJob, CreateWorkspaceJobCreateInput, FindOneCreateWorkspaceJobArgs, JobProcessLocation, JobStatusType, CloudReferenceType } from "@prisma/client";
+import { PrismaClient, FindManyCreateWorkspaceJobArgs, CreateWorkspaceJobUpdateInput, CreateWorkspaceJob, JobProcessLocation, JobStatusType } from "@prisma/client";
 
-type ConfirmWorkspaceJobCreateInput = {
-  id?: string
-  createdAt?: Date | string | null
-  updatedAt?: Date | string | null
-  name?: string | null
-  referenceId?: string | null
-  message?: string | null
-  errorMessage?: string | null
-  referenceType: CloudReferenceType
-  status?: JobStatusType
-  resourcesUrl?: string | null
-  requiresRembg?: boolean
-  requiresScreenshot?: boolean
-  requiresColorExtraction?: boolean
-  processLocationId: string
-}
-
-type ConfirmWorkspaceJobUpdateInput = {
-  status: JobStatusType
-}
+import { ConfirmWorkspaceJobCreateInput } from "./CreateWorkspaceJobPrismaAdapterType";
 
 class CreateWorkspaceJobPrismaAdapter {
   prisma: PrismaClient;

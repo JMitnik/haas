@@ -7,12 +7,10 @@ import { mailService } from '../../services/mailings/MailService';
 import { NexusGenInputs } from '../../generated/nexus';
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
-import prisma from '../../config/prisma';
 import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
 import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
-
 
 class UserService {
   prisma: PrismaClient<PrismaClientOptions, never>;

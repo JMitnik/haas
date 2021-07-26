@@ -1,11 +1,9 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { differenceInMinutes } from 'date-fns';
 import { extendType, inputObjectType, objectType, queryField, scalarType } from '@nexus/schema';
 
-import { ConnectionInterface, PaginationWhereInput } from '../general/Pagination';
+import { ConnectionInterface } from '../general/Pagination';
 import { Kind } from 'graphql';
 import { RoleType, SystemPermission } from '../role/Role';
-import UserService from './UserService';
 import { UserUpdateInput } from '@prisma/client';
 
 export const UserCustomerType = objectType({
@@ -67,19 +65,6 @@ export const UserType = objectType({
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
-
-    // t.boolean('isOnline', {
-    //   resolve(parent, args, ctx) {
-    //     if (!parent.lastActivity) return false;
-    //     const minutesSinceOnline = differenceInMinutes(new Date(parent.lastActivity), Date.now());
-
-    //     if (minutesSinceOnline > 5) {
-    //       return true;
-    //     }
-
-    //     return false;
-    //   },
-    // });
 
     t.list.field('globalPermissions', {
       nullable: true,
@@ -222,21 +207,6 @@ export const RootUserQueries = extendType({
 export const UserMutations = extendType({
   type: 'Mutation',
   definition(t) {
-    // t.field('createUser', {
-    //   type: UserType,
-    //   args: { customerSlug: 'String', input: UserInput },
-
-    //   resolve(parent, args, ctx) {
-    //     if (!args.customerSlug) throw new UserInputError('No customer scope provided');
-    //     if (!args.input) throw new UserInputError('No input provided');
-
-    //     const { email } = args.input;
-
-    //     if (!email) throw new UserInputError('No valid email provided');
-    //     return ctx.services.userService.createUser(args.input);
-    //   },
-    // });
-
     t.field('editUser', {
       type: UserType,
       args: { userId: 'String', input: EditUserInput },

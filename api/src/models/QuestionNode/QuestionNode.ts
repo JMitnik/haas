@@ -1,13 +1,11 @@
 import { PrismaClient, NodeType } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { UserInputError } from 'apollo-server';
 
 import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
-import NodeService from './NodeService';
-import prisma from '../../config/prisma';
-import { UserInputError } from 'apollo-server';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -42,11 +40,9 @@ export const QuestionOptionType = objectType({
       type: 'QuestionNode',
       nullable: true,
 
-      resolve: async (parent, ctx) => {
+      resolve: async (parent, args, ctx) => {
         if (!parent.overrideLeafId) return null;
-
-        const cta = await prisma.questionNode.findFirst({ where: { id: parent.overrideLeafId } });
-
+        const cta = await ctx.services.nodeService.getNodeById(parent.overrideLeafId);
         return cta as any;
       }
     });
@@ -469,36 +465,8 @@ export const QuestionNodeMutations = extendType({
       // @ts-ignore
       async resolve(parent: any, args: any, ctx) {
         const { id, customerId, dialogueSlug } = args.input;
-        const { prisma }: { prisma: PrismaClient } = ctx;
 
-        const customer = await prisma.customer.findOne({
-          where: {
-            id: customerId || undefined,
-          },
-          include: {
-            dialogues: {
-              where: {
-                slug: dialogueSlug,
-              },
-              include: {
-                questions: {
-                  select: {
-                    id: true,
-                  },
-                },
-                edges: {
-                  select: {
-                    id: true,
-                    parentNodeId: true,
-                    childNodeId: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        const dialogue = customer?.dialogues[0];
+        const dialogue = await ctx.services.customerService.getDialogue(customerId, dialogueSlug);
 
         if (!dialogue) {
           throw new Error('No dialogue found to be removed');
@@ -525,20 +493,7 @@ export const QuestionNodeMutations = extendType({
         const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition, extraContent } = args.input;
         const { options } = optionEntries;
 
-        const customer = await prisma.customer.findOne({
-          where: {
-            id: customerId,
-          },
-          include: {
-            dialogues: {
-              where: {
-                slug: dialogueSlug,
-              },
-            },
-          },
-        });
-
-        const dialogue = customer?.dialogues[0];
+        const dialogue = await ctx.services.customerService.getDialogue(customerId, dialogueSlug);
         const dialogueId = dialogue?.id;
 
         if (dialogueId) {

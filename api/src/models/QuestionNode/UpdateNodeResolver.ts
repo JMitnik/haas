@@ -3,7 +3,6 @@ import { NodeType } from "@prisma/client";
 import { UserInputError } from "apollo-server";
 import { NexusGenInputs } from "../../generated/nexus";
 
-import NodeService from "./NodeService";
 import { EdgeConditionInputType, OptionsInputType, QuestionNodeType, SliderNodeInputType } from "./QuestionNode";
 
 export const UpdateQuestionNodeInputType = inputObjectType({

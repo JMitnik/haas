@@ -1,4 +1,3 @@
-import { CustomFieldPrismaAdapterType } from "./CustomFieldPrismaAdapterType";
 import { PrismaClient, FindManyCustomFieldArgs, CustomField } from "@prisma/client";
 
 class CustomFieldPrismaAdapter {

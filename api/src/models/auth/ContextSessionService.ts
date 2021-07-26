@@ -1,23 +1,18 @@
 import { AuthenticationError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
-import { Request } from 'express';
 import jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
 
 import { ContextSessionType } from './ContextSessionType';
 import config from '../../config/config';
-import prisma from '../../config/prisma';
 import readBearerToken from './readBearerToken';
 import { fetchTunnelUrl } from '../../utils/fetchTunnelUrl';
-import { PrismaClient } from '@prisma/client';
 import CustomerService from '../customer/CustomerService';
-import { ContextSessionServiceType } from './ContextSessionServiceType';
-import { UserServiceType } from '../users/UserServiceTypes';
-import { CustomerServiceType } from '../customer/CustomerServiceType';
 import UserService from '../users/UserService';
 
 
 class ContextSessionService {
-  customerService: CustomerServiceType;
+  customerService: CustomerService;
   userService: UserService;
   context: ExpressContext
 

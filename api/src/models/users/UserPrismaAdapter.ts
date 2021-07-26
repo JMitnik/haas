@@ -1,9 +1,9 @@
-import { UserPrismaAdapterType, RegisterUserInput } from "./UserPrismaAdapterType";
-import { PrismaClient, UserUpdateInput, UserWhereUniqueInput, UserWhereInput, User } from "@prisma/client";
+import { RegisterUserInput } from "./UserPrismaAdapterType";
+import { PrismaClient, UserUpdateInput, UserWhereInput, User } from "@prisma/client";
 import RoleService from '../role/RoleService';
 import { RoleServiceType } from "../role/RoleServiceType";
 
-class UserPrismaAdapter implements UserPrismaAdapterType {
+class UserPrismaAdapter {
   prisma: PrismaClient;
   roleService: RoleServiceType;
 

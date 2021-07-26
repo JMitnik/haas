@@ -14,16 +14,7 @@ import CustomerService from '../customer/CustomerService';
 import JobProcessLocationPrismaAdapter from './JobProcessLocationPrismaAdapter';
 import CreateWorkspaceJobPrismaAdapter from './CreateWorkspaceJobPrismaAdapter';
 import CustomFieldPrismaAdapter from './CustomFieldPrismaAdapter';
-
-
-type ScreenshotProps = {
-  websiteUrl: string;
-  bucket: string;
-  jobId: string;
-  requiresRembg: boolean | null | undefined;
-  requiresScreenshot: boolean | null | undefined;
-  requiresColorExtraction: boolean | null | undefined;
-};
+import { CreateWorkspaceJobProps, ScreenshotProps } from './AutodeckServiceType';
 
 const s3 = new AWS.S3({
   accessKeyId: config.autodeckAwsAccessKeyId,
@@ -35,24 +26,6 @@ const sns = new AWS.SNS({
   accessKeyId: config.autodeckAwsAccessKeyId,
   secretAccessKey: config.autodeckAwsSecretAccessKey
 });
-
-export interface CreateWorkspaceJobProps {
-  id?: string | null;
-  name?: string | null;
-  websiteUrl?: string | null;
-  logoUrl?: string | null;
-  answer1?: string | null;
-  answer2?: string | null;
-  answer3?: string | null;
-  answer4?: string | null;
-  firstName?: string | null;
-  primaryColour?: string | null;
-  requiresRembg?: boolean | null;
-  requiresWebsiteScreenshot?: boolean | null;
-  requiresColorExtraction?: boolean | null;
-  usesAdjustedLogo?: boolean | null;
-  jobLocationId?: string | null;
-}
 
 class AutodeckService {
   customFieldPrismaAdapter: CustomFieldPrismaAdapter;

@@ -1,8 +1,7 @@
 import {
   ChoiceNodeEntry,
-  FormNodeEntryGetPayload,
   LinkNodeEntry, NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
-  QuestionNode, RegistrationNodeEntry,
+  RegistrationNodeEntry,
   SliderNodeEntry, TextboxNodeEntry, PrismaClient
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
@@ -13,20 +12,7 @@ import { NexusGenInputs } from '../../generated/nexus';
 import { OrderByProps } from '../../types/generic';
 import { pickProperties } from '../../utils/pickProperties';
 import NodeEntryPrismaAdapter from './NodeEntryPrismaAdapter';
-
-export interface NodeEntryWithTypes extends NodeEntry {
-  session?: {
-    id: String;
-    createdAt: Date;
-  } | undefined | null;
-  relatedNode?: QuestionNode | null;
-  sliderNodeEntry?: SliderNodeEntry | undefined | null;
-  choiceNodeEntry?: ChoiceNodeEntry | undefined | null;
-  formNodeEntry?: FormNodeEntryGetPayload<{ include: { values: true } }> | undefined | null;
-  registrationNodeEntry?: RegistrationNodeEntry | undefined | null;
-  textboxNodeEntry?: TextboxNodeEntry | undefined | null;
-  linkNodeEntry?: LinkNodeEntry | undefined | null;
-}
+import { NodeEntryWithTypes } from './NodeEntryServiceType';
 
 class NodeEntryService {
   nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;

@@ -2,8 +2,6 @@ import { UserInputError } from 'apollo-server-express';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
-import { CustomerType } from '../customer/Customer';
-// eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
 import { TagEnum } from '@prisma/client';
 

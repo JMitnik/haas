@@ -1,14 +1,6 @@
-import { BatchPayload, PrismaClient, Share, ShareCreateInput, ShareUpdateInput } from "@prisma/client";
+import { BatchPayload, PrismaClient, Share } from "@prisma/client";
 
-export type UpdateShareInput = {
-  title: string;
-  url: string;
-  tooltip: string;
-}
-
-export interface CreateShareInput extends UpdateShareInput {
-  questionId: string;
-};
+import { CreateShareInput, UpdateShareInput } from "./ShareNodePrismaAdapterType";
 
 class ShareNodePrismaAdapter {
   prisma: PrismaClient;

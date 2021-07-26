@@ -1,9 +1,19 @@
-import { QuestionCondition, Edge, QuestionNode } from "@prisma/client";
+interface QuestionConditionProps {
+  id?: number;
+  conditionType: string;
+  renderMin: number;
+  renderMax: number;
+  matchValue: string;
+}
 
-export interface EdgeServiceType {
-  getConditionsById(edgeId: string): Promise<QuestionCondition[]>;
-  getEdgeById(edgeId: string): Promise<(Edge & {
-    conditions: QuestionCondition[];
-  }) | null>;
-  createEdge(parent: QuestionNode, child: QuestionNode, conditions: any): Promise<void>
+interface EdgeNodeProps {
+  id: string;
+  title: string;
+}
+
+export interface EdgeChildProps {
+  id?: string;
+  conditions: [QuestionConditionProps];
+  parentNode: EdgeNodeProps;
+  childNode: EdgeNodeProps;
 }

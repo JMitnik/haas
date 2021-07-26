@@ -15,13 +15,7 @@ import FontSettingsPrismaAdapter from '../settings/FontSettingsPrismaAdapter';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
-
-export type UpdateCustomerInput = {
-  name: string;
-  slug: string;
-  logoUrl?: string | null;
-  primaryColour?: string | null;
-};
+import { UpdateCustomerInput } from './CustomerServiceType';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -45,6 +39,39 @@ class CustomerService {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
   }
+
+  async getDialogue(customerId: string, dialogueSlug: string) {
+    const customer = await prisma.customer.findOne({
+      where: {
+        id: customerId || undefined,
+      },
+      include: {
+        dialogues: {
+          where: {
+            slug: dialogueSlug,
+          },
+          include: {
+            questions: {
+              select: {
+                id: true,
+              },
+            },
+            edges: {
+              select: {
+                id: true,
+                parentNodeId: true,
+                childNodeId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const dialogue = customer?.dialogues[0];
+    return dialogue;
+  }
+
   getColourSettings(colourSettingsId: number) {
     return this.colourSettingsPrismaAdater.getById(colourSettingsId);
   }

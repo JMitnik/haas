@@ -1,8 +1,6 @@
 import { PrismaClient, TriggerUpdateInput, TriggerCreateInput, Trigger } from "@prisma/client";
-import { CreateTriggerInput } from "../../TriggerService";
-import { CreateQuestionOfTriggerInput } from "../QuestionOfTrigger/QuestionOfTriggerPrismaAdapter";
-
-
+import { CreateTriggerInput } from "../../TriggerServiceType";
+import { CreateQuestionOfTriggerInput } from "../QuestionOfTrigger/QuestionOfTriggerPrismaAdapterType";
 
 class TriggerPrismaAdapter {
   prisma: PrismaClient;

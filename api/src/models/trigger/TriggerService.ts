@@ -7,7 +7,6 @@ import {
   User,
   UserWhereUniqueInput,
   PrismaClient,
-  TriggerCreateInput,
   Dialogue,
   TriggerMedium,
   TriggerEnum,
@@ -25,31 +24,15 @@ import { SessionWithEntries } from '../session/SessionTypes';
 import { mailService } from '../../services/mailings/MailService';
 
 import { smsService } from '../../services/sms/SmsService';
-import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
+import NodeEntryService from '../node-entry/NodeEntryService';
+import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import makeTriggerMailTemplate from '../../services/mailings/templates/makeTriggerMailTemplate';
 import prisma from '../../config/prisma';
 import TriggerPrismaAdapter from './adapters/Trigger/TriggerPrismaAdapter';
-import QuestionOfTriggerPrismaAdapter, { CreateQuestionOfTriggerInput } from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapter';
+import QuestionOfTriggerPrismaAdapter from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapter';
+import { CreateQuestionOfTriggerInput } from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapterType';
 import TriggerConditionPrismaAdapter from './adapters/TriggerCondition/TriggerConditionPrismaAdapter';
-
-export interface CreateTriggerInput {
-  name: string;
-  medium: TriggerMedium;
-  type: TriggerEnum;
-  customerSlug: string;
-  recipients: { id: string }[];
-}
-
-interface TriggerWithSendData extends Trigger {
-  recipients: User[];
-  conditions: TriggerCondition[];
-  customer: CustomerWithCustomerSettings | null;
-  relatedNode: {
-    questionDialogue: {
-      title: string;
-    } | null;
-  } | null;
-}
+import { CreateTriggerInput, TriggerWithSendData } from './TriggerServiceType';
 
 class TriggerService {
   triggerPrismaAdapter: TriggerPrismaAdapter;

@@ -1,44 +1,10 @@
 import { PrismaClient, QuestionNodeUpdateInput, QuestionNodeCreateInput, BatchPayload, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, FormNodeFieldUpsertArgs, FormNodeCreateInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, NodeType } from "@prisma/client";
-import { NexusGenInputs } from "../../../../generated/nexus";
-import { CreateQuestionInput } from "../../../questionnaire/DialoguePrismaAdapter";
+
+import { CreateQuestionInput } from "../../../questionnaire/DialoguePrismaAdapterType";
 import NodeService from "../../NodeService";
 import { QuestionOptionProps } from "../../NodeServiceType";
 import QuestionOptionPrismaAdapter from "../QuestionOption/QuestionOptionPrismaAdapter";
-
-export type CreateCTAInput = {
-  title: string,
-  type?: "GENERIC" | "SLIDER" | "FORM" | "CHOICE" | "REGISTRATION" | "TEXTBOX" | "LINK" | "SHARE" | "VIDEO_EMBEDDED" | undefined,
-  form?: NexusGenInputs['FormNodeInputType'] | null, // FormNodeInputType
-  links: {
-    id: string | undefined;
-    backgroundColor: string | undefined;
-    iconUrl: string | undefined;
-    title: string | undefined;
-    type: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP";
-    url: string;
-  }[],
-  share: {
-    id: string | undefined;
-    title: string;
-    tooltip: string | undefined;
-    url: string;
-  } | undefined,
-  dialogueId: string,
-}
-
-export type UpdateFormFieldsInput = {
-  questionId: string;
-  fields: FormNodeFieldUpsertArgs[];
-}
-
-export type CreateFormFieldsInput = {
-  questionId: string;
-  fields: FormNodeCreateInput;
-}
-
-export interface UpdateQuestionInput extends CreateQuestionInput {
-  currentOverrideLeafId?: string | null;
-}
+import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput } from "./QuestionNodePrismaAdapterType";
 
 class QuestionNodePrismaAdapter {
   prisma: PrismaClient;

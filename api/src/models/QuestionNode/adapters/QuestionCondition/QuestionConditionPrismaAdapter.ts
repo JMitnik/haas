@@ -1,7 +1,6 @@
-import { QuestionConditionPrismaAdapterType } from "./QuestionConditionPrismaAdapterType";
 import { PrismaClient, QuestionConditionUpdateInput, QuestionConditionCreateInput, QuestionCondition } from "@prisma/client";
 
-class QuestionConditionPrismaAdapter implements QuestionConditionPrismaAdapterType {
+class QuestionConditionPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {

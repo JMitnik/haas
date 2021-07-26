@@ -1,16 +1,6 @@
-import { BatchPayload, Dialogue, PrismaClient, QuestionNode, QuestionOfTrigger, QuestionOfTriggerCreateInput, TriggerConditionEnum } from "@prisma/client";
+import { BatchPayload, Dialogue, PrismaClient, QuestionNode, QuestionOfTrigger, QuestionOfTriggerCreateInput } from "@prisma/client";
 
-export interface CreateQuestionOfTriggerInput {
-  triggerId: string;
-  condition: {
-    id?: number | null | undefined;
-    maxValue?: number | null | undefined;
-    minValue?: number | null | undefined;
-    questionId?: string | null | undefined;
-    textValue?: string | null | undefined;
-    type?: TriggerConditionEnum | null;
-  }
-}
+import { CreateQuestionOfTriggerInput } from "./QuestionOfTriggerPrismaAdapterType";
 
 class QuestionOfTriggerPrismaAdapter {
   prisma: PrismaClient;
