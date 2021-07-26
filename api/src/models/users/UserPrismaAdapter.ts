@@ -61,6 +61,35 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
         },
       },
     });
+  };
+
+  async createNewUser(customerId: string, roleId: string, email: string) {
+    return this.prisma.user.create({
+      data: {
+        email,
+        customers: {
+          create: {
+            customer: { connect: { id: customerId } },
+            role: { connect: { id: roleId } },
+          },
+        },
+      },
+      include: {
+        customers: {
+          include: {
+            customer: {
+              include: {
+                settings: {
+                  include: {
+                    colourSettings: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async registerUser(registerUserInput: RegisterUserInput) {
@@ -119,10 +148,13 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     });;
   }
 
-  async getUserById(userId: string) {
+  async getUserByEmail(email: string) {
     return this.prisma.user.findFirst({
       where: {
-        id: userId,
+        email: {
+          equals: email,
+          mode: 'insensitive',
+        }
       },
       include: {
         customers: {
@@ -136,13 +168,10 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
     })
   }
 
-  async getUserByEmail(email: string) {
+  async getUserById(userId: string) {
     return this.prisma.user.findFirst({
       where: {
-        email: {
-          equals: email,
-          mode: 'insensitive',
-        }
+        id: userId,
       },
       include: {
         customers: {

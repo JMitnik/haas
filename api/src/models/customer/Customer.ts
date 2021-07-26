@@ -47,8 +47,8 @@ export const CustomerType = objectType({
       args: { customerSlug: 'String', filter: PaginationWhereInput },
       nullable: true,
 
-      async resolve(parent, args) {
-        const users = await UserService.paginatedUsers(
+      async resolve(parent, args, ctx) {
+        const users = await ctx.services.userService.paginatedUsers(
           parent.slug,
           {
             pageIndex: args.filter?.pageIndex,

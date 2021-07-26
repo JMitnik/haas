@@ -70,12 +70,12 @@ class UserService {
   }
 
   async getCustomersOfUser(userId: string): Promise<Customer[]> {
-    const user = await this.userPrismaAdapter.findFirst({ id: userId });
+    const user = await this.userPrismaAdapter.getUserById(userId);
     return user?.customers.map((customerOfUser) => customerOfUser.customer) || [];
   }
 
   async getUserCustomers(userId: string) {
-    const user = await this.userPrismaAdapter.findFirst({ id: userId });
+    const user = await this.userPrismaAdapter.getUserById(userId);
     const { customers, ...rest } = user;
 
     return customers?.map((customerOfUser) => ({
@@ -86,7 +86,7 @@ class UserService {
   }
 
   async getGlobalPermissions(userId: string) {
-    const user = await this.userPrismaAdapter.findFirst({ id: userId });
+    const user = await this.userPrismaAdapter.getUserById(userId);
     return user?.globalPermissions || [];
   }
 
@@ -144,32 +144,7 @@ class UserService {
    * Invites a new user to a current customer, and mails them with a login-token.
    */
   async inviteNewUserToCustomer(email: string, customerId: string, roleId: string) {
-    const createdUser = await this.prisma.user.create({
-      data: {
-        email,
-        customers: {
-          create: {
-            customer: { connect: { id: customerId } },
-            role: { connect: { id: roleId } },
-          },
-        },
-      },
-      include: {
-        customers: {
-          include: {
-            customer: {
-              include: {
-                settings: {
-                  include: {
-                    colourSettings: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
+    const createdUser = await this.userPrismaAdapter.createNewUser(customerId, roleId, email)
 
     const inviteLoginToken = AuthService.createUserToken(createdUser.id);
 
@@ -206,7 +181,7 @@ class UserService {
   }
 
   async inviteExistingUserToCustomer(userId: string, newRoleId: string, workspaceId: string) {
-    const invitedUser = await this.userOfCustomerPrismaAdapter.createUserForInvitingWorkspace(workspaceId, newRoleId, userId);
+    const invitedUser = await this.userOfCustomerPrismaAdapter.createExistingUserForInvitingWorkspace(workspaceId, newRoleId, userId);
 
     const inviteLoginToken = AuthService.createUserToken(userId);
     await this.userPrismaAdapter.setLoginToken(userId, inviteLoginToken);
@@ -286,7 +261,7 @@ class UserService {
     return usersOfCustomer;
   };
 
-  static paginatedUsers = async (
+  paginatedUsers = async (
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
@@ -308,12 +283,12 @@ class UserService {
     };
 
     const findManyUsers = async ({ props, paginationOpts }: FindManyCallBackProps) => {
-      const users: any = await prisma.userOfCustomer.findMany(props);
+      const users: any = this.prisma.userOfCustomer.findMany(props);
       const filteredBySearch = UserService.filterBySearchTerm(users, paginationOpts?.searchTerm);
       const orderedUsers = UserService.orderUsersBy(filteredBySearch, paginationOpts?.orderBy?.[0]);
       return orderedUsers;
     };
-    const countUsers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.userOfCustomer.count(countArgs);
+    const countUsers = async ({ props: countArgs }: FindManyCallBackProps) => this.prisma.userOfCustomer.count(countArgs);
 
     const paginateProps: PaginateProps = {
       findManyArgs: {

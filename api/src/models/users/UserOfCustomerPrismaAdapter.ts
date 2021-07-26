@@ -7,6 +7,20 @@ class UserOfCustomerPrismaAdapter implements UserOfCustomerPrismaAdapterType {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
+
+  getAllUsersByCustomerSlug(customerSlug: string) {
+    return this.prisma.userOfCustomer.findMany({
+      where: {
+        customer: { slug: customerSlug },
+      },
+      include: {
+        customer: true,
+        role: true,
+        user: true,
+      },
+    })
+  }
+
   delete(userId: string, customerId: string): Promise<UserOfCustomer> {
     return this.prisma.userOfCustomer.delete({
       where: {
@@ -18,7 +32,7 @@ class UserOfCustomerPrismaAdapter implements UserOfCustomerPrismaAdapterType {
     });
   }
 
-  createUserForInvitingWorkspace = (workspaceId: string, roleId: string, userId: string) => {
+  createExistingUserForInvitingWorkspace = (workspaceId: string, roleId: string, userId: string) => {
     return this.prisma.userOfCustomer.create({
       data: {
         customer: { connect: { id: workspaceId } },
