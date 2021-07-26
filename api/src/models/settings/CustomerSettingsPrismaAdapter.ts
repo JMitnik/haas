@@ -1,7 +1,6 @@
-import { CustomerSettingsPrismaAdapterType } from "./CustomerSettingsPrismaAdapterType";
 import { PrismaClient, CustomerSettingsUpdateInput, CustomerSettings } from "@prisma/client";
 
-class CustomerSettingsPrismaAdapter implements CustomerSettingsPrismaAdapterType {
+class CustomerSettingsPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {

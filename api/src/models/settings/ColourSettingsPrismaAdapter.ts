@@ -1,7 +1,6 @@
-import { ColourSettingsPrismaAdapterType } from "./ColourSettingsPrismaAdapterType";
 import { ColourSettings, PrismaClient } from "@prisma/client";
 
-class ColourSettingsPrismaAdapter implements ColourSettingsPrismaAdapterType {
+class ColourSettingsPrismaAdapter {
   prisma: PrismaClient;
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;

@@ -1,7 +1,6 @@
-import { FontSettingsPrismaAdapterType } from "./FontSettingsPrismaAdapterType";
 import { PrismaClient, FontSettings } from "@prisma/client";
 
-class FontSettingsPrismaAdapter implements FontSettingsPrismaAdapterType {
+class FontSettingsPrismaAdapter {
   prisma: PrismaClient;
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
