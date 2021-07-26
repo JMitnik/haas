@@ -9,6 +9,8 @@ import {
   PrismaClient,
   TriggerCreateInput,
   Dialogue,
+  TriggerMedium,
+  TriggerEnum,
 } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
 import { isPresent } from 'ts-is-present';
@@ -26,13 +28,17 @@ import { smsService } from '../../services/sms/SmsService';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import makeTriggerMailTemplate from '../../services/mailings/templates/makeTriggerMailTemplate';
 import prisma from '../../config/prisma';
-import { TriggerServiceType } from './TriggerServiceType';
-import { TriggerPrismaAdapterType } from './adapters/Trigger/TriggerPrismaAdapterType';
 import TriggerPrismaAdapter from './adapters/Trigger/TriggerPrismaAdapter';
-import { QuestionOfTriggerPrismaAdapterType } from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapterType';
-import QuestionOfTriggerPrismaAdapter from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapter';
-import { TriggerConditionPrismaAdapterType } from './adapters/TriggerCondition/TriggerConditionPrismaAdapterType';
+import QuestionOfTriggerPrismaAdapter, { CreateQuestionOfTriggerInput } from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapter';
 import TriggerConditionPrismaAdapter from './adapters/TriggerCondition/TriggerConditionPrismaAdapter';
+
+export interface CreateTriggerInput {
+  name: string;
+  medium: TriggerMedium;
+  type: TriggerEnum;
+  customerSlug: string;
+  recipients: { id: string }[];
+}
 
 interface TriggerWithSendData extends Trigger {
   recipients: User[];
@@ -45,10 +51,10 @@ interface TriggerWithSendData extends Trigger {
   } | null;
 }
 
-class TriggerService implements TriggerServiceType {
-  triggerPrismaAdapter: TriggerPrismaAdapterType;
-  questionOfTriggerPrismaAdapter: QuestionOfTriggerPrismaAdapterType;
-  triggerConditionPrismaAdapter: TriggerConditionPrismaAdapterType;
+class TriggerService {
+  triggerPrismaAdapter: TriggerPrismaAdapter;
+  questionOfTriggerPrismaAdapter: QuestionOfTriggerPrismaAdapter;
+  triggerConditionPrismaAdapter: TriggerConditionPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.triggerPrismaAdapter = new TriggerPrismaAdapter(prismaClient);
@@ -60,33 +66,12 @@ class TriggerService implements TriggerServiceType {
     return this.triggerPrismaAdapter.getById(triggerId);
   }
 
-  async createTrigger(triggerCreateArgs: TriggerCreateInput, conditions: { id?: number | null | undefined; maxValue?: number | null | undefined; minValue?: number | null | undefined; questionId?: string | null | undefined; textValue?: string | null | undefined; type?: "LOW_THRESHOLD" | "HIGH_THRESHOLD" | "INNER_RANGE" | "OUTER_RANGE" | "TEXT_MATCH" | null | undefined; }[]): Promise<Trigger> {
+  async createTrigger(triggerCreateArgs: CreateTriggerInput, conditions: { id?: number | null | undefined; maxValue?: number | null | undefined; minValue?: number | null | undefined; questionId?: string | null | undefined; textValue?: string | null | undefined; type?: "LOW_THRESHOLD" | "HIGH_THRESHOLD" | "INNER_RANGE" | "OUTER_RANGE" | "TEXT_MATCH" | null | undefined; }[]): Promise<Trigger> {
     const trigger = await this.triggerPrismaAdapter.create(triggerCreateArgs);
 
-    conditions?.forEach(async (condition: any) => await this.questionOfTriggerPrismaAdapter.create({
-      question: {
-        connect: {
-          id: condition?.questionId || undefined,
-        },
-      },
-      trigger: {
-        connect: {
-          id: trigger.id,
-        },
-      },
-      triggerCondition: {
-        create: {
-          type: condition.type || 'TEXT_MATCH',
-          maxValue: condition.maxValue,
-          minValue: condition.minValue,
-          textValue: condition.textValue,
-          trigger: {
-            connect: {
-              id: trigger.id,
-            },
-          },
-        },
-      },
+    conditions?.forEach(async (condition) => await this.questionOfTriggerPrismaAdapter.createQuestionOfTrigger({
+      triggerId: trigger.id,
+      condition,
     }));
 
     return trigger;
@@ -221,24 +206,16 @@ class TriggerService implements TriggerServiceType {
     }
   };
 
-  static async tryTrigger(session: SessionWithEntries, trigger: TriggerWithSendData) {
+  async tryTrigger(session: SessionWithEntries, trigger: TriggerWithSendData) {
     const currentDate = new Date();
     const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 5), trigger.lastSent);
 
     // TODO-LATER: Put this part into a queue
     if (!safeToSend) return;
 
-    await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
+    await this.triggerPrismaAdapter.updateLastSent(trigger.id, currentDate);
 
-    const questionsOfTrigger = await prisma.questionOfTrigger.findMany({
-      where: {
-        triggerId: trigger.id,
-      },
-      include: {
-        question: true,
-        triggerCondition: true,
-      },
-    });
+    const questionsOfTrigger = await this.triggerPrismaAdapter.getQuestionsOfTriggerById(trigger.id);
 
     const triggerTargets = questionsOfTrigger.map((questionOfTrigger) => {
       const { questionId, triggerCondition } = questionOfTrigger;
@@ -257,75 +234,21 @@ class TriggerService implements TriggerServiceType {
     }
   }
 
-  static tryTriggers = async (session: SessionWithEntries) => {
+  tryTriggers = async (session: SessionWithEntries) => {
     const questionIds = session.nodeEntries?.map((entry) => entry.relatedNodeId).filter(isPresent);
-    const dialogueTriggers = await TriggerService.findTriggersByQuestionIds(questionIds);
+    const dialogueTriggers = await this.findTriggersByQuestionIds(questionIds);
 
     dialogueTriggers.forEach(async (trigger) => {
-      await TriggerService.tryTrigger(session, trigger);
+      await this.tryTrigger(session, trigger);
     });
   };
 
-  static findTriggersByDialogueId = async (dialogueId: string) => prisma.trigger.findMany({
-    where: {
-      relatedNode: {
-        questionDialogueId: dialogueId,
-      },
-    },
-    include: {
-      customer: {
-        include: {
-          settings: {
-            include: {
-              colourSettings: true,
-            },
-          },
-        },
-      },
-    },
-  });
+  findTriggersByDialogueId = async (dialogueId: string) => {
+    return this.triggerPrismaAdapter.findTriggersByDialogueId(dialogueId);
+  }
 
-  static findTriggersByQuestionIds = async (questionIds: Array<string>) => {
-    const questionOfTriggerEntries = await prisma.questionOfTrigger.findMany({
-      where: {
-        questionId: {
-          in: questionIds,
-        },
-      },
-    });
-
-    const triggerIds = questionOfTriggerEntries.map((entry) => entry.triggerId);
-
-    return prisma.trigger.findMany({
-      where: {
-        type: 'QUESTION',
-        id: {
-          in: triggerIds,
-        },
-      },
-      include: {
-        recipients: true,
-        conditions: true,
-        customer: {
-          include: {
-            settings: {
-              include: {
-                colourSettings: true,
-              },
-            },
-          },
-        },
-        relatedNode: {
-          select: {
-            questionDialogue: {
-              select: {
-                title: true,
-              },
-            },
-          },
-        },
-      },
-    });
+  findTriggersByQuestionIds = async (questionIds: Array<string>) => {
+    return this.triggerPrismaAdapter.findTriggersByQuestionIds(questionIds);
   };
 
   static matchMulti(triggerTargets: {
@@ -442,68 +365,23 @@ class TriggerService implements TriggerServiceType {
     return updateTriggerArgs;
   };
 
-  static updateConditions = async (
+  updateConditions = async (
     dbTriggerConditions: Array<TriggerCondition>,
     newConditions: Array<NexusGenInputs['TriggerConditionInputType']>,
     triggerId: string,
   ) => {
     const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
-      const upsertQuestionOfTrigger = await prisma.questionOfTrigger.upsert({
-        where: {
-          questionId_triggerId: {
-            questionId: condition.questionId || '-1',
-            triggerId: triggerId || '-1',
-          },
-        },
-        create: {
-          question: {
-            connect: {
-              id: condition.questionId || undefined,
-            },
-          },
-          trigger: {
-            connect: {
-              id: triggerId,
-            },
-          },
-          triggerCondition: {
-            create: {
-              type: condition.type || undefined,
-              minValue: condition.minValue,
-              maxValue: condition.maxValue,
-              textValue: condition.textValue,
-              trigger: {
-                connect: {
-                  id: triggerId,
-                },
-              },
-            },
-          },
-        },
-        update: {
-          question: {
-            connect: {
-              id: condition.questionId || undefined,
-            },
-          },
-          triggerCondition: {
-            update: {
-              type: condition.type || undefined,
-              minValue: condition.minValue,
-              maxValue: condition.maxValue,
-              textValue: condition.textValue,
-            },
-          },
-        },
-      });
+      const upsertInput: CreateQuestionOfTriggerInput = { condition, triggerId };
+
+      const upsertQuestionOfTrigger = await this.triggerPrismaAdapter.upsertQuestionOfTrigger(upsertInput);
+
       return upsertQuestionOfTrigger.triggerConditionId;
     }));
 
     await Promise.all(dbTriggerConditions.map(async (condition) => {
       if (!upsertedConditionsIds.includes(condition.id)) {
-        await prisma.questionOfTrigger.deleteMany({ where: { triggerConditionId: condition.id } });
-        const deletedCondition = await prisma.triggerCondition.delete({ where: { id: condition.id } });
-        return deletedCondition.id;
+        await this.questionOfTriggerPrismaAdapter.deleteManyByTriggerConditionId(condition.id);
+        return this.triggerConditionPrismaAdapter.deleteById(condition.id);
       }
 
       return null;

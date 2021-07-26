@@ -22,9 +22,11 @@ import SessionPrismaAdapter from './SessionPrismaAdapter';
 
 class SessionService {
   sessionPrismaAdapter: SessionPrismaAdapter;
+  triggerService: TriggerService;
 
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
+    this.triggerService = new TriggerService(prismaClient);
   }
 
   getSessionById(sessionId: string): Promise<Session | null> {
@@ -75,7 +77,7 @@ class SessionService {
     }
 
     try {
-      await TriggerService.tryTriggers(session);
+      await this.triggerService.tryTriggers(session);
     } catch (error) {
       console.log('Something went wrong while handling sms triggers: ', error);
     }

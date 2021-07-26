@@ -1,9 +1,7 @@
 import {
   PrismaClient,
-  TriggerCreateInput,
   TriggerUpdateInput,
   TriggerEnum,
-  TriggerConditionUpdateInput
 } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
@@ -12,8 +10,9 @@ import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 import { UserType } from '../users/User';
 
-import TriggerService from './TriggerService';
+import TriggerService, { CreateTriggerInput } from './TriggerService';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
+import { UserInputError } from 'apollo-server-express';
 
 const TriggerTypeEnum = enumType({
   name: 'TriggerTypeEnum',
@@ -184,16 +183,17 @@ const TriggerMutations = extendType({
         input: CreateTriggerInputType,
       },
       async resolve(parent, args, ctx) {
-        if (!args?.input?.customerSlug) throw new Error('No provided customer found');
+        if (!args.input?.customerSlug) throw new Error('No provided customer found');
+        if (!args.input.trigger?.name) throw new UserInputError('No trigger name provided');
+        if (!args.input.trigger?.medium) throw new UserInputError('No trigger medium provided');
+        if (!args.input.trigger?.type) throw new UserInputError('No trigger type provided');
 
-        // TODO: Setup sensible defaults instead of these?
-        const createArgs: TriggerCreateInput = {
-          name: args.input.trigger?.name || '',
-          medium: args.input.trigger?.medium || 'EMAIL',
-          type: args.input.trigger?.type || 'QUESTION',
-          customer: { connect: { slug: args.input.customerSlug } },
-          relatedNode: undefined,
-          recipients: { connect: args.input.recipients?.ids?.map((id: string) => ({ id })) },
+        const createArgs: CreateTriggerInput = {
+          name: args.input.trigger?.name,
+          medium: args.input.trigger?.medium,
+          type: args.input.trigger?.type,
+          customerSlug: args.input.customerSlug,
+          recipients: args.input.recipients?.ids?.map((id: string) => ({ id })) || [],
         };
 
         return ctx.services.triggerService.createTrigger(createArgs, args.input.trigger?.conditions || []);
@@ -283,7 +283,7 @@ const TriggerQueries = extendType({
         }
 
         if (args.dialogueId) {
-          return TriggerService.findTriggersByDialogueId(args.dialogueId) as any;
+          return ctx.services.triggerService.findTriggersByDialogueId(args.dialogueId) as any;
         }
 
         if (args.customerSlug) {

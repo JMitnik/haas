@@ -1,10 +1,56 @@
-import { QuestionOfTriggerPrismaAdapterType } from "./QuestionOfTriggerPrismaAdapterType";
-import { BatchPayload, Dialogue, PrismaClient, QuestionNode, QuestionOfTrigger, QuestionOfTriggerCreateInput } from "@prisma/client";
+import { BatchPayload, Dialogue, PrismaClient, QuestionNode, QuestionOfTrigger, QuestionOfTriggerCreateInput, TriggerConditionEnum } from "@prisma/client";
 
-class QuestionOfTriggerPrismaAdapter implements QuestionOfTriggerPrismaAdapterType {
+export interface CreateQuestionOfTriggerInput {
+  triggerId: string;
+  condition: {
+    id?: number | null | undefined;
+    maxValue?: number | null | undefined;
+    minValue?: number | null | undefined;
+    questionId?: string | null | undefined;
+    textValue?: string | null | undefined;
+    type?: TriggerConditionEnum | null;
+  }
+}
+
+class QuestionOfTriggerPrismaAdapter {
   prisma: PrismaClient;
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
+  }
+
+  async deleteManyByTriggerConditionId(triggerConditionId: number) {
+    await this.prisma.questionOfTrigger.deleteMany({ where: { triggerConditionId } });
+  }
+
+  createQuestionOfTrigger(data: CreateQuestionOfTriggerInput) {
+    const { condition, triggerId } = data;
+    return this.prisma.questionOfTrigger.create({
+      data: {
+        question: {
+          connect: {
+            id: condition?.questionId || undefined,
+          },
+        },
+        trigger: {
+          connect: {
+            id: triggerId,
+          },
+        },
+        triggerCondition: {
+          create: {
+            type: condition.type || 'TEXT_MATCH',
+            maxValue: condition.maxValue,
+            minValue: condition.minValue,
+            textValue: condition.textValue,
+            trigger: {
+              connect: {
+                id: triggerId,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   create(data: QuestionOfTriggerCreateInput): Promise<QuestionOfTrigger> {
