@@ -1,13 +1,10 @@
-import { TagServiceType } from "./TagServiceType";
 import { PrismaClient, Tag, TagCreateInput } from "@prisma/client";
-import { TagPrismaAdapterType } from "./TagPrismaAdapterType";
-import TagPrismaAdapter from "./TagPrismaAdapter";
-import { CustomerPrismaAdapterType } from "../customer/CustomerPrismaAdapterType";
+import TagPrismaAdapter, { CreateTagInput } from "./TagPrismaAdapter";
 import { CustomerPrismaAdapter } from "../customer/CustomerPrismaAdapter";
 
-class TagService implements TagServiceType {
-  tagPrismaAdapter: TagPrismaAdapterType;
-  customerPrismaAdapter: CustomerPrismaAdapterType;
+class TagService {
+  tagPrismaAdapter: TagPrismaAdapter;
+  customerPrismaAdapter: CustomerPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.tagPrismaAdapter = new TagPrismaAdapter(prismaClient);
@@ -19,16 +16,12 @@ class TagService implements TagServiceType {
 
   async createTag(customerSlug: string, name: string, type: "DEFAULT" | "AGENT" | "LOCATION"): Promise<Tag> {
     const customer = await this.customerPrismaAdapter.findWorkspaceBySlug(customerSlug);
-    const createTagInput: TagCreateInput = {
+    const createTagInput: CreateTagInput = {
       name,
       type: type || "DEFAULT",
-      customer: {
-        connect: {
-          id: customer?.id,
-        }
-      }
+      customerId: customer?.id || '-1',
     }
-    return this.tagPrismaAdapter.create(createTagInput);
+    return this.tagPrismaAdapter.createTag(createTagInput);
   }
   getAllTagsByCustomerSlug(customerSlug: string): Promise<Tag[]> {
     return this.customerPrismaAdapter.findManyTagsByCustomerSlug(customerSlug);

@@ -1,5 +1,11 @@
 import { TagPrismaAdapterType } from "./TagPrismaAdapterType";
-import { PrismaClient, Tag, TagCreateInput } from "@prisma/client";
+import { PrismaClient, Tag, TagCreateInput, TagEnum } from "@prisma/client";
+
+export interface CreateTagInput {
+  name: string;
+  type: TagEnum,
+  customerId: string;
+}
 
 class TagPrismaAdapter implements TagPrismaAdapterType {
   prisma: PrismaClient;
@@ -13,6 +19,21 @@ class TagPrismaAdapter implements TagPrismaAdapterType {
         id: tagId,
       }
     })
+  }
+
+  createTag(data: CreateTagInput) {
+    const { name, type, customerId } = data;
+    return this.prisma.tag.create({
+      data: {
+        name,
+        type,
+        customer: {
+          connect: {
+            id: customerId,
+          },
+        },
+      },
+    });
   }
 
   create(data: TagCreateInput): Promise<Tag> {
