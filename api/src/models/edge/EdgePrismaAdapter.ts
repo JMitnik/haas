@@ -1,8 +1,18 @@
 import { PrismaClient, EdgeCreateInput, BatchPayload, Edge, QuestionCondition } from "@prisma/client";
 
-import { EdgePrismaAdapterType } from "./EdgePrismaAdapterType";
+export interface CreateEdgeInput {
+  dialogueId: string;
+  parentNodeId: string;
+  conditions: Array<{
+    renderMin: number | null,
+    renderMax: number | null,
+    matchValue: string | null,
+    conditionType: string,
+  }>;
+  childNodeId: string;
+}
 
-class EdgePrismaAdapter implements EdgePrismaAdapterType {
+class EdgePrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
@@ -16,6 +26,31 @@ class EdgePrismaAdapter implements EdgePrismaAdapterType {
       },
     });
   }
+
+  createEdge(input: CreateEdgeInput) {
+    return this.prisma.edge.create({
+      data: {
+        dialogue: {
+          connect: {
+            id: input.dialogueId,
+          }
+        },
+        parentNode: {
+          connect: {
+            id: input.parentNodeId,
+          },
+        },
+        conditions: {
+          create: input.conditions,
+        },
+        childNode: {
+          connect: {
+            id: input.childNodeId,
+          },
+        },
+      },
+    });
+  };
 
   create(data: EdgeCreateInput): Promise<Edge> {
     return this.prisma.edge.create({

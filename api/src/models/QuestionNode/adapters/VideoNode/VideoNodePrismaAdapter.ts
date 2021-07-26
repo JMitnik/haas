@@ -1,7 +1,11 @@
-import { VideoNodePrismaAdapterType } from "./VideoNodePrismaAdapterType";
 import { PrismaClient, VideoEmbeddedNodeUpdateInput, VideoEmbeddedNodeCreateInput, VideoEmbeddedNode } from "@prisma/client";
 
-class VideoNodePrismaAdapter implements VideoNodePrismaAdapterType {
+interface CreateVideoEmbeddedNodeInput {
+  parentNodeId: string;
+  videoUrl?: string | null;
+}
+
+class VideoNodePrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
@@ -23,6 +27,20 @@ class VideoNodePrismaAdapter implements VideoNodePrismaAdapterType {
       }
     });
   };
+
+  createVideoNode(data: CreateVideoEmbeddedNodeInput) {
+    const { parentNodeId, videoUrl } = data;
+    return this.prisma.videoEmbeddedNode.create({
+      data: {
+        videoUrl: videoUrl,
+        QuestionNode: parentNodeId ? {
+          connect: {
+            id: parentNodeId,
+          },
+        } : undefined,
+      },
+    });
+  }
 
   create(data: VideoEmbeddedNodeCreateInput): Promise<VideoEmbeddedNode> {
     return this.prisma.videoEmbeddedNode.create({

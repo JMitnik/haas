@@ -27,7 +27,7 @@ export type CreateDialogueInput = {
   customerId: string
 };
 
-export type CreateQuestionInput = {
+export interface CreateQuestionInput {
   id?: string,
   isRoot?: boolean,
   isLeaf?: boolean,

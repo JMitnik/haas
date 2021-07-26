@@ -2,7 +2,7 @@ import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, Quest
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import { QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps } from './NodeServiceType';
-import QuestionNodePrismaAdapter, { CreateCTAInput } from './adapters/QuestionNode/QuestionNodePrismaAdapter';
+import QuestionNodePrismaAdapter, { CreateCTAInput, UpdateQuestionInput } from './adapters/QuestionNode/QuestionNodePrismaAdapter';
 import LinkPrismaAdapter from '../link/LinkPrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
 import ShareNodePrismaAdapter from './adapters/ShareNode/ShareNodePrismaAdapter';
@@ -512,37 +512,22 @@ class NodeService {
       title,
       type,
       options,
-      overrideLeafId,
+      overrideLeafId: (overrideLeafId && overrideLeafId !== 'None') ? overrideLeafId : undefined,
       dialogueId,
       videoEmbeddedNode: extraContent ? { videoUrl: extraContent } : undefined,
     }
 
     const newQuestion = await this.questionNodePrismaAdapter.createQuestion(params);
-
-    await this.edgePrismaAdapter.create({
-      dialogue: {
-        connect: {
-          id: dialogueId,
-        },
-      },
-      parentNode: {
-        connect: {
-          id: parentQuestionId,
-        },
-      },
-      conditions: {
-        create: {
-          renderMin: edgeCondition.renderMin,
-          renderMax: edgeCondition.renderMax,
-          matchValue: edgeCondition.matchValue,
-          conditionType: edgeCondition.conditionType,
-        },
-      },
-      childNode: {
-        connect: {
-          id: newQuestion.id,
-        },
-      },
+    await this.edgePrismaAdapter.createEdge({
+      dialogueId,
+      parentNodeId: parentQuestionId,
+      conditions: [{
+        renderMin: edgeCondition.renderMin,
+        renderMax: edgeCondition.renderMax,
+        matchValue: edgeCondition.matchValue,
+        conditionType: edgeCondition.conditionType,
+      }],
+      childNodeId: newQuestion.id,
     });
 
     return newQuestion;
@@ -577,12 +562,11 @@ class NodeService {
 
     const existingEdgeCondition = dbEdge?.conditions && dbEdge.conditions[0];
 
-
     try {
       await this.removeNonExistingQuestionOptions(activeOptions, options);
     } catch (e) {
       console.log('Something went wrong removing options: ', e);
-    }
+    };
 
     // Updating any question except root question should have this edge
     if (existingEdgeCondition) {
@@ -591,32 +575,20 @@ class NodeService {
       } catch (e) {
         console.log('something went wrong updating edges: ', e.stack);
       }
-    }
+    };
 
-    const updatedOptionIds = await this.updateQuestionOptions(options);
-
-    // Remove videoEmbeddedNode if updated to different type
-    let embedVideoInput: VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput | undefined;
-    if (activeQuestion?.type !== NodeType.VIDEO_EMBEDDED && activeQuestion?.videoEmbeddedNodeId) {
-      embedVideoInput = { delete: true };
-    }
-
-    const updatedNode = leaf ? await this.questionNodePrismaAdapter.updateDialogueBuilderNode(questionId, {
-      videoEmbeddedNode: embedVideoInput,
-      title,
-      overrideLeaf: leaf,
-      type,
-      options: {
-        connect: updatedOptionIds,
-      },
-    }) : await this.questionNodePrismaAdapter.updateDialogueBuilderNode(questionId, {
-      videoEmbeddedNode: embedVideoInput,
+    const updateInput: UpdateQuestionInput = {
       title,
       type,
-      options: {
-        connect: updatedOptionIds,
+      options,
+      overrideLeafId: overrideLeafId || undefined,
+      currentOverrideLeafId: currentOverrideLeafId,
+      videoEmbeddedNode: {
+        id: activeQuestion?.videoEmbeddedNodeId || undefined
       },
-    })
+    };
+
+    const updatedNode = await this.questionNodePrismaAdapter.updateDialogueBuilderNode(questionId, updateInput);
 
     if (type === NodeType.VIDEO_EMBEDDED) {
       if (updatedNode?.videoEmbeddedNodeId) {
@@ -624,47 +596,24 @@ class NodeService {
           videoUrl: extraContent,
         });
       } else {
-        await this.videoNodePrismaAdapter.create({
+        await this.videoNodePrismaAdapter.createVideoNode({
           videoUrl: extraContent,
-          QuestionNode: {
-            connect: { id: questionId },
-          },
-        })
+          parentNodeId: questionId,
+        });
       }
     } else if (type === NodeType.SLIDER) {
       if (updatedNode?.sliderNodeId) {
-        await this.sliderNodePrismaAdapter.update(updatedNode.sliderNodeId, {
+        await this.sliderNodePrismaAdapter.updateSliderNode(updatedNode.sliderNodeId, {
           happyText: happyText || null,
           unhappyText: unhappyText || null,
-          markers: {
-            update: sliderNode?.markers?.map((marker) => ({
-              where: { id: marker?.id || undefined },
-              data: {
-                label: marker.label,
-                subLabel: marker.subLabel,
-              },
-            })),
-          },
+          markers: sliderNode?.markers,
         });
       } else {
-        await this.sliderNodePrismaAdapter.create({
+        await this.sliderNodePrismaAdapter.createSliderNode({
           happyText: happyText || null,
           unhappyText: unhappyText || null,
-          QuestionNode: {
-            connect: { id: questionId },
-          },
-          markers: {
-            create: sliderNode?.markers?.map((marker) => ({
-              label: marker.label || '',
-              subLabel: marker.subLabel || '',
-              range: {
-                create: {
-                  start: marker?.range?.start || undefined,
-                  end: marker?.range?.end || undefined,
-                },
-              },
-            })),
-          },
+          parentNodeId: questionId,
+          markers: sliderNode?.markers,
         });
       };
     };
@@ -672,20 +621,7 @@ class NodeService {
     return updatedNode;
   };
 
-  updateQuestionOptions = async (options: QuestionOptionProps[]): Promise<{ id: number }[]> => Promise.all(
-    options?.map(async (option) => {
-      const optionId = option.id ? option.id : -1
-      const optionUpsertInput = {
-        value: option.value,
-        publicValue: option.publicValue,
-        overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
-        position: option.position,
-      }
-      const updatedQOption = await this.questionOptionPrismaAdapter.upsert(optionId, optionUpsertInput, optionUpsertInput);
 
-      return { id: updatedQOption.id };
-    }),
-  );
 
   updateNewQConditions = async (edge: EdgeChildProps) => {
     const { conditionType, renderMax, renderMin, matchValue } = edge.conditions[0];

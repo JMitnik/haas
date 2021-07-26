@@ -5,9 +5,9 @@ import { QuestionConditionProps } from "../questionnaire/DialogueTypes";
 export interface QuestionOptionProps {
   id?: number;
   value: string;
-  publicValue?: string;
+  publicValue?: string | null;
   overrideLeafId?: string;
-  position: number;
+  position: number | null;
 }
 export interface LinkGenericInputProps {
   type: 'SOCIAL' | 'API' | 'FACEBOOK' | 'LINKEDIN' | 'WHATSAPP' | 'INSTAGRAM' | 'TWITTER';

@@ -1,7 +1,9 @@
-import { PrismaClient, QuestionNodeUpdateInput, QuestionNodeCreateInput, BatchPayload, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, FormNodeFieldUpsertArgs, FormNodeCreateInput } from "@prisma/client";
+import { PrismaClient, QuestionNodeUpdateInput, QuestionNodeCreateInput, BatchPayload, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, FormNodeFieldUpsertArgs, FormNodeCreateInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, NodeType } from "@prisma/client";
 import { NexusGenInputs } from "../../../../generated/nexus";
 import { CreateQuestionInput } from "../../../questionnaire/DialoguePrismaAdapter";
 import NodeService from "../../NodeService";
+import { QuestionOptionProps } from "../../NodeServiceType";
+import QuestionOptionPrismaAdapter from "../QuestionOption/QuestionOptionPrismaAdapter";
 
 export type CreateCTAInput = {
   title: string,
@@ -34,11 +36,17 @@ export type CreateFormFieldsInput = {
   fields: FormNodeCreateInput;
 }
 
+export interface UpdateQuestionInput extends CreateQuestionInput {
+  currentOverrideLeafId?: string | null;
+}
+
 class QuestionNodePrismaAdapter {
   prisma: PrismaClient;
+  questionOptionPrismaAdapter: QuestionOptionPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
+    this.questionOptionPrismaAdapter = new QuestionOptionPrismaAdapter(prismaClient);
   }
 
   createFieldsOfForm(input: CreateFormFieldsInput) {
@@ -104,10 +112,43 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  async updateDialogueBuilderNode(nodeId: string, data: QuestionNodeUpdateInput) {
+  updateQuestionOptions = async (options: QuestionOptionProps[]): Promise<{ id: number }[]> => Promise.all(
+    options?.map(async (option) => {
+      const optionId = option.id ? option.id : -1
+      const optionUpsertInput = {
+        value: option.value,
+        publicValue: option.publicValue,
+        overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
+        position: option.position,
+      }
+      const updatedQOption = await this.questionOptionPrismaAdapter.upsert(optionId, optionUpsertInput, optionUpsertInput);
+
+      return { id: updatedQOption.id };
+    }),
+  );
+
+  async updateDialogueBuilderNode(nodeId: string, data: UpdateQuestionInput) {
+    const { title, type, options, currentOverrideLeafId, overrideLeafId, videoEmbeddedNode } = data;
+    const leaf = NodeService.getLeafState(currentOverrideLeafId || null, overrideLeafId || null);
+    const updatedOptionIds = await this.updateQuestionOptions(options || []);
+
+    // Remove videoEmbeddedNode if updated to different type
+    let embedVideoInput: VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput | undefined;
+    if (type !== NodeType.VIDEO_EMBEDDED && videoEmbeddedNode?.id) {
+      embedVideoInput = { delete: true };
+    }
+
     return this.prisma.questionNode.update({
       where: { id: nodeId },
-      data: data,
+      data: {
+        title,
+        type,
+        options: {
+          connect: updatedOptionIds,
+        },
+        overrideLeaf: leaf || undefined,
+        videoEmbeddedNode: embedVideoInput,
+      },
       include: {
         videoEmbeddedNode: true,
       }
