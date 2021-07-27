@@ -8,20 +8,16 @@ import {
   UserWhereUniqueInput,
   PrismaClient,
   Dialogue,
-  TriggerMedium,
-  TriggerEnum,
 } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
-// eslint-disable-next-line import/no-cycle
+
 import { NexusGenInputs } from '../../generated/nexus';
-// eslint-disable-next-line import/no-cycle
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { SessionWithEntries } from '../session/SessionTypes';
 import { mailService } from '../../services/mailings/MailService';
-
 import { smsService } from '../../services/sms/SmsService';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
@@ -39,15 +35,15 @@ class TriggerService {
 
   getTriggersByCustomerSlug(customerSlug: string) {
     return this.triggerPrismaAdapter.getTriggersByCustomerSlug(customerSlug);
-  }
+  };
 
   getTriggersByUserId(userId: string) {
     return this.triggerPrismaAdapter.getTriggersByUserId(userId);
-  }
+  };
 
   getTriggerById(triggerId: string): Promise<Trigger | null> {
     return this.triggerPrismaAdapter.getById(triggerId);
-  }
+  };
 
   async createTrigger(triggerCreateArgs: CreateTriggerInput, conditions: { id?: number | null | undefined; maxValue?: number | null | undefined; minValue?: number | null | undefined; questionId?: string | null | undefined; textValue?: string | null | undefined; type?: "LOW_THRESHOLD" | "HIGH_THRESHOLD" | "INNER_RANGE" | "OUTER_RANGE" | "TEXT_MATCH" | null | undefined; }[]): Promise<Trigger> {
     const trigger = await this.triggerPrismaAdapter.create(triggerCreateArgs);
@@ -148,7 +144,7 @@ class TriggerService {
       recipient: recipient.email,
       subject: 'A HAAS alert has been triggered',
     });
-  }
+  };
 
   static sendSmsTrigger(
     trigger: TriggerWithSendData,
@@ -161,7 +157,7 @@ class TriggerService {
     const joinedValues = mappedValues.join(', ');
 
     smsService.send(recipient.phone, `HAAS: Your Alert "${trigger.name}" was triggered because of the following condition(s): ${joinedValues}`);
-  }
+  };
 
   static sendTrigger = (
     trigger: TriggerWithSendData,
@@ -187,7 +183,7 @@ class TriggerService {
 
       default:
         break;
-    }
+    };
   };
 
   async tryTrigger(session: SessionWithEntries, trigger: TriggerWithSendData) {
@@ -229,7 +225,7 @@ class TriggerService {
 
   findTriggersByDialogueId = async (dialogueId: string) => {
     return this.triggerPrismaAdapter.findTriggersByDialogueId(dialogueId);
-  }
+  };
 
   findTriggersByQuestionIds = async (questionIds: Array<string>) => {
     return this.triggerPrismaAdapter.findTriggersByQuestionIds(questionIds);
@@ -241,7 +237,7 @@ class TriggerService {
   }[]) {
     const matchResults = triggerTargets.map((triggerTarget) => triggerTarget.nodeEntry && TriggerService.match(triggerTarget.condition, triggerTarget.nodeEntry));
     return matchResults;
-  }
+  };
 
   static match(triggerCondition: TriggerCondition, entry: NodeEntryWithTypes) {
     let conditionMatched;
@@ -252,28 +248,28 @@ class TriggerService {
 
         if (!entry.sliderNodeEntry?.value || !triggerCondition?.maxValue) {
           break;
-        }
+        };
 
         if (entry.sliderNodeEntry?.value > triggerCondition.maxValue) {
           conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value, conditionType: triggerCondition.type };
-        }
+        };
 
         break;
-      }
+      };
 
       case 'LOW_THRESHOLD': {
         conditionMatched = { isMatch: false };
 
         if (!entry.sliderNodeEntry?.value || !triggerCondition?.minValue) {
           break;
-        }
+        };
 
         if (entry.sliderNodeEntry?.value < triggerCondition.minValue) {
           conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value, conditionType: triggerCondition.type };
-        }
+        };
 
         break;
-      }
+      };
 
       case 'TEXT_MATCH': {
         conditionMatched = { isMatch: false };
@@ -281,14 +277,14 @@ class TriggerService {
 
         if (!textEntry || !triggerCondition?.textValue) {
           break;
-        }
+        };
 
         if (textEntry === triggerCondition.textValue) {
           conditionMatched = { isMatch: true, value: textEntry, conditionType: triggerCondition.type };
-        }
+        };
 
         break;
-      }
+      };
 
       case 'INNER_RANGE': {
         conditionMatched = { isMatch: false };
@@ -297,7 +293,7 @@ class TriggerService {
 
         if (!score || !triggerCondition.maxValue || !triggerCondition.minValue) {
           break;
-        }
+        };
 
         if (score <= triggerCondition.maxValue && score >= triggerCondition.minValue) {
           conditionMatched = {
@@ -305,10 +301,10 @@ class TriggerService {
             value: score,
             conditionType: triggerCondition.type,
           };
-        }
+        };
 
         break;
-      }
+      };
 
       case 'OUTER_RANGE': {
         conditionMatched = { isMatch: false };
@@ -316,7 +312,7 @@ class TriggerService {
 
         if (!score || !triggerCondition.maxValue || !triggerCondition.minValue) {
           break;
-        }
+        };
 
         if (score > triggerCondition.maxValue || score < triggerCondition.minValue) {
           conditionMatched = {
@@ -324,14 +320,14 @@ class TriggerService {
             value: score,
             conditionType: triggerCondition.type,
           };
-        }
+        };
 
         break;
-      }
+      };
 
       default:
         conditionMatched = { isMatch: false };
-    }
+    };
 
     return conditionMatched;
   }
@@ -346,6 +342,7 @@ class TriggerService {
     } else if (!newRelatedNodeId) {
       updateTriggerArgs.relatedNode = { disconnect: true };
     }
+
     return updateTriggerArgs;
   };
 
@@ -389,15 +386,15 @@ class TriggerService {
     const recipientUpdateArgs: any = {};
     if (newRecipientObjects.length > 0) {
       recipientUpdateArgs.connect = newRecipientObjects;
-    }
+    };
 
     if (deleteRecipientObjects.length > 0) {
       recipientUpdateArgs.disconnect = deleteRecipientObjects;
-    }
+    };
 
     updateTriggerArgs.recipients = recipientUpdateArgs;
     return updateTriggerArgs;
   };
-}
+};
 
 export default TriggerService;
