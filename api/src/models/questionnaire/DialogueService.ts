@@ -18,16 +18,12 @@ import {
 import { isPresent } from 'ts-is-present';
 
 import NodeService from '../QuestionNode/NodeService';
-// eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
-// eslint-disable-next-line import/no-cycle
 import {
   HistoryDataProps, HistoryDataWithEntry, IdMapProps,
   PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType
 } from './DialogueTypes';
-// eslint-disable-next-line import/no-cycle
 import NodeEntryService from '../node-entry/NodeEntryService';
-// eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
@@ -65,7 +61,7 @@ class DialogueService {
     const tags = entries?.map((entryId) => ({ id: entryId })) || [];
 
     return this.dialoguePrismaAdapter.connectTags(dialogueId, tags);
-  }
+  };
 
   async getFilteredDialogues(searchTerm?: string | null | undefined) {
     let dialogues = await this.dialoguePrismaAdapter.getAllDialoguesWithTags();
@@ -75,48 +71,53 @@ class DialogueService {
     }
 
     return dialogues;
-  }
+  };
+
   getDialogueById(dialogueId: string): Promise<Dialogue | null> {
     return this.dialoguePrismaAdapter.getDialogueById(dialogueId);
-  }
+  };
+
   async getCTAsByDialogueId(dialogueId: string, searchTerm?: string | null | undefined) {
     const leafs = await this.dialoguePrismaAdapter.getCTAsByDialogueId(dialogueId);
 
     if (searchTerm) {
       const lowerCasedSearch = searchTerm.toLowerCase();
       return leafs.filter((leaf) => leaf.title.toLowerCase().includes(lowerCasedSearch));
-    }
+    };
 
     return leafs;
-  }
+  };
 
   getQuestionsByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getQuestionsByDialogueId(dialogueId);
-  }
+  };
+
   getEdgesByDialogueId(dialogueId: string): Promise<Edge[]> {
     return this.dialoguePrismaAdapter.getEdgesByDialogueId(dialogueId);
-  }
+  };
+
   getRootQuestionByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getRootQuestionByDialogueId(dialogueId);
-  }
+  };
 
   getTagsByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getTagsByDialogueId(dialogueId);
-  }
+  };
 
   findDialoguesByCustomerId(customerId: string) {
     return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId);
-  }
+  };
 
   async delete(dialogueId: string) {
     return this.dialoguePrismaAdapter.delete(dialogueId);
-  }
+  };
 
   async findDialogueIdsByCustomerId(customerId: string) {
     const dialogueIdObjects = await this.dialoguePrismaAdapter.findDialogueIdsOfCustomer(customerId);
     const dialogueIds = dialogueIdObjects.map((dialogue) => dialogue.id);
+
     return dialogueIds;
-  }
+  };
 
   static constructDialogue(
     customerId: string,
@@ -140,25 +141,25 @@ class DialogueService {
 
     if (tags.length) {
       constructDialogueFragment.tags = { connect: tags.map((tag) => ({ id: tag.id })) };
-    }
+    };
 
     return constructDialogueFragment;
-  }
+  };
 
   static filterDialoguesBySearchTerm = (dialogues: Array<Dialogue & {
     tags: Tag[];
   }>, searchTerm: string) => dialogues.filter((dialogue) => {
     if (dialogue.title.toLowerCase().includes(
       searchTerm.toLowerCase(),
-    )) { return true; }
+    )) { return true; };
 
     if (dialogue.publicTitle?.toLowerCase().includes(
       searchTerm.toLowerCase()
-    )) { return true; }
+    )) { return true; };
 
     if (dialogue.tags.find((tag) => tag.name.toLowerCase().includes(
       searchTerm.toLowerCase(),
-    ))) { return true; }
+    ))) { return true; };
 
     return false;
   });
@@ -180,11 +181,12 @@ class DialogueService {
     const tagUpdateArgs: any = {};
     if (newTagObjects.length > 0) {
       tagUpdateArgs.connect = newTagObjects;
-    }
+    };
 
     if (deleteTagObjects.length > 0) {
       tagUpdateArgs.disconnect = deleteTagObjects;
-    }
+    };
+
     updateDialogueArgs.tags = tagUpdateArgs;
 
     return updateDialogueArgs;
@@ -204,16 +206,17 @@ class DialogueService {
         update: {
           header: heading || '',
           subtext: subHeading || '',
-        }
+        },
       };
     } else if (!dbPostLeaf && (heading || subHeading)) {
       return {
         create: {
           header: heading || '',
           subtext: subHeading || '',
-        }
-      }
+        },
+      };
     }
+
     return undefined;
   }
 
@@ -244,7 +247,7 @@ class DialogueService {
     };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
-    }
+    };
 
     return this.dialoguePrismaAdapter.update(dbDialogue?.id || '-1', updateDialogueArgs);
   };
@@ -274,6 +277,7 @@ class DialogueService {
 
     // If there are three, grab the first three, otherwise get the entire element
     const topNPaths = pathFrequencies.length > nPaths ? pathFrequencies.slice(0, nPaths) : pathFrequencies;
+
     return topNPaths || [];
   };
 
@@ -332,6 +336,7 @@ class DialogueService {
       const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
 
       if (!simulatedChoiceNodeId) return;
+
       const fakeSessionInputArgs: (
         {
           createdAt: Date,
@@ -621,24 +626,24 @@ class DialogueService {
     // TODO: Put in validation function, or add validator service library
     if (!input.dialogueSlug) {
       throw new Error('Slug required, not found!');
-    }
+    };
 
     if (!input.title) {
       throw new Error('Title required, not found!');
-    }
+    };
 
     if (!input.description) {
       throw new Error('Description required, not found!');
-    }
+    };
 
     if (!input.language) {
       throw new Error('Language required, not found!');
-    }
+    };
 
     if (customers.length > 1) {
       // TODO: Make this a logger or something
       console.warn(`Multiple customers found with slug ${input.customerSlug}`);
-    }
+    };
 
     const customer = customers?.[0];
     if (!customer) {
@@ -748,7 +753,7 @@ class DialogueService {
       const matchResult = question.id.match(v4) || [];
       if (matchResult.length > 0) {
         question.id = finalMapping[question.id];
-      }
+      };
 
       const updatedEdges = question.children?.map((edge) => {
         const matchParent = edge?.parentNode?.id?.match(v4) || [];
@@ -765,6 +770,7 @@ class DialogueService {
       question.children = updatedEdges?.length > 0 ? updatedEdges : [];
       return question;
     });
+
     return finalQuestions;
   };
 
@@ -792,7 +798,7 @@ class DialogueService {
 
     if (!sessions) {
       return [];
-    }
+    };
 
     const scoringEntriesFromSessions = SessionService.getScoringEntriesFromSessions(sessions);
 

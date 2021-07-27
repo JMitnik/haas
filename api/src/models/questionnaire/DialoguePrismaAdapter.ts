@@ -15,7 +15,7 @@ class DialoguePrismaAdapter {
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-  }
+  };
 
   async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
 
@@ -47,14 +47,14 @@ class DialoguePrismaAdapter {
                 overrideLeaf: overrideLeafId ? {
                   connect: {
                     id: overrideLeafId,
-                  }
-                } : undefined
+                  },
+                } : undefined,
               })),
             } : undefined,
             overrideLeaf: question.overrideLeafId ? {
               connect: {
                 id: question.overrideLeafId,
-              }
+              },
             } : undefined,
             form: question.form ? {
               create: {
@@ -80,14 +80,15 @@ class DialoguePrismaAdapter {
               },
             } : undefined,
           })),
-        }
+        },
       },
       include: {
         questions: true,
-      }
+      },
     });
+
     return dialogue.questions;
-  }
+  };
 
   async update(dialogueId: string, updateArgs: DialogueUpdateInput, include?: DialogueInclude | null | undefined): Promise<Dialogue> {
     return this.prisma.dialogue.update({
@@ -97,8 +98,7 @@ class DialoguePrismaAdapter {
       data: updateArgs,
       include,
     });
-  }
-
+  };
 
   getDialogueByQuestionNodeId(nodeId: string): Promise<Dialogue | null> {
     return this.prisma.dialogue.findFirst({
@@ -147,13 +147,13 @@ class DialoguePrismaAdapter {
         tags: true,
       },
     });
-  }
+  };
 
   getDialogueById(dialogueId: string): Promise<Dialogue | null> {
     return this.prisma.dialogue.findOne({
       where: { id: dialogueId },
     });
-  }
+  };
 
   getCTAsByDialogueId(dialogueId: string) {
     return this.prisma.questionNode.findMany({
@@ -172,7 +172,7 @@ class DialoguePrismaAdapter {
         },
       },
     });
-  }
+  };
 
   getQuestionsByDialogueId(dialogueId: string) {
     return this.prisma.questionNode.findMany({
@@ -204,7 +204,7 @@ class DialoguePrismaAdapter {
         },
       },
     });
-  }
+  };
 
   async getEdgesByDialogueId(dialogueId: string): Promise<Edge[]> {
     const dialogue = await this.prisma.dialogue.findOne({
@@ -217,9 +217,9 @@ class DialoguePrismaAdapter {
     });
 
     const edges = dialogue?.edges;
-
     return edges || [];
-  }
+  };
+
   async getRootQuestionByDialogueId(dialogueId: string) {
     return this.prisma.questionNode.findFirst({
       where: {
@@ -243,7 +243,7 @@ class DialoguePrismaAdapter {
         },
       },
     });
-  }
+  };
 
   async getTagsByDialogueId(dialogueId: string) {
     const dialogue = await this.prisma.dialogue.findOne({
@@ -252,7 +252,7 @@ class DialoguePrismaAdapter {
     });
 
     return dialogue?.tags || [];
-  }
+  };
 
   async getTemplateDialogue(dialogueId: string) {
     return this.prisma.dialogue.findOne({
@@ -308,11 +308,11 @@ class DialoguePrismaAdapter {
         },
       },
     });
-  }
+  };
 
   async create(input: Subset<DialogueCreateArgs, DialogueCreateArgs>) {
     return this.prisma.dialogue.create(input);
-  }
+  };
 
   async createTemplate(input: CreateDialogueInput) {
     return this.prisma.dialogue.create({
@@ -323,14 +323,14 @@ class DialoguePrismaAdapter {
         customer: {
           connect: {
             id: input.customerId
-          }
+          },
         },
         questions: {
           create: [],
-        }
-      }
+        },
+      },
     });
-  }
+  };
 
   async getDialogueWithNodesAndEdges(dialogueId: string) {
     return this.prisma.dialogue.findOne({
@@ -361,7 +361,7 @@ class DialoguePrismaAdapter {
         tags: true,
       },
     });
-  }
+  };
 
   async setGeneratedWithGenData(dialogueId: string, isGeneratedWithGenData: boolean) {
     return this.prisma.dialogue.update({
@@ -372,7 +372,7 @@ class DialoguePrismaAdapter {
         wasGeneratedWithGenData: isGeneratedWithGenData,
       },
     });
-  }
+  };
 
   async createEdges(
     dialogueId: string,
@@ -404,9 +404,9 @@ class DialoguePrismaAdapter {
             },
           })),
         },
-      }
-    })
-  }
+      },
+    });
+  };
 
   async read(dialogueId: string) {
     return this.prisma.dialogue.findOne({
@@ -422,7 +422,7 @@ class DialoguePrismaAdapter {
         sessions: true,
       },
     });
-  }
+  };
 
   async delete(dialogueId: string): Promise<Dialogue> {
     return this.prisma.dialogue.delete({
@@ -453,6 +453,7 @@ class DialoguePrismaAdapter {
       },
     });
   };
-}
+
+};
 
 export default DialoguePrismaAdapter;

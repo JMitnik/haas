@@ -3,27 +3,18 @@ import { UserInputError } from 'apollo-server-express';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { subDays } from 'date-fns';
 
-// eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
-// eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
-// eslint-disable-next-line import/no-cycle
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
-// eslint-disable-next-line import/no-cycle
 import { SessionConnection, SessionType } from '../session/Session';
-// eslint-disable-next-line import/no-cycle
 import { TagType, TagsInputType } from '../tag/Tag';
-// eslint-disable-next-line import/no-cycle
 import DialogueService from './DialogueService';
-// eslint-disable-next-line import/no-cycle
 import { PaginationWhereInput } from '../general/Pagination';
-// eslint-disable-next-line import/no-cycle
 import PaginationService from '../general/PaginationService';
-// eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
 import isValidDate from '../../utils/isValidDate';
-import { CopyDialogueInputType } from './DialogueTypes'
+import { CopyDialogueInputType } from './DialogueTypes';
 
 export const TEXT_NODES = [
   'TEXTBOX',
