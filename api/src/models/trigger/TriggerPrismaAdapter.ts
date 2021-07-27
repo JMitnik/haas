@@ -1,4 +1,5 @@
 import { PrismaClient, TriggerUpdateInput, Trigger, BatchPayload, TriggerCondition, Dialogue, QuestionNode } from "@prisma/client";
+
 import { CreateQuestionOfTriggerInput, CreateTriggerInput } from "./TriggerServiceType";
 
 class TriggerPrismaAdapter {
@@ -80,7 +81,7 @@ class TriggerPrismaAdapter {
 
   async deleteQuestionsByTriggerConditionId(triggerConditionId: number) {
     return this.prisma.questionOfTrigger.deleteMany({ where: { triggerConditionId } });
-  }
+  };
 
   getConditionsByTriggerId(triggerId: string): Promise<TriggerCondition[]> {
     return this.prisma.triggerCondition.findMany({ where: { triggerId: triggerId }, orderBy: { createdAt: 'asc' } });
@@ -102,8 +103,8 @@ class TriggerPrismaAdapter {
           slug: customerSlug,
         },
       },
-    })
-  }
+    });
+  };
 
   getTriggersByUserId(userId: string) {
     return this.prisma.trigger.findMany({
@@ -114,8 +115,8 @@ class TriggerPrismaAdapter {
           },
         },
       },
-    })
-  }
+    });
+  };
 
   upsertQuestionOfTrigger(input: CreateQuestionOfTriggerInput) {
     return this.prisma.questionOfTrigger.upsert({
@@ -167,7 +168,7 @@ class TriggerPrismaAdapter {
       },
     });
 
-  }
+  };
 
   findTriggersByQuestionIds = async (questionIds: Array<string>) => {
     const questionOfTriggerEntries = await this.prisma.questionOfTrigger.findMany({
@@ -241,7 +242,7 @@ class TriggerPrismaAdapter {
         triggerCondition: true,
       },
     });
-  }
+  };
 
   updateLastSent(triggerId: string, lastSent: Date) {
     return this.prisma.trigger.update({
@@ -291,7 +292,8 @@ class TriggerPrismaAdapter {
 
   delete(triggerId: string): Promise<Trigger | null> {
     return this.prisma.trigger.delete({ where: { id: triggerId } });
-  }
-}
+  };
+
+};
 
 export default TriggerPrismaAdapter;
