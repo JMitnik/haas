@@ -1,13 +1,7 @@
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
-// eslint-disable-next-line import/no-cycle
-import { CustomerType } from '../customer/Customer';
-// eslint-disable-next-line import/no-cycle
 import { PaginationWhereInput } from '../general/Pagination';
-import { PermissionType } from '../permission/Permission';
 import { SystemPermissions } from './Permissions';
-import RoleService from './RoleService';
-import { SystemPermissionEnum } from '@prisma/client';
 
 export const SystemPermission = enumType({
   name: 'SystemPermission',
