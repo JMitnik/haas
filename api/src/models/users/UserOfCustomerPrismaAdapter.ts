@@ -5,7 +5,7 @@ class UserOfCustomerPrismaAdapter {
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-  }
+  };
 
   getAllUsersByCustomerSlug(customerSlug: string) {
     return this.prisma.userOfCustomer.findMany({
