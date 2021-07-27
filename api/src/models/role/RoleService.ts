@@ -1,5 +1,6 @@
-import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import { PrismaClient, Role, SystemPermissionEnum } from '@prisma/client';
+
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import RolePrismaAdapter from './RolePrismaAdapter';
 
 export interface CreateRoleInput {
@@ -13,25 +14,26 @@ class RoleService {
 
   constructor(prismaClient: PrismaClient) {
     this.rolePrismaAdapter = new RolePrismaAdapter(prismaClient);
-  }
+  };
 
   async getPermissionsByRoleId(roleId: string): Promise<SystemPermissionEnum[]> {
     const role = await this.rolePrismaAdapter.getRoleById(roleId);
     return role?.permissions || [];
-  }
+  };
 
   updatePermissions(roleId: string, permissions: SystemPermissionEnum[]) {
     return this.rolePrismaAdapter.updatePermissions(roleId, permissions);
-  }
+  };
 
   createRole(customerId: string, roleName: string): Promise<Role> {
     const createInput: CreateRoleInput = {
       name: roleName,
       permissions: ['CAN_VIEW_DIALOGUE'],
       customerId,
-    }
+    };
+
     return this.rolePrismaAdapter.createRole(createInput);
-  }
+  };
 
   paginatedRoles = async (
     customerId: string,
@@ -68,11 +70,12 @@ class RoleService {
     if (firstRole) return firstRole;
 
     throw new Error('Unable to find any roles');
-  }
+  };
 
   deleteRoles = async (roleIds: Array<string>) => {
     return this.rolePrismaAdapter.deleteMany(roleIds);
   };
-}
+
+};
 
 export default RoleService;
