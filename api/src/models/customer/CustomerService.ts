@@ -9,9 +9,6 @@ import NodeService from '../QuestionNode/NodeService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
 import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
-import CustomerSettingsPrismaAdapter from '../settings/CustomerSettingsPrismaAdapter';
-import ColourSettingsPrismaAdapter from '../settings/ColourSettingsPrismaAdapter';
-import FontSettingsPrismaAdapter from '../settings/FontSettingsPrismaAdapter';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
@@ -19,9 +16,6 @@ import { UpdateCustomerInput } from './CustomerServiceType';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
-  customerSettingsPrismaAdapter: CustomerSettingsPrismaAdapter;
-  colourSettingsPrismaAdater: ColourSettingsPrismaAdapter;
-  fontSettingsPrismaAdapter: FontSettingsPrismaAdapter;
   tagPrismaAdapter: TagPrismaAdapter;
   dialogueService: DialogueService;
   dialoguePrismaAdapter: DialoguePrismaAdapter;
@@ -30,9 +24,6 @@ class CustomerService {
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
-    this.customerSettingsPrismaAdapter = new CustomerSettingsPrismaAdapter(prismaClient)
-    this.colourSettingsPrismaAdater = new ColourSettingsPrismaAdapter(prismaClient);
-    this.fontSettingsPrismaAdapter = new FontSettingsPrismaAdapter(prismaClient);
     this.dialogueService = new DialogueService(prismaClient);
     this.tagPrismaAdapter = new TagPrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
@@ -73,10 +64,10 @@ class CustomerService {
   }
 
   getColourSettings(colourSettingsId: number) {
-    return this.colourSettingsPrismaAdater.getById(colourSettingsId);
+    return this.customerPrismaAdapter.getColourSettingsById(colourSettingsId);
   }
   getFontSettings(fontSettingsId: number) {
-    return this.fontSettingsPrismaAdapter.getById(fontSettingsId);
+    return this.customerPrismaAdapter.getFontSettingsById(fontSettingsId);
   }
 
   findWorkspaceBySlug(slug: string): Promise<Customer | null> {
@@ -92,7 +83,7 @@ class CustomerService {
   }
 
   getCustomerSettingsByCustomerId(customerId: string): Promise<CustomerSettings | null> {
-    return this.customerSettingsPrismaAdapter.getCustomerSettingsByCustomerId(customerId);
+    return this.customerPrismaAdapter.getCustomerSettingsByCustomerId(customerId);
   }
 
   findWorkspaceBySlugs(slugs: (string | undefined)[]) {
@@ -182,15 +173,15 @@ class CustomerService {
 
     // //// Settings-related
     if (fontSettingsId) {
-      await this.fontSettingsPrismaAdapter.delete(fontSettingsId);
+      await this.customerPrismaAdapter.deleteFontSettings(fontSettingsId);
     }
 
     if (colourSettingsId) {
-      await this.colourSettingsPrismaAdater.delete(colourSettingsId);
+      await this.customerPrismaAdapter.deleteColourSettings(colourSettingsId);
     }
 
     if (customer?.settings) {
-      await this.customerSettingsPrismaAdapter.deleteByCustomerId(customerId);
+      await this.customerPrismaAdapter.deleteCustomerSettingByCustomerId(customerId);
     }
 
     const dialogueIds = await this.dialogueService.findDialogueIdsByCustomerId(customerId);

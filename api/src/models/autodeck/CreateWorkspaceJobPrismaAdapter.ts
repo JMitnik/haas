@@ -15,7 +15,8 @@ class CreateWorkspaceJobPrismaAdapter {
         id: jobId,
       }
     });
-  }
+  };
+
   create(data: ConfirmWorkspaceJobCreateInput) {
     const inputCreate: ConfirmWorkspaceJobCreateInput = { ...data, processLocationId: data.processLocationId }
     return this.prisma.createWorkspaceJob.create({
@@ -51,11 +52,11 @@ class CreateWorkspaceJobPrismaAdapter {
         processLocation: {
           connect: {
             id: inputCreate.processLocationId,
-          }
-        }
+          },
+        },
       },
       update,
-    })
+    });
   };
 
   updateStatus(jobId: string, status: JobStatusType) {
@@ -68,9 +69,9 @@ class CreateWorkspaceJobPrismaAdapter {
       },
       include: {
         processLocation: true,
-      }
-    })
-  }
+      },
+    });
+  };
 
   async update(jobId: string, data: CreateWorkspaceJobUpdateInput) {
     return this.prisma.createWorkspaceJob.update({
@@ -80,18 +81,17 @@ class CreateWorkspaceJobPrismaAdapter {
       data,
       include: {
         processLocation: true,
-      }
+      },
     });
-  }
-  findMany(args: FindManyCreateWorkspaceJobArgs) {
+  };
+
+  getJobs(args: FindManyCreateWorkspaceJobArgs) {
     return this.prisma.createWorkspaceJob.findMany(args);
-  }
+  };
 
   count(args: FindManyCreateWorkspaceJobArgs) {
     return this.prisma.createWorkspaceJob.count(args);
-  }
-
-
+  };
 }
 
 export default CreateWorkspaceJobPrismaAdapter;

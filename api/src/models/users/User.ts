@@ -97,7 +97,7 @@ export const UserType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx, info) {
-        return ctx.services.userService.getRoleOfUser(parent.id, info.variableValues.customerSlug);
+        return ctx.services.userService.getRoleOfWorkspaceUser(parent.id, info.variableValues.customerSlug);
       },
     });
   },

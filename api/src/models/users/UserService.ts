@@ -56,7 +56,7 @@ class UserService {
     return this.userPrismaAdapter.getAllUsersByCustomerSlug(customerSlug);
   }
 
-  async getRoleOfUser(userId: string, customerSlug: string) {
+  async getRoleOfWorkspaceUser(userId: string, customerSlug: string) {
     const user = await this.userPrismaAdapter.getUserById(userId);
 
     const userCustomer = user.customers.find((cus: any) => (
@@ -103,7 +103,7 @@ class UserService {
   };
 
   getRecipientsOfTrigger(triggerId: string): Promise<User[]> {
-    return this.userPrismaAdapter.findManyByTriggerId(triggerId);
+    return this.userPrismaAdapter.getUsersByTriggerId(triggerId);
   }
 
   findUserContext(userId: string) {

@@ -1,17 +1,58 @@
-import { PrismaClient, Dialogue, CustomerUpdateInput, Customer, Tag } from '@prisma/client';
-import { CustomerPrismaAdapterType } from './CustomerPrismaAdapterType';
+import { PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import defaultWorkspaceTemplate from '../templates/defaultWorkspaceTemplate';
 import { UpdateCustomerInput } from './CustomerServiceType';
 
-export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
+export class CustomerPrismaAdapter {
   prisma: PrismaClient
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
 
-  async findManyTagsByCustomerSlug(customerSlug: string): Promise<Tag[]> {
+  async deleteFontSettings(fontSettingsId: number): Promise<FontSettings> {
+    return this.prisma.fontSettings.delete({
+      where: {
+        id: fontSettingsId,
+      },
+    });
+  };
+
+  getFontSettingsById(fontSettingsId: number): Promise<FontSettings | null> {
+    return this.prisma.fontSettings.findOne({
+      where: { id: fontSettingsId },
+    });
+  };
+
+  async deleteColourSettings(colourSettingsId: number): Promise<ColourSettings> {
+    return this.prisma.colourSettings.delete({
+      where: {
+        id: colourSettingsId,
+      },
+    });
+  };
+
+  getColourSettingsById(colourSettingsId: number) {
+    return this.prisma.colourSettings.findOne({
+      where: { id: colourSettingsId },
+    });
+  };
+
+  async deleteCustomerSettingByCustomerId(customerId: string): Promise<CustomerSettings> {
+    return this.prisma.customerSettings.delete({
+      where: {
+        customerId,
+      },
+    });
+  };
+
+  async getCustomerSettingsByCustomerId(customerId: string) {
+    return this.prisma.customerSettings.findOne({
+      where: { customerId },
+    });
+  }
+
+  async getTagsByCustomerSlug(customerSlug: string): Promise<Tag[]> {
     const customer = await this.prisma.customer.findOne({
       where: { slug: customerSlug },
       include: {
@@ -33,7 +74,6 @@ export class CustomerPrismaAdapter implements CustomerPrismaAdapterType {
   async findAll() {
     return this.prisma.customer.findMany();
   }
-
 
   async findWorkspaceBySlugs(slugs: Array<string | undefined>): Promise<Customer | null> {
     const filteredSlugs: any = slugs.filter((slug) => slug);

@@ -13,10 +13,10 @@ class TriggerConditionPrismaAdapter {
   }
 
   deleteManyByTriggerId(triggerId: string): Promise<BatchPayload> {
-    return this.prisma.triggerCondition.deleteMany({ where: { triggerId: triggerId } });;
+    return this.prisma.triggerCondition.deleteMany({ where: { triggerId: triggerId } });
   }
 
-  findManyByTriggerId(triggerId: string): Promise<TriggerCondition[]> {
+  getConditionsByTriggerId(triggerId: string): Promise<TriggerCondition[]> {
     return this.prisma.triggerCondition.findMany({ where: { triggerId: triggerId }, orderBy: { createdAt: 'asc' } });
   };
 };

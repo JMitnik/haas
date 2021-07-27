@@ -13,7 +13,6 @@ import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/tabl
 import CustomerService from '../customer/CustomerService';
 import JobProcessLocationPrismaAdapter from './JobProcessLocationPrismaAdapter';
 import CreateWorkspaceJobPrismaAdapter from './CreateWorkspaceJobPrismaAdapter';
-import CustomFieldPrismaAdapter from './CustomFieldPrismaAdapter';
 import { CreateWorkspaceJobProps, ScreenshotProps } from './AutodeckServiceType';
 
 const s3 = new AWS.S3({
@@ -24,11 +23,10 @@ const s3 = new AWS.S3({
 const sns = new AWS.SNS({
   region: 'eu-central-1',
   accessKeyId: config.autodeckAwsAccessKeyId,
-  secretAccessKey: config.autodeckAwsSecretAccessKey
+  secretAccessKey: config.autodeckAwsSecretAccessKey,
 });
 
 class AutodeckService {
-  customFieldPrismaAdapter: CustomFieldPrismaAdapter;
   customerService: CustomerService;
   jobProcessLocationPrismaAdapter: JobProcessLocationPrismaAdapter;
   createWorkspaceJobPrismaAdapter: CreateWorkspaceJobPrismaAdapter;
@@ -37,37 +35,36 @@ class AutodeckService {
     this.customerService = new CustomerService(prismaClient);
     this.jobProcessLocationPrismaAdapter = new JobProcessLocationPrismaAdapter(prismaClient);
     this.createWorkspaceJobPrismaAdapter = new CreateWorkspaceJobPrismaAdapter(prismaClient);
-    this.customFieldPrismaAdapter = new CustomFieldPrismaAdapter(prismaClient)
-  }
+  };
 
   update(input: { id: string; resourceUrl: string | null | undefined; status: "PRE_PROCESSING" | "PRE_PROCESSING_LOGO" | "PRE_PROCESSING_WEBSITE_SCREENSHOT" | "READY_FOR_PROCESSING" | "IN_PHOTOSHOP_QUEUE" | "PHOTOSHOP_PROCESSING" | "PROCESSING" | "WRAPPING_UP" | "PENDING" | "COMPLETED" | "FAILED" | "TRANSFORMING_PSDS_TO_PNGS" | "STITCHING_SLIDES" | "COMPRESSING_SALES_MATERIAL"; errorMessage: string | undefined; }) {
     return this.createWorkspaceJobPrismaAdapter.update(input.id, {
       resourcesUrl: input.resourceUrl,
       status: input.status,
-      errorMessage: input.errorMessage
+      errorMessage: input.errorMessage,
     });
-  }
+  };
 
   getJobById(jobId: string) {
     return this.createWorkspaceJobPrismaAdapter.getJobById(jobId);
-  }
+  };
 
   getJobProcessLocationOfJob(createWorkspaceJobId: string): Promise<JobProcessLocation> {
     return this.jobProcessLocationPrismaAdapter.getJobProcessLocationByJobId(createWorkspaceJobId);
-  }
+  };
 
   getCustomFieldsOfJobProcessLocation(jobProcessLocationId: string): Promise<CustomField[]> {
-    return this.customFieldPrismaAdapter.getCustomFieldsByJobProcessLocationId(jobProcessLocationId);
-  }
+    return this.jobProcessLocationPrismaAdapter.getCustomFieldsByJobProcessLocationId(jobProcessLocationId);
+  };
 
   getJobProcessLocations = async () => {
     return this.jobProcessLocationPrismaAdapter.findAll();
-  }
+  };
 
   createJobProcessLocation = async (input: any) => {
     const data = { name: input.name, path: input.path, type: input.type };
     return this.jobProcessLocationPrismaAdapter.create(data);
-  }
+  };
 
   paginatedAutodeckJobs = async (
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
@@ -76,31 +73,31 @@ class AutodeckService {
       where: {
         id: {
           not: undefined
-        }
+        },
       },
       orderBy: {
         updatedAt: 'desc'
-      }
+      },
     };
 
-    const findManyTriggers = async (
+    const getAllJobs = async (
       { props: findManyArgs }: FindManyCallBackProps,
     ) => {
-      return this.createWorkspaceJobPrismaAdapter.findMany(findManyArgs);
+      return this.createWorkspaceJobPrismaAdapter.getJobs(findManyArgs);
     };
 
-    const countTriggers = async ({ props: countArgs }: FindManyCallBackProps) => this.createWorkspaceJobPrismaAdapter.count(countArgs);
+    const countJobs = async ({ props: countArgs }: FindManyCallBackProps) => this.createWorkspaceJobPrismaAdapter.count(countArgs);
 
     const paginateProps: PaginateProps = {
       findManyArgs: {
         findArgs: findManyTriggerArgs,
         searchFields: ['name'],
         orderFields: ['updatedAt'],
-        findManyCallBack: findManyTriggers,
+        findManyCallBack: getAllJobs,
       },
       countArgs: {
         countWhereInput: findManyTriggerArgs,
-        countCallBack: countTriggers,
+        countCallBack: countJobs,
       },
       paginationOpts,
     };
@@ -109,7 +106,7 @@ class AutodeckService {
   };
 
   addNewCustomFieldsToTemplate = async (input: NexusGenInputs['GenerateAutodeckInput'], processLocationId: string) => {
-    const newCustomFields = input.newCustomFields?.map(({ key, value }) => ({ key: key || '', value: value || '' })) || []
+    const newCustomFields = input.newCustomFields?.map(({ key, value }) => ({ key: key || '', value: value || '' })) || [];
     return this.jobProcessLocationPrismaAdapter.addNewCustomFields(processLocationId, newCustomFields);
   }
 
@@ -117,11 +114,11 @@ class AutodeckService {
     const mergedCustomFields = input.customFields?.concat(input?.newCustomFields || []).concat(input?.standardFields || []) || [];
     let mappedKeyValuePairs = {}
     mergedCustomFields.forEach(({ key, value }) => {
-      if (key) Object.assign(mappedKeyValuePairs, { [key]: value })
-    })
+      if (key) Object.assign(mappedKeyValuePairs, { [key]: value });
+    });
 
-    return mappedKeyValuePairs
-  }
+    return mappedKeyValuePairs;
+  };
 
   static usesAdjustedLogo = async (id: string) => {
     const params = {
@@ -132,14 +129,14 @@ class AutodeckService {
     return await new Promise((resolve, reject) => {
       s3.listObjectsV2(params, (err, data) => {
         if (err) return reject(err);
-        const fileWithAdjusted = data.Contents?.find((file) => file.Key?.includes('/adjusted'))
+        const fileWithAdjusted = data.Contents?.find((file) => file.Key?.includes('/adjusted'));
         if (!fileWithAdjusted) {
-          resolve(false)
-        }
+          resolve(false);
+        };
         resolve(true);
-      })
+      });
     });
-  }
+  };
 
 
   retryJob = async (jobId: string) => {
@@ -151,7 +148,7 @@ class AutodeckService {
     const sNSParams = {
       Message: strEvent,
       // TODO: Track this as dependency
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel"
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel",
     }
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
@@ -163,7 +160,7 @@ class AutodeckService {
     const csvData = { 'colour-0': input.primaryColour };
     const csv = papaparse.unparse([csvData]);
     const csvPath = `${input.id}/dominant_colours.csv`;
-    await AutodeckService.uploadDataToS3('haas-autodeck-logos', csvPath, csv, 'text/csv')
+    await AutodeckService.uploadDataToS3('haas-autodeck-logos', csvPath, csv, 'text/csv');
 
     const updatedWorkspaceJob = await this.createWorkspaceJobPrismaAdapter.upsert(input.id, {
       id: input.id || '',
@@ -178,10 +175,10 @@ class AutodeckService {
       status: 'IN_PHOTOSHOP_QUEUE',
     });
 
-    const processLocationId = updatedWorkspaceJob.jobProcessLocationId
-    await this.addNewCustomFieldsToTemplate(input, processLocationId)
+    const processLocationId = updatedWorkspaceJob.jobProcessLocationId;
+    await this.addNewCustomFieldsToTemplate(input, processLocationId);
 
-    const mappedCustomFields = AutodeckService.generateKeyValuePair(input)
+    const mappedCustomFields = AutodeckService.generateKeyValuePair(input);
 
     const pitchdeckData: any = {
       ...mappedCustomFields,
@@ -191,15 +188,20 @@ class AutodeckService {
 
     const pitchdeckCSV = papaparse.unparse([pitchdeckData]);
     const pitchdeckCSVPath = `${input.id}/pitchdeck_input.csv`;
-    await AutodeckService.uploadDataToS3('haas-autodeck-logos', pitchdeckCSVPath, pitchdeckCSV, 'text/csv')
+    await AutodeckService.uploadDataToS3('haas-autodeck-logos', pitchdeckCSVPath, pitchdeckCSV, 'text/csv');
 
-    const photoshopInput = { jobId: updatedWorkspaceJob.id, usesAdjustedLogo: input.usesAdjustedLogo, rootFolder: updatedWorkspaceJob.processLocation.path }
+    const photoshopInput = {
+      jobId: updatedWorkspaceJob.id,
+      usesAdjustedLogo: input.usesAdjustedLogo,
+      rootFolder: updatedWorkspaceJob.processLocation.path
+    };
     const strEvent = JSON.stringify(photoshopInput, null, 2);
     const sNSParams = {
       Message: strEvent,
       // TODO: Track this as dependency
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel"
-    }
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel",
+    };
+
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
     });
@@ -214,15 +216,15 @@ class AutodeckService {
           isSeed: true,
           logo: pitchdeckData?.uploadLogo,
           willGenerateFakeData: true
-        }
+        };
         await this.customerService.createWorkspace(workspaceInput, userId)
       } catch (e) {
         console.log('Something went wrong: ', e)
-      }
-    }
+      };
+    };
 
     return updatedWorkspaceJob;
-  }
+  };
 
   static getAdjustedLogo = async (adjusedLogoInput: NexusGenInputs['AdjustedImageInput']) => {
     const S3_BUCKET_PREFIX = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${adjusedLogoInput.id}`;
@@ -241,11 +243,11 @@ class AutodeckService {
           if (!fileWithRembg) {
             const originalFile = data.Contents?.find((file) => file.Key?.includes('/original'))
             const fileName = originalFile?.Key?.split('/')[1];
-            resolve(fileName)
-          }
+            resolve(fileName);
+          };
           const fileName = fileWithRembg?.Key?.split('/')[1];
           resolve(fileName);
-        }
+        };
 
         const adjustedFile = data.Contents?.find((file) => file.Key?.includes('adjusted'));
         if (!adjustedFile) {
@@ -253,7 +255,7 @@ class AutodeckService {
           if (!fileWithRembg) {
             const originalFile = data.Contents?.find((file) => file.Key?.includes('/original'))
             const fileName = originalFile?.Key?.split('/')[1];
-            resolve(fileName)
+            resolve(fileName);
           }
           const fileName = fileWithRembg?.Key?.split('/')[1];
           resolve(fileName);
@@ -264,14 +266,14 @@ class AutodeckService {
     });
 
     const adjustedLogoUrl = `${S3_BUCKET_PREFIX}/${logoKey}#${Date.now()}`;
-    return { url: adjustedLogoUrl }
+    return { url: adjustedLogoUrl };
   }
 
   static whitifyImage = (whitifyImageInput: NexusGenInputs['AdjustedImageInput']) => {
     const strEvent = JSON.stringify(whitifyImageInput, null, 2);
     const sNSParams = {
       Message: strEvent,
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:WhitifyImageChannel"
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:WhitifyImageChannel",
     }
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);

@@ -17,8 +17,8 @@ class UserOfCustomerPrismaAdapter {
         role: true,
         user: true,
       },
-    })
-  }
+    });
+  };
 
   delete(userId: string, customerId: string): Promise<UserOfCustomer> {
     return this.prisma.userOfCustomer.delete({
@@ -29,7 +29,7 @@ class UserOfCustomerPrismaAdapter {
         },
       },
     });
-  }
+  };
 
   createExistingUserForInvitingWorkspace = (workspaceId: string, roleId: string, userId: string) => {
     return this.prisma.userOfCustomer.create({
@@ -42,14 +42,14 @@ class UserOfCustomerPrismaAdapter {
         user: {
           select: {
             email: true,
-          }
+          },
         },
         customer: {
           include: {
             settings: { include: { colourSettings: true } }
-          }
-        }
-      }
+          },
+        },
+      },
     });
   };
 
@@ -72,33 +72,21 @@ class UserOfCustomerPrismaAdapter {
         role: {
           select: {
             name: true,
-          }
+          },
         },
         user: {
           select: {
             email: true,
-          }
+          },
         },
         customer: {
           select: {
             name: true
-          }
-        }
-      }
-    })
-  }
-
-  update(userId: string, customerId: string, data: UserOfCustomerUpdateInput): Promise<UserOfCustomer> {
-    return this.prisma.userOfCustomer.update({
-      where: {
-        userId_customerId: {
-          customerId,
-          userId,
-        }
+          },
+        },
       },
-      data,
-    })
-  }
+    });
+  };
 
   getByIds(customerId: string, userId: string) {
     return this.prisma.userOfCustomer.findOne({
@@ -113,7 +101,7 @@ class UserOfCustomerPrismaAdapter {
         role: true,
         user: true,
       },
-    });;
+    });
   };
 
   connectUserToWorkspace(customerId: string, roleId: string, userId: string) {
@@ -130,7 +118,7 @@ class UserOfCustomerPrismaAdapter {
     return this.prisma.userOfCustomer.create({
       data,
     });
-  }
-}
+  };
+};
 
 export default UserOfCustomerPrismaAdapter;

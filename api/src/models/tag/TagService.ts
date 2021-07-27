@@ -25,7 +25,7 @@ class TagService {
     return this.tagPrismaAdapter.createTag(createTagInput);
   }
   getAllTagsByCustomerSlug(customerSlug: string): Promise<Tag[]> {
-    return this.customerPrismaAdapter.findManyTagsByCustomerSlug(customerSlug);
+    return this.customerPrismaAdapter.getTagsByCustomerSlug(customerSlug);
   }
 
   getAllTagsOfDialogue(dialogueId: string): Promise<Tag[]> {

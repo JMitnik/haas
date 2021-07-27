@@ -7,6 +7,14 @@ class JobProcessLocationPrismaAdapter {
     this.prisma = prismaClient;
   }
 
+  getCustomFieldsByJobProcessLocationId(jobProcessLocationId: string) {
+    return this.prisma.customField.findMany({
+      where: {
+        jobProcessLocationId: jobProcessLocationId,
+      },
+    });
+  }
+
   getJobProcessLocationByJobId = (jobId: string) => {
     return this.prisma.jobProcessLocation.findFirst({
       where: {

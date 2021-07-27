@@ -5,13 +5,7 @@ import EdgeService from '../edge/EdgeService';
 import { QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps } from './NodeServiceType';
 import QuestionNodePrismaAdapter from './adapters/QuestionNode/QuestionNodePrismaAdapter';
 import { CreateCTAInput, UpdateQuestionInput } from './adapters/QuestionNode/QuestionNodePrismaAdapterType';
-import LinkPrismaAdapter from '../link/LinkPrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
-import ShareNodePrismaAdapter from './adapters/ShareNode/ShareNodePrismaAdapter';
-import QuestionConditionPrismaAdapter from './adapters/QuestionCondition/QuestionConditionPrismaAdapter';
-import VideoNodePrismaAdapter from './adapters/VideoNode/VideoNodePrismaAdapter';
-import SliderNodePrismaAdapter from './adapters/SliderNode/SliderNodePrismaAdapter';
-import QuestionOptionPrismaAdapter from './adapters/QuestionOption/QuestionOptionPrismaAdapter';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionsInput, CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
@@ -55,47 +49,35 @@ class NodeService {
   prisma: PrismaClient;
   questionNodePrismaAdapter: QuestionNodePrismaAdapter;
   edgeService: EdgeService;
-  linkPrismaAdapter: LinkPrismaAdapter;
-  shareNodePrismaAdapter: ShareNodePrismaAdapter;
-  questionConditionAdapter: QuestionConditionPrismaAdapter;
-  videoNodePrismaAdapter: VideoNodePrismaAdapter;
-  sliderNodePrismaAdapter: SliderNodePrismaAdapter;
-  questionOptionPrismaAdapter: QuestionOptionPrismaAdapter;
   edgePrismaAdapter: EdgePrismaAdapter;
   dialoguePrismaAdapter: DialoguePrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.edgeService = new EdgeService(prismaClient);
-    this.linkPrismaAdapter = new LinkPrismaAdapter(prismaClient);
-    this.shareNodePrismaAdapter = new ShareNodePrismaAdapter(prismaClient);
-    this.questionConditionAdapter = new QuestionConditionPrismaAdapter(prismaClient);
-    this.videoNodePrismaAdapter = new VideoNodePrismaAdapter(prismaClient);
-    this.sliderNodePrismaAdapter = new SliderNodePrismaAdapter(prismaClient);
-    this.questionOptionPrismaAdapter = new QuestionOptionPrismaAdapter(prismaClient);
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.prisma = prismaClient;
   }
 
   getEdgesOfQuestion(nodeId: string) {
-    return this.edgePrismaAdapter.findManyByParentId(nodeId);
+    return this.edgePrismaAdapter.getEdgesByParentQuestionId(nodeId);
   }
 
-  getOptionsByParentId(parentId: string) {
-    return this.questionOptionPrismaAdapter.findOptionsByParentId(parentId);
+  getOptionsByQuestionId(parentId: string) {
+    return this.questionNodePrismaAdapter.findOptionsByQuestionId(parentId);
   }
 
   getLinksByParentId(parentId: string): Promise<Link[]> {
-    return this.linkPrismaAdapter.findManyByParentId(parentId);
+    return this.getLinksByNodeId(parentId);
   }
 
   async getShareNode(parentId: string): Promise<Share> {
-    return this.shareNodePrismaAdapter.getNodeByParentId(parentId);
+    return this.questionNodePrismaAdapter.getShareNodeByQuestionId(parentId);
   }
 
   getVideoEmbeddedNode(nodeId: string) {
-    return this.videoNodePrismaAdapter.getNodeById(nodeId);
+    return this.questionNodePrismaAdapter.getVideoNodeById(nodeId);
   }
 
   async createCTA(input: {
@@ -159,12 +141,12 @@ class NodeService {
 
     // If a share was previously on the node, but not any longer the case, disconnect it.
     if (existingNode?.share && (!input?.share || input?.type !== 'SHARE')) {
-      await this.shareNodePrismaAdapter.delete(existingNode.share.id);
+      await this.questionNodePrismaAdapter.deleteShareNode(existingNode.share.id);
     }
 
     // If type is share, create a share connection (or update it)
     if (input?.share && input?.share.id && input?.type === 'SHARE' && existingNode?.id) {
-      await this.shareNodePrismaAdapter.upsert(input?.share.id,
+      await this.questionNodePrismaAdapter.upsertShareNode(input?.share.id,
         {
           title: input?.share.title || '',
           url: input?.share.url || '',
@@ -230,7 +212,7 @@ class NodeService {
     const removeLinkIds = existingLinks?.filter(({ id }) => (!newLinkIds?.includes(id) && id)).map(({ id }) => id);
 
     if (removeLinkIds?.length > 0) {
-      await this.linkPrismaAdapter.deleteMany(removeLinkIds);
+      await this.deleteLinks(removeLinkIds);
     }
   };
 
@@ -250,12 +232,20 @@ class NodeService {
     },
   });
 
+  getLinksByNodeId(parentId: string): Promise<Link[]> {
+    return this.questionNodePrismaAdapter.getLinksByNodeId(parentId);
+  };
+
+  deleteLinks(linkIds: string[]) {
+    return this.questionNodePrismaAdapter.deleteLinks(linkIds);
+  };
+
   upsertLinks = async (
     newLinks: NexusGenInputs['CTALinkInputObjectType'][],
     questionId: string,
   ) => {
     newLinks?.forEach(async (link) => {
-      await this.linkPrismaAdapter.upsertLink(link.id || '-1',
+      await this.questionNodePrismaAdapter.upsertLink(link.id || '-1',
         {
           title: link.title || '',
           url: link.url || '',
@@ -417,7 +407,7 @@ class NodeService {
       renderMax: number | null,
       matchValue: string | null
     },
-  ) => this.questionConditionAdapter.update(dbEdgeCondition.id, {
+  ) => this.edgePrismaAdapter.updateCondition(dbEdgeCondition.id, {
     conditionType: newEdgeCondition.conditionType,
     matchValue: newEdgeCondition.matchValue,
     renderMin: newEdgeCondition.renderMin,
@@ -479,10 +469,10 @@ class NodeService {
 
     const deletedQuestion = await this.questionNodePrismaAdapter.getNodeById(id);
 
-    await this.shareNodePrismaAdapter.deleteManyByParentQuestionId(id);
+    await this.questionNodePrismaAdapter.deleteShareNodesByQuestionId(id);
 
     if (deletedQuestion?.videoEmbeddedNodeId) {
-      await this.videoNodePrismaAdapter.delete(deletedQuestion?.videoEmbeddedNodeId);
+      await this.questionNodePrismaAdapter.deleteVideoNode(deletedQuestion?.videoEmbeddedNodeId);
     }
 
     await this.questionNodePrismaAdapter.deleteMany(questionIds);
@@ -595,24 +585,24 @@ class NodeService {
 
     if (type === NodeType.VIDEO_EMBEDDED) {
       if (updatedNode?.videoEmbeddedNodeId) {
-        await this.videoNodePrismaAdapter.update(updatedNode.videoEmbeddedNodeId, {
+        await this.questionNodePrismaAdapter.updateVideoNode(updatedNode.videoEmbeddedNodeId, {
           videoUrl: extraContent,
         });
       } else {
-        await this.videoNodePrismaAdapter.createVideoNode({
+        await this.questionNodePrismaAdapter.createVideoNode({
           videoUrl: extraContent,
           parentNodeId: questionId,
         });
       }
     } else if (type === NodeType.SLIDER) {
       if (updatedNode?.sliderNodeId) {
-        await this.sliderNodePrismaAdapter.updateSliderNode(updatedNode.sliderNodeId, {
+        await this.questionNodePrismaAdapter.updateSliderNode(updatedNode.sliderNodeId, {
           happyText: happyText || null,
           unhappyText: unhappyText || null,
           markers: sliderNode?.markers,
         });
       } else {
-        await this.sliderNodePrismaAdapter.createSliderNode({
+        await this.questionNodePrismaAdapter.createSliderNode({
           happyText: happyText || null,
           unhappyText: unhappyText || null,
           parentNodeId: questionId,
@@ -630,7 +620,7 @@ class NodeService {
     const { conditionType, renderMax, renderMin, matchValue } = edge.conditions[0];
     const conditionUpsertAgs = { conditionType, renderMax, renderMin, matchValue };
     const conditionId = edge?.conditions?.[0]?.id ? edge?.conditions?.[0]?.id : -1
-    const condition = await this.questionConditionAdapter.upsert(conditionId, conditionUpsertAgs, conditionUpsertAgs);
+    const condition = await this.edgePrismaAdapter.upsertCondition(conditionId, conditionUpsertAgs, conditionUpsertAgs);
 
     return { id: condition.id };
   };
@@ -645,7 +635,7 @@ class NodeService {
     const removeQuestionOptionsIds = existingOptions?.filter((id) => (!newOptionIds.includes(id) && id));
 
     if (removeQuestionOptionsIds?.length > 0) {
-      await this.questionOptionPrismaAdapter.deleteMany(removeQuestionOptionsIds);
+      await this.questionNodePrismaAdapter.deleteQuestionOptions(removeQuestionOptionsIds);
     }
   };
 

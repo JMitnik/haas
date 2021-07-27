@@ -35,9 +35,7 @@ import { CreateQuestionsInput } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
-import QuestionConditionPrismaAdapter from '../QuestionNode/adapters/QuestionCondition/QuestionConditionPrismaAdapter';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
-import QuestionOptionPrismaAdapter from '../QuestionNode/adapters/QuestionOption/QuestionOptionPrismaAdapter';
 import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
 
 function getRandomInt(max: number) {
@@ -49,9 +47,7 @@ class DialogueService {
   customerPrismaAdapter: CustomerPrismaAdapter;
   sessionPrismaAdapter: SessionPrismaAdapter;
   nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;
-  questionConditionPrismaAdapter: QuestionConditionPrismaAdapter;
   edgePrismaAdapter: EdgePrismaAdapter;
-  questionOptionPrismaAdapter: QuestionOptionPrismaAdapter;
   questionNodePrismaAdapter: QuestionNodePrismaAdapter;
   nodeService: NodeService;
 
@@ -60,9 +56,7 @@ class DialogueService {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
-    this.questionConditionPrismaAdapter = new QuestionConditionPrismaAdapter(prismaClient);
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
-    this.questionOptionPrismaAdapter = new QuestionOptionPrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
   }
@@ -425,14 +419,14 @@ class DialogueService {
     // //// Edge-related
     const edgeIds = dialogue?.edges && dialogue?.edges.map((edge) => edge.id);
     if (edgeIds && edgeIds.length > 0) {
-      await this.questionConditionPrismaAdapter.deleteManyByEdgeIds(edgeIds);
+      await this.edgePrismaAdapter.deleteConditionsByEdgeIds(edgeIds);
       await this.edgePrismaAdapter.deleteMany(edgeIds);
     }
 
     // //// Question-related
     const questionIds = dialogue?.questions.map((question) => question.id);
     if (questionIds && questionIds.length > 0) {
-      await this.questionOptionPrismaAdapter.deleteManyByQuestionIds(questionIds);
+      await this.questionNodePrismaAdapter.deleteOptionsByQuestionIds(questionIds);
 
       await this.questionNodePrismaAdapter.deleteMany(questionIds);
     }

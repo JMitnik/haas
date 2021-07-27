@@ -1,18 +1,191 @@
-import { PrismaClient, QuestionNodeUpdateInput, QuestionNodeCreateInput, BatchPayload, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, FormNodeFieldUpsertArgs, FormNodeCreateInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, NodeType } from "@prisma/client";
+import { PrismaClient, QuestionNodeUpdateInput, QuestionNodeCreateInput, BatchPayload, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, FormNodeFieldUpsertArgs, FormNodeCreateInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, NodeType, Link, QuestionOptionCreateInput, QuestionOptionUpdateInput, Share, VideoEmbeddedNodeUpdateInput } from "@prisma/client";
 
 import { CreateQuestionInput } from "../../../questionnaire/DialoguePrismaAdapterType";
 import NodeService from "../../NodeService";
 import { QuestionOptionProps } from "../../NodeServiceType";
-import QuestionOptionPrismaAdapter from "../QuestionOption/QuestionOptionPrismaAdapter";
-import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput } from "./QuestionNodePrismaAdapterType";
+import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput, CreateLinkInput, UpdateLinkInput, CreateShareInput, UpdateShareInput, UpdateSliderNodeInput, CreateSliderNodeInput, CreateVideoEmbeddedNodeInput } from "./QuestionNodePrismaAdapterType";
 
 class QuestionNodePrismaAdapter {
   prisma: PrismaClient;
-  questionOptionPrismaAdapter: QuestionOptionPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-    this.questionOptionPrismaAdapter = new QuestionOptionPrismaAdapter(prismaClient);
+  }
+
+  updateVideoNode(nodeId: string, data: VideoEmbeddedNodeUpdateInput): Promise<VideoEmbeddedNode> {
+    return this.prisma.videoEmbeddedNode.update({
+      where: { id: nodeId },
+      data: data,
+    });
+  };
+
+  createVideoNode(data: CreateVideoEmbeddedNodeInput) {
+    const { parentNodeId, videoUrl } = data;
+    return this.prisma.videoEmbeddedNode.create({
+      data: {
+        videoUrl: videoUrl,
+        QuestionNode: parentNodeId ? {
+          connect: {
+            id: parentNodeId,
+          },
+        } : undefined,
+      },
+    });
+  };
+
+  deleteVideoNode(id: string): Promise<VideoEmbeddedNode> {
+    return this.prisma.videoEmbeddedNode.delete({
+      where: {
+        id,
+      }
+    });
+  };
+
+  getVideoNodeById(nodeId: string): Promise<VideoEmbeddedNode | null> {
+    return this.prisma.videoEmbeddedNode.findOne({
+      where: {
+        id: nodeId,
+      }
+    })
+  }
+
+  createSliderNode(data: CreateSliderNodeInput) {
+    const { parentNodeId, markers, unhappyText, happyText } = data;
+    return this.prisma.sliderNode.create({
+      data: {
+        unhappyText,
+        happyText,
+        QuestionNode: {
+          connect: {
+            id: parentNodeId,
+          },
+        },
+        markers: {
+          create: markers?.map((marker) => ({
+            label: marker.label || '',
+            subLabel: marker.subLabel || '',
+            range: {
+              create: {
+                start: marker?.range?.start || undefined,
+                end: marker?.range?.end || undefined,
+              },
+            },
+          })),
+        },
+      },
+    });
+  };
+
+  updateSliderNode(parentNodeId: string, data: UpdateSliderNodeInput) {
+    const { happyText, unhappyText, markers } = data;
+    return this.prisma.sliderNode.update({
+      where: { id: parentNodeId },
+      data: {
+        happyText,
+        unhappyText,
+        markers: {
+          update: markers?.map((marker) => ({
+            where: { id: marker?.id || undefined },
+            data: {
+              label: marker.label,
+              subLabel: marker.subLabel,
+            },
+          })),
+        },
+      },
+    });
+  };
+
+  upsertShareNode(id: string, create: CreateShareInput, update: UpdateShareInput): Promise<Share> {
+    return this.prisma.share.upsert({
+      where: {
+        id,
+      },
+      create: {
+        title: create.title,
+        tooltip: create.tooltip,
+        url: create.url,
+        questionNode: {
+          connect: {
+            id: create.questionId
+          }
+        }
+      },
+      update: {
+        title: update.title,
+        tooltip: update.tooltip,
+        url: update.url,
+      },
+    });
+  };
+
+  async getShareNodeByQuestionId(parentId: string) {
+    return this.prisma.share.findFirst({
+      where: {
+        questionNodeId: parentId,
+      },
+    });
+  };
+
+  deleteShareNodesByQuestionId(parentId: string): Promise<BatchPayload> {
+    return this.prisma.share.deleteMany({
+      where: {
+        questionNodeId: parentId,
+      },
+    });
+  };
+
+  deleteShareNode(id: string) {
+    return this.prisma.share.delete({ where: { id } });
+  }
+
+  deleteOptionsByQuestionIds(questionIds: string[]): Promise<BatchPayload> {
+    return this.prisma.questionOption.deleteMany(
+      {
+        where: {
+          questionNodeId: {
+            in: questionIds,
+          },
+        },
+      },
+    );
+  };
+
+  upsertLink(linkId: string, create: CreateLinkInput, update: UpdateLinkInput) {
+    return this.prisma.link.upsert({
+      where: { id: linkId },
+      create: {
+        title: create.title,
+        type: create.type,
+        url: create.url,
+        backgroundColor: create.backgroundColor,
+        iconUrl: create.iconUrl,
+        questionNode: {
+          connect: {
+            id: create.questionId,
+          }
+        }
+      },
+      update: {
+        title: update.title,
+        type: update.type,
+        url: update.url,
+        backgroundColor: update.backgroundColor,
+        iconUrl: update.iconUrl,
+      }
+    });
+  };
+
+  deleteLinks(linkIds: string[]) {
+    return this.prisma.link.deleteMany({ where: { id: { in: linkIds } } });
+  }
+
+  getLinksByNodeId(parentId: string): Promise<Link[]> {
+    return this.prisma.link.findMany({
+      where: {
+        questionNodeId: parentId,
+      },
+    });
   }
 
   createFieldsOfForm(input: CreateFormFieldsInput) {
@@ -78,6 +251,27 @@ class QuestionNodePrismaAdapter {
     });
   };
 
+  upsertQuestionOption(id: number, create: QuestionOptionCreateInput, update: QuestionOptionUpdateInput): Promise<QuestionOption> {
+    return this.prisma.questionOption.upsert({
+      where: { id },
+      create,
+      update,
+    })
+  };
+
+  findOptionsByQuestionId(parentId: string) {
+    return this.prisma.questionOption.findMany({
+      where: { questionNodeId: parentId },
+      include: {
+        overrideLeaf: true
+      }
+    });
+  }
+
+  deleteQuestionOptions(optionIds: number[]): Promise<BatchPayload> {
+    return this.prisma.questionOption.deleteMany({ where: { id: { in: optionIds } } });
+  };
+
   updateQuestionOptions = async (options: QuestionOptionProps[]): Promise<{ id: number }[]> => Promise.all(
     options?.map(async (option) => {
       const optionId = option.id ? option.id : -1
@@ -87,7 +281,7 @@ class QuestionNodePrismaAdapter {
         overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
         position: option.position,
       }
-      const updatedQOption = await this.questionOptionPrismaAdapter.upsert(optionId, optionUpsertInput, optionUpsertInput);
+      const updatedQOption = await this.upsertQuestionOption(optionId, optionUpsertInput, optionUpsertInput);
 
       return { id: updatedQOption.id };
     }),

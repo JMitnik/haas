@@ -4,6 +4,7 @@ import { CreateQuestionOfTriggerInput } from "./QuestionOfTriggerPrismaAdapterTy
 
 class QuestionOfTriggerPrismaAdapter {
   prisma: PrismaClient;
+
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
@@ -41,17 +42,12 @@ class QuestionOfTriggerPrismaAdapter {
         },
       },
     });
-  }
-
-  create(data: QuestionOfTriggerCreateInput): Promise<QuestionOfTrigger> {
-    return this.prisma.questionOfTrigger.create({
-      data,
-    });
   };
 
   deleteManyByTriggerId(triggerId: string): Promise<BatchPayload> {
     return this.prisma.questionOfTrigger.deleteMany({ where: { triggerId: triggerId } });
-  }
+  };
+
   async findDialogueByTriggerId(triggerId: string): Promise<Dialogue | null> {
     const questionsOfTrigger = await this.prisma.questionOfTrigger.findMany({
       where: {
@@ -70,6 +66,7 @@ class QuestionOfTriggerPrismaAdapter {
 
     return questionsOfTrigger[0].question.questionDialogue;
   }
+
   async findOneQuestion(triggerId: string, triggerConditionId: number): Promise<QuestionNode | null> {
     const questionOfTrigger = await this.prisma.questionOfTrigger.findMany({
       where: {

@@ -43,7 +43,7 @@ class TriggerService {
     this.triggerPrismaAdapter = new TriggerPrismaAdapter(prismaClient);
     this.questionOfTriggerPrismaAdapter = new QuestionOfTriggerPrismaAdapter(prismaClient);
     this.triggerConditionPrismaAdapter = new TriggerConditionPrismaAdapter(prismaClient);
-  }
+  };
 
   getTriggerById(triggerId: string): Promise<Trigger | null> {
     return this.triggerPrismaAdapter.getById(triggerId);
@@ -58,7 +58,7 @@ class TriggerService {
     }));
 
     return trigger;
-  }
+  };
 
   async editTrigger(triggerId: string, triggerUpdateInput: TriggerUpdateInput, recipientIds: string[], conditions: Array<NexusGenInputs['TriggerConditionInputType']>) {
     let updateTriggerArgs = triggerUpdateInput;
@@ -70,36 +70,37 @@ class TriggerService {
       updateTriggerArgs = TriggerService.updateRecipients(
         dbTrigger.recipients, (recipientIds || []), triggerUpdateInput,
       );
-    }
+    };
 
     if (dbTrigger?.conditions) {
       await this.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
-    }
+    };
 
     return this.triggerPrismaAdapter.update(dbTrigger?.id, updateTriggerArgs);
-  }
+  };
 
   async deleteTrigger(triggerId: string) {
     await this.questionOfTriggerPrismaAdapter.deleteManyByTriggerId(triggerId);
     await this.triggerConditionPrismaAdapter.deleteManyByTriggerId(triggerId);
     return this.triggerPrismaAdapter.delete(triggerId);
-  }
+  };
 
   getConditionsOfTrigger(triggerId: string): Promise<TriggerCondition[]> {
-    return this.triggerConditionPrismaAdapter.findManyByTriggerId(triggerId);
-  }
+    return this.triggerConditionPrismaAdapter.getConditionsByTriggerId(triggerId);
+  };
+
   getDialogueOfTrigger(triggerId: string): Promise<Dialogue | null> {
     return this.questionOfTriggerPrismaAdapter.findDialogueByTriggerId(triggerId);
-  }
+  };
 
   getQuestionOfTrigger(triggerId: string, triggerConditionId: number) {
     return this.questionOfTriggerPrismaAdapter.findOneQuestion(triggerId, triggerConditionId);
-  }
+  };
 
   static getSearchTermFilter = (searchTerm: string) => {
     if (!searchTerm) {
       return [];
-    }
+    };
 
     const searchTermFilter: TriggerWhereInput[] = [
       { name: { contains: searchTerm } },

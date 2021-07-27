@@ -41,11 +41,11 @@ class UserPrismaAdapter {
     });
   }
 
-  findManyByTriggerId(triggerId: string): Promise<User[]> {
+  getUsersByTriggerId(triggerId: string): Promise<User[]> {
     return this.prisma.user.findMany({
       where: { triggers: { some: { id: triggerId } } },
-    });;
-  }
+    });
+  };
 
   findUserContext(userId: string) {
     return this.prisma.user.findOne({
@@ -115,8 +115,7 @@ class UserPrismaAdapter {
         },
       },
     });
-  }
-
+  };
 
   async existsWithinWorkspace(email: string, workspaceId: string): Promise<Boolean> {
     const userExists = await this.prisma.user.findFirst({
@@ -134,6 +133,7 @@ class UserPrismaAdapter {
         },
       },
     });
+
     return userExists ? true : false;
   }
 
@@ -145,8 +145,8 @@ class UserPrismaAdapter {
           where: { customerId: workspaceId },
         },
       },
-    });;
-  }
+    });
+  };
 
   async getUserByEmail(email: string) {
     return this.prisma.user.findFirst({
@@ -162,11 +162,11 @@ class UserPrismaAdapter {
             customer: true,
             role: true,
             user: true,
-          }
-        }
-      }
-    })
-  }
+          },
+        },
+      },
+    });
+  };
 
   async getUserById(userId: string) {
     return this.prisma.user.findFirst({
@@ -254,10 +254,9 @@ class UserPrismaAdapter {
         },
       },
     });
+
     return validUsers;
-  }
-
-
+  };
 }
 
 export default UserPrismaAdapter;

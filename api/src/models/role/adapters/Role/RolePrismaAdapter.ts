@@ -85,8 +85,8 @@ class RolePrismaAdapter implements RolePrismaAdapterType {
   count(where: RoleWhereInput): Promise<number> {
     return this.prisma.role.count({
       where,
-    })
-  }
+    });
+  };
 
   findManyPaginated(where: RoleWhereInput, take?: number | undefined, skip?: number | undefined): Promise<Role[]> {
     return this.prisma.role.findMany({
@@ -94,9 +94,8 @@ class RolePrismaAdapter implements RolePrismaAdapterType {
       take,
       skip,
     });
-  }
+  };
 
-
-}
+};
 
 export default RolePrismaAdapter;
