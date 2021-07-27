@@ -5,7 +5,7 @@ class JobProcessLocationPrismaAdapter {
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-  }
+  };
 
   getCustomFieldsByJobProcessLocationId(jobProcessLocationId: string) {
     return this.prisma.customField.findMany({
@@ -13,7 +13,7 @@ class JobProcessLocationPrismaAdapter {
         jobProcessLocationId: jobProcessLocationId,
       },
     });
-  }
+  };
 
   getJobProcessLocationByJobId = (jobId: string) => {
     return this.prisma.jobProcessLocation.findFirst({
@@ -26,17 +26,17 @@ class JobProcessLocationPrismaAdapter {
       },
       include: {
         fields: true,
-      }
-    })
-  }
+      },
+    });
+  };
 
   findFirst(args: FindFirstJobProcessLocationArgs): Promise<JobProcessLocation & { fields: CustomField[]; }> {
     return this.prisma.jobProcessLocation.findFirst({
       where: args.where, include: {
         fields: true,
-      }
+      },
     });
-  }
+  };
 
   addNewCustomFields = (
     jobProcessLocationId: string,
@@ -51,10 +51,10 @@ class JobProcessLocationPrismaAdapter {
       data: {
         fields: {
           create: newCustomFields,
-        }
-      }
-    })
-  }
+        },
+      },
+    });
+  };
 
   update(jobProcessLocationId: string, data: JobProcessLocationUpdateInput) {
     return this.prisma.jobProcessLocation.update({
@@ -64,25 +64,26 @@ class JobProcessLocationPrismaAdapter {
       data,
       include: {
         fields: true,
-      }
-    })
-  }
+      },
+    });
+  };
+
   async create(data: JobProcessLocationCreateInput) {
     return this.prisma.jobProcessLocation.create({
       data,
       include: {
         fields: true,
-      }
-    })
-  }
+      },
+    });
+  };
 
   async findAll() {
     return this.prisma.jobProcessLocation.findMany({
       include: {
         fields: true,
-      }
-    })
-  }
-}
+      },
+    });
+  };
+};
 
 export default JobProcessLocationPrismaAdapter;
