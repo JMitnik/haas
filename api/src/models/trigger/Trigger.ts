@@ -1,19 +1,17 @@
 import {
-  PrismaClient,
   TriggerUpdateInput,
   TriggerEnum,
 } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { UserInputError } from 'apollo-server-express';
 
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 import { UserType } from '../users/User';
-
 import TriggerService from './TriggerService';
 import { CreateTriggerInput } from './TriggerServiceType';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
-import { UserInputError } from 'apollo-server-express';
 
 const TriggerTypeEnum = enumType({
   name: 'TriggerTypeEnum',
