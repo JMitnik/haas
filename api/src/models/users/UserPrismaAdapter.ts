@@ -1,19 +1,17 @@
-import { RegisterUserInput } from "./UserPrismaAdapterType";
 import { PrismaClient, UserUpdateInput, UserWhereInput, User } from "@prisma/client";
+
+import { RegisterUserInput } from "./UserPrismaAdapterType";
 import RoleService from '../role/RoleService';
-import { RoleServiceType } from "../role/RoleServiceType";
 
 class UserPrismaAdapter {
   prisma: PrismaClient;
-  roleService: RoleServiceType;
+  roleService: RoleService;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
   }
-  findManyByCustomerSlug(customerSlug: string): Promise<User[]> {
-    throw new Error("Method not implemented.");
-  }
+
   /**
    *  Checks if email address already exists (not belonging to userId)
    * @email the email to look for
@@ -28,18 +26,19 @@ class UserPrismaAdapter {
         },
       },
     });
+
     return otherMails ? true : false;
-  }
+  };
 
   getAllUsersByCustomerSlug(customerSlug: string): Promise<User[]> {
     return this.prisma.user.findMany({
       where: {
         customers: {
           every: { customer: { slug: customerSlug } },
-        }
-      }
+        },
+      },
     });
-  }
+  };
 
   getUsersByTriggerId(triggerId: string): Promise<User[]> {
     return this.prisma.user.findMany({
@@ -90,7 +89,7 @@ class UserPrismaAdapter {
         },
       },
     });
-  }
+  };
 
   async registerUser(registerUserInput: RegisterUserInput) {
     return this.prisma.user.create({
@@ -135,7 +134,7 @@ class UserPrismaAdapter {
     });
 
     return userExists ? true : false;
-  }
+  };
 
   async findUserWithinWorkspace(email: string, workspaceId: string) {
     return this.prisma.user.findFirst({
@@ -179,11 +178,11 @@ class UserPrismaAdapter {
             customer: true,
             role: true,
             user: true,
-          }
-        }
-      }
-    })
-  }
+          },
+        },
+      },
+    });
+  };
 
   async findFirst(where: UserWhereInput) {
     return this.prisma.user.findFirst({
@@ -194,11 +193,11 @@ class UserPrismaAdapter {
             customer: true,
             role: true,
             user: true,
-          }
-        }
-      }
-    })
-  }
+          },
+        },
+      },
+    });
+  };
 
   async logout(userId: string | undefined): Promise<User> {
     return this.prisma.user.update({
@@ -207,7 +206,7 @@ class UserPrismaAdapter {
         refreshToken: null,
       },
     });
-  }
+  };
 
   async setLoginToken(userId: string | undefined, loginToken: string | null): Promise<User> {
     return this.prisma.user.update({
@@ -216,7 +215,7 @@ class UserPrismaAdapter {
         loginToken,
       },
     });
-  }
+  };
 
   async login(userId: string | undefined, refreshToken: string): Promise<User> {
     return this.prisma.user.update({
@@ -226,14 +225,14 @@ class UserPrismaAdapter {
         loginToken: null,
       },
     });
-  }
+  };
 
   async update(userId: string | undefined, data: UserUpdateInput): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
       data,
     });
-  }
+  };
 
   async getValidUsers(loginToken: string, userId: string | undefined) {
     const validUsers = await this.prisma.user.findMany({
