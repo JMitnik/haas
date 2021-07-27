@@ -3,12 +3,12 @@ import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, Quest
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import { QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps } from './NodeServiceType';
-import QuestionNodePrismaAdapter from './adapters/QuestionNode/QuestionNodePrismaAdapter';
-import { CreateCTAInput, UpdateQuestionInput } from './adapters/QuestionNode/QuestionNodePrismaAdapterType';
+import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionsInput, CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
+import { CreateCTAInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
 
 const standardOptions = [
   { value: 'Facilities', position: 1 },

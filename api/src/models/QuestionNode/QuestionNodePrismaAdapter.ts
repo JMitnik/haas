@@ -1,8 +1,8 @@
 import { PrismaClient, QuestionNodeUpdateInput, QuestionNodeCreateInput, BatchPayload, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, FormNodeFieldUpsertArgs, FormNodeCreateInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, NodeType, Link, QuestionOptionCreateInput, QuestionOptionUpdateInput, Share, VideoEmbeddedNodeUpdateInput } from "@prisma/client";
 
-import { CreateQuestionInput } from "../../../questionnaire/DialoguePrismaAdapterType";
-import NodeService from "../../NodeService";
-import { QuestionOptionProps } from "../../NodeServiceType";
+import { CreateQuestionInput } from "../questionnaire/DialoguePrismaAdapterType";
+import NodeService from "./NodeService";
+import { QuestionOptionProps } from "./NodeServiceType";
 import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput, CreateLinkInput, UpdateLinkInput, CreateShareInput, UpdateShareInput, UpdateSliderNodeInput, CreateSliderNodeInput, CreateVideoEmbeddedNodeInput } from "./QuestionNodePrismaAdapterType";
 
 class QuestionNodePrismaAdapter {

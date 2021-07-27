@@ -1,6 +1,6 @@
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import { PrismaClient, Role, SystemPermissionEnum } from '@prisma/client';
-import RolePrismaAdapter from './adapters/Role/RolePrismaAdapter';
+import RolePrismaAdapter from './RolePrismaAdapter';
 
 export interface CreateRoleInput {
   permissions: SystemPermissionEnum[];

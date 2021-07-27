@@ -2,7 +2,7 @@ import { EdgeCreateInput, QuestionNode, PrismaClient, QuestionCondition } from '
 
 import { EdgeChildProps } from './EdgeServiceType';
 import EdgePrismaAdapter from './EdgePrismaAdapter';
-import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
+import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
 
 class EdgeService {
   edgePrismaAdapter: EdgePrismaAdapter;

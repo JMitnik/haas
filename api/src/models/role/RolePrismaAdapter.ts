@@ -1,6 +1,6 @@
 import { PrismaClient, RoleWhereInput, RoleCreateInput, RoleUpdateInput, BatchPayload, Role } from "@prisma/client";
 
-import { CreateRoleInput } from "../../RoleService";
+import { CreateRoleInput } from "./RoleService";
 
 class RolePrismaAdapter {
   prisma: PrismaClient;

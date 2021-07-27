@@ -36,7 +36,7 @@ import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
-import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
+import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));

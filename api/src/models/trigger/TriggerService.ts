@@ -27,7 +27,7 @@ import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import makeTriggerMailTemplate from '../../services/mailings/templates/makeTriggerMailTemplate';
 import prisma from '../../config/prisma';
-import TriggerPrismaAdapter from './adapters/Trigger/TriggerPrismaAdapter';
+import TriggerPrismaAdapter from './TriggerPrismaAdapter';
 import { CreateQuestionOfTriggerInput, CreateTriggerInput, TriggerWithSendData } from './TriggerServiceType';
 
 class TriggerService {

@@ -1,7 +1,7 @@
 import { FormNodeFieldUpsertArgs, FormNodeCreateInput, LinkTypeEnum } from "@prisma/client"
 
-import { NexusGenInputs } from "../../../../generated/nexus"
-import { CreateQuestionInput } from "../../../questionnaire/DialoguePrismaAdapterType"
+import { NexusGenInputs } from "../../generated/nexus"
+import { CreateQuestionInput } from "../questionnaire/DialoguePrismaAdapterType"
 
 export type CreateCTAInput = {
   title: string,
