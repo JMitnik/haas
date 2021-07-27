@@ -10,11 +10,10 @@ import { fetchTunnelUrl } from '../../utils/fetchTunnelUrl';
 import CustomerService from '../customer/CustomerService';
 import UserService from '../users/UserService';
 
-
 class ContextSessionService {
   customerService: CustomerService;
   userService: UserService;
-  context: ExpressContext
+  context: ExpressContext;
 
   constructor(context: ExpressContext, prismaClient: PrismaClient) {
     this.customerService = new CustomerService(prismaClient);
@@ -28,12 +27,12 @@ class ContextSessionService {
     if (vars?.customerSlug || vars?.input?.customerSlug) {
       const customer = await this.customerService.findWorkspaceBySlugs([vars?.customerSlug, vars?.input?.customerSlug])
       return customer;
-    }
+    };
 
     if (vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId) {
       const customer = await this.customerService.findWorkspaceBySlugs([vars?.customerId, vars?.input?.customerId, vars?.workspaceId, vars?.input?.workspaceId])
       return customer;
-    }
+    };
 
     return null;
   };
