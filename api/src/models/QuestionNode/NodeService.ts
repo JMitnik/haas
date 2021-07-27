@@ -1,4 +1,4 @@
-import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, PrismaClient, FormNodeFieldUpsertArgs, Share, Edge, EdgeCreateWithoutDialogueInput, Enumerable, QuestionOption, QuestionOptionCreateManyWithoutQuestionNodeInput, VideoEmbeddedNode } from '@prisma/client';
+import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, PrismaClient, FormNodeFieldUpsertArgs, Share, Edge, EdgeCreateWithoutDialogueInput, Enumerable, QuestionOption, QuestionOptionCreateManyWithoutQuestionNodeInput, VideoEmbeddedNode, VideoEmbeddedNodeCreateWithoutQuestionNodeInput } from '@prisma/client';
 import cuid from 'cuid';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -6,11 +6,10 @@ import EdgeService from '../edge/EdgeService';
 import { QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps } from './NodeServiceType';
 import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
-import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
+import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionsInput, CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import { CreateCTAInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
-import prisma from '../../config/prisma';
 
 const standardOptions = [
   { value: 'Facilities', position: 1 },
@@ -251,9 +250,9 @@ class NodeService {
    */
   static duplicateEdge(idMap: IdMapProps, edge: (Edge & {
     conditions: QuestionCondition[];
-  })) {
+  })): CreateEdgeInput {
     const mappedId = idMap[edge.id];
-    const { childNodeId, parentNodeId, conditions, } = edge;
+    const { childNodeId, parentNodeId, conditions, dialogueId } = edge;
     // Should only not exist for the edge attaching start of branch to its parent
     const mappedParentNodeId = idMap[parentNodeId] || parentNodeId;
     const mappedChildNodeId = idMap[childNodeId];
@@ -263,7 +262,7 @@ class NodeService {
       return { ...rest };
     });
 
-    return { ...edge, id: mappedId, parentNodeId: mappedParentNodeId, questionNodeId: mappedParentNodeId, childNodeId: mappedChildNodeId, conditions: mappedConditions }
+    return { ...edge, dialogueId: dialogueId || '-1', id: mappedId, parentNodeId: mappedParentNodeId, childNodeId: mappedChildNodeId, conditions: mappedConditions }
   }
 
   /**
@@ -276,25 +275,19 @@ class NodeService {
     options: QuestionOption[];
     videoEmbeddedNode: VideoEmbeddedNode | null;
     isOverrideLeafOf: QuestionNode[];
-  }) {
+  }): CreateQuestionInput {
     const mappedId = idMap[question.id];
-    const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
+    const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { videoUrl: question.videoEmbeddedNode?.videoUrl } : undefined
     const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id }));
-    const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = {
-      create: question.options.map((option) => {
-        const { id, overrideLeafId, questionNodeId, questionId, ...rest } = option;
-        return {
-          position: rest.position,
-          value: rest.value,
-          publicValue: rest.publicValue,
-          overrideLeaf: overrideLeafId ? {
-            connect: {
-              id: overrideLeafId,
-            }
-          } : undefined,
-        }
-      })
-    };
+    const mappedOptions: QuestionOptionProps[] = question.options.map((option) => {
+      const { id, overrideLeafId, questionNodeId, questionId, ...rest } = option;
+      return {
+        position: rest.position,
+        value: rest.value,
+        publicValue: rest.publicValue,
+        overrideLeafId: overrideLeafId || undefined,
+      };
+    });
 
     const mappedObject = {
       ...question,
@@ -302,6 +295,7 @@ class NodeService {
       videoEmbeddedNode: mappedVideoEmbeddedNode,
       options: mappedOptions,
       isOverrideLeafOf: mappedIsOverrideLeafOf,
+      overrideLeafId: question.overrideLeafId || undefined,
     };
 
     return mappedObject;
@@ -314,44 +308,17 @@ class NodeService {
   duplicateBranch = async (questionId: string) => {
     const idMap: IdMapProps = {};
 
-    const question = await prisma.questionNode.findFirst({
-      where: {
-        id: questionId,
-      },
-      include: {
-        // TODO: Add triggers and handle them in map function
-        options: true,
-        videoEmbeddedNode: true,
-        isOverrideLeafOf: true,
-      }
-    });
+    const question = await this.questionNodePrismaAdapter.getNodeById(questionId);
 
-    const edges = await prisma.edge.findMany({
-      where: {
-        dialogueId: question.questionDialogueId,
-      },
-      include: {
-        conditions: true,
-      }
-    });
+    if (!question || !question.questionDialogueId) return null;
+
+    const edges = await this.edgePrismaAdapter.getEdgesByDialogueId(question.questionDialogueId);
 
     const { edgeIds, questionIds } = NodeService.getNestedBranchIds(edges, [], [questionId], questionId);
 
     NodeService.createCuidPairs(idMap, [...questionIds, ...edgeIds, questionId]);
 
-    const targetQuestions = await prisma.questionNode.findMany({
-      where: {
-        id: {
-          in: questionIds,
-        },
-      },
-      include: {
-        options: true,
-        videoEmbeddedNode: true,
-        isOverrideLeafOf: true,
-        Edge: true,
-      }
-    });
+    const targetQuestions = await this.questionNodePrismaAdapter.getNodesByNodeIds(questionIds);
 
     const updatedQuestions = targetQuestions.map((question) => {
       const mappedObject = NodeService.mapQuestion(idMap, question);
@@ -363,60 +330,13 @@ class NodeService {
 
     if (!parentQuestionEdge) throw 'No edge exist to connect new branch to their parent'
 
-    const updatedEdges: Enumerable<EdgeCreateWithoutDialogueInput> = [...targetEdges, parentQuestionEdge].map((edge) => {
+    const updatedEdges: Array<CreateEdgeInput> = [...targetEdges, parentQuestionEdge].map((edge) => {
       const mappedEdge = NodeService.duplicateEdge(idMap, edge);
-
-      return {
-        parentNode: {
-          connect: {
-            id: mappedEdge.parentNodeId,
-          },
-        },
-        childNode: {
-          connect: {
-            id: mappedEdge.childNodeId,
-          }
-        },
-        conditions: {
-          create: mappedEdge.conditions,
-        },
-
-      };
+      return mappedEdge;
     });
 
-    await prisma.dialogue.update({
-      where: {
-        id: question.questionDialogueId || '-1',
-      },
-      data: {
-        questions: {
-          create: updatedQuestions.map((question) => ({
-            id: question.id,
-            isRoot: question.isRoot,
-            isLeaf: question.isLeaf,
-            title: question.title,
-            type: question.type,
-            options: question.options,
-            videoEmbeddedNode: question.videoEmbeddedNode,
-            isOverrideLeafOf: {
-              connect: question.isOverrideLeafOf,
-            },
-            overrideLeaf: question.overrideLeafId ? {
-              connect: {
-                id: question.overrideLeafId,
-              }
-            } : undefined,
-          })),
-        },
-        edges: {
-          create: updatedEdges.map((edge) => ({
-            childNode: edge.childNode,
-            conditions: edge.conditions,
-            parentNode: edge.parentNode,
-          })),
-        }
-      },
-    });
+    await this.dialoguePrismaAdapter.createNodes(question.questionDialogueId, updatedQuestions);
+    await this.dialoguePrismaAdapter.createEdges(question.questionDialogueId, updatedEdges);
 
     return null;
   }

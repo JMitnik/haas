@@ -1,6 +1,7 @@
 import { PrismaClient, EdgeCreateInput, BatchPayload, Edge, QuestionCondition, QuestionConditionUpdateInput, QuestionConditionCreateInput } from "@prisma/client";
 
 export interface CreateEdgeInput {
+  id?: string;
   dialogueId: string;
   parentNodeId: string;
   conditions: Array<{
@@ -17,6 +18,17 @@ class EdgePrismaAdapter {
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
+  };
+
+  getEdgesByDialogueId(dialogueId: string) {
+    return this.prisma.edge.findMany({
+      where: {
+        dialogueId: dialogueId,
+      },
+      include: {
+        conditions: true,
+      }
+    });
   }
 
   getEdgesByParentQuestionId(parentId: string): Promise<Edge[]> {
@@ -30,6 +42,7 @@ class EdgePrismaAdapter {
   createEdge(input: CreateEdgeInput) {
     return this.prisma.edge.create({
       data: {
+        id: input.id,
         dialogue: {
           connect: {
             id: input.dialogueId,

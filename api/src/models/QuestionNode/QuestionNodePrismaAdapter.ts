@@ -469,10 +469,30 @@ class QuestionNodePrismaAdapter {
     });
   }
 
+  getNodesByNodeIds(questionIds: string[]) {
+    return this.prisma.questionNode.findMany({
+      where: {
+        id: {
+          in: questionIds,
+        },
+      },
+      include: {
+        options: true,
+        videoEmbeddedNode: true,
+        isOverrideLeafOf: true,
+        Edge: true,
+      },
+    });
+  };
 
   async getNodeById(nodeId: string): Promise<QuestionNode | null> {
     return this.prisma.questionNode.findOne({
       where: { id: nodeId },
+      include: {
+        options: true,
+        videoEmbeddedNode: true,
+        isOverrideLeafOf: true,
+      },
     });
   }
 
