@@ -12,13 +12,14 @@ class EdgeService {
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
   }
+
   getEdgeById(edgeId: string) {
     return this.edgePrismaAdapter.getEdgeById(edgeId);
-  }
+  };
 
   async getConditionsById(edgeId: string): Promise<QuestionCondition[]> {
     return this.edgePrismaAdapter.getConditionsById(edgeId);
-  }
+  };
 
   static constructEdge(
     parentNodeEntry: QuestionNode,
@@ -45,7 +46,7 @@ class EdgeService {
         },
       },
     };
-  }
+  };
 
   createEdge = async (parent: QuestionNode, child: QuestionNode, conditions: any) => {
     const edge = await this.edgePrismaAdapter.create(EdgeService.constructEdge(parent, child, conditions));
@@ -63,6 +64,7 @@ class EdgeService {
       }
     }
   };
-}
+
+};
 
 export default EdgeService;
