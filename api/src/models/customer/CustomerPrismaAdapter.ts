@@ -51,7 +51,7 @@ export class CustomerPrismaAdapter {
     return this.prisma.customerSettings.findOne({
       where: { customerId },
     });
-  }
+  };
 
   async getTagsByCustomerSlug(customerSlug: string): Promise<Tag[]> {
     const customer = await this.prisma.customer.findOne({
@@ -62,19 +62,19 @@ export class CustomerPrismaAdapter {
     });
 
     return customer?.tags || [];
-  }
+  };
 
   findWorkspaceBySlug(slug: string): Promise<Customer | null> {
     return this.prisma.customer.findOne({ where: { slug } });
-  }
+  };
 
   findWorkspaceById(id: string): Promise<Customer | null> {
     return this.prisma.customer.findOne({ where: { id } });
-  }
+  };
 
   async findAll() {
     return this.prisma.customer.findMany();
-  }
+  };
 
   async findWorkspaceBySlugs(slugs: Array<string | undefined>): Promise<Customer | null> {
     const filteredSlugs: any = slugs.filter((slug) => slug);
@@ -88,28 +88,27 @@ export class CustomerPrismaAdapter {
         {
           id: {
             in: filteredSlugs,
-          }
-        }]
-
+          },
+        }],
       },
     });
-  }
+  };
 
   async exists(customerId: string): Promise<Boolean> {
     const customerExists = await this.prisma.customer.findFirst({
-      where: { id: customerId }
+      where: { id: customerId },
     });
 
     return customerExists ? true : false;
-  }
+  };
 
   async getAllCustomersBySlug(customerSlug?: string | null) {
     return this.prisma.customer.findMany({
       where: {
         slug: customerSlug || undefined
-      }
-    })
-  }
+      },
+    });
+  };
 
   async getDialogueTags(customerSlug: string, dialogueSlug: string) {
     const customer = await this.prisma.customer.findOne({
@@ -130,11 +129,11 @@ export class CustomerPrismaAdapter {
     });
     const dbDialogue = customer?.dialogues[0];
     return dbDialogue;
-  }
+  };
 
   delete(customerId: string): Promise<Customer> {
     return this.prisma.customer.delete({ where: { id: customerId } });
-  }
+  };
 
   async getDialogueById(customerId: string, dialogueId: string): Promise<Dialogue | undefined> {
     const customerWithDialogue = await this.prisma.customer.findOne({
@@ -147,7 +146,8 @@ export class CustomerPrismaAdapter {
     });
 
     return customerWithDialogue?.dialogues?.[0];
-  }
+  };
+
   async getCustomer(customerId: string) {
     return this.prisma.customer.findOne({
       where: { id: customerId },
@@ -160,7 +160,7 @@ export class CustomerPrismaAdapter {
         },
       },
     });
-  }
+  };
 
   async updateCustomer(customerId: string, input: UpdateCustomerInput): Promise<Customer> {
     const customer = await this.prisma.customer.update({
@@ -226,6 +226,6 @@ export class CustomerPrismaAdapter {
         roles: true,
       },
     });
-  }
+  };
 
-}
+};
