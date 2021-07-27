@@ -8,7 +8,7 @@ class SessionPrismaAdapter {
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-  }
+  };
 
   updateDelivery(sessionId: string, deliveryId: string) {
     return this.prisma.session.update({
@@ -17,9 +17,9 @@ class SessionPrismaAdapter {
       },
       data: {
         delivery: { connect: { id: deliveryId } }
-      }
-    })
-  }
+      },
+    });
+  };
 
   createSession(data: CreateSessionInput) {
     const { device, originUrl, dialogueId, entries, totalTimeInSec } = data;
@@ -57,17 +57,17 @@ class SessionPrismaAdapter {
         id: sessionId,
       },
     });
-  }
+  };
 
   async deleteMany(sessionIds: string[]) {
     return this.prisma.session.deleteMany({
       where: {
         id: {
           in: sessionIds,
-        }
-      }
-    })
-  }
+        },
+      },
+    });
+  };
 
   createFakeSession(data: (
     {
@@ -110,8 +110,7 @@ class SessionPrismaAdapter {
         },
       },
     });
-  }
-
-}
+  };
+};
 
 export default SessionPrismaAdapter;
