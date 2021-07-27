@@ -5,13 +5,13 @@ class NodeEntryPrismaAdapter {
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-  }
+  };
+
   create(data: NodeEntryCreateInput) {
     return this.prisma.nodeEntry.create({
       data,
     });
-  }
-
+  };
 
   async findNodeEntriesBySessionId(sessionId: string): Promise<(NodeEntry & { choiceNodeEntry: ChoiceNodeEntry | null; linkNodeEntry: LinkNodeEntry | null; registrationNodeEntry: RegistrationNodeEntry | null; sliderNodeEntry: SliderNodeEntry | null; textboxNodeEntry: TextboxNodeEntry | null; })[]> {
     const nodeEntries = await this.prisma.nodeEntry.findMany({
@@ -30,20 +30,19 @@ class NodeEntryPrismaAdapter {
     });
 
     return nodeEntries;
-  }
+  };
 
   getAmountOfNodeEntriesBySessionId(sessionId: string) {
-    return this.prisma.nodeEntry.count(
-      {
-        where: {
-          sessionId,
-        }
-      });
-  }
+    return this.prisma.nodeEntry.count({
+      where: {
+        sessionId,
+      },
+    });
+  };
 
   count(where: NodeEntryWhereInput): Promise<number> {
     return this.prisma.nodeEntry.count({ where, });
-  }
+  };
 
   async getChildNodeEntriesById(nodeId: string) {
     const nodeEntry = await this.prisma.nodeEntry.findOne({
@@ -65,27 +64,26 @@ class NodeEntryPrismaAdapter {
         },
       },
     });
+
     return nodeEntry;
   }
 
   async deleteManyNodeEntries(sessionIds: string[]): Promise<BatchPayload> {
-    return this.prisma.nodeEntry.deleteMany(
-      {
-        where: {
-          sessionId: {
-            in: sessionIds,
-          },
+    return this.prisma.nodeEntry.deleteMany({
+      where: {
+        sessionId: {
+          in: sessionIds,
         },
       },
+    },
     );
-  }
+  };
 
   async deleteManyChoiceNodeEntries(nodeEntryIds: string[]): Promise<BatchPayload> {
-    return this.prisma.choiceNodeEntry.deleteMany(
-      { where: { nodeEntryId: { in: nodeEntryIds } } },
-    );
-  }
-
+    return this.prisma.choiceNodeEntry.deleteMany({
+      where: { nodeEntryId: { in: nodeEntryIds } }
+    });
+  };
 
   async deleteManyLinkNodeEntries(nodeEntryIds: string[]): Promise<BatchPayload> {
     return this.prisma.linkNodeEntry.deleteMany(
