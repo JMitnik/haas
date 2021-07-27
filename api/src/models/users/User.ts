@@ -1,10 +1,10 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType, queryField, scalarType } from '@nexus/schema';
+import { UserUpdateInput } from '@prisma/client';
+import { Kind } from 'graphql';
 
 import { ConnectionInterface } from '../general/Pagination';
-import { Kind } from 'graphql';
 import { RoleType, SystemPermission } from '../role/Role';
-import { UserUpdateInput } from '@prisma/client';
 
 export const UserCustomerType = objectType({
   name: 'UserCustomer',
