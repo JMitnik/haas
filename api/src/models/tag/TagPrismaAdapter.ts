@@ -1,4 +1,5 @@
-import { PrismaClient, Tag, TagCreateInput, TagEnum } from "@prisma/client";
+import { PrismaClient, Tag, TagCreateInput } from "@prisma/client";
+
 import { CreateTagInput } from "./TagPrismaAdapterType";
 
 class TagPrismaAdapter {
@@ -6,14 +7,15 @@ class TagPrismaAdapter {
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-  }
+  };
+
   delete(tagId: string): Promise<Tag> {
     return this.prisma.tag.delete({
       where: {
         id: tagId,
-      }
-    })
-  }
+      },
+    });
+  };
 
   createTag(data: CreateTagInput) {
     const { name, type, customerId } = data;
@@ -28,7 +30,7 @@ class TagPrismaAdapter {
         },
       },
     });
-  }
+  };
 
   create(data: TagCreateInput): Promise<Tag> {
     return this.prisma.tag.create({
@@ -42,14 +44,13 @@ class TagPrismaAdapter {
         isTagOf: { some: { id: dialogueId } },
       },
     });
-  }
+  };
 
   // FIXME: Cannot used this in prisma.transaction
   async deleteAllByCustomerId(customerId: string) {
     return this.prisma.tag.deleteMany({ where: { customerId } });
-  }
+  };
 
-
-}
+};
 
 export default TagPrismaAdapter;
