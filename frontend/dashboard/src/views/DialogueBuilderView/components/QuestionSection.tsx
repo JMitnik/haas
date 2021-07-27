@@ -1,12 +1,14 @@
+import { Div, Flex, H4 } from '@haas/ui';
 import { Plus } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { Div, Flex, H4 } from '@haas/ui';
 import SplitArrowIcon from 'components/Icons/SplitIcon';
 
-import { useTranslation } from 'react-i18next';
 import { AddQuestionContainer, DepthSpan } from './QuestionEntry/QuestionEntryStyles';
 import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
+import { QuestionNodeProblem } from '../DialogueBuilderTypes';
+import { findProblemsInChildCondition } from '../findProblemsInChildConditions';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 
 interface QuestionSectionProps {
@@ -25,11 +27,13 @@ interface QuestionSectionProps {
   depth: number;
   condition: EdgeConditionProps | undefined;
   edgeId: string | undefined;
+  problems?: (QuestionNodeProblem | undefined)[];
 }
 
 const QuestionSection = ({
   index,
   activeQuestion,
+  problems,
   onActiveQuestionChange,
   onAddQuestion,
   onDeleteQuestion,
@@ -52,7 +56,9 @@ const QuestionSection = ({
   };
 
   const activeChildrenIds = question.children?.map((child) => child.childNode.id);
-  const children: Array<QuestionEntryProps> = questionsQ.filter((question) => activeChildrenIds?.includes(question.id));
+  const children: QuestionEntryProps[] = questionsQ.filter((childQuestion) => (
+    activeChildrenIds?.includes(childQuestion.id)
+  ));
   const parentOptions = question.options;
 
   const getConditionOfParentQuestion = (childNodeId: string) => {
@@ -70,6 +76,9 @@ const QuestionSection = ({
     onActiveQuestionChange('-1');
   };
 
+  const childConditions = children.map((child) => getConditionOfParentQuestion(child.id));
+  const childConditionsProblems: any[] = question.isRoot ? findProblemsInChildCondition(childConditions) : [];
+
   return (
     <Flex data-cy="QuestionSection" paddingTop="10px" paddingBottom="10px" flexDirection="column" paddingLeft={`${depth * 10}px`}>
       {depth > 1 && index === 0 && (
@@ -83,6 +92,7 @@ const QuestionSection = ({
         </Flex>
       )}
 
+      {/* The question itself */}
       <QuestionEntry
         depth={depth}
         edgeId={edgeId}
@@ -101,32 +111,34 @@ const QuestionSection = ({
         question={question}
         Icon={Icon}
         leafs={leafs}
+        problems={problems || []}
         ctaNodes={ctaNodes}
       />
 
-      {isQuestionExpanded && children.map(
-        (child, index) => (
-          <QuestionSection
-            edgeId={getEdgeIdfromParentQuestion(child.id)}
-            options={parentOptions}
-            parentQuestionType={question.type}
-            condition={getConditionOfParentQuestion(child.id)}
-            depth={depth + 1}
-            Icon={child.icon}
-            activeQuestion={activeQuestion}
-            index={index}
-            leafs={leafs}
-            ctaNodes={ctaNodes}
-            onActiveQuestionChange={onActiveQuestionChange}
-            question={child}
-            questionsQ={questionsQ}
-            key={`section-${child.id}-${child.updatedAt}`}
-            onAddQuestion={onAddQuestion}
-            onDeleteQuestion={onDeleteQuestion}
-          />
-        ),
-      )}
+      {/* Children */}
+      {isQuestionExpanded && children.map((child, childIndex) => (
+        <QuestionSection
+          edgeId={getEdgeIdfromParentQuestion(child.id)}
+          options={parentOptions}
+          parentQuestionType={question.type}
+          condition={getConditionOfParentQuestion(child.id)}
+          depth={depth + 1}
+          Icon={child.icon}
+          activeQuestion={activeQuestion}
+          index={childIndex}
+          leafs={leafs}
+          ctaNodes={ctaNodes}
+          onActiveQuestionChange={onActiveQuestionChange}
+          question={child}
+          questionsQ={questionsQ}
+          key={`section-${child.id}-${child.updatedAt}`}
+          problems={childConditionsProblems[childIndex]}
+          onAddQuestion={onAddQuestion}
+          onDeleteQuestion={onDeleteQuestion}
+        />
+      ))}
 
+      {/* Card for adding question */}
       {(isQuestionExpanded && !isAddExpanded) && (
         <AddQuestionContainer onClick={() => handleAdd()}>
           <Flex justifyContent="center" alignItems="center">
@@ -138,6 +150,7 @@ const QuestionSection = ({
         </AddQuestionContainer>
       )}
 
+      {/* Adding new question */}
       {(isQuestionExpanded && isAddExpanded) && (
         <Div marginLeft={`${depth * 10 + 10}px`}>
           <QuestionEntry
@@ -156,6 +169,7 @@ const QuestionSection = ({
             onDeleteQuestion={onDeleteQuestion}
             key={`entry-depth-${depth}-add-new`}
             index={0}
+            problems={[]}
             questionsQ={questionsQ}
             question={{
               id: '-1', title: '', icon: Icon, isRoot: false, isLeaf: false, type: 'Choice', extraContent: '',
