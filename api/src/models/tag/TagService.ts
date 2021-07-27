@@ -29,7 +29,7 @@ class TagService {
   }
 
   getAllTagsOfDialogue(dialogueId: string): Promise<Tag[]> {
-    return this.tagPrismaAdapter.findManyByDialogueId(dialogueId);
+    return this.tagPrismaAdapter.findTagsByDialogueId(dialogueId);
   }
 
 }

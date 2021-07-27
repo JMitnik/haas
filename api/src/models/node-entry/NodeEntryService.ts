@@ -28,7 +28,7 @@ class NodeEntryService {
   }
 
   getNodeEntriesBySessionId(sessionId: string): Promise<(NodeEntry & { choiceNodeEntry: ChoiceNodeEntry | null; linkNodeEntry: LinkNodeEntry | null; registrationNodeEntry: RegistrationNodeEntry | null; sliderNodeEntry: SliderNodeEntry | null; textboxNodeEntry: TextboxNodeEntry | null; })[]> {
-    return this.nodeEntryPrismaAdapter.findManyNodeEntriesBySessionId(sessionId);
+    return this.nodeEntryPrismaAdapter.findNodeEntriesBySessionId(sessionId);
   }
 
   getAmountOfPaths(sessionId: string): Promise<number> {

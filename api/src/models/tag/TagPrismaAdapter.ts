@@ -36,7 +36,7 @@ class TagPrismaAdapter {
     });
   };
 
-  findManyByDialogueId(dialogueId: string): Promise<Tag[]> {
+  findTagsByDialogueId(dialogueId: string): Promise<Tag[]> {
     return this.prisma.tag.findMany({
       where: {
         isTagOf: { some: { id: dialogueId } },

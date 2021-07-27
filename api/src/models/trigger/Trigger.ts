@@ -270,31 +270,16 @@ const TriggerQueries = extendType({
         filter: PaginationWhereInput,
       },
       resolve(parent, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
         if (args.userId) {
-          return prisma.trigger.findMany({
-            where: {
-              recipients: {
-                some: {
-                  id: args.userId,
-                },
-              },
-            },
-          }) as any;
-        }
+          return ctx.services.triggerService.getTriggersByUserId(args.userId);
+        };
 
         if (args.dialogueId) {
-          return ctx.services.triggerService.findTriggersByDialogueId(args.dialogueId) as any;
-        }
+          return ctx.services.triggerService.findTriggersByDialogueId(args.dialogueId);
+        };
 
         if (args.customerSlug) {
-          return prisma.trigger.findMany({
-            where: {
-              customer: {
-                slug: args.customerSlug,
-              },
-            },
-          }) as any;
+          return ctx.services.triggerService.getTriggersByCustomerSlug(args.customerSlug);
         }
         return [];
       },

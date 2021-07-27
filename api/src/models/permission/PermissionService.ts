@@ -16,7 +16,7 @@ class PermissionService {
   }
 
   getPermissionsOfCustomer(customerId: string): Promise<Permission[]> {
-    return this.permissionPrismaAdapter.findManyByCustomerId(customerId);
+    return this.permissionPrismaAdapter.findPermissionsByCustomerId(customerId);
   }
 
   deletePermissions = async (permissionIds: Array<string>) => {

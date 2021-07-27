@@ -1,15 +1,14 @@
 import { PrismaClient, PermissionCreateInput, Permission } from "@prisma/client";
-import { PermissionPrismaAdapterType } from "./PermissionPrismaAdapterType";
 import { CreatePermissionInput } from "./PermissionService";
 
-class PermissionPrismaAdapter implements PermissionPrismaAdapterType {
+class PermissionPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
 
-  findManyByCustomerId(customerId: string): Promise<Permission[]> {
+  findPermissionsByCustomerId(customerId: string): Promise<Permission[]> {
     return this.prisma.permission.findMany({ where: { customerId } });
   }
 

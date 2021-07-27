@@ -1,14 +1,13 @@
-import { RolePrismaAdapterType } from "./RolePrismaAdapterType";
 import { PrismaClient, RoleWhereInput, RoleCreateInput, RoleUpdateInput, BatchPayload, Role } from "@prisma/client";
+
 import { CreateRoleInput } from "../../RoleService";
 
-class RolePrismaAdapter implements RolePrismaAdapterType {
+class RolePrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
-
 
   getRoleById(roleId: string) {
     return this.prisma.role.findOne({
@@ -88,7 +87,7 @@ class RolePrismaAdapter implements RolePrismaAdapterType {
     });
   };
 
-  findManyPaginated(where: RoleWhereInput, take?: number | undefined, skip?: number | undefined): Promise<Role[]> {
+  findRolesPaginated(where: RoleWhereInput, take?: number | undefined, skip?: number | undefined): Promise<Role[]> {
     return this.prisma.role.findMany({
       where,
       take,

@@ -37,7 +37,7 @@ class RoleService {
     customerId: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const roles = await this.rolePrismaAdapter.findManyPaginated({ customerId }, paginationOpts.limit || undefined, paginationOpts.offset || undefined);
+    const roles = await this.rolePrismaAdapter.findRolesPaginated({ customerId }, paginationOpts.limit || undefined, paginationOpts.offset || undefined);
 
     const totalRoles = await this.rolePrismaAdapter.count({ customerId });
     const totalPages = paginationOpts.limit ? Math.ceil(totalRoles / (paginationOpts.limit)) : 1;
@@ -57,7 +57,7 @@ class RoleService {
   };
 
   async fetchDefaultRoleForCustomer(customerId: string) {
-    const roles = await this.rolePrismaAdapter.findManyPaginated({ customerId: customerId })
+    const roles = await this.rolePrismaAdapter.findRolesPaginated({ customerId: customerId })
 
     const guestRole = roles.find((role) => role.name.toLowerCase().includes('guest'));
     if (guestRole) return guestRole;
