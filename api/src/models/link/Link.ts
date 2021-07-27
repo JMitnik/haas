@@ -1,6 +1,5 @@
 import { enumType, inputObjectType, objectType } from '@nexus/schema';
 
-// eslint-disable-next-line import/no-cycle
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 
 export const LinkTypeEnumType = enumType({
@@ -56,7 +55,7 @@ export const LinkType = objectType({
 
         if (!questionNode) throw new Error('Unable to find related node');
 
-        return questionNode as any;
+        return questionNode;
       },
     });
   },
