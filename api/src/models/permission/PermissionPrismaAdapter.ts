@@ -6,11 +6,11 @@ class PermissionPrismaAdapter {
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-  }
+  };
 
   findPermissionsByCustomerId(customerId: string): Promise<Permission[]> {
     return this.prisma.permission.findMany({ where: { customerId } });
-  }
+  };
 
   async createPermission(input: CreatePermissionInput) {
     return this.prisma.permission.create({
@@ -20,11 +20,11 @@ class PermissionPrismaAdapter {
         Customer: input.customerId ? {
           connect: {
             id: input.customerId,
-          }
+          },
         } : undefined,
-      }
-    })
-  }
+      },
+    });
+  };
 
   async create(data: PermissionCreateInput) {
     return this.prisma.permission.create({
@@ -32,8 +32,8 @@ class PermissionPrismaAdapter {
       include: {
         Customer: true,
       },
-    })
-  }
+    });
+  };
 
   async deleteMany(permissionIds: string[]) {
     return this.prisma.permission.deleteMany({
@@ -43,7 +43,8 @@ class PermissionPrismaAdapter {
         },
       },
     });
-  }
-}
+  };
+
+};
 
 export default PermissionPrismaAdapter;
