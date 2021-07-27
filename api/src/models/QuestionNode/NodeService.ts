@@ -99,7 +99,7 @@ class NodeService {
   /**
    * Recursively get ids of all edges and questions.
    * */
-  static getDuplicateIds = (edges: Edge[], edgeIds: string[], questionIds: string[], questionId: string) => {
+  static getNestedBranchIds = (edges: Edge[], edgeIds: string[], questionIds: string[], questionId: string) => {
     const targetEdges = edges.filter((edge) => edge.parentNodeId === questionId);
     if (targetEdges.length) {
       targetEdges.forEach((targetEdge) => {
@@ -109,14 +109,20 @@ class NodeService {
         edgeIds.push(edgeId);
         questionIds.push(childQuestionNodeId);
 
-        NodeService.getDuplicateIds(edges, edgeIds, questionIds, childQuestionNodeId)
+        NodeService.getNestedBranchIds(edges, edgeIds, questionIds, childQuestionNodeId)
       });
     };
 
     return { edgeIds, questionIds };
   };
 
-  static mapEdge(idMap: IdMapProps, edge: (Edge & {
+  /**
+   * Maps all known cuids of a prisma edge to a new cuid while maintaining relationships with parent/child nodes as well as edge conditions
+   * @param idMap A map containing old cuid-replace cuid pairs
+   * @param edge A prisma edge with conditions
+   * @returns An edge with replaced cuids
+   */
+  static duplicateEdge(idMap: IdMapProps, edge: (Edge & {
     conditions: QuestionCondition[];
   })) {
     const mappedId = idMap[edge.id];
@@ -202,7 +208,7 @@ class NodeService {
       }
     });
 
-    const { edgeIds, questionIds } = NodeService.getDuplicateIds(edges, [], [questionId], questionId);
+    const { edgeIds, questionIds } = NodeService.getNestedBranchIds(edges, [], [questionId], questionId);
 
     NodeService.createCuidPairs(idMap, [...questionIds, ...edgeIds, questionId]);
 
@@ -231,7 +237,7 @@ class NodeService {
     if (!parentQuestionEdge) throw 'No edge exist to connect new branch to their parent'
 
     const updatedEdges: Enumerable<EdgeCreateWithoutDialogueInput> = [...targetEdges, parentQuestionEdge].map((edge) => {
-      const mappedEdge = NodeService.mapEdge(idMap, edge);
+      const mappedEdge = NodeService.duplicateEdge(idMap, edge);
 
       return {
         parentNode: {
