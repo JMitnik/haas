@@ -7,7 +7,6 @@ import {
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
-// eslint-disable-next-line import/no-cycle
 import { NexusGenInputs } from '../../generated/nexus';
 import { OrderByProps } from '../../types/generic';
 import { pickProperties } from '../../utils/pickProperties';
@@ -19,21 +18,22 @@ class NodeEntryService {
 
   constructor(prismaClient: PrismaClient) {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
-  }
+  };
+
   createNodeEntry(sessionId: string, nodeEntryInput: { data?: { choice?: { value?: string | null | undefined; } | null | undefined; form?: { values?: { email?: string | null | undefined; longText?: string | null | undefined; number?: number | null | undefined; phoneNumber?: string | null | undefined; relatedFieldId?: string | null | undefined; shortText?: string | null | undefined; url?: string | null | undefined; }[] | null | undefined; } | null | undefined; register?: { value?: string | null | undefined; } | null | undefined; slider?: { value?: number | null | undefined; } | null | undefined; textbox?: { value?: string | null | undefined; } | null | undefined; } | null | undefined; depth?: number | null | undefined; edgeId?: string | null | undefined; nodeId?: string | null | undefined; }): Promise<NodeEntry> {
     return this.nodeEntryPrismaAdapter.create({
       session: { connect: { id: sessionId } },
       ...NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput),
-    })
-  }
+    });
+  };
 
   getNodeEntriesBySessionId(sessionId: string): Promise<(NodeEntry & { choiceNodeEntry: ChoiceNodeEntry | null; linkNodeEntry: LinkNodeEntry | null; registrationNodeEntry: RegistrationNodeEntry | null; sliderNodeEntry: SliderNodeEntry | null; textboxNodeEntry: TextboxNodeEntry | null; })[]> {
     return this.nodeEntryPrismaAdapter.findNodeEntriesBySessionId(sessionId);
-  }
+  };
 
   getAmountOfPaths(sessionId: string): Promise<number> {
     return this.nodeEntryPrismaAdapter.getAmountOfNodeEntriesBySessionId(sessionId);
-  }
+  };
 
   async getNodeEntryValues(id: string) {
     const nodeEntry = await this.nodeEntryPrismaAdapter.getChildNodeEntriesById(id);
@@ -46,7 +46,7 @@ class NodeEntryService {
       textboxNodeEntry: nodeEntry?.textboxNodeEntry?.value,
       formNodeEntry: nodeEntry?.formNodeEntry,
     };
-  }
+  };
 
   static constructCreateNodeEntryFragment = (nodeEntryInput: NexusGenInputs['NodeEntryInput']): NodeEntryCreateWithoutSessionInput => ({
     relatedNode: (nodeEntryInput.nodeId && { connect: { id: nodeEntryInput.nodeId } }) || undefined,
@@ -93,15 +93,15 @@ class NodeEntryService {
 
     if (nodeEntry.relatedNode?.type === 'CHOICE') {
       return nodeEntry.choiceNodeEntry?.value?.toLowerCase().includes(processedSearch);
-    }
+    };
 
     if (nodeEntry.relatedNode?.type === 'REGISTRATION') {
       return nodeEntry.registrationNodeEntry?.value?.toString().includes(processedSearch);
-    }
+    };
 
     if (nodeEntry.relatedNode?.type === 'TEXTBOX') {
       return nodeEntry.textboxNodeEntry?.value?.toString().includes(processedSearch);
-    }
+    };
 
     return false;
   };
@@ -135,39 +135,39 @@ class NodeEntryService {
   static getNodeEntryValue = (nodeEntry: NodeEntryWithTypes): any => {
     if (nodeEntry.relatedNode?.type === 'GENERIC') {
       return null;
-    }
+    };
 
     if (nodeEntry.relatedNode?.type === 'SLIDER') {
       try {
         return nodeEntry?.sliderNodeEntry?.value;
       } catch {
         throw new Error('sliderNodeEntry was not included on initial retrieval.');
-      }
-    }
+      };
+    };
 
     if (nodeEntry.relatedNode?.type === 'CHOICE') {
       try {
         return nodeEntry?.choiceNodeEntry?.value;
       } catch {
         throw new Error('ChoiceNodeEntry was not included on initial retrieval.');
-      }
-    }
+      };
+    };
 
     if (nodeEntry.relatedNode?.type === 'LINK') {
       try {
         return nodeEntry?.linkNodeEntry?.value;
       } catch {
         throw new Error('LinkNodeEntry was not included on initial retrieval.');
-      }
-    }
+      };
+    };
 
     if (nodeEntry.relatedNode?.type === 'REGISTRATION') {
       try {
         return nodeEntry?.registrationNodeEntry?.value;
       } catch {
         throw new Error('RegistrationNodeEntry was not included on initial retrieval.');
-      }
-    }
+      };
+    };
 
     if (nodeEntry.relatedNode?.type === 'FORM') {
       try {
@@ -181,12 +181,12 @@ class NodeEntryService {
         ])).find(isPresent)).join(', ');
       } catch {
         throw new Error('RegistrationNodeEntry was not included on initial retrieval.');
-      }
-    }
+      };
+    };
 
     if (!nodeEntry.relatedNode) {
       return null;
-    }
+    };
 
     throw new Error(`Unable to find node entry type ${nodeEntry.relatedNode?.type}.`);
   };
@@ -273,7 +273,7 @@ class NodeEntryService {
         },
       ],
     };
-  }
+  };
 
   static getTextValueFromEntry = (entry: NodeEntryWithTypes): (string | null) => {
     if (entry.relatedNode?.type === 'CHOICE') return entry.choiceNodeEntry?.value || null;
@@ -293,6 +293,6 @@ class NodeEntryService {
   ) => ((offset + limit) < entries.length
     ? entries.slice(offset, (pageIndex + 1) * limit)
     : entries.slice(offset, entries.length));
-}
+};
 
 export default NodeEntryService;
