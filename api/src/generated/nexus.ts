@@ -1143,6 +1143,7 @@ export interface NexusGenFieldTypes {
     deleteTag: NexusGenRootTypes['Tag']; // Tag!
     deleteTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     deleteUser: NexusGenRootTypes['DeleteUserOutput']; // DeleteUserOutput!
+    duplicateQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     editDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     editTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     editUser: NexusGenRootTypes['UserType']; // UserType!
@@ -1524,6 +1525,9 @@ export interface NexusGenArgTypes {
     }
     deleteUser: { // args
       input?: NexusGenInputs['DeleteUserInput'] | null; // DeleteUserInput
+    }
+    duplicateQuestion: { // args
+      questionId?: string | null; // String
     }
     editDialogue: { // args
       customerSlug?: string | null; // String

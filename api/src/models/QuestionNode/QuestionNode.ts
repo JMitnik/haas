@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { UserInputError } from 'apollo-server-express';
 
 import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
@@ -491,6 +492,21 @@ export const DeleteNodeInputType = inputObjectType({
 export const QuestionNodeMutations = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('duplicateQuestion', {
+      type: QuestionNodeType,
+      nullable: true,
+      args: { questionId: 'String' },
+
+      async resolve(parent, args) {
+        if (!args.questionId) {
+          throw new UserInputError('Question id is missing!');
+        }
+
+        await NodeService.duplicateBranch(args.questionId);
+        return null;
+      },
+    });
+
     t.field('deleteQuestion', {
       type: QuestionNodeType,
       args: { input: DeleteNodeInputType },

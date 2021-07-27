@@ -67,6 +67,10 @@ const language = {
       en: 'You have no choices yet',
       de: 'Sie haben noch keine Auswahlmöglichkeiten',
     },
+    edit_question: {
+      en: 'Edit question',
+      de: 'Question bearbeiten',
+    },
     edit_dialogue: {
       en: 'Edit dialogue',
       de: 'Dialog bearbeiten',
@@ -697,6 +701,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Date',
       de: 'Datum',
     },
+    duplicate: {
+      en: 'Duplicate branch',
+      de: 'Doppelzweig',
+    },
     delete: {
       en: 'Delete',
       de: 'Löschen',
@@ -901,6 +909,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     phone: {
       en: 'Phone number',
       de: 'Telefonnummer',
+    },
+    question_problem_range: {
+      en: 'Problem with question {{ problemIndex }} with range {{ problemRange }}: {{ problemType }}',
+      de: 'Problem mit Frage {{ problemIndex }} mit Reichweite {{ problemRange }}: {{ problemType }}',
     },
     last_updated: {
       en: 'Last update {{date}} ago',
@@ -1686,6 +1698,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
+    branch_duplicated: {
+      en: 'Branch duplicated!',
+      de: 'Zweig dupliziert!',
+    },
+    branch_duplicated_helper: {
+      en: 'A new branch has succesfully been created.',
+      de: 'Eine neue Zweig wurde erfolgreich erstellt.',
+    },
     campaign_created: {
       en: 'Campaign created!',
       de: 'Kampagne erstellt!',
