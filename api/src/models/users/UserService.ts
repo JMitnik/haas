@@ -23,14 +23,14 @@ class UserService {
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
-  }
+  };
 
   async deleteUser(userId: string, customerId: string): Promise<{ deletedUser: boolean; }> {
     const removedUser = await this.userOfCustomerPrismaAdapter.delete(userId, customerId);
     if (removedUser) return { deletedUser: true };
 
     return { deletedUser: false };
-  }
+  };
 
   async editUser(
     userUpdateInput: UserUpdateInput,
@@ -50,11 +50,11 @@ class UserService {
     };
 
     return this.userPrismaAdapter.update(userId, userUpdateInput);
-  }
+  };
 
   getAllUsersByCustomerSlug(customerSlug: string): Promise<User[]> {
     return this.userPrismaAdapter.getAllUsersByCustomerSlug(customerSlug);
-  }
+  };
 
   async getRoleOfWorkspaceUser(userId: string, customerSlug: string) {
     const user = await this.userPrismaAdapter.getUserById(userId);
@@ -65,12 +65,12 @@ class UserService {
 
     const role = userCustomer?.role || null;
     return role;
-  }
+  };
 
   async getCustomersOfUser(userId: string): Promise<Customer[]> {
     const user = await this.userPrismaAdapter.getUserById(userId);
     return user?.customers.map((customerOfUser) => customerOfUser.customer) || [];
-  }
+  };
 
   async getUserCustomers(userId: string) {
     const user = await this.userPrismaAdapter.getUserById(userId);
@@ -81,12 +81,12 @@ class UserService {
       role: customerOfUser.role,
       user: rest, //TODO: check if changes to rest covers user: parent from resolver (parent === User),
     })) || [];
-  }
+  };
 
   async getGlobalPermissions(userId: string) {
     const user = await this.userPrismaAdapter.getUserById(userId);
     return user?.globalPermissions || [];
-  }
+  };
 
   async getUserOfCustomer(workspaceId: string | null | undefined, customerSlug: string | null | undefined, userId: string) {
     let customerId = '';
@@ -95,7 +95,7 @@ class UserService {
       customerId = customer?.id || '';
     } else {
       customerId = workspaceId || '';
-    }
+    };
 
     const userWithCustomer = await this.userOfCustomerPrismaAdapter.getByIds(customerId, userId);
     if (!userWithCustomer) return null;
@@ -104,27 +104,27 @@ class UserService {
 
   getRecipientsOfTrigger(triggerId: string): Promise<User[]> {
     return this.userPrismaAdapter.getUsersByTriggerId(triggerId);
-  }
+  };
 
   findUserContext(userId: string) {
     return this.userPrismaAdapter.findUserContext(userId);
-  }
+  };
 
   findEmailWithinWorkspace(emailAddress: string, workspaceId: string) {
     return this.userPrismaAdapter.findUserWithinWorkspace(emailAddress, workspaceId);
-  }
+  };
 
   logout(userId: string): Promise<User> {
     return this.userPrismaAdapter.logout(userId);
-  }
+  };
 
   setLoginToken(userId: string, loginToken: string): Promise<User> {
     return this.userPrismaAdapter.setLoginToken(userId, loginToken);
-  }
+  };
 
   async getUserById(userId: string) {
     return this.userPrismaAdapter.getUserById(userId);
-  }
+  };
 
   async getUserByEmail(emailAddress: string): Promise<User | null> {
     return this.userPrismaAdapter.getUserByEmail(emailAddress);
@@ -136,7 +136,7 @@ class UserService {
 
   async getValidUsers(loginToken: string, userId: string | undefined): Promise<(User & { customers: (UserOfCustomer & { customer: Customer; role: Role; })[]; })[]> {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
-  }
+  };
 
   /**
    * Invites a new user to a current customer, and mails them with a login-token.
@@ -160,7 +160,7 @@ class UserService {
       subject: 'Welcome to HAAS!',
       body: emailBody,
     });
-  }
+  };
 
   async updateUserRole(userId: string, newRoleId: string, workspaceId: string) {
     const updatedUser = await this.userOfCustomerPrismaAdapter.updateWorkspaceUserRole(userId, workspaceId, newRoleId);
@@ -176,7 +176,7 @@ class UserService {
       subject: 'HAAS: New role assigned to you.',
       body: emailBody,
     });
-  }
+  };
 
   async inviteExistingUserToCustomer(userId: string, newRoleId: string, workspaceId: string) {
     const invitedUser = await this.userOfCustomerPrismaAdapter.createExistingUserForInvitingWorkspace(workspaceId, newRoleId, userId);
@@ -196,7 +196,7 @@ class UserService {
       subject: `HAAS: You have been invited to ${invitedUser.customer.name}`,
       body: emailBody,
     });
-  }
+  };
 
 
   static filterBySearchTerm = (
