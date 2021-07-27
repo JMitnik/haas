@@ -147,6 +147,7 @@ enum FormNodeFieldType {
 model FormNodeField {
   id                     String                   @id @default(cuid())
   label                  String
+  placeholder            String?
   type                   FormNodeFieldType        @default(shortText)
   isRequired             Boolean                  @default(false)
   position               Int

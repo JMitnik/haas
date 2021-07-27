@@ -1555,6 +1555,13 @@
     {
       "tag": "CreateField",
       "model": "FormNodeField",
+      "field": "placeholder",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
       "field": "type",
       "type": "FormNodeFieldType",
       "arity": "Required"
