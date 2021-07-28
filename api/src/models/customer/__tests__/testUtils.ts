@@ -6,7 +6,6 @@ export const clearCustomerDatabase = async (prisma: PrismaClient) => {
   const colourSettings = prisma.colourSettings.deleteMany({});
   const fontSettings = prisma.fontSettings.deleteMany({});
   const customerSettings = prisma.customerSettings.deleteMany({});
-  
   const deleteDialogues = prisma.dialogue.deleteMany({});
   const deleteWorkspaces = prisma.customer.deleteMany({});
 
@@ -16,7 +15,7 @@ export const clearCustomerDatabase = async (prisma: PrismaClient) => {
     deleteRoles,
     colourSettings,
     fontSettings,
-    customerSettings, 
+    customerSettings,
     deleteDialogues,
     deleteWorkspaces,
   ]);

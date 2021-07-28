@@ -1,6 +1,7 @@
+import { CustomerUpdateInput } from "@prisma/client";
+
 import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
 import { CustomerPrismaAdapter } from "../CustomerPrismaAdapter";
-import { CustomerUpdateInput } from "@prisma/client";
 import { NexusGenInputs } from "../../../generated/nexus";
 import { clearCustomerDatabase } from './testUtils';
 
@@ -15,31 +16,26 @@ const defaultCustomerInput: NexusGenInputs['CreateWorkspaceInput'] = {
 };
 
 describe('CustomerPrismaAdapter', () => {
-  // beforeEach(async () => {
-  //   await seedWorkspace(prisma, workspaceId, dialogueId);
-  // });
-
   afterEach(async () => {
     await clearCustomerDatabase(prisma);
     prisma.$disconnect();
   });
 
-  test('customerPrismaAdapter.createWorkspace', async () => {
-    const customer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
-    const { name, slug, roles, id } = customer;
+  test('Creates a workspace', async () => {
+    const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
 
     // customer 
-    expect(name).toBe(defaultCustomerInput.name);
-    expect(slug).toBe(defaultCustomerInput.slug);
+    expect(createdCustomer.name).toBe(defaultCustomerInput.name);
+    expect(createdCustomer.slug).toBe(defaultCustomerInput.slug);
 
     // standard role should be made for customer
-    expect(roles.length).not.toEqual(0);
+    expect(createdCustomer.roles.length).not.toEqual(0);
 
     // settings (main & colour settings)
 
     const customerSettings = await prisma.customerSettings.findOne({
       where: {
-        customerId: id,
+        customerId: createdCustomer.id,
       },
       include: {
         colourSettings: true,
@@ -52,10 +48,9 @@ describe('CustomerPrismaAdapter', () => {
     expect(customerSettings?.colourSettings?.primary).toBe(defaultCustomerInput.primaryColour);
 
     // tags
-
     const tags = await prisma.tag.findMany({
       where: {
-        customerId: customer.id,
+        customerId: createdCustomer.id,
       }
     });
 
@@ -164,7 +159,7 @@ describe('CustomerPrismaAdapter', () => {
   test('customerPrismaAdapter.getAllCustomersBySlug', async () => {
     const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
     const customerInputTwo = { ...defaultCustomerInput, slug: 'customerSlugTwo', name: 'workspaceTwo' };
-    
+
     await customerPrismaAdapter.createWorkspace(customerInputTwo);
 
     const customers = await customerPrismaAdapter.getAllCustomersBySlug(createdCustomer.slug);
