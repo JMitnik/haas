@@ -1,4 +1,4 @@
-import { FindManyUserOfCustomerArgs, UserOfCustomer, PrismaClient, PrismaClientOptions, UserUpdateInput, Customer, Role, User } from '@prisma/client';
+import { FindManyUserOfCustomerArgs, UserOfCustomer, PrismaClient, UserUpdateInput, Customer, Role, User } from '@prisma/client';
 import { UserInputError } from 'apollo-server';
 import _ from 'lodash';
 
@@ -11,21 +11,22 @@ import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUp
 import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
+import { DeletedUserOutput, UserWithWorkspaces } from './UserServiceTypes';
 
 class UserService {
-  prisma: PrismaClient<PrismaClientOptions, never>;
+  prisma: PrismaClient;
   userPrismaAdapter: UserPrismaAdapter;
   customerPrismaAdapter: CustomerPrismaAdapter;
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
 
-  constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
+  constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
   };
 
-  async deleteUser(userId: string, customerId: string): Promise<{ deletedUser: boolean; }> {
+  async deleteUser(userId: string, customerId: string): Promise<DeletedUserOutput> {
     const removedUser = await this.userOfCustomerPrismaAdapter.delete(userId, customerId);
     if (removedUser) return { deletedUser: true };
 
@@ -97,7 +98,7 @@ class UserService {
       customerId = workspaceId || '';
     };
 
-    const userWithCustomer = await this.userOfCustomerPrismaAdapter.getByIds(customerId, userId);
+    const userWithCustomer = await this.userOfCustomerPrismaAdapter.findUserCustomerByIds(customerId, userId);
     if (!userWithCustomer) return null;
     return userWithCustomer;
   };
@@ -134,7 +135,7 @@ class UserService {
     return this.userPrismaAdapter.login(userId, refreshToken);
   };
 
-  async getValidUsers(loginToken: string, userId: string | undefined): Promise<(User & { customers: (UserOfCustomer & { customer: Customer; role: Role; })[]; })[]> {
+  async getValidUsers(loginToken: string, userId: string | undefined): Promise<UserWithWorkspaces[]> {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   };
 
@@ -181,6 +182,7 @@ class UserService {
   async inviteExistingUserToCustomer(userId: string, newRoleId: string, workspaceId: string) {
     const invitedUser = await this.userOfCustomerPrismaAdapter.createExistingUserForInvitingWorkspace(workspaceId, newRoleId, userId);
 
+    // TODO: Make instance
     const inviteLoginToken = AuthService.createUserToken(userId);
     await this.userPrismaAdapter.setLoginToken(userId, inviteLoginToken);
 
