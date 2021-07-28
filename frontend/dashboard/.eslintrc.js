@@ -14,6 +14,8 @@ module.exports = {
         "@typescript-eslint/camelcase": "off",
         "@typescript-eslint/no-unused-vars": "error",
         "react/jsx-props-no-spreading": "off",
+        "no-use-before-define": "off",
+        "@typescript-eslint/no-use-before-define": ["error"],
         "react/no-array-index-key": "off",
         "no-console": "off",
         "react/no-this-in-sfc": "off", // Bugged, gets triggered by non-SFC functions

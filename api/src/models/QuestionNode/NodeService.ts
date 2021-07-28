@@ -9,7 +9,7 @@ interface LeafNodeDataEntryProps {
   type: NodeType;
   links: LinkGenericInputProps[];
   form?: NexusGenInputs['FormNodeInputType'];
-}
+};
 
 interface QuestionOptionProps {
   id?: number;
@@ -17,14 +17,14 @@ interface QuestionOptionProps {
   publicValue?: string;
   overrideLeafId?: string;
   position: number;
-}
+};
 
 interface EdgeChildProps {
   id?: string;
   conditions: [QuestionConditionProps];
   parentNode: EdgeNodeProps;
   childNode: EdgeNodeProps;
-}
+};
 
 interface QuestionConditionProps {
   id?: number;
@@ -32,17 +32,17 @@ interface QuestionConditionProps {
   renderMin: number;
   renderMax: number;
   matchValue: string;
-}
+};
 
 interface EdgeNodeProps {
   id: string;
   title: string;
-}
+};
 
 interface LinkGenericInputProps {
   type: 'SOCIAL' | 'API' | 'FACEBOOK' | 'LINKEDIN' | 'WHATSAPP' | 'INSTAGRAM' | 'TWITTER';
   url: string;
-}
+};
 
 const standardOptions = [
   { value: 'Facilities', position: 1 },

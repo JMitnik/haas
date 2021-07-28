@@ -37,7 +37,7 @@ const client = new ApolloClient({
     authorizeLink,
     createUploadLink({
       credentials: 'include',
-      uri: process.env.REACT_APP_API_ENDPOINT || 'http://localhost:4000/graphql',
+      uri: import.meta.env.VITE_API_ENDPOINT?.toString() || 'http://localhost:4000/graphql',
     }),
   ]),
   cache: new InMemoryCache(),

@@ -12,7 +12,7 @@ const IllustrationCardWrapper = styled.div`
       bottom: ${theme.gutter}px;
       font-weight: 200;
       font-size: 1.3rem;
-      text-align: center; 
+      text-align: center;
       transform: translateY(-35%);
       display: block;
       max-width: 80%;

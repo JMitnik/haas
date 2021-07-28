@@ -852,7 +852,7 @@ export const SwitchItem = styled.button.attrs({ type: 'button' }) <SwitchItemPro
   `}
 `
 
-type ReactSelectProps = ReactSelect<T>['props'];
+type ReactSelectProps = ReactSelect<any>['props'];
 
 interface SelectContainerProps {
   menuIsOpen?: boolean;
