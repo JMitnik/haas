@@ -67,7 +67,7 @@ const TriggerType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        return ctx.services.triggerService.getDialogueOfTrigger(parent.id)
+        return ctx.services.triggerService.findDialogueOfTrigger(parent.id)
       },
     });
 
@@ -251,7 +251,7 @@ const TriggerQueries = extendType({
       async resolve(parent, args, ctx) {
         if (!args.triggerId) throw new Error('No id provided');
 
-        const trigger = await ctx.services.triggerService.getTriggerById(args.triggerId);
+        const trigger = await ctx.services.triggerService.findTriggerById(args.triggerId);
 
         if (!trigger) throw new Error('Cant find trigger');
 
