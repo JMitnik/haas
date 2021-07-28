@@ -574,6 +574,8 @@ class DialogueService {
               select: {
                 publicValue: true,
                 value: true,
+                overrideLeafId: true,
+                position: true,
               },
             },
             overrideLeaf: {
@@ -622,7 +624,20 @@ class DialogueService {
       const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
       const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
       const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
-      const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
+      const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = {
+        create: question.options.map((option) => {
+          const { overrideLeafId, position, publicValue, value } = option;
+          const mappedOverrideLeafId = overrideLeafId && idMap[overrideLeafId];
+
+          return {
+            position,
+            publicValue,
+            value,
+            overrideLeaf: mappedOverrideLeafId ? { connect: { id: mappedOverrideLeafId } } : undefined
+          };
+        })
+      };
+
       const mappedObject = {
         ...question,
         id: mappedId,

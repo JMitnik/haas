@@ -1,13 +1,9 @@
 import * as UI from '@haas/ui';
-import React from 'react';
-
 import { AtSign, FileText, Hash, Link2, Phone, Type } from 'react-feather';
-import {
-  getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries_value_formNodeEntry
-  as FormNodeEntryType,
-} from 'queries/__generated__/getDialogueSessionConnection';
-import { FormNodeFieldTypeEnum } from 'types/globalTypes';
+import React from 'react';
 import styled from 'styled-components';
+
+import { FormNodeEntryType, FormNodeFieldTypeEnum } from 'types/generated-types';
 
 /**
  * Wrap the underlying element to be full-width
@@ -103,13 +99,13 @@ const FormNodeUrlEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) =
   </GeneralWrappedTextContainer>
 );
 
-const MapFormNodeEntryVal: {[key in FormNodeFieldTypeEnum]?: React.FC<{ formNodeFieldEntry: any }>} = {
-  [FormNodeFieldTypeEnum.email]: FormNodeEmailEntry,
-  [FormNodeFieldTypeEnum.longText]: FormNodeLongTextEntry,
-  [FormNodeFieldTypeEnum.shortText]: FormNodeShortTextEntry,
-  [FormNodeFieldTypeEnum.phoneNumber]: FormNodePhoneNumberEntry,
-  [FormNodeFieldTypeEnum.number]: FormNodeNumberEntry,
-  [FormNodeFieldTypeEnum.url]: FormNodeUrlEntry,
+const MapFormNodeEntryVal: { [key in FormNodeFieldTypeEnum]?: React.FC<{ formNodeFieldEntry: any }> } = {
+  [FormNodeFieldTypeEnum.Email]: FormNodeEmailEntry,
+  [FormNodeFieldTypeEnum.LongText]: FormNodeLongTextEntry,
+  [FormNodeFieldTypeEnum.ShortText]: FormNodeShortTextEntry,
+  [FormNodeFieldTypeEnum.PhoneNumber]: FormNodePhoneNumberEntry,
+  [FormNodeFieldTypeEnum.Number]: FormNodeNumberEntry,
+  [FormNodeFieldTypeEnum.Url]: FormNodeUrlEntry,
 };
 
 export const FormNodeEntry = ({ nodeEntry }: { nodeEntry: FormNodeEntryType }) => (
@@ -117,6 +113,7 @@ export const FormNodeEntry = ({ nodeEntry }: { nodeEntry: FormNodeEntryType }) =
     <UI.CardBody>
       <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 1fr']}>
         {nodeEntry.values?.map((formNodeFieldEntry, index) => {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           const { relatedField, __typename, ...entryData } = formNodeFieldEntry;
           // We can't rely on the relatedField.type because users may have changed the type whilst the value remains
           // on previous type.

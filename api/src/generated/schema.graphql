@@ -669,6 +669,7 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
+  duplicateQuestion(questionId: String): QuestionNode
   editDialogue(customerSlug: String, description: String, dialogueFinisherHeading: String, dialogueFinisherSubheading: String, dialogueSlug: String, isWithoutGenData: Boolean, language: LanguageEnumType, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
@@ -719,6 +720,7 @@ input NodeEntryDataInput {
   register: RegisterNodeEntryInput
   slider: SliderNodeEntryInput
   textbox: TextboxNodeEntryInput
+  video: VideoNodeEntryInput
 }
 
 """Input type for node-entry metadata"""
@@ -736,6 +738,7 @@ type NodeEntryValue {
   registrationNodeEntry: String
   sliderNodeEntry: Int
   textboxNodeEntry: String
+  videoNodeEntry: String
 }
 
 input OptionInputType {
@@ -1277,4 +1280,9 @@ type VerifyUserTokenOutput {
   accessToken: String!
   accessTokenExpiry: Int!
   userData: UserType!
+}
+
+"""Input type for a video node"""
+input VideoNodeEntryInput {
+  value: String
 }

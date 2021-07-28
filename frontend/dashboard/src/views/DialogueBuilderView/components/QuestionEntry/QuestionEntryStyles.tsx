@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 
-import { Card, Div, Flex, H4, Span } from '@haas/ui';
+import { Card, Div, Flex, H4, Icon, Span } from '@haas/ui';
 
 export const QuestionEntryHeader = styled(H4)`
 ${({ theme }) => css`
@@ -18,6 +18,7 @@ export const ConditionContainer = styled(Flex) <{ activeCTA: string | null, id: 
     margin-bottom: 25px;
     width: 60px;
     height: 60px;
+    position: relative;
 
     border-top-left-radius: ${theme.borderRadiuses.somewhatRounded};
     border-bottom-left-radius: ${theme.borderRadiuses.somewhatRounded};
@@ -54,11 +55,11 @@ export const AddQuestionContainer = styled(Flex)`
     cursor: pointer;
     min-width: 500px;
     max-width: 800px;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
     background-color: ${theme.colors.default.lightest};
     color: ${theme.colors.default.muted};
-   
+
     border: ${theme.colors.app.mutedOnDefault} 1px solid;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
     transition: all 0.2s ease-in;
@@ -96,48 +97,48 @@ export const QuestionEntryViewContainer = styled(Card) <{ activeCTA: string | nu
       background-color: ${theme.colors.white};
       opacity: 0.5;
     `};
- `} 
+ `}
 `;
 
-export const AddChildContainer = styled(Flex) <{isDisabled?: Boolean}>`
+export const AddChildContainer = styled(Flex) <{ isDisabled?: Boolean }>`
   ${({ theme, isDisabled }) => css`
-    position: absolute; 
+    position: absolute;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    bottom: 0; 
+    bottom: 0;
     left: 50%;
     transform: translate(-50%, -10px);
 
     ${isDisabled && css`
       pointer-events: none;
-      
+
       div > button {
         background-color: ${theme.colors.white};
         opacity: 0.5;
       }
     `}
-    
+
  `}
 `;
 
 export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
   ${({ theme, hasCTA }) => css`
     flex-direction: column;
-    justify-content: center; 
+    justify-content: center;
     justify-items: center;
-    border-left: none; 
+    border-left: none;
     border-bottom-right-radius: ${theme.borderRadiuses.somewhatRounded};
     border-top-right-radius: ${theme.borderRadiuses.somewhatRounded};
     color: ${theme.colors.default.muted};
     margin-bottom: 25px;
-    
+
     ${!hasCTA && css`
       border-color: ${theme.colors.default.darkest};
       opacity: 0.4;
       border: 1px dashed;
     `}
-    
+
     ${hasCTA && css`
       border: none;
       background: ${theme.colors.default.dark};
@@ -147,6 +148,7 @@ export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
 
 export const ConditionSpan = styled(Span)`
    ${({ theme }) => css`
+    position: relative;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -176,6 +178,7 @@ export const DepthSpan = styled(Span)`
 
 export const QuestionEntryContainer = styled(Flex)`
  ${({ theme }) => css`
+    position: relative;
     flex-direction: column;
     color: ${theme.colors.default.muted};
  `}
@@ -202,9 +205,34 @@ export const DeleteQuestionOptionButtonContainer = styled.button`
   cursor: pointer;
   transition: all 0.2s ease-in;
   margin-left: 1%;
-  
+
   &:hover {
     transition: all 0.2s ease-in;
     opacity: 0.8;
   }
+`;
+
+export const QuestionNodeProblem = styled.div`
+  ${({ theme }) => css`
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 10px;
+    background: ${theme.colors.yellow[200]};
+    color: ${theme.colors.yellow[500]};
+
+    > ${Icon} {
+      width: 24px;
+      height: 24px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    svg {
+      max-width: 100%;
+    }
+  `}
 `;
