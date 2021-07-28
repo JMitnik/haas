@@ -1,16 +1,30 @@
-import { PrismaClient, PermissionCreateInput } from "@prisma/client";
-import { PermissionPrismaAdapterType } from "./PermissionPrismaAdapterType";
+import { PrismaClient, PermissionCreateInput, Permission } from "@prisma/client";
+import { CreatePermissionInput } from "./PermissionService";
 
-class PermissionPrismaAdapter implements PermissionPrismaAdapterType {
+class PermissionPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-  }
+  };
 
-  findManyByCustomerId(customerId: string): Promise<import("@prisma/client").Permission[]> {
+  findPermissionsByCustomerId(customerId: string): Promise<Permission[]> {
     return this.prisma.permission.findMany({ where: { customerId } });
-  }
+  };
+
+  async createPermission(input: CreatePermissionInput) {
+    return this.prisma.permission.create({
+      data: {
+        name: input.name,
+        description: input.description,
+        Customer: input.customerId ? {
+          connect: {
+            id: input.customerId,
+          },
+        } : undefined,
+      },
+    });
+  };
 
   async create(data: PermissionCreateInput) {
     return this.prisma.permission.create({
@@ -18,8 +32,8 @@ class PermissionPrismaAdapter implements PermissionPrismaAdapterType {
       include: {
         Customer: true,
       },
-    })
-  }
+    });
+  };
 
   async deleteMany(permissionIds: string[]) {
     return this.prisma.permission.deleteMany({
@@ -29,7 +43,8 @@ class PermissionPrismaAdapter implements PermissionPrismaAdapterType {
         },
       },
     });
-  }
-}
+  };
+
+};
 
 export default PermissionPrismaAdapter;

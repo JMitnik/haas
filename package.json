@@ -23,7 +23,7 @@
         "**/@typescript-eslint/eslint-plugin": "^4.1.1",
         "**/@typescript-eslint/parser": "^4.1.1",
         "jest-environment-jsdom": "^26.0.1"
-      },
+    },
     "scripts": {
         "aws:deploy-pipeline": "cd aws/stack && cdk deploy haasSvcPipeline --profile haas",
         "start": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn start:api\"",
@@ -37,6 +37,8 @@
         "build:client": "yarn workspace @haas/client build",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
         "clean:npm": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+        "eslint": "yarn eslint:client",
+        "eslint:api": "yarn workspace @haas/api eslint",
         "eslint:client": "yarn workspace @haas/client eslint",
         "eslint:dashboard": "yarn workspace @haas/dashboard eslint",
         "gen": "bash scripts/generate.sh",

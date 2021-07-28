@@ -1,16 +1,17 @@
-import { UserPrismaAdapterType, RegisterUserInput } from "./UserPrismaAdapterType";
-import { PrismaClient, UserUpdateInput, UserWhereUniqueInput, UserWhereInput } from "@prisma/client";
-import RoleService from '../role/RoleService';
-import { RoleServiceType } from "../role/RoleServiceType";
+import { PrismaClient, UserUpdateInput, UserWhereInput, User } from "@prisma/client";
 
-class UserPrismaAdapter implements UserPrismaAdapterType {
+import { RegisterUserInput } from "./UserPrismaAdapterType";
+import RoleService from '../role/RoleService';
+
+class UserPrismaAdapter {
   prisma: PrismaClient;
-  roleService: RoleServiceType;
+  roleService: RoleService;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
   }
+
   /**
    *  Checks if email address already exists (not belonging to userId)
    * @email the email to look for
@@ -25,24 +26,25 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
         },
       },
     });
-    return otherMails ? true : false;
-  }
 
-  findManyByCustomerSlug(customerSlug: string): Promise<import("@prisma/client").User[]> {
+    return otherMails ? true : false;
+  };
+
+  getAllUsersByCustomerSlug(customerSlug: string): Promise<User[]> {
     return this.prisma.user.findMany({
       where: {
         customers: {
           every: { customer: { slug: customerSlug } },
-        }
-      }
+        },
+      },
     });
-  }
+  };
 
-  findManyByTriggerId(triggerId: string): Promise<import("@prisma/client").User[]> {
+  getUsersByTriggerId(triggerId: string): Promise<User[]> {
     return this.prisma.user.findMany({
       where: { triggers: { some: { id: triggerId } } },
-    });;
-  }
+    });
+  };
 
   findUserContext(userId: string) {
     return this.prisma.user.findOne({
@@ -58,7 +60,36 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
         },
       },
     });
-  }
+  };
+
+  async createNewUser(customerId: string, roleId: string, email: string) {
+    return this.prisma.user.create({
+      data: {
+        email,
+        customers: {
+          create: {
+            customer: { connect: { id: customerId } },
+            role: { connect: { id: roleId } },
+          },
+        },
+      },
+      include: {
+        customers: {
+          include: {
+            customer: {
+              include: {
+                settings: {
+                  include: {
+                    colourSettings: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  };
 
   async registerUser(registerUserInput: RegisterUserInput) {
     return this.prisma.user.create({
@@ -83,8 +114,7 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
         },
       },
     });
-  }
-
+  };
 
   async existsWithinWorkspace(email: string, workspaceId: string): Promise<Boolean> {
     const userExists = await this.prisma.user.findFirst({
@@ -102,8 +132,9 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
         },
       },
     });
+
     return userExists ? true : false;
-  }
+  };
 
   async findUserWithinWorkspace(email: string, workspaceId: string) {
     return this.prisma.user.findFirst({
@@ -113,8 +144,45 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
           where: { customerId: workspaceId },
         },
       },
-    });;
-  }
+    });
+  };
+
+  async getUserByEmail(email: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        email: {
+          equals: email,
+          mode: 'insensitive',
+        }
+      },
+      include: {
+        customers: {
+          include: {
+            customer: true,
+            role: true,
+            user: true,
+          },
+        },
+      },
+    });
+  };
+
+  async getUserById(userId: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      include: {
+        customers: {
+          include: {
+            customer: true,
+            role: true,
+            user: true,
+          },
+        },
+      },
+    });
+  };
 
   async findFirst(where: UserWhereInput) {
     return this.prisma.user.findFirst({
@@ -125,18 +193,46 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
             customer: true,
             role: true,
             user: true,
-          }
-        }
-      }
-    })
-  }
+          },
+        },
+      },
+    });
+  };
 
-  async update(userId: string | undefined, data: UserUpdateInput): Promise<import("@prisma/client").User> {
+  async logout(userId: string | undefined): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        refreshToken: null,
+      },
+    });
+  };
+
+  async setLoginToken(userId: string | undefined, loginToken: string | null): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        loginToken,
+      },
+    });
+  };
+
+  async login(userId: string | undefined, refreshToken: string): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        refreshToken,
+        loginToken: null,
+      },
+    });
+  };
+
+  async update(userId: string | undefined, data: UserUpdateInput): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
       data,
     });
-  }
+  };
 
   async getValidUsers(loginToken: string, userId: string | undefined) {
     const validUsers = await this.prisma.user.findMany({
@@ -157,10 +253,9 @@ class UserPrismaAdapter implements UserPrismaAdapterType {
         },
       },
     });
+
     return validUsers;
-  }
-
-
+  };
 }
 
 export default UserPrismaAdapter;

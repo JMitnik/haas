@@ -1,17 +1,11 @@
 import { PrismaClient, NodeType } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { UserInputError } from 'apollo-server-express';
 
-// eslint-disable-next-line import/no-cycle
 import { CTALinksInputType, LinkType } from '../link/Link';
-// eslint-disable-next-line import/named
-// eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
-// eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
-import NodeService from './NodeService';
-import prisma from '../../config/prisma';
-import { UserInputError } from 'apollo-server';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -46,13 +40,20 @@ export const QuestionOptionType = objectType({
       type: 'QuestionNode',
       nullable: true,
 
-      resolve: async (parent, ctx) => {
+      resolve: async (parent, args, ctx) => {
         if (!parent.overrideLeafId) return null;
-
-        const cta = await prisma.questionNode.findFirst({ where: { id: parent.overrideLeafId } });
-
+        const cta = await ctx.services.nodeService.getNodeById(parent.overrideLeafId);
         return cta as any;
       }
+    });
+
+    t.int('position', {
+      nullable: true,
+      resolve(parent) {
+        if (!parent.position) return null;
+
+        return parent.position;
+      },
     });
   },
 });
@@ -100,6 +101,7 @@ export const FormNodeFieldInput = inputObjectType({
   definition(t) {
     t.id('id', { required: false });
     t.string('label');
+    t.string('placeholder');
     t.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired', { default: false });
     t.int('position');
@@ -111,6 +113,8 @@ export const FormNodeInputType = inputObjectType({
 
   definition(t) {
     t.string('id', { nullable: true });
+    t.string('helperText', { nullable: true });
+
     t.list.field('fields', { type: FormNodeFieldInput });
   },
 });
@@ -124,6 +128,12 @@ export const FormNodeField = objectType({
     t.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired');
     t.int('position');
+    t.string('placeholder', {
+      nullable: true,
+      resolve(root) {
+        return root.placeholder;
+      },
+    })
   },
 });
 
@@ -132,6 +142,8 @@ export const FormNodeType = objectType({
 
   definition(t) {
     t.string('id', { nullable: true });
+    t.string('helperText', { nullable: true });
+
     t.list.field('fields', { type: FormNodeField });
   },
 });
@@ -162,6 +174,9 @@ export const SliderNodeType = objectType({
 
   definition(t) {
     t.id('id', { nullable: true });
+    t.string('happyText', { nullable: true });
+    t.string('unhappyText', { nullable: true });
+
     t.list.field('markers', {
       type: SliderNodeMarkerType,
       nullable: true,
@@ -220,7 +235,6 @@ export const QuestionNodeType = objectType({
       nullable: true,
       resolve: (parent: any) => {
         if (parent.type === 'FORM') {
-          // console.log(parent.form);
           return parent.form;
         }
 
@@ -235,7 +249,7 @@ export const QuestionNodeType = objectType({
         if (!parent.isLeaf || !parent.id) {
           return null;
         }
-        
+
         const share = await ctx.services.nodeService.getShareNode(parent.id);
 
         if (!share) return null;
@@ -290,7 +304,7 @@ export const QuestionNodeType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        if(!parent.overrideLeafId) return null
+        if (!parent.overrideLeafId) return null
         const overrideLeaf = await ctx.services.nodeService.getNodeById(parent.overrideLeafId);
 
         return overrideLeaf;
@@ -301,7 +315,7 @@ export const QuestionNodeType = objectType({
       type: QuestionOptionType,
 
       resolve(parent, args, ctx) {
-        return ctx.services.nodeService.getOptionsByParentId(parent.id);
+        return ctx.services.nodeService.getOptionsByQuestionId(parent.id);
       },
     });
 
@@ -337,6 +351,7 @@ export const OptionInputType = inputObjectType({
     t.string('value');
     t.string('publicValue', { nullable: true });
     t.string('overrideLeafId', { required: false });
+    t.int('position', { required: true });
   },
 });
 
@@ -420,7 +435,9 @@ export const CreateQuestionNodeInputType = inputObjectType({
     t.string('dialogueSlug');
     t.string('title');
     t.string('type');
-    t.string('extraContent', { nullable: true })
+    t.string('extraContent', { nullable: true });
+    t.string('unhappyText');
+    t.string('happyText');
 
     t.field('optionEntries', { type: OptionsInputType });
     t.field('edgeCondition', { type: EdgeConditionInputType });
@@ -441,6 +458,21 @@ export const DeleteNodeInputType = inputObjectType({
 export const QuestionNodeMutations = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('duplicateQuestion', {
+      type: QuestionNodeType,
+      nullable: true,
+      args: { questionId: 'String' },
+
+      async resolve(parent, args, ctx) {
+        if (!args.questionId) {
+          throw new UserInputError('Question id is missing!');
+        }
+
+        await ctx.services.nodeService.duplicateBranch(args.questionId);
+        return null;
+      },
+    });
+
     t.field('deleteQuestion', {
       type: QuestionNodeType,
       args: { input: DeleteNodeInputType },
@@ -448,36 +480,8 @@ export const QuestionNodeMutations = extendType({
       // @ts-ignore
       async resolve(parent: any, args: any, ctx) {
         const { id, customerId, dialogueSlug } = args.input;
-        const { prisma }: { prisma: PrismaClient } = ctx;
 
-        const customer = await prisma.customer.findOne({
-          where: {
-            id: customerId || undefined,
-          },
-          include: {
-            dialogues: {
-              where: {
-                slug: dialogueSlug,
-              },
-              include: {
-                questions: {
-                  select: {
-                    id: true,
-                  },
-                },
-                edges: {
-                  select: {
-                    id: true,
-                    parentNodeId: true,
-                    childNodeId: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        const dialogue = customer?.dialogues[0];
+        const dialogue = await ctx.services.customerService.getDialogue(customerId, dialogueSlug);
 
         if (!dialogue) {
           throw new Error('No dialogue found to be removed');
@@ -504,20 +508,7 @@ export const QuestionNodeMutations = extendType({
         const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition, extraContent } = args.input;
         const { options } = optionEntries;
 
-        const customer = await prisma.customer.findOne({
-          where: {
-            id: customerId,
-          },
-          include: {
-            dialogues: {
-              where: {
-                slug: dialogueSlug,
-              },
-            },
-          },
-        });
-
-        const dialogue = customer?.dialogues[0];
+        const dialogue = await ctx.services.customerService.getDialogue(customerId, dialogueSlug);
         const dialogueId = dialogue?.id;
 
         if (dialogueId) {
@@ -566,9 +557,9 @@ export const QuestionNodeMutations = extendType({
           url: args.input?.share?.url || '',
         } : undefined;
 
-       
-        const mappedLinks = links?.linkTypes?.map(({backgroundColor, iconUrl, id, title, type, url }) => ({
-          id: id  || undefined,
+
+        const mappedLinks = links?.linkTypes?.map(({ backgroundColor, iconUrl, id, title, type, url }) => ({
+          id: id || undefined,
           backgroundColor: backgroundColor || undefined,
           iconUrl: iconUrl || undefined,
           title: title || undefined,
@@ -585,7 +576,7 @@ export const QuestionNodeMutations = extendType({
           type: validatedType,
           links: mappedLinks,
         }
-        
+
         return ctx.services.nodeService.createCTA(createCTAInput);
       },
     });

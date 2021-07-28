@@ -47,8 +47,8 @@ export const CustomerType = objectType({
       args: { customerSlug: 'String', filter: PaginationWhereInput },
       nullable: true,
 
-      async resolve(parent, args) {
-        const users = await UserService.paginatedUsers(
+      async resolve(parent, args, ctx) {
+        const users = await ctx.services.userService.paginatedUsers(
           parent.slug,
           {
             pageIndex: args.filter?.pageIndex,
@@ -176,6 +176,7 @@ const EditWorkspaceInput = inputObjectType({
     t.string('slug', { required: true });
     t.string('name', { required: true });
     t.string('logo');
+    t.int('logoOpacity', { nullable: true });
     t.string('primaryColour', { required: true });
   },
 });
@@ -189,6 +190,7 @@ const CreateWorkspaceInput = inputObjectType({
     t.string('slug', { required: true });
     t.string('name', { required: true });
     t.string('logo');
+    t.int('logoOpacity');
     t.string('primaryColour', { required: true });
 
     // Creation specific data

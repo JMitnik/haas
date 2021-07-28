@@ -1,45 +1,41 @@
-import { TagServiceType } from "./TagServiceType";
-import { PrismaClient, TagCreateInput } from "@prisma/client";
-import { TagPrismaAdapterType } from "./TagPrismaAdapterType";
+import { PrismaClient, Tag } from "@prisma/client";
+
 import TagPrismaAdapter from "./TagPrismaAdapter";
-import { CustomerServiceType } from "../customer/CustomerServiceType";
-import CustomerService from "../customer/CustomerService";
-import { CustomerPrismaAdapterType } from "../customer/CustomerPrismaAdapterType";
+import { CreateTagInput } from "./TagPrismaAdapterType";
 import { CustomerPrismaAdapter } from "../customer/CustomerPrismaAdapter";
 
-class TagService implements TagServiceType {
-  tagPrismaAdapter: TagPrismaAdapterType;
-  customerPrismaAdapter: CustomerPrismaAdapterType;
+class TagService {
+  tagPrismaAdapter: TagPrismaAdapter;
+  customerPrismaAdapter: CustomerPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.tagPrismaAdapter = new TagPrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
-  }
-  deleteTag(tagId: string): Promise<import("@prisma/client").Tag> {
+  };
+
+  deleteTag(tagId: string): Promise<Tag> {
     return this.tagPrismaAdapter.delete(tagId);
-  }
+  };
 
-  async createTag(customerSlug: string, name: string, type: "DEFAULT" | "AGENT" | "LOCATION"): Promise<import("@prisma/client").Tag> {
+  async createTag(customerSlug: string, name: string, type: "DEFAULT" | "AGENT" | "LOCATION"): Promise<Tag> {
     const customer = await this.customerPrismaAdapter.findWorkspaceBySlug(customerSlug);
-    const createTagInput: TagCreateInput = {
-      name, 
-      type: type || "DEFAULT", 
-      customer: {
-        connect: {
-          id: customer?.id,
-        }
-      }
-    }
-    return this.tagPrismaAdapter.create(createTagInput);
-  }
-  getAllTagsByCustomerSlug(customerSlug: string): Promise<import("@prisma/client").Tag[]> {
-    return this.customerPrismaAdapter.findManyTagsByCustomerSlug(customerSlug);
-  }
+    const createTagInput: CreateTagInput = {
+      name,
+      type: type || "DEFAULT",
+      customerId: customer?.id || '-1',
+    };
 
-  getAllTagsOfDialogue(dialogueId: string): Promise<import("@prisma/client").Tag[]> {
-    return this.tagPrismaAdapter.findManyByDialogueId(dialogueId);
-  }
+    return this.tagPrismaAdapter.createTag(createTagInput);
+  };
 
-}
+  getAllTagsByCustomerSlug(customerSlug: string): Promise<Tag[]> {
+    return this.customerPrismaAdapter.getTagsByCustomerSlug(customerSlug);
+  };
+
+  getAllTagsOfDialogue(dialogueId: string): Promise<Tag[]> {
+    return this.tagPrismaAdapter.findTagsByDialogueId(dialogueId);
+  };
+
+};
 
 export default TagService;

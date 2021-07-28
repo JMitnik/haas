@@ -1,0 +1,5 @@
+mutation duplicateQuestion($questionId: String) {
+  duplicateQuestion(questionId: $questionId) {
+    id
+  }
+}

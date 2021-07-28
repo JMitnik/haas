@@ -7,89 +7,54 @@ import {
   User,
   UserWhereUniqueInput,
   PrismaClient,
-  TriggerCreateInput,
+  Dialogue,
 } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
-// eslint-disable-next-line import/no-cycle
+
 import { NexusGenInputs } from '../../generated/nexus';
-// eslint-disable-next-line import/no-cycle
-import { CustomerWithCustomerSettings } from '../customer/Customer';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { SessionWithEntries } from '../session/SessionTypes';
 import { mailService } from '../../services/mailings/MailService';
-
 import { smsService } from '../../services/sms/SmsService';
-import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
+import NodeEntryService from '../node-entry/NodeEntryService';
+import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import makeTriggerMailTemplate from '../../services/mailings/templates/makeTriggerMailTemplate';
 import prisma from '../../config/prisma';
-import { TriggerServiceType } from './TriggerServiceType';
-import { TriggerPrismaAdapterType } from './adapters/Trigger/TriggerPrismaAdapterType';
-import TriggerPrismaAdapter from './adapters/Trigger/TriggerPrismaAdapter';
-import { QuestionOfTriggerPrismaAdapterType } from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapterType';
-import QuestionOfTriggerPrismaAdapter from './adapters/QuestionOfTrigger/QuestionOfTriggerPrismaAdapter';
-import { TriggerConditionPrismaAdapterType } from './adapters/TriggerCondition/TriggerConditionPrismaAdapterType';
-import TriggerConditionPrismaAdapter from './adapters/TriggerCondition/TriggerConditionPrismaAdapter';
+import TriggerPrismaAdapter from './TriggerPrismaAdapter';
+import { CreateQuestionOfTriggerInput, CreateTriggerInput, TriggerWithSendData } from './TriggerServiceType';
 
-interface TriggerWithSendData extends Trigger {
-  recipients: User[];
-  conditions: TriggerCondition[];
-  customer: CustomerWithCustomerSettings | null;
-  relatedNode: {
-    questionDialogue: {
-      title: string;
-    } | null;
-  } | null;
-}
-
-class TriggerService implements TriggerServiceType {
-  triggerPrismaAdapter: TriggerPrismaAdapterType;
-  questionOfTriggerPrismaAdapter: QuestionOfTriggerPrismaAdapterType;
-  triggerConditionPrismaAdapter: TriggerConditionPrismaAdapterType;
+class TriggerService {
+  triggerPrismaAdapter: TriggerPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.triggerPrismaAdapter = new TriggerPrismaAdapter(prismaClient);
-    this.questionOfTriggerPrismaAdapter = new QuestionOfTriggerPrismaAdapter(prismaClient);
-    this.triggerConditionPrismaAdapter = new TriggerConditionPrismaAdapter(prismaClient);
-  }
+  };
+
+  getTriggersByCustomerSlug(customerSlug: string) {
+    return this.triggerPrismaAdapter.getTriggersByCustomerSlug(customerSlug);
+  };
+
+  getTriggersByUserId(userId: string) {
+    return this.triggerPrismaAdapter.getTriggersByUserId(userId);
+  };
 
   getTriggerById(triggerId: string): Promise<Trigger | null> {
     return this.triggerPrismaAdapter.getById(triggerId);
-  }
+  };
 
-  async createTrigger(triggerCreateArgs: TriggerCreateInput, conditions: { id?: number | null | undefined; maxValue?: number | null | undefined; minValue?: number | null | undefined; questionId?: string | null | undefined; textValue?: string | null | undefined; type?: "LOW_THRESHOLD" | "HIGH_THRESHOLD" | "INNER_RANGE" | "OUTER_RANGE" | "TEXT_MATCH" | null | undefined; }[]): Promise<Trigger> {
+  async createTrigger(triggerCreateArgs: CreateTriggerInput, conditions: { id?: number | null | undefined; maxValue?: number | null | undefined; minValue?: number | null | undefined; questionId?: string | null | undefined; textValue?: string | null | undefined; type?: "LOW_THRESHOLD" | "HIGH_THRESHOLD" | "INNER_RANGE" | "OUTER_RANGE" | "TEXT_MATCH" | null | undefined; }[]): Promise<Trigger> {
     const trigger = await this.triggerPrismaAdapter.create(triggerCreateArgs);
 
-    conditions?.forEach(async (condition: any) => await this.questionOfTriggerPrismaAdapter.create({
-      question: {
-        connect: {
-          id: condition?.questionId || undefined,
-        },
-      },
-      trigger: {
-        connect: {
-          id: trigger.id,
-        },
-      },
-      triggerCondition: {
-        create: {
-          type: condition.type || 'TEXT_MATCH',
-          maxValue: condition.maxValue,
-          minValue: condition.minValue,
-          textValue: condition.textValue,
-          trigger: {
-            connect: {
-              id: trigger.id,
-            },
-          },
-        },
-      },
+    conditions?.forEach(async (condition) => await this.triggerPrismaAdapter.createQuestionOfTrigger({
+      triggerId: trigger.id,
+      condition,
     }));
 
     return trigger;
-  }
+  };
 
   async editTrigger(triggerId: string, triggerUpdateInput: TriggerUpdateInput, recipientIds: string[], conditions: Array<NexusGenInputs['TriggerConditionInputType']>) {
     let updateTriggerArgs = triggerUpdateInput;
@@ -101,36 +66,37 @@ class TriggerService implements TriggerServiceType {
       updateTriggerArgs = TriggerService.updateRecipients(
         dbTrigger.recipients, (recipientIds || []), triggerUpdateInput,
       );
-    }
+    };
 
     if (dbTrigger?.conditions) {
-      await TriggerService.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
-    }
+      await this.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
+    };
 
     return this.triggerPrismaAdapter.update(dbTrigger?.id, updateTriggerArgs);
-  }
+  };
 
   async deleteTrigger(triggerId: string) {
-    await this.questionOfTriggerPrismaAdapter.deleteManyByTriggerId(triggerId);
-    await this.triggerConditionPrismaAdapter.deleteManyByTriggerId(triggerId);
+    await this.triggerPrismaAdapter.deleteQuestionsByTriggerId(triggerId);
+    await this.triggerPrismaAdapter.deleteConditionsByTriggerId(triggerId);
     return this.triggerPrismaAdapter.delete(triggerId);
-  }
+  };
 
   getConditionsOfTrigger(triggerId: string): Promise<TriggerCondition[]> {
-    return this.triggerConditionPrismaAdapter.findManyByTriggerId(triggerId);
-  }
-  getDialogueOfTrigger(triggerId: string): Promise<import("@prisma/client").Dialogue | null> {
-    return this.questionOfTriggerPrismaAdapter.findDialogueByTriggerId(triggerId);
-  }
+    return this.triggerPrismaAdapter.getConditionsByTriggerId(triggerId);
+  };
+
+  getDialogueOfTrigger(triggerId: string): Promise<Dialogue | null> {
+    return this.triggerPrismaAdapter.getDialogueByTriggerId(triggerId);
+  };
 
   getQuestionOfTrigger(triggerId: string, triggerConditionId: number) {
-    return this.questionOfTriggerPrismaAdapter.findOneQuestion(triggerId, triggerConditionId);
-  }
+    return this.triggerPrismaAdapter.getQuestionByTriggerProps(triggerId, triggerConditionId);
+  };
 
   static getSearchTermFilter = (searchTerm: string) => {
     if (!searchTerm) {
       return [];
-    }
+    };
 
     const searchTermFilter: TriggerWhereInput[] = [
       { name: { contains: searchTerm } },
@@ -178,7 +144,7 @@ class TriggerService implements TriggerServiceType {
       recipient: recipient.email,
       subject: 'A HAAS alert has been triggered',
     });
-  }
+  };
 
   static sendSmsTrigger(
     trigger: TriggerWithSendData,
@@ -191,7 +157,7 @@ class TriggerService implements TriggerServiceType {
     const joinedValues = mappedValues.join(', ');
 
     smsService.send(recipient.phone, `HAAS: Your Alert "${trigger.name}" was triggered because of the following condition(s): ${joinedValues}`);
-  }
+  };
 
   static sendTrigger = (
     trigger: TriggerWithSendData,
@@ -217,27 +183,19 @@ class TriggerService implements TriggerServiceType {
 
       default:
         break;
-    }
+    };
   };
 
-  static async tryTrigger(session: SessionWithEntries, trigger: TriggerWithSendData) {
+  async tryTrigger(session: SessionWithEntries, trigger: TriggerWithSendData) {
     const currentDate = new Date();
     const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 5), trigger.lastSent);
 
     // TODO-LATER: Put this part into a queue
     if (!safeToSend) return;
 
-    await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
+    await this.triggerPrismaAdapter.updateLastSent(trigger.id, currentDate);
 
-    const questionsOfTrigger = await prisma.questionOfTrigger.findMany({
-      where: {
-        triggerId: trigger.id,
-      },
-      include: {
-        question: true,
-        triggerCondition: true,
-      },
-    });
+    const questionsOfTrigger = await this.triggerPrismaAdapter.getQuestionsOfTriggerById(trigger.id);
 
     const triggerTargets = questionsOfTrigger.map((questionOfTrigger) => {
       const { questionId, triggerCondition } = questionOfTrigger;
@@ -256,75 +214,21 @@ class TriggerService implements TriggerServiceType {
     }
   }
 
-  static tryTriggers = async (session: SessionWithEntries) => {
+  tryTriggers = async (session: SessionWithEntries) => {
     const questionIds = session.nodeEntries?.map((entry) => entry.relatedNodeId).filter(isPresent);
-    const dialogueTriggers = await TriggerService.findTriggersByQuestionIds(questionIds);
+    const dialogueTriggers = await this.findTriggersByQuestionIds(questionIds);
 
     dialogueTriggers.forEach(async (trigger) => {
-      await TriggerService.tryTrigger(session, trigger);
+      await this.tryTrigger(session, trigger);
     });
   };
 
-  static findTriggersByDialogueId = async (dialogueId: string) => prisma.trigger.findMany({
-    where: {
-      relatedNode: {
-        questionDialogueId: dialogueId,
-      },
-    },
-    include: {
-      customer: {
-        include: {
-          settings: {
-            include: {
-              colourSettings: true,
-            },
-          },
-        },
-      },
-    },
-  });
+  findTriggersByDialogueId = async (dialogueId: string) => {
+    return this.triggerPrismaAdapter.findTriggersByDialogueId(dialogueId);
+  };
 
-  static findTriggersByQuestionIds = async (questionIds: Array<string>) => {
-    const questionOfTriggerEntries = await prisma.questionOfTrigger.findMany({
-      where: {
-        questionId: {
-          in: questionIds,
-        },
-      },
-    });
-
-    const triggerIds = questionOfTriggerEntries.map((entry) => entry.triggerId);
-
-    return prisma.trigger.findMany({
-      where: {
-        type: 'QUESTION',
-        id: {
-          in: triggerIds,
-        },
-      },
-      include: {
-        recipients: true,
-        conditions: true,
-        customer: {
-          include: {
-            settings: {
-              include: {
-                colourSettings: true,
-              },
-            },
-          },
-        },
-        relatedNode: {
-          select: {
-            questionDialogue: {
-              select: {
-                title: true,
-              },
-            },
-          },
-        },
-      },
-    });
+  findTriggersByQuestionIds = async (questionIds: Array<string>) => {
+    return this.triggerPrismaAdapter.findTriggersByQuestionIds(questionIds);
   };
 
   static matchMulti(triggerTargets: {
@@ -333,7 +237,7 @@ class TriggerService implements TriggerServiceType {
   }[]) {
     const matchResults = triggerTargets.map((triggerTarget) => triggerTarget.nodeEntry && TriggerService.match(triggerTarget.condition, triggerTarget.nodeEntry));
     return matchResults;
-  }
+  };
 
   static match(triggerCondition: TriggerCondition, entry: NodeEntryWithTypes) {
     let conditionMatched;
@@ -344,28 +248,28 @@ class TriggerService implements TriggerServiceType {
 
         if (!entry.sliderNodeEntry?.value || !triggerCondition?.maxValue) {
           break;
-        }
+        };
 
         if (entry.sliderNodeEntry?.value > triggerCondition.maxValue) {
           conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value, conditionType: triggerCondition.type };
-        }
+        };
 
         break;
-      }
+      };
 
       case 'LOW_THRESHOLD': {
         conditionMatched = { isMatch: false };
 
         if (!entry.sliderNodeEntry?.value || !triggerCondition?.minValue) {
           break;
-        }
+        };
 
         if (entry.sliderNodeEntry?.value < triggerCondition.minValue) {
           conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value, conditionType: triggerCondition.type };
-        }
+        };
 
         break;
-      }
+      };
 
       case 'TEXT_MATCH': {
         conditionMatched = { isMatch: false };
@@ -373,14 +277,14 @@ class TriggerService implements TriggerServiceType {
 
         if (!textEntry || !triggerCondition?.textValue) {
           break;
-        }
+        };
 
         if (textEntry === triggerCondition.textValue) {
           conditionMatched = { isMatch: true, value: textEntry, conditionType: triggerCondition.type };
-        }
+        };
 
         break;
-      }
+      };
 
       case 'INNER_RANGE': {
         conditionMatched = { isMatch: false };
@@ -389,7 +293,7 @@ class TriggerService implements TriggerServiceType {
 
         if (!score || !triggerCondition.maxValue || !triggerCondition.minValue) {
           break;
-        }
+        };
 
         if (score <= triggerCondition.maxValue && score >= triggerCondition.minValue) {
           conditionMatched = {
@@ -397,10 +301,10 @@ class TriggerService implements TriggerServiceType {
             value: score,
             conditionType: triggerCondition.type,
           };
-        }
+        };
 
         break;
-      }
+      };
 
       case 'OUTER_RANGE': {
         conditionMatched = { isMatch: false };
@@ -408,7 +312,7 @@ class TriggerService implements TriggerServiceType {
 
         if (!score || !triggerCondition.maxValue || !triggerCondition.minValue) {
           break;
-        }
+        };
 
         if (score > triggerCondition.maxValue || score < triggerCondition.minValue) {
           conditionMatched = {
@@ -416,14 +320,14 @@ class TriggerService implements TriggerServiceType {
             value: score,
             conditionType: triggerCondition.type,
           };
-        }
+        };
 
         break;
-      }
+      };
 
       default:
         conditionMatched = { isMatch: false };
-    }
+    };
 
     return conditionMatched;
   }
@@ -438,71 +342,27 @@ class TriggerService implements TriggerServiceType {
     } else if (!newRelatedNodeId) {
       updateTriggerArgs.relatedNode = { disconnect: true };
     }
+
     return updateTriggerArgs;
   };
 
-  static updateConditions = async (
+  updateConditions = async (
     dbTriggerConditions: Array<TriggerCondition>,
     newConditions: Array<NexusGenInputs['TriggerConditionInputType']>,
     triggerId: string,
   ) => {
     const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
-      const upsertQuestionOfTrigger = await prisma.questionOfTrigger.upsert({
-        where: {
-          questionId_triggerId: {
-            questionId: condition.questionId || '-1',
-            triggerId: triggerId || '-1',
-          },
-        },
-        create: {
-          question: {
-            connect: {
-              id: condition.questionId || undefined,
-            },
-          },
-          trigger: {
-            connect: {
-              id: triggerId,
-            },
-          },
-          triggerCondition: {
-            create: {
-              type: condition.type || undefined,
-              minValue: condition.minValue,
-              maxValue: condition.maxValue,
-              textValue: condition.textValue,
-              trigger: {
-                connect: {
-                  id: triggerId,
-                },
-              },
-            },
-          },
-        },
-        update: {
-          question: {
-            connect: {
-              id: condition.questionId || undefined,
-            },
-          },
-          triggerCondition: {
-            update: {
-              type: condition.type || undefined,
-              minValue: condition.minValue,
-              maxValue: condition.maxValue,
-              textValue: condition.textValue,
-            },
-          },
-        },
-      });
+      const upsertInput: CreateQuestionOfTriggerInput = { condition, triggerId };
+
+      const upsertQuestionOfTrigger = await this.triggerPrismaAdapter.upsertQuestionOfTrigger(upsertInput);
+
       return upsertQuestionOfTrigger.triggerConditionId;
     }));
 
     await Promise.all(dbTriggerConditions.map(async (condition) => {
       if (!upsertedConditionsIds.includes(condition.id)) {
-        await prisma.questionOfTrigger.deleteMany({ where: { triggerConditionId: condition.id } });
-        const deletedCondition = await prisma.triggerCondition.delete({ where: { id: condition.id } });
-        return deletedCondition.id;
+        await this.triggerPrismaAdapter.deleteQuestionsByTriggerConditionId(condition.id);
+        return this.triggerPrismaAdapter.deleteConditionById(condition.id);
       }
 
       return null;
@@ -526,15 +386,15 @@ class TriggerService implements TriggerServiceType {
     const recipientUpdateArgs: any = {};
     if (newRecipientObjects.length > 0) {
       recipientUpdateArgs.connect = newRecipientObjects;
-    }
+    };
 
     if (deleteRecipientObjects.length > 0) {
       recipientUpdateArgs.disconnect = deleteRecipientObjects;
-    }
+    };
 
     updateTriggerArgs.recipients = recipientUpdateArgs;
     return updateTriggerArgs;
   };
-}
+};
 
 export default TriggerService;

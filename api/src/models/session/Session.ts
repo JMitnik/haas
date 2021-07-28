@@ -1,12 +1,8 @@
 import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
-
-// eslint-disable-next-line import/no-cycle
 import { UserInputError } from 'apollo-server-express';
+
 import { NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
-// eslint-disable-next-line import/no-cycle
 import { ConnectionInterface } from '../general/Pagination';
-// eslint-disable-next-line import/no-cycle
-import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from './SessionService';
 
 export const SessionType = objectType({
@@ -37,12 +33,12 @@ export const SessionType = objectType({
 
     t.int('totalTimeInSec', {
       nullable: true,
-      resolve: (parent) => parent.totalTimeInSec || null
+      resolve: (parent) => parent.totalTimeInSec || null,
     });
 
     t.string('originUrl', {
       nullable: true,
-      resolve: (parent) => parent.originUrl || ''
+      resolve: (parent) => parent.originUrl || '',
     });
 
     t.string('deliveryId', { nullable: true, resolve: (parent) => parent.deliveryId });
@@ -144,7 +140,7 @@ export const CreateSessionMutation = mutationField('createSession', {
     }
 
     try {
-      const session = SessionService.createSession(args.input, ctx);
+      const session = ctx.services.sessionService.createSession(args.input, ctx);
       return session;
     } catch (error) {
       throw new Error(`Failed making a session due to ${error}`);
@@ -174,7 +170,7 @@ export const AppendToInteractionMutation = mutationField('appendToInteraction', 
     if (!args?.input.sessionId) throw new UserInputError('No valid existing interaction found');
 
     const updatedInteraction = await ctx.services.nodeEntryService.createNodeEntry(args.input.sessionId, args.input);
-   
+
     return updatedInteraction as any;
   },
 });

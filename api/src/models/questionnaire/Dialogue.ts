@@ -1,30 +1,20 @@
 
-import { PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { subDays } from 'date-fns';
 
-// eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
-// eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
-// eslint-disable-next-line import/no-cycle
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
-// eslint-disable-next-line import/no-cycle
 import { SessionConnection, SessionType } from '../session/Session';
-// eslint-disable-next-line import/no-cycle
 import { TagType, TagsInputType } from '../tag/Tag';
-// eslint-disable-next-line import/no-cycle
 import DialogueService from './DialogueService';
-// eslint-disable-next-line import/no-cycle
 import { PaginationWhereInput } from '../general/Pagination';
-// eslint-disable-next-line import/no-cycle
 import PaginationService from '../general/PaginationService';
-// eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
 import isValidDate from '../../utils/isValidDate';
-import { CopyDialogueInputType } from './DialogueServiceType';
+import { CopyDialogueInputType } from './DialogueTypes';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -89,6 +79,15 @@ export const DialogueFilterInputType = inputObjectType({
   },
 });
 
+export const DialogueFinisherType = objectType({
+  name: 'DialogueFinisherObjectType',
+  definition(t) {
+    t.id('id');
+    t.string('header');
+    t.string('subtext');
+  }
+});
+
 export const DialogueType = objectType({
   name: 'Dialogue',
 
@@ -101,10 +100,28 @@ export const DialogueType = objectType({
     // Placeholder data related properties
     t.boolean('isWithoutGenData');
     t.boolean('wasGeneratedWithGenData');
+    t.field('language', {
+      type: LanguageEnumType,
+    });
 
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+
+    t.field('postLeafNode', {
+      type: DialogueFinisherType,
+      nullable: true,
+      resolve(parent, args, ctx) {
+        if (!parent.postLeafNodeId) {
+          return null
+        };
+        return ctx.prisma.postLeafNode.findFirst({
+          where: {
+            id: parent.postLeafNodeId,
+          }
+        });
+      }
+    });
 
     t.field('averageScore', {
       type: 'Float',
@@ -227,7 +244,7 @@ export const DialogueType = objectType({
     t.list.field('edges', {
       type: EdgeType,
       async resolve(parent, args, ctx) {
-       return ctx.services.dialogueService.getEdgesByDialogueId(parent.id);
+        return ctx.services.dialogueService.getEdgesByDialogueId(parent.id);
       },
     });
 
@@ -283,6 +300,11 @@ export const DeleteDialogueInputType = inputObjectType({
   },
 });
 
+export const LanguageEnumType = enumType({
+  name: 'LanguageEnumType',
+  members: ['ENGLISH', 'DUTCH', 'GERMAN'],
+});
+
 export const CreateDialogueInputType = inputObjectType({
   name: 'CreateDialogueInputType',
   definition(t) {
@@ -299,6 +321,9 @@ export const CreateDialogueInputType = inputObjectType({
     t.field('tags', {
       type: TagsInputType,
     });
+    t.field('language', {
+      type: LanguageEnumType,
+    });
   },
 });
 
@@ -311,9 +336,9 @@ export const DialogueMutations = extendType({
 
       async resolve(parent, args: any, ctx) {
         const {
-          input: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
+          input: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId, language },
         } = args;
-        const copyDialogueInput: CopyDialogueInputType = { customerSlug, dialogueSlug, templateId: templateDialogueId, title, publicTitle, description, dialogueTags: tags };
+        const copyDialogueInput: CopyDialogueInputType = { customerSlug, dialogueSlug, templateId: templateDialogueId, title, publicTitle, description, dialogueTags: tags, language };
 
         return ctx.services.dialogueService.copyDialogue(copyDialogueInput);
       },
@@ -333,6 +358,7 @@ export const DialogueMutations = extendType({
 
     t.field('editDialogue', {
       type: DialogueType,
+      // TODO: Move args to their own InputType
       args: {
         customerSlug: 'String',
         dialogueSlug: 'String',
@@ -341,6 +367,9 @@ export const DialogueMutations = extendType({
         publicTitle: 'String',
         isWithoutGenData: 'Boolean',
         tags: TagsInputType,
+        language: LanguageEnumType,
+        dialogueFinisherHeading: 'String',
+        dialogueFinisherSubheading: 'String',
       },
       resolve(parent, args, ctx) {
         return ctx.services.dialogueService.editDialogue(args);
@@ -413,7 +442,7 @@ export const DialogueRootQuery = extendType({
       args: {
         filter: DialogueFilterInputType,
       },
-      async resolve(parent, args, ctx) {        
+      async resolve(parent, args, ctx) {
         return ctx.services.dialogueService.getFilteredDialogues(args.filter?.searchTerm);
       },
     });

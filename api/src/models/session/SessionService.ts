@@ -1,68 +1,48 @@
-/* eslint-disable import/no-cycle */
 import {
   NodeEntry, Session, SessionOrderByInput, SessionWhereInput, PrismaClient,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-
 import { sortBy } from 'lodash';
-// eslint-disable-next-line import/no-cycle
+
 import { TEXT_NODES } from '../questionnaire/Dialogue';
-// eslint-disable-next-line import/no-cycle
-// eslint-disable-next-line import/no-cycle
 import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
-import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
-// eslint-disable-next-line import/no-cycle
+import NodeEntryService from '../node-entry/NodeEntryService';
+import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionWithEntries, SessionServiceType } from './SessionTypes';
+import { SessionWithEntries } from './SessionTypes';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
-import { SessionPrismaAdapterType } from './SessionPrismaAdapterType';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 
-class SessionService implements SessionServiceType {
-  sessionPrismaAdapter: SessionPrismaAdapterType;
+class SessionService {
+  sessionPrismaAdapter: SessionPrismaAdapter;
+  triggerService: TriggerService;
 
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
-  }
+    this.triggerService = new TriggerService(prismaClient);
+  };
 
   getSessionById(sessionId: string): Promise<Session | null> {
     return this.sessionPrismaAdapter.getSessionById(sessionId);
-  }
+  };
+
   /**
    * Create a user-session from the client
    * @param obj
    * @param args
    * @param ctx
    */
-  static async createSession(sessionInput: any, ctx: any) {
+  async createSession(sessionInput: any, ctx: any) {
     const { dialogueId, entries } = sessionInput;
-
-    const session = await prisma.session.create({
-      data: {
-        dialogue: {
-          connect: { id: dialogueId },
-        },
-        nodeEntries: {
-          create: entries.map((entry: any) => NodeEntryService.constructCreateNodeEntryFragment(entry)),
-        },
-        originUrl: sessionInput.originUrl || '',
-        totalTimeInSec: sessionInput.totalTimeInSec,
-        device: sessionInput.device || '',
-      },
-      include: {
-        nodeEntries: {
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            relatedNode: true,
-            sliderNodeEntry: true,
-          },
-        },
-      },
+    const session = await this.sessionPrismaAdapter.createSession({
+      device: sessionInput.device || '',
+      totalTimeInSec: sessionInput.totalTimeInSec,
+      originUrl: sessionInput.originUrl || '',
+      entries,
+      dialogueId,
     });
 
     try {
@@ -83,26 +63,21 @@ class SessionService implements SessionServiceType {
       }
     } catch (error) {
       Sentry.captureException(error);
-    }
+    };
 
     try {
       if (sessionInput.deliveryId) {
-        await prisma.session.update({
-          where: { id: session.id },
-          data: {
-            delivery: { connect: { id: sessionInput.deliveryId } }
-          }
-        })
-      }
+        await this.sessionPrismaAdapter.updateDelivery(session.id, sessionInput.deliveryId);
+      };
     } catch (error) {
       Sentry.captureException(error);
-    }
+    };
 
     try {
-      await TriggerService.tryTriggers(session);
+      await this.triggerService.tryTriggers(session);
     } catch (error) {
       console.log('Something went wrong while handling sms triggers: ', error);
-    }
+    };
 
     return session;
   }
@@ -128,13 +103,13 @@ class SessionService implements SessionServiceType {
    */
   static getScoringEntryFromSession(session: SessionWithEntries): NodeEntryWithTypes | null {
     return session.nodeEntries.find((entry) => entry.sliderNodeEntry?.value) || null;
-  }
+  };
 
   static getScoreFromSession(session: SessionWithEntries): number | null {
     const entry = SessionService.getScoringEntryFromSession(session);
 
     return entry?.sliderNodeEntry?.value || null;
-  }
+  };
 
   /**
    * Get text entries from a list of sessions
@@ -145,7 +120,7 @@ class SessionService implements SessionServiceType {
   ): (NodeEntryWithTypes | undefined | null)[] {
     if (!sessions.length) {
       return [];
-    }
+    };
 
     const textEntries = sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
       const isTextEntry = entry?.relatedNode?.type && TEXT_NODES.includes(entry?.relatedNode?.type);
@@ -163,7 +138,7 @@ class SessionService implements SessionServiceType {
     session: SessionWithEntries,
   ): Promise<NodeEntryWithTypes[] | undefined | null> {
     return session.nodeEntries.filter((entry) => entry?.relatedNode?.type && entry?.relatedNode?.type in TEXT_NODES);
-  }
+  };
 
   static async getSessionScore(sessionId: string): Promise<number | undefined | null> {
     const session = await prisma.session.findOne({
@@ -187,7 +162,7 @@ class SessionService implements SessionServiceType {
     ));
 
     return rootedNodeEntry?.sliderNodeEntry?.value;
-  }
+  };
 
   static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (SessionOrderByInput | undefined) {
     if (!orderByArray?.length) return undefined;
@@ -199,7 +174,7 @@ class SessionService implements SessionServiceType {
       createdAt: orderBy.by === 'createdAt' ? orderBy.desc ? 'desc' : 'asc' : undefined,
       // dialogueId: orderBy.by === 'dialogueId' ? orderBy.desc ? 'desc' : 'asc' : undefined,
     };
-  }
+  };
 
   /**
    * Fetches all sessions of dialogue using dialogueId {dialogueId}
@@ -301,7 +276,7 @@ class SessionService implements SessionServiceType {
       sorted = sortBy(sessionsWithScores, 'paths');
     } else {
       sorted = sortBy(sessionsWithScores, 'createdAt');
-    }
+    };
 
     if (paginationOpts?.orderBy?.[0].desc) return sorted.reverse();
 
@@ -413,10 +388,10 @@ class SessionService implements SessionServiceType {
         { createdAt: { gte: startDate } },
         { createdAt: { lte: endDate } },
       ];
-    }
+    };
 
     return dateRange;
-  }
-}
+  };
+};
 
 export default SessionService;

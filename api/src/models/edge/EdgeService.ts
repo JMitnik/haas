@@ -1,51 +1,31 @@
-import { EdgeCreateInput, QuestionNode, PrismaClient } from '@prisma/client';
-import { EdgeServiceType } from './EdgeServiceType';
-import { EdgePrismaAdapterType } from './EdgePrismaAdapterType';
+import { EdgeCreateInput, QuestionNode, PrismaClient, QuestionCondition } from '@prisma/client';
+
+import { EdgeChildProps } from './EdgeServiceType';
 import EdgePrismaAdapter from './EdgePrismaAdapter';
-import { QuestionNodePrismaAdapterType } from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapterType';
-import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
+import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
 
-interface QuestionConditionProps {
-  id?: number;
-  conditionType: string;
-  renderMin: number;
-  renderMax: number;
-  matchValue: string;
-}
-
-interface EdgeNodeProps {
-  id: string;
-  title: string;
-}
-
-interface EdgeChildProps {
-  id?: string;
-  conditions: [QuestionConditionProps];
-  parentNode: EdgeNodeProps;
-  childNode: EdgeNodeProps;
-}
-
-class EdgeService implements EdgeServiceType {
-  edgePrismaAdapter: EdgePrismaAdapterType;
-  questionNodePrismaAdapter: QuestionNodePrismaAdapterType;
+class EdgeService {
+  edgePrismaAdapter: EdgePrismaAdapter;
+  questionNodePrismaAdapter: QuestionNodePrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
   }
+
   getEdgeById(edgeId: string) {
     return this.edgePrismaAdapter.getEdgeById(edgeId);
-  }
+  };
 
-  async getConditionsById(edgeId: string): Promise<import("@prisma/client").QuestionCondition[]> {
+  async getConditionsById(edgeId: string): Promise<QuestionCondition[]> {
     return this.edgePrismaAdapter.getConditionsById(edgeId);
-  }
+  };
 
   static constructEdge(
     parentNodeEntry: QuestionNode,
     childNodeEntry: QuestionNode,
     conditions: any,
-  ) : EdgeCreateInput {
+  ): EdgeCreateInput {
     return {
       dialogue: {
         connect: {
@@ -66,16 +46,12 @@ class EdgeService implements EdgeServiceType {
         },
       },
     };
-  }
+  };
 
   createEdge = async (parent: QuestionNode, child: QuestionNode, conditions: any) => {
     const edge = await this.edgePrismaAdapter.create(EdgeService.constructEdge(parent, child, conditions));
-    
-    await this.questionNodePrismaAdapter.update(parent.id, {
-      children: {
-        connect: [{ id: edge.id }],
-      },
-    });
+
+    await this.questionNodePrismaAdapter.connectEdgeToQuestion(parent.id, edge.id);
   };
 
   removeNonExistingEdges = async (activeEdges: Array<string>,
@@ -88,6 +64,7 @@ class EdgeService implements EdgeServiceType {
       }
     }
   };
-}
+
+};
 
 export default EdgeService;

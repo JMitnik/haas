@@ -1,12 +1,104 @@
-import { PrismaClient, Dialogue, DialogueUpdateInput, QuestionNode, Edge, DialogueCreateInput, DialogueInclude, DialogueSelect, Subset, DialogueCreateArgs } from "@prisma/client";
-import { DialoguePrismaAdapterType } from "./DialoguePrismaAdapterType";
+import {
+  PrismaClient,
+  Dialogue,
+  DialogueUpdateInput,
+  Edge,
+  DialogueInclude,
+  Subset,
+  DialogueCreateArgs,
+} from "@prisma/client";
 
-class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
+import { CreateQuestionsInput, CreateDialogueInput } from "./DialoguePrismaAdapterType";
+
+class DialoguePrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-  }
+  };
+
+  async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
+
+    const dialogue = await this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: {
+        questions: {
+          create: questions.map((question) => ({
+            id: question.id,
+            isRoot: question.isRoot,
+            isLeaf: question.isLeaf,
+            title: question.title,
+            type: question.type,
+            videoEmbeddedNode: question.videoEmbeddedNode?.videoUrl ? {
+              create: {
+                videoUrl: question.videoEmbeddedNode.videoUrl,
+              }
+            } : undefined,
+            links: question.links?.length ? {
+              create: question.links,
+            } : undefined,
+            options: question.options?.length ? {
+              create: question.options.map(({ overrideLeafId, position, publicValue, value }) => ({
+                value,
+                position,
+                publicValue,
+                overrideLeaf: overrideLeafId ? {
+                  connect: {
+                    id: overrideLeafId,
+                  },
+                } : undefined,
+              })),
+            } : undefined,
+            overrideLeaf: question.overrideLeafId ? {
+              connect: {
+                id: question.overrideLeafId,
+              },
+            } : undefined,
+            form: question.form ? {
+              create: {
+                fields: {
+                  create: question.form?.fields,
+                },
+              },
+            } : undefined,
+            sliderNode: question.sliderNode ? {
+              create: {
+                markers: {
+                  create: question?.sliderNode?.markers?.map((marker) => ({
+                    label: marker?.label,
+                    subLabel: marker?.subLabel,
+                    range: {
+                      create: {
+                        start: marker?.range?.start,
+                        end: marker?.range?.end,
+                      },
+                    },
+                  })),
+                },
+              },
+            } : undefined,
+          })),
+        },
+      },
+      include: {
+        questions: true,
+      },
+    });
+
+    return dialogue.questions;
+  };
+
+  async update(dialogueId: string, updateArgs: DialogueUpdateInput, include?: DialogueInclude | null | undefined): Promise<Dialogue> {
+    return this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: updateArgs,
+      include,
+    });
+  };
 
   getDialogueByQuestionNodeId(nodeId: string): Promise<Dialogue | null> {
     return this.prisma.dialogue.findFirst({
@@ -55,13 +147,13 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
         tags: true,
       },
     });
-  }
+  };
 
   getDialogueById(dialogueId: string): Promise<Dialogue | null> {
     return this.prisma.dialogue.findOne({
       where: { id: dialogueId },
     });
-  }
+  };
 
   getCTAsByDialogueId(dialogueId: string) {
     return this.prisma.questionNode.findMany({
@@ -80,7 +172,7 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
         },
       },
     });
-  }
+  };
 
   getQuestionsByDialogueId(dialogueId: string) {
     return this.prisma.questionNode.findMany({
@@ -112,7 +204,7 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
         },
       },
     });
-  }
+  };
 
   async getEdgesByDialogueId(dialogueId: string): Promise<Edge[]> {
     const dialogue = await this.prisma.dialogue.findOne({
@@ -125,9 +217,9 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
     });
 
     const edges = dialogue?.edges;
-
     return edges || [];
-  }
+  };
+
   async getRootQuestionByDialogueId(dialogueId: string) {
     return this.prisma.questionNode.findFirst({
       where: {
@@ -151,7 +243,7 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
         },
       },
     });
-  }
+  };
 
   async getTagsByDialogueId(dialogueId: string) {
     const dialogue = await this.prisma.dialogue.findOne({
@@ -160,7 +252,7 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
     });
 
     return dialogue?.tags || [];
-  }
+  };
 
   async getTemplateDialogue(dialogueId: string) {
     return this.prisma.dialogue.findOne({
@@ -201,12 +293,7 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
                 fields: true,
               },
             },
-            options: {
-              select: {
-                publicValue: true,
-                value: true,
-              },
-            },
+            options: true,
             overrideLeaf: {
               select: {
                 id: true,
@@ -221,11 +308,30 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
         },
       },
     });
-  }
+  };
 
   async create(input: Subset<DialogueCreateArgs, DialogueCreateArgs>) {
     return this.prisma.dialogue.create(input);
-  }
+  };
+
+  async createTemplate(input: CreateDialogueInput) {
+    return this.prisma.dialogue.create({
+      data: {
+        slug: input.slug,
+        title: input.title,
+        description: input.description,
+        customer: {
+          connect: {
+            id: input.customerId
+          },
+        },
+        questions: {
+          create: [],
+        },
+      },
+    });
+  };
+
   async getDialogueWithNodesAndEdges(dialogueId: string) {
     return this.prisma.dialogue.findOne({
       where: { id: dialogueId },
@@ -242,15 +348,66 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
     });
   }
 
-  async update(dialogueId: string, updateArgs: DialogueUpdateInput, include?: DialogueInclude | null | undefined): Promise<Dialogue> {
+  async connectTags(dialogueId: string, tags: { id: string }[]) {
     return this.prisma.dialogue.update({
       where: {
         id: dialogueId,
       },
-      data: updateArgs,
-      include,
+      data: {
+        tags: {
+          connect: tags,
+        },
+      },
+      include: {
+        tags: true,
+      },
     });
-  }
+  };
+
+  async setGeneratedWithGenData(dialogueId: string, isGeneratedWithGenData: boolean) {
+    return this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: {
+        wasGeneratedWithGenData: isGeneratedWithGenData,
+      },
+    });
+  };
+
+  async createEdges(
+    dialogueId: string,
+    edges: {
+      parentNodeId: string,
+      childNodeId: string,
+      conditions: Array<{ conditionType: string, matchValue: string | null, renderMin: number | null, renderMax: number | null }>
+    }[]
+  ) {
+    return this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: {
+        edges: {
+          create: edges?.map((edge) => ({
+            parentNode: {
+              connect: {
+                id: edge.parentNodeId,
+              }
+            },
+            conditions: {
+              create: edge.conditions,
+            },
+            childNode: {
+              connect: {
+                id: edge.childNodeId,
+              }
+            },
+          })),
+        },
+      },
+    });
+  };
 
   async read(dialogueId: string) {
     return this.prisma.dialogue.findOne({
@@ -266,7 +423,7 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
         sessions: true,
       },
     });
-  }
+  };
 
   async delete(dialogueId: string): Promise<Dialogue> {
     return this.prisma.dialogue.delete({
@@ -297,6 +454,7 @@ class DialoguePrismaAdapter implements DialoguePrismaAdapterType {
       },
     });
   };
-}
+
+};
 
 export default DialoguePrismaAdapter;

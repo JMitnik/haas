@@ -19,7 +19,7 @@
         "test": "jest -i --detectOpenHandles",
         "test:watch": "jest --watch --maxWorkers=0",
         "migrate:create": "npx prisma migrate save --experimental",
-        "migrate": "prisma migrate up --experimental --verbose",
+        "migrate": "prisma migrate up --experimental --auto-approve --verbose",
         "gen": "prisma generate && ts-node ./src/config/schema.ts",
         "seed": "ts-node --transpile-only src/data/main-seed.ts",
         "prisma": "prisma"

@@ -3,12 +3,13 @@ import gql from 'graphql-tag';
 const getCustomerFromSlug = gql`
   query getCustomer($slug: String!) {
     customer(slug: $slug) {
-      id
+    id
     name
     slug
     settings {
       id
       logoUrl
+      logoOpacity
       colourSettings {
         id
         primary

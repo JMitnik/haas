@@ -1,52 +1,45 @@
-import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
-import prisma from '../../config/prisma';
-import { RoleServiceType } from './RoleServiceType';
-import { PrismaClient } from '@prisma/client';
-import { RolePrismaAdapterType } from './adapters/Role/RolePrismaAdapterType';
-import RolePrismaAdapter from './adapters/Role/RolePrismaAdapter';
+import { PrismaClient, Role, SystemPermissionEnum } from '@prisma/client';
 
-class RoleService implements RoleServiceType {
-  rolePrismaAdapter: RolePrismaAdapterType;
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import RolePrismaAdapter from './RolePrismaAdapter';
+
+export interface CreateRoleInput {
+  permissions: SystemPermissionEnum[];
+  name: string;
+  customerId: string;
+}
+
+class RoleService {
+  rolePrismaAdapter: RolePrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.rolePrismaAdapter = new RolePrismaAdapter(prismaClient);
-  }
+  };
 
-  async getPermissionsByRoleId(roleId: string): Promise<("CAN_ACCESS_ADMIN_PANEL" | "CAN_EDIT_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_VIEW_DIALOGUE" | "CAN_DELETE_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS" | "CAN_ADD_USERS" | "CAN_DELETE_USERS" | "CAN_EDIT_USERS" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_WORKSPACE" | "CAN_EDIT_WORKSPACE" | "CAN_VIEW_CAMPAIGNS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES")[]> {
+  async getPermissionsByRoleId(roleId: string): Promise<SystemPermissionEnum[]> {
     const role = await this.rolePrismaAdapter.getRoleById(roleId);
     return role?.permissions || [];
-  }
+  };
 
-  updatePermissions(roleId: string, permissions: ("CAN_ACCESS_ADMIN_PANEL" | "CAN_EDIT_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_VIEW_DIALOGUE" | "CAN_DELETE_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS" | "CAN_ADD_USERS" | "CAN_DELETE_USERS" | "CAN_EDIT_USERS" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_WORKSPACE" | "CAN_EDIT_WORKSPACE" | "CAN_VIEW_CAMPAIGNS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES")[]) {
-    return this.rolePrismaAdapter.update(roleId, {
-      permissions: {
-        // TODO: Set to appropriate logic
-        set: permissions
-      },
-    })
-  }
+  updatePermissions(roleId: string, permissions: SystemPermissionEnum[]) {
+    return this.rolePrismaAdapter.updatePermissions(roleId, permissions);
+  };
 
-  createRole(customerId: string, roleName: string): Promise<import("@prisma/client").Role> {
-    return this.rolePrismaAdapter.create({
+  createRole(customerId: string, roleName: string): Promise<Role> {
+    const createInput: CreateRoleInput = {
       name: roleName,
-      permissions: {
-        set: [
-          'CAN_VIEW_DIALOGUE',
-        ],
-      },
-      Customer: {
-        connect: {
-          id: customerId,
-        },
-      },
-    })
-  }
+      permissions: ['CAN_VIEW_DIALOGUE'],
+      customerId,
+    };
+
+    return this.rolePrismaAdapter.createRole(createInput);
+  };
 
   paginatedRoles = async (
     customerId: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const roles = await this.rolePrismaAdapter.findManyPaginated({ customerId }, paginationOpts.limit || undefined, paginationOpts.offset || undefined);
+    const roles = await this.rolePrismaAdapter.findRolesPaginated({ customerId }, paginationOpts.limit || undefined, paginationOpts.offset || undefined);
 
     const totalRoles = await this.rolePrismaAdapter.count({ customerId });
     const totalPages = paginationOpts.limit ? Math.ceil(totalRoles / (paginationOpts.limit)) : 1;
@@ -66,7 +59,7 @@ class RoleService implements RoleServiceType {
   };
 
   async fetchDefaultRoleForCustomer(customerId: string) {
-    const roles = await this.rolePrismaAdapter.findManyPaginated({ customerId: customerId })
+    const roles = await this.rolePrismaAdapter.findRolesPaginated({ customerId: customerId })
 
     const guestRole = roles.find((role) => role.name.toLowerCase().includes('guest'));
     if (guestRole) return guestRole;
@@ -77,11 +70,12 @@ class RoleService implements RoleServiceType {
     if (firstRole) return firstRole;
 
     throw new Error('Unable to find any roles');
-  }
+  };
 
   deleteRoles = async (roleIds: Array<string>) => {
     return this.rolePrismaAdapter.deleteMany(roleIds);
   };
-}
+
+};
 
 export default RoleService;

@@ -1,83 +1,67 @@
 import { subDays } from 'date-fns';
-import _, { cloneDeep } from 'lodash';
+import _ from 'lodash';
 import cuid from 'cuid';
 
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import {
-  Dialogue, DialogueCreateInput, DialogueUpdateInput,
+  Dialogue,
+  DialogueCreateInput,
+  DialogueUpdateInput,
+  LanguageEnum,
   NodeType,
-  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, PrismaClient, SessionCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
+  PrismaClient,
+  Edge,
+  PostLeafNode,
+  PostLeafNodeUpdateOneWithoutDialogueInput,
+  Tag, TagWhereUniqueInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
+
 import NodeService from '../QuestionNode/NodeService';
-import filterDate from '../../utils/filterDate';
-// eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
-// eslint-disable-next-line import/no-cycle
 import {
   HistoryDataProps, HistoryDataWithEntry, IdMapProps,
-  PathFrequency, QuestionProps, StatisticsProps
+  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType
 } from './DialogueTypes';
-// eslint-disable-next-line import/no-cycle
-import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
-// eslint-disable-next-line import/no-cycle
+import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
-
-import { DialogueServiceType, CopyDialogueInputType } from './DialogueServiceType';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
-import { DialoguePrismaAdapterType } from './DialoguePrismaAdapterType';
-import { CustomerPrismaAdapterType } from '../customer/CustomerPrismaAdapterType';
+import { CreateQuestionsInput } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
-import { SessionPrismaAdapterType } from '../session/SessionPrismaAdapterType';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
-import { NodeEntryPrismaAdapterType } from '../node-entry/NodeEntryPrismaAdapterType';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
-import { QuestionConditionPrismaAdapterType } from '../QuestionNode/adapters/QuestionCondition/QuestionConditionPrismaAdapterType';
-import QuestionConditionPrismaAdapter from '../QuestionNode/adapters/QuestionCondition/QuestionConditionPrismaAdapter';
-import { EdgePrismaAdapterType } from '../edge/EdgePrismaAdapterType';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
-import { QuestionOptionPrismaAdapterType } from '../QuestionNode/adapters/QuestionOption/QuestionOptionPrismaAdapterType';
-import QuestionOptionPrismaAdapter from '../QuestionNode/adapters/QuestionOption/QuestionOptionPrismaAdapter';
-import { QuestionNodePrismaAdapterType } from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapterType';
-import QuestionNodePrismaAdapter from '../QuestionNode/adapters/QuestionNode/QuestionNodePrismaAdapter';
-import { NodeServiceType } from '../QuestionNode/NodeServiceType';
+import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
-class DialogueService implements DialogueServiceType {
-  dialoguePrismaAdapter: DialoguePrismaAdapterType;
-  customerPrismaAdapter: CustomerPrismaAdapterType;
-  sessionPrismaAdapter: SessionPrismaAdapterType;
-  nodeEntryPrismaAdapter: NodeEntryPrismaAdapterType;
-  questionConditionPrismaAdapter: QuestionConditionPrismaAdapterType;
-  edgePrismaAdapter: EdgePrismaAdapterType;
-  questionOptionPrismaAdapter: QuestionOptionPrismaAdapterType;
-  questionNodePrismaAdapter: QuestionNodePrismaAdapterType;
-  nodeService: NodeServiceType;
+
+class DialogueService {
+  dialoguePrismaAdapter: DialoguePrismaAdapter;
+  customerPrismaAdapter: CustomerPrismaAdapter;
+  sessionPrismaAdapter: SessionPrismaAdapter;
+  nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;
+  edgePrismaAdapter: EdgePrismaAdapter;
+  questionNodePrismaAdapter: QuestionNodePrismaAdapter;
+  nodeService: NodeService;
 
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
-    this.questionConditionPrismaAdapter = new QuestionConditionPrismaAdapter(prismaClient);
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
-    this.questionOptionPrismaAdapter = new QuestionOptionPrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
   }
 
   updateTags(dialogueId: string, entries?: string[] | null | undefined): Promise<Dialogue> {
     const tags = entries?.map((entryId) => ({ id: entryId })) || [];
-    
-    return this.dialoguePrismaAdapter.update(dialogueId, {
-      tags: {
-        connect: tags,
-      },
-    });
-  }
+
+    return this.dialoguePrismaAdapter.connectTags(dialogueId, tags);
+  };
 
   async getFilteredDialogues(searchTerm?: string | null | undefined) {
     let dialogues = await this.dialoguePrismaAdapter.getAllDialoguesWithTags();
@@ -87,48 +71,53 @@ class DialogueService implements DialogueServiceType {
     }
 
     return dialogues;
-  }
+  };
+
   getDialogueById(dialogueId: string): Promise<Dialogue | null> {
     return this.dialoguePrismaAdapter.getDialogueById(dialogueId);
-  }
+  };
+
   async getCTAsByDialogueId(dialogueId: string, searchTerm?: string | null | undefined) {
     const leafs = await this.dialoguePrismaAdapter.getCTAsByDialogueId(dialogueId);
 
     if (searchTerm) {
       const lowerCasedSearch = searchTerm.toLowerCase();
       return leafs.filter((leaf) => leaf.title.toLowerCase().includes(lowerCasedSearch));
-    }
+    };
 
     return leafs;
-  }
+  };
 
   getQuestionsByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getQuestionsByDialogueId(dialogueId);
-  }
-  getEdgesByDialogueId(dialogueId: string): Promise<import("@prisma/client").Edge[]> {
+  };
+
+  getEdgesByDialogueId(dialogueId: string): Promise<Edge[]> {
     return this.dialoguePrismaAdapter.getEdgesByDialogueId(dialogueId);
-  }
+  };
+
   getRootQuestionByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getRootQuestionByDialogueId(dialogueId);
-  }
+  };
 
   getTagsByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getTagsByDialogueId(dialogueId);
-  }
+  };
 
   findDialoguesByCustomerId(customerId: string) {
     return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId);
-  }
+  };
 
   async delete(dialogueId: string) {
     return this.dialoguePrismaAdapter.delete(dialogueId);
-  }
+  };
 
   async findDialogueIdsByCustomerId(customerId: string) {
     const dialogueIdObjects = await this.dialoguePrismaAdapter.findDialogueIdsOfCustomer(customerId);
     const dialogueIds = dialogueIdObjects.map((dialogue) => dialogue.id);
+
     return dialogueIds;
-  }
+  };
 
   static constructDialogue(
     customerId: string,
@@ -137,10 +126,12 @@ class DialogueService implements DialogueServiceType {
     description: string,
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
+    language: LanguageEnum,
   ): DialogueCreateInput {
     const constructDialogueFragment = {
       customer: { connect: { id: customerId } },
       title,
+      language,
       slug: dialogueSlug,
       description,
       publicTitle,
@@ -150,25 +141,25 @@ class DialogueService implements DialogueServiceType {
 
     if (tags.length) {
       constructDialogueFragment.tags = { connect: tags.map((tag) => ({ id: tag.id })) };
-    }
+    };
 
     return constructDialogueFragment;
-  }
+  };
 
   static filterDialoguesBySearchTerm = (dialogues: Array<Dialogue & {
     tags: Tag[];
   }>, searchTerm: string) => dialogues.filter((dialogue) => {
     if (dialogue.title.toLowerCase().includes(
       searchTerm.toLowerCase(),
-    )) { return true; }
+    )) { return true; };
 
     if (dialogue.publicTitle?.toLowerCase().includes(
       searchTerm.toLowerCase()
-    )) { return true; }
+    )) { return true; };
 
     if (dialogue.tags.find((tag) => tag.name.toLowerCase().includes(
       searchTerm.toLowerCase(),
-    ))) { return true; }
+    ))) { return true; };
 
     return false;
   });
@@ -190,25 +181,73 @@ class DialogueService implements DialogueServiceType {
     const tagUpdateArgs: any = {};
     if (newTagObjects.length > 0) {
       tagUpdateArgs.connect = newTagObjects;
-    }
+    };
 
     if (deleteTagObjects.length > 0) {
       tagUpdateArgs.disconnect = deleteTagObjects;
-    }
+    };
+
     updateDialogueArgs.tags = tagUpdateArgs;
 
     return updateDialogueArgs;
   };
 
+  static updatePostLeafNode(
+    dbPostLeaf: PostLeafNode | null | undefined,
+    heading: string | null | undefined,
+    subHeading: string | null | undefined,
+  ): PostLeafNodeUpdateOneWithoutDialogueInput | undefined {
+    if (!dbPostLeaf && !heading && !subHeading) {
+      return undefined;
+    } else if (dbPostLeaf && !heading && !subHeading) {
+      return { disconnect: true };
+    } else if (dbPostLeaf && (heading || subHeading)) {
+      return {
+        update: {
+          header: heading || '',
+          subtext: subHeading || '',
+        },
+      };
+    } else if (!dbPostLeaf && (heading || subHeading)) {
+      return {
+        create: {
+          header: heading || '',
+          subtext: subHeading || '',
+        },
+      };
+    }
+
+    return undefined;
+  }
+
   editDialogue = async (args: any) => {
-    const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData } = args;
+    const {
+      customerSlug,
+      dialogueSlug,
+      title,
+      description,
+      publicTitle,
+      tags,
+      isWithoutGenData,
+      dialogueFinisherHeading,
+      dialogueFinisherSubheading,
+      language
+    } = args;
 
     const dbDialogue = await this.customerPrismaAdapter.getDialogueTags(customerSlug, dialogueSlug);
 
-    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle, isWithoutGenData };
+    const postLeafNode = DialogueService.updatePostLeafNode(
+      dbDialogue?.postLeafNode,
+      dialogueFinisherHeading,
+      dialogueFinisherSubheading
+    );
+
+    let updateDialogueArgs: DialogueUpdateInput = {
+      title, description, publicTitle, isWithoutGenData, postLeafNode, language
+    };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
-    }
+    };
 
     return this.dialoguePrismaAdapter.update(dbDialogue?.id || '-1', updateDialogueArgs);
   };
@@ -238,6 +277,7 @@ class DialogueService implements DialogueServiceType {
 
     // If there are three, grab the first three, otherwise get the entire element
     const topNPaths = pathFrequencies.length > nPaths ? pathFrequencies.slice(0, nPaths) : pathFrequencies;
+
     return topNPaths || [];
   };
 
@@ -273,7 +313,7 @@ class DialogueService implements DialogueServiceType {
 
     const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
 
-    await this.dialoguePrismaAdapter.update(dialogueId, { wasGeneratedWithGenData: true });
+    await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueId, true);
 
     const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
     const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
@@ -296,6 +336,7 @@ class DialogueService implements DialogueServiceType {
       const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
 
       if (!simulatedChoiceNodeId) return;
+
       const fakeSessionInputArgs: (
         {
           createdAt: Date,
@@ -383,14 +424,14 @@ class DialogueService implements DialogueServiceType {
     // //// Edge-related
     const edgeIds = dialogue?.edges && dialogue?.edges.map((edge) => edge.id);
     if (edgeIds && edgeIds.length > 0) {
-      await this.questionConditionPrismaAdapter.deleteManyByEdgeIds(edgeIds);
+      await this.edgePrismaAdapter.deleteConditionsByEdgeIds(edgeIds);
       await this.edgePrismaAdapter.deleteMany(edgeIds);
     }
 
     // //// Question-related
     const questionIds = dialogue?.questions.map((question) => question.id);
     if (questionIds && questionIds.length > 0) {
-      await this.questionOptionPrismaAdapter.deleteManyByQuestionIds(questionIds);
+      await this.questionNodePrismaAdapter.deleteOptionsByQuestionIds(questionIds);
 
       await this.questionNodePrismaAdapter.deleteMany(questionIds);
     }
@@ -406,11 +447,12 @@ class DialogueService implements DialogueServiceType {
     description: string,
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
+    language: LanguageEnum,
   ) => {
     try {
       const dialogue = await this.dialoguePrismaAdapter.create({
         data: DialogueService.constructDialogue(
-          customerId, title, dialogueSlug, description, publicTitle, tags,
+          customerId, title, dialogueSlug, description, publicTitle, tags, language,
         ),
       });
 
@@ -440,7 +482,7 @@ class DialogueService implements DialogueServiceType {
 
     const idMap: IdMapProps = {};
     const dialogue = await this.initDialogue(
-      customer.id, input.title, input.dialogueSlug, input.description, input.publicTitle, tags,
+      customer.id, input.title, input.dialogueSlug, input.description, input.publicTitle, tags, input.language,
     );
 
     if (!dialogue) throw new Error('Dialogue not copied');
@@ -471,7 +513,18 @@ class DialogueService implements DialogueServiceType {
         ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } }
         : undefined
       const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
-      const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
+      const mappedOptions = question.options.map((option) => {
+        const { overrideLeafId, position, publicValue, value } = option;
+        const mappedOverrideLeafId = overrideLeafId && idMap[overrideLeafId];
+
+        return {
+          position,
+          publicValue,
+          value,
+          overrideLeafId: mappedOverrideLeafId || undefined
+        };
+      });
+
       const mappedObject = {
         ...question,
         id: mappedId,
@@ -488,83 +541,61 @@ class DialogueService implements DialogueServiceType {
 
     // Create leaf nodes
     const leafs = updatedTemplateQuestions?.filter((question) => question.isLeaf);
-    await this.dialoguePrismaAdapter.update(dialogue.id, {
-      questions: {
-        create: leafs?.map((leaf) => ({
-          id: leaf.id,
-          isRoot: false,
-          isLeaf: leaf.isLeaf,
-          title: leaf.title,
-          links: leaf.links,
-          type: leaf.type,
-          form: leaf.form ? {
-            create: {
-              fields: {
-                create: leaf.form?.fields?.map((field) => ({
-                  label: field?.label,
-                  type: field?.type || 'shortText',
-                  isRequired: field?.isRequired || false,
-                  position: field?.position,
-                })),
-              },
-            },
-          } : undefined,
-          sliderNode: leaf.sliderNode ? {
-            create: {
-              markers: {
-                create: leaf?.sliderNode?.markers?.map((marker) => ({
-                  label: marker?.label,
-                  subLabel: marker?.subLabel,
-                  range: {
-                    create: {
-                      start: marker?.range?.start,
-                      end: marker?.range?.end,
-                    },
-                  },
-                })),
-              },
-            },
-          } : undefined,
+    const mappedLeafs: CreateQuestionsInput = leafs?.map((leaf) => ({
+      id: leaf.id,
+      isRoot: false,
+      isLeaf: leaf.isLeaf,
+      title: leaf.title,
+      type: leaf.type,
+      links: leaf.links?.create?.map((link) => link) || [],
+      form: leaf.form ? {
+        fields: leaf.form?.fields?.map((field) => ({
+          label: field?.label,
+          type: field?.type || 'shortText',
+          isRequired: field?.isRequired || false,
+          position: field?.position,
         })),
-      },
-    });
+      } : undefined,
+      sliderNode: leaf.sliderNode ? {
+        markers: leaf?.sliderNode?.markers?.map((marker) => ({
+          label: marker?.label,
+          subLabel: marker?.subLabel,
+          range: {
+            start: marker?.range?.start,
+            end: marker?.range?.end,
+          },
+        })),
+      } : undefined,
+    })) || [];
+    await this.dialoguePrismaAdapter.createNodes(dialogue.id, mappedLeafs)
 
-    // Create questio nodes
+    // Create question nodes
     const questions = updatedTemplateQuestions?.filter((question) => !question.isLeaf);
-    await this.dialoguePrismaAdapter.update(dialogue.id, {
-      questions: {
-        create: questions?.map((leaf) => ({
-          id: leaf.id,
-          isRoot: leaf.isRoot,
-          isLeaf: leaf.isLeaf,
-          title: leaf.title,
-          options: leaf.options,
-          overrideLeaf: leaf.overrideLeaf?.id ? {
-            connect: {
-              id: leaf.overrideLeaf.id,
-            }
-          } : undefined,
-          type: leaf.type,
-          videoEmbeddedNode: leaf.videoEmbeddedNode,
-          sliderNode: leaf.sliderNode ? {
-            create: {
-              markers: {
-                create: leaf?.sliderNode?.markers?.map((marker) => ({
-                  label: marker?.label,
-                  subLabel: marker?.subLabel,
-                  range: {
-                    create: {
-                      start: marker?.range?.start,
-                      end: marker?.range?.end,
-                    },
-                  },
-                })),
-              },
-            },
-          } : undefined,
-        })) || [],
-      },
-    });
+    // TODO: Check if this map still works with new createNodes function (I don't think it does...)
+    const mappedQuestions: CreateQuestionsInput = questions?.map((leaf) => ({
+      id: leaf.id,
+      isRoot: leaf.isRoot,
+      isLeaf: leaf.isLeaf,
+      title: leaf.title,
+      type: leaf.type,
+      options: leaf.options,
+      overrideLeafId: leaf.overrideLeaf?.id,
+      videoEmbeddedNode: leaf.videoEmbeddedNode?.create?.videoUrl
+        ? { videoUrl: leaf.videoEmbeddedNode?.create?.videoUrl }
+        : undefined,
+      sliderNode: leaf.sliderNode ? {
+        markers: leaf?.sliderNode?.markers?.map((marker) => ({
+          label: marker?.label,
+          subLabel: marker?.subLabel,
+          range: {
+            start: marker?.range?.start,
+            end: marker?.range?.end,
+          },
+        })),
+      } : undefined,
+    })) || [];
+
+    await this.dialoguePrismaAdapter.createNodes(dialogue.id, mappedQuestions);
 
     // Create edges
     const updatedTemplateEdges = templateDialogue?.edges.map((edge) => {
@@ -576,24 +607,15 @@ class DialogueService implements DialogueServiceType {
       const mappedChildNode = { id: idMap[edge.childNodeId] };
       const mappedParentNode = { id: idMap[edge.parentNodeId] };
       const mappedObject = {
-        parentNode: { connect: mappedParentNode },
-        conditions: { create: mappedConditions },
-        childNode: { connect: mappedChildNode },
+        parentNodeId: mappedParentNode.id,
+        conditions: mappedConditions,
+        childNodeId: mappedChildNode.id,
       };
       return mappedObject;
-    });
+    }) || [];
 
-    const updatedEdgesDialogue = await this.dialoguePrismaAdapter.update(dialogue.id, {
-      edges: {
-        create: updatedTemplateEdges?.map((edge) => ({
-          parentNode: edge.parentNode,
-          conditions: edge.conditions,
-          childNode: edge.childNode,
-        })),
-      },
-    });
-
-    return updatedEdgesDialogue;
+    const updatedEdgesOfDialogue = await this.dialoguePrismaAdapter.createEdges(dialogue.id, updatedTemplateEdges);
+    return updatedEdgesOfDialogue;
   };
 
   createDialogue = async (input: NexusGenInputs['CreateDialogueInputType']): Promise<Dialogue> => {
@@ -604,20 +626,24 @@ class DialogueService implements DialogueServiceType {
     // TODO: Put in validation function, or add validator service library
     if (!input.dialogueSlug) {
       throw new Error('Slug required, not found!');
-    }
+    };
 
     if (!input.title) {
       throw new Error('Title required, not found!');
-    }
+    };
 
     if (!input.description) {
       throw new Error('Description required, not found!');
-    }
+    };
+
+    if (!input.language) {
+      throw new Error('Language required, not found!');
+    };
 
     if (customers.length > 1) {
       // TODO: Make this a logger or something
       console.warn(`Multiple customers found with slug ${input.customerSlug}`);
-    }
+    };
 
     const customer = customers?.[0];
     if (!customer) {
@@ -633,12 +659,12 @@ class DialogueService implements DialogueServiceType {
         input.title,
         input.description,
         dialogueTags,
+        input.language,
       );
     }
 
     if (input.contentType === 'TEMPLATE' && input.templateDialogueId) {
       // FIXME: Tags are not copied over
-
       const copyDialogueInput: CopyDialogueInputType = {
         customerSlug: customer.slug,
         description: input.description,
@@ -647,6 +673,7 @@ class DialogueService implements DialogueServiceType {
         publicTitle: input.publicTitle || '',
         templateId: input.templateDialogueId,
         title: input.title,
+        language: input.language,
       }
       return this.copyDialogue(copyDialogueInput);
     }
@@ -658,6 +685,7 @@ class DialogueService implements DialogueServiceType {
       input.description,
       input.publicTitle || '',
       dialogueTags,
+      input.language,
     );
 
     if (!dialogue) throw new ApolloError('customer:unable_to_create');
@@ -686,9 +714,10 @@ class DialogueService implements DialogueServiceType {
     dialogueTitle: string = 'Default dialogue',
     dialogueDescription: string = 'Default questions',
     tags: Array<{ id: string }>,
+    language: LanguageEnum = 'ENGLISH',
   ): Promise<Dialogue> => {
     const dialogue = await this.initDialogue(
-      customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags,
+      customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags, language,
     );
 
     if (!dialogue) throw new Error('Dialogue not seeded');
@@ -724,7 +753,7 @@ class DialogueService implements DialogueServiceType {
       const matchResult = question.id.match(v4) || [];
       if (matchResult.length > 0) {
         question.id = finalMapping[question.id];
-      }
+      };
 
       const updatedEdges = question.children?.map((edge) => {
         const matchParent = edge?.parentNode?.id?.match(v4) || [];
@@ -741,6 +770,7 @@ class DialogueService implements DialogueServiceType {
       question.children = updatedEdges?.length > 0 ? updatedEdges : [];
       return question;
     });
+
     return finalQuestions;
   };
 
@@ -768,7 +798,7 @@ class DialogueService implements DialogueServiceType {
 
     if (!sessions) {
       return [];
-    }
+    };
 
     const scoringEntriesFromSessions = SessionService.getScoringEntriesFromSessions(sessions);
 

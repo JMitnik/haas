@@ -1,9 +1,11 @@
 import { IAnyModelType, Instance, types } from 'mobx-state-tree';
+
 import FormNodeModel from './FormNodeModel';
 import SliderNodeModel from './SliderNodeModel';
 // eslint-disable-next-line import/no-cycle
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 import TreeLinkModel from './TreeLinkModel';
+// eslint-disable-next-line import/no-cycle
 import TreeNodeOptionModel from './TreeNodeOptionModel';
 import TreeShareModel from './TreeShareModel';
 

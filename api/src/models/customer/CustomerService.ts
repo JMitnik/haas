@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, PrismaClientOptions, prismaVersion, CustomerSettingsUpdateInput, CustomerUpdateInput } from '@prisma/client';
+import { Customer, PrismaClient, PrismaClientOptions, prismaVersion, CustomerSettingsUpdateInput, CustomerUpdateInput, CustomerSettings } from '@prisma/client';
 
 import { UserInputError } from 'apollo-server-express';
 // eslint-disable-next-line import/no-cycle
@@ -8,51 +8,66 @@ import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
-import { CustomerServiceType } from './CustomerServiceType';
-import { CustomerPrismaAdapterType } from './CustomerPrismaAdapterType';
 import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
-import { CustomerSettingsPrismaAdapterType } from '../settings/CustomerSettingsPrismaAdapterType';
-import CustomerSettingsPrismaAdapter from '../settings/CustomerSettingsPrismaAdapter';
-import ColourSettingsPrismaAdapter from '../settings/ColourSettingsPrismaAdapter';
-import { ColourSettingsPrismaAdapterType } from '../settings/ColourSettingsPrismaAdapterType';
-import { FontSettingsPrismaAdapterType } from '../settings/FontSettingsPrismaAdapterType';
-import FontSettingsPrismaAdapter from '../settings/FontSettingsPrismaAdapter';
-import { DialogueServiceType } from '../questionnaire/DialogueServiceType';
-import { TagPrismaAdapterType } from '../tag/TagPrismaAdapterType';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
-import { DialoguePrismaAdapterType } from '../questionnaire/DialoguePrismaAdapterType';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
-import { UserOfCustomerPrismaAdapterType } from '../users/UserOfCustomerPrismaAdapterType';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
-import { NodeServiceType } from '../QuestionNode/NodeServiceType';
+import { UpdateCustomerInput } from './CustomerServiceType';
 
-class CustomerService implements CustomerServiceType {
-  customerPrismaAdapter: CustomerPrismaAdapterType;
-  customerSettingsPrismaAdapter: CustomerSettingsPrismaAdapterType;
-  colourSettingsPrismaAdater: ColourSettingsPrismaAdapterType;
-  fontSettingsPrismaAdapter: FontSettingsPrismaAdapterType;
-  tagPrismaAdapter: TagPrismaAdapterType;
-  dialogueService: DialogueServiceType;
-  dialoguePrismaAdapter: DialoguePrismaAdapterType;
-  userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapterType;
-  nodeService: NodeServiceType;
+class CustomerService {
+  customerPrismaAdapter: CustomerPrismaAdapter;
+  tagPrismaAdapter: TagPrismaAdapter;
+  dialogueService: DialogueService;
+  dialoguePrismaAdapter: DialoguePrismaAdapter;
+  userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
+  nodeService: NodeService;
 
   constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
-    this.customerSettingsPrismaAdapter = new CustomerSettingsPrismaAdapter(prismaClient)
-    this.colourSettingsPrismaAdater = new ColourSettingsPrismaAdapter(prismaClient);
-    this.fontSettingsPrismaAdapter = new FontSettingsPrismaAdapter(prismaClient);
     this.dialogueService = new DialogueService(prismaClient);
     this.tagPrismaAdapter = new TagPrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
   }
+
+  async getDialogue(customerId: string, dialogueSlug: string) {
+    const customer = await prisma.customer.findOne({
+      where: {
+        id: customerId || undefined,
+      },
+      include: {
+        dialogues: {
+          where: {
+            slug: dialogueSlug,
+          },
+          include: {
+            questions: {
+              select: {
+                id: true,
+              },
+            },
+            edges: {
+              select: {
+                id: true,
+                parentNodeId: true,
+                childNodeId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const dialogue = customer?.dialogues[0];
+    return dialogue;
+  }
+
   getColourSettings(colourSettingsId: number) {
-    return this.colourSettingsPrismaAdater.getById(colourSettingsId);
+    return this.customerPrismaAdapter.getColourSettingsById(colourSettingsId);
   }
   getFontSettings(fontSettingsId: number) {
-    return this.fontSettingsPrismaAdapter.getById(fontSettingsId);
+    return this.customerPrismaAdapter.getFontSettingsById(fontSettingsId);
   }
 
   findWorkspaceBySlug(slug: string): Promise<Customer | null> {
@@ -60,15 +75,15 @@ class CustomerService implements CustomerServiceType {
   }
 
   findWorkspaceById(id: string): Promise<Customer | null> {
-   return this.customerPrismaAdapter.findWorkspaceById(id);
+    return this.customerPrismaAdapter.findWorkspaceById(id);
   }
 
   async findAll() {
     return this.customerPrismaAdapter.findAll();
   }
 
-  getCustomerSettingsByCustomerId(customerId: string): Promise<import("@prisma/client").CustomerSettings | null> {
-    return this.customerSettingsPrismaAdapter.getCustomerSettingsByCustomerId(customerId);
+  getCustomerSettingsByCustomerId(customerId: string): Promise<CustomerSettings | null> {
+    return this.customerPrismaAdapter.getCustomerSettingsByCustomerId(customerId);
   }
 
   findWorkspaceBySlugs(slugs: (string | undefined)[]) {
@@ -82,22 +97,8 @@ class CustomerService implements CustomerServiceType {
 
   seedByTemplate = async (customer: Customer, template: WorkspaceTemplate = defaultWorkspaceTemplate, willGenerateFakeData: boolean = false) => {
     // Step 1: Make dialogue
-    const dialogue = await this.dialoguePrismaAdapter.create({
-      data: {
-        customer: {
-          connect: {
-            id: customer.id,
-          },
-        },
-        slug: template.slug,
-        title: template.title,
-        description: template.description,
-        questions: {
-          create: [],
-        },
-      },
-    })
-
+    const dialogueInput = { slug: template.slug, title: template.title, description: template.description, customerId: customer.id };
+    const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
     // Step 2: Make the leafs
     const leafs = await this.nodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
 
@@ -112,19 +113,11 @@ class CustomerService implements CustomerServiceType {
 
   editWorkspace = async (input: NexusGenInputs['EditWorkspaceInput']) => {
     const { id, name, slug, primaryColour, logo } = input;
-    const customerInputData: CustomerUpdateInput = {
+    const customerInputData: UpdateCustomerInput = {
       name,
       slug,
-      settings: {
-        update: {
-          logoUrl: logo,
-          colourSettings: {
-            update: {
-              primary: primaryColour
-            }
-          }
-        }
-      }
+      logoUrl: logo,
+      primaryColour: primaryColour,
     };
     const customer = await this.customerPrismaAdapter.updateCustomer(id, customerInputData);
 
@@ -143,13 +136,7 @@ class CustomerService implements CustomerServiceType {
       if (createdUserId) {
         const adminRole = customer.roles.find((role) => role.type === 'ADMIN');
 
-        await this.userOfCustomerPrismaAdapter.create(
-          {
-            customer: { connect: { id: customer.id } },
-            role: { connect: { id: adminRole?.id } },
-            user: { connect: { id: createdUserId } },
-          },
-        );
+        await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(customer.id, adminRole?.id || '', createdUserId)
       }
 
       return customer;
@@ -186,15 +173,15 @@ class CustomerService implements CustomerServiceType {
 
     // //// Settings-related
     if (fontSettingsId) {
-      await this.fontSettingsPrismaAdapter.delete(fontSettingsId);
+      await this.customerPrismaAdapter.deleteFontSettings(fontSettingsId);
     }
 
     if (colourSettingsId) {
-      await this.colourSettingsPrismaAdater.delete(colourSettingsId);
+      await this.customerPrismaAdapter.deleteColourSettings(colourSettingsId);
     }
 
     if (customer?.settings) {
-      await this.customerSettingsPrismaAdapter.deleteByCustomerId(customerId);
+      await this.customerPrismaAdapter.deleteCustomerSettingByCustomerId(customerId);
     }
 
     const dialogueIds = await this.dialogueService.findDialogueIdsByCustomerId(customerId);

@@ -1,17 +1,22 @@
-import { CreateWorkspaceJob, FindManyCreateWorkspaceJobArgs, CreateWorkspaceJobUpdateInput, JobProcessLocation, CreateWorkspaceJobCreateInput, FindOneCreateWorkspaceJobArgs } from "@prisma/client";
-import { NexusGenInputs } from "../../generated/nexus";
+import { CloudReferenceType, JobStatusType } from "@prisma/client";
 
-export interface CreateWorkspaceJobPrismaAdapterType {
-  findMany(args: FindManyCreateWorkspaceJobArgs): Promise<CreateWorkspaceJob[]>;
-  count(args: FindManyCreateWorkspaceJobArgs): Promise<number>;
-  update(jobId: string, data: CreateWorkspaceJobUpdateInput): Promise<CreateWorkspaceJob & {
-    processLocation: JobProcessLocation;
-  }>;
-  upsert(jobId: string, create: CreateWorkspaceJobCreateInput, update: CreateWorkspaceJobUpdateInput): Promise<CreateWorkspaceJob & {
-    processLocation: JobProcessLocation;
-  }>;
-  create(data: CreateWorkspaceJobCreateInput): Promise<CreateWorkspaceJob & {
-    processLocation: JobProcessLocation;
-  }>;
-  findOne(args: FindOneCreateWorkspaceJobArgs): Promise<CreateWorkspaceJob | null>;
-}
+export type ConfirmWorkspaceJobCreateInput = {
+  id?: string
+  createdAt?: Date | string | null
+  updatedAt?: Date | string | null
+  name?: string | null
+  referenceId?: string | null
+  message?: string | null
+  errorMessage?: string | null
+  referenceType: CloudReferenceType
+  status?: JobStatusType
+  resourcesUrl?: string | null
+  requiresRembg?: boolean
+  requiresScreenshot?: boolean
+  requiresColorExtraction?: boolean
+  processLocationId: string
+};
+
+export type ConfirmWorkspaceJobUpdateInput = {
+  status: JobStatusType
+};

@@ -1,13 +1,12 @@
-import { motion } from 'framer-motion';
-import React, { useState } from 'react';
-import { useEffect } from 'react';
-import { useLocation, Redirect } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
+import { Redirect, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
 
-import Loader from 'components/Loader';
-import { useGetUrlRef } from 'hooks/useGetUrlRef';
 import { DeliveryStatusEnum, useGetDeliveryQuery, useUpdateDeliveryStatusMutation } from 'types/generated-types';
+import { useGetUrlRef } from 'hooks/useGetUrlRef';
 import CustomerOverview from 'views/CustomerOverview/CustomerOverview';
+import Loader from 'components/Loader';
 
 export const CampaignRedirect = () => {
   const location = useLocation();
@@ -24,15 +23,16 @@ export const CampaignRedirect = () => {
   const [updateDelivery, { called }] = useUpdateDeliveryStatusMutation({
     variables: {
       deliveryId: ref,
-      status: DeliveryStatusEnum.Opened
+      status: DeliveryStatusEnum.Opened,
     },
     onCompleted: () => {
       setRedirect(true);
-    }, onError: (error) => {
+    },
+    onError: (error) => {
       Sentry.captureException(error);
       setRedirect(true);
-    }
-  })
+    },
+  });
 
   useEffect(() => {
     if (ref && !called && data?.delivery?.campaignVariant) {
@@ -48,13 +48,16 @@ export const CampaignRedirect = () => {
     );
   }
 
+  const url = `/${data?.delivery?.campaignVariant?.workspace.slug}/${data?.delivery?.campaignVariant?.dialogue.slug}`;
+
   if (redirect) {
     return (
       <motion.div exit={{ opacity: 0 }}>
         <Redirect to={{
-          pathname: `/${data?.delivery?.campaignVariant.workspace.slug}/${data?.delivery?.campaignVariant.dialogue.slug}`,
-          search: location.search
-        }} />
+          pathname: url,
+          search: location.search,
+        }}
+        />
       </motion.div>
     );
   }

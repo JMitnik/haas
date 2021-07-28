@@ -1,34 +1,35 @@
-import { PrismaClient } from '@prisma/client';
-import prisma from '../../config/prisma';
-import { PermissionPrismaAdapterType } from './PermissionPrismaAdapterType';
-import PermissionPrismaAdapter from './PermissionPrismaAdapter';
-import { PermissionServiceType } from './PermissionServiceType';
+import { Permission, PrismaClient } from '@prisma/client';
 
-class PermissionService implements PermissionServiceType {
-  permissionPrismaAdapter: PermissionPrismaAdapterType;
+import PermissionPrismaAdapter from './PermissionPrismaAdapter';
+
+export type CreatePermissionInput = {
+  id?: string
+  name: string
+  description?: string | null
+  customerId?: string
+}
+
+class PermissionService {
+  permissionPrismaAdapter: PermissionPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.permissionPrismaAdapter = new PermissionPrismaAdapter(prismaClient);
-  }
+  };
 
-  getPermissionsOfCustomer(customerId: string): Promise<import("@prisma/client").Permission[]> {
-    return this.permissionPrismaAdapter.findManyByCustomerId(customerId);
-  }
+  getPermissionsOfCustomer(customerId: string): Promise<Permission[]> {
+    return this.permissionPrismaAdapter.findPermissionsByCustomerId(customerId);
+  };
 
   deletePermissions = async (permissionIds: Array<string>) => {
-   return this.permissionPrismaAdapter.deleteMany(permissionIds);
+    return this.permissionPrismaAdapter.deleteMany(permissionIds);
   };
 
   createPermission = async (name: string, customerId: string, description?: string | null | undefined) => {
-    const permission = await this.permissionPrismaAdapter.create({
-      name,
-      description,
-      Customer: {
-        connect: { id: customerId },
-      },
-    });
-
+    const input: CreatePermissionInput = { name, description, customerId };
+    const permission = await this.permissionPrismaAdapter.createPermission(input);
     return permission;
   };
-}
+
+};
+
 export default PermissionService;
