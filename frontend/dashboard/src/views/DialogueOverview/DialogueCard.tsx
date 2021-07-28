@@ -7,8 +7,11 @@ import { formatDistance } from 'date-fns';
 import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
-import Flag from 'react-flagpack';
 import React, { useRef } from 'react';
+
+import { ReactComponent as DEFlag } from 'assets/icons/flags/flag-de.svg';
+import { ReactComponent as GBFlag } from 'assets/icons/flags/flag-gb.svg';
+import { ReactComponent as NLFlag } from 'assets/icons/flags/flag-nl.svg';
 
 import { deleteDialogueMutation } from 'mutations/deleteDialogue';
 import ShowMoreButton from 'components/ShowMoreButton';
@@ -118,38 +121,19 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
   };
 
   const renderFlag = (language: string): JSX.Element => {
-    const DEFAULT_FLAG = (
-      <Flag
-        code="GBR"
-        gradient="real-linear"
-        size="m"
-        hasDropShadow
-      />
-    );
-
     switch (language) {
       case 'ENGLISH':
-        return DEFAULT_FLAG;
+        return <GBFlag />;
       case 'DUTCH':
         return (
-          <Flag
-            code="NL"
-            gradient="real-linear"
-            size="m"
-            hasDropShadow
-          />
+          <NLFlag />
         );
       case 'GERMAN':
         return (
-          <Flag
-            code="DE"
-            gradient="real-linear"
-            size="m"
-            hasDropShadow
-          />
+          <DEFlag />
         );
       default:
-        return DEFAULT_FLAG;
+        return <GBFlag />;
     }
   };
 
@@ -194,8 +178,10 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
             {!!dialogue.language && (
               <UI.Div mb={1}>
                 <UI.Label size="sm">
-                  <UI.Flex>
-                    {renderFlag(dialogue.language)}
+                  <UI.Flex alignItems="center">
+                    <UI.Icon verticalAlign="middle" mt="4px">
+                      {renderFlag(dialogue.language)}
+                    </UI.Icon>
                     <UI.Span ml={1}>
                       <UI.Helper>
                         {t(`languages:${dialogue.language.toLowerCase()}`)}
