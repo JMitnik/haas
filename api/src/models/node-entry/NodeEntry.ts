@@ -72,7 +72,7 @@ export const NodeEntryType = objectType({
         if (!parent.relatedNodeId) {
           return null;
         }
-        const relatedNode = await ctx.services.nodeService.getNodeById(parent.relatedNodeId);
+        const relatedNode = await ctx.services.nodeService.findNodeById(parent.relatedNodeId);
         return relatedNode;
       },
     });

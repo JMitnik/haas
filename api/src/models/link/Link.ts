@@ -51,7 +51,7 @@ export const LinkType = objectType({
     t.field('questionNode', {
       type: QuestionNodeType,
       async resolve(parent, args, ctx) {
-        const questionNode = await ctx.services.nodeService.getNodeByLinkId(parent.id);
+        const questionNode = await ctx.services.nodeService.findNodeByLinkId(parent.id);
 
         if (!questionNode) throw new Error('Unable to find related node');
 

@@ -33,7 +33,7 @@ export const EdgeType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.parentNodeId) return null;
 
-        const parentNode = await ctx.services.nodeService.getNodeById(parent.parentNodeId);
+        const parentNode = await ctx.services.nodeService.findNodeById(parent.parentNodeId);
         return parentNode;
       },
     });
@@ -45,7 +45,7 @@ export const EdgeType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.parentNodeId) return null;
 
-        const childNode = await ctx.services.nodeService.getNodeById(parent.childNodeId);
+        const childNode = await ctx.services.nodeService.findNodeById(parent.childNodeId);
 
         return childNode;
       },
