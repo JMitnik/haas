@@ -159,8 +159,6 @@ class CustomerService {
     return dialogueOfWorkspace;
   }
 
-
-  // TODO: Use adapters for everything but Customer
   async deleteWorkspace(customerId: string) {
     if (!customerId) return null;
 
@@ -188,12 +186,16 @@ class CustomerService {
 
     if (dialogueIds.length > 0) {
       await Promise.all(dialogueIds.map(async (dialogueId) => {
-        // TODO: Rewrite this function so it uses adapter
         await this.dialogueService.deleteDialogue(dialogueId);
       }));
     }
 
     // FIXME: Makes this somehow part of the transaction. How to return Promise instead of resolved value (=object)? @JMitnik
+    // TODO: ADD Campaign, CampaignVariant, CampaignVariantToCampaign, ChoiceNodeEntry, CreateWorkspaceJob, CustomField, 
+    // TODO: Add Delivery, DeliveryEvents, FormNode, FormNodeEntry, FormNodeField, FormNodeFieldEntryData, Job, JobProcessLocation
+    // TODO: Add Link, LinkNodeEntry, NodeEntry, PostLeafNode, QuestionCondition, QuestionNode, QuestionOfTrigger, QuestionOption
+    // TODO: RegistrationNodeEntry, Session, Share, SliderNode, SliderNodeEntry, SliderNodeMarker, SliderNodeRange, TextboxNodeEntry
+    // TODO: Trigger, User, VideoEmbeddedNode, VideoNodeEntry, 
     const deleteTagsTest = this.tagPrismaAdapter.deleteAllByCustomerId(customerId);
     const deletionOfTags = prisma.tag.deleteMany({ where: { customerId } });
     const deletionOfTriggers = prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
