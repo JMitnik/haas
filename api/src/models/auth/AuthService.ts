@@ -28,6 +28,11 @@ class AuthService {
     this.roleService = new RoleService(prismaClient);
   }
 
+  /**
+   * 
+   * @param userInput the details of a user needed to register him/her/it
+   * @returns the registered user
+   */
   async registerUser(userInput: NexusGenInputs['RegisterInput']) {
     const customerExists = await this.customerPrismaAdapter.exists(userInput.customerId);
 
@@ -58,6 +63,11 @@ class AuthService {
     return user;
   }
 
+  /**
+   * 
+   * @param userId the id of the target user
+   * @returns a boolean indicating whether the user is verified or not
+   */
   async verifyUserRefreshToken(userId: string): Promise<boolean> {
     try {
       const user = await this.userService.getUserById(userId);
@@ -71,6 +81,12 @@ class AuthService {
     }
   }
 
+  /**
+   * 
+   * @param userId The id of the target user
+   * @param duration the amount of time the token is valid for in minutes
+   * @returns a JWT token
+   */
   static createUserToken(userId: string, duration: number | null = null) {
     const tokenMinutes = duration || config.jwtExpiryMinutes;
 
@@ -80,6 +96,11 @@ class AuthService {
     }, config.jwtSecret);
   }
 
+  /**
+   * 
+   * @param token a JWT token
+   * @returns the amount of time until the JWT token is expired
+   */
   static getExpiryTimeFromToken(token: string): number {
     const decoded = jwt.decode(token) as any;
 
@@ -87,12 +108,11 @@ class AuthService {
     return decoded.exp;
   }
 
-  static async checkPassword(inputPassword: string, dbPassword: string) {
-    const res = await bcrypt.compare(inputPassword, dbPassword);
-
-    return res;
-  }
-
+  /**
+   * 
+   * @param passwordInput A password in string format
+   * @returns A hashed password
+   */
   static async generatePassword(passwordInput: string) {
     const hashedPassword: string = await new Promise((resolve, reject) => {
       bcrypt.hash(passwordInput, 12, (err, hash) => {
