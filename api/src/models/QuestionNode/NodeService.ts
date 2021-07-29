@@ -3,7 +3,7 @@ import cuid from 'cuid';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
-import { QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps } from './NodeServiceType';
+import { QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps, CreateCTAInputProps, DialogueWithEdges } from './NodeServiceType';
 import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
 import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
@@ -65,58 +65,77 @@ class NodeService {
     this.prisma = prismaClient;
   }
 
-  getEdgesOfQuestion(nodeId: string) {
+  /**
+   * Find node by its own id.
+   * */
+   findNodeById(nodeId: string) {
+    return this.questionNodePrismaAdapter.findNodeById(nodeId);
+  }
+
+  /**
+   * Get all child-edges belonging to node.
+   * */
+  getChildEdgesOfNode(nodeId: string) {
     return this.edgePrismaAdapter.getEdgesByParentQuestionId(nodeId);
   }
 
-  getOptionsByQuestionId(parentId: string) {
+  /**
+   * Get all options belonging to node.
+   * */
+  getOptionsByNodeId(parentId: string) {
     return this.questionNodePrismaAdapter.findOptionsByQuestionId(parentId);
   }
 
+  /**
+   * Get all links belonging to a particular node.
+   * */
   getLinksByParentId(parentId: string): Promise<Link[]> {
     return this.getLinksByNodeId(parentId);
   }
 
+  /**
+   * Get connected share-node by node id.
+   * */
   async getShareNode(parentId: string): Promise<Share> {
     return this.questionNodePrismaAdapter.getShareNodeByQuestionId(parentId);
   }
 
+  /**
+   * Get connected video-node by node id.
+   * */
   getVideoEmbeddedNode(nodeId: string) {
     return this.questionNodePrismaAdapter.getVideoNodeById(nodeId);
   }
 
-  async createCTA(input: {
-    dialogueSlug: string,
-    customerSlug: string,
-    title: string,
-    type?: "GENERIC" | "SLIDER" | "FORM" | "CHOICE" | "REGISTRATION" | "TEXTBOX" | "LINK" | "SHARE" | "VIDEO_EMBEDDED" | undefined,
-    form?: NexusGenInputs['FormNodeInputType'] | null, // FormNodeInputType
-    links: {
-      id: string | undefined;
-      backgroundColor: string | undefined;
-      iconUrl: string | undefined;
-      title: string | undefined;
-      type: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP";
-      url: string;
-    }[],
-    share: {
-      id: string | undefined;
-      title: string;
-      tooltip: string | undefined;
-      url: string;
-    } | undefined,
-  }) {
-    const { customerSlug, dialogueSlug, title, type, links, share, form } = input;
-    const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(customerSlug, dialogueSlug);
+  /**
+   * Create call-to-action.
+   * */
+  async createCTA(input: CreateCTAInputProps) {
+    const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(input.customerSlug, input.dialogueSlug);
     if (!dialogue?.id) throw 'No Dialogue found to add CTA to!'
-    const ctaInput: CreateCTAInput = { title, type, links, share, form, dialogueId: dialogue.id }
-    return this.questionNodePrismaAdapter.createCTANode(ctaInput);
+
+    return this.questionNodePrismaAdapter.createCTANode({
+      dialogueId: dialogue.id,
+      links: input.links,
+      share: input.share,
+      title: input.title,
+      form: input.form,
+      type: input.type
+    });
   }
 
-  delete(id: string): Promise<QuestionNode> {
+  /**
+   * Deletes node.
+   *
+   * TODO: Figure out what the difference is between deleteQuestionNode and deleteNode.
+   * */
+  deleteNode(id: string): Promise<QuestionNode> {
     return this.questionNodePrismaAdapter.delete(id);
   }
 
+  /**
+   * Converts FormNode to Prisma-friendly format.
+   * */
   saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeFieldUpsertArgs[] | undefined => (
     input.fields?.map((field) => ({
       create: {
@@ -137,6 +156,9 @@ class NodeService {
     })) || undefined
   );
 
+  /**
+   * Updates existing call-to-action.
+   * */
   async updateCTA(input: NexusGenInputs['UpdateCTAInputType']) {
     if (!input.id) {
       throw new Error('No ID Found');
@@ -201,14 +223,12 @@ class NodeService {
     });
   };
 
-  getNodeByLinkId(linkId: string) {
-    return this.questionNodePrismaAdapter.getNodeByLinkId(linkId);
+  /**
+   * Find node belonging to a link.
+   * **/
+  findNodeByLinkId(linkId: string) {
+    return this.questionNodePrismaAdapter.findNodeByLinkId(linkId);
   }
-
-  getNodeById(parentNodeId: string) {
-    return this.questionNodePrismaAdapter.getNodeById(parentNodeId);
-  }
-
 
   /**
    * Creates a key-value pair of an existing CUID (e.g. questionId or edgeId) and a newly generate CUID
@@ -308,7 +328,7 @@ class NodeService {
   duplicateBranch = async (questionId: string) => {
     const idMap: IdMapProps = {};
 
-    const question = await this.questionNodePrismaAdapter.getNodeById(questionId);
+    const question = await this.questionNodePrismaAdapter.findNodeById(questionId);
 
     if (!question || !question.questionDialogueId) return null;
 
@@ -369,10 +389,16 @@ class NodeService {
     },
   });
 
+  /**
+   * Get all links belonging to a particular node.
+   * */
   getLinksByNodeId(parentId: string): Promise<Link[]> {
     return this.questionNodePrismaAdapter.getLinksByNodeId(parentId);
   };
 
+  /**
+   * Delete all links.
+   * */
   deleteLinks(linkIds: string[]) {
     return this.questionNodePrismaAdapter.deleteLinks(linkIds);
   };
@@ -402,13 +428,15 @@ class NodeService {
     });
   };
 
-  static constructQuestionNode(title: string,
+  static constructQuestionNode = (
+    title: string,
     questionnaireId: string,
     type: NodeType,
     options: Array<any> = [],
     isRoot: boolean = false,
     overrideLeafId: string = '',
-    isLeaf: boolean = false): QuestionNodeCreateInput {
+    isLeaf: boolean = false
+  ): QuestionNodeCreateInput => {
     return {
       title,
       questionDialogue: {
@@ -432,6 +460,9 @@ class NodeService {
     };
   }
 
+  /**
+   * Create node.
+   * */
   createQuestionNode = async (
     title: string,
     questionnaireId: string,
@@ -439,8 +470,8 @@ class NodeService {
     options: Array<any> = [],
     isRoot: boolean = false,
     overrideLeafId: string = '',
-    isLeaf: boolean = false) => {
-
+    isLeaf: boolean = false
+  ) => {
     const qOptions = options.length > 0 ? [
       ...options,
     ] : [];
@@ -459,6 +490,9 @@ class NodeService {
     return this.questionNodePrismaAdapter.createQuestion(params);
   };
 
+  /**
+   * Create template call-to-actions.
+   * */
   createTemplateLeafNodes = async (
     leafNodesArray: LeafNodeDataEntryProps[],
     dialogueId: string,
@@ -490,32 +524,20 @@ class NodeService {
     return finalLeafNodes;
   };
 
-  static getCorrectLeaf = (leafs: QuestionNode[], titleSubset: string) => {
+  /**
+   * Find a call-to-action containing text.
+   * */
+  static findLeafIdContainingText = (leafs: QuestionNode[], titleSubset: string) => {
     const correctLeaf = leafs.find((leaf) => leaf.title.includes(titleSubset));
     return correctLeaf?.id;
   };
 
-  static getLeafObject = (currentOverrideLeafId: string | undefined | null, overrideLeaf: any) => {
-    if (overrideLeaf?.id) {
-      return {
-        connect: {
-          id: overrideLeaf.id,
-        },
-      };
-    }
-
-    if (currentOverrideLeafId && !overrideLeaf?.id) {
-      return { disconnect: true };
-    }
-
-    if (!currentOverrideLeafId && !overrideLeaf?.id) {
-      return null;
-    }
-
-    return null;
-  };
-
-  static getLeafState = (currentOverrideLeafId: string | null, newOverrideLeafId: string | null) => {
+  /**
+   * Construct update leaf state to use in Prisma call.
+   *
+   * TODO: Move to prisma-adapter.
+   * */
+  static constructUpdateLeafState = (currentOverrideLeafId: string | null, newOverrideLeafId: string | null) => {
     if (newOverrideLeafId) {
       return {
         connect: {
@@ -535,15 +557,14 @@ class NodeService {
     return null;
   };
 
+  /**
+   * Update an edge based on new condition.
+   *
+   * TODO: Move to EdgeService.
+   * */
   updateEdge = async (
     dbEdgeCondition: QuestionCondition,
-    newEdgeCondition: {
-      id: number | null,
-      conditionType: string,
-      renderMin: number | null,
-      renderMax: number | null,
-      matchValue: string | null
-    },
+    newEdgeCondition: Omit<QuestionCondition, 'edgeId'>,
   ) => this.edgePrismaAdapter.updateCondition(dbEdgeCondition.id, {
     conditionType: newEdgeCondition.conditionType,
     matchValue: newEdgeCondition.matchValue,
@@ -551,6 +572,9 @@ class NodeService {
     renderMax: newEdgeCondition.renderMax,
   });
 
+  /**
+   * Get delete ids (?)
+   * */
   static getDeleteIDs = (
     edges: Array<{ id: string, childNodeId: string, parentNodeId: string }>,
     questions: Array<{ id: string }>, foundEdgeIds: Array<string>,
@@ -581,30 +605,25 @@ class NodeService {
     return { edgeIds: foundEdgeIds, questionIds: foundQuestionIds };
   };
 
-  deleteQuestionFromBuilder = async (id: string, dialogue: Dialogue & {
-    questions: {
-      id: string;
-    }[];
-    edges: {
-      id: string;
-      parentNodeId: string;
-      childNodeId: string;
-    }[];
-  }) => {
-    const { questions, edges } = dialogue;
-    const foundEdgeIds: Array<string> = [];
-    const foundQuestionIds: Array<string> = [id];
-    const edgeToDeleteQuestion = edges.find((edge) => edge.childNodeId === id);
+  /**
+   * Deletes a question.
+   *
+   * TODO: Figure out what the difference is between deleteQuestionNode and deleteNode.
+   * */
+  deleteQuestionNode = async (id: string, dialogue: DialogueWithEdges) => {
+    const foundEdgeIds: string[] = [];
+    const foundQuestionIds: string[] = [id];
+    const edgeToDeleteQuestion = dialogue.edges.find((edge) => edge.childNodeId === id);
 
     if (edgeToDeleteQuestion) {
       foundEdgeIds.push(edgeToDeleteQuestion.id);
     }
 
-    const { edgeIds, questionIds } = NodeService.getDeleteIDs(edges, questions, foundEdgeIds, foundQuestionIds);
+    const { edgeIds, questionIds } = NodeService.getDeleteIDs(dialogue.edges, dialogue.questions, foundEdgeIds, foundQuestionIds);
 
     await this.edgePrismaAdapter.deleteMany(edgeIds);
 
-    const deletedQuestion = await this.questionNodePrismaAdapter.getNodeById(id);
+    const deletedQuestion = await this.questionNodePrismaAdapter.findNodeById(id);
 
     await this.questionNodePrismaAdapter.deleteShareNodesByQuestionId(id);
 
@@ -614,10 +633,15 @@ class NodeService {
 
     await this.questionNodePrismaAdapter.deleteMany(questionIds);
 
-    const questionToDelete = questions.find((question) => id === question.id);
+    const questionToDelete = dialogue.questions.find((question) => id === question.id);
     return questionToDelete;
   };
 
+  /**
+   * Creates a node (from builder).
+   *
+   * TODO: Figure out waht difference is between createQuestionFromBuilder and createQuestionNode
+   * */
   createQuestionFromBuilder = async (
     dialogueId: string,
     title: string,
@@ -663,6 +687,11 @@ class NodeService {
     return newQuestion;
   };
 
+  /**
+   * Update node from builer.
+   *
+   * TODO: Rename to updateNode.
+   * */
   updateQuestionFromBuilder = async (
     questionId: string,
     title: string,
@@ -670,13 +699,7 @@ class NodeService {
     overrideLeafId: string | null,
     edgeId: string | undefined,
     options: QuestionOptionProps[],
-    edgeCondition: {
-      id: number | null,
-      conditionType: string,
-      renderMin: number | null,
-      renderMax: number | null,
-      matchValue: string | null
-    },
+    edgeCondition: QuestionCondition,
     sliderNode: NexusGenInputs['SliderNodeInputType'],
     extraContent: string | null | undefined,
     happyText: string | null | undefined,
@@ -688,7 +711,7 @@ class NodeService {
 
     const activeOptions = activeQuestion ? activeQuestion?.options?.map((option) => option.id) : [];
     const currentOverrideLeafId = activeQuestion?.overrideLeafId || null;
-    const leaf = NodeService.getLeafState(currentOverrideLeafId, overrideLeafId);
+    const leaf = NodeService.constructUpdateLeafState(currentOverrideLeafId, overrideLeafId);
 
     const existingEdgeCondition = dbEdge?.conditions && dbEdge.conditions[0];
 
@@ -751,17 +774,9 @@ class NodeService {
     return updatedNode;
   };
 
-
-
-  updateNewQConditions = async (edge: EdgeChildProps) => {
-    const { conditionType, renderMax, renderMin, matchValue } = edge.conditions[0];
-    const conditionUpsertAgs = { conditionType, renderMax, renderMin, matchValue };
-    const conditionId = edge?.conditions?.[0]?.id ? edge?.conditions?.[0]?.id : -1
-    const condition = await this.edgePrismaAdapter.upsertCondition(conditionId, conditionUpsertAgs, conditionUpsertAgs);
-
-    return { id: condition.id };
-  };
-
+  /**
+   * Remove non-existing question options.
+   * */
   removeNonExistingQuestionOptions = async (
     existingOptions: number[],
     newOptions: QuestionOptionProps[],
@@ -776,6 +791,9 @@ class NodeService {
     }
   };
 
+  /**
+   * Create nodes from a default template.
+   * */
   createTemplateNodes = async (
     dialogueId: string,
     workspaceName: string,
@@ -788,14 +806,14 @@ class NodeService {
     );
 
     // Positive Sub child 1 (What did you like?)
-    const instagramNodeId = NodeService.getCorrectLeaf(leafs, 'Follow us on Instagram and stay');
+    const instagramNodeId = NodeService.findLeafIdContainingText(leafs, 'Follow us on Instagram and stay');
     const rootToWhatDidYou = await this.createQuestionNode(
       'What did you like?', dialogueId, NodeType.CHOICE, standardOptions, false,
       instagramNodeId,
     );
 
     // Positive Sub sub child 1 (Facilities)
-    const comeAndJoin1stAprilId = NodeService.getCorrectLeaf(leafs,
+    const comeAndJoin1stAprilId = NodeService.findLeafIdContainingText(leafs,
       'Come and join us on 1st April for our great event');
     const whatDidYouToFacilities = await this.createQuestionNode(
       'What exactly did you like about the facilities?', dialogueId,
@@ -809,7 +827,7 @@ class NodeService {
     );
 
     // Positive Sub sub child 3 (Product/Services)
-    const weThinkYouMightLikeThis = NodeService.getCorrectLeaf(
+    const weThinkYouMightLikeThis = NodeService.findLeafIdContainingText(
       leafs,
       'We think you might like this as',
     );
@@ -824,7 +842,7 @@ class NodeService {
     );
 
     // Positive Sub sub child 4 (Customer Support)
-    const yourEmailBelowForNewsletter = NodeService.getCorrectLeaf(leafs,
+    const yourEmailBelowForNewsletter = NodeService.findLeafIdContainingText(leafs,
       'your email below to receive our newsletter');
     const whatDidYouToCustomerSupport = await this.createQuestionNode(
       'What exactly did you like about the customer support?', dialogueId,
@@ -832,7 +850,7 @@ class NodeService {
     );
 
     // Neutral Sub child 2
-    const leaveYourEmailBelowToReceive = NodeService.getCorrectLeaf(leafs,
+    const leaveYourEmailBelowToReceive = NodeService.findLeafIdContainingText(leafs,
       'Leave your email below to receive our');
     const rootToWhatWouldYouLikeToTalkAbout = await this.createQuestionNode(
       'What would you like to talk about?', dialogueId, NodeType.CHOICE,
@@ -865,13 +883,13 @@ class NodeService {
     );
 
     // Negative Sub sub child 1 (Facilities)
-    const ourTeamIsOnIt = NodeService.getCorrectLeaf(leafs, 'Our team is on it');
+    const ourTeamIsOnIt = NodeService.findLeafIdContainingText(leafs, 'Our team is on it');
     const weAreSorryToHearThatToFacilities = await this.createQuestionNode(
       'Please elaborate.', dialogueId, NodeType.CHOICE, facilityOptions, false, ourTeamIsOnIt,
     );
 
     // Negative Sub sub child 2 (Website)
-    const pleaseClickWhatsappLink = NodeService.getCorrectLeaf(leafs,
+    const pleaseClickWhatsappLink = NodeService.findLeafIdContainingText(leafs,
       'Please click on the Whatsapp link below so our service');
     const weAreSorryToHearThatToWebsite = await this.createQuestionNode(
       'Please elaborate.', dialogueId, NodeType.CHOICE, websiteOptions,
@@ -879,14 +897,14 @@ class NodeService {
     );
 
     // Negative Sub sub child 3 (Product/Services)
-    const clickBelowForRefund = NodeService.getCorrectLeaf(leafs, 'Click below for your refund');
+    const clickBelowForRefund = NodeService.findLeafIdContainingText(leafs, 'Click below for your refund');
     const weAreSorryToHearThatToProduct = await this.createQuestionNode(
       'Please elaborate.', dialogueId, NodeType.CHOICE, productServicesOptions,
       false, clickBelowForRefund,
     );
 
     // Negative Sub sub child 4 (Customer Support)
-    const ourCustomerExperienceSupervisor = NodeService.getCorrectLeaf(leafs,
+    const ourCustomerExperienceSupervisor = NodeService.findLeafIdContainingText(leafs,
       'Our customer experience supervisor is');
     const weAreSorryToHearThatToCustomerSupport = await this.createQuestionNode(
       'Please elaborate', dialogueId, NodeType.CHOICE, customerSupportOptions,

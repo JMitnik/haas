@@ -25,7 +25,7 @@ export const SessionType = objectType({
         // @ts-ignore
         if (parent.score) return parent.score;
 
-        const score = await SessionService.getSessionScore(parent.id) || 0.0;
+        const score = await SessionService.findSessionScore(parent.id) || 0.0;
 
         return score;
       },
@@ -107,7 +107,7 @@ export const SessionQuery = extendType({
           return null;
         }
 
-        const session = await ctx.services.sessionService.getSessionById(args.where.id);
+        const session = await ctx.services.sessionService.findSessionById(args.where.id);
 
         return session;
       },
@@ -140,7 +140,7 @@ export const CreateSessionMutation = mutationField('createSession', {
     }
 
     try {
-      const session = ctx.services.sessionService.createSession(args.input, ctx);
+      const session = ctx.services.sessionService.createSession(args.input);
       return session;
     } catch (error) {
       throw new Error(`Failed making a session due to ${error}`);
