@@ -15,7 +15,7 @@ export const SessionType = objectType({
     // t.int('index');
     t.int('paths', {
       async resolve(parent, args, ctx) {
-        const entryCount = await ctx.services.nodeEntryService.getAmountOfPaths(parent.id);
+        const entryCount = await ctx.services.nodeEntryService.countNodeEntriesBySessionid(parent.id);
         return entryCount;
       },
     });

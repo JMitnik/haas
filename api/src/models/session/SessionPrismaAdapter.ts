@@ -42,11 +42,15 @@ class SessionPrismaAdapter {
       },
       include: {
         nodeEntries: {
+          // TODO: Can we define these fields in one place (right now, it exists everywhere).
           include: {
             choiceNodeEntry: true,
             linkNodeEntry: true,
             registrationNodeEntry: true,
+            textboxNodeEntry: true,
             relatedNode: true,
+            formNodeEntry: { include: { values: true } },
+            videoNodeEntry: true,
             sliderNodeEntry: true,
           },
         },

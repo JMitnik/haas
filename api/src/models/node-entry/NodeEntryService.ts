@@ -1,8 +1,6 @@
 import {
-  ChoiceNodeEntry,
-  LinkNodeEntry, NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
-  RegistrationNodeEntry,
-  SliderNodeEntry, TextboxNodeEntry, PrismaClient
+  NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
+  PrismaClient
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
@@ -20,23 +18,35 @@ class NodeEntryService {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
   };
 
-  createNodeEntry(sessionId: string, nodeEntryInput: { data?: { choice?: { value?: string | null | undefined; } | null | undefined; form?: { values?: { email?: string | null | undefined; longText?: string | null | undefined; number?: number | null | undefined; phoneNumber?: string | null | undefined; relatedFieldId?: string | null | undefined; shortText?: string | null | undefined; url?: string | null | undefined; }[] | null | undefined; } | null | undefined; register?: { value?: string | null | undefined; } | null | undefined; slider?: { value?: number | null | undefined; } | null | undefined; textbox?: { value?: string | null | undefined; } | null | undefined; } | null | undefined; depth?: number | null | undefined; edgeId?: string | null | undefined; nodeId?: string | null | undefined; }): Promise<NodeEntry> {
+  /**
+   * Create node-entries.
+   * */
+  createNodeEntry(sessionId: string, nodeEntryInput: NexusGenInputs['NodeEntryInput']): Promise<NodeEntry> {
     return this.nodeEntryPrismaAdapter.create({
       session: { connect: { id: sessionId } },
       ...NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput),
     });
   };
 
-  getNodeEntriesBySessionId(sessionId: string): Promise<(NodeEntry & { choiceNodeEntry: ChoiceNodeEntry | null; linkNodeEntry: LinkNodeEntry | null; registrationNodeEntry: RegistrationNodeEntry | null; sliderNodeEntry: SliderNodeEntry | null; textboxNodeEntry: TextboxNodeEntry | null; })[]> {
-    return this.nodeEntryPrismaAdapter.findNodeEntriesBySessionId(sessionId);
+  /**
+   * Fetch all node-entries by session id.
+   * */
+  getNodeEntriesBySessionId(sessionId: string): Promise<NodeEntryWithTypes[]> {
+    return this.nodeEntryPrismaAdapter.getNodeEntriesBySessionId(sessionId);
   };
 
-  getAmountOfPaths(sessionId: string): Promise<number> {
-    return this.nodeEntryPrismaAdapter.getAmountOfNodeEntriesBySessionId(sessionId);
+  /**
+   * Count node entries by session id.
+   * */
+  countNodeEntriesBySessionid(sessionId: string): Promise<number> {
+    return this.nodeEntryPrismaAdapter.countNodeEntriesBySessionId(sessionId);
   };
 
-  async getNodeEntryValues(id: string) {
-    const nodeEntry = await this.nodeEntryPrismaAdapter.getChildNodeEntriesById(id);
+  /**
+   * Find node-entry values along with its sub-fields.
+   * */
+  async findNodeEntryValues(id: string) {
+    const nodeEntry = await this.nodeEntryPrismaAdapter.findNodeEntryValuesById(id);
 
     return {
       choiceNodeEntry: nodeEntry?.choiceNodeEntry?.value,
@@ -48,6 +58,11 @@ class NodeEntryService {
     };
   };
 
+  /**
+   * Construct create node entry fragment form Graphql input.
+   *
+   * TODO: move to prisma adapter?
+   * */
   static constructCreateNodeEntryFragment = (nodeEntryInput: NexusGenInputs['NodeEntryInput']): NodeEntryCreateWithoutSessionInput => ({
     relatedNode: (nodeEntryInput.nodeId && { connect: { id: nodeEntryInput.nodeId } }) || undefined,
     relatedEdge: (nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } }) || undefined,
@@ -88,6 +103,9 @@ class NodeEntryService {
     } : undefined,
   });
 
+  /**
+   * Check if node-entry contains search term.
+   * */
   static isNodeEntryMatchText = (nodeEntry: NodeEntryWithTypes, searchTerm: string) => {
     const processedSearch = searchTerm.toLowerCase();
 

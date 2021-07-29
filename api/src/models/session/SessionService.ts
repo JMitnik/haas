@@ -195,6 +195,7 @@ class SessionService {
       },
     });
 
+    // TODO: Move this to the corresponding prisma-adapter.
     const dialougeWithSessionWithEntries = await prisma.dialogue.findOne({
       where: { id: dialogueId },
       include: {
@@ -239,9 +240,11 @@ class SessionService {
                 choiceNodeEntry: true,
                 linkNodeEntry: true,
                 registrationNodeEntry: true,
+                formNodeEntry: { include: { values: true } },
                 sliderNodeEntry: true,
                 textboxNodeEntry: true,
                 relatedNode: true,
+                videoNodeEntry: true,
               },
               orderBy: {
                 depth: 'asc',
