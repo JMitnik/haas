@@ -35,6 +35,7 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
   async resolve(parent, args, ctx) {
     if (!args.input?.userId) throw new UserInputError('User not provided');
     if (!args.input?.customerId && !args.input?.customerSlug) throw new UserInputError('Neither slug nor id of Customer was provided');
+
     return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId);
   },
 });
@@ -187,6 +188,7 @@ export const RootUserQueries = extendType({
         return ctx.services.userService.getAllUsersByCustomerSlug(args.customerSlug);
       },
     });
+
     t.field('user', {
       type: UserType,
       args: { userId: 'String' },
