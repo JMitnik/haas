@@ -1,9 +1,7 @@
-import { Customer, PrismaClient, PrismaClientOptions, prismaVersion, CustomerSettingsUpdateInput, CustomerUpdateInput, CustomerSettings } from '@prisma/client';
-
+import { Customer, PrismaClient, PrismaClientOptions, CustomerSettings } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
-// eslint-disable-next-line import/no-cycle
+
 import { NexusGenInputs } from '../../generated/nexus';
-// eslint-disable-next-line import/no-cycle
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
@@ -31,6 +29,12 @@ class CustomerService {
     this.nodeService = new NodeService(prismaClient);
   }
 
+  /**
+   * Get a dialogue based on workspace ID and dialogue Slug. 
+   * @param customerId Workspace ID
+   * @param dialogueSlug Dialogue Slug
+   * @returns A dialogue including question Ids and edges 
+   */
   async getDialogue(customerId: string, dialogueSlug: string) {
     const customer = await prisma.customer.findOne({
       where: {
@@ -63,38 +67,83 @@ class CustomerService {
     return dialogue;
   }
 
+  /**
+   * Finds the colour settings based on ID
+   * @param colourSettingsId the ID of the colour settings entry 
+   * @returns ColourSettings prisma entry
+   */
   getColourSettings(colourSettingsId: number) {
     return this.customerPrismaAdapter.getColourSettingsById(colourSettingsId);
   }
+
+  /**
+   * Finds the font settings based on ID
+   * @param fontSettingsId the ID of the font settings entry
+   * @returns FontSettings prisma entry
+   */
   getFontSettings(fontSettingsId: number) {
     return this.customerPrismaAdapter.getFontSettingsById(fontSettingsId);
   }
 
+  /**
+   * Finds workspace by workspace slug
+   * @param slug Workspace slug
+   * @returns A workspace matching the provided slug
+   */
   findWorkspaceBySlug(slug: string): Promise<Customer | null> {
     return this.customerPrismaAdapter.findWorkspaceBySlug(slug);
   }
 
+  /**
+   * Finds workspace by workspace ID
+   * @param id Finds workspace by workspace ID
+   * @returns A workspace matching the provided ID
+   */
   findWorkspaceById(id: string): Promise<Customer | null> {
     return this.customerPrismaAdapter.findWorkspaceById(id);
   }
 
+  /**
+   * Finds all workspaces available
+   * @returns workspaces
+   */
   async findAll() {
     return this.customerPrismaAdapter.findAll();
   }
 
+  /**
+   * Finds the customer settings of a workspace by the workspace ID
+   * @param customerId workspace ID
+   * @returns CustomerSettings prisma entry
+   */
   getCustomerSettingsByCustomerId(customerId: string): Promise<CustomerSettings | null> {
     return this.customerPrismaAdapter.getCustomerSettingsByCustomerId(customerId);
   }
 
+  /**
+   * Finds a workspace by one of the provided identifiers.
+   * @param slugs the identifiers. These could include either IDs or slugs
+   * @returns A workspace matching either an provided ID or slug
+   */
   findWorkspaceBySlugs(slugs: (string | undefined)[]) {
     return this.customerPrismaAdapter.findWorkspaceBySlugs(slugs);
   }
 
-
+  /**
+   * Deletes a workspace from the database
+   * @param customerId 
+   * @returns the deleted workspace
+   */
   async delete(customerId: string): Promise<Customer> {
     return this.customerPrismaAdapter.delete(customerId);
   }
 
+  /**
+   * Creates a new dialogue (using a template) and optionally populates the dialogue with fake data
+   * @param customer A Customer prisma entry
+   * @param template A dialogue template
+   * @param willGenerateFakeData A boolean indicating whether fake data should be generated
+   */
   seedByTemplate = async (customer: Customer, template: WorkspaceTemplate = defaultWorkspaceTemplate, willGenerateFakeData: boolean = false) => {
     // Step 1: Make dialogue
     const dialogueInput = { slug: template.slug, title: template.title, description: template.description, customerId: customer.id };
@@ -111,6 +160,11 @@ class CustomerService {
     }
   };
 
+  /**
+   * Edits a workspace
+   * @param input the new workspace settings
+   * @returns Updated workspace
+   */
   editWorkspace = async (input: NexusGenInputs['EditWorkspaceInput']) => {
     const { id, name, slug, primaryColour, logo } = input;
     const customerInputData: UpdateCustomerInput = {
@@ -124,6 +178,12 @@ class CustomerService {
     return customer;
   };
 
+  /**
+   * Creates a new workspace
+   * @param input workspace properties
+   * @param createdUserId the user ID creating the new workspace
+   * @returns A newly created workspace
+   */
   createWorkspace = async (input: NexusGenInputs['CreateWorkspaceInput'], createdUserId?: string) => {
     try {
       const customer = await this.customerPrismaAdapter.createWorkspace(input);
@@ -159,6 +219,11 @@ class CustomerService {
     return dialogueOfWorkspace;
   }
 
+  /**
+   * Deletes a workspace
+   * @param customerId ID of workspace to be deleted
+   * @returns deleted workspace
+   */
   async deleteWorkspace(customerId: string) {
     if (!customerId) return null;
 
