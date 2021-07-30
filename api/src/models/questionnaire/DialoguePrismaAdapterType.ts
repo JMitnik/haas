@@ -12,7 +12,7 @@ export type CreateDialogueInput = {
   isWithoutGenData?: boolean
   endScreenText?: string | null
   wasGeneratedWithGenData?: boolean
-  customerId: string
+  customer?: { id?: string, name?: string, slug?: string, create: boolean }
 };
 
 export interface CreateQuestionInput {

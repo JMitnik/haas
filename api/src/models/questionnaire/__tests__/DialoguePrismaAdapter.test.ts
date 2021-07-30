@@ -3,6 +3,7 @@ import DialoguePrismaAdapter from "../DialoguePrismaAdapter";
 import { clearDialogueDatabase } from './testUtils';
 import { DialogueCreateInput } from "@prisma/client";
 import cuid from 'cuid';
+import { CreateDialogueInput } from "../DialoguePrismaAdapterType";
 
 const prisma = makeTestPrisma();
 const dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
@@ -19,6 +20,17 @@ const defaultDialogueCreateInput: DialogueCreateInput = {
   }
 }
 
+const defaultCreateDialogueInput: CreateDialogueInput = {
+  title: 'DEFAULT_DIALOGUE',
+  slug: 'default',
+  description: 'description',
+  customer: {
+    name: 'DEFAULT_CUSTOMER',
+    slug: 'customerSlug',
+    create: true,
+  }
+}
+
 describe('DialoguePrismaAdapter', () => {
   afterEach(async () => {
     await clearDialogueDatabase(prisma);
@@ -26,10 +38,12 @@ describe('DialoguePrismaAdapter', () => {
   });
 
   test('Creates a dialogue', async () => {
-    const dialogue = await dialoguePrismaAdapter.create({ data: defaultDialogueCreateInput });
+    const dialogue = await dialoguePrismaAdapter.createTemplate(defaultCreateDialogueInput);
     expect(dialogue).not.toBeNull();
-    expect(dialogue.title).toBe(defaultDialogueCreateInput.title);
-    expect(dialogue.slug).toBe(defaultDialogueCreateInput.slug);
+    expect(dialogue?.title).toBe(defaultDialogueCreateInput.title);
+    expect(dialogue?.slug).toBe(defaultDialogueCreateInput.slug);
+    expect(dialogue?.customer?.name).toBe(defaultCreateDialogueInput?.customer?.name);
+    expect(dialogue?.customer?.slug).toBe(defaultCreateDialogueInput?.customer?.slug);
   });
 
   test('Deletes a dialogue', async () => {
@@ -693,7 +707,7 @@ describe('DialoguePrismaAdapter', () => {
 
     const dialogueWithEdges = await dialoguePrismaAdapter.create({ data: edgesTestDialogueInput });
     const templateDialogue = await dialoguePrismaAdapter.getTemplateDialogue(dialogueWithEdges.id);
-    expect(templateDialogue?.questions).toHaveLength(3);
+    expect(templateDialogue?.questions).toHaveLength(5);
     expect(templateDialogue?.edges).toHaveLength(2);
   });
 });

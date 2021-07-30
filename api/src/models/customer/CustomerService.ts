@@ -11,6 +11,7 @@ import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { UpdateCustomerInput } from './CustomerServiceType';
+import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -146,8 +147,10 @@ class CustomerService {
    */
   seedByTemplate = async (customer: Customer, template: WorkspaceTemplate = defaultWorkspaceTemplate, willGenerateFakeData: boolean = false) => {
     // Step 1: Make dialogue
-    const dialogueInput = { slug: template.slug, title: template.title, description: template.description, customerId: customer.id };
+    const dialogueInput: CreateDialogueInput = { slug: template.slug, title: template.title, description: template.description, customer: { id: customer.id, create: false } };
     const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
+
+    if (!dialogue) throw 'ERROR: No dialogue created!'
     // Step 2: Make the leafs
     const leafs = await this.nodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
 
