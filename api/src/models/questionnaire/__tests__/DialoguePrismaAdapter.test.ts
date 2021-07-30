@@ -1,7 +1,6 @@
 import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
 import DialoguePrismaAdapter from "../DialoguePrismaAdapter";
 import { clearDialogueDatabase } from './testUtils';
-import DialogueService from "../DialogueService";
 import { DialogueCreateInput } from "@prisma/client";
 import cuid from 'cuid';
 
@@ -20,25 +19,20 @@ const defaultDialogueCreateInput: DialogueCreateInput = {
   }
 }
 
-
 describe('DialoguePrismaAdapter', () => {
-  // beforeEach(async () => {
-  //   await seedWorkspace(prisma, workspaceId, dialogueId);
-  // });
-
   afterEach(async () => {
     await clearDialogueDatabase(prisma);
     prisma.$disconnect();
   });
 
-  test('dialoguePrismaAdapter.create', async () => {
+  test('Creates a dialogue', async () => {
     const dialogue = await dialoguePrismaAdapter.create({ data: defaultDialogueCreateInput });
     expect(dialogue).not.toBeNull();
     expect(dialogue.title).toBe(defaultDialogueCreateInput.title);
     expect(dialogue.slug).toBe(defaultDialogueCreateInput.slug);
   });
 
-  test('dialoguePrismaAdapter.delete', async () => {
+  test('Deletes a dialogue', async () => {
     const dialogue = await dialoguePrismaAdapter.create({ data: defaultDialogueCreateInput });
     const dialogues = await prisma.dialogue.findMany();
     expect(dialogues).toHaveLength(1);
@@ -48,7 +42,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(noDialogues).toHaveLength(0);
   });
 
-  test('dialoguePrismaAdapter.findDialogueIdsOfCustomer', async () => {
+  test('Finds dialogue ids of workspace by workspace ID', async () => {
     await dialoguePrismaAdapter.create({ data: defaultDialogueCreateInput });
     const targetDialogueOne = await prisma.dialogue.create({
       data: {
@@ -81,8 +75,8 @@ describe('DialoguePrismaAdapter', () => {
     expect(dialogueIds).toHaveLength(2);
   });
 
-  test('dialoguePrismaAdapter.findDialoguesByCustomerId', async () => {
-    dialoguePrismaAdapter.create({ data: defaultDialogueCreateInput });
+  test('Finds dialogues of a workspace by dialogue id', async () => {
+    await dialoguePrismaAdapter.create({ data: defaultDialogueCreateInput });
     const targetDialogueOne = await prisma.dialogue.create({
       data: {
         title: 'TARGET_DIALOGUE_ONE',
@@ -117,7 +111,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(dialogueSlugTwo).not.toBeUndefined();
   });
 
-  test('dialoguePrismaAdapter.getCTAsByDialogueId', async () => {
+  test('Finds CTAs of a dialogue by ID', async () => {
     const targetDialogueOne = await prisma.dialogue.create({
       data: {
         title: 'TARGET_DIALOGUE_ONE',
@@ -164,7 +158,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(shareCTA).not.toBeUndefined();
   });
 
-  test('dialoguePrismaAdapter.getDialogueById', async () => {
+  test('Finds dialogue by ID', async () => {
     const dialogue = await dialoguePrismaAdapter.create({ data: defaultDialogueCreateInput });
     const notFoundDialogue = await dialoguePrismaAdapter.getDialogueById('-1');
     expect(notFoundDialogue).toBeNull();
@@ -172,16 +166,8 @@ describe('DialoguePrismaAdapter', () => {
     expect(foundDialogue).not.toBeNull();
   });
 
-  test('dialoguePrismaAdapter.getDialogueByQuestionNodeId', async () => {
-    const defaultDialogueInput: DialogueCreateInput = {
-      ...defaultDialogueCreateInput,
-      questions: {
-        create: {
-          title: 'DEFAULT_QUESTION',
-        },
-      },
-    };
-    const defaultDialogue = await prisma.dialogue.create({
+  test('Finds the dialogue by the ID of question node attached to it', async () => {
+    await prisma.dialogue.create({
       data: defaultDialogueCreateInput,
       include: {
         questions: true
@@ -221,7 +207,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(foundDialogue?.slug).toBe(targetDialogueOne.slug);
   });
 
-  test('dialoguePrismaAdapter.getDialogueBySlug', async () => {
+  test('Finds dialogue by workspace ID and dialogue slug', async () => {
     await dialoguePrismaAdapter.create({ data: defaultDialogueCreateInput });
     const targetDialogueOne = await prisma.dialogue.create({
       data: {
@@ -250,7 +236,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(foundDialogue?.title).toBe(targetDialogueOne.title);
   });
 
-  test('dialoguePrismaAdapter.getDialogueBySlugs', async () => {
+  test('Finds dialogue by workspace slug and dialogue slug', async () => {
     await dialoguePrismaAdapter.create({ data: defaultDialogueCreateInput });
     const targetDialogueOne = await prisma.dialogue.create({
       data: {
@@ -283,7 +269,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(foundDialogue?.title).toBe(targetDialogueOne.title);
   });
 
-  test('dialoguePrismaAdapter.getDialogueWithNodesAndEdges', async () => {
+  test('Finds dialogue with corresponding nodes and edges', async () => {
     const dialogueId = cuid();
     const dialogueCreateInputWithEdgesAndQuestions: DialogueCreateInput = {
       ...defaultDialogueCreateInput,
@@ -327,7 +313,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(foundDialogue?.questions).toHaveLength(3);
   });
 
-  test('dialoguePrismaAdapter.getEdgesByDialogueId', async () => {
+  test('Finds all edges by dialogue ID', async () => {
     const defaultDialogueId = cuid();
     const dialogueCreateInputWithEdgesAndQuestions: DialogueCreateInput = {
       ...defaultDialogueCreateInput,
@@ -434,7 +420,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(foundEdges).toHaveLength(2);
   });
 
-  test('dialoguePrismaAdapter.getQuestionsByDialogueId', async () => {
+  test('Finds all questions by dialogue ID', async () => {
     const defaultDialogueWithQuestionCreateInput: DialogueCreateInput = {
       ...defaultDialogueCreateInput,
       questions: {
@@ -471,7 +457,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(targetOneQuestion).not.toBeUndefined();
   });
 
-  test('dialoguePrismaAdapter.getRootQuestionByDialogueId', async () => {
+  test('Finds the root question of a dialogue by dialogue ID', async () => {
     const defaultDialogueWithQuestionCreateInput: DialogueCreateInput = {
       ...defaultDialogueCreateInput,
       questions: {
@@ -508,7 +494,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(rootQuestion.title).toBe('targetRootQuestion');
   });
 
-  test('dialoguePrismaAdapter.getTagsByDialogueId', async () => {
+  test('Finds the tags of a dialogue by dialogue ID', async () => {
     const defaultTagsDialogueInput: DialogueCreateInput = {
       title: 'DEFAULT_DIALOGUE',
       slug: 'default',
@@ -590,7 +576,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(targetOneTag).not.toBeUndefined();
   });
 
-  test('dialoguePrismaAdapter.getTemplateDialogue', async () => {
+  test('Finds dialogue by dialogue ID', async () => {
     const defaultDialogueId = cuid();
     const dialogueCreateInputWithEdgesAndQuestions: DialogueCreateInput = {
       ...defaultDialogueCreateInput,

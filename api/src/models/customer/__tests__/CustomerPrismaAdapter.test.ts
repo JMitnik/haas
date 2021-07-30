@@ -121,9 +121,9 @@ describe('CustomerPrismaAdapter', () => {
     const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
     const foundCustomer = await customerPrismaAdapter.findWorkspaceById(createdCustomer.id);
     expect(foundCustomer).not.toBeNull();
-    expect(foundCustomer.slug).toBe(defaultCustomerInput.slug);
-    expect(foundCustomer.settings.colourSettings.primary).toBe(defaultCustomerInput.primaryColour);
-    expect(foundCustomer.settings.logoUrl).toBe(defaultCustomerInput.logo);
+    expect(foundCustomer?.slug).toBe(defaultCustomerInput.slug);
+    expect(foundCustomer?.settings?.colourSettings?.primary).toBe(defaultCustomerInput.primaryColour);
+    expect(foundCustomer?.settings?.logoUrl).toBe(defaultCustomerInput.logo);
 
     const notFoundCustomer = await customerPrismaAdapter.findWorkspaceById('-1');
     expect(notFoundCustomer).toBeNull();
@@ -135,7 +135,7 @@ describe('CustomerPrismaAdapter', () => {
     // Expect workspace to be found with existing slug
     const foundCustomer = await customerPrismaAdapter.findWorkspaceBySlug(createdCustomer.slug);
     expect(foundCustomer).not.toBeNull();
-    expect(foundCustomer.slug).toBe(defaultCustomerInput.slug);
+    expect(foundCustomer?.slug).toBe(defaultCustomerInput.slug);
 
     // Expect no workspace to be found with non-existing slug
     const notFoundCustomer = await customerPrismaAdapter.findWorkspaceBySlug('nonExistingSlug');
@@ -309,14 +309,14 @@ describe('CustomerPrismaAdapter', () => {
     expect(dialogueWithTags?.tags).toHaveLength(3);
   });
 
-  test('customerPrismaAdapter.updateCustomer', async () => {
+  test('Updates a workspace', async () => {
     const customer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
     const customerUpdateInput: UpdateCustomerInput = { name: 'newName', slug: 'newSlug' }
     const updatedCustomer = await customerPrismaAdapter.updateCustomer(customer.id, customerUpdateInput);
-    expect(updatedCustomer.name).toBe(customerUpdateInput.name);
-    expect(updatedCustomer.slug).toBe(customerUpdateInput.slug);
-    expect(updatedCustomer.settings.logoUrl).toBe(defaultCustomerInput.logo);
-    expect(updatedCustomer.settings.colourSettings.primary).toBe(defaultCustomerInput.primaryColour);
+    expect(updatedCustomer?.name).toBe(customerUpdateInput.name);
+    expect(updatedCustomer?.slug).toBe(customerUpdateInput.slug);
+    expect(updatedCustomer?.settings?.logoUrl).toBe(defaultCustomerInput.logo);
+    expect(updatedCustomer?.settings?.colourSettings?.primary).toBe(defaultCustomerInput.primaryColour);
   });
 
 });
