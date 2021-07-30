@@ -1,4 +1,4 @@
-import { TriggerMedium, TriggerEnum, Trigger, User, TriggerCondition, TriggerConditionEnum } from "@prisma/client";
+import { TriggerMedium, TriggerEnum, Trigger, User, TriggerCondition as PrismaTriggerCondition, TriggerConditionEnum } from "@prisma/client";
 
 import { CustomerWithCustomerSettings } from "../customer/Customer";
 
@@ -12,7 +12,7 @@ export interface CreateTriggerInput {
 
 export interface TriggerWithSendData extends Trigger {
   recipients: User[];
-  conditions: TriggerCondition[];
+  conditions: PrismaTriggerCondition[];
   customer: CustomerWithCustomerSettings | null;
   relatedNode: {
     questionDialogue: {
@@ -21,14 +21,16 @@ export interface TriggerWithSendData extends Trigger {
   } | null;
 }
 
+export interface TriggerCondition {
+  id?: number | null;
+  maxValue?: number | null;
+  minValue?: number | null;
+  questionId?: string | null;
+  textValue?: string | null;
+  type?: TriggerConditionEnum | null
+}
+
 export interface CreateQuestionOfTriggerInput {
   triggerId: string;
-  condition: {
-    id?: number | null | undefined;
-    maxValue?: number | null | undefined;
-    minValue?: number | null | undefined;
-    questionId?: string | null | undefined;
-    textValue?: string | null | undefined;
-    type?: TriggerConditionEnum | null;
-  }
+  condition: TriggerCondition;
 }

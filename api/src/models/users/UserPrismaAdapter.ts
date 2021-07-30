@@ -234,6 +234,7 @@ class UserPrismaAdapter {
     });
   };
 
+  // TODO: Should do a findOne lookup
   async getValidUsers(loginToken: string, userId: string | undefined) {
     const validUsers = await this.prisma.user.findMany({
       where: {

@@ -37,6 +37,11 @@ class AutodeckService {
     this.createWorkspaceJobPrismaAdapter = new CreateWorkspaceJobPrismaAdapter(prismaClient);
   };
 
+  /**
+   * 
+   * @param input Update input containing status, resourceUrl and/or errorMessage 
+   * @returns An updated CreateWorkspaceJob
+   */
   update(input: { id: string; resourceUrl: string | null | undefined; status: "PRE_PROCESSING" | "PRE_PROCESSING_LOGO" | "PRE_PROCESSING_WEBSITE_SCREENSHOT" | "READY_FOR_PROCESSING" | "IN_PHOTOSHOP_QUEUE" | "PHOTOSHOP_PROCESSING" | "PROCESSING" | "WRAPPING_UP" | "PENDING" | "COMPLETED" | "FAILED" | "TRANSFORMING_PSDS_TO_PNGS" | "STITCHING_SLIDES" | "COMPRESSING_SALES_MATERIAL"; errorMessage: string | undefined; }) {
     return this.createWorkspaceJobPrismaAdapter.update(input.id, {
       resourcesUrl: input.resourceUrl,
@@ -45,27 +50,56 @@ class AutodeckService {
     });
   };
 
+  /**
+   * 
+   * @param jobId The id of an Autodeck job
+   * @returns An autodeck job
+   */
   getJobById(jobId: string) {
     return this.createWorkspaceJobPrismaAdapter.getJobById(jobId);
   };
 
+  /**
+   * Find the corresponding Job location by a job ID 
+   * @param createWorkspaceJobId The id of an Autodeck job
+   * @returns JobProcessLocation prisma entry
+   */
   getJobProcessLocationOfJob(createWorkspaceJobId: string): Promise<JobProcessLocation> {
     return this.jobProcessLocationPrismaAdapter.getJobProcessLocationByJobId(createWorkspaceJobId);
   };
 
+  /**
+   * Finds all custom fields added to a JobProcessLocation
+   * @param jobProcessLocationId The id of a JobProcessLocation entry
+   * @returns The custom fields added to a JobProcessLocation
+   */
   getCustomFieldsOfJobProcessLocation(jobProcessLocationId: string): Promise<CustomField[]> {
     return this.jobProcessLocationPrismaAdapter.getCustomFieldsByJobProcessLocationId(jobProcessLocationId);
   };
 
+  /**
+   * 
+   * @returns All JobProcessLocations currently available
+   */
   getJobProcessLocations = async () => {
     return this.jobProcessLocationPrismaAdapter.findAll();
   };
 
+  /**
+   * Creates a JobProcessLocation prisma entry based on provided input
+   * @param input An object containing a display name, folder path and type of a JobProcessLocation
+   * @returns A created JobProcessLocation prisma entry
+   */
   createJobProcessLocation = async (input: any) => {
     const data = { name: input.name, path: input.path, type: input.type };
     return this.jobProcessLocationPrismaAdapter.create(data);
   };
 
+  /**
+   * Finds a subset of all Autodeck jobs
+   * @param paginationOpts 
+   * @returns An subset of all Autodeck jobs based on pagination input
+   */
   paginatedAutodeckJobs = async (
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
@@ -105,11 +139,22 @@ class AutodeckService {
     return paginate(paginateProps);
   };
 
+  /**
+   * Adds new custom fields to a JobProcessLocation
+   * @param input The new custom fields
+   * @param processLocationId The id of a JobProcessLocation entry
+   * @returns An updated JobProcessLocation entry
+   */
   addNewCustomFieldsToTemplate = async (input: NexusGenInputs['GenerateAutodeckInput'], processLocationId: string) => {
     const newCustomFields = input.newCustomFields?.map(({ key, value }) => ({ key: key || '', value: value || '' })) || [];
     return this.jobProcessLocationPrismaAdapter.addNewCustomFields(processLocationId, newCustomFields);
   }
 
+  /**
+   * Merges and generates a single object containing all template and custom fields
+   * @param input Object containing, the template fields, previously added custom fields and new custom fields
+   * @returns A single object containing all fields
+   */
   static generateKeyValuePair = (input: NexusGenInputs['GenerateAutodeckInput']) => {
     const mergedCustomFields = input.customFields?.concat(input?.newCustomFields || []).concat(input?.standardFields || []) || [];
     let mappedKeyValuePairs = {}
@@ -120,6 +165,11 @@ class AutodeckService {
     return mappedKeyValuePairs;
   };
 
+  /**
+   * Checks whether an adjusted (post-edited after background removal etc.) logo is available on S3
+   * @param id The id of an Autodeck job
+   * @returns A boolean indicating whether an adjusted logo is available
+   */
   static usesAdjustedLogo = async (id: string) => {
     const params = {
       Bucket: 'haas-autodeck-logos',
@@ -138,7 +188,11 @@ class AutodeckService {
     });
   };
 
-
+  /**
+   * Restarts a job
+   * @param jobId The ID of the job that needs be restarted
+   * @returns An updated Autodeck job entry
+   */
   retryJob = async (jobId: string) => {
     const updatedWorkspaceJob = await this.createWorkspaceJobPrismaAdapter.updateStatus(jobId, 'IN_PHOTOSHOP_QUEUE');
 
@@ -156,6 +210,12 @@ class AutodeckService {
     return updatedWorkspaceJob;
   }
 
+  /**
+   * Updates a new Autodeck job when pre-processing is accepted, and starts the photoshop process.
+   * @param input 
+   * @param userId The ID of the user creating the job
+   * @returns An updated autodeck job
+   */
   confirmWorkspaceJob = async (input: NexusGenInputs['GenerateAutodeckInput'], userId?: string) => {
     const csvData = { 'colour-0': input.primaryColour };
     const csv = papaparse.unparse([csvData]);
@@ -184,7 +244,6 @@ class AutodeckService {
       ...mappedCustomFields,
       rootPath: updatedWorkspaceJob.processLocation.path,
     };
-
 
     const pitchdeckCSV = papaparse.unparse([pitchdeckData]);
     const pitchdeckCSVPath = `${input.id}/pitchdeck_input.csv`;
@@ -226,6 +285,15 @@ class AutodeckService {
     return updatedWorkspaceJob;
   };
 
+  /**
+   * Finds the adjusted pre-processing logo on S3
+   * @param adjusedLogoInput An object containing:
+   * - A Autodeck job id (string)
+   * - A S3 bucket (string)
+   * - A S3 File key (string)
+   * - A reset property (boolean)
+   * @returns An object containing the url to an adjusted logo
+   */
   static getAdjustedLogo = async (adjusedLogoInput: NexusGenInputs['AdjustedImageInput']) => {
     const S3_BUCKET_PREFIX = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${adjusedLogoInput.id}`;
     if (!adjusedLogoInput.bucket) return { url: 'not_found' };
@@ -269,6 +337,14 @@ class AutodeckService {
     return { url: adjustedLogoUrl };
   }
 
+  /**
+   * Starts the whitify lambda 
+   * @param whitifyImageInput An object containing:
+   * - A Autodeck job id (string)
+   * - A S3 bucket (string)
+   * - A S3 File key (string)
+   * - A reset property (boolean)
+   */
   static whitifyImage = (whitifyImageInput: NexusGenInputs['AdjustedImageInput']) => {
     const strEvent = JSON.stringify(whitifyImageInput, null, 2);
     const sNSParams = {
@@ -280,6 +356,10 @@ class AutodeckService {
     });
   }
 
+  /**
+   * Starts the resizeImage lambda
+   * @param input object containing S3 bucket and S3 key properties
+   */
   static resizeImage = (input: { bucket: string, key: string }) => {
 
     const strEvent = JSON.stringify(input, null, 2);
@@ -292,7 +372,10 @@ class AutodeckService {
     });
   }
 
-
+  /**
+   * Start the removePixel lambda
+   * @param removePixelRangeEventInput 
+   */
   static removePixelRange = (removePixelRangeEventInput: NexusGenInputs['RemovePixelRangeInput']) => {
 
     const strEvent = JSON.stringify(removePixelRangeEventInput, null, 2);
@@ -305,6 +388,11 @@ class AutodeckService {
     });
   }
 
+  /**
+   * Creates a new Autodeck job
+   * @param input An object containing info in regard to what pre-processing needs to be done.
+   * @returns A created autodeck job
+   */
   createWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
     const workspaceJob = await this.createWorkspaceJobPrismaAdapter.create({
       id: input.id || '',
@@ -369,6 +457,14 @@ class AutodeckService {
     return workspaceJob;
   }
 
+  /**
+   * Finds the pre-processed data (logo, website) that needs to be reviewed
+   * @param id The id of the autodeck job
+   * @returns An object containing:
+   * - Array of most dominant colours of logo
+   * - Url to pre-processed logo
+   * - Url to website screenshot
+   */
   static getPreviewData = async (id: string) => {
     const S3_BUCKET_PREFIX = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${id}`;
 
@@ -418,51 +514,15 @@ class AutodeckService {
     const result: { colors: Array<string>, rembgLogoUrl: string, websiteScreenshotUrl: string }
       = { colors: colorPalette, rembgLogoUrl, websiteScreenshotUrl };
     return result;
-  }
-
-  static downloadFileFromS3 = async (bucket: string, fileKey: string, filePath: string) => {
-    'use strict';
-    return new Promise(function (resolve, reject) {
-      const file = fs.createWriteStream(filePath),
-        stream = s3.getObject({
-          Bucket: bucket,
-          Key: fileKey
-        }).createReadStream();
-      stream.on('error', reject);
-      file.on('error', reject);
-      file.on('finish', function () {
-        resolve(filePath);
-      });
-      stream.pipe(file);
-    });
-  }
+  };
 
   /**
- * @param {String} source
- * @param {String} out
- * @returns {Promise}
- */
-  static zipDirectory = (source: string, out: string) => {
-    const archive = archiver('zip', { zlib: { level: 9 } });
-    const stream = fs.createWriteStream(out);
-
-    return new Promise((resolve, reject) => {
-      archive
-        .directory(source, false)
-        .on('error', (err: any) => reject(err))
-        .pipe(stream);
-      // @ts-ignore
-      stream.on('close', () => resolve());
-      archive.finalize();
-    });
-  };
-
-  static fetchImage = async (url: string, destinationPath: string) => {
-    const response = await fetch(url);
-    const buffer = await response.buffer();
-    fs.writeFileSync(destinationPath, buffer);
-  };
-
+   * Uploads a file to a S3 bucket
+   * @param bucket 
+   * @param fileKey 
+   * @param data file as a stream
+   * @param mimeType 
+   */
   static uploadDataToS3 = (bucket: string, fileKey: string, data: string, mimeType: string) => {
     return s3.upload({
       Bucket: bucket,
@@ -473,8 +533,13 @@ class AutodeckService {
     }).promise();
   };
 
+  /**
+   * Uploads a file to a S3 bucket
+   * @param bucket 
+   * @param fileKey 
+   * @param filePath path to file
+   */
   static uploadFileToS3 = (bucket: string, fileKey: string, filePath: string) => {
-    console.log('uploading: ', bucket, fileKey, filePath);
     return s3.upload({
       Bucket: bucket,
       Key: fileKey,

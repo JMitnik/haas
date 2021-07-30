@@ -42,7 +42,7 @@ export const QuestionOptionType = objectType({
 
       resolve: async (parent, args, ctx) => {
         if (!parent.overrideLeafId) return null;
-        const cta = await ctx.services.nodeService.getNodeById(parent.overrideLeafId);
+        const cta = await ctx.services.nodeService.findNodeById(parent.overrideLeafId);
         return cta as any;
       }
     });
@@ -277,7 +277,7 @@ export const QuestionNodeType = objectType({
       type: LinkType,
       async resolve(parent, args, ctx) {
         if (parent.isLeaf) {
-          const links = await ctx.services.nodeService.getLinksByParentId(parent.id);
+          const links = await ctx.services.nodeService.getLinksByNodeId(parent.id);
 
           return links as any;
         }
@@ -305,7 +305,7 @@ export const QuestionNodeType = objectType({
 
       async resolve(parent, args, ctx) {
         if (!parent.overrideLeafId) return null
-        const overrideLeaf = await ctx.services.nodeService.getNodeById(parent.overrideLeafId);
+        const overrideLeaf = await ctx.services.nodeService.findNodeById(parent.overrideLeafId);
 
         return overrideLeaf;
       },
@@ -315,14 +315,14 @@ export const QuestionNodeType = objectType({
       type: QuestionOptionType,
 
       resolve(parent, args, ctx) {
-        return ctx.services.nodeService.getOptionsByQuestionId(parent.id);
+        return ctx.services.nodeService.getOptionsByNodeId(parent.id);
       },
     });
 
     t.list.field('children', {
       type: EdgeType,
       resolve(parent, args, ctx) {
-        return ctx.services.nodeService.getEdgesOfQuestion(parent.id);
+        return ctx.services.nodeService.getChildEdgesOfNode(parent.id);
       },
     });
   },
@@ -487,7 +487,7 @@ export const QuestionNodeMutations = extendType({
           throw new Error('No dialogue found to be removed');
         }
 
-        const deletedDialogues = await ctx.services.nodeService.deleteQuestionFromBuilder(id, dialogue);
+        const deletedDialogues = await ctx.services.nodeService.deleteQuestionNode(id, dialogue);
 
         if (!deletedDialogues) throw new Error('Unable to delete dialogue');
 
@@ -526,7 +526,7 @@ export const QuestionNodeMutations = extendType({
       args: { input: DeleteNodeInputType },
 
       async resolve(parent: any, args: any, ctx) {
-        return ctx.services.nodeService.delete(args?.input?.id);
+        return ctx.services.nodeService.deleteNode(args?.input?.id);
       },
     });
 

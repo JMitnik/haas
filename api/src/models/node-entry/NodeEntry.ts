@@ -1,10 +1,6 @@
-import { NodeEntry } from '@prisma/client';
 import { inputObjectType, objectType } from '@nexus/schema';
 
-// eslint-disable-next-line import/no-cycle
 import { FormNodeField, QuestionNodeType } from '../QuestionNode/QuestionNode';
-// eslint-disable-next-line import/no-cycle
-import NodeEntryService from './NodeEntryService';
 
 export const FormNodeEntryValueType = objectType({
   name: 'FormNodeEntryValueType',
@@ -72,7 +68,7 @@ export const NodeEntryType = objectType({
         if (!parent.relatedNodeId) {
           return null;
         }
-        const relatedNode = await ctx.services.nodeService.getNodeById(parent.relatedNodeId);
+        const relatedNode = await ctx.services.nodeService.findNodeById(parent.relatedNodeId);
         return relatedNode;
       },
     });
@@ -83,7 +79,7 @@ export const NodeEntryType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        const nodeEntryValues = await ctx.services.nodeEntryService.getNodeEntryValues(parent.id);
+        const nodeEntryValues = await ctx.services.nodeEntryService.findNodeEntryValues(parent.id);
         return nodeEntryValues;
       },
     });

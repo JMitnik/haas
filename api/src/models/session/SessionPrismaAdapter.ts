@@ -21,6 +21,9 @@ class SessionPrismaAdapter {
     });
   };
 
+  /**
+   * Creates a session in the database.
+   * */
   createSession(data: CreateSessionInput) {
     const { device, originUrl, dialogueId, entries, totalTimeInSec } = data;
     return this.prisma.session.create({
@@ -39,6 +42,32 @@ class SessionPrismaAdapter {
       },
       include: {
         nodeEntries: {
+          // TODO: Can we define these fields in one place (right now, it exists everywhere).
+          include: {
+            choiceNodeEntry: true,
+            linkNodeEntry: true,
+            registrationNodeEntry: true,
+            textboxNodeEntry: true,
+            relatedNode: true,
+            formNodeEntry: { include: { values: true } },
+            videoNodeEntry: true,
+            sliderNodeEntry: true,
+          },
+        },
+      },
+    });
+  };
+
+  /**
+   * Fetches single session from database.
+   * */
+  findSessionById(sessionId: string): Promise<Session | null> {
+    return this.prisma.session.findOne({
+      where: {
+        id: sessionId,
+      },
+      include: {
+        nodeEntries: {
           include: {
             choiceNodeEntry: true,
             linkNodeEntry: true,
@@ -47,14 +76,6 @@ class SessionPrismaAdapter {
             sliderNodeEntry: true,
           },
         },
-      },
-    });
-  };
-
-  getSessionById(sessionId: string): Promise<Session | null> {
-    return this.prisma.session.findOne({
-      where: {
-        id: sessionId,
       },
     });
   };

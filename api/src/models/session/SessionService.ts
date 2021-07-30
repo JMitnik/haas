@@ -25,17 +25,17 @@ class SessionService {
     this.triggerService = new TriggerService(prismaClient);
   };
 
-  getSessionById(sessionId: string): Promise<Session | null> {
-    return this.sessionPrismaAdapter.getSessionById(sessionId);
+  /**
+   * Finds single session by passed ID.
+   * */
+  findSessionById(sessionId: string): Promise<Session | null> {
+    return this.sessionPrismaAdapter.findSessionById(sessionId);
   };
 
   /**
-   * Create a user-session from the client
-   * @param obj
-   * @param args
-   * @param ctx
+   * Create a user-session from the client.
    */
-  async createSession(sessionInput: any, ctx: any) {
+  async createSession(sessionInput: any) {
     const { dialogueId, entries } = sessionInput;
     const session = await this.sessionPrismaAdapter.createSession({
       device: sessionInput.device || '',
@@ -83,7 +83,7 @@ class SessionService {
   }
 
   /**
-   * Get scoring entries from a list of sessions
+   * Get scoring entries from a list of sessions.
    * @param sessions
    */
   static getScoringEntriesFromSessions(
@@ -140,7 +140,11 @@ class SessionService {
     return session.nodeEntries.filter((entry) => entry?.relatedNode?.type && entry?.relatedNode?.type in TEXT_NODES);
   };
 
-  static async getSessionScore(sessionId: string): Promise<number | undefined | null> {
+  /**
+   * Finds session score in database, based on the provided id.
+   * */
+  static async findSessionScore(sessionId: string): Promise<number | undefined | null> {
+    // TODO: Replace with prismAdapter.findSessionById
     const session = await prisma.session.findOne({
       where: { id: sessionId },
       include: {
@@ -191,6 +195,7 @@ class SessionService {
       },
     });
 
+    // TODO: Move this to the corresponding prisma-adapter.
     const dialougeWithSessionWithEntries = await prisma.dialogue.findOne({
       where: { id: dialogueId },
       include: {
@@ -235,9 +240,11 @@ class SessionService {
                 choiceNodeEntry: true,
                 linkNodeEntry: true,
                 registrationNodeEntry: true,
+                formNodeEntry: { include: { values: true } },
                 sliderNodeEntry: true,
                 textboxNodeEntry: true,
                 relatedNode: true,
+                videoNodeEntry: true,
               },
               orderBy: {
                 depth: 'asc',

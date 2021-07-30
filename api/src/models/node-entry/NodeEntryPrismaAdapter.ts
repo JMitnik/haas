@@ -1,4 +1,6 @@
-import { PrismaClient, NodeEntryWhereInput, NodeEntryCreateInput, BatchPayload, ChoiceNodeEntry, LinkNodeEntry, NodeEntry, RegistrationNodeEntry, SliderNodeEntry, TextboxNodeEntry } from "@prisma/client";
+import { PrismaClient, NodeEntryWhereInput, NodeEntryCreateInput, BatchPayload } from "@prisma/client";
+
+import { NodeEntryWithTypes } from "./NodeEntryServiceType";
 
 class NodeEntryPrismaAdapter {
   prisma: PrismaClient;
@@ -13,16 +15,17 @@ class NodeEntryPrismaAdapter {
     });
   };
 
-  async findNodeEntriesBySessionId(sessionId: string): Promise<(NodeEntry & { choiceNodeEntry: ChoiceNodeEntry | null; linkNodeEntry: LinkNodeEntry | null; registrationNodeEntry: RegistrationNodeEntry | null; sliderNodeEntry: SliderNodeEntry | null; textboxNodeEntry: TextboxNodeEntry | null; })[]> {
+  async getNodeEntriesBySessionId(sessionId: string): Promise<NodeEntryWithTypes[]> {
     const nodeEntries = await this.prisma.nodeEntry.findMany({
       where: { sessionId: sessionId },
       include: {
-        // TODO: Add videoEmbeddedNodeValue here as well or is this one saved as choiceNodeEntry? Add FormNode?
         choiceNodeEntry: true,
         linkNodeEntry: true,
         registrationNodeEntry: true,
         sliderNodeEntry: true,
         textboxNodeEntry: true,
+        formNodeEntry: { include: { values: true } },
+        videoNodeEntry: true,
       },
       orderBy: {
         depth: 'asc',
@@ -32,27 +35,33 @@ class NodeEntryPrismaAdapter {
     return nodeEntries;
   };
 
-  getAmountOfNodeEntriesBySessionId(sessionId: string) {
-    return this.prisma.nodeEntry.count({
-      where: {
-        sessionId,
-      },
-    });
+  /**
+   * Count by sesion id.
+   * */
+  countNodeEntriesBySessionId(sessionId: string) {
+    return this.prisma.nodeEntry.count({ where: { sessionId, } });
   };
 
+  /**
+   * Raw count of node-entries.
+   * */
   count(where: NodeEntryWhereInput): Promise<number> {
     return this.prisma.nodeEntry.count({ where, });
   };
 
-  async getChildNodeEntriesById(nodeId: string) {
+  /**
+   * Find node-entry along with its sub-fields.
+   * */
+  async findNodeEntryValuesById(nodeEntryId: string) {
     const nodeEntry = await this.prisma.nodeEntry.findOne({
-      where: { id: nodeId },
+      where: { id: nodeEntryId },
       include: {
         choiceNodeEntry: true,
         linkNodeEntry: true,
         registrationNodeEntry: true,
         sliderNodeEntry: true,
         textboxNodeEntry: true,
+        videoNodeEntry: true,
         formNodeEntry: {
           include: {
             values: {

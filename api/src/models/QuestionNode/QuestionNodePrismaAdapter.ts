@@ -289,7 +289,7 @@ class QuestionNodePrismaAdapter {
 
   async updateDialogueBuilderNode(nodeId: string, data: UpdateQuestionInput) {
     const { title, type, options, currentOverrideLeafId, overrideLeafId, videoEmbeddedNode } = data;
-    const leaf = NodeService.getLeafState(currentOverrideLeafId || null, overrideLeafId || null);
+    const leaf = NodeService.constructUpdateLeafState(currentOverrideLeafId || null, overrideLeafId || null);
     const updatedOptionIds = await this.updateQuestionOptions(options || []);
 
     // Remove videoEmbeddedNode if updated to different type
@@ -421,7 +421,7 @@ class QuestionNodePrismaAdapter {
   }
 
 
-  async getNodeByLinkId(linkId: string) {
+  async findNodeByLinkId(linkId: string) {
     const link = await this.prisma.link.findOne({
       where: { id: linkId },
       include: { questionNode: true },
@@ -485,7 +485,7 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  async getNodeById(nodeId: string): Promise<QuestionNode | null> {
+  async findNodeById(nodeId: string): Promise<QuestionNode | null> {
     return this.prisma.questionNode.findOne({
       where: { id: nodeId },
       include: {

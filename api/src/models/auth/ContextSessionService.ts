@@ -21,6 +21,10 @@ class ContextSessionService {
     this.context = context;
   }
 
+  /**
+   * Finds a matching workspace based on either the workspace slug or id in the current request body
+   * @returns A workspace
+   */
   getWorkSpaceFromReq = async () => {
     const vars = this.context.req.body.variables;
 
@@ -37,6 +41,10 @@ class ContextSessionService {
     return null;
   };
 
+  /**
+   * Creates a context session used for every GraphQL call
+   * @returns ContextSession
+   */
   constructContextSession = async (): Promise<ContextSessionType | null> => {
     // Support auth use-case if a token is supported using cookie (should be HTTP-only)
     const cookieToken: string | null = this.context.req.cookies?.access_token;
