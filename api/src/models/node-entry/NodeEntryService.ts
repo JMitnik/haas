@@ -55,6 +55,7 @@ class NodeEntryService {
       sliderNodeEntry: nodeEntry?.sliderNodeEntry?.value,
       textboxNodeEntry: nodeEntry?.textboxNodeEntry?.value,
       formNodeEntry: nodeEntry?.formNodeEntry,
+      videoNodeEntry: nodeEntry?.videoNodeEntry?.value,
     };
   };
 

@@ -277,7 +277,7 @@ export const QuestionNodeType = objectType({
       type: LinkType,
       async resolve(parent, args, ctx) {
         if (parent.isLeaf) {
-          const links = await ctx.services.nodeService.getLinksByParentId(parent.id);
+          const links = await ctx.services.nodeService.getLinksByNodeId(parent.id);
 
           return links as any;
         }

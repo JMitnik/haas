@@ -68,7 +68,7 @@ class NodeService {
   /**
    * Find node by its own id.
    * */
-   findNodeById(nodeId: string) {
+  findNodeById(nodeId: string) {
     return this.questionNodePrismaAdapter.findNodeById(nodeId);
   }
 
@@ -84,13 +84,6 @@ class NodeService {
    * */
   getOptionsByNodeId(parentId: string) {
     return this.questionNodePrismaAdapter.findOptionsByQuestionId(parentId);
-  }
-
-  /**
-   * Get all links belonging to a particular node.
-   * */
-  getLinksByParentId(parentId: string): Promise<Link[]> {
-    return this.getLinksByNodeId(parentId);
   }
 
   /**

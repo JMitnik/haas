@@ -61,6 +61,7 @@ class NodeEntryPrismaAdapter {
         registrationNodeEntry: true,
         sliderNodeEntry: true,
         textboxNodeEntry: true,
+        videoNodeEntry: true,
         formNodeEntry: {
           include: {
             values: {
