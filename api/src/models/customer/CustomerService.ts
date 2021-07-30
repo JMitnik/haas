@@ -227,7 +227,7 @@ class CustomerService {
   async deleteWorkspace(customerId: string) {
     if (!customerId) return null;
 
-    const customer = await this.customerPrismaAdapter.getCustomer(customerId);
+    const customer = await this.customerPrismaAdapter.findWorkspaceById(customerId);
 
     if (!customer) return null;
 

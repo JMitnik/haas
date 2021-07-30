@@ -1,9 +1,8 @@
-import { CustomerUpdateInput } from "@prisma/client";
-
 import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
 import { CustomerPrismaAdapter } from "../CustomerPrismaAdapter";
 import { NexusGenInputs } from "../../../generated/nexus";
 import { clearCustomerDatabase } from './testUtils';
+import { UpdateCustomerInput } from "../CustomerServiceType";
 
 const prisma = makeTestPrisma();
 const customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
@@ -57,7 +56,7 @@ describe('CustomerPrismaAdapter', () => {
     expect(tags.length).not.toEqual(0);
   });
 
-  test('customerPrismaAdapter.delete', async () => {
+  test('Deletes a workspace (INCOMPLETE)', async () => {
     const customer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
     const deleteTags = prisma.tag.deleteMany({});
     const deleteRoles = prisma.role.deleteMany({});
@@ -84,7 +83,7 @@ describe('CustomerPrismaAdapter', () => {
     expect(customerPostDelete).toBeNull();
   });
 
-  test('customerPrismaAdapter.exists', async () => {
+  test('Checks whether customer exits based on a workspace ID', async () => {
     const customer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
     const customerExists = await customerPrismaAdapter.exists(customer.id);
 
@@ -97,7 +96,7 @@ describe('CustomerPrismaAdapter', () => {
     expect(customerExistsPostDelete).toBe(false);
   });
 
-  test('customerPrismaAdapter.findAll', async () => {
+  test('Finds all workspaces', async () => {
     const customers = await customerPrismaAdapter.findAll();
     expect(customers).toHaveLength(0);
 
@@ -107,36 +106,43 @@ describe('CustomerPrismaAdapter', () => {
     expect(customersPostCreate).toHaveLength(1);
   });
 
-  test('customerPrismaAdapter.findManyTagsByCustomerSlug', async () => {
+  test('Finds all tags of a workspace', async () => {
     await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
     const customerInputTwo = { ...defaultCustomerInput, slug: 'customerSlugTwo', name: 'workspaceTwo' };
     await customerPrismaAdapter.createWorkspace(customerInputTwo);
-    const tags = await customerPrismaAdapter.findManyTagsByCustomerSlug(customerInputTwo.slug);
+    const tags = await customerPrismaAdapter.getTagsByCustomerSlug(customerInputTwo.slug);
     expect(tags).toHaveLength(3);
 
     const allTags = await prisma.tag.findMany({});
     expect(allTags).toHaveLength(6);
   });
 
-  test('customerPrismaAdapter.findWorkspaceById', async () => {
+  test('Finds workspace by ID', async () => {
     const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
     const foundCustomer = await customerPrismaAdapter.findWorkspaceById(createdCustomer.id);
     expect(foundCustomer).not.toBeNull();
+    expect(foundCustomer.slug).toBe(defaultCustomerInput.slug);
+    expect(foundCustomer.settings.colourSettings.primary).toBe(defaultCustomerInput.primaryColour);
+    expect(foundCustomer.settings.logoUrl).toBe(defaultCustomerInput.logo);
 
     const notFoundCustomer = await customerPrismaAdapter.findWorkspaceById('-1');
     expect(notFoundCustomer).toBeNull();
   });
 
-  test('customerPrismaAdapter.findWorkspaceBySlug', async () => {
+  test('Finds workspace by slug', async () => {
     const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
+
+    // Expect workspace to be found with existing slug
     const foundCustomer = await customerPrismaAdapter.findWorkspaceBySlug(createdCustomer.slug);
     expect(foundCustomer).not.toBeNull();
+    expect(foundCustomer.slug).toBe(defaultCustomerInput.slug);
 
+    // Expect no workspace to be found with non-existing slug
     const notFoundCustomer = await customerPrismaAdapter.findWorkspaceBySlug('nonExistingSlug');
     expect(notFoundCustomer).toBeNull();
   });
 
-  test('customerPrismaAdapter.findWorkspaceBySlugs', async () => {
+  test('Finds workspace by either slug or ID ', async () => {
     const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
 
     // Find by id in list
@@ -156,7 +162,7 @@ describe('CustomerPrismaAdapter', () => {
     expect(foundByIdCustomer).not.toBeNull();
   });
 
-  test('customerPrismaAdapter.getAllCustomersBySlug', async () => {
+  test('Finds all workspaces by slug', async () => {
     const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
     const customerInputTwo = { ...defaultCustomerInput, slug: 'customerSlugTwo', name: 'workspaceTwo' };
 
@@ -166,27 +172,7 @@ describe('CustomerPrismaAdapter', () => {
     expect(customers).toHaveLength(1);
   });
 
-  test('customerPrismaAdapter.findWorkspaceSettings', async () => {
-    const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
-    const settingsNotFound = await customerPrismaAdapter.findWorkspaceSettings('NOT_FOUND');
-
-    expect(settingsNotFound).toBeNull();
-
-    const settingsFound = await customerPrismaAdapter.findWorkspaceSettings(createdCustomer.id);
-    expect(settingsFound).not.toBeNull();
-  });
-
-  test('customerPrismaAdapter.getCustomer', async () => {
-    const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
-    const customerNotFound = await customerPrismaAdapter.getCustomer('NOT_FOUND');
-
-    expect(customerNotFound).toBeNull();
-
-    const customerFound = await customerPrismaAdapter.getCustomer(createdCustomer.id);
-    expect(customerFound).not.toBeNull();
-  });
-
-  test('customerPrismaAdapter.getDialogueById', async () => {
+  test('Finds a dialogue by workspace + dialogue ID', async () => {
     const customer = await prisma.customer.create({
       data: {
         name: 'workspace',
@@ -222,7 +208,7 @@ describe('CustomerPrismaAdapter', () => {
     expect(foundDialogue).not.toBeUndefined();
   });
 
-  test('customerPrismaAdapter.getDialogueBySlug', async () => {
+  test('Finds dialogue by workspace ID + customer slug', async () => {
     const customer = await prisma.customer.create({
       data: {
         name: 'workspace',
@@ -256,7 +242,7 @@ describe('CustomerPrismaAdapter', () => {
     expect(foundDialogue).not.toBeUndefined();
   });
 
-  test('customerPrismaAdapter.getDialogueTags', async () => {
+  test('Finds tags of dialogue by workspace ID + dialogue slug', async () => {
     const customer = await prisma.customer.create({
       data: {
         name: 'workspace',
@@ -325,11 +311,12 @@ describe('CustomerPrismaAdapter', () => {
 
   test('customerPrismaAdapter.updateCustomer', async () => {
     const customer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
-    const customerUpdateInput: CustomerUpdateInput = { name: 'newName', slug: 'newSlug', }
+    const customerUpdateInput: UpdateCustomerInput = { name: 'newName', slug: 'newSlug' }
     const updatedCustomer = await customerPrismaAdapter.updateCustomer(customer.id, customerUpdateInput);
     expect(updatedCustomer.name).toBe(customerUpdateInput.name);
     expect(updatedCustomer.slug).toBe(customerUpdateInput.slug);
+    expect(updatedCustomer.settings.logoUrl).toBe(defaultCustomerInput.logo);
+    expect(updatedCustomer.settings.colourSettings.primary).toBe(defaultCustomerInput.primaryColour);
   });
-
 
 });
