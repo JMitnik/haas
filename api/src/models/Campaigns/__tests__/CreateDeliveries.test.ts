@@ -1,4 +1,4 @@
-import { validateDeliveryRows } from '../CreateBatchDeliveriesResolver';
+import { validateDeliveryRows } from '../graphql/CreateBatchDeliveriesResolver';
 
 describe('Delivery creation validation', () => {
   test('it validates a random entry correctly', () => {

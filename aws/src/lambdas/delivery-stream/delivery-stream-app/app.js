@@ -34,6 +34,11 @@ exports.lambdaHandler = async (event, context, callback) => {
 
     await Promise.all(event.Records.map((record) => {
       const row = record.dynamodb.NewImage;
+      let from = 'HAAS'
+
+      if (row.DeliveryFrom && row.DeliveryFrom.S) {
+        from = row.DeliveryFrom.S;
+      }
 
       if (
         record.eventName === 'MODIFY'
@@ -52,14 +57,15 @@ exports.lambdaHandler = async (event, context, callback) => {
           );
 
         } else if (row.DeliveryType.S === 'SMS') {
-          // return sendSNSMessage(
+          // return sendTwilioMessage(
           //   row.DeliveryRecipient.S,
           //   row.DeliveryBody.S,
           //   row.DeliveryDate_DeliveryID.S
           // );
           return sendRecordSMS(
             row.DeliveryRecipient.S,
-            row.DeliveryBody.S
+            row.DeliveryBody.S,
+            from
           );
         }
       }
@@ -98,12 +104,13 @@ const sendRecordEmail = (
 const sendRecordSMS = (
   recipient,
   body,
+  from = 'haas'
 ) => {
   return snsClient.publish({
     MessageAttributes: {
       'AWS.SNS.SMS.SenderID': {
         'DataType': 'String',
-        'StringValue': 'haas'
+        'StringValue': from
       }
     },
     PhoneNumber: recipient,
@@ -116,16 +123,18 @@ const sendRecordSMS = (
   });
 };
 
-const sendSNSMessage = (
+const sendTwilioMessage = (
   recipient,
   body,
-  deliveryId
+  deliveryId,
+  from = 'haas'
 ) => {
   return snsClient.publish({
     TopicArn: `arn:aws:sns:eu-central-1:${accountId}:twilioSMSTopic`,
     Message: JSON.stringify({
       PhoneNumber: recipient,
       body,
+      from,
       deliveryId
     })
   }).promise().catch((err) => {

@@ -1,9 +1,10 @@
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { UserInputError } from 'apollo-server';
-import { NexusGenFieldTypes } from '../../generated/nexus';
-import { PaginationWhereInput } from '../general/Pagination';
+
+import { NexusGenFieldTypes } from '../../../generated/nexus';
+import { PaginationWhereInput } from '../../general/Pagination';
 import { CampaignVariantModel } from './CampaignModel';
-import { CampaignService } from './CampaignService';
+import { CampaignService } from '../CampaignService';
 
 
 export const DeliveryStatusEnum = enumType({
@@ -45,7 +46,7 @@ export const DeliveryEventModel = objectType({
 
 export const DeliveryConnectionModel = objectType({
   name: 'DeliveryConnectionType',
-  
+
   definition(t) {
     t.implements('ConnectionInterface');
     t.list.field('deliveries', { type: DeliveryModel });
@@ -74,13 +75,13 @@ export const GetDelivery = extendType({
   type: 'Query',
 
   definition(t) {
-    t.field('delivery', { 
+    t.field('delivery', {
       type: DeliveryModel,
       nullable: true,
       args: { deliveryId: 'String' },
       resolve: async (parent, args, ctx) => {
         if (!args.deliveryId) throw new UserInputError('You forgot the delivery id');
-        
+
         const delivery = await ctx.prisma.delivery.findFirst({
           where: { id: args.deliveryId || '' },
           include: {
@@ -107,8 +108,8 @@ export const GetDeliveryConnectionOfCampaign = extendType({
   type: 'CampaignType',
 
   definition(t) {
-    t.field('deliveryConnection', { 
-      type: DeliveryConnectionModel, 
+    t.field('deliveryConnection', {
+      type: DeliveryConnectionModel,
       nullable: true,
       args: { filter: DeliveryConnectionFilterInput },
 

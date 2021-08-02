@@ -21,8 +21,8 @@ export class CampaignService {
   /**
    * Gets paginated deliveries given a `campaignId`, generic `paginationOptions` and specific
    * delivery-centric access options.
-   * @param campaignId 
-   * @param paginationOptions 
+   * @param campaignId
+   * @param paginationOptions
    */
   static getPaginatedDeliveries<GenericModelType>(
     campaignId: string,
@@ -67,7 +67,7 @@ export class CampaignService {
 
   /**
    * Fetches general statistics about a specific collection
-   * @param deliveries 
+   * @param deliveries
    */
   static getStatisticsFromDeliveries(
     deliveries: NexusGenFieldTypes['DeliveryType'][],

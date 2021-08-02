@@ -382,12 +382,20 @@ model NodeEntry {
   sliderNodeEntry  SliderNodeEntry?
   choiceNodeEntry  ChoiceNodeEntry?
   textboxNodeEntry TextboxNodeEntry?
+  videoNodeEntry   VideoNodeEntry?
 
   // @Deprecated => FormNodeEntry
   registrationNodeEntry RegistrationNodeEntry?
 
   formNodeEntry FormNodeEntry?
   linkNodeEntry LinkNodeEntry?
+}
+
+model VideoNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       String?
+  nodeEntryId String
+  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model LinkNodeEntry {
@@ -718,6 +726,7 @@ model Delivery {
   deliveryRecipientLastName  String?
   deliveryRecipientEmail     String?
   deliveryRecipientPhone     String?
+  deliveryRecipientPrefix     String?
 
   campaignId String
   campaign   Campaign @relation(fields: [campaignId], references: [id])

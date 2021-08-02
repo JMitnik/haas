@@ -3,8 +3,8 @@
   "steps": [
     {
       "tag": "CreateField",
-      "model": "FormNodeField",
-      "field": "placeholder",
+      "model": "CampaignVariant",
+      "field": "from",
       "type": "String",
       "arity": "Optional"
     }

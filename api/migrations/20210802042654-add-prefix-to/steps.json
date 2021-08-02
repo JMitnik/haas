@@ -508,6 +508,38 @@
     {
       "tag": "CreateField",
       "model": "CustomerSettings",
+      "field": "logoOpacity",
+      "type": "Int",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CustomerSettings",
+          "field": "logoOpacity"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CustomerSettings",
+          "field": "logoOpacity"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "30"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CustomerSettings",
       "field": "colourSettingsId",
       "type": "Int",
       "arity": "Optional"
@@ -1523,6 +1555,13 @@
     {
       "tag": "CreateField",
       "model": "FormNodeField",
+      "field": "placeholder",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
       "field": "type",
       "type": "FormNodeFieldType",
       "arity": "Required"
@@ -1697,6 +1736,13 @@
       },
       "argument": "",
       "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNode",
+      "field": "helperText",
+      "type": "String",
+      "arity": "Optional"
     },
     {
       "tag": "CreateField",
@@ -4815,6 +4861,13 @@
     {
       "tag": "CreateField",
       "model": "NodeEntry",
+      "field": "videoNodeEntry",
+      "type": "VideoNodeEntry",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "NodeEntry",
       "field": "registrationNodeEntry",
       "type": "RegistrationNodeEntry",
       "arity": "Optional"
@@ -4832,6 +4885,113 @@
       "field": "linkNodeEntry",
       "type": "LinkNodeEntry",
       "arity": "Optional"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "VideoNodeEntry"
+    },
+    {
+      "tag": "CreateField",
+      "model": "VideoNodeEntry",
+      "field": "id",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "VideoNodeEntry",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "VideoNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "VideoNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "autoincrement()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "VideoNodeEntry",
+      "field": "value",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "VideoNodeEntry",
+      "field": "nodeEntryId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "VideoNodeEntry",
+      "field": "nodeEntry",
+      "type": "NodeEntry",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "VideoNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "VideoNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "VideoNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[nodeEntryId]"
     },
     {
       "tag": "CreateModel",
@@ -8034,6 +8194,13 @@
       "tag": "CreateField",
       "model": "Delivery",
       "field": "deliveryRecipientPhone",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Delivery",
+      "field": "deliveryRecipientPrefix",
       "type": "String",
       "arity": "Optional"
     },

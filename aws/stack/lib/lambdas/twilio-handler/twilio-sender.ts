@@ -39,6 +39,7 @@ interface MessageProps {
   body: string;
   PhoneNumber: string;
   deliveryId: string;
+  from: string;
 }
 
 exports.main = async function(event: any, context: any) {
@@ -46,6 +47,7 @@ exports.main = async function(event: any, context: any) {
     let phoneNumber = '';
     let body = '';
     let deliveryId = '';
+    let from = ''
 
     // TODO: Maybe loop over records?
     if (!event?.Records[0]?.Sns?.Message) {
@@ -62,6 +64,7 @@ exports.main = async function(event: any, context: any) {
     phoneNumber = message.PhoneNumber;
     body = message.body;
     deliveryId = message.deliveryId;
+    from = message.from || 'haas';
 
     const callbackUrlParam = await ssmClient.getParameter({
       Name: 'TWILIO_CALLBACK_URL'
@@ -76,6 +79,7 @@ exports.main = async function(event: any, context: any) {
     await twilioClient.messages.create({
       to: phoneNumber,
       body,
+      from,
       messagingServiceSid: twilioServiceSID,
       statusCallback: `${stripTrailingSlash(callbackUrl)}?deliveryId=${deliveryId}`,
     });

@@ -1,7 +1,7 @@
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { ApolloError } from 'apollo-server';
-import { CustomerType } from '../customer/Customer';
-import { DialogueType } from '../questionnaire/Dialogue';
+import { CustomerType } from '../../customer/Customer';
+import { DialogueType } from '../../questionnaire/Dialogue';
 
 export const CampaignVariantEnum = enumType({
   name: 'CampaignVariantEnum',
@@ -134,7 +134,7 @@ export const GetCampaignVariantOfDelivery = extendType({
   type: 'DeliveryType',
 
   definition(t) {
-    t.field('campaignVariant', { 
+    t.field('campaignVariant', {
       type: CampaignVariantModel,
       nullable: true,
       resolve: async (parent, args, ctx) => {

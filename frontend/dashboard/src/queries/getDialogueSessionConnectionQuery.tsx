@@ -33,6 +33,7 @@ const getDialogueSessionConnectionQuery = gql`
                 textboxNodeEntry
                 registrationNodeEntry
                 choiceNodeEntry
+                videoNodeEntry
                 linkNodeEntry
                 formNodeEntry {
                   id

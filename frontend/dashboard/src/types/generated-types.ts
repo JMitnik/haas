@@ -137,6 +137,7 @@ export type CreateCampaignVariantInputType = {
   label?: Maybe<Scalars['String']>;
   workspaceId: Scalars['ID'];
   dialogueId: Scalars['ID'];
+  from?: Maybe<Scalars['String']>;
   type: CampaignVariantEnum;
   body?: Maybe<Scalars['String']>;
   weight?: Maybe<Scalars['Float']>;
@@ -197,6 +198,7 @@ export type CreateWorkspaceInput = {
   slug: Scalars['String'];
   name: Scalars['String'];
   logo?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   primaryColour: Scalars['String'];
   isSeed?: Maybe<Scalars['Boolean']>;
   willGenerateFakeData?: Maybe<Scalars['Boolean']>;
@@ -285,6 +287,7 @@ export type CustomerSettings = {
   __typename?: 'CustomerSettings';
   id: Scalars['ID'];
   logoUrl?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   colourSettings?: Maybe<ColourSettings>;
   fontSettings?: Maybe<FontSettings>;
 };
@@ -504,6 +507,7 @@ export type EditWorkspaceInput = {
   slug: Scalars['String'];
   name: Scalars['String'];
   logo?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   primaryColour: Scalars['String'];
 };
 
@@ -558,11 +562,13 @@ export type FormNodeField = {
   type: FormNodeFieldTypeEnum;
   isRequired: Scalars['Boolean'];
   position: Scalars['Int'];
+  placeholder?: Maybe<Scalars['String']>;
 };
 
 export type FormNodeFieldInput = {
   id?: Maybe<Scalars['ID']>;
   label?: Maybe<Scalars['String']>;
+  placeholder?: Maybe<Scalars['String']>;
   type?: Maybe<FormNodeFieldTypeEnum>;
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
@@ -580,12 +586,14 @@ export enum FormNodeFieldTypeEnum {
 
 export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
+  helperText?: Maybe<Scalars['String']>;
   fields?: Maybe<Array<FormNodeFieldInput>>;
 };
 
 export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
+  helperText?: Maybe<Scalars['String']>;
   fields: Array<FormNodeField>;
 };
 
@@ -783,6 +791,7 @@ export type Mutation = {
   inviteUser: InviteUserOutput;
   createSession: Session;
   appendToInteraction: Session;
+  duplicateQuestion?: Maybe<QuestionNode>;
   deleteQuestion: QuestionNode;
   createQuestion?: Maybe<QuestionNode>;
   deleteCTA: QuestionNode;
@@ -1014,6 +1023,11 @@ export type MutationAppendToInteractionArgs = {
 };
 
 
+export type MutationDuplicateQuestionArgs = {
+  questionId?: Maybe<Scalars['String']>;
+};
+
+
 export type MutationDeleteQuestionArgs = {
   input?: Maybe<DeleteNodeInputType>;
 };
@@ -1061,6 +1075,7 @@ export type NodeEntryDataInput = {
   textbox?: Maybe<TextboxNodeEntryInput>;
   form?: Maybe<FormNodeEntryInput>;
   choice?: Maybe<ChoiceNodeEntryInput>;
+  video?: Maybe<VideoNodeEntryInput>;
   register?: Maybe<RegisterNodeEntryInput>;
 };
 
@@ -1079,6 +1094,7 @@ export type NodeEntryValue = {
   registrationNodeEntry?: Maybe<Scalars['String']>;
   choiceNodeEntry?: Maybe<Scalars['String']>;
   linkNodeEntry?: Maybe<Scalars['String']>;
+  videoNodeEntry?: Maybe<Scalars['String']>;
   formNodeEntry?: Maybe<FormNodeEntryType>;
 };
 
@@ -1764,6 +1780,11 @@ export type VerifyUserTokenOutput = {
   userData: UserType;
 };
 
+/** Input type for a video node */
+export type VideoNodeEntryInput = {
+  value?: Maybe<Scalars['String']>;
+};
+
 export type GetWorkspaceAdminsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
 }>;
@@ -2044,6 +2065,19 @@ export type GetWorkspaceDialoguesQuery = (
         & Pick<Tag, 'id' | 'type' | 'name'>
       )>> }
     )>> }
+  )> }
+);
+
+export type DuplicateQuestionMutationVariables = Exact<{
+  questionId?: Maybe<Scalars['String']>;
+}>;
+
+
+export type DuplicateQuestionMutation = (
+  { __typename?: 'Mutation' }
+  & { duplicateQuestion?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id'>
   )> }
 );
 
@@ -2753,6 +2787,39 @@ export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDi
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
     }
+export const DuplicateQuestionDocument = gql`
+    mutation duplicateQuestion($questionId: String) {
+  duplicateQuestion(questionId: $questionId) {
+    id
+  }
+}
+    `;
+export type DuplicateQuestionMutationFn = Apollo.MutationFunction<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
+
+/**
+ * __useDuplicateQuestionMutation__
+ *
+ * To run a mutation, you first call `useDuplicateQuestionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDuplicateQuestionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [duplicateQuestionMutation, { data, loading, error }] = useDuplicateQuestionMutation({
+ *   variables: {
+ *      questionId: // value for 'questionId'
+ *   },
+ * });
+ */
+export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>(DuplicateQuestionDocument, options);
+      }
+export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
+export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
+export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {

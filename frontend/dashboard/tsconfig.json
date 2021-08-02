@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ESNext",
     "lib": [
       "dom",
       "dom.iterable",
@@ -20,6 +20,7 @@
     "baseUrl": "src",
     "jsx": "react",
     "types": [
+      "vite/client", "vite-plugin-svgr/client",
       "jest",
       "@testing-library/jest-dom"
     ],
@@ -27,5 +28,8 @@
   },
   "include": [
     "./src"
+  ],
+  "exclude": [
+    "**/__tests__/**"
   ]
 }
