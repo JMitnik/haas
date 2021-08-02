@@ -8200,6 +8200,13 @@
     {
       "tag": "CreateField",
       "model": "Delivery",
+      "field": "deliveryRecipientPrefix",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Delivery",
       "field": "campaignId",
       "type": "String",
       "arity": "Required"

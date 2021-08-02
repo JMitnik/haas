@@ -726,6 +726,7 @@ model Delivery {
   deliveryRecipientLastName  String?
   deliveryRecipientEmail     String?
   deliveryRecipientPhone     String?
+  deliveryRecipientPrefix     String?
 
   campaignId String
   campaign   Campaign @relation(fields: [campaignId], references: [id])
