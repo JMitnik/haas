@@ -4,8 +4,8 @@ import { isPresent } from 'ts-is-present';
 
 import { CampaignCreateInput } from '@prisma/client';
 import { CampaignModel, CampaignVariantEnum } from './CampaignModel';
-import { NexusGenInputs } from '../../generated/nexus';
-import prisma from '../../config/prisma';
+import { NexusGenInputs } from '../../../generated/nexus';
+import prisma from '../../../config/prisma';
 
 export const CreateCampaignVariantInputType = inputObjectType({
   name: 'CreateCampaignVariantInputType',
