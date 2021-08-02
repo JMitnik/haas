@@ -164,12 +164,15 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
         workspaceName: variant?.campaignVariant?.workspace?.name || '',
       });
 
+      const from = variant.campaignVariant.from;
+
       return {
         ...record,
         id,
         scheduleKey,
         variant,
         body,
+        from,
         scheduleKeyId
       }
     });
@@ -237,6 +240,11 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
             key: 'DeliveryBody',
             type: 'string',
             value: record.body
+          },
+          {
+            key: 'DeliveryFrom',
+            type: 'string',
+            value: record.from || '',
           },
           {
             key: 'DeliveryStatus',
