@@ -3,9 +3,8 @@ import { LoginService } from "../models/auth/LoginService"
 import UserService from "../models/users/UserService"
 import { APIServiceContainer } from "../types/APIContext"
 import { PrismaClient } from "@prisma/client"
-import { PrismaClientOptions } from "@prisma/client/runtime"
 
-export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, never>): APIServiceContainer => {
+export const bootstrapServices = (prisma: PrismaClient): APIServiceContainer => {
   const loginService = new LoginService(mailService);
   const userService = new UserService(prisma);
   return {

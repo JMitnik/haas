@@ -155,7 +155,7 @@ class SessionService {
   }
 
   static async getSessionScore(sessionId: string): Promise<number | undefined | null> {
-    const session = await prisma.session.findOne({
+    const session = await prisma.session.findUnique({
       where: { id: sessionId },
       include: {
         nodeEntries: {
@@ -199,13 +199,13 @@ class SessionService {
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
   ): Promise<Array<SessionWithEntries> | null | undefined> {
-    const dialogue = await prisma.dialogue.findOne({
+    const dialogue = await prisma.dialogue.findUnique({
       where: {
         id: dialogueId,
       },
     });
 
-    const dialougeWithSessionWithEntries = await prisma.dialogue.findOne({
+    const dialougeWithSessionWithEntries = await prisma.dialogue.findUnique({
       where: { id: dialogueId },
       include: {
         sessions: {
@@ -365,7 +365,7 @@ class SessionService {
   };
 
   static async getSessionEntries(session: Session): Promise<NodeEntry[] | []> {
-    const sessionWithEntries = await prisma.session.findOne({
+    const sessionWithEntries = await prisma.session.findUnique({
       where: { id: session.id },
       include: {
         nodeEntries: {

@@ -69,7 +69,7 @@ class AuthService {
 
   static async verifyUserRefreshToken(userId: string): Promise<boolean> {
     try {
-      const user = await prisma.user.findOne({
+      const user = await prisma.user.findUnique({
         where: { id: userId },
       });
 

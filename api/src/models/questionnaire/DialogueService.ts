@@ -144,7 +144,7 @@ class DialogueService {
       language
     } = args;
 
-    const customer = await prisma.customer.findOne({
+    const customer = await prisma.customer.findUnique({
       where: {
         slug: customerSlug,
       },
@@ -241,7 +241,7 @@ class DialogueService {
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
 
-    const dialogueWithNodes = await prisma.dialogue.findOne({
+    const dialogueWithNodes = await prisma.dialogue.findUnique({
       where: { id: dialogueId },
       include: {
         questions: true,
@@ -359,7 +359,7 @@ class DialogueService {
   };
 
   static deleteDialogue = async (dialogueId: string) => {
-    const dialogue = await prisma.dialogue.findOne({
+    const dialogue = await prisma.dialogue.findUnique({
       where: {
         id: dialogueId,
       },
@@ -532,7 +532,7 @@ class DialogueService {
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
     language: LanguageEnum = 'ENGLISH') => {
-    const templateDialogue = await prisma.dialogue.findOne({
+    const templateDialogue = await prisma.dialogue.findUnique({
       where: {
         id: templateId,
       },

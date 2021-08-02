@@ -46,7 +46,7 @@ export const TagQueries = extendType({
         }
 
         if (args.customerSlug) {
-          const customer = await ctx.prisma.customer.findOne({
+          const customer = await ctx.prisma.customer.findUnique({
             where: { slug: args.customerSlug },
             include: {
               tags: true,
@@ -106,7 +106,7 @@ export const TagMutations = extendType({
       async resolve(parent, args, ctx) {
         if (!args.customerSlug) throw new UserInputError('No customer slug provided for which tag to create');
 
-        const customer = await ctx.prisma.customer.findOne({
+        const customer = await ctx.prisma.customer.findUnique({
           where: { slug: args.customerSlug },
         });
 

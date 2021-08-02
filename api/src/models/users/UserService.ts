@@ -1,4 +1,4 @@
-import { FindManyUserOfCustomerArgs, UserOfCustomer, PrismaClient, PrismaClientOptions } from '@prisma/client';
+import { Prisma, UserOfCustomer, PrismaClient } from '@prisma/client';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import _ from 'lodash';
@@ -10,12 +10,11 @@ import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import prisma from '../../config/prisma';
 import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
-import { UserServiceType } from './UserServiceTypes';
 
-class UserService implements UserServiceType {
-  prisma: PrismaClient<PrismaClientOptions, never>;
+class UserService {
+  prisma: PrismaClient;
 
-  constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
+  constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
 
@@ -248,7 +247,7 @@ class UserService implements UserServiceType {
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const userOfCustomerFindManyArgs: FindManyUserOfCustomerArgs = {
+    const userOfCustomerFindManyArgs: Prisma.UserOfCustomerFindManyArgs = {
       where: {
         customer: { slug: customerSlug },
       },
@@ -259,7 +258,7 @@ class UserService implements UserServiceType {
       },
     };
 
-    const countWhereInput: FindManyUserOfCustomerArgs = {
+    const countWhereInput: Prisma.UserOfCustomerFindManyArgs = {
       where: {
         customer: { slug: customerSlug },
       }

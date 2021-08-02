@@ -37,7 +37,7 @@ export const CustomerSettingsType = objectType({
       resolve(parent, args, ctx) {
         if (!parent.colourSettingsId) return null;
 
-        const colourSettings = ctx.prisma.colourSettings.findOne({
+        const colourSettings = ctx.prisma.colourSettings.findUnique({
           where: { id: parent.colourSettingsId || undefined },
         });
 
@@ -50,7 +50,7 @@ export const CustomerSettingsType = objectType({
       type: FontSettingsType,
 
       resolve(parent, args, ctx) {
-        const colourSettings = ctx.prisma.fontSettings.findOne({
+        const colourSettings = ctx.prisma.fontSettings.findUnique({
           where: { id: parent.fontSettingsId || undefined },
         });
 

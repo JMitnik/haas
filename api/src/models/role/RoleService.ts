@@ -39,7 +39,7 @@ class RoleService {
   };
 
   static async fetchDefaultRoleForCustomer(customerId: string) {
-    const customerWithRoles = await prisma.customer.findOne({
+    const customerWithRoles = await prisma.customer.findUnique({
       where: { id: customerId || undefined },
       include: {
         roles: true,
@@ -59,9 +59,11 @@ class RoleService {
 
   static roles = async (customerSlug: string) => {
     const roles = await prisma.role.findMany({
-      where: { Customer: {
-        slug: customerSlug,
-      } },
+      where: {
+        Customer: {
+          slug: customerSlug,
+        }
+      },
     });
 
     const rolesWithNrPermisisons = roles.map((role) => ({

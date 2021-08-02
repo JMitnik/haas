@@ -37,7 +37,7 @@ export const CustomerType = objectType({
       nullable: true,
 
       async resolve(parent: Customer, args, ctx) {
-        const customerSettings = await ctx.prisma.customerSettings.findOne({
+        const customerSettings = await ctx.prisma.customerSettings.findUnique({
           where: { customerId: parent.id },
         });
 
@@ -99,7 +99,7 @@ export const CustomerType = objectType({
       async resolve(parent, args, ctx) {
         if (!args.userId) throw new UserInputError('No valid user id provided');
 
-        const customerWithUsers = await ctx.prisma.customer.findOne({
+        const customerWithUsers = await ctx.prisma.customer.findUnique({
           where: { id: parent.id },
           include: {
             users: {
@@ -154,7 +154,7 @@ export const CustomerType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        const customer = await ctx.prisma.customer.findOne({
+        const customer = await ctx.prisma.customer.findUnique({
           where: { id: parent.id },
           include: {
             users: {
@@ -258,11 +258,11 @@ export const WorkspaceMutations = Upload && extendType({
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
           },
-          (error, result: UploadApiResponse | undefined) => {
-            if (result) return resolve(result);
+            (error, result: UploadApiResponse | undefined) => {
+              if (result) return resolve(result);
 
-            return reject(error);
-          });
+              return reject(error);
+            });
 
           return createReadStream().pipe(cld_upload_stream);
         });
@@ -361,12 +361,12 @@ export const CustomerQuery = extendType({
       nullable: true,
       async resolve(parent, args, ctx) {
         if (args.slug) {
-          const customer = await ctx.prisma.customer.findOne({ where: { slug: args.slug } });
+          const customer = await ctx.prisma.customer.findUnique({ where: { slug: args.slug } });
           return customer;
         }
 
         if (args.id) {
-          const customer = await ctx.prisma.customer.findOne({ where: { id: args.id } });
+          const customer = await ctx.prisma.customer.findUnique({ where: { id: args.id } });
           return customer;
         }
 

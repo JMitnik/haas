@@ -1,6 +1,8 @@
-import { PrismaClient,
+import {
+  PrismaClient,
   TriggerCreateInput,
-  TriggerUpdateInput } from '@prisma/client';
+  TriggerUpdateInput
+} from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { DialogueType } from '../questionnaire/Dialogue';
@@ -191,7 +193,7 @@ const TriggerMutations = extendType({
 
       async resolve(parent, args, ctx) {
         if (!args.triggerId) throw new Error('No valid trigger ID provided');
-        const dbTrigger = await ctx.prisma.trigger.findOne({
+        const dbTrigger = await ctx.prisma.trigger.findUnique({
           where: { id: args.triggerId },
           include: {
             conditions: true,
@@ -236,7 +238,7 @@ const TriggerMutations = extendType({
         if (!args.input.customerSlug) throw new Error('No provided customer found');
 
         // TODO: Setup sensible defaults instead of these?
-        const createArgs : TriggerCreateInput = {
+        const createArgs: TriggerCreateInput = {
           name: args.input.trigger?.name || '',
           medium: args.input.trigger?.medium || 'EMAIL',
           type: args.input.trigger?.type || 'QUESTION',
@@ -316,11 +318,11 @@ const TriggerQueries = extendType({
         // TODO: Do we put this here, or extract it from the graph?
         // const users = await ctx.prisma.trigger.findMany({ where: { customerId: args.customerId } });
 
-        return { 
-          triggers: entries as NexusGenFieldTypes['TriggerType'][], 
-          pageInfo, 
-          offset: args.filter?.offset || 0, 
-          limit: args.filter?.limit || 0 
+        return {
+          triggers: entries as NexusGenFieldTypes['TriggerType'][],
+          pageInfo,
+          offset: args.filter?.offset || 0,
+          limit: args.filter?.limit || 0
         };
       },
     });
@@ -333,7 +335,7 @@ const TriggerQueries = extendType({
       async resolve(parent, args, ctx) {
         if (!args.triggerId) throw new Error('No id provided');
 
-        const trigger = await ctx.prisma.trigger.findOne({ where: { id: args.triggerId } });
+        const trigger = await ctx.prisma.trigger.findUnique({ where: { id: args.triggerId } });
 
         if (!trigger) throw new Error('Cant find trigger');
 

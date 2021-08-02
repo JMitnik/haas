@@ -13,7 +13,7 @@ const getWorkSpaceFromReq = async (req: Request) => {
   const vars = req.body.variables;
 
   if (vars?.customerSlug || vars?.input?.customerSlug) {
-    const customer = await prisma.customer.findOne({
+    const customer = await prisma.customer.findUnique({
       where: {
         slug: vars?.customerSlug || vars?.input?.customerSlug,
       },
@@ -23,7 +23,7 @@ const getWorkSpaceFromReq = async (req: Request) => {
   }
 
   if (vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId) {
-    const customer = await prisma.customer.findOne({
+    const customer = await prisma.customer.findUnique({
       where: {
         id: vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId,
       },
@@ -67,7 +67,7 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
   if (!decodedUserId) return null;
   if (!decodedExpAt) return null;
 
-  const user = await prisma.user.findOne({
+  const user = await prisma.user.findUnique({
     where: {
       id: decodedUserId,
     },
@@ -89,7 +89,7 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
   const workspace = await getWorkSpaceFromReq(context.req);
   const activeWorkspace = customersAndPermissions?.find((userCustomer) => userCustomer.id === workspace?.id) || null;
 
-  const baseUrl = process.env.ENVIRONMENT === 'local' ? await fetchTunnelUrl(): config.baseUrl;
+  const baseUrl = process.env.ENVIRONMENT === 'local' ? await fetchTunnelUrl() : config.baseUrl;
 
   return {
     user,

@@ -77,7 +77,7 @@ export const createJobProcessLocationInput = inputObjectType({
 
 export const CreateJobProcessLocationMutation = mutationField('createJobProcessLocation', {
   type: JobProcessLocation,
-  args: {input : createJobProcessLocationInput},
+  args: { input: createJobProcessLocationInput },
   resolve(parent, args) {
     return AutodeckService.createJobProcessLocation(args.input)
   }
@@ -92,7 +92,7 @@ export const CloudReferenceType = enumType({
 export const JobStatusType = enumType({
   name: 'JobStatusType',
   members: ['PENDING', 'PRE_PROCESSING', 'IN_PHOTOSHOP_QUEUE', 'PRE_PROCESSING_LOGO',
-    'PRE_PROCESSING_WEBSITE_SCREENSHOT', 'PHOTOSHOP_PROCESSING', 'PROCESSING', 'WRAPPING_UP' ,
+    'PRE_PROCESSING_WEBSITE_SCREENSHOT', 'PHOTOSHOP_PROCESSING', 'PROCESSING', 'WRAPPING_UP',
     'COMPLETED', 'FAILED', 'READY_FOR_PROCESSING', 'TRANSFORMING_PSDS_TO_PNGS', 'STITCHING_SLIDES', 'COMPRESSING_SALES_MATERIAL'],
 });
 
@@ -269,7 +269,7 @@ export const RetryAutodeckJobMutation = mutationField('retryAutodeckJob', {
     if (!jobId) {
       return null;
     }
-    
+
     const job = await AutodeckService.retryJob(jobId);
 
     return job ? job as any : null;
@@ -298,7 +298,7 @@ export const GetJobQuery = queryField('getJob', {
   async resolve(parent, args, ctx) {
     if (!args.id) return null;
 
-    const job = await ctx.prisma.createWorkspaceJob.findOne({
+    const job = await ctx.prisma.createWorkspaceJob.findUnique({
       where: {
         id: args.id,
       },
@@ -364,7 +364,7 @@ export const AdjustedImageInput = inputObjectType({
   name: 'AdjustedImageInput',
   definition(t) {
     t.string('id', { nullable: true });
-    t.string('key', { nullable: true});
+    t.string('key', { nullable: true });
     t.string('bucket');
     t.boolean('reset', { nullable: true })
   }
@@ -383,11 +383,11 @@ export const GetAdjustedLogoQuery = queryField('getAdjustedLogo', {
 export const WhitifyImageMutation = mutationField('whitifyImage', {
   type: AWSImageType,
   nullable: true,
-  args: { input : AdjustedImageInput},
+  args: { input: AdjustedImageInput },
   resolve(parent, args) {
     if (!args.input) return null;
     AutodeckService.whitifyImage(args.input)
-    return { url: 'Succesfully started lambda'}
+    return { url: 'Succesfully started lambda' }
   }
 })
 
@@ -400,7 +400,7 @@ export const RemovePixelRangeMutation = mutationField('removePixelRange', {
 
     AutodeckService.removePixelRange(args.input)
 
-    return { url: 'succesfully start lambda i guess'};
+    return { url: 'succesfully start lambda i guess' };
   }
 })
 

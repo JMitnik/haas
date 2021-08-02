@@ -125,7 +125,7 @@ export const SessionQuery = extendType({
           return null;
         }
 
-        const session = await ctx.prisma.session.findOne({
+        const session = await ctx.prisma.session.findUnique({
           where: {
             id: args.where.id,
           },

@@ -39,7 +39,7 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
 
     let customerId = '';
     if (!args.input?.customerId && args.input?.customerSlug) {
-      const customer = await ctx.prisma.customer.findOne({
+      const customer = await ctx.prisma.customer.findUnique({
         where: { slug: args.input.customerSlug },
       });
       customerId = customer?.id || '';
@@ -47,7 +47,7 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
       customerId = args.input.customerId || '';
     }
 
-    const userWithCustomer = await ctx.prisma.userOfCustomer.findOne({
+    const userWithCustomer = await ctx.prisma.userOfCustomer.findUnique({
       where: {
         userId_customerId: {
           customerId,
@@ -112,7 +112,7 @@ export const UserType = objectType({
       type: SystemPermission,
 
       async resolve(parent, args, ctx) {
-        const user = await ctx.prisma.user.findOne({
+        const user = await ctx.prisma.user.findUnique({
           where: { id: parent.id },
         });
 
@@ -124,7 +124,7 @@ export const UserType = objectType({
       type: UserCustomerType,
 
       async resolve(parent, args, ctx) {
-        const userWithCustomers = await ctx.prisma.user.findOne({
+        const userWithCustomers = await ctx.prisma.user.findUnique({
           where: { id: parent.id },
           include: {
             customers: {
@@ -156,7 +156,7 @@ export const UserType = objectType({
       type: 'Customer',
 
       async resolve(parent, args, ctx) {
-        const userWithCustomers = await ctx.prisma.user.findOne({
+        const userWithCustomers = await ctx.prisma.user.findUnique({
           where: { id: parent.id },
           include: {
             customers: {
@@ -179,7 +179,7 @@ export const UserType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx, info) {
-        const userWithRole = await ctx.prisma.user.findOne({
+        const userWithRole = await ctx.prisma.user.findUnique({
           where: { id: parent.id || undefined },
           include: {
             customers: {
@@ -264,7 +264,7 @@ export const RootUserQueries = extendType({
         if (!ctx.session?.user?.id) throw new ApolloError('No valid user');
         const userId = ctx.session?.user?.id;
 
-        const user = await ctx.prisma.user.findOne({
+        const user = await ctx.prisma.user.findUnique({
           where: { id: userId },
           include: {
             customers: {
@@ -295,9 +295,13 @@ export const RootUserQueries = extendType({
 
       resolve(parent, args, ctx) {
         if (!args.customerSlug) throw new UserInputError('No business provided');
-        return ctx.prisma.user.findMany({ where: { customers: {
-          every: { customer: { slug: args.customerSlug || undefined } },
-        } } });
+        return ctx.prisma.user.findMany({
+          where: {
+            customers: {
+              every: { customer: { slug: args.customerSlug || undefined } },
+            }
+          }
+        });
       },
     });
     t.field('user', {
@@ -308,7 +312,7 @@ export const RootUserQueries = extendType({
       async resolve(parent, args, ctx) {
         if (!args.userId) throw new UserInputError('No valid user id provided');
 
-        const user = await ctx.prisma.user.findOne({ where: { id: args.userId } });
+        const user = await ctx.prisma.user.findUnique({ where: { id: args.userId } });
 
         if (!user) throw new UserInputError('Cant find user with this ID');
         return user || null;
@@ -359,10 +363,12 @@ export const UserMutations = extendType({
 
         if (args.input.customerId) {
           await ctx.prisma.userOfCustomer.update({
-            where: { userId_customerId: {
-              userId: args?.userId,
-              customerId: args.input.customerId,
-            } },
+            where: {
+              userId_customerId: {
+                userId: args?.userId,
+                customerId: args.input.customerId,
+              }
+            },
             data: {
               role: {
                 connect: {

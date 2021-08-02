@@ -52,7 +52,7 @@ export const LinkType = objectType({
     t.field('questionNode', {
       type: QuestionNodeType,
       async resolve(parent, args, ctx) {
-        const link = await ctx.prisma.link.findOne({
+        const link = await ctx.prisma.link.findUnique({
           where: { id: parent.id },
           include: { questionNode: true },
         });

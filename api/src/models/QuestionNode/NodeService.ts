@@ -596,7 +596,7 @@ class NodeService {
       },
     });
 
-    const deletedQuestion = await prisma.questionNode.findOne({
+    const deletedQuestion = await prisma.questionNode.findUnique({
       where: {
         id,
       }
@@ -722,7 +722,7 @@ class NodeService {
     happyText: string | null | undefined,
     unhappyText: string | null | undefined,
   ) => {
-    const existingQuestion = await prisma.questionNode.findOne({
+    const existingQuestion = await prisma.questionNode.findUnique({
       where: { id: questionId },
       include: {
         videoEmbeddedNode: true,
@@ -741,7 +741,7 @@ class NodeService {
       }
     });
 
-    const existingEdge = await prisma.edge.findOne({
+    const existingEdge = await prisma.edge.findUnique({
       where: { id: edgeId },
       include: {
         conditions: true,
