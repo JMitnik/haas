@@ -590,7 +590,7 @@ describe('DialoguePrismaAdapter', () => {
     expect(targetOneTag).not.toBeUndefined();
   });
 
-  test('Finds dialogue by dialogue ID', async () => {
+  test('Finds dialogue (with questions and edges) by dialogue ID', async () => {
     const defaultDialogueId = cuid();
     const dialogueCreateInputWithEdgesAndQuestions: DialogueCreateInput = {
       ...defaultDialogueCreateInput,
