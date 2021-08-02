@@ -158,7 +158,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       const body = mustache.render(templateBody, {
         firstName: record.firstName,
         lastName: record.lastName,
-        prefix: record.prefix,
+        prefix: record.prefix || '',
         dialogueUrl,
         dialogueName: variant?.campaignVariant?.dialogue?.title || '',
         workspaceName: variant?.campaignVariant?.workspace?.name || '',
