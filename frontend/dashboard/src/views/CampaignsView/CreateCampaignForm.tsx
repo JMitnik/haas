@@ -39,8 +39,8 @@ const variantSchema = yup.object({
   from: yup.string().when('type', {
     is: (ctaType) => ctaType === 'SMS',
     // @ts-ignore
-    // TODO: Validate no whitespace
-    then: yup.string().max(MAX_SMS_FROM_CHARACTERS).noWhitespace(),
+    // FIXME:  yup.string(...).max(...).noWhitespace is not a function. Had to remove noWhitespace()
+    then: yup.string().max(MAX_SMS_FROM_CHARACTERS),
     otherwise: yup.string().notRequired(),
   }),
   dialogue: yup.object({
