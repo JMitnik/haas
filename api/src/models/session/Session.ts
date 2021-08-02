@@ -29,7 +29,7 @@ export const SessionType = objectType({
         // @ts-ignore
         if (parent.score) return parent.score;
 
-        const score = await SessionService.getSessionScore(parent.id) || 0.0;
+        const score = (await SessionService.getSessionScore(parent.id)) || 0.0;
 
         return score;
       },

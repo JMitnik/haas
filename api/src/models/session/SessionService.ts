@@ -1,7 +1,5 @@
 /* eslint-disable import/no-cycle */
-import {
-  NodeEntry, Session, SessionOrderByInput, SessionWhereInput,
-} from '@prisma/client';
+import { NodeEntry, Session, Prisma } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 
 import { sortBy } from 'lodash';
@@ -178,7 +176,7 @@ class SessionService {
     return rootedNodeEntry?.sliderNodeEntry?.value;
   }
 
-  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (SessionOrderByInput | undefined) {
+  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (Prisma.SessionOrderByInput | undefined) {
     if (!orderByArray?.length) return undefined;
 
     const orderBy = orderByArray[0];
@@ -386,8 +384,8 @@ class SessionService {
   }
 
   // TODO: Make Utils script
-  static constructDateRangeWhereInput(startDate?: Date, endDate?: Date): SessionWhereInput[] | [] {
-    let dateRange: SessionWhereInput[] | [] = [];
+  static constructDateRangeWhereInput(startDate?: Date, endDate?: Date): Prisma.SessionWhereInput[] | [] {
+    let dateRange: Prisma.SessionWhereInput[] | [] = [];
 
     if (startDate && !endDate) {
       dateRange = [

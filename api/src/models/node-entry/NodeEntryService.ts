@@ -1,9 +1,12 @@
 import {
   ChoiceNodeEntry,
-  FormNodeEntryGetPayload,
-  LinkNodeEntry, NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
-  QuestionNode, RegistrationNodeEntry,
-  SliderNodeEntry, TextboxNodeEntry
+  Prisma,
+  LinkNodeEntry,
+  NodeEntry,
+  QuestionNode,
+  RegistrationNodeEntry,
+  SliderNodeEntry,
+  TextboxNodeEntry,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
@@ -22,14 +25,14 @@ export interface NodeEntryWithTypes extends NodeEntry {
   relatedNode?: QuestionNode | null;
   sliderNodeEntry?: SliderNodeEntry | undefined | null;
   choiceNodeEntry?: ChoiceNodeEntry | undefined | null;
-  formNodeEntry?: FormNodeEntryGetPayload<{ include: { values: true } }> | undefined | null;
+  formNodeEntry?: Prisma.FormNodeEntryGetPayload<{ include: { values: true } }> | undefined | null;
   registrationNodeEntry?: RegistrationNodeEntry | undefined | null;
   textboxNodeEntry?: TextboxNodeEntry | undefined | null;
   linkNodeEntry?: LinkNodeEntry | undefined | null;
 }
 
 class NodeEntryService {
-  static constructCreateNodeEntryFragment = (nodeEntryInput: NexusGenInputs['NodeEntryInput']): NodeEntryCreateWithoutSessionInput => ({
+  static constructCreateNodeEntryFragment = (nodeEntryInput: NexusGenInputs['NodeEntryInput']): Prisma.NodeEntryCreateWithoutSessionInput => ({
     relatedNode: (nodeEntryInput.nodeId && { connect: { id: nodeEntryInput.nodeId } }) || undefined,
     relatedEdge: (nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } }) || undefined,
     depth: nodeEntryInput?.depth,
@@ -178,7 +181,7 @@ class NodeEntryService {
    * Used generally in the fetching of relevant interactions/sessions.
    * @param text
    */
-  static constructFindWhereTextNodeEntryFragment(text: string): NodeEntryWhereInput {
+  static constructFindWhereTextNodeEntryFragment(text: string): Prisma.NodeEntryWhereInput {
     return {
       OR: [
         {

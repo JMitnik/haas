@@ -9,7 +9,7 @@ import request from 'request';
 import config from '../../config/config';
 import prisma from '../../config/prisma';
 import { NexusGenInputs } from '../../generated/nexus';
-import { FindManyCreateWorkspaceJobArgs } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import CustomerService from '../customer/CustomerService';
 
@@ -78,7 +78,7 @@ class AutodeckService {
   static paginatedAutodeckJobs = async (
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const findManyTriggerArgs: FindManyCreateWorkspaceJobArgs = {
+    const findManyTriggerArgs: Prisma.CreateWorkspaceJobFindManyArgs = {
       where: {
         id: {
           not: undefined
@@ -122,7 +122,7 @@ class AutodeckService {
       },
       data: {
         fields: {
-          create: input?.newCustomFields?.map(({key, value}) => ({ key: key || '', value: value || '' }))
+          create: input?.newCustomFields?.map(({ key, value }) => ({ key: key || '', value: value || '' }))
         }
       }
     })
@@ -149,7 +149,7 @@ class AutodeckService {
         if (err) return reject(err);
         const fileWithAdjusted = data.Contents?.find((file) => file.Key?.includes('/adjusted'))
         if (!fileWithAdjusted) {
-         resolve(false)
+          resolve(false)
         }
         resolve(true);
       })
