@@ -4,8 +4,8 @@ import { isPresent } from 'ts-is-present';
 
 import { CampaignCreateInput } from '@prisma/client';
 import { CampaignModel, CampaignVariantEnum } from './CampaignModel';
-import { NexusGenInputs } from '../../generated/nexus';
-import prisma from '../../config/prisma';
+import { NexusGenInputs } from '../../../generated/nexus';
+import prisma from '../../../config/prisma';
 
 export const CreateCampaignVariantInputType = inputObjectType({
   name: 'CreateCampaignVariantInputType',
@@ -13,6 +13,7 @@ export const CreateCampaignVariantInputType = inputObjectType({
     t.string('label');
     t.id('workspaceId', { required: true });
     t.id('dialogueId', { required: true });
+    t.string('from', { required: false });
     t.field('type', { type: CampaignVariantEnum, required: true });
     t.string('body');
     t.float('weight');
@@ -54,6 +55,7 @@ const saveCampaign = (input: NexusGenInputs['CreateCampaignInputType']): Campaig
         create: {
           label: variant.label || '',
           subject: variant.subject,
+          from: variant.from,
           type: variant.type,
           body: variant.body || '',
           dialogue: {

@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    from: {
+      en: 'From',
+      de: 'Aus',
+    },
     yes: {
       en: 'Yes',
       de: 'Ja',

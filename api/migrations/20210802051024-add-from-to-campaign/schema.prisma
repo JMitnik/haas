@@ -702,6 +702,7 @@ model CampaignVariant {
   workspace Customer @relation(fields: [customerId], references: [id])
   dialogue  Dialogue @relation(fields: [dialogueId], references: [id])
 
+  from                      String?
   subject                   String?
   type                      CampaignVariantTypeEnum
   CampaignVariantToCampaign CampaignVariantToCampaign[]
@@ -726,6 +727,7 @@ model Delivery {
   deliveryRecipientLastName  String?
   deliveryRecipientEmail     String?
   deliveryRecipientPhone     String?
+  deliveryRecipientPrefix     String?
 
   campaignId String
   campaign   Campaign @relation(fields: [campaignId], references: [id])

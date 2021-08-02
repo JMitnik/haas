@@ -54,7 +54,8 @@
         "test:watch:dashboard": "yarn workspace @haas/dashboard test:watch",
         "test:cypress-dashboard": "yarn workspace @haas/dashboard cypress open",
         "test:cypress-client": "yarn workspace @haas/client cypress open",
-        "restart:api": "yarn kill:api && yarn start:api"
+        "restart:api": "yarn kill:api && yarn start:api",
+        "tunnel:api": "ngrok http https://localhost:4000"
     },
     "devDependencies": {
         "concurrently": "^5.1.0",
