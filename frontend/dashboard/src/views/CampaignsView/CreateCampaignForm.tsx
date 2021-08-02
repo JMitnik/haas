@@ -63,7 +63,13 @@ const schema = yup.object({
 type FormProps = yup.InferType<typeof schema>;
 type VariantFormProps = yup.InferType<typeof variantSchema>;
 
-const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFormMethods<FormProps>, activeVariantIndex: number, variant: any }) => {
+interface ActiveVariantFormProps {
+  form: UseFormMethods<FormProps>;
+  activeVariantIndex: number;
+  variant: any;
+}
+
+const ActiveVariantForm = ({ form, activeVariantIndex, variant }: ActiveVariantFormProps) => {
   const activeVariant = form.watch(`variants[${activeVariantIndex}]`) as VariantFormProps;
   const { t } = useTranslation();
 
@@ -293,7 +299,11 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
     const maxValue = Math.min(event.target.value, 100);
     const value = Math.max(maxValue, 0);
 
-    const otherFields = variants.map((item, index) => ({ ...item, originalIndex: index })).filter((item, index) => index !== currentItemIndex);
+    const otherFields = variants.map((item, index) => ({
+      ...item,
+      originalIndex: index,
+    })).filter((item, index) => index !== currentItemIndex);
+
     const distributed = 100 - value;
     otherFields.forEach((field) => {
       form.setValue(`variants.${field.originalIndex}.weight`, distributed);
