@@ -2648,17 +2648,35 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.9.2.tgz#adea7b6953cbb34651766b0548468e743c6a2353"
   integrity sha512-VZMYa7+fXHdwIq1TDhSXoVmSPEGM/aa+6Aiq3nVVJ9bXr24zScr+NlKFKC3iPljA7ho/GAZr+d2jOf5GIRC30Q==
 
-"@prisma/cli@2.8.0":
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/@prisma/cli/-/cli-2.8.0.tgz#919d7f66023affa76d14823212b62a8512cfd37d"
-  integrity sha512-Kg1C47d75jdEIMmJif8TMlv/2Ihx08E1qWp0euwoZhjd807HGnjgC9tJYjTfkdf+NMJSAUbvoPXKInEX0HoOMw==
+"@prisma/bar@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@prisma/bar/-/bar-0.0.1.tgz#088c4fbbb79c588391437ade9fd3a85527e753b3"
+  integrity sha512-FVLhwVkbfhXlBhroWfIXMLi+3Jh9IEzYp+9z+MUUiw3ZsbcoAil7CN9/QIjHc4/TcCRyRfuSmT7qCnn4O+TjJw==
 
-"@prisma/client@2.8.0":
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-2.8.0.tgz#a0f7247786c9b6ee804437acf8215854c5eb3946"
-  integrity sha512-5+GzRTkPnmv4OEV2tB8kwQt/xLLxBR/daJBcMt6pnnonJvrREsu0tSTdz2LJNPaj3kTT0fSS/OaeGMMdfVYSpw==
+"@prisma/cli@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@prisma/cli/-/cli-2.12.0.tgz#1c607e53b23632e01bf0b1ee86b5ab5a8864dfef"
+  integrity sha512-6olsgYNo1WePykEjKD3I49OCu9QKASoLLYV04y5UZxBqwkfxPoD8ppE+kc1nvRF8u+TU0oTLMphNTj2/l6tNsg==
   dependencies:
-    pkg-up "^3.1.0"
+    "@prisma/bar" "^0.0.1"
+    "@prisma/engines" "2.12.0-18.cf0680a1bfe8d5e743dc659cc7f08009f9587d58"
+
+"@prisma/client@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-2.12.0.tgz#6910a24607357ea272ecb516f44eb8730bd7bd4c"
+  integrity sha512-OozxNF5I8+amaMLlb7NZK3XbvmUgBRUpq2cqresmIhsrfH/LaOaAr4riDW3cF/YgIEpb4tgPoSUEDI3VKyD4yg==
+  dependencies:
+    "@prisma/engines-version" "2.12.0-18.cf0680a1bfe8d5e743dc659cc7f08009f9587d58"
+
+"@prisma/engines-version@2.12.0-18.cf0680a1bfe8d5e743dc659cc7f08009f9587d58":
+  version "2.12.0-18.cf0680a1bfe8d5e743dc659cc7f08009f9587d58"
+  resolved "https://registry.yarnpkg.com/@prisma/engines-version/-/engines-version-2.12.0-18.cf0680a1bfe8d5e743dc659cc7f08009f9587d58.tgz#428f8996f88c92a4142e35f196584a5e17c95871"
+  integrity sha512-IHb/Jag1Wmoq5tLZhOHP5zqLHEXqQEfrHb6l0drIBSvh2AF7yWQ3yyuD0ZEb1Nq37SvbBgop5wrWMOU8YWFTGQ==
+
+"@prisma/engines@2.12.0-18.cf0680a1bfe8d5e743dc659cc7f08009f9587d58":
+  version "2.12.0-18.cf0680a1bfe8d5e743dc659cc7f08009f9587d58"
+  resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-2.12.0-18.cf0680a1bfe8d5e743dc659cc7f08009f9587d58.tgz#0e23c811cfa2f58650bb3c04394b1ac0d9dac78a"
+  integrity sha512-F6RmUZ5JpPWxmGvVDji8c4gepHIGkvYbtuFi0IoDDJVaCVo8yS656stciKFyswI6/BLWXa0X47/MIMbz6nzw7g==
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -12850,7 +12868,7 @@ is-color-stop@^1.0.0:
     rgb-regex "^1.0.1"
     rgba-regex "^1.0.0"
 
-is-core-module@^2.2.0, is-core-module@^2.4.0:
+is-core-module@^2.2.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.4.0.tgz#8e9fc8e15027b011418026e98f0e6f4d86305cc1"
   integrity sha512-6A2fkfq1rfeQZjxrZJGerpLCTHRNEBiSgnu0+obeJpEPZRUooHgsizvzv0ZjJwOz3iWIHdJtVWJ/tmPr3D21/A==
