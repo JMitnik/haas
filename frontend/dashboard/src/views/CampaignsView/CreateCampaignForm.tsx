@@ -38,7 +38,9 @@ const variantSchema = yup.object({
   type: yup.mixed().oneOf(['EMAIL', 'SMS']).required(),
   from: yup.string().when('type', {
     is: (ctaType) => ctaType === 'SMS',
-    then: yup.string().max(MAX_SMS_FROM_CHARACTERS),
+    // @ts-ignore
+    // TODO: Validate no whitespace
+    then: yup.string().max(MAX_SMS_FROM_CHARACTERS).noWhitespace(),
     otherwise: yup.string().notRequired(),
   }),
   dialogue: yup.object({
