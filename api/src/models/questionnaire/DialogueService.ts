@@ -3,14 +3,7 @@ import _, { cloneDeep } from 'lodash';
 import cuid from 'cuid';
 
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import {
-  Dialogue, DialogueCreateInput, DialogueUpdateInput,
-  LanguageEnum,
-  NodeType,
-  PostLeafNode,
-  PostLeafNodeUpdateOneWithoutDialogueInput,
-  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
-} from '@prisma/client';
+import { Dialogue, Prisma, LanguageEnum, NodeType, PostLeafNode, Tag } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import NodeService from '../QuestionNode/NodeService';
 import filterDate from '../../utils/filterDate';
@@ -40,7 +33,7 @@ class DialogueService {
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
     language: LanguageEnum,
-  ): DialogueCreateInput {
+  ): Prisma.DialogueCreateInput {
     const constructDialogueFragment = {
       customer: { connect: { id: customerId } },
       title,
@@ -80,11 +73,11 @@ class DialogueService {
   static updateTags = (
     dbTags: Array<Tag>,
     newTags: Array<string>,
-    updateDialogueArgs: DialogueUpdateInput,
+    updateDialogueArgs: Prisma.DialogueUpdateInput,
   ) => {
     const newTagObjects = newTags.map((tag) => ({ id: tag }));
 
-    const deleteTagObjects: TagWhereUniqueInput[] = [];
+    const deleteTagObjects: Prisma.TagWhereUniqueInput[] = [];
     dbTags.forEach((tag) => {
       if (!newTags.includes(tag.id)) {
         deleteTagObjects.push({ id: tag.id });
@@ -107,7 +100,7 @@ class DialogueService {
     dbPostLeaf: PostLeafNode | null | undefined,
     heading: string | null | undefined,
     subHeading: string | null | undefined,
-  ): PostLeafNodeUpdateOneWithoutDialogueInput | undefined {
+  ): Prisma.PostLeafNodeUpdateOneWithoutDialogueInput | undefined {
     if (!dbPostLeaf && !heading && !subHeading) {
       return undefined;
     } else if (dbPostLeaf && !heading && !subHeading) {
@@ -144,7 +137,7 @@ class DialogueService {
       language
     } = args;
 
-    const customer = await prisma.customer.findOne({
+    const customer = await prisma.customer.findUnique({
       where: {
         slug: customerSlug,
       },
@@ -168,7 +161,7 @@ class DialogueService {
       dialogueFinisherSubheading
     );
 
-    let updateDialogueArgs: DialogueUpdateInput = {
+    let updateDialogueArgs: Prisma.DialogueUpdateInput = {
       title, description, publicTitle, isWithoutGenData, postLeafNode, language
     };
     if (dbDialogue?.tags) {
@@ -241,7 +234,7 @@ class DialogueService {
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
 
-    const dialogueWithNodes = await prisma.dialogue.findOne({
+    const dialogueWithNodes = await prisma.dialogue.findUnique({
       where: { id: dialogueId },
       include: {
         questions: true,
@@ -359,7 +352,7 @@ class DialogueService {
   };
 
   static deleteDialogue = async (dialogueId: string) => {
-    const dialogue = await prisma.dialogue.findOne({
+    const dialogue = await prisma.dialogue.findUnique({
       where: {
         id: dialogueId,
       },
@@ -532,7 +525,7 @@ class DialogueService {
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
     language: LanguageEnum = 'ENGLISH') => {
-    const templateDialogue = await prisma.dialogue.findOne({
+    const templateDialogue = await prisma.dialogue.findUnique({
       where: {
         id: templateId,
       },
@@ -622,9 +615,9 @@ class DialogueService {
 
       const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
       const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
-      const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
+      const mappedVideoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
       const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
-      const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = {
+      const mappedOptions: Prisma.QuestionOptionCreateManyWithoutQuestionNodeInput = {
         create: question.options.map((option) => {
           const { overrideLeafId, position, publicValue, value } = option;
           const mappedOverrideLeafId = overrideLeafId && idMap[overrideLeafId];

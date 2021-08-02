@@ -33,7 +33,7 @@ export const EdgeType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.parentNodeId) return null;
 
-        const parentNode = await ctx.prisma.questionNode.findOne({
+        const parentNode = await ctx.prisma.questionNode.findUnique({
           where: { id: parent.parentNodeId },
         });
 
@@ -48,7 +48,7 @@ export const EdgeType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.parentNodeId) return null;
 
-        const childNode = await ctx.prisma.questionNode.findOne({
+        const childNode = await ctx.prisma.questionNode.findUnique({
           where: { id: parent.childNodeId },
         });
 
@@ -82,7 +82,7 @@ export const EdgeQueries = extendType({
       resolve(parent, args, ctx) {
         if (!args.id) return null;
 
-        return ctx.prisma.edge.findOne({ where: { id: args.id } });
+        return ctx.prisma.edge.findUnique({ where: { id: args.id } });
       },
     });
   },

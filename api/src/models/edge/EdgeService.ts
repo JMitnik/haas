@@ -1,4 +1,4 @@
-import { EdgeCreateInput, QuestionNode } from '@prisma/client';
+import { Prisma, QuestionNode } from '@prisma/client';
 import prisma from '../../config/prisma';
 
 interface QuestionConditionProps {
@@ -26,7 +26,7 @@ class EdgeResolver {
     parentNodeEntry: QuestionNode,
     childNodeEntry: QuestionNode,
     conditions: any,
-  ) : EdgeCreateInput {
+  ) : Prisma.EdgeCreateInput {
     return {
       dialogue: {
         connect: {

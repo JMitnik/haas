@@ -1,6 +1,4 @@
-import { PrismaClient,
-  TriggerCreateInput,
-  TriggerUpdateInput } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { DialogueType } from '../questionnaire/Dialogue';
@@ -191,7 +189,7 @@ const TriggerMutations = extendType({
 
       async resolve(parent, args, ctx) {
         if (!args.triggerId) throw new Error('No valid trigger ID provided');
-        const dbTrigger = await ctx.prisma.trigger.findOne({
+        const dbTrigger = await ctx.prisma.trigger.findUnique({
           where: { id: args.triggerId },
           include: {
             conditions: true,
@@ -202,7 +200,7 @@ const TriggerMutations = extendType({
 
         if (!dbTrigger) throw new Error('Unable to find trigger with given ID');
 
-        let updateTriggerArgs: TriggerUpdateInput = {
+        let updateTriggerArgs: Prisma.TriggerUpdateInput = {
           name: args.trigger?.name || '',
           type: args.trigger?.type || 'QUESTION',
           medium: args.trigger?.medium || 'EMAIL',
@@ -236,7 +234,7 @@ const TriggerMutations = extendType({
         if (!args.input.customerSlug) throw new Error('No provided customer found');
 
         // TODO: Setup sensible defaults instead of these?
-        const createArgs : TriggerCreateInput = {
+        const createArgs : Prisma.TriggerCreateInput = {
           name: args.input.trigger?.name || '',
           medium: args.input.trigger?.medium || 'EMAIL',
           type: args.input.trigger?.type || 'QUESTION',
@@ -333,7 +331,7 @@ const TriggerQueries = extendType({
       async resolve(parent, args, ctx) {
         if (!args.triggerId) throw new Error('No id provided');
 
-        const trigger = await ctx.prisma.trigger.findOne({ where: { id: args.triggerId } });
+        const trigger = await ctx.prisma.trigger.findUnique({ where: { id: args.triggerId } });
 
         if (!trigger) throw new Error('Cant find trigger');
 

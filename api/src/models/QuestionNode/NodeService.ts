@@ -1,4 +1,14 @@
-import { Dialogue, Edge, EdgeCreateWithoutDialogueInput, Enumerable, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionOption, QuestionOptionCreateManyWithoutQuestionNodeInput, VideoEmbeddedNode, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput } from '@prisma/client';
+import {
+  Dialogue,
+  Edge,
+  Prisma,
+  Link,
+  NodeType,
+  QuestionCondition,
+  QuestionNode,
+  QuestionOption,
+  VideoEmbeddedNode,
+} from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
@@ -151,9 +161,9 @@ class NodeService {
     isOverrideLeafOf: QuestionNode[];
   }) {
     const mappedId = idMap[question.id];
-    const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
+    const mappedVideoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
     const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id }));
-    const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = {
+    const mappedOptions: Prisma.QuestionOptionCreateManyWithoutQuestionNodeInput = {
       create: question.options.map((option) => {
         const { id, overrideLeafId, questionNodeId, questionId, ...rest } = option;
         return {
@@ -199,6 +209,8 @@ class NodeService {
       }
     });
 
+    if (!question) throw 'No question found to duplicate!';
+
     const edges = await prisma.edge.findMany({
       where: {
         dialogueId: question.questionDialogueId,
@@ -236,7 +248,7 @@ class NodeService {
 
     if (!parentQuestionEdge) throw 'No edge exist to connect new branch to their parent'
 
-    const updatedEdges: Enumerable<EdgeCreateWithoutDialogueInput> = [...targetEdges, parentQuestionEdge].map((edge) => {
+    const updatedEdges: Prisma.Enumerable<Prisma.EdgeCreateWithoutDialogueInput> = [...targetEdges, parentQuestionEdge].map((edge) => {
       const mappedEdge = NodeService.duplicateEdge(idMap, edge);
 
       return {
@@ -309,7 +321,7 @@ class NodeService {
   /**
    * Save FormNodeInput when `creating`
    */
-  static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeCreateInput => ({
+  static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Prisma.FormNodeCreateInput => ({
     helperText: input.helperText,
     fields: {
       create: input.fields?.map((field) => ({
@@ -360,7 +372,7 @@ class NodeService {
     options: Array<any> = [],
     isRoot: boolean = false,
     overrideLeafId: string = '',
-    isLeaf: boolean = false): QuestionNodeCreateInput {
+    isLeaf: boolean = false): Prisma.QuestionNodeCreateInput {
     return {
       title,
       questionDialogue: {
@@ -596,7 +608,7 @@ class NodeService {
       },
     });
 
-    const deletedQuestion = await prisma.questionNode.findOne({
+    const deletedQuestion = await prisma.questionNode.findUnique({
       where: {
         id,
       }
@@ -647,7 +659,7 @@ class NodeService {
   ) => {
     // TODO: Add sliderNode when a new sliderNode is created (doesn't happen now because only root slider node)
     const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
-    const videoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = extraContent ? {
+    const videoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = extraContent ? {
       create: { videoUrl: extraContent }
     } : undefined;
     const newQuestion = await prisma.questionNode.create({
@@ -722,7 +734,7 @@ class NodeService {
     happyText: string | null | undefined,
     unhappyText: string | null | undefined,
   ) => {
-    const existingQuestion = await prisma.questionNode.findOne({
+    const existingQuestion = await prisma.questionNode.findUnique({
       where: { id: questionId },
       include: {
         videoEmbeddedNode: true,
@@ -741,7 +753,7 @@ class NodeService {
       }
     });
 
-    const existingEdge = await prisma.edge.findOne({
+    const existingEdge = await prisma.edge.findUnique({
       where: { id: edgeId },
       include: {
         conditions: true,
@@ -773,7 +785,7 @@ class NodeService {
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);
 
     // Remove videoEmbeddedNode if updated to different type
-    let embedVideoInput: VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput | undefined;
+    let embedVideoInput: Prisma.VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput | undefined;
     if (existingQuestion?.type !== NodeType.VIDEO_EMBEDDED && existingQuestion?.videoEmbeddedNodeId) {
       embedVideoInput = { delete: true };
     }

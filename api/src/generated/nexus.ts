@@ -920,7 +920,7 @@ export interface NexusGenFieldTypes {
     id: string; // String!
     message: string | null; // String
     name: string; // String!
-    processLocation: NexusGenRootTypes['JobProcessLocation']; // JobProcessLocation!
+    processLocation: NexusGenRootTypes['JobProcessLocation'] | null; // JobProcessLocation
     referenceId: string | null; // String
     referenceType: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
     requiresColorExtraction: boolean; // Boolean!
@@ -937,7 +937,7 @@ export interface NexusGenFieldTypes {
     value: string | null; // String
   }
   Customer: { // field return type
-    campaign: NexusGenRootTypes['CampaignType']; // CampaignType!
+    campaign: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     campaigns: NexusGenRootTypes['CampaignType'][]; // [CampaignType!]!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]

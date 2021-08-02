@@ -28,7 +28,7 @@ export const RoleType = objectType({
       type: SystemPermission,
 
       async resolve(parent, args, ctx) {
-        const fetchedRole = await ctx.prisma.role.findOne({
+        const fetchedRole = await ctx.prisma.role.findUnique({
           where: { id: parent.id },
         });
 

@@ -4,7 +4,7 @@ import prisma from '../../config/prisma';
 import AWS from '../../config/aws';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
-import { DeliveryStatusTypeEnum, FindManyDeliveryArgs } from '@prisma/client';
+import { DeliveryStatusTypeEnum, Prisma } from '@prisma/client';
 
 interface DeliveryOptionsProps {
   status?: DeliveryStatusTypeEnum;
@@ -29,7 +29,7 @@ export class CampaignService {
     paginationOptions?: NexusGenInputs['PaginationWhereInput'],
     deliveryOptions?: DeliveryOptionsProps
   ) {
-    const deliveryFilterOptions: FindManyDeliveryArgs = {
+    const deliveryFilterOptions: Prisma.FindManyDeliveryArgs = {
       where: {
         campaignId,
         currentStatus: deliveryOptions?.status || undefined,

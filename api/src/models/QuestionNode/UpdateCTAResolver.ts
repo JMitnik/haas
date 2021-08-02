@@ -3,7 +3,7 @@ import { UserInputError } from 'apollo-server-express';
 import { inputObjectType, mutationField } from '@nexus/schema';
 
 import { CTALinksInputType } from '../link/Link';
-import { FormNodeFieldUpsertArgs } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { FormNodeInputType, QuestionNodeType, ShareNodeInputType } from '.';
 import { NexusGenInputs } from '../../generated/nexus';
 import { QuestionNodeTypeEnum } from './QuestionNode';
@@ -25,7 +25,7 @@ export const UpdateCTAInputType = inputObjectType({
   },
 });
 
-const saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeFieldUpsertArgs[] | undefined => (
+const saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Prisma.FormNodeFieldUpsertArgs[] | undefined => (
   input.fields?.map((field) => ({
     create: {
       type: field.type || 'shortText',
@@ -54,7 +54,7 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
   async resolve(parent, args, ctx) {
     if (!args.input?.id) throw new UserInputError('No ID Found');
 
-    const existingNode = await ctx.prisma.questionNode.findOne({
+    const existingNode = await ctx.prisma.questionNode.findUnique({
       where: { id: args?.input?.id || undefined },
       include: {
         links: true,
