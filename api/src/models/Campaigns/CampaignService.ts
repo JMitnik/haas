@@ -29,7 +29,7 @@ export class CampaignService {
     paginationOptions?: NexusGenInputs['PaginationWhereInput'],
     deliveryOptions?: DeliveryOptionsProps
   ) {
-    const deliveryFilterOptions: Prisma.FindManyDeliveryArgs = {
+    const deliveryFilterOptions: Prisma.DeliveryFindManyArgs = {
       where: {
         campaignId,
         currentStatus: deliveryOptions?.status || undefined,

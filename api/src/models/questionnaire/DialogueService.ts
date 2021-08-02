@@ -615,9 +615,9 @@ class DialogueService {
 
       const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
       const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
-      const mappedVideoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
+      const mappedVideoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateNestedOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
       const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
-      const mappedOptions: Prisma.QuestionOptionCreateManyWithoutQuestionNodeInput = {
+      const mappedOptions: Prisma.QuestionOptionCreateNestedManyWithoutQuestionNodeInput = {
         create: question.options.map((option) => {
           const { overrideLeafId, position, publicValue, value } = option;
           const mappedOverrideLeafId = overrideLeafId && idMap[overrideLeafId];

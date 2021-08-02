@@ -78,7 +78,7 @@ class AutodeckService {
   static paginatedAutodeckJobs = async (
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const findManyTriggerArgs: Prisma.FindManyCreateWorkspaceJobArgs = {
+    const findManyTriggerArgs: Prisma.CreateWorkspaceJobFindManyArgs = {
       where: {
         id: {
           not: undefined

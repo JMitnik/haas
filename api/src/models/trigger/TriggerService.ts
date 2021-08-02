@@ -44,12 +44,12 @@ class TriggerService {
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const findManyTriggerArgs: Prisma.FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
+    const findManyTriggerArgs: Prisma.TriggerFindManyArgs = { where: { customer: { slug: customerSlug } } };
 
     const findManyTriggers = async (
-      { props: findManyArgs } : FindManyCallBackProps,
+      { props: findManyArgs }: FindManyCallBackProps,
     ) => prisma.trigger.findMany(findManyArgs);
-    const countTriggers = async ({ props: countArgs } : FindManyCallBackProps) => prisma.trigger.count(countArgs);
+    const countTriggers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.trigger.count(countArgs);
 
     const paginateProps: PaginateProps = {
       findManyArgs: {
@@ -84,7 +84,7 @@ class TriggerService {
   static sendSmsTrigger(
     trigger: TriggerWithSendData,
     recipient: User, session: SessionWithEntries,
-    values: Array<{value: string | number | undefined, type: string}>,
+    values: Array<{ value: string | number | undefined, type: string }>,
   ) {
     if (!recipient.phone) return;
 

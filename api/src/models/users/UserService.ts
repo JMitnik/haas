@@ -248,7 +248,7 @@ class UserService implements UserServiceType {
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const userOfCustomerFindManyArgs: Prisma.FindManyUserOfCustomerArgs = {
+    const userOfCustomerFindManyArgs: Prisma.UserOfCustomerFindManyArgs = {
       where: {
         customer: { slug: customerSlug },
       },
@@ -259,7 +259,7 @@ class UserService implements UserServiceType {
       },
     };
 
-    const countWhereInput: Prisma.FindManyUserOfCustomerArgs = {
+    const countWhereInput: Prisma.UserOfCustomerFindManyArgs = {
       where: {
         customer: { slug: customerSlug },
       }

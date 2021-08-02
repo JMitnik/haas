@@ -161,9 +161,9 @@ class NodeService {
     isOverrideLeafOf: QuestionNode[];
   }) {
     const mappedId = idMap[question.id];
-    const mappedVideoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
+    const mappedVideoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateNestedOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } } : undefined
     const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id }));
-    const mappedOptions: Prisma.QuestionOptionCreateManyWithoutQuestionNodeInput = {
+    const mappedOptions: Prisma.QuestionOptionCreateNestedManyWithoutQuestionNodeInput = {
       create: question.options.map((option) => {
         const { id, overrideLeafId, questionNodeId, questionId, ...rest } = option;
         return {
@@ -659,7 +659,7 @@ class NodeService {
   ) => {
     // TODO: Add sliderNode when a new sliderNode is created (doesn't happen now because only root slider node)
     const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
-    const videoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = extraContent ? {
+    const videoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateNestedOneWithoutQuestionNodeInput | undefined = extraContent ? {
       create: { videoUrl: extraContent }
     } : undefined;
     const newQuestion = await prisma.questionNode.create({
