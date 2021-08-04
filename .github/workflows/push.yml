@@ -17,3 +17,5 @@ jobs:
         DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
     - name: Run Unit and integration Tests
       run: yarn test:integration
+      env:
+        DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
