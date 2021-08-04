@@ -23,7 +23,7 @@ describe('CustomerPrismaAdapter', () => {
   test('Creates a workspace', async () => {
     const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
 
-    // customer 
+    // customer
     expect(createdCustomer.name).toBe(defaultCustomerInput.name);
     expect(createdCustomer.slug).toBe(defaultCustomerInput.slug);
 
