@@ -8108,6 +8108,13 @@
     {
       "tag": "CreateField",
       "model": "CampaignVariant",
+      "field": "from",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
       "field": "subject",
       "type": "String",
       "arity": "Optional"
@@ -8194,6 +8201,13 @@
       "tag": "CreateField",
       "model": "Delivery",
       "field": "deliveryRecipientPhone",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Delivery",
+      "field": "deliveryRecipientPrefix",
       "type": "String",
       "arity": "Optional"
     },
