@@ -24,7 +24,7 @@ describe('CustomerPrismaAdapter', () => {
     const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
 
     // customer
-    expect(createdCustomer.name).toBe('asdasdas');
+    expect(createdCustomer.name).toBe(defaultCustomerInput.name);
     expect(createdCustomer.slug).toBe(defaultCustomerInput.slug);
 
     // standard role should be made for customer
