@@ -11,5 +11,7 @@ jobs:
       run: yarn eslint
     - name: Start Testing Containers
       run: yarn dock:test:start-db
+    - name: Generate required artifacts
+      run: yarn gen:api:prisma
     - name: Run Unit and integration Tests
       run: yarn test:integration
