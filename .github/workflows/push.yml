@@ -13,5 +13,7 @@ jobs:
       run: yarn dock:test:start-db
     - name: Generate required artifacts
       run: yarn gen:api:prisma
+      env:
+        DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
     - name: Run Unit and integration Tests
       run: yarn test:integration
