@@ -29,4 +29,6 @@ if (import.meta.env.PROD) {
       }
     },
   });
+} else {
+  serviceWorker.unregister();
 }

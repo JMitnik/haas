@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -702,7 +702,6 @@ model CampaignVariant {
   workspace Customer @relation(fields: [customerId], references: [id])
   dialogue  Dialogue @relation(fields: [dialogueId], references: [id])
 
-  from                      String?
   subject                   String?
   type                      CampaignVariantTypeEnum
   CampaignVariantToCampaign CampaignVariantToCampaign[]

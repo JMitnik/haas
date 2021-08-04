@@ -80,6 +80,7 @@ export interface NexusGenInputs {
   CreateCampaignVariantInputType: { // input type
     body?: string | null; // String
     dialogueId: string; // ID!
+    from?: string | null; // String
     label?: string | null; // String
     subject?: string | null; // String
     type: NexusGenEnums['CampaignVariantEnum']; // CampaignVariantEnum!

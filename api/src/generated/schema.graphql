@@ -108,6 +108,7 @@ input CreateCampaignInputType {
 input CreateCampaignVariantInputType {
   body: String
   dialogueId: ID!
+  from: String
   label: String
   subject: String
   type: CampaignVariantEnum!

@@ -3,18 +3,19 @@ import { inputObjectType, mutationField, objectType } from '@nexus/schema';
 import { nanoid } from 'nanoid';
 import format from 'date-fns/format';
 import mustache from 'mustache';
-
 import { CampaignVariantTypeEnum, DeliveryStatusTypeEnum } from '@prisma/client';
-import { parseCsv } from '../../utils/parseCsv';
-import { probability } from '../../utils/probability';
-import prisma from '../../config/prisma';
-import DynamoScheduleService from '../../services/DynamoScheduleService';
+
+import { parseCsv } from '../../../utils/parseCsv';
+import { probability } from '../../../utils/probability';
+import prisma from '../../../config/prisma';
+import DynamoScheduleService from '../../../services/DynamoScheduleService';
 
 interface CSVDeliveryRow {
   firstName?: string;
   lastName?: string;
   email?: string;
   phoneNumber?: string;
+  prefix?: string;
 }
 
 export const CreateBatchDeliveriesInputType = inputObjectType({
@@ -87,6 +88,7 @@ export const validateDeliveryRows = (
       firstName: record.firstName,
       lastName: record.lastName,
       phoneNumber: record.phone,
+      prefix: record.prefix || '',
     });
   });
 
@@ -156,10 +158,13 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       const body = mustache.render(templateBody, {
         firstName: record.firstName,
         lastName: record.lastName,
+        prefix: record.prefix || '',
         dialogueUrl,
         dialogueName: variant?.campaignVariant?.dialogue?.title || '',
         workspaceName: variant?.campaignVariant?.workspace?.name || '',
       });
+
+      const from = variant.campaignVariant.from;
 
       return {
         ...record,
@@ -167,6 +172,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
         scheduleKey,
         variant,
         body,
+        from,
         scheduleKeyId
       }
     });
@@ -182,6 +188,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
             deliveryRecipientLastName: record.lastName,
             deliveryRecipientFirstName: record.firstName,
             deliveryRecipientPhone: record.phoneNumber,
+            deliveryRecipientPrefix: record.prefix,
             campaignVariant: {
               connect: { id: record.variant.campaignVariantId },
             },
@@ -233,6 +240,11 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
             key: 'DeliveryBody',
             type: 'string',
             value: record.body
+          },
+          {
+            key: 'DeliveryFrom',
+            type: 'string',
+            value: record.from || '',
           },
           {
             key: 'DeliveryStatus',

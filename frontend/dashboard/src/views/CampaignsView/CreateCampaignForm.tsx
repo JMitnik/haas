@@ -5,13 +5,18 @@ import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 
+import { CircularProgress, CircularProgressLabel, useToast } from '@chakra-ui/core';
 import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
 import { Mail, Smartphone } from 'react-feather';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useToast, CircularProgress, CircularProgressLabel } from '@chakra-ui/core';
 import Select from 'react-select';
 
-import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum, refetchGetWorkspaceCampaignsQuery } from 'types/generated-types';
+import {
+  CampaignVariantEnum,
+  refetchGetWorkspaceCampaignsQuery,
+  useCreateCampaignMutation,
+  useGetWorkspaceDialoguesQuery,
+} from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 
 type InputEvent = React.FormEvent<HTMLInputElement>;
@@ -21,6 +26,7 @@ thank you for subscribing to {{dialogueId}}!
 Please visit {{dialogueUrl}}.`;
 
 const SMS_LIMIT_CHARACTERS = 160;
+const MAX_SMS_FROM_CHARACTERS = 11;
 
 const mapVariantIndexToLabel: { [key: number]: string } = {
   0: 'A',
@@ -30,6 +36,13 @@ const mapVariantIndexToLabel: { [key: number]: string } = {
 const variantSchema = yup.object({
   label: yup.string().required(),
   type: yup.mixed().oneOf(['EMAIL', 'SMS']).required(),
+  from: yup.string().when('type', {
+    is: (ctaType) => ctaType === 'SMS',
+    // @ts-ignore
+    // TODO: Validate no whitespace
+    then: yup.string().max(MAX_SMS_FROM_CHARACTERS),
+    otherwise: yup.string().notRequired(),
+  }),
   dialogue: yup.object({
     label: yup.string(),
     value: yup.string(),
@@ -50,7 +63,13 @@ const schema = yup.object({
 type FormProps = yup.InferType<typeof schema>;
 type VariantFormProps = yup.InferType<typeof variantSchema>;
 
-const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFormMethods<FormProps>, activeVariantIndex: number, variant: any }) => {
+interface ActiveVariantFormProps {
+  form: UseFormMethods<FormProps>;
+  activeVariantIndex: number;
+  variant: any;
+}
+
+const ActiveVariantForm = ({ form, activeVariantIndex, variant }: ActiveVariantFormProps) => {
   const activeVariant = form.watch(`variants[${activeVariantIndex}]`) as VariantFormProps;
   const { t } = useTranslation();
 
@@ -58,17 +77,16 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
 
   const { data } = useGetWorkspaceDialoguesQuery({
     variables: {
-      customerSlug
+      customerSlug,
     },
-    fetchPolicy: 'cache-and-network'
+    fetchPolicy: 'cache-and-network',
   });
 
-  const dialogues = data?.customer?.dialogues?.map(dialogue => ({
+  const dialogues = data?.customer?.dialogues?.map((dialogue) => ({
     label: dialogue.title,
-    value: dialogue.id
+    value: dialogue.id,
   })) || [];
 
-  console.log(data);
   const percentageFull = Math.min(Math.floor((activeVariant.body.length / SMS_LIMIT_CHARACTERS) * 100), 100);
 
   return (
@@ -87,6 +105,17 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
             name={`variants[${activeVariantIndex}].label`}
             defaultValue={activeVariant?.label}
             id={`variants[${activeVariantIndex}].label`}
+            ref={form.register()}
+          />
+        </UI.FormControl>
+
+        <UI.FormControl>
+          <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].from`}>{t('from')}</UI.FormLabel>
+          <UI.Input
+            key={variant.variantIndex}
+            name={`variants[${activeVariantIndex}].from`}
+            placeholder={activeVariant.type === 'SMS' ? 'HAAS' : 'noreply@haas.live'}
+            id={`variants[${activeVariantIndex}].from`}
             ref={form.register()}
           />
         </UI.FormControl>
@@ -143,7 +172,10 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
                 <UI.ColumnFlex alignItems="flex-end">
                   <UI.Helper>{t('character_limit')}</UI.Helper>
                   <CircularProgress
-                    mt={2} color={activeVariant.body.length <= 160 ? 'green' : 'red'} value={percentageFull}>
+                    mt={2}
+                    color={activeVariant.body.length <= 160 ? 'green' : 'red'}
+                    value={percentageFull}
+                  >
                     <CircularProgressLabel>{activeVariant?.body?.length}</CircularProgressLabel>
                   </CircularProgress>
                 </UI.ColumnFlex>
@@ -181,6 +213,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
         {
           label: '',
           type: 'EMAIL',
+          from: undefined,
           body: createCampaignBodyPlaceholder,
           weight: 50,
           dialogue: undefined,
@@ -188,6 +221,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
         {
           label: '',
           type: 'EMAIL',
+          from: undefined,
           body: createCampaignBodyPlaceholder,
           weight: 50,
           dialogue: undefined,
@@ -210,6 +244,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
           label: variant.label,
           subject: '',
           weight: variant.weight,
+          from: variant.from || undefined,
           type: variant.type as CampaignVariantEnum,
           workspaceId: activeCustomer?.id || '',
         })),
@@ -217,8 +252,8 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
     },
     refetchQueries: [
       refetchGetWorkspaceCampaignsQuery({
-        customerSlug: activeCustomer?.slug || ''
-      })
+        customerSlug: activeCustomer?.slug || '',
+      }),
     ],
     onCompleted: () => {
       toast({
@@ -264,7 +299,11 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
     const maxValue = Math.min(event.target.value, 100);
     const value = Math.max(maxValue, 0);
 
-    const otherFields = variants.map((item, index) => ({ ...item, originalIndex: index })).filter((item, index) => index !== currentItemIndex);
+    const otherFields = variants.map((item, index) => ({
+      ...item,
+      originalIndex: index,
+    })).filter((item, index) => index !== currentItemIndex);
+
     const distributed = 100 - value;
     otherFields.forEach((field) => {
       form.setValue(`variants.${field.originalIndex}.weight`, distributed);
@@ -331,12 +370,12 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
               form={form}
             />
           ) : (
-              <UI.IllustrationCard
-                svg={<DecideIll />}
-                text={t('select_a_variant')}
-                isFlat
-              />
-            )}
+            <UI.IllustrationCard
+              svg={<DecideIll />}
+              text={t('select_a_variant')}
+              isFlat
+            />
+          )}
         </UI.Card>
         <UI.Button type="submit" isDisabled={!form.formState.isValid}>
           {t('save')}

@@ -137,6 +137,7 @@ export type CreateCampaignVariantInputType = {
   label?: Maybe<Scalars['String']>;
   workspaceId: Scalars['ID'];
   dialogueId: Scalars['ID'];
+  from?: Maybe<Scalars['String']>;
   type: CampaignVariantEnum;
   body?: Maybe<Scalars['String']>;
   weight?: Maybe<Scalars['Float']>;
@@ -302,11 +303,6 @@ export type CustomFieldType = {
   jobProcessLocationId: Scalars['String'];
 };
 
-
-export type Debug = {
-  __typename?: 'Debug';
-  debugResolver?: Maybe<Scalars['String']>;
-};
 
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
@@ -796,7 +792,6 @@ export type Mutation = {
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
-  debugMutation?: Maybe<Scalars['String']>;
 };
 
 
