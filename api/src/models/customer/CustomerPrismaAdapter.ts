@@ -68,8 +68,18 @@ export class CustomerPrismaAdapter {
     return this.prisma.customer.findOne({ where: { slug } });
   };
 
-  findWorkspaceById(id: string): Promise<Customer | null> {
-    return this.prisma.customer.findOne({ where: { id } });
+  findWorkspaceById(id: string) {
+    return this.prisma.customer.findOne({
+      where: { id: id },
+      include: {
+        settings: {
+          include: {
+            colourSettings: true,
+            fontSettings: true,
+          },
+        },
+      },
+    });
   };
 
   async findAll() {
@@ -148,21 +158,7 @@ export class CustomerPrismaAdapter {
     return customerWithDialogue?.dialogues?.[0];
   };
 
-  async getCustomer(customerId: string) {
-    return this.prisma.customer.findOne({
-      where: { id: customerId },
-      include: {
-        settings: {
-          include: {
-            colourSettings: true,
-            fontSettings: true,
-          },
-        },
-      },
-    });
-  };
-
-  async updateCustomer(customerId: string, input: UpdateCustomerInput): Promise<Customer> {
+  async updateCustomer(customerId: string, input: UpdateCustomerInput) {
     const customer = await this.prisma.customer.update({
       where: {
         id: customerId,
@@ -181,6 +177,14 @@ export class CustomerPrismaAdapter {
           }
         } : undefined
       },
+      include: {
+        settings: {
+          include: {
+            colourSettings: true,
+            fontSettings: true,
+          },
+        },
+      },
     });
 
     return customer;
@@ -197,10 +201,6 @@ export class CustomerPrismaAdapter {
     });
 
     return customerWithDialogue?.dialogues?.[0];
-  }
-
-  async findWorkspaceSettings(customerId: string) {
-    return this.prisma.customerSettings.findOne({ where: { customerId } });
   }
 
   async createWorkspace(input: NexusGenInputs['CreateWorkspaceInput']) {

@@ -1,4 +1,4 @@
-import { Dialogue, DialogueUpdateInput, QuestionNode, Edge, QuestionCondition, Subset, DialogueCreateArgs, Link, SliderNode, SliderNodeMarker, SliderNodeRange, FormNode, FormNodeField, DialogueInclude, VideoEmbeddedNode, Tag, FormNodeFieldType, LinkTypeEnum, NodeType, VideoEmbeddedNodeCreateWithoutQuestionNodeInput } from "@prisma/client";
+import { FormNodeFieldType, LinkTypeEnum, NodeType, VideoEmbeddedNodeCreateWithoutQuestionNodeInput } from "@prisma/client";
 
 export type CreateDialogueInput = {
   id?: string
@@ -12,7 +12,7 @@ export type CreateDialogueInput = {
   isWithoutGenData?: boolean
   endScreenText?: string | null
   wasGeneratedWithGenData?: boolean
-  customerId: string
+  customer?: { id?: string, name?: string, slug?: string, create: boolean }
 };
 
 export interface CreateQuestionInput {

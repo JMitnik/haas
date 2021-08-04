@@ -314,21 +314,39 @@ class DialoguePrismaAdapter {
     return this.prisma.dialogue.create(input);
   };
 
+  getCustomerType(input: CreateDialogueInput) {
+    if (input.customer?.create && input.customer.slug && input.customer.name) {
+      return {
+        create: {
+          id: input?.customer?.id,
+          slug: input.customer.slug,
+          name: input.customer?.name,
+        }
+      };
+    } else if (!input.customer?.create && input.customer?.id) {
+      return {
+        connect: {
+          id: input.customer.id,
+        },
+      };
+    }
+  }
+
   async createTemplate(input: CreateDialogueInput) {
-    return this.prisma.dialogue.create({
+    const customerType = this.getCustomerType(input);
+    return customerType && this.prisma.dialogue.create({
       data: {
         slug: input.slug,
         title: input.title,
         description: input.description,
-        customer: {
-          connect: {
-            id: input.customerId
-          },
-        },
+        customer: customerType,
         questions: {
           create: [],
         },
       },
+      include: {
+        customer: true,
+      }
     });
   };
 
@@ -339,6 +357,7 @@ class DialoguePrismaAdapter {
         questions: true,
         edges: {
           include: {
+            parentNode: true,
             conditions: true,
             childNode: true,
           },
