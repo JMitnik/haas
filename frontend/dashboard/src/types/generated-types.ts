@@ -250,7 +250,6 @@ export type Customer = {
   settings?: Maybe<CustomerSettings>;
   usersConnection?: Maybe<UserConnection>;
   dialogue?: Maybe<Dialogue>;
-  userCustomer?: Maybe<UserCustomer>;
   dialogues?: Maybe<Array<Dialogue>>;
   users?: Maybe<Array<UserType>>;
   campaign: CampaignType;
@@ -266,11 +265,6 @@ export type CustomerUsersConnectionArgs = {
 
 export type CustomerDialogueArgs = {
   where?: Maybe<DialogueWhereUniqueInput>;
-};
-
-
-export type CustomerUserCustomerArgs = {
-  userId?: Maybe<Scalars['String']>;
 };
 
 
@@ -757,7 +751,6 @@ export type Mutation = {
   removePixelRange?: Maybe<AwsImageType>;
   uploadJobImage?: Maybe<AwsImageType>;
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
-  updateJob?: Maybe<JobObjectType>;
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
@@ -841,15 +834,6 @@ export type MutationUploadJobImageArgs = {
 
 
 export type MutationUpdateCreateWorkspaceJobArgs = {
-  id?: Maybe<Scalars['String']>;
-  status?: Maybe<JobStatusType>;
-  resourceUrl?: Maybe<Scalars['String']>;
-  referenceId?: Maybe<Scalars['String']>;
-  errorMessage?: Maybe<Scalars['String']>;
-};
-
-
-export type MutationUpdateJobArgs = {
   id?: Maybe<Scalars['String']>;
   status?: Maybe<JobStatusType>;
   resourceUrl?: Maybe<Scalars['String']>;
@@ -1214,8 +1198,6 @@ export type Query = {
   refreshAccessToken: RefreshAccessTokenOutput;
   sessions: Array<Session>;
   session?: Maybe<Session>;
-  questionNode?: Maybe<QuestionNode>;
-  questionNodes: Array<QuestionNode>;
   edge?: Maybe<Edge>;
 };
 
@@ -1327,11 +1309,6 @@ export type QuerySessionsArgs = {
 
 export type QuerySessionArgs = {
   where?: Maybe<SessionWhereUniqueInput>;
-};
-
-
-export type QueryQuestionNodeArgs = {
-  where?: Maybe<QuestionNodeWhereUniqueInput>;
 };
 
 

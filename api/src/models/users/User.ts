@@ -1,11 +1,10 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { differenceInMinutes } from 'date-fns';
 import { extendType, inputObjectType, objectType, queryField, scalarType } from '@nexus/schema';
-
-import { ConnectionInterface, PaginationWhereInput } from '../general/Pagination';
+import { UserUpdateInput } from '@prisma/client';
 import { Kind } from 'graphql';
+
+import { ConnectionInterface } from '../general/Pagination';
 import { RoleType, SystemPermission } from '../role/Role';
-import UserService from './UserService';
 
 export const UserCustomerType = objectType({
   name: 'UserCustomer',
@@ -37,33 +36,7 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
     if (!args.input?.userId) throw new UserInputError('User not provided');
     if (!args.input?.customerId && !args.input?.customerSlug) throw new UserInputError('Neither slug nor id of Customer was provided');
 
-    let customerId = '';
-    if (!args.input?.customerId && args.input?.customerSlug) {
-      const customer = await ctx.prisma.customer.findOne({
-        where: { slug: args.input.customerSlug },
-      });
-      customerId = customer?.id || '';
-    } else {
-      customerId = args.input.customerId || '';
-    }
-
-    const userWithCustomer = await ctx.prisma.userOfCustomer.findOne({
-      where: {
-        userId_customerId: {
-          customerId,
-          userId: args.input.userId,
-        },
-      },
-      include: {
-        customer: true,
-        role: true,
-        user: true,
-      },
-    });
-
-    if (!userWithCustomer) return null;
-
-    return userWithCustomer;
+    return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId);
   },
 });
 
@@ -94,29 +67,12 @@ export const UserType = objectType({
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
 
-    // t.boolean('isOnline', {
-    //   resolve(parent, args, ctx) {
-    //     if (!parent.lastActivity) return false;
-    //     const minutesSinceOnline = differenceInMinutes(new Date(parent.lastActivity), Date.now());
-
-    //     if (minutesSinceOnline > 5) {
-    //       return true;
-    //     }
-
-    //     return false;
-    //   },
-    // });
-
     t.list.field('globalPermissions', {
       nullable: true,
       type: SystemPermission,
 
       async resolve(parent, args, ctx) {
-        const user = await ctx.prisma.user.findOne({
-          where: { id: parent.id },
-        });
-
-        return user?.globalPermissions as any;
+        return ctx.services.userService.getGlobalPermissions(parent.id);
       },
     });
 
@@ -124,31 +80,7 @@ export const UserType = objectType({
       type: UserCustomerType,
 
       async resolve(parent, args, ctx) {
-        const userWithCustomers = await ctx.prisma.user.findOne({
-          where: { id: parent.id },
-          include: {
-            customers: {
-              include: {
-                customer: true,
-                role: true,
-                user: true,
-              },
-            },
-          },
-        });
-
-        const customers = userWithCustomers?.customers;
-
-        return customers?.map((customerOfUser: any) => ({
-          id: '',
-          roleId: '',
-          createdAt: new Date(),
-          customerId: '',
-          userId: '',
-          customer: customerOfUser.customer,
-          role: customerOfUser.role,
-          user: parent,
-        })) || [];
+        return ctx.services.userService.getUserCustomers(parent.id);
       },
     });
 
@@ -156,20 +88,7 @@ export const UserType = objectType({
       type: 'Customer',
 
       async resolve(parent, args, ctx) {
-        const userWithCustomers = await ctx.prisma.user.findOne({
-          where: { id: parent.id },
-          include: {
-            customers: {
-              include: {
-                customer: true,
-              },
-            },
-          },
-        });
-
-        const customers = userWithCustomers?.customers.map((customerOfUser: any) => customerOfUser.customer);
-
-        return customers || [];
+        return ctx.services.userService.getCustomersOfUser(parent.id);
       },
     });
 
@@ -179,25 +98,7 @@ export const UserType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx, info) {
-        const userWithRole = await ctx.prisma.user.findOne({
-          where: { id: parent.id || undefined },
-          include: {
-            customers: {
-              include: {
-                role: true,
-                customer: true,
-              },
-            },
-          },
-        });
-
-        const userCustomer = userWithRole?.customers.find((cus: any) => (
-          cus.customer.slug === info.variableValues.customerSlug
-        ));
-
-        const role = userCustomer?.role || null;
-
-        return role;
+        return ctx.services.userService.getRoleOfWorkspaceUser(parent.id, info.variableValues.customerSlug);
       },
     });
   },
@@ -264,18 +165,7 @@ export const RootUserQueries = extendType({
         if (!ctx.session?.user?.id) throw new ApolloError('No valid user');
         const userId = ctx.session?.user?.id;
 
-        const user = await ctx.prisma.user.findOne({
-          where: { id: userId },
-          include: {
-            customers: {
-              include: {
-                customer: true,
-                role: true,
-                user: true,
-              },
-            },
-          },
-        });
+        const user = await ctx.services.userService.findUserContext(userId);
 
         if (!user) throw new ApolloError('There is something wrong in our records. Please contact an admin.', 'UNAUTHENTIC');
 
@@ -295,11 +185,10 @@ export const RootUserQueries = extendType({
 
       resolve(parent, args, ctx) {
         if (!args.customerSlug) throw new UserInputError('No business provided');
-        return ctx.prisma.user.findMany({ where: { customers: {
-          every: { customer: { slug: args.customerSlug || undefined } },
-        } } });
+        return ctx.services.userService.getAllUsersByCustomerSlug(args.customerSlug);
       },
     });
+
     t.field('user', {
       type: UserType,
       args: { userId: 'String' },
@@ -308,7 +197,7 @@ export const RootUserQueries = extendType({
       async resolve(parent, args, ctx) {
         if (!args.userId) throw new UserInputError('No valid user id provided');
 
-        const user = await ctx.prisma.user.findOne({ where: { id: args.userId } });
+        const user = await ctx.services.userService.findUserContext(args.userId);
 
         if (!user) throw new UserInputError('Cant find user with this ID');
         return user || null;
@@ -320,21 +209,6 @@ export const RootUserQueries = extendType({
 export const UserMutations = extendType({
   type: 'Mutation',
   definition(t) {
-    t.field('createUser', {
-      type: UserType,
-      args: { customerSlug: 'String', input: UserInput },
-
-      resolve(parent, args, ctx) {
-        if (!args.customerSlug) throw new UserInputError('No customer scope provided');
-        if (!args.input) throw new UserInputError('No input provided');
-
-        const { email } = args.input;
-
-        if (!email) throw new UserInputError('No valid email provided');
-        return ctx.services.userService.createUser(args.input);
-      },
-    });
-
     t.field('editUser', {
       type: UserType,
       args: { userId: 'String', input: EditUserInput },
@@ -343,47 +217,9 @@ export const UserMutations = extendType({
         if (!args.userId) throw new UserInputError('No valid user provided to edit');
         if (!args.input) throw new UserInputError('No input provided');
         const { firstName, lastName, email, phone, roleId } = args.input;
+        const userUpdateInput: UserUpdateInput = { firstName, lastName, phone, email };
 
-        const otherMails = await ctx.prisma.user.findMany({
-          where: {
-            AND: {
-              email: { equals: email },
-              id: { not: args.userId },
-            },
-          },
-        });
-
-        if (otherMails.length) throw new UserInputError('Email is already taken');
-
-        if (!email) throw new UserInputError('No valid email provided');
-
-        if (args.input.customerId) {
-          await ctx.prisma.userOfCustomer.update({
-            where: { userId_customerId: {
-              userId: args?.userId,
-              customerId: args.input.customerId,
-            } },
-            data: {
-              role: {
-                connect: {
-                  id: roleId || undefined,
-                },
-              },
-            },
-          });
-        }
-
-        return ctx.prisma.user.update({
-          where: {
-            id: args.userId,
-          },
-          data: {
-            firstName,
-            lastName,
-            phone,
-            email,
-          },
-        });
+        return ctx.services.userService.editUser(userUpdateInput, email, args.userId, args.input.customerId, roleId);
       },
     });
 
@@ -394,18 +230,7 @@ export const UserMutations = extendType({
         if (!args.input?.customerId) throw new UserInputError('No workspace provided');
         if (!args.input?.userId) throw new UserInputError('No user provided');
 
-        const removedUser = await ctx.prisma.userOfCustomer.delete({
-          where: {
-            userId_customerId: {
-              customerId: args.input.customerId,
-              userId: args.input.userId,
-            },
-          },
-        });
-
-        if (removedUser) return { deletedUser: true };
-
-        return { deletedUser: false };
+        return ctx.services.userService.deleteUser(args.input.userId, args.input.customerId);
       },
     });
   },

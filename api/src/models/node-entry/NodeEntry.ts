@@ -1,10 +1,6 @@
-import { NodeEntry } from '@prisma/client';
 import { inputObjectType, objectType } from '@nexus/schema';
 
-// eslint-disable-next-line import/no-cycle
 import { FormNodeField, QuestionNodeType } from '../QuestionNode/QuestionNode';
-// eslint-disable-next-line import/no-cycle
-import NodeEntryService from './NodeEntryService';
 
 export const FormNodeEntryValueType = objectType({
   name: 'FormNodeEntryValueType',
@@ -68,12 +64,11 @@ export const NodeEntryType = objectType({
       type: QuestionNodeType,
       nullable: true,
 
-      resolve(parent, args, ctx) {
+      async resolve(parent, args, ctx) {
         if (!parent.relatedNodeId) {
           return null;
         }
-
-        const relatedNode = ctx.prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+        const relatedNode = await ctx.services.nodeService.findNodeById(parent.relatedNodeId);
         return relatedNode;
       },
     });
@@ -84,36 +79,8 @@ export const NodeEntryType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        const nodeEntry = await ctx.prisma.nodeEntry.findOne({
-          where: { id: parent.id },
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            sliderNodeEntry: true,
-            textboxNodeEntry: true,
-            videoNodeEntry: true,
-            formNodeEntry: {
-              include: {
-                values: {
-                  include: {
-                    relatedField: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        return {
-          choiceNodeEntry: nodeEntry?.choiceNodeEntry?.value,
-          videoNodeEntry: nodeEntry?.videoNodeEntry?.value,
-          linkNodeEntry: nodeEntry?.linkNodeEntry?.value?.toString(),
-          registrationNodeEntry: nodeEntry?.registrationNodeEntry?.value?.toString(),
-          sliderNodeEntry: nodeEntry?.sliderNodeEntry?.value,
-          textboxNodeEntry: nodeEntry?.textboxNodeEntry?.value,
-          formNodeEntry: nodeEntry?.formNodeEntry,
-        };
+        const nodeEntryValues = await ctx.services.nodeEntryService.findNodeEntryValues(parent.id);
+        return nodeEntryValues;
       },
     });
   },

@@ -33,12 +33,12 @@ export const PermissionMutations = extendType({
       args: { data: PermissionInput },
       nullable: true,
 
-      async resolve(parent, args) {
+      async resolve(parent, args, ctx) {
         if (!args.data?.name || !args.data?.customerId) {
           throw new Error('Name and/or customerID not valid!');
         }
 
-        const permission = await PermissionService.createPermission(
+        const permission = await ctx.services.permissionService.createPermission(
           args.data?.name,
           args.data?.customerId,
           args.data?.description,
