@@ -37,11 +37,8 @@ export const CustomerType = objectType({
       nullable: true,
 
       async resolve(parent: Customer, args, ctx) {
-        const customerSettings = await ctx.prisma.customerSettings.findUnique({
-          where: { customerId: parent.id },
-        });
-
-        return customerSettings as any;
+        const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
+        return customerSettings;
       },
     });
 
@@ -50,8 +47,8 @@ export const CustomerType = objectType({
       args: { customerSlug: 'String', filter: PaginationWhereInput },
       nullable: true,
 
-      async resolve(parent, args) {
-        const users = await UserService.paginatedUsers(
+      async resolve(parent, args, ctx) {
+        const users = await ctx.services.userService.paginatedUsers(
           parent.slug,
           {
             pageIndex: args.filter?.pageIndex,
@@ -72,54 +69,22 @@ export const CustomerType = objectType({
       nullable: true,
       args: { where: DialogueWhereUniqueInput },
 
-      async resolve(parent, args) {
+      async resolve(parent, args, ctx) {
         if (args?.where?.slug) {
           const dialogueSlug: string = args.where.slug;
 
-          const customer = await CustomerService.getDialogueFromCustomerBySlug(parent.id, dialogueSlug);
+          const customer = await ctx.services.customerService.getDialogueBySlug(parent.id, dialogueSlug);
           return customer || null as any;
         }
 
         if (args?.where?.id) {
           const dialogueId: string = args.where.id;
 
-          const customer = await CustomerService.getDialogueFromCustomerById(parent.id, dialogueId);
+          const customer = await ctx.services.customerService.getDialogueById(parent.id, dialogueId);
           return customer || null as any;
         }
 
         return null;
-      },
-    });
-
-    t.field('userCustomer', {
-      type: UserCustomerType,
-      args: { userId: 'String' },
-      nullable: true,
-
-      async resolve(parent, args, ctx) {
-        if (!args.userId) throw new UserInputError('No valid user id provided');
-
-        const customerWithUsers = await ctx.prisma.customer.findUnique({
-          where: { id: parent.id },
-          include: {
-            users: {
-              where: {
-                userId: args.userId,
-              },
-              include: {
-                user: true,
-                role: true,
-                customer: true,
-              },
-            },
-          },
-        });
-
-        const user = customerWithUsers?.users[0];
-
-        if (!user) throw new UserInputError('Cant find user with this ID');
-
-        return user as any;
       },
     });
 
@@ -132,14 +97,7 @@ export const CustomerType = objectType({
       async resolve(parent: Customer, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
-        let dialogues = await prisma.dialogue.findMany({
-          where: {
-            customerId: parent.id,
-          },
-          include: {
-            tags: true,
-          },
-        });
+        let dialogues = await ctx.services.dialogueService.findDialoguesByCustomerId(parent.id);
 
         if (args.filter && args.filter.searchTerm) {
           dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
@@ -258,11 +216,11 @@ export const WorkspaceMutations = Upload && extendType({
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
           },
-          (error, result: UploadApiResponse | undefined) => {
-            if (result) return resolve(result);
+            (error, result: UploadApiResponse | undefined) => {
+              if (result) return resolve(result);
 
-            return reject(error);
-          });
+              return reject(error);
+            });
 
           return createReadStream().pipe(cld_upload_stream);
         });
@@ -289,7 +247,7 @@ export const WorkspaceMutations = Upload && extendType({
           }
         }
 
-        const workspace = CustomerService.createWorkspace(args?.input, ctx.session?.user?.id);
+        const workspace = ctx.services.customerService.createWorkspace(args?.input, ctx.session?.user?.id);
 
         return workspace as any;
       },
@@ -299,7 +257,7 @@ export const WorkspaceMutations = Upload && extendType({
       type: CustomerType,
       args: { input: EditWorkspaceInput },
 
-      resolve(parent, args) {
+      resolve(parent, args, ctx) {
         if (!args.input) throw new UserInputError('No input provided');
         const primaryColor = args?.input?.primaryColour;
 
@@ -311,7 +269,7 @@ export const WorkspaceMutations = Upload && extendType({
           }
         }
 
-        return CustomerService.editWorkspace(args.input);
+        return ctx.services.customerService.editWorkspace(args.input);
       },
     });
   },
@@ -322,14 +280,14 @@ export const DeleteCustomerMutation = mutationField('deleteCustomer', {
   nullable: true,
   args: { where: CustomerWhereUniqueInput },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     const customerId = args?.where?.id;
 
     if (!customerId) {
       return null;
     }
 
-    const deletedCustomer = CustomerService.deleteCustomer(customerId);
+    const deletedCustomer = ctx.services.customerService.deleteWorkspace(customerId);
 
     return deletedCustomer;
   },
@@ -342,7 +300,7 @@ export const CustomersQuery = extendType({
     t.list.field('customers', {
       type: CustomerType,
       async resolve(parent, args, ctx) {
-        const customers = await ctx.prisma.customer.findMany();
+        const customers = await ctx.services.customerService.findAll();
         return customers;
       },
     });
@@ -361,12 +319,12 @@ export const CustomerQuery = extendType({
       nullable: true,
       async resolve(parent, args, ctx) {
         if (args.slug) {
-          const customer = await ctx.prisma.customer.findUnique({ where: { slug: args.slug } });
+          const customer = await ctx.services.customerService.findWorkspaceBySlug(args.slug);
           return customer;
         }
 
         if (args.id) {
-          const customer = await ctx.prisma.customer.findUnique({ where: { id: args.id } });
+          const customer = await ctx.services.customerService.findWorkspaceById(args.id);
           return customer;
         }
 

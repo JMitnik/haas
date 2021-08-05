@@ -34,12 +34,10 @@ export const CustomerSettingsType = objectType({
       type: ColourSettingsType,
       nullable: true,
 
-      resolve(parent, args, ctx) {
+      async resolve(parent, args, ctx) {
         if (!parent.colourSettingsId) return null;
 
-        const colourSettings = ctx.prisma.colourSettings.findUnique({
-          where: { id: parent.colourSettingsId || undefined },
-        });
+        const colourSettings = await ctx.services.customerService.getColourSettings(parent.colourSettingsId);
 
         return colourSettings;
       },
@@ -49,10 +47,9 @@ export const CustomerSettingsType = objectType({
       nullable: true,
       type: FontSettingsType,
 
-      resolve(parent, args, ctx) {
-        const colourSettings = ctx.prisma.fontSettings.findUnique({
-          where: { id: parent.fontSettingsId || undefined },
-        });
+      async resolve(parent, args, ctx) {
+        if (!parent.fontSettingsId) return null;
+        const colourSettings = await ctx.services.customerService.getFontSettings(parent.fontSettingsId);
 
         return colourSettings;
       },

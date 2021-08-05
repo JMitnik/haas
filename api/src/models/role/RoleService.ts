@@ -1,27 +1,47 @@
+import { PrismaClient, Role, SystemPermissionEnum } from '@prisma/client';
+
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
-import prisma from '../../config/prisma';
+import RolePrismaAdapter from './RolePrismaAdapter';
+
+export interface CreateRoleInput {
+  permissions: SystemPermissionEnum[];
+  name: string;
+  customerId: string;
+}
 
 class RoleService {
-  static sliceRoles = (
-    entries: Array<any>,
-    offset: number,
-    limit: number,
-    pageIndex: number,
-  ) => ((offset + limit) < entries.length
-    ? entries.slice(offset, (pageIndex + 1) * limit)
-    : entries.slice(offset, entries.length));
+  rolePrismaAdapter: RolePrismaAdapter;
 
-  static paginatedRoles = async (
+  constructor(prismaClient: PrismaClient) {
+    this.rolePrismaAdapter = new RolePrismaAdapter(prismaClient);
+  };
+
+  async getPermissionsByRoleId(roleId: string): Promise<SystemPermissionEnum[]> {
+    const role = await this.rolePrismaAdapter.getRoleById(roleId);
+    return role?.permissions || [];
+  };
+
+  updatePermissions(roleId: string, permissions: SystemPermissionEnum[]) {
+    return this.rolePrismaAdapter.updatePermissions(roleId, permissions);
+  };
+
+  createRole(customerId: string, roleName: string): Promise<Role> {
+    const createInput: CreateRoleInput = {
+      name: roleName,
+      permissions: ['CAN_VIEW_DIALOGUE'],
+      customerId,
+    };
+
+    return this.rolePrismaAdapter.createRole(createInput);
+  };
+
+  paginatedRoles = async (
     customerId: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const roles = await prisma.role.findMany({
-      where: { customerId },
-      take: paginationOpts.limit || undefined,
-      skip: paginationOpts.offset || undefined,
-    });
+    const roles = await this.rolePrismaAdapter.findRolesPaginated({ customerId }, paginationOpts.limit || undefined, paginationOpts.offset || undefined);
 
-    const totalRoles = await prisma.role.count({ where: { customerId } });
+    const totalRoles = await this.rolePrismaAdapter.count({ customerId });
     const totalPages = paginationOpts.limit ? Math.ceil(totalRoles / (paginationOpts.limit)) : 1;
 
     const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
@@ -38,47 +58,24 @@ class RoleService {
     };
   };
 
-  static async fetchDefaultRoleForCustomer(customerId: string) {
-    const customerWithRoles = await prisma.customer.findUnique({
-      where: { id: customerId || undefined },
-      include: {
-        roles: true,
-      },
-    });
+  async fetchDefaultRoleForCustomer(customerId: string) {
+    const roles = await this.rolePrismaAdapter.findRolesPaginated({ customerId: customerId })
 
-    const guestRole = customerWithRoles?.roles.find((role) => role.name.toLowerCase().includes('guest'));
+    const guestRole = roles.find((role) => role.name.toLowerCase().includes('guest'));
     if (guestRole) return guestRole;
 
     // TODO: Make this a better heuristic
 
-    const firstRole = customerWithRoles?.roles?.[0];
+    const firstRole = roles?.[0];
     if (firstRole) return firstRole;
 
     throw new Error('Unable to find any roles');
-  }
-
-  static roles = async (customerSlug: string) => {
-    const roles = await prisma.role.findMany({
-      where: { Customer: {
-        slug: customerSlug,
-      } },
-    });
-
-    const rolesWithNrPermisisons = roles.map((role) => ({
-      ...role,
-      nrPermissions: role.permissions.length,
-    }));
-
-    return rolesWithNrPermisisons;
   };
 
-  static deleteRoles = async (roleIds: Array<string>) => {
-    prisma.role.deleteMany({
-      where: {
-        id: { in: roleIds },
-      },
-    });
+  deleteRoles = async (roleIds: Array<string>) => {
+    return this.rolePrismaAdapter.deleteMany(roleIds);
   };
-}
+
+};
 
 export default RoleService;

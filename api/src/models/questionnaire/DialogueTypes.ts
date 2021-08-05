@@ -1,6 +1,17 @@
-import { NodeType } from '@prisma/client';
-import { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
+import { NodeType, LanguageEnum } from '@prisma/client';
 
+import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
+
+export interface CopyDialogueInputType {
+  customerSlug: string;
+  dialogueSlug: string;
+  templateId: string;
+  title: string;
+  publicTitle: string;
+  description: string;
+  dialogueTags: { entries?: string[] | null | undefined; } | null | undefined;
+  language: LanguageEnum;
+};
 export interface LeafNodeProps {
   id: string;
   nodeId?: string;
@@ -62,7 +73,7 @@ export interface PathFrequency {
 }
 
 export interface IdMapProps {
-  [details: string] : string;
+  [details: string]: string;
 }
 
 export interface QuestionProps {

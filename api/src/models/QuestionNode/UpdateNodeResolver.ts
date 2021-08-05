@@ -3,7 +3,6 @@ import { NodeType } from "@prisma/client";
 import { UserInputError } from "apollo-server";
 import { NexusGenInputs } from "../../generated/nexus";
 
-import NodeService from "./NodeService";
 import { EdgeConditionInputType, OptionsInputType, QuestionNodeType, SliderNodeInputType } from "./QuestionNode";
 
 export const UpdateQuestionNodeInputType = inputObjectType({
@@ -38,11 +37,11 @@ export const UpdateQuestionNode = mutationField('updateQuestion', {
   type: QuestionNodeType,
   args: { input: UpdateQuestionNodeInputType },
 
-  resolve(parent, args) {
+  resolve(parent, args, ctx) {
     if (!args?.input) throw new UserInputError('No input provided');
     validateUpdateQuestion(args.input);
 
-    return NodeService.updateQuestionFromBuilder(
+    return ctx.services.nodeService.updateQuestionFromBuilder(
       args.input.id as string,
       args.input.title as string,
       args.input.type as NodeType,

@@ -222,7 +222,6 @@ type Customer {
   name: String!
   settings: CustomerSettings
   slug: String!
-  userCustomer(userId: String): UserCustomer
   users: [UserType!]
   usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
 }
@@ -661,7 +660,6 @@ type Mutation {
   createSession(input: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(input: CreateTriggerInputType): TriggerType!
-  createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
@@ -690,7 +688,6 @@ type Mutation {
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
-  updateJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
@@ -843,11 +840,8 @@ type Query {
   getPreviewData(id: String): PreviewDataType
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   me: UserType!
-  questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode
-  questionNodes: [QuestionNode!]!
   refreshAccessToken: RefreshAccessTokenOutput!
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
-  roles(customerSlug: String): [RoleType!]
   session(where: SessionWhereUniqueInput): Session
   sessions(where: SessionWhereUniqueInput): [Session!]!
   tags(customerSlug: String, dialogueId: String): [Tag!]!

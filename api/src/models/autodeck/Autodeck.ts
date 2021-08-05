@@ -37,11 +37,7 @@ export const JobProcessLocation = objectType({
       type: CustomFieldType,
       nullable: true,
       resolve(parent, args, ctx) {
-        return ctx.prisma.customField.findMany({
-          where: {
-            jobProcessLocationId: parent.id,
-          }
-        })
+        return ctx.services.autodeckService.getCustomFieldsOfJobProcessLocation(parent.id);
       }
     })
   }
@@ -58,8 +54,8 @@ export const JobProcessLocations = objectType({
 
 export const GetJobProcessLocationQuery = queryField('getJobProcessLocations', {
   type: JobProcessLocations,
-  async resolve() {
-    const jobProcessLocations = await AutodeckService.getJobProcessLocations()
+  async resolve(parent, args, ctx) {
+    const jobProcessLocations = await ctx.services.autodeckService.getJobProcessLocations()
     return { jobProcessLocations: jobProcessLocations || [] };
   }
 })
@@ -78,10 +74,9 @@ export const createJobProcessLocationInput = inputObjectType({
 export const CreateJobProcessLocationMutation = mutationField('createJobProcessLocation', {
   type: JobProcessLocation,
   args: { input: createJobProcessLocationInput },
-  resolve(parent, args) {
-    return AutodeckService.createJobProcessLocation(args.input)
+  resolve(parent, args, ctx) {
+    return ctx.services.autodeckService.createJobProcessLocation(args.input);
   }
-
 })
 
 export const CloudReferenceType = enumType({
@@ -131,20 +126,8 @@ export const CreateWorkspaceJobType = objectType({
 
     t.field('processLocation', {
       type: JobProcessLocation,
-      nullable: true,
-      resolve(parent, args, ctx) {
-        return ctx.prisma.jobProcessLocation.findFirst({
-          where: {
-            job: {
-              some: {
-                id: parent.id
-              }
-            }
-          },
-          include: {
-            fields: true,
-          }
-        }) as any;
+      async resolve(parent, args, ctx) {
+        return ctx.services.autodeckService.getJobProcessLocationOfJob(parent.id);
       }
     })
   },
@@ -235,7 +218,7 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
   nullable: true,
   args: { input: GenerateAutodeckInput },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     const { input } = args;
 
     if (!input) {
@@ -253,7 +236,7 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       jobLocationId: input.jobLocationId,
     }
 
-    const job = await AutodeckService.createWorkspaceJob(jobInput);
+    const job = await ctx.services.autodeckService.createWorkspaceJob(jobInput);
 
     return job ? job as any : null;
   },
@@ -264,14 +247,14 @@ export const RetryAutodeckJobMutation = mutationField('retryAutodeckJob', {
   nullable: true,
   args: { jobId: 'String' },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     const { jobId } = args;
 
     if (!jobId) {
       return null;
     }
 
-    const job = await AutodeckService.retryJob(jobId);
+    const job = await ctx.services.autodeckService.retryJob(jobId);
 
     return job ? job as any : null;
   },
@@ -288,7 +271,7 @@ export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWor
       return null;
     }
 
-    return AutodeckService.confirmWorkspaceJob(input, userId) as any;
+    return ctx.services.autodeckService.confirmWorkspaceJob(input, userId) as any;
   }
 })
 
@@ -298,14 +281,7 @@ export const GetJobQuery = queryField('getJob', {
   args: { id: 'String' },
   async resolve(parent, args, ctx) {
     if (!args.id) return null;
-
-    const job = await ctx.prisma.createWorkspaceJob.findUnique({
-      where: {
-        id: args.id,
-      },
-    });
-
-    return job ? job as any : null;
+    return ctx.services.autodeckService.getJobById(args.id) as any;
   },
 });
 
@@ -322,8 +298,8 @@ export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
   type: AutodeckConnectionModel,
   args: { filter: PaginationWhereInput },
 
-  async resolve(parent, args) {
-    const { entries, pageInfo } = await AutodeckService.paginatedAutodeckJobs({
+  async resolve(parent, args, ctx) {
+    const { entries, pageInfo } = await ctx.services.autodeckService.paginatedAutodeckJobs({
       limit: args.filter?.limit,
       offset: args.filter?.offset,
       orderBy: args.filter?.orderBy,
@@ -460,49 +436,9 @@ export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorksp
       return null;
     }
 
-    return ctx.prisma.createWorkspaceJob.update({
-      where: {
-        id: id || undefined,
-      },
-      data: {
-        resourcesUrl: resourceUrl,
-        status: status || undefined,
-        errorMessage
-      },
+    const updateInput = { id: args.id, resourceUrl, status: status || 'PENDING', errorMessage: errorMessage || undefined };
 
-    }) as any;
-  },
-
-});
-
-export const UpdateJobMutation = mutationField('updateJob', {
-  type: JobObjectType,
-  nullable: true,
-  args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String', errorMessage: 'String' },
-  resolve(parent, args, ctx) {
-    const { id, resourceUrl, status, errorMessage } = args;
-
-    if (!args.id) {
-      return null;
-    }
-
-    return ctx.prisma.job.update({
-      where: {
-        id: id || undefined,
-      },
-      data: {
-        createWorkspaceJob: {
-          update: {
-            resourcesUrl: resourceUrl,
-            status: status || undefined,
-            errorMessage: errorMessage
-          },
-        },
-      },
-      include: {
-        createWorkspaceJob: true,
-      },
-    }) as any;
+    return ctx.services.autodeckService.update(updateInput) as any;
   },
 
 });
