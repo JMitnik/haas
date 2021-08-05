@@ -1,4 +1,4 @@
-import { PrismaClient, UserOfCustomer, UserOfCustomerCreateInput, UserOfCustomerUpdateInput } from "@prisma/client";
+import { PrismaClient, UserOfCustomer, Prisma } from "@prisma/client";
 
 class UserOfCustomerPrismaAdapter {
   prisma: PrismaClient;
@@ -107,7 +107,7 @@ class UserOfCustomerPrismaAdapter {
    * Finds a single userCustomer by the ids.
    * */
   findUserCustomerByIds(customerId: string, userId: string) {
-    return this.prisma.userOfCustomer.findOne({
+    return this.prisma.userOfCustomer.findUnique({
       where: {
         userId_customerId: {
           customerId,
@@ -138,7 +138,7 @@ class UserOfCustomerPrismaAdapter {
   /**
    * Creates userCustomer given raw data.
    * */
-  create(data: UserOfCustomerCreateInput): Promise<UserOfCustomer> {
+  create(data: Prisma.UserOfCustomerCreateInput): Promise<UserOfCustomer> {
     return this.prisma.userOfCustomer.create({
       data,
     });

@@ -1,4 +1,4 @@
-import { PrismaClient, JobProcessLocationCreateInput, JobProcessLocationUpdateInput, FindFirstJobProcessLocationArgs, CustomField, JobProcessLocation } from "@prisma/client";
+import { Prisma, PrismaClient, CustomField, JobProcessLocation } from "@prisma/client";
 
 class JobProcessLocationPrismaAdapter {
   prisma: PrismaClient;
@@ -30,7 +30,7 @@ class JobProcessLocationPrismaAdapter {
     });
   };
 
-  findFirst(args: FindFirstJobProcessLocationArgs): Promise<JobProcessLocation & { fields: CustomField[]; }> {
+  findFirst(args: Prisma.JobProcessLocationFindFirstArgs) {
     return this.prisma.jobProcessLocation.findFirst({
       where: args.where, include: {
         fields: true,
@@ -56,7 +56,7 @@ class JobProcessLocationPrismaAdapter {
     });
   };
 
-  update(jobProcessLocationId: string, data: JobProcessLocationUpdateInput) {
+  update(jobProcessLocationId: string, data: Prisma.JobProcessLocationUpdateInput) {
     return this.prisma.jobProcessLocation.update({
       where: {
         id: jobProcessLocationId,
@@ -68,7 +68,7 @@ class JobProcessLocationPrismaAdapter {
     });
   };
 
-  async create(data: JobProcessLocationCreateInput) {
+  async create(data: Prisma.JobProcessLocationCreateInput) {
     return this.prisma.jobProcessLocation.create({
       data,
       include: {

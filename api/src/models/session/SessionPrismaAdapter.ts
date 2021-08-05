@@ -62,7 +62,7 @@ class SessionPrismaAdapter {
    * Fetches single session from database.
    * */
   findSessionById(sessionId: string): Promise<Session | null> {
-    return this.prisma.session.findOne({
+    return this.prisma.session.findUnique({
       where: {
         id: sessionId,
       },

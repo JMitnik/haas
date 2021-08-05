@@ -1,4 +1,4 @@
-import { PrismaClient, PermissionCreateInput, Permission } from "@prisma/client";
+import { PrismaClient, Prisma, Permission } from "@prisma/client";
 import { CreatePermissionInput } from "./PermissionService";
 
 class PermissionPrismaAdapter {
@@ -26,7 +26,7 @@ class PermissionPrismaAdapter {
     });
   };
 
-  async create(data: PermissionCreateInput) {
+  async create(data: Prisma.PermissionCreateInput) {
     return this.prisma.permission.create({
       data,
       include: {

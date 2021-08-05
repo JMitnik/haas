@@ -920,7 +920,7 @@ export interface NexusGenFieldTypes {
     id: string; // String!
     message: string | null; // String
     name: string; // String!
-    processLocation: NexusGenRootTypes['JobProcessLocation'] | null; // JobProcessLocation
+    processLocation: NexusGenRootTypes['JobProcessLocation']; // JobProcessLocation!
     referenceId: string | null; // String
     referenceType: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
     requiresColorExtraction: boolean; // Boolean!

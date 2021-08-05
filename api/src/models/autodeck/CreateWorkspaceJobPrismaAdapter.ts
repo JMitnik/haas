@@ -1,4 +1,4 @@
-import { PrismaClient, FindManyCreateWorkspaceJobArgs, CreateWorkspaceJobUpdateInput, CreateWorkspaceJob, JobProcessLocation, JobStatusType } from "@prisma/client";
+import { Prisma, PrismaClient, CreateWorkspaceJob, JobProcessLocation, JobStatusType } from "@prisma/client";
 
 import { ConfirmWorkspaceJobCreateInput } from "./CreateWorkspaceJobPrismaAdapterType";
 
@@ -10,7 +10,7 @@ class CreateWorkspaceJobPrismaAdapter {
   }
 
   async getJobById(jobId: string) {
-    return this.prisma.createWorkspaceJob.findOne({
+    return this.prisma.createWorkspaceJob.findUnique({
       where: {
         id: jobId,
       }
@@ -37,7 +37,7 @@ class CreateWorkspaceJobPrismaAdapter {
   upsert(
     jobId: string | undefined,
     create: ConfirmWorkspaceJobCreateInput,
-    update: CreateWorkspaceJobUpdateInput
+    update: Prisma.CreateWorkspaceJobUpdateInput
   ): Promise<CreateWorkspaceJob & { processLocation: JobProcessLocation; }> {
     const inputCreate: ConfirmWorkspaceJobCreateInput = { ...create, processLocationId: create.processLocationId }
     return this.prisma.createWorkspaceJob.upsert({
@@ -73,7 +73,7 @@ class CreateWorkspaceJobPrismaAdapter {
     });
   };
 
-  async update(jobId: string, data: CreateWorkspaceJobUpdateInput) {
+  async update(jobId: string, data: Prisma.CreateWorkspaceJobUpdateInput) {
     return this.prisma.createWorkspaceJob.update({
       where: {
         id: jobId,
@@ -85,11 +85,11 @@ class CreateWorkspaceJobPrismaAdapter {
     });
   };
 
-  getJobs(args: FindManyCreateWorkspaceJobArgs) {
+  getJobs(args: Prisma.CreateWorkspaceJobFindManyArgs) {
     return this.prisma.createWorkspaceJob.findMany(args);
   };
 
-  count(args: FindManyCreateWorkspaceJobArgs) {
+  count(args: Prisma.CreateWorkspaceJobCountArgs) {
     return this.prisma.createWorkspaceJob.count(args);
   };
 }

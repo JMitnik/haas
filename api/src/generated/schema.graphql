@@ -182,7 +182,7 @@ type CreateWorkspaceJobType {
   id: String!
   message: String
   name: String!
-  processLocation: JobProcessLocation
+  processLocation: JobProcessLocation!
   referenceId: String
   referenceType: CloudReferenceType!
   requiresColorExtraction: Boolean!

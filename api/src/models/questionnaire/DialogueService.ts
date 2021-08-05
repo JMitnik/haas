@@ -3,7 +3,7 @@ import _ from 'lodash';
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
-import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient } from '@prisma/client';
+import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge } from '@prisma/client';
 
 import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
