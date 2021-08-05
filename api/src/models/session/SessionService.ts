@@ -291,7 +291,6 @@ class SessionService {
     }
 
     if (paginationOpts?.orderBy?.[0].desc) return sorted.reverse();
-
     return sorted;
   }
 
