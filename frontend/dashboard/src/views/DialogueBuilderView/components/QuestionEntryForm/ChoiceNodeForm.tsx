@@ -8,6 +8,7 @@ import { CTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
+import { TopicPicker } from 'components/TopicPicker';
 import Dropdown from 'components/Dropdown';
 
 export interface ChoiceProps {
@@ -64,7 +65,6 @@ export const ChoiceNodeForm = ({ form, ctaNodes, topics }: ChoiceNodeFormProps) 
   const activeFormTopic = form.watch('topic');
   const activeTopic = topics.find((topic) => topic.id === activeFormTopic?.value);
   const availableTopicValues = activeTopic?.topicValues || [];
-  console.log(availableTopicValues);
 
   const hasSelectedTopic = !!activeFormTopic;
   const choiceGridColumns = hasSelectedTopic ? '2fr 2fr 2fr 1fr' : '2fr 2fr 1fr';
@@ -108,7 +108,36 @@ export const ChoiceNodeForm = ({ form, ctaNodes, topics }: ChoiceNodeFormProps) 
                 >
                   {hasSelectedTopic && (
                     <UI.Div>
-                      Topic value
+                      <Controller
+                        name={`optionsFull[${index}].topicValue`}
+                        control={form.control}
+                        defaultValue={}
+                        render={({ onChange, value }) => (
+                          <Dropdown
+                            renderOverlay={({ onClose }) => (
+                              <TopicPicker
+                                items={availableTopicValues}
+                                onClose={onClose}
+                                onChange={onChange}
+                              />
+                            )}
+                          >
+                            {({ onOpen, reference }) => (
+                              <>
+                                {value ? (
+                                  <UI.Button onClick={onOpen} ref={reference}>
+                                    {value.label}
+                                  </UI.Button>
+                                ) : (
+                                  <UI.Button onClick={onOpen} ref={reference}>
+                                    Select topic
+                                  </UI.Button>
+                                )}
+                              </>
+                            )}
+                          </Dropdown>
+                        )}
+                      />
                     </UI.Div>
                   )}
                   <UI.Div
@@ -124,7 +153,6 @@ export const ChoiceNodeForm = ({ form, ctaNodes, topics }: ChoiceNodeFormProps) 
                       control={form.control}
                       render={({ value, onChange }) => (
                         <Dropdown
-                          placement="left-start"
                           renderOverlay={({ onClose }) => (
                             <ChoiceDropdown
                               value={value}
