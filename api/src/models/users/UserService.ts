@@ -1,4 +1,4 @@
-import { FindManyUserOfCustomerArgs, UserOfCustomer, PrismaClient, UserUpdateInput, Customer, Role, User } from '@prisma/client';
+import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
 import { UserInputError } from 'apollo-server';
 import _ from 'lodash';
 
@@ -34,7 +34,7 @@ class UserService {
   };
 
   async editUser(
-    userUpdateInput: UserUpdateInput,
+    userUpdateInput: Prisma.UserUpdateInput,
     email: string,
     userId: string,
     customerId: string | null | undefined,
@@ -60,6 +60,8 @@ class UserService {
   async getRoleOfWorkspaceUser(userId: string, customerSlug: string) {
     const user = await this.userPrismaAdapter.getUserById(userId);
 
+    if (!user) throw 'No user found!';
+
     const userCustomer = user.customers.find((cus: any) => (
       cus.customer.slug === customerSlug
     ));
@@ -75,6 +77,9 @@ class UserService {
 
   async getUserCustomers(userId: string) {
     const user = await this.userPrismaAdapter.getUserById(userId);
+
+    if (!user) throw 'No user found!';
+
     const { customers, ...rest } = user;
 
     return customers?.map((customerOfUser) => ({
@@ -265,7 +270,7 @@ class UserService {
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const userOfCustomerFindManyArgs: FindManyUserOfCustomerArgs = {
+    const userOfCustomerFindManyArgs: Prisma.UserOfCustomerFindManyArgs = {
       where: {
         customer: { slug: customerSlug },
       },
@@ -276,7 +281,7 @@ class UserService {
       },
     };
 
-    const countWhereInput: FindManyUserOfCustomerArgs = {
+    const countWhereInput: Prisma.UserOfCustomerFindManyArgs = {
       where: {
         customer: { slug: customerSlug },
       }

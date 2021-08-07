@@ -1,4 +1,4 @@
-import { PrismaClient, NodeEntryWhereInput, NodeEntryCreateInput, BatchPayload } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 
 import { NodeEntryWithTypes } from "./NodeEntryServiceType";
 
@@ -9,7 +9,7 @@ class NodeEntryPrismaAdapter {
     this.prisma = prismaClient;
   };
 
-  create(data: NodeEntryCreateInput) {
+  create(data: Prisma.NodeEntryCreateInput) {
     return this.prisma.nodeEntry.create({
       data,
     });
@@ -45,7 +45,7 @@ class NodeEntryPrismaAdapter {
   /**
    * Raw count of node-entries.
    * */
-  count(where: NodeEntryWhereInput): Promise<number> {
+  count(where: Prisma.NodeEntryWhereInput): Promise<number> {
     return this.prisma.nodeEntry.count({ where, });
   };
 
@@ -53,7 +53,7 @@ class NodeEntryPrismaAdapter {
    * Find node-entry along with its sub-fields.
    * */
   async findNodeEntryValuesById(nodeEntryId: string) {
-    const nodeEntry = await this.prisma.nodeEntry.findOne({
+    const nodeEntry = await this.prisma.nodeEntry.findUnique({
       where: { id: nodeEntryId },
       include: {
         choiceNodeEntry: true,
@@ -77,7 +77,7 @@ class NodeEntryPrismaAdapter {
     return nodeEntry;
   }
 
-  async deleteManyNodeEntries(sessionIds: string[]): Promise<BatchPayload> {
+  async deleteManyNodeEntries(sessionIds: string[]): Promise<Prisma.BatchPayload> {
     return this.prisma.nodeEntry.deleteMany({
       where: {
         sessionId: {
@@ -88,13 +88,13 @@ class NodeEntryPrismaAdapter {
     );
   };
 
-  async deleteManyChoiceNodeEntries(nodeEntryIds: string[]): Promise<BatchPayload> {
+  async deleteManyChoiceNodeEntries(nodeEntryIds: string[]): Promise<Prisma.BatchPayload> {
     return this.prisma.choiceNodeEntry.deleteMany({
       where: { nodeEntryId: { in: nodeEntryIds } }
     });
   };
 
-  async deleteManyLinkNodeEntries(nodeEntryIds: string[]): Promise<BatchPayload> {
+  async deleteManyLinkNodeEntries(nodeEntryIds: string[]): Promise<Prisma.BatchPayload> {
     return this.prisma.linkNodeEntry.deleteMany(
       { where: { nodeEntryId: { in: nodeEntryIds } } },
     );

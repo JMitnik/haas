@@ -23,5 +23,5 @@ main()
     throw e;
   })
   .finally(async () => {
-    await prisma.disconnect();
+    await prisma.$disconnect();
   });

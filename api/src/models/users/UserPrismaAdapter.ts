@@ -1,4 +1,4 @@
-import { PrismaClient, UserUpdateInput, UserWhereInput, User } from "@prisma/client";
+import { PrismaClient, User, Prisma } from "@prisma/client";
 
 import { RegisterUserInput } from "./UserPrismaAdapterType";
 import RoleService from '../role/RoleService';
@@ -47,7 +47,7 @@ class UserPrismaAdapter {
   };
 
   findUserContext(userId: string) {
-    return this.prisma.user.findOne({
+    return this.prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -168,7 +168,7 @@ class UserPrismaAdapter {
   };
 
   async getUserById(userId: string) {
-    return this.prisma.user.findFirst({
+    return this.prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -184,7 +184,7 @@ class UserPrismaAdapter {
     });
   };
 
-  async findFirst(where: UserWhereInput) {
+  async findFirst(where: Prisma.UserWhereInput) {
     return this.prisma.user.findFirst({
       where: where,
       include: {
@@ -227,7 +227,7 @@ class UserPrismaAdapter {
     });
   };
 
-  async update(userId: string | undefined, data: UserUpdateInput): Promise<User> {
+  async update(userId: string | undefined, data: Prisma.UserUpdateInput): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
       data,

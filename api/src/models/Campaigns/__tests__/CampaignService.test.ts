@@ -1,15 +1,15 @@
-import { CampaignCreateInput, CustomerCreateInput, DeliveryCreateInput, DialogueCreateInput } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import prisma from "../../../config/prisma";
 import faker from 'faker';
 import { CampaignService } from "../CampaignService";
 
-const SAMPLE_WORKSPACE: CustomerCreateInput = {
+const SAMPLE_WORKSPACE: Prisma.CustomerCreateInput = {
   id: 'TEST_WORKSPACE',
   name: 'Test workspace',
   slug: 'test_workspace',
 }
 
-const SAMPLE_DIALOGUE: DialogueCreateInput = {
+const SAMPLE_DIALOGUE: Prisma.DialogueCreateInput = {
   id: 'TEST_DIALOGUE',
   customer: { connect: { id: SAMPLE_WORKSPACE.id } },
   description: '',
@@ -17,7 +17,7 @@ const SAMPLE_DIALOGUE: DialogueCreateInput = {
   title: 'Test Dialogue',
 }
 
-const SAMPLE_CAMPAIGN: CampaignCreateInput = {
+const SAMPLE_CAMPAIGN: Prisma.CampaignCreateInput = {
   id: 'TEST_CAMPAIGN',
   label: 'test',
   workspace: { connect: { id: SAMPLE_WORKSPACE.id } },
@@ -35,17 +35,17 @@ const SAMPLE_CAMPAIGN: CampaignCreateInput = {
         }
       }
     }, {
-        weight: 50,
-        campaignVariant: {
-          create: {
-            id: 'TEST_VARIANT_2',
-            body: 'Dear {{ firstName }}, how are you?',
-            dialogue: { connect: { id: SAMPLE_DIALOGUE.id } },
-            label: 'Test Campaign',
-            type: 'QUEUE',
-            workspace: { connect: { id: SAMPLE_WORKSPACE.id } },
-          }
+      weight: 50,
+      campaignVariant: {
+        create: {
+          id: 'TEST_VARIANT_2',
+          body: 'Dear {{ firstName }}, how are you?',
+          dialogue: { connect: { id: SAMPLE_DIALOGUE.id } },
+          label: 'Test Campaign',
+          type: 'QUEUE',
+          workspace: { connect: { id: SAMPLE_WORKSPACE.id } },
         }
+      }
     }]
   }
 };
@@ -53,7 +53,7 @@ const SAMPLE_CAMPAIGN: CampaignCreateInput = {
 // TODO: Make DRY
 const NR_DELIVERIES_A = 15;
 
-const SAMPLE_DELIVERIES_A: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_A)).map((nr) => ({
+const SAMPLE_DELIVERIES_A: Prisma.DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_A)).map((nr) => ({
   id: `TEST_DELIVERY_${faker.datatype.uuid()}`,
   scheduledAt: faker.date.future().toISOString(),
   deliveryRecipientFirstName: faker.name.firstName(),
@@ -61,13 +61,13 @@ const SAMPLE_DELIVERIES_A: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIE
   deliveryRecipientEmail: faker.internet.email(),
   deliveryRecipientPhone: faker.phone.phoneNumber(),
   campaign: { connect: { id: SAMPLE_CAMPAIGN.id } },
-  campaignVariant:{ connect: { id: 'TEST_VARIANT_1' } },
+  campaignVariant: { connect: { id: 'TEST_VARIANT_1' } },
   currentStatus: 'SCHEDULED',
 }));
 
 const NR_DELIVERIES_B = 35;
 
-const SAMPLE_DELIVERIES_B: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_B)).map((nr) => ({
+const SAMPLE_DELIVERIES_B: Prisma.DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_B)).map((nr) => ({
   id: `TEST_DELIVERY_${faker.datatype.uuid()}`,
   scheduledAt: faker.date.future().toISOString(),
   deliveryRecipientFirstName: faker.name.firstName(),
@@ -75,13 +75,13 @@ const SAMPLE_DELIVERIES_B: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIE
   deliveryRecipientEmail: faker.internet.email(),
   deliveryRecipientPhone: faker.phone.phoneNumber(),
   campaign: { connect: { id: SAMPLE_CAMPAIGN.id } },
-  campaignVariant:{ connect: { id: 'TEST_VARIANT_2' } },
+  campaignVariant: { connect: { id: 'TEST_VARIANT_2' } },
   currentStatus: 'SCHEDULED',
 }));
 
 const NR_DELIVERIES_DEPLOYED_AND_A = 10;
 
-const SAMPLE_DELIVERIES_DEPLOYED_AND_A: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_DEPLOYED_AND_A)).map((nr) => ({
+const SAMPLE_DELIVERIES_DEPLOYED_AND_A: Prisma.DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_DEPLOYED_AND_A)).map((nr) => ({
   id: `TEST_DELIVERY_${faker.datatype.uuid()}`,
   scheduledAt: faker.date.future().toISOString(),
   deliveryRecipientFirstName: faker.name.firstName(),
@@ -89,13 +89,13 @@ const SAMPLE_DELIVERIES_DEPLOYED_AND_A: DeliveryCreateInput[] = Array.from(Array
   deliveryRecipientEmail: faker.internet.email(),
   deliveryRecipientPhone: faker.phone.phoneNumber(),
   campaign: { connect: { id: SAMPLE_CAMPAIGN.id } },
-  campaignVariant:{ connect: { id: 'TEST_VARIANT_1' } },
+  campaignVariant: { connect: { id: 'TEST_VARIANT_1' } },
   currentStatus: 'DEPLOYED',
 }));
 
 const NR_DELIVERIES_DEPLOYED_AND_B = 5;
 
-const SAMPLE_DELIVERIES_DEPLOYED_AND_B: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_DEPLOYED_AND_B)).map((nr) => ({
+const SAMPLE_DELIVERIES_DEPLOYED_AND_B: Prisma.DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_DEPLOYED_AND_B)).map((nr) => ({
   id: `TEST_DELIVERY_${faker.datatype.uuid()}`,
   scheduledAt: faker.date.future().toISOString(),
   deliveryRecipientFirstName: faker.name.firstName(),
@@ -103,7 +103,7 @@ const SAMPLE_DELIVERIES_DEPLOYED_AND_B: DeliveryCreateInput[] = Array.from(Array
   deliveryRecipientEmail: faker.internet.email(),
   deliveryRecipientPhone: faker.phone.phoneNumber(),
   campaign: { connect: { id: SAMPLE_CAMPAIGN.id } },
-  campaignVariant:{ connect: { id: 'TEST_VARIANT_2' } },
+  campaignVariant: { connect: { id: 'TEST_VARIANT_2' } },
   currentStatus: 'DEPLOYED',
 }));
 
@@ -167,7 +167,7 @@ afterAll(async () => {
 
     try {
       const removeCampaignVariant = await prisma.campaignVariant.deleteMany({
-        where: { id: { startsWith: 'TEST_VARIANT'} }
+        where: { id: { startsWith: 'TEST_VARIANT' } }
       });
     } catch (error) {
       console.log(error);
@@ -175,7 +175,7 @@ afterAll(async () => {
 
     try {
       const removeCampaign = await prisma.campaign.delete({
-        where: {  id: SAMPLE_CAMPAIGN.id },
+        where: { id: SAMPLE_CAMPAIGN.id },
       });
 
     } catch (error) {
@@ -216,7 +216,7 @@ describe('CampaignService:pagination', () => {
   test('it fetches only variant B', async () => {
     const deliveryPagination = await CampaignService.getPaginatedDeliveries(
       SAMPLE_CAMPAIGN.id as string,
-      {  },
+      {},
       { variantId: 'TEST_VARIANT_2' }
     );
 
@@ -226,7 +226,7 @@ describe('CampaignService:pagination', () => {
   test('it fetches only deployed', async () => {
     const deliveryPagination = await CampaignService.getPaginatedDeliveries(
       SAMPLE_CAMPAIGN.id as string,
-      {  },
+      {},
       { status: 'DEPLOYED' }
     );
 

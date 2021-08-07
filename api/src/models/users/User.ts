@@ -1,6 +1,6 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType, queryField, scalarType } from '@nexus/schema';
-import { UserUpdateInput } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
 
 import { ConnectionInterface } from '../general/Pagination';
@@ -217,7 +217,7 @@ export const UserMutations = extendType({
         if (!args.userId) throw new UserInputError('No valid user provided to edit');
         if (!args.input) throw new UserInputError('No input provided');
         const { firstName, lastName, email, phone, roleId } = args.input;
-        const userUpdateInput: UserUpdateInput = { firstName, lastName, phone, email };
+        const userUpdateInput: Prisma.UserUpdateInput = { firstName, lastName, phone, email };
 
         return ctx.services.userService.editUser(userUpdateInput, email, args.userId, args.input.customerId, roleId);
       },

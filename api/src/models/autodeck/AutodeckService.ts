@@ -8,7 +8,7 @@ import request from 'request';
 
 import config from '../../config/config';
 import { NexusGenInputs } from '../../generated/nexus';
-import { CustomField, FindManyCreateWorkspaceJobArgs, JobProcessLocation, PrismaClient, PrismaClientOptions } from '@prisma/client';
+import { CustomField, JobProcessLocation, Prisma, PrismaClient } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import CustomerService from '../customer/CustomerService';
 import JobProcessLocationPrismaAdapter from './JobProcessLocationPrismaAdapter';
@@ -31,7 +31,7 @@ class AutodeckService {
   jobProcessLocationPrismaAdapter: JobProcessLocationPrismaAdapter;
   createWorkspaceJobPrismaAdapter: CreateWorkspaceJobPrismaAdapter;
 
-  constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
+  constructor(prismaClient: PrismaClient) {
     this.customerService = new CustomerService(prismaClient);
     this.jobProcessLocationPrismaAdapter = new JobProcessLocationPrismaAdapter(prismaClient);
     this.createWorkspaceJobPrismaAdapter = new CreateWorkspaceJobPrismaAdapter(prismaClient);
@@ -64,7 +64,7 @@ class AutodeckService {
    * @param createWorkspaceJobId The id of an Autodeck job
    * @returns JobProcessLocation prisma entry
    */
-  getJobProcessLocationOfJob(createWorkspaceJobId: string): Promise<JobProcessLocation> {
+  getJobProcessLocationOfJob(createWorkspaceJobId: string) {
     return this.jobProcessLocationPrismaAdapter.getJobProcessLocationByJobId(createWorkspaceJobId);
   };
 
@@ -103,7 +103,7 @@ class AutodeckService {
   paginatedAutodeckJobs = async (
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const findManyTriggerArgs: FindManyCreateWorkspaceJobArgs = {
+    const findManyTriggerArgs: Prisma.CreateWorkspaceJobFindManyArgs = {
       where: {
         id: {
           not: undefined

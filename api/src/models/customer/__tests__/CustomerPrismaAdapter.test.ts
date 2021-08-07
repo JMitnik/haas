@@ -32,7 +32,7 @@ describe('CustomerPrismaAdapter', () => {
 
     // settings (main & colour settings)
 
-    const customerSettings = await prisma.customerSettings.findOne({
+    const customerSettings = await prisma.customerSettings.findUnique({
       where: {
         customerId: createdCustomer.id,
       },
@@ -74,7 +74,7 @@ describe('CustomerPrismaAdapter', () => {
 
     await customerPrismaAdapter.delete(customer.id);
 
-    const customerPostDelete = await prisma.customer.findOne({
+    const customerPostDelete = await prisma.customer.findUnique({
       where: {
         id: customer.id,
       },

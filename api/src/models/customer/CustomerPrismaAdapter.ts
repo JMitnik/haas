@@ -20,7 +20,7 @@ export class CustomerPrismaAdapter {
   };
 
   getFontSettingsById(fontSettingsId: number): Promise<FontSettings | null> {
-    return this.prisma.fontSettings.findOne({
+    return this.prisma.fontSettings.findUnique({
       where: { id: fontSettingsId },
     });
   };
@@ -34,7 +34,7 @@ export class CustomerPrismaAdapter {
   };
 
   getColourSettingsById(colourSettingsId: number) {
-    return this.prisma.colourSettings.findOne({
+    return this.prisma.colourSettings.findUnique({
       where: { id: colourSettingsId },
     });
   };
@@ -48,13 +48,13 @@ export class CustomerPrismaAdapter {
   };
 
   async getCustomerSettingsByCustomerId(customerId: string) {
-    return this.prisma.customerSettings.findOne({
+    return this.prisma.customerSettings.findUnique({
       where: { customerId },
     });
   };
 
   async getTagsByCustomerSlug(customerSlug: string): Promise<Tag[]> {
-    const customer = await this.prisma.customer.findOne({
+    const customer = await this.prisma.customer.findUnique({
       where: { slug: customerSlug },
       include: {
         tags: true,
@@ -65,11 +65,11 @@ export class CustomerPrismaAdapter {
   };
 
   findWorkspaceBySlug(slug: string): Promise<Customer | null> {
-    return this.prisma.customer.findOne({ where: { slug } });
+    return this.prisma.customer.findUnique({ where: { slug } });
   };
 
   findWorkspaceById(id: string) {
-    return this.prisma.customer.findOne({
+    return this.prisma.customer.findUnique({
       where: { id: id },
       include: {
         settings: {
@@ -121,7 +121,7 @@ export class CustomerPrismaAdapter {
   };
 
   async getDialogueTags(customerSlug: string, dialogueSlug: string) {
-    const customer = await this.prisma.customer.findOne({
+    const customer = await this.prisma.customer.findUnique({
       where: {
         slug: customerSlug,
       },
@@ -141,12 +141,12 @@ export class CustomerPrismaAdapter {
     return dbDialogue;
   };
 
-  delete(customerId: string): Promise<Customer> {
+  delete(customerId: string) {
     return this.prisma.customer.delete({ where: { id: customerId } });
   };
 
   async getDialogueById(customerId: string, dialogueId: string): Promise<Dialogue | undefined> {
-    const customerWithDialogue = await this.prisma.customer.findOne({
+    const customerWithDialogue = await this.prisma.customer.findFirst({
       where: { id: customerId },
       include: {
         dialogues: {
@@ -191,7 +191,7 @@ export class CustomerPrismaAdapter {
   };
 
   async getDialogueBySlug(customerId: string, dialogueSlug: string): Promise<Dialogue | undefined> {
-    const customerWithDialogue = await this.prisma.customer.findOne({
+    const customerWithDialogue = await this.prisma.customer.findUnique({
       where: { id: customerId },
       include: {
         dialogues: {

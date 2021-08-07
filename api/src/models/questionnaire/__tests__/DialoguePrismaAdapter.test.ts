@@ -1,14 +1,14 @@
 import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
 import DialoguePrismaAdapter from "../DialoguePrismaAdapter";
 import { clearDialogueDatabase } from './testUtils';
-import { DialogueCreateInput } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import cuid from 'cuid';
 import { CreateDialogueInput } from "../DialoguePrismaAdapterType";
 
 const prisma = makeTestPrisma();
 const dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
 
-const defaultDialogueCreateInput: DialogueCreateInput = {
+const defaultDialogueCreateInput: Prisma.DialogueCreateInput = {
   title: 'DEFAULT_DIALOGUE',
   slug: 'default',
   description: 'description',
@@ -285,7 +285,7 @@ describe('DialoguePrismaAdapter', () => {
 
   test('Finds dialogue with corresponding nodes and edges', async () => {
     const dialogueId = cuid();
-    const dialogueCreateInputWithEdgesAndQuestions: DialogueCreateInput = {
+    const dialogueCreateInputWithEdgesAndQuestions: Prisma.DialogueCreateInput = {
       ...defaultDialogueCreateInput,
       id: dialogueId,
       questions: {
@@ -329,7 +329,7 @@ describe('DialoguePrismaAdapter', () => {
 
   test('Finds all edges by dialogue ID', async () => {
     const defaultDialogueId = cuid();
-    const dialogueCreateInputWithEdgesAndQuestions: DialogueCreateInput = {
+    const dialogueCreateInputWithEdgesAndQuestions: Prisma.DialogueCreateInput = {
       ...defaultDialogueCreateInput,
       id: defaultDialogueId,
       questions: {
@@ -368,7 +368,7 @@ describe('DialoguePrismaAdapter', () => {
     await dialoguePrismaAdapter.create({ data: dialogueCreateInputWithEdgesAndQuestions });
 
     const edgesTestDialogueId = cuid();
-    const edgesTestDialogueInput: DialogueCreateInput = {
+    const edgesTestDialogueInput: Prisma.DialogueCreateInput = {
       id: edgesTestDialogueId,
       title: 'DEFAULT_DIALOGUE',
       slug: 'edgesTest',
@@ -435,7 +435,7 @@ describe('DialoguePrismaAdapter', () => {
   });
 
   test('Finds all questions by dialogue ID', async () => {
-    const defaultDialogueWithQuestionCreateInput: DialogueCreateInput = {
+    const defaultDialogueWithQuestionCreateInput: Prisma.DialogueCreateInput = {
       ...defaultDialogueCreateInput,
       questions: {
         create: [
@@ -446,7 +446,7 @@ describe('DialoguePrismaAdapter', () => {
 
     await dialoguePrismaAdapter.create({ data: defaultDialogueWithQuestionCreateInput });
 
-    const questionsDialogueCreateInput: DialogueCreateInput = {
+    const questionsDialogueCreateInput: Prisma.DialogueCreateInput = {
       title: 'questionsDialogue',
       slug: 'questionsTest',
       description: 'description',
@@ -472,7 +472,7 @@ describe('DialoguePrismaAdapter', () => {
   });
 
   test('Finds the root question of a dialogue by dialogue ID', async () => {
-    const defaultDialogueWithQuestionCreateInput: DialogueCreateInput = {
+    const defaultDialogueWithQuestionCreateInput: Prisma.DialogueCreateInput = {
       ...defaultDialogueCreateInput,
       questions: {
         create: [
@@ -483,7 +483,7 @@ describe('DialoguePrismaAdapter', () => {
 
     await dialoguePrismaAdapter.create({ data: defaultDialogueWithQuestionCreateInput });
 
-    const targetDialogueCreateInput: DialogueCreateInput = {
+    const targetDialogueCreateInput: Prisma.DialogueCreateInput = {
       title: 'questionsDialogue',
       slug: 'questionsTest',
       description: 'description',
@@ -505,11 +505,11 @@ describe('DialoguePrismaAdapter', () => {
 
     const rootQuestion = await dialoguePrismaAdapter.getRootQuestionByDialogueId(targetRootQuestionDialogue.id);
     // TODO: Should I test (and thus create all different node types) that are part of the return type of the function
-    expect(rootQuestion.title).toBe('targetRootQuestion');
+    expect(rootQuestion?.title).toBe('targetRootQuestion');
   });
 
   test('Finds the tags of a dialogue by dialogue ID', async () => {
-    const defaultTagsDialogueInput: DialogueCreateInput = {
+    const defaultTagsDialogueInput: Prisma.DialogueCreateInput = {
       title: 'DEFAULT_DIALOGUE',
       slug: 'default',
       description: 'description',
@@ -543,7 +543,7 @@ describe('DialoguePrismaAdapter', () => {
 
     await dialoguePrismaAdapter.create({ data: defaultTagsDialogueInput });
 
-    const targetDialogueCreateInput: DialogueCreateInput = {
+    const targetDialogueCreateInput: Prisma.DialogueCreateInput = {
       title: 'targetDialogue',
       slug: 'tagsTest',
       description: 'description',
@@ -592,7 +592,7 @@ describe('DialoguePrismaAdapter', () => {
 
   test('Finds dialogue (with questions and edges) by dialogue ID', async () => {
     const defaultDialogueId = cuid();
-    const dialogueCreateInputWithEdgesAndQuestions: DialogueCreateInput = {
+    const dialogueCreateInputWithEdgesAndQuestions: Prisma.DialogueCreateInput = {
       ...defaultDialogueCreateInput,
       id: defaultDialogueId,
       questions: {
@@ -632,7 +632,7 @@ describe('DialoguePrismaAdapter', () => {
 
     const edgesTestDialogueId = cuid();
     const edgeId = cuid();
-    const edgesTestDialogueInput: DialogueCreateInput = {
+    const edgesTestDialogueInput: Prisma.DialogueCreateInput = {
       id: edgesTestDialogueId,
       title: 'DEFAULT_DIALOGUE',
       slug: 'edgesTest',

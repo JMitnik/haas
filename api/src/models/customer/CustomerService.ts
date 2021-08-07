@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, PrismaClientOptions, CustomerSettings } from '@prisma/client';
+import { Customer, PrismaClient, Prisma, CustomerSettings } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -21,7 +21,7 @@ class CustomerService {
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
   nodeService: NodeService;
 
-  constructor(prismaClient: PrismaClient<PrismaClientOptions, never>) {
+  constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.dialogueService = new DialogueService(prismaClient);
     this.tagPrismaAdapter = new TagPrismaAdapter(prismaClient);
@@ -37,7 +37,7 @@ class CustomerService {
    * @returns A dialogue including question Ids and edges 
    */
   async getDialogue(customerId: string, dialogueSlug: string) {
-    const customer = await prisma.customer.findOne({
+    const customer = await prisma.customer.findUnique({
       where: {
         id: customerId || undefined,
       },

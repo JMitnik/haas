@@ -1,4 +1,4 @@
-import { EdgeCreateInput, QuestionNode, PrismaClient, QuestionCondition } from '@prisma/client';
+import { Prisma, QuestionNode, PrismaClient, QuestionCondition } from '@prisma/client';
 
 import { EdgeChildProps } from './EdgeServiceType';
 import EdgePrismaAdapter from './EdgePrismaAdapter';
@@ -42,7 +42,7 @@ class EdgeService {
     parentNodeEntry: QuestionNode,
     childNodeEntry: QuestionNode,
     conditions: any,
-  ): EdgeCreateInput {
+  ): Prisma.EdgeCreateInput {
     return {
       dialogue: {
         connect: {

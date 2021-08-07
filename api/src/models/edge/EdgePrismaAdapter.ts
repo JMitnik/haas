@@ -1,4 +1,4 @@
-import { PrismaClient, EdgeCreateInput, BatchPayload, Edge, QuestionCondition, QuestionConditionUpdateInput, QuestionConditionCreateInput } from "@prisma/client";
+import { Prisma, PrismaClient, Edge, QuestionCondition } from "@prisma/client";
 
 export interface CreateEdgeInput {
   id?: string;
@@ -65,20 +65,20 @@ class EdgePrismaAdapter {
     });
   };
 
-  create(data: EdgeCreateInput): Promise<Edge> {
+  create(data: Prisma.EdgeCreateInput): Promise<Edge> {
     return this.prisma.edge.create({
       data
     })
   };
 
   async getEdgeById(edgeId: string) {
-    return this.prisma.edge.findOne({
+    return this.prisma.edge.findUnique({
       where: { id: edgeId },
       include: { conditions: true }
     });
   };
 
-  upsertCondition(id: number, create: QuestionConditionCreateInput, update: QuestionConditionUpdateInput): Promise<QuestionCondition> {
+  upsertCondition(id: number, create: Prisma.QuestionConditionCreateInput, update: Prisma.QuestionConditionUpdateInput): Promise<QuestionCondition> {
     return this.prisma.questionCondition.upsert({
       where: { id },
       create,
@@ -86,7 +86,7 @@ class EdgePrismaAdapter {
     })
   }
 
-  updateCondition(id: number | undefined, data: QuestionConditionUpdateInput): Promise<QuestionCondition> {
+  updateCondition(id: number | undefined, data: Prisma.QuestionConditionUpdateInput): Promise<QuestionCondition> {
     return this.prisma.questionCondition.update({
       where: {
         id: id || undefined,
@@ -113,7 +113,7 @@ class EdgePrismaAdapter {
     });
   }
 
-  async deleteMany(edgeIds: string[]): Promise<BatchPayload> {
+  async deleteMany(edgeIds: string[]): Promise<Prisma.BatchPayload> {
     return this.prisma.edge.deleteMany(
       {
         where: {
