@@ -20,6 +20,7 @@
         "test:integration": "jest -i --detectOpenHandles",
         "test:watch": "jest --watch --maxWorkers=0",
         "migrate:create": "prisma migrate dev --create-only",
+        "migrate:baseline": "prisma migrate resolve",
         "migrate": "prisma migrate dev",
         "gen": "prisma generate && ts-node ./src/config/schema.ts",
         "gen:prisma": "prisma generate",
