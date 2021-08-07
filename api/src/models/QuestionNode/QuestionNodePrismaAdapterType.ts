@@ -1,4 +1,4 @@
-import { FormNodeFieldUpsertArgs, FormNodeCreateInput, LinkTypeEnum } from "@prisma/client"
+import { Prisma, LinkTypeEnum } from "@prisma/client"
 
 import { NexusGenInputs } from "../../generated/nexus"
 import { CreateQuestionInput } from "../questionnaire/DialoguePrismaAdapterType"
@@ -26,12 +26,12 @@ export type CreateCTAInput = {
 
 export type UpdateFormFieldsInput = {
   questionId: string;
-  fields: FormNodeFieldUpsertArgs[];
+  fields: Prisma.FormNodeFieldUpsertArgs[];
 }
 
 export type CreateFormFieldsInput = {
   questionId: string;
-  fields: FormNodeCreateInput;
+  fields: Prisma.FormNodeCreateInput;
 }
 
 export interface UpdateQuestionInput extends CreateQuestionInput {
