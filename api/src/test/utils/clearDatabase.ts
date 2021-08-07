@@ -7,7 +7,10 @@ export const clearDatabase = async (): Promise<void> => {
   if (config.env === 'prod') return;
 
   const dialogues = await prisma.dialogue.findMany();
-  await Promise.all(dialogues.map(async (dialogue) => DialogueService.deleteDialogue(dialogue.id)));
+  const dialogueService = new DialogueService(prisma);
+  const customerService = new CustomerService(prisma);
+
+  await Promise.all(dialogues.map(async (dialogue) => dialogueService.deleteDialogue(dialogue.id)));
   const customers = await prisma.customer.findMany();
-  await Promise.all(await customers.map((customer) => CustomerService.deleteCustomer(customer.id)));
+  await Promise.all(customers.map((customer) => customerService.deleteWorkspace(customer.id)));
 };

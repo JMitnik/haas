@@ -25,7 +25,7 @@ const isSelf = rule({ cache: 'no_cache' })(
 
 const isFromClient = rule({ cache: 'contextual' })(
   async (parent, args, ctx: APIContext) => {
-    console.log(ctx.req.get('origin'));
+    // console.log(ctx.req.get('origin'));
     if (config.env === 'local') return true;
 
     if (ctx.req.get('origin') === config.clientUrl) {

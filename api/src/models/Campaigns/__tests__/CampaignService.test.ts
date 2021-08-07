@@ -54,7 +54,7 @@ const SAMPLE_CAMPAIGN: CampaignCreateInput = {
 const NR_DELIVERIES_A = 15;
 
 const SAMPLE_DELIVERIES_A: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_A)).map((nr) => ({
-  id: `TEST_DELIVERY_${faker.random.uuid()}`,
+  id: `TEST_DELIVERY_${faker.datatype.uuid()}`,
   scheduledAt: faker.date.future().toISOString(),
   deliveryRecipientFirstName: faker.name.firstName(),
   deliveryRecipientLastName: faker.name.lastName(),
@@ -68,7 +68,7 @@ const SAMPLE_DELIVERIES_A: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIE
 const NR_DELIVERIES_B = 35;
 
 const SAMPLE_DELIVERIES_B: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_B)).map((nr) => ({
-  id: `TEST_DELIVERY_${faker.random.uuid()}`,
+  id: `TEST_DELIVERY_${faker.datatype.uuid()}`,
   scheduledAt: faker.date.future().toISOString(),
   deliveryRecipientFirstName: faker.name.firstName(),
   deliveryRecipientLastName: faker.name.lastName(),
@@ -82,7 +82,7 @@ const SAMPLE_DELIVERIES_B: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIE
 const NR_DELIVERIES_DEPLOYED_AND_A = 10;
 
 const SAMPLE_DELIVERIES_DEPLOYED_AND_A: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_DEPLOYED_AND_A)).map((nr) => ({
-  id: `TEST_DELIVERY_${faker.random.uuid()}`,
+  id: `TEST_DELIVERY_${faker.datatype.uuid()}`,
   scheduledAt: faker.date.future().toISOString(),
   deliveryRecipientFirstName: faker.name.firstName(),
   deliveryRecipientLastName: faker.name.lastName(),
@@ -96,7 +96,7 @@ const SAMPLE_DELIVERIES_DEPLOYED_AND_A: DeliveryCreateInput[] = Array.from(Array
 const NR_DELIVERIES_DEPLOYED_AND_B = 5;
 
 const SAMPLE_DELIVERIES_DEPLOYED_AND_B: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_DEPLOYED_AND_B)).map((nr) => ({
-  id: `TEST_DELIVERY_${faker.random.uuid()}`,
+  id: `TEST_DELIVERY_${faker.datatype.uuid()}`,
   scheduledAt: faker.date.future().toISOString(),
   deliveryRecipientFirstName: faker.name.firstName(),
   deliveryRecipientLastName: faker.name.lastName(),
@@ -145,9 +145,6 @@ beforeAll(async () => {
     } catch (error) {
       console.log(error);
     }
-
-    console.log("PREPARATION: Created all input!");
-    console.log("===============================");
   }
 });
 
@@ -204,9 +201,6 @@ afterAll(async () => {
   }
 
   await prisma.$disconnect();
-
-  console.log("STOPPED: Removed input");
-  console.log("===============================");
 });
 
 describe('CampaignService:pagination', () => {

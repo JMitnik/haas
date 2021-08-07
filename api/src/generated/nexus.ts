@@ -945,7 +945,6 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
     slug: string; // String!
-    userCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     users: NexusGenRootTypes['UserType'][] | null; // [UserType!]
     usersConnection: NexusGenRootTypes['UserConnection'] | null; // UserConnection
   }
@@ -1135,7 +1134,6 @@ export interface NexusGenFieldTypes {
     createSession: NexusGenRootTypes['Session']; // Session!
     createTag: NexusGenRootTypes['Tag']; // Tag!
     createTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
-    createUser: NexusGenRootTypes['UserType']; // UserType!
     createWorkspace: NexusGenRootTypes['Customer']; // Customer!
     deleteCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     deleteCustomer: NexusGenRootTypes['Customer'] | null; // Customer
@@ -1160,7 +1158,6 @@ export interface NexusGenFieldTypes {
     updateCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     updateCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateDeliveryStatus: string; // String!
-    updateJob: NexusGenRootTypes['JobObjectType'] | null; // JobObjectType
     updateQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
     uploadJobImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
@@ -1214,11 +1211,8 @@ export interface NexusGenFieldTypes {
     getPreviewData: NexusGenRootTypes['PreviewDataType'] | null; // PreviewDataType
     lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     me: NexusGenRootTypes['UserType']; // UserType!
-    questionNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
-    questionNodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     refreshAccessToken: NexusGenRootTypes['RefreshAccessTokenOutput']; // RefreshAccessTokenOutput!
     roleConnection: NexusGenRootTypes['RoleConnection']; // RoleConnection!
-    roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     session: NexusGenRootTypes['Session'] | null; // Session
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     tags: NexusGenRootTypes['Tag'][]; // [Tag!]!
@@ -1424,9 +1418,6 @@ export interface NexusGenArgTypes {
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
     }
-    userCustomer: { // args
-      userId?: string | null; // String
-    }
     usersConnection: { // args
       customerSlug?: string | null; // String
       filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
@@ -1497,10 +1488,6 @@ export interface NexusGenArgTypes {
     }
     createTrigger: { // args
       input?: NexusGenInputs['CreateTriggerInputType'] | null; // CreateTriggerInputType
-    }
-    createUser: { // args
-      customerSlug?: string | null; // String
-      input?: NexusGenInputs['UserInput'] | null; // UserInput
     }
     createWorkspace: { // args
       input?: NexusGenInputs['CreateWorkspaceInput'] | null; // CreateWorkspaceInput
@@ -1590,13 +1577,6 @@ export interface NexusGenArgTypes {
       deliveryId?: string | null; // String
       status?: NexusGenEnums['DeliveryStatusEnum'] | null; // DeliveryStatusEnum
     }
-    updateJob: { // args
-      errorMessage?: string | null; // String
-      id?: string | null; // String
-      referenceId?: string | null; // String
-      resourceUrl?: string | null; // String
-      status?: NexusGenEnums['JobStatusType'] | null; // JobStatusType
-    }
     updateQuestion: { // args
       input?: NexusGenInputs['UpdateQuestionNodeInputType'] | null; // UpdateQuestionNodeInputType
     }
@@ -1652,15 +1632,9 @@ export interface NexusGenArgTypes {
       numberOfDaysBack?: number | null; // Int
       offset?: number | null; // Int
     }
-    questionNode: { // args
-      where?: NexusGenInputs['QuestionNodeWhereUniqueInput'] | null; // QuestionNodeWhereUniqueInput
-    }
     roleConnection: { // args
       customerId?: string | null; // String
       filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
-    }
-    roles: { // args
-      customerSlug?: string | null; // String
     }
     session: { // args
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput

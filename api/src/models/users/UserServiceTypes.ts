@@ -1,7 +1,7 @@
-import { NexusGenInputs } from "../../generated/nexus";
-import { User } from "@prisma/client";
+import { Customer, Role, User, UserOfCustomer } from "@prisma/client";
 
-export interface UserServiceType {
-  createUser(userInput: NexusGenInputs['UserInput']): Promise<User>;
-  inviteNewUserToCustomer(email: string, customerId: string, roleId: string): Promise<void>;
+export interface DeletedUserOutput {
+  deletedUser: boolean;
 }
+
+export type UserWithWorkspaces = (User & { customers: (UserOfCustomer & { customer: Customer; role: Role; })[]; });

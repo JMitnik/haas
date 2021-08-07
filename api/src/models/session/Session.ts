@@ -1,12 +1,8 @@
 import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
-
-// eslint-disable-next-line import/no-cycle
 import { UserInputError } from 'apollo-server-express';
+
 import { NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
-// eslint-disable-next-line import/no-cycle
 import { ConnectionInterface } from '../general/Pagination';
-// eslint-disable-next-line import/no-cycle
-import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from './SessionService';
 
 export const SessionType = objectType({
@@ -19,7 +15,7 @@ export const SessionType = objectType({
     // t.int('index');
     t.int('paths', {
       async resolve(parent, args, ctx) {
-        const entryCount = await ctx.prisma.nodeEntry.count({ where: { sessionId: parent.id } });
+        const entryCount = await ctx.services.nodeEntryService.countNodeEntriesBySessionid(parent.id);
         return entryCount;
       },
     });
@@ -29,7 +25,7 @@ export const SessionType = objectType({
         // @ts-ignore
         if (parent.score) return parent.score;
 
-        const score = await SessionService.getSessionScore(parent.id) || 0.0;
+        const score = await SessionService.findSessionScore(parent.id) || 0.0;
 
         return score;
       },
@@ -37,12 +33,12 @@ export const SessionType = objectType({
 
     t.int('totalTimeInSec', {
       nullable: true,
-      resolve: (parent) => parent.totalTimeInSec || null
+      resolve: (parent) => parent.totalTimeInSec || null,
     });
 
     t.string('originUrl', {
       nullable: true,
-      resolve: (parent) => parent.originUrl || ''
+      resolve: (parent) => parent.originUrl || '',
     });
 
     t.string('deliveryId', { nullable: true, resolve: (parent) => parent.deliveryId });
@@ -55,21 +51,7 @@ export const SessionType = objectType({
       type: NodeEntryType,
 
       async resolve(parent, args, ctx) {
-        const nodeEntries = await ctx.prisma.nodeEntry.findMany({
-          where: { sessionId: parent.id },
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            sliderNodeEntry: true,
-            textboxNodeEntry: true,
-          },
-          orderBy: {
-            depth: 'asc',
-          },
-        });
-
-        return nodeEntries;
+        return ctx.services.nodeEntryService.getNodeEntriesBySessionId(parent.id);
       },
     });
   },
@@ -125,11 +107,7 @@ export const SessionQuery = extendType({
           return null;
         }
 
-        const session = await ctx.prisma.session.findOne({
-          where: {
-            id: args.where.id,
-          },
-        });
+        const session = await ctx.services.sessionService.findSessionById(args.where.id);
 
         return session;
       },
@@ -162,7 +140,7 @@ export const CreateSessionMutation = mutationField('createSession', {
     }
 
     try {
-      const session = SessionService.createSession(args.input, ctx);
+      const session = ctx.services.sessionService.createSession(args.input);
       return session;
     } catch (error) {
       throw new Error(`Failed making a session due to ${error}`);
@@ -187,16 +165,11 @@ export const AppendToInteractionMutation = mutationField('appendToInteraction', 
   type: SessionType,
   args: { input: AppendToInteractionInput },
 
-  resolve(parent, args, ctx) {
+  async resolve(parent, args, ctx) {
     if (!args?.input) throw new UserInputError('No valid new interaction data provided');
     if (!args?.input.sessionId) throw new UserInputError('No valid existing interaction found');
 
-    const updatedInteraction = ctx.prisma.nodeEntry.create({
-      data: {
-        session: { connect: { id: args.input.sessionId } },
-        ...NodeEntryService.constructCreateNodeEntryFragment(args.input),
-      },
-    });
+    const updatedInteraction = await ctx.services.nodeEntryService.createNodeEntry(args.input.sessionId, args.input);
 
     return updatedInteraction as any;
   },

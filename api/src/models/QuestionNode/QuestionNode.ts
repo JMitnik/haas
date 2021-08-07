@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, NodeType } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
 
@@ -6,8 +6,6 @@ import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
-import NodeService from './NodeService';
-import prisma from '../../config/prisma';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -42,11 +40,9 @@ export const QuestionOptionType = objectType({
       type: 'QuestionNode',
       nullable: true,
 
-      resolve: async (parent, ctx) => {
+      resolve: async (parent, args, ctx) => {
         if (!parent.overrideLeafId) return null;
-
-        const cta = await prisma.questionNode.findFirst({ where: { id: parent.overrideLeafId } });
-
+        const cta = await ctx.services.nodeService.findNodeById(parent.overrideLeafId);
         return cta as any;
       }
     });
@@ -202,15 +198,9 @@ export const QuestionNodeType = objectType({
     t.string('extraContent', {
       nullable: true,
       resolve: async (parent, args, ctx) => {
-        const videoEmbeddedNode = parent.videoEmbeddedNodeId ? await ctx.prisma.videoEmbeddedNode.findOne({
-          where: {
-            id: parent.videoEmbeddedNodeId,
-          },
-          select: {
-            videoUrl: true
-          }
-        }) : null;
-        return videoEmbeddedNode?.videoUrl || null;
+        if (!parent.videoEmbeddedNodeId) return null;
+        const node = await ctx.services.nodeService.getVideoEmbeddedNode(parent.videoEmbeddedNodeId);
+        return node?.videoUrl || null;
       },
     });
     t.string('creationDate', { nullable: true });
@@ -260,11 +250,7 @@ export const QuestionNodeType = objectType({
           return null;
         }
 
-        const [share] = await ctx.prisma.share.findMany({
-          where: {
-            questionNodeId: parent.id,
-          },
-        });
+        const share = await ctx.services.nodeService.getShareNode(parent.id);
 
         if (!share) return null;
 
@@ -291,11 +277,7 @@ export const QuestionNodeType = objectType({
       type: LinkType,
       async resolve(parent, args, ctx) {
         if (parent.isLeaf) {
-          const links = await ctx.prisma.link.findMany({
-            where: {
-              questionNodeId: parent.id,
-            },
-          });
+          const links = await ctx.services.nodeService.getLinksByNodeId(parent.id);
 
           return links as any;
         }
@@ -310,11 +292,7 @@ export const QuestionNodeType = objectType({
 
       resolve(parent, args, ctx) {
         if (parent.questionDialogueId) {
-          return ctx.prisma.dialogue.findOne({
-            where: {
-              id: parent.questionDialogueId,
-            },
-          });
+          return ctx.services.dialogueService.getDialogueById(parent.questionDialogueId);
         }
 
         return null;
@@ -325,10 +303,9 @@ export const QuestionNodeType = objectType({
       type: QuestionNodeType,
       nullable: true,
 
-      resolve(parent, args, ctx) {
-        const overrideLeaf = ctx.prisma.questionNode.findOne({
-          where: { id: parent.id },
-        }).overrideLeaf();
+      async resolve(parent, args, ctx) {
+        if (!parent.overrideLeafId) return null
+        const overrideLeaf = await ctx.services.nodeService.findNodeById(parent.overrideLeafId);
 
         return overrideLeaf;
       },
@@ -338,25 +315,14 @@ export const QuestionNodeType = objectType({
       type: QuestionOptionType,
 
       resolve(parent, args, ctx) {
-        const options = ctx.prisma.questionOption.findMany({
-          where: { questionNodeId: parent.id },
-          include: { overrideLeaf: true },
-          orderBy: { position: 'asc' },
-        });
-
-        return options;
+        return ctx.services.nodeService.getOptionsByNodeId(parent.id);
       },
     });
 
     t.list.field('children', {
       type: EdgeType,
       resolve(parent, args, ctx) {
-        const children = ctx.prisma.edge.findMany({
-          where: {
-            parentNodeId: parent.id,
-          },
-        });
-        return children;
+        return ctx.services.nodeService.getChildEdgesOfNode(parent.id);
       },
     });
   },
@@ -497,12 +463,12 @@ export const QuestionNodeMutations = extendType({
       nullable: true,
       args: { questionId: 'String' },
 
-      async resolve(parent, args) {
+      async resolve(parent, args, ctx) {
         if (!args.questionId) {
           throw new UserInputError('Question id is missing!');
         }
 
-        await NodeService.duplicateBranch(args.questionId);
+        await ctx.services.nodeService.duplicateBranch(args.questionId);
         return null;
       },
     });
@@ -512,44 +478,16 @@ export const QuestionNodeMutations = extendType({
       args: { input: DeleteNodeInputType },
       // TODO: Remove the any
       // @ts-ignore
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx) {
         const { id, customerId, dialogueSlug } = args.input;
-        const { prisma }: { prisma: PrismaClient } = ctx;
 
-        const customer = await prisma.customer.findOne({
-          where: {
-            id: customerId || undefined,
-          },
-          include: {
-            dialogues: {
-              where: {
-                slug: dialogueSlug,
-              },
-              include: {
-                questions: {
-                  select: {
-                    id: true,
-                  },
-                },
-                edges: {
-                  select: {
-                    id: true,
-                    parentNodeId: true,
-                    childNodeId: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        const dialogue = customer?.dialogues[0];
+        const dialogue = await ctx.services.customerService.getDialogue(customerId, dialogueSlug);
 
         if (!dialogue) {
           throw new Error('No dialogue found to be removed');
         }
 
-        const deletedDialogues = await NodeService.deleteQuestionFromBuilder(id, dialogue);
+        const deletedDialogues = await ctx.services.nodeService.deleteQuestionNode(id, dialogue);
 
         if (!deletedDialogues) throw new Error('Unable to delete dialogue');
 
@@ -564,30 +502,17 @@ export const QuestionNodeMutations = extendType({
         input: CreateQuestionNodeInputType,
       },
       // TODO: Remove the any
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         // eslint-disable-next-line max-len
         const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition, extraContent } = args.input;
         const { options } = optionEntries;
 
-        const customer = await prisma.customer.findOne({
-          where: {
-            id: customerId,
-          },
-          include: {
-            dialogues: {
-              where: {
-                slug: dialogueSlug,
-              },
-            },
-          },
-        });
-
-        const dialogue = customer?.dialogues[0];
+        const dialogue = await ctx.services.customerService.getDialogue(customerId, dialogueSlug);
         const dialogueId = dialogue?.id;
 
         if (dialogueId) {
-          return NodeService.createQuestionFromBuilder(
+          return ctx.services.nodeService.createQuestionFromBuilder(
             dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition, extraContent
           );
         }
@@ -600,20 +525,8 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: DeleteNodeInputType },
 
-      async resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-
-        await prisma.share.deleteMany({
-          where: {
-            questionNodeId: args?.input?.id,
-          }
-        });
-
-        return prisma.questionNode.delete({
-          where: {
-            id: args?.input?.id,
-          },
-        });
+      async resolve(parent: any, args: any, ctx) {
+        return ctx.services.nodeService.deleteNode(args?.input?.id);
       },
     });
 
@@ -622,77 +535,49 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: CreateCTAInputType },
 
-      async resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const { customerSlug, dialogueSlug, title, type, links, share } = args.input;
-
-        const customer = await prisma.customer.findOne({
-          where: {
-            slug: customerSlug,
-          },
-          include: {
-            dialogues: {
-              where: {
-                slug: dialogueSlug,
-              },
-              select: {
-                id: true,
-              },
-            },
-          },
-        });
-
-        return prisma.questionNode.create({
-          data: {
-            title,
-            type,
-            isLeaf: true,
-            links: {
-              create: [...links?.linkTypes],
-            },
-            share: {
-              create: share,
-            },
-            form: {
-              create: args.input.form ? NodeService.saveCreateFormNodeInput(args.input.form) : undefined,
-            },
-            questionDialogue: {
-              connect: {
-                id: customer?.dialogues[0].id,
-              },
-            },
-          },
-        });
-      },
-    });
-  },
-});
-
-export const getQuestionNodeQuery = extendType({
-  type: 'Query',
-
-  definition(t) {
-    t.field('questionNode', {
-      type: QuestionNodeType,
-      args: {
-        where: QuestionNodeInput,
-      },
-      nullable: true,
       async resolve(parent, args, ctx) {
-        if (!args.where?.id) return null;
+        const links = args.input?.links;
 
-        const questionNode = await ctx.prisma.questionNode.findOne({
-          where: { id: args.where.id },
-        });
+        const validatedType = Object.values(NodeType).find((type) => type === args.input?.type);
 
-        return questionNode;
-      },
-    });
+        if (!args.input?.customerSlug
+          || !args.input?.dialogueSlug
+          || !args.input?.title
+          || typeof validatedType === undefined
+          || (args.input.type === NodeType.LINK && links?.linkTypes?.length === 0)
+          || (args.input.type === NodeType.SHARE && !args.input?.share?.title)
+          || (args.input.type === NodeType.FORM && args.input.form?.fields?.length === 0))
+          throw new UserInputError(`Input data is unsufficient: ${args.input}`);
 
-    t.list.field('questionNodes', {
-      type: QuestionNodeType,
-      resolve(parent, args, ctx) {
-        return ctx.prisma.questionNode.findMany();
+
+        const share = args.input?.share?.title ? {
+          id: args.input?.share?.id || undefined,
+          title: args.input?.share?.title,
+          tooltip: args.input?.share?.tooltip || undefined,
+          url: args.input?.share?.url || '',
+        } : undefined;
+
+
+        const mappedLinks = links?.linkTypes?.map(({ backgroundColor, iconUrl, id, title, type, url }) => ({
+          id: id || undefined,
+          backgroundColor: backgroundColor || undefined,
+          iconUrl: iconUrl || undefined,
+          title: title || undefined,
+          type: type || 'SOCIAL',
+          url: url || '',
+        })) || [];
+
+        const createCTAInput = {
+          form: args.input.form,
+          share,
+          customerSlug: args.input?.customerSlug,
+          dialogueSlug: args.input?.dialogueSlug,
+          title: args.input?.title,
+          type: validatedType,
+          links: mappedLinks,
+        }
+
+        return ctx.services.nodeService.createCTA(createCTAInput);
       },
     });
   },

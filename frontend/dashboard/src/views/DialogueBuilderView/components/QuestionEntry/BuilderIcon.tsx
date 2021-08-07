@@ -23,7 +23,7 @@ const BuilderIcon = ({ type, Icon }: BuilderIconProps) => (
       <BuilderEntryIcon>
         <Icon />
       </BuilderEntryIcon>
-      <Span marginTop="5px" fontSize="0.6em" color="default.darker">
+      <Span marginTop="5px" fontSize="0.6em" color="default.darker" textAlign="center">
         {type}
       </Span>
     </Flex>
