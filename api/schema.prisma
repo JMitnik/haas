@@ -6,7 +6,6 @@ datasource postgresql {
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["transactionApi"]
   output          = "./node_modules/@prisma/client"
 }
 
@@ -358,6 +357,8 @@ model Session {
   originUrl      String?
   totalTimeInSec Int?
   device         String?
+
+  browser        String?
 }
 
 // Node-entry types
