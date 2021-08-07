@@ -1275,6 +1275,7 @@ export interface NexusGenFieldTypes {
     roleId: string | null; // String
   }
   Session: { // field return type
+    browser: string; // String!
     createdAt: any; // Date!
     delivery: NexusGenRootTypes['DeliveryType'] | null; // DeliveryType
     deliveryId: string | null; // String
