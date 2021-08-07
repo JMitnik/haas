@@ -41,8 +41,7 @@ COPY --chown=node:node ./src/generated/schema.graphql ./dist/generated/schema.gr
 # - Useful as target for a separate docker image
 ###
 FROM base as migrateBuilder
-RUN npm install @prisma/cli@2.8.0 --no-save
-RUN npx prisma init > 0
+RUN npm install prisma --no-save
 
 # Copy 3: copy the built node app.
 COPY schema.prisma package.json ./

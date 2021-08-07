@@ -52,6 +52,7 @@ export const GetCampaignOfWorkspace = extendType({
     t.field('campaign', {
       type: CampaignModel,
       args: { campaignId: 'String' },
+      nullable: true,
       resolve: async (parent, args, ctx) => {
         const workspaceWithCampaign = await ctx.prisma.campaign.findFirst({
           where: {
@@ -75,6 +76,8 @@ export const GetCampaignOfWorkspace = extendType({
           }
         });
 
+        if (!workspaceWithCampaign) return null;
+
         return {
           ...workspaceWithCampaign,
           deliveries: [],
@@ -86,7 +89,7 @@ export const GetCampaignOfWorkspace = extendType({
               workspace: variantEdge.campaignVariant.workspace,
             }))
           ]
-        };
+        } as any;
       }
     })
   }
@@ -118,6 +121,8 @@ export const GetCampaignsOfWorkspace = extendType({
           },
         });
 
+        if (!workspaceWithCampaigns) throw "Can't find workspace!"
+
         return workspaceWithCampaigns.campaigns.map(campaign => ({
           ...campaign,
           variants: campaign.variantsEdges.map((variantEdge) => ({
@@ -140,7 +145,7 @@ export const GetCampaignVariantOfDelivery = extendType({
       resolve: async (parent, args, ctx) => {
         if (!parent.id) throw new ApolloError('Cant find matching delivery');
 
-        const campaignVariant = (await ctx.prisma.delivery.findOne({
+        const campaignVariant = (await ctx.prisma.delivery.findUnique({
           where: { id: parent.id },
           include: {
             campaignVariant: {

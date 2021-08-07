@@ -1,9 +1,9 @@
+import { PrismaClient, Prisma } from "@prisma/client"
+
 import { mailService } from "../services/mailings/MailService"
 import { LoginService } from "../models/auth/LoginService"
 import UserService from "../models/users/UserService"
 import { APIServiceContainer } from "../types/APIContext"
-import { PrismaClient } from "@prisma/client"
-import { PrismaClientOptions } from "@prisma/client/runtime"
 import CustomerService from "../models/customer/CustomerService"
 import AutodeckService from "../models/autodeck/AutodeckService"
 import DialogueService from "../models/questionnaire/DialogueService"
@@ -17,7 +17,7 @@ import SessionService from "../models/session/SessionService"
 import TagService from "../models/tag/TagService"
 import TriggerService from "../models/trigger/TriggerService"
 
-export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, never>): APIServiceContainer => {
+export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
   const userService = new UserService(prisma);
   const customerService = new CustomerService(prisma);
@@ -26,7 +26,7 @@ export const bootstrapServices = (prisma: PrismaClient<PrismaClientOptions, neve
   const dialogueService = new DialogueService(prisma);
   const authService = new AuthService(prisma);
   const nodeService = new NodeService(prisma);
-  const edgeService = new EdgeService(prisma); 
+  const edgeService = new EdgeService(prisma);
   const nodeEntryService = new NodeEntryService(prisma);
   const permissionService = new PermissionService(prisma);
   const roleService = new RoleService(prisma);

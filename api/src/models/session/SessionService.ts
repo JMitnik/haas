@@ -1,5 +1,5 @@
 import {
-  NodeEntry, Session, SessionOrderByInput, SessionWhereInput, PrismaClient,
+  NodeEntry, Session, Prisma, PrismaClient,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { sortBy } from 'lodash';
@@ -145,7 +145,7 @@ class SessionService {
    * */
   static async findSessionScore(sessionId: string): Promise<number | undefined | null> {
     // TODO: Replace with prismAdapter.findSessionById
-    const session = await prisma.session.findOne({
+    const session = await prisma.session.findUnique({
       where: { id: sessionId },
       include: {
         nodeEntries: {
@@ -168,7 +168,7 @@ class SessionService {
     return rootedNodeEntry?.sliderNodeEntry?.value;
   };
 
-  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (SessionOrderByInput | undefined) {
+  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (Prisma.SessionOrderByInput | undefined) {
     if (!orderByArray?.length) return undefined;
 
     const orderBy = orderByArray[0];
@@ -189,14 +189,13 @@ class SessionService {
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
   ): Promise<Array<SessionWithEntries> | null | undefined> {
-    const dialogue = await prisma.dialogue.findOne({
+    const dialogue = await prisma.dialogue.findUnique({
       where: {
         id: dialogueId,
       },
     });
 
-    // TODO: Move this to the corresponding prisma-adapter.
-    const dialougeWithSessionWithEntries = await prisma.dialogue.findOne({
+    const dialougeWithSessionWithEntries = await prisma.dialogue.findUnique({
       where: { id: dialogueId },
       include: {
         sessions: {
@@ -286,7 +285,6 @@ class SessionService {
     };
 
     if (paginationOpts?.orderBy?.[0].desc) return sorted.reverse();
-
     return sorted;
   }
 
@@ -358,7 +356,7 @@ class SessionService {
   };
 
   static async getSessionEntries(session: Session): Promise<NodeEntry[] | []> {
-    const sessionWithEntries = await prisma.session.findOne({
+    const sessionWithEntries = await prisma.session.findUnique({
       where: { id: session.id },
       include: {
         nodeEntries: {
@@ -379,8 +377,8 @@ class SessionService {
   }
 
   // TODO: Make Utils script
-  static constructDateRangeWhereInput(startDate?: Date, endDate?: Date): SessionWhereInput[] | [] {
-    let dateRange: SessionWhereInput[] | [] = [];
+  static constructDateRangeWhereInput(startDate?: Date, endDate?: Date): Prisma.SessionWhereInput[] | [] {
+    let dateRange: Prisma.SessionWhereInput[] | [] = [];
 
     if (startDate && !endDate) {
       dateRange = [

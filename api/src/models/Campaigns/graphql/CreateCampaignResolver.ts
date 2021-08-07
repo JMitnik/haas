@@ -2,7 +2,7 @@ import { UserInputError } from 'apollo-server';
 import { inputObjectType, mutationField } from '@nexus/schema';
 import { isPresent } from 'ts-is-present';
 
-import { CampaignCreateInput } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { CampaignModel, CampaignVariantEnum } from './CampaignModel';
 import { NexusGenInputs } from '../../../generated/nexus';
 import prisma from '../../../config/prisma';
@@ -41,7 +41,7 @@ const validateProbabilityEdges = (input: NexusGenInputs['CreateCampaignInputType
   }
 };
 
-const saveCampaign = (input: NexusGenInputs['CreateCampaignInputType']): CampaignCreateInput => ({
+const saveCampaign = (input: NexusGenInputs['CreateCampaignInputType']): Prisma.CampaignCreateInput => ({
   label: input.label || '',
   workspace: {
     connect: {

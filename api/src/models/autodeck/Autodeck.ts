@@ -77,7 +77,6 @@ export const CreateJobProcessLocationMutation = mutationField('createJobProcessL
   resolve(parent, args, ctx) {
     return ctx.services.autodeckService.createJobProcessLocation(args.input);
   }
-
 })
 
 export const CloudReferenceType = enumType({
@@ -128,7 +127,11 @@ export const CreateWorkspaceJobType = objectType({
     t.field('processLocation', {
       type: JobProcessLocation,
       async resolve(parent, args, ctx) {
-        return ctx.services.autodeckService.getJobProcessLocationOfJob(parent.id);
+        const processLocation = await ctx.services.autodeckService.getJobProcessLocationOfJob(parent.id);
+
+        if (!processLocation) throw Error('Process location not found!');
+
+        return processLocation;
       }
     })
   },

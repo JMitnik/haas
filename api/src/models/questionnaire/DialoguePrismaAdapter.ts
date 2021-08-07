@@ -1,11 +1,8 @@
 import {
+  Prisma,
   PrismaClient,
   Dialogue,
-  DialogueUpdateInput,
   Edge,
-  DialogueInclude,
-  Subset,
-  DialogueCreateArgs,
 } from "@prisma/client";
 
 import { CreateQuestionsInput, CreateDialogueInput } from "./DialoguePrismaAdapterType";
@@ -90,7 +87,7 @@ class DialoguePrismaAdapter {
     return dialogue.questions;
   };
 
-  async update(dialogueId: string, updateArgs: DialogueUpdateInput, include?: DialogueInclude | null | undefined): Promise<Dialogue> {
+  async update(dialogueId: string, updateArgs: Prisma.DialogueUpdateInput, include?: Prisma.DialogueInclude | null | undefined): Promise<Dialogue> {
     return this.prisma.dialogue.update({
       where: {
         id: dialogueId,
@@ -113,7 +110,7 @@ class DialoguePrismaAdapter {
   }
 
   async getDialogueBySlugs(customerSlug: string, dialogueSlug: string): Promise<Dialogue | null> {
-    const customer = await this.prisma.customer.findOne({
+    const customer = await this.prisma.customer.findUnique({
       where: {
         slug: customerSlug,
       },
@@ -131,7 +128,7 @@ class DialoguePrismaAdapter {
   }
 
   getDialogueBySlug(customerId: string, dialogueSlug: string): Promise<Dialogue | null> {
-    return this.prisma.dialogue.findOne({
+    return this.prisma.dialogue.findUnique({
       where: {
         slug_customerId: {
           customerId,
@@ -150,7 +147,7 @@ class DialoguePrismaAdapter {
   };
 
   getDialogueById(dialogueId: string): Promise<Dialogue | null> {
-    return this.prisma.dialogue.findOne({
+    return this.prisma.dialogue.findUnique({
       where: { id: dialogueId },
     });
   };
@@ -207,7 +204,7 @@ class DialoguePrismaAdapter {
   };
 
   async getEdgesByDialogueId(dialogueId: string): Promise<Edge[]> {
-    const dialogue = await this.prisma.dialogue.findOne({
+    const dialogue = await this.prisma.dialogue.findUnique({
       where: {
         id: dialogueId,
       },
@@ -246,7 +243,7 @@ class DialoguePrismaAdapter {
   };
 
   async getTagsByDialogueId(dialogueId: string) {
-    const dialogue = await this.prisma.dialogue.findOne({
+    const dialogue = await this.prisma.dialogue.findUnique({
       where: { id: dialogueId },
       include: { tags: true },
     });
@@ -255,7 +252,7 @@ class DialoguePrismaAdapter {
   };
 
   async getTemplateDialogue(dialogueId: string) {
-    return this.prisma.dialogue.findOne({
+    return this.prisma.dialogue.findUnique({
       where: {
         id: dialogueId,
       },
@@ -310,7 +307,7 @@ class DialoguePrismaAdapter {
     });
   };
 
-  async create(input: Subset<DialogueCreateArgs, DialogueCreateArgs>) {
+  async create(input: Prisma.Subset<Prisma.DialogueCreateArgs, Prisma.DialogueCreateArgs>) {
     return this.prisma.dialogue.create(input);
   };
 
@@ -351,7 +348,7 @@ class DialoguePrismaAdapter {
   };
 
   async getDialogueWithNodesAndEdges(dialogueId: string) {
-    return this.prisma.dialogue.findOne({
+    return this.prisma.dialogue.findUnique({
       where: { id: dialogueId },
       include: {
         questions: true,
@@ -428,7 +425,7 @@ class DialoguePrismaAdapter {
   };
 
   async read(dialogueId: string) {
-    return this.prisma.dialogue.findOne({
+    return this.prisma.dialogue.findUnique({
       where: {
         id: dialogueId,
       },

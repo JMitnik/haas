@@ -112,7 +112,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
     if (!args.input.campaignId) throw new UserInputError('No related campaign provided!');
     if (!args.input.batchScheduledAt) throw new UserInputError('No scheduled date provided!');
 
-    const relatedCampaign = await prisma.campaign.findOne({
+    const relatedCampaign = await prisma.campaign.findUnique({
       where: { id: args.input.campaignId },
       include: {
         variantsEdges: {

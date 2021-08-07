@@ -1,4 +1,4 @@
-import { PrismaClient, QuestionNodeUpdateInput, QuestionNodeCreateInput, BatchPayload, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, FormNodeFieldUpsertArgs, FormNodeCreateInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, NodeType, Link, QuestionOptionCreateInput, QuestionOptionUpdateInput, Share, VideoEmbeddedNodeUpdateInput } from "@prisma/client";
+import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from "@prisma/client";
 
 import { CreateQuestionInput } from "../questionnaire/DialoguePrismaAdapterType";
 import NodeService from "./NodeService";
@@ -12,7 +12,7 @@ class QuestionNodePrismaAdapter {
     this.prisma = prismaClient;
   }
 
-  updateVideoNode(nodeId: string, data: VideoEmbeddedNodeUpdateInput): Promise<VideoEmbeddedNode> {
+  updateVideoNode(nodeId: string, data: Prisma.VideoEmbeddedNodeUpdateInput): Promise<VideoEmbeddedNode> {
     return this.prisma.videoEmbeddedNode.update({
       where: { id: nodeId },
       data: data,
@@ -42,7 +42,7 @@ class QuestionNodePrismaAdapter {
   };
 
   getVideoNodeById(nodeId: string): Promise<VideoEmbeddedNode | null> {
-    return this.prisma.videoEmbeddedNode.findOne({
+    return this.prisma.videoEmbeddedNode.findUnique({
       where: {
         id: nodeId,
       }
@@ -127,7 +127,7 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  deleteShareNodesByQuestionId(parentId: string): Promise<BatchPayload> {
+  deleteShareNodesByQuestionId(parentId: string): Promise<Prisma.BatchPayload> {
     return this.prisma.share.deleteMany({
       where: {
         questionNodeId: parentId,
@@ -139,7 +139,7 @@ class QuestionNodePrismaAdapter {
     return this.prisma.share.delete({ where: { id } });
   }
 
-  deleteOptionsByQuestionIds(questionIds: string[]): Promise<BatchPayload> {
+  deleteOptionsByQuestionIds(questionIds: string[]): Promise<Prisma.BatchPayload> {
     return this.prisma.questionOption.deleteMany(
       {
         where: {
@@ -251,7 +251,7 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  upsertQuestionOption(id: number, create: QuestionOptionCreateInput, update: QuestionOptionUpdateInput): Promise<QuestionOption> {
+  upsertQuestionOption(id: number, create: Prisma.QuestionOptionCreateInput, update: Prisma.QuestionOptionUpdateInput): Promise<QuestionOption> {
     return this.prisma.questionOption.upsert({
       where: { id },
       create,
@@ -268,7 +268,7 @@ class QuestionNodePrismaAdapter {
     });
   }
 
-  deleteQuestionOptions(optionIds: number[]): Promise<BatchPayload> {
+  deleteQuestionOptions(optionIds: number[]): Promise<Prisma.BatchPayload> {
     return this.prisma.questionOption.deleteMany({ where: { id: { in: optionIds } } });
   };
 
@@ -293,7 +293,7 @@ class QuestionNodePrismaAdapter {
     const updatedOptionIds = await this.updateQuestionOptions(options || []);
 
     // Remove videoEmbeddedNode if updated to different type
-    let embedVideoInput: VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput | undefined;
+    let embedVideoInput: Prisma.VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput | undefined;
     if (type !== NodeType.VIDEO_EMBEDDED && videoEmbeddedNode?.id) {
       embedVideoInput = { delete: true };
     }
@@ -316,7 +316,7 @@ class QuestionNodePrismaAdapter {
   }
 
   getDialogueBuilderNode(nodeId: string): Promise<(QuestionNode & { videoEmbeddedNode: VideoEmbeddedNode | null; children: Edge[]; options: QuestionOption[]; questionDialogue: { id: string; } | null; overrideLeaf: { id: string; } | null; }) | null> {
-    return this.prisma.questionNode.findOne({
+    return this.prisma.questionNode.findUnique({
       where: { id: nodeId },
       include: {
         videoEmbeddedNode: true,
@@ -398,14 +398,14 @@ class QuestionNodePrismaAdapter {
     });
   }
 
-  create(data: QuestionNodeCreateInput): Promise<QuestionNode> {
+  create(data: Prisma.QuestionNodeCreateInput): Promise<QuestionNode> {
     return this.prisma.questionNode.create({
       data,
     });
   };
 
   async getCTANode(nodeId: string) {
-    const existingNode = await this.prisma.questionNode.findOne({
+    const existingNode = await this.prisma.questionNode.findUnique({
       where: { id: nodeId },
       include: {
         links: true,
@@ -422,7 +422,7 @@ class QuestionNodePrismaAdapter {
 
 
   async findNodeByLinkId(linkId: string) {
-    const link = await this.prisma.link.findOne({
+    const link = await this.prisma.link.findUnique({
       where: { id: linkId },
       include: { questionNode: true },
     });
@@ -460,7 +460,7 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  update(nodeId: string, data: QuestionNodeUpdateInput): Promise<QuestionNode> {
+  update(nodeId: string, data: Prisma.QuestionNodeUpdateInput): Promise<QuestionNode> {
     return this.prisma.questionNode.update({
       where: {
         id: nodeId,
@@ -486,7 +486,7 @@ class QuestionNodePrismaAdapter {
   };
 
   async findNodeById(nodeId: string): Promise<QuestionNode | null> {
-    return this.prisma.questionNode.findOne({
+    return this.prisma.questionNode.findUnique({
       where: { id: nodeId },
       include: {
         options: true,
@@ -496,7 +496,7 @@ class QuestionNodePrismaAdapter {
     });
   }
 
-  async deleteMany(questionIds: string[]): Promise<BatchPayload> {
+  async deleteMany(questionIds: string[]): Promise<Prisma.BatchPayload> {
     return this.prisma.questionNode.deleteMany(
       {
         where: {

@@ -937,7 +937,7 @@ export interface NexusGenFieldTypes {
     value: string | null; // String
   }
   Customer: { // field return type
-    campaign: NexusGenRootTypes['CampaignType']; // CampaignType!
+    campaign: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     campaigns: NexusGenRootTypes['CampaignType'][]; // [CampaignType!]!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]

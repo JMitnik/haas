@@ -112,7 +112,7 @@ export const CustomerType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        const customer = await ctx.prisma.customer.findOne({
+        const customer = await ctx.prisma.customer.findUnique({
           where: { id: parent.id },
           include: {
             users: {

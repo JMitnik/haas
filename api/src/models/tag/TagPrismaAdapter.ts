@@ -1,4 +1,4 @@
-import { PrismaClient, Tag, TagCreateInput } from "@prisma/client";
+import { Prisma, PrismaClient, Tag } from "@prisma/client";
 
 import { CreateTagInput } from "./TagPrismaAdapterType";
 
@@ -32,7 +32,7 @@ class TagPrismaAdapter {
     });
   };
 
-  create(data: TagCreateInput): Promise<Tag> {
+  create(data: Prisma.TagCreateInput): Promise<Tag> {
     return this.prisma.tag.create({
       data,
     });

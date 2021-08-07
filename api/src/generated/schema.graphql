@@ -214,7 +214,7 @@ input CTAShareInputObjectType {
 }
 
 type Customer {
-  campaign(campaignId: String): CampaignType!
+  campaign(campaignId: String): CampaignType
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]

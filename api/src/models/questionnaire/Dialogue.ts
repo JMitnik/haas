@@ -236,6 +236,7 @@ export const DialogueType = objectType({
       type: QuestionNodeType,
       async resolve(parent, args, ctx) {
         const rootQuestion = await ctx.services.dialogueService.getRootQuestionByDialogueId(parent.id);
+        if (!rootQuestion) throw Error('No root question found');
 
         return rootQuestion;
       },

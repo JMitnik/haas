@@ -1,6 +1,7 @@
 import {
-  NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
-  PrismaClient
+  NodeEntry, //NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput
+  PrismaClient,
+  Prisma
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
@@ -64,7 +65,7 @@ class NodeEntryService {
    *
    * TODO: move to prisma adapter?
    * */
-  static constructCreateNodeEntryFragment = (nodeEntryInput: NexusGenInputs['NodeEntryInput']): NodeEntryCreateWithoutSessionInput => ({
+  static constructCreateNodeEntryFragment = (nodeEntryInput: NexusGenInputs['NodeEntryInput']): Prisma.NodeEntryCreateWithoutSessionInput => ({
     relatedNode: (nodeEntryInput.nodeId && { connect: { id: nodeEntryInput.nodeId } }) || undefined,
     relatedEdge: (nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } }) || undefined,
     depth: nodeEntryInput?.depth,
@@ -215,7 +216,7 @@ class NodeEntryService {
    * Used generally in the fetching of relevant interactions/sessions.
    * @param text
    */
-  static constructFindWhereTextNodeEntryFragment(text: string): NodeEntryWhereInput {
+  static constructFindWhereTextNodeEntryFragment(text: string): Prisma.NodeEntryWhereInput {
     return {
       OR: [
         {

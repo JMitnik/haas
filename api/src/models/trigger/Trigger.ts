@@ -1,5 +1,5 @@
 import {
-  TriggerUpdateInput,
+  Prisma,
   TriggerEnum,
 } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
@@ -163,7 +163,7 @@ const TriggerMutations = extendType({
         const validatedType = Object.values(TriggerEnum).find((type) => type === args.trigger?.type);
         if (!args.triggerId || !validatedType || !args.trigger?.name || !args.trigger?.medium) throw new Error('Missing input data!');
 
-        let updateTriggerArgs: TriggerUpdateInput = {
+        let updateTriggerArgs: Prisma.TriggerUpdateInput = {
           name: args.trigger?.name,
           type: validatedType,
           medium: args.trigger?.medium,

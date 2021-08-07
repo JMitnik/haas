@@ -1,21 +1,9 @@
 import { subDays } from 'date-fns';
 import _ from 'lodash';
 import cuid from 'cuid';
-
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import {
-  Dialogue,
-  DialogueCreateInput,
-  DialogueUpdateInput,
-  LanguageEnum,
-  NodeType,
-  PrismaClient,
-  Edge,
-  PostLeafNode,
-  PostLeafNodeUpdateOneWithoutDialogueInput,
-  Tag, TagWhereUniqueInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput
-} from '@prisma/client';
 import { isPresent } from 'ts-is-present';
+import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge } from '@prisma/client';
 
 import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
@@ -33,6 +21,7 @@ import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
+
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -127,7 +116,7 @@ class DialogueService {
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
     language: LanguageEnum,
-  ): DialogueCreateInput {
+  ): Prisma.DialogueCreateInput {
     const constructDialogueFragment = {
       customer: { connect: { id: customerId } },
       title,
@@ -167,11 +156,11 @@ class DialogueService {
   static updateTags = (
     dbTags: Array<Tag>,
     newTags: Array<string>,
-    updateDialogueArgs: DialogueUpdateInput,
+    updateDialogueArgs: Prisma.DialogueUpdateInput,
   ) => {
     const newTagObjects = newTags.map((tag) => ({ id: tag }));
 
-    const deleteTagObjects: TagWhereUniqueInput[] = [];
+    const deleteTagObjects: Prisma.TagWhereUniqueInput[] = [];
     dbTags.forEach((tag) => {
       if (!newTags.includes(tag.id)) {
         deleteTagObjects.push({ id: tag.id });
@@ -196,7 +185,7 @@ class DialogueService {
     dbPostLeaf: PostLeafNode | null | undefined,
     heading: string | null | undefined,
     subHeading: string | null | undefined,
-  ): PostLeafNodeUpdateOneWithoutDialogueInput | undefined {
+  ): Prisma.PostLeafNodeUpdateOneWithoutDialogueInput | undefined {
     if (!dbPostLeaf && !heading && !subHeading) {
       return undefined;
     } else if (dbPostLeaf && !heading && !subHeading) {
@@ -242,7 +231,7 @@ class DialogueService {
       dialogueFinisherSubheading
     );
 
-    let updateDialogueArgs: DialogueUpdateInput = {
+    let updateDialogueArgs: Prisma.DialogueUpdateInput = {
       title, description, publicTitle, isWithoutGenData, postLeafNode, language
     };
     if (dbDialogue?.tags) {
@@ -509,7 +498,7 @@ class DialogueService {
 
       const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
       const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
-      const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId
+      const mappedVideoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateNestedOneWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId
         ? { create: { videoUrl: question.videoEmbeddedNode?.videoUrl } }
         : undefined
       const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));

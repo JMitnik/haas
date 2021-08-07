@@ -1,9 +1,9 @@
-import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput, VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput, PrismaClient, FormNodeFieldUpsertArgs, Share, Edge, EdgeCreateWithoutDialogueInput, Enumerable, QuestionOption, QuestionOptionCreateManyWithoutQuestionNodeInput, VideoEmbeddedNode, VideoEmbeddedNodeCreateWithoutQuestionNodeInput } from '@prisma/client';
+import { Prisma, Link, NodeType, QuestionCondition, QuestionNode, PrismaClient, Share, Edge, QuestionOption, VideoEmbeddedNode } from '@prisma/client';
 import cuid from 'cuid';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
-import { QuestionOptionProps, LeafNodeDataEntryProps, EdgeChildProps, CreateCTAInputProps, DialogueWithEdges } from './NodeServiceType';
+import { QuestionOptionProps, LeafNodeDataEntryProps, CreateCTAInputProps, DialogueWithEdges } from './NodeServiceType';
 import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
 import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
@@ -89,7 +89,7 @@ class NodeService {
   /**
    * Get connected share-node by node id.
    * */
-  async getShareNode(parentId: string): Promise<Share> {
+  async getShareNode(parentId: string) {
     return this.questionNodePrismaAdapter.getShareNodeByQuestionId(parentId);
   }
 
@@ -129,7 +129,7 @@ class NodeService {
   /**
    * Converts FormNode to Prisma-friendly format.
    * */
-  saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeFieldUpsertArgs[] | undefined => (
+  saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Prisma.FormNodeFieldUpsertArgs[] | undefined => (
     input.fields?.map((field) => ({
       create: {
         type: field.type || 'shortText',
@@ -290,7 +290,7 @@ class NodeService {
     isOverrideLeafOf: QuestionNode[];
   }): CreateQuestionInput {
     const mappedId = idMap[question.id];
-    const mappedVideoEmbeddedNode: VideoEmbeddedNodeCreateWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { videoUrl: question.videoEmbeddedNode?.videoUrl } : undefined
+    const mappedVideoEmbeddedNode: Prisma.VideoEmbeddedNodeCreateWithoutQuestionNodeInput | undefined = question.videoEmbeddedNodeId ? { videoUrl: question.videoEmbeddedNode?.videoUrl } : undefined
     const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id }));
     const mappedOptions: QuestionOptionProps[] = question.options.map((option) => {
       const { id, overrideLeafId, questionNodeId, questionId, ...rest } = option;
@@ -369,7 +369,7 @@ class NodeService {
   /**
    * Save FormNodeInput when `creating`
    */
-  static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeCreateInput => ({
+  static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Prisma.FormNodeCreateInput => ({
     helperText: input.helperText,
     fields: {
       create: input.fields?.map((field) => ({
@@ -429,7 +429,7 @@ class NodeService {
     isRoot: boolean = false,
     overrideLeafId: string = '',
     isLeaf: boolean = false
-  ): QuestionNodeCreateInput => {
+  ): Prisma.QuestionNodeCreateInput => {
     return {
       title,
       questionDialogue: {
