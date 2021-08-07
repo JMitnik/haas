@@ -366,6 +366,7 @@ export const OptionInputType = inputObjectType({
     t.string('value');
     t.string('publicValue', { nullable: true });
     t.string('overrideLeafId', { required: false });
+    t.string('topicValueId', { required: false });
   },
 });
 

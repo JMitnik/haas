@@ -171,6 +171,10 @@ const DialogueBuilderQuestionForm = ({
     })),
   };
 
+  // TODO: For edit
+  // Frontend-to-API-level: We need to fetch from our API for every option the connected topic-value.
+  // API-to-form-level: We need to connect our FORM to the currently connected topic-values.
+
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -402,6 +406,7 @@ const DialogueBuilderQuestionForm = ({
                 value: option?.value,
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
+                topicValueId: option?.topicValue?.id,
               })),
             },
             edgeCondition,

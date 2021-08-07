@@ -15,6 +15,7 @@ interface QuestionOptionProps {
   value: string;
   publicValue?: string;
   overrideLeafId?: string;
+  topicValueId?: string;
 }
 
 interface EdgeChildProps {
@@ -642,12 +643,14 @@ class NodeService {
           create: {
             value: option.value,
             publicValue: option.publicValue,
-            overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
+            overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
+            relatedTopicValue: option.topicValueId ? { connect: { id: option.topicValueId } } : undefined,
           },
           update: {
             value: option.value,
             publicValue: option.publicValue,
-            overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
+            overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
+            relatedTopicValue: option.topicValueId ? { connect: { id: option.topicValueId } } : undefined,
           },
         },
       );

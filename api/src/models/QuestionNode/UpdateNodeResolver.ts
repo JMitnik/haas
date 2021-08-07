@@ -35,7 +35,7 @@ export const validateUpdateQuestion = (input: NexusGenInputs['UpdateQuestionNode
 export const UpdateQuestionNode = mutationField('updateQuestion', {
   type: QuestionNodeType,
   args: { input: UpdateQuestionNodeInputType },
-  
+
   resolve(parent, args) {
     if (!args?.input) throw new UserInputError('No input provided');
     validateUpdateQuestion(args.input);

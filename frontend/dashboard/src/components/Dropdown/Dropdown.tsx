@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import React, { useRef, useState } from 'react';
 
 import { Div } from '@haas/ui';
 import { Placement } from '@popperjs/core';
@@ -17,14 +17,20 @@ interface DropdownProps {
   minWidth?: number;
 }
 
-const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset = [0, 12], minWidth }: DropdownProps) => {
+const Dropdown = ({
+  children,
+  renderOverlay,
+  placement = 'right-start',
+  offset = [0, 12],
+  minWidth,
+}: DropdownProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [overlay, setOverlay] = useState<HTMLDivElement | null>(null);
-  const [toggleRef, setToggleRef] = useState<HTMLDivElement | null>(null);
+  const [overlayElement, setOverlayElement] = useState<HTMLDivElement | null>(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   useOnClickOutside(ref, () => setIsOpen(false));
-  const { styles, attributes } = usePopper(toggleRef, overlay, {
+  const { styles, attributes } = usePopper(referenceElement, overlayElement, {
     placement,
     strategy: 'fixed',
     modifiers: [{
@@ -38,7 +44,7 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
 
   const handleToggleDropdown = (event: any) => {
     event.stopPropagation();
-    setIsOpen((isOpen) => !isOpen);
+    setIsOpen((isOpenState) => !isOpenState);
   };
 
   const handleClose = () => setIsOpen(false);
@@ -50,7 +56,7 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
           <>
             {createPortal(
               <Div
-                ref={setOverlay}
+                ref={setOverlayElement}
                 style={{
                   ...styles.popper,
                   minWidth,
@@ -67,16 +73,16 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
                     {renderOverlay?.({ onClose: handleClose })}
                   </DropdownOverlayContainer>
                 </motion.div>
-              </Div>
-              , document.getElementById('popper_root') as HTMLElement)}
+              </Div>,
+              document.getElementById('popper_root') as HTMLElement,
+            )}
           </>
         ) : null}
       </AnimatePresence>
 
       <Div
-        width="100%"
         display="inline-block"
-        ref={setToggleRef}
+        ref={setReferenceElement}
       >
         <>
           {children?.({ onOpen: handleToggleDropdown, onClose: handleClose })}

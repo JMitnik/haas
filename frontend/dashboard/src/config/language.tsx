@@ -9,6 +9,10 @@ const language = {
       en: 'Opinion about customer support',
       de: 'Meinung zum Kundensupport',
     },
+    topic_value: {
+      en: 'Topic value',
+      de: 'Themenwert',
+    },
     topic_values: {
       en: 'Topic values',
       de: 'Themenwerte',
