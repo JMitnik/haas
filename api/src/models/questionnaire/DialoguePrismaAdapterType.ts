@@ -1,4 +1,4 @@
-import { FormNodeFieldType, LinkTypeEnum, NodeType, VideoEmbeddedNodeCreateWithoutQuestionNodeInput } from "@prisma/client";
+import { FormNodeFieldType, LinkTypeEnum, NodeType, Prisma } from "@prisma/client";
 
 export type CreateDialogueInput = {
   id?: string
@@ -23,7 +23,7 @@ export interface CreateQuestionInput {
   type: NodeType,
   overrideLeafId?: string,
   dialogueId?: string,
-  videoEmbeddedNode?: VideoEmbeddedNodeCreateWithoutQuestionNodeInput,
+  videoEmbeddedNode?: Prisma.VideoEmbeddedNodeCreateWithoutQuestionNodeInput,
   options?: {
     publicValue?: string | null;
     value: string;
