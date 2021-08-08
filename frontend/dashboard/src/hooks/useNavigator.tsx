@@ -1,4 +1,4 @@
-import { useParams, useRouteMatch, useHistory, generatePath } from 'react-router';
+import { generatePath, useHistory, useParams, useRouteMatch } from 'react-router';
 
 export const ROUTES = {
   WORKSPACE_ROOT: '/dashboard/b/:customerSlug',
@@ -33,6 +33,7 @@ export const useNavigator = () => {
   };
 
   const getCampaignsPath = () => generatePath(ROUTES.CAMPAIGNS_VIEW, { customerSlug, campaignId });
+  const getDialoguesPath = () => generatePath(ROUTES.DIALOGUES_VIEW, { customerSlug });
 
   const dialoguesMatch = useRouteMatch({
     path: ROUTES.DIALOGUES_VIEW,
@@ -45,6 +46,7 @@ export const useNavigator = () => {
   return {
     goToCampaignView,
     getCampaignsPath,
+    getDialoguesPath,
     dialoguesMatch,
     dialogueMatch,
     customerSlug,

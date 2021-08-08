@@ -20,7 +20,6 @@ import {
 } from 'styled-system';
 import { Stack as ChakraStack, StackProps as ChakraStackProps  } from '@chakra-ui/core';
 import { Div, GenericProps } from './Generics';
-import { ViewTitle, ViewTitleContainer } from './Type';
 
 interface ContainerProps extends GenericProps {}
 
@@ -44,54 +43,6 @@ export const Container = styled(Div)<ContainerProps>`
     ${space}
     ${flexbox}
     ${width}
-  `}
-`;
-
-const ViewHeadContainer = styled(Div)`
-  ${({ theme }) => css`
-    background: ${theme.colors.gray[100]};
-    padding: ${theme.gutter / 2}px ${theme.gutter}px;
-    border-bottom: 1px solid ${theme.colors.gray[200]};
-    position: sticky;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-
-    ${ViewTitleContainer} {
-      margin-bottom: 0;
-    }
-  `}
-`;
-
-export const ViewHead = ({ children }: { children: React.ReactNode }) => (
-  <ViewHeadContainer>
-    <Stack spacing={4} isInline alignItems="center">
-      {children}
-    </Stack>
-  </ViewHeadContainer>
-);
-
-export const ViewContainer = styled(Div)<{ isCompact?: boolean; }>`
-  ${({ theme, isCompact }) => css`
-    margin: 0 auto;
-    min-height: 100vh;
-
-    ${isCompact && css`
-      max-width: 1400px;
-    `}
-  `}
-`;
-
-export const ViewBody = styled(Div)<{ isCompact?: boolean; }>`
-  ${({ theme, isCompact }) => css`
-    margin: 0 auto;
-    min-height: 100vh;
-    padding: ${theme.gutter}px;
-
-    ${isCompact && css`
-      max-width: 1400px;
-    `}
   `}
 `;
 

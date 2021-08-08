@@ -19,6 +19,7 @@ import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
+import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
@@ -281,6 +282,7 @@ const DialogueView = () => {
     compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
     dateLabel: 'last_week',
   });
+  const { getDialoguesPath } = useNavigator();
 
   const history = useHistory();
 
@@ -316,7 +318,7 @@ const DialogueView = () => {
 
   return (
     <>
-      <UI.ViewHead>
+      <UI.ViewHead renderBreadCrumb={<UI.Breadcrumb to={getDialoguesPath()}>{t('go_to_dialogues')}</UI.Breadcrumb>}>
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
             <UI.ViewTitle leftIcon={<ChartbarIcon />}>

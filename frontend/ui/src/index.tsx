@@ -13,3 +13,4 @@ export * from './Labels';
 export * from './Nav';
 export * from './Lists';
 export * from './Special';
+export * from './View';

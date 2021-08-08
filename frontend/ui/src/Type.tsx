@@ -13,36 +13,6 @@ export const GenericType = styled.p<GenericTypeProps>`
 
 export const Text = styled(GenericType).attrs({ as: 'p' })``;
 
-interface ViewTitleProps {
-  leftIcon?: React.ReactNode;
-  children?: React.ReactNode;
-}
-
-export const ViewTitleContainer = styled(Text)`
-  ${({ theme }) => css`
-    color: ${theme.colors.gray[600]};
-    font-size: 1.8rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-
-    svg {
-      width: 24px;
-    }
-  `}
-`;
-
-export const ViewTitle = ({ leftIcon, children, ...props }: ViewTitleProps) => (
-  <ViewTitleContainer {...props}>
-    {!!leftIcon && (
-      <Icon display="inline-block" width="24px" mr={1}>
-        {leftIcon}
-      </Icon>
-    )}
-    {children}
-  </ViewTitleContainer>
-);
-
 export const Helper = styled(Text)`
   ${({ theme }) => css`
     margin: 0;

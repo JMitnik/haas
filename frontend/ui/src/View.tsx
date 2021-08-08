@@ -1,0 +1,93 @@
+import React from 'react';
+import styled, { css } from 'styled-components';
+import { Div } from './Generics';
+import { Breadcrumb } from './Nav';
+import { Stack } from './Container';
+import { Text } from './Type';
+import { Icon } from './Icon';
+
+
+interface ViewTitleProps {
+  leftIcon?: React.ReactNode;
+  children?: React.ReactNode;
+}
+
+export const ViewTitleContainer = styled(Text)`
+  ${({ theme }) => css`
+    color: ${theme.colors.gray[600]};
+    font-size: 1.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 24px;
+    }
+  `}
+`;
+
+export const ViewTitle = ({ leftIcon, children, ...props }: ViewTitleProps) => (
+  <ViewTitleContainer {...props}>
+    {!!leftIcon && (
+      <Icon display="inline-block" width="24px" mr={1}>
+        {leftIcon}
+      </Icon>
+    )}
+    {children}
+  </ViewTitleContainer>
+);
+
+const ViewHeadContainer = styled(Div)`
+${({ theme }) => css`
+  background: ${theme.colors.gray[100]};
+  padding: ${theme.gutter / 2}px ${theme.gutter}px;
+  border-bottom: 1px solid ${theme.colors.gray[200]};
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  ${ViewTitleContainer} {
+    margin-bottom: 0;
+  }
+`}
+`;
+
+interface ViewHeadProps {
+  children: React.ReactNode;
+  renderBreadCrumb?: React.ReactNode;
+}
+
+export const ViewHead = ({ children, renderBreadCrumb }: ViewHeadProps) => (
+  <ViewHeadContainer>
+    {!!renderBreadCrumb && renderBreadCrumb}
+
+    <Stack spacing={4} isInline alignItems="center">
+      {children}
+    </Stack>
+  </ViewHeadContainer>
+);
+
+export const ViewContainer = styled(Div) <{ isCompact?: boolean; }>`
+${({ theme, isCompact }) => css`
+  margin: 0 auto;
+  min-height: 100vh;
+
+  ${isCompact && css`
+    max-width: 1400px;
+  `}
+`}
+`;
+
+export const ViewBody = styled(Div) <{ isCompact?: boolean; }>`
+${({ theme, isCompact }) => css`
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: ${theme.gutter}px;
+
+  ${isCompact && css`
+    max-width: 1400px;
+  `}
+`}
+`;

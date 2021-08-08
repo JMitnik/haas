@@ -293,45 +293,54 @@ const InteractionsOverview = () => {
   const pageIndex = data?.customer?.dialogue?.sessionConnection?.pageInfo.pageIndex || 0;
 
   return (
-    <InteractionsOverviewContainer>
-      <ViewTitle>
-        <Icon as={Activity} mr={1} />
-        {t('views:interactions_view')}
-      </ViewTitle>
+    <>
+      <UI.ViewHead>
+        <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
+          <UI.Flex alignItems="center">
+            <ViewTitle>
+              <Icon as={Activity} mr={1} />
+              {t('views:interactions_view')}
+            </ViewTitle>
 
-      <Flex mb={4} alignItems="center" justifyContent="space-between">
-        <Button
-          onClick={() => fetchCSVData({
-            variables: { dialogueSlug, customerSlug },
-          })}
-          leftIcon={Download}
-          isDisabled={csvLoading}
-          size="sm"
-        >
-          <Span fontWeight="bold">{t('export_to_csv')}</Span>
-        </Button>
+            <UI.Button
+              onClick={() => fetchCSVData({
+                variables: { dialogueSlug, customerSlug },
+              })}
+              leftIcon={Download}
+              isDisabled={csvLoading}
+              size="sm"
+              variantColor="teal"
+              ml={4}
+            >
+              <Span fontWeight="bold">{t('export_to_csv')}</Span>
+            </UI.Button>
+          </UI.Flex>
 
-        <Flex alignItems="center">
-          <DatePicker
-            activeStartDate={paginationProps.activeStartDate}
-            activeEndDate={paginationProps.activeEndDate}
-            onDateChange={handleDateChange}
-          />
-          <SearchBar
-            activeSearchTerm={paginationProps.activeSearchTerm}
-            onSearchTermChange={handleSearchTermChange}
-          />
-        </Flex>
-      </Flex>
-      <Table
-        loading={loading}
-        headers={tableHeaders}
-        paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-        onPaginationChange={setPaginationProps}
-        data={sessions}
-        renderExpandedRowContainer={(input) => <ExpandedInteractionRow data={input} />}
-      />
-    </InteractionsOverviewContainer>
+          <Flex alignItems="center">
+            <DatePicker
+              activeStartDate={paginationProps.activeStartDate}
+              activeEndDate={paginationProps.activeEndDate}
+              onDateChange={handleDateChange}
+            />
+            <SearchBar
+              activeSearchTerm={paginationProps.activeSearchTerm}
+              onSearchTermChange={handleSearchTermChange}
+            />
+          </Flex>
+        </UI.Flex>
+      </UI.ViewHead>
+
+      <UI.ViewBody>
+        <Table
+          loading={loading}
+          headers={tableHeaders}
+          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
+          onPaginationChange={setPaginationProps}
+          data={sessions}
+          renderExpandedRowContainer={(input) => <ExpandedInteractionRow data={input} />}
+        />
+      </UI.ViewBody>
+    </>
   );
 };
 
