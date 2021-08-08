@@ -87,6 +87,26 @@ export const RoleQueries = extendType({
         };
       },
     });
+
+    t.list.field('roles', {
+      type: RoleType,
+      args: { customerSlug: 'String' },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!args.customerSlug) {
+          return [];
+        }
+
+        const roles = await ctx.services.roleService.fetchDefaultRoleForCustomer(args.customerSlug);
+
+        if (!roles) {
+          return [];
+        }
+
+        return roles;
+      },
+    });
   },
 });
 

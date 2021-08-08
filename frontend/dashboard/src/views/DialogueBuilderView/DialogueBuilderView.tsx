@@ -1,10 +1,9 @@
-import { ColumnFlex, Div, Icon, ViewTitle } from '@haas/ui';
+import * as UI from '@haas/ui';
 import { Zap } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import { CTANode, QuestionEntryProps } from './DialogueBuilderInterfaces';
-import { DialogueBuilderContainer } from './DialogueBuilderStyles';
 import QuestionSection from './components/QuestionSection';
 
 interface QuestionEntryExtendedProps extends QuestionEntryProps {
@@ -26,39 +25,43 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
   const { t } = useTranslation();
 
   return (
-    <DialogueBuilderContainer data-cy="DialogueBuilderContainer">
-      <ViewTitle>
-        <Icon as={Zap} mr={1} />
-        {t('views:builder_view')}
-      </ViewTitle>
+    <>
+      <UI.ViewHead>
+        <UI.ViewTitle>
+          <UI.Icon as={Zap} mr={1} />
+          {t('views:builder_view')}
+        </UI.ViewTitle>
+      </UI.ViewHead>
 
-      <ColumnFlex>
-        {(nodes && nodes.length === 0) && (
-          <Div alignSelf="center">No question available...</Div>
-        )}
+      <UI.ViewBody>
+        <UI.ColumnFlex>
+          {(nodes && nodes.length === 0) && (
+            <UI.Div alignSelf="center">No question available...</UI.Div>
+          )}
 
-        {root && (
-          <QuestionSection
-            parentQuestionType=""
-            edgeId={undefined}
-            options={root.options}
-            condition={undefined}
-            depth={1}
-            activeQuestion={activeQuestion}
-            onActiveQuestionChange={setActiveQuestion}
-            onAddQuestion={undefined}
-            onDeleteQuestion={undefined}
-            key={`${root.id}-${root.updatedAt}`}
-            index={0}
-            questionsQ={nodes}
-            question={root}
-            Icon={root.icon}
-            leafs={selectLeafs}
-            ctaNodes={ctaNodes}
-          />
-        )}
-      </ColumnFlex>
-    </DialogueBuilderContainer>
+          {root && (
+            <QuestionSection
+              parentQuestionType=""
+              edgeId={undefined}
+              options={root.options}
+              condition={undefined}
+              depth={1}
+              activeQuestion={activeQuestion}
+              onActiveQuestionChange={setActiveQuestion}
+              onAddQuestion={undefined}
+              onDeleteQuestion={undefined}
+              key={`${root.id}-${root.updatedAt}`}
+              index={0}
+              questionsQ={nodes}
+              question={root}
+              Icon={root.icon}
+              leafs={selectLeafs}
+              ctaNodes={ctaNodes}
+            />
+          )}
+        </UI.ColumnFlex>
+      </UI.ViewBody>
+    </>
   );
 };
 

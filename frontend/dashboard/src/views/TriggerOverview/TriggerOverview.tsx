@@ -1,10 +1,9 @@
 import * as UI from '@haas/ui';
+import { Plus } from 'react-feather';
 import {
-  Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
-import { Div, Flex, Text, ViewTitle } from '@haas/ui';
-import { Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/client';
@@ -132,94 +131,93 @@ const TriggersOverview = () => {
   const { t } = useTranslation();
 
   return (
-    <Div margin="0 auto" height="100vh" maxHeight="100vh">
-      <ViewTitle>{t('views:trigger_overview')}</ViewTitle>
-
-      <Div mb={4} width="100%">
-        <Flex justifyContent="space-between">
-          <Div mr={4}>
-            <Button
+    <>
+      <UI.ViewHead>
+        <UI.Flex justifyContent="space-between" width="100%">
+          <UI.Flex alignItems="center">
+            <UI.ViewTitle>{t('views:trigger_overview')}</UI.ViewTitle>
+            <UI.Button
               onClick={handleAddUser}
               leftIcon={Plus}
               variantColor="teal"
+              size="sm"
+              ml={4}
             >
               {t('create_trigger')}
-            </Button>
-          </Div>
-          <Div>
-            <SearchBar
-              activeSearchTerm={paginationProps.activeSearchTerm}
-              onSearchTermChange={handleSearchTermChange}
-            />
-          </Div>
-        </Flex>
-      </Div>
+            </UI.Button>
+          </UI.Flex>
+          <SearchBar
+            activeSearchTerm={paginationProps.activeSearchTerm}
+            onSearchTermChange={handleSearchTermChange}
+          />
+        </UI.Flex>
+      </UI.ViewHead>
 
-      <Div borderRadius="lg" flexGrow={1} backgroundColor="white">
-        <Table
-          headers={HEADERS}
-          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-          onPaginationChange={setPaginationProps}
-          onDeleteEntry={handleDeleteTrigger}
-          onEditEntry={handleEditEntry}
-          onAddEntry={handleAddUser}
-          renderOptions={
-            (data: any) => (
+      <UI.ViewBody>
+        <UI.Div borderRadius="lg" flexGrow={1} backgroundColor="white">
+          <Table
+            headers={HEADERS}
+            paginationProps={{ ...paginationProps, pageCount, pageIndex }}
+            onPaginationChange={setPaginationProps}
+            onDeleteEntry={handleDeleteTrigger}
+            onEditEntry={handleEditEntry}
+            onAddEntry={handleAddUser}
+            renderOptions={(alertData: any) => (
               <>
                 {canDeleteTriggers && (
-                  <ShowMoreButton
-                    renderMenu={(
-                      <UI.List>
-                        <UI.ListHeader>{t('edit_trigger')}</UI.ListHeader>
-                        {canDeleteTriggers && (
-                          <>
-                            {canEditTriggers && (
-                              <UI.ListItem
-                                onClick={(e: any) => handleEditEntry(e, data?.id)}
-                              >
-                                {t('edit_trigger')}
-                              </UI.ListItem>
-                            )}
-                            <Popover>
-                              {() => (
-                                <>
-                                  <PopoverTrigger>
-                                    <UI.ListItem>
-                                      {t('delete_trigger')}
-                                    </UI.ListItem>
-                                  </PopoverTrigger>
-                                  <PopoverContent zIndex={4}>
-                                    <PopoverArrow />
-                                    <PopoverHeader>{t('delete')}</PopoverHeader>
-                                    <PopoverCloseButton />
-                                    <PopoverBody>
-                                      <Text>{t('delete_trigger_popover')}</Text>
-                                    </PopoverBody>
-                                    <PopoverFooter>
-                                      <Button
-                                        variantColor="red"
-                                        onClick={(e: any) => handleDeleteTrigger(e, data?.id)}
-                                      >
-                                        {t('delete')}
-                                      </Button>
-                                    </PopoverFooter>
-                                  </PopoverContent>
-                                </>
-                              )}
-                            </Popover>
-                          </>
+                <ShowMoreButton
+                  renderMenu={(
+                    <UI.List>
+                      <UI.ListHeader>{t('edit_trigger')}</UI.ListHeader>
+                      {canDeleteTriggers && (
+                      <>
+                        {canEditTriggers && (
+                        <UI.ListItem
+                          onClick={(e: any) => handleEditEntry(e, alertData?.id)}
+                        >
+                          {t('edit_trigger')}
+                        </UI.ListItem>
                         )}
-                      </UI.List>
-                    )}
-                  />
+                        <Popover>
+                          {() => (
+                            <>
+                              <PopoverTrigger>
+                                <UI.ListItem>
+                                  {t('delete_trigger')}
+                                </UI.ListItem>
+                              </PopoverTrigger>
+                              <PopoverContent zIndex={4}>
+                                <PopoverArrow />
+                                <PopoverHeader>{t('delete')}</PopoverHeader>
+                                <PopoverCloseButton />
+                                <PopoverBody>
+                                  <UI.Text>{t('delete_trigger_popover')}</UI.Text>
+                                </PopoverBody>
+                                <PopoverFooter>
+                                  <UI.Button
+                                    variantColor="red"
+                                    onClick={(e: any) => handleDeleteTrigger(e, alertData?.id)}
+                                  >
+                                    {t('delete')}
+                                  </UI.Button>
+                                </PopoverFooter>
+                              </PopoverContent>
+                            </>
+                          )}
+                        </Popover>
+                      </>
+                      )}
+                    </UI.List>
+                      )}
+                />
                 )}
               </>
-            )
-          }
-          data={tableData}
-        />
-      </Div>
-    </Div>
+            )}
+            data={tableData}
+          />
+        </UI.Div>
+      </UI.ViewBody>
+    </>
   );
 };
 

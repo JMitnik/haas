@@ -1,0 +1,18 @@
+query GetUserCustomerFromCustomer($id: ID!, $userId: String!) {
+  customer(id: $id) {
+    id
+    userCustomer(userId: $userId) {
+      user {
+        id
+        email
+        phone
+        firstName
+        lastName
+      }
+      role {
+        name
+        id
+      }
+    }
+  }
+}

@@ -58,6 +58,12 @@ class RoleService {
     };
   };
 
+  getAllRolesForWorkspaceBySlug = async (workspaceSlug: string) => {
+    const roles = await this.rolePrismaAdapter.findManyByCustomerSlug(workspaceSlug);
+
+    return roles;
+  }
+
   async fetchDefaultRoleForCustomer(customerId: string) {
     const roles = await this.rolePrismaAdapter.findRolesPaginated({ customerId: customerId })
 

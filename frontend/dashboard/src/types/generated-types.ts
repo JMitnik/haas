@@ -252,8 +252,10 @@ export type Customer = {
   dialogue?: Maybe<Dialogue>;
   dialogues?: Maybe<Array<Dialogue>>;
   users?: Maybe<Array<UserType>>;
-  campaign: CampaignType;
+  roles?: Maybe<Array<RoleType>>;
+  campaign?: Maybe<CampaignType>;
   campaigns: Array<CampaignType>;
+  userCustomer?: Maybe<UserCustomer>;
 };
 
 
@@ -275,6 +277,11 @@ export type CustomerDialoguesArgs = {
 
 export type CustomerCampaignArgs = {
   campaignId?: Maybe<Scalars['String']>;
+};
+
+
+export type CustomerUserCustomerArgs = {
+  userId?: Maybe<Scalars['String']>;
 };
 
 export type CustomerSettings = {
@@ -767,7 +774,6 @@ export type Mutation = {
   createWorkspace: Customer;
   editWorkspace: Customer;
   deleteCustomer?: Maybe<Customer>;
-  createUser: UserType;
   editUser: UserType;
   deleteUser: DeleteUserOutput;
   copyDialogue: Dialogue;
@@ -928,12 +934,6 @@ export type MutationEditWorkspaceArgs = {
 
 export type MutationDeleteCustomerArgs = {
   where?: Maybe<CustomerWhereUniqueInput>;
-};
-
-
-export type MutationCreateUserArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
-  input?: Maybe<UserInput>;
 };
 
 
@@ -1192,7 +1192,6 @@ export type Query = {
   me: UserType;
   users: Array<UserType>;
   user?: Maybe<UserType>;
-  lineChartData: Array<LineChartDataType>;
   dialogue?: Maybe<Dialogue>;
   dialogues: Array<Dialogue>;
   refreshAccessToken: RefreshAccessTokenOutput;
@@ -1281,14 +1280,6 @@ export type QueryUsersArgs = {
 
 export type QueryUserArgs = {
   userId?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryLineChartDataArgs = {
-  dialogueId?: Maybe<Scalars['String']>;
-  numberOfDaysBack?: Maybe<Scalars['Int']>;
-  limit?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -1956,7 +1947,7 @@ export type GetWorkspaceCampaignQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
-    & { campaign: (
+    & { campaign?: Maybe<(
       { __typename?: 'CampaignType' }
       & Pick<CampaignType, 'id' | 'label'>
       & { allDeliveryConnection?: Maybe<(
@@ -1982,7 +1973,7 @@ export type GetWorkspaceCampaignQuery = (
         { __typename?: 'CampaignVariantType' }
         & Pick<CampaignVariantType, 'id' | 'label'>
       )> }
-    ) }
+    )> }
   )> }
 );
 
@@ -2069,6 +2060,47 @@ export type RequestInviteMutation = (
     { __typename?: 'RequestInviteOutput' }
     & Pick<RequestInviteOutput, 'didInvite' | 'userExists'>
   ) }
+);
+
+export type GetRolesQueryVariables = Exact<{
+  id?: Maybe<Scalars['ID']>;
+}>;
+
+
+export type GetRolesQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { roles?: Maybe<Array<(
+      { __typename?: 'RoleType' }
+      & Pick<RoleType, 'id' | 'name'>
+    )>> }
+  )> }
+);
+
+export type GetUserCustomerFromCustomerQueryVariables = Exact<{
+  id: Scalars['ID'];
+  userId: Scalars['String'];
+}>;
+
+
+export type GetUserCustomerFromCustomerQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { userCustomer?: Maybe<(
+      { __typename?: 'UserCustomer' }
+      & { user: (
+        { __typename?: 'UserType' }
+        & Pick<UserType, 'id' | 'email' | 'phone' | 'firstName' | 'lastName'>
+      ), role: (
+        { __typename?: 'RoleType' }
+        & Pick<RoleType, 'name' | 'id'>
+      ) }
+    )> }
+  )> }
 );
 
 
@@ -2831,3 +2863,97 @@ export function useRequestInviteMutation(baseOptions?: Apollo.MutationHookOption
 export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInviteMutation>;
 export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
 export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;
+export const GetRolesDocument = gql`
+    query GetRoles($id: ID) {
+  customer(id: $id) {
+    id
+    roles {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetRolesQuery__
+ *
+ * To run a query within a React component, call `useGetRolesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetRolesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetRolesQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetRolesQuery(baseOptions?: Apollo.QueryHookOptions<GetRolesQuery, GetRolesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetRolesQuery, GetRolesQueryVariables>(GetRolesDocument, options);
+      }
+export function useGetRolesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetRolesQuery, GetRolesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetRolesQuery, GetRolesQueryVariables>(GetRolesDocument, options);
+        }
+export type GetRolesQueryHookResult = ReturnType<typeof useGetRolesQuery>;
+export type GetRolesLazyQueryHookResult = ReturnType<typeof useGetRolesLazyQuery>;
+export type GetRolesQueryResult = Apollo.QueryResult<GetRolesQuery, GetRolesQueryVariables>;
+export function refetchGetRolesQuery(variables?: GetRolesQueryVariables) {
+      return { query: GetRolesDocument, variables: variables }
+    }
+export const GetUserCustomerFromCustomerDocument = gql`
+    query GetUserCustomerFromCustomer($id: ID!, $userId: String!) {
+  customer(id: $id) {
+    id
+    userCustomer(userId: $userId) {
+      user {
+        id
+        email
+        phone
+        firstName
+        lastName
+      }
+      role {
+        name
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserCustomerFromCustomerQuery__
+ *
+ * To run a query within a React component, call `useGetUserCustomerFromCustomerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserCustomerFromCustomerQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserCustomerFromCustomerQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserCustomerFromCustomerQuery(baseOptions: Apollo.QueryHookOptions<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>(GetUserCustomerFromCustomerDocument, options);
+      }
+export function useGetUserCustomerFromCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>(GetUserCustomerFromCustomerDocument, options);
+        }
+export type GetUserCustomerFromCustomerQueryHookResult = ReturnType<typeof useGetUserCustomerFromCustomerQuery>;
+export type GetUserCustomerFromCustomerLazyQueryHookResult = ReturnType<typeof useGetUserCustomerFromCustomerLazyQuery>;
+export type GetUserCustomerFromCustomerQueryResult = Apollo.QueryResult<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>;
+export function refetchGetUserCustomerFromCustomerQuery(variables?: GetUserCustomerFromCustomerQueryVariables) {
+      return { query: GetUserCustomerFromCustomerDocument, variables: variables }
+    }

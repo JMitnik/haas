@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
 import { Button, Icon } from '@chakra-ui/core';
 import { Div, Flex, ViewTitle } from '@haas/ui';
@@ -135,77 +136,86 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
   const activeLeafs = mapLeafs(data?.customer?.dialogue?.leafs);
 
   return (
-    <DialogueViewContainer>
-      <ViewTitle>
-        <Icon as={Mail} mr={1} />
-        {t('views:cta_view')}
-      </ViewTitle>
-      <Flex flexDirection="row" justifyContent="space-between" alignItems="center" mb={4}>
-        <Button
-          size="sm"
-          variant="outline"
-          leftIcon={Plus}
-          isDisabled={!!activeCTA || false}
-          onClick={() => handleAddCTA()}
-        >
-          {t('add_call_to_action')}
-        </Button>
-        <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
-      </Flex>
-      <AnimateSharedLayout>
-        <motion.div variants={actionsAnimation} initial="inital" animate="animate">
-          {newCTA && (
-            <CTACard
-              id="-1"
-              activeCTA={activeCTA}
-              onActiveCTAChange={setActiveCTA}
-              Icon={RegisterIcon}
-              title=""
-              type={initializeCTAType('REGISTER')}
-              links={[]}
-              share={{ title: '', url: '', tooltip: '' }}
-              onNewCTAChange={setNewCTA}
-            />
-          )}
+    <>
+      <UI.ViewHead>
+        <UI.Flex justifyContent="space-between" width="100%">
+          <UI.Flex alignItems="center">
+            <ViewTitle leftIcon={<Mail />}>
+              {t('views:cta_view')}
+            </ViewTitle>
 
-          {!activeLeafs && leafs && leafs.map(
-            (leaf: any, index: number) => (
+            <UI.Button
+              leftIcon={Plus}
+              variantColor="teal"
+              ml={4}
+              size="sm"
+              onClick={() => handleAddCTA()}
+            >
+              {t('add_call_to_action')}
+            </UI.Button>
+          </UI.Flex>
+
+          <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
+        </UI.Flex>
+      </UI.ViewHead>
+
+      <UI.ViewBody>
+        <AnimateSharedLayout>
+          <motion.div variants={actionsAnimation} initial="inital" animate="animate">
+            {newCTA && (
               <CTACard
-                key={index}
+                id="-1"
                 activeCTA={activeCTA}
                 onActiveCTAChange={setActiveCTA}
-                id={leaf.id}
-                Icon={leaf.icon}
-                title={leaf.title}
-                type={initializeCTAType(leaf.type)}
-                links={leaf.links}
-                share={leaf?.share}
-                form={leaf?.form}
+                Icon={RegisterIcon}
+                title=""
+                type={initializeCTAType('REGISTER')}
+                links={[]}
+                share={{ title: '', url: '', tooltip: '' }}
                 onNewCTAChange={setNewCTA}
               />
-            ),
-          )}
+            )}
 
-          {activeLeafs && activeLeafs?.map(
-            (leaf: any, index: number) => (
-              <CTACard
-                key={index}
-                activeCTA={activeCTA}
-                onActiveCTAChange={setActiveCTA}
-                id={leaf.id}
-                Icon={leaf.icon}
-                title={leaf.title}
-                type={initializeCTAType(leaf.type)}
-                links={leaf.links}
-                share={leaf?.share}
-                form={leaf?.form}
-                onNewCTAChange={setNewCTA}
-              />
-            ),
-          )}
-        </motion.div>
-      </AnimateSharedLayout>
-    </DialogueViewContainer>
+            {!activeLeafs && leafs && leafs.map(
+              (leaf: any, index: number) => (
+                <CTACard
+                  key={index}
+                  activeCTA={activeCTA}
+                  onActiveCTAChange={setActiveCTA}
+                  id={leaf.id}
+                  Icon={leaf.icon}
+                  title={leaf.title}
+                  type={initializeCTAType(leaf.type)}
+                  links={leaf.links}
+                  share={leaf?.share}
+                  form={leaf?.form}
+                  onNewCTAChange={setNewCTA}
+                />
+              ),
+            )}
+
+            {activeLeafs && activeLeafs?.map(
+              (leaf: any, index: number) => (
+                <CTACard
+                  key={index}
+                  activeCTA={activeCTA}
+                  onActiveCTAChange={setActiveCTA}
+                  id={leaf.id}
+                  Icon={leaf.icon}
+                  title={leaf.title}
+                  type={initializeCTAType(leaf.type)}
+                  links={leaf.links}
+                  share={leaf?.share}
+                  form={leaf?.form}
+                  onNewCTAChange={setNewCTA}
+                />
+              ),
+            )}
+          </motion.div>
+        </AnimateSharedLayout>
+      </UI.ViewBody>
+
+    </>
   );
 };
 

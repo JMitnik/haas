@@ -1,6 +1,6 @@
 /* eslint-disable radix */
+import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { FormContainer, ViewTitle } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
@@ -12,6 +12,7 @@ import React from 'react';
 
 import createTriggerMutation from 'mutations/createTrigger';
 
+import { useNavigator } from 'hooks/useNavigator';
 import TriggerForm from './TriggerForm';
 
 interface FormDataProps {
@@ -93,6 +94,7 @@ const schema = yup.object().shape({
 });
 
 const AddTriggerView = () => {
+  const { getAlertsPath } = useNavigator();
   const history = useHistory();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -167,19 +169,26 @@ const AddTriggerView = () => {
 
   return (
     <>
-      <ViewTitle>{t('views:create_trigger_view')}</ViewTitle>
+      <UI.ViewHead renderBreadCrumb={(
+        <UI.Breadcrumb to={getAlertsPath()}>{t('go_to_alerts')}</UI.Breadcrumb>
+      )}
+      >
+        <UI.ViewTitle>{t('views:create_trigger_view')}</UI.ViewTitle>
+      </UI.ViewHead>
 
-      <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
+      <UI.ViewBody>
+        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
 
-        <FormContainer>
-          <TriggerForm
-            form={form}
-            isLoading={isLoading}
-            onFormSubmit={onSubmit}
-            serverErrors={serverError}
-          />
-        </FormContainer>
-      </motion.div>
+          <UI.FormContainer>
+            <TriggerForm
+              form={form}
+              isLoading={isLoading}
+              onFormSubmit={onSubmit}
+              serverErrors={serverError}
+            />
+          </UI.FormContainer>
+        </motion.div>
+      </UI.ViewBody>
 
     </>
   );

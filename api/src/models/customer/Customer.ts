@@ -14,7 +14,6 @@ import CustomerService from './CustomerService';
 import { PaginationWhereInput } from '../general/Pagination';
 import { UserConnection, UserCustomerType } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
-import UserService from '../users/UserService';
 import isValidColor from '../../utils/isValidColor';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
@@ -135,6 +134,17 @@ export const CustomerType = objectType({
 
         return users;
       },
+    });
+
+    t.list.field('roles', {
+      type: 'RoleType',
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        const roles = await ctx.services.roleService.getAllRolesForWorkspaceBySlug(parent.slug);
+
+        return roles;
+      }
     });
   },
 });

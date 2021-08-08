@@ -1,16 +1,7 @@
 import * as UI from '@haas/ui';
-import { debounce } from 'lodash';
-import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useMutation } from '@apollo/client';
-import React, { useCallback, useEffect, useState } from 'react';
-
-import { Div, Flex, Text, ViewTitle } from '@haas/ui';
-import SearchBar from 'components/SearchBar/SearchBar';
-import Table from 'components/Table/Table';
-import getPaginatedUsers from 'queries/getPaginatedUsers';
-
+import { ErrorBoundary } from 'react-error-boundary';
+import { Plus } from 'react-feather';
 import {
-  Button,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -21,12 +12,19 @@ import {
   PopoverTrigger,
   useToast,
 } from '@chakra-ui/core';
-import { ErrorBoundary } from 'react-error-boundary';
-import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
-import { Plus } from 'react-feather';
-import { useCustomer } from 'providers/CustomerProvider';
+import { debounce } from 'lodash';
+import { useHistory, useParams } from 'react-router';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
+import React, { useCallback, useEffect, useState } from 'react';
+
+import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
+import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
+import { useCustomer } from 'providers/CustomerProvider';
+import SearchBar from 'components/SearchBar/SearchBar';
 import ShowMoreButton from 'components/ShowMoreButton';
+import Table from 'components/Table/Table';
+import getPaginatedUsers from 'queries/getPaginatedUsers';
 import useAuth from 'hooks/useAuth';
 
 import deleteUserQuery from '../../mutations/deleteUser';
@@ -168,89 +166,90 @@ const UsersOverview = () => {
 
   return (
     <>
-      <ViewTitle>{t('views:users_overview')}</ViewTitle>
-
-      <Div mb={4} width="100%">
-        <Flex justifyContent="space-between">
-          {canInviteUsers && (
-            <Div mr={4}>
-              <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">
+      <UI.ViewHead>
+        <UI.Flex width="100%" justifyContent="space-between">
+          <UI.Flex alignItems="center">
+            <UI.ViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.ViewTitle>
+            {canInviteUsers && (
+              <UI.Button size="sm" ml={4} onClick={handleAddUser} leftIcon={Plus} variantColor="teal">
                 {t('invite_user')}
-              </Button>
-            </Div>
-          )}
-          <Div>
-            <SearchBar
-              activeSearchTerm={paginationProps.activeSearchTerm}
-              onSearchTermChange={handleSearchTermChange}
-            />
-          </Div>
-        </Flex>
-      </Div>
-
-      <Div borderRadius="lg" flexGrow={1} backgroundColor="white" mb="1%">
-        <ErrorBoundary
-          FallbackComponent={() => (
-            <Div>
-              We are experiencing some maintenance with the Users data. We will be back shortly.
-            </Div>
-          )}
-        >
-          <Table
-            headers={HEADERS}
-            paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-            onPaginationChange={setPaginationProps}
-            data={tableData}
-            renderOptions={(data: any) => (
-              <>
-                {canDeleteUsers && (
-                  <ShowMoreButton
-                    renderMenu={(
-                      <UI.List>
-                        <UI.ListHeader>{t('edit_user')}</UI.ListHeader>
-                        {canDeleteUsers && (
-                          <>
-                            {canEditUsers && (
-                              <UI.ListItem onClick={(e: any) => handleEditUser(e, data?.id)}>
-                                {t('edit_user')}
-                              </UI.ListItem>
-                            )}
-                            <Popover>
-                              {() => (
-                                <>
-                                  <PopoverTrigger>
-                                    <UI.ListItem>{t('delete_user')}</UI.ListItem>
-                                  </PopoverTrigger>
-                                  <PopoverContent zIndex={4}>
-                                    <PopoverArrow />
-                                    <PopoverHeader>{t('delete')}</PopoverHeader>
-                                    <PopoverCloseButton />
-                                    <PopoverBody>
-                                      <Text>{t('delete_user_popover')}</Text>
-                                    </PopoverBody>
-                                    <PopoverFooter>
-                                      <Button
-                                        variantColor="red"
-                                        onClick={(e: any) => handleDeleteUser(e, data?.id)}
-                                      >
-                                        {t('delete')}
-                                      </Button>
-                                    </PopoverFooter>
-                                  </PopoverContent>
-                                </>
-                              )}
-                            </Popover>
-                          </>
-                        )}
-                      </UI.List>
-                    )}
-                  />
-                )}
-              </>
+              </UI.Button>
             )}
+          </UI.Flex>
+
+          <SearchBar
+            activeSearchTerm={paginationProps.activeSearchTerm}
+            onSearchTermChange={handleSearchTermChange}
           />
-        </ErrorBoundary>
-      </Div>
+        </UI.Flex>
+      </UI.ViewHead>
+
+      <UI.ViewBody>
+
+        <UI.Div borderRadius="lg" flexGrow={1} backgroundColor="white" mb="1%">
+          <ErrorBoundary
+            FallbackComponent={() => (
+              <UI.Div>
+                We are experiencing some maintenance with the Users data. We will be back shortly.
+              </UI.Div>
+            )}
+          >
+            <Table
+              headers={HEADERS}
+              paginationProps={{ ...paginationProps, pageCount, pageIndex }}
+              onPaginationChange={setPaginationProps}
+              data={tableData}
+              renderOptions={(usersData: any) => (
+                <>
+                  {canDeleteUsers && (
+                    <ShowMoreButton
+                      renderMenu={(
+                        <UI.List>
+                          <UI.ListHeader>{t('edit_user')}</UI.ListHeader>
+                          {canDeleteUsers && (
+                            <>
+                              {canEditUsers && (
+                                <UI.ListItem onClick={(e: any) => handleEditUser(e, usersData?.id)}>
+                                  {t('edit_user')}
+                                </UI.ListItem>
+                              )}
+                              <Popover>
+                                {() => (
+                                  <>
+                                    <PopoverTrigger>
+                                      <UI.ListItem>{t('delete_user')}</UI.ListItem>
+                                    </PopoverTrigger>
+                                    <PopoverContent zIndex={4}>
+                                      <PopoverArrow />
+                                      <PopoverHeader>{t('delete')}</PopoverHeader>
+                                      <PopoverCloseButton />
+                                      <PopoverBody>
+                                        <UI.Text>{t('delete_user_popover')}</UI.Text>
+                                      </PopoverBody>
+                                      <PopoverFooter>
+                                        <UI.Button
+                                          variantColor="red"
+                                          onClick={(e: any) => handleDeleteUser(e, usersData?.id)}
+                                        >
+                                          {t('delete')}
+                                        </UI.Button>
+                                      </PopoverFooter>
+                                    </PopoverContent>
+                                  </>
+                                )}
+                              </Popover>
+                            </>
+                          )}
+                        </UI.List>
+                      )}
+                    />
+                  )}
+                </>
+              )}
+            />
+          </ErrorBoundary>
+        </UI.Div>
+      </UI.ViewBody>
     </>
   );
 };

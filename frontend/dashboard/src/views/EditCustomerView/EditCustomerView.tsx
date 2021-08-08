@@ -1,7 +1,5 @@
+import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import {
-  FormContainer, ViewTitle,
-} from '@haas/ui';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -48,23 +46,6 @@ const schema = yup.object().shape({
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
-
-const EditCustomerView = () => {
-  const { customerSlug } = useParams<{ customerSlug: string }>();
-
-  const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
-    variables: {
-      customerSlug,
-    },
-  });
-
-  if (loading) return null;
-  if (error) return <><p>{error.message}</p></>;
-
-  const customer = customerData?.customer;
-
-  return <EditCustomerForm customer={customer} />;
-};
 
 const startsWithCloudinary = (url: string) => url.includes('cloudinary');
 
@@ -151,20 +132,41 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
   return (
     <>
-      <ViewTitle>{t('views:edit_business_settings_view')}</ViewTitle>
-      <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-        <FormContainer>
-          <CustomerForm
-            form={form}
-            isLoading={isLoading}
-            onFormSubmit={onSubmit}
-            serverErrors={serverErrors}
-            isInEdit
-          />
-        </FormContainer>
-      </motion.div>
+      <UI.ViewHead>
+        <UI.ViewTitle>{t('views:edit_business_settings_view')}</UI.ViewTitle>
+      </UI.ViewHead>
+      <UI.ViewBody>
+        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
+          <UI.FormContainer>
+            <CustomerForm
+              form={form}
+              isLoading={isLoading}
+              onFormSubmit={onSubmit}
+              serverErrors={serverErrors}
+              isInEdit
+            />
+          </UI.FormContainer>
+        </motion.div>
+      </UI.ViewBody>
     </>
   );
+};
+
+const EditCustomerView = () => {
+  const { customerSlug } = useParams<{ customerSlug: string }>();
+
+  const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
+    variables: {
+      customerSlug,
+    },
+  });
+
+  if (loading) return null;
+  if (error) return <><p>{error.message}</p></>;
+
+  const customer = customerData?.customer;
+
+  return <EditCustomerForm customer={customer} />;
 };
 
 export default EditCustomerView;

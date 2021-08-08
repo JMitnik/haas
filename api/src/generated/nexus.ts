@@ -943,8 +943,10 @@ export interface NexusGenFieldTypes {
     dialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
     id: string; // ID!
     name: string; // String!
+    roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
     slug: string; // String!
+    userCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     users: NexusGenRootTypes['UserType'][] | null; // [UserType!]
     usersConnection: NexusGenRootTypes['UserConnection'] | null; // UserConnection
   }
@@ -1212,6 +1214,7 @@ export interface NexusGenFieldTypes {
     me: NexusGenRootTypes['UserType']; // UserType!
     refreshAccessToken: NexusGenRootTypes['RefreshAccessTokenOutput']; // RefreshAccessTokenOutput!
     roleConnection: NexusGenRootTypes['RoleConnection']; // RoleConnection!
+    roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     session: NexusGenRootTypes['Session'] | null; // Session
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     tags: NexusGenRootTypes['Tag'][]; // [Tag!]!
@@ -1416,6 +1419,9 @@ export interface NexusGenArgTypes {
     }
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+    }
+    userCustomer: { // args
+      userId?: string | null; // String
     }
     usersConnection: { // args
       customerSlug?: string | null; // String
@@ -1628,6 +1634,9 @@ export interface NexusGenArgTypes {
     roleConnection: { // args
       customerId?: string | null; // String
       filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
+    }
+    roles: { // args
+      customerSlug?: string | null; // String
     }
     session: { // args
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput

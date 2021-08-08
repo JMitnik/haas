@@ -1,6 +1,6 @@
 /* eslint-disable radix */
+import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { FormContainer, ViewTitle } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
@@ -112,24 +112,6 @@ const getConditionType = (type: string) => {
   return conditionTypeSelectOption;
 };
 
-const EditTriggerView = () => {
-  const { triggerId } = useParams<{ triggerId: string, customerSlug: string }>();
-
-  const { data: triggerData, error, loading } = useQuery(getTriggerQuery, {
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      id: triggerId,
-    },
-  });
-
-  if (loading) return null;
-  if (error) return <><p>{error.message}</p></>;
-
-  const trigger = triggerData?.trigger;
-
-  return <EditTriggerForm trigger={trigger} />;
-};
-
 const EditTriggerForm = ({ trigger }: { trigger: any }) => {
   const { triggerId, customerSlug } = useParams<{ triggerId: string, customerSlug: string }>();
   const history = useHistory();
@@ -238,22 +220,43 @@ const EditTriggerForm = ({ trigger }: { trigger: any }) => {
 
   return (
     <>
-      <ViewTitle>{t('views:edit_trigger_view')}</ViewTitle>
+      <UI.ViewHead>
+        <UI.ViewTitle>{t('views:edit_trigger_view')}</UI.ViewTitle>
+      </UI.ViewHead>
+      <UI.ViewBody>
+        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
 
-      <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-
-        <FormContainer>
-          <TriggerForm
-            form={form}
-            isLoading={isLoading}
-            isInEdit
-            onFormSubmit={onSubmit}
-            serverErrors={serverError}
-          />
-        </FormContainer>
-      </motion.div>
+          <UI.FormContainer>
+            <TriggerForm
+              form={form}
+              isLoading={isLoading}
+              isInEdit
+              onFormSubmit={onSubmit}
+              serverErrors={serverError}
+            />
+          </UI.FormContainer>
+        </motion.div>
+      </UI.ViewBody>
     </>
   );
+};
+
+const EditTriggerView = () => {
+  const { triggerId } = useParams<{ triggerId: string, customerSlug: string }>();
+
+  const { data: triggerData, error, loading } = useQuery(getTriggerQuery, {
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      id: triggerId,
+    },
+  });
+
+  if (loading) return null;
+  if (error) return <><p>{error.message}</p></>;
+
+  const trigger = triggerData?.trigger;
+
+  return <EditTriggerForm trigger={trigger} />;
 };
 
 export default EditTriggerView;
