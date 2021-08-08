@@ -2049,6 +2049,57 @@ export type DuplicateQuestionMutation = (
   )> }
 );
 
+export type GetDialogueStatisticsQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+  dialogueSlug: Scalars['String'];
+  prevDateFilter?: Maybe<DialogueFilterInputType>;
+  statisticsDateFilter?: Maybe<DialogueFilterInputType>;
+}>;
+
+
+export type GetDialogueStatisticsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'title'>
+      & { thisWeekAverageScore: Dialogue['averageScore'], previousScore: Dialogue['averageScore'] }
+      & { sessions: Array<(
+        { __typename?: 'Session' }
+        & Pick<Session, 'id' | 'createdAt' | 'score'>
+        & { nodeEntries: Array<(
+          { __typename?: 'NodeEntry' }
+          & { relatedNode?: Maybe<(
+            { __typename?: 'QuestionNode' }
+            & Pick<QuestionNode, 'title' | 'type'>
+          )>, value?: Maybe<(
+            { __typename?: 'NodeEntryValue' }
+            & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'linkNodeEntry'>
+          )> }
+        )> }
+      )>, statistics?: Maybe<(
+        { __typename?: 'DialogueStatistics' }
+        & Pick<DialogueStatistics, 'nrInteractions'>
+        & { topPositivePath?: Maybe<Array<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'answer' | 'quantity' | 'basicSentiment'>
+        )>>, mostPopularPath?: Maybe<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'answer' | 'quantity' | 'basicSentiment'>
+        )>, topNegativePath?: Maybe<Array<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'quantity' | 'answer' | 'basicSentiment'>
+        )>>, history?: Maybe<Array<(
+          { __typename?: 'lineChartDataType' }
+          & Pick<LineChartDataType, 'x' | 'y'>
+        )>> }
+      )> }
+    )> }
+  )> }
+);
+
 export type RequestInviteMutationVariables = Exact<{
   input?: Maybe<RequestInviteInput>;
 }>;
@@ -2829,6 +2880,93 @@ export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOp
 export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
 export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
 export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
+export const GetDialogueStatisticsDocument = gql`
+    query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
+  customer(slug: $customerSlug) {
+    id
+    dialogue(where: {slug: $dialogueSlug}) {
+      id
+      title
+      thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
+      previousScore: averageScore(input: $prevDateFilter)
+      sessions(take: 3) {
+        id
+        createdAt
+        score
+        nodeEntries {
+          relatedNode {
+            title
+            type
+          }
+          value {
+            sliderNodeEntry
+            textboxNodeEntry
+            registrationNodeEntry
+            choiceNodeEntry
+            linkNodeEntry
+          }
+        }
+      }
+      statistics(input: $statisticsDateFilter) {
+        nrInteractions
+        topPositivePath {
+          answer
+          quantity
+          basicSentiment
+        }
+        mostPopularPath {
+          answer
+          quantity
+          basicSentiment
+        }
+        topNegativePath {
+          quantity
+          answer
+          basicSentiment
+        }
+        history {
+          x
+          y
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDialogueStatisticsQuery__
+ *
+ * To run a query within a React component, call `useGetDialogueStatisticsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDialogueStatisticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDialogueStatisticsQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      dialogueSlug: // value for 'dialogueSlug'
+ *      prevDateFilter: // value for 'prevDateFilter'
+ *      statisticsDateFilter: // value for 'statisticsDateFilter'
+ *   },
+ * });
+ */
+export function useGetDialogueStatisticsQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>(GetDialogueStatisticsDocument, options);
+      }
+export function useGetDialogueStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>(GetDialogueStatisticsDocument, options);
+        }
+export type GetDialogueStatisticsQueryHookResult = ReturnType<typeof useGetDialogueStatisticsQuery>;
+export type GetDialogueStatisticsLazyQueryHookResult = ReturnType<typeof useGetDialogueStatisticsLazyQuery>;
+export type GetDialogueStatisticsQueryResult = Apollo.QueryResult<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>;
+export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatisticsQueryVariables) {
+      return { query: GetDialogueStatisticsDocument, variables: variables }
+    }
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {

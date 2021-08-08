@@ -59,16 +59,18 @@ const Table = ({
               index={index}
             />
           ) : (
-            <TableRow
-              headers={headers}
-              onEditEntry={onEditEntry}
-              onDeleteEntry={onDeleteEntry}
-              data={dataEntry}
-              key={index}
-              renderExpandedRow={renderExpandedRowContainer && renderExpandedRowContainer(dataEntry)}
-              renderOptions={renderOptions}
-              index={index}
-            />
+            <UI.Skeleton isLoading={loading || false}>
+              <TableRow
+                headers={headers}
+                onEditEntry={onEditEntry}
+                onDeleteEntry={onDeleteEntry}
+                data={dataEntry}
+                key={index}
+                renderExpandedRow={renderExpandedRowContainer && renderExpandedRowContainer(dataEntry)}
+                renderOptions={renderOptions}
+                index={index}
+              />
+            </UI.Skeleton>
           )
         ))}
       </Div>

@@ -4,20 +4,21 @@ import {
   Activity, Award, Clipboard, Download, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
 } from 'react-feather';
-import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
+import { Button, Skeleton, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { ThemeContext } from 'styled-components';
-import { gql, useQuery } from '@apollo/client';
 import { sub } from 'date-fns';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
-import React, { useContext, useReducer, useRef } from 'react';
+import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
 
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
+
+import { GetDialogueStatisticsQuery, useGetDialogueStatisticsQuery } from 'types/generated-types';
 
 import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
@@ -129,62 +130,6 @@ const dateReducer = (state: ActiveDateState, action: ActiveDateAction): ActiveDa
       };
   }
 };
-const getDialogueStatistics = gql`
-  query dialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
-    customer(slug: $customerSlug) {
-      id
-      dialogue(where: { slug: $dialogueSlug }) {
-        id
-        title
-        thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
-        previousScore: averageScore(input: $prevDateFilter)
-        sessions(take: 3) {
-          id
-          createdAt
-          score
-          nodeEntries {
-            relatedNode {
-              title
-              type
-            }
-            value {
-              sliderNodeEntry
-              textboxNodeEntry
-              registrationNodeEntry
-              choiceNodeEntry
-              linkNodeEntry
-            }
-          }
-        }
-        statistics(input: $statisticsDateFilter) {
-          nrInteractions
-          topPositivePath {
-            answer
-            quantity
-            basicSentiment
-          }
-
-          mostPopularPath {
-            answer
-            quantity
-            basicSentiment
-          }
-
-          topNegativePath {
-            quantity
-            answer
-            basicSentiment
-          }
-
-          history {
-            x
-            y
-          }
-        }
-      }
-    }
-  }
-`;
 
 interface ShareDialogueDropdownProps {
   dialogueName: string;
@@ -276,18 +221,24 @@ const calcScoreIncrease = (currentScore: number, prevScore: number) => {
 };
 
 const DialogueView = () => {
-  const { dialogueSlug, customerSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const [activeDateState, dispatch] = useReducer(dateReducer, {
     startDate: sub(new Date(), { weeks: 1 }),
     compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
     dateLabel: 'last_week',
   });
-  const { getDialoguesPath } = useNavigator();
-
+  const { dialogueSlug, customerSlug, getDialoguesPath } = useNavigator();
   const history = useHistory();
+  const { t } = useTranslation();
 
-  // TODO: Move this to page level
-  const { data } = useQuery<any>(getDialogueStatistics, {
+  /**
+   * Cache dialogue statistics data when switching between date filters.
+   * */
+  const [
+    cachedDialogueCustomer,
+    setCachedDialogueCustomer,
+  ] = useState<GetDialogueStatisticsQuery['customer'] | undefined>(undefined);
+
+  const { data, loading } = useGetDialogueStatisticsQuery({
     variables: {
       dialogueSlug,
       customerSlug,
@@ -301,20 +252,32 @@ const DialogueView = () => {
     pollInterval: 5000,
   });
 
-  const dialogue = data?.customer?.dialogue;
+  useEffect(() => {
+    if (data && !loading) {
+      setCachedDialogueCustomer(data?.customer);
+    }
+  }, [data, loading]);
 
-  const increaseInAverageScore = calcScoreIncrease(dialogue?.thisWeekAverageScore, dialogue?.previousScore);
+  if (!cachedDialogueCustomer) return <UI.Loader />;
+  const { dialogue } = cachedDialogueCustomer;
 
-  const { t } = useTranslation();
+  const increaseInAverageScore = calcScoreIncrease(
+    dialogue?.thisWeekAverageScore || 0,
+    dialogue?.previousScore || 0,
+  );
 
   const makeSearchUrl = () => {
-    if (!dialogue.statistics?.mostPopularPath?.answer) return '';
+    if (!dialogue?.statistics?.mostPopularPath?.answer) return '';
 
-    return qs.stringify({ search: dialogue.statistics?.mostPopularPath?.answer });
+    return qs.stringify({ search: dialogue?.statistics?.mostPopularPath?.answer });
   };
 
-  if (!dialogue) return <UI.Loader />;
   const shareUrl = `https://client.haas.live/${customerSlug}/${dialogueSlug}`;
+
+  const fetchStatus = {
+    isRefreshing: loading && !!dialogue,
+    isLoading: loading,
+  };
 
   return (
     <>
@@ -355,74 +318,81 @@ const DialogueView = () => {
             </UI.H4>
 
             <UI.Grid gridTemplateColumns="repeat(auto-fit, minmax(275px, 1fr))" minHeight="100px">
-              <SummaryModule
-                heading={t('interactions')}
-                renderIcon={Activity}
-                onClick={() => (
-                  history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)
-                )}
-                isInFallback={dialogue.statistics.nrInteractions === 0}
-                fallbackMetric={t('dialogue:fallback_no_interactions')}
-                renderMetric={`${dialogue.statistics.nrInteractions} ${dialogue.statistics.nrInteractions > 1 ? t('interactions') : t('interaction')}`}
-              />
+              <UI.Skeleton {...fetchStatus}>
+                <SummaryModule
+                  heading={t('interactions')}
+                  renderIcon={Activity}
+                  onClick={() => (
+                    history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)
+                  )}
+                  isInFallback={dialogue?.statistics?.nrInteractions === 0}
+                  fallbackMetric={t('dialogue:fallback_no_interactions')}
+                  renderMetric={`${dialogue?.statistics?.nrInteractions} ${dialogue?.statistics?.nrInteractions || 0 > 1 ? t('interactions') : t('interaction')}`}
+                />
+              </UI.Skeleton>
 
-              <SummaryModule
-                heading={t('dialogue:average_score')}
-                renderIcon={Award}
-                isInFallback={dialogue.thisWeekAverageScore === 0}
-                fallbackMetric={t('dialogue:fallback_no_score')}
-                renderMetric={`${(dialogue.thisWeekAverageScore / 10).toFixed(2)} ${t('score')}`}
-                renderCornerMetric={(
-                  <UI.Flex color="red">
-                    {increaseInAverageScore > 0 ? (
-                      <>
-                        <UI.Icon size="22px" as={TrendingUp} color="green.200" />
-                        <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="green.400">
-                          {increaseInAverageScore.toFixed(2)}
-                          {' '}
-                          %
-                        </UI.Text>
-                      </>
-                    ) : (
-                      <>
-                        <UI.Icon size="22px" as={TrendingDown} color="red.200" />
-                        <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
-                          {increaseInAverageScore.toFixed(2)}
-                          {' '}
-                          %
-                        </UI.Text>
-                      </>
-                    )}
-                  </UI.Flex>
-                )}
-              />
+              <UI.Skeleton {...fetchStatus}>
 
-              <SummaryModule
-                heading={t('dialogue:frequently_mentioned')}
-                renderIcon={MessageCircle}
-                renderFooterText={t('dialogue:view_all_mentions')}
-                isInFallback={!dialogue.statistics?.mostPopularPath}
-                onClick={() => (
-                  history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions?${makeSearchUrl()}`)
-                )}
-                fallbackMetric={t('dialogue:fallback_no_keywords')}
-                renderMetric={dialogue.statistics?.mostPopularPath?.answer}
-                renderCornerMetric={(
-                  <>
-                    {dialogue.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
-                      <Tag size="sm" variantColor="green">
-                        <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
-                        <TagLabel color="green.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
-                      </Tag>
-                    ) : (
-                      <Tag size="sm" variantColor="red">
-                        <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
-                        <TagLabel color="red.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
-                      </Tag>
-                    )}
-                  </>
-                )}
-              />
+                <SummaryModule
+                  heading={t('dialogue:average_score')}
+                  renderIcon={Award}
+                  isInFallback={dialogue?.thisWeekAverageScore === 0}
+                  fallbackMetric={t('dialogue:fallback_no_score')}
+                  renderMetric={`${(dialogue?.thisWeekAverageScore || 0 / 10).toFixed(2)} ${t('score')}`}
+                  renderCornerMetric={(
+                    <UI.Flex color="red">
+                      {increaseInAverageScore > 0 ? (
+                        <>
+                          <UI.Icon size="22px" as={TrendingUp} color="green.200" />
+                          <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="green.400">
+                            {increaseInAverageScore.toFixed(2)}
+                            {' '}
+                            %
+                          </UI.Text>
+                        </>
+                      ) : (
+                        <>
+                          <UI.Icon size="22px" as={TrendingDown} color="red.200" />
+                          <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
+                            {increaseInAverageScore.toFixed(2)}
+                            {' '}
+                            %
+                          </UI.Text>
+                        </>
+                      )}
+                    </UI.Flex>
+                  )}
+                />
+              </UI.Skeleton>
+
+              <UI.Skeleton {...fetchStatus}>
+                <SummaryModule
+                  heading={t('dialogue:frequently_mentioned')}
+                  renderIcon={MessageCircle}
+                  renderFooterText={t('dialogue:view_all_mentions')}
+                  isInFallback={!dialogue?.statistics?.mostPopularPath}
+                  onClick={() => (
+                    history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions?${makeSearchUrl()}`)
+                  )}
+                  fallbackMetric={t('dialogue:fallback_no_keywords')}
+                  renderMetric={dialogue?.statistics?.mostPopularPath?.answer}
+                  renderCornerMetric={(
+                    <>
+                      {dialogue?.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
+                        <Tag size="sm" variantColor="green">
+                          <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
+                          <TagLabel color="green.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
+                        </Tag>
+                      ) : (
+                        <Tag size="sm" variantColor="red">
+                          <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
+                          <TagLabel color="red.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
+                        </Tag>
+                      )}
+                    </>
+                  )}
+                />
+              </UI.Skeleton>
             </UI.Grid>
           </UI.Div>
 
@@ -438,8 +408,13 @@ const DialogueView = () => {
               </UI.Flex>
             </UI.H4>
             <UI.Grid gridTemplateColumns="1fr 1fr">
-              <PositivePathsModule positivePaths={dialogue.statistics?.topPositivePath} />
-              <NegativePathsModule negativePaths={dialogue.statistics?.topNegativePath} />
+              <UI.Skeleton {...fetchStatus}>
+                <PositivePathsModule positivePaths={dialogue?.statistics?.topPositivePath} />
+              </UI.Skeleton>
+
+              <UI.Skeleton {...fetchStatus}>
+                <NegativePathsModule negativePaths={dialogue?.statistics?.topNegativePath} />
+              </UI.Skeleton>
             </UI.Grid>
           </UI.Div>
 
@@ -457,14 +432,18 @@ const DialogueView = () => {
           </UI.Div>
 
           <UI.Div gridColumn="span 2">
-            {dialogue.statistics?.history ? (
-              <ScoreGraphModule chartData={dialogue.statistics?.history} />
+            {dialogue?.statistics?.history ? (
+              <UI.Skeleton {...fetchStatus}>
+                <ScoreGraphModule chartData={dialogue?.statistics?.history || []} />
+              </UI.Skeleton>
             ) : (
               <UI.Div>{t('no_data')}</UI.Div>
             )}
           </UI.Div>
 
-          <InteractionFeedModule interactions={dialogue?.sessions} />
+          <UI.Skeleton {...fetchStatus}>
+            <InteractionFeedModule interactions={dialogue?.sessions || []} />
+          </UI.Skeleton>
         </UI.Grid>
       </UI.ViewBody>
     </>
