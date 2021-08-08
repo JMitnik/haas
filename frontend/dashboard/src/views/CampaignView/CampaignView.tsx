@@ -166,11 +166,11 @@ export const CampaignView = () => {
 
   return (
     <>
-      <UI.ViewHeading>
+      <UI.ViewHead>
         <UI.Stack>
           <UI.Breadcrumb to={campaignsPath}>{t('back_to_campaigns')}</UI.Breadcrumb>
           <UI.Stack isInline alignItems="center" spacing={4}>
-            <UI.PageTitle>{campaign?.label}</UI.PageTitle>
+            <UI.ViewTitle>{campaign?.label}</UI.ViewTitle>
             <UI.Button
               leftIcon={Plus}
               onClick={() => setIsOpenImportModal(true)}
@@ -178,11 +178,10 @@ export const CampaignView = () => {
               variantColor="teal"
             >
               {t('import_deliveries')}
-
             </UI.Button>
           </UI.Stack>
         </UI.Stack>
-      </UI.ViewHeading>
+      </UI.ViewHead>
       <UI.ViewContainer>
         <UI.Card noHover>
           <UI.Div p={2}>

@@ -1,5 +1,5 @@
 import { Button, ButtonGroup } from '@chakra-ui/core';
-import { Div, Flex, Grid, H4, PageTitle } from '@haas/ui';
+import { Div, Flex, Grid, H4, ViewTitle } from '@haas/ui';
 import { Grid as GridIcon, List, Plus } from 'react-feather';
 import { Link, useParams } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/client';
@@ -31,7 +31,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean })
 
   return (
     <>
-      <PageTitle>{t('dialogues')}</PageTitle>
+      <ViewTitle>{t('dialogues')}</ViewTitle>
 
       <Div mb={4} maxWidth="800px" width="100%">
         <Flex>

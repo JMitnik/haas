@@ -1,15 +1,15 @@
 import * as yup from 'yup';
-import { gql } from '@apollo/client';
 import { Controller, useForm } from 'react-hook-form';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/client';
+
 import React from 'react';
 import Select from 'react-select';
 
 import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import {
   Div, Form, FormContainer, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle
+  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, ViewTitle,
 } from '@haas/ui';
 import { Mail } from 'react-feather';
 import { motion } from 'framer-motion';
@@ -125,7 +125,7 @@ const InviteUserView = () => {
 
   return (
     <>
-      <PageTitle>{t('views:invite_user')}</PageTitle>
+      <ViewTitle>{t('views:invite_user')}</ViewTitle>
 
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>

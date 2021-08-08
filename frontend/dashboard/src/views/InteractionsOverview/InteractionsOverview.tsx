@@ -9,7 +9,7 @@ import {
   getDialogueSessionConnection as CustomerSessionConnection,
   getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions as Session,
 } from 'queries/__generated__/getDialogueSessionConnection';
-import { Div, Flex, PageTitle, Span, Text } from '@haas/ui';
+import { Div, Flex, Span, Text, ViewTitle } from '@haas/ui';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/client';
 import { useLocation, useParams } from 'react-router';
@@ -294,10 +294,10 @@ const InteractionsOverview = () => {
 
   return (
     <InteractionsOverviewContainer>
-      <PageTitle>
+      <ViewTitle>
         <Icon as={Activity} mr={1} />
         {t('views:interactions_view')}
-      </PageTitle>
+      </ViewTitle>
 
       <Flex mb={4} alignItems="center" justifyContent="space-between">
         <Button

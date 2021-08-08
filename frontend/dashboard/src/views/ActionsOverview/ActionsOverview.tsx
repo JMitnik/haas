@@ -1,6 +1,6 @@
 import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
 import { Button, Icon } from '@chakra-ui/core';
-import { Div, Flex, PageTitle } from '@haas/ui';
+import { Div, Flex, ViewTitle } from '@haas/ui';
 import { Mail, Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/client';
@@ -136,10 +136,10 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
 
   return (
     <DialogueViewContainer>
-      <PageTitle>
+      <ViewTitle>
         <Icon as={Mail} mr={1} />
         {t('views:cta_view')}
-      </PageTitle>
+      </ViewTitle>
       <Flex flexDirection="row" justifyContent="space-between" alignItems="center" mb={4}>
         <Button
           size="sm"

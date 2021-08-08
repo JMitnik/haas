@@ -1,16 +1,16 @@
 import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { Mail, Phone, User } from 'react-feather';
-import { gql } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/client';
+
 import React from 'react';
 import Select from 'react-select';
 
 import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import {
   Div, Form, FormContainer, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Loader, Muted, PageTitle
+  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Loader, Muted, ViewTitle,
 } from '@haas/ui';
 
 import { motion } from 'framer-motion';
@@ -171,7 +171,7 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
 
   return (
     <>
-      <PageTitle>{t('edit_user')}</PageTitle>
+      <ViewTitle>{t('edit_user')}</ViewTitle>
 
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>

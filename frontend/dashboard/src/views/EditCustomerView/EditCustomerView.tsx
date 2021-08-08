@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import {
-  FormContainer, PageTitle,
+  FormContainer, ViewTitle,
 } from '@haas/ui';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
@@ -151,7 +151,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
   return (
     <>
-      <PageTitle>{t('views:edit_business_settings_view')}</PageTitle>
+      <ViewTitle>{t('views:edit_business_settings_view')}</ViewTitle>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
           <CustomerForm

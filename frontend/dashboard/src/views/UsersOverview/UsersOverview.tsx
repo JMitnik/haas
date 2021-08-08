@@ -4,7 +4,7 @@ import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Div, Flex, PageTitle, Text } from '@haas/ui';
+import { Div, Flex, Text, ViewTitle } from '@haas/ui';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import getPaginatedUsers from 'queries/getPaginatedUsers';
@@ -168,7 +168,7 @@ const UsersOverview = () => {
 
   return (
     <>
-      <PageTitle>{t('views:users_overview')}</PageTitle>
+      <ViewTitle>{t('views:users_overview')}</ViewTitle>
 
       <Div mb={4} width="100%">
         <Flex justifyContent="space-between">

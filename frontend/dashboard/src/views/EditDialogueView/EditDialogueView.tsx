@@ -5,7 +5,7 @@ import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '
 import { Controller, useForm } from 'react-hook-form';
 import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel, FormSection,
-  H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, RadioButton, Textarea,
+  H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Textarea, ViewTitle,
 } from '@haas/ui';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
@@ -189,9 +189,9 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
 
   return (
     <Div>
-      <PageTitle>
+      <ViewTitle>
         {t('views:edit_dialogue_view')}
-      </PageTitle>
+      </ViewTitle>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
           <Form onSubmit={form.handleSubmit(onSubmit)}>

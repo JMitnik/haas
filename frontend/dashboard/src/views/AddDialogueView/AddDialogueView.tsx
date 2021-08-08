@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
 import {
   Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea
+  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea, ViewTitle,
 } from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
@@ -202,7 +202,7 @@ const AddDialogueView = () => {
 
   return (
     <Container>
-      <PageTitle>{t('views:add_dialogue_view')}</PageTitle>
+      <ViewTitle>{t('views:add_dialogue_view')}</ViewTitle>
 
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>

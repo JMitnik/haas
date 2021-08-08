@@ -1,5 +1,5 @@
-import DialogueService from './DialogueService';
-import { mockNegativeEntries, mockPositiveEntries } from './__mocks__/mockEntries';
+import DialogueService from '../DialogueService';
+import { mockNegativeEntries, mockPositiveEntries } from '../__mocks__/mockEntries';
 
 describe('DialogueService.getTopNPaths', () => {
   it('Deals appropriately with negativepaths', async () => {

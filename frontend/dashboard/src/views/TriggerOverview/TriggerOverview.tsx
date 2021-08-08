@@ -1,9 +1,9 @@
 import * as UI from '@haas/ui';
 import {
   Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
-  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
-import { Div, Flex, PageTitle, Text } from '@haas/ui';
+import { Div, Flex, Text, ViewTitle } from '@haas/ui';
 import { Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
@@ -85,8 +85,8 @@ const TriggersOverview = () => {
           limit: paginationProps.pageSize,
           pageIndex: paginationProps.pageIndex,
           orderBy: paginationProps.sortBy,
-        }
-      }
+        },
+      },
     }],
     onError: (serverError: any) => {
       console.log(serverError);
@@ -133,7 +133,7 @@ const TriggersOverview = () => {
 
   return (
     <Div margin="0 auto" height="100vh" maxHeight="100vh">
-      <PageTitle>{t('views:trigger_overview')}</PageTitle>
+      <ViewTitle>{t('views:trigger_overview')}</ViewTitle>
 
       <Div mb={4} width="100%">
         <Flex justifyContent="space-between">

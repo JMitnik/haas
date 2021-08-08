@@ -1,6 +1,6 @@
 /* eslint-disable radix */
 import * as yup from 'yup';
-import { FormContainer, PageTitle } from '@haas/ui';
+import { FormContainer, ViewTitle } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
@@ -238,7 +238,7 @@ const EditTriggerForm = ({ trigger }: { trigger: any }) => {
 
   return (
     <>
-      <PageTitle>{t('views:edit_trigger_view')}</PageTitle>
+      <ViewTitle>{t('views:edit_trigger_view')}</ViewTitle>
 
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
 

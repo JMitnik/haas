@@ -1,4 +1,4 @@
-import { ColumnFlex, Div, Icon, PageTitle } from '@haas/ui';
+import { ColumnFlex, Div, Icon, ViewTitle } from '@haas/ui';
 import { Zap } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
@@ -27,10 +27,10 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
 
   return (
     <DialogueBuilderContainer data-cy="DialogueBuilderContainer">
-      <PageTitle>
+      <ViewTitle>
         <Icon as={Zap} mr={1} />
         {t('views:builder_view')}
-      </PageTitle>
+      </ViewTitle>
 
       <ColumnFlex>
         {(nodes && nodes.length === 0) && (
