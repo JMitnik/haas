@@ -76,12 +76,11 @@ const Table = ({
       </Div>
 
       {data.length === 0 && loading && (
-        <Flex gridRow="2 / -1" gridColumn="1 / -1" justifyContent="center" alignItems="center">
-          <Div color="default.darker" marginRight="5px">
-            <Info />
-          </Div>
-          <H4 color="default.darker">Loading data...</H4>
-        </Flex>
+        <>
+          {[...Array(10).keys()].map((item) => (
+            <UI.Skeleton key={item} isLoading manualHeight={40} />
+          ))}
+        </>
       )}
 
       {data.length === 0 && !loading && (
