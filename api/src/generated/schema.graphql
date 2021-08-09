@@ -843,7 +843,6 @@ type Query {
   me: UserType!
   refreshAccessToken: RefreshAccessTokenOutput!
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
-  roles(customerSlug: String): [RoleType!]
   session(where: SessionWhereUniqueInput): Session
   sessions(where: SessionWhereUniqueInput): [Session!]!
   tags(customerSlug: String, dialogueId: String): [Tag!]!
