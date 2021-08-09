@@ -325,7 +325,27 @@ export const QuestionNodeType = objectType({
         return ctx.services.nodeService.getChildEdgesOfNode(parent.id);
       },
     });
+
+    t.field('statistics', {
+      type: NodeStatisticsType,
+      nullable: true,
+
+      resolve(parent) {
+        // @ts-ignore
+        if (parent.statistics) return parent.statistics;
+
+        return null;
+      }
+    });
   },
+});
+
+export const NodeStatisticsType = objectType({
+  name: 'NodeStatisticsType',
+
+  definition(t) {
+    t.int('count', { nullable: true });
+  }
 });
 
 export const QuestionNodeWhereInputType = inputObjectType({

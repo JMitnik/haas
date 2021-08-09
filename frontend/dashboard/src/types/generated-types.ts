@@ -448,13 +448,26 @@ export type DialogueFinisherObjectType = {
   subtext: Scalars['String'];
 };
 
+export type DialogueRootBranchStatisticsType = {
+  __typename?: 'DialogueRootBranchStatisticsType';
+  nodes?: Maybe<Array<QuestionNode>>;
+};
+
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
   nrInteractions: Scalars['Int'];
   topPositivePath?: Maybe<Array<TopPathType>>;
   topNegativePath?: Maybe<Array<TopPathType>>;
   mostPopularPath?: Maybe<TopPathType>;
+  branch: DialogueRootBranchStatisticsType;
   history?: Maybe<Array<LineChartDataType>>;
+};
+
+
+export type DialogueStatisticsBranchArgs = {
+  min?: Maybe<Scalars['Int']>;
+  max?: Maybe<Scalars['Int']>;
+  dialogueId?: Maybe<Scalars['ID']>;
 };
 
 export type DialogueWhereUniqueInput = {
@@ -1082,6 +1095,11 @@ export type NodeEntryValue = {
   formNodeEntry?: Maybe<FormNodeEntryType>;
 };
 
+export type NodeStatisticsType = {
+  __typename?: 'NodeStatisticsType';
+  count?: Maybe<Scalars['Int']>;
+};
+
 export type OptionInputType = {
   id?: Maybe<Scalars['Int']>;
   value?: Maybe<Scalars['String']>;
@@ -1329,6 +1347,7 @@ export type QuestionNode = {
   overrideLeaf?: Maybe<QuestionNode>;
   options: Array<QuestionOption>;
   children: Array<Edge>;
+  statistics?: Maybe<NodeStatisticsType>;
 };
 
 /** The different types a node can assume */
@@ -2046,6 +2065,69 @@ export type DuplicateQuestionMutation = (
   & { duplicateQuestion?: Maybe<(
     { __typename?: 'QuestionNode' }
     & Pick<QuestionNode, 'id'>
+  )> }
+);
+
+export type GetBranchStatisticsQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+  dialogueSlug: Scalars['String'];
+  dialogueId: Scalars['ID'];
+  statisticsDateFilter?: Maybe<DialogueFilterInputType>;
+}>;
+
+
+export type GetBranchStatisticsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id'>
+      & { statistics?: Maybe<(
+        { __typename?: 'DialogueStatistics' }
+        & { negativeBranch: (
+          { __typename?: 'DialogueRootBranchStatisticsType' }
+          & { nodes?: Maybe<Array<(
+            { __typename?: 'QuestionNode' }
+            & Pick<QuestionNode, 'id' | 'isRoot' | 'title'>
+            & { children: Array<(
+              { __typename?: 'Edge' }
+              & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
+            )>, statistics?: Maybe<(
+              { __typename?: 'NodeStatisticsType' }
+              & Pick<NodeStatisticsType, 'count'>
+            )> }
+          )>> }
+        ), neutralBranch: (
+          { __typename?: 'DialogueRootBranchStatisticsType' }
+          & { nodes?: Maybe<Array<(
+            { __typename?: 'QuestionNode' }
+            & Pick<QuestionNode, 'id' | 'isRoot' | 'title'>
+            & { children: Array<(
+              { __typename?: 'Edge' }
+              & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
+            )>, statistics?: Maybe<(
+              { __typename?: 'NodeStatisticsType' }
+              & Pick<NodeStatisticsType, 'count'>
+            )> }
+          )>> }
+        ), positiveBranch: (
+          { __typename?: 'DialogueRootBranchStatisticsType' }
+          & { nodes?: Maybe<Array<(
+            { __typename?: 'QuestionNode' }
+            & Pick<QuestionNode, 'id' | 'isRoot' | 'title'>
+            & { children: Array<(
+              { __typename?: 'Edge' }
+              & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
+            )>, statistics?: Maybe<(
+              { __typename?: 'NodeStatisticsType' }
+              & Pick<NodeStatisticsType, 'count'>
+            )> }
+          )>> }
+        ) }
+      )> }
+    )> }
   )> }
 );
 
@@ -2880,6 +2962,97 @@ export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOp
 export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
 export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
 export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
+export const GetBranchStatisticsDocument = gql`
+    query GetBranchStatistics($customerSlug: String!, $dialogueSlug: String!, $dialogueId: ID!, $statisticsDateFilter: DialogueFilterInputType) {
+  customer(slug: $customerSlug) {
+    id
+    dialogue(where: {slug: $dialogueSlug}) {
+      id
+      statistics(input: $statisticsDateFilter) {
+        negativeBranch: branch(min: 0, max: 30, dialogueId: $dialogueId) {
+          nodes {
+            id
+            isRoot
+            title
+            children {
+              id
+              parentNodeId
+              childNodeId
+            }
+            statistics {
+              count
+            }
+          }
+        }
+        neutralBranch: branch(min: 31, max: 60, dialogueId: $dialogueId) {
+          nodes {
+            id
+            isRoot
+            title
+            children {
+              id
+              parentNodeId
+              childNodeId
+            }
+            statistics {
+              count
+            }
+          }
+        }
+        positiveBranch: branch(min: 31, max: 60, dialogueId: $dialogueId) {
+          nodes {
+            id
+            isRoot
+            title
+            children {
+              id
+              parentNodeId
+              childNodeId
+            }
+            statistics {
+              count
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetBranchStatisticsQuery__
+ *
+ * To run a query within a React component, call `useGetBranchStatisticsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBranchStatisticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBranchStatisticsQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      dialogueSlug: // value for 'dialogueSlug'
+ *      dialogueId: // value for 'dialogueId'
+ *      statisticsDateFilter: // value for 'statisticsDateFilter'
+ *   },
+ * });
+ */
+export function useGetBranchStatisticsQuery(baseOptions: Apollo.QueryHookOptions<GetBranchStatisticsQuery, GetBranchStatisticsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBranchStatisticsQuery, GetBranchStatisticsQueryVariables>(GetBranchStatisticsDocument, options);
+      }
+export function useGetBranchStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBranchStatisticsQuery, GetBranchStatisticsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBranchStatisticsQuery, GetBranchStatisticsQueryVariables>(GetBranchStatisticsDocument, options);
+        }
+export type GetBranchStatisticsQueryHookResult = ReturnType<typeof useGetBranchStatisticsQuery>;
+export type GetBranchStatisticsLazyQueryHookResult = ReturnType<typeof useGetBranchStatisticsLazyQuery>;
+export type GetBranchStatisticsQueryResult = Apollo.QueryResult<GetBranchStatisticsQuery, GetBranchStatisticsQueryVariables>;
+export function refetchGetBranchStatisticsQuery(variables?: GetBranchStatisticsQueryVariables) {
+      return { query: GetBranchStatisticsDocument, variables: variables }
+    }
 export const GetDialogueStatisticsDocument = gql`
     query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
   customer(slug: $customerSlug) {

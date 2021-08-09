@@ -13,15 +13,16 @@ import QRCode from 'qrcode.react';
 import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
 
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
+import { GetDialogueStatisticsQuery, useGetBranchStatisticsQuery, useGetDialogueStatisticsQuery } from 'types/generated-types';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
-
-import { GetDialogueStatisticsQuery, useGetDialogueStatisticsQuery } from 'types/generated-types';
-
 import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
+
+import { SunburstModule } from './Modules/SunburstModule';
+import { useDialogue } from 'providers/DialogueProvider';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
@@ -252,6 +253,18 @@ const DialogueView = () => {
     pollInterval: 5000,
   });
 
+  const { activeDialogue } = useDialogue();
+
+  const { data: branchStatisticsData, loading: branchLoading } = useGetBranchStatisticsQuery({
+    variables: {
+      dialogueId: activeDialogue?.id || '',
+      dialogueSlug,
+      customerSlug,
+      statisticsDateFilter: { startDate: activeDateState.startDate.toISOString() },
+    },
+    pollInterval: 5000,
+  });
+
   useEffect(() => {
     if (data && !loading) {
       setCachedDialogueCustomer(data?.customer);
@@ -394,6 +407,12 @@ const DialogueView = () => {
                 />
               </UI.Skeleton>
             </UI.Grid>
+          </UI.Div>
+
+          <UI.Div mt={2} gridColumn="1 / 4">
+            {!!branchStatisticsData && (
+              <SunburstModule data={branchStatisticsData} />
+            )}
           </UI.Div>
 
           <UI.Div mt={2} gridColumn="1 / 4">

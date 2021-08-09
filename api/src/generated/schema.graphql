@@ -361,7 +361,12 @@ type DialogueFinisherObjectType {
   subtext: String!
 }
 
+type DialogueRootBranchStatisticsType {
+  nodes: [QuestionNode!]
+}
+
 type DialogueStatistics {
+  branch(dialogueId: ID, max: Int, min: Int): DialogueRootBranchStatisticsType!
   history: [lineChartDataType!]
   mostPopularPath: topPathType
   nrInteractions: Int!
@@ -741,6 +746,10 @@ type NodeEntryValue {
   videoNodeEntry: String
 }
 
+type NodeStatisticsType {
+  count: Int
+}
+
 input OptionInputType {
   id: Int
   overrideLeafId: String
@@ -875,6 +884,7 @@ type QuestionNode {
 
   """Slidernode resolver"""
   sliderNode: SliderNodeType
+  statistics: NodeStatisticsType
   title: String!
   type: QuestionNodeTypeEnum!
   updatedAt: String

@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 
 import { ViewContainer } from '@haas/ui';
+import { gql, useQuery } from '@apollo/client';
 import { useDialogue } from 'providers/DialogueProvider';
 import { useParams } from 'react-router';
-import { useQuery } from '@apollo/client';
-import { gql } from '@apollo/client';
 
 interface DialogueLayoutProps {
   children: React.ReactNode;
@@ -15,6 +14,7 @@ const getSharedDialogueLayoutQuery = gql`
     customer(slug: $customerSlug) {
       id
       dialogue(where: { slug: $dialogueSlug }) {
+        id
         title
         tags {
           type

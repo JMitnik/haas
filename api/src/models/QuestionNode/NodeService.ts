@@ -50,7 +50,7 @@ export interface IdMapProps {
   [details: string]: string;
 }
 
-class NodeService {
+export class NodeService {
   prisma: PrismaClient;
   questionNodePrismaAdapter: QuestionNodePrismaAdapter;
   edgeService: EdgeService;

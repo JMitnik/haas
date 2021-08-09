@@ -17,6 +17,7 @@ import SessionService from '../models/session/SessionService';
 import TagService from '../models/tag/TagService';
 import TriggerService from '../models/trigger/TriggerService';
 import EdgeService from '../models/edge/EdgeService';
+import { DialogueStatisticsService } from '../models/questionnaire/DialogueStatisticsService';
 
 export interface APIServiceContainer {
   userService: UserService;
@@ -25,6 +26,7 @@ export interface APIServiceContainer {
   loginService: LoginService;
   autodeckService: AutodeckService;
   dialogueService: DialogueService;
+  dialogueStatisticsService: DialogueStatisticsService;
   authService: AuthService;
   nodeService: NodeService;
   edgeService: EdgeService;

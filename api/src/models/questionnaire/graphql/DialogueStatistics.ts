@@ -1,4 +1,7 @@
 import { objectType } from '@nexus/schema';
+import { UserInputError } from 'apollo-server-express';
+import { CustomerType } from '../../customer';
+import { QuestionNodeType } from '../../QuestionNode';
 
 
 export const DialgoueStatisticsLineChartDataType = objectType({
@@ -21,6 +24,14 @@ export const DialogueStatisticsTopPathType = objectType({
   },
 });
 
+export const DialogueRootBranchStatisticsType = objectType({
+  name: 'DialogueRootBranchStatisticsType',
+
+  definition(t) {
+    t.list.field('nodes', { type: QuestionNodeType, nullable: true });
+  }
+})
+
 export const DialogueStatistics = objectType({
   name: 'DialogueStatistics',
 
@@ -40,6 +51,24 @@ export const DialogueStatistics = objectType({
     t.field('mostPopularPath', {
       type: DialogueStatisticsTopPathType,
       nullable: true,
+    });
+
+    t.field('branch', {
+      args: { min: 'Int', max: 'Int', dialogueId: 'ID' },
+      type: DialogueRootBranchStatisticsType,
+      resolve: (parent, args, ctx, info) => {
+        const { dialogueSlug, customerSlug } = info.variableValues;
+
+        if (!args.dialogueId) {
+          throw new UserInputError('Currently we do not support without passing in both slugs')
+        }
+
+        return ctx.services.dialogueStatisticsService.getNodeStatisticsByRootBranch(
+          args.dialogueId,
+          args.min || 0,
+          args.max || 30
+        );
+      }
     });
 
     t.list.field('history', {
