@@ -4,7 +4,7 @@ import {
   Activity, Award, Clipboard, Download, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
 } from 'react-feather';
-import { Button, Skeleton, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
+import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { ThemeContext } from 'styled-components';
 import { sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
@@ -13,16 +13,20 @@ import QRCode from 'qrcode.react';
 import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
 
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
-import { GetDialogueStatisticsQuery, useGetBranchStatisticsQuery, useGetDialogueStatisticsQuery } from 'types/generated-types';
+import {
+  GetDialogueStatisticsQuery,
+  useGetBranchStatisticsQuery,
+  useGetDialogueStatisticsQuery
+} from 'types/generated-types';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
+import { useDialogue } from 'providers/DialogueProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
 
 import { SunburstModule } from './Modules/SunburstModule';
-import { useDialogue } from 'providers/DialogueProvider';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
