@@ -261,7 +261,7 @@ export const CampaignView = () => {
                 <UI.Span ml={3}>
                   (Total deliveries:
                   {' '}
-                  {data?.customer?.campaign.allDeliveryConnection?.nrTotal}
+                  {data?.customer?.campaign?.allDeliveryConnection?.nrTotal}
                   )
                 </UI.Span>
               </UI.Div>
