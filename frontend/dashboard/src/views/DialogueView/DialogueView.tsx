@@ -4,7 +4,7 @@ import {
   Activity, Award, Clipboard, Download, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
 } from 'react-feather';
-import { Button, Skeleton, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
+import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { ThemeContext } from 'styled-components';
 import { sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
@@ -431,19 +431,23 @@ const DialogueView = () => {
             </UI.H4>
           </UI.Div>
 
-          <UI.Div gridColumn="span 2">
-            {dialogue?.statistics?.history ? (
-              <UI.Skeleton {...fetchStatus}>
-                <ScoreGraphModule chartData={dialogue?.statistics?.history || []} />
-              </UI.Skeleton>
-            ) : (
-              <UI.Div>{t('no_data')}</UI.Div>
-            )}
-          </UI.Div>
+          <UI.Div gridColumn="span 3">
+            <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
+              <UI.Div>
+                {dialogue?.statistics?.history ? (
+                  <UI.Skeleton {...fetchStatus}>
+                    <ScoreGraphModule chartData={dialogue?.statistics?.history || []} />
+                  </UI.Skeleton>
+                ) : (
+                  <UI.Div>{t('no_data')}</UI.Div>
+                )}
+              </UI.Div>
 
-          <UI.Skeleton {...fetchStatus}>
-            <InteractionFeedModule interactions={dialogue?.sessions || []} />
-          </UI.Skeleton>
+              <UI.Skeleton {...fetchStatus}>
+                <InteractionFeedModule interactions={dialogue?.sessions || []} />
+              </UI.Skeleton>
+            </UI.Grid>
+          </UI.Div>
         </UI.Grid>
       </UI.ViewBody>
     </>
