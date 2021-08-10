@@ -1,9 +1,11 @@
 import styled, { css } from 'styled-components';
 import React from 'react';
+import { Skeleton as ChakraSkeleton } from '@chakra-ui/core';
 import { Text } from './Type';
 import Card from './Cards';
 import { Span } from './Span';
 import { CloseIcon } from './assets/icon-close';
+import { Div } from './Generics';
 
 const IllustrationCardWrapper = styled.div`
   ${({ theme }) => css`
@@ -69,3 +71,36 @@ export const CloseButton = ({ onClose }: any) => (
     <CloseIcon />
   </CloseButtonContainer>
 );
+
+interface SkeletonProps {
+  isLoading: boolean;
+  borderRadius?: string;
+  children?: React.ReactNode;
+  isRefreshing?: boolean;
+  manualHeight?: number;
+}
+
+/**
+ * Skeletons are responsible for handling loading / refreshing states.
+ *
+ * Note:
+ * - Refresh has priority over loading.
+ * - It is adviced to group the relevant states into a single object, like:
+ * const fetchStatus = {
+ *  isLoading: loadingCondition,
+ *  isRefresing: loadingCondition && refreshingCondition
+ * }
+ */
+export const Skeleton = ({ isLoading, borderRadius = '10px', isRefreshing = false, manualHeight, children }: SkeletonProps) => (
+  <>
+    {isRefreshing ? (
+      <Div opacity={0.5} style={{ pointerEvents: 'none', cursor: 'initial' }}>
+        {children}
+      </Div>
+    ): (
+      <ChakraSkeleton isLoaded={!isLoading} borderRadius={borderRadius} height={!!manualHeight ? `${manualHeight}px` : 'auto'}>
+        {children}
+      </ChakraSkeleton>
+    )}
+  </>
+)

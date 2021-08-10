@@ -1,0 +1,9 @@
+query GetRoles($id: ID) {
+  customer(id: $id) {
+    id
+    roles {
+      id
+      name
+    }
+  }
+}

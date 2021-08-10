@@ -3,6 +3,7 @@ import { UserInputError } from 'apollo-server-express';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { subDays } from 'date-fns';
 
+import { DialgoueStatisticsLineChartDataType, DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/Customer';
 import { EdgeType } from '../edge/Edge';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
@@ -21,53 +22,6 @@ export const TEXT_NODES = [
   'CHOICE',
 ];
 
-export const lineChartDataType = objectType({
-  name: 'lineChartDataType',
-
-  definition(t) {
-    t.string('x', { nullable: true });
-    t.int('y', { nullable: true });
-    t.string('entryId', { nullable: true });
-  },
-});
-
-export const topPathType = objectType({
-  name: 'topPathType',
-
-  definition(t) {
-    t.string('answer', { nullable: true });
-    t.int('quantity', { nullable: true });
-    t.string('basicSentiment', { nullable: true });
-  },
-});
-
-export const DialogueStatistics = objectType({
-  name: 'DialogueStatistics',
-
-  definition(t) {
-    t.int('nrInteractions');
-
-    t.list.field('topPositivePath', {
-      type: topPathType,
-      nullable: true,
-    });
-
-    t.list.field('topNegativePath', {
-      type: topPathType,
-      nullable: true,
-    });
-
-    t.field('mostPopularPath', {
-      type: topPathType,
-      nullable: true,
-    });
-
-    t.list.field('history', {
-      nullable: true,
-      type: lineChartDataType,
-    });
-  },
-});
 
 export const DialogueFilterInputType = inputObjectType({
   name: 'DialogueFilterInputType',
@@ -396,28 +350,6 @@ export const DialogueRootQuery = extendType({
   type: 'Query',
 
   definition(t) {
-    t.list.field('lineChartData', {
-      type: lineChartDataType,
-      args: {
-        dialogueId: 'String',
-        numberOfDaysBack: 'Int',
-        limit: 'Int',
-        offset: 'Int',
-      },
-      resolve(parent, args) {
-        if (!args.dialogueId || !args.numberOfDaysBack || !args.limit || !args.offset) {
-          return [];
-        }
-
-        return DialogueService.getNextLineData(
-          args.dialogueId,
-          args.numberOfDaysBack,
-          args.limit,
-          args.offset,
-        );
-      },
-    });
-
     t.field('dialogue', {
       type: DialogueType,
       args: { where: DialogueWhereUniqueInput },
@@ -451,8 +383,6 @@ export const DialogueRootQuery = extendType({
 });
 
 export default [
-  topPathType,
-  lineChartDataType,
   DialogueWhereUniqueInput,
   DialogueMutations,
   DialogueType,

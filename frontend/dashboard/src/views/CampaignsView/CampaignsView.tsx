@@ -6,11 +6,11 @@ import React, { useState } from 'react';
 import { ReactComponent as EmptyIll } from 'assets/images/undraw_empty.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 
-import CreateCampaignForm from './CreateCampaignForm';
-import Select from 'react-select';
-import { useNavigator } from 'hooks/useNavigator';
 import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
+import { useNavigator } from 'hooks/useNavigator';
+import Select from 'react-select';
 import useAuth from 'hooks/useAuth';
+import CreateCampaignForm from './CreateCampaignForm';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
@@ -21,20 +21,20 @@ const CampaignsView = () => {
   const { data } = useGetWorkspaceCampaignsQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
-      customerSlug
-    }
+      customerSlug,
+    },
   });
 
   const campaigns = data?.customer?.campaigns || [];
 
   const handleSelectCampaign = ({ value }: any) => {
     goToCampaignView(value);
-  }
+  };
 
   return (
     <>
-      <UI.ViewHeading>
-        <UI.PageTitle>{t('campaigns')}</UI.PageTitle>
+      <UI.ViewHead>
+        <UI.ViewTitle>{t('campaigns')}</UI.ViewTitle>
         {canCreateCampaigns && (
           <UI.Button
             size="sm"
@@ -45,7 +45,7 @@ const CampaignsView = () => {
             {t('create_campaign')}
           </UI.Button>
         )}
-      </UI.ViewHeading>
+      </UI.ViewHead>
       <UI.ViewContainer>
         {/* TODO: Set proper close */}
         {campaigns.length === 0 ? (
@@ -64,23 +64,23 @@ const CampaignsView = () => {
             </UI.Button>
           </UI.IllustrationCard>
         ) : (
-            <UI.IllustrationCard
-              svg={<SelectIll />}
-              isFlat
-              text={t('select_campaign_text')}
-            >
-              <UI.Div style={{ fontSize: '1rem', textAlign: 'left' }} margin="0 auto" maxWidth="200px">
-                <Select
-                  options={campaigns.map((campaign: any) => ({
-                    label: campaign.label,
-                    value: campaign.id
-                  }))}
-                  onChange={(data) => handleSelectCampaign(data)}
-                  placeholder={t('select_campaign')}
-                />
-              </UI.Div>
-            </UI.IllustrationCard>
-          )}
+          <UI.IllustrationCard
+            svg={<SelectIll />}
+            isFlat
+            text={t('select_campaign_text')}
+          >
+            <UI.Div style={{ fontSize: '1rem', textAlign: 'left' }} margin="0 auto" maxWidth="200px">
+              <Select
+                options={campaigns.map((campaign: any) => ({
+                  label: campaign.label,
+                  value: campaign.id,
+                }))}
+                onChange={(data) => handleSelectCampaign(data)}
+                placeholder={t('select_campaign')}
+              />
+            </UI.Div>
+          </UI.IllustrationCard>
+        )}
         <UI.Modal
           willCloseOnOutsideClick={false}
           isOpen={openedModal}

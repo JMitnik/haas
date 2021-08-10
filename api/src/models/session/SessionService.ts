@@ -176,7 +176,6 @@ class SessionService {
     return {
       id: orderBy.by === 'id' ? orderBy.desc ? 'desc' : 'asc' : undefined,
       createdAt: orderBy.by === 'createdAt' ? orderBy.desc ? 'desc' : 'asc' : undefined,
-      // dialogueId: orderBy.by === 'dialogueId' ? orderBy.desc ? 'desc' : 'asc' : undefined,
     };
   };
 

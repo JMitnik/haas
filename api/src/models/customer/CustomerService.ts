@@ -31,10 +31,10 @@ class CustomerService {
   }
 
   /**
-   * Get a dialogue based on workspace ID and dialogue Slug. 
+   * Get a dialogue based on workspace ID and dialogue Slug.
    * @param customerId Workspace ID
    * @param dialogueSlug Dialogue Slug
-   * @returns A dialogue including question Ids and edges 
+   * @returns A dialogue including question Ids and edges
    */
   async getDialogue(customerId: string, dialogueSlug: string) {
     const customer = await prisma.customer.findUnique({
@@ -70,7 +70,7 @@ class CustomerService {
 
   /**
    * Finds the colour settings based on ID
-   * @param colourSettingsId the ID of the colour settings entry 
+   * @param colourSettingsId the ID of the colour settings entry
    * @returns ColourSettings prisma entry
    */
   getColourSettings(colourSettingsId: number) {
@@ -132,7 +132,7 @@ class CustomerService {
 
   /**
    * Deletes a workspace from the database
-   * @param customerId 
+   * @param customerId
    * @returns the deleted workspace
    */
   async delete(customerId: string): Promise<Customer> {
@@ -169,14 +169,13 @@ class CustomerService {
    * @returns Updated workspace
    */
   editWorkspace = async (input: NexusGenInputs['EditWorkspaceInput']) => {
-    const { id, name, slug, primaryColour, logo } = input;
-    const customerInputData: UpdateCustomerInput = {
-      name,
-      slug,
-      logoUrl: logo,
-      primaryColour: primaryColour,
-    };
-    const customer = await this.customerPrismaAdapter.updateCustomer(id, customerInputData);
+    const customer = await this.customerPrismaAdapter.updateCustomer(input.id, {
+      name: input.name,
+      slug: input.slug,
+      logoOpacity: input.logoOpacity,
+      logoUrl: input.logo,
+      primaryColour: input.primaryColour
+    });
 
     return customer;
   };
@@ -259,11 +258,11 @@ class CustomerService {
     }
 
     // FIXME: Makes this somehow part of the transaction. How to return Promise instead of resolved value (=object)? @JMitnik
-    // TODO: ADD Campaign, CampaignVariant, CampaignVariantToCampaign, ChoiceNodeEntry, CreateWorkspaceJob, CustomField, 
+    // TODO: ADD Campaign, CampaignVariant, CampaignVariantToCampaign, ChoiceNodeEntry, CreateWorkspaceJob, CustomField,
     // TODO: Add Delivery, DeliveryEvents, FormNode, FormNodeEntry, FormNodeField, FormNodeFieldEntryData, Job, JobProcessLocation
     // TODO: Add Link, LinkNodeEntry, NodeEntry, PostLeafNode, QuestionCondition, QuestionNode, QuestionOfTrigger, QuestionOption
     // TODO: RegistrationNodeEntry, Session, Share, SliderNode, SliderNodeEntry, SliderNodeMarker, SliderNodeRange, TextboxNodeEntry
-    // TODO: Trigger, User, VideoEmbeddedNode, VideoNodeEntry, 
+    // TODO: Trigger, User, VideoEmbeddedNode, VideoNodeEntry,
     const deleteTagsTest = this.tagPrismaAdapter.deleteAllByCustomerId(customerId);
     const deletionOfTags = prisma.tag.deleteMany({ where: { customerId } });
     const deletionOfTriggers = prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });

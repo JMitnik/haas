@@ -1,16 +1,16 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import * as UI from '@haas/ui';
-import React, { useState } from 'react';
-import { useEffect } from 'react';
-import { Plus, Download, RefreshCcw, ArrowLeft } from 'react-feather';
-import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Download, Plus, RefreshCcw } from 'react-feather';
+import { CreateWorkspaceJobType, JobStatusType, PaginationSortByEnum, PaginationWhereInput, useConfirmWorkspaceJobMutation, useCreateWorkspaceJobMutation, useGetAutodeckJobsQuery, useRetryAutodeckJobMutation } from 'types/generated-types';
 import { DeepPartial } from 'types/customTypes';
-import { PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation, JobStatusType, useRetryAutodeckJobMutation } from 'types/generated-types';
-import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
-import { ProcessingStatus, DateLabel } from './Components';
+import { useEffect } from 'react';
 import { useHistory } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import { DateLabel, ProcessingStatus } from './Components';
 
 export const paginationFilter: PaginationWhereInput = {
   limit: 15,
@@ -21,7 +21,7 @@ export const paginationFilter: PaginationWhereInput = {
   orderBy: [
     {
       by: PaginationSortByEnum.UpdatedAt,
-      desc: true
+      desc: true,
     },
   ],
 };
@@ -40,7 +40,7 @@ const BackButtonContainer = styled(UI.Div)`
       color: ${theme.colors.gray[900]};
     }
   `}
-`
+`;
 
 const POLL_INTERVAL_SECONDS = 20;
 const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
@@ -60,34 +60,34 @@ export const AutodeckOverview = () => {
       setActiveJob(null);
       refetchAutodeckJobs({
         filter: paginationState,
-      })
-    }
-  })
+      });
+    },
+  });
 
   const [createJob, { loading }] = useCreateWorkspaceJobMutation({
     onCompleted: () => {
       setIsOpenImportModal(false);
       refetchAutodeckJobs({
         filter: paginationState,
-      })
-    }
-  })
+      });
+    },
+  });
 
   const [confirmJob, { loading: confirmLoading }] = useConfirmWorkspaceJobMutation({
     onCompleted: () => {
       setIsOpenImportModal(false);
       refetchAutodeckJobs({
         filter: paginationState,
-      })
-    }
-  })
+      });
+    },
+  });
 
   const { data, refetch: refetchAutodeckJobs } = useGetAutodeckJobsQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
       filter: paginationState,
     },
-    pollInterval: POLL_INTERVAL
+    pollInterval: POLL_INTERVAL,
   });
 
   useEffect(() => {
@@ -103,23 +103,29 @@ export const AutodeckOverview = () => {
       setIsOpenImportModal(true);
     }
     setActiveJob(job);
-  }
+  };
 
   return (
     <>
-      <UI.ViewHeading>
+      <UI.ViewHead>
         <UI.Stack>
           <UI.Stack isInline alignItems="center" spacing={4}>
             <BackButtonContainer onClick={() => history.goBack()}>
               <ArrowLeft />
             </BackButtonContainer>
-            <UI.PageTitle>{'Autodeck overview'}</UI.PageTitle>
+            <UI.ViewTitle>Autodeck overview</UI.ViewTitle>
             <UI.Button
               leftIcon={Plus}
-              onClick={() => setIsOpenImportModal(true)} size="sm" variantColor="teal">{t('autodeck:create_job')}</UI.Button>
+              onClick={() => setIsOpenImportModal(true)}
+              size="sm"
+              variantColor="teal"
+            >
+              {t('autodeck:create_job')}
+
+            </UI.Button>
           </UI.Stack>
         </UI.Stack>
-      </UI.ViewHeading>
+      </UI.ViewHead>
       <UI.ViewContainer>
         <UI.Card noHover>
           <UI.Div p={2}>
@@ -140,7 +146,7 @@ export const AutodeckOverview = () => {
               </UI.TableHeading>
 
               <UI.TableBody>
-                {data?.getAutodeckJobs?.jobs.map(job => (
+                {data?.getAutodeckJobs?.jobs.map((job) => (
                   <UI.TableRow hasHover key={job.id} onClick={() => handleActiveJob(job, job.status)}>
                     <UI.TableCell>
                       {job?.name || ''}
@@ -151,8 +157,7 @@ export const AutodeckOverview = () => {
                     <UI.TableCell>
                       {job.updatedAt
                         ? <DateLabel dateString={job.updatedAt} />
-                        : 'Not updated yet'
-                      }
+                        : 'Not updated yet'}
                     </UI.TableCell>
                     <UI.TableCell>
                       <ProcessingStatus
@@ -182,23 +187,29 @@ export const AutodeckOverview = () => {
               <UI.Div>
                 <UI.Stack isInline>
                   <UI.Button
-                    onClick={() => setPaginationState(state => ({
+                    onClick={() => setPaginationState((state) => ({
                       ...state,
 
                       pageIndex: (state.pageIndex || 0) - 1,
                       offset: (state.offset || 0) - (state.limit || 0),
 
                     }))}
-                    isDisabled={paginationState.pageIndex === 0}>Previous</UI.Button>
+                    isDisabled={paginationState.pageIndex === 0}
+                  >
+                    Previous
+                  </UI.Button>
                   <UI.Button
-                    onClick={() => setPaginationState(state => ({
+                    onClick={() => setPaginationState((state) => ({
                       ...state,
                       ...state,
                       pageIndex: (state.pageIndex || 0) + 1,
                       offset: (state.offset || 0) + (state.limit || 0),
 
                     }))}
-                    isDisabled={(paginationState.pageIndex || 0) + 1 === data?.getAutodeckJobs?.pageInfo?.nrPages}>Next</UI.Button>
+                    isDisabled={(paginationState.pageIndex || 0) + 1 === data?.getAutodeckJobs?.pageInfo?.nrPages}
+                  >
+                    Next
+                  </UI.Button>
                 </UI.Stack>
               </UI.Div>
             </UI.PaginationFooter>
@@ -223,49 +234,55 @@ export const AutodeckOverview = () => {
                   <UI.Helper mb={1}>{t('updated_at')}</UI.Helper>
                   {activeJob?.updatedAt
                     ? <DateLabel dateString={activeJob?.updatedAt} />
-                    : 'Not updated yet'
-                  }
+                    : 'Not updated yet'}
                 </UI.Div>
 
-                {activeJob?.status === JobStatusType.Failed &&
+                {activeJob?.status === JobStatusType.Failed
+                  && (
                   <UI.Div>
                     <UI.Helper mb={1}>Error</UI.Helper>
                     {activeJob.errorMessage}
                   </UI.Div>
-                }
+                  )}
                 <UI.Div useFlex justifyContent="space-between">
                   <UI.Div>
                     <UI.Helper mb={1}>{t('status')}</UI.Helper>
                     {activeJob?.status}
                   </UI.Div>
-                  {activeJob?.status !== JobStatusType.Failed &&
+                  {activeJob?.status !== JobStatusType.Failed
+                    && (
                     <UI.Button
                       leftIcon={Download}
                       isDisabled={activeJob?.status !== JobStatusType.Completed || !activeJob.resourcesUrl}
                       size="sm"
-                      variantColor="green">{activeJob?.resourcesUrl ?
-                        <a style={{ color: 'white', textDecoration: 'none' }} href={activeJob?.resourcesUrl} download>
-                          {t('autodeck:download_result')}
-                        </a> :
-                        t('autodeck:download_result')
-                      }
+                      variantColor="green"
+                    >
+                      {activeJob?.resourcesUrl
+                        ? (
+                          <a style={{ color: 'white', textDecoration: 'none' }} href={activeJob?.resourcesUrl} download>
+                            {t('autodeck:download_result')}
+                          </a>
+                        )
+                        : t('autodeck:download_result')}
                     </UI.Button>
-                  }
+                    )}
 
-                  {activeJob?.status === JobStatusType.Failed &&
+                  {activeJob?.status === JobStatusType.Failed
+                    && (
                     <UI.Button
                       isDisabled={retryLoading}
                       onClick={() => retryJob({
                         variables: {
-                          jobId: activeJob?.id
-                        }
+                          jobId: activeJob?.id,
+                        },
                       })}
                       leftIcon={RefreshCcw}
                       size="sm"
-                      variantColor="red">
-                        Retry
+                      variantColor="red"
+                    >
+                      Retry
                     </UI.Button>
-                  }
+                    )}
 
                 </UI.Div>
               </UI.Stack>
@@ -273,11 +290,14 @@ export const AutodeckOverview = () => {
           </UI.Card>
         </UI.Modal>
 
-        <UI.Modal isOpen={isOpenImportModal} onClose={() => {
-          setIsOpenImportModal(false)
-          setActiveJob(null)
-        }}>
-          <UI.Card bg="white" noHover overflowY={'scroll'} height={800} width={1200}>
+        <UI.Modal
+          isOpen={isOpenImportModal}
+          onClose={() => {
+            setIsOpenImportModal(false);
+            setActiveJob(null);
+          }}
+        >
+          <UI.Card bg="white" noHover overflowY="scroll" height={800} width={1200}>
             <UI.CardBody>
               <AutodeckForm
                 job={activeJob}
@@ -286,13 +306,14 @@ export const AutodeckOverview = () => {
                 onCreateJob={createJob}
                 onConfirmJob={confirmJob}
                 isConfirmLoading={confirmLoading}
-                onClose={() => setIsOpenImportModal(false)} />
+                onClose={() => setIsOpenImportModal(false)}
+              />
             </UI.CardBody>
           </UI.Card>
         </UI.Modal>
       </UI.ViewContainer>
     </>
-  )
+  );
 };
 
 export default AutodeckOverview;

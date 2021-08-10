@@ -1,6 +1,18 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    go_to_alerts: {
+      en: 'All alerts',
+      de: 'Alle Alerts',
+    },
+    go_to_users: {
+      en: 'Users overview',
+      de: 'Benutzerübersicht',
+    },
+    go_to_dialogues: {
+      en: 'ALl dialogues',
+      de: 'Alle Dialoge',
+    },
     from: {
       en: 'From',
       de: 'Aus',
