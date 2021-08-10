@@ -17,9 +17,9 @@ const defaultDialogueCreateInput: Prisma.DialogueCreateInput = {
         create: {
             name: 'DEFAULT_CUSTOMER',
             slug: 'customerSlug',
-        }
-    }
-}
+        },
+    },
+};
 
 
 describe('EdgePrismaAdapter', () => {
@@ -38,10 +38,10 @@ describe('EdgePrismaAdapter', () => {
                     create: {
                         name: 'customerName',
                         slug: 'customerSlug',
-                    }
-                }
-            }
-        })
+                    },
+                },
+            },
+        });
 
         const parentQuestionOne = await prisma.questionNode.create({
             data: {
@@ -111,7 +111,7 @@ describe('EdgePrismaAdapter', () => {
                     matchValue: 'edgeTwoMatch',
                     renderMax: null,
                     renderMin: null,
-                }
+                },
             ],
         });
 
@@ -146,10 +146,10 @@ describe('EdgePrismaAdapter', () => {
                     create: {
                         name: 'customerName',
                         slug: 'customerSlug',
-                    }
-                }
-            }
-        })
+                    },
+                },
+            },
+        });
 
         const parentQuestionOne = await prisma.questionNode.create({
             data: {
@@ -194,7 +194,7 @@ describe('EdgePrismaAdapter', () => {
                     matchValue: 'edgeOneMatch',
                     renderMax: null,
                     renderMin: null,
-                }
+                },
             ],
         });
 
@@ -208,7 +208,7 @@ describe('EdgePrismaAdapter', () => {
                     matchValue: 'edgeTwoMatch',
                     renderMax: null,
                     renderMin: null,
-                }
+                },
             ],
         });
 
@@ -227,10 +227,10 @@ describe('EdgePrismaAdapter', () => {
                     create: {
                         name: 'customerName',
                         slug: 'customerSlug',
-                    }
-                }
-            }
-        })
+                    },
+                },
+            },
+        });
 
         const parentQuestionOne = await prisma.questionNode.create({
             data: {
@@ -286,7 +286,7 @@ describe('EdgePrismaAdapter', () => {
                     matchValue: 'edgeOneMatch',
                     renderMax: null,
                     renderMin: null,
-                }
+                },
             ],
         });
 
@@ -300,7 +300,7 @@ describe('EdgePrismaAdapter', () => {
                     matchValue: 'edgeTwoMatch',
                     renderMax: null,
                     renderMin: null,
-                }
+                },
             ],
         });
 
@@ -314,7 +314,7 @@ describe('EdgePrismaAdapter', () => {
                     matchValue: 'edgeThreeValueBoundary',
                     renderMax: 69,
                     renderMin: 96,
-                }
+                },
             ],
         });
 
@@ -342,7 +342,7 @@ describe('EdgePrismaAdapter', () => {
             renderMin: null,
             renderMax: null,
             matchValue: 'haas',
-        }
+        };
 
         const createdCondition = await prisma.questionCondition.create({
             data: createEdgeCondition,
@@ -365,10 +365,10 @@ describe('EdgePrismaAdapter', () => {
                     create: {
                         name: 'customerName',
                         slug: 'customerSlug',
-                    }
-                }
-            }
-        })
+                    },
+                },
+            },
+        });
 
         const parentQuestionOne = await prisma.questionNode.create({
             data: {
@@ -416,7 +416,7 @@ describe('EdgePrismaAdapter', () => {
             renderMin: null,
             renderMax: null,
             matchValue: 'haas',
-        }
+        };
 
         const firstUpsertCondition = await edgePrismaAdapter.upsertCondition(-1, createEdgeCondition, updateEdgeCondition);
         // Expect the condition be created
@@ -496,8 +496,8 @@ describe('EdgePrismaAdapter', () => {
                 matchValue: 'haas',
                 renderMax: null,
                 renderMin: null,
-            }]
-        })
+            }],
+        });
 
         await edgePrismaAdapter.createEdge({
             parentNodeId: parentQuestionOne.id,
@@ -528,10 +528,11 @@ describe('EdgePrismaAdapter', () => {
                     create: {
                         name: 'customerName',
                         slug: 'customerSlug',
-                    }
-                }
-            }
-        })
+                    },
+                },
+            },
+        });
+
         const parentQuestionOne = await prisma.questionNode.create({
             data: {
                 title: 'parentQuestionOne',
@@ -574,8 +575,8 @@ describe('EdgePrismaAdapter', () => {
                 matchValue: 'haas',
                 renderMax: null,
                 renderMin: null,
-            }]
-        })
+            }],
+        });
 
         const targetEdge = await edgePrismaAdapter.createEdge({
             parentNodeId: parentQuestionOne.id,
@@ -670,9 +671,9 @@ describe('EdgePrismaAdapter', () => {
                             questionDialogue: {
                                 connect: {
                                     id: defaultDialogueId,
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
                     childNode: {
                         create: {
@@ -681,12 +682,12 @@ describe('EdgePrismaAdapter', () => {
                             questionDialogue: {
                                 connect: {
                                     id: defaultDialogueId,
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
-                }
-            }
+                },
+            },
         };
 
         await dialoguePrismaAdapter.create({ data: dialogueCreateInputWithEdgesAndQuestions });
@@ -701,7 +702,7 @@ describe('EdgePrismaAdapter', () => {
                 create: {
                     name: 'EDGES_CUSTOMER',
                     slug: 'customerEdgesSlug',
-                }
+                },
             },
             edges: {
                 create: [
@@ -713,8 +714,8 @@ describe('EdgePrismaAdapter', () => {
                                     connect: {
                                         id: edgesTestDialogueId,
                                     },
-                                }
-                            }
+                                },
+                            },
                         },
                         childNode: {
                             create: {
@@ -723,9 +724,9 @@ describe('EdgePrismaAdapter', () => {
                                     connect: {
                                         id: edgesTestDialogueId,
                                     },
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
                     {
                         parentNode: {
@@ -735,7 +736,7 @@ describe('EdgePrismaAdapter', () => {
                                     connect: {
                                         id: edgesTestDialogueId,
                                     },
-                                }
+                                },
                             },
                         },
                         childNode: {
@@ -745,13 +746,13 @@ describe('EdgePrismaAdapter', () => {
                                     connect: {
                                         id: edgesTestDialogueId,
                                     },
-                                }
-                            }
-                        }
-                    }
-                ]
-            }
-        }
+                                },
+                            },
+                        },
+                    },
+                ],
+            },
+        };
 
         const dialogueWithEdges = await dialoguePrismaAdapter.create({ data: edgesTestDialogueInput });
         const foundEdges = await edgePrismaAdapter.getEdgesByDialogueId(dialogueWithEdges.id);
