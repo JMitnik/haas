@@ -52,6 +52,7 @@ type CampaignVariantType {
   body: String!
   deliveryConnection: DeliveryConnectionType
   dialogue: Dialogue!
+  from: String
   id: ID!
   label: String!
   type: CampaignVariantEnum!

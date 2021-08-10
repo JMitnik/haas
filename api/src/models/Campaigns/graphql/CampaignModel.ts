@@ -18,6 +18,7 @@ export const CampaignVariantModel = objectType({
     t.string('label');
     t.int('weight');
     t.string('body');
+    t.string('from', { nullable: true });
     t.field('type', { type: CampaignVariantEnum });
     t.field('workspace', { type: CustomerType });
     t.field('dialogue', { type: DialogueType });

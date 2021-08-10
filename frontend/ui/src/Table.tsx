@@ -58,12 +58,14 @@ export const TableHeadingContainer = styled.thead`
     letter-spacing: 0.05em;
     border-bottom: 1px solid ${theme.colors.gray[200]};
     padding: 0 ${theme.gutter}px;
+    text-align: left;
   `}
 `;
 
 export const TableHeadingCell = styled.th`
   padding: 0.75rem 1.5rem;
-`; 
+  text-align: left;
+`;
 
 export const TableHeading = ({ children, ...props }: any) => (
   <TableHeadingContainer {...props}>
