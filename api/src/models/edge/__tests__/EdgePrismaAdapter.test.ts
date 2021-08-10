@@ -28,7 +28,334 @@ describe('EdgePrismaAdapter', () => {
         prisma.$disconnect();
     });
 
-    test('Upsert a edge condition', async () => {
+    test('Deletes edges by edge IDs', async () => {
+        const dialogue = await prisma.dialogue.create({
+            data: {
+                title: 'dialogue',
+                slug: 'slug',
+                description: 'desc',
+                customer: {
+                    create: {
+                        name: 'customerName',
+                        slug: 'customerSlug',
+                    }
+                }
+            }
+        })
+
+        const parentQuestionOne = await prisma.questionNode.create({
+            data: {
+                title: 'parentQuestionOne',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        const childQuestionOne = await prisma.questionNode.create({
+            data: {
+                title: 'childQuestionOne',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        const childQuestionTwo = await prisma.questionNode.create({
+            data: {
+                title: 'childQuestionTwo',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        const childQuestionThree = await prisma.questionNode.create({
+            data: {
+                title: 'childQuestionTwo',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        const edgeOne = await edgePrismaAdapter.createEdge({
+            parentNodeId: parentQuestionOne.id,
+            childNodeId: childQuestionOne.id,
+            dialogueId: dialogue.id,
+            conditions: [
+                {
+                    conditionType: 'match',
+                    matchValue: 'edgeOneMatch',
+                    renderMax: null,
+                    renderMin: null,
+                }
+            ],
+        });
+
+        const edgeTwo = await edgePrismaAdapter.createEdge({
+            parentNodeId: parentQuestionOne.id,
+            childNodeId: childQuestionTwo.id,
+            dialogueId: dialogue.id,
+            conditions: [
+                {
+                    conditionType: 'match',
+                    matchValue: 'edgeTwoMatch',
+                    renderMax: null,
+                    renderMin: null,
+                }
+            ],
+        });
+
+        const edgeThree = await edgePrismaAdapter.createEdge({
+            parentNodeId: parentQuestionOne.id,
+            childNodeId: childQuestionThree.id,
+            dialogueId: dialogue.id,
+            conditions: [
+                {
+                    conditionType: 'valueBoundary',
+                    matchValue: 'edgeThreeValueBoundary',
+                    renderMax: 69,
+                    renderMin: 96,
+                }
+            ],
+        });
+
+        await edgePrismaAdapter.deleteMany([edgeOne.id, edgeTwo.id]);
+        const targetEdge = await edgePrismaAdapter.getEdgeById(edgeThree.id);
+        expect(targetEdge).not.toBeNull();
+        const totalEdges = await prisma.edge.findMany();
+        expect(totalEdges).toHaveLength(1);
+    });
+
+    test('Finds conditions by edge ID', async () => {
+        const dialogue = await prisma.dialogue.create({
+            data: {
+                title: 'dialogue',
+                slug: 'slug',
+                description: 'desc',
+                customer: {
+                    create: {
+                        name: 'customerName',
+                        slug: 'customerSlug',
+                    }
+                }
+            }
+        })
+
+        const parentQuestionOne = await prisma.questionNode.create({
+            data: {
+                title: 'parentQuestionOne',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        const childQuestionOne = await prisma.questionNode.create({
+            data: {
+                title: 'childQuestionOne',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        const childQuestionTwo = await prisma.questionNode.create({
+            data: {
+                title: 'childQuestionTwo',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        await edgePrismaAdapter.createEdge({
+            parentNodeId: parentQuestionOne.id,
+            childNodeId: childQuestionOne.id,
+            dialogueId: dialogue.id,
+            conditions: [
+                {
+                    conditionType: 'match',
+                    matchValue: 'edgeOneMatch',
+                    renderMax: null,
+                    renderMin: null,
+                }
+            ],
+        });
+
+        const edgeTwo = await edgePrismaAdapter.createEdge({
+            parentNodeId: parentQuestionOne.id,
+            childNodeId: childQuestionTwo.id,
+            dialogueId: dialogue.id,
+            conditions: [
+                {
+                    conditionType: 'match',
+                    matchValue: 'edgeTwoMatch',
+                    renderMax: null,
+                    renderMin: null,
+                }
+            ],
+        });
+
+        const targetConditions = await edgePrismaAdapter.getConditionsById(edgeTwo.id);
+        expect(targetConditions).toHaveLength(1);
+        expect(targetConditions?.[0]?.conditionType).toBe('match');
+    });
+
+    test('Deletes conditions based on edge IDs', async () => {
+        const dialogue = await prisma.dialogue.create({
+            data: {
+                title: 'dialogue',
+                slug: 'slug',
+                description: 'desc',
+                customer: {
+                    create: {
+                        name: 'customerName',
+                        slug: 'customerSlug',
+                    }
+                }
+            }
+        })
+
+        const parentQuestionOne = await prisma.questionNode.create({
+            data: {
+                title: 'parentQuestionOne',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        const childQuestionOne = await prisma.questionNode.create({
+            data: {
+                title: 'childQuestionOne',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        const childQuestionTwo = await prisma.questionNode.create({
+            data: {
+                title: 'childQuestionTwo',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        const childQuestionThree = await prisma.questionNode.create({
+            data: {
+                title: 'childQuestionThree',
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id,
+                    },
+                },
+            },
+        });
+
+        const edgeOne = await edgePrismaAdapter.createEdge({
+            parentNodeId: parentQuestionOne.id,
+            childNodeId: childQuestionOne.id,
+            dialogueId: dialogue.id,
+            conditions: [
+                {
+                    conditionType: 'match',
+                    matchValue: 'edgeOneMatch',
+                    renderMax: null,
+                    renderMin: null,
+                }
+            ],
+        });
+
+        const edgeTwo = await edgePrismaAdapter.createEdge({
+            parentNodeId: parentQuestionOne.id,
+            childNodeId: childQuestionTwo.id,
+            dialogueId: dialogue.id,
+            conditions: [
+                {
+                    conditionType: 'match',
+                    matchValue: 'edgeTwoMatch',
+                    renderMax: null,
+                    renderMin: null,
+                }
+            ],
+        });
+
+        const edgeThree = await edgePrismaAdapter.createEdge({
+            parentNodeId: parentQuestionOne.id,
+            childNodeId: childQuestionThree.id,
+            dialogueId: dialogue.id,
+            conditions: [
+                {
+                    conditionType: 'valueBoundary',
+                    matchValue: 'edgeThreeValueBoundary',
+                    renderMax: 69,
+                    renderMin: 96,
+                }
+            ],
+        });
+
+        const totalConditions = await prisma.questionCondition.count();
+        expect(totalConditions).toBe(3);
+
+        await edgePrismaAdapter.deleteConditionsByEdgeIds([edgeOne.id, edgeTwo.id]);
+        const newTotalConditions = await prisma.questionCondition.count();
+        expect(newTotalConditions).toBe(1);
+
+        const targetEdgeCondition = await edgePrismaAdapter.getEdgeById(edgeThree.id);
+        expect(targetEdgeCondition?.conditions?.[0]?.conditionType).toBe('valueBoundary');
+    });
+
+    test('Updates an edge condition', async () => {
+        const createEdgeCondition: Prisma.QuestionConditionCreateInput = {
+            conditionType: 'valueBoundary',
+            renderMin: 10,
+            renderMax: 90,
+            matchValue: null,
+        };
+
+        const updateEdgeConditionInput: Prisma.QuestionConditionUpdateInput = {
+            conditionType: 'valueBoundary',
+            renderMin: null,
+            renderMax: null,
+            matchValue: 'haas',
+        }
+
+        const createdCondition = await prisma.questionCondition.create({
+            data: createEdgeCondition,
+        });
+
+        const updatedCondition = await edgePrismaAdapter.updateCondition(createdCondition.id, updateEdgeConditionInput);
+        expect(updatedCondition?.conditionType).toBe(updateEdgeConditionInput?.conditionType);
+        expect(updatedCondition?.matchValue).toBe(updateEdgeConditionInput?.matchValue);
+        expect(updatedCondition?.renderMin).toBeNull();
+        expect(updatedCondition?.renderMin).toBeNull();
+    });
+
+    test('Upserts an edge condition', async () => {
         const dialogue = await prisma.dialogue.create({
             data: {
                 title: 'dialogue',
