@@ -349,6 +349,14 @@ type Dialogue {
   wasGeneratedWithGenData: Boolean!
 }
 
+type DialogueChoiceSummaryType {
+  averageValue: Float!
+  choiceValue: String!
+  count: Int!
+  max: Float!
+  min: Float!
+}
+
 input DialogueFilterInputType {
   endDate: String
   searchTerm: String
@@ -370,8 +378,33 @@ type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType
   nrInteractions: Int!
+  statisticsSummaries(filter: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryType!]
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
+}
+
+type DialogueStatisticsSessionsSummaryType {
+  average: Float!
+  count: Int!
+  max: Float!
+  min: Float!
+}
+
+input DialogueStatisticsSummaryFilterInput {
+  groupBy: DialogueStatisticsSummaryGroupby
+}
+
+enum DialogueStatisticsSummaryGroupby {
+  day
+  hour
+  week
+}
+
+type DialogueStatisticsSummaryType {
+  choicesSummaries: [DialogueChoiceSummaryType!]
+  endDate: Date!
+  sessionsSummary: DialogueStatisticsSessionsSummaryType
+  startDate: Date!
 }
 
 input DialogueWhereUniqueInput {
