@@ -42,16 +42,16 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
           axisRight={null}
           enableArea
           axisBottom={null}
-          axisLeft={{
-            orient: 'left',
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 0,
-            legend: 'dialogue score',
-            legendOffset: -40,
-            legendPosition: 'middle',
-          }}
-          colors={{ scheme: 'category10' }}
+          // axisLeft={{
+          //   orient: 'left',
+          //   tickSize: 5,
+          //   tickPadding: 5,
+          //   tickRotation: 0,
+          //   legend: 'dialogue score',
+          //   legendOffset: -40,
+          //   legendPosition: 'middle',
+          // }}
+          colors={{ scheme: 'spectral' }}
           pointSize={10}
           pointBorderWidth={2}
           pointBorderColor={{ from: 'serieColor' }}
@@ -59,6 +59,7 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
           curve="natural"
           pointLabelYOffset={-12}
           useMesh
+
         />
       </CardBody>
     </Card>

@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { ArrowLeft, Plus } from 'react-feather';
-import { Div, Flex, PageTitle } from '@haas/ui';
+import { Div, Flex, ViewTitle } from '@haas/ui';
 import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 
@@ -50,14 +50,14 @@ const AdminOverview = () => {
 
   return (
     <>
-      <UI.ViewHeading>
+      <UI.ViewHead>
         <UI.Stack>
           <UI.Stack isInline alignItems="center" spacing={4}>
             <BackButtonContainer onClick={() => history.goBack()}>
               <ArrowLeft />
             </BackButtonContainer>
 
-            <PageTitle>{t('views:admin_overview')}</PageTitle>
+            <ViewTitle>{t('views:admin_overview')}</ViewTitle>
             <Flex
               flexDirection="row"
               justifyContent="space-between"
@@ -75,7 +75,7 @@ const AdminOverview = () => {
             </Flex>
           </UI.Stack>
         </UI.Stack>
-      </UI.ViewHeading>
+      </UI.ViewHead>
 
       <UI.ViewContainer>
         <UI.Card noHover>

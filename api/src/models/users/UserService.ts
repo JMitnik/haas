@@ -288,7 +288,7 @@ class UserService {
     };
 
     const findManyUsers = async ({ props, paginationOpts }: FindManyCallBackProps) => {
-      const users: any = this.prisma.userOfCustomer.findMany(props);
+      const users: any = await this.prisma.userOfCustomer.findMany(props);
       const filteredBySearch = UserService.filterBySearchTerm(users, paginationOpts?.searchTerm);
       const orderedUsers = UserService.orderUsersBy(filteredBySearch, paginationOpts?.orderBy?.[0]);
       return orderedUsers;

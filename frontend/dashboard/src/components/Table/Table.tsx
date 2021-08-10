@@ -1,6 +1,5 @@
 import * as UI from '@haas/ui';
-import { Div, Flex, H4 } from '@haas/ui';
-import { Info } from 'react-feather';
+import { Div } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
@@ -59,27 +58,30 @@ const Table = ({
               index={index}
             />
           ) : (
-            <TableRow
-              headers={headers}
-              onEditEntry={onEditEntry}
-              onDeleteEntry={onDeleteEntry}
-              data={dataEntry}
-              key={index}
-              renderExpandedRow={renderExpandedRowContainer && renderExpandedRowContainer(dataEntry)}
-              renderOptions={renderOptions}
-              index={index}
-            />
+            <UI.Skeleton isLoading={loading || false} borderRadius="0px">
+              <TableRow
+                headers={headers}
+                onEditEntry={onEditEntry}
+                onDeleteEntry={onDeleteEntry}
+                data={dataEntry}
+                key={index}
+                renderExpandedRow={renderExpandedRowContainer && renderExpandedRowContainer(dataEntry)}
+                renderOptions={renderOptions}
+                index={index}
+              />
+            </UI.Skeleton>
           )
         ))}
       </Div>
 
       {data.length === 0 && loading && (
-        <Flex gridRow="2 / -1" gridColumn="1 / -1" justifyContent="center" alignItems="center">
-          <Div color="default.darker" marginRight="5px">
-            <Info />
-          </Div>
-          <H4 color="default.darker">Loading data...</H4>
-        </Flex>
+        <>
+          {[...Array(8).keys()].map((item) => (
+            <UI.Div key={item}>
+              <UI.Skeleton borderRadius="0px" key={item} isLoading manualHeight={70} />
+            </UI.Div>
+          ))}
+        </>
       )}
 
       {data.length === 0 && !loading && (

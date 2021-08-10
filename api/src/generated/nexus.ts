@@ -943,8 +943,10 @@ export interface NexusGenFieldTypes {
     dialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
     id: string; // ID!
     name: string; // String!
+    roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
     slug: string; // String!
+    userCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     users: NexusGenRootTypes['UserType'][] | null; // [UserType!]
     usersConnection: NexusGenRootTypes['UserConnection'] | null; // UserConnection
   }
@@ -1209,7 +1211,6 @@ export interface NexusGenFieldTypes {
     getJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     getJobProcessLocations: NexusGenRootTypes['JobProcessLocations']; // JobProcessLocations!
     getPreviewData: NexusGenRootTypes['PreviewDataType'] | null; // PreviewDataType
-    lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     me: NexusGenRootTypes['UserType']; // UserType!
     refreshAccessToken: NexusGenRootTypes['RefreshAccessTokenOutput']; // RefreshAccessTokenOutput!
     roleConnection: NexusGenRootTypes['RoleConnection']; // RoleConnection!
@@ -1418,6 +1419,9 @@ export interface NexusGenArgTypes {
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
     }
+    userCustomer: { // args
+      userId?: string | null; // String
+    }
     usersConnection: { // args
       customerSlug?: string | null; // String
       filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
@@ -1625,12 +1629,6 @@ export interface NexusGenArgTypes {
     }
     getPreviewData: { // args
       id?: string | null; // String
-    }
-    lineChartData: { // args
-      dialogueId?: string | null; // String
-      limit?: number | null; // Int
-      numberOfDaysBack?: number | null; // Int
-      offset?: number | null; // Int
     }
     roleConnection: { // args
       customerId?: string | null; // String
