@@ -1,6 +1,5 @@
 import * as UI from '@haas/ui';
-import { Div, Flex, H4 } from '@haas/ui';
-import { Info } from 'react-feather';
+import { Div } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
@@ -59,7 +58,7 @@ const Table = ({
               index={index}
             />
           ) : (
-            <UI.Skeleton isLoading={loading || false}>
+            <UI.Skeleton isLoading={loading || false} borderRadius="0px">
               <TableRow
                 headers={headers}
                 onEditEntry={onEditEntry}
@@ -77,8 +76,10 @@ const Table = ({
 
       {data.length === 0 && loading && (
         <>
-          {[...Array(10).keys()].map((item) => (
-            <UI.Skeleton key={item} isLoading manualHeight={40} />
+          {[...Array(8).keys()].map((item) => (
+            <UI.Div key={item}>
+              <UI.Skeleton borderRadius="0px" key={item} isLoading manualHeight={70} />
+            </UI.Div>
           ))}
         </>
       )}

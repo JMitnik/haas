@@ -74,6 +74,7 @@ export const CloseButton = ({ onClose }: any) => (
 
 interface SkeletonProps {
   isLoading: boolean;
+  borderRadius?: string;
   children?: React.ReactNode;
   isRefreshing?: boolean;
   manualHeight?: number;
@@ -90,14 +91,14 @@ interface SkeletonProps {
  *  isRefresing: loadingCondition && refreshingCondition
  * }
  */
-export const Skeleton = ({ isLoading, isRefreshing = false, manualHeight, children }: SkeletonProps) => (
+export const Skeleton = ({ isLoading, borderRadius = '10px', isRefreshing = false, manualHeight, children }: SkeletonProps) => (
   <>
     {isRefreshing ? (
       <Div opacity={0.5} style={{ pointerEvents: 'none', cursor: 'initial' }}>
         {children}
       </Div>
     ): (
-      <ChakraSkeleton isLoaded={!isLoading} borderRadius="10px" height={!!manualHeight ? `${manualHeight}px` : 'auto'}>
+      <ChakraSkeleton isLoaded={!isLoading} borderRadius={borderRadius} height={!!manualHeight ? `${manualHeight}px` : 'auto'}>
         {children}
       </ChakraSkeleton>
     )}
