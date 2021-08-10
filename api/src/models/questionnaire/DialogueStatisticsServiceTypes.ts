@@ -9,6 +9,7 @@ export interface NodeWithEdge extends QuestionNode {
 }
 
 export type SessionGroup = (Session & {
+  rootValue: number;
   nodeEntries: (NodeEntry & {
       choiceNodeEntry: ChoiceNodeEntry | null;
       sliderNodeEntry: SliderNodeEntry | null;
