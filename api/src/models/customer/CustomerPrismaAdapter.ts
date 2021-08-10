@@ -169,6 +169,7 @@ export class CustomerPrismaAdapter {
         settings: (input.primaryColour || input.logoUrl) ? {
           update: {
             logoUrl: input.logoUrl,
+            logoOpacity: input.logoOpacity,
             colourSettings: input.primaryColour ? {
               update: {
                 primary: input.primaryColour,
@@ -212,6 +213,7 @@ export class CustomerPrismaAdapter {
         settings: {
           create: {
             logoUrl: input.logo,
+            logoOpacity: input.logoOpacity || 30,
             colourSettings: {
               create: {
                 primary: input.primaryColour || defaultWorkspaceTemplate.primaryColor,

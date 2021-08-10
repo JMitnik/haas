@@ -169,14 +169,13 @@ class CustomerService {
    * @returns Updated workspace
    */
   editWorkspace = async (input: NexusGenInputs['EditWorkspaceInput']) => {
-    const { id, name, slug, primaryColour, logo } = input;
-    const customerInputData: UpdateCustomerInput = {
-      name,
-      slug,
-      logoUrl: logo,
-      primaryColour: primaryColour,
-    };
-    const customer = await this.customerPrismaAdapter.updateCustomer(id, customerInputData);
+    const customer = await this.customerPrismaAdapter.updateCustomer(input.id, {
+      name: input.name,
+      slug: input.slug,
+      logoOpacity: input.logoOpacity,
+      logoUrl: input.logo,
+      primaryColour: input.primaryColour
+    });
 
     return customer;
   };
