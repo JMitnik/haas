@@ -369,16 +369,12 @@ type DialogueFinisherObjectType {
   subtext: String!
 }
 
-type DialogueRootBranchStatisticsType {
-  nodes: [QuestionNode!]
-}
-
 type DialogueStatistics {
-  branch(dialogueId: ID, max: Int, min: Int): DialogueRootBranchStatisticsType!
+  dialogueId: ID!
   history: [lineChartDataType!]
   mostPopularPath: topPathType
   nrInteractions: Int!
-  statisticsSummaries(filter: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryType!]
+  statisticsSummaries(filter: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryType
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
 }
@@ -391,7 +387,9 @@ type DialogueStatisticsSessionsSummaryType {
 }
 
 input DialogueStatisticsSummaryFilterInput {
+  endDate: Date
   groupBy: DialogueStatisticsSummaryGroupby
+  startDate: Date
 }
 
 enum DialogueStatisticsSummaryGroupby {
@@ -400,11 +398,15 @@ enum DialogueStatisticsSummaryGroupby {
   week
 }
 
-type DialogueStatisticsSummaryType {
+type DialogueStatisticsSummaryGroupType {
   choicesSummaries: [DialogueChoiceSummaryType!]
   endDate: Date!
   sessionsSummary: DialogueStatisticsSessionsSummaryType
   startDate: Date!
+}
+
+type DialogueStatisticsSummaryType {
+  summaryGroups: [DialogueStatisticsSummaryGroupType!]!
 }
 
 input DialogueWhereUniqueInput {

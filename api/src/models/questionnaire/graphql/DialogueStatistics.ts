@@ -41,6 +41,8 @@ export const DialogueStatisticsSummaryFilterInput = inputObjectType({
   name: 'DialogueStatisticsSummaryFilterInput',
 
   definition(t) {
+    t.date('startDate', { required: false });
+    t.date('endDate', { required: false });
     t.field('groupBy', { type: DialogueStatisticsSummaryGroupbyEnum });
   }
 });
@@ -68,8 +70,8 @@ export const DialogueChoiceSummaryType = objectType({
   }
 });
 
-export const DialogueStatisticsSummaryType = objectType({
-  name: 'DialogueStatisticsSummaryType',
+export const DialogueStatisticsSummaryGroupType = objectType({
+  name: 'DialogueStatisticsSummaryGroupType',
 
   definition(t) {
     t.date('startDate');
@@ -79,10 +81,19 @@ export const DialogueStatisticsSummaryType = objectType({
   }
 });
 
+export const DialogueStatisticsSummaryType = objectType({
+  name: 'DialogueStatisticsSummaryType',
+
+  definition(t) {
+    t.list.field('summaryGroups', { type: DialogueStatisticsSummaryGroupType });
+  }
+});
+
 export const DialogueStatistics = objectType({
   name: 'DialogueStatistics',
 
   definition(t) {
+    t.id('dialogueId');
     t.int('nrInteractions');
 
     t.list.field('topPositivePath', {
@@ -123,10 +134,16 @@ export const DialogueStatistics = objectType({
       type: DialgoueStatisticsLineChartDataType,
     });
 
-    t.list.field('statisticsSummaries', {
+    t.field('statisticsSummaries', {
       nullable: true,
       type: DialogueStatisticsSummaryType,
-      args: { filter: DialogueStatisticsSummaryFilterInput }
+      args: { filter: DialogueStatisticsSummaryFilterInput },
+      resolve: (parent, args, ctx) => {
+        return ctx.services.dialogueStatisticsService.getDialogueStatisticsSummary(
+          parent.dialogueId,
+          args.filter || undefined
+        );
+      }
     });
   },
 });

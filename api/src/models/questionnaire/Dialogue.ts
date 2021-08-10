@@ -119,6 +119,7 @@ export const DialogueType = objectType({
 
         if (!statistics) {
           return {
+            dialogueId: parent.id,
             nrInteractions: 0,
             history: [],
             topNegativePath: [],
@@ -126,7 +127,10 @@ export const DialogueType = objectType({
           };
         }
 
-        return statistics;
+        return {
+          dialogueId: parent.id,
+          ...statistics
+        };
       },
     });
 

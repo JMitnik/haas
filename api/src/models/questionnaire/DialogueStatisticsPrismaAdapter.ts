@@ -36,6 +36,36 @@ export class DialogueStatisticsPrismaAdapter {
   }
 
   /**
+   * Fetch all sessions between startDate and endDate, with sliderNodeEntries and choiceNodeEntries
+   **/
+  getSessionsBetweenDates = async (dialogueId: string, startDate?: Date, endDate?: Date) => {
+    const sessions = await this.prisma.session.findMany({
+      where: {
+        AND: [
+          { dialogueId },
+          { createdAt: startDate ? { gte: new Date(startDate) } : undefined },
+          { createdAt: endDate ? { lte: new Date(endDate) } : undefined },
+        ]
+      },
+      include: {
+        nodeEntries: {
+          include: {
+            choiceNodeEntry: true,
+            sliderNodeEntry: true,
+            relatedNode: {
+              select: {
+                isRoot: true
+              }
+            }
+          },
+        }
+      }
+    });
+
+    return sessions;
+  }
+
+  /**
    * Gets nodes with statistics, per branch, along with count.
    * */
   getNodeStatisticsByRootBranch = async (dialogueId: string, min: number, max: number) => {
