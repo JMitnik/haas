@@ -4,7 +4,7 @@ import { add, format } from "date-fns";
 import parse from "date-fns/parse";
 import { NexusGenFieldTypes, NexusGenInputs } from "../../generated/nexus";
 import { DialogueStatisticsPrismaAdapter } from "./DialogueStatisticsPrismaAdapter";
-import { SessionGroup } from "./DialogueStatisticsServiceTypes";
+import { SessionChoiceGroupValue, SessionGroup } from "./DialogueStatisticsServiceTypes";
 
 const groupKey = {
   hour: 'HH-dd-LL-y',
@@ -68,45 +68,30 @@ export class DialogueStatisticsService {
 
   private getChoiceStatisticsSummary = (
     sessionGroup: SessionGroup
-  ): NexusGenFieldTypes['DialogueStatisticsSessionsSummaryType'] => {
-    const sessionStatistics = sessionGroup.reduce((result, current) => {
-      if (current.rootValue > result.max) result.max = current.rootValue;
-      if (current.rootValue < result.min) result.min = current.rootValue;
-      result.sum += current.rootValue;
-
-      return result;
-    }, { max: -Infinity, min: +Infinity, sum: 0 });
-
-    return {
-      count: sessionGroup.length,
-      average: sessionStatistics.sum / sessionGroup.length,
-      max: sessionStatistics.max,
-      min: sessionStatistics.min,
-    }
-  }
-
-  private getDialogueStatisticsSummaryGroup = (
-    startDate: Date,
-    endDate: Date,
-    sessionGroup: SessionGroup
-  ): NexusGenFieldTypes['DialogueStatisticsSummaryGroupType'] => {
-    // TODO: Generate choices-level summary using lodash (or another prisma call perhaps?)
+  ): NexusGenFieldTypes['DialogueChoiceSummaryType'][] => {
     const nodeEntryStatistics = sessionGroup.reduce((result, current) => {
       current.nodeEntries.forEach(nodeEntry => {
         if (!nodeEntry.relatedNodeId) return;
         if (!nodeEntry.choiceNodeEntry) return;
 
+        // If we have not added the node yet, add it.
         if (!(nodeEntry.relatedNodeId in result.nodes)) {
           // @ts-ignore
-          result.nodes[nodeEntry.relatedNodeId] = { value: nodeEntry.choiceNodeEntry.value, count: 0, sumScore: 0, maxScore: 0, minScore: 0 }
+          result.nodes[nodeEntry.relatedNodeId] = {
+            value: nodeEntry.choiceNodeEntry.value,
+            count: 0,
+            sumScore: 0,
+            maxScore: -Infinity,
+            minScore: +Infinity
+          }
         }
 
         // @ts-ignore
         let lookupNode = result.nodes[nodeEntry.relatedNodeId];
 
+        // Add max-score, min-score, count, and a sum of all scores
         // @ts-ignore
         if (current.rootValue > lookupNode.maxScore) result.nodes[nodeEntry.relatedNodeId].maxScore = current.rootValue;
-
         // @ts-ignore
         if (current.rootValue < lookupNode.minScore) result.nodes[nodeEntry.relatedNodeId].minScore = current.rootValue;
         // @ts-ignore
@@ -118,9 +103,25 @@ export class DialogueStatisticsService {
       return result;
     }, { nodes: {} });
 
-    console.log(nodeEntryStatistics);
+    // @ts-ignore
+    const choices: [string, SessionChoiceGroupValue][] = Object.entries(nodeEntryStatistics['nodes']);
+
+    return choices.map(([choiceId, choiceStatistics]) => ({
+      averageValue: choiceStatistics.sumScore / choiceStatistics.count,
+      choiceValue: choiceStatistics.value,
+      count: choiceStatistics.count,
+      max: choiceStatistics.maxScore,
+      min: choiceStatistics.minScore,
+    }))
+  }
+
+  private getDialogueStatisticsSummaryGroup = (
+    startDate: Date,
+    endDate: Date,
+    sessionGroup: SessionGroup
+  ): NexusGenFieldTypes['DialogueStatisticsSummaryGroupType'] => {
     return {
-      choicesSummaries: null,
+      choicesSummaries: this.getChoiceStatisticsSummary(sessionGroup),
       sessionsSummary: this.getSessionStatisticsSummary(sessionGroup),
       startDate,
       endDate

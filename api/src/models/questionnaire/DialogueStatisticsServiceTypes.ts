@@ -18,3 +18,11 @@ export type SessionGroup = (Session & {
       } | null;
   })[];
 })[];
+
+export type SessionChoiceGroupValue = {
+  value: string;
+  count: number;
+  sumScore: number;
+  maxScore: number;
+  minScore: number;
+}
