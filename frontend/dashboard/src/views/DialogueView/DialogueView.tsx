@@ -6,7 +6,7 @@ import {
 } from 'react-feather';
 import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { ThemeContext } from 'styled-components';
-import { sub } from 'date-fns';
+import { format, sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
@@ -26,9 +26,10 @@ import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
 
+import { useDialogue } from 'providers/DialogueProvider';
+import { CalendarModule } from './Modules/CalendarModule';
 import { PieChartModule } from './Modules/PieChartModule';
 import { SunburstModule } from './Modules/SunburstModule';
-import { useDialogue } from 'providers/DialogueProvider';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
@@ -278,7 +279,7 @@ const DialogueView = () => {
     },
   });
 
-  const summaryGroups = summaryData?.dialogue?.statistics?.statisticsSummaries?.summaryGroups;
+  const summaryGroups = summaryData?.dialogue?.statistics?.statisticsSummaries?.summaryGroups || [];
   const summaryGroup = summaryGroups?.[summaryGroups?.length - 1];
 
   useEffect(() => {
@@ -435,6 +436,17 @@ const DialogueView = () => {
               })) || []}
             />
           </UI.Div>
+          {/*
+          {!!summaryGroups.length && (
+            <UI.Div gridColumn="span 3">
+              <CalendarModule
+                data={summaryGroups?.map((calendarSummaryGroup) => ({
+                  day: format(new Date(calendarSummaryGroup.startDate), 'yyyy-mm-dd'),
+                  value: calendarSummaryGroup.sessionsSummary?.count,
+                })) || []}
+              />
+            </UI.Div>
+          )} */}
 
           <UI.Div mt={2} gridColumn="1 / 4">
             <UI.H4 color="default.darker" mb={4}>
