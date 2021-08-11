@@ -149,13 +149,13 @@ export class DialogueStatisticsService {
     const sessionGroups: [string, SessionGroup][] = Object.entries(groupBy(sessions.map(session => ({
       ...session,
       rootValue: session.nodeEntries.find(nodeEntry => nodeEntry.relatedNode?.isRoot)?.sliderNodeEntry?.value || 0,
-      dateGroup: format(session.createdAt, 'dd-LL-y')
+      dateGroup: format(session.createdAt, 'LL-y')
     })), 'dateGroup'));
 
 
     return {
       summaryGroups: sessionGroups.map(([date, sessionGroup]) => {
-        const startDate = parse(date, 'dd-LL-y', new Date());
+        const startDate = parse(date, 'LL-y', new Date());
         const endDate = add(startDate, { months: 1 });
 
         return this.getDialogueStatisticsSummaryGroup(startDate, endDate, sessionGroup);

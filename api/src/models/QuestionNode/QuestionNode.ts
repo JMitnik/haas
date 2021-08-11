@@ -315,7 +315,8 @@ export const QuestionNodeType = objectType({
       type: QuestionOptionType,
 
       resolve(parent, args, ctx) {
-        return ctx.services.nodeService.getOptionsByNodeId(parent.id);
+        // @ts-ignore
+        return parent.options || ctx.services.nodeService.getOptionsByNodeId(parent.id);
       },
     });
 

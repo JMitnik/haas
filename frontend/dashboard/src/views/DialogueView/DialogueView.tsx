@@ -14,19 +14,21 @@ import React, { useContext, useEffect, useReducer, useRef, useState } from 'reac
 
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
 import {
+  DialogueStatisticsSummaryGroupby,
   GetDialogueStatisticsQuery,
-  useGetBranchStatisticsQuery,
-  useGetDialogueStatisticsQuery
+  useGetDialogueStatisticsQuery,
+  useGetDialogueStatisticsSummaryQuery,
 } from 'types/generated-types';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
-import { useDialogue } from 'providers/DialogueProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
 
+import { PieChartModule } from './Modules/PieChartModule';
 import { SunburstModule } from './Modules/SunburstModule';
+import { useDialogue } from 'providers/DialogueProvider';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
@@ -134,6 +136,14 @@ const dateReducer = (state: ActiveDateState, action: ActiveDateAction): ActiveDa
         dateLabel: 'last_month',
       };
   }
+};
+
+const parseColor = (score: number) => {
+  if (score > 100) return 'hsl(213, 93%, 68%)';
+  if (score > 60 && score <= 90) return 'hsl(164, 84%, 52%)';
+  if (score <= 60 && score > 30) return 'hsl(46, 97%, 64%)';
+
+  return 'hsl(0, 91%, 71%)';
 };
 
 interface ShareDialogueDropdownProps {
@@ -259,15 +269,17 @@ const DialogueView = () => {
 
   const { activeDialogue } = useDialogue();
 
-  const { data: branchStatisticsData, loading: branchLoading } = useGetBranchStatisticsQuery({
+  const { data: summaryData, loading: summaryLoading } = useGetDialogueStatisticsSummaryQuery({
     variables: {
       dialogueId: activeDialogue?.id || '',
-      dialogueSlug,
-      customerSlug,
-      statisticsDateFilter: { startDate: activeDateState.startDate.toISOString() },
+      filter: {
+        groupBy: DialogueStatisticsSummaryGroupby.Day,
+      },
     },
-    pollInterval: 5000,
   });
+
+  const summaryGroups = summaryData?.dialogue?.statistics?.statisticsSummaries?.summaryGroups;
+  const summaryGroup = summaryGroups?.[summaryGroups?.length - 1];
 
   useEffect(() => {
     if (data && !loading) {
@@ -413,10 +425,15 @@ const DialogueView = () => {
             </UI.Grid>
           </UI.Div>
 
-          <UI.Div mt={2} gridColumn="1 / 4">
-            {!!branchStatisticsData && (
-              <SunburstModule data={branchStatisticsData} />
-            )}
+          <UI.Div gridColumn="span 3">
+            <PieChartModule
+              data={summaryGroup?.choicesSummaries?.map((choiceSummary) => ({
+                id: choiceSummary.choiceValue,
+                value: (choiceSummary.count),
+                color: parseColor(choiceSummary.averageValue),
+                average: choiceSummary.averageValue,
+              })) || []}
+            />
           </UI.Div>
 
           <UI.Div mt={2} gridColumn="1 / 4">

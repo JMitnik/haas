@@ -435,6 +435,15 @@ export type DialogueLeafsArgs = {
   searchTerm?: Maybe<Scalars['String']>;
 };
 
+export type DialogueChoiceSummaryType = {
+  __typename?: 'DialogueChoiceSummaryType';
+  choiceValue: Scalars['String'];
+  averageValue: Scalars['Float'];
+  count: Scalars['Int'];
+  min: Scalars['Float'];
+  max: Scalars['Float'];
+};
+
 export type DialogueFilterInputType = {
   searchTerm?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
@@ -448,26 +457,53 @@ export type DialogueFinisherObjectType = {
   subtext: Scalars['String'];
 };
 
-export type DialogueRootBranchStatisticsType = {
-  __typename?: 'DialogueRootBranchStatisticsType';
-  nodes?: Maybe<Array<QuestionNode>>;
-};
-
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
+  dialogueId: Scalars['ID'];
   nrInteractions: Scalars['Int'];
   topPositivePath?: Maybe<Array<TopPathType>>;
   topNegativePath?: Maybe<Array<TopPathType>>;
   mostPopularPath?: Maybe<TopPathType>;
-  branch: DialogueRootBranchStatisticsType;
   history?: Maybe<Array<LineChartDataType>>;
+  statisticsSummaries?: Maybe<DialogueStatisticsSummaryType>;
 };
 
 
-export type DialogueStatisticsBranchArgs = {
-  min?: Maybe<Scalars['Int']>;
-  max?: Maybe<Scalars['Int']>;
-  dialogueId?: Maybe<Scalars['ID']>;
+export type DialogueStatisticsStatisticsSummariesArgs = {
+  filter?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+export type DialogueStatisticsSessionsSummaryType = {
+  __typename?: 'DialogueStatisticsSessionsSummaryType';
+  count: Scalars['Int'];
+  average: Scalars['Float'];
+  min: Scalars['Float'];
+  max: Scalars['Float'];
+};
+
+export type DialogueStatisticsSummaryFilterInput = {
+  startDate?: Maybe<Scalars['Date']>;
+  endDate?: Maybe<Scalars['Date']>;
+  groupBy?: Maybe<DialogueStatisticsSummaryGroupby>;
+};
+
+export enum DialogueStatisticsSummaryGroupby {
+  Hour = 'hour',
+  Day = 'day',
+  Week = 'week'
+}
+
+export type DialogueStatisticsSummaryGroupType = {
+  __typename?: 'DialogueStatisticsSummaryGroupType';
+  startDate: Scalars['Date'];
+  endDate: Scalars['Date'];
+  sessionsSummary?: Maybe<DialogueStatisticsSessionsSummaryType>;
+  choicesSummaries?: Maybe<Array<DialogueChoiceSummaryType>>;
+};
+
+export type DialogueStatisticsSummaryType = {
+  __typename?: 'DialogueStatisticsSummaryType';
+  summaryGroups: Array<DialogueStatisticsSummaryGroupType>;
 };
 
 export type DialogueWhereUniqueInput = {
@@ -2068,69 +2104,6 @@ export type DuplicateQuestionMutation = (
   )> }
 );
 
-export type GetBranchStatisticsQueryVariables = Exact<{
-  customerSlug: Scalars['String'];
-  dialogueSlug: Scalars['String'];
-  dialogueId: Scalars['ID'];
-  statisticsDateFilter?: Maybe<DialogueFilterInputType>;
-}>;
-
-
-export type GetBranchStatisticsQuery = (
-  { __typename?: 'Query' }
-  & { customer?: Maybe<(
-    { __typename?: 'Customer' }
-    & Pick<Customer, 'id'>
-    & { dialogue?: Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id'>
-      & { statistics?: Maybe<(
-        { __typename?: 'DialogueStatistics' }
-        & { negativeBranch: (
-          { __typename?: 'DialogueRootBranchStatisticsType' }
-          & { nodes?: Maybe<Array<(
-            { __typename?: 'QuestionNode' }
-            & Pick<QuestionNode, 'id' | 'isRoot' | 'title'>
-            & { children: Array<(
-              { __typename?: 'Edge' }
-              & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
-            )>, statistics?: Maybe<(
-              { __typename?: 'NodeStatisticsType' }
-              & Pick<NodeStatisticsType, 'count'>
-            )> }
-          )>> }
-        ), neutralBranch: (
-          { __typename?: 'DialogueRootBranchStatisticsType' }
-          & { nodes?: Maybe<Array<(
-            { __typename?: 'QuestionNode' }
-            & Pick<QuestionNode, 'id' | 'isRoot' | 'title'>
-            & { children: Array<(
-              { __typename?: 'Edge' }
-              & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
-            )>, statistics?: Maybe<(
-              { __typename?: 'NodeStatisticsType' }
-              & Pick<NodeStatisticsType, 'count'>
-            )> }
-          )>> }
-        ), positiveBranch: (
-          { __typename?: 'DialogueRootBranchStatisticsType' }
-          & { nodes?: Maybe<Array<(
-            { __typename?: 'QuestionNode' }
-            & Pick<QuestionNode, 'id' | 'isRoot' | 'title'>
-            & { children: Array<(
-              { __typename?: 'Edge' }
-              & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
-            )>, statistics?: Maybe<(
-              { __typename?: 'NodeStatisticsType' }
-              & Pick<NodeStatisticsType, 'count'>
-            )> }
-          )>> }
-        ) }
-      )> }
-    )> }
-  )> }
-);
-
 export type GetDialogueStatisticsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   dialogueSlug: Scalars['String'];
@@ -2177,6 +2150,36 @@ export type GetDialogueStatisticsQuery = (
           { __typename?: 'lineChartDataType' }
           & Pick<LineChartDataType, 'x' | 'y'>
         )>> }
+      )> }
+    )> }
+  )> }
+);
+
+export type GetDialogueStatisticsSummaryQueryVariables = Exact<{
+  dialogueId: Scalars['ID'];
+  filter?: Maybe<DialogueStatisticsSummaryFilterInput>;
+}>;
+
+
+export type GetDialogueStatisticsSummaryQuery = (
+  { __typename?: 'Query' }
+  & { dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & { statistics?: Maybe<(
+      { __typename?: 'DialogueStatistics' }
+      & { statisticsSummaries?: Maybe<(
+        { __typename?: 'DialogueStatisticsSummaryType' }
+        & { summaryGroups: Array<(
+          { __typename?: 'DialogueStatisticsSummaryGroupType' }
+          & Pick<DialogueStatisticsSummaryGroupType, 'startDate' | 'endDate'>
+          & { sessionsSummary?: Maybe<(
+            { __typename?: 'DialogueStatisticsSessionsSummaryType' }
+            & Pick<DialogueStatisticsSessionsSummaryType, 'count' | 'average' | 'max' | 'min'>
+          )>, choicesSummaries?: Maybe<Array<(
+            { __typename?: 'DialogueChoiceSummaryType' }
+            & Pick<DialogueChoiceSummaryType, 'choiceValue' | 'averageValue' | 'count' | 'min' | 'max'>
+          )>> }
+        )> }
       )> }
     )> }
   )> }
@@ -2962,97 +2965,6 @@ export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOp
 export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
 export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
 export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
-export const GetBranchStatisticsDocument = gql`
-    query GetBranchStatistics($customerSlug: String!, $dialogueSlug: String!, $dialogueId: ID!, $statisticsDateFilter: DialogueFilterInputType) {
-  customer(slug: $customerSlug) {
-    id
-    dialogue(where: {slug: $dialogueSlug}) {
-      id
-      statistics(input: $statisticsDateFilter) {
-        negativeBranch: branch(min: 0, max: 30, dialogueId: $dialogueId) {
-          nodes {
-            id
-            isRoot
-            title
-            children {
-              id
-              parentNodeId
-              childNodeId
-            }
-            statistics {
-              count
-            }
-          }
-        }
-        neutralBranch: branch(min: 31, max: 60, dialogueId: $dialogueId) {
-          nodes {
-            id
-            isRoot
-            title
-            children {
-              id
-              parentNodeId
-              childNodeId
-            }
-            statistics {
-              count
-            }
-          }
-        }
-        positiveBranch: branch(min: 31, max: 60, dialogueId: $dialogueId) {
-          nodes {
-            id
-            isRoot
-            title
-            children {
-              id
-              parentNodeId
-              childNodeId
-            }
-            statistics {
-              count
-            }
-          }
-        }
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useGetBranchStatisticsQuery__
- *
- * To run a query within a React component, call `useGetBranchStatisticsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetBranchStatisticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetBranchStatisticsQuery({
- *   variables: {
- *      customerSlug: // value for 'customerSlug'
- *      dialogueSlug: // value for 'dialogueSlug'
- *      dialogueId: // value for 'dialogueId'
- *      statisticsDateFilter: // value for 'statisticsDateFilter'
- *   },
- * });
- */
-export function useGetBranchStatisticsQuery(baseOptions: Apollo.QueryHookOptions<GetBranchStatisticsQuery, GetBranchStatisticsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetBranchStatisticsQuery, GetBranchStatisticsQueryVariables>(GetBranchStatisticsDocument, options);
-      }
-export function useGetBranchStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBranchStatisticsQuery, GetBranchStatisticsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetBranchStatisticsQuery, GetBranchStatisticsQueryVariables>(GetBranchStatisticsDocument, options);
-        }
-export type GetBranchStatisticsQueryHookResult = ReturnType<typeof useGetBranchStatisticsQuery>;
-export type GetBranchStatisticsLazyQueryHookResult = ReturnType<typeof useGetBranchStatisticsLazyQuery>;
-export type GetBranchStatisticsQueryResult = Apollo.QueryResult<GetBranchStatisticsQuery, GetBranchStatisticsQueryVariables>;
-export function refetchGetBranchStatisticsQuery(variables?: GetBranchStatisticsQueryVariables) {
-      return { query: GetBranchStatisticsDocument, variables: variables }
-    }
 export const GetDialogueStatisticsDocument = gql`
     query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
   customer(slug: $customerSlug) {
@@ -3139,6 +3051,65 @@ export type GetDialogueStatisticsLazyQueryHookResult = ReturnType<typeof useGetD
 export type GetDialogueStatisticsQueryResult = Apollo.QueryResult<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>;
 export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatisticsQueryVariables) {
       return { query: GetDialogueStatisticsDocument, variables: variables }
+    }
+export const GetDialogueStatisticsSummaryDocument = gql`
+    query GetDialogueStatisticsSummary($dialogueId: ID!, $filter: DialogueStatisticsSummaryFilterInput) {
+  dialogue(where: {id: $dialogueId}) {
+    statistics {
+      statisticsSummaries(filter: $filter) {
+        summaryGroups {
+          startDate
+          endDate
+          sessionsSummary {
+            count
+            average
+            max
+            min
+          }
+          choicesSummaries {
+            choiceValue
+            averageValue
+            count
+            min
+            max
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDialogueStatisticsSummaryQuery__
+ *
+ * To run a query within a React component, call `useGetDialogueStatisticsSummaryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDialogueStatisticsSummaryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDialogueStatisticsSummaryQuery({
+ *   variables: {
+ *      dialogueId: // value for 'dialogueId'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetDialogueStatisticsSummaryQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueStatisticsSummaryQuery, GetDialogueStatisticsSummaryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDialogueStatisticsSummaryQuery, GetDialogueStatisticsSummaryQueryVariables>(GetDialogueStatisticsSummaryDocument, options);
+      }
+export function useGetDialogueStatisticsSummaryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueStatisticsSummaryQuery, GetDialogueStatisticsSummaryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDialogueStatisticsSummaryQuery, GetDialogueStatisticsSummaryQueryVariables>(GetDialogueStatisticsSummaryDocument, options);
+        }
+export type GetDialogueStatisticsSummaryQueryHookResult = ReturnType<typeof useGetDialogueStatisticsSummaryQuery>;
+export type GetDialogueStatisticsSummaryLazyQueryHookResult = ReturnType<typeof useGetDialogueStatisticsSummaryLazyQuery>;
+export type GetDialogueStatisticsSummaryQueryResult = Apollo.QueryResult<GetDialogueStatisticsSummaryQuery, GetDialogueStatisticsSummaryQueryVariables>;
+export function refetchGetDialogueStatisticsSummaryQuery(variables?: GetDialogueStatisticsSummaryQueryVariables) {
+      return { query: GetDialogueStatisticsSummaryDocument, variables: variables }
     }
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {

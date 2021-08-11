@@ -1,0 +1,25 @@
+query GetDialogueStatisticsSummary($dialogueId: ID!, $filter: DialogueStatisticsSummaryFilterInput) {
+  dialogue(where: { id: $dialogueId }) {
+    statistics {
+      statisticsSummaries(filter: $filter) {
+        summaryGroups {
+          startDate
+          endDate
+          sessionsSummary {
+            count
+            average
+            max
+            min
+          }
+          choicesSummaries {
+            choiceValue
+            averageValue
+            count
+            min
+            max
+          }
+        }
+      }
+    }
+  }
+}
