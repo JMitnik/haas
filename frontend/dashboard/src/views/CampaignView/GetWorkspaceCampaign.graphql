@@ -48,6 +48,19 @@ query GetWorkspaceCampaign(
       variants {
         id
         label
+        from
+        type
+        weight
+        body
+
+        dialogue {
+          id
+          title
+        }
+
+        workspace {
+          id
+        }
       }
     }
   }

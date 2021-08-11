@@ -436,6 +436,7 @@ const DialogueView = () => {
               <UI.Div>
                 {dialogue?.statistics?.history ? (
                   <UI.Skeleton {...fetchStatus}>
+                    {/* @ts-ignore */}
                     <ScoreGraphModule chartData={dialogue?.statistics?.history || []} />
                   </UI.Skeleton>
                 ) : (
@@ -444,6 +445,7 @@ const DialogueView = () => {
               </UI.Div>
 
               <UI.Skeleton {...fetchStatus}>
+                {/* @ts-ignore */}
                 <InteractionFeedModule interactions={dialogue?.sessions || []} />
               </UI.Skeleton>
             </UI.Grid>

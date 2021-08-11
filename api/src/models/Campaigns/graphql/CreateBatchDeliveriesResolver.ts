@@ -130,11 +130,13 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
 
     if (!relatedCampaign) throw new UserInputError('Related campaign does not exist');
 
+
     // Validate CSV
     const { successRecords, erroredRecords } = validateDeliveryRows(
       csvData,
       relatedCampaign.variantsEdges.map((variantEdge) => variantEdge.campaignVariant.type),
     );
+    console.log(erroredRecords);
 
     // For each row in CSV, we do some small preprocessing
     const preprocessedRecords = successRecords.map(record => {

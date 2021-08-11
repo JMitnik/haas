@@ -1,18 +1,23 @@
 import * as UI from '@haas/ui';
-import { AtSign, Clock, Eye, Flag, Plus, Smartphone } from 'react-feather';
+import { AtSign, Clock, Eye, Flag, Mail, Plus, Settings, Smartphone } from 'react-feather';
+import { ErrorBoundary } from 'react-error-boundary';
+import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
+import React, { useEffect, useState } from 'react';
+
 import {
   CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType,
   GetWorkspaceCampaignQuery,
   PaginationSortByEnum, useGetWorkspaceCampaignQuery,
 } from 'types/generated-types';
 import { DeepPartial } from 'types/customTypes';
-import { ErrorBoundary } from 'react-error-boundary';
-import { format } from 'date-fns';
 import { useLogger } from 'hooks/useLogger';
 import { useNavigator } from 'hooks/useNavigator';
-import { useTranslation } from 'react-i18next';
-import React, { useEffect, useState } from 'react';
 
+import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
+
+import { CampaignType } from './CampaignViewTypes';
+// eslint-disable-next-line import/no-cycle
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
 export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
@@ -108,9 +113,22 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
   }
 };
 
+const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
+  label: campaign.label,
+  variants: campaign.variants.map((variant) => ({
+    body: variant.body,
+    dialogue: { label: variant.dialogue.title, value: variant.dialogue.id },
+    from: variant.from || '',
+    label: variant.label,
+    type: variant.type,
+    weight: variant.weight,
+  }))
+});
+
 export const CampaignView = () => {
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
   const [isOpenDetailModel, setIsOpenDetailModel] = useState(false);
+  const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false);
   const [activeDelivery, setActiveDelivery] = useState<DeepPartial<DeliveryType> | null>(null);
   const { t } = useTranslation();
   const logger = useLogger();
@@ -161,28 +179,40 @@ export const CampaignView = () => {
     }
   }, [activeDelivery, setIsOpenImportModal]);
 
-  const campaign = dataCache?.customer?.campaign;
+  const campaign = dataCache?.customer?.campaign || null;
   const deliveryConnection = campaign?.deliveryConnection;
 
   return (
     <>
       <UI.ViewHead>
-        <UI.Stack>
-          <UI.Breadcrumb to={campaignsPath}>{t('back_to_campaigns')}</UI.Breadcrumb>
-          <UI.Stack isInline alignItems="center" spacing={4}>
-            <UI.ViewTitle>{campaign?.label}</UI.ViewTitle>
-            <UI.Button
-              leftIcon={Plus}
-              onClick={() => setIsOpenImportModal(true)}
-              size="sm"
-              variantColor="teal"
-            >
-              {t('import_deliveries')}
-            </UI.Button>
+        <UI.Flex justifyContent="space-between" width="100%" alignItems="flex-end">
+          <UI.Stack>
+            <UI.Breadcrumb to={campaignsPath}>{t('back_to_campaigns')}</UI.Breadcrumb>
+            <UI.Stack isInline alignItems="center" spacing={4}>
+              <UI.ViewTitle>{campaign?.label}</UI.ViewTitle>
+              <UI.Button
+                leftIcon={Plus}
+                onClick={() => setIsOpenImportModal(true)}
+                size="sm"
+                variantColor="teal"
+              >
+                {t('import_deliveries')}
+              </UI.Button>
+            </UI.Stack>
           </UI.Stack>
-        </UI.Stack>
+
+          <UI.Button
+            leftIcon={Settings}
+            size="md"
+            variant="outline"
+            onClick={() => setIsOpenSettingsModal(true)}
+          >
+            Settings
+          </UI.Button>
+        </UI.Flex>
+
       </UI.ViewHead>
-      <UI.ViewContainer>
+      <UI.ViewBody>
         <UI.Card noHover>
           <UI.Div p={2}>
             <UI.Table width="100%" isLoading={loading}>
@@ -225,7 +255,20 @@ export const CampaignView = () => {
                         ? delivery?.deliveryRecipientEmail : delivery?.deliveryRecipientPhone}
                     </UI.TableCell>
                     <UI.TableCell>
-                      {delivery?.campaignVariant?.label}
+                      <UI.Label variantColor="teal">
+                        <UI.Flex>
+                          <UI.Icon mr={1}>
+                            {delivery?.campaignVariant?.type === CampaignVariantEnum.Email && (
+                              <Mail width={14} />
+                            )}
+
+                            {delivery?.campaignVariant?.type === CampaignVariantEnum.Sms && (
+                              <Smartphone width={14} />
+                            )}
+                          </UI.Icon>
+                          {delivery?.campaignVariant?.label}
+                        </UI.Flex>
+                      </UI.Label>
                     </UI.TableCell>
                     <UI.TableCell>
                       <DeliveryStatus
@@ -261,7 +304,7 @@ export const CampaignView = () => {
                 <UI.Span ml={3}>
                   (Total deliveries:
                   {' '}
-                  {data?.customer?.campaign.allDeliveryConnection?.nrTotal}
+                  {data?.customer?.campaign?.allDeliveryConnection?.nrTotal}
                   )
                 </UI.Span>
               </UI.Div>
@@ -280,7 +323,6 @@ export const CampaignView = () => {
                     isDisabled={paginationState.paginationFilter?.pageIndex === 0}
                   >
                     Previous
-
                   </UI.Button>
                   <UI.Button
                     onClick={() => setPaginationState((state) => ({
@@ -296,7 +338,6 @@ export const CampaignView = () => {
                     }
                   >
                     Next
-
                   </UI.Button>
                 </UI.Stack>
               </UI.Div>
@@ -402,7 +443,21 @@ export const CampaignView = () => {
             </UI.CardBody>
           </UI.Card>
         </UI.Modal>
-      </UI.ViewContainer>
+
+        {!!campaign && (
+          <UI.Modal isOpen={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
+            <UI.Card bg="white" noHover width={700}>
+              <UI.CardBody>
+                <CreateCampaignForm
+                  onClose={() => setIsOpenSettingsModal(false)}
+                  campaign={campaignToForm(campaign)}
+                  isReadOnly
+                />
+              </UI.CardBody>
+            </UI.Card>
+          </UI.Modal>
+        )}
+      </UI.ViewBody>
     </>
   );
 };
