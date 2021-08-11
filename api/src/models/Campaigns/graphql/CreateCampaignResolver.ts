@@ -50,7 +50,7 @@ const saveCampaign = (input: NexusGenInputs['CreateCampaignInputType']): Prisma.
   },
   variantsEdges: {
     create: input.variants?.map((variant) => ({
-      weight: variant.weight || 50,
+      weight: variant.weight ?? 50,
       campaignVariant: {
         create: {
           label: variant.label || '',

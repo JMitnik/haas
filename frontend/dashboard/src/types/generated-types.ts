@@ -79,6 +79,7 @@ export type CampaignVariantType = {
   label: Scalars['String'];
   weight: Scalars['Int'];
   body: Scalars['String'];
+  from?: Maybe<Scalars['String']>;
   type: CampaignVariantEnum;
   workspace: Customer;
   dialogue: Dialogue;
@@ -1185,7 +1186,6 @@ export type Query = {
   trigger?: Maybe<TriggerType>;
   triggers: Array<TriggerType>;
   roleConnection: RoleConnection;
-  roles?: Maybe<Array<RoleType>>;
   customers: Array<Customer>;
   customer?: Maybe<Customer>;
   UserOfCustomer?: Maybe<UserCustomer>;
@@ -1254,11 +1254,6 @@ export type QueryTriggersArgs = {
 export type QueryRoleConnectionArgs = {
   customerId?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
-};
-
-
-export type QueryRolesArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
 };
 
 
@@ -1971,7 +1966,14 @@ export type GetWorkspaceCampaignQuery = (
         ) }
       )>, variants: Array<(
         { __typename?: 'CampaignVariantType' }
-        & Pick<CampaignVariantType, 'id' | 'label'>
+        & Pick<CampaignVariantType, 'id' | 'label' | 'from' | 'type' | 'weight' | 'body'>
+        & { dialogue: (
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'id' | 'title'>
+        ), workspace: (
+          { __typename?: 'Customer' }
+          & Pick<Customer, 'id'>
+        ) }
       )> }
     )> }
   )> }
@@ -2673,6 +2675,17 @@ export const GetWorkspaceCampaignDocument = gql`
       variants {
         id
         label
+        from
+        type
+        weight
+        body
+        dialogue {
+          id
+          title
+        }
+        workspace {
+          id
+        }
       }
     }
   }

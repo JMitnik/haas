@@ -486,6 +486,7 @@ export interface NexusGenRootTypes {
     body: string; // String!
     deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     dialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    from?: string | null; // String
     id: string; // ID!
     label: string; // String!
     type: NexusGenEnums['CampaignVariantEnum']; // CampaignVariantEnum!
@@ -898,6 +899,7 @@ export interface NexusGenFieldTypes {
     body: string; // String!
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     dialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    from: string | null; // String
     id: string; // ID!
     label: string; // String!
     type: NexusGenEnums['CampaignVariantEnum']; // CampaignVariantEnum!
