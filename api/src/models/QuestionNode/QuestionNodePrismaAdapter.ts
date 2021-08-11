@@ -262,6 +262,9 @@ class QuestionNodePrismaAdapter {
   findOptionsByQuestionId(parentId: string) {
     return this.prisma.questionOption.findMany({
       where: { questionNodeId: parentId },
+      orderBy: {
+        position: 'asc',
+      },
       include: {
         overrideLeaf: true
       }
