@@ -5,7 +5,9 @@ import { SystemPermission } from 'types/globalTypes';
 
 interface UseAuthProps {
   canCreateCustomers: boolean;
+  canDeleteDialogue: boolean;
   canDeleteCustomers: boolean;
+  canEditDialogue: boolean;
   canCreateTriggers: boolean;
   canViewCampaigns: boolean;
   canCreateCampaigns: boolean;
@@ -42,7 +44,7 @@ const useAuth = (): UseAuthProps => {
   const canViewUsers = authPermissions?.includes(SystemPermission.CAN_VIEW_USERS) || false;
   const canDeleteUsers = authPermissions?.includes(SystemPermission.CAN_DELETE_USERS) || false;
   const canEditUsers = authPermissions?.includes(SystemPermission.CAN_EDIT_USERS) || false;
-  
+
   const canViewCampaigns = authPermissions?.includes(SystemPermission.CAN_VIEW_CAMPAIGNS) || false;
   const canCreateCampaigns = authPermissions?.includes(SystemPermission.CAN_CREATE_CAMPAIGNS) || false;
   const canCreateDeliveries = authPermissions?.includes(SystemPermission.CAN_CREATE_DELIVERIES) || false;
@@ -52,12 +54,16 @@ const useAuth = (): UseAuthProps => {
   const canViewDialogueBuilder = authPermissions?.includes(SystemPermission.CAN_VIEW_DIALOGUE) || false;
   const canBuildDialogues = authPermissions?.includes(SystemPermission.CAN_BUILD_DIALOGUE) || false;
   const canViewDialogueView = authPermissions?.includes(SystemPermission.CAN_VIEW_DIALOGUE_ANALYTICS) || false;
+  const canEditDialogue = authPermissions?.includes(SystemPermission.CAN_EDIT_DIALOGUE) || false;
+  const canDeleteDialogue = authPermissions?.includes(SystemPermission.CAN_DELETE_DIALOGUE) || false;
 
   const canCreateTriggers = authPermissions?.includes(SystemPermission.CAN_CREATE_TRIGGERS) || false;
   const canEditTriggers = authPermissions?.includes(SystemPermission.CAN_CREATE_TRIGGERS) || false;
   const canDeleteTriggers = authPermissions?.includes(SystemPermission.CAN_DELETE_TRIGGERS) || false;
 
   return {
+    canDeleteDialogue,
+    canEditDialogue,
     canViewCampaigns,
     canCreateCampaigns,
     canCreateDeliveries,

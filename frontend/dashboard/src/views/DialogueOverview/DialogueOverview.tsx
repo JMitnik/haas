@@ -11,11 +11,12 @@ import { getQuestionnairesOfCustomer as CustomerData } from 'queries/__generated
 import Searchbar from 'components/SearchBar';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
+import useAuth from 'hooks/useAuth';
 
 import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
-const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean }) => {
+const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
 
@@ -27,6 +28,8 @@ const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean })
       customerSlug,
     },
   });
+
+  const { canDeleteDialogue } = useAuth();
 
   const filteredDialogues = data?.customer?.dialogues || dialogues;
 
@@ -82,19 +85,21 @@ const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean })
               <DialogueCard key={index} dialogue={dialogue} />
             ))}
 
-            <AddDialogueCard data-cy="AddDialogueCard">
-              <Link to={`/dashboard/b/${customerSlug}/dialogue/add`} />
+            {canDeleteDialogue && (
+              <AddDialogueCard data-cy="AddDialogueCard">
+                <Link to={`/dashboard/b/${customerSlug}/dialogue/add`} />
 
-              <Flex flexDirection="column" alignItems="center" justifyContent="center">
-                <SurveyIcon />
-                <TranslatedPlus>
-                  <Plus strokeWidth="3px" />
-                </TranslatedPlus>
-                <H4 color="default.dark">
-                  {t('create_dialogue')}
-                </H4>
-              </Flex>
-            </AddDialogueCard>
+                <Flex flexDirection="column" alignItems="center" justifyContent="center">
+                  <SurveyIcon />
+                  <TranslatedPlus>
+                    <Plus strokeWidth="3px" />
+                  </TranslatedPlus>
+                  <H4 color="default.dark">
+                    {t('create_dialogue')}
+                  </H4>
+                </Flex>
+              </AddDialogueCard>
+            )}
           </Grid>
         ) : (
           <Grid gridRowGap={2}>
