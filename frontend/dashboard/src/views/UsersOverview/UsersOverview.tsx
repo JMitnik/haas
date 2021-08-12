@@ -170,11 +170,16 @@ const UsersOverview = () => {
         <UI.Flex width="100%" justifyContent="space-between">
           <UI.Flex alignItems="center">
             <UI.ViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.ViewTitle>
-            {canInviteUsers && (
-              <UI.Button size="sm" ml={4} onClick={handleAddUser} leftIcon={Plus} variantColor="teal">
-                {t('invite_user')}
-              </UI.Button>
-            )}
+            <UI.Button
+              isDisabled={!canInviteUsers}
+              size="sm"
+              ml={4}
+              onClick={handleAddUser}
+              leftIcon={Plus}
+              variantColor="teal"
+            >
+              {t('invite_user')}
+            </UI.Button>
           </UI.Flex>
 
           <SearchBar
