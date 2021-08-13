@@ -343,11 +343,14 @@ class DialogueService {
 
   // TODO: Offload all this work to redis for much better performance + Cache
   static getStatistics = async (dialogueId: string, startDate?: Date | null, endDate?: Date | null): Promise<StatisticsProps> => {
+    // Fetch all relevant sessions
     const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, { startDate, endDate });
-
     if (!sessions) { throw new Error('No sessions present'); }
 
-    const scoreEntries = SessionService.getScoringEntriesFromSessions(sessions).filter(isPresent) || [];
+    // Get the scoring-entries from each session.
+    const scoreEntries = SessionService.getScoringEntriesFromSessions(
+      sessions
+    ).filter(isPresent) || [];
 
     // Then dresses it up as X/Y data for the lineChart
     const history: HistoryDataProps[] = scoreEntries?.map((entry) => ({
@@ -356,6 +359,7 @@ class DialogueService {
       entryId: entry?.id || null,
       sessionId: entry?.sessionId || null,
     })).filter(isPresent) || [];
+
     const historyCloned = [...history];
 
     // Get text entries

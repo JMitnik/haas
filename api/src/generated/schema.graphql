@@ -52,6 +52,7 @@ type CampaignVariantType {
   body: String!
   deliveryConnection: DeliveryConnectionType
   dialogue: Dialogue!
+  from: String
   id: ID!
   label: String!
   type: CampaignVariantEnum!
@@ -887,7 +888,6 @@ type Query {
   me: UserType!
   refreshAccessToken: RefreshAccessTokenOutput!
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
-  roles(customerSlug: String): [RoleType!]
   session(where: SessionWhereUniqueInput): Session
   sessions(where: SessionWhereUniqueInput): [Session!]!
   tags(customerSlug: String, dialogueId: String): [Tag!]!

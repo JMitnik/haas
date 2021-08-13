@@ -3,7 +3,6 @@
 import * as UI from '@haas/ui';
 import { ArrowLeft, Download, Plus, RefreshCcw } from 'react-feather';
 import { CreateWorkspaceJobType, JobStatusType, PaginationSortByEnum, PaginationWhereInput, useConfirmWorkspaceJobMutation, useCreateWorkspaceJobMutation, useGetAutodeckJobsQuery, useRetryAutodeckJobMutation } from 'types/generated-types';
-import { DateLabel, ProcessingStatus } from './Components';
 import { DeepPartial } from 'types/customTypes';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router';
@@ -11,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import { DateLabel, ProcessingStatus } from './Components';
 
 export const paginationFilter: PaginationWhereInput = {
   limit: 15,
@@ -197,7 +197,6 @@ export const AutodeckOverview = () => {
                     isDisabled={paginationState.pageIndex === 0}
                   >
                     Previous
-
                   </UI.Button>
                   <UI.Button
                     onClick={() => setPaginationState((state) => ({
@@ -210,7 +209,6 @@ export const AutodeckOverview = () => {
                     isDisabled={(paginationState.pageIndex || 0) + 1 === data?.getAutodeckJobs?.pageInfo?.nrPages}
                   >
                     Next
-
                   </UI.Button>
                 </UI.Stack>
               </UI.Div>

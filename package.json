@@ -52,6 +52,7 @@
         "migrate:create": "yarn workspace @haas/api migrate:create",
         "seed:api": "yarn workspace @haas/api seed",
         "kill": "yarn kill:api && yarn kill:client",
+        "kill:dashboard": "yarn workspace @haas/dashboard kill",
         "kill:api": "yarn workspace @haas/api kill",
         "kill:client": "kill $(lsof -t -i:3000) | exit 0",
         "test": "yarn workspace @haas/api test",
