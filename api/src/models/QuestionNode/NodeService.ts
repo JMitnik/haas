@@ -416,6 +416,7 @@ class NodeService {
       matchValue: string | null
     },
     extraContent: string | null,
+    topic: string | undefined,
   ) => {
     const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
     const videoEmbeddedNode: VideoEmbeddedNodeCreateOneWithoutQuestionNodeInput | undefined = extraContent ? { create: { videoUrl: extraContent } } : undefined;
@@ -431,6 +432,9 @@ class NodeService {
             publicValue: option.publicValue,
             overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
           })),
+        },
+        relatedTopic: {
+          connect: { id: topic }
         },
         questionDialogue: {
           connect: {
@@ -467,6 +471,7 @@ class NodeService {
         },
       },
     });
+
     return newQuestion;
   };
 
@@ -486,6 +491,7 @@ class NodeService {
     },
     sliderNode: NexusGenInputs['SliderNodeInputType'],
     extraContent: string | null | undefined,
+    topic: string
   ) => {
     const activeQuestion = await prisma.questionNode.findOne({
       where: { id: questionId },
@@ -555,6 +561,9 @@ class NodeService {
         options: {
           connect: updatedOptionIds,
         },
+        relatedTopic: {
+          connect: { id: topic }
+        }
       },
       include: {
         videoEmbeddedNode: true,
@@ -568,6 +577,9 @@ class NodeService {
         options: {
           connect: updatedOptionIds,
         },
+        relatedTopic: {
+          connect: { id: topic }
+        }
       },
       include: {
         videoEmbeddedNode: true,

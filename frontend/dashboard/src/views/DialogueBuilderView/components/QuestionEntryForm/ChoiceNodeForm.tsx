@@ -109,9 +109,8 @@ export const ChoiceNodeForm = ({ form, ctaNodes, topics }: ChoiceNodeFormProps) 
                   {hasSelectedTopic && (
                     <UI.Div>
                       <Controller
-                        name={`optionsFull[${index}].topicValue`}
+                        name={`optionsFull[${index}].relatedTopicValue`}
                         control={form.control}
-                        defaultValue={}
                         render={({ onChange, value }) => (
                           <Dropdown
                             renderOverlay={({ onClose }) => (

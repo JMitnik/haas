@@ -48,13 +48,16 @@ interface FormDataProps {
   videoEmbedded: string;
   questionType: string;
   matchText: string;
+  topic: {
+    value: string;
+    label: string;
+  };
   activeLeaf: string;
   parentQuestionType: string;
   sliderNode: {
     id: string;
     markers: SliderNodeMarkerProps[];
   };
-  topic: any;
   options: string[];
   optionsFull: any[];
 }
@@ -171,10 +174,11 @@ const DialogueBuilderQuestionForm = ({
     })),
   };
 
+  console.log(question);
+
   // TODO: For edit
   // Frontend-to-API-level: We need to fetch from our API for every option the connected topic-value.
   // API-to-form-level: We need to connect our FORM to the currently connected topic-values.
-
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -182,10 +186,17 @@ const DialogueBuilderQuestionForm = ({
     defaultValues: {
       parentQuestionType,
       sliderNode,
-      topic: undefined,
+      topic: {
+        label: question?.relatedTopic?.label,
+        value: question?.relatedTopic?.id,
+      } || undefined,
       optionsFull: options.map((option) => ({
         value: option.value,
         publicValue: option.publicValue,
+        relatedTopicValue: {
+          label: option.relatedTopicValue?.label,
+          value: option.relatedTopicValue?.id,
+        },
         overrideLeaf: {
           label: option.overrideLeaf?.title,
           value: option.overrideLeaf?.id,
@@ -194,6 +205,8 @@ const DialogueBuilderQuestionForm = ({
       })),
     },
   });
+
+  console.log(form.getValues());
 
   const toast = useToast();
   const [activeQuestionType, setActiveQuestionType] = useState(type);
@@ -389,6 +402,8 @@ const DialogueBuilderQuestionForm = ({
     const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
     const values = form.getValues();
 
+    console.log(formData);
+
     if (question.id !== '-1') {
       updateQuestion({
         variables: {
@@ -400,13 +415,14 @@ const DialogueBuilderQuestionForm = ({
             edgeId: edgeId || '-1',
             title,
             type,
+            topic: formData?.topic?.value,
             optionEntries: {
               options: values.optionsFull?.map((option) => ({
                 id: option?.id,
                 value: option?.value,
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
-                topicValueId: option?.topicValue?.id,
+                topicValueId: option?.relatedTopicValue?.id,
               })),
             },
             edgeCondition,
@@ -431,6 +447,7 @@ const DialogueBuilderQuestionForm = ({
             dialogueSlug,
             title,
             type,
+            topic: formData?.topic?.value,
             extraContent: formData.videoEmbedded,
             overrideLeafId: overrideLeafId || 'None',
             parentQuestionId,

@@ -152,6 +152,7 @@ input CreateQuestionNodeInputType {
   overrideLeafId: ID
   parentQuestionId: ID
   title: String
+  topic: String
   type: String
 }
 
@@ -875,6 +876,7 @@ type QuestionNode {
   overrideLeafId: String
   questionDialogue: Dialogue
   questionDialogueId: String
+  relatedTopic: TopicModel
   share: ShareNodeType
 
   """Slidernode resolver"""
@@ -911,6 +913,7 @@ type QuestionOption {
   overrideLeaf: QuestionNode
   publicValue: String
   questionId: String
+  relatedTopicValue: TopicValueModel
   value: String!
 }
 
@@ -1228,6 +1231,7 @@ input UpdateQuestionNodeInputType {
   overrideLeafId: ID
   sliderNode: SliderNodeInputType
   title: String
+  topic: String
   type: String
 }
 

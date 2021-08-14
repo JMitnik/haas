@@ -106,6 +106,7 @@ export interface NexusGenInputs {
     overrideLeafId?: string | null; // ID
     parentQuestionId?: string | null; // ID
     title?: string | null; // String
+    topic?: string | null; // String
     type?: string | null; // String
   }
   CreateTopicInput: { // input type
@@ -418,6 +419,7 @@ export interface NexusGenInputs {
     overrideLeafId?: string | null; // ID
     sliderNode?: NexusGenInputs['SliderNodeInputType'] | null; // SliderNodeInputType
     title?: string | null; // String
+    topic?: string | null; // String
     type?: string | null; // String
   }
   UserInput: { // input type
@@ -1245,6 +1247,7 @@ export interface NexusGenFieldTypes {
     overrideLeafId: string | null; // String
     questionDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     questionDialogueId: string | null; // String
+    relatedTopic: NexusGenRootTypes['TopicModel'] | null; // TopicModel
     share: NexusGenRootTypes['ShareNodeType'] | null; // ShareNodeType
     sliderNode: NexusGenRootTypes['SliderNodeType'] | null; // SliderNodeType
     title: string; // String!
@@ -1256,6 +1259,7 @@ export interface NexusGenFieldTypes {
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     publicValue: string | null; // String
     questionId: string | null; // String
+    relatedTopicValue: NexusGenRootTypes['TopicValueModel'] | null; // TopicValueModel
     value: string; // String!
   }
   RefreshAccessTokenOutput: { // field return type

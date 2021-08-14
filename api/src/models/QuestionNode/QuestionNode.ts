@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { NodeType, PrismaClient } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -11,6 +11,7 @@ import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
 import prisma from '../../config/prisma';
+import { TopicModel, TopicValueModel } from '../topics';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -52,6 +53,11 @@ export const QuestionOptionType = objectType({
 
         return cta as any;
       }
+    });
+
+    t.field('relatedTopicValue', {
+      type: TopicValueModel,
+      nullable: true,
     });
   },
 });
@@ -189,13 +195,21 @@ export const QuestionNodeType = objectType({
           where: {
             id: parent.videoEmbeddedNodeId,
           },
-           select: {
-             videoUrl: true
-           }
+          select: {
+            videoUrl: true
+          }
         }) : null;
         return videoEmbeddedNode?.videoUrl ||  null;
       },
-     });
+    });
+
+    t.field('relatedTopic', {
+      type: TopicModel,
+      // @ts-ignore
+      resolve: (parent) => parent.relatedTopic,
+      nullable: true,
+    });
+
     t.string('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
     t.string('overrideLeafId', { nullable: true });
@@ -318,6 +332,9 @@ export const QuestionNodeType = objectType({
       type: QuestionOptionType,
 
       resolve(parent, args, ctx) {
+        // @ts-ignore
+        if (parent.options) return parent.options;
+
         const options = ctx.prisma.questionOption.findMany({
           where: { questionNodeId: parent.id },
           include: {
@@ -450,7 +467,8 @@ export const CreateQuestionNodeInputType = inputObjectType({
     t.string('dialogueSlug');
     t.string('title');
     t.string('type');
-    t.string('extraContent', { nullable: true })
+    t.string('extraContent', { nullable: true });
+    t.string('topic', { nullable: true });
 
     t.field('optionEntries', { type: OptionsInputType });
     t.field('edgeCondition', { type: EdgeConditionInputType });
@@ -528,33 +546,34 @@ export const QuestionNodeMutations = extendType({
         input: CreateQuestionNodeInputType,
       },
       // TODO: Remove the any
-      async resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        // eslint-disable-next-line max-len
-        const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition, extraContent } = args.input;
-        const { options } = optionEntries;
-
-        const customer = await prisma.customer.findOne({
+      async resolve(parent: any, args, ctx) {
+        const customer = await ctx.prisma.customer.findOne({
           where: {
-            id: customerId,
+            id: args?.input?.customerId || '',
           },
           include: {
             dialogues: {
               where: {
-                slug: dialogueSlug,
+                slug: args?.input?.dialogueSlug || '',
               },
             },
           },
         });
 
-        const dialogue = customer?.dialogues[0];
-        const dialogueId = dialogue?.id;
-
-        console.log('extra content create: ', extraContent)
+        const dialogueId = customer?.dialogues[0]?.id;
 
         if (dialogueId) {
           return NodeService.createQuestionFromBuilder(
-            dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition, extraContent
+            dialogueId || '',
+            args?.input?.title || '',
+            args?.input?.type as NodeType,
+            args?.input?.overrideLeafId || '',
+            args?.input?.parentQuestionId || '',
+            // @ts-ignore
+            args?.input?.optionEntries?.options || [],
+            args?.input?.edgeCondition,
+            args?.input?.extraContent,
+            args?.input?.topic
           );
         }
 

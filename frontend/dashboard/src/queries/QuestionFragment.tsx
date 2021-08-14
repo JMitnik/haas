@@ -26,6 +26,10 @@ const QuestionFragment = gql`
         }
       }
     }
+    relatedTopic {
+      id
+      label
+    }
     type
     children {
       id
@@ -53,6 +57,11 @@ const QuestionFragment = gql`
           id
           title
           type
+        }
+
+        relatedTopicValue {
+          id
+          label
         }
     }
   }

@@ -35,6 +35,10 @@ export interface QuestionEntryProps {
   options?: QuestionOptionProps[];
   sliderNode?: any;
   nrOfEntries?: number;
+  relatedTopic: {
+    id: string
+    label: string;
+  }
 }
 
 export interface QuestionOptionProps {
@@ -42,6 +46,10 @@ export interface QuestionOptionProps {
   value: string;
   publicValue?: string;
   overrideLeaf?: CTANode;
+  relatedTopicValue?: {
+    id: string;
+    label: string;
+  }
 }
 
 export interface ShallowQuestionEntryProps {

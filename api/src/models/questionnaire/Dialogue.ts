@@ -287,6 +287,12 @@ export const DialogueType = objectType({
           },
           include: {
             isRelatedNodeOfNodeEntries: true,
+            relatedTopic: true,
+            options: {
+              include: {
+                relatedTopicValue: true
+              }
+            },
             form: {
               include: {
                 fields: true,

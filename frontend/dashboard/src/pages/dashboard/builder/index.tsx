@@ -85,6 +85,7 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
       overrideLeaf,
       options,
       children,
+      relatedTopic,
       updatedAt,
       sliderNode,
       extraContent,
@@ -97,6 +98,7 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
       isLeaf,
       extraContent,
       nrOfEntries,
+      relatedTopic,
       type: initializeQuestionType(type),
       sliderNode,
       icon: getIcon(type),
@@ -112,6 +114,7 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
         value: option.value,
         publicValue: option.publicValue,
         overrideLeaf: option.overrideLeaf,
+        relatedTopicValue: option.relatedTopicValue,
       })),
       children: children?.map((edge: EdgeChildProps) => ({
         id: edge.id,

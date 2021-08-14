@@ -7,7 +7,11 @@ export const TopicModel = objectType({
   definition(t) {
     t.id('id');
     t.string('label');
-    t.list.field('topicValues', { type: TopicValueModel });
+    t.list.field('topicValues', {
+      type: TopicValueModel,
+      // @ts-ignore
+      resolve: (parent) => parent.topicValues
+    });
   }
 });
 
@@ -37,7 +41,7 @@ export const TopicModel = objectType({
         });
 
         // Give them to me.
-        return dialogueWithTopics?.topics;
+        return dialogueWithTopics?.topics || [];
       }
     })
   },
