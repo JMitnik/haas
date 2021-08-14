@@ -50,8 +50,8 @@ export class DialogueStatisticsPrismaAdapter {
       include: {
         nodeEntries: {
           include: {
-            choiceNodeEntry: true,
             sliderNodeEntry: true,
+            choiceNodeEntry: true,
             relatedNode: {
               select: {
                 isRoot: true

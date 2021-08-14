@@ -370,26 +370,47 @@ type DialogueFinisherObjectType {
   subtext: String!
 }
 
+"""Summary of a dialogue's dialogue-paths."""
+type DialoguePathsSummaryType {
+  mostCriticalPath: DialoguePathType
+  mostPopularPath: DialoguePathType
+}
+
+type DialoguePathSummaryType {
+  averageValue: Int!
+  countEntries: Int!
+  maxValue: Int!
+  minValue: Int!
+}
+
+"""A generic path in a dialogue, from root to end."""
+type DialoguePathType {
+  dialoguePathSummary: DialoguePathSummaryType!
+  edges: [Edge!]!
+  nodes: [QuestionNode!]!
+}
+
 type DialogueStatistics {
   dialogueId: ID!
-  history: [lineChartDataType!]
-  mostPopularPath: topPathType
+  history: [lineChartDataType!] @deprecated(reason: "This field is deprecated")
+  mostPopularPath: topPathType @deprecated(reason: "This field is deprecated")
   nrInteractions: Int!
-  statisticsSummaries(filter: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryType
-  topNegativePath: [topPathType!]
-  topPositivePath: [topPathType!]
+  statisticsSummary(filter: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryType
+  topNegativePath: [topPathType!] @deprecated(reason: "This field is deprecated")
+  topPositivePath: [topPathType!] @deprecated(reason: "This field is deprecated")
 }
 
 type DialogueStatisticsSessionsSummaryType {
   average: Float!
   count: Int!
+  endDate: Date!
   max: Float!
   min: Float!
+  startDate: Date!
 }
 
 input DialogueStatisticsSummaryFilterInput {
   endDate: Date
-  groupBy: DialogueStatisticsSummaryGroupby
   startDate: Date
 }
 
@@ -399,15 +420,10 @@ enum DialogueStatisticsSummaryGroupby {
   week
 }
 
-type DialogueStatisticsSummaryGroupType {
-  choicesSummaries: [DialogueChoiceSummaryType!]
-  endDate: Date!
-  sessionsSummary: DialogueStatisticsSessionsSummaryType
-  startDate: Date!
-}
-
 type DialogueStatisticsSummaryType {
-  summaryGroups: [DialogueStatisticsSummaryGroupType!]!
+  choicesSummaries: [DialogueChoiceSummaryType!]
+  pathsSummary: DialoguePathsSummaryType
+  sessionsSummaries(groupBy: DialogueStatisticsSummaryGroupby): [DialogueStatisticsSessionsSummaryType!]
 }
 
 input DialogueWhereUniqueInput {

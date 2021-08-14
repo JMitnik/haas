@@ -11,7 +11,6 @@ export interface NodeWithEdge extends QuestionNode {
 export type SessionGroup = (Session & {
   rootValue: number;
   nodeEntries: (NodeEntry & {
-      choiceNodeEntry: ChoiceNodeEntry | null;
       sliderNodeEntry: SliderNodeEntry | null;
       relatedNode: {
         isRoot: boolean;
@@ -25,4 +24,8 @@ export type SessionChoiceGroupValue = {
   sumScore: number;
   maxScore: number;
   minScore: number;
+}
+
+export interface QuestionNodeWithChildren extends QuestionNode {
+  children: Edge[];
 }
