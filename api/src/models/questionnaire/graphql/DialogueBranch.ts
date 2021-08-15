@@ -5,7 +5,7 @@ import { QuestionNodeType } from '../../QuestionNode/QuestionNode';
 
 export const DialogueBranchSummaryType = objectType({
   name: 'DialogueBranchSummaryType',
-  description: 'Summar of a branch in the dialogue.',
+  description: 'Summary of a branch in the dialogue.',
 
   definition(t) {
     t.int('countEntries');

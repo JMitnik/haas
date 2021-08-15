@@ -25,7 +25,3 @@ export type SessionChoiceGroupValue = {
   maxScore: number;
   minScore: number;
 }
-
-export interface QuestionNodeWithChildren extends QuestionNode {
-  children: Edge[];
-}

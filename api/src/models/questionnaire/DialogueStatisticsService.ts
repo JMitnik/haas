@@ -3,10 +3,11 @@ import { groupBy, maxBy, meanBy, minBy } from 'lodash'
 import { add, format } from "date-fns";
 import parse from "date-fns/parse";
 
-import { buildTree } from '../../utils/buildTree';
+import { buildTree, DialogueTreeNode } from '../../utils/buildTree';
+import { traverseTree } from '../../utils/traverseTree';
 import { NexusGenFieldTypes, NexusGenInputs } from "../../generated/nexus";
 import { DialogueStatisticsPrismaAdapter } from "./DialogueStatisticsPrismaAdapter";
-import { QuestionNodeWithChildren, SessionChoiceGroupValue, SessionGroup } from "./DialogueStatisticsServiceTypes";
+import { SessionChoiceGroupValue, SessionGroup } from "./DialogueStatisticsServiceTypes";
 
 const groupKey = {
   hour: 'HH-dd-LL-y',
@@ -54,6 +55,7 @@ export class DialogueStatisticsService {
     return {
       pathsSummary: await this.getPathsSummary(dialogueId, filter?.startDate, filter?.endDate),
       choicesSummaries: await this.getChoiceStatisticsSummary(dialogueId, filter?.startDate, filter?.endDate),
+      branchesSummary: null,
       sessionsSummaries: sessionGroups.map(([date, sessionGroup]) => {
         const startDate = parse(date, 'LL-y', new Date());
         const endDate = add(startDate, { months: 1 });
@@ -192,7 +194,11 @@ export class DialogueStatisticsService {
       include: {
         questions: {
           include: {
-            children: true
+            isParentNodeOf: {
+              include: {
+                conditions: true,
+              }
+            },
           }
         },
       }
@@ -205,16 +211,40 @@ export class DialogueStatisticsService {
 
     const dialogueTree = buildTree(dialogue?.questions);
 
-    const recursiveFindMostPopularNode = (currentNode: QuestionNodeWithChildren) => {
-      if (!currentNode.children) return undefined;
+    const branches = dialogueTree.children.reduce((result, current) => {
+      const conditionWithRenderValues = current.conditions.find((condition) => condition.renderMax || condition.renderMin);
 
-      const edgeWithCount = currentNode.children.map((edge) => ({
+      // @ts-ignore
+      if (conditionWithRenderValues?.renderMax <= result.negativeBranch?.upperLimit) {
+        result.negativeBranch = {
+          ...current,
+          upperLimit: conditionWithRenderValues?.renderMax as number,
+        }
+      }
+
+      // @ts-ignore
+      if (conditionWithRenderValues?.renderMin >= result.positiveBranch?.lowerLimit) {
+        result.positiveBranch = {
+          ...current,
+          lowerLimit: conditionWithRenderValues?.renderMin as number,
+        }
+      }
+
+      return result;
+    }, { negativeBranch: { upperLimit: Infinity }, positiveBranch: { lowerLimit: -Infinity } });
+
+    const selectPopularNode = (node: DialogueTreeNode) => {
+      const candidateEdges = node.children.map(edge => ({
         ...edge,
-        edgeCount: nodeCounts.find((nodeCount) => nodeCount.relatedNodeId === edge.childNodeId)?._count || 0,
+        edgeCount: nodeCounts.find((edgeCount) => edgeCount.relatedNodeId === edge?.childNode?.id)
       }));
 
-      // return recursiveFindMostPopularNode(edgeWithCount
-    }
+      return maxBy(candidateEdges, (edge) => edge.edgeCount);
+    };
+
+    const trendingPath = traverseTree(dialogueTree, selectPopularNode);
+    const negativePath = traverseTree(branches.negativeBranch.childNode, selectPopularNode);
+    const positivePath = traverseTree(branches.positiveBranch.childNode, selectPopularNode);
 
     return {
       mostCriticalPath: null,

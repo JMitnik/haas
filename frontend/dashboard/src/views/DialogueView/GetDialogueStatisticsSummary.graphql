@@ -1,4 +1,4 @@
-query GetDialogueStatisticsSummary($dialogueId: ID!, $filter: DialogueStatisticsSummaryFilterInput, $sessionGroupby: DialogueStatisticsSummaryGroupby) {
+query GetDialogueStatisticsSummary($dialogueId: ID!, $filter: DialogueStatisticsSummaryFilterInput, $sessionGroupby: DialogueStatisticsSummaryGroupby, $branchBy: SliderBranch) {
   dialogue(where: { id: $dialogueId }) {
     statistics {
       statisticsSummary(filter: $filter) {
@@ -19,26 +19,51 @@ query GetDialogueStatisticsSummary($dialogueId: ID!, $filter: DialogueStatistics
           max
         }
 
-        pathsSummary {
-          mostPopularPath {
+        branchesSummary(branchBy: $branchBy) {
+          nrBranches
+
+          branches {
+            branchMinValue
+            branchMaxValue
+
             nodes {
               id
-            }
-            pathSummary {
-              countEntries
-            }
-          }
 
-          mostCriticalPath {
-            nodes {
+              nodeSummary {
+                nrEntries
+              }
+
+              children {
+                id
+              }
+            }
+
+            edges {
               id
-            }
-
-            pathSummary {
-              countEntries
             }
           }
         }
+
+        # pathsSummary {
+        #   mostPopularPath {
+        #     nodes {
+        #       id
+        #     }
+        #     pathSummary {
+        #       countEntries
+        #     }
+        #   }
+
+        #   mostCriticalPath {
+        #     nodes {
+        #       id
+        #     }
+
+        #     pathSummary {
+        #       countEntries
+        #     }
+        #   }
+        # }
       }
     }
   }

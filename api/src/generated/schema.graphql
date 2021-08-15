@@ -421,6 +421,7 @@ enum DialogueStatisticsSummaryGroupby {
 }
 
 type DialogueStatisticsSummaryType {
+  branchesSummary: DialoguePathsSummaryType
   choicesSummaries: [DialogueChoiceSummaryType!]
   pathsSummary: DialoguePathsSummaryType
   sessionsSummaries(groupBy: DialogueStatisticsSummaryGroupby): [DialogueStatisticsSessionsSummaryType!]

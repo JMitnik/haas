@@ -107,6 +107,7 @@ export const DialogueStatisticsSummaryType = objectType({
 
   definition(t) {
     t.field('pathsSummary', { type: DialoguePathsSummaryType, nullable: true });
+    t.field('branchesSummary', { type: DialoguePathsSummaryType, nullable: true });
 
     t.list.field('sessionsSummaries', {
       type: DialogueStatisticsSessionsSummaryType,

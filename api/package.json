@@ -10,6 +10,7 @@
     },
     "scripts": {
         "start": "tsnd --exit-child --transpile-only -- ./src/app.ts",
+        "start:debug": "tsnd --inspect=localhost:9229 --exit-child --transpile-only -- ./src/app.ts",
         "dev": "npx nodemon --watch src ./src/app.ts",
         "build": "yarn",
         "docker:up": "docker-compose -f docker-compose.local.yml up -d ",

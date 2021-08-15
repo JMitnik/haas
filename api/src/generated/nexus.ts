@@ -602,6 +602,7 @@ export interface NexusGenRootTypes {
     startDate: any; // Date!
   }
   DialogueStatisticsSummaryType: { // root type
+    branchesSummary?: NexusGenRootTypes['DialoguePathsSummaryType'] | null; // DialoguePathsSummaryType
     choicesSummaries?: NexusGenRootTypes['DialogueChoiceSummaryType'][] | null; // [DialogueChoiceSummaryType!]
     pathsSummary?: NexusGenRootTypes['DialoguePathsSummaryType'] | null; // DialoguePathsSummaryType
     sessionsSummaries?: NexusGenRootTypes['DialogueStatisticsSessionsSummaryType'][] | null; // [DialogueStatisticsSessionsSummaryType!]
@@ -1106,6 +1107,7 @@ export interface NexusGenFieldTypes {
     startDate: any; // Date!
   }
   DialogueStatisticsSummaryType: { // field return type
+    branchesSummary: NexusGenRootTypes['DialoguePathsSummaryType'] | null; // DialoguePathsSummaryType
     choicesSummaries: NexusGenRootTypes['DialogueChoiceSummaryType'][] | null; // [DialogueChoiceSummaryType!]
     pathsSummary: NexusGenRootTypes['DialoguePathsSummaryType'] | null; // DialoguePathsSummaryType
     sessionsSummaries: NexusGenRootTypes['DialogueStatisticsSessionsSummaryType'][] | null; // [DialogueStatisticsSessionsSummaryType!]
