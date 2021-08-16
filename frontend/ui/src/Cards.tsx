@@ -3,10 +3,12 @@ import { Div } from './Generics';
 import { Flex } from './Container';
 import { Span } from './Span';
 import { Button } from './Buttons';
+import { Text } from './Type';
 
 type BoxShadowSize = 'sm' | 'md' | 'lg';
 
 interface CardProps {
+  hasHover?: boolean;
   noHover?: boolean;
   isFlat?: boolean;
   outline?: boolean;
@@ -14,8 +16,8 @@ interface CardProps {
   willFocusWithin?: boolean;
 }
 
-export const Card = styled(Div) <CardProps>`
-  ${({ theme, noHover, boxShadow, outline, isFlat, willFocusWithin }) => css`
+export const Card = styled(Div)<CardProps>`
+  ${({ theme, hasHover, isFlat, willFocusWithin }) => css`
     position: relative;
     display: flex;
     flex-direction: column;
@@ -33,7 +35,7 @@ export const Card = styled(Div) <CardProps>`
       box-shadow: none;
     `}
 
-    ${!noHover && css`
+    ${hasHover && css`
       cursor: pointer;
 
       &:hover {
@@ -109,6 +111,18 @@ export const AddCard = styled(Card)`
       bottom: 0;
       top: 0;
       text-decoration: none;
+    }
+  `}
+`;
+
+export const CardHead = styled(Div)`
+  ${({ theme }) => css`
+    border-radius: ${theme.borderRadiuses.md} ${theme.borderRadiuses.md} 0 0;
+    padding: ${theme.gutter / 2}px ${theme.gutter}px;
+
+    ${Text} {
+      font-size: 1.2rem;
+      font-weight: 600;
     }
   `}
 `;

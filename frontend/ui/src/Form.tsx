@@ -784,6 +784,13 @@ interface PureDatePickerProps {
 }
 
 export const DatePickerContainer = styled.div`
+  z-index: 500;
+
+  .ant-picker-range {
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  }
+
   .ant-picker-panel-container {
     border-radius: 10px;
   }

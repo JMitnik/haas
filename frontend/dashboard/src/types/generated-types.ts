@@ -436,6 +436,28 @@ export type DialogueLeafsArgs = {
   searchTerm?: Maybe<Scalars['String']>;
 };
 
+/** Summary of all branches */
+export type DialogueBranchesSummaryType = {
+  __typename?: 'DialogueBranchesSummaryType';
+  positiveBranch?: Maybe<DialogueBranchType>;
+  neutralBranch?: Maybe<DialogueBranchType>;
+  negativeBranch?: Maybe<DialogueBranchType>;
+};
+
+/** Summary of a branch in the dialogue. */
+export type DialogueBranchSummaryType = {
+  __typename?: 'DialogueBranchSummaryType';
+  countEntries: Scalars['Int'];
+};
+
+/** Branch in the dialogue. */
+export type DialogueBranchType = {
+  __typename?: 'DialogueBranchType';
+  branchSummary?: Maybe<DialogueBranchSummaryType>;
+  nodes: Array<QuestionNode>;
+  edges: Array<Edge>;
+};
+
 export type DialogueChoiceSummaryType = {
   __typename?: 'DialogueChoiceSummaryType';
   choiceValue: Scalars['String'];
@@ -458,24 +480,54 @@ export type DialogueFinisherObjectType = {
   subtext: Scalars['String'];
 };
 
+/** Summary of a dialogue's dialogue-paths. */
+export type DialoguePathsSummaryType = {
+  __typename?: 'DialoguePathsSummaryType';
+  mostPopularPath?: Maybe<DialoguePathType>;
+  mostCriticalPath?: Maybe<DialoguePathType>;
+};
+
+export type DialoguePathSummaryType = {
+  __typename?: 'DialoguePathSummaryType';
+  countEntries?: Maybe<Scalars['Int']>;
+  averageValue?: Maybe<Scalars['Int']>;
+  minValue?: Maybe<Scalars['Int']>;
+  maxValue?: Maybe<Scalars['Int']>;
+};
+
+/** A generic path in a dialogue, from root to end. */
+export type DialoguePathType = {
+  __typename?: 'DialoguePathType';
+  dialoguePathSummary?: Maybe<DialoguePathSummaryType>;
+  callToAction?: Maybe<QuestionNode>;
+  nodes: Array<QuestionNode>;
+  edges: Array<Edge>;
+};
+
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
   dialogueId: Scalars['ID'];
   nrInteractions: Scalars['Int'];
+  statisticsSummary?: Maybe<DialogueStatisticsSummaryType>;
+  /** @deprecated This field is deprecated */
   topPositivePath?: Maybe<Array<TopPathType>>;
+  /** @deprecated This field is deprecated */
   topNegativePath?: Maybe<Array<TopPathType>>;
+  /** @deprecated This field is deprecated */
   mostPopularPath?: Maybe<TopPathType>;
+  /** @deprecated This field is deprecated */
   history?: Maybe<Array<LineChartDataType>>;
-  statisticsSummaries?: Maybe<DialogueStatisticsSummaryType>;
 };
 
 
-export type DialogueStatisticsStatisticsSummariesArgs = {
+export type DialogueStatisticsStatisticsSummaryArgs = {
   filter?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
 export type DialogueStatisticsSessionsSummaryType = {
   __typename?: 'DialogueStatisticsSessionsSummaryType';
+  startDate: Scalars['Date'];
+  endDate: Scalars['Date'];
   count: Scalars['Int'];
   average: Scalars['Float'];
   min: Scalars['Float'];
@@ -485,7 +537,6 @@ export type DialogueStatisticsSessionsSummaryType = {
 export type DialogueStatisticsSummaryFilterInput = {
   startDate?: Maybe<Scalars['Date']>;
   endDate?: Maybe<Scalars['Date']>;
-  groupBy?: Maybe<DialogueStatisticsSummaryGroupby>;
 };
 
 export enum DialogueStatisticsSummaryGroupby {
@@ -494,17 +545,17 @@ export enum DialogueStatisticsSummaryGroupby {
   Week = 'week'
 }
 
-export type DialogueStatisticsSummaryGroupType = {
-  __typename?: 'DialogueStatisticsSummaryGroupType';
-  startDate: Scalars['Date'];
-  endDate: Scalars['Date'];
-  sessionsSummary?: Maybe<DialogueStatisticsSessionsSummaryType>;
+export type DialogueStatisticsSummaryType = {
+  __typename?: 'DialogueStatisticsSummaryType';
+  pathsSummary?: Maybe<DialoguePathsSummaryType>;
+  branchesSummary?: Maybe<DialogueBranchesSummaryType>;
+  sessionsSummaries?: Maybe<Array<DialogueStatisticsSessionsSummaryType>>;
   choicesSummaries?: Maybe<Array<DialogueChoiceSummaryType>>;
 };
 
-export type DialogueStatisticsSummaryType = {
-  __typename?: 'DialogueStatisticsSummaryType';
-  summaryGroups: Array<DialogueStatisticsSummaryGroupType>;
+
+export type DialogueStatisticsSummaryTypeSessionsSummariesArgs = {
+  groupBy?: Maybe<DialogueStatisticsSummaryGroupby>;
 };
 
 export type DialogueWhereUniqueInput = {
@@ -1363,6 +1414,7 @@ export type QuestionNode = {
   isRoot: Scalars['Boolean'];
   title: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
+  layer?: Maybe<Scalars['Int']>;
   extraContent?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   type: QuestionNodeTypeEnum;
@@ -2160,6 +2212,7 @@ export type GetDialogueStatisticsQuery = (
 export type GetDialogueStatisticsSummaryQueryVariables = Exact<{
   dialogueId: Scalars['ID'];
   filter?: Maybe<DialogueStatisticsSummaryFilterInput>;
+  sessionGroupby?: Maybe<DialogueStatisticsSummaryGroupby>;
 }>;
 
 
@@ -2169,18 +2222,41 @@ export type GetDialogueStatisticsSummaryQuery = (
     { __typename?: 'Dialogue' }
     & { statistics?: Maybe<(
       { __typename?: 'DialogueStatistics' }
-      & { statisticsSummaries?: Maybe<(
+      & { statisticsSummary?: Maybe<(
         { __typename?: 'DialogueStatisticsSummaryType' }
-        & { summaryGroups: Array<(
-          { __typename?: 'DialogueStatisticsSummaryGroupType' }
-          & Pick<DialogueStatisticsSummaryGroupType, 'startDate' | 'endDate'>
-          & { sessionsSummary?: Maybe<(
-            { __typename?: 'DialogueStatisticsSessionsSummaryType' }
-            & Pick<DialogueStatisticsSessionsSummaryType, 'count' | 'average' | 'max' | 'min'>
-          )>, choicesSummaries?: Maybe<Array<(
-            { __typename?: 'DialogueChoiceSummaryType' }
-            & Pick<DialogueChoiceSummaryType, 'choiceValue' | 'averageValue' | 'count' | 'min' | 'max'>
-          )>> }
+        & { sessionsSummaries?: Maybe<Array<(
+          { __typename?: 'DialogueStatisticsSessionsSummaryType' }
+          & Pick<DialogueStatisticsSessionsSummaryType, 'startDate' | 'endDate' | 'count' | 'average' | 'max' | 'min'>
+        )>>, choicesSummaries?: Maybe<Array<(
+          { __typename?: 'DialogueChoiceSummaryType' }
+          & Pick<DialogueChoiceSummaryType, 'choiceValue' | 'averageValue' | 'count' | 'min' | 'max'>
+        )>>, pathsSummary?: Maybe<(
+          { __typename?: 'DialoguePathsSummaryType' }
+          & { mostPopularPath?: Maybe<(
+            { __typename?: 'DialoguePathType' }
+            & { dialoguePathSummary?: Maybe<(
+              { __typename?: 'DialoguePathSummaryType' }
+              & Pick<DialoguePathSummaryType, 'countEntries'>
+            )>, nodes: Array<(
+              { __typename?: 'QuestionNode' }
+              & Pick<QuestionNode, 'id' | 'type' | 'title' | 'layer'>
+            )>, edges: Array<(
+              { __typename?: 'Edge' }
+              & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
+            )> }
+          )>, mostCriticalPath?: Maybe<(
+            { __typename?: 'DialoguePathType' }
+            & { dialoguePathSummary?: Maybe<(
+              { __typename?: 'DialoguePathSummaryType' }
+              & Pick<DialoguePathSummaryType, 'countEntries'>
+            )>, nodes: Array<(
+              { __typename?: 'QuestionNode' }
+              & Pick<QuestionNode, 'id' | 'type' | 'title' | 'layer'>
+            )>, edges: Array<(
+              { __typename?: 'Edge' }
+              & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
+            )> }
+          )> }
         )> }
       )> }
     )> }
@@ -3066,25 +3142,57 @@ export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatist
       return { query: GetDialogueStatisticsDocument, variables: variables }
     }
 export const GetDialogueStatisticsSummaryDocument = gql`
-    query GetDialogueStatisticsSummary($dialogueId: ID!, $filter: DialogueStatisticsSummaryFilterInput) {
+    query GetDialogueStatisticsSummary($dialogueId: ID!, $filter: DialogueStatisticsSummaryFilterInput, $sessionGroupby: DialogueStatisticsSummaryGroupby) {
   dialogue(where: {id: $dialogueId}) {
     statistics {
-      statisticsSummaries(filter: $filter) {
-        summaryGroups {
+      statisticsSummary(filter: $filter) {
+        sessionsSummaries(groupBy: $sessionGroupby) {
           startDate
           endDate
-          sessionsSummary {
-            count
-            average
-            max
-            min
+          count
+          average
+          max
+          min
+        }
+        choicesSummaries {
+          choiceValue
+          averageValue
+          count
+          min
+          max
+        }
+        pathsSummary {
+          mostPopularPath {
+            dialoguePathSummary {
+              countEntries
+            }
+            nodes {
+              id
+              type
+              title
+              layer
+            }
+            edges {
+              id
+              parentNodeId
+              childNodeId
+            }
           }
-          choicesSummaries {
-            choiceValue
-            averageValue
-            count
-            min
-            max
+          mostCriticalPath {
+            dialoguePathSummary {
+              countEntries
+            }
+            nodes {
+              id
+              type
+              title
+              layer
+            }
+            edges {
+              id
+              parentNodeId
+              childNodeId
+            }
           }
         }
       }
@@ -3107,6 +3215,7 @@ export const GetDialogueStatisticsSummaryDocument = gql`
  *   variables: {
  *      dialogueId: // value for 'dialogueId'
  *      filter: // value for 'filter'
+ *      sessionGroupby: // value for 'sessionGroupby'
  *   },
  * });
  */

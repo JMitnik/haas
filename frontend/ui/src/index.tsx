@@ -12,5 +12,6 @@ export * from './Loader';
 export * from './Labels';
 export * from './Nav';
 export * from './Lists';
+export * from './Dropdown';
 export * from './Special';
 export * from './View';

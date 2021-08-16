@@ -194,6 +194,7 @@ export const QuestionNodeType = objectType({
     t.boolean('isRoot');
     t.string('title');
     t.string('updatedAt');
+    t.int('layer', { nullable: true });
 
     t.string('extraContent', {
       nullable: true,

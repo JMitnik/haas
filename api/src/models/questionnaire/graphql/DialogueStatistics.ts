@@ -1,7 +1,8 @@
-import { QuestionNodeType } from '../../QuestionNode';
 import { inputObjectType, objectType, enumType } from '@nexus/schema';
-import { EdgeType } from '../../edge/Edge';
 
+import { QuestionNodeType } from '../../QuestionNode';
+import { EdgeType } from '../../edge/Edge';
+import { DialogueBranchesSummaryType } from './DialogueBranch';
 
 export const DialgoueStatisticsLineChartDataType = objectType({
   name: 'lineChartDataType',
@@ -27,10 +28,10 @@ export const DialoguePathSummaryType = objectType({
   name: 'DialoguePathSummaryType',
 
   definition(t) {
-    t.int('countEntries');
-    t.int('averageValue');
-    t.int('minValue');
-    t.int('maxValue');
+    t.int('countEntries', { nullable: true });
+    t.int('averageValue', { nullable: true });
+    t.int('minValue', { nullable: true });
+    t.int('maxValue', { nullable: true });
   }
 });
 
@@ -39,7 +40,8 @@ export const DialoguePathType = objectType({
   description: 'A generic path in a dialogue, from root to end.',
 
   definition(t) {
-    t.field('dialoguePathSummary', { type: DialoguePathSummaryType });
+    t.field('dialoguePathSummary', { type: DialoguePathSummaryType, nullable: true });
+    t.field('callToAction', { type: QuestionNodeType, nullable: true });
     t.list.field('nodes', { type: QuestionNodeType });
     t.list.field('edges', { type: EdgeType });
   }
@@ -107,7 +109,7 @@ export const DialogueStatisticsSummaryType = objectType({
 
   definition(t) {
     t.field('pathsSummary', { type: DialoguePathsSummaryType, nullable: true });
-    t.field('branchesSummary', { type: DialoguePathsSummaryType, nullable: true });
+    t.field('branchesSummary', { type: DialogueBranchesSummaryType, nullable: true });
 
     t.list.field('sessionsSummaries', {
       type: DialogueStatisticsSessionsSummaryType,
@@ -130,10 +132,12 @@ export const DialogueStatistics = objectType({
       nullable: true,
       type: DialogueStatisticsSummaryType,
       args: { filter: DialogueStatisticsSummaryFilterInput },
-      resolve: (parent, args, ctx) => {
+      resolve: (parent, args, ctx, info) => {
+        const groupBySessions = info.variableValues.sessionGroupby;
         return ctx.services.dialogueStatisticsService.getDialogueStatisticsSummary(
           parent.dialogueId,
-          args.filter || undefined
+          args.filter || undefined,
+          groupBySessions
         );
       }
     });

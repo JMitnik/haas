@@ -1,9 +1,11 @@
-import { DialogueTreeEdgeNode, DialogueTreeNode, DialogueTreePath } from './buildTree';
+import { DialogueTreeEdge, DialogueTreeNode } from '../models/questionnaire/entities/DialogueTreeTypes';
+import { DialogueTreePath } from '../models/questionnaire/entities/DialoguePath';
 
 export const traverseTree = (
-  dialogueTree: DialogueTreeNode,
-  decisionCallback: (dialogueTreeNode: DialogueTreeNode) => DialogueTreeEdgeNode | undefined,
+  dialogueTree: DialogueTreeNode | undefined,
+  decisionCallback: (dialogueTreeNode: DialogueTreeNode) => DialogueTreeEdge | undefined,
 ): DialogueTreePath => {
+  if (!dialogueTree) throw new Error('No node');
   let nodes = [dialogueTree];
   let edges = [];
   let callToActionId: string | undefined = undefined;
@@ -12,7 +14,7 @@ export const traverseTree = (
   let currentNode = dialogueTree;
 
   while (isTraversing) {
-    if (!currentNode.children) {
+    if (!currentNode.isParentNodeOf) {
       isTraversing = false;
       break;
     }
@@ -35,9 +37,9 @@ export const traverseTree = (
     currentNode = nextEdge?.childNode;
   }
 
-  return {
+  return new DialogueTreePath(
     nodes,
     edges,
     callToActionId,
-  };
+  );
 }

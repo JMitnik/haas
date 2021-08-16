@@ -350,6 +350,25 @@ type Dialogue {
   wasGeneratedWithGenData: Boolean!
 }
 
+"""Summary of all branches"""
+type DialogueBranchesSummaryType {
+  negativeBranch: DialogueBranchType
+  neutralBranch: DialogueBranchType
+  positiveBranch: DialogueBranchType
+}
+
+"""Summary of a branch in the dialogue."""
+type DialogueBranchSummaryType {
+  countEntries: Int!
+}
+
+"""Branch in the dialogue."""
+type DialogueBranchType {
+  branchSummary: DialogueBranchSummaryType
+  edges: [Edge!]!
+  nodes: [QuestionNode!]!
+}
+
 type DialogueChoiceSummaryType {
   averageValue: Float!
   choiceValue: String!
@@ -377,15 +396,16 @@ type DialoguePathsSummaryType {
 }
 
 type DialoguePathSummaryType {
-  averageValue: Int!
-  countEntries: Int!
-  maxValue: Int!
-  minValue: Int!
+  averageValue: Int
+  countEntries: Int
+  maxValue: Int
+  minValue: Int
 }
 
 """A generic path in a dialogue, from root to end."""
 type DialoguePathType {
-  dialoguePathSummary: DialoguePathSummaryType!
+  callToAction: QuestionNode
+  dialoguePathSummary: DialoguePathSummaryType
   edges: [Edge!]!
   nodes: [QuestionNode!]!
 }
@@ -421,7 +441,7 @@ enum DialogueStatisticsSummaryGroupby {
 }
 
 type DialogueStatisticsSummaryType {
-  branchesSummary: DialoguePathsSummaryType
+  branchesSummary: DialogueBranchesSummaryType
   choicesSummaries: [DialogueChoiceSummaryType!]
   pathsSummary: DialoguePathsSummaryType
   sessionsSummaries(groupBy: DialogueStatisticsSummaryGroupby): [DialogueStatisticsSessionsSummaryType!]
@@ -926,6 +946,7 @@ type QuestionNode {
   id: ID!
   isLeaf: Boolean!
   isRoot: Boolean!
+  layer: Int
   links: [LinkType!]!
   options: [QuestionOption!]!
   overrideLeaf: QuestionNode

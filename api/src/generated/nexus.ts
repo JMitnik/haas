@@ -558,6 +558,19 @@ export interface NexusGenRootTypes {
     updatedAt?: string | null; // String
   }
   Dialogue: prisma.Dialogue;
+  DialogueBranchSummaryType: { // root type
+    countEntries: number; // Int!
+  }
+  DialogueBranchType: { // root type
+    branchSummary?: NexusGenRootTypes['DialogueBranchSummaryType'] | null; // DialogueBranchSummaryType
+    edges: NexusGenRootTypes['Edge'][]; // [Edge!]!
+    nodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
+  }
+  DialogueBranchesSummaryType: { // root type
+    negativeBranch?: NexusGenRootTypes['DialogueBranchType'] | null; // DialogueBranchType
+    neutralBranch?: NexusGenRootTypes['DialogueBranchType'] | null; // DialogueBranchType
+    positiveBranch?: NexusGenRootTypes['DialogueBranchType'] | null; // DialogueBranchType
+  }
   DialogueChoiceSummaryType: { // root type
     averageValue: number; // Float!
     choiceValue: string; // String!
@@ -571,13 +584,14 @@ export interface NexusGenRootTypes {
     subtext: string; // String!
   }
   DialoguePathSummaryType: { // root type
-    averageValue: number; // Int!
-    countEntries: number; // Int!
-    maxValue: number; // Int!
-    minValue: number; // Int!
+    averageValue?: number | null; // Int
+    countEntries?: number | null; // Int
+    maxValue?: number | null; // Int
+    minValue?: number | null; // Int
   }
   DialoguePathType: { // root type
-    dialoguePathSummary: NexusGenRootTypes['DialoguePathSummaryType']; // DialoguePathSummaryType!
+    callToAction?: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
+    dialoguePathSummary?: NexusGenRootTypes['DialoguePathSummaryType'] | null; // DialoguePathSummaryType
     edges: NexusGenRootTypes['Edge'][]; // [Edge!]!
     nodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
   }
@@ -602,7 +616,7 @@ export interface NexusGenRootTypes {
     startDate: any; // Date!
   }
   DialogueStatisticsSummaryType: { // root type
-    branchesSummary?: NexusGenRootTypes['DialoguePathsSummaryType'] | null; // DialoguePathsSummaryType
+    branchesSummary?: NexusGenRootTypes['DialogueBranchesSummaryType'] | null; // DialogueBranchesSummaryType
     choicesSummaries?: NexusGenRootTypes['DialogueChoiceSummaryType'][] | null; // [DialogueChoiceSummaryType!]
     pathsSummary?: NexusGenRootTypes['DialoguePathsSummaryType'] | null; // DialoguePathsSummaryType
     sessionsSummaries?: NexusGenRootTypes['DialogueStatisticsSessionsSummaryType'][] | null; // [DialogueStatisticsSessionsSummaryType!]
@@ -1062,6 +1076,19 @@ export interface NexusGenFieldTypes {
     updatedAt: string | null; // String
     wasGeneratedWithGenData: boolean; // Boolean!
   }
+  DialogueBranchSummaryType: { // field return type
+    countEntries: number; // Int!
+  }
+  DialogueBranchType: { // field return type
+    branchSummary: NexusGenRootTypes['DialogueBranchSummaryType'] | null; // DialogueBranchSummaryType
+    edges: NexusGenRootTypes['Edge'][]; // [Edge!]!
+    nodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
+  }
+  DialogueBranchesSummaryType: { // field return type
+    negativeBranch: NexusGenRootTypes['DialogueBranchType'] | null; // DialogueBranchType
+    neutralBranch: NexusGenRootTypes['DialogueBranchType'] | null; // DialogueBranchType
+    positiveBranch: NexusGenRootTypes['DialogueBranchType'] | null; // DialogueBranchType
+  }
   DialogueChoiceSummaryType: { // field return type
     averageValue: number; // Float!
     choiceValue: string; // String!
@@ -1075,13 +1102,14 @@ export interface NexusGenFieldTypes {
     subtext: string; // String!
   }
   DialoguePathSummaryType: { // field return type
-    averageValue: number; // Int!
-    countEntries: number; // Int!
-    maxValue: number; // Int!
-    minValue: number; // Int!
+    averageValue: number | null; // Int
+    countEntries: number | null; // Int
+    maxValue: number | null; // Int
+    minValue: number | null; // Int
   }
   DialoguePathType: { // field return type
-    dialoguePathSummary: NexusGenRootTypes['DialoguePathSummaryType']; // DialoguePathSummaryType!
+    callToAction: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
+    dialoguePathSummary: NexusGenRootTypes['DialoguePathSummaryType'] | null; // DialoguePathSummaryType
     edges: NexusGenRootTypes['Edge'][]; // [Edge!]!
     nodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
   }
@@ -1107,7 +1135,7 @@ export interface NexusGenFieldTypes {
     startDate: any; // Date!
   }
   DialogueStatisticsSummaryType: { // field return type
-    branchesSummary: NexusGenRootTypes['DialoguePathsSummaryType'] | null; // DialoguePathsSummaryType
+    branchesSummary: NexusGenRootTypes['DialogueBranchesSummaryType'] | null; // DialogueBranchesSummaryType
     choicesSummaries: NexusGenRootTypes['DialogueChoiceSummaryType'][] | null; // [DialogueChoiceSummaryType!]
     pathsSummary: NexusGenRootTypes['DialoguePathsSummaryType'] | null; // DialoguePathsSummaryType
     sessionsSummaries: NexusGenRootTypes['DialogueStatisticsSessionsSummaryType'][] | null; // [DialogueStatisticsSessionsSummaryType!]
@@ -1322,6 +1350,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     isLeaf: boolean; // Boolean!
     isRoot: boolean; // Boolean!
+    layer: number | null; // Int
     links: NexusGenRootTypes['LinkType'][]; // [LinkType!]!
     options: NexusGenRootTypes['QuestionOption'][]; // [QuestionOption!]!
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
@@ -1776,7 +1805,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "AWSImageType" | "AutodeckConnectionType" | "CampaignType" | "CampaignVariantType" | "ColourSettings" | "CreateBatchDeliveriesOutputType" | "CreateWorkspaceJobType" | "CustomFieldType" | "Customer" | "CustomerSettings" | "DeleteUserOutput" | "DeliveryConnectionType" | "DeliveryEventType" | "DeliveryType" | "Dialogue" | "DialogueChoiceSummaryType" | "DialogueFinisherObjectType" | "DialoguePathSummaryType" | "DialoguePathType" | "DialoguePathsSummaryType" | "DialogueStatistics" | "DialogueStatisticsSessionsSummaryType" | "DialogueStatisticsSummaryType" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "JobObjectType" | "JobProcessLocation" | "JobProcessLocations" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "NodeStatisticsType" | "PaginationPageInfo" | "PermssionType" | "PreviewDataType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "AWSImageType" | "AutodeckConnectionType" | "CampaignType" | "CampaignVariantType" | "ColourSettings" | "CreateBatchDeliveriesOutputType" | "CreateWorkspaceJobType" | "CustomFieldType" | "Customer" | "CustomerSettings" | "DeleteUserOutput" | "DeliveryConnectionType" | "DeliveryEventType" | "DeliveryType" | "Dialogue" | "DialogueBranchSummaryType" | "DialogueBranchType" | "DialogueBranchesSummaryType" | "DialogueChoiceSummaryType" | "DialogueFinisherObjectType" | "DialoguePathSummaryType" | "DialoguePathType" | "DialoguePathsSummaryType" | "DialogueStatistics" | "DialogueStatisticsSessionsSummaryType" | "DialogueStatisticsSummaryType" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "JobObjectType" | "JobProcessLocation" | "JobProcessLocations" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "NodeStatisticsType" | "PaginationPageInfo" | "PermssionType" | "PreviewDataType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "AdjustedImageInput" | "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomFieldInputType" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DeliveryConnectionFilter" | "DialogueFilterInputType" | "DialogueStatisticsSummaryFilterInput" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GenerateAutodeckInput" | "GetCampaignsInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RemovePixelRangeInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput" | "VideoNodeEntryInput" | "createJobProcessLocationInput";
 

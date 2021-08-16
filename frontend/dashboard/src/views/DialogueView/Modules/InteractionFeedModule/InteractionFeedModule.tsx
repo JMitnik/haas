@@ -1,4 +1,4 @@
-import { Card, CardBody, Div, Flex, H4, Text } from '@haas/ui';
+import * as UI from '@haas/ui';
 import { Info } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
@@ -12,10 +12,13 @@ const InteractionFeedModule = ({ interactions }: { interactions: Session[] }) =>
   const { t } = useTranslation();
 
   return (
-    <Card bg="white" noHover>
-      <CardBody useFlex height="100%" flexDirection="column">
-        <Text mb={2} fontSize="1.2rem" color="gray.400">{t('latest_interactions')}</Text>
-
+    <UI.Card bg="white">
+      <UI.CardHead bg="gray.50">
+        <UI.Text color="gray.500">
+          {t('latest_interactions')}
+        </UI.Text>
+      </UI.CardHead>
+      <UI.CardBody useFlex height="100%" flexDirection="column">
         <InteractionFeedEntriesContainer>
           {interactions?.length > 0 && interactions?.map((interaction, index) => (
             <InteractionFeedEntry
@@ -26,15 +29,15 @@ const InteractionFeedModule = ({ interactions }: { interactions: Session[] }) =>
         </InteractionFeedEntriesContainer>
 
         {(interactions?.length === 0 || (!interactions)) && (
-          <Flex flexGrow={1} justifyContent="center" alignItems="center">
-            <Div color="default.darker" marginRight="5px">
+          <UI.Flex flexGrow={1} justifyContent="center" alignItems="center">
+            <UI.Div color="default.darker" marginRight="5px">
               <Info />
-            </Div>
-            <H4 color="default.darker">No data available</H4>
-          </Flex>
+            </UI.Div>
+            <UI.H4 color="default.darker">No data available</UI.H4>
+          </UI.Flex>
         )}
-      </CardBody>
-    </Card>
+      </UI.CardBody>
+    </UI.Card>
   );
 };
 

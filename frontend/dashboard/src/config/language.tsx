@@ -1,6 +1,26 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    frequent_answers_heading: {
+      en: 'Frequently answered',
+      de: 'Häufig beantwortet',
+    },
+    count_heading: {
+      en: 'Number of interactions',
+      de: 'Anzahl der Wechselwirkungen.',
+    },
+    count: {
+      en: 'Interactions',
+      de: 'Wechselwirkungen',
+    },
+    score_heading: {
+      en: 'Average score',
+      de: 'Durchschnittliche Punktzahl',
+    },
+    score: {
+      en: 'Score',
+      de: 'Punktzahl',
+    },
     go_to_alerts: {
       en: 'All alerts',
       de: 'Alle Alerts',

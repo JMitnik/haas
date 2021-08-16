@@ -11,7 +11,6 @@ const FallbackContainer = styled(Div)`
     > ${Text} {
         padding: ${theme.gutter}px;
         position: relative;
-        z-index: 300;
     }
 
     > ${Div} {

@@ -25,7 +25,9 @@ export class DialogueStatisticsPrismaAdapter {
             },
           }
         },
-        edges: true
+        edges: {
+          include: { conditions: true }
+        }
       }
     });
 
@@ -46,6 +48,9 @@ export class DialogueStatisticsPrismaAdapter {
           { createdAt: startDate ? { gte: new Date(startDate) } : undefined },
           { createdAt: endDate ? { lte: new Date(endDate) } : undefined },
         ]
+      },
+      orderBy: {
+        createdAt: 'asc'
       },
       include: {
         nodeEntries: {
@@ -129,5 +134,26 @@ export class DialogueStatisticsPrismaAdapter {
     })
 
     return nodeEntryCounts;
+  }
+
+  /**
+   * Group entries by node, between
+   */
+  groupNodeEntriesBetweenDates = async (dialogueId: string, startDate?: Date, endDate?: Date) => {
+    return await this.prisma.nodeEntry.groupBy({
+      by: ['relatedNodeId'],
+      _count: true,
+      where: {
+        AND: [{
+          relatedNode: {
+            questionDialogueId: dialogueId,
+          },
+          creationDate: {
+            gt: startDate ? startDate: undefined,
+            lt: endDate ? endDate: undefined,
+          }
+        }]
+      },
+    });
   }
 }
