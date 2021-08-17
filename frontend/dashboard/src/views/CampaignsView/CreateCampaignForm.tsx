@@ -265,7 +265,7 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
           weight: variant.weight,
           from: variant.from || undefined,
           type: variant.type as CampaignVariantEnum,
-          customVariables: form.getValues().customVariables,
+          customVariables: form.getValues().customVariables?.map((val) => val || { key: '' }),
           workspaceId: activeCustomer?.id || '',
         })),
       },
