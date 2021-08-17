@@ -66,6 +66,12 @@ export type CampaignTypeDeliveryConnectionArgs = {
   filter?: Maybe<DeliveryConnectionFilter>;
 };
 
+export type CampaignVariantCustomVariableType = {
+  __typename?: 'CampaignVariantCustomVariableType';
+  id: Scalars['ID'];
+  key: Scalars['String'];
+};
+
 export enum CampaignVariantEnum {
   Sms = 'SMS',
   Email = 'EMAIL',
@@ -81,8 +87,9 @@ export type CampaignVariantType = {
   body: Scalars['String'];
   from?: Maybe<Scalars['String']>;
   type: CampaignVariantEnum;
-  workspace: Customer;
-  dialogue: Dialogue;
+  workspace?: Maybe<Customer>;
+  dialogue?: Maybe<Dialogue>;
+  customVariables?: Maybe<Array<CampaignVariantCustomVariableType>>;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
@@ -128,6 +135,10 @@ export type CreateBatchDeliveriesOutputType = {
   nrDeliveries: Scalars['Int'];
 };
 
+export type CreateCampaignCustomVariable = {
+  key?: Maybe<Scalars['String']>;
+};
+
 export type CreateCampaignInputType = {
   label?: Maybe<Scalars['String']>;
   workspaceId: Scalars['ID'];
@@ -135,14 +146,15 @@ export type CreateCampaignInputType = {
 };
 
 export type CreateCampaignVariantInputType = {
-  label?: Maybe<Scalars['String']>;
   workspaceId: Scalars['ID'];
   dialogueId: Scalars['ID'];
-  from?: Maybe<Scalars['String']>;
-  type: CampaignVariantEnum;
+  label?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['String']>;
-  weight?: Maybe<Scalars['Float']>;
+  from?: Maybe<Scalars['String']>;
   subject?: Maybe<Scalars['String']>;
+  weight?: Maybe<Scalars['Float']>;
+  type: CampaignVariantEnum;
+  customVariables?: Maybe<Array<CreateCampaignCustomVariable>>;
 };
 
 export type CreateCtaInputType = {
@@ -1967,13 +1979,16 @@ export type GetWorkspaceCampaignQuery = (
       )>, variants: Array<(
         { __typename?: 'CampaignVariantType' }
         & Pick<CampaignVariantType, 'id' | 'label' | 'from' | 'type' | 'weight' | 'body'>
-        & { dialogue: (
+        & { customVariables?: Maybe<Array<(
+          { __typename?: 'CampaignVariantCustomVariableType' }
+          & Pick<CampaignVariantCustomVariableType, 'id' | 'key'>
+        )>>, dialogue?: Maybe<(
           { __typename?: 'Dialogue' }
           & Pick<Dialogue, 'id' | 'title'>
-        ), workspace: (
+        )>, workspace?: Maybe<(
           { __typename?: 'Customer' }
           & Pick<Customer, 'id'>
-        ) }
+        )> }
       )> }
     )> }
   )> }
@@ -2679,6 +2694,10 @@ export const GetWorkspaceCampaignDocument = gql`
         type
         weight
         body
+        customVariables {
+          id
+          key
+        }
         dialogue {
           id
           title
