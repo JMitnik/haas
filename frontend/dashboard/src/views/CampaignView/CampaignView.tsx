@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import { AtSign, Clock, Eye, Flag, Mail, Plus, Settings, Smartphone } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { format } from 'date-fns';
+import { union } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
@@ -115,6 +116,7 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
 
 const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
   label: campaign.label,
+  customVariables: union(campaign.variants.map((variant) => variant.customVariables.map((variable) => variable.key))),
   variants: campaign.variants.map((variant) => ({
     body: variant.body,
     dialogue: { label: variant.dialogue.title, value: variant.dialogue.id },
@@ -122,7 +124,7 @@ const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
     label: variant.label,
     type: variant.type,
     weight: variant.weight,
-  }))
+  })),
 });
 
 export const CampaignView = () => {

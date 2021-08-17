@@ -99,6 +99,7 @@ export const GetCampaignVariantOfDelivery = extendType({
                 CampaignVariantToCampaign: true,
                 dialogue: true,
                 workspace: true,
+                customVariables: true,
               }
             }
           }
@@ -113,7 +114,8 @@ export const GetCampaignVariantOfDelivery = extendType({
           label: campaignVariant.label,
           weight: campaignVariant.CampaignVariantToCampaign[0].weight,
           workspace: campaignVariant.workspace,
-          type: campaignVariant.type
+          type: campaignVariant.type,
+          customVariables: campaignVariant.customVariables,
         };
       }
     })

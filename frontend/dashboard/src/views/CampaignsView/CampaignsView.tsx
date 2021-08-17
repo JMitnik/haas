@@ -8,9 +8,9 @@ import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 
 import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
+import CreateCampaignForm from './CreateCampaignForm';
 import Select from 'react-select';
 import useAuth from 'hooks/useAuth';
-import CreateCampaignForm from './CreateCampaignForm';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
