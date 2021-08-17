@@ -3,8 +3,7 @@ import { UserInputError } from 'apollo-server';
 
 import { NexusGenFieldTypes } from '../../../generated/nexus';
 import { PaginationWhereInput } from '../../general/Pagination';
-import { CampaignVariantModel } from './CampaignModel';
-import { CampaignService } from '../CampaignService';
+import { CampaignVariantModel } from './CampaignVariantModel';
 
 
 export const DeliveryStatusEnum = enumType({

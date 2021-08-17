@@ -1,10 +1,13 @@
 import { addDays } from 'date-fns';
 import { uniqueId } from 'lodash';
+
 import prisma from '../../config/prisma';
 import AWS from '../../config/aws';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { DeliveryStatusTypeEnum, Prisma, PrismaClient } from '@prisma/client';
+import { CampaignPrismaAdapter } from './CampaignPrismaAdapter';
+import { CampaignWithVariants } from './CampaignTypes';
 
 interface DeliveryOptionsProps {
   status?: DeliveryStatusTypeEnum;
@@ -18,11 +21,18 @@ interface DeliveryUpdateItemProps {
 }
 
 export class CampaignService {
-  prisma: PrismaClient
+  prisma: PrismaClient;
+  prismaAdapter: CampaignPrismaAdapter;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
+    this.prismaAdapter = new CampaignPrismaAdapter(prisma);
   }
+
+  findCampaign = async (campaignId: string, workspaceId: string): Promise<CampaignWithVariants | null> => {
+    return this.prismaAdapter.findCampaign(campaignId, workspaceId);
+  }
+
   /**
    * Gets paginated deliveries given a `campaignId`, generic `paginationOptions` and specific
    * delivery-centric access options.

@@ -3,23 +3,36 @@ import { inputObjectType, mutationField } from '@nexus/schema';
 import { isPresent } from 'ts-is-present';
 
 import { Prisma } from '@prisma/client';
-import { CampaignModel, CampaignVariantEnum } from './CampaignModel';
+import { CampaignModel } from './CampaignModel';
+import { CampaignVariantEnum } from './CampaignVariantModel';
 import { NexusGenInputs } from '../../../generated/nexus';
 import prisma from '../../../config/prisma';
+
+export const CreateCampaignCustomVariable = inputObjectType({
+  name: 'CreateCampaignCustomVariable',
+
+  definition(t) {
+    t.string('key');
+  },
+});
 
 export const CreateCampaignVariantInputType = inputObjectType({
   name: 'CreateCampaignVariantInputType',
   definition(t) {
-    t.string('label');
     t.id('workspaceId', { required: true });
     t.id('dialogueId', { required: true });
-    t.string('from', { required: false });
-    t.field('type', { type: CampaignVariantEnum, required: true });
+
+    t.string('label');
     t.string('body');
-    t.float('weight');
+    t.string('from', { required: false });
     t.string('subject', { required: false });
+    t.float('weight');
+
+    t.field('type', { type: CampaignVariantEnum, required: true });
+    t.list.field('customVariables', { type: CreateCampaignCustomVariable, required: false });
   },
 });
+
 
 export const CreateCampaignInputType = inputObjectType({
   name: 'CreateCampaignInputType',
@@ -58,6 +71,13 @@ const saveCampaign = (input: NexusGenInputs['CreateCampaignInputType']): Prisma.
           from: variant.from,
           type: variant.type,
           body: variant.body || '',
+          customVariables: {
+            createMany: {
+              data: variant.customVariables?.map(variable => ({
+                key: variable.key || '',
+              })) || []
+            },
+          },
           dialogue: {
             connect: { id: variant.dialogueId },
           },

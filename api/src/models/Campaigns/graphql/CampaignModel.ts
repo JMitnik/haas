@@ -1,29 +1,7 @@
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
-import { ApolloError } from 'apollo-server';
-import { CustomerType } from '../../customer/Customer';
-import { DialogueType } from '../../questionnaire/Dialogue';
+import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { ApolloError, UserInputError } from 'apollo-server';
+import { CampaignVariantModel } from './CampaignVariantModel';
 
-export const CampaignVariantEnum = enumType({
-  name: 'CampaignVariantEnum',
-
-  members: ['SMS', 'EMAIL', 'QUEUE'],
-});
-
-export const CampaignVariantModel = objectType({
-  name: 'CampaignVariantType',
-  description: 'Variant of campaign',
-
-  definition(t) {
-    t.id('id');
-    t.string('label');
-    t.int('weight');
-    t.string('body');
-    t.string('from', { nullable: true });
-    t.field('type', { type: CampaignVariantEnum });
-    t.field('workspace', { type: CustomerType });
-    t.field('dialogue', { type: DialogueType });
-  }
-})
 
 export const CampaignModel = objectType({
   name: 'CampaignType',
@@ -55,27 +33,12 @@ export const GetCampaignOfWorkspace = extendType({
       args: { campaignId: 'String' },
       nullable: true,
       resolve: async (parent, args, ctx) => {
-        const workspaceWithCampaign = await ctx.prisma.campaign.findFirst({
-          where: {
-            AND: [
-              { workspaceId: parent.id },
-              { id: args.campaignId || '' },
-            ]
-          },
-          include: {
-            deliveries: true,
-            variantsEdges: {
-              include: {
-                campaignVariant: {
-                  include: {
-                    dialogue: true,
-                    workspace: true,
-                  }
-                },
-              }
-            }
-          }
-        });
+        if (!args.campaignId) throw new UserInputError('Missing campaign id');
+
+        const workspaceWithCampaign = await ctx.services.campaignService.findCampaign(
+          parent.id,
+          args.campaignId,
+        );
 
         if (!workspaceWithCampaign) return null;
 
@@ -90,11 +53,11 @@ export const GetCampaignOfWorkspace = extendType({
               workspace: variantEdge.campaignVariant.workspace,
             }))
           ]
-        } as any;
+        };
       }
     })
   }
-})
+});
 
 /**
  * Access pattern for accessign all campaigns belonging to a workspace.

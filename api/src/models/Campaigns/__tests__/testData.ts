@@ -46,3 +46,36 @@ export const SAMPLE_CAMPAIGN_SIMPLE: Prisma.CampaignCreateInput = {
     }]
   }
 };
+
+export const SAMPLE_CAMPAIGN_WITH_CUSTOM_VARIABLES: Prisma.CampaignCreateInput = {
+  id: 'TEST_CAMPAIGN',
+  label: 'test',
+  workspace: { connect: { id: SAMPLE_WORKSPACE.id } },
+  variantsEdges: {
+    create: [{
+      weight: 50,
+      campaignVariant: {
+        create: {
+          id: 'TEST_VARIANT_1',
+          body: 'Dear {{ firstName }}, how are you?',
+          dialogue: { connect: { id: SAMPLE_DIALOGUE.id } },
+          label: 'Test Campaign',
+          type: 'QUEUE',
+          workspace: { connect: { id: SAMPLE_WORKSPACE.id } },
+        }
+      }
+    }, {
+      weight: 50,
+      campaignVariant: {
+        create: {
+          id: 'TEST_VARIANT_2',
+          body: 'Dear {{ firstName }}, how are you?',
+          dialogue: { connect: { id: SAMPLE_DIALOGUE.id } },
+          label: 'Test Campaign',
+          type: 'QUEUE',
+          workspace: { connect: { id: SAMPLE_WORKSPACE.id } },
+        }
+      }
+    }]
+  }
+};
