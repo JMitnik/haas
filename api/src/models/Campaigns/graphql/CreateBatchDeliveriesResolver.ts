@@ -40,7 +40,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
     if (!args.input.batchScheduledAt) throw new UserInputError('No scheduled date provided!');
 
     const callbackUrl = `${ctx.session?.baseUrl}/webhooks/delivery`;
-    const records = await parseCsv(args.input.uploadedCsv);
+    const records = await parseCsv(await args.input.uploadedCsv);
 
     return await ctx.services.campaignService.createBatchDeliveries(
       args.input.campaignId,
