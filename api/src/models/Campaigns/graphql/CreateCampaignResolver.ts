@@ -1,25 +1,34 @@
 import { UserInputError } from 'apollo-server';
 import { inputObjectType, mutationField } from '@nexus/schema';
-import { isPresent } from 'ts-is-present';
 
-import { Prisma } from '@prisma/client';
-import { CampaignModel, CampaignVariantEnum } from './CampaignModel';
-import { NexusGenInputs } from '../../../generated/nexus';
-import prisma from '../../../config/prisma';
+import { CampaignModel } from './CampaignModel';
+import { CampaignVariantEnum } from './CampaignVariantModel';
+
+export const CreateCampaignCustomVariable = inputObjectType({
+  name: 'CreateCampaignCustomVariable',
+
+  definition(t) {
+    t.string('key');
+  },
+});
 
 export const CreateCampaignVariantInputType = inputObjectType({
   name: 'CreateCampaignVariantInputType',
   definition(t) {
-    t.string('label');
     t.id('workspaceId', { required: true });
     t.id('dialogueId', { required: true });
-    t.string('from', { required: false });
-    t.field('type', { type: CampaignVariantEnum, required: true });
+
+    t.string('label');
     t.string('body');
-    t.float('weight');
+    t.string('from', { required: false });
     t.string('subject', { required: false });
+    t.float('weight');
+
+    t.field('type', { type: CampaignVariantEnum, required: true });
+    t.list.field('customVariables', { type: CreateCampaignCustomVariable, required: false });
   },
 });
+
 
 export const CreateCampaignInputType = inputObjectType({
   name: 'CreateCampaignInputType',
@@ -30,69 +39,13 @@ export const CreateCampaignInputType = inputObjectType({
   },
 });
 
-const validateProbabilityEdges = (input: NexusGenInputs['CreateCampaignInputType']) => {
-  const weights = input.variants?.map((variant) => variant.weight).filter(isPresent) || [];
-
-  const totalWeight = weights?.reduce((total, weight) => total + weight);
-
-  // Since approximation, let's do it like this
-  if (totalWeight !== 100) {
-    throw new UserInputError('Weights do not sum up to 100%');
-  }
-};
-
-const saveCampaign = (input: NexusGenInputs['CreateCampaignInputType']): Prisma.CampaignCreateInput => ({
-  label: input.label || '',
-  workspace: {
-    connect: {
-      id: input.workspaceId,
-    },
-  },
-  variantsEdges: {
-    create: input.variants?.map((variant) => ({
-      weight: variant.weight ?? 50,
-      campaignVariant: {
-        create: {
-          label: variant.label || '',
-          subject: variant.subject,
-          from: variant.from,
-          type: variant.type,
-          body: variant.body || '',
-          dialogue: {
-            connect: { id: variant.dialogueId },
-          },
-          workspace: {
-            connect: { id: variant.workspaceId },
-          },
-        },
-      },
-    })),
-  },
-});
-
 export const CreateCampaignResolver = mutationField('createCampaign', {
   type: CampaignModel,
   args: { input: CreateCampaignInputType },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('Empty input!');
-    validateProbabilityEdges(args?.input);
-
-    const campaign = await prisma.campaign.create({
-      data: saveCampaign(args.input),
-      include: {
-        variantsEdges: {
-          include: {
-            campaignVariant: {
-              include: {
-                dialogue: true,
-                workspace: true
-              }
-            }
-          }
-        }
-      }
-    });
+    const campaign = await ctx.services.campaignService.createCampaign(args.input);
 
     return {
       ...campaign,

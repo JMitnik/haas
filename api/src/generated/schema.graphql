@@ -41,6 +41,11 @@ type CampaignType {
   variants: [CampaignVariantType!]!
 }
 
+type CampaignVariantCustomVariableType {
+  id: ID!
+  key: String!
+}
+
 enum CampaignVariantEnum {
   EMAIL
   QUEUE
@@ -50,14 +55,15 @@ enum CampaignVariantEnum {
 """Variant of campaign"""
 type CampaignVariantType {
   body: String!
+  customVariables: [CampaignVariantCustomVariableType!]
   deliveryConnection: DeliveryConnectionType
-  dialogue: Dialogue!
+  dialogue: Dialogue
   from: String
   id: ID!
   label: String!
   type: CampaignVariantEnum!
   weight: Int!
-  workspace: Customer!
+  workspace: Customer
 }
 
 """Input type for a choice node"""
@@ -100,6 +106,10 @@ type CreateBatchDeliveriesOutputType {
   nrDeliveries: Int!
 }
 
+input CreateCampaignCustomVariable {
+  key: String
+}
+
 input CreateCampaignInputType {
   label: String
   variants: [CreateCampaignVariantInputType!]
@@ -108,6 +118,7 @@ input CreateCampaignInputType {
 
 input CreateCampaignVariantInputType {
   body: String
+  customVariables: [CreateCampaignCustomVariable!]
   dialogueId: ID!
   from: String
   label: String
