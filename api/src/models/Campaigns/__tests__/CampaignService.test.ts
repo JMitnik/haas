@@ -11,7 +11,7 @@ const campaignService = new CampaignService(prisma);
 
 const makeDelivery = (
   nrDeliveries: number,
-  campaignId: string,
+  campaignId: string = '',
   variantId: string,
   status: DeliveryStatusTypeEnum,
   customVariables?: any,
@@ -37,7 +37,7 @@ const DELIVERIES_B_DEPLOYED: Prisma.DeliveryCreateInput[] = makeDelivery(5, SAMP
 
 const ALL_DELIVERIES = [...DELIVERIES_A_SCHEDULED, ...DELIVERIES_B_SCHEDULED, ...DELIVERIES_A_DEPLOYED, ...DELIVERIES_B_DEPLOYED];
 
-describe('CampaignService:pagination', () => {
+describe('CampaignService', () => {
   beforeEach(async () => {
     await prepData(
       prisma,
@@ -80,5 +80,124 @@ describe('CampaignService:pagination', () => {
     );
 
     expect(deliveryPagination.entries.length).toBe(10 + 5);
+  });
+
+  test('it invalidates a random entry correctly', async () => {
+    const campaign = await campaignService.findCampaign(SAMPLE_CAMPAIGN_SIMPLE?.id || '');
+    const { erroredRecords } = campaignService.validateDeliveryRows(
+      [{ test: 'test' }],
+      campaign?.variantsEdges.map(edge => ({
+        ...edge.campaignVariant,
+        type: 'EMAIL',
+      }))
+    );
+    expect(erroredRecords).toHaveLength(1);
+  });
+
+  test('it validates a good entry correctly, and checks custom variables', async () => {
+    const campaign = await campaignService.createCampaign({
+      workspaceId: SAMPLE_WORKSPACE.id,
+      label: 'Test',
+      variants: [{
+        weight: 100,
+        customVariables: [{
+          key: 'energyLabel'
+        }],
+        dialogueId: SAMPLE_DIALOGUE.id,
+        type: 'QUEUE',
+        workspaceId: SAMPLE_WORKSPACE.id,
+        body: 'Dear {{ firstName }}, happy to hear you join us at {{ energyLabel }}.',
+      }],
+    });
+
+    const { successRecords, erroredRecords } = campaignService.validateDeliveryRows(
+      [{ email: 'jason@jason.com', age: 22, energyLabel: 'Test'  }],
+      campaign?.variantsEdges.map(edge => ({
+        ...edge.campaignVariant,
+        type: 'EMAIL',
+      }))
+    );
+
+    expect(erroredRecords).toHaveLength(0);
+    expect(successRecords[0]).not.toHaveProperty('age');
+    expect(successRecords[0]).toHaveProperty('energyLabel');
+    expect(successRecords[0]['energyLabel']).toEqual('Test');
+  });
+
+  test('can extract custom variables', async () => {
+    const campaign = await campaignService.createCampaign({
+      workspaceId: SAMPLE_WORKSPACE.id,
+      label: 'Test',
+      variants: [{
+        weight: 100,
+        customVariables: [{
+          key: 'energyLabel'
+        }],
+        dialogueId: SAMPLE_DIALOGUE.id,
+        type: 'QUEUE',
+        workspaceId: SAMPLE_WORKSPACE.id,
+        body: 'Dear {{ firstName }}, happy to hear you join us at {{ energyLabel }}.',
+      }],
+    });
+
+    const records = [{
+      firstName: 'Joseph',
+      lastName: 'Joestar',
+      age: 32,
+      energyLabel: 'Private Corp',
+    }];
+
+    const customVariables = campaignService.extractCustomVariablesFromCSVRecord(
+      campaign.variantsEdges?.map(edge => edge.campaignVariant),
+      records[0]
+    );
+
+    expect(customVariables).toHaveProperty('energyLabel')
+    expect(customVariables['energyLabel']).toEqual('Private Corp');
+    expect(customVariables).not.toHaveProperty('age');
+  });
+
+  test('can render body correctly with custom variable', async () => {
+    const campaign = await campaignService.createCampaign({
+      workspaceId: SAMPLE_WORKSPACE.id,
+      label: 'Test',
+      variants: [{
+        weight: 100,
+        customVariables: [{
+          key: 'energyLabel'
+        }],
+        dialogueId: SAMPLE_DIALOGUE.id,
+        type: 'QUEUE',
+        workspaceId: SAMPLE_WORKSPACE.id,
+        body: 'Dear {{ firstName }}, happy to hear you join us at {{ energyLabel }}.',
+      }],
+    });
+
+    const records = [{
+      firstName: 'Joseph',
+      lastName: 'Joestar',
+      age: 32,
+      energyLabel: 'Private Corp',
+    },
+    {
+      firstName: 'Josuke',
+      lastName: 'Joestar',
+    }];
+
+    const bodies = records.map(record => {
+      const customVariables = campaignService.extractCustomVariablesFromCSVRecord(
+        campaign.variantsEdges?.map(edge => edge.campaignVariant),
+        record
+      );
+
+      const body = campaignService.renderBody(
+        campaign.variantsEdges[0].campaignVariant.body,
+        { firstName: record.firstName, ...customVariables }
+      );
+      return body;
+    });
+
+    expect(bodies[0]).toEqual('Dear Joseph, happy to hear you join us at Private Corp.');
+    expect(bodies[1]).toEqual('Dear Josuke, happy to hear you join us at .');
   });
 });

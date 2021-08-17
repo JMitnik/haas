@@ -24,6 +24,7 @@ export const clearDatabase = async (prisma: PrismaClient) => {
   if (process.env.NODE_ENV === 'test') {
     await prisma.$transaction([
       prisma.delivery.deleteMany({}),
+      prisma.campaignVariantCustomVariable.deleteMany({}),
       prisma.campaignVariantToCampaign.deleteMany({}),
       prisma.campaignVariant.deleteMany({}),
       prisma.campaign.deleteMany({}),

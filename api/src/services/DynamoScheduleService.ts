@@ -44,8 +44,6 @@ class DynamoScheduleService {
     batchGroups.forEach(async (batch) => {
       const processedBatch = DynamoScheduleService.processBatchForDynamo(batch, schedulerOptions);
 
-      console.log(JSON.stringify(processedBatch));
-
       dynamoClient.batchWriteItem(processedBatch, (err, data) => {
         if (err) console.log(err, err.stack); // an error occurred
         else console.log(data); // successful response
