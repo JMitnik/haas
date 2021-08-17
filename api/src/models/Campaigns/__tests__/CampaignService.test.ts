@@ -257,7 +257,7 @@ describe('CampaignService', () => {
     );
 
     const campaignWithDeliveries = await campaignService.findCampaign(campaign.id);
-    expect(campaignWithDeliveries.deliveries.length).toEqual(2);
+    expect(campaignWithDeliveries?.deliveries.length).toEqual(2);
 
     expect(campaignService.dynamoScheduleService.batchScheduleOneOffs).toHaveBeenCalledTimes(1);
     expect(campaignService.dynamoScheduleService.batchScheduleOneOffs).toHaveBeenCalledWith(
