@@ -125,7 +125,7 @@ export class CampaignService {
     inputCsv: File,
     scheduledTimeStamp: string,
     callbackUrl: string
-  ) => {
+  ): Promise<NexusGenFieldTypes['CreateBatchDeliveriesOutputType']> => {
     const campaign = await this.findCampaign(campaignId);
     if (!campaign) throw new UserInputError('Related campaign does not exist');
 
@@ -152,7 +152,7 @@ export class CampaignService {
     return {
       nrDeliveries: createdDatabaseRecords.filter((item) => item).length,
       failedDeliveries: erroredRecords,
-    } as any;
+    };
   };
 
   /**

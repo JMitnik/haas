@@ -1,14 +1,5 @@
 import { UserInputError } from 'apollo-server';
 import { inputObjectType, mutationField, objectType } from '@nexus/schema';
-import { nanoid } from 'nanoid';
-import format from 'date-fns/format';
-import mustache from 'mustache';
-import { CampaignVariantTypeEnum, DeliveryStatusTypeEnum } from '@prisma/client';
-
-import { parseCsv } from '../../../utils/parseCsv';
-import { probability } from '../../../utils/probability';
-import prisma from '../../../config/prisma';
-import DynamoScheduleService from '../../../services/DynamoScheduleService';
 
 export const CreateBatchDeliveriesInputType = inputObjectType({
   name: 'CreateBatchDeliveriesInputType',
