@@ -6,7 +6,7 @@ const language = {
       de: 'Benutzerdefinierte Variablen',
     },
     custom_variables_helper: {
-      en: 'With custom variables, you can inject your own variables. Add a whitelist of allowed custom variables, and use them with {{customVariable}}.',
+      en: 'With custom variables, you can inject your own variables. Add a whitelist of allowed custom variables, and use them in your body.',
       de: 'Mit benutzerdefinierten Variablen können Sie Ihre eigenen Variablen injizieren. Fügen Sie einen Whitelisten von erlaubten benutzerdefinierten Variablen hinzu und verwenden Sie sie mit {{customvariable}}.',
     },
     go_to_alerts: {
