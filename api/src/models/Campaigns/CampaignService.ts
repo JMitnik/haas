@@ -28,12 +28,22 @@ export class CampaignService {
   /**
    * Create a campaign.
    */
-  createCampaign = (input: NexusGenInputs['CreateCampaignInputType']) => {
+  createCampaign = async (input: NexusGenInputs['CreateCampaignInputType']) => {
     this.validateCampaignEdges(input);
 
     return this.prismaAdapter.createCampaign(input);
   }
 
+  /**
+   * Find all campaigns of workspace.
+   */
+  findCampaignsOfWorkspace = async (workspaceId: string) => {
+    return this.prismaAdapter.findCampaignsOfWorkspace(workspaceId);
+  }
+
+  /**
+   * Find campaign by ID.
+   */
   findCampaign = async (campaignId: string): Promise<CampaignWithVariants | null> => {
     return this.prismaAdapter.findCampaign(campaignId);
   }
