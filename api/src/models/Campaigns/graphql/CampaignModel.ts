@@ -35,10 +35,7 @@ export const GetCampaignOfWorkspace = extendType({
       resolve: async (parent, args, ctx) => {
         if (!args.campaignId) throw new UserInputError('Missing campaign id');
 
-        const workspaceWithCampaign = await ctx.services.campaignService.findCampaign(
-          parent.id,
-          args.campaignId,
-        );
+        const workspaceWithCampaign = await ctx.services.campaignService.findCampaign(args.campaignId);
 
         if (!workspaceWithCampaign) return null;
 
