@@ -6,7 +6,6 @@ datasource postgresql {
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["transactionApi"]
   output          = "./node_modules/@prisma/client"
 }
 

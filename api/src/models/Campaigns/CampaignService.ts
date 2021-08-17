@@ -4,7 +4,7 @@ import prisma from '../../config/prisma';
 import AWS from '../../config/aws';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
-import { DeliveryStatusTypeEnum, Prisma } from '@prisma/client';
+import { DeliveryStatusTypeEnum, Prisma, PrismaClient } from '@prisma/client';
 
 interface DeliveryOptionsProps {
   status?: DeliveryStatusTypeEnum;
@@ -18,13 +18,18 @@ interface DeliveryUpdateItemProps {
 }
 
 export class CampaignService {
+  prisma: PrismaClient
+
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
   /**
    * Gets paginated deliveries given a `campaignId`, generic `paginationOptions` and specific
    * delivery-centric access options.
    * @param campaignId
    * @param paginationOptions
    */
-  static getPaginatedDeliveries<GenericModelType>(
+  getPaginatedDeliveries<GenericModelType>(
     campaignId: string,
     paginationOptions?: NexusGenInputs['PaginationWhereInput'],
     deliveryOptions?: DeliveryOptionsProps
@@ -39,13 +44,13 @@ export class CampaignService {
       },
     };
 
-    const findManyDeliveriesCallback = ({ props: findManyArgs }: FindManyCallBackProps) => prisma.delivery.findMany({
+    const findManyDeliveriesCallback = ({ props: findManyArgs }: FindManyCallBackProps) => this.prisma.delivery.findMany({
       ...findManyArgs,
       include: {
         events: true
       }
     });
-    const countDeliveriesCallback = async ({ props: countArgs }: FindManyCallBackProps) => prisma.delivery.count(countArgs);
+    const countDeliveriesCallback = async ({ props: countArgs }: FindManyCallBackProps) => this.prisma.delivery.count(countArgs);
 
     const deliveryPaginationOptions: PaginateProps = {
       findManyArgs: {
@@ -69,7 +74,7 @@ export class CampaignService {
    * Fetches general statistics about a specific collection
    * @param deliveries
    */
-  static getStatisticsFromDeliveries(
+  getStatisticsFromDeliveries(
     deliveries: NexusGenFieldTypes['DeliveryType'][],
   ) {
     return {

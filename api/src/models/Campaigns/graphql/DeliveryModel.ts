@@ -117,7 +117,7 @@ export const GetDeliveryConnectionOfCampaign = extendType({
         const campaignId = parent.id || args?.filter?.campaignId;
         if (!campaignId) throw new UserInputError('No campaign ID was provided');
 
-        const deliveriesPaginated = await CampaignService.getPaginatedDeliveries<NexusGenFieldTypes['DeliveryType']>(
+        const deliveriesPaginated = await ctx.services.campaignService.getPaginatedDeliveries<NexusGenFieldTypes['DeliveryType']>(
           campaignId,
           args?.filter?.paginationFilter || undefined,
           {
@@ -126,7 +126,7 @@ export const GetDeliveryConnectionOfCampaign = extendType({
           }
         );
 
-        const { nrFinished, nrOpened, nrSent, nrTotal } = CampaignService.getStatisticsFromDeliveries(deliveriesPaginated.entries);
+        const { nrFinished, nrOpened, nrSent, nrTotal } = ctx.services.campaignService.getStatisticsFromDeliveries(deliveriesPaginated.entries);
 
         return {
           deliveries: deliveriesPaginated.entries,
