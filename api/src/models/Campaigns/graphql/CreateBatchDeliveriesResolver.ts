@@ -1,6 +1,8 @@
 import { UserInputError } from 'apollo-server';
 import { inputObjectType, mutationField, objectType } from '@nexus/schema';
 
+import { parseCsv } from '../../../utils/parseCsv';
+
 export const CreateBatchDeliveriesInputType = inputObjectType({
   name: 'CreateBatchDeliveriesInputType',
   definition(t) {
@@ -36,11 +38,13 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
     if (!args.input.uploadedCsv) throw new UserInputError('No CSV uploaded!');
     if (!args.input.campaignId) throw new UserInputError('No related campaign provided!');
     if (!args.input.batchScheduledAt) throw new UserInputError('No scheduled date provided!');
+
     const callbackUrl = `${ctx.session?.baseUrl}/webhooks/delivery`;
+    const records = await parseCsv(args.input.uploadedCsv);
 
     return await ctx.services.campaignService.createBatchDeliveries(
       args.input.campaignId,
-      args.input.uploadedCsv,
+      records,
       args.input.batchScheduledAt,
       callbackUrl
     );

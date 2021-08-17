@@ -35,8 +35,8 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const sessionService = new SessionService(prisma);
   const tagService = new TagService(prisma);
   const triggerService = new TriggerService(prisma);
-  const campaignService = new CampaignService(prisma);
   const dynamoScheduleService = new DynamoScheduleService();
+  const campaignService = new CampaignService(prisma, dynamoScheduleService);
 
   return {
     triggerService,

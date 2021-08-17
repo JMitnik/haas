@@ -19,10 +19,12 @@ import DynamoScheduleService from '../../services/DynamoScheduleService';
 export class CampaignService {
   prisma: PrismaClient;
   prismaAdapter: CampaignPrismaAdapter;
+  dynamoScheduleService: DynamoScheduleService;
 
-  constructor(prisma: PrismaClient) {
+  constructor(prisma: PrismaClient, dynamoScheduleService: DynamoScheduleService) {
     this.prisma = prisma;
     this.prismaAdapter = new CampaignPrismaAdapter(prisma);
+    this.dynamoScheduleService = dynamoScheduleService;
   }
 
   /**
@@ -132,21 +134,21 @@ export class CampaignService {
    */
   createBatchDeliveries = async (
     campaignId: string,
-    inputCsv: File,
+    csvRecords: any[],
     scheduledTimeStamp: string,
     callbackUrl: string
   ): Promise<NexusGenFieldTypes['CreateBatchDeliveriesOutputType']> => {
     const campaign = await this.findCampaign(campaignId);
     if (!campaign) throw new UserInputError('Related campaign does not exist');
 
-    const csvRecords = await parseCsv(inputCsv);
+    // Pick out correct rows, and preprocess them in the corresponding format.
     const { successRecords, erroredRecords } = this.validateDeliveryRows(
       csvRecords,
       campaign.variantsEdges.map(variantEdge => variantEdge.campaignVariant)
     );
-
     const deliveryRecords = this.preprocessDeliveryCSVRows(campaign, successRecords, scheduledTimeStamp);
 
+    // Save deliveries to prisma.
     const createdDatabaseRecords = await Promise.all(deliveryRecords.map(async record => {
       try {
         await this.prismaAdapter.createDelivery(record);
@@ -157,6 +159,7 @@ export class CampaignService {
       }
     }));
 
+    // Send deliveries as jobs to Dynamo.
     await this.deployDeliveryJobs(deliveryRecords, callbackUrl);
 
     return {
@@ -173,7 +176,7 @@ export class CampaignService {
     callbackUrl: string,
     tableName: string = 'CampaignDeliveries'
   ) => {
-    await DynamoScheduleService.batchScheduleOneOffs(deliveryRecords.map(record => ({
+    await this.dynamoScheduleService.batchScheduleOneOffs(deliveryRecords.map(record => ({
       attributes: [
         {
           key: 'DeliveryDate',
@@ -343,13 +346,17 @@ export class CampaignService {
 
       return {
         ...record,
+        campaignId: campaign.id,
+        campaignVariantId: variant.id,
+        currentStatus: 'SCHEDULED',
+        scheduledAt: scheduledDate,
         customVariables,
         id,
         scheduleKey,
         variant,
         body,
         from,
-        scheduleKeyId
+        scheduleKeyId,
       }
     });
   }
