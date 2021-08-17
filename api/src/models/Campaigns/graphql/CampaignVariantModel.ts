@@ -29,8 +29,8 @@ export const CampaignVariantModel = objectType({
     t.string('body');
     t.string('from', { nullable: true });
     t.field('type', { type: CampaignVariantEnum });
-    t.field('workspace', { type: CustomerType });
-    t.field('dialogue', { type: DialogueType });
+    t.field('workspace', { type: CustomerType, nullable: true });
+    t.field('dialogue', { type: DialogueType, nullable: true });
 
     t.list.field('customVariables', { type: CampaignVariantCustomVariableType, nullable: true });
   }

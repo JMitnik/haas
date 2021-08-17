@@ -57,13 +57,13 @@ type CampaignVariantType {
   body: String!
   customVariables: [CampaignVariantCustomVariableType!]
   deliveryConnection: DeliveryConnectionType
-  dialogue: Dialogue!
+  dialogue: Dialogue
   from: String
   id: ID!
   label: String!
   type: CampaignVariantEnum!
   weight: Int!
-  workspace: Customer!
+  workspace: Customer
 }
 
 """Input type for a choice node"""

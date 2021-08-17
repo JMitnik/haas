@@ -110,6 +110,31 @@ export class CampaignPrismaAdapter {
   }
 
   /**
+   * Find campaigns of workspace.
+   */
+  findCampaignsOfWorkspace = async (workspaceId: string) => {
+    return this.prisma.customer.findFirst({
+      where: { id: workspaceId },
+      include: {
+        campaigns: {
+          include: {
+            variantsEdges: {
+              include: {
+                campaignVariant: {
+                  include: {
+                    dialogue: true,
+                    workspace: true,
+                  }
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  /**
    * Find campaign by id.
    */
   findCampaign = async (id: string): Promise<CampaignWithVariants | null> => {

@@ -65,24 +65,9 @@ export const GetCampaignsOfWorkspace = extendType({
   definition(t) {
     t.list.field('campaigns', {
       type: CampaignModel,
-      // @ts-ignore
       resolve: async (parent, args, ctx) => {
-        const workspaceWithCampaigns = await ctx.prisma.customer.findFirst({
-          where: { id: parent.id },
-          include: {
-            campaigns: {
-              include: {
-                variantsEdges: {
-                  include: {
-                    campaignVariant: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        if (!workspaceWithCampaigns) throw "Can't find workspace!"
+        const workspaceWithCampaigns = await ctx.services.campaignService.findCampaignsOfWorkspace(parent.id);
+        if (!workspaceWithCampaigns) throw new UserInputError('Can\'t find workspace!');
 
         return workspaceWithCampaigns.campaigns.map(campaign => ({
           ...campaign,
@@ -90,7 +75,7 @@ export const GetCampaignsOfWorkspace = extendType({
             weight: variantEdge.weight,
             ...variantEdge.campaignVariant
           }))
-        })) || [] as any;
+        })) || [];
       },
     });
   },

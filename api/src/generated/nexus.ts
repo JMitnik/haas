@@ -494,13 +494,13 @@ export interface NexusGenRootTypes {
     body: string; // String!
     customVariables?: NexusGenRootTypes['CampaignVariantCustomVariableType'][] | null; // [CampaignVariantCustomVariableType!]
     deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
-    dialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     from?: string | null; // String
     id: string; // ID!
     label: string; // String!
     type: NexusGenEnums['CampaignVariantEnum']; // CampaignVariantEnum!
     weight: number; // Int!
-    workspace: NexusGenRootTypes['Customer']; // Customer!
+    workspace?: NexusGenRootTypes['Customer'] | null; // Customer
   }
   ColourSettings: prisma.ColourSettings;
   CreateBatchDeliveriesOutputType: { // root type
@@ -913,13 +913,13 @@ export interface NexusGenFieldTypes {
     body: string; // String!
     customVariables: NexusGenRootTypes['CampaignVariantCustomVariableType'][] | null; // [CampaignVariantCustomVariableType!]
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
-    dialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     from: string | null; // String
     id: string; // ID!
     label: string; // String!
     type: NexusGenEnums['CampaignVariantEnum']; // CampaignVariantEnum!
     weight: number; // Int!
-    workspace: NexusGenRootTypes['Customer']; // Customer!
+    workspace: NexusGenRootTypes['Customer'] | null; // Customer
   }
   ColourSettings: { // field return type
     id: string; // ID!
