@@ -16,58 +16,13 @@ import List from 'components/List/List';
 import ListItem from 'components/List/ListItem';
 import useAuth from 'hooks/useAuth';
 
-interface NavItemContainerProps {
-  isSubchildActive?: boolean;
-}
-
-export const NavItemContainer = styled.li<NavItemContainerProps>`
-  ${({ theme, isSubchildActive }) => css`
-    position: relative;
-
-    ${isSubchildActive && css`
-      border-radius: 5px;
-      border: 1px solid ${theme.colors.gray[200]};
-      overflow: hidden;
-
-      &::before {
-        content: '';
-        top: 0;
-        z-index: 200;
-        bottom: 0;
-        position: absolute;
-        left: 0;
-        height: 100%;
-        width: 3px;
-        background: ${theme.colors.primaryGradient};
-      }
-    `}
-  `}
-`;
-
-interface NavItemProps extends LinkProps {
-  renderSibling?: React.ReactNode;
-  exact?: boolean;
-  isSubchildActive?: boolean;
-  isDisabled?: boolean;
-}
-
-interface NavLinkProps extends LinkProps {
-  isDisabled?: boolean;
-}
-
-export const NavLinkContainer = styled(NavLink)<NavLinkProps>`
-  ${({ theme, isDisabled }) => css`
+export const NavLinkContainer = styled(NavLink)`
+  ${({ theme }) => css`
     color: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['600']};
     padding: 8px 11px;
     display: flex;
     align-items: center;
     font-size: 0.8rem;
-
-    ${isDisabled && css`
-      opacity: 0.3;
-      pointer-events: none;
-      cursor: not-allowed;
-    `}
 
     /* For the icons */
     svg {
@@ -97,9 +52,53 @@ export const NavLinkContainer = styled(NavLink)<NavLinkProps>`
   `}
 `;
 
+interface NavItemContainerProps {
+  isSubchildActive?: boolean;
+  isDisabled?: boolean;
+}
+
+export const NavItemContainer = styled.li<NavItemContainerProps>`
+  ${({ theme, isSubchildActive, isDisabled }) => css`
+    position: relative;
+
+    ${isSubchildActive && css`
+      border-radius: 5px;
+      border: 1px solid ${theme.colors.gray[200]};
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        top: 0;
+        z-index: 200;
+        bottom: 0;
+        position: absolute;
+        left: 0;
+        height: 100%;
+        width: 3px;
+        background: ${theme.colors.primaryGradient};
+      }
+    `}
+
+    ${isDisabled && css`
+      ${NavLinkContainer} {
+        opacity: 0.3;
+        pointer-events: none;
+        cursor: not-allowed;
+      }
+    `}
+  `}
+`;
+
+interface NavItemProps extends LinkProps {
+  renderSibling?: React.ReactNode;
+  exact?: boolean;
+  isSubchildActive?: boolean;
+  isDisabled?: boolean;
+}
+
 export const NavItem = ({ children, renderSibling, isDisabled, isSubchildActive, ...props }: NavItemProps) => (
-  <NavItemContainer isSubchildActive={isSubchildActive}>
-    <NavLinkContainer isDisabled={isDisabled} {...props}>
+  <NavItemContainer isSubchildActive={isSubchildActive} isDisabled={isDisabled}>
+    <NavLinkContainer {...props}>
       {children}
     </NavLinkContainer>
     {!isDisabled && (

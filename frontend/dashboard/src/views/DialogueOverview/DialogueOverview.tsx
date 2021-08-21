@@ -37,7 +37,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
     <>
       <UI.ViewHead>
         <UI.ViewTitle>
-          <ViewTitle>{t('dialogues')}</ViewTitle>
+          {t('dialogues')}
         </UI.ViewTitle>
       </UI.ViewHead>
       <UI.ViewBody>

@@ -169,6 +169,8 @@ export class DialogueStatisticsService {
     // @ts-ignore
     const choices: [string, SessionChoiceGroupValue][] = Object.entries(nodeEntryStatistics['nodes']);
 
+
+
     return choices.map(([choiceId, choiceStatistics]) => ({
       averageValue: choiceStatistics.sumScore / choiceStatistics.count,
       choiceValue: choiceStatistics.value,
