@@ -12,6 +12,8 @@ export const SessionType = objectType({
     t.date('createdAt');
     t.string('dialogueId');
 
+    t.string('browser', { resolve: (parent) => parent?.browser || '' });
+
     // t.int('index');
     t.int('paths', {
       async resolve(parent, args, ctx) {

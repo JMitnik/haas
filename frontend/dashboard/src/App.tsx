@@ -163,6 +163,7 @@ const CustomerRoutes = () => (
                     />
 
                     <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_DELETE_DIALOGUE}
                       path="/dashboard/b/:customerSlug/dialogue/add"
                       render={() => <AddDialogueView />}
                     />
@@ -204,6 +205,14 @@ const RootAppRoute = () => {
   if (isLoggedIn) return <Redirect to="/dashboard" />;
 
   return <Redirect to="/public/login" />;
+};
+
+const RootApp = ({ children }: { children: React.ReactNode }) => {
+  const { isInitializingUser } = useUser();
+
+  if (isInitializingUser) return <GlobalLoader />;
+
+  return <>{children}</>;
 };
 
 const AppRoutes = () => (
@@ -275,14 +284,6 @@ const AppRoutes = () => (
     </Switch>
   </RootApp>
 );
-
-const RootApp = ({ children }: { children: React.ReactNode }) => {
-  const { isInitializingUser } = useUser();
-
-  if (isInitializingUser) return <GlobalLoader />;
-
-  return <>{children}</>;
-};
 
 const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => {
   if (error?.message.includes('Failed to fetch')) {

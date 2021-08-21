@@ -18,6 +18,8 @@ import SessionService from "../models/session/SessionService"
 import TagService from "../models/tag/TagService"
 import TriggerService from "../models/trigger/TriggerService"
 import { DialogueStatisticsPrismaAdapter } from "../models/questionnaire/DialogueStatisticsPrismaAdapter"
+import { CampaignService } from "../models/Campaigns/CampaignService"
+import DynamoScheduleService from "../services/DynamoScheduleService"
 
 export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -38,6 +40,8 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const sessionService = new SessionService(prisma);
   const tagService = new TagService(prisma);
   const triggerService = new TriggerService(prisma);
+  const dynamoScheduleService = new DynamoScheduleService();
+  const campaignService = new CampaignService(prisma, dynamoScheduleService);
 
   return {
     triggerService,
@@ -55,6 +59,7 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
     customerService,
     userService,
     loginService,
-    mailService
+    mailService,
+    campaignService,
   }
 }

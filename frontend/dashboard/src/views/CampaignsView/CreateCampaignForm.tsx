@@ -58,6 +58,9 @@ const variantSchema = yup.object({
 const schema = yup.object({
   label: yup.string().required(),
   variants: yup.array().of(variantSchema),
+  customVariables: yup.array().of(yup.object({
+    key: yup.string(),
+  })),
 }).required();
 
 export type CampaignFormProps = yup.InferType<typeof schema>;
@@ -214,6 +217,7 @@ interface CreateCampaignFormProps {
 
 const campaignDefaultValues: CampaignFormProps = {
   label: '',
+  customVariables: [{ key: '' }],
   variants: [
     {
       label: '',
@@ -261,6 +265,7 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
           weight: variant.weight,
           from: variant.from || undefined,
           type: variant.type as CampaignVariantEnum,
+          customVariables: form.getValues().customVariables?.map((val) => val || { key: '' }),
           workspaceId: activeCustomer?.id || '',
         })),
       },
@@ -309,6 +314,14 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
     control: form.control,
     keyName: 'variantIndex',
   });
+
+  const { append: addCustomVariable, fields: customVariables } = useFieldArray({
+    name: 'customVariables',
+    control: form.control,
+    keyName: 'idKey',
+  });
+
+  console.log(customVariables);
 
   const handleVariantWeightChange = (event: any, currentItemIndex: number) => {
     const maxValue = Math.min(event.target.value, 100);
@@ -378,6 +391,25 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
                 </UI.Flex>
               ))}
             </UI.Stack>
+          </UI.Div>
+
+          <UI.Div>
+            <UI.FormControl>
+              <UI.InputHeader>{t('custom_variables')}</UI.InputHeader>
+              <UI.InputHelper>{t('custom_variables_helper')}</UI.InputHelper>
+              <UI.Stack spacing={1}>
+                {customVariables.map((customVariable, index) => (
+                  <UI.Input
+                    key={customVariable.idKey}
+                    defaultValue={customVariable.key}
+                    name={`customVariables.${index}.key`}
+                    ref={form.register()}
+                  />
+                ))}
+              </UI.Stack>
+
+              <UI.Button mt={2} onClick={() => addCustomVariable({ key: '' })}>Add variable</UI.Button>
+            </UI.FormControl>
           </UI.Div>
         </UI.Stack>
         <UI.Card isFlat noHover bg="gray.100">

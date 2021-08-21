@@ -12,7 +12,7 @@ const DialoguesPage = () => {
   const toast = useToast();
 
   // TODO: Handle the loading
-  const { error, data, loading: isLoading } = useQuery<any>(getDialoguesOfCustomer, {
+  const { error, data } = useQuery<any>(getDialoguesOfCustomer, {
     variables: { customerSlug },
     fetchPolicy: 'cache-and-network',
     onError: () => {
@@ -33,7 +33,7 @@ const DialoguesPage = () => {
     dialogues = data?.customer?.dialogues;
   }
 
-  return <DialogueOverview isLoading={isLoading} dialogues={dialogues} />;
+  return <DialogueOverview dialogues={dialogues} />;
 };
 
 export default DialoguesPage;

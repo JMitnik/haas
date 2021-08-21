@@ -21,6 +21,14 @@ const language = {
       en: 'Score',
       de: 'Punktzahl',
     },
+    custom_variables: {
+      en: 'Custom variables',
+      de: 'Benutzerdefinierte Variablen',
+    },
+    custom_variables_helper: {
+      en: 'With custom variables, you can inject your own variables. Add a whitelist of allowed custom variables, and use them in your body.',
+      de: 'Mit benutzerdefinierten Variablen können Sie Ihre eigenen Variablen injizieren. Fügen Sie einen Whitelisten von erlaubten benutzerdefinierten Variablen hinzu und verwenden Sie sie mit {{customvariable}}.',
+    },
     go_to_alerts: {
       en: 'All alerts',
       de: 'Alle Alerts',
@@ -821,10 +829,6 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     dialogues: {
       en: 'Dialogues',
       de: 'Dialog',
-    },
-    score: {
-      en: 'Score',
-      de: 'Ergebnis',
     },
     export_to_csv: {
       en: 'CSV export',
