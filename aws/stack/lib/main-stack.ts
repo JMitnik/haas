@@ -9,7 +9,8 @@ import * as route53 from '@aws-cdk/aws-route53';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import { Duration } from '@aws-cdk/core';
-
+import * as service_discovery from '@aws-cdk/aws-servicediscovery';
+import * as elasticache from '@aws-cdk/aws-elasticache';
 
 // Prerequisites:
 // 1. You have an Ec2 Keyname-pair created (HaasAPI_RemoteBastionAccess)
@@ -134,6 +135,28 @@ export class APIStack extends cdk.Stack {
       this, 'AUTODECK_API_KEY', 'prod/AutoDeckAWSKeys'
     );
 
+    const serviceNamespace = new service_discovery.PrivateDnsNamespace(this, 'SERVICE_DISCOVERY_NAMESPACE', {
+      name: 'HAAS_SVC',
+      vpc,
+      description: 'Namespace for HAAS services'
+    });
+
+    const cacheSubnetGroup = new elasticache.CfnSubnetGroup(this, 'API_CACHE_Subnetgroup', {
+      description: 'Elasticache subnet groups',
+      subnetIds: vpc.isolatedSubnets.map(subnet => subnet.subnetId),
+      cacheSubnetGroupName: 'RedisSubnetGroup',
+    });
+
+    const cache = new elasticache.CfnCacheCluster(this, 'API_CACHE', {
+      engine: 'redis',
+      cacheNodeType: 'cache.t2.medium',
+      numCacheNodes: 1,
+      vpcSecurityGroupIds: [vpc.vpcDefaultSecurityGroup],
+
+      // .ref because this is an L1 construct, and thus uses cloudformation-based refs
+      cacheSubnetGroupName: cacheSubnetGroup.ref
+    });
+
     // Our main API service; we will adjust this as necessary to deal with more load.
     const apiService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "API_SERVICE", {
       cluster,
@@ -163,6 +186,31 @@ export class APIStack extends cdk.Stack {
           AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_SECRET_ACCESS_KEY'),
           AUTODECK_AWS_ACCESS_KEY_ID: ecs.Secret.fromSecretsManager(autodeckAWSSecret, 'AUTODECK_AWS_ACCESS_KEY_ID'),
           AUTODECK_AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(autodeckAWSSecret, 'AUTODECK_AWS_SECRET_ACCESS_KEY'),
+        },
+      },
+    });
+
+    // API Service for data analytics
+    const dataAnalyticsService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'DATA_ANALYTICS_SERVICE', {
+      cluster,
+      memoryLimitMiB: 2048,
+      desiredCount: 1,
+      assignPublicIp: true,
+      domainZone: hostedZone,
+      domainName: 'das.haas.live',
+      certificate: tlsCertificate,
+      cloudMapOptions: {
+        name: 'das',
+        cloudMapNamespace: serviceNamespace,
+      },
+      taskImageOptions: {
+        image: ecs.ContainerImage.fromAsset('../../data-service'),
+        containerPort: 8080,
+        environment: {
+          ENVIRONMENT: 'prod',
+        },
+        secrets: {
+          DB_STRING: ecs.Secret.fromSecretsManager(dbString, 'url'),
         },
       },
     });
@@ -202,8 +250,11 @@ export class APIStack extends cdk.Stack {
 
     this.db = rdsDb;
 
+    dbString.grantRead(dataAnalyticsService.taskDefinition.taskRole);
+
     // Who can access the database?
     rdsDb.connections.allowFrom(apiService.service, ec2.Port.tcp(5432));
+    rdsDb.connections.allowFrom(dataAnalyticsService.service, ec2.Port.tcp(5432));
     rdsDb.connections.allowFrom(remoteBastion, ec2.Port.tcp(5432));
     rdsDb.connections.allowFrom(rdsSecurityGroup, ec2.Port.tcp(5432));
   }
