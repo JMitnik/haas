@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { groupBy, maxBy, meanBy, minBy } from 'lodash'
-import { add, format } from "date-fns";
+import { groupBy, maxBy } from 'lodash'
+import { add, format, differenceInHours } from "date-fns";
 import parse from "date-fns/parse";
 
 import { DialogueTree } from './entities/DialogueTree';
@@ -9,6 +9,9 @@ import { NexusGenEnums, NexusGenFieldTypes, NexusGenInputs } from "../../generat
 import { DialogueStatisticsPrismaAdapter } from "./DialogueStatisticsPrismaAdapter";
 import { SessionChoiceGroupValue, SessionGroup } from "./DialogueStatisticsServiceTypes";
 import { DialogueTreeNode } from "./entities/DialogueTreeTypes";
+import { RedisClient } from "../../config/redis";
+
+const HOURS_IN_DAY = 24;
 
 const groupKey = {
   hour: 'HH-dd-LL-y',
@@ -20,16 +23,21 @@ const groupAddDateKey = {
   hour: { hours: 1 },
   day: { days: 1 },
   week: { weeks: 1 },
-  month: { months: 1 }
 }
 
 export class DialogueStatisticsService {
   prisma: PrismaClient;
   prismaAdapter: DialogueStatisticsPrismaAdapter;
+  redis: RedisClient;
 
-  constructor(prisma: PrismaClient, prismaAdapter: DialogueStatisticsPrismaAdapter) {
+  constructor(
+    prisma: PrismaClient,
+    prismaAdapter: DialogueStatisticsPrismaAdapter,
+    redis: RedisClient
+  ) {
     this.prisma = prisma;
     this.prismaAdapter = prismaAdapter;
+    this.redis = redis;
   }
 
   /**
@@ -40,13 +48,22 @@ export class DialogueStatisticsService {
     filter?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'],
     sessionGroupBy?: NexusGenEnums['DialogueStatisticsSummaryGroupby']
   ): Promise<NexusGenFieldTypes['DialogueStatisticsSummaryType']> => {
-    // TODO: Read data from Redis
+    const redisKey = this.parseCacheKey(dialogueId, filter?.startDate, filter?.endDate);
 
-    // TODO: Add safety guards: if by hour, then do max 5 days
-    // TODO: Add safety guards: if by day, then do max 31 days
-    // TODO: Add safety guards: if by week, then do max 52 weeks
-    // TODO: Add safety guards: if by months, then do max 12 months
-    const groupByKey = groupKey[sessionGroupBy || 'hour'];
+    try {
+      const cachedRes = await this.redis.get(redisKey);
+
+      if (cachedRes) {
+        const cachedObject: unknown = JSON.stringify(cachedRes) as unknown;
+        return cachedObject as NexusGenFieldTypes['DialogueStatisticsSummaryType'];
+      }
+
+    } catch (e) {
+      console.log(e);
+    }
+
+    const getGroupByFromDates = this.getGroupbyFromDates(filter?.startDate, filter?.endDate);
+    const groupByKey = groupKey[getGroupByFromDates];
 
     const sessions = await this.prismaAdapter.getSessionsBetweenDates(
       dialogueId,
@@ -62,7 +79,7 @@ export class DialogueStatisticsService {
       dateGroup: format(session.createdAt, groupByKey)
     })), 'dateGroup'));
 
-    return {
+    const summary: NexusGenFieldTypes['DialogueStatisticsSummaryType'] = {
       pathsSummary: await this.getPathsSummary(dialogueId, filter?.startDate, filter?.endDate),
       choicesSummaries: await this.getChoiceStatisticsSummary(dialogueId, filter?.startDate, filter?.endDate),
       branchesSummary: null,
@@ -73,6 +90,15 @@ export class DialogueStatisticsService {
         return this.getSessionStatisticsSummary(sessionGroup, startDate, endDate);
       })
     };
+
+    try {
+      this.redis.set(redisKey, JSON.stringify(summary));
+      this.redis.expire(redisKey, 600);
+    } catch (e) {
+      console.error(e);
+    }
+
+    return summary;
   }
 
   /**
@@ -96,6 +122,33 @@ export class DialogueStatisticsService {
       }))
     }
   }
+
+  parseCacheKey = (dialogueId: string, startDate?: Date, endDate?: Date): string => {
+    let base = `dialogue_statistics:${dialogueId}`;
+    let affix = '';
+
+    if (startDate) {
+      affix += `${format(startDate, groupKey['hour'])}`
+    }
+
+    if (endDate) {
+      affix += `${format(endDate, groupKey['hour'])}`
+    }
+
+    if (!affix) {
+      return base;
+    }
+
+    return `${base}:${affix}`;
+  }
+
+  getGroupbyFromDates = (
+    startDate: Date,
+    endDate: Date
+  ): NexusGenEnums['DialogueStatisticsSummaryGroupby'] => {
+    if (differenceInHours(endDate, startDate) <= HOURS_IN_DAY * 3) return 'hour';
+    return 'day';
+  };
 
   private getSessionStatisticsSummary = (
     sessionGroup: SessionGroup,

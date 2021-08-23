@@ -12,7 +12,7 @@ jobs:
     - name: Run ESLint
       run: yarn eslint
     - name: Start Testing Containers
-      run: yarn dock:test:start-db
+      run: yarn dock:test:up
     - name: Generate required artifacts
       run: yarn gen:api:prisma
       env:

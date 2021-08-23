@@ -20,6 +20,8 @@ import TriggerService from "../models/trigger/TriggerService"
 import { DialogueStatisticsPrismaAdapter } from "../models/questionnaire/DialogueStatisticsPrismaAdapter"
 import { CampaignService } from "../models/Campaigns/CampaignService"
 import DynamoScheduleService from "../services/DynamoScheduleService"
+import { makeRedis } from './redis';
+import config from "./config"
 
 export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -32,7 +34,11 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const nodeService = new NodeService(prisma);
   const dialogueStatisticsServicePrismaAdapter = new DialogueStatisticsPrismaAdapter(prisma);
 
-  const dialogueStatisticsService = new DialogueStatisticsService(prisma, dialogueStatisticsServicePrismaAdapter);
+  const dialogueStatisticsService = new DialogueStatisticsService(
+    prisma,
+    dialogueStatisticsServicePrismaAdapter,
+    makeRedis(config.redisUrl),
+  );
   const edgeService = new EdgeService(prisma);
   const nodeEntryService = new NodeEntryService(prisma);
   const permissionService = new PermissionService(prisma);

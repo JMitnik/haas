@@ -41,24 +41,9 @@ describe('DialogueStatisticsService', () => {
     console.log(negativeNodes);
   });
 
-  test('it can find the sub-root node of a negative branch', async () => {
-    const createdDialogue = await createTestDialogue(prisma);
-    await createFewInteractions(prisma);
-    const nodesAndEdges = await dialogueStatisticsPrismaAdapter.getNodesAndEdges(createdDialogue.id);
-
-    const subRootNode = dialogueStatisticsPrismaAdapter.findSubRootNode(
-      nodesAndEdges.nodes,
-      0,
-      30
-    );
-
-    expect(subRootNode.id).toEqual('LEVEL_1_NEGATIVE');
-  });
-
   test('it can find the entire nodes of an entire sub-branch', async () => {
     const createdDialogue = await createTestDialogue(prisma);
     await createFewInteractions(prisma);
     const nodesAndEdges = await dialogueStatisticsPrismaAdapter.getNodesAndEdges(createdDialogue.id);
-
   });
 })

@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 export interface ConfigProps {
+  redisUrl: string;
   baseUrl: string;
   jwtSecret: string;
   jwtExpiryMinutes: number;
@@ -27,9 +28,11 @@ export interface ConfigProps {
 }
 
 if (!process.env.JWT_SECRET) throw new Error('Ensure you set a JWT secret in your env');
+if (!process.env.REDIS_URL) console.warn('Redis not defined; wont use caching layer');
 if (!process.env.MAIL_SENDER) console.log('Mail sender not defined; wont send mails as a result');
 
 const config: ConfigProps = {
+  redisUrl: process.env.REDIS_URL || 'http://localhost:6379',
   baseUrl: process.env.BASE_URL || 'http://localhost:4000',
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiryMinutes: 4320,

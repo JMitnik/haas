@@ -64,9 +64,9 @@
         "test:cypress-client": "yarn workspace @haas/client cypress open",
         "restart:api": "yarn kill:api && yarn start:api",
         "types:api": "yarn workspace @haas/api types",
-        "dock:test:start-db": "(cd container/test && docker-compose up -d) && sleep 10 && (export DB_STRING=postgresql://prisma:prisma@localhost:5431/postgres?schema=public && yarn migrate)",
-        "dock:test:restart-db": "yarn dock:test:end-db  && yarn dock:test:start-db ",
-        "dock:test:end-db": "(cd container/test && docker-compose down)",
+        "dock:test:up": "(cd container/test && docker-compose up -d) && sleep 10 && (export DB_STRING=postgresql://prisma:prisma@localhost:5431/postgres?schema=public && yarn migrate)",
+        "dock:test:restart": "yarn dock:test:down  && yarn dock:test:up",
+        "dock:test:down": "(cd container/test && docker-compose down)",
         "tunnel:api": "ngrok http https://localhost:4000"
     },
     "devDependencies": {
