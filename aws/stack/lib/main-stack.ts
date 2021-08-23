@@ -174,6 +174,7 @@ export class APIStack extends cdk.Stack {
           BASE_URL: 'http://api.haas.live',
           CLIENT_URL: 'https://client.haas.live',
           DASHBOARD_URL: 'https://dashboard.haas.live',
+          REDIS_URL: `redis://${cache.attrRedisEndpointAddress}`,
           CLOUDINARY_URL: 'cloudinary://591617433181475:rGNg80eDICKoUKgzrMlSPQitZw8@dx8khik9g',
           MAIL_SENDER: 'noreply@haas.live',
           ENVIRONMENT: 'prod',

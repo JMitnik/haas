@@ -3,9 +3,15 @@ import { traverseTree } from '../../../utils/traverseTree';
 import { DialogueTreePath } from './DialoguePath';
 import { PrismaQuestionNode, DialogueTreeNode, DialogueTreeEdge, DialogueBranchSplit, PrismaEdge } from './DialogueTreeTypes';
 
+/**
+ * DialogueTree.
+ */
 export class DialogueTree {
   rootNode?: DialogueTreeNode;
 
+  /**
+   * Create DialogueTree from Prisma-fetched nodes.
+   */
   initFromPrismaNodes = (nodes: PrismaQuestionNode[], edges: PrismaEdge[]) => {
     const rootNode = nodes.find(node => node.isRoot);
 
@@ -42,6 +48,9 @@ export class DialogueTree {
     return this;
   }
 
+  /**
+   * Traverse tree using a callback which takes a path when given edges.
+   */
   traverse = (
     decisionCallback: (dialogueTreeNode: DialogueTreeNode) => DialogueTreeEdge | undefined
   ): DialogueTreePath => {
@@ -52,6 +61,14 @@ export class DialogueTree {
     return traverseTree(this.rootNode, decisionCallback);
   }
 
+  /**
+   * Splits the dialogue by the branches stemming from the root-slider.
+   *
+   * Example:
+   * - Positive => All nodes in Positive (70+).
+   * - Neutral => ALl nodes in Neutral (50-70).
+   * - Negative => All nodes in Negative (50-).
+   */
   getBranchesByRootSlider = (): DialogueBranchSplit => {
     if (!this.rootNode) {
       throw new Error('Tree has not been initialized');

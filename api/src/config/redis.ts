@@ -1,5 +1,4 @@
 import redis from 'redis';
-import config from './config';
 import { promisify } from 'util';
 
 

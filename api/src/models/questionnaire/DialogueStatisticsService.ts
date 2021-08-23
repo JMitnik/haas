@@ -239,6 +239,13 @@ export class DialogueStatisticsService {
     endDate: Date
   ): Promise<NexusGenFieldTypes['DialoguePathsSummaryType']> => {
     const nodeCounts = await this.prismaAdapter.groupNodeEntriesBetweenDates(dialogueId, startDate, endDate);
+    const nodeToCounts = nodeCounts.reduce<Record<string, number>>((total, current) => {
+      if (current.relatedNodeId) {
+        total[current.relatedNodeId] = current._count
+      }
+
+      return total;
+    }, {});
     const dialogue = await this.prismaAdapter.getNodesAndEdges(dialogueId);
 
     if (!dialogue?.nodes) return {
@@ -251,7 +258,7 @@ export class DialogueStatisticsService {
     const selectPopularNode = (node: DialogueTreeNode) => {
       const candidateEdges = node.isParentNodeOf.map(edge => ({
         ...edge,
-        edgeCount: nodeCounts.find((edgeCount) => edgeCount.relatedNodeId === edge?.childNodeId)
+        edgeCount: nodeToCounts[edge.childNodeId],
       }));
 
       return maxBy(candidateEdges, (edge) => edge.edgeCount);
@@ -260,11 +267,9 @@ export class DialogueStatisticsService {
     const branches = dialogueTree.getBranchesByRootSlider();
 
     const negativePath = traverseTree(branches.negativeBranch.rootEdge?.childNode, selectPopularNode);
-    const negativeNodeId = negativePath.getLastNode().id;
-    const negativePathCount = nodeCounts.find((edgeCount => edgeCount.relatedNodeId === negativeNodeId))?._count;
+    const negativePathCount = nodeToCounts[negativePath.getLastNode().id];
     const positivePath = traverseTree(branches.positiveBranch.rootEdge?.childNode, selectPopularNode);
-    const positiveNodeId = positivePath.getLastNode().id;
-    const positivePathCount = nodeCounts.find((edgeCount => edgeCount.relatedNodeId === positiveNodeId))?._count;
+    const positivePathCount = nodeToCounts[positivePath.getLastNode().id];
 
     return {
       mostCriticalPath: {

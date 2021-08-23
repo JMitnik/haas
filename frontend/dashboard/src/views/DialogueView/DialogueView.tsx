@@ -142,6 +142,7 @@ const DialogueView = () => {
         startDate: startDate ? startDate.getTime() : undefined,
         endDate: endDate ? endDate.getTime() : undefined,
       },
+      // @ts-ignore
       sessionGroupby: activeDateState.groupBy,
     },
   });
@@ -149,7 +150,7 @@ const DialogueView = () => {
   const statisticsSummary = summaryData?.dialogue?.statistics?.statisticsSummary;
   const sessionsSummaries = statisticsSummary?.sessionsSummaries;
   const choicesSummaries = statisticsSummary?.choicesSummaries;
-  console.log(choicesSummaries);
+  console.log(statisticsSummary?.pathsSummary);
 
   useEffect(() => {
     if (data && !loading) {
