@@ -130,9 +130,14 @@ export class DialogueTree {
    */
   addNodeCounts = (nodeCounts: Record<string, number>): void => {
     const nodeCountsArray = Object.entries(nodeCounts);
-    nodeCountsArray.forEach(([nodeId, nodeValue]) => {
-      this.nodes[nodeId].summary = { nrEntries: nodeValue, visitRate: null };
-    });
+
+    for (let index = 0; index < nodeCountsArray.length; index++) {
+      const [nodeId, nodeValue] = nodeCountsArray[index];
+
+      if (nodeId in this.nodes) {
+        this.nodes[nodeId].summary = { nrEntries: nodeValue, visitRate: null };
+      }
+    }
 
     this.hasAddedNodeEntries = true;
   }

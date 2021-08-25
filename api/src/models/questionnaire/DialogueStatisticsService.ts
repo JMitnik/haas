@@ -50,17 +50,17 @@ export class DialogueStatisticsService {
   ): Promise<NexusGenFieldTypes['DialogueStatisticsSummaryType']> => {
     const redisKey = this.parseCacheKey(dialogueId, filter?.startDate, filter?.endDate);
 
-    try {
-      const cachedRes = await this.redis.get(redisKey);
+    // try {
+    //   const cachedRes = await this.redis.get(redisKey);
 
-      if (cachedRes) {
-        const cachedObject: unknown = JSON.stringify(cachedRes) as unknown;
-        return cachedObject as NexusGenFieldTypes['DialogueStatisticsSummaryType'];
-      }
+    //   if (cachedRes) {
+    //     const cachedObject: unknown = JSON.parse(cachedRes) as unknown;
+    //     return cachedObject as NexusGenFieldTypes['DialogueStatisticsSummaryType'];
+    //   }
 
-    } catch (e) {
-      console.log(e);
-    }
+    // } catch (e) {
+    //   console.log(e);
+    // }
 
     const getGroupByFromDates = this.getGroupbyFromDates(filter?.startDate, filter?.endDate);
     const groupByKey = groupKey[getGroupByFromDates];
@@ -267,8 +267,11 @@ export class DialogueStatisticsService {
     const branches = dialogueTree.getBranchesByRootSlider();
 
     const negativePath = traverseTree(branches.negativeBranch.rootEdge?.childNode, selectPopularNode);
+    negativePath.prepend(dialogueTree.rootNode as DialogueTreeNode);
     const negativePathCount = nodeToCounts[negativePath.getLastNode().id];
+
     const positivePath = traverseTree(branches.positiveBranch.rootEdge?.childNode, selectPopularNode);
+    positivePath.prepend(dialogueTree.rootNode as DialogueTreeNode);
     const positivePathCount = nodeToCounts[positivePath.getLastNode().id];
 
     dialogueTree.addNodeCounts(nodeToCounts);

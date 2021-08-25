@@ -12,6 +12,14 @@ export class DialogueTreePath {
     this.callToActionId = callToActionId;
   }
 
+  prepend(node: DialogueTreeNode): void {
+    this.nodes = [node, ...this.nodes];
+  }
+
+  append(node: DialogueTreeNode): void {
+    this.nodes = [...this.nodes, node];
+  }
+
   getLastNode(): DialogueTreeNode {
     return maxBy(this.nodes, (node => node.layer)) as DialogueTreeNode;
   }

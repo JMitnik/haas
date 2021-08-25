@@ -81,3 +81,45 @@ describe('DialogueStatisticsService.parseCacheKey', () => {
     expect(cacheKey).toEqual('dialogue_statistics:TEST_123:00-13-01-202100-15-01-2021');
   });
 });
+
+describe('DialogueStatisticsService.calculateStatistics', () => {
+  afterEach(async () => {
+    await clearDialogueDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
+  test('it can calculate a summary of critical path', async () => {
+    // Prep make some interactions and a dialogue
+    const createdDialogue = await createTestDialogue(prisma);
+    await createFewInteractions(prisma);
+
+    const statisticsSummary = await dialogueStatisticsService.getDialogueStatisticsSummary(
+      'TEST_ID'
+    );
+
+    expect(statisticsSummary.pathsSummary.mostCriticalPath.nodes).toHaveLength(3);
+    // @ts-ignore
+    expect(statisticsSummary.pathsSummary.mostCriticalPath.nodes[0].summary.nrEntries).toEqual(3);
+    // @ts-ignore
+    expect(statisticsSummary.pathsSummary.mostCriticalPath.nodes[1].summary.nrEntries).toEqual(2);
+    // @ts-ignore
+    expect(statisticsSummary.pathsSummary.mostCriticalPath.nodes[1].summary.visitRate).toBeCloseTo(0.6666666);
+    // @ts-ignore
+    expect(statisticsSummary.pathsSummary.mostCriticalPath.nodes[2].summary.nrEntries).toEqual(1);
+    // @ts-ignore
+    expect(statisticsSummary.pathsSummary.mostCriticalPath.nodes[2].summary.visitRate).toBeCloseTo(0.5);
+
+    expect(statisticsSummary.pathsSummary.mostPopularPath.nodes).toHaveLength(3);
+    // TODO: Fix this sumamry problem: Prisma backing type ruins this
+    // @ts-ignore
+    expect(statisticsSummary.pathsSummary.mostPopularPath.nodes[0].summary.nrEntries).toEqual(3);
+    // @ts-ignore
+    expect(statisticsSummary.pathsSummary.mostPopularPath.nodes[1].summary.nrEntries).toEqual(1);
+    // @ts-ignore
+    expect(statisticsSummary.pathsSummary.mostPopularPath.nodes[1].summary.visitRate).toBeCloseTo(0.3333333);
+    // @ts-ignore
+    expect(statisticsSummary.pathsSummary.mostPopularPath.nodes[2].summary.nrEntries).toEqual(1);
+    // @ts-ignore
+    expect(statisticsSummary.pathsSummary.mostPopularPath.nodes[2].summary.visitRate).toBeCloseTo(1);
+  });
+});
