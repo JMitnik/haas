@@ -33,5 +33,9 @@ describe('DialogueTree', () => {
 
     expect(branches.positiveBranch.rootEdge.childNode.id).toBe('LEVEL_1_POSITIVE');
     expect(branches.negativeBranch.rootEdge.childNode.id).toBe('LEVEL_1_NEGATIVE');
+
+    dialogueTree.nodes['LEVEL_1_POSITIVE'].title = 'SLIDER YOOs';
+
+    console.log(dialogueTree.rootNode.isParentNodeOf[0]);
   });
 })

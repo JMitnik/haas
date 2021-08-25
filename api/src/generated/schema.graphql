@@ -974,6 +974,10 @@ type QuestionNode {
   updatedAt: String
 }
 
+type QuestionNodeSummaryType {
+  nrEntries: Int!
+}
+
 """The different types a node can assume"""
 enum QuestionNodeTypeEnum {
   CHOICE

@@ -1,4 +1,5 @@
 import { NodeType } from '@prisma/client';
+import { NexusGenFieldTypes } from '../../../generated/nexus';
 import { traverseTree } from '../../../utils/traverseTree';
 import { DialogueTreePath } from './DialoguePath';
 import { PrismaQuestionNode, DialogueTreeNode, DialogueTreeEdge, DialogueBranchSplit, PrismaEdge } from './DialogueTreeTypes';
@@ -7,7 +8,14 @@ import { PrismaQuestionNode, DialogueTreeNode, DialogueTreeEdge, DialogueBranchS
  * DialogueTree.
  */
 export class DialogueTree {
+  nodes: Record<string, DialogueTreeNode>;
+  edges: Record<string, DialogueTreeEdge>;
   rootNode?: DialogueTreeNode;
+
+  constructor() {
+    this.nodes = {};
+    this.edges = {};
+  }
 
   /**
    * Create DialogueTree from Prisma-fetched nodes.
@@ -23,23 +31,28 @@ export class DialogueTree {
       currentNode: PrismaQuestionNode,
       layer: number,
     ): DialogueTreeNode => {
-      return {
+      const node  = {
         ...currentNode,
         layer,
-        isParentNodeOf: currentNode?.isParentNodeOf ? (
-          currentNode?.isParentNodeOf.map(childEdge => {
-            const childNode = nodes.find(node => node.id === childEdge.childNodeId) as DialogueTreeNode;
-            const edge = edges.find(edge => childEdge.id === edge.id) as DialogueTreeEdge;
-
-            return {
-              ...childEdge,
-              childNode: recursiveGetChildren(childNode, layer + 1),
-              parentNodeId: currentNode.id,
-              conditions: edge.conditions,
-            }
-          })
-        ): []
+        isParentNodeOf: [],
       };
+
+      this.nodes[currentNode.id] = node;
+      this.nodes[currentNode.id].isParentNodeOf = currentNode?.isParentNodeOf ? (
+        currentNode?.isParentNodeOf.map(childEdge => {
+          const childNode = nodes.find(node => node.id === childEdge.childNodeId) as DialogueTreeNode;
+          const edge = edges.find(edge => childEdge.id === edge.id) as DialogueTreeEdge;
+
+          return {
+            ...childEdge,
+            childNode: recursiveGetChildren(childNode, layer + 1),
+            parentNodeId: currentNode.id,
+            conditions: edge.conditions,
+          }
+        })
+      ): [];
+
+      return node;
     };
 
     const dialogueTreeRootNode = recursiveGetChildren(rootNode, 0);

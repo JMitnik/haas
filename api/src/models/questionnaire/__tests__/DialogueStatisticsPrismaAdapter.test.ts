@@ -9,7 +9,7 @@ const dialogueStatisticsPrismaAdapter = new DialogueStatisticsPrismaAdapter(pris
 
 describe('DialogueStatisticsService', () => {
   afterEach(async () => {
-    await clearDialogueDatabase(prisma);
+    // await clearDialogueDatabase(prisma);
     await prisma.$disconnect();
   });
 
@@ -37,8 +37,6 @@ describe('DialogueStatisticsService', () => {
       0,
       30
     );
-
-    console.log(negativeNodes);
   });
 
   test('it can find the entire nodes of an entire sub-branch', async () => {

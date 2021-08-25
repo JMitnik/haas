@@ -21,6 +21,8 @@ export interface DialogueTreeEdge extends Omit<PrismaEdge, 'childNode'> {
 export interface DialogueTreeNode extends Omit<PrismaQuestionNode, 'isParentNodeOf'> {
   layer: number;
   isParentNodeOf: DialogueTreeEdge[];
+
+  summary?: NexusGenFieldTypes['QuestionNodeSummaryType'];
 }
 
 export interface DialogueBranchSplit {

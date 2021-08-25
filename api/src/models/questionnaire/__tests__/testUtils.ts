@@ -228,7 +228,7 @@ export const createTestDialogue = async (prisma: PrismaClient) => {
         title: node.title,
         type: node.type,
         isRoot: node.isRoot,
-        questionDialogue: { connect: { id: createdDialogue.id } }
+        questionDialogue: { connect: { id: createdDialogue?.id } }
       }
     });
   }));
@@ -236,7 +236,7 @@ export const createTestDialogue = async (prisma: PrismaClient) => {
   const createdEdges = await Promise.all(edges.map(async (edge) => {
     await prisma.edge.create({
       data: {
-        dialogue: { connect: { id: createdDialogue.id } },
+        dialogue: { connect: { id: 'TEST_ID' } },
         ...edge
       }
     });
