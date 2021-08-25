@@ -271,6 +271,9 @@ export class DialogueStatisticsService {
     const positivePath = traverseTree(branches.positiveBranch.rootEdge?.childNode, selectPopularNode);
     const positivePathCount = nodeToCounts[positivePath.getLastNode().id];
 
+    dialogueTree.addNodeCounts(nodeToCounts);
+    dialogueTree.calculateNodeRate();
+
     return {
       mostCriticalPath: {
         edges: negativePath.edges,

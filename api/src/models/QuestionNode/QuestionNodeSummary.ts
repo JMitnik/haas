@@ -4,6 +4,7 @@ export const QuestionNodeSummaryType = objectType({
   name: 'QuestionNodeSummaryType',
 
   definition(t) {
-    t.int('nrEntries');
+    t.int('nrEntries', { nullable: true });
+    t.float('visitRate', { nullable: true });
   }
 });

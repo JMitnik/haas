@@ -975,7 +975,8 @@ type QuestionNode {
 }
 
 type QuestionNodeSummaryType {
-  nrEntries: Int!
+  nrEntries: Int
+  visitRate: Float
 }
 
 """The different types a node can assume"""

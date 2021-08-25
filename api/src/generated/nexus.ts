@@ -730,7 +730,8 @@ export interface NexusGenRootTypes {
   Query: {};
   QuestionNode: prisma.QuestionNode;
   QuestionNodeSummaryType: { // root type
-    nrEntries: number; // Int!
+    nrEntries?: number | null; // Int
+    visitRate?: number | null; // Float
   }
   QuestionOption: prisma.QuestionOption;
   RefreshAccessTokenOutput: { // root type
@@ -1383,7 +1384,8 @@ export interface NexusGenFieldTypes {
     updatedAt: string | null; // String
   }
   QuestionNodeSummaryType: { // field return type
-    nrEntries: number; // Int!
+    nrEntries: number | null; // Int
+    visitRate: number | null; // Float
   }
   QuestionOption: { // field return type
     id: number; // Int!

@@ -33,9 +33,30 @@ describe('DialogueTree', () => {
 
     expect(branches.positiveBranch.rootEdge.childNode.id).toBe('LEVEL_1_POSITIVE');
     expect(branches.negativeBranch.rootEdge.childNode.id).toBe('LEVEL_1_NEGATIVE');
+  });
 
-    dialogueTree.nodes['LEVEL_1_POSITIVE'].title = 'SLIDER YOOs';
+  test('add node-entries to tree', async () => {
+    // Prep: create dialogue and fetch nodes/edges
+    const createdDialogue = await createTestDialogue(prisma);
+    const { nodes, edges } = await dialogueServicePrismaService.getNodesAndEdges(createdDialogue.id);
+    const dialogueTree = new DialogueTree().initFromPrismaNodes(nodes, edges);
 
-    console.log(dialogueTree.rootNode.isParentNodeOf[0]);
+    dialogueTree.addNodeCounts({ 'LEVEL_1_NEGATIVE': 22 });
+
+    expect(dialogueTree.nodes['LEVEL_1_NEGATIVE']?.summary?.nrEntries).toEqual(22);
+  });
+
+  test('can calculate visit rate', async () => {
+    // Prep: create dialogue and fetch nodes/edges
+    const createdDialogue = await createTestDialogue(prisma);
+    const { nodes, edges } = await dialogueServicePrismaService.getNodesAndEdges(createdDialogue.id);
+    const dialogueTree = new DialogueTree().initFromPrismaNodes(nodes, edges);
+
+    dialogueTree.addNodeCounts({ 'LEVEL_1_POSITIVE': 20, 'LEVEL_1_NEUTRAL': 20 ,'LEVEL_1_NEGATIVE': 60 });
+    dialogueTree.calculateNodeRate();
+
+    expect(dialogueTree.nodes['LEVEL_1_NEGATIVE'].summary?.visitRate).toEqual(0.6);
+    // Unvisited nodes
+    expect(dialogueTree.nodes['LEVEL_2_NEGATIVE_Facilities'].summary?.visitRate).toEqual(0.0);
   });
 })

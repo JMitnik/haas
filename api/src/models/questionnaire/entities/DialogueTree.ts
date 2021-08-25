@@ -1,4 +1,5 @@
 import { NodeType } from '@prisma/client';
+import { sumBy } from 'lodash';
 import { NexusGenFieldTypes } from '../../../generated/nexus';
 import { traverseTree } from '../../../utils/traverseTree';
 import { DialogueTreePath } from './DialoguePath';
@@ -11,6 +12,8 @@ export class DialogueTree {
   nodes: Record<string, DialogueTreeNode>;
   edges: Record<string, DialogueTreeEdge>;
   rootNode?: DialogueTreeNode;
+
+  hasAddedNodeEntries: boolean = false;
 
   constructor() {
     this.nodes = {};
@@ -31,24 +34,28 @@ export class DialogueTree {
       currentNode: PrismaQuestionNode,
       layer: number,
     ): DialogueTreeNode => {
-      const node  = {
+      const node: DialogueTreeNode = {
         ...currentNode,
         layer,
         isParentNodeOf: [],
+        // Derived values
+        summary: { nrEntries: 0, visitRate: 0.0 }
       };
 
       this.nodes[currentNode.id] = node;
       this.nodes[currentNode.id].isParentNodeOf = currentNode?.isParentNodeOf ? (
         currentNode?.isParentNodeOf.map(childEdge => {
           const childNode = nodes.find(node => node.id === childEdge.childNodeId) as DialogueTreeNode;
-          const edge = edges.find(edge => childEdge.id === edge.id) as DialogueTreeEdge;
+          const matchEdge = edges.find(edge => childEdge.id === edge.id) as DialogueTreeEdge;
 
-          return {
+          this.edges[childEdge.id] = {
             ...childEdge,
             childNode: recursiveGetChildren(childNode, layer + 1),
             parentNodeId: currentNode.id,
-            conditions: edge.conditions,
+            conditions: matchEdge.conditions,
           }
+
+          return this.edges[childEdge.id];
         })
       ): [];
 
@@ -116,5 +123,46 @@ export class DialogueTree {
     }, { negativeBranch: { upperLimit: Infinity }, positiveBranch: { lowerLimit: -Infinity } });
 
     return branches;
+  }
+
+  /**
+   * Add node counts to tree, based on {NODE_ID: COUNT} count.
+   */
+  addNodeCounts = (nodeCounts: Record<string, number>): void => {
+    const nodeCountsArray = Object.entries(nodeCounts);
+    nodeCountsArray.forEach(([nodeId, nodeValue]) => {
+      this.nodes[nodeId].summary = { nrEntries: nodeValue, visitRate: null };
+    });
+
+    this.hasAddedNodeEntries = true;
+  }
+
+  /**
+   * Calculate nodes-visit rate in entire tree.
+   */
+  calculateNodeRate = () => {
+    if (!this.hasAddedNodeEntries) {
+      throw new Error('Node entries has not been added yet');
+    }
+
+    const nodes = Object.entries(this.nodes);
+
+    nodes.forEach(([_, node]) => {
+      const childCounts = node.isParentNodeOf?.map(childEdge => ({
+        id: childEdge?.childNode?.id || undefined,
+        count: childEdge?.childNode?.summary?.nrEntries || 0
+      })).filter(node => node.count);
+
+      const totalCount = sumBy(childCounts, (item) => item.count);
+
+      if (totalCount) {
+        childCounts.forEach((childCount) => {
+          if (childCount.id && this.nodes[childCount.id]?.summary) {
+            // @ts-ignore
+            this.nodes?.[childCount.id]?.summary?.visitRate = childCount.count / totalCount;
+          }
+        });
+      }
+    })
   }
 }
