@@ -25,9 +25,9 @@ import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
 
 import { ChoiceSummaryModule } from './Modules/ChoiceSummaryModule';
+import { PathSummaryModule } from './Modules/PathSummaryModule';
 import { ShareModal } from './ShareModal';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
-import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryModule from './Modules/SummaryModules/SummaryModule';
 
@@ -150,7 +150,7 @@ const DialogueView = () => {
   const statisticsSummary = summaryData?.dialogue?.statistics?.statisticsSummary;
   const sessionsSummaries = statisticsSummary?.sessionsSummaries;
   const choicesSummaries = statisticsSummary?.choicesSummaries;
-  console.log(statisticsSummary?.pathsSummary);
+  const pathSummary = statisticsSummary?.pathsSummary;
 
   useEffect(() => {
     if (data && !loading) {
@@ -324,8 +324,7 @@ const DialogueView = () => {
 
               <UI.Skeleton {...fetchStatus}>
                 <UI.Card />
-
-                <NegativePathsModule negativePaths={dialogue?.statistics?.topNegativePath} />
+                <PathSummaryModule data={pathSummary} />
               </UI.Skeleton>
             </UI.Grid>
           </UI.Div>

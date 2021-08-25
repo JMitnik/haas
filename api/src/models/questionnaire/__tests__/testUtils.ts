@@ -235,7 +235,10 @@ export const createTestDialogue = async (prisma: PrismaClient) => {
 
   const createdEdges = await Promise.all(edges.map(async (edge) => {
     await prisma.edge.create({
-      data: edge
+      data: {
+        dialogue: { connect: { id: createdDialogue.id } },
+        ...edge
+      }
     });
   }));
 
