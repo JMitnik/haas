@@ -25,6 +25,7 @@ import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
 
 import { ChoiceSummaryModule } from './Modules/ChoiceSummaryModule';
+import { Module } from './Modules/Module';
 import { PathSummaryModule } from './Modules/PathSummaryModule';
 import { ShareModal } from './ShareModal';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
@@ -179,6 +180,11 @@ const DialogueView = () => {
     isLoading: loading,
   };
 
+  const fetchSummaryStatus = {
+    isRefrehsing: summaryLoading,
+    isLoading: summaryLoading,
+  };
+
   return (
     <>
       <UI.ViewHead renderBreadCrumb={<UI.Breadcrumb to={getDialoguesPath()}>{t('go_to_dialogues')}</UI.Breadcrumb>}>
@@ -322,10 +328,15 @@ const DialogueView = () => {
                 <ChoiceSummaryModule data={choicesSummaries || []} />
               </UI.Skeleton>
 
-              <UI.Skeleton {...fetchStatus}>
-                <UI.Card />
-                <PathSummaryModule data={pathSummary} />
-              </UI.Skeleton>
+              <Module
+                {...fetchSummaryStatus}
+                isEmpty={pathSummary?.mostPopularPath?.edges.length === 0}
+              >
+                {!!pathSummary && (
+                  // @ts-ignore
+                  <PathSummaryModule data={pathSummary} />
+                )}
+              </Module>
             </UI.Grid>
           </UI.Div>
 

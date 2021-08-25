@@ -1378,7 +1378,7 @@ export interface NexusGenFieldTypes {
     questionDialogueId: string | null; // String
     share: NexusGenRootTypes['ShareNodeType'] | null; // ShareNodeType
     sliderNode: NexusGenRootTypes['SliderNodeType'] | null; // SliderNodeType
-    statistics: NexusGenRootTypes['NodeStatisticsType'] | null; // NodeStatisticsType
+    summary: NexusGenRootTypes['QuestionNodeSummaryType']; // QuestionNodeSummaryType!
     title: string; // String!
     type: NexusGenEnums['QuestionNodeTypeEnum']; // QuestionNodeTypeEnum!
     updatedAt: string | null; // String

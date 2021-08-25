@@ -30,6 +30,10 @@ query GetDialogueStatisticsSummary($dialogueId: ID!, $filter: DialogueStatistics
               type
               title
               layer
+              summary {
+                nrEntries
+                visitRate
+              }
             }
 
             edges {
@@ -48,6 +52,11 @@ query GetDialogueStatisticsSummary($dialogueId: ID!, $filter: DialogueStatistics
               type
               title
               layer
+
+              summary {
+                nrEntries
+                visitRate
+              }
             }
 
             edges {

@@ -6,6 +6,7 @@ import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
+import { QuestionNodeSummaryType } from './QuestionNodeSummary';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -328,16 +329,8 @@ export const QuestionNodeType = objectType({
       },
     });
 
-    t.field('statistics', {
-      type: NodeStatisticsType,
-      nullable: true,
-
-      resolve(parent) {
-        // @ts-ignore
-        if (parent.statistics) return parent.statistics;
-
-        return null;
-      }
+    t.field('summary', {
+      type: QuestionNodeSummaryType
     });
   },
 });

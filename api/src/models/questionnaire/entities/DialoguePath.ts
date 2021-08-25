@@ -12,11 +12,15 @@ export class DialogueTreePath {
     this.callToActionId = callToActionId;
   }
 
-  prepend(node: DialogueTreeNode): void {
+  prependNode(node: DialogueTreeNode): void {
     this.nodes = [node, ...this.nodes];
   }
 
-  append(node: DialogueTreeNode): void {
+  prependEdges(edges: DialogueTreeEdge[]): void {
+    this.edges = [...edges, ...this.edges];
+  }
+
+  appendNode(node: DialogueTreeNode): void {
     this.nodes = [...this.nodes, node];
   }
 

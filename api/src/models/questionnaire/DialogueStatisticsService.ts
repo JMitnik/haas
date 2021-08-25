@@ -222,8 +222,6 @@ export class DialogueStatisticsService {
     // @ts-ignore
     const choices: [string, SessionChoiceGroupValue][] = Object.entries(nodeEntryStatistics['nodes']);
 
-
-
     return choices.map(([choiceId, choiceStatistics]) => ({
       averageValue: choiceStatistics.sumScore / choiceStatistics.count,
       choiceValue: choiceStatistics.value,
@@ -267,11 +265,12 @@ export class DialogueStatisticsService {
     const branches = dialogueTree.getBranchesByRootSlider();
 
     const negativePath = traverseTree(branches.negativeBranch.rootEdge?.childNode, selectPopularNode);
-    negativePath.prepend(dialogueTree.rootNode as DialogueTreeNode);
+    negativePath.prependNode(dialogueTree.rootNode as DialogueTreeNode);
+    negativePath.prependEdges(dialogueTree.rootNode?.isParentNodeOf || []);
     const negativePathCount = nodeToCounts[negativePath.getLastNode().id];
 
     const positivePath = traverseTree(branches.positiveBranch.rootEdge?.childNode, selectPopularNode);
-    positivePath.prepend(dialogueTree.rootNode as DialogueTreeNode);
+    positivePath.prependEdges(dialogueTree.rootNode?.isParentNodeOf || []);
     const positivePathCount = nodeToCounts[positivePath.getLastNode().id];
 
     dialogueTree.addNodeCounts(nodeToCounts);

@@ -1442,7 +1442,13 @@ export type QuestionNode = {
   overrideLeaf?: Maybe<QuestionNode>;
   options: Array<QuestionOption>;
   children: Array<Edge>;
-  statistics?: Maybe<NodeStatisticsType>;
+  summary: QuestionNodeSummaryType;
+};
+
+export type QuestionNodeSummaryType = {
+  __typename?: 'QuestionNodeSummaryType';
+  nrEntries?: Maybe<Scalars['Int']>;
+  visitRate?: Maybe<Scalars['Float']>;
 };
 
 /** The different types a node can assume */
@@ -1557,6 +1563,7 @@ export type Session = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   dialogueId: Scalars['String'];
+  browser: Scalars['String'];
   paths: Scalars['Int'];
   score: Scalars['Float'];
   totalTimeInSec?: Maybe<Scalars['Int']>;
@@ -2215,9 +2222,6 @@ export type GetDialogueStatisticsQuery = (
         )>, topNegativePath?: Maybe<Array<(
           { __typename?: 'topPathType' }
           & Pick<TopPathType, 'quantity' | 'answer' | 'basicSentiment'>
-        )>>, history?: Maybe<Array<(
-          { __typename?: 'lineChartDataType' }
-          & Pick<LineChartDataType, 'x' | 'y'>
         )>> }
       )> }
     )> }
@@ -2255,6 +2259,10 @@ export type GetDialogueStatisticsSummaryQuery = (
             )>, nodes: Array<(
               { __typename?: 'QuestionNode' }
               & Pick<QuestionNode, 'id' | 'type' | 'title' | 'layer'>
+              & { summary: (
+                { __typename?: 'QuestionNodeSummaryType' }
+                & Pick<QuestionNodeSummaryType, 'nrEntries' | 'visitRate'>
+              ) }
             )>, edges: Array<(
               { __typename?: 'Edge' }
               & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
@@ -2267,6 +2275,10 @@ export type GetDialogueStatisticsSummaryQuery = (
             )>, nodes: Array<(
               { __typename?: 'QuestionNode' }
               & Pick<QuestionNode, 'id' | 'type' | 'title' | 'layer'>
+              & { summary: (
+                { __typename?: 'QuestionNodeSummaryType' }
+                & Pick<QuestionNodeSummaryType, 'nrEntries' | 'visitRate'>
+              ) }
             )>, edges: Array<(
               { __typename?: 'Edge' }
               & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
@@ -3117,10 +3129,6 @@ export const GetDialogueStatisticsDocument = gql`
           answer
           basicSentiment
         }
-        history {
-          x
-          y
-        }
       }
     }
   }
@@ -3190,6 +3198,10 @@ export const GetDialogueStatisticsSummaryDocument = gql`
               type
               title
               layer
+              summary {
+                nrEntries
+                visitRate
+              }
             }
             edges {
               id
@@ -3206,6 +3218,10 @@ export const GetDialogueStatisticsSummaryDocument = gql`
               type
               title
               layer
+              summary {
+                nrEntries
+                visitRate
+              }
             }
             edges {
               id

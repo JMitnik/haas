@@ -968,7 +968,7 @@ type QuestionNode {
 
   """Slidernode resolver"""
   sliderNode: SliderNodeType
-  statistics: NodeStatisticsType
+  summary: QuestionNodeSummaryType!
   title: String!
   type: QuestionNodeTypeEnum!
   updatedAt: String
