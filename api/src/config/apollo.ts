@@ -1,4 +1,4 @@
-import { ApolloError, ApolloServer, UserInputError } from 'apollo-server-express';
+import { ApolloServer, UserInputError } from 'apollo-server-express';
 import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
 
@@ -48,6 +48,7 @@ const makeApollo = async () => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
 
   const apollo: ApolloServer = new ApolloServer({
+    uploads: false,
     schema: applyMiddleware(schema, authShield),
     context: async (ctx): Promise<APIContext> => ({
       ...ctx,
