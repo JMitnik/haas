@@ -1,6 +1,30 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    trends_between_dates: {
+      en: 'Trends between {{startDate}} and {{endDate}}.',
+      de: 'Trends zwischen {{startDate}} und {{endDate}}.'
+    },
+    interactions_between_dates: {
+      en: 'Most frequent interactions between {{startDate}} and {{endDate}}.',
+      de: 'Die meisten häufigsten Wechselwirkungen zwischen {{startDate}} und {{endDate}}.',
+    },
+    no_journeys_made_yet: {
+      en: 'No journeys made yet between {{startDate}} and {{endDate}}.',
+      de: 'Keine Reisen, die noch zwischen {{{{startDate}} und {{endDate}} gemacht wurden.'
+    },
+    no_choices_made_yet: {
+      en: 'No choices have been recorded between {{startDate}} and {{endDate}}.',
+      de: 'Es wurden keine Auswahlmöglichkeiten zwischen {{startDate}}} und {{endDate}} wiedergegeben.'
+    },
+    no_scores_made_yet: {
+      en: 'No scores have been recorded between {{startDate}} and {{endDate}}.',
+      de: 'Es wurden keine Auswahlmöglichkeiten zwischen {{startDate}}} und {{endDate}} wiedergegeben.'
+    },
+    no_interactions_made: {
+      en: 'No interactions have been recorded yet.',
+      de: 'Noch wurden noch keine Interaktionen aufgezeichnet.'
+    },
     frequent_answers_heading: {
       en: 'Frequently answered',
       de: 'Häufig beantwortet',

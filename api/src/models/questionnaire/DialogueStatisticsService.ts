@@ -213,7 +213,13 @@ export class DialogueStatisticsService {
         // @ts-ignore
         result.nodes[nodeEntry.relatedNodeId].count += 1;
         // @ts-ignore
-        result.nodes[nodeEntry.relatedNodeId].sumScore += rootValue;
+
+        if (!rootValue) {
+          console.log(rootValue);
+        } else {
+          // @ts-ignore
+          result.nodes[nodeEntry.relatedNodeId].sumScore += rootValue;
+        }
       })
 
       return result;
@@ -246,7 +252,7 @@ export class DialogueStatisticsService {
     }, {});
     const dialogue = await this.prismaAdapter.getNodesAndEdges(dialogueId);
 
-    if (!dialogue?.nodes) return {
+    if (!dialogue?.nodes ||!nodeCounts.length) return {
       mostCriticalPath: null,
       mostPopularPath: null,
     }

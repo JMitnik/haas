@@ -2,20 +2,21 @@ import * as UI from '@haas/ui';
 import * as qs from 'qs';
 import {
   Activity, Award, MessageCircle,
-  ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
 } from 'react-feather';
-import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
-import { startOfMonth, startOfWeek, startOfYear, sub } from 'date-fns';
-import { useHistory } from 'react-router-dom';
+import { format, isValid, parse, startOfMonth, startOfWeek, startOfYear } from 'date-fns';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import { ReactComponent as AnalyticsIll } from 'assets/images/undraw_analytics.svg';
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
 import {
   GetDialogueStatisticsQuery,
   useGetDialogueStatisticsQuery,
   useGetDialogueStatisticsSummaryQuery,
 } from 'types/generated-types';
+import { ReactComponent as InteractionsIll } from 'assets/images/undraw_interactions.svg';
+import { ReactComponent as LikeDislikeIll } from 'assets/images/undraw_like_dislike.svg';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
@@ -23,6 +24,7 @@ import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 import { useDialogue } from 'providers/DialogueProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
+import useLocalStorage from 'hooks/useLocalStorage';
 
 import { ChoiceSummaryModule } from './Modules/ChoiceSummaryModule';
 import { Module } from './Modules/Module';
@@ -32,66 +34,11 @@ import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFe
 import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryModule from './Modules/SummaryModules/SummaryModule';
 
-type ActiveDateType = 'last_hour' | 'last_day' | 'last_week' | 'last_month' | 'last_year';
-type Groupby = 'minute' | 'hour' | 'day' | 'week';
-
-interface ActiveDateState {
-  dateLabel: ActiveDateType;
-  startDate: Date;
-  groupBy: Groupby;
-  compareStatisticStartDate: Date;
-}
-
-interface ActiveDateAction {
-  type: ActiveDateType;
-}
-
-const dateReducer = (state: ActiveDateState, action: ActiveDateAction): ActiveDateState => {
-  switch (action.type) {
-    case 'last_hour':
-      return {
-        startDate: sub(new Date(), { hours: 1 }),
-        compareStatisticStartDate: sub(new Date(), { hours: 2 }),
-        groupBy: 'minute',
-        dateLabel: 'last_hour',
-      };
-
-    case 'last_day':
-      return {
-        startDate: sub(new Date(), { hours: 24 }),
-        compareStatisticStartDate: sub(new Date(), { days: 2 }),
-        groupBy: 'hour',
-        dateLabel: 'last_day',
-      };
-    case 'last_month':
-      return {
-        startDate: sub(new Date(), { months: 1 }),
-        compareStatisticStartDate: sub(new Date(), { months: 2 }),
-        groupBy: 'day',
-        dateLabel: 'last_month',
-      };
-    case 'last_week':
-      return {
-        startDate: sub(new Date(), { weeks: 1 }),
-        compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
-        groupBy: 'day',
-        dateLabel: 'last_week',
-      };
-    case 'last_year':
-      return {
-        startDate: sub(new Date(), { years: 1 }),
-        compareStatisticStartDate: sub(new Date(), { years: 2 }),
-        groupBy: 'week',
-        dateLabel: 'last_year',
-      };
-    default:
-      return {
-        startDate: sub(new Date(), { weeks: 1 }),
-        compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
-        groupBy: 'day',
-        dateLabel: 'last_month',
-      };
-  }
+const isToday = (someDate: Date) => {
+  const today = new Date();
+  return someDate.getDate() === today.getDate()
+    && someDate.getMonth() === today.getMonth()
+    && someDate.getFullYear() === today.getFullYear();
 };
 
 const calcScoreIncrease = (currentScore: number, prevScore: number) => {
@@ -101,16 +48,72 @@ const calcScoreIncrease = (currentScore: number, prevScore: number) => {
 };
 
 const DialogueView = () => {
-  const [activeDateState] = useReducer(dateReducer, {
-    startDate: sub(new Date(), { weeks: 1 }),
-    compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
-    dateLabel: 'last_week',
-    groupBy: 'day',
-  });
-  const [[startDate, endDate], setDateRange] = useState([startOfWeek(new Date()), new Date()]);
   const { dialogueSlug, customerSlug, getDialoguesPath } = useNavigator();
+  const location = useLocation();
+
+  const [localDateRange, setLocalDateRange] = useLocalStorage<any>(
+    `dialogue:${dialogueSlug}:dateRange`,
+    JSON.stringify({
+      startDate: format(new Date(), 'dd-MM-yyyy'),
+      endDate: format(new Date(), 'dd-MM-yyyy'),
+    })
+  );
+
+  // Get start and end-date of dialogue filter
+  const [[startDate, endDate], setDateRange] = useState(() => {
+    // These are the default dates if no local-storage has been set
+    let startDate = new Date();
+    let endDate = new Date();
+
+    // First parse local-stored dates
+    const { startDate: startDateLocal, endDate: endDateLocal } = JSON.parse(localDateRange);
+    const parsedStartDateLocal = parse(startDateLocal, 'dd-MM-yyyy', new Date());
+    const parsedEndDateLocal = parse(endDateLocal, 'dd-MM-yyyy', new Date());
+
+    if (isValid(parsedStartDateLocal)) {
+      startDate = parsedStartDateLocal;
+    }
+
+    if (isValid(parsedEndDateLocal)) {
+      endDate = parsedEndDateLocal;
+    }
+
+    const urlParams = qs.parse(location.search, { ignoreQueryPrefix: true });
+
+    // If URL param is set, override it
+    const parsedStartDate = parse(urlParams?.startDate as string, 'dd-MM-yyyy', new Date());
+    if (isValid(parsedStartDate)) {
+      startDate = parsedStartDate;
+    }
+
+    const parsedEndDate = parse(urlParams?.endDate as string, 'dd-MM-yyyy', new Date());
+    if (isValid(parsedEndDate)) {
+      endDate = parsedEndDate;
+    }
+
+    return [startDate, endDate];
+  });
+
   const history = useHistory();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      const startDateString = format(startDate, 'dd-MM-yyyy');
+      const endDateString = format(endDate, 'dd-MM-yyyy');
+      const dateUrl = qs.stringify({
+        startDate: startDateString,
+        endDate: endDateString,
+      });
+
+      history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}?${dateUrl}`);
+
+      setLocalDateRange(JSON.stringify({
+        startDate: startDateString,
+        endDate: endDateString
+      }));
+    }
+  }, [startDate, endDate, setDateRange]);
 
   /**
    * Cache dialogue statistics data when switching between date filters.
@@ -143,8 +146,7 @@ const DialogueView = () => {
         startDate: startDate ? startDate.getTime() : undefined,
         endDate: endDate ? endDate.getTime() : undefined,
       },
-      // @ts-ignore
-      sessionGroupby: activeDateState.groupBy,
+      sessionGroupby: undefined,
     },
   });
 
@@ -161,11 +163,6 @@ const DialogueView = () => {
 
   if (!cachedDialogueCustomer) return <UI.Loader />;
   const { dialogue } = cachedDialogueCustomer;
-
-  const increaseInAverageScore = calcScoreIncrease(
-    dialogue?.thisWeekAverageScore || 0,
-    dialogue?.previousScore || 0,
-  );
 
   const makeSearchUrl = () => {
     if (!dialogue?.statistics?.mostPopularPath?.answer) return '';
@@ -184,6 +181,9 @@ const DialogueView = () => {
     isRefrehsing: summaryLoading,
     isLoading: summaryLoading,
   };
+
+  const humanStartDate = format(startDate, 'LLL do yyyy');
+  const humanEndDate = isToday(endDate) ? 'today': format(endDate, 'LLL do yyyy');
 
   return (
     <>
@@ -230,7 +230,10 @@ const DialogueView = () => {
                   <TrendingIcon fill="currentColor" />
                 </UI.Div>
                 <UI.Span ml={2}>
-                  {t(`dialogue:${activeDateState.dateLabel}_summary`)}
+                  {t('trends_between_dates', {
+                    startDate: humanStartDate,
+                    endDate: humanEndDate
+                  })}
                 </UI.Span>
               </UI.Flex>
             </UI.H4>
@@ -257,29 +260,6 @@ const DialogueView = () => {
                 isInFallback={dialogue?.thisWeekAverageScore === 0}
                 fallbackMetric={t('dialogue:fallback_no_score')}
                 renderMetric={`${(dialogue?.thisWeekAverageScore || 0 / 10).toFixed(2)} ${t('score')}`}
-                renderCornerMetric={(
-                  <UI.Flex color="red">
-                    {increaseInAverageScore > 0 ? (
-                      <>
-                        <UI.Icon size="22px" as={TrendingUp} color="green.200" />
-                        <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="green.400">
-                          {increaseInAverageScore.toFixed(2)}
-                          {' '}
-                          %
-                        </UI.Text>
-                      </>
-                    ) : (
-                      <>
-                        <UI.Icon size="22px" as={TrendingDown} color="red.200" />
-                        <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
-                          {increaseInAverageScore.toFixed(2)}
-                          {' '}
-                          %
-                        </UI.Text>
-                      </>
-                    )}
-                  </UI.Flex>
-                  )}
               />
             </UI.Skeleton>
 
@@ -294,21 +274,6 @@ const DialogueView = () => {
                 )}
                 fallbackMetric={t('dialogue:fallback_no_keywords')}
                 renderMetric={dialogue?.statistics?.mostPopularPath?.answer}
-                renderCornerMetric={(
-                  <>
-                    {dialogue?.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
-                      <Tag size="sm" variantColor="green">
-                        <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
-                        <TagLabel color="green.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
-                      </Tag>
-                    ) : (
-                      <Tag size="sm" variantColor="red">
-                        <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
-                        <TagLabel color="red.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
-                      </Tag>
-                    )}
-                  </>
-                  )}
               />
             </UI.Skeleton>
           </UI.Grid>
@@ -319,20 +284,28 @@ const DialogueView = () => {
                   <PathsIcon fill="currentColor" />
                 </UI.Div>
                 <UI.Span ml={2}>
-                  {t(`dialogue:notable_paths_of_${activeDateState.dateLabel}`)}
+                  {t('interactions_between_dates', {
+                    startDate: humanStartDate,
+                    endDate: humanEndDate
+                  })}
                 </UI.Span>
               </UI.Flex>
             </UI.H4>
             <UI.Grid gridTemplateColumns="1fr 1fr">
-              <UI.Skeleton {...fetchStatus}>
-                <ChoiceSummaryModule data={choicesSummaries || []} />
-              </UI.Skeleton>
-
               <Module
                 {...fetchSummaryStatus}
-                isEmpty={pathSummary?.mostPopularPath?.edges.length === 0}
+                isEmpty={!choicesSummaries?.length}
+                fallbackText={t('no_choices_made_yet', { startDate: humanStartDate, endDate: humanEndDate })}
               >
-                {!!pathSummary && (
+                <ChoiceSummaryModule data={choicesSummaries || []} />
+              </Module>
+              <Module
+                {...fetchSummaryStatus}
+                isEmpty={!pathSummary?.mostCriticalPath}
+                fallbackIllustration={<LikeDislikeIll />}
+                fallbackText={t('no_journeys_made_yet', { startDate: humanStartDate, endDate: humanEndDate })}
+              >
+                {!!pathSummary?.mostCriticalPath && (
                   // @ts-ignore
                   <PathSummaryModule data={pathSummary} />
                 )}
@@ -356,15 +329,24 @@ const DialogueView = () => {
           <UI.Div>
             <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
               <UI.Div>
-                <UI.Skeleton isLoading={summaryLoading}>
+                <Module
+                  {...fetchSummaryStatus}
+                  isEmpty={!sessionsSummaries?.length}
+                  fallbackIllustration={<AnalyticsIll />}
+                  fallbackText={t('no_scores_made_yet', { startDate: humanStartDate, endDate: humanEndDate })}
+                >
                   <ScoreGraphModule chartData={sessionsSummaries || []} />
-                </UI.Skeleton>
+                </Module>
               </UI.Div>
-
-              <UI.Skeleton {...fetchStatus}>
+              <Module
+                {...fetchStatus}
+                isEmpty={!dialogue?.sessions?.length}
+                fallbackText={t('no_interactions_made')}
+                fallbackIllustration={<InteractionsIll />}
+              >
                 {/* @ts-ignore */}
                 <InteractionFeedModule interactions={dialogue?.sessions || []} />
-              </UI.Skeleton>
+              </Module>
             </UI.Grid>
           </UI.Div>
         </UI.Grid>

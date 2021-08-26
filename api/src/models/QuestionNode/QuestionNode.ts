@@ -330,7 +330,9 @@ export const QuestionNodeType = objectType({
     });
 
     t.field('summary', {
-      type: QuestionNodeSummaryType
+      type: QuestionNodeSummaryType,
+      // @ts-ignore
+      resolve: (parent) => parent.summary,
     });
   },
 });
