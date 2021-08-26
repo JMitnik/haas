@@ -39,6 +39,8 @@ class DynamoScheduleService {
    * @param items
    */
   batchScheduleOneOffs = async (items: ScheduleItem[], schedulerOptions: SchedulerOptions) => {
+    if (process.env.NODE_ENV === 'test') return;
+
     const batchGroups = _.chunk(items, MAX_BATCH_SIZE);
 
     batchGroups.forEach(async (batch) => {
@@ -46,7 +48,6 @@ class DynamoScheduleService {
 
       dynamoClient.batchWriteItem(processedBatch, (err, data) => {
         if (err) console.log(err, err.stack); // an error occurred
-        else console.log(data); // successful response
       });
     });
   }

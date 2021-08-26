@@ -6,9 +6,9 @@ import { APIContext } from '../types/APIContext';
 import Sentry from './sentry';
 import authShield from './auth';
 import ContextSessionService from '../models/auth/ContextSessionService';
-import prisma from './prisma';
 import schema from './schema';
 import { bootstrapServices } from './bootstrap';
+import { PrismaClient } from '@prisma/client';
 
 const handleError = (ctx: any, error: GraphQLError) => {
   // Filter out user-input-errors (not interesting)
@@ -44,7 +44,7 @@ const handleError = (ctx: any, error: GraphQLError) => {
 }
 
 
-const makeApollo = async () => {
+export const makeApollo = async (prisma: PrismaClient) => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
 
   const apollo: ApolloServer = new ApolloServer({
