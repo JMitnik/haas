@@ -4,6 +4,7 @@ import cors, { CorsOptions } from 'cors';
 import express from 'express';
 import fs from 'fs';
 import https from 'https';
+import { graphqlUploadExpress } from 'graphql-upload';
 
 import AWS from './config/aws';
 import config from './config/config';
@@ -24,6 +25,8 @@ const main = async () => {
 
   const apollo = await makeApollo();
   const app = express();
+  app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
+
   const corsOptions: CorsOptions = {
     // Hardcoded for the moment
     origin: (origin, callback) => {

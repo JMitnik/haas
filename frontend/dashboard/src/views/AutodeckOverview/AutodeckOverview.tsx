@@ -54,6 +54,14 @@ export const AutodeckOverview = () => {
 
   const [paginationState, setPaginationState] = useState(paginationFilter);
 
+  const { data, refetch: refetchAutodeckJobs } = useGetAutodeckJobsQuery({
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      filter: paginationState,
+    },
+    pollInterval: POLL_INTERVAL,
+  });
+
   const [retryJob, { loading: retryLoading }] = useRetryAutodeckJobMutation({
     onCompleted: () => {
       setIsOpenDetailModel(false);
@@ -65,6 +73,9 @@ export const AutodeckOverview = () => {
   });
 
   const [createJob, { loading }] = useCreateWorkspaceJobMutation({
+    onError: (err: any) => {
+      console.log('ERROR: ', err);
+    },
     onCompleted: () => {
       setIsOpenImportModal(false);
       refetchAutodeckJobs({
@@ -80,14 +91,6 @@ export const AutodeckOverview = () => {
         filter: paginationState,
       });
     },
-  });
-
-  const { data, refetch: refetchAutodeckJobs } = useGetAutodeckJobsQuery({
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      filter: paginationState,
-    },
-    pollInterval: POLL_INTERVAL,
   });
 
   useEffect(() => {
@@ -239,10 +242,10 @@ export const AutodeckOverview = () => {
 
                 {activeJob?.status === JobStatusType.Failed
                   && (
-                  <UI.Div>
-                    <UI.Helper mb={1}>Error</UI.Helper>
-                    {activeJob.errorMessage}
-                  </UI.Div>
+                    <UI.Div>
+                      <UI.Helper mb={1}>Error</UI.Helper>
+                      {activeJob.errorMessage}
+                    </UI.Div>
                   )}
                 <UI.Div useFlex justifyContent="space-between">
                   <UI.Div>
@@ -251,37 +254,37 @@ export const AutodeckOverview = () => {
                   </UI.Div>
                   {activeJob?.status !== JobStatusType.Failed
                     && (
-                    <UI.Button
-                      leftIcon={Download}
-                      isDisabled={activeJob?.status !== JobStatusType.Completed || !activeJob.resourcesUrl}
-                      size="sm"
-                      variantColor="green"
-                    >
-                      {activeJob?.resourcesUrl
-                        ? (
-                          <a style={{ color: 'white', textDecoration: 'none' }} href={activeJob?.resourcesUrl} download>
-                            {t('autodeck:download_result')}
-                          </a>
-                        )
-                        : t('autodeck:download_result')}
-                    </UI.Button>
+                      <UI.Button
+                        leftIcon={Download}
+                        isDisabled={activeJob?.status !== JobStatusType.Completed || !activeJob.resourcesUrl}
+                        size="sm"
+                        variantColor="green"
+                      >
+                        {activeJob?.resourcesUrl
+                          ? (
+                            <a style={{ color: 'white', textDecoration: 'none' }} href={activeJob?.resourcesUrl} download>
+                              {t('autodeck:download_result')}
+                            </a>
+                          )
+                          : t('autodeck:download_result')}
+                      </UI.Button>
                     )}
 
                   {activeJob?.status === JobStatusType.Failed
                     && (
-                    <UI.Button
-                      isDisabled={retryLoading}
-                      onClick={() => retryJob({
-                        variables: {
-                          jobId: activeJob?.id,
-                        },
-                      })}
-                      leftIcon={RefreshCcw}
-                      size="sm"
-                      variantColor="red"
-                    >
-                      Retry
-                    </UI.Button>
+                      <UI.Button
+                        isDisabled={retryLoading}
+                        onClick={() => retryJob({
+                          variables: {
+                            jobId: activeJob?.id,
+                          },
+                        })}
+                        leftIcon={RefreshCcw}
+                        size="sm"
+                        variantColor="red"
+                      >
+                        Retry
+                      </UI.Button>
                     )}
 
                 </UI.Div>
