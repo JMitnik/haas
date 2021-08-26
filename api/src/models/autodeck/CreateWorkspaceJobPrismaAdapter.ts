@@ -18,13 +18,13 @@ class CreateWorkspaceJobPrismaAdapter {
   };
 
   create(data: ConfirmWorkspaceJobCreateInput) {
-    const inputCreate: ConfirmWorkspaceJobCreateInput = { ...data, processLocationId: data.processLocationId }
+    const { processLocationId, ...rest } = data;
     return this.prisma.createWorkspaceJob.create({
       data: {
-        ...data,
+        ...rest,
         processLocation: {
           connect: {
-            id: inputCreate.processLocationId,
+            id: processLocationId,
           },
         },
       },

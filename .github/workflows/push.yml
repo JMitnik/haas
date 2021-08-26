@@ -8,7 +8,7 @@ jobs:
     - name: Install modules
       run: yarn
     - name: Check types
-      run: yarn types:api
+      run: yarn types
     - name: Run ESLint
       run: yarn eslint
     - name: Start Testing Containers

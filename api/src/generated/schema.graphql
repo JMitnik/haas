@@ -994,6 +994,7 @@ type RoleType {
 }
 
 type Session {
+  browser: String!
   createdAt: Date!
   delivery: DeliveryType
   deliveryId: String

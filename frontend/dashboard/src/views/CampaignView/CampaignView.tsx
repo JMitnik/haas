@@ -116,6 +116,7 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
 
 const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
   label: campaign.label,
+  // @ts-ignore
   customVariables: union(campaign.variants.map((variant) => variant.customVariables.map((variable) => variable.key))),
   variants: campaign.variants.map((variant) => ({
     body: variant.body,
@@ -151,7 +152,7 @@ export const CampaignView = () => {
       deliveryConnectionFilter: paginationState,
     },
     pollInterval: POLL_INTERVAL,
-    onCompleted: (data) => setDataCache(data),
+    onCompleted: (completeData) => setDataCache(completeData),
     onError: (error) => logger.logError(error, {
       tags: { section: 'campaign' },
     }),
@@ -452,6 +453,7 @@ export const CampaignView = () => {
               <UI.CardBody>
                 <CreateCampaignForm
                   onClose={() => setIsOpenSettingsModal(false)}
+                  // @ts-ignore
                   campaign={campaignToForm(campaign)}
                   isReadOnly
                 />

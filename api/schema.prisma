@@ -357,6 +357,8 @@ model Session {
   originUrl      String?
   totalTimeInSec Int?
   device         String?
+
+  browser        String?
 }
 
 // Node-entry types
