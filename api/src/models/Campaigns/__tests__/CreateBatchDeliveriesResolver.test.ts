@@ -10,8 +10,9 @@ jest.setTimeout(30000);
 const prisma = makeTestPrisma();
 const ctx = makeTestContext(prisma);
 
-afterEach(() => {
-  clearDatabase(prisma);
+afterEach(async () => {
+  await clearDatabase(prisma);
+  await prisma.$disconnect();
 });
 
 it('send deliveries', async () => {

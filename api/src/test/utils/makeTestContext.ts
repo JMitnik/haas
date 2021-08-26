@@ -1,5 +1,3 @@
-// tests/__helpers.ts                                            // 1
-
 import { Server } from 'http';
 import getPort, { makeRange } from 'get-port';
 import { PrismaClient } from '@prisma/client';
@@ -15,7 +13,7 @@ export const makeTestContext = (prisma: PrismaClient): TestContext => {
   let ctx = {} as TestContext;
   const graphqlCtx = graphqlTestContext(prisma);
 
-  beforeEach(async () => {                                        // 2
+  beforeEach(async () => {
     const client = await graphqlCtx.before();
 
     Object.assign(ctx, {
@@ -23,11 +21,11 @@ export const makeTestContext = (prisma: PrismaClient): TestContext => {
     });
   });
 
-  afterEach(async () => {                                         // 3
+  afterEach(async () => {
     await graphqlCtx.after();
   });
 
-  return ctx;                                                     // 8
+  return ctx;
 }
 
 function graphqlTestContext(prisma: PrismaClient) {
@@ -35,14 +33,14 @@ function graphqlTestContext(prisma: PrismaClient) {
 
   return {
     async before() {
-      const port = await getPort({ port: makeRange(4002, 6000) });  // 4
+      const port = await getPort({ port: makeRange(4002, 6000) });
       serverInstance = await makeServer(port, prisma);
 
-      return new GraphQLClient(`http://localhost:${port}/graphql`);         // 6
+      return new GraphQLClient(`http://localhost:${port}/graphql`);
     },
 
     async after() {
-      serverInstance?.close();                           // 7
+      serverInstance?.close();
     },
   };
 }
