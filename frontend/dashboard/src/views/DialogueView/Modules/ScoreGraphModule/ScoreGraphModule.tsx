@@ -57,7 +57,21 @@ const ScoreGraphModule = ({ chartData }: { chartData: DialogueStatisticsSessions
             </UI.Text>
 
             <UI.Div>
-              <UI.DropdownButton
+              <UI.Switch>
+                <UI.SwitchItem
+                  isActive={metric === 'score'}
+                  onClick={() => setMetric('score')}
+                >
+                  {t('score')}
+                </UI.SwitchItem>
+                <UI.SwitchItem
+                  isActive={metric === 'count'}
+                  onClick={() => setMetric('count')}
+                >
+                  {t('count')}
+                </UI.SwitchItem>
+              </UI.Switch>
+              {/* <UI.DropdownButton
                 options={[
                   { value: 'score', label: t('score') },
                   { value: 'count', label: t('count') },
@@ -65,7 +79,7 @@ const ScoreGraphModule = ({ chartData }: { chartData: DialogueStatisticsSessions
                 onClick={(clickedMetric) => setMetric(clickedMetric)}
               >
                 {t(metric)}
-              </UI.DropdownButton>
+              </UI.DropdownButton> */}
             </UI.Div>
           </UI.Flex>
         </UI.CardHead>

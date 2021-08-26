@@ -41,12 +41,6 @@ const isToday = (someDate: Date) => {
     && someDate.getFullYear() === today.getFullYear();
 };
 
-const calcScoreIncrease = (currentScore: number, prevScore: number) => {
-  if (!prevScore) return 100;
-
-  return currentScore / prevScore || 0;
-};
-
 const DialogueView = () => {
   const { dialogueSlug, customerSlug, getDialoguesPath } = useNavigator();
   const location = useLocation();
@@ -148,6 +142,7 @@ const DialogueView = () => {
       },
       sessionGroupby: undefined,
     },
+    fetchPolicy: 'cache-and-network'
   });
 
   const statisticsSummary = summaryData?.dialogue?.statistics?.statisticsSummary;
