@@ -1,9 +1,9 @@
 // tests/__helpers.ts                                            // 1
 
 import { Server } from 'http';
-import getPort, { makeRange } from "get-port";
+import getPort, { makeRange } from 'get-port';
 import { PrismaClient } from '@prisma/client';
-import { GraphQLClient } from "graphql-request";
+import { GraphQLClient } from 'graphql-request';
 
 import { makeServer } from '../../config/server';
 

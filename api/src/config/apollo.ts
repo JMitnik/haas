@@ -1,6 +1,7 @@
 import { ApolloServer, UserInputError } from 'apollo-server-express';
 import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
+import { PrismaClient } from '@prisma/client';
 
 import { APIContext } from '../types/APIContext';
 import Sentry from './sentry';
@@ -8,7 +9,6 @@ import authShield from './auth';
 import ContextSessionService from '../models/auth/ContextSessionService';
 import schema from './schema';
 import { bootstrapServices } from './bootstrap';
-import { PrismaClient } from '@prisma/client';
 
 const handleError = (ctx: any, error: GraphQLError) => {
   // Filter out user-input-errors (not interesting)
