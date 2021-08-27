@@ -35,7 +35,7 @@ exports.lambdaHandler = async (event, context, callback) => {
     const sharedCallbackUrl = event.Records[0].dynamodb.NewImage.callback.S;
 
     console.log(`Sending to callback ${sharedCallbackUrl} updates of ${JSON.stringify(updates.map(update => update.dateId))}`);
-    await sendApiMessage(sharedCallbackUrl, updates);
+    await sendApiMessage({ updates }, sharedCallbackUrl);
     console.log(`Processing ${event.Records.length} records`);
 
     const records = event.Records.map((record) => {

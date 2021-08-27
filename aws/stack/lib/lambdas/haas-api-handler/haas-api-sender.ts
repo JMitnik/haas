@@ -1,4 +1,4 @@
-import { sendToCallbackUrl } from "../../helpers/helpers";
+import fetch from "node-fetch";
 
 const missingNotificationResponse = {
   statusCode: 400,
@@ -12,6 +12,18 @@ const genericErrorResponse = {
   body: 'General error'
 };
 
+const missingCallbackResponse = {
+  statusCode: 400,
+  headers: {},
+  body: 'callbackUrl is missing in body'
+};
+
+const missingPayloadResponse = {
+  statusCode: 400,
+  headers: {},
+  body: 'payload is missing in body'
+};
+
 const successResponse = {
   statusCode: 200,
   headers: {},
@@ -19,7 +31,7 @@ const successResponse = {
 };
 
 interface MessageProps {
-  payload: string;
+  payload: any;
   callbackUrl: string;
 }
 
@@ -31,10 +43,38 @@ exports.main = async function(event: any, context: any) {
     }
 
     const { payload, callbackUrl }: MessageProps = JSON.parse(event?.Records[0]?.Sns?.Message);
-    await sendToCallbackUrl(callbackUrl, payload);
+    if (!callbackUrl) { return missingCallbackResponse; }
+    if (!payload) { return missingPayloadResponse; }
 
-    return successResponse;
-  } catch {
+    console.log(JSON.parse(event?.Records[0]?.Sns?.Message));
+    const callbackUrlHttps = callbackUrl.replace(/^http:\/\//i, 'https://');
+
+    try {
+      const res = await fetch(callbackUrlHttps, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+      console.log("Res:", res);
+      console.log("Res response:", res.status);
+      console.log("Res response:", await res.text);
+      console.log("Res response:", await res.json());
+      return successResponse;
+    } catch (error: unknown) {
+      console.error({ error, callbackUrlHttps });
+
+      if (error instanceof Error) {
+        return genericErrorResponse;
+      }
+
+      return genericErrorResponse;
+    }
+
+  } catch (error) {
+    console.error({ error });
+
     console.log("Errored out");
     return genericErrorResponse;
   }

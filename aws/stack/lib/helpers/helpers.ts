@@ -1,5 +1,4 @@
-import * as https from 'https';
-import { parse } from 'url';
+import fetch from 'node-fetch';
 
 export const sendErrorToDynamo = async (
   dynamoClient: AWS.DynamoDB.DocumentClient,
@@ -29,28 +28,12 @@ export const sendErrorToDynamo = async (
 }
 
 
-export const sendToCallbackUrl = async (callbackUrl: string, payload: string) => {
-  const {hostname, pathname} = parse(callbackUrl);
-
-  return new Promise((resolve, reject) => {
-    const req = https.request({
-      hostname,
-      method: 'POST',
-      path: pathname,
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    }, (res) => {
-      resolve('Success');
-    });
-
-    req.on('error', (e) => {
-      console.error(e);
-      reject(e.message);
-    });
-
-    // send the request
-    req.write(JSON.stringify(payload));
-    req.end();
+export const sendToCallbackUrl = async (callbackUrl: string, payload: any) => {
+  return fetch(callbackUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload)
   });
 };

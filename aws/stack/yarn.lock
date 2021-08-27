@@ -503,6 +503,19 @@
     "@aws-cdk/cx-api" "1.120.0"
     constructs "^3.3.69"
 
+"@aws-cdk/aws-lambda-destinations@^1.120.0":
+  version "1.120.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-lambda-destinations/-/aws-lambda-destinations-1.120.0.tgz#7f3369186b41784765129374eb8c0fd33303089a"
+  integrity sha512-9xeEyjaFqQ+BLgh/O+f9vwF4LI7XohyuetUb/hYPKARQdUQy7y2DnEmPQ/G7ognx1Enh5OLthuOHMfTdkuSmGw==
+  dependencies:
+    "@aws-cdk/aws-events" "1.120.0"
+    "@aws-cdk/aws-events-targets" "1.120.0"
+    "@aws-cdk/aws-lambda" "1.120.0"
+    "@aws-cdk/aws-sns" "1.120.0"
+    "@aws-cdk/aws-sqs" "1.120.0"
+    "@aws-cdk/core" "1.120.0"
+    constructs "^3.3.69"
+
 "@aws-cdk/aws-lambda-nodejs@^1.120.0":
   version "1.120.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-lambda-nodejs/-/aws-lambda-nodejs-1.120.0.tgz#53f7cb8d6ea55393af36def38e5235677cc64860"
@@ -4157,6 +4170,11 @@ nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
+
+node-fetch@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
+  integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
 node-int64@^0.4.0:
   version "0.4.0"
