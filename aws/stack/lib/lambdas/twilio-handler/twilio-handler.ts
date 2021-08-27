@@ -61,6 +61,7 @@ exports.main = async function (event: any, context: any) {
     }
 
     if (body.MessageStatus === 'failed' || body.MessageStatus === 'undelivered') {
+      console.error(`Something went wrong for ${dateDeliveryId}`);
       status = 'ERRORED';
     }
 

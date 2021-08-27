@@ -69,7 +69,7 @@ const main = async () => {
   });
 
   app.post('/webhooks/delivery', bodyParser.json(), async (req: any, res: any, next: any) => {
-    console.log(req.body);
+    // console.log(req.body);
     await CampaignService.updateBatchDeliveryStatus(req.body);
     res.status(200).end();
   });
