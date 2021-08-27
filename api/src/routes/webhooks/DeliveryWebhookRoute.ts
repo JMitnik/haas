@@ -34,7 +34,7 @@ router.post('/',
         msg = e.message;
       }
 
-      return res.status(400).send(msg).end();
+      return res.status(400).json({ error: msg }).send(msg).end();
     }
   }
 );
