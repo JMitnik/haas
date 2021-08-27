@@ -69,9 +69,13 @@ const main = async () => {
   });
 
   app.post('/webhooks/delivery', bodyParser.json(), async (req: any, res: any, next: any) => {
-    console.log(req.body);
-    await CampaignService.updateBatchDeliveryStatus(req.body);
-    res.status(200).end();
+    try {
+      await CampaignService.updateBatchDeliveryStatus(req.body);
+      res.status(200).end();
+    } catch(e) {
+      console.error(req.body);
+      res.status(400).send(e.toString()).end();
+    }
   });
 
   app.use(cookieParser());
