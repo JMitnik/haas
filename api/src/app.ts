@@ -74,6 +74,7 @@ const main = async () => {
       res.status(200).end();
     } catch(e) {
       console.error(req.body);
+      // @ts-ignore
       res.status(400).send(e.toString()).end();
     }
   });

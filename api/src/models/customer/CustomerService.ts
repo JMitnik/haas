@@ -203,6 +203,7 @@ class CustomerService {
 
       return customer;
     } catch (error) {
+      // @ts-ignore
       if (error.code === 'P2002') {
         throw new UserInputError('customer:existing_slug');
       }
