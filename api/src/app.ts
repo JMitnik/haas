@@ -9,7 +9,7 @@ import { graphqlUploadExpress } from 'graphql-upload';
 import AWS from './config/aws';
 import config from './config/config';
 import makeApollo from './config/apollo';
-import { CampaignService } from './models/Campaigns/CampaignService';
+import DeliveryWebhookRoute from './routes/webhooks/DeliveryWebhookRoute';
 
 process.on('SIGINT', () => {
   console.log('received sigint');
@@ -20,12 +20,9 @@ process.on('SIGINT', () => {
 });
 
 const main = async () => {
-  console.log(config.testString);
   console.log('🏳️\tStarting application');
 
-  const apollo = await makeApollo();
   const app = express();
-  app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
 
   const corsOptions: CorsOptions = {
     // Hardcoded for the moment
@@ -41,47 +38,19 @@ const main = async () => {
     credentials: true,
   };
 
-  app.get('/', (req, res, next) => {
-    console.log(`The length of the env variable is ${config.jwtSecret.length}`);
+  app.get('/', (req, res, next) => { res.json({ status: 'HAAS API V2.1.0' }); });
+  app.get('/health', (req, res, next) => { res.json({ status: 'Health check' }); });
 
-    res.json({ status: 'HAAS API V2.1.0' });
-  });
-
-  app.get('/health', (req, res, next) => {
-    res.json({ status: 'Health check' });
-  });
-
-  app.get('/test', async (req, res, next) => {
-    const dynamoClient = new AWS.DynamoDB.DocumentClient();
-    const result = await (dynamoClient.query({
-      TableName: 'CampaignDeliveries',
-      KeyConditionExpression: 'DeliveryDate = :dddd',
-      ExpressionAttributeValues: {
-        ':dddd': '26022021'
-      }
-    }).promise());
-
-    res.json({ nrItems: result?.Items?.length });
-  });
-
-  app.post('/webhooks', bodyParser.json(), async (req: any, res: any, next: any) => {
-    res.send('success');
-  });
-
-  app.post('/webhooks/delivery', bodyParser.json(), async (req: any, res: any, next: any) => {
-    try {
-      await CampaignService.updateBatchDeliveryStatus(req.body);
-      res.status(200).end();
-    } catch(e) {
-      console.error(req.body);
-      // @ts-ignore
-      res.status(400).send(e.toString()).end();
-    }
-  });
+  // Webhooks route
+  app.post('/webhooks', express.json(), async (req, res) => { res.send('success'); });
+  app.use('/webhooks/delivery', DeliveryWebhookRoute);
 
   app.use(cookieParser());
   app.use(cors(corsOptions));
 
+  // Add /graphql and graphqlUploadExpress
+  const apollo = await makeApollo();
+  app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
   apollo.applyMiddleware({ app, cors: false, });
 
   console.log('🏳️\tStarting the server');
