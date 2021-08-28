@@ -190,29 +190,3 @@ const sendApiMessage = (
     })
   }).promise();
 };
-
-const sendToCallbackUrl = async (callbackUrl, payload) => {
-  const {hostname, pathname} = URL.parse(callbackUrl);
-
-  return new Promise((resolve, reject) => {
-    const req = https.request({
-      hostname,
-      method: 'POST',
-      path: pathname,
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    }, (res) => {
-      resolve('Success');
-    });
-
-    req.on('error', (e) => {
-      console.error(e);
-      reject(e.message);
-    });
-
-    // send the request
-    req.write(JSON.stringify(payload));
-    req.end();
-  });
-};

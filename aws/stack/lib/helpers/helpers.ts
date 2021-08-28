@@ -1,5 +1,7 @@
 import fetch from 'node-fetch';
 
+import { APIError } from './errors';
+
 export const sendErrorToDynamo = async (
   dynamoClient: AWS.DynamoDB.DocumentClient,
   deliveryId: string,
@@ -28,12 +30,28 @@ export const sendErrorToDynamo = async (
 }
 
 
-export const sendToCallbackUrl = async (callbackUrl: string, payload: any) => {
-  return fetch(callbackUrl, {
+export const sendToCallbackUrl = async (callbackUrl: string, payload: any): Promise<any> => {
+  const res = await fetch(callbackUrl, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json', },
     body: JSON.stringify(payload)
   });
+
+  if (res.ok) { return res.json(); }
+  else {
+    const msg = await res.text();
+    throw new APIError(callbackUrl, msg);
+  }
 };
+
+export const makeSuccessResponse = (message: string) => ({
+  statusCode: 200,
+  headers: {},
+  body: message,
+});
+
+export const makeFailedResponse = (message: string) => ({
+  statusCode: 400,
+  headers: {},
+  body: message,
+});

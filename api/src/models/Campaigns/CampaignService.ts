@@ -231,7 +231,6 @@ export class CampaignService {
    * Update a batch of deliveries
    */
   static async updateBatchDeliveryStatus(updatedDeliveries: DeliveryUpdateItemProps[]) {
-    console.log("hmm");
     const deliveryUpdates = updatedDeliveries.map(delivery => {
       const id = delivery.dateId.slice(delivery.dateId.length - 10);
 
