@@ -53,6 +53,8 @@ exports.lambdaHandler = async (event, context, callback) => {
       const hasRecipient = !!row.DeliveryRecipient.S;
       const hasBody = !!row.DeliveryBody.S;
 
+      const dateId = row.DeliveryDate_DeliveryID.S;
+
       const willError = row.DeliveryStatus.S === 'FAILED';
 
       let failureMessage = '';
@@ -62,7 +64,7 @@ exports.lambdaHandler = async (event, context, callback) => {
 
       if (isModified && willError) {
         return sendApiMessage(
-          { updates: [ { oldStatus: 'DEPLOYED', newStatus: 'FAILED', failureMessage  } ] },
+          { updates: [ { dateId, oldStatus: 'DEPLOYED', newStatus: 'FAILED', failureMessage  } ] },
           sharedCallbackUrl
         )
       }
