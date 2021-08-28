@@ -449,7 +449,7 @@ export interface NexusGenInputs {
 export interface NexusGenEnums {
   CampaignVariantEnum: "EMAIL" | "QUEUE" | "SMS"
   CloudReferenceType: prisma.CloudReferenceType
-  DeliveryStatusEnum: "DEPLOYED" | "FINISHED" | "OPENED" | "SCHEDULED" | "SENT"
+  DeliveryStatusEnum: "DEPLOYED" | "FAILED" | "FINISHED" | "OPENED" | "SCHEDULED" | "SENT"
   FormNodeFieldTypeEnum: "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
@@ -547,6 +547,7 @@ export interface NexusGenRootTypes {
   }
   DeliveryEventType: { // root type
     createdAt: string; // String!
+    failureMessage?: string | null; // String
     id: string; // ID!
     status: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
   }
@@ -991,6 +992,7 @@ export interface NexusGenFieldTypes {
   }
   DeliveryEventType: { // field return type
     createdAt: string; // String!
+    failureMessage: string | null; // String
     id: string; // ID!
     status: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
   }
