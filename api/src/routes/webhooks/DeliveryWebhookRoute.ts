@@ -26,7 +26,7 @@ router.post('/',
 
     try {
       await CampaignService.updateBatchDeliveryStatus(req.body.updates);
-      return res.status(200).end();
+      return res.status(200).json({ status: 'success' }).end();
     } catch(e: unknown) {
       let msg = 'Error';
 
