@@ -5,7 +5,7 @@ import { APIError } from './errors';
 export const sendErrorToDynamo = async (
   dynamoClient: AWS.DynamoDB.DocumentClient,
   deliveryId: string,
-  errorMessage: string,
+  failureMessage: string,
   tableName: string = 'CampaignDeliveries',
   errorStatus: string ='FAILED'
 ) => {
@@ -19,16 +19,17 @@ export const sendErrorToDynamo = async (
       DeliveryDate: `${day}${month}${year}`,
       DeliveryDate_DeliveryID: deliveryId,
     },
-    UpdateExpression: 'set DeliveryStatus = :status, DeliveryError = :errorMessage',
+    UpdateExpression: 'set DeliveryStatus = :status, DeliveryFailureMessage = :failureMessage',
     ExpressionAttributeValues: {
       ':status': errorStatus,
-      ':errorMessage': errorMessage
+      ':failureMessage': failureMessage
     }
   }).promise();
 }
 
 
 export const sendToCallbackUrl = async (callbackUrl: string, payload: any): Promise<any> => {
+  console.log(JSON.stringify({payload}));
   const res = await fetch(callbackUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', },

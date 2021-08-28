@@ -108,7 +108,11 @@ exports.main = async function(event: any, context: any) {
     } catch (error) {
       console.error(error);
 
-      await sendErrorToDynamo(dynamoClient, deliveryId, `SendError: SMS Failed to send due to ${JSON.stringify(error)}`);
+      await sendErrorToDynamo(
+        dynamoClient,
+        deliveryId,
+        `SendError: SMS Failed to send due to ${JSON.stringify(error)}`
+      );
       return errorSmsSendResponse;
     }
 
