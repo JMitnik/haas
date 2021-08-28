@@ -53,7 +53,19 @@ exports.lambdaHandler = async (event, context, callback) => {
       const hasRecipient = !!row.DeliveryRecipient.S;
       const hasBody = !!row.DeliveryBody.S;
 
-      const willError = row.DeliveryStatus.S === 'ERRORED';
+      const willError = row.DeliveryStatus.S === 'FAILED';
+
+      let failureMessage = '';
+      if (row.DeliveryFailureMessage && row.DeliveryFailureMessage.S) {
+        failureMessage = row.DeliveryFailureMessage.S;
+      }
+
+      if (isModified && willError) {
+        return sendApiMessage(
+          { updates: [ { oldStatus: 'DEPLOYED', newStatus: 'FAILED', failureMessage  } ] },
+          sharedCallbackUrl
+        )
+      }
 
       if (isModified && hasDifferentStatus && willDeploy && hasRecipient && hasBody) {
           return deployMessage(
@@ -65,10 +77,6 @@ exports.lambdaHandler = async (event, context, callback) => {
             row.DeliveryType.S,
             'A delivery from HAAS!'
           )
-      }
-
-      if (isModified && willError) {
-        console.error(`Error identified in ${row}`);
       }
     });
 

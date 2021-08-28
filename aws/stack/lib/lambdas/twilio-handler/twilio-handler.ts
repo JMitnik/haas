@@ -1,5 +1,6 @@
 import { parse } from 'querystring';
 import * as AWS from 'aws-sdk';
+import { sendErrorToDynamo } from '../../helpers/helpers';
 
 const dynamoClient = new AWS.DynamoDB.DocumentClient();
 
@@ -23,12 +24,7 @@ exports.main = async function (event: any, context: any) {
     const body: TwilioBody = parse(event.body);
 
     if (!event.queryStringParameters?.deliveryId) {
-      console.error("No queryStringParamers found for delivery-id. Can't update status");
-      return {
-        statusCode: 400,
-        headers: {},
-        body: 'SMS received, but delivery was not updated'
-      }
+      throw new Error('No queryStringParamers found for delivery-id. Can\'t update status');
     }
 
     const dateDeliveryId = event.queryStringParameters?.deliveryId;
@@ -37,32 +33,26 @@ exports.main = async function (event: any, context: any) {
     const day = dateDeliveryId.slice(8, 10);
     let status = '';
 
-    switch(body.MessageStatus) {
-      case 'accepted': {
-        status = 'DELIVERED';
-        break;
-      }
-      case 'delivered': {
-        status = 'DELIVERED';
-        break;
-      }
-      case 'failed': {
-        status = 'ERRORED';
-        break;
-      }
-      case 'undelivered': {
-        status = 'ERRORED';
-        break;
-      }
-    }
-
     if (body.MessageStatus === 'accepted' || body.MessageStatus === 'delivered') {
       status = 'DELIVERED';
+
+      await dynamoClient.update({
+        TableName: TABLE_NAME,
+        Key: {
+          DeliveryDate: `${day}${month}${year}`,
+          DeliveryDate_DeliveryID: dateDeliveryId,
+        },
+        UpdateExpression: 'set DeliveryStatus = :status',
+        ExpressionAttributeValues: {
+          ':status': status,
+        }
+      }).promise();
     }
 
     if (body.MessageStatus === 'failed' || body.MessageStatus === 'undelivered') {
-      console.error(`Something went wrong for ${dateDeliveryId}`);
-      status = 'ERRORED';
+      status = 'FAILED';
+
+      await sendErrorToDynamo(dynamoClient, dateDeliveryId, `SendError: SMS Failed, according to ${body}`);
     }
 
     try {
@@ -79,13 +69,7 @@ exports.main = async function (event: any, context: any) {
       }).promise();
     }
     catch (error) {
-      console.error(`Unable to update dynamo during positive update: ${JSON.stringify(error, null, 2)}`);
-
-      return {
-        statusCode: 400,
-        headers: {},
-        body: JSON.stringify(error)
-      };
+      throw new Error(`Unable to update dynamo during positive update: ${JSON.stringify(error, null, 2)}`);
     }
 
     return {
@@ -94,12 +78,7 @@ exports.main = async function (event: any, context: any) {
       body: 'SMS has been handled'
     };
   } catch (error) {
-    var body = error.stack || JSON.stringify(error, null, 2);
-
-    return {
-      statusCode: 400,
-      headers: {},
-      body: JSON.stringify(body)
-    };
+    var errBody = error.stack || JSON.stringify(error, null, 2);
+    throw new Error(`Unknown update ${errBody}`);
   }
 }

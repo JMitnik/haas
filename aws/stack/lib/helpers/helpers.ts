@@ -7,13 +7,11 @@ export const sendErrorToDynamo = async (
   deliveryId: string,
   errorMessage: string,
   tableName: string = 'CampaignDeliveries',
-  errorStatus: string ='ERRORED'
+  errorStatus: string ='FAILED'
 ) => {
   const year = deliveryId.slice(0, 4);
   const month = deliveryId.slice(5, 7);
   const day = deliveryId.slice(8, 10);
-
-  console.log({ deliveryId, errorMessage, tableName, errorStatus });
 
   return dynamoClient.update({
     TableName: tableName,
@@ -37,7 +35,7 @@ export const sendToCallbackUrl = async (callbackUrl: string, payload: any): Prom
     body: JSON.stringify(payload)
   });
 
-  if (res.ok) { return res.json(); }
+  if (res.ok) { return await res.json(); }
   else {
     const msg = await res.text();
     throw new APIError(callbackUrl, msg);
