@@ -3,8 +3,25 @@ import { Tag as ChakraTag, TagProps as ChakraTagProps } from '@chakra-ui/core';
 import { Span } from './Span';
 import styled, { css } from 'styled-components';
 
+export const LabelContainer = styled.div`
+  font-weight: 600;
+  line-height: 1rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+
+  div {
+    font-weight: 600;
+    align-items: center;
+  }
+`;
+
 export const Label = (props: ChakraTagProps) => (
-  <ChakraTag {...props} />
+  <LabelContainer>
+    <ChakraTag {...props} />
+  </LabelContainer>
 );
 
 export const MicroLabel = styled(Span)`

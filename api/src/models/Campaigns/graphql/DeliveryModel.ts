@@ -9,7 +9,7 @@ import { CampaignVariantModel } from './CampaignVariantModel';
 export const DeliveryStatusEnum = enumType({
   name: 'DeliveryStatusEnum',
 
-  members: ['SCHEDULED', 'DEPLOYED', 'SENT', 'OPENED', 'FINISHED'],
+  members: ['SCHEDULED', 'DEPLOYED', 'SENT', 'OPENED', 'FINISHED', 'FAILED'],
 });
 
 // /**
@@ -40,6 +40,7 @@ export const DeliveryEventModel = objectType({
     t.id('id');
     t.field('status', { type: DeliveryStatusEnum });
     t.string('createdAt');
+    t.string('failureMessage', { nullable: true });
   }
 })
 

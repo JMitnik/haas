@@ -37,6 +37,7 @@ query GetWorkspaceCampaign(
             id
             createdAt
             status
+            failureMessage
           }
         }
 
