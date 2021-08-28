@@ -84,7 +84,11 @@ export class CampaignService {
     const findManyDeliveriesCallback = ({ props: findManyArgs }: FindManyCallBackProps) => this.prisma.delivery.findMany({
       ...findManyArgs,
       include: {
-        events: true
+        events: {
+          orderBy: {
+            createdAt: 'asc'
+          }
+        }
       }
     });
     const countDeliveriesCallback = async ({ props: countArgs }: FindManyCallBackProps) => this.prisma.delivery.count(countArgs);
