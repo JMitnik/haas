@@ -1,6 +1,6 @@
 import { parse } from 'querystring';
 import * as AWS from 'aws-sdk';
-import { sendErrorToDynamo } from '../../helpers/helpers';
+import { sendErrorToDynamo, updateDynamo } from '../../helpers/helpers';
 
 const dynamoClient = new AWS.DynamoDB.DocumentClient();
 
@@ -20,63 +20,32 @@ const TABLE_NAME = 'CampaignDeliveries';
 
 exports.main = async function (event: any, context: any) {
   try {
+    // Validate input
     if (!event.body) return { body: 'No body' };
     const body: TwilioBody = parse(event.body);
-
     if (!event.queryStringParameters?.deliveryId) {
       throw new Error('No queryStringParamers found for delivery-id. Can\'t update status');
     }
 
+    // Parse input
     const dateDeliveryId = event.queryStringParameters?.deliveryId;
-    const year = dateDeliveryId.slice(0, 4);
-    const month = dateDeliveryId.slice(5, 7);
-    const day = dateDeliveryId.slice(8, 10);
-    let status = '';
 
+    // If SMS is accepted => Dynamo as DELIVERED
     if (body.MessageStatus === 'accepted' || body.MessageStatus === 'delivered') {
-      status = 'DELIVERED';
-
-      await dynamoClient.update({
-        TableName: TABLE_NAME,
-        Key: {
-          DeliveryDate: `${day}${month}${year}`,
-          DeliveryDate_DeliveryID: dateDeliveryId,
-        },
-        UpdateExpression: 'set DeliveryStatus = :status',
-        ExpressionAttributeValues: {
-          ':status': status,
-        }
-      }).promise();
+      await updateDynamo(dynamoClient, dateDeliveryId, 'DELIVERED', TABLE_NAME, 'twilioHandle--success');
     }
 
+    // // If SMS is failed => Dynamo as failure
     if (body.MessageStatus === 'failed' || body.MessageStatus === 'undelivered') {
-      status = 'FAILED';
-
-      await sendErrorToDynamo(dynamoClient, dateDeliveryId, `SendError: SMS Failed, according to ${body}`);
+      await sendErrorToDynamo(
+        dynamoClient,
+        dateDeliveryId,
+        `SendError: SMS Failed, according to ${body}`,
+        'twilioHandle--Failed'
+      );
     }
 
-    try {
-      await dynamoClient.update({
-        TableName: TABLE_NAME,
-        Key: {
-          DeliveryDate: `${day}${month}${year}`,
-          DeliveryDate_DeliveryID: dateDeliveryId,
-        },
-        UpdateExpression: 'set DeliveryStatus = :status',
-        ExpressionAttributeValues: {
-          ':status': status,
-        }
-      }).promise();
-    }
-    catch (error) {
-      throw new Error(`Unable to update dynamo during positive update: ${JSON.stringify(error, null, 2)}`);
-    }
-
-    return {
-      statusCode: 200,
-      headers: {},
-      body: 'SMS has been handled'
-    };
+    return { statusCode: 200, headers: {}, body: 'SMS has been handled' };
   } catch (error) {
     var errBody = error.stack || JSON.stringify(error, null, 2);
     throw new Error(`Unknown update ${errBody}`);

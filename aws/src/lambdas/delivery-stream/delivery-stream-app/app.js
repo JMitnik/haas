@@ -26,17 +26,18 @@ exports.lambdaHandler = async (event, context, callback) => {
   } catch (e) {}
 
   try {
-    const updates = event.Records.map((record) => ({
+    const updatesWithNew = event.Records.filter(record =>  !!record.dynamodb.NewImage);
+    if (!updatesWithNew.length) return { status: 400, headers: {} };
+
+    // Prepare updates to send to API Webhook
+    const updates = updatesWithNew.map((record) => ({
       dateId: record.dynamodb.NewImage.DeliveryDate_DeliveryID.S,
       oldStatus: record.dynamodb.OldImage.DeliveryStatus.S,
       newStatus: record.dynamodb.NewImage.DeliveryStatus.S,
+      failureMessage: (record.dynamodb.NewImage && record.dynamodb.NewImage.DeliveryFailureMessage) ? record.dynamodb.NewImage.DeliveryFailureMessage.S : ''
     }));
-
     const sharedCallbackUrl = event.Records[0].dynamodb.NewImage.callback.S;
-
-    console.log(`Sending to callback ${sharedCallbackUrl} updates of ${JSON.stringify(updates.map(update => update.dateId))}`);
     await sendApiMessage({ updates }, sharedCallbackUrl);
-    console.log(`Processing ${event.Records.length} records`);
 
     const records = event.Records.map((record) => {
       const row = record.dynamodb.NewImage;
@@ -52,22 +53,6 @@ exports.lambdaHandler = async (event, context, callback) => {
       const willDeploy = row.DeliveryStatus.S === 'DEPLOYED';
       const hasRecipient = !!row.DeliveryRecipient.S;
       const hasBody = !!row.DeliveryBody.S;
-
-      const dateId = row.DeliveryDate_DeliveryID.S;
-
-      const willError = row.DeliveryStatus.S === 'FAILED';
-
-      let failureMessage = '';
-      if (row.DeliveryFailureMessage && row.DeliveryFailureMessage.S) {
-        failureMessage = row.DeliveryFailureMessage.S;
-      }
-
-      if (isModified && willError) {
-        return sendApiMessage(
-          { updates: [ { dateId, oldStatus: 'DEPLOYED', newStatus: 'FAILED', failureMessage  } ] },
-          sharedCallbackUrl
-        )
-      }
 
       if (isModified && hasDifferentStatus && willDeploy && hasRecipient && hasBody) {
           return deployMessage(
@@ -87,7 +72,6 @@ exports.lambdaHandler = async (event, context, callback) => {
     console.log(`Deployed ${records.length} records`);
   } catch (err) {
     console.log(err);
-    callback(null, `Had an error: ${err}`);
   }
 };
 

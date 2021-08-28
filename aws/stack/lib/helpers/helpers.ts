@@ -7,11 +7,14 @@ export const sendErrorToDynamo = async (
   deliveryId: string,
   failureMessage: string,
   tableName: string = 'CampaignDeliveries',
-  errorStatus: string ='FAILED'
+  errorStatus: string = 'FAILED',
+  from: string = '',
 ) => {
   const year = deliveryId.slice(0, 4);
   const month = deliveryId.slice(5, 7);
   const day = deliveryId.slice(8, 10);
+
+  console.log({ from });
 
   return dynamoClient.update({
     TableName: tableName,
@@ -23,6 +26,33 @@ export const sendErrorToDynamo = async (
     ExpressionAttributeValues: {
       ':status': errorStatus,
       ':failureMessage': failureMessage
+    }
+  }).promise();
+}
+
+export const updateDynamo = async (
+  dynamoClient: AWS.DynamoDB.DocumentClient,
+  deliveryId: string,
+  status: string,
+  tableName: string = 'CampaignDeliveries',
+  from: string = '',
+) => {
+  const year = deliveryId.slice(0, 4);
+  const month = deliveryId.slice(5, 7);
+  const day = deliveryId.slice(8, 10);
+
+  console.log({ from });
+  console.log({status});
+
+  return dynamoClient.update({
+    TableName: tableName,
+    Key: {
+      DeliveryDate: `${day}${month}${year}`,
+      DeliveryDate_DeliveryID: deliveryId,
+    },
+    UpdateExpression: 'set DeliveryStatus = :status',
+    ExpressionAttributeValues: {
+      ':status': status,
     }
   }).promise();
 }
