@@ -244,7 +244,8 @@ export class CampaignService {
       const newEvent = prisma.deliveryEvents.create({
         data: {
           status: delivery.newStatus,
-          Delivery: { connect: { id } }
+          Delivery: { connect: { id } },
+          failureMessage: delivery?.failureMessage || undefined
         }
       });
 
