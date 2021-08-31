@@ -226,7 +226,7 @@ class SessionService {
                   },
                 },
               },
-            }, {}],
+            }, { }],
           },
           orderBy: {
             createdAt: 'desc',
@@ -336,6 +336,7 @@ class SessionService {
       paginationOpts: pageOpts,
     };
 
+    console.log('paginate props: ', paginateProps);
     const { entries, pageInfo: paginateInfo } = await paginate(paginateProps);
 
     const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {

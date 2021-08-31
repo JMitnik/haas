@@ -161,9 +161,10 @@ const UsersOverview = () => {
     [],
   );
 
-  const pageCount = data?.userTable?.pageInfo?.nrPages || 1;
-  const pageIndex = data?.userTable?.pageInfo?.pageIndex || 0;
-
+  console.log('page info: ', data?.customer?.usersConnection?.pageInfo);
+  const pageCount = data?.customer?.usersConnection?.pageInfo?.nrPages || 1;
+  const pageIndex = data?.customer?.usersConnection?.pageInfo?.pageIndex || 0;
+  console.log('PAGINATION INDEX USERS: ', pageIndex);
   return (
     <>
       <UI.ViewHead>

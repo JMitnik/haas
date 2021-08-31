@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
-import { NexusGenInputs } from '../../generated/nexus';
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
@@ -309,7 +309,14 @@ class UserService {
       paginationOpts,
     };
 
-    const { entries, pageInfo } = await paginate(paginateProps);
+    console.log('pagination props: ', paginateProps);
+    const { entries, pageInfo: paginateInfo } = await paginate(paginateProps);
+
+    const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
+      nrPages: paginateInfo?.nrPages || 1,
+      pageIndex: (paginationOpts?.pageIndex !== undefined && paginationOpts?.pageIndex !== null)
+        ? paginationOpts.pageIndex : 0,
+    };
 
     return {
       userCustomers: entries,

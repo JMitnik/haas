@@ -56,9 +56,7 @@ export const CustomerType = objectType({
             orderBy: args.filter?.orderBy,
             searchTerm: args.filter?.searchTerm,
           },
-
         );
-
         return users as any;
       },
     });
