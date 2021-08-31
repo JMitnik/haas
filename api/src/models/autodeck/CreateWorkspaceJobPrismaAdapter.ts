@@ -39,7 +39,7 @@ class CreateWorkspaceJobPrismaAdapter {
     create: ConfirmWorkspaceJobCreateInput,
     update: Prisma.CreateWorkspaceJobUpdateInput
   ): Promise<CreateWorkspaceJob & { processLocation: JobProcessLocation; }> {
-    const inputCreate: ConfirmWorkspaceJobCreateInput = { ...create, processLocationId: create.processLocationId }
+    const { processLocationId, ...rest } = create;
     return this.prisma.createWorkspaceJob.upsert({
       where: {
         id: jobId || '-1',
@@ -48,10 +48,10 @@ class CreateWorkspaceJobPrismaAdapter {
         processLocation: true,
       },
       create: {
-        ...create,
+        ...rest,
         processLocation: {
           connect: {
-            id: inputCreate.processLocationId,
+            id: processLocationId,
           },
         },
       },
