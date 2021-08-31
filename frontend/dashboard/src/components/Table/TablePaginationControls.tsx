@@ -49,7 +49,7 @@ interface TablePaginationControlsProps {
 
 const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginationControlsProps) => {
   const { t } = useTranslation();
-  console.log('pagination props: ', paginationProps);
+
   return (
     <Flex gridRow="-1" alignItems="center" justifyContent="flex-end">
       <Flex marginRight="20px" alignItems="center" justifyContent="center">

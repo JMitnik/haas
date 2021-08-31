@@ -54,7 +54,6 @@ export const slice = (
   limit: number,
   pageIndex: number,
 ) => {
-  console.log('entries: ', entries.length, 'offset: ', offset, 'limit: ', limit, 'pageIndex: ', pageIndex, 'offset + limit is smaller than entries: ', (offset + limit) < entries.length)
   if (entries.length < limit) return entries;
 
   return (offset + limit) < entries.length
@@ -129,21 +128,15 @@ export const paginate = async <GenericModelType>({
   // Find entries logic
   const findManyInput = constructFindManyInput({ ...findManyArgs, paginationOpts });
   const entries = await findManyArgs.findManyCallBack({ props: findManyInput, paginationOpts, rest });
-  console.log('TOTAL ENTRIES: ', entries.length);
   const slicedEntries = slice(entries, (offset || 0), (limit || entries.length), (pageIndex || 0));
-  console.log('sliced entries: ', slicedEntries.length);
   // Page logic
   const triggerTotal = await countCallBack({ props: countWhereInput, paginationOpts, rest: countRest });
   const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
-  console.log('has page index: ', paginationOpts.pageIndex)
-  const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
-    ? paginationOpts.pageIndex : 1;
-
-  console.log('CURRENT PAGE: ', currentPage);
 
   const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
-    nrPages: totalPages,
-    pageIndex: currentPage,
+    nrPages: totalPages || 1,
+    pageIndex: (paginationOpts?.pageIndex !== undefined && paginationOpts?.pageIndex !== null)
+      ? paginationOpts.pageIndex : 0,
   };
 
   return {

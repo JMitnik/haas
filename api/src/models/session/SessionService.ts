@@ -336,14 +336,7 @@ class SessionService {
       paginationOpts: pageOpts,
     };
 
-    console.log('paginate props: ', paginateProps);
-    const { entries, pageInfo: paginateInfo } = await paginate(paginateProps);
-
-    const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
-      nrPages: paginateInfo?.nrPages || 1,
-      pageIndex: (paginationOpts?.pageIndex !== undefined && paginationOpts?.pageIndex !== null)
-        ? paginationOpts.pageIndex : 0,
-    };
+    const { entries, pageInfo } = await paginate(paginateProps);
 
     return {
       sessions: entries as NexusGenFieldTypes['Session'][],
