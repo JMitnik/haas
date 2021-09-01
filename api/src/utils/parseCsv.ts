@@ -9,7 +9,7 @@ interface ParseCSVOptions {
  * @param file
  * @param options
  */
-export const parseCsv = async (file: any, options: ParseCSVOptions = { delimiter: ';' }): Promise<any[]> => {
+export const parseCsv = async ({ file }: any, options: ParseCSVOptions = { delimiter: ';' }): Promise<any[]> => {
   const results: any[] = [];
   await new Promise((resolve, reject) => file.createReadStream()
     .pipe(csvParser.parse({ headers: true, delimiter: options.delimiter }))

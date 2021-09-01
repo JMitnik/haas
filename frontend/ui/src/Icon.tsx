@@ -4,7 +4,7 @@ import {
   typography, TypographyProps,
   color, ColorProps,
   space, SpaceProps } from 'styled-system';
-import { Span } from '.';
+import { Span } from './Span';
 
 interface IconProps extends LayoutProps, TypographyProps, ColorProps, SpaceProps {
   stroke?: string;
@@ -18,7 +18,7 @@ export const Icon = styled.span<IconProps>`
       }
     `}
   `}
-  
+
   ${color}
   ${typography}
   ${layout}

@@ -310,12 +310,14 @@ type DeliveryConnectionType implements ConnectionInterface {
 
 type DeliveryEventType {
   createdAt: String!
+  failureMessage: String
   id: ID!
   status: DeliveryStatusEnum!
 }
 
 enum DeliveryStatusEnum {
   DEPLOYED
+  FAILED
   FINISHED
   OPENED
   SCHEDULED

@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AtSign, Clock, Eye, Flag, Mail, Plus, Settings, Smartphone } from 'react-feather';
+import { AlertTriangle, AtSign, Clock, Eye, Flag, Mail, Plus, Settings, Smartphone } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { format } from 'date-fns';
 import { union } from 'lodash';
@@ -103,6 +103,12 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
     case DeliveryStatusEnum.Opened: {
       return (
         <UI.Label variantColor="yellow">{status}</UI.Label>
+      );
+    }
+
+    case DeliveryStatusEnum.Failed: {
+      return (
+        <UI.Label variantColor="red">{status}</UI.Label>
       );
     }
 
@@ -377,60 +383,93 @@ export const CampaignView = () => {
               <UI.FormSectionHeader>{t('events')}</UI.FormSectionHeader>
               <UI.Stack spacing={4}>
                 {activeDelivery?.events?.map((event) => (
-                  <UI.Flex alignItems="center" justifyContent="space-between">
-                    {event?.status === DeliveryStatusEnum.Scheduled && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="gray.200" padding="5px" color="gray.500" style={{ borderRadius: '100%' }}>
-                          <Clock />
-                        </UI.Div>
-                        {t('scheduled_event')}
-                      </UI.Flex>
-                    )}
-                    {event?.status === DeliveryStatusEnum.Deployed && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="blue.200" padding="5px" color="blue.500" style={{ borderRadius: '100%' }}>
-                          {activeDelivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
-                            <AtSign />
-                          ) : (
-                            <Smartphone />
-                          )}
-                        </UI.Div>
-                        {t('deployed_event')}
-                      </UI.Flex>
-                    )}
-                    {event?.status === DeliveryStatusEnum.Opened && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div
-                          mr={2}
-                          bg="yellow.200"
-                          padding="5px"
-                          color="yellow.500"
-                          style={{ borderRadius: '100%' }}
-                        >
-                          <Eye />
-                        </UI.Div>
-                        {t('opened_event')}
-                      </UI.Flex>
-                    )}
-                    {event?.status === DeliveryStatusEnum.Finished && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="green.200" padding="5px" color="green.500" style={{ borderRadius: '100%' }}>
-                          <Flag />
-                        </UI.Div>
-                        {t('finished_event')}
-                      </UI.Flex>
-                    )}
-                    <UI.Span color="gray.500">
-                      {event?.createdAt && (
-                        <>
-                          {format(
-                            new Date(parseInt(event?.createdAt, 10)),
-                            'MMM do HH:mm',
-                          )}
-                        </>
+                  <UI.Div key={event?.id}>
+                    <UI.Flex alignItems="center" justifyContent="space-between">
+                      {event?.status === DeliveryStatusEnum.Scheduled && (
+                        <UI.Flex alignItems="center">
+                          <UI.Div mr={2} bg="gray.200" padding="5px" color="gray.500" style={{ borderRadius: '100%' }}>
+                            <Clock />
+                          </UI.Div>
+                          {t('scheduled_event')}
+                        </UI.Flex>
                       )}
-                    </UI.Span>
-                  </UI.Flex>
+                      {event?.status === DeliveryStatusEnum.Deployed && (
+                        <UI.Flex alignItems="center">
+                          <UI.Div mr={2} bg="blue.200" padding="5px" color="blue.500" style={{ borderRadius: '100%' }}>
+                            {activeDelivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
+                              <AtSign />
+                            ) : (
+                              <Smartphone />
+                            )}
+                          </UI.Div>
+                          {t('deployed_event')}
+                        </UI.Flex>
+                      )}
+                      {event?.status === DeliveryStatusEnum.Opened && (
+                        <UI.Flex alignItems="center">
+                          <UI.Div
+                            mr={2}
+                            bg="yellow.200"
+                            padding="5px"
+                            color="yellow.500"
+                            style={{ borderRadius: '100%' }}
+                          >
+                            <Eye />
+                          </UI.Div>
+                          {t('opened_event')}
+                        </UI.Flex>
+                      )}
+                      {event?.status === DeliveryStatusEnum.Failed && (
+                        <UI.Div>
+                          <UI.Flex alignItems="center">
+                            <UI.Div
+                              mr={2}
+                              bg="red.200"
+                              padding="5px"
+                              color="red.500"
+                              style={{ borderRadius: '100%' }}
+                            >
+                              <AlertTriangle />
+                            </UI.Div>
+                            {t('problem_delivery')}
+                          </UI.Flex>
+                        </UI.Div>
+                      )}
+                      {event?.status === DeliveryStatusEnum.Finished && (
+                        <UI.Flex alignItems="center">
+                          <UI.Div
+                            mr={2}
+                            bg="green.200"
+                            padding="5px"
+                            color="green.500"
+                            style={{ borderRadius: '100%' }}
+                          >
+                            <Flag />
+                          </UI.Div>
+                          {t('finished_event')}
+                        </UI.Flex>
+                      )}
+                      <UI.Span color="gray.500">
+                        {event?.createdAt && (
+                          <>
+                            {format(
+                              new Date(parseInt(event?.createdAt, 10)),
+                              'MMM do HH:mm',
+                            )}
+                          </>
+                        )}
+                      </UI.Span>
+                    </UI.Flex>
+
+                    {event?.failureMessage && (
+                      <UI.Div mt={4}>
+                        <UI.ErrorPane
+                          header="Delivery failure"
+                          text={event?.failureMessage}
+                        />
+                      </UI.Div>
+                    )}
+                  </UI.Div>
                 ))}
               </UI.Stack>
             </UI.CardBody>

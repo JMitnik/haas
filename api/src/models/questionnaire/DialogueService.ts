@@ -451,6 +451,7 @@ class DialogueService {
 
       return dialogue;
     } catch (error) {
+      // @ts-ignore
       if (error.code === 'P2002') {
         throw new UserInputError('dialogue:existing_slug');
       }

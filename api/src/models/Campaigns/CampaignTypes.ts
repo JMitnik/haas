@@ -40,6 +40,7 @@ export interface DeliveryUpdateItemProps {
   dateId: string;
   oldStatus: DeliveryStatusTypeEnum;
   newStatus: DeliveryStatusTypeEnum;
+  failureMessage?: string;
 }
 
 export interface ErroredRecord {
