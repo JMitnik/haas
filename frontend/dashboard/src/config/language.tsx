@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    problem_delivery: {
+      en: 'Delivery was failed',
+      de: 'Die Lieferung war fehlgeschlagen',
+    },
     custom_variables: {
       en: 'Custom variables',
       de: 'Benutzerdefinierte Variablen',

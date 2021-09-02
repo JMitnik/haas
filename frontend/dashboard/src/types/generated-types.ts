@@ -372,6 +372,7 @@ export type DeliveryEventType = {
   id: Scalars['ID'];
   status: DeliveryStatusEnum;
   createdAt: Scalars['String'];
+  failureMessage?: Maybe<Scalars['String']>;
 };
 
 export enum DeliveryStatusEnum {
@@ -379,7 +380,8 @@ export enum DeliveryStatusEnum {
   Deployed = 'DEPLOYED',
   Sent = 'SENT',
   Opened = 'OPENED',
-  Finished = 'FINISHED'
+  Finished = 'FINISHED',
+  Failed = 'FAILED'
 }
 
 /** Delivery */
@@ -1450,6 +1452,7 @@ export type Session = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   dialogueId: Scalars['String'];
+  browser: Scalars['String'];
   paths: Scalars['Int'];
   score: Scalars['Float'];
   totalTimeInSec?: Maybe<Scalars['Int']>;
@@ -1970,7 +1973,7 @@ export type GetWorkspaceCampaignQuery = (
             & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
           )>, events: Array<(
             { __typename?: 'DeliveryEventType' }
-            & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status'>
+            & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status' | 'failureMessage'>
           )> }
         )>, pageInfo: (
           { __typename?: 'PaginationPageInfo' }
@@ -2681,6 +2684,7 @@ export const GetWorkspaceCampaignDocument = gql`
             id
             createdAt
             status
+            failureMessage
           }
         }
         pageInfo {

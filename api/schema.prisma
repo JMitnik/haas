@@ -733,6 +733,7 @@ enum DeliveryStatusTypeEnum {
   SENT
   OPENED
   FINISHED
+  FAILED
 }
 
 model Delivery {
@@ -768,4 +769,6 @@ model DeliveryEvents {
   createdAt  DateTime               @default(now())
   deliveryId String?
   Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
+
+  failureMessage String?
 }
