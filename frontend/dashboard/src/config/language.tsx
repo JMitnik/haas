@@ -2115,7 +2115,7 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Dieses Feld sollte eine URL sein. Versuchen Sie, alle seltsamen Zeichen, wie Leerzeichen, zu entfernen.',
     },
     url_extension_format_not_supported: {
-      en: 'URL Extension not supported. Use only numbers, digits and - for your url extension. Example: happy-2',
+      en: 'URL Extension not supported. Use only letters, digits and - for your url extension. Example: happy-2',
       de: 'URL-Erweiterung nicht unterstützt. Verwenden Sie nur Zahlen, Ziffern und - für Ihre URL-Erweiterung. Beispiel: Happy-2',
     },
   },
