@@ -3,7 +3,7 @@ import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { APIStack } from '../lib/main-stack';
 import { MainPipelineStack } from '../lib/pipeline/main-pipeline-stack';
-// import { HaasCampaignStack } from '../lib/stacks/campaign-stack';
+import { HaasCampaignStack } from '../lib/stacks/campaign-stack';
 
 const app = new cdk.App();
 
@@ -20,6 +20,6 @@ const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
 });
 
 // // Campaign stack
-// const campaign = new HaasCampaignStack(app, 'HAASCampaign', {
-//     accountId: '649621042808'
-// });
+const campaign = new HaasCampaignStack(app, 'HAASCampaign', {
+  accountId: '649621042808'
+});

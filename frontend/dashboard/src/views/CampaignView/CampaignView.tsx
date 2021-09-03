@@ -41,8 +41,7 @@ export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
   },
 };
 
-const POLL_INTERVAL_SECONDS = 20;
-const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
+const POLL_INTERVAL_SECONDS = 30;
 
 const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
   const date = new Date(parseInt(scheduledAt, 10));
@@ -162,7 +161,7 @@ export const CampaignView = () => {
       customerSlug,
       deliveryConnectionFilter: paginationState,
     },
-    pollInterval: POLL_INTERVAL,
+    pollInterval: POLL_INTERVAL_SECONDS,
     onCompleted: (completeData) => setDataCache(completeData),
     onError: (error) => logger.logError(error, {
       tags: { section: 'campaign' },
