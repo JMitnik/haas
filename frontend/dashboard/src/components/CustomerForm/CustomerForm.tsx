@@ -217,6 +217,9 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                 name="name"
                 ref={form.register()}
               />
+              <UI.ErrorMessage>
+                {t(form?.errors?.name?.message)}
+              </UI.ErrorMessage>
             </FormControl>
 
             <FormControl isInvalid={!!form.errors.slug} isRequired>
@@ -229,6 +232,9 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                 name="slug"
                 ref={form.register()}
               />
+              <UI.ErrorMessage>
+                {t(form?.errors?.slug?.message)}
+              </UI.ErrorMessage>
             </FormControl>
           </InputGrid>
         </Div>

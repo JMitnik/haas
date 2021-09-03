@@ -6,15 +6,15 @@ import { gql, useMutation } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-
 import { useToast } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 
+import { CreateWorkspaceInput } from 'types/globalTypes';
+import { MATCH_COLOR_FORMAT, MATCH_URL_EXTENSION_FORMAT } from 'utils/validationHelpers';
 import CustomerForm from 'components/CustomerForm';
 import intToBool from 'utils/intToBool';
 
-import { CreateWorkspaceInput } from 'types/globalTypes';
 import { useUser } from '../../providers/UserProvider';
 import getCustomersOfUser from '../../queries/getCustomersOfUser';
 
@@ -27,11 +27,14 @@ const createWorkspaceMutation = gql`
 `;
 
 const schema = yup.object().shape({
-  name: yup.string().required('Name is required'),
+  name: yup.string().required('validation:field_required'),
   logo: yup.string().url('Url should be valid'),
   logoOpacity: yup.number().min(0).max(1),
-  slug: yup.string().required('Slug is required'),
-  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
+  slug: yup
+    .string()
+    .matches(MATCH_URL_EXTENSION_FORMAT, { message: 'validation:url_extension_format_not_supported' })
+    .required('validation:field_required'),
+  primaryColour: yup.string().required().matches(MATCH_COLOR_FORMAT, {
     message: 'Provided colour is not a valid hexadecimal',
   }),
   seed: yup.number(),
@@ -55,38 +58,40 @@ const AddCustomerView = () => {
     },
   });
 
-  const [createWorkspace, { loading, error: serverErrors }] = useMutation<null, { input: CreateWorkspaceInput }>(createWorkspaceMutation, {
-    onCompleted: () => {
-      toast({
-        title: 'Created!',
-        description: 'A new business has been added.',
-        status: 'success',
-        position: 'bottom-right',
-        isClosable: true,
-      });
+  const [createWorkspace, { loading, error: serverErrors }] = useMutation<null, { input: CreateWorkspaceInput }>(
+    createWorkspaceMutation, {
+      onCompleted: () => {
+        toast({
+          title: 'Created!',
+          description: 'A new business has been added.',
+          status: 'success',
+          position: 'bottom-right',
+          isClosable: true,
+        });
 
-      refreshUser();
+        refreshUser();
 
-      setTimeout(() => {
-        history.push('/');
-      }, 500);
-    },
-    onError: () => {
-      toast({
-        title: 'Unexpected error!',
-        description: 'See the form for more information.',
-        status: 'error',
-        position: 'bottom-right',
-        isClosable: true,
-      });
-    },
-    refetchQueries: [{
-      query: getCustomersOfUser,
-      variables: {
-        userId: user?.id,
+        setTimeout(() => {
+          history.push('/');
+        }, 500);
       },
-    }],
-  });
+      onError: () => {
+        toast({
+          title: 'Unexpected error!',
+          description: 'See the form for more information.',
+          status: 'error',
+          position: 'bottom-right',
+          isClosable: true,
+        });
+      },
+      refetchQueries: [{
+        query: getCustomersOfUser,
+        variables: {
+          userId: user?.id,
+        },
+      }],
+    },
+  );
 
   const onSubmit = (formData: FormDataProps) => {
     createWorkspace({
