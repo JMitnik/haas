@@ -199,8 +199,8 @@ const InteractionsOverview = () => {
   const { dialogueSlug, customerSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const [fetchInteractions, { data, loading }] = useLazyQuery<CustomerSessionConnection>(
     getDialogueSessionConnectionQuery, {
-      fetchPolicy: 'cache-and-network',
-    }
+    fetchPolicy: 'cache-and-network',
+  },
   );
 
   const handleExportCSV = (sessions: Array<Session> | undefined, customerSlug: string, dialogueSlug: string) => {
@@ -217,7 +217,7 @@ const InteractionsOverview = () => {
           || value?.textboxNodeEntry;
         return { [`depth${index}-title`]: relatedNode?.title, [`depth${index}-entry`]: entryAnswer };
       });
-      const mergedNodeEntries = lodash.reduce(mappedNodeEntries, (prev, entry) => ({ ...prev, ...entry }), {});
+      const mergedNodeEntries = lodash.reduce(mappedNodeEntries, (prev, entry) => ({ ...prev, ...entry }), { });
       const date = new Date(parseInt(createdAt));
       const result = { timestamp: date.toISOString() };
       const mergedResult = lodash.assign(result, mergedNodeEntries);
@@ -242,12 +242,12 @@ const InteractionsOverview = () => {
 
   const [fetchCSVData, { loading: csvLoading }] = useLazyQuery<CustomerSessionConnection>(
     getDialogueSessionConnectionQuery, {
-      fetchPolicy: 'cache-and-network',
-      onCompleted: (csvData: any) => {
-        const sessions = csvData?.customer?.dialogue?.sessionConnection?.sessions;
-        handleExportCSV(sessions, customerSlug, dialogueSlug);
-      },
-    }
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (csvData: any) => {
+      const sessions = csvData?.customer?.dialogue?.sessionConnection?.sessions;
+      handleExportCSV(sessions, customerSlug, dialogueSlug);
+    },
+  },
   );
 
   const location = useLocation();
@@ -290,7 +290,7 @@ const InteractionsOverview = () => {
       ...prevValues,
       activeStartDate: startDate,
       activeEndDate: endDate,
-      pageIndex: 0
+      pageIndex: 0,
     }));
   }, 250), []);
 
