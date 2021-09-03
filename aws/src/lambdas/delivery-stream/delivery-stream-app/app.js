@@ -79,8 +79,6 @@ exports.lambdaHandler = async (event, context, callback) => {
  * Deploy message using EMAIL and SMS.
  */
 const deployMessage = (recipient, body, from, method, deliveryId, deliveryType, subject) => {
-  console.log('We should message the following entry:', JSON.stringify({ body, from, method, deliveryType }));
-
   if (deliveryType === 'EMAIL') {
     return sendRecordEmail(recipient, body, subject);
 

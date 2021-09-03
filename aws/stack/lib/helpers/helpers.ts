@@ -14,8 +14,6 @@ export const sendErrorToDynamo = async (
   const month = deliveryId.slice(5, 7);
   const day = deliveryId.slice(8, 10);
 
-  console.log({ from });
-
   return dynamoClient.update({
     TableName: tableName,
     Key: {
