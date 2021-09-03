@@ -39,9 +39,6 @@ export const updateDynamo = async (
   const month = deliveryId.slice(5, 7);
   const day = deliveryId.slice(8, 10);
 
-  console.log({ from });
-  console.log({status});
-
   return dynamoClient.update({
     TableName: tableName,
     Key: {
@@ -57,7 +54,6 @@ export const updateDynamo = async (
 
 
 export const sendToCallbackUrl = async (callbackUrl: string, payload: any): Promise<any> => {
-  console.log(JSON.stringify({payload}));
   const res = await fetch(callbackUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', },
