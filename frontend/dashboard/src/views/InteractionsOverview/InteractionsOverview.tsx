@@ -298,7 +298,7 @@ const InteractionsOverview = () => {
 
   const pageCount = data?.customer?.dialogue?.sessionConnection?.pageInfo.nrPages || 1;
   const pageIndex = data?.customer?.dialogue?.sessionConnection?.pageInfo.pageIndex || 0;
-  console.log('PAGE INDEX: ', pageIndex);
+
   return (
     <>
       <UI.ViewHead>
