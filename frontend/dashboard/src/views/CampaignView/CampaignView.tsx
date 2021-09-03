@@ -114,7 +114,7 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
 
     default: {
       return (
-        <UI.Label>{status}</UI.Label>
+        <UI.Label variantColor="blue">{status}</UI.Label>
       );
     }
   }
