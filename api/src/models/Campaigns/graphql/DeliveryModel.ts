@@ -9,7 +9,7 @@ import { CampaignVariantModel } from './CampaignVariantModel';
 export const DeliveryStatusEnum = enumType({
   name: 'DeliveryStatusEnum',
 
-  members: ['SCHEDULED', 'DEPLOYED', 'SENT', 'OPENED', 'FINISHED', 'FAILED'],
+  members: ['SCHEDULED', 'DEPLOYED', 'SENT', 'OPENED', 'FINISHED', 'FAILED', 'DELIVERED'],
 });
 
 // /**
