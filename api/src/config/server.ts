@@ -13,7 +13,6 @@ import { makeApollo } from './apollo';
 import config from "./config";
 
 export const makeServer = async (port: number, prismaClient: PrismaClient) => {
-  console.log(port);
   console.log('🏳️\tStarting application');
 
   const apollo = await makeApollo(prismaClient);

@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    delivery_delivered: {
+      en: 'Delivery has arrived',
+      de: 'Lieferung ist angekommen',
+    },
     problem_delivery: {
       en: 'Delivery was failed',
       de: 'Die Lieferung war fehlgeschlagen',

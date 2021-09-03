@@ -316,6 +316,7 @@ type DeliveryEventType {
 }
 
 enum DeliveryStatusEnum {
+  DELIVERED
   DEPLOYED
   FAILED
   FINISHED
