@@ -6,7 +6,6 @@ datasource postgresql {
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["transactionApi"]
   output          = "./node_modules/@prisma/client"
 }
 
@@ -41,6 +40,7 @@ model FontSettings {
 model CustomerSettings {
   id               Int             @id @default(autoincrement())
   logoUrl          String?
+  logoOpacity      Int?            @default(30)
   colourSettingsId Int?
   colourSettings   ColourSettings? @relation(fields: [colourSettingsId], references: [id])
   fontSettingsId   Int?
@@ -79,22 +79,40 @@ model Tag {
   customerId String
 }
 
+enum LanguageEnum {
+  DUTCH
+  GERMAN
+  ENGLISH
+}
+
+model PostLeafNode {
+  id      String @id @default(cuid())
+  header  String
+  subtext String
+
+  dialogue Dialogue?
+}
+
 model Dialogue {
-  id               String         @id @default(cuid())
-  title            String
-  slug             String
-  description      String
-  creationDate     DateTime       @default(now())
-  updatedAt        DateTime?      @updatedAt
-  publicTitle      String?
-  customerId       String
-  customer         Customer       @relation(fields: [customerId], references: [id])
-  edges            Edge[]
-  questions        QuestionNode[]
-  sessions         Session[]
-  tags             Tag[]
-  isOnline         Boolean        @default(value: false)
-  isWithoutGenData Boolean        @default(value: false)
+  id             String         @id @default(cuid())
+  title          String
+  slug           String
+  description    String
+  creationDate   DateTime       @default(now())
+  updatedAt      DateTime?      @updatedAt
+  publicTitle    String?
+  customerId     String
+  postLeafNodeId String?
+  customer       Customer       @relation(fields: [customerId], references: [id])
+  edges          Edge[]
+  questions      QuestionNode[]
+  sessions       Session[]
+  tags           Tag[]
+  postLeafNode   PostLeafNode?  @relation(fields: [postLeafNodeId], references: [id])
+  language       LanguageEnum   @default(ENGLISH)
+
+  isOnline         Boolean @default(value: false)
+  isWithoutGenData Boolean @default(value: false)
 
   endScreenText String?
 
@@ -131,6 +149,7 @@ enum FormNodeFieldType {
 model FormNodeField {
   id                     String                   @id @default(cuid())
   label                  String
+  placeholder            String?
   type                   FormNodeFieldType        @default(shortText)
   isRequired             Boolean                  @default(false)
   position               Int
@@ -141,6 +160,7 @@ model FormNodeField {
 
 model FormNode {
   id           String          @id @default(cuid())
+  helperText   String?
   createdAt    DateTime        @default(now())
   fields       FormNodeField[]
   QuestionNode QuestionNode[]
@@ -190,10 +210,11 @@ model SliderNodeMarker {
 }
 
 model SliderNode {
-  id           String             @id @default(cuid())
-  markers      SliderNodeMarker[]
-  QuestionNode QuestionNode[]
-
+  id               String             @id @default(cuid())
+  markers          SliderNodeMarker[]
+  QuestionNode     QuestionNode[]
+  unhappyText      String?
+  happyText        String?
   earlyReleaseText String?
 }
 
@@ -349,6 +370,7 @@ model TopicValue {
   parentTopicId String
   parentTopic Topic @relation(fields: [parentTopicId], references: [id])
   relatedChoices  QuestionOption[]
+  position Int?
 }
 
 model Session {
@@ -364,6 +386,8 @@ model Session {
   originUrl      String?
   totalTimeInSec Int?
   device         String?
+
+  browser        String?
 }
 
 // Node-entry types
@@ -388,12 +412,20 @@ model NodeEntry {
   sliderNodeEntry  SliderNodeEntry?
   choiceNodeEntry  ChoiceNodeEntry?
   textboxNodeEntry TextboxNodeEntry?
+  videoNodeEntry   VideoNodeEntry?
 
   // @Deprecated => FormNodeEntry
   registrationNodeEntry RegistrationNodeEntry?
 
   formNodeEntry FormNodeEntry?
   linkNodeEntry LinkNodeEntry?
+}
+
+model VideoNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       String?
+  nodeEntryId String
+  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model LinkNodeEntry {
@@ -658,7 +690,7 @@ model CreateWorkspaceJob {
   requiresRembg           Boolean            @default(true)
   requiresScreenshot      Boolean            @default(true)
   requiresColorExtraction Boolean            @default(true)
-  Job                     Job
+  Job                     Job?
   processLocation         JobProcessLocation @relation(fields: [jobProcessLocationId], references: [id])
   jobProcessLocationId    String
 }
@@ -696,6 +728,19 @@ model CampaignVariantToCampaign {
   @@id([campaignId, campaignVariantId])
 }
 
+// Custom variable for campaign-variants
+model CampaignVariantCustomVariable {
+  id String @id @default(cuid())
+
+  campaignVariantId String
+  campaignVariant CampaignVariant @relation(fields: [campaignVariantId], references: [id])
+
+  key String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
 model CampaignVariant {
   id    String @id @default(cuid())
   label String
@@ -704,12 +749,15 @@ model CampaignVariant {
   workspace Customer @relation(fields: [customerId], references: [id])
   dialogue  Dialogue @relation(fields: [dialogueId], references: [id])
 
+  from                      String?
   subject                   String?
   type                      CampaignVariantTypeEnum
   CampaignVariantToCampaign CampaignVariantToCampaign[]
   Delivery                  Delivery[]
   customerId                String
   dialogueId                String
+
+  customVariables CampaignVariantCustomVariable[]
 }
 
 enum DeliveryStatusTypeEnum {
@@ -718,6 +766,8 @@ enum DeliveryStatusTypeEnum {
   SENT
   OPENED
   FINISHED
+  FAILED
+  DELIVERED
 }
 
 model Delivery {
@@ -728,12 +778,14 @@ model Delivery {
   deliveryRecipientLastName  String?
   deliveryRecipientEmail     String?
   deliveryRecipientPhone     String?
+  deliveryRecipientPrefix    String?
 
   campaignId String
   campaign   Campaign @relation(fields: [campaignId], references: [id])
 
   campaignVariantId String
   campaignVariant   CampaignVariant @relation(fields: [campaignVariantId], references: [id])
+  customVariables Json?
 
   currentStatus DeliveryStatusTypeEnum
 
@@ -751,4 +803,6 @@ model DeliveryEvents {
   createdAt  DateTime               @default(now())
   deliveryId String?
   Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
+
+  failureMessage String?
 }

@@ -180,7 +180,7 @@ export class MainPipelineStack extends Stack {
               'echo $CODEBUILD_SRC_DIR > codebuildsrcdir.txt',
               'pwd > whereami.txt',
               'ls > whatsaroundme.txt',
-              './node_modules/.bin/prisma migrate up --experimental > output.txt 2>&1',
+              './node_modules/.bin/prisma migrate dev --skip-generate --schema ./schema.prisma > output.txt 2>&1',
             ]
           }
         },

@@ -1,16 +1,14 @@
+import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import {
-  FormContainer, PageTitle,
-} from '@haas/ui';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/client';
+
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
-import { gql } from '@apollo/client';
 
 import CustomerForm from 'components/CustomerForm';
 import boolToInt from 'utils/booleanToNumber';
@@ -26,6 +24,7 @@ const editWorkspaceMutation = gql`
         slug
         settings {
           logoUrl
+          logoOpacity
           colourSettings {
           primary
         }
@@ -38,6 +37,7 @@ const schema = yup.object().shape({
   name: yup.string().required(),
   logo: yup.string().url(),
   uploadLogo: yup.string().url(),
+  logoOpacity: yup.number().min(0).max(1),
   slug: yup.string().required(),
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
@@ -46,23 +46,6 @@ const schema = yup.object().shape({
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
-
-const EditCustomerView = () => {
-  const { customerSlug } = useParams<{ customerSlug: string }>();
-
-  const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
-    variables: {
-      customerSlug,
-    },
-  });
-
-  if (loading) return null;
-  if (error) return <><p>{error.message}</p></>;
-
-  const customer = customerData?.customer;
-
-  return <EditCustomerForm customer={customer} />;
-};
 
 const startsWithCloudinary = (url: string) => url.includes('cloudinary');
 
@@ -77,6 +60,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     defaultValues: {
       name: customer.name,
       logo: customer.settings?.logoUrl,
+      logoOpacity: (customer.settings?.logoOpacity !== undefined && customer.settings?.logoOpacity !== null)
+        ? Math.min(Math.max(0, customer.settings?.logoOpacity / 100), 1)
+        : 0.3,
       uploadLogo: customer.settings?.logoUrl,
       useCustomUrl: boolToInt(!startsWithCloudinary(customer.settings?.logoUrl)),
       primaryColour: customer.settings?.colourSettings?.primary,
@@ -117,6 +103,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
           id: customer?.id,
           customerSlug,
           logo: intToBool(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
+          logoOpacity: (formData.logoOpacity !== null && formData.logoOpacity !== undefined)
+            ? formData.logoOpacity * 100
+            : 0,
           slug: formData.slug,
           primaryColour: formData.primaryColour,
           name: formData.name,
@@ -143,20 +132,41 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
   return (
     <>
-      <PageTitle>{t('views:edit_business_settings_view')}</PageTitle>
-      <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-        <FormContainer>
-          <CustomerForm
-            form={form}
-            isLoading={isLoading}
-            onFormSubmit={onSubmit}
-            serverErrors={serverErrors}
-            isInEdit
-          />
-        </FormContainer>
-      </motion.div>
+      <UI.ViewHead>
+        <UI.ViewTitle>{t('views:edit_business_settings_view')}</UI.ViewTitle>
+      </UI.ViewHead>
+      <UI.ViewBody>
+        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
+          <UI.FormContainer>
+            <CustomerForm
+              form={form}
+              isLoading={isLoading}
+              onFormSubmit={onSubmit}
+              serverErrors={serverErrors}
+              isInEdit
+            />
+          </UI.FormContainer>
+        </motion.div>
+      </UI.ViewBody>
     </>
   );
+};
+
+const EditCustomerView = () => {
+  const { customerSlug } = useParams<{ customerSlug: string }>();
+
+  const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
+    variables: {
+      customerSlug,
+    },
+  });
+
+  if (loading) return null;
+  if (error) return <><p>{error.message}</p></>;
+
+  const customer = customerData?.customer;
+
+  return <EditCustomerForm customer={customer} />;
 };
 
 export default EditCustomerView;

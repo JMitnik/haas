@@ -1,24 +1,28 @@
-import { Briefcase, Link, Trash2, ThumbsUp, ThumbsDown } from 'react-feather';
-import { useGetPreviewDataLazyQuery, useGetJobProcessLocationsQuery, JobProcessLocationType } from 'types/generated-types';
+import { Briefcase, Link, ThumbsDown, ThumbsUp, Trash2 } from 'react-feather';
 import { Button, ButtonGroup, RadioButtonGroup } from '@chakra-ui/core';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import {
-  Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Textarea,
-  Muted,
+  Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted,
   RadioButton,
+  Textarea,
 } from '@haas/ui';
+import {
+  JobProcessLocationType,
+  useGetJobProcessLocationsQuery,
+  useGetPreviewDataLazyQuery,
+} from 'types/generated-types';
 import { useTranslation } from 'react-i18next';
-import React, { useState, useEffect } from 'react';
-import cuid from 'cuid';
-import Select from 'react-select';
 import { yupResolver } from '@hookform/resolvers';
+import React, { useEffect, useState } from 'react';
+import Select from 'react-select';
 import boolToInt from 'utils/booleanToNumber';
+import cuid from 'cuid';
 
-import WebsiteScreenshotFragment from '../Fragments/WebsiteScreenshot';
-import PrimaryColourFragment from '../Fragments/PrimaryColor';
+import { AutodeckFormProps, FormDataProps, schema } from '../Types';
 import CustomerLogoFormFragment from '../Fragments/CustomerLogoFragment';
 import PitchdeckFragment from '../Fragments/PitchdeckFragment';
-import { FormDataProps, AutodeckFormProps, schema } from '../Types';
+import PrimaryColourFragment from '../Fragments/PrimaryColor';
+import WebsiteScreenshotFragment from '../Fragments/WebsiteScreenshot';
 
 const AutodeckForm = ({
   onClose,
@@ -27,13 +31,13 @@ const AutodeckForm = ({
   job,
   isInEditing,
   onConfirmJob,
-  isConfirmLoading
+  isConfirmLoading,
 }: AutodeckFormProps) => {
   const { t } = useTranslation();
   const [activeJobId] = useState(cuid());
-  const [activeTemplateType, setActiveTemplateType] = useState<JobProcessLocationType | undefined>(undefined)
-  const [fetchPreviewData, { data: previewData }] = useGetPreviewDataLazyQuery()
-  const { data: jobProcessLocations } = useGetJobProcessLocationsQuery()
+  const [activeTemplateType, setActiveTemplateType] = useState<JobProcessLocationType | undefined>(undefined);
+  const [fetchPreviewData, { data: previewData }] = useGetPreviewDataLazyQuery();
+  const { data: jobProcessLocations } = useGetJobProcessLocationsQuery();
 
   const form = useForm<FormDataProps>({
     defaultValues: {
@@ -43,45 +47,43 @@ const AutodeckForm = ({
       useRembg: 1,
       name: job?.name || '',
       customFields: job?.processLocation?.customFields || [],
-      newCustomFields: []
+      newCustomFields: [],
     },
     mode: 'all',
     shouldFocusError: true,
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   });
 
   const { fields } = useFieldArray({
     control: form.control,
-    name: "customFields",
-    keyName: 'arrayKey'
+    name: 'customFields',
+    keyName: 'arrayKey',
   });
 
   const { fields: newCustomFields, append, remove } = useFieldArray({
     control: form.control,
-    name: "newCustomFields",
-    keyName: 'arrayKey'
+    name: 'newCustomFields',
+    keyName: 'arrayKey',
   });
 
   const { setValue } = form;
 
   const onFormSubmit = (data: FormDataProps) => {
-    const requiresRembgLambda = data?.useRembg === 1 ? true : false;
-    const requiresColorExtraction = data?.useCustomColour === 1 ? true : false;
-    const requiresWebsiteScreenshot = data?.useWebsiteUrl === 1 ? true : false;
-    const usesAdjustedLogo = data?.isEditingLogo === 1 ? true : false;
-    const jobLocationId = data.jobLocation?.value
+    const requiresRembgLambda = data?.useRembg === 1;
+    const requiresColorExtraction = data?.useCustomColour === 1;
+    const requiresWebsiteScreenshot = data?.useWebsiteUrl === 1;
+    const usesAdjustedLogo = data?.isEditingLogo === 1;
+    const jobLocationId = data.jobLocation?.value;
 
     const mappedStandardFields = Object.entries(data)
       .filter((obj) => typeof obj[1] === 'string')
-      .map((obj) => ({ key: obj[0], value: obj[1] }))
+      .map((obj) => ({ key: obj[0], value: obj[1] }));
     const mappedCustomFields = data.customFields?.map((field) => ({ key: field?.key, value: field?.value })) || [];
-    const mappedNewCustomFields = data.newCustomFields?.map((field) => {
-      return { key: field?.key, value: field?.value }
-    })
+    const mappedNewCustomFields = data.newCustomFields?.map((field) => ({ key: field?.key, value: field?.value }));
 
-    const isGenerateWorkspace = data.isGenerateWorkspace === 1 ? true : false;
+    const isGenerateWorkspace = data.isGenerateWorkspace === 1;
 
-    console.log('Submit data: ', data)
+    console.log('Submit data: ', data);
 
     if (!isInEditing && (requiresRembgLambda || requiresColorExtraction || requiresWebsiteScreenshot)) {
       return onCreateJob({
@@ -97,9 +99,9 @@ const AutodeckForm = ({
             requiresColorExtraction,
             usesAdjustedLogo: false,
             jobLocationId,
-          }
-        }
-      })
+          },
+        },
+      });
     }
     onConfirmJob({
       variables: {
@@ -116,7 +118,7 @@ const AutodeckForm = ({
           answer3: data.answer3,
           answer4: data.answer4,
           primaryColour: data.primaryColour,
-          usesAdjustedLogo: usesAdjustedLogo,
+          usesAdjustedLogo,
           sorryAboutX: data?.sorryAboutX,
           youLoveX: data.youLoveX,
           reward: data.reward,
@@ -127,11 +129,11 @@ const AutodeckForm = ({
           customFields: mappedCustomFields || [],
           newCustomFields: mappedNewCustomFields || [],
           slug: data.slug,
-          isGenerateWorkspace: isGenerateWorkspace
-        }
-      }
-    })
-  }
+          isGenerateWorkspace,
+        },
+      },
+    });
+  };
 
   useEffect(() => {
     const jobId = job?.id;
@@ -139,7 +141,7 @@ const AutodeckForm = ({
     fetchPreviewData({
       variables: {
         id: jobId,
-      }
+      },
     });
   }, [job, fetchPreviewData]);
 
@@ -151,15 +153,17 @@ const AutodeckForm = ({
   }, [previewData, setValue]);
 
   const mappedJobLocations = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations
-    .map((jobLocation) => ({ label: `${jobLocation.name} - ${jobLocation.path}`, value: jobLocation.id }))
+    .map((jobLocation) => ({ label: `${jobLocation.name} - ${jobLocation.path}`, value: jobLocation.id }));
 
-  const activeJobLocation = isInEditing && job?.processLocation ? { label: `${job?.processLocation?.name} - ${job?.processLocation?.path}`, value: job?.processLocation?.id } : null
+  const activeJobLocation = isInEditing && job?.processLocation ? { label: `${job?.processLocation?.name} - ${job?.processLocation?.path}`, value: job?.processLocation?.id } : null;
 
   const handleJobLocationChange = (id: string) => {
-    const jobLocation = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations.find((location) => location.id === id);
+    const jobLocation = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations.find(
+      (location) => location.id === id,
+    );
     form.setValue('customFields', jobLocation?.customFields || []);
     return setActiveTemplateType(jobLocation?.type);
-  }
+  };
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -180,7 +184,7 @@ const AutodeckForm = ({
                   isDisabled={isInEditing}
                   placeholder="Peach inc."
                   leftEl={<Briefcase />}
-                  defaultValue={'job'}
+                  defaultValue="job"
                   name="name"
                   ref={form.register()}
                 />
@@ -189,46 +193,53 @@ const AutodeckForm = ({
               {(isInEditing
                 || (form.watch('useRembg') === 0
                   && form.watch('useWebsiteUrl') === 0
-                  && form.watch('useCustomColour') === 0)) &&
-                <>
-                  <FormControl>
-                    <FormLabel>{'Generate workspace'}</FormLabel>
-                    <InputHelper>{'Should a workspace be generated based on current content'}</InputHelper>
-                    <Controller
-                      control={form.control}
-                      name="isGenerateWorkspace"
-                      defaultValue={0}
-                      render={({ onChange, value }) => (
-                        <RadioButtonGroup
-                          value={value}
-                          isInline
-                          onChange={onChange}
-                          display="flex"
-                        >
-                          <RadioButton icon={ThumbsUp} value={1} text={'Yes'} description={'Generate workspace'} />
-                          <RadioButton icon={ThumbsDown} value={0} text={'No'} description={'Do not generate workspace'} />
-                        </RadioButtonGroup>
+                  && form.watch('useCustomColour') === 0))
+                && (
+                  <>
+                    <FormControl>
+                      <FormLabel>Generate workspace</FormLabel>
+                      <InputHelper>Should a workspace be generated based on current content</InputHelper>
+                      <Controller
+                        control={form.control}
+                        name="isGenerateWorkspace"
+                        defaultValue={0}
+                        render={({ onChange, value }) => (
+                          <RadioButtonGroup
+                            value={value}
+                            isInline
+                            onChange={onChange}
+                            display="flex"
+                          >
+                            <RadioButton icon={ThumbsUp} value={1} text="Yes" description="Generate workspace" />
+                            <RadioButton
+                              icon={ThumbsDown}
+                              value={0}
+                              text="No"
+                              description="Do not generate workspace"
+                            />
+                          </RadioButtonGroup>
+                        )}
+                      />
+
+                    </FormControl>
+
+                    {form.watch('isGenerateWorkspace') === 1
+                      && (
+                        <>
+                          <FormControl isInvalid={!!form.errors.slug} isRequired>
+                            <FormLabel htmlFor="name">{t('slug')}</FormLabel>
+                            <InputHelper>{t('customer:slug_helper')}</InputHelper>
+                            <Input
+                              placeholder="peach"
+                              leftAddOn="https://client.haas.live/"
+                              name="slug"
+                              ref={form.register()}
+                            />
+                          </FormControl>
+                        </>
                       )}
-                    />
-
-                  </FormControl>
-
-                  {form.watch('isGenerateWorkspace') === 1 &&
-                    <>
-                      <FormControl isInvalid={!!form.errors.slug} isRequired>
-                        <FormLabel htmlFor="name">{t('slug')}</FormLabel>
-                        <InputHelper>{t('customer:slug_helper')}</InputHelper>
-                        <Input
-                          placeholder="peach"
-                          leftAddOn="https://client.haas.live/"
-                          name="slug"
-                          ref={form.register()}
-                        />
-                      </FormControl>
-                    </>
-                  }
-                </>
-              }
+                  </>
+                )}
 
               <FormControl isInvalid={!!form.errors.jobLocation} isRequired>
                 <FormLabel htmlFor="jobLocation">{t('process_location')}</FormLabel>
@@ -239,26 +250,27 @@ const AutodeckForm = ({
                   control={form.control}
                   render={({ onChange, value }) => (
                     <Select
-                      styles={!!form.errors.jobLocation ? {
-                        control: base => ({
+                      styles={form.errors.jobLocation ? {
+                        control: (base) => ({
                           ...base,
                           border: '1px solid red',
                           '&:hover': {
                             border: '1px solid red',
-                          }
-                        })
+                          },
+                        }),
                       } : undefined}
                       isDisabled={isInEditing}
                       options={mappedJobLocations}
                       value={value}
                       onChange={(opt: any) => {
                         onChange(opt);
-                        handleJobLocationChange(opt?.value)
+                        handleJobLocationChange(opt?.value);
                       }}
                     />
                   )}
                 />
-                {form.errors.jobLocation && <span style={{ color: 'red', marginTop: '5px' }}>Please select job type</span>}
+                {form.errors.jobLocation
+                  && <span style={{ color: 'red', marginTop: '5px' }}>Please select job type</span>}
               </FormControl>
             </InputGrid>
           </Div>
@@ -275,11 +287,20 @@ const AutodeckForm = ({
           </Div>
           <Div>
             <InputGrid>
-              <CustomerLogoFormFragment isInEditing={isInEditing} previewLogo={previewData?.getPreviewData?.rembgLogoUrl || ''} jobId={job?.id || activeJobId} form={form} />
+              <CustomerLogoFormFragment
+                isInEditing={isInEditing}
+                previewLogo={previewData?.getPreviewData?.rembgLogoUrl || ''}
+                jobId={job?.id || activeJobId}
+                form={form}
+              />
             </InputGrid>
             <Hr />
             <InputGrid>
-              <PrimaryColourFragment palette={previewData?.getPreviewData?.colors || []} isInEditing={isInEditing} form={form} />
+              <PrimaryColourFragment
+                palette={previewData?.getPreviewData?.colors || []}
+                isInEditing={isInEditing}
+                form={form}
+              />
             </InputGrid>
           </Div>
         </FormSection>
@@ -300,162 +321,174 @@ const AutodeckForm = ({
         </FormSection>
       </>
 
-      {((job?.processLocation?.type === "PITCHDECK"
-      || job?.processLocation?.type === "BROCHURE"
-      || activeTemplateType === JobProcessLocationType.Pitchdeck
-      || activeTemplateType === JobProcessLocationType.Brochure)
-      && (isInEditing
-        || (form.watch('useRembg') === 0
-          && form.watch('useWebsiteUrl') === 0
-          && form.watch('useCustomColour') === 0)))
-        &&
-        <>
-          <Hr />
-          <FormSection id="dialogue">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:dialogue')}</H3>
-              <Muted color="gray.600">
-                {t('autodeck:dialogue_helper')}
-              </Muted>
-            </Div>
-            <Div>
-              <InputGrid>
-                <FormControl isInvalid={!!form.errors.firstName} isRequired>
-                  <FormLabel htmlFor="name">{t('autodeck:client_first_name')}</FormLabel>
-                  <InputHelper>{t('autodeck:client_first_name_helper')}</InputHelper>
-                  <Input
-                    // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                    leftEl={<Link />}
-                    name="firstName"
-                    ref={form.register()}
-                  />
-                  {form.errors.firstName?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.firstName?.message}</span>}
-                </FormControl>
-                <PitchdeckFragment form={form} />
-              </InputGrid>
-            </Div>
-          </FormSection>
-        </>
-      }
+      {((job?.processLocation?.type === 'PITCHDECK'
+        || job?.processLocation?.type === 'BROCHURE'
+        || activeTemplateType === JobProcessLocationType.Pitchdeck
+        || activeTemplateType === JobProcessLocationType.Brochure)
+        && (isInEditing
+          || (form.watch('useRembg') === 0
+            && form.watch('useWebsiteUrl') === 0
+            && form.watch('useCustomColour') === 0)))
+        && (
+          <>
+            <Hr />
+            <FormSection id="dialogue">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:dialogue')}</H3>
+                <Muted color="gray.600">
+                  {t('autodeck:dialogue_helper')}
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid>
+                  <FormControl isInvalid={!!form.errors.firstName} isRequired>
+                    <FormLabel htmlFor="name">{t('autodeck:client_first_name')}</FormLabel>
+                    <InputHelper>{t('autodeck:client_first_name_helper')}</InputHelper>
+                    <Input
+                      // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                      leftEl={<Link />}
+                      name="firstName"
+                      ref={form.register()}
+                    />
+                    {form.errors.firstName?.message
+                      && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.firstName?.message}</span>}
+                  </FormControl>
+                  <PitchdeckFragment form={form} />
+                </InputGrid>
+              </Div>
+            </FormSection>
+          </>
+        )}
 
-
-      {((job?.processLocation?.type === "ONE_PAGER" || activeTemplateType === JobProcessLocationType.OnePager) && (isInEditing
-        || (form.watch('useRembg') === 0
-          && form.watch('useWebsiteUrl') === 0
-          && form.watch('useCustomColour') === 0)))
-        &&
-        <>
-          <Hr />
-          <FormSection id="dialogue">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:dialogue')}</H3>
-              <Muted color="gray.600">
-                {t('autodeck:dialogue_helper')}
-              </Muted>
-            </Div>
-            <Div>
-              <InputGrid>
-                <FormControl isInvalid={!!form.errors.firstName} isRequired>
-                  <FormLabel htmlFor="name">{t('autodeck:client_first_name')}</FormLabel>
-                  <InputHelper>{t('autodeck:client_first_name_helper')}</InputHelper>
-                  <Input
-                    // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                    leftEl={<Link />}
-                    name="firstName"
-                    // isInvalid={!!form.errors.logo}
-                    ref={form.register()}
-                  />
-                </FormControl>
-              </InputGrid>
-            </Div>
-          </FormSection>
-        </>
-      }
+      {((job?.processLocation?.type === 'ONE_PAGER' || activeTemplateType === JobProcessLocationType.OnePager)
+        && (isInEditing
+          || (form.watch('useRembg') === 0
+            && form.watch('useWebsiteUrl') === 0
+            && form.watch('useCustomColour') === 0)))
+        && (
+          <>
+            <Hr />
+            <FormSection id="dialogue">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:dialogue')}</H3>
+                <Muted color="gray.600">
+                  {t('autodeck:dialogue_helper')}
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid>
+                  <FormControl isInvalid={!!form.errors.firstName} isRequired>
+                    <FormLabel htmlFor="name">{t('autodeck:client_first_name')}</FormLabel>
+                    <InputHelper>{t('autodeck:client_first_name_helper')}</InputHelper>
+                    <Input
+                      // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                      leftEl={<Link />}
+                      name="firstName"
+                      // isInvalid={!!form.errors.logo}
+                      ref={form.register()}
+                    />
+                  </FormControl>
+                </InputGrid>
+              </Div>
+            </FormSection>
+          </>
+        )}
 
       {/* If not removing background, not processing website screenshot, and not colour palette, then show fields */}
       {(isInEditing
         || (form.watch('useRembg') === 0
           && form.watch('useWebsiteUrl') === 0
           && form.watch('useCustomColour') === 0))
-        &&
-        <>
-          <Hr />
-          <FormSection id="customFields">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:custom_fields')}</H3>
-              <Muted color="gray.600">
-                {t('autodeck:custom_fields_helper')}
-              </Muted>
-            </Div>
-            <Div>
-              <InputGrid>
-                {fields.map((customField, index) => {
-                  const error: any = form.errors.customFields?.[index]
-                  const errorTwo = error?.value?.message
-                  console.log('err: ', error, 'errTwo: ', errorTwo)
-                  return (
-                    <>
-                      <input type="hidden" name={`customFields[${index}].key`} defaultValue={fields[index]?.key} ref={form.register()} />
-                      <FormControl isInvalid={!!form.errors.customFields?.[index]}>
-                        <FormLabel htmlFor={`customFields[${index}].key`}>{fields[index]?.key}</FormLabel>
-                        <InputHelper>Fill in a value corresponding with a layer in Photoshop</InputHelper>
-                        <Input
-                          id={customField.arrayKey}
-                          defaultValue=""
-                          // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                          leftEl={<Link />}
-                          name={`customFields[${index}].value`}
-                          ref={form.register()}
-                        />
-                      </FormControl>
-                      {errorTwo && <span style={{ marginTop: '5px', color: 'red' }}>{errorTwo}</span>}
-                    </>
-                  )
-                })}
-
-                {newCustomFields.map((newCustomField, index) => {
-                  const error: any = form.errors.newCustomFields?.[index]
-                  const errorTwo = error?.key?.message
-                  const errorValue = error?.value?.message
-                  return (
-                    <Div key={newCustomField.arrayKey} position="relative" borderBottom="1px solid #4f5d6e" borderTop="1px solid #4f5d6e" padding="1em 0">
-                      <Div marginBottom="24px">
-                        <Div position="absolute" right="5px" style={{ cursor: 'pointer' }} onClick={() => remove(index)}>
-                          <Trash2 color="red" />
-                        </Div>
-                        <FormControl isInvalid={!!form.errors.newCustomFields?.[index]} isRequired>
-                          <FormLabel htmlFor="key">Key</FormLabel>
-                          <InputHelper>Fill in a key corresponding with a layer in Photoshop</InputHelper>
+        && (
+          <>
+            <Hr />
+            <FormSection id="customFields">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:custom_fields')}</H3>
+                <Muted color="gray.600">
+                  {t('autodeck:custom_fields_helper')}
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid>
+                  {fields.map((customField, index) => {
+                    const error: any = form.errors.customFields?.[index];
+                    const errorTwo = error?.value?.message;
+                    console.log('err: ', error, 'errTwo: ', errorTwo);
+                    return (
+                      <>
+                        <input type="hidden" name={`customFields[${index}].key`} defaultValue={fields[index]?.key} ref={form.register()} />
+                        <FormControl isInvalid={!!form.errors.customFields?.[index]}>
+                          <FormLabel htmlFor={`customFields[${index}].key`}>{fields[index]?.key}</FormLabel>
+                          <InputHelper>Fill in a value corresponding with a layer in Photoshop</InputHelper>
                           <Input
+                            id={customField.arrayKey}
+                            defaultValue=""
                             // eslint-disable-next-line jsx-a11y/anchor-is-valid
                             leftEl={<Link />}
-                            name={`newCustomFields[${index}].key`} // TODO: CHeck this newCustomFields[${index}].value
+                            name={`customFields[${index}].value`}
                             ref={form.register()}
                           />
-                          {errorTwo && <span style={{ marginTop: '5px', color: 'red' }}>{errorTwo}</span>}
+                        </FormControl>
+                        {errorTwo && <span style={{ marginTop: '5px', color: 'red' }}>{errorTwo}</span>}
+                      </>
+                    );
+                  })}
+
+                  {newCustomFields.map((newCustomField, index) => {
+                    const error: any = form.errors.newCustomFields?.[index];
+                    const errorTwo = error?.key?.message;
+                    const errorValue = error?.value?.message;
+                    return (
+                      <Div
+                        key={newCustomField.arrayKey}
+                        position="relative"
+                        borderBottom="1px solid #4f5d6e"
+                        borderTop="1px solid #4f5d6e"
+                        padding="1em 0"
+                      >
+                        <Div marginBottom="24px">
+                          <Div
+                            position="absolute"
+                            right="5px"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => remove(index)}
+                          >
+                            <Trash2 color="red" />
+                          </Div>
+                          <FormControl isInvalid={!!form.errors.newCustomFields?.[index]} isRequired>
+                            <FormLabel htmlFor="key">Key</FormLabel>
+                            <InputHelper>Fill in a key corresponding with a layer in Photoshop</InputHelper>
+                            <Input
+                              // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                              leftEl={<Link />}
+                              name={`newCustomFields[${index}].key`} // TODO: CHeck this newCustomFields[${index}].value
+                              ref={form.register()}
+                            />
+                            {errorTwo && <span style={{ marginTop: '5px', color: 'red' }}>{errorTwo}</span>}
+                          </FormControl>
+                        </Div>
+
+                        <FormControl isRequired>
+                          <FormLabel htmlFor="value">Value</FormLabel>
+                          <InputHelper>Fill in a value a layer in Photoshop should get</InputHelper>
+                          <Textarea
+                            // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                            name={`newCustomFields[${index}].value`}
+                            ref={form.register({ required: false })}
+                          />
+                          {errorValue && <span style={{ marginTop: '5px', color: 'red' }}>{errorValue}</span>}
                         </FormControl>
                       </Div>
+                    );
+                  })}
+                  <Button onClick={() => append({ id: cuid(), key: '', value: '' })}>Add new custom value</Button>
 
-                      <FormControl isRequired>
-                        <FormLabel htmlFor="value">Value</FormLabel>
-                        <InputHelper>Fill in a value a layer in Photoshop should get</InputHelper>
-                        <Textarea
-                          // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                          name={`newCustomFields[${index}].value`}
-                          ref={form.register({ required: false })}
-                        />
-                        {errorValue && <span style={{ marginTop: '5px', color: 'red' }}>{errorValue}</span>}
-                      </FormControl>
-                    </Div>
-                  )
-                })}
-                <Button onClick={() => append({ id: cuid(), key: '', value: '' })}>Add new custom value</Button>
-
-              </InputGrid>
-            </Div>
-          </FormSection>
-        </>
-      }
+                </InputGrid>
+              </Div>
+            </FormSection>
+          </>
+        )}
 
       <ButtonGroup>
         <Button

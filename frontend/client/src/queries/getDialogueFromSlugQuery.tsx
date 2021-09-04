@@ -12,8 +12,13 @@ const getDialogueFromSlug = gql`
         title
         slug
         publicTitle
+        language
         creationDate
         updatedAt
+        postLeafNode {
+          header
+          subtext
+        }
         leafs {
           id
           title
@@ -33,10 +38,12 @@ const getDialogueFromSlug = gql`
           }
           form {
             id
+            helperText
             fields {
               id
               label
               type
+              placeholder
               isRequired
               position
             }

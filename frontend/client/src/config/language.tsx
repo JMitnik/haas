@@ -16,6 +16,11 @@ const language = {
       de: 'Hinterlassen Sie Ihre Daten',
       nl: 'Laat het ons weten',
     },
+    go_back: {
+      en: 'Go back',
+      de: 'Geh zurück',
+      nl: 'Ga terug',
+    },
     first_name: {
       en: 'First name',
       de: 'Vorname',

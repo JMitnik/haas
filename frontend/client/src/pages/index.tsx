@@ -1,5 +1,6 @@
 import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
+import { I18nextProvider } from 'react-i18next';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import React, { useLayoutEffect } from 'react';
 
@@ -10,6 +11,7 @@ import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
 import { CampaignRedirect } from './campaign';
 import NodePage from './[customer]/[dialogue]/[node]';
+import lang from '../config/i18n-config';
 
 const ErrorPage = () => (
   <div>
@@ -59,13 +61,16 @@ const App = () => {
   }, []);
 
   return (
-    <AppProviders>
-      <GlobalAppLayout>
-        <ErrorBoundary FallbackComponent={ErrorPage}>
-          <AppRoutes />
-        </ErrorBoundary>
-      </GlobalAppLayout>
-    </AppProviders>
+    <I18nextProvider i18n={lang}>
+      <AppProviders>
+        <GlobalAppLayout>
+          <ErrorBoundary FallbackComponent={ErrorPage}>
+            <AppRoutes />
+          </ErrorBoundary>
+        </GlobalAppLayout>
+      </AppProviders>
+    </I18nextProvider>
+
   );
 };
 

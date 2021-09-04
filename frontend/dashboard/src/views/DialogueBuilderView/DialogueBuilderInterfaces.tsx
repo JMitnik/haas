@@ -50,6 +50,7 @@ export interface QuestionOptionProps {
     id: string;
     label: string;
   }
+  position?: number;
 }
 
 export interface ShallowQuestionEntryProps {

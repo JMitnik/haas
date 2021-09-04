@@ -1,4 +1,4 @@
-import { Customer, SystemPermissionEnum, User, UserOfCustomer } from '@prisma/client';
+import { SystemPermissionEnum, User, UserOfCustomer } from '@prisma/client';
 
 export interface CustomerAndPermission {
   permissions?: SystemPermissionEnum[];

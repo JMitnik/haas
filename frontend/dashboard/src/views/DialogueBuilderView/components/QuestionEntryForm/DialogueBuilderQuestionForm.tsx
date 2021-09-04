@@ -60,6 +60,9 @@ interface FormDataProps {
   };
   options: string[];
   optionsFull: any[];
+  unhappyText: string;
+  happyText: string;
+  useCustomerSatisfactionTexts: number;
 }
 
 const isChoiceType = (questionType: string) => {
@@ -190,7 +193,11 @@ const DialogueBuilderQuestionForm = ({
         label: question?.relatedTopic?.label,
         value: question?.relatedTopic?.id,
       } || undefined,
+      unhappyText: question.sliderNode?.unhappyText,
+      happyText: question.sliderNode?.happyText,
       optionsFull: options.map((option) => ({
+        id: option.id,
+        position: option.position,
         value: option.value,
         publicValue: option.publicValue,
         relatedTopicValue: {
@@ -402,13 +409,16 @@ const DialogueBuilderQuestionForm = ({
     const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
     const values = form.getValues();
 
-    console.log(formData);
+    const unhappyText = formData.useCustomerSatisfactionTexts === 1 ? formData.unhappyText : null;
+    const happyText = formData.useCustomerSatisfactionTexts === 1 ? formData.happyText : null;
 
     if (question.id !== '-1') {
       updateQuestion({
         variables: {
           input: {
             id,
+            unhappyText,
+            happyText,
             extraContent: formData.videoEmbedded,
             customerId: activeCustomer?.id,
             overrideLeafId: overrideLeafId || '',
@@ -417,12 +427,13 @@ const DialogueBuilderQuestionForm = ({
             type,
             topic: formData?.topic?.value,
             optionEntries: {
-              options: values.optionsFull?.map((option) => ({
+              options: values.optionsFull?.map((option, index) => ({
                 id: option?.id,
                 value: option?.value,
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
                 topicValueId: option?.relatedTopicValue?.id,
+                position: index + 1,
               })),
             },
             edgeCondition,
@@ -448,15 +459,18 @@ const DialogueBuilderQuestionForm = ({
             title,
             type,
             topic: formData?.topic?.value,
+            unhappyText,
+            happyText,
             extraContent: formData.videoEmbedded,
             overrideLeafId: overrideLeafId || 'None',
             parentQuestionId,
             optionEntries: {
-              options: values.optionsFull?.map((option) => ({
+              options: values.optionsFull?.map((option, index) => ({
                 id: option?.id,
                 value: option?.value,
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
+                position: index + 1,
               })),
             },
             edgeCondition,

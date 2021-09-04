@@ -7,6 +7,7 @@ const getDialoguesOfCustomer = gql`
       dialogues(filter: $filter) {
         id
         title
+        language
         slug
         publicTitle
         creationDate

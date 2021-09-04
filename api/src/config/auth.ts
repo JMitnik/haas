@@ -1,4 +1,4 @@
-import { allow, deny , or, rule, shield } from 'graphql-shield';
+import { allow, deny, or, rule, shield } from 'graphql-shield';
 
 import { ApolloError } from 'apollo-server-express';
 import { SystemPermissionEnum } from '@prisma/client';
@@ -25,7 +25,7 @@ const isSelf = rule({ cache: 'no_cache' })(
 
 const isFromClient = rule({ cache: 'contextual' })(
   async (parent, args, ctx: APIContext) => {
-    console.log(ctx.req.get('origin'));
+    // console.log(ctx.req.get('origin'));
     if (config.env === 'local') return true;
 
     if (ctx.req.get('origin') === config.clientUrl) {
@@ -61,10 +61,13 @@ const isLocal = rule({ cache: 'no_cache' })(
 const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) => rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
     // All permissions: either globalPermissions or workspace permissions
+    const globalPermissions = ctx.session?.user?.globalPermissions || [];
+    const workspacePermissions = ctx.session?.activeWorkspace?.permissions || [];
+
     const allRelevantPermissions = [
-      ctx.session?.user?.globalPermissions,
-      ctx.session?.activeWorkspace?.permissions
-    ].flat();
+      ...globalPermissions,
+      ...workspacePermissions
+    ];
 
     if (!ctx.session?.user?.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
 

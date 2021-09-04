@@ -15,7 +15,7 @@ export const ShareItem = styled.a<ColorProps>`
     cursor: pointer;
 
     @media ${theme.media.mob} {
-      margin-right: ${theme.gutter}px;
+      margin-right: ${theme.gutter / 2}px;
     }
 
     svg, img {

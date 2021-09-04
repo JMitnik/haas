@@ -87,7 +87,7 @@ const AllParentChildren: ParentChildren[] = [
       { childNodeId: '1-POSITIVE', condition: { id: getRandomInt(100000), conditionType: 'valueBoundary', renderMin: 60, renderMax: 100 } },
       { childNodeId: '1-NEUTRAL', condition: { id: getRandomInt(100000), conditionType: 'valueBoundary', renderMin: 40, renderMax: 60 } },
       { childNodeId: '1-NEGATIVE', condition: { id: getRandomInt(100000), conditionType: 'valueBoundary', renderMin: 0, renderMax: 40 } },
-    ]
+    ],
   },
   {
     parentNodeId: '1-POSITIVE',
@@ -96,7 +96,7 @@ const AllParentChildren: ParentChildren[] = [
       { childNodeId: '2-POSITIVE-TOPIC-B', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Business' } },
       { childNodeId: '2-POSITIVE-TOPIC-C', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Car-performance' } },
       { childNodeId: '2-POSITIVE-TOPIC-D', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Delivery' } },
-    ]
+    ],
   },
   {
     parentNodeId: '1-NEUTRAL',
@@ -105,7 +105,7 @@ const AllParentChildren: ParentChildren[] = [
       { childNodeId: '2-NEUTRAL-TOPIC-B', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Business' } },
       { childNodeId: '2-NEUTRAL-TOPIC-C', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Car-performance' } },
       { childNodeId: '2-NEUTRAL-TOPIC-D', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Delivery' } },
-    ]
+    ],
   },
   {
     parentNodeId: '1-NEGATIVE',
@@ -114,7 +114,7 @@ const AllParentChildren: ParentChildren[] = [
       { childNodeId: '2-NEGATIVE-TOPIC-B', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Business' } },
       { childNodeId: '2-NEGATIVE-TOPIC-C', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Car-performance' } },
       { childNodeId: '2-NEGATIVE-TOPIC-D', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Delivery' } },
-    ]
+    ],
   },
 ];
 

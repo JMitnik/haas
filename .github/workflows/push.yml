@@ -1,0 +1,26 @@
+name: CI_PR
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install modules
+      run: yarn
+    - name: Check types
+      run: yarn types
+    - name: Run ESLint
+      run: yarn eslint
+    - name: Start Testing Containers
+      run: yarn dock:test:start-db
+    - name: Generate required artifacts
+      run: yarn gen:api:prisma
+      env:
+        DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
+    - name: Run Unit and integration Tests
+      run: yarn test:integration
+      env:
+        # These ENV values are not reflecting actual secrets from production
+        DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
+        JWT_SECRET: 'test123'
+        MAIL_SENDER: 'test123'

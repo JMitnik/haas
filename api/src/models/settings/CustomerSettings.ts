@@ -25,17 +25,19 @@ export const CustomerSettingsType = objectType({
   definition(t) {
     t.id('id');
     t.string('logoUrl', { nullable: true });
+    t.string('logoUrl', { nullable: true });
+
+    // On a schale of 1-100
+    t.int('logoOpacity', { nullable: true, resolve: (parent) => parent.logoOpacity ?? 30 });
 
     t.field('colourSettings', {
       type: ColourSettingsType,
       nullable: true,
 
-      resolve(parent, args, ctx) {
+      async resolve(parent, args, ctx) {
         if (!parent.colourSettingsId) return null;
 
-        const colourSettings = ctx.prisma.colourSettings.findOne({
-          where: { id: parent.colourSettingsId || undefined },
-        });
+        const colourSettings = await ctx.services.customerService.getColourSettings(parent.colourSettingsId);
 
         return colourSettings;
       },
@@ -45,10 +47,9 @@ export const CustomerSettingsType = objectType({
       nullable: true,
       type: FontSettingsType,
 
-      resolve(parent, args, ctx) {
-        const colourSettings = ctx.prisma.fontSettings.findOne({
-          where: { id: parent.fontSettingsId || undefined },
-        });
+      async resolve(parent, args, ctx) {
+        if (!parent.fontSettingsId) return null;
+        const colourSettings = await ctx.services.customerService.getFontSettings(parent.fontSettingsId);
 
         return colourSettings;
       },

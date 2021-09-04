@@ -1,18 +1,24 @@
 import * as UI from '@haas/ui';
-import { format } from 'date-fns';
-import { useLogger } from 'hooks/useLogger';
-import { useNavigator } from 'hooks/useNavigator';
-import React, { useState } from 'react';
-import { useEffect } from 'react';
+import { AlertTriangle, AtSign, Clock, Eye, Flag, Inbox, Mail, Plus, Settings, Smartphone } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
-import { AtSign, Clock, Eye, Flag, Plus, Smartphone } from 'react-feather';
+import { format } from 'date-fns';
+import { union } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { DeepPartial } from 'types/customTypes';
+import React, { useEffect, useState } from 'react';
+
 import {
   CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType,
   GetWorkspaceCampaignQuery,
-  PaginationSortByEnum, useGetWorkspaceCampaignQuery
+  PaginationSortByEnum, useGetWorkspaceCampaignQuery,
 } from 'types/generated-types';
+import { DeepPartial } from 'types/customTypes';
+import { useLogger } from 'hooks/useLogger';
+import { useNavigator } from 'hooks/useNavigator';
+
+import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
+
+import { CampaignType } from './CampaignViewTypes';
+// eslint-disable-next-line import/no-cycle
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
 export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
@@ -29,14 +35,13 @@ export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
       },
       {
         by: PaginationSortByEnum.UpdatedAt,
-        desc: true
+        desc: true,
       },
     ],
   },
 };
 
-const POLL_INTERVAL_SECONDS = 20;
-const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
+const POLL_INTERVAL_SECONDS = 30;
 
 const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
   const date = new Date(parseInt(scheduledAt, 10));
@@ -48,7 +53,7 @@ const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
       </UI.Icon>
       {format(date, 'MM/dd HH:mm')}
     </UI.Flex>
-  )
+  );
 };
 
 const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) => {
@@ -68,7 +73,7 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
         <UI.Label variantColor="blue">
           {status}
         </UI.Label>
-      )
+      );
     }
 
     case DeliveryStatusEnum.Scheduled: {
@@ -91,26 +96,52 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
             </UI.Div>
           </ErrorBoundary>
         </UI.Label>
-      )
+      );
     }
 
     case DeliveryStatusEnum.Opened: {
       return (
         <UI.Label variantColor="yellow">{status}</UI.Label>
-      )
+      );
     }
 
+    case DeliveryStatusEnum.Failed: {
+      return (
+        <UI.Label variantColor="red">{status}</UI.Label>
+      );
+    }
+
+    case DeliveryStatusEnum.Delivered: {
+      return (
+        <UI.Label variantColor="cyan">{status}</UI.Label>
+      );
+    }
     default: {
       return (
-        <UI.Label>{status}</UI.Label>
-      )
+        <UI.Label variantColor="blue">{status}</UI.Label>
+      );
     }
   }
-}
+};
+
+const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
+  label: campaign.label,
+  // @ts-ignore
+  customVariables: union(campaign.variants.map((variant) => variant.customVariables.map((variable) => variable.key))),
+  variants: campaign.variants.map((variant) => ({
+    body: variant.body,
+    dialogue: { label: variant.dialogue.title, value: variant.dialogue.id },
+    from: variant.from || '',
+    label: variant.label,
+    type: variant.type,
+    weight: variant.weight,
+  })),
+});
 
 export const CampaignView = () => {
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
   const [isOpenDetailModel, setIsOpenDetailModel] = useState(false);
+  const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false);
   const [activeDelivery, setActiveDelivery] = useState<DeepPartial<DeliveryType> | null>(null);
   const { t } = useTranslation();
   const logger = useLogger();
@@ -130,11 +161,11 @@ export const CampaignView = () => {
       customerSlug,
       deliveryConnectionFilter: paginationState,
     },
-    pollInterval: POLL_INTERVAL,
-    onCompleted: (data) => setDataCache(data),
+    pollInterval: POLL_INTERVAL_SECONDS,
+    onCompleted: (completeData) => setDataCache(completeData),
     onError: (error) => logger.logError(error, {
-      tags: { section: 'campaign' }
-    })
+      tags: { section: 'campaign' },
+    }),
   });
 
   // use-table-select placement
@@ -161,23 +192,40 @@ export const CampaignView = () => {
     }
   }, [activeDelivery, setIsOpenImportModal]);
 
-  const campaign = dataCache?.customer?.campaign;
+  const campaign = dataCache?.customer?.campaign || null;
   const deliveryConnection = campaign?.deliveryConnection;
 
   return (
     <>
-      <UI.ViewHeading>
-        <UI.Stack>
-          <UI.Breadcrumb to={campaignsPath}>{t('back_to_campaigns')}</UI.Breadcrumb>
-          <UI.Stack isInline alignItems="center" spacing={4}>
-            <UI.PageTitle>{campaign?.label}</UI.PageTitle>
-            <UI.Button
-              leftIcon={Plus}
-              onClick={() => setIsOpenImportModal(true)} size="sm" variantColor="teal">{t('import_deliveries')}</UI.Button>
+      <UI.ViewHead>
+        <UI.Flex justifyContent="space-between" width="100%" alignItems="flex-end">
+          <UI.Stack>
+            <UI.Breadcrumb to={campaignsPath}>{t('back_to_campaigns')}</UI.Breadcrumb>
+            <UI.Stack isInline alignItems="center" spacing={4}>
+              <UI.ViewTitle>{campaign?.label}</UI.ViewTitle>
+              <UI.Button
+                leftIcon={Plus}
+                onClick={() => setIsOpenImportModal(true)}
+                size="sm"
+                variantColor="teal"
+              >
+                {t('import_deliveries')}
+              </UI.Button>
+            </UI.Stack>
           </UI.Stack>
-        </UI.Stack>
-      </UI.ViewHeading>
-      <UI.ViewContainer>
+
+          <UI.Button
+            leftIcon={Settings}
+            size="md"
+            variant="outline"
+            onClick={() => setIsOpenSettingsModal(true)}
+          >
+            Settings
+          </UI.Button>
+        </UI.Flex>
+
+      </UI.ViewHead>
+      <UI.ViewBody>
         <UI.Card noHover>
           <UI.Div p={2}>
             <UI.Table width="100%" isLoading={loading}>
@@ -200,9 +248,9 @@ export const CampaignView = () => {
               </UI.TableHeading>
 
               <UI.TableBody>
-                {deliveryConnection?.deliveries.map(delivery => (
+                {deliveryConnection?.deliveries.map((delivery) => (
                   <UI.TableRow
-                    // isSelected={selectedIds.includes(delivery.id)} 
+                    // isSelected={selectedIds.includes(delivery.id)}
                     hasHover
                     key={delivery.id}
                     onClick={() => setActiveDelivery(delivery)}
@@ -216,11 +264,24 @@ export const CampaignView = () => {
                       {delivery?.deliveryRecipientFirstName || ''}
                     </UI.TableCell>
                     <UI.TableCell>
-                      {delivery.campaignVariant?.type === CampaignVariantEnum.Email ?
-                        delivery?.deliveryRecipientEmail : delivery?.deliveryRecipientPhone}
+                      {delivery.campaignVariant?.type === CampaignVariantEnum.Email
+                        ? delivery?.deliveryRecipientEmail : delivery?.deliveryRecipientPhone}
                     </UI.TableCell>
                     <UI.TableCell>
-                      {delivery?.campaignVariant?.label}
+                      <UI.Label variantColor="teal">
+                        <UI.Flex>
+                          <UI.Icon mr={1}>
+                            {delivery?.campaignVariant?.type === CampaignVariantEnum.Email && (
+                              <Mail width={14} />
+                            )}
+
+                            {delivery?.campaignVariant?.type === CampaignVariantEnum.Sms && (
+                              <Smartphone width={14} />
+                            )}
+                          </UI.Icon>
+                          {delivery?.campaignVariant?.label}
+                        </UI.Flex>
+                      </UI.Label>
                     </UI.TableCell>
                     <UI.TableCell>
                       <DeliveryStatus
@@ -254,32 +315,43 @@ export const CampaignView = () => {
                   {deliveryConnection?.pageInfo.nrPages}
                 </UI.Span>
                 <UI.Span ml={3}>
-                  (Total deliveries: {data?.customer?.campaign.allDeliveryConnection?.nrTotal})
+                  (Total deliveries:
+                  {' '}
+                  {data?.customer?.campaign?.allDeliveryConnection?.nrTotal}
+                  )
                 </UI.Span>
               </UI.Div>
 
               <UI.Div>
                 <UI.Stack isInline>
                   <UI.Button
-                    onClick={() => setPaginationState(state => ({
+                    onClick={() => setPaginationState((state) => ({
                       ...state,
                       paginationFilter: {
                         ...state.paginationFilter,
                         pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
                         offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
-                      }
+                      },
                     }))}
-                    isDisabled={paginationState.paginationFilter?.pageIndex === 0}>Previous</UI.Button>
+                    isDisabled={paginationState.paginationFilter?.pageIndex === 0}
+                  >
+                    Previous
+                  </UI.Button>
                   <UI.Button
-                    onClick={() => setPaginationState(state => ({
+                    onClick={() => setPaginationState((state) => ({
                       ...state,
                       paginationFilter: {
                         ...state.paginationFilter,
                         pageIndex: (state.paginationFilter?.pageIndex || 0) + 1,
                         offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
-                      }
+                      },
                     }))}
-                    isDisabled={(paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages}>Next</UI.Button>
+                    isDisabled={
+                      (paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages
+                    }
+                  >
+                    Next
+                  </UI.Button>
                 </UI.Stack>
               </UI.Div>
             </UI.PaginationFooter>
@@ -314,55 +386,112 @@ export const CampaignView = () => {
 
               <UI.FormSectionHeader>{t('events')}</UI.FormSectionHeader>
               <UI.Stack spacing={4}>
-                {activeDelivery?.events?.map(event => (
-                  <UI.Flex alignItems="center" justifyContent="space-between">
-                    {event?.status === DeliveryStatusEnum.Scheduled && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="gray.200" padding="5px" color="gray.500" style={{ borderRadius: '100%' }}>
-                          <Clock />
-                        </UI.Div>
-                        {t('scheduled_event')}
-                      </UI.Flex>
-                    )}
-                    {event?.status === DeliveryStatusEnum.Deployed && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="blue.200" padding="5px" color="blue.500" style={{ borderRadius: '100%' }}>
-                          {activeDelivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
-                            <AtSign />
-                          ) : (
-                            <Smartphone />
-                          )}
-                        </UI.Div>
-                        {t('deployed_event')}
-                      </UI.Flex>
-                    )}
-                    {event?.status === DeliveryStatusEnum.Opened && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="yellow.200" padding="5px" color="yellow.500" style={{ borderRadius: '100%' }}>
-                          <Eye />
-                        </UI.Div>
-                        {t('opened_event')}
-                      </UI.Flex>
-                    )}
-                    {event?.status === DeliveryStatusEnum.Finished && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="green.200" padding="5px" color="green.500" style={{ borderRadius: '100%' }}>
-                          <Flag />
-                        </UI.Div>
-                        {t('finished_event')}
-                      </UI.Flex>
-                    )}
-                    <UI.Span color="gray.500">
-                      {event?.createdAt && (
-                        <>
-                          {format(
-                            new Date(parseInt(event?.createdAt, 10)),
-                            'MMM do HH:mm'
-                          )}
-                        </>
+                {activeDelivery?.events?.map((event) => (
+                  <UI.Div key={event?.id}>
+                    <UI.Flex alignItems="center" justifyContent="space-between">
+                      {event?.status === DeliveryStatusEnum.Scheduled && (
+                        <UI.Flex alignItems="center">
+                          <UI.Div mr={2} bg="gray.200" padding="5px" color="gray.500" style={{ borderRadius: '100%' }}>
+                            <Clock />
+                          </UI.Div>
+                          {t('scheduled_event')}
+                        </UI.Flex>
                       )}
-                    </UI.Span>
-                  </UI.Flex>
+                      {event?.status === DeliveryStatusEnum.Deployed && (
+                        <UI.Flex alignItems="center">
+                          <UI.Div mr={2} bg="blue.200" padding="5px" color="blue.500" style={{ borderRadius: '100%' }}>
+                            {activeDelivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
+                              <AtSign />
+                            ) : (
+                              <Smartphone />
+                            )}
+                          </UI.Div>
+                          {t('deployed_event')}
+                        </UI.Flex>
+                      )}
+                      {event?.status === DeliveryStatusEnum.Opened && (
+                        <UI.Flex alignItems="center">
+                          <UI.Div
+                            mr={2}
+                            bg="yellow.200"
+                            padding="5px"
+                            color="yellow.500"
+                            style={{ borderRadius: '100%' }}
+                          >
+                            <Eye />
+                          </UI.Div>
+                          {t('opened_event')}
+                        </UI.Flex>
+                      )}
+                      {event?.status === DeliveryStatusEnum.Failed && (
+                        <UI.Div>
+                          <UI.Flex alignItems="center">
+                            <UI.Div
+                              mr={2}
+                              bg="red.200"
+                              padding="5px"
+                              color="red.500"
+                              style={{ borderRadius: '100%' }}
+                            >
+                              <AlertTriangle />
+                            </UI.Div>
+                            {t('problem_delivery')}
+                          </UI.Flex>
+                        </UI.Div>
+                      )}
+
+                      {event?.status === DeliveryStatusEnum.Delivered && (
+                        <UI.Div>
+                          <UI.Flex alignItems="center">
+                            <UI.Div
+                              mr={2}
+                              bg="cyan.200"
+                              padding="5px"
+                              color="cyan.500"
+                              style={{ borderRadius: '100%' }}
+                            >
+                              <Inbox />
+                            </UI.Div>
+                            {t('delivery_delivered')}
+                          </UI.Flex>
+                        </UI.Div>
+                      )}
+
+                      {event?.status === DeliveryStatusEnum.Finished && (
+                        <UI.Flex alignItems="center">
+                          <UI.Div
+                            mr={2}
+                            bg="green.200"
+                            padding="5px"
+                            color="green.500"
+                            style={{ borderRadius: '100%' }}
+                          >
+                            <Flag />
+                          </UI.Div>
+                          {t('finished_event')}
+                        </UI.Flex>
+                      )}
+                      <UI.Span color="gray.500">
+                        {event?.createdAt && (
+                          <>
+                            {format(
+                              new Date(parseInt(event?.createdAt, 10)),
+                              'MMM do HH:mm',
+                            )}
+                          </>
+                        )}
+                      </UI.Span>
+                    </UI.Flex>
+
+                    {event?.failureMessage && (
+                      <UI.Div mt={4}>
+                        <UI.ErrorPane
+                          header="Delivery failure"
+                          text={event?.failureMessage}
+                        />
+                      </UI.Div>
+                    )}
+                  </UI.Div>
                 ))}
               </UI.Stack>
             </UI.CardBody>
@@ -373,11 +502,27 @@ export const CampaignView = () => {
           <UI.Card bg="white" noHover width={700}>
             <UI.CardBody>
               <ImportDeliveriesForm
-                onClose={() => setIsOpenImportModal(false)} />
+                onClose={() => setIsOpenImportModal(false)}
+              />
             </UI.CardBody>
           </UI.Card>
         </UI.Modal>
-      </UI.ViewContainer>
+
+        {!!campaign && (
+          <UI.Modal isOpen={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
+            <UI.Card bg="white" noHover width={700}>
+              <UI.CardBody>
+                <CreateCampaignForm
+                  onClose={() => setIsOpenSettingsModal(false)}
+                  // @ts-ignore
+                  campaign={campaignToForm(campaign)}
+                  isReadOnly
+                />
+              </UI.CardBody>
+            </UI.Card>
+          </UI.Modal>
+        )}
+      </UI.ViewBody>
     </>
-  )
+  );
 };

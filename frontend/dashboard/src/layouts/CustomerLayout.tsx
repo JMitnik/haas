@@ -63,8 +63,12 @@ const SubNav = styled.ul`
   `}
 `;
 
-const SubNavItem = styled.li`
-  ${({ theme }) => css`
+interface SubNavItemProps {
+  isDisabled?: boolean;
+}
+
+const SubNavItem = styled.li<SubNavItemProps>`
+  ${({ theme, isDisabled }) => css`
     a {
       font-size: 0.8rem;
       font-weight: 700;
@@ -84,12 +88,24 @@ const SubNavItem = styled.li`
       background: ${theme.colors.primaryGradient};
       border-radius: ${theme.borderRadiuses.somewhatRounded};
     }
+
+    ${isDisabled && css`
+      pointer-events: none;
+      opacity: 0.3;
+    `}
   `}
 `;
 
 const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
   const { t } = useTranslation();
-  const { canViewUsers, canEditCustomer, canCreateTriggers, canViewCampaigns } = useAuth();
+  const {
+    canViewUsers,
+    canEditCustomer,
+    canCreateTriggers,
+    canViewCampaigns,
+    canBuildDialogues,
+    canEditDialogue,
+  } = useAuth();
   const { dialogueMatch } = useNavigator();
   const dialogueSlug = dialogueMatch?.params?.dialogueSlug;
 
@@ -119,24 +135,24 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
                         </NavLink>
                       </SubNavItem>
                       <SubNavItem>
-                        <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/topics`}>
+                      <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/topics`}>
                           <UI.Icon mr={2} as={CollectionIcon} />
                           {t('views:topic_view')}
                         </NavLink>
                       </SubNavItem>
-                      <SubNavItem>
+                      <SubNavItem isDisabled={!canBuildDialogues}>
                         <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions`}>
                           <UI.Icon mr={2} as={CursorClickIcon} />
                           {t('views:cta_view')}
                         </NavLink>
                       </SubNavItem>
-                      <SubNavItem>
+                      <SubNavItem isDisabled={!canBuildDialogues}>
                         <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder`}>
                           <UI.Icon mr={2} as={WrenchIcon} />
                           {t('views:builder_view')}
                         </NavLink>
                       </SubNavItem>
-                      <SubNavItem>
+                      <SubNavItem isDisabled={!canEditDialogue}>
                         <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/edit`}>
                           <UI.Icon mr={2} as={SliderIcon} />
                           {t('views:configurations')}
@@ -151,30 +167,22 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
             <SurveyIcon />
             {t('dialogues')}
           </NavItem>
-          {canViewUsers && (
-            <NavItem to={`/dashboard/b/${customerSlug}/users`}>
-              <UsersIcon />
-              {t('users')}
-            </NavItem>
-          )}
-          {canCreateTriggers && (
-            <NavItem to={`/dashboard/b/${customerSlug}/triggers`}>
-              <NotificationIcon />
-              {t('alerts')}
-            </NavItem>
-          )}
-          {canViewCampaigns && (
-            <NavItem to={`/dashboard/b/${customerSlug}/campaigns`}>
-              <ChatIcon />
-              {t('campaigns')}
-            </NavItem>
-          )}
-          {canEditCustomer && (
-            <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
-              <SettingsIcon />
-              {t('settings')}
-            </NavItem>
-          )}
+          <NavItem isDisabled={!canViewUsers} to={`/dashboard/b/${customerSlug}/users`}>
+            <UsersIcon />
+            {t('users')}
+          </NavItem>
+          <NavItem isDisabled={!canCreateTriggers} to={`/dashboard/b/${customerSlug}/triggers`}>
+            <NotificationIcon />
+            {t('alerts')}
+          </NavItem>
+          <NavItem isDisabled={!canViewCampaigns} to={`/dashboard/b/${customerSlug}/campaigns`}>
+            <ChatIcon />
+            {t('campaigns')}
+          </NavItem>
+          <NavItem isDisabled={!canEditCustomer} to={`/dashboard/b/${customerSlug}/edit`}>
+            <SettingsIcon />
+            {t('settings')}
+          </NavItem>
         </AnimateSharedLayout>
       </motion.ul>
     </NavItems>
@@ -206,10 +214,10 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
                 </Sidenav>
               </motion.div>
             ) : (
-                <MobileBottomNav>
-                  <DashboardNav customerSlug={params.customerSlug} />
-                </MobileBottomNav>
-              )}
+              <MobileBottomNav>
+                <DashboardNav customerSlug={params.customerSlug} />
+              </MobileBottomNav>
+            )}
           </Div>
 
           <DashboardViewContainer>

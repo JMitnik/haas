@@ -1,5 +1,7 @@
+import React from 'react';
 import styled, { css } from 'styled-components';
 import { TypographyProps, typography, space, SpaceProps, color, ColorProps } from 'styled-system';
+import { Icon, Span, Div } from '.';
 
 interface GenericTypeProps extends TypographyProps, SpaceProps, ColorProps {}
 
@@ -11,24 +13,9 @@ export const GenericType = styled.p<GenericTypeProps>`
 
 export const Text = styled(GenericType).attrs({ as: 'p' })``;
 
-export const PageTitle = styled(Text)`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.gutter}px;
-    color: ${theme.colors.gray[600]};
-    font-size: 1.8rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-
-    svg {
-      width: 24px;
-    }
-  `}
-`
-
 export const Helper = styled(Text)`
   ${({ theme }) => css`
-    margin: 0;  
+    margin: 0;
     color: ${theme.colors.gray[500]};
     font-weight: 700;
     line-height: 1rem;

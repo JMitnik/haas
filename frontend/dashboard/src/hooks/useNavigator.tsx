@@ -1,4 +1,4 @@
-import { useParams, useRouteMatch, useHistory, generatePath } from 'react-router';
+import { generatePath, useHistory, useParams, useRouteMatch } from 'react-router';
 
 export const ROUTES = {
   WORKSPACE_ROOT: '/dashboard/b/:customerSlug',
@@ -8,6 +8,8 @@ export const ROUTES = {
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
   AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
   ADMIN_OVERVIEW: '/dashboard/admin',
+  USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
+  ALERTS_OVERVIEW: '/dashboard/b/:customerSlug/triggers',
 };
 
 interface DashboardParams {
@@ -33,6 +35,9 @@ export const useNavigator = () => {
   };
 
   const getCampaignsPath = () => generatePath(ROUTES.CAMPAIGNS_VIEW, { customerSlug, campaignId });
+  const getUsersPath = () => generatePath(ROUTES.USERS_OVERVIEW, { customerSlug });
+  const getDialoguesPath = () => generatePath(ROUTES.DIALOGUES_VIEW, { customerSlug });
+  const getAlertsPath = () => generatePath(ROUTES.ALERTS_OVERVIEW, { customerSlug });
 
   const dialoguesMatch = useRouteMatch({
     path: ROUTES.DIALOGUES_VIEW,
@@ -45,6 +50,9 @@ export const useNavigator = () => {
   return {
     goToCampaignView,
     getCampaignsPath,
+    getDialoguesPath,
+    getUsersPath,
+    getAlertsPath,
     dialoguesMatch,
     dialogueMatch,
     customerSlug,

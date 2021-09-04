@@ -1,4 +1,5 @@
 import * as UI from '@haas/ui';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { SliderNodeMarkersProps } from '../../../../models/Tree/SliderNodeMarkersModel';
@@ -15,12 +16,13 @@ interface SliderTextProps {
    * Renders adaptable SliderText based on current score, and relevant markers
    */
 export const SliderText = ({ color, adaptedColor, score, isEarly, markers }: SliderTextProps) => {
+  const { t } = useTranslation();
   let text = '';
   let subText = '';
 
   if (isEarly) {
-    text = 'That was quick!';
-    subText = 'Tap me again if you are sure.';
+    text = t('quick_release_text');
+    subText = t('quick_release_subtext');
   }
 
   if (!isEarly && markers.length) {
@@ -37,7 +39,7 @@ export const SliderText = ({ color, adaptedColor, score, isEarly, markers }: Sli
       return false;
     });
 
-    text = activeMarker?.label || 'Thanks for voting';
+    text = activeMarker?.label || t('thanks_for_voting');
     subText = activeMarker?.subLabel || '';
   }
 

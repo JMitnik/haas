@@ -38,17 +38,16 @@ class DynamoScheduleService {
    * Schedules a batch of `one-off` items (>25 items) and send write requests to DynamoDB.
    * @param items
    */
-  static async batchScheduleOneOffs(items: ScheduleItem[], schedulerOptions: SchedulerOptions) {
+  batchScheduleOneOffs = async (items: ScheduleItem[], schedulerOptions: SchedulerOptions) => {
+    if (process.env.NODE_ENV === 'test') return;
+
     const batchGroups = _.chunk(items, MAX_BATCH_SIZE);
 
     batchGroups.forEach(async (batch) => {
       const processedBatch = DynamoScheduleService.processBatchForDynamo(batch, schedulerOptions);
 
-      console.log(JSON.stringify(processedBatch));
-
       dynamoClient.batchWriteItem(processedBatch, (err, data) => {
         if (err) console.log(err, err.stack); // an error occurred
-        else console.log(data); // successful response
       });
     });
   }

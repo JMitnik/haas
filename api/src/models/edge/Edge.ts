@@ -33,10 +33,7 @@ export const EdgeType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.parentNodeId) return null;
 
-        const parentNode = await ctx.prisma.questionNode.findOne({
-          where: { id: parent.parentNodeId },
-        });
-
+        const parentNode = await ctx.services.nodeService.findNodeById(parent.parentNodeId);
         return parentNode;
       },
     });
@@ -48,9 +45,7 @@ export const EdgeType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.parentNodeId) return null;
 
-        const childNode = await ctx.prisma.questionNode.findOne({
-          where: { id: parent.childNodeId },
-        });
+        const childNode = await ctx.services.nodeService.findNodeById(parent.childNodeId);
 
         return childNode;
       },
@@ -60,9 +55,7 @@ export const EdgeType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        const edgeConditions = await ctx.prisma.questionCondition.findMany({
-          where: { edgeId: parent.id },
-        });
+        const edgeConditions = await ctx.services.edgeService.getConditionsById(parent.id);
 
         return edgeConditions || [];
       },
@@ -82,7 +75,7 @@ export const EdgeQueries = extendType({
       resolve(parent, args, ctx) {
         if (!args.id) return null;
 
-        return ctx.prisma.edge.findOne({ where: { id: args.id } });
+        return ctx.services.edgeService.getEdgeById(args.id);
       },
     });
   },

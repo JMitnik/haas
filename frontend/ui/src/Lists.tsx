@@ -3,7 +3,6 @@ import Color from 'color';
 import { ChevronRight } from 'react-feather';
 import styled, { css } from 'styled-components';
 
-import { ReactComponent as CloseIcon } from './assets/icon-close.svg';
 import { Div, SelectContainer } from '.';
 
 import { Span } from './Span';
@@ -136,16 +135,3 @@ export const ListItemCaret = () => (
   </ListItemCaretWrapper>
 );
 
-const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 1rem;
-  height: 1rem;
-`;
-
-export const CloseButton = ({ onClose }: any) => (
-  <CloseButtonContainer onClick={onClose}>
-    <CloseIcon />
-  </CloseButtonContainer>
-)

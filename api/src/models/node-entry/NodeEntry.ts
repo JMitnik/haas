@@ -1,10 +1,6 @@
-import { NodeEntry } from '@prisma/client';
 import { inputObjectType, objectType } from '@nexus/schema';
 
-// eslint-disable-next-line import/no-cycle
 import { FormNodeField, QuestionNodeType } from '../QuestionNode/QuestionNode';
-// eslint-disable-next-line import/no-cycle
-import NodeEntryService from './NodeEntryService';
 
 export const FormNodeEntryValueType = objectType({
   name: 'FormNodeEntryValueType',
@@ -39,6 +35,7 @@ export const NodeEntryValueType = objectType({
     t.string('registrationNodeEntry', { nullable: true });
     t.string('choiceNodeEntry', { nullable: true });
     t.string('linkNodeEntry', { nullable: true });
+    t.string('videoNodeEntry', { nullable: true });
     t.field('formNodeEntry', { type: FormNodeEntryType, nullable: true });
   },
 });
@@ -67,12 +64,11 @@ export const NodeEntryType = objectType({
       type: QuestionNodeType,
       nullable: true,
 
-      resolve(parent, args, ctx) {
+      async resolve(parent, args, ctx) {
         if (!parent.relatedNodeId) {
           return null;
         }
-
-        const relatedNode = ctx.prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+        const relatedNode = await ctx.services.nodeService.findNodeById(parent.relatedNodeId);
         return relatedNode;
       },
     });
@@ -83,34 +79,8 @@ export const NodeEntryType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        const nodeEntry = await ctx.prisma.nodeEntry.findOne({
-          where: { id: parent.id },
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            sliderNodeEntry: true,
-            textboxNodeEntry: true,
-            formNodeEntry: {
-              include: {
-                values: {
-                  include: {
-                    relatedField: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        return {
-          choiceNodeEntry: nodeEntry?.choiceNodeEntry?.value,
-          linkNodeEntry: nodeEntry?.linkNodeEntry?.value?.toString(),
-          registrationNodeEntry: nodeEntry?.registrationNodeEntry?.value?.toString(),
-          sliderNodeEntry: nodeEntry?.sliderNodeEntry?.value,
-          textboxNodeEntry: nodeEntry?.textboxNodeEntry?.value,
-          formNodeEntry: nodeEntry?.formNodeEntry,
-        };
+        const nodeEntryValues = await ctx.services.nodeEntryService.findNodeEntryValues(parent.id);
+        return nodeEntryValues;
       },
     });
   },
@@ -158,6 +128,15 @@ export const ChoiceNodeEntryInput = inputObjectType({
   },
 });
 
+export const VideoNodeEntryInput = inputObjectType({
+  name: 'VideoNodeEntryInput',
+  description: 'Input type for a video node',
+
+  definition(t) {
+    t.string('value');
+  },
+});
+
 export const TextboxNodeEntryInput = inputObjectType({
   name: 'TextboxNodeEntryInput',
   description: 'Input type for a textbox node',
@@ -194,6 +173,7 @@ export const NodeEntryDataInput = inputObjectType({
     t.field('textbox', { type: TextboxNodeEntryInput, nullable: true });
     t.field('form', { type: FormNodeEntryInput, nullable: true });
     t.field('choice', { type: ChoiceNodeEntryInput, nullable: true });
+    t.field('video', { type: VideoNodeEntryInput, nullable: true });
 
     // @deprecated
     t.field('register', { type: RegisterNodeEntryInput, nullable: true, deprecation: 'This will be deprectated from now on' });

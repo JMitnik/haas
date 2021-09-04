@@ -41,7 +41,8 @@ const multiChoiceItemAnimation: Variants = {
 const VideoEmbeddedNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
   const handleSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
     const entry: SessionEntryDataProps = {
-      choice: { value: multiChoiceOption.value },
+      choice: undefined,
+      video: { value: multiChoiceOption.value },
       register: undefined,
       slider: undefined,
       textbox: undefined,

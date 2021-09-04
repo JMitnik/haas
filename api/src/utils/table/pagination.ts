@@ -53,9 +53,13 @@ export const slice = (
   offset: number,
   limit: number,
   pageIndex: number,
-) => ((offset + limit) < entries.length
-  ? entries.slice(offset, (pageIndex + 1) * limit)
-  : entries);
+) => {
+  if (entries.length < limit) return entries;
+
+  return (offset + limit) < entries.length
+    ? entries.slice(offset, (pageIndex + 1) * limit)
+    : entries.slice(offset, entries.length);
+};
 
 export const getSearchTermFilter = (searchFields: NexusGenEnums['PaginationSearchEnum'][], searchTerm: string) => {
   if (!searchTerm || !searchFields.length) {
@@ -113,7 +117,7 @@ export const constructFindManyInput = (
 
 export const paginate = async <GenericModelType>({
   findManyArgs,
-  paginationOpts = {},
+  paginationOpts = { },
   countArgs,
   useSlice = true
 }: PaginateProps,
@@ -128,12 +132,11 @@ export const paginate = async <GenericModelType>({
   // Page logic
   const triggerTotal = await countCallBack({ props: countWhereInput, paginationOpts, rest: countRest });
   const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
-  const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
-    ? paginationOpts.pageIndex : 1;
 
   const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
-    nrPages: totalPages,
-    pageIndex: currentPage,
+    nrPages: totalPages || 1,
+    pageIndex: (paginationOpts?.pageIndex !== undefined && paginationOpts?.pageIndex !== null)
+      ? paginationOpts.pageIndex : 0,
   };
 
   return {

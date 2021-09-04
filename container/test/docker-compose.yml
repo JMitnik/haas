@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3'
 services:
   postgres:
     restart: always
@@ -8,17 +8,3 @@ services:
       POSTGRES_PASSWORD: prisma
     ports:
       - '5431:5432'
-  test_api:
-    build: ../../api
-    ports:
-      - '3999:4000'
-    env_file:
-      - ../../api/.env
-    links: 
-      - "postgres: db"
-    environment: 
-      DB_STRING: 'postgresql://prisma:prisma@postgres:5432/postgres?schema=public'
-    volumes:
-        - '../../api/src:/app/src'
-    depends_on: 
-      - postgres

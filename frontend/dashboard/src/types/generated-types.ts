@@ -66,6 +66,12 @@ export type CampaignTypeDeliveryConnectionArgs = {
   filter?: Maybe<DeliveryConnectionFilter>;
 };
 
+export type CampaignVariantCustomVariableType = {
+  __typename?: 'CampaignVariantCustomVariableType';
+  id: Scalars['ID'];
+  key: Scalars['String'];
+};
+
 export enum CampaignVariantEnum {
   Sms = 'SMS',
   Email = 'EMAIL',
@@ -79,9 +85,11 @@ export type CampaignVariantType = {
   label: Scalars['String'];
   weight: Scalars['Int'];
   body: Scalars['String'];
+  from?: Maybe<Scalars['String']>;
   type: CampaignVariantEnum;
-  workspace: Customer;
-  dialogue: Dialogue;
+  workspace?: Maybe<Customer>;
+  dialogue?: Maybe<Dialogue>;
+  customVariables?: Maybe<Array<CampaignVariantCustomVariableType>>;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
@@ -127,6 +135,10 @@ export type CreateBatchDeliveriesOutputType = {
   nrDeliveries: Scalars['Int'];
 };
 
+export type CreateCampaignCustomVariable = {
+  key?: Maybe<Scalars['String']>;
+};
+
 export type CreateCampaignInputType = {
   label?: Maybe<Scalars['String']>;
   workspaceId: Scalars['ID'];
@@ -134,13 +146,15 @@ export type CreateCampaignInputType = {
 };
 
 export type CreateCampaignVariantInputType = {
-  label?: Maybe<Scalars['String']>;
   workspaceId: Scalars['ID'];
   dialogueId: Scalars['ID'];
-  type: CampaignVariantEnum;
+  label?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['String']>;
-  weight?: Maybe<Scalars['Float']>;
+  from?: Maybe<Scalars['String']>;
   subject?: Maybe<Scalars['String']>;
+  weight?: Maybe<Scalars['Float']>;
+  type: CampaignVariantEnum;
+  customVariables?: Maybe<Array<CreateCampaignCustomVariable>>;
 };
 
 export type CreateCtaInputType = {
@@ -163,6 +177,7 @@ export type CreateDialogueInputType = {
   templateDialogueId?: Maybe<Scalars['String']>;
   publicTitle?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
+  language?: Maybe<LanguageEnumType>;
 };
 
 export type CreateJobProcessLocationInput = {
@@ -179,6 +194,8 @@ export type CreateQuestionNodeInputType = {
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
   extraContent?: Maybe<Scalars['String']>;
+  unhappyText?: Maybe<Scalars['String']>;
+  happyText?: Maybe<Scalars['String']>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
@@ -210,6 +227,7 @@ export type CreateWorkspaceInput = {
   slug: Scalars['String'];
   name: Scalars['String'];
   logo?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   primaryColour: Scalars['String'];
   isSeed?: Maybe<Scalars['Boolean']>;
   willGenerateFakeData?: Maybe<Scalars['Boolean']>;
@@ -261,11 +279,12 @@ export type Customer = {
   settings?: Maybe<CustomerSettings>;
   usersConnection?: Maybe<UserConnection>;
   dialogue?: Maybe<Dialogue>;
-  userCustomer?: Maybe<UserCustomer>;
   dialogues?: Maybe<Array<Dialogue>>;
   users?: Maybe<Array<UserType>>;
-  campaign: CampaignType;
+  roles?: Maybe<Array<RoleType>>;
+  campaign?: Maybe<CampaignType>;
   campaigns: Array<CampaignType>;
+  userCustomer?: Maybe<UserCustomer>;
 };
 
 
@@ -280,11 +299,6 @@ export type CustomerDialogueArgs = {
 };
 
 
-export type CustomerUserCustomerArgs = {
-  userId?: Maybe<Scalars['String']>;
-};
-
-
 export type CustomerDialoguesArgs = {
   filter?: Maybe<DialogueFilterInputType>;
 };
@@ -294,10 +308,16 @@ export type CustomerCampaignArgs = {
   campaignId?: Maybe<Scalars['String']>;
 };
 
+
+export type CustomerUserCustomerArgs = {
+  userId?: Maybe<Scalars['String']>;
+};
+
 export type CustomerSettings = {
   __typename?: 'CustomerSettings';
   id: Scalars['ID'];
   logoUrl?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   colourSettings?: Maybe<ColourSettings>;
   fontSettings?: Maybe<FontSettings>;
 };
@@ -373,6 +393,7 @@ export type DeliveryEventType = {
   id: Scalars['ID'];
   status: DeliveryStatusEnum;
   createdAt: Scalars['String'];
+  failureMessage?: Maybe<Scalars['String']>;
 };
 
 export enum DeliveryStatusEnum {
@@ -380,7 +401,9 @@ export enum DeliveryStatusEnum {
   Deployed = 'DEPLOYED',
   Sent = 'SENT',
   Opened = 'OPENED',
-  Finished = 'FINISHED'
+  Finished = 'FINISHED',
+  Failed = 'FAILED',
+  Delivered = 'DELIVERED'
 }
 
 /** Delivery */
@@ -406,9 +429,11 @@ export type Dialogue = {
   description: Scalars['String'];
   isWithoutGenData: Scalars['Boolean'];
   wasGeneratedWithGenData: Scalars['Boolean'];
+  language: LanguageEnumType;
   publicTitle?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
+  postLeafNode?: Maybe<DialogueFinisherObjectType>;
   averageScore: Scalars['Float'];
   statistics?: Maybe<DialogueStatistics>;
   sessionConnection?: Maybe<SessionConnection>;
@@ -452,6 +477,13 @@ export type DialogueFilterInputType = {
   searchTerm?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
+};
+
+export type DialogueFinisherObjectType = {
+  __typename?: 'DialogueFinisherObjectType';
+  id: Scalars['ID'];
+  header: Scalars['String'];
+  subtext: Scalars['String'];
 };
 
 export type DialogueStatistics = {
@@ -524,6 +556,7 @@ export type EditWorkspaceInput = {
   slug: Scalars['String'];
   name: Scalars['String'];
   logo?: Maybe<Scalars['String']>;
+  logoOpacity?: Maybe<Scalars['Int']>;
   primaryColour: Scalars['String'];
 };
 
@@ -578,11 +611,13 @@ export type FormNodeField = {
   type: FormNodeFieldTypeEnum;
   isRequired: Scalars['Boolean'];
   position: Scalars['Int'];
+  placeholder?: Maybe<Scalars['String']>;
 };
 
 export type FormNodeFieldInput = {
   id?: Maybe<Scalars['ID']>;
   label?: Maybe<Scalars['String']>;
+  placeholder?: Maybe<Scalars['String']>;
   type?: Maybe<FormNodeFieldTypeEnum>;
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
@@ -600,12 +635,14 @@ export enum FormNodeFieldTypeEnum {
 
 export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
+  helperText?: Maybe<Scalars['String']>;
   fields?: Maybe<Array<FormNodeFieldInput>>;
 };
 
 export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
+  helperText?: Maybe<Scalars['String']>;
   fields: Array<FormNodeField>;
 };
 
@@ -711,6 +748,12 @@ export enum JobStatusType {
   CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL'
 }
 
+export enum LanguageEnumType {
+  English = 'ENGLISH',
+  Dutch = 'DUTCH',
+  German = 'GERMAN'
+}
+
 export type LineChartDataType = {
   __typename?: 'lineChartDataType';
   x?: Maybe<Scalars['String']>;
@@ -763,7 +806,6 @@ export type Mutation = {
   removePixelRange?: Maybe<AwsImageType>;
   uploadJobImage?: Maybe<AwsImageType>;
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
-  updateJob?: Maybe<JobObjectType>;
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
@@ -780,7 +822,6 @@ export type Mutation = {
   createWorkspace: Customer;
   editWorkspace: Customer;
   deleteCustomer?: Maybe<Customer>;
-  createUser: UserType;
   editUser: UserType;
   deleteUser: DeleteUserOutput;
   copyDialogue: Dialogue;
@@ -797,6 +838,7 @@ export type Mutation = {
   inviteUser: InviteUserOutput;
   createSession: Session;
   appendToInteraction: Session;
+  duplicateQuestion?: Maybe<QuestionNode>;
   deleteQuestion: QuestionNode;
   createQuestion?: Maybe<QuestionNode>;
   deleteCTA: QuestionNode;
@@ -849,15 +891,6 @@ export type MutationUploadJobImageArgs = {
 
 
 export type MutationUpdateCreateWorkspaceJobArgs = {
-  id?: Maybe<Scalars['String']>;
-  status?: Maybe<JobStatusType>;
-  resourceUrl?: Maybe<Scalars['String']>;
-  referenceId?: Maybe<Scalars['String']>;
-  errorMessage?: Maybe<Scalars['String']>;
-};
-
-
-export type MutationUpdateJobArgs = {
   id?: Maybe<Scalars['String']>;
   status?: Maybe<JobStatusType>;
   resourceUrl?: Maybe<Scalars['String']>;
@@ -955,12 +988,6 @@ export type MutationDeleteCustomerArgs = {
 };
 
 
-export type MutationCreateUserArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
-  input?: Maybe<UserInput>;
-};
-
-
 export type MutationEditUserArgs = {
   userId?: Maybe<Scalars['String']>;
   input?: Maybe<EditUserInput>;
@@ -990,6 +1017,9 @@ export type MutationEditDialogueArgs = {
   publicTitle?: Maybe<Scalars['String']>;
   isWithoutGenData?: Maybe<Scalars['Boolean']>;
   tags?: Maybe<TagsInputObjectType>;
+  language?: Maybe<LanguageEnumType>;
+  dialogueFinisherHeading?: Maybe<Scalars['String']>;
+  dialogueFinisherSubheading?: Maybe<Scalars['String']>;
 };
 
 
@@ -1025,6 +1055,11 @@ export type MutationCreateSessionArgs = {
 
 export type MutationAppendToInteractionArgs = {
   input?: Maybe<AppendToInteractionInput>;
+};
+
+
+export type MutationDuplicateQuestionArgs = {
+  questionId?: Maybe<Scalars['String']>;
 };
 
 
@@ -1085,6 +1120,7 @@ export type NodeEntryDataInput = {
   textbox?: Maybe<TextboxNodeEntryInput>;
   form?: Maybe<FormNodeEntryInput>;
   choice?: Maybe<ChoiceNodeEntryInput>;
+  video?: Maybe<VideoNodeEntryInput>;
   register?: Maybe<RegisterNodeEntryInput>;
 };
 
@@ -1103,6 +1139,7 @@ export type NodeEntryValue = {
   registrationNodeEntry?: Maybe<Scalars['String']>;
   choiceNodeEntry?: Maybe<Scalars['String']>;
   linkNodeEntry?: Maybe<Scalars['String']>;
+  videoNodeEntry?: Maybe<Scalars['String']>;
   formNodeEntry?: Maybe<FormNodeEntryType>;
 };
 
@@ -1111,6 +1148,7 @@ export type OptionInputType = {
   value?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
   overrideLeafId?: Maybe<Scalars['String']>;
+  position: Scalars['Int'];
 };
 
 export type OptionsInputType = {
@@ -1208,21 +1246,17 @@ export type Query = {
   trigger?: Maybe<TriggerType>;
   triggers: Array<TriggerType>;
   roleConnection: RoleConnection;
-  roles?: Maybe<Array<RoleType>>;
   customers: Array<Customer>;
   customer?: Maybe<Customer>;
   UserOfCustomer?: Maybe<UserCustomer>;
   me: UserType;
   users: Array<UserType>;
   user?: Maybe<UserType>;
-  lineChartData: Array<LineChartDataType>;
   dialogue?: Maybe<Dialogue>;
   dialogues: Array<Dialogue>;
   refreshAccessToken: RefreshAccessTokenOutput;
   sessions: Array<Session>;
   session?: Maybe<Session>;
-  questionNode?: Maybe<QuestionNode>;
-  questionNodes: Array<QuestionNode>;
   edge?: Maybe<Edge>;
 };
 
@@ -1283,11 +1317,6 @@ export type QueryRoleConnectionArgs = {
 };
 
 
-export type QueryRolesArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
-};
-
-
 export type QueryCustomerArgs = {
   id?: Maybe<Scalars['ID']>;
   slug?: Maybe<Scalars['String']>;
@@ -1309,14 +1338,6 @@ export type QueryUserArgs = {
 };
 
 
-export type QueryLineChartDataArgs = {
-  dialogueId?: Maybe<Scalars['String']>;
-  numberOfDaysBack?: Maybe<Scalars['Int']>;
-  limit?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
-};
-
-
 export type QueryDialogueArgs = {
   where?: Maybe<DialogueWhereUniqueInput>;
 };
@@ -1334,11 +1355,6 @@ export type QuerySessionsArgs = {
 
 export type QuerySessionArgs = {
   where?: Maybe<SessionWhereUniqueInput>;
-};
-
-
-export type QueryQuestionNodeArgs = {
-  where?: Maybe<QuestionNodeWhereUniqueInput>;
 };
 
 
@@ -1400,6 +1416,7 @@ export type QuestionOption = {
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
+  position?: Maybe<Scalars['Int']>;
 };
 
 export type RecipientsInputType = {
@@ -1482,6 +1499,7 @@ export type Session = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   dialogueId: Scalars['String'];
+  browser: Scalars['String'];
   paths: Scalars['Int'];
   score: Scalars['Float'];
   totalTimeInSec?: Maybe<Scalars['Int']>;
@@ -1574,6 +1592,8 @@ export type SliderNodeRangeType = {
 export type SliderNodeType = {
   __typename?: 'SliderNodeType';
   id?: Maybe<Scalars['ID']>;
+  happyText?: Maybe<Scalars['String']>;
+  unhappyText?: Maybe<Scalars['String']>;
   markers?: Maybe<Array<SliderNodeMarkerType>>;
 };
 
@@ -1724,6 +1744,8 @@ export type UpdateQuestionNodeInputType = {
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
   extraContent?: Maybe<Scalars['String']>;
+  unhappyText?: Maybe<Scalars['String']>;
+  happyText?: Maybe<Scalars['String']>;
   sliderNode?: Maybe<SliderNodeInputType>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
@@ -1787,6 +1809,11 @@ export type VerifyUserTokenOutput = {
   accessToken: Scalars['String'];
   accessTokenExpiry: Scalars['Int'];
   userData: UserType;
+};
+
+/** Input type for a video node */
+export type VideoNodeEntryInput = {
+  value?: Maybe<Scalars['String']>;
 };
 
 export type GetWorkspaceAdminsQueryVariables = Exact<{
@@ -1983,7 +2010,7 @@ export type GetWorkspaceCampaignQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
-    & { campaign: (
+    & { campaign?: Maybe<(
       { __typename?: 'CampaignType' }
       & Pick<CampaignType, 'id' | 'label'>
       & { allDeliveryConnection?: Maybe<(
@@ -1999,7 +2026,7 @@ export type GetWorkspaceCampaignQuery = (
             & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
           )>, events: Array<(
             { __typename?: 'DeliveryEventType' }
-            & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status'>
+            & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status' | 'failureMessage'>
           )> }
         )>, pageInfo: (
           { __typename?: 'PaginationPageInfo' }
@@ -2007,9 +2034,19 @@ export type GetWorkspaceCampaignQuery = (
         ) }
       )>, variants: Array<(
         { __typename?: 'CampaignVariantType' }
-        & Pick<CampaignVariantType, 'id' | 'label'>
+        & Pick<CampaignVariantType, 'id' | 'label' | 'from' | 'type' | 'weight' | 'body'>
+        & { customVariables?: Maybe<Array<(
+          { __typename?: 'CampaignVariantCustomVariableType' }
+          & Pick<CampaignVariantCustomVariableType, 'id' | 'key'>
+        )>>, dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'id' | 'title'>
+        )>, workspace?: Maybe<(
+          { __typename?: 'Customer' }
+          & Pick<Customer, 'id'>
+        )> }
       )> }
-    ) }
+    )> }
   )> }
 );
 
@@ -2072,6 +2109,70 @@ export type GetWorkspaceDialoguesQuery = (
   )> }
 );
 
+export type DuplicateQuestionMutationVariables = Exact<{
+  questionId?: Maybe<Scalars['String']>;
+}>;
+
+
+export type DuplicateQuestionMutation = (
+  { __typename?: 'Mutation' }
+  & { duplicateQuestion?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id'>
+  )> }
+);
+
+export type GetDialogueStatisticsQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+  dialogueSlug: Scalars['String'];
+  prevDateFilter?: Maybe<DialogueFilterInputType>;
+  statisticsDateFilter?: Maybe<DialogueFilterInputType>;
+}>;
+
+
+export type GetDialogueStatisticsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'title'>
+      & { thisWeekAverageScore: Dialogue['averageScore'], previousScore: Dialogue['averageScore'] }
+      & { sessions: Array<(
+        { __typename?: 'Session' }
+        & Pick<Session, 'id' | 'createdAt' | 'score'>
+        & { nodeEntries: Array<(
+          { __typename?: 'NodeEntry' }
+          & { relatedNode?: Maybe<(
+            { __typename?: 'QuestionNode' }
+            & Pick<QuestionNode, 'title' | 'type'>
+          )>, value?: Maybe<(
+            { __typename?: 'NodeEntryValue' }
+            & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'linkNodeEntry'>
+          )> }
+        )> }
+      )>, statistics?: Maybe<(
+        { __typename?: 'DialogueStatistics' }
+        & Pick<DialogueStatistics, 'nrInteractions'>
+        & { topPositivePath?: Maybe<Array<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'answer' | 'quantity' | 'basicSentiment'>
+        )>>, mostPopularPath?: Maybe<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'answer' | 'quantity' | 'basicSentiment'>
+        )>, topNegativePath?: Maybe<Array<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'quantity' | 'answer' | 'basicSentiment'>
+        )>>, history?: Maybe<Array<(
+          { __typename?: 'lineChartDataType' }
+          & Pick<LineChartDataType, 'x' | 'y'>
+        )>> }
+      )> }
+    )> }
+  )> }
+);
+
 export type RequestInviteMutationVariables = Exact<{
   input?: Maybe<RequestInviteInput>;
 }>;
@@ -2085,6 +2186,7 @@ export type RequestInviteMutation = (
   ) }
 );
 
+<<<<<<< HEAD
 export type CreateTopicMutationVariables = Exact<{
   input?: Maybe<CreateTopicInput>;
 }>;
@@ -2118,10 +2220,37 @@ export type GetTopicsOfDialogueQueryVariables = Exact<{
 
 
 export type GetTopicsOfDialogueQuery = (
+=======
+export type GetRolesQueryVariables = Exact<{
+  id?: Maybe<Scalars['ID']>;
+}>;
+
+
+export type GetRolesQuery = (
   { __typename?: 'Query' }
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
+    & { roles?: Maybe<Array<(
+      { __typename?: 'RoleType' }
+      & Pick<RoleType, 'id' | 'name'>
+    )>> }
+  )> }
+);
+
+export type GetUserCustomerFromCustomerQueryVariables = Exact<{
+  id: Scalars['ID'];
+  userId: Scalars['String'];
+}>;
+
+
+export type GetUserCustomerFromCustomerQuery = (
+>>>>>>> dev
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+<<<<<<< HEAD
     & { dialogue?: Maybe<(
       { __typename?: 'Dialogue' }
       & Pick<Dialogue, 'id'>
@@ -2129,6 +2258,17 @@ export type GetTopicsOfDialogueQuery = (
         { __typename?: 'TopicModel' }
         & Pick<TopicModel, 'id' | 'label'>
       )> }
+=======
+    & { userCustomer?: Maybe<(
+      { __typename?: 'UserCustomer' }
+      & { user: (
+        { __typename?: 'UserType' }
+        & Pick<UserType, 'id' | 'email' | 'phone' | 'firstName' | 'lastName'>
+      ), role: (
+        { __typename?: 'RoleType' }
+        & Pick<RoleType, 'name' | 'id'>
+      ) }
+>>>>>>> dev
     )> }
   )> }
 );
@@ -2643,6 +2783,7 @@ export const GetWorkspaceCampaignDocument = gql`
             id
             createdAt
             status
+            failureMessage
           }
         }
         pageInfo {
@@ -2652,6 +2793,21 @@ export const GetWorkspaceCampaignDocument = gql`
       variants {
         id
         label
+        from
+        type
+        weight
+        body
+        customVariables {
+          id
+          key
+        }
+        dialogue {
+          id
+          title
+        }
+        workspace {
+          id
+        }
       }
     }
   }
@@ -2826,6 +2982,126 @@ export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDi
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
     }
+export const DuplicateQuestionDocument = gql`
+    mutation duplicateQuestion($questionId: String) {
+  duplicateQuestion(questionId: $questionId) {
+    id
+  }
+}
+    `;
+export type DuplicateQuestionMutationFn = Apollo.MutationFunction<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
+
+/**
+ * __useDuplicateQuestionMutation__
+ *
+ * To run a mutation, you first call `useDuplicateQuestionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDuplicateQuestionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [duplicateQuestionMutation, { data, loading, error }] = useDuplicateQuestionMutation({
+ *   variables: {
+ *      questionId: // value for 'questionId'
+ *   },
+ * });
+ */
+export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>(DuplicateQuestionDocument, options);
+      }
+export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
+export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
+export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
+export const GetDialogueStatisticsDocument = gql`
+    query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
+  customer(slug: $customerSlug) {
+    id
+    dialogue(where: {slug: $dialogueSlug}) {
+      id
+      title
+      thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
+      previousScore: averageScore(input: $prevDateFilter)
+      sessions(take: 3) {
+        id
+        createdAt
+        score
+        nodeEntries {
+          relatedNode {
+            title
+            type
+          }
+          value {
+            sliderNodeEntry
+            textboxNodeEntry
+            registrationNodeEntry
+            choiceNodeEntry
+            linkNodeEntry
+          }
+        }
+      }
+      statistics(input: $statisticsDateFilter) {
+        nrInteractions
+        topPositivePath {
+          answer
+          quantity
+          basicSentiment
+        }
+        mostPopularPath {
+          answer
+          quantity
+          basicSentiment
+        }
+        topNegativePath {
+          quantity
+          answer
+          basicSentiment
+        }
+        history {
+          x
+          y
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDialogueStatisticsQuery__
+ *
+ * To run a query within a React component, call `useGetDialogueStatisticsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDialogueStatisticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDialogueStatisticsQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      dialogueSlug: // value for 'dialogueSlug'
+ *      prevDateFilter: // value for 'prevDateFilter'
+ *      statisticsDateFilter: // value for 'statisticsDateFilter'
+ *   },
+ * });
+ */
+export function useGetDialogueStatisticsQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>(GetDialogueStatisticsDocument, options);
+      }
+export function useGetDialogueStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>(GetDialogueStatisticsDocument, options);
+        }
+export type GetDialogueStatisticsQueryHookResult = ReturnType<typeof useGetDialogueStatisticsQuery>;
+export type GetDialogueStatisticsLazyQueryHookResult = ReturnType<typeof useGetDialogueStatisticsLazyQuery>;
+export type GetDialogueStatisticsQueryResult = Apollo.QueryResult<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>;
+export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatisticsQueryVariables) {
+      return { query: GetDialogueStatisticsDocument, variables: variables }
+    }
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {
@@ -2860,6 +3136,7 @@ export function useRequestInviteMutation(baseOptions?: Apollo.MutationHookOption
 export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInviteMutation>;
 export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
 export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;
+<<<<<<< HEAD
 export const CreateTopicDocument = gql`
     mutation CreateTopic($input: CreateTopicInput) {
   createTopic(input: $input) {
@@ -2935,6 +3212,65 @@ export const GetTopicsOfDialogueDocument = gql`
       topics {
         id
         label
+=======
+export const GetRolesDocument = gql`
+    query GetRoles($id: ID) {
+  customer(id: $id) {
+    id
+    roles {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetRolesQuery__
+ *
+ * To run a query within a React component, call `useGetRolesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetRolesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetRolesQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetRolesQuery(baseOptions?: Apollo.QueryHookOptions<GetRolesQuery, GetRolesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetRolesQuery, GetRolesQueryVariables>(GetRolesDocument, options);
+      }
+export function useGetRolesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetRolesQuery, GetRolesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetRolesQuery, GetRolesQueryVariables>(GetRolesDocument, options);
+        }
+export type GetRolesQueryHookResult = ReturnType<typeof useGetRolesQuery>;
+export type GetRolesLazyQueryHookResult = ReturnType<typeof useGetRolesLazyQuery>;
+export type GetRolesQueryResult = Apollo.QueryResult<GetRolesQuery, GetRolesQueryVariables>;
+export function refetchGetRolesQuery(variables?: GetRolesQueryVariables) {
+      return { query: GetRolesDocument, variables: variables }
+    }
+export const GetUserCustomerFromCustomerDocument = gql`
+    query GetUserCustomerFromCustomer($id: ID!, $userId: String!) {
+  customer(id: $id) {
+    id
+    userCustomer(userId: $userId) {
+      user {
+        id
+        email
+        phone
+        firstName
+        lastName
+      }
+      role {
+        name
+        id
+>>>>>>> dev
       }
     }
   }
@@ -2942,15 +3278,23 @@ export const GetTopicsOfDialogueDocument = gql`
     `;
 
 /**
+<<<<<<< HEAD
  * __useGetTopicsOfDialogueQuery__
  *
  * To run a query within a React component, call `useGetTopicsOfDialogueQuery` and pass it any options that fit your needs.
  * When your component renders, `useGetTopicsOfDialogueQuery` returns an object from Apollo Client that contains loading, error, and data properties
+=======
+ * __useGetUserCustomerFromCustomerQuery__
+ *
+ * To run a query within a React component, call `useGetUserCustomerFromCustomerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserCustomerFromCustomerQuery` returns an object from Apollo Client that contains loading, error, and data properties
+>>>>>>> dev
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
+<<<<<<< HEAD
  * const { data, loading, error } = useGetTopicsOfDialogueQuery({
  *   variables: {
  *      dialogueSlug: // value for 'dialogueSlug'
@@ -2971,4 +3315,26 @@ export type GetTopicsOfDialogueLazyQueryHookResult = ReturnType<typeof useGetTop
 export type GetTopicsOfDialogueQueryResult = Apollo.QueryResult<GetTopicsOfDialogueQuery, GetTopicsOfDialogueQueryVariables>;
 export function refetchGetTopicsOfDialogueQuery(variables?: GetTopicsOfDialogueQueryVariables) {
       return { query: GetTopicsOfDialogueDocument, variables: variables }
+=======
+ * const { data, loading, error } = useGetUserCustomerFromCustomerQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserCustomerFromCustomerQuery(baseOptions: Apollo.QueryHookOptions<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>(GetUserCustomerFromCustomerDocument, options);
+      }
+export function useGetUserCustomerFromCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>(GetUserCustomerFromCustomerDocument, options);
+        }
+export type GetUserCustomerFromCustomerQueryHookResult = ReturnType<typeof useGetUserCustomerFromCustomerQuery>;
+export type GetUserCustomerFromCustomerLazyQueryHookResult = ReturnType<typeof useGetUserCustomerFromCustomerLazyQuery>;
+export type GetUserCustomerFromCustomerQueryResult = Apollo.QueryResult<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>;
+export function refetchGetUserCustomerFromCustomerQuery(variables?: GetUserCustomerFromCustomerQueryVariables) {
+      return { query: GetUserCustomerFromCustomerDocument, variables: variables }
+>>>>>>> dev
     }

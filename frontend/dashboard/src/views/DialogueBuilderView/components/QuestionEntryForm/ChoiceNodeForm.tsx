@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import { ArrowDown, ArrowUp, PlusCircle, Trash } from 'react-feather';
 import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import React from 'react';
 
 import { CTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
@@ -9,7 +10,6 @@ import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
 import { TopicPicker } from 'components/TopicPicker';
-import Dropdown from 'components/Dropdown';
 
 export interface ChoiceProps {
   id: string;

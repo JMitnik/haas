@@ -37,11 +37,7 @@ export const JobProcessLocation = objectType({
       type: CustomFieldType,
       nullable: true,
       resolve(parent, args, ctx) {
-        return ctx.prisma.customField.findMany({
-          where: {
-            jobProcessLocationId: parent.id,
-          }
-        })
+        return ctx.services.autodeckService.getCustomFieldsOfJobProcessLocation(parent.id);
       }
     })
   }
@@ -58,8 +54,8 @@ export const JobProcessLocations = objectType({
 
 export const GetJobProcessLocationQuery = queryField('getJobProcessLocations', {
   type: JobProcessLocations,
-  async resolve() {
-    const jobProcessLocations = await AutodeckService.getJobProcessLocations()
+  async resolve(parent, args, ctx) {
+    const jobProcessLocations = await ctx.services.autodeckService.getJobProcessLocations()
     return { jobProcessLocations: jobProcessLocations || [] };
   }
 })
@@ -77,11 +73,10 @@ export const createJobProcessLocationInput = inputObjectType({
 
 export const CreateJobProcessLocationMutation = mutationField('createJobProcessLocation', {
   type: JobProcessLocation,
-  args: {input : createJobProcessLocationInput},
-  resolve(parent, args) {
-    return AutodeckService.createJobProcessLocation(args.input)
+  args: { input: createJobProcessLocationInput },
+  resolve(parent, args, ctx) {
+    return ctx.services.autodeckService.createJobProcessLocation(args.input);
   }
-
 })
 
 export const CloudReferenceType = enumType({
@@ -92,7 +87,7 @@ export const CloudReferenceType = enumType({
 export const JobStatusType = enumType({
   name: 'JobStatusType',
   members: ['PENDING', 'PRE_PROCESSING', 'IN_PHOTOSHOP_QUEUE', 'PRE_PROCESSING_LOGO',
-    'PRE_PROCESSING_WEBSITE_SCREENSHOT', 'PHOTOSHOP_PROCESSING', 'PROCESSING', 'WRAPPING_UP' ,
+    'PRE_PROCESSING_WEBSITE_SCREENSHOT', 'PHOTOSHOP_PROCESSING', 'PROCESSING', 'WRAPPING_UP',
     'COMPLETED', 'FAILED', 'READY_FOR_PROCESSING', 'TRANSFORMING_PSDS_TO_PNGS', 'STITCHING_SLIDES', 'COMPRESSING_SALES_MATERIAL'],
 });
 
@@ -131,19 +126,12 @@ export const CreateWorkspaceJobType = objectType({
 
     t.field('processLocation', {
       type: JobProcessLocation,
-      resolve(parent, args, ctx) {
-        return ctx.prisma.jobProcessLocation.findFirst({
-          where: {
-            job: {
-              some: {
-                id: parent.id
-              }
-            }
-          },
-          include: {
-            fields: true,
-          }
-        })
+      async resolve(parent, args, ctx) {
+        const processLocation = await ctx.services.autodeckService.getJobProcessLocationOfJob(parent.id);
+
+        if (!processLocation) throw Error('Process location not found!');
+
+        return processLocation;
       }
     })
   },
@@ -234,7 +222,7 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
   nullable: true,
   args: { input: GenerateAutodeckInput },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     const { input } = args;
 
     if (!input) {
@@ -252,7 +240,7 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       jobLocationId: input.jobLocationId,
     }
 
-    const job = await AutodeckService.createWorkspaceJob(jobInput);
+    const job = await ctx.services.autodeckService.createWorkspaceJob(jobInput);
 
     return job ? job as any : null;
   },
@@ -263,14 +251,14 @@ export const RetryAutodeckJobMutation = mutationField('retryAutodeckJob', {
   nullable: true,
   args: { jobId: 'String' },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     const { jobId } = args;
 
     if (!jobId) {
       return null;
     }
 
-    const job = await AutodeckService.retryJob(jobId);
+    const job = await ctx.services.autodeckService.retryJob(jobId);
 
     return job ? job as any : null;
   },
@@ -287,7 +275,7 @@ export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWor
       return null;
     }
 
-    return AutodeckService.confirmWorkspaceJob(input, userId) as any;
+    return ctx.services.autodeckService.confirmWorkspaceJob(input, userId) as any;
   }
 })
 
@@ -297,14 +285,7 @@ export const GetJobQuery = queryField('getJob', {
   args: { id: 'String' },
   async resolve(parent, args, ctx) {
     if (!args.id) return null;
-
-    const job = await ctx.prisma.createWorkspaceJob.findOne({
-      where: {
-        id: args.id,
-      },
-    });
-
-    return job ? job as any : null;
+    return ctx.services.autodeckService.getJobById(args.id) as any;
   },
 });
 
@@ -321,8 +302,8 @@ export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
   type: AutodeckConnectionModel,
   args: { filter: PaginationWhereInput },
 
-  async resolve(parent, args) {
-    const { entries, pageInfo } = await AutodeckService.paginatedAutodeckJobs({
+  async resolve(parent, args, ctx) {
+    const { entries, pageInfo } = await ctx.services.autodeckService.paginatedAutodeckJobs({
       limit: args.filter?.limit,
       offset: args.filter?.offset,
       orderBy: args.filter?.orderBy,
@@ -364,7 +345,7 @@ export const AdjustedImageInput = inputObjectType({
   name: 'AdjustedImageInput',
   definition(t) {
     t.string('id', { nullable: true });
-    t.string('key', { nullable: true});
+    t.string('key', { nullable: true });
     t.string('bucket');
     t.boolean('reset', { nullable: true })
   }
@@ -383,11 +364,11 @@ export const GetAdjustedLogoQuery = queryField('getAdjustedLogo', {
 export const WhitifyImageMutation = mutationField('whitifyImage', {
   type: AWSImageType,
   nullable: true,
-  args: { input : AdjustedImageInput},
+  args: { input: AdjustedImageInput },
   resolve(parent, args) {
     if (!args.input) return null;
     AutodeckService.whitifyImage(args.input)
-    return { url: 'Succesfully started lambda'}
+    return { url: 'Succesfully started lambda' }
   }
 })
 
@@ -400,7 +381,7 @@ export const RemovePixelRangeMutation = mutationField('removePixelRange', {
 
     AutodeckService.removePixelRange(args.input)
 
-    return { url: 'succesfully start lambda i guess'};
+    return { url: 'succesfully start lambda i guess' };
   }
 })
 
@@ -420,8 +401,9 @@ export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
   },
   async resolve(parent, args) {
     const { file, jobId } = args;
+    const waitedFile = await file;
     const { createReadStream, filename, mimetype, encoding }:
-      { createReadStream: any, filename: string, mimetype: string, encoding: string } = await file;
+      { createReadStream: any, filename: string, mimetype: string, encoding: string } = waitedFile.file;
 
     const extension = filename.split('.')[1]
     let fileName;
@@ -454,54 +436,13 @@ export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorksp
   args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String', errorMessage: 'String' },
   resolve(parent, args, ctx) {
     const { id, resourceUrl, status, errorMessage } = args;
-
     if (!args.id) {
       return null;
     }
 
-    return ctx.prisma.createWorkspaceJob.update({
-      where: {
-        id: id || undefined,
-      },
-      data: {
-        resourcesUrl: resourceUrl,
-        status: status || undefined,
-        errorMessage
-      },
+    const updateInput = { id: args.id, resourceUrl, status: status || 'PENDING', errorMessage: errorMessage || undefined };
 
-    }) as any;
-  },
-
-});
-
-export const UpdateJobMutation = mutationField('updateJob', {
-  type: JobObjectType,
-  nullable: true,
-  args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String', errorMessage: 'String' },
-  resolve(parent, args, ctx) {
-    const { id, resourceUrl, status, errorMessage } = args;
-
-    if (!args.id) {
-      return null;
-    }
-
-    return ctx.prisma.job.update({
-      where: {
-        id: id || undefined,
-      },
-      data: {
-        createWorkspaceJob: {
-          update: {
-            resourcesUrl: resourceUrl,
-            status: status || undefined,
-            errorMessage: errorMessage
-          },
-        },
-      },
-      include: {
-        createWorkspaceJob: true,
-      },
-    }) as any;
+    return ctx.services.autodeckService.update(updateInput) as any;
   },
 
 });

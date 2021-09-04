@@ -1,6 +1,5 @@
 import { enumType, inputObjectType, objectType } from '@nexus/schema';
 
-// eslint-disable-next-line import/no-cycle
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 
 export const LinkTypeEnumType = enumType({
@@ -52,14 +51,11 @@ export const LinkType = objectType({
     t.field('questionNode', {
       type: QuestionNodeType,
       async resolve(parent, args, ctx) {
-        const link = await ctx.prisma.link.findOne({
-          where: { id: parent.id },
-          include: { questionNode: true },
-        });
+        const questionNode = await ctx.services.nodeService.findNodeByLinkId(parent.id);
 
-        if (!link?.questionNode) throw new Error('Unable to find related node');
+        if (!questionNode) throw new Error('Unable to find related node');
 
-        return link?.questionNode as any;
+        return questionNode;
       },
     });
   },

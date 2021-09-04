@@ -148,7 +148,7 @@ export class APIStack extends cdk.Stack {
         image: ecs.ContainerImage.fromEcrRepository(svcRepo),
         containerPort: 4000,
         environment: {
-          BASE_URL: 'http://api.haas.live',
+          BASE_URL: 'https://api.haas.live',
           CLIENT_URL: 'https://client.haas.live',
           DASHBOARD_URL: 'https://dashboard.haas.live',
           CLOUDINARY_URL: 'cloudinary://591617433181475:rGNg80eDICKoUKgzrMlSPQitZw8@dx8khik9g',

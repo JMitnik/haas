@@ -41,6 +41,11 @@ type CampaignType {
   variants: [CampaignVariantType!]!
 }
 
+type CampaignVariantCustomVariableType {
+  id: ID!
+  key: String!
+}
+
 enum CampaignVariantEnum {
   EMAIL
   QUEUE
@@ -50,13 +55,15 @@ enum CampaignVariantEnum {
 """Variant of campaign"""
 type CampaignVariantType {
   body: String!
+  customVariables: [CampaignVariantCustomVariableType!]
   deliveryConnection: DeliveryConnectionType
-  dialogue: Dialogue!
+  dialogue: Dialogue
+  from: String
   id: ID!
   label: String!
   type: CampaignVariantEnum!
   weight: Int!
-  workspace: Customer!
+  workspace: Customer
 }
 
 """Input type for a choice node"""
@@ -99,6 +106,10 @@ type CreateBatchDeliveriesOutputType {
   nrDeliveries: Int!
 }
 
+input CreateCampaignCustomVariable {
+  key: String
+}
+
 input CreateCampaignInputType {
   label: String
   variants: [CreateCampaignVariantInputType!]
@@ -107,7 +118,9 @@ input CreateCampaignInputType {
 
 input CreateCampaignVariantInputType {
   body: String
+  customVariables: [CreateCampaignCustomVariable!]
   dialogueId: ID!
+  from: String
   label: String
   subject: String
   type: CampaignVariantEnum!
@@ -131,6 +144,7 @@ input CreateDialogueInputType {
   description: String
   dialogueSlug: String
   isSeed: Boolean
+  language: LanguageEnumType
   publicTitle: String
   tags: TagsInputObjectType
   templateDialogueId: String
@@ -148,12 +162,14 @@ input CreateQuestionNodeInputType {
   dialogueSlug: String
   edgeCondition: EdgeConditionInputType
   extraContent: String
+  happyText: String
   optionEntries: OptionsInputType
   overrideLeafId: ID
   parentQuestionId: ID
   title: String
   topic: String
   type: String
+  unhappyText: String
 }
 
 input CreateTopicInput {
@@ -181,6 +197,7 @@ input CreateTriggerInputType {
 input CreateWorkspaceInput {
   isSeed: Boolean = false
   logo: String
+  logoOpacity: Int
   name: String!
   primaryColour: String!
   slug: String!
@@ -225,12 +242,13 @@ input CTAShareInputObjectType {
 }
 
 type Customer {
-  campaign(campaignId: String): CampaignType!
+  campaign(campaignId: String): CampaignType
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
+  roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
   userCustomer(userId: String): UserCustomer
@@ -242,6 +260,7 @@ type CustomerSettings {
   colourSettings: ColourSettings
   fontSettings: FontSettings
   id: ID!
+  logoOpacity: Int
   logoUrl: String
 }
 
@@ -307,12 +326,15 @@ type DeliveryConnectionType implements ConnectionInterface {
 
 type DeliveryEventType {
   createdAt: String!
+  failureMessage: String
   id: ID!
   status: DeliveryStatusEnum!
 }
 
 enum DeliveryStatusEnum {
+  DELIVERED
   DEPLOYED
+  FAILED
   FINISHED
   OPENED
   SCHEDULED
@@ -342,7 +364,9 @@ type Dialogue {
   edges: [Edge!]!
   id: ID!
   isWithoutGenData: Boolean!
+  language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
+  postLeafNode: DialogueFinisherObjectType
   publicTitle: String
   questions: [QuestionNode!]!
   rootQuestion: QuestionNode!
@@ -361,6 +385,12 @@ input DialogueFilterInputType {
   endDate: String
   searchTerm: String
   startDate: String
+}
+
+type DialogueFinisherObjectType {
+  header: String!
+  id: ID!
+  subtext: String!
 }
 
 type DialogueStatistics {
@@ -427,6 +457,7 @@ input EditWorkspaceInput {
   customerSlug: String!
   id: ID!
   logo: String
+  logoOpacity: Int
   name: String!
   primaryColour: String!
   slug: String!
@@ -476,6 +507,7 @@ type FormNodeField {
   id: ID!
   isRequired: Boolean!
   label: String!
+  placeholder: String
   position: Int!
   type: FormNodeFieldTypeEnum!
 }
@@ -484,6 +516,7 @@ input FormNodeFieldInput {
   id: ID
   isRequired: Boolean = false
   label: String
+  placeholder: String
   position: Int
   type: FormNodeFieldTypeEnum
 }
@@ -500,11 +533,13 @@ enum FormNodeFieldTypeEnum {
 
 input FormNodeInputType {
   fields: [FormNodeFieldInput!]
+  helperText: String
   id: String
 }
 
 type FormNodeType {
   fields: [FormNodeField!]!
+  helperText: String
   id: String
 }
 
@@ -605,6 +640,12 @@ enum JobStatusType {
   WRAPPING_UP
 }
 
+enum LanguageEnumType {
+  DUTCH
+  ENGLISH
+  GERMAN
+}
+
 type lineChartDataType {
   entryId: String
   x: String
@@ -663,7 +704,6 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTopic(input: CreateTopicInput): CreateTopicOutput!
   createTrigger(input: CreateTriggerInputType): TriggerType!
-  createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
@@ -672,8 +712,13 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
+<<<<<<< HEAD
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTopic(input: EditTopicInput): EditTopicOutput!
+=======
+  duplicateQuestion(questionId: String): QuestionNode
+  editDialogue(customerSlug: String, description: String, dialogueFinisherHeading: String, dialogueFinisherSubheading: String, dialogueSlug: String, isWithoutGenData: Boolean, language: LanguageEnumType, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+>>>>>>> dev
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
@@ -692,7 +737,6 @@ type Mutation {
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
-  updateJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
@@ -723,6 +767,7 @@ input NodeEntryDataInput {
   register: RegisterNodeEntryInput
   slider: SliderNodeEntryInput
   textbox: TextboxNodeEntryInput
+  video: VideoNodeEntryInput
 }
 
 """Input type for node-entry metadata"""
@@ -740,11 +785,13 @@ type NodeEntryValue {
   registrationNodeEntry: String
   sliderNodeEntry: Int
   textboxNodeEntry: String
+  videoNodeEntry: String
 }
 
 input OptionInputType {
   id: Int
   overrideLeafId: String
+  position: Int!
   publicValue: String
   topicValueId: String
   value: String
@@ -841,13 +888,9 @@ type Query {
   getJob(id: String): CreateWorkspaceJobType
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
-  lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   me: UserType!
-  questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode
-  questionNodes: [QuestionNode!]!
   refreshAccessToken: RefreshAccessTokenOutput!
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
-  roles(customerSlug: String): [RoleType!]
   session(where: SessionWhereUniqueInput): Session
   sessions(where: SessionWhereUniqueInput): [Session!]!
   tags(customerSlug: String, dialogueId: String): [Tag!]!
@@ -911,6 +954,7 @@ input QuestionNodeWhereUniqueInput {
 type QuestionOption {
   id: Int!
   overrideLeaf: QuestionNode
+  position: Int
   publicValue: String
   questionId: String
   relatedTopicValue: TopicValueModel
@@ -989,6 +1033,7 @@ type RoleType {
 }
 
 type Session {
+  browser: String!
   createdAt: Date!
   delivery: DeliveryType
   deliveryId: String
@@ -1078,8 +1123,10 @@ type SliderNodeRangeType {
 }
 
 type SliderNodeType {
+  happyText: String
   id: ID
   markers: [SliderNodeMarkerType!]
+  unhappyText: String
 }
 
 """Details regarding interaction with social node"""
@@ -1226,6 +1273,7 @@ input UpdateQuestionNodeInputType {
   edgeCondition: EdgeConditionInputType
   edgeId: ID
   extraContent: String
+  happyText: String
   id: ID!
   optionEntries: OptionsInputType
   overrideLeafId: ID
@@ -1233,6 +1281,7 @@ input UpdateQuestionNodeInputType {
   title: String
   topic: String
   type: String
+  unhappyText: String
 }
 
 """The `Upload` scalar type represents a file upload."""
@@ -1291,4 +1340,9 @@ type VerifyUserTokenOutput {
   accessToken: String!
   accessTokenExpiry: Int!
   userData: UserType!
+}
+
+"""Input type for a video node"""
+input VideoNodeEntryInput {
+  value: String
 }
