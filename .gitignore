@@ -69,3 +69,5 @@ launch.json
 .next
 
 cdk.out
+
+*.pyc

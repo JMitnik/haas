@@ -104,6 +104,24 @@ export const CustomerType = objectType({
       },
     });
 
+    t.field('userCustomer', {
+      type: UserCustomerType,
+      args: { userId: 'String' },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!args.userId) throw new UserInputError('No valid user id provided');
+
+        const customerWithUsers = await ctx.services.userService.getUserOfCustomer(parent.id, parent.slug, args.userId);
+        if (!customerWithUsers) return null;
+
+        const user = customerWithUsers?.user;
+        if (!user) throw new UserInputError('Cant find user with this ID');
+
+        return user as any;
+      },
+    });
+
     t.list.field('users', {
       type: 'UserType',
       nullable: true,
