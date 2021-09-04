@@ -26,22 +26,8 @@ export const TopicModel = objectType({
       type: TopicModel,
 
       async resolve(parent, args, ctx) {
-        // Go to the database with a particular dialogue-id
-        // From the database, get all topics
-        const which_DialogueID_DoWeWant_AllTopics_From = parent.id;
-        const dialogueWithTopics = await ctx.prisma.dialogue.findOne({
-          where: { id: which_DialogueID_DoWeWant_AllTopics_From },
-          include: {
-            topics: {
-              include: {
-                values: true
-              }
-            }
-          }
-        });
-
-        // Give them to me.
-        return dialogueWithTopics?.topics || [];
+        const dialogue = await ctx.services.dialogueService.findDialogueById(parent.id);
+        return dialogue?.topics || [];
       }
     })
   },

@@ -146,9 +146,10 @@ class DialoguePrismaAdapter {
     });
   };
 
-  getDialogueById(dialogueId: string): Promise<Dialogue | null> {
+  findDialogueById(dialogueId: string): Promise<Dialogue | null> {
     return this.prisma.dialogue.findUnique({
       where: { id: dialogueId },
+      include: { topics: { include: { values: true } } }
     });
   };
 

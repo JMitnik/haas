@@ -360,7 +360,7 @@ export const DialogueRootQuery = extendType({
           throw new Error('No valid id supplied');
         }
 
-        const dialogue = await ctx.services.dialogueService.getDialogueById(args.where.id);
+        const dialogue = await ctx.services.dialogueService.findDialogueById(args.where.id);
 
         if (!dialogue) {
           throw new Error('Unable to find dialogue with supplied id');

@@ -29,8 +29,8 @@ const TopicsOverview = () => {
 
   return (
     <>
-      <UI.ViewHeading>
-        <UI.PageTitle>{t('views:topic_view')}</UI.PageTitle>
+      <UI.ViewHead>
+        <UI.ViewTitle>{t('views:topic_view')}</UI.ViewTitle>
         <UI.Button
           onClick={() => setIsOpenModal(true)}
           leftIcon={Plus}
@@ -39,8 +39,8 @@ const TopicsOverview = () => {
         >
           {t('create_topic')}
         </UI.Button>
-      </UI.ViewHeading>
-      <UI.ViewContainer>
+      </UI.ViewHead>
+      <UI.ViewBody>
 
         {/* Modal (isOpenModal): Popup for creating a topic */}
         <UI.Modal isOpen={isOpenModal} onClose={() => setIsOpenModal(false)}>
@@ -76,7 +76,7 @@ const TopicsOverview = () => {
             </UI.Stack>
           </UI.Div>
         </UI.Div>
-      </UI.ViewContainer>
+      </UI.ViewBody>
     </>
   );
 };

@@ -62,8 +62,8 @@ class DialogueService {
     return dialogues;
   };
 
-  getDialogueById(dialogueId: string): Promise<Dialogue | null> {
-    return this.dialoguePrismaAdapter.getDialogueById(dialogueId);
+  findDialogueById(dialogueId: string): Promise<Dialogue | null> {
+    return this.dialoguePrismaAdapter.findDialogueById(dialogueId);
   };
 
   async getCTAsByDialogueId(dialogueId: string, searchTerm?: string | null | undefined) {

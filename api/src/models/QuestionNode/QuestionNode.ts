@@ -309,7 +309,7 @@ export const QuestionNodeType = objectType({
 
       resolve(parent, args, ctx) {
         if (parent.questionDialogueId) {
-          return ctx.services.dialogueService.getDialogueById(parent.questionDialogueId);
+          return ctx.services.dialogueService.findDialogueById(parent.questionDialogueId);
         }
 
         return null;

@@ -350,6 +350,8 @@ model QuestionOption {
 
   relatedTopicValueId String?
   relatedTopicValue TopicValue? @relation(fields: [relatedTopicValueId], references: [id])
+
+  position Int?
 }
 
 model Topic {
