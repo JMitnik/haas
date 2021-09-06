@@ -1,11 +1,12 @@
 import { Prisma } from "@prisma/client";
 import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
 import NodeEntryPrismaAdapter from '../../node-entry/NodeEntryPrismaAdapter';
+import SessionPrismaAdapter from '../../session/SessionPrismaAdapter';
 import { clearDatabase } from './testUtils';
 
 const prisma = makeTestPrisma();
 const nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prisma);
-
+const sessionPrismaAdapter = new SessionPrismaAdapter(prisma);
 const defaultDialogueCreateInput: Prisma.DialogueCreateInput = {
     id: 'DIALOGUE_ID',
     title: 'DEFAULT_DIALOGUE',
@@ -156,40 +157,169 @@ const defaultSessionCreateInput: Prisma.SessionCreateInput = {
 
 describe('NodeEntryPrismaAdapter', () => {
     beforeEach(async () => {
-        await prisma.dialogue.create({
-            data: defaultDialogueCreateInput,
-        });
+        // await prisma.dialogue.create({
+        //     data: defaultDialogueCreateInput,
+        // });
 
-        await prisma.nodeEntry.create({
-            data: defaultVideoNodeEntryCreateInput,
-        });
+        // await prisma.nodeEntry.create({
+        //     data: defaultVideoNodeEntryCreateInput,
+        // });
 
-        await prisma.sliderNodeEntry.create({
-            data: sliderNodeEntryCreateInput,
-        });
+        // const sliderNodeEntry = await prisma.sliderNodeEntry.create({
+        //     data: sliderNodeEntryCreateInput,
+        // });
 
-        await prisma.choiceNodeEntry.create({
-            data: defaultChoiceEntryCreateInput,
-        });
+        // await prisma.choiceNodeEntry.create({
+        //     data: defaultChoiceEntryCreateInput,
+        // });
 
-        await prisma.session.create({
-            data: defaultSessionCreateInput,
-        });
+        // await prisma.session.create({
+        //     data: {
+        //         id: 'SESSION_ID',
+        //         dialogue: {
+        //             connect: {
+        //                 id: defaultDialogueCreateInput.id,
+        //             },
+        //         },
+        //         nodeEntries: {
+        //             create: {
+        //                 sliderNodeEntry: {
+        //                     create: {
+        //                         value: 69,
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     },
+        // });
+
+        // const p = await prisma.formNode.create({
+        //     data: {
+        //         fields: {
+        //             create: [
+        //                 {
+        //                     id: 'shortTextId',
+        //                     label: 'Short Text',
+        //                     position: 0,
+        //                     type: 'shortText',
+        //                 }
+        //             ]
+        //         }
+        //     }
+        // })
     });
 
     afterEach(async () => {
         await clearDatabase(prisma);
-        prisma.$disconnect();
+        await prisma.$disconnect();
     });
 
     test('Finds node entries by session ID', async () => {
+        const dialogue = await prisma.dialogue.create({
+            data: {
+                title: 'DEFAULT_DIALOGUE',
+                slug: 'default',
+                description: 'description',
+                customer: {
+                    create: {
+                        name: 'DEFAULT_CUSTOMER',
+                        slug: 'customerSlug',
+                    },
+                },
+            },
+        });
+
+        const formNode = await prisma.formNode.create({
+            data: {
+                fields: {
+                    create: [
+                        {
+                            id: 'shortTextId',
+                            label: 'Short Text',
+                            position: 0,
+                            type: 'shortText',
+                        }
+                    ]
+                }
+            }
+        })
+
+        const sesh = await sessionPrismaAdapter.createSession({
+            dialogueId: dialogue.id,
+            originUrl: 'https/placeholder.com',
+            device: 'Android',
+            totalTimeInSec: 69,
+            entries: [
+                {
+                    depth: 0,
+                    data: {
+                        slider: {
+                            value: 22
+                        }
+                    },
+                },
+                {
+                    depth: 1,
+                    data: {
+                        choice: {
+                            value: 'CHOICE',
+                        }
+                    }
+                },
+                {
+                    depth: 2,
+                    data: {
+                        video: {
+                            value: 'I understand',
+                        },
+                    },
+                },
+                {
+                    depth: 3,
+                    data: {
+                        form: {
+                            values: [
+                                // {
+                                //     email: 'email@haas.nl',
+                                // },
+                                // {
+                                //     longText: 'longText',
+                                // },
+                                // {
+                                //     number: 123,
+                                // },
+                                // {
+                                //     phoneNumber: '+316123456789',
+                                // },
+                                {
+                                    shortText: 'shortText',
+                                    relatedFieldId: 'shortTextId',
+                                },
+                                // {
+                                //     url: 'https://url-here.nl'
+                                // }
+                            ]
+                        }
+                    }
+                }
+            ]
+        });
 
         const foundNodeEntries = await prisma.session.findUnique({
             where: {
-                id: 'SESSION_ID',
+                id: sesh.id,
             },
-        }); // await nodeEntryPrismaAdapter.getNodeEntriesBySessionId('SESSION_ID');
+            include: {
+                nodeEntries: {
+                    select: {
+                        depth: true,
+                        formNodeEntry: true,
+                    }
+                },
+            }
+        })
+        // const foundNodeEntries = await nodeEntryPrismaAdapter.getNodeEntriesBySessionId(sesh.id);
         console.log(foundNodeEntries);
-        // expect(foundNodeEntries).toHaveLength(4);
+        expect(foundNodeEntries).not.toBeNull();
     });
 });
