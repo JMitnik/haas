@@ -56,16 +56,6 @@ export const FormContainer = styled(Div) <FormContainerProps>`
   `}
 `;
 
-export const FormControl = forwardRef((props: FormControlProps, ref) => {
-  const { children, ...restProps } = props;
-
-  return (
-    <ChakraFormControl display="flex" flexDirection="column" ref={ref} {...restProps}>
-      {children}
-    </ChakraFormControl>
-  );
-});
-
 export const FormGroupContainer = styled.div`
   ${({ theme }) => css`
     padding-bottom: ${theme.gutter * 3}px;
@@ -203,6 +193,17 @@ export const ErrorStyle = {
     boxShadow: 'none',
   }),
 };
+
+export const ErrorMessage = styled(Text)`
+  ${({ theme }) => css`
+    color: ${theme.colors.red[400]};
+    font-weight: 600;
+    line-height: 1rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    margin-top: 12px;
+  `}
+`;
 
 export const StyledInput = styled.input<{ isInvalid?: boolean }>`
   ${({ theme, isInvalid }) => css`
@@ -896,3 +897,13 @@ export const Select = (props: ReactSelectProps) => (
     <ReactSelect {...props} classNamePrefix="select" />
   </SelectContainer>
 );
+
+export const FormControl = forwardRef((props: FormControlProps, ref) => {
+  const { children, ...restProps } = props;
+
+  return (
+    <ChakraFormControl display="flex" flexDirection="column" ref={ref} {...restProps}>
+      {children}
+    </ChakraFormControl>
+  );
+});
