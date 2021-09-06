@@ -176,7 +176,6 @@ class SessionService {
     return {
       id: orderBy.by === 'id' ? orderBy.desc ? 'desc' : 'asc' : undefined,
       createdAt: orderBy.by === 'createdAt' ? orderBy.desc ? 'desc' : 'asc' : undefined,
-      // dialogueId: orderBy.by === 'dialogueId' ? orderBy.desc ? 'desc' : 'asc' : undefined,
     };
   };
 
@@ -227,7 +226,7 @@ class SessionService {
                   },
                 },
               },
-            }, {}],
+            }, { }],
           },
           orderBy: {
             createdAt: 'desc',
@@ -337,13 +336,7 @@ class SessionService {
       paginationOpts: pageOpts,
     };
 
-    const { entries, pageInfo: paginateInfo } = await paginate(paginateProps);
-
-    const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
-      nrPages: paginateInfo?.nrPages || 1,
-      pageIndex: (paginationOpts?.pageIndex !== undefined && paginationOpts?.pageIndex !== null)
-        ? paginationOpts.pageIndex : 0,
-    };
+    const { entries, pageInfo } = await paginate(paginateProps);
 
     return {
       sessions: entries as NexusGenFieldTypes['Session'][],

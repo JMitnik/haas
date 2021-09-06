@@ -41,6 +41,11 @@ type CampaignType {
   variants: [CampaignVariantType!]!
 }
 
+type CampaignVariantCustomVariableType {
+  id: ID!
+  key: String!
+}
+
 enum CampaignVariantEnum {
   EMAIL
   QUEUE
@@ -50,13 +55,15 @@ enum CampaignVariantEnum {
 """Variant of campaign"""
 type CampaignVariantType {
   body: String!
+  customVariables: [CampaignVariantCustomVariableType!]
   deliveryConnection: DeliveryConnectionType
-  dialogue: Dialogue!
+  dialogue: Dialogue
+  from: String
   id: ID!
   label: String!
   type: CampaignVariantEnum!
   weight: Int!
-  workspace: Customer!
+  workspace: Customer
 }
 
 """Input type for a choice node"""
@@ -99,6 +106,10 @@ type CreateBatchDeliveriesOutputType {
   nrDeliveries: Int!
 }
 
+input CreateCampaignCustomVariable {
+  key: String
+}
+
 input CreateCampaignInputType {
   label: String
   variants: [CreateCampaignVariantInputType!]
@@ -107,6 +118,7 @@ input CreateCampaignInputType {
 
 input CreateCampaignVariantInputType {
   body: String
+  customVariables: [CreateCampaignCustomVariable!]
   dialogueId: ID!
   from: String
   label: String
@@ -220,8 +232,10 @@ type Customer {
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
+  roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
+  userCustomer(userId: String): UserCustomer
   users: [UserType!]
   usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
 }
@@ -296,12 +310,15 @@ type DeliveryConnectionType implements ConnectionInterface {
 
 type DeliveryEventType {
   createdAt: String!
+  failureMessage: String
   id: ID!
   status: DeliveryStatusEnum!
 }
 
 enum DeliveryStatusEnum {
+  DELIVERED
   DEPLOYED
+  FAILED
   FINISHED
   OPENED
   SCHEDULED
@@ -838,7 +855,6 @@ type Query {
   getJob(id: String): CreateWorkspaceJobType
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
-  lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   me: UserType!
   refreshAccessToken: RefreshAccessTokenOutput!
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!

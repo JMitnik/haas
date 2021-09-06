@@ -695,6 +695,19 @@ model CampaignVariantToCampaign {
   @@id([campaignId, campaignVariantId])
 }
 
+// Custom variable for campaign-variants
+model CampaignVariantCustomVariable {
+  id String @id @default(cuid())
+
+  campaignVariantId String
+  campaignVariant CampaignVariant @relation(fields: [campaignVariantId], references: [id])
+
+  key String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
 model CampaignVariant {
   id    String @id @default(cuid())
   label String
@@ -710,6 +723,8 @@ model CampaignVariant {
   Delivery                  Delivery[]
   customerId                String
   dialogueId                String
+
+  customVariables CampaignVariantCustomVariable[]
 }
 
 enum DeliveryStatusTypeEnum {
@@ -718,6 +733,8 @@ enum DeliveryStatusTypeEnum {
   SENT
   OPENED
   FINISHED
+  FAILED
+  DELIVERED
 }
 
 model Delivery {
@@ -735,6 +752,7 @@ model Delivery {
 
   campaignVariantId String
   campaignVariant   CampaignVariant @relation(fields: [campaignVariantId], references: [id])
+  customVariables Json?
 
   currentStatus DeliveryStatusTypeEnum
 
@@ -752,4 +770,6 @@ model DeliveryEvents {
   createdAt  DateTime               @default(now())
   deliveryId String?
   Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
+
+  failureMessage String?
 }

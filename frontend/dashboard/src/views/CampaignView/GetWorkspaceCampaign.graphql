@@ -37,6 +37,7 @@ query GetWorkspaceCampaign(
             id
             createdAt
             status
+            failureMessage
           }
         }
 
@@ -48,6 +49,23 @@ query GetWorkspaceCampaign(
       variants {
         id
         label
+        from
+        type
+        weight
+        body
+        customVariables {
+          id
+          key
+        }
+
+        dialogue {
+          id
+          title
+        }
+
+        workspace {
+          id
+        }
       }
     }
   }

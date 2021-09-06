@@ -1,6 +1,34 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    delivery_delivered: {
+      en: 'Delivery has arrived',
+      de: 'Lieferung ist angekommen',
+    },
+    problem_delivery: {
+      en: 'Delivery was failed',
+      de: 'Die Lieferung war fehlgeschlagen',
+    },
+    custom_variables: {
+      en: 'Custom variables',
+      de: 'Benutzerdefinierte Variablen',
+    },
+    custom_variables_helper: {
+      en: 'With custom variables, you can inject your own variables. Add a whitelist of allowed custom variables, and use them in your body.',
+      de: 'Mit benutzerdefinierten Variablen können Sie Ihre eigenen Variablen injizieren. Fügen Sie einen Whitelisten von erlaubten benutzerdefinierten Variablen hinzu und verwenden Sie sie mit {{customvariable}}.',
+    },
+    go_to_alerts: {
+      en: 'All alerts',
+      de: 'Alle Alerts',
+    },
+    go_to_users: {
+      en: 'Users overview',
+      de: 'Benutzerübersicht',
+    },
+    go_to_dialogues: {
+      en: 'ALl dialogues',
+      de: 'Alle Dialoge',
+    },
     from: {
       en: 'From',
       de: 'Aus',
@@ -2075,6 +2103,20 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     dutch: {
       en: 'Dutch',
       de: 'Niederländisch',
+    },
+  },
+  validation: {
+    field_required: {
+      en: 'This field is required.',
+      de: 'Dieses Feld wird benötigt.',
+    },
+    url_not_correct: {
+      en: 'This field should be a URL. Try to remove any strange characters, like spaces.',
+      de: 'Dieses Feld sollte eine URL sein. Versuchen Sie, alle seltsamen Zeichen, wie Leerzeichen, zu entfernen.',
+    },
+    url_extension_format_not_supported: {
+      en: 'URL Extension not supported. Use only letters, digits and - for your url extension. Example: happy-2',
+      de: 'URL-Erweiterung nicht unterstützt. Verwenden Sie nur Zahlen, Ziffern und - für Ihre URL-Erweiterung. Beispiel: Happy-2',
     },
   },
 };

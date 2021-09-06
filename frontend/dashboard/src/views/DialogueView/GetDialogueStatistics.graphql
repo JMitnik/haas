@@ -1,0 +1,54 @@
+query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
+  customer(slug: $customerSlug) {
+    id
+    dialogue(where: { slug: $dialogueSlug }) {
+      id
+      title
+      thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
+      previousScore: averageScore(input: $prevDateFilter)
+      sessions(take: 3) {
+        id
+        createdAt
+        score
+        nodeEntries {
+          relatedNode {
+            title
+            type
+          }
+          value {
+            sliderNodeEntry
+            textboxNodeEntry
+            registrationNodeEntry
+            choiceNodeEntry
+            linkNodeEntry
+          }
+        }
+      }
+      statistics(input: $statisticsDateFilter) {
+        nrInteractions
+        topPositivePath {
+          answer
+          quantity
+          basicSentiment
+        }
+
+        mostPopularPath {
+          answer
+          quantity
+          basicSentiment
+        }
+
+        topNegativePath {
+          quantity
+          answer
+          basicSentiment
+        }
+
+        history {
+          x
+          y
+        }
+      }
+    }
+  }
+}

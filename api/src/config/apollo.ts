@@ -1,12 +1,12 @@
-import { ApolloError, ApolloServer, UserInputError } from 'apollo-server-express';
+import { ApolloServer, UserInputError } from 'apollo-server-express';
 import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
+import { PrismaClient } from '@prisma/client';
 
 import { APIContext } from '../types/APIContext';
 import Sentry from './sentry';
 import authShield from './auth';
 import ContextSessionService from '../models/auth/ContextSessionService';
-import prisma from './prisma';
 import schema from './schema';
 import { bootstrapServices } from './bootstrap';
 
@@ -44,10 +44,11 @@ const handleError = (ctx: any, error: GraphQLError) => {
 }
 
 
-const makeApollo = async () => {
+export const makeApollo = async (prisma: PrismaClient) => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
 
   const apollo: ApolloServer = new ApolloServer({
+    uploads: false,
     schema: applyMiddleware(schema, authShield),
     context: async (ctx): Promise<APIContext> => ({
       ...ctx,

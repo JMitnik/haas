@@ -401,8 +401,9 @@ export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
   },
   async resolve(parent, args) {
     const { file, jobId } = args;
+    const waitedFile = await file;
     const { createReadStream, filename, mimetype, encoding }:
-      { createReadStream: any, filename: string, mimetype: string, encoding: string } = await file;
+      { createReadStream: any, filename: string, mimetype: string, encoding: string } = waitedFile.file;
 
     const extension = filename.split('.')[1]
     let fileName;
@@ -435,7 +436,6 @@ export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorksp
   args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String', errorMessage: 'String' },
   resolve(parent, args, ctx) {
     const { id, resourceUrl, status, errorMessage } = args;
-
     if (!args.id) {
       return null;
     }

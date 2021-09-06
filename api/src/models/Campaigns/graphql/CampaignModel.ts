@@ -1,28 +1,7 @@
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
-import { ApolloError } from 'apollo-server';
-import { CustomerType } from '../../customer/Customer';
-import { DialogueType } from '../../questionnaire/Dialogue';
+import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { ApolloError, UserInputError } from 'apollo-server';
+import { CampaignVariantModel } from './CampaignVariantModel';
 
-export const CampaignVariantEnum = enumType({
-  name: 'CampaignVariantEnum',
-
-  members: ['SMS', 'EMAIL', 'QUEUE'],
-});
-
-export const CampaignVariantModel = objectType({
-  name: 'CampaignVariantType',
-  description: 'Variant of campaign',
-
-  definition(t) {
-    t.id('id');
-    t.string('label');
-    t.int('weight');
-    t.string('body');
-    t.field('type', { type: CampaignVariantEnum });
-    t.field('workspace', { type: CustomerType });
-    t.field('dialogue', { type: DialogueType });
-  }
-})
 
 export const CampaignModel = objectType({
   name: 'CampaignType',
@@ -54,27 +33,9 @@ export const GetCampaignOfWorkspace = extendType({
       args: { campaignId: 'String' },
       nullable: true,
       resolve: async (parent, args, ctx) => {
-        const workspaceWithCampaign = await ctx.prisma.campaign.findFirst({
-          where: {
-            AND: [
-              { workspaceId: parent.id },
-              { id: args.campaignId || '' },
-            ]
-          },
-          include: {
-            deliveries: true,
-            variantsEdges: {
-              include: {
-                campaignVariant: {
-                  include: {
-                    dialogue: true,
-                    workspace: true,
-                  }
-                },
-              }
-            }
-          }
-        });
+        if (!args.campaignId) throw new UserInputError('Missing campaign id');
+
+        const workspaceWithCampaign = await ctx.services.campaignService.findCampaign(args.campaignId);
 
         if (!workspaceWithCampaign) return null;
 
@@ -89,11 +50,11 @@ export const GetCampaignOfWorkspace = extendType({
               workspace: variantEdge.campaignVariant.workspace,
             }))
           ]
-        } as any;
+        };
       }
     })
   }
-})
+});
 
 /**
  * Access pattern for accessign all campaigns belonging to a workspace.
@@ -104,24 +65,9 @@ export const GetCampaignsOfWorkspace = extendType({
   definition(t) {
     t.list.field('campaigns', {
       type: CampaignModel,
-      // @ts-ignore
       resolve: async (parent, args, ctx) => {
-        const workspaceWithCampaigns = await ctx.prisma.customer.findFirst({
-          where: { id: parent.id },
-          include: {
-            campaigns: {
-              include: {
-                variantsEdges: {
-                  include: {
-                    campaignVariant: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        if (!workspaceWithCampaigns) throw "Can't find workspace!"
+        const workspaceWithCampaigns = await ctx.services.campaignService.findCampaignsOfWorkspace(parent.id);
+        if (!workspaceWithCampaigns) throw new UserInputError('Can\'t find workspace!');
 
         return workspaceWithCampaigns.campaigns.map(campaign => ({
           ...campaign,
@@ -129,7 +75,7 @@ export const GetCampaignsOfWorkspace = extendType({
             weight: variantEdge.weight,
             ...variantEdge.campaignVariant
           }))
-        })) || [] as any;
+        })) || [];
       },
     });
   },
@@ -153,6 +99,7 @@ export const GetCampaignVariantOfDelivery = extendType({
                 CampaignVariantToCampaign: true,
                 dialogue: true,
                 workspace: true,
+                customVariables: true,
               }
             }
           }
@@ -167,7 +114,8 @@ export const GetCampaignVariantOfDelivery = extendType({
           label: campaignVariant.label,
           weight: campaignVariant.CampaignVariantToCampaign[0].weight,
           workspace: campaignVariant.workspace,
-          type: campaignVariant.type
+          type: campaignVariant.type,
+          customVariables: campaignVariant.customVariables,
         };
       }
     })

@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
-import { NexusGenInputs } from '../../generated/nexus';
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
@@ -288,7 +288,7 @@ class UserService {
     };
 
     const findManyUsers = async ({ props, paginationOpts }: FindManyCallBackProps) => {
-      const users: any = this.prisma.userOfCustomer.findMany(props);
+      const users: any = await this.prisma.userOfCustomer.findMany(props);
       const filteredBySearch = UserService.filterBySearchTerm(users, paginationOpts?.searchTerm);
       const orderedUsers = UserService.orderUsersBy(filteredBySearch, paginationOpts?.orderBy?.[0]);
       return orderedUsers;

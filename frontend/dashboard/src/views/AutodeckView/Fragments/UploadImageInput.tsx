@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react'
 import { useToast } from '@chakra-ui/core';
 import { useUploadJobImageMutation } from 'types/generated-types';
 import FileDropInput from 'components/FileDropInput';
+import React, { useEffect } from 'react';
 
 const UploadImageInput = ({ onChange, value, jobId, imageType, isInEditing, isDisapproved }: any) => {
   const toast = useToast();
@@ -26,21 +26,21 @@ const UploadImageInput = ({ onChange, value, jobId, imageType, isInEditing, isDi
         isClosable: true,
       });
     },
-  })
+  });
 
   const onDrop = (files: File[]) => {
     if (!files.length) return;
     onChange('');
     const [file] = files;
-    const disapproved: boolean = isDisapproved || false
+    const disapproved: boolean = isDisapproved || false;
     uploadFile({ variables: { file, jobId, type: imageType, disapproved } });
   };
 
   useEffect(() => {
     if (value) {
-      onChange(value)
+      onChange(value);
     }
-  }, [value, onChange])
+  }, [value, onChange]);
 
   return (
     <>
@@ -49,4 +49,4 @@ const UploadImageInput = ({ onChange, value, jobId, imageType, isInEditing, isDi
   );
 };
 
-export default UploadImageInput
+export default UploadImageInput;

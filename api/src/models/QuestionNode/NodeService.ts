@@ -719,6 +719,7 @@ class NodeService {
       try {
         await this.updateEdge(existingEdgeCondition, edgeCondition);
       } catch (e) {
+        // @ts-ignore
         console.log('something went wrong updating edges: ', e.stack);
       }
     };

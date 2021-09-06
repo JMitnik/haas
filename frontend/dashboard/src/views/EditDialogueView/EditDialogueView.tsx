@@ -5,7 +5,7 @@ import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '
 import { Controller, useForm } from 'react-hook-form';
 import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel, FormSection,
-  H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, RadioButton, Textarea,
+  H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Textarea, ViewTitle,
 } from '@haas/ui';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
@@ -188,251 +188,256 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
   const { t } = useTranslation();
 
   return (
-    <Div>
-      <PageTitle>
-        {t('views:edit_dialogue_view')}
-      </PageTitle>
-      <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-        <FormContainer>
-          <Form onSubmit={form.handleSubmit(onSubmit)}>
-            <ServerError serverError={serverError} />
-            <FormSection id="general">
-              <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:about')}</H3>
-                <Muted color="gray.600">
-                  {t('dialogue:about_helper')}
-                </Muted>
-              </Div>
-              <Div>
-                <InputGrid>
-                  <FormControl isRequired isInvalid={!!form.errors.title}>
-                    <FormLabel htmlFor="title">{t('title')}</FormLabel>
-                    <InputHelper>{t('dialogue:title_helper')}</InputHelper>
-                    <Input
-                      placeholder={t('dialogue:title_placeholder')}
-                      leftEl={<Type />}
-                      name="title"
-                      ref={form.register({ required: true })}
-                    />
-                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
-                  </FormControl>
+    <>
+      <UI.ViewHead>
+        <UI.ViewTitle>
+          {t('views:edit_dialogue_view')}
+        </UI.ViewTitle>
+      </UI.ViewHead>
+      <UI.ViewBody>
 
-                  <FormControl isInvalid={!!form.errors.publicTitle}>
-                    <FormLabel htmlFor="publicTitle">{t('dialogue:public_title')}</FormLabel>
-                    <InputHelper>
-                      {t('dialogue:public_title_helper')}
-                    </InputHelper>
-                    <Input
-                      placeholder={t('dialogue:public_title_placeholder')}
-                      leftEl={<Type />}
-                      name="publicTitle"
-                      ref={form.register({ required: false })}
-                    />
-                    <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
-                  </FormControl>
+        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
+          <FormContainer>
+            <Form onSubmit={form.handleSubmit(onSubmit)}>
+              <ServerError serverError={serverError} />
+              <FormSection id="general">
+                <Div>
+                  <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:about')}</H3>
+                  <Muted color="gray.600">
+                    {t('dialogue:about_helper')}
+                  </Muted>
+                </Div>
+                <Div>
+                  <InputGrid>
+                    <FormControl isRequired isInvalid={!!form.errors.title}>
+                      <FormLabel htmlFor="title">{t('title')}</FormLabel>
+                      <InputHelper>{t('dialogue:title_helper')}</InputHelper>
+                      <Input
+                        placeholder={t('dialogue:title_placeholder')}
+                        leftEl={<Type />}
+                        name="title"
+                        ref={form.register({ required: true })}
+                      />
+                      <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                    </FormControl>
 
-                  <FormControl isRequired>
-                    <FormLabel htmlFor="languageOption">
-                      {t('language')}
-                    </FormLabel>
-                    <InputHelper>
-                      {t('dialogue:language_helper')}
-                    </InputHelper>
-                    <Controller
-                      name="languageOption"
-                      control={form.control}
-                      as={Select}
-                      options={LANGUAGE_OPTIONS}
-                    />
-                  </FormControl>
+                    <FormControl isInvalid={!!form.errors.publicTitle}>
+                      <FormLabel htmlFor="publicTitle">{t('dialogue:public_title')}</FormLabel>
+                      <InputHelper>
+                        {t('dialogue:public_title_helper')}
+                      </InputHelper>
+                      <Input
+                        placeholder={t('dialogue:public_title_placeholder')}
+                        leftEl={<Type />}
+                        name="publicTitle"
+                        ref={form.register({ required: false })}
+                      />
+                      <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
+                    </FormControl>
 
-                  <FormControl isRequired isInvalid={!!form.errors.description}>
-                    <FormLabel htmlFor="title">{t('description')}</FormLabel>
-                    <InputHelper>
-                      {t('dialogue:description_helper')}
-                    </InputHelper>
-                    <Textarea
-                      placeholder={t('dialogue:description_placeholder')}
-                      name="description"
-                      ref={form.register({ required: true })}
-                    />
-                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
-                  </FormControl>
+                    <FormControl isRequired>
+                      <FormLabel htmlFor="languageOption">
+                        {t('language')}
+                      </FormLabel>
+                      <InputHelper>
+                        {t('dialogue:language_helper')}
+                      </InputHelper>
+                      <Controller
+                        name="languageOption"
+                        control={form.control}
+                        as={Select}
+                        options={LANGUAGE_OPTIONS}
+                      />
+                    </FormControl>
 
-                  <FormControl isRequired isInvalid={!!form.errors.slug}>
-                    <FormLabel htmlFor="slug">{t('slug')}</FormLabel>
-                    <InputHelper>{t('dialogue:slug_helper')}</InputHelper>
-                    <Input
-                      placeholder="peaches-or-apples"
-                      leftAddOn={`https://client.haas.live/${customerSlug}`}
-                      name="slug"
-                      ref={form.register({ required: true })}
-                    />
-                    <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
-                  </FormControl>
-                </InputGrid>
-              </Div>
-            </FormSection>
+                    <FormControl isRequired isInvalid={!!form.errors.description}>
+                      <FormLabel htmlFor="title">{t('description')}</FormLabel>
+                      <InputHelper>
+                        {t('dialogue:description_helper')}
+                      </InputHelper>
+                      <Textarea
+                        placeholder={t('dialogue:description_placeholder')}
+                        name="description"
+                        ref={form.register({ required: true })}
+                      />
+                      <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                    </FormControl>
 
-            <Hr />
+                    <FormControl isRequired isInvalid={!!form.errors.slug}>
+                      <FormLabel htmlFor="slug">{t('slug')}</FormLabel>
+                      <InputHelper>{t('dialogue:slug_helper')}</InputHelper>
+                      <Input
+                        placeholder="peaches-or-apples"
+                        leftAddOn={`https://client.haas.live/${customerSlug}`}
+                        name="slug"
+                        ref={form.register({ required: true })}
+                      />
+                      <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
+                    </FormControl>
+                  </InputGrid>
+                </Div>
+              </FormSection>
 
-            <FormSection>
-              <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:dialogue_finisher')}</H3>
-                <Muted color="gray.600">
-                  {t('dialogue:dialogue_finisher_helper')}
-                </Muted>
-              </Div>
-              <Div>
-                <InputGrid>
-                  <UI.FormControl isInvalid={!!form.errors.postLeafHeading}>
-                    <UI.FormLabel htmlFor="postLeafHeading">
-                      {t('dialogue:finisher_heading')}
-                    </UI.FormLabel>
-                    <UI.InputHelper>
-                      {t('dialogue:finisher_heading_helper')}
-                    </UI.InputHelper>
-                    <UI.Input
-                      name="postLeafHeading"
-                      leftEl={<Type />}
-                      ref={form.register()}
-                      placeholder="Thank you for participating!"
-                    />
-                    <FormErrorMessage>{form.errors.postLeafHeading?.message}</FormErrorMessage>
-                  </UI.FormControl>
+              <Hr />
 
-                  <UI.FormControl isInvalid={!!form.errors.postLeafSubheading}>
-                    <UI.FormLabel htmlFor="postLeafSubheading">
-                      {t('dialogue:finisher_subheading')}
-                    </UI.FormLabel>
-                    <UI.InputHelper>
-                      {t('dialogue:finisher_subheading_helper')}
-                    </UI.InputHelper>
-                    <UI.Input
-                      name="postLeafSubheading"
-                      leftEl={<Type />}
-                      placeholder="We will strive towards making you happier."
-                      ref={form.register()}
-                    />
-                    <FormErrorMessage>{form.errors.postLeafSubheading?.message}</FormErrorMessage>
-                  </UI.FormControl>
-                </InputGrid>
-              </Div>
-            </FormSection>
+              <FormSection>
+                <Div>
+                  <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:dialogue_finisher')}</H3>
+                  <Muted color="gray.600">
+                    {t('dialogue:dialogue_finisher_helper')}
+                  </Muted>
+                </Div>
+                <Div>
+                  <InputGrid>
+                    <UI.FormControl isInvalid={!!form.errors.postLeafHeading}>
+                      <UI.FormLabel htmlFor="postLeafHeading">
+                        {t('dialogue:finisher_heading')}
+                      </UI.FormLabel>
+                      <UI.InputHelper>
+                        {t('dialogue:finisher_heading_helper')}
+                      </UI.InputHelper>
+                      <UI.Input
+                        name="postLeafHeading"
+                        leftEl={<Type />}
+                        ref={form.register()}
+                        placeholder="Thank you for participating!"
+                      />
+                      <FormErrorMessage>{form.errors.postLeafHeading?.message}</FormErrorMessage>
+                    </UI.FormControl>
 
-            <Hr />
+                    <UI.FormControl isInvalid={!!form.errors.postLeafSubheading}>
+                      <UI.FormLabel htmlFor="postLeafSubheading">
+                        {t('dialogue:finisher_subheading')}
+                      </UI.FormLabel>
+                      <UI.InputHelper>
+                        {t('dialogue:finisher_subheading_helper')}
+                      </UI.InputHelper>
+                      <UI.Input
+                        name="postLeafSubheading"
+                        leftEl={<Type />}
+                        placeholder="We will strive towards making you happier."
+                        ref={form.register()}
+                      />
+                      <FormErrorMessage>{form.errors.postLeafSubheading?.message}</FormErrorMessage>
+                    </UI.FormControl>
+                  </InputGrid>
+                </Div>
+              </FormSection>
 
-            <FormSection id="tags">
-              <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>{t('tags')}</H3>
-                <Muted color="gray.600">
-                  {t('dialogue:tag_helper')}
-                </Muted>
-              </Div>
-              <Div>
-                <InputGrid gridTemplateColumns="1fr">
-                  <Div>
-                    <Button
-                      leftIcon={Plus}
-                      onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
-                    >
-                      {t('add_tag')}
-                    </Button>
-                  </Div>
+              <Hr />
 
-                  <Stack>
-                    {activeTags?.map((tag, index) => (
-                      <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
-                        <Div
-                          data-cy="SelectOptions"
-                          flexGrow={9}
-                        >
-                          <Controller
-                            name={`tags[${index}]`}
-                            control={form.control}
-                            as={Select}
-                            options={tagOptions}
-                            defaultValue={tag}
-                          />
-                          <FormErrorMessage>{form.errors.tags?.[index]?.value?.message}</FormErrorMessage>
-                        </Div>
-                        <Flex justifyContent="center" alignContent="center" flexGrow={1}>
-                          <Button
-                            size="xs"
-                            variantColor="red"
-                            variant="outline"
-                            leftIcon={Minus}
-                            onClick={() => deleteTag(index)}
+              <FormSection id="tags">
+                <Div>
+                  <H3 color="default.text" fontWeight={500} pb={2}>{t('tags')}</H3>
+                  <Muted color="gray.600">
+                    {t('dialogue:tag_helper')}
+                  </Muted>
+                </Div>
+                <Div>
+                  <InputGrid gridTemplateColumns="1fr">
+                    <Div>
+                      <Button
+                        leftIcon={Plus}
+                        onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
+                      >
+                        {t('add_tag')}
+                      </Button>
+                    </Div>
+
+                    <Stack>
+                      {activeTags?.map((tag, index) => (
+                        <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
+                          <Div
+                            data-cy="SelectOptions"
+                            flexGrow={9}
                           >
-                            {t('remove')}
-                          </Button>
+                            <Controller
+                              name={`tags[${index}]`}
+                              control={form.control}
+                              as={Select}
+                              options={tagOptions}
+                              defaultValue={tag}
+                            />
+                            <FormErrorMessage>{form.errors.tags?.[index]?.value?.message}</FormErrorMessage>
+                          </Div>
+                          <Flex justifyContent="center" alignContent="center" flexGrow={1}>
+                            <Button
+                              size="xs"
+                              variantColor="red"
+                              variant="outline"
+                              leftIcon={Minus}
+                              onClick={() => deleteTag(index)}
+                            >
+                              {t('remove')}
+                            </Button>
+                          </Flex>
                         </Flex>
-                      </Flex>
-                    ))}
-                  </Stack>
-                </InputGrid>
-              </Div>
-            </FormSection>
+                      ))}
+                    </Stack>
+                  </InputGrid>
+                </Div>
+              </FormSection>
 
-            {dialogue.wasGeneratedWithGenData && (
-              <>
-                <Hr />
+              {dialogue.wasGeneratedWithGenData && (
+                <>
+                  <Hr />
 
-                <FormSection id="data">
-                  <Div>
-                    <H3 color="default.text" fontWeight={500} pb={2}>{t('data')}</H3>
-                    <Muted color="gray.600">
-                      {t('dialogue:data_helper')}
-                    </Muted>
-                  </Div>
-                  <Div>
-                    <InputGrid gridTemplateColumns="1fr">
-                      <FormControl>
-                        <FormLabel>{t('dialogue:hide_fake_data')}</FormLabel>
-                        <InputHelper>{t('dialogue:hide_fake_data_helper')}</InputHelper>
-                        <Controller
-                          name="isWithoutGenData"
-                          control={form.control}
-                          render={({ onChange, onBlur, value }) => (
-                            <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
-                              <RadioButton
-                                icon={Minus}
-                                value={1}
-                                mr={2}
-                                text={(t('dialogue:hide_fake_data'))}
-                                description={t('dialogue:do_hide_fake_data_helper')}
-                              />
-                              <RadioButton
-                                icon={Activity}
-                                value={0}
-                                text={(t('dialogue:no_hide_fake_data'))}
-                                description={t('dialogue:no_hide_fake_data_helper')}
-                              />
-                            </RadioButtonGroup>
-                          )}
-                        />
-                      </FormControl>
-                    </InputGrid>
-                  </Div>
-                </FormSection>
-              </>
-            )}
+                  <FormSection id="data">
+                    <Div>
+                      <H3 color="default.text" fontWeight={500} pb={2}>{t('data')}</H3>
+                      <Muted color="gray.600">
+                        {t('dialogue:data_helper')}
+                      </Muted>
+                    </Div>
+                    <Div>
+                      <InputGrid gridTemplateColumns="1fr">
+                        <FormControl>
+                          <FormLabel>{t('dialogue:hide_fake_data')}</FormLabel>
+                          <InputHelper>{t('dialogue:hide_fake_data_helper')}</InputHelper>
+                          <Controller
+                            name="isWithoutGenData"
+                            control={form.control}
+                            render={({ onChange, onBlur, value }) => (
+                              <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
+                                <RadioButton
+                                  icon={Minus}
+                                  value={1}
+                                  mr={2}
+                                  text={(t('dialogue:hide_fake_data'))}
+                                  description={t('dialogue:do_hide_fake_data_helper')}
+                                />
+                                <RadioButton
+                                  icon={Activity}
+                                  value={0}
+                                  text={(t('dialogue:no_hide_fake_data'))}
+                                  description={t('dialogue:no_hide_fake_data_helper')}
+                                />
+                              </RadioButtonGroup>
+                            )}
+                          />
+                        </FormControl>
+                      </InputGrid>
+                    </Div>
+                  </FormSection>
+                </>
+              )}
 
-            <ButtonGroup>
-              <Button
-                isLoading={isLoading}
-                isDisabled={!form.formState.isValid}
-                variantColor="teal"
-                type="submit"
-              >
-                {t('save')}
-              </Button>
-              <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
-            </ButtonGroup>
-          </Form>
-        </FormContainer>
-      </motion.div>
-    </Div>
+              <ButtonGroup>
+                <Button
+                  isLoading={isLoading}
+                  isDisabled={!form.formState.isValid}
+                  variantColor="teal"
+                  type="submit"
+                >
+                  {t('save')}
+                </Button>
+                <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
+              </ButtonGroup>
+            </Form>
+          </FormContainer>
+        </motion.div>
+      </UI.ViewBody>
+    </>
   );
 };
 

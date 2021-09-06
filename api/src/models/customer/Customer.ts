@@ -14,7 +14,6 @@ import CustomerService from './CustomerService';
 import { PaginationWhereInput } from '../general/Pagination';
 import { UserConnection, UserCustomerType } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
-import UserService from '../users/UserService';
 import isValidColor from '../../utils/isValidColor';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
@@ -57,9 +56,7 @@ export const CustomerType = objectType({
             orderBy: args.filter?.orderBy,
             searchTerm: args.filter?.searchTerm,
           },
-
         );
-
         return users as any;
       },
     });
@@ -136,6 +133,17 @@ export const CustomerType = objectType({
         return users;
       },
     });
+
+    t.list.field('roles', {
+      type: 'RoleType',
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        const roles = await ctx.services.roleService.getAllRolesForWorkspaceBySlug(parent.slug);
+
+        return roles;
+      }
+    });
   },
 });
 
@@ -210,7 +218,11 @@ export const WorkspaceMutations = Upload && extendType({
       },
       async resolve(parent, args) {
         const { file } = args;
-        const { createReadStream, filename, mimetype, encoding } = await file;
+
+        const waitedFile = await file;
+        const { createReadStream, filename, mimetype, encoding }:
+          { createReadStream: any, filename: string, mimetype: string, encoding: string } = waitedFile.file;
+
 
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({

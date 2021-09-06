@@ -12,17 +12,14 @@ import {
   WidthProps,
   BorderProps,
   ColorProps,
-  FlexProps,
-  flexDirection,
   LayoutProps,
   layout,
-  PositionProps, 
+  PositionProps,
   position,
   SpaceProps,
 } from 'styled-system';
 import { Stack as ChakraStack, StackProps as ChakraStackProps  } from '@chakra-ui/core';
 import { Div, GenericProps } from './Generics';
-import { PageTitle } from './Type';
 
 interface ContainerProps extends GenericProps {}
 
@@ -46,38 +43,6 @@ export const Container = styled(Div)<ContainerProps>`
     ${space}
     ${flexbox}
     ${width}
-  `}
-`;
-
-
-const ViewHeadingContainer = styled(Div)`
-  ${({ theme }) => css`
-    padding: ${theme.gutter / 2}px ${theme.gutter}px;
-    border-bottom: 1px solid ${theme.colors.gray[200]};
-
-    ${PageTitle} {
-      margin-bottom: 0;
-    }
-  `}
-`;
-
-export const ViewHeading = ({ children }: { children: React.ReactNode }) => (
-  <ViewHeadingContainer>
-    <Stack spacing={4} isInline alignItems="center">
-      {children}
-    </Stack>
-  </ViewHeadingContainer>
-);
-
-export const ViewContainer = styled(Div)<{ isCompact?: boolean; }>`
-  ${({ theme, isCompact }) => css`
-    padding: ${theme.gutter}px;
-    margin: 0 auto;
-    min-height: 100vh;
-
-    ${isCompact && css`
-      max-width: 1400px;
-    `}
   `}
 `;
 

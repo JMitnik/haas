@@ -58,18 +58,22 @@ const variantSchema = yup.object({
 const schema = yup.object({
   label: yup.string().required(),
   variants: yup.array().of(variantSchema),
+  customVariables: yup.array().of(yup.object({
+    key: yup.string(),
+  })),
 }).required();
 
-type FormProps = yup.InferType<typeof schema>;
+export type CampaignFormProps = yup.InferType<typeof schema>;
 type VariantFormProps = yup.InferType<typeof variantSchema>;
 
 interface ActiveVariantFormProps {
-  form: UseFormMethods<FormProps>;
+  form: UseFormMethods<CampaignFormProps>;
   activeVariantIndex: number;
+  isReadOnly?: boolean;
   variant: any;
 }
 
-const ActiveVariantForm = ({ form, activeVariantIndex, variant }: ActiveVariantFormProps) => {
+const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: ActiveVariantFormProps) => {
   const activeVariant = form.watch(`variants[${activeVariantIndex}]`) as VariantFormProps;
   const { t } = useTranslation();
 
@@ -105,6 +109,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: ActiveVariantF
             name={`variants[${activeVariantIndex}].label`}
             defaultValue={activeVariant?.label}
             id={`variants[${activeVariantIndex}].label`}
+            isDisabled={isReadOnly}
             ref={form.register()}
           />
         </UI.FormControl>
@@ -114,9 +119,11 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: ActiveVariantF
           <UI.Input
             key={variant.variantIndex}
             name={`variants[${activeVariantIndex}].from`}
+            defaultValue={activeVariant?.from}
             placeholder={activeVariant.type === 'SMS' ? 'HAAS' : 'noreply@haas.live'}
             id={`variants[${activeVariantIndex}].from`}
             ref={form.register()}
+            isDisabled={isReadOnly}
           />
         </UI.FormControl>
 
@@ -130,6 +137,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: ActiveVariantF
             render={({ value, onChange, onBlur }) => (
               <Select
                 placeholder="Select a dialogue"
+                isDisabled={isReadOnly}
                 id={`variants[${activeVariantIndex}].dialogue`}
                 classNamePrefix="select"
                 className="select"
@@ -201,33 +209,44 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: ActiveVariantF
   );
 };
 
-const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
+interface CreateCampaignFormProps {
+  isReadOnly?: boolean;
+  onClose?: () => void;
+  campaign?: CampaignFormProps;
+}
+
+const campaignDefaultValues: CampaignFormProps = {
+  label: '',
+  customVariables: [{ key: '' }],
+  variants: [
+    {
+      label: '',
+      type: 'EMAIL',
+      from: undefined,
+      body: createCampaignBodyPlaceholder,
+      weight: 50,
+      // @ts-ignore
+      dialogue: undefined,
+    },
+    {
+      label: '',
+      type: 'EMAIL',
+      from: undefined,
+      body: createCampaignBodyPlaceholder,
+      weight: 50,
+      // @ts-ignore
+      dialogue: undefined,
+    },
+  ],
+};
+
+const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCampaignFormProps) => {
   const { activeCustomer } = useCustomer();
   const toast = useToast();
   const { t } = useTranslation();
 
-  const form = useForm<FormProps>({
-    defaultValues: {
-      label: '',
-      variants: [
-        {
-          label: '',
-          type: 'EMAIL',
-          from: undefined,
-          body: createCampaignBodyPlaceholder,
-          weight: 50,
-          dialogue: undefined,
-        },
-        {
-          label: '',
-          type: 'EMAIL',
-          from: undefined,
-          body: createCampaignBodyPlaceholder,
-          weight: 50,
-          dialogue: undefined,
-        },
-      ],
-    },
+  const form = useForm<CampaignFormProps>({
+    defaultValues: campaign || campaignDefaultValues,
     shouldUnregister: false,
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -246,6 +265,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
           weight: variant.weight,
           from: variant.from || undefined,
           type: variant.type as CampaignVariantEnum,
+          customVariables: form.getValues().customVariables?.map((val) => val || { key: '' }),
           workspaceId: activeCustomer?.id || '',
         })),
       },
@@ -295,6 +315,14 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
     keyName: 'variantIndex',
   });
 
+  const { append: addCustomVariable, fields: customVariables } = useFieldArray({
+    name: 'customVariables',
+    control: form.control,
+    keyName: 'idKey',
+  });
+
+  console.log(customVariables);
+
   const handleVariantWeightChange = (event: any, currentItemIndex: number) => {
     const maxValue = Math.min(event.target.value, 100);
     const value = Math.max(maxValue, 0);
@@ -313,7 +341,9 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
   };
 
   const handleSubmit = () => {
-    createCampaign();
+    if (!isReadOnly) {
+      createCampaign();
+    }
   };
 
   return (
@@ -322,7 +352,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
         <UI.Stack spacing={4}>
           <UI.FormControl isRequired>
             <UI.FormLabel htmlFor="label">{t('campaign_label')}</UI.FormLabel>
-            <UI.Input name="label" id="label" ref={form.register} />
+            <UI.Input name="label" id="label" ref={form.register} isDisabled={isReadOnly} />
           </UI.FormControl>
           <UI.Div>
             <UI.InputHeader>{t('variants')}</UI.InputHeader>
@@ -350,6 +380,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
                           onChange={(e: InputEvent) => {
                             handleVariantWeightChange(e, index);
                           }}
+                          isDisabled={isReadOnly}
                           onBlur={onBlur}
                           type="number"
                           rightAddOn="%"
@@ -361,10 +392,30 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
               ))}
             </UI.Stack>
           </UI.Div>
+
+          <UI.Div>
+            <UI.FormControl>
+              <UI.InputHeader>{t('custom_variables')}</UI.InputHeader>
+              <UI.InputHelper>{t('custom_variables_helper')}</UI.InputHelper>
+              <UI.Stack spacing={1}>
+                {customVariables.map((customVariable, index) => (
+                  <UI.Input
+                    key={customVariable.idKey}
+                    defaultValue={customVariable.key}
+                    name={`customVariables.${index}.key`}
+                    ref={form.register()}
+                  />
+                ))}
+              </UI.Stack>
+
+              <UI.Button mt={2} onClick={() => addCustomVariable({ key: '' })}>Add variable</UI.Button>
+            </UI.FormControl>
+          </UI.Div>
         </UI.Stack>
         <UI.Card isFlat noHover bg="gray.100">
           {(activeVariantIndex === 0 || activeVariantIndex) ? (
             <ActiveVariantForm
+              isReadOnly={isReadOnly}
               variant={variants[activeVariantIndex]}
               activeVariantIndex={activeVariantIndex}
               form={form}
@@ -377,7 +428,7 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
             />
           )}
         </UI.Card>
-        <UI.Button type="submit" isDisabled={!form.formState.isValid}>
+        <UI.Button type="submit" isDisabled={!form.formState.isValid || isReadOnly}>
           {t('save')}
         </UI.Button>
       </UI.Grid>

@@ -22,22 +22,29 @@ const TopNavContainer = styled(Div)<GenericProps>`
   `}
 `;
 
+const BreadCrumbContainer = styled.div`
+  > a {
+    display: inline-block;
+  }
+`
 
 export const Breadcrumb = ({ children, ...props }: LinkProps) => (
-  <Link {...props}>
-    <Flex alignItems="center">
-      <Helper style={{ display: 'flex', alignItems: 'center', fontSize: '0.7rem' }}>
-        <Icon as={ChevronLeft} width="18px" color="currentColor" />
-        {children}
-      </Helper>
-    </Flex>
-  </Link>
+  <BreadCrumbContainer>
+    <Link {...props}>
+      <Flex alignItems="center">
+        <Helper style={{ display: 'flex', alignItems: 'center', fontSize: '0.7rem' }}>
+          <Icon as={ChevronLeft} width="18px" color="currentColor" />
+          {children}
+        </Helper>
+      </Flex>
+    </Link>
+  </BreadCrumbContainer>
 )
 
 export const ExtLinkContainer = styled.a<ColorProps>`
   ${({ theme }) => css`
     ${color};
-    
+
     text-decoration: none;
     font-weight: 600;
     color: ${theme.colors.blue[300]};

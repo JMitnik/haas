@@ -66,6 +66,12 @@ export type CampaignTypeDeliveryConnectionArgs = {
   filter?: Maybe<DeliveryConnectionFilter>;
 };
 
+export type CampaignVariantCustomVariableType = {
+  __typename?: 'CampaignVariantCustomVariableType';
+  id: Scalars['ID'];
+  key: Scalars['String'];
+};
+
 export enum CampaignVariantEnum {
   Sms = 'SMS',
   Email = 'EMAIL',
@@ -79,9 +85,11 @@ export type CampaignVariantType = {
   label: Scalars['String'];
   weight: Scalars['Int'];
   body: Scalars['String'];
+  from?: Maybe<Scalars['String']>;
   type: CampaignVariantEnum;
-  workspace: Customer;
-  dialogue: Dialogue;
+  workspace?: Maybe<Customer>;
+  dialogue?: Maybe<Dialogue>;
+  customVariables?: Maybe<Array<CampaignVariantCustomVariableType>>;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
@@ -127,6 +135,10 @@ export type CreateBatchDeliveriesOutputType = {
   nrDeliveries: Scalars['Int'];
 };
 
+export type CreateCampaignCustomVariable = {
+  key?: Maybe<Scalars['String']>;
+};
+
 export type CreateCampaignInputType = {
   label?: Maybe<Scalars['String']>;
   workspaceId: Scalars['ID'];
@@ -134,14 +146,15 @@ export type CreateCampaignInputType = {
 };
 
 export type CreateCampaignVariantInputType = {
-  label?: Maybe<Scalars['String']>;
   workspaceId: Scalars['ID'];
   dialogueId: Scalars['ID'];
-  from?: Maybe<Scalars['String']>;
-  type: CampaignVariantEnum;
+  label?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['String']>;
-  weight?: Maybe<Scalars['Float']>;
+  from?: Maybe<Scalars['String']>;
   subject?: Maybe<Scalars['String']>;
+  weight?: Maybe<Scalars['Float']>;
+  type: CampaignVariantEnum;
+  customVariables?: Maybe<Array<CreateCampaignCustomVariable>>;
 };
 
 export type CreateCtaInputType = {
@@ -252,8 +265,10 @@ export type Customer = {
   dialogue?: Maybe<Dialogue>;
   dialogues?: Maybe<Array<Dialogue>>;
   users?: Maybe<Array<UserType>>;
-  campaign: CampaignType;
+  roles?: Maybe<Array<RoleType>>;
+  campaign?: Maybe<CampaignType>;
   campaigns: Array<CampaignType>;
+  userCustomer?: Maybe<UserCustomer>;
 };
 
 
@@ -275,6 +290,11 @@ export type CustomerDialoguesArgs = {
 
 export type CustomerCampaignArgs = {
   campaignId?: Maybe<Scalars['String']>;
+};
+
+
+export type CustomerUserCustomerArgs = {
+  userId?: Maybe<Scalars['String']>;
 };
 
 export type CustomerSettings = {
@@ -352,6 +372,7 @@ export type DeliveryEventType = {
   id: Scalars['ID'];
   status: DeliveryStatusEnum;
   createdAt: Scalars['String'];
+  failureMessage?: Maybe<Scalars['String']>;
 };
 
 export enum DeliveryStatusEnum {
@@ -359,7 +380,9 @@ export enum DeliveryStatusEnum {
   Deployed = 'DEPLOYED',
   Sent = 'SENT',
   Opened = 'OPENED',
-  Finished = 'FINISHED'
+  Finished = 'FINISHED',
+  Failed = 'FAILED',
+  Delivered = 'DELIVERED'
 }
 
 /** Delivery */
@@ -767,7 +790,6 @@ export type Mutation = {
   createWorkspace: Customer;
   editWorkspace: Customer;
   deleteCustomer?: Maybe<Customer>;
-  createUser: UserType;
   editUser: UserType;
   deleteUser: DeleteUserOutput;
   copyDialogue: Dialogue;
@@ -928,12 +950,6 @@ export type MutationEditWorkspaceArgs = {
 
 export type MutationDeleteCustomerArgs = {
   where?: Maybe<CustomerWhereUniqueInput>;
-};
-
-
-export type MutationCreateUserArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
-  input?: Maybe<UserInput>;
 };
 
 
@@ -1185,14 +1201,12 @@ export type Query = {
   trigger?: Maybe<TriggerType>;
   triggers: Array<TriggerType>;
   roleConnection: RoleConnection;
-  roles?: Maybe<Array<RoleType>>;
   customers: Array<Customer>;
   customer?: Maybe<Customer>;
   UserOfCustomer?: Maybe<UserCustomer>;
   me: UserType;
   users: Array<UserType>;
   user?: Maybe<UserType>;
-  lineChartData: Array<LineChartDataType>;
   dialogue?: Maybe<Dialogue>;
   dialogues: Array<Dialogue>;
   refreshAccessToken: RefreshAccessTokenOutput;
@@ -1258,11 +1272,6 @@ export type QueryRoleConnectionArgs = {
 };
 
 
-export type QueryRolesArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
-};
-
-
 export type QueryCustomerArgs = {
   id?: Maybe<Scalars['ID']>;
   slug?: Maybe<Scalars['String']>;
@@ -1281,14 +1290,6 @@ export type QueryUsersArgs = {
 
 export type QueryUserArgs = {
   userId?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryLineChartDataArgs = {
-  dialogueId?: Maybe<Scalars['String']>;
-  numberOfDaysBack?: Maybe<Scalars['Int']>;
-  limit?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -1452,6 +1453,7 @@ export type Session = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   dialogueId: Scalars['String'];
+  browser: Scalars['String'];
   paths: Scalars['Int'];
   score: Scalars['Float'];
   totalTimeInSec?: Maybe<Scalars['Int']>;
@@ -1956,7 +1958,7 @@ export type GetWorkspaceCampaignQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
-    & { campaign: (
+    & { campaign?: Maybe<(
       { __typename?: 'CampaignType' }
       & Pick<CampaignType, 'id' | 'label'>
       & { allDeliveryConnection?: Maybe<(
@@ -1972,7 +1974,7 @@ export type GetWorkspaceCampaignQuery = (
             & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
           )>, events: Array<(
             { __typename?: 'DeliveryEventType' }
-            & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status'>
+            & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status' | 'failureMessage'>
           )> }
         )>, pageInfo: (
           { __typename?: 'PaginationPageInfo' }
@@ -1980,9 +1982,19 @@ export type GetWorkspaceCampaignQuery = (
         ) }
       )>, variants: Array<(
         { __typename?: 'CampaignVariantType' }
-        & Pick<CampaignVariantType, 'id' | 'label'>
+        & Pick<CampaignVariantType, 'id' | 'label' | 'from' | 'type' | 'weight' | 'body'>
+        & { customVariables?: Maybe<Array<(
+          { __typename?: 'CampaignVariantCustomVariableType' }
+          & Pick<CampaignVariantCustomVariableType, 'id' | 'key'>
+        )>>, dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'id' | 'title'>
+        )>, workspace?: Maybe<(
+          { __typename?: 'Customer' }
+          & Pick<Customer, 'id'>
+        )> }
       )> }
-    ) }
+    )> }
   )> }
 );
 
@@ -2058,6 +2070,57 @@ export type DuplicateQuestionMutation = (
   )> }
 );
 
+export type GetDialogueStatisticsQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+  dialogueSlug: Scalars['String'];
+  prevDateFilter?: Maybe<DialogueFilterInputType>;
+  statisticsDateFilter?: Maybe<DialogueFilterInputType>;
+}>;
+
+
+export type GetDialogueStatisticsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'title'>
+      & { thisWeekAverageScore: Dialogue['averageScore'], previousScore: Dialogue['averageScore'] }
+      & { sessions: Array<(
+        { __typename?: 'Session' }
+        & Pick<Session, 'id' | 'createdAt' | 'score'>
+        & { nodeEntries: Array<(
+          { __typename?: 'NodeEntry' }
+          & { relatedNode?: Maybe<(
+            { __typename?: 'QuestionNode' }
+            & Pick<QuestionNode, 'title' | 'type'>
+          )>, value?: Maybe<(
+            { __typename?: 'NodeEntryValue' }
+            & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'linkNodeEntry'>
+          )> }
+        )> }
+      )>, statistics?: Maybe<(
+        { __typename?: 'DialogueStatistics' }
+        & Pick<DialogueStatistics, 'nrInteractions'>
+        & { topPositivePath?: Maybe<Array<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'answer' | 'quantity' | 'basicSentiment'>
+        )>>, mostPopularPath?: Maybe<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'answer' | 'quantity' | 'basicSentiment'>
+        )>, topNegativePath?: Maybe<Array<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'quantity' | 'answer' | 'basicSentiment'>
+        )>>, history?: Maybe<Array<(
+          { __typename?: 'lineChartDataType' }
+          & Pick<LineChartDataType, 'x' | 'y'>
+        )>> }
+      )> }
+    )> }
+  )> }
+);
+
 export type RequestInviteMutationVariables = Exact<{
   input?: Maybe<RequestInviteInput>;
 }>;
@@ -2069,6 +2132,47 @@ export type RequestInviteMutation = (
     { __typename?: 'RequestInviteOutput' }
     & Pick<RequestInviteOutput, 'didInvite' | 'userExists'>
   ) }
+);
+
+export type GetRolesQueryVariables = Exact<{
+  id?: Maybe<Scalars['ID']>;
+}>;
+
+
+export type GetRolesQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { roles?: Maybe<Array<(
+      { __typename?: 'RoleType' }
+      & Pick<RoleType, 'id' | 'name'>
+    )>> }
+  )> }
+);
+
+export type GetUserCustomerFromCustomerQueryVariables = Exact<{
+  id: Scalars['ID'];
+  userId: Scalars['String'];
+}>;
+
+
+export type GetUserCustomerFromCustomerQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { userCustomer?: Maybe<(
+      { __typename?: 'UserCustomer' }
+      & { user: (
+        { __typename?: 'UserType' }
+        & Pick<UserType, 'id' | 'email' | 'phone' | 'firstName' | 'lastName'>
+      ), role: (
+        { __typename?: 'RoleType' }
+        & Pick<RoleType, 'name' | 'id'>
+      ) }
+    )> }
+  )> }
 );
 
 
@@ -2581,6 +2685,7 @@ export const GetWorkspaceCampaignDocument = gql`
             id
             createdAt
             status
+            failureMessage
           }
         }
         pageInfo {
@@ -2590,6 +2695,21 @@ export const GetWorkspaceCampaignDocument = gql`
       variants {
         id
         label
+        from
+        type
+        weight
+        body
+        customVariables {
+          id
+          key
+        }
+        dialogue {
+          id
+          title
+        }
+        workspace {
+          id
+        }
       }
     }
   }
@@ -2797,6 +2917,93 @@ export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOp
 export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
 export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
 export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
+export const GetDialogueStatisticsDocument = gql`
+    query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
+  customer(slug: $customerSlug) {
+    id
+    dialogue(where: {slug: $dialogueSlug}) {
+      id
+      title
+      thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
+      previousScore: averageScore(input: $prevDateFilter)
+      sessions(take: 3) {
+        id
+        createdAt
+        score
+        nodeEntries {
+          relatedNode {
+            title
+            type
+          }
+          value {
+            sliderNodeEntry
+            textboxNodeEntry
+            registrationNodeEntry
+            choiceNodeEntry
+            linkNodeEntry
+          }
+        }
+      }
+      statistics(input: $statisticsDateFilter) {
+        nrInteractions
+        topPositivePath {
+          answer
+          quantity
+          basicSentiment
+        }
+        mostPopularPath {
+          answer
+          quantity
+          basicSentiment
+        }
+        topNegativePath {
+          quantity
+          answer
+          basicSentiment
+        }
+        history {
+          x
+          y
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDialogueStatisticsQuery__
+ *
+ * To run a query within a React component, call `useGetDialogueStatisticsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDialogueStatisticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDialogueStatisticsQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      dialogueSlug: // value for 'dialogueSlug'
+ *      prevDateFilter: // value for 'prevDateFilter'
+ *      statisticsDateFilter: // value for 'statisticsDateFilter'
+ *   },
+ * });
+ */
+export function useGetDialogueStatisticsQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>(GetDialogueStatisticsDocument, options);
+      }
+export function useGetDialogueStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>(GetDialogueStatisticsDocument, options);
+        }
+export type GetDialogueStatisticsQueryHookResult = ReturnType<typeof useGetDialogueStatisticsQuery>;
+export type GetDialogueStatisticsLazyQueryHookResult = ReturnType<typeof useGetDialogueStatisticsLazyQuery>;
+export type GetDialogueStatisticsQueryResult = Apollo.QueryResult<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>;
+export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatisticsQueryVariables) {
+      return { query: GetDialogueStatisticsDocument, variables: variables }
+    }
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {
@@ -2831,3 +3038,97 @@ export function useRequestInviteMutation(baseOptions?: Apollo.MutationHookOption
 export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInviteMutation>;
 export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
 export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;
+export const GetRolesDocument = gql`
+    query GetRoles($id: ID) {
+  customer(id: $id) {
+    id
+    roles {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetRolesQuery__
+ *
+ * To run a query within a React component, call `useGetRolesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetRolesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetRolesQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetRolesQuery(baseOptions?: Apollo.QueryHookOptions<GetRolesQuery, GetRolesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetRolesQuery, GetRolesQueryVariables>(GetRolesDocument, options);
+      }
+export function useGetRolesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetRolesQuery, GetRolesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetRolesQuery, GetRolesQueryVariables>(GetRolesDocument, options);
+        }
+export type GetRolesQueryHookResult = ReturnType<typeof useGetRolesQuery>;
+export type GetRolesLazyQueryHookResult = ReturnType<typeof useGetRolesLazyQuery>;
+export type GetRolesQueryResult = Apollo.QueryResult<GetRolesQuery, GetRolesQueryVariables>;
+export function refetchGetRolesQuery(variables?: GetRolesQueryVariables) {
+      return { query: GetRolesDocument, variables: variables }
+    }
+export const GetUserCustomerFromCustomerDocument = gql`
+    query GetUserCustomerFromCustomer($id: ID!, $userId: String!) {
+  customer(id: $id) {
+    id
+    userCustomer(userId: $userId) {
+      user {
+        id
+        email
+        phone
+        firstName
+        lastName
+      }
+      role {
+        name
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserCustomerFromCustomerQuery__
+ *
+ * To run a query within a React component, call `useGetUserCustomerFromCustomerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserCustomerFromCustomerQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserCustomerFromCustomerQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserCustomerFromCustomerQuery(baseOptions: Apollo.QueryHookOptions<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>(GetUserCustomerFromCustomerDocument, options);
+      }
+export function useGetUserCustomerFromCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>(GetUserCustomerFromCustomerDocument, options);
+        }
+export type GetUserCustomerFromCustomerQueryHookResult = ReturnType<typeof useGetUserCustomerFromCustomerQuery>;
+export type GetUserCustomerFromCustomerLazyQueryHookResult = ReturnType<typeof useGetUserCustomerFromCustomerLazyQuery>;
+export type GetUserCustomerFromCustomerQueryResult = Apollo.QueryResult<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>;
+export function refetchGetUserCustomerFromCustomerQuery(variables?: GetUserCustomerFromCustomerQueryVariables) {
+      return { query: GetUserCustomerFromCustomerDocument, variables: variables }
+    }
