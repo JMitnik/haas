@@ -26,6 +26,7 @@ import CustomerProvider from 'providers/CustomerProvider';
 import CustomerRoute from 'components/Routes/CustomerRoute';
 import CustomersPage from 'pages/dashboard/customers';
 import DashboardPage from 'pages/dashboard';
+import DeprecatedInteractionsOverview from 'views/InteractionsOverview/DeprecatedInteractionsOverview';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
@@ -40,7 +41,6 @@ import FirstTimePage from 'pages/dashboard/first_time';
 import GlobalLoader from 'components/GlobalLoader';
 import GlobalStyle from 'config/global-styles';
 import GuardedRoute from 'components/Routes/GuardedRoute';
-import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import InviteUserView from 'views/UsersOverview/InviteUserView';
 import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
@@ -78,7 +78,7 @@ const CustomerRoutes = () => (
 
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                      render={() => <InteractionsOverview />}
+                      render={() => <DeprecatedInteractionsOverview />}
                     />
 
                     <GuardedRoute

@@ -4,6 +4,7 @@ import {
 import { isPresent } from 'ts-is-present';
 import { sortBy } from 'lodash';
 
+import { offsetPaginate } from '../general/PaginationHelpers';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
 import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
@@ -287,7 +288,34 @@ class SessionService {
     return sorted;
   }
 
-  static getSessionConnection = async (
+  getSessionConnection = async (
+    dialogueId: string,
+    filter?: NexusGenInputs['SessionConnectionFilterInput']
+  ): Promise<NexusGenFieldTypes['SessionConnection'] | null> => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const sessions = await this.sessionPrismaAdapter.findSessions(dialogueId, filter);
+    const totalSessions = await this.sessionPrismaAdapter.countSessions(dialogueId, filter);
+
+    const {
+      totalPages, hasPrevPage, hasNextPage, nextPageOffset, pageIndex, prevPageOffset
+    } = offsetPaginate(totalSessions, offset, perPage);
+
+    return {
+      sessions,
+      totalPages,
+      pageInfo: {
+        hasPrevPage,
+        hasNextPage,
+        prevPageOffset,
+        nextPageOffset,
+        pageIndex
+      }
+    };
+  };
+
+  static deprecatedGetSessionConnection = async (
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
   ): Promise<NexusGenRootTypes['SessionConnection']> => {

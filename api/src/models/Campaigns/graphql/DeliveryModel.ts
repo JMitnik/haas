@@ -48,7 +48,7 @@ export const DeliveryConnectionModel = objectType({
   name: 'DeliveryConnectionType',
 
   definition(t) {
-    t.implements('ConnectionInterface');
+    t.implements('DeprecatedConnectionInterface');
     t.list.field('deliveries', { type: DeliveryModel });
     t.int('nrTotal');
     t.int('nrSent');

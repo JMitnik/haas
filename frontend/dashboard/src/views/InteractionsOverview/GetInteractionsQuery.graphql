@@ -1,0 +1,29 @@
+query GetInteractionsQuery(
+    $customerSlug: String,
+    $dialogueSlug: String,
+    $sessionsFilter: SessionConnectionFilterInput
+) {
+  customer(slug: $customerSlug) {
+    id
+    dialogue(where: { slug: $dialogueSlug }) {
+      id
+      sessionConnection(filter: $sessionsFilter) {
+        sessions {
+            id
+            createdAt
+            paths
+        }
+
+        totalPages
+
+        pageInfo {
+            hasPrevPage
+            hasNextPage
+            pageIndex
+            nextPageOffset
+            prevPageOffset
+        }
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@ import * as AuthAPI from '../models/auth/Auth';
 import * as AutodeckAPI from '../models/autodeck/Autodeck';
 import * as CampaignAPI from '../models/Campaigns';
 import * as DebugAPI from '../models/debug/Debug';
-import * as InteractionAPI from '../models/session/Session';
+import * as InteractionAPI from '../models/session/graphql';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import * as QuestionNodeAPI from '../models/QuestionNode';

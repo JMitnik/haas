@@ -293,7 +293,7 @@ export const AutodeckConnectionModel = objectType({
   name: 'AutodeckConnectionType',
 
   definition(t) {
-    t.implements('ConnectionInterface');
+    t.implements('DeprecatedConnectionInterface');
     t.list.field('jobs', { type: CreateWorkspaceJobType });
   }
 });

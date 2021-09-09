@@ -1,7 +1,41 @@
-import { PrismaClient, Session } from "@prisma/client";
+import { Prisma, PrismaClient, Session } from "@prisma/client";
+import { NexusGenFieldTypes, NexusGenInputNames, NexusGenInputs } from "../../generated/nexus";
 
 import NodeEntryService from "../node-entry/NodeEntryService";
 import { CreateSessionInput } from "./SessionPrismaAdapterType";
+
+const constructSessionFilter = (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput']) => {
+  return Prisma.validator<Prisma.SessionWhereInput>()({
+    dialogueId: dialogueId,
+    createdAt: {
+      gte: filter?.startDate ? new Date(filter.startDate) : undefined,
+      lte: filter?.endDate ? new Date(filter.endDate) : undefined,
+    },
+    AND: filter?.search ? [{
+      OR: [
+        {
+          nodeEntries: {
+            some: {
+              choiceNodeEntry: { value: { contains: filter.search } },
+            }
+          }
+        },
+        {
+          delivery: {
+            OR: [
+              {
+                deliveryRecipientFirstName: { contains: filter.search, mode: 'insensitive' }
+              },
+              {
+                deliveryRecipientLastName: { contains: filter.search, mode: 'insensitive' }
+              },
+            ] || []
+          }
+        }
+      ]
+    }] : undefined,
+  })
+}
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;
@@ -9,6 +43,25 @@ class SessionPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  findSessions = async (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput']) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const sessions = await this.prisma.session.findMany({
+      where: constructSessionFilter(dialogueId, filter),
+      skip: offset,
+      take: perPage,
+    });
+
+    return sessions;
+  }
+
+  countSessions = async (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput']) => {
+    return await this.prisma.session.count({
+      where: constructSessionFilter(dialogueId, filter),
+    });
+  }
 
   updateDelivery(sessionId: string, deliveryId: string) {
     return this.prisma.session.update({
