@@ -10,6 +10,7 @@ import { AppContainer } from 'styles/AppStyles';
 import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DefaultThemeProviders } from 'providers/ThemeProvider';
 import { DialogueProvider } from 'providers/DialogueProvider';
+import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/globalTypes';
 import ActionsPage from 'pages/dashboard/actions';
@@ -26,7 +27,6 @@ import CustomerProvider from 'providers/CustomerProvider';
 import CustomerRoute from 'components/Routes/CustomerRoute';
 import CustomersPage from 'pages/dashboard/customers';
 import DashboardPage from 'pages/dashboard';
-import DeprecatedInteractionsOverview from 'views/InteractionsOverview/DeprecatedInteractionsOverview';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
@@ -78,7 +78,7 @@ const CustomerRoutes = () => (
 
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                      render={() => <DeprecatedInteractionsOverview />}
+                      render={() => <InteractionsOverview />}
                     />
 
                     <GuardedRoute

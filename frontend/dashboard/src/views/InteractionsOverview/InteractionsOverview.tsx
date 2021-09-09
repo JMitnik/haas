@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable radix */
 import * as UI from '@haas/ui';
@@ -9,19 +10,18 @@ import { Icon } from '@chakra-ui/core';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/client';
 import { useLocation, useParams } from 'react-router';
+import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
 import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import {
-  getDialogueSessionConnection as CustomerSessionConnection,
-  getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions as Session,
-} from 'queries/__generated__/getDialogueSessionConnection';
-import {
+  CompactEntriesPath,
   EntryBreadCrumbContainer,
   NodeTypeIcon,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
-import { NodeEntry, QuestionNodeTypeEnum } from 'types/generated-types';
+import { NodeEntry, QuestionNodeTypeEnum, Session, SessionFragmentFragment, useGetInteractionsQueryQuery } from 'types/generated-types';
 import DatePicker from 'components/DatePicker/DatePicker';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
@@ -37,15 +37,16 @@ import {
 } from './InteractionOverviewStyles';
 
 interface TableProps {
-  activeStartDate: Date | null;
-  activeEndDate: Date | null;
-  activeSearchTerm: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  search: string;
   pageIndex: number;
-  pageSize: number;
+  perPage: number;
   sortBy: {
     by: string;
     desc: boolean;
-  }[]
+  }[];
+  totalPages: number;
 }
 
 const tableHeaders = [
@@ -195,109 +196,91 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
   );
 };
 
-const DeprecatedInteractionsOverview = () => {
-  const { dialogueSlug, customerSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
-  const [fetchInteractions, { data, loading }] = useLazyQuery<CustomerSessionConnection>(
-    getDialogueSessionConnectionQuery, {
-      fetchPolicy: 'cache-and-network',
-    },
-  );
-
-  const handleExportCSV = (sessions: Array<Session> | undefined, customerSlug: string, dialogueSlug: string) => {
-    if (!sessions) return;
-    const mappedSessions = sessions.map((session) => {
-      const { createdAt, nodeEntries } = session;
-      const mappedNodeEntries = nodeEntries.map((entry, index) => {
-        const { relatedNode, value } = entry;
-        const entryAnswer = value?.choiceNodeEntry
-          || value?.linkNodeEntry
-          || value?.registrationNodeEntry
-          || value?.formNodeEntry
-          || value?.sliderNodeEntry
-          || value?.textboxNodeEntry;
-        return { [`depth${index}-title`]: relatedNode?.title, [`depth${index}-entry`]: entryAnswer };
-      });
-      const mergedNodeEntries = lodash.reduce(mappedNodeEntries, (prev, entry) => ({ ...prev, ...entry }), { });
-      const date = new Date(parseInt(createdAt));
-      const result = { timestamp: date.toISOString() };
-      const mergedResult = lodash.assign(result, mergedNodeEntries);
-      return mergedResult;
-    });
-
-    const biggestSession = lodash.maxBy(sessions, (session) => session.paths);
-    const headers = Array.from(Array(biggestSession?.paths)).map((entry: any, index) => [`depth${index}-title`, `depth${index}-entry`]);
-    const flattenedHeader = ['timestamp', ...lodash.flatten(headers)];
-
-    const csv = Papa.unparse(mappedSessions, { columns: flattenedHeader });
-    const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const csvUrl = window.URL.createObjectURL(csvData);
-    const tempLink = document.createElement('a');
-    const currDate = new Date().getTime();
-
-    tempLink.href = csvUrl;
-    tempLink.setAttribute('download', `${currDate}-${customerSlug}-${dialogueSlug}.csv`);
-    tempLink.click();
-    tempLink.remove();
-  };
-
-  const [fetchCSVData, { loading: csvLoading }] = useLazyQuery<CustomerSessionConnection>(
-    getDialogueSessionConnectionQuery, {
-      fetchPolicy: 'cache-and-network',
-      onCompleted: (csvData: any) => {
-        const sessions = csvData?.customer?.dialogue?.sessionConnection?.sessions;
-        handleExportCSV(sessions, customerSlug, dialogueSlug);
-      },
-    },
-  );
-
+export const InteractionsOverview = () => {
+  // TODO: Test
+  const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
+  const { dialogueSlug, customerSlug } = useNavigator();
   const location = useLocation();
 
-  const [paginationProps, setPaginationProps] = useState<TableProps>({
-    activeStartDate: null,
-    activeEndDate: null,
-    activeSearchTerm: qs.parse(location.search, { ignoreQueryPrefix: true })?.search?.toString() || '',
+  const [filter, setFilter] = useState<TableProps>({
+    startDate: null,
+    endDate: null,
+    search: qs.parse(location.search, { ignoreQueryPrefix: true })?.search?.toString() || '',
     pageIndex: 0,
-    pageSize: 8,
+    perPage: 8,
     sortBy: [{ by: 'createdAt', desc: true }],
+    totalPages: 0,
   });
 
-  const sessions = data?.customer?.dialogue?.sessionConnection?.sessions || [];
-  useEffect(() => {
-    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
-    fetchInteractions({
-      variables: {
-        dialogueSlug,
-        customerSlug,
-        filter: {
-          startDate: activeStartDate,
-          endDate: activeEndDate,
-          searchTerm: activeSearchTerm,
-          offset: pageIndex * pageSize,
-          limit: pageSize,
-          pageIndex,
-          orderBy: sortBy,
-        },
+  useGetInteractionsQueryQuery({
+    variables: {
+      customerSlug,
+      dialogueSlug,
+      sessionsFilter: {
+        startDate: filter.startDate?.toISOString(),
+        endDate: filter.endDate?.toISOString(),
+        search: filter.search,
       },
-    });
-  }, [paginationProps, fetchInteractions, dialogueSlug, customerSlug]);
+    },
+    onCompleted: (fetchedData) => {
+      setSessions(
+        fetchedData?.customer?.dialogue?.sessionConnection?.sessions || [],
+      );
 
-  const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
-    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm, pageIndex: 0 }));
+      setFilter((filterValues) => ({
+        ...filterValues,
+        totalPages: fetchedData.customer?.dialogue?.sessionConnection?.totalPages || 0,
+      }));
+    },
+  });
+
+  // const [fetchCSVData, { loading: csvLoading }] = useLazyQuery<CustomerSessionConnection>(
+  //   getDialogueSessionConnectionQuery, {
+  //     fetchPolicy: 'cache-and-network',
+  //     onCompleted: (csvData: any) => {
+  //       const sessions = csvData?.customer?.dialogue?.sessionConnection?.sessions;
+  //       handleExportCSV(sessions, customerSlug, dialogueSlug);
+  //     },
+  //   },
+  // );
+
+  // useEffect(() => {
+  //   const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
+  //   fetchInteractions({
+  //     variables: {
+  //       dialogueSlug,
+  //       customerSlug,
+  //       filter: {
+  //         startDate: activeStartDate,
+  //         endDate: activeEndDate,
+  //         searchTerm: activeSearchTerm,
+  //         offset: pageIndex * pageSize,
+  //         limit: pageSize,
+  //         pageIndex,
+  //         orderBy: sortBy,
+  //       },
+  //     },
+  //   });
+  // }, [paginationProps, fetchInteractions, dialogueSlug, customerSlug]);
+
+  const handleSearchTermChange = useCallback(debounce((search: string) => {
+    setFilter((prevValues) => ({
+      ...prevValues,
+      search,
+      pageIndex: 0,
+    }));
   }, 250), []);
 
   const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
-    setPaginationProps((prevValues) => ({
+    setFilter((prevValues) => ({
       ...prevValues,
-      activeStartDate: startDate,
-      activeEndDate: endDate,
+      startDate,
+      endDate,
       pageIndex: 0,
     }));
   }, 250), []);
 
   const { t } = useTranslation();
-
-  const pageCount = data?.customer?.dialogue?.sessionConnection?.pageInfo.nrPages || 1;
-  const pageIndex = data?.customer?.dialogue?.sessionConnection?.pageInfo.pageIndex || 0;
 
   return (
     <>
@@ -309,7 +292,7 @@ const DeprecatedInteractionsOverview = () => {
               {t('views:interactions_view')}
             </ViewTitle>
 
-            <UI.Button
+            {/* <UI.Button
               onClick={() => fetchCSVData({
                 variables: { dialogueSlug, customerSlug },
               })}
@@ -320,17 +303,17 @@ const DeprecatedInteractionsOverview = () => {
               ml={4}
             >
               <Span fontWeight="bold">{t('export_to_csv')}</Span>
-            </UI.Button>
+            </UI.Button> */}
           </UI.Flex>
 
           <Flex alignItems="center">
             <DatePicker
-              activeStartDate={paginationProps.activeStartDate}
-              activeEndDate={paginationProps.activeEndDate}
+              activeStartDate={filter.startDate}
+              activeEndDate={filter.endDate}
               onDateChange={handleDateChange}
             />
             <SearchBar
-              activeSearchTerm={paginationProps.activeSearchTerm}
+              activeSearchTerm={filter.search}
               onSearchTermChange={handleSearchTermChange}
             />
           </Flex>
@@ -338,17 +321,76 @@ const DeprecatedInteractionsOverview = () => {
       </UI.ViewHead>
 
       <UI.ViewBody>
-        <Table
-          loading={loading}
-          headers={tableHeaders}
-          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-          onPaginationChange={setPaginationProps}
-          data={sessions}
-          renderExpandedRowContainer={(input) => <ExpandedInteractionRow data={input} />}
-        />
+        <UI.Div width="100%">
+          <TableHeadingRow gridTemplateColumns="30px 1fr 1fr 1fr 1fr">
+            <UI.Div />
+            <TableHeadingCell>
+              User
+            </TableHeadingCell>
+            <TableHeadingCell>
+              Interaction
+            </TableHeadingCell>
+            <TableHeadingCell>
+              Path
+            </TableHeadingCell>
+            <TableHeadingCell>
+              Delivery
+            </TableHeadingCell>
+          </TableHeadingRow>
+          <UI.Div>
+            {sessions.map((session) => (
+              <TableRow gridTemplateColumns="30px 1fr 1fr 1fr 1fr" key={session.id}>
+                <UI.Div />
+                <TableCell>
+                  {session.score}
+                </TableCell>
+                <TableCell>
+                  {session.createdAt}
+                </TableCell>
+                <TableCell>
+                  <CompactEntriesPath nodeEntries={session.nodeEntries} />
+                </TableCell>
+                <TableCell>
+                  <UI.Label>
+                    {session.delivery?.id}
+                  </UI.Label>
+                </TableCell>
+              </TableRow>
+            ))}
+          </UI.Div>
+        </UI.Div>
       </UI.ViewBody>
     </>
   );
 };
 
-export default DeprecatedInteractionsOverview;
+const TableHeadingRow = styled(UI.Grid)`
+  margin-bottom: 6px;
+`;
+
+const TableRow = styled(UI.Grid)`
+  background: white;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 10px;
+`;
+
+const TableHeadingCell = styled(UI.Div)`
+  ${({ theme }) => css`
+    font-weight: 600;
+    line-height: 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: ${theme.colors.gray[500]};
+  `}
+`;
+
+const TableCell = styled(UI.Div)`
+  font-weight: 600;
+  line-height: 1rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;

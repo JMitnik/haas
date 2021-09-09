@@ -9,19 +9,17 @@ query GetInteractionsQuery(
       id
       sessionConnection(filter: $sessionsFilter) {
         sessions {
-            id
-            createdAt
-            paths
+          ...SessionFragment
         }
 
         totalPages
 
         pageInfo {
-            hasPrevPage
-            hasNextPage
-            pageIndex
-            nextPageOffset
-            prevPageOffset
+          hasPrevPage
+          hasNextPage
+          pageIndex
+          nextPageOffset
+          prevPageOffset
         }
       }
     }

@@ -1,0 +1,17 @@
+fragment SessionFragment on Session {
+  id
+  createdAt
+  paths
+  score
+  originUrl
+  totalTimeInSec
+  device
+
+  nodeEntries {
+    ...NodeEntryFragment
+  }
+
+  delivery {
+    ...DeliveryFragment
+  }
+}

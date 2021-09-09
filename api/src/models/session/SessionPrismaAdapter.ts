@@ -52,6 +52,7 @@ class SessionPrismaAdapter {
       where: constructSessionFilter(dialogueId, filter),
       skip: offset,
       take: perPage,
+      include: { delivery: { include: { campaignVariant: true, } } }
     });
 
     return sessions;
