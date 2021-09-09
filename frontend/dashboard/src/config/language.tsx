@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    delivery_delivered: {
+      en: 'Delivery has arrived',
+      de: 'Lieferung ist angekommen',
+    },
     problem_delivery: {
       en: 'Delivery was failed',
       de: 'Die Lieferung war fehlgeschlagen',
@@ -2099,6 +2103,20 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     dutch: {
       en: 'Dutch',
       de: 'Niederländisch',
+    },
+  },
+  validation: {
+    field_required: {
+      en: 'This field is required.',
+      de: 'Dieses Feld wird benötigt.',
+    },
+    url_not_correct: {
+      en: 'This field should be a URL. Try to remove any strange characters, like spaces.',
+      de: 'Dieses Feld sollte eine URL sein. Versuchen Sie, alle seltsamen Zeichen, wie Leerzeichen, zu entfernen.',
+    },
+    url_extension_format_not_supported: {
+      en: 'URL Extension not supported. Use only letters, digits and - for your url extension. Example: happy-2',
+      de: 'URL-Erweiterung nicht unterstützt. Verwenden Sie nur Zahlen, Ziffern und - für Ihre URL-Erweiterung. Beispiel: Happy-2',
     },
   },
 };

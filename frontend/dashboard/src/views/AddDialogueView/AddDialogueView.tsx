@@ -1,11 +1,11 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
-import {
-  Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea, ViewTitle,
-} from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
+import {
+  Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
+  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea,
+} from '@haas/ui';
 import { Minus, Plus, Type } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/client';
@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import { getCustomers as CustomerData } from 'queries/__generated__/getCustomers';
+import { MATCH_URL_EXTENSION_FORMAT } from 'utils/validationHelpers';
 import { createDialogue } from 'mutations/createDialogue';
 import { motion } from 'framer-motion';
 import { useUser } from 'providers/UserProvider';
@@ -39,7 +40,10 @@ const schema = yup.object({
   title: yup.string().required('Title is required'),
   publicTitle: yup.string().notRequired(),
   description: yup.string().required('Description is required'),
-  slug: yup.string().required('Slug is required'),
+  slug: yup
+    .string()
+    .matches(MATCH_URL_EXTENSION_FORMAT, { message: 'validation:url_extension_format_not_supported' })
+    .required('validation:field_required'),
   languageOption: yup.object().nullable(true).shape(
     { label: yup.string().required(), value: yup.string().required() },
   ).required('Content option is required'),
@@ -60,7 +64,9 @@ const schema = yup.object({
     value: yup.string().notRequired(),
   }).nullable(true)
     .when(['customerOption'], {
-      is: (customerOption: { label: string, value: string } | undefined) => typeof customerOption?.value !== 'undefined',
+      is: (
+        customerOption: { label: string, value: string } | undefined,
+      ) => typeof customerOption?.value !== 'undefined',
       then: yup.object().required().shape({
         label: yup.string().required(),
         value: yup.string().required(),
@@ -230,7 +236,7 @@ const AddDialogueView = () => {
                         name="title"
                         ref={form.register({ required: true })}
                       />
-                      <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                      <UI.ErrorMessage>{t(form.errors.title?.message || '')}</UI.ErrorMessage>
                     </FormControl>
 
                     <FormControl isInvalid={!!form.errors.publicTitle}>
@@ -275,7 +281,7 @@ const AddDialogueView = () => {
                         name="description"
                         ref={form.register({ required: true })}
                       />
-                      <FormErrorMessage>{form.errors.description?.message}</FormErrorMessage>
+                      <UI.ErrorMessage>{t(form.errors.description?.message || '')}</UI.ErrorMessage>
                     </FormControl>
 
                     <FormControl isRequired isInvalid={!!form.errors.slug}>
@@ -283,11 +289,11 @@ const AddDialogueView = () => {
                       <InputHelper>{t('dialogue:slug_helper')}</InputHelper>
                       <Input
                         placeholder="peaches-or-apples"
-                        leftAddOn={`https://client.haas.live/${customerSlug}`}
+                        leftAddOn={`https://client.haas.live/${customerSlug}/`}
                         name="slug"
                         ref={form.register({ required: true })}
                       />
-                      <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
+                      <UI.ErrorMessage>{t(form.errors.slug?.message || '')}</UI.ErrorMessage>
                     </FormControl>
 
                   </InputGrid>

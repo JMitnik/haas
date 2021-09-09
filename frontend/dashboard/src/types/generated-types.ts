@@ -381,7 +381,8 @@ export enum DeliveryStatusEnum {
   Sent = 'SENT',
   Opened = 'OPENED',
   Finished = 'FINISHED',
-  Failed = 'FAILED'
+  Failed = 'FAILED',
+  Delivered = 'DELIVERED'
 }
 
 /** Delivery */

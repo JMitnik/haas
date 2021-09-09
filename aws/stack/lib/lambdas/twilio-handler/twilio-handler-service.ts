@@ -7,6 +7,8 @@ import * as iam from '@aws-cdk/aws-iam';
 import * as sns from '@aws-cdk/aws-sns';
 import * as sqs from '@aws-cdk/aws-sqs';
 import * as snsSubs from '@aws-cdk/aws-sns-subscriptions';
+import * as dynamo from '@aws-cdk/aws-dynamodb';
+import { Duration } from '@aws-cdk/core';
 
 interface TwilioHanderServiceProps {
     accountId: string;
@@ -18,6 +20,8 @@ export class TwilioHandlerService extends core.Construct {
     constructor(scope: core.Construct, id: string, props: TwilioHanderServiceProps) {
         super(scope, id);
         const postApi = new apigateway.RestApi(this, 'handle-twilio-api');
+
+        const dynamoTable = dynamo.Table.fromTableName(this, 'CampaignTable', 'CampaignDeliveries');
 
         // Synchronize the TWILIO_CALLBACK_URL parameter in SSM with the API gateway
         new ssm.StringParameter(this, 'API_URL', {
@@ -47,7 +51,8 @@ export class TwilioHandlerService extends core.Construct {
                 TWILIO_ACCOUNT_SID: twilioSecret.secretValueFromJson('TWILIO_ACCOUNT_SID').toString(),
                 TWILIO_AUTH_TOKEN: twilioSecret.secretValueFromJson('TWILIO_AUTH_TOKEN').toString(),
                 TWILIO_MESSAGE_SERVICE_SID: twilioSecret.secretValueFromJson('TWILIO_MESSAGE_SERVICE_SID').toString(),
-            }
+            },
+            timeout: Duration.seconds(120),
         });
 
         // Wrap lambda in an API-Gateway integration
@@ -89,6 +94,10 @@ export class TwilioHandlerService extends core.Construct {
         // Finally, connect the gateway to the lambda-integrations
         postApi.root.addMethod('GET', senderIntegration);
         postApi.root.addMethod('POST', callbackIntegration);
+
+        // Allow sender to write to table
+        dynamoTable.grantWriteData(senderHandler);
+        dynamoTable.grantWriteData(callbackHandler);
 
         // TODO: Is this URL deterministic? Or is it changed with every
         // deployment? If so, need to consider what happens to existing

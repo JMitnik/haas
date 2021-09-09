@@ -161,8 +161,8 @@ const UsersOverview = () => {
     [],
   );
 
-  const pageCount = data?.userTable?.pageInfo?.nrPages || 1;
-  const pageIndex = data?.userTable?.pageInfo?.pageIndex || 0;
+  const pageCount = data?.customer?.usersConnection?.pageInfo?.nrPages || 1;
+  const pageIndex = data?.customer?.usersConnection?.pageInfo?.pageIndex || 0;
 
   return (
     <>

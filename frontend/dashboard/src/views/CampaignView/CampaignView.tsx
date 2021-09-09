@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AlertTriangle, AtSign, Clock, Eye, Flag, Mail, Plus, Settings, Smartphone } from 'react-feather';
+import { AlertTriangle, AtSign, Clock, Eye, Flag, Inbox, Mail, Plus, Settings, Smartphone } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { format } from 'date-fns';
 import { union } from 'lodash';
@@ -41,8 +41,7 @@ export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
   },
 };
 
-const POLL_INTERVAL_SECONDS = 20;
-const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
+const POLL_INTERVAL_SECONDS = 30;
 
 const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
   const date = new Date(parseInt(scheduledAt, 10));
@@ -112,6 +111,11 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
       );
     }
 
+    case DeliveryStatusEnum.Delivered: {
+      return (
+        <UI.Label variantColor="cyan">{status}</UI.Label>
+      );
+    }
     default: {
       return (
         <UI.Label variantColor="blue">{status}</UI.Label>
@@ -157,7 +161,7 @@ export const CampaignView = () => {
       customerSlug,
       deliveryConnectionFilter: paginationState,
     },
-    pollInterval: POLL_INTERVAL,
+    pollInterval: POLL_INTERVAL_SECONDS,
     onCompleted: (completeData) => setDataCache(completeData),
     onError: (error) => logger.logError(error, {
       tags: { section: 'campaign' },
@@ -435,6 +439,24 @@ export const CampaignView = () => {
                           </UI.Flex>
                         </UI.Div>
                       )}
+
+                      {event?.status === DeliveryStatusEnum.Delivered && (
+                        <UI.Div>
+                          <UI.Flex alignItems="center">
+                            <UI.Div
+                              mr={2}
+                              bg="cyan.200"
+                              padding="5px"
+                              color="cyan.500"
+                              style={{ borderRadius: '100%' }}
+                            >
+                              <Inbox />
+                            </UI.Div>
+                            {t('delivery_delivered')}
+                          </UI.Flex>
+                        </UI.Div>
+                      )}
+
                       {event?.status === DeliveryStatusEnum.Finished && (
                         <UI.Flex alignItems="center">
                           <UI.Div
