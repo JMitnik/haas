@@ -125,7 +125,7 @@ class DialogueService {
       description,
       publicTitle,
       questions: { create: [] },
-      tags: {},
+      tags: { },
     };
 
     if (tags.length) {
@@ -167,7 +167,7 @@ class DialogueService {
       }
     });
 
-    const tagUpdateArgs: any = {};
+    const tagUpdateArgs: any = { };
     if (newTagObjects.length > 0) {
       tagUpdateArgs.connect = newTagObjects;
     };
@@ -399,6 +399,10 @@ class DialogueService {
     if (nodeEntryIds.length > 0) {
       await this.nodeEntryPrismaAdapter.deleteManySliderNodeEntries(nodeEntryIds);
 
+      await this.nodeEntryPrismaAdapter.deleteManyVideoNodeEntries(nodeEntryIds);
+
+      await this.nodeEntryPrismaAdapter.deleteManyFormNodeEntries(nodeEntryIds);
+
       await this.nodeEntryPrismaAdapter.deleteManyTextBoxNodeEntries(nodeEntryIds);
 
       await this.nodeEntryPrismaAdapter.deleteManyRegistrationNodeEntries(nodeEntryIds);
@@ -474,7 +478,7 @@ class DialogueService {
 
     const templateDialogue = await this.dialoguePrismaAdapter.getTemplateDialogue(input.templateId)
 
-    const idMap: IdMapProps = {};
+    const idMap: IdMapProps = { };
     const dialogue = await this.initDialogue(
       customer.id, input.title, input.dialogueSlug, input.description, input.publicTitle, tags, input.language,
     );
@@ -742,7 +746,7 @@ class DialogueService {
       ...currentValue,
     });
 
-    const finalMapping = newMappedQuestions.reduce(reducer, {});
+    const finalMapping = newMappedQuestions.reduce(reducer, { });
     const finalQuestions = questions.map((question) => {
       const matchResult = question.id.match(v4) || [];
       if (matchResult.length > 0) {

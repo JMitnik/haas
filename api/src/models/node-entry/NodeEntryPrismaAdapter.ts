@@ -76,7 +76,11 @@ class NodeEntryPrismaAdapter {
 
     return nodeEntry;
   }
-
+  /**
+   * Deletes all node entries by session id (NOTE: child node entries (e.g. slider, choice) need to be removed before)
+   * @param sessionIds A list of IDs representing the session of which the node entries should be removed
+   * @returns the deleted node entries
+   */
   async deleteManyNodeEntries(sessionIds: string[]): Promise<Prisma.BatchPayload> {
     return this.prisma.nodeEntry.deleteMany({
       where: {
@@ -86,6 +90,18 @@ class NodeEntryPrismaAdapter {
       },
     },
     );
+  };
+
+  async deleteManyFormNodeEntries(nodeEntryIds: string[]): Promise<Prisma.BatchPayload> {
+    return this.prisma.formNodeEntry.deleteMany({
+      where: { nodeEntryId: { in: nodeEntryIds } }
+    });
+  };
+
+  async deleteManyVideoNodeEntries(nodeEntryIds: string[]): Promise<Prisma.BatchPayload> {
+    return this.prisma.videoNodeEntry.deleteMany({
+      where: { nodeEntryId: { in: nodeEntryIds } }
+    });
   };
 
   async deleteManyChoiceNodeEntries(nodeEntryIds: string[]): Promise<Prisma.BatchPayload> {
