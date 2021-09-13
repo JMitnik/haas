@@ -2,43 +2,36 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable radix */
 import * as UI from '@haas/ui';
-import * as lodash from 'lodash';
 import * as qs from 'qs';
-import { Activity, Download, Link, Monitor, User, Watch } from 'react-feather';
-import { Div, Flex, Span, Text, ViewTitle } from '@haas/ui';
-import { Icon } from '@chakra-ui/core';
+import { Activity, Filter } from 'react-feather';
+import { Flex, ViewTitle } from '@haas/ui';
+import {
+  Icon,
+  Popover,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  Radio,
+  RadioGroup,
+  useDisclosure,
+} from '@chakra-ui/core';
 import { debounce } from 'lodash';
-import { useLazyQuery } from '@apollo/client';
-import { useLocation, useParams } from 'react-router';
+import { useLocation } from 'react-router';
 import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
-import Papa from 'papaparse';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import {
   CompactEntriesPath,
-  EntryBreadCrumbContainer,
-  NodeTypeIcon,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
-import { NodeEntry, QuestionNodeTypeEnum, Session, SessionFragmentFragment, useGetInteractionsQueryQuery } from 'types/generated-types';
-import DatePicker from 'components/DatePicker/DatePicker';
+import { Controller, useForm } from 'react-hook-form';
+import { SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery } from 'types/generated-types';
+import { useDateFilter } from 'hooks/useDateFilter';
 import SearchBar from 'components/SearchBar/SearchBar';
-import Table from 'components/Table/Table';
-import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
-
-import { FormNodeEntry } from './FormNodeEntry';
-import {
-  InteractionDateCell, InteractionPathCell,
-  InteractionUserCell, ScoreCell,
-} from './InteractionTableCells';
-import {
-  InteractionDetailQuestionEntry,
-} from './InteractionOverviewStyles';
 
 interface TableProps {
-  startDate: Date | null;
-  endDate: Date | null;
   search: string;
   pageIndex: number;
   perPage: number;
@@ -47,169 +40,43 @@ interface TableProps {
     desc: boolean;
   }[];
   totalPages: number;
+  startDate?: Date;
+  endDate?: Date;
+  filterCampaigns?: SessionDeliveryType | 'all' | null;
+  filterCampaignId?: string | 'all' | null;
 }
 
-const tableHeaders = [
-  { Header: 'user', accessor: 'id', Cell: InteractionUserCell },
-  { Header: 'date', accessor: 'createdAt', Cell: InteractionDateCell },
-  { Header: 'interaction_path', accessor: 'nodeEntries', Cell: InteractionPathCell, disableSorting: true },
-  { Header: 'score', accessor: 'score', Cell: ScoreCell },
-];
+interface CampaignVariant {
+  id: string;
+  label: string;
+}
 
-const FallbackNode = () => (
-  <UI.Div>
-    User kept it empty
-  </UI.Div>
-);
-
-const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
-  if (!entry) return <Div>test</Div>;
-
-  switch (entry.relatedNode?.type) {
-    case QuestionNodeTypeEnum.Slider:
-      return <>{entry.value?.sliderNodeEntry}</>;
-
-    case QuestionNodeTypeEnum.Choice:
-      return <>{entry.value?.choiceNodeEntry}</>;
-
-    case QuestionNodeTypeEnum.VideoEmbedded:
-      return <>{entry.value?.videoNodeEntry}</>;
-
-    case QuestionNodeTypeEnum.Registration:
-      return <>{entry.value?.registrationNodeEntry}</>;
-
-    case QuestionNodeTypeEnum.Textbox:
-      return <>{entry.value?.textboxNodeEntry}</>;
-
-    case QuestionNodeTypeEnum.Form:
-      if (!entry.value?.formNodeEntry) return <FallbackNode />;
-      return (
-        <FormNodeEntry nodeEntry={entry.value?.formNodeEntry} />
-      );
-
-    default:
-      return (<>N/A available</>);
+const undefinedToNull = (value: any) => {
+  if (value === undefined) {
+    return 'all';
   }
-};
 
-const ExpandedInteractionRow = ({ data }: { data: any }) => {
-  const { t } = useTranslation();
-
-  return (
-    <Div useFlex flexDirection="column" backgroundColor="gray.100" gridColumn="1 / -1">
-      <Div padding={25}>
-        <Div marginBottom={10} useFlex flexDirection="column">
-          <Div useFlex flexDirection="row">
-            <Div width="51%">
-              <Text color="gray.400" fontSize="1.2rem" fontWeight="600">{t('interactions:user_data')}</Text>
-            </Div>
-          </Div>
-          <UI.Div pt={4}>
-            <UI.Stack isInline spacing={4}>
-              {data.delivery && (
-                <UI.Div>
-                  <UI.Helper>{t('delivery_recipient')}</UI.Helper>
-                  <UI.Label size="sm" mt={1} variantColor="cyan">
-                    <UI.Icon mr={2}><User width="0.8rem" /></UI.Icon>
-                    {data.delivery.deliveryRecipientFirstName}
-                    {data.delivery.deliveryRecipientLastName}
-                  </UI.Label>
-                </UI.Div>
-              )}
-              {data.device && (
-                <UI.Div>
-                  <UI.Helper mb={1}>{t('device')}</UI.Helper>
-                  <UI.Label mt={1} size="sm" variantColor="cyan">
-                    <UI.Icon mr={2}><Monitor width="0.8rem" /></UI.Icon>
-                    {data.device}
-                  </UI.Label>
-                </UI.Div>
-              )}
-              {data.totalTimeInSec && (
-                <UI.Div>
-                  <UI.Helper mb={1}>{t('duration')}</UI.Helper>
-                  <UI.Label mt={1} size="sm" variantColor="cyan">
-                    <UI.Icon mr={2}><Watch width="0.8rem" /></UI.Icon>
-                    {data.totalTimeInSec}
-                    {' '}
-                    {t('seconds')}
-                  </UI.Label>
-                </UI.Div>
-              )}
-              {data.originUrl && (
-                <UI.Div>
-                  <UI.Helper>{t('origin_url')}</UI.Helper>
-                  <UI.Label size="sm" mt={1} variantColor="cyan">
-                    <UI.Icon mr={2}><Link width="0.8rem" /></UI.Icon>
-                    {data.originUrl}
-                  </UI.Label>
-                </UI.Div>
-              )}
-            </UI.Stack>
-          </UI.Div>
-        </Div>
-        <UI.Hr />
-        <Div position="relative" useFlex flexDirection="row">
-          <InteractionDetailQuestionEntry useFlex flexDirection="column">
-            {/* TODO: Make each mapped entry an individual component */}
-            {data.nodeEntries.map((nodeEntry: any, index: any) => {
-              const { id, relatedNode, value } = nodeEntry;
-
-              return (
-                <Div marginBottom={20} useFlex flexDirection="column" key={`${id}-${index}`}>
-                  <Div useFlex flexDirection="row">
-                    <EntryBreadCrumbContainer
-                      pr={3}
-                      zIndex={10 - index}
-                      margin={0}
-                      height={40}
-                      score={relatedNode?.type === 'SLIDER' ? value?.sliderNodeEntry : null}
-                    >
-                      <NodeTypeIcon node={relatedNode} />
-                    </EntryBreadCrumbContainer>
-                    <Div maxWidth={[300, 400, 500, 700]} ml={2} useFlex flexDirection="column">
-                      <Div>
-                        <Text fontWeight="300" color="gray.500" fontSize="0.8rem">{t('interactions:you_asked')}</Text>
-                        <Text fontWeight="600" color="gray.500" fontSize="0.8rem">{relatedNode?.title || 'N/A'}</Text>
-                      </Div>
-                      <Div mt={4}>
-                        <Text
-                          fontWeight="300"
-                          color="gray.500"
-                          fontSize="0.8rem"
-                        >
-                          {t('interactions:they_answered')}
-                        </Text>
-                        <Text fontWeight="600" color="gray.500" fontSize="0.8rem">
-                          <InteractionTableValue entry={nodeEntry} />
-                        </Text>
-                      </Div>
-                    </Div>
-                  </Div>
-                </Div>
-              );
-            })}
-          </InteractionDetailQuestionEntry>
-        </Div>
-      </Div>
-    </Div>
-  );
+  return value;
 };
 
 export const InteractionsOverview = () => {
-  // TODO: Test
-  const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
+  const { t } = useTranslation();
   const { dialogueSlug, customerSlug } = useNavigator();
   const location = useLocation();
 
+  const [campaignVariants, setCampaignVariants] = useState<CampaignVariant[]>([]);
+  const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
+  const { startDate, endDate, setDate } = useDateFilter({});
   const [filter, setFilter] = useState<TableProps>({
-    startDate: null,
-    endDate: null,
+    startDate,
+    endDate,
     search: qs.parse(location.search, { ignoreQueryPrefix: true })?.search?.toString() || '',
     pageIndex: 0,
     perPage: 8,
     sortBy: [{ by: 'createdAt', desc: true }],
     totalPages: 0,
+    filterCampaigns: 'all',
+    filterCampaignId: 'all',
   });
 
   useGetInteractionsQueryQuery({
@@ -217,12 +84,18 @@ export const InteractionsOverview = () => {
       customerSlug,
       dialogueSlug,
       sessionsFilter: {
-        startDate: filter.startDate?.toISOString(),
-        endDate: filter.endDate?.toISOString(),
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
         search: filter.search,
+        deliveryType: filter.filterCampaigns === 'all' ? undefined : filter.filterCampaigns,
+        campaignVariantId: filter.filterCampaignId === 'all' ? undefined : filter.filterCampaignId,
       },
     },
     onCompleted: (fetchedData) => {
+      setCampaignVariants(
+        fetchedData?.customer?.dialogue?.campaignVariants || [],
+      );
+
       setSessions(
         fetchedData?.customer?.dialogue?.sessionConnection?.sessions || [],
       );
@@ -244,24 +117,13 @@ export const InteractionsOverview = () => {
   //   },
   // );
 
-  // useEffect(() => {
-  //   const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
-  //   fetchInteractions({
-  //     variables: {
-  //       dialogueSlug,
-  //       customerSlug,
-  //       filter: {
-  //         startDate: activeStartDate,
-  //         endDate: activeEndDate,
-  //         searchTerm: activeSearchTerm,
-  //         offset: pageIndex * pageSize,
-  //         limit: pageSize,
-  //         pageIndex,
-  //         orderBy: sortBy,
-  //       },
-  //     },
-  //   });
-  // }, [paginationProps, fetchInteractions, dialogueSlug, customerSlug]);
+  const handleCampaignVariantFilterChange = (filterValues: CampaignVariantFormProps) => {
+    setFilter({
+      ...filter,
+      filterCampaigns: filterValues.filterCampaigns as SessionDeliveryType,
+      filterCampaignId: filterValues.filterCampaignVariant,
+    });
+  };
 
   const handleSearchTermChange = useCallback(debounce((search: string) => {
     setFilter((prevValues) => ({
@@ -270,17 +132,6 @@ export const InteractionsOverview = () => {
       pageIndex: 0,
     }));
   }, 250), []);
-
-  const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
-    setFilter((prevValues) => ({
-      ...prevValues,
-      startDate,
-      endDate,
-      pageIndex: 0,
-    }));
-  }, 250), []);
-
-  const { t } = useTranslation();
 
   return (
     <>
@@ -291,27 +142,9 @@ export const InteractionsOverview = () => {
               <Icon as={Activity} mr={1} />
               {t('views:interactions_view')}
             </ViewTitle>
-
-            {/* <UI.Button
-              onClick={() => fetchCSVData({
-                variables: { dialogueSlug, customerSlug },
-              })}
-              leftIcon={Download}
-              isDisabled={csvLoading}
-              size="sm"
-              variantColor="teal"
-              ml={4}
-            >
-              <Span fontWeight="bold">{t('export_to_csv')}</Span>
-            </UI.Button> */}
           </UI.Flex>
 
           <Flex alignItems="center">
-            <DatePicker
-              activeStartDate={filter.startDate}
-              activeEndDate={filter.endDate}
-              onDateChange={handleDateChange}
-            />
             <SearchBar
               activeSearchTerm={filter.search}
               onSearchTermChange={handleSearchTermChange}
@@ -321,6 +154,25 @@ export const InteractionsOverview = () => {
       </UI.ViewHead>
 
       <UI.ViewBody>
+        <UI.Flex mb={4} justifyContent="flex-end">
+          <UI.Stack isInline spacing={4} alignItems="center">
+            <UI.Div>
+              <UI.DatePicker
+                onChange={setDate}
+                range
+              />
+            </UI.Div>
+
+            <CampaignVariantPicker
+              defaultValues={{
+                filterCampaignVariant: undefinedToNull(filter.filterCampaignId),
+                filterCampaigns: undefinedToNull(filter.filterCampaigns),
+              }}
+              campaignVariants={campaignVariants}
+              onApply={handleCampaignVariantFilterChange}
+            />
+          </UI.Stack>
+        </UI.Flex>
         <UI.Div width="100%">
           <TableHeadingRow gridTemplateColumns="30px 1fr 1fr 1fr 1fr">
             <UI.Div />
@@ -361,6 +213,162 @@ export const InteractionsOverview = () => {
         </UI.Div>
       </UI.ViewBody>
     </>
+  );
+};
+
+interface PickerContainerProps {
+  isActive?: boolean;
+}
+
+const PickerContainer = styled(UI.Div)<PickerContainerProps>`
+  ${({ theme, isActive }) => css`
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+    border: none;
+    padding: 6px 10px;
+    font-weight: 700;
+    color: ${theme.colors.gray[500]};
+
+    ${UI.Span} {
+      padding-right: ${theme.gutter / 3}px;
+    }
+
+    ${UI.Icon} {
+      padding-left: ${theme.gutter / 3}px;
+      border-left: 1px solid ${theme.colors.gray[200]};
+      color: ${theme.colors.gray[500]};
+
+      ${isActive && css`
+        color: ${theme.colors.blue[500]};
+      `}
+    }
+  `}
+`;
+
+interface CampaignVariantFormProps {
+  filterCampaigns?: string;
+  filterCampaignVariant?: string;
+}
+
+interface CampaignVariantPickerProps {
+  defaultValues: CampaignVariantFormProps;
+  campaignVariants: CampaignVariant[];
+  onApply: (filterValues: CampaignVariantFormProps) => void;
+}
+
+const CampaignVariantPicker = ({ defaultValues, campaignVariants, onApply }: CampaignVariantPickerProps) => {
+  const { onOpen, onClose, isOpen } = useDisclosure();
+
+  const handleSave = (filterValues: CampaignVariantFormProps) => {
+    onApply(filterValues);
+    onClose();
+  };
+
+  const isActive = defaultValues.filterCampaignVariant !== 'all' || defaultValues.filterCampaigns !== 'all';
+
+  return (
+    <Popover
+      usePortal
+      isOpen={isOpen}
+      onOpen={onOpen}
+      closeOnBlur={false}
+      onClose={onClose}
+    >
+      <PopoverTrigger>
+        <PickerContainer isActive={isActive}>
+          <UI.Span>
+            Filter campaigns
+          </UI.Span>
+          <UI.Icon>
+            <Filter />
+          </UI.Icon>
+        </PickerContainer>
+      </PopoverTrigger>
+      <PopoverContent
+        zIndex={300}
+        borderWidth={0}
+        borderRadius={10}
+        boxShadow="0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important"
+      >
+        <PopoverHeader>
+          <UI.Helper>
+            Filter campaigns
+          </UI.Helper>
+        </PopoverHeader>
+        <PopoverCloseButton />
+
+        <FilterByCampaignForm
+          defaultValues={defaultValues}
+          onApply={handleSave}
+          campaignVariants={campaignVariants}
+        />
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+interface FilterByCampaignFormProps {
+  defaultValues: CampaignVariantFormProps;
+  campaignVariants: CampaignVariant[];
+  onApply: (filterValues: CampaignVariantFormProps) => void;
+}
+
+const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: FilterByCampaignFormProps) => {
+  const form = useForm<CampaignVariantFormProps>({
+    defaultValues: {
+      filterCampaignVariant: defaultValues.filterCampaignVariant,
+      filterCampaigns: defaultValues.filterCampaigns as SessionDeliveryType,
+    },
+  });
+
+  const filterCampaignWatch = form.watch('filterCampaigns');
+
+  const handleSubmit = () => {
+    onApply(form.getValues());
+  };
+
+  return (
+    <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
+      <UI.Div py={2} px={2}>
+        Filter campaign types
+        <Controller
+          control={form.control}
+          name="filterCampaigns"
+          defaultValue={defaultValues.filterCampaigns}
+          render={({ onChange, value }) => (
+            <RadioGroup size="sm" onChange={onChange} value={value}>
+              <Radio value="all" mb={0}>All</Radio>
+              <Radio value={SessionDeliveryType.Campaigns} mb={0}>Only campaigns</Radio>
+              <Radio value={SessionDeliveryType.NoCampaigns} mb={0}>Only non-campaigns</Radio>
+            </RadioGroup>
+          )}
+        />
+
+        {filterCampaignWatch !== SessionDeliveryType.NoCampaigns && (
+        <UI.Div mt={2}>
+          Pick campaign
+          <Controller
+            control={form.control}
+            name="filterCampaignVariant"
+            defaultValue={defaultValues.filterCampaignVariant}
+            render={({ onChange, value }) => (
+              <RadioGroup size="sm" onChange={onChange} value={value}>
+                <Radio value="all" mb={0}>All</Radio>
+                {campaignVariants.map((variant) => (
+                  <Radio key={variant.id} value={variant.id} mb={0}>{variant.label}</Radio>
+                ))}
+              </RadioGroup>
+            )}
+          />
+        </UI.Div>
+        )}
+      </UI.Div>
+
+      <UI.Button type="submit" variantColor="teal" size="sm" ml={2} mb={4}>Apply filters</UI.Button>
+    </UI.Form>
   );
 };
 

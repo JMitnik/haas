@@ -441,6 +441,7 @@ export type Dialogue = {
   questions: Array<QuestionNode>;
   sessions: Array<Session>;
   leafs: Array<QuestionNode>;
+  campaignVariants: Array<CampaignVariantType>;
 };
 
 
@@ -1497,6 +1498,9 @@ export type SessionConnectionFilterInput = {
   search?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
+  deliveryType?: Maybe<SessionDeliveryType>;
+  scoreRange?: Maybe<SessionScoreRangeFilter>;
+  campaignVariantId?: Maybe<Scalars['String']>;
   orderBy?: Maybe<SessionConnectionOrderByInput>;
   offset?: Maybe<Scalars['Int']>;
   perPage?: Maybe<Scalars['Int']>;
@@ -1504,8 +1508,7 @@ export type SessionConnectionFilterInput = {
 
 /** Fields to order SessionConnection by. */
 export enum SessionConnectionOrder {
-  FirstName = 'firstName',
-  LastName = 'lastName'
+  CreatedAt = 'createdAt'
 }
 
 /** Sorting of sessionConnection */
@@ -1513,6 +1516,12 @@ export type SessionConnectionOrderByInput = {
   by: SessionConnectionOrder;
   desc?: Maybe<Scalars['Boolean']>;
 };
+
+/** Delivery type of session to filter by. */
+export enum SessionDeliveryType {
+  Campaigns = 'campaigns',
+  NoCampaigns = 'noCampaigns'
+}
 
 /** Input for session */
 export type SessionInput = {
@@ -1522,6 +1531,12 @@ export type SessionInput = {
   originUrl?: Maybe<Scalars['String']>;
   device?: Maybe<Scalars['String']>;
   totalTimeInSec?: Maybe<Scalars['Int']>;
+};
+
+/** Scores to filter sessions by. */
+export type SessionScoreRangeFilter = {
+  min?: Maybe<Scalars['Int']>;
+  max?: Maybe<Scalars['Int']>;
 };
 
 export type SessionWhereUniqueInput = {
@@ -1809,6 +1824,10 @@ export type VideoNodeEntryInput = {
 export type DeliveryFragmentFragment = (
   { __typename?: 'DeliveryType' }
   & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName'>
+  & { campaignVariant?: Maybe<(
+    { __typename?: 'CampaignVariantType' }
+    & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
+  )> }
 );
 
 export type NodeEntryFragmentFragment = (
@@ -2219,7 +2238,10 @@ export type GetInteractionsQueryQuery = (
     & { dialogue?: Maybe<(
       { __typename?: 'Dialogue' }
       & Pick<Dialogue, 'id'>
-      & { sessionConnection?: Maybe<(
+      & { campaignVariants: Array<(
+        { __typename?: 'CampaignVariantType' }
+        & Pick<CampaignVariantType, 'id' | 'label'>
+      )>, sessionConnection?: Maybe<(
         { __typename?: 'SessionConnection' }
         & Pick<SessionConnection, 'totalPages'>
         & { sessions: Array<(
@@ -2326,6 +2348,11 @@ export const DeliveryFragmentFragmentDoc = gql`
   id
   deliveryRecipientFirstName
   deliveryRecipientLastName
+  campaignVariant {
+    id
+    label
+    type
+  }
 }
     `;
 export const SessionFragmentFragmentDoc = gql`
@@ -3180,6 +3207,10 @@ export const GetInteractionsQueryDocument = gql`
     id
     dialogue(where: {slug: $dialogueSlug}) {
       id
+      campaignVariants {
+        id
+        label
+      }
       sessionConnection(filter: $sessionsFilter) {
         sessions {
           ...SessionFragment

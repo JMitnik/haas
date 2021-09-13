@@ -64,8 +64,6 @@ export const TableRow = styled.tr<TableRowProps>`
   `}
 `;
 
-export const ModernTable = styled()
-
 export const Table = styled.table<{ isLoading?: boolean }>`
   ${({ theme, isLoading }) => css`
     ${isLoading &&

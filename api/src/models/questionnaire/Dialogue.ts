@@ -228,6 +228,14 @@ export const DialogueType = objectType({
         return ctx.services.dialogueService.getCTAsByDialogueId(parent.id, args.searchTerm);
       },
     });
+
+    t.list.field('campaignVariants', {
+      type: 'CampaignVariantType',
+      // @ts-ignore
+      resolve: (parent, args, ctx) => {
+        return ctx.services.dialogueService.getCampaignVariantsByDialogueId(parent.id);
+      }
+    })
   },
 });
 

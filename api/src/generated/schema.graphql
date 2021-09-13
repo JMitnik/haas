@@ -357,6 +357,7 @@ type DeprecatedPaginationPageInfo {
 
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
+  campaignVariants: [CampaignVariantType!]!
   creationDate: String
   customer: Customer
   customerId: String!
@@ -1039,24 +1040,32 @@ type SessionConnection implements ConnectionInterface {
 }
 
 input SessionConnectionFilterInput {
+  campaignVariantId: String
+  deliveryType: SessionDeliveryType
   endDate: String
   offset: Int
   orderBy: SessionConnectionOrderByInput
   perPage: Int = 10
+  scoreRange: SessionScoreRangeFilter
   search: String
   startDate: String
 }
 
 """Fields to order SessionConnection by."""
 enum SessionConnectionOrder {
-  firstName
-  lastName
+  createdAt
 }
 
 """Sorting of sessionConnection"""
 input SessionConnectionOrderByInput {
   by: SessionConnectionOrder!
   desc: Boolean = true
+}
+
+"""Delivery type of session to filter by."""
+enum SessionDeliveryType {
+  campaigns
+  noCampaigns
 }
 
 """Input for session"""
@@ -1067,6 +1076,12 @@ input SessionInput {
   entries: [NodeEntryInput!]
   originUrl: String
   totalTimeInSec: Int
+}
+
+"""Scores to filter sessions by."""
+input SessionScoreRangeFilter {
+  max: Int
+  min: Int
 }
 
 input SessionWhereUniqueInput {

@@ -785,9 +785,29 @@ interface PureDatePickerProps {
 }
 
 export const DatePickerContainer = styled.div`
-  .ant-picker-panel-container {
-    border-radius: 10px;
-  }
+  ${({ theme }) => css`
+    z-index: 500;
+
+    .ant-picker-range {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+      border: none;
+      padding: 10px 14px;
+    }
+
+    .ant-picker-input input {
+      font-weight: 600;
+      line-height: 1rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: ${theme.colors.gray[500]};
+    }
+
+    .ant-picker-panel-container {
+      border-radius: 10px;
+    }
+  `}
 `;
 
 export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
@@ -810,14 +830,18 @@ export const DatePicker = ({ range, ...restProps }: RangePickerProps | PureDateP
     {range !== undefined ? (
       <RangeDatePickerWrapper
         {...range}
+        format={'dd-MM-yyyy'}
         {...restProps as RangePickerProps}
       />
     ) : (
       <PureDatePickerWrapper
-        {...restProps as PureDatePickerProps} />
+        {...restProps as PureDatePickerProps}
+        format={'dd-MM-yyyy'}
+      />
     )}
   </DatePickerContainer>
-)
+);
+
 export const Switch = styled.div`
   ${({ theme }) => css`
     display: flex;
