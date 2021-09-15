@@ -26,15 +26,6 @@ class PermissionPrismaAdapter {
     });
   };
 
-  async create(data: Prisma.PermissionCreateInput) {
-    return this.prisma.permission.create({
-      data,
-      include: {
-        Customer: true,
-      },
-    });
-  };
-
   async deleteMany(permissionIds: string[]) {
     return this.prisma.permission.deleteMany({
       where: {
