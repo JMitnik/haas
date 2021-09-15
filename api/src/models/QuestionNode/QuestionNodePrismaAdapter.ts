@@ -54,6 +54,7 @@ class QuestionNodePrismaAdapter {
   createSliderNode(data: CreateSliderNodeInput) {
     const { parentNodeId, markers, unhappyText, happyText } = data;
     const mappedMarkers = markers ? markers?.map((marker) => ({
+      id: marker.id || '',
       label: marker.label || '',
       subLabel: marker.subLabel || '',
       range: {
@@ -108,10 +109,10 @@ class QuestionNodePrismaAdapter {
     ]);
   };
 
-  updateSliderNode(parentNodeId: string, data: UpdateSliderNodeInput) {
+  updateSliderNode(id: string, data: UpdateSliderNodeInput) {
     const { happyText, unhappyText, markers } = data;
     return this.prisma.sliderNode.update({
-      where: { id: parentNodeId },
+      where: { id: id },
       data: {
         happyText,
         unhappyText,
