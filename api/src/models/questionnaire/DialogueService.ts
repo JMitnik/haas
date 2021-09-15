@@ -21,6 +21,7 @@ import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
+import { SliderNode } from '../QuestionNode/SliderNode';
 
 
 function getRandomInt(max: number) {
@@ -691,6 +692,26 @@ class DialogueService {
           title: `What do you think about ${customer?.name} ?`,
           type: NodeType.SLIDER,
           isRoot: true,
+          sliderNode: {
+            create: {
+              markers: {
+                create: SliderNode.DEFAULT_MARKERS.map(({ id, label, subLabel, range }) => {
+                  return {
+                    id,
+                    label: label || 'none',
+                    subLabel: subLabel || 'none',
+                    range: {
+                      create: {
+                        id: range?.id,
+                        start: range?.start,
+                        end: range?.end,
+                      }
+                    },
+                  }
+                })
+              },
+            }
+          }
         },
       },
     })
