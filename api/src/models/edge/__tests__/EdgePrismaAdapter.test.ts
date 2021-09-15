@@ -21,6 +21,110 @@ const defaultDialogueCreateInput: Prisma.DialogueCreateInput = {
     },
 };
 
+const setupBasicDialogue = async () => {
+    const dialogue = await prisma.dialogue.create({
+        data: {
+            title: 'dialogue',
+            slug: 'slug',
+            description: 'desc',
+            customer: {
+                create: {
+                    name: 'customerName',
+                    slug: 'customerSlug',
+                },
+            },
+        },
+    });
+
+    const parentQuestionOne = await prisma.questionNode.create({
+        data: {
+            title: 'parentQuestionOne',
+            questionDialogue: {
+                connect: {
+                    id: dialogue.id,
+                },
+            },
+        },
+    });
+
+    const childQuestionOne = await prisma.questionNode.create({
+        data: {
+            title: 'childQuestionOne',
+            questionDialogue: {
+                connect: {
+                    id: dialogue.id,
+                },
+            },
+        },
+    });
+
+    const childQuestionTwo = await prisma.questionNode.create({
+        data: {
+            title: 'childQuestionTwo',
+            questionDialogue: {
+                connect: {
+                    id: dialogue.id,
+                },
+            },
+        },
+    });
+
+    const childQuestionThree = await prisma.questionNode.create({
+        data: {
+            title: 'childQuestionTwo',
+            questionDialogue: {
+                connect: {
+                    id: dialogue.id,
+                },
+            },
+        },
+    });
+
+    const edgeOne = await edgePrismaAdapter.createEdge({
+        parentNodeId: parentQuestionOne.id,
+        childNodeId: childQuestionOne.id,
+        dialogueId: dialogue.id,
+        conditions: [
+            {
+                conditionType: 'match',
+                matchValue: 'edgeOneMatch',
+                renderMax: null,
+                renderMin: null,
+            }
+        ],
+    });
+
+    const edgeTwo = await edgePrismaAdapter.createEdge({
+        parentNodeId: parentQuestionOne.id,
+        childNodeId: childQuestionTwo.id,
+        dialogueId: dialogue.id,
+        conditions: [
+            {
+                conditionType: 'match',
+                matchValue: 'edgeTwoMatch',
+                renderMax: null,
+                renderMin: null,
+            },
+        ],
+    });
+
+    const edgeThree = await edgePrismaAdapter.createEdge({
+        parentNodeId: parentQuestionOne.id,
+        childNodeId: childQuestionThree.id,
+        dialogueId: dialogue.id,
+        conditions: [
+            {
+                conditionType: 'valueBoundary',
+                matchValue: 'edgeThreeValueBoundary',
+                renderMax: 69,
+                renderMin: 96,
+            }
+        ],
+    });
+
+    return { dialogue, parentQuestionOne, childQuestionOne, childQuestionTwo, childQuestionThree, edgeOne, edgeTwo, edgeThree }
+};
+
 
 describe('EdgePrismaAdapter', () => {
     afterEach(async () => {
@@ -29,105 +133,7 @@ describe('EdgePrismaAdapter', () => {
     });
 
     test('Deletes edges by edge IDs', async () => {
-        const dialogue = await prisma.dialogue.create({
-            data: {
-                title: 'dialogue',
-                slug: 'slug',
-                description: 'desc',
-                customer: {
-                    create: {
-                        name: 'customerName',
-                        slug: 'customerSlug',
-                    },
-                },
-            },
-        });
-
-        const parentQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'parentQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionTwo = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionTwo',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionThree = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionTwo',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const edgeOne = await edgePrismaAdapter.createEdge({
-            parentNodeId: parentQuestionOne.id,
-            childNodeId: childQuestionOne.id,
-            dialogueId: dialogue.id,
-            conditions: [
-                {
-                    conditionType: 'match',
-                    matchValue: 'edgeOneMatch',
-                    renderMax: null,
-                    renderMin: null,
-                }
-            ],
-        });
-
-        const edgeTwo = await edgePrismaAdapter.createEdge({
-            parentNodeId: parentQuestionOne.id,
-            childNodeId: childQuestionTwo.id,
-            dialogueId: dialogue.id,
-            conditions: [
-                {
-                    conditionType: 'match',
-                    matchValue: 'edgeTwoMatch',
-                    renderMax: null,
-                    renderMin: null,
-                },
-            ],
-        });
-
-        const edgeThree = await edgePrismaAdapter.createEdge({
-            parentNodeId: parentQuestionOne.id,
-            childNodeId: childQuestionThree.id,
-            dialogueId: dialogue.id,
-            conditions: [
-                {
-                    conditionType: 'valueBoundary',
-                    matchValue: 'edgeThreeValueBoundary',
-                    renderMax: 69,
-                    renderMin: 96,
-                }
-            ],
-        });
+        const { edgeOne, edgeThree, edgeTwo } = await setupBasicDialogue();
 
         await edgePrismaAdapter.deleteMany([edgeOne.id, edgeTwo.id]);
         const targetEdge = await edgePrismaAdapter.getEdgeById(edgeThree.id);
@@ -137,186 +143,16 @@ describe('EdgePrismaAdapter', () => {
     });
 
     test('Finds conditions by edge ID', async () => {
-        const dialogue = await prisma.dialogue.create({
-            data: {
-                title: 'dialogue',
-                slug: 'slug',
-                description: 'desc',
-                customer: {
-                    create: {
-                        name: 'customerName',
-                        slug: 'customerSlug',
-                    },
-                },
-            },
-        });
-
-        const parentQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'parentQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionTwo = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionTwo',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        await edgePrismaAdapter.createEdge({
-            parentNodeId: parentQuestionOne.id,
-            childNodeId: childQuestionOne.id,
-            dialogueId: dialogue.id,
-            conditions: [
-                {
-                    conditionType: 'match',
-                    matchValue: 'edgeOneMatch',
-                    renderMax: null,
-                    renderMin: null,
-                },
-            ],
-        });
-
-        const edgeTwo = await edgePrismaAdapter.createEdge({
-            parentNodeId: parentQuestionOne.id,
-            childNodeId: childQuestionTwo.id,
-            dialogueId: dialogue.id,
-            conditions: [
-                {
-                    conditionType: 'match',
-                    matchValue: 'edgeTwoMatch',
-                    renderMax: null,
-                    renderMin: null,
-                },
-            ],
-        });
+        const { edgeTwo } = await setupBasicDialogue();
 
         const targetConditions = await edgePrismaAdapter.getConditionsById(edgeTwo.id);
         expect(targetConditions).toHaveLength(1);
         expect(targetConditions?.[0]?.conditionType).toBe('match');
+        expect(targetConditions?.[0]?.matchValue).toBe('edgeTwoMatch');
     });
 
     test('Deletes conditions based on edge IDs', async () => {
-        const dialogue = await prisma.dialogue.create({
-            data: {
-                title: 'dialogue',
-                slug: 'slug',
-                description: 'desc',
-                customer: {
-                    create: {
-                        name: 'customerName',
-                        slug: 'customerSlug',
-                    },
-                },
-            },
-        });
-
-        const parentQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'parentQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionTwo = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionTwo',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionThree = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionThree',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const edgeOne = await edgePrismaAdapter.createEdge({
-            parentNodeId: parentQuestionOne.id,
-            childNodeId: childQuestionOne.id,
-            dialogueId: dialogue.id,
-            conditions: [
-                {
-                    conditionType: 'match',
-                    matchValue: 'edgeOneMatch',
-                    renderMax: null,
-                    renderMin: null,
-                },
-            ],
-        });
-
-        const edgeTwo = await edgePrismaAdapter.createEdge({
-            parentNodeId: parentQuestionOne.id,
-            childNodeId: childQuestionTwo.id,
-            dialogueId: dialogue.id,
-            conditions: [
-                {
-                    conditionType: 'match',
-                    matchValue: 'edgeTwoMatch',
-                    renderMax: null,
-                    renderMin: null,
-                },
-            ],
-        });
-
-        const edgeThree = await edgePrismaAdapter.createEdge({
-            parentNodeId: parentQuestionOne.id,
-            childNodeId: childQuestionThree.id,
-            dialogueId: dialogue.id,
-            conditions: [
-                {
-                    conditionType: 'valueBoundary',
-                    matchValue: 'edgeThreeValueBoundary',
-                    renderMax: 69,
-                    renderMin: 96,
-                },
-            ],
-        });
+        const { edgeOne, edgeTwo, edgeThree } = await setupBasicDialogue();
 
         const totalConditions = await prisma.questionCondition.count();
         expect(totalConditions).toBe(3);
@@ -356,41 +192,7 @@ describe('EdgePrismaAdapter', () => {
     });
 
     test('Upserts an edge condition', async () => {
-        const dialogue = await prisma.dialogue.create({
-            data: {
-                title: 'dialogue',
-                slug: 'slug',
-                description: 'desc',
-                customer: {
-                    create: {
-                        name: 'customerName',
-                        slug: 'customerSlug',
-                    },
-                },
-            },
-        });
-
-        const parentQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'parentQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
+        const { dialogue, parentQuestionOne, childQuestionOne } = await setupBasicDialogue();
 
         const edge = await edgePrismaAdapter.createEdge({
             parentNodeId: parentQuestionOne.id,
@@ -438,52 +240,7 @@ describe('EdgePrismaAdapter', () => {
     });
 
     test('Finds edge by edge ID', async () => {
-        const dialogue = await prisma.dialogue.create({
-            data: {
-                title: 'dialogue',
-                slug: 'slug',
-                description: 'desc',
-                customer: {
-                    create: {
-                        name: 'customerName',
-                        slug: 'customerSlug',
-                    }
-                }
-            }
-        })
-
-        const parentQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'parentQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionTwo = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionTwo',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
+        const { parentQuestionOne, childQuestionOne, dialogue, childQuestionTwo } = await setupBasicDialogue();
 
         const edgeOneCuid = cuid();
         await edgePrismaAdapter.createEdge({
@@ -519,52 +276,7 @@ describe('EdgePrismaAdapter', () => {
     });
 
     test('Create an edge based on existing question nodes', async () => {
-        const dialogue = await prisma.dialogue.create({
-            data: {
-                title: 'dialogue',
-                slug: 'slug',
-                description: 'desc',
-                customer: {
-                    create: {
-                        name: 'customerName',
-                        slug: 'customerSlug',
-                    },
-                },
-            },
-        });
-
-        const parentQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'parentQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionOne = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionOne',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
-
-        const childQuestionTwo = await prisma.questionNode.create({
-            data: {
-                title: 'childQuestionTwo',
-                questionDialogue: {
-                    connect: {
-                        id: dialogue.id,
-                    },
-                },
-            },
-        });
+        const { dialogue, parentQuestionOne, childQuestionTwo, childQuestionOne } = await setupBasicDialogue();
 
         await edgePrismaAdapter.createEdge({
             parentNodeId: parentQuestionOne.id,
