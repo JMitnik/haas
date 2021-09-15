@@ -161,7 +161,7 @@ export const CampaignView = () => {
       customerSlug,
       deliveryConnectionFilter: paginationState,
     },
-    pollInterval: POLL_INTERVAL_SECONDS,
+    pollInterval: POLL_INTERVAL_SECONDS * 1000,
     onCompleted: (completeData) => setDataCache(completeData),
     onError: (error) => logger.logError(error, {
       tags: { section: 'campaign' },
