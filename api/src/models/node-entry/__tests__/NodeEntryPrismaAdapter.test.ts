@@ -389,7 +389,7 @@ describe('NodeEntryPrismaAdapter', () => {
 
         const sessionIds = [sesh.id, sessionTwo.id]
         const nodeEntries = await nodeEntryPrismaAdapter.getNodeEntriesBySessionIds(sessionIds || []);
-
+        expect(nodeEntries).toHaveLength(6);
         const nodeEntryIds = nodeEntries.map((nodeEntry) => nodeEntry.id);
 
         await nodeEntryPrismaAdapter.deleteManySliderNodeEntries(nodeEntryIds);
