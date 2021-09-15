@@ -129,7 +129,7 @@ const setupBasicDialogue = async () => {
 describe('EdgePrismaAdapter', () => {
     afterEach(async () => {
         await clearDatabase(prisma);
-        prisma.$disconnect();
+        await prisma.$disconnect();
     });
 
     test('Deletes edges by edge IDs', async () => {
