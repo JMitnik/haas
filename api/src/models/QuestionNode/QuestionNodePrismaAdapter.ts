@@ -1,9 +1,11 @@
 import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from "@prisma/client";
+import cuid from "cuid";
 
 import { CreateQuestionInput } from "../questionnaire/DialoguePrismaAdapterType";
 import NodeService from "./NodeService";
 import { QuestionOptionProps } from "./NodeServiceType";
 import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput, CreateLinkInput, UpdateLinkInput, CreateShareInput, UpdateShareInput, UpdateSliderNodeInput, CreateSliderNodeInput, CreateVideoEmbeddedNodeInput } from "./QuestionNodePrismaAdapterType";
+import { SliderNode } from "./SliderNode";
 
 class QuestionNodePrismaAdapter {
   prisma: PrismaClient;
@@ -51,8 +53,30 @@ class QuestionNodePrismaAdapter {
 
   createSliderNode(data: CreateSliderNodeInput) {
     const { parentNodeId, markers, unhappyText, happyText } = data;
+    const mappedMarkers = markers ? markers?.map((marker) => ({
+      label: marker.label || '',
+      subLabel: marker.subLabel || '',
+      range: {
+        create: {
+          start: marker?.range?.start || undefined,
+          end: marker?.range?.end || undefined,
+        },
+      },
+    })) : SliderNode.DEFAULT_MARKERS.map(({ id, label, subLabel, range }) => {
+      return {
+        label: label || '',
+        subLabel: subLabel || '',
+        range: {
+          create: {
+            start: range?.start,
+            end: range?.end,
+          }
+        },
+      }
+    });
     return this.prisma.sliderNode.create({
       data: {
+        id: cuid(),
         unhappyText,
         happyText,
         QuestionNode: {
@@ -61,19 +85,27 @@ class QuestionNodePrismaAdapter {
           },
         },
         markers: {
-          create: markers?.map((marker) => ({
-            label: marker.label || '',
-            subLabel: marker.subLabel || '',
-            range: {
-              create: {
-                start: marker?.range?.start || undefined,
-                end: marker?.range?.end || undefined,
-              },
-            },
-          })),
+          create: mappedMarkers,
         },
       },
     });
+  };
+
+  async deleteSliderNode(sliderNodeId: string) {
+    const delMarkers = this.prisma.sliderNodeMarker.deleteMany({
+      where: {
+        sliderNodeId: sliderNodeId,
+      }
+    })
+    const delSliderNode = this.prisma.sliderNode.delete({
+      where: {
+        id: sliderNodeId,
+      },
+    });
+    return this.prisma.$transaction([
+      delMarkers,
+      delSliderNode,
+    ]);
   };
 
   updateSliderNode(parentNodeId: string, data: UpdateSliderNodeInput) {
@@ -314,6 +346,7 @@ class QuestionNodePrismaAdapter {
       },
       include: {
         videoEmbeddedNode: true,
+        sliderNode: true,
       }
     })
   }

@@ -695,14 +695,12 @@ class DialogueService {
           sliderNode: {
             create: {
               markers: {
-                create: SliderNode.DEFAULT_MARKERS.map(({ id, label, subLabel, range }) => {
+                create: SliderNode.DEFAULT_MARKERS.map(({ label, subLabel, range }) => {
                   return {
-                    id,
-                    label: label || 'none',
-                    subLabel: subLabel || 'none',
+                    label: label || '',
+                    subLabel: subLabel || '',
                     range: {
                       create: {
-                        id: range?.id,
                         start: range?.start,
                         end: range?.end,
                       }

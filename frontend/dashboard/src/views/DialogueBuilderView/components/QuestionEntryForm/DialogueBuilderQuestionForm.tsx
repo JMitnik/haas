@@ -415,8 +415,8 @@ const DialogueBuilderQuestionForm = ({
             },
             edgeCondition,
             sliderNode: isSlider ? {
-              id: sliderNodeData.id,
-              markers: sliderNodeData.markers.map((marker, index) => ({
+              id: sliderNodeData?.id,
+              markers: sliderNodeData?.markers?.map((marker, index) => ({
                 id: marker.id,
                 label: marker.label,
                 subLabel: marker.subLabel,
@@ -451,8 +451,8 @@ const DialogueBuilderQuestionForm = ({
             },
             edgeCondition,
             sliderNode: isSlider ? {
-              id: sliderNodeData.id,
-              markers: sliderNodeData.markers.map((marker, index) => ({
+              id: sliderNodeData?.id,
+              markers: sliderNodeData?.markers?.map((marker, index) => ({
                 id: marker.id,
                 label: marker.label,
                 subLabel: marker.subLabel,

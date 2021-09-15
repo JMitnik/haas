@@ -737,7 +737,10 @@ class NodeService {
 
     const updatedNode = await this.questionNodePrismaAdapter.updateDialogueBuilderNode(questionId, updateInput);
 
-    if (type === NodeType.VIDEO_EMBEDDED) {
+    if (type === NodeType.VIDEO_EMBEDDED || type === NodeType.CHOICE) {
+      if (updatedNode?.sliderNodeId) {
+        await this.questionNodePrismaAdapter.deleteSliderNode(updatedNode?.sliderNodeId);
+      }
       if (updatedNode?.videoEmbeddedNodeId) {
         await this.questionNodePrismaAdapter.updateVideoNode(updatedNode.videoEmbeddedNodeId, {
           videoUrl: extraContent,
@@ -749,6 +752,10 @@ class NodeService {
         });
       }
     } else if (type === NodeType.SLIDER) {
+      await this.questionNodePrismaAdapter.deleteOptionsByQuestionIds([updatedNode.id])
+      if (updatedNode?.videoEmbeddedNodeId) {
+        await this.questionNodePrismaAdapter.deleteVideoNode(updatedNode?.videoEmbeddedNodeId);
+      }
       if (updatedNode?.sliderNodeId) {
         await this.questionNodePrismaAdapter.updateSliderNode(updatedNode.sliderNodeId, {
           happyText: happyText || null,
