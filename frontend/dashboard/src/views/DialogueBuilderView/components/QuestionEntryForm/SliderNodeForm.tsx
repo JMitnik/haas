@@ -46,8 +46,18 @@ const SliderNodeForm = ({ form }: { form: any }) => {
                 onChange={onChange}
                 display="flex"
               >
-                <RadioButton icon={Edit} value={1} text={t('yes')} description={t('dialogue:use_custom_satisfaction_text')} />
-                <RadioButton icon={CheckSquare} value={0} text={t('no')} description={t('dialogue:do_not_use_custom_satisfaction_text')} />
+                <RadioButton
+                  icon={Edit}
+                  value={1}
+                  text={t('yes')}
+                  description={t('dialogue:use_custom_satisfaction_text')}
+                />
+                <RadioButton
+                  icon={CheckSquare}
+                  value={0}
+                  text={t('no')}
+                  description={t('dialogue:do_not_use_custom_satisfaction_text')}
+                />
               </RadioButtonGroup>
             )}
           />
