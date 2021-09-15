@@ -488,7 +488,7 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  async findNodeById(nodeId: string): Promise<QuestionNode | null> {
+  async findNodeById(nodeId: string) {
     return this.prisma.questionNode.findUnique({
       where: { id: nodeId },
       include: {
