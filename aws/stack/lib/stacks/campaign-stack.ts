@@ -11,7 +11,7 @@ export class HaasCampaignStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: HaasCampaignStackProps) {
     super(scope, id);
 
-    const haasApiHandler = new HaasAPIHandleService(this, 'HAASApiHandler');
+    const haasApiHandler = new HaasAPIHandleService(this, 'HAASApiHandler');c
 
     const twilioHandler = new TwilioHandlerService(this, 'TwilioHandler', {
       accountId: props.accountId
