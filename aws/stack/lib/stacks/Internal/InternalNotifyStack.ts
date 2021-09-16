@@ -27,8 +27,6 @@ export class InternalNotifyStack extends cdk.Stack {
 
     const service = ecs.FargateService.fromFargateServiceArn(this, 'api_service', '')
 
-    service
-
     const cpuMetric = new cloudwatch.Metric({
       namespace: 'AWS/ECS',
       metricName: 'CPUUtilization',
