@@ -7,6 +7,7 @@ import * as ecs from "@aws-cdk/aws-ecs";
 
 interface HaasCampaignStackProps {
   accountId: string;
+  secretSlackKey: string;
 }
 
 export class InternalNotifyStack extends cdk.Stack {
@@ -14,7 +15,7 @@ export class InternalNotifyStack extends cdk.Stack {
     super(scope, id);
 
     const slackUrl = secretsmanager.Secret.fromSecretNameV2(
-      this, 'SLACK_URL', 'internal/SLACK_URL'
+      this, 'SLACK_URL', props.secretSlackKey
     );
 
     const slackSender = new SNSLambda(this, 'SlackSender', {
@@ -25,15 +26,9 @@ export class InternalNotifyStack extends cdk.Stack {
     });
     slackUrl.grantRead(slackSender.lambda);
 
-    const service = ecs.FargateService.fromFargateServiceArn(this, 'api_service', '')
-
     const cpuMetric = new cloudwatch.Metric({
       namespace: 'AWS/ECS',
       metricName: 'CPUUtilization',
-
-      dimensionsMap: {
-        ClusterName: ""
-      }
     }).createAlarm(this, 'CPUAlarm', {
       threshold: 50,
       evaluationPeriods: 15

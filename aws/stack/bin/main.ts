@@ -27,5 +27,6 @@ const campaign = new HaasCampaignStack(app, 'HAASCampaign', {
 
 // // Internal stack
 const internalStack = new InternalNotifyStack(app, 'InternalNotifyStack', {
-  accountId: '649621042808'
+  accountId: '649621042808',
+  secretSlackKey: 'internal/SLACK_URL'
 });
