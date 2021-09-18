@@ -8,6 +8,7 @@ import { CreateCTAInput, CreateLinkInput, CreateShareInput, UpdateLinkInput, Upd
 import { CreateCTAInputProps, QuestionOptionProps } from "../NodeServiceType";
 import { CreateQuestionInput } from "../../questionnaire/DialoguePrismaAdapterType";
 import EdgePrismaAdapter from "../../edge/EdgePrismaAdapter";
+import { id } from "date-fns/locale";
 
 
 const prisma = makeTestPrisma();
@@ -1412,8 +1413,6 @@ describe('QuestionNodePrismaAdapter', () => {
             parentNodeId: 'parentQuestionId',
         });
 
-        console.log('edge: ', edge);
-
         await questionNodePrismaAdapter.connectEdgeToQuestion('parentQuestionId', edge.id);
 
         const questionWithEdge = await prisma.questionNode.findUnique({
@@ -1494,7 +1493,127 @@ describe('QuestionNodePrismaAdapter', () => {
         expect(questionWithoutDeletedNodes?.form?.fields?.[0]?.id).toBe('lastNameId');
     });
 
-    // test('', async () => {
+    test('Finds questions by question IDs', async () => {
+        const ctaOne = await questionNodePrismaAdapter.createQuestion({
+            title: 'ctaOne',
+            type: 'LINK',
+            links: [
+                {
+                    backgroundColor: '',
+                    iconUrl: '',
+                    title: '',
+                    type: 'FACEBOOK',
+                    url: '',
+                }
+            ]
+        })
 
-    // })
+        const nodeOne = await questionNodePrismaAdapter.createQuestion({
+            title: 'q1',
+            type: 'VIDEO_EMBEDDED',
+            overrideLeafId: ctaOne.id,
+            options: [
+                {
+                    position: 0,
+                    value: 'valueOne',
+                },
+            ],
+            videoEmbeddedNode: {
+                videoUrl: 'videoUrl',
+            }
+        });
+
+        await questionNodePrismaAdapter.createQuestion({
+            title: 'q2',
+            type: 'SLIDER',
+            overrideLeafId: ctaOne.id,
+        });
+
+        const nodes = await questionNodePrismaAdapter.getNodesByNodeIds([ctaOne.id, nodeOne.id]);
+
+        expect(nodes).toHaveLength(2);
+        const targetCTA = nodes.find((node) => node.title === ctaOne.title);
+        expect(targetCTA?.isOverrideLeafOf).toHaveLength(2);
+        const targetQuestion = nodes.find((node) => node.title === nodeOne.title);
+        expect(targetQuestion?.options).toHaveLength(1);
+        expect(targetQuestion?.videoEmbeddedNode?.videoUrl).toBe('videoUrl')
+    });
+
+    test('Finds node by ID', async () => {
+        const ctaOne = await questionNodePrismaAdapter.createQuestion({
+            title: 'ctaOne',
+            type: 'LINK',
+            links: [
+                {
+                    backgroundColor: '',
+                    iconUrl: '',
+                    title: '',
+                    type: 'FACEBOOK',
+                    url: '',
+                }
+            ]
+        })
+
+        const nodeOne = await questionNodePrismaAdapter.createQuestion({
+            title: 'q1',
+            type: 'VIDEO_EMBEDDED',
+            overrideLeafId: ctaOne.id,
+            options: [
+                {
+                    position: 0,
+                    value: 'valueOne',
+                },
+            ],
+            videoEmbeddedNode: {
+                videoUrl: 'videoUrl',
+            }
+        });
+        const targetCTA = await questionNodePrismaAdapter.findNodeById(ctaOne.id);
+        expect(targetCTA?.isOverrideLeafOf).toHaveLength(1);
+
+        const targetQuestion = await questionNodePrismaAdapter.findNodeById(nodeOne.id);
+        expect(targetQuestion?.options).toHaveLength(1);
+        expect(targetQuestion?.videoEmbeddedNode?.videoUrl).toBe('videoUrl')
+    });
+
+    test('', async () => {
+        const ctaOne = await questionNodePrismaAdapter.createQuestion({
+            title: 'ctaOne',
+            type: 'LINK',
+            links: [
+                {
+                    backgroundColor: '',
+                    iconUrl: '',
+                    title: '',
+                    type: 'FACEBOOK',
+                    url: '',
+                }
+            ]
+        })
+
+        const nodeOne = await questionNodePrismaAdapter.createQuestion({
+            title: 'q1',
+            type: 'VIDEO_EMBEDDED',
+            overrideLeafId: ctaOne.id,
+            options: [
+                {
+                    position: 0,
+                    value: 'valueOne',
+                },
+            ],
+            videoEmbeddedNode: {
+                videoUrl: 'videoUrl',
+            }
+        });
+
+        const nodeTwo = await questionNodePrismaAdapter.createQuestion({
+            title: 'q2',
+            type: 'SLIDER',
+            overrideLeafId: ctaOne.id,
+        });
+
+        await questionNodePrismaAdapter.deleteMany([ctaOne?.id, nodeOne?.id]);
+        const nodes = await questionNodePrismaAdapter.getNodesByNodeIds([ctaOne?.id, nodeOne?.id, nodeTwo?.id]);
+        expect(nodes).toHaveLength(1);
+    });
 });
