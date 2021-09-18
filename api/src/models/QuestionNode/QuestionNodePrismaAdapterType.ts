@@ -35,6 +35,13 @@ export type CreateFormFieldsInput = {
 }
 
 export interface UpdateQuestionInput extends CreateQuestionInput {
+  options?: {
+    id?: number;
+    publicValue?: string | null;
+    value: string;
+    position: number | null;
+    overrideLeafId?: string;
+  }[],
   currentOverrideLeafId?: string | null;
 }
 

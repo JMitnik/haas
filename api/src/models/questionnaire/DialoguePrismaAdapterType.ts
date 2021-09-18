@@ -44,6 +44,7 @@ export interface CreateQuestionInput {
       type: FormNodeFieldType,
       isRequired: boolean,
       position: number,
+      placeholder?: string | null;
     }>,
   },
   sliderNode?: {

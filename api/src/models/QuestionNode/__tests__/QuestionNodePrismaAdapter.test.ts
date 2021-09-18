@@ -4,11 +4,15 @@ import cuid from 'cuid';
 import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
 import { clearDatabase } from './testUtils';
 import QuestionNodePrismaAdapter from '../QuestionNodePrismaAdapter';
-import { CreateLinkInput, CreateShareInput, UpdateLinkInput, UpdateShareInput } from "../QuestionNodePrismaAdapterType";
+import { CreateCTAInput, CreateLinkInput, CreateShareInput, UpdateLinkInput, UpdateQuestionInput, UpdateShareInput } from "../QuestionNodePrismaAdapterType";
+import { CreateCTAInputProps, QuestionOptionProps } from "../NodeServiceType";
+import { CreateQuestionInput } from "../../questionnaire/DialoguePrismaAdapterType";
+import EdgePrismaAdapter from "../../edge/EdgePrismaAdapter";
 
 
 const prisma = makeTestPrisma();
 const questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prisma);
+const edgePrismaAdapter = new EdgePrismaAdapter(prisma)
 
 describe('QuestionNodePrismaAdapter', () => {
 
@@ -441,18 +445,21 @@ describe('QuestionNodePrismaAdapter', () => {
                 fields: {
                     create: [
                         {
+                            id: 'firstNameId',
                             isRequired: false,
                             label: 'First name',
                             type: 'shortText',
                             position: 1,
                         },
                         {
+                            id: 'lastNameId',
                             isRequired: false,
                             label: 'Last name',
                             type: 'shortText',
                             position: 2,
                         },
                         {
+                            id: 'emailId',
                             isRequired: true,
                             placeholder: 'email address',
                             label: 'Email',
@@ -483,4 +490,1011 @@ describe('QuestionNodePrismaAdapter', () => {
         expect(formFieldThree?.position).toBe(3);
         expect(formFieldThree?.placeholder).toBe('email address');
     });
+
+    test('Updates fields of a form', async () => {
+        const nodeOne = await prisma.questionNode.create({
+            data: {
+                title: 'formNodeOne',
+                type: 'FORM',
+            }
+        });
+
+        await questionNodePrismaAdapter.createFieldsOfForm({
+            questionId: nodeOne.id,
+            fields: {
+                fields: {
+                    create: [
+                        {
+                            id: 'firstNameId',
+                            placeholder: 'First name here',
+                            isRequired: false,
+                            label: 'First name',
+                            type: 'shortText',
+                            position: 1,
+                        },
+                    ],
+                },
+            },
+        });
+        const updateFormFields: Prisma.FormNodeFieldUpsertArgs[] = [
+            {
+                create: {
+                    id: 'emailId',
+                    isRequired: false,
+                    label: 'Email',
+                    placeholder: 'Enter email here',
+                    type: 'email',
+                    position: 1,
+                },
+                update: {
+                    isRequired: true,
+                    label: 'Not this email',
+                    type: 'phoneNumber',
+                    position: 3,
+                },
+                where: {
+                    id: 'emailId',
+                },
+            },
+            {
+                create: {
+                    isRequired: false,
+                    label: 'First name',
+                    type: 'shortText',
+                    position: 2,
+                },
+                update: {
+                    isRequired: true,
+                    label: 'First name edit',
+                    placeholder: 'First name placeholder edit',
+                    type: 'longText',
+                    position: 2,
+                },
+                where: {
+                    id: 'firstNameId',
+                },
+            },
+        ];
+        const updateFields = { questionId: nodeOne.id, fields: updateFormFields };
+        await questionNodePrismaAdapter.updateFieldsOfForm(updateFields);
+
+        const updatedForm = await prisma.questionNode.findUnique({
+            where: {
+                id: nodeOne.id,
+            },
+            include: {
+                form: {
+                    include: {
+                        fields: true,
+                    }
+                },
+            },
+        });
+
+        expect(updatedForm?.form?.fields).toHaveLength(2);
+
+        // Field correctly created
+        const emailField = updatedForm?.form?.fields.find((field) => field.id === 'emailId');
+        expect(emailField).not.toBeNull();
+        expect(emailField?.isRequired).toBe(false);
+        expect(emailField?.label).toBe('Email');
+        expect(emailField?.placeholder).toBe('Enter email here');
+        expect(emailField?.position).toBe(1);
+        expect(emailField?.type).toBe('email');
+
+        const updatedFirstNameField = updatedForm?.form?.fields.find((field) => field.id === 'firstNameId');
+        expect(updatedFirstNameField).not.toBeNull();
+        expect(updatedFirstNameField?.isRequired).toBe(true);
+        expect(updatedFirstNameField?.label).toBe('First name edit');
+        expect(updatedFirstNameField?.placeholder).toBe('First name placeholder edit');
+        expect(updatedFirstNameField?.position).toBe(2);
+        expect(updatedFirstNameField?.type).toBe('longText');
+    });
+
+    test('Creates a CTA node', async () => {
+        const workspaceWithDialogue = await prisma.customer.create({
+            data: {
+                name: 'workspace',
+                slug: 'workspaceSlug',
+                dialogues: {
+                    create: {
+                        id: 'dialogueId',
+                        title: 'dialogue',
+                        slug: 'dialogueSlug',
+                        description: 'desc',
+                    }
+                }
+            }
+        })
+        const input: CreateCTAInput = {
+            dialogueId: 'dialogueId',
+            title: 'AIOCTA',
+            links: [
+                {
+                    id: 'linkThreeId',
+                    title: 'linkThreeTitle',
+                    backgroundColor: '#fffff',
+                    iconUrl: 'https://icon.create',
+                    type: 'SOCIAL',
+                    url: 'https://url.create',
+                }
+            ],
+            share: {
+                id: 'shareId',
+                title: 'shareTitle',
+                tooltip: 'shareTooltip',
+                url: 'shareUrl',
+            },
+            form: {
+                fields: [
+                    {
+                        id: 'firstNameId',
+                        placeholder: 'First name here',
+                        isRequired: false,
+                        label: 'First name',
+                        type: 'shortText',
+                        position: 1,
+                    }
+                ]
+            },
+            type: 'GENERIC',
+        };
+
+        await questionNodePrismaAdapter.createCTANode(input);
+        const dialogueWithCTANode = await prisma.dialogue.findUnique({
+            where: {
+                id: 'dialogueId',
+            },
+            include: {
+                questions: {
+                    include: {
+                        form: {
+                            include: {
+                                fields: true,
+                            }
+                        },
+                        share: true,
+                        links: true,
+                    },
+                },
+            },
+        });
+        const cta = dialogueWithCTANode?.questions?.[0]
+        expect(cta).not.toBeNull();
+
+        // Links check
+        expect(cta?.links).toHaveLength(1);
+        expect(cta?.links?.[0]?.title).toBe('linkThreeTitle');
+        expect(cta?.links?.[0]?.backgroundColor).toBe('#fffff');
+        expect(cta?.links?.[0]?.iconUrl).toBe('https://icon.create');
+        expect(cta?.links?.[0]?.type).toBe('SOCIAL');
+        expect(cta?.links?.[0]?.url).toBe('https://url.create');
+
+        // Share check
+        expect(cta?.share?.title).toBe('shareTitle');
+        expect(cta?.share?.tooltip).toBe('shareTooltip');
+        expect(cta?.share?.url).toBe('shareUrl');
+
+        // Form check
+        expect(cta?.form?.fields).toHaveLength(1);
+        expect(cta?.form?.fields?.[0]?.isRequired).toBe(false);
+        expect(cta?.form?.fields?.[0]?.label).toBe('First name');
+        expect(cta?.form?.fields?.[0]?.placeholder).toBe('First name here');
+        expect(cta?.form?.fields?.[0]?.position).toBe(1);
+        expect(cta?.form?.fields?.[0]?.type).toBe('shortText');
+    });
+
+    test('Deletes a question node', async () => {
+        const dialogueWithQuestions = await prisma.dialogue.create({
+            data: {
+                title: 'dialogue',
+                id: 'dialogueId',
+                description: 'desc',
+                slug: 'dialogueSlug',
+                customer: {
+                    create: {
+                        name: 'customer',
+                        slug: 'customerSlug',
+                    },
+                },
+                questions: {
+                    create: [
+                        {
+                            id: 'questionOneId',
+                            title: 'questionOne'
+                        },
+                        {
+                            id: 'questionTwoId',
+                            title: 'questionTwo',
+                        },
+                    ],
+                },
+            },
+            include: {
+                questions: true,
+            },
+        });
+        expect(dialogueWithQuestions?.questions).toHaveLength(2);
+        await questionNodePrismaAdapter.delete('questionTwoId');
+
+        const questions = await prisma.questionNode.findMany({
+            where: {
+                questionDialogueId: 'dialogueId',
+            },
+        });
+
+        expect(questions).toHaveLength(1);
+        expect(questions?.[0]?.title).toBe('questionOne');
+    });
+
+    test('Upserts a question option', async () => {
+        const createOptionInput: Prisma.QuestionOptionCreateInput = {
+            value: 'createOption',
+            position: 0,
+            publicValue: 'optionOne'
+        }
+
+        const updateOptionInput: Prisma.QuestionOptionUpdateInput = {
+            value: 'updateOption',
+            position: 1,
+            publicValue: 'optionTwo',
+        }
+        const questionOption = await questionNodePrismaAdapter.upsertQuestionOption(-1, createOptionInput, updateOptionInput);
+        expect(questionOption?.value).toBe(createOptionInput.value);
+        expect(questionOption?.position).toBe(createOptionInput.position);
+        expect(questionOption?.publicValue).toBe(createOptionInput.publicValue);
+
+        const updatedQuestionOption = await questionNodePrismaAdapter.upsertQuestionOption(questionOption.id, createOptionInput, updateOptionInput);
+        expect(updatedQuestionOption?.value).toBe(updateOptionInput.value);
+        expect(updatedQuestionOption?.position).toBe(updateOptionInput.position);
+        expect(updatedQuestionOption?.publicValue).toBe(updateOptionInput.publicValue);
+    });
+
+    test('Finds options by question Id', async () => {
+        await prisma.questionNode.create({
+            data: {
+                title: 'questionOne',
+                options: {
+                    create: [
+                        {
+                            id: 1,
+                            value: 'optionOne',
+                        },
+                        {
+                            id: 2,
+                            value: 'optionTwo',
+                        }
+                    ]
+                }
+            }
+        });
+
+        const targetQuestion = await prisma.questionNode.create({
+            data: {
+                title: 'questionTwo',
+                options: {
+                    create: [
+                        {
+                            id: 3,
+                            value: 'optionThree',
+                        },
+                        {
+                            id: 4,
+                            value: 'optionFour',
+                        },
+                    ],
+                },
+            },
+        });
+
+        const options = await questionNodePrismaAdapter.findOptionsByQuestionId(targetQuestion.id);
+        expect(options).toHaveLength(2);
+        const optionThree = options.find((option) => option.id === 3);
+        expect(optionThree).not.toBeNull();
+        const optionFour = options.find((option) => option.id === 4);
+        expect(optionFour).not.toBeNull();
+    });
+
+    test('Deletes question options based on Ids', async () => {
+        const question = await prisma.questionNode.create({
+            data: {
+                title: 'questionOne',
+                options: {
+                    create: [
+                        {
+                            id: 1,
+                            value: 'optionOne',
+                        },
+                        {
+                            id: 2,
+                            value: 'optionTwo',
+                        },
+                        {
+                            id: 3,
+                            value: 'optionThree'
+                        }
+                    ]
+                }
+            }
+        });
+        await questionNodePrismaAdapter.deleteQuestionOptions([1, 3]);
+
+        const questionWithOneOption = await prisma.questionNode.findUnique({
+            where: {
+                id: question.id,
+            },
+            include: {
+                options: true,
+            },
+        });
+
+        expect(questionWithOneOption?.options).toHaveLength(1);
+        expect(questionWithOneOption?.options?.[0]?.id).toBe(2);
+    });
+
+    test('Updates question options (upsert)', async () => {
+        const inputOptions: QuestionOptionProps[] = [
+            {
+                value: 'optionOne',
+                position: 0,
+            },
+            {
+                value: 'optionTwo',
+                position: 1,
+            },
+            {
+                value: 'optionThree',
+                position: 2,
+            },
+        ];
+
+        const firstOptionsState = await questionNodePrismaAdapter.updateQuestionOptions(inputOptions);
+        expect(firstOptionsState).toHaveLength(3);
+        const mappedFirstOptionIds = firstOptionsState.map((option) => option.id);
+        const optionsFirstState = await prisma.questionOption.findMany({
+            where: {
+                id: {
+                    in: mappedFirstOptionIds,
+                },
+            },
+        });
+        const optionOne = optionsFirstState.find((option) => option.value === 'optionOne');
+        const optionTwo = optionsFirstState.find((option) => option.value === 'optionTwo');
+        const optionThree = optionsFirstState.find((option) => option.value === 'optionThree');
+
+        const updatedInputOptions: QuestionOptionProps[] = [
+            {
+                id: optionOne?.id,
+                value: 'optionOne',
+                position: 0,
+            },
+            {
+                id: optionThree?.id,
+                value: 'optionThree',
+                position: 1,
+            },
+            {
+                value: 'optionFour',
+                position: 2,
+            }
+        ]
+
+        const secondOptionsState = await questionNodePrismaAdapter.updateQuestionOptions(updatedInputOptions);
+        expect(secondOptionsState).toHaveLength(3);
+        const mappedSecondOptionIds = firstOptionsState.map((option) => option.id);
+        const optionsSecondtState = await prisma.questionOption.findMany({
+            where: {
+                id: {
+                    in: mappedSecondOptionIds,
+                },
+            },
+        });
+
+        // Verify that no new entries were created for the two updated options
+        const optionOneUpdated = optionsSecondtState.find((option) => option.value === 'optionOne');
+        expect(optionOneUpdated).not.toBeNull();
+        expect(optionOneUpdated?.id).toBe(optionOne?.id);
+
+        const optionThreeUpdated = optionsSecondtState.find((option) => option.value === 'optionThree');
+        expect(optionThreeUpdated).not.toBeNull();
+        expect(optionThreeUpdated?.id).toBe(optionThree?.id);
+
+
+        // Verify that a new entry was created for option #4
+        const optionFour = optionsSecondtState.find((option) => option.value === 'optionFour');
+        expect(optionFour?.id).not.toBe(optionTwo?.id);
+    });
+
+    test('Updates a dialogue builder node', async () => {
+        // Create a 'typical' choice question node
+        const choiceNode = await prisma.questionNode.create({
+            data: {
+                title: 'choiceNode',
+                type: 'CHOICE',
+                options: {
+                    create: [
+                        {
+                            id: 1,
+                            value: 'optionOne',
+                            position: 0,
+                        },
+                        {
+                            id: 2,
+                            value: 'optionTwo',
+                            position: 1,
+                        },
+                        {
+                            id: 3,
+                            value: 'optionThree',
+                            position: 2,
+                        },
+                    ]
+                }
+            },
+        });
+
+        // Create CTA node
+        const cta = await prisma.questionNode.create({
+            data: {
+                title: 'Please share this offer!',
+                type: 'SHARE',
+                share: {
+                    create: {
+                        title: 'shareNode',
+                        url: 'shareUrl',
+                    },
+                },
+            },
+        })
+
+        // Scenario #1: add CTA to node & question option
+        const addCTAInput: UpdateQuestionInput = {
+            title: 'choiceNode',
+            type: 'CHOICE',
+            overrideLeafId: cta.id,
+            options: [
+                {
+                    id: 1,
+                    value: 'optionOne',
+                    position: 0,
+                    overrideLeafId: cta.id,
+                },
+                {
+                    id: 2,
+                    value: 'optionTwo',
+                    position: 1,
+                },
+                {
+                    id: 3,
+                    value: 'optionThree',
+                    position: 2,
+                },
+            ]
+        }
+
+        const postCTAsAddedNode = await questionNodePrismaAdapter.updateDialogueBuilderNode(choiceNode.id, addCTAInput);
+        expect(postCTAsAddedNode?.overrideLeafId).toBe(cta.id);
+
+        const questionOptionWithCTA = postCTAsAddedNode?.options.find((option) => option.overrideLeafId);
+        expect(questionOptionWithCTA).not.toBeUndefined();
+        expect(questionOptionWithCTA?.overrideLeafId).toBe(cta.id);
+
+        // Scenario #2: remove CTA from node
+        const removeCTAInput: UpdateQuestionInput = {
+            title: 'choiceNode',
+            type: 'CHOICE',
+            currentOverrideLeafId: cta.id,
+            overrideLeafId: undefined,
+            options: [
+                {
+                    id: 1,
+                    value: 'optionOne',
+                    position: 0,
+                    overrideLeafId: cta.id,
+                },
+                {
+                    id: 2,
+                    value: 'optionTwo',
+                    position: 1,
+                },
+                {
+                    id: 3,
+                    value: 'optionThree',
+                    position: 2,
+                },
+            ],
+        };
+
+        const postCTAsRemovedNode = await questionNodePrismaAdapter.updateDialogueBuilderNode(choiceNode.id, removeCTAInput);
+
+        expect(postCTAsRemovedNode?.overrideLeafId).toBeNull();
+
+        // Switch to different type (= Video node)
+        const videoNode = await prisma.questionNode.update({
+            data: {
+                type: 'VIDEO_EMBEDDED',
+                videoEmbeddedNode: {
+                    create: {
+                        videoUrl: 'https://video-url.here',
+                    }
+                }
+            },
+            where: {
+                id: choiceNode.id,
+            },
+        });
+
+        expect(videoNode?.videoEmbeddedNodeId).not.toBeNull();
+
+        // Scenario #4: Switch back to choice node and remove video node
+        const changeChoiceTypeInput: UpdateQuestionInput = {
+            title: 'choiceNode',
+            type: 'CHOICE',
+            videoEmbeddedNode: {
+                id: videoNode?.videoEmbeddedNodeId || 'id',
+            },
+            options: [
+                {
+                    id: 1,
+                    value: 'optionOne',
+                    position: 0,
+                    overrideLeafId: cta.id,
+                },
+                {
+                    id: 2,
+                    value: 'optionTwo',
+                    position: 1,
+                },
+                {
+                    id: 3,
+                    value: 'optionThree',
+                    position: 2,
+                },
+            ],
+        };
+        const postChanceChoiceTypeNode = await questionNodePrismaAdapter.updateDialogueBuilderNode(videoNode.id, changeChoiceTypeInput);
+        expect(postChanceChoiceTypeNode?.title).toBe('choiceNode');
+        expect(postChanceChoiceTypeNode?.type).toBe('CHOICE');
+        expect(postChanceChoiceTypeNode?.videoEmbeddedNode).toBeNull();
+    });
+
+    test('Finds question node (and its relations) by its ID for updating through dialogue builder', async () => {
+        const node = await prisma.questionNode.create({
+            data: {
+                title: 'questionTitle',
+                type: 'GENERIC',
+                overrideLeaf: {
+                    create: {
+                        title: 'overrideLeaf',
+                        type: 'SHARE',
+                        share: {
+                            create: {
+                                title: 'shareTitle',
+                                url: 'shareUrl',
+                            }
+                        }
+                    }
+                },
+                videoEmbeddedNode: {
+                    create: {
+                        videoUrl: 'videoUrlHere',
+                    },
+                },
+                options: {
+                    create: [
+                        {
+                            id: 1,
+                            value: 'optionOne',
+                        },
+                        {
+                            id: 2,
+                            value: 'optionTwo',
+                        },
+                        {
+                            id: 3,
+                            value: 'optionThree'
+                        }
+                    ]
+                },
+                questionDialogue: {
+                    create: {
+                        title: 'dialogueTitle',
+                        slug: 'dialogueSlug',
+                        description: 'desc',
+                        customer: {
+                            create: {
+                                slug: 'customerSlug',
+                                name: 'customerName',
+                            }
+                        }
+                    },
+                }
+            }
+        })
+        const dialogueNode = await questionNodePrismaAdapter.getDialogueBuilderNode(node.id);
+        expect(dialogueNode?.videoEmbeddedNode).not.toBeNull();
+        expect(dialogueNode?.options).toHaveLength(3);
+        expect(dialogueNode?.overrideLeaf).not.toBeNull();
+        expect(dialogueNode?.questionDialogue).not.toBeNull();
+    });
+
+    test('Creates a question', async () => {
+        const dialogue = await prisma.dialogue.create({
+            data: {
+                description: '',
+                slug: 'dialogueSlug',
+                title: 'dialogue',
+                customer: {
+                    create: {
+                        slug: 'customerSlug',
+                        name: 'customer',
+                    }
+                }
+            }
+        });
+
+        const cta = await prisma.questionNode.create(
+            {
+                data: {
+                    title: 'ctaNode',
+                    type: 'SHARE',
+                    share: {
+                        create: {
+                            title: 'shareTitle',
+                            url: 'shareUrl',
+                        }
+                    }
+                }
+            }
+        )
+
+        const createQuestionInput: CreateQuestionInput = {
+            title: 'questionTitle',
+            type: 'SLIDER',
+            dialogueId: dialogue.id,
+            form: {
+                fields: [
+                    {
+                        isRequired: true,
+                        placeholder: 'placeholder',
+                        label: 'fieldLabelOne',
+                        position: 0,
+                        type: 'shortText',
+                    },
+                ],
+            },
+            isLeaf: true,
+            isRoot: true,
+            links: [
+                {
+                    backgroundColor: 'backgroundColor',
+                    iconUrl: 'iconUrl',
+                    title: 'linkTitleOne',
+                    type: 'SOCIAL',
+                    url: 'linkUrl',
+                },
+            ],
+            options: [
+                {
+                    position: 0,
+                    value: 'optionOne',
+                    overrideLeafId: cta.id,
+                    publicValue: 'publicValue',
+                },
+            ],
+            overrideLeafId: cta.id,
+            sliderNode: {
+                markers: [
+                    {
+                        label: 'markerLabel',
+                        subLabel: 'markerSubLabel',
+                        range: {
+                            start: 0,
+                            end: 100,
+                        },
+                    }
+                ],
+            },
+            videoEmbeddedNode: {
+                videoUrl: 'videoUrl'
+            },
+        };
+
+        const question = await questionNodePrismaAdapter.createQuestion(createQuestionInput);
+
+        const createdQuestion = await prisma.questionNode.findUnique({
+            where: {
+                id: question.id,
+            },
+            include: {
+                options: true,
+                sliderNode: {
+                    include: {
+                        markers: {
+                            include: {
+                                range: true,
+                            }
+                        },
+                    }
+                },
+                videoEmbeddedNode: true,
+                links: true,
+                form: {
+                    include: {
+                        fields: true,
+                    },
+                },
+                overrideLeaf: true,
+            }
+        });
+
+        expect(createdQuestion?.overrideLeaf?.id).toBe(createQuestionInput?.overrideLeafId);
+        expect(createdQuestion?.isLeaf).toBe(createQuestionInput?.isLeaf);
+        expect(createdQuestion?.isRoot).toBe(createQuestionInput?.isRoot);
+        expect(createdQuestion?.type).toBe(createQuestionInput?.type);
+        expect(createdQuestion?.title).toBe(createQuestionInput?.title);
+
+        // Links
+        expect(createdQuestion?.links).toHaveLength(1);
+        expect(createdQuestion?.links?.[0]?.backgroundColor).toBe(createQuestionInput?.links?.[0].backgroundColor);
+        expect(createdQuestion?.links?.[0]?.iconUrl).toBe(createQuestionInput?.links?.[0].iconUrl);
+        expect(createdQuestion?.links?.[0]?.title).toBe(createQuestionInput?.links?.[0].title);
+        expect(createdQuestion?.links?.[0]?.type).toBe(createQuestionInput?.links?.[0].type);
+        expect(createdQuestion?.links?.[0]?.url).toBe(createQuestionInput?.links?.[0].url);
+
+        // Options
+        expect(createdQuestion?.options).toHaveLength(1);
+        expect(createdQuestion?.options?.[0]?.overrideLeafId).toBe(createQuestionInput?.options?.[0].overrideLeafId);
+        expect(createdQuestion?.options?.[0]?.position).toBe(createQuestionInput?.options?.[0]?.position);
+        expect(createdQuestion?.options?.[0]?.publicValue).toBe(createQuestionInput?.options?.[0]?.publicValue);
+        expect(createdQuestion?.options?.[0]?.value).toBe(createQuestionInput?.options?.[0]?.value);
+
+        // SliderNode
+        expect(createdQuestion?.sliderNode).not.toBeNull();
+        expect(createdQuestion?.sliderNode?.markers).toHaveLength(1);
+        expect(createdQuestion?.sliderNode?.markers?.[0]?.label).toBe(createQuestionInput?.sliderNode?.markers?.[0]?.label);
+        expect(createdQuestion?.sliderNode?.markers?.[0]?.subLabel).toBe(createQuestionInput?.sliderNode?.markers?.[0]?.subLabel);
+        expect(createdQuestion?.sliderNode?.markers?.[0]?.range?.start).toBe(createQuestionInput?.sliderNode?.markers?.[0]?.range.start);
+        expect(createdQuestion?.sliderNode?.markers?.[0]?.range?.end).toBe(createQuestionInput?.sliderNode?.markers?.[0]?.range.end);
+
+        // VideoNode
+        expect(createdQuestion?.videoEmbeddedNode).not.toBeNull();
+        expect(createdQuestion?.videoEmbeddedNode?.videoUrl).toBe(createQuestionInput?.videoEmbeddedNode?.videoUrl);
+
+        // Form
+        expect(createdQuestion?.form).not.toBeNull();
+        expect(createdQuestion?.form?.fields).toHaveLength(1);
+        expect(createdQuestion?.form?.fields?.[0]?.isRequired).toBe(createQuestionInput?.form?.fields?.[0].isRequired);
+        expect(createdQuestion?.form?.fields?.[0]?.label).toBe(createQuestionInput?.form?.fields?.[0].label);
+        expect(createdQuestion?.form?.fields?.[0]?.placeholder).toBe(createQuestionInput?.form?.fields?.[0].placeholder);
+        expect(createdQuestion?.form?.fields?.[0]?.position).toBe(createQuestionInput?.form?.fields?.[0].position);
+        expect(createdQuestion?.form?.fields?.[0]?.type).toBe(createQuestionInput?.form?.fields?.[0].type);
+    });
+
+    test('Finds a "CTA" node', async () => {
+        const dialogue = await prisma.dialogue.create({
+            data: {
+                description: '',
+                slug: 'dialogueSlug',
+                title: 'dialogue',
+                customer: {
+                    create: {
+                        slug: 'customerSlug',
+                        name: 'customer',
+                    }
+                }
+            }
+        });
+
+        const createQuestionInput: CreateQuestionInput = {
+            title: 'ctaQuestionTitle',
+            type: 'GENERIC',
+            dialogueId: dialogue.id,
+            isLeaf: true,
+            form: {
+                fields: [
+                    {
+                        isRequired: true,
+                        placeholder: 'placeholder',
+                        label: 'fieldLabelOne',
+                        position: 0,
+                        type: 'shortText',
+                    },
+                ],
+            },
+            links: [
+                {
+                    backgroundColor: 'backgroundColor',
+                    iconUrl: 'iconUrl',
+                    title: 'linkTitleOne',
+                    type: 'SOCIAL',
+                    url: 'linkUrl',
+                },
+            ],
+        };
+
+        const question = await prisma.questionNode.create({
+            data: {
+                title: createQuestionInput.title,
+                type: 'GENERIC',
+                links: {
+                    create: createQuestionInput.links,
+                },
+                form: {
+                    create: {
+                        fields: {
+                            create: createQuestionInput?.form?.fields,
+                        },
+                    },
+                },
+                share: {
+                    create: {
+                        title: 'shareTitle',
+                        url: 'shareUrl',
+                    },
+                },
+                questionDialogue: {
+                    connect: {
+                        id: dialogue.id
+                    },
+                },
+            }
+        })
+
+        const ctaQuestion = await questionNodePrismaAdapter.getCTANode(question.id);
+
+        // Share
+        expect(ctaQuestion?.share).not.toBeNull();
+        expect(ctaQuestion?.links).toHaveLength(1);
+        expect(ctaQuestion?.form?.fields).toHaveLength(1);
+    });
+
+    test('Finds parent question node by Link id', async () => {
+        const link = await prisma.link.create({
+            data: {
+                type: 'FACEBOOK',
+                url: 'url',
+                questionNode: {
+                    create: {
+                        title: 'linkParentQuestion'
+                    },
+                },
+            },
+        });
+
+        const notFoundParent = await questionNodePrismaAdapter.findNodeByLinkId('-1');
+        expect(notFoundParent).toBeNull();
+
+        const foundParent = await questionNodePrismaAdapter.findNodeByLinkId(link.id);
+        expect(foundParent).not.toBeNull();
+        expect(foundParent?.title).toBe('linkParentQuestion');
+    });
+
+    test('Connects edge to question', async () => {
+        const dialogue = await prisma.dialogue.create({
+            data: {
+                description: '',
+                slug: 'dialogueSlug',
+                title: 'dialogue',
+                customer: {
+                    create: {
+                        slug: 'customerSlug',
+                        name: 'customer',
+                    },
+                },
+                questions: {
+                    create: [
+                        {
+                            id: 'parentQuestionId',
+                            title: 'parent',
+                        },
+                        {
+                            id: 'childQuestionId',
+                            title: 'child',
+                        }
+                    ]
+                }
+            },
+
+        });
+
+        const edge = await edgePrismaAdapter.createEdge({
+            childNodeId: 'childQuestionId',
+            conditions: [
+                {
+                    conditionType: 'TEXT_MATCH',
+                    matchValue: 'oi',
+                    renderMax: 0,
+                    renderMin: 0,
+                },
+            ],
+            dialogueId: dialogue.id,
+            parentNodeId: 'parentQuestionId',
+        });
+
+        console.log('edge: ', edge);
+
+        await questionNodePrismaAdapter.connectEdgeToQuestion('parentQuestionId', edge.id);
+
+        const questionWithEdge = await prisma.questionNode.findUnique({
+            where: {
+                id: 'parentQuestionId',
+            },
+            include: {
+                children: {
+                    include: {
+                        conditions: true,
+                    }
+                },
+            },
+        });
+
+        expect(questionWithEdge?.children).toHaveLength(1);
+        expect(questionWithEdge?.children?.[0]?.parentNodeId).toBe('parentQuestionId');
+    });
+
+    test('Removes form fields from form node', async () => {
+        const nodeOne = await prisma.questionNode.create({
+            data: {
+                title: 'questionOne',
+            }
+        })
+        await questionNodePrismaAdapter.createFieldsOfForm({
+            questionId: nodeOne.id,
+            fields: {
+                fields: {
+                    create: [
+                        {
+                            id: 'firstNameId',
+                            isRequired: false,
+                            label: 'First name',
+                            type: 'shortText',
+                            position: 1,
+                        },
+                        {
+                            id: 'lastNameId',
+                            isRequired: false,
+                            label: 'Last name',
+                            type: 'shortText',
+                            position: 2,
+                        },
+                        {
+                            id: 'emailId',
+                            isRequired: true,
+                            placeholder: 'email address',
+                            label: 'Email',
+                            type: 'email',
+                            position: 3,
+                        },
+                    ],
+                },
+            },
+        });
+        await questionNodePrismaAdapter.removeFormFields(
+            nodeOne.id, [
+            { id: 'firstNameId' },
+            { id: 'emailId' }
+        ]
+        );
+
+        const questionWithoutDeletedNodes = await prisma.questionNode.findUnique({
+            where: {
+                id: nodeOne.id,
+            },
+            include: {
+                form: {
+                    include: {
+                        fields: true,
+                    },
+                },
+            },
+        });
+
+        expect(questionWithoutDeletedNodes?.form?.fields).toHaveLength(1);
+        expect(questionWithoutDeletedNodes?.form?.fields?.[0]?.id).toBe('lastNameId');
+    });
+
+    // test('', async () => {
+
+    // })
 });

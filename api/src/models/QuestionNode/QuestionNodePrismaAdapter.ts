@@ -346,6 +346,7 @@ class QuestionNodePrismaAdapter {
         videoEmbeddedNode: embedVideoInput,
       },
       include: {
+        options: true,
         videoEmbeddedNode: true,
         sliderNode: true,
       }
@@ -373,6 +374,8 @@ class QuestionNodePrismaAdapter {
     });
   }
 
+  // TODO: Add share node option createion to CreateQuestionInput and function
+  // TODO: Add happyText, unhappyText & earlyReleaseText to sliderNode creation
   createQuestion(question: CreateQuestionInput) {
     return this.prisma.questionNode.create({
       data: {
@@ -435,12 +438,6 @@ class QuestionNodePrismaAdapter {
     });
   }
 
-  create(data: Prisma.QuestionNodeCreateInput): Promise<QuestionNode> {
-    return this.prisma.questionNode.create({
-      data,
-    });
-  };
-
   async getCTANode(nodeId: string) {
     const existingNode = await this.prisma.questionNode.findUnique({
       where: { id: nodeId },
@@ -464,7 +461,7 @@ class QuestionNodePrismaAdapter {
       include: { questionNode: true },
     });
 
-    return link?.questionNode;
+    return link?.questionNode || null;
   }
 
   connectEdgeToQuestion(nodeId: string, edgeId: string) {
@@ -517,7 +514,6 @@ class QuestionNodePrismaAdapter {
         options: true,
         videoEmbeddedNode: true,
         isOverrideLeafOf: true,
-        Edge: true,
       },
     });
   };

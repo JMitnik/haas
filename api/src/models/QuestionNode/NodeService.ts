@@ -699,7 +699,7 @@ class NodeService {
     unhappyText: string | null | undefined,
   ) => {
     const activeQuestion = await this.questionNodePrismaAdapter.getDialogueBuilderNode(questionId);
-
+    console.log('active question: ', activeQuestion);
     const dbEdge = await this.edgeService.getEdgeById(edgeId || '-1');
 
     const activeOptions = activeQuestion ? activeQuestion?.options?.map((option) => option.id) : [];
