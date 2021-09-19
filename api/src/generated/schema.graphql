@@ -211,10 +211,10 @@ input CTALinkInputObjectType {
   header: String
   iconUrl: String
   id: String
+  imageUrl: String
   subHeader: String
   title: String
   type: LinkTypeEnumType
-  uploadImage: String
   url: String
 }
 
@@ -632,10 +632,14 @@ type lineChartDataType {
 
 type LinkType {
   backgroundColor: String
+  buttonText: String
+  header: String
   iconUrl: String
   id: String!
+  imageUrl: String
   questionNode: QuestionNode!
   questionNodeId: String
+  subHeader: String
   title: String
   type: String!
   url: String!

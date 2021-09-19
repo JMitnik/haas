@@ -43,10 +43,10 @@ export interface NexusGenInputs {
     header?: string | null; // String
     iconUrl?: string | null; // String
     id?: string | null; // String
+    imageUrl?: string | null; // String
     subHeader?: string | null; // String
     title?: string | null; // String
     type?: NexusGenEnums['LinkTypeEnumType'] | null; // LinkTypeEnumType
-    uploadImage?: string | null; // String
     url?: string | null; // String
   }
   CTALinksInputType: { // input type
@@ -635,9 +635,13 @@ export interface NexusGenRootTypes {
   }
   LinkType: { // root type
     backgroundColor?: string | null; // String
+    buttonText?: string | null; // String
+    header?: string | null; // String
     iconUrl?: string | null; // String
     id: string; // String!
+    imageUrl?: string | null; // String
     questionNodeId?: string | null; // String
+    subHeader?: string | null; // String
     title?: string | null; // String
     type: string; // String!
     url: string; // String!
@@ -1130,10 +1134,14 @@ export interface NexusGenFieldTypes {
   }
   LinkType: { // field return type
     backgroundColor: string | null; // String
+    buttonText: string | null; // String
+    header: string | null; // String
     iconUrl: string | null; // String
     id: string; // String!
+    imageUrl: string | null; // String
     questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     questionNodeId: string | null; // String
+    subHeader: string | null; // String
     title: string | null; // String
     type: string; // String!
     url: string; // String!

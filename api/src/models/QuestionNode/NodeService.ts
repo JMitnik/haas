@@ -411,7 +411,7 @@ class NodeService {
           buttonText: link.buttonText || '',
           header: link.header || '',
           subHeader: link.subHeader || '',
-          imageUrl: link.uploadImage || '',
+          imageUrl: link.imageUrl || '',
           questionId,
         },
         {
@@ -423,7 +423,7 @@ class NodeService {
           buttonText: link.buttonText || '',
           header: link.header || '',
           subHeader: link.subHeader || '',
-          imageUrl: link.uploadImage || '',
+          imageUrl: link.imageUrl || '',
         }
       );
     });

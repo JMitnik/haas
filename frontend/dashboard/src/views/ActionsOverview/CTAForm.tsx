@@ -34,8 +34,8 @@ import getCTANodesQuery from 'queries/getCTANodes';
 import intToBool from 'utils/intToBool';
 import updateCTAMutation from 'mutations/updateCTA';
 
-import { FormDataProps } from './CTATypes';
 import { useUploadUpsellImageMutation } from 'types/generated-types';
+import { FormDataProps } from './CTATypes';
 import FormNodeForm from './FormNodeForm';
 
 interface LinkInputProps {
@@ -49,6 +49,7 @@ interface LinkInputProps {
   header?: string;
   subHeader?: string;
   uploadImage?: string;
+  imageUrl?: string;
   buttonText?: string;
 }
 
@@ -313,9 +314,9 @@ const CTAForm = ({
         linkTypes: activeLinks.map((link, index) => {
           const { id, ...linkData } = link;
           console.log('form data link: ', formData.links[index]);
-          const { buttonText, subHeader, header, uploadImage } = formData.links[index];
+          const { buttonText, subHeader, header, imageUrl } = formData.links[index];
           return {
-            ...linkData, type: linkData.type?.value, buttonText, subHeader, header, uploadImage,
+            ...linkData, type: linkData.type?.value, buttonText, subHeader, header, imageUrl,
           };
         }),
       };
@@ -342,9 +343,9 @@ const CTAForm = ({
       const mappedLinks = {
         linkTypes: activeLinks.map((link, index) => {
           console.log('form data link: ', formData.links[index]);
-          const { buttonText, subHeader, header, uploadImage } = formData.links[index];
+          const { buttonText, subHeader, header, imageUrl } = formData.links[index];
           return {
-            ...link, type: link.type?.value, buttonText, subHeader, header, uploadImage,
+            ...link, type: link.type?.value, buttonText, subHeader, header, imageUrl,
           };
         }),
       };
@@ -682,8 +683,8 @@ const CTAForm = ({
 
                                   <Controller
                                     control={form.control}
-                                    name={`links[${index}].uploadImage`}
-                                    defaultValue=""
+                                    name={`links[${index}].imageUrl`}
+                                    defaultValue={link.imageUrl}
                                     render={({ onChange, value }) => (
                                       <ImageUploadLogoInput
                                         value={value}

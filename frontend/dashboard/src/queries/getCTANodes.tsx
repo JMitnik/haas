@@ -19,6 +19,10 @@ const getCTANodesOfDialogue = gql`
             iconUrl
             backgroundColor
             type
+            header
+            subHeader
+            buttonText
+            imageUrl
           }
           share {
             id
