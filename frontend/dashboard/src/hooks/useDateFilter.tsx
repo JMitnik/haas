@@ -46,7 +46,11 @@ export const useDateFilter = ({
   });
 
   const setDate = (dateRange: [Date, Date]) => {
-    setDateRange(dateRange);
+    if (dateRange === null) {
+      setDateRange([undefined, undefined]);
+    } else {
+      setDateRange(dateRange);
+    }
   };
 
   return {

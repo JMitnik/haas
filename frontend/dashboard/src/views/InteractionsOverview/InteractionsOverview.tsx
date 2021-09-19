@@ -3,7 +3,8 @@
 /* eslint-disable radix */
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
-import { Activity, Filter } from 'react-feather';
+import { Activity, Crosshair, Filter } from 'react-feather';
+import { Controller, useForm } from 'react-hook-form';
 import { Flex, ViewTitle } from '@haas/ui';
 import {
   Icon,
@@ -17,17 +18,20 @@ import {
   useDisclosure,
 } from '@chakra-ui/core';
 import { debounce } from 'lodash';
+import { format } from 'date-fns';
 import { useLocation } from 'react-router';
 import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
-import React, { useCallback, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import {
   CompactEntriesPath,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
-import { Controller, useForm } from 'react-hook-form';
-import { SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery } from 'types/generated-types';
+import {DeliveryFragmentFragment,
+  SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery } from 'types/generated-types';
+import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
+import { paginate } from 'utils/paginate';
 import { useDateFilter } from 'hooks/useDateFilter';
 import SearchBar from 'components/SearchBar/SearchBar';
 
@@ -46,10 +50,9 @@ interface TableProps {
   filterCampaignId?: string | 'all' | null;
 }
 
-interface CampaignVariant {
-  id: string;
-  label: string;
-}
+const AvatarContainer = styled(UI.Flex)`
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+`;
 
 const undefinedToNull = (value: any) => {
   if (value === undefined) {
@@ -58,6 +61,146 @@ const undefinedToNull = (value: any) => {
 
   return value;
 };
+
+const Avatar = ({ name, brand }: { name: string, brand: string }) => {
+  const firstLetter = name.slice(0, 1);
+  console.log(firstLetter);
+
+  return (
+    <AvatarContainer
+      alignItems="center"
+      justifyContent="center"
+      bg={`${brand}.100`}
+      width="30px"
+      height="30px"
+      color={`${brand}.600`}
+      borderRadius="10px"
+    >
+      <UI.Span fontWeight="600">
+        {firstLetter}
+      </UI.Span>
+    </AvatarContainer>
+  );
+};
+
+const DeliveryUserCell = ({ delivery }: { delivery: DeliveryFragmentFragment }) => (
+  <UI.Flex alignItems="center">
+    <UI.Div mr={2}>
+      {delivery.deliveryRecipientFirstName && (
+        <Avatar name={delivery.deliveryRecipientFirstName} brand="blue" />
+      )}
+    </UI.Div>
+    <UI.ColumnFlex>
+      <UI.Span fontWeight={600} color="blue.500">
+        {delivery.deliveryRecipientFirstName}
+        {' '}
+        {delivery.deliveryRecipientLastName}
+      </UI.Span>
+      <UI.Span color="blue.300" fontSize="0.7rem">
+        {delivery.id}
+      </UI.Span>
+    </UI.ColumnFlex>
+  </UI.Flex>
+);
+
+const AnonymousCell = ({ sessionId }: { sessionId: string }) => (
+  <UI.Flex alignItems="center">
+    <UI.Div mr={2}>
+      <Avatar name="A" brand="gray" />
+    </UI.Div>
+    <UI.ColumnFlex>
+      <UI.Span fontWeight={600} color="gray.500">
+        Anonymous
+      </UI.Span>
+      <UI.Span color="gray.400" fontSize="0.7rem">
+        {sessionId}
+      </UI.Span>
+    </UI.ColumnFlex>
+  </UI.Flex>
+);
+
+const DateCell = ({ timestamp }: { timestamp: string }) => {
+  const date = new Date(parseInt(timestamp, 10));
+
+  const formattedDate = format(date, 'd MMM yyyy');
+  const formattedTimestamp = format(date, 'HH:mm');
+
+  return (
+    <UI.ColumnFlex>
+      <UI.Helper>{formattedDate}</UI.Helper>
+      <UI.Span color="gray.400" fontWeight={600}>{formattedTimestamp}</UI.Span>
+    </UI.ColumnFlex>
+  );
+};
+
+interface FilterButtonProps {
+  filterKey: string;
+  value: string;
+  onDisable: () => void;
+}
+
+const FilterButton = ({ filterKey, value, onDisable }: FilterButtonProps) => {
+  console.log(filterKey);
+  return (
+    <UI.Label fontSize="0.7rem">
+      {filterKey}
+      :
+      {' '}
+      {value}
+      <UI.IconButton
+        aria-label="close"
+        icon={IconClose}
+        onClick={onDisable}
+        width={10}
+        minWidth={10}
+      />
+    </UI.Label>
+  );
+};
+
+const ActiveFilters = ({
+  filter,
+  setFilters
+}: { filter: TableProps, setFilters: Dispatch<SetStateAction<TableProps>>}) => {
+  console.log('filter');
+  return (
+    <UI.Stack isInline spacing={2} alignItems="center">
+      {!!filter.search && (
+        <FilterButton
+          filterKey="search"
+          value={filter.search}
+          onDisable={() => setFilters((filter) => ({ ...filter, search: '' }))}
+        />
+      )}
+      {/* {(filter.startDate || filter.endDate) && (
+      <UI.Label>
+        date:
+        {filter.startDate?.toISOString()}
+        {' - '}
+        {filter.endDate?.toISOString()}
+      </UI.Label>
+      )}
+      {!!filter.filterCampaigns && (
+      <UI.Label>
+        distribution:
+        {' '}
+        {filter.filterCampaigns}
+      </UI.Label>
+      )}
+      {!!filter.filterCampaignId && (
+      <UI.Label>
+        campaign-variant:
+        {' '}
+        {filter.filterCampaignId}
+      </UI.Label> */}
+    </UI.Stack>
+  );
+};
+
+interface CampaignVariant {
+  id: string;
+  label: string;
+}
 
 export const InteractionsOverview = () => {
   const { t } = useTranslation();
@@ -79,13 +222,25 @@ export const InteractionsOverview = () => {
     filterCampaignId: 'all',
   });
 
+  useEffect(() => {
+    console.log(startDate);
+    console.log(endDate);
+
+    setFilter((filter) => ({
+      ...filter,
+      startDate,
+      endDate,
+    }));
+  }, [startDate, endDate, setFilter]);
+
   useGetInteractionsQueryQuery({
     variables: {
       customerSlug,
       dialogueSlug,
       sessionsFilter: {
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
+        offset: filter.pageIndex * filter.perPage,
+        startDate: filter.startDate?.toISOString(),
+        endDate: filter.endDate?.toISOString(),
         search: filter.search,
         deliveryType: filter.filterCampaigns === 'all' ? undefined : filter.filterCampaigns,
         campaignVariantId: filter.filterCampaignId === 'all' ? undefined : filter.filterCampaignId,
@@ -125,13 +280,13 @@ export const InteractionsOverview = () => {
     });
   };
 
-  const handleSearchTermChange = useCallback(debounce((search: string) => {
+  const handleSearchTermChange = (search: string) => {
     setFilter((prevValues) => ({
       ...prevValues,
       search,
       pageIndex: 0,
     }));
-  }, 250), []);
+  };
 
   return (
     <>
@@ -154,7 +309,7 @@ export const InteractionsOverview = () => {
       </UI.ViewHead>
 
       <UI.ViewBody>
-        <UI.Flex mb={4} justifyContent="flex-end">
+        <UI.Flex mb={2} justifyContent="flex-end">
           <UI.Stack isInline spacing={4} alignItems="center">
             <UI.Div>
               <UI.DatePicker
@@ -173,9 +328,11 @@ export const InteractionsOverview = () => {
             />
           </UI.Stack>
         </UI.Flex>
+        <UI.Flex mb={4} justifyContent="flex-end">
+          <ActiveFilters filter={filter} setFilters={setFilter} />
+        </UI.Flex>
         <UI.Div width="100%">
-          <TableHeadingRow gridTemplateColumns="30px 1fr 1fr 1fr 1fr">
-            <UI.Div />
+          <TableHeadingRow gridTemplateColumns="1fr 1fr 1fr 1fr">
             <TableHeadingCell>
               User
             </TableHeadingCell>
@@ -183,39 +340,97 @@ export const InteractionsOverview = () => {
               Interaction
             </TableHeadingCell>
             <TableHeadingCell>
-              Path
+              Distribution
             </TableHeadingCell>
             <TableHeadingCell>
-              Delivery
+              Date
             </TableHeadingCell>
           </TableHeadingRow>
           <UI.Div>
             {sessions.map((session) => (
-              <TableRow gridTemplateColumns="30px 1fr 1fr 1fr 1fr" key={session.id}>
-                <UI.Div />
+              <TableRow gridTemplateColumns="1fr 1fr 1fr 1fr" key={session.id}>
                 <TableCell>
-                  {session.score}
-                </TableCell>
-                <TableCell>
-                  {session.createdAt}
+                  {session.delivery?.deliveryRecipientFirstName ? (
+                    <DeliveryUserCell delivery={session.delivery} />
+                  ): (
+                    <AnonymousCell sessionId={session.id} />
+                  )}
                 </TableCell>
                 <TableCell>
                   <CompactEntriesPath nodeEntries={session.nodeEntries} />
                 </TableCell>
+                <TableCell />
                 <TableCell>
-                  <UI.Label>
-                    {session.delivery?.id}
-                  </UI.Label>
+                  <DateCell timestamp={session.createdAt} />
                 </TableCell>
               </TableRow>
             ))}
           </UI.Div>
+          <UI.Flex justifyContent="flex-end" mt={4}>
+            <Pagination
+              pageIndex={filter.pageIndex}
+              maxPages={filter.totalPages}
+              perPage={filter.perPage}
+              setPageIndex={(page) => setFilter((filter) => ({...filter, pageIndex: page - 1}))}
+            />
+          </UI.Flex>
         </UI.Div>
       </UI.ViewBody>
     </>
   );
 };
 
+interface PaginationProps {
+  pageIndex: number;
+  maxPages: number;
+  perPage: number;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setPageIndex: (page: number) => void;
+}
+
+const PaginationContainer = styled(UI.Div)`
+  box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+  display: inline-block;
+  border-radius: 10px;
+`;
+
+const Pagination = ({
+  pageIndex,
+  maxPages,
+  perPage,
+  setPageIndex
+}: PaginationProps) => {
+  const { pages } = paginate(maxPages, pageIndex + 1, perPage, 5);
+
+  return (
+    <PaginationContainer bg="white" padding={2}>
+      <UI.Flex alignItems="center">
+        <UI.Div mr={2}>
+          Page
+          {' '}
+          {pageIndex + 1}
+          {' '}
+          out of
+          {' '}
+          {maxPages}
+        </UI.Div>
+        <UI.Stack spacing={2} isInline>
+          {pages.map((page) => (
+            <UI.Button
+              size="sm"
+              variantColor="teal"
+              isActive={page - 1 === pageIndex}
+              key={page}
+              onClick={() => setPageIndex(page)}
+            >
+              {page}
+            </UI.Button>
+          ))}
+        </UI.Stack>
+      </UI.Flex>
+    </PaginationContainer>
+  );
+};
 interface PickerContainerProps {
   isActive?: boolean;
 }
@@ -373,15 +588,23 @@ const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: Filt
 };
 
 const TableHeadingRow = styled(UI.Grid)`
-  margin-bottom: 6px;
+  ${({ theme }) => css`
+    background: ${theme.colors.gray[100]};
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  `}
 `;
 
 const TableRow = styled(UI.Grid)`
-  background: white;
-  align-items: center;
-  margin-bottom: 12px;
-  padding: 12px;
-  border-radius: 10px;
+  ${({ theme }) => css`
+    background: white;
+    align-items: center;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01),0 2px 4px -1px rgba(0,0,0,0.03);
+  `}
 `;
 
 const TableHeadingCell = styled(UI.Div)`
@@ -396,9 +619,9 @@ const TableHeadingCell = styled(UI.Div)`
 `;
 
 const TableCell = styled(UI.Div)`
-  font-weight: 600;
+  /* font-weight: 600;
   line-height: 1rem;
   font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.05em; */
 `;
