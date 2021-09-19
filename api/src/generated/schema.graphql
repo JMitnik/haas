@@ -207,10 +207,14 @@ type CreateWorkspaceJobType {
 
 input CTALinkInputObjectType {
   backgroundColor: String
+  buttonText: String
+  header: String
   iconUrl: String
   id: String
+  subHeader: String
   title: String
   type: LinkTypeEnumType
+  uploadImage: String
   url: String
 }
 

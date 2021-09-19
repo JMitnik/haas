@@ -242,6 +242,10 @@ export type CtaLinkInputObjectType = {
   title?: Maybe<Scalars['String']>;
   iconUrl?: Maybe<Scalars['String']>;
   backgroundColor?: Maybe<Scalars['String']>;
+  header?: Maybe<Scalars['String']>;
+  subHeader?: Maybe<Scalars['String']>;
+  buttonText?: Maybe<Scalars['String']>;
+  uploadImage?: Maybe<Scalars['String']>;
 };
 
 export type CtaLinksInputType = {

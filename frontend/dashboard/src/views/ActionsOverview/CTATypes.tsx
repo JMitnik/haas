@@ -17,7 +17,7 @@ export interface FormDataProps {
     backgroundColor?: string;
     header?: string;
     subHeader?: string;
-    imageUrl?: string;
+    uploadImage?: string;
     buttonText?: string;
   }>;
   share: { id?: string, tooltip: string, url: string, title: string };

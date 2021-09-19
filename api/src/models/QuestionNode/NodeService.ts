@@ -408,6 +408,10 @@ class NodeService {
           type: link.type || 'API',
           backgroundColor: link.backgroundColor || '',
           iconUrl: link.iconUrl || '',
+          buttonText: link.buttonText || '',
+          header: link.header || '',
+          subHeader: link.subHeader || '',
+          imageUrl: link.uploadImage || '',
           questionId,
         },
         {
@@ -416,6 +420,10 @@ class NodeService {
           type: link.type || 'API',
           backgroundColor: link.backgroundColor || '',
           iconUrl: link.iconUrl || '',
+          buttonText: link.buttonText || '',
+          header: link.header || '',
+          subHeader: link.subHeader || '',
+          imageUrl: link.uploadImage || '',
         }
       );
     });

@@ -25,6 +25,7 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
   args: { input: UpdateCTAInputType },
 
   async resolve(parent, args, ctx) {
+    console.log('updateCTA input:', args.input?.links?.linkTypes);
     if (!args.input?.id) throw new UserInputError('No ID Found');
     return ctx.services.nodeService.updateCTA(args.input);
   }

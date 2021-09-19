@@ -45,6 +45,10 @@ export interface UpdateLinkInput {
   type: LinkTypeEnum;
   backgroundColor: string;
   iconUrl: string;
+  buttonText: string;
+  header: string;
+  subHeader: string;
+  imageUrl: string;
 }
 
 export interface CreateLinkInput extends UpdateLinkInput {

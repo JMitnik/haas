@@ -39,10 +39,14 @@ export interface NexusGenInputs {
   }
   CTALinkInputObjectType: { // input type
     backgroundColor?: string | null; // String
+    buttonText?: string | null; // String
+    header?: string | null; // String
     iconUrl?: string | null; // String
     id?: string | null; // String
+    subHeader?: string | null; // String
     title?: string | null; // String
     type?: NexusGenEnums['LinkTypeEnumType'] | null; // LinkTypeEnumType
+    uploadImage?: string | null; // String
     url?: string | null; // String
   }
   CTALinksInputType: { // input type

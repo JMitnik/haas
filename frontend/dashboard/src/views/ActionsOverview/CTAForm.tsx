@@ -48,7 +48,7 @@ interface LinkInputProps {
   backgroundColor?: string;
   header?: string;
   subHeader?: string;
-  imageUrl?: string;
+  uploadImage?: string;
   buttonText?: string;
 }
 
@@ -154,7 +154,7 @@ const ImageUploadLogoInput = ({ onChange, value }: any) => {
         position: 'bottom-right',
         isClosable: true,
       });
-
+      console.log('upload url: ', result?.uploadUpsellImage?.url);
       onChange(result?.uploadUpsellImage?.url);
     },
     onError: () => {
@@ -310,9 +310,13 @@ const CTAForm = ({
 
     if (id === '-1') {
       const mappedLinks = {
-        linkTypes: activeLinks.map((link) => {
+        linkTypes: activeLinks.map((link, index) => {
           const { id, ...linkData } = link;
-          return { ...linkData, type: linkData.type?.value };
+          console.log('form data link: ', formData.links[index]);
+          const { buttonText, subHeader, header, uploadImage } = formData.links[index];
+          return {
+            ...linkData, type: linkData.type?.value, buttonText, subHeader, header, uploadImage,
+          };
         }),
       };
 
@@ -335,7 +339,16 @@ const CTAForm = ({
         },
       });
     } else {
-      const mappedLinks = { linkTypes: activeLinks.map((link) => ({ ...link, type: link.type?.value })) };
+      const mappedLinks = {
+        linkTypes: activeLinks.map((link, index) => {
+          console.log('form data link: ', formData.links[index]);
+          const { buttonText, subHeader, header, uploadImage } = formData.links[index];
+          return {
+            ...link, type: link.type?.value, buttonText, subHeader, header, uploadImage,
+          };
+        }),
+      };
+      console.log('mapped links: ', mappedLinks);
       updateCTA({
         variables: {
           input: {
@@ -651,7 +664,7 @@ const CTAForm = ({
                                   </FormErrorMessage>
                                 </FormControl>
                                 <FormControl>
-                                  <FormLabel htmlFor={`links[${index}].subHeader`}>{t('cta:redirect_button_text')}</FormLabel>
+                                  <FormLabel htmlFor={`links[${index}].buttonText`}>{t('cta:redirect_button_text')}</FormLabel>
                                   <InputHelper>{t('cta:redirect_button_text_helper')}</InputHelper>
                                   <Input
                                     isInvalid={!!form.errors.links?.[index]?.buttonText}
@@ -669,7 +682,7 @@ const CTAForm = ({
 
                                   <Controller
                                     control={form.control}
-                                    name="uploadImage"
+                                    name={`links[${index}].uploadImage`}
                                     defaultValue=""
                                     render={({ onChange, value }) => (
                                       <ImageUploadLogoInput

@@ -26,6 +26,10 @@ export const CTALinkInputObjectType = inputObjectType({
     t.string('title', { nullable: true });
     t.string('iconUrl', { nullable: true });
     t.string('backgroundColor', { nullable: true });
+    t.string('header', { nullable: true });
+    t.string('subHeader', { nullable: true });
+    t.string('buttonText', { nullable: true });
+    t.string('uploadImage', { nullable: true });
   },
 });
 
