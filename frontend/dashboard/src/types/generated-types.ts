@@ -774,6 +774,7 @@ export type Mutation = {
   removePixelRange?: Maybe<AwsImageType>;
   uploadJobImage?: Maybe<AwsImageType>;
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
+  uploadUpsellImage?: Maybe<ImageType>;
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
@@ -861,6 +862,11 @@ export type MutationUpdateCreateWorkspaceJobArgs = {
   resourceUrl?: Maybe<Scalars['String']>;
   referenceId?: Maybe<Scalars['String']>;
   errorMessage?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationUploadUpsellImageArgs = {
+  file?: Maybe<Scalars['Upload']>;
 };
 
 
@@ -1764,6 +1770,19 @@ export type VideoNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+export type UploadUpsellImageMutationVariables = Exact<{
+  file: Scalars['Upload'];
+}>;
+
+
+export type UploadUpsellImageMutation = (
+  { __typename?: 'Mutation' }
+  & { uploadUpsellImage?: Maybe<(
+    { __typename?: 'ImageType' }
+    & Pick<ImageType, 'url'>
+  )> }
+);
+
 export type GetWorkspaceAdminsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
 }>;
@@ -2176,6 +2195,39 @@ export type GetUserCustomerFromCustomerQuery = (
 );
 
 
+export const UploadUpsellImageDocument = gql`
+    mutation uploadUpsellImage($file: Upload!) {
+  uploadUpsellImage(file: $file) {
+    url
+  }
+}
+    `;
+export type UploadUpsellImageMutationFn = Apollo.MutationFunction<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>;
+
+/**
+ * __useUploadUpsellImageMutation__
+ *
+ * To run a mutation, you first call `useUploadUpsellImageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadUpsellImageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadUpsellImageMutation, { data, loading, error }] = useUploadUpsellImageMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useUploadUpsellImageMutation(baseOptions?: Apollo.MutationHookOptions<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>(UploadUpsellImageDocument, options);
+      }
+export type UploadUpsellImageMutationHookResult = ReturnType<typeof useUploadUpsellImageMutation>;
+export type UploadUpsellImageMutationResult = Apollo.MutationResult<UploadUpsellImageMutation>;
+export type UploadUpsellImageMutationOptions = Apollo.BaseMutationOptions<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>;
 export const GetWorkspaceAdminsDocument = gql`
     query GetWorkspaceAdmins($customerSlug: String!) {
   users(customerSlug: $customerSlug) {

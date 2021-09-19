@@ -9,6 +9,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Link, PlusCircle, Trash, Type } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
 import { useMutation } from '@apollo/client';
+
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
@@ -22,6 +23,7 @@ import {
 } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
+import FileDropInput from 'components/FileDropInput';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
@@ -33,6 +35,7 @@ import intToBool from 'utils/intToBool';
 import updateCTAMutation from 'mutations/updateCTA';
 
 import { FormDataProps } from './CTATypes';
+import { useUploadUpsellImageMutation } from 'types/generated-types';
 import FormNodeForm from './FormNodeForm';
 
 interface LinkInputProps {
@@ -43,6 +46,10 @@ interface LinkInputProps {
   iconUrl?: string;
   tooltip?: string;
   backgroundColor?: string;
+  header?: string;
+  subHeader?: string;
+  imageUrl?: string;
+  buttonText?: string;
 }
 
 interface ShareProps {
@@ -132,7 +139,48 @@ const LINK_TYPES = [
   { label: 'LINKEDIN', value: 'LINKEDIN' },
   { label: 'TWITTER', value: 'TWITTER' },
   { label: 'WHATSAPP', value: 'WHATSAPP' },
+  { label: 'SELL', value: 'SELL' },
 ];
+
+const ImageUploadLogoInput = ({ onChange, value }: any) => {
+  const toast = useToast();
+
+  const [uploadFile, { loading }] = useUploadUpsellImageMutation({
+    onCompleted: (result) => {
+      toast({
+        title: 'Uploaded!',
+        description: 'File has been uploaded.',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+
+      onChange(result?.uploadUpsellImage?.url);
+    },
+    onError: () => {
+      toast({
+        title: 'Something went wrong',
+        description: 'We were unable to upload file. Try again',
+        status: 'error',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+    },
+  });
+
+  const onDrop = (files: File[]) => {
+    if (!files.length) return;
+
+    const [file] = files;
+    uploadFile({ variables: { file } });
+  };
+
+  return (
+    <>
+      <FileDropInput value={value} onDrop={onDrop} isLoading={loading} />
+    </>
+  );
+};
 
 const CTAForm = ({
   id,
@@ -572,9 +620,65 @@ const CTAForm = ({
                                     onChange={(e: any) => handleBackgroundColorChange(e.currentTarget.value, index)}
                                     ref={form.register({ required: false })}
                                   />
-                                  <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor?.message}</FormErrorMessage>
+                                  <FormErrorMessage>
+                                    {!!form.errors.links?.[index]?.backgroundColor?.message}
+                                  </FormErrorMessage>
                                 </FormControl>
+                                <FormControl>
+                                  <FormLabel htmlFor={`links[${index}].header`}>{t('cta:upsell_header')}</FormLabel>
+                                  <InputHelper>{t('cta:upsell_header_helper')}</InputHelper>
+                                  <Input
+                                    isInvalid={!!form.errors.links?.[index]?.header}
+                                    name={`links[${index}].header`}
+                                    defaultValue={link.header}
+                                    ref={form.register({ required: false })}
+                                  />
+                                  <FormErrorMessage>
+                                    {!!form.errors.links?.[index]?.header?.message}
+                                  </FormErrorMessage>
+                                </FormControl>
+                                <FormControl>
+                                  <FormLabel htmlFor={`links[${index}].subHeader`}>{t('cta:upsell_subheader')}</FormLabel>
+                                  <InputHelper>{t('cta:upsell_subheader_helper')}</InputHelper>
+                                  <Input
+                                    isInvalid={!!form.errors.links?.[index]?.subHeader}
+                                    name={`links[${index}].subHeader`}
+                                    defaultValue={link.subHeader}
+                                    ref={form.register({ required: false })}
+                                  />
+                                  <FormErrorMessage>
+                                    {!!form.errors.links?.[index]?.subHeader?.message}
+                                  </FormErrorMessage>
+                                </FormControl>
+                                <FormControl>
+                                  <FormLabel htmlFor={`links[${index}].subHeader`}>{t('cta:redirect_button_text')}</FormLabel>
+                                  <InputHelper>{t('cta:redirect_button_text_helper')}</InputHelper>
+                                  <Input
+                                    isInvalid={!!form.errors.links?.[index]?.buttonText}
+                                    name={`links[${index}].buttonText`}
+                                    defaultValue={link.buttonText}
+                                    ref={form.register({ required: false })}
+                                  />
+                                  <FormErrorMessage>
+                                    {!!form.errors.links?.[index]?.buttonText?.message}
+                                  </FormErrorMessage>
+                                </FormControl>
+                                <FormControl>
+                                  <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+                                  <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
+                                  <Controller
+                                    control={form.control}
+                                    name="uploadImage"
+                                    defaultValue=""
+                                    render={({ onChange, value }) => (
+                                      <ImageUploadLogoInput
+                                        value={value}
+                                        onChange={onChange}
+                                      />
+                                    )}
+                                  />
+                                </FormControl>
                               </Grid>
                               <Button
                                 mt={4}

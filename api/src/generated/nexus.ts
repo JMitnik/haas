@@ -1182,6 +1182,7 @@ export interface NexusGenFieldTypes {
     updateQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
     uploadJobImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
+    uploadUpsellImage: NexusGenRootTypes['ImageType'] | null; // ImageType
     verifyUserToken: NexusGenRootTypes['VerifyUserTokenOutput']; // VerifyUserTokenOutput!
     whitifyImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
   }
@@ -1613,6 +1614,9 @@ export interface NexusGenArgTypes {
       file?: any | null; // Upload
       jobId?: string | null; // String
       type?: NexusGenEnums['UploadImageEnumType'] | null; // UploadImageEnumType
+    }
+    uploadUpsellImage: { // args
+      file?: any | null; // Upload
     }
     verifyUserToken: { // args
       token?: string | null; // String

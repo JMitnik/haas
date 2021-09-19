@@ -15,6 +15,10 @@ export interface FormDataProps {
     tooltip?: string;
     iconUrl?: string;
     backgroundColor?: string;
+    header?: string;
+    subHeader?: string;
+    imageUrl?: string;
+    buttonText?: string;
   }>;
   share: { id?: string, tooltip: string, url: string, title: string };
   formNode?: {

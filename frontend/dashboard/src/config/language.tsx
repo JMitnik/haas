@@ -1904,6 +1904,30 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'What is the background color for the link?',
       de: 'Was ist die Hintergrundfarbe für den Link?',
     },
+    upsell_header: {
+      en: 'Header text',
+      de: 'Überschrift',
+    },
+    upsell_header_helper: {
+      en: 'What is the header text for up/cross-sell opportunity?',
+      de: 'Wie lautet der Kopfzeilentext für Up-/Cross-Selling-Opportunities?',
+    },
+    upsell_subheader: {
+      en: 'Subheader text',
+      de: 'Untertiteltext',
+    },
+    upsell_subheader_helper: {
+      en: 'What is the subheader text for up/cross-sell opportunity?',
+      de: 'Wie lautet der Untertiteltext für Up-/Cross-Selling-Opportunities?',
+    },
+    redirect_button_text: {
+      en: 'Redirect button text',
+      de: 'Schaltflächentext umleiten',
+    },
+    redirect_button_text_helper: {
+      en: 'What is the text of the redirect button?',
+      de: 'Wie lautet der Text der Weiterleitungsschaltfläche?',
+    },
     delete_link: {
       en: 'Delete link',
       de: 'Link löschen',
