@@ -3811,6 +3811,14 @@
     "@svgr/plugin-svgo" "^4.3.1"
     loader-utils "^1.2.3"
 
+"@szhsin/react-menu@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@szhsin/react-menu/-/react-menu-2.0.1.tgz#0b6cdc5337f7da921d02df6350746138957227b5"
+  integrity sha512-pKwvRe22ByxBXwCjalaU8KI+HdVZc1YTh2oj44p+EfxsPeV7wjfydjmhqBJAEFJFiQqGkdo7ACwJVRmoaUycFw==
+  dependencies:
+    prop-types "^15.7.2"
+    react-transition-state "^0.3.0"
+
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@szmarczak/http-timer/-/http-timer-1.1.2.tgz#b1665e2c461a2cd92f4c1bbf50d5454de0d4b421"
@@ -19587,6 +19595,11 @@ react-transition-group@^4.3.0:
     dom-helpers "^5.0.1"
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
+
+react-transition-state@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/react-transition-state/-/react-transition-state-0.3.0.tgz#31dcf3cc95dc6eab4243fbdbdf665de2e4174438"
+  integrity sha512-SwfZCOk9nIPCAz/9wC9t/eS5ut7pkSrQoJGJ+xPPbXLQP52ySLjf5fvBX6ySKk8Al0qXM8MM1NU152CFfpFXaQ==
 
 react-youtube@^7.13.1:
   version "7.13.1"

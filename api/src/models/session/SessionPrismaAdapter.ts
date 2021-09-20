@@ -93,6 +93,21 @@ class SessionPrismaAdapter {
 
     // Add search filter
     if (filter?.search) {
+      const [potentialFirstName, potentialLastName] = filter.search.split(' ');
+
+      const doFullSearch = () => {
+        if (potentialLastName) {
+          return {
+            AND: potentialLastName ? [
+              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
+              { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
+            ]: undefined
+          }
+        }
+
+        return
+      };
+
       query = {
         ...cloneDeep(query),
         OR: [{
@@ -127,8 +142,14 @@ class SessionPrismaAdapter {
             OR: [
               { deliveryRecipientEmail: { equals: filter.search, mode: 'insensitive' }, },
               { deliveryRecipientPhone: { equals: filter.search, mode: 'insensitive' }, },
-              { deliveryRecipientFirstName: { equals: filter.search, mode: 'insensitive' }, },
-              { deliveryRecipientLastName: { equals: filter.search, mode: 'insensitive' }, }
+              { AND: potentialLastName ? [
+                { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
+                { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
+              ]: undefined },
+              { OR: !potentialLastName? [
+                { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
+                { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' }, },
+              ] : undefined }
             ]
           }
         }]

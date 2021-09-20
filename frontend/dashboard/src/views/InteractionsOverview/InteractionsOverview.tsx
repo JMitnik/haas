@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable radix */
+import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
-import { Activity, Filter } from 'react-feather';
+import { Activity, BarChart, Calendar, Filter, MessageCircle } from 'react-feather';
+import { ControlledMenu, MenuDivider, MenuHeader, MenuItem, MenuState, SubMenu, useMenuState } from '@szhsin/react-menu';
 import { Controller, useForm } from 'react-hook-form';
 import { Flex, ViewTitle } from '@haas/ui';
 import {
@@ -17,7 +19,7 @@ import {
   RadioGroup,
   useDisclosure,
 } from '@chakra-ui/core';
-import { format } from 'date-fns';
+import { endOfDay, format, startOfDay } from 'date-fns';
 import { useLocation } from 'react-router';
 import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
@@ -138,8 +140,36 @@ interface FilterButtonProps {
   onDisable: () => void;
 }
 
+const FilterButtonContainer = styled(UI.Div)`
+  font-weight: 600;
+  line-height: 1rem;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: white;
+  box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+  border-radius: 10px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+
+  button {
+    margin-left: 10px;
+    max-width: 20px !important;
+    max-height: 20px;
+
+    min-width: auto;
+    min-height: auto;
+
+    svg {
+      width: 80%;
+      height: 100%;
+    }
+  }
+`;
+
 const FilterButton = ({ filterKey, value, onDisable }: FilterButtonProps) => (
-  <UI.Label fontSize="0.7rem">
+  <FilterButtonContainer>
     {filterKey}
     :
     {' '}
@@ -151,14 +181,14 @@ const FilterButton = ({ filterKey, value, onDisable }: FilterButtonProps) => (
       width={10}
       minWidth={10}
     />
-  </UI.Label>
+  </FilterButtonContainer>
 );
 
 const ActiveFilters = ({
   filter,
   setFilters
 }: { filter: TableProps, setFilters: Dispatch<SetStateAction<TableProps>>}) => (
-  <UI.Stack isInline spacing={2} alignItems="center">
+  <UI.Stack isInline spacing={4} alignItems="center">
     {!!filter.search && (
     <FilterButton
       filterKey="search"
@@ -166,27 +196,27 @@ const ActiveFilters = ({
       onDisable={() => setFilters((filter) => ({ ...filter, search: '' }))}
     />
     )}
-    {/* {(filter.startDate || filter.endDate) && (
-      <UI.Label>
-        date:
-        {filter.startDate?.toISOString()}
-        {' - '}
-        {filter.endDate?.toISOString()}
-      </UI.Label>
-      )}
-      {!!filter.filterCampaigns && (
-      <UI.Label>
-        distribution:
-        {' '}
-        {filter.filterCampaigns}
-      </UI.Label>
-      )}
-      {!!filter.filterCampaignId && (
-      <UI.Label>
-        campaign-variant:
-        {' '}
-        {filter.filterCampaignId}
-      </UI.Label> */}
+    {(filter.startDate || filter.endDate) && (
+      <FilterButton
+        filterKey="date"
+        value={`${filter.startDate?.toISOString()} - ${filter.endDate?.toISOString()}`}
+        onDisable={() => setFilters((filter) => ({ ...filter, startDate: undefined, endDate: undefined, }))}
+      />
+    )}
+    {!!filter.filterCampaigns && (
+      <FilterButton
+        filterKey="distribution"
+        value={filter.filterCampaigns}
+        onDisable={() => setFilters((filter) => ({...filter, filterCampaigns: undefined }))}
+      />
+    )}
+    {!!filter.filterCampaignId && (
+      <FilterButton
+        filterKey="campaignVariant"
+        value={filter.filterCampaignId}
+        onDisable={() => setFilters((filter) => ({...filter, filterCampaignId: undefined }))}
+      />
+    )}
   </UI.Stack>
 );
 
@@ -194,6 +224,54 @@ interface CampaignVariant {
   id: string;
   label: string;
 }
+
+const MenuContainer = styled.div`
+  ${({ theme }) => css`
+    .szh-menu {
+      border-radius: 10px;
+    }
+
+    .szh-menu__header {
+      display: flex;
+      font-weight: 600;
+      line-height: 1rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      align-items: center;
+      letter-spacing: 0.05em;
+    }
+
+    .szh-menu__submenu > .szh-menu__item {
+      color: #4a5568;
+      font-weight: 500;
+
+      ${UI.Icon} {
+        max-width: 20px;
+        margin-right: 12px;
+
+        svg {
+          max-width: 100%;
+        }
+      }
+    }
+  `}
+`;
+
+interface MenuProps {
+  children: React.ReactNode;
+  anchorPoint: { x: number; y: number };
+  endTransition: () => void;
+  onClose: () => void;
+  state? : MenuState;
+}
+
+const Menu = ({ children, ...menuProps } : MenuProps) => (
+  <MenuContainer>
+    <ControlledMenu {...menuProps}>
+      {children}
+    </ControlledMenu>
+  </MenuContainer>
+);
 
 export const InteractionsOverview = () => {
   const { t } = useTranslation();
@@ -224,15 +302,17 @@ export const InteractionsOverview = () => {
     }));
   }, [startDate, endDate, setFilter]);
 
+  console.log(filter.startDate);
+  console.log(filter.endDate);
   useGetInteractionsQueryQuery({
     variables: {
       customerSlug,
       dialogueSlug,
       sessionsFilter: {
         offset: filter.pageIndex * filter.perPage,
-        startDate: filter.startDate?.toISOString(),
+        startDate: filter.startDate ? filter.startDate?.toISOString() : undefined,
         perPage: filter.perPage,
-        endDate: filter.endDate?.toISOString(),
+        endDate: filter.endDate ? filter.endDate?.toISOString() : undefined,
         search: filter.search,
         deliveryType: filter.filterCampaigns === 'all' ? undefined : filter.filterCampaigns,
         campaignVariantId: filter.filterCampaignId === 'all' ? undefined : filter.filterCampaignId,
@@ -269,6 +349,25 @@ export const InteractionsOverview = () => {
       ...filter,
       filterCampaigns: filterValues.filterCampaigns as SessionDeliveryType,
       filterCampaignId: filterValues.filterCampaignVariant,
+      pageIndex: 0,
+    });
+  };
+
+  const handleSingleDateFilterChange = (day: Date) => {
+    setFilter({
+      ...filter,
+      startDate: startOfDay(day),
+      endDate: endOfDay(day),
+      pageIndex: 0,
+    });
+  };
+
+  const handleMultiDateFilterChange = (startDate?: Date, endDate?: Date) => {
+    setFilter({
+      ...filter,
+      startDate,
+      endDate,
+      pageIndex: 0,
     });
   };
 
@@ -279,6 +378,9 @@ export const InteractionsOverview = () => {
       pageIndex: 0,
     }));
   };
+  const { toggleMenu, ...menuProps } = useMenuState();
+  const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
+  const [contextInteraction, setContextInteraction] = useState<SessionFragmentFragment>();
 
   return (
     <>
@@ -339,11 +441,86 @@ export const InteractionsOverview = () => {
             </TableHeadingCell>
           </TableHeadingRow>
           <UI.Div>
+            <Menu
+              {...menuProps}
+              anchorPoint={anchorPoint}
+              onClose={() => toggleMenu(false)}
+            >
+              <MenuHeader>
+                <UI.Icon>
+                  <Filter />
+                </UI.Icon>
+                Filter
+              </MenuHeader>
+              <SubMenu label={(
+                <UI.Flex>
+                  <UI.Icon mr={1} width={10}>
+                    <Calendar />
+                  </UI.Icon>
+                  Date
+                </UI.Flex>
+                  )}
+              >
+                <MenuItem
+                  onClick={() => handleMultiDateFilterChange(undefined, new Date(contextInteraction?.createdAt))}
+                >
+                  Before date
+                </MenuItem>
+                <MenuItem
+                  onClick={() => handleSingleDateFilterChange(contextInteraction?.createdAt)}
+                >
+                  On day
+                </MenuItem>
+                <MenuItem
+                  onClick={() => handleMultiDateFilterChange(new Date(contextInteraction?.createdAt), undefined)}
+                >
+                  After day
+                </MenuItem>
+              </SubMenu>
+              {contextInteraction?.delivery && (
+                <>
+                  <SubMenu label={(
+                    <UI.Flex>
+                      <UI.Icon mr={1} width={10}>
+                        <MessageCircle />
+                      </UI.Icon>
+                      Campaign
+                    </UI.Flex>
+                  )}
+                  >
+                    <MenuItem
+                      onClick={() => handleSearchTermChange(contextInteraction?.delivery?.deliveryRecipientFirstName)}
+                    >
+                      More from
+                      {' '}
+                      {contextInteraction?.delivery?.deliveryRecipientFirstName}
+                      {' '}
+                      {contextInteraction?.delivery?.deliveryRecipientLastName}
+                    </MenuItem>
+                    <MenuItem onClick={() => handleCampaignVariantFilterChange({
+                      filterCampaignVariant: contextInteraction?.delivery?.campaignVariant?.id
+                    })}
+                    >
+                      More from campaign variant
+                      {' '}
+                      {contextInteraction?.delivery?.campaignVariant?.label}
+                    </MenuItem>
+                  </SubMenu>
+                </>
+              )}
+            </Menu>
+
             {sessions.map((session) => (
               <TableRow
                 onClick={() => setActiveSession(session)}
                 gridTemplateColumns="1fr 1fr 1fr 1fr"
                 key={session.id}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setAnchorPoint({ x: e.clientX, y: e.clientY });
+                  setContextInteraction(session);
+                  toggleMenu(true);
+                }}
               >
                 <TableCell>
                   {session.delivery?.deliveryRecipientFirstName ? (
