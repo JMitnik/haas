@@ -13,7 +13,6 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => {
-  const fromOutput = useRef<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
   const startedRef = useRef<boolean>();
 
@@ -24,8 +23,6 @@ const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => 
       onSearchTermChange(searchTerm);
       startedRef.current = false;
     }
-
-    fromOutput.current = true;
   }, 500, [searchTerm]);
 
   useEffect(() => {

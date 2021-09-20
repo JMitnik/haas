@@ -3,7 +3,7 @@
 /* eslint-disable radix */
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
-import { Activity, Crosshair, Filter } from 'react-feather';
+import { Activity, Filter } from 'react-feather';
 import { Controller, useForm } from 'react-hook-form';
 import { Flex, ViewTitle } from '@haas/ui';
 import {
@@ -17,12 +17,11 @@ import {
   RadioGroup,
   useDisclosure,
 } from '@chakra-ui/core';
-import { debounce } from 'lodash';
 import { format } from 'date-fns';
 import { useLocation } from 'react-router';
 import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import {
@@ -34,6 +33,7 @@ import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
 import { paginate } from 'utils/paginate';
 import { useDateFilter } from 'hooks/useDateFilter';
 import SearchBar from 'components/SearchBar/SearchBar';
+import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
 interface TableProps {
   search: string;
@@ -64,7 +64,6 @@ const undefinedToNull = (value: any) => {
 
 const Avatar = ({ name, brand }: { name: string, brand: string }) => {
   const firstLetter = name.slice(0, 1);
-  console.log(firstLetter);
 
   return (
     <AvatarContainer
@@ -139,40 +138,35 @@ interface FilterButtonProps {
   onDisable: () => void;
 }
 
-const FilterButton = ({ filterKey, value, onDisable }: FilterButtonProps) => {
-  console.log(filterKey);
-  return (
-    <UI.Label fontSize="0.7rem">
-      {filterKey}
-      :
-      {' '}
-      {value}
-      <UI.IconButton
-        aria-label="close"
-        icon={IconClose}
-        onClick={onDisable}
-        width={10}
-        minWidth={10}
-      />
-    </UI.Label>
-  );
-};
+const FilterButton = ({ filterKey, value, onDisable }: FilterButtonProps) => (
+  <UI.Label fontSize="0.7rem">
+    {filterKey}
+    :
+    {' '}
+    {value}
+    <UI.IconButton
+      aria-label="close"
+      icon={IconClose}
+      onClick={onDisable}
+      width={10}
+      minWidth={10}
+    />
+  </UI.Label>
+);
 
 const ActiveFilters = ({
   filter,
   setFilters
-}: { filter: TableProps, setFilters: Dispatch<SetStateAction<TableProps>>}) => {
-  console.log('filter');
-  return (
-    <UI.Stack isInline spacing={2} alignItems="center">
-      {!!filter.search && (
-        <FilterButton
-          filterKey="search"
-          value={filter.search}
-          onDisable={() => setFilters((filter) => ({ ...filter, search: '' }))}
-        />
-      )}
-      {/* {(filter.startDate || filter.endDate) && (
+}: { filter: TableProps, setFilters: Dispatch<SetStateAction<TableProps>>}) => (
+  <UI.Stack isInline spacing={2} alignItems="center">
+    {!!filter.search && (
+    <FilterButton
+      filterKey="search"
+      value={filter.search}
+      onDisable={() => setFilters((filter) => ({ ...filter, search: '' }))}
+    />
+    )}
+    {/* {(filter.startDate || filter.endDate) && (
       <UI.Label>
         date:
         {filter.startDate?.toISOString()}
@@ -193,9 +187,8 @@ const ActiveFilters = ({
         {' '}
         {filter.filterCampaignId}
       </UI.Label> */}
-    </UI.Stack>
-  );
-};
+  </UI.Stack>
+);
 
 interface CampaignVariant {
   id: string;
@@ -207,6 +200,7 @@ export const InteractionsOverview = () => {
   const { dialogueSlug, customerSlug } = useNavigator();
   const location = useLocation();
 
+  const [activeSession, setActiveSession] = useState<SessionFragmentFragment | null>(null);
   const [campaignVariants, setCampaignVariants] = useState<CampaignVariant[]>([]);
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
   const { startDate, endDate, setDate } = useDateFilter({});
@@ -215,7 +209,7 @@ export const InteractionsOverview = () => {
     endDate,
     search: qs.parse(location.search, { ignoreQueryPrefix: true })?.search?.toString() || '',
     pageIndex: 0,
-    perPage: 8,
+    perPage: 10,
     sortBy: [{ by: 'createdAt', desc: true }],
     totalPages: 0,
     filterCampaigns: 'all',
@@ -223,9 +217,6 @@ export const InteractionsOverview = () => {
   });
 
   useEffect(() => {
-    console.log(startDate);
-    console.log(endDate);
-
     setFilter((filter) => ({
       ...filter,
       startDate,
@@ -240,6 +231,7 @@ export const InteractionsOverview = () => {
       sessionsFilter: {
         offset: filter.pageIndex * filter.perPage,
         startDate: filter.startDate?.toISOString(),
+        perPage: filter.perPage,
         endDate: filter.endDate?.toISOString(),
         search: filter.search,
         deliveryType: filter.filterCampaigns === 'all' ? undefined : filter.filterCampaigns,
@@ -348,7 +340,11 @@ export const InteractionsOverview = () => {
           </TableHeadingRow>
           <UI.Div>
             {sessions.map((session) => (
-              <TableRow gridTemplateColumns="1fr 1fr 1fr 1fr" key={session.id}>
+              <TableRow
+                onClick={() => setActiveSession(session)}
+                gridTemplateColumns="1fr 1fr 1fr 1fr"
+                key={session.id}
+              >
                 <TableCell>
                   {session.delivery?.deliveryRecipientFirstName ? (
                     <DeliveryUserCell delivery={session.delivery} />
@@ -375,6 +371,12 @@ export const InteractionsOverview = () => {
             />
           </UI.Flex>
         </UI.Div>
+
+        <UI.Modal isOpen={!!activeSession} onClose={() => setActiveSession(null)}>
+          <UI.Card bg="white" width={600} padding={4} noHover>
+            test
+          </UI.Card>
+        </UI.Modal>
       </UI.ViewBody>
     </>
   );
@@ -401,6 +403,22 @@ const Pagination = ({
   setPageIndex
 }: PaginationProps) => {
   const { pages } = paginate(maxPages, pageIndex + 1, perPage, 5);
+  const startedRef = useRef<boolean>(false);
+  const [inputPageIndex, setInputPageIndex] = useState(1);
+
+  useDebouncedEffect(() => {
+    if (startedRef.current) {
+      startedRef.current = false;
+      setPageIndex(Math.max(0, Number(inputPageIndex)));
+    }
+  }, 500, [inputPageIndex]);
+
+  useEffect(() => {
+    if (!startedRef.current) {
+      startedRef.current = false;
+      setInputPageIndex(pageIndex);
+    }
+  }, [pageIndex, setInputPageIndex]);
 
   return (
     <PaginationContainer bg="white" padding={2}>
@@ -414,6 +432,13 @@ const Pagination = ({
           {' '}
           {maxPages}
         </UI.Div>
+
+        <UI.Input
+          type="number"
+          value={inputPageIndex}
+          width={40}
+          onChange={(e) => { startedRef.current = true; setInputPageIndex(e.target.value); }}
+        />
         <UI.Stack spacing={2} isInline>
           {pages.map((page) => (
             <UI.Button
@@ -604,6 +629,14 @@ const TableRow = styled(UI.Grid)`
     margin-bottom: 12px;
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01),0 2px 4px -1px rgba(0,0,0,0.03);
+    transition: all 0.2s ease-in;
+    cursor: pointer;
+
+    &:hover {
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.08);
+      transition: all 0.2s ease-in;
+    }
   `}
 `;
 
