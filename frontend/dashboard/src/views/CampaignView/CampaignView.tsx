@@ -323,21 +323,41 @@ export const CampaignView = () => {
               </UI.Div>
 
               <UI.Div>
-                <UI.Stack isInline>
+                <UI.Stack isInline alignItems="center">
+                  <UI.Div>
+                    <UI.Button
+                      size="sm"
+                      variantColor="teal"
+                      onClick={() => setPaginationState((state) => ({
+                        ...state,
+                        paginationFilter: {
+                          ...state.paginationFilter,
+                          pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
+                          offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
+                        },
+                      }))}
+                      isDisabled={paginationState.paginationFilter?.pageIndex === 0}
+                    >
+                      Previous
+                    </UI.Button>
+                  </UI.Div>
+
+                  <UI.Div>
+                    <UI.DebouncedInput
+                      value={(paginationState.paginationFilter?.pageIndex || 0) + 1}
+                      onChange={(val) => setPaginationState((state) => ({
+                        ...state,
+                        paginationFilter: {
+                          ...state.paginationFilter,
+                          pageIndex: val - 1,
+                          offset: Math.max((val - 1), 0) * (state.paginationFilter?.limit || 0)
+                        }
+                      }))}
+                    />
+                  </UI.Div>
                   <UI.Button
-                    onClick={() => setPaginationState((state) => ({
-                      ...state,
-                      paginationFilter: {
-                        ...state.paginationFilter,
-                        pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
-                        offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
-                      },
-                    }))}
-                    isDisabled={paginationState.paginationFilter?.pageIndex === 0}
-                  >
-                    Previous
-                  </UI.Button>
-                  <UI.Button
+                    size="sm"
+                    variantColor="teal"
                     onClick={() => setPaginationState((state) => ({
                       ...state,
                       paginationFilter: {

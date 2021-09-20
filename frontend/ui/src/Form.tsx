@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, ReactNode } from 'react';
+import React, { forwardRef, Ref, ReactNode, useState, useEffect, useRef } from 'react';
 import 'antd/dist/antd.css'; // Slider,
 import 'easymde/dist/easymde.min.css'; // Markdown
 import AntdDatePickerGenerate from 'rc-picker/lib/generate/dateFns';
@@ -797,6 +797,43 @@ export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
     {...props}
   />
 );
+
+const useDebouncedEffect = (
+  callback: () => any, delay = 250, dependencies?: any[],
+) => useEffect(() => {
+  const timer = setTimeout(callback, delay);
+
+  return () => {
+    clearTimeout(timer);
+  };
+}, dependencies);
+
+export const DebouncedInput = ({ value, onChange }: { value: any, onChange: (val: any) => void }) => {
+  const [localValue, setLocalValue] = useState();
+  const startedRef = useRef<boolean>();
+
+  useDebouncedEffect(() => {
+    if (startedRef.current) {
+      onChange(localValue);
+      startedRef.current = false;
+    }
+  }, 500, [localValue]);
+
+  useEffect(() => {
+    if (value !== localValue && !startedRef.current) {
+      setLocalValue(value);
+    }
+  }, [value]);
+
+  return (
+    <Input
+      value={localValue}
+      width={40}
+      // @ts-ignore
+      onChange={(e) => {startedRef.current = true; setLocalValue(e.target.value)}}
+    />
+  )
+}
 
 export const RangeDatePickerWrapper = (props: RangePickerProps) => (
   <AntdRangePicker
