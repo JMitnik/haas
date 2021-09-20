@@ -336,7 +336,7 @@ export const CampaignView = () => {
                           offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
                         },
                       }))}
-                      isDisabled={loading || paginationState.paginationFilter?.pageIndex === 0}
+                      isDisabled={paginationState.paginationFilter?.pageIndex === 0}
                     >
                       Previous
                     </UI.Button>
@@ -366,10 +366,7 @@ export const CampaignView = () => {
                         offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
                       },
                     }))}
-                    isDisabled={
-                      loading
-                      || (paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages
-                    }
+                    isDisabled={(paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages}
                   >
                     Next
                   </UI.Button>
