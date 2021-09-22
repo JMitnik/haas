@@ -1,6 +1,7 @@
 import { Facebook, Globe, Instagram, Linkedin, ShoppingCart, Twitter } from 'react-feather';
+import Color from 'color';
 import React from 'react';
-import styled, { } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Div, Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
@@ -57,24 +58,36 @@ const DefaultSocialItems = (handleLinkClick: any) => (
 );
 
 const DrawerContainer = styled(Div)`
+   ${({ theme }) => css`
   display: grid;
   row-gap: 2em;
-  background: white;
+  background: ${Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()};
+  
   padding: 24px;
   border-radius: 30px;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
   backdrop-filter: blur(10px);
+  max-width: 600px;
+  `}
 `;
 
 const TextGradient = styled(Div)`
-  background-image: linear-gradient(180deg, rgba(6, 41, 166, 0.2) 0%, rgba(6, 41, 166, 0) 90.62%, rgba(6, 41, 166, 0.00574713) 96.87%),
-linear-gradient(0deg, #22A8F4, #22A8F4);
+ ${({ theme }) => css`
+
+ /* ${Color(theme.colors.primary).isDark() && `
+    background-image: linear-gradient(180deg, rgba(6, 41, 166, 0.2) 0%, rgba(6, 41, 166, 0) 90.62%, rgba(6, 41, 166, 0.00574713) 96.87%),
+    linear-gradient(0deg, ${theme.colors.primary}, ${theme.colors.primary});
     background-size: 100%;
     background-clip: text;
     -webkit-background-clip: text;
     -moz-background-clip: text;
     -webkit-text-fill-color: transparent; 
-    -moz-text-fill-color: transparent;
+    -moz-text-fill-color: transparent; 
+ `} */
+
+  color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+  
+ `}
 `;
 
 const HeaderContainer = styled(TextGradient)`
@@ -91,30 +104,56 @@ const ImageContainer = styled(Div)`
   justify-content: center;
 
   img {
-    max-width: 70%;
+    max-height: 200px;
+    object-fit: contain;
   }
 `;
 
-const RedirectButton = styled.button`
-  all: unset;
+const RedirectButton = styled.a`
+   ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+  
+    max-width: fit-content;
+    background: ${Color(theme.colors.primary).isLight() ? Color(theme.colors.primary).hex() : Color(theme.colors.primary).lighten(0.3).hex()};
+    font-weight: bold;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+    padding: 12px 32px;
 
-  display: flex;
-  align-items: center;
+    animation: 2s pulse infinite;
+    text-decoration: none;
+    color: ${Color(theme.colors.primary).isDark() ? Color('white').hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
 
-  max-width: fit-content;
-  background: #92E4FE;
-  color: #1D9ED9;
-  font-weight: bold;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.05);
-  border-radius: 5px;
-  padding: 12px 32px;
+    :hover {
+      cursor: pointer;
+      color: ${Color(theme.colors.primary).isDark() ? Color('white').hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+    }
+  `}
+  
+  @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 0 ,0, 0.7);
+      }
+      
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 5px rgba(0, 0 ,0, 0);
+      }
+
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0px rgba(0, 0, 0, 0);
+      }
+    }
   
 `;
 
 const RedirectContainer = styled(Div)`
   display: flex;
   justify-content: center;
-  padding-bottom: 2em;
+  padding-bottom: 1em;
 `;
 
 const IconContainer = styled(Div)`
@@ -136,29 +175,38 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   return (
     <SocialShareNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>
-      <DrawerContainer>
-        <ImageContainer>
-          <img src={node.links[0].imageUrl || ''} alt="product" />
-        </ImageContainer>
-        <div>
-          <HeaderContainer>
-            {node.links[0].header}
-          </HeaderContainer>
-          <SubheaderContainer>
-            {node.links[0].subHeader}
-          </SubheaderContainer>
-        </div>
-        <RedirectContainer>
+      {node.links.length === 1 && (
+        <Flex justifyContent="center">
+          <DrawerContainer>
 
-          <RedirectButton>
-            <IconContainer>
-              <ShoppingCart />
-            </IconContainer>
-            Claim
-          </RedirectButton>
-        </RedirectContainer>
+            <ImageContainer>
+              <img src={node.links[0].imageUrl || ''} alt="product" />
+            </ImageContainer>
 
-      </DrawerContainer>
+            <div style={{ paddingBottom: '1em' }}>
+              <HeaderContainer>
+                {node.links[0].header}
+              </HeaderContainer>
+              <SubheaderContainer>
+                {node.links[0].subHeader}
+              </SubheaderContainer>
+            </div>
+            <RedirectContainer>
+
+              <RedirectButton href={node.links[0].url} target="__blank" rel="noopener noreferrer">
+                <IconContainer>
+                  <ShoppingCart />
+                </IconContainer>
+
+                {node.links[0].buttonText}
+
+              </RedirectButton>
+            </RedirectContainer>
+
+          </DrawerContainer>
+        </Flex>
+      )}
+
       {(node.links.length === 0 || node.links.length > 1) && (
         <Flex data-testid="shareitems" justifyContent="center" alignItems="center">
           {node.links.length === 0 && <DefaultSocialItems />}
