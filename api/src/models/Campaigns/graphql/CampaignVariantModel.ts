@@ -1,5 +1,6 @@
 import { enumType, objectType } from '@nexus/schema';
 
+import { CampaignModel } from './CampaignModel';
 import { CustomerType } from '../../customer/Customer';
 import { DialogueType } from '../../questionnaire/Dialogue';
 
@@ -31,6 +32,7 @@ export const CampaignVariantModel = objectType({
     t.field('type', { type: CampaignVariantEnum });
     t.field('workspace', { type: CustomerType, nullable: true });
     t.field('dialogue', { type: DialogueType, nullable: true });
+    t.field('campaign', { type: CampaignModel, nullable: true });
 
     t.list.field('customVariables', { type: CampaignVariantCustomVariableType, nullable: true });
   }

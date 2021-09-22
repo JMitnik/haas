@@ -86,6 +86,10 @@ const authShield = shield({
   Customer: {
     usersConnection: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)
   },
+  DeliveryType: {
+    deliveryRecipientFirstName: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES)),
+    deliveryRecipientLastName: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES)),
+  },
   Dialogue: {
     // Write this up
     // statistics: canAccessCompany,

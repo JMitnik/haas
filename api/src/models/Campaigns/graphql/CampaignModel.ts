@@ -10,7 +10,7 @@ export const CampaignModel = objectType({
   definition(t) {
     t.id('id');
     t.string('label');
-    t.list.field('variants', { type: CampaignVariantModel });
+    t.list.field('variants', { type: CampaignVariantModel, nullable: true });
   },
 });
 
@@ -96,7 +96,11 @@ export const GetCampaignVariantOfDelivery = extendType({
           include: {
             campaignVariant: {
               include: {
-                CampaignVariantToCampaign: true,
+                CampaignVariantToCampaign: {
+                  include: {
+                    campaign: true,
+                  }
+                },
                 dialogue: true,
                 workspace: true,
                 customVariables: true,
@@ -113,6 +117,11 @@ export const GetCampaignVariantOfDelivery = extendType({
           dialogue: campaignVariant.dialogue,
           label: campaignVariant.label,
           weight: campaignVariant.CampaignVariantToCampaign[0].weight,
+          campaign: {
+            id: campaignVariant.CampaignVariantToCampaign[0].campaign.id,
+            label: campaignVariant.CampaignVariantToCampaign[0].campaign.label,
+            variants: [],
+          },
           workspace: campaignVariant.workspace,
           type: campaignVariant.type,
           customVariables: campaignVariant.customVariables,

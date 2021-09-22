@@ -29,8 +29,10 @@ import styled, { css } from 'styled-components';
 import {
   CompactEntriesPath,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
-import {DeliveryFragmentFragment,
-  SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery } from 'types/generated-types';
+import {
+  DeliveryFragmentFragment,
+  SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery
+} from 'types/generated-types';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
 import { paginate } from 'utils/paginate';
 import { useDateFilter } from 'hooks/useDateFilter';
@@ -187,14 +189,14 @@ const FilterButton = ({ filterKey, value, onDisable }: FilterButtonProps) => (
 const ActiveFilters = ({
   filter,
   setFilters
-}: { filter: TableProps, setFilters: Dispatch<SetStateAction<TableProps>>}) => (
+}: { filter: TableProps, setFilters: Dispatch<SetStateAction<TableProps>> }) => (
   <UI.Stack isInline spacing={4} alignItems="center">
     {!!filter.search && (
-    <FilterButton
-      filterKey="search"
-      value={filter.search}
-      onDisable={() => setFilters((filter) => ({ ...filter, search: '' }))}
-    />
+      <FilterButton
+        filterKey="search"
+        value={filter.search}
+        onDisable={() => setFilters((filter) => ({ ...filter, search: '' }))}
+      />
     )}
     {(filter.startDate || filter.endDate) && (
       <FilterButton
@@ -207,14 +209,14 @@ const ActiveFilters = ({
       <FilterButton
         filterKey="distribution"
         value={filter.filterCampaigns}
-        onDisable={() => setFilters((filter) => ({...filter, filterCampaigns: undefined }))}
+        onDisable={() => setFilters((filter) => ({ ...filter, filterCampaigns: undefined }))}
       />
     )}
     {!!filter.filterCampaignId && (
       <FilterButton
         filterKey="campaignVariant"
         value={filter.filterCampaignId}
-        onDisable={() => setFilters((filter) => ({...filter, filterCampaignId: undefined }))}
+        onDisable={() => setFilters((filter) => ({ ...filter, filterCampaignId: undefined }))}
       />
     )}
   </UI.Stack>
@@ -262,10 +264,10 @@ interface MenuProps {
   anchorPoint: { x: number; y: number };
   endTransition: () => void;
   onClose: () => void;
-  state? : MenuState;
+  state?: MenuState;
 }
 
-const Menu = ({ children, ...menuProps } : MenuProps) => (
+const Menu = ({ children, ...menuProps }: MenuProps) => (
   <MenuContainer>
     <ControlledMenu {...menuProps}>
       {children}
@@ -459,7 +461,7 @@ export const InteractionsOverview = () => {
                   </UI.Icon>
                   Date
                 </UI.Flex>
-                  )}
+              )}
               >
                 <MenuItem
                   onClick={() => handleMultiDateFilterChange(undefined, new Date(contextInteraction?.createdAt))}
@@ -525,7 +527,7 @@ export const InteractionsOverview = () => {
                 <TableCell>
                   {session.delivery?.deliveryRecipientFirstName ? (
                     <DeliveryUserCell delivery={session.delivery} />
-                  ): (
+                  ) : (
                     <AnonymousCell sessionId={session.id} />
                   )}
                 </TableCell>
@@ -544,13 +546,13 @@ export const InteractionsOverview = () => {
               pageIndex={filter.pageIndex}
               maxPages={filter.totalPages}
               perPage={filter.perPage}
-              setPageIndex={(page) => setFilter((filter) => ({...filter, pageIndex: page - 1}))}
+              setPageIndex={(page) => setFilter((filter) => ({ ...filter, pageIndex: page - 1 }))}
             />
           </UI.Flex>
         </UI.Div>
 
         <UI.Modal isOpen={!!activeSession} onClose={() => setActiveSession(null)}>
-          <UI.Card bg="white" width={600} padding={4} noHover>
+          <UI.Card borderRadius={10} bg="white" width={600} padding={4} noHover>
             test
           </UI.Card>
         </UI.Modal>
@@ -637,7 +639,7 @@ interface PickerContainerProps {
   isActive?: boolean;
 }
 
-const PickerContainer = styled(UI.Div)<PickerContainerProps>`
+const PickerContainer = styled(UI.Div) <PickerContainerProps>`
   ${({ theme, isActive }) => css`
     display: flex;
     align-items: center;
@@ -765,22 +767,22 @@ const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: Filt
         />
 
         {filterCampaignWatch !== SessionDeliveryType.NoCampaigns && (
-        <UI.Div mt={2}>
-          Pick campaign
-          <Controller
-            control={form.control}
-            name="filterCampaignVariant"
-            defaultValue={defaultValues.filterCampaignVariant}
-            render={({ onChange, value }) => (
-              <RadioGroup size="sm" onChange={onChange} value={value}>
-                <Radio value="all" mb={0}>All</Radio>
-                {campaignVariants.map((variant) => (
-                  <Radio key={variant.id} value={variant.id} mb={0}>{variant.label}</Radio>
-                ))}
-              </RadioGroup>
-            )}
-          />
-        </UI.Div>
+          <UI.Div mt={2}>
+            Pick campaign
+            <Controller
+              control={form.control}
+              name="filterCampaignVariant"
+              defaultValue={defaultValues.filterCampaignVariant}
+              render={({ onChange, value }) => (
+                <RadioGroup size="sm" onChange={onChange} value={value}>
+                  <Radio value="all" mb={0}>All</Radio>
+                  {campaignVariants.map((variant) => (
+                    <Radio key={variant.id} value={variant.id} mb={0}>{variant.label}</Radio>
+                  ))}
+                </RadioGroup>
+              )}
+            />
+          </UI.Div>
         )}
       </UI.Div>
 
