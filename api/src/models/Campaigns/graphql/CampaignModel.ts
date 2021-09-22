@@ -117,6 +117,7 @@ export const GetCampaignVariantOfDelivery = extendType({
           dialogue: campaignVariant.dialogue,
           label: campaignVariant.label,
           weight: campaignVariant.CampaignVariantToCampaign[0].weight,
+          // @ts-ignore
           campaign: campaignVariant.CampaignVariantToCampaign[0].campaign,
           workspace: campaignVariant.workspace,
           type: campaignVariant.type,
