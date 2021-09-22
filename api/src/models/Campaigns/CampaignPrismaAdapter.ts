@@ -135,6 +135,21 @@ export class CampaignPrismaAdapter {
   }
 
   /**
+   * Find delivery
+   * @param id
+   * @returns
+   */
+  findDelivery = async (deliveryId: string) => {
+    return this.prisma.delivery.findFirst({
+      where: { id: deliveryId },
+      include: {
+        campaign: true,
+        campaignVariant: true,
+      }
+    })
+  }
+
+  /**
    * Find campaign by id.
    */
   findCampaign = async (id: string): Promise<CampaignWithVariants | null> => {

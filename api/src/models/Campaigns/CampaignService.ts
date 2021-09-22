@@ -44,6 +44,12 @@ export class CampaignService {
   }
 
   /**
+   *
+   * @param campaignId
+   * @returns
+   */
+
+  /**
    * Find campaign by ID.
    */
   findCampaign = async (campaignId: string): Promise<CampaignWithVariants | null> => {
