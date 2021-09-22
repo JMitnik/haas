@@ -38,7 +38,7 @@ type CampaignType {
   deliveryConnection(filter: DeliveryConnectionFilter): DeliveryConnectionType
   id: ID!
   label: String!
-  variants: [CampaignVariantType!]!
+  variants: [CampaignVariantType!]
 }
 
 type CampaignVariantCustomVariableType {

@@ -484,7 +484,7 @@ export interface NexusGenRootTypes {
   CampaignType: { // root type
     id: string; // ID!
     label: string; // String!
-    variants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
+    variants?: NexusGenRootTypes['CampaignVariantType'][] | null; // [CampaignVariantType!]
   }
   CampaignVariantCustomVariableType: { // root type
     id: string; // ID!
@@ -905,7 +905,7 @@ export interface NexusGenFieldTypes {
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     id: string; // ID!
     label: string; // String!
-    variants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
+    variants: NexusGenRootTypes['CampaignVariantType'][] | null; // [CampaignVariantType!]
   }
   CampaignVariantCustomVariableType: { // field return type
     id: string; // ID!
