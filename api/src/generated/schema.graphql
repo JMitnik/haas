@@ -55,6 +55,7 @@ enum CampaignVariantEnum {
 """Variant of campaign"""
 type CampaignVariantType {
   body: String!
+  campaign: CampaignType
   customVariables: [CampaignVariantCustomVariableType!]
   deliveryConnection: DeliveryConnectionType
   dialogue: Dialogue

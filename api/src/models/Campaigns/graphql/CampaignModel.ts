@@ -96,7 +96,11 @@ export const GetCampaignVariantOfDelivery = extendType({
           include: {
             campaignVariant: {
               include: {
-                CampaignVariantToCampaign: true,
+                CampaignVariantToCampaign: {
+                  include: {
+                    campaign: true
+                  }
+                },
                 dialogue: true,
                 workspace: true,
                 customVariables: true,
@@ -113,6 +117,7 @@ export const GetCampaignVariantOfDelivery = extendType({
           dialogue: campaignVariant.dialogue,
           label: campaignVariant.label,
           weight: campaignVariant.CampaignVariantToCampaign[0].weight,
+          campaign: campaignVariant.CampaignVariantToCampaign[0].campaign,
           workspace: campaignVariant.workspace,
           type: campaignVariant.type,
           customVariables: campaignVariant.customVariables,

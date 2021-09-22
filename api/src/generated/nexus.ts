@@ -492,6 +492,7 @@ export interface NexusGenRootTypes {
   }
   CampaignVariantType: { // root type
     body: string; // String!
+    campaign?: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     customVariables?: NexusGenRootTypes['CampaignVariantCustomVariableType'][] | null; // [CampaignVariantCustomVariableType!]
     deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
@@ -912,6 +913,7 @@ export interface NexusGenFieldTypes {
   }
   CampaignVariantType: { // field return type
     body: string; // String!
+    campaign: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     customVariables: NexusGenRootTypes['CampaignVariantCustomVariableType'][] | null; // [CampaignVariantCustomVariableType!]
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue

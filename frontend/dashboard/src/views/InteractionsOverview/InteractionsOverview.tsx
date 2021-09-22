@@ -138,7 +138,7 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
               {data.originUrl && (
                 <UI.Div>
                   <UI.Helper>{t('origin_url')}</UI.Helper>
-                  <UI.Label size="sm" mt={1} variantColor="cyan">
+                  <UI.Label textTransform="none" size="sm" mt={1} variantColor="cyan">
                     <UI.Icon mr={2}><Link width="0.8rem" /></UI.Icon>
                     {data.originUrl}
                   </UI.Label>
@@ -199,8 +199,8 @@ const InteractionsOverview = () => {
   const { dialogueSlug, customerSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const [fetchInteractions, { data, loading }] = useLazyQuery<CustomerSessionConnection>(
     getDialogueSessionConnectionQuery, {
-    fetchPolicy: 'cache-and-network',
-  },
+      fetchPolicy: 'cache-and-network',
+    },
   );
 
   const handleExportCSV = (sessions: Array<Session> | undefined, customerSlug: string, dialogueSlug: string) => {
@@ -242,12 +242,12 @@ const InteractionsOverview = () => {
 
   const [fetchCSVData, { loading: csvLoading }] = useLazyQuery<CustomerSessionConnection>(
     getDialogueSessionConnectionQuery, {
-    fetchPolicy: 'cache-and-network',
-    onCompleted: (csvData: any) => {
-      const sessions = csvData?.customer?.dialogue?.sessionConnection?.sessions;
-      handleExportCSV(sessions, customerSlug, dialogueSlug);
+      fetchPolicy: 'cache-and-network',
+      onCompleted: (csvData: any) => {
+        const sessions = csvData?.customer?.dialogue?.sessionConnection?.sessions;
+        handleExportCSV(sessions, customerSlug, dialogueSlug);
+      },
     },
-  },
   );
 
   const location = useLocation();
