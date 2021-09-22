@@ -120,7 +120,7 @@ export const GetCampaignVariantOfDelivery = extendType({
           campaign: {
             id: campaignVariant.CampaignVariantToCampaign[0].campaign.id,
             label: campaignVariant.CampaignVariantToCampaign[0].campaign.label,
-            variants: undefined,
+            variants: [],
           },
           workspace: campaignVariant.workspace,
           type: campaignVariant.type,
