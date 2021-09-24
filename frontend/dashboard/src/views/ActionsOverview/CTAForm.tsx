@@ -23,6 +23,7 @@ import {
 } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useUploadUpsellImageMutation } from 'types/generated-types';
 import FileDropInput from 'components/FileDropInput';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -34,7 +35,6 @@ import getCTANodesQuery from 'queries/getCTANodes';
 import intToBool from 'utils/intToBool';
 import updateCTAMutation from 'mutations/updateCTA';
 
-import { useUploadUpsellImageMutation } from 'types/generated-types';
 import { FormDataProps } from './CTATypes';
 import FormNodeForm from './FormNodeForm';
 
@@ -140,7 +140,6 @@ const LINK_TYPES = [
   { label: 'LINKEDIN', value: 'LINKEDIN' },
   { label: 'TWITTER', value: 'TWITTER' },
   { label: 'WHATSAPP', value: 'WHATSAPP' },
-  { label: 'SELL', value: 'SELL' },
 ];
 
 const ImageUploadLogoInput = ({ onChange, value }: any) => {
