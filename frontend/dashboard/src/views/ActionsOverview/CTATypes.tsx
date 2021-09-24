@@ -10,9 +10,9 @@ export interface FormDataProps {
   links: Array<{
     id?: string | null;
     title: string;
-    type?: string;
+    type?: string | null;
     url: string;
-    tooltip?: string;
+    // tooltip?: string;
     iconUrl?: string;
     backgroundColor?: string;
     header?: string;
