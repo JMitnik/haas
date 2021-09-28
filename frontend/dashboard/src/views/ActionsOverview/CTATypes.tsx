@@ -26,7 +26,6 @@ export interface FormDataProps {
     title: string;
     type?: string | null;
     url: string;
-    // tooltip?: string;
     iconUrl?: string;
     backgroundColor?: string;
     header?: string;
