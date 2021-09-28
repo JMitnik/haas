@@ -73,20 +73,7 @@ const DrawerContainer = styled(Div)`
 
 const TextGradient = styled(Div)`
  ${({ theme }) => css`
-
- /* ${Color(theme.colors.primary).isDark() && `
-    background-image: linear-gradient(180deg, rgba(6, 41, 166, 0.2) 0%, rgba(6, 41, 166, 0) 90.62%, rgba(6, 41, 166, 0.00574713) 96.87%),
-    linear-gradient(0deg, ${theme.colors.primary}, ${theme.colors.primary});
-    background-size: 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
-    -webkit-text-fill-color: transparent; 
-    -moz-text-fill-color: transparent; 
- `} */
-
-  color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
-  
+    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
  `}
 `;
 
@@ -115,7 +102,6 @@ const RedirectButton = styled.a`
     align-items: center;
   
     max-width: fit-content;
-    background: ${Color(theme.colors.primary).isLight() ? Color(theme.colors.primary).hex() : Color(theme.colors.primary).lighten(0.3).hex()};
     font-weight: bold;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.05);
     border-radius: 5px;
@@ -123,7 +109,10 @@ const RedirectButton = styled.a`
 
     animation: 2s pulse infinite;
     text-decoration: none;
-    color: ${Color(theme.colors.primary).isDark() ? Color('white').hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+
+    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()}); 
+    font-family: 'Inter', sans-serif;
+    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
 
     :hover {
       cursor: pointer;
@@ -147,7 +136,6 @@ const RedirectButton = styled.a`
         box-shadow: 0 0 0 0px rgba(0, 0, 0, 0);
       }
     }
-  
 `;
 
 const RedirectContainer = styled(Div)`
@@ -158,10 +146,6 @@ const RedirectContainer = styled(Div)`
 
 const IconContainer = styled(Div)`
   margin-right: 10px;
-  svg {
-    /* width: 1em;
-    height: auto; */
-  }
 `;
 
 const SocialShareNode = ({ node }: SocialShareNodeProps) => {
@@ -169,8 +153,6 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   const handleLinkClick = (event: any) => {
     console.log(event);
   };
-
-  console.log('node links: ', node.links[0]);
 
   return (
     <SocialShareNodeContainer>
@@ -197,9 +179,7 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
                 <IconContainer>
                   <ShoppingCart />
                 </IconContainer>
-
                 {node.links[0].buttonText}
-
               </RedirectButton>
             </RedirectContainer>
 

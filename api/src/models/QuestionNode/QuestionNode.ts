@@ -558,14 +558,14 @@ export const QuestionNodeMutations = extendType({
         } : undefined;
 
 
-        const mappedLinks = links?.linkTypes?.map(({ backgroundColor, iconUrl, id, title, type, url, buttonText, subHeader, header, uploadImage }) => ({
+        const mappedLinks = links?.linkTypes?.map(({ backgroundColor, iconUrl, id, title, type, url, buttonText, subHeader, header, imageUrl }) => ({
           id: id || undefined,
           backgroundColor: backgroundColor || undefined,
           iconUrl: iconUrl || undefined,
           title: title || undefined,
           type: type || 'SOCIAL',
           url: url || '',
-          imageUrl: uploadImage || undefined,
+          imageUrl: imageUrl || undefined,
           buttonText: buttonText || undefined,
           subHeader: subHeader || undefined,
           header: header || undefined,

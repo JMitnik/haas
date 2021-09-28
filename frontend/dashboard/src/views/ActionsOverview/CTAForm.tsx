@@ -1,30 +1,25 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { AnimatePresence, motion } from 'framer-motion';
 import {
   Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { Link, PlusCircle, Trash, Type } from 'react-feather';
-import { cloneDeep } from 'lodash';
+import { Controller, useForm } from 'react-hook-form';
+import { Link, Trash, Type } from 'react-feather';
 import { useMutation } from '@apollo/client';
 
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import Select from 'react-select';
-import cuid from 'cuid';
 
 import {
   Div, Flex, Form, FormContainer,
-  FormControl, FormLabel, FormSection, Grid, H4, Hr, Input, InputGrid, InputHelper, Span, Text,
+  FormControl, FormLabel, FormSection, Input, InputGrid, InputHelper, Span, Text,
 } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useUploadUpsellImageMutation } from 'types/generated-types';
-import FileDropInput from 'components/FileDropInput';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
@@ -35,23 +30,9 @@ import getCTANodesQuery from 'queries/getCTANodes';
 import intToBool from 'utils/intToBool';
 import updateCTAMutation from 'mutations/updateCTA';
 
-import { FormDataProps } from './CTATypes';
+import { FormDataProps, LinkInputProps } from './CTATypes';
 import FormNodeForm from './FormNodeForm';
-
-interface LinkInputProps {
-  id?: string | null;
-  title: string;
-  type?: { label: string, value: string } | null;
-  url: string;
-  iconUrl?: string;
-  // tooltip?: string;
-  backgroundColor?: string;
-  header?: string;
-  subHeader?: string;
-  uploadImage?: string;
-  imageUrl?: string;
-  buttonText?: string;
-}
+import LinksOverview from './LinksOverview';
 
 interface ShareProps {
   id?: string;
@@ -81,12 +62,12 @@ const schema = yup.object().shape({
   ).required('CTA type is required'),
   links: yup.array().when('ctaType', {
     is: (ctaType: { label: string, value: string }) => isShareType(ctaType),
-    then: yup.array().of(yup.object().shape({
+    then: yup.array().min(1).of(yup.object().shape({
       url: yup.string().required(),
       title: yup.string().required(),
       type: yup.string().notRequired(),
     })),
-    otherwise: yup.array().of(yup.object().shape({
+    otherwise: yup.array().min(1).of(yup.object().shape({
       url: yup.string().required(),
       title: yup.string().notRequired(),
       type: yup.string().required(),
@@ -132,56 +113,6 @@ const CTA_TYPES = [
   { label: 'Share', value: 'SHARE', ShareIcon },
 ];
 
-const LINK_TYPES = [
-  { label: 'SOCIAL', value: 'SOCIAL' },
-  { label: 'API', value: 'API' },
-  { label: 'FACEBOOK', value: 'FACEBOOK' },
-  { label: 'INSTAGRAM', value: 'INSTAGRAM' },
-  { label: 'LINKEDIN', value: 'LINKEDIN' },
-  { label: 'TWITTER', value: 'TWITTER' },
-  { label: 'WHATSAPP', value: 'WHATSAPP' },
-];
-
-const ImageUploadLogoInput = ({ onChange, value }: any) => {
-  const toast = useToast();
-
-  const [uploadFile, { loading }] = useUploadUpsellImageMutation({
-    onCompleted: (result) => {
-      toast({
-        title: 'Uploaded!',
-        description: 'File has been uploaded.',
-        status: 'success',
-        position: 'bottom-right',
-        isClosable: true,
-      });
-      console.log('upload url: ', result?.uploadUpsellImage?.url);
-      onChange(result?.uploadUpsellImage?.url);
-    },
-    onError: () => {
-      toast({
-        title: 'Something went wrong',
-        description: 'We were unable to upload file. Try again',
-        status: 'error',
-        position: 'bottom-right',
-        isClosable: true,
-      });
-    },
-  });
-
-  const onDrop = (files: File[]) => {
-    if (!files.length) return;
-
-    const [file] = files;
-    uploadFile({ variables: { file } });
-  };
-
-  return (
-    <>
-      <FileDropInput value={value} onDrop={onDrop} isLoading={loading} />
-    </>
-  );
-};
-
 const CTAForm = ({
   id,
   title,
@@ -220,49 +151,6 @@ const CTAForm = ({
   });
 
   const { t } = useTranslation();
-
-  const clonedLinks = cloneDeep(links);
-  const [activeLinks, setActiveLinks] = useState<Array<LinkInputProps>>(clonedLinks);
-
-  const [activeType, setActiveType] = useState<{ label: string, value: string }>(type);
-
-  // useEffect(() => {
-  //   if (clonedLinks) {
-  //     const mappedLinks = clonedLinks.map((link) => ({ ...link, type: link?.type?.value || '' }));
-  //     form.setValue('links', mappedLinks);
-  //   }
-  //   // eslint-disable-next-line
-  // }, []);
-
-  const handleMultiChange = useCallback((selectedOption: any) => {
-    setActiveType(selectedOption);
-  }, [setActiveType]);
-
-  useEffect(() => {
-    handleMultiChange(activeType);
-  }, [activeType, handleMultiChange]);
-
-  const addCondition = () => {
-    setActiveLinks((prevLinks) => [...prevLinks, { id: cuid(), url: '', title: '' }]);
-  };
-
-  const { fields: linkFields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'links',
-    keyName: 'fieldIndex',
-  });
-
-  const appendNewField = (): LinkInputProps => ({
-    title: '',
-    url: '',
-    backgroundColor: '',
-    buttonText: '',
-    header: '',
-    iconUrl: '',
-    imageUrl: '',
-    subHeader: '',
-    type: '',
-  });
 
   const refetchingQueries = [
     {
@@ -325,20 +213,11 @@ const CTAForm = ({
   const watchType = form.watch('ctaType');
 
   const onSubmit = (formData: FormDataProps) => {
-    console.log(formData);
-
     if (id === '-1') {
       const mappedLinks = {
-        linkTypes: activeLinks.map((link, index) => {
-          const { id, ...linkData } = link;
-          console.log('form data link: ', formData.links[index]);
-          const { buttonText, subHeader, header, imageUrl } = formData.links[index];
-          return {
-            ...linkData, type: linkData.type?.value, buttonText, subHeader, header, imageUrl,
-          };
-        }),
+        linkTypes: formData.links,
       };
-      console.log('CREATING');
+
       addCTA({
         variables: {
           input: {
@@ -358,23 +237,9 @@ const CTAForm = ({
         },
       });
     } else {
-      console.log('form links: ', formData.links);
-      console.log('link fields: ', linkFields);
       const mappedLinks = {
-        linkTypes: formData.links.map((link) => {
-          const { fieldIndex, ...linkReady } = link;
-          console.log('tooltip: ', linkReady?.title);
-          return ({ ...linkReady });
-        }),
-        // linkTypes: activeLinks.map((link, index) => {
-        //   console.log('form data link: ', formData.links[index]);
-        //   const { buttonText, subHeader, header, imageUrl } = formData.links[index];
-        //   return {
-        //     ...link, type: link.type?.value, buttonText, subHeader, header, imageUrl,
-        //   };
-        // }),
+        linkTypes: formData.links,
       };
-      console.log('mapped links: ', mappedLinks);
       updateCTA({
         variables: {
           input: {
@@ -402,57 +267,6 @@ const CTAForm = ({
     }
     onActiveCTAChange(null);
   };
-
-  // const handleURLChange = useCallback(debounce((newUrl: string, index: number) => {
-  //   setActiveLinks((prevLinks) => {
-  //     if (!prevLinks?.length) {
-  //       prevLinks[0] = { title: '', url: newUrl };
-  //       return [...prevLinks];
-  //     }
-  //     prevLinks[index].url = newUrl;
-  //     return [...prevLinks];
-  //   });
-  // }, 250), []);
-
-  // const handleTooltipChange = useCallback(debounce((newTooltip: string, index: number) => {
-  //   setActiveLinks((prevLinks) => {
-  //     if (!prevLinks?.length) {
-  //       prevLinks[0] = { title: newTooltip, url: '' };
-  //       return [...prevLinks];
-  //     }
-  //     prevLinks[index].title = newTooltip;
-  //     return [...prevLinks];
-  //   });
-  // }, 250), []);
-
-  // const handleIconChange = useCallback(debounce((newIcon: string, index: number) => {
-  //   setActiveLinks((prevLinks) => {
-  //     prevLinks[index].iconUrl = newIcon;
-  //     return [...prevLinks];
-  //   });
-  // }, 250), []);
-
-  // const handleBackgroundColorChange = useCallback(debounce((newColor: string, index: number) => {
-  //   setActiveLinks((prevLinks) => {
-  //     prevLinks[index].backgroundColor = newColor;
-  //     return [...prevLinks];
-  //   });
-  // }, 250), []);
-
-  // const handleLinkTypeChange = (qOption: any, index: number) => {
-  //   form.setValue(`links[${index}].type`, qOption?.value);
-  //   setActiveLinks((prevLinks) => {
-  //     prevLinks[index].type = qOption;
-  //     return [...prevLinks];
-  //   });
-  // };
-
-  // const handleDeleteLink = (index: number) => {
-  //   setActiveLinks((prevLinks) => {
-  //     prevLinks.splice(index, 1);
-  //     return [...prevLinks];
-  //   });
-  // };
 
   return (
     <FormContainer expandedForm>
@@ -529,6 +343,7 @@ const CTAForm = ({
                     <Input
                       name="share.url"
                       placeholder="https://share/url"
+                      // eslint-disable-next-line jsx-a11y/anchor-is-valid
                       leftEl={<Link />}
                       defaultValue={share?.url}
                       ref={form.register({ required: true })}
@@ -536,7 +351,6 @@ const CTAForm = ({
                     <FormErrorMessage>{form.errors.share?.url}</FormErrorMessage>
                   </FormControl>
 
-                  {/* TODO: Change default value and error */}
                   <FormControl isRequired>
                     <FormLabel htmlFor="share.tooltip">{t('cta:button_text')}</FormLabel>
                     <InputHelper>{t('cta:button_text_helper')}</InputHelper>
@@ -545,7 +359,6 @@ const CTAForm = ({
                       placeholder="Share..."
                       leftEl={<Type />}
                       defaultValue={share?.tooltip}
-                      // onChange={(e: any) => handleTooltipChange(e.currentTarget.value, 0)}
                       ref={form.register({ required: true })}
                     />
                     <FormErrorMessage>{form.errors.share?.tooltip}</FormErrorMessage>
@@ -558,199 +371,7 @@ const CTAForm = ({
           {watchType?.value === 'LINK' && (
             <>
               <UI.Hr />
-              <FormSection id="links">
-                <Div>
-                  <UI.FormSectionHeader>Links</UI.FormSectionHeader>
-                  <UI.FormSectionHelper>{t('cta:link_header')}</UI.FormSectionHelper>
-                </Div>
-                <Div>
-                  <InputGrid>
-                    <Div gridColumn="1 / -1">
-                      <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
-                        <H4>Links</H4>
-                        <Button
-                          leftIcon={PlusCircle}
-                          onClick={() => append(appendNewField())}
-                          size="sm"
-                        >
-                          {t('cta:add_link')}
-
-                        </Button>
-                      </Flex>
-                      <Hr />
-
-                      <AnimatePresence>
-                        {linkFields.map((link, index) => (
-                          <motion.div key={(`${link.id}` || link.url)} initial={{ opacity: 1 }} exit={{ opacity: 0, x: 100 }}>
-                            <Div
-                              position="relative"
-                              key={link.fieldIndex}
-                              marginTop={15}
-                              gridColumn="1 / -1"
-                              bg="gray.100"
-                              padding={4}
-                            >
-                              <Grid
-                                gridGap="12px"
-                                gridTemplateColumns={['1fr 1fr']}
-                              >
-                                <FormControl isRequired isInvalid={!!form.errors?.links?.[index]?.url}>
-                                  <FormLabel htmlFor={`links[${index}].url`}>{t('cta:url')}</FormLabel>
-                                  <InputHelper>{t('cta:link_url_helper')}</InputHelper>
-                                  <Input
-                                    name={`links[${index}].url`}
-                                    defaultValue={link.url}
-                                    placeholder="https://link.to/"
-                                    leftEl={<Type />}
-                                    // onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
-                                    ref={form.register({ required: true })}
-                                  />
-                                  <FormErrorMessage>{!!form.errors?.links?.[index]?.url?.message}</FormErrorMessage>
-                                </FormControl>
-
-                                <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
-                                  <FormLabel htmlFor={`links[${index}].type`}>{t('cta:type')}</FormLabel>
-                                  <InputHelper>{t('cta:link_type_helper')}</InputHelper>
-                                  <Controller
-                                    id={`link-${link.id}-${index}`}
-                                    name={`links[${index}].type`}
-                                    control={form.control}
-                                    defaultValue={link.type}
-                                    render={({ onChange, value }) => {
-                                      console.log('VALUE: ', value);
-                                      const data = { label: value, value: value?.value };
-                                      return (
-                                        <Select
-                                          options={LINK_TYPES}
-                                          value={data}
-                                          onChange={(opt: any) => {
-                                            // handleLinkTypeChange(opt, index);
-                                            console.log('OPT: ', opt);
-                                            onChange(opt.value);
-                                          }}
-                                        />
-                                      );
-                                    }}
-                                  />
-                                  <FormErrorMessage>{!!form.errors.links?.[index]?.type?.message}</FormErrorMessage>
-                                </FormControl>
-
-                                <FormControl>
-                                  <FormLabel htmlFor={`links[${index}].title`}>{t('cta:link_tooltip')}</FormLabel>
-                                  <InputHelper>{t('cta:link_tooltip_helper')}</InputHelper>
-                                  <Input
-                                    isInvalid={!!form.errors.links?.[index]?.title}
-                                    name={`links[${index}].title`}
-                                    defaultValue={link.title}
-                                    // onChange={(e: any) => handleTooltipChange(e.currentTarget.value, index)}
-                                    ref={form.register({ required: false })}
-                                  />
-                                  <FormErrorMessage>{!!form.errors.links?.[index]?.title?.message}</FormErrorMessage>
-                                </FormControl>
-
-                                <FormControl>
-                                  <FormLabel htmlFor={`links[${index}].iconUrl`}>{t('cta:link_icon')}</FormLabel>
-                                  <InputHelper>{t('cta:link_icon_helper')}</InputHelper>
-                                  <Input
-                                    isInvalid={!!form.errors.links?.[index]?.iconUrl}
-                                    name={`links[${index}].iconUrl`}
-                                    defaultValue={link.iconUrl}
-                                    // onChange={(e: any) => handleIconChange(e.currentTarget.value, index)}
-                                    ref={form.register({ required: false })}
-                                  />
-                                  <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl?.message}</FormErrorMessage>
-                                </FormControl>
-
-                                <FormControl>
-                                  <FormLabel htmlFor={`links[${index}].backgroundColor`}>{t('cta:background_color')}</FormLabel>
-                                  <InputHelper>{t('cta:background_color_helper')}</InputHelper>
-                                  <Input
-                                    isInvalid={!!form.errors.links?.[index]?.backgroundColor}
-                                    name={`links[${index}].backgroundColor`}
-                                    defaultValue={link.backgroundColor}
-                                    // onChange={(e: any) => handleBackgroundColorChange(e.currentTarget.value, index)}
-                                    ref={form.register({ required: false })}
-                                  />
-                                  <FormErrorMessage>
-                                    {!!form.errors.links?.[index]?.backgroundColor?.message}
-                                  </FormErrorMessage>
-                                </FormControl>
-                                <FormControl>
-                                  <FormLabel htmlFor={`links[${index}].header`}>{t('cta:upsell_header')}</FormLabel>
-                                  <InputHelper>{t('cta:upsell_header_helper')}</InputHelper>
-                                  <Input
-                                    isInvalid={!!form.errors.links?.[index]?.header}
-                                    name={`links[${index}].header`}
-                                    defaultValue={link.header}
-                                    ref={form.register({ required: false })}
-                                  />
-                                  <FormErrorMessage>
-                                    {!!form.errors.links?.[index]?.header?.message}
-                                  </FormErrorMessage>
-                                </FormControl>
-                                <FormControl>
-                                  <FormLabel htmlFor={`links[${index}].subHeader`}>{t('cta:upsell_subheader')}</FormLabel>
-                                  <InputHelper>{t('cta:upsell_subheader_helper')}</InputHelper>
-                                  <Input
-                                    isInvalid={!!form.errors.links?.[index]?.subHeader}
-                                    name={`links[${index}].subHeader`}
-                                    defaultValue={link.subHeader}
-                                    ref={form.register({ required: false })}
-                                  />
-                                  <FormErrorMessage>
-                                    {!!form.errors.links?.[index]?.subHeader?.message}
-                                  </FormErrorMessage>
-                                </FormControl>
-                                <FormControl>
-                                  <FormLabel htmlFor={`links[${index}].buttonText`}>{t('cta:redirect_button_text')}</FormLabel>
-                                  <InputHelper>{t('cta:redirect_button_text_helper')}</InputHelper>
-                                  <Input
-                                    isInvalid={!!form.errors.links?.[index]?.buttonText}
-                                    name={`links[${index}].buttonText`}
-                                    defaultValue={link.buttonText}
-                                    ref={form.register({ required: false })}
-                                  />
-                                  <FormErrorMessage>
-                                    {!!form.errors.links?.[index]?.buttonText?.message}
-                                  </FormErrorMessage>
-                                </FormControl>
-                                <FormControl>
-                                  <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
-                                  <InputHelper>{t('logo_upload_helper')}</InputHelper>
-
-                                  <Controller
-                                    control={form.control}
-                                    name={`links[${index}].imageUrl`}
-                                    defaultValue={link.imageUrl}
-                                    render={({ onChange, value }) => (
-                                      <ImageUploadLogoInput
-                                        value={value}
-                                        onChange={onChange}
-                                      />
-                                    )}
-                                  />
-                                </FormControl>
-                              </Grid>
-                              <Button
-                                mt={4}
-                                variant="outline"
-                                size="sm"
-                                variantColor="red"
-                                onClick={() => {
-                                  // handleDeleteLink(index)
-                                  remove(index);
-                                }}
-                              >
-                                {t('cta:delete_link')}
-                              </Button>
-                            </Div>
-                          </motion.div>
-                        ))}
-                      </AnimatePresence>
-                    </Div>
-                  </InputGrid>
-                </Div>
-              </FormSection>
+              <LinksOverview form={form} />
             </>
           )}
 
