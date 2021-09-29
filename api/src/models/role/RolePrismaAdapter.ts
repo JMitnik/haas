@@ -31,15 +31,6 @@ class RolePrismaAdapter {
     })
   }
 
-  update(roleId: string, data: Prisma.RoleUpdateInput): Promise<Role> {
-    return this.prisma.role.update({
-      where: {
-        id: roleId,
-      },
-      data: data,
-    });
-  }
-
   createRole(data: CreateRoleInput) {
     const { customerId, permissions, name } = data;
     return this.prisma.role.create({
@@ -55,12 +46,6 @@ class RolePrismaAdapter {
         },
       },
     });
-  }
-
-  create(data: Prisma.RoleCreateInput): Promise<Role> {
-    return this.prisma.role.create({
-      data,
-    })
   }
 
   deleteMany(roleIds: string[]): Promise<Prisma.BatchPayload> {
