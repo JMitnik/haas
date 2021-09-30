@@ -71,42 +71,7 @@ export const LinkType = objectType({
   },
 });
 
-export const UploadSellImageMutation = Upload && mutationField('uploadUpsellImage', {
-  type: ImageType,
-  nullable: true,
-  args: {
-    file: Upload,
-  },
-
-  async resolve(parent, args) {
-    const { file } = args;
-
-    const waitedFile = await file;
-    const { createReadStream, filename, mimetype, encoding }:
-      { createReadStream: any, filename: string, mimetype: string, encoding: string } = waitedFile.file;
-
-
-    const stream = new Promise<UploadApiResponse>((resolve, reject) => {
-      const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
-        folder: 'sellable_items',
-      },
-        (error, result: UploadApiResponse | undefined) => {
-          if (result) return resolve(result);
-
-          return reject(error);
-        });
-
-      return createReadStream().pipe(cld_upload_stream);
-    });
-
-    const result = await stream;
-    const { secure_url } = result;
-    return { filename, mimetype, encoding, url: secure_url };
-  },
-});
-
 export default [
-  UploadSellImageMutation,
   CTALinkInputObjectType,
   CTALinksInputType,
   LinkType,

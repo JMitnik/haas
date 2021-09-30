@@ -7,6 +7,7 @@ import { makeServer } from '../../config/server';
 
 type TestContext = {
   client: GraphQLClient;
+  server: Server;
 };
 
 export const makeTestContext = (prisma: PrismaClient): TestContext => {
@@ -14,10 +15,11 @@ export const makeTestContext = (prisma: PrismaClient): TestContext => {
   const graphqlCtx = graphqlTestContext(prisma);
 
   beforeEach(async () => {
-    const client = await graphqlCtx.before();
+    const { client, server } = await graphqlCtx.before();
 
     Object.assign(ctx, {
       client,
+      server,
     });
   });
 
@@ -36,7 +38,7 @@ function graphqlTestContext(prisma: PrismaClient) {
       const port = await getPort({ port: makeRange(4002, 6000) });
       serverInstance = await makeServer(port, prisma);
 
-      return new GraphQLClient(`http://localhost:${port}/graphql`);
+      return { client: new GraphQLClient(`http://localhost:${port}/graphql`), server: serverInstance };
     },
 
     async after() {
