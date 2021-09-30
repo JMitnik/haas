@@ -12,7 +12,6 @@ export const UploadSellImageResolver = Upload && mutationField('uploadUpsellImag
     const { file } = args;
     const waitedFile = await file;
     const readyFile = waitedFile.file;
-
     return ctx.services.linkService.uploadImage(readyFile);
   },
 });

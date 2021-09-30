@@ -98,7 +98,7 @@ const authShield = shield({
     appendToInteraction: allow,
     verifyUserToken: allow,
     requestInvite: allow,
-    uploadUpsellImage: allow, //TODO: this is necessary for the test (but should be allowed in another way right?)
+    uploadUpsellImage: isSuperAdmin,
     deleteCustomer: isSuperAdmin,
 
     createCampaign: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_CAMPAIGNS),
