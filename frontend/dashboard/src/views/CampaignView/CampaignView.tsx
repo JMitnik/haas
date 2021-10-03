@@ -12,9 +12,9 @@ import {
   PaginationSortByEnum, useGetWorkspaceCampaignQuery,
 } from 'types/generated-types';
 import { DeepPartial } from 'types/customTypes';
+import { formatSimpleDate } from 'utils/dateUtils';
 import { useLogger } from 'hooks/useLogger';
 import { useNavigator } from 'hooks/useNavigator';
-
 import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
 
 import { CampaignType } from './CampaignViewTypes';
@@ -350,8 +350,8 @@ export const CampaignView = () => {
                         paginationFilter: {
                           ...state.paginationFilter,
                           pageIndex: val - 1,
-                          offset: Math.max((val - 1), 0) * (state.paginationFilter?.limit || 0)
-                        }
+                          offset: Math.max((val - 1), 0) * (state.paginationFilter?.limit || 0),
+                        },
                       }))}
                     />
                   </UI.Div>
@@ -366,7 +366,9 @@ export const CampaignView = () => {
                         offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
                       },
                     }))}
-                    isDisabled={(paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages}
+                    isDisabled={
+                      (paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages
+                    }
                   >
                     Next
                   </UI.Button>
@@ -377,9 +379,13 @@ export const CampaignView = () => {
         </UI.Card>
 
         <UI.Modal isOpen={isOpenDetailModel} onClose={() => setActiveDelivery(null)}>
-          <UI.Card bg="white" width={600} noHover>
-            <UI.CardBody>
-              <UI.FormSectionHeader>{t('details')}</UI.FormSectionHeader>
+          <UI.ModalCard maxWidth={800} onClose={() => setActiveDelivery(null)}>
+            <UI.ModalHead>
+              <UI.ModalTitle>
+                {t('details')}
+              </UI.ModalTitle>
+            </UI.ModalHead>
+            <UI.ModalBody>
               <UI.Stack mb={4}>
                 <UI.Div>
                   <UI.Helper mb={1}>{t('first_name')}</UI.Helper>
@@ -490,14 +496,8 @@ export const CampaignView = () => {
                         </UI.Flex>
                       )}
                       <UI.Span color="gray.500">
-                        {event?.createdAt && (
-                          <>
-                            {format(
-                              new Date(parseInt(event?.createdAt, 10)),
-                              'MMM do HH:mm',
-                            )}
-                          </>
-                        )}
+                        {/* @ts-ignore */}
+                        {event?.createdAt && formatSimpleDate(event.createdAt)}
                       </UI.Span>
                     </UI.Flex>
 
@@ -512,32 +512,32 @@ export const CampaignView = () => {
                   </UI.Div>
                 ))}
               </UI.Stack>
-            </UI.CardBody>
-          </UI.Card>
+            </UI.ModalBody>
+          </UI.ModalCard>
         </UI.Modal>
 
         <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
-          <UI.Card bg="white" noHover width={700}>
-            <UI.CardBody>
+          <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenImportModal(false)}>
+            <UI.ModalBody>
               <ImportDeliveriesForm
                 onClose={() => setIsOpenImportModal(false)}
               />
-            </UI.CardBody>
-          </UI.Card>
+            </UI.ModalBody>
+          </UI.ModalCard>
         </UI.Modal>
 
         {!!campaign && (
           <UI.Modal isOpen={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
-            <UI.Card bg="white" noHover width={700}>
-              <UI.CardBody>
+            <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenSettingsModal(false)}>
+              <UI.ModalBody>
                 <CreateCampaignForm
                   onClose={() => setIsOpenSettingsModal(false)}
                   // @ts-ignore
                   campaign={campaignToForm(campaign)}
                   isReadOnly
                 />
-              </UI.CardBody>
-            </UI.Card>
+              </UI.ModalBody>
+            </UI.ModalCard>
           </UI.Modal>
         )}
       </UI.ViewBody>

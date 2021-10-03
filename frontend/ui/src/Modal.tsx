@@ -12,7 +12,7 @@ export const ModalBody = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px 0;
     overflow-y: scroll;
-    height: 60vh;
+    height: 70vh;
   `}
 `;
 
