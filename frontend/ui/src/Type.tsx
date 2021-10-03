@@ -13,10 +13,14 @@ export const GenericType = styled.p<GenericTypeProps>`
 
 export const Text = styled(GenericType).attrs({ as: 'p' })``;
 
+interface HelperProps {
+  color?: string;
+}
+
 export const Helper = styled(Text)`
-  ${({ theme }) => css`
+  ${({ theme, color }) => css`
     margin: 0;
-    color: ${theme.colors.gray[500]};
+    color: ${theme.colors[color]} || ${theme.colors.gray[500]};
     font-weight: 700;
     line-height: 1rem;
     font-size: 0.8rem;

@@ -1,11 +1,11 @@
 import * as UI from '@haas/ui';
-import { AlertCircle, Clock, Eye, Flag, HelpCircle, Mail, UserCheck } from 'react-feather';
 import React from 'react';
 
 import { Circle } from 'components/Common/Circle';
-import { SessionFragmentFragment } from 'types/generated-types';
+import { NodeEntryFragmentFragment, QuestionNodeTypeEnum, SessionFragmentFragment } from 'types/generated-types';
+import { QuestionNodeIcon } from 'components/Dialogue/QuestionNodeIcon';
 import { Timeline, TimelineItem } from 'components/Common/Timeline';
-import { formatSimpleDate } from 'utils/dateUtils';
+import { formatSliderValue } from 'components/Dialogue/utils/formatSliderValue';
 
 interface Interaction extends SessionFragmentFragment { }
 
@@ -13,157 +13,220 @@ interface InteractionTimelineProps {
   interaction: Interaction;
 }
 
-interface InteractionDescriptionProps {
-  // eslint-disable-next-line react/no-unused-prop-types
-  event: DeliveryEventFragmentFragment;
-  // eslint-disable-next-line react/no-unused-prop-types
-  delivery: Delivery;
+interface InteractionNodeEntryDescriptionProps {
+  nodeEntry: NodeEntryFragmentFragment;
 }
 
-const DeployedStatusDescription = ({ event }: InteractionDescriptionProps) => (
+// const DeployedStatusDescription = ({ event }: InteractionDescriptionProps) => (
+//   <>
+//     <UI.SectionHeader>
+//       Delivery was deployed
+//     </UI.SectionHeader>
+//     {' '}
+//     Deployed on
+//     {' '}
+//     {formatSimpleDate(event.createdAt)}
+//   </>
+// );
+
+// const ScheduledStatusDescription = ({ delivery }: InteractionDescriptionProps) => (
+//   <>
+//     <UI.SectionHeader>
+//       Delivery was scheduled
+//     </UI.SectionHeader>
+//     {' '}
+//     Scheduled on
+//     {' '}
+//     {formatSimpleDate(delivery.scheduledAt)}
+//   </>
+// );
+
+// const FailedStatusDescription = ({ event }: InteractionDescriptionProps) => (
+//   <>
+//     <UI.SectionHeader>
+//       Delivery failed
+//     </UI.SectionHeader>
+//     {' '}
+//     Failed on
+//     {' '}
+//     {formatSimpleDate(event.createdAt)}
+
+//     <UI.Div mt={1}>
+//       {event.failureMessage && (
+//         <UI.ErrorPane
+//           header="Delivery failure"
+//           text={event.failureMessage}
+//         />
+//       )}
+//     </UI.Div>
+//   </>
+// );
+
+// const FinishedStatusDescription = ({ event }: InteractionDescriptionProps) => (
+//   <>
+//     <UI.SectionHeader>
+//       Interaction finished
+//     </UI.SectionHeader>
+//     {' '}
+//     on
+//     {' '}
+//     {formatSimpleDate(event.createdAt)}
+//   </>
+// );
+
+// const OpenedStatusDescription = ({ event }: InteractionDescriptionProps) => (
+//   <>
+//     <UI.SectionHeader>
+//       Dialogue opened
+//     </UI.SectionHeader>
+//     {' '}
+//     on
+//     {' '}
+//     {formatSimpleDate(event.createdAt)}
+//   </>
+// );
+
+// const SentStatusDescription = ({ event }: InteractionDescriptionProps) => (
+//   <>
+//     <UI.SectionHeader>
+//       Dialogue sent
+//     </UI.SectionHeader>
+//     {' '}
+//     on
+//     {' '}
+//     {formatSimpleDate(event.createdAt)}
+//   </>
+// );
+
+const TextboxNodeDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionProps) => (
   <>
-    <UI.SectionHeader>
-      Delivery was deployed
-    </UI.SectionHeader>
-    {' '}
-    Deployed on
-    {' '}
-    {formatSimpleDate(event.createdAt)}
+    {nodeEntry.value?.textboxNodeEntry ? (
+      <>
+        <UI.SectionHeader>
+          User wrote the following down:
+        </UI.SectionHeader>
+        <UI.Div
+          bg="white"
+          borderRadius="10px"
+          padding={2}
+        >
+          {nodeEntry.value?.textboxNodeEntry}
+        </UI.Div>
+        <UI.Span>
+          when asked
+          &quot;
+          {nodeEntry.relatedNode?.title}
+          &quot;
+        </UI.Span>
+      </>
+    ) : (
+      <>
+        User left it empty
+      </>
+    )}
   </>
 );
 
-const ScheduledStatusDescription = ({ delivery }: InteractionDescriptionProps) => (
+const MultiChoiceEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionProps) => (
   <>
-    <UI.SectionHeader>
-      Delivery was scheduled
-    </UI.SectionHeader>
-    {' '}
-    Scheduled on
-    {' '}
-    {formatSimpleDate(delivery.scheduledAt)}
+    {nodeEntry.value?.choiceNodeEntry && (
+      <>
+        <UI.SectionHeader>
+          User selected:
+          &quot;
+          {nodeEntry.value?.choiceNodeEntry}
+          &quot;
+        </UI.SectionHeader>
+        <UI.Span>
+          when asked
+          &quot;
+          {nodeEntry.relatedNode?.title}
+          &quot;
+        </UI.Span>
+      </>
+    )}
   </>
 );
 
-const FailedStatusDescription = ({ event }: InteractionDescriptionProps) => (
+const VideoEmbedEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionProps) => (
   <>
-    <UI.SectionHeader>
-      Delivery failed
-    </UI.SectionHeader>
-    {' '}
-    Failed on
-    {' '}
-    {formatSimpleDate(event.createdAt)}
-
-    <UI.Div mt={1}>
-      {event.failureMessage && (
-        <UI.ErrorPane
-          header="Delivery failure"
-          text={event.failureMessage}
-        />
-      )}
-    </UI.Div>
+    {nodeEntry.value?.videoNodeEntry && (
+      <>
+        <UI.SectionHeader>
+          User made choice:
+          {' '}
+          {nodeEntry.value?.videoNodeEntry}
+        </UI.SectionHeader>
+        <UI.Span>
+          when asked
+          &quot;
+          {nodeEntry.relatedNode?.title}
+          &quot;
+        </UI.Span>
+      </>
+    )}
   </>
 );
 
-const FinishedStatusDescription = ({ event }: InteractionDescriptionProps) => (
+const SliderEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionProps) => (
   <>
-    <UI.SectionHeader>
-      Interaction finished
-    </UI.SectionHeader>
-    {' '}
-    on
-    {' '}
-    {formatSimpleDate(event.createdAt)}
+    {nodeEntry.value?.sliderNodeEntry && (
+      <>
+        <UI.SectionHeader>
+          User slid the bunny to value:
+          {' '}
+          {formatSliderValue(nodeEntry.value?.sliderNodeEntry)}
+        </UI.SectionHeader>
+        <UI.Span>
+          when asked
+          &quot;
+          {nodeEntry.relatedNode?.title}
+          &quot;
+        </UI.Span>
+      </>
+    )}
   </>
 );
 
-const OpenedStatusDescription = ({ event }: InteractionDescriptionProps) => (
-  <>
-    <UI.SectionHeader>
-      Dialogue opened
-    </UI.SectionHeader>
-    {' '}
-    on
-    {' '}
-    {formatSimpleDate(event.createdAt)}
-  </>
-);
-
-const SentStatusDescription = ({ event }: InteractionDescriptionProps) => (
-  <>
-    <UI.SectionHeader>
-      Dialogue sent
-    </UI.SectionHeader>
-    {' '}
-    on
-    {' '}
-    {formatSimpleDate(event.createdAt)}
-  </>
-);
-
-const DeliveredStatusDescription = ({ event }: InteractionDescriptionProps) => (
-  <>
-    <UI.SectionHeader>
-      Dialogue successfully delivered
-    </UI.SectionHeader>
-    {' '}
-    on
-    {' '}
-    {formatSimpleDate(event.createdAt)}
-  </>
-);
-
-const MapCampaignDescription: { [key in DeliveryStatusEnum]?: React.FC<InteractionDescriptionProps> } = {
-  [DeliveryStatusEnum.Deployed]: DeployedStatusDescription,
-  [DeliveryStatusEnum.Failed]: FailedStatusDescription,
-  [DeliveryStatusEnum.Finished]: FinishedStatusDescription,
-  [DeliveryStatusEnum.Opened]: OpenedStatusDescription,
-  [DeliveryStatusEnum.Scheduled]: ScheduledStatusDescription,
-  [DeliveryStatusEnum.Sent]: SentStatusDescription,
-  [DeliveryStatusEnum.Delivered]: DeliveredStatusDescription,
+const MapCampaignDescription: { [key in QuestionNodeTypeEnum]?: React.FC<InteractionNodeEntryDescriptionProps> } = {
+  [QuestionNodeTypeEnum.Slider]: SliderEntryDescription,
+  [QuestionNodeTypeEnum.Choice]: MultiChoiceEntryDescription,
+  [QuestionNodeTypeEnum.Textbox]: TextboxNodeDescription,
+  [QuestionNodeTypeEnum.VideoEmbedded]: VideoEmbedEntryDescription,
+  // [DeliveryStatusEnum.Failed]: FailedStatusDescription,
+  // [DeliveryStatusEnum.Finished]: FinishedStatusDescription,
+  // [DeliveryStatusEnum.Opened]: OpenedStatusDescription,
+  // [DeliveryStatusEnum.Scheduled]: ScheduledStatusDescription,
+  // [DeliveryStatusEnum.Sent]: SentStatusDescription,
+  // [DeliveryStatusEnum.Delivered]: DeliveredStatusDescription,
 };
 
-const MapCampaignIcon: { [key in DeliveryStatusEnum]?: React.FC } = {
-  [DeliveryStatusEnum.Deployed]: Mail,
-  [DeliveryStatusEnum.Failed]: AlertCircle,
-  [DeliveryStatusEnum.Finished]: Flag,
-  [DeliveryStatusEnum.Opened]: Eye,
-  [DeliveryStatusEnum.Scheduled]: Clock,
-  [DeliveryStatusEnum.Sent]: Mail,
-  [DeliveryStatusEnum.Delivered]: UserCheck,
-};
+const StatusDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionProps) => {
+  if (!nodeEntry.relatedNode?.type) return <></>;
 
-const Icon = ({ deliveryType }: { deliveryType: DeliveryStatusEnum }) => {
-  const CampaignIcon = MapCampaignIcon[deliveryType];
+  const MappedStatusDescription = MapCampaignDescription[nodeEntry.relatedNode?.type];
 
-  if (!CampaignIcon) {
-    return <HelpCircle />;
-  }
-
-  return <CampaignIcon />;
-};
-
-const StatusDescription = ({ event, delivery }: StatusDescriptionProps) => {
-  const DeliveryStatusDescription = MapCampaignDescription[event.status];
-
-  if (!DeliveryStatusDescription) {
+  if (!MappedStatusDescription) {
     return <></>;
   }
 
-  return <DeliveryStatusDescription event={event} delivery={delivery} />;
+  return <MappedStatusDescription nodeEntry={nodeEntry} />;
 };
 
-export const InteractionTimeline = ({ delivery }: CampaignTimelineProps) => (
-  <Timeline enableFold isBlock nrItems={delivery.events?.length} brand="teal">
-    {delivery.events?.map((event) => (
-      <TimelineItem gridTemplateColumns="40px 1fr" key={event.id}>
-        <Circle brand={event.status === DeliveryStatusEnum.Failed ? 'red' : 'teal'}>
-          <UI.Icon>
-            <Campaign deliveryType={event.status} />
-          </UI.Icon>
+export const InteractionTimeline = ({ interaction }: InteractionTimelineProps) => (
+  <Timeline enableFold isBlock nrItems={interaction.nodeEntries?.length} brand="blue">
+    {interaction.nodeEntries.map((nodeEntry) => (
+      <TimelineItem gridTemplateColumns="40px 1fr" key={nodeEntry.id}>
+        <Circle brand="blue">
+          {nodeEntry.relatedNode?.type && (
+            <UI.Icon color="white">
+              <QuestionNodeIcon nodeType={nodeEntry.relatedNode.type} />
+            </UI.Icon>
+          )}
         </Circle>
         <UI.Div>
-          <StatusDescription event={event} delivery={delivery} />
+          <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
+          <StatusDescription nodeEntry={nodeEntry} />
         </UI.Div>
       </TimelineItem>
     ))}

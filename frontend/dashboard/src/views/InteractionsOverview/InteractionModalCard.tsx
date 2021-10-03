@@ -1,27 +1,22 @@
 import * as UI from '@haas/ui';
 import { CampaignTimeline } from 'components/Campaign/CampaignTimeline';
 import { Circle } from 'components/Common/Circle';
-import { MessageCircle, ThumbsUp } from 'react-feather';
+import { Clock, Mail, MessageCircle, Monitor, Phone, ThumbsUp, User } from 'react-feather';
 import { Timeline, TimelineItem } from 'components/Common/Timeline';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
-import { DeliveryEventFragmentFragment, DeliveryFragmentFragment, useGetInteractionQuery } from 'types/generated-types';
+import { CampaignVariantEnum, useGetInteractionQuery } from 'types/generated-types';
+import { InteractionTimeline } from 'components/Interaction/InteractionTimeline';
+import { formatSimpleDate } from 'utils/dateUtils';
+import { useTranslation } from 'react-i18next';
 
 interface InteractionModalCardProps {
   sessionId: string;
   onClose: () => void;
 }
 
-interface Delivery extends DeliveryFragmentFragment {
-  events: DeliveryEventFragmentFragment[];
-}
-
-interface InteractionDeliveryProps {
-  delivery: Delivery;
-}
-
 export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCardProps) => {
+  const { t } = useTranslation();
   const { data, loading, error } = useGetInteractionQuery({
     variables: { sessionId },
   });
@@ -31,7 +26,6 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
   }
 
   const delivery = data?.session?.delivery;
-  const nodeEntries = data?.session?.nodeEntries;
 
   return (
     <UI.ModalCard maxWidth={1200} onClose={onClose}>
@@ -41,31 +35,84 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
         </UI.ModalTitle>
       </UI.ModalHead>
       <UI.ModalBody>
-        <Timeline>
-          {/* TODO: Make into an accordion */}
-          {!!delivery && (
-            <TimelineItem gridTemplateColumns="40px 1fr">
-              <Circle brand="teal">
-                <MessageCircle />
-              </Circle>
-              <UI.Div>
-                <UI.Div mb={2} color="teal.700">
-                  <UI.SectionHeader>Dialogue deployed via delivery</UI.SectionHeader>
-                  <UI.Button size="xs">See Delivery</UI.Button>
+        {data && (
+          <Timeline>
+            {!!delivery && (
+              <TimelineItem gridTemplateColumns="40px 1fr">
+                <Circle brand="teal">
+                  <MessageCircle />
+                </Circle>
+                <UI.Div>
+                  <UI.Div mb={2} color="teal.700">
+                    <UI.SectionHeader>Dialogue deployed via delivery</UI.SectionHeader>
+                    <UI.Div my={1}>
+                      <UI.Stack isInline>
+                        <UI.Label variantColor="teal" size="sm" fontSize="0.6rem">
+                          <UI.Icon mr={1}><User width="0.8rem" /></UI.Icon>
+                          {delivery.deliveryRecipientFirstName}
+                          {' '}
+                          {delivery.deliveryRecipientLastName}
+                        </UI.Label>
+                        {delivery.campaignVariant?.type === CampaignVariantEnum.Email && (
+                          <UI.Label variantColor="teal" size="sm" fontSize="0.6rem">
+                            <UI.Icon mr={1}><Mail width="0.8rem" /></UI.Icon>
+                            {delivery.deliveryRecipientEmail}
+                          </UI.Label>
+                        )}
+                        {delivery.campaignVariant?.type === CampaignVariantEnum.Sms && (
+                          <UI.Label variantColor="teal" size="sm" fontSize="0.6rem">
+                            <UI.Icon mr={1}><Phone width="0.8rem" /></UI.Icon>
+                            {delivery.deliveryRecipientPhone}
+                          </UI.Label>
+                        )}
+                      </UI.Stack>
+                    </UI.Div>
+                    <UI.Button size="xs">Go to Delivery</UI.Button>
+                  </UI.Div>
+                  <CampaignTimeline delivery={delivery} />
                 </UI.Div>
-                <CampaignTimeline delivery={delivery} />
-              </UI.Div>
-            </TimelineItem>
-          )}
-          <TimelineItem gridTemplateColumns="40px 1fr">
-            <Circle brand="orange">
-              <ThumbsUp />
-            </Circle>
-            <UI.Div mb={2} color="orange.700">
-              <UI.SectionHeader>Dialogue interaction</UI.SectionHeader>
-            </UI.Div>
-          </TimelineItem>
-        </Timeline>
+              </TimelineItem>
+            )}
+            {!!data.session && (
+              <TimelineItem gridTemplateColumns="40px 1fr">
+                <Circle brand="blue">
+                  <ThumbsUp />
+                </Circle>
+                <UI.Div>
+
+                  <UI.Div mb={2} color="blue.700">
+                    <UI.SectionHeader>Dialogue entries</UI.SectionHeader>
+                    <UI.Span>
+                      Opened on
+                      {' '}
+                      {formatSimpleDate(data.session?.createdAt)}
+                    </UI.Span>
+                    <UI.Div mt={1}>
+                      <UI.Stack isInline>
+                        <UI.Label variantColor="blue" size="sm" fontSize="0.6rem">
+                          <UI.Icon mr={1}><Monitor width="0.8rem" /></UI.Icon>
+                          {data.session.device}
+                        </UI.Label>
+                        <UI.Label variantColor="blue" size="sm" fontSize="0.6rem">
+                          <UI.Icon mr={1}><Clock width="0.8rem" /></UI.Icon>
+                          {data.session.totalTimeInSec}
+                          {' '}
+                          {t('seconds')}
+                        </UI.Label>
+                      </UI.Stack>
+                    </UI.Div>
+                  </UI.Div>
+                  <UI.Div>
+                    <InteractionTimeline interaction={data.session} />
+                  </UI.Div>
+                </UI.Div>
+              </TimelineItem>
+            )}
+          </Timeline>
+        )}
+        {error && (
+          <UI.ErrorPane header="Server problem" text={error.message} />
+        )}
       </UI.ModalBody>
     </UI.ModalCard>
   );

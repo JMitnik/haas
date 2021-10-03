@@ -29,7 +29,7 @@ const DeployedStatusDescription = ({ event }: StatusDescriptionProps) => (
       Delivery was deployed
     </UI.SectionHeader>
     {' '}
-    Deployed on
+    on
     {' '}
     {formatSimpleDate(event.createdAt)}
   </>
@@ -41,7 +41,7 @@ const ScheduledStatusDescription = ({ delivery }: StatusDescriptionProps) => (
       Delivery was scheduled
     </UI.SectionHeader>
     {' '}
-    Scheduled on
+    on
     {' '}
     {formatSimpleDate(delivery.scheduledAt)}
   </>
@@ -53,7 +53,7 @@ const FailedStatusDescription = ({ event }: StatusDescriptionProps) => (
       Delivery failed
     </UI.SectionHeader>
     {' '}
-    Failed on
+    on
     {' '}
     {formatSimpleDate(event.createdAt)}
 

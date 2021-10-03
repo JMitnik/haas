@@ -10,7 +10,6 @@ interface TimelineItemContainerProps {
 
 export const TimelineItemContainer = styled(UI.Grid) <TimelineItemContainerProps>`
   position: relative;
-  align-items: center;
   padding: 10px 0;
 
   &:first-of-type {
