@@ -4,9 +4,9 @@
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
-import { Activity, BarChart, Calendar, Filter, MessageCircle } from 'react-feather';
+import { Activity, Calendar, Filter, MessageCircle } from 'react-feather';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ControlledMenu, MenuDivider, MenuHeader, MenuItem, MenuState, SubMenu, useMenuState } from '@szhsin/react-menu';
+import { ControlledMenu, MenuHeader, MenuItem, MenuState, SubMenu, useMenuState } from '@szhsin/react-menu';
 import { Controller, useForm } from 'react-hook-form';
 import { Flex, ViewTitle } from '@haas/ui';
 import {
@@ -21,7 +21,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/core';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
-import { Route, Switch, useLocation, useRouteMatch } from 'react-router';
+import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
@@ -32,14 +32,15 @@ import {
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import {
   DeliveryFragmentFragment,
-  SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery
+  SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery,
 } from 'types/generated-types';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
-import { InteractionModalCard } from './InteractionModalCard';
 import { paginate } from 'utils/paginate';
 import { useDateFilter } from 'hooks/useDateFilter';
 import SearchBar from 'components/SearchBar/SearchBar';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
+
+import { InteractionModalCard } from './InteractionModalCard';
 
 interface TableProps {
   search: string;
@@ -190,35 +191,35 @@ const FilterButton = ({ filterKey, value, onDisable }: FilterButtonProps) => (
 
 const ActiveFilters = ({
   filter,
-  setFilters
+  setFilters,
 }: { filter: TableProps, setFilters: Dispatch<SetStateAction<TableProps>> }) => (
   <UI.Stack isInline spacing={4} alignItems="center">
     {!!filter.search && (
       <FilterButton
         filterKey="search"
         value={filter.search}
-        onDisable={() => setFilters((filter) => ({ ...filter, search: '' }))}
+        onDisable={() => setFilters((newFilter) => ({ ...newFilter, search: '' }))}
       />
     )}
     {(filter.startDate || filter.endDate) && (
       <FilterButton
         filterKey="date"
         value={`${filter.startDate?.toISOString()} - ${filter.endDate?.toISOString()}`}
-        onDisable={() => setFilters((filter) => ({ ...filter, startDate: undefined, endDate: undefined, }))}
+        onDisable={() => setFilters((newFilter) => ({ ...newFilter, startDate: undefined, endDate: undefined }))}
       />
     )}
     {!!filter.filterCampaigns && (
       <FilterButton
         filterKey="distribution"
         value={filter.filterCampaigns}
-        onDisable={() => setFilters((filter) => ({ ...filter, filterCampaigns: undefined }))}
+        onDisable={() => setFilters((newFilter) => ({ ...newFilter, filterCampaigns: undefined }))}
       />
     )}
     {!!filter.filterCampaignId && (
       <FilterButton
         filterKey="campaignVariant"
         value={filter.filterCampaignId}
-        onDisable={() => setFilters((filter) => ({ ...filter, filterCampaignId: undefined }))}
+        onDisable={() => setFilters((newFilter) => ({ ...newFilter, filterCampaignId: undefined }))}
       />
     )}
   </UI.Stack>
@@ -308,12 +309,6 @@ export const InteractionsOverview = () => {
   const { customerSlug, dialogueSlug, goToInteractionsView } = useNavigator();
   const location = useLocation();
 
-  const match = useRouteMatch({
-    path: ROUTES.INTERACTION_VIEW,
-    strict: true,
-    exact: true
-  });
-
   const [campaignVariants, setCampaignVariants] = useState<CampaignVariant[]>([]);
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
   const { startDate, endDate, setDate } = useDateFilter({});
@@ -330,8 +325,8 @@ export const InteractionsOverview = () => {
   });
 
   useEffect(() => {
-    setFilter((filter) => ({
-      ...filter,
+    setFilter((newFilter) => ({
+      ...newFilter,
       startDate,
       endDate,
     }));
@@ -367,16 +362,6 @@ export const InteractionsOverview = () => {
     },
   });
 
-  // const [fetchCSVData, { loading: csvLoading }] = useLazyQuery<CustomerSessionConnection>(
-  //   getDialogueSessionConnectionQuery, {
-  //     fetchPolicy: 'cache-and-network',
-  //     onCompleted: (csvData: any) => {
-  //       const sessions = csvData?.customer?.dialogue?.sessionConnection?.sessions;
-  //       handleExportCSV(sessions, customerSlug, dialogueSlug);
-  //     },
-  //   },
-  // );
-
   const handleCampaignVariantFilterChange = (filterValues: CampaignVariantFormProps) => {
     setFilter({
       ...filter,
@@ -395,11 +380,11 @@ export const InteractionsOverview = () => {
     });
   };
 
-  const handleMultiDateFilterChange = (startDate?: Date, endDate?: Date) => {
+  const handleMultiDateFilterChange = (newStartDate?: Date, newEndDate?: Date) => {
     setFilter({
       ...filter,
-      startDate,
-      endDate,
+      startDate: newStartDate,
+      endDate: newEndDate,
       pageIndex: 0,
     });
   };
@@ -522,7 +507,9 @@ export const InteractionsOverview = () => {
                   )}
                   >
                     <MenuItem
-                      onClick={() => handleSearchTermChange(contextInteraction?.delivery?.deliveryRecipientFirstName)}
+                      onClick={() => handleSearchTermChange(
+                        contextInteraction?.delivery?.deliveryRecipientFirstName || '',
+                      )}
                     >
                       More from
                       {' '}
@@ -531,7 +518,7 @@ export const InteractionsOverview = () => {
                       {contextInteraction?.delivery?.deliveryRecipientLastName}
                     </MenuItem>
                     <MenuItem onClick={() => handleCampaignVariantFilterChange({
-                      filterCampaignVariant: contextInteraction?.delivery?.campaignVariant?.id
+                      filterCampaignVariant: contextInteraction?.delivery?.campaignVariant?.id,
                     })}
                     >
                       More from campaign variant
@@ -563,6 +550,7 @@ export const InteractionsOverview = () => {
                   )}
                 </TableCell>
                 <TableCell>
+                  {/* @ts-ignore */}
                   <CompactEntriesPath nodeEntries={session.nodeEntries} />
                 </TableCell>
                 <TableCell />
@@ -577,7 +565,7 @@ export const InteractionsOverview = () => {
               pageIndex={filter.pageIndex}
               maxPages={filter.totalPages}
               perPage={filter.perPage}
-              setPageIndex={(page) => setFilter((filter) => ({ ...filter, pageIndex: page - 1 }))}
+              setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
             />
           </UI.Flex>
         </UI.Div>
@@ -600,6 +588,7 @@ export const InteractionsOverview = () => {
                   <UI.Modal isOpen onClose={() => goToInteractionsView()}>
                     <InteractionModalCard
                       onClose={() => goToInteractionsView()}
+                      // @ts-ignore
                       sessionId={match?.params?.interactionId}
                     />
                   </UI.Modal>
@@ -632,7 +621,7 @@ const Pagination = ({
   pageIndex,
   maxPages,
   perPage,
-  setPageIndex
+  setPageIndex,
 }: PaginationProps) => {
   const { pages } = paginate(maxPages, pageIndex + 1, perPage, 5);
   const startedRef = useRef<boolean>(false);
@@ -669,6 +658,7 @@ const Pagination = ({
           type="number"
           value={inputPageIndex}
           width={40}
+          // @ts-ignore
           onChange={(e) => { startedRef.current = true; setInputPageIndex(e.target.value); }}
         />
         <UI.Stack spacing={2} isInline>
@@ -854,22 +844,20 @@ const TableHeadingRow = styled(UI.Grid)`
 `;
 
 const TableRow = styled(UI.Grid)`
-  ${({ theme }) => css`
-    background: white;
-    align-items: center;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01),0 2px 4px -1px rgba(0,0,0,0.03);
-    transition: all 0.2s ease-in;
-    cursor: pointer;
+  background: white;
+  align-items: center;
+  padding: 6px 12px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01),0 2px 4px -1px rgba(0,0,0,0.03);
+  transition: all 0.2s ease-in;
+  cursor: pointer;
 
-    &:hover {
-      cursor: pointer;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.08);
-      transition: all 0.2s ease-in;
-    }
-  `}
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.08);
+    transition: all 0.2s ease-in;
+  }
 `;
 
 const TableHeadingCell = styled(UI.Div)`
