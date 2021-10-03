@@ -134,6 +134,29 @@ export class CampaignPrismaAdapter {
     });
   }
 
+
+  /**
+   * Find delivery of session.
+   * @param campaignId
+   * @returns
+   */
+  findDeliveryOfSession = async (sessionId: string) => {
+    return this.prisma.session.findFirst({
+      where: { id: sessionId }
+    }).delivery();
+  }
+
+  /**
+   * Find delivery-events of delivery.
+   * @param campaignId
+   * @returns
+   */
+  findDeliveryEventsOfDelivery = async (deliveryId: string) => {
+    return this.prisma.delivery.findFirst({
+      where: { id: deliveryId }
+    }).events();
+  }
+
   /**
    * Find delivery
    * @param id

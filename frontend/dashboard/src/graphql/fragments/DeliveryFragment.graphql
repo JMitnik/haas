@@ -1,7 +1,14 @@
 fragment DeliveryFragment on DeliveryType {
   id
+
   deliveryRecipientFirstName
   deliveryRecipientLastName
+  deliveryRecipientEmail
+  deliveryRecipientPhone
+
+  scheduledAt
+  updatedAt
+  createdAt
 
   campaignVariant {
     id

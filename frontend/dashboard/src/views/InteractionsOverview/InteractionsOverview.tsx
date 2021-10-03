@@ -5,6 +5,7 @@ import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
 import { Activity, BarChart, Calendar, Filter, MessageCircle } from 'react-feather';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ControlledMenu, MenuDivider, MenuHeader, MenuItem, MenuState, SubMenu, useMenuState } from '@szhsin/react-menu';
 import { Controller, useForm } from 'react-hook-form';
 import { Flex, ViewTitle } from '@haas/ui';
@@ -19,9 +20,9 @@ import {
   RadioGroup,
   useDisclosure,
 } from '@chakra-ui/core';
+import { ROUTES, useNavigator } from 'hooks/useNavigator';
+import { Route, Switch, useLocation, useRouteMatch } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
-import { useLocation } from 'react-router';
-import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -34,6 +35,7 @@ import {
   SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery
 } from 'types/generated-types';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
+import { InteractionModalCard } from './InteractionModalCard';
 import { paginate } from 'utils/paginate';
 import { useDateFilter } from 'hooks/useDateFilter';
 import SearchBar from 'components/SearchBar/SearchBar';
@@ -230,22 +232,40 @@ interface CampaignVariant {
 const MenuContainer = styled.div`
   ${({ theme }) => css`
     .szh-menu {
+      min-width: 200px;
       border-radius: 10px;
+      padding: 0;
+    }
+
+    .szh-menu .szh-menu__header:first-child {
+      border-radius: 10px 10px 0 0;
+    }
+
+    .szh-menu__item--hover {
+      background: ${theme.colors.gray[100]};
     }
 
     .szh-menu__header {
+      padding: 6px 12px;
       display: flex;
       font-weight: 600;
       line-height: 1rem;
       font-size: 0.7rem;
       text-transform: uppercase;
       align-items: center;
+      background: ${theme.colors.gray[50]};
       letter-spacing: 0.05em;
+      color: ${theme.colors.gray[500]};
+
+      ${UI.Icon} {
+        margin-right: 6px;
+      }
     }
 
     .szh-menu__submenu > .szh-menu__item {
-      color: #4a5568;
-      font-weight: 500;
+      padding: 4px 16px;
+      color: ${theme.colors.gray[600]};
+      font-weight: 600;
 
       ${UI.Icon} {
         max-width: 20px;
@@ -267,20 +287,33 @@ interface MenuProps {
   state?: MenuState;
 }
 
+const MotionControlledMenu = motion.custom(ControlledMenu);
+
 const Menu = ({ children, ...menuProps }: MenuProps) => (
   <MenuContainer>
-    <ControlledMenu {...menuProps}>
-      {children}
-    </ControlledMenu>
+    <motion.div>
+      <AnimatePresence exitBeforeEnter>
+        <MotionControlledMenu {...menuProps}>
+          <motion.div key={menuProps.state} exit={{ opacity: 0 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {children}
+          </motion.div>
+        </MotionControlledMenu>
+      </AnimatePresence>
+    </motion.div>
   </MenuContainer>
 );
 
 export const InteractionsOverview = () => {
   const { t } = useTranslation();
-  const { dialogueSlug, customerSlug } = useNavigator();
+  const { customerSlug, dialogueSlug, goToInteractionsView } = useNavigator();
   const location = useLocation();
 
-  const [activeSession, setActiveSession] = useState<SessionFragmentFragment | null>(null);
+  const match = useRouteMatch({
+    path: ROUTES.INTERACTION_VIEW,
+    strict: true,
+    exact: true
+  });
+
   const [campaignVariants, setCampaignVariants] = useState<CampaignVariant[]>([]);
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
   const { startDate, endDate, setDate } = useDateFilter({});
@@ -304,8 +337,6 @@ export const InteractionsOverview = () => {
     }));
   }, [startDate, endDate, setFilter]);
 
-  console.log(filter.startDate);
-  console.log(filter.endDate);
   useGetInteractionsQueryQuery({
     variables: {
       customerSlug,
@@ -514,7 +545,7 @@ export const InteractionsOverview = () => {
 
             {sessions.map((session) => (
               <TableRow
-                onClick={() => setActiveSession(session)}
+                onClick={() => goToInteractionsView(session.id)}
                 gridTemplateColumns="1fr 1fr 1fr 1fr"
                 key={session.id}
                 onContextMenu={(e) => {
@@ -551,11 +582,33 @@ export const InteractionsOverview = () => {
           </UI.Flex>
         </UI.Div>
 
-        <UI.Modal isOpen={!!activeSession} onClose={() => setActiveSession(null)}>
-          <UI.Card borderRadius={10} bg="white" width={600} padding={4} noHover>
-            test
-          </UI.Card>
-        </UI.Modal>
+        <AnimatePresence>
+          <Switch
+            location={location}
+            key={location.pathname}
+          >
+            <Route
+              path={ROUTES.INTERACTION_VIEW}
+            >
+              {({ match }) => (
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <UI.Modal isOpen onClose={() => goToInteractionsView()}>
+                    <InteractionModalCard
+                      onClose={() => goToInteractionsView()}
+                      sessionId={match?.params?.interactionId}
+                    />
+                  </UI.Modal>
+                </motion.div>
+              )}
+            </Route>
+          </Switch>
+        </AnimatePresence>
+
       </UI.ViewBody>
     </>
   );

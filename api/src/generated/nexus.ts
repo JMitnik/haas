@@ -571,21 +571,21 @@ export interface NexusGenRootTypes {
     startDate?: string | null; // String
   }
   DeliveryEventType: { // root type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     failureMessage?: string | null; // String
     id: string; // ID!
     status: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
   }
   DeliveryType: { // root type
+    createdAt?: any | null; // Date
     currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
     deliveryRecipientEmail?: string | null; // String
     deliveryRecipientFirstName?: string | null; // String
     deliveryRecipientLastName?: string | null; // String
     deliveryRecipientPhone?: string | null; // String
-    events: NexusGenRootTypes['DeliveryEventType'][]; // [DeliveryEventType!]!
     id: string; // ID!
-    scheduledAt?: string | null; // String
-    updatedAt?: string | null; // String
+    scheduledAt?: any | null; // Date
+    updatedAt?: any | null; // Date
   }
   DeprecatedPaginationPageInfo: { // root type
     cursor?: string | null; // String
@@ -1033,22 +1033,23 @@ export interface NexusGenFieldTypes {
     startDate: string | null; // String
   }
   DeliveryEventType: { // field return type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     failureMessage: string | null; // String
     id: string; // ID!
     status: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
   }
   DeliveryType: { // field return type
     campaignVariant: NexusGenRootTypes['CampaignVariantType'] | null; // CampaignVariantType
+    createdAt: any | null; // Date
     currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
     deliveryRecipientEmail: string | null; // String
     deliveryRecipientFirstName: string | null; // String
     deliveryRecipientLastName: string | null; // String
     deliveryRecipientPhone: string | null; // String
-    events: NexusGenRootTypes['DeliveryEventType'][]; // [DeliveryEventType!]!
+    events: NexusGenRootTypes['DeliveryEventType'][] | null; // [DeliveryEventType!]
     id: string; // ID!
-    scheduledAt: string | null; // String
-    updatedAt: string | null; // String
+    scheduledAt: any | null; // Date
+    updatedAt: any | null; // Date
   }
   DeprecatedPaginationPageInfo: { // field return type
     cursor: string | null; // String
@@ -1711,7 +1712,7 @@ export interface NexusGenArgTypes {
       filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
     }
     session: { // args
-      where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
+      id?: string | null; // String
     }
     sessions: { // args
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput

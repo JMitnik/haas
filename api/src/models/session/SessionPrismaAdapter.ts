@@ -5,39 +5,6 @@ import { NexusGenFieldTypes, NexusGenInputNames, NexusGenInputs } from "../../ge
 import NodeEntryService from "../node-entry/NodeEntryService";
 import { CreateSessionInput } from "./SessionPrismaAdapterType";
 
-const constructSessionFilter = (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput']) => {
-  return Prisma.validator<Prisma.SessionWhereInput>()({
-    dialogueId: dialogueId,
-    createdAt: {
-      gte: filter?.startDate ? new Date(filter.startDate) : undefined,
-      lte: filter?.endDate ? new Date(filter.endDate) : undefined,
-    },
-    AND: filter?.search ? [{
-      OR: [
-        {
-          nodeEntries: {
-            some: {
-              choiceNodeEntry: { value: { contains: filter.search } },
-            }
-          }
-        },
-        {
-          delivery: {
-            OR: [
-              {
-                deliveryRecipientFirstName: { contains: filter.search, mode: 'insensitive' }
-              },
-              {
-                deliveryRecipientLastName: { contains: filter.search, mode: 'insensitive' }
-              },
-            ] || []
-          }
-        }
-      ]
-    }] : undefined,
-  })
-}
-
 class SessionPrismaAdapter {
   prisma: PrismaClient;
 
@@ -101,7 +68,7 @@ class SessionPrismaAdapter {
             AND: potentialLastName ? [
               { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
               { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
-            ]: undefined
+            ] : undefined
           }
         }
 
@@ -142,14 +109,18 @@ class SessionPrismaAdapter {
             OR: [
               { deliveryRecipientEmail: { equals: filter.search, mode: 'insensitive' }, },
               { deliveryRecipientPhone: { equals: filter.search, mode: 'insensitive' }, },
-              { AND: potentialLastName ? [
-                { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
-                { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
-              ]: undefined },
-              { OR: !potentialLastName? [
-                { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
-                { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' }, },
-              ] : undefined }
+              {
+                AND: potentialLastName ? [
+                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
+                  { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
+                ] : undefined
+              },
+              {
+                OR: !potentialLastName ? [
+                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
+                  { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' }, },
+                ] : undefined
+              }
             ]
           }
         }]

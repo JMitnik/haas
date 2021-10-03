@@ -24,12 +24,24 @@ export const DeliveryModel = objectType({
     t.string('deliveryRecipientLastName', { nullable: true });
     t.string('deliveryRecipientEmail', { nullable: true });
     t.string('deliveryRecipientPhone', { nullable: true });
-    t.string('scheduledAt', { nullable: true });
-    t.string('updatedAt', { nullable: true });
+
+    t.date('createdAt', { nullable: true });
+    t.date('scheduledAt', { nullable: true });
+    t.date('updatedAt', { nullable: true });
+
     t.field('campaignVariant', { type: CampaignVariantModel });
     t.field('currentStatus', { type: DeliveryStatusEnum });
 
-    t.list.field('events', { type: DeliveryEventModel });
+    t.list.field('events', {
+      type: DeliveryEventModel,
+      nullable: true,
+      resolve: (parent, _, ctx) => {
+        // @ts-ignore
+        if (parent.events) return parent.events;
+
+        return ctx.services.campaignService.findDeliveryEventsOfDelivery(parent.id) || [];
+      }
+    });
   },
 });
 
@@ -39,10 +51,10 @@ export const DeliveryEventModel = objectType({
   definition(t) {
     t.id('id');
     t.field('status', { type: DeliveryStatusEnum });
-    t.string('createdAt');
+    t.date('createdAt');
     t.string('failureMessage', { nullable: true });
   }
-})
+});
 
 export const DeliveryConnectionModel = objectType({
   name: 'DeliveryConnectionType',

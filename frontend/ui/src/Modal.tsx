@@ -1,14 +1,19 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
 import React, { useEffect, useRef } from 'react';
 import { X } from 'react-feather';
+import { CloseIcon } from './assets/icon-close';
 import ReactModal from 'react-modal';
 import styled, { css } from 'styled-components';
+import { Paragraph } from './Type';
 import { Div } from './Generics';
+import { Card } from '.';
 
 export const ModalBody = styled(Div)`
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  ${({ theme }) => css`
+    padding: ${theme.gutter}px 0;
+    overflow-y: scroll;
+    height: 60vh;
+  `}
 `;
 
 if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#root');
@@ -95,31 +100,23 @@ export const Modal = ({
               position: 'absolute',
               border: 0,
               background: 'transparent',
-              overflow: 'initial',
+              padding: 24,
               borderRadius: '10px',
-              left: '0',
-              bottom: '0',
-              right: '0',
-              top: '0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              outline: 'none',
-              padding: '20px',
+              left: '50%',
+              top: '40%',
               margin: '0px auto',
-              maxWidth: '100%',
+              overflow: 'initial',
+              width: '100%',
+              transform: 'translateX(-50%) translateY(-50%)'
             }
           }}
         >
-          <CloseIconWrapper aria-label="closeModal" onClick={onClose}>
-            <X />
-          </CloseIconWrapper>
           <Div ref={ref}>
             <motion.div
               key="modal"
+              initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              initial={{ y: 30, opacity: 0 }}
-              exit={{ y: 30, opacity: 0 }}
+              exit={{ y: 10, opacity: 0 }}
             >
               {children}
             </motion.div>
@@ -129,3 +126,69 @@ export const Modal = ({
     </AnimatePresence >
   );
 };
+
+export const ModalTitle = styled(Paragraph)``;
+
+export const ModalHead = styled(Div)`
+  ${({ theme }) => css`
+    border-bottom: 1px solid ${theme.colors.gray[100]};
+
+    ${ModalTitle} {
+      color: ${theme.colors.gray[800]};
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+  `}
+`;
+
+interface ModalCardProps {
+  children: React.ReactNode;
+  onClose: () => void;
+  minWidth?: number;
+  maxWidth?: number;
+}
+
+const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
+  ${({ theme }) => css`
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: ${theme.colors.gray[400]};
+    transition: color ease-in 0.2s;
+
+    &:hover {
+      color: ${theme.colors.gray[600]};
+      transition: color ease-in 0.2s;
+    }
+  `}
+`;
+
+const CloseButton = ({ onClose }: any) => (
+  <CloseButtonContainer onClick={onClose}>
+    <CloseIcon />
+  </CloseButtonContainer>
+);
+
+const ModalCardContainer = styled(Div)`
+  position: relative;
+
+  ${Card} {
+    margin: 0 auto;
+  }
+
+  ${CloseButtonContainer} {
+  }
+`;
+
+export const ModalCard = ({ children, onClose, maxWidth = 600 }: ModalCardProps) => (
+  <ModalCardContainer>
+    <Card bg="white" noHover maxWidth={maxWidth} padding={4}>
+      {!!onClose && (
+        <CloseButton onClose={onClose} />
+      )}
+      {children}
+    </Card>
+  </ModalCardContainer>
+)

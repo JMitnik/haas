@@ -129,4 +129,6 @@ theme.colors.app.onDefault = theme.colors.default.darkest;
 theme.colors.app.mutedOnDefault = theme.colors.default.normalAlt;
 theme.colors.app.mutedAltOnDefault = theme.colors.default.darker;
 
+export type Brand = keyof typeof chakraTheme.colors;
+
 export default theme;

@@ -61,7 +61,7 @@ export const Hr = styled.hr`
 `;
 
 
-const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
+export const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
   position: absolute;
   top: 12px;
   right: 12px;
@@ -100,7 +100,7 @@ export const Skeleton = ({ isLoading, borderRadius = '10px', isRefreshing = fals
       <Div opacity={0.5} style={{ pointerEvents: 'none', cursor: 'initial' }}>
         {children}
       </Div>
-    ): (
+    ) : (
       <ChakraSkeleton isLoaded={!isLoading} borderRadius={borderRadius} height={!!manualHeight ? `${manualHeight}px` : 'auto'}>
         {children}
       </ChakraSkeleton>
@@ -140,7 +140,7 @@ export const ErrorPane = ({ header, text, renderCallToAction }: ErrorPaneProps) 
     {header && (
       <Flex alignItems="flex-end">
         <PaneIcon mr={2} color="red.500"><Icon><AlertTriangle /></Icon></PaneIcon>
-        <PaneHeader  color="red.500" fontSize="900">{header}</PaneHeader>
+        <PaneHeader color="red.500" fontSize="900">{header}</PaneHeader>
       </Flex>
     )}
 
@@ -151,7 +151,7 @@ export const ErrorPane = ({ header, text, renderCallToAction }: ErrorPaneProps) 
 
     {!!renderCallToAction && (
       <>
-      {renderCallToAction}
+        {renderCallToAction}
       </>
     )}
   </Div>

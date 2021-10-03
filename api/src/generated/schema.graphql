@@ -309,7 +309,7 @@ type DeliveryConnectionType implements DeprecatedConnectionInterface {
 }
 
 type DeliveryEventType {
-  createdAt: String!
+  createdAt: Date!
   failureMessage: String
   id: ID!
   status: DeliveryStatusEnum!
@@ -328,15 +328,16 @@ enum DeliveryStatusEnum {
 """Delivery"""
 type DeliveryType {
   campaignVariant: CampaignVariantType
+  createdAt: Date
   currentStatus: DeliveryStatusEnum!
   deliveryRecipientEmail: String
   deliveryRecipientFirstName: String
   deliveryRecipientLastName: String
   deliveryRecipientPhone: String
-  events: [DeliveryEventType!]!
+  events: [DeliveryEventType!]
   id: ID!
-  scheduledAt: String
-  updatedAt: String
+  scheduledAt: Date
+  updatedAt: Date
 }
 
 """Interface all pagination-based models should implement"""
@@ -880,7 +881,9 @@ type Query {
   me: UserType!
   refreshAccessToken: RefreshAccessTokenOutput!
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
-  session(where: SessionWhereUniqueInput): Session
+
+  """A session is one entire user-interaction"""
+  session(id: String): Session
   sessions(where: SessionWhereUniqueInput): [Session!]!
   tags(customerSlug: String, dialogueId: String): [Tag!]!
   trigger(triggerId: String): TriggerType

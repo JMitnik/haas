@@ -7,7 +7,7 @@ import {
   Slider as AntdSlider,
   // DatePicker as AntdDatepicker,
 } from 'antd';
-import { Div, Paragraph } from '@haas/ui';
+import { Div, Paragraph, SectionHeader } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
 import {
   ButtonProps as ChakraButtonProps,
@@ -135,7 +135,7 @@ export const Textarea = forwardRef(
   )
 );
 
-export const Input = forwardRef(({id, ...props}: InputProps, ref: Ref<HTMLInputElement>) => (
+export const Input = forwardRef(({ id, ...props }: InputProps, ref: Ref<HTMLInputElement>) => (
   <InputGroup>
     {props.leftEl && (
       <ChakraInputLeftElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
@@ -566,14 +566,7 @@ export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDiv
   </FormSectionContainer>
 ));
 
-export const FormSectionHeader = styled(Text)`
-  ${({ theme }) => css`
-    font-size: 1.3rem;
-    color: ${theme.colors.default.text};
-    font-weight: 700;
-    margin-bottom: ${theme.gutter / 4}px;
-  `}
-`;
+export const FormSectionHeader = styled(SectionHeader)``;
 
 export const FormSectionHelper = styled(Text)`
   ${({ theme }) => css`
@@ -850,7 +843,7 @@ export const DebouncedInput = ({ value, onChange }: { value: any, onChange: (val
       value={localValue}
       width={40}
       // @ts-ignore
-      onChange={(e) => {startedRef.current = true; setLocalValue(e.target.value)}}
+      onChange={(e) => { startedRef.current = true; setLocalValue(e.target.value) }}
     />
   )
 }

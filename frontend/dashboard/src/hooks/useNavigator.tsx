@@ -4,6 +4,8 @@ export const ROUTES = {
   WORKSPACE_ROOT: '/dashboard/b/:customerSlug',
   DIALOGUES_VIEW: '/dashboard/b/:customerSlug/d',
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
+  INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions',
+  INTERACTION_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions/:interactionId',
   CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
   AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
@@ -34,6 +36,21 @@ export const useNavigator = () => {
     history.push(path);
   };
 
+  const goToInteractionsView = (interactionId?: string) => {
+    if (interactionId) {
+      history.push(generatePath(ROUTES.INTERACTION_VIEW, {
+        customerSlug,
+        dialogueSlug,
+        interactionId,
+      }));
+    } else {
+      history.push(generatePath(ROUTES.INTERACTIONS_VIEW, {
+        customerSlug,
+        dialogueSlug,
+      }));
+    }
+  };
+
   const getCampaignsPath = () => generatePath(ROUTES.CAMPAIGNS_VIEW, { customerSlug, campaignId });
   const getUsersPath = () => generatePath(ROUTES.USERS_OVERVIEW, { customerSlug });
   const getDialoguesPath = () => generatePath(ROUTES.DIALOGUES_VIEW, { customerSlug });
@@ -48,6 +65,7 @@ export const useNavigator = () => {
   });
 
   return {
+    goToInteractionsView,
     goToCampaignView,
     getCampaignsPath,
     getDialoguesPath,

@@ -1,0 +1,13 @@
+query GetInteraction($sessionId: String!) {
+  session(id: $sessionId) {
+    id
+    ...SessionFragment
+
+    delivery {
+      ...DeliveryFragment
+      events {
+        ...DeliveryEventFragment
+      }
+    }
+  }
+}

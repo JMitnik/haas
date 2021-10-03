@@ -44,6 +44,22 @@ export class CampaignService {
   }
 
   /**
+   * Find delivery of session.
+   * @param campaignId
+   * @returns
+   */
+  findDeliveryOfSession = async (sessionId: string) => {
+    return this.prismaAdapter.findDeliveryOfSession(sessionId);
+  }
+
+  /**
+   * Find delivery-events of delivery.
+   */
+  findDeliveryEventsOfDelivery = async (deliveryId: string) => {
+    return this.prismaAdapter.findDeliveryEventsOfDelivery(deliveryId);
+  }
+
+  /**
    *
    * @param campaignId
    * @returns
