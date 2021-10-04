@@ -5,6 +5,12 @@ query GetInteraction($sessionId: String!) {
 
     delivery {
       ...DeliveryFragment
+      campaignVariant {
+        id
+        campaign {
+          id
+        }
+      }
       events {
         ...DeliveryEventFragment
       }

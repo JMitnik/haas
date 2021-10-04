@@ -8,6 +8,7 @@ import React from 'react';
 import { CampaignVariantEnum, useGetInteractionQuery } from 'types/generated-types';
 import { InteractionTimeline } from 'components/Interaction/InteractionTimeline';
 import { formatSimpleDate } from 'utils/dateUtils';
+import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
 
 interface InteractionModalCardProps {
@@ -16,6 +17,7 @@ interface InteractionModalCardProps {
 }
 
 export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCardProps) => {
+  const { goToDeliveryView } = useNavigator();
   const { t } = useTranslation();
   const { data, loading, error } = useGetInteractionQuery({
     variables: { sessionId },
@@ -67,7 +69,12 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
                         )}
                       </UI.Stack>
                     </UI.Div>
-                    <UI.Button size="xs">Go to Delivery</UI.Button>
+                    <UI.Button
+                      size="xs"
+                      onClick={() => goToDeliveryView(delivery.campaignVariant?.campaign?.id || '', delivery.id)}
+                    >
+                      Go to Delivery
+                    </UI.Button>
                   </UI.Div>
                   <CampaignTimeline delivery={delivery} />
                 </UI.Div>

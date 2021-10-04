@@ -41,7 +41,7 @@ const ScheduledStatusDescription = ({ delivery }: StatusDescriptionProps) => (
       Delivery was scheduled
     </UI.SectionHeader>
     {' '}
-    on
+    for
     {' '}
     {formatSimpleDate(delivery.scheduledAt)}
   </>

@@ -2056,6 +2056,23 @@ export type CreateBatchDeliveriesMutation = (
   ) }
 );
 
+export type GetDeliveryQueryVariables = Exact<{
+  deliveryId?: Maybe<Scalars['String']>;
+}>;
+
+
+export type GetDeliveryQuery = (
+  { __typename?: 'Query' }
+  & { delivery?: Maybe<(
+    { __typename?: 'DeliveryType' }
+    & { events?: Maybe<Array<(
+      { __typename?: 'DeliveryEventType' }
+      & DeliveryEventFragmentFragment
+    )>> }
+    & DeliveryFragmentFragment
+  )> }
+);
+
 export type GetWorkspaceCampaignQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   campaignId: Scalars['String'];
@@ -2243,7 +2260,14 @@ export type GetInteractionQuery = (
     & Pick<Session, 'id'>
     & { delivery?: Maybe<(
       { __typename?: 'DeliveryType' }
-      & { events?: Maybe<Array<(
+      & { campaignVariant?: Maybe<(
+        { __typename?: 'CampaignVariantType' }
+        & Pick<CampaignVariantType, 'id'>
+        & { campaign?: Maybe<(
+          { __typename?: 'CampaignType' }
+          & Pick<CampaignType, 'id'>
+        )> }
+      )>, events?: Maybe<Array<(
         { __typename?: 'DeliveryEventType' }
         & DeliveryEventFragmentFragment
       )>> }
@@ -2893,6 +2917,48 @@ export function useCreateBatchDeliveriesMutation(baseOptions?: Apollo.MutationHo
 export type CreateBatchDeliveriesMutationHookResult = ReturnType<typeof useCreateBatchDeliveriesMutation>;
 export type CreateBatchDeliveriesMutationResult = Apollo.MutationResult<CreateBatchDeliveriesMutation>;
 export type CreateBatchDeliveriesMutationOptions = Apollo.BaseMutationOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
+export const GetDeliveryDocument = gql`
+    query GetDelivery($deliveryId: String) {
+  delivery(deliveryId: $deliveryId) {
+    ...DeliveryFragment
+    events {
+      ...DeliveryEventFragment
+    }
+  }
+}
+    ${DeliveryFragmentFragmentDoc}
+${DeliveryEventFragmentFragmentDoc}`;
+
+/**
+ * __useGetDeliveryQuery__
+ *
+ * To run a query within a React component, call `useGetDeliveryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDeliveryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDeliveryQuery({
+ *   variables: {
+ *      deliveryId: // value for 'deliveryId'
+ *   },
+ * });
+ */
+export function useGetDeliveryQuery(baseOptions?: Apollo.QueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
+      }
+export function useGetDeliveryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
+        }
+export type GetDeliveryQueryHookResult = ReturnType<typeof useGetDeliveryQuery>;
+export type GetDeliveryLazyQueryHookResult = ReturnType<typeof useGetDeliveryLazyQuery>;
+export type GetDeliveryQueryResult = Apollo.QueryResult<GetDeliveryQuery, GetDeliveryQueryVariables>;
+export function refetchGetDeliveryQuery(variables?: GetDeliveryQueryVariables) {
+      return { query: GetDeliveryDocument, variables: variables }
+    }
 export const GetWorkspaceCampaignDocument = gql`
     query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilter) {
   customer(slug: $customerSlug) {
@@ -3251,6 +3317,12 @@ export const GetInteractionDocument = gql`
     ...SessionFragment
     delivery {
       ...DeliveryFragment
+      campaignVariant {
+        id
+        campaign {
+          id
+        }
+      }
       events {
         ...DeliveryEventFragment
       }

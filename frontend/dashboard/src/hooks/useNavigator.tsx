@@ -8,6 +8,7 @@ export const ROUTES = {
   INTERACTION_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions/:interactionId',
   CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
+  DELIVERY_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId/:deliveryId',
   AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
   ADMIN_OVERVIEW: '/dashboard/admin',
   USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
@@ -27,10 +28,20 @@ export const useNavigator = () => {
   });
   const history = useHistory();
 
-  const goToCampaignView = (campaignId: string) => {
+  const goToCampaignView = (nextCampaignId: string) => {
     const path = generatePath(ROUTES.CAMPAIGN_VIEW, {
       customerSlug,
-      campaignId,
+      campaignId: nextCampaignId,
+    });
+
+    history.push(path);
+  };
+
+  const goToDeliveryView = (nextCampaignId: string, deliveryId: string) => {
+    const path = generatePath(ROUTES.DELIVERY_VIEW, {
+      customerSlug,
+      campaignId: nextCampaignId,
+      deliveryId,
     });
 
     history.push(path);
@@ -65,6 +76,7 @@ export const useNavigator = () => {
   });
 
   return {
+    goToDeliveryView,
     goToInteractionsView,
     goToCampaignView,
     getCampaignsPath,

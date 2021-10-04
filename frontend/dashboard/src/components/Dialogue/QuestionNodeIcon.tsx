@@ -6,6 +6,7 @@ import { ReactComponent as MultiChoiceIcon } from 'assets/icons/multi-choice-ico
 import { QuestionNodeTypeEnum } from 'types/generated-types';
 import { ReactComponent as SliderIcon } from 'assets/icons/haas.svg';
 import LinkIcon from 'components/Icons/LinkIcon';
+import VideoIcon from 'components/Icons/VideoIcon';
 
 const FormIcon = () => (
   <>
@@ -19,6 +20,7 @@ const MapQuestionNodeIcon: { [key in QuestionNodeTypeEnum]?: React.FC<{ color?: 
   [QuestionNodeTypeEnum.Form]: FormIcon,
   [QuestionNodeTypeEnum.Generic]: Eye,
   [QuestionNodeTypeEnum.Link]: LinkIcon,
+  [QuestionNodeTypeEnum.VideoEmbedded]: VideoIcon,
 };
 
 export const QuestionNodeIcon = ({ nodeType }: { nodeType: QuestionNodeTypeEnum }) => {
