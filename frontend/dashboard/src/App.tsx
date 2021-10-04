@@ -3,6 +3,7 @@ import { ApolloProvider } from '@apollo/client';
 import { Div, ViewContainer } from '@haas/ui';
 import { ErrorBoundary } from '@sentry/react';
 import { I18nextProvider } from 'react-i18next';
+import { QueryParamProvider } from 'use-query-params';
 import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import React, { FC } from 'react';
 
@@ -308,9 +309,11 @@ const App: FC = () => (
             <DefaultThemeProviders>
               <UserProvider>
                 <AppContainer>
-                  <ErrorBoundary fallback={GeneralErrorFallback}>
-                    <AppRoutes />
-                  </ErrorBoundary>
+                  <QueryParamProvider ReactRouterRoute={Route}>
+                    <ErrorBoundary fallback={GeneralErrorFallback}>
+                      <AppRoutes />
+                    </ErrorBoundary>
+                  </QueryParamProvider>
                 </AppContainer>
                 <GlobalStyle />
               </UserProvider>

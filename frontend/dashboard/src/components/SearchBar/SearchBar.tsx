@@ -7,7 +7,7 @@ import useDebouncedEffect from 'hooks/useDebouncedEffect';
 import { InputIcon, SearchbarInput, SearchbarInputContainer } from './SearchBarStyles';
 
 interface SearchBarProps {
-  activeSearchTerm: string;
+  activeSearchTerm?: string | null;
   onSearchTermChange: (newSearchTerm: string) => void;
   isSearching?: boolean;
 }

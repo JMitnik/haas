@@ -3,9 +3,9 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import * as qs from 'qs';
 import { Activity, Calendar, Filter, MessageCircle } from 'react-feather';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ArrayParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { ControlledMenu, MenuHeader, MenuItem, MenuState, SubMenu, useMenuState } from '@szhsin/react-menu';
 import { Controller, useForm } from 'react-hook-form';
 import { Flex, ViewTitle } from '@haas/ui';
@@ -24,7 +24,7 @@ import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import {
@@ -37,7 +37,6 @@ import {
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { paginate } from 'utils/paginate';
-import { useDateFilter } from 'hooks/useDateFilter';
 import SearchBar from 'components/SearchBar/SearchBar';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
@@ -323,26 +322,17 @@ export const InteractionsOverview = () => {
 
   const [campaignVariants, setCampaignVariants] = useState<CampaignVariant[]>([]);
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
-  const { startDate, endDate, setDate } = useDateFilter({});
-  const [filter, setFilter] = useState<TableProps>({
-    startDate,
-    endDate,
-    search: qs.parse(location.search, { ignoreQueryPrefix: true })?.search?.toString() || '',
-    pageIndex: 0,
-    perPage: 10,
-    sortBy: [{ by: 'createdAt', desc: true }],
-    totalPages: 0,
-    filterCampaigns: 'all',
-    filterCampaignId: 'all',
-  });
 
-  useEffect(() => {
-    setFilter((newFilter) => ({
-      ...newFilter,
-      startDate,
-      endDate,
-    }));
-  }, [startDate, endDate, setFilter]);
+  const [filter, setFilter] = useQueryParams({
+    startDate: DateTimeParam,
+    endDate: DateTimeParam,
+    search: StringParam,
+    pageIndex: withDefault(NumberParam, 0),
+    perPage: withDefault(NumberParam, 10),
+    filterCampaigns: StringParam,
+    filterCampaignId: StringParam,
+  });
+  const [totalPages, setTotalPages] = useState();
 
   useGetInteractionsQueryQuery({
     variables: {
@@ -367,10 +357,7 @@ export const InteractionsOverview = () => {
         fetchedData?.customer?.dialogue?.sessionConnection?.sessions || [],
       );
 
-      setFilter((filterValues) => ({
-        ...filterValues,
-        totalPages: fetchedData.customer?.dialogue?.sessionConnection?.totalPages || 0,
-      }));
+      setTotalPages(fetchedData.customer?.dialogue?.sessionConnection?.totalPages || 0);
     },
   });
 
@@ -380,6 +367,14 @@ export const InteractionsOverview = () => {
       filterCampaigns: filterValues.filterCampaigns as SessionDeliveryType,
       filterCampaignId: filterValues.filterCampaignVariant,
       pageIndex: 0,
+    });
+  };
+
+  const handleDateChange = (newStartDate?: Date, newEndDate?: Date) => {
+    setFilter({
+      ...filter,
+      startDate: newStartDate,
+      endDate: newEndDate,
     });
   };
 
@@ -438,7 +433,7 @@ export const InteractionsOverview = () => {
             <UI.Div>
               <UI.DatePicker
                 value={[filter.startDate, filter.endDate]}
-                onChange={setDate}
+                onChange={handleDateChange}
                 range
               />
             </UI.Div>
@@ -576,7 +571,7 @@ export const InteractionsOverview = () => {
           <UI.Flex justifyContent="flex-end" mt={4}>
             <Pagination
               pageIndex={filter.pageIndex}
-              maxPages={filter.totalPages}
+              maxPages={totalPages}
               perPage={filter.perPage}
               setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
             />
@@ -650,7 +645,7 @@ const Pagination = ({
   useEffect(() => {
     if (!startedRef.current) {
       startedRef.current = false;
-      setInputPageIndex(pageIndex);
+      setInputPageIndex(pageIndex + 1);
     }
   }, [pageIndex, setInputPageIndex]);
 
@@ -666,7 +661,6 @@ const Pagination = ({
           {' '}
           {maxPages}
         </UI.Div>
-
         <UI.Input
           type="number"
           value={inputPageIndex}
@@ -674,19 +668,25 @@ const Pagination = ({
           // @ts-ignore
           onChange={(e) => { startedRef.current = true; setInputPageIndex(e.target.value); }}
         />
-        <UI.Stack spacing={2} isInline>
-          {pages.map((page) => (
-            <UI.Button
-              size="sm"
-              variantColor="teal"
-              isActive={page - 1 === pageIndex}
-              key={page}
-              onClick={() => setPageIndex(page)}
-            >
-              {page}
-            </UI.Button>
-          ))}
-        </UI.Stack>
+        {pages.length > 1 && (
+          <>
+
+            <UI.Stack spacing={2} isInline>
+              {pages.map((page) => (
+                <UI.Button
+                  size="sm"
+                  variantColor="teal"
+                  isActive={page - 1 === pageIndex}
+                  key={page}
+                  onClick={() => setPageIndex(page)}
+                >
+                  {page}
+                </UI.Button>
+              ))}
+            </UI.Stack>
+          </>
+        )}
+
       </UI.Flex>
     </PaginationContainer>
   );
