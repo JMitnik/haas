@@ -72,7 +72,7 @@ export const Timeline = ({ children, enableFold, nrItems, ...props }: TimelinePr
         <>
           {!!nrItems && (
             <>
-              {t('currently hiding')}
+              {t('currently_hiding')}
               {' '}
               {nrItems}
               {' '}

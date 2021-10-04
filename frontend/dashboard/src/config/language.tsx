@@ -54,7 +54,7 @@ const language = {
       de: 'Zur Lieferung',
     },
     dialogue_via_delivery: {
-      en: 'Dialogue deployed via delivery',
+      en: 'Distribution: via delivery',
       de: 'Dialog über die Lieferung eingesetzt',
     },
     delivery_delivered: {

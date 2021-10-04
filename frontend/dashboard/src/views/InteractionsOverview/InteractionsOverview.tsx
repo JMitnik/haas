@@ -260,7 +260,7 @@ export const InteractionsOverview = () => {
     filterCampaigns: StringParam,
     filterCampaignId: StringParam,
     orderByField: withDefault(StringParam, SessionConnectionOrder.CreatedAt),
-    orderByDescending: BooleanParam,
+    orderByDescending: withDefault(BooleanParam, true),
   });
   const [totalPages, setTotalPages] = useState<number>(0);
 
@@ -857,7 +857,7 @@ interface TableHeadingCellProps {
   onDescendChange?: (isDescend: boolean) => void;
 }
 
-const TableHeadingCell = ({ children, sorting, descending, onDescendChange }: TableHeadingCellProps) => (
+const TableHeadingCell = ({ children, sorting, descending = true, onDescendChange }: TableHeadingCellProps) => (
   <TableHeadingCellContainer>
     {children}
 

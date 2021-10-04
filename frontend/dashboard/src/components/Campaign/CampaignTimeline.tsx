@@ -25,6 +25,7 @@ interface StatusDescriptionProps {
 
 const DeployedStatusDescription = ({ event }: StatusDescriptionProps) => (
   <>
+    <UI.Helper color="green.400">{event.status}</UI.Helper>
     <UI.SectionHeader>
       Delivery was deployed
     </UI.SectionHeader>
@@ -35,8 +36,9 @@ const DeployedStatusDescription = ({ event }: StatusDescriptionProps) => (
   </>
 );
 
-const ScheduledStatusDescription = ({ delivery }: StatusDescriptionProps) => (
+const ScheduledStatusDescription = ({ delivery, event }: StatusDescriptionProps) => (
   <>
+    <UI.Helper color="green.400">{event.status}</UI.Helper>
     <UI.SectionHeader>
       Delivery was scheduled
     </UI.SectionHeader>
@@ -49,6 +51,7 @@ const ScheduledStatusDescription = ({ delivery }: StatusDescriptionProps) => (
 
 const FailedStatusDescription = ({ event }: StatusDescriptionProps) => (
   <>
+    <UI.Helper color="red.400">{event.status}</UI.Helper>
     <UI.SectionHeader>
       Delivery failed
     </UI.SectionHeader>
@@ -70,6 +73,7 @@ const FailedStatusDescription = ({ event }: StatusDescriptionProps) => (
 
 const FinishedStatusDescription = ({ event }: StatusDescriptionProps) => (
   <>
+    <UI.Helper color="green.400">{event.status}</UI.Helper>
     <UI.SectionHeader>
       Interaction finished
     </UI.SectionHeader>
@@ -82,6 +86,7 @@ const FinishedStatusDescription = ({ event }: StatusDescriptionProps) => (
 
 const OpenedStatusDescription = ({ event }: StatusDescriptionProps) => (
   <>
+    <UI.Helper color="green.400">{event.status}</UI.Helper>
     <UI.SectionHeader>
       Dialogue opened
     </UI.SectionHeader>
@@ -94,6 +99,7 @@ const OpenedStatusDescription = ({ event }: StatusDescriptionProps) => (
 
 const SentStatusDescription = ({ event }: StatusDescriptionProps) => (
   <>
+    <UI.Helper color="green.400">{event.status}</UI.Helper>
     <UI.SectionHeader>
       Dialogue sent
     </UI.SectionHeader>
@@ -106,6 +112,7 @@ const SentStatusDescription = ({ event }: StatusDescriptionProps) => (
 
 const DeliveredStatusDescription = ({ event }: StatusDescriptionProps) => (
   <>
+    <UI.Helper color="green.400">{event.status}</UI.Helper>
     <UI.SectionHeader>
       Dialogue successfully delivered
     </UI.SectionHeader>
