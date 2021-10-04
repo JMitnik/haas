@@ -264,7 +264,7 @@ export const InteractionsOverview = () => {
   });
   const [totalPages, setTotalPages] = useState<number>(0);
 
-  useGetInteractionsQueryQuery({
+  const { loading: isLoading } = useGetInteractionsQueryQuery({
     variables: {
       customerSlug,
       dialogueSlug,
@@ -525,12 +525,15 @@ export const InteractionsOverview = () => {
             ))}
           </UI.Div>
           <UI.Flex justifyContent="flex-end" mt={4}>
-            <Pagination
-              pageIndex={filter.pageIndex}
-              maxPages={totalPages}
-              perPage={filter.perPage}
-              setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
-            />
+            {totalPages > 1 && (
+              <Pagination
+                pageIndex={filter.pageIndex}
+                maxPages={totalPages}
+                perPage={filter.perPage}
+                isLoading={isLoading}
+                setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+              />
+            )}
           </UI.Flex>
         </UI.Div>
 
@@ -573,6 +576,7 @@ interface PaginationProps {
   perPage: number;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setPageIndex: (page: number) => void;
+  isLoading: boolean;
 }
 
 const PaginationContainer = styled(UI.Div)`
@@ -586,6 +590,7 @@ const Pagination = ({
   maxPages,
   perPage,
   setPageIndex,
+  isLoading,
 }: PaginationProps) => {
   const { t } = useTranslation();
   const { pages } = paginate(maxPages, pageIndex + 1, perPage, 5);
@@ -595,7 +600,7 @@ const Pagination = ({
   useDebouncedEffect(() => {
     if (startedRef.current) {
       startedRef.current = false;
-      setPageIndex(Math.max(0, Number(inputPageIndex)));
+      setPageIndex(Math.max(1, Number(inputPageIndex)));
     }
   }, 500, [inputPageIndex]);
 
@@ -634,6 +639,7 @@ const Pagination = ({
                   variantColor="teal"
                   isActive={page - 1 === pageIndex}
                   key={page}
+                  isDisabled={isLoading}
                   onClick={() => setPageIndex(page)}
                 >
                   {page}
