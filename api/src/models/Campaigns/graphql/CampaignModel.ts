@@ -88,44 +88,15 @@ export const GetCampaignVariantOfDelivery = extendType({
     t.field('campaignVariant', {
       type: CampaignVariantModel,
       nullable: true,
+      // @ts-ignore
       resolve: async (parent, args, ctx) => {
         if (!parent.id) throw new ApolloError('Cant find matching delivery');
 
-        const campaignVariant = (await ctx.prisma.delivery.findUnique({
+        const campaignVariant = ctx.prisma.delivery.findUnique({
           where: { id: parent.id },
-          include: {
-            campaignVariant: {
-              include: {
-                CampaignVariantToCampaign: {
-                  include: {
-                    campaign: true,
-                  }
-                },
-                dialogue: true,
-                workspace: true,
-                customVariables: true,
-              }
-            }
-          }
-        }))?.campaignVariant;
+        }).campaignVariant();
 
-        if (!campaignVariant) throw new ApolloError('Parent delivery is not connected to campaign variant');
-
-        return {
-          id: campaignVariant.id,
-          body: campaignVariant.body,
-          dialogue: campaignVariant.dialogue,
-          label: campaignVariant.label,
-          weight: campaignVariant.CampaignVariantToCampaign[0].weight,
-          campaign: {
-            id: campaignVariant.CampaignVariantToCampaign[0].campaign.id,
-            label: campaignVariant.CampaignVariantToCampaign[0].campaign.label,
-            variants: [],
-          },
-          workspace: campaignVariant.workspace,
-          type: campaignVariant.type,
-          customVariables: campaignVariant.customVariables,
-        };
+        return campaignVariant;
       }
     })
   }

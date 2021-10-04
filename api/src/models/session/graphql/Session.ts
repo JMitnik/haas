@@ -49,7 +49,7 @@ export const SessionType = objectType({
     t.field('delivery', {
       type: 'DeliveryType',
       nullable: true,
-      resolve: (parent, _, ctx) => {
+      resolve: async (parent, _, ctx) => {
         // @ts-ignore
         if (parent.delivery) return parent.delivery
 
@@ -62,6 +62,8 @@ export const SessionType = objectType({
       type: NodeEntryType,
 
       async resolve(parent, args, ctx) {
+        // @ts-ignore
+        if (parent.nodeEntries) return parent.nodeEntries;
         return ctx.services.nodeEntryService.getNodeEntriesBySessionId(parent.id);
       },
     });

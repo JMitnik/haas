@@ -1,7 +1,6 @@
 fragment SessionFragment on Session {
   id
   createdAt
-  paths
   score
   originUrl
   totalTimeInSec
