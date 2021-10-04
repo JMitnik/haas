@@ -437,6 +437,7 @@ export const InteractionsOverview = () => {
           <UI.Stack isInline spacing={2} alignItems="center">
             <UI.Div>
               <UI.DatePicker
+                value={[filter.startDate, filter.endDate]}
                 onChange={setDate}
                 range
               />

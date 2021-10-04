@@ -764,6 +764,7 @@ interface RangeProps {
 interface RangePickerProps {
   range: RangeProps;
   format?: string;
+  value?: [Date | undefined, Date | undefined];
   defaultValue?: [Date, Date];
   onChange: (dates: any, dateStrings: string[]) => void;
   showTime?: boolean | TimePickerProps;
