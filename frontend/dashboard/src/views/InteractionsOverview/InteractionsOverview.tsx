@@ -35,11 +35,13 @@ import {
   SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery,
 } from 'types/generated-types';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
+import { formatSimpleDate } from 'utils/dateUtils';
 import { paginate } from 'utils/paginate';
 import { useDateFilter } from 'hooks/useDateFilter';
 import SearchBar from 'components/SearchBar/SearchBar';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
+import { ErrorBoundary } from 'react-error-boundary';
 import { InteractionModalCard } from './InteractionModalCard';
 
 interface TableProps {
@@ -193,34 +195,44 @@ const ActiveFilters = ({
   filter,
   setFilters,
 }: { filter: TableProps, setFilters: Dispatch<SetStateAction<TableProps>> }) => (
-  <UI.Stack isInline spacing={4} alignItems="center">
+  <UI.Stack isInline spacing={2} alignItems="center">
     {!!filter.search && (
-      <FilterButton
-        filterKey="search"
-        value={filter.search}
-        onDisable={() => setFilters((newFilter) => ({ ...newFilter, search: '' }))}
-      />
+      <UI.Div>
+        <FilterButton
+          filterKey="search"
+          value={filter.search}
+          onDisable={() => setFilters((newFilter) => ({ ...newFilter, search: '' }))}
+        />
+      </UI.Div>
     )}
     {(filter.startDate || filter.endDate) && (
-      <FilterButton
-        filterKey="date"
-        value={`${filter.startDate?.toISOString()} - ${filter.endDate?.toISOString()}`}
-        onDisable={() => setFilters((newFilter) => ({ ...newFilter, startDate: undefined, endDate: undefined }))}
-      />
+      <UI.Div>
+        <ErrorBoundary fallbackRender={() => <></>}>
+          <FilterButton
+            filterKey="date"
+            value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
+            onDisable={() => setFilters((newFilter) => ({ ...newFilter, startDate: undefined, endDate: undefined }))}
+          />
+        </ErrorBoundary>
+      </UI.Div>
     )}
     {!!filter.filterCampaigns && (
-      <FilterButton
-        filterKey="distribution"
-        value={filter.filterCampaigns}
-        onDisable={() => setFilters((newFilter) => ({ ...newFilter, filterCampaigns: undefined }))}
-      />
+      <UI.Div>
+        <FilterButton
+          filterKey="distribution"
+          value={filter.filterCampaigns}
+          onDisable={() => setFilters((newFilter) => ({ ...newFilter, filterCampaigns: undefined }))}
+        />
+      </UI.Div>
     )}
     {!!filter.filterCampaignId && (
-      <FilterButton
-        filterKey="campaignVariant"
-        value={filter.filterCampaignId}
-        onDisable={() => setFilters((newFilter) => ({ ...newFilter, filterCampaignId: undefined }))}
-      />
+      <UI.Div>
+        <FilterButton
+          filterKey="campaignVariant"
+          value={filter.filterCampaignId}
+          onDisable={() => setFilters((newFilter) => ({ ...newFilter, filterCampaignId: undefined }))}
+        />
+      </UI.Div>
     )}
   </UI.Stack>
 );
@@ -422,7 +434,7 @@ export const InteractionsOverview = () => {
 
       <UI.ViewBody>
         <UI.Flex mb={2} justifyContent="flex-end">
-          <UI.Stack isInline spacing={4} alignItems="center">
+          <UI.Stack isInline spacing={2} alignItems="center">
             <UI.Div>
               <UI.DatePicker
                 onChange={setDate}
