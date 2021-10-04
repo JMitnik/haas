@@ -109,21 +109,24 @@ const DeliveryUserCell = ({ delivery }: { delivery: DeliveryFragmentFragment }) 
   </UI.Flex>
 );
 
-const AnonymousCell = ({ sessionId }: { sessionId: string }) => (
-  <UI.Flex alignItems="center">
-    <UI.Div mr={2}>
-      <Avatar name="A" brand="gray" />
-    </UI.Div>
-    <UI.ColumnFlex>
-      <UI.Span fontWeight={600} color="gray.500">
-        Anonymous
-      </UI.Span>
-      <UI.Span color="gray.400" fontSize="0.7rem">
-        {sessionId}
-      </UI.Span>
-    </UI.ColumnFlex>
-  </UI.Flex>
-);
+const AnonymousCell = ({ sessionId }: { sessionId: string }) => {
+  const { t } = useTranslation();
+  return (
+    <UI.Flex alignItems="center">
+      <UI.Div mr={2}>
+        <Avatar name="A" brand="gray" />
+      </UI.Div>
+      <UI.ColumnFlex>
+        <UI.Span fontWeight={600} color="gray.500">
+          {t('anonymous')}
+        </UI.Span>
+        <UI.Span color="gray.400" fontSize="0.7rem">
+          {sessionId}
+        </UI.Span>
+      </UI.ColumnFlex>
+    </UI.Flex>
+  );
+};
 
 const DateCell = ({ timestamp }: { timestamp: string }) => {
   const date = new Date(parseInt(timestamp, 10));
@@ -395,20 +398,20 @@ export const InteractionsOverview = () => {
         <UI.Div width="100%">
           <TableHeadingRow gridTemplateColumns="1fr 1fr 1fr 1fr">
             <TableHeadingCell>
-              User
+              {t('user')}
             </TableHeadingCell>
             <TableHeadingCell>
-              Interaction
+              {t('interaction')}
             </TableHeadingCell>
             <TableHeadingCell>
-              Distribution
+              {t('distribution')}
             </TableHeadingCell>
             <TableHeadingCell
               sorting
               descending={filter.orderByDescending || false}
               onDescendChange={(isDescend) => setFilter({ orderByDescending: isDescend })}
             >
-              Date
+              {t('when')}
             </TableHeadingCell>
           </TableHeadingRow>
           <UI.Div>
@@ -421,31 +424,37 @@ export const InteractionsOverview = () => {
                 <UI.Icon>
                   <Filter />
                 </UI.Icon>
-                Filter
+                {t('filter')}
               </MenuHeader>
               <SubMenu label={(
                 <UI.Flex>
                   <UI.Icon mr={1} width={10}>
                     <Calendar />
                   </UI.Icon>
-                  Date
+                  {t('date')}
                 </UI.Flex>
               )}
               >
                 <MenuItem
                   onClick={() => handleMultiDateFilterChange(undefined, new Date(contextInteraction?.createdAt))}
                 >
-                  Before date
+                  {t('before_day_of')}
+                  {' '}
+                  {formatSimpleDate(contextInteraction?.createdAt)}
                 </MenuItem>
                 <MenuItem
                   onClick={() => handleSingleDateFilterChange(contextInteraction?.createdAt)}
                 >
-                  On day
+                  {t('on_day_of')}
+                  {' '}
+                  {formatSimpleDate(contextInteraction?.createdAt)}
                 </MenuItem>
                 <MenuItem
                   onClick={() => handleMultiDateFilterChange(new Date(contextInteraction?.createdAt), undefined)}
                 >
-                  After day
+                  {t('after_day_of')}
+                  {' '}
+                  {formatSimpleDate(contextInteraction?.createdAt)}
                 </MenuItem>
               </SubMenu>
               {contextInteraction?.delivery && (
@@ -455,7 +464,7 @@ export const InteractionsOverview = () => {
                       <UI.Icon mr={1} width={10}>
                         <MessageCircle />
                       </UI.Icon>
-                      Campaign
+                      {t('campaign')}
                     </UI.Flex>
                   )}
                   >
@@ -464,7 +473,7 @@ export const InteractionsOverview = () => {
                         contextInteraction?.delivery?.deliveryRecipientFirstName || '',
                       )}
                     >
-                      More from
+                      {t('more_from')}
                       {' '}
                       {contextInteraction?.delivery?.deliveryRecipientFirstName}
                       {' '}
@@ -474,7 +483,9 @@ export const InteractionsOverview = () => {
                       filterCampaignVariant: contextInteraction?.delivery?.campaignVariant?.id,
                     })}
                     >
-                      More from campaign variant
+                      {t('more_from')}
+                      {' '}
+                      {t('campaign_variant')}
                       {' '}
                       {contextInteraction?.delivery?.campaignVariant?.label}
                     </MenuItem>
@@ -576,6 +587,7 @@ const Pagination = ({
   perPage,
   setPageIndex,
 }: PaginationProps) => {
+  const { t } = useTranslation();
   const { pages } = paginate(maxPages, pageIndex + 1, perPage, 5);
   const startedRef = useRef<boolean>(false);
   const [inputPageIndex, setInputPageIndex] = useState(1);
@@ -598,11 +610,11 @@ const Pagination = ({
     <PaginationContainer bg="white" padding={2}>
       <UI.Flex alignItems="center">
         <UI.Div mr={2}>
-          Page
+          {t('page')}
           {' '}
           {pageIndex + 1}
           {' '}
-          out of
+          {t('aus')}
           {' '}
           {maxPages}
         </UI.Div>

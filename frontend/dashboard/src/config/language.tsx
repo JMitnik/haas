@@ -1,6 +1,58 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    currently_hiding: {
+      en: 'Currently hiding',
+      de: 'Verzeit versteckt',
+    },
+    items: {
+      en: 'Items',
+      de: 'Artikel',
+    },
+    out_of: {
+      en: 'Out of',
+      de: 'Aus',
+    },
+    campaign_variant: {
+      en: 'Campaign variant',
+      de: 'Kampagnenvariante',
+    },
+    more_from: {
+      en: 'More from',
+      de: 'Mehr von',
+    },
+    before_day_of: {
+      en: 'Before day of',
+      de: 'Vor dem Tag der',
+    },
+    on_day_of: {
+      en: 'On day of',
+      de: 'Am Tag der',
+    },
+    after_day_of: {
+      en: 'After day of',
+      de: 'Nach dem Tag der',
+    },
+    anonymous: {
+      en: 'Anonymous',
+      de: 'Anonym',
+    },
+    opened_on: {
+      en: 'Opened on',
+      de: 'Eröffnet am',
+    },
+    entries: {
+      en: 'Dialogue entries',
+      de: 'Dialogeinträge',
+    },
+    go_to_delivery: {
+      en: 'Go to Delivery',
+      de: 'Zur Lieferung',
+    },
+    dialogue_via_delivery: {
+      en: 'Dialogue deployed via delivery',
+      de: 'Dialog über die Lieferung eingesetzt',
+    },
     delivery_delivered: {
       en: 'Delivery has arrived',
       de: 'Lieferung ist angekommen',

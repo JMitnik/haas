@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 
 import { Brand } from 'config/theme';
 import { MinusCircle, PlusCircle } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 
 export interface TimelineProps {
   children: React.ReactNode;
@@ -44,6 +45,7 @@ export const TimelineContainer = styled(UI.Div) <TimelineProps>`
 `;
 
 export const Timeline = ({ children, enableFold, nrItems, ...props }: TimelineProps) => {
+  const { t } = useTranslation();
   const [isFold, setIsFold] = useState<boolean>(false);
 
   const handleToggleFold = () => {
@@ -70,11 +72,11 @@ export const Timeline = ({ children, enableFold, nrItems, ...props }: TimelinePr
         <>
           {!!nrItems && (
             <>
-              Currently hiding
+              {t('currently hiding')}
               {' '}
               {nrItems}
               {' '}
-              items
+              {t('items')}
             </>
           )}
         </>

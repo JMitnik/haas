@@ -33,7 +33,7 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
     <UI.ModalCard maxWidth={1200} onClose={onClose}>
       <UI.ModalHead>
         <UI.ModalTitle>
-          Session
+          {t('interaction')}
         </UI.ModalTitle>
       </UI.ModalHead>
       <UI.ModalBody>
@@ -46,7 +46,7 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
                 </Circle>
                 <UI.Div>
                   <UI.Div mb={2} color="teal.700">
-                    <UI.SectionHeader>Dialogue deployed via delivery</UI.SectionHeader>
+                    <UI.SectionHeader>{t('dialogue_via_delivery')}</UI.SectionHeader>
                     <UI.Div my={1}>
                       <UI.Stack isInline>
                         <UI.Label variantColor="teal" size="sm" fontSize="0.6rem">
@@ -73,7 +73,7 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
                       size="xs"
                       onClick={() => goToDeliveryView(delivery.campaignVariant?.campaign?.id || '', delivery.id)}
                     >
-                      Go to Delivery
+                      {t('go_to_delivery')}
                     </UI.Button>
                   </UI.Div>
                   <CampaignTimeline delivery={delivery} />
@@ -88,9 +88,9 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
                 <UI.Div>
 
                   <UI.Div mb={2} color="blue.700">
-                    <UI.SectionHeader>Dialogue entries</UI.SectionHeader>
+                    <UI.SectionHeader>{t('entries')}</UI.SectionHeader>
                     <UI.Span>
-                      Opened on
+                      {t('opened_on')}
                       {' '}
                       {formatSimpleDate(data.session?.createdAt)}
                     </UI.Span>
