@@ -5,9 +5,9 @@ import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
 import { Activity, Calendar, Filter, MessageCircle } from 'react-feather';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrayParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
-import { ControlledMenu, MenuHeader, MenuItem, MenuState, SubMenu, useMenuState } from '@szhsin/react-menu';
+import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { Controller, useForm } from 'react-hook-form';
+import { ErrorBoundary } from 'react-error-boundary';
 import { Flex, ViewTitle } from '@haas/ui';
 import {
   Icon,
@@ -20,11 +20,12 @@ import {
   RadioGroup,
   useDisclosure,
 } from '@chakra-ui/core';
+import { MenuHeader, MenuItem, SubMenu, useMenuState } from '@szhsin/react-menu';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import {
@@ -32,28 +33,26 @@ import {
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import {
   DeliveryFragmentFragment,
+  SessionConnectionOrder,
   SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery,
 } from 'types/generated-types';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
+import { ReactComponent as IconSortDown } from 'assets/icons/icon-cheveron-down.svg';
+import { ReactComponent as IconSortUp } from 'assets/icons/icon-cheveron-up.svg';
+import { Menu } from 'components/Common/Menu/Menu';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { paginate } from 'utils/paginate';
 import SearchBar from 'components/SearchBar/SearchBar';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
-import { ErrorBoundary } from 'react-error-boundary';
 import { InteractionModalCard } from './InteractionModalCard';
 
 interface TableProps {
-  search: string;
-  pageIndex: number;
-  perPage: number;
-  sortBy: {
-    by: string;
-    desc: boolean;
-  }[];
-  totalPages: number;
-  startDate?: Date;
-  endDate?: Date;
+  search?: string | null;
+  pageIndex?: number | null;
+  perPage?: number | null;
+  startDate?: Date | null;
+  endDate?: Date | null;
   filterCampaigns?: SessionDeliveryType | 'all' | null;
   filterCampaignId?: string | 'all' | null;
 }
@@ -241,80 +240,6 @@ interface CampaignVariant {
   label: string;
 }
 
-const MenuContainer = styled.div`
-  ${({ theme }) => css`
-    .szh-menu {
-      min-width: 200px;
-      border-radius: 10px;
-      padding: 0;
-    }
-
-    .szh-menu .szh-menu__header:first-child {
-      border-radius: 10px 10px 0 0;
-    }
-
-    .szh-menu__item--hover {
-      background: ${theme.colors.gray[100]};
-    }
-
-    .szh-menu__header {
-      padding: 6px 12px;
-      display: flex;
-      font-weight: 600;
-      line-height: 1rem;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      align-items: center;
-      background: ${theme.colors.gray[50]};
-      letter-spacing: 0.05em;
-      color: ${theme.colors.gray[500]};
-
-      ${UI.Icon} {
-        margin-right: 6px;
-      }
-    }
-
-    .szh-menu__submenu > .szh-menu__item {
-      padding: 4px 16px;
-      color: ${theme.colors.gray[600]};
-      font-weight: 600;
-
-      ${UI.Icon} {
-        max-width: 20px;
-        margin-right: 12px;
-
-        svg {
-          max-width: 100%;
-        }
-      }
-    }
-  `}
-`;
-
-interface MenuProps {
-  children: React.ReactNode;
-  anchorPoint: { x: number; y: number };
-  endTransition: () => void;
-  onClose: () => void;
-  state?: MenuState;
-}
-
-const MotionControlledMenu = motion.custom(ControlledMenu);
-
-const Menu = ({ children, ...menuProps }: MenuProps) => (
-  <MenuContainer>
-    <motion.div>
-      <AnimatePresence exitBeforeEnter>
-        <MotionControlledMenu {...menuProps}>
-          <motion.div key={menuProps.state} exit={{ opacity: 0 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            {children}
-          </motion.div>
-        </MotionControlledMenu>
-      </AnimatePresence>
-    </motion.div>
-  </MenuContainer>
-);
-
 export const InteractionsOverview = () => {
   const { t } = useTranslation();
   const { customerSlug, dialogueSlug, goToInteractionsView } = useNavigator();
@@ -331,8 +256,10 @@ export const InteractionsOverview = () => {
     perPage: withDefault(NumberParam, 10),
     filterCampaigns: StringParam,
     filterCampaignId: StringParam,
+    orderByField: withDefault(StringParam, SessionConnectionOrder.CreatedAt),
+    orderByDescending: BooleanParam,
   });
-  const [totalPages, setTotalPages] = useState();
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   useGetInteractionsQueryQuery({
     variables: {
@@ -343,8 +270,12 @@ export const InteractionsOverview = () => {
         startDate: filter.startDate ? filter.startDate?.toISOString() : undefined,
         perPage: filter.perPage,
         endDate: filter.endDate ? filter.endDate?.toISOString() : undefined,
+        orderBy: {
+          by: filter.orderByField as SessionConnectionOrder,
+          desc: filter.orderByDescending,
+        },
         search: filter.search,
-        deliveryType: filter.filterCampaigns === 'all' ? undefined : filter.filterCampaigns,
+        deliveryType: filter.filterCampaigns === 'all' ? undefined : filter.filterCampaigns as SessionDeliveryType,
         campaignVariantId: filter.filterCampaignId === 'all' ? undefined : filter.filterCampaignId,
       },
     },
@@ -370,12 +301,21 @@ export const InteractionsOverview = () => {
     });
   };
 
-  const handleDateChange = (newStartDate?: Date, newEndDate?: Date) => {
-    setFilter({
-      ...filter,
-      startDate: newStartDate,
-      endDate: newEndDate,
-    });
+  const handleDateChange = (dates: Date[]) => {
+    if (dates) {
+      const [newStartDate, newEndDate] = dates;
+      setFilter({
+        ...filter,
+        startDate: newStartDate,
+        endDate: newEndDate,
+      });
+    } else {
+      setFilter({
+        ...filter,
+        startDate: null,
+        endDate: null,
+      });
+    }
   };
 
   const handleSingleDateFilterChange = (day: Date) => {
@@ -449,6 +389,7 @@ export const InteractionsOverview = () => {
           </UI.Stack>
         </UI.Flex>
         <UI.Flex mb={4} justifyContent="flex-end">
+          {/* @ts-ignore */}
           <ActiveFilters filter={filter} setFilters={setFilter} />
         </UI.Flex>
         <UI.Div width="100%">
@@ -462,7 +403,11 @@ export const InteractionsOverview = () => {
             <TableHeadingCell>
               Distribution
             </TableHeadingCell>
-            <TableHeadingCell>
+            <TableHeadingCell
+              sorting
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({ orderByDescending: isDescend })}
+            >
               Date
             </TableHeadingCell>
           </TableHeadingRow>
@@ -670,8 +615,7 @@ const Pagination = ({
         />
         {pages.length > 1 && (
           <>
-
-            <UI.Stack spacing={2} isInline>
+            <UI.Stack spacing={2} isInline ml={2}>
               {pages.map((page) => (
                 <UI.Button
                   size="sm"
@@ -873,7 +817,7 @@ const TableRow = styled(UI.Grid)`
   }
 `;
 
-const TableHeadingCell = styled(UI.Div)`
+const TableHeadingCellContainer = styled(UI.Div)`
   ${({ theme }) => css`
     font-weight: 600;
     line-height: 1rem;
@@ -881,13 +825,41 @@ const TableHeadingCell = styled(UI.Div)`
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: ${theme.colors.gray[500]};
+    display: flex;
+    align-items: center;
+
+    svg {
+      stroke: ${theme.colors.gray[400]};
+    }
+
+    .active {
+      stroke: ${theme.colors.gray[800]};
+    }
   `}
 `;
 
-const TableCell = styled(UI.Div)`
-  /* font-weight: 600;
-  line-height: 1rem;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em; */
-`;
+interface TableHeadingCellProps {
+  children: React.ReactNode;
+  sorting?: boolean;
+  descending?: boolean;
+  onDescendChange?: (isDescend: boolean) => void;
+}
+
+const TableHeadingCell = ({ children, sorting, descending, onDescendChange }: TableHeadingCellProps) => (
+  <TableHeadingCellContainer>
+    {children}
+
+    {sorting && (
+      <UI.Icon ml={2} width="21px" display="block">
+        <IconSortUp onClick={() => onDescendChange?.(false)} className={descending ? '' : 'active'} />
+        <IconSortDown
+          onClick={() => onDescendChange?.(true)}
+          className={descending ? 'active' : ''}
+          style={{ marginTop: '-8px' }}
+        />
+      </UI.Icon>
+    )}
+  </TableHeadingCellContainer>
+);
+
+const TableCell = styled(UI.Div)``;
