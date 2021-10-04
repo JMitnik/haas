@@ -90,6 +90,7 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
                   </UI.Span>
                   <UI.Span fontSize="0.6rem">
                     {!!delivery.scheduledAt && (
+                      // @ts-ignore
                       <DeliveryScheduledLabel scheduledAt={delivery.scheduledAt} />
                     )}
                   </UI.Span>

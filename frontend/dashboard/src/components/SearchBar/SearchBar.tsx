@@ -9,17 +9,16 @@ import { InputIcon, SearchbarInput, SearchbarInputContainer } from './SearchBarS
 interface SearchBarProps {
   activeSearchTerm?: string | null;
   onSearchTermChange: (newSearchTerm: string) => void;
-  isSearching?: boolean;
 }
 
 const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => {
-  const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
+  const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm ?? '');
   const startedRef = useRef<boolean>();
 
   const { t } = useTranslation();
 
   useDebouncedEffect(() => {
-    if (typeof startedRef.current !== 'undefined') {
+    if (typeof startedRef.current !== 'undefined' && searchTerm !== undefined && searchTerm !== null) {
       onSearchTermChange(searchTerm);
       startedRef.current = false;
     }
@@ -27,7 +26,7 @@ const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => 
 
   useEffect(() => {
     if (!startedRef.current) {
-      setSearchTerm(activeSearchTerm);
+      setSearchTerm(activeSearchTerm || '');
     }
   }, [activeSearchTerm, setSearchTerm]);
 
@@ -39,7 +38,7 @@ const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => 
 
       <SearchbarInput
         data-cy="SearchbarInput"
-        value={searchTerm}
+        value={searchTerm ?? ''}
         placeholder={t('search')}
         onChange={(e) => { startedRef.current = true; setSearchTerm(e.target.value); }}
       />

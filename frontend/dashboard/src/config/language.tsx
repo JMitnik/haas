@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    campaign: {
+      en: 'Campaign',
+      de: 'Kampagne',
+    },
     currently_hiding: {
       en: 'Currently hiding',
       de: 'Verzeit versteckt',

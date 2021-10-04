@@ -227,7 +227,7 @@ class SessionService {
                   },
                 },
               },
-            }, { }],
+            }, {}],
           },
           orderBy: {
             createdAt: 'desc',
@@ -290,7 +290,7 @@ class SessionService {
 
   getSessionConnection = async (
     dialogueId: string,
-    filter?: NexusGenInputs['SessionConnectionFilterInput']
+    filter?: NexusGenInputs['SessionConnectionFilterInput'] | null
   ): Promise<NexusGenFieldTypes['SessionConnection'] | null> => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
@@ -312,67 +312,6 @@ class SessionService {
         nextPageOffset,
         pageIndex
       }
-    };
-  };
-
-  static deprecatedGetSessionConnection = async (
-    dialogueId: string,
-    paginationOpts?: Nullable<PaginationProps>,
-  ): Promise<NexusGenRootTypes['SessionConnection']> => {
-    const findManySessions = async ({ paginationOpts: paginationOptions, rest }: FindManyCallBackProps) => {
-      const { dialogueId } = rest;
-      const startDate = paginationOptions?.startDate ? new Date(paginationOptions?.startDate) : null;
-      const endDate = paginationOptions?.endDate ? new Date(paginationOptions?.endDate) : null;
-      const paginationArgs = { ...paginationOptions, startDate, endDate };
-      const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, paginationArgs);
-      return sessions || [];
-    };
-
-    const countSessions = async ({ paginationOpts: paginationOptions, rest }: FindManyCallBackProps) => {
-      const { dialogueId } = rest;
-      const startDate = paginationOptions?.startDate ? new Date(paginationOptions?.startDate) : null;
-      const endDate = paginationOptions?.endDate ? new Date(paginationOptions?.endDate) : null;
-
-      const totalNrOfSessions = (await SessionService.fetchSessionsByDialogue(dialogueId, {
-        searchTerm: paginationOpts?.searchTerm,
-        startDate,
-        endDate,
-      }))?.length;
-
-      return totalNrOfSessions || 0;
-    };
-
-    const pageOpts: NexusGenInputs['PaginationWhereInput'] = {
-      ...paginationOpts,
-      startDate: paginationOpts?.startDate?.toDateString() || null,
-      endDate: paginationOpts?.endDate?.toDateString() || null,
-    };
-
-    const paginateProps: PaginateProps = {
-      findManyArgs: {
-        findArgs: null,
-        searchFields: [],
-        orderFields: [],
-        findManyCallBack: findManySessions,
-        dialogueId,
-      },
-      countArgs: {
-        countWhereInput: null,
-        countCallBack: countSessions,
-        dialogueId,
-      },
-      paginationOpts: pageOpts,
-    };
-
-    const { entries, pageInfo } = await paginate(paginateProps);
-
-    return {
-      sessions: entries as NexusGenFieldTypes['Session'][],
-      offset: paginationOpts?.offset || 0,
-      limit: paginationOpts?.limit || 0,
-      startDate: paginationOpts?.startDate?.toString(),
-      endDate: paginationOpts?.endDate?.toString(),
-      pageInfo,
     };
   };
 

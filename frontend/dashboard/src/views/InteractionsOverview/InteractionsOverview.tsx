@@ -470,7 +470,7 @@ export const InteractionsOverview = () => {
                   >
                     <MenuItem
                       onClick={() => handleSearchTermChange(
-                        contextInteraction?.delivery?.deliveryRecipientFirstName || '',
+                        `${contextInteraction?.delivery?.deliveryRecipientFirstName} ${contextInteraction?.delivery?.deliveryRecipientLastName}` || '',
                       )}
                     >
                       {t('more_from')}
@@ -614,7 +614,7 @@ const Pagination = ({
           {' '}
           {pageIndex + 1}
           {' '}
-          {t('aus')}
+          {t('out_of')}
           {' '}
           {maxPages}
         </UI.Div>

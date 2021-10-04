@@ -17,7 +17,7 @@ class SessionPrismaAdapter {
    * @param dialogueId
    * @param filter
    */
-  buildFindSessionsQuery = (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput']) => {
+  buildFindSessionsQuery = (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
     // Required: filter by dialogueId
     let query: Prisma.SessionWhereInput = { dialogueId, delivery: undefined, };
 
@@ -134,7 +134,7 @@ class SessionPrismaAdapter {
    * Order interactions by a "created-at".
    * @param filter
    */
-  buildOrderByQuery = (filter?: NexusGenInputs['SessionConnectionFilterInput']) => {
+  buildOrderByQuery = (filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
     let orderByQuery: Prisma.SessionOrderByInput[] = [];
 
     if (filter?.orderBy?.by === 'createdAt') {
@@ -146,7 +146,7 @@ class SessionPrismaAdapter {
     return orderByQuery;
   }
 
-  findSessions = async (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput']) => {
+  findSessions = async (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
 
@@ -161,7 +161,7 @@ class SessionPrismaAdapter {
     return sessions;
   }
 
-  countSessions = async (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput']) => {
+  countSessions = async (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
     return await this.prisma.session.count({
       where: this.buildFindSessionsQuery(dialogueId, filter),
     });

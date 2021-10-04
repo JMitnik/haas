@@ -27,7 +27,7 @@ const actionsAnimation: Variants = {
   initial: {
     opacity: 0,
   },
-  enter: {
+  animate: {
     opacity: 1,
     transition: {
       staggerChildren: 0.2,
@@ -161,7 +161,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
 
       <UI.ViewBody>
         <AnimateSharedLayout>
-          <motion.div variants={actionsAnimation} initial="inital" animate="animate">
+          <motion.div variants={actionsAnimation} initial="initial" animate="animate">
             {newCTA && (
               <CTACard
                 id="-1"
