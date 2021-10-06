@@ -245,7 +245,7 @@ export type CtaLinkInputObjectType = {
   header?: Maybe<Scalars['String']>;
   subHeader?: Maybe<Scalars['String']>;
   buttonText?: Maybe<Scalars['String']>;
-  uploadImage?: Maybe<Scalars['String']>;
+  imageUrl?: Maybe<Scalars['String']>;
 };
 
 export type CtaLinksInputType = {
@@ -742,6 +742,10 @@ export type LinkType = {
   title?: Maybe<Scalars['String']>;
   iconUrl?: Maybe<Scalars['String']>;
   backgroundColor?: Maybe<Scalars['String']>;
+  header?: Maybe<Scalars['String']>;
+  subHeader?: Maybe<Scalars['String']>;
+  buttonText?: Maybe<Scalars['String']>;
+  imageUrl?: Maybe<Scalars['String']>;
   questionNode: QuestionNode;
 };
 
@@ -778,7 +782,6 @@ export type Mutation = {
   removePixelRange?: Maybe<AwsImageType>;
   uploadJobImage?: Maybe<AwsImageType>;
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
-  uploadUpsellImage?: Maybe<ImageType>;
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
@@ -801,6 +804,7 @@ export type Mutation = {
   createDialogue: Dialogue;
   editDialogue: Dialogue;
   deleteDialogue: Dialogue;
+  uploadUpsellImage?: Maybe<ImageType>;
   register?: Maybe<Scalars['String']>;
   /** Given a token, checks in the database whether token has been set and has not expired yet */
   verifyUserToken: VerifyUserTokenOutput;
@@ -866,11 +870,6 @@ export type MutationUpdateCreateWorkspaceJobArgs = {
   resourceUrl?: Maybe<Scalars['String']>;
   referenceId?: Maybe<Scalars['String']>;
   errorMessage?: Maybe<Scalars['String']>;
-};
-
-
-export type MutationUploadUpsellImageArgs = {
-  file?: Maybe<Scalars['Upload']>;
 };
 
 
@@ -1000,6 +999,12 @@ export type MutationEditDialogueArgs = {
 
 export type MutationDeleteDialogueArgs = {
   input?: Maybe<DeleteDialogueInputType>;
+};
+
+
+export type MutationUploadUpsellImageArgs = {
+  workspaceId?: Maybe<Scalars['String']>;
+  file?: Maybe<Scalars['Upload']>;
 };
 
 
@@ -1776,6 +1781,7 @@ export type VideoNodeEntryInput = {
 
 export type UploadUpsellImageMutationVariables = Exact<{
   file: Scalars['Upload'];
+  workspaceId?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -2200,8 +2206,8 @@ export type GetUserCustomerFromCustomerQuery = (
 
 
 export const UploadUpsellImageDocument = gql`
-    mutation uploadUpsellImage($file: Upload!) {
-  uploadUpsellImage(file: $file) {
+    mutation uploadUpsellImage($file: Upload!, $workspaceId: String) {
+  uploadUpsellImage(file: $file, workspaceId: $workspaceId) {
     url
   }
 }
@@ -2222,6 +2228,7 @@ export type UploadUpsellImageMutationFn = Apollo.MutationFunction<UploadUpsellIm
  * const [uploadUpsellImageMutation, { data, loading, error }] = useUploadUpsellImageMutation({
  *   variables: {
  *      file: // value for 'file'
+ *      workspaceId: // value for 'workspaceId'
  *   },
  * });
  */

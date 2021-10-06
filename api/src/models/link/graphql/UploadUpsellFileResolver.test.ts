@@ -17,7 +17,7 @@ describe('UploadUpsellFileResolver', () => {
   });
 
   test(`Uploads upsell file to cloudinary`, async () => {
-    const { user } = await prepDefaultData(prisma);
+    const { user, workspace } = await prepDefaultData(prisma);
 
     // Generate token for API access
     const token = AuthService.createUserToken(user.id, 22);
@@ -27,14 +27,15 @@ describe('UploadUpsellFileResolver', () => {
       'operations',
       JSON.stringify({
         query: `
-            mutation uploadUpsellImage($file: Upload!) {
-              uploadUpsellImage(file: $file) {
+          mutation uploadUpsellImage($file: Upload!, $workspaceId: String) {
+            uploadUpsellImage(file: $file, workspaceId: $workspaceId) {
                 url
-              } 
             }
+          }
           `,
         variables: {
-          file: null
+          file: null,
+          workspaceId: workspace.id
         }
       })
     )
@@ -52,6 +53,50 @@ describe('UploadUpsellFileResolver', () => {
     expect(res?.data?.uploadUpsellImage?.url).not.toBeNull();
     expect(res?.data?.uploadUpsellImage?.url).not.toBeUndefined();
     expect(res?.data?.uploadUpsellImage?.url).toContain('http');
+  });
+
+  test('Unable to upload upsell image unauthorized', async () => {
+    const { user, workspace, userRole } = await prepDefaultData(prisma);
+
+    await prisma.role.update({
+      where: { id: userRole.id },
+      data: {
+        permissions: []
+      }
+    })
+
+    // Generate token for API access
+    const token = AuthService.createUserToken(user.id, 22);
+    const body = new FormData();
+
+    body.append(
+      'operations',
+      JSON.stringify({
+        query: `
+          mutation uploadUpsellImage($file: Upload!, $workspaceId: String) {
+            uploadUpsellImage(file: $file, workspaceId: $workspaceId) {
+                url
+            }
+          }
+          `,
+        variables: {
+          file: null,
+          workspaceId: workspace.id
+        }
+      })
+    )
+    body.append('map', JSON.stringify({ 1: ['variables.file'] }));
+    body.append('1', 'a', 'a.txt');
+
+    await fetch(`http://localhost:${ctx.port}/graphql`, {
+      method: 'POST',
+      body,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(response => response.json())
+      .catch((reason) => expect(reason.message).toContain('Not Authorised!'));
   });
 
 });

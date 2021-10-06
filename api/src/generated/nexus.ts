@@ -1629,6 +1629,7 @@ export interface NexusGenArgTypes {
     }
     uploadUpsellImage: { // args
       file?: any | null; // Upload
+      workspaceId?: string | null; // String
     }
     verifyUserToken: { // args
       token?: string | null; // String

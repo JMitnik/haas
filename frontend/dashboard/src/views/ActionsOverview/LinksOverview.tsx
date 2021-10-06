@@ -10,6 +10,7 @@ import React from 'react';
 import Select from 'react-select';
 
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
+import { useCustomer } from 'providers/CustomerProvider';
 
 import { FormDataProps, LinkInputProps } from './CTATypes';
 
@@ -25,6 +26,7 @@ const LINK_TYPES = [
 
 const ImageUploadLogoInput = ({ onChange, value }: any) => {
   const toast = useToast();
+  const { activeCustomer } = useCustomer();
 
   const [uploadFile, { loading }] = useUploadUpsellImageMutation({
     onCompleted: (result) => {
@@ -52,7 +54,7 @@ const ImageUploadLogoInput = ({ onChange, value }: any) => {
     if (!files.length) return;
 
     const [file] = files;
-    uploadFile({ variables: { file } });
+    uploadFile({ variables: { file, workspaceId: activeCustomer?.id } });
   };
 
   return (
