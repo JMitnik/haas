@@ -22,7 +22,8 @@ export const UploadSellImageResolver = Upload && mutationField('uploadUpsellImag
     const readyFile = waitedFile.file;
 
     if (!args?.input?.workspaceId) throw new ApolloError('No workspace ID provided, cannot upload file');
-    return ctx.services.linkService.uploadImage(readyFile);
+    const uploadImage = await ctx.services.linkService.uploadImage(readyFile);
+    return uploadImage;
   },
 });
 

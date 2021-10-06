@@ -26,6 +26,7 @@ class UploadFileService {
 
     const result = await stream;
     const { secure_url } = result;
+    console.log('SECURE URL: ', secure_url);
     return { filename, mimetype, encoding, url: secure_url };
   };
 };
