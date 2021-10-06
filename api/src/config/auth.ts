@@ -93,6 +93,7 @@ const authShield = shield({
   Dialogue: {
     // Write this up
     // statistics: canAccessCompany,
+    sessionConnection: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_DIALOGUE)
   },
   Mutation: {
     '*': isSuperAdmin,
