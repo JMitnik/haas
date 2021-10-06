@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { createReadStream } from 'fs';
+import { createReadStream, existsSync } from 'fs';
 
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
@@ -20,8 +20,11 @@ describe('UploadUpsellFileResolver', () => {
 
   test(`Uploads upsell file to cloudinary`, async () => {
     const { user, workspace } = await prepDefaultData(prisma);
-    const image = createReadStream(`${__dirname}/earbuds.webp`);
 
+    const image = createReadStream(`${__dirname}/earbuds.webp`);
+    console.log('File path: ', `${__dirname}/earbuds.webp`);
+    const inputFileExists = existsSync(`${__dirname}/earbuds.webp`);
+    expect(inputFileExists).toBe(true);
     // Generate token for API access
     const token = AuthService.createUserToken(user.id, 22);
     const res = await ctx.client.request(`
