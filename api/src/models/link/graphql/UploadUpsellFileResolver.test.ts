@@ -28,6 +28,7 @@ describe('UploadUpsellFileResolver', () => {
     mutation uploadUpsellImage($input: UploadSellImageInputType) {
       uploadUpsellImage(input: $input) {
           url
+          filename
       }
     }
   `,
