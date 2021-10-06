@@ -1,5 +1,5 @@
-  mutation uploadUpsellImage($file: Upload!, $workspaceId: String) {
-    uploadUpsellImage(file: $file, workspaceId: $workspaceId) {
+  mutation uploadUpsellImage($input: UploadSellImageInputType) {
+    uploadUpsellImage(input: $input) {
         url
     }
   }

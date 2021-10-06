@@ -1,4 +1,6 @@
 import fetch from 'node-fetch';
+import { createReadStream } from 'fs';
+
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import AuthService from '../../auth/AuthService';
@@ -18,46 +20,38 @@ describe('UploadUpsellFileResolver', () => {
 
   test(`Uploads upsell file to cloudinary`, async () => {
     const { user, workspace } = await prepDefaultData(prisma);
+    const image = createReadStream(`${__dirname}/earbuds.webp`);
 
     // Generate token for API access
     const token = AuthService.createUserToken(user.id, 22);
-    const body = new FormData();
-
-    body.append(
-      'operations',
-      JSON.stringify({
-        query: `
-          mutation uploadUpsellImage($file: Upload!, $workspaceId: String) {
-            uploadUpsellImage(file: $file, workspaceId: $workspaceId) {
-                url
-            }
-          }
-          `,
-        variables: {
-          file: null,
-          workspaceId: workspace.id
+    const res = await ctx.client.request(`
+    mutation uploadUpsellImage($input: UploadSellImageInputType) {
+      uploadUpsellImage(input: $input) {
+          url
+      }
+    }
+  `,
+      {
+        input: {
+          workspaceId: workspace.id,
+          file: image,
         }
-      })
-    )
-    body.append('map', JSON.stringify({ 1: ['variables.file'] }));
-    body.append('1', 'a', 'a.txt');
-
-    const res = await fetch(`http://localhost:${ctx.port}/graphql`, {
-      method: 'POST',
-      body,
-      headers: {
+      },
+      {
         'Authorization': `Bearer ${token}`
       }
-    }).then(response => response.json()).catch((reason) => console.log('Something WENT WRONG: ', reason));
+    );
 
-    expect(res?.data?.uploadUpsellImage?.url).not.toBeNull();
-    expect(res?.data?.uploadUpsellImage?.url).not.toBeUndefined();
-    expect(res?.data?.uploadUpsellImage?.url).toContain('http');
+    console.log('RES: ', res);
+
+    expect(res?.uploadUpsellImage?.url).not.toBeNull();
+    expect(res?.uploadUpsellImage?.url).not.toBeUndefined();
+    expect(res?.uploadUpsellImage?.url).toContain('http');
   });
 
   test('Unable to upload upsell image unauthorized', async () => {
     const { user, workspace, userRole } = await prepDefaultData(prisma);
-
+    const image = createReadStream(`${__dirname}/earbuds.webp`);
     await prisma.role.update({
       where: { id: userRole.id },
       data: {
@@ -67,35 +61,24 @@ describe('UploadUpsellFileResolver', () => {
 
     // Generate token for API access
     const token = AuthService.createUserToken(user.id, 22);
-    const body = new FormData();
 
-    body.append(
-      'operations',
-      JSON.stringify({
-        query: `
-          mutation uploadUpsellImage($file: Upload!, $workspaceId: String) {
-            uploadUpsellImage(file: $file, workspaceId: $workspaceId) {
-                url
-            }
-          }
-          `,
-        variables: {
-          file: null,
-          workspaceId: workspace.id
+    await ctx.client.request(`
+    mutation uploadUpsellImage($input: UploadSellImageInputType) {
+      uploadUpsellImage(input: $input) {
+          url
+      }
+    }
+  `,
+      {
+        input: {
+          workspaceId: workspace.id,
+          file: image,
         }
-      })
-    )
-    body.append('map', JSON.stringify({ 1: ['variables.file'] }));
-    body.append('1', 'a', 'a.txt');
-
-    await fetch(`http://localhost:${ctx.port}/graphql`, {
-      method: 'POST',
-      body,
-      headers: {
+      },
+      {
         'Authorization': `Bearer ${token}`
       }
-    })
-      .then(response => response.json())
+    )
       .catch((reason) => expect(reason.message).toContain('Not Authorised!'));
   });
 

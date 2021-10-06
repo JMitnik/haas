@@ -34,17 +34,17 @@ it('send deliveries', async () => {
       }
     }
   `,
-  {
-    input: {
-      workspaceId: workspace.id,
-      uploadedCsv: file,
-      campaignId: campaign.id,
-      batchScheduledAt: '2011-10-05T14:48:00.000Z'
+    {
+      input: {
+        workspaceId: workspace.id,
+        uploadedCsv: file,
+        campaignId: campaign.id,
+        batchScheduledAt: '2011-10-05T14:48:00.000Z'
+      }
+    },
+    {
+      'Authorization': `Bearer ${token}`
     }
-  },
-  {
-    'Authorization': `Bearer ${token}`
-  }
   );
 
   expect(res).toMatchObject({
@@ -56,7 +56,7 @@ it('unable to send deliveries unauthorized', async () => {
   const { user, campaign, workspace, userRole } = await prepDefaultData(prisma);
 
   await prisma.role.update({
-    where: {id: userRole.id},
+    where: { id: userRole.id },
     data: {
       permissions: []
     }
@@ -79,17 +79,17 @@ it('unable to send deliveries unauthorized', async () => {
         }
       }
     `,
-    {
-      input: {
-        workspaceId: workspace.id,
-        uploadedCsv: file,
-        campaignId: campaign.id,
-        batchScheduledAt: '2011-10-05T14:48:00.000Z'
+      {
+        input: {
+          workspaceId: workspace.id,
+          uploadedCsv: file,
+          campaignId: campaign.id,
+          batchScheduledAt: '2011-10-05T14:48:00.000Z'
+        }
+      },
+      {
+        'Authorization': `Bearer ${token}`
       }
-    },
-    {
-      'Authorization': `Bearer ${token}`
-    }
     );
   } catch (error) {
     expect(error.message).toContain('Not Authorised!');

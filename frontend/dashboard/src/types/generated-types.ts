@@ -1003,8 +1003,7 @@ export type MutationDeleteDialogueArgs = {
 
 
 export type MutationUploadUpsellImageArgs = {
-  workspaceId?: Maybe<Scalars['String']>;
-  file?: Maybe<Scalars['Upload']>;
+  input?: Maybe<UploadSellImageInputType>;
 };
 
 
@@ -1720,6 +1719,11 @@ export enum UploadImageEnumType {
   WebsiteScreenshot = 'WEBSITE_SCREENSHOT'
 }
 
+export type UploadSellImageInputType = {
+  file?: Maybe<Scalars['Upload']>;
+  workspaceId?: Maybe<Scalars['String']>;
+};
+
 export type UserConnection = ConnectionInterface & {
   __typename?: 'UserConnection';
   offset: Scalars['Int'];
@@ -1780,8 +1784,7 @@ export type VideoNodeEntryInput = {
 };
 
 export type UploadUpsellImageMutationVariables = Exact<{
-  file: Scalars['Upload'];
-  workspaceId?: Maybe<Scalars['String']>;
+  input?: Maybe<UploadSellImageInputType>;
 }>;
 
 
@@ -2206,8 +2209,8 @@ export type GetUserCustomerFromCustomerQuery = (
 
 
 export const UploadUpsellImageDocument = gql`
-    mutation uploadUpsellImage($file: Upload!, $workspaceId: String) {
-  uploadUpsellImage(file: $file, workspaceId: $workspaceId) {
+    mutation uploadUpsellImage($input: UploadSellImageInputType) {
+  uploadUpsellImage(input: $input) {
     url
   }
 }
@@ -2227,8 +2230,7 @@ export type UploadUpsellImageMutationFn = Apollo.MutationFunction<UploadUpsellIm
  * @example
  * const [uploadUpsellImageMutation, { data, loading, error }] = useUploadUpsellImageMutation({
  *   variables: {
- *      file: // value for 'file'
- *      workspaceId: // value for 'workspaceId'
+ *      input: // value for 'input'
  *   },
  * });
  */

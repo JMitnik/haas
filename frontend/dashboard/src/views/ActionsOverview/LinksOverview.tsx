@@ -54,7 +54,7 @@ const ImageUploadLogoInput = ({ onChange, value }: any) => {
     if (!files.length) return;
 
     const [file] = files;
-    uploadFile({ variables: { file, workspaceId: activeCustomer?.id } });
+    uploadFile({ variables: { input: { file, workspaceId: activeCustomer?.id } } });
   };
 
   return (
