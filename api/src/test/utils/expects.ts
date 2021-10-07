@@ -7,5 +7,5 @@ import { GraphQLError } from 'graphql';
  */
 export const expectUnauthorizedErrorOnResolver = (error: GraphQLError, resolverName: string) => {
   expect(error.message).toContain('Not Authorised!');
-  expect(error.path[error.path.length - 1]).toEqual(resolverName);
+  expect(error?.path?.[error?.path?.length - 1]).toEqual(resolverName);
 }

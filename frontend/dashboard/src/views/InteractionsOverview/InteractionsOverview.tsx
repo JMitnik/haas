@@ -309,8 +309,8 @@ export const InteractionsOverview = () => {
       const [newStartDate, newEndDate] = dates;
       setFilter({
         ...filter,
-        startDate: newStartDate,
-        endDate: newEndDate,
+        startDate: startOfDay(newStartDate),
+        endDate: endOfDay(newEndDate),
       });
     } else {
       setFilter({
