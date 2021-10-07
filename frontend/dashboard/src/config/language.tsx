@@ -14,7 +14,7 @@ const language = {
       de: 'Artikel',
     },
     out_of: {
-      en: 'Out of',
+      en: 'out of',
       de: 'Aus',
     },
     campaign_variant: {
