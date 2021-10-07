@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { createReadStream, existsSync } from 'fs';
 
 import { makeTestContext } from '../../../test/utils/makeTestContext';
@@ -7,7 +6,11 @@ import AuthService from '../../auth/AuthService';
 import { clearDatabase, prepDefaultData } from './testUtils';
 
 jest.mock('../../..//utils/upload/uploadCloudinary', () => {
-  return jest.fn(() => ({ url: 'https://cloudinary-url.mock' }));
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ url: 'https://cloudinary-url.mock' })),
+    uploadCloudinary: jest.fn(() => ({ url: 'https://cloudinary-url.mock' })),
+  }
 });
 
 const prisma = makeTestPrisma();

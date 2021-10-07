@@ -11,7 +11,7 @@ interface UploadFile {
  * @file input file object
  * @folder folder on cloudinary
  */
-module.exports = async (file: UploadFile, folder: string) => {
+export const uploadCloudinary = async (file: UploadFile, folder: string) => {
   const { createReadStream, filename, mimetype, encoding } = file;
   const stream = new Promise<UploadApiResponse>((resolve, reject) => {
     const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
@@ -32,3 +32,5 @@ module.exports = async (file: UploadFile, folder: string) => {
   console.log('SECURE URL: ', secure_url);
   return { filename, mimetype, encoding, url: secure_url };
 };
+
+export default uploadCloudinary;
