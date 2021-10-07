@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import UploadFileService from '../../utils/upload/UploadFileService';
+const uploadCloudinary = require('../../utils/upload/uploadCloudinary');
 
 class LinkService {
   prisma: PrismaClient;
@@ -14,8 +14,7 @@ class LinkService {
    * @returns File object including uploaded image URL
    */
   uploadImage = async (file: any) => {
-    const image = await UploadFileService.uploadCloudinary(file, 'sellable_items');
-    console.log('LinkService uploadImage: ', image);
+    const image = await uploadCloudinary(file, 'sellable_items');
     return image;
   }
 }

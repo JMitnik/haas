@@ -6,7 +6,9 @@ import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import AuthService from '../../auth/AuthService';
 import { clearDatabase, prepDefaultData } from './testUtils';
 
-const FormData = require('form-data');
+jest.mock('../../..//utils/upload/uploadCloudinary', () => {
+  return jest.fn(() => ({ url: 'https://cloudinary-url.mock' }));
+});
 
 const prisma = makeTestPrisma();
 const ctx = makeTestContext(prisma);
@@ -22,16 +24,15 @@ describe('UploadUpsellFileResolver', () => {
     const { user, workspace } = await prepDefaultData(prisma);
 
     const image = createReadStream(`${__dirname}/earbuds.webp`);
-    console.log('File path: ', `${__dirname}/earbuds.webp`);
     const inputFileExists = existsSync(`${__dirname}/earbuds.webp`);
     expect(inputFileExists).toBe(true);
+
     // Generate token for API access
     const token = AuthService.createUserToken(user.id, 22);
     const res = await ctx.client.request(`
     mutation uploadUpsellImage($input: UploadSellImageInputType) {
       uploadUpsellImage(input: $input) {
           url
-          filename
       }
     }
   `,
@@ -45,8 +46,6 @@ describe('UploadUpsellFileResolver', () => {
         'Authorization': `Bearer ${token}`
       }
     );
-
-    console.log('RES: ', res);
 
     expect(res?.uploadUpsellImage?.url).not.toBeNull();
     expect(res?.uploadUpsellImage?.url).not.toBeUndefined();
