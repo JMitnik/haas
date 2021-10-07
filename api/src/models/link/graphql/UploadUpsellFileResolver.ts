@@ -1,5 +1,5 @@
 import { inputObjectType, mutationField } from '@nexus/schema';
-import { ApolloError } from 'apollo-server-express';
+import { UserInputError } from 'apollo-server-express';
 import { ImageType, Upload } from '../../customer';
 
 export const UploadSellImageInputType = inputObjectType({
@@ -21,7 +21,7 @@ export const UploadSellImageResolver = Upload && mutationField('uploadUpsellImag
     const waitedFile = await args.input?.file;
     const readyFile = waitedFile.file;
 
-    if (!args?.input?.workspaceId) throw new ApolloError('No workspace ID provided, cannot upload file');
+    if (!args?.input?.workspaceId) throw new UserInputError('No workspace ID provided, cannot upload file');
     const uploadImage = await ctx.services.linkService.uploadImage(readyFile);
     return uploadImage;
   },
