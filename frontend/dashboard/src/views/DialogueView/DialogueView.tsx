@@ -174,7 +174,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
             </UI.Div>
             <UI.ColumnFlex alignItems="center">
               <UI.Div ref={qrContainerRef}>
-                <QRCode fgColor={qrColor} value={shareUrl} />
+                <QRCode fgColor={qrColor} value={`${shareUrl}?origin=qrc`} />
               </UI.Div>
               <Button
                 margin="0 auto"

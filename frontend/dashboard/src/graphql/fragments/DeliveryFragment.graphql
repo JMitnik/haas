@@ -14,5 +14,10 @@ fragment DeliveryFragment on DeliveryType {
     id
     label
     type
+
+    campaign {
+      id
+      label
+    }
   }
 }

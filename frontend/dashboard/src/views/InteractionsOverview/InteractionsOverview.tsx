@@ -3,7 +3,7 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { Activity, Calendar, Filter, MessageCircle } from 'react-feather';
+import { Activity, Calendar, Filter, Link2, Mail, MessageCircle, Smartphone } from 'react-feather';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { Controller, useForm } from 'react-hook-form';
@@ -12,6 +12,8 @@ import { Flex, ViewTitle } from '@haas/ui';
 import {
   Icon,
   Popover,
+  PopoverArrow,
+  PopoverBody,
   PopoverCloseButton,
   PopoverContent,
   PopoverHeader,
@@ -22,20 +24,21 @@ import {
 } from '@chakra-ui/core';
 import { MenuHeader, MenuItem, SubMenu, useMenuState } from '@szhsin/react-menu';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
-import { Route, Switch, useLocation } from 'react-router';
+import { Route, Switch, useHistory, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import {
-  CompactEntriesPath,
-} from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
-import {
+  CampaignVariantEnum,
   DeliveryFragmentFragment,
   SessionConnectionOrder,
   SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery,
 } from 'types/generated-types';
+import {
+  CompactEntriesPath,
+} from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
 import { ReactComponent as IconSortDown } from 'assets/icons/icon-cheveron-down.svg';
 import { ReactComponent as IconSortUp } from 'assets/icons/icon-cheveron-up.svg';
@@ -45,6 +48,7 @@ import { paginate } from 'utils/paginate';
 import SearchBar from 'components/SearchBar/SearchBar';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
+import { Circle } from 'components/Common/Circle';
 import { InteractionModalCard } from './InteractionModalCard';
 
 interface TableProps {
@@ -175,6 +179,165 @@ const FilterButtonContainer = styled(UI.Div)`
     }
   }
 `;
+
+interface DistributionInnerCellProps {
+  session: SessionFragmentFragment;
+}
+
+const TableCellButtonContainer = styled(UI.Div)`
+  transition: all ease-in 0.2s;
+  text-align: left;
+
+  &:hover {
+    transition: all ease-in 0.2s;
+    box-shadow: 0 4px 6px rgba(50,50,93,.07), 0 1px 3px rgba(0,0,0,.03);
+  }
+`;
+
+const TableCellButton = ({
+  children,
+  renderBody
+}: { children: React.ReactNode, renderBody?: () => React.ReactNode }) => (
+  <UI.Div onClick={(e) => e.stopPropagation()}>
+    <Popover usePortal>
+      <PopoverTrigger>
+        <TableCellButtonContainer
+          as="button"
+          py={1}
+          px={2}
+          borderRadius={10}
+          border="1px solid"
+          borderColor="gray.100"
+        >
+          {children}
+        </TableCellButtonContainer>
+      </PopoverTrigger>
+      <PopoverContent
+        borderRadius={10}
+        borderWidth={1}
+        borderColor="gray.300"
+        py={1}
+        px={2}
+        boxShadow="0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important"
+      >
+        <PopoverArrow borderColor="gray.300" />
+        <PopoverBody>
+          {renderBody?.()}
+        </PopoverBody>
+      </PopoverContent>
+    </Popover>
+  </UI.Div>
+);
+
+const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
+  const { goToCampaignView } = useNavigator();
+
+  return (
+
+    <UI.Div>
+      {session.delivery ? (
+        <TableCellButton renderBody={() => (
+          <>
+            <UI.Helper>Origin</UI.Helper>
+            <UI.Stack spacing={1}>
+              <UI.Stack isInline alignItems="center">
+                <UI.Text>Url:</UI.Text>
+                <UI.Muted>
+                  <UI.Span fontSize="0.7rem">
+                    {session.originUrl}
+                  </UI.Span>
+                </UI.Muted>
+              </UI.Stack>
+              <UI.Div>
+                <UI.Stack isInline>
+                  <UI.Text>Campaign:</UI.Text>
+                  <UI.Div>
+                    <UI.Muted>
+                      <UI.Span fontSize="0.7rem">
+                        {session.delivery?.campaignVariant?.campaign?.label}
+                      </UI.Span>
+                    </UI.Muted>
+                    {!!session.delivery?.campaignVariant?.campaign?.id && (
+                      <UI.Button
+                        size="xs"
+                        onClick={
+                          () => goToCampaignView(session.delivery?.campaignVariant?.campaign?.id)
+                        }
+                      >
+                        View campaign
+                      </UI.Button>
+                    )}
+                  </UI.Div>
+                </UI.Stack>
+              </UI.Div>
+              <UI.Stack isInline alignItems="center">
+                <UI.Text>Campaign variant:</UI.Text>
+                <UI.Muted>
+                  <UI.Span fontSize="0.7rem">
+                    {session.delivery?.campaignVariant?.label}
+                    {' - '}
+                    {session.delivery?.campaignVariant?.type}
+                  </UI.Span>
+                </UI.Muted>
+              </UI.Stack>
+            </UI.Stack>
+          </>
+        )}
+        >
+          <UI.Flex>
+            <UI.Div>
+              {session.delivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
+                <Circle brand="blue" mr={2}>
+                  <UI.Icon>
+                    <Smartphone />
+                  </UI.Icon>
+                </Circle>
+              ) : (
+                <Circle brand="blue" mr={2}>
+                  <UI.Icon>
+                    <Mail />
+                  </UI.Icon>
+                </Circle>
+              )}
+            </UI.Div>
+            <UI.Div>
+              <UI.Helper color="blue.500">
+                Campaign:
+                {' '}
+                {session.delivery.campaignVariant?.label}
+              </UI.Helper>
+              <UI.Flex>
+                <UI.Muted>
+                  {session.originUrl}
+                </UI.Muted>
+              </UI.Flex>
+            </UI.Div>
+          </UI.Flex>
+        </TableCellButton>
+      ) : (
+        <>
+          <TableCellButton>
+            <UI.Div>
+              <UI.Flex>
+                <Circle brand="gray" mr={2}>
+                  <UI.Icon>
+                    <Link2 />
+                  </UI.Icon>
+                </Circle>
+                <UI.Div>
+                  <UI.Helper color="gray.500">Link click</UI.Helper>
+                  <UI.Muted>
+                    {session.originUrl}
+                  </UI.Muted>
+                </UI.Div>
+              </UI.Flex>
+            </UI.Div>
+          </TableCellButton>
+        </>
+      )}
+    </UI.Div>
+  );
+};
 
 const FilterButton = ({ filterKey, value, onDisable }: FilterButtonProps) => (
   <FilterButtonContainer>
@@ -404,7 +567,7 @@ export const InteractionsOverview = () => {
               {t('interaction')}
             </TableHeadingCell>
             <TableHeadingCell>
-              {t('distribution')}
+              {t('origin')}
             </TableHeadingCell>
             <TableHeadingCell
               sorting
@@ -517,7 +680,9 @@ export const InteractionsOverview = () => {
                   {/* @ts-ignore */}
                   <CompactEntriesPath nodeEntries={session.nodeEntries} />
                 </TableCell>
-                <TableCell />
+                <TableCell>
+                  <DistributionInnerCell session={session} />
+                </TableCell>
                 <TableCell>
                   <DateCell timestamp={session.createdAt} />
                 </TableCell>

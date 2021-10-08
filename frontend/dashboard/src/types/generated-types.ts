@@ -1835,6 +1835,10 @@ export type DeliveryFragmentFragment = (
   & { campaignVariant?: Maybe<(
     { __typename?: 'CampaignVariantType' }
     & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
+    & { campaign?: Maybe<(
+      { __typename?: 'CampaignType' }
+      & Pick<CampaignType, 'id' | 'label'>
+    )> }
   )> }
 );
 
@@ -2419,6 +2423,10 @@ export const DeliveryFragmentFragmentDoc = gql`
     id
     label
     type
+    campaign {
+      id
+      label
+    }
   }
 }
     `;
