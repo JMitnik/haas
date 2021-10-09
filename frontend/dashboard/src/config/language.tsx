@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    show_interactions_between: {
+      en: 'Show interactions between a start and end-date.',
+      de: 'Interaktionen zwischen einem Start- und einem Enddatum anzeigen',
+    },
     reset: {
       en: 'Reset',
       de: 'Zurücksetzen',

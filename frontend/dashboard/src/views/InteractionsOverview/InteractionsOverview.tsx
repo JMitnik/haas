@@ -356,6 +356,7 @@ export const InteractionsOverview = () => {
   const [totalPages, setTotalPages] = useState<number>(0);
 
   const { loading: isLoading } = useGetInteractionsQueryQuery({
+    fetchPolicy: 'cache-and-network',
     variables: {
       customerSlug,
       dialogueSlug,
@@ -497,7 +498,7 @@ export const InteractionsOverview = () => {
                         {t('filter_by_date')}
                       </UI.RadioHeader>
                       <UI.Div mb={1}>
-                        <UI.Muted>Show interactions between</UI.Muted>
+                        <UI.Muted>{t('show_interactions_between')}</UI.Muted>
                       </UI.Div>
                       <UI.Div>
                         <UI.DatePicker
@@ -736,6 +737,7 @@ const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: Filt
 
   const handleSubmit = () => {
     onApply(form.getValues());
+    form.reset(form.getValues());
   };
 
   return (
@@ -786,7 +788,15 @@ const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: Filt
           )}
         </UI.Div>
 
-        <UI.Button type="submit" variantColor="teal" size="sm" mb={4}>Apply filters</UI.Button>
+        <UI.Button
+          isDisabled={!form.formState.isDirty}
+          type="submit"
+          variantColor="teal"
+          size="sm"
+          mb={4}
+        >
+          Apply filters
+        </UI.Button>
       </UI.Stack>
     </UI.Form>
   );

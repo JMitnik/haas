@@ -49,7 +49,7 @@ export const Body = ({
   hasClose,
   children,
   padding,
-  maxWidth = 300,
+  maxWidth = 400,
   arrowBg = 'white',
 }: PopoverBodyProps) => (
   <PopoverContent
