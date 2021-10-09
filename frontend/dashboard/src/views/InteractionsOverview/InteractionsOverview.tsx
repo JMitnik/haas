@@ -12,8 +12,6 @@ import { Flex, ViewTitle } from '@haas/ui';
 import {
   Icon,
   Popover,
-  PopoverArrow,
-  PopoverBody,
   PopoverCloseButton,
   PopoverContent,
   PopoverHeader,
@@ -24,12 +22,13 @@ import {
 } from '@chakra-ui/core';
 import { MenuHeader, MenuItem, SubMenu, useMenuState } from '@szhsin/react-menu';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
-import { Route, Switch, useHistory, useLocation } from 'react-router';
+import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import * as Table from 'components/Common/Table';
 import {
   CampaignVariantEnum,
   DeliveryFragmentFragment,
@@ -40,8 +39,6 @@ import {
   CompactEntriesPath,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
-import { ReactComponent as IconSortDown } from 'assets/icons/icon-cheveron-down.svg';
-import { ReactComponent as IconSortUp } from 'assets/icons/icon-cheveron-up.svg';
 import { Menu } from 'components/Common/Menu/Menu';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { paginate } from 'utils/paginate';
@@ -184,51 +181,6 @@ interface DistributionInnerCellProps {
   session: SessionFragmentFragment;
 }
 
-const TableCellButtonContainer = styled(UI.Div)`
-  transition: all ease-in 0.2s;
-  text-align: left;
-
-  &:hover {
-    transition: all ease-in 0.2s;
-    box-shadow: 0 4px 6px rgba(50,50,93,.07), 0 1px 3px rgba(0,0,0,.03);
-  }
-`;
-
-const TableCellButton = ({
-  children,
-  renderBody
-}: { children: React.ReactNode, renderBody?: () => React.ReactNode }) => (
-  <UI.Div onClick={(e) => e.stopPropagation()}>
-    <Popover usePortal>
-      <PopoverTrigger>
-        <TableCellButtonContainer
-          as="button"
-          py={1}
-          px={2}
-          borderRadius={10}
-          border="1px solid"
-          borderColor="gray.100"
-        >
-          {children}
-        </TableCellButtonContainer>
-      </PopoverTrigger>
-      <PopoverContent
-        borderRadius={10}
-        borderWidth={1}
-        borderColor="gray.300"
-        py={1}
-        px={2}
-        boxShadow="0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important"
-      >
-        <PopoverArrow borderColor="gray.300" />
-        <PopoverBody>
-          {renderBody?.()}
-        </PopoverBody>
-      </PopoverContent>
-    </Popover>
-  </UI.Div>
-);
-
 const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
   const { goToCampaignView } = useNavigator();
 
@@ -236,11 +188,11 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
 
     <UI.Div>
       {session.delivery ? (
-        <TableCellButton renderBody={() => (
+        <Table.PopButton renderBody={() => (
           <>
             <UI.Helper>Origin</UI.Helper>
             <UI.Stack spacing={1}>
-              <UI.Stack isInline alignItems="center">
+              <UI.Stack isInline>
                 <UI.Text>Url:</UI.Text>
                 <UI.Muted>
                   <UI.Span fontSize="0.7rem">
@@ -261,7 +213,7 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
                       <UI.Button
                         size="xs"
                         onClick={
-                          () => goToCampaignView(session.delivery?.campaignVariant?.campaign?.id)
+                          () => goToCampaignView(session.delivery?.campaignVariant?.campaign?.id || '')
                         }
                       >
                         View campaign
@@ -287,13 +239,13 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
           <UI.Flex>
             <UI.Div>
               {session.delivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
-                <Circle brand="blue" mr={2}>
+                <Circle flexShrink={0} brand="blue" mr={2}>
                   <UI.Icon>
                     <Smartphone />
                   </UI.Icon>
                 </Circle>
               ) : (
-                <Circle brand="blue" mr={2}>
+                <Circle flexShrink={0} brand="blue" mr={2}>
                   <UI.Icon>
                     <Mail />
                   </UI.Icon>
@@ -304,7 +256,7 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
               <UI.Helper color="blue.500">
                 Campaign:
                 {' '}
-                {session.delivery.campaignVariant?.label}
+                {session.delivery.campaignVariant?.campaign?.label}
               </UI.Helper>
               <UI.Flex>
                 <UI.Muted>
@@ -313,13 +265,13 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
               </UI.Flex>
             </UI.Div>
           </UI.Flex>
-        </TableCellButton>
+        </Table.PopButton>
       ) : (
         <>
-          <TableCellButton>
+          <Table.PopButton>
             <UI.Div>
               <UI.Flex>
-                <Circle brand="gray" mr={2}>
+                <Circle flexShrink={0} brand="gray" mr={2}>
                   <UI.Icon>
                     <Link2 />
                   </UI.Icon>
@@ -332,7 +284,7 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
                 </UI.Div>
               </UI.Flex>
             </UI.Div>
-          </TableCellButton>
+          </Table.PopButton>
         </>
       )}
     </UI.Div>
@@ -404,6 +356,10 @@ const ActiveFilters = ({
 interface CampaignVariant {
   id: string;
   label: string;
+  campaign: {
+    id: string;
+    label: string;
+  }
 }
 
 export const InteractionsOverview = () => {
@@ -559,24 +515,24 @@ export const InteractionsOverview = () => {
           <ActiveFilters filter={filter} setFilters={setFilter} />
         </UI.Flex>
         <UI.Div width="100%">
-          <TableHeadingRow gridTemplateColumns="1fr 1fr 1fr 1fr">
-            <TableHeadingCell>
+          <Table.HeadingRow gridTemplateColumns="1fr 1fr 1fr 1fr">
+            <Table.HeadingCell>
               {t('user')}
-            </TableHeadingCell>
-            <TableHeadingCell>
+            </Table.HeadingCell>
+            <Table.HeadingCell>
               {t('interaction')}
-            </TableHeadingCell>
-            <TableHeadingCell>
+            </Table.HeadingCell>
+            <Table.HeadingCell>
               {t('origin')}
-            </TableHeadingCell>
-            <TableHeadingCell
+            </Table.HeadingCell>
+            <Table.HeadingCell
               sorting
               descending={filter.orderByDescending || false}
               onDescendChange={(isDescend) => setFilter({ orderByDescending: isDescend })}
             >
               {t('when')}
-            </TableHeadingCell>
-          </TableHeadingRow>
+            </Table.HeadingCell>
+          </Table.HeadingRow>
           <UI.Div>
             <Menu
               {...menuProps}
@@ -658,7 +614,7 @@ export const InteractionsOverview = () => {
             </Menu>
 
             {sessions.map((session) => (
-              <TableRow
+              <Table.Row
                 onClick={() => goToInteractionsView(session.id)}
                 gridTemplateColumns="1fr 1fr 1fr 1fr"
                 key={session.id}
@@ -669,24 +625,24 @@ export const InteractionsOverview = () => {
                   toggleMenu(true);
                 }}
               >
-                <TableCell>
+                <Table.Cell>
                   {session.delivery?.deliveryRecipientFirstName ? (
                     <DeliveryUserCell delivery={session.delivery} />
                   ) : (
                     <AnonymousCell sessionId={session.id} />
                   )}
-                </TableCell>
-                <TableCell>
+                </Table.Cell>
+                <Table.Cell>
                   {/* @ts-ignore */}
                   <CompactEntriesPath nodeEntries={session.nodeEntries} />
-                </TableCell>
-                <TableCell>
+                </Table.Cell>
+                <Table.Cell>
                   <DistributionInnerCell session={session} />
-                </TableCell>
-                <TableCell>
+                </Table.Cell>
+                <Table.Cell>
                   <DateCell timestamp={session.createdAt} />
-                </TableCell>
-              </TableRow>
+                </Table.Cell>
+              </Table.Row>
             ))}
           </UI.Div>
           <UI.Flex justifyContent="flex-end" mt={4}>
@@ -960,7 +916,13 @@ const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: Filt
                 <RadioGroup size="sm" onChange={onChange} value={value}>
                   <Radio value="all" mb={0}>All</Radio>
                   {campaignVariants.map((variant) => (
-                    <Radio key={variant.id} value={variant.id} mb={0}>{variant.label}</Radio>
+                    <Radio key={variant.id} value={variant.id} mb={0}>
+                      {variant?.campaign?.label}
+                      {' '}
+                      -
+                      {' '}
+                      {variant.label}
+                    </Radio>
                   ))}
                 </RadioGroup>
               )}
@@ -973,76 +935,3 @@ const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: Filt
     </UI.Form>
   );
 };
-
-const TableHeadingRow = styled(UI.Grid)`
-  ${({ theme }) => css`
-    background: ${theme.colors.gray[100]};
-    padding: 12px 16px;
-    border-radius: 10px;
-    margin-bottom: 12px;
-  `}
-`;
-
-const TableRow = styled(UI.Grid)`
-  background: white;
-  align-items: center;
-  padding: 6px 12px;
-  margin-bottom: 12px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01),0 2px 4px -1px rgba(0,0,0,0.03);
-  transition: all 0.2s ease-in;
-  cursor: pointer;
-
-  &:hover {
-    cursor: pointer;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.08);
-    transition: all 0.2s ease-in;
-  }
-`;
-
-const TableHeadingCellContainer = styled(UI.Div)`
-  ${({ theme }) => css`
-    font-weight: 600;
-    line-height: 1rem;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: ${theme.colors.gray[500]};
-    display: flex;
-    align-items: center;
-
-    svg {
-      stroke: ${theme.colors.gray[400]};
-    }
-
-    .active {
-      stroke: ${theme.colors.gray[800]};
-    }
-  `}
-`;
-
-interface TableHeadingCellProps {
-  children: React.ReactNode;
-  sorting?: boolean;
-  descending?: boolean;
-  onDescendChange?: (isDescend: boolean) => void;
-}
-
-const TableHeadingCell = ({ children, sorting, descending = true, onDescendChange }: TableHeadingCellProps) => (
-  <TableHeadingCellContainer>
-    {children}
-
-    {sorting && (
-      <UI.Icon ml={2} width="21px" display="block">
-        <IconSortUp onClick={() => onDescendChange?.(false)} className={descending ? '' : 'active'} />
-        <IconSortDown
-          onClick={() => onDescendChange?.(true)}
-          className={descending ? 'active' : ''}
-          style={{ marginTop: '-8px' }}
-        />
-      </UI.Icon>
-    )}
-  </TableHeadingCellContainer>
-);
-
-const TableCell = styled(UI.Div)``;

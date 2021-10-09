@@ -2299,6 +2299,10 @@ export type GetInteractionsQueryQuery = (
       & { campaignVariants: Array<(
         { __typename?: 'CampaignVariantType' }
         & Pick<CampaignVariantType, 'id' | 'label'>
+        & { campaign?: Maybe<(
+          { __typename?: 'CampaignType' }
+          & Pick<CampaignType, 'id' | 'label'>
+        )> }
       )>, sessionConnection?: Maybe<(
         { __typename?: 'SessionConnection' }
         & Pick<SessionConnection, 'totalPages'>
@@ -3380,6 +3384,10 @@ export const GetInteractionsQueryDocument = gql`
       campaignVariants {
         id
         label
+        campaign {
+          id
+          label
+        }
       }
       sessionConnection(filter: $sessionsFilter) {
         sessions {

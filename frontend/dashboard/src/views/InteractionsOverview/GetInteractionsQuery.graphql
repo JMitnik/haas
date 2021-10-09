@@ -11,6 +11,10 @@ query GetInteractionsQuery(
       campaignVariants {
         id
         label
+        campaign {
+          id
+          label
+        }
       }
       sessionConnection(filter: $sessionsFilter) {
         sessions {
