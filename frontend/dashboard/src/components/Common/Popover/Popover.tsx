@@ -1,20 +1,24 @@
+import * as UI from '@haas/ui';
 import {
   Popover,
   PopoverArrow,
   PopoverBody,
+  PopoverCloseButton,
   PopoverContent,
+  PopoverHeader,
   PopoverTrigger,
 } from '@chakra-ui/core';
 import React from 'react';
 
 interface PopoverBaseProps {
   children?: React.ReactNode;
-  onClose?: any;
-  onOpen?: any;
+  onOpen?: () => void;
+  onClose?: () => void;
+  isOpen?: boolean;
 }
 
 export const Base = ({ children, ...props }: PopoverBaseProps) => (
-  <Popover usePortal {...props}>
+  <Popover placement="bottom-start" usePortal {...props}>
     {children}
   </Popover>
 );
@@ -30,21 +34,45 @@ export const Trigger = ({ children }: PopoverTriggerProps) => (
 );
 
 interface PopoverBodyProps {
+  header?: string;
   hasArrow?: boolean;
+  hasClose?: boolean;
   children?: React.ReactNode;
+  padding?: number;
+  maxWidth?: number;
+  arrowBg?: string;
 }
 
-export const Body = ({ hasArrow, children }: PopoverBodyProps) => (
+export const Body = ({
+  header,
+  hasArrow,
+  hasClose,
+  children,
+  padding,
+  maxWidth = 300,
+  arrowBg = 'white',
+}: PopoverBodyProps) => (
   <PopoverContent
+    maxW={maxWidth}
     borderRadius={10}
+    zIndex={100000}
     borderWidth={1}
     borderColor="gray.300"
-    py={1}
-    px={2}
     boxShadow="0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important"
   >
-    {hasArrow && <PopoverArrow />}
-    <PopoverBody>
+    {!!header && (
+      <>
+        <PopoverHeader>
+          <UI.Helper>
+            {header}
+          </UI.Helper>
+        </PopoverHeader>
+        <PopoverCloseButton />
+      </>
+    )}
+    {hasArrow && <PopoverArrow bg={arrowBg} />}
+    {hasClose && <PopoverCloseButton />}
+    <PopoverBody padding={padding}>
       {children}
     </PopoverBody>
   </PopoverContent>

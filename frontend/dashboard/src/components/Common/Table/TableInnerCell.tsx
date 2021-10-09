@@ -14,10 +14,11 @@ const TableCellButtonContainer = styled(UI.Div)`
   }
 `;
 
-export const PopButton = ({
+export const InnerCell = ({
   children,
   renderBody,
-}: { children: React.ReactNode, renderBody?: () => React.ReactNode }) => (
+  header,
+}: { children: React.ReactNode, header?: string, renderBody?: () => React.ReactNode }) => (
   <UI.Div onClick={(e) => e.stopPropagation()}>
     <Popover.Base>
       <Popover.Trigger>
@@ -32,9 +33,11 @@ export const PopButton = ({
           {children}
         </TableCellButtonContainer>
       </Popover.Trigger>
-      <Popover.Body hasArrow>
-        {renderBody?.()}
-      </Popover.Body>
+      {!!renderBody && (
+        <Popover.Body hasArrow header={header}>
+          {renderBody?.()}
+        </Popover.Body>
+      )}
     </Popover.Base>
   </UI.Div>
 );

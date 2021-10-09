@@ -3,7 +3,7 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { Activity, Calendar, Filter, Link2, Mail, MessageCircle, Smartphone } from 'react-feather';
+import { Activity, Calendar, Filter, Link2, Mail, MessageCircle, Plus, Search, Smartphone } from 'react-feather';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { Controller, useForm } from 'react-hook-form';
@@ -11,41 +11,36 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { Flex, ViewTitle } from '@haas/ui';
 import {
   Icon,
-  Popover,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
   Radio,
   RadioGroup,
-  useDisclosure,
 } from '@chakra-ui/core';
 import { MenuHeader, MenuItem, SubMenu, useMenuState } from '@szhsin/react-menu';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import styled, { css } from 'styled-components';
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import styled from 'styled-components';
 
 import * as Table from 'components/Common/Table';
+import { Avatar } from 'components/Common/Avatar';
 import {
   CampaignVariantEnum,
   DeliveryFragmentFragment,
   SessionConnectionOrder,
   SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery,
 } from 'types/generated-types';
+import { Circle } from 'components/Common/Circle';
 import {
   CompactEntriesPath,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
 import { Menu } from 'components/Common/Menu/Menu';
+import { PickerButton } from 'components/Common/Picker/PickerButton';
+import { TabbedMenu } from 'components/Common/TabMenu';
 import { formatSimpleDate } from 'utils/dateUtils';
-import { paginate } from 'utils/paginate';
 import SearchBar from 'components/SearchBar/SearchBar';
-import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
-import { Circle } from 'components/Common/Circle';
 import { InteractionModalCard } from './InteractionModalCard';
 
 interface TableProps {
@@ -58,36 +53,12 @@ interface TableProps {
   filterCampaignId?: string | 'all' | null;
 }
 
-const AvatarContainer = styled(UI.Flex)`
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
-`;
-
 const undefinedToNull = (value: any) => {
   if (value === undefined) {
     return 'all';
   }
 
   return value;
-};
-
-const Avatar = ({ name, brand }: { name: string, brand: string }) => {
-  const firstLetter = name.slice(0, 1);
-
-  return (
-    <AvatarContainer
-      alignItems="center"
-      justifyContent="center"
-      bg={`${brand}.100`}
-      width="30px"
-      height="30px"
-      color={`${brand}.600`}
-      borderRadius="10px"
-    >
-      <UI.Span fontWeight="600">
-        {firstLetter}
-      </UI.Span>
-    </AvatarContainer>
-  );
 };
 
 const DeliveryUserCell = ({ delivery }: { delivery: DeliveryFragmentFragment }) => (
@@ -188,53 +159,54 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
 
     <UI.Div>
       {session.delivery ? (
-        <Table.PopButton renderBody={() => (
-          <>
-            <UI.Helper>Origin</UI.Helper>
-            <UI.Stack spacing={1}>
-              <UI.Stack isInline>
-                <UI.Text>Url:</UI.Text>
-                <UI.Muted>
-                  <UI.Span fontSize="0.7rem">
-                    {session.originUrl}
-                  </UI.Span>
-                </UI.Muted>
-              </UI.Stack>
-              <UI.Div>
+        <Table.InnerCell
+          header="Origin"
+          renderBody={() => (
+            <>
+              <UI.Stack spacing={1}>
                 <UI.Stack isInline>
-                  <UI.Text>Campaign:</UI.Text>
-                  <UI.Div>
-                    <UI.Muted>
-                      <UI.Span fontSize="0.7rem">
-                        {session.delivery?.campaignVariant?.campaign?.label}
-                      </UI.Span>
-                    </UI.Muted>
-                    {!!session.delivery?.campaignVariant?.campaign?.id && (
-                      <UI.Button
-                        size="xs"
-                        onClick={
-                          () => goToCampaignView(session.delivery?.campaignVariant?.campaign?.id || '')
-                        }
-                      >
-                        View campaign
-                      </UI.Button>
-                    )}
-                  </UI.Div>
+                  <UI.Text>Url:</UI.Text>
+                  <UI.Muted>
+                    <UI.Span fontSize="0.7rem">
+                      {session.originUrl}
+                    </UI.Span>
+                  </UI.Muted>
                 </UI.Stack>
-              </UI.Div>
-              <UI.Stack isInline alignItems="center">
-                <UI.Text>Campaign variant:</UI.Text>
-                <UI.Muted>
-                  <UI.Span fontSize="0.7rem">
-                    {session.delivery?.campaignVariant?.label}
-                    {' - '}
-                    {session.delivery?.campaignVariant?.type}
-                  </UI.Span>
-                </UI.Muted>
+                <UI.Div>
+                  <UI.Stack isInline>
+                    <UI.Text>Campaign:</UI.Text>
+                    <UI.Div>
+                      <UI.Muted>
+                        <UI.Span fontSize="0.7rem">
+                          {session.delivery?.campaignVariant?.campaign?.label}
+                        </UI.Span>
+                      </UI.Muted>
+                      {!!session.delivery?.campaignVariant?.campaign?.id && (
+                        <UI.Button
+                          size="xs"
+                          onClick={
+                            () => goToCampaignView(session.delivery?.campaignVariant?.campaign?.id || '')
+                          }
+                        >
+                          View campaign
+                        </UI.Button>
+                      )}
+                    </UI.Div>
+                  </UI.Stack>
+                </UI.Div>
+                <UI.Stack isInline alignItems="center">
+                  <UI.Text>Campaign variant:</UI.Text>
+                  <UI.Muted>
+                    <UI.Span fontSize="0.7rem">
+                      {session.delivery?.campaignVariant?.label}
+                      {' - '}
+                      {session.delivery?.campaignVariant?.type}
+                    </UI.Span>
+                  </UI.Muted>
+                </UI.Stack>
               </UI.Stack>
-            </UI.Stack>
-          </>
-        )}
+            </>
+          )}
         >
           <UI.Flex>
             <UI.Div>
@@ -265,10 +237,10 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
               </UI.Flex>
             </UI.Div>
           </UI.Flex>
-        </Table.PopButton>
+        </Table.InnerCell>
       ) : (
         <>
-          <Table.PopButton>
+          <Table.InnerCell>
             <UI.Div>
               <UI.Flex>
                 <Circle flexShrink={0} brand="gray" mr={2}>
@@ -284,7 +256,7 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
                 </UI.Div>
               </UI.Flex>
             </UI.Div>
-          </Table.PopButton>
+          </Table.InnerCell>
         </>
       )}
     </UI.Div>
@@ -356,10 +328,10 @@ const ActiveFilters = ({
 interface CampaignVariant {
   id: string;
   label: string;
-  campaign: {
+  campaign?: {
     id: string;
     label: string;
-  }
+  } | null;
 }
 
 export const InteractionsOverview = () => {
@@ -423,19 +395,21 @@ export const InteractionsOverview = () => {
     });
   };
 
-  const handleDateChange = (dates: Date[]) => {
+  const handleDateChange = (dates: Date[] | null) => {
     if (dates) {
       const [newStartDate, newEndDate] = dates;
       setFilter({
         ...filter,
         startDate: startOfDay(newStartDate),
         endDate: endOfDay(newEndDate),
+        pageIndex: 0,
       });
     } else {
       setFilter({
         ...filter,
         startDate: null,
         endDate: null,
+        pageIndex: 0,
       });
     }
   };
@@ -490,29 +464,76 @@ export const InteractionsOverview = () => {
       </UI.ViewHead>
 
       <UI.ViewBody>
-        <UI.Flex mb={2} justifyContent="flex-end">
+        <UI.Flex mb={2} justifyContent="flex-start">
           <UI.Stack isInline spacing={2} alignItems="center">
-            <UI.Div>
-              <UI.DatePicker
-                value={[filter.startDate, filter.endDate]}
-                onChange={handleDateChange}
-                range
-              />
-            </UI.Div>
+            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={<Plus />}>
+              {() => (
+                <TabbedMenu
+                  menuHeader={t('add_filter')}
+                  tabs={[
+                    { label: t('search'), icon: <Search /> },
+                    { label: t('date'), icon: <Calendar /> },
+                    { label: t('origin'), icon: <MessageCircle /> },
+                  ]}
+                >
+                  <UI.Div id="searchFilter">
+                    <UI.Stack>
+                      <UI.RadioHeader>
+                        {t('filter_by_search')}
+                      </UI.RadioHeader>
+                      <UI.Div mb={1}>
+                        <UI.Muted>{t('filter_by_search_helper')}</UI.Muted>
+                      </UI.Div>
+                      <SearchBar
+                        activeSearchTerm={filter.search}
+                        onSearchTermChange={handleSearchTermChange}
+                      />
+                    </UI.Stack>
+                  </UI.Div>
 
-            <CampaignVariantPicker
-              defaultValues={{
-                filterCampaignVariant: undefinedToNull(filter.filterCampaignId),
-                filterCampaigns: undefinedToNull(filter.filterCampaigns),
-              }}
-              campaignVariants={campaignVariants}
-              onApply={handleCampaignVariantFilterChange}
-            />
+                  <UI.Div id="dateFilter">
+                    <UI.Stack spacing={2}>
+                      <UI.RadioHeader>
+                        {t('filter_by_date')}
+                      </UI.RadioHeader>
+                      <UI.Div mb={1}>
+                        <UI.Muted>Show interactions between</UI.Muted>
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.DatePicker
+                          value={[filter.startDate, filter.endDate]}
+                          onChange={handleDateChange}
+                          range
+                        />
+                      </UI.Div>
+                      <UI.Button size="sm" onClick={() => handleDateChange(null)}>{t('reset')}</UI.Button>
+                    </UI.Stack>
+                  </UI.Div>
+                  <UI.Div id="campaignFilter">
+                    <UI.Stack>
+                      <FilterByCampaignForm
+                        defaultValues={{
+                          filterCampaignVariant: undefinedToNull(filter.filterCampaignId),
+                          filterCampaigns: undefinedToNull(filter.filterCampaigns),
+                        }}
+                        campaignVariants={campaignVariants}
+                        onApply={handleCampaignVariantFilterChange}
+                      />
+                    </UI.Stack>
+                  </UI.Div>
+                </TabbedMenu>
+              )}
+            </PickerButton>
+
+            <UI.Separator bg="gray.200" />
+
+            {/* @ts-ignore */}
+            <ActiveFilters filter={filter} setFilters={setFilter} />
+
           </UI.Stack>
         </UI.Flex>
         <UI.Flex mb={4} justifyContent="flex-end">
           {/* @ts-ignore */}
-          <ActiveFilters filter={filter} setFilters={setFilter} />
         </UI.Flex>
         <UI.Div width="100%">
           <Table.HeadingRow gridTemplateColumns="1fr 1fr 1fr 1fr">
@@ -647,7 +668,7 @@ export const InteractionsOverview = () => {
           </UI.Div>
           <UI.Flex justifyContent="flex-end" mt={4}>
             {totalPages > 1 && (
-              <Pagination
+              <Table.Pagination
                 pageIndex={filter.pageIndex}
                 maxPages={totalPages}
                 perPage={filter.perPage}
@@ -691,182 +712,10 @@ export const InteractionsOverview = () => {
   );
 };
 
-interface PaginationProps {
-  pageIndex: number;
-  maxPages: number;
-  perPage: number;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setPageIndex: (page: number) => void;
-  isLoading: boolean;
-}
-
-const PaginationContainer = styled(UI.Div)`
-  box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
-  display: inline-block;
-  border-radius: 10px;
-`;
-
-const Pagination = ({
-  pageIndex,
-  maxPages,
-  perPage,
-  setPageIndex,
-  isLoading,
-}: PaginationProps) => {
-  const { t } = useTranslation();
-  const { pages } = paginate(maxPages, pageIndex + 1, perPage, 5);
-  const startedRef = useRef<boolean>(false);
-  const [inputPageIndex, setInputPageIndex] = useState(1);
-
-  useDebouncedEffect(() => {
-    if (startedRef.current) {
-      startedRef.current = false;
-      setPageIndex(Math.max(1, Number(inputPageIndex)));
-    }
-  }, 500, [inputPageIndex]);
-
-  useEffect(() => {
-    if (!startedRef.current) {
-      startedRef.current = false;
-      setInputPageIndex(pageIndex + 1);
-    }
-  }, [pageIndex, setInputPageIndex]);
-
-  return (
-    <PaginationContainer bg="white" padding={2}>
-      <UI.Flex alignItems="center">
-        <UI.Div mr={2}>
-          {t('page')}
-          {' '}
-          {pageIndex + 1}
-          {' '}
-          {t('out_of')}
-          {' '}
-          {maxPages}
-        </UI.Div>
-        <UI.Input
-          type="number"
-          value={inputPageIndex}
-          width={40}
-          // @ts-ignore
-          onChange={(e) => { startedRef.current = true; setInputPageIndex(e.target.value); }}
-        />
-        {pages.length > 1 && (
-          <>
-            <UI.Stack spacing={2} isInline ml={2}>
-              {pages.map((page) => (
-                <UI.Button
-                  size="sm"
-                  variantColor="teal"
-                  isActive={page - 1 === pageIndex}
-                  key={page}
-                  isDisabled={isLoading}
-                  onClick={() => setPageIndex(page)}
-                >
-                  {page}
-                </UI.Button>
-              ))}
-            </UI.Stack>
-          </>
-        )}
-
-      </UI.Flex>
-    </PaginationContainer>
-  );
-};
-interface PickerContainerProps {
-  isActive?: boolean;
-}
-
-const PickerContainer = styled(UI.Div) <PickerContainerProps>`
-  ${({ theme, isActive }) => css`
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
-    border: none;
-    padding: 6px 10px;
-    font-weight: 700;
-    color: ${theme.colors.gray[500]};
-
-    ${UI.Span} {
-      padding-right: ${theme.gutter / 3}px;
-    }
-
-    ${UI.Icon} {
-      padding-left: ${theme.gutter / 3}px;
-      border-left: 1px solid ${theme.colors.gray[200]};
-      color: ${theme.colors.gray[500]};
-
-      ${isActive && css`
-        color: ${theme.colors.blue[500]};
-      `}
-    }
-  `}
-`;
-
 interface CampaignVariantFormProps {
   filterCampaigns?: string;
   filterCampaignVariant?: string;
 }
-
-interface CampaignVariantPickerProps {
-  defaultValues: CampaignVariantFormProps;
-  campaignVariants: CampaignVariant[];
-  onApply: (filterValues: CampaignVariantFormProps) => void;
-}
-
-const CampaignVariantPicker = ({ defaultValues, campaignVariants, onApply }: CampaignVariantPickerProps) => {
-  const { onOpen, onClose, isOpen } = useDisclosure();
-
-  const handleSave = (filterValues: CampaignVariantFormProps) => {
-    onApply(filterValues);
-    onClose();
-  };
-
-  const isActive = defaultValues.filterCampaignVariant !== 'all' || defaultValues.filterCampaigns !== 'all';
-
-  return (
-    <Popover
-      usePortal
-      isOpen={isOpen}
-      onOpen={onOpen}
-      closeOnBlur={false}
-      onClose={onClose}
-    >
-      <PopoverTrigger>
-        <PickerContainer isActive={isActive}>
-          <UI.Span>
-            Filter campaigns
-          </UI.Span>
-          <UI.Icon>
-            <Filter />
-          </UI.Icon>
-        </PickerContainer>
-      </PopoverTrigger>
-      <PopoverContent
-        zIndex={300}
-        borderWidth={0}
-        borderRadius={10}
-        boxShadow="0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important"
-      >
-        <PopoverHeader>
-          <UI.Helper>
-            Filter campaigns
-          </UI.Helper>
-        </PopoverHeader>
-        <PopoverCloseButton />
-
-        <FilterByCampaignForm
-          defaultValues={defaultValues}
-          onApply={handleSave}
-          campaignVariants={campaignVariants}
-        />
-      </PopoverContent>
-    </Popover>
-  );
-};
 
 interface FilterByCampaignFormProps {
   defaultValues: CampaignVariantFormProps;
@@ -875,6 +724,7 @@ interface FilterByCampaignFormProps {
 }
 
 const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: FilterByCampaignFormProps) => {
+  const { t } = useTranslation();
   const form = useForm<CampaignVariantFormProps>({
     defaultValues: {
       filterCampaignVariant: defaultValues.filterCampaignVariant,
@@ -890,48 +740,54 @@ const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: Filt
 
   return (
     <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
-      <UI.Div py={2} px={2}>
-        Filter campaign types
-        <Controller
-          control={form.control}
-          name="filterCampaigns"
-          defaultValue={defaultValues.filterCampaigns}
-          render={({ onChange, value }) => (
-            <RadioGroup size="sm" onChange={onChange} value={value}>
-              <Radio value="all" mb={0}>All</Radio>
-              <Radio value={SessionDeliveryType.Campaigns} mb={0}>Only campaigns</Radio>
-              <Radio value={SessionDeliveryType.NoCampaigns} mb={0}>Only non-campaigns</Radio>
-            </RadioGroup>
+      <UI.Stack>
+        <UI.Div>
+          <UI.RadioHeader>
+            {t('filter_by_origin_type')}
+          </UI.RadioHeader>
+          <Controller
+            control={form.control}
+            name="filterCampaigns"
+            defaultValue={defaultValues.filterCampaigns}
+            render={({ onChange, value }) => (
+              <RadioGroup size="sm" onChange={onChange} value={value}>
+                <Radio value="all" mb={0}>All</Radio>
+                <Radio value={SessionDeliveryType.Campaigns} mb={0}>Only campaigns</Radio>
+                <Radio value={SessionDeliveryType.NoCampaigns} mb={0}>Only link-clicks</Radio>
+              </RadioGroup>
+            )}
+          />
+
+          {filterCampaignWatch !== SessionDeliveryType.NoCampaigns && (
+            <UI.Div mt={2}>
+              <UI.RadioHeader>
+                Pick campaigns
+              </UI.RadioHeader>
+              <Controller
+                control={form.control}
+                name="filterCampaignVariant"
+                defaultValue={defaultValues.filterCampaignVariant}
+                render={({ onChange, value }) => (
+                  <RadioGroup size="sm" onChange={onChange} value={value}>
+                    <Radio value="all" mb={0}>All</Radio>
+                    {campaignVariants.map((variant) => (
+                      <Radio key={variant.id} value={variant.id} mb={0}>
+                        {variant?.campaign?.label}
+                        {' '}
+                        -
+                        {' '}
+                        {variant.label}
+                      </Radio>
+                    ))}
+                  </RadioGroup>
+                )}
+              />
+            </UI.Div>
           )}
-        />
+        </UI.Div>
 
-        {filterCampaignWatch !== SessionDeliveryType.NoCampaigns && (
-          <UI.Div mt={2}>
-            Pick campaign
-            <Controller
-              control={form.control}
-              name="filterCampaignVariant"
-              defaultValue={defaultValues.filterCampaignVariant}
-              render={({ onChange, value }) => (
-                <RadioGroup size="sm" onChange={onChange} value={value}>
-                  <Radio value="all" mb={0}>All</Radio>
-                  {campaignVariants.map((variant) => (
-                    <Radio key={variant.id} value={variant.id} mb={0}>
-                      {variant?.campaign?.label}
-                      {' '}
-                      -
-                      {' '}
-                      {variant.label}
-                    </Radio>
-                  ))}
-                </RadioGroup>
-              )}
-            />
-          </UI.Div>
-        )}
-      </UI.Div>
-
-      <UI.Button type="submit" variantColor="teal" size="sm" ml={2} mb={4}>Apply filters</UI.Button>
+        <UI.Button type="submit" variantColor="teal" size="sm" mb={4}>Apply filters</UI.Button>
+      </UI.Stack>
     </UI.Form>
   );
 };

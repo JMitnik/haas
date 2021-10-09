@@ -156,3 +156,12 @@ export const ErrorPane = ({ header, text, renderCallToAction }: ErrorPaneProps) 
     )}
   </Div>
 );
+
+export const Separator = styled(Div)`
+  ${({ theme }) => css`
+    width: 2px;
+    height: 80%;
+    margin-left: ${theme.gutter / 2}px;
+    margin-right: ${theme.gutter / 2}px;
+  `}
+`

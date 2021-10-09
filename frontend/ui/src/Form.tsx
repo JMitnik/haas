@@ -7,7 +7,7 @@ import {
   Slider as AntdSlider,
   // DatePicker as AntdDatepicker,
 } from 'antd';
-import { Div, Paragraph, SectionHeader } from '@haas/ui';
+import { Div, Paragraph, SectionHeader, Strong } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
 import {
   ButtonProps as ChakraButtonProps,
@@ -567,6 +567,14 @@ export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDiv
 ));
 
 export const FormSectionHeader = styled(SectionHeader)``;
+
+export const RadioHeader = styled(Strong)`
+  ${({ theme }) => css`
+    padding-bottom: ${theme.gutter / 2}px;
+    margin-bottom: ${theme.gutter / 2}px;
+    border-bottom: 1px solid ${theme.colors.gray[200]};
+  `}
+`;
 
 export const FormSectionHelper = styled(Text)`
   ${({ theme }) => css`

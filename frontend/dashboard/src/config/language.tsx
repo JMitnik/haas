@@ -1,6 +1,34 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    reset: {
+      en: 'Reset',
+      de: 'Zurücksetzen',
+    },
+    filter_by_search_helper: {
+      en: 'Search by questions, answers, delivery name, etc',
+      de: 'Suche nach Fragen, Antworten, Namen der Zustellungsempfänger',
+    },
+    filter_by_origin_type: {
+      en: 'Filter by origin type',
+      de: 'Filter nach Herkunftsart',
+    },
+    filter_by_search: {
+      en: 'Filter by search',
+      de: 'Nach Suche filtern',
+    },
+    filter_by_date: {
+      en: 'Filter by date',
+      de: 'Nach Datum filtern',
+    },
+    origin: {
+      en: 'Origin',
+      de: 'Herkunftsart',
+    },
+    add_filter: {
+      en: 'Add filter',
+      de: 'Add filter',
+    },
     campaign: {
       en: 'Campaign',
       de: 'Kampagne',

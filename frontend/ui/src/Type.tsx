@@ -120,3 +120,11 @@ export const Muted = styled(GenericType).attrs({ as: 'p' })`
     color: ${theme.colors.gray['500']};
   `}
 `;
+
+export const Strong = styled(GenericType).attrs({ as: 'p' })`
+  ${({ theme }) => css`
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: ${theme.colors.gray['600']};
+  `}
+`;
