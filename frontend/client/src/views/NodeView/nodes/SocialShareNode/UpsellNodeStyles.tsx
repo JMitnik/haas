@@ -7,7 +7,7 @@ export const DrawerContainer = styled(UI.Div)`
     display: grid;
     row-gap: 2em;
     background: ${Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()};
-    
+
     padding: 24px;
     border-radius: 30px;
     box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
@@ -29,6 +29,7 @@ export const HeaderContainer = styled(TextGradient)`
 
 export const SubheaderContainer = styled(TextGradient)`
   font-size: 1em;
+  max-width: 300px;
 `;
 
 export const ImageContainer = styled(UI.Div)`
@@ -45,7 +46,7 @@ export const RedirectButton = styled.a`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
-  
+
     max-width: fit-content;
     font-weight: bold;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.05);
@@ -55,7 +56,7 @@ export const RedirectButton = styled.a`
     animation: 2s pulse infinite;
     text-decoration: none;
 
-    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()}); 
+    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()});
     font-family: 'Inter', sans-serif;
     color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
 
@@ -64,13 +65,13 @@ export const RedirectButton = styled.a`
       color: ${Color(theme.colors.primary).isDark() ? Color('white').hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
     }
   `}
-  
+
   @keyframes pulse {
     0% {
       transform: scale(0.95);
       box-shadow: 0 0 0 0 rgba(0, 0 ,0, 0.7);
     }
-    
+
     70% {
       transform: scale(1);
       box-shadow: 0 0 0 5px rgba(0, 0 ,0, 0);
