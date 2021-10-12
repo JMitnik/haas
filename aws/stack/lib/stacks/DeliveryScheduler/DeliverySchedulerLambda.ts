@@ -2,12 +2,8 @@ import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { format, parse } from 'date-fns';
 
-const credentials = new AWS.SharedIniFileCredentials({ profile: 'haas-prod' });
-
 const dbClient = new AWS.DynamoDB.DocumentClient({
-  region: 'eu-central-1',
   endpoint: process.env.AWS_SAM_LOCAL ? 'http://host.docker.internal:8000' : undefined,
-  credentials
 });
 
 const TABLE_NAME = 'CampaignDeliveries';
@@ -28,9 +24,13 @@ exports.lambdaHandler = async () => {
   try {
     const endDate = Date.now();
     const scheduledItems = await queryPendingScheduledItems(endDate);
-    // const updatedPendingItems = await updatePendingItems(scheduledItems);
-    // return updatedPendingItems;
 
+    if (scheduledItems.length > 0) {
+      console.log(`Will deploy ${scheduledItems.length} items`);
+    }
+
+    const updatedPendingItems = await updatePendingItems(scheduledItems);
+    return updatedPendingItems;
   } catch (err) {
     console.error(err);
     return err;
@@ -101,7 +101,7 @@ const queryPendingScheduledItems = async (
   const items = results?.Items || [];
 
   if (items.length > 0) {
-    const numberItems = Math.min(items.length - 1, maxItems);
+    const numberItems = Math.min(items.length, maxItems);
     return items.slice(0, numberItems);
   }
 
