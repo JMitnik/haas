@@ -750,6 +750,7 @@ export type LinkType = {
 };
 
 export enum LinkTypeEnumType {
+  Single = 'SINGLE',
   Social = 'SOCIAL',
   Api = 'API',
   Facebook = 'FACEBOOK',

@@ -1,4 +1,6 @@
+import * as UI from '@haas/ui';
 import { UseFormMethods } from 'react-hook-form';
+import React from 'react';
 
 export interface LinkInputProps {
   id?: string | null;
@@ -47,3 +49,14 @@ export interface FormDataProps {
     }[];
   };
 }
+
+interface LinkSectionHeaderProps {
+  title: string;
+}
+
+export const LinkSectionHeader = ({ title }: LinkSectionHeaderProps) => (
+  <UI.Div style={{ fontSize: '1.5em' }} gridColumn="1/-1">
+    <UI.Div>{title}</UI.Div>
+    <UI.Hr style={{ padding: '0px' }} />
+  </UI.Div>
+);

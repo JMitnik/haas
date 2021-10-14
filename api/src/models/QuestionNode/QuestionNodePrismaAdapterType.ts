@@ -12,7 +12,7 @@ export type CreateCTAInput = {
     backgroundColor: string | undefined;
     iconUrl: string | undefined;
     title: string | undefined;
-    type: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP";
+    type: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP" | "SINGLE";
     url: string;
   }[],
   share: {

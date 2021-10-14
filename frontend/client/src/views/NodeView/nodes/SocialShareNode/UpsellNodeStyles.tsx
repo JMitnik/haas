@@ -41,8 +41,12 @@ export const ImageContainer = styled(UI.Div)`
   }
 `;
 
-export const RedirectButton = styled.a`
-  ${({ theme }) => css`
+interface RedirectButtonProps {
+  overrideBackgroundColor?: string;
+}
+
+export const RedirectButton = styled.a<RedirectButtonProps>`
+  ${({ theme, overrideBackgroundColor }) => css`
     display: flex;
     align-items: center;
   
@@ -63,6 +67,17 @@ export const RedirectButton = styled.a`
       cursor: pointer;
       color: ${Color(theme.colors.primary).isDark() ? Color('white').hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
     }
+
+    ${overrideBackgroundColor && css`
+      background: linear-gradient(45deg, ${Color(overrideBackgroundColor).lighten(0.3).hex()}, ${Color(overrideBackgroundColor).lighten(0.3).saturate(1).hex()}); 
+      font-family: 'Inter', sans-serif;
+      color: ${Color(overrideBackgroundColor).isDark() ? Color(overrideBackgroundColor).mix(Color('white'), 0.8).saturate(1).hex() : Color(overrideBackgroundColor).mix(Color('black'), 0.5).saturate(1).hex()};
+
+      :hover {
+        cursor: pointer;
+        color: ${Color(overrideBackgroundColor).isDark() ? Color('white').hex() : Color(overrideBackgroundColor).mix(Color('black'), 0.5).saturate(1).hex()};
+      }
+    `}
   `}
   
   @keyframes pulse {
@@ -81,4 +96,35 @@ export const RedirectButton = styled.a`
       box-shadow: 0 0 0 0px rgba(0, 0, 0, 0);
     }
   }
+`;
+
+export const ButtonIconContainer = styled(UI.Div) <RedirectButtonProps>`
+   //TODO: Adjust color of custom icon using inverse CSS property (?)
+   ${({ theme, overrideBackgroundColor }) => css`    
+      img {
+        color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+        width: 24px;
+        height: auto
+      }
+
+      svg {
+        color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+        width: 24px;
+        height: auto;
+      }
+
+      ${overrideBackgroundColor && css` 
+        img {
+          color: ${Color(overrideBackgroundColor).isDark() ? Color(overrideBackgroundColor).mix(Color('white'), 0.8).saturate(1).hex() : Color(overrideBackgroundColor).mix(Color('black'), 0.5).saturate(1).hex()};
+          width: 24px;
+          height: auto
+        }
+
+        svg {
+          color: ${Color(overrideBackgroundColor).isDark() ? Color(overrideBackgroundColor).mix(Color('white'), 0.8).saturate(1).hex() : Color(overrideBackgroundColor).mix(Color('black'), 0.5).saturate(1).hex()};
+          width: 24px;
+          height: auto;
+        }
+      `}
+   `}
 `;

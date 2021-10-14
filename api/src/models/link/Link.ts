@@ -7,6 +7,7 @@ import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 export const LinkTypeEnumType = enumType({
   name: 'LinkTypeEnumType',
   members: [
+    'SINGLE',
     'SOCIAL',
     'API',
     'FACEBOOK',
