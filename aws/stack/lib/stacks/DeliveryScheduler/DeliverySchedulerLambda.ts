@@ -65,7 +65,8 @@ const updatePendingItems = async (
 /**
  * Query SCHEDULED items which have a delivery-date before NOW.
  *
- * - Does this for `maxItems` items. The idea is that
+ * - Does this for `maxItems` items. The idea is that we only handle a number of items a time (so that we don't perform
+ *   for example 300 writes at a time). At the next scheduled lambda call, we handle the next `maxItems`.
  */
 const queryPendingScheduledItems = async (
   endDateTimestamp: Date | number,
