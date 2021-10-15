@@ -17,6 +17,9 @@ interface DeliverySchedulerConstructProps {
  * Creates:
  * - An EventsBridge rule that runs every 2 minutes.
  * - A Lambda function that gets invoked by the rule. This lambda requires read and write permission by the dynamo-table.
+ *
+ * Pre-conditions:
+ * - A table has been created in the current environment, called CampaignTable.
  */
 export class DeliverySchedulerConstruct extends cdk.Construct {
   constructor(scope: cdk.Construct, id: string, props?: DeliverySchedulerConstructProps) {
