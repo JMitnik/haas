@@ -41,6 +41,36 @@ export class CampaignPrismaAdapter {
   }
 
   /**
+   * Find campaign variant of delivery.
+   * @param deliveryId
+   */
+  findCampaignVariantOfDelivery = async (deliveryId: string) => {
+    return this.prisma.delivery.findUnique({
+      where: { id: deliveryId }
+    }).campaignVariant();
+  }
+
+  /**
+   * Find campaign variant of delivery.
+   * @param deliveryId
+   */
+  findWorkspaceOfCampaignVariant = async (campaignVariantId: string) => {
+    return this.prisma.campaignVariant.findUnique({
+      where: { id: campaignVariantId }
+    }).workspace();
+  }
+
+  /**
+   * Find campaign variant of delivery.
+   * @param deliveryId
+   */
+  findDialogueOfCampaignVariant = async (campaignVariantId: string) => {
+    return this.prisma.campaignVariant.findUnique({
+      where: { id: campaignVariantId }
+    }).dialogue();
+  }
+
+  /**
    * Create campaign from campaign-input.
    */
   createCampaign = async (input: NexusGenInputs['CreateCampaignInputType']) => {

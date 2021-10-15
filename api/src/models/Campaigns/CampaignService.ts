@@ -44,6 +44,27 @@ export class CampaignService {
   }
 
   /**
+   * Find all campaign-variants of delivery.
+   */
+  findCampaignVariantOfDelivery = async (deliveryId: string) => {
+    return this.prismaAdapter.findCampaignVariantOfDelivery(deliveryId);
+  }
+
+  /**
+   * Find workspace of campaign-variant.
+   */
+  findWorkspaceOfCampaignVariant = async (campaignVariantId: string) => {
+    return this.prismaAdapter.findWorkspaceOfCampaignVariant(campaignVariantId);
+  }
+
+  /**
+   * Find delivery of campaign-variant.
+   */
+  findDialogueOfCampaignVariant = async (campaignVariantId: string) => {
+    return this.prismaAdapter.findDialogueOfCampaignVariant(campaignVariantId);
+  }
+
+  /**
    * Find delivery of session.
    * @param campaignId
    * @returns

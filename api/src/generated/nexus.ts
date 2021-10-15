@@ -518,13 +518,11 @@ export interface NexusGenRootTypes {
     campaign?: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     customVariables?: NexusGenRootTypes['CampaignVariantCustomVariableType'][] | null; // [CampaignVariantCustomVariableType!]
     deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
-    dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     from?: string | null; // String
     id: string; // ID!
     label: string; // String!
     type: NexusGenEnums['CampaignVariantEnum']; // CampaignVariantEnum!
     weight: number; // Int!
-    workspace?: NexusGenRootTypes['Customer'] | null; // Customer
   }
   ColourSettings: prisma.ColourSettings;
   CreateBatchDeliveriesOutputType: { // root type
