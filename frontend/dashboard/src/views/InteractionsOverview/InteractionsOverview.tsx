@@ -444,6 +444,8 @@ export const InteractionsOverview = () => {
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [contextInteraction, setContextInteraction] = useState<SessionFragmentFragment>();
 
+  const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
+
   return (
     <>
       <UI.ViewHead>
@@ -537,7 +539,7 @@ export const InteractionsOverview = () => {
           {/* @ts-ignore */}
         </UI.Flex>
         <UI.Div width="100%">
-          <Table.HeadingRow gridTemplateColumns="1fr 1fr 1fr 1fr">
+          <Table.HeadingRow gridTemplateColumns={columns}>
             <Table.HeadingCell>
               {t('user')}
             </Table.HeadingCell>
@@ -638,7 +640,7 @@ export const InteractionsOverview = () => {
             {sessions.map((session) => (
               <Table.Row
                 onClick={() => goToInteractionsView(session.id)}
-                gridTemplateColumns="1fr 1fr 1fr 1fr"
+                gridTemplateColumns={columns}
                 key={session.id}
                 onContextMenu={(e) => {
                   e.preventDefault();

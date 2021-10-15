@@ -217,7 +217,10 @@ class SessionPrismaAdapter {
 
   /**
    * Fetches single session from database.
-   * */
+   *
+   * Notes:
+   * - Includes node-entries
+  */
   findSessionById(sessionId: string): Promise<Session | null> {
     return this.prisma.session.findUnique({
       where: {
@@ -225,6 +228,7 @@ class SessionPrismaAdapter {
       },
       include: {
         nodeEntries: {
+          orderBy: { depth: 'asc' },
           include: {
             choiceNodeEntry: true,
             linkNodeEntry: true,

@@ -55,7 +55,7 @@ interface NavLinkProps extends LinkProps {
   isDisabled?: boolean;
 }
 
-export const NavLinkContainer = styled(NavLink)<NavLinkProps>`
+export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
   ${({ theme, isDisabled }) => css`
     color: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['600']};
     padding: 8px 11px;
@@ -296,6 +296,7 @@ export const SidenavContainer = styled.div`
     z-index: 1200;
     font-weight: 1000;
     width: ${theme.sidenav.width}px;
+    background: ${theme.colors.gray[100]};
     border-right: 1px solid ${theme.colors.gray['200']};
 
     /* background: ${theme.isDarkColor ? theme.colors.primary : theme.colors.primaries['700']}; */
