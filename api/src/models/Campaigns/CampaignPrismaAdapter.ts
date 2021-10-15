@@ -49,18 +49,18 @@ export class CampaignPrismaAdapter {
    * @returns
    */
   findCampaignOfVariantId = async (campaignVariantId: string) => {
-    const edges = await this.prisma.campaign.findUnique({
+    const edges = await this.prisma.campaignVariant.findUnique({
       where: { id: campaignVariantId },
       include: {
-        variantsEdges: {
+        CampaignVariantToCampaign: {
           include: {
-            campaign: true
+            campaign: true,
           }
         }
       }
     });
 
-    return edges?.variantsEdges[0].campaign;
+    return edges?.CampaignVariantToCampaign[0].campaign;
   }
 
   /**
