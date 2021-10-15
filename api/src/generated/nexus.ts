@@ -515,7 +515,6 @@ export interface NexusGenRootTypes {
   }
   CampaignVariantType: { // root type
     body: string; // String!
-    campaign?: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     customVariables?: NexusGenRootTypes['CampaignVariantCustomVariableType'][] | null; // [CampaignVariantCustomVariableType!]
     deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     from?: string | null; // String

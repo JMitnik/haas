@@ -37,6 +37,22 @@ export class CampaignService {
   }
 
   /**
+   * Find delivery
+   * @param workspaceId
+   * @returns
+   */
+  findDelivery = async (deliveryId: string) => {
+    return this.prismaAdapter.findDelivery(deliveryId);
+  }
+
+  /**
+   * Find all campaigns of workspace.
+   */
+  findCampaignOfVariantId = async (campaignVariantId: string) => {
+    return this.prismaAdapter.findCampaignOfVariantId(campaignVariantId);
+  }
+
+  /**
    * Find all campaigns of workspace.
    */
   findCampaignsOfWorkspace = async (workspaceId: string) => {

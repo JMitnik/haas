@@ -41,6 +41,29 @@ export class CampaignPrismaAdapter {
   }
 
   /**
+   * Find campaign of campaign-variant
+   *
+   * Warning: (not a good query.)
+   *
+   * @param campaignVariantId
+   * @returns
+   */
+  findCampaignOfVariantId = async (campaignVariantId: string) => {
+    const edges = await this.prisma.campaign.findUnique({
+      where: { id: campaignVariantId },
+      include: {
+        variantsEdges: {
+          include: {
+            campaign: true
+          }
+        }
+      }
+    });
+
+    return edges?.variantsEdges[0].campaign;
+  }
+
+  /**
    * Find campaign variant of delivery.
    * @param deliveryId
    */
@@ -189,6 +212,9 @@ export class CampaignPrismaAdapter {
 
   /**
    * Find delivery
+   *
+   * Note:
+   * - Eager loads `campaign` and `campaignVariant` as well (often requested together).
    * @param id
    * @returns
    */

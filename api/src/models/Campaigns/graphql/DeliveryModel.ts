@@ -29,7 +29,17 @@ export const DeliveryModel = objectType({
     t.date('scheduledAt', { nullable: true });
     t.date('updatedAt', { nullable: true });
 
-    t.field('campaignVariant', { type: CampaignVariantModel });
+    t.field('campaignVariant', {
+      type: CampaignVariantModel,
+      nullable: true,
+      resolve: (parent, _, ctx) => {
+        // @ts-ignore
+        if (parent.campaignVariant) return parent.campaignVariant;
+
+        return ctx.services.campaignService.findCampaignVariantOfDelivery(parent.id);
+      }
+    });
+
     t.field('currentStatus', { type: DeliveryStatusEnum });
 
     t.list.field('events', {
@@ -91,23 +101,9 @@ export const GetDelivery = extendType({
       type: DeliveryModel,
       nullable: true,
       args: { deliveryId: 'String' },
-      resolve: async (parent, args, ctx) => {
+      resolve: (parent, args, ctx, info) => {
         if (!args.deliveryId) throw new UserInputError('You forgot the delivery id');
-
-        const delivery = await ctx.prisma.delivery.findFirst({
-          where: { id: args.deliveryId || '' },
-          include: {
-            events: true,
-            campaignVariant: {
-              include: {
-                dialogue: true,
-                workspace: true,
-              }
-            }
-          }
-        });
-
-        return delivery as any;
+        return ctx.services.campaignService.findDelivery(args.deliveryId);
       }
     });
   }
@@ -116,6 +112,7 @@ export const GetDelivery = extendType({
 /**
  * Access pattern to access Deliveries by campaign
  */
+// TODO: Just move this to DeliveryConnection, super-confusing otherwise.
 export const GetDeliveryConnectionOfCampaign = extendType({
   type: 'CampaignType',
 

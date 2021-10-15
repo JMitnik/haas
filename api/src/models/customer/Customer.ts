@@ -15,6 +15,7 @@ import { PaginationWhereInput } from '../general/Pagination';
 import { UserConnection, UserCustomerType } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
 import isValidColor from '../../utils/isValidColor';
+import { CampaignModel } from '../Campaigns';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -131,6 +132,22 @@ export const CustomerType = objectType({
         const users = customer?.users.map((userCustomer) => userCustomer.user) || null as any;
 
         return users;
+      },
+    });
+
+    t.list.field('campaigns', {
+      type: CampaignModel,
+      resolve: async (parent, args, ctx) => {
+        const workspaceWithCampaigns = await ctx.services.campaignService.findCampaignsOfWorkspace(parent.id);
+        if (!workspaceWithCampaigns) throw new UserInputError('Can\'t find workspace!');
+
+        return workspaceWithCampaigns.campaigns.map(campaign => ({
+          ...campaign,
+          variants: campaign.variantsEdges.map((variantEdge) => ({
+            weight: variantEdge.weight,
+            ...variantEdge.campaignVariant
+          }))
+        })) || [];
       },
     });
 

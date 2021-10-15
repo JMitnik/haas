@@ -36,7 +36,6 @@ export const CampaignVariantModel = objectType({
       resolve: (parent, _, ctx) => {
         // @ts-ignore
         if (parent.workspace) return parent.workspace;
-
         return ctx.services.campaignService.findWorkspaceOfCampaignVariant(parent.id);
       }
     });
@@ -46,11 +45,19 @@ export const CampaignVariantModel = objectType({
       resolve: (parent, _, ctx) => {
         // @ts-ignore
         if (parent.dialogue) return parent.dialogue;
-
         return ctx.services.campaignService.findDialogueOfCampaignVariant(parent.id);
       }
     });
-    t.field('campaign', { type: CampaignModel, nullable: true });
+    t.field('campaign', {
+      type: CampaignModel,
+      nullable: true,
+      resolve: (parent, _, ctx) => {
+        // @ts-ignore
+        if (parent.campaign) return parent.campaign;
+
+        return ctx.services.campaignService.findCampaignOfVariantId(parent.id);
+      }
+    });
 
     t.list.field('customVariables', { type: CampaignVariantCustomVariableType, nullable: true });
   }
