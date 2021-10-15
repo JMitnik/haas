@@ -1868,7 +1868,7 @@ export type NodeEntryFragmentFragment = (
 
 export type SessionFragmentFragment = (
   { __typename?: 'Session' }
-  & Pick<Session, 'id' | 'createdAt' | 'paths' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device'>
+  & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device'>
   & { nodeEntries: Array<(
     { __typename?: 'NodeEntry' }
     & NodeEntryFragmentFragment
@@ -2438,7 +2438,6 @@ export const SessionFragmentFragmentDoc = gql`
     fragment SessionFragment on Session {
   id
   createdAt
-  paths
   score
   originUrl
   totalTimeInSec

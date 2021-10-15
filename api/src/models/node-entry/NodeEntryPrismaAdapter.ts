@@ -1,6 +1,4 @@
-import { PrismaClient, Prisma } from "@prisma/client";
-
-import { NodeEntryWithTypes } from "./NodeEntryServiceType";
+import { PrismaClient, Prisma, NodeEntry } from "@prisma/client";
 
 class NodeEntryPrismaAdapter {
   prisma: PrismaClient;
@@ -15,24 +13,19 @@ class NodeEntryPrismaAdapter {
     });
   };
 
-  async getNodeEntriesBySessionId(sessionId: string): Promise<NodeEntryWithTypes[]> {
-    const nodeEntries = await this.prisma.nodeEntry.findMany({
-      where: { sessionId: sessionId },
+  async getNodeEntriesBySessionId(sessionId: string): Promise<NodeEntry[]> {
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
       include: {
-        choiceNodeEntry: true,
-        linkNodeEntry: true,
-        registrationNodeEntry: true,
-        sliderNodeEntry: true,
-        textboxNodeEntry: true,
-        formNodeEntry: { include: { values: true } },
-        videoNodeEntry: true,
-      },
-      orderBy: {
-        depth: 'asc',
-      },
+        nodeEntries: {
+          orderBy: {
+            depth: 'asc'
+          }
+        }
+      }
     });
 
-    return nodeEntries;
+    return session?.nodeEntries || [];
   };
 
   /**

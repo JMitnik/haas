@@ -10,7 +10,17 @@ const prisma = new PrismaClient({
       emit: 'stdout',
       level: 'warn',
     },
+    {
+      emit: 'event',
+      level: 'query',
+    }
   ]
 });
+
+if (process.env.ENVIRONMENT === 'debug') {
+  prisma.$on('query', (event) => {
+    console.log(event.query);
+  });
+}
 
 export default prisma;

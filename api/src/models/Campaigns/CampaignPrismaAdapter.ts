@@ -141,7 +141,7 @@ export class CampaignPrismaAdapter {
    * @returns
    */
   findDeliveryOfSession = async (sessionId: string) => {
-    return this.prisma.session.findFirst({
+    return this.prisma.session.findUnique({
       where: { id: sessionId }
     }).delivery();
   }

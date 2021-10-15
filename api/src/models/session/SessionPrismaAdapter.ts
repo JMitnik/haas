@@ -162,7 +162,7 @@ class SessionPrismaAdapter {
   }
 
   countSessions = async (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
-    return await this.prisma.session.count({
+    return this.prisma.session.count({
       where: this.buildFindSessionsQuery(dialogueId, filter),
     });
   }

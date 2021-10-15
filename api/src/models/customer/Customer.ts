@@ -331,16 +331,16 @@ export const CustomerQuery = extendType({
       nullable: true,
       async resolve(parent, args, ctx) {
         if (args.slug) {
-          const customer = await ctx.services.customerService.findWorkspaceBySlug(args.slug);
+          const customer = ctx.services.customerService.findWorkspaceBySlug(args.slug);
           return customer;
         }
 
         if (args.id) {
-          const customer = await ctx.services.customerService.findWorkspaceById(args.id);
+          const customer = ctx.services.customerService.findWorkspaceById(args.id);
           return customer;
         }
 
-        throw new UserInputError('Cant find the customer here');
+        throw new UserInputError('Provide workspace Slug or Id');
       },
     });
   },
