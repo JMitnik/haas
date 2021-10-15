@@ -1,4 +1,6 @@
-import { PrismaClient, SystemPermissionEnum } from "@prisma/client";
+import { NodeType, Prisma, PrismaClient } from "@prisma/client";
+import { internet, date } from "faker";
+import AuthService from "../../models/auth/AuthService";
 
 /**
  * Generates a workspace in a database.
@@ -42,20 +44,18 @@ export const seedDialogue = async (prisma: PrismaClient, workspaceId: string) =>
  * @param rolePermissions
  * @returns
  */
-export const seedUser = async (prisma: PrismaClient, workspaceId: string, rolePermissions: SystemPermissionEnum[]) => {
+export const seedUser = async (
+  prisma: PrismaClient,
+  workspaceId: string,
+  role: Prisma.RoleCreateInput,
+) => {
   const user = await prisma.user.create({
     data: {
-      id: 'TEST_USER',
-      email: 'TEST@Hotmail.com',
+      email: internet.email()
     }
   });
 
-  const userRole = await prisma.role.create({
-    data: {
-      name: 'UserRole',
-      permissions: rolePermissions
-    }
-  });
+  const userRole = await prisma.role.create({ data: role });
 
   const userRoleUser = await prisma.userOfCustomer.create({
     data: {
@@ -65,5 +65,63 @@ export const seedUser = async (prisma: PrismaClient, workspaceId: string, rolePe
     }
   });
 
-  return { user, userRole, userRoleUser }
+  const token = AuthService.createUserToken(user.id, 22);
+
+  return { user, token, userRole, userRoleUser }
+}
+
+const sample = (array: any[]) => {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+export const seedSession = async (
+  prisma: PrismaClient,
+  dialogueId: string,
+) => {
+  const session = prisma.session.create({
+    data: {
+      browser: sample(['Firefox', 'IEEdge', 'Chrome', 'Safari']),
+      dialogueId,
+      device: sample(['iPhone', 'Android', 'Mac', 'Windows ']),
+      createdAt: date.recent(),
+      nodeEntries: {
+        create: [{
+          depth: 0,
+          relatedNode: {
+            create: {
+              title: 'Test',
+              type: NodeType.SLIDER,
+            }
+          },
+          sliderNodeEntry: {
+            create: { value: Math.floor(Math.random() * 100), }
+          },
+        },
+        {
+          depth: 1,
+          choiceNodeEntry: {
+            create: {
+              value: sample(['Customer support', 'Facilities', 'Website', 'Application']),
+            }
+          },
+          relatedNode: {
+            create: { title: 'What did you think of this?', type: NodeType.CHOICE },
+          }
+        }
+        ],
+      }
+    }
+  });
+
+  return session;
+}
+
+export const seedSessions = async (
+  prisma: PrismaClient,
+  dialogueId: string,
+  nrSessions: number
+) => {
+  Promise.all(Array.from(Array(nrSessions).keys()).map(async () => {
+    return seedSession(prisma, dialogueId);
+  }));
 }
