@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { TypographyProps, typography, space, SpaceProps, color, ColorProps } from 'styled-system';
 import { Icon, Span, Div } from '.';
 
-interface GenericTypeProps extends TypographyProps, SpaceProps, ColorProps {}
+interface GenericTypeProps extends TypographyProps, SpaceProps, ColorProps { }
 
 export const GenericType = styled.p<GenericTypeProps>`
   ${color}
@@ -13,15 +13,44 @@ export const GenericType = styled.p<GenericTypeProps>`
 
 export const Text = styled(GenericType).attrs({ as: 'p' })``;
 
-export const Helper = styled(Text)`
-  ${({ theme }) => css`
+interface HelperProps {
+  color?: any;
+}
+
+export const Helper = styled(Text) <HelperProps>`
+  ${({ theme, color }) => css`
     margin: 0;
-    color: ${theme.colors.gray[500]};
+
+    ${!color && css`
+      color: ${theme.colors.gray[500]};
+    `}
     font-weight: 700;
     line-height: 1rem;
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+  `}
+`;
+
+/**
+ * Section headers are headers for clearly defined sections.
+ */
+export const SectionHeader = styled(Text)`
+  ${({ theme }) => css`
+    font-size: 1rem;
+    color: ${theme.colors.gray[700]};
+    color: var(--active-brand);
+    font-weight: 600;
+  `}
+`;
+
+/**
+ * Section subheaders are headers for clearly defined sections.
+ */
+export const SectionSubHeader = styled(Text)`
+  ${({ theme }) => css`
+    color: ${theme.colors.gray[500]};
+    font-size: 0.8rem;
   `}
 `;
 
@@ -86,8 +115,16 @@ export const H5 = styled(GenericType).attrs({ as: 'h5' })`
 
 export const Muted = styled(GenericType).attrs({ as: 'p' })`
   ${({ theme }) => css`
-    font-weight: 400;
+    font-weight: 500;
     font-size: 0.8rem;
     color: ${theme.colors.gray['500']};
+  `}
+`;
+
+export const Strong = styled(GenericType).attrs({ as: 'p' })`
+  ${({ theme }) => css`
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: ${theme.colors.gray['600']};
   `}
 `;

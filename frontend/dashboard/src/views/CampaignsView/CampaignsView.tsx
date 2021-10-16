@@ -2,15 +2,15 @@ import * as UI from '@haas/ui';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
+import Select from 'react-select';
 
 import { ReactComponent as EmptyIll } from 'assets/images/undraw_empty.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
-
 import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
-import CreateCampaignForm from './CreateCampaignForm';
-import Select from 'react-select';
 import useAuth from 'hooks/useAuth';
+
+import CreateCampaignForm from './CreateCampaignForm';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
@@ -75,7 +75,7 @@ const CampaignsView = () => {
                   label: campaign.label,
                   value: campaign.id,
                 }))}
-                onChange={(data) => handleSelectCampaign(data)}
+                onChange={(selectedData) => handleSelectCampaign(selectedData)}
                 placeholder={t('select_campaign')}
               />
             </UI.Div>
@@ -86,12 +86,14 @@ const CampaignsView = () => {
           isOpen={openedModal}
           onClose={() => setIsOpenedModal(false)}
         >
-          <UI.Card width={900} noHover bg="white">
-            <UI.CardBody>
-              <UI.FormSectionHeader>{t('create_campaign')}</UI.FormSectionHeader>
+          <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenedModal(false)}>
+            <UI.ModalHead>
+              <UI.ModalTitle>{t('create_campaign')}</UI.ModalTitle>
+            </UI.ModalHead>
+            <UI.ModalBody>
               <CreateCampaignForm onClose={() => setIsOpenedModal(false)} />
-            </UI.CardBody>
-          </UI.Card>
+            </UI.ModalBody>
+          </UI.ModalCard>
         </UI.Modal>
       </UI.ViewContainer>
     </>

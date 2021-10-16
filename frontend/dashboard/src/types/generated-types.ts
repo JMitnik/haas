@@ -33,11 +33,12 @@ export type AppendToInteractionInput = {
   data?: Maybe<NodeEntryDataInput>;
 };
 
-export type AutodeckConnectionType = ConnectionInterface & {
+export type AutodeckConnectionType = DeprecatedConnectionInterface & {
   __typename?: 'AutodeckConnectionType';
-  offset: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
   limit: Scalars['Int'];
-  pageInfo: PaginationPageInfo;
+  pageInfo: DeprecatedPaginationPageInfo;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
   jobs: Array<CreateWorkspaceJobType>;
@@ -56,7 +57,7 @@ export type CampaignType = {
   __typename?: 'CampaignType';
   id: Scalars['ID'];
   label: Scalars['String'];
-  variants: Array<CampaignVariantType>;
+  variants?: Maybe<Array<CampaignVariantType>>;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
@@ -89,6 +90,7 @@ export type CampaignVariantType = {
   type: CampaignVariantEnum;
   workspace?: Maybe<Customer>;
   dialogue?: Maybe<Dialogue>;
+  campaign?: Maybe<CampaignType>;
   customVariables?: Maybe<Array<CampaignVariantCustomVariableType>>;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
@@ -115,11 +117,8 @@ export type ColourSettings = {
 
 /** Interface all pagination-based models should implement */
 export type ConnectionInterface = {
-  offset: Scalars['Int'];
-  limit: Scalars['Int'];
+  totalPages?: Maybe<Scalars['Int']>;
   pageInfo: PaginationPageInfo;
-  startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
 };
 
 export type CreateBatchDeliveriesInputType = {
@@ -269,9 +268,9 @@ export type Customer = {
   dialogue?: Maybe<Dialogue>;
   dialogues?: Maybe<Array<Dialogue>>;
   users?: Maybe<Array<UserType>>;
+  campaigns: Array<CampaignType>;
   roles?: Maybe<Array<RoleType>>;
   campaign?: Maybe<CampaignType>;
-  campaigns: Array<CampaignType>;
   userCustomer?: Maybe<UserCustomer>;
 };
 
@@ -357,11 +356,12 @@ export type DeliveryConnectionFilter = {
   campaignVariantId?: Maybe<Scalars['ID']>;
 };
 
-export type DeliveryConnectionType = ConnectionInterface & {
+export type DeliveryConnectionType = DeprecatedConnectionInterface & {
   __typename?: 'DeliveryConnectionType';
-  offset: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
   limit: Scalars['Int'];
-  pageInfo: PaginationPageInfo;
+  pageInfo: DeprecatedPaginationPageInfo;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
   deliveries: Array<DeliveryType>;
@@ -375,7 +375,7 @@ export type DeliveryEventType = {
   __typename?: 'DeliveryEventType';
   id: Scalars['ID'];
   status: DeliveryStatusEnum;
-  createdAt: Scalars['String'];
+  createdAt: Scalars['Date'];
   failureMessage?: Maybe<Scalars['String']>;
 };
 
@@ -397,11 +397,30 @@ export type DeliveryType = {
   deliveryRecipientLastName?: Maybe<Scalars['String']>;
   deliveryRecipientEmail?: Maybe<Scalars['String']>;
   deliveryRecipientPhone?: Maybe<Scalars['String']>;
-  scheduledAt?: Maybe<Scalars['String']>;
-  updatedAt?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['Date']>;
+  scheduledAt?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
   campaignVariant?: Maybe<CampaignVariantType>;
   currentStatus: DeliveryStatusEnum;
-  events: Array<DeliveryEventType>;
+  events?: Maybe<Array<DeliveryEventType>>;
+};
+
+/** Interface all pagination-based models should implement */
+export type DeprecatedConnectionInterface = {
+  cursor?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
+  limit: Scalars['Int'];
+  pageInfo: DeprecatedPaginationPageInfo;
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+};
+
+/** Information with regards to current page, and total number of pages */
+export type DeprecatedPaginationPageInfo = {
+  __typename?: 'DeprecatedPaginationPageInfo';
+  cursor?: Maybe<Scalars['String']>;
+  nrPages: Scalars['Int'];
+  pageIndex: Scalars['Int'];
 };
 
 export type Dialogue = {
@@ -428,6 +447,7 @@ export type Dialogue = {
   questions: Array<QuestionNode>;
   sessions: Array<Session>;
   leafs: Array<QuestionNode>;
+  campaignVariants: Array<CampaignVariantType>;
 };
 
 
@@ -442,7 +462,7 @@ export type DialogueStatisticsArgs = {
 
 
 export type DialogueSessionConnectionArgs = {
-  filter?: Maybe<PaginationWhereInput>;
+  filter?: Maybe<SessionConnectionFilterInput>;
 };
 
 
@@ -1124,10 +1144,13 @@ export type OptionsInputType = {
   options?: Maybe<Array<OptionInputType>>;
 };
 
-/** Information with regards to current page, and total number of pages */
+/** Information with regards to current page. */
 export type PaginationPageInfo = {
   __typename?: 'PaginationPageInfo';
-  nrPages: Scalars['Int'];
+  hasPrevPage: Scalars['Boolean'];
+  hasNextPage: Scalars['Boolean'];
+  prevPageOffset: Scalars['Int'];
+  nextPageOffset: Scalars['Int'];
   pageIndex: Scalars['Int'];
 };
 
@@ -1174,6 +1197,7 @@ export type PaginationWhereInput = {
   pageIndex?: Maybe<Scalars['Int']>;
   searchTerm?: Maybe<Scalars['String']>;
   search?: Maybe<Scalars['String']>;
+  cursor?: Maybe<Scalars['String']>;
   orderBy?: Maybe<Array<PaginationSortInput>>;
 };
 
@@ -1225,6 +1249,7 @@ export type Query = {
   dialogues: Array<Dialogue>;
   refreshAccessToken: RefreshAccessTokenOutput;
   sessions: Array<Session>;
+  /** A session is one entire user-interaction */
   session?: Maybe<Session>;
   edge?: Maybe<Edge>;
 };
@@ -1323,7 +1348,7 @@ export type QuerySessionsArgs = {
 
 
 export type QuerySessionArgs = {
-  where?: Maybe<SessionWhereUniqueInput>;
+  id?: Maybe<Scalars['String']>;
 };
 
 
@@ -1430,11 +1455,12 @@ export type RequestInviteOutput = {
   userExists: Scalars['Boolean'];
 };
 
-export type RoleConnection = ConnectionInterface & {
+export type RoleConnection = DeprecatedConnectionInterface & {
   __typename?: 'RoleConnection';
-  offset: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
   limit: Scalars['Int'];
-  pageInfo: PaginationPageInfo;
+  pageInfo: DeprecatedPaginationPageInfo;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
   roles: Array<RoleType>;
@@ -1472,21 +1498,47 @@ export type Session = {
   score: Scalars['Float'];
   totalTimeInSec?: Maybe<Scalars['Int']>;
   originUrl?: Maybe<Scalars['String']>;
+  device?: Maybe<Scalars['String']>;
   deliveryId?: Maybe<Scalars['String']>;
   delivery?: Maybe<DeliveryType>;
-  device?: Maybe<Scalars['String']>;
   nodeEntries: Array<NodeEntry>;
 };
 
 export type SessionConnection = ConnectionInterface & {
   __typename?: 'SessionConnection';
-  offset: Scalars['Int'];
-  limit: Scalars['Int'];
+  totalPages?: Maybe<Scalars['Int']>;
   pageInfo: PaginationPageInfo;
-  startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
   sessions: Array<Session>;
 };
+
+export type SessionConnectionFilterInput = {
+  search?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  deliveryType?: Maybe<SessionDeliveryType>;
+  scoreRange?: Maybe<SessionScoreRangeFilter>;
+  campaignVariantId?: Maybe<Scalars['String']>;
+  orderBy?: Maybe<SessionConnectionOrderByInput>;
+  offset?: Maybe<Scalars['Int']>;
+  perPage?: Maybe<Scalars['Int']>;
+};
+
+/** Fields to order SessionConnection by. */
+export enum SessionConnectionOrder {
+  CreatedAt = 'createdAt'
+}
+
+/** Sorting of sessionConnection */
+export type SessionConnectionOrderByInput = {
+  by: SessionConnectionOrder;
+  desc?: Maybe<Scalars['Boolean']>;
+};
+
+/** Delivery type of session to filter by. */
+export enum SessionDeliveryType {
+  Campaigns = 'campaigns',
+  NoCampaigns = 'noCampaigns'
+}
 
 /** Input for session */
 export type SessionInput = {
@@ -1496,6 +1548,12 @@ export type SessionInput = {
   originUrl?: Maybe<Scalars['String']>;
   device?: Maybe<Scalars['String']>;
   totalTimeInSec?: Maybe<Scalars['Int']>;
+};
+
+/** Scores to filter sessions by. */
+export type SessionScoreRangeFilter = {
+  min?: Maybe<Scalars['Int']>;
+  max?: Maybe<Scalars['Int']>;
 };
 
 export type SessionWhereUniqueInput = {
@@ -1648,11 +1706,12 @@ export type TriggerConditionType = {
   question?: Maybe<QuestionNode>;
 };
 
-export type TriggerConnectionType = ConnectionInterface & {
+export type TriggerConnectionType = DeprecatedConnectionInterface & {
   __typename?: 'TriggerConnectionType';
-  offset: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
   limit: Scalars['Int'];
-  pageInfo: PaginationPageInfo;
+  pageInfo: DeprecatedPaginationPageInfo;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
   triggers: Array<TriggerType>;
@@ -1724,11 +1783,12 @@ export type UploadSellImageInputType = {
   workspaceId?: Maybe<Scalars['String']>;
 };
 
-export type UserConnection = ConnectionInterface & {
+export type UserConnection = DeprecatedConnectionInterface & {
   __typename?: 'UserConnection';
-  offset: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
   limit: Scalars['Int'];
-  pageInfo: PaginationPageInfo;
+  pageInfo: DeprecatedPaginationPageInfo;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
   userCustomers: Array<UserCustomer>;
@@ -1782,6 +1842,60 @@ export type VerifyUserTokenOutput = {
 export type VideoNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
+
+export type DeliveryEventFragmentFragment = (
+  { __typename?: 'DeliveryEventType' }
+  & Pick<DeliveryEventType, 'id' | 'status' | 'createdAt' | 'failureMessage'>
+);
+
+export type DeliveryFragmentFragment = (
+  { __typename?: 'DeliveryType' }
+  & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'createdAt'>
+  & { campaignVariant?: Maybe<(
+    { __typename?: 'CampaignVariantType' }
+    & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
+    & { campaign?: Maybe<(
+      { __typename?: 'CampaignType' }
+      & Pick<CampaignType, 'id' | 'label'>
+    )> }
+  )> }
+);
+
+export type NodeEntryFragmentFragment = (
+  { __typename?: 'NodeEntry' }
+  & Pick<NodeEntry, 'id' | 'depth'>
+  & { relatedNode?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'title' | 'type'>
+  )>, value?: Maybe<(
+    { __typename?: 'NodeEntryValue' }
+    & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'videoNodeEntry' | 'linkNodeEntry'>
+    & { formNodeEntry?: Maybe<(
+      { __typename?: 'FormNodeEntryType' }
+      & Pick<FormNodeEntryType, 'id'>
+      & { values: Array<(
+        { __typename?: 'FormNodeEntryValueType' }
+        & Pick<FormNodeEntryValueType, 'email' | 'phoneNumber' | 'url' | 'shortText' | 'longText' | 'number'>
+        & { relatedField: (
+          { __typename?: 'FormNodeField' }
+          & Pick<FormNodeField, 'id' | 'type'>
+        ) }
+      )> }
+    )> }
+  )> }
+);
+
+export type SessionFragmentFragment = (
+  { __typename?: 'Session' }
+  & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device'>
+  & { nodeEntries: Array<(
+    { __typename?: 'NodeEntry' }
+    & NodeEntryFragmentFragment
+  )>, delivery?: Maybe<(
+    { __typename?: 'DeliveryType' }
+    & DeliveryFragmentFragment
+  )> }
+);
 
 export type UploadUpsellImageMutationVariables = Exact<{
   input?: Maybe<UploadSellImageInputType>;
@@ -1856,8 +1970,8 @@ export type GetAutodeckJobsQuery = (
         )>> }
       ) }
     )>, pageInfo: (
-      { __typename?: 'PaginationPageInfo' }
-      & Pick<PaginationPageInfo, 'nrPages' | 'pageIndex'>
+      { __typename?: 'DeprecatedPaginationPageInfo' }
+      & Pick<DeprecatedPaginationPageInfo, 'nrPages' | 'pageIndex'>
     ) }
   ) }
 );
@@ -1978,6 +2092,23 @@ export type CreateBatchDeliveriesMutation = (
   ) }
 );
 
+export type GetDeliveryQueryVariables = Exact<{
+  deliveryId?: Maybe<Scalars['String']>;
+}>;
+
+
+export type GetDeliveryQuery = (
+  { __typename?: 'Query' }
+  & { delivery?: Maybe<(
+    { __typename?: 'DeliveryType' }
+    & { events?: Maybe<Array<(
+      { __typename?: 'DeliveryEventType' }
+      & DeliveryEventFragmentFragment
+    )>> }
+    & DeliveryFragmentFragment
+  )> }
+);
+
 export type GetWorkspaceCampaignQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   campaignId: Scalars['String'];
@@ -2004,15 +2135,15 @@ export type GetWorkspaceCampaignQuery = (
           & { campaignVariant?: Maybe<(
             { __typename?: 'CampaignVariantType' }
             & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
-          )>, events: Array<(
+          )>, events?: Maybe<Array<(
             { __typename?: 'DeliveryEventType' }
             & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status' | 'failureMessage'>
-          )> }
+          )>> }
         )>, pageInfo: (
-          { __typename?: 'PaginationPageInfo' }
-          & Pick<PaginationPageInfo, 'nrPages'>
+          { __typename?: 'DeprecatedPaginationPageInfo' }
+          & Pick<DeprecatedPaginationPageInfo, 'nrPages'>
         ) }
-      )>, variants: Array<(
+      )>, variants?: Maybe<Array<(
         { __typename?: 'CampaignVariantType' }
         & Pick<CampaignVariantType, 'id' | 'label' | 'from' | 'type' | 'weight' | 'body'>
         & { customVariables?: Maybe<Array<(
@@ -2025,7 +2156,7 @@ export type GetWorkspaceCampaignQuery = (
           { __typename?: 'Customer' }
           & Pick<Customer, 'id'>
         )> }
-      )> }
+      )>> }
     )> }
   )> }
 );
@@ -2056,10 +2187,10 @@ export type GetWorkspaceCampaignsQuery = (
     & { campaigns: Array<(
       { __typename?: 'CampaignType' }
       & Pick<CampaignType, 'id' | 'label'>
-      & { variants: Array<(
+      & { variants?: Maybe<Array<(
         { __typename?: 'CampaignVariantType' }
         & Pick<CampaignVariantType, 'id' | 'label'>
-      )> }
+      )>> }
     )> }
   )> }
 );
@@ -2153,6 +2284,72 @@ export type GetDialogueStatisticsQuery = (
   )> }
 );
 
+export type GetInteractionQueryVariables = Exact<{
+  sessionId: Scalars['String'];
+}>;
+
+
+export type GetInteractionQuery = (
+  { __typename?: 'Query' }
+  & { session?: Maybe<(
+    { __typename?: 'Session' }
+    & Pick<Session, 'id'>
+    & { delivery?: Maybe<(
+      { __typename?: 'DeliveryType' }
+      & { campaignVariant?: Maybe<(
+        { __typename?: 'CampaignVariantType' }
+        & Pick<CampaignVariantType, 'id'>
+        & { campaign?: Maybe<(
+          { __typename?: 'CampaignType' }
+          & Pick<CampaignType, 'id'>
+        )> }
+      )>, events?: Maybe<Array<(
+        { __typename?: 'DeliveryEventType' }
+        & DeliveryEventFragmentFragment
+      )>> }
+      & DeliveryFragmentFragment
+    )> }
+    & SessionFragmentFragment
+  )> }
+);
+
+export type GetInteractionsQueryQueryVariables = Exact<{
+  customerSlug?: Maybe<Scalars['String']>;
+  dialogueSlug?: Maybe<Scalars['String']>;
+  sessionsFilter?: Maybe<SessionConnectionFilterInput>;
+}>;
+
+
+export type GetInteractionsQueryQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id'>
+      & { campaignVariants: Array<(
+        { __typename?: 'CampaignVariantType' }
+        & Pick<CampaignVariantType, 'id' | 'label'>
+        & { campaign?: Maybe<(
+          { __typename?: 'CampaignType' }
+          & Pick<CampaignType, 'id' | 'label'>
+        )> }
+      )>, sessionConnection?: Maybe<(
+        { __typename?: 'SessionConnection' }
+        & Pick<SessionConnection, 'totalPages'>
+        & { sessions: Array<(
+          { __typename?: 'Session' }
+          & SessionFragmentFragment
+        )>, pageInfo: (
+          { __typename?: 'PaginationPageInfo' }
+          & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'pageIndex' | 'nextPageOffset' | 'prevPageOffset'>
+        ) }
+      )> }
+    )> }
+  )> }
+);
+
 export type RequestInviteMutationVariables = Exact<{
   input?: Maybe<RequestInviteInput>;
 }>;
@@ -2207,7 +2404,85 @@ export type GetUserCustomerFromCustomerQuery = (
   )> }
 );
 
-
+export const DeliveryEventFragmentFragmentDoc = gql`
+    fragment DeliveryEventFragment on DeliveryEventType {
+  id
+  status
+  createdAt
+  failureMessage
+}
+    `;
+export const NodeEntryFragmentFragmentDoc = gql`
+    fragment NodeEntryFragment on NodeEntry {
+  id
+  depth
+  relatedNode {
+    title
+    type
+  }
+  value {
+    sliderNodeEntry
+    textboxNodeEntry
+    registrationNodeEntry
+    choiceNodeEntry
+    videoNodeEntry
+    linkNodeEntry
+    formNodeEntry {
+      id
+      values {
+        relatedField {
+          id
+          type
+        }
+        email
+        phoneNumber
+        url
+        shortText
+        longText
+        number
+      }
+    }
+  }
+}
+    `;
+export const DeliveryFragmentFragmentDoc = gql`
+    fragment DeliveryFragment on DeliveryType {
+  id
+  deliveryRecipientFirstName
+  deliveryRecipientLastName
+  deliveryRecipientEmail
+  deliveryRecipientPhone
+  scheduledAt
+  updatedAt
+  createdAt
+  campaignVariant {
+    id
+    label
+    type
+    campaign {
+      id
+      label
+    }
+  }
+}
+    `;
+export const SessionFragmentFragmentDoc = gql`
+    fragment SessionFragment on Session {
+  id
+  createdAt
+  score
+  originUrl
+  totalTimeInSec
+  device
+  nodeEntries {
+    ...NodeEntryFragment
+  }
+  delivery {
+    ...DeliveryFragment
+  }
+}
+    ${NodeEntryFragmentFragmentDoc}
+${DeliveryFragmentFragmentDoc}`;
 export const UploadUpsellImageDocument = gql`
     mutation uploadUpsellImage($input: UploadSellImageInputType) {
   uploadUpsellImage(input: $input) {
@@ -2718,6 +2993,48 @@ export function useCreateBatchDeliveriesMutation(baseOptions?: Apollo.MutationHo
 export type CreateBatchDeliveriesMutationHookResult = ReturnType<typeof useCreateBatchDeliveriesMutation>;
 export type CreateBatchDeliveriesMutationResult = Apollo.MutationResult<CreateBatchDeliveriesMutation>;
 export type CreateBatchDeliveriesMutationOptions = Apollo.BaseMutationOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
+export const GetDeliveryDocument = gql`
+    query GetDelivery($deliveryId: String) {
+  delivery(deliveryId: $deliveryId) {
+    ...DeliveryFragment
+    events {
+      ...DeliveryEventFragment
+    }
+  }
+}
+    ${DeliveryFragmentFragmentDoc}
+${DeliveryEventFragmentFragmentDoc}`;
+
+/**
+ * __useGetDeliveryQuery__
+ *
+ * To run a query within a React component, call `useGetDeliveryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDeliveryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDeliveryQuery({
+ *   variables: {
+ *      deliveryId: // value for 'deliveryId'
+ *   },
+ * });
+ */
+export function useGetDeliveryQuery(baseOptions?: Apollo.QueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
+      }
+export function useGetDeliveryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
+        }
+export type GetDeliveryQueryHookResult = ReturnType<typeof useGetDeliveryQuery>;
+export type GetDeliveryLazyQueryHookResult = ReturnType<typeof useGetDeliveryLazyQuery>;
+export type GetDeliveryQueryResult = Apollo.QueryResult<GetDeliveryQuery, GetDeliveryQueryVariables>;
+export function refetchGetDeliveryQuery(variables?: GetDeliveryQueryVariables) {
+      return { query: GetDeliveryDocument, variables: variables }
+    }
 export const GetWorkspaceCampaignDocument = gql`
     query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilter) {
   customer(slug: $customerSlug) {
@@ -3068,6 +3385,123 @@ export type GetDialogueStatisticsLazyQueryHookResult = ReturnType<typeof useGetD
 export type GetDialogueStatisticsQueryResult = Apollo.QueryResult<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>;
 export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatisticsQueryVariables) {
       return { query: GetDialogueStatisticsDocument, variables: variables }
+    }
+export const GetInteractionDocument = gql`
+    query GetInteraction($sessionId: String!) {
+  session(id: $sessionId) {
+    id
+    ...SessionFragment
+    delivery {
+      ...DeliveryFragment
+      campaignVariant {
+        id
+        campaign {
+          id
+        }
+      }
+      events {
+        ...DeliveryEventFragment
+      }
+    }
+  }
+}
+    ${SessionFragmentFragmentDoc}
+${DeliveryFragmentFragmentDoc}
+${DeliveryEventFragmentFragmentDoc}`;
+
+/**
+ * __useGetInteractionQuery__
+ *
+ * To run a query within a React component, call `useGetInteractionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInteractionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInteractionQuery({
+ *   variables: {
+ *      sessionId: // value for 'sessionId'
+ *   },
+ * });
+ */
+export function useGetInteractionQuery(baseOptions: Apollo.QueryHookOptions<GetInteractionQuery, GetInteractionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetInteractionQuery, GetInteractionQueryVariables>(GetInteractionDocument, options);
+      }
+export function useGetInteractionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetInteractionQuery, GetInteractionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetInteractionQuery, GetInteractionQueryVariables>(GetInteractionDocument, options);
+        }
+export type GetInteractionQueryHookResult = ReturnType<typeof useGetInteractionQuery>;
+export type GetInteractionLazyQueryHookResult = ReturnType<typeof useGetInteractionLazyQuery>;
+export type GetInteractionQueryResult = Apollo.QueryResult<GetInteractionQuery, GetInteractionQueryVariables>;
+export function refetchGetInteractionQuery(variables?: GetInteractionQueryVariables) {
+      return { query: GetInteractionDocument, variables: variables }
+    }
+export const GetInteractionsQueryDocument = gql`
+    query GetInteractionsQuery($customerSlug: String, $dialogueSlug: String, $sessionsFilter: SessionConnectionFilterInput) {
+  customer(slug: $customerSlug) {
+    id
+    dialogue(where: {slug: $dialogueSlug}) {
+      id
+      campaignVariants {
+        id
+        label
+        campaign {
+          id
+          label
+        }
+      }
+      sessionConnection(filter: $sessionsFilter) {
+        sessions {
+          ...SessionFragment
+        }
+        totalPages
+        pageInfo {
+          hasPrevPage
+          hasNextPage
+          pageIndex
+          nextPageOffset
+          prevPageOffset
+        }
+      }
+    }
+  }
+}
+    ${SessionFragmentFragmentDoc}`;
+
+/**
+ * __useGetInteractionsQueryQuery__
+ *
+ * To run a query within a React component, call `useGetInteractionsQueryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInteractionsQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInteractionsQueryQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      dialogueSlug: // value for 'dialogueSlug'
+ *      sessionsFilter: // value for 'sessionsFilter'
+ *   },
+ * });
+ */
+export function useGetInteractionsQueryQuery(baseOptions?: Apollo.QueryHookOptions<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>(GetInteractionsQueryDocument, options);
+      }
+export function useGetInteractionsQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>(GetInteractionsQueryDocument, options);
+        }
+export type GetInteractionsQueryQueryHookResult = ReturnType<typeof useGetInteractionsQueryQuery>;
+export type GetInteractionsQueryLazyQueryHookResult = ReturnType<typeof useGetInteractionsQueryLazyQuery>;
+export type GetInteractionsQueryQueryResult = Apollo.QueryResult<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>;
+export function refetchGetInteractionsQueryQuery(variables?: GetInteractionsQueryQueryVariables) {
+      return { query: GetInteractionsQueryDocument, variables: variables }
     }
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {

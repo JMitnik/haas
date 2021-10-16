@@ -1,0 +1,9 @@
+query GetDelivery($deliveryId: String) {
+  delivery(deliveryId: $deliveryId) {
+    ...DeliveryFragment
+
+    events {
+      ...DeliveryEventFragment
+    }
+  }
+}

@@ -205,7 +205,7 @@ const TriggerMutations = extendType({
 export const TriggerConnectionType = objectType({
   name: 'TriggerConnectionType',
   definition(t) {
-    t.implements('ConnectionInterface');
+    t.implements('DeprecatedConnectionInterface');
     t.list.field('triggers', { type: TriggerType });
   },
 });

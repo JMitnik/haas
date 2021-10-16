@@ -43,16 +43,16 @@ export const EntryBreadCrumbContainer = styled(Div) <{ score?: number | null, is
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       font-weight: 500;
       height: 40px;
+      width: 40px;
       padding: 0;
       border: 1px solid white;
       justify-content: center;
       border-radius: 100px !important;
-      width: 40px;
-      
+
       ${isInline && css`
         margin-left: -8px;
       `}
-      
+
       &:first-of-type {
         border-top-left-radius: 30px;
         border-border-bottom-left-radius: 30px;

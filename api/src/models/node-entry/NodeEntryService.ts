@@ -32,7 +32,7 @@ class NodeEntryService {
   /**
    * Fetch all node-entries by session id.
    * */
-  getNodeEntriesBySessionId(sessionId: string): Promise<NodeEntryWithTypes[]> {
+  getNodeEntriesBySessionId(sessionId: string): Promise<NodeEntry[]> {
     return this.nodeEntryPrismaAdapter.getNodeEntriesBySessionId(sessionId);
   };
 

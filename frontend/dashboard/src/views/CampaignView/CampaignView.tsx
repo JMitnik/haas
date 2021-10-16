@@ -1,10 +1,11 @@
 import * as UI from '@haas/ui';
-import { AlertTriangle, AtSign, Clock, Eye, Flag, Inbox, Mail, Plus, Settings, Smartphone } from 'react-feather';
+import { Clock, Mail, Plus, Settings, Smartphone } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
+import { Route, Switch, useLocation } from 'react-router';
 import { format } from 'date-fns';
 import { union } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import {
   CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType,
@@ -12,12 +13,13 @@ import {
   PaginationSortByEnum, useGetWorkspaceCampaignQuery,
 } from 'types/generated-types';
 import { DeepPartial } from 'types/customTypes';
+import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { useLogger } from 'hooks/useLogger';
-import { useNavigator } from 'hooks/useNavigator';
-
 import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { CampaignType } from './CampaignViewTypes';
+import { DeliveryModalCard } from './DeliveryModalCard';
 // eslint-disable-next-line import/no-cycle
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
@@ -88,6 +90,7 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
                   </UI.Span>
                   <UI.Span fontSize="0.6rem">
                     {!!delivery.scheduledAt && (
+                      // @ts-ignore
                       <DeliveryScheduledLabel scheduledAt={delivery.scheduledAt} />
                     )}
                   </UI.Span>
@@ -140,15 +143,14 @@ const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
 
 export const CampaignView = () => {
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
-  const [isOpenDetailModel, setIsOpenDetailModel] = useState(false);
   const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false);
-  const [activeDelivery, setActiveDelivery] = useState<DeepPartial<DeliveryType> | null>(null);
   const { t } = useTranslation();
   const logger = useLogger();
+  const location = useLocation();
 
   const [paginationState, setPaginationState] = useState(defaultCampaignViewFilter);
 
-  const { customerSlug, campaignId, getCampaignsPath } = useNavigator();
+  const { customerSlug, campaignId, getCampaignsPath, goToCampaignView, goToDeliveryView } = useNavigator();
   const campaignsPath = getCampaignsPath();
 
   // For tables we will consider data-caches.
@@ -161,7 +163,7 @@ export const CampaignView = () => {
       customerSlug,
       deliveryConnectionFilter: paginationState,
     },
-    pollInterval: POLL_INTERVAL_SECONDS,
+    pollInterval: POLL_INTERVAL_SECONDS * 1000,
     onCompleted: (completeData) => setDataCache(completeData),
     onError: (error) => logger.logError(error, {
       tags: { section: 'campaign' },
@@ -183,14 +185,6 @@ export const CampaignView = () => {
   // const isInEdit = selectedIds.length > 0;
 
   // use-table-select end
-
-  useEffect(() => {
-    if (activeDelivery) {
-      setIsOpenDetailModel(true);
-    } else {
-      setIsOpenDetailModel(false);
-    }
-  }, [activeDelivery, setIsOpenImportModal]);
 
   const campaign = dataCache?.customer?.campaign || null;
   const deliveryConnection = campaign?.deliveryConnection;
@@ -250,16 +244,10 @@ export const CampaignView = () => {
               <UI.TableBody>
                 {deliveryConnection?.deliveries.map((delivery) => (
                   <UI.TableRow
-                    // isSelected={selectedIds.includes(delivery.id)}
                     hasHover
                     key={delivery.id}
-                    onClick={() => setActiveDelivery(delivery)}
+                    onClick={() => goToDeliveryView(campaignId, delivery.id)}
                   >
-                    {/* <UI.TableCell width="1rem" center>
-                      <UI.TableSelect
-                        isSelected={selectedIds.includes(delivery.id)} onClick={() => handleSelect(delivery.id)}
-                      />
-                    </UI.TableCell> */}
                     <UI.TableCell>
                       {delivery?.deliveryRecipientFirstName || ''}
                     </UI.TableCell>
@@ -323,21 +311,41 @@ export const CampaignView = () => {
               </UI.Div>
 
               <UI.Div>
-                <UI.Stack isInline>
+                <UI.Stack isInline alignItems="center">
+                  <UI.Div>
+                    <UI.Button
+                      size="sm"
+                      variantColor="teal"
+                      onClick={() => setPaginationState((state) => ({
+                        ...state,
+                        paginationFilter: {
+                          ...state.paginationFilter,
+                          pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
+                          offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
+                        },
+                      }))}
+                      isDisabled={paginationState.paginationFilter?.pageIndex === 0}
+                    >
+                      Previous
+                    </UI.Button>
+                  </UI.Div>
+
+                  <UI.Div>
+                    <UI.DebouncedInput
+                      value={(paginationState.paginationFilter?.pageIndex || 0) + 1}
+                      onChange={(val) => setPaginationState((state) => ({
+                        ...state,
+                        paginationFilter: {
+                          ...state.paginationFilter,
+                          pageIndex: val - 1,
+                          offset: Math.max((val - 1), 0) * (state.paginationFilter?.limit || 0),
+                        },
+                      }))}
+                    />
+                  </UI.Div>
                   <UI.Button
-                    onClick={() => setPaginationState((state) => ({
-                      ...state,
-                      paginationFilter: {
-                        ...state.paginationFilter,
-                        pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
-                        offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
-                      },
-                    }))}
-                    isDisabled={paginationState.paginationFilter?.pageIndex === 0}
-                  >
-                    Previous
-                  </UI.Button>
-                  <UI.Button
+                    size="sm"
+                    variantColor="teal"
                     onClick={() => setPaginationState((state) => ({
                       ...state,
                       paginationFilter: {
@@ -358,170 +366,58 @@ export const CampaignView = () => {
           )}
         </UI.Card>
 
-        <UI.Modal isOpen={isOpenDetailModel} onClose={() => setActiveDelivery(null)}>
-          <UI.Card bg="white" width={600} noHover>
-            <UI.CardBody>
-              <UI.FormSectionHeader>{t('details')}</UI.FormSectionHeader>
-              <UI.Stack mb={4}>
-                <UI.Div>
-                  <UI.Helper mb={1}>{t('first_name')}</UI.Helper>
-                  {activeDelivery?.deliveryRecipientFirstName}
-                </UI.Div>
-                <UI.Div>
-                  <UI.Helper mb={1}>{t('last_name')}</UI.Helper>
-                  {activeDelivery?.deliveryRecipientLastName}
-                </UI.Div>
-
-                <UI.Div>
-                  <UI.Helper mb={1}>{t('email')}</UI.Helper>
-                  {activeDelivery?.deliveryRecipientEmail}
-                </UI.Div>
-                <UI.Div>
-                  <UI.Helper mb={1}>{t('phone')}</UI.Helper>
-                  {activeDelivery?.deliveryRecipientPhone}
-                </UI.Div>
-              </UI.Stack>
-
-              <UI.Hr />
-
-              <UI.FormSectionHeader>{t('events')}</UI.FormSectionHeader>
-              <UI.Stack spacing={4}>
-                {activeDelivery?.events?.map((event) => (
-                  <UI.Div key={event?.id}>
-                    <UI.Flex alignItems="center" justifyContent="space-between">
-                      {event?.status === DeliveryStatusEnum.Scheduled && (
-                        <UI.Flex alignItems="center">
-                          <UI.Div mr={2} bg="gray.200" padding="5px" color="gray.500" style={{ borderRadius: '100%' }}>
-                            <Clock />
-                          </UI.Div>
-                          {t('scheduled_event')}
-                        </UI.Flex>
-                      )}
-                      {event?.status === DeliveryStatusEnum.Deployed && (
-                        <UI.Flex alignItems="center">
-                          <UI.Div mr={2} bg="blue.200" padding="5px" color="blue.500" style={{ borderRadius: '100%' }}>
-                            {activeDelivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
-                              <AtSign />
-                            ) : (
-                              <Smartphone />
-                            )}
-                          </UI.Div>
-                          {t('deployed_event')}
-                        </UI.Flex>
-                      )}
-                      {event?.status === DeliveryStatusEnum.Opened && (
-                        <UI.Flex alignItems="center">
-                          <UI.Div
-                            mr={2}
-                            bg="yellow.200"
-                            padding="5px"
-                            color="yellow.500"
-                            style={{ borderRadius: '100%' }}
-                          >
-                            <Eye />
-                          </UI.Div>
-                          {t('opened_event')}
-                        </UI.Flex>
-                      )}
-                      {event?.status === DeliveryStatusEnum.Failed && (
-                        <UI.Div>
-                          <UI.Flex alignItems="center">
-                            <UI.Div
-                              mr={2}
-                              bg="red.200"
-                              padding="5px"
-                              color="red.500"
-                              style={{ borderRadius: '100%' }}
-                            >
-                              <AlertTriangle />
-                            </UI.Div>
-                            {t('problem_delivery')}
-                          </UI.Flex>
-                        </UI.Div>
-                      )}
-
-                      {event?.status === DeliveryStatusEnum.Delivered && (
-                        <UI.Div>
-                          <UI.Flex alignItems="center">
-                            <UI.Div
-                              mr={2}
-                              bg="cyan.200"
-                              padding="5px"
-                              color="cyan.500"
-                              style={{ borderRadius: '100%' }}
-                            >
-                              <Inbox />
-                            </UI.Div>
-                            {t('delivery_delivered')}
-                          </UI.Flex>
-                        </UI.Div>
-                      )}
-
-                      {event?.status === DeliveryStatusEnum.Finished && (
-                        <UI.Flex alignItems="center">
-                          <UI.Div
-                            mr={2}
-                            bg="green.200"
-                            padding="5px"
-                            color="green.500"
-                            style={{ borderRadius: '100%' }}
-                          >
-                            <Flag />
-                          </UI.Div>
-                          {t('finished_event')}
-                        </UI.Flex>
-                      )}
-                      <UI.Span color="gray.500">
-                        {event?.createdAt && (
-                          <>
-                            {format(
-                              new Date(parseInt(event?.createdAt, 10)),
-                              'MMM do HH:mm',
-                            )}
-                          </>
-                        )}
-                      </UI.Span>
-                    </UI.Flex>
-
-                    {event?.failureMessage && (
-                      <UI.Div mt={4}>
-                        <UI.ErrorPane
-                          header="Delivery failure"
-                          text={event?.failureMessage}
-                        />
-                      </UI.Div>
-                    )}
-                  </UI.Div>
-                ))}
-              </UI.Stack>
-            </UI.CardBody>
-          </UI.Card>
-        </UI.Modal>
-
         <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
-          <UI.Card bg="white" noHover width={700}>
-            <UI.CardBody>
+          <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenImportModal(false)}>
+            <UI.ModalBody>
               <ImportDeliveriesForm
                 onClose={() => setIsOpenImportModal(false)}
               />
-            </UI.CardBody>
-          </UI.Card>
+            </UI.ModalBody>
+          </UI.ModalCard>
         </UI.Modal>
 
         {!!campaign && (
           <UI.Modal isOpen={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
-            <UI.Card bg="white" noHover width={700}>
-              <UI.CardBody>
+            <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenSettingsModal(false)}>
+              <UI.ModalBody>
                 <CreateCampaignForm
                   onClose={() => setIsOpenSettingsModal(false)}
                   // @ts-ignore
                   campaign={campaignToForm(campaign)}
                   isReadOnly
                 />
-              </UI.CardBody>
-            </UI.Card>
+              </UI.ModalBody>
+            </UI.ModalCard>
           </UI.Modal>
         )}
+
+        <AnimatePresence>
+          <Switch
+            location={location}
+            key={location.pathname}
+          >
+            <Route
+              path={ROUTES.DELIVERY_VIEW}
+            >
+              {({ match }) => (
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <UI.Modal isOpen onClose={() => goToCampaignView(campaignId)}>
+                    <DeliveryModalCard
+                      onClose={() => goToCampaignView(campaignId)}
+                      // @ts-ignore
+                      id={match?.params?.deliveryId}
+                    />
+                  </UI.Modal>
+                </motion.div>
+              )}
+            </Route>
+          </Switch>
+        </AnimatePresence>
       </UI.ViewBody>
     </>
   );

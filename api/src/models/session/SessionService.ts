@@ -4,6 +4,7 @@ import {
 import { isPresent } from 'ts-is-present';
 import { sortBy } from 'lodash';
 
+import { offsetPaginate } from '../general/PaginationHelpers';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
 import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
@@ -226,7 +227,7 @@ class SessionService {
                   },
                 },
               },
-            }, { }],
+            }, {}],
           },
           orderBy: {
             createdAt: 'desc',
@@ -287,64 +288,30 @@ class SessionService {
     return sorted;
   }
 
-  static getSessionConnection = async (
+  getSessionConnection = async (
     dialogueId: string,
-    paginationOpts?: Nullable<PaginationProps>,
-  ): Promise<NexusGenRootTypes['SessionConnection']> => {
-    const findManySessions = async ({ paginationOpts: paginationOptions, rest }: FindManyCallBackProps) => {
-      const { dialogueId } = rest;
-      const startDate = paginationOptions?.startDate ? new Date(paginationOptions?.startDate) : null;
-      const endDate = paginationOptions?.endDate ? new Date(paginationOptions?.endDate) : null;
-      const paginationArgs = { ...paginationOptions, startDate, endDate };
-      const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, paginationArgs);
-      return sessions || [];
-    };
+    filter?: NexusGenInputs['SessionConnectionFilterInput'] | null
+  ): Promise<NexusGenFieldTypes['SessionConnection'] | null> => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
 
-    const countSessions = async ({ paginationOpts: paginationOptions, rest }: FindManyCallBackProps) => {
-      const { dialogueId } = rest;
-      const startDate = paginationOptions?.startDate ? new Date(paginationOptions?.startDate) : null;
-      const endDate = paginationOptions?.endDate ? new Date(paginationOptions?.endDate) : null;
+    const sessions = await this.sessionPrismaAdapter.findSessions(dialogueId, filter);
+    const totalSessions = await this.sessionPrismaAdapter.countSessions(dialogueId, filter);
 
-      const totalNrOfSessions = (await SessionService.fetchSessionsByDialogue(dialogueId, {
-        searchTerm: paginationOpts?.searchTerm,
-        startDate,
-        endDate,
-      }))?.length;
-
-      return totalNrOfSessions || 0;
-    };
-
-    const pageOpts: NexusGenInputs['PaginationWhereInput'] = {
-      ...paginationOpts,
-      startDate: paginationOpts?.startDate?.toDateString() || null,
-      endDate: paginationOpts?.endDate?.toDateString() || null,
-    };
-
-    const paginateProps: PaginateProps = {
-      findManyArgs: {
-        findArgs: null,
-        searchFields: [],
-        orderFields: [],
-        findManyCallBack: findManySessions,
-        dialogueId,
-      },
-      countArgs: {
-        countWhereInput: null,
-        countCallBack: countSessions,
-        dialogueId,
-      },
-      paginationOpts: pageOpts,
-    };
-
-    const { entries, pageInfo } = await paginate(paginateProps);
+    const {
+      totalPages, hasPrevPage, hasNextPage, nextPageOffset, pageIndex, prevPageOffset
+    } = offsetPaginate(totalSessions, offset, perPage);
 
     return {
-      sessions: entries as NexusGenFieldTypes['Session'][],
-      offset: paginationOpts?.offset || 0,
-      limit: paginationOpts?.limit || 0,
-      startDate: paginationOpts?.startDate?.toString(),
-      endDate: paginationOpts?.endDate?.toString(),
-      pageInfo,
+      sessions,
+      totalPages,
+      pageInfo: {
+        hasPrevPage,
+        hasNextPage,
+        prevPageOffset,
+        nextPageOffset,
+        pageIndex
+      }
     };
   };
 

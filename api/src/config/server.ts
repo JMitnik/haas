@@ -1,23 +1,18 @@
 import { PrismaClient } from "@prisma/client";
 import fs from 'fs';
 import https from 'https';
-import AWS from "aws-sdk";
-import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors, { CorsOptions } from "cors";
 import express from "express";
 import { graphqlUploadExpress } from "graphql-upload";
 
-import { CampaignService } from "../models/Campaigns/CampaignService";
+import DeliveryWebhookRoute from '../routes/webhooks/DeliveryWebhookRoute';
 import { makeApollo } from './apollo';
 import config from "./config";
 
 export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   console.log('🏳️\tStarting application');
-
-  const apollo = await makeApollo(prismaClient);
   const app = express();
-  app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
 
   const corsOptions: CorsOptions = {
     // Hardcoded for the moment
@@ -33,45 +28,20 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
     credentials: true,
   };
 
-  app.get('/', (req, res, next) => {
-    console.log(`The length of the env variable is ${config.jwtSecret.length}`);
+  app.get('/', (req, res, next) => { res.json({ status: 'HAAS API V2.1.0' }); });
+  app.get('/health', (req, res, next) => { res.json({ status: 'Health check' }); });
 
-    res.json({ status: 'HAAS API V2.1.0' });
-  });
-
-  app.get('/health', (req, res, next) => {
-    res.json({ status: 'Health check' });
-  });
-
-  app.get('/test', async (req, res, next) => {
-    const dynamoClient = new AWS.DynamoDB.DocumentClient();
-    const result = await (dynamoClient.query({
-      TableName: 'CampaignDeliveries',
-      KeyConditionExpression: 'DeliveryDate = :dddd',
-      ExpressionAttributeValues: {
-        ':dddd': '26022021'
-      }
-    }).promise());
-
-    res.json({ nrItems: result?.Items?.length });
-  });
-
-  app.post('/webhooks', bodyParser.json(), async (req: any, res: any, next: any) => {
-    res.send('success');
-  });
-
-  app.post('/webhooks/delivery', bodyParser.json(), async (req: any, res: any, next: any) => {
-    console.log(req.body);
-    await CampaignService.updateBatchDeliveryStatus(req.body);
-    res.status(200).end();
-  });
+  // Webhooks route
+  app.post('/webhooks', express.json(), async (req, res) => { res.send('success'); });
+  app.use('/webhooks/delivery', DeliveryWebhookRoute);
 
   app.use(cookieParser());
   app.use(cors(corsOptions));
 
+  // Add /graphql and graphqlUploadExpress
+  const apollo = await makeApollo(prismaClient);
+  app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
   apollo.applyMiddleware({ app, cors: false, });
-
-  console.log('🏳️\tStarting the server');
 
   if (config.useSSL) {
     const key: any = process.env.HTTPS_SERVER_KEY_PATH;

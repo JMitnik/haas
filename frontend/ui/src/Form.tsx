@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, ReactNode } from 'react';
+import React, { forwardRef, Ref, ReactNode, useState, useEffect, useRef } from 'react';
 import 'antd/dist/antd.css'; // Slider,
 import 'easymde/dist/easymde.min.css'; // Markdown
 import AntdDatePickerGenerate from 'rc-picker/lib/generate/dateFns';
@@ -7,7 +7,7 @@ import {
   Slider as AntdSlider,
   // DatePicker as AntdDatepicker,
 } from 'antd';
-import { Div, Paragraph } from '@haas/ui';
+import { Div, Paragraph, SectionHeader, Strong } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
 import {
   ButtonProps as ChakraButtonProps,
@@ -135,7 +135,7 @@ export const Textarea = forwardRef(
   )
 );
 
-export const Input = forwardRef(({id, ...props}: InputProps, ref: Ref<HTMLInputElement>) => (
+export const Input = forwardRef(({ id, ...props }: InputProps, ref: Ref<HTMLInputElement>) => (
   <InputGroup>
     {props.leftEl && (
       <ChakraInputLeftElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
@@ -566,12 +566,13 @@ export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDiv
   </FormSectionContainer>
 ));
 
-export const FormSectionHeader = styled(Text)`
+export const FormSectionHeader = styled(SectionHeader)``;
+
+export const RadioHeader = styled(Strong)`
   ${({ theme }) => css`
-    font-size: 1.3rem;
-    color: ${theme.colors.default.text};
-    font-weight: 700;
-    margin-bottom: ${theme.gutter / 4}px;
+    padding-bottom: ${theme.gutter / 2}px;
+    margin-bottom: ${theme.gutter / 2}px;
+    border-bottom: 1px solid ${theme.colors.gray[200]};
   `}
 `;
 
@@ -771,6 +772,7 @@ interface RangeProps {
 interface RangePickerProps {
   range: RangeProps;
   format?: string;
+  value?: [Date | undefined | null, Date | undefined | null];
   defaultValue?: [Date, Date];
   onChange: (dates: any, dateStrings: string[]) => void;
   showTime?: boolean | TimePickerProps;
@@ -785,9 +787,29 @@ interface PureDatePickerProps {
 }
 
 export const DatePickerContainer = styled.div`
-  .ant-picker-panel-container {
-    border-radius: 10px;
-  }
+  ${({ theme }) => css`
+    z-index: 500;
+
+    .ant-picker-range {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+      border: none;
+      padding: 10px 14px;
+    }
+
+    .ant-picker-input input {
+      font-weight: 600;
+      line-height: 1rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: ${theme.colors.gray[500]};
+    }
+
+    .ant-picker-panel-container {
+      border-radius: 10px;
+    }
+  `}
 `;
 
 export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
@@ -797,6 +819,43 @@ export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
     {...props}
   />
 );
+
+const useDebouncedEffect = (
+  callback: () => any, delay = 250, dependencies?: any[],
+) => useEffect(() => {
+  const timer = setTimeout(callback, delay);
+
+  return () => {
+    clearTimeout(timer);
+  };
+}, dependencies);
+
+export const DebouncedInput = ({ value, onChange }: { value: any, onChange: (val: any) => void }) => {
+  const [localValue, setLocalValue] = useState();
+  const startedRef = useRef<boolean>();
+
+  useDebouncedEffect(() => {
+    if (startedRef.current) {
+      onChange(localValue);
+      startedRef.current = false;
+    }
+  }, 500, [localValue]);
+
+  useEffect(() => {
+    if (value !== localValue && !startedRef.current) {
+      setLocalValue(value);
+    }
+  }, [value]);
+
+  return (
+    <Input
+      value={localValue}
+      width={40}
+      // @ts-ignore
+      onChange={(e) => { startedRef.current = true; setLocalValue(e.target.value) }}
+    />
+  )
+}
 
 export const RangeDatePickerWrapper = (props: RangePickerProps) => (
   <AntdRangePicker
@@ -810,14 +869,18 @@ export const DatePicker = ({ range, ...restProps }: RangePickerProps | PureDateP
     {range !== undefined ? (
       <RangeDatePickerWrapper
         {...range}
+        format={'dd-MM-yyyy'}
         {...restProps as RangePickerProps}
       />
     ) : (
       <PureDatePickerWrapper
-        {...restProps as PureDatePickerProps} />
+        {...restProps as PureDatePickerProps}
+        format={'dd-MM-yyyy'}
+      />
     )}
   </DatePickerContainer>
-)
+);
+
 export const Switch = styled.div`
   ${({ theme }) => css`
     display: flex;

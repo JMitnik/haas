@@ -1,6 +1,94 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    show_interactions_between: {
+      en: 'Show interactions between a start and end-date.',
+      de: 'Interaktionen zwischen einem Start- und einem Enddatum anzeigen',
+    },
+    reset: {
+      en: 'Reset',
+      de: 'Zurücksetzen',
+    },
+    filter_by_search_helper: {
+      en: 'Search by questions, answers, delivery name, etc',
+      de: 'Suche nach Fragen, Antworten, Namen der Zustellungsempfänger',
+    },
+    filter_by_origin_type: {
+      en: 'Filter by origin type',
+      de: 'Filter nach Herkunftsart',
+    },
+    filter_by_search: {
+      en: 'Filter by search',
+      de: 'Nach Suche filtern',
+    },
+    filter_by_date: {
+      en: 'Filter by date',
+      de: 'Nach Datum filtern',
+    },
+    origin: {
+      en: 'Origin',
+      de: 'Herkunftsart',
+    },
+    add_filter: {
+      en: 'Add filter',
+      de: 'Add filter',
+    },
+    campaign: {
+      en: 'Campaign',
+      de: 'Kampagne',
+    },
+    currently_hiding: {
+      en: 'Currently hiding',
+      de: 'Verzeit versteckt',
+    },
+    items: {
+      en: 'Items',
+      de: 'Artikel',
+    },
+    out_of: {
+      en: 'out of',
+      de: 'Aus',
+    },
+    campaign_variant: {
+      en: 'Campaign variant',
+      de: 'Kampagnenvariante',
+    },
+    more_from: {
+      en: 'More from',
+      de: 'Mehr von',
+    },
+    before_day_of: {
+      en: 'Before day of',
+      de: 'Vor dem Tag der',
+    },
+    on_day_of: {
+      en: 'On day of',
+      de: 'Am Tag der',
+    },
+    after_day_of: {
+      en: 'After day of',
+      de: 'Nach dem Tag der',
+    },
+    anonymous: {
+      en: 'Anonymous',
+      de: 'Anonym',
+    },
+    opened_on: {
+      en: 'Opened on',
+      de: 'Eröffnet am',
+    },
+    entries: {
+      en: 'Dialogue entries',
+      de: 'Dialogeinträge',
+    },
+    go_to_delivery: {
+      en: 'Go to Delivery',
+      de: 'Zur Lieferung',
+    },
+    dialogue_via_delivery: {
+      en: 'Distribution: via delivery',
+      de: 'Dialog über die Lieferung eingesetzt',
+    },
     delivery_delivered: {
       en: 'Delivery has arrived',
       de: 'Lieferung ist angekommen',

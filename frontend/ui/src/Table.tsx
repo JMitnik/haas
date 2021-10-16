@@ -9,6 +9,37 @@ interface TableRowProps {
   isSelected?: boolean;
 }
 
+
+export const ModernTableRow = styled.tr<TableRowProps>`
+  ${({ theme, hasHover, isSelected }) => css`
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    background: white;
+    margin-bottom: 24px;
+
+    border-collapse: separate;
+    border-spacing: 0 8px;
+
+    ${hasHover &&
+    css`
+      &:hover {
+        cursor: pointer;
+        background: ${theme.colors.gray[100]};
+      }
+    `}
+
+    ${isSelected &&
+    css`
+      background: blue;
+      background: ${theme.colors.gray[200]};
+
+      &:hover {
+        background: ${theme.colors.gray[200]};
+      }
+    `}
+  `}
+`;
+
 export const TableRow = styled.tr<TableRowProps>`
   ${({ theme, hasHover, isSelected }) => css`
     border-left: 3px solid transparent;
@@ -42,9 +73,9 @@ export const Table = styled.table<{ isLoading?: boolean }>`
       }
     `}
 
-    ${TableRow} + ${TableRow} {
+    /* ${TableRow} + ${TableRow} {
       border-top: 1px solid ${theme.colors.gray[200]};
-    }
+    } */
   `}
 `;
 

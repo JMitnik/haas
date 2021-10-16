@@ -41,9 +41,9 @@ model CustomerSettings {
   id               Int             @id @default(autoincrement())
   logoUrl          String?
   logoOpacity      Int?            @default(30)
-  colourSettingsId Int?
+  colourSettingsId Int?            @unique
   colourSettings   ColourSettings? @relation(fields: [colourSettingsId], references: [id])
-  fontSettingsId   Int?
+  fontSettingsId   Int?            @unique
   fontSettings     FontSettings?   @relation(fields: [fontSettingsId], references: [id])
   customerId       String?         @unique
   customer         Customer?       @relation(fields: [customerId], references: [id])
@@ -102,7 +102,7 @@ model Dialogue {
   updatedAt      DateTime?      @updatedAt
   publicTitle    String?
   customerId     String
-  postLeafNodeId String?
+  postLeafNodeId String?        @unique
   customer       Customer       @relation(fields: [customerId], references: [id])
   edges          Edge[]
   questions      QuestionNode[]
@@ -185,7 +185,7 @@ model FormNodeEntry {
   values FormNodeFieldEntryData[]
 
   // Relation to node
-  nodeEntryId String
+  nodeEntryId String    @unique
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
@@ -284,7 +284,7 @@ model Share {
   tooltip String?
 
   questionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
-  questionNodeId String?
+  questionNodeId String?       @unique
 }
 
 model Link {
@@ -399,35 +399,35 @@ model NodeEntry {
 model VideoNodeEntry {
   id          Int       @id @default(autoincrement())
   value       String?
-  nodeEntryId String
+  nodeEntryId String    @unique
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model LinkNodeEntry {
   id          Int       @id @default(autoincrement())
   value       Json?
-  nodeEntryId String
+  nodeEntryId String    @unique
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model SliderNodeEntry {
   id          Int       @id @default(autoincrement())
   value       Int?
-  nodeEntryId String
+  nodeEntryId String    @unique
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model ChoiceNodeEntry {
   id          Int       @id @default(autoincrement())
   value       String?
-  nodeEntryId String
+  nodeEntryId String    @unique
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model TextboxNodeEntry {
   id          Int       @id @default(autoincrement())
   value       String?
-  nodeEntryId String
+  nodeEntryId String    @unique
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
@@ -435,7 +435,7 @@ model TextboxNodeEntry {
 model RegistrationNodeEntry {
   id          Int       @id @default(autoincrement())
   value       Json?
-  nodeEntryId String
+  nodeEntryId String    @unique
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
@@ -595,7 +595,7 @@ model Job {
   updatedAt            DateTime?           @updatedAt
   type                 JobType
   createWorkspaceJob   CreateWorkspaceJob? @relation(references: [id], fields: [createWorkspaceJobId])
-  createWorkspaceJobId String?
+  createWorkspaceJobId String?             @unique
 }
 
 enum CloudReferenceType {

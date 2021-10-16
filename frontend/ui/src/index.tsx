@@ -1,4 +1,3 @@
-export * from './Modal';
 export * from './Type';
 export * from './Table';
 export * from './Generics';
@@ -12,5 +11,6 @@ export * from './Loader';
 export * from './Labels';
 export * from './Nav';
 export * from './Lists';
+export * from './Modal';
 export * from './Special';
 export * from './View';

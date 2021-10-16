@@ -47,7 +47,7 @@ class RoleService {
     const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
       ? paginationOpts.pageIndex : 1;
 
-    const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
+    const pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo'] = {
       nrPages: totalPages,
       pageIndex: currentPage,
     };

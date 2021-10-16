@@ -1,0 +1,6 @@
+fragment DeliveryEventFragment on DeliveryEventType {
+  id
+  status
+  createdAt
+  failureMessage
+}

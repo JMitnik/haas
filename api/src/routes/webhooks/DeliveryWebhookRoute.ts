@@ -21,6 +21,7 @@ router.post('/',
     // Validate input
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      res.statusMessage = 'Input invalid';
       return res.status(400).json({ errors: errors.array() }).send();
     }
 
@@ -34,6 +35,7 @@ router.post('/',
         msg = e.message;
       }
 
+      res.statusMessage = 'Unknown error';
       return res.status(400).json({ error: msg }).send(msg).end();
     }
   }

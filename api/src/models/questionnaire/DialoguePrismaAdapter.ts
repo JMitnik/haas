@@ -152,6 +152,12 @@ class DialoguePrismaAdapter {
     });
   };
 
+  getCampaignVariantsByDialogueId(dialogueId: string) {
+    return this.prisma.campaignVariant.findMany({
+      where: { dialogueId }
+    });
+  }
+
   getCTAsByDialogueId(dialogueId: string) {
     return this.prisma.questionNode.findMany({
       where: {
