@@ -1312,17 +1312,13 @@ enum UploadImageEnumType {
   WEBSITE_SCREENSHOT
 }
 
-<<<<<<< HEAD
 input UploadSellImageInputType {
   file: Upload
   workspaceId: String
 }
 
-type UserConnection implements ConnectionInterface {
-=======
 type UserConnection implements DeprecatedConnectionInterface {
   cursor: String
->>>>>>> dev
   endDate: String
   limit: Int!
   offset: Int
