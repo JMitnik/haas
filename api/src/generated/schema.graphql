@@ -36,7 +36,7 @@ type AWSImageType {
 
 """Campaign"""
 type CampaignType {
-  deliveryConnection(filter: DeliveryConnectionFilter): DeliveryConnectionType
+  deliveryConnection(filter: DeliveryConnectionFilterInput): DeliveryConnectionType
   id: ID!
   label: String!
   variants: [CampaignVariantType!]
@@ -291,25 +291,31 @@ type DeleteUserOutput {
   deletedUser: Boolean!
 }
 
-input DeliveryConnectionFilter {
-  campaignId: String
-  campaignVariantId: ID
-  paginationFilter: PaginationWhereInput
-  status: DeliveryStatusEnum
+input DeliveryConnectionFilterInput {
+  campaignVariantId: String
+  endDate: String
+  offset: Int
+  orderBy: DeliveryConnectionOrderByInput
+  perPage: Int = 10
+  search: String
+  startDate: String
 }
 
-type DeliveryConnectionType implements DeprecatedConnectionInterface {
-  cursor: String
+"""Fields to order DeliveryConnection by."""
+enum DeliveryConnectionOrder {
+  createdAt
+}
+
+"""Sorting of DeliveryConnection"""
+input DeliveryConnectionOrderByInput {
+  by: DeliveryConnectionOrder!
+  desc: Boolean = true
+}
+
+type DeliveryConnectionType implements ConnectionInterface {
   deliveries: [DeliveryType!]!
-  endDate: String
-  limit: Int!
-  nrFinished: Int!
-  nrOpened: Int!
-  nrSent: Int!
-  nrTotal: Int!
-  offset: Int
-  pageInfo: DeprecatedPaginationPageInfo!
-  startDate: String
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
 }
 
 type DeliveryEventType {

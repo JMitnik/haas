@@ -2,7 +2,7 @@ import { extendType, inputObjectType, mutationField, objectType } from '@nexus/s
 import { UserInputError } from 'apollo-server-express';
 
 import { NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../../node-entry/NodeEntry';
-import { ConnectionInterface, DeprecatedConnectionInterface } from '../../general/Pagination';
+import { ConnectionInterface } from '../../general/Pagination';
 import SessionService from '../SessionService';
 
 export const SessionType = objectType({

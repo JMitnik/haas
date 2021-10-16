@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { Clock, Mail, Plus, Settings, Smartphone } from 'react-feather';
+import { Clock, Plus, Search, Settings } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Route, Switch, useLocation } from 'react-router';
 import { format } from 'date-fns';
@@ -8,44 +8,27 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Table from 'components/Common/Table';
-import {
-  CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType,
-  GetWorkspaceCampaignQuery,
-  PaginationSortByEnum, SessionConnectionOrder, useGetWorkspaceCampaignQuery,
-} from 'types/generated-types';
-import { DeepPartial } from 'types/customTypes';
-import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
-import { DeliveryRecipientAdres } from 'components/Campaign/DeliveryRecipientAdres';
-import { ROUTES, useNavigator } from 'hooks/useNavigator';
-import { useLogger } from 'hooks/useLogger';
-import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
-
 import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
+import { DeepPartial } from 'types/customTypes';
+import {
+  DeliveryConnectionOrder, DeliveryStatusEnum,
+  DeliveryType,
+  GetWorkspaceCampaignQuery, useGetWorkspaceCampaignQuery,
+} from 'types/generated-types';
+import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
+import { DeliveryRecipientAdres } from 'components/Campaign/DeliveryRecipientAdres';
+import { PickerButton } from 'components/Common/Picker/PickerButton';
+import { ROUTES, useNavigator } from 'hooks/useNavigator';
+import { TabbedMenu } from 'components/Common/TabMenu';
+import { useLogger } from 'hooks/useLogger';
+import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
+import Searchbar from 'components/SearchBar';
+
 import { CampaignType } from './CampaignViewTypes';
 import { DeliveryModalCard } from './DeliveryModalCard';
 // eslint-disable-next-line import/no-cycle
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
-
-export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
-  paginationFilter: {
-    limit: 10,
-    startDate: undefined,
-    endDate: undefined,
-    pageIndex: 0,
-    offset: 0,
-    orderBy: [
-      {
-        by: PaginationSortByEnum.ScheduledAt,
-        desc: true,
-      },
-      {
-        by: PaginationSortByEnum.UpdatedAt,
-        desc: true,
-      },
-    ],
-  },
-};
 
 const POLL_INTERVAL_SECONDS = 30;
 
@@ -152,8 +135,6 @@ export const CampaignView = () => {
   const logger = useLogger();
   const location = useLocation();
 
-  const [paginationState, setPaginationState] = useState(defaultCampaignViewFilter);
-
   const { customerSlug, campaignId, getCampaignsPath, goToCampaignView } = useNavigator();
   const campaignsPath = getCampaignsPath();
 
@@ -165,24 +146,27 @@ export const CampaignView = () => {
     perPage: withDefault(NumberParam, 10),
     filterCampaigns: StringParam,
     filterCampaignId: StringParam,
-    orderByField: withDefault(StringParam, SessionConnectionOrder.CreatedAt),
+    orderByField: withDefault(StringParam, DeliveryConnectionOrder.CreatedAt),
     orderByDescending: withDefault(BooleanParam, true),
   });
 
   // For tables we will consider data-caches.
   // useTableData
   const [dataCache, setDataCache] = useState<GetWorkspaceCampaignQuery | undefined>(undefined);
-  const { data, loading: isLoading } = useGetWorkspaceCampaignQuery({
+  const { loading: isLoading, refetch } = useGetWorkspaceCampaignQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
       campaignId,
       customerSlug,
       deliveryConnectionFilter: {
-        paginationFilter: {
-          startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
-          endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
-          search: filter.search,
-          pageIndex: filter.pageIndex,
+        startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
+        endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
+        search: filter.search,
+        offset: filter.pageIndex * filter.perPage,
+        perPage: filter.perPage,
+        orderBy: {
+          by: filter.orderByField as DeliveryConnectionOrder,
+          desc: filter.orderByDescending,
         },
       },
     },
@@ -193,12 +177,20 @@ export const CampaignView = () => {
     }),
   });
 
-  const totalPages = dataCache?.customer?.campaign?.deliveryConnection?.pageInfo?.nrPages || 0;
+  const totalPages = dataCache?.customer?.campaign?.deliveryConnection?.totalPages || 0;
 
   const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
   const campaign = dataCache?.customer?.campaign || null;
   const deliveryConnection = campaign?.deliveryConnection;
+
+  const handleSearchChange = (search: string) => {
+    setFilter((prevValues) => ({
+      ...prevValues,
+      search,
+      pageIndex: 0,
+    }));
+  };
 
   return (
     <>
@@ -232,6 +224,20 @@ export const CampaignView = () => {
       </UI.ViewHead>
       <UI.ViewBody>
         <UI.Div>
+          <UI.Div mb={2}>
+            <PickerButton label={t('add_filter')} icon={(<Plus />)}>
+              {() => (
+                <TabbedMenu tabs={[{ label: t('search'), icon: <Search /> }]}>
+                  <UI.Div>
+                    <Searchbar
+                      activeSearchTerm={filter.search}
+                      onSearchTermChange={handleSearchChange}
+                    />
+                  </UI.Div>
+                </TabbedMenu>
+              )}
+            </PickerButton>
+          </UI.Div>
           <Table.HeadingRow gridTemplateColumns={columns}>
             <Table.HeadingCell>
               {t('recipient')}
@@ -280,6 +286,7 @@ export const CampaignView = () => {
           <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenImportModal(false)}>
             <UI.ModalBody>
               <ImportDeliveriesForm
+                onComplete={() => refetch()}
                 onClose={() => setIsOpenImportModal(false)}
               />
             </UI.ModalBody>
