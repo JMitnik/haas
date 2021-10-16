@@ -84,6 +84,7 @@ export const CampaignView = () => {
       },
     },
     pollInterval: POLL_INTERVAL_SECONDS * 1000,
+    errorPolicy: 'ignore',
     onCompleted: (completeData) => setDataCache(completeData),
     onError: (error) => logger.logError(error, {
       tags: { section: 'campaign' },

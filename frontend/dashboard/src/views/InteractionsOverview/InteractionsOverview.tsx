@@ -354,6 +354,7 @@ export const InteractionsOverview = () => {
         campaignVariantId: filter.filterCampaignId === 'all' ? undefined : filter.filterCampaignId,
       },
     },
+    errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
       setCampaignVariants(
         fetchedData?.customer?.dialogue?.campaignVariants || [],
