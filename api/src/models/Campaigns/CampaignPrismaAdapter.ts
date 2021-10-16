@@ -60,7 +60,7 @@ export class CampaignPrismaAdapter {
       }
     });
 
-    return edges?.CampaignVariantToCampaign[0].campaign;
+    return edges?.CampaignVariantToCampaign[0]?.campaign;
   }
 
   /**
