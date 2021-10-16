@@ -11,6 +11,9 @@ interface UpsellNodeProps {
     subHeader: string | null
     url: string | null
     buttonText: string | null
+    title: string | null
+    backgroundColor: string | null
+    iconUrl: string | null
   }
 }
 
@@ -32,9 +35,20 @@ const UpsellNode = ({ link }: UpsellNodeProps) => (
       </UI.Div>
       <UI.Flex justifyContent="center" pb={2}>
 
-        <LS.RedirectButton href={link.url || undefined} target="__blank" rel="noopener noreferrer">
+        <LS.RedirectButton
+          overrideBackgroundColor={link.backgroundColor || undefined}
+          title={link.title || undefined}
+          href={link.url || undefined}
+          target="__blank"
+          rel="noopener noreferrer"
+        >
           <UI.Div mr={2}>
-            <ShoppingCart />
+            {link.iconUrl ? (
+              <LS.ButtonIconContainer overrideBackgroundColor={link.backgroundColor || undefined}>
+                <img alt="Icon on redirect button" src={link.iconUrl} />
+              </LS.ButtonIconContainer>
+            ) : <ShoppingCart />}
+
           </UI.Div>
           {link.buttonText || 'Go'}
         </LS.RedirectButton>

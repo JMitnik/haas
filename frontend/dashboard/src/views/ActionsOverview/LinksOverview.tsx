@@ -12,9 +12,10 @@ import Select from 'react-select';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { useCustomer } from 'providers/CustomerProvider';
 
-import { FormDataProps, LinkInputProps } from './CTATypes';
+import { FormDataProps, LinkInputProps, LinkSectionHeader } from './CTATypes';
 
 const LINK_TYPES = [
+  { label: 'SINGLE', value: 'SINGLE' },
   { label: 'SOCIAL', value: 'SOCIAL' },
   { label: 'API', value: 'API' },
   { label: 'FACEBOOK', value: 'FACEBOOK' },
@@ -88,6 +89,8 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
     type: null,
   });
 
+  const linkType = form.watch('links[0].type');
+
   return (
     <>
       <UI.FormSection id="links">
@@ -129,6 +132,8 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                         gridGap="12px"
                         gridTemplateColumns={['1fr 1fr']}
                       >
+
+                        <LinkSectionHeader title="General" />
                         <FormControl isRequired isInvalid={!!form.errors?.links?.[index]?.url}>
                           <FormLabel htmlFor={`links[${index}].url`}>{t('cta:url')}</FormLabel>
                           <UI.InputHelper>{t('cta:link_url_helper')}</UI.InputHelper>
@@ -165,6 +170,59 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           />
                           <FormErrorMessage>{!!form.errors.links?.[index]?.type?.message}</FormErrorMessage>
                         </FormControl>
+
+                        {linkType === 'SINGLE' && (
+                          <>
+                            <LinkSectionHeader title="Content (Single link only)" />
+
+                            <FormControl>
+                              <FormLabel htmlFor={`links[${index}].header`}>{t('cta:upsell_header')}</FormLabel>
+                              <UI.InputHelper>{t('cta:upsell_header_helper')}</UI.InputHelper>
+                              <UI.Input
+                                isInvalid={!!form.errors.links?.[index]?.header}
+                                name={`links[${index}].header`}
+                                defaultValue={link.header}
+                                ref={form.register({ required: false })}
+                              />
+                              <FormErrorMessage>
+                                {!!form.errors.links?.[index]?.header?.message}
+                              </FormErrorMessage>
+                            </FormControl>
+
+                            <FormControl>
+                              <FormLabel htmlFor={`links[${index}].subHeader`}>{t('cta:upsell_subheader')}</FormLabel>
+                              <UI.InputHelper>{t('cta:upsell_subheader_helper')}</UI.InputHelper>
+                              <UI.Input
+                                isInvalid={!!form.errors.links?.[index]?.subHeader}
+                                name={`links[${index}].subHeader`}
+                                defaultValue={link.subHeader}
+                                ref={form.register({ required: false })}
+                              />
+                              <FormErrorMessage>
+                                {!!form.errors.links?.[index]?.subHeader?.message}
+                              </FormErrorMessage>
+                            </FormControl>
+
+                            <FormControl>
+                              <FormLabel htmlFor="cloudinary">{t('cta:link_header_image')}</FormLabel>
+                              <UI.InputHelper>{t('cta:link_header_image_helper')}</UI.InputHelper>
+
+                              <Controller
+                                control={form.control}
+                                name={`links[${index}].imageUrl`}
+                                defaultValue={link.imageUrl}
+                                render={({ onChange, value }) => (
+                                  <ImageUploadLogoInput
+                                    value={value}
+                                    onChange={onChange}
+                                  />
+                                )}
+                              />
+                            </FormControl>
+                          </>
+                        )}
+
+                        <LinkSectionHeader title="Button" />
 
                         <FormControl>
                           <FormLabel htmlFor={`links[${index}].title`}>{t('cta:link_tooltip')}</FormLabel>
@@ -203,32 +261,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                             {!!form.errors.links?.[index]?.backgroundColor?.message}
                           </FormErrorMessage>
                         </FormControl>
-                        <FormControl>
-                          <FormLabel htmlFor={`links[${index}].header`}>{t('cta:upsell_header')}</FormLabel>
-                          <UI.InputHelper>{t('cta:upsell_header_helper')}</UI.InputHelper>
-                          <UI.Input
-                            isInvalid={!!form.errors.links?.[index]?.header}
-                            name={`links[${index}].header`}
-                            defaultValue={link.header}
-                            ref={form.register({ required: false })}
-                          />
-                          <FormErrorMessage>
-                            {!!form.errors.links?.[index]?.header?.message}
-                          </FormErrorMessage>
-                        </FormControl>
-                        <FormControl>
-                          <FormLabel htmlFor={`links[${index}].subHeader`}>{t('cta:upsell_subheader')}</FormLabel>
-                          <UI.InputHelper>{t('cta:upsell_subheader_helper')}</UI.InputHelper>
-                          <UI.Input
-                            isInvalid={!!form.errors.links?.[index]?.subHeader}
-                            name={`links[${index}].subHeader`}
-                            defaultValue={link.subHeader}
-                            ref={form.register({ required: false })}
-                          />
-                          <FormErrorMessage>
-                            {!!form.errors.links?.[index]?.subHeader?.message}
-                          </FormErrorMessage>
-                        </FormControl>
+
                         <FormControl>
                           <FormLabel htmlFor={`links[${index}].buttonText`}>{t('cta:redirect_button_text')}</FormLabel>
                           <UI.InputHelper>{t('cta:redirect_button_text_helper')}</UI.InputHelper>
@@ -242,22 +275,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                             {!!form.errors.links?.[index]?.buttonText?.message}
                           </FormErrorMessage>
                         </FormControl>
-                        <FormControl>
-                          <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
-                          <UI.InputHelper>{t('logo_upload_helper')}</UI.InputHelper>
 
-                          <Controller
-                            control={form.control}
-                            name={`links[${index}].imageUrl`}
-                            defaultValue={link.imageUrl}
-                            render={({ onChange, value }) => (
-                              <ImageUploadLogoInput
-                                value={value}
-                                onChange={onChange}
-                              />
-                            )}
-                          />
-                        </FormControl>
                       </Grid>
                       <Button
                         mt={4}

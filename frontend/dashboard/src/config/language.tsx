@@ -1960,6 +1960,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Add link',
       de: 'Link hinzufügen',
     },
+    link_header_image: {
+      en: 'Link Header Image: Drag and Drop',
+      de: 'Header-Bild verlinken',
+    },
+    link_header_image_helper: {
+      en: 'Upload a header image',
+      de: 'Ein Header-Bild hochladen',
+    },
     link_url_helper: {
       en: 'What is the url the link should lead to?',
       de: 'Zu welcher URL sollte der Link führen?',
@@ -1977,36 +1985,36 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Was ist der Text, wenn Sie mit der Maus über den Link fahren?',
     },
     link_icon: {
-      en: 'Icon',
-      de: 'Symbol',
+      en: 'Redirect Button Icon Url',
+      de: 'Umleitungs-Button-Symbol-URL',
     },
     link_icon_helper: {
-      en: 'What icon is displayed for the link?',
-      de: 'Welches Symbol wird für den Link angezeigt?',
+      en: 'Set an URL for the icon used in the button',
+      de: 'Legen Sie eine URL für das Symbol fest, das in der Schaltfläche verwendet wird',
     },
     background_color: {
       en: 'Background color',
       de: 'Hintergrundfarbe',
     },
     background_color_helper: {
-      en: 'What is the background color for the link?',
-      de: 'Was ist die Hintergrundfarbe für den Link?',
+      en: 'What is the background color of the button?',
+      de: 'Was ist die Hintergrundfarbe für den Taste?',
     },
     upsell_header: {
       en: 'Header text',
       de: 'Überschrift',
     },
     upsell_header_helper: {
-      en: 'What is the header text for up/cross-sell opportunity?',
-      de: 'Wie lautet der Kopfzeilentext für Up-/Cross-Selling-Opportunities?',
+      en: 'What is the header text?',
+      de: 'Wie lautet der Kopfzeilentext?',
     },
     upsell_subheader: {
       en: 'Subheader text',
       de: 'Untertiteltext',
     },
     upsell_subheader_helper: {
-      en: 'What is the subheader text for up/cross-sell opportunity?',
-      de: 'Wie lautet der Untertiteltext für Up-/Cross-Selling-Opportunities?',
+      en: 'What is the subheader text?',
+      de: 'Wie lautet der Untertiteltext?',
     },
     redirect_button_text: {
       en: 'Redirect button text',

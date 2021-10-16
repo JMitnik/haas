@@ -265,6 +265,7 @@ model QuestionNode {
 }
 
 enum LinkTypeEnum {
+  SINGLE
   SOCIAL
   API
   FACEBOOK
