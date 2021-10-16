@@ -1,11 +1,14 @@
-import { generatePath, useHistory, useParams, useRouteMatch } from 'react-router';
+import { generatePath, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
 
 export const ROUTES = {
   WORKSPACE_ROOT: '/dashboard/b/:customerSlug',
   DIALOGUES_VIEW: '/dashboard/b/:customerSlug/d',
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
+  INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions',
+  INTERACTION_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions/:interactionId',
   CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
+  DELIVERY_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId/:deliveryId',
   AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
   ADMIN_OVERVIEW: '/dashboard/admin',
   USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
@@ -24,14 +27,40 @@ export const useNavigator = () => {
     path: ROUTES.DIALOGUE_ROOT,
   });
   const history = useHistory();
+  const location = useLocation();
 
-  const goToCampaignView = (campaignId: string) => {
+  const goToCampaignView = (nextCampaignId: string) => {
     const path = generatePath(ROUTES.CAMPAIGN_VIEW, {
       customerSlug,
-      campaignId,
+      campaignId: nextCampaignId,
     });
 
     history.push(path);
+  };
+
+  const goToDeliveryView = (nextCampaignId: string, deliveryId: string) => {
+    const path = generatePath(ROUTES.DELIVERY_VIEW, {
+      customerSlug,
+      campaignId: nextCampaignId,
+      deliveryId,
+    });
+
+    history.push(path);
+  };
+
+  const goToInteractionsView = (interactionId?: string) => {
+    if (interactionId) {
+      history.push(generatePath(ROUTES.INTERACTION_VIEW, {
+        customerSlug,
+        dialogueSlug,
+        interactionId,
+      }) + location.search);
+    } else {
+      history.push(generatePath(ROUTES.INTERACTIONS_VIEW, {
+        customerSlug,
+        dialogueSlug,
+      }) + location.search);
+    }
   };
 
   const getCampaignsPath = () => generatePath(ROUTES.CAMPAIGNS_VIEW, { customerSlug, campaignId });
@@ -48,6 +77,8 @@ export const useNavigator = () => {
   });
 
   return {
+    goToDeliveryView,
+    goToInteractionsView,
     goToCampaignView,
     getCampaignsPath,
     getDialoguesPath,

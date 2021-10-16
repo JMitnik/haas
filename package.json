@@ -36,6 +36,8 @@
         "start:dashboard": "yarn workspace @haas/dashboard start",
         "deploy:aws:campaign": "cd aws/commands && bash deploy-campaign.bash",
         "dock:start-db": "cd container/api && docker-compose up -d",
+        "dock:up": "cd container/api && docker-compose up -d",
+        "dock:down": "cd container/api && docker-compose down",
         "dock:test": "bash scripts/dock-test.sh",
         "dev": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn dev:api\"",
         "dev:api": "yarn workspace @haas/api dev",

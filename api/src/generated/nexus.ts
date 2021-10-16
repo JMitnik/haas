@@ -282,6 +282,7 @@ export interface NexusGenInputs {
     desc?: boolean | null; // Boolean
   }
   PaginationWhereInput: { // input type
+    cursor?: string | null; // String
     endDate?: string | null; // String
     limit?: number | null; // Int
     offset?: number | null; // Int
@@ -341,6 +342,21 @@ export interface NexusGenInputs {
     name?: string | null; // String
     permissions?: NexusGenEnums['SystemPermission'][] | null; // [SystemPermission!]
   }
+  SessionConnectionFilterInput: { // input type
+    campaignVariantId?: string | null; // String
+    deliveryType?: NexusGenEnums['SessionDeliveryType'] | null; // SessionDeliveryType
+    endDate?: string | null; // String
+    offset?: number | null; // Int
+    orderBy?: NexusGenInputs['SessionConnectionOrderByInput'] | null; // SessionConnectionOrderByInput
+    perPage?: number | null; // Int
+    scoreRange?: NexusGenInputs['SessionScoreRangeFilter'] | null; // SessionScoreRangeFilter
+    search?: string | null; // String
+    startDate?: string | null; // String
+  }
+  SessionConnectionOrderByInput: { // input type
+    by: NexusGenEnums['SessionConnectionOrder']; // SessionConnectionOrder!
+    desc?: boolean | null; // Boolean
+  }
   SessionInput: { // input type
     deliveryId?: string | null; // String
     device?: string | null; // String
@@ -348,6 +364,10 @@ export interface NexusGenInputs {
     entries?: NexusGenInputs['NodeEntryInput'][] | null; // [NodeEntryInput!]
     originUrl?: string | null; // String
     totalTimeInSec?: number | null; // Int
+  }
+  SessionScoreRangeFilter: { // input type
+    max?: number | null; // Int
+    min?: number | null; // Int
   }
   SessionWhereUniqueInput: { // input type
     dialogueId?: string | null; // ID
@@ -458,6 +478,8 @@ export interface NexusGenEnums {
   PaginationSearchEnum: "email" | "firstName" | "lastName" | "name" | "publicTitle" | "title"
   PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "scheduledAt" | "score" | "type" | "updatedAt" | "user" | "when"
   QuestionNodeTypeEnum: "CHOICE" | "FORM" | "GENERIC" | "LINK" | "REGISTRATION" | "SHARE" | "SLIDER" | "TEXTBOX" | "VIDEO_EMBEDDED"
+  SessionConnectionOrder: "createdAt"
+  SessionDeliveryType: "campaigns" | "noCampaigns"
   SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ADD_USERS" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionEnum: prisma.TriggerConditionEnum
@@ -474,17 +496,18 @@ export interface NexusGenRootTypes {
     url?: string | null; // String
   }
   AutodeckConnectionType: { // root type
+    cursor?: string | null; // String
     endDate?: string | null; // String
     jobs: NexusGenRootTypes['CreateWorkspaceJobType'][]; // [CreateWorkspaceJobType!]!
     limit: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset?: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     startDate?: string | null; // String
   }
   CampaignType: { // root type
     id: string; // ID!
     label: string; // String!
-    variants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
+    variants?: NexusGenRootTypes['CampaignVariantType'][] | null; // [CampaignVariantType!]
   }
   CampaignVariantCustomVariableType: { // root type
     id: string; // ID!
@@ -494,13 +517,11 @@ export interface NexusGenRootTypes {
     body: string; // String!
     customVariables?: NexusGenRootTypes['CampaignVariantCustomVariableType'][] | null; // [CampaignVariantCustomVariableType!]
     deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
-    dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     from?: string | null; // String
     id: string; // ID!
     label: string; // String!
     type: NexusGenEnums['CampaignVariantEnum']; // CampaignVariantEnum!
     weight: number; // Int!
-    workspace?: NexusGenRootTypes['Customer'] | null; // Customer
   }
   ColourSettings: prisma.ColourSettings;
   CreateBatchDeliveriesOutputType: { // root type
@@ -534,6 +555,7 @@ export interface NexusGenRootTypes {
     deletedUser: boolean; // Boolean!
   }
   DeliveryConnectionType: { // root type
+    cursor?: string | null; // String
     deliveries: NexusGenRootTypes['DeliveryType'][]; // [DeliveryType!]!
     endDate?: string | null; // String
     limit: number; // Int!
@@ -541,26 +563,31 @@ export interface NexusGenRootTypes {
     nrOpened: number; // Int!
     nrSent: number; // Int!
     nrTotal: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset?: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     startDate?: string | null; // String
   }
   DeliveryEventType: { // root type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     failureMessage?: string | null; // String
     id: string; // ID!
     status: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
   }
   DeliveryType: { // root type
+    createdAt?: any | null; // Date
     currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
     deliveryRecipientEmail?: string | null; // String
     deliveryRecipientFirstName?: string | null; // String
     deliveryRecipientLastName?: string | null; // String
     deliveryRecipientPhone?: string | null; // String
-    events: NexusGenRootTypes['DeliveryEventType'][]; // [DeliveryEventType!]!
     id: string; // ID!
-    scheduledAt?: string | null; // String
-    updatedAt?: string | null; // String
+    scheduledAt?: any | null; // Date
+    updatedAt?: any | null; // Date
+  }
+  DeprecatedPaginationPageInfo: { // root type
+    cursor?: string | null; // String
+    nrPages: number; // Int!
+    pageIndex: number; // Int!
   }
   Dialogue: prisma.Dialogue;
   DialogueFinisherObjectType: { // root type
@@ -655,8 +682,11 @@ export interface NexusGenRootTypes {
     videoNodeEntry?: string | null; // String
   }
   PaginationPageInfo: { // root type
-    nrPages: number; // Int!
+    hasNextPage: boolean; // Boolean!
+    hasPrevPage: boolean; // Boolean!
+    nextPageOffset: number; // Int!
     pageIndex: number; // Int!
+    prevPageOffset: number; // Int!
   }
   PermssionType: { // root type
     customer?: NexusGenRootTypes['Customer'] | null; // Customer
@@ -680,10 +710,11 @@ export interface NexusGenRootTypes {
     userExists: boolean; // Boolean!
   }
   RoleConnection: { // root type
+    cursor?: string | null; // String
     endDate?: string | null; // String
     limit: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset?: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
     startDate?: string | null; // String
   }
@@ -696,12 +727,9 @@ export interface NexusGenRootTypes {
   }
   Session: prisma.Session;
   SessionConnection: { // root type
-    endDate?: string | null; // String
-    limit: number; // Int!
-    offset: number; // Int!
     pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
-    startDate?: string | null; // String
+    totalPages?: number | null; // Int
   }
   ShareNodeType: { // root type
     createdAt?: string | null; // String
@@ -736,10 +764,11 @@ export interface NexusGenRootTypes {
     type: NexusGenEnums['TriggerConditionEnum']; // TriggerConditionEnum!
   }
   TriggerConnectionType: { // root type
+    cursor?: string | null; // String
     endDate?: string | null; // String
     limit: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset?: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     startDate?: string | null; // String
     triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
   }
@@ -751,10 +780,11 @@ export interface NexusGenRootTypes {
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
   UserConnection: { // root type
+    cursor?: string | null; // String
     endDate?: string | null; // String
     limit: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset?: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     startDate?: string | null; // String
     userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
@@ -786,7 +816,8 @@ export interface NexusGenRootTypes {
     basicSentiment?: string | null; // String
     quantity?: number | null; // Int
   }
-  ConnectionInterface: NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['UserConnection'] | NexusGenRootTypes['AutodeckConnectionType'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
+  ConnectionInterface: NexusGenRootTypes['SessionConnection'];
+  DeprecatedConnectionInterface: NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['UserConnection'] | NexusGenRootTypes['AutodeckConnectionType'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
   String: string;
   Int: number;
   Float: number;
@@ -848,7 +879,10 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   RequestInviteInput: NexusGenInputs['RequestInviteInput'];
   RoleDataInput: NexusGenInputs['RoleDataInput'];
   RoleInput: NexusGenInputs['RoleInput'];
+  SessionConnectionFilterInput: NexusGenInputs['SessionConnectionFilterInput'];
+  SessionConnectionOrderByInput: NexusGenInputs['SessionConnectionOrderByInput'];
   SessionInput: NexusGenInputs['SessionInput'];
+  SessionScoreRangeFilter: NexusGenInputs['SessionScoreRangeFilter'];
   SessionWhereUniqueInput: NexusGenInputs['SessionWhereUniqueInput'];
   ShareNodeInputType: NexusGenInputs['ShareNodeInputType'];
   SlideNodeMarkerInput: NexusGenInputs['SlideNodeMarkerInput'];
@@ -877,6 +911,8 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   PaginationSearchEnum: NexusGenEnums['PaginationSearchEnum'];
   PaginationSortByEnum: NexusGenEnums['PaginationSortByEnum'];
   QuestionNodeTypeEnum: NexusGenEnums['QuestionNodeTypeEnum'];
+  SessionConnectionOrder: NexusGenEnums['SessionConnectionOrder'];
+  SessionDeliveryType: NexusGenEnums['SessionDeliveryType'];
   SystemPermission: NexusGenEnums['SystemPermission'];
   TagTypeEnum: NexusGenEnums['TagTypeEnum'];
   TriggerConditionEnum: NexusGenEnums['TriggerConditionEnum'];
@@ -893,18 +929,19 @@ export interface NexusGenFieldTypes {
     url: string | null; // String
   }
   AutodeckConnectionType: { // field return type
+    cursor: string | null; // String
     endDate: string | null; // String
     jobs: NexusGenRootTypes['CreateWorkspaceJobType'][]; // [CreateWorkspaceJobType!]!
     limit: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     startDate: string | null; // String
   }
   CampaignType: { // field return type
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     id: string; // ID!
     label: string; // String!
-    variants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
+    variants: NexusGenRootTypes['CampaignVariantType'][] | null; // [CampaignVariantType!]
   }
   CampaignVariantCustomVariableType: { // field return type
     id: string; // ID!
@@ -912,6 +949,7 @@ export interface NexusGenFieldTypes {
   }
   CampaignVariantType: { // field return type
     body: string; // String!
+    campaign: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     customVariables: NexusGenRootTypes['CampaignVariantCustomVariableType'][] | null; // [CampaignVariantCustomVariableType!]
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
@@ -979,6 +1017,7 @@ export interface NexusGenFieldTypes {
     deletedUser: boolean; // Boolean!
   }
   DeliveryConnectionType: { // field return type
+    cursor: string | null; // String
     deliveries: NexusGenRootTypes['DeliveryType'][]; // [DeliveryType!]!
     endDate: string | null; // String
     limit: number; // Int!
@@ -986,30 +1025,37 @@ export interface NexusGenFieldTypes {
     nrOpened: number; // Int!
     nrSent: number; // Int!
     nrTotal: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     startDate: string | null; // String
   }
   DeliveryEventType: { // field return type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     failureMessage: string | null; // String
     id: string; // ID!
     status: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
   }
   DeliveryType: { // field return type
     campaignVariant: NexusGenRootTypes['CampaignVariantType'] | null; // CampaignVariantType
+    createdAt: any | null; // Date
     currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
     deliveryRecipientEmail: string | null; // String
     deliveryRecipientFirstName: string | null; // String
     deliveryRecipientLastName: string | null; // String
     deliveryRecipientPhone: string | null; // String
-    events: NexusGenRootTypes['DeliveryEventType'][]; // [DeliveryEventType!]!
+    events: NexusGenRootTypes['DeliveryEventType'][] | null; // [DeliveryEventType!]
     id: string; // ID!
-    scheduledAt: string | null; // String
-    updatedAt: string | null; // String
+    scheduledAt: any | null; // Date
+    updatedAt: any | null; // Date
+  }
+  DeprecatedPaginationPageInfo: { // field return type
+    cursor: string | null; // String
+    nrPages: number; // Int!
+    pageIndex: number; // Int!
   }
   Dialogue: { // field return type
     averageScore: number; // Float!
+    campaignVariants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
     creationDate: string | null; // String
     customer: NexusGenRootTypes['Customer'] | null; // Customer
     customerId: string; // String!
@@ -1204,8 +1250,11 @@ export interface NexusGenFieldTypes {
     videoNodeEntry: string | null; // String
   }
   PaginationPageInfo: { // field return type
-    nrPages: number; // Int!
+    hasNextPage: boolean; // Boolean!
+    hasPrevPage: boolean; // Boolean!
+    nextPageOffset: number; // Int!
     pageIndex: number; // Int!
+    prevPageOffset: number; // Int!
   }
   PermssionType: { // field return type
     customer: NexusGenRootTypes['Customer'] | null; // Customer
@@ -1279,10 +1328,11 @@ export interface NexusGenFieldTypes {
     userExists: boolean; // Boolean!
   }
   RoleConnection: { // field return type
+    cursor: string | null; // String
     endDate: string | null; // String
     limit: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
     startDate: string | null; // String
   }
@@ -1309,12 +1359,9 @@ export interface NexusGenFieldTypes {
     totalTimeInSec: number | null; // Int
   }
   SessionConnection: { // field return type
-    endDate: string | null; // String
-    limit: number; // Int!
-    offset: number; // Int!
     pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
-    startDate: string | null; // String
+    totalPages: number | null; // Int
   }
   ShareNodeType: { // field return type
     createdAt: string | null; // String
@@ -1357,10 +1404,11 @@ export interface NexusGenFieldTypes {
     type: NexusGenEnums['TriggerConditionEnum']; // TriggerConditionEnum!
   }
   TriggerConnectionType: { // field return type
+    cursor: string | null; // String
     endDate: string | null; // String
     limit: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     startDate: string | null; // String
     triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
   }
@@ -1375,10 +1423,11 @@ export interface NexusGenFieldTypes {
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
   UserConnection: { // field return type
+    cursor: string | null; // String
     endDate: string | null; // String
     limit: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     startDate: string | null; // String
     userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
@@ -1415,10 +1464,15 @@ export interface NexusGenFieldTypes {
     quantity: number | null; // Int
   }
   ConnectionInterface: { // field return type
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    totalPages: number | null; // Int
+  }
+  DeprecatedConnectionInterface: { // field return type
+    cursor: string | null; // String
     endDate: string | null; // String
     limit: number; // Int!
-    offset: number; // Int!
-    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    offset: number | null; // Int
+    pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo']; // DeprecatedPaginationPageInfo!
     startDate: string | null; // String
   }
 }
@@ -1455,7 +1509,7 @@ export interface NexusGenArgTypes {
       searchTerm?: string | null; // String
     }
     sessionConnection: { // args
-      filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
+      filter?: NexusGenInputs['SessionConnectionFilterInput'] | null; // SessionConnectionFilterInput
     }
     sessions: { // args
       take?: number | null; // Int
@@ -1655,7 +1709,7 @@ export interface NexusGenArgTypes {
       filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
     }
     session: { // args
-      where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
+      id?: string | null; // String
     }
     sessions: { // args
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
@@ -1690,18 +1744,19 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  ConnectionInterface: "DeliveryConnectionType" | "SessionConnection" | "UserConnection" | "AutodeckConnectionType" | "RoleConnection" | "TriggerConnectionType"
+  ConnectionInterface: "SessionConnection"
+  DeprecatedConnectionInterface: "DeliveryConnectionType" | "UserConnection" | "AutodeckConnectionType" | "RoleConnection" | "TriggerConnectionType"
 }
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "AWSImageType" | "AutodeckConnectionType" | "CampaignType" | "CampaignVariantCustomVariableType" | "CampaignVariantType" | "ColourSettings" | "CreateBatchDeliveriesOutputType" | "CreateWorkspaceJobType" | "CustomFieldType" | "Customer" | "CustomerSettings" | "DeleteUserOutput" | "DeliveryConnectionType" | "DeliveryEventType" | "DeliveryType" | "Dialogue" | "DialogueFinisherObjectType" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "JobObjectType" | "JobProcessLocation" | "JobProcessLocations" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "PreviewDataType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "AWSImageType" | "AutodeckConnectionType" | "CampaignType" | "CampaignVariantCustomVariableType" | "CampaignVariantType" | "ColourSettings" | "CreateBatchDeliveriesOutputType" | "CreateWorkspaceJobType" | "CustomFieldType" | "Customer" | "CustomerSettings" | "DeleteUserOutput" | "DeliveryConnectionType" | "DeliveryEventType" | "DeliveryType" | "DeprecatedPaginationPageInfo" | "Dialogue" | "DialogueFinisherObjectType" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "JobObjectType" | "JobProcessLocation" | "JobProcessLocations" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "PreviewDataType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AdjustedImageInput" | "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignCustomVariable" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomFieldInputType" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DeliveryConnectionFilter" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GenerateAutodeckInput" | "GetCampaignsInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RemovePixelRangeInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput" | "VideoNodeEntryInput" | "createJobProcessLocationInput";
+export type NexusGenInputNames = "AdjustedImageInput" | "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignCustomVariable" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomFieldInputType" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DeliveryConnectionFilter" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GenerateAutodeckInput" | "GetCampaignsInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RemovePixelRangeInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionConnectionFilterInput" | "SessionConnectionOrderByInput" | "SessionInput" | "SessionScoreRangeFilter" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput" | "VideoNodeEntryInput" | "createJobProcessLocationInput";
 
-export type NexusGenEnumNames = "CampaignVariantEnum" | "CloudReferenceType" | "DeliveryStatusEnum" | "FormNodeFieldTypeEnum" | "JobProcessLocationType" | "JobStatusType" | "LanguageEnumType" | "LinkTypeEnumType" | "PaginationSearchEnum" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum" | "UploadImageEnumType";
+export type NexusGenEnumNames = "CampaignVariantEnum" | "CloudReferenceType" | "DeliveryStatusEnum" | "FormNodeFieldTypeEnum" | "JobProcessLocationType" | "JobStatusType" | "LanguageEnumType" | "LinkTypeEnumType" | "PaginationSearchEnum" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SessionConnectionOrder" | "SessionDeliveryType" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum" | "UploadImageEnumType";
 
-export type NexusGenInterfaceNames = "ConnectionInterface";
+export type NexusGenInterfaceNames = "ConnectionInterface" | "DeprecatedConnectionInterface";
 
 export type NexusGenScalarNames = "Boolean" | "Date" | "Float" | "ID" | "Int" | "String" | "Upload";
 

@@ -10,7 +10,7 @@ import { FormNodeEntryType, FormNodeFieldTypeEnum } from 'types/generated-types'
  */
 const LongTextContainer = styled.div`
   grid-column: span 2;
-  
+
   > * {
     width: 100%;
     height: auto;
@@ -35,7 +35,7 @@ const GeneralWrappedTextContainer = styled.div`
 
 const FormNodeEmailEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <GeneralWrappedTextContainer>
-    <UI.Label variantColor="gray" bg="gray.300">
+    <UI.Label textTransform="none" variantColor="gray" bg="gray.300">
       <UI.Icon color="gray.500" mr={1}>
         <AtSign width="14px" height="14px" />
       </UI.Icon>
@@ -46,7 +46,7 @@ const FormNodeEmailEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any })
 
 const FormNodeLongTextEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <LongTextContainer>
-    <UI.Label variantColor="gray" bg="gray.300">
+    <UI.Label textTransform="none" variantColor="gray" bg="gray.300">
       <UI.Icon color="gray.500" mr={1}>
         <FileText width="14px" height="14px" />
       </UI.Icon>
@@ -57,7 +57,7 @@ const FormNodeLongTextEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any
 
 const FormNodeShortTextEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <GeneralWrappedTextContainer>
-    <UI.Label variantColor="gray" bg="gray.300">
+    <UI.Label textTransform="none" variantColor="gray" bg="gray.300">
       <UI.Icon color="gray.500" mr={1}>
         <Type width="14px" height="14px" />
       </UI.Icon>
@@ -68,7 +68,7 @@ const FormNodeShortTextEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: an
 
 const FormNodePhoneNumberEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <GeneralWrappedTextContainer>
-    <UI.Label variantColor="gray" bg="gray.300">
+    <UI.Label textTransform="none" variantColor="gray" bg="gray.300">
       <UI.Icon color="gray.500" mr={1}>
         <Phone width="14px" height="14px" />
       </UI.Icon>
@@ -109,7 +109,7 @@ const MapFormNodeEntryVal: { [key in FormNodeFieldTypeEnum]?: React.FC<{ formNod
 };
 
 export const FormNodeEntry = ({ nodeEntry }: { nodeEntry: FormNodeEntryType }) => (
-  <UI.Card noHover>
+  <UI.Card noHover bg="white">
     <UI.CardBody>
       <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 1fr']}>
         {nodeEntry.values?.map((formNodeFieldEntry, index) => {

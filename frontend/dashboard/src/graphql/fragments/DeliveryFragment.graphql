@@ -1,0 +1,23 @@
+fragment DeliveryFragment on DeliveryType {
+  id
+
+  deliveryRecipientFirstName
+  deliveryRecipientLastName
+  deliveryRecipientEmail
+  deliveryRecipientPhone
+
+  scheduledAt
+  updatedAt
+  createdAt
+
+  campaignVariant {
+    id
+    label
+    type
+
+    campaign {
+      id
+      label
+    }
+  }
+}

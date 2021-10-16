@@ -1,9 +1,9 @@
 import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
 
-import { NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
-import { ConnectionInterface } from '../general/Pagination';
-import SessionService from './SessionService';
+import { NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../../node-entry/NodeEntry';
+import { ConnectionInterface, DeprecatedConnectionInterface } from '../../general/Pagination';
+import SessionService from '../SessionService';
 
 export const SessionType = objectType({
   name: 'Session',
@@ -43,16 +43,27 @@ export const SessionType = objectType({
       resolve: (parent) => parent.originUrl || '',
     });
 
+    t.string('device', { nullable: true });
     t.string('deliveryId', { nullable: true, resolve: (parent) => parent.deliveryId });
 
-    t.field('delivery', { type: 'DeliveryType', nullable: true });
+    t.field('delivery', {
+      type: 'DeliveryType',
+      nullable: true,
+      resolve: async (parent, _, ctx) => {
+        // @ts-ignore
+        if (parent.delivery) return parent.delivery
 
-    t.string('device', { nullable: true });
+        return ctx.services.campaignService.findDeliveryOfSession(parent.id);
+      }
+    });
+
 
     t.list.field('nodeEntries', {
       type: NodeEntryType,
 
       async resolve(parent, args, ctx) {
+        // @ts-ignore
+        if (parent.nodeEntries) return parent.nodeEntries;
         return ctx.services.nodeEntryService.getNodeEntriesBySessionId(parent.id);
       },
     });
@@ -100,18 +111,14 @@ export const SessionQuery = extendType({
     });
 
     t.field('session', {
+      description: 'A session is one entire user-interaction',
       type: SessionType,
-      args: { where: SessionWhereUniqueInput },
+      args: { id: 'String' },
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        if (!args.where?.id) {
-          return null;
-        }
-
-        const session = await ctx.services.sessionService.findSessionById(args.where.id);
-
-        return session;
+        if (!args?.id) throw new UserInputError('No id provided as input');
+        return ctx.services.sessionService.findSessionById(args.id);
       },
     });
   },

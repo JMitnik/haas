@@ -321,8 +321,6 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
     keyName: 'idKey',
   });
 
-  console.log(customVariables);
-
   const handleVariantWeightChange = (event: any, currentItemIndex: number) => {
     const maxValue = Math.min(event.target.value, 100);
     const value = Math.max(maxValue, 0);

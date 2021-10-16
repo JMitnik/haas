@@ -17,12 +17,13 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
-type AutodeckConnectionType implements ConnectionInterface {
+type AutodeckConnectionType implements DeprecatedConnectionInterface {
+  cursor: String
   endDate: String
   jobs: [CreateWorkspaceJobType!]!
   limit: Int!
-  offset: Int!
-  pageInfo: PaginationPageInfo!
+  offset: Int
+  pageInfo: DeprecatedPaginationPageInfo!
   startDate: String
 }
 
@@ -38,7 +39,7 @@ type CampaignType {
   deliveryConnection(filter: DeliveryConnectionFilter): DeliveryConnectionType
   id: ID!
   label: String!
-  variants: [CampaignVariantType!]!
+  variants: [CampaignVariantType!]
 }
 
 type CampaignVariantCustomVariableType {
@@ -55,6 +56,7 @@ enum CampaignVariantEnum {
 """Variant of campaign"""
 type CampaignVariantType {
   body: String!
+  campaign: CampaignType
   customVariables: [CampaignVariantCustomVariableType!]
   deliveryConnection: DeliveryConnectionType
   dialogue: Dialogue
@@ -87,11 +89,8 @@ type ColourSettings {
 
 """Interface all pagination-based models should implement"""
 interface ConnectionInterface {
-  endDate: String
-  limit: Int!
-  offset: Int!
   pageInfo: PaginationPageInfo!
-  startDate: String
+  totalPages: Int
 }
 
 input CreateBatchDeliveriesInputType {
@@ -295,7 +294,8 @@ input DeliveryConnectionFilter {
   status: DeliveryStatusEnum
 }
 
-type DeliveryConnectionType implements ConnectionInterface {
+type DeliveryConnectionType implements DeprecatedConnectionInterface {
+  cursor: String
   deliveries: [DeliveryType!]!
   endDate: String
   limit: Int!
@@ -303,13 +303,13 @@ type DeliveryConnectionType implements ConnectionInterface {
   nrOpened: Int!
   nrSent: Int!
   nrTotal: Int!
-  offset: Int!
-  pageInfo: PaginationPageInfo!
+  offset: Int
+  pageInfo: DeprecatedPaginationPageInfo!
   startDate: String
 }
 
 type DeliveryEventType {
-  createdAt: String!
+  createdAt: Date!
   failureMessage: String
   id: ID!
   status: DeliveryStatusEnum!
@@ -328,19 +328,38 @@ enum DeliveryStatusEnum {
 """Delivery"""
 type DeliveryType {
   campaignVariant: CampaignVariantType
+  createdAt: Date
   currentStatus: DeliveryStatusEnum!
   deliveryRecipientEmail: String
   deliveryRecipientFirstName: String
   deliveryRecipientLastName: String
   deliveryRecipientPhone: String
-  events: [DeliveryEventType!]!
+  events: [DeliveryEventType!]
   id: ID!
-  scheduledAt: String
-  updatedAt: String
+  scheduledAt: Date
+  updatedAt: Date
+}
+
+"""Interface all pagination-based models should implement"""
+interface DeprecatedConnectionInterface {
+  cursor: String
+  endDate: String
+  limit: Int!
+  offset: Int
+  pageInfo: DeprecatedPaginationPageInfo!
+  startDate: String
+}
+
+"""Information with regards to current page, and total number of pages"""
+type DeprecatedPaginationPageInfo {
+  cursor: String
+  nrPages: Int!
+  pageIndex: Int!
 }
 
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
+  campaignVariants: [CampaignVariantType!]!
   creationDate: String
   customer: Customer
   customerId: String!
@@ -354,7 +373,7 @@ type Dialogue {
   publicTitle: String
   questions: [QuestionNode!]!
   rootQuestion: QuestionNode!
-  sessionConnection(filter: PaginationWhereInput): SessionConnection
+  sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   sessions(take: Int): [Session!]!
   slug: String!
   statistics(input: DialogueFilterInputType): DialogueStatistics
@@ -768,10 +787,13 @@ input OptionsInputType {
   options: [OptionInputType!]
 }
 
-"""Information with regards to current page, and total number of pages"""
+"""Information with regards to current page."""
 type PaginationPageInfo {
-  nrPages: Int!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  nextPageOffset: Int!
   pageIndex: Int!
+  prevPageOffset: Int!
 }
 
 """Fields that can be used for free text search on tables"""
@@ -810,6 +832,7 @@ input PaginationSortInput {
 }
 
 input PaginationWhereInput {
+  cursor: String
   endDate: String
   limit: Int
   offset: Int
@@ -858,7 +881,9 @@ type Query {
   me: UserType!
   refreshAccessToken: RefreshAccessTokenOutput!
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
-  session(where: SessionWhereUniqueInput): Session
+
+  """A session is one entire user-interaction"""
+  session(id: String): Session
   sessions(where: SessionWhereUniqueInput): [Session!]!
   tags(customerSlug: String, dialogueId: String): [Tag!]!
   trigger(triggerId: String): TriggerType
@@ -966,11 +991,12 @@ type RequestInviteOutput {
   userExists: Boolean!
 }
 
-type RoleConnection implements ConnectionInterface {
+type RoleConnection implements DeprecatedConnectionInterface {
+  cursor: String
   endDate: String
   limit: Int!
-  offset: Int!
-  pageInfo: PaginationPageInfo!
+  offset: Int
+  pageInfo: DeprecatedPaginationPageInfo!
   roles: [RoleType!]!
   startDate: String
 }
@@ -1012,12 +1038,38 @@ type Session {
 }
 
 type SessionConnection implements ConnectionInterface {
-  endDate: String
-  limit: Int!
-  offset: Int!
   pageInfo: PaginationPageInfo!
   sessions: [Session!]!
+  totalPages: Int
+}
+
+input SessionConnectionFilterInput {
+  campaignVariantId: String
+  deliveryType: SessionDeliveryType
+  endDate: String
+  offset: Int
+  orderBy: SessionConnectionOrderByInput
+  perPage: Int = 10
+  scoreRange: SessionScoreRangeFilter
+  search: String
   startDate: String
+}
+
+"""Fields to order SessionConnection by."""
+enum SessionConnectionOrder {
+  createdAt
+}
+
+"""Sorting of sessionConnection"""
+input SessionConnectionOrderByInput {
+  by: SessionConnectionOrder!
+  desc: Boolean = true
+}
+
+"""Delivery type of session to filter by."""
+enum SessionDeliveryType {
+  campaigns
+  noCampaigns
 }
 
 """Input for session"""
@@ -1028,6 +1080,12 @@ input SessionInput {
   entries: [NodeEntryInput!]
   originUrl: String
   totalTimeInSec: Int
+}
+
+"""Scores to filter sessions by."""
+input SessionScoreRangeFilter {
+  max: Int
+  min: Int
 }
 
 input SessionWhereUniqueInput {
@@ -1173,11 +1231,12 @@ type TriggerConditionType {
   type: TriggerConditionEnum!
 }
 
-type TriggerConnectionType implements ConnectionInterface {
+type TriggerConnectionType implements DeprecatedConnectionInterface {
+  cursor: String
   endDate: String
   limit: Int!
-  offset: Int!
-  pageInfo: PaginationPageInfo!
+  offset: Int
+  pageInfo: DeprecatedPaginationPageInfo!
   startDate: String
   triggers: [TriggerType!]!
 }
@@ -1244,11 +1303,12 @@ enum UploadImageEnumType {
   WEBSITE_SCREENSHOT
 }
 
-type UserConnection implements ConnectionInterface {
+type UserConnection implements DeprecatedConnectionInterface {
+  cursor: String
   endDate: String
   limit: Int!
-  offset: Int!
-  pageInfo: PaginationPageInfo!
+  offset: Int
+  pageInfo: DeprecatedPaginationPageInfo!
   startDate: String
   userCustomers: [UserCustomer!]!
 }

@@ -80,15 +80,20 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
 
 const authShield = shield({
   Query: {
-    users: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS),
+    users: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
     user: or(isSelf, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
   },
   Customer: {
-    usersConnection: containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)
+    usersConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
+  },
+  DeliveryType: {
+    deliveryRecipientFirstName: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES)),
+    deliveryRecipientLastName: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES)),
   },
   Dialogue: {
     // Write this up
     // statistics: canAccessCompany,
+    sessionConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_DIALOGUE)),
   },
   Mutation: {
     '*': isSuperAdmin,
@@ -100,31 +105,31 @@ const authShield = shield({
     requestInvite: allow,
     deleteCustomer: isSuperAdmin,
 
-    createCampaign: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_CAMPAIGNS),
-    createBatchDeliveries: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES),
+    createCampaign: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_CAMPAIGNS)),
+    createBatchDeliveries: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES)),
 
-    inviteUser: containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS),
-    editWorkspace: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
+    inviteUser: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS)),
+    editWorkspace: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE)),
     editUser: or(isSelf, isSuperAdmin),
 
     updateDeliveryStatus: isFromClient,
 
     // // Dialogue-specific settings
-    deleteQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    updateQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    createQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    updateCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    deleteCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    createCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
+    deleteQuestion: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE)),
+    updateQuestion: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE)),
+    createQuestion: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE)),
+    updateCTA: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE)),
+    deleteCTA: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE)),
+    createCTA: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE)),
     copyDialogue: isSuperAdmin,
-    createDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    editDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_DIALOGUE),
-    deleteDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_DIALOGUE),
+    createDialogue: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE)),
+    editDialogue: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_DIALOGUE)),
+    deleteDialogue: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_DIALOGUE)),
 
     // // Workspace-trigger specific settings
-    deleteTrigger: containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_TRIGGERS),
-    editTrigger: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_TRIGGERS),
-    createTrigger: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_TRIGGERS),
+    deleteTrigger: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_TRIGGERS)),
+    editTrigger: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_TRIGGERS)),
+    createTrigger: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_TRIGGERS)),
   },
 }, { fallbackRule: allow, allowExternalErrors: true });
 

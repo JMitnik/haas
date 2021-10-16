@@ -10,7 +10,7 @@ export const CampaignModel = objectType({
   definition(t) {
     t.id('id');
     t.string('label');
-    t.list.field('variants', { type: CampaignVariantModel });
+    t.list.field('variants', { type: CampaignVariantModel, nullable: true });
   },
 });
 
@@ -56,68 +56,3 @@ export const GetCampaignOfWorkspace = extendType({
   }
 });
 
-/**
- * Access pattern for accessign all campaigns belonging to a workspace.
- */
-export const GetCampaignsOfWorkspace = extendType({
-  type: 'Customer',
-
-  definition(t) {
-    t.list.field('campaigns', {
-      type: CampaignModel,
-      resolve: async (parent, args, ctx) => {
-        const workspaceWithCampaigns = await ctx.services.campaignService.findCampaignsOfWorkspace(parent.id);
-        if (!workspaceWithCampaigns) throw new UserInputError('Can\'t find workspace!');
-
-        return workspaceWithCampaigns.campaigns.map(campaign => ({
-          ...campaign,
-          variants: campaign.variantsEdges.map((variantEdge) => ({
-            weight: variantEdge.weight,
-            ...variantEdge.campaignVariant
-          }))
-        })) || [];
-      },
-    });
-  },
-});
-
-export const GetCampaignVariantOfDelivery = extendType({
-  type: 'DeliveryType',
-
-  definition(t) {
-    t.field('campaignVariant', {
-      type: CampaignVariantModel,
-      nullable: true,
-      resolve: async (parent, args, ctx) => {
-        if (!parent.id) throw new ApolloError('Cant find matching delivery');
-
-        const campaignVariant = (await ctx.prisma.delivery.findUnique({
-          where: { id: parent.id },
-          include: {
-            campaignVariant: {
-              include: {
-                CampaignVariantToCampaign: true,
-                dialogue: true,
-                workspace: true,
-                customVariables: true,
-              }
-            }
-          }
-        }))?.campaignVariant;
-
-        if (!campaignVariant) throw new ApolloError('Parent delivery is not connected to campaign variant');
-
-        return {
-          id: campaignVariant.id,
-          body: campaignVariant.body,
-          dialogue: campaignVariant.dialogue,
-          label: campaignVariant.label,
-          weight: campaignVariant.CampaignVariantToCampaign[0].weight,
-          workspace: campaignVariant.workspace,
-          type: campaignVariant.type,
-          customVariables: campaignVariant.customVariables,
-        };
-      }
-    })
-  }
-})

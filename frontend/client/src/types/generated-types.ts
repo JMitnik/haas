@@ -1,5 +1,6 @@
-import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
+import { gql } from '@apollo/client';
+
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -34,7 +35,6 @@ export type CampaignType = {
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
-
 /** Campaign */
 export type CampaignTypeDeliveryConnectionArgs = {
   filter?: Maybe<DeliveryConnectionFilter>;
@@ -43,7 +43,7 @@ export type CampaignTypeDeliveryConnectionArgs = {
 export enum CampaignVariantEnum {
   Sms = 'SMS',
   Email = 'EMAIL',
-  Queue = 'QUEUE'
+  Queue = 'QUEUE',
 }
 
 /** Variant of campaign */
@@ -73,7 +73,7 @@ export type ColourSettings = {
 };
 
 /** Interface all pagination-based models should implement */
-export type ConnectionInterface = {
+export type DeprecatedConnectionInterface = {
   offset: Scalars['Int'];
   limit: Scalars['Int'];
   pageInfo: PaginationPageInfo;
@@ -194,27 +194,22 @@ export type Customer = {
   campaigns: Array<CampaignType>;
 };
 
-
 export type CustomerUsersConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
 };
 
-
 export type CustomerDialogueArgs = {
   where?: Maybe<DialogueWhereUniqueInput>;
 };
-
 
 export type CustomerUserCustomerArgs = {
   userId?: Maybe<Scalars['String']>;
 };
 
-
 export type CustomerDialoguesArgs = {
   filter?: Maybe<DialogueFilterInputType>;
 };
-
 
 export type CustomerCampaignArgs = {
   campaignId?: Maybe<Scalars['String']>;
@@ -231,7 +226,6 @@ export type CustomerSettings = {
 export type CustomerWhereUniqueInput = {
   id: Scalars['ID'];
 };
-
 
 export type Debug = {
   __typename?: 'Debug';
@@ -267,7 +261,7 @@ export type DeliveryConnectionFilter = {
   campaignVariantId?: Maybe<Scalars['ID']>;
 };
 
-export type DeliveryConnectionType = ConnectionInterface & {
+export type DeliveryConnectionType = DeprecatedConnectionInterface & {
   __typename?: 'DeliveryConnectionType';
   offset: Scalars['Int'];
   limit: Scalars['Int'];
@@ -293,7 +287,7 @@ export enum DeliveryStatusEnum {
   Deployed = 'DEPLOYED',
   Sent = 'SENT',
   Opened = 'OPENED',
-  Finished = 'FINISHED'
+  Finished = 'FINISHED',
 }
 
 /** Delivery */
@@ -335,26 +329,21 @@ export type Dialogue = {
   leafs: Array<QuestionNode>;
 };
 
-
 export type DialogueAverageScoreArgs = {
   input?: Maybe<DialogueFilterInputType>;
 };
-
 
 export type DialogueStatisticsArgs = {
   input?: Maybe<DialogueFilterInputType>;
 };
 
-
 export type DialogueSessionConnectionArgs = {
   filter?: Maybe<PaginationWhereInput>;
 };
 
-
 export type DialogueSessionsArgs = {
   take?: Maybe<Scalars['Int']>;
 };
-
 
 export type DialogueLeafsArgs = {
   searchTerm?: Maybe<Scalars['String']>;
@@ -497,7 +486,7 @@ export enum FormNodeFieldTypeEnum {
   Url = 'url',
   ShortText = 'shortText',
   LongText = 'longText',
-  Number = 'number'
+  Number = 'number',
 }
 
 export type FormNodeInputType = {
@@ -561,7 +550,7 @@ export enum LinkTypeEnumType {
   Linkedin = 'LINKEDIN',
   Whatsapp = 'WHATSAPP',
   Instagram = 'INSTAGRAM',
-  Twitter = 'TWITTER'
+  Twitter = 'TWITTER',
 }
 
 /** Login credential */
@@ -622,12 +611,10 @@ export type Mutation = {
   debugMutation?: Maybe<Scalars['String']>;
 };
 
-
 export type MutationAssignTagsArgs = {
   dialogueId?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
 };
-
 
 export type MutationCreateTagArgs = {
   name?: Maybe<Scalars['String']>;
@@ -635,33 +622,27 @@ export type MutationCreateTagArgs = {
   type?: Maybe<TagTypeEnum>;
 };
 
-
 export type MutationDeleteTagArgs = {
   tagId?: Maybe<Scalars['String']>;
 };
-
 
 export type MutationCreateCampaignArgs = {
   input?: Maybe<CreateCampaignInputType>;
 };
 
-
 export type MutationCreateBatchDeliveriesArgs = {
   input?: Maybe<CreateBatchDeliveriesInputType>;
 };
-
 
 export type MutationUpdateDeliveryStatusArgs = {
   deliveryId?: Maybe<Scalars['String']>;
   status?: Maybe<DeliveryStatusEnum>;
 };
 
-
 export type MutationDeleteTriggerArgs = {
   id?: Maybe<Scalars['String']>;
   customerSlug?: Maybe<Scalars['String']>;
 };
-
 
 export type MutationEditTriggerArgs = {
   triggerId?: Maybe<Scalars['String']>;
@@ -670,74 +651,60 @@ export type MutationEditTriggerArgs = {
   trigger?: Maybe<TriggerInputType>;
 };
 
-
 export type MutationCreateTriggerArgs = {
   input?: Maybe<CreateTriggerInputType>;
 };
-
 
 export type MutationCreatePermissionArgs = {
   data?: Maybe<PermissionInput>;
 };
 
-
 export type MutationCreateRoleArgs = {
   data?: Maybe<RoleInput>;
 };
-
 
 export type MutationUpdateRolesArgs = {
   roleId?: Maybe<Scalars['String']>;
   permissions?: Maybe<PermissionIdsInput>;
 };
 
-
 export type MutationSingleUploadArgs = {
   file?: Maybe<Scalars['Upload']>;
 };
-
 
 export type MutationCreateWorkspaceArgs = {
   input?: Maybe<CreateWorkspaceInput>;
 };
 
-
 export type MutationEditWorkspaceArgs = {
   input?: Maybe<EditWorkspaceInput>;
 };
 
-
 export type MutationDeleteCustomerArgs = {
   where?: Maybe<CustomerWhereUniqueInput>;
 };
-
 
 export type MutationCreateUserArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   input?: Maybe<UserInput>;
 };
 
-
 export type MutationEditUserArgs = {
   userId?: Maybe<Scalars['String']>;
   input?: Maybe<EditUserInput>;
 };
 
-
 export type MutationDeleteUserArgs = {
   input?: Maybe<DeleteUserInput>;
 };
-
 
 export type MutationCopyDialogueArgs = {
   input?: Maybe<CreateDialogueInputType>;
 };
 
-
 export type MutationCreateDialogueArgs = {
   input?: Maybe<CreateDialogueInputType>;
 };
-
 
 export type MutationEditDialogueArgs = {
   customerSlug?: Maybe<Scalars['String']>;
@@ -749,66 +716,53 @@ export type MutationEditDialogueArgs = {
   tags?: Maybe<TagsInputObjectType>;
 };
 
-
 export type MutationDeleteDialogueArgs = {
   input?: Maybe<DeleteDialogueInputType>;
 };
-
 
 export type MutationRegisterArgs = {
   input?: Maybe<RegisterInput>;
 };
 
-
 export type MutationVerifyUserTokenArgs = {
   token?: Maybe<Scalars['String']>;
 };
-
 
 export type MutationRequestInviteArgs = {
   input?: Maybe<RequestInviteInput>;
 };
 
-
 export type MutationInviteUserArgs = {
   input?: Maybe<InviteUserInput>;
 };
-
 
 export type MutationCreateSessionArgs = {
   input?: Maybe<SessionInput>;
 };
 
-
 export type MutationAppendToInteractionArgs = {
   input?: Maybe<AppendToInteractionInput>;
 };
-
 
 export type MutationDeleteQuestionArgs = {
   input?: Maybe<DeleteNodeInputType>;
 };
 
-
 export type MutationUpdateQuestionArgs = {
   input?: Maybe<UpdateQuestionNodeInputType>;
 };
-
 
 export type MutationCreateQuestionArgs = {
   input?: Maybe<CreateQuestionNodeInputType>;
 };
 
-
 export type MutationDeleteCtaArgs = {
   input?: Maybe<DeleteNodeInputType>;
 };
 
-
 export type MutationCreateCtaArgs = {
   input?: Maybe<CreateCtaInputType>;
 };
-
 
 export type MutationUpdateCtaArgs = {
   input?: Maybe<UpdateCtaInputType>;
@@ -877,7 +831,7 @@ export enum PaginationSearchEnum {
   LastName = 'lastName',
   Email = 'email',
   Title = 'title',
-  PublicTitle = 'publicTitle'
+  PublicTitle = 'publicTitle',
 }
 
 /** Ways to sort a pagination object */
@@ -896,7 +850,7 @@ export enum PaginationSortByEnum {
   User = 'user',
   When = 'when',
   ScheduledAt = 'scheduledAt',
-  UpdatedAt = 'updatedAt'
+  UpdatedAt = 'updatedAt',
 }
 
 /** Sorting of pagination (type and whether it ascends) */
@@ -960,28 +914,23 @@ export type Query = {
   edge?: Maybe<Edge>;
 };
 
-
 export type QueryTagsArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   dialogueId?: Maybe<Scalars['String']>;
 };
 
-
 export type QueryDeliveryArgs = {
   deliveryId?: Maybe<Scalars['String']>;
 };
-
 
 export type QueryTriggerConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
 };
 
-
 export type QueryTriggerArgs = {
   triggerId?: Maybe<Scalars['String']>;
 };
-
 
 export type QueryTriggersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
@@ -990,38 +939,31 @@ export type QueryTriggersArgs = {
   filter?: Maybe<PaginationWhereInput>;
 };
 
-
 export type QueryRoleConnectionArgs = {
   customerId?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
 };
 
-
 export type QueryRolesArgs = {
   customerSlug?: Maybe<Scalars['String']>;
 };
-
 
 export type QueryCustomerArgs = {
   id?: Maybe<Scalars['ID']>;
   slug?: Maybe<Scalars['String']>;
 };
 
-
 export type QueryUserOfCustomerArgs = {
   input?: Maybe<UserOfCustomerInput>;
 };
-
 
 export type QueryUsersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
 };
 
-
 export type QueryUserArgs = {
   userId?: Maybe<Scalars['String']>;
 };
-
 
 export type QueryLineChartDataArgs = {
   dialogueId?: Maybe<Scalars['String']>;
@@ -1030,31 +972,25 @@ export type QueryLineChartDataArgs = {
   offset?: Maybe<Scalars['Int']>;
 };
 
-
 export type QueryDialogueArgs = {
   where?: Maybe<DialogueWhereUniqueInput>;
 };
-
 
 export type QueryDialoguesArgs = {
   filter?: Maybe<DialogueFilterInputType>;
 };
 
-
 export type QuerySessionsArgs = {
   where?: Maybe<SessionWhereUniqueInput>;
 };
-
 
 export type QuerySessionArgs = {
   where?: Maybe<SessionWhereUniqueInput>;
 };
 
-
 export type QueryQuestionNodeArgs = {
   where?: Maybe<QuestionNodeWhereUniqueInput>;
 };
-
 
 export type QueryEdgeArgs = {
   id?: Maybe<Scalars['String']>;
@@ -1092,7 +1028,7 @@ export enum QuestionNodeTypeEnum {
   Form = 'FORM',
   Textbox = 'TEXTBOX',
   Link = 'LINK',
-  Share = 'SHARE'
+  Share = 'SHARE',
 }
 
 export type QuestionNodeWhereInputType = {
@@ -1145,7 +1081,7 @@ export type RequestInviteOutput = {
   didInvite: Scalars['Boolean'];
 };
 
-export type RoleConnection = ConnectionInterface & {
+export type RoleConnection = DeprecatedConnectionInterface & {
   __typename?: 'RoleConnection';
   offset: Scalars['Int'];
   limit: Scalars['Int'];
@@ -1187,7 +1123,7 @@ export type Session = {
   nodeEntries: Array<NodeEntry>;
 };
 
-export type SessionConnection = ConnectionInterface & {
+export type SessionConnection = DeprecatedConnectionInterface & {
   __typename?: 'SessionConnection';
   offset: Scalars['Int'];
   limit: Scalars['Int'];
@@ -1294,7 +1230,7 @@ export enum SystemPermission {
   CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
   CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
   CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
-  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES'
+  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES',
 }
 
 export type Tag = {
@@ -1312,7 +1248,7 @@ export type TagsInputObjectType = {
 export enum TagTypeEnum {
   Default = 'DEFAULT',
   Location = 'LOCATION',
-  Agent = 'AGENT'
+  Agent = 'AGENT',
 }
 
 /** Input type for a textbox node */
@@ -1332,7 +1268,7 @@ export enum TriggerConditionEnum {
   HighThreshold = 'HIGH_THRESHOLD',
   InnerRange = 'INNER_RANGE',
   OuterRange = 'OUTER_RANGE',
-  TextMatch = 'TEXT_MATCH'
+  TextMatch = 'TEXT_MATCH',
 }
 
 export type TriggerConditionInputType = {
@@ -1355,7 +1291,7 @@ export type TriggerConditionType = {
   question?: Maybe<QuestionNode>;
 };
 
-export type TriggerConnectionType = ConnectionInterface & {
+export type TriggerConnectionType = DeprecatedConnectionInterface & {
   __typename?: 'TriggerConnectionType';
   offset: Scalars['Int'];
   limit: Scalars['Int'];
@@ -1375,7 +1311,7 @@ export type TriggerInputType = {
 export enum TriggerMediumEnum {
   Email = 'EMAIL',
   Phone = 'PHONE',
-  Both = 'BOTH'
+  Both = 'BOTH',
 }
 
 export type TriggerType = {
@@ -1392,7 +1328,7 @@ export type TriggerType = {
 
 export enum TriggerTypeEnum {
   Question = 'QUESTION',
-  Scheduled = 'SCHEDULED'
+  Scheduled = 'SCHEDULED',
 }
 
 export type UpdateCtaInputType = {
@@ -1417,8 +1353,7 @@ export type UpdateQuestionNodeInputType = {
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
 
-
-export type UserConnection = ConnectionInterface & {
+export type UserConnection = DeprecatedConnectionInterface & {
   __typename?: 'UserConnection';
   offset: Scalars['Int'];
   limit: Scalars['Int'];
@@ -1476,7 +1411,6 @@ export type GetDeliveryQueryVariables = Exact<{
   deliveryId?: Maybe<Scalars['String']>;
 }>;
 
-
 export type GetDeliveryQuery = (
   { __typename?: 'Query' }
   & { delivery?: Maybe<(
@@ -1501,7 +1435,6 @@ export type UpdateDeliveryStatusMutationVariables = Exact<{
   status: DeliveryStatusEnum;
 }>;
 
-
 export type UpdateDeliveryStatusMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'updateDeliveryStatus'>
@@ -1510,7 +1443,6 @@ export type UpdateDeliveryStatusMutation = (
 export type CreateSessionMutationVariables = Exact<{
   input?: Maybe<SessionInput>;
 }>;
-
 
 export type CreateSessionMutation = (
   { __typename?: 'Mutation' }
@@ -1559,7 +1491,6 @@ export type CustomerQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
 
-
 export type CustomerQuery = (
   { __typename?: 'Query' }
   & { customer?: Maybe<(
@@ -1572,7 +1503,6 @@ export type GetDialogueQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   dialogueSlug: Scalars['String'];
 }>;
-
 
 export type GetDialogueQuery = (
   { __typename?: 'Query' }
@@ -1742,17 +1672,17 @@ export const GetDeliveryDocument = gql`
  * });
  */
 export function useGetDeliveryQuery(baseOptions?: Apollo.QueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
-        return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, baseOptions);
-      }
+  return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, baseOptions);
+}
 export function useGetDeliveryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
-          return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, baseOptions);
-        }
+  return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, baseOptions);
+}
 export type GetDeliveryQueryHookResult = ReturnType<typeof useGetDeliveryQuery>;
 export type GetDeliveryLazyQueryHookResult = ReturnType<typeof useGetDeliveryLazyQuery>;
 export type GetDeliveryQueryResult = Apollo.QueryResult<GetDeliveryQuery, GetDeliveryQueryVariables>;
 export function refetchGetDeliveryQuery(variables?: GetDeliveryQueryVariables) {
-      return { query: GetDeliveryDocument, variables: variables }
-    }
+  return { query: GetDeliveryDocument, variables };
+}
 export const UpdateDeliveryStatusDocument = gql`
     mutation UpdateDeliveryStatus($deliveryId: String!, $status: DeliveryStatusEnum!) {
   updateDeliveryStatus(deliveryId: $deliveryId, status: $status)
@@ -1779,8 +1709,8 @@ export type UpdateDeliveryStatusMutationFn = Apollo.MutationFunction<UpdateDeliv
  * });
  */
 export function useUpdateDeliveryStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>) {
-        return Apollo.useMutation<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>(UpdateDeliveryStatusDocument, baseOptions);
-      }
+  return Apollo.useMutation<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>(UpdateDeliveryStatusDocument, baseOptions);
+}
 export type UpdateDeliveryStatusMutationHookResult = ReturnType<typeof useUpdateDeliveryStatusMutation>;
 export type UpdateDeliveryStatusMutationResult = Apollo.MutationResult<UpdateDeliveryStatusMutation>;
 export type UpdateDeliveryStatusMutationOptions = Apollo.BaseMutationOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
@@ -1811,8 +1741,8 @@ export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutat
  * });
  */
 export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSessionMutation, CreateSessionMutationVariables>) {
-        return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, baseOptions);
-      }
+  return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, baseOptions);
+}
 export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
 export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
 export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
@@ -1841,17 +1771,17 @@ export const CustomerDocument = gql`
  * });
  */
 export function useCustomerQuery(baseOptions: Apollo.QueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
-        return Apollo.useQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
-      }
+  return Apollo.useQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
+}
 export function useCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
-          return Apollo.useLazyQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
-        }
+  return Apollo.useLazyQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
+}
 export type CustomerQueryHookResult = ReturnType<typeof useCustomerQuery>;
 export type CustomerLazyQueryHookResult = ReturnType<typeof useCustomerLazyQuery>;
 export type CustomerQueryResult = Apollo.QueryResult<CustomerQuery, CustomerQueryVariables>;
 export function refetchCustomerQuery(variables?: CustomerQueryVariables) {
-      return { query: CustomerDocument, variables: variables }
-    }
+  return { query: CustomerDocument, variables };
+}
 export const GetDialogueDocument = gql`
     query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
   customer(slug: $customerSlug) {
@@ -1919,14 +1849,14 @@ ${CustomerFragmentFragmentDoc}`;
  * });
  */
 export function useGetDialogueQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
-        return Apollo.useQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
-      }
+  return Apollo.useQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
+}
 export function useGetDialogueLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
-          return Apollo.useLazyQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
-        }
+  return Apollo.useLazyQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
+}
 export type GetDialogueQueryHookResult = ReturnType<typeof useGetDialogueQuery>;
 export type GetDialogueLazyQueryHookResult = ReturnType<typeof useGetDialogueLazyQuery>;
 export type GetDialogueQueryResult = Apollo.QueryResult<GetDialogueQuery, GetDialogueQueryVariables>;
 export function refetchGetDialogueQuery(variables?: GetDialogueQueryVariables) {
-      return { query: GetDialogueDocument, variables: variables }
-    }
+  return { query: GetDialogueDocument, variables };
+}

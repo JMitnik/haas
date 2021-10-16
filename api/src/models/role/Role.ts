@@ -51,7 +51,7 @@ export const RoleInput = inputObjectType({
 export const RoleConnection = objectType({
   name: 'RoleConnection',
   definition(t) {
-    t.implements('ConnectionInterface');
+    t.implements('DeprecatedConnectionInterface');
     t.list.field('roles', { type: RoleType });
   },
 });

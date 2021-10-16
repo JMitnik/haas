@@ -1,4 +1,6 @@
-import { PrismaClient, Session } from "@prisma/client";
+import { Prisma, PrismaClient, Session } from "@prisma/client";
+import { cloneDeep } from "lodash";
+import { NexusGenFieldTypes, NexusGenInputNames, NexusGenInputs } from "../../generated/nexus";
 
 import NodeEntryService from "../node-entry/NodeEntryService";
 import { CreateSessionInput } from "./SessionPrismaAdapterType";
@@ -9,6 +11,161 @@ class SessionPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  /**
+   * Build a session prisma query based on the filter parameters.
+   * @param dialogueId
+   * @param filter
+   */
+  buildFindSessionsQuery = (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
+    // Required: filter by dialogueId
+    let query: Prisma.SessionWhereInput = { dialogueId, delivery: undefined, };
+
+    // Optional: Filter by campaigns or not
+    if (filter?.deliveryType) {
+      query.delivery = {
+        is: filter?.deliveryType === 'noCampaigns' ? null : undefined,
+        isNot: filter?.deliveryType === 'campaigns' ? null : undefined,
+      }
+    }
+
+    // Optional: filter by score range.
+    if (filter?.scoreRange?.min || filter?.scoreRange?.max) {
+      query.nodeEntries = {
+        some: {
+          sliderNodeEntry: {
+            value: {
+              gte: filter?.scoreRange?.min || undefined,
+              lte: filter?.scoreRange?.max || undefined,
+            }
+          }
+        }
+      }
+    }
+
+    // Optional: Filter by campaign-variant
+    if (filter?.campaignVariantId) {
+      query.delivery = {
+        campaignVariantId: filter.campaignVariantId
+      }
+    }
+
+    // Optional: filter by date
+    if (filter?.startDate || filter?.endDate) {
+      query.createdAt = {
+        gte: filter?.startDate ? new Date(filter.startDate) : undefined,
+        lte: filter?.endDate ? new Date(filter.endDate) : undefined,
+      }
+    }
+
+    // Add search filter
+    if (filter?.search) {
+      const [potentialFirstName, potentialLastName] = filter.search.split(' ');
+
+      const doFullSearch = () => {
+        if (potentialLastName) {
+          return {
+            AND: potentialLastName ? [
+              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
+              { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
+            ] : undefined
+          }
+        }
+
+        return
+      };
+
+      query = {
+        ...cloneDeep(query),
+        OR: [{
+          nodeEntries: {
+            some: {
+              // Allow searching in choices and form entries
+              OR: [
+                {
+                  choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } }
+                },
+                {
+                  formNodeEntry: {
+                    values: {
+                      some: {
+                        OR: [
+                          { longText: { contains: filter.search, mode: 'insensitive' } },
+                          { shortText: { contains: filter.search, mode: 'insensitive' } },
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+
+        // Allow searching for delivery properties
+        // TODO: Might be a tricky query, perhaps we should do per-field searching instead.
+        {
+          delivery: {
+            OR: [
+              { deliveryRecipientEmail: { equals: filter.search, mode: 'insensitive' }, },
+              { deliveryRecipientPhone: { equals: filter.search, mode: 'insensitive' }, },
+              {
+                AND: potentialLastName ? [
+                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
+                  { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
+                ] : undefined
+              },
+              {
+                OR: !potentialLastName ? [
+                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
+                  { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' }, },
+                ] : undefined
+              }
+            ]
+          }
+        }]
+      }
+    }
+
+    return query;
+  }
+
+  /**
+   * Order interactions by a "created-at".
+   * @param filter
+   */
+  buildOrderByQuery = (filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
+    let orderByQuery: Prisma.SessionOrderByInput[] = [];
+
+    if (filter?.orderBy?.by === 'createdAt') {
+      orderByQuery.push({
+        createdAt: filter.orderBy.desc ? 'desc' : 'asc',
+      })
+    }
+
+    return orderByQuery;
+  }
+
+  findSessions = async (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const sessions = await this.prisma.session.findMany({
+      where: this.buildFindSessionsQuery(dialogueId, filter),
+      skip: offset,
+      take: perPage,
+      orderBy: this.buildOrderByQuery(filter),
+      include: { delivery: { include: { campaignVariant: true, } } }
+    });
+
+    return sessions;
+  }
+
+  countSessions = async (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
+    return this.prisma.session.count({
+      where: this.buildFindSessionsQuery(dialogueId, filter),
+    });
+  }
 
   updateDelivery(sessionId: string, deliveryId: string) {
     return this.prisma.session.update({
@@ -60,7 +217,10 @@ class SessionPrismaAdapter {
 
   /**
    * Fetches single session from database.
-   * */
+   *
+   * Notes:
+   * - Includes node-entries
+  */
   findSessionById(sessionId: string): Promise<Session | null> {
     return this.prisma.session.findUnique({
       where: {
@@ -68,6 +228,7 @@ class SessionPrismaAdapter {
       },
       include: {
         nodeEntries: {
+          orderBy: { depth: 'asc' },
           include: {
             choiceNodeEntry: true,
             linkNodeEntry: true,

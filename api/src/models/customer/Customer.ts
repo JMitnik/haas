@@ -15,6 +15,7 @@ import { PaginationWhereInput } from '../general/Pagination';
 import { UserConnection, UserCustomerType } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
 import isValidColor from '../../utils/isValidColor';
+import { CampaignModel } from '../Campaigns';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -131,6 +132,22 @@ export const CustomerType = objectType({
         const users = customer?.users.map((userCustomer) => userCustomer.user) || null as any;
 
         return users;
+      },
+    });
+
+    t.list.field('campaigns', {
+      type: CampaignModel,
+      resolve: async (parent, args, ctx) => {
+        const workspaceWithCampaigns = await ctx.services.campaignService.findCampaignsOfWorkspace(parent.id);
+        if (!workspaceWithCampaigns) throw new UserInputError('Can\'t find workspace!');
+
+        return workspaceWithCampaigns.campaigns.map(campaign => ({
+          ...campaign,
+          variants: campaign.variantsEdges.map((variantEdge) => ({
+            weight: variantEdge.weight,
+            ...variantEdge.campaignVariant
+          }))
+        })) || [];
       },
     });
 
@@ -331,16 +348,16 @@ export const CustomerQuery = extendType({
       nullable: true,
       async resolve(parent, args, ctx) {
         if (args.slug) {
-          const customer = await ctx.services.customerService.findWorkspaceBySlug(args.slug);
+          const customer = ctx.services.customerService.findWorkspaceBySlug(args.slug);
           return customer;
         }
 
         if (args.id) {
-          const customer = await ctx.services.customerService.findWorkspaceById(args.id);
+          const customer = ctx.services.customerService.findWorkspaceById(args.id);
           return customer;
         }
 
-        throw new UserInputError('Cant find the customer here');
+        throw new UserInputError('Provide workspace Slug or Id');
       },
     });
   },
