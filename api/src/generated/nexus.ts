@@ -160,8 +160,13 @@ export interface NexusGenInputs {
     offset?: number | null; // Int
     orderBy?: NexusGenInputs['DeliveryConnectionOrderByInput'] | null; // DeliveryConnectionOrderByInput
     perPage?: number | null; // Int
+    recipientEmail?: string | null; // String
+    recipientFirstName?: string | null; // String
+    recipientLastName?: string | null; // String
+    recipientPhoneNumber?: string | null; // String
     search?: string | null; // String
     startDate?: string | null; // String
+    status?: NexusGenEnums['DeliveryStatusEnum'] | null; // DeliveryStatusEnum
   }
   DeliveryConnectionOrderByInput: { // input type
     by: NexusGenEnums['DeliveryConnectionOrder']; // DeliveryConnectionOrder!

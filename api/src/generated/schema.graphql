@@ -297,8 +297,13 @@ input DeliveryConnectionFilterInput {
   offset: Int
   orderBy: DeliveryConnectionOrderByInput
   perPage: Int = 10
+  recipientEmail: String
+  recipientFirstName: String
+  recipientLastName: String
+  recipientPhoneNumber: String
   search: String
   startDate: String
+  status: DeliveryStatusEnum
 }
 
 """Fields to order DeliveryConnection by."""

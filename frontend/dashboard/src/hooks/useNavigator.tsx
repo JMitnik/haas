@@ -35,7 +35,7 @@ export const useNavigator = () => {
       campaignId: nextCampaignId,
     });
 
-    history.push(path);
+    history.push(path + location.search);
   };
 
   const goToDeliveryView = (nextCampaignId: string, deliveryId: string) => {
@@ -45,7 +45,7 @@ export const useNavigator = () => {
       deliveryId,
     });
 
-    history.push(path);
+    history.push(path + location.search);
   };
 
   const goToInteractionsView = (interactionId?: string) => {

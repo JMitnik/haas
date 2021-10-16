@@ -1,6 +1,42 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    filter_by_recipient_first_name: {
+      en: 'Filter by first name',
+      de: 'Nach Vornamen filtern',
+    },
+    filter_by_recipient_last_name: {
+      en: 'Filter by last name',
+      de: 'Nach Nachnamen filtern',
+    },
+    filter_by_recipient_email: {
+      en: 'Filter by email',
+      de: 'Nach E-mail filtern',
+    },
+    filter_by_recipient_phone: {
+      en: 'Filter by phone number',
+      de: 'Nach Telefonnummern filtern',
+    },
+    recipientFirstName: {
+      en: 'Recipient first name',
+      de: 'Vorname des Empfängers',
+    },
+    recipientLastName: {
+      en: 'Recipient first name',
+      de: 'Nachname des Empfängers',
+    },
+    recipientEmail: {
+      en: 'Recipient email',
+      de: 'E-Mail des Empfängers',
+    },
+    updatedAt: {
+      en: 'Updated at',
+      de: 'aktualisiert am',
+    },
+    filter_by_updated_date_description: {
+      en: 'Filter by last updated date.',
+      de: 'Filter nach Datum der letzten Aktualisierung',
+    },
     last_update: {
       en: 'Last update',
       de: 'Letztes Update',

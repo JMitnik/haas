@@ -28,7 +28,7 @@ export class CampaignPrismaAdapter {
 
     // Optional: filter by date
     if (filter?.startDate || filter?.endDate) {
-      query.createdAt = {
+      query.updatedAt = {
         gte: filter?.startDate ? new Date(filter.startDate) : undefined,
         lte: filter?.endDate ? new Date(filter.endDate) : undefined,
       }
@@ -58,6 +58,12 @@ export class CampaignPrismaAdapter {
         ]
       }
     }
+
+    if (filter?.recipientEmail) { query.deliveryRecipientEmail = { equals: filter.recipientEmail } }
+    if (filter?.recipientPhoneNumber) { query.deliveryRecipientPhone = { equals: filter.recipientPhoneNumber } }
+    if (filter?.recipientFirstName) { query.deliveryRecipientFirstName = { contains: filter.recipientFirstName } }
+    if (filter?.recipientLastName) { query.deliveryRecipientLastName = { contains: filter.recipientLastName } }
+    if (filter?.status) { query.currentStatus = { equals: filter.status } }
 
     return query;
   }

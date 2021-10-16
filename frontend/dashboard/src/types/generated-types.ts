@@ -354,6 +354,11 @@ export type DeliveryConnectionFilterInput = {
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
   campaignVariantId?: Maybe<Scalars['String']>;
+  recipientFirstName?: Maybe<Scalars['String']>;
+  recipientLastName?: Maybe<Scalars['String']>;
+  recipientPhoneNumber?: Maybe<Scalars['String']>;
+  recipientEmail?: Maybe<Scalars['String']>;
+  status?: Maybe<DeliveryStatusEnum>;
   orderBy?: Maybe<DeliveryConnectionOrderByInput>;
   offset?: Maybe<Scalars['Int']>;
   perPage?: Maybe<Scalars['Int']>;
@@ -1857,7 +1862,7 @@ export type DeliveryEventFragmentFragment = (
 
 export type DeliveryFragmentFragment = (
   { __typename?: 'DeliveryType' }
-  & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'createdAt'>
+  & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'createdAt' | 'currentStatus'>
   & { campaignVariant?: Maybe<(
     { __typename?: 'CampaignVariantType' }
     & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
@@ -2460,6 +2465,7 @@ export const DeliveryFragmentFragmentDoc = gql`
   scheduledAt
   updatedAt
   createdAt
+  currentStatus
   campaignVariant {
     id
     label

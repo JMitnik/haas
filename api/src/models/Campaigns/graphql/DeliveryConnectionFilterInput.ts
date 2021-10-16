@@ -26,6 +26,11 @@ export const DeliveryConnectionFilterInput = inputObjectType({
     t.string('startDate', { required: false });
     t.string('endDate', { required: false });
     t.string('campaignVariantId', { required: false });
+    t.string('recipientFirstName', { required: false });
+    t.string('recipientLastName', { required: false });
+    t.string('recipientPhoneNumber', { required: false });
+    t.string('recipientEmail', { required: false });
+    t.field('status', { type: 'DeliveryStatusEnum', required: false });
 
     // Post-order
     t.field('orderBy', { type: DeliveryConnectionOrderByInput });
