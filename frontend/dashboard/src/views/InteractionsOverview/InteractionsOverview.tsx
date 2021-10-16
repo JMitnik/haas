@@ -26,7 +26,6 @@ import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
 import {
   CampaignVariantEnum,
-  DeliveryFragmentFragment,
   SessionConnectionOrder,
   SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery,
 } from 'types/generated-types';
@@ -34,6 +33,7 @@ import { Circle } from 'components/Common/Circle';
 import {
   CompactEntriesPath,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
+import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
 import { Menu } from 'components/Common/Menu/Menu';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
@@ -60,26 +60,6 @@ const undefinedToNull = (value: any) => {
 
   return value;
 };
-
-const DeliveryUserCell = ({ delivery }: { delivery: DeliveryFragmentFragment }) => (
-  <UI.Flex alignItems="center">
-    <UI.Div mr={2}>
-      {delivery.deliveryRecipientFirstName && (
-        <Avatar name={delivery.deliveryRecipientFirstName} brand="blue" />
-      )}
-    </UI.Div>
-    <UI.ColumnFlex>
-      <UI.Span fontWeight={600} color="blue.500">
-        {delivery.deliveryRecipientFirstName}
-        {' '}
-        {delivery.deliveryRecipientLastName}
-      </UI.Span>
-      <UI.Span color="blue.300" fontSize="0.7rem">
-        {delivery.id}
-      </UI.Span>
-    </UI.ColumnFlex>
-  </UI.Flex>
-);
 
 const AnonymousCell = ({ sessionId }: { sessionId: string }) => {
   const { t } = useTranslation();
@@ -651,7 +631,7 @@ export const InteractionsOverview = () => {
               >
                 <Table.Cell>
                   {session.delivery?.deliveryRecipientFirstName ? (
-                    <DeliveryUserCell delivery={session.delivery} />
+                    <DeliveryRecipient delivery={session.delivery} />
                   ) : (
                     <AnonymousCell sessionId={session.id} />
                   )}

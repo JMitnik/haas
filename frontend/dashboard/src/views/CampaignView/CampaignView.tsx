@@ -11,14 +11,17 @@ import * as Table from 'components/Common/Table';
 import {
   CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType,
   GetWorkspaceCampaignQuery,
-  PaginationSortByEnum, useGetWorkspaceCampaignQuery,
+  PaginationSortByEnum, SessionConnectionOrder, useGetWorkspaceCampaignQuery,
 } from 'types/generated-types';
 import { DeepPartial } from 'types/customTypes';
+import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
+import { DeliveryRecipientAdres } from 'components/Campaign/DeliveryRecipientAdres';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { useLogger } from 'hooks/useLogger';
 import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { CampaignType } from './CampaignViewTypes';
 import { DeliveryModalCard } from './DeliveryModalCard';
 // eslint-disable-next-line import/no-cycle
@@ -151,18 +154,37 @@ export const CampaignView = () => {
 
   const [paginationState, setPaginationState] = useState(defaultCampaignViewFilter);
 
-  const { customerSlug, campaignId, getCampaignsPath, goToCampaignView, goToDeliveryView } = useNavigator();
+  const { customerSlug, campaignId, getCampaignsPath, goToCampaignView } = useNavigator();
   const campaignsPath = getCampaignsPath();
+
+  const [filter, setFilter] = useQueryParams({
+    startDate: DateTimeParam,
+    endDate: DateTimeParam,
+    search: StringParam,
+    pageIndex: withDefault(NumberParam, 0),
+    perPage: withDefault(NumberParam, 10),
+    filterCampaigns: StringParam,
+    filterCampaignId: StringParam,
+    orderByField: withDefault(StringParam, SessionConnectionOrder.CreatedAt),
+    orderByDescending: withDefault(BooleanParam, true),
+  });
 
   // For tables we will consider data-caches.
   // useTableData
   const [dataCache, setDataCache] = useState<GetWorkspaceCampaignQuery | undefined>(undefined);
-  const { data, loading } = useGetWorkspaceCampaignQuery({
+  const { data, loading: isLoading } = useGetWorkspaceCampaignQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
       campaignId,
       customerSlug,
-      deliveryConnectionFilter: paginationState,
+      deliveryConnectionFilter: {
+        paginationFilter: {
+          startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
+          endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
+          search: filter.search,
+          pageIndex: filter.pageIndex,
+        },
+      },
     },
     pollInterval: POLL_INTERVAL_SECONDS * 1000,
     onCompleted: (completeData) => setDataCache(completeData),
@@ -171,21 +193,7 @@ export const CampaignView = () => {
     }),
   });
 
-  // use-table-select placement
-  // const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
-  // const handleSelect = (id: string) => {
-  //   if (selectedIds.includes(id)) {
-  //     console.log(selectedIds);
-  //     setSelectedIds(ids => ids.splice(ids.indexOf(id), 1));
-  //   } else {
-  //     setSelectedIds(ids => [...ids, id]);
-  //   }
-  // }
-
-  // const isInEdit = selectedIds.length > 0;
-
-  // use-table-select end
+  const totalPages = dataCache?.customer?.campaign?.deliveryConnection?.pageInfo?.nrPages || 0;
 
   const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
@@ -241,86 +249,32 @@ export const CampaignView = () => {
           {deliveryConnection?.deliveries.map((delivery) => (
             <Table.Row key={delivery.id} gridTemplateColumns={columns}>
               <Table.Cell>
-                {delivery.deliveryRecipientFirstName}
+                <DeliveryRecipient delivery={delivery} />
+              </Table.Cell>
+              <Table.Cell>
+                <DeliveryRecipientAdres delivery={delivery} />
+              </Table.Cell>
+              <Table.Cell>
+                <Table.InnerCell>
+                  <UI.Helper>
+                    {delivery.campaignVariant?.label}
+                  </UI.Helper>
+                </Table.InnerCell>
+              </Table.Cell>
+              <Table.Cell>
+                <DeliveryStatus delivery={delivery} />
               </Table.Cell>
             </Table.Row>
           ))}
         </UI.Div>
-        {(deliveryConnection?.pageInfo?.nrPages || 0) > 1 && (
-          <UI.PaginationFooter>
-            <UI.Div style={{ lineHeight: 'normal' }}>
-              Showing page
-              <UI.Span ml={1} fontWeight="bold">
-                {(paginationState.paginationFilter?.pageIndex || 0) + 1}
-              </UI.Span>
-              <UI.Span ml={1}>
-                out of
-              </UI.Span>
-              <UI.Span ml={1} fontWeight="bold">
-                {deliveryConnection?.pageInfo.nrPages}
-              </UI.Span>
-              <UI.Span ml={3}>
-                (Total deliveries:
-                {' '}
-                {data?.customer?.campaign?.allDeliveryConnection?.nrTotal}
-                )
-              </UI.Span>
-            </UI.Div>
 
-            <UI.Div>
-              <UI.Stack isInline alignItems="center">
-                <UI.Div>
-                  <UI.Button
-                    size="sm"
-                    variantColor="teal"
-                    onClick={() => setPaginationState((state) => ({
-                      ...state,
-                      paginationFilter: {
-                        ...state.paginationFilter,
-                        pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
-                        offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
-                      },
-                    }))}
-                    isDisabled={paginationState.paginationFilter?.pageIndex === 0}
-                  >
-                    Previous
-                  </UI.Button>
-                </UI.Div>
-
-                <UI.Div>
-                  <UI.DebouncedInput
-                    value={(paginationState.paginationFilter?.pageIndex || 0) + 1}
-                    onChange={(val) => setPaginationState((state) => ({
-                      ...state,
-                      paginationFilter: {
-                        ...state.paginationFilter,
-                        pageIndex: val - 1,
-                        offset: Math.max((val - 1), 0) * (state.paginationFilter?.limit || 0),
-                      },
-                    }))}
-                  />
-                </UI.Div>
-                <UI.Button
-                  size="sm"
-                  variantColor="teal"
-                  onClick={() => setPaginationState((state) => ({
-                    ...state,
-                    paginationFilter: {
-                      ...state.paginationFilter,
-                      pageIndex: (state.paginationFilter?.pageIndex || 0) + 1,
-                      offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
-                    },
-                  }))}
-                  isDisabled={
-                    (paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages
-                  }
-                >
-                  Next
-                </UI.Button>
-              </UI.Stack>
-            </UI.Div>
-          </UI.PaginationFooter>
-        )}
+        <Table.Pagination
+          pageIndex={filter.pageIndex}
+          maxPages={totalPages}
+          perPage={filter.perPage}
+          isLoading={isLoading}
+          setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+        />
 
         <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
           <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenImportModal(false)}>
