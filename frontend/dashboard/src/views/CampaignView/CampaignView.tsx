@@ -7,6 +7,7 @@ import { union } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
+import * as Table from 'components/Common/Table';
 import {
   CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType,
   GetWorkspaceCampaignQuery,
@@ -220,6 +221,16 @@ export const CampaignView = () => {
 
       </UI.ViewHead>
       <UI.ViewBody>
+        <UI.Div>
+          <Table.HeadingRow>
+            <Table.HeadingCell>
+              {t('recipient')}
+            </Table.HeadingCell>
+          </Table.HeadingRow>
+          {deliveryConnection?.deliveries.map((delivery) => (
+
+          ))}
+        </UI.Div>
         <UI.Card noHover>
           <UI.Div p={2}>
             <UI.Table width="100%" isLoading={loading}>
