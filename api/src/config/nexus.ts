@@ -17,6 +17,7 @@ import permissionNexus from '../models/permission/Permission';
 import roleNexus from '../models/role/Role';
 import tagNexus from '../models/tag/Tag';
 import triggerNexus from '../models/trigger/Trigger';
+import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
 
 const nexus = [
   ...Array(AutodeckAPI),
@@ -30,6 +31,7 @@ const nexus = [
   ...Array(UserAPI),
   ...customerSettingsNexus,
   ...dialogueNexus,
+  ...Array(uploadNexus),
   ...Array(AuthAPI),
   ...Array(AuthAPI),
   ...Array(PaginationAPI),

@@ -241,6 +241,10 @@ export type CtaLinkInputObjectType = {
   title?: Maybe<Scalars['String']>;
   iconUrl?: Maybe<Scalars['String']>;
   backgroundColor?: Maybe<Scalars['String']>;
+  header?: Maybe<Scalars['String']>;
+  subHeader?: Maybe<Scalars['String']>;
+  buttonText?: Maybe<Scalars['String']>;
+  imageUrl?: Maybe<Scalars['String']>;
 };
 
 export type CtaLinksInputType = {
@@ -264,9 +268,9 @@ export type Customer = {
   dialogue?: Maybe<Dialogue>;
   dialogues?: Maybe<Array<Dialogue>>;
   users?: Maybe<Array<UserType>>;
+  campaigns: Array<CampaignType>;
   roles?: Maybe<Array<RoleType>>;
   campaign?: Maybe<CampaignType>;
-  campaigns: Array<CampaignType>;
   userCustomer?: Maybe<UserCustomer>;
 };
 
@@ -758,10 +762,15 @@ export type LinkType = {
   title?: Maybe<Scalars['String']>;
   iconUrl?: Maybe<Scalars['String']>;
   backgroundColor?: Maybe<Scalars['String']>;
+  header?: Maybe<Scalars['String']>;
+  subHeader?: Maybe<Scalars['String']>;
+  buttonText?: Maybe<Scalars['String']>;
+  imageUrl?: Maybe<Scalars['String']>;
   questionNode: QuestionNode;
 };
 
 export enum LinkTypeEnumType {
+  Single = 'SINGLE',
   Social = 'SOCIAL',
   Api = 'API',
   Facebook = 'FACEBOOK',
@@ -816,6 +825,7 @@ export type Mutation = {
   createDialogue: Dialogue;
   editDialogue: Dialogue;
   deleteDialogue: Dialogue;
+  uploadUpsellImage?: Maybe<ImageType>;
   register?: Maybe<Scalars['String']>;
   /** Given a token, checks in the database whether token has been set and has not expired yet */
   verifyUserToken: VerifyUserTokenOutput;
@@ -1010,6 +1020,11 @@ export type MutationEditDialogueArgs = {
 
 export type MutationDeleteDialogueArgs = {
   input?: Maybe<DeleteDialogueInputType>;
+};
+
+
+export type MutationUploadUpsellImageArgs = {
+  input?: Maybe<UploadSellImageInputType>;
 };
 
 
@@ -1764,6 +1779,11 @@ export enum UploadImageEnumType {
   WebsiteScreenshot = 'WEBSITE_SCREENSHOT'
 }
 
+export type UploadSellImageInputType = {
+  file?: Maybe<Scalars['Upload']>;
+  workspaceId?: Maybe<Scalars['String']>;
+};
+
 export type UserConnection = DeprecatedConnectionInterface & {
   __typename?: 'UserConnection';
   cursor?: Maybe<Scalars['String']>;
@@ -1875,6 +1895,19 @@ export type SessionFragmentFragment = (
   )>, delivery?: Maybe<(
     { __typename?: 'DeliveryType' }
     & DeliveryFragmentFragment
+  )> }
+);
+
+export type UploadUpsellImageMutationVariables = Exact<{
+  input?: Maybe<UploadSellImageInputType>;
+}>;
+
+
+export type UploadUpsellImageMutation = (
+  { __typename?: 'Mutation' }
+  & { uploadUpsellImage?: Maybe<(
+    { __typename?: 'ImageType' }
+    & Pick<ImageType, 'url'>
   )> }
 );
 
@@ -2451,6 +2484,39 @@ export const SessionFragmentFragmentDoc = gql`
 }
     ${NodeEntryFragmentFragmentDoc}
 ${DeliveryFragmentFragmentDoc}`;
+export const UploadUpsellImageDocument = gql`
+    mutation uploadUpsellImage($input: UploadSellImageInputType) {
+  uploadUpsellImage(input: $input) {
+    url
+  }
+}
+    `;
+export type UploadUpsellImageMutationFn = Apollo.MutationFunction<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>;
+
+/**
+ * __useUploadUpsellImageMutation__
+ *
+ * To run a mutation, you first call `useUploadUpsellImageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadUpsellImageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadUpsellImageMutation, { data, loading, error }] = useUploadUpsellImageMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUploadUpsellImageMutation(baseOptions?: Apollo.MutationHookOptions<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>(UploadUpsellImageDocument, options);
+      }
+export type UploadUpsellImageMutationHookResult = ReturnType<typeof useUploadUpsellImageMutation>;
+export type UploadUpsellImageMutationResult = Apollo.MutationResult<UploadUpsellImageMutation>;
+export type UploadUpsellImageMutationOptions = Apollo.BaseMutationOptions<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>;
 export const GetWorkspaceAdminsDocument = gql`
     query GetWorkspaceAdmins($customerSlug: String!) {
   users(customerSlug: $customerSlug) {

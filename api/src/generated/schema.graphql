@@ -206,8 +206,12 @@ type CreateWorkspaceJobType {
 
 input CTALinkInputObjectType {
   backgroundColor: String
+  buttonText: String
+  header: String
   iconUrl: String
   id: String
+  imageUrl: String
+  subHeader: String
   title: String
   type: LinkTypeEnumType
   url: String
@@ -647,10 +651,14 @@ type lineChartDataType {
 
 type LinkType {
   backgroundColor: String
+  buttonText: String
+  header: String
   iconUrl: String
   id: String!
+  imageUrl: String
   questionNode: QuestionNode!
   questionNodeId: String
+  subHeader: String
   title: String
   type: String!
   url: String!
@@ -661,6 +669,7 @@ enum LinkTypeEnumType {
   FACEBOOK
   INSTAGRAM
   LINKEDIN
+  SINGLE
   SOCIAL
   TWITTER
   WHATSAPP
@@ -727,6 +736,7 @@ type Mutation {
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
+  uploadUpsellImage(input: UploadSellImageInputType): ImageType
 
   """
   Given a token, checks in the database whether token has been set and has not expired yet
@@ -1301,6 +1311,11 @@ scalar Upload
 enum UploadImageEnumType {
   LOGO
   WEBSITE_SCREENSHOT
+}
+
+input UploadSellImageInputType {
+  file: Upload
+  workspaceId: String
 }
 
 type UserConnection implements DeprecatedConnectionInterface {

@@ -103,6 +103,7 @@ const authShield = shield({
     appendToInteraction: allow,
     verifyUserToken: allow,
     requestInvite: allow,
+    uploadUpsellImage: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
     deleteCustomer: isSuperAdmin,
 
     createCampaign: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_CAMPAIGNS)),

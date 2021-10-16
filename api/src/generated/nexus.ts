@@ -39,8 +39,12 @@ export interface NexusGenInputs {
   }
   CTALinkInputObjectType: { // input type
     backgroundColor?: string | null; // String
+    buttonText?: string | null; // String
+    header?: string | null; // String
     iconUrl?: string | null; // String
     id?: string | null; // String
+    imageUrl?: string | null; // String
+    subHeader?: string | null; // String
     title?: string | null; // String
     type?: NexusGenEnums['LinkTypeEnumType'] | null; // LinkTypeEnumType
     url?: string | null; // String
@@ -442,6 +446,10 @@ export interface NexusGenInputs {
     type?: string | null; // String
     unhappyText?: string | null; // String
   }
+  UploadSellImageInputType: { // input type
+    file?: any | null; // Upload
+    workspaceId?: string | null; // String
+  }
   UserInput: { // input type
     customerId?: string | null; // String
     email: string; // String!
@@ -474,7 +482,7 @@ export interface NexusGenEnums {
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
   LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
-  LinkTypeEnumType: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP"
+  LinkTypeEnumType: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SINGLE" | "SOCIAL" | "TWITTER" | "WHATSAPP"
   PaginationSearchEnum: "email" | "firstName" | "lastName" | "name" | "publicTitle" | "title"
   PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "scheduledAt" | "score" | "type" | "updatedAt" | "user" | "when"
   QuestionNodeTypeEnum: "CHOICE" | "FORM" | "GENERIC" | "LINK" | "REGISTRATION" | "SHARE" | "SLIDER" | "TEXTBOX" | "VIDEO_EMBEDDED"
@@ -658,9 +666,13 @@ export interface NexusGenRootTypes {
   }
   LinkType: { // root type
     backgroundColor?: string | null; // String
+    buttonText?: string | null; // String
+    header?: string | null; // String
     iconUrl?: string | null; // String
     id: string; // String!
+    imageUrl?: string | null; // String
     questionNodeId?: string | null; // String
+    subHeader?: string | null; // String
     title?: string | null; // String
     type: string; // String!
     url: string; // String!
@@ -896,6 +908,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   TriggerInputType: NexusGenInputs['TriggerInputType'];
   UpdateCTAInputType: NexusGenInputs['UpdateCTAInputType'];
   UpdateQuestionNodeInputType: NexusGenInputs['UpdateQuestionNodeInputType'];
+  UploadSellImageInputType: NexusGenInputs['UploadSellImageInputType'];
   UserInput: NexusGenInputs['UserInput'];
   UserOfCustomerInput: NexusGenInputs['UserOfCustomerInput'];
   VideoNodeEntryInput: NexusGenInputs['VideoNodeEntryInput'];
@@ -1172,10 +1185,14 @@ export interface NexusGenFieldTypes {
   }
   LinkType: { // field return type
     backgroundColor: string | null; // String
+    buttonText: string | null; // String
+    header: string | null; // String
     iconUrl: string | null; // String
     id: string; // String!
+    imageUrl: string | null; // String
     questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     questionNodeId: string | null; // String
+    subHeader: string | null; // String
     title: string | null; // String
     type: string; // String!
     url: string; // String!
@@ -1228,6 +1245,7 @@ export interface NexusGenFieldTypes {
     updateQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
     uploadJobImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
+    uploadUpsellImage: NexusGenRootTypes['ImageType'] | null; // ImageType
     verifyUserToken: NexusGenRootTypes['VerifyUserTokenOutput']; // VerifyUserTokenOutput!
     whitifyImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
   }
@@ -1668,6 +1686,9 @@ export interface NexusGenArgTypes {
       jobId?: string | null; // String
       type?: NexusGenEnums['UploadImageEnumType'] | null; // UploadImageEnumType
     }
+    uploadUpsellImage: { // args
+      input?: NexusGenInputs['UploadSellImageInputType'] | null; // UploadSellImageInputType
+    }
     verifyUserToken: { // args
       token?: string | null; // String
     }
@@ -1752,7 +1773,7 @@ export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames = "AWSImageType" | "AutodeckConnectionType" | "CampaignType" | "CampaignVariantCustomVariableType" | "CampaignVariantType" | "ColourSettings" | "CreateBatchDeliveriesOutputType" | "CreateWorkspaceJobType" | "CustomFieldType" | "Customer" | "CustomerSettings" | "DeleteUserOutput" | "DeliveryConnectionType" | "DeliveryEventType" | "DeliveryType" | "DeprecatedPaginationPageInfo" | "Dialogue" | "DialogueFinisherObjectType" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "JobObjectType" | "JobProcessLocation" | "JobProcessLocations" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "PreviewDataType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AdjustedImageInput" | "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignCustomVariable" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomFieldInputType" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DeliveryConnectionFilter" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GenerateAutodeckInput" | "GetCampaignsInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RemovePixelRangeInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionConnectionFilterInput" | "SessionConnectionOrderByInput" | "SessionInput" | "SessionScoreRangeFilter" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput" | "VideoNodeEntryInput" | "createJobProcessLocationInput";
+export type NexusGenInputNames = "AdjustedImageInput" | "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignCustomVariable" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomFieldInputType" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DeliveryConnectionFilter" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GenerateAutodeckInput" | "GetCampaignsInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RemovePixelRangeInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionConnectionFilterInput" | "SessionConnectionOrderByInput" | "SessionInput" | "SessionScoreRangeFilter" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UploadSellImageInputType" | "UserInput" | "UserOfCustomerInput" | "VideoNodeEntryInput" | "createJobProcessLocationInput";
 
 export type NexusGenEnumNames = "CampaignVariantEnum" | "CloudReferenceType" | "DeliveryStatusEnum" | "FormNodeFieldTypeEnum" | "JobProcessLocationType" | "JobStatusType" | "LanguageEnumType" | "LinkTypeEnumType" | "PaginationSearchEnum" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SessionConnectionOrder" | "SessionDeliveryType" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum" | "UploadImageEnumType";
 
