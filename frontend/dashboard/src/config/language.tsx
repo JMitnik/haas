@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    last_update: {
+      en: 'Last update',
+      de: 'Letztes Update',
+    },
     show_interactions_between: {
       en: 'Show interactions between a start and end-date.',
       de: 'Interaktionen zwischen einem Start- und einem Enddatum anzeigen',

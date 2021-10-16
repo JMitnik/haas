@@ -1,8 +1,6 @@
 import * as UI from '@haas/ui';
-import { Clock, Plus, Search, Settings } from 'react-feather';
-import { ErrorBoundary } from 'react-error-boundary';
+import { Plus, Search, Settings } from 'react-feather';
 import { Route, Switch, useLocation } from 'react-router';
-import { format } from 'date-fns';
 import { union } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
@@ -10,14 +8,13 @@ import React, { useState } from 'react';
 import * as Table from 'components/Common/Table';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
-import { DeepPartial } from 'types/customTypes';
 import {
-  DeliveryConnectionOrder, DeliveryStatusEnum,
-  DeliveryType,
-  GetWorkspaceCampaignQuery, useGetWorkspaceCampaignQuery,
+  DeliveryConnectionOrder, GetWorkspaceCampaignQuery, useGetWorkspaceCampaignQuery,
 } from 'types/generated-types';
 import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
 import { DeliveryRecipientAdres } from 'components/Campaign/DeliveryRecipientAdres';
+import { DeliveryStatus } from 'components/Campaign/DeliveryStatus';
+import { FormatTimestamp } from 'components/Common/DateAndTime';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { TabbedMenu } from 'components/Common/TabMenu';
@@ -27,92 +24,9 @@ import Searchbar from 'components/SearchBar';
 
 import { CampaignType } from './CampaignViewTypes';
 import { DeliveryModalCard } from './DeliveryModalCard';
-// eslint-disable-next-line import/no-cycle
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
 const POLL_INTERVAL_SECONDS = 30;
-
-const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
-  const date = new Date(parseInt(scheduledAt, 10));
-
-  return (
-    <UI.Flex alignItems="center">
-      <UI.Icon pr={1}>
-        <Clock width="0.7rem" />
-      </UI.Icon>
-      {format(date, 'MM/dd HH:mm')}
-    </UI.Flex>
-  );
-};
-
-const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) => {
-  const status = delivery.currentStatus;
-
-  switch (status) {
-    case DeliveryStatusEnum.Finished: {
-      return (
-        <UI.Label variantColor="green">
-          {status}
-        </UI.Label>
-      );
-    }
-
-    case DeliveryStatusEnum.Deployed: {
-      return (
-        <UI.Label variantColor="blue">
-          {status}
-        </UI.Label>
-      );
-    }
-
-    case DeliveryStatusEnum.Scheduled: {
-      return (
-        <UI.Label>
-          <ErrorBoundary FallbackComponent={() => <div>{status}</div>}>
-            <UI.Div py={1}>
-              <UI.Stack>
-                <>
-                  <UI.Span>
-                    {status}
-                  </UI.Span>
-                  <UI.Span fontSize="0.6rem">
-                    {!!delivery.scheduledAt && (
-                      // @ts-ignore
-                      <DeliveryScheduledLabel scheduledAt={delivery.scheduledAt} />
-                    )}
-                  </UI.Span>
-                </>
-              </UI.Stack>
-            </UI.Div>
-          </ErrorBoundary>
-        </UI.Label>
-      );
-    }
-
-    case DeliveryStatusEnum.Opened: {
-      return (
-        <UI.Label variantColor="yellow">{status}</UI.Label>
-      );
-    }
-
-    case DeliveryStatusEnum.Failed: {
-      return (
-        <UI.Label variantColor="red">{status}</UI.Label>
-      );
-    }
-
-    case DeliveryStatusEnum.Delivered: {
-      return (
-        <UI.Label variantColor="cyan">{status}</UI.Label>
-      );
-    }
-    default: {
-      return (
-        <UI.Label variantColor="blue">{status}</UI.Label>
-      );
-    }
-  }
-};
 
 const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
   label: campaign.label,
@@ -135,7 +49,7 @@ export const CampaignView = () => {
   const logger = useLogger();
   const location = useLocation();
 
-  const { customerSlug, campaignId, getCampaignsPath, goToCampaignView } = useNavigator();
+  const { customerSlug, campaignId, getCampaignsPath, goToCampaignView, goToDeliveryView } = useNavigator();
   const campaignsPath = getCampaignsPath();
 
   const [filter, setFilter] = useQueryParams({
@@ -151,7 +65,6 @@ export const CampaignView = () => {
   });
 
   // For tables we will consider data-caches.
-  // useTableData
   const [dataCache, setDataCache] = useState<GetWorkspaceCampaignQuery | undefined>(undefined);
   const { loading: isLoading, refetch } = useGetWorkspaceCampaignQuery({
     fetchPolicy: 'cache-and-network',
@@ -179,7 +92,7 @@ export const CampaignView = () => {
 
   const totalPages = dataCache?.customer?.campaign?.deliveryConnection?.totalPages || 0;
 
-  const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
+  const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)';
 
   const campaign = dataCache?.customer?.campaign || null;
   const deliveryConnection = campaign?.deliveryConnection;
@@ -217,7 +130,7 @@ export const CampaignView = () => {
             variant="outline"
             onClick={() => setIsOpenSettingsModal(true)}
           >
-            Settings
+            {t('settings')}
           </UI.Button>
         </UI.Flex>
 
@@ -225,10 +138,13 @@ export const CampaignView = () => {
       <UI.ViewBody>
         <UI.Div>
           <UI.Div mb={2}>
-            <PickerButton label={t('add_filter')} icon={(<Plus />)}>
+            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={(<Plus />)}>
               {() => (
-                <TabbedMenu tabs={[{ label: t('search'), icon: <Search /> }]}>
+                <TabbedMenu menuHeader={t('add_filter')} tabs={[{ label: t('search'), icon: <Search /> }]}>
                   <UI.Div>
+                    <UI.RadioHeader>
+                      {t('search')}
+                    </UI.RadioHeader>
                     <Searchbar
                       activeSearchTerm={filter.search}
                       onSearchTermChange={handleSearchChange}
@@ -251,9 +167,17 @@ export const CampaignView = () => {
             <Table.HeadingCell>
               {t('status')}
             </Table.HeadingCell>
+            <Table.HeadingCell>
+              {t('last_update')}
+            </Table.HeadingCell>
           </Table.HeadingRow>
           {deliveryConnection?.deliveries.map((delivery) => (
-            <Table.Row key={delivery.id} gridTemplateColumns={columns}>
+            <Table.Row
+              onClick={() => goToDeliveryView(campaignId, delivery.id)}
+              isLoading={isLoading}
+              key={delivery.id}
+              gridTemplateColumns={columns}
+            >
               <Table.Cell>
                 <DeliveryRecipient delivery={delivery} />
               </Table.Cell>
@@ -270,17 +194,22 @@ export const CampaignView = () => {
               <Table.Cell>
                 <DeliveryStatus delivery={delivery} />
               </Table.Cell>
+              <Table.Cell>
+                <FormatTimestamp timestamp={delivery.updatedAt} />
+              </Table.Cell>
             </Table.Row>
           ))}
         </UI.Div>
 
-        <Table.Pagination
-          pageIndex={filter.pageIndex}
-          maxPages={totalPages}
-          perPage={filter.perPage}
-          isLoading={isLoading}
-          setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
-        />
+        <UI.Flex justifyContent="flex-end">
+          <Table.Pagination
+            pageIndex={filter.pageIndex}
+            maxPages={totalPages}
+            perPage={filter.perPage}
+            isLoading={isLoading}
+            setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+          />
+        </UI.Flex>
 
         <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
           <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenImportModal(false)}>
