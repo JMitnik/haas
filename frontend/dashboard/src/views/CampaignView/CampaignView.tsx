@@ -187,6 +187,8 @@ export const CampaignView = () => {
 
   // use-table-select end
 
+  const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
+
   const campaign = dataCache?.customer?.campaign || null;
   const deliveryConnection = campaign?.deliveryConnection;
 
@@ -222,138 +224,52 @@ export const CampaignView = () => {
       </UI.ViewHead>
       <UI.ViewBody>
         <UI.Div>
-          <Table.HeadingRow>
+          <Table.HeadingRow gridTemplateColumns={columns}>
             <Table.HeadingCell>
               {t('recipient')}
             </Table.HeadingCell>
+            <Table.HeadingCell>
+              {t('recipient_adress')}
+            </Table.HeadingCell>
+            <Table.HeadingCell>
+              {t('variant')}
+            </Table.HeadingCell>
+            <Table.HeadingCell>
+              {t('status')}
+            </Table.HeadingCell>
           </Table.HeadingRow>
           {deliveryConnection?.deliveries.map((delivery) => (
-
+            <Table.Row key={delivery.id} gridTemplateColumns={columns}>
+              <Table.Cell>
+                {delivery.deliveryRecipientFirstName}
+              </Table.Cell>
+            </Table.Row>
           ))}
         </UI.Div>
-        <UI.Card noHover>
-          <UI.Div p={2}>
-            <UI.Table width="100%" isLoading={loading}>
-              <UI.TableHeading>
-                {/* <UI.TableHeadingCell>
-                  <UI.TableSelect />
-                </UI.TableHeadingCell> */}
-                <UI.TableHeadingCell>
-                  {t('recipient')}
-                </UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('recipient_adress')}
-                </UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('variant')}
-                </UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('status')}
-                </UI.TableHeadingCell>
-              </UI.TableHeading>
+        {(deliveryConnection?.pageInfo?.nrPages || 0) > 1 && (
+          <UI.PaginationFooter>
+            <UI.Div style={{ lineHeight: 'normal' }}>
+              Showing page
+              <UI.Span ml={1} fontWeight="bold">
+                {(paginationState.paginationFilter?.pageIndex || 0) + 1}
+              </UI.Span>
+              <UI.Span ml={1}>
+                out of
+              </UI.Span>
+              <UI.Span ml={1} fontWeight="bold">
+                {deliveryConnection?.pageInfo.nrPages}
+              </UI.Span>
+              <UI.Span ml={3}>
+                (Total deliveries:
+                {' '}
+                {data?.customer?.campaign?.allDeliveryConnection?.nrTotal}
+                )
+              </UI.Span>
+            </UI.Div>
 
-              <UI.TableBody>
-                {deliveryConnection?.deliveries.map((delivery) => (
-                  <UI.TableRow
-                    hasHover
-                    key={delivery.id}
-                    onClick={() => goToDeliveryView(campaignId, delivery.id)}
-                  >
-                    <UI.TableCell>
-                      {delivery?.deliveryRecipientFirstName || ''}
-                    </UI.TableCell>
-                    <UI.TableCell>
-                      {delivery.campaignVariant?.type === CampaignVariantEnum.Email
-                        ? delivery?.deliveryRecipientEmail : delivery?.deliveryRecipientPhone}
-                    </UI.TableCell>
-                    <UI.TableCell>
-                      <UI.Label variantColor="teal">
-                        <UI.Flex>
-                          <UI.Icon mr={1}>
-                            {delivery?.campaignVariant?.type === CampaignVariantEnum.Email && (
-                              <Mail width={14} />
-                            )}
-
-                            {delivery?.campaignVariant?.type === CampaignVariantEnum.Sms && (
-                              <Smartphone width={14} />
-                            )}
-                          </UI.Icon>
-                          {delivery?.campaignVariant?.label}
-                        </UI.Flex>
-                      </UI.Label>
-                    </UI.TableCell>
-                    <UI.TableCell>
-                      <DeliveryStatus
-                        delivery={delivery}
-                      />
-                    </UI.TableCell>
-                  </UI.TableRow>
-                ))}
-
-                {/* {isInEdit && (
-                  <UI.TableActionBar>
-                    <UI.Div>
-                      Selected {selectedIds.length} deliveries
-                    </UI.Div>
-                  </UI.TableActionBar>
-                )} */}
-              </UI.TableBody>
-            </UI.Table>
-          </UI.Div>
-          {(deliveryConnection?.pageInfo?.nrPages || 0) > 1 && (
-            <UI.PaginationFooter>
-              <UI.Div style={{ lineHeight: 'normal' }}>
-                Showing page
-                <UI.Span ml={1} fontWeight="bold">
-                  {(paginationState.paginationFilter?.pageIndex || 0) + 1}
-                </UI.Span>
-                <UI.Span ml={1}>
-                  out of
-                </UI.Span>
-                <UI.Span ml={1} fontWeight="bold">
-                  {deliveryConnection?.pageInfo.nrPages}
-                </UI.Span>
-                <UI.Span ml={3}>
-                  (Total deliveries:
-                  {' '}
-                  {data?.customer?.campaign?.allDeliveryConnection?.nrTotal}
-                  )
-                </UI.Span>
-              </UI.Div>
-
-              <UI.Div>
-                <UI.Stack isInline alignItems="center">
-                  <UI.Div>
-                    <UI.Button
-                      size="sm"
-                      variantColor="teal"
-                      onClick={() => setPaginationState((state) => ({
-                        ...state,
-                        paginationFilter: {
-                          ...state.paginationFilter,
-                          pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
-                          offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
-                        },
-                      }))}
-                      isDisabled={paginationState.paginationFilter?.pageIndex === 0}
-                    >
-                      Previous
-                    </UI.Button>
-                  </UI.Div>
-
-                  <UI.Div>
-                    <UI.DebouncedInput
-                      value={(paginationState.paginationFilter?.pageIndex || 0) + 1}
-                      onChange={(val) => setPaginationState((state) => ({
-                        ...state,
-                        paginationFilter: {
-                          ...state.paginationFilter,
-                          pageIndex: val - 1,
-                          offset: Math.max((val - 1), 0) * (state.paginationFilter?.limit || 0),
-                        },
-                      }))}
-                    />
-                  </UI.Div>
+            <UI.Div>
+              <UI.Stack isInline alignItems="center">
+                <UI.Div>
                   <UI.Button
                     size="sm"
                     variantColor="teal"
@@ -361,21 +277,50 @@ export const CampaignView = () => {
                       ...state,
                       paginationFilter: {
                         ...state.paginationFilter,
-                        pageIndex: (state.paginationFilter?.pageIndex || 0) + 1,
-                        offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
+                        pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
+                        offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
                       },
                     }))}
-                    isDisabled={
-                      (paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages
-                    }
+                    isDisabled={paginationState.paginationFilter?.pageIndex === 0}
                   >
-                    Next
+                    Previous
                   </UI.Button>
-                </UI.Stack>
-              </UI.Div>
-            </UI.PaginationFooter>
-          )}
-        </UI.Card>
+                </UI.Div>
+
+                <UI.Div>
+                  <UI.DebouncedInput
+                    value={(paginationState.paginationFilter?.pageIndex || 0) + 1}
+                    onChange={(val) => setPaginationState((state) => ({
+                      ...state,
+                      paginationFilter: {
+                        ...state.paginationFilter,
+                        pageIndex: val - 1,
+                        offset: Math.max((val - 1), 0) * (state.paginationFilter?.limit || 0),
+                      },
+                    }))}
+                  />
+                </UI.Div>
+                <UI.Button
+                  size="sm"
+                  variantColor="teal"
+                  onClick={() => setPaginationState((state) => ({
+                    ...state,
+                    paginationFilter: {
+                      ...state.paginationFilter,
+                      pageIndex: (state.paginationFilter?.pageIndex || 0) + 1,
+                      offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
+                    },
+                  }))}
+                  isDisabled={
+                    (paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages
+                  }
+                >
+                  Next
+                </UI.Button>
+              </UI.Stack>
+            </UI.Div>
+          </UI.PaginationFooter>
+        )}
 
         <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
           <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenImportModal(false)}>
