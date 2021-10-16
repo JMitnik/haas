@@ -50,7 +50,6 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
                 onSearchTermChange={(newTerm) => {
                   loadCustomerData({ variables: { customerSlug, filter: { searchTerm: newTerm } } });
                 }}
-                isSearching={isSearching}
               />
             </Div>
             <ButtonGroup display="flex" alignItems="center">
@@ -104,7 +103,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
         ) : (
           <Grid gridRowGap={2}>
             {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-            <DialogueCard isCompact key={index} dialogue={dialogue} />
+              <DialogueCard isCompact key={index} dialogue={dialogue} />
             ))}
           </Grid>
         )}

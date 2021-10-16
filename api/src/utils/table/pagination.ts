@@ -117,7 +117,7 @@ export const constructFindManyInput = (
 
 export const paginate = async <GenericModelType>({
   findManyArgs,
-  paginationOpts = { },
+  paginationOpts = {},
   countArgs,
   useSlice = true
 }: PaginateProps,
@@ -133,7 +133,7 @@ export const paginate = async <GenericModelType>({
   const triggerTotal = await countCallBack({ props: countWhereInput, paginationOpts, rest: countRest });
   const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
 
-  const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
+  const pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo'] = {
     nrPages: totalPages || 1,
     pageIndex: (paginationOpts?.pageIndex !== undefined && paginationOpts?.pageIndex !== null)
       ? paginationOpts.pageIndex : 0,

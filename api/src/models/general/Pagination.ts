@@ -5,8 +5,8 @@ const PaginationSortByEnum = enumType({
   description: 'Ways to sort a pagination object',
   // TODO: Make this enum overrideable?
   members: [
-    'score', 'id', 'createdAt', 'email', 
-    'name', 'firstName', 'lastName', 'role', 
+    'score', 'id', 'createdAt', 'email',
+    'name', 'firstName', 'lastName', 'role',
     'medium', 'type', 'paths', 'user', 'when',
     'scheduledAt', 'updatedAt'
   ],
@@ -30,13 +30,47 @@ export const PaginationSortInput = inputObjectType({
   },
 });
 
-export const PaginationPageInfo = objectType({
-  name: 'PaginationPageInfo',
+export const DeprecatedPaginationPageInfo = objectType({
+  name: 'DeprecatedPaginationPageInfo',
   description: 'Information with regards to current page, and total number of pages',
 
   definition(t) {
+    t.string('cursor', { nullable: true });
+
     t.int('nrPages');
     t.int('pageIndex');
+  },
+});
+
+export const PaginationPageInfo = objectType({
+  name: 'PaginationPageInfo',
+  description: 'Information with regards to current page.',
+
+  definition(t) {
+    t.boolean('hasPrevPage');
+    t.boolean('hasNextPage');
+    t.int('prevPageOffset');
+    t.int('nextPageOffset');
+    t.int('pageIndex');
+  },
+});
+
+export const DeprecatedConnectionInterface = interfaceType({
+  name: 'DeprecatedConnectionInterface',
+  description: 'Interface all pagination-based models should implement',
+
+  definition(t) {
+    t.resolveType(() => null);
+
+    // TODO: Replace by cursor
+    t.string('cursor', { nullable: true });
+    t.int('offset', { nullable: true });
+    t.int('limit');
+
+    t.field('pageInfo', { type: DeprecatedPaginationPageInfo });
+
+    t.string('startDate', { nullable: true });
+    t.string('endDate', { nullable: true });
   },
 });
 
@@ -46,15 +80,9 @@ export const ConnectionInterface = interfaceType({
 
   definition(t) {
     t.resolveType(() => null);
-
-    // TODO: Replace by cursor
-    t.int('offset');
-    t.int('limit');
+    t.int('totalPages', { nullable: true });
 
     t.field('pageInfo', { type: PaginationPageInfo });
-
-    t.string('startDate', { nullable: true });
-    t.string('endDate', { nullable: true });
   },
 });
 
@@ -72,6 +100,7 @@ export const PaginationWhereInput = inputObjectType({
     // TODO: Rename to search
     t.string('searchTerm', { required: false });
     t.string('search', { required: false });
+    t.string('cursor', { required: false });
 
     t.list.field('orderBy', {
       type: PaginationSortInput,

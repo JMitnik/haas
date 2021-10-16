@@ -109,7 +109,7 @@ const MapFormNodeEntryVal: { [key in FormNodeFieldTypeEnum]?: React.FC<{ formNod
 };
 
 export const FormNodeEntry = ({ nodeEntry }: { nodeEntry: FormNodeEntryType }) => (
-  <UI.Card noHover>
+  <UI.Card noHover bg="white">
     <UI.CardBody>
       <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 1fr']}>
         {nodeEntry.values?.map((formNodeFieldEntry, index) => {

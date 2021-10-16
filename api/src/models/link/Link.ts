@@ -1,10 +1,13 @@
-import { enumType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, inputObjectType, mutationField, objectType } from '@nexus/schema';
+import cloudinary, { UploadApiResponse } from 'cloudinary';
+import { ImageType, Upload } from '../customer';
 
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 
 export const LinkTypeEnumType = enumType({
   name: 'LinkTypeEnumType',
   members: [
+    'SINGLE',
     'SOCIAL',
     'API',
     'FACEBOOK',
@@ -24,6 +27,10 @@ export const CTALinkInputObjectType = inputObjectType({
     t.string('title', { nullable: true });
     t.string('iconUrl', { nullable: true });
     t.string('backgroundColor', { nullable: true });
+    t.string('header', { nullable: true });
+    t.string('subHeader', { nullable: true });
+    t.string('buttonText', { nullable: true });
+    t.string('imageUrl', { nullable: true });
   },
 });
 
@@ -47,6 +54,10 @@ export const LinkType = objectType({
     t.string('title', { nullable: true });
     t.string('iconUrl', { nullable: true });
     t.string('backgroundColor', { nullable: true });
+    t.string('header', { nullable: true });
+    t.string('subHeader', { nullable: true });
+    t.string('buttonText', { nullable: true });
+    t.string('imageUrl', { nullable: true });
 
     t.field('questionNode', {
       type: QuestionNodeType,

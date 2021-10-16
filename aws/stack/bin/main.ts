@@ -4,6 +4,7 @@ import * as cdk from '@aws-cdk/core';
 import { APIStack } from '../lib/main-stack';
 import { MainPipelineStack } from '../lib/pipeline/main-pipeline-stack';
 import { HaasCampaignStack } from '../lib/stacks/campaign-stack';
+import { InternalNotifyStack } from '../lib/stacks/Internal/InternalNotifyStack';
 
 const app = new cdk.App();
 
@@ -22,4 +23,10 @@ const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
 // // Campaign stack
 const campaign = new HaasCampaignStack(app, 'HAASCampaign', {
   accountId: '649621042808'
+});
+
+// // Internal stack
+const internalStack = new InternalNotifyStack(app, 'InternalNotifyStack', {
+  accountId: '649621042808',
+  secretSlackKey: 'internal/SLACK_URL'
 });

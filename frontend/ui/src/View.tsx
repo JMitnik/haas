@@ -86,6 +86,7 @@ ${({ theme, isCompact }) => css`
   margin: 0 auto;
   min-height: 100vh;
   padding: ${theme.gutter}px;
+  background: ${theme.colors.gray[50]};
 
   ${isCompact && css`
     max-width: 1400px;

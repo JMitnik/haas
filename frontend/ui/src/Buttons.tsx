@@ -16,11 +16,11 @@ const ButtonContainer = styled.div`
   }
 `;
 
-export const Button = (props: ButtonProps) => (
+export const Button = React.forwardRef((props: ButtonProps, ref) => (
   <ButtonContainer>
-    <ChakraButton {...props} />
+    <ChakraButton {...props} ref={ref} />
   </ButtonContainer>
-);
+));
 
 export const ButtonGroup = (props: ChakraButtonGroupProps) => (
   <ChakraButtonGroup {...props} />
@@ -33,7 +33,7 @@ export const GradientButton = styled(Button)`
     transform: none;
     padding: 12px !important;
     font-size: 1rem;
-    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()}); 
+    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()});
     font-family: 'Inter', sans-serif;
     color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex()
       : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};

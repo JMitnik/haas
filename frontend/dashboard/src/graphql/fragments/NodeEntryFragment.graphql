@@ -1,0 +1,32 @@
+fragment NodeEntryFragment on NodeEntry {
+  id
+  depth
+  relatedNode {
+    title
+    type
+  }
+  value {
+    sliderNodeEntry
+    textboxNodeEntry
+    registrationNodeEntry
+    choiceNodeEntry
+    videoNodeEntry
+    linkNodeEntry
+    formNodeEntry {
+      id
+      values {
+        relatedField {
+          id
+          type
+        }
+
+        email
+        phoneNumber
+        url
+        shortText
+        longText
+        number
+      }
+    }
+  }
+}

@@ -558,13 +558,17 @@ export const QuestionNodeMutations = extendType({
         } : undefined;
 
 
-        const mappedLinks = links?.linkTypes?.map(({ backgroundColor, iconUrl, id, title, type, url }) => ({
+        const mappedLinks = links?.linkTypes?.map(({ backgroundColor, iconUrl, id, title, type, url, buttonText, subHeader, header, imageUrl }) => ({
           id: id || undefined,
           backgroundColor: backgroundColor || undefined,
           iconUrl: iconUrl || undefined,
           title: title || undefined,
           type: type || 'SOCIAL',
           url: url || '',
+          imageUrl: imageUrl || undefined,
+          buttonText: buttonText || undefined,
+          subHeader: subHeader || undefined,
+          header: header || undefined,
         })) || [];
 
         const createCTAInput = {

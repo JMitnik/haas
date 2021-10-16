@@ -29,6 +29,10 @@ const getDialogueFromSlug = gql`
             title
             iconUrl
             backgroundColor
+            buttonText
+            header
+            subHeader
+            imageUrl
           }
           share {
             id

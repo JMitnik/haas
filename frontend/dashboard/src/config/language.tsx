@@ -1,6 +1,94 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    show_interactions_between: {
+      en: 'Show interactions between a start and end-date.',
+      de: 'Interaktionen zwischen einem Start- und einem Enddatum anzeigen',
+    },
+    reset: {
+      en: 'Reset',
+      de: 'Zurücksetzen',
+    },
+    filter_by_search_helper: {
+      en: 'Search by questions, answers, delivery name, etc',
+      de: 'Suche nach Fragen, Antworten, Namen der Zustellungsempfänger',
+    },
+    filter_by_origin_type: {
+      en: 'Filter by origin type',
+      de: 'Filter nach Herkunftsart',
+    },
+    filter_by_search: {
+      en: 'Filter by search',
+      de: 'Nach Suche filtern',
+    },
+    filter_by_date: {
+      en: 'Filter by date',
+      de: 'Nach Datum filtern',
+    },
+    origin: {
+      en: 'Origin',
+      de: 'Herkunftsart',
+    },
+    add_filter: {
+      en: 'Add filter',
+      de: 'Add filter',
+    },
+    campaign: {
+      en: 'Campaign',
+      de: 'Kampagne',
+    },
+    currently_hiding: {
+      en: 'Currently hiding',
+      de: 'Verzeit versteckt',
+    },
+    items: {
+      en: 'Items',
+      de: 'Artikel',
+    },
+    out_of: {
+      en: 'out of',
+      de: 'Aus',
+    },
+    campaign_variant: {
+      en: 'Campaign variant',
+      de: 'Kampagnenvariante',
+    },
+    more_from: {
+      en: 'More from',
+      de: 'Mehr von',
+    },
+    before_day_of: {
+      en: 'Before day of',
+      de: 'Vor dem Tag der',
+    },
+    on_day_of: {
+      en: 'On day of',
+      de: 'Am Tag der',
+    },
+    after_day_of: {
+      en: 'After day of',
+      de: 'Nach dem Tag der',
+    },
+    anonymous: {
+      en: 'Anonymous',
+      de: 'Anonym',
+    },
+    opened_on: {
+      en: 'Opened on',
+      de: 'Eröffnet am',
+    },
+    entries: {
+      en: 'Dialogue entries',
+      de: 'Dialogeinträge',
+    },
+    go_to_delivery: {
+      en: 'Go to Delivery',
+      de: 'Zur Lieferung',
+    },
+    dialogue_via_delivery: {
+      en: 'Distribution: via delivery',
+      de: 'Dialog über die Lieferung eingesetzt',
+    },
     delivery_delivered: {
       en: 'Delivery has arrived',
       de: 'Lieferung ist angekommen',
@@ -1872,6 +1960,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Add link',
       de: 'Link hinzufügen',
     },
+    link_header_image: {
+      en: 'Link Header Image: Drag and Drop',
+      de: 'Header-Bild verlinken',
+    },
+    link_header_image_helper: {
+      en: 'Upload a header image',
+      de: 'Ein Header-Bild hochladen',
+    },
     link_url_helper: {
       en: 'What is the url the link should lead to?',
       de: 'Zu welcher URL sollte der Link führen?',
@@ -1889,20 +1985,44 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Was ist der Text, wenn Sie mit der Maus über den Link fahren?',
     },
     link_icon: {
-      en: 'Icon',
-      de: 'Symbol',
+      en: 'Redirect Button Icon Url',
+      de: 'Umleitungs-Button-Symbol-URL',
     },
     link_icon_helper: {
-      en: 'What icon is displayed for the link?',
-      de: 'Welches Symbol wird für den Link angezeigt?',
+      en: 'Set an URL for the icon used in the button',
+      de: 'Legen Sie eine URL für das Symbol fest, das in der Schaltfläche verwendet wird',
     },
     background_color: {
       en: 'Background color',
       de: 'Hintergrundfarbe',
     },
     background_color_helper: {
-      en: 'What is the background color for the link?',
-      de: 'Was ist die Hintergrundfarbe für den Link?',
+      en: 'What is the background color of the button?',
+      de: 'Was ist die Hintergrundfarbe für den Taste?',
+    },
+    upsell_header: {
+      en: 'Header text',
+      de: 'Überschrift',
+    },
+    upsell_header_helper: {
+      en: 'What is the header text?',
+      de: 'Wie lautet der Kopfzeilentext?',
+    },
+    upsell_subheader: {
+      en: 'Subheader text',
+      de: 'Untertiteltext',
+    },
+    upsell_subheader_helper: {
+      en: 'What is the subheader text?',
+      de: 'Wie lautet der Untertiteltext?',
+    },
+    redirect_button_text: {
+      en: 'Redirect button text',
+      de: 'Schaltflächentext umleiten',
+    },
+    redirect_button_text_helper: {
+      en: 'What is the text of the redirect button?',
+      de: 'Wie lautet der Text der Weiterleitungsschaltfläche?',
     },
     delete_link: {
       en: 'Delete link',

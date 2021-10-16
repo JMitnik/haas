@@ -37,10 +37,63 @@ export class CampaignService {
   }
 
   /**
+   * Find delivery
+   * @param workspaceId
+   * @returns
+   */
+  findDelivery = async (deliveryId: string) => {
+    return this.prismaAdapter.findDelivery(deliveryId);
+  }
+
+  /**
+   * Find all campaigns of workspace.
+   */
+  findCampaignOfVariantId = async (campaignVariantId: string) => {
+    return this.prismaAdapter.findCampaignOfVariantId(campaignVariantId);
+  }
+
+  /**
    * Find all campaigns of workspace.
    */
   findCampaignsOfWorkspace = async (workspaceId: string) => {
     return this.prismaAdapter.findCampaignsOfWorkspace(workspaceId);
+  }
+
+  /**
+   * Find all campaign-variants of delivery.
+   */
+  findCampaignVariantOfDelivery = async (deliveryId: string) => {
+    return this.prismaAdapter.findCampaignVariantOfDelivery(deliveryId);
+  }
+
+  /**
+   * Find workspace of campaign-variant.
+   */
+  findWorkspaceOfCampaignVariant = async (campaignVariantId: string) => {
+    return this.prismaAdapter.findWorkspaceOfCampaignVariant(campaignVariantId);
+  }
+
+  /**
+   * Find delivery of campaign-variant.
+   */
+  findDialogueOfCampaignVariant = async (campaignVariantId: string) => {
+    return this.prismaAdapter.findDialogueOfCampaignVariant(campaignVariantId);
+  }
+
+  /**
+   * Find delivery of session.
+   * @param campaignId
+   * @returns
+   */
+  findDeliveryOfSession = async (sessionId: string) => {
+    return this.prismaAdapter.findDeliveryOfSession(sessionId);
+  }
+
+  /**
+   * Find delivery-events of delivery.
+   */
+  findDeliveryEventsOfDelivery = async (deliveryId: string) => {
+    return this.prismaAdapter.findDeliveryEventsOfDelivery(deliveryId);
   }
 
   /**

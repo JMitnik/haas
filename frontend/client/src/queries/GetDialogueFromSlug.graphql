@@ -18,6 +18,10 @@ query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
           title
           iconUrl
           backgroundColor
+          buttonText
+          header
+          subHeader
+          imageUrl
         }
         share {
           id

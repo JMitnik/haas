@@ -160,6 +160,10 @@ class QuestionNodePrismaAdapter {
         url: create.url,
         backgroundColor: create.backgroundColor,
         iconUrl: create.iconUrl,
+        buttonText: create.buttonText,
+        header: create.header,
+        imageUrl: create.imageUrl,
+        subHeader: create.subHeader,
         questionNode: {
           connect: {
             id: create.questionId,
@@ -172,6 +176,10 @@ class QuestionNodePrismaAdapter {
         url: update.url,
         backgroundColor: update.backgroundColor,
         iconUrl: update.iconUrl,
+        buttonText: create.buttonText,
+        header: create.header,
+        imageUrl: create.imageUrl,
+        subHeader: create.subHeader,
       }
     });
   };

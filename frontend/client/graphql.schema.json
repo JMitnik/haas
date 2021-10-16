@@ -1147,7 +1147,7 @@
         "interfaces": [
           {
             "kind": "INTERFACE",
-            "name": "ConnectionInterface",
+            "name": "DeprecatedConnectionInterface",
             "ofType": null
           }
         ],
@@ -1156,7 +1156,7 @@
       },
       {
         "kind": "INTERFACE",
-        "name": "ConnectionInterface",
+        "name": "DeprecatedConnectionInterface",
         "description": "Interface all pagination-based models should implement",
         "fields": [
           {
@@ -2740,7 +2740,7 @@
         "interfaces": [
           {
             "kind": "INTERFACE",
-            "name": "ConnectionInterface",
+            "name": "DeprecatedConnectionInterface",
             "ofType": null
           }
         ],
@@ -4439,7 +4439,7 @@
         "interfaces": [
           {
             "kind": "INTERFACE",
-            "name": "ConnectionInterface",
+            "name": "DeprecatedConnectionInterface",
             "ofType": null
           }
         ],

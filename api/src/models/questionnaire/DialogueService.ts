@@ -77,6 +77,10 @@ class DialogueService {
     return leafs;
   };
 
+  getCampaignVariantsByDialogueId(dialogueId: string) {
+    return this.dialoguePrismaAdapter.getCampaignVariantsByDialogueId(dialogueId);
+  }
+
   getQuestionsByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getQuestionsByDialogueId(dialogueId);
   };

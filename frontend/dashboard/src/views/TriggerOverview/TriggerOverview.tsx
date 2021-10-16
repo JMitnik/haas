@@ -165,51 +165,51 @@ const TriggersOverview = () => {
             renderOptions={(alertData: any) => (
               <>
                 {canDeleteTriggers && (
-                <ShowMoreButton
-                  renderMenu={(
-                    <UI.List>
-                      <UI.ListHeader>{t('edit_trigger')}</UI.ListHeader>
-                      {canDeleteTriggers && (
-                      <>
-                        {canEditTriggers && (
-                        <UI.ListItem
-                          onClick={(e: any) => handleEditEntry(e, alertData?.id)}
-                        >
-                          {t('edit_trigger')}
-                        </UI.ListItem>
+                  <ShowMoreButton
+                    renderMenu={(
+                      <UI.List>
+                        <UI.ListHeader>{t('edit_trigger')}</UI.ListHeader>
+                        {canDeleteTriggers && (
+                          <>
+                            {canEditTriggers && (
+                              <UI.ListItem
+                                onClick={(e: any) => handleEditEntry(e, alertData?.id)}
+                              >
+                                {t('edit_trigger')}
+                              </UI.ListItem>
+                            )}
+                            <Popover>
+                              {() => (
+                                <>
+                                  <PopoverTrigger>
+                                    <UI.ListItem>
+                                      {t('delete_trigger')}
+                                    </UI.ListItem>
+                                  </PopoverTrigger>
+                                  <PopoverContent zIndex={4}>
+                                    <PopoverArrow />
+                                    <PopoverHeader>{t('delete')}</PopoverHeader>
+                                    <PopoverCloseButton />
+                                    <PopoverBody>
+                                      <UI.Text>{t('delete_trigger_popover')}</UI.Text>
+                                    </PopoverBody>
+                                    <PopoverFooter>
+                                      <UI.Button
+                                        variantColor="red"
+                                        onClick={(e: any) => handleDeleteTrigger(e, alertData?.id)}
+                                      >
+                                        {t('delete')}
+                                      </UI.Button>
+                                    </PopoverFooter>
+                                  </PopoverContent>
+                                </>
+                              )}
+                            </Popover>
+                          </>
                         )}
-                        <Popover>
-                          {() => (
-                            <>
-                              <PopoverTrigger>
-                                <UI.ListItem>
-                                  {t('delete_trigger')}
-                                </UI.ListItem>
-                              </PopoverTrigger>
-                              <PopoverContent zIndex={4}>
-                                <PopoverArrow />
-                                <PopoverHeader>{t('delete')}</PopoverHeader>
-                                <PopoverCloseButton />
-                                <PopoverBody>
-                                  <UI.Text>{t('delete_trigger_popover')}</UI.Text>
-                                </PopoverBody>
-                                <PopoverFooter>
-                                  <UI.Button
-                                    variantColor="red"
-                                    onClick={(e: any) => handleDeleteTrigger(e, alertData?.id)}
-                                  >
-                                    {t('delete')}
-                                  </UI.Button>
-                                </PopoverFooter>
-                              </PopoverContent>
-                            </>
-                          )}
-                        </Popover>
-                      </>
-                      )}
-                    </UI.List>
-                      )}
-                />
+                      </UI.List>
+                    )}
+                  />
                 )}
               </>
             )}

@@ -12,7 +12,7 @@ export type CreateCTAInput = {
     backgroundColor: string | undefined;
     iconUrl: string | undefined;
     title: string | undefined;
-    type: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP";
+    type: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP" | "SINGLE";
     url: string;
   }[],
   share: {
@@ -45,6 +45,10 @@ export interface UpdateLinkInput {
   type: LinkTypeEnum;
   backgroundColor: string;
   iconUrl: string;
+  buttonText: string;
+  header: string;
+  subHeader: string;
+  imageUrl: string;
 }
 
 export interface CreateLinkInput extends UpdateLinkInput {

@@ -18,6 +18,7 @@ import TagService from '../models/tag/TagService';
 import TriggerService from '../models/trigger/TriggerService';
 import EdgeService from '../models/edge/EdgeService';
 import { CampaignService } from '../models/Campaigns/CampaignService';
+import LinkService from '../models/link/LinkService';
 
 export interface APIServiceContainer {
   userService: UserService;
@@ -36,6 +37,7 @@ export interface APIServiceContainer {
   tagService: TagService;
   triggerService: TriggerService;
   campaignService: CampaignService;
+  linkService: LinkService;
 }
 
 export interface APIContext extends ExpressContext {

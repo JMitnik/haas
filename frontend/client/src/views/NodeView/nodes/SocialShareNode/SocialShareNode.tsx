@@ -8,6 +8,7 @@ import CustomIcon from 'components/Icons/CustomIcon';
 
 import { GenericNodeProps } from '../types';
 import { ShareItem, SocialShareNodeContainer } from './SocialShareNodeStyles';
+import UpsellNode from './UpsellNode';
 
 type SocialShareNodeProps = GenericNodeProps;
 
@@ -64,32 +65,39 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   return (
     <SocialShareNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>
-      <Flex data-testid="shareitems" justifyContent="center" alignItems="center">
-        {node.links.length === 0 && <DefaultSocialItems />}
-        {node.links.map((link, index) => (
-          <ShareItem
-            title={link.title || undefined}
-            data-testid={link.type}
-            href={link.url}
-            onClick={handleLinkClick}
-            target="__blank"
-            key={index}
-            rel="noopener noreferrer"
-            backgroundColor={link.backgroundColor || '#007bb5'}
-          >
-            {link.type === 'TWITTER' && <Twitter stroke="none" fill="white" />}
-            {link.type === 'FACEBOOK' && <Facebook stroke="none" fill="white" />}
-            {link.type === 'INSTAGRAM' && <Instagram stroke="white" />}
-            {link.type === 'LINKEDIN' && <Linkedin stroke="none" fill="white" />}
-            {link.type === 'WHATSAPP' && <Whatsapp stroke="none" fill="white" />}
-            {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'WHATSAPP'].includes(link.type) && link.iconUrl)
-              && <CustomIcon logo={link.iconUrl} />}
-            {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'WHATSAPP'].includes(link.type) && !link.iconUrl)
-              && <Globe data-testid="globe" stroke="white" />}
-          </ShareItem>
-        ))}
+      {node.links.length === 1 && (
+        <UpsellNode link={node.links[0]} />
+      )}
 
-      </Flex>
+      {(node.links.length === 0 || node.links.length > 1) && (
+        <Flex data-testid="shareitems" justifyContent="center" alignItems="center">
+          {node.links.length === 0 && <DefaultSocialItems />}
+          {node.links.map((link, index) => (
+            <ShareItem
+              title={link.title || undefined}
+              data-testid={link.type}
+              href={link.url}
+              onClick={handleLinkClick}
+              target="__blank"
+              key={index}
+              rel="noopener noreferrer"
+              backgroundColor={link.backgroundColor || '#007bb5'}
+            >
+              {link.type === 'TWITTER' && <Twitter stroke="none" fill="white" />}
+              {link.type === 'FACEBOOK' && <Facebook stroke="none" fill="white" />}
+              {link.type === 'INSTAGRAM' && <Instagram stroke="white" />}
+              {link.type === 'LINKEDIN' && <Linkedin stroke="none" fill="white" />}
+              {link.type === 'WHATSAPP' && <Whatsapp stroke="none" fill="white" />}
+              {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'WHATSAPP'].includes(link.type) && link.iconUrl)
+                && <CustomIcon logo={link.iconUrl} />}
+              {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'WHATSAPP'].includes(link.type) && !link.iconUrl)
+                && <Globe data-testid="globe" stroke="white" />}
+            </ShareItem>
+          ))}
+
+        </Flex>
+      )}
+
     </SocialShareNodeContainer>
   );
 };

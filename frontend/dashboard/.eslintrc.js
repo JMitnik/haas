@@ -21,7 +21,7 @@ module.exports = {
         "react/no-this-in-sfc": "off", // Bugged, gets triggered by non-SFC functions
         "no-param-reassign": "off",
         "sort-imports-es6-autofix/sort-imports-es6": "error",
-        "max-len": ["error", { "code": 120, "ignoreStrings": false, "tabWidth": 4, "ignoreTemplateLiterals": true }],
+        "max-len": ["error", { "code": 120, "ignoreStrings": false, "tabWidth": 2, "ignoreTemplateLiterals": true }],
         "no-multiple-empty-lines": ["error", { "max": 1 }],
         "no-nested-ternary": "off",
         "no-plusplus": "off",

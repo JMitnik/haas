@@ -7,7 +7,7 @@ import { DialgoueStatisticsLineChartDataType, DialogueStatistics } from './graph
 import { CustomerType } from '../customer/Customer';
 import { EdgeType } from '../edge/Edge';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
-import { SessionConnection, SessionType } from '../session/Session';
+import { SessionConnection, SessionType } from '../session/graphql/Session';
 import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
 import { PaginationWhereInput } from '../general/Pagination';
@@ -16,6 +16,7 @@ import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
 import isValidDate from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
+import { SessionConnectionFilterInput } from '../session/graphql';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -132,21 +133,15 @@ export const DialogueType = objectType({
 
     t.field('sessionConnection', {
       type: SessionConnection,
-      args: { filter: PaginationWhereInput },
+      args: { filter: SessionConnectionFilterInput },
       nullable: true,
 
-      async resolve(parent, args) {
+      async resolve(parent, args, ctx) {
         if (!parent.id) return null;
-
-        const sessionConnection = await SessionService.getSessionConnection(parent.id, {
-          startDate: args.filter?.startDate ? PaginationService.formatDate(args.filter?.startDate) : null,
-          endDate: args.filter?.endDate ? PaginationService.formatDate(args.filter?.endDate) : null,
-          limit: args.filter?.limit,
-          offset: args.filter?.offset,
-          orderBy: args.filter?.orderBy,
-          pageIndex: args.filter?.pageIndex,
-          searchTerm: args.filter?.searchTerm,
-        });
+        const sessionConnection = await ctx.services.sessionService.getSessionConnection(
+          parent.id,
+          args.filter
+        );
 
         if (!sessionConnection) return null;
 
@@ -236,6 +231,14 @@ export const DialogueType = objectType({
         return ctx.services.dialogueService.getCTAsByDialogueId(parent.id, args.searchTerm);
       },
     });
+
+    t.list.field('campaignVariants', {
+      type: 'CampaignVariantType',
+      // @ts-ignore
+      resolve: (parent, args, ctx) => {
+        return ctx.services.dialogueService.getCampaignVariantsByDialogueId(parent.id);
+      }
+    })
   },
 });
 

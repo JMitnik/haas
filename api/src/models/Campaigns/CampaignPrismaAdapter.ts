@@ -41,6 +41,59 @@ export class CampaignPrismaAdapter {
   }
 
   /**
+   * Find campaign of campaign-variant
+   *
+   * Warning: (not a good query.)
+   *
+   * @param campaignVariantId
+   * @returns
+   */
+  findCampaignOfVariantId = async (campaignVariantId: string) => {
+    const edges = await this.prisma.campaignVariant.findUnique({
+      where: { id: campaignVariantId },
+      include: {
+        CampaignVariantToCampaign: {
+          include: {
+            campaign: true,
+          }
+        }
+      }
+    });
+
+    return edges?.CampaignVariantToCampaign[0].campaign;
+  }
+
+  /**
+   * Find campaign variant of delivery.
+   * @param deliveryId
+   */
+  findCampaignVariantOfDelivery = async (deliveryId: string) => {
+    return this.prisma.delivery.findUnique({
+      where: { id: deliveryId }
+    }).campaignVariant();
+  }
+
+  /**
+   * Find campaign variant of delivery.
+   * @param deliveryId
+   */
+  findWorkspaceOfCampaignVariant = async (campaignVariantId: string) => {
+    return this.prisma.campaignVariant.findUnique({
+      where: { id: campaignVariantId }
+    }).workspace();
+  }
+
+  /**
+   * Find campaign variant of delivery.
+   * @param deliveryId
+   */
+  findDialogueOfCampaignVariant = async (campaignVariantId: string) => {
+    return this.prisma.campaignVariant.findUnique({
+      where: { id: campaignVariantId }
+    }).dialogue();
+  }
+
+  /**
    * Create campaign from campaign-input.
    */
   createCampaign = async (input: NexusGenInputs['CreateCampaignInputType']) => {
@@ -134,8 +187,34 @@ export class CampaignPrismaAdapter {
     });
   }
 
+
+  /**
+   * Find delivery of session.
+   * @param campaignId
+   * @returns
+   */
+  findDeliveryOfSession = async (sessionId: string) => {
+    return this.prisma.session.findUnique({
+      where: { id: sessionId }
+    }).delivery();
+  }
+
+  /**
+   * Find delivery-events of delivery.
+   * @param campaignId
+   * @returns
+   */
+  findDeliveryEventsOfDelivery = async (deliveryId: string) => {
+    return this.prisma.delivery.findFirst({
+      where: { id: deliveryId }
+    }).events();
+  }
+
   /**
    * Find delivery
+   *
+   * Note:
+   * - Eager loads `campaign` and `campaignVariant` as well (often requested together).
    * @param id
    * @returns
    */

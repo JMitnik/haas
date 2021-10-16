@@ -12,16 +12,15 @@ import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
 import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
 
+import * as Popover from 'components/Common/Popover';
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
+import { GetDialogueStatisticsQuery, useGetDialogueStatisticsQuery } from 'types/generated-types';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
-import { GetDialogueStatisticsQuery, useGetDialogueStatisticsQuery } from 'types/generated-types';
-
 import { useNavigator } from 'hooks/useNavigator';
-import Dropdown from 'components/Dropdown';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
@@ -160,8 +159,8 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
   const { t } = useTranslation();
 
   return (
-    <UI.Card zIndex={500} noHover bg="white" width="400px" maxWidth="100%">
-      <UI.CardBody>
+    <>
+      <>
         <UI.Div />
         <UI.Div mb={4}>
           <UI.Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_qr')}</UI.Text>
@@ -174,7 +173,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
             </UI.Div>
             <UI.ColumnFlex alignItems="center">
               <UI.Div ref={qrContainerRef}>
-                <QRCode fgColor={qrColor} value={shareUrl} />
+                <QRCode fgColor={qrColor} value={`${shareUrl}?origin=qrc`} />
               </UI.Div>
               <Button
                 margin="0 auto"
@@ -209,8 +208,8 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
 
           </UI.Flex>
         </UI.Div>
-      </UI.CardBody>
-    </UI.Card>
+      </>
+    </>
   );
 };
 
@@ -287,15 +286,16 @@ const DialogueView = () => {
             <UI.ViewTitle leftIcon={<ChartbarIcon />}>
               {t('views:dialogue_view')}
             </UI.ViewTitle>
-            <Dropdown
-              renderOverlay={() => <ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />}
-            >
-              {({ onOpen }) => (
-                <UI.Button onClick={onOpen} variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
+            <Popover.Base>
+              <Popover.Trigger>
+                <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
                   {t('share')}
                 </UI.Button>
-              )}
-            </Dropdown>
+              </Popover.Trigger>
+              <Popover.Body hasArrow>
+                <ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />
+              </Popover.Body>
+            </Popover.Base>
           </UI.Flex>
 
           <UI.Flex justifyContent="space-between" flexWrap="wrap">

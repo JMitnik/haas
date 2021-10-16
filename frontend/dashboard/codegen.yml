@@ -10,3 +10,4 @@ generates:
       withMutationOptionsType: true
       reactApolloVersion: 3
       withRefetchFn: true
+      withResultType: true
