@@ -7,26 +7,23 @@ import { Activity, Calendar, Filter, Link2, Mail, MessageCircle, Plus, Search, S
 import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { Controller, useForm } from 'react-hook-form';
-import { ErrorBoundary } from 'react-error-boundary';
 import { Flex, ViewTitle } from '@haas/ui';
 import {
   Icon,
   Radio,
   RadioGroup,
 } from '@chakra-ui/core';
-import { MenuHeader, MenuItem, SubMenu, useMenuState } from '@szhsin/react-menu';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import React, { Dispatch, SetStateAction, useState } from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
 
+import * as Menu from 'components/Common/Menu';
 import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
 import {
   CampaignVariantEnum,
-  DeliveryFragmentFragment,
   SessionConnectionOrder,
   SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery,
 } from 'types/generated-types';
@@ -34,24 +31,14 @@ import { Circle } from 'components/Common/Circle';
 import {
   CompactEntriesPath,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
-import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
-import { Menu } from 'components/Common/Menu/Menu';
+import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { formatSimpleDate } from 'utils/dateUtils';
+import { useMenu } from 'components/Common/Menu/useMenu';
 import SearchBar from 'components/SearchBar/SearchBar';
 
 import { InteractionModalCard } from './InteractionModalCard';
-
-interface TableProps {
-  search?: string | null;
-  pageIndex?: number | null;
-  perPage?: number | null;
-  startDate?: Date | null;
-  endDate?: Date | null;
-  filterCampaigns?: SessionDeliveryType | 'all' | null;
-  filterCampaignId?: string | 'all' | null;
-}
 
 const undefinedToNull = (value: any) => {
   if (value === undefined) {
@@ -60,26 +47,6 @@ const undefinedToNull = (value: any) => {
 
   return value;
 };
-
-const DeliveryUserCell = ({ delivery }: { delivery: DeliveryFragmentFragment }) => (
-  <UI.Flex alignItems="center">
-    <UI.Div mr={2}>
-      {delivery.deliveryRecipientFirstName && (
-        <Avatar name={delivery.deliveryRecipientFirstName} brand="blue" />
-      )}
-    </UI.Div>
-    <UI.ColumnFlex>
-      <UI.Span fontWeight={600} color="blue.500">
-        {delivery.deliveryRecipientFirstName}
-        {' '}
-        {delivery.deliveryRecipientLastName}
-      </UI.Span>
-      <UI.Span color="blue.300" fontSize="0.7rem">
-        {delivery.id}
-      </UI.Span>
-    </UI.ColumnFlex>
-  </UI.Flex>
-);
 
 const AnonymousCell = ({ sessionId }: { sessionId: string }) => {
   const { t } = useTranslation();
@@ -113,40 +80,6 @@ const DateCell = ({ timestamp }: { timestamp: string }) => {
     </UI.ColumnFlex>
   );
 };
-
-interface FilterButtonProps {
-  filterKey: string;
-  value: string;
-  onDisable: () => void;
-}
-
-const FilterButtonContainer = styled(UI.Div)`
-  font-weight: 600;
-  line-height: 1rem;
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: white;
-  box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
-  border-radius: 10px;
-  padding: 4px 8px;
-  display: flex;
-  align-items: center;
-
-  button {
-    margin-left: 10px;
-    max-width: 20px !important;
-    max-height: 20px;
-
-    min-width: auto;
-    min-height: auto;
-
-    svg {
-      width: 80%;
-      height: 100%;
-    }
-  }
-`;
 
 interface DistributionInnerCellProps {
   session: SessionFragmentFragment;
@@ -263,68 +196,6 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
   );
 };
 
-const FilterButton = ({ filterKey, value, onDisable }: FilterButtonProps) => (
-  <FilterButtonContainer>
-    {filterKey}
-    :
-    {' '}
-    {value}
-    <UI.IconButton
-      aria-label="close"
-      icon={IconClose}
-      onClick={onDisable}
-      width={10}
-      minWidth={10}
-    />
-  </FilterButtonContainer>
-);
-
-const ActiveFilters = ({
-  filter,
-  setFilters,
-}: { filter: TableProps, setFilters: Dispatch<SetStateAction<TableProps>> }) => (
-  <UI.Stack isInline spacing={2} alignItems="center">
-    {!!filter.search && (
-      <UI.Div>
-        <FilterButton
-          filterKey="search"
-          value={filter.search}
-          onDisable={() => setFilters((newFilter) => ({ ...newFilter, search: '' }))}
-        />
-      </UI.Div>
-    )}
-    {(filter.startDate || filter.endDate) && (
-      <UI.Div>
-        <ErrorBoundary fallbackRender={() => <></>}>
-          <FilterButton
-            filterKey="date"
-            value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
-            onDisable={() => setFilters((newFilter) => ({ ...newFilter, startDate: undefined, endDate: undefined }))}
-          />
-        </ErrorBoundary>
-      </UI.Div>
-    )}
-    {!!filter.filterCampaigns && (
-      <UI.Div>
-        <FilterButton
-          filterKey="distribution"
-          value={filter.filterCampaigns}
-          onDisable={() => setFilters((newFilter) => ({ ...newFilter, filterCampaigns: undefined }))}
-        />
-      </UI.Div>
-    )}
-    {!!filter.filterCampaignId && (
-      <UI.Div>
-        <FilterButton
-          filterKey="campaignVariant"
-          value={filter.filterCampaignId}
-          onDisable={() => setFilters((newFilter) => ({ ...newFilter, filterCampaignId: undefined }))}
-        />
-      </UI.Div>
-    )}
-  </UI.Stack>
-);
-
 interface CampaignVariant {
   id: string;
   label: string;
@@ -374,6 +245,7 @@ export const InteractionsOverview = () => {
         campaignVariantId: filter.filterCampaignId === 'all' ? undefined : filter.filterCampaignId,
       },
     },
+    errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
       setCampaignVariants(
         fetchedData?.customer?.dialogue?.campaignVariants || [],
@@ -440,10 +312,7 @@ export const InteractionsOverview = () => {
       pageIndex: 0,
     }));
   };
-  const { toggleMenu, ...menuProps } = useMenuState();
-  const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
-  const [contextInteraction, setContextInteraction] = useState<SessionFragmentFragment>();
-
+  const { menuProps, openMenu, closeMenu, activeItem: contextInteraction } = useMenu<SessionFragmentFragment>();
   const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
   return (
@@ -531,8 +400,32 @@ export const InteractionsOverview = () => {
             <UI.Separator bg="gray.200" />
 
             {/* @ts-ignore */}
-            <ActiveFilters filter={filter} setFilters={setFilter} />
-
+            <UI.Stack isInline spacing={4} alignItems="center">
+              <Table.FilterButton
+                condition={!!filter.search}
+                filterKey="search"
+                value={filter.search}
+                onClose={() => setFilter({ search: '' })}
+              />
+              <Table.FilterButton
+                condition={!!(filter.startDate || filter.endDate)}
+                filterKey="date"
+                value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
+                onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
+              />
+              <Table.FilterButton
+                condition={!!filter.filterCampaigns}
+                filterKey="distribution"
+                value={filter.filterCampaigns}
+                onClose={() => setFilter({ filterCampaigns: undefined })}
+              />
+              <Table.FilterButton
+                condition={!!filter.filterCampaignId}
+                filterKey="campaignVariant"
+                value={filter.filterCampaignId}
+                onClose={() => setFilter({ filterCampaignId: undefined })}
+              />
+            </UI.Stack>
           </UI.Stack>
         </UI.Flex>
         <UI.Flex mb={4} justifyContent="flex-end">
@@ -558,18 +451,17 @@ export const InteractionsOverview = () => {
             </Table.HeadingCell>
           </Table.HeadingRow>
           <UI.Div>
-            <Menu
+            <Menu.Base
               {...menuProps}
-              anchorPoint={anchorPoint}
-              onClose={() => toggleMenu(false)}
+              onClose={closeMenu}
             >
-              <MenuHeader>
+              <Menu.Header>
                 <UI.Icon>
                   <Filter />
                 </UI.Icon>
                 {t('filter')}
-              </MenuHeader>
-              <SubMenu label={(
+              </Menu.Header>
+              <Menu.SubMenu label={(
                 <UI.Flex>
                   <UI.Icon mr={1} width={10}>
                     <Calendar />
@@ -578,31 +470,31 @@ export const InteractionsOverview = () => {
                 </UI.Flex>
               )}
               >
-                <MenuItem
+                <Menu.Item
                   onClick={() => handleMultiDateFilterChange(undefined, new Date(contextInteraction?.createdAt))}
                 >
                   {t('before_day_of')}
                   {' '}
                   {formatSimpleDate(contextInteraction?.createdAt)}
-                </MenuItem>
-                <MenuItem
+                </Menu.Item>
+                <Menu.Item
                   onClick={() => handleSingleDateFilterChange(contextInteraction?.createdAt)}
                 >
                   {t('on_day_of')}
                   {' '}
                   {formatSimpleDate(contextInteraction?.createdAt)}
-                </MenuItem>
-                <MenuItem
+                </Menu.Item>
+                <Menu.Item
                   onClick={() => handleMultiDateFilterChange(new Date(contextInteraction?.createdAt), undefined)}
                 >
                   {t('after_day_of')}
                   {' '}
                   {formatSimpleDate(contextInteraction?.createdAt)}
-                </MenuItem>
-              </SubMenu>
+                </Menu.Item>
+              </Menu.SubMenu>
               {contextInteraction?.delivery && (
                 <>
-                  <SubMenu label={(
+                  <Menu.SubMenu label={(
                     <UI.Flex>
                       <UI.Icon mr={1} width={10}>
                         <MessageCircle />
@@ -611,7 +503,7 @@ export const InteractionsOverview = () => {
                     </UI.Flex>
                   )}
                   >
-                    <MenuItem
+                    <Menu.Item
                       onClick={() => handleSearchTermChange(
                         `${contextInteraction?.delivery?.deliveryRecipientFirstName} ${contextInteraction?.delivery?.deliveryRecipientLastName}` || '',
                       )}
@@ -621,8 +513,8 @@ export const InteractionsOverview = () => {
                       {contextInteraction?.delivery?.deliveryRecipientFirstName}
                       {' '}
                       {contextInteraction?.delivery?.deliveryRecipientLastName}
-                    </MenuItem>
-                    <MenuItem onClick={() => handleCampaignVariantFilterChange({
+                    </Menu.Item>
+                    <Menu.Item onClick={() => handleCampaignVariantFilterChange({
                       filterCampaignVariant: contextInteraction?.delivery?.campaignVariant?.id,
                     })}
                     >
@@ -631,27 +523,22 @@ export const InteractionsOverview = () => {
                       {t('campaign_variant')}
                       {' '}
                       {contextInteraction?.delivery?.campaignVariant?.label}
-                    </MenuItem>
-                  </SubMenu>
+                    </Menu.Item>
+                  </Menu.SubMenu>
                 </>
               )}
-            </Menu>
+            </Menu.Base>
 
             {sessions.map((session) => (
               <Table.Row
                 onClick={() => goToInteractionsView(session.id)}
                 gridTemplateColumns={columns}
                 key={session.id}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  setAnchorPoint({ x: e.clientX, y: e.clientY });
-                  setContextInteraction(session);
-                  toggleMenu(true);
-                }}
+                onContextMenu={(e) => openMenu(e, session)}
               >
                 <Table.Cell>
                   {session.delivery?.deliveryRecipientFirstName ? (
-                    <DeliveryUserCell delivery={session.delivery} />
+                    <DeliveryRecipient delivery={session.delivery} />
                   ) : (
                     <AnonymousCell sessionId={session.id} />
                   )}

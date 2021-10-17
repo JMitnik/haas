@@ -5,27 +5,30 @@ import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { refetchGetWorkspaceCampaignQuery, useCreateBatchDeliveriesMutation } from 'types/generated-types';
+import { useCreateBatchDeliveriesMutation } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useLogger } from 'hooks/useLogger';
 import { useNavigator } from 'hooks/useNavigator';
 import FileDropInput from 'components/FileDropInput';
 
-import { defaultCampaignViewFilter } from './CampaignView';
-
 const schema = yup.object({
-  batchScheduledAt: yup.date()
+  batchScheduledAt: yup.date(),
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
 
-export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
-  const { campaignId, customerSlug } = useNavigator();
+interface ImportDeliveriesFormProps {
+  onClose: () => void;
+  onComplete?: () => void;
+}
+
+export const ImportDeliveriesForm = ({ onClose, onComplete }: ImportDeliveriesFormProps) => {
+  const { campaignId } = useNavigator();
   const form = useForm<FormProps>({
     defaultValues: {
-      batchScheduledAt: new Date()
+      batchScheduledAt: new Date(),
     },
-    mode: 'all'
+    mode: 'all',
   });
   const { activeCustomer } = useCustomer();
   const logger = useLogger();
@@ -44,12 +47,12 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
         duration: 1500,
       });
 
+      onComplete?.();
       onClose();
     },
-    awaitRefetchQueries: true,
     onError: (error) => {
       logger.logError(error, {
-        tags: { section: 'campaign' }
+        tags: { section: 'campaign' },
       });
       toast({
         title: 'Something went wrong!',
@@ -59,13 +62,6 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
         duration: 1500,
       });
     },
-    refetchQueries: [
-      refetchGetWorkspaceCampaignQuery({
-        customerSlug,
-        campaignId,
-        deliveryConnectionFilter: defaultCampaignViewFilter
-      })
-    ]
   });
 
   const handleDrop = (files: File[]) => {
@@ -83,8 +79,8 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
           campaignId,
           batchScheduledAt: (formData.batchScheduledAt as Date).toISOString(),
           uploadedCsv: activeCSV,
-        }
-      }
+        },
+      },
     });
   };
 

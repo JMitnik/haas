@@ -54,7 +54,7 @@ const MenuContainer = styled.div`
   `}
 `;
 
-interface MenuProps {
+interface MenuBaseProps {
   children: React.ReactNode;
   anchorPoint: { x: number; y: number };
   endTransition: () => void;
@@ -64,7 +64,7 @@ interface MenuProps {
 
 const MotionControlledMenu = motion.custom(ControlledMenu);
 
-export const Menu = ({ children, ...menuProps }: MenuProps) => (
+export const Base = ({ children, ...menuProps }: MenuBaseProps) => (
   <MenuContainer>
     <motion.div>
       <AnimatePresence exitBeforeEnter>

@@ -10,6 +10,7 @@ export interface CircleProps {
 export const Circle = styled(UI.Div) <CircleProps>`
   ${({ theme, brand }) => css`
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     font-weight: 500;

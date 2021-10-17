@@ -1,20 +1,13 @@
 query GetWorkspaceCampaign(
   $customerSlug: String!
   $campaignId: String!
-  $deliveryConnectionFilter: DeliveryConnectionFilter
+  $deliveryConnectionFilter: DeliveryConnectionFilterInput
 ) {
   customer(slug: $customerSlug) {
     id
     campaign(campaignId: $campaignId) {
       id
       label
-
-      allDeliveryConnection: deliveryConnection {
-        nrTotal
-        nrSent
-        nrOpened
-        nrFinished
-      }
 
       deliveryConnection(filter: $deliveryConnectionFilter) {
         deliveries {
@@ -41,8 +34,13 @@ query GetWorkspaceCampaign(
           }
         }
 
+        totalPages
         pageInfo {
-          nrPages
+          hasPrevPage
+          hasNextPage
+          prevPageOffset
+          nextPageOffset
+          pageIndex
         }
       }
 

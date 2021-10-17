@@ -1,4 +1,5 @@
-import { DeliveryStatusTypeEnum, PrismaClient } from '@prisma/client';
+import { DeliveryStatusTypeEnum, Prisma, PrismaClient } from '@prisma/client';
+import { cloneDeep } from 'lodash';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 
 import { CampaignWithVariants, DeliveryInput } from './CampaignTypes';
@@ -9,6 +10,64 @@ export class CampaignPrismaAdapter {
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
+
+
+  /**
+   * Build a session prisma query based on the filter parameters.
+   * @param dialogueId
+   * @param filter
+   */
+  buildFindDeliveriesQuery = (campaignId: string, filter?: NexusGenInputs['DeliveryConnectionFilterInput'] | null) => {
+    // Required: filter by campaignId
+    let query: Prisma.DeliveryWhereInput = { campaignId };
+
+    // Optional: Filter by campaign-variant
+    if (filter?.campaignVariantId) {
+      query.campaignVariantId = filter.campaignVariantId;
+    }
+
+    // Optional: filter by date
+    if (filter?.startDate || filter?.endDate) {
+      query.updatedAt = {
+        gte: filter?.startDate ? new Date(filter.startDate) : undefined,
+        lte: filter?.endDate ? new Date(filter.endDate) : undefined,
+      }
+    }
+
+    // Add search filter
+    if (filter?.search) {
+      const [potentialFirstName, potentialLastName] = filter.search.split(' ');
+
+      query = {
+        ...cloneDeep(query),
+        OR: [
+          { deliveryRecipientEmail: { contains: filter.search, mode: 'insensitive' }, },
+          { deliveryRecipientPhone: { contains: filter.search, mode: 'insensitive' }, },
+          {
+            AND: potentialLastName ? [
+              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
+              { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
+            ] : undefined
+          },
+          {
+            OR: !potentialLastName ? [
+              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
+              { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' }, },
+            ] : undefined
+          }
+        ]
+      }
+    }
+
+    if (filter?.recipientEmail) { query.deliveryRecipientEmail = { equals: filter.recipientEmail } }
+    if (filter?.recipientPhoneNumber) { query.deliveryRecipientPhone = { equals: filter.recipientPhoneNumber } }
+    if (filter?.recipientFirstName) { query.deliveryRecipientFirstName = { contains: filter.recipientFirstName } }
+    if (filter?.recipientLastName) { query.deliveryRecipientLastName = { contains: filter.recipientLastName } }
+    if (filter?.status) { query.currentStatus = { equals: filter.status } }
+
+    return query;
+  }
+
 
   /**
    * Create delivery.
@@ -38,6 +97,53 @@ export class CampaignPrismaAdapter {
         }
       },
     });
+  }
+
+  /**
+   * Order interactions by a "created-at".
+   * @param filter
+   */
+  buildOrderByQuery = (filter?: NexusGenInputs['DeliveryConnectionFilterInput'] | null) => {
+    let orderByQuery: Prisma.DeliveryOrderByInput[] = [];
+
+    if (filter?.orderBy?.by === 'createdAt') {
+      orderByQuery.push({
+        createdAt: filter.orderBy.desc ? 'desc' : 'asc',
+      })
+    }
+
+    return orderByQuery;
+  }
+
+  /**
+   * Find deliveries, given a filter.
+   * @param campaignId
+   * @param filter
+   * @returns
+   */
+  findDeliveries = async (campaignId: string, filter?: NexusGenInputs['DeliveryConnectionFilterInput'] | null) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const deliveries = await this.prisma.delivery.findMany({
+      where: this.buildFindDeliveriesQuery(campaignId, filter),
+      skip: offset,
+      take: perPage,
+      orderBy: this.buildOrderByQuery(filter),
+      include: { campaignVariant: true, campaign: true }
+    });
+
+    return deliveries;
+  }
+
+  /**
+   * Count deliveries matching a filter.
+   * @param campaignId
+   * @param filter
+   * @returns
+   */
+  countDeliveries = async (campaignId: string, filter?: NexusGenInputs['DeliveryConnectionFilterInput'] | null) => {
+    return this.prisma.delivery.count({ where: this.buildFindDeliveriesQuery(campaignId, filter) });
   }
 
   /**

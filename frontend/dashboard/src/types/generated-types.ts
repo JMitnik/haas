@@ -64,7 +64,7 @@ export type CampaignType = {
 
 /** Campaign */
 export type CampaignTypeDeliveryConnectionArgs = {
-  filter?: Maybe<DeliveryConnectionFilter>;
+  filter?: Maybe<DeliveryConnectionFilterInput>;
 };
 
 export type CampaignVariantCustomVariableType = {
@@ -91,8 +91,8 @@ export type CampaignVariantType = {
   workspace?: Maybe<Customer>;
   dialogue?: Maybe<Dialogue>;
   campaign?: Maybe<CampaignType>;
-  customVariables?: Maybe<Array<CampaignVariantCustomVariableType>>;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
+  customVariables?: Maybe<Array<CampaignVariantCustomVariableType>>;
 };
 
 /** Input type for a choice node */
@@ -349,26 +349,37 @@ export type DeleteUserOutput = {
   deletedUser: Scalars['Boolean'];
 };
 
-export type DeliveryConnectionFilter = {
-  campaignId?: Maybe<Scalars['String']>;
-  paginationFilter?: Maybe<PaginationWhereInput>;
-  status?: Maybe<DeliveryStatusEnum>;
-  campaignVariantId?: Maybe<Scalars['ID']>;
-};
-
-export type DeliveryConnectionType = DeprecatedConnectionInterface & {
-  __typename?: 'DeliveryConnectionType';
-  cursor?: Maybe<Scalars['String']>;
-  offset?: Maybe<Scalars['Int']>;
-  limit: Scalars['Int'];
-  pageInfo: DeprecatedPaginationPageInfo;
+export type DeliveryConnectionFilterInput = {
+  search?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
+  campaignVariantId?: Maybe<Scalars['String']>;
+  recipientFirstName?: Maybe<Scalars['String']>;
+  recipientLastName?: Maybe<Scalars['String']>;
+  recipientPhoneNumber?: Maybe<Scalars['String']>;
+  recipientEmail?: Maybe<Scalars['String']>;
+  status?: Maybe<DeliveryStatusEnum>;
+  orderBy?: Maybe<DeliveryConnectionOrderByInput>;
+  offset?: Maybe<Scalars['Int']>;
+  perPage?: Maybe<Scalars['Int']>;
+};
+
+/** Fields to order DeliveryConnection by. */
+export enum DeliveryConnectionOrder {
+  CreatedAt = 'createdAt'
+}
+
+/** Sorting of DeliveryConnection */
+export type DeliveryConnectionOrderByInput = {
+  by: DeliveryConnectionOrder;
+  desc?: Maybe<Scalars['Boolean']>;
+};
+
+export type DeliveryConnectionType = ConnectionInterface & {
+  __typename?: 'DeliveryConnectionType';
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo: PaginationPageInfo;
   deliveries: Array<DeliveryType>;
-  nrTotal: Scalars['Int'];
-  nrSent: Scalars['Int'];
-  nrOpened: Scalars['Int'];
-  nrFinished: Scalars['Int'];
 };
 
 export type DeliveryEventType = {
@@ -1851,7 +1862,7 @@ export type DeliveryEventFragmentFragment = (
 
 export type DeliveryFragmentFragment = (
   { __typename?: 'DeliveryType' }
-  & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'createdAt'>
+  & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'createdAt' | 'currentStatus'>
   & { campaignVariant?: Maybe<(
     { __typename?: 'CampaignVariantType' }
     & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
@@ -2113,7 +2124,7 @@ export type GetDeliveryQuery = (
 export type GetWorkspaceCampaignQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   campaignId: Scalars['String'];
-  deliveryConnectionFilter?: Maybe<DeliveryConnectionFilter>;
+  deliveryConnectionFilter?: Maybe<DeliveryConnectionFilterInput>;
 }>;
 
 
@@ -2125,11 +2136,9 @@ export type GetWorkspaceCampaignQuery = (
     & { campaign?: Maybe<(
       { __typename?: 'CampaignType' }
       & Pick<CampaignType, 'id' | 'label'>
-      & { allDeliveryConnection?: Maybe<(
+      & { deliveryConnection?: Maybe<(
         { __typename?: 'DeliveryConnectionType' }
-        & Pick<DeliveryConnectionType, 'nrTotal' | 'nrSent' | 'nrOpened' | 'nrFinished'>
-      )>, deliveryConnection?: Maybe<(
-        { __typename?: 'DeliveryConnectionType' }
+        & Pick<DeliveryConnectionType, 'totalPages'>
         & { deliveries: Array<(
           { __typename?: 'DeliveryType' }
           & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'currentStatus'>
@@ -2141,8 +2150,8 @@ export type GetWorkspaceCampaignQuery = (
             & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status' | 'failureMessage'>
           )>> }
         )>, pageInfo: (
-          { __typename?: 'DeprecatedPaginationPageInfo' }
-          & Pick<DeprecatedPaginationPageInfo, 'nrPages'>
+          { __typename?: 'PaginationPageInfo' }
+          & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
         ) }
       )>, variants?: Maybe<Array<(
         { __typename?: 'CampaignVariantType' }
@@ -2456,6 +2465,7 @@ export const DeliveryFragmentFragmentDoc = gql`
   scheduledAt
   updatedAt
   createdAt
+  currentStatus
   campaignVariant {
     id
     label
@@ -3037,18 +3047,12 @@ export function refetchGetDeliveryQuery(variables?: GetDeliveryQueryVariables) {
       return { query: GetDeliveryDocument, variables: variables }
     }
 export const GetWorkspaceCampaignDocument = gql`
-    query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilter) {
+    query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilterInput) {
   customer(slug: $customerSlug) {
     id
     campaign(campaignId: $campaignId) {
       id
       label
-      allDeliveryConnection: deliveryConnection {
-        nrTotal
-        nrSent
-        nrOpened
-        nrFinished
-      }
       deliveryConnection(filter: $deliveryConnectionFilter) {
         deliveries {
           id
@@ -3071,8 +3075,13 @@ export const GetWorkspaceCampaignDocument = gql`
             failureMessage
           }
         }
+        totalPages
         pageInfo {
-          nrPages
+          hasPrevPage
+          hasNextPage
+          prevPageOffset
+          nextPageOffset
+          pageIndex
         }
       }
       variants {

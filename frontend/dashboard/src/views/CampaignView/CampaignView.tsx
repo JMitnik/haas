@@ -1,131 +1,37 @@
 import * as UI from '@haas/ui';
-import { Clock, Mail, Plus, Settings, Smartphone } from 'react-feather';
-import { ErrorBoundary } from 'react-error-boundary';
+import { Calendar, Plus, Search, Settings, User } from 'react-feather';
 import { Route, Switch, useLocation } from 'react-router';
-import { format } from 'date-fns';
+import { endOfDay, startOfDay } from 'date-fns';
 import { union } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import {
-  CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType,
-  GetWorkspaceCampaignQuery,
-  PaginationSortByEnum, useGetWorkspaceCampaignQuery,
-} from 'types/generated-types';
-import { DeepPartial } from 'types/customTypes';
-import { ROUTES, useNavigator } from 'hooks/useNavigator';
-import { useLogger } from 'hooks/useLogger';
-import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
-
+import * as Menu from 'components/Common/Menu';
+import * as Table from 'components/Common/Table';
 import { AnimatePresence, motion } from 'framer-motion';
+import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
+import {
+  DeliveryConnectionOrder, DeliveryFragmentFragment,
+  DeliveryStatusEnum, GetWorkspaceCampaignQuery, useGetWorkspaceCampaignQuery,
+} from 'types/generated-types';
+import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
+import { DeliveryRecipientAddress } from 'components/Campaign/DeliveryRecipientAddress';
+import { DeliveryStatus } from 'components/Campaign/DeliveryStatus';
+import { FormatTimestamp } from 'components/Common/DateAndTime';
+import { PickerButton } from 'components/Common/Picker/PickerButton';
+import { ROUTES, useNavigator } from 'hooks/useNavigator';
+import { TabbedMenu } from 'components/Common/TabMenu';
+import { formatSimpleDate } from 'utils/dateUtils';
+import { useLogger } from 'hooks/useLogger';
+import { useMenu } from 'components/Common/Menu/useMenu';
+import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
+import Searchbar from 'components/SearchBar';
+
 import { CampaignType } from './CampaignViewTypes';
 import { DeliveryModalCard } from './DeliveryModalCard';
-// eslint-disable-next-line import/no-cycle
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
-export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
-  paginationFilter: {
-    limit: 10,
-    startDate: undefined,
-    endDate: undefined,
-    pageIndex: 0,
-    offset: 0,
-    orderBy: [
-      {
-        by: PaginationSortByEnum.ScheduledAt,
-        desc: true,
-      },
-      {
-        by: PaginationSortByEnum.UpdatedAt,
-        desc: true,
-      },
-    ],
-  },
-};
-
 const POLL_INTERVAL_SECONDS = 30;
-
-const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
-  const date = new Date(parseInt(scheduledAt, 10));
-
-  return (
-    <UI.Flex alignItems="center">
-      <UI.Icon pr={1}>
-        <Clock width="0.7rem" />
-      </UI.Icon>
-      {format(date, 'MM/dd HH:mm')}
-    </UI.Flex>
-  );
-};
-
-const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) => {
-  const status = delivery.currentStatus;
-
-  switch (status) {
-    case DeliveryStatusEnum.Finished: {
-      return (
-        <UI.Label variantColor="green">
-          {status}
-        </UI.Label>
-      );
-    }
-
-    case DeliveryStatusEnum.Deployed: {
-      return (
-        <UI.Label variantColor="blue">
-          {status}
-        </UI.Label>
-      );
-    }
-
-    case DeliveryStatusEnum.Scheduled: {
-      return (
-        <UI.Label>
-          <ErrorBoundary FallbackComponent={() => <div>{status}</div>}>
-            <UI.Div py={1}>
-              <UI.Stack>
-                <>
-                  <UI.Span>
-                    {status}
-                  </UI.Span>
-                  <UI.Span fontSize="0.6rem">
-                    {!!delivery.scheduledAt && (
-                      // @ts-ignore
-                      <DeliveryScheduledLabel scheduledAt={delivery.scheduledAt} />
-                    )}
-                  </UI.Span>
-                </>
-              </UI.Stack>
-            </UI.Div>
-          </ErrorBoundary>
-        </UI.Label>
-      );
-    }
-
-    case DeliveryStatusEnum.Opened: {
-      return (
-        <UI.Label variantColor="yellow">{status}</UI.Label>
-      );
-    }
-
-    case DeliveryStatusEnum.Failed: {
-      return (
-        <UI.Label variantColor="red">{status}</UI.Label>
-      );
-    }
-
-    case DeliveryStatusEnum.Delivered: {
-      return (
-        <UI.Label variantColor="cyan">{status}</UI.Label>
-      );
-    }
-    default: {
-      return (
-        <UI.Label variantColor="blue">{status}</UI.Label>
-      );
-    }
-  }
-};
 
 const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
   label: campaign.label,
@@ -148,46 +54,129 @@ export const CampaignView = () => {
   const logger = useLogger();
   const location = useLocation();
 
-  const [paginationState, setPaginationState] = useState(defaultCampaignViewFilter);
-
   const { customerSlug, campaignId, getCampaignsPath, goToCampaignView, goToDeliveryView } = useNavigator();
   const campaignsPath = getCampaignsPath();
 
+  const [filter, setFilter] = useQueryParams({
+    startDate: DateTimeParam,
+    endDate: DateTimeParam,
+    search: StringParam,
+    pageIndex: withDefault(NumberParam, 0),
+    perPage: withDefault(NumberParam, 10),
+    recipientEmail: StringParam,
+    recipientPhone: StringParam,
+    recipientFirstName: StringParam,
+    recipientLastName: StringParam,
+    status: StringParam,
+    orderByField: withDefault(StringParam, DeliveryConnectionOrder.CreatedAt),
+    orderByDescending: withDefault(BooleanParam, true),
+  });
+
   // For tables we will consider data-caches.
-  // useTableData
   const [dataCache, setDataCache] = useState<GetWorkspaceCampaignQuery | undefined>(undefined);
-  const { data, loading } = useGetWorkspaceCampaignQuery({
+  const { loading: isLoading, refetch } = useGetWorkspaceCampaignQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
       campaignId,
       customerSlug,
-      deliveryConnectionFilter: paginationState,
+      deliveryConnectionFilter: {
+        startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
+        endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
+        search: filter.search,
+        offset: filter.pageIndex * filter.perPage,
+        perPage: filter.perPage,
+        recipientEmail: filter.recipientEmail,
+        recipientFirstName: filter.recipientFirstName,
+        recipientLastName: filter.recipientLastName,
+        recipientPhoneNumber: filter.recipientPhone,
+        status: filter.status as DeliveryStatusEnum,
+        orderBy: {
+          by: filter.orderByField as DeliveryConnectionOrder,
+          desc: filter.orderByDescending,
+        },
+      },
     },
     pollInterval: POLL_INTERVAL_SECONDS * 1000,
+    errorPolicy: 'ignore',
     onCompleted: (completeData) => setDataCache(completeData),
     onError: (error) => logger.logError(error, {
       tags: { section: 'campaign' },
     }),
   });
 
-  // use-table-select placement
-  // const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const totalPages = dataCache?.customer?.campaign?.deliveryConnection?.totalPages || 0;
 
-  // const handleSelect = (id: string) => {
-  //   if (selectedIds.includes(id)) {
-  //     console.log(selectedIds);
-  //     setSelectedIds(ids => ids.splice(ids.indexOf(id), 1));
-  //   } else {
-  //     setSelectedIds(ids => [...ids, id]);
-  //   }
-  // }
-
-  // const isInEdit = selectedIds.length > 0;
-
-  // use-table-select end
+  const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)';
 
   const campaign = dataCache?.customer?.campaign || null;
   const deliveryConnection = campaign?.deliveryConnection;
+
+  const handleSearchChange = (search: string) => {
+    setFilter((prevValues) => ({
+      ...prevValues,
+      search,
+      pageIndex: 0,
+    }));
+  };
+
+  const handleDateChange = (dates: Date[] | null) => {
+    if (dates) {
+      const [newStartDate, newEndDate] = dates;
+      setFilter({
+        ...filter,
+        startDate: startOfDay(newStartDate),
+        endDate: endOfDay(newEndDate),
+        pageIndex: 0,
+      });
+    } else {
+      setFilter({
+        ...filter,
+        startDate: null,
+        endDate: null,
+        pageIndex: 0,
+      });
+    }
+  };
+
+  const handleSingleDateFilterChange = (day: Date) => {
+    setFilter({
+      ...filter,
+      startDate: startOfDay(day),
+      endDate: endOfDay(day),
+      pageIndex: 0,
+    });
+  };
+
+  const handleMultiDateFilterChange = (newStartDate?: Date, newEndDate?: Date) => {
+    setFilter({
+      ...filter,
+      startDate: newStartDate,
+      endDate: newEndDate,
+      pageIndex: 0,
+    });
+  };
+
+  const handleRecipientFirstName = (firstName?: string | null) => {
+    setFilter({ recipientFirstName: firstName, pageIndex: 0 });
+  };
+
+  const handleRecipientLastName = (lastName?: string | null) => {
+    setFilter({ recipientLastName: lastName, pageIndex: 0 });
+  };
+
+  const handleRecipientEmail = (email?: string | null) => {
+    setFilter({ recipientEmail: email, pageIndex: 0 });
+  };
+
+  const handleRecipientPhone = (phone?: string | null) => {
+    setFilter({ recipientPhone: phone, pageIndex: 0 });
+  };
+
+  const handleStatus = (status?: string | null) => {
+    setFilter({ status, pageIndex: 0 });
+  };
+
+  const { openMenu, closeMenu, menuProps, activeItem } = useMenu<DeliveryFragmentFragment>();
 
   return (
     <>
@@ -214,162 +203,294 @@ export const CampaignView = () => {
             variant="outline"
             onClick={() => setIsOpenSettingsModal(true)}
           >
-            Settings
+            {t('settings')}
           </UI.Button>
         </UI.Flex>
 
       </UI.ViewHead>
       <UI.ViewBody>
-        <UI.Card noHover>
-          <UI.Div p={2}>
-            <UI.Table width="100%" isLoading={loading}>
-              <UI.TableHeading>
-                {/* <UI.TableHeadingCell>
-                  <UI.TableSelect />
-                </UI.TableHeadingCell> */}
-                <UI.TableHeadingCell>
-                  {t('recipient')}
-                </UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('recipient_adress')}
-                </UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('variant')}
-                </UI.TableHeadingCell>
-                <UI.TableHeadingCell>
-                  {t('status')}
-                </UI.TableHeadingCell>
-              </UI.TableHeading>
-
-              <UI.TableBody>
-                {deliveryConnection?.deliveries.map((delivery) => (
-                  <UI.TableRow
-                    hasHover
-                    key={delivery.id}
-                    onClick={() => goToDeliveryView(campaignId, delivery.id)}
-                  >
-                    <UI.TableCell>
-                      {delivery?.deliveryRecipientFirstName || ''}
-                    </UI.TableCell>
-                    <UI.TableCell>
-                      {delivery.campaignVariant?.type === CampaignVariantEnum.Email
-                        ? delivery?.deliveryRecipientEmail : delivery?.deliveryRecipientPhone}
-                    </UI.TableCell>
-                    <UI.TableCell>
-                      <UI.Label variantColor="teal">
-                        <UI.Flex>
-                          <UI.Icon mr={1}>
-                            {delivery?.campaignVariant?.type === CampaignVariantEnum.Email && (
-                              <Mail width={14} />
-                            )}
-
-                            {delivery?.campaignVariant?.type === CampaignVariantEnum.Sms && (
-                              <Smartphone width={14} />
-                            )}
-                          </UI.Icon>
-                          {delivery?.campaignVariant?.label}
-                        </UI.Flex>
-                      </UI.Label>
-                    </UI.TableCell>
-                    <UI.TableCell>
-                      <DeliveryStatus
-                        delivery={delivery}
-                      />
-                    </UI.TableCell>
-                  </UI.TableRow>
-                ))}
-
-                {/* {isInEdit && (
-                  <UI.TableActionBar>
-                    <UI.Div>
-                      Selected {selectedIds.length} deliveries
-                    </UI.Div>
-                  </UI.TableActionBar>
-                )} */}
-              </UI.TableBody>
-            </UI.Table>
-          </UI.Div>
-          {(deliveryConnection?.pageInfo?.nrPages || 0) > 1 && (
-            <UI.PaginationFooter>
-              <UI.Div style={{ lineHeight: 'normal' }}>
-                Showing page
-                <UI.Span ml={1} fontWeight="bold">
-                  {(paginationState.paginationFilter?.pageIndex || 0) + 1}
-                </UI.Span>
-                <UI.Span ml={1}>
-                  out of
-                </UI.Span>
-                <UI.Span ml={1} fontWeight="bold">
-                  {deliveryConnection?.pageInfo.nrPages}
-                </UI.Span>
-                <UI.Span ml={3}>
-                  (Total deliveries:
-                  {' '}
-                  {data?.customer?.campaign?.allDeliveryConnection?.nrTotal}
-                  )
-                </UI.Span>
-              </UI.Div>
-
-              <UI.Div>
-                <UI.Stack isInline alignItems="center">
+        <UI.Div>
+          <UI.Flex mb={2}>
+            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={(<Plus />)}>
+              {() => (
+                <TabbedMenu
+                  menuHeader={t('add_filter')}
+                  tabs={[
+                    { label: t('search'), icon: <Search /> },
+                    { label: t('date'), icon: <Calendar /> },
+                    { label: t('recipient'), icon: <User /> },
+                  ]}
+                >
                   <UI.Div>
-                    <UI.Button
-                      size="sm"
-                      variantColor="teal"
-                      onClick={() => setPaginationState((state) => ({
-                        ...state,
-                        paginationFilter: {
-                          ...state.paginationFilter,
-                          pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
-                          offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
-                        },
-                      }))}
-                      isDisabled={paginationState.paginationFilter?.pageIndex === 0}
-                    >
-                      Previous
-                    </UI.Button>
-                  </UI.Div>
-
-                  <UI.Div>
-                    <UI.DebouncedInput
-                      value={(paginationState.paginationFilter?.pageIndex || 0) + 1}
-                      onChange={(val) => setPaginationState((state) => ({
-                        ...state,
-                        paginationFilter: {
-                          ...state.paginationFilter,
-                          pageIndex: val - 1,
-                          offset: Math.max((val - 1), 0) * (state.paginationFilter?.limit || 0),
-                        },
-                      }))}
+                    <UI.RadioHeader>
+                      {t('filter_by_search')}
+                    </UI.RadioHeader>
+                    <Searchbar
+                      activeSearchTerm={filter.search}
+                      onSearchTermChange={handleSearchChange}
                     />
                   </UI.Div>
-                  <UI.Button
-                    size="sm"
-                    variantColor="teal"
-                    onClick={() => setPaginationState((state) => ({
-                      ...state,
-                      paginationFilter: {
-                        ...state.paginationFilter,
-                        pageIndex: (state.paginationFilter?.pageIndex || 0) + 1,
-                        offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
-                      },
-                    }))}
-                    isDisabled={
-                      (paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages
-                    }
+
+                  <UI.Div>
+                    <UI.RadioHeader>
+                      {t('filter_by_date')}
+                    </UI.RadioHeader>
+                    <UI.SectionSubHeader>
+                      {t('filter_by_updated_date_description')}
+                    </UI.SectionSubHeader>
+                    <UI.DatePicker
+                      value={[filter.startDate, filter.endDate]}
+                      onChange={handleDateChange}
+                      range
+                    />
+                  </UI.Div>
+
+                  <UI.Div>
+                    <UI.Stack>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_first_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.recipientFirstName}
+                          onSearchTermChange={handleRecipientFirstName}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_last_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.recipientLastName}
+                          onSearchTermChange={handleRecipientLastName}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_email')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.recipientEmail}
+                          onSearchTermChange={handleRecipientEmail}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_phone')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.recipientPhone}
+                          onSearchTermChange={handleRecipientPhone}
+                        />
+                      </UI.Div>
+                    </UI.Stack>
+                  </UI.Div>
+                </TabbedMenu>
+              )}
+            </PickerButton>
+
+            <UI.Separator bg="gray.200" />
+
+            <UI.Stack spacing={2} isInline>
+              <Table.FilterButton
+                condition={!!filter.search}
+                filterKey="search"
+                value={filter.search}
+                onClose={() => handleSearchChange('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.recipientFirstName}
+                filterKey="recipientFirstName"
+                value={filter.recipientFirstName}
+                onClose={() => handleRecipientFirstName('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.recipientLastName}
+                filterKey="recipientLastName"
+                value={filter.recipientLastName}
+                onClose={() => handleRecipientLastName('')}
+              />
+              <Table.FilterButton
+                condition={!!(filter.startDate || filter.endDate)}
+                filterKey="updatedAt"
+                value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
+                onClose={() => handleMultiDateFilterChange(undefined, undefined)}
+              />
+              <Table.FilterButton
+                condition={!!filter.recipientEmail}
+                filterKey="recipientEmail"
+                value={filter.recipientEmail}
+                onClose={() => handleRecipientEmail('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.recipientPhone}
+                filterKey="recipientPhone"
+                value={filter.recipientPhone}
+                onClose={() => handleRecipientPhone('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.status}
+                filterKey="status"
+                value={filter.status}
+                onClose={() => handleStatus(undefined)}
+              />
+            </UI.Stack>
+          </UI.Flex>
+
+          <UI.Div>
+            <Menu.Base {...menuProps} onClose={closeMenu}>
+              <Menu.Header>
+                {t('filter')}
+              </Menu.Header>
+              <Menu.SubMenu label={(
+                <UI.Flex>
+                  <UI.Icon mr={1} width={10}>
+                    <Calendar />
+                  </UI.Icon>
+                  {t('date')}
+                </UI.Flex>
+              )}
+              >
+                <Menu.Item
+                  onClick={() => handleMultiDateFilterChange(undefined, new Date(activeItem?.updatedAt))}
+                >
+                  {t('before_day_of')}
+                  {' '}
+                  {formatSimpleDate(activeItem?.updatedAt)}
+                </Menu.Item>
+                <Menu.Item
+                  onClick={() => handleSingleDateFilterChange(activeItem?.updatedAt)}
+                >
+                  {t('on_day_of')}
+                  {' '}
+                  {formatSimpleDate(activeItem?.updatedAt)}
+                </Menu.Item>
+                <Menu.Item
+                  onClick={() => handleMultiDateFilterChange(new Date(activeItem?.updatedAt), undefined)}
+                >
+                  {t('after_day_of')}
+                  {' '}
+                  {formatSimpleDate(activeItem?.updatedAt)}
+                </Menu.Item>
+              </Menu.SubMenu>
+              <Menu.SubMenu label={(
+                <UI.Flex>
+                  <UI.Icon mr={1} width={10}>
+                    <User />
+                  </UI.Icon>
+                  {t('recipient')}
+                </UI.Flex>
+              )}
+              >
+                <Menu.Item
+                  onClick={() => handleRecipientFirstName(activeItem?.deliveryRecipientFirstName)}
+                >
+                  Starting with
+                  {' '}
+                  {activeItem?.deliveryRecipientFirstName}
+                </Menu.Item>
+                <Menu.Item
+                  onClick={() => handleRecipientLastName(activeItem?.deliveryRecipientLastName)}
+                >
+                  Ending with
+                  {' '}
+                  {activeItem?.deliveryRecipientLastName}
+                </Menu.Item>
+                {activeItem?.deliveryRecipientPhone && (
+                  <Menu.Item
+                    onClick={() => handleRecipientPhone(activeItem?.deliveryRecipientPhone)}
                   >
-                    Next
-                  </UI.Button>
-                </UI.Stack>
-              </UI.Div>
-            </UI.PaginationFooter>
-          )}
-        </UI.Card>
+                    With phone number
+                    {' '}
+                    {activeItem?.deliveryRecipientPhone}
+                  </Menu.Item>
+                )}
+                {activeItem?.deliveryRecipientEmail && (
+                  <Menu.Item
+                    onClick={() => handleRecipientEmail(activeItem?.deliveryRecipientEmail)}
+                  >
+                    With email
+                    {' '}
+                    {activeItem?.deliveryRecipientEmail}
+                  </Menu.Item>
+                )}
+              </Menu.SubMenu>
+
+              <Menu.Item
+                onClick={() => handleStatus(activeItem?.currentStatus)}
+              >
+                With status
+                {' '}
+                <UI.Div ml={2}>
+                  <DeliveryStatus onlyStatus delivery={activeItem as DeliveryFragmentFragment} />
+                </UI.Div>
+              </Menu.Item>
+            </Menu.Base>
+
+            <Table.HeadingRow gridTemplateColumns={columns}>
+              <Table.HeadingCell>
+                {t('recipient')}
+              </Table.HeadingCell>
+              <Table.HeadingCell>
+                {t('recipient_adress')}
+              </Table.HeadingCell>
+              <Table.HeadingCell>
+                {t('variant')}
+              </Table.HeadingCell>
+              <Table.HeadingCell>
+                {t('status')}
+              </Table.HeadingCell>
+              <Table.HeadingCell>
+                {t('last_update')}
+              </Table.HeadingCell>
+            </Table.HeadingRow>
+            {deliveryConnection?.deliveries.map((delivery) => (
+              <Table.Row
+                onClick={() => goToDeliveryView(campaignId, delivery.id)}
+                isLoading={isLoading}
+                key={delivery.id}
+                gridTemplateColumns={columns}
+                onContextMenu={(e) => openMenu(e, delivery)}
+              >
+                <Table.Cell>
+                  <DeliveryRecipient delivery={delivery} />
+                </Table.Cell>
+                <Table.Cell>
+                  <DeliveryRecipientAddress delivery={delivery} />
+                </Table.Cell>
+                <Table.Cell>
+                  <Table.InnerCell>
+                    <UI.Helper>
+                      {delivery.campaignVariant?.label}
+                    </UI.Helper>
+                  </Table.InnerCell>
+                </Table.Cell>
+                <Table.Cell>
+                  <DeliveryStatus delivery={delivery} />
+                </Table.Cell>
+                <Table.Cell>
+                  <FormatTimestamp timestamp={delivery.updatedAt} />
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </UI.Div>
+        </UI.Div>
+
+        <UI.Flex justifyContent="flex-end">
+          <Table.Pagination
+            pageIndex={filter.pageIndex}
+            maxPages={totalPages}
+            perPage={filter.perPage}
+            isLoading={isLoading}
+            setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+          />
+        </UI.Flex>
 
         <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
           <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenImportModal(false)}>
             <UI.ModalBody>
               <ImportDeliveriesForm
+                onComplete={() => refetch()}
                 onClose={() => setIsOpenImportModal(false)}
               />
             </UI.ModalBody>
