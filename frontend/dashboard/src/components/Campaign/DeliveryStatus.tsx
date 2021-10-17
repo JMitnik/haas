@@ -20,7 +20,12 @@ const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
   );
 };
 
-export const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) => {
+interface DeliveryStatusProps {
+  delivery: DeepPartial<DeliveryType>;
+  onlyStatus?: boolean;
+}
+
+export const DeliveryStatus = ({ delivery, onlyStatus = false }: DeliveryStatusProps) => {
   const status = delivery.currentStatus;
 
   switch (status) {
@@ -50,12 +55,14 @@ export const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryTyp
                   <UI.Span>
                     {status}
                   </UI.Span>
-                  <UI.Span fontSize="0.6rem">
-                    {!!delivery.scheduledAt && (
-                      // @ts-ignore
-                      <DeliveryScheduledLabel scheduledAt={delivery.scheduledAt} />
-                    )}
-                  </UI.Span>
+                  {!onlyStatus && (
+                    <UI.Span fontSize="0.6rem">
+                      {!!delivery.scheduledAt && (
+                        // @ts-ignore
+                        <DeliveryScheduledLabel scheduledAt={delivery.scheduledAt} />
+                      )}
+                    </UI.Span>
+                  )}
                 </>
               </UI.Stack>
             </UI.Div>

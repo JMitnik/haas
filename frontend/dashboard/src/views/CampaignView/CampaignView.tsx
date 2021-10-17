@@ -339,6 +339,9 @@ export const CampaignView = () => {
 
           <UI.Div>
             <Menu.Base {...menuProps} onClose={closeMenu}>
+              <Menu.Header>
+                {t('filter')}
+              </Menu.Header>
               <Menu.SubMenu label={(
                 <UI.Flex>
                   <UI.Icon mr={1} width={10}>
@@ -419,7 +422,7 @@ export const CampaignView = () => {
                 With status
                 {' '}
                 <UI.Div ml={2}>
-                  <DeliveryStatus delivery={activeItem as DeliveryFragmentFragment} />
+                  <DeliveryStatus onlyStatus delivery={activeItem as DeliveryFragmentFragment} />
                 </UI.Div>
               </Menu.Item>
             </Menu.Base>
