@@ -5,7 +5,7 @@ import React from 'react';
 
 import { CampaignVariantEnum, DeliveryFragmentFragment } from 'types/generated-types';
 
-export const DeliveryRecipientAdres = ({ delivery }: { delivery: DeliveryFragmentFragment }) => (
+export const DeliveryRecipientAddress = ({ delivery }: { delivery: DeliveryFragmentFragment }) => (
   <UI.Div>
     {delivery.campaignVariant?.type === CampaignVariantEnum.Email && (
       <UI.Stack isInline spacing={2}>

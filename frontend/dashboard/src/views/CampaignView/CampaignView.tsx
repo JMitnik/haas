@@ -15,7 +15,7 @@ import {
   DeliveryStatusEnum, GetWorkspaceCampaignQuery, useGetWorkspaceCampaignQuery,
 } from 'types/generated-types';
 import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
-import { DeliveryRecipientAdres } from 'components/Campaign/DeliveryRecipientAdres';
+import { DeliveryRecipientAddress } from 'components/Campaign/DeliveryRecipientAddress';
 import { DeliveryStatus } from 'components/Campaign/DeliveryStatus';
 import { FormatTimestamp } from 'components/Common/DateAndTime';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
@@ -456,7 +456,7 @@ export const CampaignView = () => {
                   <DeliveryRecipient delivery={delivery} />
                 </Table.Cell>
                 <Table.Cell>
-                  <DeliveryRecipientAdres delivery={delivery} />
+                  <DeliveryRecipientAddress delivery={delivery} />
                 </Table.Cell>
                 <Table.Cell>
                   <Table.InnerCell>
