@@ -15,6 +15,7 @@ import { probability } from '../../utils/probability';
 import mustache from 'mustache';
 import { isPresent } from 'ts-is-present';
 import DynamoScheduleService from '../../services/DynamoScheduleService';
+import { offsetPaginate } from '../general/PaginationHelpers';
 
 export class CampaignService {
   prisma: PrismaClient;
@@ -118,6 +119,25 @@ export class CampaignService {
       throw new UserInputError('Weights do not sum up to 100%');
     }
   }
+
+  getDeliveryConnection = async (
+    campaignId: string,
+    filter?: NexusGenInputs['DeliveryConnectionFilterInput'] | null
+  ): Promise<NexusGenFieldTypes['DeliveryConnectionType'] | null> => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const deliveries = await this.prismaAdapter.findDeliveries(campaignId, filter);
+    const totalDeliveries = await this.prismaAdapter.countDeliveries(campaignId, filter);
+
+    const { totalPages, ...pageInfo } = offsetPaginate(totalDeliveries, offset, perPage);
+
+    return {
+      deliveries,
+      totalPages,
+      pageInfo
+    };
+  };
 
   /**
    * Gets paginated deliveries given a `campaignId`, generic `paginationOptions` and specific

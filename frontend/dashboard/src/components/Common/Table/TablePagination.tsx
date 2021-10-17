@@ -46,6 +46,8 @@ export const Pagination = ({
     }
   }, [pageIndex, setInputPageIndex]);
 
+  if (pages.length <= 1) return null;
+
   return (
     <PaginationContainer bg="white" padding={2}>
       <UI.Flex alignItems="center">

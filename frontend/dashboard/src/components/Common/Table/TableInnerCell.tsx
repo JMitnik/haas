@@ -19,7 +19,7 @@ export const InnerCell = ({
   renderBody,
   header,
 }: { children: React.ReactNode, header?: string, renderBody?: () => React.ReactNode }) => (
-  <UI.Div onClick={(e) => e.stopPropagation()}>
+  <UI.Div display="inline-block" onClick={(e) => e.stopPropagation()}>
     <Popover.Base>
       <Popover.Trigger>
         <TableCellButtonContainer

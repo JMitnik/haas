@@ -2,6 +2,7 @@ import { enumType, objectType } from '@nexus/schema';
 
 import { CampaignModel } from './CampaignModel';
 import { CustomerType } from '../../customer/Customer';
+import { DeliveryConnectionModel } from './DeliveryConnectionModel';
 import { DialogueType } from '../../questionnaire/Dialogue';
 
 export const CampaignVariantEnum = enumType({
@@ -58,6 +59,8 @@ export const CampaignVariantModel = objectType({
         return ctx.services.campaignService.findCampaignOfVariantId(parent.id);
       }
     });
+
+    t.field('deliveryConnection', { type: DeliveryConnectionModel, nullable: true });
 
     t.list.field('customVariables', { type: CampaignVariantCustomVariableType, nullable: true });
   }

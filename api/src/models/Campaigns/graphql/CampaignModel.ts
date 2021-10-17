@@ -1,7 +1,10 @@
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
-import { ApolloError, UserInputError } from 'apollo-server';
-import { CampaignVariantModel } from './CampaignVariantModel';
+import { UserInputError } from 'apollo-server';
 
+import { CampaignVariantModel } from './CampaignVariantModel';
+import { DeliveryConnectionModel } from './DeliveryConnectionModel';
+import { DeliveryConnectionFilterInput } from './DeliveryConnectionFilterInput';
+import { NexusGenFieldTypes } from '../../../generated/nexus';
 
 export const CampaignModel = objectType({
   name: 'CampaignType',
@@ -11,6 +14,21 @@ export const CampaignModel = objectType({
     t.id('id');
     t.string('label');
     t.list.field('variants', { type: CampaignVariantModel, nullable: true });
+
+    t.field('deliveryConnection', {
+      type: DeliveryConnectionModel,
+      nullable: true,
+      args: { filter: DeliveryConnectionFilterInput },
+
+      resolve: async (parent, args, ctx) => {
+        const deliveryConnection = await ctx.services.campaignService.getDeliveryConnection(
+          parent.id,
+          args.filter
+        );
+
+        return deliveryConnection || null;
+      }
+    });
   },
 });
 
