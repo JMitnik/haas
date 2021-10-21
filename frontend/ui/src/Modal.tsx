@@ -79,51 +79,45 @@ export const Modal = ({
   });
 
   return (
-    <AnimatePresence key="modal">
-      <motion.div
-        key={isOpen ? 'open' : 'no'} exit={{ opacity: 0 }}>
-        <ReactModal
-          isOpen={isOpen}
-          onRequestClose={onClose}
-          shouldCloseOnOverlayClick
-          style={{
-            overlay: {
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 8000,
-              backgroundColor: 'rgba(0, 0, 0, 0.35)'
-            },
-            content: {
-              position: 'absolute',
-              border: 0,
-              background: 'transparent',
-              padding: 24,
-              borderRadius: '10px',
-              left: '50%',
-              top: '40%',
-              margin: '0px auto',
-              overflow: 'initial',
-              width: '100%',
-              transform: 'translateX(-50%) translateY(-50%)'
-            }
-          }}
+    <ReactModal
+      isOpen={isOpen}
+      onRequestClose={onClose}
+      shouldCloseOnOverlayClick
+      style={{
+        overlay: {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 8000,
+          backgroundColor: 'rgba(0, 0, 0, 0.35)'
+        },
+        content: {
+          position: 'absolute',
+          border: 0,
+          background: 'transparent',
+          padding: 24,
+          borderRadius: '10px',
+          left: '50%',
+          top: '40%',
+          margin: '0px auto',
+          overflow: 'initial',
+          width: '100%',
+          transform: 'translateX(-50%) translateY(-50%)'
+        }
+      }}
+    >
+      <Div ref={ref}>
+        <motion.div
+          key="modal"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
         >
-          <Div ref={ref}>
-            <motion.div
-              key="modal"
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 10, opacity: 0 }}
-            >
-              {children}
-            </motion.div>
-          </Div>
-        </ReactModal>
-      </motion.div>
-    </AnimatePresence >
+          {children}
+        </motion.div>
+      </Div>
+    </ReactModal>
   );
 };
 

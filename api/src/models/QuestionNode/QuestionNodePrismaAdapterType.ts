@@ -27,11 +27,13 @@ export type CreateCTAInput = {
 export type UpdateFormFieldsInput = {
   questionId: string;
   fields: Prisma.FormNodeFieldUpsertArgs[];
+  helperText?: string;
 }
 
 export type CreateFormFieldsInput = {
   questionId: string;
   fields: Prisma.FormNodeCreateInput;
+  helperText?: string;
 }
 
 export interface UpdateQuestionInput extends CreateQuestionInput {

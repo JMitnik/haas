@@ -203,7 +203,10 @@ class QuestionNodePrismaAdapter {
       },
       data: {
         form: {
-          create: input.fields,
+          create: {
+            helperText: input.helperText,
+            ...input.fields,
+          }
         },
       }
     })
@@ -217,6 +220,7 @@ class QuestionNodePrismaAdapter {
       data: {
         form: {
           update: {
+            helperText: input.helperText,
             fields: {
               upsert: input.fields,
             },
