@@ -21,18 +21,6 @@ import { TabbedMenu } from 'components/Common/TabMenu';
 import { formatSimpleDate } from 'utils/dateUtils';
 import deleteUserQuery from '../../mutations/deleteUser';
 
-interface TableProps {
-  activeStartDate: Date | null;
-  activeEndDate: Date | null;
-  activeSearchTerm: string;
-  pageIndex: number;
-  pageSize: number;
-  sortBy: {
-    by: string;
-    desc: boolean;
-  }[];
-}
-
 const columns = 'minmax(150px, 1fr) minmax(200px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)';
 
 const UsersOverview = () => {
@@ -50,6 +38,9 @@ const UsersOverview = () => {
     startDate: DateTimeParam,
     endDate: DateTimeParam,
     search: StringParam,
+    firstName: StringParam,
+    lastName: StringParam,
+    email: StringParam,
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 10),
     role: StringParam,
@@ -178,23 +169,15 @@ const UsersOverview = () => {
   };
 
   const handleRecipientFirstName = (firstName?: string | null) => {
-    setFilter({ recipientFirstName: firstName, pageIndex: 0 });
+    setFilter({ firstName, pageIndex: 0 });
   };
 
   const handleRecipientLastName = (lastName?: string | null) => {
-    setFilter({ recipientLastName: lastName, pageIndex: 0 });
+    setFilter({ lastName, pageIndex: 0 });
   };
 
   const handleRecipientEmail = (email?: string | null) => {
-    setFilter({ recipientEmail: email, pageIndex: 0 });
-  };
-
-  const handleRecipientPhone = (phone?: string | null) => {
-    setFilter({ recipientPhone: phone, pageIndex: 0 });
-  };
-
-  const handleStatus = (status?: string | null) => {
-    setFilter({ status, pageIndex: 0 });
+    setFilter({ email, pageIndex: 0 });
   };
 
   const tableData = data?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
@@ -205,7 +188,6 @@ const UsersOverview = () => {
   console.log('Table data:', tableData);
 
   const pageCount = data?.customer?.usersConnection?.pageInfo?.nrPages || 0;
-  const pageIndex = data?.customer?.usersConnection?.pageInfo?.pageIndex || 0;
 
   return (
     <>
@@ -276,7 +258,7 @@ const UsersOverview = () => {
                           {t('filter_by_recipient_first_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientFirstName}
+                          activeSearchTerm={filter.firstName}
                           onSearchTermChange={handleRecipientFirstName}
                         />
                       </UI.Div>
@@ -285,7 +267,7 @@ const UsersOverview = () => {
                           {t('filter_by_recipient_last_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientLastName}
+                          activeSearchTerm={filter.lastName}
                           onSearchTermChange={handleRecipientLastName}
                         />
                       </UI.Div>
@@ -294,17 +276,8 @@ const UsersOverview = () => {
                           {t('filter_by_recipient_email')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientEmail}
+                          activeSearchTerm={filter.email}
                           onSearchTermChange={handleRecipientEmail}
-                        />
-                      </UI.Div>
-                      <UI.Div>
-                        <UI.RadioHeader>
-                          {t('filter_by_recipient_phone')}
-                        </UI.RadioHeader>
-                        <Searchbar
-                          activeSearchTerm={filter.recipientPhone}
-                          onSearchTermChange={handleRecipientPhone}
                         />
                       </UI.Div>
                     </UI.Stack>
@@ -323,15 +296,15 @@ const UsersOverview = () => {
                 onClose={() => handleSearchChange('')}
               />
               <Table.FilterButton
-                condition={!!filter.recipientFirstName}
+                condition={!!filter.firstName}
                 filterKey="recipientFirstName"
-                value={filter.recipientFirstName}
+                value={filter.firstName}
                 onClose={() => handleRecipientFirstName('')}
               />
               <Table.FilterButton
-                condition={!!filter.recipientLastName}
+                condition={!!filter.lastName}
                 filterKey="recipientLastName"
-                value={filter.recipientLastName}
+                value={filter.lastName}
                 onClose={() => handleRecipientLastName('')}
               />
               <Table.FilterButton
@@ -341,22 +314,10 @@ const UsersOverview = () => {
                 onClose={() => handleMultiDateFilterChange(undefined, undefined)}
               />
               <Table.FilterButton
-                condition={!!filter.recipientEmail}
+                condition={!!filter.email}
                 filterKey="recipientEmail"
-                value={filter.recipientEmail}
+                value={filter.email}
                 onClose={() => handleRecipientEmail('')}
-              />
-              <Table.FilterButton
-                condition={!!filter.recipientPhone}
-                filterKey="recipientPhone"
-                value={filter.recipientPhone}
-                onClose={() => handleRecipientPhone('')}
-              />
-              <Table.FilterButton
-                condition={!!filter.status}
-                filterKey="status"
-                value={filter.status}
-                onClose={() => handleStatus(undefined)}
               />
             </UI.Stack>
           </UI.Flex>
