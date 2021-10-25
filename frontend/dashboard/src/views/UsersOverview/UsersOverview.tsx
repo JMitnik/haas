@@ -36,7 +36,7 @@ interface TableProps {
 const columns = 'minmax(150px, 1fr) minmax(200px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)';
 
 const UsersOverview = () => {
-  const { canDeleteUsers, canInviteUsers, canEditUsers } = useAuth();
+  const { canInviteUsers } = useAuth();
   const { activeCustomer } = useCustomer();
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
@@ -52,61 +52,43 @@ const UsersOverview = () => {
     search: StringParam,
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 10),
-    recipientEmail: StringParam,
-    recipientPhone: StringParam,
-    recipientFirstName: StringParam,
-    recipientLastName: StringParam,
-    status: StringParam,
+    role: StringParam,
     orderByField: withDefault(StringParam, PaginationSortByEnum.CreatedAt),
     orderByDescending: withDefault(BooleanParam, true),
   });
 
-  const [paginationProps, setPaginationProps] = useState<TableProps>({
-    activeStartDate: null,
-    activeEndDate: null,
-    activeSearchTerm: '',
-    pageIndex: 0,
-    pageSize: 8,
-    sortBy: [{ by: 'email', desc: true }],
-  });
-
   useEffect(() => {
-    const {
-      activeStartDate,
-      activeEndDate,
-      pageIndex,
-      pageSize,
-      sortBy,
-      activeSearchTerm,
-    } = paginationProps;
     fetchUsers({
       variables: {
         customerSlug,
         filter: {
-          startDate: null, // activeStartDate,
-          endDate: null, // activeEndDate,
-          searchTerm: activeSearchTerm,
-          offset: pageIndex * pageSize,
-          limit: pageSize,
-          pageIndex,
+          startDate: null, // filter.startDate, // TODO: fix this
+          endDate: null, // || filter.endDate, // TODO: fix this
+          searchTerm: filter.search,
+          offset: filter.pageIndex * filter.perPage,
+          limit: filter.perPage,
+          pageIndex: filter.pageIndex,
           orderBy: [{ by: PaginationSortByEnum.FirstName, desc: true }], // sortBy,
         },
       },
     });
-  }, [customerSlug, fetchUsers, paginationProps]);
+  }, [customerSlug, fetchUsers, filter]);
 
   const [deleteUser] = useMutation(deleteUserQuery, {
     onCompleted: () => {
       refetch?.({
         customerSlug,
         filter: {
-          startDate: null, // paginationProps.activeStartDate,
-          endDate: null, // paginationProps.activeEndDate,
-          searchTerm: paginationProps.activeSearchTerm,
-          offset: paginationProps.pageIndex * paginationProps.pageSize,
-          limit: paginationProps.pageSize,
-          pageIndex: paginationProps.pageIndex,
-          orderBy: [{ by: PaginationSortByEnum.FirstName, desc: true }], // paginationProps.sortBy,
+          startDate: null,
+          endDate: null,
+          searchTerm: filter.search,
+          offset: filter.pageIndex * filter.perPage,
+          limit: filter.perPage,
+          pageIndex: filter.pageIndex,
+          orderBy: [{
+            by: filter.orderByField as PaginationSortByEnum,
+            desc: filter.orderByDescending,
+          }],
         },
       });
       toast({
@@ -184,15 +166,6 @@ const UsersOverview = () => {
         pageIndex: 0,
       });
     }
-  };
-
-  const handleSingleDateFilterChange = (day: Date) => {
-    setFilter({
-      ...filter,
-      startDate: startOfDay(day),
-      endDate: endOfDay(day),
-      pageIndex: 0,
-    });
   };
 
   const handleMultiDateFilterChange = (newStartDate?: Date, newEndDate?: Date) => {
