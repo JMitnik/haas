@@ -22,7 +22,7 @@ const language = {
       de: 'Vorname des Empfängers',
     },
     recipientLastName: {
-      en: 'Recipient first name',
+      en: 'Recipient last name',
       de: 'Nachname des Empfängers',
     },
     recipientEmail: {

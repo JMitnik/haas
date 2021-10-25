@@ -202,10 +202,18 @@ class NodeService {
 
       if (existingNode?.form) {
         const fields = this.saveEditFormNodeInput(input.form) || [];
-        await this.questionNodePrismaAdapter.updateFieldsOfForm({ questionId: input.id, fields })
+        await this.questionNodePrismaAdapter.updateFieldsOfForm({
+          questionId: input.id,
+          fields,
+          helperText: input.form.helperText || '',
+        })
       } else {
         const fields = NodeService.saveCreateFormNodeInput(input.form);
-        await this.questionNodePrismaAdapter.createFieldsOfForm({ questionId: input.id, fields });
+        await this.questionNodePrismaAdapter.createFieldsOfForm({
+          questionId: input.id,
+          fields,
+          helperText: input.form.helperText || '',
+        });
       };
     };
 

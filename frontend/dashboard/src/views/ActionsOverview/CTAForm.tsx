@@ -68,7 +68,7 @@ const schema = yup.object().shape({
       title: yup.string().required(),
       type: yup.string().notRequired(),
     })),
-    otherwise: yup.array().min(1).of(yup.object().shape({
+    otherwise: yup.array().of(yup.object().shape({
       url: yup.string().required(),
       title: yup.string().notRequired(),
       type: yup.string().required(),

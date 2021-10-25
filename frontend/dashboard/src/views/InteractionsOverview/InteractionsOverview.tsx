@@ -531,6 +531,7 @@ export const InteractionsOverview = () => {
 
             {sessions.map((session) => (
               <Table.Row
+                isLoading={isLoading}
                 onClick={() => goToInteractionsView(session.id)}
                 gridTemplateColumns={columns}
                 key={session.id}

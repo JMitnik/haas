@@ -335,6 +335,8 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
     append(appendNewField(fields.length + 1));
   };
 
+  console.log(openedField);
+
   const formNodeFields = form.watch('formNode.fields', []);
 
   return (
