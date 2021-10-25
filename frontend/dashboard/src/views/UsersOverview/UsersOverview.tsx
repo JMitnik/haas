@@ -1,32 +1,24 @@
 import * as UI from '@haas/ui';
-import { ErrorBoundary } from 'react-error-boundary';
-import { Plus } from 'react-feather';
-import {
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverFooter,
-  PopoverHeader,
-  PopoverTrigger,
-  useToast,
-} from '@chakra-ui/core';
-import { debounce } from 'lodash';
+import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
+import { Calendar, Plus, Search, User } from 'react-feather';
+import { endOfDay, startOfDay } from 'date-fns';
 import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
+import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
+import * as Table from 'components/Common/Table';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { useCustomer } from 'providers/CustomerProvider';
 import SearchBar from 'components/SearchBar/SearchBar';
-import ShowMoreButton from 'components/ShowMoreButton';
-import Table from 'components/Table/Table';
-import getPaginatedUsers from 'queries/getPaginatedUsers';
+import Searchbar from 'components/SearchBar';
 import useAuth from 'hooks/useAuth';
 
+import { PaginationSortByEnum, useGetPaginatedUsersLazyQuery } from 'types/generated-types';
+import { PickerButton } from 'components/Common/Picker/PickerButton';
+import { TabbedMenu } from 'components/Common/TabMenu';
+import { formatSimpleDate } from 'utils/dateUtils';
 import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {
@@ -41,12 +33,7 @@ interface TableProps {
   }[];
 }
 
-const HEADERS = [
-  { Header: 'first_name', accessor: 'firstName', Cell: GenericCell },
-  { Header: 'last_name', accessor: 'lastName', Cell: GenericCell },
-  { Header: 'email', accessor: 'email', Cell: GenericCell },
-  { Header: 'role', accessor: 'role', Cell: RoleCell },
-];
+const columns = 'minmax(150px, 1fr) minmax(200px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)';
 
 const UsersOverview = () => {
   const { canDeleteUsers, canInviteUsers, canEditUsers } = useAuth();
@@ -55,8 +42,23 @@ const UsersOverview = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const toast = useToast();
-  const [fetchUsers, { data, refetch }] = useLazyQuery(getPaginatedUsers, {
+  const [fetchUsers, { data, refetch, loading: isLoading }] = useGetPaginatedUsersLazyQuery({
     fetchPolicy: 'cache-and-network',
+  });
+
+  const [filter, setFilter] = useQueryParams({
+    startDate: DateTimeParam,
+    endDate: DateTimeParam,
+    search: StringParam,
+    pageIndex: withDefault(NumberParam, 0),
+    perPage: withDefault(NumberParam, 10),
+    recipientEmail: StringParam,
+    recipientPhone: StringParam,
+    recipientFirstName: StringParam,
+    recipientLastName: StringParam,
+    status: StringParam,
+    orderByField: withDefault(StringParam, PaginationSortByEnum.CreatedAt),
+    orderByDescending: withDefault(BooleanParam, true),
   });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
@@ -67,11 +69,6 @@ const UsersOverview = () => {
     pageSize: 8,
     sortBy: [{ by: 'email', desc: true }],
   });
-
-  const tableData: any = data?.customer?.usersConnection?.userCustomers?.map((userCustomer: any) => ({
-    ...userCustomer.user,
-    role: userCustomer.role,
-  })) || [];
 
   useEffect(() => {
     const {
@@ -86,13 +83,13 @@ const UsersOverview = () => {
       variables: {
         customerSlug,
         filter: {
-          startDate: activeStartDate,
-          endDate: activeEndDate,
+          startDate: null, // activeStartDate,
+          endDate: null, // activeEndDate,
           searchTerm: activeSearchTerm,
           offset: pageIndex * pageSize,
           limit: pageSize,
           pageIndex,
-          orderBy: sortBy,
+          orderBy: [{ by: PaginationSortByEnum.FirstName, desc: true }], // sortBy,
         },
       },
     });
@@ -103,13 +100,13 @@ const UsersOverview = () => {
       refetch?.({
         customerSlug,
         filter: {
-          startDate: paginationProps.activeStartDate,
-          endDate: paginationProps.activeEndDate,
+          startDate: null, // paginationProps.activeStartDate,
+          endDate: null, // paginationProps.activeEndDate,
           searchTerm: paginationProps.activeSearchTerm,
           offset: paginationProps.pageIndex * paginationProps.pageSize,
           limit: paginationProps.pageSize,
           pageIndex: paginationProps.pageIndex,
-          orderBy: paginationProps.sortBy,
+          orderBy: [{ by: PaginationSortByEnum.FirstName, desc: true }], // paginationProps.sortBy,
         },
       });
       toast({
@@ -154,14 +151,87 @@ const UsersOverview = () => {
     history.push(`/dashboard/b/${customerSlug}/users/invite/`);
   };
 
-  const handleSearchTermChange = useCallback(
-    debounce((newSearchTerm: string) => {
-      setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
-    }, 250),
-    [],
-  );
+  const handleSearchTermChange = (search: string) => {
+    setFilter((prevValues) => ({
+      ...prevValues,
+      search,
+      pageIndex: 0,
+    }));
+  };
 
-  const pageCount = data?.customer?.usersConnection?.pageInfo?.nrPages || 1;
+  const handleSearchChange = (search: string) => {
+    setFilter((prevValues) => ({
+      ...prevValues,
+      search,
+      pageIndex: 0,
+    }));
+  };
+
+  const handleDateChange = (dates: Date[] | null) => {
+    if (dates) {
+      const [newStartDate, newEndDate] = dates;
+      setFilter({
+        ...filter,
+        startDate: startOfDay(newStartDate),
+        endDate: endOfDay(newEndDate),
+        pageIndex: 0,
+      });
+    } else {
+      setFilter({
+        ...filter,
+        startDate: null,
+        endDate: null,
+        pageIndex: 0,
+      });
+    }
+  };
+
+  const handleSingleDateFilterChange = (day: Date) => {
+    setFilter({
+      ...filter,
+      startDate: startOfDay(day),
+      endDate: endOfDay(day),
+      pageIndex: 0,
+    });
+  };
+
+  const handleMultiDateFilterChange = (newStartDate?: Date, newEndDate?: Date) => {
+    setFilter({
+      ...filter,
+      startDate: newStartDate,
+      endDate: newEndDate,
+      pageIndex: 0,
+    });
+  };
+
+  const handleRecipientFirstName = (firstName?: string | null) => {
+    setFilter({ recipientFirstName: firstName, pageIndex: 0 });
+  };
+
+  const handleRecipientLastName = (lastName?: string | null) => {
+    setFilter({ recipientLastName: lastName, pageIndex: 0 });
+  };
+
+  const handleRecipientEmail = (email?: string | null) => {
+    setFilter({ recipientEmail: email, pageIndex: 0 });
+  };
+
+  const handleRecipientPhone = (phone?: string | null) => {
+    setFilter({ recipientPhone: phone, pageIndex: 0 });
+  };
+
+  const handleStatus = (status?: string | null) => {
+    setFilter({ status, pageIndex: 0 });
+  };
+
+  const tableData = data?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
+    ...userCustomer.user,
+    role: userCustomer.role,
+  })) || [];
+
+  console.log('Table data:', tableData);
+
+  const pageCount = data?.customer?.usersConnection?.pageInfo?.nrPages || 0;
   const pageIndex = data?.customer?.usersConnection?.pageInfo?.pageIndex || 0;
 
   return (
@@ -183,77 +253,201 @@ const UsersOverview = () => {
           </UI.Flex>
 
           <SearchBar
-            activeSearchTerm={paginationProps.activeSearchTerm}
+            activeSearchTerm={filter.search}
             onSearchTermChange={handleSearchTermChange}
           />
         </UI.Flex>
       </UI.ViewHead>
 
       <UI.ViewBody>
-
-        <UI.Div borderRadius="lg" flexGrow={1} backgroundColor="white" mb="1%">
-          <ErrorBoundary
-            FallbackComponent={() => (
-              <UI.Div>
-                We are experiencing some maintenance with the Users data. We will be back shortly.
-              </UI.Div>
-            )}
-          >
-            <Table
-              headers={HEADERS}
-              paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-              onPaginationChange={setPaginationProps}
-              data={tableData}
-              renderOptions={(usersData: any) => (
-                <>
-                  {canDeleteUsers && (
-                    <ShowMoreButton
-                      renderMenu={(
-                        <UI.List>
-                          <UI.ListHeader>{t('edit_user')}</UI.ListHeader>
-                          {canDeleteUsers && (
-                            <>
-                              {canEditUsers && (
-                                <UI.ListItem onClick={(e: any) => handleEditUser(e, usersData?.id)}>
-                                  {t('edit_user')}
-                                </UI.ListItem>
-                              )}
-                              <Popover>
-                                {() => (
-                                  <>
-                                    <PopoverTrigger>
-                                      <UI.ListItem>{t('delete_user')}</UI.ListItem>
-                                    </PopoverTrigger>
-                                    <PopoverContent zIndex={4}>
-                                      <PopoverArrow />
-                                      <PopoverHeader>{t('delete')}</PopoverHeader>
-                                      <PopoverCloseButton />
-                                      <PopoverBody>
-                                        <UI.Text>{t('delete_user_popover')}</UI.Text>
-                                      </PopoverBody>
-                                      <PopoverFooter>
-                                        <UI.Button
-                                          variantColor="red"
-                                          onClick={(e: any) => handleDeleteUser(e, usersData?.id)}
-                                        >
-                                          {t('delete')}
-                                        </UI.Button>
-                                      </PopoverFooter>
-                                    </PopoverContent>
-                                  </>
-                                )}
-                              </Popover>
-                            </>
-                          )}
-                        </UI.List>
-                      )}
+        <UI.Div>
+          <UI.Flex mb={2}>
+            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={(<Plus />)}>
+              {() => (
+                <TabbedMenu
+                  menuHeader={t('add_filter')}
+                  tabs={[
+                    { label: t('search'), icon: <Search /> },
+                    { label: t('date'), icon: <Calendar /> },
+                    { label: t('recipient'), icon: <User /> },
+                  ]}
+                >
+                  <UI.Div>
+                    <UI.RadioHeader>
+                      {t('filter_by_search')}
+                    </UI.RadioHeader>
+                    <Searchbar
+                      activeSearchTerm={filter.search}
+                      onSearchTermChange={handleSearchChange}
                     />
-                  )}
-                </>
+                  </UI.Div>
+
+                  <UI.Div>
+                    <UI.RadioHeader>
+                      {t('filter_by_date')}
+                    </UI.RadioHeader>
+                    <UI.SectionSubHeader>
+                      {t('filter_by_updated_date_description')}
+                    </UI.SectionSubHeader>
+                    <UI.DatePicker
+                      value={[filter.startDate, filter.endDate]}
+                      onChange={handleDateChange}
+                      range
+                    />
+                  </UI.Div>
+
+                  <UI.Div>
+                    <UI.Stack>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_first_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.recipientFirstName}
+                          onSearchTermChange={handleRecipientFirstName}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_last_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.recipientLastName}
+                          onSearchTermChange={handleRecipientLastName}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_email')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.recipientEmail}
+                          onSearchTermChange={handleRecipientEmail}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_phone')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.recipientPhone}
+                          onSearchTermChange={handleRecipientPhone}
+                        />
+                      </UI.Div>
+                    </UI.Stack>
+                  </UI.Div>
+                </TabbedMenu>
               )}
-            />
-          </ErrorBoundary>
+            </PickerButton>
+
+            <UI.Separator bg="gray.200" />
+
+            <UI.Stack spacing={2} isInline>
+              <Table.FilterButton
+                condition={!!filter.search}
+                filterKey="search"
+                value={filter.search}
+                onClose={() => handleSearchChange('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.recipientFirstName}
+                filterKey="recipientFirstName"
+                value={filter.recipientFirstName}
+                onClose={() => handleRecipientFirstName('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.recipientLastName}
+                filterKey="recipientLastName"
+                value={filter.recipientLastName}
+                onClose={() => handleRecipientLastName('')}
+              />
+              <Table.FilterButton
+                condition={!!(filter.startDate || filter.endDate)}
+                filterKey="updatedAt"
+                value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
+                onClose={() => handleMultiDateFilterChange(undefined, undefined)}
+              />
+              <Table.FilterButton
+                condition={!!filter.recipientEmail}
+                filterKey="recipientEmail"
+                value={filter.recipientEmail}
+                onClose={() => handleRecipientEmail('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.recipientPhone}
+                filterKey="recipientPhone"
+                value={filter.recipientPhone}
+                onClose={() => handleRecipientPhone('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.status}
+                filterKey="status"
+                value={filter.status}
+                onClose={() => handleStatus(undefined)}
+              />
+            </UI.Stack>
+          </UI.Flex>
+
+          <Table.HeadingRow gridTemplateColumns={columns}>
+            <Table.HeadingCell>
+              {t('first_name')}
+            </Table.HeadingCell>
+            <Table.HeadingCell>
+              {t('last_name')}
+            </Table.HeadingCell>
+            <Table.HeadingCell>
+              {t('email')}
+            </Table.HeadingCell>
+            <Table.HeadingCell>
+              {t('role')}
+            </Table.HeadingCell>
+          </Table.HeadingRow>
+          {tableData.map((user) => (
+            <Table.Row
+              // onClick={() => goToDeliveryView(campaignId, delivery.id)}
+              isLoading={isLoading}
+              key={user.id}
+              gridTemplateColumns={columns}
+            >
+              <Table.Cell>
+                <Table.InnerCell>
+                  <UI.Helper>
+                    {user?.firstName}
+                  </UI.Helper>
+                </Table.InnerCell>
+              </Table.Cell>
+              <Table.Cell>
+                <Table.InnerCell>
+                  <UI.Helper>
+                    {user?.lastName}
+                  </UI.Helper>
+                </Table.InnerCell>
+              </Table.Cell>
+              <Table.Cell>
+                <Table.InnerCell>
+                  <UI.Helper>
+                    {user?.email}
+                  </UI.Helper>
+                </Table.InnerCell>
+              </Table.Cell>
+              <Table.Cell>
+                <UI.Helper>
+                  {user?.role?.name}
+                </UI.Helper>
+                {/* <FormatTimestamp timestamp={delivery.updatedAt} /> */}
+              </Table.Cell>
+            </Table.Row>
+          ))}
         </UI.Div>
+        <UI.Flex justifyContent="flex-end">
+          <Table.Pagination
+            pageIndex={filter.pageIndex}
+            maxPages={pageCount}
+            perPage={filter.perPage}
+            isLoading={isLoading}
+            setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+          />
+        </UI.Flex>
       </UI.ViewBody>
     </>
   );

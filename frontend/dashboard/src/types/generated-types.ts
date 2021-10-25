@@ -2373,6 +2373,36 @@ export type RequestInviteMutation = (
   ) }
 );
 
+export type GetPaginatedUsersQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+  filter?: Maybe<PaginationWhereInput>;
+}>;
+
+
+export type GetPaginatedUsersQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { usersConnection?: Maybe<(
+      { __typename?: 'UserConnection' }
+      & { userCustomers: Array<(
+        { __typename?: 'UserCustomer' }
+        & { user: (
+          { __typename?: 'UserType' }
+          & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName'>
+        ), role: (
+          { __typename?: 'RoleType' }
+          & Pick<RoleType, 'id' | 'name'>
+        ) }
+      )>, pageInfo: (
+        { __typename?: 'DeprecatedPaginationPageInfo' }
+        & Pick<DeprecatedPaginationPageInfo, 'nrPages' | 'pageIndex'>
+      ) }
+    )> }
+  )> }
+);
+
 export type GetRolesQueryVariables = Exact<{
   id?: Maybe<Scalars['ID']>;
 }>;
@@ -3547,6 +3577,63 @@ export function useRequestInviteMutation(baseOptions?: Apollo.MutationHookOption
 export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInviteMutation>;
 export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
 export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;
+export const GetPaginatedUsersDocument = gql`
+    query getPaginatedUsers($customerSlug: String!, $filter: PaginationWhereInput) {
+  customer(slug: $customerSlug) {
+    id
+    usersConnection(filter: $filter) {
+      userCustomers {
+        user {
+          id
+          email
+          firstName
+          lastName
+        }
+        role {
+          id
+          name
+        }
+      }
+      pageInfo {
+        nrPages
+        pageIndex
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetPaginatedUsersQuery__
+ *
+ * To run a query within a React component, call `useGetPaginatedUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPaginatedUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPaginatedUsersQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetPaginatedUsersQuery(baseOptions: Apollo.QueryHookOptions<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(GetPaginatedUsersDocument, options);
+      }
+export function useGetPaginatedUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(GetPaginatedUsersDocument, options);
+        }
+export type GetPaginatedUsersQueryHookResult = ReturnType<typeof useGetPaginatedUsersQuery>;
+export type GetPaginatedUsersLazyQueryHookResult = ReturnType<typeof useGetPaginatedUsersLazyQuery>;
+export type GetPaginatedUsersQueryResult = Apollo.QueryResult<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>;
+export function refetchGetPaginatedUsersQuery(variables?: GetPaginatedUsersQueryVariables) {
+      return { query: GetPaginatedUsersDocument, variables: variables }
+    }
 export const GetRolesDocument = gql`
     query GetRoles($id: ID) {
   customer(id: $id) {
