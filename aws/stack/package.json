@@ -33,12 +33,12 @@
     "@aws-cdk/aws-lambda-nodejs": "^1.120.0",
     "@aws-cdk/aws-rds": "^1.120.0",
     "@aws-cdk/aws-secretsmanager": "^1.120.0",
-    "@aws-cdk/aws-eventbridge": "^1.120.0",
     "@aws-cdk/aws-ssm": "^1.120.0",
     "@aws-cdk/core": "1.120.0",
     "@aws-cdk/pipelines": "^1.120.0",
     "@aws-cdk/aws-cloudwatch-actions": "1.120.0",
     "aws-lambda": "^1.0.6",
+    "date-fns": "^2.12.0",
     "node-fetch": "^2.6.1",
     "source-map-support": "^0.5.16"
   }
