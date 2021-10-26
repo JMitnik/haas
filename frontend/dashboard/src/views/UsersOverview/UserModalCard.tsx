@@ -24,9 +24,7 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
     return <UI.Loader />;
   }
 
-  const delivery = data?.customer?.userCustomer;
-
-  console.log('USER: ', delivery);
+  const userOfCustomer = data?.customer?.userCustomer;
 
   return (
     <UI.ModalCard onClose={onClose}>
@@ -37,26 +35,33 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
         {error && (
           <UI.ErrorPane header="Server Error" text={error.message} />
         )}
-        {delivery && (
+        {userOfCustomer && (
           <>
             <UI.Stack mb={4}>
               <UI.Div>
                 <UI.Helper mb={1}>{t('first_name')}</UI.Helper>
-                {delivery?.deliveryRecipientFirstName}
+                {userOfCustomer?.user?.firstName || 'None'}
               </UI.Div>
               <UI.Div>
                 <UI.Helper mb={1}>{t('last_name')}</UI.Helper>
-                {delivery?.deliveryRecipientLastName}
+                {userOfCustomer?.user?.lastName || 'None'}
               </UI.Div>
 
               <UI.Div>
                 <UI.Helper mb={1}>{t('email')}</UI.Helper>
-                {delivery?.deliveryRecipientEmail}
+                {userOfCustomer?.user?.email}
               </UI.Div>
+
               <UI.Div>
                 <UI.Helper mb={1}>{t('phone')}</UI.Helper>
-                {delivery?.deliveryRecipientPhone}
+                {userOfCustomer?.user?.phone || 'None'}
               </UI.Div>
+
+              <UI.Div>
+                <UI.Helper mb={1}>{t('role')}</UI.Helper>
+                {userOfCustomer?.role?.name || 'None'}
+              </UI.Div>
+
             </UI.Stack>
 
             <UI.Hr />
