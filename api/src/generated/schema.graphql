@@ -1362,6 +1362,7 @@ input UserConnectionOrderByInput {
 }
 
 type UserCustomer {
+  createdAt: String
   customer: Customer!
   role: RoleType!
   user: UserType!

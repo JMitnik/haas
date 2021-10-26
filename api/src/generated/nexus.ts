@@ -818,6 +818,7 @@ export interface NexusGenRootTypes {
     userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
   UserCustomer: { // root type
+    createdAt?: string | null; // String
     customer: NexusGenRootTypes['Customer']; // Customer!
     role: NexusGenRootTypes['RoleType']; // RoleType!
     user: NexusGenRootTypes['UserType']; // UserType!
@@ -1460,6 +1461,7 @@ export interface NexusGenFieldTypes {
     userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
   UserCustomer: { // field return type
+    createdAt: string | null; // String
     customer: NexusGenRootTypes['Customer']; // Customer!
     role: NexusGenRootTypes['RoleType']; // RoleType!
     user: NexusGenRootTypes['UserType']; // UserType!

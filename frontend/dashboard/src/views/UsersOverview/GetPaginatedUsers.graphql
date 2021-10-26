@@ -1,9 +1,9 @@
 query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInput) {
     customer(slug: $customerSlug) {
       id
-
       usersConnection(filter: $filter) {
         userCustomers {
+          createdAt
           user {
             id
             email

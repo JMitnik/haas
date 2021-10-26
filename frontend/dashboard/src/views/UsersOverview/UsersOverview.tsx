@@ -15,13 +15,14 @@ import SearchBar from 'components/SearchBar/SearchBar';
 import Searchbar from 'components/SearchBar';
 import useAuth from 'hooks/useAuth';
 
+import { FormatTimestamp } from 'components/Common/DateAndTime';
 import { PaginationSortByEnum, UserConnectionOrder, useGetPaginatedUsersLazyQuery } from 'types/generated-types';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { formatSimpleDate } from 'utils/dateUtils';
 import deleteUserQuery from '../../mutations/deleteUser';
 
-const columns = 'minmax(150px, 1fr) minmax(200px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)';
+const columns = 'minmax(50px, 1fr) minmax(50px, 1fr) minmax(200px, 1fr) minmax(30px, 1fr) minmax(50px, 1fr)';
 
 const UsersOverview = () => {
   const { canInviteUsers } = useAuth();
@@ -182,6 +183,7 @@ const UsersOverview = () => {
   };
 
   const tableData = data?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
+    createdAt: userCustomer.createdAt,
     ...userCustomer.user,
     role: userCustomer.role,
   })) || [];
@@ -334,6 +336,9 @@ const UsersOverview = () => {
             <Table.HeadingCell>
               {t('role')}
             </Table.HeadingCell>
+            <Table.HeadingCell>
+              {t('created_at')}
+            </Table.HeadingCell>
           </Table.HeadingRow>
           {tableData.map((user) => (
             <Table.Row
@@ -372,6 +377,10 @@ const UsersOverview = () => {
                   {user?.role?.name}
                 </UI.Helper>
                 {/* <FormatTimestamp timestamp={delivery.updatedAt} /> */}
+              </Table.Cell>
+              <Table.Cell>
+
+                <FormatTimestamp timestamp={user.createdAt} />
               </Table.Cell>
             </Table.Row>
           ))}

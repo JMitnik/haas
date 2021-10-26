@@ -1830,6 +1830,7 @@ export type UserConnectionOrderByInput = {
 
 export type UserCustomer = {
   __typename?: 'UserCustomer';
+  createdAt?: Maybe<Scalars['String']>;
   user: UserType;
   customer: Customer;
   role: RoleType;
@@ -2411,6 +2412,7 @@ export type GetPaginatedUsersQuery = (
       & Pick<UserConnection, 'totalPages'>
       & { userCustomers: Array<(
         { __typename?: 'UserCustomer' }
+        & Pick<UserCustomer, 'createdAt'>
         & { user: (
           { __typename?: 'UserType' }
           & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName'>
@@ -3606,6 +3608,7 @@ export const GetPaginatedUsersDocument = gql`
     id
     usersConnection(filter: $filter) {
       userCustomers {
+        createdAt
         user {
           id
           email
