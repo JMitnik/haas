@@ -1830,7 +1830,7 @@ export type UserConnectionOrderByInput = {
 
 export type UserCustomer = {
   __typename?: 'UserCustomer';
-  createdAt?: Maybe<Scalars['String']>;
+  createdAt: Scalars['String'];
   user: UserType;
   customer: Customer;
   role: RoleType;

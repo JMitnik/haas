@@ -274,10 +274,7 @@ class UserService {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
 
-    console.log('filter:', filter);
-
     const users = await this.userPrismaAdapter.findPaginatedUsers(customerSlug, filter);
-
     const totalUsers = await this.userPrismaAdapter.countUsers(customerSlug, filter);
 
     const { totalPages, ...pageInfo } = offsetPaginate(totalUsers, offset, perPage);

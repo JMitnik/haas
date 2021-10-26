@@ -11,6 +11,7 @@ export const ROUTES = {
   DELIVERY_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId/:deliveryId',
   AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
   ADMIN_OVERVIEW: '/dashboard/admin',
+  USER_VIEW: '/dashboard/b/:customerSlug/users/:userId',
   USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
   ALERTS_OVERVIEW: '/dashboard/b/:customerSlug/triggers',
 };
@@ -33,6 +34,23 @@ export const useNavigator = () => {
     const path = generatePath(ROUTES.CAMPAIGN_VIEW, {
       customerSlug,
       campaignId: nextCampaignId,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToUsersOverview = () => {
+    const path = generatePath(ROUTES.USERS_OVERVIEW, {
+      customerSlug,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToUserView = (userId: string) => {
+    const path = generatePath(ROUTES.USER_VIEW, {
+      customerSlug,
+      userId,
     });
 
     history.push(path + location.search);
@@ -77,6 +95,8 @@ export const useNavigator = () => {
   });
 
   return {
+    goToUsersOverview,
+    goToUserView,
     goToDeliveryView,
     goToInteractionsView,
     goToCampaignView,

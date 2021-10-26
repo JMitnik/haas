@@ -107,8 +107,6 @@ class UserPrismaAdapter {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
 
-    console.log('orderby: ', this.buildOrderByQuery(filter));
-
     const users = await this.prisma.userOfCustomer.findMany({
       where: this.buildFindUsersQuery(customerSlug, filter),
       skip: offset,

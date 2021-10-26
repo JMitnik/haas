@@ -10,7 +10,7 @@ export const UserCustomerType = objectType({
   name: 'UserCustomer',
 
   definition(t) {
-    t.string('createdAt', { nullable: true });
+    t.string('createdAt', { nullable: false });
     t.field('user', { type: 'UserType' });
     t.field('customer', { type: 'Customer' });
     t.field('role', { type: 'RoleType' });
