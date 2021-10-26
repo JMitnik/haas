@@ -34,7 +34,7 @@ const AvatarCell = ({ firstName }: { firstName?: string | null }) => {
   return (
     <UI.Flex alignItems="center">
       <UI.Div mr={2}>
-        {nameExists ? <Avatar name={firstName} brand="blue" /> : <Avatar name="A" brand="gray" />}
+        {nameExists ? <Avatar name={firstName || ''} brand="blue" /> : <Avatar name="A" brand="gray" />}
       </UI.Div>
       <UI.ColumnFlex>
         {nameExists && (
