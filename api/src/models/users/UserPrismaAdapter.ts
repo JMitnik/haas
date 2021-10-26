@@ -23,6 +23,13 @@ class UserPrismaAdapter {
       user: {},
     };
 
+    if (filter?.startDate || filter?.endDate) {
+      userOfCustomerWhereInput.createdAt = {
+        gte: filter?.startDate ? new Date(filter.startDate) : undefined,
+        lte: filter?.endDate ? new Date(filter.endDate) : undefined,
+      }
+    }
+
     if (filter?.search) {
       userOfCustomerWhereInput = {
         ...cloneDeep(userOfCustomerWhereInput),
@@ -46,8 +53,6 @@ class UserPrismaAdapter {
     }
 
     // TODO: Add role search support 
-
-    console.log('user of customer where input: ', userOfCustomerWhereInput);
 
     return userOfCustomerWhereInput;
   }
@@ -102,6 +107,8 @@ class UserPrismaAdapter {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
 
+    console.log('orderby: ', this.buildOrderByQuery(filter));
+
     const users = await this.prisma.userOfCustomer.findMany({
       where: this.buildFindUsersQuery(customerSlug, filter),
       skip: offset,
@@ -113,6 +120,7 @@ class UserPrismaAdapter {
         user: true,
       },
     });
+
     const orderedUsers = this.orderUsersBy(users, filter);
     return orderedUsers;
   }

@@ -86,7 +86,6 @@ export const CustomerType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        console.log('paginate args: ', args)
         const users = await ctx.services.userService.paginatedUsers(
           parent.slug,
           args.filter,

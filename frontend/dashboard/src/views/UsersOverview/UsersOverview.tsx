@@ -53,6 +53,9 @@ const UsersOverview = () => {
       variables: {
         customerSlug,
         filter: {
+          firstName: filter.firstName,
+          lastName: filter.lastName,
+          email: filter.email,
           startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
           endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
           search: filter.search,
@@ -183,9 +186,7 @@ const UsersOverview = () => {
     role: userCustomer.role,
   })) || [];
 
-  console.log('Table data:', tableData);
-
-  const pageCount = data?.customer?.usersConnection?.pageInfo?.nrPages || 0;
+  const pageCount = data?.customer?.usersConnection?.totalPages || 0;
 
   return (
     <>
@@ -342,18 +343,22 @@ const UsersOverview = () => {
               gridTemplateColumns={columns}
             >
               <Table.Cell>
-                <Table.InnerCell>
-                  <UI.Helper>
-                    {user?.firstName}
-                  </UI.Helper>
-                </Table.InnerCell>
+                {user?.firstName && (
+                  <Table.InnerCell>
+                    <UI.Helper>
+                      {user?.firstName}
+                    </UI.Helper>
+                  </Table.InnerCell>
+                )}
               </Table.Cell>
               <Table.Cell>
-                <Table.InnerCell>
-                  <UI.Helper>
-                    {user?.lastName}
-                  </UI.Helper>
-                </Table.InnerCell>
+                {user?.lastName && (
+                  <Table.InnerCell>
+                    <UI.Helper>
+                      {user?.lastName}
+                    </UI.Helper>
+                  </Table.InnerCell>
+                )}
               </Table.Cell>
               <Table.Cell>
                 <Table.InnerCell>
