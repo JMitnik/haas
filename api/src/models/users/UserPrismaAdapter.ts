@@ -1,7 +1,10 @@
-import { PrismaClient, User, Prisma } from "@prisma/client";
+import { PrismaClient, User, Prisma, UserOfCustomer } from "@prisma/client";
+import _, { cloneDeep } from "lodash";
 
 import { RegisterUserInput } from "./UserPrismaAdapterType";
 import RoleService from '../role/RoleService';
+import { NexusGenInputs } from "../../generated/nexus";
+
 
 class UserPrismaAdapter {
   prisma: PrismaClient;
@@ -10,6 +13,108 @@ class UserPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
+  }
+
+  buildFindUsersQuery = (customerSlug: string, filter?: NexusGenInputs['UserConnectionFilterInput'] | null): Prisma.UserOfCustomerWhereInput => {
+    let userOfCustomerWhereInput: Prisma.UserOfCustomerWhereInput = {
+      customer: {
+        slug: customerSlug,
+      },
+      user: {},
+    };
+
+    if (filter?.search) {
+      userOfCustomerWhereInput = {
+        ...cloneDeep(userOfCustomerWhereInput),
+        OR: [
+          { user: { email: { contains: filter.search, mode: 'insensitive' } } },
+          { user: { firstName: { contains: filter.search, mode: 'insensitive' } } },
+          { user: { lastName: { contains: filter.search, mode: 'insensitive' } } },
+        ]
+      }
+    }
+
+    if (filter?.email && userOfCustomerWhereInput.user) {
+      userOfCustomerWhereInput.user.email = { equals: filter.email, mode: 'insensitive' }
+    }
+    if (filter?.firstName && userOfCustomerWhereInput.user) {
+      userOfCustomerWhereInput.user.firstName = { contains: filter.firstName, mode: 'insensitive' }
+    }
+
+    if (filter?.lastName && userOfCustomerWhereInput.user) {
+      userOfCustomerWhereInput.user.lastName = { contains: filter.lastName, mode: 'insensitive' }
+    }
+
+    // TODO: Add role search support 
+
+    console.log('user of customer where input: ', userOfCustomerWhereInput);
+
+    return userOfCustomerWhereInput;
+  }
+
+  orderUsersBy = (
+    usersOfCustomer: (UserOfCustomer & {
+      user: {
+        firstName: string | null;
+        lastName: string | null;
+        email: string;
+      },
+      role: {
+        name: string;
+      };
+    })[],
+    filter?: NexusGenInputs['UserConnectionFilterInput'] | null,
+  ) => {
+    if (filter?.orderBy?.by === 'firstName') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.firstName, filter.orderBy.desc ? 'desc' : 'asc');
+    } if (filter?.orderBy?.by === 'lastName') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.lastName, filter.orderBy.desc ? 'desc' : 'asc');
+    } if (filter?.orderBy?.by === 'email') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, filter.orderBy.desc ? 'desc' : 'asc');
+    }
+    // } if (filter?.orderBy?.by === 'role') { // TODO: Implement this one
+    //   return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.role.name, orderBy.desc ? 'desc' : 'asc');
+    // }
+
+    return usersOfCustomer;
+  };
+
+  buildOrderByQuery = (filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
+    let orderByQuery: Prisma.UserOfCustomerOrderByInput[] = [];
+
+    if (filter?.orderBy?.by === 'createdAt') {
+      orderByQuery.push({
+        createdAt: filter.orderBy.desc ? 'desc' : 'asc',
+      })
+    }
+
+    return orderByQuery;
+  }
+
+  countUsers = async (customerSlug: string, filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
+    const totalUsers = await this.prisma.userOfCustomer.count({
+      where: this.buildFindUsersQuery(customerSlug, filter),
+    });
+    return totalUsers;
+  }
+
+  findPaginatedUsers = async (customerSlug: string, filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const users = await this.prisma.userOfCustomer.findMany({
+      where: this.buildFindUsersQuery(customerSlug, filter),
+      skip: offset,
+      take: perPage,
+      orderBy: this.buildOrderByQuery(filter),
+      include: {
+        customer: true,
+        role: true,
+        user: true,
+      },
+    });
+    const orderedUsers = this.orderUsersBy(users, filter);
+    return orderedUsers;
   }
 
   /**

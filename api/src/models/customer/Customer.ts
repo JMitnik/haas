@@ -2,7 +2,7 @@
 import { ColourSettings, Customer, CustomerSettings, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload, UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
@@ -25,6 +25,44 @@ export interface CustomerWithCustomerSettings extends Customer {
   settings?: CustomerSettingsWithColour | null;
 }
 
+export const UserConnectionOrderByInput = inputObjectType({
+  name: 'UserConnectionOrderByInput',
+  description: 'Sorting of UserConnection',
+
+  definition(t) {
+    t.field('by', { type: UserConnectionOrderType, nullable: false });
+    t.boolean('desc', { default: true, required: false });
+  },
+});
+
+export const UserConnectionOrderType = enumType({
+  name: 'UserConnectionOrder',
+  description: 'Fields to order UserConnection by.',
+
+  members: ['firstName', 'lastName', 'email', 'createdAt']
+});
+
+
+export const UserConnectionFilterInput = inputObjectType({
+  name: 'UserConnectionFilterInput',
+  definition(t) {
+    // Pre-filter
+    t.string('search', { required: false });
+    t.string('startDate', { required: false });
+    t.string('endDate', { required: false });
+    t.string('firstName', { required: false });
+    t.string('lastName', { required: false });
+    t.string('email', { required: false });
+
+    // Post-order
+    t.field('orderBy', { type: UserConnectionOrderByInput });
+
+    // Paginate
+    t.int('offset', { nullable: true });
+    t.int('perPage', { required: false, default: 10 });
+  }
+})
+
 export const CustomerType = objectType({
   name: 'Customer',
   definition(t) {
@@ -44,19 +82,14 @@ export const CustomerType = objectType({
 
     t.field('usersConnection', {
       type: UserConnection,
-      args: { customerSlug: 'String', filter: PaginationWhereInput },
+      args: { customerSlug: 'String', filter: UserConnectionFilterInput },
       nullable: true,
 
       async resolve(parent, args, ctx) {
+        console.log('paginate args: ', args)
         const users = await ctx.services.userService.paginatedUsers(
           parent.slug,
-          {
-            pageIndex: args.filter?.pageIndex,
-            offset: args.filter?.offset,
-            limit: args.filter?.limit,
-            orderBy: args.filter?.orderBy,
-            searchTerm: args.filter?.searchTerm,
-          },
+          args.filter,
         );
         return users as any;
       },

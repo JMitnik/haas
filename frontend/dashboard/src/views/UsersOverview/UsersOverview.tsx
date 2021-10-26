@@ -15,7 +15,7 @@ import SearchBar from 'components/SearchBar/SearchBar';
 import Searchbar from 'components/SearchBar';
 import useAuth from 'hooks/useAuth';
 
-import { PaginationSortByEnum, useGetPaginatedUsersLazyQuery } from 'types/generated-types';
+import { PaginationSortByEnum, UserConnectionOrder, useGetPaginatedUsersLazyQuery } from 'types/generated-types';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { formatSimpleDate } from 'utils/dateUtils';
@@ -53,13 +53,12 @@ const UsersOverview = () => {
       variables: {
         customerSlug,
         filter: {
-          startDate: null, // filter.startDate, // TODO: fix this
-          endDate: null, // || filter.endDate, // TODO: fix this
-          searchTerm: filter.search,
+          startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
+          endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
+          search: filter.search,
           offset: filter.pageIndex * filter.perPage,
-          limit: filter.perPage,
-          pageIndex: filter.pageIndex,
-          orderBy: [{ by: PaginationSortByEnum.FirstName, desc: true }], // sortBy,
+          perPage: filter.perPage,
+          orderBy: { by: filter.orderByField as UserConnectionOrder, desc: filter.orderByDescending }, // sortBy,
         },
       },
     });
@@ -70,16 +69,15 @@ const UsersOverview = () => {
       refetch?.({
         customerSlug,
         filter: {
-          startDate: null,
-          endDate: null,
-          searchTerm: filter.search,
+          startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
+          endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
+          search: filter.search,
           offset: filter.pageIndex * filter.perPage,
-          limit: filter.perPage,
-          pageIndex: filter.pageIndex,
-          orderBy: [{
-            by: filter.orderByField as PaginationSortByEnum,
+          perPage: filter.perPage,
+          orderBy: {
+            by: filter.orderByField as UserConnectionOrder,
             desc: filter.orderByDescending,
-          }],
+          },
         },
       });
       toast({

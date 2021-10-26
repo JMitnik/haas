@@ -3,7 +3,7 @@ import { extendType, inputObjectType, objectType, queryField, scalarType } from 
 import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
 
-import { DeprecatedConnectionInterface } from '../general/Pagination';
+import { ConnectionInterface, DeprecatedConnectionInterface } from '../general/Pagination';
 import { RoleType, SystemPermission } from '../role/Role';
 
 export const UserCustomerType = objectType({
@@ -107,7 +107,7 @@ export const UserType = objectType({
 export const UserConnection = objectType({
   name: 'UserConnection',
   definition(t) {
-    t.implements(DeprecatedConnectionInterface);
+    t.implements(ConnectionInterface);
     t.list.field('userCustomers', { type: UserCustomerType });
   },
 });

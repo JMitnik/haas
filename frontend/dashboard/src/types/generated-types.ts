@@ -277,7 +277,7 @@ export type Customer = {
 
 export type CustomerUsersConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
-  filter?: Maybe<PaginationWhereInput>;
+  filter?: Maybe<UserConnectionFilterInput>;
 };
 
 
@@ -1795,15 +1795,37 @@ export type UploadSellImageInputType = {
   workspaceId?: Maybe<Scalars['String']>;
 };
 
-export type UserConnection = DeprecatedConnectionInterface & {
+export type UserConnection = ConnectionInterface & {
   __typename?: 'UserConnection';
-  cursor?: Maybe<Scalars['String']>;
-  offset?: Maybe<Scalars['Int']>;
-  limit: Scalars['Int'];
-  pageInfo: DeprecatedPaginationPageInfo;
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo: PaginationPageInfo;
+  userCustomers: Array<UserCustomer>;
+};
+
+export type UserConnectionFilterInput = {
+  search?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
-  userCustomers: Array<UserCustomer>;
+  firstName?: Maybe<Scalars['String']>;
+  lastName?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  orderBy?: Maybe<UserConnectionOrderByInput>;
+  offset?: Maybe<Scalars['Int']>;
+  perPage?: Maybe<Scalars['Int']>;
+};
+
+/** Fields to order UserConnection by. */
+export enum UserConnectionOrder {
+  FirstName = 'firstName',
+  LastName = 'lastName',
+  Email = 'email',
+  CreatedAt = 'createdAt'
+}
+
+/** Sorting of UserConnection */
+export type UserConnectionOrderByInput = {
+  by: UserConnectionOrder;
+  desc?: Maybe<Scalars['Boolean']>;
 };
 
 export type UserCustomer = {
@@ -2375,7 +2397,7 @@ export type RequestInviteMutation = (
 
 export type GetPaginatedUsersQueryVariables = Exact<{
   customerSlug: Scalars['String'];
-  filter?: Maybe<PaginationWhereInput>;
+  filter?: Maybe<UserConnectionFilterInput>;
 }>;
 
 
@@ -2386,6 +2408,7 @@ export type GetPaginatedUsersQuery = (
     & Pick<Customer, 'id'>
     & { usersConnection?: Maybe<(
       { __typename?: 'UserConnection' }
+      & Pick<UserConnection, 'totalPages'>
       & { userCustomers: Array<(
         { __typename?: 'UserCustomer' }
         & { user: (
@@ -2396,8 +2419,8 @@ export type GetPaginatedUsersQuery = (
           & Pick<RoleType, 'id' | 'name'>
         ) }
       )>, pageInfo: (
-        { __typename?: 'DeprecatedPaginationPageInfo' }
-        & Pick<DeprecatedPaginationPageInfo, 'nrPages' | 'pageIndex'>
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
       ) }
     )> }
   )> }
@@ -3578,7 +3601,7 @@ export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInvite
 export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
 export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;
 export const GetPaginatedUsersDocument = gql`
-    query getPaginatedUsers($customerSlug: String!, $filter: PaginationWhereInput) {
+    query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInput) {
   customer(slug: $customerSlug) {
     id
     usersConnection(filter: $filter) {
@@ -3594,8 +3617,12 @@ export const GetPaginatedUsersDocument = gql`
           name
         }
       }
+      totalPages
       pageInfo {
-        nrPages
+        hasPrevPage
+        hasNextPage
+        prevPageOffset
+        nextPageOffset
         pageIndex
       }
     }

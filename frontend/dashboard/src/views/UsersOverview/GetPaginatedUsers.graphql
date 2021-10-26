@@ -1,4 +1,4 @@
-query getPaginatedUsers($customerSlug: String!, $filter: PaginationWhereInput) {
+query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInput) {
     customer(slug: $customerSlug) {
       id
 
@@ -15,8 +15,12 @@ query getPaginatedUsers($customerSlug: String!, $filter: PaginationWhereInput) {
             name
           }
         }
+        totalPages
         pageInfo {
-          nrPages
+          hasPrevPage
+          hasNextPage
+          prevPageOffset
+          nextPageOffset
           pageIndex
         }
       }

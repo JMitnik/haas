@@ -1,6 +1,6 @@
 import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
 import { UserInputError } from 'apollo-server';
-import _ from 'lodash';
+import _, { cloneDeep } from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
@@ -12,6 +12,7 @@ import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
 import { DeletedUserOutput, UserWithWorkspaces } from './UserServiceTypes';
+import { offsetPaginate } from '../general/PaginationHelpers';
 
 class UserService {
   prisma: PrismaClient;
@@ -268,55 +269,24 @@ class UserService {
 
   paginatedUsers = async (
     customerSlug: string,
-    paginationOpts: NexusGenInputs['PaginationWhereInput'],
+    filter?: NexusGenInputs['UserConnectionFilterInput'] | null,
   ) => {
-    const userOfCustomerFindManyArgs: Prisma.UserOfCustomerFindManyArgs = {
-      where: {
-        customer: { slug: customerSlug },
-      },
-      include: {
-        customer: true,
-        role: true,
-        user: true,
-      },
-    };
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
 
-    const countWhereInput: Prisma.UserOfCustomerFindManyArgs = {
-      where: {
-        customer: { slug: customerSlug },
-      }
-    };
+    console.log('filter:', filter);
 
-    const findManyUsers = async ({ props, paginationOpts }: FindManyCallBackProps) => {
-      const users: any = await this.prisma.userOfCustomer.findMany(props);
-      const filteredBySearch = UserService.filterBySearchTerm(users, paginationOpts?.searchTerm);
-      const orderedUsers = UserService.orderUsersBy(filteredBySearch, paginationOpts?.orderBy?.[0]);
-      return orderedUsers;
-    };
-    const countUsers = async ({ props: countArgs }: FindManyCallBackProps) => this.prisma.userOfCustomer.count(countArgs);
+    const users = await this.userPrismaAdapter.findPaginatedUsers(customerSlug, filter);
+    console.log('Users: ', users);
 
-    const paginateProps: PaginateProps = {
-      findManyArgs: {
-        findArgs: userOfCustomerFindManyArgs,
-        searchFields: [],
-        orderFields: [],
-        findManyCallBack: findManyUsers,
-      },
-      countArgs: {
-        countWhereInput,
-        countCallBack: countUsers,
-      },
-      paginationOpts,
-    };
+    const totalUsers = await this.userPrismaAdapter.countUsers(customerSlug, filter);
+    console.log('total Users: ', totalUsers);
 
-    const { entries, pageInfo } = await paginate(paginateProps);
+    const { totalPages, ...pageInfo } = offsetPaginate(totalUsers, offset, perPage);
 
     return {
-      userCustomers: entries,
-      offset: paginationOpts?.offset || 0,
-      limit: paginationOpts?.limit || 0,
-      startDate: paginationOpts?.startDate?.toString(),
-      endDate: paginationOpts?.endDate?.toString(),
+      userCustomers: users,
+      totalPages,
       pageInfo,
     };
   };
