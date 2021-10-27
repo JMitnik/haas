@@ -95,6 +95,7 @@ const UsersOverview = () => {
     },
     errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
+      console.log('Fetched data: ', fetchedData);
       setActivePaginatedUsersResult(fetchedData);
     },
   });
@@ -137,11 +138,6 @@ const UsersOverview = () => {
   const handleEditUser = (event: any, userId: string) => {
     event.stopPropagation();
     history.push(`/dashboard/b/${customerSlug}/u/${userId}/edit`);
-  };
-
-  const handleAddUser = (event: any) => {
-    event.stopPropagation();
-    history.push(`/dashboard/b/${customerSlug}/users/invite/`);
   };
 
   const handleSearchTermChange = (search: string) => {
@@ -212,6 +208,25 @@ const UsersOverview = () => {
 
   const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
   console.log(tableData);
+
+  const handleRefetch = () => {
+    refetch({
+      customerSlug,
+      filter: {
+        firstName: filter.firstName,
+        lastName: filter.lastName,
+        email: filter.email,
+        role: filter.role,
+        startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
+        endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
+        search: filter.search,
+        offset: filter.pageIndex * filter.perPage,
+        perPage: filter.perPage,
+        orderBy: { by: filter.orderByField as UserConnectionOrder, desc: filter.orderByDescending },
+      },
+    });
+  };
+
   return (
     <>
       <UI.ViewHead>
@@ -219,8 +234,8 @@ const UsersOverview = () => {
           <UI.Flex alignItems="center">
             <UI.ViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.ViewTitle>
             <InviteUserButton label="">
-              {() => (
-                <InviteUserForm />
+              {(onClose) => (
+                <InviteUserForm onRefetch={handleRefetch} onClose={onClose} />
               )}
             </InviteUserButton>
           </UI.Flex>
@@ -235,125 +250,120 @@ const UsersOverview = () => {
       <UI.ViewBody>
         <UI.Div>
           <UI.Flex mb={2} justifyContent="space-between">
-            <UI.Flex>
-              <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={(<Plus />)}>
-                {() => (
-                  <TabbedMenu
-                    menuHeader={t('add_filter')}
-                    tabs={[
-                      { label: t('search'), icon: <Search /> },
-                      { label: t('date'), icon: <Calendar /> },
-                      { label: t('recipient'), icon: <User /> },
-                    ]}
-                  >
-                    <UI.Div>
-                      <UI.RadioHeader>
-                        {t('filter_by_search')}
-                      </UI.RadioHeader>
-                      <Searchbar
-                        activeSearchTerm={filter.search}
-                        onSearchTermChange={handleSearchChange}
-                      />
-                    </UI.Div>
 
-                    <UI.Div>
-                      <UI.RadioHeader>
-                        {t('filter_by_date')}
-                      </UI.RadioHeader>
-                      <UI.SectionSubHeader>
-                        {t('filter_by_updated_date_description')}
-                      </UI.SectionSubHeader>
-                      <UI.DatePicker
-                        value={[filter.startDate, filter.endDate]}
-                        onChange={handleDateChange}
-                        range
-                      />
-                    </UI.Div>
-
-                    <UI.Div>
-                      <UI.Stack>
-                        <UI.Div>
-                          <UI.RadioHeader>
-                            {t('filter_by_recipient_first_name')}
-                          </UI.RadioHeader>
-                          <Searchbar
-                            activeSearchTerm={filter.firstName}
-                            onSearchTermChange={handleRecipientFirstName}
-                          />
-                        </UI.Div>
-                        <UI.Div>
-                          <UI.RadioHeader>
-                            {t('filter_by_recipient_last_name')}
-                          </UI.RadioHeader>
-                          <Searchbar
-                            activeSearchTerm={filter.lastName}
-                            onSearchTermChange={handleRecipientLastName}
-                          />
-                        </UI.Div>
-                        <UI.Div>
-                          <UI.RadioHeader>
-                            {t('filter_by_recipient_email')}
-                          </UI.RadioHeader>
-                          <Searchbar
-                            activeSearchTerm={filter.email}
-                            onSearchTermChange={handleRecipientEmail}
-                          />
-                        </UI.Div>
-                        <UI.Div>
-                          <UI.RadioHeader>
-                            {t('filter_by_role_name')}
-                          </UI.RadioHeader>
-                          <Searchbar
-                            activeSearchTerm={filter.role}
-                            onSearchTermChange={handleRole}
-                          />
-                        </UI.Div>
-                      </UI.Stack>
-                    </UI.Div>
-                  </TabbedMenu>
-                )}
-              </PickerButton>
-
-              <UI.Separator bg="gray.200" />
-
-              <UI.Stack spacing={2} isInline>
-                <Table.FilterButton
-                  condition={!!filter.search}
-                  filterKey="search"
-                  value={filter.search}
-                  onClose={() => handleSearchChange('')}
-                />
-                <Table.FilterButton
-                  condition={!!filter.firstName}
-                  filterKey="recipientFirstName"
-                  value={filter.firstName}
-                  onClose={() => handleRecipientFirstName('')}
-                />
-                <Table.FilterButton
-                  condition={!!filter.lastName}
-                  filterKey="recipientLastName"
-                  value={filter.lastName}
-                  onClose={() => handleRecipientLastName('')}
-                />
-                <Table.FilterButton
-                  condition={!!(filter.startDate || filter.endDate)}
-                  filterKey="updatedAt"
-                  value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
-                  onClose={() => handleMultiDateFilterChange(undefined, undefined)}
-                />
-                <Table.FilterButton
-                  condition={!!filter.email}
-                  filterKey="recipientEmail"
-                  value={filter.email}
-                  onClose={() => handleRecipientEmail('')}
-                />
-              </UI.Stack>
-            </UI.Flex>
-            <InviteUserButton label="">
+            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={(<Plus />)}>
               {() => (
-                <InviteUserForm />
+                <TabbedMenu
+                  menuHeader={t('add_filter')}
+                  tabs={[
+                    { label: t('search'), icon: <Search /> },
+                    { label: t('date'), icon: <Calendar /> },
+                    { label: t('recipient'), icon: <User /> },
+                  ]}
+                >
+                  <UI.Div>
+                    <UI.RadioHeader>
+                      {t('filter_by_search')}
+                    </UI.RadioHeader>
+                    <Searchbar
+                      activeSearchTerm={filter.search}
+                      onSearchTermChange={handleSearchChange}
+                    />
+                  </UI.Div>
+
+                  <UI.Div>
+                    <UI.RadioHeader>
+                      {t('filter_by_date')}
+                    </UI.RadioHeader>
+                    <UI.SectionSubHeader>
+                      {t('filter_by_updated_date_description')}
+                    </UI.SectionSubHeader>
+                    <UI.DatePicker
+                      value={[filter.startDate, filter.endDate]}
+                      onChange={handleDateChange}
+                      range
+                    />
+                  </UI.Div>
+
+                  <UI.Div>
+                    <UI.Stack>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_first_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.firstName}
+                          onSearchTermChange={handleRecipientFirstName}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_last_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.lastName}
+                          onSearchTermChange={handleRecipientLastName}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_email')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.email}
+                          onSearchTermChange={handleRecipientEmail}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_role_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.role}
+                          onSearchTermChange={handleRole}
+                        />
+                      </UI.Div>
+                    </UI.Stack>
+                  </UI.Div>
+                </TabbedMenu>
               )}
-            </InviteUserButton>
+            </PickerButton>
+
+            <UI.Separator bg="gray.200" />
+
+            <UI.Stack spacing={2} isInline>
+              <Table.FilterButton
+                condition={!!filter.search}
+                filterKey="search"
+                value={filter.search}
+                onClose={() => handleSearchChange('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.firstName}
+                filterKey="recipientFirstName"
+                value={filter.firstName}
+                onClose={() => handleRecipientFirstName('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.lastName}
+                filterKey="recipientLastName"
+                value={filter.lastName}
+                onClose={() => handleRecipientLastName('')}
+              />
+              <Table.FilterButton
+                condition={!!(filter.startDate || filter.endDate)}
+                filterKey="updatedAt"
+                value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
+                onClose={() => handleMultiDateFilterChange(undefined, undefined)}
+              />
+              <Table.FilterButton
+                condition={!!filter.email}
+                filterKey="recipientEmail"
+                value={filter.email}
+                onClose={() => handleRecipientEmail('')}
+              />
+            </UI.Stack>
+
           </UI.Flex>
 
           <Table.HeadingRow gridTemplateColumns={columns}>

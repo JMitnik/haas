@@ -8,7 +8,6 @@ import {
 } from '@haas/ui';
 import { Mail } from 'react-feather';
 import { gql, useMutation } from '@apollo/client';
-import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
@@ -48,7 +47,12 @@ const schema = yup.object().shape({
   }),
 });
 
-const InviteUserForm = () => {
+interface InviteUserFormProps {
+  onClose: () => void;
+  onRefetch: () => void;
+}
+
+const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
   const toast = useToast();
@@ -62,12 +66,16 @@ const InviteUserForm = () => {
     variables: { id: activeCustomer?.id },
     fetchPolicy: 'network-only',
   });
+
   const selectRoles = roleData?.customer?.roles?.map((role) => ({ label: role.name, value: role.id }));
 
   const [addUser, { loading: isLoading }] = useMutation(inviteUserMutation, {
     onCompleted: (resData) => {
       const userDidExist = resData?.inviteUser?.didAlreadyExist;
       const didInviteUser = resData?.inviteUser?.didInvite;
+
+      onClose();
+      onRefetch();
 
       if (!userDidExist && didInviteUser) {
         toast({
@@ -126,70 +134,68 @@ const InviteUserForm = () => {
 
   return (
     <UI.ViewBody>
-      <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-        <FormContainer>
-          <Form onSubmit={form.handleSubmit(handleSubmit)}>
-            <FormSection id="about">
-              <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>{t('user:about_user')}</H3>
-                <Muted color="gray.600">
-                  {t('user:about_user_helper')}
-                </Muted>
-              </Div>
-              <Div>
-                <InputGrid>
-                  <FormControl isRequired isInvalid={!!form.errors.email}>
-                    <FormLabel htmlFor="email">{t('email')}</FormLabel>
-                    <InputHelper>{t('email_helper')}</InputHelper>
-                    <Input
-                      placeholder="Doe"
-                      leftEl={<Mail />}
-                      name="email"
-                      ref={form.register()}
-                    />
-                    <FormErrorMessage>{form.errors?.email?.message}</FormErrorMessage>
-                  </FormControl>
-                </InputGrid>
-              </Div>
-            </FormSection>
-
-            <Hr />
-
-            <FormSection id="roles">
-              <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>{t('roles')}</H3>
-                <Muted color="gray.600">
-                  {t('user:roles_helper')}
-                </Muted>
-              </Div>
-              <Div>
-                <FormControl isInvalid={!!form.errors.phone}>
-                  <FormLabel htmlFor="pgone">{t('role_selector')}</FormLabel>
-                  <InputHelper>{t('role_selector_helper')}</InputHelper>
-                  <Controller
-                    name="role"
-                    as={Select}
-                    control={form.control}
-                    options={selectRoles}
+      <FormContainer>
+        <Form onSubmit={form.handleSubmit(handleSubmit)}>
+          <FormSection id="about">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('user:about_user')}</H3>
+              <Muted color="gray.600">
+                {t('user:about_user_helper')}
+              </Muted>
+            </Div>
+            <Div>
+              <InputGrid>
+                <FormControl isRequired isInvalid={!!form.errors.email}>
+                  <FormLabel htmlFor="email">{t('email')}</FormLabel>
+                  <InputHelper>{t('email_helper')}</InputHelper>
+                  <Input
+                    placeholder="Doe"
+                    leftEl={<Mail />}
+                    name="email"
+                    ref={form.register()}
                   />
+                  <FormErrorMessage>{form.errors?.email?.message}</FormErrorMessage>
                 </FormControl>
-              </Div>
-            </FormSection>
+              </InputGrid>
+            </Div>
+          </FormSection>
 
-            <ButtonGroup>
-              <Button
-                isLoading={isLoading}
-                isDisabled={!form.formState.isValid}
-                variantColor="teal"
-                type="submit"
-              >
-                Send invite
-              </Button>
-              <Button variant="outline" onClick={() => history.goBack()}>Cancel</Button>
-            </ButtonGroup>
-          </Form>
-        </FormContainer>
-      </motion.div>
+          <Hr />
+
+          <FormSection id="roles">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('roles')}</H3>
+              <Muted color="gray.600">
+                {t('user:roles_helper')}
+              </Muted>
+            </Div>
+            <Div>
+              <FormControl isInvalid={!!form.errors.phone}>
+                <FormLabel htmlFor="pgone">{t('role_selector')}</FormLabel>
+                <InputHelper>{t('role_selector_helper')}</InputHelper>
+                <Controller
+                  name="role"
+                  as={Select}
+                  control={form.control}
+                  options={selectRoles}
+                />
+              </FormControl>
+            </Div>
+          </FormSection>
+
+          <ButtonGroup>
+            <Button
+              isLoading={isLoading}
+              isDisabled={!form.formState.isValid}
+              variantColor="teal"
+              type="submit"
+            >
+              Send invite
+            </Button>
+            <Button variant="outline" onClick={() => onClose()}>Cancel</Button>
+          </ButtonGroup>
+        </Form>
+      </FormContainer>
     </UI.ViewBody>
   );
 };

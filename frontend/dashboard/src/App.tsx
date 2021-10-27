@@ -42,7 +42,6 @@ import FirstTimePage from 'pages/dashboard/first_time';
 import GlobalLoader from 'components/GlobalLoader';
 import GlobalStyle from 'config/global-styles';
 import GuardedRoute from 'components/Routes/GuardedRoute';
-import InviteUserView from 'views/UsersOverview/InviteUserButton';
 import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
@@ -149,12 +148,6 @@ const CustomerRoutes = () => (
                       path="/dashboard/b/:customerSlug/u/:userId/edit"
                       allowedPermission={SystemPermission.CAN_EDIT_USERS}
                       render={() => <EditUserView />}
-                    />
-
-                    <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_ADD_USERS}
-                      path="/dashboard/b/:customerSlug/users/invite"
-                      render={() => <InviteUserView />}
                     />
 
                     <GuardedRoute
