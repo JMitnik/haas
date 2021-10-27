@@ -4,15 +4,20 @@ import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, 
 import { Calendar, Plus, Search, User } from 'react-feather';
 import { Route, Switch, useHistory, useLocation, useParams } from 'react-router';
 import { endOfDay, startOfDay } from 'date-fns';
-import { useMutation } from '@apollo/client';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
 import { FormatTimestamp } from 'components/Common/DateAndTime';
-import { PaginationSortByEnum, UserConnectionOrder, useGetPaginatedUsersLazyQuery } from 'types/generated-types';
+import {
+  GetPaginatedUsersQuery,
+  PaginationSortByEnum,
+  UserConnectionOrder,
+  useDeleteUserMutation,
+  useGetPaginatedUsersQuery,
+} from 'types/generated-types';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { TabbedMenu } from 'components/Common/TabMenu';
@@ -24,7 +29,6 @@ import Searchbar from 'components/SearchBar';
 import useAuth from 'hooks/useAuth';
 
 import { UserModalCard } from './UserModalCard';
-import deleteUserQuery from '../../mutations/deleteUser';
 
 const columns = 'minmax(50px, 1fr) minmax(50px, 1fr) minmax(200px, 1fr) minmax(30px, 1fr) minmax(50px, 1fr)';
 
@@ -56,9 +60,7 @@ const UsersOverview = () => {
   const history = useHistory();
   const location = useLocation();
   const toast = useToast();
-  const [fetchUsers, { data, refetch, loading: isLoading }] = useGetPaginatedUsersLazyQuery({
-    fetchPolicy: 'cache-and-network',
-  });
+  const [activePaginatedUsersResult, setActivePaginatedUsersResult] = useState<GetPaginatedUsersQuery>();
 
   const [filter, setFilter] = useQueryParams({
     startDate: DateTimeParam,
@@ -74,41 +76,31 @@ const UsersOverview = () => {
     orderByDescending: withDefault(BooleanParam, true),
   });
 
-  useEffect(() => {
-    fetchUsers({
-      variables: {
-        customerSlug,
-        filter: {
-          firstName: filter.firstName,
-          lastName: filter.lastName,
-          email: filter.email,
-          startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
-          endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
-          search: filter.search,
-          offset: filter.pageIndex * filter.perPage,
-          perPage: filter.perPage,
-          orderBy: { by: filter.orderByField as UserConnectionOrder, desc: filter.orderByDescending }, // sortBy,
-        },
+  const { refetch, loading: isLoading } = useGetPaginatedUsersQuery({
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      customerSlug,
+      filter: {
+        firstName: filter.firstName,
+        lastName: filter.lastName,
+        email: filter.email,
+        startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
+        endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
+        search: filter.search,
+        offset: filter.pageIndex * filter.perPage,
+        perPage: filter.perPage,
+        orderBy: { by: filter.orderByField as UserConnectionOrder, desc: filter.orderByDescending },
       },
-    });
-  }, [customerSlug, fetchUsers, filter]);
+    },
+    errorPolicy: 'ignore',
+    onCompleted: (fetchedData) => {
+      setActivePaginatedUsersResult(fetchedData);
+    },
+  });
 
-  const [deleteUser] = useMutation(deleteUserQuery, {
+  const [deleteUser] = useDeleteUserMutation({
     onCompleted: () => {
-      refetch?.({
-        customerSlug,
-        filter: {
-          startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
-          endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
-          search: filter.search,
-          offset: filter.pageIndex * filter.perPage,
-          perPage: filter.perPage,
-          orderBy: {
-            by: filter.orderByField as UserConnectionOrder,
-            desc: filter.orderByDescending,
-          },
-        },
-      });
+      refetch();
       toast({
         title: 'User removed!',
         description: 'The user has been removed from the workspace.',
@@ -207,14 +199,14 @@ const UsersOverview = () => {
     setFilter({ email, pageIndex: 0 });
   };
 
-  const tableData = data?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
+  const tableData = activePaginatedUsersResult?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
     createdAt: userCustomer.createdAt,
     ...userCustomer.user,
     role: userCustomer.role,
   })) || [];
 
-  const pageCount = data?.customer?.usersConnection?.totalPages || 0;
-
+  const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
+  console.log(tableData);
   return (
     <>
       <UI.ViewHead>
@@ -361,7 +353,11 @@ const UsersOverview = () => {
             <Table.HeadingCell>
               {t('role')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({ orderByDescending: isDescend })}
+            >
               {t('created_at')}
             </Table.HeadingCell>
           </Table.HeadingRow>

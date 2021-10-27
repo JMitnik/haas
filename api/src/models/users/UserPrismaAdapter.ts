@@ -15,6 +15,11 @@ class UserPrismaAdapter {
     this.roleService = new RoleService(prismaClient);
   }
 
+  /**
+  * Build a userConnection prisma query based on the filter parameters.
+  * @param customerSlug the slug of a workspace
+  * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
+  */
   buildFindUsersQuery = (customerSlug: string, filter?: NexusGenInputs['UserConnectionFilterInput'] | null): Prisma.UserOfCustomerWhereInput => {
     let userOfCustomerWhereInput: Prisma.UserOfCustomerWhereInput = {
       customer: {
@@ -84,25 +89,41 @@ class UserPrismaAdapter {
     return usersOfCustomer;
   };
 
+  /**
+  * Order userOfCustomer by a "createdAt".
+  * @param filter
+  */
   buildOrderByQuery = (filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
     let orderByQuery: Prisma.UserOfCustomerOrderByInput[] = [];
 
     if (filter?.orderBy?.by === 'createdAt') {
       orderByQuery.push({
         createdAt: filter.orderBy.desc ? 'desc' : 'asc',
-      })
-    }
+      });
+    };
 
     return orderByQuery;
-  }
+  };
 
+  /**
+   * 
+   * @param customerSlug slug of a workspace
+   * @param filter UserConnectionFilterInput
+   * @returns amount of users based on filter criteria
+   */
   countUsers = async (customerSlug: string, filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
     const totalUsers = await this.prisma.userOfCustomer.count({
       where: this.buildFindUsersQuery(customerSlug, filter),
     });
     return totalUsers;
-  }
+  };
 
+  /**
+   * 
+   * @param customerSlug slug of a workspace
+   * @param filter UserConnectionFilterInput
+   * @returns A subset of UserOfCustomer prisma entries based on specified filters
+   */
   findPaginatedUsers = async (customerSlug: string, filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
@@ -121,7 +142,7 @@ class UserPrismaAdapter {
 
     const orderedUsers = this.orderUsersBy(users, filter);
     return orderedUsers;
-  }
+  };
 
   /**
    *  Checks if email address already exists (not belonging to userId)

@@ -10,6 +10,11 @@ interface UserModalCardProps {
   onClose: () => void;
 }
 
+/**
+ * A modal used to display information of a user after it being clicked on in the UsersOverview
+ * @param object with an unique identifier as well as a onClose function to close the modal
+ * @returns a pop-up modal displaying User specific information
+ */
 export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();

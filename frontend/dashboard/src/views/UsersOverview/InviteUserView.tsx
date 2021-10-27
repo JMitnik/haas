@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
 
 import React from 'react';
@@ -19,7 +19,6 @@ import { useGetRolesQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
-import getRolesQuery from 'queries/getRoles';
 import getUsersQuery from 'queries/getUsers';
 
 interface SelectType {

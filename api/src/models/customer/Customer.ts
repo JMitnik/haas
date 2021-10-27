@@ -2,20 +2,19 @@
 import { ColourSettings, Customer, CustomerSettings, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload, UserInputError } from 'apollo-server-express';
-import { enumType, extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
+import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
+
 // eslint-disable-next-line import/no-cycle
-import CustomerService from './CustomerService';
-// eslint-disable-next-line import/no-cycle
-import { PaginationWhereInput } from '../general/Pagination';
-import { UserConnection, UserCustomerType } from '../users/User';
+import { UserConnection } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
 import isValidColor from '../../utils/isValidColor';
 import { CampaignModel } from '../Campaigns';
+import { UserConnectionFilterInput } from './UserConnection';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -24,44 +23,6 @@ export interface CustomerSettingsWithColour extends CustomerSettings {
 export interface CustomerWithCustomerSettings extends Customer {
   settings?: CustomerSettingsWithColour | null;
 }
-
-export const UserConnectionOrderByInput = inputObjectType({
-  name: 'UserConnectionOrderByInput',
-  description: 'Sorting of UserConnection',
-
-  definition(t) {
-    t.field('by', { type: UserConnectionOrderType, nullable: false });
-    t.boolean('desc', { default: true, required: false });
-  },
-});
-
-export const UserConnectionOrderType = enumType({
-  name: 'UserConnectionOrder',
-  description: 'Fields to order UserConnection by.',
-
-  members: ['firstName', 'lastName', 'email', 'createdAt']
-});
-
-
-export const UserConnectionFilterInput = inputObjectType({
-  name: 'UserConnectionFilterInput',
-  definition(t) {
-    // Pre-filter
-    t.string('search', { required: false });
-    t.string('startDate', { required: false });
-    t.string('endDate', { required: false });
-    t.string('firstName', { required: false });
-    t.string('lastName', { required: false });
-    t.string('email', { required: false });
-
-    // Post-order
-    t.field('orderBy', { type: UserConnectionOrderByInput });
-
-    // Paginate
-    t.int('offset', { nullable: true });
-    t.int('perPage', { required: false, default: 10 });
-  }
-})
 
 export const CustomerType = objectType({
   name: 'Customer',
