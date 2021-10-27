@@ -470,6 +470,7 @@ export interface NexusGenInputs {
     offset?: number | null; // Int
     orderBy?: NexusGenInputs['UserConnectionOrderByInput'] | null; // UserConnectionOrderByInput
     perPage?: number | null; // Int
+    role?: string | null; // String
     search?: string | null; // String
     startDate?: string | null; // String
   }

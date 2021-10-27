@@ -1343,6 +1343,7 @@ input UserConnectionFilterInput {
   offset: Int
   orderBy: UserConnectionOrderByInput
   perPage: Int = 10
+  role: String
   search: String
   startDate: String
 }

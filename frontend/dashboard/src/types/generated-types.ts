@@ -1809,6 +1809,7 @@ export type UserConnectionFilterInput = {
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
+  role?: Maybe<Scalars['String']>;
   orderBy?: Maybe<UserConnectionOrderByInput>;
   offset?: Maybe<Scalars['Int']>;
   perPage?: Maybe<Scalars['Int']>;

@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    filter_by_role_name: {
+      en: 'Filter by role name',
+      de: 'Nach Rollennamen filtern',
+    },
     filter_by_recipient_first_name: {
       en: 'Filter by first name',
       de: 'Nach Vornamen filtern',

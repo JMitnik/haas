@@ -28,6 +28,7 @@ export const UserConnectionFilterInput = inputObjectType({
     t.string('firstName', { required: false });
     t.string('lastName', { required: false });
     t.string('email', { required: false });
+    t.string('role', { required: false });
 
     // Post-order
     t.field('orderBy', { type: UserConnectionOrderByInput });

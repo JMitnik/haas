@@ -84,6 +84,7 @@ const UsersOverview = () => {
         firstName: filter.firstName,
         lastName: filter.lastName,
         email: filter.email,
+        role: filter.role,
         startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
         endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
         search: filter.search,
@@ -185,6 +186,10 @@ const UsersOverview = () => {
       endDate: newEndDate,
       pageIndex: 0,
     });
+  };
+
+  const handleRole = (role?: string | null) => {
+    setFilter({ role, pageIndex: 0 });
   };
 
   const handleRecipientFirstName = (firstName?: string | null) => {
@@ -296,6 +301,15 @@ const UsersOverview = () => {
                         <Searchbar
                           activeSearchTerm={filter.email}
                           onSearchTermChange={handleRecipientEmail}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_role_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          activeSearchTerm={filter.role}
+                          onSearchTermChange={handleRole}
                         />
                       </UI.Div>
                     </UI.Stack>

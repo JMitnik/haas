@@ -26,6 +26,7 @@ class UserPrismaAdapter {
         slug: customerSlug,
       },
       user: {},
+      role: {},
     };
 
     if (filter?.startDate || filter?.endDate) {
@@ -39,6 +40,7 @@ class UserPrismaAdapter {
       userOfCustomerWhereInput = {
         ...cloneDeep(userOfCustomerWhereInput),
         OR: [
+          { role: { name: { contains: filter.search, mode: 'insensitive' } } },
           { user: { email: { contains: filter.search, mode: 'insensitive' } } },
           { user: { firstName: { contains: filter.search, mode: 'insensitive' } } },
           { user: { lastName: { contains: filter.search, mode: 'insensitive' } } },
@@ -57,7 +59,10 @@ class UserPrismaAdapter {
       userOfCustomerWhereInput.user.lastName = { contains: filter.lastName, mode: 'insensitive' }
     }
 
-    // TODO: Add role search support 
+    // TODO: Add role search support
+    if (filter?.role && userOfCustomerWhereInput.role) {
+      userOfCustomerWhereInput.role.name = { contains: filter.role, mode: 'insensitive' }
+    }
 
     return userOfCustomerWhereInput;
   }
