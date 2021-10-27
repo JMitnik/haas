@@ -32,7 +32,7 @@ import { UserModalCard } from './UserModalCard';
 
 const columns = 'minmax(50px, 1fr) minmax(50px, 1fr) minmax(200px, 1fr) minmax(30px, 1fr) minmax(50px, 1fr)';
 
-const AvatarCell = ({ firstName }: { firstName?: string | null }) => {
+const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
   const nameExists = !!firstName;
 
   return (
@@ -383,7 +383,7 @@ const UsersOverview = () => {
               gridTemplateColumns={columns}
             >
               <Table.Cell>
-                <AvatarCell firstName={user.firstName} />
+                <UserAvatarCell firstName={user.firstName} />
               </Table.Cell>
 
               <Table.Cell>
