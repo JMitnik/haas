@@ -31,7 +31,15 @@ import { UserModalCard } from './UserModalCard';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
 
-const columns = 'minmax(50px, 1fr) minmax(50px, 1fr) minmax(200px, 1fr) minmax(30px, 1fr) minmax(50px, 1fr)';
+const columns = `
+  minmax(50px, 1fr) 
+  minmax(50px, 1fr) 
+  minmax(200px, 1fr) 
+  minmax(30px, 1fr) 
+  minmax(50px, 1fr) 
+  minmax(50px, 1fr) 
+  minmax(50px, 1fr)
+  `;
 
 const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
   const nameExists = !!firstName;
@@ -387,6 +395,12 @@ const UsersOverview = () => {
             >
               {t('created_at')}
             </Table.HeadingCell>
+            <Table.HeadingCell>
+              {t('last_logged_in')}
+            </Table.HeadingCell>
+            <Table.HeadingCell>
+              {t('user_workspace_access')}
+            </Table.HeadingCell>
           </Table.HeadingRow>
           {tableData.map((user) => (
             <Table.Row
@@ -421,9 +435,21 @@ const UsersOverview = () => {
                   </UI.Helper>
                 </Table.InnerCell>
               </Table.Cell>
-              <Table.Cell>
 
+              <Table.Cell>
                 <FormatTimestamp timestamp={user.createdAt} />
+              </Table.Cell>
+
+              <Table.Cell>
+                {user.lastLoggedIn ? <FormatTimestamp timestamp={user.lastLoggedIn} /> : <UI.Helper>Never</UI.Helper>}
+              </Table.Cell>
+
+              <Table.Cell>
+                <Table.InnerCell brand={user?.isActive ? 'green' : 'red'}>
+                  <UI.Helper color={user?.isActive ? 'green.600' : 'red.600'}>
+                    {user?.isActive ? 'Active' : 'Inactive'}
+                  </UI.Helper>
+                </Table.InnerCell>
               </Table.Cell>
             </Table.Row>
           ))}

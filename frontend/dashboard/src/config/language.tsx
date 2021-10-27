@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    last_logged_in: {
+      en: 'Last logged in',
+      de: 'Zuletzt eingeloggt',
+    },
+    user_workspace_access: {
+      en: 'Access',
+      de: 'Betreten',
+    },
     filter_by_role_name: {
       en: 'Filter by role name',
       de: 'Nach Rollennamen filtern',

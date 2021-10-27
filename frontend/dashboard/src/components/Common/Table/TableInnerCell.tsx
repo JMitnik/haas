@@ -14,11 +14,19 @@ const TableCellButtonContainer = styled(UI.Div)`
   }
 `;
 
+interface InnerCellProps {
+  brand?: string;
+  children: React.ReactNode
+  header?: string
+  renderBody?: () => React.ReactNode
+}
+
 export const InnerCell = ({
   children,
   renderBody,
   header,
-}: { children: React.ReactNode, header?: string, renderBody?: () => React.ReactNode }) => (
+  brand,
+}: InnerCellProps) => (
   <UI.Div display="inline-block" onClick={(e) => e.stopPropagation()}>
     <Popover.Base>
       <Popover.Trigger>
@@ -29,6 +37,7 @@ export const InnerCell = ({
           borderRadius={10}
           border="1px solid"
           borderColor="gray.100"
+          bg={brand ? `${brand}.100` : 'none'}
         >
           {children}
         </TableCellButtonContainer>
