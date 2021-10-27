@@ -42,7 +42,7 @@ import FirstTimePage from 'pages/dashboard/first_time';
 import GlobalLoader from 'components/GlobalLoader';
 import GlobalStyle from 'config/global-styles';
 import GuardedRoute from 'components/Routes/GuardedRoute';
-import InviteUserView from 'views/UsersOverview/InviteUserView';
+import InviteUserView from 'views/UsersOverview/InviteUserButton';
 import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
