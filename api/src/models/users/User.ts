@@ -1,5 +1,5 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, objectType, queryField, scalarType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, mutationField, objectType, queryField, scalarType } from '@nexus/schema';
 import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
 
@@ -11,6 +11,7 @@ export const UserCustomerType = objectType({
 
   definition(t) {
     t.string('createdAt', { nullable: false });
+    t.boolean('isActive');
     t.field('user', { type: 'UserType' });
     t.field('customer', { type: 'Customer' });
     t.field('role', { type: 'RoleType' });
@@ -67,6 +68,7 @@ export const UserType = objectType({
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
+    t.string('lastLoggedIn', { nullable: true });
 
     t.list.field('globalPermissions', {
       nullable: true,
@@ -206,6 +208,27 @@ export const RootUserQueries = extendType({
     });
   },
 });
+
+export const HandleUserStateInWorkspaceInput = inputObjectType({
+  name: 'HandleUserStateInWorkspaceInput',
+  definition(t) {
+    t.string('userId');
+    t.string('worksapceId');
+    t.boolean('isActive')
+  }
+})
+
+export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorkspace', {
+  type: UserCustomerType,
+  args: { input: HandleUserStateInWorkspaceInput },
+  async resolve(parent, args, ctx) {
+    if (!args?.input?.userId) throw new UserInputError('No valid user provided to edit');
+    if (!args?.input?.isActive) throw new UserInputError('No activity state provided');
+    if (!args?.input?.worksapceId) throw new UserInputError('No workspace Id provided');
+
+    return ctx.services.userService.setUserStateInWorkspace(args.input) as any;
+  }
+})
 
 export const UserMutations = extendType({
   type: 'Mutation',

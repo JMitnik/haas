@@ -354,11 +354,26 @@ class UserPrismaAdapter {
     });
   };
 
+  async setIsActive(input: NexusGenInputs['HandleUserStateInWorkspaceInput']) {
+    return this.prisma.userOfCustomer.update({
+      where: {
+        userId_customerId: {
+          userId: input.userId || '',
+          customerId: input.worksapceId || '',
+        }
+      },
+      data: {
+        isActive: input.isActive || true,
+      }
+    })
+  }
+
   async login(userId: string | undefined, refreshToken: string): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
       data: {
         refreshToken,
+        lastLoggedIn: new Date(Date.now()),
         loginToken: null,
       },
     });

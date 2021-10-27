@@ -145,6 +145,10 @@ class UserService {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   };
 
+  async setUserStateInWorkspace(input: NexusGenInputs['HandleUserStateInWorkspaceInput']) {
+    return this.userPrismaAdapter.setIsActive(input);
+  }
+
   /**
    * Invites a new user to a current customer, and mails them with a login-token.
    */

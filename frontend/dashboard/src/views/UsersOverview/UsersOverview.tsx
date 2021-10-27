@@ -201,6 +201,7 @@ const UsersOverview = () => {
   };
 
   const tableData = activePaginatedUsersResult?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
+    isActive: userCustomer.isActive,
     createdAt: userCustomer.createdAt,
     ...userCustomer.user,
     role: userCustomer.role,

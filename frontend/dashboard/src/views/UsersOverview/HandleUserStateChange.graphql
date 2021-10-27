@@ -1,0 +1,7 @@
+mutation handleUserStateInWorkspace($input: HandleUserStateInWorkspaceInput!) {
+    handleUserStateInWorkspace( input: $input ) {
+      user {
+        email
+      }
+    }
+}
