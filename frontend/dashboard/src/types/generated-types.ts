@@ -569,6 +569,10 @@ export type FailedDeliveryModel = {
   error: Scalars['String'];
 };
 
+export type FindRoleInput = {
+  roleId?: Maybe<Scalars['String']>;
+};
+
 export type FontSettings = {
   __typename?: 'FontSettings';
   id: Scalars['ID'];
@@ -1262,6 +1266,7 @@ export type Query = {
   triggerConnection?: Maybe<TriggerConnectionType>;
   trigger?: Maybe<TriggerType>;
   triggers: Array<TriggerType>;
+  findRoleById?: Maybe<RoleType>;
   roleConnection: RoleConnection;
   customers: Array<Customer>;
   customer?: Maybe<Customer>;
@@ -1326,6 +1331,11 @@ export type QueryTriggersArgs = {
   dialogueId?: Maybe<Scalars['String']>;
   userId?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
+};
+
+
+export type QueryFindRoleByIdArgs = {
+  input?: Maybe<FindRoleInput>;
 };
 
 
@@ -1843,7 +1853,7 @@ export type UserConnectionOrderByInput = {
 
 export type UserCustomer = {
   __typename?: 'UserCustomer';
-  createdAt: Scalars['String'];
+  createdAt: Scalars['Date'];
   isActive: Scalars['Boolean'];
   user: UserType;
   customer: Customer;
@@ -1873,7 +1883,7 @@ export type UserType = {
   phone?: Maybe<Scalars['String']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
-  lastLoggedIn?: Maybe<Scalars['String']>;
+  lastLoggedIn?: Maybe<Scalars['Date']>;
   globalPermissions?: Maybe<Array<SystemPermission>>;
   userCustomers: Array<UserCustomer>;
   customers: Array<Customer>;
@@ -2453,6 +2463,19 @@ export type GetPaginatedUsersQuery = (
         & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
       ) }
     )> }
+  )> }
+);
+
+export type FindRoleByIdQueryVariables = Exact<{
+  input?: Maybe<FindRoleInput>;
+}>;
+
+
+export type FindRoleByIdQuery = (
+  { __typename?: 'Query' }
+  & { findRoleById?: Maybe<(
+    { __typename?: 'RoleType' }
+    & Pick<RoleType, 'name' | 'nrPermissions' | 'permissions'>
   )> }
 );
 
@@ -3743,6 +3766,46 @@ export type GetPaginatedUsersLazyQueryHookResult = ReturnType<typeof useGetPagin
 export type GetPaginatedUsersQueryResult = Apollo.QueryResult<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>;
 export function refetchGetPaginatedUsersQuery(variables?: GetPaginatedUsersQueryVariables) {
       return { query: GetPaginatedUsersDocument, variables: variables }
+    }
+export const FindRoleByIdDocument = gql`
+    query findRoleById($input: FindRoleInput) {
+  findRoleById(input: $input) {
+    name
+    nrPermissions
+    permissions
+  }
+}
+    `;
+
+/**
+ * __useFindRoleByIdQuery__
+ *
+ * To run a query within a React component, call `useFindRoleByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFindRoleByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFindRoleByIdQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useFindRoleByIdQuery(baseOptions?: Apollo.QueryHookOptions<FindRoleByIdQuery, FindRoleByIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FindRoleByIdQuery, FindRoleByIdQueryVariables>(FindRoleByIdDocument, options);
+      }
+export function useFindRoleByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FindRoleByIdQuery, FindRoleByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FindRoleByIdQuery, FindRoleByIdQueryVariables>(FindRoleByIdDocument, options);
+        }
+export type FindRoleByIdQueryHookResult = ReturnType<typeof useFindRoleByIdQuery>;
+export type FindRoleByIdLazyQueryHookResult = ReturnType<typeof useFindRoleByIdLazyQuery>;
+export type FindRoleByIdQueryResult = Apollo.QueryResult<FindRoleByIdQuery, FindRoleByIdQueryVariables>;
+export function refetchFindRoleByIdQuery(variables?: FindRoleByIdQueryVariables) {
+      return { query: FindRoleByIdDocument, variables: variables }
     }
 export const GetRolesDocument = gql`
     query GetRoles($id: ID) {

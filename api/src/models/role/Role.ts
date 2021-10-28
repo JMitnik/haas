@@ -1,4 +1,5 @@
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType, queryField } from '@nexus/schema';
+import { UserInputError } from 'apollo-server-express';
 
 import { PaginationWhereInput } from '../general/Pagination';
 import { SystemPermissions } from './Permissions';
@@ -55,6 +56,24 @@ export const RoleConnection = objectType({
     t.list.field('roles', { type: RoleType });
   },
 });
+
+export const FindRoleInput = inputObjectType({
+  name: 'FindRoleInput',
+  definition(t) {
+    t.string('roleId');
+  },
+});
+
+export const FindRoleByIdResolver = queryField('findRoleById', {
+  type: RoleType,
+  nullable: true,
+  args: { input: FindRoleInput },
+  resolve(parent, args, ctx) {
+    if (!args.input?.roleId) throw new UserInputError('No RoleId provided!');
+    return ctx.services.roleService.findRoleById(args.input.roleId);
+  }
+})
+
 
 export const RoleQueries = extendType({
   type: 'Query',
@@ -136,6 +155,8 @@ export const RoleMutations = extendType({
 });
 
 export default [
+  FindRoleInput,
+  FindRoleByIdResolver,
   RoleConnection,
   RoleQueries,
   RoleDataInput,

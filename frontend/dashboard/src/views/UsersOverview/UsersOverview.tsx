@@ -34,6 +34,7 @@ import { PopoverItem } from './UsersOverviewStyles';
 import { UserModalCard } from './UserModalCard';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
+import RoleUserModalCard from './RoleUserModalCard';
 
 const columns = `
   minmax(50px, 1fr) 
@@ -68,7 +69,7 @@ const UsersOverview = () => {
   const { canAccessAdmin, canEditUsers } = useAuth();
   const { activeCustomer } = useCustomer();
   const { customerSlug } = useParams<{ customerSlug: string }>();
-  const { goToUserView, goToUsersOverview } = useNavigator();
+  const { goToUserView, goToUsersOverview, goToRoleUserView } = useNavigator();
   const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
@@ -448,11 +449,15 @@ const UsersOverview = () => {
               </Table.Cell>
 
               <Table.Cell>
+
                 <Table.InnerCell>
-                  <UI.Helper>
-                    {user?.role?.name}
-                  </UI.Helper>
+                  <UI.Div onClick={() => goToRoleUserView(user.id, user.role.id)}>
+                    <UI.Helper>
+                      {user?.role?.name}
+                    </UI.Helper>
+                  </UI.Div>
                 </Table.InnerCell>
+
               </Table.Cell>
 
               <Table.Cell>
@@ -526,6 +531,27 @@ const UsersOverview = () => {
             key={location.pathname}
           >
             <Route
+              path={ROUTES.ROLE_USER_VIEW}
+            >
+              {({ match }) => (
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <UI.Modal isOpen onClose={() => goToUsersOverview()}>
+                    <RoleUserModalCard
+                      onClose={() => goToUsersOverview()}
+                      // @ts-ignore
+                      id={match?.params?.roleId}
+                    />
+                  </UI.Modal>
+                </motion.div>
+              )}
+            </Route>
+
+            <Route
               path={ROUTES.USER_VIEW}
             >
               {({ match }) => (
@@ -545,6 +571,7 @@ const UsersOverview = () => {
                 </motion.div>
               )}
             </Route>
+
           </Switch>
         </AnimatePresence>
       </UI.ViewBody>

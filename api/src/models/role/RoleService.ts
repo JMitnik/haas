@@ -16,6 +16,10 @@ class RoleService {
     this.rolePrismaAdapter = new RolePrismaAdapter(prismaClient);
   };
 
+  async findRoleById(roleId: string) {
+    return this.rolePrismaAdapter.getRoleById(roleId);
+  }
+
   async getPermissionsByRoleId(roleId: string): Promise<SystemPermissionEnum[]> {
     const role = await this.rolePrismaAdapter.getRoleById(roleId);
     return role?.permissions || [];

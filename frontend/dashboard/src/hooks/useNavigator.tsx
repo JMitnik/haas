@@ -12,6 +12,7 @@ export const ROUTES = {
   AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
   ADMIN_OVERVIEW: '/dashboard/admin',
   USER_VIEW: '/dashboard/b/:customerSlug/users/:userId',
+  ROLE_USER_VIEW: '/dashboard/b/:customerSlug/users/:userId/role/:roleId',
   USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
   ALERTS_OVERVIEW: '/dashboard/b/:customerSlug/triggers',
 };
@@ -42,6 +43,16 @@ export const useNavigator = () => {
   const goToUsersOverview = () => {
     const path = generatePath(ROUTES.USERS_OVERVIEW, {
       customerSlug,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToRoleUserView = (userId: string, roleId: string) => {
+    const path = generatePath(ROUTES.ROLE_USER_VIEW, {
+      customerSlug,
+      userId,
+      roleId,
     });
 
     history.push(path + location.search);
@@ -97,6 +108,7 @@ export const useNavigator = () => {
   return {
     goToUsersOverview,
     goToUserView,
+    goToRoleUserView,
     goToDeliveryView,
     goToInteractionsView,
     goToCampaignView,
