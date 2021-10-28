@@ -22,19 +22,18 @@ import {
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { TabbedMenu } from 'components/Common/TabMenu';
+import { TableCellButtonContainer } from 'components/Common/Table';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useCustomer } from 'providers/CustomerProvider';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Searchbar from 'components/SearchBar';
+import useAuth from 'hooks/useAuth';
 
-import { ClickablePopoverItem } from './UsersOverviewStyles';
-import { TableCellButtonContainer } from 'components/Common/Table';
+import { PopoverItem } from './UsersOverviewStyles';
 import { UserModalCard } from './UserModalCard';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
-import SetUserAccessButton from './SetUserAccessButton';
-import useAuth from 'hooks/useAuth';
 
 const columns = `
   minmax(50px, 1fr) 
@@ -131,10 +130,10 @@ const UsersOverview = () => {
     });
   };
 
-  const [setUserAccessibility, { loading: isSettingUserAccessibility }] = useHandleUserStateInWorkspaceMutation({
+  const [setUserAccessibility] = useHandleUserStateInWorkspaceMutation({
     onCompleted: (userOfCustomer) => {
       const email = userOfCustomer?.handleUserStateInWorkspace?.user?.email;
-      const state = userOfCustomer?.handleUserStateInWorkspace?.isActive ? 'Active' : 'Inactive';
+      const state = userOfCustomer?.handleUserStateInWorkspace?.isActive ? t('active') : t('inactive');
       toast({
         title: 'User accessibility changed!',
         description: `User with email ${email} has been set to ${state}`,
@@ -471,7 +470,7 @@ const UsersOverview = () => {
                   brand={user?.isActive ? 'green' : 'red'}
                   renderBody={() => (
                     <UI.Stack spacing={1}>
-                      <ClickablePopoverItem>
+                      <PopoverItem>
                         <UI.Text>Set access of this user to: </UI.Text>
                         <UI.Flex justifyContent="center">
                           <TableCellButtonContainer
@@ -493,18 +492,18 @@ const UsersOverview = () => {
                             bg={user?.isActive ? 'red.100' : 'green.100'}
                           >
                             <UI.Helper color={user?.isActive ? 'red.600' : 'green.600'}>
-                              {user?.isActive ? 'Inactive' : 'Active'}
+                              {user?.isActive ? t('inactive') : t('active')}
                             </UI.Helper>
                           </TableCellButtonContainer>
                         </UI.Flex>
 
-                      </ClickablePopoverItem>
+                      </PopoverItem>
 
                     </UI.Stack>
                   )}
                 >
                   <UI.Helper color={user?.isActive ? 'green.600' : 'red.600'}>
-                    {user?.isActive ? 'Active' : 'Inactive'}
+                    {user?.isActive ? t('active') : t('inactive')}
                   </UI.Helper>
                 </Table.InnerCell>
               </Table.Cell>

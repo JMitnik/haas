@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    active: {
+      en: 'Active',
+      de: 'Aktiv',
+    },
+    inactive: {
+      en: 'Inactive',
+      de: 'Inaktiv',
+    },
     last_logged_in: {
       en: 'Last logged in',
       de: 'Zuletzt eingeloggt',
