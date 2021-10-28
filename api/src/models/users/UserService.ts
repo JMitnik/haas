@@ -76,6 +76,13 @@ class UserService {
     return user?.customers.map((customerOfUser) => customerOfUser.customer) || [];
   };
 
+  async findActiveWorkspacesOfUser(userId: string) {
+    const userWorkspaces = await this.userPrismaAdapter.findAllWorkspacesByUserId(userId)
+    const activeUserWorkspaces = userWorkspaces.filter((userInWorkspace) => userInWorkspace.isActive);
+    const finalWorkspaces = activeUserWorkspaces.map((workspace) => workspace.customer);
+    return finalWorkspaces;
+  }
+
   async getUserCustomers(userId: string) {
     const user = await this.userPrismaAdapter.getUserById(userId);
 

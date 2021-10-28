@@ -91,7 +91,7 @@ export const UserType = objectType({
       type: 'Customer',
 
       async resolve(parent, args, ctx) {
-        return ctx.services.userService.getCustomersOfUser(parent.id);
+        return ctx.services.userService.findActiveWorkspacesOfUser(parent.id);
       },
     });
 

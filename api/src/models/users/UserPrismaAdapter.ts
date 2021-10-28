@@ -16,6 +16,24 @@ class UserPrismaAdapter {
   }
 
   /**
+   * 
+   * @param userId  
+   * @returns a list of workspaces together and whether a user is active in them or not
+   */
+  findAllWorkspacesByUserId = async (userId: string) => {
+    const userWorkspaces = await this.prisma.userOfCustomer.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        isActive: true,
+        customer: true,
+      },
+    });
+    return userWorkspaces;
+  }
+
+  /**
   * Build a userConnection prisma query based on the filter parameters.
   * @param customerSlug the slug of a workspace
   * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
