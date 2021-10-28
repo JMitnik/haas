@@ -371,8 +371,6 @@ class UserPrismaAdapter {
         customer: true,
       }
     });
-
-    console.log('Result: ', result);
     return result;
   }
 

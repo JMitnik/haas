@@ -38,7 +38,7 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
     if (!args.input?.userId) throw new UserInputError('User not provided');
     if (!args.input?.customerId && !args.input?.customerSlug) throw new UserInputError('Neither slug nor id of Customer was provided');
 
-    return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId) as any;
+    return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId);
   },
 });
 
@@ -222,7 +222,6 @@ export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorksp
   type: UserCustomerType,
   args: { input: HandleUserStateInWorkspaceInput },
   async resolve(parent, args, ctx) {
-    console.log('HEYOOO: ', args?.input);
     if (!args?.input?.userId) throw new UserInputError('No valid user provided to edit');
     if (args?.input?.isActive === undefined || args?.input?.isActive === null || typeof args?.input?.isActive === undefined) throw new UserInputError('No activity state provided');
     if (!args?.input?.workspaceId) throw new UserInputError('No workspace Id provided');

@@ -28,8 +28,8 @@ import { useCustomer } from 'providers/CustomerProvider';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Searchbar from 'components/SearchBar';
 
-import { TableCellButtonContainer } from 'components/Common/Table';
 import { ClickablePopoverItem } from './UsersOverviewStyles';
+import { TableCellButtonContainer } from 'components/Common/Table';
 import { UserModalCard } from './UserModalCard';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
@@ -109,13 +109,11 @@ const UsersOverview = () => {
     },
     errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
-      console.log('Fetched data: ', fetchedData);
       setActivePaginatedUsersResult(fetchedData);
     },
   });
 
   const handleRefetch = () => {
-    console.log('Should refetch');
     refetch({
       customerSlug,
       filter: {
@@ -257,7 +255,6 @@ const UsersOverview = () => {
   })) || [];
 
   const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
-  console.log(tableData);
 
   return (
     <>

@@ -146,7 +146,6 @@ class UserService {
   };
 
   async setUserStateInWorkspace(input: { userId: string, workspaceId: string, isActive: boolean }) {
-    console.log('in set user state in workspace');
     return this.userPrismaAdapter.setIsActive(input);
   }
 
