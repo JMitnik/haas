@@ -685,7 +685,7 @@ export type GetCampaignsInput = {
 
 export type HandleUserStateInWorkspaceInput = {
   userId?: Maybe<Scalars['String']>;
-  worksapceId?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
   isActive?: Maybe<Scalars['Boolean']>;
 };
 
@@ -2506,6 +2506,7 @@ export type HandleUserStateInWorkspaceMutation = (
   { __typename?: 'Mutation' }
   & { handleUserStateInWorkspace: (
     { __typename?: 'UserCustomer' }
+    & Pick<UserCustomer, 'isActive'>
     & { user: (
       { __typename?: 'UserType' }
       & Pick<UserType, 'email'>
@@ -3840,6 +3841,7 @@ export function refetchGetUserCustomerFromCustomerQuery(variables?: GetUserCusto
 export const HandleUserStateInWorkspaceDocument = gql`
     mutation handleUserStateInWorkspace($input: HandleUserStateInWorkspaceInput!) {
   handleUserStateInWorkspace(input: $input) {
+    isActive
     user {
       email
     }

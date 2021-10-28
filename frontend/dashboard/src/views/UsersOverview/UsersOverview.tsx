@@ -17,6 +17,7 @@ import {
   UserConnectionOrder,
   useDeleteUserMutation,
   useGetPaginatedUsersQuery,
+  useHandleUserStateInWorkspaceMutation,
 } from 'types/generated-types';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
@@ -27,9 +28,13 @@ import { useCustomer } from 'providers/CustomerProvider';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Searchbar from 'components/SearchBar';
 
+import { TableCellButtonContainer } from 'components/Common/Table';
+import { ClickablePopoverItem } from './UsersOverviewStyles';
 import { UserModalCard } from './UserModalCard';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
+import SetUserAccessButton from './SetUserAccessButton';
+import useAuth from 'hooks/useAuth';
 
 const columns = `
   minmax(50px, 1fr) 
@@ -61,6 +66,7 @@ const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
 };
 
 const UsersOverview = () => {
+  const { canAccessAdmin, canEditUsers } = useAuth();
   const { activeCustomer } = useCustomer();
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { goToUserView, goToUsersOverview } = useNavigator();
@@ -105,6 +111,40 @@ const UsersOverview = () => {
     onCompleted: (fetchedData) => {
       console.log('Fetched data: ', fetchedData);
       setActivePaginatedUsersResult(fetchedData);
+    },
+  });
+
+  const handleRefetch = () => {
+    console.log('Should refetch');
+    refetch({
+      customerSlug,
+      filter: {
+        firstName: filter.firstName,
+        lastName: filter.lastName,
+        email: filter.email,
+        role: filter.role,
+        startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
+        endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
+        search: filter.search,
+        offset: filter.pageIndex * filter.perPage,
+        perPage: filter.perPage,
+        orderBy: { by: filter.orderByField as UserConnectionOrder, desc: filter.orderByDescending },
+      },
+    });
+  };
+
+  const [setUserAccessibility, { loading: isSettingUserAccessibility }] = useHandleUserStateInWorkspaceMutation({
+    onCompleted: (userOfCustomer) => {
+      const email = userOfCustomer?.handleUserStateInWorkspace?.user?.email;
+      const state = userOfCustomer?.handleUserStateInWorkspace?.isActive ? 'Active' : 'Inactive';
+      toast({
+        title: 'User accessibility changed!',
+        description: `User with email ${email} has been set to ${state}`,
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+      handleRefetch();
     },
   });
 
@@ -209,32 +249,15 @@ const UsersOverview = () => {
   };
 
   const tableData = activePaginatedUsersResult?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
+    ...userCustomer.user,
     isActive: userCustomer.isActive,
     createdAt: userCustomer.createdAt,
-    ...userCustomer.user,
+    userId: userCustomer.user.id,
     role: userCustomer.role,
   })) || [];
 
   const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
   console.log(tableData);
-
-  const handleRefetch = () => {
-    refetch({
-      customerSlug,
-      filter: {
-        firstName: filter.firstName,
-        lastName: filter.lastName,
-        email: filter.email,
-        role: filter.role,
-        startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
-        endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
-        search: filter.search,
-        offset: filter.pageIndex * filter.perPage,
-        perPage: filter.perPage,
-        orderBy: { by: filter.orderByField as UserConnectionOrder, desc: filter.orderByDescending },
-      },
-    });
-  };
 
   return (
     <>
@@ -445,7 +468,44 @@ const UsersOverview = () => {
               </Table.Cell>
 
               <Table.Cell>
-                <Table.InnerCell brand={user?.isActive ? 'green' : 'red'}>
+                <Table.InnerCell
+                  isDisabled={!canAccessAdmin && !canEditUsers}
+                  header="User Workspace Access"
+                  brand={user?.isActive ? 'green' : 'red'}
+                  renderBody={() => (
+                    <UI.Stack spacing={1}>
+                      <ClickablePopoverItem>
+                        <UI.Text>Set access of this user to: </UI.Text>
+                        <UI.Flex justifyContent="center">
+                          <TableCellButtonContainer
+                            onClick={() => setUserAccessibility({
+                              variables: {
+                                input: {
+                                  isActive: !user.isActive,
+                                  userId: user.userId,
+                                  workspaceId: activeCustomer?.id,
+                                },
+                              },
+                            })}
+                            as="button"
+                            py={1}
+                            px={2}
+                            borderRadius={10}
+                            border="1px solid"
+                            borderColor="gray.100"
+                            bg={user?.isActive ? 'red.100' : 'green.100'}
+                          >
+                            <UI.Helper color={user?.isActive ? 'red.600' : 'green.600'}>
+                              {user?.isActive ? 'Inactive' : 'Active'}
+                            </UI.Helper>
+                          </TableCellButtonContainer>
+                        </UI.Flex>
+
+                      </ClickablePopoverItem>
+
+                    </UI.Stack>
+                  )}
+                >
                   <UI.Helper color={user?.isActive ? 'green.600' : 'red.600'}>
                     {user?.isActive ? 'Active' : 'Inactive'}
                   </UI.Helper>

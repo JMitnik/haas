@@ -1,17 +1,27 @@
 import * as UI from '@haas/ui';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import * as Popover from 'components/Common/Popover';
 
-const TableCellButtonContainer = styled(UI.Div)`
-  transition: all ease-in 0.2s;
-  text-align: left;
+export const TableCellButtonContainer = styled(UI.Div) <{ isDisabled?: boolean }>`
+  ${({ isDisabled }) => css`
 
-  &:hover {
     transition: all ease-in 0.2s;
-    box-shadow: 0 4px 6px rgba(50,50,93,.07), 0 1px 3px rgba(0,0,0,.03);
-  }
+    text-align: left;
+
+    ${!isDisabled && css` 
+      &:hover {
+        transition: all ease-in 0.2s;
+        box-shadow: 0 4px 6px rgba(50,50,93,.07), 0 1px 3px rgba(0,0,0,.03);
+      }
+    `}
+
+    ${isDisabled && css`
+      pointer-events: none;
+    `}
+
+  `}
 `;
 
 interface InnerCellProps {
@@ -19,6 +29,7 @@ interface InnerCellProps {
   children: React.ReactNode
   header?: string
   renderBody?: () => React.ReactNode
+  isDisabled?: boolean
 }
 
 export const InnerCell = ({
@@ -26,11 +37,13 @@ export const InnerCell = ({
   renderBody,
   header,
   brand,
+  isDisabled,
 }: InnerCellProps) => (
   <UI.Div display="inline-block" onClick={(e) => e.stopPropagation()}>
     <Popover.Base>
       <Popover.Trigger>
         <TableCellButtonContainer
+          isDisabled={isDisabled}
           as="button"
           py={1}
           px={2}

@@ -1,5 +1,5 @@
 import { Div } from '@haas/ui';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const FlexRow = styled(Div)`
     display: flex;
@@ -18,3 +18,9 @@ export const OutputContainer = styled(FlexRow)`
     align-items: center;
 `;
 
+export const ClickablePopoverItem = styled.button` 
+  all: unset;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+`;

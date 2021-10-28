@@ -588,7 +588,7 @@ input GetCampaignsInput {
 input HandleUserStateInWorkspaceInput {
   isActive: Boolean
   userId: String
-  worksapceId: String
+  workspaceId: String
 }
 
 type ImageType {

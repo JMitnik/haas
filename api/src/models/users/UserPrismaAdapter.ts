@@ -354,18 +354,25 @@ class UserPrismaAdapter {
     });
   };
 
-  async setIsActive(input: NexusGenInputs['HandleUserStateInWorkspaceInput']) {
-    return this.prisma.userOfCustomer.update({
+  async setIsActive(input: { userId: string, workspaceId: string, isActive: boolean }) {
+    const result = await this.prisma.userOfCustomer.update({
       where: {
         userId_customerId: {
-          userId: input.userId || '',
-          customerId: input.worksapceId || '',
+          userId: input.userId,
+          customerId: input.workspaceId,
         }
       },
       data: {
-        isActive: input.isActive || true,
+        isActive: input.isActive,
+      },
+      include: {
+        user: true,
+        role: true,
       }
-    })
+    });
+
+    console.log('Result: ', result);
+    return result;
   }
 
   async login(userId: string | undefined, refreshToken: string): Promise<User> {

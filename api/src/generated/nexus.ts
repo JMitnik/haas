@@ -264,7 +264,7 @@ export interface NexusGenInputs {
   HandleUserStateInWorkspaceInput: { // input type
     isActive?: boolean | null; // Boolean
     userId?: string | null; // String
-    worksapceId?: string | null; // String
+    workspaceId?: string | null; // String
   }
   InviteUserInput: { // input type
     customerId: string; // String!

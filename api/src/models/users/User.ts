@@ -213,7 +213,7 @@ export const HandleUserStateInWorkspaceInput = inputObjectType({
   name: 'HandleUserStateInWorkspaceInput',
   definition(t) {
     t.string('userId');
-    t.string('worksapceId');
+    t.string('workspaceId');
     t.boolean('isActive')
   }
 })
@@ -222,9 +222,10 @@ export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorksp
   type: UserCustomerType,
   args: { input: HandleUserStateInWorkspaceInput },
   async resolve(parent, args, ctx) {
+    console.log('HEYOOO: ', args?.input);
     if (!args?.input?.userId) throw new UserInputError('No valid user provided to edit');
-    if (!args?.input?.isActive) throw new UserInputError('No activity state provided');
-    if (!args?.input?.worksapceId) throw new UserInputError('No workspace Id provided');
+    if (typeof args?.input?.isActive === undefined) throw new UserInputError('No activity state provided');
+    if (!args?.input?.workspaceId) throw new UserInputError('No workspace Id provided');
 
     return ctx.services.userService.setUserStateInWorkspace(args.input) as any;
   }
