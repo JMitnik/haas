@@ -824,7 +824,7 @@ export interface NexusGenRootTypes {
     userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
   UserCustomer: { // root type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     customer: NexusGenRootTypes['Customer']; // Customer!
     isActive: boolean; // Boolean!
     role: NexusGenRootTypes['RoleType']; // RoleType!
@@ -834,7 +834,7 @@ export interface NexusGenRootTypes {
     email: string; // String!
     firstName?: string | null; // String
     id: string; // ID!
-    lastLoggedIn?: string | null; // String
+    lastLoggedIn?: any | null; // Date
     lastName?: string | null; // String
     phone?: string | null; // String
     roleId?: string | null; // String
@@ -1471,7 +1471,7 @@ export interface NexusGenFieldTypes {
     userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
   UserCustomer: { // field return type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     customer: NexusGenRootTypes['Customer']; // Customer!
     isActive: boolean; // Boolean!
     role: NexusGenRootTypes['RoleType']; // RoleType!
@@ -1483,7 +1483,7 @@ export interface NexusGenFieldTypes {
     firstName: string | null; // String
     globalPermissions: NexusGenEnums['SystemPermission'][] | null; // [SystemPermission!]
     id: string; // ID!
-    lastLoggedIn: string | null; // String
+    lastLoggedIn: any | null; // Date
     lastName: string | null; // String
     phone: string | null; // String
     role: NexusGenRootTypes['RoleType'] | null; // RoleType

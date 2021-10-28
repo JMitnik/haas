@@ -368,6 +368,7 @@ class UserPrismaAdapter {
       include: {
         user: true,
         role: true,
+        customer: true,
       }
     });
 

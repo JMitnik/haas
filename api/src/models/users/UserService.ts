@@ -145,7 +145,7 @@ class UserService {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   };
 
-  async setUserStateInWorkspace(input: NexusGenInputs['HandleUserStateInWorkspaceInput']) {
+  async setUserStateInWorkspace(input: { userId: string, workspaceId: string, isActive: boolean }) {
     console.log('in set user state in workspace');
     return this.userPrismaAdapter.setIsActive(input);
   }

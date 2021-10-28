@@ -1,5 +1,5 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { enumType, extendType, inputObjectType, mutationField, objectType, queryField, scalarType } from '@nexus/schema';
+import { extendType, inputObjectType, mutationField, objectType, queryField, scalarType } from '@nexus/schema';
 import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
 
@@ -10,7 +10,7 @@ export const UserCustomerType = objectType({
   name: 'UserCustomer',
 
   definition(t) {
-    t.string('createdAt', { nullable: false });
+    t.date('createdAt', { nullable: false });
     t.boolean('isActive');
     t.field('user', { type: 'UserType' });
     t.field('customer', { type: 'Customer' });
@@ -68,7 +68,7 @@ export const UserType = objectType({
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
-    t.string('lastLoggedIn', { nullable: true });
+    t.date('lastLoggedIn', { nullable: true });
 
     t.list.field('globalPermissions', {
       nullable: true,
@@ -224,10 +224,11 @@ export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorksp
   async resolve(parent, args, ctx) {
     console.log('HEYOOO: ', args?.input);
     if (!args?.input?.userId) throw new UserInputError('No valid user provided to edit');
-    if (typeof args?.input?.isActive === undefined) throw new UserInputError('No activity state provided');
+    if (args?.input?.isActive === undefined || args?.input?.isActive === null || typeof args?.input?.isActive === undefined) throw new UserInputError('No activity state provided');
     if (!args?.input?.workspaceId) throw new UserInputError('No workspace Id provided');
 
-    return ctx.services.userService.setUserStateInWorkspace(args.input) as any;
+    const input = { userId: args.input.userId, isActive: args.input.isActive, workspaceId: args.input.workspaceId }
+    return ctx.services.userService.setUserStateInWorkspace(input);
   }
 })
 

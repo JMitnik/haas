@@ -1370,7 +1370,7 @@ input UserConnectionOrderByInput {
 }
 
 type UserCustomer {
-  createdAt: String!
+  createdAt: Date!
   customer: Customer!
   isActive: Boolean!
   role: RoleType!
@@ -1399,7 +1399,7 @@ type UserType {
   firstName: String
   globalPermissions: [SystemPermission!]
   id: ID!
-  lastLoggedIn: String
+  lastLoggedIn: Date
   lastName: String
   phone: String
   role: RoleType
