@@ -9,6 +9,17 @@ export const SystemPermission = enumType({
   members: SystemPermissions,
 });
 
+export const RoleWithPermissionsType = objectType({
+  name: 'RoleWithPermissionsType',
+  definition(t) {
+    t.field('role', { type: RoleType });
+    t.list.field('allPermissions', {
+      type: SystemPermission,
+      resolve: () => SystemPermissions,
+    });
+  }
+})
+
 export const RoleType = objectType({
   name: 'RoleType',
 
@@ -65,12 +76,17 @@ export const FindRoleInput = inputObjectType({
 });
 
 export const FindRoleByIdResolver = queryField('findRoleById', {
-  type: RoleType,
+  type: RoleWithPermissionsType,
   nullable: true,
   args: { input: FindRoleInput },
-  resolve(parent, args, ctx) {
+  async resolve(parent, args, ctx) {
     if (!args.input?.roleId) throw new UserInputError('No RoleId provided!');
-    return ctx.services.roleService.findRoleById(args.input.roleId);
+
+    const role = await ctx.services.roleService.findRoleById(args.input.roleId);
+
+    if (!role) return null;
+
+    return { role } as any;
   }
 })
 

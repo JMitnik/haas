@@ -101,15 +101,15 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
             <>
               {customers?.map(
                 (customer: any, index: any) => customer && (
-                <motion.div style={{ height: '100%' }} key={index} variants={cardItemAnimation}>
-                  <ErrorBoundary key={index} FallbackComponent={() => <></>}>
-                    <CustomerCard key={index} customer={customer} />
-                  </ErrorBoundary>
-                </motion.div>
+                  <motion.div style={{ height: '100%' }} key={index} variants={cardItemAnimation}>
+                    <ErrorBoundary key={index} FallbackComponent={() => <></>}>
+                      <CustomerCard key={index} customer={customer} />
+                    </ErrorBoundary>
+                  </motion.div>
                 ),
               )}
 
-              {canCreateCustomers && (
+              {(canCreateCustomers || canAccessAdmin) && (
                 <AddCard>
                   <Link to="/dashboard/b/add" />
                   <Flex flexDirection="column" alignItems="center" justifyContent="center">

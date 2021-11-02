@@ -905,7 +905,7 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
-  findRoleById(input: FindRoleInput): RoleType
+  findRoleById(input: FindRoleInput): RoleWithPermissionsType
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
   getAutodeckJobs(filter: PaginationWhereInput): AutodeckConnectionType!
   getJob(id: String): CreateWorkspaceJobType
@@ -1053,6 +1053,11 @@ type RoleType {
   nrPermissions: Int
   permissions: [SystemPermission!]
   roleId: String
+}
+
+type RoleWithPermissionsType {
+  allPermissions: [SystemPermission!]!
+  role: RoleType!
 }
 
 type Session {

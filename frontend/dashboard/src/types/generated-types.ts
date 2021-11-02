@@ -1266,7 +1266,7 @@ export type Query = {
   triggerConnection?: Maybe<TriggerConnectionType>;
   trigger?: Maybe<TriggerType>;
   triggers: Array<TriggerType>;
-  findRoleById?: Maybe<RoleType>;
+  findRoleById?: Maybe<RoleWithPermissionsType>;
   roleConnection: RoleConnection;
   customers: Array<Customer>;
   customer?: Maybe<Customer>;
@@ -1520,6 +1520,12 @@ export type RoleType = {
   customerId?: Maybe<Scalars['String']>;
   nrPermissions?: Maybe<Scalars['Int']>;
   permissions?: Maybe<Array<SystemPermission>>;
+};
+
+export type RoleWithPermissionsType = {
+  __typename?: 'RoleWithPermissionsType';
+  role: RoleType;
+  allPermissions: Array<SystemPermission>;
 };
 
 export type Session = {
@@ -2474,8 +2480,12 @@ export type FindRoleByIdQueryVariables = Exact<{
 export type FindRoleByIdQuery = (
   { __typename?: 'Query' }
   & { findRoleById?: Maybe<(
-    { __typename?: 'RoleType' }
-    & Pick<RoleType, 'name' | 'nrPermissions' | 'permissions'>
+    { __typename?: 'RoleWithPermissionsType' }
+    & Pick<RoleWithPermissionsType, 'allPermissions'>
+    & { role: (
+      { __typename?: 'RoleType' }
+      & Pick<RoleType, 'name' | 'nrPermissions' | 'permissions'>
+    ) }
   )> }
 );
 
@@ -3770,9 +3780,12 @@ export function refetchGetPaginatedUsersQuery(variables?: GetPaginatedUsersQuery
 export const FindRoleByIdDocument = gql`
     query findRoleById($input: FindRoleInput) {
   findRoleById(input: $input) {
-    name
-    nrPermissions
-    permissions
+    role {
+      name
+      nrPermissions
+      permissions
+    }
+    allPermissions
   }
 }
     `;
