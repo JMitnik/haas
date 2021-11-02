@@ -10,7 +10,7 @@ const isSuperAdmin = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
     if (!ctx.session?.user?.id) return new ApolloError('Unauthenticated', 'UNAUTHENTICATED');
 
-    return ctx.session?.globalPermissions?.includes('CAN_ACCESS_ADMIN_PANEL');
+    return ctx.session?.globalPermissions.filter((globalPermission) => globalPermission.type === 'CAN_ACCESS_ADMIN_PANEL').length > 0;
   },
 );
 
@@ -72,7 +72,7 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
     if (!ctx.session?.user?.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
 
     if (!ctx.session?.activeWorkspace) return false;
-    if (!allRelevantPermissions?.includes(guardedPermission)) return false;
+    if (allRelevantPermissions?.filter((permission) => permission.type === guardedPermission).length === 0) return false;
 
     return true;
   },

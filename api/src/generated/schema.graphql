@@ -720,7 +720,7 @@ type Mutation {
   createCTA(input: CreateCTAInputType): QuestionNode!
   createDialogue(input: CreateDialogueInputType): Dialogue!
   createJobProcessLocation(input: createJobProcessLocationInput): JobProcessLocation!
-  createPermission(data: PermissionInput): PermssionType
+  createPermission(input: PermissionInput): PermssionType
   createQuestion(input: CreateQuestionNodeInputType): QuestionNode
   createRole(data: RoleInput): RoleType!
   createSession(input: SessionInput): Session!
@@ -883,13 +883,15 @@ input PermissionInput {
   customerId: String
   description: String
   name: String
+  type: SystemPermission
 }
 
 type PermssionType {
   customer: Customer
   description: String
-  id: ID!
+  isEnabled: Boolean!
   name: String!
+  type: SystemPermission!
 }
 
 type PreviewDataType {

@@ -50,14 +50,14 @@ model CustomerSettings {
 }
 
 model Customer {
-  id              String            @id @default(cuid())
-  slug            String            @unique
+  id              String                      @id @default(cuid())
+  slug            String                      @unique
   name            String
   settings        CustomerSettings?
   dialogues       Dialogue[]
   users           UserOfCustomer[]
   roles           Role[]
-  permissions     Permission[]
+  permissions     PermissionOfWorkspaceRole[]
   triggers        Trigger[]
   tags            Tag[]
   campaigns       Campaign[]
@@ -440,17 +440,6 @@ model RegistrationNodeEntry {
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
-// Permissions
-model Permission {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-
-  // type       SystemPermissionEnum TODO: Add enum type, and start using these permissions EVERYWHERE instead of enum
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
-}
-
 enum SystemPermissionEnum {
   CAN_ACCESS_ADMIN_PANEL
   CAN_EDIT_DIALOGUE
@@ -481,36 +470,64 @@ enum RoleTypeEnum {
 }
 
 model Role {
-  id          String                 @id @default(cuid())
-  name        String
-  type        RoleTypeEnum           @default(value: USER)
-  isPrivate   Boolean                @default(false)
-  permissions SystemPermissionEnum[]
-  users       UserOfCustomer[]
-  Customer    Customer?              @relation(fields: [customerId], references: [id])
-  customerId  String?
+  id        String       @id @default(cuid())
+  name      String
+  type      RoleTypeEnum @default(value: USER)
+  isPrivate Boolean      @default(false)
+
+  users      UserOfCustomer[]
+  Customer   Customer?        @relation(fields: [customerId], references: [id])
+  customerId String?
+
+  permissions PermissionOfWorkspaceRole[]
 
   @@unique([id, name])
 }
 
+// Permissions
+model Permission {
+  id          String               @id @default(cuid())
+  description String?
+  isEnabled   Boolean              @default(true)
+  type        SystemPermissionEnum
+
+  roles PermissionOfWorkspaceRole[]
+  users User[]
+}
+
+model PermissionOfWorkspaceRole {
+  workspace   Customer @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+
+  role   Role   @relation(fields: [roleId], references: [id])
+  roleId String
+
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId String
+
+  @@id([permissionId, workspaceId, roleId])
+}
+
 model User {
-  id                 String                 @id @default(cuid())
-  createdAt          DateTime               @default(now())
-  updatedAt          DateTime?              @updatedAt
-  email              String                 @unique
-  lastLoggedIn       DateTime?
-  password           String?
-  phone              String?
-  firstName          String?
-  lastName           String?
-  triggers           Trigger[]
-  customers          UserOfCustomer[]
-  globalPermissions  SystemPermissionEnum[]
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
+  email        String    @unique
+  lastLoggedIn DateTime?
+  password     String?
+  phone        String?
+  firstName    String?
+  lastName     String?
+
   loginToken         String?
   loginTokenExpiry   DateTime?
   refreshToken       String?
   refreshTokenExpiry DateTime?
   lastActivity       DateTime?
+
+  globalPermissions Permission[]
+  triggers          Trigger[]
+  customers         UserOfCustomer[]
 }
 
 model UserOfCustomer {

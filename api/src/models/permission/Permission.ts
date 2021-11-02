@@ -1,16 +1,21 @@
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { SystemPermissionEnum } from '@prisma/client';
+import { UserInputError } from 'apollo-server-express';
 
 import { CustomerType } from '../customer/Customer';
-import PermissionService from './PermissionService';
+import { SystemPermission } from '../role/Role';
+import PermissionService, { CreatePermissionInput } from './PermissionService';
 
 export const PermissionType = objectType({
   name: 'PermssionType',
 
   definition(t) {
-    t.id('id');
     t.string('name');
     t.string('description', { nullable: true });
+    t.boolean('isEnabled');
+
     t.field('customer', { type: CustomerType, nullable: true });
+    t.field('type', { type: SystemPermission })
   },
 });
 
@@ -21,6 +26,8 @@ export const PermissionInput = inputObjectType({
     t.string('customerId');
     t.string('name');
     t.string('description', { nullable: true });
+
+    t.field('type', { type: SystemPermission });
   },
 });
 
@@ -30,21 +37,24 @@ export const PermissionMutations = extendType({
   definition(t) {
     t.field('createPermission', {
       type: PermissionType,
-      args: { data: PermissionInput },
+      args: { input: PermissionInput },
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        if (!args.data?.name || !args.data?.customerId) {
-          throw new Error('Name and/or customerID not valid!');
-        }
+        if (!args.input?.name || !args.input?.customerId || !args.input?.type) {
+          throw new UserInputError('Name and/or customerID not valid!');
+        };
 
-        const permission = await ctx.services.permissionService.createPermission(
-          args.data?.name,
-          args.data?.customerId,
-          args.data?.description,
-        );
+        const createPermissionInput: CreatePermissionInput = {
+          customerId: args?.input.customerId,
+          name: args?.input.name,
+          description: args?.input?.description,
+          type: args?.input?.type
+        };
 
-        return permission;
+        const permission = await ctx.services.permissionService.createPermission(createPermissionInput);
+
+        return permission || null;
       },
     });
   },

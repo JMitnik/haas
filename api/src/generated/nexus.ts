@@ -323,6 +323,7 @@ export interface NexusGenInputs {
     customerId?: string | null; // String
     description?: string | null; // String
     name?: string | null; // String
+    type?: NexusGenEnums['SystemPermission'] | null; // SystemPermission
   }
   QuestionNodeWhereInputType: { // input type
     id?: string | null; // ID
@@ -733,8 +734,9 @@ export interface NexusGenRootTypes {
   PermssionType: { // root type
     customer?: NexusGenRootTypes['Customer'] | null; // Customer
     description?: string | null; // String
-    id: string; // ID!
+    isEnabled: boolean; // Boolean!
     name: string; // String!
+    type: NexusGenEnums['SystemPermission']; // SystemPermission!
   }
   PreviewDataType: { // root type
     colors: string[]; // [String!]!
@@ -1306,8 +1308,9 @@ export interface NexusGenFieldTypes {
   PermssionType: { // field return type
     customer: NexusGenRootTypes['Customer'] | null; // Customer
     description: string | null; // String
-    id: string; // ID!
+    isEnabled: boolean; // Boolean!
     name: string; // String!
+    type: NexusGenEnums['SystemPermission']; // SystemPermission!
   }
   PreviewDataType: { // field return type
     colors: string[]; // [String!]!
@@ -1595,7 +1598,7 @@ export interface NexusGenArgTypes {
       input?: NexusGenInputs['createJobProcessLocationInput'] | null; // createJobProcessLocationInput
     }
     createPermission: { // args
-      data?: NexusGenInputs['PermissionInput'] | null; // PermissionInput
+      input?: NexusGenInputs['PermissionInput'] | null; // PermissionInput
     }
     createQuestion: { // args
       input?: NexusGenInputs['CreateQuestionNodeInputType'] | null; // CreateQuestionNodeInputType

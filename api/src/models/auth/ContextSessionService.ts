@@ -80,7 +80,7 @@ class ContextSessionService {
     const user = await this.userService.findUserContext(decodedUserId);
 
     const customersAndPermissions = user?.customers.map((customer) => ({
-      permissions: customer.role.permissions,
+      permissions: customer.role.permissions.map((per) => per.permission),
       id: customer.customer.id,
     }));
 

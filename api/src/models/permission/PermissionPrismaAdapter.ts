@@ -17,11 +17,12 @@ class PermissionPrismaAdapter {
       data: {
         name: input.name,
         description: input.description,
-        Customer: input.customerId ? {
+        type: input.type,
+        Customer: {
           connect: {
             id: input.customerId,
           },
-        } : undefined,
+        },
       },
     });
   };
@@ -35,12 +36,10 @@ class PermissionPrismaAdapter {
     });
   };
 
-  async deleteMany(permissionIds: string[]) {
+  async deleteManyByWorkspaceId(workspaceId: string) {
     return this.prisma.permission.deleteMany({
       where: {
-        id: {
-          in: permissionIds,
-        },
+        customerId: workspaceId,
       },
     });
   };

@@ -207,10 +207,23 @@ class UserPrismaAdapter {
         id: userId,
       },
       include: {
+        globalPermissions: {
+          select: {
+            type: true,
+          }
+        },
         customers: {
           include: {
             customer: true,
-            role: true,
+            role: {
+              include: {
+                permissions: {
+                  include: {
+                    permission: true,
+                  }
+                },
+              }
+            },
           },
         },
       },
@@ -328,6 +341,7 @@ class UserPrismaAdapter {
         id: userId,
       },
       include: {
+        globalPermissions: true,
         customers: {
           include: {
             customer: true,
