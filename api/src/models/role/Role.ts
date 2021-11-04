@@ -1,4 +1,4 @@
-import { enumType, extendType, inputObjectType, objectType, queryField } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
 
 import { PaginationWhereInput } from '../general/Pagination';
@@ -125,12 +125,31 @@ export const RoleQueries = extendType({
   },
 });
 
+export const UpdatePermissionsInput = inputObjectType({
+  name: 'UpdatePermissionsInput',
+  definition(t) {
+    t.string('roleId');
+    t.list.field('permissions', { type: SystemPermission });
+  },
+});
+
 export const PermissionIdsInput = inputObjectType({
   name: 'PermissionIdsInput',
   definition(t) {
     t.list.string('ids');
   },
 });
+
+export const UpdatePermissionsMutationResolver = mutationField('updatePermissions', {
+  type: RoleType,
+  nullable: true,
+  args: { input: UpdatePermissionsInput },
+  resolve(parent, args, ctx) {
+    if (!args.input?.roleId) throw new UserInputError('No RoleId provided to update permissions for!');
+
+    return ctx.services.roleService.updatePermissions(args.input.roleId, args.input.permissions || []);
+  }
+})
 
 export const RoleMutations = extendType({
   type: 'Mutation',
@@ -171,6 +190,8 @@ export const RoleMutations = extendType({
 });
 
 export default [
+  UpdatePermissionsInput,
+  UpdatePermissionsMutationResolver,
   FindRoleInput,
   FindRoleByIdResolver,
   RoleConnection,

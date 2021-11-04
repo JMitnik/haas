@@ -834,6 +834,7 @@ export type Mutation = {
   editTrigger: TriggerType;
   createTrigger: TriggerType;
   createPermission?: Maybe<PermssionType>;
+  updatePermissions?: Maybe<RoleType>;
   createRole: RoleType;
   updateRoles: RoleType;
   singleUpload: ImageType;
@@ -971,6 +972,11 @@ export type MutationCreateTriggerArgs = {
 
 export type MutationCreatePermissionArgs = {
   data?: Maybe<PermissionInput>;
+};
+
+
+export type MutationUpdatePermissionsArgs = {
+  input?: Maybe<UpdatePermissionsInput>;
 };
 
 
@@ -1797,6 +1803,11 @@ export type UpdateCtaInputType = {
   form?: Maybe<FormNodeInputType>;
 };
 
+export type UpdatePermissionsInput = {
+  roleId?: Maybe<Scalars['String']>;
+  permissions?: Maybe<Array<SystemPermission>>;
+};
+
 export type UpdateQuestionNodeInputType = {
   id: Scalars['ID'];
   customerId?: Maybe<Scalars['ID']>;
@@ -2545,6 +2556,19 @@ export type HandleUserStateInWorkspaceMutation = (
       & Pick<UserType, 'email'>
     ) }
   ) }
+);
+
+export type UpdatePermissionsMutationVariables = Exact<{
+  input: UpdatePermissionsInput;
+}>;
+
+
+export type UpdatePermissionsMutation = (
+  { __typename?: 'Mutation' }
+  & { updatePermissions?: Maybe<(
+    { __typename?: 'RoleType' }
+    & Pick<RoleType, 'permissions'>
+  )> }
 );
 
 export const DeliveryEventFragmentFragmentDoc = gql`
@@ -3950,3 +3974,36 @@ export function useHandleUserStateInWorkspaceMutation(baseOptions?: Apollo.Mutat
 export type HandleUserStateInWorkspaceMutationHookResult = ReturnType<typeof useHandleUserStateInWorkspaceMutation>;
 export type HandleUserStateInWorkspaceMutationResult = Apollo.MutationResult<HandleUserStateInWorkspaceMutation>;
 export type HandleUserStateInWorkspaceMutationOptions = Apollo.BaseMutationOptions<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>;
+export const UpdatePermissionsDocument = gql`
+    mutation updatePermissions($input: UpdatePermissionsInput!) {
+  updatePermissions(input: $input) {
+    permissions
+  }
+}
+    `;
+export type UpdatePermissionsMutationFn = Apollo.MutationFunction<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>;
+
+/**
+ * __useUpdatePermissionsMutation__
+ *
+ * To run a mutation, you first call `useUpdatePermissionsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdatePermissionsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updatePermissionsMutation, { data, loading, error }] = useUpdatePermissionsMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdatePermissionsMutation(baseOptions?: Apollo.MutationHookOptions<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>(UpdatePermissionsDocument, options);
+      }
+export type UpdatePermissionsMutationHookResult = ReturnType<typeof useUpdatePermissionsMutation>;
+export type UpdatePermissionsMutationResult = Apollo.MutationResult<UpdatePermissionsMutation>;
+export type UpdatePermissionsMutationOptions = Apollo.BaseMutationOptions<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>;

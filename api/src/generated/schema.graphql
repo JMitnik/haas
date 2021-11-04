@@ -755,6 +755,7 @@ type Mutation {
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
+  updatePermissions(input: UpdatePermissionsInput): RoleType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
@@ -1316,6 +1317,11 @@ input UpdateCTAInputType {
   share: ShareNodeInputType
   title: String
   type: QuestionNodeTypeEnum
+}
+
+input UpdatePermissionsInput {
+  permissions: [SystemPermission!]
+  roleId: String
 }
 
 input UpdateQuestionNodeInputType {
