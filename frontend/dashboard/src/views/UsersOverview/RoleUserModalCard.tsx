@@ -5,6 +5,20 @@ import React from 'react';
 
 import { Checkbox, useToast } from '@chakra-ui/core';
 import { SystemPermission, useFindRoleByIdQuery, useUpdatePermissionsMutation } from 'types/generated-types';
+import styled, { css } from 'styled-components';
+
+const CheckBoxCard = styled(UI.Card) <{ isChecked?: boolean }>`
+  ${({ isChecked }) => css`
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid #F9F6EE;
+    ${isChecked && css`
+      border: 1px solid #3182ce;
+    `}
+    
+  `}
+ 
+`;
 
 interface RoleUserModalCardProps {
   id: string;
@@ -64,7 +78,7 @@ const RoleUserForm = ({ permissionsState, allPermissions, permissionsArray, role
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <UI.Grid gridTemplateColumns="1fr 1fr">
+      <UI.Grid paddingLeft={1} paddingRight={1} gridTemplateColumns="1fr 1fr">
         {allPermissions?.map((permission) => (
           <Controller
             control={control}
@@ -72,12 +86,25 @@ const RoleUserForm = ({ permissionsState, allPermissions, permissionsArray, role
             defaultValue={permissionsArray?.includes(permission)}
             key={permission}
             render={({ onChange, value }) => (
-              <Checkbox
-                isChecked={value}
-                onChange={() => onChange(!value)}
-              >
-                {permission}
-              </Checkbox>
+              <CheckBoxCard isChecked={value} padding={1} onClick={() => onChange(!value)}>
+                <UI.Flex justifyContent="flex-end">
+                  <Checkbox
+                    isChecked={value}
+                    onChange={() => onChange(!value)}
+                  />
+                </UI.Flex>
+
+                <UI.Text
+                  style={{ transform: 'translateY(-5px)' }}
+                  fontWeight="bold"
+                  color="#4A5568"
+                >
+                  {permission.replaceAll('_', ' ')}
+
+                </UI.Text>
+                <UI.Text>bla bla blab bla bla bla bla bla bla</UI.Text>
+              </CheckBoxCard>
+
             )}
           />
         ))}
