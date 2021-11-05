@@ -34,10 +34,10 @@ export const RoleType = objectType({
       nullable: true,
       type: SystemPermission,
 
-      async resolve(parent, args, ctx) {
-        const permissions = await ctx.services.roleService.getPermissionsByRoleId(parent.id);
-        return permissions;
-      },
+      // async resolve(parent, args, ctx) {
+      //   const permissions = await ctx.services.roleService.getPermissionsByRoleId(parent.id);
+      //   return permissions;
+      // },
     });
   },
 });
@@ -72,6 +72,7 @@ export const FindRoleInput = inputObjectType({
   name: 'FindRoleInput',
   definition(t) {
     t.string('roleId');
+    t.string('userId');
   },
 });
 
@@ -81,9 +82,12 @@ export const FindRoleByIdResolver = queryField('findRoleById', {
   args: { input: FindRoleInput },
   async resolve(parent, args, ctx) {
     if (!args.input?.roleId) throw new UserInputError('No RoleId provided!');
+    if (!args.input?.userId) throw new UserInputError('No UserId provided!');
 
-    const role = await ctx.services.roleService.findRoleById(args.input.roleId);
+    console.log('args.input: ', args.input)
 
+    const role = await ctx.services.roleService.findRoleById(args.input.roleId, args.input.userId);
+    console.log('ROLE: ', role);
     if (!role) return null;
 
     return { role } as any;

@@ -16,8 +16,12 @@ class RoleService {
     this.rolePrismaAdapter = new RolePrismaAdapter(prismaClient);
   };
 
-  async findRoleById(roleId: string) {
-    return this.rolePrismaAdapter.getRoleById(roleId);
+  async findRoleById(roleId: string, userId: string) {
+    const globalPermissions = await this.rolePrismaAdapter.getGlobalPermissions(userId);
+    const role = await this.rolePrismaAdapter.getRoleById(roleId);
+    const roleIncludingGlobalPermissions = [...role?.permissions || [], ...globalPermissions || []];
+    console.log('role including', roleIncludingGlobalPermissions);
+    return { ...role, permissions: roleIncludingGlobalPermissions };
   }
 
   async getPermissionsByRoleId(roleId: string): Promise<SystemPermissionEnum[]> {

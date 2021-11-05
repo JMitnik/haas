@@ -22,6 +22,7 @@ const CheckBoxCard = styled(UI.Card) <{ isChecked?: boolean }>`
 
 interface RoleUserModalCardProps {
   id: string;
+  userId: string;
   onClose: () => void;
 }
 
@@ -38,7 +39,9 @@ interface PermissionsType {
   isActive: boolean;
 }
 
-const RoleUserForm = ({ permissionsState, allPermissions, permissionsArray, roleId, onClose }: RoleUserFormProps) => {
+const RoleUserForm = (
+  { permissionsState, allPermissions, permissionsArray, roleId, onClose }: RoleUserFormProps,
+) => {
   const { t } = useTranslation();
   const toast = useToast();
 
@@ -86,11 +89,16 @@ const RoleUserForm = ({ permissionsState, allPermissions, permissionsArray, role
             defaultValue={permissionsArray?.includes(permission)}
             key={permission}
             render={({ onChange, value }) => (
-              <CheckBoxCard isChecked={value} padding={1} onClick={() => onChange(!value)}>
+              <CheckBoxCard
+                isChecked={value}
+                padding={1}
+                onClick={() => permission !== 'CAN_ACCESS_ADMIN_PANEL' && onChange(!value)}
+              >
                 <UI.Flex justifyContent="flex-end">
                   <Checkbox
+                    isDisabled={permission === 'CAN_ACCESS_ADMIN_PANEL'}
                     isChecked={value}
-                    onChange={() => onChange(!value)}
+                    onChange={() => permission !== 'CAN_ACCESS_ADMIN_PANEL' && onChange(!value)}
                   />
                 </UI.Flex>
 
@@ -102,7 +110,7 @@ const RoleUserForm = ({ permissionsState, allPermissions, permissionsArray, role
                   {permission.replaceAll('_', ' ')}
 
                 </UI.Text>
-                <UI.Text>bla bla blab bla bla bla bla bla bla</UI.Text>
+                <UI.Text>{t(`permissions:${permission.toLowerCase()}`)}</UI.Text>
               </CheckBoxCard>
 
             )}
@@ -110,7 +118,7 @@ const RoleUserForm = ({ permissionsState, allPermissions, permissionsArray, role
         ))}
       </UI.Grid>
 
-      <UI.Flex justifyContent="flex-end">
+      <UI.Flex justifyContent="flex-end" pr={4}>
         <UI.Button variantColor="teal" type="submit">
           {t('save')}
         </UI.Button>
@@ -126,13 +134,15 @@ const RoleUserForm = ({ permissionsState, allPermissions, permissionsArray, role
  * @returns a pop-up modal displaying User role specific information, on this modal is a form where u can set the
  * permissions of a selected role
  */
-export const RoleUserModalCard = ({ id, onClose }: RoleUserModalCardProps) => {
+export const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
   const { t } = useTranslation();
   const { data, loading, error } = useFindRoleByIdQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
       input: {
         roleId: id,
+        // @ts-ignore
+        userId,
       },
     },
   });

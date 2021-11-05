@@ -571,6 +571,7 @@ export type FailedDeliveryModel = {
 
 export type FindRoleInput = {
   roleId?: Maybe<Scalars['String']>;
+  userId?: Maybe<Scalars['String']>;
 };
 
 export type FontSettings = {

@@ -9,6 +9,15 @@ class RolePrismaAdapter {
     this.prisma = prismaClient;
   }
 
+  async getGlobalPermissions(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      }
+    });
+    return user?.globalPermissions;
+  }
+
   getRoleById(roleId: string) {
     return this.prisma.role.findUnique({
       where: {

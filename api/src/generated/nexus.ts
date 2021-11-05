@@ -207,6 +207,7 @@ export interface NexusGenInputs {
   }
   FindRoleInput: { // input type
     roleId?: string | null; // String
+    userId?: string | null; // String
   }
   FormNodeEntryFieldInput: { // input type
     email?: string | null; // String
@@ -769,6 +770,7 @@ export interface NexusGenRootTypes {
     id: string; // ID!
     name: string; // String!
     nrPermissions?: number | null; // Int
+    permissions?: NexusGenEnums['SystemPermission'][] | null; // [SystemPermission!]
     roleId?: string | null; // String
   }
   RoleWithPermissionsType: { // root type

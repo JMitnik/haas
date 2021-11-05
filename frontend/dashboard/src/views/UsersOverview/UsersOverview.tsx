@@ -545,6 +545,8 @@ const UsersOverview = () => {
                       onClose={() => goToUsersOverview()}
                       // @ts-ignore
                       id={match?.params?.roleId}
+                      // @ts-ignore
+                      userId={match?.params?.userId}
                     />
                   </UI.Modal>
                 </motion.div>

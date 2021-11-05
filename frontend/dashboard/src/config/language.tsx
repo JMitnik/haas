@@ -2285,6 +2285,76 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Niederländisch',
     },
   },
+  permissions: {
+    can_access_admin_panel: {
+      en: 'This system-wide permission allows a user to do everything (overrules others) within the haas dashboard. It is specified per user and cannot be set within a workspace.',
+      de: 'Diese systemweite Berechtigung ermöglicht es einem Benutzer, alles innerhalb des haas-Dashboards zu tun. Sie wird pro Benutzer angegeben und kann nicht innerhalb eines Arbeitsbereichs festgelegt werden.',
+    },
+    can_edit_dialogue: {
+      en: 'This permissions allows a user to change the settings of a dialogue.',
+      de: 'Diese Berechtigungen ermöglichen es einem Benutzer, die Einstellungen eines Dialogs zu ändern.',
+    },
+    can_build_dialogue: {
+      en: 'This permissions gives a user access to the dialogue builder and trigger overview',
+      de: 'Diese Berechtigungen geben einem Benutzer Zugriff auf den Dialog-Builder und die Trigger-Übersicht',
+    },
+    can_view_dialogue: {
+      en: 'This permission allows a user to view the dialogue builder',
+      de: 'Diese Berechtigung ermöglicht es einem Benutzer, den Dialog-Builder anzuzeigen',
+    },
+    can_delete_dialogue: {
+      en: 'This permission allows a user to remove a dialogue from a workspace',
+      de: 'Mit dieser Berechtigung kann ein Benutzer einen Dialog aus einem Arbeitsbereich entfernen',
+    },
+    can_view_dialogue_analytics: {
+      en: 'This permission allows a user to view the analytics page of a workspace',
+      de: 'Mit dieser Berechtigung kann ein Benutzer die Analyseseite eines Arbeitsbereichs anzeigen',
+    },
+    can_view_users: {
+      en: 'This permission allows a user to view the users overview',
+      de: 'Mit dieser Berechtigung kann ein Benutzer die Benutzerübersicht anzeigen',
+    },
+    can_add_users: {
+      en: 'This permission allows a user to add new users to a workspace',
+      de: 'Mit dieser Berechtigung kann ein Benutzer einem Arbeitsbereich neue Benutzer hinzufügen',
+    },
+    can_delete_users: {
+      en: 'This permission allows a user to remove other users from a workspace',
+      de: 'Mit dieser Berechtigung kann ein Benutzer andere Benutzer aus einem Arbeitsbereich entfernen',
+    },
+    can_edit_users: {
+      en: 'This permission allows a user to edit users within a workspace',
+      de: 'Mit dieser Berechtigung kann ein Benutzer Benutzer innerhalb eines Arbeitsbereichs bearbeiten',
+    },
+    can_create_triggers: {
+      en: 'This permissions allows a user to create triggers in the action overview',
+      de: 'Diese Berechtigungen ermöglichen es einem Benutzer, Trigger in der Aktionsübersicht zu erstellen',
+    },
+    can_delete_triggers: {
+      en: 'This permission allows a users to delete triggers from the action overview',
+      de: 'Diese Berechtigung ermöglicht es einem Benutzer, Trigger aus der Aktionsübersicht zu löschen',
+    },
+    can_delete_workspace: {
+      en: 'This permission allows a user to remove an entire workspace from the dashboard',
+      de: 'Mit dieser Berechtigung kann ein Benutzer einen gesamten Arbeitsbereich aus dem Dashboard entfernen.',
+    },
+    can_edit_workspace: {
+      en: 'This permissions allows a user to edit the workspace settings',
+      de: 'Mit diesen Berechtigungen kann ein Benutzer die Arbeitsbereichseinstellungen bearbeiten',
+    },
+    can_view_campaigns: {
+      en: 'This permissions allows users to access the campaign overview of a workspace',
+      de: 'Mit dieser Berechtigung können Benutzer auf die Kampagnenübersicht eines Arbeitsbereichs zugreifen',
+    },
+    can_create_campaigns: {
+      en: 'This permission allows a user to create new campaigns for a workspace',
+      de: 'Mit dieser Berechtigung kann ein Nutzer neue Kampagnen für einen Arbeitsbereich erstellen',
+    },
+    can_create_deliveries: {
+      en: 'This permissions allows a user to create new deliveries for a campaign',
+      de: 'Mit dieser Berechtigung kann ein Benutzer neue Lieferungen für eine Kampagne erstellen',
+    },
+  },
   validation: {
     field_required: {
       en: 'This field is required.',
