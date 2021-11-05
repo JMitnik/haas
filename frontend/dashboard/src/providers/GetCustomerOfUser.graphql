@@ -1,0 +1,22 @@
+query getCustomerOfUser($input: UserOfCustomerInput) {
+    UserOfCustomer(input: $input) {
+      customer {
+        id
+        name
+        slug
+        settings {
+          logoUrl
+          colourSettings {
+            primary
+          }
+        }
+      }
+      role {
+        name
+        permissions
+      }
+      user {
+        id
+      }
+    }
+  }

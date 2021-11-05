@@ -134,7 +134,7 @@ const RoleUserForm = (
  * @returns a pop-up modal displaying User role specific information, on this modal is a form where u can set the
  * permissions of a selected role
  */
-export const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
+const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
   const { t } = useTranslation();
   const { data, loading, error } = useFindRoleByIdQuery({
     fetchPolicy: 'cache-and-network',

@@ -1975,6 +1975,36 @@ export type SessionFragmentFragment = (
   )> }
 );
 
+export type GetCustomerOfUserQueryVariables = Exact<{
+  input?: Maybe<UserOfCustomerInput>;
+}>;
+
+
+export type GetCustomerOfUserQuery = (
+  { __typename?: 'Query' }
+  & { UserOfCustomer?: Maybe<(
+    { __typename?: 'UserCustomer' }
+    & { customer: (
+      { __typename?: 'Customer' }
+      & Pick<Customer, 'id' | 'name' | 'slug'>
+      & { settings?: Maybe<(
+        { __typename?: 'CustomerSettings' }
+        & Pick<CustomerSettings, 'logoUrl'>
+        & { colourSettings?: Maybe<(
+          { __typename?: 'ColourSettings' }
+          & Pick<ColourSettings, 'primary'>
+        )> }
+      )> }
+    ), role: (
+      { __typename?: 'RoleType' }
+      & Pick<RoleType, 'name' | 'permissions'>
+    ), user: (
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'id'>
+    ) }
+  )> }
+);
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -2674,6 +2704,61 @@ export const SessionFragmentFragmentDoc = gql`
 }
     ${NodeEntryFragmentFragmentDoc}
 ${DeliveryFragmentFragmentDoc}`;
+export const GetCustomerOfUserDocument = gql`
+    query getCustomerOfUser($input: UserOfCustomerInput) {
+  UserOfCustomer(input: $input) {
+    customer {
+      id
+      name
+      slug
+      settings {
+        logoUrl
+        colourSettings {
+          primary
+        }
+      }
+    }
+    role {
+      name
+      permissions
+    }
+    user {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCustomerOfUserQuery__
+ *
+ * To run a query within a React component, call `useGetCustomerOfUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCustomerOfUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCustomerOfUserQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetCustomerOfUserQuery(baseOptions?: Apollo.QueryHookOptions<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(GetCustomerOfUserDocument, options);
+      }
+export function useGetCustomerOfUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(GetCustomerOfUserDocument, options);
+        }
+export type GetCustomerOfUserQueryHookResult = ReturnType<typeof useGetCustomerOfUserQuery>;
+export type GetCustomerOfUserLazyQueryHookResult = ReturnType<typeof useGetCustomerOfUserLazyQuery>;
+export type GetCustomerOfUserQueryResult = Apollo.QueryResult<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>;
+export function refetchGetCustomerOfUserQuery(variables?: GetCustomerOfUserQueryVariables) {
+      return { query: GetCustomerOfUserDocument, variables: variables }
+    }
 export const MeDocument = gql`
     query me {
   me {

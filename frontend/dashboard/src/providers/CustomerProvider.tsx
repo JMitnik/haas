@@ -1,46 +1,16 @@
 import { useHistory, useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
 import React, { useContext, useEffect, useState } from 'react';
-import { gql } from '@apollo/client';
 
-import { SystemPermission } from 'types/globalTypes';
-import {
-  getCustomerOfUser_UserOfCustomer_customer as Customer,
-  getCustomerOfUser_UserOfCustomer_role as Role,
-  getCustomerOfUser as UserCustomerData,
-  getCustomerOfUserVariables as UserCustomerVariables,
-} from './__generated__/getCustomerOfUser';
+import { Customer, RoleType, SystemPermission, useGetCustomerOfUserQuery } from 'types/generated-types';
+
 import { useUser } from './UserProvider';
 
 const CustomerContext = React.createContext({} as CustomerContextProps);
 
-const getCustomerOfUser = gql`
-  query getCustomerOfUser($input: UserOfCustomerInput) {
-    UserOfCustomer(input: $input) {
-      customer {
-        id
-        name
-        slug
-        settings {
-          logoUrl
-          colourSettings {
-            primary
-          }
-        }
-      }
-      role {
-        name
-        permissions
-      }
-      user {
-        id
-      }
-    }
-  }
-`;
-
 interface CustomerProps extends Customer {
-  userRole: Role;
+  userRole: {
+    __typename?: 'RoleType' | undefined;
+  } & Pick<RoleType, 'name' | 'permissions'>;
 }
 
 interface CustomerContextProps {
@@ -75,7 +45,7 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [activeCustomer]);
 
-  useQuery<UserCustomerData, UserCustomerVariables>(getCustomerOfUser, {
+  useGetCustomerOfUserQuery({
     skip: !customerSlug,
     variables: {
       input: {
@@ -84,7 +54,7 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
       },
     },
     onCompleted: (data) => {
-      const customer = data.UserOfCustomer?.customer;
+      const customer: any = data.UserOfCustomer?.customer;
       const role = data.UserOfCustomer?.role;
 
       if (!customer) {
