@@ -1,10 +1,8 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { ApolloQueryResult, gql, useMutation, useQuery } from '@apollo/client';
+import { useHistory } from 'react-router';
 import React, { useContext, useEffect, useState } from 'react';
 
-import { useHistory } from 'react-router';
-import { gql } from '@apollo/client';
-
-import { me as GetUserData, me_me as User } from './__generated__/me';
+import { Exact, MeQuery, useMeQuery } from 'types/generated-types';
 
 const POLL_INTERVAL_SECONDS = 60;
 
@@ -16,46 +14,26 @@ const refreshAccessTokenQuery = gql`
   }
 `;
 
-export const queryMe = gql`
-  query me {
-    me {
-      id
-      email
-      firstName
-      lastName
-      phone
-      globalPermissions
-      userCustomers {
-        customer {
-          id
-          name
-          slug
-        }
-        role {
-          name
-          permissions
-        }
-      }
-    }
-  }
-`;
-
 const logoutMutation = gql`
   mutation logout {
     logout
   }
 `;
 
+type MeUserType = MeQuery['me'];
+
 interface AuthContextProps {
-  user: User | null;
+  user: MeUserType | null;
   userIsValid?: () => boolean;
   logout: () => void;
   accessToken: string | null;
   isLoggedIn: boolean;
   isInitializingUser: boolean;
   setAccessToken: (token: string) => void;
-  setUser: (userData: User) => void;
-  refreshUser: () => void;
+  setUser: (userData: MeUserType) => void;
+  refreshUser: (variables?: Partial<Exact<{
+    [key: string]: never;
+  }>> | undefined) => Promise<ApolloQueryResult<MeQuery>>;
   hardRefreshUser: () => void;
 }
 
@@ -72,7 +50,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }, 1000);
   };
 
-  const { data, refetch: getUser } = useQuery<GetUserData>(queryMe, {
+  const { data, refetch: getUser } = useMeQuery({
     onCompleted: () => {
       stopInitializingUser();
     },

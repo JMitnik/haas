@@ -8,9 +8,9 @@ import {
 import { Mail, Phone, User } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
 import { gql, useMutation } from '@apollo/client';
-import { queryMe, useUser } from 'providers/UserProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
+import { useUser } from 'providers/UserProvider';
 
 import { useTranslation } from 'react-i18next';
 import React from 'react';
@@ -52,12 +52,13 @@ const editUserMutation = gql`
 
 const EditMeForm = () => {
   const { t } = useTranslation();
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
   const toast = useToast();
   const history = useHistory();
 
   const [editUser, { loading: isLoading, error: serverErrors }] = useMutation(editUserMutation, {
     onCompleted: () => {
+      refreshUser();
       toast({
         title: t('toast:user_edited'),
         description: t('toast:user_edited_helper'),
@@ -71,6 +72,7 @@ const EditMeForm = () => {
       }, 500);
     },
     onError: () => {
+      refreshUser();
       toast({
         title: 'Something went wrong!',
         description: 'Currently unable to edit your detail. Please try again.',
@@ -79,7 +81,6 @@ const EditMeForm = () => {
         duration: 1500,
       });
     },
-    refetchQueries: [{ query: queryMe }],
   });
 
   const form = useForm({

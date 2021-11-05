@@ -91,6 +91,7 @@ class UserService {
     const { customers, ...rest } = user;
 
     return customers?.map((customerOfUser) => ({
+      isActive: customerOfUser.isActive,
       customer: customerOfUser.customer,
       role: customerOfUser.role,
       user: rest, //TODO: check if changes to rest covers user: parent from resolver (parent === User),

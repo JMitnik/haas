@@ -7,7 +7,9 @@ const CustomerRoute = (props: RouteProps) => {
   const { user, isLoggedIn } = useUser();
   const { customerSlug } = useParams<{ customerSlug: string }>();
 
-  if (!isLoggedIn) return <Redirect to="/" />;
+  const userOfWorkspace = user?.userCustomers.find((c) => c.customer.slug === customerSlug);
+
+  if (!isLoggedIn || !userOfWorkspace?.isActive) return <Redirect to="/" />;
 
   const customer = user?.userCustomers.find((userCustomer: any) => userCustomer.customer.slug === customerSlug);
 
