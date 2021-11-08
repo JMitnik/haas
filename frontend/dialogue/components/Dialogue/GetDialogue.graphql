@@ -1,0 +1,36 @@
+query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
+  customer(slug: $customerSlug) {
+    id
+    dialogue(where: { slug: $dialogueSlug }) {
+      id
+      title
+      slug
+      publicTitle
+      creationDate
+      updatedAt
+      leafs {
+        id
+        title
+        type
+        links {
+          url
+          type
+          title
+          iconUrl
+          backgroundColor
+          buttonText
+          header
+          subHeader
+          imageUrl
+        }
+        share {
+          id
+          title
+          url
+          tooltip
+        }
+      }
+      customerId
+    }
+  }
+}
