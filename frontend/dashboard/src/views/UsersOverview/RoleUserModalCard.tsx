@@ -45,7 +45,7 @@ const RoleUserForm = (
   const { t } = useTranslation();
   const toast = useToast();
 
-  const [updatePermissions] = useUpdatePermissionsMutation({
+  const [updatePermissions, { loading }] = useUpdatePermissionsMutation({
     onCompleted: (data) => {
       console.log('Return data: ', data);
       onClose();
@@ -119,7 +119,7 @@ const RoleUserForm = (
       </UI.Grid>
 
       <UI.Flex justifyContent="flex-end" pr={4}>
-        <UI.Button variantColor="teal" type="submit">
+        <UI.Button isLoading={loading} variantColor="teal" type="submit">
           {t('save')}
         </UI.Button>
       </UI.Flex>
@@ -141,7 +141,6 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
     variables: {
       input: {
         roleId: id,
-        // @ts-ignore
         userId,
       },
     },
@@ -161,7 +160,7 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
   return (
     <UI.ModalCard onClose={onClose}>
       <UI.ModalHead>
-        <UI.ModalTitle>{t('details')}</UI.ModalTitle>
+        <UI.ModalTitle>{t('role_permissions')}</UI.ModalTitle>
       </UI.ModalHead>
       <UI.ModalBody>
         {error && (

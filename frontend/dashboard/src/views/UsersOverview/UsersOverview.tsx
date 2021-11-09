@@ -8,6 +8,7 @@ import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
+import * as Menu from 'components/Common/Menu';
 import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
 import { FormatTimestamp } from 'components/Common/DateAndTime';
@@ -32,6 +33,7 @@ import useAuth from 'hooks/useAuth';
 
 import { PopoverItem } from './UsersOverviewStyles';
 import { UserModalCard } from './UserModalCard';
+import { useMenu } from 'components/Common/Menu/useMenu';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
 import RoleUserModalCard from './RoleUserModalCard';
@@ -65,8 +67,12 @@ const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
   );
 };
 
+interface ContextualMenuProps {
+  userId: string;
+}
+
 const UsersOverview = () => {
-  const { canAccessAdmin, canEditUsers } = useAuth();
+  const { canAccessAdmin, canEditUsers, canDeleteUsers } = useAuth();
   const { activeCustomer } = useCustomer();
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { goToUserView, goToUsersOverview, goToRoleUserView } = useNavigator();
@@ -74,6 +80,9 @@ const UsersOverview = () => {
   const history = useHistory();
   const location = useLocation();
   const toast = useToast();
+
+  const { menuProps, openMenu, closeMenu, activeItem: contextUser } = useMenu<ContextualMenuProps>();
+
   const [activePaginatedUsersResult, setActivePaginatedUsersResult] = useState<GetPaginatedUsersQuery>();
 
   const [filter, setFilter] = useQueryParams({
@@ -148,7 +157,6 @@ const UsersOverview = () => {
 
   const [deleteUser] = useDeleteUserMutation({
     onCompleted: () => {
-      refetch();
       toast({
         title: 'User removed!',
         description: 'The user has been removed from the workspace.',
@@ -156,6 +164,7 @@ const UsersOverview = () => {
         position: 'bottom-right',
         duration: 1500,
       });
+      handleRefetch();
     },
     onError: () => {
       toast({
@@ -168,9 +177,7 @@ const UsersOverview = () => {
     },
   });
 
-  const handleDeleteUser = (event: any, userId: string) => {
-    event.stopPropagation();
-
+  const handleDeleteUser = (userId: string) => {
     deleteUser({
       variables: {
         input: {
@@ -181,8 +188,8 @@ const UsersOverview = () => {
     });
   };
 
-  const handleEditUser = (event: any, userId: string) => {
-    event.stopPropagation();
+  const handleEditUser = (userId: string) => {
+    // event.stopPropagation();
     history.push(`/dashboard/b/${customerSlug}/u/${userId}/edit`);
   };
 
@@ -422,8 +429,30 @@ const UsersOverview = () => {
               {t('user_workspace_access')}
             </Table.HeadingCell>
           </Table.HeadingRow>
+          <Menu.Base
+            {...menuProps}
+            onClose={closeMenu}
+          >
+            <Menu.Header>
+              {t('filter')}
+            </Menu.Header>
+
+            <Menu.Item
+              disabled={!canDeleteUsers && !canAccessAdmin}
+              onClick={() => handleEditUser(contextUser?.userId || '')}
+            >
+              {t('edit_user')}
+            </Menu.Item>
+            <Menu.Item
+              disabled={tableData.length === 1 || (!canEditUsers && !canAccessAdmin)}
+              onClick={() => handleDeleteUser(contextUser?.userId || '')}
+            >
+              {t('delete_user')}
+            </Menu.Item>
+          </Menu.Base>
           {tableData.map((user) => (
             <Table.Row
+              onContextMenu={(e) => openMenu(e, { userId: user.userId })}
               onClick={() => goToUserView(user.id)}
               isLoading={isLoading}
               key={user.id}
@@ -450,7 +479,7 @@ const UsersOverview = () => {
 
               <Table.Cell>
 
-                <Table.InnerCell>
+                <Table.InnerCell isDisabled={!canAccessAdmin && !canEditUsers}>
                   <UI.Div onClick={() => goToRoleUserView(user.id, user.role.id)}>
                     <UI.Helper>
                       {user?.role?.name}

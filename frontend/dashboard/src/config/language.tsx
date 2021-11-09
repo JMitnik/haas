@@ -315,6 +315,10 @@ const language = {
       en: "Delivery's dialogue was finished",
       de: 'Der Dialog der Lieferung wurde abgeschlossen',
     },
+    role_permissions: {
+      en: 'Role Permissions',
+      de: 'Rollenberechtigungen',
+    },
     details: {
       en: 'Details',
       de: 'Detail',
