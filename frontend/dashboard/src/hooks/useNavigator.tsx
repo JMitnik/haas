@@ -28,6 +28,10 @@ export const useNavigator = () => {
   const dialogueMatch = useRouteMatch<{ dialogueSlug: string }>({
     path: ROUTES.DIALOGUE_ROOT,
   });
+
+  const userOverviewMatch = useRouteMatch<{ dialogueSlug: string }>({
+    path: ROUTES.USERS_OVERVIEW,
+  });
   const history = useHistory();
   const location = useLocation();
 
@@ -122,5 +126,6 @@ export const useNavigator = () => {
     dialogueSlug,
     campaignId,
     campaignsMatch,
+    userOverviewMatch,
   };
 };

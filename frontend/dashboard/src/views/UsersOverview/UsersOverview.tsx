@@ -27,13 +27,13 @@ import { TableCellButtonContainer } from 'components/Common/Table';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useMenu } from 'components/Common/Menu/useMenu';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Searchbar from 'components/SearchBar';
 import useAuth from 'hooks/useAuth';
 
 import { PopoverItem } from './UsersOverviewStyles';
 import { UserModalCard } from './UserModalCard';
-import { useMenu } from 'components/Common/Menu/useMenu';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
 import RoleUserModalCard from './RoleUserModalCard';
@@ -75,7 +75,7 @@ const UsersOverview = () => {
   const { canAccessAdmin, canEditUsers, canDeleteUsers } = useAuth();
   const { activeCustomer } = useCustomer();
   const { customerSlug } = useParams<{ customerSlug: string }>();
-  const { goToUserView, goToUsersOverview, goToRoleUserView } = useNavigator();
+  const { goToUserView, goToUsersOverview, goToRoleUserView, userOverviewMatch } = useNavigator();
   const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
@@ -263,6 +263,8 @@ const UsersOverview = () => {
 
   const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
 
+  console.log('Location: ', location);
+  console.log('Dialogue match: ', userOverviewMatch);
   return (
     <>
       <UI.ViewHead>
@@ -553,58 +555,60 @@ const UsersOverview = () => {
             setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
           />
         </UI.Flex>
-
-        <AnimatePresence>
-          <Switch
-            location={location}
-            key={location.pathname}
-          >
-            <Route
-              path={ROUTES.ROLE_USER_VIEW}
+        {!userOverviewMatch?.isExact && (
+          <AnimatePresence>
+            <Switch
+              location={location}
+              key={location.pathname}
             >
-              {({ match }) => (
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <UI.Modal isOpen onClose={() => goToUsersOverview()}>
-                    <RoleUserModalCard
-                      onClose={() => goToUsersOverview()}
-                      // @ts-ignore
-                      id={match?.params?.roleId}
-                      // @ts-ignore
-                      userId={match?.params?.userId}
-                    />
-                  </UI.Modal>
-                </motion.div>
-              )}
-            </Route>
+              <Route
+                path={ROUTES.ROLE_USER_VIEW}
+              >
+                {({ match }) => (
+                  <motion.div
+                    key={location.pathname}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <UI.Modal isOpen onClose={() => goToUsersOverview()}>
+                      <RoleUserModalCard
+                        onClose={() => goToUsersOverview()}
+                        // @ts-ignore
+                        id={match?.params?.roleId}
+                        // @ts-ignore
+                        userId={match?.params?.userId}
+                      />
+                    </UI.Modal>
+                  </motion.div>
+                )}
+              </Route>
 
-            <Route
-              path={ROUTES.USER_VIEW}
-            >
-              {({ match }) => (
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <UI.Modal isOpen onClose={() => goToUsersOverview()}>
-                    <UserModalCard
-                      onClose={() => goToUsersOverview()}
-                      // @ts-ignore
-                      id={match?.params?.userId}
-                    />
-                  </UI.Modal>
-                </motion.div>
-              )}
-            </Route>
+              <Route
+                path={ROUTES.USER_VIEW}
+              >
+                {({ match }) => (
+                  <motion.div
+                    key={location.pathname}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <UI.Modal isOpen onClose={() => goToUsersOverview()}>
+                      <UserModalCard
+                        onClose={() => goToUsersOverview()}
+                        // @ts-ignore
+                        id={match?.params?.userId}
+                      />
+                    </UI.Modal>
+                  </motion.div>
+                )}
+              </Route>
 
-          </Switch>
-        </AnimatePresence>
+            </Switch>
+          </AnimatePresence>
+        )}
+
       </UI.ViewBody>
     </>
   );

@@ -160,7 +160,13 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
   return (
     <UI.ModalCard onClose={onClose}>
       <UI.ModalHead>
-        <UI.ModalTitle>{t('role_permissions')}</UI.ModalTitle>
+        <UI.ModalTitle>
+          {t('role_permissions')}
+          {' '}
+          -
+          {' '}
+          {userOfCustomer?.role?.name}
+        </UI.ModalTitle>
       </UI.ModalHead>
       <UI.ModalBody>
         {error && (
