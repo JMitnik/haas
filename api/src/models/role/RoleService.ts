@@ -19,7 +19,7 @@ class RoleService {
   async findRoleById(roleId: string, userId: string) {
     const globalPermissions = await this.rolePrismaAdapter.getGlobalPermissions(userId);
     const role = await this.rolePrismaAdapter.getRoleById(roleId);
-    const roleIncludingGlobalPermissions = [...role?.permissions || [], ...globalPermissions || []];
+    const roleIncludingGlobalPermissions = [...(role?.permissions || []), ...(globalPermissions || [])];
     return { ...role, permissions: roleIncludingGlobalPermissions };
   }
 
