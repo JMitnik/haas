@@ -189,7 +189,6 @@ const UsersOverview = () => {
   };
 
   const handleEditUser = (userId: string) => {
-    // event.stopPropagation();
     history.push(`/dashboard/b/${customerSlug}/u/${userId}/edit`);
   };
 
@@ -263,8 +262,6 @@ const UsersOverview = () => {
 
   const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
 
-  console.log('Location: ', location);
-  console.log('Dialogue match: ', userOverviewMatch);
   return (
     <>
       <UI.ViewHead>
