@@ -83,7 +83,7 @@ export const UserType = objectType({
       type: UserCustomerType,
 
       async resolve(parent, args, ctx) {
-        return ctx.services.userService.getUserCustomers(parent.id) as any;
+        return ctx.services.userService.getUserCustomers(parent.id);
       },
     });
 

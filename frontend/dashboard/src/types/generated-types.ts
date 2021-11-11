@@ -1989,11 +1989,14 @@ export type GetCustomerOfUserQuery = (
       & Pick<Customer, 'id' | 'name' | 'slug'>
       & { settings?: Maybe<(
         { __typename?: 'CustomerSettings' }
-        & Pick<CustomerSettings, 'logoUrl'>
+        & Pick<CustomerSettings, 'id' | 'logoUrl'>
         & { colourSettings?: Maybe<(
           { __typename?: 'ColourSettings' }
-          & Pick<ColourSettings, 'primary'>
+          & Pick<ColourSettings, 'id' | 'primary'>
         )> }
+      )>, campaigns: Array<(
+        { __typename?: 'CampaignType' }
+        & Pick<CampaignType, 'id' | 'label'>
       )> }
     ), role: (
       { __typename?: 'RoleType' }
@@ -2712,10 +2715,16 @@ export const GetCustomerOfUserDocument = gql`
       name
       slug
       settings {
+        id
         logoUrl
         colourSettings {
+          id
           primary
         }
+      }
+      campaigns {
+        id
+        label
       }
     }
     role {

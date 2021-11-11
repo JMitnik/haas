@@ -77,7 +77,6 @@ class UserPrismaAdapter {
       userOfCustomerWhereInput.user.lastName = { contains: filter.lastName, mode: 'insensitive' }
     }
 
-    // TODO: Add role search support
     if (filter?.role && userOfCustomerWhereInput.role) {
       userOfCustomerWhereInput.role.name = { contains: filter.role, mode: 'insensitive' }
     }
@@ -105,9 +104,6 @@ class UserPrismaAdapter {
     } if (filter?.orderBy?.by === 'email') {
       return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, filter.orderBy.desc ? 'desc' : 'asc');
     }
-    // } if (filter?.orderBy?.by === 'role') { // TODO: Implement this one
-    //   return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.role.name, orderBy.desc ? 'desc' : 'asc');
-    // }
 
     return usersOfCustomer;
   };

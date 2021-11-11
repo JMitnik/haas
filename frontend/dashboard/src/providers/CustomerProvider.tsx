@@ -54,7 +54,7 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
       },
     },
     onCompleted: (data) => {
-      const customer: any = data.UserOfCustomer?.customer;
+      const customer = data.UserOfCustomer?.customer;
       const role = data.UserOfCustomer?.role;
 
       if (!customer) {

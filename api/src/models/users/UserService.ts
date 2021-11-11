@@ -91,6 +91,7 @@ class UserService {
     const { customers, ...rest } = user;
 
     return customers?.map((customerOfUser) => ({
+      createdAt: customerOfUser.createdAt,
       isActive: customerOfUser.isActive,
       customer: customerOfUser.customer,
       role: customerOfUser.role,
