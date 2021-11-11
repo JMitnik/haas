@@ -46,8 +46,7 @@ const RoleUserForm = (
   const toast = useToast();
 
   const [updatePermissions, { loading }] = useUpdatePermissionsMutation({
-    onCompleted: (data) => {
-      console.log('Return data: ', data);
+    onCompleted: () => {
       onClose();
       toast({
         title: 'Updated permissions',
