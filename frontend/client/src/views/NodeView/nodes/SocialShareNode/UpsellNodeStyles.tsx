@@ -40,6 +40,13 @@ export const ImageContainer = styled(UI.Div)`
     max-height: 200px;
     object-fit: contain;
   }
+
+  svg {
+    max-height: 200px;
+    object-fit: contain;
+    width: auto;
+  }
+  
 `;
 
 interface RedirectButtonProps {
