@@ -17,6 +17,10 @@ const prisma = new PrismaClient({
   ]
 });
 
+prisma.$on('beforeExit', () => {
+  console.log('Prisma: BeforeExit is being run (it is disconnecting)');
+})
+
 if (process.env.ENVIRONMENT === 'debug') {
   prisma.$on('query', (event) => {
     console.log(event.query);
