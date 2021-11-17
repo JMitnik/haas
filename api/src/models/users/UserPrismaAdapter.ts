@@ -87,9 +87,6 @@ class UserPrismaAdapter {
     } if (filter?.orderBy?.by === 'email') {
       return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, filter.orderBy.desc ? 'desc' : 'asc');
     }
-    // } if (filter?.orderBy?.by === 'role') { // TODO: Implement this one
-    //   return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.role.name, orderBy.desc ? 'desc' : 'asc');
-    // }
 
     return usersOfCustomer;
   };
@@ -111,7 +108,7 @@ class UserPrismaAdapter {
   };
 
   /**
-   * 
+   *
    * @param customerSlug slug of a workspace
    * @param filter UserConnectionFilterInput
    * @returns amount of users based on filter criteria
@@ -124,7 +121,7 @@ class UserPrismaAdapter {
   };
 
   /**
-   * 
+   *
    * @param customerSlug slug of a workspace
    * @param filter UserConnectionFilterInput
    * @returns A subset of UserOfCustomer prisma entries based on specified filters
