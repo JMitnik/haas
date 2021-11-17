@@ -50,6 +50,7 @@ const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
 };
 
 const UsersOverview = () => {
+  console.log('tSADASDSDest');
   const { customerSlug, goToUserView, goToUsersOverview } = useNavigator();
   const { t } = useTranslation();
   const location = useLocation();
