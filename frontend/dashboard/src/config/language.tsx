@@ -2293,6 +2293,7 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
   },
 };
 
+// eslint-disable-next-line @typescript-eslint/no-shadow
 export const parseLanguages = (language: string, input: any, output?: any) => {
   output = output || {};
 
