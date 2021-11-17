@@ -119,7 +119,7 @@ export const InputLabel = styled.label`
 `;
 
 export const FormLabel = forwardRef((props: FormLabelProps, ref) => (
-  <ChakraFormLabel fontSize="0.8rem" color="gray.600" fontWeight="600" {...props} ref={ref} />
+  <ChakraFormLabel fontSize="0.9rem" color="gray.600" fontWeight="600" {...props} ref={ref} />
 ));
 
 interface InputProps extends ChakraInputProps {
@@ -613,7 +613,7 @@ export const RadioButtons = forwardRef(({ children, onChange, value, defaultValu
 ));
 
 export const InputGrid = (props: InputGridProps) => (
-  <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
+  <Grid gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
     {props.children}
   </Grid>
 );

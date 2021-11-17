@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    filter_users: {
+      en: 'Filter users',
+      de: 'Benutzer filtern',
+    },
+    invite_user_description: {
+      en: 'Invite a new user to your workspace. The user will receive an email with a notification of this.',
+      de: 'Einen neuen Benutzer in Ihre Arbeitsumgebung einladen. Der Benutzer erhält eine Benachrichtigung darüber.',
+    },
     filter_by_role_name: {
       en: 'Filter by role name',
       de: 'Nach Rollennamen filtern',
