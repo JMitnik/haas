@@ -1,2 +1,2 @@
 export * from './graphql/GetUserCustomerOfCustomer';
-export * from './Customer';
+export * from './graphql/Customer';

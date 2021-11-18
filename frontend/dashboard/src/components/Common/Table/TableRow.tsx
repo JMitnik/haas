@@ -3,10 +3,11 @@ import styled, { css } from 'styled-components';
 
 interface RowProps {
   isLoading?: boolean;
+  isDisabled?: boolean;
 }
 
 export const Row = styled(UI.Grid) <RowProps>`
-  ${({ isLoading }) => css`
+  ${({ isLoading, isDisabled }) => css`
     background: white;
     align-items: center;
     padding: 6px 12px;
@@ -21,6 +22,11 @@ export const Row = styled(UI.Grid) <RowProps>`
       transition: all ease-in 0.2s;
       opacity: 0.4;
       pointer-events: none;
+    `}
+
+    ${isDisabled && css`
+      transition: all ease-in 0.2s;
+      opacity: 0.4;
     `}
 
     &:hover {

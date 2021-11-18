@@ -1,15 +1,17 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, objectType, queryField, scalarType } from '@nexus/schema';
+import { extendType, inputObjectType, mutationField, objectType, queryField, scalarType } from '@nexus/schema';
 import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
 
-import { DeprecatedConnectionInterface } from '../general/Pagination';
-import { RoleType, SystemPermission } from '../role/Role';
+import { ConnectionInterface } from '../../general/Pagination';
+import { RoleType, SystemPermission } from '../../role/Role';
 
 export const UserCustomerType = objectType({
   name: 'UserCustomer',
 
   definition(t) {
+    t.date('createdAt', { nullable: false });
+    t.boolean('isActive');
     t.field('user', { type: 'UserType' });
     t.field('customer', { type: 'Customer' });
     t.field('role', { type: 'RoleType' });
@@ -66,6 +68,8 @@ export const UserType = objectType({
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
+    t.date('lastLoggedIn', { nullable: true });
+    t.date('lastActivity', { nullable: true });
 
     t.list.field('globalPermissions', {
       nullable: true,
@@ -80,7 +84,7 @@ export const UserType = objectType({
       type: UserCustomerType,
 
       async resolve(parent, args, ctx) {
-        return ctx.services.userService.getUserCustomers(parent.id);
+        return ctx.services.userService.getUserCustomers(parent.id) as any;
       },
     });
 
@@ -88,7 +92,7 @@ export const UserType = objectType({
       type: 'Customer',
 
       async resolve(parent, args, ctx) {
-        return ctx.services.userService.getCustomersOfUser(parent.id);
+        return ctx.services.userService.findActiveWorkspacesOfUser(parent.id);
       },
     });
 
@@ -107,7 +111,7 @@ export const UserType = objectType({
 export const UserConnection = objectType({
   name: 'UserConnection',
   definition(t) {
-    t.implements(DeprecatedConnectionInterface);
+    t.implements(ConnectionInterface);
     t.list.field('userCustomers', { type: UserCustomerType });
   },
 });
@@ -205,6 +209,28 @@ export const RootUserQueries = extendType({
     });
   },
 });
+
+export const HandleUserStateInWorkspaceInput = inputObjectType({
+  name: 'HandleUserStateInWorkspaceInput',
+  definition(t) {
+    t.string('userId');
+    t.string('workspaceId');
+    t.boolean('isActive')
+  }
+})
+
+export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorkspace', {
+  type: UserCustomerType,
+  args: { input: HandleUserStateInWorkspaceInput },
+  async resolve(parent, args, ctx) {
+    if (!args?.input?.userId) throw new UserInputError('No valid user provided to edit');
+    if (args?.input?.isActive === undefined || args?.input?.isActive === null || typeof args?.input?.isActive === undefined) throw new UserInputError('No activity state provided');
+    if (!args?.input?.workspaceId) throw new UserInputError('No workspace Id provided');
+
+    const input = { userId: args.input.userId, isActive: args.input.isActive, workspaceId: args.input.workspaceId }
+    return ctx.services.userService.setUserStateInWorkspace(input);
+  }
+})
 
 export const UserMutations = extendType({
   type: 'Mutation',

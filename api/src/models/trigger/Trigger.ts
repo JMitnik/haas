@@ -8,7 +8,7 @@ import { UserInputError } from 'apollo-server-express';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
-import { UserType } from '../users/User';
+import { UserType } from '../users/graphql/User';
 import TriggerService from './TriggerService';
 import { CreateTriggerInput } from './TriggerServiceType';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';

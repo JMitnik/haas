@@ -12,13 +12,14 @@ import React from 'react';
 
 interface PopoverBaseProps {
   children?: React.ReactNode;
+  closeOnClickOutside?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
   isOpen?: boolean;
 }
 
-export const Base = ({ children, ...props }: PopoverBaseProps) => (
-  <Popover placement="bottom-start" usePortal {...props}>
+export const Base = ({ children, closeOnClickOutside = true, ...props }: PopoverBaseProps) => (
+  <Popover closeOnBlur={closeOnClickOutside} placement="bottom-start" usePortal {...props}>
     {children}
   </Popover>
 );
@@ -63,7 +64,7 @@ export const Body = ({
     {!!header && (
       <>
         <PopoverHeader>
-          <UI.Helper>
+          <UI.Helper px={2}>
             {header}
           </UI.Helper>
         </PopoverHeader>

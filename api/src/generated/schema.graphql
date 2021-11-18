@@ -240,7 +240,7 @@ type Customer {
   slug: String!
   userCustomer(userId: String): UserCustomer
   users: [UserType!]
-  usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
+  usersConnection(customerSlug: String, filter: UserConnectionFilterInput): UserConnection
 }
 
 type CustomerSettings {
@@ -585,6 +585,12 @@ input GetCampaignsInput {
   customerSlug: String
 }
 
+input HandleUserStateInWorkspaceInput {
+  isActive: Boolean
+  userId: String
+  workspaceId: String
+}
+
 type ImageType {
   encoding: String
   filename: String
@@ -730,6 +736,7 @@ type Mutation {
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
+  handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
 
   """Invite a user to a particular customer domain, given an email and role"""
   inviteUser(input: InviteUserInput): InviteUserOutput!
@@ -1329,18 +1336,46 @@ input UploadSellImageInputType {
   workspaceId: String
 }
 
-type UserConnection implements DeprecatedConnectionInterface {
-  cursor: String
-  endDate: String
-  limit: Int!
-  offset: Int
-  pageInfo: DeprecatedPaginationPageInfo!
-  startDate: String
+type UserConnection implements ConnectionInterface {
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
   userCustomers: [UserCustomer!]!
 }
 
+input UserConnectionFilterInput {
+  email: String
+  endDate: String
+  firstName: String
+  lastName: String
+  offset: Int
+  orderBy: UserConnectionOrderByInput
+  perPage: Int = 10
+  role: String
+  search: String
+  startDate: String
+}
+
+"""Fields to order UserConnection by."""
+enum UserConnectionOrder {
+  createdAt
+  email
+  firstName
+  isActive
+  lastActivity
+  lastName
+  role
+}
+
+"""Sorting of UserConnection"""
+input UserConnectionOrderByInput {
+  by: UserConnectionOrder!
+  desc: Boolean = true
+}
+
 type UserCustomer {
+  createdAt: Date!
   customer: Customer!
+  isActive: Boolean!
   role: RoleType!
   user: UserType!
 }
@@ -1367,6 +1402,8 @@ type UserType {
   firstName: String
   globalPermissions: [SystemPermission!]
   id: ID!
+  lastActivity: Date
+  lastLoggedIn: Date
   lastName: String
   phone: String
   role: RoleType

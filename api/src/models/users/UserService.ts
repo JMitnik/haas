@@ -1,6 +1,6 @@
 import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
 import { UserInputError } from 'apollo-server';
-import _ from 'lodash';
+import _, { cloneDeep } from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
@@ -12,6 +12,7 @@ import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
 import { DeletedUserOutput, UserWithWorkspaces } from './UserServiceTypes';
+import { offsetPaginate } from '../general/PaginationHelpers';
 
 class UserService {
   prisma: PrismaClient;
@@ -31,6 +32,10 @@ class UserService {
     if (removedUser) return { deletedUser: true };
 
     return { deletedUser: false };
+  };
+
+  async updateLastSeen(userId: string) {
+    return this.userPrismaAdapter.updateLastSeen(userId, new Date());
   };
 
   async editUser(
@@ -74,6 +79,14 @@ class UserService {
     const user = await this.userPrismaAdapter.getUserById(userId);
     return user?.customers.map((customerOfUser) => customerOfUser.customer) || [];
   };
+
+  async findActiveWorkspacesOfUser(userId: string) {
+    const userWorkspaces = await this.userPrismaAdapter.findAllWorkspacesByUserId(userId)
+    const activeUserWorkspacesRelations = userWorkspaces.filter((userInWorkspace) => userInWorkspace.isActive);
+    const activeWorkspaces = activeUserWorkspacesRelations.map((workspaceRelation) => workspaceRelation.customer);
+
+    return activeWorkspaces;
+  }
 
   async getUserCustomers(userId: string) {
     const user = await this.userPrismaAdapter.getUserById(userId);
@@ -143,6 +156,10 @@ class UserService {
   async getValidUsers(loginToken: string, userId: string | undefined): Promise<UserWithWorkspaces[]> {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   };
+
+  async setUserStateInWorkspace(input: { userId: string, workspaceId: string, isActive: boolean }) {
+    return this.userPrismaAdapter.setIsActive(input);
+  }
 
   /**
    * Invites a new user to a current customer, and mails them with a login-token.
@@ -268,55 +285,19 @@ class UserService {
 
   paginatedUsers = async (
     customerSlug: string,
-    paginationOpts: NexusGenInputs['PaginationWhereInput'],
+    filter?: NexusGenInputs['UserConnectionFilterInput'] | null,
   ) => {
-    const userOfCustomerFindManyArgs: Prisma.UserOfCustomerFindManyArgs = {
-      where: {
-        customer: { slug: customerSlug },
-      },
-      include: {
-        customer: true,
-        role: true,
-        user: true,
-      },
-    };
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
 
-    const countWhereInput: Prisma.UserOfCustomerFindManyArgs = {
-      where: {
-        customer: { slug: customerSlug },
-      }
-    };
+    const users = await this.userPrismaAdapter.findPaginatedUsers(customerSlug, filter);
+    const totalUsers = await this.userPrismaAdapter.countUsers(customerSlug, filter);
 
-    const findManyUsers = async ({ props, paginationOpts }: FindManyCallBackProps) => {
-      const users: any = await this.prisma.userOfCustomer.findMany(props);
-      const filteredBySearch = UserService.filterBySearchTerm(users, paginationOpts?.searchTerm);
-      const orderedUsers = UserService.orderUsersBy(filteredBySearch, paginationOpts?.orderBy?.[0]);
-      return orderedUsers;
-    };
-    const countUsers = async ({ props: countArgs }: FindManyCallBackProps) => this.prisma.userOfCustomer.count(countArgs);
-
-    const paginateProps: PaginateProps = {
-      findManyArgs: {
-        findArgs: userOfCustomerFindManyArgs,
-        searchFields: [],
-        orderFields: [],
-        findManyCallBack: findManyUsers,
-      },
-      countArgs: {
-        countWhereInput,
-        countCallBack: countUsers,
-      },
-      paginationOpts,
-    };
-
-    const { entries, pageInfo } = await paginate(paginateProps);
+    const { totalPages, ...pageInfo } = offsetPaginate(totalUsers, offset, perPage);
 
     return {
-      userCustomers: entries,
-      offset: paginationOpts?.offset || 0,
-      limit: paginationOpts?.limit || 0,
-      startDate: paginationOpts?.startDate?.toString(),
-      endDate: paginationOpts?.endDate?.toString(),
+      userCustomers: users,
+      totalPages,
       pageInfo,
     };
   };
