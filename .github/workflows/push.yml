@@ -17,10 +17,12 @@ jobs:
       run: yarn gen:api:prisma
       env:
         DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
-    - name: Run Unit and integration Tests
-      run: yarn test:integration
+    - name: Run API Unit and integration Tests
+      run: yarn test:integration:api
       env:
         # These ENV values are not reflecting actual secrets from production
         DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
         JWT_SECRET: 'test123'
         MAIL_SENDER: 'test123'
+    - name: Run Dashboard Unit and integration Tests
+      run: yarn test:integration:dashboard
