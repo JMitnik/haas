@@ -14,7 +14,7 @@ export const UserConnectionOrderType = enumType({
   name: 'UserConnectionOrder',
   description: 'Fields to order UserConnection by.',
 
-  members: ['firstName', 'lastName', 'email', 'createdAt']
+  members: ['firstName', 'lastName', 'email', 'createdAt', 'lastActivity', 'role', 'isActive']
 });
 
 

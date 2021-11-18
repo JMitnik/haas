@@ -1,8 +1,8 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
-import { Calendar, Plus, Search, User } from 'react-feather';
-import { Route, Switch, useHistory, useLocation, useParams } from 'react-router';
+import { Calendar, Filter, Search, User } from 'react-feather';
+import { Route, Switch, useHistory, useLocation } from 'react-router';
 import { endOfDay, startOfDay } from 'date-fns';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +23,6 @@ import {
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { TabbedMenu } from 'components/Common/TabMenu';
-import { TableCellButtonContainer } from 'components/Common/Table';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -32,19 +31,18 @@ import SearchBar from 'components/SearchBar/SearchBar';
 import Searchbar from 'components/SearchBar';
 import useAuth from 'hooks/useAuth';
 
-import { PopoverItem } from './UsersOverviewStyles';
 import { UserModalCard } from './UserModalCard';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
 import RoleUserModalCard from './RoleUserModalCard';
 
 const columns = `
-  minmax(50px, 1fr) 
-  minmax(50px, 1fr) 
-  minmax(200px, 1fr) 
-  minmax(30px, 1fr) 
-  minmax(50px, 1fr) 
-  minmax(50px, 1fr) 
+  minmax(50px, 1fr)
+  minmax(50px, 1fr)
+  minmax(200px, 1fr)
+  minmax(30px, 1fr)
+  minmax(50px, 1fr)
+  minmax(50px, 1fr)
   minmax(50px, 1fr)
   `;
 
@@ -74,11 +72,10 @@ interface ContextualMenuProps {
 const UsersOverview = () => {
   const { canAccessAdmin, canEditUsers, canDeleteUsers } = useAuth();
   const { activeCustomer } = useCustomer();
-  const { customerSlug } = useParams<{ customerSlug: string }>();
-  const { goToUserView, goToUsersOverview, goToRoleUserView, userOverviewMatch } = useNavigator();
+  const { customerSlug, goToUserView, goToUsersOverview, goToRoleUserView, userOverviewMatch } = useNavigator();
   const { t } = useTranslation();
-  const history = useHistory();
   const location = useLocation();
+  const history = useHistory();
   const toast = useToast();
 
   const { menuProps, openMenu, closeMenu, activeItem: contextUser } = useMenu<ContextualMenuProps>();
@@ -100,7 +97,7 @@ const UsersOverview = () => {
   });
 
   const { refetch, loading: isLoading } = useGetPaginatedUsersQuery({
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
     variables: {
       customerSlug,
       filter: {
@@ -117,60 +114,35 @@ const UsersOverview = () => {
       },
     },
     errorPolicy: 'ignore',
+    notifyOnNetworkStatusChange: true,
     onCompleted: (fetchedData) => {
       setActivePaginatedUsersResult(fetchedData);
     },
   });
 
-  const handleRefetch = () => {
-    refetch({
-      customerSlug,
-      filter: {
-        firstName: filter.firstName,
-        lastName: filter.lastName,
-        email: filter.email,
-        role: filter.role,
-        startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
-        endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
-        search: filter.search,
-        offset: filter.pageIndex * filter.perPage,
-        perPage: filter.perPage,
-        orderBy: { by: filter.orderByField as UserConnectionOrder, desc: filter.orderByDescending },
-      },
-    });
-  };
-
-  const [setUserAccessibility] = useHandleUserStateInWorkspaceMutation({
+  const [setUserAccess] = useHandleUserStateInWorkspaceMutation({
     onCompleted: (userOfCustomer) => {
       const email = userOfCustomer?.handleUserStateInWorkspace?.user?.email;
       const state = userOfCustomer?.handleUserStateInWorkspace?.isActive ? t('active') : t('inactive');
+      refetch();
       toast({
-        title: 'User accessibility changed!',
-        description: `User with email ${email} has been set to ${state}`,
+        title: t('toast:user_access_changed'),
+        description: t('toast:user_access_helper', { email, state }),
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
       });
-      handleRefetch();
     },
   });
 
   const [deleteUser] = useDeleteUserMutation({
     onCompleted: () => {
+      refetch();
+
       toast({
         title: 'User removed!',
         description: 'The user has been removed from the workspace.',
         status: 'success',
-        position: 'bottom-right',
-        duration: 1500,
-      });
-      handleRefetch();
-    },
-    onError: () => {
-      toast({
-        title: 'An error ocurred!',
-        description: 'It was not possible to remove user.',
-        status: 'error',
         position: 'bottom-right',
         duration: 1500,
       });
@@ -268,9 +240,9 @@ const UsersOverview = () => {
         <UI.Flex width="100%" justifyContent="space-between">
           <UI.Flex alignItems="center">
             <UI.ViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.ViewTitle>
-            <InviteUserButton label="">
+            <InviteUserButton>
               {(onClose) => (
-                <InviteUserForm onRefetch={handleRefetch} onClose={onClose} />
+                <InviteUserForm onRefetch={refetch} onClose={onClose} />
               )}
             </InviteUserButton>
           </UI.Flex>
@@ -286,10 +258,10 @@ const UsersOverview = () => {
         <UI.Div>
           <UI.Flex mb={2} justifyContent="space-between">
 
-            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={(<Plus />)}>
+            <PickerButton arrowBg="gray.50" label={t('filter_users')} icon={(<Filter />)}>
               {() => (
                 <TabbedMenu
-                  menuHeader={t('add_filter')}
+                  menuHeader={t('filter_users')}
                   tabs={[
                     { label: t('search'), icon: <Search /> },
                     { label: t('date'), icon: <Calendar /> },
@@ -310,7 +282,7 @@ const UsersOverview = () => {
                     <UI.RadioHeader>
                       {t('filter_by_date')}
                     </UI.RadioHeader>
-                    <UI.SectionSubHeader>
+                    <UI.SectionSubHeader mb={2}>
                       {t('filter_by_updated_date_description')}
                     </UI.SectionSubHeader>
                     <UI.DatePicker
@@ -321,7 +293,7 @@ const UsersOverview = () => {
                   </UI.Div>
 
                   <UI.Div>
-                    <UI.Stack>
+                    <UI.Stack spacing={4}>
                       <UI.Div>
                         <UI.RadioHeader>
                           {t('filter_by_recipient_first_name')}
@@ -402,29 +374,74 @@ const UsersOverview = () => {
           </UI.Flex>
 
           <Table.HeadingRow gridTemplateColumns={columns}>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.FirstName}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.FirstName,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('first_name')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.LastName}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.LastName,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('last_name')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.Email}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.Email,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('email')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.Role}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.Role,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('role')}
             </Table.HeadingCell>
             <Table.HeadingCell
-              sorting
+              sorting={filter.orderByField === UserConnectionOrder.CreatedAt}
               descending={filter.orderByDescending || false}
-              onDescendChange={(isDescend) => setFilter({ orderByDescending: isDescend })}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.CreatedAt,
+                orderByDescending: isDescend,
+              })}
             >
               {t('created_at')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
-              {t('last_logged_in')}
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.LastActivity}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.LastActivity,
+                orderByDescending: isDescend,
+              })}
+            >
+              {t('last_activity')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.IsActive}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.IsActive,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('user_workspace_access')}
             </Table.HeadingCell>
           </Table.HeadingRow>
@@ -452,6 +469,7 @@ const UsersOverview = () => {
           {tableData.map((user) => (
             <Table.Row
               onContextMenu={(e) => openMenu(e, { userId: user.userId })}
+              isDisabled={!user.isActive}
               onClick={() => goToUserView(user.id)}
               isLoading={isLoading}
               key={user.id}
@@ -466,14 +484,11 @@ const UsersOverview = () => {
                   <UI.Span fontWeight={600} color="gray.500">
                     {user?.lastName}
                   </UI.Span>
-
                 )}
               </Table.Cell>
 
               <Table.Cell>
-                <UI.Helper>
-                  {user?.email}
-                </UI.Helper>
+                {user?.email}
               </Table.Cell>
 
               <Table.Cell>
@@ -493,52 +508,27 @@ const UsersOverview = () => {
               </Table.Cell>
 
               <Table.Cell>
-                {user.lastLoggedIn ? <FormatTimestamp timestamp={user.lastLoggedIn} /> : <UI.Helper>Never</UI.Helper>}
+                {user.lastActivity ? <FormatTimestamp timestamp={user.lastActivity} /> : <UI.Helper>-</UI.Helper>}
               </Table.Cell>
 
-              <Table.Cell>
-                <Table.InnerCell
+              <Table.Cell onClick={(e) => e.stopPropagation()}>
+                <UI.Toggle
+                  size="lg"
+                  isChecked={user.isActive}
+                  color="teal"
                   isDisabled={!canAccessAdmin && !canEditUsers}
-                  header="User Workspace Access"
-                  brand={user?.isActive ? 'green' : 'red'}
-                  renderBody={() => (
-                    <UI.Stack spacing={1}>
-                      <PopoverItem>
-                        <UI.Text>Set access of this user to: </UI.Text>
-                        <UI.Flex justifyContent="center">
-                          <TableCellButtonContainer
-                            onClick={() => setUserAccessibility({
-                              variables: {
-                                input: {
-                                  isActive: !user.isActive,
-                                  userId: user.userId,
-                                  workspaceId: activeCustomer?.id,
-                                },
-                              },
-                            })}
-                            as="button"
-                            py={1}
-                            px={2}
-                            borderRadius={10}
-                            border="1px solid"
-                            borderColor="gray.100"
-                            bg={user?.isActive ? 'red.100' : 'green.100'}
-                          >
-                            <UI.Helper color={user?.isActive ? 'red.600' : 'green.600'}>
-                              {user?.isActive ? t('inactive') : t('active')}
-                            </UI.Helper>
-                          </TableCellButtonContainer>
-                        </UI.Flex>
-
-                      </PopoverItem>
-
-                    </UI.Stack>
-                  )}
-                >
-                  <UI.Helper color={user?.isActive ? 'green.600' : 'red.600'}>
-                    {user?.isActive ? t('active') : t('inactive')}
-                  </UI.Helper>
-                </Table.InnerCell>
+                  onChange={() => {
+                    setUserAccess({
+                      variables: {
+                        input: {
+                          isActive: !user.isActive,
+                          userId: user.userId,
+                          workspaceId: activeCustomer?.id,
+                        },
+                      },
+                    });
+                  }}
+                />
               </Table.Cell>
             </Table.Row>
           ))}

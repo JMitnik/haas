@@ -3,8 +3,8 @@ import { extendType, inputObjectType, mutationField, objectType, queryField, sca
 import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
 
-import { ConnectionInterface, DeprecatedConnectionInterface } from '../general/Pagination';
-import { RoleType, SystemPermission } from '../role/Role';
+import { ConnectionInterface } from '../../general/Pagination';
+import { RoleType, SystemPermission } from '../../role/Role';
 
 export const UserCustomerType = objectType({
   name: 'UserCustomer',
@@ -69,6 +69,7 @@ export const UserType = objectType({
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
     t.date('lastLoggedIn', { nullable: true });
+    t.date('lastActivity', { nullable: true });
 
     t.list.field('globalPermissions', {
       nullable: true,

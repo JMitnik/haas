@@ -1377,7 +1377,10 @@ enum UserConnectionOrder {
   createdAt
   email
   firstName
+  isActive
+  lastActivity
   lastName
+  role
 }
 
 """Sorting of UserConnection"""
@@ -1416,6 +1419,7 @@ type UserType {
   firstName: String
   globalPermissions: [SystemPermission!]
   id: ID!
+  lastActivity: Date
   lastLoggedIn: Date
   lastName: String
   phone: String

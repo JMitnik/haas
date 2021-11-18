@@ -1860,7 +1860,10 @@ export enum UserConnectionOrder {
   FirstName = 'firstName',
   LastName = 'lastName',
   Email = 'email',
-  CreatedAt = 'createdAt'
+  CreatedAt = 'createdAt',
+  LastActivity = 'lastActivity',
+  Role = 'role',
+  IsActive = 'isActive'
 }
 
 /** Sorting of UserConnection */
@@ -1902,6 +1905,7 @@ export type UserType = {
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   lastLoggedIn?: Maybe<Scalars['Date']>;
+  lastActivity?: Maybe<Scalars['Date']>;
   globalPermissions?: Maybe<Array<SystemPermission>>;
   userCustomers: Array<UserCustomer>;
   customers: Array<Customer>;
@@ -2526,7 +2530,7 @@ export type GetPaginatedUsersQuery = (
         & Pick<UserCustomer, 'createdAt' | 'isActive'>
         & { user: (
           { __typename?: 'UserType' }
-          & Pick<UserType, 'lastLoggedIn' | 'id' | 'email' | 'firstName' | 'lastName'>
+          & Pick<UserType, 'lastLoggedIn' | 'lastActivity' | 'id' | 'email' | 'firstName' | 'lastName'>
         ), role: (
           { __typename?: 'RoleType' }
           & Pick<RoleType, 'id' | 'name'>
@@ -3918,6 +3922,7 @@ export const GetPaginatedUsersDocument = gql`
         isActive
         user {
           lastLoggedIn
+          lastActivity
           id
           email
           firstName

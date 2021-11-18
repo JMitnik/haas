@@ -536,7 +536,7 @@ export interface NexusGenEnums {
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
   UploadImageEnumType: "LOGO" | "WEBSITE_SCREENSHOT"
-  UserConnectionOrder: "createdAt" | "email" | "firstName" | "lastName"
+  UserConnectionOrder: "createdAt" | "email" | "firstName" | "isActive" | "lastActivity" | "lastName" | "role"
 }
 
 export interface NexusGenRootTypes {
@@ -846,6 +846,7 @@ export interface NexusGenRootTypes {
     email: string; // String!
     firstName?: string | null; // String
     id: string; // ID!
+    lastActivity?: any | null; // Date
     lastLoggedIn?: any | null; // Date
     lastName?: string | null; // String
     phone?: string | null; // String
@@ -1503,6 +1504,7 @@ export interface NexusGenFieldTypes {
     firstName: string | null; // String
     globalPermissions: NexusGenEnums['SystemPermission'][] | null; // [SystemPermission!]
     id: string; // ID!
+    lastActivity: any | null; // Date
     lastLoggedIn: any | null; // Date
     lastName: string | null; // String
     phone: string | null; // String

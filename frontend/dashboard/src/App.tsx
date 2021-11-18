@@ -1,19 +1,15 @@
 import { AnimatePresence } from 'framer-motion';
-import { ApolloProvider } from '@apollo/client';
-import { Div, ViewContainer } from '@haas/ui';
-import { ErrorBoundary } from '@sentry/react';
-import { I18nextProvider } from 'react-i18next';
-import { QueryParamProvider } from 'use-query-params';
-import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import { ViewContainer } from '@haas/ui';
 import React, { FC } from 'react';
 
-import { AppContainer } from 'styles/AppStyles';
+import { AppProviders } from 'config/AppProviders';
 import { CampaignView } from 'views/CampaignView/CampaignView';
-import { DefaultThemeProviders } from 'providers/ThemeProvider';
 import { DialogueProvider } from 'providers/DialogueProvider';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/generated-types';
+import { useUser } from 'providers/UserProvider';
 import ActionsPage from 'pages/dashboard/actions';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
@@ -37,21 +33,16 @@ import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
-import FallbackServerError from 'components/FallbackServerError';
 import FirstTimePage from 'pages/dashboard/first_time';
 import GlobalLoader from 'components/GlobalLoader';
-import GlobalStyle from 'config/global-styles';
 import GuardedRoute from 'components/Routes/GuardedRoute';
 import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
-import UserProvider, { useUser } from 'providers/UserProvider';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 import VerifyTokenPage from 'pages/verify_token';
-import client from 'config/apollo';
-import lang from 'config/i18n-config';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
@@ -279,43 +270,10 @@ const AppRoutes = () => (
   </RootApp>
 );
 
-const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => {
-  if (error?.message.includes('Failed to fetch')) {
-    console.log('Server is down!!!!');
-  }
-
-  console.log(error);
-
-  return (
-    <Div minHeight="100vh" display="flex" alignItems="center">
-      <FallbackServerError />
-    </Div>
-  );
-};
-
 const App: FC = () => (
-  <>
-    <I18nextProvider i18n={lang}>
-      <Router>
-        <ErrorBoundary fallback={GeneralErrorFallback}>
-          <ApolloProvider client={client}>
-            <DefaultThemeProviders>
-              <UserProvider>
-                <AppContainer>
-                  <QueryParamProvider ReactRouterRoute={Route}>
-                    <ErrorBoundary fallback={GeneralErrorFallback}>
-                      <AppRoutes />
-                    </ErrorBoundary>
-                  </QueryParamProvider>
-                </AppContainer>
-                <GlobalStyle />
-              </UserProvider>
-            </DefaultThemeProviders>
-          </ApolloProvider>
-        </ErrorBoundary>
-      </Router>
-    </I18nextProvider>
-  </>
+  <AppProviders>
+    <AppRoutes />
+  </AppProviders>
 );
 
 export default App;

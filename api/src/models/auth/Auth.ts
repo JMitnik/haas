@@ -1,7 +1,7 @@
 import { inputObjectType, mutationField, objectType, queryField, unionType } from '@nexus/schema';
 
 import { ApolloError, AuthenticationError, UserInputError } from 'apollo-server-express';
-import { UserInput, UserType } from '../users/User';
+import { UserInput, UserType } from '../users/graphql/User';
 import { mailService } from '../../services/mailings/MailService';
 import AuthService from './AuthService';
 import UserService from '../users/UserService';
@@ -198,6 +198,7 @@ export const RefreshAccessTokenQuery = queryField('refreshAccessToken', {
     }
 
     const newToken = AuthService.createUserToken(ctx.session?.user?.id);
+    await ctx.services.userService.updateLastSeen(ctx.session.user.id);
 
     return {
       accessToken: newToken,
