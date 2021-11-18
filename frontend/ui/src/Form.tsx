@@ -922,7 +922,7 @@ export const Toggle = forwardRef((props: SwitchProps, ref) => {
   const { children, ...restProps } = props;
 
   return (
-    <ChakraSwitch ref={ref} {...restProps}>
+    <ChakraSwitch ref={ref} color="teal" {...restProps}>
       {children}
     </ChakraSwitch>
   );
