@@ -115,8 +115,8 @@ const UsersOverview = () => {
       refetch();
 
       toast({
-        title: 'User accessibility changed!',
-        description: `User with email ${email} has been set to ${state}`,
+        title: t('toast:user_access_changed'),
+        description: t('toast:user_access_helper', { email, state }),
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
