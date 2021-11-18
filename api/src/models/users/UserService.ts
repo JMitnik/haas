@@ -34,6 +34,10 @@ class UserService {
     return { deletedUser: false };
   };
 
+  async updateLastSeen(userId: string) {
+    return this.userPrismaAdapter.updateLastSeen(userId, new Date());
+  };
+
   async editUser(
     userUpdateInput: Prisma.UserUpdateInput,
     email: string,

@@ -1843,7 +1843,7 @@ export type UserConnectionOrderByInput = {
 
 export type UserCustomer = {
   __typename?: 'UserCustomer';
-  createdAt: Scalars['String'];
+  createdAt: Scalars['Date'];
   isActive: Scalars['Boolean'];
   user: UserType;
   customer: Customer;
@@ -1873,7 +1873,8 @@ export type UserType = {
   phone?: Maybe<Scalars['String']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
-  lastLoggedIn?: Maybe<Scalars['String']>;
+  lastLoggedIn?: Maybe<Scalars['Date']>;
+  lastActivity?: Maybe<Scalars['Date']>;
   globalPermissions?: Maybe<Array<SystemPermission>>;
   userCustomers: Array<UserCustomer>;
   customers: Array<Customer>;
@@ -2443,7 +2444,7 @@ export type GetPaginatedUsersQuery = (
         & Pick<UserCustomer, 'createdAt' | 'isActive'>
         & { user: (
           { __typename?: 'UserType' }
-          & Pick<UserType, 'lastLoggedIn' | 'id' | 'email' | 'firstName' | 'lastName'>
+          & Pick<UserType, 'lastLoggedIn' | 'lastActivity' | 'id' | 'email' | 'firstName' | 'lastName'>
         ), role: (
           { __typename?: 'RoleType' }
           & Pick<RoleType, 'id' | 'name'>
@@ -3690,6 +3691,7 @@ export const GetPaginatedUsersDocument = gql`
         isActive
         user {
           lastLoggedIn
+          lastActivity
           id
           email
           firstName

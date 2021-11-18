@@ -5,16 +5,16 @@ import { GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
-import { CustomerSettingsType } from '../settings/CustomerSettings';
+import { CustomerSettingsType } from '../../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
-import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
+import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../../questionnaire/Dialogue';
 
 // eslint-disable-next-line import/no-cycle
-import { UserConnection } from '../users/User';
-import DialogueService from '../questionnaire/DialogueService';
-import isValidColor from '../../utils/isValidColor';
-import { CampaignModel } from '../Campaigns';
-import { UserConnectionFilterInput } from './UserConnection';
+import { UserConnection } from '../../users/graphql/User';
+import DialogueService from '../../questionnaire/DialogueService';
+import isValidColor from '../../../utils/isValidColor';
+import { CampaignModel } from '../../Campaigns';
+import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;

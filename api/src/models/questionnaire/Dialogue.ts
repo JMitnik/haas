@@ -4,7 +4,7 @@ import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema
 import { subDays } from 'date-fns';
 
 import { DialgoueStatisticsLineChartDataType, DialogueStatistics } from './graphql/DialogueStatistics';
-import { CustomerType } from '../customer/Customer';
+import { CustomerType } from '../customer/graphql/Customer';
 import { EdgeType } from '../edge/Edge';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 import { SessionConnection, SessionType } from '../session/graphql/Session';

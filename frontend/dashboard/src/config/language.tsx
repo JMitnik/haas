@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    last_activity: {
+      en: 'Last seen',
+      de: 'Zuletzt gesehen',
+    },
     active: {
       en: 'Active',
       de: 'Aktiv',

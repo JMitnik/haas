@@ -10,7 +10,7 @@ export const TableCellButtonContainer = styled(UI.Div) <{ isDisabled?: boolean }
     transition: all ease-in 0.2s;
     text-align: left;
 
-    ${!isDisabled && css` 
+    ${!isDisabled && css`
       &:hover {
         transition: all ease-in 0.2s;
         box-shadow: 0 4px 6px rgba(50,50,93,.07), 0 1px 3px rgba(0,0,0,.03);
@@ -50,7 +50,7 @@ export const InnerCell = ({
           borderRadius={10}
           border="1px solid"
           borderColor="gray.100"
-          bg={brand ? `${brand}.100` : 'none'}
+          bg={brand ? `${brand}.100` : 'white'}
         >
           {children}
         </TableCellButtonContainer>

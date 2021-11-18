@@ -1,6 +1,6 @@
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
-import { CustomerType } from '../customer/Customer';
+import { CustomerType } from '../customer/graphql/Customer';
 import PermissionService from './PermissionService';
 
 export const PermissionType = objectType({

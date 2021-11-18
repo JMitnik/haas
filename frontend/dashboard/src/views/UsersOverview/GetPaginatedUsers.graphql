@@ -7,6 +7,7 @@ query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInp
           isActive
           user {
             lastLoggedIn
+            lastActivity
             id
             email
             firstName

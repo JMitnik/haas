@@ -372,7 +372,7 @@ const UsersOverview = () => {
               {t('created_at')}
             </Table.HeadingCell>
             <Table.HeadingCell>
-              {t('last_logged_in')}
+              {t('last_activity')}
             </Table.HeadingCell>
             <Table.HeadingCell>
               {t('user_workspace_access')}
@@ -398,9 +398,7 @@ const UsersOverview = () => {
               </Table.Cell>
 
               <Table.Cell>
-                <UI.Helper>
-                  {user?.email}
-                </UI.Helper>
+                {user?.email}
               </Table.Cell>
 
               <Table.Cell>
@@ -416,7 +414,7 @@ const UsersOverview = () => {
               </Table.Cell>
 
               <Table.Cell>
-                {user.lastLoggedIn ? <FormatTimestamp timestamp={user.lastLoggedIn} /> : <UI.Helper>Never</UI.Helper>}
+                {user.lastActivity ? <FormatTimestamp timestamp={user.lastActivity} /> : <UI.Helper>-</UI.Helper>}
               </Table.Cell>
 
               <Table.Cell>

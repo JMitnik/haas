@@ -16,8 +16,8 @@ class UserPrismaAdapter {
   }
 
   /**
-   * 
-   * @param userId  
+   *
+   * @param userId
    * @returns a list of workspaces together and whether a user is active in them or not
    */
   findAllWorkspacesByUserId = async (userId: string) => {
@@ -103,6 +103,8 @@ class UserPrismaAdapter {
     } if (filter?.orderBy?.by === 'lastName') {
       return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.lastName, filter.orderBy.desc ? 'desc' : 'asc');
     } if (filter?.orderBy?.by === 'email') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, filter.orderBy.desc ? 'desc' : 'asc');
+    } if (filter?.orderBy?.by === 'lastActivity') {
       return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, filter.orderBy.desc ? 'desc' : 'asc');
     }
 
@@ -387,6 +389,18 @@ class UserPrismaAdapter {
       }
     });
     return result;
+  }
+
+  /**
+   * Updates the user's last activity date
+   */
+  async updateLastSeen(userId: string | undefined, lastSeen: Date) {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        lastActivity: lastSeen,
+      },
+    });
   }
 
   async login(userId: string | undefined, refreshToken: string): Promise<User> {
