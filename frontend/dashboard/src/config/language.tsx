@@ -1,6 +1,18 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    filter_users: {
+      en: 'Filter users',
+      de: 'Benutzer filtern',
+    },
+    invite_user_description: {
+      en: 'Invite a new user to your workspace. The user will receive an email with a notification of this.',
+      de: 'Einen neuen Benutzer in Ihre Arbeitsumgebung einladen. Der Benutzer erhält eine Benachrichtigung darüber.',
+    },
+    filter_by_role_name: {
+      en: 'Filter by role name',
+      de: 'Nach Rollennamen filtern',
+    },
     filter_by_recipient_first_name: {
       en: 'Filter by first name',
       de: 'Nach Vornamen filtern',
@@ -2281,6 +2293,7 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
   },
 };
 
+// eslint-disable-next-line @typescript-eslint/no-shadow
 export const parseLanguages = (language: string, input: any, output?: any) => {
   output = output || {};
 

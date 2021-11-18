@@ -240,7 +240,7 @@ type Customer {
   slug: String!
   userCustomer(userId: String): UserCustomer
   users: [UserType!]
-  usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
+  usersConnection(customerSlug: String, filter: UserConnectionFilterInput): UserConnection
 }
 
 type CustomerSettings {
@@ -1329,17 +1329,41 @@ input UploadSellImageInputType {
   workspaceId: String
 }
 
-type UserConnection implements DeprecatedConnectionInterface {
-  cursor: String
-  endDate: String
-  limit: Int!
-  offset: Int
-  pageInfo: DeprecatedPaginationPageInfo!
-  startDate: String
+type UserConnection implements ConnectionInterface {
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
   userCustomers: [UserCustomer!]!
 }
 
+input UserConnectionFilterInput {
+  email: String
+  endDate: String
+  firstName: String
+  lastName: String
+  offset: Int
+  orderBy: UserConnectionOrderByInput
+  perPage: Int = 10
+  role: String
+  search: String
+  startDate: String
+}
+
+"""Fields to order UserConnection by."""
+enum UserConnectionOrder {
+  createdAt
+  email
+  firstName
+  lastName
+}
+
+"""Sorting of UserConnection"""
+input UserConnectionOrderByInput {
+  by: UserConnectionOrder!
+  desc: Boolean = true
+}
+
 type UserCustomer {
+  createdAt: String!
   customer: Customer!
   role: RoleType!
   user: UserType!

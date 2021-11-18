@@ -3,6 +3,8 @@ import { InMemoryCache } from '@apollo/client/cache';
 import { createUploadLink } from 'apollo-upload-client';
 import { onError } from '@apollo/client/link/error';
 
+import { getApiEndpoint } from 'utils/getApiEndpoint';
+
 const authorizeLink = new ApolloLink((operation, forward) => {
   const localToken = localStorage.getItem('access_token');
 
@@ -37,7 +39,7 @@ const client = new ApolloClient({
     authorizeLink,
     createUploadLink({
       credentials: 'include',
-      uri: import.meta.env.VITE_API_ENDPOINT?.toString() || 'http://localhost:4000/graphql',
+      uri: getApiEndpoint(),
     }),
   ]),
   cache: new InMemoryCache(),

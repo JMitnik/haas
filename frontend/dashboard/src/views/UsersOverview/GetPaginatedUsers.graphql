@@ -1,12 +1,9 @@
-import { gql } from '@apollo/client';
-
-const getPaginatedUsers = gql`
-  query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInput) {
+query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInput) {
     customer(slug: $customerSlug) {
       id
-
       usersConnection(filter: $filter) {
         userCustomers {
+          createdAt
           user {
             id
             email
@@ -18,13 +15,14 @@ const getPaginatedUsers = gql`
             name
           }
         }
+        totalPages
         pageInfo {
-          nrPages
+          hasPrevPage
+          hasNextPage
+          prevPageOffset
+          nextPageOffset
           pageIndex
         }
       }
     }
   }
-`;
-
-export default getPaginatedUsers;

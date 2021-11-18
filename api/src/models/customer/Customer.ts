@@ -8,14 +8,13 @@ import cloudinary, { UploadApiResponse } from 'cloudinary';
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
+
 // eslint-disable-next-line import/no-cycle
-import CustomerService from './CustomerService';
-// eslint-disable-next-line import/no-cycle
-import { PaginationWhereInput } from '../general/Pagination';
-import { UserConnection, UserCustomerType } from '../users/User';
+import { UserConnection } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
 import isValidColor from '../../utils/isValidColor';
 import { CampaignModel } from '../Campaigns';
+import { UserConnectionFilterInput } from './UserConnection';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -44,19 +43,13 @@ export const CustomerType = objectType({
 
     t.field('usersConnection', {
       type: UserConnection,
-      args: { customerSlug: 'String', filter: PaginationWhereInput },
+      args: { customerSlug: 'String', filter: UserConnectionFilterInput },
       nullable: true,
 
       async resolve(parent, args, ctx) {
         const users = await ctx.services.userService.paginatedUsers(
           parent.slug,
-          {
-            pageIndex: args.filter?.pageIndex,
-            offset: args.filter?.offset,
-            limit: args.filter?.limit,
-            orderBy: args.filter?.orderBy,
-            searchTerm: args.filter?.searchTerm,
-          },
+          args.filter,
         );
         return users as any;
       },

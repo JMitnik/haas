@@ -3,13 +3,14 @@ import { extendType, inputObjectType, objectType, queryField, scalarType } from 
 import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
 
-import { DeprecatedConnectionInterface } from '../general/Pagination';
+import { ConnectionInterface, DeprecatedConnectionInterface } from '../general/Pagination';
 import { RoleType, SystemPermission } from '../role/Role';
 
 export const UserCustomerType = objectType({
   name: 'UserCustomer',
 
   definition(t) {
+    t.string('createdAt', { nullable: false });
     t.field('user', { type: 'UserType' });
     t.field('customer', { type: 'Customer' });
     t.field('role', { type: 'RoleType' });
@@ -36,7 +37,7 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
     if (!args.input?.userId) throw new UserInputError('User not provided');
     if (!args.input?.customerId && !args.input?.customerSlug) throw new UserInputError('Neither slug nor id of Customer was provided');
 
-    return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId);
+    return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId) as any;
   },
 });
 
@@ -80,7 +81,7 @@ export const UserType = objectType({
       type: UserCustomerType,
 
       async resolve(parent, args, ctx) {
-        return ctx.services.userService.getUserCustomers(parent.id);
+        return ctx.services.userService.getUserCustomers(parent.id) as any;
       },
     });
 
@@ -107,7 +108,7 @@ export const UserType = objectType({
 export const UserConnection = objectType({
   name: 'UserConnection',
   definition(t) {
-    t.implements(DeprecatedConnectionInterface);
+    t.implements(ConnectionInterface);
     t.list.field('userCustomers', { type: UserCustomerType });
   },
 });

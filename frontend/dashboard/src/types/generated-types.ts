@@ -277,7 +277,7 @@ export type Customer = {
 
 export type CustomerUsersConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
-  filter?: Maybe<PaginationWhereInput>;
+  filter?: Maybe<UserConnectionFilterInput>;
 };
 
 
@@ -1795,19 +1795,43 @@ export type UploadSellImageInputType = {
   workspaceId?: Maybe<Scalars['String']>;
 };
 
-export type UserConnection = DeprecatedConnectionInterface & {
+export type UserConnection = ConnectionInterface & {
   __typename?: 'UserConnection';
-  cursor?: Maybe<Scalars['String']>;
-  offset?: Maybe<Scalars['Int']>;
-  limit: Scalars['Int'];
-  pageInfo: DeprecatedPaginationPageInfo;
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo: PaginationPageInfo;
+  userCustomers: Array<UserCustomer>;
+};
+
+export type UserConnectionFilterInput = {
+  search?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
-  userCustomers: Array<UserCustomer>;
+  firstName?: Maybe<Scalars['String']>;
+  lastName?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  role?: Maybe<Scalars['String']>;
+  orderBy?: Maybe<UserConnectionOrderByInput>;
+  offset?: Maybe<Scalars['Int']>;
+  perPage?: Maybe<Scalars['Int']>;
+};
+
+/** Fields to order UserConnection by. */
+export enum UserConnectionOrder {
+  FirstName = 'firstName',
+  LastName = 'lastName',
+  Email = 'email',
+  CreatedAt = 'createdAt'
+}
+
+/** Sorting of UserConnection */
+export type UserConnectionOrderByInput = {
+  by: UserConnectionOrder;
+  desc?: Maybe<Scalars['Boolean']>;
 };
 
 export type UserCustomer = {
   __typename?: 'UserCustomer';
+  createdAt: Scalars['String'];
   user: UserType;
   customer: Customer;
   role: RoleType;
@@ -2371,6 +2395,51 @@ export type RequestInviteMutation = (
     { __typename?: 'RequestInviteOutput' }
     & Pick<RequestInviteOutput, 'didInvite' | 'userExists'>
   ) }
+);
+
+export type DeleteUserMutationVariables = Exact<{
+  input: DeleteUserInput;
+}>;
+
+
+export type DeleteUserMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteUser: (
+    { __typename?: 'DeleteUserOutput' }
+    & Pick<DeleteUserOutput, 'deletedUser'>
+  ) }
+);
+
+export type GetPaginatedUsersQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+  filter?: Maybe<UserConnectionFilterInput>;
+}>;
+
+
+export type GetPaginatedUsersQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { usersConnection?: Maybe<(
+      { __typename?: 'UserConnection' }
+      & Pick<UserConnection, 'totalPages'>
+      & { userCustomers: Array<(
+        { __typename?: 'UserCustomer' }
+        & Pick<UserCustomer, 'createdAt'>
+        & { user: (
+          { __typename?: 'UserType' }
+          & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName'>
+        ), role: (
+          { __typename?: 'RoleType' }
+          & Pick<RoleType, 'id' | 'name'>
+        ) }
+      )>, pageInfo: (
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+      ) }
+    )> }
+  )> }
 );
 
 export type GetRolesQueryVariables = Exact<{
@@ -3547,6 +3616,101 @@ export function useRequestInviteMutation(baseOptions?: Apollo.MutationHookOption
 export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInviteMutation>;
 export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
 export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;
+export const DeleteUserDocument = gql`
+    mutation deleteUser($input: DeleteUserInput!) {
+  deleteUser(input: $input) {
+    deletedUser
+  }
+}
+    `;
+export type DeleteUserMutationFn = Apollo.MutationFunction<DeleteUserMutation, DeleteUserMutationVariables>;
+
+/**
+ * __useDeleteUserMutation__
+ *
+ * To run a mutation, you first call `useDeleteUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUserMutation, { data, loading, error }] = useDeleteUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteUserMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUserMutation, DeleteUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, options);
+      }
+export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutation>;
+export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
+export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
+export const GetPaginatedUsersDocument = gql`
+    query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInput) {
+  customer(slug: $customerSlug) {
+    id
+    usersConnection(filter: $filter) {
+      userCustomers {
+        createdAt
+        user {
+          id
+          email
+          firstName
+          lastName
+        }
+        role {
+          id
+          name
+        }
+      }
+      totalPages
+      pageInfo {
+        hasPrevPage
+        hasNextPage
+        prevPageOffset
+        nextPageOffset
+        pageIndex
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetPaginatedUsersQuery__
+ *
+ * To run a query within a React component, call `useGetPaginatedUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPaginatedUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPaginatedUsersQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetPaginatedUsersQuery(baseOptions: Apollo.QueryHookOptions<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(GetPaginatedUsersDocument, options);
+      }
+export function useGetPaginatedUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(GetPaginatedUsersDocument, options);
+        }
+export type GetPaginatedUsersQueryHookResult = ReturnType<typeof useGetPaginatedUsersQuery>;
+export type GetPaginatedUsersLazyQueryHookResult = ReturnType<typeof useGetPaginatedUsersLazyQuery>;
+export type GetPaginatedUsersQueryResult = Apollo.QueryResult<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>;
+export function refetchGetPaginatedUsersQuery(variables?: GetPaginatedUsersQueryVariables) {
+      return { query: GetPaginatedUsersDocument, variables: variables }
+    }
 export const GetRolesDocument = gql`
     query GetRoles($id: ID) {
   customer(id: $id) {
