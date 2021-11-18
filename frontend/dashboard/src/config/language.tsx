@@ -1,6 +1,26 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    last_activity: {
+      en: 'Last seen',
+      de: 'Zuletzt gesehen',
+    },
+    active: {
+      en: 'Active',
+      de: 'Aktiv',
+    },
+    inactive: {
+      en: 'Inactive',
+      de: 'Inaktiv',
+    },
+    last_logged_in: {
+      en: 'Last logged in',
+      de: 'Zuletzt eingeloggt',
+    },
+    user_workspace_access: {
+      en: 'Access',
+      de: 'Betreten',
+    },
     filter_users: {
       en: 'Filter users',
       de: 'Benutzer filtern',
@@ -1870,6 +1890,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
+    user_access_changed: {
+      en: 'User access changed!',
+      de: 'Benutzerzugang geändert!',
+    },
+    user_access_helper: {
+      en: 'User with email {{email}} has been set to {{state}}',
+      de: 'Benutzer mit der E-Mail {{email}} wurde auf {{state}} gesetzt',
+    },
     branch_duplicated: {
       en: 'Branch duplicated!',
       de: 'Zweig dupliziert!',

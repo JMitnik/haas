@@ -16,6 +16,25 @@ class UserPrismaAdapter {
   }
 
   /**
+   * Find all workspaces belonging to user id.
+   * @param userId
+   * @returns a list of workspaces together and whether a user is active in them or not
+   */
+  findAllWorkspacesByUserId = async (userId: string) => {
+    const userWorkspaces = await this.prisma.userOfCustomer.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        isActive: true,
+        customer: true,
+      },
+    });
+
+    return userWorkspaces;
+  }
+
+  /**
   * Build a userConnection prisma query based on the filter parameters.
   * @param customerSlug the slug of a workspace
   * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
@@ -86,23 +105,63 @@ class UserPrismaAdapter {
       return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.lastName, filter.orderBy.desc ? 'desc' : 'asc');
     } if (filter?.orderBy?.by === 'email') {
       return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, filter.orderBy.desc ? 'desc' : 'asc');
+    } if (filter?.orderBy?.by === 'lastActivity') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, filter.orderBy.desc ? 'desc' : 'asc');
     }
 
     return usersOfCustomer;
   };
 
   /**
-  * Order userOfCustomer by a "createdAt".
+  * Order userOfCustomer by UserConnectionFilterInput
   * @param filter
   */
   buildOrderByQuery = (filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
-    let orderByQuery: Prisma.UserOfCustomerOrderByInput[] = [];
+    let orderByQuery: Prisma.UserOfCustomerOrderByWithRelationInput[] = [];
 
     if (filter?.orderBy?.by === 'createdAt') {
       orderByQuery.push({
         createdAt: filter.orderBy.desc ? 'desc' : 'asc',
       });
     };
+
+    if (filter?.orderBy?.by === 'lastActivity') {
+      orderByQuery.push({
+        user: {
+          lastActivity: filter.orderBy.desc ? 'desc' : 'asc',
+        }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'firstName') {
+      orderByQuery.push({
+        user: { firstName: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'lastName') {
+      orderByQuery.push({
+        user: { lastName: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'email') {
+      orderByQuery.push({
+        user: { email: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'role') {
+      orderByQuery.push({
+        role: { name: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'isActive') {
+      orderByQuery.push({
+        isActive: filter.orderBy.desc ? 'desc' : 'asc',
+      });
+    }
 
     return orderByQuery;
   };
@@ -142,8 +201,7 @@ class UserPrismaAdapter {
       },
     });
 
-    const orderedUsers = this.orderUsersBy(users, filter);
-    return orderedUsers;
+    return users;
   };
 
   /**
@@ -351,11 +409,55 @@ class UserPrismaAdapter {
     });
   };
 
+  async setIsActive(input: { userId: string, workspaceId: string, isActive: boolean }) {
+    const result = await this.prisma.userOfCustomer.update({
+      where: {
+        userId_customerId: {
+          userId: input.userId,
+          customerId: input.workspaceId,
+        }
+      },
+      data: {
+        isActive: input.isActive,
+      },
+      include: {
+        user: true,
+        role: true,
+        customer: true,
+      }
+    });
+
+    return result;
+  }
+
+  /**
+   * Updates the user's last activity date
+   */
+  async updateLastSeen(userId: string | undefined, lastSeen: Date) {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        lastActivity: lastSeen,
+      },
+    });
+  }
+
+  /**
+   * Login user.
+   *
+   * - Set new refresh token
+   * - Update `lastLoggedIn`
+   * - Update `loginToken`
+   * @param userId
+   * @param refreshToken
+   * @returns
+   */
   async login(userId: string | undefined, refreshToken: string): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
       data: {
         refreshToken,
+        lastLoggedIn: new Date(Date.now()),
         loginToken: null,
       },
     });

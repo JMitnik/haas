@@ -37,12 +37,12 @@ export const HeadingCell = ({ children, sorting, descending = true, onDescendCha
   <TableHeadingCellContainer>
     {children}
 
-    {sorting && (
+    {!!onDescendChange && (
       <UI.Icon ml={2} width="21px" display="block">
-        <IconSortUp onClick={() => onDescendChange?.(false)} className={descending ? '' : 'active'} />
+        <IconSortUp onClick={() => onDescendChange?.(false)} className={sorting && !descending ? 'active' : ''} />
         <IconSortDown
           onClick={() => onDescendChange?.(true)}
-          className={descending ? 'active' : ''}
+          className={sorting && descending ? 'active' : ''}
           style={{ marginTop: '-8px' }}
         />
       </UI.Icon>

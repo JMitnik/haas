@@ -34,6 +34,10 @@ class UserService {
     return { deletedUser: false };
   };
 
+  async updateLastSeen(userId: string) {
+    return this.userPrismaAdapter.updateLastSeen(userId, new Date());
+  };
+
   async editUser(
     userUpdateInput: Prisma.UserUpdateInput,
     email: string,
@@ -75,6 +79,14 @@ class UserService {
     const user = await this.userPrismaAdapter.getUserById(userId);
     return user?.customers.map((customerOfUser) => customerOfUser.customer) || [];
   };
+
+  async findActiveWorkspacesOfUser(userId: string) {
+    const userWorkspaces = await this.userPrismaAdapter.findAllWorkspacesByUserId(userId)
+    const activeUserWorkspacesRelations = userWorkspaces.filter((userInWorkspace) => userInWorkspace.isActive);
+    const activeWorkspaces = activeUserWorkspacesRelations.map((workspaceRelation) => workspaceRelation.customer);
+
+    return activeWorkspaces;
+  }
 
   async getUserCustomers(userId: string) {
     const user = await this.userPrismaAdapter.getUserById(userId);
@@ -144,6 +156,10 @@ class UserService {
   async getValidUsers(loginToken: string, userId: string | undefined): Promise<UserWithWorkspaces[]> {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   };
+
+  async setUserStateInWorkspace(input: { userId: string, workspaceId: string, isActive: boolean }) {
+    return this.userPrismaAdapter.setIsActive(input);
+  }
 
   /**
    * Invites a new user to a current customer, and mails them with a login-token.

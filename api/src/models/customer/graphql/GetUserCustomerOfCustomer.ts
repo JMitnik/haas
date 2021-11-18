@@ -1,7 +1,7 @@
 import { extendType } from "@nexus/schema";
 import { UserInputError } from "apollo-server";
 
-import { UserCustomerType } from "../../users/User";
+import { UserCustomerType } from "../../users/graphql/User";
 
 export const GetUserCustomerOfCustomer = extendType({
   type: 'Customer',

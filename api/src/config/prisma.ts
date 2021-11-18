@@ -1,6 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient({
+interface CustomNodeJsGlobal extends NodeJS.Global {
+  prisma: PrismaClient
+}
+
+// Prevent multiple instances of Prisma Client in development
+declare const global: CustomNodeJsGlobal
+
+
+const prisma = global.prisma || new PrismaClient({
   log: [
     {
       emit: 'stdout',
@@ -17,12 +25,16 @@ const prisma = new PrismaClient({
   ]
 });
 
+if (process.env.NODE_ENV === 'development') global.prisma = prisma
+
 prisma.$on('beforeExit', () => {
   console.log('Prisma: BeforeExit is being run (it is disconnecting)');
 })
 
 if (process.env.ENVIRONMENT === 'debug') {
+  // @ts-ignore
   prisma.$on('query', (event) => {
+    // @ts-ignore
     console.log(event.query);
   });
 }

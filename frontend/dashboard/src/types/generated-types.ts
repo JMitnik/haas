@@ -683,6 +683,12 @@ export type GetCampaignsInput = {
   customerSlug?: Maybe<Scalars['String']>;
 };
 
+export type HandleUserStateInWorkspaceInput = {
+  userId?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
+  isActive?: Maybe<Scalars['Boolean']>;
+};
+
 export type ImageType = {
   __typename?: 'ImageType';
   filename?: Maybe<Scalars['String']>;
@@ -830,6 +836,7 @@ export type Mutation = {
   createWorkspace: Customer;
   editWorkspace: Customer;
   deleteCustomer?: Maybe<Customer>;
+  handleUserStateInWorkspace: UserCustomer;
   editUser: UserType;
   deleteUser: DeleteUserOutput;
   copyDialogue: Dialogue;
@@ -991,6 +998,11 @@ export type MutationEditWorkspaceArgs = {
 
 export type MutationDeleteCustomerArgs = {
   where?: Maybe<CustomerWhereUniqueInput>;
+};
+
+
+export type MutationHandleUserStateInWorkspaceArgs = {
+  input?: Maybe<HandleUserStateInWorkspaceInput>;
 };
 
 
@@ -1820,7 +1832,10 @@ export enum UserConnectionOrder {
   FirstName = 'firstName',
   LastName = 'lastName',
   Email = 'email',
-  CreatedAt = 'createdAt'
+  CreatedAt = 'createdAt',
+  LastActivity = 'lastActivity',
+  Role = 'role',
+  IsActive = 'isActive'
 }
 
 /** Sorting of UserConnection */
@@ -1831,7 +1846,8 @@ export type UserConnectionOrderByInput = {
 
 export type UserCustomer = {
   __typename?: 'UserCustomer';
-  createdAt: Scalars['String'];
+  createdAt: Scalars['Date'];
+  isActive: Scalars['Boolean'];
   user: UserType;
   customer: Customer;
   role: RoleType;
@@ -1860,6 +1876,8 @@ export type UserType = {
   phone?: Maybe<Scalars['String']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
+  lastLoggedIn?: Maybe<Scalars['Date']>;
+  lastActivity?: Maybe<Scalars['Date']>;
   globalPermissions?: Maybe<Array<SystemPermission>>;
   userCustomers: Array<UserCustomer>;
   customers: Array<Customer>;
@@ -2426,10 +2444,10 @@ export type GetPaginatedUsersQuery = (
       & Pick<UserConnection, 'totalPages'>
       & { userCustomers: Array<(
         { __typename?: 'UserCustomer' }
-        & Pick<UserCustomer, 'createdAt'>
+        & Pick<UserCustomer, 'createdAt' | 'isActive'>
         & { user: (
           { __typename?: 'UserType' }
-          & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName'>
+          & Pick<UserType, 'lastLoggedIn' | 'lastActivity' | 'id' | 'email' | 'firstName' | 'lastName'>
         ), role: (
           { __typename?: 'RoleType' }
           & Pick<RoleType, 'id' | 'name'>
@@ -2481,6 +2499,23 @@ export type GetUserCustomerFromCustomerQuery = (
       ) }
     )> }
   )> }
+);
+
+export type HandleUserStateInWorkspaceMutationVariables = Exact<{
+  input: HandleUserStateInWorkspaceInput;
+}>;
+
+
+export type HandleUserStateInWorkspaceMutation = (
+  { __typename?: 'Mutation' }
+  & { handleUserStateInWorkspace: (
+    { __typename?: 'UserCustomer' }
+    & Pick<UserCustomer, 'isActive'>
+    & { user: (
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'email'>
+    ) }
+  ) }
 );
 
 export const DeliveryEventFragmentFragmentDoc = gql`
@@ -3656,7 +3691,10 @@ export const GetPaginatedUsersDocument = gql`
     usersConnection(filter: $filter) {
       userCustomers {
         createdAt
+        isActive
         user {
+          lastLoggedIn
+          lastActivity
           id
           email
           firstName
@@ -3805,3 +3843,39 @@ export type GetUserCustomerFromCustomerQueryResult = Apollo.QueryResult<GetUserC
 export function refetchGetUserCustomerFromCustomerQuery(variables?: GetUserCustomerFromCustomerQueryVariables) {
       return { query: GetUserCustomerFromCustomerDocument, variables: variables }
     }
+export const HandleUserStateInWorkspaceDocument = gql`
+    mutation handleUserStateInWorkspace($input: HandleUserStateInWorkspaceInput!) {
+  handleUserStateInWorkspace(input: $input) {
+    isActive
+    user {
+      email
+    }
+  }
+}
+    `;
+export type HandleUserStateInWorkspaceMutationFn = Apollo.MutationFunction<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>;
+
+/**
+ * __useHandleUserStateInWorkspaceMutation__
+ *
+ * To run a mutation, you first call `useHandleUserStateInWorkspaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useHandleUserStateInWorkspaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [handleUserStateInWorkspaceMutation, { data, loading, error }] = useHandleUserStateInWorkspaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useHandleUserStateInWorkspaceMutation(baseOptions?: Apollo.MutationHookOptions<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>(HandleUserStateInWorkspaceDocument, options);
+      }
+export type HandleUserStateInWorkspaceMutationHookResult = ReturnType<typeof useHandleUserStateInWorkspaceMutation>;
+export type HandleUserStateInWorkspaceMutationResult = Apollo.MutationResult<HandleUserStateInWorkspaceMutation>;
+export type HandleUserStateInWorkspaceMutationOptions = Apollo.BaseMutationOptions<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>;

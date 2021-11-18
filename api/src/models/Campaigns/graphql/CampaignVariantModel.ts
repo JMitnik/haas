@@ -1,7 +1,7 @@
 import { enumType, objectType } from '@nexus/schema';
 
 import { CampaignModel } from './CampaignModel';
-import { CustomerType } from '../../customer/Customer';
+import { CustomerType } from '../../customer/graphql/Customer';
 import { DeliveryConnectionModel } from './DeliveryConnectionModel';
 import { DialogueType } from '../../questionnaire/Dialogue';
 

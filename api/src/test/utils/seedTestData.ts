@@ -48,10 +48,12 @@ export const seedUser = async (
   prisma: PrismaClient,
   workspaceId: string,
   role: Prisma.RoleCreateInput,
+  userInput?: Prisma.UserCreateInput
 ) => {
   const user = await prisma.user.create({
     data: {
-      email: internet.email()
+      email: internet.email(),
+      ...userInput,
     }
   });
 

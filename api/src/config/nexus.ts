@@ -6,7 +6,7 @@ import * as InteractionAPI from '../models/session/graphql';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import * as QuestionNodeAPI from '../models/QuestionNode';
-import * as UserAPI from '../models/users/User';
+import * as UserAPI from '../models/users/graphql';
 import * as WorkspaceAPI from '../models/customer';
 import config from './config';
 import customerSettingsNexus from '../models/settings/CustomerSettings';

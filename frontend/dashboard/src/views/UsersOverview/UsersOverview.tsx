@@ -4,6 +4,7 @@ import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, 
 import { Calendar, Filter, Search, User } from 'react-feather';
 import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, startOfDay } from 'date-fns';
+import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -15,20 +16,31 @@ import {
   PaginationSortByEnum,
   UserConnectionOrder,
   useGetPaginatedUsersQuery,
+  useHandleUserStateInWorkspaceMutation,
 } from 'types/generated-types';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { formatSimpleDate } from 'utils/dateUtils';
+import { useCustomer } from 'providers/CustomerProvider';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Searchbar from 'components/SearchBar';
+import useAuth from 'hooks/useAuth';
 
 import { UserModalCard } from './UserModalCard';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
 
-const columns = 'minmax(50px, 1fr) minmax(50px, 1fr) minmax(200px, 1fr) minmax(30px, 1fr) minmax(50px, 1fr)';
+const columns = `
+  minmax(50px, 1fr)
+  minmax(50px, 1fr)
+  minmax(200px, 1fr)
+  minmax(30px, 1fr)
+  minmax(50px, 1fr)
+  minmax(50px, 1fr)
+  minmax(50px, 1fr)
+  `;
 
 const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
   const nameExists = !!firstName;
@@ -50,9 +62,12 @@ const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
 };
 
 const UsersOverview = () => {
+  const { canAccessAdmin, canEditUsers } = useAuth();
+  const { activeCustomer } = useCustomer();
   const { customerSlug, goToUserView, goToUsersOverview } = useNavigator();
   const { t } = useTranslation();
   const location = useLocation();
+  const toast = useToast();
   const [activePaginatedUsersResult, setActivePaginatedUsersResult] = useState<GetPaginatedUsersQuery>();
 
   const [filter, setFilter] = useQueryParams({
@@ -70,7 +85,7 @@ const UsersOverview = () => {
   });
 
   const { refetch, loading: isLoading } = useGetPaginatedUsersQuery({
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
     variables: {
       customerSlug,
       filter: {
@@ -87,8 +102,25 @@ const UsersOverview = () => {
       },
     },
     errorPolicy: 'ignore',
+    notifyOnNetworkStatusChange: true,
     onCompleted: (fetchedData) => {
       setActivePaginatedUsersResult(fetchedData);
+    },
+  });
+
+  const [setUserAccessibility] = useHandleUserStateInWorkspaceMutation({
+    onCompleted: (userOfCustomer) => {
+      const email = userOfCustomer?.handleUserStateInWorkspace?.user?.email;
+      const state = userOfCustomer?.handleUserStateInWorkspace?.isActive ? t('active') : t('inactive');
+      refetch();
+
+      toast({
+        title: t('toast:user_access_changed'),
+        description: t('toast:user_access_helper', { email, state }),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
     },
   });
 
@@ -153,30 +185,14 @@ const UsersOverview = () => {
   };
 
   const tableData = activePaginatedUsersResult?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
-    createdAt: userCustomer.createdAt,
     ...userCustomer.user,
+    isActive: userCustomer.isActive,
+    createdAt: userCustomer.createdAt,
+    userId: userCustomer.user.id,
     role: userCustomer.role,
   })) || [];
 
   const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
-
-  const handleRefetch = () => {
-    refetch({
-      customerSlug,
-      filter: {
-        firstName: filter.firstName,
-        lastName: filter.lastName,
-        email: filter.email,
-        role: filter.role,
-        startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
-        endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
-        search: filter.search,
-        offset: filter.pageIndex * filter.perPage,
-        perPage: filter.perPage,
-        orderBy: { by: filter.orderByField as UserConnectionOrder, desc: filter.orderByDescending },
-      },
-    });
-  };
 
   return (
     <>
@@ -186,7 +202,7 @@ const UsersOverview = () => {
             <UI.ViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.ViewTitle>
             <InviteUserButton>
               {(onClose) => (
-                <InviteUserForm onRefetch={handleRefetch} onClose={onClose} />
+                <InviteUserForm onRefetch={refetch} onClose={onClose} />
               )}
             </InviteUserButton>
           </UI.Flex>
@@ -318,28 +334,80 @@ const UsersOverview = () => {
           </UI.Flex>
 
           <Table.HeadingRow gridTemplateColumns={columns}>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.FirstName}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.FirstName,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('first_name')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.LastName}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.LastName,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('last_name')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.Email}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.Email,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('email')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.Role}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.Role,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('role')}
             </Table.HeadingCell>
             <Table.HeadingCell
-              sorting
+              sorting={filter.orderByField === UserConnectionOrder.CreatedAt}
               descending={filter.orderByDescending || false}
-              onDescendChange={(isDescend) => setFilter({ orderByDescending: isDescend })}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.CreatedAt,
+                orderByDescending: isDescend,
+              })}
             >
               {t('created_at')}
+            </Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.LastActivity}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.LastActivity,
+                orderByDescending: isDescend,
+              })}
+            >
+              {t('last_activity')}
+            </Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.IsActive}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.IsActive,
+                orderByDescending: isDescend,
+              })}
+            >
+              {t('user_workspace_access')}
             </Table.HeadingCell>
           </Table.HeadingRow>
           {tableData.map((user) => (
             <Table.Row
+              isDisabled={!user.isActive}
               onClick={() => goToUserView(user.id)}
               isLoading={isLoading}
               key={user.id}
@@ -358,9 +426,7 @@ const UsersOverview = () => {
               </Table.Cell>
 
               <Table.Cell>
-                <UI.Helper>
-                  {user?.email}
-                </UI.Helper>
+                {user?.email}
               </Table.Cell>
 
               <Table.Cell>
@@ -370,8 +436,33 @@ const UsersOverview = () => {
                   </UI.Helper>
                 </Table.InnerCell>
               </Table.Cell>
+
               <Table.Cell>
                 <FormatTimestamp timestamp={user.createdAt} />
+              </Table.Cell>
+
+              <Table.Cell>
+                {user.lastActivity ? <FormatTimestamp timestamp={user.lastActivity} /> : <UI.Helper>-</UI.Helper>}
+              </Table.Cell>
+
+              <Table.Cell onClick={(e) => e.stopPropagation()}>
+                <UI.Toggle
+                  size="lg"
+                  isChecked={user.isActive}
+                  color="teal"
+                  isDisabled={!canAccessAdmin && !canEditUsers}
+                  onChange={() => {
+                    setUserAccessibility({
+                      variables: {
+                        input: {
+                          isActive: !user.isActive,
+                          userId: user.userId,
+                          workspaceId: activeCustomer?.id,
+                        },
+                      },
+                    });
+                  }}
+                />
               </Table.Cell>
             </Table.Row>
           ))}

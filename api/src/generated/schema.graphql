@@ -585,6 +585,12 @@ input GetCampaignsInput {
   customerSlug: String
 }
 
+input HandleUserStateInWorkspaceInput {
+  isActive: Boolean
+  userId: String
+  workspaceId: String
+}
+
 type ImageType {
   encoding: String
   filename: String
@@ -730,6 +736,7 @@ type Mutation {
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
+  handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
 
   """Invite a user to a particular customer domain, given an email and role"""
   inviteUser(input: InviteUserInput): InviteUserOutput!
@@ -1353,7 +1360,10 @@ enum UserConnectionOrder {
   createdAt
   email
   firstName
+  isActive
+  lastActivity
   lastName
+  role
 }
 
 """Sorting of UserConnection"""
@@ -1363,8 +1373,9 @@ input UserConnectionOrderByInput {
 }
 
 type UserCustomer {
-  createdAt: String!
+  createdAt: Date!
   customer: Customer!
+  isActive: Boolean!
   role: RoleType!
   user: UserType!
 }
@@ -1391,6 +1402,8 @@ type UserType {
   firstName: String
   globalPermissions: [SystemPermission!]
   id: ID!
+  lastActivity: Date
+  lastLoggedIn: Date
   lastName: String
   phone: String
   role: RoleType
