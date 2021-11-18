@@ -1,10 +1,9 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Div } from './Generics';
-import { Breadcrumb } from './Nav';
 import { Stack } from './Container';
-import { Text } from './Type';
 import { Icon } from './Icon';
+import { Span } from './Span';
 
 
 interface ViewTitleProps {
@@ -12,7 +11,7 @@ interface ViewTitleProps {
   children?: React.ReactNode;
 }
 
-export const ViewTitleContainer = styled(Text)`
+export const ViewTitleContainer = styled(Span)`
   ${({ theme }) => css`
     color: ${theme.colors.gray[600]};
     font-size: 1.8rem;
@@ -84,7 +83,6 @@ ${({ theme, isCompact }) => css`
 export const ViewBody = styled(Div) <{ isCompact?: boolean; }>`
 ${({ theme, isCompact }) => css`
   margin: 0 auto;
-  /* min-height: 100vh; */
   padding: ${theme.gutter}px;
   background: ${theme.colors.gray[50]};
 

@@ -1,8 +1,8 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
-import { Calendar, Plus, Search, User } from 'react-feather';
-import { Route, Switch, useHistory, useLocation, useParams } from 'react-router';
+import { Calendar, Filter, Search, User } from 'react-feather';
+import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, startOfDay } from 'date-fns';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,6 @@ import {
   GetPaginatedUsersQuery,
   PaginationSortByEnum,
   UserConnectionOrder,
-  useDeleteUserMutation,
   useGetPaginatedUsersQuery,
   useHandleUserStateInWorkspaceMutation,
 } from 'types/generated-types';
@@ -36,12 +35,12 @@ import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
 
 const columns = `
-  minmax(50px, 1fr) 
-  minmax(50px, 1fr) 
-  minmax(200px, 1fr) 
-  minmax(30px, 1fr) 
-  minmax(50px, 1fr) 
-  minmax(50px, 1fr) 
+  minmax(50px, 1fr)
+  minmax(50px, 1fr)
+  minmax(200px, 1fr)
+  minmax(30px, 1fr)
+  minmax(50px, 1fr)
+  minmax(50px, 1fr)
   minmax(50px, 1fr)
   `;
 
@@ -67,10 +66,8 @@ const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
 const UsersOverview = () => {
   const { canAccessAdmin, canEditUsers } = useAuth();
   const { activeCustomer } = useCustomer();
-  const { customerSlug } = useParams<{ customerSlug: string }>();
-  const { goToUserView, goToUsersOverview } = useNavigator();
+  const { customerSlug, goToUserView, goToUsersOverview } = useNavigator();
   const { t } = useTranslation();
-  const history = useHistory();
   const location = useLocation();
   const toast = useToast();
   const [activePaginatedUsersResult, setActivePaginatedUsersResult] = useState<GetPaginatedUsersQuery>();
@@ -144,46 +141,6 @@ const UsersOverview = () => {
       handleRefetch();
     },
   });
-
-  const [deleteUser] = useDeleteUserMutation({
-    onCompleted: () => {
-      refetch();
-      toast({
-        title: 'User removed!',
-        description: 'The user has been removed from the workspace.',
-        status: 'success',
-        position: 'bottom-right',
-        duration: 1500,
-      });
-    },
-    onError: () => {
-      toast({
-        title: 'An error ocurred!',
-        description: 'It was not possible to remove user.',
-        status: 'error',
-        position: 'bottom-right',
-        duration: 1500,
-      });
-    },
-  });
-
-  const handleDeleteUser = (event: any, userId: string) => {
-    event.stopPropagation();
-
-    deleteUser({
-      variables: {
-        input: {
-          userId,
-          customerId: activeCustomer?.id,
-        },
-      },
-    });
-  };
-
-  const handleEditUser = (event: any, userId: string) => {
-    event.stopPropagation();
-    history.push(`/dashboard/b/${customerSlug}/u/${userId}/edit`);
-  };
 
   const handleSearchTermChange = (search: string) => {
     setFilter((prevValues) => ({
@@ -261,7 +218,7 @@ const UsersOverview = () => {
         <UI.Flex width="100%" justifyContent="space-between">
           <UI.Flex alignItems="center">
             <UI.ViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.ViewTitle>
-            <InviteUserButton label="">
+            <InviteUserButton>
               {(onClose) => (
                 <InviteUserForm onRefetch={handleRefetch} onClose={onClose} />
               )}
@@ -279,10 +236,10 @@ const UsersOverview = () => {
         <UI.Div>
           <UI.Flex mb={2} justifyContent="space-between">
 
-            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={(<Plus />)}>
+            <PickerButton arrowBg="gray.50" label={t('filter_users')} icon={(<Filter />)}>
               {() => (
                 <TabbedMenu
-                  menuHeader={t('add_filter')}
+                  menuHeader={t('filter_users')}
                   tabs={[
                     { label: t('search'), icon: <Search /> },
                     { label: t('date'), icon: <Calendar /> },
@@ -303,7 +260,7 @@ const UsersOverview = () => {
                     <UI.RadioHeader>
                       {t('filter_by_date')}
                     </UI.RadioHeader>
-                    <UI.SectionSubHeader>
+                    <UI.SectionSubHeader mb={2}>
                       {t('filter_by_updated_date_description')}
                     </UI.SectionSubHeader>
                     <UI.DatePicker
@@ -314,7 +271,7 @@ const UsersOverview = () => {
                   </UI.Div>
 
                   <UI.Div>
-                    <UI.Stack>
+                    <UI.Stack spacing={4}>
                       <UI.Div>
                         <UI.RadioHeader>
                           {t('filter_by_recipient_first_name')}
@@ -437,7 +394,6 @@ const UsersOverview = () => {
                   <UI.Span fontWeight={600} color="gray.500">
                     {user?.lastName}
                   </UI.Span>
-
                 )}
               </Table.Cell>
 

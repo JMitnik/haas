@@ -1,11 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import {
-  Div, Form, FormContainer, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted,
-} from '@haas/ui';
+import { FormErrorMessage, useToast } from '@chakra-ui/core';
 import { Mail } from 'react-feather';
 import { gql, useMutation } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
@@ -133,70 +129,54 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
   };
 
   return (
-    <UI.ViewBody>
-      <FormContainer>
-        <Form onSubmit={form.handleSubmit(handleSubmit)}>
-          <FormSection id="about">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('user:about_user')}</H3>
-              <Muted color="gray.600">
-                {t('user:about_user_helper')}
-              </Muted>
-            </Div>
-            <Div>
-              <InputGrid>
-                <FormControl isRequired isInvalid={!!form.errors.email}>
-                  <FormLabel htmlFor="email">{t('email')}</FormLabel>
-                  <InputHelper>{t('email_helper')}</InputHelper>
-                  <Input
-                    placeholder="Doe"
-                    leftEl={<Mail />}
-                    name="email"
-                    ref={form.register()}
-                  />
-                  <FormErrorMessage>{form.errors?.email?.message}</FormErrorMessage>
-                </FormControl>
-              </InputGrid>
-            </Div>
-          </FormSection>
-
-          <Hr />
-
-          <FormSection id="roles">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('roles')}</H3>
-              <Muted color="gray.600">
-                {t('user:roles_helper')}
-              </Muted>
-            </Div>
-            <Div>
-              <FormControl isInvalid={!!form.errors.phone}>
-                <FormLabel htmlFor="pgone">{t('role_selector')}</FormLabel>
-                <InputHelper>{t('role_selector_helper')}</InputHelper>
-                <Controller
-                  name="role"
-                  as={Select}
-                  control={form.control}
-                  options={selectRoles}
+    <UI.Div py={2} px={4}>
+      <UI.FormSectionHelper mb={1}>
+        {t('invite_user_description')}
+      </UI.FormSectionHelper>
+      <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
+        <UI.InputGrid>
+          <UI.Div>
+            <UI.InputGrid>
+              <UI.FormControl isRequired isInvalid={!!form.errors.email}>
+                <UI.FormLabel htmlFor="email">{t('email')}</UI.FormLabel>
+                <UI.InputHelper>{t('email_helper')}</UI.InputHelper>
+                <UI.Input
+                  placeholder="Doe"
+                  leftEl={<Mail />}
+                  name="email"
+                  ref={form.register()}
                 />
-              </FormControl>
-            </Div>
-          </FormSection>
+                <FormErrorMessage>{form.errors?.email?.message}</FormErrorMessage>
+              </UI.FormControl>
+              <UI.Div>
+                <UI.FormControl>
+                  <UI.FormLabel htmlFor="pgone">{t('role_selector')}</UI.FormLabel>
+                  <UI.InputHelper>{t('role_selector_helper')}</UI.InputHelper>
+                  <Controller
+                    name="role"
+                    as={Select}
+                    control={form.control}
+                    options={selectRoles}
+                  />
+                </UI.FormControl>
+              </UI.Div>
 
-          <ButtonGroup>
-            <Button
-              isLoading={isLoading}
-              isDisabled={!form.formState.isValid}
-              variantColor="teal"
-              type="submit"
-            >
-              Send invite
-            </Button>
-            <Button variant="outline" onClick={() => onClose()}>Cancel</Button>
-          </ButtonGroup>
-        </Form>
-      </FormContainer>
-    </UI.ViewBody>
+              <UI.Stack isInline>
+                <UI.Button
+                  isLoading={isLoading}
+                  isDisabled={!form.formState.isValid}
+                  variantColor="teal"
+                  type="submit"
+                >
+                  Send invite
+                </UI.Button>
+                <UI.Button variant="outline" onClick={() => onClose()}>Cancel</UI.Button>
+              </UI.Stack>
+            </UI.InputGrid>
+          </UI.Div>
+        </UI.InputGrid>
+      </UI.Form>
+    </UI.Div>
   );
 };
 
