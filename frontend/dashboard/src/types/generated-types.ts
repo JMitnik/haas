@@ -1832,7 +1832,10 @@ export enum UserConnectionOrder {
   FirstName = 'firstName',
   LastName = 'lastName',
   Email = 'email',
-  CreatedAt = 'createdAt'
+  CreatedAt = 'createdAt',
+  LastActivity = 'lastActivity',
+  Role = 'role',
+  IsActive = 'isActive'
 }
 
 /** Sorting of UserConnection */

@@ -528,7 +528,7 @@ export interface NexusGenEnums {
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
   UploadImageEnumType: "LOGO" | "WEBSITE_SCREENSHOT"
-  UserConnectionOrder: "createdAt" | "email" | "firstName" | "lastActivity" | "lastName"
+  UserConnectionOrder: "createdAt" | "email" | "firstName" | "isActive" | "lastActivity" | "lastName" | "role"
 }
 
 export interface NexusGenRootTypes {

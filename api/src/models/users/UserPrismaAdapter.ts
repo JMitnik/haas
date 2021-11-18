@@ -16,7 +16,7 @@ class UserPrismaAdapter {
   }
 
   /**
-   *
+   * Find all workspaces belonging to user id.
    * @param userId
    * @returns a list of workspaces together and whether a user is active in them or not
    */
@@ -30,6 +30,7 @@ class UserPrismaAdapter {
         customer: true,
       },
     });
+
     return userWorkspaces;
   }
 
@@ -112,17 +113,55 @@ class UserPrismaAdapter {
   };
 
   /**
-  * Order userOfCustomer by a "createdAt".
+  * Order userOfCustomer by UserConnectionFilterInput
   * @param filter
   */
   buildOrderByQuery = (filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
-    let orderByQuery: Prisma.UserOfCustomerOrderByInput[] = [];
+    let orderByQuery: Prisma.UserOfCustomerOrderByWithRelationInput[] = [];
 
     if (filter?.orderBy?.by === 'createdAt') {
       orderByQuery.push({
         createdAt: filter.orderBy.desc ? 'desc' : 'asc',
       });
     };
+
+    if (filter?.orderBy?.by === 'lastActivity') {
+      orderByQuery.push({
+        user: {
+          lastActivity: filter.orderBy.desc ? 'desc' : 'asc',
+        }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'firstName') {
+      orderByQuery.push({
+        user: { firstName: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'lastName') {
+      orderByQuery.push({
+        user: { lastName: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'email') {
+      orderByQuery.push({
+        user: { email: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'role') {
+      orderByQuery.push({
+        role: { name: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'isActive') {
+      orderByQuery.push({
+        isActive: filter.orderBy.desc ? 'desc' : 'asc',
+      });
+    }
 
     return orderByQuery;
   };
@@ -162,8 +201,7 @@ class UserPrismaAdapter {
       },
     });
 
-    const orderedUsers = this.orderUsersBy(users, filter);
-    return orderedUsers;
+    return users;
   };
 
   /**
@@ -388,6 +426,7 @@ class UserPrismaAdapter {
         customer: true,
       }
     });
+
     return result;
   }
 
@@ -403,6 +442,16 @@ class UserPrismaAdapter {
     });
   }
 
+  /**
+   * Login user.
+   *
+   * - Set new refresh token
+   * - Update `lastLoggedIn`
+   * - Update `loginToken`
+   * @param userId
+   * @param refreshToken
+   * @returns
+   */
   async login(userId: string | undefined, refreshToken: string): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },

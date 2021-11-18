@@ -23,8 +23,10 @@ import {
   InputProps as ChakraInputProps,
   InputGroupProps,
   FormControlProps,
+  Switch as ChakraSwitch,
   Textarea as ChakraTextArea,
   RadioButtonGroup as ChakraRadioButtonGroup,
+  SwitchProps,
 } from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
@@ -915,6 +917,16 @@ export const SwitchItem = styled.button.attrs({ type: 'button' }) <SwitchItemPro
     `}
   `}
 `
+
+export const Toggle = forwardRef((props: SwitchProps, ref) => {
+  const { children, ...restProps } = props;
+
+  return (
+    <ChakraSwitch ref={ref} {...restProps}>
+      {children}
+    </ChakraSwitch>
+  );
+});
 
 type ReactSelectProps = ReactSelect<any>['props'];
 

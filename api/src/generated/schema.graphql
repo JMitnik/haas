@@ -1360,8 +1360,10 @@ enum UserConnectionOrder {
   createdAt
   email
   firstName
+  isActive
   lastActivity
   lastName
+  role
 }
 
 """Sorting of UserConnection"""

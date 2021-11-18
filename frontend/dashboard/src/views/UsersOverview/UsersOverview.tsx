@@ -21,7 +21,6 @@ import {
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { TabbedMenu } from 'components/Common/TabMenu';
-import { TableCellButtonContainer } from 'components/Common/Table';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -29,7 +28,6 @@ import SearchBar from 'components/SearchBar/SearchBar';
 import Searchbar from 'components/SearchBar';
 import useAuth from 'hooks/useAuth';
 
-import { PopoverItem } from './UsersOverviewStyles';
 import { UserModalCard } from './UserModalCard';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
@@ -87,7 +85,7 @@ const UsersOverview = () => {
   });
 
   const { refetch, loading: isLoading } = useGetPaginatedUsersQuery({
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
     variables: {
       customerSlug,
       filter: {
@@ -104,33 +102,18 @@ const UsersOverview = () => {
       },
     },
     errorPolicy: 'ignore',
+    notifyOnNetworkStatusChange: true,
     onCompleted: (fetchedData) => {
       setActivePaginatedUsersResult(fetchedData);
     },
   });
 
-  const handleRefetch = () => {
-    refetch({
-      customerSlug,
-      filter: {
-        firstName: filter.firstName,
-        lastName: filter.lastName,
-        email: filter.email,
-        role: filter.role,
-        startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
-        endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
-        search: filter.search,
-        offset: filter.pageIndex * filter.perPage,
-        perPage: filter.perPage,
-        orderBy: { by: filter.orderByField as UserConnectionOrder, desc: filter.orderByDescending },
-      },
-    });
-  };
-
   const [setUserAccessibility] = useHandleUserStateInWorkspaceMutation({
     onCompleted: (userOfCustomer) => {
       const email = userOfCustomer?.handleUserStateInWorkspace?.user?.email;
       const state = userOfCustomer?.handleUserStateInWorkspace?.isActive ? t('active') : t('inactive');
+      refetch();
+
       toast({
         title: 'User accessibility changed!',
         description: `User with email ${email} has been set to ${state}`,
@@ -138,7 +121,6 @@ const UsersOverview = () => {
         position: 'bottom-right',
         duration: 1500,
       });
-      handleRefetch();
     },
   });
 
@@ -220,7 +202,7 @@ const UsersOverview = () => {
             <UI.ViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.ViewTitle>
             <InviteUserButton>
               {(onClose) => (
-                <InviteUserForm onRefetch={handleRefetch} onClose={onClose} />
+                <InviteUserForm onRefetch={refetch} onClose={onClose} />
               )}
             </InviteUserButton>
           </UI.Flex>
@@ -352,34 +334,80 @@ const UsersOverview = () => {
           </UI.Flex>
 
           <Table.HeadingRow gridTemplateColumns={columns}>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.FirstName}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.FirstName,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('first_name')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.LastName}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.LastName,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('last_name')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.Email}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.Email,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('email')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.Role}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.Role,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('role')}
             </Table.HeadingCell>
             <Table.HeadingCell
-              sorting
+              sorting={filter.orderByField === UserConnectionOrder.CreatedAt}
               descending={filter.orderByDescending || false}
-              onDescendChange={(isDescend) => setFilter({ orderByDescending: isDescend })}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.CreatedAt,
+                orderByDescending: isDescend,
+              })}
             >
               {t('created_at')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.LastActivity}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.LastActivity,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('last_activity')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.IsActive}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.IsActive,
+                orderByDescending: isDescend,
+              })}
+            >
               {t('user_workspace_access')}
             </Table.HeadingCell>
           </Table.HeadingRow>
           {tableData.map((user) => (
             <Table.Row
+              isDisabled={!user.isActive}
               onClick={() => goToUserView(user.id)}
               isLoading={isLoading}
               key={user.id}
@@ -417,49 +445,24 @@ const UsersOverview = () => {
                 {user.lastActivity ? <FormatTimestamp timestamp={user.lastActivity} /> : <UI.Helper>-</UI.Helper>}
               </Table.Cell>
 
-              <Table.Cell>
-                <Table.InnerCell
+              <Table.Cell onClick={(e) => e.stopPropagation()}>
+                <UI.Toggle
+                  size="lg"
+                  isChecked={user.isActive}
+                  color="teal"
                   isDisabled={!canAccessAdmin && !canEditUsers}
-                  header="User Workspace Access"
-                  brand={user?.isActive ? 'green' : 'red'}
-                  renderBody={() => (
-                    <UI.Stack spacing={1}>
-                      <PopoverItem>
-                        <UI.Text>Set access of this user to: </UI.Text>
-                        <UI.Flex justifyContent="center">
-                          <TableCellButtonContainer
-                            onClick={() => setUserAccessibility({
-                              variables: {
-                                input: {
-                                  isActive: !user.isActive,
-                                  userId: user.userId,
-                                  workspaceId: activeCustomer?.id,
-                                },
-                              },
-                            })}
-                            as="button"
-                            py={1}
-                            px={2}
-                            borderRadius={10}
-                            border="1px solid"
-                            borderColor="gray.100"
-                            bg={user?.isActive ? 'red.100' : 'green.100'}
-                          >
-                            <UI.Helper color={user?.isActive ? 'red.600' : 'green.600'}>
-                              {user?.isActive ? t('inactive') : t('active')}
-                            </UI.Helper>
-                          </TableCellButtonContainer>
-                        </UI.Flex>
-
-                      </PopoverItem>
-
-                    </UI.Stack>
-                  )}
-                >
-                  <UI.Helper color={user?.isActive ? 'green.600' : 'red.600'}>
-                    {user?.isActive ? t('active') : t('inactive')}
-                  </UI.Helper>
-                </Table.InnerCell>
+                  onChange={() => {
+                    setUserAccessibility({
+                      variables: {
+                        input: {
+                          isActive: !user.isActive,
+                          userId: user.userId,
+                          workspaceId: activeCustomer?.id,
+                        },
+                      },
+                    });
+                  }}
+                />
               </Table.Cell>
             </Table.Row>
           ))}
