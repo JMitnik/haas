@@ -9,6 +9,7 @@ import UsersOverview from '../UsersOverview';
 
 const generateUserCustomer: (index: number) => UserCustomer = (index: number) => ({
   __typename: 'UserCustomer',
+  isActive: true,
   customer: {
     id: '',
     campaigns: [],
@@ -28,6 +29,7 @@ const generateUserCustomer: (index: number) => UserCustomer = (index: number) =>
     email: `${name.firstName()}@example.com`,
     __typename: 'UserType',
     customers: [],
+    lastLoggedIn: new Date().toISOString(),
     userCustomers: [],
   },
 });
@@ -54,6 +56,7 @@ describe('UsersOverview (happy path)', () => {
               {
                 __typename: 'UserCustomer',
                 createdAt: new Date().toISOString(),
+                isActive: true,
                 role: {
                   id: '1',
                   name: 'Manager',
@@ -61,6 +64,7 @@ describe('UsersOverview (happy path)', () => {
                 },
                 user: {
                   id: 'A',
+                  lastLoggedIn: new Date().toISOString(),
                   firstName: 'John',
                   lastName: 'Doe',
                   email: 'johndoe@gmail.com',
@@ -101,6 +105,7 @@ describe('UsersOverview (happy path)', () => {
             userCustomers: [
               {
                 __typename: 'UserCustomer',
+                isActive: true,
                 createdAt: new Date().toISOString(),
                 role: {
                   id: '1',
@@ -110,6 +115,7 @@ describe('UsersOverview (happy path)', () => {
                 user: {
                   id: 'A',
                   firstName: 'John',
+                  lastLoggedIn: new Date().toISOString(),
                   lastName: 'Doe',
                   email: 'johndoe@gmail.com',
                   __typename: 'UserType',
