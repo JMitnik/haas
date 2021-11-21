@@ -1,6 +1,6 @@
 import React, { forwardRef, Ref, ReactNode, useState, useEffect, useRef } from 'react';
-import 'antd/dist/antd.css'; // Slider,
-import 'easymde/dist/easymde.min.css'; // Markdown
+// import 'antd/dist/antd.css'; // Slider,
+// import 'easymde/dist/easymde.min.css'; // Markdown
 import AntdDatePickerGenerate from 'rc-picker/lib/generate/dateFns';
 import generatePicker from 'antd/lib/date-picker/generatePicker';
 import {

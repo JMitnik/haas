@@ -1,6 +1,20 @@
 query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
   customer(slug: $customerSlug) {
     id
+    slug
+    name
+    settings {
+      id
+      logoUrl
+      logoOpacity
+      colourSettings {
+        id
+        primary
+        primaryAlt
+        secondary
+      }
+    }
+
     dialogue(where: { slug: $dialogueSlug }) {
       id
       title

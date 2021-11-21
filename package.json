@@ -9,7 +9,8 @@
             "api",
             "frontend/dashboard",
             "frontend/ui",
-            "frontend/client"
+            "frontend/client",
+            "frontend/dialogue"
         ],
         "nohoist": [
             "frontend/client/webpack-dev-server",
@@ -32,6 +33,7 @@
         "start": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn start:api\"",
         "start:api": "yarn workspace @haas/api start",
         "start:api:debug": "yarn workspace @haas/api start:debug",
+        "start:dialogue": "yarn workspace @haas/dialogue dev",
         "start:client": "yarn workspace @haas/client start",
         "start:dashboard": "yarn workspace @haas/dashboard start",
         "deploy:aws:campaign": "cd aws/commands && bash deploy-campaign.bash",

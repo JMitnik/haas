@@ -1,6 +1,7 @@
 {
-  "name": "dialogue",
+  "name": "@haas/dialogue",
   "private": true,
+  "version": "0.0.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,10 +11,12 @@
   },
   "dependencies": {
     "@apollo/client": "3.4.16",
-    "graphql": "16.0.1",
+    "@haas/ui": "*",
+    "@chakra-ui/core": "^0.8.0",
     "next": "12.0.2",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "styled-components": "^5.3.3"
   },
   "devDependencies": {
     "eslint": "7",
