@@ -16,10 +16,24 @@ class RoleService {
     this.rolePrismaAdapter = new RolePrismaAdapter(prismaClient);
   };
 
+  /**
+   * Finds role `roleId` of user `userId`.
+   *
+   * - Permissions of Role also includes GlobalPermissions
+   * # TODO: Add this note to the Graphql API documentation.
+   * @param roleId
+   * @param userId
+   * @returns
+   */
   async findRoleById(roleId: string, userId: string) {
-    const globalPermissions = await this.rolePrismaAdapter.getGlobalPermissions(userId);
+    const globalPermissions = await this.rolePrismaAdapter.getGlobalPermissionsOfUser(userId);
     const role = await this.rolePrismaAdapter.getRoleById(roleId);
-    const roleIncludingGlobalPermissions = [...(role?.permissions || []), ...(globalPermissions || [])];
+
+    // Concat role permissions with global permissions
+    const roleIncludingGlobalPermissions = [
+      ...(role?.permissions || []),
+      ...(globalPermissions || [])
+    ];
     return { ...role, permissions: roleIncludingGlobalPermissions };
   }
 

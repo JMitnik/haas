@@ -32,6 +32,7 @@ export const useNavigator = () => {
   const userOverviewMatch = useRouteMatch<{ dialogueSlug: string }>({
     path: ROUTES.USERS_OVERVIEW,
   });
+
   const history = useHistory();
   const location = useLocation();
 

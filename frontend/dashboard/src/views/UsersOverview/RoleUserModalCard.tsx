@@ -12,12 +12,11 @@ const CheckBoxCard = styled(UI.Card) <{ isChecked?: boolean }>`
     width: 100%;
     min-height: 100px;
     border: 1px solid #F9F6EE;
+
     ${isChecked && css`
       border: 1px solid #3182ce;
     `}
-    
   `}
- 
 `;
 
 interface RoleUserModalCardProps {
@@ -27,9 +26,9 @@ interface RoleUserModalCardProps {
 }
 
 interface RoleUserFormProps {
-  allPermissions?: Array<SystemPermission>
-  permissionsState?: Array<PermissionsType>
-  permissionsArray?: Array<SystemPermission>
+  allPermissions?: SystemPermission[];
+  permissionsState?: PermissionsType[];
+  permissionsArray?: SystemPermission[];
   roleId: string;
   onClose: () => void;
 }
@@ -39,8 +38,13 @@ interface PermissionsType {
   isActive: boolean;
 }
 
-const RoleUserForm = (
-  { permissionsState, allPermissions, permissionsArray, roleId, onClose }: RoleUserFormProps,
+const RoleUserForm = ({
+  permissionsState,
+  allPermissions,
+  permissionsArray,
+  roleId,
+  onClose
+}: RoleUserFormProps,
 ) => {
   const { t } = useTranslation();
   const toast = useToast();

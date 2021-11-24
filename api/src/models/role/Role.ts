@@ -18,7 +18,7 @@ export const RoleWithPermissionsType = objectType({
       resolve: () => SystemPermissions,
     });
   }
-})
+});
 
 export const RoleType = objectType({
   name: 'RoleType',

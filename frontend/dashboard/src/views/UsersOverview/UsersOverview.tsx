@@ -44,7 +44,7 @@ const columns = `
   minmax(50px, 1fr)
   minmax(50px, 1fr)
   minmax(50px, 1fr)
-  `;
+`;
 
 const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
   const nameExists = !!firstName;
