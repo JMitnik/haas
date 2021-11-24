@@ -1,7 +1,8 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 
-import { theme } from './theme';
-import ThemeProviders from './ThemeProviders';
+import { theme } from './Theme/theme';
+import ThemeProviders from './Theme/ThemeProviders';
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -9,9 +10,11 @@ interface AppProvidersProps {
 
 const AppProviders = ({ children }: AppProvidersProps) => {
   return (
-    <ThemeProviders>
-      {children}
-    </ThemeProviders>
+    <BrowserRouter>
+      <ThemeProviders>
+        {children}
+      </ThemeProviders>
+    </BrowserRouter>
   )
 }
 

@@ -1,7 +1,11 @@
 import React from 'react';
-import * as UI from '@haas/ui';
+
 import { Customer, Dialogue as DialogueType } from 'types/generated-types';
 import AppProviders from 'config/AppProviders';
+import DialogueThemer from 'config/Theme/DialogueThemer';
+
+import * as LS from './DialogueStyles';
+import { DialogueRouter } from './DialogueRouter';
 
 interface DialogueProps {
   dialogue: DialogueType;
@@ -11,11 +15,11 @@ interface DialogueProps {
 const Dialogue = ({ dialogue, workspace }: DialogueProps) => {
   return (
     <AppProviders>
-      <div style={{ height: '100%' }}>
-        <UI.Text>
-          {dialogue.title}
-        </UI.Text>
-      </div>
+      <DialogueThemer>
+        <LS.DialogueContainer>
+          <DialogueRouter />
+        </LS.DialogueContainer>
+      </DialogueThemer>
     </AppProviders>
   )
 }

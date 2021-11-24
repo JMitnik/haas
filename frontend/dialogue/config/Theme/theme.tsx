@@ -57,4 +57,6 @@ export const chakraDefaultTheme = {
   fontSizes: chakraTheme.fontSizes,
 };
 
+export type Theme = typeof theme;
+
 theme.colors.app.background = theme.colors.default.normal;

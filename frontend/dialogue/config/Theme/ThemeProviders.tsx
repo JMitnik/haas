@@ -1,8 +1,9 @@
 import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
 import { ThemeProvider } from 'styled-components';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { theme, chakraDefaultTheme } from 'config/theme';
+import { theme, chakraDefaultTheme } from 'config/Theme/theme';
+import DialogueThemer from './DialogueThemer';
 
 /* eslint-disable arrow-body-style */
 export const removeEmpty = (obj: any) => {
@@ -30,25 +31,13 @@ interface ThemeProvidersProps {
 const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   const [customTheme, setCustomTheme] = useState({});
 
-  if (customTheme) {
-    return (
-      <ThemeProvider theme={theme}>
-        <ThemeProvider theme={makeCustomTheme(theme, customTheme)}>
-          <ChakraThemeProvider theme={makeCustomTheme(chakraDefaultTheme, customTheme)}>
-            <CSSReset />
-              {children}
-          </ChakraThemeProvider>
-        </ThemeProvider>
-      </ThemeProvider>
-    );
-  }
-
   return (
-    <>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={makeCustomTheme(theme, customTheme)}>
+      <ChakraThemeProvider theme={makeCustomTheme(chakraDefaultTheme, customTheme)}>
+        <CSSReset />
         {children}
-      </ThemeProvider>
-    </>
+      </ChakraThemeProvider>
+    </ThemeProvider>
   );
 };
 

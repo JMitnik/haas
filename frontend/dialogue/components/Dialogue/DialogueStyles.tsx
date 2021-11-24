@@ -1,14 +1,15 @@
 import styled, { css } from 'styled-components';
 
 interface DialogueContainerProps {
-  gradientStart: string;
-  gradientTo: string;
-  gradientStops: string[];
+  // gradientStart: string;
+  // gradientTo: string;
+  // gradientStops: string[];
 }
 
-const DialogueContainer = css<DialogueContainerProps>`
-  ${({ theme, gradientStart, gradientTo, gradientStops = [] }) => css`
-      --bg-gradient-from: ${gradientStart};
-      --bg-gradient-stops: ${gradientStops.join(', ')};
+export const DialogueContainer = styled.div<DialogueContainerProps>`
+  ${({ theme }) => css`
+    padding: ${theme.gutter}px 0;
+    width: ${theme.containerWidth}px;
+    margin: 0 auto;
   `}
 `;
