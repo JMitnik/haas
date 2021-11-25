@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
 
 import { ConnectionInterface } from '../../general/Pagination';
-import { RoleType, SystemPermission } from '../../role/Role';
+import { RoleType, SystemPermission } from '../../role/graphql/Role';
 
 export const UserCustomerType = objectType({
   name: 'UserCustomer',
@@ -84,7 +84,7 @@ export const UserType = objectType({
       type: UserCustomerType,
 
       async resolve(parent, args, ctx) {
-        return ctx.services.userService.getUserCustomers(parent.id) as any;
+        return ctx.services.userService.getUserCustomers(parent.id);
       },
     });
 

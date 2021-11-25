@@ -443,11 +443,13 @@ model RegistrationNodeEntry {
 
 // Permissions
 model Permission {
-  id          String    @id @default(cuid())
+  id          String  @id @default(cuid())
   name        String
   description String?
-  Customer    Customer? @relation(fields: [customerId], references: [id])
-  customerId  String?
+
+  // type       SystemPermissionEnum TODO: Add enum type, and start using these permissions EVERYWHERE instead of enum
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
 }
 
 enum SystemPermissionEnum {

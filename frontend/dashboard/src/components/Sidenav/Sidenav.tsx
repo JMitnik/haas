@@ -52,18 +52,19 @@ interface NavItemProps extends LinkProps {
 }
 
 interface NavLinkProps extends LinkProps {
-  isDisabled?: boolean;
+  // Styled-components does not pass props with a dollar sign to the underlying element.
+  $isDisabled?: boolean;
 }
 
 export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
-  ${({ theme, isDisabled }) => css`
+  ${({ theme, $isDisabled }) => css`
     color: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['600']};
     padding: 8px 11px;
     display: flex;
     align-items: center;
     font-size: 0.8rem;
 
-    ${isDisabled && css`
+    ${$isDisabled && css`
       opacity: 0.3;
       pointer-events: none;
       cursor: not-allowed;
@@ -99,7 +100,7 @@ export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
 
 export const NavItem = ({ children, renderSibling, isDisabled, isSubchildActive, ...props }: NavItemProps) => (
   <NavItemContainer isSubchildActive={isSubchildActive}>
-    <NavLinkContainer isDisabled={isDisabled} {...props}>
+    <NavLinkContainer $isDisabled={isDisabled} {...props}>
       {children}
     </NavLinkContainer>
     {!isDisabled && (

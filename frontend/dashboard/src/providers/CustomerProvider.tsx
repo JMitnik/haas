@@ -1,58 +1,35 @@
 import { useHistory, useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
 import React, { useContext, useEffect, useState } from 'react';
-import { gql } from '@apollo/client';
 
-import { SystemPermission } from 'types/globalTypes';
-import {
-  getCustomerOfUser_UserOfCustomer_customer as Customer,
-  getCustomerOfUser_UserOfCustomer_role as Role,
-  getCustomerOfUser as UserCustomerData,
-  getCustomerOfUserVariables as UserCustomerVariables,
-} from './__generated__/getCustomerOfUser';
+import { Customer, RoleType, SystemPermission, useGetCustomerOfUserQuery } from 'types/generated-types';
+
 import { useUser } from './UserProvider';
 
 const CustomerContext = React.createContext({} as CustomerContextProps);
 
-const getCustomerOfUser = gql`
-  query getCustomerOfUser($input: UserOfCustomerInput) {
-    UserOfCustomer(input: $input) {
-      customer {
-        id
-        name
-        slug
-        settings {
-          logoUrl
-          colourSettings {
-            primary
-          }
-        }
-      }
-      role {
-        name
-        permissions
-      }
-      user {
-        id
-      }
-    }
-  }
-`;
-
 interface CustomerProps extends Customer {
-  userRole: Role;
+  userRole: {
+    __typename?: 'RoleType' | undefined;
+  } & Pick<RoleType, 'name' | 'permissions'>;
 }
 
 interface CustomerContextProps {
+  isLoading: boolean;
   setActiveCustomer: (customer: CustomerProps | null) => void;
   activeCustomer?: CustomerProps | null;
   activePermissions?: SystemPermission[];
 }
 
-const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
+interface CustomerProviderProps {
+  children: React.ReactNode;
+  workspaceOverrideSlug?: string;
+}
+
+const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderProps) => {
   const { user } = useUser();
   const history = useHistory();
   const { customerSlug } = useParams<{ customerSlug: string }>();
+  const workspaceSlug = customerSlug || workspaceOverrideSlug;
 
   // Synchronize customer with localstorage
   const [activeCustomer, setActiveCustomer] = useState<CustomerProps | null>(() => {
@@ -75,11 +52,11 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [activeCustomer]);
 
-  useQuery<UserCustomerData, UserCustomerVariables>(getCustomerOfUser, {
-    skip: !customerSlug,
+  const { loading: isLoading } = useGetCustomerOfUserQuery({
+    skip: !workspaceSlug,
     variables: {
       input: {
-        customerSlug,
+        customerSlug: workspaceSlug,
         userId: user?.id,
       },
     },
@@ -108,7 +85,7 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
   const activePermissions = [...(user?.globalPermissions || []), ...(activeCustomer?.userRole?.permissions || [])];
 
   return (
-    <CustomerContext.Provider value={{ activeCustomer, setActiveCustomer, activePermissions }}>
+    <CustomerContext.Provider value={{ activeCustomer, setActiveCustomer, activePermissions, isLoading }}>
       {children}
     </CustomerContext.Provider>
   );
