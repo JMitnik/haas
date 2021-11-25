@@ -31,6 +31,8 @@ const useAuth = (): UseAuthProps => {
   // Technically this should not work in views without CustomerProvider <- Will return undefined thus
   const { activePermissions } = useCustomer();
 
+  // console.log({ user, activePermissions });
+
   const authPermissions = activePermissions || user?.globalPermissions;
   const isSuperAdmin = user?.globalPermissions?.includes(SystemPermission.CanAccessAdminPanel);
 

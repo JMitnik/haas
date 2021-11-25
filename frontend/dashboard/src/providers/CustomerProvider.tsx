@@ -14,15 +14,22 @@ interface CustomerProps extends Customer {
 }
 
 interface CustomerContextProps {
+  isLoading: boolean;
   setActiveCustomer: (customer: CustomerProps | null) => void;
   activeCustomer?: CustomerProps | null;
   activePermissions?: SystemPermission[];
 }
 
-const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
+interface CustomerProviderProps {
+  children: React.ReactNode;
+  workspaceOverrideSlug?: string;
+}
+
+const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderProps) => {
   const { user } = useUser();
   const history = useHistory();
   const { customerSlug } = useParams<{ customerSlug: string }>();
+  const workspaceSlug = customerSlug || workspaceOverrideSlug;
 
   // Synchronize customer with localstorage
   const [activeCustomer, setActiveCustomer] = useState<CustomerProps | null>(() => {
@@ -45,11 +52,11 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [activeCustomer]);
 
-  useGetCustomerOfUserQuery({
-    skip: !customerSlug,
+  const { loading: isLoading } = useGetCustomerOfUserQuery({
+    skip: !workspaceSlug,
     variables: {
       input: {
-        customerSlug,
+        customerSlug: workspaceSlug,
         userId: user?.id,
       },
     },
@@ -78,7 +85,7 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
   const activePermissions = [...(user?.globalPermissions || []), ...(activeCustomer?.userRole?.permissions || [])];
 
   return (
-    <CustomerContext.Provider value={{ activeCustomer, setActiveCustomer, activePermissions }}>
+    <CustomerContext.Provider value={{ activeCustomer, setActiveCustomer, activePermissions, isLoading }}>
       {children}
     </CustomerContext.Provider>
   );

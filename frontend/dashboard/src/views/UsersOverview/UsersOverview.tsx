@@ -135,7 +135,7 @@ const UsersOverview = () => {
     },
   });
 
-  const [deleteUser] = useDeleteUserMutation({
+  const [deleteUser, { called, loading }] = useDeleteUserMutation({
     onCompleted: () => {
       refetch();
 
@@ -148,6 +148,8 @@ const UsersOverview = () => {
       });
     },
   });
+
+  // console.log({called, loading })
 
   const handleDeleteUser = (userId: string) => {
     deleteUser({
@@ -463,7 +465,7 @@ const UsersOverview = () => {
               disabled={tableData.length === 1 || (!canEditUsers && !canAccessAdmin)}
               onClick={() => handleDeleteUser(contextUser?.userId || '')}
             >
-              {t('delete_user')}
+              {t('remove_user')}
             </Menu.Item>
           </Menu.Base>
           {tableData.map((user) => (

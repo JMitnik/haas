@@ -635,6 +635,10 @@ const language = {
       en: 'Register',
       de: 'Registrieren',
     },
+    remove_user: {
+      en: 'Remove user',
+      de: 'Benutzer entfernen',
+    },
     delete_user: {
       en: 'Delete user',
       de: 'Benutzer zu löschen',
