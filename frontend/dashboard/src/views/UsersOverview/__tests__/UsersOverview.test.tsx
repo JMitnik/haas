@@ -1,12 +1,26 @@
 import { graphql } from 'msw';
 import { name } from 'faker';
 import { range } from 'lodash';
-import { expectWorkspaceLoaded, fireEvent, userEvent, render, screen, server, waitFor } from 'test';
 import React from 'react';
 
-import { DeleteUserMutation, DeleteUserMutationVariables, GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables, UserCustomer } from 'types/generated-types';
+import {
+  expectWorkspaceLoaded,
+  fireEvent,
+  userEvent,
+  render,
+  screen,
+  server,
+  waitFor,
+  act,
+  waitForRequest
+} from 'test';
+import {
+  DeleteUserMutationVariables,
+  GetPaginatedUsersQuery,
+  GetPaginatedUsersQueryVariables,
+  UserCustomer
+} from 'types/generated-types';
 import UsersOverview from '../UsersOverview';
-import { useLocation } from 'react-router-dom';
 
 const generateUserCustomer: (index: number) => UserCustomer = (index: number) => ({
   __typename: 'UserCustomer',
@@ -265,10 +279,17 @@ describe('UsersOverview (happy path)', () => {
 
     await expectWorkspaceLoaded();
 
+    const waitForDeleteUser = waitForRequest<DeleteUserMutationVariables>(server, 'deleteUser');
+
     fireEvent.contextMenu(await screen.findByText('johndoe@gmail.com'));
     const removeDropdown = await screen.findByText('Remove user');
     expect(removeDropdown).not.toBeDisabled();
     userEvent.click(removeDropdown);
+
+    await act(async () => {
+      const req = await waitForDeleteUser;
+      expect(req.body.variables?.input.userId).toBe('JOHN_ID_1');
+    });
 
     await waitFor(() => {
       expect(screen.queryByText('johndoe@gmail.com')).not.toBeInTheDocument();
