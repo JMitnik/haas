@@ -21,6 +21,7 @@ const generateUserCustomer: (index: number) => UserCustomer = (index: number) =>
   role: {
     id: '1',
     name: 'Admin',
+    allPermissions: [],
     __typename: 'RoleType',
   },
   user: {

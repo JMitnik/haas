@@ -14,7 +14,7 @@ import dialogueNexus from '../models/questionnaire/Dialogue';
 import edgeNexus from '../models/edge/Edge';
 import linkNexus from '../models/link/Link';
 import permissionNexus from '../models/permission/Permission';
-import roleNexus from '../models/role/Role';
+import * as RoleAPI from '../models/role';
 import tagNexus from '../models/tag/Tag';
 import triggerNexus from '../models/trigger/Trigger';
 import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
@@ -26,7 +26,7 @@ const nexus = [
   ...Array(CampaignAPI),
   ...triggerNexus,
   ...permissionNexus,
-  ...roleNexus,
+  ...Array(RoleAPI),
   ...Array(WorkspaceAPI),
   ...Array(UserAPI),
   ...customerSettingsNexus,

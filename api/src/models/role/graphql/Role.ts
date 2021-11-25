@@ -1,23 +1,12 @@
 import { enumType, extendType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
 
-import { PaginationWhereInput } from '../general/Pagination';
-import { SystemPermissions } from './Permissions';
+import { PaginationWhereInput } from '../../general/Pagination';
+import { SystemPermissions } from '../Permissions';
 
 export const SystemPermission = enumType({
   name: 'SystemPermission',
   members: SystemPermissions,
-});
-
-export const RoleWithPermissionsType = objectType({
-  name: 'RoleWithPermissionsType',
-  definition(t) {
-    t.field('role', { type: RoleType });
-    t.list.field('allPermissions', {
-      type: SystemPermission,
-      resolve: () => SystemPermissions,
-    });
-  }
 });
 
 export const RoleType = objectType({
@@ -29,6 +18,11 @@ export const RoleType = objectType({
     t.string('roleId', { nullable: true });
     t.string('customerId', { nullable: true });
     t.int('nrPermissions', { nullable: true });
+
+    t.list.field('allPermissions', {
+      type: SystemPermission,
+      resolve: () => SystemPermissions,
+    });
 
     t.list.field('permissions', {
       nullable: true,
@@ -71,26 +65,25 @@ export const FindRoleInput = inputObjectType({
   },
 });
 
-export const FindRoleByIdResolver = queryField('findRoleById', {
-  type: RoleWithPermissionsType,
-  nullable: true,
-  args: { input: FindRoleInput },
-  async resolve(parent, args, ctx) {
-    if (!args.input?.roleId) throw new UserInputError('No RoleId provided!');
-    if (!args.input?.userId) throw new UserInputError('No UserId provided!');
-
-    const role = await ctx.services.roleService.findRoleById(args.input.roleId, args.input.userId);
-
-    if (!role) return null;
-
-    return { role } as any;
-  }
-})
-
-
 export const RoleQueries = extendType({
   type: 'Query',
   definition(t) {
+    t.field('role', {
+      type: RoleType,
+      nullable: true,
+      args: { input: FindRoleInput },
+      async resolve(parent, args, ctx) {
+        if (!args.input?.roleId) throw new UserInputError('No RoleId provided!');
+        if (!args.input?.userId) throw new UserInputError('No UserId provided!');
+
+        const role = await ctx.services.roleService.findRoleById(args.input.roleId, args.input.userId);
+
+        if (!role) throw new UserInputError('Role not found!');
+
+        return role as any;
+      }
+    });
+
     t.field('roleConnection', {
       type: RoleConnection,
       args: {
@@ -189,8 +182,8 @@ export const RoleMutations = extendType({
 export default [
   UpdatePermissionsInput,
   UpdatePermissionsMutationResolver,
-  FindRoleInput,
-  FindRoleByIdResolver,
+  // FindRoleInput,
+  // FindRoleByIdResolver,
   RoleConnection,
   RoleQueries,
   RoleDataInput,

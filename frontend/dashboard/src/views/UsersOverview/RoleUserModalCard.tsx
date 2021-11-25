@@ -156,14 +156,14 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
     },
   });
 
-  const userOfCustomer = data?.findRoleById;
+  const role = data?.role;
 
   if (loading) {
     return <UI.Loader />;
   }
 
-  const permissions: PermissionsType[] = userOfCustomer?.allPermissions?.map((permission) => ({
-    isActive: userOfCustomer?.role?.permissions?.includes(permission) || false,
+  const permissions: PermissionsType[] = role?.allPermissions?.map((permission) => ({
+    isActive: role?.permissions?.includes(permission) || false,
     permission,
   })) || [];
 
@@ -175,17 +175,18 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
           {' '}
           -
           {' '}
-          {userOfCustomer?.role?.name}
+          {role?.name}
         </UI.ModalTitle>
       </UI.ModalHead>
       <UI.ModalBody>
         {error && (
           <UI.ErrorPane header="Server Error" text={error.message} />
         )}
+        <UI.Div mt={2} />
         <RoleUserForm
           permissionsState={permissions}
-          allPermissions={userOfCustomer?.allPermissions}
-          permissionsArray={userOfCustomer?.role?.permissions || []}
+          allPermissions={role?.allPermissions}
+          permissionsArray={role?.permissions || []}
           roleId={id}
           onClose={onClose}
         />

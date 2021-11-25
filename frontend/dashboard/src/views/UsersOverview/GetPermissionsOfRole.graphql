@@ -1,10 +1,9 @@
 query findRoleById($input: FindRoleInput) {
-  findRoleById(input: $input) {
-    role {
-      name
-      nrPermissions
-      permissions
-    }
+  role(input: $input) {
+    id
+    name
+    nrPermissions
+    permissions
     allPermissions
   }
 }

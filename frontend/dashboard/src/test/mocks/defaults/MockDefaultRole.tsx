@@ -7,5 +7,6 @@ export const defaultAdminRole: RoleType = {
   id: 'ROLE_1',
   name: 'Admin',
   __typename: 'RoleType',
+  allPermissions: [],
   permissions: [SystemPermission.CanEditUsers, SystemPermission.CanDeleteUsers],
 };
