@@ -1898,6 +1898,22 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
+    updated_permissions: {
+      en: 'Updated permissions',
+      de: 'Berechtigungen aktualisiert',
+    },
+    updated_permissions_helper: {
+      en: 'The permissions have been updated.',
+      de: 'Die Berechtigungen wurden aktualisiert.',
+    },
+    user_removed: {
+      en: 'User removed',
+      de: 'Benutzer entfernt',
+    },
+    user_removed_helper: {
+      en: 'The user has been removed from the workspace.',
+      de: 'Der Benutzer wurde aus dem Arbeitsbereich entfernt.',
+    },
     user_access_changed: {
       en: 'User access changed!',
       de: 'Benutzerzugang geändert!',

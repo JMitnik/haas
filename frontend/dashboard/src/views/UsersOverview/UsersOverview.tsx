@@ -135,13 +135,13 @@ const UsersOverview = () => {
     },
   });
 
-  const [deleteUser, { called, loading }] = useDeleteUserMutation({
+  const [deleteUser] = useDeleteUserMutation({
     onCompleted: () => {
       refetch();
 
       toast({
-        title: 'User removed!',
-        description: 'The user has been removed from the workspace.',
+        title: t('toast:user_removed'),
+        description: t('toast:user_removed_helper'),
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
@@ -452,7 +452,7 @@ const UsersOverview = () => {
             onClose={closeMenu}
           >
             <Menu.Header>
-              {t('filter')}
+              {t('actions')}
             </Menu.Header>
 
             <Menu.Item

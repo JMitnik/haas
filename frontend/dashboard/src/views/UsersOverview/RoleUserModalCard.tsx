@@ -8,13 +8,13 @@ import { SystemPermission, useFindRoleByIdQuery, useUpdatePermissionsMutation } 
 import styled, { css } from 'styled-components';
 
 const CheckBoxCard = styled(UI.Card) <{ isChecked?: boolean }>`
-  ${({ isChecked }) => css`
+  ${({ theme, isChecked }) => css`
     width: 100%;
     min-height: 100px;
     border: 1px solid #F9F6EE;
 
     ${isChecked && css`
-      border: 1px solid #3182ce;
+      border: 1px solid ${theme.colors.blue[500]};
     `}
   `}
 `;
@@ -53,8 +53,8 @@ const RoleUserForm = ({
     onCompleted: () => {
       onClose();
       toast({
-        title: 'Updated permissions',
-        description: 'Role has been updated with new permissions!',
+        title: t('toast:updated_permissions'),
+        description: t('toast:updated_permissions_helper'),
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
@@ -97,23 +97,26 @@ const RoleUserForm = ({
                 padding={1}
                 onClick={() => permission !== 'CAN_ACCESS_ADMIN_PANEL' && onChange(!value)}
               >
-                <UI.Flex justifyContent="flex-end">
-                  <Checkbox
+                <UI.Flex
+                  justifyContent="space-between"
+                  alignItems="center"
+                  borderBottom="1px solid"
+                  borderBottomColor="gray.100"
+                  py={1}
+                  px={1}
+                >
+                  <UI.Helper>
+                    {permission.replaceAll('_', ' ')}
+                  </UI.Helper>
+                  <UI.Checkbox
+                    // Without stopPropagation, checkbox and checkboxcard cancel each other out
+                    onClick={(e) => e.stopPropagation()}
                     isDisabled={permission === 'CAN_ACCESS_ADMIN_PANEL'}
                     isChecked={value}
                     onChange={() => permission !== 'CAN_ACCESS_ADMIN_PANEL' && onChange(!value)}
                   />
                 </UI.Flex>
-
-                <UI.Text
-                  style={{ transform: 'translateY(-5px)' }}
-                  fontWeight="bold"
-                  color="#4A5568"
-                >
-                  {permission.replaceAll('_', ' ')}
-
-                </UI.Text>
-                <UI.Text>{t(`permissions:${permission.toLowerCase()}`)}</UI.Text>
+                <UI.Text px={1} py={1}>{t(`permissions:${permission.toLowerCase()}`)}</UI.Text>
               </CheckBoxCard>
 
             )}
@@ -133,6 +136,10 @@ const RoleUserForm = ({
 
 /**
  * A modal used to display information of a user role after it being clicked on in the UsersOverview
+ *
+ * Note:
+ * - Permissions that are derived from global permissions could be checked, but they are not "disabled" yet in the Database.
+ *
  * @param object with an unique identifier as well as a onClose function to close the modal
  * @returns a pop-up modal displaying User role specific information, on this modal is a form where u can set the
  * permissions of a selected role
@@ -155,9 +162,9 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
     return <UI.Loader />;
   }
 
-  const perms: Array<PermissionsType> = userOfCustomer?.allPermissions?.map((perm) => ({
-    isActive: userOfCustomer?.role?.permissions?.includes(perm) || false,
-    permission: perm,
+  const permissions: PermissionsType[] = userOfCustomer?.allPermissions?.map((permission) => ({
+    isActive: userOfCustomer?.role?.permissions?.includes(permission) || false,
+    permission,
   })) || [];
 
   return (
@@ -176,13 +183,12 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
           <UI.ErrorPane header="Server Error" text={error.message} />
         )}
         <RoleUserForm
-          permissionsState={perms}
+          permissionsState={permissions}
           allPermissions={userOfCustomer?.allPermissions}
           permissionsArray={userOfCustomer?.role?.permissions || []}
           roleId={id}
           onClose={onClose}
         />
-
       </UI.ModalBody>
     </UI.ModalCard>
   );
