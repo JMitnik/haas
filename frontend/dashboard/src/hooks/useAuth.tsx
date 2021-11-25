@@ -31,13 +31,11 @@ const useAuth = (): UseAuthProps => {
   // Technically this should not work in views without CustomerProvider <- Will return undefined thus
   const { activePermissions } = useCustomer();
 
-  // console.log({ user, activePermissions });
-
   const authPermissions = activePermissions || user?.globalPermissions;
   const isSuperAdmin = user?.globalPermissions?.includes(SystemPermission.CanAccessAdminPanel);
 
   /**
-   * Chcek if user has permission to features,
+   * Check if user has permission to features,
    * 1. Check if user is SuperAdmin (allow *).
    * 2. Check if feature is in user's workspace permissions or globalpermissions.
    * 3. Else, return false.
