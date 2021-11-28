@@ -277,7 +277,7 @@ export type Customer = {
 
 export type CustomerUsersConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
-  filter?: Maybe<PaginationWhereInput>;
+  filter?: Maybe<UserConnectionFilterInput>;
 };
 
 
@@ -569,6 +569,11 @@ export type FailedDeliveryModel = {
   error: Scalars['String'];
 };
 
+export type FindRoleInput = {
+  roleId?: Maybe<Scalars['String']>;
+  userId?: Maybe<Scalars['String']>;
+};
+
 export type FontSettings = {
   __typename?: 'FontSettings';
   id: Scalars['ID'];
@@ -681,6 +686,12 @@ export type GenerateAutodeckInput = {
 
 export type GetCampaignsInput = {
   customerSlug?: Maybe<Scalars['String']>;
+};
+
+export type HandleUserStateInWorkspaceInput = {
+  userId?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
+  isActive?: Maybe<Scalars['Boolean']>;
 };
 
 export type ImageType = {
@@ -824,12 +835,14 @@ export type Mutation = {
   editTrigger: TriggerType;
   createTrigger: TriggerType;
   createPermission?: Maybe<PermssionType>;
+  updatePermissions?: Maybe<RoleType>;
   createRole: RoleType;
   updateRoles: RoleType;
   singleUpload: ImageType;
   createWorkspace: Customer;
   editWorkspace: Customer;
   deleteCustomer?: Maybe<Customer>;
+  handleUserStateInWorkspace: UserCustomer;
   editUser: UserType;
   deleteUser: DeleteUserOutput;
   copyDialogue: Dialogue;
@@ -963,6 +976,11 @@ export type MutationCreatePermissionArgs = {
 };
 
 
+export type MutationUpdatePermissionsArgs = {
+  input?: Maybe<UpdatePermissionsInput>;
+};
+
+
 export type MutationCreateRoleArgs = {
   data?: Maybe<RoleInput>;
 };
@@ -991,6 +1009,11 @@ export type MutationEditWorkspaceArgs = {
 
 export type MutationDeleteCustomerArgs = {
   where?: Maybe<CustomerWhereUniqueInput>;
+};
+
+
+export type MutationHandleUserStateInWorkspaceArgs = {
+  input?: Maybe<HandleUserStateInWorkspaceInput>;
 };
 
 
@@ -1250,6 +1273,7 @@ export type Query = {
   triggerConnection?: Maybe<TriggerConnectionType>;
   trigger?: Maybe<TriggerType>;
   triggers: Array<TriggerType>;
+  role?: Maybe<RoleType>;
   roleConnection: RoleConnection;
   customers: Array<Customer>;
   customer?: Maybe<Customer>;
@@ -1314,6 +1338,11 @@ export type QueryTriggersArgs = {
   dialogueId?: Maybe<Scalars['String']>;
   userId?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
+};
+
+
+export type QueryRoleArgs = {
+  input?: Maybe<FindRoleInput>;
 };
 
 
@@ -1497,6 +1526,7 @@ export type RoleType = {
   roleId?: Maybe<Scalars['String']>;
   customerId?: Maybe<Scalars['String']>;
   nrPermissions?: Maybe<Scalars['Int']>;
+  allPermissions: Array<SystemPermission>;
   permissions?: Maybe<Array<SystemPermission>>;
 };
 
@@ -1769,6 +1799,11 @@ export type UpdateCtaInputType = {
   form?: Maybe<FormNodeInputType>;
 };
 
+export type UpdatePermissionsInput = {
+  roleId?: Maybe<Scalars['String']>;
+  permissions?: Maybe<Array<SystemPermission>>;
+};
+
 export type UpdateQuestionNodeInputType = {
   id: Scalars['ID'];
   customerId?: Maybe<Scalars['ID']>;
@@ -1795,19 +1830,47 @@ export type UploadSellImageInputType = {
   workspaceId?: Maybe<Scalars['String']>;
 };
 
-export type UserConnection = DeprecatedConnectionInterface & {
+export type UserConnection = ConnectionInterface & {
   __typename?: 'UserConnection';
-  cursor?: Maybe<Scalars['String']>;
-  offset?: Maybe<Scalars['Int']>;
-  limit: Scalars['Int'];
-  pageInfo: DeprecatedPaginationPageInfo;
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo: PaginationPageInfo;
+  userCustomers: Array<UserCustomer>;
+};
+
+export type UserConnectionFilterInput = {
+  search?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
-  userCustomers: Array<UserCustomer>;
+  firstName?: Maybe<Scalars['String']>;
+  lastName?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  role?: Maybe<Scalars['String']>;
+  orderBy?: Maybe<UserConnectionOrderByInput>;
+  offset?: Maybe<Scalars['Int']>;
+  perPage?: Maybe<Scalars['Int']>;
+};
+
+/** Fields to order UserConnection by. */
+export enum UserConnectionOrder {
+  FirstName = 'firstName',
+  LastName = 'lastName',
+  Email = 'email',
+  CreatedAt = 'createdAt',
+  LastActivity = 'lastActivity',
+  Role = 'role',
+  IsActive = 'isActive'
+}
+
+/** Sorting of UserConnection */
+export type UserConnectionOrderByInput = {
+  by: UserConnectionOrder;
+  desc?: Maybe<Scalars['Boolean']>;
 };
 
 export type UserCustomer = {
   __typename?: 'UserCustomer';
+  createdAt: Scalars['Date'];
+  isActive: Scalars['Boolean'];
   user: UserType;
   customer: Customer;
   role: RoleType;
@@ -1836,6 +1899,8 @@ export type UserType = {
   phone?: Maybe<Scalars['String']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
+  lastLoggedIn?: Maybe<Scalars['Date']>;
+  lastActivity?: Maybe<Scalars['Date']>;
   globalPermissions?: Maybe<Array<SystemPermission>>;
   userCustomers: Array<UserCustomer>;
   customers: Array<Customer>;
@@ -1907,6 +1972,61 @@ export type SessionFragmentFragment = (
     { __typename?: 'DeliveryType' }
     & DeliveryFragmentFragment
   )> }
+);
+
+export type GetCustomerOfUserQueryVariables = Exact<{
+  input?: Maybe<UserOfCustomerInput>;
+}>;
+
+
+export type GetCustomerOfUserQuery = (
+  { __typename?: 'Query' }
+  & { UserOfCustomer?: Maybe<(
+    { __typename?: 'UserCustomer' }
+    & { customer: (
+      { __typename?: 'Customer' }
+      & Pick<Customer, 'id' | 'name' | 'slug'>
+      & { settings?: Maybe<(
+        { __typename?: 'CustomerSettings' }
+        & Pick<CustomerSettings, 'id' | 'logoUrl'>
+        & { colourSettings?: Maybe<(
+          { __typename?: 'ColourSettings' }
+          & Pick<ColourSettings, 'id' | 'primary'>
+        )> }
+      )>, campaigns: Array<(
+        { __typename?: 'CampaignType' }
+        & Pick<CampaignType, 'id' | 'label'>
+      )> }
+    ), role: (
+      { __typename?: 'RoleType' }
+      & Pick<RoleType, 'name' | 'permissions'>
+    ), user: (
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'id'>
+    ) }
+  )> }
+);
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = (
+  { __typename?: 'Query' }
+  & { me: (
+    { __typename?: 'UserType' }
+    & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName' | 'phone' | 'globalPermissions'>
+    & { userCustomers: Array<(
+      { __typename?: 'UserCustomer' }
+      & Pick<UserCustomer, 'isActive'>
+      & { customer: (
+        { __typename?: 'Customer' }
+        & Pick<Customer, 'id' | 'name' | 'slug'>
+      ), role: (
+        { __typename?: 'RoleType' }
+        & Pick<RoleType, 'name' | 'permissions'>
+      ) }
+    )> }
+  ) }
 );
 
 export type UploadUpsellImageMutationVariables = Exact<{
@@ -2373,6 +2493,64 @@ export type RequestInviteMutation = (
   ) }
 );
 
+export type DeleteUserMutationVariables = Exact<{
+  input: DeleteUserInput;
+}>;
+
+
+export type DeleteUserMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteUser: (
+    { __typename?: 'DeleteUserOutput' }
+    & Pick<DeleteUserOutput, 'deletedUser'>
+  ) }
+);
+
+export type GetPaginatedUsersQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+  filter?: Maybe<UserConnectionFilterInput>;
+}>;
+
+
+export type GetPaginatedUsersQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { usersConnection?: Maybe<(
+      { __typename?: 'UserConnection' }
+      & Pick<UserConnection, 'totalPages'>
+      & { userCustomers: Array<(
+        { __typename?: 'UserCustomer' }
+        & Pick<UserCustomer, 'createdAt' | 'isActive'>
+        & { user: (
+          { __typename?: 'UserType' }
+          & Pick<UserType, 'lastLoggedIn' | 'lastActivity' | 'id' | 'email' | 'firstName' | 'lastName'>
+        ), role: (
+          { __typename?: 'RoleType' }
+          & Pick<RoleType, 'id' | 'name'>
+        ) }
+      )>, pageInfo: (
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+      ) }
+    )> }
+  )> }
+);
+
+export type FindRoleByIdQueryVariables = Exact<{
+  input?: Maybe<FindRoleInput>;
+}>;
+
+
+export type FindRoleByIdQuery = (
+  { __typename?: 'Query' }
+  & { role?: Maybe<(
+    { __typename?: 'RoleType' }
+    & Pick<RoleType, 'id' | 'name' | 'nrPermissions' | 'permissions' | 'allPermissions'>
+  )> }
+);
+
 export type GetRolesQueryVariables = Exact<{
   id?: Maybe<Scalars['ID']>;
 }>;
@@ -2411,6 +2589,36 @@ export type GetUserCustomerFromCustomerQuery = (
         & Pick<RoleType, 'name' | 'id'>
       ) }
     )> }
+  )> }
+);
+
+export type HandleUserStateInWorkspaceMutationVariables = Exact<{
+  input: HandleUserStateInWorkspaceInput;
+}>;
+
+
+export type HandleUserStateInWorkspaceMutation = (
+  { __typename?: 'Mutation' }
+  & { handleUserStateInWorkspace: (
+    { __typename?: 'UserCustomer' }
+    & Pick<UserCustomer, 'isActive'>
+    & { user: (
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'email'>
+    ) }
+  ) }
+);
+
+export type UpdatePermissionsMutationVariables = Exact<{
+  input: UpdatePermissionsInput;
+}>;
+
+
+export type UpdatePermissionsMutation = (
+  { __typename?: 'Mutation' }
+  & { updatePermissions?: Maybe<(
+    { __typename?: 'RoleType' }
+    & Pick<RoleType, 'permissions'>
   )> }
 );
 
@@ -2494,6 +2702,121 @@ export const SessionFragmentFragmentDoc = gql`
 }
     ${NodeEntryFragmentFragmentDoc}
 ${DeliveryFragmentFragmentDoc}`;
+export const GetCustomerOfUserDocument = gql`
+    query getCustomerOfUser($input: UserOfCustomerInput) {
+  UserOfCustomer(input: $input) {
+    customer {
+      id
+      name
+      slug
+      settings {
+        id
+        logoUrl
+        colourSettings {
+          id
+          primary
+        }
+      }
+      campaigns {
+        id
+        label
+      }
+    }
+    role {
+      name
+      permissions
+    }
+    user {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCustomerOfUserQuery__
+ *
+ * To run a query within a React component, call `useGetCustomerOfUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCustomerOfUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCustomerOfUserQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetCustomerOfUserQuery(baseOptions?: Apollo.QueryHookOptions<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(GetCustomerOfUserDocument, options);
+      }
+export function useGetCustomerOfUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(GetCustomerOfUserDocument, options);
+        }
+export type GetCustomerOfUserQueryHookResult = ReturnType<typeof useGetCustomerOfUserQuery>;
+export type GetCustomerOfUserLazyQueryHookResult = ReturnType<typeof useGetCustomerOfUserLazyQuery>;
+export type GetCustomerOfUserQueryResult = Apollo.QueryResult<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>;
+export function refetchGetCustomerOfUserQuery(variables?: GetCustomerOfUserQueryVariables) {
+      return { query: GetCustomerOfUserDocument, variables: variables }
+    }
+export const MeDocument = gql`
+    query me {
+  me {
+    id
+    email
+    firstName
+    lastName
+    phone
+    globalPermissions
+    userCustomers {
+      isActive
+      customer {
+        id
+        name
+        slug
+      }
+      role {
+        name
+        permissions
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useMeQuery__
+ *
+ * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+      }
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+        }
+export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
+export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
+export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export function refetchMeQuery(variables?: MeQueryVariables) {
+      return { query: MeDocument, variables: variables }
+    }
 export const UploadUpsellImageDocument = gql`
     mutation uploadUpsellImage($input: UploadSellImageInputType) {
   uploadUpsellImage(input: $input) {
@@ -3547,6 +3870,146 @@ export function useRequestInviteMutation(baseOptions?: Apollo.MutationHookOption
 export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInviteMutation>;
 export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
 export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;
+export const DeleteUserDocument = gql`
+    mutation deleteUser($input: DeleteUserInput!) {
+  deleteUser(input: $input) {
+    deletedUser
+  }
+}
+    `;
+export type DeleteUserMutationFn = Apollo.MutationFunction<DeleteUserMutation, DeleteUserMutationVariables>;
+
+/**
+ * __useDeleteUserMutation__
+ *
+ * To run a mutation, you first call `useDeleteUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUserMutation, { data, loading, error }] = useDeleteUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteUserMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUserMutation, DeleteUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, options);
+      }
+export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutation>;
+export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
+export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
+export const GetPaginatedUsersDocument = gql`
+    query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInput) {
+  customer(slug: $customerSlug) {
+    id
+    usersConnection(filter: $filter) {
+      userCustomers {
+        createdAt
+        isActive
+        user {
+          lastLoggedIn
+          lastActivity
+          id
+          email
+          firstName
+          lastName
+        }
+        role {
+          id
+          name
+        }
+      }
+      totalPages
+      pageInfo {
+        hasPrevPage
+        hasNextPage
+        prevPageOffset
+        nextPageOffset
+        pageIndex
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetPaginatedUsersQuery__
+ *
+ * To run a query within a React component, call `useGetPaginatedUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPaginatedUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPaginatedUsersQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetPaginatedUsersQuery(baseOptions: Apollo.QueryHookOptions<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(GetPaginatedUsersDocument, options);
+      }
+export function useGetPaginatedUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(GetPaginatedUsersDocument, options);
+        }
+export type GetPaginatedUsersQueryHookResult = ReturnType<typeof useGetPaginatedUsersQuery>;
+export type GetPaginatedUsersLazyQueryHookResult = ReturnType<typeof useGetPaginatedUsersLazyQuery>;
+export type GetPaginatedUsersQueryResult = Apollo.QueryResult<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>;
+export function refetchGetPaginatedUsersQuery(variables?: GetPaginatedUsersQueryVariables) {
+      return { query: GetPaginatedUsersDocument, variables: variables }
+    }
+export const FindRoleByIdDocument = gql`
+    query findRoleById($input: FindRoleInput) {
+  role(input: $input) {
+    id
+    name
+    nrPermissions
+    permissions
+    allPermissions
+  }
+}
+    `;
+
+/**
+ * __useFindRoleByIdQuery__
+ *
+ * To run a query within a React component, call `useFindRoleByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFindRoleByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFindRoleByIdQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useFindRoleByIdQuery(baseOptions?: Apollo.QueryHookOptions<FindRoleByIdQuery, FindRoleByIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FindRoleByIdQuery, FindRoleByIdQueryVariables>(FindRoleByIdDocument, options);
+      }
+export function useFindRoleByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FindRoleByIdQuery, FindRoleByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FindRoleByIdQuery, FindRoleByIdQueryVariables>(FindRoleByIdDocument, options);
+        }
+export type FindRoleByIdQueryHookResult = ReturnType<typeof useFindRoleByIdQuery>;
+export type FindRoleByIdLazyQueryHookResult = ReturnType<typeof useFindRoleByIdLazyQuery>;
+export type FindRoleByIdQueryResult = Apollo.QueryResult<FindRoleByIdQuery, FindRoleByIdQueryVariables>;
+export function refetchFindRoleByIdQuery(variables?: FindRoleByIdQueryVariables) {
+      return { query: FindRoleByIdDocument, variables: variables }
+    }
 export const GetRolesDocument = gql`
     query GetRoles($id: ID) {
   customer(id: $id) {
@@ -3641,3 +4104,72 @@ export type GetUserCustomerFromCustomerQueryResult = Apollo.QueryResult<GetUserC
 export function refetchGetUserCustomerFromCustomerQuery(variables?: GetUserCustomerFromCustomerQueryVariables) {
       return { query: GetUserCustomerFromCustomerDocument, variables: variables }
     }
+export const HandleUserStateInWorkspaceDocument = gql`
+    mutation handleUserStateInWorkspace($input: HandleUserStateInWorkspaceInput!) {
+  handleUserStateInWorkspace(input: $input) {
+    isActive
+    user {
+      email
+    }
+  }
+}
+    `;
+export type HandleUserStateInWorkspaceMutationFn = Apollo.MutationFunction<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>;
+
+/**
+ * __useHandleUserStateInWorkspaceMutation__
+ *
+ * To run a mutation, you first call `useHandleUserStateInWorkspaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useHandleUserStateInWorkspaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [handleUserStateInWorkspaceMutation, { data, loading, error }] = useHandleUserStateInWorkspaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useHandleUserStateInWorkspaceMutation(baseOptions?: Apollo.MutationHookOptions<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>(HandleUserStateInWorkspaceDocument, options);
+      }
+export type HandleUserStateInWorkspaceMutationHookResult = ReturnType<typeof useHandleUserStateInWorkspaceMutation>;
+export type HandleUserStateInWorkspaceMutationResult = Apollo.MutationResult<HandleUserStateInWorkspaceMutation>;
+export type HandleUserStateInWorkspaceMutationOptions = Apollo.BaseMutationOptions<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>;
+export const UpdatePermissionsDocument = gql`
+    mutation updatePermissions($input: UpdatePermissionsInput!) {
+  updatePermissions(input: $input) {
+    permissions
+  }
+}
+    `;
+export type UpdatePermissionsMutationFn = Apollo.MutationFunction<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>;
+
+/**
+ * __useUpdatePermissionsMutation__
+ *
+ * To run a mutation, you first call `useUpdatePermissionsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdatePermissionsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updatePermissionsMutation, { data, loading, error }] = useUpdatePermissionsMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdatePermissionsMutation(baseOptions?: Apollo.MutationHookOptions<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>(UpdatePermissionsDocument, options);
+      }
+export type UpdatePermissionsMutationHookResult = ReturnType<typeof useUpdatePermissionsMutation>;
+export type UpdatePermissionsMutationResult = Apollo.MutationResult<UpdatePermissionsMutation>;
+export type UpdatePermissionsMutationOptions = Apollo.BaseMutationOptions<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>;

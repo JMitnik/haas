@@ -1,0 +1,31 @@
+query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInput) {
+    customer(slug: $customerSlug) {
+      id
+      usersConnection(filter: $filter) {
+        userCustomers {
+          createdAt
+          isActive
+          user {
+            lastLoggedIn
+            lastActivity
+            id
+            email
+            firstName
+            lastName
+          }
+          role {
+            id
+            name
+          }
+        }
+        totalPages
+        pageInfo {
+          hasPrevPage
+          hasNextPage
+          prevPageOffset
+          nextPageOffset
+          pageIndex
+        }
+      }
+    }
+  }

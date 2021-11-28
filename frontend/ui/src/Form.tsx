@@ -10,6 +10,8 @@ import {
 import { Div, Paragraph, SectionHeader, Strong } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
 import {
+  Checkbox as ChakraCheckbox,
+  CheckboxProps as ChakraCheckboxProps,
   ButtonProps as ChakraButtonProps,
   Button,
   FormControl as ChakraFormControl,
@@ -23,8 +25,10 @@ import {
   InputProps as ChakraInputProps,
   InputGroupProps,
   FormControlProps,
+  Switch as ChakraSwitch,
   Textarea as ChakraTextArea,
   RadioButtonGroup as ChakraRadioButtonGroup,
+  SwitchProps,
 } from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
@@ -55,6 +59,8 @@ export const FormContainer = styled(Div) <FormContainerProps>`
     `}
   `}
 `;
+
+export const Checkbox = (props: ChakraCheckboxProps) => <ChakraCheckbox {...props} color="red" />;
 
 export const FormGroupContainer = styled.div`
   ${({ theme }) => css`
@@ -119,7 +125,7 @@ export const InputLabel = styled.label`
 `;
 
 export const FormLabel = forwardRef((props: FormLabelProps, ref) => (
-  <ChakraFormLabel fontSize="0.8rem" color="gray.600" fontWeight="600" {...props} ref={ref} />
+  <ChakraFormLabel fontSize="0.9rem" color="gray.600" fontWeight="600" {...props} ref={ref} />
 ));
 
 interface InputProps extends ChakraInputProps {
@@ -237,56 +243,6 @@ export const StyledTextInput = styled(Input).attrs({ as: 'textarea' })`
   min-height: 150px;
 `;
 
-export const CheckBoxWrapper = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-`;
-
-export const CheckBoxLabel = styled.label`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 42px;
-  height: 26px;
-  border-radius: 15px;
-  background: #bebebe;
-  cursor: pointer;
-
-  &::after {
-    content: '';
-    display: block;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    margin: 3px;
-    background: #ffffff;
-    box-shadow: 1px 3px 3px 1px rgba(0, 0, 0, 0.2);
-    transition: 0.2s;
-  }
-`;
-
-export const CheckBox = styled.input`
-  opacity: 0;
-  z-index: 1;
-  border-radius: 15px;
-  width: 42px;
-  height: 26px;
-
-  &:checked + ${CheckBoxLabel} {
-    background: #3847b2;
-
-    &::after {
-      content: '';
-      display: block;
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      margin-left: 21px;
-      transition: 0.2s;
-    }
-  }
-`;
 
 type SliderProps = InputHTMLAttributes<HTMLInputElement> | SpaceProps;
 
@@ -613,7 +569,7 @@ export const RadioButtons = forwardRef(({ children, onChange, value, defaultValu
 ));
 
 export const InputGrid = (props: InputGridProps) => (
-  <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
+  <Grid gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
     {props.children}
   </Grid>
 );
@@ -915,6 +871,16 @@ export const SwitchItem = styled.button.attrs({ type: 'button' }) <SwitchItemPro
     `}
   `}
 `
+
+export const Toggle = forwardRef((props: SwitchProps, ref) => {
+  const { children, ...restProps } = props;
+
+  return (
+    <ChakraSwitch ref={ref} color="teal" {...restProps}>
+      {children}
+    </ChakraSwitch>
+  );
+});
 
 type ReactSelectProps = ReactSelect<any>['props'];
 

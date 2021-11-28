@@ -1,6 +1,6 @@
 import {
   Button, ButtonGroup, Popover, PopoverArrow, PopoverBody,
-  PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+  PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -10,8 +10,8 @@ import React from 'react';
 import { Card, CardBody, ColumnFlex, H3, Span, Text } from '@haas/ui';
 import { deleteFullCustomerQuery } from 'mutations/deleteFullCustomer';
 import { isValidColor } from 'utils/ColorUtils';
-import { queryMe, useUser } from 'providers/UserProvider';
 import { useMutation } from '@apollo/client';
+import { useUser } from 'providers/UserProvider';
 import getCustomersOfUser from 'queries/getCustomersOfUser';
 import useAuth from 'hooks/useAuth';
 
@@ -21,7 +21,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
   const toast = useToast();
   const { t } = useTranslation();
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
   const { canDeleteCustomers } = useAuth();
 
   const setCustomerSlug = (customerSlug: string) => {
@@ -30,8 +30,9 @@ const CustomerCard = ({ customer }: { customer: any }) => {
   };
 
   const [deleteCustomer] = useMutation(deleteFullCustomerQuery, {
-    refetchQueries: [{ query: queryMe }, { query: getCustomersOfUser, variables: { userId: user?.id } }],
+    refetchQueries: [{ query: getCustomersOfUser, variables: { userId: user?.id } }],
     onError: () => {
+      refreshUser();
       toast({
         title: 'Something went wrong',
         description: 'There was a problem with deleting the customer.',
@@ -41,6 +42,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
       });
     },
     onCompleted: () => {
+      refreshUser();
       toast({
         title: 'Customer deleted!',
         description: 'The customer has been deleted.',

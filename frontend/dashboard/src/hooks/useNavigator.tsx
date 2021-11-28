@@ -11,6 +11,8 @@ export const ROUTES = {
   DELIVERY_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId/:deliveryId',
   AUTODECK_OVERVIEW: '/dashboard/autodeck-overview',
   ADMIN_OVERVIEW: '/dashboard/admin',
+  USER_VIEW: '/dashboard/b/:customerSlug/users/:userId',
+  ROLE_USER_VIEW: '/dashboard/b/:customerSlug/users/:userId/role/:roleId',
   USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
   ALERTS_OVERVIEW: '/dashboard/b/:customerSlug/triggers',
 };
@@ -26,6 +28,11 @@ export const useNavigator = () => {
   const dialogueMatch = useRouteMatch<{ dialogueSlug: string }>({
     path: ROUTES.DIALOGUE_ROOT,
   });
+
+  const userOverviewMatch = useRouteMatch<{ dialogueSlug: string }>({
+    path: ROUTES.USERS_OVERVIEW,
+  });
+
   const history = useHistory();
   const location = useLocation();
 
@@ -33,6 +40,33 @@ export const useNavigator = () => {
     const path = generatePath(ROUTES.CAMPAIGN_VIEW, {
       customerSlug,
       campaignId: nextCampaignId,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToUsersOverview = () => {
+    const path = generatePath(ROUTES.USERS_OVERVIEW, {
+      customerSlug,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToRoleUserView = (userId: string, roleId: string) => {
+    const path = generatePath(ROUTES.ROLE_USER_VIEW, {
+      customerSlug,
+      userId,
+      roleId,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToUserView = (userId: string) => {
+    const path = generatePath(ROUTES.USER_VIEW, {
+      customerSlug,
+      userId,
     });
 
     history.push(path + location.search);
@@ -77,6 +111,9 @@ export const useNavigator = () => {
   });
 
   return {
+    goToUsersOverview,
+    goToUserView,
+    goToRoleUserView,
     goToDeliveryView,
     goToInteractionsView,
     goToCampaignView,
@@ -90,5 +127,6 @@ export const useNavigator = () => {
     dialogueSlug,
     campaignId,
     campaignsMatch,
+    userOverviewMatch,
   };
 };

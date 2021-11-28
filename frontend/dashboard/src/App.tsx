@@ -1,19 +1,15 @@
 import { AnimatePresence } from 'framer-motion';
-import { ApolloProvider } from '@apollo/client';
-import { Div, ViewContainer } from '@haas/ui';
-import { ErrorBoundary } from '@sentry/react';
-import { I18nextProvider } from 'react-i18next';
-import { QueryParamProvider } from 'use-query-params';
-import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import { ViewContainer } from '@haas/ui';
 import React, { FC } from 'react';
 
-import { AppContainer } from 'styles/AppStyles';
+import { AppProviders } from 'config/AppProviders';
 import { CampaignView } from 'views/CampaignView/CampaignView';
-import { DefaultThemeProviders } from 'providers/ThemeProvider';
 import { DialogueProvider } from 'providers/DialogueProvider';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
-import { SystemPermission } from 'types/globalTypes';
+import { SystemPermission } from 'types/generated-types';
+import { useUser } from 'providers/UserProvider';
 import ActionsPage from 'pages/dashboard/actions';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
@@ -37,22 +33,16 @@ import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
-import FallbackServerError from 'components/FallbackServerError';
 import FirstTimePage from 'pages/dashboard/first_time';
 import GlobalLoader from 'components/GlobalLoader';
-import GlobalStyle from 'config/global-styles';
 import GuardedRoute from 'components/Routes/GuardedRoute';
-import InviteUserView from 'views/UsersOverview/InviteUserView';
 import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
-import UserProvider, { useUser } from 'providers/UserProvider';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 import VerifyTokenPage from 'pages/verify_token';
-import client from 'config/apollo';
-import lang from 'config/i18n-config';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
@@ -66,13 +56,13 @@ const CustomerRoutes = () => (
                 <DialogueLayout>
                   <Switch>
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_BUILD_DIALOGUE}
+                      allowedPermission={SystemPermission.CanBuildDialogue}
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
                       render={() => <DialogueBuilderPage />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_EDIT_DIALOGUE}
+                      allowedPermission={SystemPermission.CanEditDialogue}
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
                       render={() => <EditDialogueView />}
                     />
@@ -83,13 +73,13 @@ const CustomerRoutes = () => (
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_BUILD_DIALOGUE}
+                      allowedPermission={SystemPermission.CanBuildDialogue}
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
                       render={() => <ActionsPage />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_VIEW_DIALOGUE_ANALYTICS}
+                      allowedPermission={SystemPermission.CanViewDialogueAnalytics}
                       redirectRoute="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                       render={() => <DialoguePage />}
@@ -100,13 +90,13 @@ const CustomerRoutes = () => (
             />
 
             <GuardedRoute
-              allowedPermission={SystemPermission.CAN_VIEW_CAMPAIGNS}
+              allowedPermission={SystemPermission.CanViewCampaigns}
               path={ROUTES.CAMPAIGNS_VIEW}
               render={() => <CampaignsView />}
             />
 
             <GuardedRoute
-              allowedPermission={SystemPermission.CAN_CREATE_DELIVERIES}
+              allowedPermission={SystemPermission.CanCreateDeliveries}
               path={ROUTES.CAMPAIGN_VIEW}
               render={() => <CampaignView />}
             />
@@ -122,49 +112,43 @@ const CustomerRoutes = () => (
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
+                      allowedPermission={SystemPermission.CanCreateTriggers}
                       path="/dashboard/b/:customerSlug/triggers/add"
                       render={() => <AddTriggerView />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
+                      allowedPermission={SystemPermission.CanCreateTriggers}
                       path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
                       render={() => <EditTriggerView />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
+                      allowedPermission={SystemPermission.CanCreateTriggers}
                       path="/dashboard/b/:customerSlug/triggers"
                       render={() => <TriggersOverview />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_EDIT_WORKSPACE}
+                      allowedPermission={SystemPermission.CanEditWorkspace}
                       path="/dashboard/b/:customerSlug/edit"
                       render={() => <EditCustomerView />}
                     />
 
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/u/:userId/edit"
-                      allowedPermission={SystemPermission.CAN_EDIT_USERS}
+                      allowedPermission={SystemPermission.CanEditUsers}
                       render={() => <EditUserView />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_ADD_USERS}
-                      path="/dashboard/b/:customerSlug/users/invite"
-                      render={() => <InviteUserView />}
-                    />
-
-                    <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_VIEW_USERS}
+                      allowedPermission={SystemPermission.CanViewUsers}
                       path="/dashboard/b/:customerSlug/users"
                       render={() => <UsersOverview />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_DELETE_DIALOGUE}
+                      allowedPermission={SystemPermission.CanDeleteDialogue}
                       path="/dashboard/b/:customerSlug/dialogue/add"
                       render={() => <AddDialogueView />}
                     />
@@ -231,13 +215,13 @@ const AppRoutes = () => (
       <Route path="/dashboard/b/:customerSlug" render={() => <CustomerRoutes />} />
 
       <GuardedRoute
-        allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
+        allowedPermission={SystemPermission.CanAccessAdminPanel}
         path={ROUTES.AUTODECK_OVERVIEW}
         render={() => <AutodeckOverview />}
       />
 
       <GuardedRoute
-        allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
+        allowedPermission={SystemPermission.CanAccessAdminPanel}
         path={ROUTES.ADMIN_OVERVIEW}
         render={() => <AdminOverview />}
       />
@@ -286,43 +270,10 @@ const AppRoutes = () => (
   </RootApp>
 );
 
-const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => {
-  if (error?.message.includes('Failed to fetch')) {
-    console.log('Server is down!!!!');
-  }
-
-  console.log(error);
-
-  return (
-    <Div minHeight="100vh" display="flex" alignItems="center">
-      <FallbackServerError />
-    </Div>
-  );
-};
-
 const App: FC = () => (
-  <>
-    <I18nextProvider i18n={lang}>
-      <Router>
-        <ErrorBoundary fallback={GeneralErrorFallback}>
-          <ApolloProvider client={client}>
-            <DefaultThemeProviders>
-              <UserProvider>
-                <AppContainer>
-                  <QueryParamProvider ReactRouterRoute={Route}>
-                    <ErrorBoundary fallback={GeneralErrorFallback}>
-                      <AppRoutes />
-                    </ErrorBoundary>
-                  </QueryParamProvider>
-                </AppContainer>
-                <GlobalStyle />
-              </UserProvider>
-            </DefaultThemeProviders>
-          </ApolloProvider>
-        </ErrorBoundary>
-      </Router>
-    </I18nextProvider>
-  </>
+  <AppProviders>
+    <AppRoutes />
+  </AppProviders>
 );
 
 export default App;

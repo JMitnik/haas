@@ -18,3 +18,9 @@ export const OutputContainer = styled(FlexRow)`
     align-items: center;
 `;
 
+export const PopoverItem = styled.button`
+  all: unset;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+`;

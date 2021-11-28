@@ -6,7 +6,7 @@ import * as InteractionAPI from '../models/session/graphql';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import * as QuestionNodeAPI from '../models/QuestionNode';
-import * as UserAPI from '../models/users/User';
+import * as UserAPI from '../models/users/graphql';
 import * as WorkspaceAPI from '../models/customer';
 import config from './config';
 import customerSettingsNexus from '../models/settings/CustomerSettings';
@@ -14,7 +14,7 @@ import dialogueNexus from '../models/questionnaire/Dialogue';
 import edgeNexus from '../models/edge/Edge';
 import linkNexus from '../models/link/Link';
 import permissionNexus from '../models/permission/Permission';
-import roleNexus from '../models/role/Role';
+import * as RoleAPI from '../models/role';
 import tagNexus from '../models/tag/Tag';
 import triggerNexus from '../models/trigger/Trigger';
 import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
@@ -26,7 +26,7 @@ const nexus = [
   ...Array(CampaignAPI),
   ...triggerNexus,
   ...permissionNexus,
-  ...roleNexus,
+  ...Array(RoleAPI),
   ...Array(WorkspaceAPI),
   ...Array(UserAPI),
   ...customerSettingsNexus,

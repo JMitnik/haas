@@ -1,7 +1,10 @@
-import { PrismaClient, User, Prisma } from "@prisma/client";
+import { PrismaClient, User, Prisma, UserOfCustomer } from "@prisma/client";
+import _, { cloneDeep } from "lodash";
 
 import { RegisterUserInput } from "./UserPrismaAdapterType";
 import RoleService from '../role/RoleService';
+import { NexusGenInputs } from "../../generated/nexus";
+
 
 class UserPrismaAdapter {
   prisma: PrismaClient;
@@ -11,6 +14,194 @@ class UserPrismaAdapter {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
   }
+
+  /**
+   * Find all workspaces belonging to user id.
+   * @param userId
+   * @returns a list of workspaces together and whether a user is active in them or not
+   */
+  findAllWorkspacesByUserId = async (userId: string) => {
+    const userWorkspaces = await this.prisma.userOfCustomer.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        isActive: true,
+        customer: true,
+      },
+    });
+
+    return userWorkspaces;
+  }
+
+  /**
+  * Build a userConnection prisma query based on the filter parameters.
+  * @param customerSlug the slug of a workspace
+  * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
+  */
+  buildFindUsersQuery = (customerSlug: string, filter?: NexusGenInputs['UserConnectionFilterInput'] | null): Prisma.UserOfCustomerWhereInput => {
+    let userOfCustomerWhereInput: Prisma.UserOfCustomerWhereInput = {
+      customer: {
+        slug: customerSlug,
+      },
+      user: {},
+      role: {},
+    };
+
+    if (filter?.startDate || filter?.endDate) {
+      userOfCustomerWhereInput.createdAt = {
+        gte: filter?.startDate ? new Date(filter.startDate) : undefined,
+        lte: filter?.endDate ? new Date(filter.endDate) : undefined,
+      }
+    }
+
+    if (filter?.search) {
+      userOfCustomerWhereInput = {
+        ...cloneDeep(userOfCustomerWhereInput),
+        OR: [
+          { role: { name: { contains: filter.search, mode: 'insensitive' } } },
+          { user: { email: { contains: filter.search, mode: 'insensitive' } } },
+          { user: { firstName: { contains: filter.search, mode: 'insensitive' } } },
+          { user: { lastName: { contains: filter.search, mode: 'insensitive' } } },
+        ]
+      }
+    }
+
+    if (filter?.email && userOfCustomerWhereInput.user) {
+      userOfCustomerWhereInput.user.email = { equals: filter.email, mode: 'insensitive' }
+    }
+    if (filter?.firstName && userOfCustomerWhereInput.user) {
+      userOfCustomerWhereInput.user.firstName = { contains: filter.firstName, mode: 'insensitive' }
+    }
+
+    if (filter?.lastName && userOfCustomerWhereInput.user) {
+      userOfCustomerWhereInput.user.lastName = { contains: filter.lastName, mode: 'insensitive' }
+    }
+
+    if (filter?.role && userOfCustomerWhereInput.role) {
+      userOfCustomerWhereInput.role.name = { contains: filter.role, mode: 'insensitive' }
+    }
+
+    return userOfCustomerWhereInput;
+  }
+
+  orderUsersBy = (
+    usersOfCustomer: (UserOfCustomer & {
+      user: {
+        firstName: string | null;
+        lastName: string | null;
+        email: string;
+      },
+      role: {
+        name: string;
+      };
+    })[],
+    filter?: NexusGenInputs['UserConnectionFilterInput'] | null,
+  ) => {
+    if (filter?.orderBy?.by === 'firstName') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.firstName, filter.orderBy.desc ? 'desc' : 'asc');
+    } if (filter?.orderBy?.by === 'lastName') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.lastName, filter.orderBy.desc ? 'desc' : 'asc');
+    } if (filter?.orderBy?.by === 'email') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, filter.orderBy.desc ? 'desc' : 'asc');
+    } if (filter?.orderBy?.by === 'lastActivity') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, filter.orderBy.desc ? 'desc' : 'asc');
+    }
+
+    return usersOfCustomer;
+  };
+
+  /**
+  * Order userOfCustomer by UserConnectionFilterInput
+  * @param filter
+  */
+  buildOrderByQuery = (filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
+    let orderByQuery: Prisma.UserOfCustomerOrderByWithRelationInput[] = [];
+
+    if (filter?.orderBy?.by === 'createdAt') {
+      orderByQuery.push({
+        createdAt: filter.orderBy.desc ? 'desc' : 'asc',
+      });
+    };
+
+    if (filter?.orderBy?.by === 'lastActivity') {
+      orderByQuery.push({
+        user: {
+          lastActivity: filter.orderBy.desc ? 'desc' : 'asc',
+        }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'firstName') {
+      orderByQuery.push({
+        user: { firstName: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'lastName') {
+      orderByQuery.push({
+        user: { lastName: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'email') {
+      orderByQuery.push({
+        user: { email: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'role') {
+      orderByQuery.push({
+        role: { name: filter.orderBy.desc ? 'desc' : 'asc', }
+      });
+    }
+
+    if (filter?.orderBy?.by === 'isActive') {
+      orderByQuery.push({
+        isActive: filter.orderBy.desc ? 'desc' : 'asc',
+      });
+    }
+
+    return orderByQuery;
+  };
+
+  /**
+   *
+   * @param customerSlug slug of a workspace
+   * @param filter UserConnectionFilterInput
+   * @returns amount of users based on filter criteria
+   */
+  countUsers = async (customerSlug: string, filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
+    const totalUsers = await this.prisma.userOfCustomer.count({
+      where: this.buildFindUsersQuery(customerSlug, filter),
+    });
+    return totalUsers;
+  };
+
+  /**
+   *
+   * @param customerSlug slug of a workspace
+   * @param filter UserConnectionFilterInput
+   * @returns A subset of UserOfCustomer prisma entries based on specified filters
+   */
+  findPaginatedUsers = async (customerSlug: string, filter?: NexusGenInputs['UserConnectionFilterInput'] | null) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const users = await this.prisma.userOfCustomer.findMany({
+      where: this.buildFindUsersQuery(customerSlug, filter),
+      skip: offset,
+      take: perPage,
+      orderBy: this.buildOrderByQuery(filter),
+      include: {
+        customer: true,
+        role: true,
+        user: true,
+      },
+    });
+
+    return users;
+  };
 
   /**
    *  Checks if email address already exists (not belonging to userId)
@@ -217,11 +408,55 @@ class UserPrismaAdapter {
     });
   };
 
+  async setIsActive(input: { userId: string, workspaceId: string, isActive: boolean }) {
+    const result = await this.prisma.userOfCustomer.update({
+      where: {
+        userId_customerId: {
+          userId: input.userId,
+          customerId: input.workspaceId,
+        }
+      },
+      data: {
+        isActive: input.isActive,
+      },
+      include: {
+        user: true,
+        role: true,
+        customer: true,
+      }
+    });
+
+    return result;
+  }
+
+  /**
+   * Updates the user's last activity date
+   */
+  async updateLastSeen(userId: string | undefined, lastSeen: Date) {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        lastActivity: lastSeen,
+      },
+    });
+  }
+
+  /**
+   * Login user.
+   *
+   * - Set new refresh token
+   * - Update `lastLoggedIn`
+   * - Update `loginToken`
+   * @param userId
+   * @param refreshToken
+   * @returns
+   */
   async login(userId: string | undefined, refreshToken: string): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
       data: {
         refreshToken,
+        lastLoggedIn: new Date(Date.now()),
         loginToken: null,
       },
     });

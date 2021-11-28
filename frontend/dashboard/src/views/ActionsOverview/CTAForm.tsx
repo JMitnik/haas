@@ -54,6 +54,7 @@ interface CTAFormProps {
 }
 
 const isShareType = (ctaType: any) => ctaType?.value === 'SHARE';
+const isLinkType = (ctaType: any) => ctaType?.value === 'LINK';
 
 const schema = yup.object().shape({
   title: yup.string().required(),
@@ -61,8 +62,8 @@ const schema = yup.object().shape({
     { label: yup.string().required(), value: yup.string().required() },
   ).required('CTA type is required'),
   links: yup.array().when('ctaType', {
-    is: (ctaType: { label: string, value: string }) => isShareType(ctaType),
-    then: yup.array().min(1).of(yup.object().shape({
+    is: (ctaType: { label: string, value: string }) => !isLinkType(ctaType),
+    then: yup.array().of(yup.object().shape({
       url: yup.string().required(),
       title: yup.string().required(),
       type: yup.string().notRequired(),

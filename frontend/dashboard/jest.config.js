@@ -1,21 +1,20 @@
 module.exports = {
-  roots: [
-    '<rootDir>/src',
-  ],
+  clearMocks: true,
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  roots: ['src',],
+  moduleNameMapper: {
+    '\\.(css|less)$': '<rootDir>/src/mocks/styleMock.js',
+    '\\.(svg)$': '<rootDir>/src/mocks/svgMock.ts',
+  },
+  modulePaths: ["node_modules", "<rootDir>/src"],
   testMatch: [
-    '**/__tests__/**/*.+(ts|tsx|js)',
+    '**/__tests__/**/*.test.+(ts|tsx|js)',
     '**/?(*.)+(spec|test).+(ts|tsx|js)',
   ],
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
+    "^.+\\.js?$": "babel-jest"
   },
-  moduleDirectories: [
-    'node_modules',
-    'src',
-  ],
-  moduleNameMapper: {
-    '\\.(css|less)$': '<rootDir>/src/test/mocks/styleMock.js',
-    '^.+\\.svg$': '<rootDir>/src/test/mocks/svgMock.tsx',
-  },
+  setupFilesAfterEnv: ['<rootDir>/src/test/setup.tsx'],
 };
-
