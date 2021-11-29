@@ -78,7 +78,6 @@ class UserPrismaAdapter {
       userOfCustomerWhereInput.user.lastName = { contains: filter.lastName, mode: 'insensitive' }
     }
 
-    // TODO: Add role search support
     if (filter?.role && userOfCustomerWhereInput.role) {
       userOfCustomerWhereInput.role.name = { contains: filter.role, mode: 'insensitive' }
     }

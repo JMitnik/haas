@@ -9,6 +9,19 @@ class RolePrismaAdapter {
     this.prisma = prismaClient;
   }
 
+  /**
+   * Gets global permissions of a user.
+   * @param userId
+   */
+  async getGlobalPermissionsOfUser(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId, },
+      select: { globalPermissions: true },
+    });
+
+    return user?.globalPermissions;
+  }
+
   getRoleById(roleId: string) {
     return this.prisma.role.findUnique({
       where: {

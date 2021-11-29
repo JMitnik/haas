@@ -1,7 +1,8 @@
 import { Redirect, Route, RouteProps, generatePath, useParams } from 'react-router';
-import { SystemPermission } from 'types/globalTypes';
-import { useUser } from 'providers/UserProvider';
 import React from 'react';
+
+import { SystemPermission } from 'types/generated-types';
+import { useUser } from 'providers/UserProvider';
 import useAuth from 'hooks/useAuth';
 
 interface GuardedRouteProps extends RouteProps {

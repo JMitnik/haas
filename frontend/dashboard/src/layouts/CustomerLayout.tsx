@@ -29,6 +29,8 @@ import useMediaDevice from 'hooks/useMediaDevice';
 import { NavLink } from 'react-router-dom';
 import { useNavigator } from 'hooks/useNavigator';
 import NotAuthorizedView from './NotAuthorizedView';
+import { useCustomer } from 'providers/CustomerProvider';
+import { Loader } from 'components/Common/Loader/Loader';
 
 const CustomerLayoutContainer = styled(Div) <{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
@@ -182,15 +184,27 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
   );
 };
 
+const CornerLoaderPosition = styled.div`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+`;
+
 const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
   const params: { topicId: string, customerSlug: string, dialogueSlug: string } = useParams<any>();
   const device = useMediaDevice();
+  const { isLoading } = useCustomer();
 
   return (
     <ErrorBoundary FallbackComponent={NotAuthorizedView}>
       <CustomThemeProviders>
-
         <CustomerLayoutContainer isMobile={device.isSmall}>
+
+          {isLoading && (
+            <CornerLoaderPosition >
+              <Loader testId="runner" />
+            </CornerLoaderPosition>
+          )}
           <Div>
             {!device.isSmall ? (
               <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>

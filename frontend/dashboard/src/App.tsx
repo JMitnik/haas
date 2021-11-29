@@ -8,7 +8,7 @@ import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DialogueProvider } from 'providers/DialogueProvider';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
-import { SystemPermission } from 'types/globalTypes';
+import { SystemPermission } from 'types/generated-types';
 import { useUser } from 'providers/UserProvider';
 import ActionsPage from 'pages/dashboard/actions';
 import AddCustomerPage from 'pages/dashboard/customers/add';
@@ -56,13 +56,13 @@ const CustomerRoutes = () => (
                 <DialogueLayout>
                   <Switch>
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_BUILD_DIALOGUE}
+                      allowedPermission={SystemPermission.CanBuildDialogue}
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
                       render={() => <DialogueBuilderPage />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_EDIT_DIALOGUE}
+                      allowedPermission={SystemPermission.CanEditDialogue}
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
                       render={() => <EditDialogueView />}
                     />
@@ -73,13 +73,13 @@ const CustomerRoutes = () => (
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_BUILD_DIALOGUE}
+                      allowedPermission={SystemPermission.CanBuildDialogue}
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
                       render={() => <ActionsPage />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_VIEW_DIALOGUE_ANALYTICS}
+                      allowedPermission={SystemPermission.CanViewDialogueAnalytics}
                       redirectRoute="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                       render={() => <DialoguePage />}
@@ -90,13 +90,13 @@ const CustomerRoutes = () => (
             />
 
             <GuardedRoute
-              allowedPermission={SystemPermission.CAN_VIEW_CAMPAIGNS}
+              allowedPermission={SystemPermission.CanViewCampaigns}
               path={ROUTES.CAMPAIGNS_VIEW}
               render={() => <CampaignsView />}
             />
 
             <GuardedRoute
-              allowedPermission={SystemPermission.CAN_CREATE_DELIVERIES}
+              allowedPermission={SystemPermission.CanCreateDeliveries}
               path={ROUTES.CAMPAIGN_VIEW}
               render={() => <CampaignView />}
             />
@@ -112,43 +112,43 @@ const CustomerRoutes = () => (
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
+                      allowedPermission={SystemPermission.CanCreateTriggers}
                       path="/dashboard/b/:customerSlug/triggers/add"
                       render={() => <AddTriggerView />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
+                      allowedPermission={SystemPermission.CanCreateTriggers}
                       path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
                       render={() => <EditTriggerView />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
+                      allowedPermission={SystemPermission.CanCreateTriggers}
                       path="/dashboard/b/:customerSlug/triggers"
                       render={() => <TriggersOverview />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_EDIT_WORKSPACE}
+                      allowedPermission={SystemPermission.CanEditWorkspace}
                       path="/dashboard/b/:customerSlug/edit"
                       render={() => <EditCustomerView />}
                     />
 
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/u/:userId/edit"
-                      allowedPermission={SystemPermission.CAN_EDIT_USERS}
+                      allowedPermission={SystemPermission.CanEditUsers}
                       render={() => <EditUserView />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_VIEW_USERS}
+                      allowedPermission={SystemPermission.CanViewUsers}
                       path="/dashboard/b/:customerSlug/users"
                       render={() => <UsersOverview />}
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CAN_DELETE_DIALOGUE}
+                      allowedPermission={SystemPermission.CanDeleteDialogue}
                       path="/dashboard/b/:customerSlug/dialogue/add"
                       render={() => <AddDialogueView />}
                     />
@@ -215,13 +215,13 @@ const AppRoutes = () => (
       <Route path="/dashboard/b/:customerSlug" render={() => <CustomerRoutes />} />
 
       <GuardedRoute
-        allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
+        allowedPermission={SystemPermission.CanAccessAdminPanel}
         path={ROUTES.AUTODECK_OVERVIEW}
         render={() => <AutodeckOverview />}
       />
 
       <GuardedRoute
-        allowedPermission={SystemPermission.CAN_ACCESS_ADMIN_PANEL}
+        allowedPermission={SystemPermission.CanAccessAdminPanel}
         path={ROUTES.ADMIN_OVERVIEW}
         render={() => <AdminOverview />}
       />

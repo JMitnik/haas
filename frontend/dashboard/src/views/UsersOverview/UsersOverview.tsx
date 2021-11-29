@@ -2,12 +2,13 @@ import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { Calendar, Filter, Search, User } from 'react-feather';
-import { Route, Switch, useLocation } from 'react-router';
+import { Route, Switch, useHistory, useLocation } from 'react-router';
 import { endOfDay, startOfDay } from 'date-fns';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
+import * as Menu from 'components/Common/Menu';
 import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
 import { FormatTimestamp } from 'components/Common/DateAndTime';
@@ -15,6 +16,7 @@ import {
   GetPaginatedUsersQuery,
   PaginationSortByEnum,
   UserConnectionOrder,
+  useDeleteUserMutation,
   useGetPaginatedUsersQuery,
   useHandleUserStateInWorkspaceMutation,
 } from 'types/generated-types';
@@ -24,6 +26,7 @@ import { TabbedMenu } from 'components/Common/TabMenu';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useMenu } from 'components/Common/Menu/useMenu';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Searchbar from 'components/SearchBar';
 import useAuth from 'hooks/useAuth';
@@ -31,6 +34,7 @@ import useAuth from 'hooks/useAuth';
 import { UserModalCard } from './UserModalCard';
 import InviteUserButton from './InviteUserButton';
 import InviteUserForm from './InviteUserForm';
+import RoleUserModalCard from './RoleUserModalCard';
 
 const columns = `
   minmax(50px, 1fr)
@@ -40,7 +44,7 @@ const columns = `
   minmax(50px, 1fr)
   minmax(50px, 1fr)
   minmax(50px, 1fr)
-  `;
+`;
 
 const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
   const nameExists = !!firstName;
@@ -61,13 +65,21 @@ const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
   );
 };
 
+interface ContextualMenuProps {
+  userId: string;
+}
+
 const UsersOverview = () => {
-  const { canAccessAdmin, canEditUsers } = useAuth();
+  const { canAccessAdmin, canEditUsers, canDeleteUsers } = useAuth();
   const { activeCustomer } = useCustomer();
-  const { customerSlug, goToUserView, goToUsersOverview } = useNavigator();
+  const { customerSlug, goToUserView, goToUsersOverview, goToRoleUserView, userOverviewMatch } = useNavigator();
   const { t } = useTranslation();
   const location = useLocation();
+  const history = useHistory();
   const toast = useToast();
+
+  const { menuProps, openMenu, closeMenu, activeItem: contextUser } = useMenu<ContextualMenuProps>();
+
   const [activePaginatedUsersResult, setActivePaginatedUsersResult] = useState<GetPaginatedUsersQuery>();
 
   const [filter, setFilter] = useQueryParams({
@@ -108,12 +120,11 @@ const UsersOverview = () => {
     },
   });
 
-  const [setUserAccessibility] = useHandleUserStateInWorkspaceMutation({
+  const [setUserAccess] = useHandleUserStateInWorkspaceMutation({
     onCompleted: (userOfCustomer) => {
       const email = userOfCustomer?.handleUserStateInWorkspace?.user?.email;
       const state = userOfCustomer?.handleUserStateInWorkspace?.isActive ? t('active') : t('inactive');
       refetch();
-
       toast({
         title: t('toast:user_access_changed'),
         description: t('toast:user_access_helper', { email, state }),
@@ -123,6 +134,37 @@ const UsersOverview = () => {
       });
     },
   });
+
+  const [deleteUser] = useDeleteUserMutation({
+    onCompleted: () => {
+      refetch();
+
+      toast({
+        title: t('toast:user_removed'),
+        description: t('toast:user_removed_helper'),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
+  });
+
+  // console.log({called, loading })
+
+  const handleDeleteUser = (userId: string) => {
+    deleteUser({
+      variables: {
+        input: {
+          userId,
+          customerId: activeCustomer?.id,
+        },
+      },
+    });
+  };
+
+  const handleEditUser = (userId: string) => {
+    history.push(`/dashboard/b/${customerSlug}/u/${userId}/edit`);
+  };
 
   const handleSearchTermChange = (search: string) => {
     setFilter((prevValues) => ({
@@ -405,8 +447,30 @@ const UsersOverview = () => {
               {t('user_workspace_access')}
             </Table.HeadingCell>
           </Table.HeadingRow>
+          <Menu.Base
+            {...menuProps}
+            onClose={closeMenu}
+          >
+            <Menu.Header>
+              {t('actions')}
+            </Menu.Header>
+
+            <Menu.Item
+              disabled={!canDeleteUsers && !canAccessAdmin}
+              onClick={() => handleEditUser(contextUser?.userId || '')}
+            >
+              {t('edit_user')}
+            </Menu.Item>
+            <Menu.Item
+              disabled={tableData.length === 1 || (!canEditUsers && !canAccessAdmin)}
+              onClick={() => handleDeleteUser(contextUser?.userId || '')}
+            >
+              {t('remove_user')}
+            </Menu.Item>
+          </Menu.Base>
           {tableData.map((user) => (
             <Table.Row
+              onContextMenu={(e) => openMenu(e, { userId: user.userId })}
               isDisabled={!user.isActive}
               onClick={() => goToUserView(user.id)}
               isLoading={isLoading}
@@ -430,11 +494,15 @@ const UsersOverview = () => {
               </Table.Cell>
 
               <Table.Cell>
-                <Table.InnerCell>
-                  <UI.Helper>
-                    {user?.role?.name}
-                  </UI.Helper>
+
+                <Table.InnerCell isDisabled={!canAccessAdmin && !canEditUsers}>
+                  <UI.Div onClick={() => goToRoleUserView(user.id, user.role.id)}>
+                    <UI.Helper>
+                      {user?.role?.name}
+                    </UI.Helper>
+                  </UI.Div>
                 </Table.InnerCell>
+
               </Table.Cell>
 
               <Table.Cell>
@@ -452,7 +520,7 @@ const UsersOverview = () => {
                   color="teal"
                   isDisabled={!canAccessAdmin && !canEditUsers}
                   onChange={() => {
-                    setUserAccessibility({
+                    setUserAccess({
                       variables: {
                         input: {
                           isActive: !user.isActive,
@@ -476,34 +544,60 @@ const UsersOverview = () => {
             setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
           />
         </UI.Flex>
-
-        <AnimatePresence>
-          <Switch
-            location={location}
-            key={location.pathname}
-          >
-            <Route
-              path={ROUTES.USER_VIEW}
+        {!userOverviewMatch?.isExact && (
+          <AnimatePresence>
+            <Switch
+              location={location}
+              key={location.pathname}
             >
-              {({ match }) => (
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <UI.Modal isOpen onClose={() => goToUsersOverview()}>
-                    <UserModalCard
-                      onClose={() => goToUsersOverview()}
-                      // @ts-ignore
-                      id={match?.params?.userId}
-                    />
-                  </UI.Modal>
-                </motion.div>
-              )}
-            </Route>
-          </Switch>
-        </AnimatePresence>
+              <Route
+                path={ROUTES.ROLE_USER_VIEW}
+              >
+                {({ match }) => (
+                  <motion.div
+                    key={location.pathname}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <UI.Modal isOpen onClose={() => goToUsersOverview()}>
+                      <RoleUserModalCard
+                        onClose={() => goToUsersOverview()}
+                        // @ts-ignore
+                        id={match?.params?.roleId}
+                        // @ts-ignore
+                        userId={match?.params?.userId}
+                      />
+                    </UI.Modal>
+                  </motion.div>
+                )}
+              </Route>
+
+              <Route
+                path={ROUTES.USER_VIEW}
+              >
+                {({ match }) => (
+                  <motion.div
+                    key={location.pathname}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <UI.Modal isOpen onClose={() => goToUsersOverview()}>
+                      <UserModalCard
+                        onClose={() => goToUsersOverview()}
+                        // @ts-ignore
+                        id={match?.params?.userId}
+                      />
+                    </UI.Modal>
+                  </motion.div>
+                )}
+              </Route>
+
+            </Switch>
+          </AnimatePresence>
+        )}
+
       </UI.ViewBody>
     </>
   );

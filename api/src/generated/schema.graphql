@@ -476,6 +476,11 @@ type FailedDeliveryModel {
   record: String!
 }
 
+input FindRoleInput {
+  roleId: String
+  userId: String
+}
+
 type FontSettings {
   id: ID!
 }
@@ -751,6 +756,7 @@ type Mutation {
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
+  updatePermissions(input: UpdatePermissionsInput): RoleType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
@@ -908,6 +914,7 @@ type Query {
   getPreviewData(id: String): PreviewDataType
   me: UserType!
   refreshAccessToken: RefreshAccessTokenOutput!
+  role(input: FindRoleInput): RoleType
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
 
   """A session is one entire user-interaction"""
@@ -1042,6 +1049,7 @@ input RoleInput {
 }
 
 type RoleType {
+  allPermissions: [SystemPermission!]!
   customerId: String
   id: ID!
   name: String!
@@ -1306,6 +1314,11 @@ input UpdateCTAInputType {
   share: ShareNodeInputType
   title: String
   type: QuestionNodeTypeEnum
+}
+
+input UpdatePermissionsInput {
+  permissions: [SystemPermission!]
+  roleId: String
 }
 
 input UpdateQuestionNodeInputType {

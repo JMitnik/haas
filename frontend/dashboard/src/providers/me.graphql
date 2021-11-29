@@ -1,0 +1,22 @@
+query me {
+    me {
+      id
+      email
+      firstName
+      lastName
+      phone
+      globalPermissions
+      userCustomers {
+        isActive
+        customer {
+          id
+          name
+          slug
+        }
+        role {
+          name
+          permissions
+        }
+      }
+    }
+  }
