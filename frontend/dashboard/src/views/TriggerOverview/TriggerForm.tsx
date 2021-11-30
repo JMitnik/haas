@@ -3,14 +3,14 @@ import * as UI from '@haas/ui';
 import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
 import {
   CornerRightDown, CornerRightUp, Mail, Maximize2,
-  Minimize2, MousePointer, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch
+  Minimize2, MousePointer, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch,
 } from 'react-feather';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { ReactComponent as PaperIll } from 'assets/images/paper.svg';
 import { ReactComponent as SMSIll } from 'assets/images/sms.svg';
 import { Slider } from 'antd';
+import { gql, useLazyQuery, useQuery } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useQuery } from '@apollo/client';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Select from 'react-select';
 import styled from 'styled-components';
@@ -22,10 +22,10 @@ import {
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Span,
 } from '@haas/ui';
 import { SelectType } from 'types/generic';
+
 import { useTranslation } from 'react-i18next';
 import ServerError from 'components/ServerError';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
-import { gql } from '@apollo/client';
 
 import { getCustomerTriggerData as CustomerTriggerData } from './__generated__/getCustomerTriggerData';
 
@@ -200,8 +200,15 @@ const FormConditionFragment = ({
   questions,
   questionsSelect,
   activeDialogue,
+  activeType,
 }: any) => {
   const { t } = useTranslation();
+
+  const watchQuestionType = useWatch({
+    control: form.control,
+    name: 'type',
+    defaultValue: activeType,
+  });
 
   const watchConditionType = useWatch({
     control: form.control,
@@ -258,7 +265,7 @@ const FormConditionFragment = ({
       </UI.Flex>
       <UI.Hr />
       <input type="hidden" ref={form.register()} name={`conditions[${fieldIndex}].id`} />
-      {form.watch('type') === TriggerQuestionType.QUESTION && activeDialogue && (
+      {watchQuestionType === TriggerQuestionType.QUESTION && activeDialogue && (
         <FormControl mb={4}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].questionId`}>{t('trigger:question')}</FormLabel>
           <InputHelper>
@@ -335,23 +342,23 @@ const FormConditionFragment = ({
                     />
                   </RadioButtonGroup>
                 ) : (
-                    <RadioButtonGroup
-                      display="flex"
-                      value={value}
-                      onChange={(val) => {
-                        onChange(val);
-                        onBlur();
-                      }}
-                    >
-                      <RadioButton
-                        mr={2}
-                        icon={Target}
-                        value="TEXT_MATCH"
-                        text="Match text"
-                        description="Match specific text"
-                      />
-                    </RadioButtonGroup>
-                  )}
+                  <RadioButtonGroup
+                    display="flex"
+                    value={value}
+                    onChange={(val) => {
+                      onChange(val);
+                      onBlur();
+                    }}
+                  >
+                    <RadioButton
+                      mr={2}
+                      icon={Target}
+                      value="TEXT_MATCH"
+                      text="Match text"
+                      description="Match specific text"
+                    />
+                  </RadioButtonGroup>
+                )}
               </>
             )}
           />
@@ -511,6 +518,12 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
     keyName: 'indexKey',
   });
 
+  const watch = useWatch({
+    name: ['dialogue', 'recipients', 'type'],
+    defaultValue: undefined,
+    control: form.control,
+  });
+
   // Fetching dialogue data
   const { data: triggerData } = useQuery<CustomerTriggerData>(getCustomerTriggerData, { variables: { customerSlug } });
   const dialogues = triggerData?.customer?.dialogues?.map((dialogue) => ({
@@ -532,17 +545,14 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
     label: question?.title, value: question?.id,
   })) || [];
 
-  const activeDialogue = form.watch('dialogue');
-  const databaseRecipients = form.watch('recipients');
-
   useEffect(() => {
-    if (activeDialogue) {
-      fetchQuestions({ variables: { customerSlug, dialogueSlug: activeDialogue.value } });
+    if (watch?.dialogue?.value && customerSlug) {
+      fetchQuestions({ variables: { customerSlug, dialogueSlug: watch?.dialogue?.value } });
     }
-  }, [customerSlug, activeDialogue, fetchQuestions]);
+  }, [customerSlug, watch?.dialogue?.value, fetchQuestions]);
 
   // Dealing with recipients
-  const [activeRecipients, setActiveRecipients] = useState<Array<null | SelectType>>(() => databaseRecipients || []);
+  const [activeRecipients, setActiveRecipients] = useState<Array<null | SelectType>>(() => watch?.recipients || []);
 
   const addRecipient = () => setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
 
@@ -668,7 +678,8 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <FormConditionFragment
                 key={condition?.indexKey}
                 condition={condition}
-                activeDialogue={activeDialogue}
+                activeDialogue={watch?.dialogue}
+                activeType={watch?.type}
                 questions={questionsData}
                 questionsSelect={questionsSelect}
                 onDelete={handleDeleteCondition}
@@ -677,7 +688,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               />
             ))}
 
-            {!activeDialogue ? (
+            {!watch?.dialogue ? (
               <UI.IllustrationCard svg={<PaperIll />} text={t('trigger:select_dialogue_placeholder')}>
                 <Button
                   leftIcon={MousePointer}
@@ -690,36 +701,36 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 </Button>
               </UI.IllustrationCard>
             ) : (
-                <>
-                  {fields.length === 0 ? (
-                    <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
-                      <Button
-                        leftIcon={PlusCircle}
-                        onClick={addCondition}
-                        isDisabled={!activeDialogue}
-                        size="sm"
-                        variant="outline"
-                        variantColor="teal"
-                      >
-                        {t('trigger:add_condition')}
-                      </Button>
-                    </UI.IllustrationCard>
-                  ) : (
-                      <UI.Div>
-                        <Button
-                          leftIcon={PlusCircle}
-                          onClick={addCondition}
-                          isDisabled={!activeDialogue}
-                          size="sm"
-                          variant="outline"
-                          variantColor="teal"
-                        >
-                          {t('trigger:add_condition')}
-                        </Button>
-                      </UI.Div>
-                    )}
-                </>
-              )}
+              <>
+                {fields.length === 0 ? (
+                  <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
+                    <Button
+                      leftIcon={PlusCircle}
+                      onClick={addCondition}
+                      isDisabled={!watch?.dialogue}
+                      size="sm"
+                      variant="outline"
+                      variantColor="teal"
+                    >
+                      {t('trigger:add_condition')}
+                    </Button>
+                  </UI.IllustrationCard>
+                ) : (
+                  <UI.Div>
+                    <Button
+                      leftIcon={PlusCircle}
+                      onClick={addCondition}
+                      isDisabled={!watch?.dialogue}
+                      size="sm"
+                      variant="outline"
+                      variantColor="teal"
+                    >
+                      {t('trigger:add_condition')}
+                    </Button>
+                  </UI.Div>
+                )}
+              </>
+            )}
 
           </InputGrid>
 
@@ -795,18 +806,18 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               </Button>
             </UI.IllustrationCard>
           ) : (
-              <Div>
-                <Button
-                  onClick={addRecipient}
-                  size="sm"
-                  variant="outline"
-                  variantColor="teal"
-                  leftIcon={UserPlus}
-                >
-                  {t('add_recipient')}
-                </Button>
-              </Div>
-            )}
+            <Div>
+              <Button
+                onClick={addRecipient}
+                size="sm"
+                variant="outline"
+                variantColor="teal"
+                leftIcon={UserPlus}
+              >
+                {t('add_recipient')}
+              </Button>
+            </Div>
+          )}
         </UI.InputGrid>
       </FormSection>
 

@@ -1,14 +1,12 @@
 import * as UI from '@haas/ui';
 import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
-import { Button, Icon } from '@chakra-ui/core';
-import { Div, Flex, ViewTitle } from '@haas/ui';
 import { Mail, Plus } from 'react-feather';
+import { ViewTitle } from '@haas/ui';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
 
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -34,8 +32,6 @@ const actionsAnimation: Variants = {
     },
   },
 };
-
-const DialogueViewContainer = styled(Div)``;
 
 const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
   if (leaf.type === 'LINK') {
