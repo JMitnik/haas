@@ -5,8 +5,8 @@ datasource postgresql {
 
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
-  provider = "prisma-client-js"
-  output   = "./node_modules/@prisma/client"
+  provider        = "prisma-client-js"
+  output          = "./node_modules/@prisma/client"
   previewFeatures = ["orderByRelation"]
 }
 
@@ -119,6 +119,8 @@ model Dialogue {
 
   wasGeneratedWithGenData Boolean           @default(value: false)
   CampaignVariant         CampaignVariant[]
+  AutomationEvent         AutomationEvent[]
+
   @@unique([slug, customerId])
 }
 
@@ -263,6 +265,8 @@ model QuestionNode {
   videoEmbeddedNodeId String?
   sliderNodeId        String?
   formNodeId          String?
+
+  AutomationEvent AutomationEvent[]
 }
 
 enum LinkTypeEnum {
@@ -782,4 +786,73 @@ model DeliveryEvents {
   Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
 
   failureMessage String?
+}
+
+// AUTOMATIONS
+enum AutomationType {
+  TRIGGER
+  CAMPAIGN
+}
+
+enum AutomationEventType {
+  RECURRING
+  NEW_INTERACTION_QUESTION
+  NEW_INTERACTION_DIALOGUE
+  API_CALL
+}
+
+model AutomationEvent {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  type           AutomationEventType
+  question       QuestionNode?       @relation(fields: [questionNodeId], references: [id])
+  questionNodeId String?
+
+  dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
+  dialogueId String?
+
+  // Recurring input (Will probably need some sort of recurring enum type with options such as EVERY_WEEK EVERY_FRIDAY, EVERY_DAY)
+  startDate DateTime?
+  endDate   DateTime?
+
+  AutomationTrigger AutomationTrigger[]
+}
+
+model AutomationCondition {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+
+  AutomationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id])
+  automationTriggerId String?
+}
+
+model AutomationTrigger {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  event      AutomationEvent       @relation(fields: [automationEventId], references: [id])
+  conditions AutomationCondition[]
+
+  automation        Automation[]
+  automationEventId String
+}
+
+model Automation {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  isActive    Boolean @default(false)
+  label       String
+  description String?
+
+  type AutomationType
+
+  automationTrigger   AutomationTrigger @relation(fields: [automationTriggerId], references: [id])
+  automationTriggerId String
 }
