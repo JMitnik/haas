@@ -121,6 +121,7 @@ model Dialogue {
   CampaignVariant         CampaignVariant[]
   AutomationEvent         AutomationEvent[]
 
+  AutomationCondition AutomationCondition[]
   @@unique([slug, customerId])
 }
 
@@ -266,7 +267,8 @@ model QuestionNode {
   sliderNodeId        String?
   formNodeId          String?
 
-  AutomationEvent AutomationEvent[]
+  AutomationEvent     AutomationEvent[]
+  AutomationCondition AutomationCondition[]
 }
 
 enum LinkTypeEnum {
@@ -820,11 +822,52 @@ model AutomationEvent {
   AutomationTrigger AutomationTrigger[]
 }
 
+enum AutomationConditionScopeType {
+  QUESTION
+  DIALOGUE
+  WORKSPACE
+}
+
+enum AutomationConditionOperatorType {
+  SMALLER_THAN
+  SMALLER_OR_EQUAL_THAN
+  GREATER_THAN
+  GREATER_OR_EQUAL_THAN
+  INNER_RANGE
+  OUTER_RANGE
+  IS_EQUAL
+  IS_NOT_EQUAL
+  IS_TRUE
+  IS_FALSE
+}
+
+model AutomationConditionMatchValue {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  numberValue Int?
+  textValue   String?
+
+  AutomationCondition   AutomationCondition? @relation(fields: [automationConditionId], references: [id])
+  automationConditionId String?
+}
+
 model AutomationCondition {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
+  scope    AutomationConditionScopeType
+  operator AutomationConditionOperatorType
+
+  matchValues AutomationConditionMatchValue[]
+
+  question       QuestionNode? @relation(fields: [questionNodeId], references: [id])
+  questionNodeId String?
+
+  dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
+  dialogueId String?
 
   AutomationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id])
   automationTriggerId String?
