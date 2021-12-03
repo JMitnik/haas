@@ -1,6 +1,7 @@
-import { objectType } from '@nexus/schema';
+import { inputObjectType, objectType, queryField } from '@nexus/schema';
 import { AutomationType } from './AutomationType';
 import { AutomationTriggerModel } from './AutomationTrigger'
+import { UserInputError } from 'apollo-server-express';
 
 export const AutomationModel = objectType({
   name: 'AutomationModel',
@@ -25,3 +26,53 @@ export const AutomationModel = objectType({
     });
   },
 });
+
+export const GetAutomationInput = inputObjectType({
+  name: 'GetAutomationInput',
+  definition(t) {
+    t.string('id');
+  }
+})
+
+export const GetAutomationQuery = queryField('automation', {
+  type: AutomationModel,
+  nullable: true,
+  args: {
+    input: GetAutomationInput,
+  },
+  async resolve(parent, args, ctx) {
+    if (!args.input?.id) throw new UserInputError('No ID available to find automation with!');
+
+    const automation = await ctx.prisma.automation.findUnique({
+      where: {
+        id: args.input.id,
+      },
+      include: {
+        automationTrigger: {
+          include: {
+            event: {
+              include: {
+                question: true,
+                dialogue: true,
+              }
+            },
+            conditions: {
+              include: {
+                questionScope: true,
+                dialogueScope: true,
+                matchValue: true,
+                workspaceScope: true,
+                dialogue: true,
+                question: true,
+              }
+            },
+            actions: true,
+          },
+        },
+      },
+    });
+
+
+    return automation as any;
+  }
+})

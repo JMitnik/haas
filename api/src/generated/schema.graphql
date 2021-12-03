@@ -728,6 +728,10 @@ input GenerateAutodeckInput {
   youLoveX: String
 }
 
+input GetAutomationInput {
+  id: String
+}
+
 input GetCampaignsInput {
   customerSlug: String
 }
@@ -1049,6 +1053,7 @@ type PreviewDataType {
 }
 
 type Query {
+  automation(input: GetAutomationInput): AutomationModel
   customer(id: ID, slug: String): Customer
   customers: [Customer!]!
   delivery(deliveryId: String): DeliveryType
