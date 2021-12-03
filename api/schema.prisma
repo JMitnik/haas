@@ -803,23 +803,13 @@ enum AutomationEventType {
   API_CALL
 }
 
-model AutomationEvent {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  type           AutomationEventType
-  question       QuestionNode?       @relation(fields: [questionNodeId], references: [id])
-  questionNodeId String?
-
-  dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
-  dialogueId String?
-
-  // Recurring input (Will probably need some sort of recurring enum type with options such as EVERY_WEEK EVERY_FRIDAY, EVERY_DAY)
-  startDate DateTime?
-  endDate   DateTime?
-
-  AutomationTrigger AutomationTrigger[]
+enum RecurringPeriodType {
+  EVERY_WEEK
+  EVERY_DAY
+  START_OF_DAY
+  END_OF_DAY
+  START_OF_WEEK
+  END_OF_WEEK
 }
 
 enum AutomationConditionScopeType {
@@ -839,6 +829,68 @@ enum AutomationConditionOperatorType {
   IS_NOT_EQUAL
   IS_TRUE
   IS_FALSE
+  EVERY_N_TH_TIME
+}
+
+enum MatchValueType {
+  STRING
+  INT
+  DATE_TIME
+}
+
+enum QuestionAspect {
+  NODE_VALUE
+  ANSWER_SPEED
+}
+
+enum DialogueAspect {
+  NR_INTERACTIONS
+  NR_VISITORS
+  GENERAL_SCORE
+  LATEST_SCORE
+}
+
+enum WorkspaceAspect {
+  NR_INTERACTIONS
+  NR_VISITORS
+  GENERAL_SCORE
+}
+
+enum ConditionPropertyAggregateType {
+  COUNT
+  MIN
+  MAX
+  AVG
+}
+
+enum AutomationActionType {
+  SEND_SMS
+  SEND_EMAIL
+  API_CALL
+  GENERATE_REPORT
+  WEBHOOK
+}
+
+model AutomationEvent {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  type AutomationEventType
+
+  // Trigger-related events
+  question   QuestionNode? @relation(fields: [questionId], references: [id])
+  questionId String?
+
+  dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
+  dialogueId String?
+
+  // Recurring-related events
+  periodType RecurringPeriodType?
+  startDate  DateTime?
+  endDate    DateTime?
+
+  automationTrigger AutomationTrigger[]
 }
 
 model AutomationConditionMatchValue {
@@ -846,11 +898,80 @@ model AutomationConditionMatchValue {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
-  numberValue Int?
-  textValue   String?
+  type MatchValueType
 
-  AutomationCondition   AutomationCondition? @relation(fields: [automationConditionId], references: [id])
-  automationConditionId String?
+  numberValue   Int?
+  textValue     String? // TODO: Reference an actual choice option instead of raw text here eventually
+  dateTimeValue DateTime?
+
+  questionConditionScope   QuestionConditionScope? @relation(fields: [questionConditionScopeId], references: [id])
+  questionConditionScopeId String?
+
+  dialogueConditionScope   DialogueConditionScope? @relation(fields: [dialogueConditionScopeId], references: [id])
+  dialogueConditionScopeId String?
+
+  workspaceConditionScope   WorkspaceConditionScope? @relation(fields: [workspaceConditionScopeId], references: [id])
+  workspaceConditionScopeId String?
+
+  automationCondition AutomationCondition[]
+}
+
+model ConditionPropertyAggregate {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  startDate DateTime?
+  endDate   DateTime?
+  latest    Int?
+
+  type ConditionPropertyAggregateType
+
+  questionConditionScope  QuestionConditionScope[]
+  dialogueConditionScope  DialogueConditionScope[]
+  workspaceConditionScope WorkspaceConditionScope[]
+}
+
+model QuestionConditionScope {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  aspect QuestionAspect
+
+  aggregate   ConditionPropertyAggregate? @relation(fields: [aggregateId], references: [id])
+  aggregateId String?
+
+  automationCondition           AutomationCondition[]
+  automationConditionMatchValue AutomationConditionMatchValue[]
+}
+
+model DialogueConditionScope {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  aspect DialogueAspect
+
+  aggregate   ConditionPropertyAggregate? @relation(fields: [aggregateId], references: [id])
+  aggregateId String?
+
+  automationCondition           AutomationCondition[]
+  automationConditionMatchValue AutomationConditionMatchValue[]
+}
+
+model WorkspaceConditionScope {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  aspect WorkspaceAspect
+
+  aggregate   ConditionPropertyAggregate? @relation(fields: [aggregateId], references: [id])
+  aggregateId String?
+
+  automationCondition           AutomationCondition[]
+  automationConditionMatchValue AutomationConditionMatchValue[]
 }
 
 model AutomationCondition {
@@ -861,16 +982,36 @@ model AutomationCondition {
   scope    AutomationConditionScopeType
   operator AutomationConditionOperatorType
 
-  matchValues AutomationConditionMatchValue[]
+  matchValue   AutomationConditionMatchValue @relation(fields: [matchValueId], references: [id])
+  matchValueId String
 
-  question       QuestionNode? @relation(fields: [questionNodeId], references: [id])
-  questionNodeId String?
+  questionScope   QuestionConditionScope? @relation(fields: [questionScopeId], references: [id])
+  questionScopeId String?
+
+  dialogueScope   DialogueConditionScope? @relation(fields: [dialogueScopeId], references: [id])
+  dialogueScopeId String?
+
+  workspaceScope   WorkspaceConditionScope? @relation(fields: [workspaceScopeId], references: [id])
+  workspaceScopeId String?
+
+  question   QuestionNode? @relation(fields: [questionId], references: [id])
+  questionId String?
 
   dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
   dialogueId String?
 
-  AutomationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id])
+  automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id])
   automationTriggerId String?
+}
+
+model AutomationAction {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  type AutomationActionType
+
+  automationTrigger AutomationTrigger[]
 }
 
 model AutomationTrigger {
@@ -878,11 +1019,13 @@ model AutomationTrigger {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
-  event      AutomationEvent       @relation(fields: [automationEventId], references: [id])
-  conditions AutomationCondition[]
+  event   AutomationEvent @relation(fields: [eventId], references: [id])
+  eventId String
 
-  automation        Automation[]
-  automationEventId String
+  conditions AutomationCondition[]
+  actions    AutomationAction[]
+
+  automation Automation[]
 }
 
 model Automation {
