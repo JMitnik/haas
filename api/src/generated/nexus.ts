@@ -1186,7 +1186,6 @@ export interface NexusGenFieldTypes {
     latest: number | null; // Int
     startDate: string | null; // String
     type: NexusGenEnums['ConditionPropertyAggregateType']; // ConditionPropertyAggregateType!
-    updatedAt: string; // String!
   }
   CreateBatchDeliveriesOutputType: { // field return type
     failedDeliveries: NexusGenRootTypes['FailedDeliveryModel'][]; // [FailedDeliveryModel!]!
@@ -1523,11 +1522,10 @@ export interface NexusGenFieldTypes {
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
   }
   QuestionConditionScope: { // field return type
-    aggregate: NexusGenRootTypes['ConditionPropertyAggregate']; // ConditionPropertyAggregate!
+    aggregate: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect: NexusGenEnums['QuestionAspectType']; // QuestionAspectType!
     createdAt: string; // String!
     id: string; // ID!
-    updatedAt: string; // String!
   }
   QuestionNode: { // field return type
     children: NexusGenRootTypes['Edge'][]; // [Edge!]!

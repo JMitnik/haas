@@ -203,7 +203,6 @@ type ConditionPropertyAggregate {
   latest: Int
   startDate: String
   type: ConditionPropertyAggregateType!
-  updatedAt: String!
 }
 
 enum ConditionPropertyAggregateType {
@@ -1088,11 +1087,10 @@ enum QuestionAspectType {
 }
 
 type QuestionConditionScope {
-  aggregate: ConditionPropertyAggregate!
+  aggregate: ConditionPropertyAggregate
   aspect: QuestionAspectType!
   createdAt: String!
   id: ID!
-  updatedAt: String!
 }
 
 type QuestionNode {

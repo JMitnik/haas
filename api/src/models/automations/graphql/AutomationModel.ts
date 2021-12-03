@@ -72,6 +72,7 @@ export const GetAutomationQuery = queryField('automation', {
       },
     });
 
+    console.log(automation?.automationTrigger.conditions[0]);
 
     return automation as any;
   }

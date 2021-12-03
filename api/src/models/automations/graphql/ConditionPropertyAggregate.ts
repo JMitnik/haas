@@ -6,7 +6,6 @@ export const ConditionPropertyAggregate = objectType({
   definition(t) {
     t.id('id');
     t.string('createdAt');
-    t.string('updatedAt');
 
     t.string('startDate', { nullable: true });
     t.string('endDate', { nullable: true });
