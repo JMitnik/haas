@@ -27,6 +27,20 @@ type AutodeckConnectionType implements DeprecatedConnectionInterface {
   startDate: String
 }
 
+"""Automation"""
+type AutomationModel {
+  createdAt: String!
+  id: ID!
+  isActive: Boolean!
+  type: AutomationType!
+  updatedAt: String!
+}
+
+enum AutomationType {
+  CAMPAIGN
+  TRIGGER
+}
+
 type AWSImageType {
   encoding: String
   filename: String
