@@ -27,12 +27,107 @@ type AutodeckConnectionType implements DeprecatedConnectionInterface {
   startDate: String
 }
 
-"""Automation"""
-type AutomationModel {
+"""AutomationAction"""
+type AutomationActionModel {
   createdAt: String!
   id: ID!
+  type: AutomationActionType!
+  updatedAt: String!
+}
+
+enum AutomationActionType {
+  API_CALL
+  GENERATE_REPORT
+  SEND_EMAIL
+  SEND_SMS
+  WEBHOOK
+}
+
+"""AutomationConditionMatchValue"""
+type AutomationConditionMatchValueModel {
+  createdAt: String!
+  dateTimeValue: String
+  id: ID!
+  numberValue: Int
+  textValue: String
+  type: MatchValueType!
+  updatedAt: String!
+}
+
+"""AutomationCondition"""
+type AutomationConditionModel {
+  createdAt: String!
+  dialogue: Dialogue
+  dialogueScope: DialogueConditionScopeModel
+  id: ID!
+  matchValue: AutomationConditionMatchValueModel!
+  operator: AutomationConditionOperatorType!
+  question: QuestionNode
+  questionScope: QuestionConditionScope
+  scope: AutomationConditionScopeType!
+  updatedAt: String!
+  workspaceScope: WorkspaceConditionScopeModel
+}
+
+enum AutomationConditionOperatorType {
+  EVERY_N_TH_TIME
+  GREATER_OR_EQUAL_THAN
+  GREATER_THAN
+  INNER_RANGE
+  IS_EQUAL
+  IS_FALSE
+  IS_NOT_EQUAL
+  IS_TRUE
+  OUTER_RANGE
+  SMALLER_OR_EQUAL_THAN
+  SMALLER_THAN
+}
+
+enum AutomationConditionScopeType {
+  DIALOGUE
+  QUESTION
+  WORKSPACE
+}
+
+"""AutomationEvent"""
+type AutomationEventModel {
+  createdAt: String!
+  dialogue: Dialogue
+  endDate: String
+  id: ID!
+  periodType: RecurringPeriodType
+  question: QuestionNode
+  startDate: String
+  type: AutomationEventType!
+  updatedAt: String!
+}
+
+enum AutomationEventType {
+  API_CALL
+  NEW_INTERACTION_DIALOGUE
+  NEW_INTERACTION_QUESTION
+  RECURRING
+}
+
+"""Automation"""
+type AutomationModel {
+  automationTrigger: AutomationTriggerModel
+  createdAt: String!
+  description: String
+  id: ID!
   isActive: Boolean!
+  label: String!
   type: AutomationType!
+  updatedAt: String!
+}
+
+"""AutomationTrigger"""
+type AutomationTriggerModel {
+  actions: [AutomationActionModel!]!
+  conditions: [AutomationConditionModel!]!
+  createdAt: String!
+  event: AutomationEventModel!
+  id: ID!
   updatedAt: String!
 }
 
@@ -99,6 +194,23 @@ type ColourSettings {
   primary: String!
   primaryAlt: String
   secondary: String
+}
+
+type ConditionPropertyAggregate {
+  createdAt: String!
+  endDate: String
+  id: ID!
+  latest: Int
+  startDate: String
+  type: ConditionPropertyAggregateType!
+  updatedAt: String!
+}
+
+enum ConditionPropertyAggregateType {
+  AVG
+  COUNT
+  MAX
+  MIN
 }
 
 """Interface all pagination-based models should implement"""
@@ -412,6 +524,22 @@ type Dialogue {
   wasGeneratedWithGenData: Boolean!
 }
 
+enum DialogueAspectType {
+  GENERAL_SCORE
+  LATEST_SCORE
+  NR_INTERACTIONS
+  NR_VISITORS
+}
+
+"""DialogueConditionScope"""
+type DialogueConditionScopeModel {
+  aggregate: ConditionPropertyAggregate!
+  aspect: DialogueAspectType!
+  createdAt: String!
+  id: ID!
+  updatedAt: String!
+}
+
 input DialogueFilterInputType {
   endDate: String
   searchTerm: String
@@ -723,6 +851,12 @@ type LoginOutput {
   user: UserType!
 }
 
+enum MatchValueType {
+  DATE_TIME
+  INT
+  STRING
+}
+
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
@@ -943,6 +1077,19 @@ type Query {
   users(customerSlug: String): [UserType!]!
 }
 
+enum QuestionAspectType {
+  ANSWER_SPEED
+  NODE_VALUE
+}
+
+type QuestionConditionScope {
+  aggregate: ConditionPropertyAggregate!
+  aspect: QuestionAspectType!
+  createdAt: String!
+  id: ID!
+  updatedAt: String!
+}
+
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
@@ -1001,6 +1148,15 @@ type QuestionOption {
 
 input RecipientsInputType {
   ids: [String!]
+}
+
+enum RecurringPeriodType {
+  END_OF_DAY
+  END_OF_WEEK
+  EVERY_DAY
+  EVERY_WEEK
+  START_OF_DAY
+  START_OF_WEEK
 }
 
 type RefreshAccessTokenOutput {
@@ -1447,4 +1603,19 @@ type VerifyUserTokenOutput {
 """Input type for a video node"""
 input VideoNodeEntryInput {
   value: String
+}
+
+enum WorkspaceAspectType {
+  GENERAL_SCORE
+  NR_INTERACTIONS
+  NR_VISITORS
+}
+
+"""WorkspaceConditionScope"""
+type WorkspaceConditionScopeModel {
+  aggregate: ConditionPropertyAggregate!
+  aspect: WorkspaceAspectType!
+  createdAt: String!
+  id: ID!
+  updatedAt: String!
 }
