@@ -16,6 +16,7 @@ export const WorkspaceConditionScopeModel = objectType({
 
     t.field('aggregate', {
       type: ConditionPropertyAggregate,
+      nullable: true,
     });
   },
 });

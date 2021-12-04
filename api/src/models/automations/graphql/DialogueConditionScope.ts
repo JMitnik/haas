@@ -16,6 +16,7 @@ export const DialogueConditionScopeModel = objectType({
 
     t.field('aggregate', {
       type: ConditionPropertyAggregate,
+      nullable: true,
     });
   },
 });

@@ -532,7 +532,7 @@ enum DialogueAspectType {
 
 """DialogueConditionScope"""
 type DialogueConditionScopeModel {
-  aggregate: ConditionPropertyAggregate!
+  aggregate: ConditionPropertyAggregate
   aspect: DialogueAspectType!
   createdAt: String!
   id: ID!
@@ -1616,7 +1616,7 @@ enum WorkspaceAspectType {
 
 """WorkspaceConditionScope"""
 type WorkspaceConditionScopeModel {
-  aggregate: ConditionPropertyAggregate!
+  aggregate: ConditionPropertyAggregate
   aspect: WorkspaceAspectType!
   createdAt: String!
   id: ID!

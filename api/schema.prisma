@@ -904,15 +904,6 @@ model AutomationConditionMatchValue {
   textValue     String? // TODO: Reference an actual choice option instead of raw text here eventually
   dateTimeValue DateTime?
 
-  questionConditionScope   QuestionConditionScope? @relation(fields: [questionConditionScopeId], references: [id])
-  questionConditionScopeId String?
-
-  dialogueConditionScope   DialogueConditionScope? @relation(fields: [dialogueConditionScopeId], references: [id])
-  dialogueConditionScopeId String?
-
-  workspaceConditionScope   WorkspaceConditionScope? @relation(fields: [workspaceConditionScopeId], references: [id])
-  workspaceConditionScopeId String?
-
   automationCondition AutomationCondition[]
 }
 
@@ -942,8 +933,7 @@ model QuestionConditionScope {
   aggregate   ConditionPropertyAggregate? @relation(fields: [aggregateId], references: [id])
   aggregateId String?
 
-  automationCondition           AutomationCondition[]
-  automationConditionMatchValue AutomationConditionMatchValue[]
+  automationCondition AutomationCondition[]
 }
 
 model DialogueConditionScope {
@@ -956,8 +946,7 @@ model DialogueConditionScope {
   aggregate   ConditionPropertyAggregate? @relation(fields: [aggregateId], references: [id])
   aggregateId String?
 
-  automationCondition           AutomationCondition[]
-  automationConditionMatchValue AutomationConditionMatchValue[]
+  automationCondition AutomationCondition[]
 }
 
 model WorkspaceConditionScope {
@@ -970,8 +959,7 @@ model WorkspaceConditionScope {
   aggregate   ConditionPropertyAggregate? @relation(fields: [aggregateId], references: [id])
   aggregateId String?
 
-  automationCondition           AutomationCondition[]
-  automationConditionMatchValue AutomationConditionMatchValue[]
+  automationCondition AutomationCondition[]
 }
 
 model AutomationCondition {

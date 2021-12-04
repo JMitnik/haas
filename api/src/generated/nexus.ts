@@ -706,7 +706,7 @@ export interface NexusGenRootTypes {
   }
   Dialogue: prisma.Dialogue;
   DialogueConditionScopeModel: { // root type
-    aggregate: NexusGenRootTypes['ConditionPropertyAggregate']; // ConditionPropertyAggregate!
+    aggregate?: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect: NexusGenEnums['DialogueAspectType']; // DialogueAspectType!
     createdAt: string; // String!
     id: string; // ID!
@@ -935,7 +935,7 @@ export interface NexusGenRootTypes {
     userData: NexusGenRootTypes['UserType']; // UserType!
   }
   WorkspaceConditionScopeModel: { // root type
-    aggregate: NexusGenRootTypes['ConditionPropertyAggregate']; // ConditionPropertyAggregate!
+    aggregate?: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect: NexusGenEnums['WorkspaceAspectType']; // WorkspaceAspectType!
     createdAt: string; // String!
     id: string; // ID!
@@ -1292,7 +1292,7 @@ export interface NexusGenFieldTypes {
     wasGeneratedWithGenData: boolean; // Boolean!
   }
   DialogueConditionScopeModel: { // field return type
-    aggregate: NexusGenRootTypes['ConditionPropertyAggregate']; // ConditionPropertyAggregate!
+    aggregate: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect: NexusGenEnums['DialogueAspectType']; // DialogueAspectType!
     createdAt: string; // String!
     id: string; // ID!
@@ -1690,7 +1690,7 @@ export interface NexusGenFieldTypes {
     userData: NexusGenRootTypes['UserType']; // UserType!
   }
   WorkspaceConditionScopeModel: { // field return type
-    aggregate: NexusGenRootTypes['ConditionPropertyAggregate']; // ConditionPropertyAggregate!
+    aggregate: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect: NexusGenEnums['WorkspaceAspectType']; // WorkspaceAspectType!
     createdAt: string; // String!
     id: string; // ID!

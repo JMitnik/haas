@@ -4,6 +4,10 @@ const prisma = new PrismaClient();
 
 async function main() {
   // wipe all content
+  const QUESTION_ID = 'QUESTION_ID';
+  const DIALOGUE_SLUG = 'DIALOGUE_SLUG';
+  const WORKSPACE_SLUG = 'WORKSPACE_SLUG';
+
   await prisma.automation.deleteMany();
   await prisma.automationTrigger.deleteMany();
   await prisma.automationEvent.deleteMany();
@@ -13,13 +17,24 @@ async function main() {
 
   await prisma.questionOfTrigger.deleteMany();
   await prisma.edge.deleteMany();
-  await prisma.questionNode.deleteMany();
+  await prisma.questionNode.deleteMany({
+    where: {
+      id: QUESTION_ID,
+    }
+  });
   await prisma.session.deleteMany();
-  await prisma.dialogue.deleteMany();
+  await prisma.dialogue.deleteMany({
+    where: {
+      slug: DIALOGUE_SLUG,
+    }
+  });
   await prisma.tag.deleteMany();
-  await prisma.userOfCustomer.deleteMany();
-  await prisma.customer.deleteMany();
-
+  // await prisma.userOfCustomer.deleteMany();
+  await prisma.customer.deleteMany({
+    where: {
+      slug: WORKSPACE_SLUG,
+    }
+  });
 
   // ... you will write your Prisma Client queries here
   const workspace = await prisma.customer.create({
@@ -33,7 +48,7 @@ async function main() {
     data: {
       title: 'Dialogue',
       description: 'Desc',
-      slug: 'DIALOGUE_SLUG',
+      slug: DIALOGUE_SLUG,
       customer: {
         connect: {
           id: workspace.id,
@@ -44,6 +59,7 @@ async function main() {
 
   const targetQuestion = await prisma.questionNode.create({
     data: {
+      id: QUESTION_ID,
       title: 'Slider question',
       type: 'SLIDER',
       questionDialogue: {
@@ -81,21 +97,21 @@ async function main() {
                 },
                 scope: 'QUESTION',
                 operator: 'SMALLER_OR_EQUAL_THAN',
+                questionScope: {
+                  create: {
+                    aspect: 'NODE_VALUE',
+                    aggregate: {
+                      create: {
+                        type: 'AVG',
+                        latest: 10,
+                      }
+                    }
+                  }
+                },
                 matchValue: {
                   create: {
                     type: 'INT',
                     numberValue: 50,
-                    questionConditionScope: {
-                      create: {
-                        aspect: 'NODE_VALUE',
-                        aggregate: {
-                          create: {
-                            type: 'AVG',
-                            latest: 10,
-                          }
-                        }
-                      }
-                    }
                   }
                 }
               },
@@ -107,20 +123,21 @@ async function main() {
                 },
                 scope: 'DIALOGUE',
                 operator: 'GREATER_THAN',
+                dialogueScope: {
+                  create: {
+                    aspect: 'NR_INTERACTIONS',
+                    aggregate: {
+                      create: {
+                        type: 'COUNT',
+                        latest: 10,
+                      }
+                    }
+                  }
+                },
                 matchValue: {
                   create: {
                     type: 'INT',
                     numberValue: 10,
-                    dialogueConditionScope: {
-                      create: {
-                        aspect: 'NR_INTERACTIONS',
-                        aggregate: {
-                          create: {
-                            type: 'COUNT',
-                          }
-                        }
-                      }
-                    }
                   }
                 }
               }
