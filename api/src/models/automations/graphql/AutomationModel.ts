@@ -1,6 +1,7 @@
 import { inputObjectType, objectType, queryField } from '@nexus/schema';
 import { AutomationType } from './AutomationType';
 import { AutomationTriggerModel } from './AutomationTrigger'
+import { CustomerType } from '../../customer/index'
 import { UserInputError } from 'apollo-server-express';
 
 export const AutomationModel = objectType({
@@ -22,6 +23,11 @@ export const AutomationModel = objectType({
 
     t.field('automationTrigger', {
       type: AutomationTriggerModel,
+      nullable: true,
+    });
+
+    t.field('workspace', {
+      type: CustomerType,
       nullable: true,
     });
   },
@@ -48,6 +54,7 @@ export const GetAutomationQuery = queryField('automation', {
         id: args.input.id,
       },
       include: {
+        workspace: true,
         automationTrigger: {
           include: {
             event: {
@@ -71,8 +78,6 @@ export const GetAutomationQuery = queryField('automation', {
         },
       },
     });
-
-    console.log(automation?.automationTrigger.conditions[0]);
 
     return automation as any;
   }

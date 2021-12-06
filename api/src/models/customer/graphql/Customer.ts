@@ -55,6 +55,13 @@ export const CustomerType = objectType({
       },
     });
 
+    t.list.field('automations', {
+      type: 'AutomationModel',
+      async resolve(parent, args, ctx) {
+        return ctx.services.automationService.findAutomationsByWorkspace(parent.id);
+      },
+    });
+
     t.field('dialogue', {
       type: DialogueType,
       nullable: true,

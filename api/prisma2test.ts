@@ -75,6 +75,11 @@ async function main() {
       label: 'First Trigger automation',
       type: 'TRIGGER',
       isActive: true,
+      workspace: {
+        connect: {
+          id: workspace.id,
+        }
+      },
       automationTrigger: {
         create: {
           event: {

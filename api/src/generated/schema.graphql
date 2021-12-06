@@ -119,6 +119,7 @@ type AutomationModel {
   label: String!
   type: AutomationType!
   updatedAt: String!
+  workspace: Customer
 }
 
 """AutomationTrigger"""
@@ -354,6 +355,7 @@ input CTAShareInputObjectType {
 }
 
 type Customer {
+  automations: [AutomationModel!]!
   campaign(campaignId: String): CampaignType
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
@@ -731,6 +733,14 @@ input GetAutomationInput {
   id: String
 }
 
+type GetAutomationsByWorkspace {
+  automations: [AutomationModel!]!
+}
+
+input GetAutomationsByWorkspaceInput {
+  workspaceId: String
+}
+
 input GetCampaignsInput {
   customerSlug: String
 }
@@ -1061,6 +1071,7 @@ type Query {
   edge(id: String): Edge
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
   getAutodeckJobs(filter: PaginationWhereInput): AutodeckConnectionType!
+  getAutomationsByWorkspace(where: GetAutomationsByWorkspaceInput): GetAutomationsByWorkspace!
   getJob(id: String): CreateWorkspaceJobType
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType

@@ -63,6 +63,7 @@ model Customer {
   tags            Tag[]
   campaigns       Campaign[]
   CampaignVariant CampaignVariant[]
+  automations     Automation[]
 }
 
 enum TagEnum {
@@ -1029,4 +1030,7 @@ model Automation {
 
   automationTrigger   AutomationTrigger @relation(fields: [automationTriggerId], references: [id])
   automationTriggerId String
+
+  workspace   Customer @relation(fields: [workspaceId], references: [id])
+  workspaceId String
 }
