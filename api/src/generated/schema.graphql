@@ -27,6 +27,10 @@ type AutodeckConnectionType implements DeprecatedConnectionInterface {
   startDate: String
 }
 
+input AutomationActionInput {
+  type: AutomationActionType
+}
+
 """AutomationAction"""
 type AutomationActionModel {
   createdAt: String!
@@ -87,6 +91,12 @@ enum AutomationConditionScopeType {
   DIALOGUE
   QUESTION
   WORKSPACE
+}
+
+input AutomationEventInput {
+  dialogueId: String
+  eventType: AutomationEventType
+  questionId: String
 }
 
 """AutomationEvent"""
@@ -197,6 +207,11 @@ type ColourSettings {
   secondary: String
 }
 
+input ConditionDialogueScopeInput {
+  aggregate: ConditionPropertyAggregateInput
+  aspect: DialogueAspectType
+}
+
 type ConditionPropertyAggregate {
   createdAt: String!
   endDate: String
@@ -206,6 +221,13 @@ type ConditionPropertyAggregate {
   type: ConditionPropertyAggregateType!
 }
 
+input ConditionPropertyAggregateInput {
+  endDate: String
+  latest: Int
+  startDate: String
+  type: ConditionPropertyAggregateType
+}
+
 enum ConditionPropertyAggregateType {
   AVG
   COUNT
@@ -213,10 +235,46 @@ enum ConditionPropertyAggregateType {
   MIN
 }
 
+input ConditionQuestionScopeInput {
+  aggregate: ConditionPropertyAggregateInput
+  aspect: QuestionAspectType
+}
+
+input ConditionScopeInput {
+  dialogueScope: ConditionDialogueScopeInput
+  questionScope: ConditionQuestionScopeInput
+  type: AutomationConditionScopeType
+  workspaceScope: ConditionWorkspaceScopeInput
+}
+
+input ConditionWorkspaceScopeInput {
+  aggregate: ConditionPropertyAggregateInput
+  aspect: WorkspaceAspectType
+}
+
 """Interface all pagination-based models should implement"""
 interface ConnectionInterface {
   pageInfo: PaginationPageInfo!
   totalPages: Int
+}
+
+input CreateAutomationCondition {
+  dialogueId: String
+  matchValue: MatchValueInput
+  operator: AutomationConditionOperatorType
+  questionId: String
+  scope: ConditionScopeInput
+  workspaceId: String
+}
+
+input CreateAutomationResolverInput {
+  actions: [AutomationActionInput!]
+  automationType: AutomationType
+  conditions: [CreateAutomationCondition!]
+  description: String
+  event: AutomationEventInput
+  label: String
+  workspaceId: String
 }
 
 input CreateBatchDeliveriesInputType {
@@ -864,6 +922,13 @@ type LoginOutput {
   user: UserType!
 }
 
+input MatchValueInput {
+  dateTimeValue: String
+  matchValueType: MatchValueType
+  numberValue: Int
+  textValue: String
+}
+
 enum MatchValueType {
   DATE_TIME
   INT
@@ -875,6 +940,7 @@ type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
+  createAutomation(input: CreateAutomationResolverInput): AutomationModel
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
   createCampaign(input: CreateCampaignInputType): CampaignType!
 

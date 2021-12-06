@@ -989,6 +989,8 @@ model AutomationCondition {
   dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
   dialogueId String?
 
+  // TODO: Add workspace relation so Workspace-wide conditions can be introduced
+
   automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id])
   automationTriggerId String?
 }
