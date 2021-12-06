@@ -1492,7 +1492,7 @@ export interface NexusGenFieldTypes {
     assignTags: NexusGenRootTypes['Dialogue']; // Dialogue!
     confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     copyDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
-    createAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
+    createAutomation: NexusGenRootTypes['AutomationModel']; // AutomationModel!
     createBatchDeliveries: NexusGenRootTypes['CreateBatchDeliveriesOutputType']; // CreateBatchDeliveriesOutputType!
     createCampaign: NexusGenRootTypes['CampaignType']; // CampaignType!
     createCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!

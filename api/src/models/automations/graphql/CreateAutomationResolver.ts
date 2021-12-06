@@ -125,7 +125,6 @@ export const CreateAutomationResolverInput = inputObjectType({
 
 export const CreateAutomationResolver = mutationField('createAutomation', {
   type: AutomationModel,
-  nullable: true,
   args: { input: CreateAutomationResolverInput },
   async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('No input provided create automation with!');
@@ -140,6 +139,8 @@ export const CreateAutomationResolver = mutationField('createAutomation', {
     if (args.input?.conditions?.length === 0) throw new UserInputError('No conditions provided for automation!');
     if (args.input?.actions?.length === 0) throw new UserInputError('No actions provided for automation!');
 
-    return ctx.services.automationService.createAutomation(args.input) as any;
+    const automation = await ctx.services.automationService.createAutomation(args.input);
+    console.log('CREATED AUTOMATION: ', automation);
+    return automation as any;
   },
 });

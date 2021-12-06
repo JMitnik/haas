@@ -940,7 +940,7 @@ type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
-  createAutomation(input: CreateAutomationResolverInput): AutomationModel
+  createAutomation(input: CreateAutomationResolverInput): AutomationModel!
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
   createCampaign(input: CreateCampaignInputType): CampaignType!
 

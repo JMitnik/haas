@@ -1,12 +1,41 @@
-import { AutomationType, DeliveryStatusTypeEnum, Prisma, PrismaClient } from '@prisma/client';
-import { isPresent } from 'ts-is-present';
+import { AutomationType, ConditionPropertyAggregateType, Prisma, PrismaClient, QuestionAspect } from '@prisma/client';
 import { NexusGenEnums, NexusGenInputs } from '../../generated/nexus';
 
+type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+
+/**
+ * XOR is needed to have a real mutually exclusive union type
+ * https://stackoverflow.com/questions/42123407/does-typescript-support-mutually-exclusive-types
+ */
+type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
+
+export interface ConditionPropertAggregateInput {
+  endDate?: string | null; // String
+  latest?: number | null; // Int
+  startDate?: string | null; // String
+  type: NexusGenEnums['ConditionPropertyAggregateType']; // ConditionPropertyAggregateType
+}
+
+export interface CreateDialogueScopeInput {
+  aggregate: ConditionPropertAggregateInput;
+  aspect: NexusGenEnums['DialogueAspectType']; // DialogueAspectType
+}
+
+export interface CreateQuestionScopeInput {
+  aggregate: ConditionPropertAggregateInput;
+  aspect: NexusGenEnums['QuestionAspectType']; // DialogueAspectType
+}
+
+export interface CreateWorkspaceScopeInput {
+  aggregate: ConditionPropertAggregateInput;
+  aspect: NexusGenEnums['WorkspaceAspectType']; // DialogueAspectType
+}
+
 export interface CreateAutomationConditionScopeInput {
-  dialogueScope?: NexusGenInputs['ConditionDialogueScopeInput'] | null; // ConditionDialogueScopeInput
-  questionScope?: NexusGenInputs['ConditionQuestionScopeInput'] | null; // ConditionQuestionScopeInput
+  dialogueScope?: CreateDialogueScopeInput | null; // ConditionDialogueScopeInput
+  questionScope?: CreateQuestionScopeInput | null; // ConditionQuestionScopeInput
   type: NexusGenEnums['AutomationConditionScopeType']; // AutomationConditionScopeType
-  workspaceScope?: NexusGenInputs['ConditionWorkspaceScopeInput'] | null; // ConditionWorkspaceScopeInput
+  workspaceScope?: CreateWorkspaceScopeInput | null; // ConditionWorkspaceScopeInput
 }
 
 export interface CreateConditionMatchValueInput {
@@ -40,6 +69,13 @@ export interface CreateAutomationInput {
   actions: {
     type: NexusGenEnums['AutomationActionType'];
   }[];
+};
+
+export type MoreXOR = CreateQuestionScopeInput['aspect'] | CreateDialogueScopeInput['aspect'] | CreateWorkspaceScopeInput['aspect']
+
+export interface CreateScopeDataInput {
+  aspect: any // TODO: Turn this into MoreXOR 
+  aggregate: ConditionPropertAggregateInput;
 }
 
 export class AutomationPrismaAdapter {
@@ -49,21 +85,61 @@ export class AutomationPrismaAdapter {
     this.prisma = prisma;
   }
 
-  constructCreateAutomationConditionScopeData = (scope: CreateAutomationConditionScopeInput) => {
+  constructCreateAutomationConditionScopeData = (scope: CreateAutomationConditionScopeInput): CreateScopeDataInput | undefined => {
+    if (scope.type === 'QUESTION' && scope.questionScope) {
+      return {
+        aspect: scope.questionScope.aspect,
+        aggregate: {
+          type: scope.questionScope.aggregate.type,
+          startDate: scope.questionScope.aggregate.startDate,
+          endDate: scope.questionScope.aggregate.endDate,
+          latest: scope.questionScope.aggregate.latest,
+        },
+      };
+    };
 
+    if (scope.type === 'DIALOGUE' && scope.dialogueScope) {
+      return {
+        aspect: scope.dialogueScope.aspect,
+        aggregate: {
+          type: scope.dialogueScope.aggregate.type,
+          startDate: scope.dialogueScope.aggregate.startDate,
+          endDate: scope.dialogueScope.aggregate.endDate,
+          latest: scope.dialogueScope.aggregate.latest,
+        },
+      }
+    }
+
+    if (scope.type === 'WORKSPACE' && scope.workspaceScope) {
+      return {
+        aspect: scope.workspaceScope.aspect,
+        aggregate: {
+          type: scope.workspaceScope.aggregate.type,
+          startDate: scope.workspaceScope.aggregate.startDate,
+          endDate: scope.workspaceScope.aggregate.endDate,
+          latest: scope.workspaceScope.aggregate.latest,
+        },
+      }
+    }
+
+    return undefined;
   }
 
   constructCreateAutomationConditionData = (conditions: CreateAutomationInput['conditions']): Prisma.AutomationConditionCreateNestedManyWithoutAutomationTriggerInput => {
     return {
       create: conditions.map((condition) => {
-        const { dialogueId, workspaceId, scope, questionId, matchValue, operator } = condition;
-
+        const { dialogueId, scope, questionId, matchValue, operator } = condition;
+        // TODO: Introduce workspace-wide condition
+        const mappedScope = this.constructCreateAutomationConditionScopeData(scope);
         return {
           scope: scope.type,
           operator,
           matchValue: {
-            create: matchValue,
+            create: {
+              type: matchValue.type
+            },
           },
+
           question: questionId ? {
             connect: {
               id: questionId,
@@ -74,7 +150,31 @@ export class AutomationPrismaAdapter {
               id: dialogueId,
             }
           } : undefined,
-        }
+          questionScope: (scope.type === 'QUESTION' && mappedScope) ? {
+            create: {
+              aggregate: {
+                create: mappedScope.aggregate,
+              },
+              aspect: mappedScope.aspect,
+            }
+          } : undefined,
+          dialogueScope: (scope.type === 'DIALOGUE' && mappedScope) ? {
+            create: {
+              aggregate: {
+                create: mappedScope.aggregate,
+              },
+              aspect: mappedScope.aspect,
+            }
+          } : undefined,
+          workspaceScope: (scope.type === 'WORKSPACE' && mappedScope) ? {
+            create: {
+              aggregate: {
+                create: mappedScope.aggregate,
+              },
+              aspect: mappedScope.aspect,
+            }
+          } : undefined,
+        };
       }),
     }
   }
@@ -115,7 +215,7 @@ export class AutomationPrismaAdapter {
 
   createAutomation = async (input: CreateAutomationInput) => {
     const { description, workspaceId, label, automationType } = input;
-    this.prisma.automation.create({
+    return this.prisma.automation.create({
       data: {
         label: label,
         type: automationType,

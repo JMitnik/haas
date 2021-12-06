@@ -13,9 +13,29 @@ class AutomationService {
   constructCreateAutomationConditionScopeInput = (condition: NexusGenInputs['CreateAutomationCondition']): CreateAutomationConditionScopeInput => {
     if (!condition.scope) throw new UserInputError('One of the automation conditions has no scope object provided!');
 
-    const { type } = condition.scope;
+    const { type, dialogueScope, workspaceScope, questionScope } = condition.scope;
     if (!type) throw new UserInputError('One of the automation conditions has no scope type provided!');
+    if (type === 'QUESTION') {
+      if (!questionScope?.aspect) {
+        throw new UserInputError('Condition scope is question but no aspect is provided!');
+      }
+      if (!questionScope?.aggregate?.type) {
+        throw new UserInputError('Condition scope is question but no aggregate type is provided!');
+      }
+    }
+    if (type === 'DIALOGUE') {
+      if (!dialogueScope?.aspect) throw new UserInputError('Condition scope is dialogue but no aspect is provided!');
+      if (!dialogueScope?.aggregate?.type) throw new UserInputError('Condition scope is dialogue but no aggregate type is provided!');
+    }
+    if (type === 'WORKSPACE') {
+      if (!workspaceScope?.aspect) throw new UserInputError('Condition scope is workspace but no aspect is provided!');
+      if (!workspaceScope?.aggregate?.type) throw new UserInputError('Condition scope is workspace but no aggregate type is provided!');
+    }
+
     return {
+      // questionScope: type === 'QUESTION' ? { 
+      //   aspect: questionScope?.aspect,
+      // } : null,
       ...condition.scope,
       type: type,
     }
@@ -49,13 +69,17 @@ class AutomationService {
         throw new UserInputError('No Operator input is provided for an AutomicCondition!');
       }
 
+      const { dateTimeValue, matchValueType, numberValue, textValue } = condition.matchValue;
+
       return {
         ...condition,
         operator: condition.operator,
         scope: this.constructCreateAutomationConditionScopeInput(condition),
         matchValue: {
-          ...condition.matchValue,
-          type: condition.matchValue?.matchValueType,
+          dateTimeValue,
+          numberValue,
+          textValue,
+          type: matchValueType,
         }
       }
     }) || [];
