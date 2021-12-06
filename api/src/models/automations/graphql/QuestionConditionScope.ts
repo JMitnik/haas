@@ -16,7 +16,6 @@ export const QuestionConditionScope = objectType({
       type: ConditionPropertyAggregate,
       nullable: true,
       resolve(root, args, ctx) {
-        console.log('root aggregate id: ', root.aggregateId);
         return root.aggregateId ? ctx.prisma.conditionPropertyAggregate.findUnique({
           where: {
             id: root.aggregateId,
