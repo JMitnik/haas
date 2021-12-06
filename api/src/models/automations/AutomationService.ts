@@ -8,6 +8,10 @@ class AutomationService {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
   }
 
+  findAutomationById = (automationId: string) => {
+    return this.automationPrismaAdapter.findAutomationById(automationId);
+  }
+
   findWorkspaceByAutomation = (automationId: string) => {
     return this.automationPrismaAdapter.findWorkspaceByAutomationId(automationId);
   };

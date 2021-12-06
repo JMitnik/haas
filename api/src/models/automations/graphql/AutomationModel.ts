@@ -49,35 +49,7 @@ export const GetAutomationQuery = queryField('automation', {
   async resolve(parent, args, ctx) {
     if (!args.input?.id) throw new UserInputError('No ID available to find automation with!');
 
-    const automation = await ctx.prisma.automation.findUnique({
-      where: {
-        id: args.input.id,
-      },
-      include: {
-        workspace: true,
-        automationTrigger: {
-          include: {
-            event: {
-              include: {
-                question: true,
-                dialogue: true,
-              }
-            },
-            conditions: {
-              include: {
-                questionScope: true,
-                dialogueScope: true,
-                matchValue: true,
-                workspaceScope: true,
-                dialogue: true,
-                question: true,
-              }
-            },
-            actions: true,
-          },
-        },
-      },
-    });
+    const automation = await ctx.services.automationService.findAutomationById(args.input.id);
 
     return automation as any;
   }

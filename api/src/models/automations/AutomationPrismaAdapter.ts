@@ -7,6 +7,38 @@ export class AutomationPrismaAdapter {
     this.prisma = prisma;
   }
 
+  findAutomationById = async (automationId: string) => {
+    return this.prisma.automation.findUnique({
+      where: {
+        id: automationId,
+      },
+      include: {
+        workspace: true,
+        automationTrigger: {
+          include: {
+            event: {
+              include: {
+                question: true,
+                dialogue: true,
+              }
+            },
+            conditions: {
+              include: {
+                questionScope: true,
+                dialogueScope: true,
+                matchValue: true,
+                workspaceScope: true,
+                dialogue: true,
+                question: true,
+              }
+            },
+            actions: true,
+          },
+        },
+      },
+    });
+  }
+
   findWorkspaceByAutomationId = async (automationId: string) => {
     const automation = await this.prisma.automation.findUnique({
       where: {
