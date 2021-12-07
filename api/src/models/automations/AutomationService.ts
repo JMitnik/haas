@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
-import { NexusGenInputNames, NexusGenInputs } from '../../generated/nexus';
-import { AutomationPrismaAdapter, CreateAutomationConditionInput, CreateAutomationConditionScopeInput, CreateAutomationInput, UpdateAutomationInput } from './AutomationPrismaAdapter';
+
+import { NexusGenInputs } from '../../generated/nexus';
+import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
+import { CreateAutomationConditionScopeInput, CreateAutomationInput, UpdateAutomationInput } from './AutomationTypes'
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -119,7 +121,7 @@ class AutomationService {
   }
 
   updateAutomation = (input: NexusGenInputs['CreateAutomationResolverInput']) => {
-    // Test whether input data matches what's needed to create an automation
+    // Test whether input data matches what's needed to update an automation
     const validatedInput = this.constructUpdateAutomationInput(input);
     return this.automationPrismaAdapter.updateAutomation(validatedInput);
   }
