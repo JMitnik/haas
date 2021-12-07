@@ -38,11 +38,13 @@ export interface NexusGenInputs {
     sessionId?: string | null; // ID
   }
   AutomationActionInput: { // input type
+    id?: string | null; // ID
     type?: NexusGenEnums['AutomationActionType'] | null; // AutomationActionType
   }
   AutomationEventInput: { // input type
     dialogueId?: string | null; // String
     eventType?: NexusGenEnums['AutomationEventType'] | null; // AutomationEventType
+    id?: string | null; // ID
     questionId?: string | null; // String
   }
   CTALinkInputObjectType: { // input type
@@ -72,9 +74,11 @@ export interface NexusGenInputs {
   ConditionDialogueScopeInput: { // input type
     aggregate?: NexusGenInputs['ConditionPropertyAggregateInput'] | null; // ConditionPropertyAggregateInput
     aspect?: NexusGenEnums['DialogueAspectType'] | null; // DialogueAspectType
+    id?: string | null; // ID
   }
   ConditionPropertyAggregateInput: { // input type
     endDate?: string | null; // String
+    id?: string | null; // ID
     latest?: number | null; // Int
     startDate?: string | null; // String
     type?: NexusGenEnums['ConditionPropertyAggregateType'] | null; // ConditionPropertyAggregateType
@@ -82,9 +86,11 @@ export interface NexusGenInputs {
   ConditionQuestionScopeInput: { // input type
     aggregate?: NexusGenInputs['ConditionPropertyAggregateInput'] | null; // ConditionPropertyAggregateInput
     aspect?: NexusGenEnums['QuestionAspectType'] | null; // QuestionAspectType
+    id?: string | null; // ID
   }
   ConditionScopeInput: { // input type
     dialogueScope?: NexusGenInputs['ConditionDialogueScopeInput'] | null; // ConditionDialogueScopeInput
+    id?: string | null; // ID
     questionScope?: NexusGenInputs['ConditionQuestionScopeInput'] | null; // ConditionQuestionScopeInput
     type?: NexusGenEnums['AutomationConditionScopeType'] | null; // AutomationConditionScopeType
     workspaceScope?: NexusGenInputs['ConditionWorkspaceScopeInput'] | null; // ConditionWorkspaceScopeInput
@@ -92,9 +98,11 @@ export interface NexusGenInputs {
   ConditionWorkspaceScopeInput: { // input type
     aggregate?: NexusGenInputs['ConditionPropertyAggregateInput'] | null; // ConditionPropertyAggregateInput
     aspect?: NexusGenEnums['WorkspaceAspectType'] | null; // WorkspaceAspectType
+    id?: string | null; // ID
   }
   CreateAutomationCondition: { // input type
     dialogueId?: string | null; // String
+    id?: string | null; // ID
     matchValue?: NexusGenInputs['MatchValueInput'] | null; // MatchValueInput
     operator?: NexusGenEnums['AutomationConditionOperatorType'] | null; // AutomationConditionOperatorType
     questionId?: string | null; // String
@@ -107,6 +115,7 @@ export interface NexusGenInputs {
     conditions?: NexusGenInputs['CreateAutomationCondition'][] | null; // [CreateAutomationCondition!]
     description?: string | null; // String
     event?: NexusGenInputs['AutomationEventInput'] | null; // AutomationEventInput
+    id?: string | null; // ID
     label?: string | null; // String
     workspaceId?: string | null; // String
   }
@@ -335,6 +344,7 @@ export interface NexusGenInputs {
   }
   MatchValueInput: { // input type
     dateTimeValue?: string | null; // String
+    id?: string | null; // ID
     matchValueType?: NexusGenEnums['MatchValueType'] | null; // MatchValueType
     numberValue?: number | null; // Int
     textValue?: string | null; // String
@@ -1526,6 +1536,7 @@ export interface NexusGenFieldTypes {
     requestInvite: NexusGenRootTypes['RequestInviteOutput']; // RequestInviteOutput!
     retryAutodeckJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
+    updateAutomation: NexusGenRootTypes['AutomationModel']; // AutomationModel!
     updateCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     updateCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateDeliveryStatus: string; // String!
@@ -1969,6 +1980,9 @@ export interface NexusGenArgTypes {
     }
     singleUpload: { // args
       file?: any | null; // Upload
+    }
+    updateAutomation: { // args
+      input?: NexusGenInputs['CreateAutomationResolverInput'] | null; // CreateAutomationResolverInput
     }
     updateCreateWorkspaceJob: { // args
       errorMessage?: string | null; // String

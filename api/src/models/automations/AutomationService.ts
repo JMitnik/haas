@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 import { NexusGenInputNames, NexusGenInputs } from '../../generated/nexus';
-import { AutomationPrismaAdapter, CreateAutomationConditionInput, CreateAutomationConditionScopeInput, CreateAutomationInput } from './AutomationPrismaAdapter';
+import { AutomationPrismaAdapter, CreateAutomationConditionInput, CreateAutomationConditionScopeInput, CreateAutomationInput, UpdateAutomationInput } from './AutomationPrismaAdapter';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -33,12 +33,9 @@ class AutomationService {
     }
 
     return {
-      // questionScope: type === 'QUESTION' ? { 
-      //   aspect: questionScope?.aspect,
-      // } : null,
       ...condition.scope,
       type: type,
-    }
+    } as CreateAutomationConditionScopeInput;
   }
 
   constructAutomationActionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['actions'] => {
@@ -111,6 +108,20 @@ class AutomationService {
     const actions: CreateAutomationInput['actions'] = this.constructAutomationActionsInput(input);
 
     return { label, workspaceId, automationType, conditions, event, actions, description: input.description }
+  }
+
+  constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): UpdateAutomationInput => {
+    if (!input.id) throw new UserInputError('No ID provided for automation that should be updated!');
+
+    const id: UpdateAutomationInput['id'] = input.id;
+    const createInput = this.constructCreateAutomationInput(input);
+    return { ...createInput, id: id }
+  }
+
+  updateAutomation = (input: NexusGenInputs['CreateAutomationResolverInput']) => {
+    // Test whether input data matches what's needed to create an automation
+    const validatedInput = this.constructUpdateAutomationInput(input);
+    return this.automationPrismaAdapter.updateAutomation(validatedInput);
   }
 
   createAutomation = (input: NexusGenInputs['CreateAutomationResolverInput']) => {

@@ -1,4 +1,4 @@
-import { inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
+import { extendInputType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
 import { AutomationType } from './AutomationType'
 import { AutomationEventType } from './AutomationEventType';
 import { AutomationConditionScopeType } from './AutomationConditionScopeType';
@@ -17,6 +17,7 @@ import { isPresent } from 'ts-is-present';
 export const MatchValueInput = inputObjectType({
   name: 'MatchValueInput',
   definition(t) {
+    t.id('id', { nullable: true });
     t.field('matchValueType', { type: MatchValueType });
     t.string('textValue', { nullable: true });
     t.int('numberValue', { nullable: true });
@@ -27,6 +28,7 @@ export const MatchValueInput = inputObjectType({
 export const ConditionPropertyAggregateInput = inputObjectType({
   name: 'ConditionPropertyAggregateInput',
   definition(t) {
+    t.id('id', { nullable: true });
     t.string('startDate', { nullable: true });
     t.string('endDate', { nullable: true });
     t.int('latest', { nullable: true });
@@ -38,6 +40,7 @@ export const ConditionPropertyAggregateInput = inputObjectType({
 export const ConditionQuestionScopeInput = inputObjectType({
   name: 'ConditionQuestionScopeInput',
   definition(t) {
+    t.id('id', { nullable: true });
     t.field('aspect', { type: QuestionAspectType });
     t.field('aggregate', { type: ConditionPropertyAggregateInput });
   },
@@ -46,6 +49,7 @@ export const ConditionQuestionScopeInput = inputObjectType({
 export const ConditionDialogueScopeInput = inputObjectType({
   name: 'ConditionDialogueScopeInput',
   definition(t) {
+    t.id('id', { nullable: true });
     t.field('aspect', { type: DialogueAspectType });
     t.field('aggregate', { type: ConditionPropertyAggregateInput });
   },
@@ -54,6 +58,7 @@ export const ConditionDialogueScopeInput = inputObjectType({
 export const ConditionWorkspaceScopeInput = inputObjectType({
   name: 'ConditionWorkspaceScopeInput',
   definition(t) {
+    t.id('id', { nullable: true });
     t.field('aspect', { type: WorkspaceAspectType });
     t.field('aggregate', { type: ConditionPropertyAggregateInput });
   },
@@ -62,6 +67,7 @@ export const ConditionWorkspaceScopeInput = inputObjectType({
 export const ConditionScopeInput = inputObjectType({
   name: 'ConditionScopeInput',
   definition(t) {
+    t.id('id', { nullable: true });
     t.field('type', { type: AutomationConditionScopeType });
     t.field('questionScope', { type: ConditionQuestionScopeInput, nullable: true });
     t.field('dialogueScope', { type: ConditionDialogueScopeInput, nullable: true });
@@ -72,6 +78,7 @@ export const ConditionScopeInput = inputObjectType({
 export const CreateAutomationCondition = inputObjectType({
   name: 'CreateAutomationCondition',
   definition(t) {
+    t.id('id', { nullable: true });
     t.field('scope', { type: ConditionScopeInput });
     t.field('operator', { type: AutomationConditionOperatorType });
     t.field('matchValue', { type: MatchValueInput });
@@ -85,6 +92,7 @@ export const CreateAutomationCondition = inputObjectType({
 export const AutomationActionInput = inputObjectType({
   name: 'AutomationActionInput',
   definition(t) {
+    t.id('id', { nullable: true });
     t.field('type', { type: AutomationActionType });
   },
 });
@@ -92,6 +100,7 @@ export const AutomationActionInput = inputObjectType({
 export const AutomationEventInput = inputObjectType({
   name: 'AutomationEventInput',
   definition(t) {
+    t.id('id', { nullable: true });
     t.field('eventType', { type: AutomationEventType });
     t.string('questionId', { nullable: true });
     t.string('dialogueId', { nullable: true });
@@ -102,6 +111,7 @@ export const CreateAutomationResolverInput = inputObjectType({
   name: 'CreateAutomationResolverInput',
   definition(t) {
     // Generic info
+    t.id('id', { nullable: true });
     t.string('label');
     t.string('description', { nullable: true });
     t.string('workspaceId');
@@ -127,17 +137,8 @@ export const CreateAutomationResolver = mutationField('createAutomation', {
   type: AutomationModel,
   args: { input: CreateAutomationResolverInput },
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input provided create automation with!');
-    if (!args.input.label || typeof args.input.label === undefined || args.input.label === null) throw new UserInputError('No label provided for automation!');
-    if (!args.input.automationType) throw new UserInputError('No automation type provided for automation!');
-    if (!args.input.workspaceId) throw new UserInputError('No workspace Id provided for automation!');
 
-    // Event input
-    if (!args.input.event) throw new UserInputError('No event provided for automation!');
-    if (!args.input.event.eventType) throw new UserInputError('No event type provided for automation event!');
-
-    if (args.input?.conditions?.length === 0) throw new UserInputError('No conditions provided for automation!');
-    if (args.input?.actions?.length === 0) throw new UserInputError('No actions provided for automation!');
+    if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
 
     const automation = await ctx.services.automationService.createAutomation(args.input);
     console.log('CREATED AUTOMATION: ', automation);

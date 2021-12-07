@@ -28,6 +28,7 @@ type AutodeckConnectionType implements DeprecatedConnectionInterface {
 }
 
 input AutomationActionInput {
+  id: ID
   type: AutomationActionType
 }
 
@@ -96,6 +97,7 @@ enum AutomationConditionScopeType {
 input AutomationEventInput {
   dialogueId: String
   eventType: AutomationEventType
+  id: ID
   questionId: String
 }
 
@@ -210,6 +212,7 @@ type ColourSettings {
 input ConditionDialogueScopeInput {
   aggregate: ConditionPropertyAggregateInput
   aspect: DialogueAspectType
+  id: ID
 }
 
 type ConditionPropertyAggregate {
@@ -223,6 +226,7 @@ type ConditionPropertyAggregate {
 
 input ConditionPropertyAggregateInput {
   endDate: String
+  id: ID
   latest: Int
   startDate: String
   type: ConditionPropertyAggregateType
@@ -238,10 +242,12 @@ enum ConditionPropertyAggregateType {
 input ConditionQuestionScopeInput {
   aggregate: ConditionPropertyAggregateInput
   aspect: QuestionAspectType
+  id: ID
 }
 
 input ConditionScopeInput {
   dialogueScope: ConditionDialogueScopeInput
+  id: ID
   questionScope: ConditionQuestionScopeInput
   type: AutomationConditionScopeType
   workspaceScope: ConditionWorkspaceScopeInput
@@ -250,6 +256,7 @@ input ConditionScopeInput {
 input ConditionWorkspaceScopeInput {
   aggregate: ConditionPropertyAggregateInput
   aspect: WorkspaceAspectType
+  id: ID
 }
 
 """Interface all pagination-based models should implement"""
@@ -260,6 +267,7 @@ interface ConnectionInterface {
 
 input CreateAutomationCondition {
   dialogueId: String
+  id: ID
   matchValue: MatchValueInput
   operator: AutomationConditionOperatorType
   questionId: String
@@ -273,6 +281,7 @@ input CreateAutomationResolverInput {
   conditions: [CreateAutomationCondition!]
   description: String
   event: AutomationEventInput
+  id: ID
   label: String
   workspaceId: String
 }
@@ -924,6 +933,7 @@ type LoginOutput {
 
 input MatchValueInput {
   dateTimeValue: String
+  id: ID
   matchValueType: MatchValueType
   numberValue: Int
   textValue: String
@@ -980,6 +990,7 @@ type Mutation {
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   singleUpload(file: Upload): ImageType!
+  updateAutomation(input: CreateAutomationResolverInput): AutomationModel!
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
