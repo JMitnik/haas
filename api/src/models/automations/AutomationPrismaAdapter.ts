@@ -1,5 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
+import { cloneDeep } from 'lodash';
 import { isPresent } from 'ts-is-present';
+import { NexusGenInputs } from '../../generated/nexus';
 
 import {
   UpdateAutomationConditionInput, UpdateAutomationInput, FullAutomationWithRels, CreateAutomationInput, CreateScopeDataInput, CreateAutomationConditionScopeInput, CreateAutomationConditionInput, AutomationTrigger
@@ -10,6 +12,79 @@ export class AutomationPrismaAdapter {
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
+  }
+
+  /**
+* Build a userConnection prisma query based on the filter parameters.
+* @param customerSlug the slug of a workspace
+* @param filter a filter containing information in regard to used search queries, date ranges and order based on column
+*/
+  buildFindAutomationsQuery = (workspaceSlug: string, filter?: NexusGenInputs['AutomationConnectionFilterInput'] | null): Prisma.AutomationWhereInput => {
+    let automationWhereInput: Prisma.AutomationWhereInput = {
+      workspace: {
+        slug: workspaceSlug,
+      },
+    }
+
+    if (filter?.search) {
+      automationWhereInput = {
+        ...cloneDeep(automationWhereInput),
+        OR: [
+          { label: { contains: filter.search, mode: 'insensitive' } },
+          { description: { contains: filter.search, mode: 'insensitive' } },
+          { workspace: { name: { contains: filter.search, mode: 'insensitive' } } },
+        ]
+      }
+    }
+
+    if (filter?.type) {
+      automationWhereInput.type = { equals: filter.type }
+    }
+
+    return automationWhereInput;
+  }
+
+  countAutomations = async (workspaceSlug: string, filter?: NexusGenInputs['AutomationConnectionFilterInput'] | null) => {
+    const totalAutomations = await this.prisma.automation.count({
+      where: this.buildFindAutomationsQuery(workspaceSlug, filter),
+    });
+    return totalAutomations;
+  }
+
+  /**
+  * Order userOfCustomer by UserConnectionFilterInput
+  * @param filter
+  */
+  buildOrderByQuery = (filter?: NexusGenInputs['AutomationConnectionFilterInput'] | null) => {
+    let orderByQuery: Prisma.AutomationOrderByWithRelationInput[] = [];
+
+    if (filter?.orderBy?.by === 'type') {
+      orderByQuery.push({
+        type: filter.orderBy.desc ? 'desc' : 'asc',
+      });
+    }
+
+    if (filter?.orderBy?.by === 'updatedAt') {
+      orderByQuery.push({
+        updatedAt: filter.orderBy.desc ? 'desc' : 'asc',
+      });
+    }
+
+    return orderByQuery;
+  };
+
+  findPaginatedAutomations = async (workspaceSlug: string, filter?: NexusGenInputs['AutomationConnectionFilterInput'] | null) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const automations = await this.prisma.automation.findMany({
+      where: this.buildFindAutomationsQuery(workspaceSlug, filter),
+      skip: offset,
+      take: perPage,
+      orderBy: this.buildOrderByQuery(filter),
+    });
+
+    return automations;
   }
 
   /**

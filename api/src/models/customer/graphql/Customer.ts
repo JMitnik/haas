@@ -16,6 +16,7 @@ import isValidColor from '../../../utils/isValidColor';
 import { CampaignModel } from '../../Campaigns';
 import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
 import { AutomationModel } from '../../automations/graphql/AutomationModel';
+import { AutomationConnection, AutomationConnectionFilterInput } from '../../automations/graphql/AutomationConnection';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -39,6 +40,16 @@ export const CustomerType = objectType({
       async resolve(parent: Customer, args, ctx) {
         const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
         return customerSettings;
+      },
+    });
+
+    t.field('automationConnection', {
+      type: AutomationConnection,
+      args: { filter: AutomationConnectionFilterInput },
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        // As any because current type only return automation without relationships
+        return ctx.services.automationService.paginatedAutomations(parent.slug, args.filter) as any;
       },
     });
 

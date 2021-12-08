@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 
 import { NexusGenInputs } from '../../generated/nexus';
+import { offsetPaginate } from '../general/PaginationHelpers';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
 import { CreateAutomationConditionScopeInput, CreateAutomationInput, UpdateAutomationInput } from './AutomationTypes'
 
@@ -206,6 +207,25 @@ class AutomationService {
    */
   findAutomationsByWorkspace = (workspaceId: string) => {
     return this.automationPrismaAdapter.findAutomationsByWorkspaceId(workspaceId);
+  };
+
+  paginatedAutomations = async (
+    workspaceSlug: string,
+    filter?: NexusGenInputs['AutomationConnectionFilterInput'] | null,
+  ) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const automations = await this.automationPrismaAdapter.findPaginatedAutomations(workspaceSlug, filter);
+    const totalUsers = await this.automationPrismaAdapter.countAutomations(workspaceSlug, filter);
+
+    const { totalPages, ...pageInfo } = offsetPaginate(totalUsers, offset, perPage);
+
+    return {
+      automations: automations,
+      totalPages,
+      pageInfo,
+    };
   };
 
 }

@@ -94,6 +94,33 @@ enum AutomationConditionScopeType {
   WORKSPACE
 }
 
+type AutomationConnection implements ConnectionInterface {
+  automations: [AutomationModel!]!
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
+}
+
+input AutomationConnectionFilterInput {
+  label: String
+  offset: Int
+  orderBy: AutomationConnectionOrderByInput
+  perPage: Int = 10
+  search: String
+  type: AutomationType
+}
+
+"""Sorting of UserConnection"""
+input AutomationConnectionOrderByInput {
+  by: AutomationConnectionOrderType!
+  desc: Boolean = true
+}
+
+"""Fields to order UserConnection by."""
+enum AutomationConnectionOrderType {
+  type
+  updatedAt
+}
+
 input AutomationEventInput {
   dialogueId: String
   eventType: AutomationEventType
@@ -422,6 +449,7 @@ input CTAShareInputObjectType {
 }
 
 type Customer {
+  automationConnection(filter: AutomationConnectionFilterInput): AutomationConnection
   automations: [AutomationModel!]!
   campaign(campaignId: String): CampaignType
   campaigns: [CampaignType!]!
