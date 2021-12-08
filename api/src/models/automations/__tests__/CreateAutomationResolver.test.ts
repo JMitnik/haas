@@ -72,7 +72,7 @@ it('unable to create automation when no workspace id is provided', async () => {
       }
     );
   } catch (error) {
-    expect(error.message).toContain('No workspaceId provided');
+    expect(error.message).toContain('Not Authorised!');
   }
 });
 
