@@ -12,6 +12,11 @@ export class AutomationPrismaAdapter {
     this.prisma = prisma;
   }
 
+  /**
+   * Finds an automation (and its relationships) by the provided ID
+   * @param automationId the ID of the automation
+   * @returns an Automation with relationships included or null if no automation with specified ID exist in the database 
+   */
   findAutomationById = async (automationId: string): Promise<FullAutomationWithRels | null> => {
     return this.prisma.automation.findUnique({
       where: {
@@ -56,6 +61,11 @@ export class AutomationPrismaAdapter {
     });
   }
 
+  /**
+   * Creates a Prisma-ready data object for creation of an AutomationConditionScope 
+   * @param scope a generic scope object containing the scope and either question, dialogue or workspace scope
+   * @returns a Prisma-ready data object for creation of an AutomationConditionScope 
+   */
   constructCreateAutomationConditionScopeData = (scope: CreateAutomationConditionScopeInput): CreateScopeDataInput | undefined => {
     if (scope.type === 'QUESTION' && scope.questionScope) {
       return {
@@ -96,6 +106,11 @@ export class AutomationPrismaAdapter {
     return undefined;
   }
 
+  /**
+   * Creates a Prisma-ready data object for UPDATE of an AutomationCondition
+   * @param condition an input object containing information for updating an AutomationCondition
+   * @returns a Prisma-ready data object for updating of an AutomationCondition 
+   */
   constructUpdateAutomationConditionData = (condition: UpdateAutomationConditionInput): Prisma.AutomationConditionUpdateWithoutAutomationTriggerInput => {
     const { dialogueId, scope, questionId, matchValue, operator } = condition;
     const mappedScope = this.constructCreateAutomationConditionScopeData(scope);
@@ -147,6 +162,11 @@ export class AutomationPrismaAdapter {
     }
   }
 
+  /**
+   * Creates a Prisma-ready data object for CREATE of an AutomationCondition
+   * @param condition an input object containing information for creating an AutomationCondition
+   * @returns a Prisma-ready data object for creating of an AutomationCondition 
+   */
   constructCreateAutomationConditionData = (condition: CreateAutomationConditionInput): Prisma.AutomationConditionCreateWithoutAutomationTriggerInput => {
     const { dialogueId, scope, questionId, matchValue, operator } = condition;
     // TODO: Introduce workspace-wide condition
@@ -162,7 +182,6 @@ export class AutomationPrismaAdapter {
           numberValue: matchValue.numberValue,
         },
       },
-
       question: questionId ? {
         connect: {
           id: questionId,
@@ -200,56 +219,49 @@ export class AutomationPrismaAdapter {
     };
   }
 
-  constructCreateAutomationConditionsData = (conditions: CreateAutomationInput['conditions']): Prisma.AutomationConditionCreateNestedManyWithoutAutomationTriggerInput => {
-    return {
-      create: conditions.map((condition) => this.constructCreateAutomationConditionData(condition)),
-    }
-  }
-
-  constructConnectAutomationActionData = (actions: CreateAutomationInput['actions']): Prisma.AutomationActionCreateNestedManyWithoutAutomationTriggerInput => {
-    return {
-      create: actions,
-    }
-  }
-
-  constructCreateAutomationEventData = (event: CreateAutomationInput['event']): Prisma.AutomationEventCreateNestedOneWithoutAutomationTriggerInput => {
-    return {
-      create: {
-        type: event.eventType || null,
-        dialogue: event.dialogueId ? {
-          connect: {
-            id: event.dialogueId,
-          },
-        } : undefined,
-        question: event.questionId ? {
-          connect: {
-            id: event.questionId,
-          }
-        } : undefined,
-      },
-    }
-  }
-
+  /**
+   * Creates a prisma-ready data object for creation of an AutomationTrigger
+   * @param input an object containing all information necessary to create an AutomationTrigger
+   * @returns a Prisma-ready data object for creation of an AutomationTrigger
+   */
   buildCreateAutomationTriggerData = (input: CreateAutomationInput): Prisma.AutomationTriggerCreateWithoutAutomationInput => {
     const { event, actions, conditions } = input;
 
     return {
-      event: this.constructCreateAutomationEventData(event),
-      conditions: this.constructCreateAutomationConditionsData(conditions),
-      actions: this.constructConnectAutomationActionData(actions),
+      event: {
+        create: {
+          type: event.eventType || null,
+          dialogue: event.dialogueId ? {
+            connect: {
+              id: event.dialogueId,
+            },
+          } : undefined,
+          question: event.questionId ? {
+            connect: {
+              id: event.questionId,
+            }
+          } : undefined,
+        },
+      },
+      conditions: {
+        create: conditions.map((condition) => this.constructCreateAutomationConditionData(condition)),
+      },
+      actions: {
+        create: actions,
+      },
     }
   }
 
-  buildUpdateAutomationTriggerData = (input: UpdateAutomationInput, automationTrigger: AutomationTrigger): Prisma.AutomationTriggerUpdateInput => {
+  /**
+   * Creates a prisma-ready data object for updating of an AutomationTrigger
+   * @param input an object containing all information necessary to update an AutomationTrigger
+   * @returns a Prisma-ready data object for updating of an AutomationTrigger
+   */
+  buildUpdateAutomationTriggerData = (input: UpdateAutomationInput): Prisma.AutomationTriggerUpdateInput => {
     const { event, actions: inputActions, conditions: inputConditions } = input;
-    const { actions: dbActions } = automationTrigger;
 
     const inputActionIds = inputActions.map((action) => action.id).filter(isPresent);
-    const dbActionIds = dbActions.map((action) => action.id);
     const inputConditionIds = inputConditions.map((condition) => condition.id).filter(isPresent);
-
-    const deleteActionIds = dbActionIds.filter((actionId) => !inputActionIds.includes(actionId));
-    console.log('inputActionIds: ', inputActionIds);
 
     return {
       event: {
@@ -307,6 +319,11 @@ export class AutomationPrismaAdapter {
     }
   }
 
+  /**
+   * Updates an automation based on provided input
+   * @param input an object containing all information necessary to update an automation
+   * @returns an updated Automation
+   */
   updateAutomation = async (input: UpdateAutomationInput) => {
     const { description, label, automationType } = input;
     const automation = await this.findAutomationById(input.id);
@@ -320,12 +337,17 @@ export class AutomationPrismaAdapter {
         description,
         // TODO: Upgrade this when campaignAutomation is introduced (delete other automation entry on swap)
         automationTrigger: automation ? {
-          update: this.buildUpdateAutomationTriggerData(input, automation.automationTrigger),
+          update: this.buildUpdateAutomationTriggerData(input),
         } : undefined,
       }
     });
   }
 
+  /**
+   * Creates an automation based on provided input
+   * @param input n object containing all information necessary to create an automation
+   * @returns an created Automation
+   */
   createAutomation = async (input: CreateAutomationInput) => {
     const { description, workspaceId, label, automationType } = input;
     return this.prisma.automation.create({
@@ -345,6 +367,11 @@ export class AutomationPrismaAdapter {
     });
   };
 
+  /**
+   * Finds the workspace an automation is part of by the provided automation ID
+   * @param automationId the id of an automation
+   * @returns a workspace
+   */
   findWorkspaceByAutomationId = async (automationId: string) => {
     const automation = await this.prisma.automation.findUnique({
       where: {
@@ -357,6 +384,11 @@ export class AutomationPrismaAdapter {
     return automation?.workspace || null;
   }
 
+  /**
+   * Finds all automations part of a workspace
+   * @param workspaceId a workspace ID
+   * @returns a list of automations part of a workspace
+   */
   findAutomationsByWorkspaceId = async (workspaceId: string) => {
     const workspace = await this.prisma.customer.findUnique({
       where: {
