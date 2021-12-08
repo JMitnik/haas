@@ -13,6 +13,7 @@ async function main() {
   await prisma.automationEvent.deleteMany();
   await prisma.automationCondition.deleteMany();
   await prisma.automationConditionMatchValue.deleteMany();
+  await prisma.automationAction.deleteMany();
 
 
   await prisma.questionOfTrigger.deleteMany();

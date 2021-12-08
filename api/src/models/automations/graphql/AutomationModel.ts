@@ -10,8 +10,8 @@ export const AutomationModel = objectType({
 
   definition(t) {
     t.id('id');
-    t.string('createdAt');
-    t.string('updatedAt');
+    t.date('createdAt');
+    t.date('updatedAt');
     t.boolean('isActive');
     t.string('label');
 

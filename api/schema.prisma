@@ -478,6 +478,8 @@ enum SystemPermissionEnum {
   CAN_VIEW_CAMPAIGNS
   CAN_CREATE_CAMPAIGNS
   CAN_CREATE_DELIVERIES
+  // Automation oriented
+  CAN_CREATE_AUTOMATIONS
 }
 
 enum RoleTypeEnum {

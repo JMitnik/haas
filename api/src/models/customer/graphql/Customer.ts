@@ -15,6 +15,7 @@ import DialogueService from '../../questionnaire/DialogueService';
 import isValidColor from '../../../utils/isValidColor';
 import { CampaignModel } from '../../Campaigns';
 import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
+import { AutomationModel } from '../../automations/graphql/AutomationModel';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -56,7 +57,7 @@ export const CustomerType = objectType({
     });
 
     t.list.field('automations', {
-      type: 'AutomationModel',
+      type: AutomationModel,
       async resolve(parent, args, ctx) {
         return ctx.services.automationService.findAutomationsByWorkspace(parent.id);
       },

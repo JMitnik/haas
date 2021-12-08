@@ -34,10 +34,10 @@ input AutomationActionInput {
 
 """AutomationAction"""
 type AutomationActionModel {
-  createdAt: String!
+  createdAt: Date!
   id: ID!
   type: AutomationActionType!
-  updatedAt: String!
+  updatedAt: Date!
 }
 
 enum AutomationActionType {
@@ -50,18 +50,18 @@ enum AutomationActionType {
 
 """AutomationConditionMatchValue"""
 type AutomationConditionMatchValueModel {
-  createdAt: String!
+  createdAt: Date!
   dateTimeValue: String
   id: ID!
   numberValue: Int
   textValue: String
   type: MatchValueType!
-  updatedAt: String!
+  updatedAt: Date!
 }
 
 """AutomationCondition"""
 type AutomationConditionModel {
-  createdAt: String!
+  createdAt: Date!
   dialogue: Dialogue
   dialogueScope: DialogueConditionScopeModel
   id: ID!
@@ -70,7 +70,7 @@ type AutomationConditionModel {
   question: QuestionNode
   questionScope: QuestionConditionScope
   scope: AutomationConditionScopeType!
-  updatedAt: String!
+  updatedAt: Date!
   workspaceScope: WorkspaceConditionScopeModel
 }
 
@@ -103,7 +103,7 @@ input AutomationEventInput {
 
 """AutomationEvent"""
 type AutomationEventModel {
-  createdAt: String!
+  createdAt: Date!
   dialogue: Dialogue
   endDate: String
   id: ID!
@@ -111,7 +111,7 @@ type AutomationEventModel {
   question: QuestionNode
   startDate: String
   type: AutomationEventType!
-  updatedAt: String!
+  updatedAt: Date!
 }
 
 enum AutomationEventType {
@@ -124,13 +124,13 @@ enum AutomationEventType {
 """Automation"""
 type AutomationModel {
   automationTrigger: AutomationTriggerModel
-  createdAt: String!
+  createdAt: Date!
   description: String
   id: ID!
   isActive: Boolean!
   label: String!
   type: AutomationType!
-  updatedAt: String!
+  updatedAt: Date!
   workspace: Customer
 }
 
@@ -138,10 +138,10 @@ type AutomationModel {
 type AutomationTriggerModel {
   actions: [AutomationActionModel!]!
   conditions: [AutomationConditionModel!]!
-  createdAt: String!
+  createdAt: Date!
   event: AutomationEventModel!
   id: ID!
-  updatedAt: String!
+  updatedAt: Date!
 }
 
 enum AutomationType {
@@ -603,9 +603,9 @@ enum DialogueAspectType {
 type DialogueConditionScopeModel {
   aggregate: ConditionPropertyAggregate
   aspect: DialogueAspectType!
-  createdAt: String!
+  createdAt: Date!
   id: ID!
-  updatedAt: String!
+  updatedAt: Date!
 }
 
 input DialogueFilterInputType {
@@ -1177,7 +1177,7 @@ enum QuestionAspectType {
 type QuestionConditionScope {
   aggregate: ConditionPropertyAggregate
   aspect: QuestionAspectType!
-  createdAt: String!
+  createdAt: Date!
   id: ID!
 }
 
@@ -1457,6 +1457,7 @@ enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
   CAN_ADD_USERS
   CAN_BUILD_DIALOGUE
+  CAN_CREATE_AUTOMATIONS
   CAN_CREATE_CAMPAIGNS
   CAN_CREATE_DELIVERIES
   CAN_CREATE_TRIGGERS
@@ -1706,7 +1707,7 @@ enum WorkspaceAspectType {
 type WorkspaceConditionScopeModel {
   aggregate: ConditionPropertyAggregate
   aspect: WorkspaceAspectType!
-  createdAt: String!
+  createdAt: Date!
   id: ID!
-  updatedAt: String!
+  updatedAt: Date!
 }

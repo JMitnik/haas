@@ -1,4 +1,4 @@
-import { extendInputType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
+import { inputObjectType, mutationField } from '@nexus/schema';
 import { AutomationType } from './AutomationType'
 import { AutomationEventType } from './AutomationEventType';
 import { AutomationConditionScopeType } from './AutomationConditionScopeType';
@@ -11,8 +11,6 @@ import { ConditionPropertyAggregateType } from './ConditionPropertyAggregateType
 import { AutomationActionType } from './AutomationActionType';
 import { AutomationModel } from './AutomationModel';
 import { UserInputError } from 'apollo-server-express';
-import { CreateAutomationInput } from '../AutomationPrismaAdapter';
-import { isPresent } from 'ts-is-present';
 
 export const MatchValueInput = inputObjectType({
   name: 'MatchValueInput',
@@ -141,7 +139,6 @@ export const CreateAutomationResolver = mutationField('createAutomation', {
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
 
     const automation = await ctx.services.automationService.createAutomation(args.input);
-    console.log('CREATED AUTOMATION: ', automation);
-    return automation as any;
+    return automation;
   },
 });

@@ -6,8 +6,8 @@ export const AutomationActionModel = objectType({
   description: 'AutomationAction',
   definition(t) {
     t.id('id');
-    t.string('createdAt');
-    t.string('updatedAt');
+    t.date('createdAt');
+    t.date('updatedAt');
 
     t.field('type', {
       type: AutomationActionType,

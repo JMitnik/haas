@@ -611,7 +611,7 @@ export interface NexusGenEnums {
   RecurringPeriodType: prisma.RecurringPeriodType
   SessionConnectionOrder: "createdAt"
   SessionDeliveryType: "campaigns" | "noCampaigns"
-  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ADD_USERS" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
+  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ADD_USERS" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
@@ -638,22 +638,22 @@ export interface NexusGenRootTypes {
     startDate?: string | null; // String
   }
   AutomationActionModel: { // root type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     id: string; // ID!
     type: NexusGenEnums['AutomationActionType']; // AutomationActionType!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   AutomationConditionMatchValueModel: { // root type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     dateTimeValue?: string | null; // String
     id: string; // ID!
     numberValue?: number | null; // Int
     textValue?: string | null; // String
     type: NexusGenEnums['MatchValueType']; // MatchValueType!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   AutomationConditionModel: { // root type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueScope?: NexusGenRootTypes['DialogueConditionScopeModel'] | null; // DialogueConditionScopeModel
     id: string; // ID!
@@ -662,11 +662,11 @@ export interface NexusGenRootTypes {
     question?: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     questionScope?: NexusGenRootTypes['QuestionConditionScope'] | null; // QuestionConditionScope
     scope: NexusGenEnums['AutomationConditionScopeType']; // AutomationConditionScopeType!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
     workspaceScope?: NexusGenRootTypes['WorkspaceConditionScopeModel'] | null; // WorkspaceConditionScopeModel
   }
   AutomationEventModel: { // root type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     endDate?: string | null; // String
     id: string; // ID!
@@ -674,26 +674,26 @@ export interface NexusGenRootTypes {
     question?: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     startDate?: string | null; // String
     type: NexusGenEnums['AutomationEventType']; // AutomationEventType!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   AutomationModel: { // root type
     automationTrigger?: NexusGenRootTypes['AutomationTriggerModel'] | null; // AutomationTriggerModel
-    createdAt: string; // String!
+    createdAt: any; // Date!
     description?: string | null; // String
     id: string; // ID!
     isActive: boolean; // Boolean!
     label: string; // String!
     type: NexusGenEnums['AutomationType']; // AutomationType!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
     workspace?: NexusGenRootTypes['Customer'] | null; // Customer
   }
   AutomationTriggerModel: { // root type
     actions: NexusGenRootTypes['AutomationActionModel'][]; // [AutomationActionModel!]!
     conditions: NexusGenRootTypes['AutomationConditionModel'][]; // [AutomationConditionModel!]!
-    createdAt: string; // String!
+    createdAt: any; // Date!
     event: NexusGenRootTypes['AutomationEventModel']; // AutomationEventModel!
     id: string; // ID!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   CampaignType: { // root type
     id: string; // ID!
@@ -777,9 +777,9 @@ export interface NexusGenRootTypes {
   DialogueConditionScopeModel: { // root type
     aggregate?: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect: NexusGenEnums['DialogueAspectType']; // DialogueAspectType!
-    createdAt: string; // String!
+    createdAt: any; // Date!
     id: string; // ID!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   DialogueFinisherObjectType: { // root type
     header: string; // String!
@@ -1009,9 +1009,9 @@ export interface NexusGenRootTypes {
   WorkspaceConditionScopeModel: { // root type
     aggregate?: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect: NexusGenEnums['WorkspaceAspectType']; // WorkspaceAspectType!
-    createdAt: string; // String!
+    createdAt: any; // Date!
     id: string; // ID!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   lineChartDataType: { // root type
     entryId?: string | null; // String
@@ -1177,22 +1177,22 @@ export interface NexusGenFieldTypes {
     startDate: string | null; // String
   }
   AutomationActionModel: { // field return type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     id: string; // ID!
     type: NexusGenEnums['AutomationActionType']; // AutomationActionType!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   AutomationConditionMatchValueModel: { // field return type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     dateTimeValue: string | null; // String
     id: string; // ID!
     numberValue: number | null; // Int
     textValue: string | null; // String
     type: NexusGenEnums['MatchValueType']; // MatchValueType!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   AutomationConditionModel: { // field return type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueScope: NexusGenRootTypes['DialogueConditionScopeModel'] | null; // DialogueConditionScopeModel
     id: string; // ID!
@@ -1201,11 +1201,11 @@ export interface NexusGenFieldTypes {
     question: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     questionScope: NexusGenRootTypes['QuestionConditionScope'] | null; // QuestionConditionScope
     scope: NexusGenEnums['AutomationConditionScopeType']; // AutomationConditionScopeType!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
     workspaceScope: NexusGenRootTypes['WorkspaceConditionScopeModel'] | null; // WorkspaceConditionScopeModel
   }
   AutomationEventModel: { // field return type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     endDate: string | null; // String
     id: string; // ID!
@@ -1213,26 +1213,26 @@ export interface NexusGenFieldTypes {
     question: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     startDate: string | null; // String
     type: NexusGenEnums['AutomationEventType']; // AutomationEventType!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   AutomationModel: { // field return type
     automationTrigger: NexusGenRootTypes['AutomationTriggerModel'] | null; // AutomationTriggerModel
-    createdAt: string; // String!
+    createdAt: any; // Date!
     description: string | null; // String
     id: string; // ID!
     isActive: boolean; // Boolean!
     label: string; // String!
     type: NexusGenEnums['AutomationType']; // AutomationType!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
     workspace: NexusGenRootTypes['Customer'] | null; // Customer
   }
   AutomationTriggerModel: { // field return type
     actions: NexusGenRootTypes['AutomationActionModel'][]; // [AutomationActionModel!]!
     conditions: NexusGenRootTypes['AutomationConditionModel'][]; // [AutomationConditionModel!]!
-    createdAt: string; // String!
+    createdAt: any; // Date!
     event: NexusGenRootTypes['AutomationEventModel']; // AutomationEventModel!
     id: string; // ID!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   CampaignType: { // field return type
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
@@ -1379,9 +1379,9 @@ export interface NexusGenFieldTypes {
   DialogueConditionScopeModel: { // field return type
     aggregate: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect: NexusGenEnums['DialogueAspectType']; // DialogueAspectType!
-    createdAt: string; // String!
+    createdAt: any; // Date!
     id: string; // ID!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   DialogueFinisherObjectType: { // field return type
     header: string; // String!
@@ -1615,7 +1615,7 @@ export interface NexusGenFieldTypes {
   QuestionConditionScope: { // field return type
     aggregate: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect: NexusGenEnums['QuestionAspectType']; // QuestionAspectType!
-    createdAt: string; // String!
+    createdAt: any; // Date!
     id: string; // ID!
   }
   QuestionNode: { // field return type
@@ -1783,9 +1783,9 @@ export interface NexusGenFieldTypes {
   WorkspaceConditionScopeModel: { // field return type
     aggregate: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect: NexusGenEnums['WorkspaceAspectType']; // WorkspaceAspectType!
-    createdAt: string; // String!
+    createdAt: any; // Date!
     id: string; // ID!
-    updatedAt: string; // String!
+    updatedAt: any; // Date!
   }
   lineChartDataType: { // field return type
     entryId: string | null; // String

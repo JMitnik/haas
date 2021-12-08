@@ -14,8 +14,8 @@ export const AutomationConditionModel = objectType({
   description: 'AutomationCondition',
   definition(t) {
     t.id('id');
-    t.string('createdAt');
-    t.string('updatedAt');
+    t.date('createdAt');
+    t.date('updatedAt');
 
     t.field('scope', {
       type: AutomationConditionScopeType,

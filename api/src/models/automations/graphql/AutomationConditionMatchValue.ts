@@ -6,8 +6,8 @@ export const AutomationConditionMatchValueModel = objectType({
   description: 'AutomationConditionMatchValue',
   definition(t) {
     t.id('id');
-    t.string('createdAt');
-    t.string('updatedAt');
+    t.date('createdAt');
+    t.date('updatedAt');
 
     t.field('type', {
       type: MatchValueType,
