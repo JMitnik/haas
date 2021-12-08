@@ -56,7 +56,7 @@ class AutomationService {
     if (input?.actions?.length === 0) throw new UserInputError('No actions provided for automation!');
 
     const validatedActions: CreateAutomationInput['actions'] = input.actions?.map((action) => {
-      if (!action.type) throw new UserInputError('No type available for one of the automation actions!');
+      if (!action.type) throw new UserInputError('No action type provided for one of the automation actions!');
       return {
         ...action,
         type: action.type,
@@ -79,11 +79,11 @@ class AutomationService {
       if (!condition.matchValue?.matchValueType
         || typeof condition.matchValue?.matchValueType === undefined
         || condition.matchValue?.matchValueType === null) {
-        throw new UserInputError('One of the match values has no type provided!');
+        throw new UserInputError('No match value type was provided for a condition!');
       }
 
       if (!condition.operator) {
-        throw new UserInputError('No Operator input is provided for an AutomicCondition!');
+        throw new UserInputError('No operator type is provided for a condition');
       }
 
       const { dateTimeValue, matchValueType, numberValue, textValue } = condition.matchValue;

@@ -137,6 +137,7 @@ export const CreateAutomationResolver = mutationField('createAutomation', {
   async resolve(parent, args, ctx) {
 
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+    console.log('args input: ', args?.input?.workspaceId);
 
     const automation = await ctx.services.automationService.createAutomation(args.input);
     return automation;
