@@ -132,5 +132,49 @@ describe('AutomationConnection resolvers', () => {
     expect(res.customer.automationConnection.automations.length).toBeGreaterThanOrEqual(1);
   });
 
+  test('user can order automation-connection by updatedAt', async () => {
+    const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);
+    await seedAutomations(prisma, workspace, dialogue, 3);
+
+    const token = AuthService.createUserToken(user.id, 22);
+
+    // Order by generic: updatedAt ascending
+    let resAsc = await ctx.client.request(Query, {
+      customerSlug: workspace.slug,
+      filter: {
+        orderBy: {
+          by: 'updatedAt',
+          desc: false,
+        },
+      },
+    }, { 'Authorization': `Bearer ${token}` });
+
+    expect(resAsc.customer.automationConnection.totalPages).toBeGreaterThanOrEqual(1);
+    expect(resAsc.customer.automationConnection.automations.length).toEqual(3);
+    const firstAutomation = resAsc.customer.automationConnection.automations?.[0]
+    const secondAutomation = resAsc.customer.automationConnection.automations?.[1]
+    const thirdAutomation = resAsc.customer.automationConnection.automations?.[2]
+    expect(firstAutomation?.updatedAt).toBeLessThan(secondAutomation?.updatedAt);
+    expect(secondAutomation?.updatedAt).toBeLessThan(thirdAutomation?.updatedAt);
+
+    // Order by generic: updatedAt descending
+    let resDesc = await ctx.client.request(Query, {
+      customerSlug: workspace.slug,
+      filter: {
+        orderBy: {
+          by: 'updatedAt',
+          desc: true,
+        },
+      },
+    }, { 'Authorization': `Bearer ${token}` });
+    expect(resDesc.customer.automationConnection.totalPages).toBeGreaterThanOrEqual(1);
+    expect(resDesc.customer.automationConnection.automations.length).toEqual(3);
+    const firstAutomationDesc = resDesc.customer.automationConnection.automations?.[0]
+    const secondAutomationDesc = resDesc.customer.automationConnection.automations?.[1]
+    const thirdAutomationDesc = resDesc.customer.automationConnection.automations?.[2]
+    expect(firstAutomationDesc?.updatedAt).toBeGreaterThan(secondAutomationDesc?.updatedAt);
+    expect(secondAutomationDesc?.updatedAt).toBeGreaterThan(thirdAutomationDesc?.updatedAt);
+  });
+
 
 });
