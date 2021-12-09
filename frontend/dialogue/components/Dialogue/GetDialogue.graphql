@@ -22,6 +22,17 @@ query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
       publicTitle
       creationDate
       updatedAt
+
+      rootQuestion {
+        ...QuestionNodeFragment
+      }
+      questions {
+        ...QuestionNodeFragment
+      }
+      edges {
+        ...EdgeFragment
+      }
+
       leafs {
         id
         title

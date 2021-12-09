@@ -569,6 +569,11 @@ export type FailedDeliveryModel = {
   record: Scalars['String'];
 };
 
+export type FindRoleInput = {
+  roleId?: Maybe<Scalars['String']>;
+  userId?: Maybe<Scalars['String']>;
+};
+
 export type FontSettings = {
   __typename?: 'FontSettings';
   id: Scalars['ID'];
@@ -855,6 +860,7 @@ export type Mutation = {
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
   updateCTA: QuestionNode;
   updateDeliveryStatus: Scalars['String'];
+  updatePermissions?: Maybe<RoleType>;
   updateQuestion: QuestionNode;
   updateRoles: RoleType;
   uploadJobImage?: Maybe<AwsImageType>;
@@ -1082,6 +1088,11 @@ export type MutationUpdateDeliveryStatusArgs = {
 };
 
 
+export type MutationUpdatePermissionsArgs = {
+  input?: Maybe<UpdatePermissionsInput>;
+};
+
+
 export type MutationUpdateQuestionArgs = {
   input?: Maybe<UpdateQuestionNodeInputType>;
 };
@@ -1265,6 +1276,7 @@ export type Query = {
   getPreviewData?: Maybe<PreviewDataType>;
   me: UserType;
   refreshAccessToken: RefreshAccessTokenOutput;
+  role?: Maybe<RoleType>;
   roleConnection: RoleConnection;
   /** A session is one entire user-interaction */
   session?: Maybe<Session>;
@@ -1322,6 +1334,11 @@ export type QueryGetJobArgs = {
 
 export type QueryGetPreviewDataArgs = {
   id?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryRoleArgs = {
+  input?: Maybe<FindRoleInput>;
 };
 
 
@@ -1504,6 +1521,7 @@ export type RoleInput = {
 
 export type RoleType = {
   __typename?: 'RoleType';
+  allPermissions: Array<SystemPermission>;
   customerId?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -1781,6 +1799,11 @@ export type UpdateCtaInputType = {
   type?: Maybe<QuestionNodeTypeEnum>;
 };
 
+export type UpdatePermissionsInput = {
+  permissions?: Maybe<Array<SystemPermission>>;
+  roleId?: Maybe<Scalars['String']>;
+};
+
 export type UpdateQuestionNodeInputType = {
   customerId?: Maybe<Scalars['ID']>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
@@ -1918,7 +1941,16 @@ export type GetDialogueQuery = (
     )>, dialogue?: Maybe<(
       { __typename?: 'Dialogue' }
       & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId'>
-      & { leafs: Array<(
+      & { rootQuestion: (
+        { __typename?: 'QuestionNode' }
+        & QuestionNodeFragmentFragment
+      ), questions: Array<(
+        { __typename?: 'QuestionNode' }
+        & QuestionNodeFragmentFragment
+      )>, edges: Array<(
+        { __typename?: 'Edge' }
+        & EdgeFragmentFragment
+      )>, leafs: Array<(
         { __typename?: 'QuestionNode' }
         & Pick<QuestionNode, 'id' | 'title' | 'type'>
         & { links: Array<(
@@ -1933,7 +1965,107 @@ export type GetDialogueQuery = (
   )> }
 );
 
+export type EdgeFragmentFragment = (
+  { __typename?: 'Edge' }
+  & Pick<Edge, 'id'>
+  & { conditions?: Maybe<Array<(
+    { __typename?: 'EdgeCondition' }
+    & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
+  )>>, parentNode?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id' | 'title'>
+  )>, childNode?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'type'>
+    & { children: Array<(
+      { __typename?: 'Edge' }
+      & Pick<Edge, 'id'>
+    )> }
+  )> }
+);
 
+export type QuestionNodeFragmentFragment = (
+  { __typename?: 'QuestionNode' }
+  & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'isLeaf' | 'type'>
+  & { children: Array<(
+    { __typename?: 'Edge' }
+    & { parentNode?: Maybe<(
+      { __typename?: 'QuestionNode' }
+      & Pick<QuestionNode, 'id'>
+    )>, childNode?: Maybe<(
+      { __typename?: 'QuestionNode' }
+      & Pick<QuestionNode, 'id'>
+    )> }
+    & EdgeFragmentFragment
+  )>, overrideLeaf?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id' | 'title' | 'type'>
+  )>, options: Array<(
+    { __typename?: 'QuestionOption' }
+    & Pick<QuestionOption, 'id' | 'value' | 'publicValue'>
+    & { overrideLeaf?: Maybe<(
+      { __typename?: 'QuestionNode' }
+      & Pick<QuestionNode, 'id'>
+    )> }
+  )> }
+);
+
+export const EdgeFragmentFragmentDoc = gql`
+    fragment EdgeFragment on Edge {
+  id
+  conditions {
+    id
+    conditionType
+    matchValue
+    renderMin
+    renderMax
+  }
+  parentNode {
+    id
+    title
+  }
+  childNode {
+    id
+    title
+    isRoot
+    children {
+      id
+    }
+    type
+  }
+}
+    `;
+export const QuestionNodeFragmentFragmentDoc = gql`
+    fragment QuestionNodeFragment on QuestionNode {
+  id
+  title
+  isRoot
+  isLeaf
+  type
+  children {
+    ...EdgeFragment
+    parentNode {
+      id
+    }
+    childNode {
+      id
+    }
+  }
+  overrideLeaf {
+    id
+    title
+    type
+  }
+  options {
+    id
+    value
+    publicValue
+    overrideLeaf {
+      id
+    }
+  }
+}
+    ${EdgeFragmentFragmentDoc}`;
 export const GetDialogueDocument = gql`
     query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
   customer(slug: $customerSlug) {
@@ -1958,6 +2090,15 @@ export const GetDialogueDocument = gql`
       publicTitle
       creationDate
       updatedAt
+      rootQuestion {
+        ...QuestionNodeFragment
+      }
+      questions {
+        ...QuestionNodeFragment
+      }
+      edges {
+        ...EdgeFragment
+      }
       leafs {
         id
         title
@@ -1984,7 +2125,8 @@ export const GetDialogueDocument = gql`
     }
   }
 }
-    `;
+    ${QuestionNodeFragmentFragmentDoc}
+${EdgeFragmentFragmentDoc}`;
 
 /**
  * __useGetDialogueQuery__

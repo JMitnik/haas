@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Customer, Dialogue as DialogueType } from 'types/generated-types';
+import { Workspace, Dialogue as DialogueType } from 'types/helper-types';
 import AppProviders from 'config/AppProviders';
 import DialogueThemer from 'config/Theme/DialogueThemer';
 
@@ -9,7 +9,7 @@ import { DialogueRouter } from './DialogueRouter';
 
 interface DialogueProps {
   dialogue: DialogueType;
-  workspace: Customer;
+  workspace: Workspace;
 }
 
 const Dialogue = ({ dialogue, workspace }: DialogueProps) => {
@@ -17,7 +17,7 @@ const Dialogue = ({ dialogue, workspace }: DialogueProps) => {
     <AppProviders>
       <DialogueThemer>
         <LS.DialogueContainer>
-          <DialogueRouter />
+          <DialogueRouter dialogue={dialogue} workspace={workspace} />
         </LS.DialogueContainer>
       </DialogueThemer>
     </AppProviders>
