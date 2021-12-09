@@ -1,8 +1,6 @@
-import { Automation } from '@prisma/client';
-
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
-import { clearDatabase, prepDefaultData } from './testUtils';
+import { clearDatabase, prepDefaultCreateData } from './testUtils';
 import AuthService from '../../auth/AuthService';
 import { constructValidCreateAutomationInputData } from './testData';
 
@@ -17,7 +15,7 @@ afterEach(async () => {
 });
 
 it('creates automation', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -47,7 +45,7 @@ it('creates automation', async () => {
 
 // TODO: Why does this one throws Not Authorized even though it is same setup as label
 it('unable to create automation when no workspace id is provided', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -77,7 +75,7 @@ it('unable to create automation when no workspace id is provided', async () => {
 });
 
 it('unable to create automation when no automation label is provided', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -107,7 +105,7 @@ it('unable to create automation when no automation label is provided', async () 
 });
 
 it('unable to create automation when no automation type is provided', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -137,7 +135,7 @@ it('unable to create automation when no automation type is provided', async () =
 });
 
 it('unable to create automation when no conditions are provided', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -167,7 +165,7 @@ it('unable to create automation when no conditions are provided', async () => {
 });
 
 it('unable to create automation when no match value type is provided for a condition', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -197,7 +195,7 @@ it('unable to create automation when no match value type is provided for a condi
 });
 
 it('unable to create automation when no operator type is provided for a condition', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -227,7 +225,7 @@ it('unable to create automation when no operator type is provided for a conditio
 });
 
 it('unable to create automation when no actions are provided', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -257,7 +255,7 @@ it('unable to create automation when no actions are provided', async () => {
 });
 
 it('unable to create automation when no action type is provided for an action', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -287,7 +285,7 @@ it('unable to create automation when no action type is provided for an action', 
 });
 
 it('unable to create automation when no event type is provided for a condition', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -317,7 +315,7 @@ it('unable to create automation when no event type is provided for a condition',
 });
 
 it('unable to create automation when no event type is provided for a condition', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
@@ -347,7 +345,7 @@ it('unable to create automation when no event type is provided for a condition',
 });
 
 it('unable to create automations unauthorized', async () => {
-  const { user, workspace, userRole, dialogue, question } = await prepDefaultData(prisma);
+  const { user, workspace, userRole, dialogue, question } = await prepDefaultCreateData(prisma);
 
   await prisma.role.update({
     where: { id: userRole.id },

@@ -1,24 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
-
-export const prepData = async (
-  prisma: PrismaClient,
-  createWorkspaceInput: Prisma.CustomerCreateInput,
-  createDialogueInput: Prisma.DialogueCreateInput,
-  createCampaignInput: Prisma.CampaignCreateInput,
-  createDeliveriesInputs: Prisma.DeliveryCreateInput[],
-) => {
-  if (process.env.NODE_ENV === 'test') {
-    await prisma.$transaction([
-      prisma.customer.create({ data: createWorkspaceInput }),
-      prisma.dialogue.create({ data: createDialogueInput }),
-      prisma.campaign.create({ data: createCampaignInput }),
-    ]);
-
-    await Promise.all(createDeliveriesInputs.map(async createDeliveryInput => (
-      await prisma.delivery.create({ data: createDeliveryInput })
-    )));
-  }
-}
+import { PrismaClient, Role } from '@prisma/client';
 
 export const clearDatabase = async (prisma: PrismaClient) => {
   if (process.env.NODE_ENV === 'test') {
@@ -38,7 +18,147 @@ export const clearDatabase = async (prisma: PrismaClient) => {
   }
 }
 
-export const prepDefaultData = async (prisma: PrismaClient) => {
+export const prepDefaultUpdateData = async (prisma: PrismaClient, roleId: string, workspaceId: string, dialogueId: string, questionId: string) => {
+  await prisma.role.update({
+    where: {
+      id: roleId,
+    },
+    data: {
+      permissions: ['CAN_UPDATE_AUTOMATIONS'],
+    }
+  });
+
+  const automation = await prisma.automation.create({
+    data: {
+      label: 'First Trigger automation',
+      type: 'TRIGGER',
+      isActive: true,
+      workspace: {
+        connect: {
+          id: workspaceId,
+        }
+      },
+      automationTrigger: {
+        create: {
+          event: {
+            create: {
+              type: 'NEW_INTERACTION_QUESTION',
+              question: {
+                connect: {
+                  id: questionId,
+                }
+              }
+            }
+          },
+          conditions: {
+            create: [
+              {
+                question: {
+                  connect: {
+                    id: questionId,
+                  }
+                },
+                scope: 'QUESTION',
+                operator: 'SMALLER_OR_EQUAL_THAN',
+                questionScope: {
+                  create: {
+                    aspect: 'NODE_VALUE',
+                    aggregate: {
+                      create: {
+                        type: 'AVG',
+                        latest: 10,
+                      }
+                    }
+                  }
+                },
+                matchValue: {
+                  create: {
+                    type: 'INT',
+                    numberValue: 50,
+                  }
+                }
+              },
+              {
+                dialogue: {
+                  connect: {
+                    id: dialogueId,
+                  }
+                },
+                scope: 'DIALOGUE',
+                operator: 'GREATER_THAN',
+                dialogueScope: {
+                  create: {
+                    aspect: 'NR_INTERACTIONS',
+                    aggregate: {
+                      create: {
+                        type: 'COUNT',
+                        latest: 10,
+                      }
+                    }
+                  }
+                },
+                matchValue: {
+                  create: {
+                    type: 'INT',
+                    numberValue: 10,
+                  }
+                }
+              }
+            ]
+          },
+          actions: {
+            create: [
+              { type: 'GENERATE_REPORT' },
+              { type: 'SEND_EMAIL' },
+            ]
+          }
+        }
+      }
+    },
+    include: {
+      workspace: true,
+      automationTrigger: {
+        include: {
+          event: {
+            include: {
+              question: true,
+              dialogue: true,
+            }
+          },
+          conditions: {
+            include: {
+              questionScope: {
+                include: {
+                  aggregate: true,
+                }
+              },
+              dialogueScope: {
+                include: {
+                  aggregate: true,
+                }
+              },
+              matchValue: true,
+              workspaceScope: {
+                include: {
+                  aggregate: true,
+                }
+              },
+              dialogue: true,
+              question: true,
+            }
+          },
+          actions: true,
+        },
+      },
+    },
+  });
+
+  return {
+    automation
+  }
+}
+
+export const prepDefaultCreateData = async (prisma: PrismaClient) => {
   const workspace = await prisma.customer.create({
     data: {
       name: 'Test',

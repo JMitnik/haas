@@ -107,7 +107,7 @@ const authShield = shield({
     deleteCustomer: isSuperAdmin,
 
     createAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_AUTOMATIONS)),
-    // updateAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_AUTOMATIONS)),
+    updateAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_UPDATE_AUTOMATIONS)),
 
     createCampaign: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_CAMPAIGNS)),
     createBatchDeliveries: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES)),

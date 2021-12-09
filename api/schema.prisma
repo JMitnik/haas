@@ -480,6 +480,7 @@ enum SystemPermissionEnum {
   CAN_CREATE_DELIVERIES
   // Automation oriented
   CAN_CREATE_AUTOMATIONS
+  CAN_UPDATE_AUTOMATIONS
 }
 
 enum RoleTypeEnum {
