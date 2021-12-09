@@ -2,7 +2,7 @@ import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { clearDatabase, prepDefaultCreateData, prepDefaultUpdateData } from './testUtils';
 import AuthService from '../../auth/AuthService';
-import { constructValidCreateAutomationInputData, constructValidUpdateAutomationInputData } from './testData';
+import { constructValidUpdateAutomationInputData } from './testData';
 
 jest.setTimeout(30000);
 
@@ -42,7 +42,38 @@ it('updates automation', async () => {
     type: input.automationType,
     label: input.label,
   });
-})
+});
+
+it('unable to update automation when no automation id is provided', async () => {
+  const { user, workspace, userRole, dialogue, question } = await prepDefaultCreateData(prisma);
+  const { automation } = await prepDefaultUpdateData(prisma, userRole.id, workspace.id, dialogue.id, question.id);
+
+  // Generate token for API access
+  const token = AuthService.createUserToken(user.id, 22);
+  const input = constructValidUpdateAutomationInputData(workspace, dialogue, question, automation);
+  input.id = null;
+
+  try {
+    await ctx.client.request(`
+      mutation updateAutomation($input: CreateAutomationResolverInput) {
+        updateAutomation(input: $input) {
+          id
+          label
+          type
+        }
+      }
+    `,
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`
+      }
+    );
+  } catch (error) {
+    expect(error.message).toContain('No ID provided for automation');
+  }
+});
 
 it('unable to create automations unauthorized', async () => {
   const { user, workspace, userRole, dialogue, question } = await prepDefaultCreateData(prisma);
