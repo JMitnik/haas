@@ -32,7 +32,6 @@ export class AutomationPrismaAdapter {
         OR: [
           { label: { contains: filter.search, mode: 'insensitive' } },
           { description: { contains: filter.search, mode: 'insensitive' } },
-          { workspace: { name: { contains: filter.search, mode: 'insensitive' } } },
         ]
       }
     }

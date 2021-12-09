@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, Role, SystemPermissionEnum } from '@prisma/client';
 
 export const clearDatabase = async (prisma: PrismaClient) => {
   if (process.env.NODE_ENV === 'test') {
@@ -18,19 +18,11 @@ export const clearDatabase = async (prisma: PrismaClient) => {
   }
 }
 
-export const prepDefaultUpdateData = async (prisma: PrismaClient, roleId: string, workspaceId: string, dialogueId: string, questionId: string) => {
-  await prisma.role.update({
-    where: {
-      id: roleId,
-    },
+export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, dialogueId: string, questionId: string, index?: number, desc?: string) => {
+  return prisma.automation.create({
     data: {
-      permissions: ['CAN_UPDATE_AUTOMATIONS'],
-    }
-  });
-
-  const automation = await prisma.automation.create({
-    data: {
-      label: 'First Trigger automation',
+      label: `Trigger automation ${index}`,
+      description: desc,
       type: 'TRIGGER',
       isActive: true,
       workspace: {
@@ -151,14 +143,27 @@ export const prepDefaultUpdateData = async (prisma: PrismaClient, roleId: string
         },
       },
     },
+  })
+}
+
+export const prepDefaultUpdateData = async (prisma: PrismaClient, roleId: string, workspaceId: string, dialogueId: string, questionId: string) => {
+  await prisma.role.update({
+    where: {
+      id: roleId,
+    },
+    data: {
+      permissions: ['CAN_UPDATE_AUTOMATIONS'],
+    }
   });
+
+  const automation = await seedAutomation(prisma, workspaceId, dialogueId, questionId);
 
   return {
     automation
   }
 }
 
-export const prepDefaultCreateData = async (prisma: PrismaClient) => {
+export const prepDefaultCreateData = async (prisma: PrismaClient, globalPermissions?: SystemPermissionEnum[]) => {
   const workspace = await prisma.customer.create({
     data: {
       name: 'Test',
@@ -192,13 +197,14 @@ export const prepDefaultCreateData = async (prisma: PrismaClient) => {
     data: {
       id: 'TEST_USER',
       email: 'TEST@Hotmail.com',
+      globalPermissions: globalPermissions || [],
     }
   });
 
   const userRole = await prisma.role.create({
     data: {
       name: 'UserRole',
-      permissions: ['CAN_CREATE_AUTOMATIONS']
+      permissions: ['CAN_VIEW_AUTOMATIONS', 'CAN_CREATE_AUTOMATIONS']
     }
   });
 
