@@ -1,9 +1,14 @@
 import { inputObjectType, mutationField, objectType } from '@nexus/schema';
+import { UserInputError } from 'apollo-server';
+
+import { SessionEventInput } from './SessionEventInput';
 
 export const UploadSessionEventsInput = inputObjectType({
   name: 'UploadSessionEventsInput',
   definition(t) {
     t.string('sessionId');
+
+    t.list.field('events', { type: SessionEventInput });
   }
 });
 
@@ -21,8 +26,10 @@ export const UploadSessionEventsResolver = mutationField('uploadSessionEvents', 
 
   resolve: async (parent, args, ctx) => {
     // Validate input: ensure they are fine
+    if (!args.input) throw new UserInputError('No input provided.');
 
-    // Call session method to upload events
+    await ctx.services.sessionService.uploadSessionEvents(args.input);
+
     return {
       status: 'success',
     };

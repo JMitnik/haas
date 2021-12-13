@@ -1,8 +1,9 @@
-import { Prisma, PrismaClient, Session } from "@prisma/client";
+import { Prisma, PrismaClient, Session, SessionEventType } from "@prisma/client";
 import { cloneDeep } from "lodash";
 import { NexusGenFieldTypes, NexusGenInputNames, NexusGenInputs } from "../../generated/nexus";
 
 import NodeEntryService from "../node-entry/NodeEntryService";
+import { UploadSessionEventsInput } from "./graphql";
 import { CreateSessionInput } from "./SessionPrismaAdapterType";
 
 class SessionPrismaAdapter {
@@ -227,6 +228,15 @@ class SessionPrismaAdapter {
         id: sessionId,
       },
       include: {
+        events: {
+          orderBy: {
+            clientEventAt: 'asc',
+          },
+          include: {
+            choiceValue: true,
+            sliderValue: true,
+          }
+        },
         nodeEntries: {
           orderBy: { depth: 'asc' },
           include: {
@@ -293,6 +303,61 @@ class SessionPrismaAdapter {
       },
     });
   };
+
+  /**
+   * Create a Prisma "create" for choice value creation.
+   * @param sessionEventInput General event input
+   * @param sessionChoiceInput Choice event input
+   * @returns A Prisma create object for creating choice value.
+   */
+  constructCreateSessionEventChoiceValue(
+    sessionEventInput: NexusGenInputs['SessionEventInput'],
+    sessionChoiceInput: NexusGenInputs['SessionEventChoiceValueInput'] | undefined
+  ): Prisma.SessionEventChoiceValueCreateNestedOneWithoutSessionEventInput | undefined {
+    if (sessionEventInput.eventType !== SessionEventType.CHOICE_ACTION) return undefined;
+    if (sessionChoiceInput === undefined) return undefined;
+
+    return {
+      create: {
+        value: sessionChoiceInput.value,
+        timeSpentInSec: sessionChoiceInput.timeSpent || 0,
+        node: { connect: { id: sessionChoiceInput.relatedNodeId } },
+      }
+    }
+  }
+
+  /**
+   * Create a session-event
+   * @param sessionEventInput Session-event input specified by GraphQL model.
+   * @returns a Promise that resolves to the created session-event.
+   */
+  createSessionEvent(sessionEventInput: NexusGenInputs['SessionEventInput']) {
+    return this.prisma.sessionEvent.create({
+      data: {
+        session: { connect: { id: sessionEventInput.sessionId } },
+        clientEventAt: sessionEventInput.timestamp,
+        eventType: sessionEventInput.eventType,
+        toNode: sessionEventInput.toNodeId,
+        choiceValue: this.constructCreateSessionEventChoiceValue(
+          sessionEventInput,
+          sessionEventInput.choiceValue || undefined
+        ),
+      }
+    });
+  }
+
+  /**
+   * Create a list of session-events (belonging to a particular existing Session).
+   * @param sessionEventInputs
+   * @returns
+   */
+  createSessionEvents(sessionEventInputs: NexusGenInputs['SessionEventInput'][]) {
+    const creates = sessionEventInputs.map((sessionEventInput) => (
+      this.createSessionEvent(sessionEventInput)
+    ));
+
+    return Promise.all(creates);
+  }
 };
 
 export default SessionPrismaAdapter;

@@ -5,8 +5,8 @@ datasource postgresql {
 
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
-  provider = "prisma-client-js"
-  output   = "./node_modules/@prisma/client"
+  provider        = "prisma-client-js"
+  output          = "./node_modules/@prisma/client"
   previewFeatures = ["orderByRelation"]
 }
 
@@ -240,6 +240,8 @@ model QuestionNode {
   questionDialogue   Dialogue? @relation(fields: [questionDialogueId], references: [id])
   questionDialogueId String?
 
+  choiceEvents SessionEventChoiceValue[]
+  sliderEvents SessionEventSliderValue[]
 
   isChildNodeOf              Edge[]      @relation("Edge_childNodeToQuestionNode")
   isParentNodeOf             Edge[]      @relation("Edge_parentNodeToQuestionNode")
@@ -364,7 +366,74 @@ model Session {
   totalTimeInSec Int?
   device         String?
 
+  events SessionEvent[]
+
   browser String?
+}
+
+enum SessionEventType {
+  CHOICE_ACTION
+  SLIDER_ACTION
+  NAVIGATION
+}
+
+model SessionEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Session belonging
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id])
+
+  // Type of event
+  eventType SessionEventType
+
+  sliderValueId String?
+  sliderValue   SessionEventSliderValue? @relation(fields: [sliderValueId], references: [id])
+  choiceValueId String?
+  choiceValue   SessionEventChoiceValue? @relation(fields: [choiceValueId], references: [id])
+
+  clientEventAt DateTime
+  toNode        String
+}
+
+model SessionEventSliderValue {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessionEventId String?
+  sessionEvent   SessionEvent?
+
+  // Linked node
+  nodeId String
+  node   QuestionNode @relation(fields: [nodeId], references: [id])
+
+  // Sliding value
+  value Int
+
+  // Meta statistics
+  timeSpentInSec Int
+}
+
+model SessionEventChoiceValue {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessionEventId String?
+  sessionEvent   SessionEvent?
+
+  // Linked node
+  nodeId String
+  node   QuestionNode @relation(fields: [nodeId], references: [id])
+
+  // Sliding value
+  value String
+
+  // Meta statistics
+  timeSpentInSec Int
 }
 
 // Node-entry types

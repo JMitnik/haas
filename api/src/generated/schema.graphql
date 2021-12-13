@@ -1111,6 +1111,30 @@ enum SessionDeliveryType {
   noCampaigns
 }
 
+"""Input type of a SessionEvent for Choices."""
+input SessionEventChoiceValueInput {
+  optionId: String
+  relatedNodeId: String!
+  timeSpent: Int
+  value: String!
+}
+
+"""Input type of a SessionEvent"""
+input SessionEventInput {
+  choiceValue: SessionEventChoiceValueInput
+  eventType: SessionEventType!
+  sessionId: String!
+  timestamp: Date!
+  toNodeId: String!
+}
+
+"""Types of events that can be emitted in a user's session."""
+enum SessionEventType {
+  CHOICE_ACTION
+  NAVIGATION
+  SLIDER_ACTION
+}
+
 """Input for session"""
 input SessionInput {
   deliveryId: String
@@ -1353,6 +1377,7 @@ input UploadSellImageInputType {
 }
 
 input UploadSessionEventsInput {
+  events: [SessionEventInput!]
   sessionId: String
 }
 

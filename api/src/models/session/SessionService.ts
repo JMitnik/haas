@@ -34,6 +34,14 @@ class SessionService {
   };
 
   /**
+   * Create session-events
+   * @param sessionInput
+   */
+  uploadSessionEvents(sessionInput: NexusGenInputs['UploadSessionEventsInput']) {
+    return this.sessionPrismaAdapter.createSessionEvents(sessionInput.events || []);
+  };
+
+  /**
    * Create a user-session from the client.
    */
   async createSession(sessionInput: any) {
