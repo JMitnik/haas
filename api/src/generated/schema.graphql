@@ -65,10 +65,10 @@ type AutomationConditionModel {
   dialogue: Dialogue
   dialogueScope: DialogueConditionScopeModel
   id: ID!
-  matchValue: AutomationConditionMatchValueModel!
+  matchValues: AutomationConditionMatchValueModel!
   operator: AutomationConditionOperatorType!
   question: QuestionNode
-  questionScope: QuestionConditionScope
+  questionScope: QuestionConditionScopeModel
   scope: AutomationConditionScopeType!
   updatedAt: Date!
   workspaceScope: WorkspaceConditionScopeModel
@@ -295,7 +295,7 @@ interface ConnectionInterface {
 input CreateAutomationCondition {
   dialogueId: String
   id: ID
-  matchValue: MatchValueInput
+  matchValues: [MatchValueInput!]
   operator: AutomationConditionOperatorType
   questionId: String
   scope: ConditionScopeInput
@@ -828,10 +828,6 @@ input GetAutomationInput {
   id: String
 }
 
-type GetAutomationsByWorkspace {
-  automations: [AutomationModel!]!
-}
-
 input GetAutomationsByWorkspaceInput {
   workspaceId: String
 }
@@ -1167,7 +1163,8 @@ type PreviewDataType {
 }
 
 type Query {
-  automation(input: GetAutomationInput): AutomationModel
+  automation(where: GetAutomationInput): AutomationModel
+  automations(where: GetAutomationsByWorkspaceInput): [AutomationModel!]!
   customer(id: ID, slug: String): Customer
   customers: [Customer!]!
   delivery(deliveryId: String): DeliveryType
@@ -1176,7 +1173,6 @@ type Query {
   edge(id: String): Edge
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
   getAutodeckJobs(filter: PaginationWhereInput): AutodeckConnectionType!
-  getAutomationsByWorkspace(where: GetAutomationsByWorkspaceInput): GetAutomationsByWorkspace!
   getJob(id: String): CreateWorkspaceJobType
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
@@ -1202,7 +1198,8 @@ enum QuestionAspectType {
   NODE_VALUE
 }
 
-type QuestionConditionScope {
+"""QuestionConditionScope"""
+type QuestionConditionScopeModel {
   aggregate: ConditionPropertyAggregate
   aspect: QuestionAspectType!
   createdAt: Date!

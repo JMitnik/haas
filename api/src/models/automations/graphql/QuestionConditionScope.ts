@@ -3,7 +3,8 @@ import { ConditionPropertyAggregate } from "./ConditionPropertyAggregate";
 import { QuestionAspectType } from './QuestionAspectType';
 
 export const QuestionConditionScope = objectType({
-  name: 'QuestionConditionScope',
+  name: 'QuestionConditionScopeModel',
+  description: 'QuestionConditionScope',
   definition(t) {
     t.id('id');
     t.date('createdAt');
@@ -15,13 +16,6 @@ export const QuestionConditionScope = objectType({
     t.field('aggregate', {
       type: ConditionPropertyAggregate,
       nullable: true,
-      resolve(root, args, ctx) {
-        return root.aggregateId ? ctx.prisma.conditionPropertyAggregate.findUnique({
-          where: {
-            id: root.aggregateId,
-          },
-        }) : null as any
-      }
     });
 
   },

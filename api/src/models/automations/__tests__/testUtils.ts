@@ -1,4 +1,4 @@
-import { PrismaClient, Role, SystemPermissionEnum } from '@prisma/client';
+import { PrismaClient, SystemPermissionEnum } from '@prisma/client';
 
 export const clearDatabase = async (prisma: PrismaClient) => {
   if (process.env.NODE_ENV === 'test') {
@@ -6,8 +6,8 @@ export const clearDatabase = async (prisma: PrismaClient) => {
       prisma.automation.deleteMany({}),
       prisma.automationTrigger.deleteMany({}),
       prisma.automationEvent.deleteMany({}),
-      prisma.automationCondition.deleteMany({}),
       prisma.automationConditionMatchValue.deleteMany({}),
+      prisma.automationCondition.deleteMany({}),
       prisma.automationAction.deleteMany({}),
       prisma.userOfCustomer.deleteMany({}),
       prisma.user.deleteMany({}),
@@ -63,7 +63,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                     }
                   }
                 },
-                matchValue: {
+                matchValues: {
                   create: {
                     type: 'INT',
                     numberValue: 50,
@@ -89,7 +89,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                     }
                   }
                 },
-                matchValue: {
+                matchValues: {
                   create: {
                     type: 'INT',
                     numberValue: 10,
@@ -129,7 +129,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                   aggregate: true,
                 }
               },
-              matchValue: true,
+              matchValues: true,
               workspaceScope: {
                 include: {
                   aggregate: true,

@@ -48,8 +48,7 @@ export const CustomerType = objectType({
       args: { filter: AutomationConnectionFilterInput },
       nullable: true,
       async resolve(parent, args, ctx) {
-        // As any because current type only return automation without relationships
-        return ctx.services.automationService.paginatedAutomations(parent.slug, args.filter) as any;
+        return ctx.services.automationService.paginatedAutomations(parent.slug, args.filter);
       },
     });
 

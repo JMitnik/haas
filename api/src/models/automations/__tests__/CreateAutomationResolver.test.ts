@@ -170,7 +170,7 @@ it('unable to create automation when no match value type is provided for a condi
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
   const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
-  (input.conditions?.[0]?.matchValue as any).matchValueType = null;
+  (input.conditions?.[0]?.matchValues?.[0] as any).matchValueType = null;
 
   try {
     await ctx.client.request(`

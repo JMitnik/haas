@@ -79,7 +79,7 @@ export const CreateAutomationCondition = inputObjectType({
     t.id('id', { nullable: true });
     t.field('scope', { type: ConditionScopeInput });
     t.field('operator', { type: AutomationConditionOperatorType });
-    t.field('matchValue', { type: MatchValueInput });
+    t.list.field('matchValues', { type: MatchValueInput });
 
     t.string('questionId', { nullable: true });
     t.string('dialogueId', { nullable: true });

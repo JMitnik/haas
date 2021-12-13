@@ -71,13 +71,13 @@ export interface CreateConditionMatchValueInput {
   textValue?: string | null; // String
 }
 
-export interface UpdateConditionMatchValueInput {
+export interface UpdateConditionMatchValueInput extends CreateConditionMatchValueInput {
   id?: string;
 }
 
 export interface CreateAutomationConditionInput {
   dialogueId?: string | null; // String
-  matchValue: CreateConditionMatchValueInput; // MatchValueInput
+  matchValues: CreateConditionMatchValueInput[]; // MatchValueInput
   operator: NexusGenEnums['AutomationConditionOperatorType']; // AutomationConditionOperatorType
   questionId?: string | null; // String
   scope: CreateAutomationConditionScopeInput; // ConditionScopeInput
@@ -86,6 +86,7 @@ export interface CreateAutomationConditionInput {
 
 export interface UpdateAutomationConditionInput extends CreateAutomationConditionInput {
   id?: string;
+  matchValues: UpdateConditionMatchValueInput[];
 }
 
 export interface CreateAutomationInput {
@@ -144,7 +145,7 @@ export interface AutomationTrigger {
     id: string;
     scope: AutomationConditionScopeType;
     operator: AutomationConditionOperatorType;
-    matchValue: AutomationConditionMatchValue,
+    matchValues: AutomationConditionMatchValue[],
     questionScope: (QuestionConditionScope
       & {
         aggregate: ConditionPropertyAggregate | null;
@@ -174,5 +175,5 @@ export interface FullAutomationWithRels {
   description?: string | null;
   type: AutomationType;
   workspace: Customer;
-  automationTrigger: AutomationTrigger;
+  automationTrigger: AutomationTrigger | null;
 }

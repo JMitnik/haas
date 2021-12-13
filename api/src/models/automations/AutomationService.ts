@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
+import { isPresent } from 'ts-is-present';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import { offsetPaginate } from '../general/PaginationHelpers';
@@ -77,28 +78,28 @@ class AutomationService {
     if (input.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
 
     const validatedConditions: CreateAutomationInput['conditions'] = input.conditions?.map((condition) => {
-      if (!condition.matchValue?.matchValueType
-        || typeof condition.matchValue?.matchValueType === undefined
-        || condition.matchValue?.matchValueType === null) {
-        throw new UserInputError('No match value type was provided for a condition!');
-      }
-
       if (!condition.operator) {
         throw new UserInputError('No operator type is provided for a condition');
       }
-
-      const { dateTimeValue, matchValueType, numberValue, textValue } = condition.matchValue;
 
       return {
         ...condition,
         operator: condition.operator,
         scope: this.constructCreateAutomationConditionScopeInput(condition),
-        matchValue: {
-          dateTimeValue,
-          numberValue,
-          textValue,
-          type: matchValueType,
-        }
+        matchValues: condition.matchValues?.map((matchValue) => {
+          const { dateTimeValue, matchValueType, numberValue, textValue } = matchValue;
+
+          if (!matchValueType) {
+            throw new UserInputError('No match value type was provided for a condition!');
+          }
+
+          return {
+            dateTimeValue,
+            numberValue,
+            textValue,
+            type: matchValueType,
+          }
+        }) || [],
       }
     }) || [];
 

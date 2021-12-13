@@ -44,12 +44,12 @@ export const GetAutomationQuery = queryField('automation', {
   type: AutomationModel,
   nullable: true,
   args: {
-    input: GetAutomationInput,
+    where: GetAutomationInput,
   },
   async resolve(parent, args, ctx) {
-    if (!args.input?.id) throw new UserInputError('No ID available to find automation with!');
+    if (!args.where?.id) throw new UserInputError('No ID available to find automation with!');
 
-    const automation = await ctx.services.automationService.findAutomationById(args.input.id);
+    const automation = await ctx.services.automationService.findAutomationById(args.where.id);
 
     return automation as any;
   }

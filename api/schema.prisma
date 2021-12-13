@@ -120,9 +120,9 @@ model Dialogue {
 
   wasGeneratedWithGenData Boolean           @default(value: false)
   CampaignVariant         CampaignVariant[]
-  AutomationEvent         AutomationEvent[]
 
-  AutomationCondition AutomationCondition[]
+  automationEvents     AutomationEvent[]
+  automationConditions AutomationCondition[]
   @@unique([slug, customerId])
 }
 
@@ -268,8 +268,8 @@ model QuestionNode {
   sliderNodeId        String?
   formNodeId          String?
 
-  AutomationEvent     AutomationEvent[]
-  AutomationCondition AutomationCondition[]
+  automationEvents     AutomationEvent[]
+  automationConditions AutomationCondition[]
 }
 
 enum LinkTypeEnum {
@@ -909,7 +909,8 @@ model AutomationConditionMatchValue {
   textValue     String? // TODO: Reference an actual choice option instead of raw text here eventually
   dateTimeValue DateTime?
 
-  automationCondition AutomationCondition[]
+  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
+  automationConditionId String
 }
 
 model ConditionPropertyAggregate {
@@ -923,9 +924,12 @@ model ConditionPropertyAggregate {
 
   type ConditionPropertyAggregateType
 
-  questionConditionScope  QuestionConditionScope[]
-  dialogueConditionScope  DialogueConditionScope[]
-  workspaceConditionScope WorkspaceConditionScope[]
+  questionConditionScope    QuestionConditionScope?  @relation(fields: [questionConditionScopeId], references: [id])
+  dialogueConditionScope    DialogueConditionScope?  @relation(fields: [dialogueConditionScopeId], references: [id])
+  workspaceConditionScope   WorkspaceConditionScope? @relation(fields: [workspaceConditionScopeId], references: [id])
+  questionConditionScopeId  String?                  @unique
+  dialogueConditionScopeId  String?                  @unique
+  workspaceConditionScopeId String?                  @unique
 }
 
 model QuestionConditionScope {
@@ -935,10 +939,9 @@ model QuestionConditionScope {
 
   aspect QuestionAspect
 
-  aggregate   ConditionPropertyAggregate? @relation(fields: [aggregateId], references: [id])
-  aggregateId String?
+  aggregate ConditionPropertyAggregate?
 
-  automationCondition AutomationCondition[]
+  automationConditions AutomationCondition[]
 }
 
 model DialogueConditionScope {
@@ -948,10 +951,9 @@ model DialogueConditionScope {
 
   aspect DialogueAspect
 
-  aggregate   ConditionPropertyAggregate? @relation(fields: [aggregateId], references: [id])
-  aggregateId String?
+  aggregate ConditionPropertyAggregate?
 
-  automationCondition AutomationCondition[]
+  automationConditions AutomationCondition[]
 }
 
 model WorkspaceConditionScope {
@@ -961,10 +963,9 @@ model WorkspaceConditionScope {
 
   aspect WorkspaceAspect
 
-  aggregate   ConditionPropertyAggregate? @relation(fields: [aggregateId], references: [id])
-  aggregateId String?
+  aggregate ConditionPropertyAggregate?
 
-  automationCondition AutomationCondition[]
+  automationConditions AutomationCondition[]
 }
 
 model AutomationCondition {
@@ -975,8 +976,7 @@ model AutomationCondition {
   scope    AutomationConditionScopeType
   operator AutomationConditionOperatorType
 
-  matchValue   AutomationConditionMatchValue @relation(fields: [matchValueId], references: [id])
-  matchValueId String
+  matchValues AutomationConditionMatchValue[]
 
   questionScope   QuestionConditionScope? @relation(fields: [questionScopeId], references: [id])
   questionScopeId String?
@@ -1006,7 +1006,7 @@ model AutomationAction {
 
   type AutomationActionType
 
-  automationTrigger AutomationTrigger[]
+  automationTriggers AutomationTrigger[]
 }
 
 model AutomationTrigger {
@@ -1020,7 +1020,7 @@ model AutomationTrigger {
   conditions AutomationCondition[]
   actions    AutomationAction[]
 
-  automation Automation[]
+  automations Automation[]
 }
 
 model Automation {
@@ -1034,8 +1034,8 @@ model Automation {
 
   type AutomationType
 
-  automationTrigger   AutomationTrigger @relation(fields: [automationTriggerId], references: [id])
-  automationTriggerId String
+  automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id])
+  automationTriggerId String?
 
   workspace   Customer @relation(fields: [workspaceId], references: [id])
   workspaceId String

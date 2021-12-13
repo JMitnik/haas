@@ -1,9 +1,11 @@
 import { Customer, Dialogue, Prisma, QuestionNode } from '@prisma/client';
 import { NexusGenInputs } from '../../../generated/nexus';
-import { FullAutomationWithRels } from '../AutomationTypes';
+import { AutomationTrigger, FullAutomationWithRels } from '../AutomationTypes';
 
 export const constructValidUpdateAutomationInputData = (workspace: Customer, dialogue: Dialogue, question: QuestionNode, automation: FullAutomationWithRels): NexusGenInputs['CreateAutomationResolverInput'] => {
-  const { event, actions, conditions } = automation.automationTrigger;
+  if (!automation.automationTrigger) throw Error('No automation trigger to be updated provided!');
+
+  const { event, actions, conditions }: AutomationTrigger = automation.automationTrigger;
 
   // Get actions ids 
   const sendSmsAction = actions.find((action) => action.type === 'SEND_EMAIL');
@@ -35,35 +37,39 @@ export const constructValidUpdateAutomationInputData = (workspace: Customer, dia
             id: questionCondition?.questionScope?.id,
             'aspect': 'NODE_VALUE',
             'aggregate': {
-              id: questionCondition?.questionScope?.aggregateId,
+              id: questionCondition?.questionScope?.aggregate?.id,
               'type': 'AVG',
               'latest': 10
             }
           }
         },
         'operator': 'SMALLER_THAN',
-        'matchValue': {
-          id: questionCondition?.matchValue?.id,
-          'matchValueType': 'INT',
-          'numberValue': 50
-        },
+        'matchValues': [
+          {
+            id: questionCondition?.matchValues?.[0]?.id,
+            'matchValueType': 'INT',
+            'numberValue': 50
+          }
+        ],
       },
       {
         id: dialogueCondition?.id,
         dialogueId: dialogue.id,
         operator: 'GREATER_THAN',
-        matchValue: {
-          id: dialogueCondition?.matchValue?.id,
-          matchValueType: 'INT',
-          numberValue: 10,
-        },
+        matchValues: [
+          {
+            id: dialogueCondition?.matchValues?.[0]?.id,
+            matchValueType: 'INT',
+            numberValue: 10,
+          },
+        ],
         scope: {
           type: 'DIALOGUE',
           dialogueScope: {
             id: dialogueCondition?.dialogueScope?.id,
             aspect: 'NR_INTERACTIONS',
             aggregate: {
-              id: dialogueCondition?.dialogueScope?.aggregateId,
+              id: dialogueCondition?.dialogueScope?.aggregate?.id,
               type: 'COUNT',
               latest: 10,
             }
@@ -97,10 +103,12 @@ export const constructValidCreateAutomationInputData = (workspace: Customer, dia
           }
         },
         'operator': 'SMALLER_THAN',
-        'matchValue': {
-          'matchValueType': 'INT',
-          'numberValue': 50
-        },
+        'matchValues': [
+          {
+            'matchValueType': 'INT',
+            'numberValue': 50
+          }
+        ],
         'questionId': question.id,
       },
     ],

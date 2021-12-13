@@ -16,7 +16,5 @@ export const AutomationConditionMatchValueModel = objectType({
     t.int('numberValue', { nullable: true });
     t.string('textValue', { nullable: true }); // TODO: Reference an actual choice option instead of raw text here eventually
     t.string('dateTimeValue', { nullable: true });
-
-
   }
 })

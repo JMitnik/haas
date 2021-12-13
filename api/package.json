@@ -26,7 +26,7 @@
     "gen": "prisma generate && ts-node ./src/config/schema.ts",
     "gen:prisma": "prisma generate",
     "seed": "ts-node --transpile-only src/data/main-seed.ts",
-    "automation": "ts-node --transpile-only ./prisma2test.ts",
+    "automation": "ts-node --transpile-only ./test/prisma2test.ts",
     "types": "tsc --noEmit",
     "prisma": "prisma"
   },
