@@ -25,7 +25,7 @@ export const AutomationConditionModel = objectType({
       type: AutomationConditionOperatorType,
     });
 
-    t.field('matchValues', {
+    t.list.field('matchValues', {
       type: AutomationConditionMatchValueModel,
     });
 

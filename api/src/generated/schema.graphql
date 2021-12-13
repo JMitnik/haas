@@ -65,7 +65,7 @@ type AutomationConditionModel {
   dialogue: Dialogue
   dialogueScope: DialogueConditionScopeModel
   id: ID!
-  matchValues: AutomationConditionMatchValueModel!
+  matchValues: [AutomationConditionMatchValueModel!]!
   operator: AutomationConditionOperatorType!
   question: QuestionNode
   questionScope: QuestionConditionScopeModel

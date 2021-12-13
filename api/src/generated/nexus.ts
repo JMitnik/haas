@@ -670,7 +670,7 @@ export interface NexusGenRootTypes {
     dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueScope?: NexusGenRootTypes['DialogueConditionScopeModel'] | null; // DialogueConditionScopeModel
     id: string; // ID!
-    matchValues: NexusGenRootTypes['AutomationConditionMatchValueModel']; // AutomationConditionMatchValueModel!
+    matchValues: NexusGenRootTypes['AutomationConditionMatchValueModel'][]; // [AutomationConditionMatchValueModel!]!
     operator: NexusGenEnums['AutomationConditionOperatorType']; // AutomationConditionOperatorType!
     question?: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     questionScope?: NexusGenRootTypes['QuestionConditionScopeModel'] | null; // QuestionConditionScopeModel
@@ -1219,7 +1219,7 @@ export interface NexusGenFieldTypes {
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueScope: NexusGenRootTypes['DialogueConditionScopeModel'] | null; // DialogueConditionScopeModel
     id: string; // ID!
-    matchValues: NexusGenRootTypes['AutomationConditionMatchValueModel']; // AutomationConditionMatchValueModel!
+    matchValues: NexusGenRootTypes['AutomationConditionMatchValueModel'][]; // [AutomationConditionMatchValueModel!]!
     operator: NexusGenEnums['AutomationConditionOperatorType']; // AutomationConditionOperatorType!
     question: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     questionScope: NexusGenRootTypes['QuestionConditionScopeModel'] | null; // QuestionConditionScopeModel
