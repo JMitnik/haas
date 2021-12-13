@@ -1,7 +1,5 @@
-import { ActionType, SliderActionValue, useStore } from "components/Dialogue/DialogueRouter";
+import { ActionType, useStore } from "components/Dialogue/DialogueRouter";
 import { QuestionNodeProps } from "components/QuestionNode/QuestionNodeTypes";
-import { useNavigate } from "react-router";
-import { useParams } from "react-router-dom";
 import { findSliderChildEdge } from "./findSliderChildEdge";
 
 export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {

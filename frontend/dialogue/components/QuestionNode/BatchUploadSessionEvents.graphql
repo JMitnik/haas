@@ -1,0 +1,5 @@
+mutation BatchUploadSessionEvents($input: BatchUploadSessionEventsInput!) {
+    batchUploadSessionEvents(input: $input) {
+      id
+    }
+}

@@ -760,6 +760,9 @@ type Mutation {
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
+
+  """Upload a number of events of a session."""
+  uploadSessionEvents(input: UploadSessionEventsInput): UploadSessionEventsOutput!
   uploadUpsellImage(input: UploadSellImageInputType): ImageType
 
   """
@@ -1347,6 +1350,14 @@ enum UploadImageEnumType {
 input UploadSellImageInputType {
   file: Upload
   workspaceId: String
+}
+
+input UploadSessionEventsInput {
+  sessionId: String
+}
+
+type UploadSessionEventsOutput {
+  status: String!
 }
 
 type UserConnection implements ConnectionInterface {

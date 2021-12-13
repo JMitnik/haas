@@ -41,14 +41,17 @@ export interface ActionEvent {
 
 interface DialogueState {
   actionEvents: ActionEvent[];
+  queuedActionEvents: ActionEvent[];
   activeCallToAction?: QuestionNodeType;
   logAction: (actionEvent: ActionEvent) => void;
+  popActionQueue: () => ActionEvent[];
   setActiveCallToAction: (callToAction: QuestionNodeType) => void;
   getCurrentNode: (dialogue: Dialogue, urlNodeId?: string) => QuestionNodeType;
 }
 
 export const useStore = create<DialogueState>((set, get) => ({
   actionEvents: [],
+  queuedActionEvents: [],
 
   setActiveCallToAction: (callToAction: QuestionNodeType) => {
     set({ activeCallToAction: callToAction });
@@ -78,8 +81,14 @@ export const useStore = create<DialogueState>((set, get) => ({
   logAction: (actionEvent: ActionEvent) => {
     set({
       actionEvents: [...get().actionEvents, actionEvent],
+      queuedActionEvents: [...get().queuedActionEvents, actionEvent],
     });
-  }
+  },
+  popActionQueue: () => {
+    const queuedEvents = get().queuedActionEvents;
+    set({ queuedActionEvents: [] });
+    return queuedEvents;
+  },
 }));
 
 interface DialogueRouterProps {

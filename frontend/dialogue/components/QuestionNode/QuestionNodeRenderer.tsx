@@ -23,14 +23,27 @@ const NodeComponent: { [key in QuestionNodeTypeEnum]?: React.FC<GenericQuestionN
   [QuestionNodeTypeEnum.VideoEmbedded]: ChoiceNode,
 };
 
+function useDebouncedEffect(fn, deps, time) {
+  const dependencies = [...deps, fn, time]
+  useEffect(() => {
+    const timeout = setTimeout(fn, time);
+    return () => {
+      clearTimeout(timeout);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, dependencies);
+}
+
 export const QuestionNodeRenderer = ({ dialogue }: QuestionNodeProps) => {
   const { nodeId } = useParams();
-  const { setActiveCallToAction, logAction, getCurrentNode, actionEvents } = useStore(state => ({
+  const { popActionQueue, queuedActionEvents, setActiveCallToAction, logAction, getCurrentNode, actionEvents } = useStore(state => ({
     activeCallToAction: state.activeCallToAction,
     getCurrentNode: state.getCurrentNode,
     actionEvents: state.actionEvents,
     logAction: state.logAction,
     setActiveCallToAction: state.setActiveCallToAction,
+    queuedActionEvents: state.queuedActionEvents,
+    popActionQueue: state.popActionQueue,
   }));
   const currentNode = getCurrentNode(dialogue, nodeId);
   const navigate = useNavigate();
@@ -47,12 +60,18 @@ export const QuestionNodeRenderer = ({ dialogue }: QuestionNodeProps) => {
     }
   }, [currentNode, navigationType, logAction]);
 
-  // TODO: Should be debounced, upload in batch to prevent server-overload
-  useEffect(() => {
-    if (actionEvents.length > 0) {
-      console.log('should upload to session');
+  // Upload every 2000 ms the events (to batch them).
+  // - TODO: The uploader should be a three-stage process, to be resilient to network errors.:
+  // - 1. Upload the events to the main API
+  // - 2. If the event does not land at the API, send it to an alternative API Gateway
+  // - 3. If the event does not land at the alternative API, send it as an error message to Sentry.
+
+  useDebouncedEffect(() => {
+    if (queuedActionEvents.length > 0) {
+      const actionEvents = popActionQueue();
+      console.log('Will log action events', actionEvents);
     }
-  }, [actionEvents])
+  }, [queuedActionEvents.length, popActionQueue], 2000);
 
   const QuestionNode = NodeComponent[currentNode.type];
 
