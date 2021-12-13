@@ -91,7 +91,7 @@ export class AutomationPrismaAdapter {
    * @param automationId the ID of the automation
    * @returns an Automation with relationships included or null if no automation with specified ID exist in the database 
    */
-  findAutomationById = async (automationId: string): Promise<FullAutomationWithRels | null> => {
+  findAutomationById = async (automationId: string) => {
     const automation = await this.prisma.automation.findUnique({
       where: {
         id: automationId,
