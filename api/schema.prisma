@@ -941,7 +941,8 @@ model QuestionConditionScope {
 
   aggregate ConditionPropertyAggregate?
 
-  automationConditions AutomationCondition[]
+  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
+  automationConditionId String              @unique
 }
 
 model DialogueConditionScope {
@@ -953,7 +954,8 @@ model DialogueConditionScope {
 
   aggregate ConditionPropertyAggregate?
 
-  automationConditions AutomationCondition[]
+  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
+  automationConditionId String              @unique
 }
 
 model WorkspaceConditionScope {
@@ -965,7 +967,8 @@ model WorkspaceConditionScope {
 
   aggregate ConditionPropertyAggregate?
 
-  automationConditions AutomationCondition[]
+  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
+  automationConditionId String              @unique
 }
 
 model AutomationCondition {
@@ -978,14 +981,9 @@ model AutomationCondition {
 
   matchValues AutomationConditionMatchValue[]
 
-  questionScope   QuestionConditionScope? @relation(fields: [questionScopeId], references: [id])
-  questionScopeId String?
-
-  dialogueScope   DialogueConditionScope? @relation(fields: [dialogueScopeId], references: [id])
-  dialogueScopeId String?
-
-  workspaceScope   WorkspaceConditionScope? @relation(fields: [workspaceScopeId], references: [id])
-  workspaceScopeId String?
+  questionScope  QuestionConditionScope?
+  dialogueScope  DialogueConditionScope?
+  workspaceScope WorkspaceConditionScope?
 
   question   QuestionNode? @relation(fields: [questionId], references: [id])
   questionId String?

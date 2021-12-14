@@ -60,8 +60,11 @@ export interface CreateAutomationConditionScopeInput {
   workspaceScope?: CreateWorkspaceScopeInput | null; // ConditionWorkspaceScopeInput
 }
 
-export interface UpdateAutomationConditionScopeInput {
+export interface UpdateAutomationConditionScopeInput extends CreateAutomationConditionScopeInput {
   id?: string;
+  dialogueScope?: UpdateDialogueScopeInput | null; // ConditionDialogueScopeInput
+  questionScope?: UpdateQuestionScopeInput | null; // ConditionQuestionScopeInput
+  workspaceScope?: UpdateWorkspaceScopeInput | null; // ConditionWorkspaceScopeInput
 }
 
 export interface CreateConditionMatchValueInput {
@@ -87,6 +90,7 @@ export interface CreateAutomationConditionInput {
 export interface UpdateAutomationConditionInput extends CreateAutomationConditionInput {
   id?: string;
   matchValues: UpdateConditionMatchValueInput[];
+  scope: UpdateAutomationConditionScopeInput;
 }
 
 export interface CreateAutomationInput {

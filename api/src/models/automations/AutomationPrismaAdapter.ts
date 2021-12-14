@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { AutomationCondition, AutomationConditionScopeType, DialogueConditionScope, Prisma, PrismaClient, QuestionConditionScope, WorkspaceConditionScope } from '@prisma/client';
 import { cloneDeep } from 'lodash';
 import { isPresent } from 'ts-is-present';
 import { NexusGenInputs } from '../../generated/nexus';
@@ -182,14 +182,60 @@ export class AutomationPrismaAdapter {
   }
 
   /**
+   * 
+   * @param condition 
+   * @returns 
+   */
+  constructUpdateRemovalScope = (
+    dbCondition: (AutomationCondition & {
+      questionScope: QuestionConditionScope | null;
+      dialogueScope: DialogueConditionScope | null;
+      workspaceScope: WorkspaceConditionScope | null;
+    }) | null,
+    condition: UpdateAutomationConditionInput,
+    checkAgainstScope: AutomationConditionScopeType): { delete: boolean } | undefined => {
+    if (dbCondition?.dialogueScope?.id && checkAgainstScope === 'DIALOGUE' && condition.scope.type !== 'DIALOGUE') {
+      console.log('INSIDEEEEE 1');
+      return { delete: true };
+    }
+
+    if (dbCondition?.questionScope?.id && checkAgainstScope === 'QUESTION' && condition.scope.type !== 'QUESTION') {
+      console.log('INSIDEEEEE 2');
+      return { delete: true };
+    }
+
+    if (dbCondition?.workspaceScope?.id && checkAgainstScope === 'WORKSPACE' && condition.scope.type !== 'WORKSPACE') {
+      console.log('INSIDEEEEE 3');
+      return { delete: true };
+    }
+    console.log('UNDEFINED :(');
+    return undefined;
+  }
+
+  /**
    * Creates a Prisma-ready data object for UPDATE of an AutomationCondition
    * @param condition an input object containing information for updating an AutomationCondition
    * @returns a Prisma-ready data object for updating of an AutomationCondition 
    */
-  constructUpdateAutomationConditionData = (condition: UpdateAutomationConditionInput): Prisma.AutomationConditionUpdateWithoutAutomationTriggerInput => {
+  constructUpdateAutomationConditionData = async (condition: UpdateAutomationConditionInput): Promise<Prisma.AutomationConditionUpdateWithoutAutomationTriggerInput> => {
     const { dialogueId, scope, questionId, matchValues, operator } = condition;
     const matchValueIds = matchValues.map((matchValue) => matchValue.id).filter(isPresent);
     const mappedScope = this.constructCreateAutomationConditionScopeData(scope);
+    const dbCondition = await this.prisma.automationCondition.findUnique(({
+      where: {
+        id: condition.id,
+      },
+      include: {
+        questionScope: true,
+        dialogueScope: true,
+        workspaceScope: true,
+      }
+    }));
+
+
+    console.log('condition: ', condition);
+    console.log('dbCondition: ', dbCondition);
+
     return {
       scope: scope.type,
       operator,
@@ -231,29 +277,53 @@ export class AutomationPrismaAdapter {
         }
       } : { disconnect: true },
       questionScope: (scope.type === 'QUESTION' && mappedScope) ? {
-        update: {
-          aggregate: {
-            update: mappedScope.aggregate,
+        upsert: {
+          create: {
+            aggregate: {
+              create: mappedScope.aggregate,
+            },
+            aspect: mappedScope.aspect,
           },
-          aspect: mappedScope.aspect,
+          update: {
+            aggregate: {
+              update: mappedScope.aggregate,
+            },
+            aspect: mappedScope.aspect,
+          },
         }
-      } : { disconnect: true }, // TODO: For all scopes If 1-1 do delete, else disconnect
+      } : this.constructUpdateRemovalScope(dbCondition, condition, 'QUESTION'),
       dialogueScope: (scope.type === 'DIALOGUE' && mappedScope) ? {
-        update: {
-          aggregate: {
-            update: mappedScope.aggregate,
+        upsert: {
+          create: {
+            aggregate: {
+              create: mappedScope.aggregate,
+            },
+            aspect: mappedScope.aspect,
           },
-          aspect: mappedScope.aspect,
+          update: {
+            aggregate: {
+              update: mappedScope.aggregate,
+            },
+            aspect: mappedScope.aspect,
+          },
         }
-      } : { disconnect: true },
+      } : this.constructUpdateRemovalScope(dbCondition, condition, 'DIALOGUE'),
       workspaceScope: (scope.type === 'WORKSPACE' && mappedScope) ? {
-        update: {
-          aggregate: {
-            update: mappedScope.aggregate,
+        upsert: {
+          create: {
+            aggregate: {
+              create: mappedScope.aggregate,
+            },
+            aspect: mappedScope.aspect,
           },
-          aspect: mappedScope.aspect,
+          update: {
+            aggregate: {
+              update: mappedScope.aggregate,
+            },
+            aspect: mappedScope.aspect,
+          },
         }
-      } : { disconnect: true },
+      } : this.constructUpdateRemovalScope(dbCondition, condition, 'WORKSPACE'),
     }
   }
 
@@ -357,11 +427,21 @@ export class AutomationPrismaAdapter {
    * @param input an object containing all information necessary to update an AutomationTrigger
    * @returns a Prisma-ready data object for updating of an AutomationTrigger
    */
-  buildUpdateAutomationTriggerData = (input: UpdateAutomationInput): Prisma.AutomationTriggerUpdateInput => {
+  buildUpdateAutomationTriggerData = async (input: UpdateAutomationInput): Promise<Prisma.AutomationTriggerUpdateInput> => {
     const { event, actions: inputActions, conditions: inputConditions } = input;
 
     const inputActionIds = inputActions.map((action) => action.id).filter(isPresent);
     const inputConditionIds = inputConditions.map((condition) => condition.id).filter(isPresent);
+    const upsertConditions = await Promise.all(inputConditions.map(async (condition) => {
+      const updateConditionInput = await this.constructUpdateAutomationConditionData(condition);
+      return {
+        where: {
+          id: condition?.id || '-1',
+        },
+        create: this.constructCreateAutomationConditionData(condition),
+        update: updateConditionInput,
+      }
+    }));
 
     return {
       event: {
@@ -406,15 +486,7 @@ export class AutomationPrismaAdapter {
             notIn: inputConditionIds,
           },
         },
-        upsert: inputConditions.map((condition) => {
-          return {
-            where: {
-              id: condition?.id || '-1',
-            },
-            create: this.constructCreateAutomationConditionData(condition),
-            update: this.constructUpdateAutomationConditionData(condition),
-          }
-        })
+        upsert: upsertConditions,
       }
     }
   }
@@ -437,7 +509,7 @@ export class AutomationPrismaAdapter {
         description,
         // TODO: Upgrade this when campaignAutomation is introduced (delete other automation entry on swap)
         automationTrigger: automation ? {
-          update: this.buildUpdateAutomationTriggerData(input),
+          update: await this.buildUpdateAutomationTriggerData(input),
         } : undefined,
       }
     });

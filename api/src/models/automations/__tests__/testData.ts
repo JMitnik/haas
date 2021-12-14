@@ -54,7 +54,7 @@ export const constructValidUpdateAutomationInputData = (workspace: Customer, dia
       },
       {
         id: dialogueCondition?.id,
-        dialogueId: dialogue.id,
+        questionId: question.id,
         operator: 'GREATER_THAN',
         matchValues: [
           {
@@ -64,16 +64,24 @@ export const constructValidUpdateAutomationInputData = (workspace: Customer, dia
           },
         ],
         scope: {
-          type: 'DIALOGUE',
-          dialogueScope: {
-            id: dialogueCondition?.dialogueScope?.id,
-            aspect: 'NR_INTERACTIONS',
-            aggregate: {
-              id: dialogueCondition?.dialogueScope?.aggregate?.id,
-              type: 'COUNT',
-              latest: 10,
+          type: 'QUESTION',
+          questionScope: {
+            'aspect': 'NODE_VALUE',
+            'aggregate': {
+              id: questionCondition?.questionScope?.aggregate?.id,
+              'type': 'AVG',
+              'latest': 10
             }
           },
+          // dialogueScope: {
+          //   id: dialogueCondition?.dialogueScope?.id,
+          //   aspect: 'NR_INTERACTIONS',
+          //   aggregate: {
+          //     id: dialogueCondition?.dialogueScope?.aggregate?.id,
+          //     type: 'COUNT',
+          //     latest: 10,
+          //   }
+          // },
         }
       }
     ],
