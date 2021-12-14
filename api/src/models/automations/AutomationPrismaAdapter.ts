@@ -183,8 +183,10 @@ export class AutomationPrismaAdapter {
 
   /**
    * 
-   * @param condition 
-   * @returns 
+   * @param dbCondition the current condition in the database matching id of input condition
+   * @param condition the input condition
+   * @param checkAgainstScope the current scope that this function is called for and being checked against.
+   * @returns either a prisma delete object or undefined depending on whether a previous scope exists
    */
   constructUpdateRemovalScope = (
     dbCondition: (AutomationCondition & {
@@ -195,20 +197,17 @@ export class AutomationPrismaAdapter {
     condition: UpdateAutomationConditionInput,
     checkAgainstScope: AutomationConditionScopeType): { delete: boolean } | undefined => {
     if (dbCondition?.dialogueScope?.id && checkAgainstScope === 'DIALOGUE' && condition.scope.type !== 'DIALOGUE') {
-      console.log('INSIDEEEEE 1');
       return { delete: true };
     }
 
     if (dbCondition?.questionScope?.id && checkAgainstScope === 'QUESTION' && condition.scope.type !== 'QUESTION') {
-      console.log('INSIDEEEEE 2');
       return { delete: true };
     }
 
     if (dbCondition?.workspaceScope?.id && checkAgainstScope === 'WORKSPACE' && condition.scope.type !== 'WORKSPACE') {
-      console.log('INSIDEEEEE 3');
       return { delete: true };
     }
-    console.log('UNDEFINED :(');
+
     return undefined;
   }
 
@@ -231,10 +230,6 @@ export class AutomationPrismaAdapter {
         workspaceScope: true,
       }
     }));
-
-
-    console.log('condition: ', condition);
-    console.log('dbCondition: ', dbCondition);
 
     return {
       scope: scope.type,

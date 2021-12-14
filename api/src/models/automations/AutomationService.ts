@@ -1,11 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import { AutomationConditionOperatorType, PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
-import { CreateAutomationConditionScopeInput, CreateAutomationInput, UpdateAutomationInput } from './AutomationTypes'
+import { CreateAutomationConditionScopeInput, CreateAutomationInput, CreateConditionMatchValueInput, UpdateAutomationInput } from './AutomationTypes'
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -20,7 +20,7 @@ class AutomationService {
    * @returns a validated AutomationConditionScope input object where it is sure specific fields exist
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationConditionScopeInput = (condition: NexusGenInputs['CreateAutomationCondition']): CreateAutomationConditionScopeInput => {
+  validateCreateAutomationConditionScopeInput = (condition: NexusGenInputs['CreateAutomationCondition']): Required<NexusGenInputs['CreateAutomationCondition']> => {
     if (!condition.scope) throw new UserInputError('One of the automation conditions has no scope object provided!');
 
     const { type, dialogueScope, workspaceScope, questionScope } = condition.scope;
@@ -42,10 +42,35 @@ class AutomationService {
       if (!workspaceScope?.aggregate?.type) throw new UserInputError('Condition scope is workspace but no aggregate type is provided!');
     }
 
+    return condition as Required<NexusGenInputs['CreateAutomationCondition']>;
+  }
+
+  /**
+   * Constructs a CREATE prisma condition scope data object 
+   * @param condition input object for an AutomationConditionScope
+   * @returns a CREATE prisma condition scope data object 
+   */
+  constructCreateAutomationConditionScopeInput = (condition: NexusGenInputs['CreateAutomationCondition']): CreateAutomationConditionScopeInput => {
+    const validatedCondition = this.validateCreateAutomationConditionScopeInput(condition);
+
     return {
-      ...condition.scope,
-      type: type,
+      ...validatedCondition.scope,
+      type: validatedCondition.scope?.type,
     } as CreateAutomationConditionScopeInput;
+  }
+
+  /**
+   * Validates data input for automation actions
+   * @param input 
+   * @returns validated CREATE prisma automation actions data list
+   */
+  validateAutomationActionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['actions'] => {
+    if (input?.actions?.length === 0) throw new UserInputError('No actions provided for automation!');
+    input.actions?.forEach((action) => {
+      if (!action.type) throw new UserInputError('No action type provided for one of the automation actions!');
+    });
+
+    return input.actions as CreateAutomationInput['actions'];
   }
 
   /**
@@ -55,17 +80,26 @@ class AutomationService {
    * @throws UserInputError if not all information is required
    */
   constructAutomationActionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['actions'] => {
-    if (input?.actions?.length === 0) throw new UserInputError('No actions provided for automation!');
-
-    const validatedActions: CreateAutomationInput['actions'] = input.actions?.map((action) => {
-      if (!action.type) throw new UserInputError('No action type provided for one of the automation actions!');
-      return {
-        ...action,
-        type: action.type,
-      }
-    }) || [];
-
+    const validatedActions = this.validateAutomationActionsInput(input);
     return validatedActions;
+  }
+
+  validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
+    if (input.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
+
+    input.conditions?.forEach((condition) => {
+      if (!condition.operator) {
+        throw new UserInputError('No operator type is provided for a condition');
+      }
+      if (condition.matchValues?.length === 0) throw new UserInputError('No match values provided for an automation condition!');
+      condition.matchValues?.forEach((matchValue) => {
+        if (!matchValue.matchValueType) {
+          throw new UserInputError('No match value type was provided for a condition!');
+        }
+      });
+    });
+
+    return input.conditions as Required<NexusGenInputs['CreateAutomationCondition'][]>;
   }
 
   /**
@@ -75,23 +109,15 @@ class AutomationService {
    * @throws UserInputError if not all information is required
    */
   constructCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['conditions'] => {
-    if (input.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
+    const validatedConditions = this.validateCreateAutomationConditionsInput(input) as Required<NexusGenInputs['CreateAutomationCondition'][]>;
 
-    const validatedConditions: CreateAutomationInput['conditions'] = input.conditions?.map((condition) => {
-      if (!condition.operator) {
-        throw new UserInputError('No operator type is provided for a condition');
-      }
-
+    const mappedConditions: CreateAutomationInput['conditions'] = validatedConditions?.map((condition) => {
       return {
         ...condition,
-        operator: condition.operator,
+        operator: condition.operator as Required<AutomationConditionOperatorType>,
         scope: this.constructCreateAutomationConditionScopeInput(condition),
         matchValues: condition.matchValues?.map((matchValue) => {
           const { dateTimeValue, matchValueType, numberValue, textValue } = matchValue;
-
-          if (!matchValueType) {
-            throw new UserInputError('No match value type was provided for a condition!');
-          }
 
           return {
             dateTimeValue,
@@ -99,11 +125,11 @@ class AutomationService {
             textValue,
             type: matchValueType,
           }
-        }) || [],
+        }) as Required<CreateConditionMatchValueInput[]> || [],
       }
     }) || [];
 
-    return validatedConditions;
+    return mappedConditions;
   }
 
   /**
@@ -123,21 +149,32 @@ class AutomationService {
   }
 
   /**
-   * Validates the Automation input object for CREATING of an automation by checking the existence of fields which could be potentially be undefined or null
+    Validates the Automation input object for CREATING of an automation by checking the existence of fields which could be potentially be undefined or null
    * @param input object containing all information needed to create an automation
    * @returns a validated Automation input object where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput => {
+  validateCreateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput => {
     if (!input) throw new UserInputError('No input provided create automation with!');
     if (!input.label || typeof input.label === undefined || input.label === null) throw new UserInputError('No label provided for automation!');
 
     if (!input.automationType) throw new UserInputError('No automation type provided for automation!');
     if (!input.workspaceId) throw new UserInputError('No workspace Id provided for automation!');
+    return input as Required<CreateAutomationInput>;
+  }
 
-    const label: CreateAutomationInput['label'] = input.label;
-    const workspaceId: CreateAutomationInput['workspaceId'] = input.workspaceId;
-    const automationType: CreateAutomationInput['automationType'] = input.automationType;
+  /**
+   * Constructs the Automation prisma data object for CREATING of an automation by checking the existence of fields which could be potentially be undefined or null
+   * @param input object containing all information needed to create an automation
+   * @returns a validated Automation prisma data object
+   * @throws UserInputError if not all information is required
+   */
+  constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput => {
+    const validatedInput = this.validateCreateAutomationInput(input);
+
+    const label: CreateAutomationInput['label'] = validatedInput.label;
+    const workspaceId: CreateAutomationInput['workspaceId'] = validatedInput.workspaceId;
+    const automationType: CreateAutomationInput['automationType'] = validatedInput.automationType;
     const conditions: CreateAutomationInput['conditions'] = this.constructCreateAutomationConditionsInput(input);
     const event: CreateAutomationInput['event'] = this.constructCreateAutomationEventInput(input);
     const actions: CreateAutomationInput['actions'] = this.constructAutomationActionsInput(input);
