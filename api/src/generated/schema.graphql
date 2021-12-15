@@ -28,7 +28,10 @@ type AutodeckConnectionType implements DeprecatedConnectionInterface {
 }
 
 input AutomationActionInput {
+  apiKey: String
+  endpoint: String
   id: ID
+  payload: JSONObject
   type: AutomationActionType
 }
 
@@ -904,6 +907,11 @@ enum JobStatusType {
   TRANSFORMING_PSDS_TO_PNGS
   WRAPPING_UP
 }
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
 
 enum LanguageEnumType {
   DUTCH

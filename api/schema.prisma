@@ -1002,8 +1002,11 @@ model AutomationAction {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
-  type AutomationActionType
+  apiKey   String?
+  endpoint String?
+  payload  Json?
 
+  type               AutomationActionType
   automationTriggers AutomationTrigger[]
 }
 

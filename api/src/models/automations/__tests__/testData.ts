@@ -97,7 +97,7 @@ export const constructValidCreateAutomationInputData = (workspace: Customer, dia
       'eventType': 'NEW_INTERACTION_QUESTION',
       'questionId': question.id,
     },
-    'actions': [{ 'type': 'SEND_SMS' }, { 'type': 'GENERATE_REPORT' }],
+    actions: [{ 'type': 'SEND_SMS', apiKey: 'API_KEY', endpoint: 'ENDPOINT', payload: { "key": "value" } }, { 'type': 'GENERATE_REPORT' }],
     'conditions': [
       {
         'scope': {

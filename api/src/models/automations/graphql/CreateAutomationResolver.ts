@@ -92,6 +92,9 @@ export const AutomationActionInput = inputObjectType({
   definition(t) {
     t.id('id', { nullable: true });
     t.field('type', { type: AutomationActionType });
+    t.string('apiKey');
+    t.string('endpoint');
+    t.json('payload');
   },
 });
 
