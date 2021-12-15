@@ -28,6 +28,15 @@ class AutomationService {
     const aggregatedData = await this.automationPrismaAdapter.aggregateScopedQuestions(questionId, 'NODE_VALUE', condition.questionScope?.aggregate);
 
     if (condition.operator === 'SMALLER_OR_EQUAL_THAN') {
+      console.log('total entries: ', aggregatedData._count._all);
+      console.log('total entries looked against: ', condition.questionScope?.aggregate?.latest);
+      const totalEntriesInDatabase = aggregatedData._count._all;
+
+      // Want latest X but there is less than X entries in the database => return false
+      if (condition.questionScope?.aggregate?.latest && totalEntriesInDatabase < condition.questionScope?.aggregate?.latest) {
+        return false;
+      }
+
       const averageValue = aggregatedData._avg?.value;
 
       const matchValue = condition.matchValues[0].numberValue as number;

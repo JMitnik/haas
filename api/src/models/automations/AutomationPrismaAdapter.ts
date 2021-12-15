@@ -40,6 +40,9 @@ export class AutomationPrismaAdapter {
           creationDate: 'desc',
         }
       },
+      _count: {
+        _all: true,
+      },
       _avg: aggregate?.type === 'AVG' ? {
         value: true,
       } : undefined,
