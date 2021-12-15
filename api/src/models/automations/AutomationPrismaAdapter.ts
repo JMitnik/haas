@@ -412,7 +412,14 @@ export class AutomationPrismaAdapter {
         create: conditions.map((condition) => this.constructCreateAutomationConditionData(condition)),
       },
       actions: {
-        create: actions,
+        create: actions.map((action) => {
+          return {
+            type: action.type,
+            apiKey: action.apiKey,
+            endpoint: action.endpoint,
+            payload: action.payload,
+          }
+        }),
       },
     }
   }
@@ -468,9 +475,15 @@ export class AutomationPrismaAdapter {
             },
             create: {
               type: action.type,
+              apiKey: action?.apiKey,
+              endpoint: action?.endpoint,
+              payload: action?.payload,
             },
             update: {
               type: action.type,
+              apiKey: action?.apiKey,
+              endpoint: action?.endpoint,
+              payload: action?.payload,
             },
           };
         }),

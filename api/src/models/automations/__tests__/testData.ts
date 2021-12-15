@@ -25,7 +25,7 @@ export const constructValidUpdateAutomationInputData = (workspace: Customer, dia
       'eventType': 'NEW_INTERACTION_DIALOGUE',
       dialogueId: dialogue.id,
     },
-    'actions': [{ id: sendSmsAction?.id, 'type': 'SEND_SMS' }, { id: generateReportAction?.id, 'type': 'GENERATE_REPORT' }],
+    'actions': [{ id: sendSmsAction?.id, 'type': 'SEND_SMS', apiKey: 'API_KEY', endpoint: 'ENDPOINT', payload: { "targets": ['+3167654321', '+12345675423'] } }, { id: generateReportAction?.id, 'type': 'GENERATE_REPORT' }],
     'conditions': [
       {
         id: questionCondition?.id,
@@ -97,7 +97,7 @@ export const constructValidCreateAutomationInputData = (workspace: Customer, dia
       'eventType': 'NEW_INTERACTION_QUESTION',
       'questionId': question.id,
     },
-    actions: [{ 'type': 'SEND_SMS', apiKey: 'API_KEY', endpoint: 'ENDPOINT', payload: { "key": "value" } }, { 'type': 'GENERATE_REPORT' }],
+    actions: [{ 'type': 'SEND_SMS', apiKey: 'API_KEY', endpoint: 'ENDPOINT', payload: { "targets": ['+3161234567'] } }, { 'type': 'GENERATE_REPORT' }],
     'conditions': [
       {
         'scope': {

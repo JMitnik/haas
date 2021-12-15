@@ -59,6 +59,12 @@ class AutomationService {
     } as CreateAutomationConditionScopeInput;
   }
 
+  hasEmptyTargetList = (payload: any): boolean => {
+    if (!payload) return true;
+    const targetsProperty = Object.entries(payload).find((entry) => entry[0] === 'targets') as [string, Array<string>] | undefined;
+    return targetsProperty ? targetsProperty[1].length === 0 : true;
+  }
+
   /**
    * Validates data input for automation actions
    * @param input 
@@ -69,17 +75,18 @@ class AutomationService {
     input.actions?.forEach((action) => {
       if (!action.type) throw new UserInputError('No action type provided for one of the automation actions!');
       // TODO: Construct type for both email, sms and all other action types to check against
-      const hasEmptyTargetList = (Object.entries(action.payload).find((entry) => entry[0] === 'targets')?.[1] as Array<string>).length === 0;
-      const noTargetList = Object.entries(action.payload).length === 0
+
+      const noTargetList = action.payload ? (Object.entries(action.payload).length === 0
         || !Object.keys(action.payload).find((key) => key === 'targets')
-        || hasEmptyTargetList;
+        || this.hasEmptyTargetList(action.payload)) : true;
 
       if (action.type === 'SEND_EMAIL') {
         if (noTargetList) throw new UserInputError('No target email addresses provided for "SEND_EMAIL"!');
         // TODO: Add additional checks such as whether all properties exist for every target entry
       }
+
       if (action.type === 'SEND_SMS') {
-        if (noTargetList) throw new UserInputError('Not target phone numbers provided for "SEND_SMS"!');
+        if (noTargetList) throw new UserInputError('No target phone numbers provided for "SEND_SMS"!');
         // TODO: Add additional checks such as whether all properties exist for every target entry
       }
 

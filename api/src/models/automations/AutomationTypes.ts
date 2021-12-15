@@ -110,6 +110,9 @@ export interface CreateAutomationInput {
 
 export interface CreateAutomationActionInput {
   type: NexusGenEnums['AutomationActionType'];
+  apiKey?: string | null;
+  endpoint?: string | null;
+  payload?: object | null;
 }
 
 export interface UpdateAutomationActionInput extends CreateAutomationActionInput {
