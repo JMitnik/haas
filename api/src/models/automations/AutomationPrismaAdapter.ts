@@ -1,10 +1,10 @@
-import { AutomationCondition, AutomationConditionScopeType, DialogueConditionScope, Prisma, PrismaClient, QuestionConditionScope, WorkspaceConditionScope } from '@prisma/client';
+import { AutomationCondition, AutomationConditionScopeType, DialogueConditionScope, Prisma, PrismaClient, QuestionAspect, QuestionConditionScope, WorkspaceConditionScope } from '@prisma/client';
 import { cloneDeep } from 'lodash';
 import { isPresent } from 'ts-is-present';
 import { NexusGenInputs } from '../../generated/nexus';
 
 import {
-  UpdateAutomationConditionInput, UpdateAutomationInput, FullAutomationWithRels, CreateAutomationInput, CreateScopeDataInput, CreateAutomationConditionScopeInput, CreateAutomationConditionInput, AutomationTrigger
+  UpdateAutomationConditionInput, UpdateAutomationInput, FullAutomationWithRels, CreateAutomationInput, CreateScopeDataInput, CreateAutomationConditionScopeInput, CreateAutomationConditionInput, AutomationTrigger, ConditionPropertAggregateInput
 } from './AutomationTypes';
 
 export class AutomationPrismaAdapter {
@@ -12,6 +12,115 @@ export class AutomationPrismaAdapter {
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
+  }
+
+  aggregateScopedQuestions = async (
+    questionId: string,
+    aspect: QuestionAspect,
+    aggregate?: ConditionPropertAggregateInput | null,
+  ) => {
+    // TODO: In the case we have 2 events triggered fast after each other than both might only look to the latest entry 🤔
+
+    // TODO: Handle choice questions through different QuestionAspects (NODE_VALUE -> SLIDER_NODE_VALUE & NODE_VALUE -> CHOICE_NODE_VALUE)
+    // OR by giving questionType as parameter to this question and based on that 
+    // => aggregate different database tables (sliderNodeEntry vs choiceNodeEntry)
+
+    const aggregatedSliderValues = await this.prisma.sliderNodeEntry.aggregate({
+      where: {
+        nodeEntry: {
+          relatedNodeId: questionId,
+          creationDate: {
+            lte: aggregate?.endDate || undefined,
+            gte: aggregate?.startDate || undefined,
+          }
+        },
+      },
+      orderBy: {
+        nodeEntry: {
+          creationDate: 'desc',
+        }
+      },
+      _avg: aggregate?.type === 'AVG' ? {
+        value: true,
+      } : undefined,
+      take: aggregate?.latest || undefined,
+    });
+    return aggregatedSliderValues;
+  }
+
+  /**
+   * Checks whether any automation events exist where either a dialogue id or one of the question Ids belongs to.
+   * @param dialogueId the dialogue ID part potentially part of an AutomationEvent 
+   * @param questionIds a list of question IDs potentially part of an AutomationEvent
+   * @returns a list of Automations
+   */
+  findPotentialTriggerdAutomations = (dialogueId: string, questionIds: Array<string>) => {
+    // TODO: Introduce system-wide fetch 
+    return this.prisma.automation.findMany({
+      where: {
+        AND: [
+          {
+            type: 'TRIGGER',
+          },
+          {
+            automationTrigger: {
+              OR: [
+                {
+                  event: {
+                    OR: [
+                      {
+                        dialogueId
+                      },
+                      {
+                        questionId: {
+                          in: questionIds,
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      include: {
+        workspace: true,
+        automationTrigger: {
+          include: {
+            event: {
+              include: {
+                question: true,
+                dialogue: true,
+              }
+            },
+            conditions: {
+              include: {
+                questionScope: {
+                  include: {
+                    aggregate: true,
+                  }
+                },
+                dialogueScope: {
+                  include: {
+                    aggregate: true,
+                  }
+                },
+                matchValues: true,
+                workspaceScope: {
+                  include: {
+                    aggregate: true,
+                  }
+                },
+                dialogue: true,
+                question: true,
+              }
+            },
+            actions: true,
+          },
+        },
+      },
+    })
   }
 
   /**

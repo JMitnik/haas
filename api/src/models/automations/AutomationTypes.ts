@@ -16,9 +16,9 @@ type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
 type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
 
 export interface ConditionPropertAggregateInput {
-  endDate?: string | null; // String
+  endDate?: Date | null; // String
   latest?: number | null; // Int
-  startDate?: string | null; // String
+  startDate?: Date | null; // String
   type: NexusGenEnums['ConditionPropertyAggregateType']; // ConditionPropertyAggregateType
 }
 
@@ -143,31 +143,33 @@ export interface AutomationEventWithRels extends AutomationEvent {
   dialogue: Dialogue | null
 }
 
+export interface AutomationCondition {
+  id: string;
+  scope: AutomationConditionScopeType;
+  operator: AutomationConditionOperatorType;
+  matchValues: AutomationConditionMatchValue[],
+  questionScope: (QuestionConditionScope
+    & {
+      aggregate: ConditionPropertyAggregate | null;
+    }) | null,
+  dialogueScope: (DialogueConditionScope
+    & {
+      aggregate: ConditionPropertyAggregate | null;
+    }) | null,
+  workspaceScope: (WorkspaceConditionScope
+    & {
+      aggregate: ConditionPropertyAggregate | null;
+    }) | null,
+  dialogue: Dialogue | null;
+  question: QuestionNode | null;
+}
+
 export interface AutomationTrigger {
   id: string;
   createdAt: Date;
   updatedAt: Date | null;
   event: AutomationEventWithRels;
-  conditions: {
-    id: string;
-    scope: AutomationConditionScopeType;
-    operator: AutomationConditionOperatorType;
-    matchValues: AutomationConditionMatchValue[],
-    questionScope: (QuestionConditionScope
-      & {
-        aggregate: ConditionPropertyAggregate | null;
-      }) | null,
-    dialogueScope: (DialogueConditionScope
-      & {
-        aggregate: ConditionPropertyAggregate | null;
-      }) | null,
-    workspaceScope: (WorkspaceConditionScope
-      & {
-        aggregate: ConditionPropertyAggregate | null;
-      }) | null,
-    dialogue: Dialogue | null;
-    question: QuestionNode | null;
-  }[];
+  conditions: AutomationCondition[];
   actions: {
     id: string;
     type: AutomationActionType;

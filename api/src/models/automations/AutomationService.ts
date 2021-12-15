@@ -1,17 +1,107 @@
-import { AutomationConditionOperatorType, PrismaClient } from '@prisma/client';
+import { AutomationConditionOperatorType, ConditionPropertyAggregate, PrismaClient, QuestionConditionScope, QuestionNode } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
+import e from 'express';
 import { isPresent } from 'ts-is-present';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import { offsetPaginate } from '../general/PaginationHelpers';
+import DialogueService from '../questionnaire/DialogueService';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
-import { CreateAutomationConditionScopeInput, CreateAutomationInput, CreateConditionMatchValueInput, UpdateAutomationInput } from './AutomationTypes'
+import { AutomationCondition, AutomationTrigger, CreateAutomationConditionScopeInput, CreateAutomationInput, CreateConditionMatchValueInput, UpdateAutomationInput } from './AutomationTypes'
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
+  dialogueService: DialogueService;
 
   constructor(prisma: PrismaClient) {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
+    this.dialogueService = new DialogueService(prisma);
+  }
+
+  /**
+   * Validates question condition scope. CURRENTLY ONLY SUPPORT SLIDER NODES
+   * @param condition 
+   */
+  validateQuestionScopeCondition = async (condition: AutomationCondition) => {
+    // Fetch data based on scope
+    const { id: questionId } = condition.question as QuestionNode;
+    const aggregatedData = await this.automationPrismaAdapter.aggregateScopedQuestions(questionId, 'NODE_VALUE', condition.questionScope?.aggregate);
+
+    if (condition.operator === 'SMALLER_OR_EQUAL_THAN') {
+      const averageValue = aggregatedData._avg?.value;
+
+      const matchValue = condition.matchValues[0].numberValue as number;
+      console.log('AVERAGE VALUE: ', averageValue, 'MATCH VALUE: ', matchValue);
+      if (!averageValue) {
+        console.log('AVG DATA IS NULL/UNDEFINED. Returning false');
+        return false;
+      }
+      return averageValue <= matchValue;
+    }
+
+    throw Error('No checks in place for provided operator type!');
+  }
+
+  /**
+   * Checks conditions of a potentially triggered automation
+   * @param automationTriggers a list of potentially triggered automations
+   * @returns boolean whether all conditions of an automation trigger pass
+   */
+  checkAutomationTriggersConditions = async (automationTrigger: AutomationTrigger) => {
+    const matchedConditionsTriggers = await Promise.all(automationTrigger.conditions.map(async (condition) => {
+      const { scope, operator } = condition;
+      console.log('HANDLED SCOPE: ', scope);
+      if (scope === 'DIALOGUE') return false;
+
+      if (scope === 'QUESTION') {
+        return this.validateQuestionScopeCondition(condition);
+      }
+
+      if (scope === 'WORKSPACE') return false;
+
+      return false;
+    }));
+
+    console.log('matchedConditionsTriggers: ', matchedConditionsTriggers);
+    const successfullyPassedAllConditions = !matchedConditionsTriggers.includes(false);
+    return successfullyPassedAllConditions;
+  }
+
+  /**
+   * Checks whether any trigger automations with an event related to a dialogue (or its questions) exists
+   * @param dialogueId a dialogue id
+   * @returns a list of automation triggers potentially triggered
+   */
+  hasPotentialTriggeredAutomations = async (dialogueId: string) => {
+    const questions = await this.dialogueService.getQuestionsByDialogueId(dialogueId);
+    const questionIds = questions.map((question) => question.id).filter(isPresent);
+    const possibleAutomations = await this.automationPrismaAdapter.findPotentialTriggerdAutomations(dialogueId, questionIds);
+
+    if (!possibleAutomations.length) return null;
+    const automationTriggers = possibleAutomations.map((automation) => automation.automationTrigger).filter(isPresent);
+    return automationTriggers;
+  }
+
+  /**
+   * Handles the whole process of checking for existing triggers, its conditions as well conducting the correct actions
+   * in case an automation trigger has actually been triggered.
+   * @param dialogueId 
+   */
+  handleTriggerAutomations = async (dialogueId: string) => {
+    const possibleTriggeredAutomations = await this.hasPotentialTriggeredAutomations(dialogueId);
+    if (!possibleTriggeredAutomations) {
+      console.log('No potential trigger automations found. abort');
+      return;
+    }
+    console.log('Has potential triggered automations: ', possibleTriggeredAutomations);
+    const triggeredAutomations = await Promise.all(possibleTriggeredAutomations.map(async (automationTrigger) => {
+      const allConditionsConfirmed = await this.checkAutomationTriggersConditions(automationTrigger);
+      if (allConditionsConfirmed) {
+        console.log('All conditions of automation trigger confirmed. Do action');
+      } else {
+        console.log('One or more conditions have failed. No action done');
+      }
+    }));
   }
 
   /**
