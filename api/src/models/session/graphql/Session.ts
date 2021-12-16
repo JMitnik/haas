@@ -148,6 +148,11 @@ export const CreateSessionMutation = mutationField('createSession', {
       throw new Error('No valid new session data provided');
     }
 
+    // Quick check to see if session is empty or not based on the entries
+    if (args?.input && !args?.input?.entries?.length) {
+      return ctx.services.sessionService.createEmptyDialogueSession(args.input.dialogueId);
+    }
+
     try {
       const session = ctx.services.sessionService.createSession(args.input);
       return session;

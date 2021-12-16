@@ -15,7 +15,8 @@ import { SessionWithEntries } from './SessionTypes';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
-import SessionPrismaAdapter, { querySessionWithEntries, Session } from './SessionPrismaAdapter';
+import SessionPrismaAdapter from './SessionPrismaAdapter';
+import { Session, SessionQueryModel } from './SessionQueryModel';
 
 class SessionService {
   sessionPrismaAdapter: SessionPrismaAdapter;
@@ -40,6 +41,10 @@ class SessionService {
   uploadSessionEvents(sessionInput: NexusGenInputs['UploadSessionEventsInput']) {
     return this.sessionPrismaAdapter.createSessionEvents(sessionInput.events || []);
   };
+
+  async createEmptyDialogueSession(dialogueId: string) {
+    return this.sessionPrismaAdapter.createEmptyDialogueSession(dialogueId);
+  }
 
   /**
    * Create a user-session from the client.
@@ -240,7 +245,7 @@ class SessionService {
           orderBy: {
             createdAt: 'desc',
           },
-          include: querySessionWithEntries.include
+          include: SessionQueryModel.queryFull.include
         },
       },
     });

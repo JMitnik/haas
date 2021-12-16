@@ -1,16 +1,18 @@
 import React, { useEffect } from 'react'
 
-import { Dialogue, Workspace, QuestionNode as QuestionNodeType } from 'types/helper-types';
-import { QuestionNodeTypeEnum } from 'types/generated-types';
+import { Dialogue, Workspace, QuestionNode as QuestionNodeType, SessionEventInput } from 'types/helper-types';
+import { QuestionNodeTypeEnum, SessionEventType } from 'types/generated-types';
 import { SliderNode } from 'components/SliderNode/SliderNode';
 import { ChoiceNode } from 'components/ChoiceNode/ChoiceNode';
-import { ActionType, useStore } from 'components/Dialogue/DialogueRouter';
+import { useStore } from 'components/Dialogue/DialogueRouter';
 
 import { QuestionNodeProps as GenericQuestionNodeProps, RunActionInput } from './QuestionNodeTypes';
 import { useNavigate, useNavigationType, useParams } from 'react-router';
+import { useSession } from 'components/Session/SessionProvider';
 
 interface QuestionNodeProps {
   dialogue: Dialogue;
+  onEventUpload: (events: SessionEventInput[]) => void;
 }
 
 const NodeComponent: { [key in QuestionNodeTypeEnum]?: React.FC<GenericQuestionNodeProps> } = {
@@ -34,7 +36,7 @@ function useDebouncedEffect(fn, deps, time) {
   }, dependencies);
 }
 
-export const QuestionNodeRenderer = ({ dialogue }: QuestionNodeProps) => {
+export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodeProps) => {
   const { nodeId } = useParams();
   const { popActionQueue, queuedActionEvents, setActiveCallToAction, logAction, getCurrentNode, actionEvents } = useStore(state => ({
     activeCallToAction: state.activeCallToAction,
@@ -47,18 +49,20 @@ export const QuestionNodeRenderer = ({ dialogue }: QuestionNodeProps) => {
   }));
   const currentNode = getCurrentNode(dialogue, nodeId);
   const navigate = useNavigate();
+  const { sessionId } = useSession();
 
   const navigationType = useNavigationType();
 
   useEffect(() => {
     if (navigationType === 'POP') {
       logAction({
-        to: currentNode.id,
-        value: { actionType: ActionType.NAVIGATION },
+        sessionId,
+        toNodeId: currentNode.id,
+        eventType: SessionEventType.Navigation,
         timestamp: new Date(),
       })
     }
-  }, [currentNode, navigationType, logAction]);
+  }, [sessionId, currentNode, navigationType, logAction]);
 
   // Upload every 2000 ms the events (to batch them).
   // - TODO: The uploader should be a three-stage process, to be resilient to network errors.:
@@ -69,9 +73,9 @@ export const QuestionNodeRenderer = ({ dialogue }: QuestionNodeProps) => {
   useDebouncedEffect(() => {
     if (queuedActionEvents.length > 0) {
       const actionEvents = popActionQueue();
-      console.log('Will log action events', actionEvents);
+      onEventUpload?.(actionEvents);
     }
-  }, [queuedActionEvents.length, popActionQueue], 2000);
+  }, [queuedActionEvents.length, popActionQueue, sessionId], 2000);
 
   const QuestionNode = NodeComponent[currentNode.type];
 
@@ -79,8 +83,8 @@ export const QuestionNodeRenderer = ({ dialogue }: QuestionNodeProps) => {
     logAction(input.event);
     setActiveCallToAction(input.activeCallToAction);
 
-    if (input.event.to) {
-      navigate(`n/${input.event.to}`);
+    if (input.event.toNodeId) {
+      navigate(`n/${input.event.toNodeId}`);
     } else {
       navigate(`n/cta`);
     }

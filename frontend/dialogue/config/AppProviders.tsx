@@ -1,3 +1,4 @@
+import { SessionProvider } from 'components/Session/SessionProvider';
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -6,15 +7,18 @@ import ThemeProviders from './Theme/ThemeProviders';
 
 interface AppProvidersProps {
   children: React.ReactNode;
+  sessionId: string;
 }
 
-const AppProviders = ({ children }: AppProvidersProps) => {
+const AppProviders = ({ children, sessionId }: AppProvidersProps) => {
   return (
-    <BrowserRouter>
-      <ThemeProviders>
-        {children}
-      </ThemeProviders>
-    </BrowserRouter>
+    <SessionProvider sessionId={sessionId}>
+      <BrowserRouter>
+        <ThemeProviders>
+          {children}
+        </ThemeProviders>
+      </BrowserRouter>
+    </SessionProvider>
   )
 }
 

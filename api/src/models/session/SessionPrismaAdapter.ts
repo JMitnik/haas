@@ -2,38 +2,9 @@ import { Prisma, PrismaClient, SessionEventType } from "@prisma/client";
 import { cloneDeep } from "lodash";
 import { NexusGenInputs } from "../../generated/nexus";
 
+import { Session, SessionQueryModel } from './SessionQueryModel';
 import NodeEntryService from "../node-entry/NodeEntryService";
 import { CreateSessionInput } from "./SessionPrismaAdapterType";
-
-export const querySessionWithEntries = Prisma.validator<Prisma.SessionArgs>()({
-  include: {
-    dialogue: true,
-    events: {
-      orderBy: {
-        clientEventAt: 'asc',
-      },
-      include: {
-        choiceValue: true,
-        sliderValue: true,
-      }
-    },
-    nodeEntries: {
-      orderBy: { depth: 'asc' },
-      include: {
-        choiceNodeEntry: true,
-        linkNodeEntry: true,
-        registrationNodeEntry: true,
-        textboxNodeEntry: true,
-        relatedNode: true,
-        formNodeEntry: { include: { values: true } },
-        videoNodeEntry: true,
-        sliderNodeEntry: true,
-      },
-    }
-  }
-});
-
-export type Session = Prisma.SessionGetPayload<typeof querySessionWithEntries>;
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;
@@ -209,25 +180,31 @@ class SessionPrismaAdapter {
   };
 
   /**
+   * Creates an empty session
+   */
+  createEmptyDialogueSession(dialogueId: string) {
+    return this.prisma.session.create({ data: { dialogueId } });
+  }
+
+  /**
    * Creates a session in the database.
    * */
-  createSession(data: CreateSessionInput) {
-    const { device, originUrl, dialogueId, entries, totalTimeInSec } = data;
+  createSession(input: CreateSessionInput) {
     return this.prisma.session.create({
       data: {
-        originUrl,
-        device,
-        totalTimeInSec,
+        originUrl: input.originUrl,
+        device: input.device,
+        totalTimeInSec: input.totalTimeInSec,
         nodeEntries: {
-          create: entries.map((entry) => NodeEntryService.constructCreateNodeEntryFragment(entry))
+          create: input.entries.map((entry) => NodeEntryService.constructCreateNodeEntryFragment(entry))
         },
         dialogue: {
           connect: {
-            id: dialogueId,
+            id: input.dialogueId,
           },
         },
       },
-      include: querySessionWithEntries.include,
+      include: SessionQueryModel.queryFull.include,
     });
   };
 
@@ -242,7 +219,7 @@ class SessionPrismaAdapter {
       where: {
         id: sessionId,
       },
-      include: querySessionWithEntries.include,
+      include: SessionQueryModel.queryFull.include,
     });
   };
 
@@ -349,10 +326,11 @@ class SessionPrismaAdapter {
    * @returns a Promise that resolves to the created session-event.
    */
   createSessionEvent(sessionEventInput: NexusGenInputs['SessionEventInput']) {
+    console.log(sessionEventInput.timestamp);
     return this.prisma.sessionEvent.create({
       data: {
         session: { connect: { id: sessionEventInput.sessionId } },
-        clientEventAt: sessionEventInput.timestamp,
+        timestamp: sessionEventInput.timestamp,
         eventType: sessionEventInput.eventType,
         toNode: sessionEventInput.toNodeId,
         sliderValue: this.constructCreateSessionEventSliderValue(

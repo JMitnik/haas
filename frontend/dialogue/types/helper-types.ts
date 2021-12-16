@@ -4,7 +4,10 @@ import {
   Customer as GeneratedWorkspace,
   QuestionNode as GeneratedQuestionNode,
   QuestionOption as GeneratedQuestionOption,
+  SessionEventInput as GeneratedSessionEventInput,
 } from './generated-types';
+
+export type SessionEventInput = GeneratedSessionEventInput;
 
 export type Dialogue = GeneratedDialogue;
 

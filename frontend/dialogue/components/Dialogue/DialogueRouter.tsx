@@ -1,10 +1,11 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import create, { GetState, SetState } from 'zustand';
 
-import { Dialogue, Workspace, QuestionNode as QuestionNodeType } from 'types/helper-types';
+import { Dialogue, Workspace, QuestionNode as QuestionNodeType, SessionEventInput } from 'types/helper-types';
 import { QuestionNodeRenderer } from 'components/QuestionNode/QuestionNodeRenderer';
 import { useEffect } from 'react';
 import { useParams, useResolvedPath } from 'react-router';
+import { SessionEventType } from 'types/generated-types';
 
 export interface SliderActionValue {
   value: number;
@@ -21,14 +22,8 @@ export interface ChoiceActionValue {
 
 export type NodeActionValue = SliderActionValue;
 
-export enum ActionType {
-  CHOICE_ACTION = 'CHOICE_ACTION',
-  SLIDER_ACTION = 'SLIDER_ACTION',
-  NAVIGATION = 'NAVIGATION',
-}
-
 interface ActionValue {
-  actionType: ActionType;
+  actionType: SessionEventType;
   sliderValue?: SliderActionValue;
   choiceValue?: ChoiceActionValue;
 }
@@ -40,11 +35,11 @@ export interface ActionEvent {
 }
 
 interface DialogueState {
-  actionEvents: ActionEvent[];
-  queuedActionEvents: ActionEvent[];
+  actionEvents: SessionEventInput[];
+  queuedActionEvents: SessionEventInput[];
   activeCallToAction?: QuestionNodeType;
-  logAction: (actionEvent: ActionEvent) => void;
-  popActionQueue: () => ActionEvent[];
+  logAction: (actionEvent: SessionEventInput) => void;
+  popActionQueue: () => SessionEventInput[];
   setActiveCallToAction: (callToAction: QuestionNodeType) => void;
   getCurrentNode: (dialogue: Dialogue, urlNodeId?: string) => QuestionNodeType;
 }
@@ -78,7 +73,7 @@ export const useStore = create<DialogueState>((set, get) => ({
 
     return dialogue.rootQuestion;
   },
-  logAction: (actionEvent: ActionEvent) => {
+  logAction: (actionEvent: SessionEventInput) => {
     set({
       actionEvents: [...get().actionEvents, actionEvent],
       queuedActionEvents: [...get().queuedActionEvents, actionEvent],
@@ -94,14 +89,16 @@ export const useStore = create<DialogueState>((set, get) => ({
 interface DialogueRouterProps {
   dialogue: Dialogue;
   workspace: Workspace;
+  onEventUpload: (events: SessionEventInput[]) => void;
 }
 
 
-export const DialogueRouter = ({ dialogue, workspace }: DialogueRouterProps) => {
+export const DialogueRouter = ({ dialogue, workspace, onEventUpload }: DialogueRouterProps) => {
+  console.log(onEventUpload);
   return (
     <Routes>
-      <Route path="/:workspace/:dialogue" element={<QuestionNodeRenderer dialogue={dialogue} />}>
-        <Route path="n/:nodeId" element={<QuestionNodeRenderer dialogue={dialogue} />} />
+      <Route path="/:workspace/:dialogue" element={<QuestionNodeRenderer onEventUpload={onEventUpload} dialogue={dialogue} />}>
+        <Route path="n/:nodeId" element={<QuestionNodeRenderer onEventUpload={onEventUpload} dialogue={dialogue} />} />
       </Route>
     </Routes>
   )

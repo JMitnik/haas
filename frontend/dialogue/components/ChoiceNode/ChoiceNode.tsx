@@ -1,5 +1,7 @@
-import { ActionType, useStore } from 'components/Dialogue/DialogueRouter';
+import { useStore } from 'components/Dialogue/DialogueRouter';
 import { QuestionNodeProps } from 'components/QuestionNode/QuestionNodeTypes';
+import { useSession } from 'components/Session/SessionProvider';
+import { SessionEventType } from 'types/generated-types';
 import { findChoiceChildEdge } from './findChoiceChildEdge';
 
 
@@ -7,6 +9,7 @@ import { findChoiceChildEdge } from './findChoiceChildEdge';
  * ChoiceNode: dialogue segment where a button press leads to the next item.
  */
 export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
+  const { sessionId } = useSession();
   const choices = node.options || [];
 
   const { activeCallToAction } = useStore(state => ({
@@ -21,16 +24,15 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
 
     onRunAction({
       event: {
+        sessionId,
         timestamp: new Date(),
-        to: childNode?.id,
-        value: {
-          actionType: ActionType.CHOICE_ACTION,
-          choiceValue: {
-            nodeId: node.id,
-            optionId: choice.id.toString(),
-            value: choice.value,
-            timeSpent: 0,
-          }
+        toNodeId: childNode.id,
+        eventType: SessionEventType.ChoiceAction,
+        choiceValue: {
+          relatedNodeId: node.id,
+          optionId: `${choice.id}`,
+          value: choice.value,
+          timeSpent: 0,
         }
       },
       activeCallToAction: choice.overrideLeaf || node.overrideLeaf,
