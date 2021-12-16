@@ -1,4 +1,4 @@
-import { AutomationConditionOperatorType, ConditionPropertyAggregate, PrismaClient, QuestionConditionScope, QuestionNode } from '@prisma/client';
+import { AutomationConditionMatchValue, AutomationConditionOperatorType, ConditionPropertyAggregate, NodeType, Prisma, PrismaClient, QuestionAspect, QuestionConditionScope, QuestionNode } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 import e from 'express';
 import { isPresent } from 'ts-is-present';
@@ -9,6 +9,20 @@ import DialogueService from '../questionnaire/DialogueService';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
 import { AutomationCondition, AutomationTrigger, CreateAutomationConditionScopeInput, CreateAutomationInput, CreateConditionMatchValueInput, UpdateAutomationInput } from './AutomationTypes'
 
+interface SetupQuestionCompareDataInput {
+  questionId: string;
+  aspect: QuestionAspect,
+  aggregate?: ConditionPropertyAggregate | null,
+  matchValues: AutomationConditionMatchValue[],
+  type: NodeType,
+}
+
+interface SetupQuestionCompareDataOutput {
+  totalEntries: number;
+  compareValue?: number | null;
+  matchValue?: number | null;
+}
+
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
   dialogueService: DialogueService;
@@ -18,34 +32,73 @@ class AutomationService {
     this.dialogueService = new DialogueService(prisma);
   }
 
+  setupSliderCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
+    const { questionId, aspect, aggregate, matchValues } = input;
+    const scopedSliderNodeEntries = await this.automationPrismaAdapter.aggregateScopedSliderNodeEntries(questionId, aspect, aggregate);
+    const aggregatedAverageValue = scopedSliderNodeEntries.aggregatedValues._avg?.value;
+    const matchValue = matchValues?.[0]?.numberValue;
+
+    return {
+      compareValue: aggregatedAverageValue,
+      matchValue: matchValue,
+      totalEntries: scopedSliderNodeEntries.totalEntries,
+    }
+  }
+
+  setupChoiceCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
+    let compareValue: number | null;
+    const { questionId, aspect, aggregate, matchValues } = input;
+    const scopedChoiceNodeEntries = await this.automationPrismaAdapter.aggregateScopedChoiceNodeEntries(questionId, aspect, aggregate);
+    const amountMatchValue = matchValues.find((matchValue) => matchValue.type === 'INT');
+    const textMatchValue = matchValues.find((matchValue) => matchValue.type === 'STRING')?.textValue;
+
+    compareValue = textMatchValue && Object.keys(scopedChoiceNodeEntries.aggregatedValues).find((key) => key === textMatchValue) ? scopedChoiceNodeEntries.aggregatedValues[textMatchValue] : 0;
+    console.log('compareValue Target: ', compareValue);
+
+    return {
+      // if matchValue doesn't exist that's a condition problem -> returning null. 
+      // if key doesn't exist in scopedChoiceNodeEntries.aggregatedValues -> returning 0.
+      compareValue: textMatchValue ? compareValue : null,
+      matchValue: amountMatchValue?.numberValue,
+      totalEntries: scopedChoiceNodeEntries.totalEntries,
+    }
+  }
+
+  setupQuestionCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
+    if (input.type === 'SLIDER') return this.setupSliderCompareData(input);
+    if (input.type === 'CHOICE') return this.setupChoiceCompareData(input);
+    return undefined;
+  };
+
   /**
    * Validates question condition scope. CURRENTLY ONLY SUPPORT SLIDER NODES
    * @param condition 
    */
   validateQuestionScopeCondition = async (condition: AutomationCondition) => {
     // Fetch data based on scope
-    const { id: questionId } = condition.question as QuestionNode;
-    const aggregatedData = await this.automationPrismaAdapter.aggregateScopedQuestions(questionId, 'NODE_VALUE', condition.questionScope?.aggregate);
+    const { id: questionId, type } = condition.question as QuestionNode;
+    const input: SetupQuestionCompareDataInput = {
+      type,
+      questionId,
+      matchValues: condition.matchValues,
+      aggregate: condition.questionScope?.aggregate,
+      aspect: condition.questionScope?.aspect as QuestionAspect,
+    };
+    const scopedData = await this.setupQuestionCompareData(input);
+
+    // Some of the data necessary to validate condition is missing
+    if (!scopedData || (!scopedData?.compareValue && typeof scopedData?.compareValue !== 'number') || !scopedData?.matchValue) {
+      return false;
+    }
+
+    // Want latest X but there is less than X *new* entries in the database => return false
+    if (condition.questionScope?.aggregate?.latest && scopedData.totalEntries % condition.questionScope?.aggregate?.latest !== 0) {
+      return false;
+    }
 
     if (condition.operator === 'SMALLER_OR_EQUAL_THAN') {
-      console.log('total entries: ', aggregatedData._count._all);
-      console.log('total entries looked against: ', condition.questionScope?.aggregate?.latest);
-      const totalEntriesInDatabase = aggregatedData._count._all;
-
-      // Want latest X but there is less than X entries in the database => return false
-      if (condition.questionScope?.aggregate?.latest && totalEntriesInDatabase < condition.questionScope?.aggregate?.latest) {
-        return false;
-      }
-
-      const averageValue = aggregatedData._avg?.value;
-
-      const matchValue = condition.matchValues[0].numberValue as number;
-      console.log('AVERAGE VALUE: ', averageValue, 'MATCH VALUE: ', matchValue);
-      if (!averageValue) {
-        console.log('AVG DATA IS NULL/UNDEFINED. Returning false');
-        return false;
-      }
-      return averageValue <= matchValue;
+      console.log(`${scopedData.compareValue} <= ${scopedData.matchValue}`);
+      return scopedData.compareValue <= scopedData.matchValue;
     }
 
     throw Error('No checks in place for provided operator type!');

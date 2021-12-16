@@ -1,5 +1,5 @@
-import { AutomationCondition, AutomationConditionScopeType, DialogueConditionScope, Prisma, PrismaClient, QuestionAspect, QuestionConditionScope, WorkspaceConditionScope } from '@prisma/client';
-import { cloneDeep } from 'lodash';
+import { AutomationCondition, AutomationConditionScopeType, DialogueConditionScope, NodeType, Prisma, PrismaClient, QuestionAspect, QuestionConditionScope, WorkspaceConditionScope } from '@prisma/client';
+import { cloneDeep, countBy, map } from 'lodash';
 import { isPresent } from 'ts-is-present';
 import { NexusGenInputs } from '../../generated/nexus';
 
@@ -14,16 +14,22 @@ export class AutomationPrismaAdapter {
     this.prisma = prisma;
   }
 
-  aggregateScopedQuestions = async (
+  aggregateScopedSliderNodeEntries = async (
     questionId: string,
     aspect: QuestionAspect,
-    aggregate?: ConditionPropertAggregateInput | null,
+    aggregate?: ConditionPropertAggregateInput | null
   ) => {
-    // TODO: In the case we have 2 events triggered fast after each other than both might only look to the latest entry 🤔
-
-    // TODO: Handle choice questions through different QuestionAspects (NODE_VALUE -> SLIDER_NODE_VALUE & NODE_VALUE -> CHOICE_NODE_VALUE)
-    // OR by giving questionType as parameter to this question and based on that 
-    // => aggregate different database tables (sliderNodeEntry vs choiceNodeEntry)
+    const totalAmountSliderValues = await this.prisma.sliderNodeEntry.count({
+      where: {
+        nodeEntry: {
+          relatedNodeId: questionId,
+          creationDate: {
+            lte: aggregate?.endDate || undefined,
+            gte: aggregate?.startDate || undefined,
+          }
+        },
+      }
+    })
 
     const aggregatedSliderValues = await this.prisma.sliderNodeEntry.aggregate({
       where: {
@@ -40,15 +46,92 @@ export class AutomationPrismaAdapter {
           creationDate: 'desc',
         }
       },
-      _count: {
-        _all: true,
-      },
+      // TODO: Change average value based aspect when we introduce new information such as slider speed
       _avg: aggregate?.type === 'AVG' ? {
         value: true,
       } : undefined,
       take: aggregate?.latest || undefined,
     });
-    return aggregatedSliderValues;
+
+    return { totalEntries: totalAmountSliderValues, aggregatedValues: aggregatedSliderValues };
+  };
+
+  aggregateScopedChoiceNodeEntries = async (
+    questionId: string,
+    aspect: QuestionAspect,
+    aggregate?: ConditionPropertAggregateInput | null
+  ) => {
+    const totalAmountChoiceValues = await this.prisma.choiceNodeEntry.count({
+      where: {
+        nodeEntry: {
+          relatedNodeId: questionId,
+          creationDate: {
+            lte: aggregate?.endDate || undefined,
+            gte: aggregate?.startDate || undefined,
+          }
+        },
+      }
+    });
+
+    console.log('AGGREGRATE LATEST: ', aggregate?.latest);
+
+    // const aggregatedChoiceNodeEntries = await this.prisma.choiceNodeEntry.groupBy({
+    //   by: ['value'],
+    //   _count: {
+    //     value: true,
+    //   },
+    //   where: {
+    //     nodeEntry: {
+    //       relatedNodeId: questionId,
+    //       creationDate: {
+    //         lte: aggregate?.endDate || undefined,
+    //         gte: aggregate?.startDate || undefined,
+    //       }
+    //     },
+    //   },
+    //   take: aggregate?.latest || undefined,
+    //   orderBy: {
+    //     value: 'desc',
+    //   },
+    // });
+
+    const aggregatedChoices = await this.prisma.choiceNodeEntry.findMany({
+      where: {
+        nodeEntry: {
+          relatedNodeId: questionId,
+          creationDate: {
+            lte: aggregate?.endDate || undefined,
+            gte: aggregate?.startDate || undefined,
+          }
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: aggregate?.latest || undefined,
+    });
+
+    const countedChoices = countBy(aggregatedChoices, (choice) => choice.value);
+    console.log('countedChoices: ', countedChoices);
+    // console.log('Aggregated choice node entries: ', aggregatedChoiceNodeEntries);
+
+    return { totalEntries: totalAmountChoiceValues, aggregatedValues: countedChoices };
+  }
+
+  aggregateScopedQuestions = async (
+    questionId: string,
+    type: NodeType,
+    aspect: QuestionAspect,
+    aggregate?: ConditionPropertAggregateInput | null,
+  ) => {
+    // TODO: In the case we have 2 events triggered fast after each other than both might only look to the latest entry 🤔
+
+    // TODO: Handle choice questions through different QuestionAspects (NODE_VALUE -> SLIDER_NODE_VALUE & NODE_VALUE -> CHOICE_NODE_VALUE)
+    // OR by giving questionType as parameter to this question and based on that 
+    // => aggregate different database tables (sliderNodeEntry vs choiceNodeEntry)
+    if (type === 'SLIDER') return this.aggregateScopedSliderNodeEntries(questionId, aspect, aggregate);
+    if (type === 'CHOICE') return this.aggregateScopedChoiceNodeEntries(questionId, aspect, aggregate);
+    return null;
   }
 
   /**

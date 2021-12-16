@@ -428,6 +428,7 @@ model SliderNodeEntry {
 
 model ChoiceNodeEntry {
   id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
   value       String?
   nodeEntryId String    @unique
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
