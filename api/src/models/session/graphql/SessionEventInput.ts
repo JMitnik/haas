@@ -20,6 +20,22 @@ export const SessionEventChoiceValueInput = inputObjectType({
   },
 });
 
+export const SessionEventSliderValueInput = inputObjectType({
+  name: 'SessionEventSliderValueInput',
+  description: 'Input type of a SessionEvent for Sliders.',
+
+  definition(t) {
+    // What is the raw value of the choice?
+    t.int('value', { required: true });
+
+    // Require that the related node of the choice is specificed.
+    t.string('relatedNodeId', { required: true });
+
+    // How much time did the user spend to create this event.
+    t.int('timeSpent');
+  },
+});
+
 export const SessionEventInput = inputObjectType({
   name: 'SessionEventInput',
   description: 'Input type of a SessionEvent',
@@ -35,5 +51,8 @@ export const SessionEventInput = inputObjectType({
     t.string('toNodeId', { required: true });
 
     t.field('choiceValue', { type: SessionEventChoiceValueInput });
+
+    // Field value for slider
+    t.field('sliderValue', { type: SessionEventSliderValueInput });
   },
 });

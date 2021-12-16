@@ -1124,8 +1124,16 @@ input SessionEventInput {
   choiceValue: SessionEventChoiceValueInput
   eventType: SessionEventType!
   sessionId: String!
+  sliderValue: SessionEventSliderValueInput
   timestamp: Date!
   toNodeId: String!
+}
+
+"""Input type of a SessionEvent for Sliders."""
+input SessionEventSliderValueInput {
+  relatedNodeId: String!
+  timeSpent: Int
+  value: Int!
 }
 
 """Types of events that can be emitted in a user's session."""

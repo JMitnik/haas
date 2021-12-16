@@ -30,7 +30,13 @@ export const seedDialogue = async (prisma: PrismaClient, workspaceId: string) =>
       customerId: workspaceId,
       title: 'Test dialogue',
       slug: 'TEST_DIALOGUE',
-      description: 'A test dialogue'
+      description: 'A test dialogue',
+      questions: {
+        create: {
+          id: 'TEST_QUESTION_1',
+          title: 'Test question',
+        }
+      }
     }
   });
 

@@ -1,10 +1,39 @@
-import { Prisma, PrismaClient, Session, SessionEventType } from "@prisma/client";
+import { Prisma, PrismaClient, SessionEventType } from "@prisma/client";
 import { cloneDeep } from "lodash";
-import { NexusGenFieldTypes, NexusGenInputNames, NexusGenInputs } from "../../generated/nexus";
+import { NexusGenInputs } from "../../generated/nexus";
 
 import NodeEntryService from "../node-entry/NodeEntryService";
-import { UploadSessionEventsInput } from "./graphql";
 import { CreateSessionInput } from "./SessionPrismaAdapterType";
+
+export const querySessionWithEntries = Prisma.validator<Prisma.SessionArgs>()({
+  include: {
+    dialogue: true,
+    events: {
+      orderBy: {
+        clientEventAt: 'asc',
+      },
+      include: {
+        choiceValue: true,
+        sliderValue: true,
+      }
+    },
+    nodeEntries: {
+      orderBy: { depth: 'asc' },
+      include: {
+        choiceNodeEntry: true,
+        linkNodeEntry: true,
+        registrationNodeEntry: true,
+        textboxNodeEntry: true,
+        relatedNode: true,
+        formNodeEntry: { include: { values: true } },
+        videoNodeEntry: true,
+        sliderNodeEntry: true,
+      },
+    }
+  }
+});
+
+export type Session = Prisma.SessionGetPayload<typeof querySessionWithEntries>;
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;
@@ -198,21 +227,7 @@ class SessionPrismaAdapter {
           },
         },
       },
-      include: {
-        nodeEntries: {
-          // TODO: Can we define these fields in one place (right now, it exists everywhere).
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            textboxNodeEntry: true,
-            relatedNode: true,
-            formNodeEntry: { include: { values: true } },
-            videoNodeEntry: true,
-            sliderNodeEntry: true,
-          },
-        },
-      },
+      include: querySessionWithEntries.include,
     });
   };
 
@@ -227,27 +242,7 @@ class SessionPrismaAdapter {
       where: {
         id: sessionId,
       },
-      include: {
-        events: {
-          orderBy: {
-            clientEventAt: 'asc',
-          },
-          include: {
-            choiceValue: true,
-            sliderValue: true,
-          }
-        },
-        nodeEntries: {
-          orderBy: { depth: 'asc' },
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            relatedNode: true,
-            sliderNodeEntry: true,
-          },
-        },
-      },
+      include: querySessionWithEntries.include,
     });
   };
 
@@ -312,16 +307,38 @@ class SessionPrismaAdapter {
    */
   constructCreateSessionEventChoiceValue(
     sessionEventInput: NexusGenInputs['SessionEventInput'],
-    sessionChoiceInput: NexusGenInputs['SessionEventChoiceValueInput'] | undefined
+    choiceValueInput: NexusGenInputs['SessionEventChoiceValueInput'] | undefined
   ): Prisma.SessionEventChoiceValueCreateNestedOneWithoutSessionEventInput | undefined {
     if (sessionEventInput.eventType !== SessionEventType.CHOICE_ACTION) return undefined;
-    if (sessionChoiceInput === undefined) return undefined;
+    if (choiceValueInput === undefined) return undefined;
 
     return {
       create: {
-        value: sessionChoiceInput.value,
-        timeSpentInSec: sessionChoiceInput.timeSpent || 0,
-        node: { connect: { id: sessionChoiceInput.relatedNodeId } },
+        value: choiceValueInput.value,
+        timeSpentInSec: choiceValueInput.timeSpent || 0,
+        node: { connect: { id: choiceValueInput.relatedNodeId } },
+      }
+    }
+  }
+
+  /**
+   * Create a Prisma "create" for slider value creation.
+   * @param sessionEventInput General event input
+   * @param sessionSliderInput Slider event input
+   * @returns A Prisma create object for creating choice value.
+   */
+  constructCreateSessionEventSliderValue(
+    sessionEventInput: NexusGenInputs['SessionEventInput'],
+    sliderValueInput: NexusGenInputs['SessionEventSliderValueInput'] | undefined
+  ): Prisma.SessionEventSliderValueCreateNestedOneWithoutSessionEventInput | undefined {
+    if (sessionEventInput.eventType !== SessionEventType.SLIDER_ACTION) return undefined;
+    if (sliderValueInput === undefined) return undefined;
+
+    return {
+      create: {
+        value: sliderValueInput.value,
+        timeSpentInSec: sliderValueInput.timeSpent || 0,
+        node: { connect: { id: sliderValueInput.relatedNodeId } },
       }
     }
   }
@@ -338,6 +355,10 @@ class SessionPrismaAdapter {
         clientEventAt: sessionEventInput.timestamp,
         eventType: sessionEventInput.eventType,
         toNode: sessionEventInput.toNodeId,
+        sliderValue: this.constructCreateSessionEventSliderValue(
+          sessionEventInput,
+          sessionEventInput.sliderValue || undefined
+        ),
         choiceValue: this.constructCreateSessionEventChoiceValue(
           sessionEventInput,
           sessionEventInput.choiceValue || undefined

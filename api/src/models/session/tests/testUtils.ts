@@ -19,6 +19,7 @@ export const clearDatabase = async (prisma: PrismaClient) => {
     prisma.session.deleteMany({}),
     prisma.userOfCustomer.deleteMany({}),
     prisma.user.deleteMany({}),
+    prisma.questionNode.deleteMany({}),
     prisma.dialogue.deleteMany({}),
     prisma.customer.deleteMany({}),
   ]);

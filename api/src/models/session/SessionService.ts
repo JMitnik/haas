@@ -1,5 +1,5 @@
 import {
-  NodeEntry, Session, Prisma, PrismaClient,
+  NodeEntry, Prisma, PrismaClient,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { sortBy } from 'lodash';
@@ -15,7 +15,7 @@ import { SessionWithEntries } from './SessionTypes';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
-import SessionPrismaAdapter from './SessionPrismaAdapter';
+import SessionPrismaAdapter, { querySessionWithEntries, Session } from './SessionPrismaAdapter';
 
 class SessionService {
   sessionPrismaAdapter: SessionPrismaAdapter;
@@ -96,7 +96,7 @@ class SessionService {
    * @param sessions
    */
   static getScoringEntriesFromSessions(
-    sessions: SessionWithEntries[],
+    sessions: Session[],
   ): (NodeEntryWithTypes)[] {
     if (!sessions.length) return [];
 
@@ -125,7 +125,7 @@ class SessionService {
    * @param sessions
    */
   static getTextEntriesFromSessions(
-    sessions: SessionWithEntries[],
+    sessions: Session[],
   ): (NodeEntryWithTypes | undefined | null)[] {
     if (!sessions.length) {
       return [];
@@ -240,24 +240,7 @@ class SessionService {
           orderBy: {
             createdAt: 'desc',
           },
-          include: {
-            delivery: true,
-            nodeEntries: {
-              include: {
-                choiceNodeEntry: true,
-                linkNodeEntry: true,
-                registrationNodeEntry: true,
-                formNodeEntry: { include: { values: true } },
-                sliderNodeEntry: true,
-                textboxNodeEntry: true,
-                relatedNode: true,
-                videoNodeEntry: true,
-              },
-              orderBy: {
-                depth: 'asc',
-              },
-            },
-          },
+          include: querySessionWithEntries.include
         },
       },
     });
@@ -274,9 +257,9 @@ class SessionService {
   }
 
   static sortSessions(
-    sessions: SessionWithEntries[],
+    sessions: Session[],
     paginationOpts?: Nullable<PaginationProps>,
-  ): SessionWithEntries[] {
+  ): Session[] {
     const sessionsWithScores = sessions.map((session) => ({
       score: SessionService.getScoreFromSession(session),
       paths: session.nodeEntries.length,

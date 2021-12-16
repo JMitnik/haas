@@ -394,7 +394,7 @@ model SessionEvent {
   choiceValueId String?
   choiceValue   SessionEventChoiceValue? @relation(fields: [choiceValueId], references: [id])
 
-  clientEventAt DateTime
+  timestamp DateTime
   toNode        String
 }
 

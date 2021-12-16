@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, SessionEventType } from '@prisma/client';
 
 import { clearDatabase } from './testUtils';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
@@ -40,7 +40,7 @@ afterEach(async () => {
   await prisma.$disconnect();
 });
 
-test('test simple append works', async () => {
+test('add single event', async () => {
   const { workspace, dialogue } = await prepEnvironment(prisma);
   const sessionService = new SessionService(prisma);
   const createdSession = await sessionService.createSession({
@@ -58,16 +58,103 @@ test('test simple append works', async () => {
           eventType: 'NAVIGATION',
           sessionId: createdSession.id,
           timestamp: Date.now(),
-          toNodeId: 'node1',
-          choiceValue: {
-
-          }
+          toNodeId: 'TEST_QUESTION_1',
         }]
       }
     },
   );
 
   const session = await sessionService.findSessionById(createdSession.id);
+  expect(session.events).toHaveLength(1);
+  expect(session.events[0].eventType).toEqual(SessionEventType.NAVIGATION);
+});
 
-  console.log(session);
+test('add multiple events in one batch', async () => {
+  const { workspace, dialogue } = await prepEnvironment(prisma);
+  const sessionService = new SessionService(prisma);
+  const createdSession = await sessionService.createSession({
+    totalTimeInSec: 0,
+    dialogueId: dialogue.id,
+    entries: [],
+  });
+
+  const res = await ctx.client.request<any, MutationInput>(Mutation,
+    // Variables
+    {
+      input: {
+        sessionId: createdSession.id,
+        events: [
+          {
+            eventType: 'NAVIGATION',
+            sessionId: createdSession.id,
+            timestamp: Date.now() - 10,
+            toNodeId: 'TEST_QUESTION_1',
+          },
+          {
+            eventType: 'SLIDER_ACTION',
+            sessionId: createdSession.id,
+            timestamp: Date.now() - 5,
+            toNodeId: 'TEST_QUESTION_1',
+            sliderValue: {
+              value: 70,
+              relatedNodeId: 'TEST_QUESTION_1',
+              timeSpent: 10,
+            }
+          }
+        ]
+      }
+    },
+  );
+
+  const session = await sessionService.findSessionById(createdSession.id);
+  expect(session.events).toHaveLength(2);
+  expect(session.events[0].eventType).toEqual(SessionEventType.NAVIGATION);
+  expect(session.events[1].eventType).toEqual(SessionEventType.SLIDER_ACTION);
+  expect(session.events[1].sliderValue.timeSpentInSec).toEqual(10);
+  expect(session.events[1].sliderValue.value).toEqual(70);
+});
+
+test('retrieving multiple events from a session are sorted by timestamp', async () => {
+  const { workspace, dialogue } = await prepEnvironment(prisma);
+  const sessionService = new SessionService(prisma);
+  const createdSession = await sessionService.createSession({
+    totalTimeInSec: 0,
+    dialogueId: dialogue.id,
+    entries: [],
+  });
+
+  const res = await ctx.client.request<any, MutationInput>(Mutation,
+    // Variables
+    {
+      input: {
+        sessionId: createdSession.id,
+        events: [
+          {
+            eventType: 'NAVIGATION',
+            sessionId: createdSession.id,
+            timestamp: Date.now() - 10,
+            toNodeId: 'TEST_QUESTION_1',
+          },
+          {
+            eventType: 'SLIDER_ACTION',
+            sessionId: createdSession.id,
+            timestamp: Date.now() - 30,
+            toNodeId: 'TEST_QUESTION_1',
+            sliderValue: {
+              value: 70,
+              relatedNodeId: 'TEST_QUESTION_1',
+              timeSpent: 10,
+            }
+          }
+        ]
+      }
+    },
+  );
+
+  const session = await sessionService.findSessionById(createdSession.id);
+  expect(session.events).toHaveLength(2);
+
+  // Even if navigation is sent first, the timestamp puts it "after" the slider event
+  expect(session.events[0].eventType).toEqual(SessionEventType.SLIDER_ACTION);
+  expect(session.events[1].eventType).toEqual(SessionEventType.NAVIGATION);
 });
