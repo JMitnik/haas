@@ -1,24 +1,34 @@
-import { useStore } from "components/Dialogue/DialogueRouter";
+import * as UI from '@haas/ui';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+
+import { QuestionNodeContainer, QuestionNodeTitle } from 'components/QuestionNode/QuestionNodeStyles';
 import { QuestionNodeProps } from "components/QuestionNode/QuestionNodeTypes";
 import { useSession } from "components/Session/SessionProvider";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { SessionEventType } from "types/generated-types";
 import { findSliderChildEdge } from "./findSliderChildEdge";
+import { SliderBunny } from './SliderBunny';
+import { NodeLayout } from 'components/QuestionNode/NodeLayout';
 
 export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
-  const ref = useRef<HTMLInputElement>();
+  const { t } = useTranslation();
+  const startTime = useRef(new Date());
+  const form = useForm({
+    defaultValues: {
+      slider: 50,
+    },
+  });
   const { sessionId } = useSession();
-  const { activeCallToAction } = useStore(state => ({
-    activeCallToAction: state.activeCallToAction
-  }));
+  const getValues = form.getValues;
 
   /**
    * Handles a sliding action: find child and pass that child to par
    */
-  const handleRunAction = () => {
-    const sliderValue = parseInt(ref.current.value, 10);
+  const handleRunAction = useCallback(() => {
+    const sliderValue = parseInt(getValues().slider as unknown as string, 10);
     const nextEdge = findSliderChildEdge(sliderValue, node.children);
-    const nextNodeId = nextEdge.childNode.id || activeCallToAction.id;
+    const nextNodeId = nextEdge.childNode.id;
 
     onRunAction({
       event: {
@@ -28,19 +38,28 @@ export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
         sliderValue: {
           relatedNodeId: node.id,
           value: sliderValue,
-          // TODO: Measure
-          timeSpent: 0,
+          timeSpent: new Date().getTime() - startTime.current.getTime(),
         },
         timestamp: new Date(),
       },
       activeCallToAction: node.overrideLeaf,
     })
-  };
+  }, [getValues, sessionId, node, onRunAction]);
 
   return (
-    <form onSubmit={(e) => {e.preventDefault(); handleRunAction()}}>
-      <input ref={ref} type="range" min="0" max="100" name="slider" />
-      <button>Submit</button>
-    </form>
+    <QuestionNodeContainer>
+      <NodeLayout node={node}>
+        <QuestionNodeTitle>{node.title}</QuestionNodeTitle>
+        <UI.Div position="relative">
+          <SliderBunny
+            form={form}
+            onSubmit={handleRunAction}
+            happyText={node.sliderNode?.happyText || t('happy')}
+            unhappyText={node.sliderNode?.unhappyText || t('unhappy')}
+            markers={node.sliderNode?.markers || []}
+          />
+        </UI.Div>
+      </NodeLayout>
+    </QuestionNodeContainer>
   )
-}
+};

@@ -13,6 +13,23 @@ fragment QuestionNodeFragment on QuestionNode {
       id
     }
   }
+
+  sliderNode {
+    id
+    happyText
+    unhappyText
+    markers {
+      id
+      label
+      subLabel
+      range {
+        id
+        start
+        end
+      }
+    }
+  }
+
   overrideLeaf {
     id
     title

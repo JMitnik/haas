@@ -7,7 +7,7 @@ export const SessionQueryModel = {
       dialogue: true,
       events: {
         orderBy: {
-          clientEventAt: 'asc',
+          timestamp: 'asc',
         },
         include: {
           choiceValue: true,

@@ -1604,7 +1604,7 @@ export type SessionEventInput = {
   sessionId: Scalars['String'];
   sliderValue?: Maybe<SessionEventSliderValueInput>;
   timestamp: Scalars['Date'];
-  toNodeId: Scalars['String'];
+  toNodeId?: Maybe<Scalars['String']>;
 };
 
 /** Input type of a SessionEvent for Sliders. */
@@ -2046,6 +2046,17 @@ export type QuestionNodeFragmentFragment = (
       & Pick<QuestionNode, 'id'>
     )> }
     & EdgeFragmentFragment
+  )>, sliderNode?: Maybe<(
+    { __typename?: 'SliderNodeType' }
+    & Pick<SliderNodeType, 'id' | 'happyText' | 'unhappyText'>
+    & { markers?: Maybe<Array<(
+      { __typename?: 'SliderNodeMarkerType' }
+      & Pick<SliderNodeMarkerType, 'id' | 'label' | 'subLabel'>
+      & { range?: Maybe<(
+        { __typename?: 'SliderNodeRangeType' }
+        & Pick<SliderNodeRangeType, 'id' | 'start' | 'end'>
+      )> }
+    )>> }
   )>, overrideLeaf?: Maybe<(
     { __typename?: 'QuestionNode' }
     & Pick<QuestionNode, 'id' | 'title' | 'type'>
@@ -2124,6 +2135,21 @@ export const QuestionNodeFragmentFragmentDoc = gql`
     }
     childNode {
       id
+    }
+  }
+  sliderNode {
+    id
+    happyText
+    unhappyText
+    markers {
+      id
+      label
+      subLabel
+      range {
+        id
+        start
+        end
+      }
     }
   }
   overrideLeaf {

@@ -332,7 +332,7 @@ class SessionPrismaAdapter {
         session: { connect: { id: sessionEventInput.sessionId } },
         timestamp: sessionEventInput.timestamp,
         eventType: sessionEventInput.eventType,
-        toNode: sessionEventInput.toNodeId,
+        toNode: sessionEventInput.toNodeId || '',
         sliderValue: this.constructCreateSessionEventSliderValue(
           sessionEventInput,
           sessionEventInput.sliderValue || undefined

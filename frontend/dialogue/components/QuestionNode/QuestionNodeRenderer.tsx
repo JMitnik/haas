@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 
 import { Dialogue, Workspace, QuestionNode as QuestionNodeType, SessionEventInput } from 'types/helper-types';
 import { QuestionNodeTypeEnum, SessionEventType } from 'types/generated-types';
@@ -37,7 +37,7 @@ function useDebouncedEffect(fn, deps, time) {
 }
 
 export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodeProps) => {
-  const { nodeId } = useParams();
+  const { workspace, dialogue: dialogueSlug, nodeId } = useParams();
   const { popActionQueue, queuedActionEvents, setActiveCallToAction, logAction, getCurrentNode, actionEvents } = useStore(state => ({
     activeCallToAction: state.activeCallToAction,
     getCurrentNode: state.getCurrentNode,
@@ -64,6 +64,18 @@ export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodePr
     }
   }, [sessionId, currentNode, navigationType, logAction]);
 
+  // TODO: Make this work
+//   useEffect(() => {
+//     return () => {
+//        window.addEventListener("beforeunload", function(e) {
+//           if (queuedActionEvents.length > 0) {
+//             const actionEvents = popActionQueue();
+//             onEventUpload?.(actionEvents);
+//           }
+//        });
+//     }
+//  });
+
   // Upload every 2000 ms the events (to batch them).
   // - TODO: The uploader should be a three-stage process, to be resilient to network errors.:
   // - 1. Upload the events to the main API
@@ -79,16 +91,16 @@ export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodePr
 
   const QuestionNode = NodeComponent[currentNode.type];
 
-  const handleRunAction = (input: RunActionInput) => {
+  const handleRunAction = useCallback((input: RunActionInput) => {
     logAction(input.event);
     setActiveCallToAction(input.activeCallToAction);
 
     if (input.event.toNodeId) {
-      navigate(`n/${input.event.toNodeId}`);
+      navigate(`/${workspace}/${dialogueSlug}/n/${input.event.toNodeId}`);
     } else {
-      navigate(`n/cta`);
+      navigate(`/${workspace}/${dialogueSlug}/n/cta`);
     }
-  }
+  }, [workspace, dialogueSlug, navigate, logAction, setActiveCallToAction]);
 
   return (
     <QuestionNode node={currentNode} onRunAction={handleRunAction}  />

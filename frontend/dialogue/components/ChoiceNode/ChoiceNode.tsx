@@ -20,13 +20,12 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
     const choice = choices[choiceIndex];
     const childEdge = findChoiceChildEdge(choice, node.children);
     const childNode = childEdge?.childNode || activeCallToAction;
-    console.log(childNode);
-
+    console.log({ activeCallToAction, childNode });
     onRunAction({
       event: {
         sessionId,
         timestamp: new Date(),
-        toNodeId: childNode.id,
+        toNodeId: childNode?.id,
         eventType: SessionEventType.ChoiceAction,
         choiceValue: {
           relatedNodeId: node.id,
@@ -35,7 +34,7 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
           timeSpent: 0,
         }
       },
-      activeCallToAction: choice.overrideLeaf || node.overrideLeaf,
+      activeCallToAction: choice.overrideLeaf || node.overrideLeaf || activeCallToAction,
     });
   }
 

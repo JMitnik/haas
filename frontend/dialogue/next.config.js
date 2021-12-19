@@ -1,4 +1,6 @@
-module.exports = {
+const withSvgr = require('next-plugin-svgr');
+
+module.exports = withSvgr({
   reactStrictMode: true,
   experimental: {
     externalDir: true,
@@ -13,4 +15,4 @@ module.exports = {
       },
     ];
   }
-}
+});

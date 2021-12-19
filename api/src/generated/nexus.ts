@@ -394,7 +394,7 @@ export interface NexusGenInputs {
     sessionId: string; // String!
     sliderValue?: NexusGenInputs['SessionEventSliderValueInput'] | null; // SessionEventSliderValueInput
     timestamp: any; // Date!
-    toNodeId: string; // String!
+    toNodeId?: string | null; // String
   }
   SessionEventSliderValueInput: { // input type
     relatedNodeId: string; // String!

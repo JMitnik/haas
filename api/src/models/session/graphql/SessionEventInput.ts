@@ -48,7 +48,7 @@ export const SessionEventInput = inputObjectType({
     t.field('eventType', { type: SessionEventType, required: true });
 
     // Identifier for which node the event leads to.
-    t.string('toNodeId', { required: true });
+    t.string('toNodeId');
 
     t.field('choiceValue', { type: SessionEventChoiceValueInput });
 

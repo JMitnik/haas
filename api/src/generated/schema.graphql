@@ -1126,7 +1126,7 @@ input SessionEventInput {
   sessionId: String!
   sliderValue: SessionEventSliderValueInput
   timestamp: Date!
-  toNodeId: String!
+  toNodeId: String
 }
 
 """Input type of a SessionEvent for Sliders."""
