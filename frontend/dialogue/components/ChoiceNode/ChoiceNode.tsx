@@ -1,7 +1,12 @@
+import * as UI from '@haas/ui';
+
 import { useStore } from 'components/Dialogue/DialogueRouter';
+import { NodeLayout } from 'components/QuestionNode/NodeLayout';
+import { QuestionNodeTitle } from 'components/QuestionNode/QuestionNodeStyles';
 import { QuestionNodeProps } from 'components/QuestionNode/QuestionNodeTypes';
 import { useSession } from 'components/Session/SessionProvider';
 import { SessionEventType } from 'types/generated-types';
+import { ChoiceNodeButtonLayout } from './ChoiceNodeButtonLayout';
 import { findChoiceChildEdge } from './findChoiceChildEdge';
 
 
@@ -39,18 +44,22 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
   }
 
   return (
-    <div>
-      {node.title}
+    <NodeLayout node={node}>
+      <QuestionNodeTitle>
+        {node.title}
+      </QuestionNodeTitle>
 
-      {choices.map((choice, index) => (
-        <button
+      <ChoiceNodeButtonLayout node={node}>
+        {choices.map((choice, index) => (
+          <UI.GradientButton
           style={{ margin: '10px' }}
           key={index}
           onClick={() => handleRunAction(index)}
-        >
-          {choice.value}
-        </button>
-      ))}
-    </div>
+          >
+            {choice.value}
+          </UI.GradientButton>
+        ))}
+      </ChoiceNodeButtonLayout>
+    </NodeLayout>
   )
 }
