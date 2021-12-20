@@ -8,4 +8,4 @@ export interface RunActionInput {
 export interface QuestionNodeProps {
   node: QuestionNodeType;
   onRunAction: (input: RunActionInput) => void;
-};
+}

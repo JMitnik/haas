@@ -81,6 +81,7 @@ export const parseLanguages = (lang: string, input: any, output?: any) => {
 };
 
 export const lang = i18n.use(initReactI18next);
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 lang.init({
   resources: {
     de: {

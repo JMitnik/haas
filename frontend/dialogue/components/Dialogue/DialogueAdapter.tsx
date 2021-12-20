@@ -14,11 +14,11 @@ interface DialogueProps {
 export const DialogueAdapter = ({ dialogue, workspace, sessionId }: DialogueProps) => {
   const [uploadSessionEvents] = useUploadSessionEventsMutation();
 
-  const handleUploadEvents = (events: SessionEventInput[]) => {
-    uploadSessionEvents({
+  const handleUploadEvents = async (events: SessionEventInput[]) => {
+    await uploadSessionEvents({
       variables: {
-        input: { events, sessionId, }
-      }
+        input: { events, sessionId },
+      },
     });
   };
 

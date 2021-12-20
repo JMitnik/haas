@@ -7,7 +7,6 @@ import { Choice, Edge } from 'types/helper-types';
  * @returns
  */
 export const findChoiceChildEdge = (choice: Choice, edges: Edge[]): Edge => {
-  console.log(edges);
   const releventEdges = edges.filter(edge => {
     const relevantEdges = edge.conditions.filter(condition => {
       if (choice.value === condition.matchValue) {

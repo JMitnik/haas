@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect } from 'react'
+import { useNavigate, useNavigationType, useParams } from 'react-router';
 
-import { Dialogue, Workspace, QuestionNode as QuestionNodeType, SessionEventInput } from 'types/helper-types';
+import { Dialogue, SessionEventInput } from 'types/helper-types';
 import { QuestionNodeTypeEnum, SessionEventType } from 'types/generated-types';
 import { SliderNode } from 'components/SliderNode/SliderNode';
 import { ChoiceNode } from 'components/ChoiceNode/ChoiceNode';
 import { useStore } from 'components/Dialogue/DialogueRouter';
+import { useSession } from 'components/Session/SessionProvider';
 
 import { QuestionNodeProps as GenericQuestionNodeProps, RunActionInput } from './QuestionNodeTypes';
-import { useNavigate, useNavigationType, useParams } from 'react-router';
-import { useSession } from 'components/Session/SessionProvider';
 
 interface QuestionNodeProps {
   dialogue: Dialogue;
@@ -38,7 +38,7 @@ function useDebouncedEffect(fn, deps, time) {
 
 export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodeProps) => {
   const { workspace, dialogue: dialogueSlug, nodeId } = useParams();
-  const { popActionQueue, queuedActionEvents, setActiveCallToAction, logAction, getCurrentNode, actionEvents } = useStore(state => ({
+  const { popActionQueue, queuedActionEvents, setActiveCallToAction, logAction, getCurrentNode } = useStore(state => ({
     activeCallToAction: state.activeCallToAction,
     getCurrentNode: state.getCurrentNode,
     actionEvents: state.actionEvents,

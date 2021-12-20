@@ -6,9 +6,9 @@ import { QuestionNodeTitle } from 'components/QuestionNode/QuestionNodeStyles';
 import { QuestionNodeProps } from 'components/QuestionNode/QuestionNodeTypes';
 import { useSession } from 'components/Session/SessionProvider';
 import { SessionEventType } from 'types/generated-types';
+
 import { ChoiceNodeButtonLayout } from './ChoiceNodeButtonLayout';
 import { findChoiceChildEdge } from './findChoiceChildEdge';
-
 
 /**
  * ChoiceNode: dialogue segment where a button press leads to the next item.
@@ -18,14 +18,14 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
   const choices = node.options || [];
 
   const { activeCallToAction } = useStore(state => ({
-    activeCallToAction: state.activeCallToAction
-  }));
+    activeCallToAction: state.activeCallToAction,
+   }));
 
   const handleRunAction = (choiceIndex: number) => {
     const choice = choices[choiceIndex];
     const childEdge = findChoiceChildEdge(choice, node.children);
     const childNode = childEdge?.childNode || activeCallToAction;
-    console.log({ activeCallToAction, childNode });
+
     onRunAction({
       event: {
         sessionId,
@@ -37,7 +37,7 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
           optionId: `${choice.id}`,
           value: choice.value,
           timeSpent: 0,
-        }
+        },
       },
       activeCallToAction: choice.overrideLeaf || node.overrideLeaf || activeCallToAction,
     });

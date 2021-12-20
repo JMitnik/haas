@@ -10,18 +10,18 @@ interface SliderAnimationStateProps {
   speed: number;
   direction: number;
   position: number;
-  animationJson: any;
+  animationJson: object;
 }
 
 interface AnimationPayload {
   speed?: number;
-  position?: number
+  position?: number;
 }
 
 type SliderAnimationActionType =
-  | { type: 'idle', payload?: AnimationPayload }
-  | { type: 'run', payload: AnimationPayload }
-  | { type: 'stop', payload?: AnimationPayload };
+  | { type: 'idle'; payload?: AnimationPayload }
+  | { type: 'run'; payload: AnimationPayload }
+  | { type: 'stop'; payload?: AnimationPayload };
 
 export const defaultSliderAnimationState: SliderAnimationStateProps = {
   isStopped: true,

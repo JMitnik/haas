@@ -1,9 +1,10 @@
 import * as UI from '@haas/ui';
-import { ReactChild } from 'react';
+import { ReactNode } from 'react';
+
 import { QuestionNode } from 'types/helper-types'
 
 interface NodeLayoutProps {
-  children: ReactChild;
+  children: ReactNode;
   node: QuestionNode;
 }
 
@@ -17,7 +18,7 @@ interface NodeLayoutProps {
  * layout is used for both desktop and mobile.
  * @returns
  */
-export const NodeLayout = ({ node, children }) => {
+export const NodeLayout = ({ children }: NodeLayoutProps) => {
   return (
     <UI.Container height="100%">
       <UI.ColumnFlex height="100%" justifyContent="space-between">

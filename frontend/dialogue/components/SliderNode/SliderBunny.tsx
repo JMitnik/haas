@@ -12,11 +12,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
 import { SliderNodeMarkerType } from 'types/generated-types';
-import HappyIcon from './icon-happy.svg';
-import UnhappyIcon from './icon-unhappy.svg';
-import FingerIcon from './icon-fingerprint.svg';
 
+import UnhappyIcon from './icon-unhappy.svg';
+import HappyIcon from './icon-happy.svg';
 import * as LS from './SliderNodeStyles';
+import FingerIcon from './icon-fingerprint.svg';
 import { SlideMeAnimation } from './SliderNodeAnimations';
 import { SliderText } from './SliderText';
 import { useBunnySliderAnimation } from './useBunnySliderAnimation';
@@ -54,8 +54,8 @@ interface SliderBunnyProps {
 }
 
 // Number of seconds that are still too fast for a slide.
-const earlyReleaseThresholdSeconds: number = 5;
-const endTime: number = 5;
+const earlyReleaseThresholdSeconds = 5;
+const endTime = 5;
 
 export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }: SliderBunnyProps) => {
   const { t } = useTranslation();
@@ -109,7 +109,7 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
   /**
    * Move the bunny, and update the slider value.
    */
-  const moveBunny = (event: React.FormEvent<HTMLInputElement>) => {
+  const moveBunny = async (event: React.FormEvent<HTMLInputElement>) => {
     const val = Number(event.currentTarget.value);
     form.setValue('slider', val);
 

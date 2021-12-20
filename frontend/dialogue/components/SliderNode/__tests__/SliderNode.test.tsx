@@ -1,6 +1,8 @@
 import { render } from '@testing-library/react';
+
 import { QuestionNodeTypeEnum } from 'types/generated-types';
 import { QuestionNode } from 'types/helper-types';
+
 import { SliderNode } from '../SliderNode';
 
 const sampleSliderNode: QuestionNode = {

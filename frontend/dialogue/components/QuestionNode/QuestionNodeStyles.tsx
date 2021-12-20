@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 export const QuestionNodeContainer = styled(UI.Div)`
   height: 100%;
