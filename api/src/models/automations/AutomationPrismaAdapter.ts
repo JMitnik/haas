@@ -73,28 +73,6 @@ export class AutomationPrismaAdapter {
       }
     });
 
-    console.log('AGGREGRATE LATEST: ', aggregate?.latest);
-
-    // const aggregatedChoiceNodeEntries = await this.prisma.choiceNodeEntry.groupBy({
-    //   by: ['value'],
-    //   _count: {
-    //     value: true,
-    //   },
-    //   where: {
-    //     nodeEntry: {
-    //       relatedNodeId: questionId,
-    //       creationDate: {
-    //         lte: aggregate?.endDate || undefined,
-    //         gte: aggregate?.startDate || undefined,
-    //       }
-    //     },
-    //   },
-    //   take: aggregate?.latest || undefined,
-    //   orderBy: {
-    //     value: 'desc',
-    //   },
-    // });
-
     const aggregatedChoices = await this.prisma.choiceNodeEntry.findMany({
       where: {
         nodeEntry: {
@@ -116,22 +94,6 @@ export class AutomationPrismaAdapter {
     // console.log('Aggregated choice node entries: ', aggregatedChoiceNodeEntries);
 
     return { totalEntries: totalAmountChoiceValues, aggregatedValues: countedChoices };
-  }
-
-  aggregateScopedQuestions = async (
-    questionId: string,
-    type: NodeType,
-    aspect: QuestionAspect,
-    aggregate?: ConditionPropertAggregateInput | null,
-  ) => {
-    // TODO: In the case we have 2 events triggered fast after each other than both might only look to the latest entry 🤔
-
-    // TODO: Handle choice questions through different QuestionAspects (NODE_VALUE -> SLIDER_NODE_VALUE & NODE_VALUE -> CHOICE_NODE_VALUE)
-    // OR by giving questionType as parameter to this question and based on that 
-    // => aggregate different database tables (sliderNodeEntry vs choiceNodeEntry)
-    if (type === 'SLIDER') return this.aggregateScopedSliderNodeEntries(questionId, aspect, aggregate);
-    if (type === 'CHOICE') return this.aggregateScopedChoiceNodeEntries(questionId, aspect, aggregate);
-    return null;
   }
 
   /**

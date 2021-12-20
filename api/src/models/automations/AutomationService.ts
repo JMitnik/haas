@@ -32,6 +32,11 @@ class AutomationService {
     this.dialogueService = new DialogueService(prisma);
   }
 
+  /**
+   * Sets up the data necessary for comparing slider data with the condition match value
+   * @param input object containing 
+   * @returns an object containing the value to be compared, the match value it should be checked against and total entries 
+   */
   setupSliderCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
     const { questionId, aspect, aggregate, matchValues } = input;
     const scopedSliderNodeEntries = await this.automationPrismaAdapter.aggregateScopedSliderNodeEntries(questionId, aspect, aggregate);
@@ -45,6 +50,11 @@ class AutomationService {
     }
   }
 
+  /**
+  * Sets up the data necessary for comparing choice data with the condition match value
+  * @param input object containing 
+  * @returns an object containing the value to be compared, the match value it should be checked against and total entries 
+  */
   setupChoiceCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
     let compareValue: number | null;
     const { questionId, aspect, aggregate, matchValues } = input;
@@ -64,6 +74,11 @@ class AutomationService {
     }
   }
 
+  /**
+  * Sets up the data necessary for comparing question data with the condition match value
+  * @param input object containing 
+  * @returns an object containing the value to be compared, the match value it should be checked against and total entries 
+  */
   setupQuestionCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
     if (input.type === 'SLIDER') return this.setupSliderCompareData(input);
     if (input.type === 'CHOICE') return this.setupChoiceCompareData(input);
