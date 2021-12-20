@@ -106,6 +106,7 @@ const authShield = shield({
     requestInvite: allow,
     uploadUpsellImage: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
     deleteCustomer: isSuperAdmin,
+    createAutomationToken: isSuperAdmin,
 
     createAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_AUTOMATIONS)),
     updateAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_UPDATE_AUTOMATIONS)),

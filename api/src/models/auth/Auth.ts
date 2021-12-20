@@ -25,6 +25,17 @@ export const RegisterInput = inputObjectType({
   },
 });
 
+export const CreateAutomationToken = mutationField('createAutomationToken', {
+  type: 'String',
+  nullable: true,
+  args: { 'email': 'String' },
+
+  async resolve(parent, args, ctx) {
+    if (!args.email) throw new ApolloError('No email address provided!');
+    return ctx.services.authService.createAutomationToken(args.email, 262974);
+  }
+});
+
 export const RegisterMutation = mutationField('register', {
   type: 'String',
   nullable: true,

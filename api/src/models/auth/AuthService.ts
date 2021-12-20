@@ -82,6 +82,21 @@ class AuthService {
   }
 
   /**
+  * 
+  * @param emailAddress The email address of the target user (e.g. automations@haas.live)
+  * @param duration the amount of time the token is valid for in minutes
+  * @returns a JWT token
+  */
+  createAutomationToken(emailAddress: string, duration: number | null = null) {
+    const tokenMinutes = duration || config.jwtExpiryMinutes;
+
+    return jwt.sign({
+      email: emailAddress,
+      exp: Math.floor(Date.now() / 1000) + (tokenMinutes * 60),
+    }, config.apiSecret);
+  }
+
+  /**
    * 
    * @param userId The id of the target user
    * @param duration the amount of time the token is valid for in minutes

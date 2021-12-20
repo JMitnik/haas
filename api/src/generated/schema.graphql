@@ -983,6 +983,7 @@ type Mutation {
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
   createAutomation(input: CreateAutomationResolverInput): AutomationModel!
+  createAutomationToken(email: String): String
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
   createCampaign(input: CreateCampaignInputType): CampaignType!
 
@@ -1488,6 +1489,7 @@ input SocialNodeEntryInput {
 
 enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
+  CAN_ACCESS_REPORT_PAGE
   CAN_ADD_USERS
   CAN_BUILD_DIALOGUE
   CAN_CREATE_AUTOMATIONS
