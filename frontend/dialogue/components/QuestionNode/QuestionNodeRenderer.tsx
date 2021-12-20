@@ -7,6 +7,7 @@ import { SliderNode } from 'components/SliderNode/SliderNode';
 import { ChoiceNode } from 'components/ChoiceNode/ChoiceNode';
 import { useStore } from 'components/Dialogue/DialogueRouter';
 import { useSession } from 'components/Session/SessionProvider';
+import { LinkNode } from 'components/LinkNode/LinkNode';
 
 import { QuestionNodeProps as GenericQuestionNodeProps, RunActionInput } from './QuestionNodeTypes';
 
@@ -20,7 +21,7 @@ const NodeComponent: { [key in QuestionNodeTypeEnum]?: React.FC<GenericQuestionN
   [QuestionNodeTypeEnum.Choice]: ChoiceNode,
   [QuestionNodeTypeEnum.Textbox]: ChoiceNode,
   [QuestionNodeTypeEnum.Form]: ChoiceNode,
-  [QuestionNodeTypeEnum.Link]: ChoiceNode,
+  [QuestionNodeTypeEnum.Link]: LinkNode,
   [QuestionNodeTypeEnum.Registration]: ChoiceNode,
   [QuestionNodeTypeEnum.VideoEmbedded]: ChoiceNode,
 };
