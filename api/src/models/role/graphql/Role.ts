@@ -104,7 +104,7 @@ export const RoleQueries = extendType({
 
         return {
           roles,
-          permissions,
+          permissions: [],
           pageInfo,
           // TODO: Figure out what to do with these?
           limit: args.filter?.limit || 0,
