@@ -493,6 +493,7 @@ enum RoleTypeEnum {
   USER
   GUEST
   CUSTOM
+  BOT
 }
 
 model Role {

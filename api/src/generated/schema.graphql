@@ -17,6 +17,11 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+input AuthenticateLambdaInput {
+  authenticateEmail: String
+  workspaceEmail: String
+}
+
 type AutodeckConnectionType implements DeprecatedConnectionInterface {
   cursor: String
   endDate: String
@@ -980,6 +985,7 @@ enum MatchValueType {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
   createAutomation(input: CreateAutomationResolverInput): AutomationModel!

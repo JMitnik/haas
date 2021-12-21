@@ -63,6 +63,25 @@ class AuthService {
     return user;
   }
 
+  async verifyLambdaAuthentication(authorizationHeader: string) {
+    try {
+      const verified = jwt.verify(authorizationHeader, config.apiSecret);
+      console.log('Verified: ', verified);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async getWorkspaceAuthorizationToken(authorizationHeader: string, workspaceEmail: string) {
+    const isVerified = this.verifyLambdaAuthentication(authorizationHeader);
+    if (!isVerified) throw new Error('CALL WAS REJECTED BECAUSE HEADER VERIFICATION WAS REJECTED');
+    const user = await this.userService.getUserByEmail(workspaceEmail);
+    if (!user) throw new Error('No matching email address was found in our systems');
+    const token = AuthService.createUserToken(user.id);
+    return token;
+  }
+
   /**
    * 
    * @param userId the id of the target user
