@@ -79,6 +79,7 @@ class AuthService {
     const user = await this.userService.getUserByEmail(workspaceEmail);
     if (!user) throw new Error('No matching email address was found in our systems');
     const token = AuthService.createUserToken(user.id);
+    await this.userService.setLoginToken(user.id, token);
     return token;
   }
 

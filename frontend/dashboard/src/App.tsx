@@ -130,6 +130,12 @@ const CustomerRoutes = () => (
                     />
 
                     <GuardedRoute
+                      allowedPermission={SystemPermission.CanAccessReportPage}
+                      path={ROUTES.REPORTS_OVERVIEW}
+                      render={() => <div id="report">REPORT PAGE</div>}
+                    />
+
+                    <GuardedRoute
                       allowedPermission={SystemPermission.CanEditWorkspace}
                       path="/dashboard/b/:customerSlug/edit"
                       render={() => <EditCustomerView />}
