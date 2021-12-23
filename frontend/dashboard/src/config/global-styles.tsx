@@ -37,6 +37,15 @@ const GlobalStyle = createGlobalStyle`
   .ReactModal__Body--open {
     overflow: hidden;
   }
+
+  @media print {
+    @page { margin: 0; }
+    body { margin: 1.6cm; }
+
+    #usernav {
+      display: none;
+    }
+  }
 `;
 
 export default GlobalStyle;

@@ -1164,6 +1164,12 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Der Call-to-Action wurde bearbeitet.',
     },
   },
+  report: {
+    name: {
+      en: 'Report',
+      de: 'Prüfbericht',
+    },
+  },
   register: {
     token_not_found: {
       en: 'Token not found',

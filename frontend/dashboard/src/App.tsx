@@ -8,7 +8,9 @@ import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DialogueProvider } from 'providers/DialogueProvider';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
+import { ReportView } from 'views/ReportView';
 import { SystemPermission } from 'types/generated-types';
+import { sub } from 'date-fns';
 import { useUser } from 'providers/UserProvider';
 import ActionsPage from 'pages/dashboard/actions';
 import AddCustomerPage from 'pages/dashboard/customers/add';
@@ -84,6 +86,7 @@ const CustomerRoutes = () => (
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                       render={() => <DialoguePage />}
                     />
+
                   </Switch>
                 </DialogueLayout>
               )}
@@ -127,12 +130,6 @@ const CustomerRoutes = () => (
                       allowedPermission={SystemPermission.CanCreateTriggers}
                       path="/dashboard/b/:customerSlug/triggers"
                       render={() => <TriggersOverview />}
-                    />
-
-                    <GuardedRoute
-                      allowedPermission={SystemPermission.CanAccessReportPage}
-                      path={ROUTES.REPORTS_OVERVIEW}
-                      render={() => <div id="report">REPORT PAGE</div>}
                     />
 
                     <GuardedRoute
@@ -190,6 +187,28 @@ const PublicRoutes = () => (
   </Switch>
 );
 
+const ReportRoutes = () => (
+  <AnimatePresence>
+    <CustomerProvider>
+      <DialogueProvider>
+        <Switch>
+          <GuardedRoute
+            allowedPermission={SystemPermission.CanAccessReportPage}
+            path={ROUTES.WEEKLY_REPORT_VIEW}
+            render={() => (
+              <ReportView
+                startDate={sub(new Date(), { weeks: 1 })}
+                dateLabel="last_week"
+                compareStatisticStartDate={sub(new Date(), { weeks: 2 })}
+              />
+            )}
+          />
+        </Switch>
+      </DialogueProvider>
+    </CustomerProvider>
+  </AnimatePresence>
+);
+
 const RootAppRoute = () => {
   const { isLoggedIn } = useUser();
 
@@ -218,6 +237,7 @@ const AppRoutes = () => (
         )}
       />
 
+      <Route path="/dashboard/b/:customerSlug/d/:dialogueSlug/_reports" render={() => <ReportRoutes />} />
       <Route path="/dashboard/b/:customerSlug" render={() => <CustomerRoutes />} />
 
       <GuardedRoute
