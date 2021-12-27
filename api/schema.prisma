@@ -154,6 +154,8 @@ model FormNodeField {
   FormNode               FormNode?                @relation(fields: [formNodeId], references: [id])
   formNodeId             String?
   FormNodeFieldEntryData FormNodeFieldEntryData[]
+
+  sessionFormNodeEvents SessionEventFormValue[]
 }
 
 model FormNode {
@@ -242,6 +244,7 @@ model QuestionNode {
 
   choiceEvents SessionEventChoiceValue[]
   sliderEvents SessionEventSliderValue[]
+  formEvents   SessionEventFormValues[]
 
   isChildNodeOf              Edge[]      @relation("Edge_childNodeToQuestionNode")
   isParentNodeOf             Edge[]      @relation("Edge_parentNodeToQuestionNode")
@@ -374,6 +377,7 @@ model Session {
 enum SessionEventType {
   CHOICE_ACTION
   SLIDER_ACTION
+  FORM_ACTION
   NAVIGATION
 }
 
@@ -393,6 +397,8 @@ model SessionEvent {
   sliderValue   SessionEventSliderValue? @relation(fields: [sliderValueId], references: [id])
   choiceValueId String?
   choiceValue   SessionEventChoiceValue? @relation(fields: [choiceValueId], references: [id])
+  formValueId   String?
+  formValue     SessionEventFormValues?   @relation(fields: [formValueId], references: [id])
 
   timestamp DateTime
   toNode        String
@@ -434,6 +440,45 @@ model SessionEventChoiceValue {
 
   // Meta statistics
   timeSpentInSec Int
+}
+
+model SessionEventFormValues {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessionEventId String?
+  sessionEvent   SessionEvent?
+
+  values SessionEventFormValue[]
+
+  // Linked node
+  nodeId String
+  node   QuestionNode @relation(fields: [nodeId], references: [id])
+
+  // Meta statistics
+  timeSpentInSec Int
+}
+
+model SessionEventFormValue {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessionFormEventId String
+  sessionFormEvent   SessionEventFormValues @relation(fields: [sessionFormEventId], references: [id])
+
+  // Data property (belonging to a specific field)
+  email       String?
+  phoneNumber String?
+  url         String?
+  shortText   String?
+  longText    String?
+  number      Int?
+
+  // The related field (relation)
+  relatedFieldId  String
+  relatedField    FormNodeField  @relation(references: [id], fields: [relatedFieldId])
 }
 
 // Node-entry types

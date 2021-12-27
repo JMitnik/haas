@@ -30,6 +30,19 @@ fragment QuestionNodeFragment on QuestionNode {
     }
   }
 
+  form {
+    id
+    helperText
+    fields {
+      id
+      label
+      type
+      placeholder
+      isRequired
+      position
+    }
+  }
+
   overrideLeaf {
     id
     title

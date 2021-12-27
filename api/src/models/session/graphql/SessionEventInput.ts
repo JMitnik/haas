@@ -1,4 +1,5 @@
 import { inputObjectType } from '@nexus/schema';
+import { FormNodeEntryFieldInput } from '../../node-entry/NodeEntry';
 import { SessionEventType } from './SessionEventType';
 
 export const SessionEventChoiceValueInput = inputObjectType({
@@ -36,6 +37,21 @@ export const SessionEventSliderValueInput = inputObjectType({
   },
 });
 
+export const SessionEventFormValueInput = inputObjectType({
+  name: 'SessionEventFormValueInput',
+  description: 'Input type of a SessionEvent for a form.',
+
+  definition(t) {
+    t.list.field('values', { type: FormNodeEntryFieldInput });
+
+    // Require that the related node of the choice is specificed.
+    t.string('relatedNodeId', { required: true });
+
+    // How much time did the user spend to create this event.
+    t.int('timeSpent');
+  },
+});
+
 export const SessionEventInput = inputObjectType({
   name: 'SessionEventInput',
   description: 'Input type of a SessionEvent',
@@ -54,5 +70,8 @@ export const SessionEventInput = inputObjectType({
 
     // Field value for slider
     t.field('sliderValue', { type: SessionEventSliderValueInput });
+
+    // Field value for form-node
+    t.field('formValue', { type: SessionEventFormValueInput });
   },
 });

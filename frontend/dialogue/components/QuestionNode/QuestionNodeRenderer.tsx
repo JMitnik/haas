@@ -8,6 +8,7 @@ import { ChoiceNode } from 'components/ChoiceNode/ChoiceNode';
 import { useStore } from 'components/Dialogue/DialogueRouter';
 import { useSession } from 'components/Session/SessionProvider';
 import { LinkNode } from 'components/LinkNode/LinkNode';
+import FormNode from 'components/FormNode/FormNode';
 
 import { QuestionNodeProps as GenericQuestionNodeProps, RunActionInput } from './QuestionNodeTypes';
 
@@ -20,7 +21,7 @@ const NodeComponent: { [key in QuestionNodeTypeEnum]?: React.FC<GenericQuestionN
   [QuestionNodeTypeEnum.Slider]: SliderNode,
   [QuestionNodeTypeEnum.Choice]: ChoiceNode,
   [QuestionNodeTypeEnum.Textbox]: ChoiceNode,
-  [QuestionNodeTypeEnum.Form]: ChoiceNode,
+  [QuestionNodeTypeEnum.Form]: FormNode,
   [QuestionNodeTypeEnum.Link]: LinkNode,
   [QuestionNodeTypeEnum.Registration]: ChoiceNode,
   [QuestionNodeTypeEnum.VideoEmbedded]: ChoiceNode,
@@ -92,16 +93,27 @@ export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodePr
 
   const QuestionNode = NodeComponent[currentNode.type];
 
+  const goToNextState = (stateNavigation) => {
+
+  }
+
   const handleRunAction = useCallback((input: RunActionInput) => {
     logAction(input.event);
-    setActiveCallToAction(input.activeCallToAction);
+
+    // We cannot unset an active-call-to-action momentarily, only override it.
+    const activeCallToAction = setActiveCallToAction(input.activeCallToAction);
+
+    goToNextState();
 
     if (input.event.toNodeId) {
       navigate(`/${workspace}/${dialogueSlug}/n/${input.event.toNodeId}`);
-    } else {
-      navigate(`/${workspace}/${dialogueSlug}/n/cta`);
+    } else if (activeCallToAction) {
+      navigate(`/${workspace}/${dialogueSlug}/n/${activeCallToAction.id}`);
+      // TODO: Account for the fact
+    } else if (currentNode.id === activeCallToAction.id) {
+      navigate(`/${workspace}/${dialogueSlug}/n/finisher`);
     }
-  }, [workspace, dialogueSlug, navigate, logAction, setActiveCallToAction]);
+  }, [workspace, dialogueSlug, navigate, logAction, setActiveCallToAction, currentNode]);
 
   return (
     <QuestionNode node={currentNode} onRunAction={handleRunAction}  />

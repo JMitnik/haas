@@ -1,18 +1,15 @@
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
-
-import { CreateSessionDocument, CreateSessionMutation, CreateSessionMutationVariables, Customer, Dialogue as DialogueType, GetDialogueDocument, GetDialogueQuery, GetDialogueQueryResult, GetDialogueQueryVariables, useUploadSessionEventsMutation } from 'types/generated-types';
-import client from 'config/apollo';
-import Dialogue from 'components/Dialogue/Dialogue';
-import { SessionEventInput } from 'types/helper-types';
 import { ApolloProvider } from '@apollo/client';
+
+import { CreateSessionDocument, CreateSessionMutation, CreateSessionMutationVariables, Customer, Dialogue as DialogueType, GetDialogueDocument, GetDialogueQuery, GetDialogueQueryVariables } from 'types/generated-types';
+import client from 'config/apollo';
 import { DialogueAdapter } from 'components/Dialogue/DialogueAdapter';
 
 interface DialogueProps {
   sessionId: string;
   dialogue: DialogueType;
-  workspace: Customer
+  workspace: Customer;
 }
 
 const DialoguePage = ({ sessionId, dialogue, workspace }: DialogueProps) => {
@@ -49,7 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     variables: {
       customerSlug: context.query.workspace as string,
       dialogueSlug: context.query.dialogue as string,
-    }
+    },
   });
 
   if (!res.data.customer || !res.data.customer.dialogue) {
@@ -57,14 +54,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {},
       redirect: {
         destination: '/404',
-      }
+      },
     }
   }
 
 
   const session = await client.mutate<CreateSessionMutation, CreateSessionMutationVariables>({
     mutation: CreateSessionDocument,
-    variables: { input: { dialogueId: res.data.customer.dialogue.id } }
+    variables: { input: { dialogueId: res.data.customer.dialogue.id } },
   });
 
   const sessionId = session.data?.createSession?.id;
@@ -73,12 +70,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {},
       redirect: {
         destination: '/404',
-      }
+      },
     }
   }
-
-  const workspace = res.data.customer;
-  const dialogue = res.data.customer;
 
   return {
     props: {

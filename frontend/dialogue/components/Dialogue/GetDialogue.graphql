@@ -37,6 +37,20 @@ query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
         id
         title
         type
+
+        form {
+          id
+          helperText
+          fields {
+            id
+            label
+            type
+            placeholder
+            isRequired
+            position
+          }
+        }
+
         links {
           url
           type

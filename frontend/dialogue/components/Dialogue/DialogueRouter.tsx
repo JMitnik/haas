@@ -1,10 +1,16 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import create, { GetState, SetState } from 'zustand';
-import { Dialogue, Workspace, QuestionNode as QuestionNodeType, SessionEventInput } from 'types/helper-types';
-import { QuestionNodeRenderer } from 'components/QuestionNode/QuestionNodeRenderer';
 import { useEffect } from 'react';
 import { useNavigate, useParams, useResolvedPath } from 'react-router';
-import { SessionEventType } from 'types/generated-types';
+
+import { Dialogue, Workspace, QuestionNode as QuestionNodeType, SessionEventInput } from 'types/helper-types';
+import { QuestionNodeRenderer } from 'components/QuestionNode/QuestionNodeRenderer';
+import {
+  SessionEventType,
+  SessionEventSliderValueInput,
+  SessionEventChoiceValueInput,
+  SessionEventFormValueInput,
+} from 'types/generated-types';
 
 export interface SliderActionValue {
   value: number;
@@ -23,8 +29,9 @@ export type NodeActionValue = SliderActionValue;
 
 interface ActionValue {
   actionType: SessionEventType;
-  sliderValue?: SliderActionValue;
-  choiceValue?: ChoiceActionValue;
+  sliderValue?: SessionEventSliderValueInput;
+  choiceValue?: SessionEventChoiceValueInput;
+  formValue?: SessionEventFormValueInput;
 }
 
 export interface ActionEvent {
@@ -39,7 +46,7 @@ interface DialogueState {
   activeCallToAction?: QuestionNodeType;
   logAction: (actionEvent: SessionEventInput) => void;
   popActionQueue: () => SessionEventInput[];
-  setActiveCallToAction: (callToAction: QuestionNodeType) => void;
+  setActiveCallToAction: (callToAction?: QuestionNodeType) => QuestionNodeType;
   getCurrentNode: (dialogue: Dialogue, urlNodeId?: string) => QuestionNodeType;
 }
 
@@ -47,8 +54,12 @@ export const useStore = create<DialogueState>((set, get) => ({
   actionEvents: [],
   queuedActionEvents: [],
 
-  setActiveCallToAction: (callToAction: QuestionNodeType) => {
-    set({ activeCallToAction: callToAction });
+  setActiveCallToAction: (callToAction?: QuestionNodeType) => {
+    if (callToAction) {
+      set({ activeCallToAction: callToAction });
+    }
+
+    return get().activeCallToAction;
   },
 
   /**
@@ -58,7 +69,7 @@ export const useStore = create<DialogueState>((set, get) => ({
    * @returns
    */
   getCurrentNode: (dialogue: Dialogue, urlNodeId: string) => {
-    if (urlNodeId && urlNodeId !== 'cta') {
+    if (urlNodeId && urlNodeId !== 'finisher') {
       const question = dialogue.questions.find((node) => node.id === urlNodeId);
       if (question) return question;
 
@@ -66,15 +77,15 @@ export const useStore = create<DialogueState>((set, get) => ({
       return callToAction;
     }
 
-    if (urlNodeId === 'cta') {
-      const activeCallToAction = get().activeCallToAction;
+    // if (urlNodeId === 'cta') {
+    //   const activeCallToAction = get().activeCallToAction;
 
-      // TODO: Make postleaf
-      // if (!activeCallToAction) {
-      //   return
-      // };
-      return get().activeCallToAction;
-    }
+    //   // TODO: Make postleaf
+    //   // if (!activeCallToAction) {
+    //   //   return
+    //   // };
+    //   return get().activeCallToAction;
+    // }
 
     return dialogue.rootQuestion;
   },

@@ -308,7 +308,7 @@ class SessionPrismaAdapter {
     sessionEventInput: NexusGenInputs['SessionEventInput'],
     sliderValueInput: NexusGenInputs['SessionEventSliderValueInput'] | undefined
   ): Prisma.SessionEventSliderValueCreateNestedOneWithoutSessionEventInput | undefined {
-    if (sessionEventInput.eventType !== SessionEventType.SLIDER_ACTION) return undefined;
+    if (sessionEventInput.eventType !== SessionEventType.FORM_ACTION) return undefined;
     if (sliderValueInput === undefined) return undefined;
 
     return {
@@ -316,6 +316,39 @@ class SessionPrismaAdapter {
         value: sliderValueInput.value,
         timeSpentInSec: sliderValueInput.timeSpent || 0,
         node: { connect: { id: sliderValueInput.relatedNodeId } },
+      }
+    }
+  }
+  /**
+   * Create a Prisma "create" for form value creation.
+   * @param sessionEventInput General event input
+   * @param sessionSliderInput Slider event input
+   * @returns A Prisma create object for creating choice value.
+   */
+  constructCreateSessionEventFormValue(
+    sessionEventInput: NexusGenInputs['SessionEventInput'],
+    formValueInput: NexusGenInputs['SessionEventFormValueInput'] | undefined
+  ): Prisma.SessionEventFormValuesCreateNestedOneWithoutSessionEventInput | undefined {
+    if (sessionEventInput.eventType !== SessionEventType.FORM_ACTION) return undefined;
+    if (formValueInput === undefined) return undefined;
+
+    return {
+      create: {
+        node: { connect: { id: formValueInput.relatedNodeId } },
+        values: {
+          createMany: {
+            data: formValueInput?.values?.map((value) => ({
+              relatedFieldId: value.relatedFieldId || '',
+              email: value.email,
+              longText: value.longText,
+              number: value.number,
+              shortText: value.shortText,
+              phoneNumber: value.phoneNumber,
+              url: value.url,
+            })) || [],
+          }
+        },
+        timeSpentInSec: formValueInput.timeSpent || 0,
       }
     }
   }
@@ -340,6 +373,10 @@ class SessionPrismaAdapter {
         choiceValue: this.constructCreateSessionEventChoiceValue(
           sessionEventInput,
           sessionEventInput.choiceValue || undefined
+        ),
+        formValue: this.constructCreateSessionEventFormValue(
+          sessionEventInput,
+          sessionEventInput.formValue || undefined
         ),
       }
     });

@@ -1597,10 +1597,18 @@ export type SessionEventChoiceValueInput = {
   value: Scalars['String'];
 };
 
+/** Input type of a SessionEvent for a form. */
+export type SessionEventFormValueInput = {
+  relatedNodeId: Scalars['String'];
+  timeSpent?: Maybe<Scalars['Int']>;
+  values?: Maybe<Array<FormNodeEntryFieldInput>>;
+};
+
 /** Input type of a SessionEvent */
 export type SessionEventInput = {
   choiceValue?: Maybe<SessionEventChoiceValueInput>;
   eventType: SessionEventType;
+  formValue?: Maybe<SessionEventFormValueInput>;
   sessionId: Scalars['String'];
   sliderValue?: Maybe<SessionEventSliderValueInput>;
   timestamp: Scalars['Date'];
@@ -1617,6 +1625,7 @@ export type SessionEventSliderValueInput = {
 /** Types of events that can be emitted in a user's session. */
 export enum SessionEventType {
   ChoiceAction = 'CHOICE_ACTION',
+  FormAction = 'FORM_ACTION',
   Navigation = 'NAVIGATION',
   SliderAction = 'SLIDER_ACTION'
 }
@@ -2002,7 +2011,14 @@ export type GetDialogueQuery = (
       )>, leafs: Array<(
         { __typename?: 'QuestionNode' }
         & Pick<QuestionNode, 'id' | 'title' | 'type'>
-        & { links: Array<(
+        & { form?: Maybe<(
+          { __typename?: 'FormNodeType' }
+          & Pick<FormNodeType, 'id' | 'helperText'>
+          & { fields: Array<(
+            { __typename?: 'FormNodeField' }
+            & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
+          )> }
+        )>, links: Array<(
           { __typename?: 'LinkType' }
           & Pick<LinkType, 'url' | 'type' | 'title' | 'iconUrl' | 'backgroundColor' | 'buttonText' | 'header' | 'subHeader' | 'imageUrl'>
         )>, share?: Maybe<(
@@ -2057,6 +2073,13 @@ export type QuestionNodeFragmentFragment = (
         & Pick<SliderNodeRangeType, 'id' | 'start' | 'end'>
       )> }
     )>> }
+  )>, form?: Maybe<(
+    { __typename?: 'FormNodeType' }
+    & Pick<FormNodeType, 'id' | 'helperText'>
+    & { fields: Array<(
+      { __typename?: 'FormNodeField' }
+      & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
+    )> }
   )>, overrideLeaf?: Maybe<(
     { __typename?: 'QuestionNode' }
     & Pick<QuestionNode, 'id' | 'title' | 'type'>
@@ -2152,6 +2175,18 @@ export const QuestionNodeFragmentFragmentDoc = gql`
       }
     }
   }
+  form {
+    id
+    helperText
+    fields {
+      id
+      label
+      type
+      placeholder
+      isRequired
+      position
+    }
+  }
   overrideLeaf {
     id
     title
@@ -2204,6 +2239,18 @@ export const GetDialogueDocument = gql`
         id
         title
         type
+        form {
+          id
+          helperText
+          fields {
+            id
+            label
+            type
+            placeholder
+            isRequired
+            position
+          }
+        }
         links {
           url
           type

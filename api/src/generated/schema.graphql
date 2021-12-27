@@ -1119,10 +1119,18 @@ input SessionEventChoiceValueInput {
   value: String!
 }
 
+"""Input type of a SessionEvent for a form."""
+input SessionEventFormValueInput {
+  relatedNodeId: String!
+  timeSpent: Int
+  values: [FormNodeEntryFieldInput!]
+}
+
 """Input type of a SessionEvent"""
 input SessionEventInput {
   choiceValue: SessionEventChoiceValueInput
   eventType: SessionEventType!
+  formValue: SessionEventFormValueInput
   sessionId: String!
   sliderValue: SessionEventSliderValueInput
   timestamp: Date!
@@ -1139,6 +1147,7 @@ input SessionEventSliderValueInput {
 """Types of events that can be emitted in a user's session."""
 enum SessionEventType {
   CHOICE_ACTION
+  FORM_ACTION
   NAVIGATION
   SLIDER_ACTION
 }
