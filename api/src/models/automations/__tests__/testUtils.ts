@@ -3,6 +3,10 @@ import { PrismaClient, SystemPermissionEnum } from '@prisma/client';
 export const clearDatabase = async (prisma: PrismaClient) => {
   if (process.env.NODE_ENV === 'test') {
     await prisma.$transaction([
+      prisma.sliderNodeEntry.deleteMany({}),
+      prisma.choiceNodeEntry.deleteMany({}),
+      prisma.nodeEntry.deleteMany({}),
+      prisma.session.deleteMany({}),
       prisma.automation.deleteMany({}),
       prisma.automationTrigger.deleteMany({}),
       prisma.automationEvent.deleteMany({}),
