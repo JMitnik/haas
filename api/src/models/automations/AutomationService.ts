@@ -1,6 +1,13 @@
-import { AutomationConditionMatchValue, AutomationConditionOperatorType, ConditionPropertyAggregate, NodeType, Prisma, PrismaClient, QuestionAspect, QuestionConditionScope, QuestionNode } from '@prisma/client';
+import {
+  AutomationConditionMatchValue,
+  AutomationConditionOperatorType,
+  ConditionPropertyAggregate,
+  NodeType,
+  PrismaClient,
+  QuestionAspect,
+  QuestionNode
+} from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
-import e from 'express';
 import { isPresent } from 'ts-is-present';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -34,8 +41,8 @@ class AutomationService {
 
   /**
    * Sets up the data necessary for comparing slider data with the condition match value
-   * @param input object containing 
-   * @returns an object containing the value to be compared, the match value it should be checked against and total entries 
+   * @param input object containing
+   * @returns an object containing the value to be compared, the match value it should be checked against and total entries
    */
   setupSliderCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
     const { questionId, aspect, aggregate, matchValues } = input;
@@ -52,8 +59,8 @@ class AutomationService {
 
   /**
   * Sets up the data necessary for comparing choice data with the condition match value
-  * @param input object containing 
-  * @returns an object containing the value to be compared, the match value it should be checked against and total entries 
+  * @param input object containing
+  * @returns an object containing the value to be compared, the match value it should be checked against and total entries
   */
   setupChoiceCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
     let compareValue: number | null;
@@ -63,10 +70,9 @@ class AutomationService {
     const textMatchValue = matchValues.find((matchValue) => matchValue.type === 'STRING')?.textValue;
 
     compareValue = textMatchValue && Object.keys(scopedChoiceNodeEntries.aggregatedValues).find((key) => key === textMatchValue) ? scopedChoiceNodeEntries.aggregatedValues[textMatchValue] : 0;
-    console.log('compareValue Target: ', compareValue);
 
     return {
-      // if matchValue doesn't exist that's a condition problem -> returning null. 
+      // if matchValue doesn't exist that's a condition problem -> returning null.
       // if key doesn't exist in scopedChoiceNodeEntries.aggregatedValues -> returning 0.
       compareValue: textMatchValue ? compareValue : null,
       matchValue: amountMatchValue?.numberValue,
@@ -76,18 +82,18 @@ class AutomationService {
 
   /**
   * Sets up the data necessary for comparing question data with the condition match value
-  * @param input object containing 
-  * @returns an object containing the value to be compared, the match value it should be checked against and total entries 
+  * @param input object containing
+  * @returns an object containing the value to be compared, the match value it should be checked against and total entries
   */
   setupQuestionCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
-    if (input.type === 'SLIDER') return this.setupSliderCompareData(input);
-    if (input.type === 'CHOICE') return this.setupChoiceCompareData(input);
+    if (input.type === NodeType.SLIDER) return this.setupSliderCompareData(input);
+    if (input.type === NodeType.CHOICE) return this.setupChoiceCompareData(input);
     return undefined;
   };
 
   /**
    * Validates question condition scope. CURRENTLY ONLY SUPPORT SLIDER NODES
-   * @param condition 
+   * @param condition
    */
   validateQuestionScopeCondition = async (condition: AutomationCondition) => {
     // Fetch data based on scope
@@ -111,12 +117,9 @@ class AutomationService {
       return false;
     }
 
-    if (condition.operator === 'SMALLER_OR_EQUAL_THAN') {
-      console.log(`${scopedData.compareValue} <= ${scopedData.matchValue}`);
+    if (condition.operator === AutomationConditionOperatorType.SMALLER_OR_EQUAL_THAN) {
       return scopedData.compareValue <= scopedData.matchValue;
     }
-
-    throw Error('No checks in place for provided operator type!');
   }
 
   /**
@@ -127,7 +130,6 @@ class AutomationService {
   checkAutomationTriggersConditions = async (automationTrigger: AutomationTrigger) => {
     const matchedConditionsTriggers = await Promise.all(automationTrigger.conditions.map(async (condition) => {
       const { scope, operator } = condition;
-      console.log('HANDLED SCOPE: ', scope);
       if (scope === 'DIALOGUE') return false;
 
       if (scope === 'QUESTION') {
@@ -162,7 +164,7 @@ class AutomationService {
   /**
    * Handles the whole process of checking for existing triggers, its conditions as well conducting the correct actions
    * in case an automation trigger has actually been triggered.
-   * @param dialogueId 
+   * @param dialogueId
    */
   handleTriggerAutomations = async (dialogueId: string) => {
     const possibleTriggeredAutomations = await this.hasPotentialTriggeredAutomations(dialogueId);
@@ -213,9 +215,9 @@ class AutomationService {
   }
 
   /**
-   * Constructs a CREATE prisma condition scope data object 
+   * Constructs a CREATE prisma condition scope data object
    * @param condition input object for an AutomationConditionScope
-   * @returns a CREATE prisma condition scope data object 
+   * @returns a CREATE prisma condition scope data object
    */
   constructCreateAutomationConditionScopeInput = (condition: NexusGenInputs['CreateAutomationCondition']): CreateAutomationConditionScopeInput => {
     const validatedCondition = this.validateCreateAutomationConditionScopeInput(condition);
@@ -234,7 +236,7 @@ class AutomationService {
 
   /**
    * Validates data input for automation actions
-   * @param input 
+   * @param input
    * @returns validated CREATE prisma automation actions data list
    */
   validateAutomationActionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['actions'] => {
@@ -256,7 +258,6 @@ class AutomationService {
         if (noTargetList) throw new UserInputError('No target phone numbers provided for "SEND_SMS"!');
         // TODO: Add additional checks such as whether all properties exist for every target entry
       }
-
     });
 
     return input.actions as CreateAutomationInput['actions'];
@@ -412,7 +413,7 @@ class AutomationService {
   /**
    * Finds an automation (and its relationships) by the provided ID
    * @param automationId the ID of the automation
-   * @returns an Automation with relationships included or null if no automation with specified ID exist in the database 
+   * @returns an Automation with relationships included or null if no automation with specified ID exist in the database
    */
   findAutomationById = (automationId: string) => {
     return this.automationPrismaAdapter.findAutomationById(automationId);
