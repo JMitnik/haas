@@ -138,7 +138,11 @@ export class AutomationPrismaAdapter {
           include: {
             event: {
               include: {
-                question: true,
+                question: {
+                  include: {
+                    questionDialogue: true,
+                  }
+                },
                 dialogue: true,
               }
             },

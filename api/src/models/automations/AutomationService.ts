@@ -1,13 +1,31 @@
-import { AutomationConditionMatchValue, AutomationConditionOperatorType, ConditionPropertyAggregate, NodeType, Prisma, PrismaClient, QuestionAspect, QuestionConditionScope, QuestionNode } from '@prisma/client';
+import {
+  AutomationAction,
+  AutomationConditionMatchValue,
+  AutomationConditionOperatorType,
+  ConditionPropertyAggregate,
+  NodeType,
+  PrismaClient,
+  QuestionAspect,
+  QuestionNode
+} from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
-import e from 'express';
 import { isPresent } from 'ts-is-present';
+import config from '../../config/config';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import DialogueService from '../questionnaire/DialogueService';
+import UserService from '../users/UserService';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
-import { AutomationCondition, AutomationTrigger, CreateAutomationConditionScopeInput, CreateAutomationInput, CreateConditionMatchValueInput, UpdateAutomationInput } from './AutomationTypes'
+import { ReportLambdaInput, reportService } from '../../services/report/ReportService'
+import {
+  AutomationCondition,
+  AutomationTrigger,
+  CreateAutomationConditionScopeInput,
+  CreateAutomationInput,
+  CreateConditionMatchValueInput,
+  UpdateAutomationInput
+} from './AutomationTypes'
 
 interface SetupQuestionCompareDataInput {
   questionId: string;
@@ -26,10 +44,12 @@ interface SetupQuestionCompareDataOutput {
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
   dialogueService: DialogueService;
+  userService: UserService;
 
   constructor(prisma: PrismaClient) {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
     this.dialogueService = new DialogueService(prisma);
+    this.userService = new UserService(prisma);
   }
 
   /**
@@ -87,7 +107,8 @@ class AutomationService {
 
   /**
    * Validates question condition scope. CURRENTLY ONLY SUPPORT SLIDER NODES
-   * @param condition 
+   * @param condition an AutomationCondition
+   * @return boolean. true if conditions are met and false if they ar enot
    */
   validateQuestionScopeCondition = async (condition: AutomationCondition) => {
     // Fetch data based on scope
@@ -111,9 +132,42 @@ class AutomationService {
       return false;
     }
 
+    // Because it passed the above batch test this one will always be true
+    if (condition.operator === 'EVERY_N_TH_TIME') return true;
+
     if (condition.operator === 'SMALLER_OR_EQUAL_THAN') {
       console.log(`${scopedData.compareValue} <= ${scopedData.matchValue}`);
       return scopedData.compareValue <= scopedData.matchValue;
+    }
+
+    if (condition.operator === 'GREATER_OR_EQUAL_THAN') {
+      return scopedData.compareValue <= scopedData.matchValue;
+    }
+
+    if (condition.operator === 'GREATER_THAN') {
+      return scopedData.compareValue > scopedData.matchValue;
+    }
+
+    if (condition.operator === 'SMALLER_THAN') {
+      return scopedData.compareValue < scopedData.matchValue;
+    }
+
+    if (condition.operator === 'IS_EQUAL') {
+      return scopedData.compareValue === scopedData.matchValue;
+    }
+
+    if (condition.operator === 'IS_NOT_EQUAL') {
+      return scopedData.compareValue !== scopedData.matchValue;
+    }
+
+    if (condition.operator === 'INNER_RANGE') {
+      // TODO: Implement 
+      return false;
+    }
+
+    if (condition.operator === 'OUTER_RANGE') {
+      // TODO: implement
+      return false;
     }
 
     throw Error('No checks in place for provided operator type!');
@@ -126,7 +180,7 @@ class AutomationService {
    */
   checkAutomationTriggersConditions = async (automationTrigger: AutomationTrigger) => {
     const matchedConditionsTriggers = await Promise.all(automationTrigger.conditions.map(async (condition) => {
-      const { scope, operator } = condition;
+      const { scope } = condition;
       console.log('HANDLED SCOPE: ', scope);
       if (scope === 'DIALOGUE') return false;
 
@@ -155,14 +209,44 @@ class AutomationService {
     const possibleAutomations = await this.automationPrismaAdapter.findPotentialTriggerdAutomations(dialogueId, questionIds);
 
     if (!possibleAutomations.length) return null;
-    const automationTriggers = possibleAutomations.map((automation) => automation.automationTrigger).filter(isPresent);
+    const automationTriggers = possibleAutomations.map((automation) => {
+      const dialogueSlug = automation.automationTrigger?.event.dialogue?.slug || automation.automationTrigger?.event.question?.questionDialogue?.slug
+      return { dialogueSlug: dialogueSlug, workspaceSlug: automation.workspace.slug, trigger: automation.automationTrigger }
+    }).filter(isPresent);
     return automationTriggers;
+  }
+
+  /**
+   * Runs an action lambda based on the specified AutomationActionType
+   * @param automationAction an Prisma AutomationAction object
+   * @param workspaceSlug the slug of the workspace the automation belongs to
+   * @param dialogueSlug the slug of the pertaining dialogue (OPTIONAL)
+   * @returns the succesfull running of a SNS related to the action
+   */
+  handleAutomationAction = async (automationAction: AutomationAction, workspaceSlug: string, dialogueSlug?: string) => {
+    if (automationAction.type === 'GENERATE_REPORT') { // TODO: Implies weekly report for now. Should probably change eventually😬
+      // get bot user to create report with
+      const botUser = await this.userService.findBotByWorkspaceName(workspaceSlug);
+      const dashboardUrl = config.dashboardUrl;
+      const reportUrl = `${dashboardUrl}/dashboard/b/${workspaceSlug}/d/${dialogueSlug}/_reports/weekly`;
+      const apiUrl = `${config.baseUrl}/graphql`
+      const authenticateEmail = 'automations@haas.live' // TODO: I think this one is not needed anymore
+      const payload: ReportLambdaInput = {
+        API_URL: apiUrl,
+        AUTHENTICATE_EMAIL: authenticateEmail,
+        DASHBOARD_URL: dashboardUrl,
+        REPORT_URL: reportUrl,
+        WORKSPACE_EMAIL: botUser?.email || '',
+      }
+      return reportService.generateReport(payload);
+    }
+    console.log(`No action handler implemented for action type: ${automationAction.type}. abort.`);
   }
 
   /**
    * Handles the whole process of checking for existing triggers, its conditions as well conducting the correct actions
    * in case an automation trigger has actually been triggered.
-   * @param dialogueId 
+   * @param dialogueId the dialogue id which is the cause of an automation being triggered
    */
   handleTriggerAutomations = async (dialogueId: string) => {
     const possibleTriggeredAutomations = await this.hasPotentialTriggeredAutomations(dialogueId);
@@ -170,10 +254,17 @@ class AutomationService {
       console.log('No potential trigger automations found. abort');
       return;
     }
-    console.log('Has potential triggered automations: ', possibleTriggeredAutomations);
+
     const triggeredAutomations = await Promise.all(possibleTriggeredAutomations.map(async (automationTrigger) => {
-      const allConditionsConfirmed = await this.checkAutomationTriggersConditions(automationTrigger);
+      const { trigger, workspaceSlug, dialogueSlug } = automationTrigger;
+      if (!trigger) throw new Error('Found automation trigger that is actually not a trigger');
+
+      const allConditionsConfirmed = await this.checkAutomationTriggersConditions(trigger);
+
       if (allConditionsConfirmed) {
+        trigger.actions.forEach((automationAction) => {
+          this.handleAutomationAction(automationAction, workspaceSlug, dialogueSlug);
+        });
         console.log('All conditions of automation trigger confirmed. Do action');
       } else {
         console.log('One or more conditions have failed. No action done');
@@ -273,6 +364,12 @@ class AutomationService {
     return validatedActions;
   }
 
+  /**
+   * Validates the AutomationCondition input list provided by checking the existence of fields could be potentially undefined or null
+   * @param input object containing a list with AutomationCondition input entries
+   * @returns a validated AutomationCondition input list
+   * @throws UserInputError if not all information is required
+   */
   validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
     if (input.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
 
@@ -436,6 +533,12 @@ class AutomationService {
     return this.automationPrismaAdapter.findAutomationsByWorkspaceId(workspaceId);
   };
 
+  /**
+   * Function to paginate through all automations of a workspace
+   * @param workspaceSlug the slug of the workspace
+   * @param filter a filter object used to paginate through automations of a workspace
+   * @returns a list of paginated automations
+   */
   paginatedAutomations = async (
     workspaceSlug: string,
     filter?: NexusGenInputs['AutomationConnectionFilterInput'] | null,
