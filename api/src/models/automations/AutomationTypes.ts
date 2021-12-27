@@ -1,7 +1,7 @@
 import {
   AutomationActionType, AutomationConditionMatchValue, AutomationConditionOperatorType,
   AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate,
-  Customer, Dialogue, DialogueConditionScope, QuestionConditionScope, QuestionNode,
+  Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
   WorkspaceConditionScope
 } from '@prisma/client';
 
@@ -14,6 +14,20 @@ type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
  * https://stackoverflow.com/questions/42123407/does-typescript-support-mutually-exclusive-types
  */
 type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
+
+export interface SetupQuestionCompareDataInput {
+  questionId: string;
+  aspect: QuestionAspect,
+  aggregate?: ConditionPropertyAggregate | null,
+  matchValues: AutomationConditionMatchValue[],
+  type: NodeType,
+}
+
+export interface SetupQuestionCompareDataOutput {
+  totalEntries: number;
+  compareValue?: number | null;
+  matchValue?: number | null;
+}
 
 export interface ConditionPropertAggregateInput {
   endDate?: Date | null; // String

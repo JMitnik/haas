@@ -24,22 +24,10 @@ import {
   CreateAutomationConditionScopeInput,
   CreateAutomationInput,
   CreateConditionMatchValueInput,
+  SetupQuestionCompareDataInput,
+  SetupQuestionCompareDataOutput,
   UpdateAutomationInput
 } from './AutomationTypes'
-
-interface SetupQuestionCompareDataInput {
-  questionId: string;
-  aspect: QuestionAspect,
-  aggregate?: ConditionPropertyAggregate | null,
-  matchValues: AutomationConditionMatchValue[],
-  type: NodeType,
-}
-
-interface SetupQuestionCompareDataOutput {
-  totalEntries: number;
-  compareValue?: number | null;
-  matchValue?: number | null;
-}
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
