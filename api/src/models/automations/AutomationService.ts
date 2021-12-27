@@ -1,11 +1,10 @@
 import {
-  AutomationConditionMatchValue,
   AutomationConditionOperatorType,
-  ConditionPropertyAggregate,
+  AutomationConditionScopeType,
+  MatchValueType,
   NodeType,
   PrismaClient,
   QuestionAspect,
-  QuestionNode
 } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
@@ -14,21 +13,16 @@ import { NexusGenInputs } from '../../generated/nexus';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import DialogueService from '../questionnaire/DialogueService';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
-import { AutomationCondition, AutomationTrigger, CreateAutomationConditionScopeInput, CreateAutomationInput, CreateConditionMatchValueInput, UpdateAutomationInput } from './AutomationTypes'
-
-interface SetupQuestionCompareDataInput {
-  questionId: string;
-  aspect: QuestionAspect,
-  aggregate?: ConditionPropertyAggregate | null,
-  matchValues: AutomationConditionMatchValue[],
-  type: NodeType,
-}
-
-interface SetupQuestionCompareDataOutput {
-  totalEntries: number;
-  compareValue?: number | null;
-  matchValue?: number | null;
-}
+import {
+  AutomationCondition,
+  AutomationTrigger,
+  CreateAutomationConditionScopeInput,
+  CreateAutomationInput,
+  CreateConditionMatchValueInput,
+  SetupQuestionCompareDataInput,
+  SetupQuestionCompareDataOutput,
+  UpdateAutomationInput
+} from './AutomationTypes'
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -46,7 +40,11 @@ class AutomationService {
    */
   setupSliderCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
     const { questionId, aspect, aggregate, matchValues } = input;
-    const scopedSliderNodeEntries = await this.automationPrismaAdapter.aggregateScopedSliderNodeEntries(questionId, aspect, aggregate);
+    const scopedSliderNodeEntries = await this.automationPrismaAdapter.aggregateScopedSliderNodeEntries(
+      questionId,
+      aspect,
+      aggregate
+    );
     const aggregatedAverageValue = scopedSliderNodeEntries.aggregatedValues._avg?.value;
     const matchValue = matchValues?.[0]?.numberValue;
 
@@ -66,8 +64,8 @@ class AutomationService {
     let compareValue: number | null;
     const { questionId, aspect, aggregate, matchValues } = input;
     const scopedChoiceNodeEntries = await this.automationPrismaAdapter.aggregateScopedChoiceNodeEntries(questionId, aspect, aggregate);
-    const amountMatchValue = matchValues.find((matchValue) => matchValue.type === 'INT');
-    const textMatchValue = matchValues.find((matchValue) => matchValue.type === 'STRING')?.textValue;
+    const amountMatchValue = matchValues.find((matchValue) => matchValue.type === MatchValueType.INT);
+    const textMatchValue = matchValues.find((matchValue) => matchValue.type === MatchValueType.STRING)?.textValue;
 
     compareValue = textMatchValue && Object.keys(scopedChoiceNodeEntries.aggregatedValues).find((key) => key === textMatchValue) ? scopedChoiceNodeEntries.aggregatedValues[textMatchValue] : 0;
 
@@ -86,25 +84,37 @@ class AutomationService {
   * @returns an object containing the value to be compared, the match value it should be checked against and total entries
   */
   setupQuestionCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
-    if (input.type === NodeType.SLIDER) return this.setupSliderCompareData(input);
-    if (input.type === NodeType.CHOICE) return this.setupChoiceCompareData(input);
-    return undefined;
+    switch (input.type) {
+      case NodeType.SLIDER: {
+        return this.setupSliderCompareData(input);
+      }
+
+      case NodeType.CHOICE: {
+        return this.setupChoiceCompareData(input);
+      }
+
+      default: {
+        return undefined;
+      }
+    }
   };
 
   /**
-   * Validates question condition scope. CURRENTLY ONLY SUPPORT SLIDER NODES
+   * Validates question condition scope.
+   *
+   * NOTE:
+   * - CURRENTLY ONLY SUPPORT SLIDER NODES
    * @param condition
    */
   validateQuestionScopeCondition = async (condition: AutomationCondition) => {
-    // Fetch data based on scope
-    const { id: questionId, type } = condition.question as QuestionNode;
     const input: SetupQuestionCompareDataInput = {
-      type,
-      questionId,
+      type: condition.question?.type as NodeType,
+      questionId: condition?.question?.id as string,
       matchValues: condition.matchValues,
       aggregate: condition.questionScope?.aggregate,
       aspect: condition.questionScope?.aspect as QuestionAspect,
     };
+    // Fetch data based on scope
     const scopedData = await this.setupQuestionCompareData(input);
 
     // Some of the data necessary to validate condition is missing
@@ -129,51 +139,66 @@ class AutomationService {
    */
   checkAutomationTriggersConditions = async (automationTrigger: AutomationTrigger) => {
     const matchedConditionsTriggers = await Promise.all(automationTrigger.conditions.map(async (condition) => {
-      const { scope, operator } = condition;
-      if (scope === 'DIALOGUE') return false;
+      switch (condition.scope) {
+        case AutomationConditionScopeType.QUESTION: {
+          return this.validateQuestionScopeCondition(condition);
+        }
 
-      if (scope === 'QUESTION') {
-        return this.validateQuestionScopeCondition(condition);
+        case AutomationConditionScopeType.DIALOGUE: {
+          return false;
+        }
+
+        case AutomationConditionScopeType.WORKSPACE: {
+          return false;
+        }
+
+        default: {
+          return false;
+        }
       }
-
-      if (scope === 'WORKSPACE') return false;
-
-      return false;
     }));
 
-    console.log('matchedConditionsTriggers: ', matchedConditionsTriggers);
-    const successfullyPassedAllConditions = !matchedConditionsTriggers.includes(false);
-    return successfullyPassedAllConditions;
+    const passedConditions = !matchedConditionsTriggers.includes(false);
+    return passedConditions;
   }
 
   /**
-   * Checks whether any trigger automations with an event related to a dialogue (or its questions) exists
+   * Checks whether any candidate trigger automations with an event related to a dialogue (or its questions).
    * @param dialogueId a dialogue id
    * @returns a list of automation triggers potentially triggered
    */
-  hasPotentialTriggeredAutomations = async (dialogueId: string) => {
+  getCandidateTriggers = async (dialogueId: string) => {
     const questions = await this.dialogueService.getQuestionsByDialogueId(dialogueId);
     const questionIds = questions.map((question) => question.id).filter(isPresent);
-    const possibleAutomations = await this.automationPrismaAdapter.findPotentialTriggerdAutomations(dialogueId, questionIds);
+    const candidateAutomations = await this.automationPrismaAdapter.findCandidateAutomations(
+      dialogueId,
+      questionIds
+    );
 
-    if (!possibleAutomations.length) return null;
-    const automationTriggers = possibleAutomations.map((automation) => automation.automationTrigger).filter(isPresent);
-    return automationTriggers;
+    if (!candidateAutomations.length) return null;
+
+    const candidateAutomationTriggers = candidateAutomations.map(
+      (automation) => automation.automationTrigger
+    ).filter(isPresent);
+
+    return candidateAutomationTriggers;
   }
 
   /**
-   * Handles the whole process of checking for existing triggers, its conditions as well conducting the correct actions
-   * in case an automation trigger has actually been triggered.
+   * Checks for a dialogue whether it has any triggered automations, and if so run corresponding actions.
    * @param dialogueId
    */
   handleTriggerAutomations = async (dialogueId: string) => {
-    const possibleTriggeredAutomations = await this.hasPotentialTriggeredAutomations(dialogueId);
-    if (!possibleTriggeredAutomations) {
+    const candidateAutomations = await this.getCandidateTriggers(dialogueId);
+    if (!candidateAutomations) {
       console.log('No potential trigger automations found. abort');
       return;
     }
-    console.log('Has potential triggered automations: ', possibleTriggeredAutomations);
-    const triggeredAutomations = await Promise.all(possibleTriggeredAutomations.map(async (automationTrigger) => {
+
+    console.log('Candidate automations: ', candidateAutomations);
+
+    const triggeredAutomations = await Promise.all(candidateAutomations.map(async (automationTrigger) => {
+      // TODO: Consider ANDS vs ORs for conditions
       const allConditionsConfirmed = await this.checkAutomationTriggersConditions(automationTrigger);
       if (allConditionsConfirmed) {
         console.log('All conditions of automation trigger confirmed. Do action');

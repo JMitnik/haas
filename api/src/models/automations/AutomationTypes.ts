@@ -1,7 +1,7 @@
 import {
   AutomationActionType, AutomationConditionMatchValue, AutomationConditionOperatorType,
   AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate,
-  Customer, Dialogue, DialogueConditionScope, QuestionConditionScope, QuestionNode,
+  Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
   WorkspaceConditionScope
 } from '@prisma/client';
 
@@ -130,7 +130,7 @@ export interface UpdateAutomationInput extends CreateAutomationInput {
 export type MoreXOR = CreateQuestionScopeInput['aspect'] | CreateDialogueScopeInput['aspect'] | CreateWorkspaceScopeInput['aspect']
 
 export interface CreateScopeDataInput {
-  aspect: any // TODO: Turn this into MoreXOR 
+  aspect: any // TODO: Turn this into MoreXOR
   aggregate: ConditionPropertAggregateInput;
 }
 
@@ -185,4 +185,19 @@ export interface FullAutomationWithRels {
   type: AutomationType;
   workspace: Customer;
   automationTrigger: AutomationTrigger | null;
+}
+
+
+export interface SetupQuestionCompareDataInput {
+  questionId: string;
+  aspect: QuestionAspect,
+  aggregate?: ConditionPropertyAggregate | null,
+  matchValues: AutomationConditionMatchValue[],
+  type: NodeType,
+}
+
+export interface SetupQuestionCompareDataOutput {
+  totalEntries: number;
+  compareValue?: number | null;
+  matchValue?: number | null;
 }
