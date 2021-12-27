@@ -94,7 +94,7 @@ class AutomationService {
   };
 
   /**
-   * Validates question condition scope. CURRENTLY ONLY SUPPORT SLIDER NODES
+   * Validates question condition scope
    * @param condition an AutomationCondition
    * @return boolean. true if conditions are met and false if they ar enot
    */
