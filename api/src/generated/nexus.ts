@@ -1338,7 +1338,7 @@ export interface NexusGenFieldTypes {
   }
   Customer: { // field return type
     automationConnection: NexusGenRootTypes['AutomationConnection'] | null; // AutomationConnection
-    automations: NexusGenRootTypes['AutomationModel'][]; // [AutomationModel!]!
+    automations: NexusGenRootTypes['AutomationModel'][] | null; // [AutomationModel!]
     campaign: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     campaigns: NexusGenRootTypes['CampaignType'][]; // [CampaignType!]!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue

@@ -458,7 +458,7 @@ input CTAShareInputObjectType {
 
 type Customer {
   automationConnection(filter: AutomationConnectionFilterInput): AutomationConnection
-  automations: [AutomationModel!]!
+  automations: [AutomationModel!]
   campaign(campaignId: String): CampaignType
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue

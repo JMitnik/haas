@@ -67,6 +67,7 @@ export const CustomerType = objectType({
     });
 
     t.list.field('automations', {
+      nullable: true,
       type: AutomationModel,
       async resolve(parent, args, ctx) {
         return ctx.services.automationService.findAutomationsByWorkspace(parent.id);

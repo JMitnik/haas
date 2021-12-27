@@ -504,7 +504,7 @@ export type Customer = {
   settings?: Maybe<CustomerSettings>;
   automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
-  automations: Array<AutomationModel>;
+  automations?: Maybe<Array<AutomationModel>>;
   dialogue?: Maybe<Dialogue>;
   dialogues?: Maybe<Array<Dialogue>>;
   users?: Maybe<Array<UserType>>;
