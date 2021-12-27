@@ -3,7 +3,7 @@ import React from 'react'
 import { useUploadSessionEventsMutation } from 'types/generated-types';
 import { Dialogue as DialogueType, Workspace, SessionEventInput } from 'types/helper-types';
 
-import Dialogue from '@haas/';
+import Dialogue from '@haas/dialogue';
 
 interface DialogueProps {
   dialogue: DialogueType;

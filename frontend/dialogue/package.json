@@ -1,6 +1,7 @@
 {
   "name": "@haas/dialogue",
   "private": true,
+  "main": "./components/Dialogue/Dialogue.tsx",
   "version": "0.0.1",
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev",
