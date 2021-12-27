@@ -63,16 +63,26 @@ class AuthService {
     return user;
   }
 
+  /**
+   * Verifies the header sent by a Automation Action lambda 
+   * @param authorizationHeader the header send by an automation action lambda to verify itself as being authentic
+   * @returns true if lambda is authentic, false if not
+   */
   async verifyLambdaAuthentication(authorizationHeader: string) {
     try {
       const verified = jwt.verify(authorizationHeader, config.apiSecret);
-      console.log('Verified: ', verified);
       return true;
     } catch (e) {
       return false;
     }
   }
 
+  /**
+   * Gets a token of a workspace (bot) email address in order to further interact with the haas API
+   * @param authorizationHeader the authentication header sent by a Automation Action lambda
+   * @param workspaceEmail the workspace (bot) email address the auth token is requested for
+   * @returns Authorization token for bot email address
+   */
   async getWorkspaceAuthorizationToken(authorizationHeader: string, workspaceEmail: string) {
     const isVerified = this.verifyLambdaAuthentication(authorizationHeader);
     if (!isVerified) throw new Error('CALL WAS REJECTED BECAUSE HEADER VERIFICATION WAS REJECTED');
@@ -102,7 +112,7 @@ class AuthService {
   }
 
   /**
-  * 
+  * Creates an automation token used as SECRET for our lambdas that interact with the haas API
   * @param emailAddress The email address of the target user (e.g. automations@haas.live)
   * @param duration the amount of time the token is valid for in minutes
   * @returns a JWT token

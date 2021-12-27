@@ -90,8 +90,6 @@ export class AutomationPrismaAdapter {
     });
 
     const countedChoices = countBy(aggregatedChoices, (choice) => choice.value);
-    console.log('countedChoices: ', countedChoices);
-    // console.log('Aggregated choice node entries: ', aggregatedChoiceNodeEntries);
 
     return { totalEntries: totalAmountChoiceValues, aggregatedValues: countedChoices };
   }
