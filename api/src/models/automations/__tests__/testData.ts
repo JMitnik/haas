@@ -1,6 +1,72 @@
 import { Customer, Dialogue, Prisma, QuestionNode } from "@prisma/client";
 import { NexusGenInputs } from "../../../generated/nexus";
-import { AutomationTrigger, FullAutomationWithRels } from "../AutomationTypes";
+import { AutomationTrigger, FullAutomationWithRels, SetupQuestionCompareDataInput } from "../AutomationTypes";
+
+export const choiceQuestionCompareDataInput: SetupQuestionCompareDataInput = {
+  type: 'CHOICE',
+  aspect: 'NODE_VALUE',
+  matchValues: [
+    {
+      numberValue: 2,
+      type: 'INT',
+      automationConditionId: '',
+      createdAt: new Date(Date.now()),
+      dateTimeValue: null,
+      textValue: null,
+      updatedAt: null,
+      id: '',
+    }, {
+      numberValue: null,
+      type: 'STRING',
+      automationConditionId: '',
+      createdAt: new Date(Date.now()),
+      dateTimeValue: null,
+      textValue: 'Facilities',
+      updatedAt: null,
+      id: '',
+    }],
+  questionId: 'CHOICE_ID',
+  aggregate: {
+    type: 'COUNT',
+    latest: 3,
+    startDate: null,
+    endDate: null,
+    createdAt: new Date(Date.now()),
+    dialogueConditionScopeId: null,
+    id: '',
+    questionConditionScopeId: '',
+    workspaceConditionScopeId: null,
+    updatedAt: null,
+  }
+}
+
+export const sliderQuestionCompareDataInput: SetupQuestionCompareDataInput = {
+  type: 'SLIDER',
+  aspect: 'NODE_VALUE',
+  matchValues: [{
+    numberValue: 50,
+    type: 'INT',
+    automationConditionId: '',
+    createdAt: new Date(Date.now()),
+    dateTimeValue: null,
+    textValue: null,
+    updatedAt: null,
+    id: '',
+  }],
+  questionId: 'SLIDER_ID',
+  aggregate: {
+    type: 'AVG',
+    latest: 3,
+    startDate: null,
+    endDate: null,
+    createdAt: new Date(Date.now()),
+    dialogueConditionScopeId: null,
+    id: '',
+    questionConditionScopeId: '',
+    workspaceConditionScopeId: null,
+    updatedAt: null,
+  }
+}
 
 export const constructValidUpdateAutomationInputData = (workspace: Customer, dialogue: Dialogue, question: QuestionNode, automation: FullAutomationWithRels): NexusGenInputs["CreateAutomationResolverInput"] => {
   if (!automation.automationTrigger) throw Error("No automation trigger to be updated provided!");
