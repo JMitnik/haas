@@ -5,7 +5,7 @@ import AppProviders from 'config/AppProviders';
 import DialogueThemer from 'config/Theme/DialogueThemer';
 
 import * as LS from './DialogueStyles';
-import { DialogueRouter } from './DialogueRouter';
+import { DialogueRoutes } from '../Navigation/DialogueRoutes';
 
 interface DialogueProps {
   onEventUpload: (events: SessionEventInput[]) => void;
@@ -19,7 +19,7 @@ const Dialogue = ({ dialogue, workspace, onEventUpload, sessionId }: DialoguePro
     <AppProviders sessionId={sessionId}>
       <DialogueThemer>
         <LS.DialogueContainer>
-          <DialogueRouter dialogue={dialogue} workspace={workspace} onEventUpload={onEventUpload} />
+          <DialogueRoutes dialogue={dialogue} workspace={workspace} onEventUpload={onEventUpload} />
         </LS.DialogueContainer>
       </DialogueThemer>
     </AppProviders>

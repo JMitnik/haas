@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect } from 'react'
-import { useNavigate, useNavigationType, useParams } from 'react-router';
+import { useNavigationType, useParams } from 'react-router';
 
 import { Dialogue, SessionEventInput } from 'types/helper-types';
+import { useEventsStore } from 'components/DialogueEventsStore/DialogueEventsStore';
 import { QuestionNodeTypeEnum, SessionEventType } from 'types/generated-types';
 import { SliderNode } from 'components/SliderNode/SliderNode';
 import { ChoiceNode } from 'components/ChoiceNode/ChoiceNode';
-import { useStore } from 'components/Dialogue/DialogueRouter';
 import { useSession } from 'components/Session/SessionProvider';
 import { LinkNode } from 'components/LinkNode/LinkNode';
 import FormNode from 'components/FormNode/FormNode';
+import { useNavigator } from 'components/Navigation/useNavigator';
 
 import { QuestionNodeProps as GenericQuestionNodeProps, RunActionInput } from './QuestionNodeTypes';
 
@@ -39,8 +40,14 @@ function useDebouncedEffect(fn, deps, time) {
 }
 
 export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodeProps) => {
-  const { workspace, dialogue: dialogueSlug, nodeId } = useParams();
-  const { popActionQueue, queuedActionEvents, setActiveCallToAction, logAction, getCurrentNode } = useStore(state => ({
+  const { workspace: workspaceSlug, dialogue: dialogueSlug, nodeId } = useParams();
+  const {
+    popActionQueue,
+    queuedActionEvents,
+    setActiveCallToAction,
+    logAction,
+    getCurrentNode,
+  } = useEventsStore(state => ({
     activeCallToAction: state.activeCallToAction,
     getCurrentNode: state.getCurrentNode,
     actionEvents: state.actionEvents,
@@ -50,11 +57,12 @@ export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodePr
     popActionQueue: state.popActionQueue,
   }));
   const currentNode = getCurrentNode(dialogue, nodeId);
-  const navigate = useNavigate();
   const { sessionId } = useSession();
+  const { transition } = useNavigator({ dialogueSlug, workspaceSlug });
 
   const navigationType = useNavigationType();
 
+  // If user went back or forward in their browser, track it as a Navigation action.
   useEffect(() => {
     if (navigationType === 'POP') {
       logAction({
@@ -93,27 +101,19 @@ export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodePr
 
   const QuestionNode = NodeComponent[currentNode.type];
 
-  const goToNextState = (stateNavigation) => {
-
-  }
-
   const handleRunAction = useCallback((input: RunActionInput) => {
     logAction(input.event);
 
     // We cannot unset an active-call-to-action momentarily, only override it.
     const activeCallToAction = setActiveCallToAction(input.activeCallToAction);
 
-    goToNextState();
-
-    if (input.event.toNodeId) {
-      navigate(`/${workspace}/${dialogueSlug}/n/${input.event.toNodeId}`);
-    } else if (activeCallToAction) {
-      navigate(`/${workspace}/${dialogueSlug}/n/${activeCallToAction.id}`);
-      // TODO: Account for the fact
-    } else if (currentNode.id === activeCallToAction.id) {
-      navigate(`/${workspace}/${dialogueSlug}/n/finisher`);
-    }
-  }, [workspace, dialogueSlug, navigate, logAction, setActiveCallToAction, currentNode]);
+    transition({
+      activeCallToActionId: activeCallToAction?.id,
+      childNodeId: input.event.toNodeId,
+      currentNode: currentNode,
+      currentStateType:
+    })
+  }, [logAction, setActiveCallToAction, transition, currentNode]);
 
   return (
     <QuestionNode node={currentNode} onRunAction={handleRunAction}  />
