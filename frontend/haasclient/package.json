@@ -1,0 +1,55 @@
+{
+  "name": "@haas/client-web",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "NODE_OPTIONS='--inspect' next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest --watch",
+    "gen": "graphql-codegen"
+  },
+  "dependencies": {
+    "@apollo/client": "3.4.16",
+    "@chakra-ui/core": "^0.8.0",
+    "@haas/ui": "*",
+    "@haas/dialogue": "*",
+    "@popperjs/core": "^2.11.0",
+    "babel-plugin-inline-react-svg": "^2.0.1",
+    "chroma-js": "^2.1.2",
+    "date-fns": "^2.27.0",
+    "i18next": "^21.6.3",
+    "next": "12.0.2",
+    "next-plugin-svgr": "^1.0.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-hook-form": "^7.22.2",
+    "react-i18next": "^11.15.1",
+    "react-lottie": "^1.2.3",
+    "react-popper": "^2.2.5",
+    "react-router-dom": "6",
+    "react-timer-hook": "^3.0.5",
+    "styled-components": "^5.3.3",
+    "use-timer": "^2.0.1",
+    "zustand": "^3.6.5"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "2.2.2",
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/react": "^12.1.2",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/chroma-js": "^2.1.3",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/parser": "^5.7.0",
+    "eslint": "7",
+    "eslint-config-next": "12.0.2",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-react": "^7.27.1",
+    "jest-canvas-mock": "^2.3.1"
+  },
+  "resolutions": {
+    "jest-environment-jsdom": "^26.0.1"
+  }
+}

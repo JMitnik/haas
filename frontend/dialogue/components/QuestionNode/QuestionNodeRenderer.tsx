@@ -111,7 +111,7 @@ export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodePr
       activeCallToActionId: activeCallToAction?.id,
       childNodeId: input.event.toNodeId,
       currentNode: currentNode,
-      currentStateType:
+      currentStateType: 'CTA', // TODO: FIx
     })
   }, [logAction, setActiveCallToAction, transition, currentNode]);
 
