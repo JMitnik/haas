@@ -8,7 +8,7 @@ export interface ReportLambdaInput {
   REPORT_URL: string;
 }
 
-class ReportService {
+export class ReportService {
   lambda: AWS.Lambda;
   sts: AWS.STS;
   sns: AWS.SNS;
@@ -28,14 +28,13 @@ class ReportService {
     const snsParams: AWS.SNS.PublishInput = {
       Message: stringifiedPayload,
       // TODO: Track this as dependency
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:haasApiReport",
+      TopicArn: 'arn:aws:sns:eu-central-1:118627563984:haasApiReport',
     }
 
-    this.sns.publish(snsParams, (err, data) => {
+    return this.sns.publish(snsParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
       console.log('Succesfully published to SNS:', data);
-    });
-
+    }).promise();
   }
 }
 

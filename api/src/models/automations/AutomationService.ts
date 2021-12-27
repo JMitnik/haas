@@ -1,23 +1,21 @@
 import {
   AutomationAction,
-  AutomationConditionMatchValue,
   AutomationConditionOperatorType,
-  ConditionPropertyAggregate,
+  AutomationConditionScopeType,
   NodeType,
   PrismaClient,
   QuestionAspect,
-  QuestionNode
+  MatchValueType,
+  AutomationActionType,
 } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
-import { isPresent } from 'ts-is-present';
-import config from '../../config/config';
+import { offsetPaginate } from '../general/PaginationHelpers';
 
 import { NexusGenInputs } from '../../generated/nexus';
-import { offsetPaginate } from '../general/PaginationHelpers';
 import DialogueService from '../questionnaire/DialogueService';
 import UserService from '../users/UserService';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
-import { ReportLambdaInput, reportService } from '../../services/report/ReportService'
+
 import {
   AutomationCondition,
   AutomationTrigger,
@@ -26,28 +24,38 @@ import {
   CreateConditionMatchValueInput,
   SetupQuestionCompareDataInput,
   SetupQuestionCompareDataOutput,
-  UpdateAutomationInput
+  UpdateAutomationInput,
 } from './AutomationTypes'
+import { isPresent } from 'ts-is-present';
+import { AutomationActionService } from './AutomationActionService';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
   dialogueService: DialogueService;
   userService: UserService;
+  automationActionService: AutomationActionService;
 
   constructor(prisma: PrismaClient) {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
     this.dialogueService = new DialogueService(prisma);
+    this.automationActionService = new AutomationActionService(prisma);
     this.userService = new UserService(prisma);
   }
 
   /**
    * Sets up the data necessary for comparing slider data with the condition match value
-   * @param input object containing 
-   * @returns an object containing the value to be compared, the match value it should be checked against and total entries 
+   * @param input object containing
+   * @returns an object containing the value to be compared, the match value it should be checked against and total entries
    */
-  setupSliderCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
+  private setupSliderCompareData = async (
+    input: SetupQuestionCompareDataInput
+  ): Promise<SetupQuestionCompareDataOutput | undefined> => {
     const { questionId, aspect, aggregate, matchValues } = input;
-    const scopedSliderNodeEntries = await this.automationPrismaAdapter.aggregateScopedSliderNodeEntries(questionId, aspect, aggregate);
+    const scopedSliderNodeEntries = await this.automationPrismaAdapter.aggregateScopedSliderNodeEntries(
+      questionId,
+      aspect,
+      aggregate
+    );
     const aggregatedAverageValue = scopedSliderNodeEntries.aggregatedValues._avg?.value;
     const matchValue = matchValues?.[0]?.numberValue;
 
@@ -60,21 +68,30 @@ class AutomationService {
 
   /**
   * Sets up the data necessary for comparing choice data with the condition match value
-  * @param input object containing 
-  * @returns an object containing the value to be compared, the match value it should be checked against and total entries 
+  * @param input object containing
+  * @returns an object containing the value to be compared, the match value it should be checked against and total entries
   */
-  setupChoiceCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
-    let compareValue: number | null;
+  private setupChoiceCompareData = async (
+    input: SetupQuestionCompareDataInput
+  ): Promise<SetupQuestionCompareDataOutput | undefined> => {
+    let compareValue: number | null = null;
     const { questionId, aspect, aggregate, matchValues } = input;
-    const scopedChoiceNodeEntries = await this.automationPrismaAdapter.aggregateScopedChoiceNodeEntries(questionId, aspect, aggregate);
-    const amountMatchValue = matchValues.find((matchValue) => matchValue.type === 'INT');
-    const textMatchValue = matchValues.find((matchValue) => matchValue.type === 'STRING')?.textValue;
+    const scopedChoiceNodeEntries = await this.automationPrismaAdapter.aggregateScopedChoiceNodeEntries(
+      questionId,
+      aspect,
+      aggregate
+    );
+    const amountMatchValue = matchValues.find((matchValue) => matchValue.type === MatchValueType.INT);
+    const textMatchValue = matchValues.find((matchValue) => matchValue.type === MatchValueType.STRING)?.textValue;
 
-    compareValue = textMatchValue && Object.keys(scopedChoiceNodeEntries.aggregatedValues).find((key) => key === textMatchValue) ? scopedChoiceNodeEntries.aggregatedValues[textMatchValue] : 0;
-    console.log('compareValue Target: ', compareValue);
+    if (textMatchValue) {
+      compareValue = Object.keys(scopedChoiceNodeEntries.aggregatedValues).find(
+        (key) => key === textMatchValue
+      ) ? scopedChoiceNodeEntries.aggregatedValues[textMatchValue] : 0;
+    }
 
     return {
-      // if matchValue doesn't exist that's a condition problem -> returning null. 
+      // if matchValue doesn't exist that's a condition problem -> returning null.
       // if key doesn't exist in scopedChoiceNodeEntries.aggregatedValues -> returning 0.
       compareValue: textMatchValue ? compareValue : null,
       matchValue: amountMatchValue?.numberValue,
@@ -84,81 +101,109 @@ class AutomationService {
 
   /**
   * Sets up the data necessary for comparing question data with the condition match value
-  * @param input object containing 
-  * @returns an object containing the value to be compared, the match value it should be checked against and total entries 
+  * @param input object containing
+  * @returns an object containing the value to be compared, the match value it should be checked against and total entries
   */
-  setupQuestionCompareData = async (input: SetupQuestionCompareDataInput): Promise<SetupQuestionCompareDataOutput | undefined> => {
-    if (input.type === 'SLIDER') return this.setupSliderCompareData(input);
-    if (input.type === 'CHOICE') return this.setupChoiceCompareData(input);
-    return undefined;
+  private setupQuestionCompareData = async (
+    input: SetupQuestionCompareDataInput
+  ): Promise<SetupQuestionCompareDataOutput | undefined> => {
+    switch (input.type) {
+      case NodeType.SLIDER: {
+        return this.setupSliderCompareData(input);
+      }
+
+      case NodeType.CHOICE: {
+        return this.setupChoiceCompareData(input);
+      }
+
+      default: {
+        return undefined;
+      }
+    }
   };
 
   /**
-   * Validates question condition scope. CURRENTLY ONLY SUPPORT SLIDER NODES
+   * Validates question condition scope.
+   *
+   * NOTE:
+   * - CURRENTLY ONLY SUPPORT SLIDER NODES
    * @param condition an AutomationCondition
    * @return boolean. true if conditions are met and false if they ar enot
    */
-  validateQuestionScopeCondition = async (condition: AutomationCondition) => {
-    // Fetch data based on scope
-    const { id: questionId, type } = condition.question as QuestionNode;
+  private validateQuestionScopeCondition = async (condition: AutomationCondition) => {
     const input: SetupQuestionCompareDataInput = {
-      type,
-      questionId,
+      type: condition.question?.type as NodeType,
+      questionId: condition?.question?.id as string,
       matchValues: condition.matchValues,
       aggregate: condition.questionScope?.aggregate,
       aspect: condition.questionScope?.aspect as QuestionAspect,
     };
+    // Fetch data based on scope
     const scopedData = await this.setupQuestionCompareData(input);
 
     // Some of the data necessary to validate condition is missing
-    if (!scopedData || (!scopedData?.compareValue && typeof scopedData?.compareValue !== 'number') || !scopedData?.matchValue) {
+    if (
+      !scopedData ||
+      (!scopedData?.compareValue && typeof scopedData?.compareValue !== 'number')
+      || !scopedData?.matchValue
+    ) {
       return false;
     }
 
     // Want latest X but there is less than X *new* entries in the database => return false
-    if (condition.questionScope?.aggregate?.latest && scopedData.totalEntries % condition.questionScope?.aggregate?.latest !== 0) {
+    const hasNotEnoughLatest = (
+      condition.questionScope?.aggregate?.latest &&
+      scopedData.totalEntries % condition.questionScope?.aggregate?.latest !== 0
+    );
+
+    if (hasNotEnoughLatest) {
       return false;
     }
 
-    // Because it passed the above batch test this one will always be true
-    if (condition.operator === 'EVERY_N_TH_TIME') return true;
+    switch (condition.operator) {
+      case AutomationConditionOperatorType.SMALLER_OR_EQUAL_THAN: {
+        return scopedData.compareValue <= scopedData.matchValue;
+      }
 
-    if (condition.operator === 'SMALLER_OR_EQUAL_THAN') {
-      console.log(`${scopedData.compareValue} <= ${scopedData.matchValue}`);
-      return scopedData.compareValue <= scopedData.matchValue;
+      // Because it passed the above batch test this one will always be true
+      case AutomationConditionOperatorType.EVERY_N_TH_TIME: {
+        return true;
+      }
+
+      case AutomationConditionOperatorType.GREATER_OR_EQUAL_THAN: {
+        return scopedData.compareValue <= scopedData.matchValue;
+      }
+
+      case AutomationConditionOperatorType.GREATER_THAN: {
+        return scopedData.compareValue > scopedData.matchValue;
+      }
+
+      case AutomationConditionOperatorType.SMALLER_THAN: {
+        return scopedData.compareValue < scopedData.matchValue;
+      }
+
+      case AutomationConditionOperatorType.IS_EQUAL: {
+        return scopedData.compareValue === scopedData.matchValue;
+      }
+
+      case AutomationConditionOperatorType.IS_NOT_EQUAL: {
+        return scopedData.compareValue !== scopedData.matchValue;
+      }
+
+      // TODO: Implement
+      case AutomationConditionOperatorType.INNER_RANGE: {
+        return false;
+      }
+
+      // TODO: Implement
+      case AutomationConditionOperatorType.OUTER_RANGE: {
+        return false;
+      }
+
+      default: {
+        throw Error('No checks in place for provided operator type!');
+      }
     }
-
-    if (condition.operator === 'GREATER_OR_EQUAL_THAN') {
-      return scopedData.compareValue <= scopedData.matchValue;
-    }
-
-    if (condition.operator === 'GREATER_THAN') {
-      return scopedData.compareValue > scopedData.matchValue;
-    }
-
-    if (condition.operator === 'SMALLER_THAN') {
-      return scopedData.compareValue < scopedData.matchValue;
-    }
-
-    if (condition.operator === 'IS_EQUAL') {
-      return scopedData.compareValue === scopedData.matchValue;
-    }
-
-    if (condition.operator === 'IS_NOT_EQUAL') {
-      return scopedData.compareValue !== scopedData.matchValue;
-    }
-
-    if (condition.operator === 'INNER_RANGE') {
-      // TODO: Implement 
-      return false;
-    }
-
-    if (condition.operator === 'OUTER_RANGE') {
-      // TODO: implement
-      return false;
-    }
-
-    throw Error('No checks in place for provided operator type!');
   }
 
   /**
@@ -168,40 +213,23 @@ class AutomationService {
    */
   checkAutomationTriggersConditions = async (automationTrigger: AutomationTrigger) => {
     const matchedConditionsTriggers = await Promise.all(automationTrigger.conditions.map(async (condition) => {
-      const { scope } = condition;
-      console.log('HANDLED SCOPE: ', scope);
-      if (scope === 'DIALOGUE') return false;
+      switch (condition.scope) {
+        case AutomationConditionScopeType.QUESTION: {
+          return this.validateQuestionScopeCondition(condition);
+        }
 
-      if (scope === 'QUESTION') {
-        return this.validateQuestionScopeCondition(condition);
+        case AutomationConditionScopeType.DIALOGUE: {
+          return false;
+        }
+
+        default: {
+          return false;
+        }
       }
-
-      if (scope === 'WORKSPACE') return false;
-
-      return false;
     }));
 
-    console.log('matchedConditionsTriggers: ', matchedConditionsTriggers);
     const successfullyPassedAllConditions = !matchedConditionsTriggers.includes(false);
     return successfullyPassedAllConditions;
-  }
-
-  /**
-   * Checks whether any trigger automations with an event related to a dialogue (or its questions) exists
-   * @param dialogueId a dialogue id
-   * @returns a list of automation triggers potentially triggered
-   */
-  hasPotentialTriggeredAutomations = async (dialogueId: string) => {
-    const questions = await this.dialogueService.getQuestionsByDialogueId(dialogueId);
-    const questionIds = questions.map((question) => question.id).filter(isPresent);
-    const possibleAutomations = await this.automationPrismaAdapter.findPotentialTriggerdAutomations(dialogueId, questionIds);
-
-    if (!possibleAutomations.length) return null;
-    const automationTriggers = possibleAutomations.map((automation) => {
-      const dialogueSlug = automation.automationTrigger?.event.dialogue?.slug || automation.automationTrigger?.event.question?.questionDialogue?.slug
-      return { dialogueSlug: dialogueSlug, workspaceSlug: automation.workspace.slug, trigger: automation.automationTrigger }
-    }).filter(isPresent);
-    return automationTriggers;
   }
 
   /**
@@ -211,53 +239,81 @@ class AutomationService {
    * @param dialogueSlug the slug of the pertaining dialogue (OPTIONAL)
    * @returns the succesfull running of a SNS related to the action
    */
-  handleAutomationAction = async (automationAction: AutomationAction, workspaceSlug: string, dialogueSlug?: string) => {
-    if (automationAction.type === 'GENERATE_REPORT') { // TODO: Implies weekly report for now. Should probably change eventually😬
-      // get bot user to create report with
-      const botUser = await this.userService.findBotByWorkspaceName(workspaceSlug);
-      const dashboardUrl = config.dashboardUrl;
-      const reportUrl = `${dashboardUrl}/dashboard/b/${workspaceSlug}/d/${dialogueSlug}/_reports/weekly`;
-      const apiUrl = `${config.baseUrl}/graphql`
-      const authenticateEmail = 'automations@haas.live' // TODO: I think this one is not needed anymore
-      const payload: ReportLambdaInput = {
-        API_URL: apiUrl,
-        AUTHENTICATE_EMAIL: authenticateEmail,
-        DASHBOARD_URL: dashboardUrl,
-        REPORT_URL: reportUrl,
-        WORKSPACE_EMAIL: botUser?.email || '',
+  public handleAutomationAction = async (
+    automationAction: AutomationAction,
+    workspaceSlug: string,
+    dialogueSlug?: string
+  ) => {
+    switch (automationAction.type) {
+      case AutomationActionType.GENERATE_REPORT: {
+        return this.automationActionService.generateReport(workspaceSlug, dialogueSlug);
+      };
+
+      default: {
+        console.log(`No action handler implemented for action type: ${automationAction.type}. abort.`);
+        return new Promise((resolve) => resolve(''));
       }
-      return reportService.generateReport(payload);
-    }
-    console.log(`No action handler implemented for action type: ${automationAction.type}. abort.`);
+    };
   }
 
   /**
-   * Handles the whole process of checking for existing triggers, its conditions as well conducting the correct actions
-   * in case an automation trigger has actually been triggered.
-   * @param dialogueId the dialogue id which is the cause of an automation being triggered
+   * Checks whether any candidate trigger automations with an event related to a dialogue (or its questions).
+   * @param dialogueId a dialogue id
+   * @returns a list of automation triggers potentially triggered
    */
+  getCandidateTriggers = async (dialogueId: string) => {
+    const questions = await this.dialogueService.getQuestionsByDialogueId(dialogueId);
+    const questionIds = questions.map((question) => question.id).filter(isPresent);
+    const candidateAutomations = await this.automationPrismaAdapter.findCandidateAutomations(
+      dialogueId,
+      questionIds
+    );
+
+    if (!candidateAutomations.length) return null;
+
+    const candidateAutomationTriggers = candidateAutomations.map((automation) => {
+      const dialogueSlug = (
+        automation.automationTrigger?.event.dialogue?.slug ||
+        automation.automationTrigger?.event.question?.questionDialogue?.slug
+      );
+
+      return {
+        dialogueSlug,
+        workspaceSlug: automation.workspace.slug,
+        trigger: automation.automationTrigger,
+      }
+    }).filter(isPresent);
+
+    return candidateAutomationTriggers;
+  }
+
   handleTriggerAutomations = async (dialogueId: string) => {
-    const possibleTriggeredAutomations = await this.hasPotentialTriggeredAutomations(dialogueId);
-    if (!possibleTriggeredAutomations) {
+    const candidateAutomations = await this.getCandidateTriggers(dialogueId);
+    if (!candidateAutomations) {
       console.log('No potential trigger automations found. abort');
       return;
     }
 
-    const triggeredAutomations = await Promise.all(possibleTriggeredAutomations.map(async (automationTrigger) => {
+    const triggeredAutomations = await Promise.all(candidateAutomations.map(async (automationTrigger) => {
       const { trigger, workspaceSlug, dialogueSlug } = automationTrigger;
-      if (!trigger) throw new Error('Found automation trigger that is actually not a trigger');
 
+      if (!trigger) return null;
+
+      // TODO: Consider ANDS vs ORs for conditions
       const allConditionsConfirmed = await this.checkAutomationTriggersConditions(trigger);
 
       if (allConditionsConfirmed) {
-        trigger.actions.forEach((automationAction) => {
-          this.handleAutomationAction(automationAction, workspaceSlug, dialogueSlug);
-        });
+        await Promise.all(trigger?.actions?.map((automationAction) => {
+          return this.handleAutomationAction(automationAction, workspaceSlug, dialogueSlug)
+        }));
+
         console.log('All conditions of automation trigger confirmed. Do action');
       } else {
         console.log('One or more conditions have failed. No action done');
       }
     }));
+
+    return triggeredAutomations;
   }
 
   /**
@@ -268,33 +324,49 @@ class AutomationService {
    */
   validateCreateAutomationConditionScopeInput = (condition: NexusGenInputs['CreateAutomationCondition']): Required<NexusGenInputs['CreateAutomationCondition']> => {
     if (!condition.scope) throw new UserInputError('One of the automation conditions has no scope object provided!');
-
     const { type, dialogueScope, workspaceScope, questionScope } = condition.scope;
     if (!type) throw new UserInputError('One of the automation conditions has no scope type provided!');
-    if (type === 'QUESTION') {
-      if (!questionScope?.aspect) {
-        throw new UserInputError('Condition scope is question but no aspect is provided!');
+
+    switch (condition.scope.type) {
+      case AutomationConditionScopeType.QUESTION: {
+        if (!questionScope?.aspect) {
+          throw new UserInputError('Condition scope is question but no aspect is provided!');
+        }
+        if (!questionScope?.aggregate?.type) {
+          throw new UserInputError('Condition scope is question but no aggregate type is provided!');
+        }
+
+        break;
       }
-      if (!questionScope?.aggregate?.type) {
-        throw new UserInputError('Condition scope is question but no aggregate type is provided!');
+
+      case AutomationConditionScopeType.DIALOGUE: {
+        if (!dialogueScope?.aspect) throw new UserInputError('Condition scope is dialogue but no aspect is provided!');
+
+        if (!dialogueScope?.aggregate?.type) throw new UserInputError('Condition scope is dialogue but no aggregate type is provided!');
+
+        break;
+      };
+
+      case AutomationConditionScopeType.WORKSPACE: {
+        if (!workspaceScope?.aspect) throw new UserInputError('Condition scope is workspace but no aspect is provided!');
+
+        if (!workspaceScope?.aggregate?.type) throw new UserInputError('Condition scope is workspace but no aggregate type is provided!');
+
+        break;
       }
-    }
-    if (type === 'DIALOGUE') {
-      if (!dialogueScope?.aspect) throw new UserInputError('Condition scope is dialogue but no aspect is provided!');
-      if (!dialogueScope?.aggregate?.type) throw new UserInputError('Condition scope is dialogue but no aggregate type is provided!');
-    }
-    if (type === 'WORKSPACE') {
-      if (!workspaceScope?.aspect) throw new UserInputError('Condition scope is workspace but no aspect is provided!');
-      if (!workspaceScope?.aggregate?.type) throw new UserInputError('Condition scope is workspace but no aggregate type is provided!');
+
+      default: {
+        break;
+      }
     }
 
-    return condition as Required<NexusGenInputs['CreateAutomationCondition']>;
+    return condition as Required<NexusGenInputs['CreateAutomationCondition']>;;
   }
 
   /**
-   * Constructs a CREATE prisma condition scope data object 
+   * Constructs a CREATE prisma condition scope data object
    * @param condition input object for an AutomationConditionScope
-   * @returns a CREATE prisma condition scope data object 
+   * @returns a CREATE prisma condition scope data object
    */
   constructCreateAutomationConditionScopeInput = (condition: NexusGenInputs['CreateAutomationCondition']): CreateAutomationConditionScopeInput => {
     const validatedCondition = this.validateCreateAutomationConditionScopeInput(condition);
@@ -313,29 +385,36 @@ class AutomationService {
 
   /**
    * Validates data input for automation actions
-   * @param input 
+   * @param input
    * @returns validated CREATE prisma automation actions data list
    */
   validateAutomationActionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['actions'] => {
     if (input?.actions?.length === 0) throw new UserInputError('No actions provided for automation!');
-    input.actions?.forEach((action) => {
-      if (!action.type) throw new UserInputError('No action type provided for one of the automation actions!');
-      // TODO: Construct type for both email, sms and all other action types to check against
 
-      const noTargetList = action.payload ? (Object.entries(action.payload).length === 0
+    input.actions?.forEach((action) => {
+      const hasNoTarget = action.payload ? (Object.entries(action.payload).length === 0
         || !Object.keys(action.payload).find((key) => key === 'targets')
         || this.hasEmptyTargetList(action.payload)) : true;
 
-      if (action.type === 'SEND_EMAIL') {
-        if (noTargetList) throw new UserInputError('No target email addresses provided for "SEND_EMAIL"!');
-        // TODO: Add additional checks such as whether all properties exist for every target entry
-      }
+      switch (action.type) {
+        case undefined: {
+          throw new UserInputError('No action type provided for automation action!');
+        }
 
-      if (action.type === 'SEND_SMS') {
-        if (noTargetList) throw new UserInputError('No target phone numbers provided for "SEND_SMS"!');
-        // TODO: Add additional checks such as whether all properties exist for every target entry
-      }
+        case AutomationActionType.SEND_EMAIL: {
+          if (hasNoTarget) throw new UserInputError('No target email addresses provided for "SEND_EMAIL"!');
+          return;
+        }
 
+        case AutomationActionType.SEND_SMS: {
+          if (hasNoTarget) throw new UserInputError('No target phone numbers provided for "SEND_SMS"!');
+          return;
+        }
+
+        default: {
+          return;
+        }
+      }
     });
 
     return input.actions as CreateAutomationInput['actions'];
@@ -347,7 +426,7 @@ class AutomationService {
    * @returns a validated AutomationAction input list where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructAutomationActionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['actions'] => {
+  private constructAutomationActionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['actions'] => {
     const validatedActions = this.validateAutomationActionsInput(input);
     return validatedActions;
   }
@@ -358,7 +437,7 @@ class AutomationService {
    * @returns a validated AutomationCondition input list
    * @throws UserInputError if not all information is required
    */
-  validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
+  private validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
     if (input.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
 
     input.conditions?.forEach((condition) => {
@@ -382,7 +461,7 @@ class AutomationService {
    * @returns a validated AutomationCondition input list where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['conditions'] => {
+  private constructCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['conditions'] => {
     const validatedConditions = this.validateCreateAutomationConditionsInput(input) as Required<NexusGenInputs['CreateAutomationCondition'][]>;
 
     const mappedConditions: CreateAutomationInput['conditions'] = validatedConditions?.map((condition) => {
@@ -412,7 +491,7 @@ class AutomationService {
    * @returns a validated AutomationEvent input object where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationEventInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['event'] => {
+  private constructCreateAutomationEventInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['event'] => {
     if (!input.event) throw new UserInputError('No event provided for automation!');
     if (!input.event?.eventType || typeof input.event?.eventType === undefined || input.event?.eventType === null) throw new UserInputError('No event type provided for automation event!');
 
@@ -428,7 +507,7 @@ class AutomationService {
    * @returns a validated Automation input object where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  validateCreateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput => {
+  private validateCreateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput => {
     if (!input) throw new UserInputError('No input provided create automation with!');
     if (!input.label || typeof input.label === undefined || input.label === null) throw new UserInputError('No label provided for automation!');
 
@@ -443,7 +522,7 @@ class AutomationService {
    * @returns a validated Automation prisma data object
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput => {
+  private constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput => {
     const validatedInput = this.validateCreateAutomationInput(input);
 
     const label: CreateAutomationInput['label'] = validatedInput.label;
@@ -462,7 +541,7 @@ class AutomationService {
    * @returns a validated Automation input object containing all information necessary to update an Automation
    * @throws UserInputError if not all information is required
    */
-  constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): UpdateAutomationInput => {
+  private constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): UpdateAutomationInput => {
     if (!input.id) throw new UserInputError('No ID provided for automation that should be updated!');
 
     const id: UpdateAutomationInput['id'] = input.id;
@@ -476,7 +555,7 @@ class AutomationService {
    * @returns updated Automation (without relationship fields)
    * @throws UserInputError if not all information is required
    */
-  updateAutomation = (input: NexusGenInputs['CreateAutomationResolverInput']) => {
+  public updateAutomation = (input: NexusGenInputs['CreateAutomationResolverInput']) => {
     // Test whether input data matches what's needed to update an automation
     const validatedInput = this.constructUpdateAutomationInput(input);
     return this.automationPrismaAdapter.updateAutomation(validatedInput);
@@ -488,7 +567,7 @@ class AutomationService {
    * @returns created Automation (without relationship fields)
    * @throws UserInputError if not all information is required
    */
-  createAutomation = (input: NexusGenInputs['CreateAutomationResolverInput']) => {
+  public createAutomation = (input: NexusGenInputs['CreateAutomationResolverInput']) => {
     // Test whether input data matches what's needed to create an automation
     const validatedInput = this.constructCreateAutomationInput(input);
     return this.automationPrismaAdapter.createAutomation(validatedInput);
@@ -497,9 +576,9 @@ class AutomationService {
   /**
    * Finds an automation (and its relationships) by the provided ID
    * @param automationId the ID of the automation
-   * @returns an Automation with relationships included or null if no automation with specified ID exist in the database 
+   * @returns an Automation with relationships included or null if no automation with specified ID exist in the database
    */
-  findAutomationById = (automationId: string) => {
+  public findAutomationById = (automationId: string) => {
     return this.automationPrismaAdapter.findAutomationById(automationId);
   }
 
@@ -508,7 +587,7 @@ class AutomationService {
    * @param automationId the id of an automation
    * @returns a workspace
    */
-  findWorkspaceByAutomation = (automationId: string) => {
+  public findWorkspaceByAutomation = (automationId: string) => {
     return this.automationPrismaAdapter.findWorkspaceByAutomationId(automationId);
   };
 
@@ -517,7 +596,7 @@ class AutomationService {
    * @param workspaceId a workspace ID
    * @returns a list of automations part of a workspace
    */
-  findAutomationsByWorkspace = (workspaceId: string) => {
+  public findAutomationsByWorkspace = (workspaceId: string) => {
     return this.automationPrismaAdapter.findAutomationsByWorkspaceId(workspaceId);
   };
 
@@ -527,7 +606,7 @@ class AutomationService {
    * @param filter a filter object used to paginate through automations of a workspace
    * @returns a list of paginated automations
    */
-  paginatedAutomations = async (
+  public paginatedAutomations = async (
     workspaceSlug: string,
     filter?: NexusGenInputs['AutomationConnectionFilterInput'] | null,
   ) => {
