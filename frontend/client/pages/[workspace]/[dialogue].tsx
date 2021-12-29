@@ -4,7 +4,7 @@ import { ApolloProvider } from '@apollo/client';
 
 import { CreateSessionDocument, CreateSessionMutation, CreateSessionMutationVariables, Customer, Dialogue as DialogueType, GetDialogueDocument, GetDialogueQuery, GetDialogueQueryVariables } from 'types/generated-types';
 import client from 'config/apollo';
-import { DialogueAdapter } from 'components/Dialogue/DialogueAdapter';
+import { DialogueAdapter } from 'components/DialogueAdapter/DialogueAdapter';
 
 interface DialogueProps {
   sessionId: string;

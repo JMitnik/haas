@@ -16,14 +16,14 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "baseUrl": ".",
+    "baseUrl": "./",
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
+    "./**/*.ts",
+    "./**/*.tsx"
   ],
   "exclude": [
     "node_modules"
