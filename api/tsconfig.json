@@ -61,9 +61,19 @@
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
     /* Advanced Options */
     "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
-    "sourceMap": true
+    "sourceMap": true,
+    "paths": {
+      "*": [
+        "./src/*"
+      ]
+    }
   },
-  "files": [
-    "./src/app.ts"
+  "ts-node": {
+    "transpileOnly": true,
+    "transpiler": "ts-node/transpilers/swc-experimental"
+  },
+  "include": [
+    "./src/app.ts",
+    "./src/scripts/*.ts"
   ]
 }
