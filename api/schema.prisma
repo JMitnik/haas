@@ -428,6 +428,7 @@ model SliderNodeEntry {
 
 model ChoiceNodeEntry {
   id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
   value       String?
   nodeEntryId String    @unique
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
@@ -1002,8 +1003,11 @@ model AutomationAction {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
-  type AutomationActionType
+  apiKey   String?
+  endpoint String?
+  payload  Json?
 
+  type               AutomationActionType
   automationTriggers AutomationTrigger[]
 }
 

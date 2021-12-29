@@ -92,6 +92,9 @@ export const AutomationActionInput = inputObjectType({
   definition(t) {
     t.id('id', { nullable: true });
     t.field('type', { type: AutomationActionType });
+    t.string('apiKey');
+    t.string('endpoint');
+    t.json('payload');
   },
 });
 
@@ -137,7 +140,6 @@ export const CreateAutomationResolver = mutationField('createAutomation', {
   async resolve(parent, args, ctx) {
 
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
-
     const automation = await ctx.services.automationService.createAutomation(args.input);
     return automation;
   },

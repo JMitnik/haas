@@ -344,6 +344,37 @@ it('unable to create automation when no event type is provided for a condition',
   }
 });
 
+it('unable to create automation when no targets are provided for a SEND_SMS action', async () => {
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
+
+  // Generate token for API access
+  const token = AuthService.createUserToken(user.id, 22);
+  const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
+  const payload = input?.actions?.find((action) => action.type === 'SEND_SMS')?.payload as { targets: Array<string> };
+  payload.targets = [];
+
+  try {
+    await ctx.client.request(`
+      mutation createAutomation($input: CreateAutomationResolverInput) {
+        createAutomation(input: $input) {
+          id
+          label
+          type
+        }
+      }
+    `,
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`
+      }
+    );
+  } catch (error) {
+    expect(error.message).toContain('No target phone numbers provided');
+  }
+});
+
 it('unable to create automations unauthorized', async () => {
   const { user, workspace, userRole, dialogue, question } = await prepDefaultCreateData(prisma);
 

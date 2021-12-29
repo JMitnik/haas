@@ -10,12 +10,14 @@ declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     upload<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Upload";
     date<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Date";
+    json<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "JSONObject";
   }
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
     upload<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Upload";
     date<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Date";
+    json<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "JSONObject";
   }
 }
 
@@ -38,7 +40,10 @@ export interface NexusGenInputs {
     sessionId?: string | null; // ID
   }
   AutomationActionInput: { // input type
+    apiKey?: string | null; // String
+    endpoint?: string | null; // String
     id?: string | null; // ID
+    payload?: any | null; // JSONObject
     type?: NexusGenEnums['AutomationActionType'] | null; // AutomationActionType
   }
   AutomationConnectionFilterInput: { // input type
@@ -1051,6 +1056,7 @@ export interface NexusGenRootTypes {
   Boolean: boolean;
   ID: string;
   Date: any;
+  JSONObject: any;
   Upload: any;
 }
 
@@ -2145,7 +2151,7 @@ export type NexusGenEnumNames = "AutomationActionType" | "AutomationConditionOpe
 
 export type NexusGenInterfaceNames = "ConnectionInterface" | "DeprecatedConnectionInterface";
 
-export type NexusGenScalarNames = "Boolean" | "Date" | "Float" | "ID" | "Int" | "String" | "Upload";
+export type NexusGenScalarNames = "Boolean" | "Date" | "Float" | "ID" | "Int" | "JSONObject" | "String" | "Upload";
 
 export type NexusGenUnionNames = never;
 

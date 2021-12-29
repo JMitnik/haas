@@ -1,10 +1,10 @@
-import { AutomationCondition, AutomationConditionScopeType, DialogueConditionScope, Prisma, PrismaClient, QuestionConditionScope, WorkspaceConditionScope } from '@prisma/client';
-import { cloneDeep } from 'lodash';
+import { AutomationCondition, AutomationConditionScopeType, DialogueConditionScope, NodeType, Prisma, PrismaClient, QuestionAspect, QuestionConditionScope, WorkspaceConditionScope } from '@prisma/client';
+import { cloneDeep, countBy, map } from 'lodash';
 import { isPresent } from 'ts-is-present';
 import { NexusGenInputs } from '../../generated/nexus';
 
 import {
-  UpdateAutomationConditionInput, UpdateAutomationInput, FullAutomationWithRels, CreateAutomationInput, CreateScopeDataInput, CreateAutomationConditionScopeInput, CreateAutomationConditionInput, AutomationTrigger
+  UpdateAutomationConditionInput, UpdateAutomationInput, FullAutomationWithRels, CreateAutomationInput, CreateScopeDataInput, CreateAutomationConditionScopeInput, CreateAutomationConditionInput, AutomationTrigger, ConditionPropertAggregateInput
 } from './AutomationTypes';
 
 export class AutomationPrismaAdapter {
@@ -12,6 +12,161 @@ export class AutomationPrismaAdapter {
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
+  }
+
+  aggregateScopedSliderNodeEntries = async (
+    questionId: string,
+    aspect: QuestionAspect,
+    aggregate?: ConditionPropertAggregateInput | null
+  ) => {
+    const totalAmountSliderValues = await this.prisma.sliderNodeEntry.count({
+      where: {
+        nodeEntry: {
+          relatedNodeId: questionId,
+          creationDate: {
+            lte: aggregate?.endDate || undefined,
+            gte: aggregate?.startDate || undefined,
+          }
+        },
+      }
+    })
+
+    const aggregatedSliderValues = await this.prisma.sliderNodeEntry.aggregate({
+      where: {
+        nodeEntry: {
+          relatedNodeId: questionId,
+          creationDate: {
+            lte: aggregate?.endDate || undefined,
+            gte: aggregate?.startDate || undefined,
+          }
+        },
+      },
+      orderBy: {
+        nodeEntry: {
+          creationDate: 'desc',
+        }
+      },
+      // TODO: Change average value based aspect when we introduce new information such as slider speed
+      _avg: aggregate?.type === 'AVG' ? {
+        value: true,
+      } : undefined,
+      take: aggregate?.latest || undefined,
+    });
+
+    return { totalEntries: totalAmountSliderValues, aggregatedValues: aggregatedSliderValues };
+  };
+
+  aggregateScopedChoiceNodeEntries = async (
+    questionId: string,
+    aspect: QuestionAspect,
+    aggregate?: ConditionPropertAggregateInput | null
+  ) => {
+    const totalAmountChoiceValues = await this.prisma.choiceNodeEntry.count({
+      where: {
+        nodeEntry: {
+          relatedNodeId: questionId,
+          creationDate: {
+            lte: aggregate?.endDate || undefined,
+            gte: aggregate?.startDate || undefined,
+          }
+        },
+      }
+    });
+
+    const aggregatedChoices = await this.prisma.choiceNodeEntry.findMany({
+      where: {
+        nodeEntry: {
+          relatedNodeId: questionId,
+          creationDate: {
+            lte: aggregate?.endDate || undefined,
+            gte: aggregate?.startDate || undefined,
+          }
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: aggregate?.latest || undefined,
+    });
+
+    const countedChoices = countBy(aggregatedChoices, (choice) => choice.value);
+
+    return { totalEntries: totalAmountChoiceValues, aggregatedValues: countedChoices };
+  }
+
+  /**
+   * Checks whether any automation events exist where either a dialogue id or one of the question Ids belongs to.
+   * @param dialogueId the dialogue ID part potentially part of an AutomationEvent
+   * @param questionIds a list of question IDs potentially part of an AutomationEvent
+   * @returns a list of Automations
+   */
+  findCandidateAutomations = (dialogueId: string, questionIds: Array<string>) => {
+    // TODO: Introduce system-wide fetch
+    return this.prisma.automation.findMany({
+      where: {
+        AND: [
+          {
+            type: 'TRIGGER',
+          },
+          {
+            automationTrigger: {
+              OR: [
+                {
+                  event: {
+                    OR: [
+                      {
+                        dialogueId
+                      },
+                      {
+                        questionId: {
+                          in: questionIds,
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      include: {
+        workspace: true,
+        automationTrigger: {
+          include: {
+            event: {
+              include: {
+                question: true,
+                dialogue: true,
+              }
+            },
+            conditions: {
+              include: {
+                questionScope: {
+                  include: {
+                    aggregate: true,
+                  }
+                },
+                dialogueScope: {
+                  include: {
+                    aggregate: true,
+                  }
+                },
+                matchValues: true,
+                workspaceScope: {
+                  include: {
+                    aggregate: true,
+                  }
+                },
+                dialogue: true,
+                question: true,
+              }
+            },
+            actions: true,
+          },
+        },
+      },
+    })
   }
 
   /**
@@ -89,7 +244,7 @@ export class AutomationPrismaAdapter {
   /**
    * Finds an automation (and its relationships) by the provided ID
    * @param automationId the ID of the automation
-   * @returns an Automation with relationships included or null if no automation with specified ID exist in the database 
+   * @returns an Automation with relationships included or null if no automation with specified ID exist in the database
    */
   findAutomationById = async (automationId: string) => {
     const automation = await this.prisma.automation.findUnique({
@@ -137,9 +292,9 @@ export class AutomationPrismaAdapter {
   }
 
   /**
-   * Creates a Prisma-ready data object for creation of an AutomationConditionScope 
+   * Creates a Prisma-ready data object for creation of an AutomationConditionScope
    * @param scope a generic scope object containing the scope and either question, dialogue or workspace scope
-   * @returns a Prisma-ready data object for creation of an AutomationConditionScope 
+   * @returns a Prisma-ready data object for creation of an AutomationConditionScope
    */
   constructCreateAutomationConditionScopeData = (scope: CreateAutomationConditionScopeInput): CreateScopeDataInput | undefined => {
     if (scope.type === 'QUESTION' && scope.questionScope) {
@@ -182,7 +337,7 @@ export class AutomationPrismaAdapter {
   }
 
   /**
-   * 
+   *
    * @param dbCondition the current condition in the database matching id of input condition
    * @param condition the input condition
    * @param checkAgainstScope the current scope that this function is called for and being checked against.
@@ -214,7 +369,7 @@ export class AutomationPrismaAdapter {
   /**
    * Creates a Prisma-ready data object for UPDATE of an AutomationCondition
    * @param condition an input object containing information for updating an AutomationCondition
-   * @returns a Prisma-ready data object for updating of an AutomationCondition 
+   * @returns a Prisma-ready data object for updating of an AutomationCondition
    */
   constructUpdateAutomationConditionData = async (condition: UpdateAutomationConditionInput): Promise<Prisma.AutomationConditionUpdateWithoutAutomationTriggerInput> => {
     const { dialogueId, scope, questionId, matchValues, operator } = condition;
@@ -325,7 +480,7 @@ export class AutomationPrismaAdapter {
   /**
    * Creates a Prisma-ready data object for CREATE of an AutomationCondition
    * @param condition an input object containing information for creating an AutomationCondition
-   * @returns a Prisma-ready data object for creating of an AutomationCondition 
+   * @returns a Prisma-ready data object for creating of an AutomationCondition
    */
   constructCreateAutomationConditionData = (condition: CreateAutomationConditionInput): Prisma.AutomationConditionCreateWithoutAutomationTriggerInput => {
     const { dialogueId, scope, questionId, matchValues, operator } = condition;
@@ -412,7 +567,14 @@ export class AutomationPrismaAdapter {
         create: conditions.map((condition) => this.constructCreateAutomationConditionData(condition)),
       },
       actions: {
-        create: actions,
+        create: actions.map((action) => {
+          return {
+            type: action.type,
+            apiKey: action.apiKey,
+            endpoint: action.endpoint,
+            payload: action.payload,
+          }
+        }),
       },
     }
   }
@@ -468,9 +630,15 @@ export class AutomationPrismaAdapter {
             },
             create: {
               type: action.type,
+              apiKey: action?.apiKey,
+              endpoint: action?.endpoint,
+              payload: action?.payload,
             },
             update: {
               type: action.type,
+              apiKey: action?.apiKey,
+              endpoint: action?.endpoint,
+              payload: action?.payload,
             },
           };
         }),

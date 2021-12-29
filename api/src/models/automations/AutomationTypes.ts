@@ -1,7 +1,7 @@
 import {
   AutomationActionType, AutomationConditionMatchValue, AutomationConditionOperatorType,
   AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate,
-  Customer, Dialogue, DialogueConditionScope, QuestionConditionScope, QuestionNode,
+  Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
   WorkspaceConditionScope
 } from '@prisma/client';
 
@@ -16,9 +16,9 @@ type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
 type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
 
 export interface ConditionPropertAggregateInput {
-  endDate?: string | null; // String
+  endDate?: Date | null; // String
   latest?: number | null; // Int
-  startDate?: string | null; // String
+  startDate?: Date | null; // String
   type: NexusGenEnums['ConditionPropertyAggregateType']; // ConditionPropertyAggregateType
 }
 
@@ -110,6 +110,9 @@ export interface CreateAutomationInput {
 
 export interface CreateAutomationActionInput {
   type: NexusGenEnums['AutomationActionType'];
+  apiKey?: string | null;
+  endpoint?: string | null;
+  payload?: object | null;
 }
 
 export interface UpdateAutomationActionInput extends CreateAutomationActionInput {
@@ -127,7 +130,7 @@ export interface UpdateAutomationInput extends CreateAutomationInput {
 export type MoreXOR = CreateQuestionScopeInput['aspect'] | CreateDialogueScopeInput['aspect'] | CreateWorkspaceScopeInput['aspect']
 
 export interface CreateScopeDataInput {
-  aspect: any // TODO: Turn this into MoreXOR 
+  aspect: any // TODO: Turn this into MoreXOR
   aggregate: ConditionPropertAggregateInput;
 }
 
@@ -140,31 +143,33 @@ export interface AutomationEventWithRels extends AutomationEvent {
   dialogue: Dialogue | null
 }
 
+export interface AutomationCondition {
+  id: string;
+  scope: AutomationConditionScopeType;
+  operator: AutomationConditionOperatorType;
+  matchValues: AutomationConditionMatchValue[],
+  questionScope: (QuestionConditionScope
+    & {
+      aggregate: ConditionPropertyAggregate | null;
+    }) | null,
+  dialogueScope: (DialogueConditionScope
+    & {
+      aggregate: ConditionPropertyAggregate | null;
+    }) | null,
+  workspaceScope: (WorkspaceConditionScope
+    & {
+      aggregate: ConditionPropertyAggregate | null;
+    }) | null,
+  dialogue: Dialogue | null;
+  question: QuestionNode | null;
+}
+
 export interface AutomationTrigger {
   id: string;
   createdAt: Date;
   updatedAt: Date | null;
   event: AutomationEventWithRels;
-  conditions: {
-    id: string;
-    scope: AutomationConditionScopeType;
-    operator: AutomationConditionOperatorType;
-    matchValues: AutomationConditionMatchValue[],
-    questionScope: (QuestionConditionScope
-      & {
-        aggregate: ConditionPropertyAggregate | null;
-      }) | null,
-    dialogueScope: (DialogueConditionScope
-      & {
-        aggregate: ConditionPropertyAggregate | null;
-      }) | null,
-    workspaceScope: (WorkspaceConditionScope
-      & {
-        aggregate: ConditionPropertyAggregate | null;
-      }) | null,
-    dialogue: Dialogue | null;
-    question: QuestionNode | null;
-  }[];
+  conditions: AutomationCondition[];
   actions: {
     id: string;
     type: AutomationActionType;
@@ -180,4 +185,19 @@ export interface FullAutomationWithRels {
   type: AutomationType;
   workspace: Customer;
   automationTrigger: AutomationTrigger | null;
+}
+
+
+export interface SetupQuestionCompareDataInput {
+  questionId: string;
+  aspect: QuestionAspect,
+  aggregate?: ConditionPropertyAggregate | null,
+  matchValues: AutomationConditionMatchValue[],
+  type: NodeType,
+}
+
+export interface SetupQuestionCompareDataOutput {
+  totalEntries: number;
+  compareValue?: number | null;
+  matchValue?: number | null;
 }
