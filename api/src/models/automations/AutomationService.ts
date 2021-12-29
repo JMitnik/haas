@@ -399,6 +399,10 @@ class AutomationService {
           throw new UserInputError('No action type provided for automation action!');
         }
 
+        case null: {
+          throw new UserInputError('No action type provided for automation action!');
+        }
+
         case AutomationActionType.SEND_EMAIL: {
           if (hasNoTarget) throw new UserInputError('No target email addresses provided for "SEND_EMAIL"!');
           return;
