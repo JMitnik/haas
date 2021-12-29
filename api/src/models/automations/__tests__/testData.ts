@@ -1,6 +1,104 @@
-import { Customer, Dialogue, Prisma, QuestionNode } from "@prisma/client";
+import { AutomationActionType, AutomationEventType, Customer, Dialogue, Prisma, QuestionNode } from "@prisma/client";
 import { NexusGenInputs } from "../../../generated/nexus";
-import { AutomationTrigger, FullAutomationWithRels, SetupQuestionCompareDataInput } from "../AutomationTypes";
+import { AutomationCondition, AutomationTrigger, FullAutomationWithRels, SetupQuestionCompareDataInput } from "../AutomationTypes";
+
+export const conditionInput: AutomationCondition = {
+  dialogue: null,
+  dialogueScope: null,
+  id: '',
+  scope: 'QUESTION',
+  operator: 'SMALLER_OR_EQUAL_THAN',
+  workspaceScope: null,
+  matchValues: [
+    {
+      numberValue: 80,
+      type: 'INT',
+      automationConditionId: '',
+      createdAt: new Date(Date.now()),
+      dateTimeValue: null,
+      textValue: null,
+      updatedAt: null,
+      id: '',
+    }
+  ],
+  question: {
+    id: 'SLIDER_ID',
+    title: 'slider',
+    type: 'SLIDER',
+    creationDate: new Date(Date.now()),
+    edgeId: '',
+    formNodeId: '',
+    isLeaf: false,
+    isRoot: true,
+    videoEmbeddedNodeId: null,
+    updatedAt: new Date(Date.now()),
+    overrideLeafId: null,
+    questionDialogueId: 'DIALOGUE_ID',
+    sliderNodeId: null,
+  },
+  questionScope: {
+    aggregate: {
+      type: 'AVG',
+      latest: 4,
+      startDate: null,
+      endDate: null,
+      createdAt: new Date(Date.now()),
+      dialogueConditionScopeId: null,
+      id: '',
+      questionConditionScopeId: '',
+      workspaceConditionScopeId: null,
+      updatedAt: null,
+    },
+    aspect: 'NODE_VALUE',
+    automationConditionId: '',
+    createdAt: new Date(Date.now()),
+    id: '',
+    updatedAt: null,
+  }
+
+}
+
+export const automationTriggerInput: AutomationTrigger = {
+  id: '',
+  updatedAt: new Date(Date.now()),
+  createdAt: new Date(Date.now()),
+  event: {
+    createdAt: new Date(Date.now()),
+    dialogue: null,
+    dialogueId: '',
+    endDate: null,
+    startDate: null,
+    id: '',
+    periodType: null,
+    updatedAt: new Date(Date.now()),
+    type: AutomationEventType.NEW_INTERACTION_QUESTION,
+    questionId: 'SLIDER_ID',
+    question: {
+      id: 'SLIDER_ID',
+      title: 'slider',
+      type: 'SLIDER',
+      creationDate: new Date(Date.now()),
+      edgeId: '',
+      formNodeId: '',
+      isLeaf: false,
+      isRoot: true,
+      videoEmbeddedNodeId: null,
+      updatedAt: new Date(Date.now()),
+      overrideLeafId: null,
+      questionDialogueId: 'DIALOGUE_ID',
+      sliderNodeId: null,
+    }
+  },
+  conditions: [
+    conditionInput,
+  ],
+  actions: [
+    {
+      id: '',
+      type: AutomationActionType.GENERATE_REPORT,
+    }
+  ]
+}
 
 export const choiceQuestionCompareDataInput: SetupQuestionCompareDataInput = {
   type: 'CHOICE',

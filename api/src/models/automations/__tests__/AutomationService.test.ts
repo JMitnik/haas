@@ -1,10 +1,11 @@
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
-import { choiceQuestionCompareDataInput, sliderQuestionCompareDataInput } from './testData';
+import { automationTriggerInput, choiceQuestionCompareDataInput, conditionInput, sliderQuestionCompareDataInput } from './testData';
 import { clearDatabase } from './testUtils';
 import AutomationService from '../AutomationService';
-import { AutomationCondition, SetupQuestionCompareDataInput } from '../AutomationTypes';
-import { NodeType, PrismaClient } from '@prisma/client';
-import { map, sample } from 'lodash';
+import { AutomationCondition, AutomationTrigger } from '../AutomationTypes';
+import { AutomationConditionOperatorType, AutomationType, NodeType, PrismaClient } from '@prisma/client';
+import { sample } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 const prisma = makeTestPrisma();
 const automationService = new AutomationService(prisma);
@@ -12,6 +13,7 @@ const automationService = new AutomationService(prisma);
 export const seedWorkspace = async (prisma: PrismaClient) => {
   const workspace = await prisma.customer.create({
     data: {
+      id: 'WORKSPACE_ID',
       name: 'WORKSPACE',
       slug: 'WORKSPACE',
       dialogues: {
@@ -91,6 +93,73 @@ export const seedSession = async (
   return session;
 }
 
+export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, dialogueId: string, questionId: string, type: AutomationType) => {
+  return prisma.automation.create({
+    data: {
+      label: `Automation`,
+      type: type,
+      isActive: true,
+      workspace: {
+        connect: {
+          id: workspaceId,
+        }
+      },
+      automationTrigger: {
+        create: {
+          event: {
+            create: {
+              type: 'NEW_INTERACTION_QUESTION',
+              question: {
+                connect: {
+                  id: questionId,
+                }
+              }
+            }
+          },
+          conditions: {
+            create: [
+              {
+                question: {
+                  connect: {
+                    id: questionId,
+                  }
+                },
+                scope: 'QUESTION',
+                operator: 'SMALLER_OR_EQUAL_THAN',
+                questionScope: {
+                  create: {
+                    aspect: 'NODE_VALUE',
+                    aggregate: {
+                      create: {
+                        type: 'AVG',
+                        latest: 3,
+                      }
+                    }
+                  }
+                },
+                matchValues: {
+                  create: {
+                    type: 'INT',
+                    numberValue: 50,
+                  }
+                }
+              },
+            ]
+          },
+          actions: {
+            create: [
+              { type: 'GENERATE_REPORT' },
+            ]
+          }
+        }
+      }
+    },
+    include: {
+      automationTrigger: true,
+    },
+  })
+}
+
 describe('AutomationService', () => {
   beforeEach(async () => {
     await seedWorkspace(prisma);
@@ -140,61 +209,7 @@ describe('AutomationService', () => {
   });
 
   test('Validates an automation condition (scope = QUESTION, type = SLIDER, Operator = SMALLER_OR_EQUAL_THAN)', async () => {
-    const condition: AutomationCondition = {
-      dialogue: null,
-      dialogueScope: null,
-      id: '',
-      scope: 'QUESTION',
-      operator: 'SMALLER_OR_EQUAL_THAN',
-      workspaceScope: null,
-      matchValues: [
-        {
-          numberValue: 80,
-          type: 'INT',
-          automationConditionId: '',
-          createdAt: new Date(Date.now()),
-          dateTimeValue: null,
-          textValue: null,
-          updatedAt: null,
-          id: '',
-        }
-      ],
-      question: {
-        id: 'SLIDER_ID',
-        title: 'slider',
-        type: 'SLIDER',
-        creationDate: new Date(Date.now()),
-        edgeId: '',
-        formNodeId: '',
-        isLeaf: false,
-        isRoot: true,
-        videoEmbeddedNodeId: null,
-        updatedAt: new Date(Date.now()),
-        overrideLeafId: null,
-        questionDialogueId: 'DIALOGUE_ID',
-        sliderNodeId: null,
-      },
-      questionScope: {
-        aggregate: {
-          type: 'AVG',
-          latest: 4,
-          startDate: null,
-          endDate: null,
-          createdAt: new Date(Date.now()),
-          dialogueConditionScopeId: null,
-          id: '',
-          questionConditionScopeId: '',
-          workspaceConditionScopeId: null,
-          updatedAt: null,
-        },
-        aspect: 'NODE_VALUE',
-        automationConditionId: '',
-        createdAt: new Date(Date.now()),
-        id: '',
-        updatedAt: null,
-      }
-
-    }
+    const condition: AutomationCondition = conditionInput;
     // Average is indeed lower than 80 => condition resolved
     const succesfullValidation = await automationService.validateQuestionScopeCondition(condition);
     expect(succesfullValidation).toBe(true);
@@ -210,6 +225,31 @@ describe('AutomationService', () => {
 
     const batchCheckValidation = await automationService.validateQuestionScopeCondition(condition);
     expect(batchCheckValidation).toBe(false);
+  });
+
+  test('Checks Automation Triggers conditions', async () => {
+    const automationTrigger: AutomationTrigger = automationTriggerInput;
+
+    // One passed condition => true
+    const singleConditionChecked = await automationService.checkAutomationTriggersConditions(automationTrigger);
+    expect(singleConditionChecked).toBe(true);
+
+    // Add an extra condition with flipped operator so it 100% return false
+    const extraCondition = cloneDeep(conditionInput);
+    extraCondition.operator = AutomationConditionOperatorType.GREATER_OR_EQUAL_THAN;
+    automationTrigger.conditions.push(extraCondition);
+
+    // One passed condition, One reject condition => false
+    const doubleConditionChecked = await automationService.checkAutomationTriggersConditions(automationTrigger);
+    expect(doubleConditionChecked).toBe(false);
+  });
+
+  test('Gets candidate trigger automations', async () => {
+    await seedAutomation(prisma, 'WORKSPACE_ID', 'DIALOGUE_ID', 'SLIDER_ID', AutomationType.TRIGGER);
+    await seedAutomation(prisma, 'WORKSPACE_ID', 'DIALOGUE_ID', 'SLIDER_ID', AutomationType.CAMPAIGN);
+    const automations = await automationService.getCandidateTriggers('DIALOGUE_ID');
+    expect(automations).toHaveLength(1);
+    expect(automations?.[0]?.trigger).not.toBeNull();
   });
 
 });

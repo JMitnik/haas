@@ -1,7 +1,8 @@
 import {
   AutomationCondition, AutomationConditionScopeType, DialogueConditionScope,
   Prisma, PrismaClient, QuestionAspect, QuestionConditionScope,
-  WorkspaceConditionScope } from '@prisma/client';
+  WorkspaceConditionScope
+} from '@prisma/client';
 import { cloneDeep, countBy } from 'lodash';
 import { isPresent } from 'ts-is-present';
 import { NexusGenInputs } from '../../generated/nexus';
@@ -97,6 +98,59 @@ export class AutomationPrismaAdapter {
     const countedChoices = countBy(aggregatedChoices, (choice) => choice.value);
 
     return { totalEntries: totalAmountChoiceValues, aggregatedValues: countedChoices };
+  }
+
+  /**
+   * Checks whether any automation events exist where either a dialogue id or one of the question Ids belongs to.
+   * @param dialogueId the dialogue ID part potentially part of an AutomationEvent
+   * @param questionIds a list of question IDs potentially part of an AutomationEvent
+   * @returns a list of Automations
+   */
+  findTriggerAutomationsById = (triggerAutomationIds: string[]) => {
+    // TODO: Introduce system-wide fetch
+    return this.prisma.automationTrigger.findMany({
+      where: {
+        id: {
+          in: triggerAutomationIds
+        },
+      },
+      include: {
+        event: {
+          include: {
+            question: {
+              include: {
+                questionDialogue: true,
+              },
+            },
+            dialogue: true,
+          },
+        },
+        conditions: {
+          include: {
+            questionScope: {
+              include: {
+                aggregate: true,
+              },
+            },
+            dialogueScope: {
+              include: {
+                aggregate: true,
+              },
+            },
+            matchValues: true,
+            workspaceScope: {
+              include: {
+                aggregate: true,
+              },
+            },
+            dialogue: true,
+            question: true,
+          },
+        },
+        actions: true,
+
+      },
+    })
   }
 
   /**
@@ -507,14 +561,14 @@ export class AutomationPrismaAdapter {
       matchValues: {
         createMany: {
           data: matchValues.map((matchValue) =>
-            (
-              {
-                type: matchValue.type,
-                textValue: matchValue.textValue,
-                dateTimeValue: matchValue.dateTimeValue,
-                numberValue: matchValue.numberValue,
-              }
-            )),
+          (
+            {
+              type: matchValue.type,
+              textValue: matchValue.textValue,
+              dateTimeValue: matchValue.dateTimeValue,
+              numberValue: matchValue.numberValue,
+            }
+          )),
         },
       },
       question: questionId ? {
@@ -601,7 +655,7 @@ export class AutomationPrismaAdapter {
    * @param input an object containing all information necessary to update an AutomationTrigger
    * @returns a Prisma-ready data object for updating of an AutomationTrigger
    */
-  async buildUpdateAutomationTriggerData (
+  async buildUpdateAutomationTriggerData(
     input: UpdateAutomationInput
   ): Promise<Prisma.AutomationTriggerUpdateInput> {
     const { event, actions: inputActions, conditions: inputConditions } = input;
