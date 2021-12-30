@@ -70,7 +70,7 @@ export const ConditionScopeInput = inputObjectType({
     t.field('questionScope', { type: ConditionQuestionScopeInput, nullable: true });
     t.field('dialogueScope', { type: ConditionDialogueScopeInput, nullable: true });
     t.field('workspaceScope', { type: ConditionWorkspaceScopeInput, nullable: true });
-  }
+  },
 })
 
 export const CreateAutomationCondition = inputObjectType({
@@ -84,7 +84,7 @@ export const CreateAutomationCondition = inputObjectType({
     t.string('questionId', { nullable: true });
     t.string('dialogueId', { nullable: true });
     t.string('workspaceId', { nullable: true });
-  }
+  },
 });
 
 export const AutomationActionInput = inputObjectType({
@@ -105,7 +105,7 @@ export const AutomationEventInput = inputObjectType({
     t.field('eventType', { type: AutomationEventType });
     t.string('questionId', { nullable: true });
     t.string('dialogueId', { nullable: true });
-  }
+  },
 })
 
 export const CreateAutomationResolverInput = inputObjectType({
@@ -129,7 +129,7 @@ export const CreateAutomationResolverInput = inputObjectType({
     // Automation Actions
     t.list.field('actions', { type: AutomationActionInput });
 
-    // Trigger: 
+    // Trigger:
     // TODO: Add fields for Trigger:recurring as wel as Campaign
   },
 });

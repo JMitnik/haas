@@ -209,7 +209,7 @@ class AutomationService {
    * @param automationTriggers a list of potentially triggered automations
    * @returns boolean whether all conditions of an automation trigger pass
    */
-  checkAutomationTriggersConditions = async (automationTrigger: AutomationTrigger) => {
+  testTriggerConditions = async (automationTrigger: AutomationTrigger) => {
     const matchedConditionsTriggers = await Promise.all(automationTrigger.conditions.map(async (condition) => {
       switch (condition.scope) {
         case AutomationConditionScopeType.QUESTION: {
@@ -285,6 +285,16 @@ class AutomationService {
     return candidateAutomationTriggers;
   }
 
+  /**
+   * See if any trigger automations are applicable now.
+   *
+   * Preconditions:
+   * - Must be called for now in SessionService.createSession. We currently have no checks that ensure the automation
+   *   is called once per "batch" of sessions. For example, if we call the `handleTriggerAutomations` function twice in
+   *   a row without creating a new session, it will simply perform the same actions.
+   * @param dialogueId
+   * @returns
+   */
   handleTriggerAutomations = async (dialogueId: string) => {
     const candidateAutomations = await this.getCandidateTriggers(dialogueId);
     if (!candidateAutomations) {
@@ -298,7 +308,7 @@ class AutomationService {
       if (!trigger) return null;
 
       // TODO: Consider ANDS vs ORs for conditions
-      const allConditionsConfirmed = await this.checkAutomationTriggersConditions(trigger);
+      const allConditionsConfirmed = await this.testTriggerConditions(trigger);
 
       if (allConditionsConfirmed) {
         await Promise.all(trigger?.actions?.map((automationAction) => {

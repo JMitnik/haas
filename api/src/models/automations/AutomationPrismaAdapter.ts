@@ -1,7 +1,7 @@
 import {
   AutomationCondition, AutomationConditionScopeType, DialogueConditionScope,
   Prisma, PrismaClient, QuestionAspect, QuestionConditionScope,
-  WorkspaceConditionScope
+  WorkspaceConditionScope,
 } from '@prisma/client';
 import { cloneDeep, countBy } from 'lodash';
 import { isPresent } from 'ts-is-present';
@@ -111,7 +111,7 @@ export class AutomationPrismaAdapter {
     return this.prisma.automationTrigger.findMany({
       where: {
         id: {
-          in: triggerAutomationIds
+          in: triggerAutomationIds,
         },
       },
       include: {
@@ -561,14 +561,14 @@ export class AutomationPrismaAdapter {
       matchValues: {
         createMany: {
           data: matchValues.map((matchValue) =>
-          (
-            {
-              type: matchValue.type,
-              textValue: matchValue.textValue,
-              dateTimeValue: matchValue.dateTimeValue,
-              numberValue: matchValue.numberValue,
-            }
-          )),
+            (
+              {
+                type: matchValue.type,
+                textValue: matchValue.textValue,
+                dateTimeValue: matchValue.dateTimeValue,
+                numberValue: matchValue.numberValue,
+              }
+            )),
         },
       },
       question: questionId ? {

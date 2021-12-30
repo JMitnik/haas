@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { allow, deny, or, rule, shield } from 'graphql-shield';
 
 import { ApolloError } from 'apollo-server-express';
@@ -66,7 +67,7 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
 
     const allRelevantPermissions = [
       ...globalPermissions,
-      ...workspacePermissions
+      ...workspacePermissions,
     ];
 
     if (!ctx.session?.user?.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
