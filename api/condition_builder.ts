@@ -1,6 +1,98 @@
 import { AutomationCondition as PrismaAutomationCondition, AutomationConditionBuilder, AutomationConditionBuilderType, NodeType, PrismaClient } from "@prisma/client"
 import { AutomationCondition } from "./src/models/automations/AutomationTypes";
 
+interface BuilderEntry extends AutomationConditionBuilder {
+  type: AutomationConditionBuilderType;
+  conditions: PrismaAutomationCondition[];
+  hasChildBuilder: BuilderEntry;
+}
+
+type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+
+/**
+ * XOR is needed to have a real mutually exclusive union type
+ * https://stackoverflow.com/questions/42123407/does-typescript-support-mutually-exclusive-types
+ */
+type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
+
+interface DestructedBuilderEntry {
+  OR?: XOR<DestructedBuilderEntry[], PrismaAutomationCondition[]>
+  AND?: XOR<DestructedBuilderEntry[], PrismaAutomationCondition[]>
+}
+
+const test: DestructedBuilderEntry = {
+  AND: [
+    {
+      createdAt: new Date(Date.now()),
+      updatedAt: null,
+      scope: 'DIALOGUE',
+      operator: 'SMALLER_OR_EQUAL_THAN',
+      questionId: null,
+      dialogueId: null,
+      automationTriggerId: null,
+      automationConditionBuilderId: null
+    },
+    {
+      OR: [
+        {
+          id: '',
+          createdAt: new Date(Date.now()),
+          updatedAt: null,
+          scope: 'DIALOGUE',
+          operator: 'SMALLER_OR_EQUAL_THAN',
+          questionId: null,
+          dialogueId: null,
+          automationTriggerId: null,
+          automationConditionBuilderId: null
+        },
+        {
+          id: '',
+          createdAt: new Date(Date.now()),
+          updatedAt: null,
+          scope: 'DIALOGUE',
+          operator: 'SMALLER_OR_EQUAL_THAN',
+          questionId: null,
+          dialogueId: null,
+          automationTriggerId: null,
+          automationConditionBuilderId: null
+        },
+        {
+          AND: [
+            {
+              id: '',
+              createdAt: new Date(Date.now()),
+              updatedAt: null,
+              scope: 'DIALOGUE',
+              operator: 'SMALLER_OR_EQUAL_THAN',
+              questionId: null,
+              dialogueId: null,
+              automationTriggerId: null,
+              automationConditionBuilderId: null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+const destruct = (dataObj: any, entry: BuilderEntry) => {
+  if (entry.conditions.length) {
+    dataObj[entry.type] = [
+      ...entry.conditions,
+    ]
+  }
+
+  if (entry.hasChildBuilder) {
+    const child = entry.hasChildBuilder;
+    const operatorObject = {}
+    const des = destruct(operatorObject, child);
+    dataObj[entry.type].push(des)
+  }
+
+  return dataObj;
+}
+
 const prisma = new PrismaClient();
 
 export const seedQuestion = (prisma: PrismaClient, dialogueId: string, type: NodeType, questionId: string) => {
@@ -99,7 +191,6 @@ const main = async () => {
       }
     }
   })
-
 
   const { sliderQuestion, dialogueId } = await seedWorkspace(prisma);
 
@@ -234,54 +325,54 @@ const main = async () => {
               }
             ]
           },
-          hasChildBuilder: {
-            create: {
-              id: 'CHILD_BUILDER_ID_TWO',
-              type: 'AND',
-              conditions: {
-                create: {
-                  id: 'BUILDER_CONDITION_ID_FOUR',
-                  scope: 'QUESTION',
-                  operator: 'SMALLER_OR_EQUAL_THAN',
-                  matchValues: {
-                    createMany: {
-                      data: [
-                        {
-                          id: 'BUILDER_MATCH_VALUE_ID_FOUR',
-                          type: 'INT',
-                          numberValue: 50,
-                        }
-                      ],
-                    },
-                  },
-                  question: {
-                    connect: {
-                      id: sliderQuestion.id,
-                    }
-                  },
-                  dialogue: dialogueId ? {
-                    connect: {
-                      id: dialogueId,
-                    },
-                  } : undefined,
-                  questionScope: {
-                    create: {
-                      id: 'BUILDER_SCOPE_ID_FOUR',
-                      aggregate: {
-                        create: {
-                          id: 'BUILDER_AGGREGATE_ID_FOUR',
-                          type: 'AVG',
-                          latest: 1,
-                        },
-                      },
-                      aspect: 'NODE_VALUE',
-                    },
-                  },
-                },
-              }
+          // hasChildBuilder: {
+          //   create: {
+          //     id: 'CHILD_BUILDER_ID_TWO',
+          //     type: 'AND',
+          //     conditions: {
+          //       create: {
+          //         id: 'BUILDER_CONDITION_ID_FOUR',
+          //         scope: 'QUESTION',
+          //         operator: 'SMALLER_OR_EQUAL_THAN',
+          //         matchValues: {
+          //           createMany: {
+          //             data: [
+          //               {
+          //                 id: 'BUILDER_MATCH_VALUE_ID_FOUR',
+          //                 type: 'INT',
+          //                 numberValue: 50,
+          //               }
+          //             ],
+          //           },
+          //         },
+          //         question: {
+          //           connect: {
+          //             id: sliderQuestion.id,
+          //           }
+          //         },
+          //         dialogue: dialogueId ? {
+          //           connect: {
+          //             id: dialogueId,
+          //           },
+          //         } : undefined,
+          //         questionScope: {
+          //           create: {
+          //             id: 'BUILDER_SCOPE_ID_FOUR',
+          //             aggregate: {
+          //               create: {
+          //                 id: 'BUILDER_AGGREGATE_ID_FOUR',
+          //                 type: 'AVG',
+          //                 latest: 1,
+          //               },
+          //             },
+          //             aspect: 'NODE_VALUE',
+          //           },
+          //         },
+          //       },
+          //     }
 
-            }
-          }
+          //   }
+          // }
         }
       }
     }
@@ -321,84 +412,72 @@ const main = async () => {
   console.log('Destructed data: ', destructedData);
   console.log('length AND', destructedData.AND.length);
   console.log('child OR length: ', destructedData.AND[1].OR[2]);
-}
 
-interface BuilderEntry extends AutomationConditionBuilder {
-  type: AutomationConditionBuilderType;
-  conditions: PrismaAutomationCondition[];
-  hasChildBuilder: BuilderEntry;
-}
-
-type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
-
-/**
- * XOR is needed to have a real mutually exclusive union type
- * https://stackoverflow.com/questions/42123407/does-typescript-support-mutually-exclusive-types
- */
-type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
-
-interface DestructedBuilderEntry {
-  OR?: XOR<DestructedBuilderEntry[], PrismaAutomationCondition[]>
-  AND?: XOR<DestructedBuilderEntry[], PrismaAutomationCondition[]>
-}
-
-const test: DestructedBuilderEntry = {
-  AND: [
-    {
-      createdAt: new Date(Date.now()),
-      updatedAt: null,
-      scope: 'DIALOGUE',
-      operator: 'SMALLER_OR_EQUAL_THAN',
-      questionId: null,
-      dialogueId: null,
-      automationTriggerId: null,
-      automationConditionBuilderId: null
-    },
-    {
-      OR: [
-        {
-          id: '',
-          createdAt: new Date(Date.now()),
-          updatedAt: null,
-          scope: 'DIALOGUE',
-          operator: 'SMALLER_OR_EQUAL_THAN',
-          questionId: null,
-          dialogueId: null,
-          automationTriggerId: null,
-          automationConditionBuilderId: null
-        },
-        {
-          id: '',
-          createdAt: new Date(Date.now()),
-          updatedAt: null,
-          scope: 'DIALOGUE',
-          operator: 'SMALLER_OR_EQUAL_THAN',
-          questionId: null,
-          dialogueId: null,
-          automationTriggerId: null,
-          automationConditionBuilderId: null
-        },
-      ]
-    }
-  ]
-}
-
-const destruct = (dataObj: any, entry: BuilderEntry) => {
-
-  if (entry.conditions.length) {
-    dataObj[entry.type] = [
-      ...entry.conditions,
+  const example: CheckedConditions = {
+    AND: [
+      false,
+      {
+        OR: [
+          false,
+          {
+            OR: [
+              false,
+              false,
+            ]
+          },
+          true
+        ]
+      }
     ]
   }
 
-  if (entry.hasChildBuilder) {
-    const child = entry.hasChildBuilder;
-    const operatorObject = {}
-    const des = destruct(operatorObject, child);
-    dataObj[entry.type].push(des)
-  }
+  let summarizedList = []
 
-  return dataObj;
+  checkConditions(example, summarizedList, 0);
+
+  console.log('Summarized list in main(): ', summarizedList);
+}
+
+interface CheckedConditions {
+  AND?: (boolean | CheckedConditions)[];
+  OR?: (boolean | CheckedConditions)[];
+}
+
+const checkConditions = (example: CheckedConditions, summarizedList = [], depth: number) => {
+  const isAND = !!example['AND']
+  depth++;
+
+  example[isAND ? 'AND' : 'OR'].forEach((entry) => {
+    if (typeof entry === 'boolean') {
+      summarizedList.push(entry);
+    }
+
+    if (typeof entry === 'object') {
+      if (entry['AND']) {
+        const areAllTrueValues = entry.AND.every((andEntry) => {
+          if (typeof andEntry === 'object') {
+            return checkConditions(andEntry, [], depth);
+          }
+          return andEntry === true;
+        });
+        summarizedList.push(areAllTrueValues);
+      }
+
+      if (entry['OR']) {
+        const someTrueValues = entry.OR.some((orEntry) => {
+          if (typeof orEntry === 'object') {
+            return checkConditions(orEntry, [], depth)
+          }
+          return orEntry === true;
+        });
+        summarizedList.push(someTrueValues);
+      }
+
+    }
+  });
+
+  const allConditionsPassed = isAND ? summarizedList.every((entry) => entry) : summarizedList.some((entry) => entry);
+  return allConditionsPassed;
 }
 
 main().finally(async () => {
