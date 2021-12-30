@@ -975,6 +975,23 @@ model WorkspaceConditionScope {
   automationConditionId String              @unique
 }
 
+enum AutomationConditionBuilderType {
+  AND
+  OR
+}
+
+model AutomationConditionBuilder {
+  id String @id @default(cuid())
+
+  type                   AutomationConditionBuilderType
+  conditions             AutomationCondition[]
+  parentConditionBuilder AutomationConditionBuilder?    @relation("AutomationConditionBuilderToAutomationConditionBuilder", fields: [parentConditionBuilderId], references: [id])
+
+  parentConditionBuilderId String? @unique
+
+  hasChildBuilder AutomationConditionBuilder? @relation("AutomationConditionBuilderToAutomationConditionBuilder")
+}
+
 model AutomationCondition {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now())
@@ -997,8 +1014,10 @@ model AutomationCondition {
 
   // TODO: Add workspace relation so Workspace-wide conditions can be introduced
 
-  automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id])
-  automationTriggerId String?
+  automationTrigger            AutomationTrigger?          @relation(fields: [automationTriggerId], references: [id])
+  automationTriggerId          String?
+  automationConditionBuilder   AutomationConditionBuilder? @relation(fields: [automationConditionBuilderId], references: [id])
+  automationConditionBuilderId String?
 }
 
 model AutomationAction {
