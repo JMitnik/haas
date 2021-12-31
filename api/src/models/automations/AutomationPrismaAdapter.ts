@@ -36,7 +36,7 @@ export class AutomationPrismaAdapter {
             aggregate: true,
           },
         },
-        matchValues: true,
+        operands: true,
         workspaceScope: {
           include: {
             aggregate: true,
@@ -589,14 +589,14 @@ export class AutomationPrismaAdapter {
       operands: {
         createMany: {
           data: operands.map((operand) =>
-            (
-              {
-                type: operand.type,
-                textValue: operand.textValue,
-                dateTimeValue: operand.dateTimeValue,
-                numberValue: operand.numberValue,
-              }
-            )),
+          (
+            {
+              type: operand.type,
+              textValue: operand.textValue,
+              dateTimeValue: operand.dateTimeValue,
+              numberValue: operand.numberValue,
+            }
+          )),
         },
       },
       question: questionId ? {

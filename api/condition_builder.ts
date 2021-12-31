@@ -145,7 +145,7 @@ const main = async () => {
       }
     }
   });
-  await prisma.automationConditionMatchValue.deleteMany({
+  await prisma.automationConditionOperand.deleteMany({
     where: {
       id: {
         in: ['BUILDER_MATCH_VALUE_ID', 'BUILDER_MATCH_VALUE_ID_TWO', 'BUILDER_MATCH_VALUE_ID_THREE', 'BUILDER_MATCH_VALUE_ID_FOUR']
@@ -215,65 +215,67 @@ const main = async () => {
   const builder = await prisma.automationConditionBuilder.create({
     data: {
       id: 'PARENT_BUILDER_ID',
-      type: AutomationConditionBuilderType.AND,
+      type: AutomationConditionBuilderType.OR,
       conditions: {
-        create: {
-          id: 'BUILDER_CONDITION_ID_TWO',
-          scope: 'QUESTION',
-          operator: 'SMALLER_OR_EQUAL_THAN',
-          matchValues: {
-            createMany: {
-              data: [
-                {
-                  id: 'BUILDER_MATCH_VALUE_ID_TWO',
-                  type: 'INT',
-                  numberValue: 30,
-                }
-              ],
-            },
-          },
-          question: {
-            connect: {
-              id: sliderQuestion.id,
-            }
-          },
-          dialogue: dialogueId ? {
-            connect: {
-              id: dialogueId,
-            },
-          } : undefined,
-          questionScope: {
-            create: {
-              id: 'BUILDER_SCOPE_ID_TWO',
-              aggregate: {
-                create: {
-                  id: 'BUILDER_AGGREGATE_ID_TWO',
-                  type: 'AVG',
-                  latest: 1,
-                },
+        create: [
+          {
+            id: 'BUILDER_CONDITION_ID',
+            scope: 'QUESTION',
+            operator: 'SMALLER_OR_EQUAL_THAN',
+            operands: {
+              createMany: {
+                data: [
+                  {
+                    id: 'BUILDER_MATCH_VALUE_ID',
+                    type: 'INT',
+                    numberValue: 1,
+                  }
+                ],
               },
-              aspect: 'NODE_VALUE',
+            },
+            question: {
+              connect: {
+                id: sliderQuestion.id,
+              }
+            },
+            dialogue: dialogueId ? {
+              connect: {
+                id: dialogueId,
+              },
+            } : undefined,
+            questionScope: {
+              create: {
+                id: 'BUILDER_SCOPE_ID',
+                aggregate: {
+                  create: {
+                    id: 'BUILDER_AGGREGATE_ID',
+                    type: 'AVG',
+                    latest: 1,
+                  },
+                },
+                aspect: 'NODE_VALUE',
+              },
             },
           },
-        }
+        ]
       },
       hasChildBuilder: {
         create: {
           id: 'CHILD_BUILDER_ONE_ID',
-          type: AutomationConditionBuilderType.OR,
+          type: 'AND',
           conditions: {
             create: [
               {
-                id: 'BUILDER_CONDITION_ID',
+                id: 'BUILDER_CONDITION_ID_TWO',
                 scope: 'QUESTION',
                 operator: 'SMALLER_OR_EQUAL_THAN',
-                matchValues: {
+                operands: {
                   createMany: {
                     data: [
                       {
-                        id: 'BUILDER_MATCH_VALUE_ID',
+                        id: 'BUILDER_MATCH_VALUE_ID_TWO',
                         type: 'INT',
-                        numberValue: 1,
+                        numberValue: 30,
                       }
                     ],
                   },
@@ -290,10 +292,10 @@ const main = async () => {
                 } : undefined,
                 questionScope: {
                   create: {
-                    id: 'BUILDER_SCOPE_ID',
+                    id: 'BUILDER_SCOPE_ID_TWO',
                     aggregate: {
                       create: {
-                        id: 'BUILDER_AGGREGATE_ID',
+                        id: 'BUILDER_AGGREGATE_ID_TWO',
                         type: 'AVG',
                         latest: 1,
                       },
@@ -306,7 +308,7 @@ const main = async () => {
                 id: 'BUILDER_CONDITION_ID_THREE',
                 scope: 'QUESTION',
                 operator: 'SMALLER_OR_EQUAL_THAN',
-                matchValues: {
+                operands: {
                   createMany: {
                     data: [
                       {
@@ -340,9 +342,9 @@ const main = async () => {
                     aspect: 'NODE_VALUE',
                   },
                 },
-              }
+              },
             ]
-          },
+          }
         }
       }
     }
@@ -413,8 +415,12 @@ const validateConditions = async (data: PreValidatedConditions, checkedObject: C
       const validated = await automationService.validateQuestionScopeCondition(condition);
 
       const hasAndorOr = Object.keys(checkedObject).find((property) => property === 'AND' || property === 'OR');
-
-      checkedObject[hasAndorOr].push(validated);
+      const type = isAND ? 'AND' : 'OR'
+      if (!hasAndorOr) {
+        console.log('Type: ', type);
+        checkedObject[type] = []
+      }
+      checkedObject[hasAndorOr || type].push(validated);
     }
 
     if (entry['AND'] || entry['OR']) {
