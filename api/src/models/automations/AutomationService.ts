@@ -5,7 +5,7 @@ import {
   NodeType,
   PrismaClient,
   QuestionAspect,
-  MatchValueType,
+  OperandType,
   AutomationActionType,
 } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
@@ -21,7 +21,7 @@ import {
   AutomationTrigger,
   CreateAutomationConditionScopeInput,
   CreateAutomationInput,
-  CreateConditionMatchValueInput,
+  CreateConditionOperandInput,
   SetupQuestionCompareDataInput,
   SetupQuestionCompareDataOutput,
   UpdateAutomationInput,
@@ -54,18 +54,18 @@ class AutomationService {
   setupSliderCompareData = async (
     input: SetupQuestionCompareDataInput
   ): Promise<SetupQuestionCompareDataOutput | undefined> => {
-    const { questionId, aspect, aggregate, matchValues } = input;
+    const { questionId, aspect, aggregate, operands } = input;
     const scopedSliderNodeEntries = await this.automationPrismaAdapter.aggregateScopedSliderNodeEntries(
       questionId,
       aspect,
       aggregate
     );
     const aggregatedAverageValue = scopedSliderNodeEntries.aggregatedValues._avg?.value;
-    const matchValue = matchValues?.[0]?.numberValue;
+    const operand = operands?.[0]?.numberValue;
 
     return {
       compareValue: aggregatedAverageValue,
-      matchValue: matchValue,
+      operand,
       totalEntries: scopedSliderNodeEntries.totalEntries,
     }
   }
@@ -79,26 +79,26 @@ class AutomationService {
     input: SetupQuestionCompareDataInput
   ): Promise<SetupQuestionCompareDataOutput | undefined> => {
     let compareValue: number | null = null;
-    const { questionId, aspect, aggregate, matchValues } = input;
+    const { questionId, aspect, aggregate, operands } = input;
     const scopedChoiceNodeEntries = await this.automationPrismaAdapter.aggregateScopedChoiceNodeEntries(
       questionId,
       aspect,
       aggregate
     );
-    const amountMatchValue = matchValues.find((matchValue) => matchValue.type === MatchValueType.INT);
-    const textMatchValue = matchValues.find((matchValue) => matchValue.type === MatchValueType.STRING)?.textValue;
+    const amountOperand = operands.find((operand) => operand.type === OperandType.INT);
+    const textOperand = operands.find((operand) => operand.type === OperandType.STRING)?.textValue;
 
-    if (textMatchValue) {
+    if (textOperand) {
       compareValue = Object.keys(scopedChoiceNodeEntries.aggregatedValues).find(
-        (key) => key === textMatchValue
-      ) ? scopedChoiceNodeEntries.aggregatedValues[textMatchValue] : 0;
+        (key) => key === textOperand
+      ) ? scopedChoiceNodeEntries.aggregatedValues[textOperand] : 0;
     }
 
     return {
       // if matchValue doesn't exist that's a condition problem -> returning null.
       // if key doesn't exist in scopedChoiceNodeEntries.aggregatedValues -> returning 0.
-      compareValue: textMatchValue ? compareValue : null,
-      matchValue: amountMatchValue?.numberValue,
+      compareValue: textOperand ? compareValue : null,
+      operand: amountOperand?.numberValue,
       totalEntries: scopedChoiceNodeEntries.totalEntries,
     }
   }
@@ -136,7 +136,7 @@ class AutomationService {
     const input: SetupQuestionCompareDataInput = {
       type: condition.question?.type as NodeType,
       questionId: condition?.question?.id as string,
-      matchValues: condition.matchValues,
+      operands: condition.operands,
       aggregate: condition.questionScope?.aggregate,
       aspect: condition.questionScope?.aspect as QuestionAspect,
     };
@@ -147,7 +147,7 @@ class AutomationService {
     if (
       !scopedData ||
       (!scopedData?.compareValue && typeof scopedData?.compareValue !== 'number')
-      || !scopedData?.matchValue
+      || !scopedData?.operand
     ) {
       return false;
     }
@@ -164,7 +164,7 @@ class AutomationService {
 
     switch (condition.operator) {
       case AutomationConditionOperatorType.SMALLER_OR_EQUAL_THAN: {
-        return scopedData.compareValue <= scopedData.matchValue;
+        return scopedData.compareValue <= scopedData.operand;
       }
 
       // Because it passed the above batch test this one will always be true
@@ -173,23 +173,23 @@ class AutomationService {
       }
 
       case AutomationConditionOperatorType.GREATER_OR_EQUAL_THAN: {
-        return scopedData.compareValue >= scopedData.matchValue;
+        return scopedData.compareValue >= scopedData.operand;
       }
 
       case AutomationConditionOperatorType.GREATER_THAN: {
-        return scopedData.compareValue > scopedData.matchValue;
+        return scopedData.compareValue > scopedData.operand;
       }
 
       case AutomationConditionOperatorType.SMALLER_THAN: {
-        return scopedData.compareValue < scopedData.matchValue;
+        return scopedData.compareValue < scopedData.operand;
       }
 
       case AutomationConditionOperatorType.IS_EQUAL: {
-        return scopedData.compareValue === scopedData.matchValue;
+        return scopedData.compareValue === scopedData.operand;
       }
 
       case AutomationConditionOperatorType.IS_NOT_EQUAL: {
-        return scopedData.compareValue !== scopedData.matchValue;
+        return scopedData.compareValue !== scopedData.operand;
       }
 
       // TODO: Implement
@@ -213,7 +213,7 @@ class AutomationService {
    * @param automationTriggers a list of potentially triggered automations
    * @returns boolean whether all conditions of an automation trigger pass
    */
-  checkAutomationTriggersConditions = async (automationTrigger: AutomationTrigger) => {
+  testTriggerConditions = async (automationTrigger: AutomationTrigger) => {
     const matchedConditionsTriggers = await Promise.all(automationTrigger.conditions.map(async (condition) => {
       switch (condition.scope) {
         case AutomationConditionScopeType.QUESTION: {
@@ -289,6 +289,16 @@ class AutomationService {
     return candidateAutomationTriggers;
   }
 
+  /**
+   * See if any trigger automations are applicable now.
+   *
+   * Preconditions:
+   * - Must be called for now in SessionService.createSession. We currently have no checks that ensure the automation
+   *   is called once per "batch" of sessions. For example, if we call the `handleTriggerAutomations` function twice in
+   *   a row without creating a new session, it will simply perform the same actions.
+   * @param dialogueId
+   * @returns
+   */
   handleTriggerAutomations = async (dialogueId: string) => {
     const candidateAutomations = await this.getCandidateTriggers(dialogueId);
     if (!candidateAutomations) {
@@ -302,7 +312,7 @@ class AutomationService {
       if (!trigger) return null;
 
       // TODO: Consider ANDS vs ORs for conditions
-      const allConditionsConfirmed = await this.checkAutomationTriggersConditions(trigger);
+      const allConditionsConfirmed = await this.testTriggerConditions(trigger);
 
       if (allConditionsConfirmed) {
         await Promise.all(trigger?.actions?.map((automationAction) => {
@@ -450,9 +460,9 @@ class AutomationService {
       if (!condition.operator) {
         throw new UserInputError('No operator type is provided for a condition');
       }
-      if (condition.matchValues?.length === 0) throw new UserInputError('No match values provided for an automation condition!');
-      condition.matchValues?.forEach((matchValue) => {
-        if (!matchValue.matchValueType) {
+      if (condition.operands?.length === 0) throw new UserInputError('No match values provided for an automation condition!');
+      condition.operands?.forEach((operand) => {
+        if (!operand.operandType) {
           throw new UserInputError('No match value type was provided for a condition!');
         }
       });
@@ -475,16 +485,16 @@ class AutomationService {
         ...condition,
         operator: condition.operator as Required<AutomationConditionOperatorType>,
         scope: this.constructCreateAutomationConditionScopeInput(condition),
-        matchValues: condition.matchValues?.map((matchValue) => {
-          const { dateTimeValue, matchValueType, numberValue, textValue } = matchValue;
+        operands: condition.operands?.map((operand) => {
+          const { dateTimeValue, operandType, numberValue, textValue } = operand;
 
           return {
             dateTimeValue,
             numberValue,
             textValue,
-            type: matchValueType,
+            type: operandType,
           }
-        }) as Required<CreateConditionMatchValueInput[]> || [],
+        }) as Required<CreateConditionOperandInput[]> || [],
       }
     }) || [];
 

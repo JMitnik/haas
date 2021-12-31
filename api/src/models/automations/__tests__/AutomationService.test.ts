@@ -22,12 +22,12 @@ export const seedWorkspace = async (prisma: PrismaClient) => {
           description: 'desc',
           slug: 'DIALOGUE_SLUG',
           title: 'DIALOGUE',
-        }
-      }
+        },
+      },
     },
     include: {
       dialogues: true,
-    }
+    },
   });
   const sliderQuestion = await seedQuestion(prisma, 'DIALOGUE_ID', 'SLIDER', 'SLIDER_ID');
   const choiceQuestion = await seedQuestion(prisma, 'DIALOGUE_ID', 'CHOICE', 'CHOICE_ID');
@@ -43,9 +43,9 @@ export const seedQuestion = (prisma: PrismaClient, dialogueId: string, type: Nod
       questionDialogue: {
         connect: {
           id: dialogueId,
-        }
-      }
-    }
+        },
+      },
+    },
   })
 }
 
@@ -70,7 +70,7 @@ export const seedSession = async (
             connect: sliderQuestionId ? { id: sliderQuestionId } : undefined,
           },
           sliderNodeEntry: {
-            create: { value: sliderValue || Math.floor(Math.random() * 100) }
+            create: { value: sliderValue || Math.floor(Math.random() * 100) },
           },
         },
         {
@@ -78,16 +78,16 @@ export const seedSession = async (
           choiceNodeEntry: {
             create: {
               value: choiceValue || sample(['Customer support', 'Facilities', 'Website', 'Application']),
-            }
+            },
           },
           relatedNode: {
             create: !choiceQuestionId ? { title: 'What did you think of this?', type: NodeType.CHOICE } : undefined,
             connect: choiceQuestionId ? { id: choiceQuestionId } : undefined,
-          }
-        }
+          },
+        },
         ],
-      }
-    }
+      },
+    },
   });
 
   return session;
@@ -96,13 +96,13 @@ export const seedSession = async (
 export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, dialogueId: string, questionId: string, type: AutomationType) => {
   return prisma.automation.create({
     data: {
-      label: `Automation`,
+      label: 'Automation',
       type: type,
       isActive: true,
       workspace: {
         connect: {
           id: workspaceId,
-        }
+        },
       },
       automationTrigger: {
         create: {
@@ -112,9 +112,9 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
               question: {
                 connect: {
                   id: questionId,
-                }
-              }
-            }
+                },
+              },
+            },
           },
           conditions: {
             create: [
@@ -122,7 +122,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                 question: {
                   connect: {
                     id: questionId,
-                  }
+                  },
                 },
                 scope: 'QUESTION',
                 operator: 'SMALLER_OR_EQUAL_THAN',
@@ -133,26 +133,26 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                       create: {
                         type: 'AVG',
                         latest: 3,
-                      }
-                    }
-                  }
+                      },
+                    },
+                  },
                 },
-                matchValues: {
+                operands: {
                   create: {
                     type: 'INT',
                     numberValue: 50,
-                  }
-                }
+                  },
+                },
               },
-            ]
+            ],
           },
           actions: {
             create: [
               { type: 'GENERATE_REPORT' },
-            ]
-          }
-        }
-      }
+            ],
+          },
+        },
+      },
     },
     include: {
       automationTrigger: true,
@@ -178,14 +178,14 @@ describe('AutomationService', () => {
     const setupData = await automationService.setupSliderCompareData(sliderQuestionCompareDataInput);
 
     expect(setupData?.totalEntries).toBe(4);
-    expect(setupData?.matchValue).toBe(50);
+    expect(setupData?.operand).toBe(50);
     expect(setupData?.compareValue).toBe(40);
   });
 
   test('Sets up compare data for choice-related node', async () => {
     const setupData = await automationService.setupChoiceCompareData(choiceQuestionCompareDataInput);
     expect(setupData?.totalEntries).toBe(4);
-    expect(setupData?.matchValue).toBe(2);
+    expect(setupData?.operand).toBe(2);
 
     // Finds two facilities in the last 3 entries
     expect(setupData?.compareValue).toBe(2);
@@ -197,12 +197,12 @@ describe('AutomationService', () => {
 
     const sliderSetupData = await automationService.setupQuestionCompareData(sliderDataInput);
     expect(sliderSetupData?.totalEntries).toBe(4);
-    expect(sliderSetupData?.matchValue).toBe(50);
+    expect(sliderSetupData?.operand).toBe(50);
     expect(sliderSetupData?.compareValue).toBe(40);
 
     const choiceSetupData = await automationService.setupQuestionCompareData(choiceDataInput);
     expect(choiceSetupData?.totalEntries).toBe(4);
-    expect(choiceSetupData?.matchValue).toBe(2);
+    expect(choiceSetupData?.operand).toBe(2);
 
     // Finds two facilities in the last 3 entries
     expect(choiceSetupData?.compareValue).toBe(2);
@@ -215,12 +215,12 @@ describe('AutomationService', () => {
     expect(succesfullValidation).toBe(true);
 
     // Average is higher than 20 => condition rejected
-    condition.matchValues[0].numberValue = 20;
+    condition.operands[0].numberValue = 20;
     const unsuccesfullValidation = await automationService.validateQuestionScopeCondition(condition);
     expect(unsuccesfullValidation).toBe(false);
 
     // Average is lower than 80 but doesn't get by batch check => condition reject
-    condition.matchValues[0].numberValue = 80;
+    condition.operands[0].numberValue = 80;
     await seedSession(prisma, 'DIALOGUE_ID', 'SLIDER_ID', 40, 'CHOICE_ID', 'Something');
 
     const batchCheckValidation = await automationService.validateQuestionScopeCondition(condition);
@@ -231,7 +231,7 @@ describe('AutomationService', () => {
     const automationTrigger: AutomationTrigger = automationTriggerInput;
 
     // One passed condition => true
-    const singleConditionChecked = await automationService.checkAutomationTriggersConditions(automationTrigger);
+    const singleConditionChecked = await automationService.testTriggerConditions(automationTrigger);
     expect(singleConditionChecked).toBe(true);
 
     // Add an extra condition with flipped operator so it 100% return false
@@ -240,7 +240,7 @@ describe('AutomationService', () => {
     automationTrigger.conditions.push(extraCondition);
 
     // One passed condition, One reject condition => false
-    const doubleConditionChecked = await automationService.checkAutomationTriggersConditions(automationTrigger);
+    const doubleConditionChecked = await automationService.testTriggerConditions(automationTrigger);
     expect(doubleConditionChecked).toBe(false);
   });
 

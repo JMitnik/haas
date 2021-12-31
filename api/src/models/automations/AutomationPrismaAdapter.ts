@@ -1,7 +1,7 @@
 import {
   AutomationCondition, AutomationConditionScopeType, DialogueConditionScope,
   Prisma, PrismaClient, QuestionAspect, QuestionConditionScope,
-  WorkspaceConditionScope
+  WorkspaceConditionScope,
 } from '@prisma/client';
 import { cloneDeep, countBy } from 'lodash';
 import { isPresent } from 'ts-is-present';
@@ -139,7 +139,7 @@ export class AutomationPrismaAdapter {
     return this.prisma.automationTrigger.findMany({
       where: {
         id: {
-          in: triggerAutomationIds
+          in: triggerAutomationIds,
         },
       },
       include: {
@@ -165,7 +165,7 @@ export class AutomationPrismaAdapter {
                 aggregate: true,
               },
             },
-            matchValues: true,
+            operands: true,
             workspaceScope: {
               include: {
                 aggregate: true,
@@ -243,7 +243,7 @@ export class AutomationPrismaAdapter {
                     aggregate: true,
                   },
                 },
-                matchValues: true,
+                operands: true,
                 workspaceScope: {
                   include: {
                     aggregate: true,
@@ -364,7 +364,7 @@ export class AutomationPrismaAdapter {
                     aggregate: true,
                   },
                 },
-                matchValues: true,
+                operands: true,
                 workspaceScope: {
                   include: {
                     aggregate: true,
@@ -467,8 +467,8 @@ export class AutomationPrismaAdapter {
   constructUpdateAutomationConditionData = async (
     condition: UpdateAutomationConditionInput
   ): Promise<Prisma.AutomationConditionUpdateWithoutAutomationTriggerInput> => {
-    const { dialogueId, scope, questionId, matchValues, operator } = condition;
-    const matchValueIds = matchValues.map((matchValue) => matchValue.id).filter(isPresent);
+    const { dialogueId, scope, questionId, operands, operator } = condition;
+    const operandIds = operands.map((operand) => operand.id).filter(isPresent);
     const mappedScope = this.constructCreateAutomationConditionScopeData(scope);
     const dbCondition = await this.prisma.automationCondition.findUnique(({
       where: {
@@ -484,29 +484,29 @@ export class AutomationPrismaAdapter {
     return {
       scope: scope.type,
       operator,
-      matchValues: {
+      operands: {
         deleteMany: {
           id: {
-            notIn: matchValueIds,
+            notIn: operandIds,
           },
         },
 
-        upsert: matchValues.map((matchValue) => {
+        upsert: operands.map((operand) => {
           return {
             where: {
-              id: matchValue?.id || '-1',
+              id: operand?.id || '-1',
             },
             create: {
-              type: matchValue.type,
-              textValue: matchValue.textValue,
-              dateTimeValue: matchValue.dateTimeValue,
-              numberValue: matchValue.numberValue,
+              type: operand.type,
+              textValue: operand.textValue,
+              dateTimeValue: operand.dateTimeValue,
+              numberValue: operand.numberValue,
             },
             update: {
-              type: matchValue.type,
-              textValue: matchValue.textValue,
-              dateTimeValue: matchValue.dateTimeValue,
-              numberValue: matchValue.numberValue,
+              type: operand.type,
+              textValue: operand.textValue,
+              dateTimeValue: operand.dateTimeValue,
+              numberValue: operand.numberValue,
             },
           }
         }),
@@ -580,23 +580,23 @@ export class AutomationPrismaAdapter {
   constructCreateAutomationConditionData = (
     condition: CreateAutomationConditionInput
   ): Prisma.AutomationConditionCreateWithoutAutomationTriggerInput => {
-    const { dialogueId, scope, questionId, matchValues, operator } = condition;
+    const { dialogueId, scope, questionId, operands, operator } = condition;
     // TODO: Introduce workspace-wide condition
     const mappedScope = this.constructCreateAutomationConditionScopeData(scope);
     return {
       scope: scope.type,
       operator,
-      matchValues: {
+      operands: {
         createMany: {
-          data: matchValues.map((matchValue) =>
-          (
-            {
-              type: matchValue.type,
-              textValue: matchValue.textValue,
-              dateTimeValue: matchValue.dateTimeValue,
-              numberValue: matchValue.numberValue,
-            }
-          )),
+          data: operands.map((operand) =>
+            (
+              {
+                type: operand.type,
+                textValue: operand.textValue,
+                dateTimeValue: operand.dateTimeValue,
+                numberValue: operand.numberValue,
+              }
+            )),
         },
       },
       question: questionId ? {

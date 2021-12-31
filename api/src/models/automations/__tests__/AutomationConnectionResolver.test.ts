@@ -4,7 +4,6 @@ import { range } from 'lodash';
 import { clearDatabase, prepDefaultCreateData, seedAutomation } from './testUtils';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
-import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
 import AuthService from '../../auth/AuthService';
 
 jest.setTimeout(30000);
@@ -44,8 +43,8 @@ const seedAutomations = async (prisma: PrismaClient, workspace: Customer, dialog
           connect: {
             id: dialogue.id,
           },
-        }
-      }
+        },
+      },
     })
     await seedAutomation(prisma, workspace.id, dialogue.id, question.id, i, `AUTOMATION_DESCRIPTION_LOOKUP#${i}`);
   }));
@@ -65,19 +64,21 @@ describe('AutomationConnection resolvers', () => {
     await prisma.role.update({
       where: { id: userRole.id },
       data: {
-        permissions: []
-      }
+        permissions: [],
+      },
     });
 
     const token = AuthService.createUserToken(user.id, 22);
     try {
-      let res = await ctx.client.request(Query, {
+      await ctx.client.request(Query, {
         customerSlug: workspace.slug,
       }, { 'Authorization': `Bearer ${token}` });
     } catch (error) {
-      expect(error.message).toContain('Not Authorised!');
+      if (error instanceof Error) {
+        expect(error.message).toContain('Not Authorised!');
+      } else { throw new Error(); }
     }
-  })
+  });
 
   test('user can access automation-connection', async () => {
     const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);

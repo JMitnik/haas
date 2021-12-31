@@ -27,6 +27,7 @@
     "gen:prisma": "prisma generate",
     "seed": "ts-node --transpile-only src/data/main-seed.ts",
     "builder": "ts-node --transpile-only ./condition_builder.ts",
+    "seed:basic": "ts-node src/scripts/seed.ts",
     "types": "tsc --noEmit",
     "prisma": "prisma"
   },
@@ -101,6 +102,9 @@
     "yup": "^0.29.1"
   },
   "devDependencies": {
+    "@swc/cli": "^0.1.55",
+    "@swc/core": "^1.2.124",
+    "@swc/helpers": "^0.3.2",
     "@types/bcrypt": "^3.0.0",
     "@types/color": "3.0.1",
     "@types/cookie-parser": "^1.4.2",
@@ -119,11 +123,12 @@
     "@typescript-eslint/parser": "^5.7.0",
     "eslint": "7",
     "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-plugin-sort-class-members": "^1.14.1",
     "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-sort-class-members": "^1.14.1",
     "jest": "^26.0.0",
     "nodemon": "^2.0.3",
     "prisma": "2.30.3",
+    "regenerator-runtime": "^0.13.9",
     "ts-jest": "^25.4.0",
     "typescript": "^3.7.3"
   },

@@ -29,12 +29,12 @@ it('creates automation', async () => {
       }
     }
   `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`
-    }
+  {
+    input: input,
+  },
+  {
+    'Authorization': `Bearer ${token}`,
+  }
   ).then((data) => data?.createAutomation);
 
   expect(res).toMatchObject({
@@ -62,15 +62,17 @@ it('unable to create automation when no workspace id is provided', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('Not Authorised!');
+    if (error instanceof Error) {
+      expect(error.message).toContain('Not Authorised!');
+    } else { throw new Error(); }
   }
 });
 
@@ -92,15 +94,17 @@ it('unable to create automation when no automation label is provided', async () 
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No label provided');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No label provided');
+    } else { throw new Error(); }
   }
 });
 
@@ -122,15 +126,17 @@ it('unable to create automation when no automation type is provided', async () =
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No automation type');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No automation type');
+    } else { throw new Error(); }
   }
 });
 
@@ -152,15 +158,17 @@ it('unable to create automation when no conditions are provided', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No conditions provided');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No conditions provided');
+    } else { throw new Error(); }
   }
 });
 
@@ -170,7 +178,7 @@ it('unable to create automation when no match value type is provided for a condi
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
   const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
-  (input.conditions?.[0]?.matchValues?.[0] as any).matchValueType = null;
+  (input.conditions?.[0]?.operands?.[0] as any).operandType = null;
 
   try {
     await ctx.client.request(`
@@ -182,15 +190,17 @@ it('unable to create automation when no match value type is provided for a condi
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No match value type');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No match value type');
+    } else { throw new Error(); }
   }
 });
 
@@ -212,15 +222,17 @@ it('unable to create automation when no operator type is provided for a conditio
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No operator type');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No operator type');
+    } else { throw new Error(); }
   }
 });
 
@@ -242,15 +254,17 @@ it('unable to create automation when no actions are provided', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No actions provided');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No actions provided');
+    } else { throw new Error(); }
   }
 });
 
@@ -272,15 +286,17 @@ it('unable to create automation when no action type is provided for an action', 
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No action type provided');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No action type provided');
+    } else { throw new Error(); }
   }
 });
 
@@ -302,15 +318,17 @@ it('unable to create automation when no event type is provided for a condition',
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No event type provided');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No event type provided');
+    } else { throw new Error(); }
   }
 });
 
@@ -332,15 +350,17 @@ it('unable to create automation when no event type is provided for a condition',
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No event type provided');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No event type provided');
+    } else { throw new Error(); }
   }
 });
 
@@ -363,15 +383,17 @@ it('unable to create automation when no targets are provided for a SEND_SMS acti
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No target phone numbers provided');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No target phone numbers provided');
+    } else { throw new Error(); }
   }
 });
 
@@ -381,8 +403,8 @@ it('unable to create automations unauthorized', async () => {
   await prisma.role.update({
     where: { id: userRole.id },
     data: {
-      permissions: []
-    }
+      permissions: [],
+    },
   })
 
   // Generate token for API access
@@ -399,15 +421,17 @@ it('unable to create automations unauthorized', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('Not Authorised!');
+    if (error instanceof Error) {
+      expect(error.message).toContain('Not Authorised!');
+    } else { throw new Error(); }
   }
 });
 

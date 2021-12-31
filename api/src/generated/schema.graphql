@@ -56,30 +56,30 @@ enum AutomationActionType {
   WEBHOOK
 }
 
-"""AutomationConditionMatchValue"""
-type AutomationConditionMatchValueModel {
-  createdAt: Date!
-  dateTimeValue: String
-  id: ID!
-  numberValue: Int
-  textValue: String
-  type: MatchValueType!
-  updatedAt: Date!
-}
-
 """AutomationCondition"""
 type AutomationConditionModel {
   createdAt: Date!
   dialogue: Dialogue
   dialogueScope: DialogueConditionScopeModel
   id: ID!
-  matchValues: [AutomationConditionMatchValueModel!]!
+  operands: [AutomationConditionOperandModel!]!
   operator: AutomationConditionOperatorType!
   question: QuestionNode
   questionScope: QuestionConditionScopeModel
   scope: AutomationConditionScopeType!
   updatedAt: Date!
   workspaceScope: WorkspaceConditionScopeModel
+}
+
+"""AutomationConditionOperand"""
+type AutomationConditionOperandModel {
+  createdAt: Date!
+  dateTimeValue: String
+  id: ID!
+  numberValue: Int
+  textValue: String
+  type: OperandType!
+  updatedAt: Date!
 }
 
 enum AutomationConditionOperatorType {
@@ -303,11 +303,19 @@ interface ConnectionInterface {
 input CreateAutomationCondition {
   dialogueId: String
   id: ID
-  matchValues: [MatchValueInput!]
+  operands: [CreateAutomationOperandInput!]
   operator: AutomationConditionOperatorType
   questionId: String
   scope: ConditionScopeInput
   workspaceId: String
+}
+
+input CreateAutomationOperandInput {
+  dateTimeValue: String
+  id: ID
+  numberValue: Int
+  operandType: OperandType
+  textValue: String
 }
 
 input CreateAutomationResolverInput {
@@ -968,20 +976,6 @@ type LoginOutput {
   user: UserType!
 }
 
-input MatchValueInput {
-  dateTimeValue: String
-  id: ID
-  matchValueType: MatchValueType
-  numberValue: Int
-  textValue: String
-}
-
-enum MatchValueType {
-  DATE_TIME
-  INT
-  STRING
-}
-
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
@@ -1084,6 +1078,12 @@ type NodeEntryValue {
   sliderNodeEntry: Int
   textboxNodeEntry: String
   videoNodeEntry: String
+}
+
+enum OperandType {
+  DATE_TIME
+  INT
+  STRING
 }
 
 input OptionInputType {
