@@ -20,6 +20,38 @@ export class AutomationPrismaAdapter {
     this.prisma = prisma;
   }
 
+  findAutomationConditionBuilderById = (builderId: string) => {
+    return this.prisma.automationConditionBuilder.findUnique({
+      where: {
+        id: builderId,
+      },
+      include: {
+        conditions: {
+          include: {
+            questionScope: {
+              include: {
+                aggregate: true,
+              },
+            },
+            dialogueScope: {
+              include: {
+                aggregate: true,
+              },
+            },
+            operands: true,
+            workspaceScope: {
+              include: {
+                aggregate: true,
+              },
+            },
+            dialogue: true,
+            question: true,
+          }
+        }
+      }
+    })
+  };
+
   findAutomationConditionById = (automationConditionId: string) => {
     return this.prisma.automationCondition.findUnique({
       where: {

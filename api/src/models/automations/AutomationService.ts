@@ -42,6 +42,10 @@ class AutomationService {
     this.userService = new UserService(prisma);
   }
 
+  findAutomationConditionBuilder = (builderId: string) => {
+    return this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
+  };
+
   findAutomationConditionById = (automationConditionId: string) => {
     return this.automationPrismaAdapter.findAutomationConditionById(automationConditionId);
   };
