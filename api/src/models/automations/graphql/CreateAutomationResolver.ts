@@ -3,7 +3,7 @@ import { AutomationType } from './AutomationType'
 import { AutomationEventType } from './AutomationEventType';
 import { AutomationConditionScopeType } from './AutomationConditionScopeType';
 import { AutomationConditionOperatorType } from './AutomationConditionOperatorType';
-import { MatchValueType } from './MatchValueType';
+import { OperandType } from './OperandType';
 import { QuestionAspectType } from './QuestionAspectType';
 import { DialogueAspectType } from './DialogueAspectType';
 import { WorkspaceAspectType } from './WorkspaceAspectType';
@@ -12,11 +12,11 @@ import { AutomationActionType } from './AutomationActionType';
 import { AutomationModel } from './AutomationModel';
 import { UserInputError } from 'apollo-server-express';
 
-export const MatchValueInput = inputObjectType({
-  name: 'MatchValueInput',
+export const CreateAutomationOperandInput = inputObjectType({
+  name: 'CreateAutomationOperandInput',
   definition(t) {
     t.id('id', { nullable: true });
-    t.field('matchValueType', { type: MatchValueType });
+    t.field('operandType', { type: OperandType });
     t.string('textValue', { nullable: true });
     t.int('numberValue', { nullable: true });
     t.string('dateTimeValue', { nullable: true });
@@ -79,7 +79,8 @@ export const CreateAutomationCondition = inputObjectType({
     t.id('id', { nullable: true });
     t.field('scope', { type: ConditionScopeInput });
     t.field('operator', { type: AutomationConditionOperatorType });
-    t.list.field('matchValues', { type: MatchValueInput });
+
+    t.list.field('operands', { type: CreateAutomationOperandInput });
 
     t.string('questionId', { nullable: true });
     t.string('dialogueId', { nullable: true });

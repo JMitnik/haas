@@ -10,7 +10,7 @@ export const clearDatabase = async (prisma: PrismaClient) => {
       prisma.automation.deleteMany({}),
       prisma.automationTrigger.deleteMany({}),
       prisma.automationEvent.deleteMany({}),
-      prisma.automationConditionMatchValue.deleteMany({}),
+      prisma.automationConditionOperand.deleteMany({}),
       prisma.dialogueConditionScope.deleteMany({}),
       prisma.questionConditionScope.deleteMany({}),
       prisma.workspaceConditionScope.deleteMany({}),
@@ -70,7 +70,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                     }
                   }
                 },
-                matchValues: {
+                operands: {
                   create: {
                     type: 'INT',
                     numberValue: 50,
@@ -96,7 +96,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                     }
                   }
                 },
-                matchValues: {
+                operands: {
                   create: {
                     type: 'INT',
                     numberValue: 10,
@@ -136,7 +136,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                   aggregate: true,
                 }
               },
-              matchValues: true,
+              operands: true,
               workspaceScope: {
                 include: {
                   aggregate: true,

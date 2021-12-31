@@ -9,7 +9,7 @@ export const conditionInput: AutomationCondition = {
   scope: 'QUESTION',
   operator: 'SMALLER_OR_EQUAL_THAN',
   workspaceScope: null,
-  matchValues: [
+  operands: [
     {
       numberValue: 80,
       type: 'INT',
@@ -103,7 +103,7 @@ export const automationTriggerInput: AutomationTrigger = {
 export const choiceQuestionCompareDataInput: SetupQuestionCompareDataInput = {
   type: 'CHOICE',
   aspect: 'NODE_VALUE',
-  matchValues: [
+  operands: [
     {
       numberValue: 2,
       type: 'INT',
@@ -141,7 +141,7 @@ export const choiceQuestionCompareDataInput: SetupQuestionCompareDataInput = {
 export const sliderQuestionCompareDataInput: SetupQuestionCompareDataInput = {
   type: 'SLIDER',
   aspect: 'NODE_VALUE',
-  matchValues: [{
+  operands: [{
     numberValue: 50,
     type: 'INT',
     automationConditionId: '',
@@ -171,7 +171,7 @@ export const constructValidUpdateAutomationInputData = (workspace: Customer, dia
 
   const { event, actions, conditions }: AutomationTrigger = automation.automationTrigger;
 
-  // Get actions ids 
+  // Get actions ids
   const sendSmsAction = actions.find((action) => action.type === "SEND_EMAIL");
   const generateReportAction = actions.find((action) => action.type === "GENERATE_REPORT");
 
@@ -208,10 +208,10 @@ export const constructValidUpdateAutomationInputData = (workspace: Customer, dia
           }
         },
         "operator": "SMALLER_THAN",
-        "matchValues": [
+        "operands": [
           {
-            id: questionCondition?.matchValues?.[0]?.id,
-            "matchValueType": "INT",
+            id: questionCondition?.operands?.[0]?.id,
+            "operandType": "INT",
             "numberValue": 50
           }
         ],
@@ -220,10 +220,10 @@ export const constructValidUpdateAutomationInputData = (workspace: Customer, dia
         id: dialogueCondition?.id,
         questionId: question.id,
         operator: "GREATER_THAN",
-        matchValues: [
+        operands: [
           {
-            id: dialogueCondition?.matchValues?.[0]?.id,
-            matchValueType: "INT",
+            id: dialogueCondition?.operands?.[0]?.id,
+            operandType: "INT",
             numberValue: 10,
           },
         ],
@@ -275,9 +275,9 @@ export const constructValidCreateAutomationInputData = (workspace: Customer, dia
           }
         },
         "operator": "SMALLER_OR_EQUAL_THAN",
-        "matchValues": [
+        "operands": [
           {
-            "matchValueType": "INT",
+            "operandType": "INT",
             "numberValue": 50
           }
         ],
