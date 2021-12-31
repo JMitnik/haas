@@ -22,12 +22,12 @@ export const seedWorkspace = async (prisma: PrismaClient) => {
           description: 'desc',
           slug: 'DIALOGUE_SLUG',
           title: 'DIALOGUE',
-        }
-      }
+        },
+      },
     },
     include: {
       dialogues: true,
-    }
+    },
   });
   const sliderQuestion = await seedQuestion(prisma, 'DIALOGUE_ID', 'SLIDER', 'SLIDER_ID');
   const choiceQuestion = await seedQuestion(prisma, 'DIALOGUE_ID', 'CHOICE', 'CHOICE_ID');
@@ -43,9 +43,9 @@ export const seedQuestion = (prisma: PrismaClient, dialogueId: string, type: Nod
       questionDialogue: {
         connect: {
           id: dialogueId,
-        }
-      }
-    }
+        },
+      },
+    },
   })
 }
 
@@ -70,7 +70,7 @@ export const seedSession = async (
             connect: sliderQuestionId ? { id: sliderQuestionId } : undefined,
           },
           sliderNodeEntry: {
-            create: { value: sliderValue || Math.floor(Math.random() * 100) }
+            create: { value: sliderValue || Math.floor(Math.random() * 100) },
           },
         },
         {
@@ -78,16 +78,16 @@ export const seedSession = async (
           choiceNodeEntry: {
             create: {
               value: choiceValue || sample(['Customer support', 'Facilities', 'Website', 'Application']),
-            }
+            },
           },
           relatedNode: {
             create: !choiceQuestionId ? { title: 'What did you think of this?', type: NodeType.CHOICE } : undefined,
             connect: choiceQuestionId ? { id: choiceQuestionId } : undefined,
-          }
-        }
+          },
+        },
         ],
-      }
-    }
+      },
+    },
   });
 
   return session;
@@ -96,13 +96,13 @@ export const seedSession = async (
 export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, dialogueId: string, questionId: string, type: AutomationType) => {
   return prisma.automation.create({
     data: {
-      label: `Automation`,
+      label: 'Automation',
       type: type,
       isActive: true,
       workspace: {
         connect: {
           id: workspaceId,
-        }
+        },
       },
       automationTrigger: {
         create: {
@@ -112,9 +112,9 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
               question: {
                 connect: {
                   id: questionId,
-                }
-              }
-            }
+                },
+              },
+            },
           },
           conditions: {
             create: [
@@ -122,7 +122,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                 question: {
                   connect: {
                     id: questionId,
-                  }
+                  },
                 },
                 scope: 'QUESTION',
                 operator: 'SMALLER_OR_EQUAL_THAN',
@@ -133,26 +133,26 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                       create: {
                         type: 'AVG',
                         latest: 3,
-                      }
-                    }
-                  }
+                      },
+                    },
+                  },
                 },
                 operands: {
                   create: {
                     type: 'INT',
                     numberValue: 50,
-                  }
-                }
+                  },
+                },
               },
-            ]
+            ],
           },
           actions: {
             create: [
               { type: 'GENERATE_REPORT' },
-            ]
-          }
-        }
-      }
+            ],
+          },
+        },
+      },
     },
     include: {
       automationTrigger: true,

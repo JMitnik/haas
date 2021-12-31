@@ -30,12 +30,12 @@ it('updates automation', async () => {
       }
     }
   `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`
-    }
+  {
+    input: input,
+  },
+  {
+    'Authorization': `Bearer ${token}`,
+  }
   ).then((data) => data?.updateAutomation);
 
   expect(res).toMatchObject({
@@ -63,15 +63,17 @@ it('unable to update automation when no automation id is provided', async () => 
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('No ID provided for automation');
+    if (error instanceof Error) {
+      expect(error.message).toContain('No ID provided for automation');
+    } else { throw new Error(); }
   }
 });
 
@@ -82,8 +84,8 @@ it('unable to create automations unauthorized', async () => {
   await prisma.role.update({
     where: { id: userRole.id },
     data: {
-      permissions: []
-    }
+      permissions: [],
+    },
   })
 
   // Generate token for API access
@@ -100,15 +102,17 @@ it('unable to create automations unauthorized', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('Not Authorised!');
+    if (error instanceof Error) {
+      expect(error.message).toContain('Not Authorised!');
+    } else { throw new Error(); }
   }
 });
 

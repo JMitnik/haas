@@ -74,6 +74,7 @@
   },
   "include": [
     "./src/app.ts",
+    "./src/**/*.test.ts",
     "./src/scripts/*.ts"
   ]
 }

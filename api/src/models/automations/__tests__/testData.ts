@@ -1,6 +1,6 @@
-import { AutomationActionType, AutomationEventType, Customer, Dialogue, Prisma, QuestionNode } from "@prisma/client";
-import { NexusGenInputs } from "../../../generated/nexus";
-import { AutomationCondition, AutomationTrigger, FullAutomationWithRels, SetupQuestionCompareDataInput } from "../AutomationTypes";
+import { AutomationActionType, AutomationEventType, Customer, Dialogue, QuestionNode } from '@prisma/client';
+import { NexusGenInputs } from '../../../generated/nexus';
+import { AutomationCondition, AutomationTrigger, FullAutomationWithRels, SetupQuestionCompareDataInput } from '../AutomationTypes';
 
 export const conditionInput: AutomationCondition = {
   dialogue: null,
@@ -19,7 +19,7 @@ export const conditionInput: AutomationCondition = {
       textValue: null,
       updatedAt: null,
       id: '',
-    }
+    },
   ],
   question: {
     id: 'SLIDER_ID',
@@ -54,7 +54,7 @@ export const conditionInput: AutomationCondition = {
     createdAt: new Date(Date.now()),
     id: '',
     updatedAt: null,
-  }
+  },
 
 }
 
@@ -87,7 +87,7 @@ export const automationTriggerInput: AutomationTrigger = {
       overrideLeafId: null,
       questionDialogueId: 'DIALOGUE_ID',
       sliderNodeId: null,
-    }
+    },
   },
   conditions: [
     conditionInput,
@@ -96,8 +96,8 @@ export const automationTriggerInput: AutomationTrigger = {
     {
       id: '',
       type: AutomationActionType.GENERATE_REPORT,
-    }
-  ]
+    },
+  ],
 }
 
 export const choiceQuestionCompareDataInput: SetupQuestionCompareDataInput = {
@@ -135,7 +135,7 @@ export const choiceQuestionCompareDataInput: SetupQuestionCompareDataInput = {
     questionConditionScopeId: '',
     workspaceConditionScopeId: null,
     updatedAt: null,
-  }
+  },
 }
 
 export const sliderQuestionCompareDataInput: SetupQuestionCompareDataInput = {
@@ -163,79 +163,79 @@ export const sliderQuestionCompareDataInput: SetupQuestionCompareDataInput = {
     questionConditionScopeId: '',
     workspaceConditionScopeId: null,
     updatedAt: null,
-  }
+  },
 }
 
-export const constructValidUpdateAutomationInputData = (workspace: Customer, dialogue: Dialogue, question: QuestionNode, automation: FullAutomationWithRels): NexusGenInputs["CreateAutomationResolverInput"] => {
-  if (!automation.automationTrigger) throw Error("No automation trigger to be updated provided!");
+export const constructValidUpdateAutomationInputData = (workspace: Customer, dialogue: Dialogue, question: QuestionNode, automation: FullAutomationWithRels): NexusGenInputs['CreateAutomationResolverInput'] => {
+  if (!automation.automationTrigger) throw Error('No automation trigger to be updated provided!');
 
   const { event, actions, conditions }: AutomationTrigger = automation.automationTrigger;
 
   // Get actions ids
-  const sendSmsAction = actions.find((action) => action.type === "SEND_EMAIL");
-  const generateReportAction = actions.find((action) => action.type === "GENERATE_REPORT");
+  const sendSmsAction = actions.find((action) => action.type === 'SEND_EMAIL');
+  const generateReportAction = actions.find((action) => action.type === 'GENERATE_REPORT');
 
   // Get condition ids
-  const questionCondition = conditions.find((condition) => condition.scope === "QUESTION");
-  const dialogueCondition = conditions.find((condition) => condition.scope === "DIALOGUE");
+  const questionCondition = conditions.find((condition) => condition.scope === 'QUESTION');
+  const dialogueCondition = conditions.find((condition) => condition.scope === 'DIALOGUE');
 
   return {
     id: automation.id,
-    "label": "UPDATED AUTOMATION TRIGGER TEST",
-    "workspaceId": workspace.id,
-    "automationType": "TRIGGER",
-    "event": {
+    'label': 'UPDATED AUTOMATION TRIGGER TEST',
+    'workspaceId': workspace.id,
+    'automationType': 'TRIGGER',
+    'event': {
       id: event.id,
-      "eventType": "NEW_INTERACTION_DIALOGUE",
+      'eventType': 'NEW_INTERACTION_DIALOGUE',
       dialogueId: dialogue.id,
     },
-    "actions": [{ id: sendSmsAction?.id, "type": "SEND_SMS", apiKey: "API_KEY", endpoint: "ENDPOINT", payload: { "targets": ["+3167654321", "+12345675423"] } }, { id: generateReportAction?.id, "type": "GENERATE_REPORT" }],
-    "conditions": [
+    'actions': [{ id: sendSmsAction?.id, 'type': 'SEND_SMS', apiKey: 'API_KEY', endpoint: 'ENDPOINT', payload: { 'targets': ['+3167654321', '+12345675423'] } }, { id: generateReportAction?.id, 'type': 'GENERATE_REPORT' }],
+    'conditions': [
       {
         id: questionCondition?.id,
-        "questionId": question.id,
-        "scope": {
+        'questionId': question.id,
+        'scope': {
           // TODO: I think scope id shouldn"t exist in CreateAutomationResolverInput as it is not a model. if not, remove
-          "type": "QUESTION",
-          "questionScope": {
+          'type': 'QUESTION',
+          'questionScope': {
             id: questionCondition?.questionScope?.id,
-            "aspect": "NODE_VALUE",
-            "aggregate": {
+            'aspect': 'NODE_VALUE',
+            'aggregate': {
               id: questionCondition?.questionScope?.aggregate?.id,
-              "type": "AVG",
-              "latest": 10
-            }
-          }
+              'type': 'AVG',
+              'latest': 10,
+            },
+          },
         },
-        "operator": "SMALLER_THAN",
-        "operands": [
+        'operator': 'SMALLER_THAN',
+        'operands': [
           {
             id: questionCondition?.operands?.[0]?.id,
-            "operandType": "INT",
-            "numberValue": 50
-          }
+            'operandType': 'INT',
+            'numberValue': 50,
+          },
         ],
       },
       {
         id: dialogueCondition?.id,
         questionId: question.id,
-        operator: "GREATER_THAN",
+        operator: 'GREATER_THAN',
         operands: [
           {
             id: dialogueCondition?.operands?.[0]?.id,
-            operandType: "INT",
+            operandType: 'INT',
             numberValue: 10,
           },
         ],
         scope: {
-          type: "QUESTION",
+          type: 'QUESTION',
           questionScope: {
-            "aspect": "NODE_VALUE",
-            "aggregate": {
+            'aspect': 'NODE_VALUE',
+            'aggregate': {
               id: questionCondition?.questionScope?.aggregate?.id,
-              "type": "AVG",
-              "latest": 10
-            }
+              'type': 'AVG',
+              'latest': 10,
+            },
           },
           // dialogueScope: {
           //   id: dialogueCondition?.dialogueScope?.id,
@@ -246,42 +246,52 @@ export const constructValidUpdateAutomationInputData = (workspace: Customer, dia
           //     latest: 10,
           //   }
           // },
-        }
-      }
+        },
+      },
     ],
   };
 }
 
-export const constructValidCreateAutomationInputData = (workspace: Customer, dialogue: Dialogue, question: QuestionNode): NexusGenInputs["CreateAutomationResolverInput"] => {
+export const constructValidCreateAutomationInputData = (
+  workspace: Customer,
+  dialogue: Dialogue,
+  question: QuestionNode
+): NexusGenInputs['CreateAutomationResolverInput'] => {
   return {
-    "label": "CREATE AUTOMATION TRIGGER TEST",
-    "workspaceId": workspace.id,
-    "automationType": "TRIGGER",
-    "event": {
-      "eventType": "NEW_INTERACTION_QUESTION",
-      "questionId": question.id,
+    'label': 'CREATE AUTOMATION TRIGGER TEST',
+    'workspaceId': workspace.id,
+    'automationType': 'TRIGGER',
+    'event': {
+      'eventType': 'NEW_INTERACTION_QUESTION',
+      'questionId': question.id,
     },
-    actions: [{ "type": AutomationActionType.SEND_SMS, apiKey: "API_KEY", endpoint: "ENDPOINT", payload: { "targets": ["+3161234567"] } }, { "type": AutomationActionType.GENERATE_REPORT }],
-    "conditions": [
+    actions: [{
+      'type': AutomationActionType.SEND_SMS,
+      apiKey: 'API_KEY',
+      endpoint: 'ENDPOINT',
+      payload: { 'targets': ['+3161234567'] } },
+    { 'type': AutomationActionType.GENERATE_REPORT },
+    ],
+    'conditions': [
       {
-        "scope": {
-          "type": "QUESTION",
-          "questionScope": {
-            "aspect": "NODE_VALUE",
-            "aggregate": {
-              "type": "AVG",
-              "latest": 10
-            }
-          }
+        'scope': {
+          'type': 'QUESTION',
+          'questionScope': {
+            'aspect': 'NODE_VALUE',
+            'aggregate': {
+              'type': 'AVG',
+              'latest': 10,
+            },
+          },
         },
-        "operator": "SMALLER_OR_EQUAL_THAN",
-        "operands": [
+        'operator': 'SMALLER_OR_EQUAL_THAN',
+        'operands': [
           {
-            "operandType": "INT",
-            "numberValue": 50
-          }
+            'operandType': 'INT',
+            'numberValue': 50,
+          },
         ],
-        "questionId": question.id,
+        'questionId': question.id,
       },
     ],
   };
