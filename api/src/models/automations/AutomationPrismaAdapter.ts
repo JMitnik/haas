@@ -20,6 +20,34 @@ export class AutomationPrismaAdapter {
     this.prisma = prisma;
   }
 
+  findAutomationConditionById = (automationConditionId: string) => {
+    return this.prisma.automationCondition.findUnique({
+      where: {
+        id: automationConditionId,
+      },
+      include: {
+        questionScope: {
+          include: {
+            aggregate: true,
+          },
+        },
+        dialogueScope: {
+          include: {
+            aggregate: true,
+          },
+        },
+        matchValues: true,
+        workspaceScope: {
+          include: {
+            aggregate: true,
+          },
+        },
+        dialogue: true,
+        question: true,
+      },
+    })
+  }
+
   aggregateScopedSliderNodeEntries = async (
     questionId: string,
     aspect: QuestionAspect,

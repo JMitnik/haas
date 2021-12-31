@@ -1,4 +1,5 @@
 import { AutomationCondition as PrismaAutomationCondition, AutomationConditionBuilder, AutomationConditionBuilderType, NodeType, PrismaClient } from "@prisma/client"
+import AutomationService from "./src/models/automations/AutomationService";
 import { AutomationCondition } from "./src/models/automations/AutomationTypes";
 
 interface BuilderEntry extends AutomationConditionBuilder {
@@ -19,6 +20,9 @@ interface DestructedBuilderEntry {
   OR?: XOR<DestructedBuilderEntry[], PrismaAutomationCondition[]>
   AND?: XOR<DestructedBuilderEntry[], PrismaAutomationCondition[]>
 }
+
+const prisma = new PrismaClient();
+const automationService = new AutomationService(prisma);
 
 const test: DestructedBuilderEntry = {
   AND: [
@@ -93,8 +97,6 @@ const destruct = (dataObj: any, entry: BuilderEntry) => {
   return dataObj;
 }
 
-const prisma = new PrismaClient();
-
 export const seedQuestion = (prisma: PrismaClient, dialogueId: string, type: NodeType, questionId: string) => {
   return prisma.questionNode.create({
     data: {
@@ -165,7 +167,23 @@ const main = async () => {
         in: ['BUILDER_CONDITION_ID', 'BUILDER_CONDITION_ID_TWO', 'BUILDER_CONDITION_ID_THREE', 'BUILDER_CONDITION_ID_FOUR']
       },
     }
+  });
+
+  await prisma.sliderNodeEntry.deleteMany({
+    where: {
+      id: {
+        in: [1337],
+      }
+    }
   }),
+
+    await prisma.nodeEntry.deleteMany({
+      where: {
+        id: {
+          in: ['SESSION_SLIDER_ENTRY'],
+        }
+      }
+    }),
 
     await prisma.questionNode.deleteMany({
       where: {
@@ -255,7 +273,7 @@ const main = async () => {
                       {
                         id: 'BUILDER_MATCH_VALUE_ID',
                         type: 'INT',
-                        numberValue: 50,
+                        numberValue: 1,
                       }
                     ],
                   },
@@ -294,7 +312,7 @@ const main = async () => {
                       {
                         id: 'BUILDER_MATCH_VALUE_ID_THREE',
                         type: 'INT',
-                        numberValue: 50,
+                        numberValue: 1,
                       }
                     ],
                   },
@@ -405,27 +423,37 @@ const main = async () => {
     }
   });
 
+  await prisma.nodeEntry.create({
+    data: {
+      id: 'SESSION_SLIDER_ENTRY',
+      relatedNode: {
+        connect: {
+          id: sliderQuestion.id,
+        },
+      },
+      sliderNodeEntry: {
+        create: {
+          id: 1337,
+          value: 5,
+        }
+      }
+    }
+  })
+
   let destructed = {};
   const destructedData = destruct(destructed, fetchedBuilder as any)
+  console.log('Destructed data: ', destructedData['AND'][1]);
+  const validatedObjects = await validateConditions(destructedData, {});
+  console.log('Validated Objects: ', validatedObjects);
 
-  console.log(fetchedBuilder)
-  console.log('Destructed data: ', destructedData);
-  console.log('length AND', destructedData.AND.length);
-  console.log('child OR length: ', destructedData.AND[1].OR[2]);
 
   const example: CheckedConditions = {
     AND: [
-      false,
+      true,
       {
         OR: [
           false,
-          {
-            OR: [
-              false,
-              false,
-            ]
-          },
-          true
+          false
         ]
       }
     ]
@@ -433,9 +461,40 @@ const main = async () => {
 
   let summarizedList = []
 
-  checkConditions(example, summarizedList, 0);
+  const builderConditionsPassed = checkConditions(validatedObjects, summarizedList, 0);
+  console.log('Builder condition passed: ', builderConditionsPassed)
+}
 
-  console.log('Summarized list in main(): ', summarizedList);
+const validateConditions = async (data: PreValidatedConditions, checkedObject: CheckedConditions) => {
+  const isAND = !!data['AND'];
+  console.log('IS AND: ', isAND);
+
+  await Promise.all(data[isAND ? 'AND' : 'OR'].map(async (entry) => {
+    if (entry['id']) {
+      const condition = await automationService.findAutomationConditionById(entry['id']);
+      const validated = await automationService.validateQuestionScopeCondition(condition);
+
+      const hasAndorOr = Object.keys(checkedObject).find((property) => property === 'AND' || property === 'OR');
+      console.log('HAS AND OR OR: ', hasAndorOr);
+
+      checkedObject[hasAndorOr].push(validated);
+    }
+
+    if (entry['AND'] || entry['OR']) {
+      checkedObject[isAND ? 'AND' : 'OR'] = [];
+      const childIsAnd = entry['AND'] ? { AND: [] } : { OR: [] };
+      const validated = await validateConditions(entry as PreValidatedConditions, childIsAnd);
+      console.log('Validated from child: ', validated);
+      checkedObject[isAND ? 'AND' : 'OR'].push(validated);
+    }
+  }));
+
+  return checkedObject;
+}
+
+interface PreValidatedConditions {
+  AND?: (AutomationCondition | PreValidatedConditions)[];
+  OR?: (AutomationCondition | PreValidatedConditions)[];
 }
 
 interface CheckedConditions {

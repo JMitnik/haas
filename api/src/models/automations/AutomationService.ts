@@ -42,6 +42,10 @@ class AutomationService {
     this.userService = new UserService(prisma);
   }
 
+  findAutomationConditionById = (automationConditionId: string) => {
+    return this.automationPrismaAdapter.findAutomationConditionById(automationConditionId);
+  };
+
   /**
    * Sets up the data necessary for comparing slider data with the condition match value
    * @param input object containing
