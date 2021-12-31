@@ -343,59 +343,12 @@ const main = async () => {
               }
             ]
           },
-          // hasChildBuilder: {
-          //   create: {
-          //     id: 'CHILD_BUILDER_ID_TWO',
-          //     type: 'AND',
-          //     conditions: {
-          //       create: {
-          //         id: 'BUILDER_CONDITION_ID_FOUR',
-          //         scope: 'QUESTION',
-          //         operator: 'SMALLER_OR_EQUAL_THAN',
-          //         matchValues: {
-          //           createMany: {
-          //             data: [
-          //               {
-          //                 id: 'BUILDER_MATCH_VALUE_ID_FOUR',
-          //                 type: 'INT',
-          //                 numberValue: 50,
-          //               }
-          //             ],
-          //           },
-          //         },
-          //         question: {
-          //           connect: {
-          //             id: sliderQuestion.id,
-          //           }
-          //         },
-          //         dialogue: dialogueId ? {
-          //           connect: {
-          //             id: dialogueId,
-          //           },
-          //         } : undefined,
-          //         questionScope: {
-          //           create: {
-          //             id: 'BUILDER_SCOPE_ID_FOUR',
-          //             aggregate: {
-          //               create: {
-          //                 id: 'BUILDER_AGGREGATE_ID_FOUR',
-          //                 type: 'AVG',
-          //                 latest: 1,
-          //               },
-          //             },
-          //             aspect: 'NODE_VALUE',
-          //           },
-          //         },
-          //       },
-          //     }
-
-          //   }
-          // }
         }
       }
     }
   });
 
+  // TODO: parentId should really be a child ID so we can recursively find all entries instead of deeply nested include
   const fetchedBuilder = await prisma.automationConditionBuilder.findUnique({
     where: {
       id: builder.id,
@@ -440,34 +393,19 @@ const main = async () => {
     }
   })
 
+
   let destructed = {};
   const destructedData = destruct(destructed, fetchedBuilder as any)
-  console.log('Destructed data: ', destructedData['AND'][1]);
+  console.log('Destructed data: ', destructedData);
   const validatedObjects = await validateConditions(destructedData, {});
   console.log('Validated Objects: ', validatedObjects);
 
-
-  const example: CheckedConditions = {
-    AND: [
-      true,
-      {
-        OR: [
-          false,
-          false
-        ]
-      }
-    ]
-  }
-
-  let summarizedList = []
-
-  const builderConditionsPassed = checkConditions(validatedObjects, summarizedList, 0);
+  const builderConditionsPassed = checkConditions(validatedObjects, [], 0);
   console.log('Builder condition passed: ', builderConditionsPassed)
 }
 
 const validateConditions = async (data: PreValidatedConditions, checkedObject: CheckedConditions) => {
   const isAND = !!data['AND'];
-  console.log('IS AND: ', isAND);
 
   await Promise.all(data[isAND ? 'AND' : 'OR'].map(async (entry) => {
     if (entry['id']) {
@@ -475,7 +413,6 @@ const validateConditions = async (data: PreValidatedConditions, checkedObject: C
       const validated = await automationService.validateQuestionScopeCondition(condition);
 
       const hasAndorOr = Object.keys(checkedObject).find((property) => property === 'AND' || property === 'OR');
-      console.log('HAS AND OR OR: ', hasAndorOr);
 
       checkedObject[hasAndorOr].push(validated);
     }
@@ -484,7 +421,6 @@ const validateConditions = async (data: PreValidatedConditions, checkedObject: C
       checkedObject[isAND ? 'AND' : 'OR'] = [];
       const childIsAnd = entry['AND'] ? { AND: [] } : { OR: [] };
       const validated = await validateConditions(entry as PreValidatedConditions, childIsAnd);
-      console.log('Validated from child: ', validated);
       checkedObject[isAND ? 'AND' : 'OR'].push(validated);
     }
   }));

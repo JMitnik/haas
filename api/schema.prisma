@@ -985,11 +985,10 @@ model AutomationConditionBuilder {
 
   type                   AutomationConditionBuilderType
   conditions             AutomationCondition[]
-  parentConditionBuilder AutomationConditionBuilder?    @relation("AutomationConditionBuilderToAutomationConditionBuilder", fields: [parentConditionBuilderId], references: [id])
+  parentConditionBuilder AutomationConditionBuilder?    @relation("AutomationConditionBuilderToAutomationConditionBuilder")
 
-  parentConditionBuilderId String? @unique
-
-  hasChildBuilder AutomationConditionBuilder? @relation("AutomationConditionBuilderToAutomationConditionBuilder")
+  childConditionBuilderId String?                     @unique
+  hasChildBuilder         AutomationConditionBuilder? @relation("AutomationConditionBuilderToAutomationConditionBuilder", fields: [childConditionBuilderId], references: [id])
 }
 
 model AutomationCondition {
