@@ -988,7 +988,7 @@ model AutomationConditionBuilder {
   parentConditionBuilder AutomationConditionBuilder?    @relation("AutomationConditionBuilderToAutomationConditionBuilder")
 
   childConditionBuilderId String?                     @unique
-  hasChildBuilder         AutomationConditionBuilder? @relation("AutomationConditionBuilderToAutomationConditionBuilder", fields: [childConditionBuilderId], references: [id])
+  childConditionBuilder   AutomationConditionBuilder? @relation("AutomationConditionBuilderToAutomationConditionBuilder", fields: [childConditionBuilderId], references: [id])
 
   automationTrigger AutomationTrigger?
 }

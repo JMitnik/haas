@@ -2,7 +2,7 @@ import {
   AutomationActionType, AutomationConditionBuilder, AutomationConditionOperand, AutomationConditionOperatorType,
   AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate,
   Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
-  WorkspaceConditionScope,
+  WorkspaceConditionScope, AutomationCondition as PrismaAutomationCondition,
 } from '@prisma/client';
 
 import { NexusGenEnums } from '../../generated/nexus';
@@ -214,4 +214,19 @@ export interface SetupQuestionCompareDataOutput {
   totalEntries: number;
   compareValue?: number | null;
   operand?: number | null;
+}
+
+export interface BuilderEntry extends AutomationConditionBuilder {
+  conditions: PrismaAutomationCondition[];
+  childConditionBuilder?: BuilderEntry | null;
+}
+
+export interface PreValidatedConditions {
+  AND?: (AutomationCondition | PreValidatedConditions)[];
+  OR?: (AutomationCondition | PreValidatedConditions)[];
+}
+
+export interface CheckedConditions {
+  AND?: (boolean | CheckedConditions)[];
+  OR?: (boolean | CheckedConditions)[];
 }

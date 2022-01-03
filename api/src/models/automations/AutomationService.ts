@@ -15,13 +15,17 @@ import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
 import UserService from '../users/UserService';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
+import AutomationConditionBuilderService from './AutomationConditionBuilderService';
 
 import {
   AutomationCondition,
   AutomationTrigger,
+  BuilderEntry,
+  CheckedConditions,
   CreateAutomationConditionScopeInput,
   CreateAutomationInput,
   CreateConditionOperandInput,
+  PreValidatedConditions,
   SetupQuestionCompareDataInput,
   SetupQuestionCompareDataOutput,
   UpdateAutomationInput,
@@ -41,6 +45,69 @@ class AutomationService {
     this.automationActionService = new AutomationActionService(prisma);
     this.userService = new UserService(prisma);
   }
+
+  validateConditionBuilder = async (builderId: string) => {
+    const conditionBuilder = await this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
+    const destructedData = await this.destructureBuilder({}, conditionBuilder as BuilderEntry);
+    console.log('Destructed data: ', destructedData);
+    const validatedObjects = await this.validateConditions(destructedData, {});
+    console.log('Validated Objects: ', validatedObjects);
+
+    const builderConditionsPassed = AutomationConditionBuilderService.checkConditions(validatedObjects, [], 0);
+    console.log('Builder condition passed: ', builderConditionsPassed)
+    return builderConditionsPassed;
+  };
+
+  destructureBuilder = async (dataObj: any, entry: BuilderEntry) => {
+    if (entry.conditions.length) {
+      dataObj[entry.type] = [
+        ...entry.conditions,
+      ]
+    }
+
+    if (entry.childConditionBuilderId) {
+      const child = await this.findAutomationConditionBuilder(entry.childConditionBuilderId);
+
+      if (!child) throw new Error('Has childConditioBuilderId but cannot find the entry in DB!');
+
+      console.log('child: ', child);
+      const operatorObject = {}
+      const des = await this.destructureBuilder(operatorObject, child);
+      dataObj[entry.type].push(des)
+    }
+    return dataObj;
+  }
+
+  validateConditions = async (data: PreValidatedConditions, checkedObject: CheckedConditions) => {
+    const isAND = !!data['AND'];
+    const type = isAND ? 'AND' : 'OR' as keyof CheckedConditions;
+    const conditions = data[isAND ? 'AND' : 'OR'] as (PreValidatedConditions | AutomationCondition)[];
+
+    await Promise.all(conditions.map(async (entry) => {
+      if ((entry as AutomationCondition)?.id) {
+        const validated = await this.testTriggerCondition(entry as AutomationCondition);
+
+        const andOrOr = Object.keys(checkedObject).find((property) => property === 'AND' || property === 'OR') as keyof CheckedConditions | undefined;
+
+        if (!andOrOr) {
+          console.log('Type: ', type);
+          checkedObject[type] = []
+        }
+        const finalType = andOrOr || type;
+        checkedObject[finalType]?.push(validated);
+      }
+
+      if ((entry as PreValidatedConditions)?.AND || (entry as PreValidatedConditions)?.OR) {
+        checkedObject[type] = [];
+        const childIsAnd = (entry as PreValidatedConditions)?.AND ? { AND: [] } : { OR: [] };
+        const validated = await this.validateConditions(entry as PreValidatedConditions, childIsAnd);
+        checkedObject[type]?.push(validated);
+      }
+    }));
+
+    return checkedObject;
+  }
+
 
   findAutomationConditionBuilder = (builderId: string) => {
     return this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
@@ -212,6 +279,22 @@ class AutomationService {
     }
   }
 
+  testTriggerCondition = (condition: AutomationCondition) => {
+    switch (condition.scope) {
+      case AutomationConditionScopeType.QUESTION: {
+        return this.validateQuestionScopeCondition(condition);
+      }
+
+      case AutomationConditionScopeType.DIALOGUE: {
+        return false;
+      }
+
+      default: {
+        return false;
+      }
+    }
+  }
+
   /**
    * Checks conditions of a potentially triggered automation
    * @param automationTriggers a list of potentially triggered automations
@@ -219,19 +302,7 @@ class AutomationService {
    */
   testTriggerConditions = async (automationTrigger: AutomationTrigger) => {
     const matchedConditionsTriggers = await Promise.all(automationTrigger.conditionBuilder.conditions.map(async (condition) => {
-      switch (condition.scope) {
-        case AutomationConditionScopeType.QUESTION: {
-          return this.validateQuestionScopeCondition(condition);
-        }
-
-        case AutomationConditionScopeType.DIALOGUE: {
-          return false;
-        }
-
-        default: {
-          return false;
-        }
-      }
+      return this.testTriggerCondition(condition);
     }));
 
     const successfullyPassedAllConditions = !matchedConditionsTriggers.includes(false);
@@ -316,7 +387,8 @@ class AutomationService {
       if (!trigger) return null;
 
       // TODO: Consider ANDS vs ORs for conditions
-      const allConditionsConfirmed = await this.testTriggerConditions(trigger);
+      const allConditionsConfirmed = await this.validateConditionBuilder(trigger.automationConditionBuilderId);
+      // const allConditionsConfirmed = await this.testTriggerConditions(trigger);
 
       if (allConditionsConfirmed) {
         await Promise.all(trigger?.actions?.map((automationAction) => {

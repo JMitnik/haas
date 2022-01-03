@@ -266,7 +266,7 @@ const main = async () => {
           },
         ]
       },
-      hasChildBuilder: {
+      childConditionBuilder: {
         create: {
           id: 'CHILD_BUILDER_ONE_ID',
           type: AutomationConditionBuilderType.OR,

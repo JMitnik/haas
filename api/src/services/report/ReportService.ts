@@ -1,3 +1,4 @@
+import config from '../../config/config';
 import AWS from '../../config/aws';
 
 export interface ReportLambdaInput {
@@ -30,10 +31,11 @@ export class ReportService {
       // TODO: Track this as dependency
       TopicArn: 'arn:aws:sns:eu-central-1:118627563984:haasApiReport',
     }
+    if (config.env === 'local') return console.log('payload for generating report: ', stringifiedPayload);
 
     return this.sns.publish(snsParams, (err, data) => {
-      if (err) console.log('ERROR: ', err);
-      console.log('Succesfully published to SNS:', data);
+      if (err) return console.log('ERROR: ', err);
+      console.log('Succesfully published to haasApiReport SNS:', data);
     }).promise();
   }
 }

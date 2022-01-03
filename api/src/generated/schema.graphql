@@ -56,6 +56,20 @@ enum AutomationActionType {
   WEBHOOK
 }
 
+"""AutomationConditionBuilder"""
+type AutomationConditionBuilderModel {
+  childConditionBuilder: AutomationConditionBuilderModel
+  childConditionBuilderId: String
+  conditions: [AutomationConditionModel!]!
+  id: ID!
+  type: AutomationConditionBuilderType!
+}
+
+enum AutomationConditionBuilderType {
+  AND
+  OR
+}
+
 """AutomationCondition"""
 type AutomationConditionModel {
   createdAt: Date!
@@ -172,7 +186,7 @@ type AutomationModel {
 """AutomationTrigger"""
 type AutomationTriggerModel {
   actions: [AutomationActionModel!]!
-  conditions: [AutomationConditionModel!]!
+  conditionBuilder: AutomationConditionBuilderModel
   createdAt: Date!
   event: AutomationEventModel!
   id: ID!
