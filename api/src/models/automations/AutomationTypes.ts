@@ -2,7 +2,7 @@ import {
   AutomationActionType, AutomationConditionBuilder, AutomationConditionOperand, AutomationConditionOperatorType,
   AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate,
   Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
-  WorkspaceConditionScope, AutomationCondition as PrismaAutomationCondition,
+  WorkspaceConditionScope, AutomationCondition as PrismaAutomationCondition, AutomationConditionBuilderType,
 } from '@prisma/client';
 
 import { NexusGenEnums } from '../../generated/nexus';
@@ -107,6 +107,12 @@ export interface UpdateAutomationConditionInput extends CreateAutomationConditio
   scope: UpdateAutomationConditionScopeInput;
 }
 
+export interface CreateConditionBuilderInput {
+  type: AutomationConditionBuilderType;
+  conditions: CreateAutomationConditionInput[];
+  childBuilder?: CreateConditionBuilderInput;
+}
+
 export interface CreateAutomationInput {
   label: string;
   workspaceId: string;
@@ -118,7 +124,8 @@ export interface CreateAutomationInput {
     eventType: NexusGenEnums['AutomationEventType']; // AutomationEventType
     questionId?: string | null; // String
   };
-  conditions: CreateAutomationConditionInput[];
+  conditionBuilder: CreateConditionBuilderInput;
+  conditions?: CreateAutomationConditionInput[];
   actions: CreateAutomationActionInput[];
 };
 

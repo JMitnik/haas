@@ -10,7 +10,7 @@ import { NexusGenInputs } from '../../generated/nexus';
 import {
   UpdateAutomationConditionInput, UpdateAutomationInput,
   CreateAutomationInput, CreateScopeDataInput, CreateAutomationConditionScopeInput,
-  CreateAutomationConditionInput, ConditionPropertAggregateInput,
+  CreateAutomationConditionInput, ConditionPropertAggregateInput, CreateConditionBuilderInput,
 } from './AutomationTypes';
 
 export class AutomationPrismaAdapter {
@@ -615,6 +615,10 @@ export class AutomationPrismaAdapter {
     }
   }
 
+  constructeCreateAutomationBuilderConditionData = (): Prisma.AutomationConditionCreateNestedManyWithoutAutomationConditionBuilderInput => {
+
+  }
+
   /**
    * Creates a Prisma-ready data object for CREATE of an AutomationCondition
    * @param condition an input object containing information for creating an AutomationCondition
@@ -622,7 +626,7 @@ export class AutomationPrismaAdapter {
    */
   constructCreateAutomationConditionData = (
     condition: CreateAutomationConditionInput
-  ): Prisma.AutomationConditionCreateWithoutAutomationConditionBuilderInput => {
+  ) => {
     const { dialogueId, scope, questionId, operands, operator } = condition;
     // TODO: Introduce workspace-wide condition
     const mappedScope = this.constructCreateAutomationConditionScopeData(scope);
@@ -679,6 +683,24 @@ export class AutomationPrismaAdapter {
     };
   }
 
+  constructCreateConditionBuilderData = (input: CreateConditionBuilderInput) => {
+    let childBuilder;
+
+    if (input.childBuilder) {
+      childBuilder = this.constructCreateConditionBuilderData(input.childBuilder);
+    }
+
+    return {
+      type: input.type,
+      conditions: {
+        create: input.conditions?.map((condition) => this.constructCreateAutomationConditionData(condition))
+      },
+      childConditionBuilder: {
+        create: childBuilder,
+      },
+    }
+  }
+
   /**
    * Creates a prisma-ready data object for creation of an AutomationTrigger
    * @param input an object containing all information necessary to create an AutomationTrigger
@@ -687,7 +709,7 @@ export class AutomationPrismaAdapter {
   buildCreateAutomationTriggerData = (
     input: CreateAutomationInput
   ): Prisma.AutomationTriggerCreateWithoutAutomationsInput => {
-    const { event, actions, conditions } = input;
+    const { event, actions, conditions, conditionBuilder } = input;
 
     return {
       event: {
@@ -706,12 +728,7 @@ export class AutomationPrismaAdapter {
         },
       },
       conditionBuilder: {
-        create: {
-          type: AutomationConditionBuilderType.AND, // TODO: Change this to whatever comes out of input + handle child builder
-          conditions: {
-            create: conditions.map((condition) => this.constructCreateAutomationConditionData(condition)),
-          }
-        }
+        create: this.constructCreateConditionBuilderData(conditionBuilder),
       },
       actions: {
         create: actions.map((action) => {

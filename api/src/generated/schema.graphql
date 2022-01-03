@@ -56,6 +56,13 @@ enum AutomationActionType {
   WEBHOOK
 }
 
+input AutomationConditionBuilderInput {
+  childConditionBuilder: AutomationConditionBuilderInput
+  conditions: [CreateAutomationCondition!]
+  id: ID
+  type: AutomationConditionBuilderType
+}
+
 """AutomationConditionBuilder"""
 type AutomationConditionBuilderModel {
   childConditionBuilder: AutomationConditionBuilderModel
@@ -312,6 +319,17 @@ input ConditionWorkspaceScopeInput {
 interface ConnectionInterface {
   pageInfo: PaginationPageInfo!
   totalPages: Int
+}
+
+input CreateAutomationBuilderResolverInput {
+  actions: [AutomationActionInput!]
+  automationType: AutomationType
+  conditionBuilder: AutomationConditionBuilderInput
+  description: String
+  event: AutomationEventInput
+  id: ID
+  label: String
+  workspaceId: String
 }
 
 input CreateAutomationCondition {
@@ -999,6 +1017,7 @@ type Mutation {
   createAutomation(input: CreateAutomationResolverInput): AutomationModel!
   createAutomationToken(email: String): String
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
+  createBuilderAutomation(input: CreateAutomationBuilderResolverInput): AutomationModel!
   createCampaign(input: CreateCampaignInputType): CampaignType!
 
   """Create Call to Actions"""

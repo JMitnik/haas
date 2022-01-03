@@ -7,6 +7,7 @@ import {
   QuestionAspect,
   OperandType,
   AutomationActionType,
+  AutomationConditionBuilderType,
 } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 import { offsetPaginate } from '../general/PaginationHelpers';
@@ -22,6 +23,7 @@ import {
   AutomationTrigger,
   BuilderEntry,
   CheckedConditions,
+  CreateAutomationConditionInput,
   CreateAutomationConditionScopeInput,
   CreateAutomationInput,
   CreateConditionOperandInput,
@@ -386,9 +388,7 @@ class AutomationService {
 
       if (!trigger) return null;
 
-      // TODO: Consider ANDS vs ORs for conditions
       const allConditionsConfirmed = await this.validateConditionBuilder(trigger.automationConditionBuilderId);
-      // const allConditionsConfirmed = await this.testTriggerConditions(trigger);
 
       if (allConditionsConfirmed) {
         await Promise.all(trigger?.actions?.map((automationAction) => {
@@ -547,6 +547,43 @@ class AutomationService {
     return input.conditions as Required<NexusGenInputs['CreateAutomationCondition'][]>;
   }
 
+  constructBuilderRecursive = (input: NexusGenInputs['AutomationConditionBuilderInput']): CreateAutomationInput['conditionBuilder'] => {
+    let mappedConditions: CreateAutomationConditionInput[] = [];
+    let childConditionBuilder;
+
+    if (input.conditions?.length) {
+      mappedConditions = input.conditions.map((condition) => {
+        return {
+          ...condition,
+          operator: condition.operator as Required<AutomationConditionOperatorType>,
+          scope: this.constructCreateAutomationConditionScopeInput(condition),
+          operands: condition.operands?.map((operand) => {
+            const { dateTimeValue, operandType, numberValue, textValue } = operand;
+
+            return {
+              dateTimeValue,
+              numberValue,
+              textValue,
+              type: operandType,
+            }
+          }) as Required<CreateConditionOperandInput[]> || [],
+        }
+      }) || [];
+    }
+
+    if (input.childConditionBuilder) {
+      childConditionBuilder = this.constructBuilderRecursive(input.childConditionBuilder);
+    }
+
+    const finalObject: CreateAutomationInput['conditionBuilder'] = {
+      conditions: mappedConditions,
+      type: input.type as Required<AutomationConditionBuilderType>,
+      childBuilder: childConditionBuilder
+    }
+
+    return finalObject;
+  }
+
   /**
    * Validates the AutomationCondition input list provided by checking the existence of fields which could be potentially be undefined or null
    * @param input object containing a list with AutomationCondition input entries
@@ -614,17 +651,22 @@ class AutomationService {
    * @returns a validated Automation prisma data object
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput => {
+  constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']): CreateAutomationInput => {
     const validatedInput = this.validateCreateAutomationInput(input);
 
     const label: CreateAutomationInput['label'] = validatedInput.label;
     const workspaceId: CreateAutomationInput['workspaceId'] = validatedInput.workspaceId;
     const automationType: CreateAutomationInput['automationType'] = validatedInput.automationType;
     const conditions: CreateAutomationInput['conditions'] = this.constructCreateAutomationConditionsInput(input);
+
+    const builderInput = input.conditionBuilder as Required<NexusGenInputs['AutomationConditionBuilderInput']>;
+    const conditionBuilder: CreateAutomationInput['conditionBuilder'] = this.constructBuilderRecursive(builderInput)
     const event: CreateAutomationInput['event'] = this.constructCreateAutomationEventInput(input);
     const actions: CreateAutomationInput['actions'] = this.constructAutomationActionsInput(input);
 
-    return { label, workspaceId, automationType, conditions, event, actions, description: input.description }
+    console.log('Condition builder: ', conditionBuilder);
+
+    return { label, workspaceId, automationType, conditions, event, actions, description: input.description, conditionBuilder }
   }
 
   /**
@@ -638,7 +680,7 @@ class AutomationService {
 
     const id: UpdateAutomationInput['id'] = input.id;
     const createInput = this.constructCreateAutomationInput(input);
-    return { ...createInput, id: id }
+    return { ...createInput, id: id, conditions: createInput.conditions || [] }
   }
 
   /**

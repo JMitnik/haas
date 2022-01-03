@@ -11,6 +11,7 @@ import { ConditionPropertyAggregateType } from './ConditionPropertyAggregateType
 import { AutomationActionType } from './AutomationActionType';
 import { AutomationModel } from './AutomationModel';
 import { UserInputError } from 'apollo-server-express';
+import { AutomationConditionBuilderType } from './AutomationConditionBuilderType';
 
 export const CreateAutomationOperandInput = inputObjectType({
   name: 'CreateAutomationOperandInput',
@@ -107,7 +108,24 @@ export const AutomationEventInput = inputObjectType({
     t.string('questionId', { nullable: true });
     t.string('dialogueId', { nullable: true });
   },
-})
+});
+
+export const AutomationConditionBuilderInput = inputObjectType({
+  name: 'AutomationConditionBuilderInput',
+  definition(t) {
+    t.id('id', { nullable: true });
+    t.field('type', {
+      type: AutomationConditionBuilderType,
+    })
+    t.list.field('conditions', {
+      type: CreateAutomationCondition,
+    });
+    t.field('childConditionBuilder', {
+      type: AutomationConditionBuilderInput,
+      nullable: true,
+    });
+  },
+});
 
 export const CreateAutomationResolverInput = inputObjectType({
   name: 'CreateAutomationResolverInput',
@@ -132,6 +150,44 @@ export const CreateAutomationResolverInput = inputObjectType({
 
     // Trigger:
     // TODO: Add fields for Trigger:recurring as wel as Campaign
+  },
+});
+
+export const CreateAutomationBuilderResolverInput = inputObjectType({
+  name: 'CreateAutomationBuilderResolverInput',
+  definition(t) {
+    // Generic info
+    t.id('id', { nullable: true });
+    t.string('label');
+    t.string('description', { nullable: true });
+    t.string('workspaceId');
+
+    // Type of automation (e.g. Trigger, Campaign etc.)
+    t.field('automationType', { type: AutomationType });
+
+    // Trigger: event related fields
+    t.field('event', { type: AutomationEventInput });
+
+    // Trigger: condition related fields
+    t.field('conditionBuilder', { type: AutomationConditionBuilderInput });
+
+    // Automation Actions
+    t.list.field('actions', { type: AutomationActionInput });
+
+    // Trigger:
+    // TODO: Add fields for Trigger:recurring as wel as Campaign
+  },
+});
+
+export const CreateBuilderAutomationResolver = mutationField('createBuilderAutomation', {
+  type: AutomationModel,
+  args: { input: CreateAutomationBuilderResolverInput },
+  async resolve(parent, args, ctx) {
+
+    if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+    console.log('Condition builder: ', args.input.conditionBuilder);
+    const automation = await ctx.services.automationService.createAutomation(args.input);
+    return automation;
   },
 });
 
