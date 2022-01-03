@@ -1,4 +1,4 @@
-import { AutomationActionType, AutomationEventType, Customer, Dialogue, QuestionNode } from '@prisma/client';
+import { AutomationActionType, AutomationConditionBuilderType, AutomationEventType, Customer, Dialogue, QuestionNode } from '@prisma/client';
 import { NexusGenInputs } from '../../../generated/nexus';
 import { AutomationCondition, AutomationTrigger, FullAutomationWithRels, SetupQuestionCompareDataInput } from '../AutomationTypes';
 
@@ -89,9 +89,12 @@ export const automationTriggerInput: AutomationTrigger = {
       sliderNodeId: null,
     },
   },
-  conditions: [
-    conditionInput,
-  ],
+  conditionBuilder: {
+    id: '',
+    childConditionBuilderId: null,
+    type: AutomationConditionBuilderType.AND,
+    conditions: [conditionInput]
+  },
   actions: [
     {
       id: '',
@@ -169,15 +172,15 @@ export const sliderQuestionCompareDataInput: SetupQuestionCompareDataInput = {
 export const constructValidUpdateAutomationInputData = (workspace: Customer, dialogue: Dialogue, question: QuestionNode, automation: FullAutomationWithRels): NexusGenInputs['CreateAutomationResolverInput'] => {
   if (!automation.automationTrigger) throw Error('No automation trigger to be updated provided!');
 
-  const { event, actions, conditions }: AutomationTrigger = automation.automationTrigger;
+  const { event, actions, conditionBuilder }: AutomationTrigger = automation.automationTrigger;
 
   // Get actions ids
   const sendSmsAction = actions.find((action) => action.type === 'SEND_EMAIL');
   const generateReportAction = actions.find((action) => action.type === 'GENERATE_REPORT');
 
   // Get condition ids
-  const questionCondition = conditions.find((condition) => condition.scope === 'QUESTION');
-  const dialogueCondition = conditions.find((condition) => condition.scope === 'DIALOGUE');
+  const questionCondition = conditionBuilder.conditions.find((condition) => condition.scope === 'QUESTION');
+  const dialogueCondition = conditionBuilder.conditions.find((condition) => condition.scope === 'DIALOGUE');
 
   return {
     id: automation.id,
@@ -269,7 +272,8 @@ export const constructValidCreateAutomationInputData = (
       'type': AutomationActionType.SEND_SMS,
       apiKey: 'API_KEY',
       endpoint: 'ENDPOINT',
-      payload: { 'targets': ['+3161234567'] } },
+      payload: { 'targets': ['+3161234567'] }
+    },
     { 'type': AutomationActionType.GENERATE_REPORT },
     ],
     'conditions': [

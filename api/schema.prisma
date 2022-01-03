@@ -989,6 +989,8 @@ model AutomationConditionBuilder {
 
   childConditionBuilderId String?                     @unique
   hasChildBuilder         AutomationConditionBuilder? @relation("AutomationConditionBuilderToAutomationConditionBuilder", fields: [childConditionBuilderId], references: [id])
+
+  automationTrigger AutomationTrigger?
 }
 
 model AutomationCondition {
@@ -1013,10 +1015,8 @@ model AutomationCondition {
 
   // TODO: Add workspace relation so Workspace-wide conditions can be introduced
 
-  automationTrigger            AutomationTrigger?          @relation(fields: [automationTriggerId], references: [id])
-  automationTriggerId          String?
-  automationConditionBuilder   AutomationConditionBuilder? @relation(fields: [automationConditionBuilderId], references: [id])
-  automationConditionBuilderId String?
+  automationConditionBuilder   AutomationConditionBuilder @relation(fields: [automationConditionBuilderId], references: [id])
+  automationConditionBuilderId String
 }
 
 model AutomationAction {
@@ -1040,9 +1040,10 @@ model AutomationTrigger {
   event   AutomationEvent @relation(fields: [eventId], references: [id])
   eventId String
 
-  conditions AutomationCondition[]
-  actions    AutomationAction[]
+  conditionBuilder             AutomationConditionBuilder @relation(fields: [automationConditionBuilderId], references: [id])
+  automationConditionBuilderId String                     @unique
 
+  actions     AutomationAction[]
   automations Automation[]
 }
 

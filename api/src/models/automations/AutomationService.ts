@@ -218,7 +218,7 @@ class AutomationService {
    * @returns boolean whether all conditions of an automation trigger pass
    */
   testTriggerConditions = async (automationTrigger: AutomationTrigger) => {
-    const matchedConditionsTriggers = await Promise.all(automationTrigger.conditions.map(async (condition) => {
+    const matchedConditionsTriggers = await Promise.all(automationTrigger.conditionBuilder.conditions.map(async (condition) => {
       switch (condition.scope) {
         case AutomationConditionScopeType.QUESTION: {
           return this.validateQuestionScopeCondition(condition);

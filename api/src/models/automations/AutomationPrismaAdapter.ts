@@ -1,5 +1,5 @@
 import {
-  AutomationCondition, AutomationConditionScopeType, DialogueConditionScope,
+  AutomationCondition, AutomationConditionBuilderType, AutomationConditionScopeType, DialogueConditionScope,
   Prisma, PrismaClient, QuestionAspect, QuestionConditionScope,
   WorkspaceConditionScope,
 } from '@prisma/client';
@@ -185,30 +185,33 @@ export class AutomationPrismaAdapter {
             dialogue: true,
           },
         },
-        conditions: {
+        conditionBuilder: {
           include: {
-            questionScope: {
+            conditions: {
               include: {
-                aggregate: true,
+                questionScope: {
+                  include: {
+                    aggregate: true,
+                  },
+                },
+                dialogueScope: {
+                  include: {
+                    aggregate: true,
+                  },
+                },
+                operands: true,
+                workspaceScope: {
+                  include: {
+                    aggregate: true,
+                  },
+                },
+                dialogue: true,
+                question: true,
               },
             },
-            dialogueScope: {
-              include: {
-                aggregate: true,
-              },
-            },
-            operands: true,
-            workspaceScope: {
-              include: {
-                aggregate: true,
-              },
-            },
-            dialogue: true,
-            question: true,
-          },
+          }
         },
         actions: true,
-
       },
     })
   }
@@ -263,27 +266,31 @@ export class AutomationPrismaAdapter {
                 dialogue: true,
               },
             },
-            conditions: {
+            conditionBuilder: {
               include: {
-                questionScope: {
+                conditions: {
                   include: {
-                    aggregate: true,
+                    questionScope: {
+                      include: {
+                        aggregate: true,
+                      },
+                    },
+                    dialogueScope: {
+                      include: {
+                        aggregate: true,
+                      },
+                    },
+                    operands: true,
+                    workspaceScope: {
+                      include: {
+                        aggregate: true,
+                      },
+                    },
+                    dialogue: true,
+                    question: true,
                   },
-                },
-                dialogueScope: {
-                  include: {
-                    aggregate: true,
-                  },
-                },
-                operands: true,
-                workspaceScope: {
-                  include: {
-                    aggregate: true,
-                  },
-                },
-                dialogue: true,
-                question: true,
-              },
+                }
+              }
             },
             actions: true,
           },
@@ -384,27 +391,31 @@ export class AutomationPrismaAdapter {
                 dialogue: true,
               },
             },
-            conditions: {
+            conditionBuilder: {
               include: {
-                questionScope: {
+                conditions: {
                   include: {
-                    aggregate: true,
+                    questionScope: {
+                      include: {
+                        aggregate: true,
+                      },
+                    },
+                    dialogueScope: {
+                      include: {
+                        aggregate: true,
+                      },
+                    },
+                    operands: true,
+                    workspaceScope: {
+                      include: {
+                        aggregate: true,
+                      },
+                    },
+                    dialogue: true,
+                    question: true,
                   },
-                },
-                dialogueScope: {
-                  include: {
-                    aggregate: true,
-                  },
-                },
-                operands: true,
-                workspaceScope: {
-                  include: {
-                    aggregate: true,
-                  },
-                },
-                dialogue: true,
-                question: true,
-              },
+                }
+              }
             },
             actions: true,
           },
@@ -498,7 +509,7 @@ export class AutomationPrismaAdapter {
    */
   constructUpdateAutomationConditionData = async (
     condition: UpdateAutomationConditionInput
-  ): Promise<Prisma.AutomationConditionUpdateWithoutAutomationTriggerInput> => {
+  ): Promise<Prisma.AutomationConditionUpdateWithoutAutomationConditionBuilderInput> => {
     const { dialogueId, scope, questionId, operands, operator } = condition;
     const operandIds = operands.map((operand) => operand.id).filter(isPresent);
     const mappedScope = this.constructCreateAutomationConditionScopeData(scope);
@@ -611,7 +622,7 @@ export class AutomationPrismaAdapter {
    */
   constructCreateAutomationConditionData = (
     condition: CreateAutomationConditionInput
-  ): Prisma.AutomationConditionCreateWithoutAutomationTriggerInput => {
+  ): Prisma.AutomationConditionCreateWithoutAutomationConditionBuilderInput => {
     const { dialogueId, scope, questionId, operands, operator } = condition;
     // TODO: Introduce workspace-wide condition
     const mappedScope = this.constructCreateAutomationConditionScopeData(scope);
@@ -694,8 +705,13 @@ export class AutomationPrismaAdapter {
           } : undefined,
         },
       },
-      conditions: {
-        create: conditions.map((condition) => this.constructCreateAutomationConditionData(condition)),
+      conditionBuilder: {
+        create: {
+          type: AutomationConditionBuilderType.AND, // TODO: Change this to whatever comes out of input + handle child builder
+          conditions: {
+            create: conditions.map((condition) => this.constructCreateAutomationConditionData(condition)),
+          }
+        }
       },
       actions: {
         create: actions.map((action) => {
@@ -776,14 +792,19 @@ export class AutomationPrismaAdapter {
           };
         }),
       },
-      conditions: {
-        deleteMany: {
-          id: {
-            notIn: inputConditionIds,
-          },
-        },
-        upsert: upsertConditions,
-      },
+      conditionBuilder: {
+        update: {
+          type: AutomationConditionBuilderType.AND, // TODO: Handle this and other fields based on input
+          conditions: {
+            deleteMany: {
+              id: {
+                notIn: inputConditionIds,
+              },
+            },
+            upsert: upsertConditions,
+          }
+        }
+      }
     }
   }
 

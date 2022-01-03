@@ -1,4 +1,4 @@
-import { PrismaClient, SystemPermissionEnum } from '@prisma/client';
+import { AutomationConditionBuilderType, PrismaClient, SystemPermissionEnum } from '@prisma/client';
 
 export const clearDatabase = async (prisma: PrismaClient) => {
   if (process.env.NODE_ENV === 'test') {
@@ -56,61 +56,66 @@ export const seedAutomation = async (
               },
             },
           },
-          conditions: {
-            create: [
-              {
-                question: {
-                  connect: {
-                    id: questionId,
-                  },
-                },
-                scope: 'QUESTION',
-                operator: 'SMALLER_OR_EQUAL_THAN',
-                questionScope: {
-                  create: {
-                    aspect: 'NODE_VALUE',
-                    aggregate: {
+          conditionBuilder: {
+            create: {
+              type: AutomationConditionBuilderType.AND,
+              conditions: {
+                create: [
+                  {
+                    question: {
+                      connect: {
+                        id: questionId,
+                      },
+                    },
+                    scope: 'QUESTION',
+                    operator: 'SMALLER_OR_EQUAL_THAN',
+                    questionScope: {
                       create: {
-                        type: 'AVG',
-                        latest: 10,
+                        aspect: 'NODE_VALUE',
+                        aggregate: {
+                          create: {
+                            type: 'AVG',
+                            latest: 10,
+                          },
+                        },
+                      },
+                    },
+                    operands: {
+                      create: {
+                        type: 'INT',
+                        numberValue: 50,
                       },
                     },
                   },
-                },
-                operands: {
-                  create: {
-                    type: 'INT',
-                    numberValue: 50,
-                  },
-                },
-              },
-              {
-                dialogue: {
-                  connect: {
-                    id: dialogueId,
-                  },
-                },
-                scope: 'DIALOGUE',
-                operator: 'GREATER_THAN',
-                dialogueScope: {
-                  create: {
-                    aspect: 'NR_INTERACTIONS',
-                    aggregate: {
+                  {
+                    dialogue: {
+                      connect: {
+                        id: dialogueId,
+                      },
+                    },
+                    scope: 'DIALOGUE',
+                    operator: 'GREATER_THAN',
+                    dialogueScope: {
                       create: {
-                        type: 'COUNT',
-                        latest: 10,
+                        aspect: 'NR_INTERACTIONS',
+                        aggregate: {
+                          create: {
+                            type: 'COUNT',
+                            latest: 10,
+                          },
+                        },
+                      },
+                    },
+                    operands: {
+                      create: {
+                        type: 'INT',
+                        numberValue: 10,
                       },
                     },
                   },
-                },
-                operands: {
-                  create: {
-                    type: 'INT',
-                    numberValue: 10,
-                  },
-                },
+                ],
               },
-            ],
+            }
           },
           actions: {
             create: [
@@ -131,27 +136,31 @@ export const seedAutomation = async (
               dialogue: true,
             },
           },
-          conditions: {
+          conditionBuilder: {
             include: {
-              questionScope: {
+              conditions: {
                 include: {
-                  aggregate: true,
+                  questionScope: {
+                    include: {
+                      aggregate: true,
+                    },
+                  },
+                  dialogueScope: {
+                    include: {
+                      aggregate: true,
+                    },
+                  },
+                  operands: true,
+                  workspaceScope: {
+                    include: {
+                      aggregate: true,
+                    },
+                  },
+                  dialogue: true,
+                  question: true,
                 },
               },
-              dialogueScope: {
-                include: {
-                  aggregate: true,
-                },
-              },
-              operands: true,
-              workspaceScope: {
-                include: {
-                  aggregate: true,
-                },
-              },
-              dialogue: true,
-              question: true,
-            },
+            }
           },
           actions: true,
         },

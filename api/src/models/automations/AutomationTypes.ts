@@ -1,5 +1,5 @@
 import {
-  AutomationActionType, AutomationConditionOperand, AutomationConditionOperatorType,
+  AutomationActionType, AutomationConditionBuilder, AutomationConditionOperand, AutomationConditionOperatorType,
   AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate,
   Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
   WorkspaceConditionScope,
@@ -183,7 +183,7 @@ export interface AutomationTrigger {
   createdAt: Date;
   updatedAt: Date | null;
   event: AutomationEventWithRels;
-  conditions: AutomationCondition[];
+  conditionBuilder: (AutomationConditionBuilder & { conditions: AutomationCondition[] });
   actions: {
     id: string;
     type: AutomationActionType;
