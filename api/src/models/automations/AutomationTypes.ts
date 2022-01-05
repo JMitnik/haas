@@ -113,6 +113,12 @@ export interface CreateConditionBuilderInput {
   childBuilder?: CreateConditionBuilderInput;
 }
 
+export interface UpdateConditionBuilderInput extends CreateConditionBuilderInput {
+  id?: string;
+  conditions: UpdateAutomationConditionInput[];
+  childBuilder?: UpdateConditionBuilderInput;
+}
+
 export interface CreateAutomationInput {
   label: string;
   workspaceId: string;
@@ -146,6 +152,7 @@ export interface UpdateAutomationInput extends CreateAutomationInput {
   automationCampaignId?: string;
   actions: UpdateAutomationActionInput[];
   conditions: UpdateAutomationConditionInput[];
+  conditionBuilder: UpdateConditionBuilderInput;
 }
 
 export type MoreXOR = CreateQuestionScopeInput['aspect'] | CreateDialogueScopeInput['aspect'] | CreateWorkspaceScopeInput['aspect']

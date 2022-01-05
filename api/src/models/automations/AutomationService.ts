@@ -558,9 +558,10 @@ class AutomationService {
           operator: condition.operator as Required<AutomationConditionOperatorType>,
           scope: this.constructCreateAutomationConditionScopeInput(condition),
           operands: condition.operands?.map((operand) => {
-            const { dateTimeValue, operandType, numberValue, textValue } = operand;
+            const { dateTimeValue, operandType, numberValue, textValue, id } = operand;
 
             return {
+              id,
               dateTimeValue,
               numberValue,
               textValue,
@@ -663,8 +664,6 @@ class AutomationService {
     const conditionBuilder: CreateAutomationInput['conditionBuilder'] = this.constructBuilderRecursive(builderInput)
     const event: CreateAutomationInput['event'] = this.constructCreateAutomationEventInput(input);
     const actions: CreateAutomationInput['actions'] = this.constructAutomationActionsInput(input);
-
-    console.log('Condition builder: ', conditionBuilder);
 
     return { label, workspaceId, automationType, conditions, event, actions, description: input.description, conditionBuilder }
   }

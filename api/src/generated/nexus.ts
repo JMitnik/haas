@@ -2067,7 +2067,7 @@ export interface NexusGenArgTypes {
       file?: any | null; // Upload
     }
     updateAutomation: { // args
-      input?: NexusGenInputs['CreateAutomationResolverInput'] | null; // CreateAutomationResolverInput
+      input?: NexusGenInputs['CreateAutomationBuilderResolverInput'] | null; // CreateAutomationBuilderResolverInput
     }
     updateCreateWorkspaceJob: { // args
       errorMessage?: string | null; // String
