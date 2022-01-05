@@ -535,7 +535,6 @@ export class AutomationPrismaAdapter {
         },
 
         upsert: operands.map((operand) => {
-          console.log('OPERAND ID: ', operand.id);
           return {
             where: {
               id: operand?.id || '-1',
@@ -683,6 +682,11 @@ export class AutomationPrismaAdapter {
     };
   }
 
+  /**
+   * Constructs a CREATE data object for a conditionBuilder created by prisma
+   * @param input CreateConditionBuilderInput
+   * @returns a prisma CREATE data object for a conditionBuilder
+   */
   constructCreateConditionBuilderData = (input: CreateConditionBuilderInput): Prisma.AutomationConditionBuilderCreateInput => {
     let childBuilder;
 
@@ -743,20 +747,64 @@ export class AutomationPrismaAdapter {
     }
   }
 
-  buildSingle = (conditionBuilder: UpdateConditionBuilderInput, parentConditionBuilderId: string) => {
-    // If builder has no ID => new builder 
-    // ===> Has to connect this new builder to 
-    // ===> If there is a child builder that one is also new and can just use prisma create/createMany properties
+  /**
+   * 
+   * @param builderId an ID of an AutomationConditionBuilder
+   * @returns all the conditions of an AutomationConditionBuilder
+   */
+  findAutomationConditionsByConditionBuilderId = (builderId: string) => {
+    return this.prisma.automationCondition.findMany({
+      where: {
+        automationConditionBuilderId: builderId,
+      }
+    });
+  };
 
-  }
+  /**
+   * Removes all entries related to 'stale' AutomationConditions (conditions which exist in database not in input)
+   * @param conditionBuilderId an ID of an AutomationConditionBuilder
+   * @param inputConditionIds a list of IDs of conditions still in input
+   */
+  removeStaleConditionRelations = async (conditionBuilderId: string, inputConditionIds: string[]) => {
+    const dbConditions = await this.findAutomationConditionsByConditionBuilderId(conditionBuilderId);
+    const dbConditionIds = dbConditions.map((condition) => condition.id);
+    const staleConditionIds = dbConditionIds.filter((conditionId) => !inputConditionIds.includes(conditionId));
+    await this.prisma.questionConditionScope.deleteMany({
+      where: {
+        automationConditionId: {
+          in: staleConditionIds,
+        },
+      },
+    });
 
-  buildUpdateAutomationConditionBuilderData = async (conditionBuilder: UpdateConditionBuilderInput, isRoot = true): Promise<Prisma.AutomationConditionBuilderUpdateWithoutAutomationTriggerInput | Prisma.AutomationConditionBuilderCreateWithoutParentConditionBuilderInput> => {
-    let childConditionBuilder;
-    const isExistingBuilder = (isRoot || !!conditionBuilder.id)
+    await this.prisma.dialogueConditionScope.deleteMany({
+      where: {
+        automationConditionId: {
+          in: staleConditionIds,
+        },
+      },
+    });
 
-    const inputConditionIds = conditionBuilder.conditions.map((condition) => condition.id).filter(isPresent);
+    await this.prisma.workspaceConditionScope.deleteMany({
+      where: {
+        automationConditionId: {
+          in: staleConditionIds,
+        },
+      },
+    });
+
+    await this.prisma.automationConditionOperand.deleteMany({
+      where: {
+        automationConditionId: {
+          in: staleConditionIds,
+        },
+      },
+    });
+  };
+
+  constructUpdateAutomationConditionsData = async (conditions: UpdateConditionBuilderInput['conditions']) => {
     const upsertConditions: Prisma.Enumerable<Prisma.AutomationConditionUpsertWithWhereUniqueWithoutAutomationConditionBuilderInput>
-      = await Promise.all(conditionBuilder.conditions.map(async (condition) => {
+      = await Promise.all(conditions.map(async (condition) => {
         return {
           where: {
             id: condition?.id || '-1',
@@ -766,34 +814,42 @@ export class AutomationPrismaAdapter {
         }
       }));
 
-    const createConditions = conditionBuilder.conditions.map((condition) => {
+    const createConditions = conditions.map((condition) => {
       return this.constructCreateAutomationConditionData(condition)
     }) as Prisma.Enumerable<Prisma.AutomationConditionCreateManyAutomationConditionBuilderInput>;
+
+    return {
+      createConditions,
+      upsertConditions,
+    }
+  }
+
+  /**
+   * Builds an prisma UPDATE data object for an AutomationConditionBuilder
+   * @param conditionBuilder the input data
+   * @param isRoot optional variable that checks whether conditionBUilder is a root conditionBuilder 
+   * @returns risma UPDATE data object for an AutomationConditionBuilder
+   */
+  buildUpdateAutomationConditionBuilderData = async (conditionBuilder: UpdateConditionBuilderInput, isRoot = true): Promise<Prisma.AutomationConditionBuilderUpdateWithoutAutomationTriggerInput | Prisma.AutomationConditionBuilderCreateWithoutParentConditionBuilderInput> => {
+    let childConditionBuilder;
+    const isExistingBuilder = (isRoot || !!conditionBuilder.id)
+
+    const inputConditionIds = conditionBuilder.conditions.map((condition) => condition.id).filter(isPresent);
+
+    // Removes all 'Stale' relationship entries with scope(s) + operands
+    if (conditionBuilder?.id) {
+      await this.removeStaleConditionRelations(conditionBuilder.id, inputConditionIds);
+    }
+
+    const { createConditions, upsertConditions } = await this.constructUpdateAutomationConditionsData(conditionBuilder.conditions);
 
     if (conditionBuilder.childBuilder) {
       const childBuilder = await this.buildUpdateAutomationConditionBuilderData(conditionBuilder.childBuilder, false);
       childConditionBuilder = childBuilder;
     }
 
-    // Delete ALL which are not in inputConditionIds is definitely not the way wtf daan 🙈
-    await this.prisma.questionConditionScope.deleteMany({
-      where: {
-        automationConditionId: {
-          notIn: inputConditionIds,
-        },
-      },
-    });
-
-    // Delete ALL which are not in inputConditionIds is definitely not the way wtf daan 🙈
-    await this.prisma.automationConditionOperand.deleteMany({
-      where: {
-        automationConditionId: {
-          notIn: inputConditionIds,
-        },
-      },
-    });
-
-    let conditionStructure: Prisma.AutomationConditionUpdateManyWithoutAutomationConditionBuilderInput | Prisma.AutomationConditionCreateNestedManyWithoutAutomationConditionBuilderInput;
+    let conditionStructure: Prisma.AutomationConditionUpdateManyWithoutAutomationConditionBuilderInput
+      | Prisma.AutomationConditionCreateNestedManyWithoutAutomationConditionBuilderInput;
 
     if (isExistingBuilder) {
       conditionStructure = {
@@ -815,25 +871,18 @@ export class AutomationPrismaAdapter {
       type: conditionBuilder.type,
       conditions: conditionStructure,
       childConditionBuilder: childConditionBuilder ? {
-        // TODO: The create of a childConditionBuilder is different than the root.
-        // Since it is guaranteed childBuilder didn't exist there is no upsert option as shown in 791
-        // therefor need adjust recursive function
-
-        create: !childConditionBuilder.id ? childConditionBuilder as Prisma.AutomationConditionBuilderCreateWithoutAutomationTriggerInput : undefined,
-        update: childConditionBuilder.id ? childConditionBuilder : undefined,
-
+        create: !conditionBuilder.childBuilder ? childConditionBuilder as Prisma.AutomationConditionBuilderCreateWithoutAutomationTriggerInput : undefined,
+        update: conditionBuilder.childBuilder ? childConditionBuilder : undefined,
       } : undefined,
     }
   };
-  async buildUpdateAutomationTriggerData(
-    input: UpdateAutomationInput
-  ): Promise<Prisma.AutomationTriggerUpdateInput> {
+
+  async buildUpdateAutomationTriggerData(input: UpdateAutomationInput): Promise<Prisma.AutomationTriggerUpdateInput> {
     const { event, actions: inputActions, conditionBuilder } = input;
 
     const inputActionIds = inputActions.map((action) => action.id).filter(isPresent);
     const updateConditionBuilderData = await this.buildUpdateAutomationConditionBuilderData(conditionBuilder);
     console.dir(updateConditionBuilderData, { depth: null });
-
     return {
       conditionBuilder: {
         update: updateConditionBuilderData,

@@ -576,7 +576,8 @@ class AutomationService {
       childConditionBuilder = this.constructBuilderRecursive(input.childConditionBuilder);
     }
 
-    const finalObject: CreateAutomationInput['conditionBuilder'] = {
+    const finalObject: UpdateAutomationInput['conditionBuilder'] = {
+      id: input.id || undefined,
       conditions: mappedConditions,
       type: input.type as Required<AutomationConditionBuilderType>,
       childBuilder: childConditionBuilder
