@@ -1,5 +1,5 @@
 import {
-  AutomationCondition, AutomationConditionBuilderType, AutomationConditionScopeType, DialogueConditionScope,
+  AutomationCondition, AutomationConditionScopeType, AutomationType, ConditionPropertyAggregateType, DialogueConditionScope,
   Prisma, PrismaClient, QuestionAspect, QuestionConditionScope,
   WorkspaceConditionScope,
 } from '@prisma/client';
@@ -130,7 +130,7 @@ export class AutomationPrismaAdapter {
         },
       },
       // TODO: Change average value based aspect when we introduce new information such as slider speed
-      _avg: aggregate?.type === 'AVG' ? {
+      _avg: aggregate?.type === ConditionPropertyAggregateType.AVG ? {
         value: true,
       } : undefined,
       take: aggregate?.latest || undefined,
@@ -252,7 +252,7 @@ export class AutomationPrismaAdapter {
       where: {
         AND: [
           {
-            type: 'TRIGGER',
+            type: AutomationType.TRIGGER,
           },
           {
             automationTrigger: {
@@ -469,7 +469,7 @@ export class AutomationPrismaAdapter {
   constructCreateAutomationConditionScopeData = (
     scope: CreateAutomationConditionScopeInput
   ): CreateScopeDataInput | undefined => {
-    if (scope.type === 'QUESTION' && scope.questionScope) {
+    if (scope.type === AutomationConditionScopeType.QUESTION && scope.questionScope) {
       return {
         aspect: scope.questionScope.aspect,
         aggregate: {
@@ -481,7 +481,7 @@ export class AutomationPrismaAdapter {
       };
     };
 
-    if (scope.type === 'DIALOGUE' && scope.dialogueScope) {
+    if (scope.type === AutomationConditionScopeType.DIALOGUE && scope.dialogueScope) {
       return {
         aspect: scope.dialogueScope.aspect,
         aggregate: {
@@ -493,7 +493,7 @@ export class AutomationPrismaAdapter {
       }
     }
 
-    if (scope.type === 'WORKSPACE' && scope.workspaceScope) {
+    if (scope.type === AutomationConditionScopeType.WORKSPACE && scope.workspaceScope) {
       return {
         aspect: scope.workspaceScope.aspect,
         aggregate: {
@@ -523,15 +523,15 @@ export class AutomationPrismaAdapter {
     }) | null,
     condition: UpdateAutomationConditionInput,
     checkAgainstScope: AutomationConditionScopeType): { delete: boolean } | undefined => {
-    if (dbCondition?.dialogueScope?.id && checkAgainstScope === 'DIALOGUE' && condition.scope.type !== 'DIALOGUE') {
+    if (dbCondition?.dialogueScope?.id && checkAgainstScope === AutomationConditionScopeType.DIALOGUE && condition.scope.type !== AutomationConditionScopeType.DIALOGUE) {
       return { delete: true };
     }
 
-    if (dbCondition?.questionScope?.id && checkAgainstScope === 'QUESTION' && condition.scope.type !== 'QUESTION') {
+    if (dbCondition?.questionScope?.id && checkAgainstScope === AutomationConditionScopeType.QUESTION && condition.scope.type !== AutomationConditionScopeType.QUESTION) {
       return { delete: true };
     }
 
-    if (dbCondition?.workspaceScope?.id && checkAgainstScope === 'WORKSPACE' && condition.scope.type !== 'WORKSPACE') {
+    if (dbCondition?.workspaceScope?.id && checkAgainstScope === AutomationConditionScopeType.WORKSPACE && condition.scope.type !== AutomationConditionScopeType.WORKSPACE) {
       return { delete: true };
     }
 
@@ -600,7 +600,7 @@ export class AutomationPrismaAdapter {
           id: dialogueId,
         },
       } : { disconnect: true },
-      questionScope: (scope.type === 'QUESTION' && mappedScope) ? {
+      questionScope: (scope.type === AutomationConditionScopeType.QUESTION && mappedScope) ? {
         upsert: {
           create: {
             aggregate: {
@@ -615,8 +615,8 @@ export class AutomationPrismaAdapter {
             aspect: mappedScope.aspect,
           },
         },
-      } : this.constructUpdateRemovalScope(dbCondition, condition, 'QUESTION'),
-      dialogueScope: (scope.type === 'DIALOGUE' && mappedScope) ? {
+      } : this.constructUpdateRemovalScope(dbCondition, condition, AutomationConditionScopeType.QUESTION),
+      dialogueScope: (scope.type === AutomationConditionScopeType.DIALOGUE && mappedScope) ? {
         upsert: {
           create: {
             aggregate: {
@@ -631,8 +631,8 @@ export class AutomationPrismaAdapter {
             aspect: mappedScope.aspect,
           },
         },
-      } : this.constructUpdateRemovalScope(dbCondition, condition, 'DIALOGUE'),
-      workspaceScope: (scope.type === 'WORKSPACE' && mappedScope) ? {
+      } : this.constructUpdateRemovalScope(dbCondition, condition, AutomationConditionScopeType.DIALOGUE),
+      workspaceScope: (scope.type === AutomationConditionScopeType.WORKSPACE && mappedScope) ? {
         upsert: {
           create: {
             aggregate: {
@@ -647,7 +647,7 @@ export class AutomationPrismaAdapter {
             aspect: mappedScope.aspect,
           },
         },
-      } : this.constructUpdateRemovalScope(dbCondition, condition, 'WORKSPACE'),
+      } : this.constructUpdateRemovalScope(dbCondition, condition, AutomationConditionScopeType.WORKSPACE),
     }
   }
 
@@ -691,7 +691,7 @@ export class AutomationPrismaAdapter {
           id: dialogueId,
         },
       } : undefined,
-      questionScope: (scope.type === 'QUESTION' && mappedScope) ? {
+      questionScope: (scope.type === AutomationConditionScopeType.QUESTION && mappedScope) ? {
         create: {
           aggregate: {
             create: mappedScope.aggregate,
@@ -699,7 +699,7 @@ export class AutomationPrismaAdapter {
           aspect: mappedScope.aspect,
         },
       } : undefined,
-      dialogueScope: (scope.type === 'DIALOGUE' && mappedScope) ? {
+      dialogueScope: (scope.type === AutomationConditionScopeType.DIALOGUE && mappedScope) ? {
         create: {
           aggregate: {
             create: mappedScope.aggregate,
@@ -707,7 +707,7 @@ export class AutomationPrismaAdapter {
           aspect: mappedScope.aspect,
         },
       } : undefined,
-      workspaceScope: (scope.type === 'WORKSPACE' && mappedScope) ? {
+      workspaceScope: (scope.type === AutomationConditionScopeType.WORKSPACE && mappedScope) ? {
         create: {
           aggregate: {
             create: mappedScope.aggregate,
@@ -893,13 +893,17 @@ export class AutomationPrismaAdapter {
     }
 
     // Constructs update statements for conditions of builder
-    const updateConditions = await this.constructUpdateAutomationConditionsData(conditionBuilder.conditions, isExistingBuilder, inputConditionIds);
+    const updateConditions = await this.constructUpdateAutomationConditionsData(
+      conditionBuilder.conditions,
+      isExistingBuilder,
+      inputConditionIds
+    );
 
     // If nested condition builder exists => recursively run this function again to update its content as well
     if (conditionBuilder.childBuilder) {
       const childBuilder = await this.buildUpdateAutomationConditionBuilderData(conditionBuilder.childBuilder, false);
       childConditionBuilder = childBuilder;
-    }
+    };
 
     return {
       type: conditionBuilder.type,
@@ -923,7 +927,7 @@ export class AutomationPrismaAdapter {
 
     const inputActionIds = inputActions.map((action) => action.id).filter(isPresent);
     const updateConditionBuilderData = await this.buildUpdateAutomationConditionBuilderData(conditionBuilder);
-    console.dir(updateConditionBuilderData, { depth: null });
+
     return {
       conditionBuilder: {
         update: updateConditionBuilderData,

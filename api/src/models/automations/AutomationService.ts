@@ -48,19 +48,32 @@ class AutomationService {
     this.userService = new UserService(prisma);
   }
 
+  /**
+   * Validates all conditions in a condition builder (including its nested condition builders)
+   * @param builderId ID of the root condition builder
+   * @returns a boolean indicating whether conditions have passed or not
+   */
   validateConditionBuilder = async (builderId: string) => {
     const conditionBuilder = await this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
-    const destructedData = await this.destructureBuilder({}, conditionBuilder as BuilderEntry);
+    const destructedData = await this.destructureBuilder(conditionBuilder as BuilderEntry);
     console.log('Destructed data: ', destructedData);
     const validatedObjects = await this.validateConditions(destructedData, {});
     console.log('Validated Objects: ', validatedObjects);
 
-    const builderConditionsPassed = AutomationConditionBuilderService.checkConditions(validatedObjects, [], 0);
+    const builderConditionsPassed = AutomationConditionBuilderService.checkConditions(validatedObjects);
     console.log('Builder condition passed: ', builderConditionsPassed)
     return builderConditionsPassed;
   };
 
-  destructureBuilder = async (dataObj: any, entry: BuilderEntry) => {
+  /**
+   * Structures conditions in builder (and its nested builders) in a format more easily validated
+   * @param dataObj an empty object
+   * @param entry an AutomationConditionBuilder entry with conditions and nested conditionBuilder
+   * @returns An object containing a list of conditions with either AND/OR as its property as well as nested objects containing conditions
+   */
+  destructureBuilder = async (entry: BuilderEntry) => {
+    const dataObj = {} as any;
+    // If there are any conditions available for a builder entry add them to a list with the type (AND/OR) as its property
     if (entry.conditions.length) {
       dataObj[entry.type] = [
         ...entry.conditions,
@@ -72,35 +85,42 @@ class AutomationService {
 
       if (!child) throw new Error('Has childConditioBuilderId but cannot find the entry in DB!');
 
-      console.log('child: ', child);
-      const operatorObject = {}
-      const des = await this.destructureBuilder(operatorObject, child);
+      // If nested condition builder exist recursively run this function again and add its contents to list 
+      const des = await this.destructureBuilder(child);
       dataObj[entry.type].push(des)
     }
+
     return dataObj;
   }
 
+  /**
+   * Validates conditions of a child builder based on its type (AND/OR)
+   * @param data an Object containing a list AutomationConditions and optionally an nested object containing additional conditions
+   * @param checkedObject an Object containing the results of previously validated conditions
+   * @returns An object containing the results (booleans) of all conditions
+   */
   validateConditions = async (data: PreValidatedConditions, checkedObject: CheckedConditions) => {
     const isAND = !!data['AND'];
     const type = isAND ? 'AND' : 'OR' as keyof CheckedConditions;
     const conditions = data[isAND ? 'AND' : 'OR'] as (PreValidatedConditions | AutomationCondition)[];
 
+    // Check if AND/OR property exist on object storing results
+    const andOrOr = Object.keys(checkedObject).find((property) => property === 'AND' || property === 'OR') as keyof CheckedConditions | undefined;
+
+    // If AND/OR property doesn't exist on object storing result 
+    // => Add the property with an empty array
+    if (!andOrOr) {
+      checkedObject[type] = [];
+    }
+
     await Promise.all(conditions.map(async (entry) => {
+      // If entry is an AutomationCondition => validate whether condition is true or not
       if ((entry as AutomationCondition)?.id) {
         const validated = await this.testTriggerCondition(entry as AutomationCondition);
-
-        const andOrOr = Object.keys(checkedObject).find((property) => property === 'AND' || property === 'OR') as keyof CheckedConditions | undefined;
-
-        if (!andOrOr) {
-          console.log('Type: ', type);
-          checkedObject[type] = []
-        }
         const finalType = andOrOr || type;
         checkedObject[finalType]?.push(validated);
-      }
-
-      if ((entry as PreValidatedConditions)?.AND || (entry as PreValidatedConditions)?.OR) {
-        checkedObject[type] = [];
+      } else {
+        // If entry is a nested object => Run this function recursively and add validated results to existing object
         const childIsAnd = (entry as PreValidatedConditions)?.AND ? { AND: [] } : { OR: [] };
         const validated = await this.validateConditions(entry as PreValidatedConditions, childIsAnd);
         checkedObject[type]?.push(validated);
@@ -110,11 +130,20 @@ class AutomationService {
     return checkedObject;
   }
 
-
+  /**
+   * Finds automation condition builder by its ID
+   * @param builderId the ID of a condition builder
+   * @returns a condition builder
+   */
   findAutomationConditionBuilder = (builderId: string) => {
     return this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
   };
 
+  /**
+   * Finds automation condition by its ID
+   * @param automationConditionId the ID of an automation condition
+   * @returns an automation condition
+   */
   findAutomationConditionById = (automationConditionId: string) => {
     return this.automationPrismaAdapter.findAutomationConditionById(automationConditionId);
   };
@@ -145,7 +174,10 @@ class AutomationService {
 
   /**
   * Sets up the data necessary for comparing choice data with the condition match value
-  * @param input object containing
+  * @param input object containing data needed to aggregate and operand data.
+  * Object *MUST* contain 2 operands: 
+  * - One of type INT (the amount to check against)
+  * - One of type STRING (the option value to check against)
   * @returns an object containing the value to be compared, the match value it should be checked against and total entries
   */
   setupChoiceCompareData = async (
@@ -281,6 +313,11 @@ class AutomationService {
     }
   }
 
+  /**
+   * Tests a condition of an AutomationTrigger based on its scope
+   * @param condition an AutomationCondition 
+   * @returns boolean. true if condition passes, false if condition fails.
+   */
   testTriggerCondition = (condition: AutomationCondition) => {
     switch (condition.scope) {
       case AutomationConditionScopeType.QUESTION: {
