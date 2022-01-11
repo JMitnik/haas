@@ -181,8 +181,6 @@ export const constructValidUpdateAutomationInputData = (
   const generateReportAction = actions.find((action) => action.type === "GENERATE_REPORT");
 
   const condition = conditionBuilder.conditions?.[0];
-  console.log('Condition builder: ', conditionBuilder);
-  console.dir(condition, { depth: null });
 
   return {
     "id": automation.id,

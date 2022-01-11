@@ -807,7 +807,6 @@ export class AutomationPrismaAdapter {
     const staleConditionIds = dbConditionIds.filter((conditionId) => !inputConditionIds.includes(conditionId));
 
     const allConditions = [...staleConditionIds, ...idOverview.conditionIds];
-    console.log('ALL CONDITIONS TO BE DELETED: ', allConditions);
 
     await this.prisma.questionConditionScope.deleteMany({
       where: {
@@ -944,11 +943,9 @@ export class AutomationPrismaAdapter {
     const isExistingBuilder = (isRoot || !!conditionBuilder.id)
     const inputConditionIds = conditionBuilder.conditions.map((condition) => condition.id).filter(isPresent);
 
-    // Removes all 'Stale' conditions (including their scope(s) & operands) of the builder
     if (conditionBuilder?.id) {
-      // Remove 'stale' builder entries
+      // Remove 'stale' builder entries (including conditions, their scope(s) & operands)
       const idOverview = await this.findStaleBuilderRelatedIds(conditionBuilder, { builderIds: [], conditionIds: [] })
-      console.log('ID MAP: ', idOverview);
       await this.removeStaleConditionRelations(conditionBuilder.id, idOverview, inputConditionIds);
     }
 
@@ -964,9 +961,6 @@ export class AutomationPrismaAdapter {
       const childBuilder = await this.buildUpdateAutomationConditionBuilderData(conditionBuilder.childBuilder, false);
       childConditionBuilder = childBuilder;
     };
-
-    console.log('conditionBuilder.childBuilder: ', conditionBuilder.childBuilder);
-    console.log('Child condition builder: ', childConditionBuilder);
 
     return {
       type: conditionBuilder.type,

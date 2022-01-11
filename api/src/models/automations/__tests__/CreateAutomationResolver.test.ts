@@ -43,7 +43,6 @@ it('creates automation', async () => {
   });
 })
 
-// TODO: Why does this one throws Not Authorized even though it is same setup as label
 it('unable to create automation when no workspace id is provided', async () => {
   const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
@@ -136,104 +135,6 @@ it('unable to create automation when no automation type is provided', async () =
   } catch (error) {
     if (error instanceof Error) {
       expect(error.message).toContain('No automation type');
-    } else { throw new Error(); }
-  }
-});
-
-it('unable to create automation when no conditions are provided', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
-
-  // Generate token for API access
-  const token = AuthService.createUserToken(user.id, 22);
-  const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
-  // TODO: Replace this with condition builder 
-  // input.conditions = [];
-
-  try {
-    await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
-          id
-          label
-          type
-        }
-      }
-    `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
-    );
-  } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No conditions provided');
-    } else { throw new Error(); }
-  }
-});
-
-it('unable to create automation when no match value type is provided for a condition', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
-
-  // Generate token for API access
-  const token = AuthService.createUserToken(user.id, 22);
-  const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
-  // (input.conditions?.[0]?.operands?.[0] as any).operandType = null;
-
-  try {
-    await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
-          id
-          label
-          type
-        }
-      }
-    `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
-    );
-  } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No match value type');
-    } else { throw new Error(); }
-  }
-});
-
-it('unable to create automation when no operator type is provided for a condition', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
-
-  // Generate token for API access
-  const token = AuthService.createUserToken(user.id, 22);
-  const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
-  // TODO: Replace this with condition builder 
-  // (input.conditions?.[0] as any).operator = null;
-
-  try {
-    await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
-          id
-          label
-          type
-        }
-      }
-    `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
-    );
-  } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No operator type');
     } else { throw new Error(); }
   }
 });
