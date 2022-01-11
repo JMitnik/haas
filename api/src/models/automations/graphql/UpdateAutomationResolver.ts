@@ -1,6 +1,6 @@
 import { mutationField } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
-import { CreateAutomationBuilderResolverInput, CreateAutomationResolverInput } from '..';
+import { CreateAutomationBuilderResolverInput } from '..';
 import { AutomationModel } from './AutomationModel';
 
 export const UpdateAutomationResolver = mutationField('updateAutomation', {

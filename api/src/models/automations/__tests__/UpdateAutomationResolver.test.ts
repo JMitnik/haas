@@ -17,12 +17,12 @@ afterEach(async () => {
 it('updates automation', async () => {
   const { user, workspace, dialogue, question, userRole } = await prepDefaultCreateData(prisma);
   const { automation } = await prepDefaultUpdateData(prisma, userRole.id, workspace.id, dialogue.id, question.id);
-
+  automation.automationTrigger?.conditionBuilder.conditions[0]?.operands
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
   const input = constructValidUpdateAutomationInputData(workspace, dialogue, question, automation);
   const res = await ctx.client.request(`
-    mutation updateAutomation($input: CreateAutomationResolverInput) {
+    mutation updateAutomation($input: CreateAutomationBuilderResolverInput) {
       updateAutomation(input: $input) {
         id
         label
@@ -55,7 +55,7 @@ it('unable to update automation when no automation id is provided', async () => 
 
   try {
     await ctx.client.request(`
-      mutation updateAutomation($input: CreateAutomationResolverInput) {
+      mutation updateAutomation($input: CreateAutomationBuilderResolverInput) {
         updateAutomation(input: $input) {
           id
           label
@@ -94,7 +94,7 @@ it('unable to create automations unauthorized', async () => {
 
   try {
     await ctx.client.request(`
-      mutation updateAutomation($input: CreateAutomationResolverInput) {
+      mutation updateAutomation($input: CreateAutomationBuilderResolverInput) {
         updateAutomation(input: $input) {
           id
           label

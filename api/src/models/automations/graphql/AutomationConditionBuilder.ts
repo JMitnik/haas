@@ -22,7 +22,6 @@ export const AutomationConditionBuilderModel = objectType({
       type: AutomationConditionBuilderModel,
       nullable: true,
       resolve(parent, args, ctx) {
-        console.log('parent: ', parent);
         if (!parent.childConditionBuilderId) return null;
         return ctx.services.automationService.findAutomationConditionBuilder(parent.childConditionBuilderId) as any;
       }

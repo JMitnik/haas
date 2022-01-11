@@ -117,6 +117,7 @@ export interface UpdateConditionBuilderInput extends CreateConditionBuilderInput
   id?: string;
   conditions: UpdateAutomationConditionInput[];
   childBuilder?: UpdateConditionBuilderInput;
+
 }
 
 export interface CreateAutomationInput {

@@ -88,32 +88,32 @@ export const seedAutomation = async (
                       },
                     },
                   },
-                  {
-                    dialogue: {
-                      connect: {
-                        id: dialogueId,
-                      },
-                    },
-                    scope: 'DIALOGUE',
-                    operator: 'GREATER_THAN',
-                    dialogueScope: {
-                      create: {
-                        aspect: 'NR_INTERACTIONS',
-                        aggregate: {
-                          create: {
-                            type: 'COUNT',
-                            latest: 10,
-                          },
-                        },
-                      },
-                    },
-                    operands: {
-                      create: {
-                        type: 'INT',
-                        numberValue: 10,
-                      },
-                    },
-                  },
+                  // {
+                  //   dialogue: {
+                  //     connect: {
+                  //       id: dialogueId,
+                  //     },
+                  //   },
+                  //   scope: 'DIALOGUE',
+                  //   operator: 'GREATER_THAN',
+                  //   dialogueScope: {
+                  //     create: {
+                  //       aspect: 'NR_INTERACTIONS',
+                  //       aggregate: {
+                  //         create: {
+                  //           type: 'COUNT',
+                  //           latest: 10,
+                  //         },
+                  //       },
+                  //     },
+                  //   },
+                  //   operands: {
+                  //     create: {
+                  //       type: 'INT',
+                  //       numberValue: 10,
+                  //     },
+                  //   },
+                  // },
                 ],
               },
             }

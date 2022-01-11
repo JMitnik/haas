@@ -350,17 +350,6 @@ input CreateAutomationOperandInput {
   textValue: String
 }
 
-input CreateAutomationResolverInput {
-  actions: [AutomationActionInput!]
-  automationType: AutomationType
-  conditions: [CreateAutomationCondition!]
-  description: String
-  event: AutomationEventInput
-  id: ID
-  label: String
-  workspaceId: String
-}
-
 input CreateBatchDeliveriesInputType {
   batchScheduledAt: String
   campaignId: ID
@@ -1014,7 +1003,6 @@ type Mutation {
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
-  createAutomation(input: CreateAutomationResolverInput): AutomationModel!
   createAutomationToken(email: String): String
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
   createBuilderAutomation(input: CreateAutomationBuilderResolverInput): AutomationModel!
