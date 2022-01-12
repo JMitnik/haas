@@ -56,7 +56,6 @@ class AutomationService {
   validateConditionBuilder = async (builderId: string) => {
     const conditionBuilder = await this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
     const destructedData = await this.destructureBuilder(conditionBuilder as BuilderEntry);
-    console.log('Destructed data: ', destructedData);
     const validatedObjects = await this.validateConditions(destructedData, {});
     console.log('Validated Objects: ', validatedObjects);
 
@@ -247,25 +246,26 @@ class AutomationService {
     };
     // Fetch data based on scope
     const scopedData = await this.setupQuestionCompareData(input);
-
     // Some of the data necessary to validate condition is missing
     if (
       !scopedData ||
       (!scopedData?.compareValue && typeof scopedData?.compareValue !== 'number')
       || !scopedData?.operand
     ) {
+      console.log('Some of the data necessary to validate condition is missing. Returning false');
       return false;
     }
 
     // Want latest X but there is less than X *new* entries in the database => return false
-    const hasNotEnoughLatest = (
-      condition.questionScope?.aggregate?.latest &&
-      scopedData.totalEntries % condition.questionScope?.aggregate?.latest !== 0
-    );
+    // TODO: Add this batch option to event instead of condition
+    // const hasNotEnoughLatest = (
+    //   condition.questionScope?.aggregate?.latest &&
+    //   scopedData.totalEntries % condition.questionScope?.aggregate?.latest !== 0
+    // );
 
-    if (hasNotEnoughLatest) {
-      return false;
-    }
+    // if (hasNotEnoughLatest) {
+    //   return false;
+    // }
 
     switch (condition.operator) {
       case AutomationConditionOperatorType.SMALLER_OR_EQUAL_THAN: {
