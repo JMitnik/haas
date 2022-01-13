@@ -107,6 +107,16 @@ export const defaultUserRole: Prisma.RoleCreateInput = {
   },
 };
 
+export const defaultBotRole: Prisma.RoleCreateInput = {
+  name: 'Bot',
+  type: 'BOT',
+  permissions: {
+    set: [
+      'CAN_ACCESS_REPORT_PAGE',
+    ],
+  },
+};
+
 const defaultWorkspaceTemplate: WorkspaceTemplate = {
   title: 'How do you feel about us?',
   slug: 'default',
@@ -131,6 +141,7 @@ const defaultWorkspaceTemplate: WorkspaceTemplate = {
     defaultAdminRole,
     defaultManagerRole,
     defaultUserRole,
+    defaultBotRole,
   ],
   rootSliderOptions: {
     markers: [

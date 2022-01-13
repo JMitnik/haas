@@ -3,10 +3,14 @@ import { PrismaClient, SystemPermissionEnum } from '@prisma/client';
 export const clearDatabase = async (prisma: PrismaClient) => {
   if (process.env.NODE_ENV === 'test') {
     await prisma.$transaction([
+      prisma.sliderNodeEntry.deleteMany({}),
+      prisma.choiceNodeEntry.deleteMany({}),
+      prisma.nodeEntry.deleteMany({}),
+      prisma.session.deleteMany({}),
       prisma.automation.deleteMany({}),
       prisma.automationTrigger.deleteMany({}),
       prisma.automationEvent.deleteMany({}),
-      prisma.automationConditionMatchValue.deleteMany({}),
+      prisma.automationConditionOperand.deleteMany({}),
       prisma.dialogueConditionScope.deleteMany({}),
       prisma.questionConditionScope.deleteMany({}),
       prisma.workspaceConditionScope.deleteMany({}),
@@ -21,7 +25,14 @@ export const clearDatabase = async (prisma: PrismaClient) => {
   }
 }
 
-export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, dialogueId: string, questionId: string, index?: number, desc?: string) => {
+export const seedAutomation = async (
+  prisma: PrismaClient,
+  workspaceId: string,
+  dialogueId: string,
+  questionId: string,
+  index?: number,
+  desc?: string
+) => {
   return prisma.automation.create({
     data: {
       label: `Trigger automation ${index}`,
@@ -31,7 +42,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
       workspace: {
         connect: {
           id: workspaceId,
-        }
+        },
       },
       automationTrigger: {
         create: {
@@ -41,9 +52,9 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
               question: {
                 connect: {
                   id: questionId,
-                }
-              }
-            }
+                },
+              },
+            },
           },
           conditions: {
             create: [
@@ -51,7 +62,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                 question: {
                   connect: {
                     id: questionId,
-                  }
+                  },
                 },
                 scope: 'QUESTION',
                 operator: 'SMALLER_OR_EQUAL_THAN',
@@ -62,22 +73,22 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                       create: {
                         type: 'AVG',
                         latest: 10,
-                      }
-                    }
-                  }
+                      },
+                    },
+                  },
                 },
-                matchValues: {
+                operands: {
                   create: {
                     type: 'INT',
                     numberValue: 50,
-                  }
-                }
+                  },
+                },
               },
               {
                 dialogue: {
                   connect: {
                     id: dialogueId,
-                  }
+                  },
                 },
                 scope: 'DIALOGUE',
                 operator: 'GREATER_THAN',
@@ -88,27 +99,27 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                       create: {
                         type: 'COUNT',
                         latest: 10,
-                      }
-                    }
-                  }
+                      },
+                    },
+                  },
                 },
-                matchValues: {
+                operands: {
                   create: {
                     type: 'INT',
                     numberValue: 10,
-                  }
-                }
-              }
-            ]
+                  },
+                },
+              },
+            ],
           },
           actions: {
             create: [
               { type: 'GENERATE_REPORT' },
               { type: 'SEND_EMAIL' },
-            ]
-          }
-        }
-      }
+            ],
+          },
+        },
+      },
     },
     include: {
       workspace: true,
@@ -118,29 +129,29 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
             include: {
               question: true,
               dialogue: true,
-            }
+            },
           },
           conditions: {
             include: {
               questionScope: {
                 include: {
                   aggregate: true,
-                }
+                },
               },
               dialogueScope: {
                 include: {
                   aggregate: true,
-                }
+                },
               },
-              matchValues: true,
+              operands: true,
               workspaceScope: {
                 include: {
                   aggregate: true,
-                }
+                },
               },
               dialogue: true,
               question: true,
-            }
+            },
           },
           actions: true,
         },
@@ -149,20 +160,26 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
   })
 }
 
-export const prepDefaultUpdateData = async (prisma: PrismaClient, roleId: string, workspaceId: string, dialogueId: string, questionId: string) => {
+export const prepDefaultUpdateData = async (
+  prisma: PrismaClient,
+  roleId: string,
+  workspaceId: string,
+  dialogueId: string,
+  questionId: string
+) => {
   await prisma.role.update({
     where: {
       id: roleId,
     },
     data: {
       permissions: ['CAN_UPDATE_AUTOMATIONS'],
-    }
+    },
   });
 
   const automation = await seedAutomation(prisma, workspaceId, dialogueId, questionId);
 
   return {
-    automation
+    automation,
   }
 }
 
@@ -182,10 +199,10 @@ export const prepDefaultCreateData = async (prisma: PrismaClient, globalPermissi
               id: 'QUESTION_ID',
               title: 'Slider question',
               type: 'SLIDER',
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     },
     include: {
       dialogues: {
@@ -201,22 +218,22 @@ export const prepDefaultCreateData = async (prisma: PrismaClient, globalPermissi
       id: 'TEST_USER',
       email: 'TEST@Hotmail.com',
       globalPermissions: globalPermissions || [],
-    }
+    },
   });
 
   const userRole = await prisma.role.create({
     data: {
       name: 'UserRole',
-      permissions: ['CAN_VIEW_AUTOMATIONS', 'CAN_CREATE_AUTOMATIONS']
-    }
+      permissions: ['CAN_VIEW_AUTOMATIONS', 'CAN_CREATE_AUTOMATIONS'],
+    },
   });
 
   await prisma.userOfCustomer.create({
     data: {
       customer: { connect: { id: workspace.id } },
       user: { connect: { id: user.id } },
-      role: { connect: { id: userRole.id } }
-    }
+      role: { connect: { id: userRole.id } },
+    },
   });
 
   return {
@@ -224,6 +241,6 @@ export const prepDefaultCreateData = async (prisma: PrismaClient, globalPermissi
     userRole,
     workspace,
     dialogue: workspace?.dialogues[0],
-    question: workspace?.dialogues[0]?.questions[0]
+    question: workspace?.dialogues[0]?.questions[0],
   }
 };

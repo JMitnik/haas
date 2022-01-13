@@ -461,6 +461,8 @@ model Permission {
 }
 
 enum SystemPermissionEnum {
+  CAN_ACCESS_REPORT_PAGE
+  CAN_DOWNLOAD_REPORTS
   CAN_ACCESS_ADMIN_PANEL
   CAN_EDIT_DIALOGUE
   CAN_BUILD_DIALOGUE
@@ -491,6 +493,7 @@ enum RoleTypeEnum {
   USER
   GUEST
   CUSTOM
+  BOT
 }
 
 model Role {
@@ -838,7 +841,7 @@ enum AutomationConditionOperatorType {
   EVERY_N_TH_TIME
 }
 
-enum MatchValueType {
+enum OperandType {
   STRING
   INT
   DATE_TIME
@@ -899,12 +902,12 @@ model AutomationEvent {
   automationTrigger AutomationTrigger[]
 }
 
-model AutomationConditionMatchValue {
+model AutomationConditionOperand {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
-  type MatchValueType
+  type OperandType
 
   numberValue   Int?
   textValue     String? // TODO: Reference an actual choice option instead of raw text here eventually
@@ -980,7 +983,7 @@ model AutomationCondition {
   scope    AutomationConditionScopeType
   operator AutomationConditionOperatorType
 
-  matchValues AutomationConditionMatchValue[]
+  operands AutomationConditionOperand[]
 
   questionScope  QuestionConditionScope?
   dialogueScope  DialogueConditionScope?

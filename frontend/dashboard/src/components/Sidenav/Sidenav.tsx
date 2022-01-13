@@ -41,6 +41,9 @@ export const NavItemContainer = styled.li<NavItemContainerProps>`
         background: ${theme.colors.primaryGradient};
       }
     `}
+    @media print {
+      display: none;
+    }
   `}
 `;
 
@@ -272,7 +275,7 @@ export const Usernav = () => {
   const { user } = useUser();
 
   return (
-    <UsernavContainer>
+    <UsernavContainer id="usernav">
       <Dropdown renderOverlay={() => <UsernavDropdown />} placement="top-start" offset={[24, 0]}>
         {({ onOpen }) => (
           <AvatarContainer>
@@ -337,6 +340,11 @@ export const SidenavContainer = styled.div`
             display: inline-block;
         }
       }
+    }
+
+    // Remove Side-nav when 
+    @media print {
+      border-right: none;
     }
   `}
 `;

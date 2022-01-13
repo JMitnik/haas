@@ -1,8 +1,8 @@
 import {
-  AutomationActionType, AutomationConditionMatchValue, AutomationConditionOperatorType,
+  AutomationActionType, AutomationConditionOperand, AutomationConditionOperatorType,
   AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate,
   Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
-  WorkspaceConditionScope
+  WorkspaceConditionScope,
 } from '@prisma/client';
 
 import { NexusGenEnums } from '../../generated/nexus';
@@ -14,6 +14,20 @@ type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
  * https://stackoverflow.com/questions/42123407/does-typescript-support-mutually-exclusive-types
  */
 type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
+
+export interface SetupQuestionCompareDataInput {
+  questionId: string;
+  aspect: QuestionAspect;
+  aggregate?: ConditionPropertyAggregate | null;
+  operands: AutomationConditionOperand[];
+  type: NodeType;
+}
+
+export interface SetupQuestionCompareDataOutput {
+  totalEntries: number;
+  compareValue?: number | null;
+  operand?: number | null;
+}
 
 export interface ConditionPropertAggregateInput {
   endDate?: Date | null; // String
@@ -67,20 +81,20 @@ export interface UpdateAutomationConditionScopeInput extends CreateAutomationCon
   workspaceScope?: UpdateWorkspaceScopeInput | null; // ConditionWorkspaceScopeInput
 }
 
-export interface CreateConditionMatchValueInput {
+export interface CreateConditionOperandInput {
   dateTimeValue?: string | null; // String
-  type: NexusGenEnums['MatchValueType']; // MatchValueType
+  type: any; // MatchValueType
   numberValue?: number | null; // Int
   textValue?: string | null; // String
 }
 
-export interface UpdateConditionMatchValueInput extends CreateConditionMatchValueInput {
+export interface UpdateConditionOperandInput extends CreateConditionOperandInput {
   id?: string;
 }
 
 export interface CreateAutomationConditionInput {
   dialogueId?: string | null; // String
-  matchValues: CreateConditionMatchValueInput[]; // MatchValueInput
+  operands: CreateConditionOperandInput[]; // MatchValueInput
   operator: NexusGenEnums['AutomationConditionOperatorType']; // AutomationConditionOperatorType
   questionId?: string | null; // String
   scope: CreateAutomationConditionScopeInput; // ConditionScopeInput
@@ -89,7 +103,7 @@ export interface CreateAutomationConditionInput {
 
 export interface UpdateAutomationConditionInput extends CreateAutomationConditionInput {
   id?: string;
-  matchValues: UpdateConditionMatchValueInput[];
+  operands: UpdateConditionOperandInput[];
   scope: UpdateAutomationConditionScopeInput;
 }
 
@@ -130,7 +144,7 @@ export interface UpdateAutomationInput extends CreateAutomationInput {
 export type MoreXOR = CreateQuestionScopeInput['aspect'] | CreateDialogueScopeInput['aspect'] | CreateWorkspaceScopeInput['aspect']
 
 export interface CreateScopeDataInput {
-  aspect: any // TODO: Turn this into MoreXOR
+  aspect: any; // TODO: Turn this into MoreXOR
   aggregate: ConditionPropertAggregateInput;
 }
 
@@ -139,27 +153,27 @@ export interface UpdateScopeDataInput extends CreateScopeDataInput {
 }
 
 export interface AutomationEventWithRels extends AutomationEvent {
-  question: QuestionNode | null,
-  dialogue: Dialogue | null
+  question: QuestionNode | null;
+  dialogue: Dialogue | null;
 }
 
 export interface AutomationCondition {
   id: string;
   scope: AutomationConditionScopeType;
   operator: AutomationConditionOperatorType;
-  matchValues: AutomationConditionMatchValue[],
+  operands: AutomationConditionOperand[];
   questionScope: (QuestionConditionScope
     & {
       aggregate: ConditionPropertyAggregate | null;
-    }) | null,
+    }) | null;
   dialogueScope: (DialogueConditionScope
     & {
       aggregate: ConditionPropertyAggregate | null;
-    }) | null,
+    }) | null;
   workspaceScope: (WorkspaceConditionScope
     & {
       aggregate: ConditionPropertyAggregate | null;
-    }) | null,
+    }) | null;
   dialogue: Dialogue | null;
   question: QuestionNode | null;
 }
@@ -190,14 +204,14 @@ export interface FullAutomationWithRels {
 
 export interface SetupQuestionCompareDataInput {
   questionId: string;
-  aspect: QuestionAspect,
-  aggregate?: ConditionPropertyAggregate | null,
-  matchValues: AutomationConditionMatchValue[],
-  type: NodeType,
+  aspect: QuestionAspect;
+  aggregate?: ConditionPropertyAggregate | null;
+  operands: AutomationConditionOperand[];
+  type: NodeType;
 }
 
 export interface SetupQuestionCompareDataOutput {
   totalEntries: number;
   compareValue?: number | null;
-  matchValue?: number | null;
+  operand?: number | null;
 }

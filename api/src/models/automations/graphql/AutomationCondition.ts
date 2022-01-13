@@ -1,8 +1,8 @@
-import { objectType } from "@nexus/schema";
+import { objectType } from '@nexus/schema';
 
 import { AutomationConditionScopeType } from './AutomationConditionScopeType';
 import { AutomationConditionOperatorType } from './AutomationConditionOperatorType';
-import { AutomationConditionMatchValueModel } from './AutomationConditionMatchValue';
+import { AutomationConditionOperandModel } from './AutomationConditionOperandModel';
 import { QuestionConditionScope } from './QuestionConditionScope';
 import { DialogueConditionScopeModel } from './DialogueConditionScope';
 import { WorkspaceConditionScopeModel } from './WorkspaceConditionScope';
@@ -25,9 +25,7 @@ export const AutomationConditionModel = objectType({
       type: AutomationConditionOperatorType,
     });
 
-    t.list.field('matchValues', {
-      type: AutomationConditionMatchValueModel,
-    });
+    t.list.field('operands', { type: AutomationConditionOperandModel });
 
     t.field('questionScope', {
       type: QuestionConditionScope,
