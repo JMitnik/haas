@@ -33,6 +33,12 @@ query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
         ...EdgeFragment
       }
 
+      postLeafNode {
+        id
+        header
+        subtext
+      }
+
       leafs {
         id
         title

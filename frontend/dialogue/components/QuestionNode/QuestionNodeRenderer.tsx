@@ -109,9 +109,8 @@ export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodePr
     transition({
       activeCallToActionId: activeCallToAction?.id,
       childNodeId: input.event.toNodeId,
-      currentNode: currentNode,
-      currentStateType: 'CTA', // TODO: FIx
-    })
+      currentNodeId: currentNode.id,
+    });
   }, [logAction, setActiveCallToAction, transition, currentNode]);
 
   return (
