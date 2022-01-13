@@ -65,12 +65,16 @@ export const useEventsStore = create<DialogueState>((set, get) => ({
    * @returns
    */
   getCurrentNode: (dialogue: Dialogue, urlNodeId: string) => {
-    if (urlNodeId && urlNodeId !== 'finisher') {
+    if (urlNodeId && urlNodeId !== '-1') {
       const question = dialogue.questions.find((node) => node.id === urlNodeId);
       if (question) return question;
 
       const callToAction = dialogue.leafs.find((node) => node.id === urlNodeId);
       return callToAction;
+    }
+
+    if (urlNodeId === '-1') {
+      return dialogue.root;
     }
 
     // if (urlNodeId === 'cta') {
