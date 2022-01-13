@@ -1037,13 +1037,17 @@ model AutomationTrigger {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
+  // Event: When is an automation triggered
   event   AutomationEvent @relation(fields: [eventId], references: [id])
   eventId String
 
+  // Condition: When should an automation actually fire.
   conditionBuilder             AutomationConditionBuilder @relation(fields: [automationConditionBuilderId], references: [id])
   automationConditionBuilderId String                     @unique
 
+  // Action: What should happen when an automation fire.
   actions     AutomationAction[]
+
   automations Automation[]
 }
 
