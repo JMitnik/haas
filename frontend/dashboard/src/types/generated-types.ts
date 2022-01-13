@@ -860,6 +860,8 @@ export type Mutation = {
   inviteUser: InviteUserOutput;
   createSession: Session;
   appendToInteraction: Session;
+  /** Upload a number of events of a session. */
+  uploadSessionEvents: UploadSessionEventsOutput;
   duplicateQuestion?: Maybe<QuestionNode>;
   deleteQuestion: QuestionNode;
   createQuestion?: Maybe<QuestionNode>;
@@ -1089,6 +1091,11 @@ export type MutationCreateSessionArgs = {
 
 export type MutationAppendToInteractionArgs = {
   input?: Maybe<AppendToInteractionInput>;
+};
+
+
+export type MutationUploadSessionEventsArgs = {
+  input?: Maybe<UploadSessionEventsInput>;
 };
 
 
@@ -1582,6 +1589,47 @@ export enum SessionDeliveryType {
   NoCampaigns = 'noCampaigns'
 }
 
+/** Input type of a SessionEvent for Choices. */
+export type SessionEventChoiceValueInput = {
+  value: Scalars['String'];
+  relatedNodeId: Scalars['String'];
+  optionId?: Maybe<Scalars['String']>;
+  timeSpent?: Maybe<Scalars['Int']>;
+};
+
+/** Input type of a SessionEvent for a form. */
+export type SessionEventFormValueInput = {
+  values?: Maybe<Array<FormNodeEntryFieldInput>>;
+  relatedNodeId: Scalars['String'];
+  timeSpent?: Maybe<Scalars['Int']>;
+};
+
+/** Input type of a SessionEvent */
+export type SessionEventInput = {
+  sessionId: Scalars['String'];
+  timestamp: Scalars['Date'];
+  eventType: SessionEventType;
+  toNodeId?: Maybe<Scalars['String']>;
+  choiceValue?: Maybe<SessionEventChoiceValueInput>;
+  sliderValue?: Maybe<SessionEventSliderValueInput>;
+  formValue?: Maybe<SessionEventFormValueInput>;
+};
+
+/** Input type of a SessionEvent for Sliders. */
+export type SessionEventSliderValueInput = {
+  value: Scalars['Int'];
+  relatedNodeId: Scalars['String'];
+  timeSpent?: Maybe<Scalars['Int']>;
+};
+
+/** Types of events that can be emitted in a user's session. */
+export enum SessionEventType {
+  ChoiceAction = 'CHOICE_ACTION',
+  SliderAction = 'SLIDER_ACTION',
+  Navigation = 'NAVIGATION',
+  FormAction = 'FORM_ACTION'
+}
+
 /** Input for session */
 export type SessionInput = {
   dialogueId: Scalars['String'];
@@ -1671,6 +1719,8 @@ export type SocialNodeEntryInput = {
 };
 
 export enum SystemPermission {
+  CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
+  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
   CanEditDialogue = 'CAN_EDIT_DIALOGUE',
   CanBuildDialogue = 'CAN_BUILD_DIALOGUE',
@@ -1687,7 +1737,10 @@ export enum SystemPermission {
   CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
   CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
   CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
-  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES'
+  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES',
+  CanViewAutomations = 'CAN_VIEW_AUTOMATIONS',
+  CanCreateAutomations = 'CAN_CREATE_AUTOMATIONS',
+  CanUpdateAutomations = 'CAN_UPDATE_AUTOMATIONS'
 }
 
 export type Tag = {
@@ -1828,6 +1881,16 @@ export enum UploadImageEnumType {
 export type UploadSellImageInputType = {
   file?: Maybe<Scalars['Upload']>;
   workspaceId?: Maybe<Scalars['String']>;
+};
+
+export type UploadSessionEventsInput = {
+  sessionId?: Maybe<Scalars['String']>;
+  events?: Maybe<Array<SessionEventInput>>;
+};
+
+export type UploadSessionEventsOutput = {
+  __typename?: 'UploadSessionEventsOutput';
+  status: Scalars['String'];
 };
 
 export type UserConnection = ConnectionInterface & {

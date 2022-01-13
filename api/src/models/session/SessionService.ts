@@ -201,7 +201,7 @@ class SessionService {
   static async fetchSessionsByDialogue(
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
-  ): Promise<Array<SessionWithEntries> | null | undefined> {
+  ): Promise<Array<Session> | null | undefined> {
     const dialogue = await prisma.dialogue.findUnique({
       where: {
         id: dialogueId,

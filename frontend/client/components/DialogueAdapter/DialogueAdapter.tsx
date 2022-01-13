@@ -1,9 +1,9 @@
 import React from 'react'
+import Dialogue from '@haas/dialogue';
 
 import { useUploadSessionEventsMutation } from 'types/generated-types';
 import { Dialogue as DialogueType, Workspace, SessionEventInput } from 'types/helper-types';
 
-import Dialogue from '@haas/dialogue';
 
 interface DialogueProps {
   dialogue: DialogueType;

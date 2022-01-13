@@ -1,15 +1,11 @@
 import { useNavigate } from 'react-router';
 
-import { useSession } from '../Session/SessionProvider';
-import { QuestionNode } from '../../types/helper-types';
-
 export type StateType = 'Question' | 'CTA' | 'FINISHER';
 
 export interface TransitionInput {
-  currentStateType: StateType;
-  currentNode: QuestionNode;
-  childNodeId: string;
-  activeCallToActionId: string;
+  currentNodeId: string;
+  childNodeId?: string;
+  activeCallToActionId?: string;
 }
 
 export interface NavigationState {
@@ -30,16 +26,34 @@ export interface UseNavigatorProps {
  */
 export const useNavigator = ({ dialogueSlug, workspaceSlug }: UseNavigatorProps) => {
   const navigate = useNavigate();
-  const { sessionId } = useSession();
 
-  const transition = ({ currentStateType, currentNode, childNodeId, activeCallToActionId }: TransitionInput) => {
-    if (input.event.toNodeId) {
-      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${input.event.toNodeId}`);
-    } else if (activeCallToAction) {
-      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${activeCallToAction.id}`);
-      // TODO: Account for the fact
-    } else if (currentNode.id === activeCallToAction.id) {
+  /**
+   * The transition function dictates where to go next based on the input parameters and available state.
+   * @param currentStateType State type: Node, CTA or FINISHER
+   */
+  const transition = ({ currentNodeId, childNodeId, activeCallToActionId }: TransitionInput) => {
+    // If we have a child node, navigate to it.
+    if (childNodeId) {
+      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${childNodeId}`);
+      return;
+    }
+
+    // If we have no active call to action, go to the finisher.
+    if (!activeCallToActionId) {
       navigate(`/${workspaceSlug}/${dialogueSlug}/n/finisher`);
+      return;
+    }
+
+    // If we are on the active Call-to-action already, go to the finisher
+    if (activeCallToActionId && currentNodeId === activeCallToActionId) {
+      navigate(`/${workspaceSlug}/${dialogueSlug}/n/finisher`);
+      return;
+    }
+
+    // If we go to the activeCallToAction, go to the activeCallToAction.
+    if (activeCallToActionId && currentNodeId !== activeCallToActionId) {
+      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${activeCallToActionId}`);
+      return;
     }
   };
 
