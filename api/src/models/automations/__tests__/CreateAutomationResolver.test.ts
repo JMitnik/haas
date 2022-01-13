@@ -337,6 +337,3 @@ it('unable to create automations unauthorized', async () => {
     } else { throw new Error(); }
   }
 });
-
-
-

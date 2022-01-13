@@ -321,6 +321,16 @@ interface ConnectionInterface {
   totalPages: Int
 }
 
+input CreateAutomationCondition {
+  dialogueId: String
+  id: ID
+  operands: [CreateAutomationOperandInput!]
+  operator: AutomationConditionOperatorType
+  questionId: String
+  scope: ConditionScopeInput
+  workspaceId: String
+}
+
 input CreateAutomationInput {
   actions: [AutomationActionInput!]
   automationType: AutomationType
@@ -329,16 +339,6 @@ input CreateAutomationInput {
   event: AutomationEventInput
   id: ID
   label: String
-  workspaceId: String
-}
-
-input CreateAutomationCondition {
-  dialogueId: String
-  id: ID
-  operands: [CreateAutomationOperandInput!]
-  operator: AutomationConditionOperatorType
-  questionId: String
-  scope: ConditionScopeInput
   workspaceId: String
 }
 

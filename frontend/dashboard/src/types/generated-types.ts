@@ -1,11 +1,10 @@
-import * as Apollo from '@apollo/client';
 import { gql } from '@apollo/client';
-
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions = {};
+const defaultOptions =  {}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -74,7 +73,7 @@ export enum AutomationActionType {
   SendEmail = 'SEND_EMAIL',
   ApiCall = 'API_CALL',
   GenerateReport = 'GENERATE_REPORT',
-  Webhook = 'WEBHOOK',
+  Webhook = 'WEBHOOK'
 }
 
 export type AutomationConditionBuilderInput = {
@@ -96,7 +95,7 @@ export type AutomationConditionBuilderModel = {
 
 export enum AutomationConditionBuilderType {
   And = 'AND',
-  Or = 'OR',
+  Or = 'OR'
 }
 
 /** AutomationCondition */
@@ -138,13 +137,13 @@ export enum AutomationConditionOperatorType {
   IsNotEqual = 'IS_NOT_EQUAL',
   IsTrue = 'IS_TRUE',
   IsFalse = 'IS_FALSE',
-  EveryNThTime = 'EVERY_N_TH_TIME',
+  EveryNThTime = 'EVERY_N_TH_TIME'
 }
 
 export enum AutomationConditionScopeType {
   Question = 'QUESTION',
   Dialogue = 'DIALOGUE',
-  Workspace = 'WORKSPACE',
+  Workspace = 'WORKSPACE'
 }
 
 export type AutomationConnection = ConnectionInterface & {
@@ -172,7 +171,7 @@ export type AutomationConnectionOrderByInput = {
 /** Fields to order UserConnection by. */
 export enum AutomationConnectionOrderType {
   UpdatedAt = 'updatedAt',
-  Type = 'type',
+  Type = 'type'
 }
 
 export type AutomationEventInput = {
@@ -200,7 +199,7 @@ export enum AutomationEventType {
   Recurring = 'RECURRING',
   NewInteractionQuestion = 'NEW_INTERACTION_QUESTION',
   NewInteractionDialogue = 'NEW_INTERACTION_DIALOGUE',
-  ApiCall = 'API_CALL',
+  ApiCall = 'API_CALL'
 }
 
 /** Automation */
@@ -230,7 +229,7 @@ export type AutomationTriggerModel = {
 
 export enum AutomationType {
   Trigger = 'TRIGGER',
-  Campaign = 'CAMPAIGN',
+  Campaign = 'CAMPAIGN'
 }
 
 export type AwsImageType = {
@@ -250,6 +249,7 @@ export type CampaignType = {
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
+
 /** Campaign */
 export type CampaignTypeDeliveryConnectionArgs = {
   filter?: Maybe<DeliveryConnectionFilterInput>;
@@ -264,7 +264,7 @@ export type CampaignVariantCustomVariableType = {
 export enum CampaignVariantEnum {
   Sms = 'SMS',
   Email = 'EMAIL',
-  Queue = 'QUEUE',
+  Queue = 'QUEUE'
 }
 
 /** Variant of campaign */
@@ -292,7 +292,7 @@ export enum CloudReferenceType {
   Aws = 'AWS',
   Gcp = 'GCP',
   Azure = 'Azure',
-  Ibm = 'IBM',
+  Ibm = 'IBM'
 }
 
 export type ColourSettings = {
@@ -331,7 +331,7 @@ export enum ConditionPropertyAggregateType {
   Count = 'COUNT',
   Min = 'MIN',
   Max = 'MAX',
-  Avg = 'AVG',
+  Avg = 'AVG'
 }
 
 export type ConditionQuestionScopeInput = {
@@ -360,6 +360,16 @@ export type ConnectionInterface = {
   pageInfo: PaginationPageInfo;
 };
 
+export type CreateAutomationCondition = {
+  id?: Maybe<Scalars['ID']>;
+  scope?: Maybe<ConditionScopeInput>;
+  operator?: Maybe<AutomationConditionOperatorType>;
+  operands?: Maybe<Array<CreateAutomationOperandInput>>;
+  questionId?: Maybe<Scalars['String']>;
+  dialogueId?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
+};
+
 export type CreateAutomationInput = {
   id?: Maybe<Scalars['ID']>;
   label?: Maybe<Scalars['String']>;
@@ -369,16 +379,6 @@ export type CreateAutomationInput = {
   event?: Maybe<AutomationEventInput>;
   conditionBuilder?: Maybe<AutomationConditionBuilderInput>;
   actions?: Maybe<Array<AutomationActionInput>>;
-};
-
-export type CreateAutomationCondition = {
-  id?: Maybe<Scalars['ID']>;
-  scope?: Maybe<ConditionScopeInput>;
-  operator?: Maybe<AutomationConditionOperatorType>;
-  operands?: Maybe<Array<CreateAutomationOperandInput>>;
-  questionId?: Maybe<Scalars['String']>;
-  dialogueId?: Maybe<Scalars['String']>;
-  workspaceId?: Maybe<Scalars['String']>;
 };
 
 export type CreateAutomationOperandInput = {
@@ -544,26 +544,32 @@ export type Customer = {
   userCustomer?: Maybe<UserCustomer>;
 };
 
+
 export type CustomerAutomationConnectionArgs = {
   filter?: Maybe<AutomationConnectionFilterInput>;
 };
+
 
 export type CustomerUsersConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<UserConnectionFilterInput>;
 };
 
+
 export type CustomerDialogueArgs = {
   where?: Maybe<DialogueWhereUniqueInput>;
 };
+
 
 export type CustomerDialoguesArgs = {
   filter?: Maybe<DialogueFilterInputType>;
 };
 
+
 export type CustomerCampaignArgs = {
   campaignId?: Maybe<Scalars['String']>;
 };
+
 
 export type CustomerUserCustomerArgs = {
   userId?: Maybe<Scalars['String']>;
@@ -594,6 +600,7 @@ export type CustomFieldType = {
   value?: Maybe<Scalars['String']>;
   jobProcessLocationId: Scalars['String'];
 };
+
 
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
@@ -634,7 +641,7 @@ export type DeliveryConnectionFilterInput = {
 
 /** Fields to order DeliveryConnection by. */
 export enum DeliveryConnectionOrder {
-  CreatedAt = 'createdAt',
+  CreatedAt = 'createdAt'
 }
 
 /** Sorting of DeliveryConnection */
@@ -665,7 +672,7 @@ export enum DeliveryStatusEnum {
   Opened = 'OPENED',
   Finished = 'FINISHED',
   Failed = 'FAILED',
-  Delivered = 'DELIVERED',
+  Delivered = 'DELIVERED'
 }
 
 /** Delivery */
@@ -729,21 +736,26 @@ export type Dialogue = {
   campaignVariants: Array<CampaignVariantType>;
 };
 
+
 export type DialogueAverageScoreArgs = {
   input?: Maybe<DialogueFilterInputType>;
 };
+
 
 export type DialogueStatisticsArgs = {
   input?: Maybe<DialogueFilterInputType>;
 };
 
+
 export type DialogueSessionConnectionArgs = {
   filter?: Maybe<SessionConnectionFilterInput>;
 };
 
+
 export type DialogueSessionsArgs = {
   take?: Maybe<Scalars['Int']>;
 };
+
 
 export type DialogueLeafsArgs = {
   searchTerm?: Maybe<Scalars['String']>;
@@ -753,7 +765,7 @@ export enum DialogueAspectType {
   NrInteractions = 'NR_INTERACTIONS',
   NrVisitors = 'NR_VISITORS',
   GeneralScore = 'GENERAL_SCORE',
-  LatestScore = 'LATEST_SCORE',
+  LatestScore = 'LATEST_SCORE'
 }
 
 /** DialogueConditionScope */
@@ -918,7 +930,7 @@ export enum FormNodeFieldTypeEnum {
   Url = 'url',
   ShortText = 'shortText',
   LongText = 'longText',
-  Number = 'number',
+  Number = 'number'
 }
 
 export type FormNodeInputType = {
@@ -1030,7 +1042,7 @@ export type JobProcessLocations = {
 export enum JobProcessLocationType {
   OnePager = 'ONE_PAGER',
   Pitchdeck = 'PITCHDECK',
-  Brochure = 'BROCHURE',
+  Brochure = 'BROCHURE'
 }
 
 export enum JobStatusType {
@@ -1047,13 +1059,14 @@ export enum JobStatusType {
   ReadyForProcessing = 'READY_FOR_PROCESSING',
   TransformingPsdsToPngs = 'TRANSFORMING_PSDS_TO_PNGS',
   StitchingSlides = 'STITCHING_SLIDES',
-  CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL',
+  CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL'
 }
+
 
 export enum LanguageEnumType {
   English = 'ENGLISH',
   Dutch = 'DUTCH',
-  German = 'GERMAN',
+  German = 'GERMAN'
 }
 
 export type LineChartDataType = {
@@ -1087,7 +1100,7 @@ export enum LinkTypeEnumType {
   Linkedin = 'LINKEDIN',
   Whatsapp = 'WHATSAPP',
   Instagram = 'INSTAGRAM',
-  Twitter = 'TWITTER',
+  Twitter = 'TWITTER'
 }
 
 /** Login credential */
@@ -1116,8 +1129,8 @@ export type Mutation = {
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
-  /** Create a new automation */
-  createBuilderAutomation: AutomationModel;
+  /** Creates a new automation. */
+  createAutomation: AutomationModel;
   updateAutomation: AutomationModel;
   createCampaign: CampaignType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
@@ -1163,29 +1176,36 @@ export type Mutation = {
   updateQuestion: QuestionNode;
 };
 
+
 export type MutationCreateJobProcessLocationArgs = {
   input?: Maybe<CreateJobProcessLocationInput>;
 };
+
 
 export type MutationGenerateAutodeckArgs = {
   input?: Maybe<GenerateAutodeckInput>;
 };
 
+
 export type MutationRetryAutodeckJobArgs = {
   jobId?: Maybe<Scalars['String']>;
 };
+
 
 export type MutationConfirmCreateWorkspaceJobArgs = {
   input?: Maybe<GenerateAutodeckInput>;
 };
 
+
 export type MutationWhitifyImageArgs = {
   input?: Maybe<AdjustedImageInput>;
 };
 
+
 export type MutationRemovePixelRangeArgs = {
   input?: Maybe<RemovePixelRangeInput>;
 };
+
 
 export type MutationUploadJobImageArgs = {
   file?: Maybe<Scalars['Upload']>;
@@ -1193,6 +1213,7 @@ export type MutationUploadJobImageArgs = {
   type?: Maybe<UploadImageEnumType>;
   disapproved?: Maybe<Scalars['Boolean']>;
 };
+
 
 export type MutationUpdateCreateWorkspaceJobArgs = {
   id?: Maybe<Scalars['String']>;
@@ -1202,10 +1223,12 @@ export type MutationUpdateCreateWorkspaceJobArgs = {
   errorMessage?: Maybe<Scalars['String']>;
 };
 
+
 export type MutationAssignTagsArgs = {
   dialogueId?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
 };
+
 
 export type MutationCreateTagArgs = {
   name?: Maybe<Scalars['String']>;
@@ -1213,35 +1236,43 @@ export type MutationCreateTagArgs = {
   type?: Maybe<TagTypeEnum>;
 };
 
+
 export type MutationDeleteTagArgs = {
   tagId?: Maybe<Scalars['String']>;
 };
 
-export type MutationCreateBuilderAutomationArgs = {
+
+export type MutationCreateAutomationArgs = {
   input?: Maybe<CreateAutomationInput>;
 };
+
 
 export type MutationUpdateAutomationArgs = {
   input?: Maybe<CreateAutomationInput>;
 };
 
+
 export type MutationCreateCampaignArgs = {
   input?: Maybe<CreateCampaignInputType>;
 };
 
+
 export type MutationCreateBatchDeliveriesArgs = {
   input?: Maybe<CreateBatchDeliveriesInputType>;
 };
+
 
 export type MutationUpdateDeliveryStatusArgs = {
   deliveryId?: Maybe<Scalars['String']>;
   status?: Maybe<DeliveryStatusEnum>;
 };
 
+
 export type MutationDeleteTriggerArgs = {
   id?: Maybe<Scalars['String']>;
   customerSlug?: Maybe<Scalars['String']>;
 };
+
 
 export type MutationEditTriggerArgs = {
   triggerId?: Maybe<Scalars['String']>;
@@ -1250,63 +1281,78 @@ export type MutationEditTriggerArgs = {
   trigger?: Maybe<TriggerInputType>;
 };
 
+
 export type MutationCreateTriggerArgs = {
   input?: Maybe<CreateTriggerInputType>;
 };
+
 
 export type MutationCreatePermissionArgs = {
   data?: Maybe<PermissionInput>;
 };
 
+
 export type MutationUpdatePermissionsArgs = {
   input?: Maybe<UpdatePermissionsInput>;
 };
 
+
 export type MutationCreateRoleArgs = {
   data?: Maybe<RoleInput>;
 };
+
 
 export type MutationUpdateRolesArgs = {
   roleId?: Maybe<Scalars['String']>;
   permissions?: Maybe<PermissionIdsInput>;
 };
 
+
 export type MutationSingleUploadArgs = {
   file?: Maybe<Scalars['Upload']>;
 };
+
 
 export type MutationCreateWorkspaceArgs = {
   input?: Maybe<CreateWorkspaceInput>;
 };
 
+
 export type MutationEditWorkspaceArgs = {
   input?: Maybe<EditWorkspaceInput>;
 };
+
 
 export type MutationDeleteCustomerArgs = {
   where?: Maybe<CustomerWhereUniqueInput>;
 };
 
+
 export type MutationHandleUserStateInWorkspaceArgs = {
   input?: Maybe<HandleUserStateInWorkspaceInput>;
 };
+
 
 export type MutationEditUserArgs = {
   userId?: Maybe<Scalars['String']>;
   input?: Maybe<EditUserInput>;
 };
 
+
 export type MutationDeleteUserArgs = {
   input?: Maybe<DeleteUserInput>;
 };
+
 
 export type MutationCopyDialogueArgs = {
   input?: Maybe<CreateDialogueInputType>;
 };
 
+
 export type MutationCreateDialogueArgs = {
   input?: Maybe<CreateDialogueInputType>;
 };
+
 
 export type MutationEditDialogueArgs = {
   customerSlug?: Maybe<Scalars['String']>;
@@ -1321,69 +1367,86 @@ export type MutationEditDialogueArgs = {
   dialogueFinisherSubheading?: Maybe<Scalars['String']>;
 };
 
+
 export type MutationDeleteDialogueArgs = {
   input?: Maybe<DeleteDialogueInputType>;
 };
+
 
 export type MutationUploadUpsellImageArgs = {
   input?: Maybe<UploadSellImageInputType>;
 };
 
+
 export type MutationAuthenticateLambdaArgs = {
   input?: Maybe<AuthenticateLambdaInput>;
 };
+
 
 export type MutationCreateAutomationTokenArgs = {
   email?: Maybe<Scalars['String']>;
 };
 
+
 export type MutationRegisterArgs = {
   input?: Maybe<RegisterInput>;
 };
+
 
 export type MutationVerifyUserTokenArgs = {
   token?: Maybe<Scalars['String']>;
 };
 
+
 export type MutationRequestInviteArgs = {
   input?: Maybe<RequestInviteInput>;
 };
+
 
 export type MutationInviteUserArgs = {
   input?: Maybe<InviteUserInput>;
 };
 
+
 export type MutationCreateSessionArgs = {
   input?: Maybe<SessionInput>;
 };
+
 
 export type MutationAppendToInteractionArgs = {
   input?: Maybe<AppendToInteractionInput>;
 };
 
+
 export type MutationDuplicateQuestionArgs = {
   questionId?: Maybe<Scalars['String']>;
 };
+
 
 export type MutationDeleteQuestionArgs = {
   input?: Maybe<DeleteNodeInputType>;
 };
 
+
 export type MutationCreateQuestionArgs = {
   input?: Maybe<CreateQuestionNodeInputType>;
 };
+
 
 export type MutationDeleteCtaArgs = {
   input?: Maybe<DeleteNodeInputType>;
 };
 
+
 export type MutationCreateCtaArgs = {
   input?: Maybe<CreateCtaInputType>;
 };
 
+
 export type MutationUpdateCtaArgs = {
   input?: Maybe<UpdateCtaInputType>;
 };
+
 
 export type MutationUpdateQuestionArgs = {
   input?: Maybe<UpdateQuestionNodeInputType>;
@@ -1433,7 +1496,7 @@ export type NodeEntryValue = {
 export enum OperandType {
   String = 'STRING',
   Int = 'INT',
-  DateTime = 'DATE_TIME',
+  DateTime = 'DATE_TIME'
 }
 
 export type OptionInputType = {
@@ -1465,7 +1528,7 @@ export enum PaginationSearchEnum {
   LastName = 'lastName',
   Email = 'email',
   Title = 'title',
-  PublicTitle = 'publicTitle',
+  PublicTitle = 'publicTitle'
 }
 
 /** Ways to sort a pagination object */
@@ -1484,7 +1547,7 @@ export enum PaginationSortByEnum {
   User = 'user',
   When = 'when',
   ScheduledAt = 'scheduledAt',
-  UpdatedAt = 'updatedAt',
+  UpdatedAt = 'updatedAt'
 }
 
 /** Sorting of pagination (type and whether it ascends) */
@@ -1561,47 +1624,58 @@ export type Query = {
   edge?: Maybe<Edge>;
 };
 
+
 export type QueryGetPreviewDataArgs = {
   id?: Maybe<Scalars['String']>;
 };
+
 
 export type QueryGetJobArgs = {
   id?: Maybe<Scalars['String']>;
 };
 
+
 export type QueryGetAutodeckJobsArgs = {
   filter?: Maybe<PaginationWhereInput>;
 };
 
+
 export type QueryGetAdjustedLogoArgs = {
   input?: Maybe<AdjustedImageInput>;
 };
+
 
 export type QueryTagsArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   dialogueId?: Maybe<Scalars['String']>;
 };
 
+
 export type QueryAutomationArgs = {
   where?: Maybe<GetAutomationInput>;
 };
+
 
 export type QueryAutomationsArgs = {
   where?: Maybe<GetAutomationsByWorkspaceInput>;
 };
 
+
 export type QueryDeliveryArgs = {
   deliveryId?: Maybe<Scalars['String']>;
 };
+
 
 export type QueryTriggerConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
 };
 
+
 export type QueryTriggerArgs = {
   triggerId?: Maybe<Scalars['String']>;
 };
+
 
 export type QueryTriggersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
@@ -1610,47 +1684,58 @@ export type QueryTriggersArgs = {
   filter?: Maybe<PaginationWhereInput>;
 };
 
+
 export type QueryRoleArgs = {
   input?: Maybe<FindRoleInput>;
 };
+
 
 export type QueryRoleConnectionArgs = {
   customerId?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
 };
 
+
 export type QueryCustomerArgs = {
   id?: Maybe<Scalars['ID']>;
   slug?: Maybe<Scalars['String']>;
 };
 
+
 export type QueryUserOfCustomerArgs = {
   input?: Maybe<UserOfCustomerInput>;
 };
+
 
 export type QueryUsersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
 };
 
+
 export type QueryUserArgs = {
   userId?: Maybe<Scalars['String']>;
 };
+
 
 export type QueryDialogueArgs = {
   where?: Maybe<DialogueWhereUniqueInput>;
 };
 
+
 export type QueryDialoguesArgs = {
   filter?: Maybe<DialogueFilterInputType>;
 };
+
 
 export type QuerySessionsArgs = {
   where?: Maybe<SessionWhereUniqueInput>;
 };
 
+
 export type QuerySessionArgs = {
   id?: Maybe<Scalars['String']>;
 };
+
 
 export type QueryEdgeArgs = {
   id?: Maybe<Scalars['String']>;
@@ -1658,7 +1743,7 @@ export type QueryEdgeArgs = {
 
 export enum QuestionAspectType {
   NodeValue = 'NODE_VALUE',
-  AnswerSpeed = 'ANSWER_SPEED',
+  AnswerSpeed = 'ANSWER_SPEED'
 }
 
 /** QuestionConditionScope */
@@ -1704,7 +1789,7 @@ export enum QuestionNodeTypeEnum {
   Textbox = 'TEXTBOX',
   Link = 'LINK',
   Share = 'SHARE',
-  VideoEmbedded = 'VIDEO_EMBEDDED',
+  VideoEmbedded = 'VIDEO_EMBEDDED'
 }
 
 export type QuestionNodeWhereInputType = {
@@ -1736,7 +1821,7 @@ export enum RecurringPeriodType {
   StartOfDay = 'START_OF_DAY',
   EndOfDay = 'END_OF_DAY',
   StartOfWeek = 'START_OF_WEEK',
-  EndOfWeek = 'END_OF_WEEK',
+  EndOfWeek = 'END_OF_WEEK'
 }
 
 export type RefreshAccessTokenOutput = {
@@ -1849,7 +1934,7 @@ export type SessionConnectionFilterInput = {
 
 /** Fields to order SessionConnection by. */
 export enum SessionConnectionOrder {
-  CreatedAt = 'createdAt',
+  CreatedAt = 'createdAt'
 }
 
 /** Sorting of sessionConnection */
@@ -1861,7 +1946,7 @@ export type SessionConnectionOrderByInput = {
 /** Delivery type of session to filter by. */
 export enum SessionDeliveryType {
   Campaigns = 'campaigns',
-  NoCampaigns = 'noCampaigns',
+  NoCampaigns = 'noCampaigns'
 }
 
 /** Input for session */
@@ -1953,6 +2038,8 @@ export type SocialNodeEntryInput = {
 };
 
 export enum SystemPermission {
+  CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
+  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
   CanEditDialogue = 'CAN_EDIT_DIALOGUE',
   CanBuildDialogue = 'CAN_BUILD_DIALOGUE',
@@ -1970,6 +2057,9 @@ export enum SystemPermission {
   CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
   CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
   CanCreateDeliveries = 'CAN_CREATE_DELIVERIES',
+  CanViewAutomations = 'CAN_VIEW_AUTOMATIONS',
+  CanCreateAutomations = 'CAN_CREATE_AUTOMATIONS',
+  CanUpdateAutomations = 'CAN_UPDATE_AUTOMATIONS'
 }
 
 export type Tag = {
@@ -1987,7 +2077,7 @@ export type TagsInputObjectType = {
 export enum TagTypeEnum {
   Default = 'DEFAULT',
   Location = 'LOCATION',
-  Agent = 'AGENT',
+  Agent = 'AGENT'
 }
 
 /** Input type for a textbox node */
@@ -2007,7 +2097,7 @@ export enum TriggerConditionEnum {
   HighThreshold = 'HIGH_THRESHOLD',
   InnerRange = 'INNER_RANGE',
   OuterRange = 'OUTER_RANGE',
-  TextMatch = 'TEXT_MATCH',
+  TextMatch = 'TEXT_MATCH'
 }
 
 export type TriggerConditionInputType = {
@@ -2051,7 +2141,7 @@ export type TriggerInputType = {
 export enum TriggerMediumEnum {
   Email = 'EMAIL',
   Phone = 'PHONE',
-  Both = 'BOTH',
+  Both = 'BOTH'
 }
 
 export type TriggerType = {
@@ -2068,7 +2158,7 @@ export type TriggerType = {
 
 export enum TriggerTypeEnum {
   Question = 'QUESTION',
-  Scheduled = 'SCHEDULED',
+  Scheduled = 'SCHEDULED'
 }
 
 export type UpdateCtaInputType = {
@@ -2101,9 +2191,10 @@ export type UpdateQuestionNodeInputType = {
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
 
+
 export enum UploadImageEnumType {
   Logo = 'LOGO',
-  WebsiteScreenshot = 'WEBSITE_SCREENSHOT',
+  WebsiteScreenshot = 'WEBSITE_SCREENSHOT'
 }
 
 export type UploadSellImageInputType = {
@@ -2139,7 +2230,7 @@ export enum UserConnectionOrder {
   CreatedAt = 'createdAt',
   LastActivity = 'lastActivity',
   Role = 'role',
-  IsActive = 'isActive',
+  IsActive = 'isActive'
 }
 
 /** Sorting of UserConnection */
@@ -2204,7 +2295,7 @@ export type VideoNodeEntryInput = {
 export enum WorkspaceAspectType {
   NrInteractions = 'NR_INTERACTIONS',
   NrVisitors = 'NR_VISITORS',
-  GeneralScore = 'GENERAL_SCORE',
+  GeneralScore = 'GENERAL_SCORE'
 }
 
 /** WorkspaceConditionScope */
@@ -2275,6 +2366,7 @@ export type GetCustomerOfUserQueryVariables = Exact<{
   input?: Maybe<UserOfCustomerInput>;
 }>;
 
+
 export type GetCustomerOfUserQuery = (
   { __typename?: 'Query' }
   & { UserOfCustomer?: Maybe<(
@@ -2305,6 +2397,7 @@ export type GetCustomerOfUserQuery = (
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
+
 export type MeQuery = (
   { __typename?: 'Query' }
   & { me: (
@@ -2328,6 +2421,7 @@ export type UploadUpsellImageMutationVariables = Exact<{
   input?: Maybe<UploadSellImageInputType>;
 }>;
 
+
 export type UploadUpsellImageMutation = (
   { __typename?: 'Mutation' }
   & { uploadUpsellImage?: Maybe<(
@@ -2339,6 +2433,7 @@ export type UploadUpsellImageMutation = (
 export type GetWorkspaceAdminsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
 }>;
+
 
 export type GetWorkspaceAdminsQuery = (
   { __typename?: 'Query' }
@@ -2352,6 +2447,7 @@ export type ConfirmWorkspaceJobMutationVariables = Exact<{
   input?: Maybe<GenerateAutodeckInput>;
 }>;
 
+
 export type ConfirmWorkspaceJobMutation = (
   { __typename?: 'Mutation' }
   & { confirmCreateWorkspaceJob?: Maybe<(
@@ -2364,6 +2460,7 @@ export type CreateWorkspaceJobMutationVariables = Exact<{
   input?: Maybe<GenerateAutodeckInput>;
 }>;
 
+
 export type CreateWorkspaceJobMutation = (
   { __typename?: 'Mutation' }
   & { generateAutodeck?: Maybe<(
@@ -2375,6 +2472,7 @@ export type CreateWorkspaceJobMutation = (
 export type GetAutodeckJobsQueryVariables = Exact<{
   filter?: Maybe<PaginationWhereInput>;
 }>;
+
 
 export type GetAutodeckJobsQuery = (
   { __typename?: 'Query' }
@@ -2405,6 +2503,7 @@ export type UploadJobImageMutationVariables = Exact<{
   disapproved?: Maybe<Scalars['Boolean']>;
 }>;
 
+
 export type UploadJobImageMutation = (
   { __typename?: 'Mutation' }
   & { uploadJobImage?: Maybe<(
@@ -2416,6 +2515,7 @@ export type UploadJobImageMutation = (
 export type RetryAutodeckJobMutationVariables = Exact<{
   jobId?: Maybe<Scalars['String']>;
 }>;
+
 
 export type RetryAutodeckJobMutation = (
   { __typename?: 'Mutation' }
@@ -2429,6 +2529,7 @@ export type GetAdjustedLogoQueryVariables = Exact<{
   input?: Maybe<AdjustedImageInput>;
 }>;
 
+
 export type GetAdjustedLogoQuery = (
   { __typename?: 'Query' }
   & { getAdjustedLogo?: Maybe<(
@@ -2438,6 +2539,7 @@ export type GetAdjustedLogoQuery = (
 );
 
 export type GetJobProcessLocationsQueryVariables = Exact<{ [key: string]: never; }>;
+
 
 export type GetJobProcessLocationsQuery = (
   { __typename?: 'Query' }
@@ -2458,6 +2560,7 @@ export type GetPreviewDataQueryVariables = Exact<{
   id?: Maybe<Scalars['String']>;
 }>;
 
+
 export type GetPreviewDataQuery = (
   { __typename?: 'Query' }
   & { getPreviewData?: Maybe<(
@@ -2469,6 +2572,7 @@ export type GetPreviewDataQuery = (
 export type RemovePixelRangeMutationVariables = Exact<{
   input?: Maybe<RemovePixelRangeInput>;
 }>;
+
 
 export type RemovePixelRangeMutation = (
   { __typename?: 'Mutation' }
@@ -2482,6 +2586,7 @@ export type WhitifyImageMutationVariables = Exact<{
   input?: Maybe<AdjustedImageInput>;
 }>;
 
+
 export type WhitifyImageMutation = (
   { __typename?: 'Mutation' }
   & { whitifyImage?: Maybe<(
@@ -2493,6 +2598,7 @@ export type WhitifyImageMutation = (
 export type CreateBatchDeliveriesMutationVariables = Exact<{
   input?: Maybe<CreateBatchDeliveriesInputType>;
 }>;
+
 
 export type CreateBatchDeliveriesMutation = (
   { __typename?: 'Mutation' }
@@ -2509,6 +2615,7 @@ export type CreateBatchDeliveriesMutation = (
 export type GetDeliveryQueryVariables = Exact<{
   deliveryId?: Maybe<Scalars['String']>;
 }>;
+
 
 export type GetDeliveryQuery = (
   { __typename?: 'Query' }
@@ -2527,6 +2634,7 @@ export type GetWorkspaceCampaignQueryVariables = Exact<{
   campaignId: Scalars['String'];
   deliveryConnectionFilter?: Maybe<DeliveryConnectionFilterInput>;
 }>;
+
 
 export type GetWorkspaceCampaignQuery = (
   { __typename?: 'Query' }
@@ -2575,6 +2683,7 @@ export type CreateCampaignMutationVariables = Exact<{
   input?: Maybe<CreateCampaignInputType>;
 }>;
 
+
 export type CreateCampaignMutation = (
   { __typename?: 'Mutation' }
   & { createCampaign: (
@@ -2586,6 +2695,7 @@ export type CreateCampaignMutation = (
 export type GetWorkspaceCampaignsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
 }>;
+
 
 export type GetWorkspaceCampaignsQuery = (
   { __typename?: 'Query' }
@@ -2607,6 +2717,7 @@ export type GetWorkspaceDialoguesQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   filter?: Maybe<DialogueFilterInputType>;
 }>;
+
 
 export type GetWorkspaceDialoguesQuery = (
   { __typename?: 'Query' }
@@ -2631,6 +2742,7 @@ export type DuplicateQuestionMutationVariables = Exact<{
   questionId?: Maybe<Scalars['String']>;
 }>;
 
+
 export type DuplicateQuestionMutation = (
   { __typename?: 'Mutation' }
   & { duplicateQuestion?: Maybe<(
@@ -2645,6 +2757,7 @@ export type GetDialogueStatisticsQueryVariables = Exact<{
   prevDateFilter?: Maybe<DialogueFilterInputType>;
   statisticsDateFilter?: Maybe<DialogueFilterInputType>;
 }>;
+
 
 export type GetDialogueStatisticsQuery = (
   { __typename?: 'Query' }
@@ -2693,6 +2806,7 @@ export type GetInteractionQueryVariables = Exact<{
   sessionId: Scalars['String'];
 }>;
 
+
 export type GetInteractionQuery = (
   { __typename?: 'Query' }
   & { session?: Maybe<(
@@ -2722,6 +2836,7 @@ export type GetInteractionsQueryQueryVariables = Exact<{
   dialogueSlug?: Maybe<Scalars['String']>;
   sessionsFilter?: Maybe<SessionConnectionFilterInput>;
 }>;
+
 
 export type GetInteractionsQueryQuery = (
   { __typename?: 'Query' }
@@ -2757,6 +2872,7 @@ export type RequestInviteMutationVariables = Exact<{
   input?: Maybe<RequestInviteInput>;
 }>;
 
+
 export type RequestInviteMutation = (
   { __typename?: 'Mutation' }
   & { requestInvite: (
@@ -2768,6 +2884,7 @@ export type RequestInviteMutation = (
 export type DeleteUserMutationVariables = Exact<{
   input: DeleteUserInput;
 }>;
+
 
 export type DeleteUserMutation = (
   { __typename?: 'Mutation' }
@@ -2781,6 +2898,7 @@ export type GetPaginatedUsersQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   filter?: Maybe<UserConnectionFilterInput>;
 }>;
+
 
 export type GetPaginatedUsersQuery = (
   { __typename?: 'Query' }
@@ -2812,6 +2930,7 @@ export type FindRoleByIdQueryVariables = Exact<{
   input?: Maybe<FindRoleInput>;
 }>;
 
+
 export type FindRoleByIdQuery = (
   { __typename?: 'Query' }
   & { role?: Maybe<(
@@ -2823,6 +2942,7 @@ export type FindRoleByIdQuery = (
 export type GetRolesQueryVariables = Exact<{
   id?: Maybe<Scalars['ID']>;
 }>;
+
 
 export type GetRolesQuery = (
   { __typename?: 'Query' }
@@ -2840,6 +2960,7 @@ export type GetUserCustomerFromCustomerQueryVariables = Exact<{
   id: Scalars['ID'];
   userId: Scalars['String'];
 }>;
+
 
 export type GetUserCustomerFromCustomerQuery = (
   { __typename?: 'Query' }
@@ -2863,6 +2984,7 @@ export type HandleUserStateInWorkspaceMutationVariables = Exact<{
   input: HandleUserStateInWorkspaceInput;
 }>;
 
+
 export type HandleUserStateInWorkspaceMutation = (
   { __typename?: 'Mutation' }
   & { handleUserStateInWorkspace: (
@@ -2878,6 +3000,7 @@ export type HandleUserStateInWorkspaceMutation = (
 export type UpdatePermissionsMutationVariables = Exact<{
   input: UpdatePermissionsInput;
 }>;
+
 
 export type UpdatePermissionsMutation = (
   { __typename?: 'Mutation' }
@@ -3015,19 +3138,19 @@ export const GetCustomerOfUserDocument = gql`
  * });
  */
 export function useGetCustomerOfUserQuery(baseOptions?: Apollo.QueryHookOptions<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(GetCustomerOfUserDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(GetCustomerOfUserDocument, options);
+      }
 export function useGetCustomerOfUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(GetCustomerOfUserDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(GetCustomerOfUserDocument, options);
+        }
 export type GetCustomerOfUserQueryHookResult = ReturnType<typeof useGetCustomerOfUserQuery>;
 export type GetCustomerOfUserLazyQueryHookResult = ReturnType<typeof useGetCustomerOfUserLazyQuery>;
 export type GetCustomerOfUserQueryResult = Apollo.QueryResult<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>;
 export function refetchGetCustomerOfUserQuery(variables?: GetCustomerOfUserQueryVariables) {
-  return { query: GetCustomerOfUserDocument, variables };
-}
+      return { query: GetCustomerOfUserDocument, variables: variables }
+    }
 export const MeDocument = gql`
     query me {
   me {
@@ -3069,19 +3192,19 @@ export const MeDocument = gql`
  * });
  */
 export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+      }
 export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+        }
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export function refetchMeQuery(variables?: MeQueryVariables) {
-  return { query: MeDocument, variables };
-}
+      return { query: MeDocument, variables: variables }
+    }
 export const UploadUpsellImageDocument = gql`
     mutation uploadUpsellImage($input: UploadSellImageInputType) {
   uploadUpsellImage(input: $input) {
@@ -3109,9 +3232,9 @@ export type UploadUpsellImageMutationFn = Apollo.MutationFunction<UploadUpsellIm
  * });
  */
 export function useUploadUpsellImageMutation(baseOptions?: Apollo.MutationHookOptions<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>(UploadUpsellImageDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>(UploadUpsellImageDocument, options);
+      }
 export type UploadUpsellImageMutationHookResult = ReturnType<typeof useUploadUpsellImageMutation>;
 export type UploadUpsellImageMutationResult = Apollo.MutationResult<UploadUpsellImageMutation>;
 export type UploadUpsellImageMutationOptions = Apollo.BaseMutationOptions<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>;
@@ -3143,19 +3266,19 @@ export const GetWorkspaceAdminsDocument = gql`
  * });
  */
 export function useGetWorkspaceAdminsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>(GetWorkspaceAdminsDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>(GetWorkspaceAdminsDocument, options);
+      }
 export function useGetWorkspaceAdminsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>(GetWorkspaceAdminsDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>(GetWorkspaceAdminsDocument, options);
+        }
 export type GetWorkspaceAdminsQueryHookResult = ReturnType<typeof useGetWorkspaceAdminsQuery>;
 export type GetWorkspaceAdminsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceAdminsLazyQuery>;
 export type GetWorkspaceAdminsQueryResult = Apollo.QueryResult<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>;
 export function refetchGetWorkspaceAdminsQuery(variables?: GetWorkspaceAdminsQueryVariables) {
-  return { query: GetWorkspaceAdminsDocument, variables };
-}
+      return { query: GetWorkspaceAdminsDocument, variables: variables }
+    }
 export const ConfirmWorkspaceJobDocument = gql`
     mutation confirmWorkspaceJob($input: GenerateAutodeckInput) {
   confirmCreateWorkspaceJob(input: $input) {
@@ -3185,9 +3308,9 @@ export type ConfirmWorkspaceJobMutationFn = Apollo.MutationFunction<ConfirmWorks
  * });
  */
 export function useConfirmWorkspaceJobMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmWorkspaceJobMutation, ConfirmWorkspaceJobMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<ConfirmWorkspaceJobMutation, ConfirmWorkspaceJobMutationVariables>(ConfirmWorkspaceJobDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ConfirmWorkspaceJobMutation, ConfirmWorkspaceJobMutationVariables>(ConfirmWorkspaceJobDocument, options);
+      }
 export type ConfirmWorkspaceJobMutationHookResult = ReturnType<typeof useConfirmWorkspaceJobMutation>;
 export type ConfirmWorkspaceJobMutationResult = Apollo.MutationResult<ConfirmWorkspaceJobMutation>;
 export type ConfirmWorkspaceJobMutationOptions = Apollo.BaseMutationOptions<ConfirmWorkspaceJobMutation, ConfirmWorkspaceJobMutationVariables>;
@@ -3220,9 +3343,9 @@ export type CreateWorkspaceJobMutationFn = Apollo.MutationFunction<CreateWorkspa
  * });
  */
 export function useCreateWorkspaceJobMutation(baseOptions?: Apollo.MutationHookOptions<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>(CreateWorkspaceJobDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>(CreateWorkspaceJobDocument, options);
+      }
 export type CreateWorkspaceJobMutationHookResult = ReturnType<typeof useCreateWorkspaceJobMutation>;
 export type CreateWorkspaceJobMutationResult = Apollo.MutationResult<CreateWorkspaceJobMutation>;
 export type CreateWorkspaceJobMutationOptions = Apollo.BaseMutationOptions<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>;
@@ -3280,19 +3403,19 @@ export const GetAutodeckJobsDocument = gql`
  * });
  */
 export function useGetAutodeckJobsQuery(baseOptions?: Apollo.QueryHookOptions<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>(GetAutodeckJobsDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>(GetAutodeckJobsDocument, options);
+      }
 export function useGetAutodeckJobsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>(GetAutodeckJobsDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>(GetAutodeckJobsDocument, options);
+        }
 export type GetAutodeckJobsQueryHookResult = ReturnType<typeof useGetAutodeckJobsQuery>;
 export type GetAutodeckJobsLazyQueryHookResult = ReturnType<typeof useGetAutodeckJobsLazyQuery>;
 export type GetAutodeckJobsQueryResult = Apollo.QueryResult<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>;
 export function refetchGetAutodeckJobsQuery(variables?: GetAutodeckJobsQueryVariables) {
-  return { query: GetAutodeckJobsDocument, variables };
-}
+      return { query: GetAutodeckJobsDocument, variables: variables }
+    }
 export const UploadJobImageDocument = gql`
     mutation uploadJobImage($file: Upload!, $jobId: String, $type: UploadImageEnumType, $disapproved: Boolean) {
   uploadJobImage(file: $file, jobId: $jobId, type: $type, disapproved: $disapproved) {
@@ -3323,9 +3446,9 @@ export type UploadJobImageMutationFn = Apollo.MutationFunction<UploadJobImageMut
  * });
  */
 export function useUploadJobImageMutation(baseOptions?: Apollo.MutationHookOptions<UploadJobImageMutation, UploadJobImageMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UploadJobImageMutation, UploadJobImageMutationVariables>(UploadJobImageDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UploadJobImageMutation, UploadJobImageMutationVariables>(UploadJobImageDocument, options);
+      }
 export type UploadJobImageMutationHookResult = ReturnType<typeof useUploadJobImageMutation>;
 export type UploadJobImageMutationResult = Apollo.MutationResult<UploadJobImageMutation>;
 export type UploadJobImageMutationOptions = Apollo.BaseMutationOptions<UploadJobImageMutation, UploadJobImageMutationVariables>;
@@ -3358,9 +3481,9 @@ export type RetryAutodeckJobMutationFn = Apollo.MutationFunction<RetryAutodeckJo
  * });
  */
 export function useRetryAutodeckJobMutation(baseOptions?: Apollo.MutationHookOptions<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>(RetryAutodeckJobDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>(RetryAutodeckJobDocument, options);
+      }
 export type RetryAutodeckJobMutationHookResult = ReturnType<typeof useRetryAutodeckJobMutation>;
 export type RetryAutodeckJobMutationResult = Apollo.MutationResult<RetryAutodeckJobMutation>;
 export type RetryAutodeckJobMutationOptions = Apollo.BaseMutationOptions<RetryAutodeckJobMutation, RetryAutodeckJobMutationVariables>;
@@ -3389,19 +3512,19 @@ export const GetAdjustedLogoDocument = gql`
  * });
  */
 export function useGetAdjustedLogoQuery(baseOptions?: Apollo.QueryHookOptions<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>(GetAdjustedLogoDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>(GetAdjustedLogoDocument, options);
+      }
 export function useGetAdjustedLogoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>(GetAdjustedLogoDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>(GetAdjustedLogoDocument, options);
+        }
 export type GetAdjustedLogoQueryHookResult = ReturnType<typeof useGetAdjustedLogoQuery>;
 export type GetAdjustedLogoLazyQueryHookResult = ReturnType<typeof useGetAdjustedLogoLazyQuery>;
 export type GetAdjustedLogoQueryResult = Apollo.QueryResult<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>;
 export function refetchGetAdjustedLogoQuery(variables?: GetAdjustedLogoQueryVariables) {
-  return { query: GetAdjustedLogoDocument, variables };
-}
+      return { query: GetAdjustedLogoDocument, variables: variables }
+    }
 export const GetJobProcessLocationsDocument = gql`
     query getJobProcessLocations {
   getJobProcessLocations {
@@ -3436,19 +3559,19 @@ export const GetJobProcessLocationsDocument = gql`
  * });
  */
 export function useGetJobProcessLocationsQuery(baseOptions?: Apollo.QueryHookOptions<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>(GetJobProcessLocationsDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>(GetJobProcessLocationsDocument, options);
+      }
 export function useGetJobProcessLocationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>(GetJobProcessLocationsDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>(GetJobProcessLocationsDocument, options);
+        }
 export type GetJobProcessLocationsQueryHookResult = ReturnType<typeof useGetJobProcessLocationsQuery>;
 export type GetJobProcessLocationsLazyQueryHookResult = ReturnType<typeof useGetJobProcessLocationsLazyQuery>;
 export type GetJobProcessLocationsQueryResult = Apollo.QueryResult<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>;
 export function refetchGetJobProcessLocationsQuery(variables?: GetJobProcessLocationsQueryVariables) {
-  return { query: GetJobProcessLocationsDocument, variables };
-}
+      return { query: GetJobProcessLocationsDocument, variables: variables }
+    }
 export const GetPreviewDataDocument = gql`
     query getPreviewData($id: String) {
   getPreviewData(id: $id) {
@@ -3476,19 +3599,19 @@ export const GetPreviewDataDocument = gql`
  * });
  */
 export function useGetPreviewDataQuery(baseOptions?: Apollo.QueryHookOptions<GetPreviewDataQuery, GetPreviewDataQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetPreviewDataQuery, GetPreviewDataQueryVariables>(GetPreviewDataDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPreviewDataQuery, GetPreviewDataQueryVariables>(GetPreviewDataDocument, options);
+      }
 export function useGetPreviewDataLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPreviewDataQuery, GetPreviewDataQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetPreviewDataQuery, GetPreviewDataQueryVariables>(GetPreviewDataDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPreviewDataQuery, GetPreviewDataQueryVariables>(GetPreviewDataDocument, options);
+        }
 export type GetPreviewDataQueryHookResult = ReturnType<typeof useGetPreviewDataQuery>;
 export type GetPreviewDataLazyQueryHookResult = ReturnType<typeof useGetPreviewDataLazyQuery>;
 export type GetPreviewDataQueryResult = Apollo.QueryResult<GetPreviewDataQuery, GetPreviewDataQueryVariables>;
 export function refetchGetPreviewDataQuery(variables?: GetPreviewDataQueryVariables) {
-  return { query: GetPreviewDataDocument, variables };
-}
+      return { query: GetPreviewDataDocument, variables: variables }
+    }
 export const RemovePixelRangeDocument = gql`
     mutation removePixelRange($input: RemovePixelRangeInput) {
   removePixelRange(input: $input) {
@@ -3516,9 +3639,9 @@ export type RemovePixelRangeMutationFn = Apollo.MutationFunction<RemovePixelRang
  * });
  */
 export function useRemovePixelRangeMutation(baseOptions?: Apollo.MutationHookOptions<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>(RemovePixelRangeDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>(RemovePixelRangeDocument, options);
+      }
 export type RemovePixelRangeMutationHookResult = ReturnType<typeof useRemovePixelRangeMutation>;
 export type RemovePixelRangeMutationResult = Apollo.MutationResult<RemovePixelRangeMutation>;
 export type RemovePixelRangeMutationOptions = Apollo.BaseMutationOptions<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>;
@@ -3549,9 +3672,9 @@ export type WhitifyImageMutationFn = Apollo.MutationFunction<WhitifyImageMutatio
  * });
  */
 export function useWhitifyImageMutation(baseOptions?: Apollo.MutationHookOptions<WhitifyImageMutation, WhitifyImageMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<WhitifyImageMutation, WhitifyImageMutationVariables>(WhitifyImageDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<WhitifyImageMutation, WhitifyImageMutationVariables>(WhitifyImageDocument, options);
+      }
 export type WhitifyImageMutationHookResult = ReturnType<typeof useWhitifyImageMutation>;
 export type WhitifyImageMutationResult = Apollo.MutationResult<WhitifyImageMutation>;
 export type WhitifyImageMutationOptions = Apollo.BaseMutationOptions<WhitifyImageMutation, WhitifyImageMutationVariables>;
@@ -3586,9 +3709,9 @@ export type CreateBatchDeliveriesMutationFn = Apollo.MutationFunction<CreateBatc
  * });
  */
 export function useCreateBatchDeliveriesMutation(baseOptions?: Apollo.MutationHookOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>(CreateBatchDeliveriesDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>(CreateBatchDeliveriesDocument, options);
+      }
 export type CreateBatchDeliveriesMutationHookResult = ReturnType<typeof useCreateBatchDeliveriesMutation>;
 export type CreateBatchDeliveriesMutationResult = Apollo.MutationResult<CreateBatchDeliveriesMutation>;
 export type CreateBatchDeliveriesMutationOptions = Apollo.BaseMutationOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
@@ -3621,19 +3744,19 @@ ${DeliveryEventFragmentFragmentDoc}`;
  * });
  */
 export function useGetDeliveryQuery(baseOptions?: Apollo.QueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
+      }
 export function useGetDeliveryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
+        }
 export type GetDeliveryQueryHookResult = ReturnType<typeof useGetDeliveryQuery>;
 export type GetDeliveryLazyQueryHookResult = ReturnType<typeof useGetDeliveryLazyQuery>;
 export type GetDeliveryQueryResult = Apollo.QueryResult<GetDeliveryQuery, GetDeliveryQueryVariables>;
 export function refetchGetDeliveryQuery(variables?: GetDeliveryQueryVariables) {
-  return { query: GetDeliveryDocument, variables };
-}
+      return { query: GetDeliveryDocument, variables: variables }
+    }
 export const GetWorkspaceCampaignDocument = gql`
     query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilterInput) {
   customer(slug: $customerSlug) {
@@ -3715,19 +3838,19 @@ export const GetWorkspaceCampaignDocument = gql`
  * });
  */
 export function useGetWorkspaceCampaignQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>(GetWorkspaceCampaignDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>(GetWorkspaceCampaignDocument, options);
+      }
 export function useGetWorkspaceCampaignLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>(GetWorkspaceCampaignDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>(GetWorkspaceCampaignDocument, options);
+        }
 export type GetWorkspaceCampaignQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignQuery>;
 export type GetWorkspaceCampaignLazyQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignLazyQuery>;
 export type GetWorkspaceCampaignQueryResult = Apollo.QueryResult<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>;
 export function refetchGetWorkspaceCampaignQuery(variables?: GetWorkspaceCampaignQueryVariables) {
-  return { query: GetWorkspaceCampaignDocument, variables };
-}
+      return { query: GetWorkspaceCampaignDocument, variables: variables }
+    }
 export const CreateCampaignDocument = gql`
     mutation CreateCampaign($input: CreateCampaignInputType) {
   createCampaign(input: $input) {
@@ -3755,9 +3878,9 @@ export type CreateCampaignMutationFn = Apollo.MutationFunction<CreateCampaignMut
  * });
  */
 export function useCreateCampaignMutation(baseOptions?: Apollo.MutationHookOptions<CreateCampaignMutation, CreateCampaignMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CreateCampaignMutation, CreateCampaignMutationVariables>(CreateCampaignDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateCampaignMutation, CreateCampaignMutationVariables>(CreateCampaignDocument, options);
+      }
 export type CreateCampaignMutationHookResult = ReturnType<typeof useCreateCampaignMutation>;
 export type CreateCampaignMutationResult = Apollo.MutationResult<CreateCampaignMutation>;
 export type CreateCampaignMutationOptions = Apollo.BaseMutationOptions<CreateCampaignMutation, CreateCampaignMutationVariables>;
@@ -3794,19 +3917,19 @@ export const GetWorkspaceCampaignsDocument = gql`
  * });
  */
 export function useGetWorkspaceCampaignsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>(GetWorkspaceCampaignsDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>(GetWorkspaceCampaignsDocument, options);
+      }
 export function useGetWorkspaceCampaignsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>(GetWorkspaceCampaignsDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>(GetWorkspaceCampaignsDocument, options);
+        }
 export type GetWorkspaceCampaignsQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignsQuery>;
 export type GetWorkspaceCampaignsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignsLazyQuery>;
 export type GetWorkspaceCampaignsQueryResult = Apollo.QueryResult<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>;
 export function refetchGetWorkspaceCampaignsQuery(variables?: GetWorkspaceCampaignsQueryVariables) {
-  return { query: GetWorkspaceCampaignsDocument, variables };
-}
+      return { query: GetWorkspaceCampaignsDocument, variables: variables }
+    }
 export const GetWorkspaceDialoguesDocument = gql`
     query GetWorkspaceDialogues($customerSlug: String!, $filter: DialogueFilterInputType) {
   customer(slug: $customerSlug) {
@@ -3851,19 +3974,19 @@ export const GetWorkspaceDialoguesDocument = gql`
  * });
  */
 export function useGetWorkspaceDialoguesQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>(GetWorkspaceDialoguesDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>(GetWorkspaceDialoguesDocument, options);
+      }
 export function useGetWorkspaceDialoguesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>(GetWorkspaceDialoguesDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>(GetWorkspaceDialoguesDocument, options);
+        }
 export type GetWorkspaceDialoguesQueryHookResult = ReturnType<typeof useGetWorkspaceDialoguesQuery>;
 export type GetWorkspaceDialoguesLazyQueryHookResult = ReturnType<typeof useGetWorkspaceDialoguesLazyQuery>;
 export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>;
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
-  return { query: GetWorkspaceDialoguesDocument, variables };
-}
+      return { query: GetWorkspaceDialoguesDocument, variables: variables }
+    }
 export const DuplicateQuestionDocument = gql`
     mutation duplicateQuestion($questionId: String) {
   duplicateQuestion(questionId: $questionId) {
@@ -3891,9 +4014,9 @@ export type DuplicateQuestionMutationFn = Apollo.MutationFunction<DuplicateQuest
  * });
  */
 export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>(DuplicateQuestionDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>(DuplicateQuestionDocument, options);
+      }
 export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
 export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
 export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
@@ -3971,19 +4094,19 @@ export const GetDialogueStatisticsDocument = gql`
  * });
  */
 export function useGetDialogueStatisticsQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>(GetDialogueStatisticsDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>(GetDialogueStatisticsDocument, options);
+      }
 export function useGetDialogueStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>(GetDialogueStatisticsDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>(GetDialogueStatisticsDocument, options);
+        }
 export type GetDialogueStatisticsQueryHookResult = ReturnType<typeof useGetDialogueStatisticsQuery>;
 export type GetDialogueStatisticsLazyQueryHookResult = ReturnType<typeof useGetDialogueStatisticsLazyQuery>;
 export type GetDialogueStatisticsQueryResult = Apollo.QueryResult<GetDialogueStatisticsQuery, GetDialogueStatisticsQueryVariables>;
 export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatisticsQueryVariables) {
-  return { query: GetDialogueStatisticsDocument, variables };
-}
+      return { query: GetDialogueStatisticsDocument, variables: variables }
+    }
 export const GetInteractionDocument = gql`
     query GetInteraction($sessionId: String!) {
   session(id: $sessionId) {
@@ -4024,19 +4147,19 @@ ${DeliveryEventFragmentFragmentDoc}`;
  * });
  */
 export function useGetInteractionQuery(baseOptions: Apollo.QueryHookOptions<GetInteractionQuery, GetInteractionQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetInteractionQuery, GetInteractionQueryVariables>(GetInteractionDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetInteractionQuery, GetInteractionQueryVariables>(GetInteractionDocument, options);
+      }
 export function useGetInteractionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetInteractionQuery, GetInteractionQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetInteractionQuery, GetInteractionQueryVariables>(GetInteractionDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetInteractionQuery, GetInteractionQueryVariables>(GetInteractionDocument, options);
+        }
 export type GetInteractionQueryHookResult = ReturnType<typeof useGetInteractionQuery>;
 export type GetInteractionLazyQueryHookResult = ReturnType<typeof useGetInteractionLazyQuery>;
 export type GetInteractionQueryResult = Apollo.QueryResult<GetInteractionQuery, GetInteractionQueryVariables>;
 export function refetchGetInteractionQuery(variables?: GetInteractionQueryVariables) {
-  return { query: GetInteractionDocument, variables };
-}
+      return { query: GetInteractionDocument, variables: variables }
+    }
 export const GetInteractionsQueryDocument = gql`
     query GetInteractionsQuery($customerSlug: String, $dialogueSlug: String, $sessionsFilter: SessionConnectionFilterInput) {
   customer(slug: $customerSlug) {
@@ -4088,19 +4211,19 @@ export const GetInteractionsQueryDocument = gql`
  * });
  */
 export function useGetInteractionsQueryQuery(baseOptions?: Apollo.QueryHookOptions<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>(GetInteractionsQueryDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>(GetInteractionsQueryDocument, options);
+      }
 export function useGetInteractionsQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>(GetInteractionsQueryDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>(GetInteractionsQueryDocument, options);
+        }
 export type GetInteractionsQueryQueryHookResult = ReturnType<typeof useGetInteractionsQueryQuery>;
 export type GetInteractionsQueryLazyQueryHookResult = ReturnType<typeof useGetInteractionsQueryLazyQuery>;
 export type GetInteractionsQueryQueryResult = Apollo.QueryResult<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>;
 export function refetchGetInteractionsQueryQuery(variables?: GetInteractionsQueryQueryVariables) {
-  return { query: GetInteractionsQueryDocument, variables };
-}
+      return { query: GetInteractionsQueryDocument, variables: variables }
+    }
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {
@@ -4129,9 +4252,9 @@ export type RequestInviteMutationFn = Apollo.MutationFunction<RequestInviteMutat
  * });
  */
 export function useRequestInviteMutation(baseOptions?: Apollo.MutationHookOptions<RequestInviteMutation, RequestInviteMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<RequestInviteMutation, RequestInviteMutationVariables>(RequestInviteDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RequestInviteMutation, RequestInviteMutationVariables>(RequestInviteDocument, options);
+      }
 export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInviteMutation>;
 export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
 export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;
@@ -4162,9 +4285,9 @@ export type DeleteUserMutationFn = Apollo.MutationFunction<DeleteUserMutation, D
  * });
  */
 export function useDeleteUserMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUserMutation, DeleteUserMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, options);
+      }
 export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutation>;
 export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
 export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
@@ -4220,19 +4343,19 @@ export const GetPaginatedUsersDocument = gql`
  * });
  */
 export function useGetPaginatedUsersQuery(baseOptions: Apollo.QueryHookOptions<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(GetPaginatedUsersDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(GetPaginatedUsersDocument, options);
+      }
 export function useGetPaginatedUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(GetPaginatedUsersDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(GetPaginatedUsersDocument, options);
+        }
 export type GetPaginatedUsersQueryHookResult = ReturnType<typeof useGetPaginatedUsersQuery>;
 export type GetPaginatedUsersLazyQueryHookResult = ReturnType<typeof useGetPaginatedUsersLazyQuery>;
 export type GetPaginatedUsersQueryResult = Apollo.QueryResult<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>;
 export function refetchGetPaginatedUsersQuery(variables?: GetPaginatedUsersQueryVariables) {
-  return { query: GetPaginatedUsersDocument, variables };
-}
+      return { query: GetPaginatedUsersDocument, variables: variables }
+    }
 export const FindRoleByIdDocument = gql`
     query findRoleById($input: FindRoleInput) {
   role(input: $input) {
@@ -4262,19 +4385,19 @@ export const FindRoleByIdDocument = gql`
  * });
  */
 export function useFindRoleByIdQuery(baseOptions?: Apollo.QueryHookOptions<FindRoleByIdQuery, FindRoleByIdQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<FindRoleByIdQuery, FindRoleByIdQueryVariables>(FindRoleByIdDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FindRoleByIdQuery, FindRoleByIdQueryVariables>(FindRoleByIdDocument, options);
+      }
 export function useFindRoleByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FindRoleByIdQuery, FindRoleByIdQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<FindRoleByIdQuery, FindRoleByIdQueryVariables>(FindRoleByIdDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FindRoleByIdQuery, FindRoleByIdQueryVariables>(FindRoleByIdDocument, options);
+        }
 export type FindRoleByIdQueryHookResult = ReturnType<typeof useFindRoleByIdQuery>;
 export type FindRoleByIdLazyQueryHookResult = ReturnType<typeof useFindRoleByIdLazyQuery>;
 export type FindRoleByIdQueryResult = Apollo.QueryResult<FindRoleByIdQuery, FindRoleByIdQueryVariables>;
 export function refetchFindRoleByIdQuery(variables?: FindRoleByIdQueryVariables) {
-  return { query: FindRoleByIdDocument, variables };
-}
+      return { query: FindRoleByIdDocument, variables: variables }
+    }
 export const GetRolesDocument = gql`
     query GetRoles($id: ID) {
   customer(id: $id) {
@@ -4304,19 +4427,19 @@ export const GetRolesDocument = gql`
  * });
  */
 export function useGetRolesQuery(baseOptions?: Apollo.QueryHookOptions<GetRolesQuery, GetRolesQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetRolesQuery, GetRolesQueryVariables>(GetRolesDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetRolesQuery, GetRolesQueryVariables>(GetRolesDocument, options);
+      }
 export function useGetRolesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetRolesQuery, GetRolesQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetRolesQuery, GetRolesQueryVariables>(GetRolesDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetRolesQuery, GetRolesQueryVariables>(GetRolesDocument, options);
+        }
 export type GetRolesQueryHookResult = ReturnType<typeof useGetRolesQuery>;
 export type GetRolesLazyQueryHookResult = ReturnType<typeof useGetRolesLazyQuery>;
 export type GetRolesQueryResult = Apollo.QueryResult<GetRolesQuery, GetRolesQueryVariables>;
 export function refetchGetRolesQuery(variables?: GetRolesQueryVariables) {
-  return { query: GetRolesDocument, variables };
-}
+      return { query: GetRolesDocument, variables: variables }
+    }
 export const GetUserCustomerFromCustomerDocument = gql`
     query GetUserCustomerFromCustomer($id: ID!, $userId: String!) {
   customer(id: $id) {
@@ -4356,19 +4479,19 @@ export const GetUserCustomerFromCustomerDocument = gql`
  * });
  */
 export function useGetUserCustomerFromCustomerQuery(baseOptions: Apollo.QueryHookOptions<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>(GetUserCustomerFromCustomerDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>(GetUserCustomerFromCustomerDocument, options);
+      }
 export function useGetUserCustomerFromCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>(GetUserCustomerFromCustomerDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>(GetUserCustomerFromCustomerDocument, options);
+        }
 export type GetUserCustomerFromCustomerQueryHookResult = ReturnType<typeof useGetUserCustomerFromCustomerQuery>;
 export type GetUserCustomerFromCustomerLazyQueryHookResult = ReturnType<typeof useGetUserCustomerFromCustomerLazyQuery>;
 export type GetUserCustomerFromCustomerQueryResult = Apollo.QueryResult<GetUserCustomerFromCustomerQuery, GetUserCustomerFromCustomerQueryVariables>;
 export function refetchGetUserCustomerFromCustomerQuery(variables?: GetUserCustomerFromCustomerQueryVariables) {
-  return { query: GetUserCustomerFromCustomerDocument, variables };
-}
+      return { query: GetUserCustomerFromCustomerDocument, variables: variables }
+    }
 export const HandleUserStateInWorkspaceDocument = gql`
     mutation handleUserStateInWorkspace($input: HandleUserStateInWorkspaceInput!) {
   handleUserStateInWorkspace(input: $input) {
@@ -4399,9 +4522,9 @@ export type HandleUserStateInWorkspaceMutationFn = Apollo.MutationFunction<Handl
  * });
  */
 export function useHandleUserStateInWorkspaceMutation(baseOptions?: Apollo.MutationHookOptions<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>(HandleUserStateInWorkspaceDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>(HandleUserStateInWorkspaceDocument, options);
+      }
 export type HandleUserStateInWorkspaceMutationHookResult = ReturnType<typeof useHandleUserStateInWorkspaceMutation>;
 export type HandleUserStateInWorkspaceMutationResult = Apollo.MutationResult<HandleUserStateInWorkspaceMutation>;
 export type HandleUserStateInWorkspaceMutationOptions = Apollo.BaseMutationOptions<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>;
@@ -4432,9 +4555,9 @@ export type UpdatePermissionsMutationFn = Apollo.MutationFunction<UpdatePermissi
  * });
  */
 export function useUpdatePermissionsMutation(baseOptions?: Apollo.MutationHookOptions<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>(UpdatePermissionsDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>(UpdatePermissionsDocument, options);
+      }
 export type UpdatePermissionsMutationHookResult = ReturnType<typeof useUpdatePermissionsMutation>;
 export type UpdatePermissionsMutationResult = Apollo.MutationResult<UpdatePermissionsMutation>;
 export type UpdatePermissionsMutationOptions = Apollo.BaseMutationOptions<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>;
