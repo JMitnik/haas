@@ -23,6 +23,5 @@ export const AutomationTriggerModel = objectType({
     t.list.field('actions', {
       type: AutomationActionModel,
     });
-
   },
 });

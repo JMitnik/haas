@@ -9,15 +9,16 @@ import {
   AutomationActionType,
   AutomationConditionBuilderType,
 } from '@prisma/client';
+import { isPresent } from 'ts-is-present';
 import { UserInputError } from 'apollo-server-express';
-import { offsetPaginate } from '../general/PaginationHelpers';
 
+
+import { offsetPaginate } from '../general/PaginationHelpers';
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
 import UserService from '../users/UserService';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
 import AutomationConditionBuilderService from './AutomationConditionBuilderService';
-
 import {
   AutomationCondition,
   AutomationTrigger,
@@ -32,7 +33,6 @@ import {
   SetupQuestionCompareDataOutput,
   UpdateAutomationInput,
 } from './AutomationTypes'
-import { isPresent } from 'ts-is-present';
 import { AutomationActionService } from './AutomationActionService';
 
 class AutomationService {
@@ -53,7 +53,7 @@ class AutomationService {
    * @param builderId ID of the root condition builder
    * @returns a boolean indicating whether conditions have passed or not
    */
-  validateConditionBuilder = async (builderId: string) => {
+  validateConditionBuilder = async (builderId: string): Promise<boolean> => {
     const conditionBuilder = await this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
     const destructedData = await this.destructureBuilder(conditionBuilder as BuilderEntry);
     console.log('Destructed data: ', destructedData);
@@ -105,7 +105,9 @@ class AutomationService {
     const conditions = data[isAND ? 'AND' : 'OR'] as (PreValidatedConditions | AutomationCondition)[];
 
     // Check if AND/OR property exist on object storing results
-    const andOrOr = Object.keys(checkedObject).find((property) => property === 'AND' || property === 'OR') as keyof CheckedConditions | undefined;
+    const andOrOr = Object.keys(checkedObject).find((property) => (
+      property === 'AND' || property === 'OR'
+    )) as keyof CheckedConditions | undefined;
 
     // If AND/OR property doesn't exist on object storing result
     // => Add the property with an empty array
@@ -340,9 +342,9 @@ class AutomationService {
    * @returns boolean whether all conditions of an automation trigger pass
    */
   testTriggerConditions = async (automationTrigger: AutomationTrigger) => {
-    const matchedConditionsTriggers = await Promise.all(automationTrigger.conditionBuilder.conditions.map(async (condition) => {
-      return this.testTriggerCondition(condition);
-    }));
+    const matchedConditionsTriggers = await Promise.all(
+      automationTrigger.conditionBuilder.conditions.map(async (condition) => this.testTriggerCondition(condition))
+    );
 
     const successfullyPassedAllConditions = !matchedConditionsTriggers.includes(false);
     return successfullyPassedAllConditions;
@@ -703,7 +705,16 @@ class AutomationService {
     const event: CreateAutomationInput['event'] = this.constructCreateAutomationEventInput(input);
     const actions: CreateAutomationInput['actions'] = this.constructAutomationActionsInput(input);
 
-    return { label, workspaceId, automationType, conditions, event, actions, description: input.description, conditionBuilder }
+    return {
+      label,
+      workspaceId,
+      automationType,
+      conditions,
+      event,
+      actions,
+      description: input.description,
+      conditionBuilder,
+    }
   }
 
   /**
@@ -795,7 +806,6 @@ class AutomationService {
       pageInfo,
     };
   };
-
 }
 
 export default AutomationService;

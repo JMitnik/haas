@@ -1,6 +1,6 @@
-import { objectType } from "@nexus/schema";
+import { objectType } from '@nexus/schema';
 import { AutomationConditionModel } from './AutomationCondition';
-import { AutomationConditionBuilderType } from "./AutomationConditionBuilderType";
+import { AutomationConditionBuilderType } from './AutomationConditionBuilderType';
 
 export const AutomationConditionBuilderModel = objectType({
   name: 'AutomationConditionBuilderModel',
@@ -24,8 +24,7 @@ export const AutomationConditionBuilderModel = objectType({
       resolve(parent, args, ctx) {
         if (!parent.childConditionBuilderId) return null;
         return ctx.services.automationService.findAutomationConditionBuilder(parent.childConditionBuilderId) as any;
-      }
+      },
     });
-
   },
 });
