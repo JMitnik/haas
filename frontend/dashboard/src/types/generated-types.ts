@@ -76,17 +76,27 @@ export enum AutomationActionType {
   Webhook = 'WEBHOOK'
 }
 
-/** AutomationConditionMatchValue */
-export type AutomationConditionMatchValueModel = {
-  __typename?: 'AutomationConditionMatchValueModel';
-  id: Scalars['ID'];
-  createdAt: Scalars['Date'];
-  updatedAt: Scalars['Date'];
-  type: MatchValueType;
-  numberValue?: Maybe<Scalars['Int']>;
-  textValue?: Maybe<Scalars['String']>;
-  dateTimeValue?: Maybe<Scalars['String']>;
+export type AutomationConditionBuilderInput = {
+  id?: Maybe<Scalars['ID']>;
+  type?: Maybe<AutomationConditionBuilderType>;
+  conditions?: Maybe<Array<CreateAutomationCondition>>;
+  childConditionBuilder?: Maybe<AutomationConditionBuilderInput>;
 };
+
+/** AutomationConditionBuilder */
+export type AutomationConditionBuilderModel = {
+  __typename?: 'AutomationConditionBuilderModel';
+  id: Scalars['ID'];
+  childConditionBuilderId?: Maybe<Scalars['String']>;
+  type: AutomationConditionBuilderType;
+  conditions: Array<AutomationConditionModel>;
+  childConditionBuilder?: Maybe<AutomationConditionBuilderModel>;
+};
+
+export enum AutomationConditionBuilderType {
+  And = 'AND',
+  Or = 'OR'
+}
 
 /** AutomationCondition */
 export type AutomationConditionModel = {
@@ -96,12 +106,24 @@ export type AutomationConditionModel = {
   updatedAt: Scalars['Date'];
   scope: AutomationConditionScopeType;
   operator: AutomationConditionOperatorType;
-  matchValues: Array<AutomationConditionMatchValueModel>;
+  operands: Array<AutomationConditionOperandModel>;
   questionScope?: Maybe<QuestionConditionScopeModel>;
   dialogueScope?: Maybe<DialogueConditionScopeModel>;
   workspaceScope?: Maybe<WorkspaceConditionScopeModel>;
   question?: Maybe<QuestionNode>;
   dialogue?: Maybe<Dialogue>;
+};
+
+/** AutomationConditionOperand */
+export type AutomationConditionOperandModel = {
+  __typename?: 'AutomationConditionOperandModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  type: OperandType;
+  numberValue?: Maybe<Scalars['Int']>;
+  textValue?: Maybe<Scalars['String']>;
+  dateTimeValue?: Maybe<Scalars['String']>;
 };
 
 export enum AutomationConditionOperatorType {
@@ -201,7 +223,7 @@ export type AutomationTriggerModel = {
   createdAt: Scalars['Date'];
   updatedAt: Scalars['Date'];
   event: AutomationEventModel;
-  conditions: Array<AutomationConditionModel>;
+  conditionBuilder?: Maybe<AutomationConditionBuilderModel>;
   actions: Array<AutomationActionModel>;
 };
 
@@ -338,25 +360,33 @@ export type ConnectionInterface = {
   pageInfo: PaginationPageInfo;
 };
 
-export type CreateAutomationCondition = {
-  id?: Maybe<Scalars['ID']>;
-  scope?: Maybe<ConditionScopeInput>;
-  operator?: Maybe<AutomationConditionOperatorType>;
-  matchValues?: Maybe<Array<MatchValueInput>>;
-  questionId?: Maybe<Scalars['String']>;
-  dialogueId?: Maybe<Scalars['String']>;
-  workspaceId?: Maybe<Scalars['String']>;
-};
-
-export type CreateAutomationResolverInput = {
+export type CreateAutomationBuilderResolverInput = {
   id?: Maybe<Scalars['ID']>;
   label?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   workspaceId?: Maybe<Scalars['String']>;
   automationType?: Maybe<AutomationType>;
   event?: Maybe<AutomationEventInput>;
-  conditions?: Maybe<Array<CreateAutomationCondition>>;
+  conditionBuilder?: Maybe<AutomationConditionBuilderInput>;
   actions?: Maybe<Array<AutomationActionInput>>;
+};
+
+export type CreateAutomationCondition = {
+  id?: Maybe<Scalars['ID']>;
+  scope?: Maybe<ConditionScopeInput>;
+  operator?: Maybe<AutomationConditionOperatorType>;
+  operands?: Maybe<Array<CreateAutomationOperandInput>>;
+  questionId?: Maybe<Scalars['String']>;
+  dialogueId?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
+};
+
+export type CreateAutomationOperandInput = {
+  id?: Maybe<Scalars['ID']>;
+  operandType?: Maybe<OperandType>;
+  textValue?: Maybe<Scalars['String']>;
+  numberValue?: Maybe<Scalars['Int']>;
+  dateTimeValue?: Maybe<Scalars['String']>;
 };
 
 export type CreateBatchDeliveriesInputType = {
@@ -1086,20 +1116,6 @@ export type LoginOutput = {
   user: UserType;
 };
 
-export type MatchValueInput = {
-  id?: Maybe<Scalars['ID']>;
-  matchValueType?: Maybe<MatchValueType>;
-  textValue?: Maybe<Scalars['String']>;
-  numberValue?: Maybe<Scalars['Int']>;
-  dateTimeValue?: Maybe<Scalars['String']>;
-};
-
-export enum MatchValueType {
-  String = 'STRING',
-  Int = 'INT',
-  DateTime = 'DATE_TIME'
-}
-
 export type Mutation = {
   __typename?: 'Mutation';
   createJobProcessLocation: JobProcessLocation;
@@ -1113,7 +1129,8 @@ export type Mutation = {
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
-  createAutomation: AutomationModel;
+  /** Create a new automation */
+  createBuilderAutomation: AutomationModel;
   updateAutomation: AutomationModel;
   createCampaign: CampaignType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
@@ -1225,13 +1242,13 @@ export type MutationDeleteTagArgs = {
 };
 
 
-export type MutationCreateAutomationArgs = {
-  input?: Maybe<CreateAutomationResolverInput>;
+export type MutationCreateBuilderAutomationArgs = {
+  input?: Maybe<CreateAutomationBuilderResolverInput>;
 };
 
 
 export type MutationUpdateAutomationArgs = {
-  input?: Maybe<CreateAutomationResolverInput>;
+  input?: Maybe<CreateAutomationBuilderResolverInput>;
 };
 
 
@@ -1475,6 +1492,12 @@ export type NodeEntryValue = {
   videoNodeEntry?: Maybe<Scalars['String']>;
   formNodeEntry?: Maybe<FormNodeEntryType>;
 };
+
+export enum OperandType {
+  String = 'STRING',
+  Int = 'INT',
+  DateTime = 'DATE_TIME'
+}
 
 export type OptionInputType = {
   id?: Maybe<Scalars['Int']>;
@@ -2015,8 +2038,6 @@ export type SocialNodeEntryInput = {
 };
 
 export enum SystemPermission {
-  CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
-  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
   CanEditDialogue = 'CAN_EDIT_DIALOGUE',
   CanBuildDialogue = 'CAN_BUILD_DIALOGUE',
@@ -2033,10 +2054,7 @@ export enum SystemPermission {
   CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
   CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
   CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
-  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES',
-  CanViewAutomations = 'CAN_VIEW_AUTOMATIONS',
-  CanCreateAutomations = 'CAN_CREATE_AUTOMATIONS',
-  CanUpdateAutomations = 'CAN_UPDATE_AUTOMATIONS'
+  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES'
 }
 
 export type Tag = {

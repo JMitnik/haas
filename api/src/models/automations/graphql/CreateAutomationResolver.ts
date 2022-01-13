@@ -114,12 +114,15 @@ export const AutomationConditionBuilderInput = inputObjectType({
   name: 'AutomationConditionBuilderInput',
   definition(t) {
     t.id('id', { nullable: true });
+
     t.field('type', {
       type: AutomationConditionBuilderType,
-    })
+    });
+
     t.list.field('conditions', {
       type: CreateAutomationCondition,
     });
+
     t.field('childConditionBuilder', {
       type: AutomationConditionBuilderInput,
       nullable: true,
@@ -180,10 +183,11 @@ export const CreateAutomationBuilderResolverInput = inputObjectType({
 });
 
 export const CreateBuilderAutomationResolver = mutationField('createBuilderAutomation', {
+  description: 'Create a new automation',
   type: AutomationModel,
   args: { input: CreateAutomationBuilderResolverInput },
-  async resolve(parent, args, ctx) {
 
+  async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
 
     const automation = await ctx.services.automationService.createAutomation(args.input);

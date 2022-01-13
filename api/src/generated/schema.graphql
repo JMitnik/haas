@@ -1005,6 +1005,8 @@ type Mutation {
   copyDialogue(input: CreateDialogueInputType): Dialogue!
   createAutomationToken(email: String): String
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
+
+  """Create a new automation"""
   createBuilderAutomation(input: CreateAutomationBuilderResolverInput): AutomationModel!
   createCampaign(input: CreateCampaignInputType): CampaignType!
 
