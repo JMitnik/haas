@@ -85,7 +85,7 @@ class AutomationService {
 
       if (!child) throw new Error('Has childConditioBuilderId but cannot find the entry in DB!');
 
-      // If nested condition builder exist recursively run this function again and add its contents to list 
+      // If nested condition builder exist recursively run this function again and add its contents to list
       const des = await this.destructureBuilder(child);
       dataObj[entry.type].push(des)
     }
@@ -107,7 +107,7 @@ class AutomationService {
     // Check if AND/OR property exist on object storing results
     const andOrOr = Object.keys(checkedObject).find((property) => property === 'AND' || property === 'OR') as keyof CheckedConditions | undefined;
 
-    // If AND/OR property doesn't exist on object storing result 
+    // If AND/OR property doesn't exist on object storing result
     // => Add the property with an empty array
     if (!andOrOr) {
       checkedObject[type] = [];
@@ -175,7 +175,7 @@ class AutomationService {
   /**
   * Sets up the data necessary for comparing choice data with the condition match value
   * @param input object containing data needed to aggregate and operand data.
-  * Object *MUST* contain 2 operands: 
+  * Object *MUST* contain 2 operands:
   * - One of type INT (the amount to check against)
   * - One of type STRING (the option value to check against)
   * @returns an object containing the value to be compared, the match value it should be checked against and total entries
@@ -315,7 +315,7 @@ class AutomationService {
 
   /**
    * Tests a condition of an AutomationTrigger based on its scope
-   * @param condition an AutomationCondition 
+   * @param condition an AutomationCondition
    * @returns boolean. true if condition passes, false if condition fails.
    */
   testTriggerCondition = (condition: AutomationCondition) => {
@@ -513,7 +513,7 @@ class AutomationService {
    * @param input
    * @returns validated CREATE prisma automation actions data list
    */
-  validateAutomationActionsInput = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']): CreateAutomationInput['actions'] => {
+  validateAutomationActionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['actions'] => {
     if (input?.actions?.length === 0) throw new UserInputError('No actions provided for automation!');
 
     input.actions?.forEach((action) => {
@@ -555,7 +555,7 @@ class AutomationService {
    * @returns a validated AutomationAction input list where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructAutomationActionsInput = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']): CreateAutomationInput['actions'] => {
+  constructAutomationActionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['actions'] => {
     const validatedActions = this.validateAutomationActionsInput(input);
     return validatedActions;
   }
@@ -566,7 +566,7 @@ class AutomationService {
    * @returns a validated AutomationCondition input list
    * @throws UserInputError if not all information is required
    */
-  validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
+  validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
     if (input.conditionBuilder?.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
 
     input.conditionBuilder?.conditions?.forEach((condition) => {
@@ -617,7 +617,7 @@ class AutomationService {
       id: input.id || undefined,
       conditions: mappedConditions,
       type: input.type as Required<AutomationConditionBuilderType>,
-      childBuilder: childConditionBuilder
+      childBuilder: childConditionBuilder,
     }
 
     return finalObject;
@@ -629,7 +629,7 @@ class AutomationService {
    * @returns a validated AutomationCondition input list where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']): CreateAutomationInput['conditions'] => {
+  constructCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['conditions'] => {
     const validatedConditions = this.validateCreateAutomationConditionsInput(input) as Required<NexusGenInputs['CreateAutomationCondition'][]>;
 
     const mappedConditions: CreateAutomationInput['conditions'] = validatedConditions?.map((condition) => {
@@ -659,7 +659,7 @@ class AutomationService {
    * @returns a validated AutomationEvent input object where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationEventInput = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']): CreateAutomationInput['event'] => {
+  constructCreateAutomationEventInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['event'] => {
     if (!input.event) throw new UserInputError('No event provided for automation!');
     if (!input.event?.eventType || typeof input.event?.eventType === undefined || input.event?.eventType === null) throw new UserInputError('No event type provided for automation event!');
 
@@ -675,7 +675,7 @@ class AutomationService {
    * @returns a validated Automation input object where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  validateCreateAutomationInput = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']): CreateAutomationInput => {
+  validateCreateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput => {
     if (!input) throw new UserInputError('No input provided create automation with!');
     if (!input.label || typeof input.label === undefined || input.label === null) throw new UserInputError('No label provided for automation!');
 
@@ -690,7 +690,7 @@ class AutomationService {
    * @returns a validated Automation prisma data object
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']): CreateAutomationInput => {
+  constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput => {
     const validatedInput = this.validateCreateAutomationInput(input);
 
     const label: CreateAutomationInput['label'] = validatedInput.label;
@@ -712,7 +712,7 @@ class AutomationService {
    * @returns a validated Automation input object containing all information necessary to update an Automation
    * @throws UserInputError if not all information is required
    */
-  constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']): UpdateAutomationInput => {
+  constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): UpdateAutomationInput => {
     if (!input.id) throw new UserInputError('No ID provided for automation that should be updated!');
 
     const id: UpdateAutomationInput['id'] = input.id;
@@ -726,7 +726,7 @@ class AutomationService {
    * @returns updated Automation (without relationship fields)
    * @throws UserInputError if not all information is required
    */
-  public updateAutomation = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']) => {
+  public updateAutomation = (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to update an automation
     const validatedInput = this.constructUpdateAutomationInput(input);
     return this.automationPrismaAdapter.updateAutomation(validatedInput);
@@ -738,7 +738,7 @@ class AutomationService {
    * @returns created Automation (without relationship fields)
    * @throws UserInputError if not all information is required
    */
-  public createAutomation = (input: NexusGenInputs['CreateAutomationBuilderResolverInput']) => {
+  public createAutomation = (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to create an automation
     const validatedInput = this.constructCreateAutomationInput(input);
     return this.automationPrismaAdapter.createAutomation(validatedInput);

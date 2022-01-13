@@ -1,8 +1,7 @@
-import { objectType } from "@nexus/schema";
+import { objectType } from '@nexus/schema';
 import { AutomationEventModel } from './AutomationEvent';
-import { AutomationConditionModel } from './AutomationCondition';
 import { AutomationActionModel } from './AutomationAction'
-import { AutomationConditionBuilderModel } from "./AutomationConditionBuilder";
+import { AutomationConditionBuilderModel } from './AutomationConditionBuilder';
 
 export const AutomationTriggerModel = objectType({
   name: 'AutomationTriggerModel',

@@ -21,21 +21,21 @@ it('creates automation', async () => {
   const token = AuthService.createUserToken(user.id, 22);
   const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
   const res = await ctx.client.request(`
-    mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-      createBuilderAutomation(input: $input) {
+    mutation createAutomation($input: CreateAutomationInput) {
+      createAutomation(input: $input) {
         id
         label
         type
       }
     }
   `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
-  ).then((data) => data?.createBuilderAutomation);
+  {
+    input: input,
+  },
+  {
+    'Authorization': `Bearer ${token}`,
+  }
+  ).then((data) => data?.createAutomation);
 
   expect(res).toMatchObject({
     type: input.automationType,
@@ -53,20 +53,20 @@ it('unable to create automation when no workspace id is provided', async () => {
 
   try {
     await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
           id
           label
           type
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -85,20 +85,20 @@ it('unable to create automation when no automation label is provided', async () 
 
   try {
     await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
           id
           label
           type
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -117,20 +117,20 @@ it('unable to create automation when no automation type is provided', async () =
 
   try {
     await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
           id
           label
           type
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -149,20 +149,20 @@ it('unable to create automation when no actions are provided', async () => {
 
   try {
     await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
           id
           label
           type
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -181,20 +181,20 @@ it('unable to create automation when no action type is provided for an action', 
 
   try {
     await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
           id
           label
           type
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -213,20 +213,20 @@ it('unable to create automation when no event type is provided for a condition',
 
   try {
     await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
           id
           label
           type
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -245,20 +245,20 @@ it('unable to create automation when no event type is provided for a condition',
 
   try {
     await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
           id
           label
           type
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -278,20 +278,20 @@ it('unable to create automation when no targets are provided for a SEND_SMS acti
 
   try {
     await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
           id
           label
           type
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -316,20 +316,20 @@ it('unable to create automations unauthorized', async () => {
 
   try {
     await ctx.client.request(`
-      mutation createBuilderAutomation($input: CreateAutomationBuilderResolverInput) {
-        createBuilderAutomation(input: $input) {
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
           id
           label
           type
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {

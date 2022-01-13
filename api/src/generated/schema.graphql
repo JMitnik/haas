@@ -321,7 +321,7 @@ interface ConnectionInterface {
   totalPages: Int
 }
 
-input CreateAutomationBuilderResolverInput {
+input CreateAutomationInput {
   actions: [AutomationActionInput!]
   automationType: AutomationType
   conditionBuilder: AutomationConditionBuilderInput
@@ -1003,11 +1003,11 @@ type Mutation {
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
+
+  """Creates a new automation."""
+  createAutomation(input: CreateAutomationInput): AutomationModel!
   createAutomationToken(email: String): String
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
-
-  """Create a new automation"""
-  createBuilderAutomation(input: CreateAutomationBuilderResolverInput): AutomationModel!
   createCampaign(input: CreateCampaignInputType): CampaignType!
 
   """Create Call to Actions"""
@@ -1046,7 +1046,7 @@ type Mutation {
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   singleUpload(file: Upload): ImageType!
-  updateAutomation(input: CreateAutomationBuilderResolverInput): AutomationModel!
+  updateAutomation(input: CreateAutomationInput): AutomationModel!
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!

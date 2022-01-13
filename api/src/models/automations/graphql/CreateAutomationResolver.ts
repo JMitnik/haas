@@ -130,34 +130,8 @@ export const AutomationConditionBuilderInput = inputObjectType({
   },
 });
 
-// export const CreateAutomationResolverInput = inputObjectType({
-//   name: 'CreateAutomationResolverInput',
-//   definition(t) {
-//     // Generic info
-//     t.id('id', { nullable: true });
-//     t.string('label');
-//     t.string('description', { nullable: true });
-//     t.string('workspaceId');
-
-//     // Type of automation (e.g. Trigger, Campaign etc.)
-//     t.field('automationType', { type: AutomationType });
-
-//     // Trigger: event related fields
-//     t.field('event', { type: AutomationEventInput });
-
-//     // Trigger: condition related fields
-//     t.list.field('conditions', { type: CreateAutomationCondition });
-
-//     // Automation Actions
-//     t.list.field('actions', { type: AutomationActionInput });
-
-//     // Trigger:
-//     // TODO: Add fields for Trigger:recurring as wel as Campaign
-//   },
-// });
-
-export const CreateAutomationBuilderResolverInput = inputObjectType({
-  name: 'CreateAutomationBuilderResolverInput',
+export const CreateAutomationInput = inputObjectType({
+  name: 'CreateAutomationInput',
   definition(t) {
     // Generic info
     t.id('id', { nullable: true });
@@ -182,10 +156,10 @@ export const CreateAutomationBuilderResolverInput = inputObjectType({
   },
 });
 
-export const CreateBuilderAutomationResolver = mutationField('createBuilderAutomation', {
-  description: 'Create a new automation',
+export const CreateAutomationResolver = mutationField('createAutomation', {
+  description: 'Creates a new automation.',
   type: AutomationModel,
-  args: { input: CreateAutomationBuilderResolverInput },
+  args: { input: CreateAutomationInput },
 
   async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
