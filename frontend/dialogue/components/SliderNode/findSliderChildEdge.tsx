@@ -1,4 +1,4 @@
-import { Edge } from 'types/helper-types';
+import { Edge } from '../../types/helper-types';
 
 /**
  * Given a slider-value, and a list of Edges, find next Edge.

@@ -2,7 +2,7 @@ import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core'
 import { ThemeProvider } from 'styled-components';
 import React, { useState } from 'react';
 
-import { theme, chakraDefaultTheme } from 'config/Theme/theme';
+import { theme, chakraDefaultTheme } from './theme';
 import DialogueThemer from './DialogueThemer';
 
 /* eslint-disable arrow-body-style */

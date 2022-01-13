@@ -1,12 +1,12 @@
 import create from 'zustand';
 
-import { Dialogue, QuestionNode as QuestionNodeType, SessionEventInput } from 'types/helper-types';
+import { Dialogue, QuestionNode as QuestionNodeType, SessionEventInput } from '../../types/helper-types';
 import {
   SessionEventType,
   SessionEventSliderValueInput,
   SessionEventChoiceValueInput,
   SessionEventFormValueInput,
-} from 'types/generated-types';
+} from '../../types/generated-types';
 
 export interface SliderActionValue {
   value: number;

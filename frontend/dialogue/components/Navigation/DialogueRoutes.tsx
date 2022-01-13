@@ -2,8 +2,8 @@ import { Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { Dialogue, Workspace, SessionEventInput } from 'types/helper-types';
-import { QuestionNodeRenderer } from 'components/QuestionNode/QuestionNodeRenderer';
+import { Dialogue, Workspace, SessionEventInput } from '../../types/helper-types';
+import { QuestionNodeRenderer } from '../QuestionNode/QuestionNodeRenderer';
 
 interface DialogueRouterProps {
   dialogue: Dialogue;

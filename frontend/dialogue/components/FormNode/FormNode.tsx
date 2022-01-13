@@ -7,12 +7,11 @@ import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 
-import { FormNodeField, SessionEventType } from 'types/generated-types';
-import { QuestionNodeProps } from 'components/QuestionNode/QuestionNodeTypes';
-import { NodeLayout } from 'components/QuestionNode/NodeLayout';
-import { QuestionNodeTitle } from 'components/QuestionNode/QuestionNodeStyles';
-import { useSession } from 'components/Session/SessionProvider';
-
+import { FormNodeField, SessionEventType } from '../../types/generated-types';
+import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
+import { NodeLayout } from '../QuestionNode/NodeLayout';
+import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeStyles';
+import { useSession } from '../Session/SessionProvider';
 import * as LS from './FormNodeStyles';
 
 interface FormNodeFormProps {

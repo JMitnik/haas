@@ -1,6 +1,6 @@
-import { Button } from "@chakra-ui/core";
-import { H5 } from "@haas/ui";
-import styled, { css } from "styled-components";
+import { Button } from '@chakra-ui/core';
+import { H5 } from '@haas/ui';
+import styled, { css } from 'styled-components';
 
 type Size = 'sm' | 'md' | 'lg';
 

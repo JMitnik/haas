@@ -10,7 +10,7 @@ interface SliderAnimationStateProps {
   speed: number;
   direction: number;
   position: number;
-  animationJson: object;
+  animationJson: typeof HAASRun | typeof HAASIdle | typeof HAASStopping;
 }
 
 interface AnimationPayload {

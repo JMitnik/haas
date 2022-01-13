@@ -11,8 +11,7 @@ import Lottie from 'react-lottie';
 import React, { useEffect, useRef, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
-import { SliderNodeMarkerType } from 'types/generated-types';
-
+import { SliderNodeMarkerType } from '../../types/generated-types';
 import UnhappyIcon from './icon-unhappy.svg';
 import HappyIcon from './icon-happy.svg';
 import * as LS from './SliderNodeStyles';

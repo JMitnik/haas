@@ -2,8 +2,7 @@ import * as UI from '@haas/ui';
 import { ShoppingCart } from 'react-feather';
 import React from 'react';
 
-import { LinkType } from 'types/generated-types';
-
+import { LinkType } from '../../types/generated-types';
 import * as LS from './UpsellNodeStyles';
 
 interface UpsellNodeProps {

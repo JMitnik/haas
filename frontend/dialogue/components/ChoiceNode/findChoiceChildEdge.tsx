@@ -1,4 +1,4 @@
-import { Choice, Edge } from 'types/helper-types';
+import { Choice, Edge } from '../../types/helper-types';
 
 /**
  * Given a choice-option value, and a list of Edges, find next Edge.

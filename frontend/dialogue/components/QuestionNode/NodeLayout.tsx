@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { ReactNode } from 'react';
 
-import { QuestionNode } from 'types/helper-types'
+import { QuestionNode } from '../../types/helper-types'
 
 interface NodeLayoutProps {
   children: ReactNode;

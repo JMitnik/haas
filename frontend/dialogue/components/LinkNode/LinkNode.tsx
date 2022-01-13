@@ -1,9 +1,8 @@
 import * as UI from '@haas/ui';
 
-import { NodeLayout } from 'components/QuestionNode/NodeLayout';
-import { QuestionNodeTitle } from 'components/QuestionNode/QuestionNodeStyles';
-import { QuestionNodeProps } from 'components/QuestionNode/QuestionNodeTypes';
-
+import { NodeLayout } from '../QuestionNode/NodeLayout';
+import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeStyles';
+import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
 import { LinkItem } from './LinkNodeStyles';
 import UpsellNode from './UpsellNode';
 

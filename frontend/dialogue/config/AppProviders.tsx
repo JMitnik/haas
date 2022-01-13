@@ -2,9 +2,8 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 
-import { SessionProvider } from 'components/Session/SessionProvider';
-import { lang } from 'config/language'
-
+import { lang } from './language'
+import { SessionProvider } from '../components/Session/SessionProvider';
 import ThemeProviders from './Theme/ThemeProviders';
 
 interface AppProvidersProps {

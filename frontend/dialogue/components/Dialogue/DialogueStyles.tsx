@@ -1,12 +1,6 @@
 import styled, { css } from 'styled-components';
 
-interface DialogueContainerProps {
-  // gradientStart: string;
-  // gradientTo: string;
-  // gradientStops: string[];
-}
-
-export const DialogueContainer = styled.div<DialogueContainerProps>`
+export const DialogueContainer = styled.div`
   ${({ theme }) => css`
     height: 100%;
     padding: ${theme.gutter}px 0;

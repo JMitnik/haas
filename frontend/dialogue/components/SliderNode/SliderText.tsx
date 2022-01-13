@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 
-import { SliderNodeMarkerType } from 'types/generated-types';
+import { SliderNodeMarkerType } from '../../types/generated-types';
 
 interface SliderTextProps {
   color: string;

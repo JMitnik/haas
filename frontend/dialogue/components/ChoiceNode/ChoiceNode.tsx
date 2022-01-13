@@ -1,12 +1,11 @@
 import * as UI from '@haas/ui';
 
-import { useEventsStore } from 'components/DialogueEventsStore';
-import { NodeLayout } from 'components/QuestionNode/NodeLayout';
-import { QuestionNodeTitle } from 'components/QuestionNode/QuestionNodeStyles';
-import { QuestionNodeProps } from 'components/QuestionNode/QuestionNodeTypes';
-import { useSession } from 'components/Session/SessionProvider';
-import { SessionEventType } from 'types/generated-types';
-
+import { useEventsStore } from '../DialogueEventsStore';
+import { NodeLayout } from '../QuestionNode/NodeLayout';
+import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeStyles';
+import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
+import { useSession } from '../Session/SessionProvider';
+import { SessionEventType } from '../../types/generated-types';
 import { ChoiceNodeButtonLayout } from './ChoiceNodeButtonLayout';
 import { findChoiceChildEdge } from './findChoiceChildEdge';
 

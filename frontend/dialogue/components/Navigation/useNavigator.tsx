@@ -1,7 +1,7 @@
-import { useNavigate, useNavigationType, useParams } from 'react-router';
+import { useNavigate } from 'react-router';
 
-import { useSession } from 'components/Session/SessionProvider';
-import { QuestionNode } from 'types/helper-types';
+import { useSession } from '../Session/SessionProvider';
+import { QuestionNode } from '../../types/helper-types';
 
 export type StateType = 'Question' | 'CTA' | 'FINISHER';
 

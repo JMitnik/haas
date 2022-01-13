@@ -1,16 +1,15 @@
 import React, { useCallback, useEffect } from 'react'
 import { useNavigationType, useParams } from 'react-router';
 
-import { Dialogue, SessionEventInput } from 'types/helper-types';
-import { useEventsStore } from 'components/DialogueEventsStore/DialogueEventsStore';
-import { QuestionNodeTypeEnum, SessionEventType } from 'types/generated-types';
-import { SliderNode } from 'components/SliderNode/SliderNode';
-import { ChoiceNode } from 'components/ChoiceNode/ChoiceNode';
-import { useSession } from 'components/Session/SessionProvider';
-import { LinkNode } from 'components/LinkNode/LinkNode';
-import FormNode from 'components/FormNode/FormNode';
-import { useNavigator } from 'components/Navigation/useNavigator';
-
+import { Dialogue, SessionEventInput } from '../../types/helper-types';
+import { useEventsStore } from '../DialogueEventsStore/DialogueEventsStore';
+import { QuestionNodeTypeEnum, SessionEventType } from '../../types/generated-types';
+import { SliderNode } from '../SliderNode/SliderNode';
+import { ChoiceNode } from '../ChoiceNode/ChoiceNode';
+import { useSession } from '../Session/SessionProvider';
+import { LinkNode } from '../LinkNode/LinkNode';
+import FormNode from '../FormNode/FormNode';
+import { useNavigator } from '../Navigation/useNavigator';
 import { QuestionNodeProps as GenericQuestionNodeProps, RunActionInput } from './QuestionNodeTypes';
 
 interface QuestionNodeProps {

@@ -3,12 +3,11 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useRef } from 'react';
 
-import { QuestionNodeProps } from 'components/QuestionNode/QuestionNodeTypes';
-import { QuestionNodeContainer, QuestionNodeTitle } from 'components/QuestionNode/QuestionNodeStyles';
-import { useSession } from 'components/Session/SessionProvider';
-import { SessionEventType } from 'types/generated-types';
-import { NodeLayout } from 'components/QuestionNode/NodeLayout';
-
+import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
+import { QuestionNodeContainer, QuestionNodeTitle } from '../QuestionNode/QuestionNodeStyles';
+import { useSession } from '../Session/SessionProvider';
+import { SessionEventType } from '../../types/generated-types';
+import { NodeLayout } from '../QuestionNode/NodeLayout';
 import { findSliderChildEdge } from './findSliderChildEdge';
 import { SliderBunny } from './SliderBunny';
 
