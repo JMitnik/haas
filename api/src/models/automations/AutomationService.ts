@@ -101,7 +101,7 @@ class AutomationService {
   validateConditions = async (data: PreValidatedConditions, checkedObject: CheckedConditions) => {
     const isAND = !!data['AND'];
     const type = isAND ? 'AND' : 'OR' as keyof CheckedConditions;
-    const conditions = data[isAND ? 'AND' : 'OR'] as (PreValidatedConditions | AutomationCondition)[];
+    const conditions = data[type] as (PreValidatedConditions | AutomationCondition)[];
 
     // Check if AND/OR property exist on object storing results
     const andOrOr = Object.keys(checkedObject).find((property) => (
