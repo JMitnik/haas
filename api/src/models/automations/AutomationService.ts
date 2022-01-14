@@ -65,7 +65,19 @@ class AutomationService {
   };
 
   /**
-   * Structures conditions in builder (and its nested builders) in a format more easily validated
+   * Restructures conditions in builder (and its nested builders) in a format more easily looped over when validating conditions
+   * e.g. 
+   * { 
+   *  AND: [
+   *    condition1,
+   *    {
+   *      OR: [
+   *        condition2,
+   *        condition3
+   *      ]
+   *    }
+   *  ]
+   * }
    * @param dataObj an empty object
    * @param entry an AutomationConditionBuilder entry with conditions and nested conditionBuilder
    * @returns An object containing a list of conditions with either AND/OR as its property as well as nested objects containing conditions
