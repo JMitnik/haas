@@ -45,7 +45,7 @@
     "@typescript-eslint/no-unused-vars": ["warn"],
     "comma-dangle": ["off", "always"],
     "@typescript-eslint/comma-dangle": ["warn", "always-multiline"],
-    "no-console": ["off"],
+    "no-console": ["warn"],
     "quotes": ["warn", "single"],
     "no-fallthrough": ["error"],
     "default-case": ["warn"],

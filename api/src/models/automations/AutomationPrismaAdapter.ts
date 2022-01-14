@@ -1,5 +1,6 @@
 import {
-  AutomationCondition, AutomationConditionScopeType, AutomationType, ConditionPropertyAggregateType, DialogueConditionScope,
+  AutomationCondition, AutomationConditionScopeType, AutomationType,
+  ConditionPropertyAggregateType, DialogueConditionScope,
   Prisma, PrismaClient, QuestionAspect, QuestionConditionScope,
   WorkspaceConditionScope,
 } from '@prisma/client';
@@ -10,7 +11,8 @@ import { NexusGenInputs } from '../../generated/nexus';
 import {
   UpdateAutomationConditionInput, UpdateAutomationInput,
   CreateAutomationInput, CreateScopeDataInput, CreateAutomationConditionScopeInput,
-  CreateAutomationConditionInput, ConditionPropertAggregateInput, CreateConditionBuilderInput, UpdateConditionBuilderInput,
+  CreateAutomationConditionInput, ConditionPropertAggregateInput, CreateConditionBuilderInput,
+  UpdateConditionBuilderInput,
 } from './AutomationTypes';
 
 export class AutomationPrismaAdapter {
@@ -51,9 +53,9 @@ export class AutomationPrismaAdapter {
             },
             dialogue: true,
             question: true,
-          }
-        }
-      }
+          },
+        },
+      },
     })
   };
 
@@ -233,7 +235,7 @@ export class AutomationPrismaAdapter {
                 question: true,
               },
             },
-          }
+          },
         },
         actions: true,
       },
@@ -313,8 +315,8 @@ export class AutomationPrismaAdapter {
                     dialogue: true,
                     question: true,
                   },
-                }
-              }
+                },
+              },
             },
             actions: true,
           },
@@ -390,7 +392,7 @@ export class AutomationPrismaAdapter {
   /**
    * Finds a subset of automations of a workspace using filter boundaries
    * @param workspaceSlug the slug of a workspace
-   * @param filter an filter object 
+   * @param filter an filter object
    * @returns A list of automations
    */
   findPaginatedAutomations = async (workspaceSlug: string, filter?: NexusGenInputs['AutomationConnectionFilterInput'] | null) => {
@@ -450,8 +452,8 @@ export class AutomationPrismaAdapter {
                     dialogue: true,
                     question: true,
                   },
-                }
-              }
+                },
+              },
             },
             actions: true,
           },
@@ -523,15 +525,26 @@ export class AutomationPrismaAdapter {
     }) | null,
     condition: UpdateAutomationConditionInput,
     checkAgainstScope: AutomationConditionScopeType): { delete: boolean } | undefined => {
-    if (dbCondition?.dialogueScope?.id && checkAgainstScope === AutomationConditionScopeType.DIALOGUE && condition.scope.type !== AutomationConditionScopeType.DIALOGUE) {
+    if (
+      dbCondition?.dialogueScope?.id &&
+      checkAgainstScope === AutomationConditionScopeType.DIALOGUE &&
+      condition.scope.type !== AutomationConditionScopeType.DIALOGUE) {
       return { delete: true };
     }
 
-    if (dbCondition?.questionScope?.id && checkAgainstScope === AutomationConditionScopeType.QUESTION && condition.scope.type !== AutomationConditionScopeType.QUESTION) {
+    if (
+      dbCondition?.questionScope?.id &&
+      checkAgainstScope === AutomationConditionScopeType.QUESTION &&
+      condition.scope.type !== AutomationConditionScopeType.QUESTION
+    ) {
       return { delete: true };
     }
 
-    if (dbCondition?.workspaceScope?.id && checkAgainstScope === AutomationConditionScopeType.WORKSPACE && condition.scope.type !== AutomationConditionScopeType.WORKSPACE) {
+    if (
+      dbCondition?.workspaceScope?.id &&
+      checkAgainstScope === AutomationConditionScopeType.WORKSPACE &&
+      condition.scope.type !== AutomationConditionScopeType.WORKSPACE
+    ) {
       return { delete: true };
     }
 
@@ -671,14 +684,14 @@ export class AutomationPrismaAdapter {
       operands: {
         createMany: {
           data: operands.map((operand) =>
-          (
-            {
-              type: operand.type,
-              textValue: operand.textValue,
-              dateTimeValue: operand.dateTimeValue,
-              numberValue: operand.numberValue,
-            }
-          )),
+            (
+              {
+                type: operand.type,
+                textValue: operand.textValue,
+                dateTimeValue: operand.dateTimeValue,
+                numberValue: operand.numberValue,
+              }
+            )),
         },
       },
       question: questionId ? {
@@ -723,7 +736,9 @@ export class AutomationPrismaAdapter {
    * @param input CreateConditionBuilderInput
    * @returns a prisma CREATE data object for a conditionBuilder
    */
-  constructCreateConditionBuilderData = (input: CreateConditionBuilderInput): Prisma.AutomationConditionBuilderCreateInput => {
+  constructCreateConditionBuilderData = (
+    input: CreateConditionBuilderInput
+  ): Prisma.AutomationConditionBuilderCreateInput => {
     let childBuilder;
 
     if (input.childBuilder) {
@@ -733,7 +748,9 @@ export class AutomationPrismaAdapter {
     return {
       type: input.type,
       conditions: {
-        create: input.conditions?.map((condition) => this.constructCreateAutomationConditionData(condition)) as Prisma.Enumerable<Prisma.AutomationConditionCreateWithoutAutomationConditionBuilderInput>
+        create: input.conditions?.map((condition) => (
+          this.constructCreateAutomationConditionData(condition)
+        )) as Prisma.Enumerable<Prisma.AutomationConditionCreateWithoutAutomationConditionBuilderInput>,
       },
       childConditionBuilder: {
         create: childBuilder,
@@ -749,7 +766,7 @@ export class AutomationPrismaAdapter {
   buildCreateAutomationTriggerData = (
     input: CreateAutomationInput
   ): Prisma.AutomationTriggerCreateWithoutAutomationsInput => {
-    const { event, actions, conditions, conditionBuilder } = input;
+    const { event, actions, conditionBuilder } = input;
 
     return {
       event: {
@@ -792,7 +809,7 @@ export class AutomationPrismaAdapter {
     return this.prisma.automationCondition.findMany({
       where: {
         automationConditionBuilderId: builderId,
-      }
+      },
     });
   };
 
@@ -801,7 +818,11 @@ export class AutomationPrismaAdapter {
    * @param conditionBuilderId an ID of an AutomationConditionBuilder
    * @param inputConditionIds a list of IDs of conditions still in input
    */
-  removeStaleConditionRelations = async (conditionBuilderId: string, idOverview: { builderIds: string[], conditionIds: string[] }, inputConditionIds: string[]) => {
+  removeStaleConditionRelations = async (
+    conditionBuilderId: string,
+    idOverview: { builderIds: string[]; conditionIds: string[] },
+    inputConditionIds: string[]
+  ) => {
     const dbConditions = await this.findAutomationConditionsByConditionBuilderId(conditionBuilderId);
     const dbConditionIds = dbConditions.map((condition) => condition.id);
     const staleConditionIds = dbConditionIds.filter((conditionId) => !inputConditionIds.includes(conditionId));
@@ -845,9 +866,9 @@ export class AutomationPrismaAdapter {
         OR: {
           id: {
             in: allConditions,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     await this.prisma.automationConditionBuilder.deleteMany({
@@ -864,41 +885,47 @@ export class AutomationPrismaAdapter {
    * @param conditions A list of automation conditions. These can include existing and new automation conditions
    * @returns an object containing a set of prisma-ready objects for either create OR upserting conditions
    */
-  constructUpdateAutomationConditionsData = async (conditions: UpdateConditionBuilderInput['conditions'], isExistingBuilder: boolean, inputConditionIds: string[]):
-    Promise<Prisma.AutomationConditionUpdateManyWithoutAutomationConditionBuilderInput |
+  constructUpdateAutomationConditionsData = async (
+    conditions: UpdateConditionBuilderInput['conditions'],
+    isExistingBuilder: boolean,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    inputConditionIds: string[]
+  ): Promise<Prisma.AutomationConditionUpdateManyWithoutAutomationConditionBuilderInput |
       Prisma.AutomationConditionCreateNestedManyWithoutAutomationConditionBuilderInput> => {
 
     if (isExistingBuilder) {
+      // eslint-disable-next-line max-len
       const upsertConditions: Prisma.Enumerable<Prisma.AutomationConditionUpsertWithWhereUniqueWithoutAutomationConditionBuilderInput>
         = await Promise.all(conditions.map(async (condition) => {
           return {
             where: {
               id: condition?.id || '-1',
             },
-            create: this.constructCreateAutomationConditionData(condition) as Prisma.AutomationConditionCreateWithoutAutomationConditionBuilderInput,
+            create: this.constructCreateAutomationConditionData(
+              condition
+            ) as Prisma.AutomationConditionCreateWithoutAutomationConditionBuilderInput,
             update: await this.constructUpdateAutomationConditionData(condition),
           }
         }));
 
       return {
-        // deleteMany: {
-        //   id: {
-        //     notIn: inputConditionIds,
-        //   },
-        // },
         upsert: upsertConditions,
       }
+
     } else {
       return {
         create: conditions.map((condition) => {
           return this.constructCreateAutomationConditionData(condition)
-        }) as Prisma.Enumerable<Prisma.AutomationConditionCreateManyAutomationConditionBuilderInput>
+        }) as Prisma.Enumerable<Prisma.AutomationConditionCreateManyAutomationConditionBuilderInput>,
       };
     }
   }
 
-  findStaleBuilderRelatedIds = async (conditionBuilder: UpdateConditionBuilderInput, idOverview: { builderIds: string[], conditionIds: string[] }) => {
-    // If there is no nested builder id in input 
+  findStaleBuilderRelatedIds = async (
+    conditionBuilder: UpdateConditionBuilderInput,
+    idOverview: { builderIds: string[]; conditionIds: string[] }
+  ) => {
+    // If there is no nested builder id in input
     // => Check if there is any 'stale' builders in database
     if (!conditionBuilder.childBuilder?.id && conditionBuilder?.id) {
       const builder = await this.prisma.automationConditionBuilder.findUnique({
@@ -909,21 +936,23 @@ export class AutomationPrismaAdapter {
           childConditionBuilder: {
             include: {
               conditions: true,
-            }
+            },
           },
           conditions: {
             select: {
               id: true,
             },
           },
-        }
+        },
       });
       // If there is no child builder in input data but there one exists in db
-      // => Remove stale builder 
+      // => Remove stale builder
       // => (BUT ALSO ALL ITS SHIT LEFTOVERS INCLUDING another childbuilder 🥲)
       if (builder?.childConditionBuilder) {
         idOverview.builderIds.push(builder?.childConditionBuilder.id);
-        const conditionIds = builder.childConditionBuilder.conditions.map((condition) => condition.id).filter(isPresent);
+        const conditionIds = builder.childConditionBuilder.conditions.map(
+          (condition) => condition.id
+        ).filter(isPresent);
         idOverview.conditionIds.push(...conditionIds);
         await this.findStaleBuilderRelatedIds(builder.childConditionBuilder as any, idOverview);
       }
@@ -935,10 +964,14 @@ export class AutomationPrismaAdapter {
   /**
    * Builds an prisma UPDATE data object for an AutomationConditionBuilder
    * @param conditionBuilder the input data
-   * @param isRoot optional variable that checks whether conditionBUilder is a root conditionBuilder 
-   * @returns risma UPDATE data object for an AutomationConditionBuilder
+   * @param isRoot optional variable that checks whether conditionBUilder is a root conditionBuilder
+   * @returns prisma UPDATE data object for an AutomationConditionBuilder
    */
-  buildUpdateAutomationConditionBuilderData = async (conditionBuilder: UpdateConditionBuilderInput, isRoot = true): Promise<Prisma.AutomationConditionBuilderUpdateWithoutAutomationTriggerInput | Prisma.AutomationConditionBuilderCreateWithoutParentConditionBuilderInput> => {
+  buildUpdateAutomationConditionBuilderData = async (
+    conditionBuilder: UpdateConditionBuilderInput,
+    isRoot = true
+  // eslint-disable-next-line max-len
+  ): Promise<Prisma.AutomationConditionBuilderUpdateWithoutAutomationTriggerInput | Prisma.AutomationConditionBuilderCreateWithoutParentConditionBuilderInput> => {
     let childConditionBuilder;
     const isExistingBuilder = (isRoot || !!conditionBuilder.id)
     const inputConditionIds = conditionBuilder.conditions.map((condition) => condition.id).filter(isPresent);
@@ -967,7 +1000,9 @@ export class AutomationPrismaAdapter {
       conditions: updateConditions,
       childConditionBuilder: childConditionBuilder ? {
         // If there is nested condition builder input data and no child builder previously existed => create childBuilder
-        create: !conditionBuilder.childBuilder?.id ? childConditionBuilder as Prisma.AutomationConditionBuilderCreateWithoutAutomationTriggerInput : undefined,
+        create: !conditionBuilder.childBuilder?.id ?
+          childConditionBuilder as Prisma.AutomationConditionBuilderCreateWithoutAutomationTriggerInput :
+          undefined,
         // If there is nested condition builder input data and child builder previously existed => update childBuilder
         update: conditionBuilder.childBuilder?.id ? childConditionBuilder : undefined,
       } : undefined,
@@ -984,7 +1019,6 @@ export class AutomationPrismaAdapter {
 
     const inputActionIds = inputActions.map((action) => action.id).filter(isPresent);
     const updateConditionBuilderData = await this.buildUpdateAutomationConditionBuilderData(conditionBuilder);
-    console.dir(updateConditionBuilderData, { depth: null });
 
     return {
       conditionBuilder: {
@@ -1030,7 +1064,7 @@ export class AutomationPrismaAdapter {
             },
           };
         }),
-      }
+      },
     }
   }
 

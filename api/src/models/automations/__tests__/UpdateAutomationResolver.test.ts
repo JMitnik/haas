@@ -22,7 +22,7 @@ it('updates automation', async () => {
   const token = AuthService.createUserToken(user.id, 22);
   const input = constructValidUpdateAutomationInputData(workspace, dialogue, question, automation);
   const res = await ctx.client.request(`
-    mutation updateAutomation($input: CreateAutomationBuilderResolverInput) {
+    mutation updateAutomation($input: CreateAutomationInput) {
       updateAutomation(input: $input) {
         id
         label
@@ -30,12 +30,12 @@ it('updates automation', async () => {
       }
     }
   `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+  {
+    input: input,
+  },
+  {
+    'Authorization': `Bearer ${token}`,
+  }
   ).then((data) => data?.updateAutomation);
 
   expect(res).toMatchObject({
@@ -55,7 +55,7 @@ it('unable to update automation when no automation id is provided', async () => 
 
   try {
     await ctx.client.request(`
-      mutation updateAutomation($input: CreateAutomationBuilderResolverInput) {
+      mutation updateAutomation($input: CreateAutomationInput) {
         updateAutomation(input: $input) {
           id
           label
@@ -63,12 +63,12 @@ it('unable to update automation when no automation id is provided', async () => 
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -94,7 +94,7 @@ it('unable to create automations unauthorized', async () => {
 
   try {
     await ctx.client.request(`
-      mutation updateAutomation($input: CreateAutomationBuilderResolverInput) {
+      mutation updateAutomation($input: CreateAutomationInput) {
         updateAutomation(input: $input) {
           id
           label
@@ -102,12 +102,12 @@ it('unable to create automations unauthorized', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {

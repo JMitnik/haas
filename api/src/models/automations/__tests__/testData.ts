@@ -171,7 +171,7 @@ export const sliderQuestionCompareDataInput: SetupQuestionCompareDataInput = {
 
 export const constructValidUpdateAutomationInputData = (
   workspace: Customer, dialogue: Dialogue, question: QuestionNode, automation: FullAutomationWithRels
-): NexusGenInputs['CreateAutomationBuilderResolverInput'] => {
+): NexusGenInputs['CreateAutomationInput'] => {
   if (!automation.automationTrigger) throw Error("No automation trigger to be updated provided!");
 
   const { event, actions, conditionBuilder }: AutomationTrigger = automation.automationTrigger;
@@ -341,7 +341,7 @@ export const constructValidCreateAutomationInputData = (
   workspace: Customer,
   dialogue: Dialogue,
   question: QuestionNode
-): NexusGenInputs["CreateAutomationBuilderResolverInput"] => {
+): NexusGenInputs["CreateAutomationInput"] => {
   return {
     "label": "QQ builder",
     "workspaceId": workspace.id,

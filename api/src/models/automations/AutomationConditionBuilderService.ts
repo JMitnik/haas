@@ -1,4 +1,4 @@
-import { CheckedConditions } from "./AutomationTypes";
+import { CheckedConditions } from './AutomationTypes';
 
 export class AutomationConditionBuilderService {
   /**
