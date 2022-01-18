@@ -1,11 +1,11 @@
 import * as UI from '@haas/ui';
-import React, { useState, useEffect } from "react";
 import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
+import React, { useEffect, useState } from 'react';
 
-import { QuestionNodeTypeEnum } from 'types/generated-types';
-import { NodeCellContainer } from 'components/NodeCell/NodeCell';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
+import { NodeCellContainer } from 'components/NodeCell/NodeCell';
+import { QuestionNodeTypeEnum } from 'types/generated-types';
 
 const DropdownOption = (props: any) => {
   const nodeProps = MapNodeToProperties(props.data.type);
@@ -29,7 +29,10 @@ const DropdownOption = (props: any) => {
             <UI.Text>
               {props.label}
             </UI.Text>
-            <UI.MicroLabel bg={nodeProps.bg} color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}>
+            <UI.MicroLabel
+              bg={nodeProps.bg}
+              color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}
+            >
               {props.data.type}
             </UI.MicroLabel>
           </UI.Div>
@@ -39,17 +42,15 @@ const DropdownOption = (props: any) => {
   );
 };
 
-const DropdownSingleValue = (props: any) => {
-  return (
-    <components.SingleValue {...props}>
-      <UI.Flex>
-        <UI.Span color="gray.300">
-          {props?.data?.label}
-        </UI.Span>
-      </UI.Flex>
-    </components.SingleValue>
-  )
-};
+const DropdownSingleValue = (props: any) => (
+  <components.SingleValue {...props}>
+    <UI.Flex>
+      <UI.Span color="gray.300">
+        {props?.data?.label}
+      </UI.Span>
+    </UI.Flex>
+  </components.SingleValue>
+);
 
 export const NodePicker = ({ onChange, onClose, items }: any) => {
   const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
@@ -79,7 +80,8 @@ export const NodePicker = ({ onChange, onClose, items }: any) => {
             <UI.Switch>
               <UI.SwitchItem
                 isActive={!filteredState}
-                onClick={() => setFilteredState(null)}>
+                onClick={() => setFilteredState(null)}
+              >
                 {t('all')}
               </UI.SwitchItem>
               <UI.SwitchItem
@@ -116,17 +118,17 @@ export const NodePicker = ({ onChange, onClose, items }: any) => {
               classNamePrefix="select"
               styles={{
                 menu: () => ({
-                  marginTop: 0
+                  marginTop: 0,
                 }),
                 control: (provided) => ({
                   ...provided,
                   borderWidth: 1,
-                })
+                }),
               }}
             />
           </UI.Div>
         </UI.Div>
       </UI.ListItem>
     </UI.List>
-  )
+  );
 };

@@ -17,7 +17,7 @@ export interface ChoiceProps {
   overrideLeafId: string;
 }
 
-const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
+export const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
   const { t } = useTranslation();
 
   return (
