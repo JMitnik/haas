@@ -155,6 +155,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                             items={formattedCtaNodes}
                             onClose={onClose}
                             onChange={onChange}
+                            questionId={choice.fieldIndex}
                           />
                         )}
                         >

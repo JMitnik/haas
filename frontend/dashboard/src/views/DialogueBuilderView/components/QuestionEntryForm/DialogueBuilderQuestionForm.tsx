@@ -206,11 +206,19 @@ const DialogueBuilderQuestionForm = ({
     },
   });
 
-  const [activeCTAId, setActiveCTAId] = useState<string | undefined>(overrideLeaf?.id);
+  const [activeCTAId, setActiveCTAId] = useState<string | undefined | null>(overrideLeaf?.id);
 
   useEffect(() => {
-    form.setValue('overrideLeaf', setOverrideLeaf(ctaNodes, activeCTAId));
-  }, [ctaNodes, activeCTAId]);
+    // If undefined but there is overrideLeafID => set it as activeId
+    if (typeof activeCTAId === 'undefined' && overrideLeaf?.id) {
+      setActiveCTAId(overrideLeaf?.id);
+    }
+
+    // If there is an activeCTAId set => override the current overrideLeaf with it
+    if (activeCTAId) {
+      form.setValue('overrideLeaf', setOverrideLeaf(ctaNodes, activeCTAId));
+    }
+  }, [ctaNodes, activeCTAId, overrideLeaf, setActiveCTAId]);
 
   const toast = useToast();
   const [activeQuestionType, setActiveQuestionType] = useState(type);
@@ -694,7 +702,6 @@ const DialogueBuilderQuestionForm = ({
                                 render={({ value, onChange }) => (
                                   <Dropdown renderOverlay={({ onClose }) => (
                                     <NodePicker
-                                      // FIXME: How can we add a newly create CTA to a question which doesn't exist yet
                                       questionId={question.id}
                                       items={formattedCtaNodes}
                                       onClose={onClose}
@@ -735,6 +742,7 @@ const DialogueBuilderQuestionForm = ({
                               <UI.Button
                                 onClick={() => {
                                   form.setValue('overrideLeaf', null);
+                                  setActiveCTAId(null);
                                 }}
                                 size="sm"
                                 variantColor="red"
