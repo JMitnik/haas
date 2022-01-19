@@ -72,6 +72,7 @@ export interface NexusGenInputs {
     dialogueSlug?: string | null; // String
     form?: NexusGenInputs['FormNodeInputType'] | null; // FormNodeInputType
     links?: NexusGenInputs['CTALinksInputType'] | null; // CTALinksInputType
+    questionId?: string | null; // String
     share?: NexusGenInputs['ShareNodeInputType'] | null; // ShareNodeInputType
     title?: string | null; // String
     type?: string | null; // String

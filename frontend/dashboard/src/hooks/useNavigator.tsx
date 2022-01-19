@@ -15,6 +15,8 @@ export const ROUTES = {
   ROLE_USER_VIEW: '/dashboard/b/:customerSlug/users/:userId/role/:roleId',
   USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
   ALERTS_OVERVIEW: '/dashboard/b/:customerSlug/triggers',
+  DIALOGUE_BUILDER_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder',
+  NEW_BUILDER_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/:questionId/new-cta',
 };
 
 interface DashboardParams {
@@ -35,6 +37,25 @@ export const useNavigator = () => {
 
   const history = useHistory();
   const location = useLocation();
+
+  const goToDialogueBuilderOverview = () => {
+    const path = generatePath(ROUTES.DIALOGUE_BUILDER_OVERVIEW, {
+      customerSlug,
+      dialogueSlug,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToNewBuilderCTAView = (questionId: string) => {
+    const path = generatePath(ROUTES.NEW_BUILDER_CTA_VIEW, {
+      customerSlug,
+      dialogueSlug,
+      questionId,
+    });
+
+    history.push(path + location.search);
+  };
 
   const goToCampaignView = (nextCampaignId: string) => {
     const path = generatePath(ROUTES.CAMPAIGN_VIEW, {
@@ -111,6 +132,8 @@ export const useNavigator = () => {
   });
 
   return {
+    goToDialogueBuilderOverview,
+    goToNewBuilderCTAView,
     goToUsersOverview,
     goToUserView,
     goToRoleUserView,

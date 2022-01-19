@@ -1,4 +1,5 @@
 import * as UI from '@haas/ui';
+import { Plus } from 'react-feather';
 import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
@@ -6,6 +7,9 @@ import React, { useEffect, useState } from 'react';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
 import { NodeCellContainer } from 'components/NodeCell/NodeCell';
 import { QuestionNodeTypeEnum } from 'types/generated-types';
+import { useNavigator } from 'hooks/useNavigator';
+
+import { NewCTAButton } from './NodePickerStyles';
 
 const DropdownOption = (props: any) => {
   const nodeProps = MapNodeToProperties(props.data.type);
@@ -52,9 +56,10 @@ const DropdownSingleValue = (props: any) => (
   </components.SingleValue>
 );
 
-export const NodePicker = ({ onChange, onClose, items }: any) => {
+export const NodePicker = ({ onChange, onClose, items, questionId }: any) => {
   const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
+  const { goToNewBuilderCTAView } = useNavigator();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -68,7 +73,19 @@ export const NodePicker = ({ onChange, onClose, items }: any) => {
   return (
     <UI.List maxWidth={300}>
       <UI.CloseButton onClose={onClose} />
-      <UI.ListHeader>{t('call_to_action')}</UI.ListHeader>
+      <UI.Flex alignItems="baseline">
+        <UI.ListHeader>{t('call_to_action')}</UI.ListHeader>
+        <UI.Button
+          leftIcon={Plus}
+          variantColor="teal"
+          ml={0}
+          size="xs"
+          onClick={() => goToNewBuilderCTAView(questionId)}
+        >
+          New
+        </UI.Button>
+      </UI.Flex>
+
       <UI.ListItem
         variant="gray"
         hasNoSelect

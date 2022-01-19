@@ -12,6 +12,21 @@ class QuestionNodePrismaAdapter {
     this.prisma = prismaClient;
   }
 
+  connectCTANodeToQuestion = async (questionId: string, ctaId: string) => {
+    return this.prisma.questionNode.update({
+      where: {
+        id: questionId,
+      },
+      data: {
+        overrideLeaf: {
+          connect: {
+            id: ctaId,
+          },
+        },
+      },
+    });
+  }
+
   updateVideoNode(nodeId: string, data: Prisma.VideoEmbeddedNodeUpdateInput): Promise<VideoEmbeddedNode> {
     return this.prisma.videoEmbeddedNode.update({
       where: { id: nodeId },

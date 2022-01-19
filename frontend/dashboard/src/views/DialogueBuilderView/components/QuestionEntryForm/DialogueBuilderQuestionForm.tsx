@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
@@ -7,7 +6,9 @@ import {
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { PlusCircle, Trash } from 'react-feather';
+import { Route, Switch, useLocation } from 'react-router';
 import { debounce } from 'lodash';
 import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
@@ -17,9 +18,9 @@ import Select from 'react-select';
 
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
+import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
@@ -29,6 +30,7 @@ import {
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps,
 } from '../../DialogueBuilderInterfaces';
 import { ChoiceNodeForm } from './ChoiceNodeForm';
+import { NewCTAModalCard } from './NewCTAModalCard';
 import SliderNodeForm from './SliderNodeForm';
 
 interface SliderNodeMarkerProps {
@@ -134,8 +136,11 @@ const createQuestionMutation = gql`
   }
 `;
 
-const setOverrideLeaf = (ctaNodes: CTANode[], overrideLeaf?: OverrideLeafProps) => {
-  const activeLeaf = ctaNodes.find((node) => node.id === overrideLeaf?.id);
+const setOverrideLeaf = (ctaNodes: CTANode[], overrideLeafId?: string) => {
+  console.log('Override leaf ID: ', overrideLeafId);
+  console.log('CTA nodes: ', ctaNodes);
+  const activeLeaf = ctaNodes.find((node) => node.id === overrideLeafId);
+  // console.log('Active leaf: ', activeLeaf);
   if (!activeLeaf) return null;
 
   return { value: activeLeaf.id, label: activeLeaf.title, type: activeLeaf.type };
@@ -160,8 +165,9 @@ const DialogueBuilderQuestionForm = ({
   onScroll,
 }: QuestionEntryFormProps) => {
   const { activeCustomer } = useCustomer();
-  const { customerSlug, dialogueSlug } = useNavigator();
   const { t } = useTranslation();
+  const { customerSlug, dialogueSlug, goToDialogueBuilderOverview } = useNavigator();
+  const location = useLocation();
 
   const sliderNode = {
     id: question.sliderNode?.id,
@@ -185,7 +191,7 @@ const DialogueBuilderQuestionForm = ({
       sliderNode,
       unhappyText: question.sliderNode?.unhappyText,
       happyText: question.sliderNode?.happyText,
-      overrideLeaf: setOverrideLeaf(ctaNodes, overrideLeaf),
+      overrideLeaf: setOverrideLeaf(ctaNodes, overrideLeaf?.id),
       optionsFull: options.map((option) => ({
         id: option.id,
         position: option.position,
@@ -199,6 +205,12 @@ const DialogueBuilderQuestionForm = ({
       })),
     },
   });
+
+  const [activeCTAId, setActiveCTAId] = useState<string | undefined>(overrideLeaf?.id);
+
+  useEffect(() => {
+    form.setValue('overrideLeaf', setOverrideLeaf(ctaNodes, activeCTAId));
+  }, [ctaNodes, activeCTAId]);
 
   const toast = useToast();
   const [activeQuestionType, setActiveQuestionType] = useState(type);
@@ -682,6 +694,8 @@ const DialogueBuilderQuestionForm = ({
                                 render={({ value, onChange }) => (
                                   <Dropdown renderOverlay={({ onClose }) => (
                                     <NodePicker
+                                      // FIXME: How can we add a newly create CTA to a question which doesn't exist yet
+                                      questionId={question.id}
                                       items={formattedCtaNodes}
                                       onClose={onClose}
                                       onChange={onChange}
@@ -722,7 +736,6 @@ const DialogueBuilderQuestionForm = ({
                                 onClick={() => {
                                   form.setValue('overrideLeaf', null);
                                 }}
-                                // TODO: Handle onClick
                                 size="sm"
                                 variantColor="red"
                                 variant="outline"
@@ -832,6 +845,36 @@ const DialogueBuilderQuestionForm = ({
           </UI.Span>
         </UI.Flex>
       </UI.Form>
+      <AnimatePresence>
+        <Switch
+          location={location}
+          key={location.pathname}
+        >
+          <Route
+            path={ROUTES.NEW_BUILDER_CTA_VIEW}
+          >
+            {() => (
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <UI.Modal isOpen onClose={() => goToDialogueBuilderOverview()}>
+                  <NewCTAModalCard
+                    onClose={() => goToDialogueBuilderOverview()}
+                    onSuccess={(newCtaId: string) => {
+                      goToDialogueBuilderOverview();
+                      setActiveCTAId(newCtaId);
+                    }}
+                  // @ts-ignore
+                  />
+                </UI.Modal>
+              </motion.div>
+            )}
+          </Route>
+        </Switch>
+      </AnimatePresence>
     </UI.FormContainer>
 
   );

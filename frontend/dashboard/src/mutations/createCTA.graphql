@@ -1,0 +1,5 @@
+mutation createCTA($input: CreateCTAInputType) {
+    createCTA(input: $input) {
+        id
+    }
+  }

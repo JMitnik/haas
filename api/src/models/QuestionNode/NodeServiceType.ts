@@ -36,6 +36,7 @@ export interface LeafNodeDataEntryProps {
 export interface CreateCTAInputProps {
   dialogueSlug: string,
   customerSlug: string,
+  questionId?: string | null,
   title: string,
   type?: NodeType;
   form?: NexusGenInputs['FormNodeInputType'] | null, // FormNodeInputType
