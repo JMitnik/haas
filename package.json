@@ -48,6 +48,7 @@
         "eslint:api": "yarn workspace @haas/api eslint",
         "eslint:client": "yarn workspace @haas/client eslint",
         "eslint:dashboard": "yarn workspace @haas/dashboard eslint",
+        "dev:prep": "yarn && yarn migrate && yarn seed:basic && yarn gen",
         "gen": "bash scripts/generate.sh",
         "gen:api": "yarn workspace @haas/api gen",
         "gen:api:prisma": "yarn workspace @haas/api gen:prisma",

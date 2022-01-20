@@ -6,10 +6,9 @@ import React, { useEffect, useState } from 'react';
 
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
 import { NodeCellContainer } from 'components/NodeCell/NodeCell';
-import { QuestionNodeTypeEnum } from 'types/generated-types';
-import { useNavigator } from 'hooks/useNavigator';
+import { QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
 
-import { NewCTAButton } from './NodePickerStyles';
+import { NewCTAModalCard } from 'views/DialogueBuilderView/components/QuestionEntryForm/NewCTAModalCard';
 
 const DropdownOption = (props: any) => {
   const nodeProps = MapNodeToProperties(props.data.type);
@@ -56,10 +55,48 @@ const DropdownSingleValue = (props: any) => (
   </components.SingleValue>
 );
 
-export const NodePicker = ({ onChange, onClose, items, goToModal }: any) => {
+interface NodeSelect extends Partial<QuestionNode> {
+  label: string;
+  value: string;
+}
+
+interface NodePickerProps {
+  questionId: string | number;
+  onChange: (node: NodeSelect) => void;
+  items: NodeSelect[];
+  onModalOpen?: () => void;
+  onModalClose?: () => void;
+  onClose?: () => void;
+}
+
+export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose }: NodePickerProps) => {
   const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
   const { t } = useTranslation();
+  const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
+
+  const handleChange = (callToAction: QuestionNode) => {
+    onChange({
+      id: callToAction.id,
+      type: callToAction.type,
+      label: callToAction.title,
+      value: callToAction.id,
+    });
+    setCreateModalIsOpen(false);
+    onClose?.();
+  };
+
+  const handleOpenModal = () => {
+    setCreateModalIsOpen(true);
+  };
+
+  useEffect(() => {
+    if (createModalIsOpen) {
+      onModalOpen?.();
+    } else {
+      onModalClose?.();
+    }
+  }, [createModalIsOpen]);
 
   useEffect(() => {
     if (!filteredState) {
@@ -79,9 +116,9 @@ export const NodePicker = ({ onChange, onClose, items, goToModal }: any) => {
           variantColor="teal"
           ml={0}
           size="xs"
-          onClick={() => goToModal()}
+          onClick={() => handleOpenModal()}
         >
-          New
+          {t('new')}
         </UI.Button>
       </UI.Flex>
 
@@ -145,6 +182,15 @@ export const NodePicker = ({ onChange, onClose, items, goToModal }: any) => {
           </UI.Div>
         </UI.Div>
       </UI.ListItem>
+
+      <UI.Modal isOpen={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
+        <NewCTAModalCard
+          onClose={() => setCreateModalIsOpen(false)}
+          onSuccess={(callToAction: any) => {
+            handleChange(callToAction);
+          }}
+        />
+      </UI.Modal>
     </UI.List>
   );
 };

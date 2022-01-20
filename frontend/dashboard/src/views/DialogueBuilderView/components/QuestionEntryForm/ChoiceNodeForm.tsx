@@ -1,18 +1,16 @@
 import * as UI from '@haas/ui';
 import { ArrowDown, ArrowUp, PlusCircle, Trash } from 'react-feather';
 
-import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
+import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
 import React from 'react';
 
 import {
   CTANode,
-  MappedQuestionOptionProps,
 } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
-import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
 
 export interface ChoiceProps {
@@ -45,7 +43,6 @@ export interface ChoiceNodeFormProps {
 
 export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
   const { t } = useTranslation();
-  const { goToNewOptionsCTAView } = useNavigator();
   const choicesForm = useFieldArray({
     name: 'optionsFull',
     control: form.control,
@@ -64,14 +61,6 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
       overrideLeaf: null,
     });
   };
-
-  // console.log('Choices form: ', choicesForm);
-
-  // const watchOptions = useWatch({
-  //   control: form.control,
-  //   name: 'optionsFull',
-  //   defaultValue: '',
-  // });
 
   return (
     <UI.Div>
@@ -162,15 +151,18 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                       control={form.control}
                       defaultValue={choice.overrideLeaf}
                       render={({ value, onChange }) => (
-                        <Dropdown renderOverlay={({ onClose }) => (
-                          <NodePicker
-                            items={formattedCtaNodes}
-                            onClose={onClose}
-                            onChange={onChange}
-                            goToModal={() => goToNewOptionsCTAView(index)}
-                            questionId={index}
-                          />
-                        )}
+                        <Dropdown
+                          defaultCloseOnClickOutside={false}
+                          renderOverlay={({ onClose, setCloseClickOnOutside }) => (
+                            <NodePicker
+                              items={formattedCtaNodes}
+                              onClose={onClose}
+                              onChange={(data) => onChange(data)}
+                              onModalOpen={() => setCloseClickOnOutside(false)}
+                              onModalClose={() => setCloseClickOnOutside(true)}
+                              questionId={index}
+                            />
+                          )}
                         >
                           {({ onOpen }) => (
                             <UI.Div

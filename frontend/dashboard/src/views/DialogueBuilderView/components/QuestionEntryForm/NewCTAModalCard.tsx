@@ -37,29 +37,6 @@ const initializeCTAType = (type: string) => {
 
 export const NewCTAModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) => {
   const { t } = useTranslation();
-  const [activeCTA, setActiveCTA] = useState<null | string>('active');
-  const [newCTA, setNewCTA] = useState(true);
-  const [cta, setCta] = useState<MappedCTANode | null>(null);
-  const { questionId, optionIndex }: { questionId?: string, optionIndex?: string } = useParams();
-
-  useEffect(() => {
-    if (!newCTA) {
-      onClose();
-    }
-  }, [newCTA]);
-
-  useEffect(() => {
-    if (!activeCTA && questionId) {
-      onSuccess(cta?.value);
-    }
-  }, [activeCTA, questionId]);
-
-  useEffect(() => {
-    if (!activeCTA && optionIndex) {
-      console.log('Should run onSuccess for option Index');
-      onSuccess({ cta, optionIndex });
-    }
-  }, [activeCTA, optionIndex]);
 
   return (
     <UI.ModalCard maxWidth={1200} onClose={onClose}>
@@ -70,16 +47,16 @@ export const NewCTAModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) =>
       </UI.ModalHead>
       <UI.ModalBody>
         <CTAForm
+          onCancel={() => onClose()}
           onDeleteCTA={() => undefined}
           id="-1"
-          onActiveCTAChange={setActiveCTA}
           title=""
           type={initializeCTAType('FORM')}
           links={[]}
           share={{ title: '', url: '', tooltip: '' }}
-          onNewCTAChange={setNewCTA}
+          onSuccess={(data) => onSuccess(data)}
+          onNewCTAChange={() => {}}
           form={{}}
-          onCTAIdFetch={setCta}
         />
       </UI.ModalBody>
     </UI.ModalCard>

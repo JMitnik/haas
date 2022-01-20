@@ -49,9 +49,11 @@ interface CTAFormProps {
   type: { label: string, value: string };
   share: ShareProps | null;
   form: any;
-  onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
-  onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
+  onActiveCTAChange?: React.Dispatch<React.SetStateAction<string | null>>;
+  onNewCTAChange?: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<any>;
+  onSuccess?: (callToAction: any) => void;
+  onCancel?: () => void;
   onCTAIdFetch?: React.Dispatch<React.SetStateAction<MappedCTANode | null>>;
 }
 
@@ -116,12 +118,22 @@ const CTA_TYPES = [
   { label: 'Share', value: 'SHARE', ShareIcon },
 ];
 
+export function stopPropagate(callback: () => void) {
+  return (e: { preventDefault: () => void, stopPropagation: () => void }) => {
+    e.stopPropagation();
+    e.preventDefault();
+    callback();
+  };
+}
+
 const CTAForm = ({
   id,
   title,
   type,
   links,
   share,
+  onSuccess,
+  onCancel,
   onActiveCTAChange,
   onNewCTAChange,
   onDeleteCTA,
@@ -130,7 +142,7 @@ const CTAForm = ({
 }: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
   const { customerSlug, dialogueSlug, questionId } = useParams<
-    { customerSlug: string, dialogueSlug: string, questionId?: string }
+  { customerSlug: string, dialogueSlug: string, questionId?: string }
   >();
 
   const form = useForm<FormDataProps>({
@@ -194,8 +206,9 @@ const CTAForm = ({
         type: data.createCTA.type,
       };
       if (onCTAIdFetch) onCTAIdFetch(CTA);
-      onNewCTAChange(false);
-      onActiveCTAChange(null);
+      onSuccess?.(data?.createCTA);
+      onNewCTAChange?.(false);
+      onActiveCTAChange?.(null);
     },
     onError: (serverError: any) => {
       console.log(serverError);
@@ -214,7 +227,7 @@ const CTAForm = ({
       });
 
       setTimeout(() => {
-        onActiveCTAChange(null);
+        onActiveCTAChange?.(null);
       }, 200);
     },
     onError: (serverError: any) => {
@@ -277,14 +290,16 @@ const CTAForm = ({
 
   const cancelCTA = () => {
     if (id === '-1') {
-      onNewCTAChange(false);
+      onNewCTAChange?.(false);
     }
-    onActiveCTAChange(null);
+    onActiveCTAChange?.(null);
+
+    onCancel?.();
   };
 
   return (
     <FormContainer expandedForm>
-      <Form onSubmit={form.handleSubmit(onSubmit)}>
+      <Form onSubmit={stopPropagate(form.handleSubmit(onSubmit))}>
         <Div>
           <FormSection id="general">
             <Div>
