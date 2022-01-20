@@ -65,6 +65,8 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
     });
   };
 
+  // console.log('Choices form: ', choicesForm);
+
   // const watchOptions = useWatch({
   //   control: form.control,
   //   name: 'optionsFull',

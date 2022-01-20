@@ -155,6 +155,7 @@ interface UseOptionsInput {
 const useOptions = ({ form, options }: UseOptionsInput) => {
   const [activeOptions, setActiveOptions] = useState<MappedQuestionOptionProps[] | null>(null);
   const [activeOptionLeaf, setActiveOptionLeaf] = useState<any>();
+  const [newActiveOptions, setNewActiveOptions] = useState(null);
   const verifiedRef = useRef(false);
 
   useEffect(() => {
@@ -169,7 +170,7 @@ const useOptions = ({ form, options }: UseOptionsInput) => {
       setActiveOptions(options);
     }
 
-    if (activeOptionLeaf) {
+    if (activeOptionLeaf?.newOption) {
       const { targetIndex, newOption } = activeOptionLeaf;
       console.log('NEWWWW OPTION: ', newOption);
       const mappedResult = activeOptions?.map((option, oldIndex) => {
@@ -192,30 +193,26 @@ const useOptions = ({ form, options }: UseOptionsInput) => {
         return option;
       }) || [];
       console.log('mapped result: ', mappedResult);
-      setActiveOptions(mappedResult);
-    }
+      form.setValue('optionsFull', mappedResult);
+      // setActiveOptionLeaf(null);
 
-    // If there is an activeCTAId set => override the current overrideLeaf with it
-    if (activeOptions) {
-      const mappedActiveOptions = activeOptions.map((option) => {
-        if (option?.newOverrideLeaf) {
-          return {
-            id: option.id,
-            value: option.value,
-            position: option.position,
-            publicValue: option.publicValue,
-            overrideLeaf: option.newOverrideLeaf,
-          };
-        }
-        return option;
-      });
-      console.log('Mapped active options: ', mappedActiveOptions);
-      form.setValue('optionsFull', mappedActiveOptions);
-      setActiveOptionLeaf(null);
+      // setActiveOptions((oldOptions) => {
+      //   const clone = _.cloneDeep(oldOptions);
+      //   clone?.splice(targetIndex, 1, newOption);
+      //   console.log(clone);
+      //   return clone;
+      // });
     }
   }, [activeOptions, setActiveOptions, activeOptionLeaf]);
 
-  return { activeOptions, setActiveOptions, setActiveOptionLeaf };
+  // useEffect(() => {
+  //   if (activeOptions) {
+  //     console.log('Hoe vaak hier: ', activeOptions);
+  //     form.setValue('optionsFull', activeOptions);
+  //     setActiveOptionLeaf(null);
+  //   }
+  // }, [activeOptions]);
+  return { activeOptions, setActiveOptionLeaf };
 };
 
 const DialogueBuilderQuestionForm = ({
@@ -264,7 +261,7 @@ const DialogueBuilderQuestionForm = ({
       unhappyText: question.sliderNode?.unhappyText,
       happyText: question.sliderNode?.happyText,
       overrideLeaf: setOverrideLeaf(ctaNodes, overrideLeaf?.id),
-      // optionsFull: options,
+      optionsFull: options,
     },
   });
 
@@ -278,7 +275,7 @@ const DialogueBuilderQuestionForm = ({
     defaultValue: options,
   });
 
-  console.log('CUSTOM HOOK: ', watchOptions);
+  // console.log('CUSTOM HOOK: ', watchOptions);
 
   useEffect(() => {
     // If undefined but there is overrideLeafID => set it as activeId
