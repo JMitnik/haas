@@ -1,17 +1,25 @@
-enum QuestionNodeTypeEnum {
-  Generic = 'GENERIC',
-  Slider = 'SLIDER',
-  Choice = 'CHOICE',
-  Registration = 'REGISTRATION',
-  Form = 'FORM',
-  Textbox = 'TEXTBOX',
-  Link = 'LINK',
-  Share = 'SHARE'
-}
+// enum QuestionNodeTypeEnum {
+//   Generic = 'GENERIC',
+//   Slider = 'SLIDER',
+//   Choice = 'CHOICE',
+//   Registration = 'REGISTRATION',
+//   Form = 'FORM',
+//   Textbox = 'TEXTBOX',
+//   Link = 'LINK',
+//   Share = 'SHARE',
+// }
+
+import { QuestionNodeTypeEnum } from 'types/generated-types';
 
 export interface CTANode {
   id: string;
   title: string;
+  type?: QuestionNodeTypeEnum;
+}
+
+export interface MappedCTANode {
+  label?: string;
+  value?: string;
   type?: QuestionNodeTypeEnum;
 }
 
@@ -34,6 +42,15 @@ export interface QuestionEntryProps {
   children?: EdgeChildProps[];
   options?: QuestionOptionProps[];
   sliderNode?: any;
+}
+
+export interface MappedQuestionOptionProps {
+  id?: number;
+  value: string;
+  publicValue?: string;
+  overrideLeaf?: MappedCTANode;
+  newOverrideLeaf?: MappedCTANode;
+  position?: number;
 }
 
 export interface QuestionOptionProps {

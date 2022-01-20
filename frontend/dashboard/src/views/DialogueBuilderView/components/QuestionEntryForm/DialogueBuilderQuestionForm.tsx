@@ -1,10 +1,11 @@
 import * as UI from '@haas/ui';
+import * as _ from 'lodash';
 import * as yup from 'yup';
 import {
   Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, UseFormMethods, useForm, useWatch } from 'react-hook-form';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { PlusCircle, Trash } from 'react-feather';
@@ -13,11 +14,12 @@ import { debounce } from 'lodash';
 import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Select from 'react-select';
 
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
+import { QuestionNodeTypeEnum } from 'types/generated-types';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -27,6 +29,8 @@ import updateQuestionMutation from 'mutations/updateQuestion';
 import {
   CTANode,
   EdgeConditionProps,
+  MappedCTANode,
+  MappedQuestionOptionProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps,
 } from '../../DialogueBuilderInterfaces';
 import { ChoiceNodeForm } from './ChoiceNodeForm';
@@ -109,11 +113,11 @@ interface QuestionEntryFormProps {
   title: string;
   overrideLeaf?: OverrideLeafProps;
   type: { label: string, value: string };
-  options: QuestionOptionProps[];
+  options: MappedQuestionOptionProps[];
   ctaNodes: CTANode[];
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
   condition: EdgeConditionProps | undefined;
-  parentOptions: QuestionOptionProps[] | undefined;
+  parentOptions: MappedQuestionOptionProps[] | undefined;
   edgeId: string | undefined;
   question: QuestionEntryProps;
   parentQuestionId?: string;
@@ -137,13 +141,81 @@ const createQuestionMutation = gql`
 `;
 
 const setOverrideLeaf = (ctaNodes: CTANode[], overrideLeafId?: string) => {
-  console.log('Override leaf ID: ', overrideLeafId);
-  console.log('CTA nodes: ', ctaNodes);
   const activeLeaf = ctaNodes.find((node) => node.id === overrideLeafId);
-  // console.log('Active leaf: ', activeLeaf);
   if (!activeLeaf) return null;
 
   return { value: activeLeaf.id, label: activeLeaf.title, type: activeLeaf.type };
+};
+
+interface UseOptionsInput {
+  form: UseFormMethods<FormDataProps>;
+  options: MappedQuestionOptionProps[]
+}
+
+const useOptions = ({ form, options }: UseOptionsInput) => {
+  const [activeOptions, setActiveOptions] = useState<MappedQuestionOptionProps[] | null>(null);
+  const [activeOptionLeaf, setActiveOptionLeaf] = useState<any>();
+  const verifiedRef = useRef(false);
+
+  useEffect(() => {
+    console.log('activeOptionLeaf ', activeOptionLeaf);
+    // If undefined but there is overrideLeafID => set it as activeId
+    // if (typeof activeOptions === 'undefined' && options) {
+    //   setActiveOptions(options);
+    // }
+    if (!verifiedRef.current) {
+      console.log('SETTING REFFFFFFFFFFFFF');
+      verifiedRef.current = true;
+      setActiveOptions(options);
+    }
+
+    if (activeOptionLeaf) {
+      const { targetIndex, newOption } = activeOptionLeaf;
+      console.log('NEWWWW OPTION: ', newOption);
+      const mappedResult = activeOptions?.map((option, oldIndex) => {
+        if (oldIndex === targetIndex) {
+          return {
+            id: 1337,
+            value: 'IETS ANDERS',
+            position: undefined,
+            publicValue: 'IETS ANDERS',
+            kaas: {
+              bestaat: 'ofniet?',
+            },
+            overrideLeaf: {
+              label: 'LABEL',
+              type: QuestionNodeTypeEnum.Registration,
+              value: 'VALUE',
+            },
+          };
+        }
+        return option;
+      }) || [];
+      console.log('mapped result: ', mappedResult);
+      setActiveOptions(mappedResult);
+    }
+
+    // If there is an activeCTAId set => override the current overrideLeaf with it
+    if (activeOptions) {
+      const mappedActiveOptions = activeOptions.map((option) => {
+        if (option?.newOverrideLeaf) {
+          return {
+            id: option.id,
+            value: option.value,
+            position: option.position,
+            publicValue: option.publicValue,
+            overrideLeaf: option.newOverrideLeaf,
+          };
+        }
+        return option;
+      });
+      console.log('Mapped active options: ', mappedActiveOptions);
+      form.setValue('optionsFull', mappedActiveOptions);
+      setActiveOptionLeaf(null);
+    }
+  }, [activeOptions, setActiveOptions, activeOptionLeaf]);
+
+  return { activeOptions, setActiveOptions, setActiveOptionLeaf };
 };
 
 const DialogueBuilderQuestionForm = ({
@@ -166,7 +238,7 @@ const DialogueBuilderQuestionForm = ({
 }: QuestionEntryFormProps) => {
   const { activeCustomer } = useCustomer();
   const { t } = useTranslation();
-  const { customerSlug, dialogueSlug, goToDialogueBuilderOverview } = useNavigator();
+  const { customerSlug, dialogueSlug, goToDialogueBuilderOverview, goToNewQuestionCTAView } = useNavigator();
   const location = useLocation();
 
   const sliderNode = {
@@ -192,21 +264,21 @@ const DialogueBuilderQuestionForm = ({
       unhappyText: question.sliderNode?.unhappyText,
       happyText: question.sliderNode?.happyText,
       overrideLeaf: setOverrideLeaf(ctaNodes, overrideLeaf?.id),
-      optionsFull: options.map((option) => ({
-        id: option.id,
-        position: option.position,
-        value: option.value,
-        publicValue: option.publicValue,
-        overrideLeaf: {
-          label: option.overrideLeaf?.title,
-          value: option.overrideLeaf?.id,
-          type: option.overrideLeaf?.type,
-        },
-      })),
+      // optionsFull: options,
     },
   });
 
   const [activeCTAId, setActiveCTAId] = useState<string | undefined | null>(overrideLeaf?.id);
+
+  const { activeOptions, setActiveOptions, setActiveOptionLeaf } = useOptions({ form, options });
+
+  const watchOptions = useWatch({
+    control: form.control,
+    name: 'optionsFull',
+    defaultValue: options,
+  });
+
+  console.log('CUSTOM HOOK: ', watchOptions);
 
   useEffect(() => {
     // If undefined but there is overrideLeafID => set it as activeId
@@ -705,6 +777,7 @@ const DialogueBuilderQuestionForm = ({
                                       questionId={question.id}
                                       items={formattedCtaNodes}
                                       onClose={onClose}
+                                      goToModal={() => goToNewQuestionCTAView(question.id)}
                                       onChange={onChange}
                                     />
                                   )}
@@ -859,7 +932,45 @@ const DialogueBuilderQuestionForm = ({
           key={location.pathname}
         >
           <Route
-            path={ROUTES.NEW_BUILDER_CTA_VIEW}
+            path={ROUTES.NEW_OPTION_CTA_VIEW}
+          >
+            {() => (
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <UI.Modal isOpen onClose={() => goToDialogueBuilderOverview()}>
+                  <NewCTAModalCard
+                    onClose={() => goToDialogueBuilderOverview()}
+                    onSuccess={(data: { cta: MappedCTANode, optionIndex: string }) => {
+                      const { cta, optionIndex } = data;
+                      // eslint-disable-next-line radix
+                      const targetIndex = parseInt(optionIndex);
+
+                      const newOption = {
+                        id: 1337,
+                        value: 'IETS ANDERS',
+                        position: undefined,
+                        publicValue: 'IETS ANDERS',
+                        overrideLeaf: {
+                          label: 'HELP',
+                          type: QuestionNodeTypeEnum.Registration,
+                          value: 'VALUE',
+                        },
+                      };
+                      setActiveOptionLeaf({ targetIndex, newOption });
+                      goToDialogueBuilderOverview();
+                    }}
+
+                  />
+                </UI.Modal>
+              </motion.div>
+            )}
+          </Route>
+          <Route
+            path={ROUTES.NEW_QUESTION_CTA_VIEW}
           >
             {() => (
               <motion.div

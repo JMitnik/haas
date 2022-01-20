@@ -15,7 +15,12 @@ import ShowMoreButton from 'components/ShowMoreButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import useAuth from 'hooks/useAuth';
 
-import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
+import {
+  CTANode,
+  EdgeConditionProps,
+  MappedQuestionOptionProps,
+  QuestionEntryProps,
+} from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
@@ -41,7 +46,7 @@ interface QuestionEntryItemProps {
   onDeleteQuestion?: (event: any, questionId: string) => void;
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
   condition: EdgeConditionProps | undefined;
-  parentOptions: QuestionOptionProps[] | undefined;
+  parentOptions: MappedQuestionOptionProps[] | undefined;
   edgeId: string | undefined;
   parentQuestionId?: string;
   depth: number;
@@ -93,7 +98,7 @@ const QuestionEntryItem = ({ depth,
   parentQuestionId,
   ctaNodes,
   onAddExpandChange,
-  problems } : QuestionEntryItemProps) => {
+  problems }: QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { canAccessAdmin } = useAuth();
@@ -180,6 +185,18 @@ const QuestionEntryItem = ({ depth,
     });
   };
 
+  const mappedOptions = question?.options?.map((option) => ({
+    id: option.id,
+    position: option.position,
+    value: option.value,
+    publicValue: option.publicValue,
+    overrideLeaf: {
+      label: option.overrideLeaf?.title,
+      value: option.overrideLeaf?.id,
+      type: option.overrideLeaf?.type,
+    },
+  })) || [];
+
   return (
     <Flex
       ref={questionRef}
@@ -255,7 +272,7 @@ const QuestionEntryItem = ({ depth,
               isRoot={question.isRoot}
               leafs={leafs}
               ctaNodes={ctaNodes}
-              options={question?.options || []}
+              options={mappedOptions}
               overrideLeaf={question.overrideLeaf}
               type={activeType}
               onActiveQuestionChange={onActiveQuestionChange}

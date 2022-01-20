@@ -6,14 +6,19 @@ import React, { useState } from 'react';
 import SplitArrowIcon from 'components/Icons/SplitIcon';
 
 import { AddQuestionContainer, DepthSpan } from './QuestionEntry/QuestionEntryStyles';
-import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
+import {
+  CTANode,
+  EdgeConditionProps,
+  MappedQuestionOptionProps,
+  QuestionEntryProps,
+} from '../DialogueBuilderInterfaces';
 import { QuestionNodeProblem } from '../DialogueBuilderTypes';
 import { findProblemsInChildCondition } from '../findProblemsInChildConditions';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 
 interface QuestionSectionProps {
   parentQuestionType: string;
-  options: QuestionOptionProps[] | undefined;
+  options: MappedQuestionOptionProps[] | undefined;
   questionsQ: Array<QuestionEntryProps>;
   question: QuestionEntryProps;
   leafs: any;
@@ -59,7 +64,30 @@ const QuestionSection = ({
   const children: QuestionEntryProps[] = questionsQ.filter((childQuestion) => (
     activeChildrenIds?.includes(childQuestion.id)
   ));
-  const parentOptions = question.options;
+
+  // const mappedOptions = options?.map((option) => ({
+  //   id: option.id,
+  //   position: option.position,
+  //   value: option.value,
+  //   publicValue: option.publicValue,
+  //   overrideLeaf: {
+  //     label: option.overrideLeaf?.title,
+  //     value: option.overrideLeaf?.id,
+  //     type: option.overrideLeaf?.type,
+  //   },
+  // })) || [];
+
+  const parentOptions = question?.options?.map((option) => ({
+    id: option.id,
+    position: option.position,
+    value: option.value,
+    publicValue: option.publicValue,
+    overrideLeaf: {
+      label: option.overrideLeaf?.title,
+      value: option.overrideLeaf?.id,
+      type: option.overrideLeaf?.type,
+    },
+  })) || [];
 
   const getConditionOfParentQuestion = (childNodeId: string) => {
     const edge = question.children?.find((child) => childNodeId === child.childNode.id);

@@ -16,7 +16,8 @@ export const ROUTES = {
   USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
   ALERTS_OVERVIEW: '/dashboard/b/:customerSlug/triggers',
   DIALOGUE_BUILDER_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder',
-  NEW_BUILDER_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/:questionId/new-cta',
+  NEW_QUESTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/question/:questionId/new-cta',
+  NEW_OPTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/option/:optionIndex/new-cta',
 };
 
 interface DashboardParams {
@@ -47,8 +48,18 @@ export const useNavigator = () => {
     history.push(path + location.search);
   };
 
-  const goToNewBuilderCTAView = (questionId: string) => {
-    const path = generatePath(ROUTES.NEW_BUILDER_CTA_VIEW, {
+  const goToNewOptionsCTAView = (optionIndex: number) => {
+    const path = generatePath(ROUTES.NEW_OPTION_CTA_VIEW, {
+      customerSlug,
+      dialogueSlug,
+      optionIndex,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToNewQuestionCTAView = (questionId: string) => {
+    const path = generatePath(ROUTES.NEW_QUESTION_CTA_VIEW, {
       customerSlug,
       dialogueSlug,
       questionId,
@@ -132,8 +143,9 @@ export const useNavigator = () => {
   });
 
   return {
+    goToNewOptionsCTAView,
     goToDialogueBuilderOverview,
-    goToNewBuilderCTAView,
+    goToNewQuestionCTAView,
     goToUsersOverview,
     goToUserView,
     goToRoleUserView,

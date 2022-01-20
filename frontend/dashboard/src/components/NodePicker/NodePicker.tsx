@@ -56,10 +56,9 @@ const DropdownSingleValue = (props: any) => (
   </components.SingleValue>
 );
 
-export const NodePicker = ({ onChange, onClose, items, questionId }: any) => {
+export const NodePicker = ({ onChange, onClose, items, goToModal }: any) => {
   const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
-  const { goToNewBuilderCTAView } = useNavigator();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -80,7 +79,7 @@ export const NodePicker = ({ onChange, onClose, items, questionId }: any) => {
           variantColor="teal"
           ml={0}
           size="xs"
-          onClick={() => goToNewBuilderCTAView(questionId)}
+          onClick={() => goToModal()}
         >
           New
         </UI.Button>

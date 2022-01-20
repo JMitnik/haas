@@ -1984,7 +1984,7 @@ export type CreateCtaMutation = (
   { __typename?: 'Mutation' }
   & { createCTA: (
     { __typename?: 'QuestionNode' }
-    & Pick<QuestionNode, 'id'>
+    & Pick<QuestionNode, 'id' | 'type' | 'title'>
   ) }
 );
 
@@ -2720,6 +2720,8 @@ export const CreateCtaDocument = gql`
     mutation createCTA($input: CreateCTAInputType) {
   createCTA(input: $input) {
     id
+    type
+    title
   }
 }
     `;

@@ -1,14 +1,14 @@
 import * as UI from '@haas/ui';
+import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
-import CTACard from 'views/ActionsOverview/CTACard';
+import { MappedCTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import CTAForm from 'views/ActionsOverview/CTAForm';
-import RegisterIcon from 'components/Icons/RegisterIcon';
 
 interface NewCTAModalCardProps {
   onClose: () => void;
-  onSuccess: (ctaId: string) => void;
+  onSuccess: (data?: any) => void;
 }
 
 const initializeCTAType = (type: string) => {
@@ -39,7 +39,8 @@ export const NewCTAModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) =>
   const { t } = useTranslation();
   const [activeCTA, setActiveCTA] = useState<null | string>('active');
   const [newCTA, setNewCTA] = useState(true);
-  const [ctaId, setCtaID] = useState<string>('');
+  const [cta, setCta] = useState<MappedCTANode | null>(null);
+  const { questionId, optionIndex }: { questionId?: string, optionIndex?: string } = useParams();
 
   useEffect(() => {
     if (!newCTA) {
@@ -48,10 +49,17 @@ export const NewCTAModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) =>
   }, [newCTA]);
 
   useEffect(() => {
-    if (!activeCTA) {
-      onSuccess(ctaId);
+    if (!activeCTA && questionId) {
+      onSuccess(cta?.value);
     }
-  }, [activeCTA]);
+  }, [activeCTA, questionId]);
+
+  useEffect(() => {
+    if (!activeCTA && optionIndex) {
+      console.log('Should run onSuccess for option Index');
+      onSuccess({ cta, optionIndex });
+    }
+  }, [activeCTA, optionIndex]);
 
   return (
     <UI.ModalCard maxWidth={1200} onClose={onClose}>
@@ -71,7 +79,7 @@ export const NewCTAModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) =>
           share={{ title: '', url: '', tooltip: '' }}
           onNewCTAChange={setNewCTA}
           form={{}}
-          onCTAIdFetch={setCtaID}
+          onCTAIdFetch={setCta}
         />
       </UI.ModalBody>
     </UI.ModalCard>

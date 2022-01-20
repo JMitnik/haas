@@ -5,33 +5,33 @@ import {
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
+import {
+  Div, Flex, Form, FormContainer,
+  FormControl, FormLabel, FormSection, Input, InputGrid, InputHelper, Span, Text,
+} from '@haas/ui';
 import { Link, Trash, Type } from 'react-feather';
 import { useMutation } from '@apollo/client';
-
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 import Select from 'react-select';
 
-import {
-  Div, Flex, Form, FormContainer,
-  FormControl, FormLabel, FormSection, Input, InputGrid, InputHelper, Span, Text,
-} from '@haas/ui';
-import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { MappedCTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
+// import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { useCreateCtaMutation } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 import ShareIcon from 'components/Icons/ShareIcon';
 import boolToInt from 'utils/booleanToNumber';
-import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import intToBool from 'utils/intToBool';
 import updateCTAMutation from 'mutations/updateCTA';
 
-import { LinkTypeEnumType, Maybe, useCreateCtaMutation } from 'types/generated-types';
 import { FormDataProps, LinkInputProps } from './CTATypes';
+
 import FormNodeForm from './FormNodeForm';
 import LinksOverview from './LinksOverview';
 
@@ -52,7 +52,7 @@ interface CTAFormProps {
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<any>;
-  onCTAIdFetch?: React.Dispatch<React.SetStateAction<string>>;
+  onCTAIdFetch?: React.Dispatch<React.SetStateAction<MappedCTANode | null>>;
 }
 
 const isShareType = (ctaType: any) => ctaType?.value === 'SHARE';
@@ -187,8 +187,13 @@ const CTAForm = ({
         position: 'bottom-right',
         duration: 1500,
       });
-      console.log('CREATED CTA: ', data.createCTA.id);
-      if (onCTAIdFetch) onCTAIdFetch(data.createCTA.id);
+      console.log('CREATED CTA: ', data.createCTA);
+      const CTA: MappedCTANode = {
+        value: data.createCTA.id,
+        label: data.createCTA.title,
+        type: data.createCTA.type,
+      };
+      if (onCTAIdFetch) onCTAIdFetch(CTA);
       onNewCTAChange(false);
       onActiveCTAChange(null);
     },
