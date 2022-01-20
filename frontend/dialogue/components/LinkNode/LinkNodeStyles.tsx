@@ -1,7 +1,7 @@
 import { ColorProps, color } from 'styled-system';
 import styled, { css } from 'styled-components';
 
-export const LinkItem = styled.a<ColorProps>`
+export const LinkItemContainer = styled.a<ColorProps>`
   ${color}
 
   ${({ theme }) => css`

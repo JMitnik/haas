@@ -5,7 +5,10 @@ import {
   QuestionNode as GeneratedQuestionNode,
   QuestionOption as GeneratedQuestionOption,
   SessionEventInput as GeneratedSessionEventInput,
+  LinkType,
 } from './generated-types';
+
+export type LinkItemType = LinkType;
 
 export type SessionEventInput = GeneratedSessionEventInput;
 
