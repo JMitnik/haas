@@ -183,7 +183,7 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
         </UI.Div>
       </UI.ListItem>
 
-      <UI.Modal isOpen={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
+      <UI.Modal willCloseOnOutsideClick={false} isOpen={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
         <NewCTAModalCard
           onClose={() => setCreateModalIsOpen(false)}
           onSuccess={(callToAction: any) => {
