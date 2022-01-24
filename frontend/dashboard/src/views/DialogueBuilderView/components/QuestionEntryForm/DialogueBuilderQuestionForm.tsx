@@ -5,8 +5,8 @@ import {
   Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
-import { Controller, useForm } from 'react-hook-form';
-import { Trash } from 'react-feather';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { List, Sliders, Trash, Youtube } from 'react-feather';
 import { debounce } from 'lodash';
 import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,7 @@ import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, Hr, Input, InputGrid, InputHelper, Span, Text,
 } from '@haas/ui';
+import { QuestionNodeTypeEnum } from 'types/generated-types';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
@@ -121,12 +122,6 @@ interface QuestionEntryFormProps {
   onScroll: () => void;
 }
 
-const questionTypes = [
-  { value: 'SLIDER', label: 'Slider' },
-  { value: 'CHOICE', label: 'Choice' },
-  { value: 'VIDEO_EMBEDDED', label: 'Video embedded' },
-];
-
 const createQuestionMutation = gql`
   mutation createQuestion($input: CreateQuestionNodeInputType!) {
     createQuestion(input: $input) {
@@ -180,6 +175,7 @@ const DialogueBuilderQuestionForm = ({
       sliderNode,
       unhappyText: question.sliderNode?.unhappyText,
       happyText: question.sliderNode?.happyText,
+      questionType: type?.value,
       optionsFull: options.map((option) => ({
         id: option.id,
         position: option.position,
@@ -195,7 +191,6 @@ const DialogueBuilderQuestionForm = ({
   });
 
   const toast = useToast();
-  const [activeQuestionType, setActiveQuestionType] = useState(type);
 
   const matchValue = condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null;
   const [activeMatchValue, setActiveMatchValue] = useState<null | { label: string, value: string }>(matchValue);
@@ -206,9 +201,17 @@ const DialogueBuilderQuestionForm = ({
       label: condition.conditionType,
     } : null,
   );
+
+  console.log('PARENT QUESTION TYPE: ', parentQuestionType);
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditionProps>(
     condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' },
   );
+
+  const questionType = useWatch({
+    control: form.control,
+    name: 'questionType',
+    defaultValue: type?.value,
+  });
 
   const setConditionType = useCallback((conditionOption: any) => {
     setActiveConditionSelect(conditionOption);
@@ -221,21 +224,10 @@ const DialogueBuilderQuestionForm = ({
     });
   }, [setActiveConditionSelect, setActiveCondition]);
 
-  const handleQuestionTypeChange = useCallback((selectOption: any) => {
-    form.setValue('questionType', selectOption?.value);
-    setActiveQuestionType(selectOption);
-  }, [setActiveQuestionType]);
-
   useEffect(() => {
     form.register({ name: 'parentQuestionType' });
     form.setValue('parentQuestionType', parentQuestionType);
   }, [parentQuestionType]);
-
-  useEffect(() => {
-    if (activeQuestionType) {
-      handleQuestionTypeChange(activeQuestionType);
-    }
-  }, [activeQuestionType, handleQuestionTypeChange]);
 
   const handleConditionTypeChange = useCallback((selectedOption: any) => {
     form.setValue('conditionType', selectedOption?.value);
@@ -380,12 +372,12 @@ const DialogueBuilderQuestionForm = ({
 
   const onSubmit = (formData: FormDataProps) => {
     const { title } = formData;
-    const type = activeQuestionType?.value;
+    const type = formData.questionType;
     const overrideLeafId = activeLeaf?.value;
     const edgeCondition = activeCondition;
     const sliderNodeData = formData.sliderNode || sliderNode;
 
-    const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
+    const isSlider = type === QuestionNodeTypeEnum.Slider && sliderNodeData;
     const values = form.getValues();
 
     const unhappyText = formData.useCustomerSatisfactionTexts === 1 ? formData.unhappyText : null;
@@ -602,33 +594,46 @@ const DialogueBuilderQuestionForm = ({
             </Div>
             <Div>
               <InputGrid>
-                <FormControl isRequired isInvalid={!!form.errors.questionType}>
-                  <FormLabel htmlFor="questionType">
-                    {t('dialogue:question_type')}
-                  </FormLabel>
+                <UI.FormControl isRequired isInvalid={!!form.errors.questionType}>
+                  <UI.FormLabel htmlFor="questionType">{t('dialogue:question_type')}</UI.FormLabel>
                   <InputHelper>
                     {t('dialogue:question_type_helper')}
                   </InputHelper>
                   <Controller
+                    control={form.control}
                     id="question-type-select"
                     name="questionType"
-                    control={form.control}
-                    defaultValue={activeQuestionType}
-                    render={({ onChange, onBlur, value }) => (
-                      <Select
-                        options={questionTypes}
-                        value={activeQuestionType}
-                        onChange={(opt: any) => {
-                          handleQuestionTypeChange(opt);
-                          onChange(opt.value);
-                        }}
-                      />
+                    render={({ onChange, value, onBlur }) => (
+                      <UI.RadioButtons
+                        value={value}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                      >
+                        <UI.RadioButton
+                          icon={Sliders}
+                          value={QuestionNodeTypeEnum.Slider}
+                          text={t('slider')}
+                          description={t('slider_helper')}
+                        />
+                        <UI.RadioButton
+                          icon={List}
+                          value={QuestionNodeTypeEnum.Choice}
+                          text={t('multiple_choice')}
+                          description={t('multiple_choice_helper')}
+                        />
+                        <UI.RadioButton
+                          icon={Youtube}
+                          value={QuestionNodeTypeEnum.VideoEmbedded}
+                          text={t('video')}
+                          description={t('video_helper')}
+                        />
+                      </UI.RadioButtons>
                     )}
                   />
                   <FormErrorMessage>{form.errors.questionType?.message}</FormErrorMessage>
-                </FormControl>
+                </UI.FormControl>
 
-                {form.watch('questionType') === 'VIDEO_EMBEDDED' && (
+                {questionType === QuestionNodeTypeEnum.VideoEmbedded && (
                   <FormControl isRequired isInvalid={!!form.errors.videoEmbedded}>
                     <FormLabel htmlFor="videoEmbedded">
                       {t('video_embedded')}
@@ -676,7 +681,7 @@ const DialogueBuilderQuestionForm = ({
             </Div>
           </FormSection>
 
-          {activeQuestionType && activeQuestionType.value === 'SLIDER' && (
+          {questionType === QuestionNodeTypeEnum.Slider && (
             <>
               <UI.Hr />
               <FormSection>
@@ -693,7 +698,7 @@ const DialogueBuilderQuestionForm = ({
             </>
           )}
 
-          {activeQuestionType && (activeQuestionType.value === 'CHOICE' || activeQuestionType.value === 'VIDEO_EMBEDDED') && (
+          {(questionType === QuestionNodeTypeEnum.Choice || questionType === QuestionNodeTypeEnum.VideoEmbedded) && (
             <>
               <UI.Hr />
               <UI.FormSection>

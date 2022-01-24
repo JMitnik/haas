@@ -1,6 +1,30 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    multiple_choice: {
+      en: 'Multiple choice',
+      de: 'Mehrfachauswah',
+    },
+    multiple_choice_helper: {
+      en: 'Answer from a list of options',
+      de: 'Antwort aus einer Liste von Optionen',
+    },
+    slider: {
+      en: 'Slider',
+      de: 'Schieberegler',
+    },
+    slider_helper: {
+      en: 'Answer by moving a slider',
+      de: 'Antworten Sie, indem Sie einen Schieberegler bewegen',
+    },
+    video: {
+      en: 'Video',
+      de: 'Video',
+    },
+    video_helper: {
+      en: 'Answer from list based on video',
+      de: 'Antwort von Liste basierend auf Video',
+    },
     last_activity: {
       en: 'Last seen',
       de: 'Zuletzt gesehen',
