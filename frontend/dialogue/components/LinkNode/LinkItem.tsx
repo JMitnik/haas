@@ -15,31 +15,31 @@ interface LinkItemProps {
 const MapLinkToIcon = (linkType: LinkTypeEnumType) => {
   switch(linkType) {
     case LinkTypeEnumType.Whatsapp: {
-      return WhatsappIcon;
+      return () => <WhatsappIcon fill="currentColor" stroke="white" />;
     }
 
     case LinkTypeEnumType.Facebook: {
-      return Facebook;
+      return () => <Facebook fill="currentColor" stroke="none" />;
     }
 
     case LinkTypeEnumType.Instagram: {
-      return Instagram;
+      return () => <Instagram fill="none" stroke="currentColor" />;
     }
 
     case LinkTypeEnumType.Linkedin: {
-      return Linkedin;
+      return () => <Linkedin fill="white" stroke="none"/>;
     }
 
     case LinkTypeEnumType.Twitter: {
-      return Twitter;
+      return () => <Twitter fill="currentColor" stroke="none" />;
     }
 
     case LinkTypeEnumType.Api: {
-      return Globe;
+      return () => <Globe fill="none" stroke="currentColor" />;
     }
 
     default: {
-      return Facebook;
+      return () => <Facebook fill="none" stroke="currentColor" />;
     }
   }
 };

@@ -1,6 +1,6 @@
 import { HAASRun } from 'assets/animations';
 import { motion } from 'framer-motion';
-import Lottie from 'react-lottie';
+// import Lottie from 'react-lottie';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -25,14 +25,14 @@ const LoaderContainer = styled.div`
 export const Loader = ({ testId = 'load' }: { testId: string }) => (
   <motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }}>
     <LoaderContainer data-testid={testId}>
-      <Lottie
+      {/* <Lottie
         options={{
           animationData: HAASRun,
           loop: true,
         }}
         isClickToPauseDisabled
         speed={1}
-      />
+      /> */}
     </LoaderContainer>
   </motion.div>
 );

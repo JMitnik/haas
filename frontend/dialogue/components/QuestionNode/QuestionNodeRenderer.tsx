@@ -11,6 +11,7 @@ import { LinkNode } from '../LinkNode/LinkNode';
 import FormNode from '../FormNode/FormNode';
 import { useNavigator } from '../Navigation/useNavigator';
 import { QuestionNodeProps as GenericQuestionNodeProps, RunActionInput } from './QuestionNodeTypes';
+import { ShareNode } from '../ShareNode/ShareNode';
 
 interface QuestionNodeProps {
   dialogue: Dialogue;
@@ -24,6 +25,7 @@ const NodeComponent: { [key in QuestionNodeTypeEnum]?: React.FC<GenericQuestionN
   [QuestionNodeTypeEnum.Form]: FormNode,
   [QuestionNodeTypeEnum.Link]: LinkNode,
   [QuestionNodeTypeEnum.Registration]: ChoiceNode,
+  [QuestionNodeTypeEnum.Share]: ShareNode,
   [QuestionNodeTypeEnum.VideoEmbedded]: ChoiceNode,
 };
 
