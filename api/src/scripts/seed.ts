@@ -109,9 +109,12 @@ export const createSeedTables = async () => {
 
 export const seed = async () => {
   await checkSeedApplied();
-  await createSeedTables();
-  console.log('Seed applied successfully.');
-  process.exit(0);
+  try {
+    await createSeedTables();
+    console.log('Seed applied successfully.');
+  } finally {
+    process.exit(0);
+  }
 };
 
 seed().then(() => {}).catch(err => {console.log(err)}).finally(() => {});

@@ -75,6 +75,7 @@
         "dock:test:restart-db": "yarn dock:test:end-db  && yarn dock:test:start-db ",
         "dock:test:end-db": "(cd container/test && docker-compose down)",
         "seed:basic": "yarn workspace @haas/api seed:basic",
+        "dev:prep": "turbo run yarn migrate seed:basic gen:api",
         "tunnel:api": "ngrok http https://localhost:4000"
     },
     "devDependencies": {
@@ -94,11 +95,18 @@
     },
     "turbo": {
       "pipeline": {
-        "gen": {
-          "dependsOn": ["^gen"]
+        "yarn": {},
+        "migrate": {
+          "dependsOn": ["yarn"]
         },
-        "build": {
-          "dependsOn": ["^build"]
+        "seed:basic": {
+          "dependsOn": ["yarn"]
+        },
+        "gen:api": {
+          "dependsOn": ["yarn"]
+        },
+        "eslint": {
+          "dependsOn": ["yarn"]
         }
       }
     },

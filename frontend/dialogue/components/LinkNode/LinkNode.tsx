@@ -12,6 +12,8 @@ export const LinkNode = ({ node }: QuestionNodeProps) => {
   const handleLinkClick = (link: LinkItemType, event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
 
+    console.log(link);
+
     window.open(event.currentTarget.href, event.currentTarget.rel);
   };
 
@@ -25,13 +27,17 @@ export const LinkNode = ({ node }: QuestionNodeProps) => {
         <UpsellNode link={node.links[0]} />
       )}
 
-      {(node.links?.length === 0 || node.links?.length > 1) && (
-        <UI.Flex data-testid="shareitems" justifyContent="center" alignItems="center">
-          {node.links?.map((link, index) => (
-            <LinkItem key={index} onClick={handleLinkClick} link={link} />
-          ))}
-        </UI.Flex>
-      )}
+      <UI.Flex justifyContent="center">
+        <UI.Span display="inline-block">
+          {(node.links?.length === 0 || node.links?.length > 1) && (
+            <UI.Flex data-testid="shareitems" justifyContent="center" alignItems="center">
+              {node.links?.map((link, index) => (
+                <LinkItem key={index} onClick={handleLinkClick} link={link} />
+              ))}
+            </UI.Flex>
+          )}
+        </UI.Span>
+      </UI.Flex>
 
     </NodeLayout>
   );

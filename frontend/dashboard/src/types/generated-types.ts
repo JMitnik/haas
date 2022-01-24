@@ -1719,8 +1719,6 @@ export type SocialNodeEntryInput = {
 };
 
 export enum SystemPermission {
-  CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
-  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
   CanEditDialogue = 'CAN_EDIT_DIALOGUE',
   CanBuildDialogue = 'CAN_BUILD_DIALOGUE',
@@ -1737,10 +1735,7 @@ export enum SystemPermission {
   CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
   CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
   CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
-  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES',
-  CanViewAutomations = 'CAN_VIEW_AUTOMATIONS',
-  CanCreateAutomations = 'CAN_CREATE_AUTOMATIONS',
-  CanUpdateAutomations = 'CAN_UPDATE_AUTOMATIONS'
+  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES'
 }
 
 export type Tag = {
