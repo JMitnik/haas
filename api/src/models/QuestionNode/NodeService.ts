@@ -697,6 +697,47 @@ class NodeService {
   };
 
   /**
+   * Finds and updates edges if an existing option in parent question has changed
+   * @param dbOptions a list of options before question is updated
+   * @param newOptions a list of updated options 
+   */
+  updateEdgeOptionsByQuestionId = async (newOptions: QuestionOptionProps[], dbOptions?: QuestionOption[], questionId?: string) => {
+    const updatable: { [key: string]: string } = {};
+
+    if (!dbOptions || !questionId) return;
+
+    newOptions.forEach((option) => {
+      // Check which options have an ID (meaning they already existed)
+      if (!option.id) return;
+
+      // Find option in database that matches the updated option from the dashboard
+      const dbOption = dbOptions.find((dbOption) => dbOption.id === option.id);
+      if (!dbOption) return;
+
+      // If the values are not the same add a key-value pair of both the old and new value to the updatable object
+      if (dbOption.value !== option.value) {
+        updatable[dbOption.value] = option.value;
+      }
+    });
+
+    // If there are no changes for existing options don't do anyting
+    if (Object.keys(updatable).length === 0) return;
+
+    // Find the edges of which the option in the parent node has changed
+    const edges = await this.edgeService.edgePrismaAdapter.findCandidateEdgesForUpdatingMatchValue(questionId, updatable);
+
+    if (edges.length === 0) return;
+
+    await Promise.all(edges.map(async (edge) => {
+      const condition = edge.conditions[0];
+      const newMatchValue = updatable[condition.matchValue as string];
+      const newCondition: Prisma.QuestionConditionUpdateInput = { matchValue: newMatchValue };
+      const updatedCondition = await this.edgeService.edgePrismaAdapter.updateCondition(condition.id, newCondition);
+      return updatedCondition;
+    }));
+  }
+
+  /**
    * Update node from builer.
    *
    * TODO: Rename to updateNode.
@@ -739,6 +780,8 @@ class NodeService {
         console.log('something went wrong updating edges: ', e.stack);
       }
     };
+
+    await this.updateEdgeOptionsByQuestionId(options, activeQuestion?.options, activeQuestion?.id);
 
     const updateInput: UpdateQuestionInput = {
       title,
