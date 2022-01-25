@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
@@ -7,7 +6,6 @@ import {
 } from '@chakra-ui/core';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { List, Sliders, Trash, Youtube } from 'react-feather';
-import { debounce } from 'lodash';
 import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
@@ -60,6 +58,7 @@ interface FormDataProps {
   unhappyText: string;
   happyText: string;
   useCustomerSatisfactionTexts: number;
+  range: number[];
 }
 
 const isChoiceType = (questionType: string) => {
@@ -74,16 +73,6 @@ const schema = yup.object().shape({
   questionType: yup.string().required(),
   videoEmbedded: yup.string().when(['questionType'], {
     is: (questionType: string) => questionType === 'VIDEO_EMBEDDED',
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
-  }),
-  minValue: yup.string().when(['parentQuestionType'], {
-    is: (parentQuestionType: string) => parentQuestionType === 'Slider',
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
-  }),
-  maxValue: yup.string().when(['parentQuestionType'], {
-    is: (parentQuestionType: string) => parentQuestionType === 'Slider',
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
@@ -106,7 +95,6 @@ interface QuestionEntryFormProps {
   id: string;
   title: string;
   overrideLeaf?: OverrideLeafProps;
-  isRoot: boolean;
   type: { label: string, value: string };
   options: QuestionOptionProps[];
   leafs: Array<{ label: string, value: string }>;
@@ -175,6 +163,7 @@ const DialogueBuilderQuestionForm = ({
       sliderNode,
       unhappyText: question.sliderNode?.unhappyText,
       happyText: question.sliderNode?.happyText,
+      range: [condition?.renderMin || 30, condition?.renderMax || 70],
       questionType: type?.value,
       optionsFull: options.map((option) => ({
         id: option.id,
@@ -202,7 +191,6 @@ const DialogueBuilderQuestionForm = ({
     } : null,
   );
 
-  console.log('PARENT QUESTION TYPE: ', parentQuestionType);
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditionProps>(
     condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' },
   );
@@ -348,33 +336,18 @@ const DialogueBuilderQuestionForm = ({
     onScroll();
   };
 
-  const setMinValue = (event: React.FocusEvent<HTMLInputElement>) => {
-    const minValue = Number(event.target.value);
-    return setActiveCondition((prevCondition) => {
-      if (!prevCondition) {
-        return { renderMin: minValue };
-      }
-      prevCondition.renderMin = minValue;
-      return prevCondition;
-    });
-  };
-
-  const setMaxValue = useCallback(debounce((value: string) => {
-    const maxValue = Number(value);
-    return setActiveCondition((prevCondition) => {
-      if (!prevCondition) {
-        return { renderMax: maxValue };
-      }
-      prevCondition.renderMax = maxValue;
-      return prevCondition;
-    });
-  }, 250), []);
-
   const onSubmit = (formData: FormDataProps) => {
     const { title } = formData;
     const type = formData.questionType;
     const overrideLeafId = activeLeaf?.value;
-    const edgeCondition = activeCondition;
+    const edgeCondition: EdgeConditionProps = {
+      id: activeCondition?.id,
+      conditionType: activeCondition?.conditionType,
+      matchValue: activeCondition?.conditionType === 'match' ? activeCondition?.matchValue : null,
+      renderMin: activeCondition?.conditionType === 'valueBoundary' ? formData.range[0] : null,
+      renderMax: activeCondition?.conditionType === 'valueBoundary' ? formData.range[1] : null,
+    };
+
     const sliderNodeData = formData.sliderNode || sliderNode;
 
     const isSlider = type === QuestionNodeTypeEnum.Slider && sliderNodeData;
@@ -506,36 +479,33 @@ const DialogueBuilderQuestionForm = ({
                   <InputGrid>
                     <FormControl isRequired isInvalid={!!form.errors.minValue}>
                       <FormLabel htmlFor="minValue">
-                        {t('min_value')}
+                        {t('range')}
                       </FormLabel>
                       <InputHelper>
-                        {t('dialogue:min_value_helper')}
+                        {t('range_helper')}
                       </InputHelper>
-                      <Input
-                        name="minValue"
-                        ref={form.register({ required: false })}
-                        defaultValue={condition?.renderMin}
-                        onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
-                      />
-                      <FormErrorMessage>{form.errors.minValue?.message}</FormErrorMessage>
-                    </FormControl>
+                      <UI.Div position="relative" pb={3}>
+                        <Controller
+                          control={form.control}
+                          name="range"
+                          defaultValue={[40, 69]}
+                          render={({ onChange, value }) => (
+                            <UI.RangeSlider
+                              onChange={onChange}
+                              defaultValue={value}
+                              // isDisabled
+                              stepSize={1}
+                              min={0}
+                              max={100}
+                            />
+                          )}
+                        />
+                        <FormErrorMessage>{form.errors.minValue?.message}</FormErrorMessage>
+                        <UI.Div position="absolute" bottom={0} left={0}>0</UI.Div>
+                        <UI.Div position="absolute" bottom={0} right={-7.5}>100</UI.Div>
+                      </UI.Div>
 
-                    <FormControl isRequired isInvalid={!!form.errors.maxValue}>
-                      <FormLabel htmlFor="maxValue">
-                        {t('max_value')}
-                      </FormLabel>
-                      <InputHelper>
-                        {t('dialogue:max_value_helper')}
-                      </InputHelper>
-                      <Input
-                        name="maxValue"
-                        ref={form.register({ required: false })}
-                        defaultValue={condition?.renderMax}
-                        onChange={(event: any) => setMaxValue(event.target.value)}
-                      />
-                      <FormErrorMessage>{form.errors.maxValue?.message}</FormErrorMessage>
                     </FormControl>
-
                   </InputGrid>
                 </Div>
               </FormSection>

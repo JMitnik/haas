@@ -1,13 +1,21 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    range: {
+      en: 'Range',
+      de: 'Reichweite',
+    },
+    range_helper: {
+      en: 'What is the range to trigger the following question?',
+      de: 'Was ist der Bereich, um die folgende Frage auszulösen?',
+    },
     multiple_choice: {
       en: 'Multiple choice',
       de: 'Mehrfachauswah',
     },
     multiple_choice_helper: {
-      en: 'Answer from a list of options',
-      de: 'Antwort aus einer Liste von Optionen',
+      en: 'Answer from a list',
+      de: 'Antwort aus einer Liste',
     },
     slider: {
       en: 'Slider',
@@ -22,8 +30,8 @@ const language = {
       de: 'Video',
     },
     video_helper: {
-      en: 'Answer from list based on video',
-      de: 'Antwort von Liste basierend auf Video',
+      en: 'Multi-choice with a video',
+      de: 'Multi-Choice mit einem Video',
     },
     last_activity: {
       en: 'Last seen',
