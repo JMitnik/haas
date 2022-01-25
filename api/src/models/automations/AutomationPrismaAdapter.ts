@@ -684,14 +684,14 @@ export class AutomationPrismaAdapter {
       operands: {
         createMany: {
           data: operands.map((operand) =>
-            (
-              {
-                type: operand.type,
-                textValue: operand.textValue,
-                dateTimeValue: operand.dateTimeValue,
-                numberValue: operand.numberValue,
-              }
-            )),
+          (
+            {
+              type: operand.type,
+              textValue: operand.textValue,
+              dateTimeValue: operand.dateTimeValue,
+              numberValue: operand.numberValue,
+            }
+          )),
         },
       },
       question: questionId ? {
@@ -891,7 +891,7 @@ export class AutomationPrismaAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     inputConditionIds: string[]
   ): Promise<Prisma.AutomationConditionUpdateManyWithoutAutomationConditionBuilderInput |
-      Prisma.AutomationConditionCreateNestedManyWithoutAutomationConditionBuilderInput> => {
+    Prisma.AutomationConditionCreateNestedManyWithoutAutomationConditionBuilderInput> => {
 
     if (isExistingBuilder) {
       // eslint-disable-next-line max-len
@@ -970,7 +970,7 @@ export class AutomationPrismaAdapter {
   buildUpdateAutomationConditionBuilderData = async (
     conditionBuilder: UpdateConditionBuilderInput,
     isRoot = true
-  // eslint-disable-next-line max-len
+    // eslint-disable-next-line max-len
   ): Promise<Prisma.AutomationConditionBuilderUpdateWithoutAutomationTriggerInput | Prisma.AutomationConditionBuilderCreateWithoutParentConditionBuilderInput> => {
     let childConditionBuilder;
     const isExistingBuilder = (isRoot || !!conditionBuilder.id)
@@ -978,7 +978,7 @@ export class AutomationPrismaAdapter {
 
     if (conditionBuilder?.id) {
       // Remove 'stale' builder entries (including conditions, their scope(s) & operands)
-      const idOverview = await this.findStaleBuilderRelatedIds(conditionBuilder, { builderIds: [], conditionIds: [] })
+      const idOverview = await this.findStaleBuilderRelatedIds(conditionBuilder, { builderIds: [], conditionIds: [] });
       await this.removeStaleConditionRelations(conditionBuilder.id, idOverview, inputConditionIds);
     }
 

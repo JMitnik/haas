@@ -737,6 +737,7 @@ class AutomationService {
    */
   constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): UpdateAutomationInput => {
     if (!input.id) throw new UserInputError('No ID provided for automation that should be updated!');
+    if (!input.conditionBuilder?.id) throw new UserInputError('No ID provided for the root condition builder');
 
     const id: UpdateAutomationInput['id'] = input.id;
     const createInput = this.constructCreateAutomationInput(input);
