@@ -272,14 +272,14 @@ class AutomationService {
 
     // Want latest X but there is less than X *new* entries in the database => return false
     // TODO: Add this batch option to event instead of condition
-    // const hasNotEnoughLatest = (
-    //   condition.questionScope?.aggregate?.latest &&
-    //   scopedData.totalEntries % condition.questionScope?.aggregate?.latest !== 0
-    // );
+    const hasNotEnoughLatest = (
+      condition.questionScope?.aggregate?.latest &&
+      scopedData.totalEntries % condition.questionScope?.aggregate?.latest !== 0
+    );
 
-    // if (hasNotEnoughLatest) {
-    //   return false;
-    // }
+    if (hasNotEnoughLatest) {
+      return false;
+    }
 
     switch (condition.operator) {
       case AutomationConditionOperatorType.SMALLER_OR_EQUAL_THAN: {
