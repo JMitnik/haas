@@ -1,10 +1,8 @@
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions =  {}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -1720,10 +1718,8 @@ export type SocialNodeEntryInput = {
 
 export enum SystemPermission {
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
-  CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
   CanAddUsers = 'CAN_ADD_USERS',
   CanBuildDialogue = 'CAN_BUILD_DIALOGUE',
-  CanCreateAutomations = 'CAN_CREATE_AUTOMATIONS',
   CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
   CanCreateDeliveries = 'CAN_CREATE_DELIVERIES',
   CanCreateTriggers = 'CAN_CREATE_TRIGGERS',
@@ -1731,12 +1727,9 @@ export enum SystemPermission {
   CanDeleteTriggers = 'CAN_DELETE_TRIGGERS',
   CanDeleteUsers = 'CAN_DELETE_USERS',
   CanDeleteWorkspace = 'CAN_DELETE_WORKSPACE',
-  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
   CanEditDialogue = 'CAN_EDIT_DIALOGUE',
   CanEditUsers = 'CAN_EDIT_USERS',
   CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
-  CanUpdateAutomations = 'CAN_UPDATE_AUTOMATIONS',
-  CanViewAutomations = 'CAN_VIEW_AUTOMATIONS',
   CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
   CanViewDialogue = 'CAN_VIEW_DIALOGUE',
   CanViewDialogueAnalytics = 'CAN_VIEW_DIALOGUE_ANALYTICS',
@@ -2046,32 +2039,6 @@ export type QuestionNodeFragmentFragment = (
   )> }
 );
 
-export type CreateSessionMutationVariables = Exact<{
-  input: SessionInput;
-}>;
-
-
-export type CreateSessionMutation = (
-  { __typename?: 'Mutation' }
-  & { createSession: (
-    { __typename?: 'Session' }
-    & Pick<Session, 'id'>
-  ) }
-);
-
-export type UploadSessionEventsMutationVariables = Exact<{
-  input: UploadSessionEventsInput;
-}>;
-
-
-export type UploadSessionEventsMutation = (
-  { __typename?: 'Mutation' }
-  & { uploadSessionEvents: (
-    { __typename?: 'UploadSessionEventsOutput' }
-    & Pick<UploadSessionEventsOutput, 'status'>
-  ) }
-);
-
 export const EdgeFragmentFragmentDoc = gql`
     fragment EdgeFragment on Edge {
   id
@@ -2155,69 +2122,3 @@ export const QuestionNodeFragmentFragmentDoc = gql`
   }
 }
     ${EdgeFragmentFragmentDoc}`;
-export const CreateSessionDocument = gql`
-    mutation CreateSession($input: SessionInput!) {
-  createSession(input: $input) {
-    id
-  }
-}
-    `;
-export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutation, CreateSessionMutationVariables>;
-
-/**
- * __useCreateSessionMutation__
- *
- * To run a mutation, you first call `useCreateSessionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateSessionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createSessionMutation, { data, loading, error }] = useCreateSessionMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSessionMutation, CreateSessionMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, options);
-      }
-export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
-export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
-export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
-export const UploadSessionEventsDocument = gql`
-    mutation UploadSessionEvents($input: UploadSessionEventsInput!) {
-  uploadSessionEvents(input: $input) {
-    status
-  }
-}
-    `;
-export type UploadSessionEventsMutationFn = Apollo.MutationFunction<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>;
-
-/**
- * __useUploadSessionEventsMutation__
- *
- * To run a mutation, you first call `useUploadSessionEventsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUploadSessionEventsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [uploadSessionEventsMutation, { data, loading, error }] = useUploadSessionEventsMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUploadSessionEventsMutation(baseOptions?: Apollo.MutationHookOptions<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>(UploadSessionEventsDocument, options);
-      }
-export type UploadSessionEventsMutationHookResult = ReturnType<typeof useUploadSessionEventsMutation>;
-export type UploadSessionEventsMutationResult = Apollo.MutationResult<UploadSessionEventsMutation>;
-export type UploadSessionEventsMutationOptions = Apollo.BaseMutationOptions<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>;
