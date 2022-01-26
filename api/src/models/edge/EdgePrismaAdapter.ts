@@ -32,19 +32,19 @@ class EdgePrismaAdapter {
   }
 
   /**
-   * Finds edges of which an out-dated option should be updated
+   * Finds edges that belong to certain conditions
    * @param parentId
-   * @param staleConditions a dictionairy of key-value pairs in old_option_value:new_option_value format
+   * @param conditions Values that correspond to the conditions of an edge.
    * @returns a list of edges with their condition
    */
-  findEdgesWithStaleConditions = (parentId: string, staleConditions: Record<string, string>) => {
+  findEdgesOfConditions = (parentId: string, conditions: string[]) => {
     return this.prisma.edge.findMany({
       where: {
         parentNodeId: parentId,
         conditions: {
           some: {
             matchValue: {
-              in: Object.keys(staleConditions),
+              in: conditions,
             }
           }
         }

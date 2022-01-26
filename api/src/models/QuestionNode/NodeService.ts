@@ -697,18 +697,13 @@ export class NodeService {
   };
 
   /**
-   * Finds and updates edges if an existing option in parent question has changed
-   * @param dbOptions a list of options before question is updated
-   * @param newOptions a list of updated options
+   * Finds stale condition values, mapping from old values to new values.
    */
-  updateStaleEdgeConditions = async (
+  private getStaleConditionsMap(
     newOptions: QuestionOptionProps[],
-    dbOptions?: QuestionOption[],
-    questionId?: string
-  ) => {
-    const updatable: { [key: string]: string } = {};
-
-    if (!dbOptions || !questionId) return;
+    dbOptions: QuestionOption[],
+  ): Record<string, string> {
+    const staleConditionOptions: { [key: string]: string } = {};
 
     newOptions.forEach((option) => {
       // Check which options have an ID (meaning they already existed)
@@ -718,25 +713,48 @@ export class NodeService {
       const dbOption = dbOptions.find((dbOption) => dbOption.id === option.id);
       if (!dbOption) return;
 
+      // If the values have changed, we mark the
       // If the values are not the same add a key-value pair of both the old and new value to the updatable object
       if (dbOption.value !== option.value) {
-        updatable[dbOption.value] = option.value;
+        staleConditionOptions[dbOption.value] = option.value;
       }
     });
 
+    return staleConditionOptions;
+  }
+
+  /**
+   * Finds and updates edges if an existing option in parent question has changed
+   * @param dbOptions a list of options before question is updated
+   * @param newOptions a list of updated options
+   */
+  updateStaleEdgeConditions = async (
+    newOptions: QuestionOptionProps[],
+    dbOptions?: QuestionOption[],
+    questionId?: string
+  ) => {
+    if (!dbOptions || !questionId) return;
+
+    const staleConditionMap = this.getStaleConditionsMap(newOptions, dbOptions);
+
     // If there are no changes for existing options don't do anyting
-    if (Object.keys(updatable).length === 0) return;
+    if (Object.keys(staleConditionMap).length === 0) return;
 
     // Find the edges of which the option in the parent node has changed
-    const edges = await this.edgeService.edgePrismaAdapter.findEdgesWithStaleConditions(questionId, updatable);
+    const edges = await this.edgeService.edgePrismaAdapter.findEdgesOfConditions(
+      questionId,
+      Object.keys(staleConditionMap)
+    );
 
     if (edges.length === 0) return;
 
+    // Update all edges with their new values
     await Promise.all(edges.map(async (edge) => {
       const condition = edge.conditions[0];
-      const newMatchValue = updatable[condition.matchValue as string];
-      const newCondition: Prisma.QuestionConditionUpdateInput = { matchValue: newMatchValue };
-      const updatedCondition = await this.edgeService.edgePrismaAdapter.updateCondition(condition.id, newCondition);
+      const updatedCondition = await this.edgeService.edgePrismaAdapter.updateCondition(condition.id, {
+        matchValue: staleConditionMap[condition.matchValue as string],
+      });
+
       return updatedCondition;
     }));
   }
