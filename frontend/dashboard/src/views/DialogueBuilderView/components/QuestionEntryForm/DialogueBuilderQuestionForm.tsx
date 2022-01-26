@@ -353,6 +353,11 @@ const DialogueBuilderQuestionForm = ({
     onScroll();
   };
 
+  const handleRemoveCTA = () => {
+    setActiveCTAId(null);
+    form.setValue('overrideLeaf', null);
+  };
+
   const setMinValue = (event: React.FocusEvent<HTMLInputElement>) => {
     const minValue = Number(event.target.value);
     return setActiveCondition((prevCondition) => {
@@ -673,9 +678,12 @@ const DialogueBuilderQuestionForm = ({
                           </UI.Grid>
 
                           <UI.Grid
-                            p={2}
+                            pt={2}
+                            pb={2}
+                            pl={0}
+                            pr={0}
                             borderBottom="1px solid #edf2f7"
-                            gridTemplateColumns="2fr 1fr"
+                            gridTemplateColumns="1fr"
                           >
                             <UI.Div alignItems="center" display="flex">
                               <Controller
@@ -702,7 +710,7 @@ const DialogueBuilderQuestionForm = ({
                                         alignItems="center"
                                       >
                                         {value?.label ? (
-                                          <NodeCell onClick={onOpen} node={value} />
+                                          <NodeCell onRemove={handleRemoveCTA} onClick={onOpen} node={value} />
                                         ) : (
                                           <UI.Button
                                             size="sm"
@@ -722,22 +730,6 @@ const DialogueBuilderQuestionForm = ({
                                 )}
                               />
                             </UI.Div>
-                            <UI.Stack alignItems="center" isInline spacing={2}>
-
-                              <UI.Button
-                                onClick={() => {
-                                  form.setValue('overrideLeaf', null);
-                                  setActiveCTAId(null);
-                                }}
-                                size="sm"
-                                variantColor="red"
-                                variant="outline"
-                              >
-                                <UI.Icon>
-                                  <Trash />
-                                </UI.Icon>
-                              </UI.Button>
-                            </UI.Stack>
                           </UI.Grid>
                         </>
                       </UI.Div>
@@ -785,7 +777,7 @@ const DialogueBuilderQuestionForm = ({
                   />
                 </UI.FormSection>
               </>
-          )}
+            )}
         </UI.Div>
 
         <UI.Flex justifyContent="space-between">

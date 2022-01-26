@@ -68,7 +68,7 @@ export const NodeCell = ({ node, onClick, onRemove }: NodeCellProps) => {
           <nodeProps.icon />
         </UI.Icon>
         <UI.Div>
-          <UI.Text>
+          <UI.Text paddingRight={2}>
             {node.label}
           </UI.Text>
           <UI.MicroLabel
