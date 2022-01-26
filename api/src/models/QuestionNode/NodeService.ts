@@ -728,7 +728,7 @@ export class NodeService {
     if (Object.keys(updatable).length === 0) return;
 
     // Find the edges of which the option in the parent node has changed
-    const edges = await this.edgeService.edgePrismaAdapter.findCandidateEdgesForUpdatingMatchValue(questionId, updatable);
+    const edges = await this.edgeService.edgePrismaAdapter.findEdgesWithStaleConditions(questionId, updatable);
 
     if (edges.length === 0) return;
 
