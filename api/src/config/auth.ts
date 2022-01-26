@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { allow, deny, or, rule, shield } from 'graphql-shield';
 
 import { ApolloError } from 'apollo-server-express';
@@ -66,7 +67,7 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
 
     const allRelevantPermissions = [
       ...globalPermissions,
-      ...workspacePermissions
+      ...workspacePermissions,
     ];
 
     if (!ctx.session?.user?.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
@@ -84,6 +85,7 @@ const authShield = shield({
     user: or(isSelf, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
   },
   Customer: {
+    automationConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_AUTOMATIONS)),
     usersConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
   },
   DeliveryType: {
@@ -103,8 +105,13 @@ const authShield = shield({
     appendToInteraction: allow,
     verifyUserToken: allow,
     requestInvite: allow,
+    authenticateLambda: allow,
     uploadUpsellImage: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
     deleteCustomer: isSuperAdmin,
+    createAutomationToken: isSuperAdmin,
+
+    createAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_AUTOMATIONS)),
+    updateAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_UPDATE_AUTOMATIONS)),
 
     createCampaign: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_CAMPAIGNS)),
     createBatchDeliveries: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES)),

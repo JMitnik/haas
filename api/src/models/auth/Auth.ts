@@ -25,6 +25,39 @@ export const RegisterInput = inputObjectType({
   },
 });
 
+export const AuthenticateLambdaInput = inputObjectType({
+  name: 'AuthenticateLambdaInput',
+  definition(t) {
+    t.string('authenticateEmail');
+    t.string('workspaceEmail');
+  },
+});
+
+export const AuthenticateLambda = mutationField('authenticateLambda', {
+  type: 'String',
+  nullable: true,
+  args: { input: AuthenticateLambdaInput },
+  async resolve(parent, args, ctx) {
+    const authorizationHeader = ctx.req.header('lambda');
+    if (!authorizationHeader) throw new Error('No authorization header available');
+    if (!args.input?.authenticateEmail) throw new Error('No authenticate email provided');
+    if (!args.input?.workspaceEmail) throw new Error('No workspace email provided');
+    const token = await ctx.services.authService.getWorkspaceAuthorizationToken(authorizationHeader, args.input.workspaceEmail);
+    return token || null;
+  }
+})
+
+export const CreateAutomationToken = mutationField('createAutomationToken', {
+  type: 'String',
+  nullable: true,
+  args: { 'email': 'String' },
+
+  async resolve(parent, args, ctx) {
+    if (!args.email) throw new ApolloError('No email address provided!');
+    return ctx.services.authService.createAutomationToken(args.email, 262974);
+  }
+});
+
 export const RegisterMutation = mutationField('register', {
   type: 'String',
   nullable: true,

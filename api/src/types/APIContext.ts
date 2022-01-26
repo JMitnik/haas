@@ -19,8 +19,10 @@ import TriggerService from '../models/trigger/TriggerService';
 import EdgeService from '../models/edge/EdgeService';
 import { CampaignService } from '../models/Campaigns/CampaignService';
 import LinkService from '../models/link/LinkService';
+import AutomationService from '../models/automations/AutomationService';
 
 export interface APIServiceContainer {
+  automationService: AutomationService;
   userService: UserService;
   customerService: CustomerService;
   mailService: MailService;
