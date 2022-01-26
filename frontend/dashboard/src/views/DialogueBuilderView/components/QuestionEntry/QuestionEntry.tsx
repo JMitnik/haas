@@ -93,7 +93,7 @@ const QuestionEntryItem = ({ depth,
   parentQuestionId,
   ctaNodes,
   onAddExpandChange,
-  problems } : QuestionEntryItemProps) => {
+  problems }: QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { canAccessAdmin } = useAuth();
@@ -252,7 +252,6 @@ const QuestionEntryItem = ({ depth,
               condition={condition}
               id={question.id}
               title={question.title}
-              isRoot={question.isRoot}
               leafs={leafs}
               ctaNodes={ctaNodes}
               options={question?.options || []}

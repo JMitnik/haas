@@ -6,7 +6,7 @@ enum QuestionNodeTypeEnum {
   Form = 'FORM',
   Textbox = 'TEXTBOX',
   Link = 'LINK',
-  Share = 'SHARE'
+  Share = 'SHARE',
 }
 
 export interface CTANode {
@@ -59,7 +59,7 @@ export interface EdgeChildProps {
 export interface EdgeConditionProps {
   id?: number;
   conditionType?: string;
-  renderMin?: number;
-  renderMax?: number;
-  matchValue?: string;
+  renderMin?: number | null;
+  renderMax?: number | null;
+  matchValue?: string | null;
 }
