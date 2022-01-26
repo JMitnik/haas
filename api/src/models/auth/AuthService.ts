@@ -64,6 +64,36 @@ class AuthService {
   }
 
   /**
+   * Verifies the header sent by a Automation Action lambda 
+   * @param authorizationHeader the header send by an automation action lambda to verify itself as being authentic
+   * @returns true if lambda is authentic, false if not
+   */
+  async verifyLambdaAuthentication(authorizationHeader: string) {
+    try {
+      const verified = jwt.verify(authorizationHeader, config.apiSecret);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * Gets a token of a workspace (bot) email address in order to further interact with the haas API
+   * @param authorizationHeader the authentication header sent by a Automation Action lambda
+   * @param workspaceEmail the workspace (bot) email address the auth token is requested for
+   * @returns Authorization token for bot email address
+   */
+  async getWorkspaceAuthorizationToken(authorizationHeader: string, workspaceEmail: string) {
+    const isVerified = this.verifyLambdaAuthentication(authorizationHeader);
+    if (!isVerified) throw new Error('CALL WAS REJECTED BECAUSE HEADER VERIFICATION WAS REJECTED');
+    const user = await this.userService.getUserByEmail(workspaceEmail);
+    if (!user) throw new Error('No matching email address was found in our systems');
+    const token = AuthService.createUserToken(user.id);
+    await this.userService.setLoginToken(user.id, token);
+    return token;
+  }
+
+  /**
    * 
    * @param userId the id of the target user
    * @returns a boolean indicating whether the user is verified or not
@@ -79,6 +109,21 @@ class AuthService {
     } catch (e) {
       return false;
     }
+  }
+
+  /**
+  * Creates an automation token used as SECRET for our lambdas that interact with the haas API
+  * @param emailAddress The email address of the target user (e.g. automations@haas.live)
+  * @param duration the amount of time the token is valid for in minutes
+  * @returns a JWT token
+  */
+  createAutomationToken(emailAddress: string, duration: number | null = null) {
+    const tokenMinutes = duration || config.jwtExpiryMinutes;
+
+    return jwt.sign({
+      email: emailAddress,
+      exp: Math.floor(Date.now() / 1000) + (tokenMinutes * 60),
+    }, config.apiSecret);
   }
 
   /**

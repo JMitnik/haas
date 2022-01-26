@@ -1,5 +1,6 @@
 import * as AuthAPI from '../models/auth/Auth';
 import * as AutodeckAPI from '../models/autodeck/Autodeck';
+import * as AutomationAPI from '../models/automations';
 import * as CampaignAPI from '../models/Campaigns';
 import * as DebugAPI from '../models/debug/Debug';
 import * as InteractionAPI from '../models/session/graphql';
@@ -23,6 +24,7 @@ const nexus = [
   ...Array(AutodeckAPI),
   ...linkNexus,
   ...tagNexus,
+  ...Array(AutomationAPI),
   ...Array(CampaignAPI),
   ...triggerNexus,
   ...permissionNexus,

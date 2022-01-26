@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "SystemPermissionEnum" ADD VALUE 'CAN_UPDATE_AUTOMATIONS';
