@@ -62,6 +62,24 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
     });
   };
 
+  const handleRemoveCTAFromOption = (index: number) => {
+    const choice = choicesForm.fields[index];
+    const newChoice = {
+      id: choice.id,
+      overrideLeaf: {
+        label: undefined,
+        value: undefined,
+        type: undefined,
+      },
+      position: undefined,
+      publicValue: choice.publicValue,
+      value: choice.value,
+    };
+
+    choicesForm.remove(index);
+    choicesForm.insert(index, newChoice);
+  };
+
   return (
     <UI.Div>
       <UI.InputHeader>{t('dialogue:choices')}</UI.InputHeader>
@@ -172,7 +190,11 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                               alignItems="center"
                             >
                               {value?.label ? (
-                                <NodeCell onClick={onOpen} node={value} />
+                                <NodeCell
+                                  onRemove={() => handleRemoveCTAFromOption(index)}
+                                  onClick={onOpen}
+                                  node={value}
+                                />
                               ) : (
                                 <UI.Button
                                   size="sm"

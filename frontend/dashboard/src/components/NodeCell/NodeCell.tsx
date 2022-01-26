@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { MapNodeToProperties } from "components/MapNodeToProperties";
+import { MapNodeToProperties } from 'components/MapNodeToProperties';
 
 export const NodeCellContainer = styled.div`
   ${({ theme }) => css`
@@ -36,13 +36,25 @@ export const NodeCellContainer = styled.div`
   `}
 `;
 
-export const NodeCell = ({ node, onClick }: { node: any, onClick?: () => void }) => {
+interface NodeCellProps {
+  node: any;
+  onClick?: () => void;
+  onRemove: () => void;
+}
+
+export const NodeCell = ({ node, onClick, onRemove }: NodeCellProps) => {
   if (!node.type) return null;
 
   const nodeProps = MapNodeToProperties(node.type);
 
+  const removeCTAFromOption = (e: any) => {
+    e.stopPropagation();
+    onRemove();
+  };
+
   return (
-    <NodeCellContainer onClick={onClick} style={{ padding: '8px 12px', width: "100%" }}>
+    <NodeCellContainer onClick={onClick} style={{ padding: '8px 12px', width: '100%', position: 'relative' }}>
+      <UI.CloseButton onClose={removeCTAFromOption} top="5px" right="5px" />
       <UI.Flex width="100%">
         <UI.Icon
           bg={nodeProps.bg}
@@ -59,11 +71,14 @@ export const NodeCell = ({ node, onClick }: { node: any, onClick?: () => void })
           <UI.Text>
             {node.label}
           </UI.Text>
-          <UI.MicroLabel bg={nodeProps.bg} color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}>
+          <UI.MicroLabel
+            bg={nodeProps.bg}
+            color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}
+          >
             {node.type}
           </UI.MicroLabel>
         </UI.Div>
       </UI.Flex>
     </NodeCellContainer>
-  )
-}
+  );
+};
