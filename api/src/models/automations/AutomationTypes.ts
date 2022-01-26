@@ -1,8 +1,8 @@
 import {
-  AutomationActionType, AutomationConditionOperand, AutomationConditionOperatorType,
+  AutomationActionType, AutomationConditionBuilder, AutomationConditionOperand, AutomationConditionOperatorType,
   AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate,
   Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
-  WorkspaceConditionScope,
+  WorkspaceConditionScope, AutomationCondition as PrismaAutomationCondition, AutomationConditionBuilderType,
 } from '@prisma/client';
 
 import { NexusGenEnums } from '../../generated/nexus';
@@ -107,6 +107,19 @@ export interface UpdateAutomationConditionInput extends CreateAutomationConditio
   scope: UpdateAutomationConditionScopeInput;
 }
 
+export interface CreateConditionBuilderInput {
+  type: AutomationConditionBuilderType;
+  conditions: CreateAutomationConditionInput[];
+  childBuilder?: CreateConditionBuilderInput;
+}
+
+export interface UpdateConditionBuilderInput extends CreateConditionBuilderInput {
+  id?: string;
+  conditions: UpdateAutomationConditionInput[];
+  childBuilder?: UpdateConditionBuilderInput;
+
+}
+
 export interface CreateAutomationInput {
   label: string;
   workspaceId: string;
@@ -118,7 +131,8 @@ export interface CreateAutomationInput {
     eventType: NexusGenEnums['AutomationEventType']; // AutomationEventType
     questionId?: string | null; // String
   };
-  conditions: CreateAutomationConditionInput[];
+  conditionBuilder: CreateConditionBuilderInput;
+  conditions?: CreateAutomationConditionInput[];
   actions: CreateAutomationActionInput[];
 };
 
@@ -139,6 +153,7 @@ export interface UpdateAutomationInput extends CreateAutomationInput {
   automationCampaignId?: string;
   actions: UpdateAutomationActionInput[];
   conditions: UpdateAutomationConditionInput[];
+  conditionBuilder: UpdateConditionBuilderInput;
 }
 
 export type MoreXOR = CreateQuestionScopeInput['aspect'] | CreateDialogueScopeInput['aspect'] | CreateWorkspaceScopeInput['aspect']
@@ -183,7 +198,7 @@ export interface AutomationTrigger {
   createdAt: Date;
   updatedAt: Date | null;
   event: AutomationEventWithRels;
-  conditions: AutomationCondition[];
+  conditionBuilder: (AutomationConditionBuilder & { conditions: AutomationCondition[] });
   actions: {
     id: string;
     type: AutomationActionType;
@@ -214,4 +229,19 @@ export interface SetupQuestionCompareDataOutput {
   totalEntries: number;
   compareValue?: number | null;
   operand?: number | null;
+}
+
+export interface BuilderEntry extends AutomationConditionBuilder {
+  conditions: PrismaAutomationCondition[];
+  childConditionBuilder?: BuilderEntry | null;
+}
+
+export interface PreValidatedConditions {
+  AND?: (AutomationCondition | PreValidatedConditions)[];
+  OR?: (AutomationCondition | PreValidatedConditions)[];
+}
+
+export interface CheckedConditions {
+  AND?: (boolean | CheckedConditions)[];
+  OR?: (boolean | CheckedConditions)[];
 }

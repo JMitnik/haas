@@ -975,6 +975,24 @@ model WorkspaceConditionScope {
   automationConditionId String              @unique
 }
 
+enum AutomationConditionBuilderType {
+  AND
+  OR
+}
+
+model AutomationConditionBuilder {
+  id String @id @default(cuid())
+
+  type                   AutomationConditionBuilderType
+  conditions             AutomationCondition[]
+  parentConditionBuilder AutomationConditionBuilder?    @relation("AutomationConditionBuilderToAutomationConditionBuilder")
+
+  childConditionBuilderId String?                     @unique
+  childConditionBuilder   AutomationConditionBuilder? @relation("AutomationConditionBuilderToAutomationConditionBuilder", fields: [childConditionBuilderId], references: [id])
+
+  automationTrigger AutomationTrigger?
+}
+
 model AutomationCondition {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now())
@@ -997,8 +1015,8 @@ model AutomationCondition {
 
   // TODO: Add workspace relation so Workspace-wide conditions can be introduced
 
-  automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id])
-  automationTriggerId String?
+  automationConditionBuilder   AutomationConditionBuilder @relation(fields: [automationConditionBuilderId], references: [id])
+  automationConditionBuilderId String
 }
 
 model AutomationAction {
@@ -1019,11 +1037,16 @@ model AutomationTrigger {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
+  // Event: When is an automation triggered
   event   AutomationEvent @relation(fields: [eventId], references: [id])
   eventId String
 
-  conditions AutomationCondition[]
-  actions    AutomationAction[]
+  // Condition: When should an automation actually fire.
+  conditionBuilder             AutomationConditionBuilder @relation(fields: [automationConditionBuilderId], references: [id])
+  automationConditionBuilderId String                     @unique
+
+  // Action: What should happen when an automation fire.
+  actions     AutomationAction[]
 
   automations Automation[]
 }

@@ -7,26 +7,32 @@ import {
   QuestionAspect,
   OperandType,
   AutomationActionType,
+  AutomationConditionBuilderType,
 } from '@prisma/client';
+import { isPresent } from 'ts-is-present';
 import { UserInputError } from 'apollo-server-express';
-import { offsetPaginate } from '../general/PaginationHelpers';
 
+
+import { offsetPaginate } from '../general/PaginationHelpers';
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
 import UserService from '../users/UserService';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
-
+import AutomationConditionBuilderService from './AutomationConditionBuilderService';
 import {
   AutomationCondition,
   AutomationTrigger,
+  BuilderEntry,
+  CheckedConditions,
+  CreateAutomationConditionInput,
   CreateAutomationConditionScopeInput,
   CreateAutomationInput,
   CreateConditionOperandInput,
+  PreValidatedConditions,
   SetupQuestionCompareDataInput,
   SetupQuestionCompareDataOutput,
   UpdateAutomationInput,
 } from './AutomationTypes'
-import { isPresent } from 'ts-is-present';
 import { AutomationActionService } from './AutomationActionService';
 
 class AutomationService {
@@ -41,6 +47,119 @@ class AutomationService {
     this.automationActionService = new AutomationActionService(prisma);
     this.userService = new UserService(prisma);
   }
+
+  /**
+   * Validates all conditions in a condition builder (including its nested condition builders)
+   * @param builderId ID of the root condition builder
+   * @returns a boolean indicating whether conditions have passed or not
+   */
+  validateConditionBuilder = async (builderId: string): Promise<boolean> => {
+    const conditionBuilder = await this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
+    const destructedData = await this.destructureBuilder(conditionBuilder as BuilderEntry);
+    const validatedObjects = await this.validateConditions(destructedData, {});
+    console.log('Validated Objects: ', validatedObjects);
+
+    const builderConditionsPassed = AutomationConditionBuilderService.checkConditions(validatedObjects);
+    console.log('Builder condition passed: ', builderConditionsPassed)
+    return builderConditionsPassed;
+  };
+
+  /**
+   * Restructures conditions in builder (and its nested builders) in a format more easily looped over when validating conditions
+   * e.g. 
+   * { 
+   *  AND: [
+   *    condition1,
+   *    {
+   *      OR: [
+   *        condition2,
+   *        condition3
+   *      ]
+   *    }
+   *  ]
+   * }
+   * @param dataObj an empty object
+   * @param entry an AutomationConditionBuilder entry with conditions and nested conditionBuilder
+   * @returns An object containing a list of conditions with either AND/OR as its property as well as nested objects containing conditions
+   */
+  destructureBuilder = async (entry: BuilderEntry) => {
+    const dataObj = {} as any;
+    // If there are any conditions available for a builder entry add them to a list with the type (AND/OR) as its property
+    if (entry.conditions.length) {
+      dataObj[entry.type] = [
+        ...entry.conditions,
+      ]
+    }
+
+    if (entry.childConditionBuilderId) {
+      const child = await this.findAutomationConditionBuilder(entry.childConditionBuilderId);
+
+      if (!child) throw new Error('Has childConditioBuilderId but cannot find the entry in DB!');
+
+      // If nested condition builder exist recursively run this function again and add its contents to list
+      const des = await this.destructureBuilder(child);
+      dataObj[entry.type].push(des)
+    }
+
+    return dataObj;
+  }
+
+  /**
+   * Validates conditions of a child builder based on its type (AND/OR)
+   * @param data an Object containing a list AutomationConditions and optionally an nested object containing additional conditions
+   * @param checkedObject an Object containing the results of previously validated conditions
+   * @returns An object containing the results (booleans) of all conditions
+   */
+  validateConditions = async (data: PreValidatedConditions, checkedObject: CheckedConditions) => {
+    const isAND = !!data['AND'];
+    const type = isAND ? 'AND' : 'OR' as keyof CheckedConditions;
+    const conditions = data[type] as (PreValidatedConditions | AutomationCondition)[];
+
+    // Check if AND/OR property exist on object storing results
+    const andOrOr = Object.keys(checkedObject).find((property) => (
+      property === 'AND' || property === 'OR'
+    )) as keyof CheckedConditions | undefined;
+
+    // If AND/OR property doesn't exist on object storing result
+    // => Add the property with an empty array
+    if (!andOrOr) {
+      checkedObject[type] = [];
+    }
+
+    await Promise.all(conditions.map(async (entry) => {
+      // If entry is an AutomationCondition => validate whether condition is true or not
+      if ((entry as AutomationCondition)?.id) {
+        const validated = await this.testTriggerCondition(entry as AutomationCondition);
+        const finalType = andOrOr || type;
+        checkedObject[finalType]?.push(validated);
+      } else {
+        // If entry is a nested object => Run this function recursively and add validated results to existing object
+        const childIsAnd = (entry as PreValidatedConditions)?.AND ? { AND: [] } : { OR: [] };
+        const validated = await this.validateConditions(entry as PreValidatedConditions, childIsAnd);
+        checkedObject[type]?.push(validated);
+      }
+    }));
+
+    return checkedObject;
+  }
+
+  /**
+   * Finds automation condition builder by its ID
+   * @param builderId the ID of a condition builder
+   * @returns a condition builder
+   */
+  findAutomationConditionBuilder = (builderId: string) => {
+    return this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
+  };
+
+  /**
+   * Finds automation condition by its ID
+   * @param automationConditionId the ID of an automation condition
+   * @returns an automation condition
+   */
+  findAutomationConditionById = (automationConditionId: string) => {
+    return this.automationPrismaAdapter.findAutomationConditionById(automationConditionId);
+  };
 
   /**
    * Sets up the data necessary for comparing slider data with the condition match value
@@ -68,7 +187,10 @@ class AutomationService {
 
   /**
   * Sets up the data necessary for comparing choice data with the condition match value
-  * @param input object containing
+  * @param input object containing data needed to aggregate and operand data.
+  * Object *MUST* contain 2 operands:
+  * - One of type INT (the amount to check against)
+  * - One of type STRING (the option value to check against)
   * @returns an object containing the value to be compared, the match value it should be checked against and total entries
   */
   setupChoiceCompareData = async (
@@ -138,17 +260,18 @@ class AutomationService {
     };
     // Fetch data based on scope
     const scopedData = await this.setupQuestionCompareData(input);
-
     // Some of the data necessary to validate condition is missing
     if (
       !scopedData ||
       (!scopedData?.compareValue && typeof scopedData?.compareValue !== 'number')
       || !scopedData?.operand
     ) {
+      console.log('Some of the data necessary to validate condition is missing. Returning false');
       return false;
     }
 
     // Want latest X but there is less than X *new* entries in the database => return false
+    // TODO: Add this batch option to event instead of condition
     const hasNotEnoughLatest = (
       condition.questionScope?.aggregate?.latest &&
       scopedData.totalEntries % condition.questionScope?.aggregate?.latest !== 0
@@ -205,26 +328,35 @@ class AutomationService {
   }
 
   /**
+   * Tests a condition of an AutomationTrigger based on its scope
+   * @param condition an AutomationCondition
+   * @returns boolean. true if condition passes, false if condition fails.
+   */
+  testTriggerCondition = (condition: AutomationCondition) => {
+    switch (condition.scope) {
+      case AutomationConditionScopeType.QUESTION: {
+        return this.validateQuestionScopeCondition(condition);
+      }
+
+      case AutomationConditionScopeType.DIALOGUE: {
+        return false;
+      }
+
+      default: {
+        return false;
+      }
+    }
+  }
+
+  /**
    * Checks conditions of a potentially triggered automation
    * @param automationTriggers a list of potentially triggered automations
    * @returns boolean whether all conditions of an automation trigger pass
    */
   testTriggerConditions = async (automationTrigger: AutomationTrigger) => {
-    const matchedConditionsTriggers = await Promise.all(automationTrigger.conditions.map(async (condition) => {
-      switch (condition.scope) {
-        case AutomationConditionScopeType.QUESTION: {
-          return this.validateQuestionScopeCondition(condition);
-        }
-
-        case AutomationConditionScopeType.DIALOGUE: {
-          return false;
-        }
-
-        default: {
-          return false;
-        }
-      }
-    }));
+    const matchedConditionsTriggers = await Promise.all(
+      automationTrigger.conditionBuilder.conditions.map(async (condition) => this.testTriggerCondition(condition))
+    );
 
     const successfullyPassedAllConditions = !matchedConditionsTriggers.includes(false);
     return successfullyPassedAllConditions;
@@ -307,8 +439,7 @@ class AutomationService {
 
       if (!trigger) return null;
 
-      // TODO: Consider ANDS vs ORs for conditions
-      const allConditionsConfirmed = await this.testTriggerConditions(trigger);
+      const allConditionsConfirmed = await this.validateConditionBuilder(trigger.automationConditionBuilderId);
 
       if (allConditionsConfirmed) {
         await Promise.all(trigger?.actions?.map((automationAction) => {
@@ -396,7 +527,7 @@ class AutomationService {
    * @param input
    * @returns validated CREATE prisma automation actions data list
    */
-  validateAutomationActionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['actions'] => {
+  validateAutomationActionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['actions'] => {
     if (input?.actions?.length === 0) throw new UserInputError('No actions provided for automation!');
 
     input.actions?.forEach((action) => {
@@ -438,7 +569,7 @@ class AutomationService {
    * @returns a validated AutomationAction input list where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructAutomationActionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['actions'] => {
+  constructAutomationActionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['actions'] => {
     const validatedActions = this.validateAutomationActionsInput(input);
     return validatedActions;
   }
@@ -449,10 +580,10 @@ class AutomationService {
    * @returns a validated AutomationCondition input list
    * @throws UserInputError if not all information is required
    */
-  validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
-    if (input.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
+  validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
+    if (input.conditionBuilder?.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
 
-    input.conditions?.forEach((condition) => {
+    input.conditionBuilder?.conditions?.forEach((condition) => {
       if (!condition.operator) {
         throw new UserInputError('No operator type is provided for a condition');
       }
@@ -464,7 +595,46 @@ class AutomationService {
       });
     });
 
-    return input.conditions as Required<NexusGenInputs['CreateAutomationCondition'][]>;
+    return input.conditionBuilder?.conditions as Required<NexusGenInputs['CreateAutomationCondition'][]>;
+  }
+
+  constructBuilderRecursive = (input: NexusGenInputs['AutomationConditionBuilderInput']): CreateAutomationInput['conditionBuilder'] => {
+    let mappedConditions: CreateAutomationConditionInput[] = [];
+    let childConditionBuilder;
+
+    if (input.conditions?.length) {
+      mappedConditions = input.conditions.map((condition) => {
+        return {
+          ...condition,
+          operator: condition.operator as Required<AutomationConditionOperatorType>,
+          scope: this.constructCreateAutomationConditionScopeInput(condition),
+          operands: condition.operands?.map((operand) => {
+            const { dateTimeValue, operandType, numberValue, textValue, id } = operand;
+
+            return {
+              id,
+              dateTimeValue,
+              numberValue,
+              textValue,
+              type: operandType,
+            }
+          }) as Required<CreateConditionOperandInput[]> || [],
+        }
+      }) || [];
+    }
+
+    if (input.childConditionBuilder) {
+      childConditionBuilder = this.constructBuilderRecursive(input.childConditionBuilder);
+    }
+
+    const finalObject: UpdateAutomationInput['conditionBuilder'] = {
+      id: input.id || undefined,
+      conditions: mappedConditions,
+      type: input.type as Required<AutomationConditionBuilderType>,
+      childBuilder: childConditionBuilder,
+    }
+
+    return finalObject;
   }
 
   /**
@@ -473,7 +643,7 @@ class AutomationService {
    * @returns a validated AutomationCondition input list where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['conditions'] => {
+  constructCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['conditions'] => {
     const validatedConditions = this.validateCreateAutomationConditionsInput(input) as Required<NexusGenInputs['CreateAutomationCondition'][]>;
 
     const mappedConditions: CreateAutomationInput['conditions'] = validatedConditions?.map((condition) => {
@@ -503,7 +673,7 @@ class AutomationService {
    * @returns a validated AutomationEvent input object where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationEventInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput['event'] => {
+  constructCreateAutomationEventInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['event'] => {
     if (!input.event) throw new UserInputError('No event provided for automation!');
     if (!input.event?.eventType || typeof input.event?.eventType === undefined || input.event?.eventType === null) throw new UserInputError('No event type provided for automation event!');
 
@@ -519,7 +689,7 @@ class AutomationService {
    * @returns a validated Automation input object where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  validateCreateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput => {
+  validateCreateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput => {
     if (!input) throw new UserInputError('No input provided create automation with!');
     if (!input.label || typeof input.label === undefined || input.label === null) throw new UserInputError('No label provided for automation!');
 
@@ -534,17 +704,29 @@ class AutomationService {
    * @returns a validated Automation prisma data object
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): CreateAutomationInput => {
+  constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput => {
     const validatedInput = this.validateCreateAutomationInput(input);
 
     const label: CreateAutomationInput['label'] = validatedInput.label;
     const workspaceId: CreateAutomationInput['workspaceId'] = validatedInput.workspaceId;
     const automationType: CreateAutomationInput['automationType'] = validatedInput.automationType;
     const conditions: CreateAutomationInput['conditions'] = this.constructCreateAutomationConditionsInput(input);
+
+    const builderInput = input.conditionBuilder as Required<NexusGenInputs['AutomationConditionBuilderInput']>;
+    const conditionBuilder: CreateAutomationInput['conditionBuilder'] = this.constructBuilderRecursive(builderInput)
     const event: CreateAutomationInput['event'] = this.constructCreateAutomationEventInput(input);
     const actions: CreateAutomationInput['actions'] = this.constructAutomationActionsInput(input);
 
-    return { label, workspaceId, automationType, conditions, event, actions, description: input.description }
+    return {
+      label,
+      workspaceId,
+      automationType,
+      conditions,
+      event,
+      actions,
+      description: input.description,
+      conditionBuilder,
+    }
   }
 
   /**
@@ -553,12 +735,13 @@ class AutomationService {
    * @returns a validated Automation input object containing all information necessary to update an Automation
    * @throws UserInputError if not all information is required
    */
-  constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationResolverInput']): UpdateAutomationInput => {
+  constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): UpdateAutomationInput => {
     if (!input.id) throw new UserInputError('No ID provided for automation that should be updated!');
+    if (!input.conditionBuilder?.id) throw new UserInputError('No ID provided for the root condition builder');
 
     const id: UpdateAutomationInput['id'] = input.id;
     const createInput = this.constructCreateAutomationInput(input);
-    return { ...createInput, id: id }
+    return { ...createInput, id: id, conditions: createInput.conditions || [] }
   }
 
   /**
@@ -567,7 +750,7 @@ class AutomationService {
    * @returns updated Automation (without relationship fields)
    * @throws UserInputError if not all information is required
    */
-  public updateAutomation = (input: NexusGenInputs['CreateAutomationResolverInput']) => {
+  public updateAutomation = (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to update an automation
     const validatedInput = this.constructUpdateAutomationInput(input);
     return this.automationPrismaAdapter.updateAutomation(validatedInput);
@@ -579,7 +762,7 @@ class AutomationService {
    * @returns created Automation (without relationship fields)
    * @throws UserInputError if not all information is required
    */
-  public createAutomation = (input: NexusGenInputs['CreateAutomationResolverInput']) => {
+  public createAutomation = (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to create an automation
     const validatedInput = this.constructCreateAutomationInput(input);
     return this.automationPrismaAdapter.createAutomation(validatedInput);
@@ -636,7 +819,6 @@ class AutomationService {
       pageInfo,
     };
   };
-
 }
 
 export default AutomationService;

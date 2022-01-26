@@ -21,7 +21,7 @@ it('creates automation', async () => {
   const token = AuthService.createUserToken(user.id, 22);
   const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
   const res = await ctx.client.request(`
-    mutation createAutomation($input: CreateAutomationResolverInput) {
+    mutation createAutomation($input: CreateAutomationInput) {
       createAutomation(input: $input) {
         id
         label
@@ -43,7 +43,6 @@ it('creates automation', async () => {
   });
 })
 
-// TODO: Why does this one throws Not Authorized even though it is same setup as label
 it('unable to create automation when no workspace id is provided', async () => {
   const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
@@ -54,7 +53,7 @@ it('unable to create automation when no workspace id is provided', async () => {
 
   try {
     await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
+      mutation createAutomation($input: CreateAutomationInput) {
         createAutomation(input: $input) {
           id
           label
@@ -86,7 +85,7 @@ it('unable to create automation when no automation label is provided', async () 
 
   try {
     await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
+      mutation createAutomation($input: CreateAutomationInput) {
         createAutomation(input: $input) {
           id
           label
@@ -118,7 +117,7 @@ it('unable to create automation when no automation type is provided', async () =
 
   try {
     await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
+      mutation createAutomation($input: CreateAutomationInput) {
         createAutomation(input: $input) {
           id
           label
@@ -140,102 +139,6 @@ it('unable to create automation when no automation type is provided', async () =
   }
 });
 
-it('unable to create automation when no conditions are provided', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
-
-  // Generate token for API access
-  const token = AuthService.createUserToken(user.id, 22);
-  const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
-  input.conditions = [];
-
-  try {
-    await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
-        createAutomation(input: $input) {
-          id
-          label
-          type
-        }
-      }
-    `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
-    );
-  } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No conditions provided');
-    } else { throw new Error(); }
-  }
-});
-
-it('unable to create automation when no match value type is provided for a condition', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
-
-  // Generate token for API access
-  const token = AuthService.createUserToken(user.id, 22);
-  const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
-  (input.conditions?.[0]?.operands?.[0] as any).operandType = null;
-
-  try {
-    await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
-        createAutomation(input: $input) {
-          id
-          label
-          type
-        }
-      }
-    `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
-    );
-  } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No match value type');
-    } else { throw new Error(); }
-  }
-});
-
-it('unable to create automation when no operator type is provided for a condition', async () => {
-  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
-
-  // Generate token for API access
-  const token = AuthService.createUserToken(user.id, 22);
-  const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
-  (input.conditions?.[0] as any).operator = null;
-
-  try {
-    await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
-        createAutomation(input: $input) {
-          id
-          label
-          type
-        }
-      }
-    `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
-    );
-  } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No operator type');
-    } else { throw new Error(); }
-  }
-});
-
 it('unable to create automation when no actions are provided', async () => {
   const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 
@@ -246,7 +149,7 @@ it('unable to create automation when no actions are provided', async () => {
 
   try {
     await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
+      mutation createAutomation($input: CreateAutomationInput) {
         createAutomation(input: $input) {
           id
           label
@@ -278,7 +181,7 @@ it('unable to create automation when no action type is provided for an action', 
 
   try {
     await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
+      mutation createAutomation($input: CreateAutomationInput) {
         createAutomation(input: $input) {
           id
           label
@@ -310,7 +213,7 @@ it('unable to create automation when no event type is provided for a condition',
 
   try {
     await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
+      mutation createAutomation($input: CreateAutomationInput) {
         createAutomation(input: $input) {
           id
           label
@@ -342,7 +245,7 @@ it('unable to create automation when no event type is provided for a condition',
 
   try {
     await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
+      mutation createAutomation($input: CreateAutomationInput) {
         createAutomation(input: $input) {
           id
           label
@@ -375,7 +278,7 @@ it('unable to create automation when no targets are provided for a SEND_SMS acti
 
   try {
     await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
+      mutation createAutomation($input: CreateAutomationInput) {
         createAutomation(input: $input) {
           id
           label
@@ -413,7 +316,7 @@ it('unable to create automations unauthorized', async () => {
 
   try {
     await ctx.client.request(`
-      mutation createAutomation($input: CreateAutomationResolverInput) {
+      mutation createAutomation($input: CreateAutomationInput) {
         createAutomation(input: $input) {
           id
           label
@@ -434,6 +337,3 @@ it('unable to create automations unauthorized', async () => {
     } else { throw new Error(); }
   }
 });
-
-
-

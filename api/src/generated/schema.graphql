@@ -56,6 +56,27 @@ enum AutomationActionType {
   WEBHOOK
 }
 
+input AutomationConditionBuilderInput {
+  childConditionBuilder: AutomationConditionBuilderInput
+  conditions: [CreateAutomationCondition!]
+  id: ID
+  type: AutomationConditionBuilderType
+}
+
+"""AutomationConditionBuilder"""
+type AutomationConditionBuilderModel {
+  childConditionBuilder: AutomationConditionBuilderModel
+  childConditionBuilderId: String
+  conditions: [AutomationConditionModel!]!
+  id: ID!
+  type: AutomationConditionBuilderType!
+}
+
+enum AutomationConditionBuilderType {
+  AND
+  OR
+}
+
 """AutomationCondition"""
 type AutomationConditionModel {
   createdAt: Date!
@@ -172,7 +193,7 @@ type AutomationModel {
 """AutomationTrigger"""
 type AutomationTriggerModel {
   actions: [AutomationActionModel!]!
-  conditions: [AutomationConditionModel!]!
+  conditionBuilder: AutomationConditionBuilderModel
   createdAt: Date!
   event: AutomationEventModel!
   id: ID!
@@ -310,23 +331,23 @@ input CreateAutomationCondition {
   workspaceId: String
 }
 
+input CreateAutomationInput {
+  actions: [AutomationActionInput!]
+  automationType: AutomationType
+  conditionBuilder: AutomationConditionBuilderInput
+  description: String
+  event: AutomationEventInput
+  id: ID
+  label: String
+  workspaceId: String
+}
+
 input CreateAutomationOperandInput {
   dateTimeValue: String
   id: ID
   numberValue: Int
   operandType: OperandType
   textValue: String
-}
-
-input CreateAutomationResolverInput {
-  actions: [AutomationActionInput!]
-  automationType: AutomationType
-  conditions: [CreateAutomationCondition!]
-  description: String
-  event: AutomationEventInput
-  id: ID
-  label: String
-  workspaceId: String
 }
 
 input CreateBatchDeliveriesInputType {
@@ -982,7 +1003,9 @@ type Mutation {
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
-  createAutomation(input: CreateAutomationResolverInput): AutomationModel!
+
+  """Creates a new automation."""
+  createAutomation(input: CreateAutomationInput): AutomationModel!
   createAutomationToken(email: String): String
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
   createCampaign(input: CreateCampaignInputType): CampaignType!
@@ -1023,7 +1046,7 @@ type Mutation {
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   singleUpload(file: Upload): ImageType!
-  updateAutomation(input: CreateAutomationResolverInput): AutomationModel!
+  updateAutomation(input: CreateAutomationInput): AutomationModel!
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!

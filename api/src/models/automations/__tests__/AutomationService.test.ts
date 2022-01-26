@@ -3,7 +3,7 @@ import { automationTriggerInput, choiceQuestionCompareDataInput, conditionInput,
 import { clearDatabase } from './testUtils';
 import AutomationService from '../AutomationService';
 import { AutomationCondition, AutomationTrigger } from '../AutomationTypes';
-import { AutomationConditionOperatorType, AutomationType, NodeType, PrismaClient } from '@prisma/client';
+import { AutomationConditionBuilderType, AutomationConditionOperatorType, AutomationType, NodeType, PrismaClient } from '@prisma/client';
 import { sample } from 'lodash';
 import { cloneDeep } from 'lodash';
 
@@ -116,35 +116,41 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
               },
             },
           },
-          conditions: {
-            create: [
-              {
-                question: {
-                  connect: {
-                    id: questionId,
-                  },
-                },
-                scope: 'QUESTION',
-                operator: 'SMALLER_OR_EQUAL_THAN',
-                questionScope: {
-                  create: {
-                    aspect: 'NODE_VALUE',
-                    aggregate: {
+          conditionBuilder: {
+            create: {
+              type: AutomationConditionBuilderType.AND,
+              conditions: {
+                create: [
+                  {
+                    question: {
+                      connect: {
+                        id: questionId,
+                      },
+                    },
+                    scope: 'QUESTION',
+                    operator: 'SMALLER_OR_EQUAL_THAN',
+                    questionScope: {
                       create: {
-                        type: 'AVG',
-                        latest: 3,
+                        aspect: 'NODE_VALUE',
+                        aggregate: {
+                          create: {
+                            type: 'AVG',
+                            latest: 3,
+                          },
+                        },
+                      },
+                    },
+                    operands: {
+                      create: {
+                        type: 'INT',
+                        numberValue: 50,
                       },
                     },
                   },
-                },
-                operands: {
-                  create: {
-                    type: 'INT',
-                    numberValue: 50,
-                  },
-                },
+                ],
               },
-            ],
+            }
+
           },
           actions: {
             create: [
@@ -237,7 +243,7 @@ describe('AutomationService', () => {
     // Add an extra condition with flipped operator so it 100% return false
     const extraCondition = cloneDeep(conditionInput);
     extraCondition.operator = AutomationConditionOperatorType.GREATER_OR_EQUAL_THAN;
-    automationTrigger.conditions.push(extraCondition);
+    automationTrigger.conditionBuilder.conditions.push(extraCondition);
 
     // One passed condition, One reject condition => false
     const doubleConditionChecked = await automationService.testTriggerConditions(automationTrigger);

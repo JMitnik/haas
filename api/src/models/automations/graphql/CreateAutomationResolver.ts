@@ -11,6 +11,7 @@ import { ConditionPropertyAggregateType } from './ConditionPropertyAggregateType
 import { AutomationActionType } from './AutomationActionType';
 import { AutomationModel } from './AutomationModel';
 import { UserInputError } from 'apollo-server-express';
+import { AutomationConditionBuilderType } from './AutomationConditionBuilderType';
 
 export const CreateAutomationOperandInput = inputObjectType({
   name: 'CreateAutomationOperandInput',
@@ -107,10 +108,30 @@ export const AutomationEventInput = inputObjectType({
     t.string('questionId', { nullable: true });
     t.string('dialogueId', { nullable: true });
   },
-})
+});
 
-export const CreateAutomationResolverInput = inputObjectType({
-  name: 'CreateAutomationResolverInput',
+export const AutomationConditionBuilderInput = inputObjectType({
+  name: 'AutomationConditionBuilderInput',
+  definition(t) {
+    t.id('id', { nullable: true });
+
+    t.field('type', {
+      type: AutomationConditionBuilderType,
+    });
+
+    t.list.field('conditions', {
+      type: CreateAutomationCondition,
+    });
+
+    t.field('childConditionBuilder', {
+      type: AutomationConditionBuilderInput,
+      nullable: true,
+    });
+  },
+});
+
+export const CreateAutomationInput = inputObjectType({
+  name: 'CreateAutomationInput',
   definition(t) {
     // Generic info
     t.id('id', { nullable: true });
@@ -125,7 +146,7 @@ export const CreateAutomationResolverInput = inputObjectType({
     t.field('event', { type: AutomationEventInput });
 
     // Trigger: condition related fields
-    t.list.field('conditions', { type: CreateAutomationCondition });
+    t.field('conditionBuilder', { type: AutomationConditionBuilderInput });
 
     // Automation Actions
     t.list.field('actions', { type: AutomationActionInput });
@@ -136,11 +157,13 @@ export const CreateAutomationResolverInput = inputObjectType({
 });
 
 export const CreateAutomationResolver = mutationField('createAutomation', {
+  description: 'Creates a new automation.',
   type: AutomationModel,
-  args: { input: CreateAutomationResolverInput },
-  async resolve(parent, args, ctx) {
+  args: { input: CreateAutomationInput },
 
+  async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+
     const automation = await ctx.services.automationService.createAutomation(args.input);
     return automation;
   },
