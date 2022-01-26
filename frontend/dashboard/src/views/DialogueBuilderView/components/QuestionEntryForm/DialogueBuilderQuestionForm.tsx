@@ -163,7 +163,7 @@ const DialogueBuilderQuestionForm = ({
       sliderNode,
       unhappyText: question.sliderNode?.unhappyText,
       happyText: question.sliderNode?.happyText,
-      range: [condition?.renderMin || 30, condition?.renderMax || 70],
+      range: [condition?.renderMin ?? 30, condition?.renderMax ?? 70],
       questionType: type?.value,
       optionsFull: options.map((option) => ({
         id: option.id,
