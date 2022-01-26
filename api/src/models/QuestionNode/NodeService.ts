@@ -50,7 +50,7 @@ export interface IdMapProps {
   [details: string]: string;
 }
 
-class NodeService {
+export class NodeService {
   prisma: PrismaClient;
   questionNodePrismaAdapter: QuestionNodePrismaAdapter;
   edgeService: EdgeService;
@@ -699,9 +699,13 @@ class NodeService {
   /**
    * Finds and updates edges if an existing option in parent question has changed
    * @param dbOptions a list of options before question is updated
-   * @param newOptions a list of updated options 
+   * @param newOptions a list of updated options
    */
-  updateEdgeOptionsByQuestionId = async (newOptions: QuestionOptionProps[], dbOptions?: QuestionOption[], questionId?: string) => {
+  updateStaleEdgeConditions = async (
+    newOptions: QuestionOptionProps[],
+    dbOptions?: QuestionOption[],
+    questionId?: string
+  ) => {
     const updatable: { [key: string]: string } = {};
 
     if (!dbOptions || !questionId) return;
@@ -781,7 +785,7 @@ class NodeService {
       }
     };
 
-    await this.updateEdgeOptionsByQuestionId(options, activeQuestion?.options, activeQuestion?.id);
+    await this.updateStaleEdgeConditions(options, activeQuestion?.options, activeQuestion?.id);
 
     const updateInput: UpdateQuestionInput = {
       title,
