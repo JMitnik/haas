@@ -1,0 +1,64 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "sort-class-members"],
+  "parserOptions": {
+    "project": "api/tsconfig.json"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "project": "api/tsconfig.json"
+      }
+    },
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts"]
+    },
+    "import/extensions": [
+      ".js",
+      ".ts"
+    ]
+  },
+  "rules": {
+    "indent": ["error", 2, {
+      "SwitchCase": 1
+    }],
+
+    // Promises/await: Ensure no promises are unawaited
+    "@typescript-eslint/no-floating-promises": "warn",
+
+    // Typescript: Use interfaces, not types
+    "@typescript-eslint/consistent-type-definitions": ["warn", "interface"],
+
+    // Typescript: Delimit Interface members
+    "@typescript-eslint/member-delimiter-style": ["warn", {
+      "multiline": {
+        "delimiter": "semi",
+        "requireLast": true
+      },
+      "singleline": {
+        "delimiter": "semi",
+        "requireLast": false
+      }
+    }],
+
+    // General style
+    "@typescript-eslint/no-unused-vars": ["warn"],
+    "comma-dangle": ["off", "always"],
+    "@typescript-eslint/comma-dangle": ["warn", "always-multiline"],
+    "no-console": ["warn"],
+    "quotes": ["warn", "single"],
+    "no-fallthrough": ["error"],
+    "default-case": ["warn"],
+    "max-len": ["warn", {
+      "code": 120,
+      "ignoreComments": true,
+      "ignoreStrings": true,
+      "ignoreTemplateLiterals": true,
+      "ignoreRegExpLiterals": true
+    }],
+
+    "lines-between-class-members": ["warn", "always", {
+      "exceptAfterSingleLine": true
+    }]
+  }
+}

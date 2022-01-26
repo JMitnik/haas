@@ -17,6 +17,11 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+input AuthenticateLambdaInput {
+  authenticateEmail: String
+  workspaceEmail: String
+}
+
 type AutodeckConnectionType implements DeprecatedConnectionInterface {
   cursor: String
   endDate: String
@@ -25,6 +30,179 @@ type AutodeckConnectionType implements DeprecatedConnectionInterface {
   offset: Int
   pageInfo: DeprecatedPaginationPageInfo!
   startDate: String
+}
+
+input AutomationActionInput {
+  apiKey: String
+  endpoint: String
+  id: ID
+  payload: JSONObject
+  type: AutomationActionType
+}
+
+"""AutomationAction"""
+type AutomationActionModel {
+  createdAt: Date!
+  id: ID!
+  type: AutomationActionType!
+  updatedAt: Date!
+}
+
+enum AutomationActionType {
+  API_CALL
+  GENERATE_REPORT
+  SEND_EMAIL
+  SEND_SMS
+  WEBHOOK
+}
+
+input AutomationConditionBuilderInput {
+  childConditionBuilder: AutomationConditionBuilderInput
+  conditions: [CreateAutomationCondition!]
+  id: ID
+  type: AutomationConditionBuilderType
+}
+
+"""AutomationConditionBuilder"""
+type AutomationConditionBuilderModel {
+  childConditionBuilder: AutomationConditionBuilderModel
+  childConditionBuilderId: String
+  conditions: [AutomationConditionModel!]!
+  id: ID!
+  type: AutomationConditionBuilderType!
+}
+
+enum AutomationConditionBuilderType {
+  AND
+  OR
+}
+
+"""AutomationCondition"""
+type AutomationConditionModel {
+  createdAt: Date!
+  dialogue: Dialogue
+  dialogueScope: DialogueConditionScopeModel
+  id: ID!
+  operands: [AutomationConditionOperandModel!]!
+  operator: AutomationConditionOperatorType!
+  question: QuestionNode
+  questionScope: QuestionConditionScopeModel
+  scope: AutomationConditionScopeType!
+  updatedAt: Date!
+  workspaceScope: WorkspaceConditionScopeModel
+}
+
+"""AutomationConditionOperand"""
+type AutomationConditionOperandModel {
+  createdAt: Date!
+  dateTimeValue: String
+  id: ID!
+  numberValue: Int
+  textValue: String
+  type: OperandType!
+  updatedAt: Date!
+}
+
+enum AutomationConditionOperatorType {
+  EVERY_N_TH_TIME
+  GREATER_OR_EQUAL_THAN
+  GREATER_THAN
+  INNER_RANGE
+  IS_EQUAL
+  IS_FALSE
+  IS_NOT_EQUAL
+  IS_TRUE
+  OUTER_RANGE
+  SMALLER_OR_EQUAL_THAN
+  SMALLER_THAN
+}
+
+enum AutomationConditionScopeType {
+  DIALOGUE
+  QUESTION
+  WORKSPACE
+}
+
+type AutomationConnection implements ConnectionInterface {
+  automations: [AutomationModel!]!
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
+}
+
+input AutomationConnectionFilterInput {
+  label: String
+  offset: Int
+  orderBy: AutomationConnectionOrderByInput
+  perPage: Int = 10
+  search: String
+  type: AutomationType
+}
+
+"""Sorting of UserConnection"""
+input AutomationConnectionOrderByInput {
+  by: AutomationConnectionOrderType!
+  desc: Boolean = true
+}
+
+"""Fields to order UserConnection by."""
+enum AutomationConnectionOrderType {
+  type
+  updatedAt
+}
+
+input AutomationEventInput {
+  dialogueId: String
+  eventType: AutomationEventType
+  id: ID
+  questionId: String
+}
+
+"""AutomationEvent"""
+type AutomationEventModel {
+  createdAt: Date!
+  dialogue: Dialogue
+  endDate: String
+  id: ID!
+  periodType: RecurringPeriodType
+  question: QuestionNode
+  startDate: String
+  type: AutomationEventType!
+  updatedAt: Date!
+}
+
+enum AutomationEventType {
+  API_CALL
+  NEW_INTERACTION_DIALOGUE
+  NEW_INTERACTION_QUESTION
+  RECURRING
+}
+
+"""Automation"""
+type AutomationModel {
+  automationTrigger: AutomationTriggerModel
+  createdAt: Date!
+  description: String
+  id: ID!
+  isActive: Boolean!
+  label: String!
+  type: AutomationType!
+  updatedAt: Date!
+  workspace: Customer
+}
+
+"""AutomationTrigger"""
+type AutomationTriggerModel {
+  actions: [AutomationActionModel!]!
+  conditionBuilder: AutomationConditionBuilderModel
+  createdAt: Date!
+  event: AutomationEventModel!
+  id: ID!
+  updatedAt: Date!
+}
+
+enum AutomationType {
+  CAMPAIGN
+  TRIGGER
 }
 
 type AWSImageType {
@@ -87,10 +265,89 @@ type ColourSettings {
   secondary: String
 }
 
+input ConditionDialogueScopeInput {
+  aggregate: ConditionPropertyAggregateInput
+  aspect: DialogueAspectType
+  id: ID
+}
+
+type ConditionPropertyAggregate {
+  createdAt: String!
+  endDate: String
+  id: ID!
+  latest: Int
+  startDate: String
+  type: ConditionPropertyAggregateType!
+}
+
+input ConditionPropertyAggregateInput {
+  endDate: String
+  id: ID
+  latest: Int
+  startDate: String
+  type: ConditionPropertyAggregateType
+}
+
+enum ConditionPropertyAggregateType {
+  AVG
+  COUNT
+  MAX
+  MIN
+}
+
+input ConditionQuestionScopeInput {
+  aggregate: ConditionPropertyAggregateInput
+  aspect: QuestionAspectType
+  id: ID
+}
+
+input ConditionScopeInput {
+  dialogueScope: ConditionDialogueScopeInput
+  id: ID
+  questionScope: ConditionQuestionScopeInput
+  type: AutomationConditionScopeType
+  workspaceScope: ConditionWorkspaceScopeInput
+}
+
+input ConditionWorkspaceScopeInput {
+  aggregate: ConditionPropertyAggregateInput
+  aspect: WorkspaceAspectType
+  id: ID
+}
+
 """Interface all pagination-based models should implement"""
 interface ConnectionInterface {
   pageInfo: PaginationPageInfo!
   totalPages: Int
+}
+
+input CreateAutomationCondition {
+  dialogueId: String
+  id: ID
+  operands: [CreateAutomationOperandInput!]
+  operator: AutomationConditionOperatorType
+  questionId: String
+  scope: ConditionScopeInput
+  workspaceId: String
+}
+
+input CreateAutomationInput {
+  actions: [AutomationActionInput!]
+  automationType: AutomationType
+  conditionBuilder: AutomationConditionBuilderInput
+  description: String
+  event: AutomationEventInput
+  id: ID
+  label: String
+  workspaceId: String
+}
+
+input CreateAutomationOperandInput {
+  dateTimeValue: String
+  id: ID
+  numberValue: Int
+  operandType: OperandType
+  textValue: String
 }
 
 input CreateBatchDeliveriesInputType {
@@ -229,6 +486,8 @@ input CTAShareInputObjectType {
 }
 
 type Customer {
+  automationConnection(filter: AutomationConnectionFilterInput): AutomationConnection
+  automations: [AutomationModel!]
   campaign(campaignId: String): CampaignType
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
@@ -396,6 +655,22 @@ type Dialogue {
   title: String!
   updatedAt: String
   wasGeneratedWithGenData: Boolean!
+}
+
+enum DialogueAspectType {
+  GENERAL_SCORE
+  LATEST_SCORE
+  NR_INTERACTIONS
+  NR_VISITORS
+}
+
+"""DialogueConditionScope"""
+type DialogueConditionScopeModel {
+  aggregate: ConditionPropertyAggregate
+  aspect: DialogueAspectType!
+  createdAt: Date!
+  id: ID!
+  updatedAt: Date!
 }
 
 input DialogueFilterInputType {
@@ -586,6 +861,14 @@ input GenerateAutodeckInput {
   youLoveX: String
 }
 
+input GetAutomationInput {
+  id: String
+}
+
+input GetAutomationsByWorkspaceInput {
+  workspaceId: String
+}
+
 input GetCampaignsInput {
   customerSlug: String
 }
@@ -659,6 +942,11 @@ enum JobStatusType {
   WRAPPING_UP
 }
 
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
 enum LanguageEnumType {
   DUTCH
   ENGLISH
@@ -712,8 +1000,13 @@ type LoginOutput {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
+
+  """Creates a new automation."""
+  createAutomation(input: CreateAutomationInput): AutomationModel!
+  createAutomationToken(email: String): String
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
   createCampaign(input: CreateCampaignInputType): CampaignType!
 
@@ -753,6 +1046,7 @@ type Mutation {
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   singleUpload(file: Upload): ImageType!
+  updateAutomation(input: CreateAutomationInput): AutomationModel!
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
@@ -807,6 +1101,12 @@ type NodeEntryValue {
   sliderNodeEntry: Int
   textboxNodeEntry: String
   videoNodeEntry: String
+}
+
+enum OperandType {
+  DATE_TIME
+  INT
+  STRING
 }
 
 input OptionInputType {
@@ -901,6 +1201,8 @@ type PreviewDataType {
 }
 
 type Query {
+  automation(where: GetAutomationInput): AutomationModel
+  automations(where: GetAutomationsByWorkspaceInput): [AutomationModel!]!
   customer(id: ID, slug: String): Customer
   customers: [Customer!]!
   delivery(deliveryId: String): DeliveryType
@@ -927,6 +1229,19 @@ type Query {
   user(userId: String): UserType
   UserOfCustomer(input: UserOfCustomerInput): UserCustomer
   users(customerSlug: String): [UserType!]!
+}
+
+enum QuestionAspectType {
+  ANSWER_SPEED
+  NODE_VALUE
+}
+
+"""QuestionConditionScope"""
+type QuestionConditionScopeModel {
+  aggregate: ConditionPropertyAggregate
+  aspect: QuestionAspectType!
+  createdAt: Date!
+  id: ID!
 }
 
 type QuestionNode {
@@ -987,6 +1302,15 @@ type QuestionOption {
 
 input RecipientsInputType {
   ids: [String!]
+}
+
+enum RecurringPeriodType {
+  END_OF_DAY
+  END_OF_WEEK
+  EVERY_DAY
+  EVERY_WEEK
+  START_OF_DAY
+  START_OF_WEEK
 }
 
 type RefreshAccessTokenOutput {
@@ -1194,8 +1518,10 @@ input SocialNodeEntryInput {
 
 enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
+  CAN_ACCESS_REPORT_PAGE
   CAN_ADD_USERS
   CAN_BUILD_DIALOGUE
+  CAN_CREATE_AUTOMATIONS
   CAN_CREATE_CAMPAIGNS
   CAN_CREATE_DELIVERIES
   CAN_CREATE_TRIGGERS
@@ -1203,9 +1529,12 @@ enum SystemPermission {
   CAN_DELETE_TRIGGERS
   CAN_DELETE_USERS
   CAN_DELETE_WORKSPACE
+  CAN_DOWNLOAD_REPORTS
   CAN_EDIT_DIALOGUE
   CAN_EDIT_USERS
   CAN_EDIT_WORKSPACE
+  CAN_UPDATE_AUTOMATIONS
+  CAN_VIEW_AUTOMATIONS
   CAN_VIEW_CAMPAIGNS
   CAN_VIEW_DIALOGUE
   CAN_VIEW_DIALOGUE_ANALYTICS
@@ -1433,4 +1762,19 @@ type VerifyUserTokenOutput {
 """Input type for a video node"""
 input VideoNodeEntryInput {
   value: String
+}
+
+enum WorkspaceAspectType {
+  GENERAL_SCORE
+  NR_INTERACTIONS
+  NR_VISITORS
+}
+
+"""WorkspaceConditionScope"""
+type WorkspaceConditionScopeModel {
+  aggregate: ConditionPropertyAggregate
+  aspect: WorkspaceAspectType!
+  createdAt: Date!
+  id: ID!
+  updatedAt: Date!
 }

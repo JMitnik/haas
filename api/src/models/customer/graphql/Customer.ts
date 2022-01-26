@@ -15,6 +15,8 @@ import DialogueService from '../../questionnaire/DialogueService';
 import isValidColor from '../../../utils/isValidColor';
 import { CampaignModel } from '../../Campaigns';
 import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
+import { AutomationModel } from '../../automations/graphql/AutomationModel';
+import { AutomationConnection, AutomationConnectionFilterInput } from '../../automations/graphql/AutomationConnection';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -41,6 +43,15 @@ export const CustomerType = objectType({
       },
     });
 
+    t.field('automationConnection', {
+      type: AutomationConnection,
+      args: { filter: AutomationConnectionFilterInput },
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        return ctx.services.automationService.paginatedAutomations(parent.slug, args.filter);
+      },
+    });
+
     t.field('usersConnection', {
       type: UserConnection,
       args: { customerSlug: 'String', filter: UserConnectionFilterInput },
@@ -52,6 +63,14 @@ export const CustomerType = objectType({
           args.filter,
         );
         return users as any;
+      },
+    });
+
+    t.list.field('automations', {
+      nullable: true,
+      type: AutomationModel,
+      async resolve(parent, args, ctx) {
+        return ctx.services.automationService.findAutomationsByWorkspace(parent.id);
       },
     });
 
