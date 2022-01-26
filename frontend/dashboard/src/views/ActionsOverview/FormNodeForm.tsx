@@ -365,6 +365,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                         <UI.Modal
                           isOpen={openedField === index}
                           onClose={() => setOpenedField(null)}
+                          maxWidth={1000}
                         >
                           <FormNodeFieldFragment
                             onSubmit={(subForm: any) => {

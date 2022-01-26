@@ -63,12 +63,14 @@ interface ModalProps {
   children: React.ReactNode;
   onClose: any;
   willCloseOnOutsideClick?: boolean;
+  maxWidth?: number;
 }
 
 export const Modal = ({
   isOpen,
   children,
   onClose,
+  maxWidth,
   willCloseOnOutsideClick = true
 }: ModalProps) => {
   const ref = useRef<any>(null);
@@ -104,6 +106,7 @@ export const Modal = ({
           margin: '0px auto',
           overflow: 'initial',
           width: '100%',
+          maxWidth,
           transform: 'translateX(-50%) translateY(-50%)'
         }
       }}
