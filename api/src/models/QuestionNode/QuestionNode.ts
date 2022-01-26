@@ -380,7 +380,7 @@ export const CreateCTAInputType = inputObjectType({
     t.string('dialogueSlug');
     t.string('title');
     t.string('type');
-    t.string('questionId', { nullable: true });
+    t.string('questionId', { description: 'Linked question-node id', nullable: true });
 
     t.field('links', {
       type: CTALinksInputType,
@@ -585,7 +585,7 @@ export const QuestionNodeMutations = extendType({
 
         console.log('QUESTION ID: ', args.input.questionId);
 
-        return ctx.services.nodeService.createCTA(createCTAInput);
+        return ctx.services.nodeService.createCallToAction(createCTAInput);
       },
     });
   },
