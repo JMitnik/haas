@@ -137,6 +137,7 @@ export const UpdatePermissionsMutationResolver = mutationField('updatePermission
   resolve(parent, args, ctx) {
     if (!args.input?.roleId) throw new UserInputError('No RoleId provided to update permissions for!');
 
+    // @ts-ignore
     return ctx.services.roleService.updatePermissions(args.input.roleId, args.input.permissions || []);
   }
 })

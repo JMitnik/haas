@@ -1720,8 +1720,10 @@ export type SocialNodeEntryInput = {
 
 export enum SystemPermission {
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
+  CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
   CanAddUsers = 'CAN_ADD_USERS',
   CanBuildDialogue = 'CAN_BUILD_DIALOGUE',
+  CanCreateAutomations = 'CAN_CREATE_AUTOMATIONS',
   CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
   CanCreateDeliveries = 'CAN_CREATE_DELIVERIES',
   CanCreateTriggers = 'CAN_CREATE_TRIGGERS',
@@ -1729,9 +1731,12 @@ export enum SystemPermission {
   CanDeleteTriggers = 'CAN_DELETE_TRIGGERS',
   CanDeleteUsers = 'CAN_DELETE_USERS',
   CanDeleteWorkspace = 'CAN_DELETE_WORKSPACE',
+  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
   CanEditDialogue = 'CAN_EDIT_DIALOGUE',
   CanEditUsers = 'CAN_EDIT_USERS',
   CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
+  CanUpdateAutomations = 'CAN_UPDATE_AUTOMATIONS',
+  CanViewAutomations = 'CAN_VIEW_AUTOMATIONS',
   CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
   CanViewDialogue = 'CAN_VIEW_DIALOGUE',
   CanViewDialogueAnalytics = 'CAN_VIEW_DIALOGUE_ANALYTICS',
@@ -1978,6 +1983,25 @@ export type VideoNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+export type EdgeFragmentFragment = (
+  { __typename?: 'Edge' }
+  & Pick<Edge, 'id'>
+  & { conditions?: Maybe<Array<(
+    { __typename?: 'EdgeCondition' }
+    & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
+  )>>, parentNode?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id' | 'title'>
+  )>, childNode?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'type'>
+    & { children: Array<(
+      { __typename?: 'Edge' }
+      & Pick<Edge, 'id'>
+    )> }
+  )> }
+);
+
 export type GetDialogueQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   dialogueSlug: Scalars['String'];
@@ -2008,6 +2032,9 @@ export type GetDialogueQuery = (
       )>, edges: Array<(
         { __typename?: 'Edge' }
         & EdgeFragmentFragment
+      )>, postLeafNode?: Maybe<(
+        { __typename?: 'DialogueFinisherObjectType' }
+        & Pick<DialogueFinisherObjectType, 'id' | 'header' | 'subtext'>
       )>, leafs: Array<(
         { __typename?: 'QuestionNode' }
         & Pick<QuestionNode, 'id' | 'title' | 'type'>
@@ -2026,25 +2053,6 @@ export type GetDialogueQuery = (
           & Pick<ShareNodeType, 'id' | 'title' | 'url' | 'tooltip'>
         )> }
       )> }
-    )> }
-  )> }
-);
-
-export type EdgeFragmentFragment = (
-  { __typename?: 'Edge' }
-  & Pick<Edge, 'id'>
-  & { conditions?: Maybe<Array<(
-    { __typename?: 'EdgeCondition' }
-    & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
-  )>>, parentNode?: Maybe<(
-    { __typename?: 'QuestionNode' }
-    & Pick<QuestionNode, 'id' | 'title'>
-  )>, childNode?: Maybe<(
-    { __typename?: 'QuestionNode' }
-    & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'type'>
-    & { children: Array<(
-      { __typename?: 'Edge' }
-      & Pick<Edge, 'id'>
     )> }
   )> }
 );
@@ -2091,32 +2099,6 @@ export type QuestionNodeFragmentFragment = (
       & Pick<QuestionNode, 'id'>
     )> }
   )> }
-);
-
-export type CreateSessionMutationVariables = Exact<{
-  input: SessionInput;
-}>;
-
-
-export type CreateSessionMutation = (
-  { __typename?: 'Mutation' }
-  & { createSession: (
-    { __typename?: 'Session' }
-    & Pick<Session, 'id'>
-  ) }
-);
-
-export type UploadSessionEventsMutationVariables = Exact<{
-  input: UploadSessionEventsInput;
-}>;
-
-
-export type UploadSessionEventsMutation = (
-  { __typename?: 'Mutation' }
-  & { uploadSessionEvents: (
-    { __typename?: 'UploadSessionEventsOutput' }
-    & Pick<UploadSessionEventsOutput, 'status'>
-  ) }
 );
 
 export const EdgeFragmentFragmentDoc = gql`
@@ -2235,6 +2217,11 @@ export const GetDialogueDocument = gql`
       edges {
         ...EdgeFragment
       }
+      postLeafNode {
+        id
+        header
+        subtext
+      }
       leafs {
         id
         title
@@ -2307,69 +2294,3 @@ export type GetDialogueQueryResult = Apollo.QueryResult<GetDialogueQuery, GetDia
 export function refetchGetDialogueQuery(variables?: GetDialogueQueryVariables) {
       return { query: GetDialogueDocument, variables: variables }
     }
-export const CreateSessionDocument = gql`
-    mutation CreateSession($input: SessionInput!) {
-  createSession(input: $input) {
-    id
-  }
-}
-    `;
-export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutation, CreateSessionMutationVariables>;
-
-/**
- * __useCreateSessionMutation__
- *
- * To run a mutation, you first call `useCreateSessionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateSessionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createSessionMutation, { data, loading, error }] = useCreateSessionMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSessionMutation, CreateSessionMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, options);
-      }
-export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
-export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
-export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
-export const UploadSessionEventsDocument = gql`
-    mutation UploadSessionEvents($input: UploadSessionEventsInput!) {
-  uploadSessionEvents(input: $input) {
-    status
-  }
-}
-    `;
-export type UploadSessionEventsMutationFn = Apollo.MutationFunction<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>;
-
-/**
- * __useUploadSessionEventsMutation__
- *
- * To run a mutation, you first call `useUploadSessionEventsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUploadSessionEventsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [uploadSessionEventsMutation, { data, loading, error }] = useUploadSessionEventsMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUploadSessionEventsMutation(baseOptions?: Apollo.MutationHookOptions<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>(UploadSessionEventsDocument, options);
-      }
-export type UploadSessionEventsMutationHookResult = ReturnType<typeof useUploadSessionEventsMutation>;
-export type UploadSessionEventsMutationResult = Apollo.MutationResult<UploadSessionEventsMutation>;
-export type UploadSessionEventsMutationOptions = Apollo.BaseMutationOptions<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>;

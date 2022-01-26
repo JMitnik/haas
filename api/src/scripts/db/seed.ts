@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
-import DialogueService from '../models/questionnaire/DialogueService';
-import { defaultAdminRole, defaultManagerRole, defaultUserRole } from '../models/templates/defaultWorkspaceTemplate';
+import DialogueService from '../../models/questionnaire/DialogueService';
+import { defaultAdminRole, defaultManagerRole, defaultUserRole } from '../../models/templates/defaultWorkspaceTemplate';
 
 const prisma = new PrismaClient();
 const dialogueService = new DialogueService(prisma);

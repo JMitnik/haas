@@ -19,46 +19,46 @@ export type Scalars = {
 };
 
 export type AdjustedImageInput = {
+  bucket?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   key?: Maybe<Scalars['String']>;
-  bucket?: Maybe<Scalars['String']>;
   reset?: Maybe<Scalars['Boolean']>;
 };
 
 /** Append new data to an uploaded session */
 export type AppendToInteractionInput = {
-  sessionId?: Maybe<Scalars['ID']>;
-  nodeId?: Maybe<Scalars['String']>;
-  edgeId?: Maybe<Scalars['String']>;
   data?: Maybe<NodeEntryDataInput>;
+  edgeId?: Maybe<Scalars['String']>;
+  nodeId?: Maybe<Scalars['String']>;
+  sessionId?: Maybe<Scalars['ID']>;
 };
 
 export type AutodeckConnectionType = DeprecatedConnectionInterface & {
   __typename?: 'AutodeckConnectionType';
   cursor?: Maybe<Scalars['String']>;
-  offset?: Maybe<Scalars['Int']>;
-  limit: Scalars['Int'];
-  pageInfo: DeprecatedPaginationPageInfo;
-  startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
   jobs: Array<CreateWorkspaceJobType>;
+  limit: Scalars['Int'];
+  offset?: Maybe<Scalars['Int']>;
+  pageInfo: DeprecatedPaginationPageInfo;
+  startDate?: Maybe<Scalars['String']>;
 };
 
 export type AwsImageType = {
   __typename?: 'AWSImageType';
+  encoding?: Maybe<Scalars['String']>;
   filename?: Maybe<Scalars['String']>;
   mimetype?: Maybe<Scalars['String']>;
-  encoding?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
 };
 
 /** Campaign */
 export type CampaignType = {
   __typename?: 'CampaignType';
+  deliveryConnection?: Maybe<DeliveryConnectionType>;
   id: Scalars['ID'];
   label: Scalars['String'];
   variants?: Maybe<Array<CampaignVariantType>>;
-  deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
 
@@ -74,25 +74,25 @@ export type CampaignVariantCustomVariableType = {
 };
 
 export enum CampaignVariantEnum {
-  Sms = 'SMS',
   Email = 'EMAIL',
-  Queue = 'QUEUE'
+  Queue = 'QUEUE',
+  Sms = 'SMS'
 }
 
 /** Variant of campaign */
 export type CampaignVariantType = {
   __typename?: 'CampaignVariantType';
+  body: Scalars['String'];
+  campaign?: Maybe<CampaignType>;
+  customVariables?: Maybe<Array<CampaignVariantCustomVariableType>>;
+  deliveryConnection?: Maybe<DeliveryConnectionType>;
+  dialogue?: Maybe<Dialogue>;
+  from?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   label: Scalars['String'];
-  weight: Scalars['Int'];
-  body: Scalars['String'];
-  from?: Maybe<Scalars['String']>;
   type: CampaignVariantEnum;
+  weight: Scalars['Int'];
   workspace?: Maybe<Customer>;
-  dialogue?: Maybe<Dialogue>;
-  campaign?: Maybe<CampaignType>;
-  deliveryConnection?: Maybe<DeliveryConnectionType>;
-  customVariables?: Maybe<Array<CampaignVariantCustomVariableType>>;
 };
 
 /** Input type for a choice node */
@@ -102,8 +102,8 @@ export type ChoiceNodeEntryInput = {
 
 export enum CloudReferenceType {
   Aws = 'AWS',
-  Gcp = 'GCP',
   Azure = 'Azure',
+  Gcp = 'GCP',
   Ibm = 'IBM'
 }
 
@@ -111,21 +111,21 @@ export type ColourSettings = {
   __typename?: 'ColourSettings';
   id: Scalars['ID'];
   primary: Scalars['String'];
-  secondary?: Maybe<Scalars['String']>;
   primaryAlt?: Maybe<Scalars['String']>;
+  secondary?: Maybe<Scalars['String']>;
 };
 
 /** Interface all pagination-based models should implement */
 export type ConnectionInterface = {
-  totalPages?: Maybe<Scalars['Int']>;
   pageInfo: PaginationPageInfo;
+  totalPages?: Maybe<Scalars['Int']>;
 };
 
 export type CreateBatchDeliveriesInputType = {
-  campaignId?: Maybe<Scalars['ID']>;
-  workspaceId?: Maybe<Scalars['String']>;
-  uploadedCsv?: Maybe<Scalars['Upload']>;
   batchScheduledAt?: Maybe<Scalars['String']>;
+  campaignId?: Maybe<Scalars['ID']>;
+  uploadedCsv?: Maybe<Scalars['Upload']>;
+  workspaceId?: Maybe<Scalars['String']>;
 };
 
 export type CreateBatchDeliveriesOutputType = {
@@ -140,43 +140,43 @@ export type CreateCampaignCustomVariable = {
 
 export type CreateCampaignInputType = {
   label?: Maybe<Scalars['String']>;
-  workspaceId: Scalars['ID'];
   variants?: Maybe<Array<CreateCampaignVariantInputType>>;
+  workspaceId: Scalars['ID'];
 };
 
 export type CreateCampaignVariantInputType = {
-  workspaceId: Scalars['ID'];
-  dialogueId: Scalars['ID'];
-  label?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['String']>;
-  from?: Maybe<Scalars['String']>;
-  subject?: Maybe<Scalars['String']>;
-  weight?: Maybe<Scalars['Float']>;
-  type: CampaignVariantEnum;
   customVariables?: Maybe<Array<CreateCampaignCustomVariable>>;
+  dialogueId: Scalars['ID'];
+  from?: Maybe<Scalars['String']>;
+  label?: Maybe<Scalars['String']>;
+  subject?: Maybe<Scalars['String']>;
+  type: CampaignVariantEnum;
+  weight?: Maybe<Scalars['Float']>;
+  workspaceId: Scalars['ID'];
 };
 
 export type CreateCtaInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   dialogueSlug?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
+  form?: Maybe<FormNodeInputType>;
   links?: Maybe<CtaLinksInputType>;
   share?: Maybe<ShareNodeInputType>;
-  form?: Maybe<FormNodeInputType>;
+  title?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
 };
 
 export type CreateDialogueInputType = {
-  customerSlug?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
-  dialogueSlug?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  isSeed?: Maybe<Scalars['Boolean']>;
   contentType?: Maybe<Scalars['String']>;
-  templateDialogueId?: Maybe<Scalars['String']>;
+  customerSlug?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  dialogueSlug?: Maybe<Scalars['String']>;
+  isSeed?: Maybe<Scalars['Boolean']>;
+  language?: Maybe<LanguageEnumType>;
   publicTitle?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
-  language?: Maybe<LanguageEnumType>;
+  templateDialogueId?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
 };
 
 export type CreateJobProcessLocationInput = {
@@ -187,16 +187,16 @@ export type CreateJobProcessLocationInput = {
 
 export type CreateQuestionNodeInputType = {
   customerId?: Maybe<Scalars['ID']>;
-  overrideLeafId?: Maybe<Scalars['ID']>;
-  parentQuestionId?: Maybe<Scalars['ID']>;
   dialogueSlug?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
+  edgeCondition?: Maybe<EdgeConditionInputType>;
   extraContent?: Maybe<Scalars['String']>;
-  unhappyText?: Maybe<Scalars['String']>;
   happyText?: Maybe<Scalars['String']>;
   optionEntries?: Maybe<OptionsInputType>;
-  edgeCondition?: Maybe<EdgeConditionInputType>;
+  overrideLeafId?: Maybe<Scalars['ID']>;
+  parentQuestionId?: Maybe<Scalars['ID']>;
+  title?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+  unhappyText?: Maybe<Scalars['String']>;
 };
 
 export type CreateTriggerInputType = {
@@ -207,44 +207,44 @@ export type CreateTriggerInputType = {
 
 /** Creates a workspace */
 export type CreateWorkspaceInput = {
-  slug: Scalars['String'];
-  name: Scalars['String'];
+  isSeed?: Maybe<Scalars['Boolean']>;
   logo?: Maybe<Scalars['String']>;
   logoOpacity?: Maybe<Scalars['Int']>;
+  name: Scalars['String'];
   primaryColour: Scalars['String'];
-  isSeed?: Maybe<Scalars['Boolean']>;
+  slug: Scalars['String'];
   willGenerateFakeData?: Maybe<Scalars['Boolean']>;
 };
 
 export type CreateWorkspaceJobType = {
   __typename?: 'CreateWorkspaceJobType';
-  id: Scalars['String'];
   createdAt: Scalars['String'];
+  errorMessage?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  message?: Maybe<Scalars['String']>;
   name: Scalars['String'];
-  status: JobStatusType;
+  processLocation: JobProcessLocation;
+  referenceId?: Maybe<Scalars['String']>;
+  referenceType: CloudReferenceType;
   requiresColorExtraction: Scalars['Boolean'];
   requiresRembg: Scalars['Boolean'];
   requiresScreenshot: Scalars['Boolean'];
   resourcesUrl?: Maybe<Scalars['String']>;
+  status: JobStatusType;
   updatedAt?: Maybe<Scalars['String']>;
-  referenceId?: Maybe<Scalars['String']>;
-  errorMessage?: Maybe<Scalars['String']>;
-  message?: Maybe<Scalars['String']>;
-  referenceType: CloudReferenceType;
-  processLocation: JobProcessLocation;
 };
 
 export type CtaLinkInputObjectType = {
-  url?: Maybe<Scalars['String']>;
-  type?: Maybe<LinkTypeEnumType>;
-  id?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
-  iconUrl?: Maybe<Scalars['String']>;
   backgroundColor?: Maybe<Scalars['String']>;
-  header?: Maybe<Scalars['String']>;
-  subHeader?: Maybe<Scalars['String']>;
   buttonText?: Maybe<Scalars['String']>;
+  header?: Maybe<Scalars['String']>;
+  iconUrl?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
   imageUrl?: Maybe<Scalars['String']>;
+  subHeader?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  type?: Maybe<LinkTypeEnumType>;
+  url?: Maybe<Scalars['String']>;
 };
 
 export type CtaLinksInputType = {
@@ -252,32 +252,31 @@ export type CtaLinksInputType = {
 };
 
 export type CtaShareInputObjectType = {
-  url?: Maybe<Scalars['String']>;
-  tooltip?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  tooltip?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
 };
 
 export type Customer = {
   __typename?: 'Customer';
-  id: Scalars['ID'];
-  slug: Scalars['String'];
-  name: Scalars['String'];
-  settings?: Maybe<CustomerSettings>;
-  usersConnection?: Maybe<UserConnection>;
+  campaign?: Maybe<CampaignType>;
+  campaigns: Array<CampaignType>;
   dialogue?: Maybe<Dialogue>;
   dialogues?: Maybe<Array<Dialogue>>;
-  users?: Maybe<Array<UserType>>;
-  campaigns: Array<CampaignType>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
   roles?: Maybe<Array<RoleType>>;
-  campaign?: Maybe<CampaignType>;
+  settings?: Maybe<CustomerSettings>;
+  slug: Scalars['String'];
   userCustomer?: Maybe<UserCustomer>;
+  users?: Maybe<Array<UserType>>;
+  usersConnection?: Maybe<UserConnection>;
 };
 
 
-export type CustomerUsersConnectionArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
-  filter?: Maybe<UserConnectionFilterInput>;
+export type CustomerCampaignArgs = {
+  campaignId?: Maybe<Scalars['String']>;
 };
 
 
@@ -291,22 +290,23 @@ export type CustomerDialoguesArgs = {
 };
 
 
-export type CustomerCampaignArgs = {
-  campaignId?: Maybe<Scalars['String']>;
-};
-
-
 export type CustomerUserCustomerArgs = {
   userId?: Maybe<Scalars['String']>;
 };
 
+
+export type CustomerUsersConnectionArgs = {
+  customerSlug?: Maybe<Scalars['String']>;
+  filter?: Maybe<UserConnectionFilterInput>;
+};
+
 export type CustomerSettings = {
   __typename?: 'CustomerSettings';
-  id: Scalars['ID'];
-  logoUrl?: Maybe<Scalars['String']>;
-  logoOpacity?: Maybe<Scalars['Int']>;
   colourSettings?: Maybe<ColourSettings>;
   fontSettings?: Maybe<FontSettings>;
+  id: Scalars['ID'];
+  logoOpacity?: Maybe<Scalars['Int']>;
+  logoUrl?: Maybe<Scalars['String']>;
 };
 
 export type CustomerWhereUniqueInput = {
@@ -321,27 +321,27 @@ export type CustomFieldInputType = {
 export type CustomFieldType = {
   __typename?: 'CustomFieldType';
   id: Scalars['String'];
+  jobProcessLocationId: Scalars['String'];
   key: Scalars['String'];
   value?: Maybe<Scalars['String']>;
-  jobProcessLocationId: Scalars['String'];
 };
 
 
 export type DeleteDialogueInputType = {
-  id?: Maybe<Scalars['ID']>;
   customerSlug?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['ID']>;
 };
 
 /** Delete Node Input type */
 export type DeleteNodeInputType = {
-  id?: Maybe<Scalars['String']>;
   customerId?: Maybe<Scalars['ID']>;
   dialogueSlug?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
 };
 
 export type DeleteUserInput = {
-  userId?: Maybe<Scalars['ID']>;
   customerId?: Maybe<Scalars['ID']>;
+  userId?: Maybe<Scalars['ID']>;
 };
 
 export type DeleteUserOutput = {
@@ -350,18 +350,18 @@ export type DeleteUserOutput = {
 };
 
 export type DeliveryConnectionFilterInput = {
-  search?: Maybe<Scalars['String']>;
-  startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
   campaignVariantId?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
+  orderBy?: Maybe<DeliveryConnectionOrderByInput>;
+  perPage?: Maybe<Scalars['Int']>;
+  recipientEmail?: Maybe<Scalars['String']>;
   recipientFirstName?: Maybe<Scalars['String']>;
   recipientLastName?: Maybe<Scalars['String']>;
   recipientPhoneNumber?: Maybe<Scalars['String']>;
-  recipientEmail?: Maybe<Scalars['String']>;
+  search?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['String']>;
   status?: Maybe<DeliveryStatusEnum>;
-  orderBy?: Maybe<DeliveryConnectionOrderByInput>;
-  offset?: Maybe<Scalars['Int']>;
-  perPage?: Maybe<Scalars['Int']>;
 };
 
 /** Fields to order DeliveryConnection by. */
@@ -377,53 +377,53 @@ export type DeliveryConnectionOrderByInput = {
 
 export type DeliveryConnectionType = ConnectionInterface & {
   __typename?: 'DeliveryConnectionType';
-  totalPages?: Maybe<Scalars['Int']>;
-  pageInfo: PaginationPageInfo;
   deliveries: Array<DeliveryType>;
+  pageInfo: PaginationPageInfo;
+  totalPages?: Maybe<Scalars['Int']>;
 };
 
 export type DeliveryEventType = {
   __typename?: 'DeliveryEventType';
-  id: Scalars['ID'];
-  status: DeliveryStatusEnum;
   createdAt: Scalars['Date'];
   failureMessage?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  status: DeliveryStatusEnum;
 };
 
 export enum DeliveryStatusEnum {
-  Scheduled = 'SCHEDULED',
+  Delivered = 'DELIVERED',
   Deployed = 'DEPLOYED',
-  Sent = 'SENT',
-  Opened = 'OPENED',
-  Finished = 'FINISHED',
   Failed = 'FAILED',
-  Delivered = 'DELIVERED'
+  Finished = 'FINISHED',
+  Opened = 'OPENED',
+  Scheduled = 'SCHEDULED',
+  Sent = 'SENT'
 }
 
 /** Delivery */
 export type DeliveryType = {
   __typename?: 'DeliveryType';
-  id: Scalars['ID'];
+  campaignVariant?: Maybe<CampaignVariantType>;
+  createdAt?: Maybe<Scalars['Date']>;
+  currentStatus: DeliveryStatusEnum;
+  deliveryRecipientEmail?: Maybe<Scalars['String']>;
   deliveryRecipientFirstName?: Maybe<Scalars['String']>;
   deliveryRecipientLastName?: Maybe<Scalars['String']>;
-  deliveryRecipientEmail?: Maybe<Scalars['String']>;
   deliveryRecipientPhone?: Maybe<Scalars['String']>;
-  createdAt?: Maybe<Scalars['Date']>;
+  events?: Maybe<Array<DeliveryEventType>>;
+  id: Scalars['ID'];
   scheduledAt?: Maybe<Scalars['Date']>;
   updatedAt?: Maybe<Scalars['Date']>;
-  campaignVariant?: Maybe<CampaignVariantType>;
-  currentStatus: DeliveryStatusEnum;
-  events?: Maybe<Array<DeliveryEventType>>;
 };
 
 /** Interface all pagination-based models should implement */
 export type DeprecatedConnectionInterface = {
   cursor?: Maybe<Scalars['String']>;
-  offset?: Maybe<Scalars['Int']>;
+  endDate?: Maybe<Scalars['String']>;
   limit: Scalars['Int'];
+  offset?: Maybe<Scalars['Int']>;
   pageInfo: DeprecatedPaginationPageInfo;
   startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
 };
 
 /** Information with regards to current page, and total number of pages */
@@ -436,29 +436,29 @@ export type DeprecatedPaginationPageInfo = {
 
 export type Dialogue = {
   __typename?: 'Dialogue';
-  id: Scalars['ID'];
-  title: Scalars['String'];
-  slug: Scalars['String'];
-  description: Scalars['String'];
-  isWithoutGenData: Scalars['Boolean'];
-  wasGeneratedWithGenData: Scalars['Boolean'];
-  language: LanguageEnumType;
-  publicTitle?: Maybe<Scalars['String']>;
-  creationDate?: Maybe<Scalars['String']>;
-  updatedAt?: Maybe<Scalars['String']>;
-  postLeafNode?: Maybe<DialogueFinisherObjectType>;
   averageScore: Scalars['Float'];
-  statistics?: Maybe<DialogueStatistics>;
-  sessionConnection?: Maybe<SessionConnection>;
-  tags?: Maybe<Array<Tag>>;
-  customerId: Scalars['String'];
-  customer?: Maybe<Customer>;
-  rootQuestion: QuestionNode;
-  edges: Array<Edge>;
-  questions: Array<QuestionNode>;
-  sessions: Array<Session>;
-  leafs: Array<QuestionNode>;
   campaignVariants: Array<CampaignVariantType>;
+  creationDate?: Maybe<Scalars['String']>;
+  customer?: Maybe<Customer>;
+  customerId: Scalars['String'];
+  description: Scalars['String'];
+  edges: Array<Edge>;
+  id: Scalars['ID'];
+  isWithoutGenData: Scalars['Boolean'];
+  language: LanguageEnumType;
+  leafs: Array<QuestionNode>;
+  postLeafNode?: Maybe<DialogueFinisherObjectType>;
+  publicTitle?: Maybe<Scalars['String']>;
+  questions: Array<QuestionNode>;
+  rootQuestion: QuestionNode;
+  sessionConnection?: Maybe<SessionConnection>;
+  sessions: Array<Session>;
+  slug: Scalars['String'];
+  statistics?: Maybe<DialogueStatistics>;
+  tags?: Maybe<Array<Tag>>;
+  title: Scalars['String'];
+  updatedAt?: Maybe<Scalars['String']>;
+  wasGeneratedWithGenData: Scalars['Boolean'];
 };
 
 
@@ -467,8 +467,8 @@ export type DialogueAverageScoreArgs = {
 };
 
 
-export type DialogueStatisticsArgs = {
-  input?: Maybe<DialogueFilterInputType>;
+export type DialogueLeafsArgs = {
+  searchTerm?: Maybe<Scalars['String']>;
 };
 
 
@@ -482,30 +482,30 @@ export type DialogueSessionsArgs = {
 };
 
 
-export type DialogueLeafsArgs = {
-  searchTerm?: Maybe<Scalars['String']>;
+export type DialogueStatisticsArgs = {
+  input?: Maybe<DialogueFilterInputType>;
 };
 
 export type DialogueFilterInputType = {
+  endDate?: Maybe<Scalars['String']>;
   searchTerm?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
 };
 
 export type DialogueFinisherObjectType = {
   __typename?: 'DialogueFinisherObjectType';
-  id: Scalars['ID'];
   header: Scalars['String'];
+  id: Scalars['ID'];
   subtext: Scalars['String'];
 };
 
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
-  nrInteractions: Scalars['Int'];
-  topPositivePath?: Maybe<Array<TopPathType>>;
-  topNegativePath?: Maybe<Array<TopPathType>>;
-  mostPopularPath?: Maybe<TopPathType>;
   history?: Maybe<Array<LineChartDataType>>;
+  mostPopularPath?: Maybe<TopPathType>;
+  nrInteractions: Scalars['Int'];
+  topNegativePath?: Maybe<Array<TopPathType>>;
+  topPositivePath?: Maybe<Array<TopPathType>>;
 };
 
 export type DialogueWhereUniqueInput = {
@@ -515,58 +515,58 @@ export type DialogueWhereUniqueInput = {
 
 export type Edge = {
   __typename?: 'Edge';
-  id: Scalars['ID'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  parentNodeId: Scalars['String'];
-  childNodeId: Scalars['String'];
-  parentNode?: Maybe<QuestionNode>;
   childNode?: Maybe<QuestionNode>;
+  childNodeId: Scalars['String'];
   conditions?: Maybe<Array<EdgeCondition>>;
+  createdAt: Scalars['String'];
+  id: Scalars['ID'];
+  parentNode?: Maybe<QuestionNode>;
+  parentNodeId: Scalars['String'];
+  updatedAt: Scalars['String'];
 };
 
 export type EdgeCondition = {
   __typename?: 'EdgeCondition';
-  id: Scalars['Int'];
   conditionType: Scalars['String'];
-  matchValue?: Maybe<Scalars['String']>;
-  renderMin?: Maybe<Scalars['Int']>;
-  renderMax?: Maybe<Scalars['Int']>;
   edgeId?: Maybe<Scalars['String']>;
+  id: Scalars['Int'];
+  matchValue?: Maybe<Scalars['String']>;
+  renderMax?: Maybe<Scalars['Int']>;
+  renderMin?: Maybe<Scalars['Int']>;
 };
 
 export type EdgeConditionInputType = {
-  id?: Maybe<Scalars['Int']>;
   conditionType?: Maybe<Scalars['String']>;
-  renderMin?: Maybe<Scalars['Int']>;
-  renderMax?: Maybe<Scalars['Int']>;
+  id?: Maybe<Scalars['Int']>;
   matchValue?: Maybe<Scalars['String']>;
+  renderMax?: Maybe<Scalars['Int']>;
+  renderMin?: Maybe<Scalars['Int']>;
 };
 
 export type EditUserInput = {
-  email: Scalars['String'];
-  roleId?: Maybe<Scalars['String']>;
-  firstName?: Maybe<Scalars['String']>;
   customerId?: Maybe<Scalars['String']>;
+  email: Scalars['String'];
+  firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   phone?: Maybe<Scalars['String']>;
+  roleId?: Maybe<Scalars['String']>;
 };
 
 /** Edit a workspace */
 export type EditWorkspaceInput = {
-  id: Scalars['ID'];
   customerSlug: Scalars['String'];
-  slug: Scalars['String'];
-  name: Scalars['String'];
+  id: Scalars['ID'];
   logo?: Maybe<Scalars['String']>;
   logoOpacity?: Maybe<Scalars['Int']>;
+  name: Scalars['String'];
   primaryColour: Scalars['String'];
+  slug: Scalars['String'];
 };
 
 export type FailedDeliveryModel = {
   __typename?: 'FailedDeliveryModel';
-  record: Scalars['String'];
   error: Scalars['String'];
+  record: Scalars['String'];
 };
 
 export type FindRoleInput = {
@@ -581,13 +581,13 @@ export type FontSettings = {
 
 /** FormNodeEntryInput */
 export type FormNodeEntryFieldInput = {
-  relatedFieldId?: Maybe<Scalars['ID']>;
   email?: Maybe<Scalars['String']>;
-  phoneNumber?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
-  shortText?: Maybe<Scalars['String']>;
   longText?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
+  phoneNumber?: Maybe<Scalars['String']>;
+  relatedFieldId?: Maybe<Scalars['ID']>;
+  shortText?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
 };
 
 /** FormNodeEntryInput */
@@ -603,85 +603,85 @@ export type FormNodeEntryType = {
 
 export type FormNodeEntryValueType = {
   __typename?: 'FormNodeEntryValueType';
-  relatedField: FormNodeField;
   email?: Maybe<Scalars['String']>;
-  phoneNumber?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
-  shortText?: Maybe<Scalars['String']>;
   longText?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
+  phoneNumber?: Maybe<Scalars['String']>;
+  relatedField: FormNodeField;
+  shortText?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
 };
 
 export type FormNodeField = {
   __typename?: 'FormNodeField';
   id: Scalars['ID'];
-  label: Scalars['String'];
-  type: FormNodeFieldTypeEnum;
   isRequired: Scalars['Boolean'];
-  position: Scalars['Int'];
+  label: Scalars['String'];
   placeholder?: Maybe<Scalars['String']>;
+  position: Scalars['Int'];
+  type: FormNodeFieldTypeEnum;
 };
 
 export type FormNodeFieldInput = {
   id?: Maybe<Scalars['ID']>;
+  isRequired?: Maybe<Scalars['Boolean']>;
   label?: Maybe<Scalars['String']>;
   placeholder?: Maybe<Scalars['String']>;
-  type?: Maybe<FormNodeFieldTypeEnum>;
-  isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
+  type?: Maybe<FormNodeFieldTypeEnum>;
 };
 
 /** The types a field can assume */
 export enum FormNodeFieldTypeEnum {
   Email = 'email',
-  PhoneNumber = 'phoneNumber',
-  Url = 'url',
-  ShortText = 'shortText',
   LongText = 'longText',
-  Number = 'number'
+  Number = 'number',
+  PhoneNumber = 'phoneNumber',
+  ShortText = 'shortText',
+  Url = 'url'
 }
 
 export type FormNodeInputType = {
-  id?: Maybe<Scalars['String']>;
-  helperText?: Maybe<Scalars['String']>;
   fields?: Maybe<Array<FormNodeFieldInput>>;
+  helperText?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
 };
 
 export type FormNodeType = {
   __typename?: 'FormNodeType';
-  id?: Maybe<Scalars['String']>;
-  helperText?: Maybe<Scalars['String']>;
   fields: Array<FormNodeField>;
+  helperText?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
 };
 
 /** Generate savales documents */
 export type GenerateAutodeckInput = {
-  id: Scalars['String'];
-  requiresRembgLambda: Scalars['Boolean'];
-  requiresWebsiteScreenshot: Scalars['Boolean'];
-  requiresColorExtraction: Scalars['Boolean'];
-  usesAdjustedLogo: Scalars['Boolean'];
-  jobLocationId?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
-  website?: Maybe<Scalars['String']>;
-  logo?: Maybe<Scalars['String']>;
-  primaryColour?: Maybe<Scalars['String']>;
-  firstName?: Maybe<Scalars['String']>;
-  companyName?: Maybe<Scalars['String']>;
   answer1?: Maybe<Scalars['String']>;
   answer2?: Maybe<Scalars['String']>;
   answer3?: Maybe<Scalars['String']>;
   answer4?: Maybe<Scalars['String']>;
-  sorryAboutX?: Maybe<Scalars['String']>;
-  youLoveX?: Maybe<Scalars['String']>;
-  reward?: Maybe<Scalars['String']>;
-  emailContent?: Maybe<Scalars['String']>;
-  textMessage?: Maybe<Scalars['String']>;
-  slug?: Maybe<Scalars['String']>;
-  isGenerateWorkspace?: Maybe<Scalars['Boolean']>;
-  standardFields?: Maybe<Array<CustomFieldInputType>>;
+  companyName?: Maybe<Scalars['String']>;
   customFields?: Maybe<Array<CustomFieldInputType>>;
+  emailContent?: Maybe<Scalars['String']>;
+  firstName?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  isGenerateWorkspace?: Maybe<Scalars['Boolean']>;
+  jobLocationId?: Maybe<Scalars['String']>;
+  logo?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
   newCustomFields?: Maybe<Array<CustomFieldInputType>>;
+  primaryColour?: Maybe<Scalars['String']>;
+  requiresColorExtraction: Scalars['Boolean'];
+  requiresRembgLambda: Scalars['Boolean'];
+  requiresWebsiteScreenshot: Scalars['Boolean'];
+  reward?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
+  sorryAboutX?: Maybe<Scalars['String']>;
+  standardFields?: Maybe<Array<CustomFieldInputType>>;
+  textMessage?: Maybe<Scalars['String']>;
+  usesAdjustedLogo: Scalars['Boolean'];
+  website?: Maybe<Scalars['String']>;
+  youLoveX?: Maybe<Scalars['String']>;
 };
 
 export type GetCampaignsInput = {
@@ -689,49 +689,49 @@ export type GetCampaignsInput = {
 };
 
 export type HandleUserStateInWorkspaceInput = {
+  isActive?: Maybe<Scalars['Boolean']>;
   userId?: Maybe<Scalars['String']>;
   workspaceId?: Maybe<Scalars['String']>;
-  isActive?: Maybe<Scalars['Boolean']>;
 };
 
 export type ImageType = {
   __typename?: 'ImageType';
+  encoding?: Maybe<Scalars['String']>;
   filename?: Maybe<Scalars['String']>;
   mimetype?: Maybe<Scalars['String']>;
-  encoding?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
 };
 
 export type InviteUserInput = {
-  roleId: Scalars['String'];
-  email: Scalars['String'];
   customerId: Scalars['String'];
+  email: Scalars['String'];
+  roleId: Scalars['String'];
 };
 
 export type InviteUserOutput = {
   __typename?: 'InviteUserOutput';
-  didInvite: Scalars['Boolean'];
   didAlreadyExist: Scalars['Boolean'];
+  didInvite: Scalars['Boolean'];
 };
 
 export type JobObjectType = {
   __typename?: 'JobObjectType';
-  id: Scalars['String'];
   createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  createWorkspaceJobId: Scalars['String'];
   createWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
+  createWorkspaceJobId: Scalars['String'];
+  id: Scalars['String'];
+  updatedAt: Scalars['String'];
 };
 
 export type JobProcessLocation = {
   __typename?: 'JobProcessLocation';
+  customFields?: Maybe<Array<CustomFieldType>>;
   id: Scalars['String'];
   name: Scalars['String'];
   path: Scalars['String'];
+  type: JobProcessLocationType;
   xMaterialDimension: Scalars['Int'];
   yMaterialDimension: Scalars['Int'];
-  type: JobProcessLocationType;
-  customFields?: Maybe<Array<CustomFieldType>>;
 };
 
 export type JobProcessLocations = {
@@ -740,66 +740,66 @@ export type JobProcessLocations = {
 };
 
 export enum JobProcessLocationType {
+  Brochure = 'BROCHURE',
   OnePager = 'ONE_PAGER',
-  Pitchdeck = 'PITCHDECK',
-  Brochure = 'BROCHURE'
+  Pitchdeck = 'PITCHDECK'
 }
 
 export enum JobStatusType {
-  Pending = 'PENDING',
-  PreProcessing = 'PRE_PROCESSING',
+  Completed = 'COMPLETED',
+  CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL',
+  Failed = 'FAILED',
   InPhotoshopQueue = 'IN_PHOTOSHOP_QUEUE',
+  Pending = 'PENDING',
+  PhotoshopProcessing = 'PHOTOSHOP_PROCESSING',
+  PreProcessing = 'PRE_PROCESSING',
   PreProcessingLogo = 'PRE_PROCESSING_LOGO',
   PreProcessingWebsiteScreenshot = 'PRE_PROCESSING_WEBSITE_SCREENSHOT',
-  PhotoshopProcessing = 'PHOTOSHOP_PROCESSING',
   Processing = 'PROCESSING',
-  WrappingUp = 'WRAPPING_UP',
-  Completed = 'COMPLETED',
-  Failed = 'FAILED',
   ReadyForProcessing = 'READY_FOR_PROCESSING',
-  TransformingPsdsToPngs = 'TRANSFORMING_PSDS_TO_PNGS',
   StitchingSlides = 'STITCHING_SLIDES',
-  CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL'
+  TransformingPsdsToPngs = 'TRANSFORMING_PSDS_TO_PNGS',
+  WrappingUp = 'WRAPPING_UP'
 }
 
 export enum LanguageEnumType {
-  English = 'ENGLISH',
   Dutch = 'DUTCH',
+  English = 'ENGLISH',
   German = 'GERMAN'
 }
 
 export type LineChartDataType = {
   __typename?: 'lineChartDataType';
+  entryId?: Maybe<Scalars['String']>;
   x?: Maybe<Scalars['String']>;
   y?: Maybe<Scalars['Int']>;
-  entryId?: Maybe<Scalars['String']>;
 };
 
 export type LinkType = {
   __typename?: 'LinkType';
-  id: Scalars['String'];
-  url: Scalars['String'];
-  questionNodeId?: Maybe<Scalars['String']>;
-  type: Scalars['String'];
-  title?: Maybe<Scalars['String']>;
-  iconUrl?: Maybe<Scalars['String']>;
   backgroundColor?: Maybe<Scalars['String']>;
-  header?: Maybe<Scalars['String']>;
-  subHeader?: Maybe<Scalars['String']>;
   buttonText?: Maybe<Scalars['String']>;
+  header?: Maybe<Scalars['String']>;
+  iconUrl?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   questionNode: QuestionNode;
+  questionNodeId?: Maybe<Scalars['String']>;
+  subHeader?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  type: Scalars['String'];
+  url: Scalars['String'];
 };
 
 export enum LinkTypeEnumType {
-  Single = 'SINGLE',
-  Social = 'SOCIAL',
   Api = 'API',
   Facebook = 'FACEBOOK',
-  Linkedin = 'LINKEDIN',
-  Whatsapp = 'WHATSAPP',
   Instagram = 'INSTAGRAM',
-  Twitter = 'TWITTER'
+  Linkedin = 'LINKEDIN',
+  Single = 'SINGLE',
+  Social = 'SOCIAL',
+  Twitter = 'TWITTER',
+  Whatsapp = 'WHATSAPP'
 }
 
 /** Login credential */
@@ -810,113 +810,71 @@ export type LoginInput = {
 /** Information you get after you log out */
 export type LoginOutput = {
   __typename?: 'LoginOutput';
-  token: Scalars['String'];
   expiryDate: Scalars['Int'];
+  token: Scalars['String'];
   user: UserType;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createJobProcessLocation: JobProcessLocation;
-  generateAutodeck?: Maybe<CreateWorkspaceJobType>;
-  retryAutodeckJob?: Maybe<CreateWorkspaceJobType>;
-  confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
-  whitifyImage?: Maybe<AwsImageType>;
-  removePixelRange?: Maybe<AwsImageType>;
-  uploadJobImage?: Maybe<AwsImageType>;
-  updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
-  assignTags: Dialogue;
-  createTag: Tag;
-  deleteTag: Tag;
-  createCampaign: CampaignType;
-  createBatchDeliveries: CreateBatchDeliveriesOutputType;
-  updateDeliveryStatus: Scalars['String'];
-  deleteTrigger?: Maybe<TriggerType>;
-  editTrigger: TriggerType;
-  createTrigger: TriggerType;
-  createPermission?: Maybe<PermssionType>;
-  updatePermissions?: Maybe<RoleType>;
-  createRole: RoleType;
-  updateRoles: RoleType;
-  singleUpload: ImageType;
-  createWorkspace: Customer;
-  editWorkspace: Customer;
-  deleteCustomer?: Maybe<Customer>;
-  handleUserStateInWorkspace: UserCustomer;
-  editUser: UserType;
-  deleteUser: DeleteUserOutput;
-  copyDialogue: Dialogue;
-  createDialogue: Dialogue;
-  editDialogue: Dialogue;
-  deleteDialogue: Dialogue;
-  uploadUpsellImage?: Maybe<ImageType>;
-  register?: Maybe<Scalars['String']>;
-  /** Given a token, checks in the database whether token has been set and has not expired yet */
-  verifyUserToken: VerifyUserTokenOutput;
-  requestInvite: RequestInviteOutput;
-  /** Logs a user out by removing their refresh token */
-  logout: Scalars['String'];
-  /** Invite a user to a particular customer domain, given an email and role */
-  inviteUser: InviteUserOutput;
-  createSession: Session;
   appendToInteraction: Session;
-  /** Upload a number of events of a session. */
-  uploadSessionEvents: UploadSessionEventsOutput;
-  duplicateQuestion?: Maybe<QuestionNode>;
-  deleteQuestion: QuestionNode;
-  createQuestion?: Maybe<QuestionNode>;
-  deleteCTA: QuestionNode;
+  assignTags: Dialogue;
+  confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
+  copyDialogue: Dialogue;
+  createBatchDeliveries: CreateBatchDeliveriesOutputType;
+  createCampaign: CampaignType;
   /** Create Call to Actions */
   createCTA: QuestionNode;
+  createDialogue: Dialogue;
+  createJobProcessLocation: JobProcessLocation;
+  createPermission?: Maybe<PermssionType>;
+  createQuestion?: Maybe<QuestionNode>;
+  createRole: RoleType;
+  createSession: Session;
+  createTag: Tag;
+  createTrigger: TriggerType;
+  createWorkspace: Customer;
+  deleteCTA: QuestionNode;
+  deleteCustomer?: Maybe<Customer>;
+  deleteDialogue: Dialogue;
+  deleteQuestion: QuestionNode;
+  deleteTag: Tag;
+  deleteTrigger?: Maybe<TriggerType>;
+  deleteUser: DeleteUserOutput;
+  duplicateQuestion?: Maybe<QuestionNode>;
+  editDialogue: Dialogue;
+  editTrigger: TriggerType;
+  editUser: UserType;
+  editWorkspace: Customer;
+  generateAutodeck?: Maybe<CreateWorkspaceJobType>;
+  handleUserStateInWorkspace: UserCustomer;
+  /** Invite a user to a particular customer domain, given an email and role */
+  inviteUser: InviteUserOutput;
+  /** Logs a user out by removing their refresh token */
+  logout: Scalars['String'];
+  register?: Maybe<Scalars['String']>;
+  removePixelRange?: Maybe<AwsImageType>;
+  requestInvite: RequestInviteOutput;
+  retryAutodeckJob?: Maybe<CreateWorkspaceJobType>;
+  singleUpload: ImageType;
+  updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
   updateCTA: QuestionNode;
+  updateDeliveryStatus: Scalars['String'];
+  updatePermissions?: Maybe<RoleType>;
   updateQuestion: QuestionNode;
+  updateRoles: RoleType;
+  uploadJobImage?: Maybe<AwsImageType>;
+  /** Upload a number of events of a session. */
+  uploadSessionEvents: UploadSessionEventsOutput;
+  uploadUpsellImage?: Maybe<ImageType>;
+  /** Given a token, checks in the database whether token has been set and has not expired yet */
+  verifyUserToken: VerifyUserTokenOutput;
+  whitifyImage?: Maybe<AwsImageType>;
 };
 
 
-export type MutationCreateJobProcessLocationArgs = {
-  input?: Maybe<CreateJobProcessLocationInput>;
-};
-
-
-export type MutationGenerateAutodeckArgs = {
-  input?: Maybe<GenerateAutodeckInput>;
-};
-
-
-export type MutationRetryAutodeckJobArgs = {
-  jobId?: Maybe<Scalars['String']>;
-};
-
-
-export type MutationConfirmCreateWorkspaceJobArgs = {
-  input?: Maybe<GenerateAutodeckInput>;
-};
-
-
-export type MutationWhitifyImageArgs = {
-  input?: Maybe<AdjustedImageInput>;
-};
-
-
-export type MutationRemovePixelRangeArgs = {
-  input?: Maybe<RemovePixelRangeInput>;
-};
-
-
-export type MutationUploadJobImageArgs = {
-  file?: Maybe<Scalars['Upload']>;
-  jobId?: Maybe<Scalars['String']>;
-  type?: Maybe<UploadImageEnumType>;
-  disapproved?: Maybe<Scalars['Boolean']>;
-};
-
-
-export type MutationUpdateCreateWorkspaceJobArgs = {
-  id?: Maybe<Scalars['String']>;
-  status?: Maybe<JobStatusType>;
-  resourceUrl?: Maybe<Scalars['String']>;
-  referenceId?: Maybe<Scalars['String']>;
-  errorMessage?: Maybe<Scalars['String']>;
+export type MutationAppendToInteractionArgs = {
+  input?: Maybe<AppendToInteractionInput>;
 };
 
 
@@ -926,15 +884,18 @@ export type MutationAssignTagsArgs = {
 };
 
 
-export type MutationCreateTagArgs = {
-  name?: Maybe<Scalars['String']>;
-  customerSlug?: Maybe<Scalars['String']>;
-  type?: Maybe<TagTypeEnum>;
+export type MutationConfirmCreateWorkspaceJobArgs = {
+  input?: Maybe<GenerateAutodeckInput>;
 };
 
 
-export type MutationDeleteTagArgs = {
-  tagId?: Maybe<Scalars['String']>;
+export type MutationCopyDialogueArgs = {
+  input?: Maybe<CreateDialogueInputType>;
+};
+
+
+export type MutationCreateBatchDeliveriesArgs = {
+  input?: Maybe<CreateBatchDeliveriesInputType>;
 };
 
 
@@ -943,8 +904,183 @@ export type MutationCreateCampaignArgs = {
 };
 
 
-export type MutationCreateBatchDeliveriesArgs = {
-  input?: Maybe<CreateBatchDeliveriesInputType>;
+export type MutationCreateCtaArgs = {
+  input?: Maybe<CreateCtaInputType>;
+};
+
+
+export type MutationCreateDialogueArgs = {
+  input?: Maybe<CreateDialogueInputType>;
+};
+
+
+export type MutationCreateJobProcessLocationArgs = {
+  input?: Maybe<CreateJobProcessLocationInput>;
+};
+
+
+export type MutationCreatePermissionArgs = {
+  data?: Maybe<PermissionInput>;
+};
+
+
+export type MutationCreateQuestionArgs = {
+  input?: Maybe<CreateQuestionNodeInputType>;
+};
+
+
+export type MutationCreateRoleArgs = {
+  data?: Maybe<RoleInput>;
+};
+
+
+export type MutationCreateSessionArgs = {
+  input?: Maybe<SessionInput>;
+};
+
+
+export type MutationCreateTagArgs = {
+  customerSlug?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  type?: Maybe<TagTypeEnum>;
+};
+
+
+export type MutationCreateTriggerArgs = {
+  input?: Maybe<CreateTriggerInputType>;
+};
+
+
+export type MutationCreateWorkspaceArgs = {
+  input?: Maybe<CreateWorkspaceInput>;
+};
+
+
+export type MutationDeleteCtaArgs = {
+  input?: Maybe<DeleteNodeInputType>;
+};
+
+
+export type MutationDeleteCustomerArgs = {
+  where?: Maybe<CustomerWhereUniqueInput>;
+};
+
+
+export type MutationDeleteDialogueArgs = {
+  input?: Maybe<DeleteDialogueInputType>;
+};
+
+
+export type MutationDeleteQuestionArgs = {
+  input?: Maybe<DeleteNodeInputType>;
+};
+
+
+export type MutationDeleteTagArgs = {
+  tagId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationDeleteTriggerArgs = {
+  customerSlug?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationDeleteUserArgs = {
+  input?: Maybe<DeleteUserInput>;
+};
+
+
+export type MutationDuplicateQuestionArgs = {
+  questionId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationEditDialogueArgs = {
+  customerSlug?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  dialogueFinisherHeading?: Maybe<Scalars['String']>;
+  dialogueFinisherSubheading?: Maybe<Scalars['String']>;
+  dialogueSlug?: Maybe<Scalars['String']>;
+  isWithoutGenData?: Maybe<Scalars['Boolean']>;
+  language?: Maybe<LanguageEnumType>;
+  publicTitle?: Maybe<Scalars['String']>;
+  tags?: Maybe<TagsInputObjectType>;
+  title?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationEditTriggerArgs = {
+  customerSlug?: Maybe<Scalars['String']>;
+  recipients?: Maybe<RecipientsInputType>;
+  trigger?: Maybe<TriggerInputType>;
+  triggerId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationEditUserArgs = {
+  input?: Maybe<EditUserInput>;
+  userId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationEditWorkspaceArgs = {
+  input?: Maybe<EditWorkspaceInput>;
+};
+
+
+export type MutationGenerateAutodeckArgs = {
+  input?: Maybe<GenerateAutodeckInput>;
+};
+
+
+export type MutationHandleUserStateInWorkspaceArgs = {
+  input?: Maybe<HandleUserStateInWorkspaceInput>;
+};
+
+
+export type MutationInviteUserArgs = {
+  input?: Maybe<InviteUserInput>;
+};
+
+
+export type MutationRegisterArgs = {
+  input?: Maybe<RegisterInput>;
+};
+
+
+export type MutationRemovePixelRangeArgs = {
+  input?: Maybe<RemovePixelRangeInput>;
+};
+
+
+export type MutationRequestInviteArgs = {
+  input?: Maybe<RequestInviteInput>;
+};
+
+
+export type MutationRetryAutodeckJobArgs = {
+  jobId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationSingleUploadArgs = {
+  file?: Maybe<Scalars['Upload']>;
+};
+
+
+export type MutationUpdateCreateWorkspaceJobArgs = {
+  errorMessage?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
+  referenceId?: Maybe<Scalars['String']>;
+  resourceUrl?: Maybe<Scalars['String']>;
+  status?: Maybe<JobStatusType>;
+};
+
+
+export type MutationUpdateCtaArgs = {
+  input?: Maybe<UpdateCtaInputType>;
 };
 
 
@@ -954,143 +1090,27 @@ export type MutationUpdateDeliveryStatusArgs = {
 };
 
 
-export type MutationDeleteTriggerArgs = {
-  id?: Maybe<Scalars['String']>;
-  customerSlug?: Maybe<Scalars['String']>;
-};
-
-
-export type MutationEditTriggerArgs = {
-  triggerId?: Maybe<Scalars['String']>;
-  customerSlug?: Maybe<Scalars['String']>;
-  recipients?: Maybe<RecipientsInputType>;
-  trigger?: Maybe<TriggerInputType>;
-};
-
-
-export type MutationCreateTriggerArgs = {
-  input?: Maybe<CreateTriggerInputType>;
-};
-
-
-export type MutationCreatePermissionArgs = {
-  data?: Maybe<PermissionInput>;
-};
-
-
 export type MutationUpdatePermissionsArgs = {
   input?: Maybe<UpdatePermissionsInput>;
 };
 
 
-export type MutationCreateRoleArgs = {
-  data?: Maybe<RoleInput>;
+export type MutationUpdateQuestionArgs = {
+  input?: Maybe<UpdateQuestionNodeInputType>;
 };
 
 
 export type MutationUpdateRolesArgs = {
-  roleId?: Maybe<Scalars['String']>;
   permissions?: Maybe<PermissionIdsInput>;
+  roleId?: Maybe<Scalars['String']>;
 };
 
 
-export type MutationSingleUploadArgs = {
+export type MutationUploadJobImageArgs = {
+  disapproved?: Maybe<Scalars['Boolean']>;
   file?: Maybe<Scalars['Upload']>;
-};
-
-
-export type MutationCreateWorkspaceArgs = {
-  input?: Maybe<CreateWorkspaceInput>;
-};
-
-
-export type MutationEditWorkspaceArgs = {
-  input?: Maybe<EditWorkspaceInput>;
-};
-
-
-export type MutationDeleteCustomerArgs = {
-  where?: Maybe<CustomerWhereUniqueInput>;
-};
-
-
-export type MutationHandleUserStateInWorkspaceArgs = {
-  input?: Maybe<HandleUserStateInWorkspaceInput>;
-};
-
-
-export type MutationEditUserArgs = {
-  userId?: Maybe<Scalars['String']>;
-  input?: Maybe<EditUserInput>;
-};
-
-
-export type MutationDeleteUserArgs = {
-  input?: Maybe<DeleteUserInput>;
-};
-
-
-export type MutationCopyDialogueArgs = {
-  input?: Maybe<CreateDialogueInputType>;
-};
-
-
-export type MutationCreateDialogueArgs = {
-  input?: Maybe<CreateDialogueInputType>;
-};
-
-
-export type MutationEditDialogueArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
-  dialogueSlug?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  publicTitle?: Maybe<Scalars['String']>;
-  isWithoutGenData?: Maybe<Scalars['Boolean']>;
-  tags?: Maybe<TagsInputObjectType>;
-  language?: Maybe<LanguageEnumType>;
-  dialogueFinisherHeading?: Maybe<Scalars['String']>;
-  dialogueFinisherSubheading?: Maybe<Scalars['String']>;
-};
-
-
-export type MutationDeleteDialogueArgs = {
-  input?: Maybe<DeleteDialogueInputType>;
-};
-
-
-export type MutationUploadUpsellImageArgs = {
-  input?: Maybe<UploadSellImageInputType>;
-};
-
-
-export type MutationRegisterArgs = {
-  input?: Maybe<RegisterInput>;
-};
-
-
-export type MutationVerifyUserTokenArgs = {
-  token?: Maybe<Scalars['String']>;
-};
-
-
-export type MutationRequestInviteArgs = {
-  input?: Maybe<RequestInviteInput>;
-};
-
-
-export type MutationInviteUserArgs = {
-  input?: Maybe<InviteUserInput>;
-};
-
-
-export type MutationCreateSessionArgs = {
-  input?: Maybe<SessionInput>;
-};
-
-
-export type MutationAppendToInteractionArgs = {
-  input?: Maybe<AppendToInteractionInput>;
+  jobId?: Maybe<Scalars['String']>;
+  type?: Maybe<UploadImageEnumType>;
 };
 
 
@@ -1099,38 +1119,18 @@ export type MutationUploadSessionEventsArgs = {
 };
 
 
-export type MutationDuplicateQuestionArgs = {
-  questionId?: Maybe<Scalars['String']>;
+export type MutationUploadUpsellImageArgs = {
+  input?: Maybe<UploadSellImageInputType>;
 };
 
 
-export type MutationDeleteQuestionArgs = {
-  input?: Maybe<DeleteNodeInputType>;
+export type MutationVerifyUserTokenArgs = {
+  token?: Maybe<Scalars['String']>;
 };
 
 
-export type MutationCreateQuestionArgs = {
-  input?: Maybe<CreateQuestionNodeInputType>;
-};
-
-
-export type MutationDeleteCtaArgs = {
-  input?: Maybe<DeleteNodeInputType>;
-};
-
-
-export type MutationCreateCtaArgs = {
-  input?: Maybe<CreateCtaInputType>;
-};
-
-
-export type MutationUpdateCtaArgs = {
-  input?: Maybe<UpdateCtaInputType>;
-};
-
-
-export type MutationUpdateQuestionArgs = {
-  input?: Maybe<UpdateQuestionNodeInputType>;
+export type MutationWhitifyImageArgs = {
+  input?: Maybe<AdjustedImageInput>;
 };
 
 export type NodeEntry = {
@@ -1139,47 +1139,47 @@ export type NodeEntry = {
   depth?: Maybe<Scalars['Int']>;
   id?: Maybe<Scalars['ID']>;
   relatedEdgeId?: Maybe<Scalars['String']>;
-  relatedNodeId?: Maybe<Scalars['String']>;
   relatedNode?: Maybe<QuestionNode>;
+  relatedNodeId?: Maybe<Scalars['String']>;
   /** The core scoring value associated with the node entry. */
   value?: Maybe<NodeEntryValue>;
 };
 
 /** Data type for the actual node entry */
 export type NodeEntryDataInput = {
+  choice?: Maybe<ChoiceNodeEntryInput>;
+  form?: Maybe<FormNodeEntryInput>;
+  register?: Maybe<RegisterNodeEntryInput>;
   slider?: Maybe<SliderNodeEntryInput>;
   textbox?: Maybe<TextboxNodeEntryInput>;
-  form?: Maybe<FormNodeEntryInput>;
-  choice?: Maybe<ChoiceNodeEntryInput>;
   video?: Maybe<VideoNodeEntryInput>;
-  register?: Maybe<RegisterNodeEntryInput>;
 };
 
 /** Input type for node-entry metadata */
 export type NodeEntryInput = {
-  nodeId?: Maybe<Scalars['String']>;
-  edgeId?: Maybe<Scalars['String']>;
-  depth?: Maybe<Scalars['Int']>;
   data?: Maybe<NodeEntryDataInput>;
+  depth?: Maybe<Scalars['Int']>;
+  edgeId?: Maybe<Scalars['String']>;
+  nodeId?: Maybe<Scalars['String']>;
 };
 
 export type NodeEntryValue = {
   __typename?: 'NodeEntryValue';
+  choiceNodeEntry?: Maybe<Scalars['String']>;
+  formNodeEntry?: Maybe<FormNodeEntryType>;
+  linkNodeEntry?: Maybe<Scalars['String']>;
+  registrationNodeEntry?: Maybe<Scalars['String']>;
   sliderNodeEntry?: Maybe<Scalars['Int']>;
   textboxNodeEntry?: Maybe<Scalars['String']>;
-  registrationNodeEntry?: Maybe<Scalars['String']>;
-  choiceNodeEntry?: Maybe<Scalars['String']>;
-  linkNodeEntry?: Maybe<Scalars['String']>;
   videoNodeEntry?: Maybe<Scalars['String']>;
-  formNodeEntry?: Maybe<FormNodeEntryType>;
 };
 
 export type OptionInputType = {
   id?: Maybe<Scalars['Int']>;
-  value?: Maybe<Scalars['String']>;
-  publicValue?: Maybe<Scalars['String']>;
   overrideLeafId?: Maybe<Scalars['String']>;
   position: Scalars['Int'];
+  publicValue?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
 };
 
 export type OptionsInputType = {
@@ -1189,40 +1189,40 @@ export type OptionsInputType = {
 /** Information with regards to current page. */
 export type PaginationPageInfo = {
   __typename?: 'PaginationPageInfo';
-  hasPrevPage: Scalars['Boolean'];
   hasNextPage: Scalars['Boolean'];
-  prevPageOffset: Scalars['Int'];
+  hasPrevPage: Scalars['Boolean'];
   nextPageOffset: Scalars['Int'];
   pageIndex: Scalars['Int'];
+  prevPageOffset: Scalars['Int'];
 };
 
 /** Fields that can be used for free text search on tables */
 export enum PaginationSearchEnum {
-  Name = 'name',
+  Email = 'email',
   FirstName = 'firstName',
   LastName = 'lastName',
-  Email = 'email',
-  Title = 'title',
-  PublicTitle = 'publicTitle'
+  Name = 'name',
+  PublicTitle = 'publicTitle',
+  Title = 'title'
 }
 
 /** Ways to sort a pagination object */
 export enum PaginationSortByEnum {
-  Score = 'score',
-  Id = 'id',
   CreatedAt = 'createdAt',
   Email = 'email',
-  Name = 'name',
   FirstName = 'firstName',
+  Id = 'id',
   LastName = 'lastName',
-  Role = 'role',
   Medium = 'medium',
-  Type = 'type',
+  Name = 'name',
   Paths = 'paths',
-  User = 'user',
-  When = 'when',
+  Role = 'role',
   ScheduledAt = 'scheduledAt',
-  UpdatedAt = 'updatedAt'
+  Score = 'score',
+  Type = 'type',
+  UpdatedAt = 'updatedAt',
+  User = 'user',
+  When = 'when'
 }
 
 /** Sorting of pagination (type and whether it ascends) */
@@ -1232,15 +1232,15 @@ export type PaginationSortInput = {
 };
 
 export type PaginationWhereInput = {
-  startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
-  offset?: Maybe<Scalars['Int']>;
-  limit?: Maybe<Scalars['Int']>;
-  pageIndex?: Maybe<Scalars['Int']>;
-  searchTerm?: Maybe<Scalars['String']>;
-  search?: Maybe<Scalars['String']>;
   cursor?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
   orderBy?: Maybe<Array<PaginationSortInput>>;
+  pageIndex?: Maybe<Scalars['Int']>;
+  search?: Maybe<Scalars['String']>;
+  searchTerm?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['String']>;
 };
 
 export type PermissionIdsInput = {
@@ -1249,16 +1249,16 @@ export type PermissionIdsInput = {
 
 export type PermissionInput = {
   customerId?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
 };
 
 export type PermssionType = {
   __typename?: 'PermssionType';
+  customer?: Maybe<Customer>;
+  description?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  customer?: Maybe<Customer>;
 };
 
 export type PreviewDataType = {
@@ -1270,57 +1270,37 @@ export type PreviewDataType = {
 
 export type Query = {
   __typename?: 'Query';
-  getJobProcessLocations: JobProcessLocations;
-  getPreviewData?: Maybe<PreviewDataType>;
-  getJob?: Maybe<CreateWorkspaceJobType>;
-  getAutodeckJobs: AutodeckConnectionType;
-  getAdjustedLogo?: Maybe<AwsImageType>;
-  tags: Array<Tag>;
-  delivery?: Maybe<DeliveryType>;
-  triggerConnection?: Maybe<TriggerConnectionType>;
-  trigger?: Maybe<TriggerType>;
-  triggers: Array<TriggerType>;
-  role?: Maybe<RoleType>;
-  roleConnection: RoleConnection;
-  customers: Array<Customer>;
   customer?: Maybe<Customer>;
-  UserOfCustomer?: Maybe<UserCustomer>;
-  me: UserType;
-  users: Array<UserType>;
-  user?: Maybe<UserType>;
+  customers: Array<Customer>;
+  delivery?: Maybe<DeliveryType>;
   dialogue?: Maybe<Dialogue>;
   dialogues: Array<Dialogue>;
+  edge?: Maybe<Edge>;
+  getAdjustedLogo?: Maybe<AwsImageType>;
+  getAutodeckJobs: AutodeckConnectionType;
+  getJob?: Maybe<CreateWorkspaceJobType>;
+  getJobProcessLocations: JobProcessLocations;
+  getPreviewData?: Maybe<PreviewDataType>;
+  me: UserType;
   refreshAccessToken: RefreshAccessTokenOutput;
-  sessions: Array<Session>;
+  role?: Maybe<RoleType>;
+  roleConnection: RoleConnection;
   /** A session is one entire user-interaction */
   session?: Maybe<Session>;
-  edge?: Maybe<Edge>;
+  sessions: Array<Session>;
+  tags: Array<Tag>;
+  trigger?: Maybe<TriggerType>;
+  triggerConnection?: Maybe<TriggerConnectionType>;
+  triggers: Array<TriggerType>;
+  user?: Maybe<UserType>;
+  UserOfCustomer?: Maybe<UserCustomer>;
+  users: Array<UserType>;
 };
 
 
-export type QueryGetPreviewDataArgs = {
-  id?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryGetJobArgs = {
-  id?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryGetAutodeckJobsArgs = {
-  filter?: Maybe<PaginationWhereInput>;
-};
-
-
-export type QueryGetAdjustedLogoArgs = {
-  input?: Maybe<AdjustedImageInput>;
-};
-
-
-export type QueryTagsArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
-  dialogueId?: Maybe<Scalars['String']>;
+export type QueryCustomerArgs = {
+  id?: Maybe<Scalars['ID']>;
+  slug?: Maybe<Scalars['String']>;
 };
 
 
@@ -1329,22 +1309,38 @@ export type QueryDeliveryArgs = {
 };
 
 
-export type QueryTriggerConnectionArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
+export type QueryDialogueArgs = {
+  where?: Maybe<DialogueWhereUniqueInput>;
+};
+
+
+export type QueryDialoguesArgs = {
+  filter?: Maybe<DialogueFilterInputType>;
+};
+
+
+export type QueryEdgeArgs = {
+  id?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryGetAdjustedLogoArgs = {
+  input?: Maybe<AdjustedImageInput>;
+};
+
+
+export type QueryGetAutodeckJobsArgs = {
   filter?: Maybe<PaginationWhereInput>;
 };
 
 
-export type QueryTriggerArgs = {
-  triggerId?: Maybe<Scalars['String']>;
+export type QueryGetJobArgs = {
+  id?: Maybe<Scalars['String']>;
 };
 
 
-export type QueryTriggersArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
-  dialogueId?: Maybe<Scalars['String']>;
-  userId?: Maybe<Scalars['String']>;
-  filter?: Maybe<PaginationWhereInput>;
+export type QueryGetPreviewDataArgs = {
+  id?: Maybe<Scalars['String']>;
 };
 
 
@@ -1359,9 +1355,43 @@ export type QueryRoleConnectionArgs = {
 };
 
 
-export type QueryCustomerArgs = {
-  id?: Maybe<Scalars['ID']>;
-  slug?: Maybe<Scalars['String']>;
+export type QuerySessionArgs = {
+  id?: Maybe<Scalars['String']>;
+};
+
+
+export type QuerySessionsArgs = {
+  where?: Maybe<SessionWhereUniqueInput>;
+};
+
+
+export type QueryTagsArgs = {
+  customerSlug?: Maybe<Scalars['String']>;
+  dialogueId?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryTriggerArgs = {
+  triggerId?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryTriggerConnectionArgs = {
+  customerSlug?: Maybe<Scalars['String']>;
+  filter?: Maybe<PaginationWhereInput>;
+};
+
+
+export type QueryTriggersArgs = {
+  customerSlug?: Maybe<Scalars['String']>;
+  dialogueId?: Maybe<Scalars['String']>;
+  filter?: Maybe<PaginationWhereInput>;
+  userId?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryUserArgs = {
+  userId?: Maybe<Scalars['String']>;
 };
 
 
@@ -1374,76 +1404,46 @@ export type QueryUsersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
 };
 
-
-export type QueryUserArgs = {
-  userId?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryDialogueArgs = {
-  where?: Maybe<DialogueWhereUniqueInput>;
-};
-
-
-export type QueryDialoguesArgs = {
-  filter?: Maybe<DialogueFilterInputType>;
-};
-
-
-export type QuerySessionsArgs = {
-  where?: Maybe<SessionWhereUniqueInput>;
-};
-
-
-export type QuerySessionArgs = {
-  id?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryEdgeArgs = {
-  id?: Maybe<Scalars['String']>;
-};
-
 export type QuestionNode = {
   __typename?: 'QuestionNode';
+  children: Array<Edge>;
+  creationDate?: Maybe<Scalars['String']>;
+  extraContent?: Maybe<Scalars['String']>;
+  /** FormNode resolver */
+  form?: Maybe<FormNodeType>;
   id: Scalars['ID'];
   isLeaf: Scalars['Boolean'];
   isRoot: Scalars['Boolean'];
-  title: Scalars['String'];
-  updatedAt?: Maybe<Scalars['String']>;
-  extraContent?: Maybe<Scalars['String']>;
-  creationDate?: Maybe<Scalars['String']>;
-  type: QuestionNodeTypeEnum;
+  links: Array<LinkType>;
+  options: Array<QuestionOption>;
+  overrideLeaf?: Maybe<QuestionNode>;
   overrideLeafId?: Maybe<Scalars['String']>;
+  questionDialogue?: Maybe<Dialogue>;
+  questionDialogueId?: Maybe<Scalars['String']>;
+  share?: Maybe<ShareNodeType>;
   /** Slidernode resolver */
   sliderNode?: Maybe<SliderNodeType>;
-  /** FormNode resolver */
-  form?: Maybe<FormNodeType>;
-  share?: Maybe<ShareNodeType>;
-  questionDialogueId?: Maybe<Scalars['String']>;
-  links: Array<LinkType>;
-  questionDialogue?: Maybe<Dialogue>;
-  overrideLeaf?: Maybe<QuestionNode>;
-  options: Array<QuestionOption>;
-  children: Array<Edge>;
+  title: Scalars['String'];
+  type: QuestionNodeTypeEnum;
+  updatedAt?: Maybe<Scalars['String']>;
 };
 
 /** The different types a node can assume */
 export enum QuestionNodeTypeEnum {
-  Generic = 'GENERIC',
-  Slider = 'SLIDER',
   Choice = 'CHOICE',
-  Registration = 'REGISTRATION',
   Form = 'FORM',
-  Textbox = 'TEXTBOX',
+  Generic = 'GENERIC',
   Link = 'LINK',
+  Registration = 'REGISTRATION',
   Share = 'SHARE',
+  Slider = 'SLIDER',
+  Textbox = 'TEXTBOX',
   VideoEmbedded = 'VIDEO_EMBEDDED'
 }
 
 export type QuestionNodeWhereInputType = {
-  isRoot?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['ID']>;
+  isRoot?: Maybe<Scalars['Boolean']>;
 };
 
 export type QuestionNodeWhereUniqueInput = {
@@ -1453,11 +1453,11 @@ export type QuestionNodeWhereUniqueInput = {
 export type QuestionOption = {
   __typename?: 'QuestionOption';
   id: Scalars['Int'];
-  value: Scalars['String'];
-  questionId?: Maybe<Scalars['String']>;
-  publicValue?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
   position?: Maybe<Scalars['Int']>;
+  publicValue?: Maybe<Scalars['String']>;
+  questionId?: Maybe<Scalars['String']>;
+  value: Scalars['String'];
 };
 
 export type RecipientsInputType = {
@@ -1471,11 +1471,11 @@ export type RefreshAccessTokenOutput = {
 
 /** Registration credentials */
 export type RegisterInput = {
+  customerId: Scalars['String'];
   email: Scalars['String'];
-  password: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
-  customerId: Scalars['String'];
+  password: Scalars['String'];
   roleId?: Maybe<Scalars['String']>;
 };
 
@@ -1485,12 +1485,12 @@ export type RegisterNodeEntryInput = {
 };
 
 export type RemovePixelRangeInput = {
-  key?: Maybe<Scalars['String']>;
-  bucket?: Maybe<Scalars['String']>;
-  red?: Maybe<Scalars['Int']>;
-  green?: Maybe<Scalars['Int']>;
   blue?: Maybe<Scalars['Int']>;
+  bucket?: Maybe<Scalars['String']>;
+  green?: Maybe<Scalars['Int']>;
+  key?: Maybe<Scalars['String']>;
   range?: Maybe<Scalars['Int']>;
+  red?: Maybe<Scalars['Int']>;
 };
 
 export type RequestInviteInput = {
@@ -1506,70 +1506,70 @@ export type RequestInviteOutput = {
 export type RoleConnection = DeprecatedConnectionInterface & {
   __typename?: 'RoleConnection';
   cursor?: Maybe<Scalars['String']>;
-  offset?: Maybe<Scalars['Int']>;
-  limit: Scalars['Int'];
-  pageInfo: DeprecatedPaginationPageInfo;
-  startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
+  limit: Scalars['Int'];
+  offset?: Maybe<Scalars['Int']>;
+  pageInfo: DeprecatedPaginationPageInfo;
   roles: Array<RoleType>;
+  startDate?: Maybe<Scalars['String']>;
 };
 
 export type RoleDataInput = {
-  name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
 };
 
 export type RoleInput = {
   customerId?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
   permissions?: Maybe<Array<SystemPermission>>;
 };
 
 export type RoleType = {
   __typename?: 'RoleType';
+  allPermissions: Array<SystemPermission>;
+  customerId?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
-  roleId?: Maybe<Scalars['String']>;
-  customerId?: Maybe<Scalars['String']>;
   nrPermissions?: Maybe<Scalars['Int']>;
-  allPermissions: Array<SystemPermission>;
   permissions?: Maybe<Array<SystemPermission>>;
+  roleId?: Maybe<Scalars['String']>;
 };
 
 export type Session = {
   __typename?: 'Session';
-  id: Scalars['ID'];
-  createdAt: Scalars['Date'];
-  dialogueId: Scalars['String'];
   browser: Scalars['String'];
+  createdAt: Scalars['Date'];
+  delivery?: Maybe<DeliveryType>;
+  deliveryId?: Maybe<Scalars['String']>;
+  device?: Maybe<Scalars['String']>;
+  dialogueId: Scalars['String'];
+  id: Scalars['ID'];
+  nodeEntries: Array<NodeEntry>;
+  originUrl?: Maybe<Scalars['String']>;
   paths: Scalars['Int'];
   score: Scalars['Float'];
   totalTimeInSec?: Maybe<Scalars['Int']>;
-  originUrl?: Maybe<Scalars['String']>;
-  device?: Maybe<Scalars['String']>;
-  deliveryId?: Maybe<Scalars['String']>;
-  delivery?: Maybe<DeliveryType>;
-  nodeEntries: Array<NodeEntry>;
 };
 
 export type SessionConnection = ConnectionInterface & {
   __typename?: 'SessionConnection';
-  totalPages?: Maybe<Scalars['Int']>;
   pageInfo: PaginationPageInfo;
   sessions: Array<Session>;
+  totalPages?: Maybe<Scalars['Int']>;
 };
 
 export type SessionConnectionFilterInput = {
+  campaignVariantId?: Maybe<Scalars['String']>;
+  deliveryType?: Maybe<SessionDeliveryType>;
+  endDate?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
+  orderBy?: Maybe<SessionConnectionOrderByInput>;
+  perPage?: Maybe<Scalars['Int']>;
+  scoreRange?: Maybe<SessionScoreRangeFilter>;
   search?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
-  deliveryType?: Maybe<SessionDeliveryType>;
-  scoreRange?: Maybe<SessionScoreRangeFilter>;
-  campaignVariantId?: Maybe<Scalars['String']>;
-  orderBy?: Maybe<SessionConnectionOrderByInput>;
-  offset?: Maybe<Scalars['Int']>;
-  perPage?: Maybe<Scalars['Int']>;
 };
 
 /** Fields to order SessionConnection by. */
@@ -1591,88 +1591,88 @@ export enum SessionDeliveryType {
 
 /** Input type of a SessionEvent for Choices. */
 export type SessionEventChoiceValueInput = {
-  value: Scalars['String'];
-  relatedNodeId: Scalars['String'];
   optionId?: Maybe<Scalars['String']>;
+  relatedNodeId: Scalars['String'];
   timeSpent?: Maybe<Scalars['Int']>;
+  value: Scalars['String'];
 };
 
 /** Input type of a SessionEvent for a form. */
 export type SessionEventFormValueInput = {
-  values?: Maybe<Array<FormNodeEntryFieldInput>>;
   relatedNodeId: Scalars['String'];
   timeSpent?: Maybe<Scalars['Int']>;
+  values?: Maybe<Array<FormNodeEntryFieldInput>>;
 };
 
 /** Input type of a SessionEvent */
 export type SessionEventInput = {
-  sessionId: Scalars['String'];
-  timestamp: Scalars['Date'];
-  eventType: SessionEventType;
-  toNodeId?: Maybe<Scalars['String']>;
   choiceValue?: Maybe<SessionEventChoiceValueInput>;
-  sliderValue?: Maybe<SessionEventSliderValueInput>;
+  eventType: SessionEventType;
   formValue?: Maybe<SessionEventFormValueInput>;
+  sessionId: Scalars['String'];
+  sliderValue?: Maybe<SessionEventSliderValueInput>;
+  timestamp: Scalars['Date'];
+  toNodeId?: Maybe<Scalars['String']>;
 };
 
 /** Input type of a SessionEvent for Sliders. */
 export type SessionEventSliderValueInput = {
-  value: Scalars['Int'];
   relatedNodeId: Scalars['String'];
   timeSpent?: Maybe<Scalars['Int']>;
+  value: Scalars['Int'];
 };
 
 /** Types of events that can be emitted in a user's session. */
 export enum SessionEventType {
   ChoiceAction = 'CHOICE_ACTION',
-  SliderAction = 'SLIDER_ACTION',
+  FormAction = 'FORM_ACTION',
   Navigation = 'NAVIGATION',
-  FormAction = 'FORM_ACTION'
+  SliderAction = 'SLIDER_ACTION'
 }
 
 /** Input for session */
 export type SessionInput = {
+  deliveryId?: Maybe<Scalars['String']>;
+  device?: Maybe<Scalars['String']>;
   dialogueId: Scalars['String'];
   entries?: Maybe<Array<NodeEntryInput>>;
-  deliveryId?: Maybe<Scalars['String']>;
   originUrl?: Maybe<Scalars['String']>;
-  device?: Maybe<Scalars['String']>;
   totalTimeInSec?: Maybe<Scalars['Int']>;
 };
 
 /** Scores to filter sessions by. */
 export type SessionScoreRangeFilter = {
-  min?: Maybe<Scalars['Int']>;
   max?: Maybe<Scalars['Int']>;
+  min?: Maybe<Scalars['Int']>;
 };
 
 export type SessionWhereUniqueInput = {
-  id?: Maybe<Scalars['ID']>;
   dialogueId?: Maybe<Scalars['ID']>;
+  id?: Maybe<Scalars['ID']>;
 };
 
 export type ShareNodeInputType = {
   id?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
   tooltip?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
 };
 
 export type ShareNodeType = {
   __typename?: 'ShareNodeType';
+  createdAt?: Maybe<Scalars['String']>;
   id: Scalars['String'];
-  url: Scalars['String'];
   title: Scalars['String'];
   tooltip?: Maybe<Scalars['String']>;
-  createdAt?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
+  url: Scalars['String'];
 };
 
 export type SlideNodeMarkerInput = {
   id?: Maybe<Scalars['ID']>;
   label: Scalars['String'];
-  subLabel: Scalars['String'];
   range?: Maybe<SliderNodeRangeInputType>;
+  subLabel: Scalars['String'];
 };
 
 /** Input type for a slider node */
@@ -1689,28 +1689,28 @@ export type SliderNodeMarkerType = {
   __typename?: 'SliderNodeMarkerType';
   id: Scalars['ID'];
   label: Scalars['String'];
-  subLabel: Scalars['String'];
   range?: Maybe<SliderNodeRangeType>;
+  subLabel: Scalars['String'];
 };
 
 export type SliderNodeRangeInputType = {
-  start?: Maybe<Scalars['Float']>;
   end?: Maybe<Scalars['Float']>;
+  start?: Maybe<Scalars['Float']>;
 };
 
 export type SliderNodeRangeType = {
   __typename?: 'SliderNodeRangeType';
+  end?: Maybe<Scalars['Float']>;
   id: Scalars['ID'];
   start?: Maybe<Scalars['Float']>;
-  end?: Maybe<Scalars['Float']>;
 };
 
 export type SliderNodeType = {
   __typename?: 'SliderNodeType';
-  id?: Maybe<Scalars['ID']>;
   happyText?: Maybe<Scalars['String']>;
-  unhappyText?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['ID']>;
   markers?: Maybe<Array<SliderNodeMarkerType>>;
+  unhappyText?: Maybe<Scalars['String']>;
 };
 
 /** Details regarding interaction with social node */
@@ -1720,29 +1720,34 @@ export type SocialNodeEntryInput = {
 
 export enum SystemPermission {
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
-  CanEditDialogue = 'CAN_EDIT_DIALOGUE',
-  CanBuildDialogue = 'CAN_BUILD_DIALOGUE',
-  CanViewDialogue = 'CAN_VIEW_DIALOGUE',
-  CanDeleteDialogue = 'CAN_DELETE_DIALOGUE',
-  CanViewDialogueAnalytics = 'CAN_VIEW_DIALOGUE_ANALYTICS',
-  CanViewUsers = 'CAN_VIEW_USERS',
+  CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
   CanAddUsers = 'CAN_ADD_USERS',
-  CanDeleteUsers = 'CAN_DELETE_USERS',
-  CanEditUsers = 'CAN_EDIT_USERS',
-  CanCreateTriggers = 'CAN_CREATE_TRIGGERS',
-  CanDeleteTriggers = 'CAN_DELETE_TRIGGERS',
-  CanDeleteWorkspace = 'CAN_DELETE_WORKSPACE',
-  CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
-  CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
+  CanBuildDialogue = 'CAN_BUILD_DIALOGUE',
+  CanCreateAutomations = 'CAN_CREATE_AUTOMATIONS',
   CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
-  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES'
+  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES',
+  CanCreateTriggers = 'CAN_CREATE_TRIGGERS',
+  CanDeleteDialogue = 'CAN_DELETE_DIALOGUE',
+  CanDeleteTriggers = 'CAN_DELETE_TRIGGERS',
+  CanDeleteUsers = 'CAN_DELETE_USERS',
+  CanDeleteWorkspace = 'CAN_DELETE_WORKSPACE',
+  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
+  CanEditDialogue = 'CAN_EDIT_DIALOGUE',
+  CanEditUsers = 'CAN_EDIT_USERS',
+  CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
+  CanUpdateAutomations = 'CAN_UPDATE_AUTOMATIONS',
+  CanViewAutomations = 'CAN_VIEW_AUTOMATIONS',
+  CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
+  CanViewDialogue = 'CAN_VIEW_DIALOGUE',
+  CanViewDialogueAnalytics = 'CAN_VIEW_DIALOGUE_ANALYTICS',
+  CanViewUsers = 'CAN_VIEW_USERS'
 }
 
 export type Tag = {
   __typename?: 'Tag';
+  customerId: Scalars['String'];
   id: Scalars['ID'];
   name: Scalars['String'];
-  customerId: Scalars['String'];
   type: TagTypeEnum;
 };
 
@@ -1751,9 +1756,9 @@ export type TagsInputObjectType = {
 };
 
 export enum TagTypeEnum {
+  Agent = 'AGENT',
   Default = 'DEFAULT',
-  Location = 'LOCATION',
-  Agent = 'AGENT'
+  Location = 'LOCATION'
 }
 
 /** Input type for a textbox node */
@@ -1764,72 +1769,72 @@ export type TextboxNodeEntryInput = {
 export type TopPathType = {
   __typename?: 'topPathType';
   answer?: Maybe<Scalars['String']>;
-  quantity?: Maybe<Scalars['Int']>;
   basicSentiment?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Int']>;
 };
 
 export enum TriggerConditionEnum {
-  LowThreshold = 'LOW_THRESHOLD',
   HighThreshold = 'HIGH_THRESHOLD',
   InnerRange = 'INNER_RANGE',
+  LowThreshold = 'LOW_THRESHOLD',
   OuterRange = 'OUTER_RANGE',
   TextMatch = 'TEXT_MATCH'
 }
 
 export type TriggerConditionInputType = {
   id?: Maybe<Scalars['Int']>;
-  questionId?: Maybe<Scalars['String']>;
-  type?: Maybe<TriggerConditionEnum>;
-  minValue?: Maybe<Scalars['Int']>;
   maxValue?: Maybe<Scalars['Int']>;
+  minValue?: Maybe<Scalars['Int']>;
+  questionId?: Maybe<Scalars['String']>;
   textValue?: Maybe<Scalars['String']>;
+  type?: Maybe<TriggerConditionEnum>;
 };
 
 export type TriggerConditionType = {
   __typename?: 'TriggerConditionType';
   id: Scalars['Int'];
-  type: TriggerConditionEnum;
-  minValue?: Maybe<Scalars['Int']>;
   maxValue?: Maybe<Scalars['Int']>;
+  minValue?: Maybe<Scalars['Int']>;
+  question?: Maybe<QuestionNode>;
   textValue?: Maybe<Scalars['String']>;
   triggerId: Scalars['String'];
-  question?: Maybe<QuestionNode>;
+  type: TriggerConditionEnum;
 };
 
 export type TriggerConnectionType = DeprecatedConnectionInterface & {
   __typename?: 'TriggerConnectionType';
   cursor?: Maybe<Scalars['String']>;
-  offset?: Maybe<Scalars['Int']>;
+  endDate?: Maybe<Scalars['String']>;
   limit: Scalars['Int'];
+  offset?: Maybe<Scalars['Int']>;
   pageInfo: DeprecatedPaginationPageInfo;
   startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
   triggers: Array<TriggerType>;
 };
 
 export type TriggerInputType = {
+  conditions?: Maybe<Array<TriggerConditionInputType>>;
+  medium?: Maybe<TriggerMediumEnum>;
   name?: Maybe<Scalars['String']>;
   type?: Maybe<TriggerTypeEnum>;
-  medium?: Maybe<TriggerMediumEnum>;
-  conditions?: Maybe<Array<TriggerConditionInputType>>;
 };
 
 export enum TriggerMediumEnum {
+  Both = 'BOTH',
   Email = 'EMAIL',
-  Phone = 'PHONE',
-  Both = 'BOTH'
+  Phone = 'PHONE'
 }
 
 export type TriggerType = {
   __typename?: 'TriggerType';
-  id: Scalars['String'];
-  name: Scalars['String'];
-  type: TriggerTypeEnum;
-  medium: TriggerMediumEnum;
-  relatedNodeId?: Maybe<Scalars['String']>;
-  relatedDialogue?: Maybe<Dialogue>;
   conditions: Array<TriggerConditionType>;
+  id: Scalars['String'];
+  medium: TriggerMediumEnum;
+  name: Scalars['String'];
   recipients: Array<UserType>;
+  relatedDialogue?: Maybe<Dialogue>;
+  relatedNodeId?: Maybe<Scalars['String']>;
+  type: TriggerTypeEnum;
 };
 
 export enum TriggerTypeEnum {
@@ -1838,33 +1843,33 @@ export enum TriggerTypeEnum {
 }
 
 export type UpdateCtaInputType = {
-  id?: Maybe<Scalars['String']>;
   customerId?: Maybe<Scalars['ID']>;
-  title?: Maybe<Scalars['String']>;
-  type?: Maybe<QuestionNodeTypeEnum>;
+  form?: Maybe<FormNodeInputType>;
+  id?: Maybe<Scalars['String']>;
   links?: Maybe<CtaLinksInputType>;
   share?: Maybe<ShareNodeInputType>;
-  form?: Maybe<FormNodeInputType>;
+  title?: Maybe<Scalars['String']>;
+  type?: Maybe<QuestionNodeTypeEnum>;
 };
 
 export type UpdatePermissionsInput = {
-  roleId?: Maybe<Scalars['String']>;
   permissions?: Maybe<Array<SystemPermission>>;
+  roleId?: Maybe<Scalars['String']>;
 };
 
 export type UpdateQuestionNodeInputType = {
-  id: Scalars['ID'];
   customerId?: Maybe<Scalars['ID']>;
-  overrideLeafId?: Maybe<Scalars['ID']>;
+  edgeCondition?: Maybe<EdgeConditionInputType>;
   edgeId?: Maybe<Scalars['ID']>;
+  extraContent?: Maybe<Scalars['String']>;
+  happyText?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  optionEntries?: Maybe<OptionsInputType>;
+  overrideLeafId?: Maybe<Scalars['ID']>;
+  sliderNode?: Maybe<SliderNodeInputType>;
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
-  extraContent?: Maybe<Scalars['String']>;
   unhappyText?: Maybe<Scalars['String']>;
-  happyText?: Maybe<Scalars['String']>;
-  sliderNode?: Maybe<SliderNodeInputType>;
-  optionEntries?: Maybe<OptionsInputType>;
-  edgeCondition?: Maybe<EdgeConditionInputType>;
 };
 
 
@@ -1879,8 +1884,8 @@ export type UploadSellImageInputType = {
 };
 
 export type UploadSessionEventsInput = {
-  sessionId?: Maybe<Scalars['String']>;
   events?: Maybe<Array<SessionEventInput>>;
+  sessionId?: Maybe<Scalars['String']>;
 };
 
 export type UploadSessionEventsOutput = {
@@ -1890,33 +1895,33 @@ export type UploadSessionEventsOutput = {
 
 export type UserConnection = ConnectionInterface & {
   __typename?: 'UserConnection';
-  totalPages?: Maybe<Scalars['Int']>;
   pageInfo: PaginationPageInfo;
+  totalPages?: Maybe<Scalars['Int']>;
   userCustomers: Array<UserCustomer>;
 };
 
 export type UserConnectionFilterInput = {
-  search?: Maybe<Scalars['String']>;
-  startDate?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
-  email?: Maybe<Scalars['String']>;
-  role?: Maybe<Scalars['String']>;
-  orderBy?: Maybe<UserConnectionOrderByInput>;
   offset?: Maybe<Scalars['Int']>;
+  orderBy?: Maybe<UserConnectionOrderByInput>;
   perPage?: Maybe<Scalars['Int']>;
+  role?: Maybe<Scalars['String']>;
+  search?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['String']>;
 };
 
 /** Fields to order UserConnection by. */
 export enum UserConnectionOrder {
-  FirstName = 'firstName',
-  LastName = 'lastName',
-  Email = 'email',
   CreatedAt = 'createdAt',
+  Email = 'email',
+  FirstName = 'firstName',
+  IsActive = 'isActive',
   LastActivity = 'lastActivity',
-  Role = 'role',
-  IsActive = 'isActive'
+  LastName = 'lastName',
+  Role = 'role'
 }
 
 /** Sorting of UserConnection */
@@ -1928,42 +1933,42 @@ export type UserConnectionOrderByInput = {
 export type UserCustomer = {
   __typename?: 'UserCustomer';
   createdAt: Scalars['Date'];
-  isActive: Scalars['Boolean'];
-  user: UserType;
   customer: Customer;
+  isActive: Scalars['Boolean'];
   role: RoleType;
+  user: UserType;
 };
 
 export type UserInput = {
+  customerId?: Maybe<Scalars['String']>;
   email: Scalars['String'];
   firstName?: Maybe<Scalars['String']>;
-  password?: Maybe<Scalars['String']>;
-  roleId?: Maybe<Scalars['String']>;
-  customerId?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
+  password?: Maybe<Scalars['String']>;
   phone?: Maybe<Scalars['String']>;
+  roleId?: Maybe<Scalars['String']>;
 };
 
 export type UserOfCustomerInput = {
-  userId?: Maybe<Scalars['String']>;
   customerId?: Maybe<Scalars['String']>;
   customerSlug?: Maybe<Scalars['String']>;
+  userId?: Maybe<Scalars['String']>;
 };
 
 export type UserType = {
   __typename?: 'UserType';
-  id: Scalars['ID'];
-  email: Scalars['String'];
-  phone?: Maybe<Scalars['String']>;
-  firstName?: Maybe<Scalars['String']>;
-  lastName?: Maybe<Scalars['String']>;
-  lastLoggedIn?: Maybe<Scalars['Date']>;
-  lastActivity?: Maybe<Scalars['Date']>;
-  globalPermissions?: Maybe<Array<SystemPermission>>;
-  userCustomers: Array<UserCustomer>;
   customers: Array<Customer>;
-  roleId?: Maybe<Scalars['String']>;
+  email: Scalars['String'];
+  firstName?: Maybe<Scalars['String']>;
+  globalPermissions?: Maybe<Array<SystemPermission>>;
+  id: Scalars['ID'];
+  lastActivity?: Maybe<Scalars['Date']>;
+  lastLoggedIn?: Maybe<Scalars['Date']>;
+  lastName?: Maybe<Scalars['String']>;
+  phone?: Maybe<Scalars['String']>;
   role?: Maybe<RoleType>;
+  roleId?: Maybe<Scalars['String']>;
+  userCustomers: Array<UserCustomer>;
 };
 
 export type VerifyUserTokenOutput = {

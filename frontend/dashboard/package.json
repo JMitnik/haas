@@ -77,7 +77,7 @@
     "test:integration": "jest --maxWorkers=0",
     "test:cypress": "(DEBUG=cypress:* && cypress open)",
     "types": "tsc --noEmit",
-    "gen": "graphql-codegen",
+    "gen": "graphql-codegen --require dotenv/config",
     "eject": "react-scripts eject",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
   },
@@ -132,6 +132,7 @@
     "cra-workspaces": "^1.0.1",
     "cypress": "^7.2.0",
     "cypress-localstorage-commands": "^1.4.1",
+    "dotenv": "^14.3.2",
     "eslint": "^7.25.0",
     "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-config-prettier": "^6.10.1",

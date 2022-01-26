@@ -1720,8 +1720,10 @@ export type SocialNodeEntryInput = {
 
 export enum SystemPermission {
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
+  CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
   CanAddUsers = 'CAN_ADD_USERS',
   CanBuildDialogue = 'CAN_BUILD_DIALOGUE',
+  CanCreateAutomations = 'CAN_CREATE_AUTOMATIONS',
   CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
   CanCreateDeliveries = 'CAN_CREATE_DELIVERIES',
   CanCreateTriggers = 'CAN_CREATE_TRIGGERS',
@@ -1729,9 +1731,12 @@ export enum SystemPermission {
   CanDeleteTriggers = 'CAN_DELETE_TRIGGERS',
   CanDeleteUsers = 'CAN_DELETE_USERS',
   CanDeleteWorkspace = 'CAN_DELETE_WORKSPACE',
+  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
   CanEditDialogue = 'CAN_EDIT_DIALOGUE',
   CanEditUsers = 'CAN_EDIT_USERS',
   CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
+  CanUpdateAutomations = 'CAN_UPDATE_AUTOMATIONS',
+  CanViewAutomations = 'CAN_VIEW_AUTOMATIONS',
   CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
   CanViewDialogue = 'CAN_VIEW_DIALOGUE',
   CanViewDialogueAnalytics = 'CAN_VIEW_DIALOGUE_ANALYTICS',

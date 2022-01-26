@@ -1,0 +1,59 @@
+fragment QuestionNodeFragment on QuestionNode {
+  id
+  title
+  isRoot
+  isLeaf
+  type
+  children {
+    ...EdgeFragment
+    parentNode {
+      id
+    }
+    childNode {
+      id
+    }
+  }
+
+  sliderNode {
+    id
+    happyText
+    unhappyText
+    markers {
+      id
+      label
+      subLabel
+      range {
+        id
+        start
+        end
+      }
+    }
+  }
+
+  form {
+    id
+    helperText
+    fields {
+      id
+      label
+      type
+      placeholder
+      isRequired
+      position
+    }
+  }
+
+  overrideLeaf {
+    id
+    title
+    type
+  }
+  options {
+    id
+    value
+    publicValue
+    overrideLeaf {
+      id
+    }
+  }
+}

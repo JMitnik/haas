@@ -1,5 +1,5 @@
 {
-  "name": "@haas/client-web",
+  "name": "@haas/client",
   "private": true,
   "version": "0.0.1",
   "scripts": {
@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --watch",
-    "gen": "graphql-codegen"
+    "gen": "graphql-codegen --require dotenv/config"
   },
   "dependencies": {
     "@apollo/client": "3.4.16",
