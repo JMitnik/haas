@@ -943,6 +943,7 @@ type QuestionNode {
   options: [QuestionOption!]!
   overrideLeaf: QuestionNode
   overrideLeafId: String
+  position: Int
   questionDialogue: Dialogue
   questionDialogueId: String
   share: ShareNodeType

@@ -206,6 +206,13 @@ export const QuestionNodeType = objectType({
     t.string('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
     t.string('overrideLeafId', { nullable: true });
+    t.int('position', {
+      nullable: true,
+      resolve: async (parent) => {
+        if (!parent.position && (typeof parent.position === undefined || typeof parent.position === null)) return null;
+        return parent.position;
+      }
+    });
 
     t.string('updatedAt', {
       nullable: true,

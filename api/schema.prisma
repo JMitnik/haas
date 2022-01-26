@@ -5,8 +5,8 @@ datasource postgresql {
 
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
-  provider = "prisma-client-js"
-  output   = "./node_modules/@prisma/client"
+  provider        = "prisma-client-js"
+  output          = "./node_modules/@prisma/client"
   previewFeatures = ["orderByRelation"]
 }
 
@@ -229,6 +229,7 @@ model QuestionNode {
   isLeaf       Boolean          @default(false)
   isRoot       Boolean          @default(false)
   title        String
+  position     Int?
   type         NodeType         @default(value: GENERIC)
   options      QuestionOption[]
   children     Edge[]

@@ -8,6 +8,7 @@ import SplitArrowIcon from 'components/Icons/SplitIcon';
 import { AddQuestionContainer, DepthSpan } from './QuestionEntry/QuestionEntryStyles';
 import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
 import { QuestionNodeProblem } from '../DialogueBuilderTypes';
+import { UseFieldArrayMethods } from 'react-hook-form';
 import { findProblemsInChildCondition } from '../findProblemsInChildConditions';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 
@@ -28,6 +29,7 @@ interface QuestionSectionProps {
   condition: EdgeConditionProps | undefined;
   edgeId: string | undefined;
   problems?: (QuestionNodeProblem | undefined)[];
+  amtSiblings: number;
 }
 
 const QuestionSection = ({
@@ -47,6 +49,7 @@ const QuestionSection = ({
   options,
   edgeId,
   parentQuestionType,
+  amtSiblings,
 }: QuestionSectionProps) => {
   const { t } = useTranslation();
   const [isQuestionExpanded, setQuestionExpanded] = useState(depth === 1 || false);
@@ -55,7 +58,7 @@ const QuestionSection = ({
     setQuestionExpanded((prevExpanded) => !prevExpanded);
   };
 
-  const activeChildrenIds = question.children?.map((child) => child.childNode.id);
+  const activeChildrenIds = question.children?.map((child) => child.childNode.id) as string[];
   const children: QuestionEntryProps[] = questionsQ.filter((childQuestion) => (
     activeChildrenIds?.includes(childQuestion.id)
   ));
@@ -106,13 +109,14 @@ const QuestionSection = ({
         onAddQuestion={onAddQuestion}
         onDeleteQuestion={onDeleteQuestion}
         key={`entry-${question.id}-${question.updatedAt}`}
-        index={0}
+        index={index}
         questionsQ={questionsQ}
         question={question}
         Icon={Icon}
         leafs={leafs}
         problems={problems || []}
         ctaNodes={ctaNodes}
+        amtSiblings={amtSiblings}
       />
 
       {/* Children */}
@@ -135,6 +139,7 @@ const QuestionSection = ({
           problems={childConditionsProblems[childIndex]}
           onAddQuestion={onAddQuestion}
           onDeleteQuestion={onDeleteQuestion}
+          amtSiblings={children?.length || 0}
         />
       ))}
 
@@ -177,6 +182,7 @@ const QuestionSection = ({
             Icon={Icon}
             leafs={leafs}
             ctaNodes={ctaNodes}
+            amtSiblings={amtSiblings}
           />
         </Div>
       )}

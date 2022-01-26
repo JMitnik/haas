@@ -15,8 +15,10 @@ import ShowMoreButton from 'components/ShowMoreButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import useAuth from 'hooks/useAuth';
 
+import { ArrowDown, ArrowUp } from 'react-feather';
 import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
+import { UseFieldArrayMethods } from 'react-hook-form';
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';
@@ -48,6 +50,7 @@ interface QuestionEntryItemProps {
   parentQuestionType: string;
   ctaNodes: CTANode[];
   problems: (QuestionNodeProblem | undefined)[];
+  amtSiblings: number;
 }
 
 interface QuestionOptionsOverlayProps {
@@ -93,7 +96,9 @@ const QuestionEntryItem = ({ depth,
   parentQuestionId,
   ctaNodes,
   onAddExpandChange,
-  problems } : QuestionEntryItemProps) => {
+  amtSiblings,
+  index,
+  problems }: QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { canAccessAdmin } = useAuth();
@@ -180,6 +185,16 @@ const QuestionEntryItem = ({ depth,
     });
   };
 
+  const handleMoveUp = () => {
+    console.log('Moving up: ');
+  };
+
+  const handleMoveDown = () => {
+    console.log('Moving down');
+  };
+
+  console.log('INdex: ', index, 'Active IDS: ', amtSiblings);
+
   return (
     <Flex
       ref={questionRef}
@@ -225,6 +240,30 @@ const QuestionEntryItem = ({ depth,
                 {t('edit')}
               </UI.Button>
             </Flex>
+            {depth !== 1 && (
+              <UI.Stack alignItems="center" isInline spacing={2}>
+                <UI.Stack spacing={2}>
+                  <UI.Button
+                    size="sm"
+                    isDisabled={index === 0}
+                    onClick={() => handleMoveUp()}
+                  >
+                    <UI.Icon>
+                      <ArrowUp />
+                    </UI.Icon>
+                  </UI.Button>
+                  <UI.Button
+                    size="sm"
+                    isDisabled={index === amtSiblings - 1}
+                    onClick={() => handleMoveDown()}
+                  >
+                    <UI.Icon>
+                      <ArrowDown />
+                    </UI.Icon>
+                  </UI.Button>
+                </UI.Stack>
+              </UI.Stack>
+            )}
 
             <UI.Div alignSelf="center">
               {canAccessAdmin && depth > 1 && (

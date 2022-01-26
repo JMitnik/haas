@@ -6,7 +6,7 @@ enum QuestionNodeTypeEnum {
   Form = 'FORM',
   Textbox = 'TEXTBOX',
   Link = 'LINK',
-  Share = 'SHARE'
+  Share = 'SHARE',
 }
 
 export interface CTANode {
@@ -26,6 +26,7 @@ export interface QuestionEntryProps {
   updatedAt?: string;
   creationDate?: string;
   title: string;
+  position?: number;
   extraContent?: string | null;
   isRoot: boolean;
   isLeaf: boolean;

@@ -188,7 +188,8 @@ class DialoguePrismaAdapter {
         ],
       },
       orderBy: {
-        creationDate: 'asc',
+        position: 'asc',
+        // creationDate: 'asc',
       },
       include: {
         form: {

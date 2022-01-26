@@ -1361,6 +1361,7 @@ export interface NexusGenFieldTypes {
     options: NexusGenRootTypes['QuestionOption'][]; // [QuestionOption!]!
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     overrideLeafId: string | null; // String
+    position: number | null; // Int
     questionDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     questionDialogueId: string | null; // String
     share: NexusGenRootTypes['ShareNodeType'] | null; // ShareNodeType

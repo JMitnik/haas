@@ -72,8 +72,8 @@ const getIcon = (questionType: string) => {
 };
 
 const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
-  let questions = nodes?.filter((node) => !node.isLeaf);
-  questions = orderBy(questions, (question) => question.creationDate, ['asc']);
+  const questions = nodes?.filter((node) => !node.isLeaf);
+  // questions = orderBy(questions, (question) => question.creationDate, ['asc']);
 
   return (
     questions?.map(
@@ -89,8 +89,10 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
         updatedAt,
         sliderNode,
         extraContent,
+        position,
       }) => ({
         id,
+        position,
         updatedAt,
         title,
         isRoot,

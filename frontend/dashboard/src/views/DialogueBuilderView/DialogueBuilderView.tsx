@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import { CTANode, QuestionEntryProps } from './DialogueBuilderInterfaces';
+import { useFieldArray, useForm } from 'react-hook-form';
 import QuestionSection from './components/QuestionSection';
 
 interface QuestionEntryExtendedProps extends QuestionEntryProps {
@@ -23,6 +24,20 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
   const [activeQuestion, setActiveQuestion] = useState<null | string>(null);
 
   const { t } = useTranslation();
+
+  const form = useForm({
+    defaultValues: {
+      nodes,
+    },
+  });
+
+  const questionsFieldArray = useFieldArray({
+    name: 'nodes',
+    control: form.control,
+    keyName: 'indexKey',
+  });
+
+  console.log('Questions field array: ', questionsFieldArray);
 
   return (
     <>
@@ -57,6 +72,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
               Icon={root.icon}
               leafs={selectLeafs}
               ctaNodes={ctaNodes}
+              amtSiblings={0}
             />
           )}
         </UI.ColumnFlex>
