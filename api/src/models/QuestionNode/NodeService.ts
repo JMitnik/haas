@@ -698,8 +698,10 @@ export class NodeService {
 
   /**
    * Finds stale condition values, mapping from old values to new values.
+   * @param dbOptions a list of options before question is updated
+   * @param newOptions a list of updated options
    */
-  private getStaleConditionsMap(
+  getStaleConditionsMap(
     newOptions: QuestionOptionProps[],
     dbOptions: QuestionOption[],
   ): Record<string, string> {
