@@ -125,6 +125,7 @@
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-sort-class-members": "^1.14.1",
     "jest": "^26.0.0",
+    "jest-mock-extended": "^2.0.4",
     "nodemon": "^2.0.3",
     "prisma": "2.30.3",
     "regenerator-runtime": "^0.13.9",
