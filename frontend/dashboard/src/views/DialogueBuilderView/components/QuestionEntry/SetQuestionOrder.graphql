@@ -1,0 +1,5 @@
+mutation setQuestionOrder($input: SetQuestionOrderInput) {
+  setQuestionOrder(input: $input) {
+    id
+  }
+}

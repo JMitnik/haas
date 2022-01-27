@@ -46,6 +46,10 @@ class DialogueService {
     this.nodeService = new NodeService(prismaClient);
   }
 
+  async setQuestionOrder(input: NexusGenInputs['SetQuestionOrderInput']) {
+    return this.dialoguePrismaAdapter.setQuestionOrder(input);
+  }
+
   updateTags(dialogueId: string, entries?: string[] | null | undefined): Promise<Dialogue> {
     const tags = entries?.map((entryId) => ({ id: entryId })) || [];
 

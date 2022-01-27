@@ -22,6 +22,7 @@ export interface OverrideLeafProps {
 }
 export interface QuestionEntryProps {
   id: string;
+  indexKey?: string;
   icon: (props: any) => JSX.Element;
   updatedAt?: string;
   creationDate?: string;
@@ -63,4 +64,8 @@ export interface EdgeConditionProps {
   renderMin?: number;
   renderMax?: number;
   matchValue?: string;
+}
+
+export interface QuestionEntryExtendedProps extends QuestionEntryProps {
+  icon: (props: any) => JSX.Element;
 }

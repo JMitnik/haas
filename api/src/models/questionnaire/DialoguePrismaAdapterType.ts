@@ -19,6 +19,7 @@ export interface CreateQuestionInput {
   id?: string,
   isRoot?: boolean,
   isLeaf?: boolean,
+  position?: number;
   title: string,
   type: NodeType,
   overrideLeafId?: string,

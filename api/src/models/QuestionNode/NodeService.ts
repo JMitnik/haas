@@ -312,6 +312,7 @@ class NodeService {
 
     const mappedObject = {
       ...question,
+      position: question.position || undefined,
       id: mappedId,
       videoEmbeddedNode: mappedVideoEmbeddedNode,
       options: mappedOptions,
@@ -477,6 +478,7 @@ class NodeService {
     questionnaireId: string,
     type: NodeType,
     options: Array<any> = [],
+    position?: number,
     isRoot: boolean = false,
     overrideLeafId: string = '',
     isLeaf: boolean = false
@@ -490,6 +492,7 @@ class NodeService {
       isRoot,
       isLeaf,
       title,
+      position,
       type,
       options: qOptions,
       overrideLeafId,
@@ -812,13 +815,13 @@ class NodeService {
     // Root question (How do you feel about?)
     const rootQuestion = await this.createQuestionNode(
       `How do you feel about ${workspaceName}?`,
-      dialogueId, NodeType.SLIDER, standardOptions, true,
+      dialogueId, NodeType.SLIDER, standardOptions, 0, true,
     );
 
     // Positive Sub child 1 (What did you like?)
     const instagramNodeId = NodeService.findLeafIdContainingText(leafs, 'Follow us on Instagram and stay');
     const rootToWhatDidYou = await this.createQuestionNode(
-      'What did you like?', dialogueId, NodeType.CHOICE, standardOptions, false,
+      'What did you like?', dialogueId, NodeType.CHOICE, standardOptions, 1, false,
       instagramNodeId,
     );
 
@@ -827,13 +830,13 @@ class NodeService {
       'Come and join us on 1st April for our great event');
     const whatDidYouToFacilities = await this.createQuestionNode(
       'What exactly did you like about the facilities?', dialogueId,
-      NodeType.CHOICE, facilityOptions, false, comeAndJoin1stAprilId,
+      NodeType.CHOICE, facilityOptions, 4, false, comeAndJoin1stAprilId,
     );
 
     // Positive Sub sub child 2 (Website)
     const whatDidYouToWebsite = await this.createQuestionNode(
       'What exactly did you like about the website?', dialogueId,
-      NodeType.CHOICE, websiteOptions, false, instagramNodeId,
+      NodeType.CHOICE, websiteOptions, 5, false, instagramNodeId,
     );
 
     // Positive Sub sub child 3 (Product/Services)
@@ -847,6 +850,7 @@ class NodeService {
       dialogueId,
       NodeType.CHOICE,
       productServicesOptions,
+      6,
       false,
       weThinkYouMightLikeThis,
     );
@@ -856,7 +860,7 @@ class NodeService {
       'your email below to receive our newsletter');
     const whatDidYouToCustomerSupport = await this.createQuestionNode(
       'What exactly did you like about the customer support?', dialogueId,
-      NodeType.CHOICE, customerSupportOptions, false, yourEmailBelowForNewsletter,
+      NodeType.CHOICE, customerSupportOptions, 7, false, yourEmailBelowForNewsletter,
     );
 
     // Neutral Sub child 2
@@ -864,38 +868,38 @@ class NodeService {
       'Leave your email below to receive our');
     const rootToWhatWouldYouLikeToTalkAbout = await this.createQuestionNode(
       'What would you like to talk about?', dialogueId, NodeType.CHOICE,
-      standardOptions, false, leaveYourEmailBelowToReceive,
+      standardOptions, 2, false, leaveYourEmailBelowToReceive,
     );
 
     // Neutral Sub sub child 1 (Facilities)
     const whatWouldYouLikeToTalkAboutToFacilities = await this.createQuestionNode('Please specify.',
-      dialogueId, NodeType.CHOICE, facilityOptions);
+      dialogueId, NodeType.CHOICE, facilityOptions, 8);
 
     // Neutral Sub sub child 2 (Website)
     const whatWouldYouLikeToTalkAboutToWebsite = await this.createQuestionNode(
-      'Please specify.', dialogueId, NodeType.CHOICE, websiteOptions,
+      'Please specify.', dialogueId, NodeType.CHOICE, websiteOptions, 9
     );
 
     // Neutral Sub sub child 3 (Product/Services)
     const whatWouldYouLikeToTalkAboutToProduct = await this.createQuestionNode(
-      'Please specify.', dialogueId, NodeType.CHOICE, productServicesOptions,
+      'Please specify.', dialogueId, NodeType.CHOICE, productServicesOptions, 10,
     );
 
     // Neutral Sub sub child 4 (Customer Support)
     const whatWouldYouLikeToTalkAboutToCustomerSupport = await this.createQuestionNode(
-      'Please specify.', dialogueId, NodeType.CHOICE, customerSupportOptions,
+      'Please specify.', dialogueId, NodeType.CHOICE, customerSupportOptions, 11,
     );
 
     // Negative Sub child 3
     const rootToWeAreSorryToHearThat = await this.createQuestionNode(
       'We are sorry to hear that! Where can we improve?', dialogueId,
-      NodeType.CHOICE, standardOptions,
+      NodeType.CHOICE, standardOptions, 3
     );
 
     // Negative Sub sub child 1 (Facilities)
     const ourTeamIsOnIt = NodeService.findLeafIdContainingText(leafs, 'Our team is on it');
     const weAreSorryToHearThatToFacilities = await this.createQuestionNode(
-      'Please elaborate.', dialogueId, NodeType.CHOICE, facilityOptions, false, ourTeamIsOnIt,
+      'Please elaborate.', dialogueId, NodeType.CHOICE, facilityOptions, 12, false, ourTeamIsOnIt,
     );
 
     // Negative Sub sub child 2 (Website)
@@ -903,14 +907,14 @@ class NodeService {
       'Please click on the Whatsapp link below so our service');
     const weAreSorryToHearThatToWebsite = await this.createQuestionNode(
       'Please elaborate.', dialogueId, NodeType.CHOICE, websiteOptions,
-      false, pleaseClickWhatsappLink,
+      13, false, pleaseClickWhatsappLink,
     );
 
     // Negative Sub sub child 3 (Product/Services)
     const clickBelowForRefund = NodeService.findLeafIdContainingText(leafs, 'Click below for your refund');
     const weAreSorryToHearThatToProduct = await this.createQuestionNode(
       'Please elaborate.', dialogueId, NodeType.CHOICE, productServicesOptions,
-      false, clickBelowForRefund,
+      14, false, clickBelowForRefund,
     );
 
     // Negative Sub sub child 4 (Customer Support)
@@ -918,7 +922,7 @@ class NodeService {
       'Our customer experience supervisor is');
     const weAreSorryToHearThatToCustomerSupport = await this.createQuestionNode(
       'Please elaborate', dialogueId, NodeType.CHOICE, customerSupportOptions,
-      false, ourCustomerExperienceSupervisor,
+      15, false, ourCustomerExperienceSupervisor,
     );
 
     // ################################### EDGES ################################

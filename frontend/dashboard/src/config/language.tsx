@@ -1898,6 +1898,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
+    moved_question: {
+      en: 'Changed question position',
+      de: 'Position der Frage geändert',
+    },
+    moved_question_helper: {
+      en: 'The position of a question within the dialogue has been altered!',
+      de: 'Die Position einer Frage innerhalb des Dialogs wurde geändert!',
+    },
     updated_permissions: {
       en: 'Updated permissions',
       de: 'Berechtigungen aktualisiert',

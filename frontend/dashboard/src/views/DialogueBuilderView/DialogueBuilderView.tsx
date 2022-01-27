@@ -1,15 +1,17 @@
 import * as UI from '@haas/ui';
 import { Zap } from 'react-feather';
-import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
-
-import { CTANode, QuestionEntryProps } from './DialogueBuilderInterfaces';
 import { useFieldArray, useForm } from 'react-hook-form';
-import QuestionSection from './components/QuestionSection';
+import { useParams } from 'react-router';
+import { useToast } from '@chakra-ui/core';
+import { useTranslation } from 'react-i18next';
+import React, { useEffect, useRef, useState } from 'react';
 
-interface QuestionEntryExtendedProps extends QuestionEntryProps {
-  icon: (props: any) => JSX.Element;
-}
+import { useCustomer } from 'providers/CustomerProvider';
+import { useSetQuestionOrderMutation } from 'types/generated-types';
+import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
+
+import { CTANode, QuestionEntryExtendedProps } from './DialogueBuilderInterfaces';
+import QuestionSection from './components/QuestionSection';
 
 interface DialogueBuilderViewProps {
   nodes: Array<QuestionEntryExtendedProps>;
@@ -22,8 +24,40 @@ interface DialogueBuilderViewProps {
 
 const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBuilderViewProps) => {
   const [activeQuestion, setActiveQuestion] = useState<null | string>(null);
-
+  const toast = useToast();
+  const { activeCustomer } = useCustomer();
+  const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { t } = useTranslation();
+  const isFirst = useRef(true);
+
+  const [setQuestionOrder] = useSetQuestionOrderMutation({
+    refetchQueries: [{
+      query: getTopicBuilderQuery,
+      variables: {
+        customerSlug: activeCustomer?.slug,
+        dialogueSlug,
+      },
+    }],
+    onCompleted: () => {
+      toast({
+        title: t('toast:moved_question'),
+        description: t('toast:moved_question_helper'),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
+    onError: (err: Error) => {
+      console.log('Error: ', err);
+      toast({
+        title: t('toast:something_went_wrong'),
+        description: t('toast:delete_node_error_helper'),
+        status: 'error',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
+  });
 
   const form = useForm({
     defaultValues: {
@@ -37,7 +71,26 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
     keyName: 'indexKey',
   });
 
-  console.log('Questions field array: ', questionsFieldArray);
+  useEffect(() => {
+    if (isFirst.current) {
+      isFirst.current = false;
+      return;
+    }
+
+    const mappedQuestions = questionsFieldArray.fields.map(
+      (field, indexPosition) => ({ id: field.id as string, position: indexPosition }),
+    );
+
+    setQuestionOrder({
+      variables: {
+        input: {
+          customerId: activeCustomer?.id as string,
+          dialogueSlug,
+          positions: mappedQuestions,
+        },
+      },
+    });
+  }, [questionsFieldArray.fields]);
 
   return (
     <>
@@ -73,7 +126,9 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
               leafs={selectLeafs}
               ctaNodes={ctaNodes}
               amtSiblings={0}
+              questionsFieldArray={questionsFieldArray}
             />
+
           )}
         </UI.ColumnFlex>
       </UI.ViewBody>

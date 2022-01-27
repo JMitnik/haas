@@ -1,4 +1,6 @@
 import * as UI from '@haas/ui';
+import { ArrayField, UseFieldArrayMethods, UseFormMethods, useWatch } from 'react-hook-form';
+import { ArrowDown, ArrowUp } from 'react-feather';
 import { Flex, Span } from '@haas/ui';
 import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router';
@@ -10,15 +12,21 @@ import ReactMarkdown from 'react-markdown';
 import { QuestionNodeProblem } from 'views/DialogueBuilderView/DialogueBuilderTypes';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useDuplicateQuestionMutation } from 'types/generated-types';
+import { useDuplicateQuestionMutation, useSetQuestionOrderMutation } from 'types/generated-types';
 import ShowMoreButton from 'components/ShowMoreButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import useAuth from 'hooks/useAuth';
 
-import { ArrowDown, ArrowUp } from 'react-feather';
-import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
+import _ from 'lodash';
+import {
+  CTANode,
+  EdgeConditionProps,
+  QuestionEntryExtendedProps,
+  QuestionEntryProps,
+  QuestionOptionProps,
+} from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
-import { UseFieldArrayMethods } from 'react-hook-form';
+
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';
@@ -30,7 +38,7 @@ interface QuestionEntryItemProps {
   onExpandChange: () => void;
   isExpanded: Boolean;
   // eslint-disable-next-line react/no-unused-prop-types
-  questionsQ: Array<QuestionEntryProps>;
+  questionsQ: Partial<ArrayField<Record<string, any>, 'indexKey'>>[];
   question: QuestionEntryProps;
   leafs: any;
   // eslint-disable-next-line react/no-unused-prop-types
@@ -51,6 +59,7 @@ interface QuestionEntryItemProps {
   ctaNodes: CTANode[];
   problems: (QuestionNodeProblem | undefined)[];
   amtSiblings: number;
+  questionsFieldArray: UseFieldArrayMethods<Record<string, any>, 'indexKey'>;
 }
 
 interface QuestionOptionsOverlayProps {
@@ -98,6 +107,8 @@ const QuestionEntryItem = ({ depth,
   onAddExpandChange,
   amtSiblings,
   index,
+  questionsQ,
+  questionsFieldArray,
   problems }: QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
@@ -105,6 +116,7 @@ const QuestionEntryItem = ({ depth,
   const { t } = useTranslation();
   const toast = useToast();
   const questionRef = useRef<HTMLDivElement | null>(null);
+
   const [duplicateQuestion] = useDuplicateQuestionMutation({
     refetchQueries: [{
       query: getTopicBuilderQuery,
@@ -185,15 +197,19 @@ const QuestionEntryItem = ({ depth,
     });
   };
 
-  const handleMoveUp = () => {
-    console.log('Moving up: ');
+  const handleMoveUp = (questionId: string) => {
+    console.log('Question ID: ', questionId);
+    const targetEntryIndex = questionsQ.findIndex((fieldArrayQuestion) => fieldArrayQuestion?.id === questionId);
+    console.log('Target index: ', targetEntryIndex);
+    questionsFieldArray.move(targetEntryIndex, targetEntryIndex - 1);
   };
 
-  const handleMoveDown = () => {
-    console.log('Moving down');
+  const handleMoveDown = (questionId: string) => {
+    console.log('Question ID: ', questionId);
+    const targetEntryIndex = questionsQ.findIndex((fieldArrayQuestion) => fieldArrayQuestion?.id === questionId);
+    console.log('TargetEntryIndex: ', targetEntryIndex);
+    questionsFieldArray.move(targetEntryIndex, targetEntryIndex + 1);
   };
-
-  console.log('INdex: ', index, 'Active IDS: ', amtSiblings);
 
   return (
     <Flex
@@ -246,7 +262,7 @@ const QuestionEntryItem = ({ depth,
                   <UI.Button
                     size="sm"
                     isDisabled={index === 0}
-                    onClick={() => handleMoveUp()}
+                    onClick={() => handleMoveUp(question.id)}
                   >
                     <UI.Icon>
                       <ArrowUp />
@@ -255,7 +271,7 @@ const QuestionEntryItem = ({ depth,
                   <UI.Button
                     size="sm"
                     isDisabled={index === amtSiblings - 1}
-                    onClick={() => handleMoveDown()}
+                    onClick={() => handleMoveDown(question.id)}
                   >
                     <UI.Icon>
                       <ArrowDown />

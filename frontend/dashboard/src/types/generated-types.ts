@@ -849,6 +849,7 @@ export type Mutation = {
   createDialogue: Dialogue;
   editDialogue: Dialogue;
   deleteDialogue: Dialogue;
+  setQuestionOrder?: Maybe<Dialogue>;
   uploadUpsellImage?: Maybe<ImageType>;
   register?: Maybe<Scalars['String']>;
   /** Given a token, checks in the database whether token has been set and has not expired yet */
@@ -1054,6 +1055,11 @@ export type MutationEditDialogueArgs = {
 
 export type MutationDeleteDialogueArgs = {
   input?: Maybe<DeleteDialogueInputType>;
+};
+
+
+export type MutationSetQuestionOrderArgs = {
+  input?: Maybe<SetQuestionOrderInput>;
 };
 
 
@@ -1408,6 +1414,7 @@ export type QuestionNode = {
   creationDate?: Maybe<Scalars['String']>;
   type: QuestionNodeTypeEnum;
   overrideLeafId?: Maybe<Scalars['String']>;
+  position?: Maybe<Scalars['Int']>;
   /** Slidernode resolver */
   sliderNode?: Maybe<SliderNodeType>;
   /** FormNode resolver */
@@ -1450,6 +1457,11 @@ export type QuestionOption = {
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
+  position?: Maybe<Scalars['Int']>;
+};
+
+export type QuestionPositionOrderInput = {
+  id?: Maybe<Scalars['String']>;
   position?: Maybe<Scalars['Int']>;
 };
 
@@ -1601,6 +1613,12 @@ export type SessionScoreRangeFilter = {
 export type SessionWhereUniqueInput = {
   id?: Maybe<Scalars['ID']>;
   dialogueId?: Maybe<Scalars['ID']>;
+};
+
+export type SetQuestionOrderInput = {
+  customerId: Scalars['String'];
+  dialogueSlug: Scalars['String'];
+  positions: Array<QuestionPositionOrderInput>;
 };
 
 export type ShareNodeInputType = {
@@ -2360,6 +2378,19 @@ export type DuplicateQuestionMutation = (
   & { duplicateQuestion?: Maybe<(
     { __typename?: 'QuestionNode' }
     & Pick<QuestionNode, 'id'>
+  )> }
+);
+
+export type SetQuestionOrderMutationVariables = Exact<{
+  input?: Maybe<SetQuestionOrderInput>;
+}>;
+
+
+export type SetQuestionOrderMutation = (
+  { __typename?: 'Mutation' }
+  & { setQuestionOrder?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id'>
   )> }
 );
 
@@ -3632,6 +3663,39 @@ export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOp
 export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
 export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
 export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
+export const SetQuestionOrderDocument = gql`
+    mutation setQuestionOrder($input: SetQuestionOrderInput) {
+  setQuestionOrder(input: $input) {
+    id
+  }
+}
+    `;
+export type SetQuestionOrderMutationFn = Apollo.MutationFunction<SetQuestionOrderMutation, SetQuestionOrderMutationVariables>;
+
+/**
+ * __useSetQuestionOrderMutation__
+ *
+ * To run a mutation, you first call `useSetQuestionOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetQuestionOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setQuestionOrderMutation, { data, loading, error }] = useSetQuestionOrderMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSetQuestionOrderMutation(baseOptions?: Apollo.MutationHookOptions<SetQuestionOrderMutation, SetQuestionOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SetQuestionOrderMutation, SetQuestionOrderMutationVariables>(SetQuestionOrderDocument, options);
+      }
+export type SetQuestionOrderMutationHookResult = ReturnType<typeof useSetQuestionOrderMutation>;
+export type SetQuestionOrderMutationResult = Apollo.MutationResult<SetQuestionOrderMutation>;
+export type SetQuestionOrderMutationOptions = Apollo.BaseMutationOptions<SetQuestionOrderMutation, SetQuestionOrderMutationVariables>;
 export const GetDialogueStatisticsDocument = gql`
     query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
   customer(slug: $customerSlug) {

@@ -1,6 +1,6 @@
 
 import { UserInputError } from 'apollo-server-express';
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
 import { subDays } from 'date-fns';
 
 import { DialgoueStatisticsLineChartDataType, DialogueStatistics } from './graphql/DialogueStatistics';
@@ -385,10 +385,52 @@ export const DialogueRootQuery = extendType({
   },
 });
 
+export const QuestionPositionOrderInput = inputObjectType({
+  name: "QuestionPositionOrderInput",
+  definition(t) {
+    t.string('id');
+    t.int('position');
+  }
+})
+
+export const SetQuestionorderMutationInput = inputObjectType({
+  name: 'SetQuestionOrderInput',
+
+  definition(t) {
+    t.string('customerId', {
+      required: true,
+    });
+    t.string('dialogueSlug', {
+      required: true,
+    });
+    t.list.field('positions', {
+      type: QuestionPositionOrderInput,
+      required: true,
+    })
+  }
+})
+
+export const SetQuestionOrderMutation = mutationField('setQuestionOrder', {
+  type: DialogueType,
+  nullable: true,
+  args: { input: SetQuestionorderMutationInput },
+  async resolve(parent, args, ctx) {
+    console.log('Args: ', args?.input);
+
+    if (!args.input) throw new UserInputError('Input does not exist');
+
+    const updatedDialogue = ctx.services.dialogueService.setQuestionOrder(args.input);
+    return updatedDialogue;
+  }
+})
+
 export default [
   DialogueWhereUniqueInput,
   DialogueMutations,
   DialogueType,
   DialogueRootQuery,
   DialogueStatistics,
+  SetQuestionOrderMutation,
+  SetQuestionorderMutationInput,
+  QuestionPositionOrderInput
 ];

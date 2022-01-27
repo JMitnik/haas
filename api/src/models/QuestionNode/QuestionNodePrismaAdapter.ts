@@ -358,6 +358,7 @@ class QuestionNodePrismaAdapter {
         isLeaf: question.isLeaf,
         title: question.title,
         type: question.type,
+        position: question.position,
         questionDialogue: question.dialogueId ? {
           connect: {
             id: question.dialogueId,

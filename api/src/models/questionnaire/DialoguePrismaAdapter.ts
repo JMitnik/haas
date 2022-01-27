@@ -4,6 +4,7 @@ import {
   Dialogue,
   Edge,
 } from "@prisma/client";
+import { NexusGenInputs } from "../../generated/nexus";
 
 import { CreateQuestionsInput, CreateDialogueInput } from "./DialoguePrismaAdapterType";
 
@@ -13,6 +14,34 @@ class DialoguePrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  constructSetQuestionOrderInput = (input: NexusGenInputs['SetQuestionOrderInput'])
+    : Prisma.Enumerable<Prisma.QuestionNodeUpdateManyWithWhereWithoutQuestionDialogueInput> => {
+    return input.positions.map((entry) => ({
+      data: {
+        position: entry.position,
+      },
+      where: {
+        id: entry.id as string,
+      }
+    }))
+  }
+
+  async setQuestionOrder(input: NexusGenInputs['SetQuestionOrderInput']) {
+    return this.prisma.dialogue.update({
+      where: {
+        slug_customerId: {
+          slug: input.dialogueSlug,
+          customerId: input.customerId,
+        },
+      },
+      data: {
+        questions: {
+          updateMany: this.constructSetQuestionOrderInput(input),
+        }
+      }
+    })
+  }
 
   async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
 

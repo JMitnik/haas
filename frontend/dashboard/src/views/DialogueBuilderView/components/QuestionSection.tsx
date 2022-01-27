@@ -1,3 +1,4 @@
+import { ArrayField, UseFieldArrayMethods } from 'react-hook-form';
 import { Div, Flex, H4 } from '@haas/ui';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -6,16 +7,20 @@ import React, { useState } from 'react';
 import SplitArrowIcon from 'components/Icons/SplitIcon';
 
 import { AddQuestionContainer, DepthSpan } from './QuestionEntry/QuestionEntryStyles';
-import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
+import {
+  CTANode,
+  EdgeConditionProps,
+  QuestionEntryProps,
+  QuestionOptionProps,
+} from '../DialogueBuilderInterfaces';
 import { QuestionNodeProblem } from '../DialogueBuilderTypes';
-import { UseFieldArrayMethods } from 'react-hook-form';
 import { findProblemsInChildCondition } from '../findProblemsInChildConditions';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 
 interface QuestionSectionProps {
   parentQuestionType: string;
   options: QuestionOptionProps[] | undefined;
-  questionsQ: Array<QuestionEntryProps>;
+  questionsQ: Partial<ArrayField<Record<string, any>, 'indexKey'>>[];
   question: QuestionEntryProps;
   leafs: any;
   ctaNodes: CTANode[];
@@ -30,6 +35,7 @@ interface QuestionSectionProps {
   edgeId: string | undefined;
   problems?: (QuestionNodeProblem | undefined)[];
   amtSiblings: number;
+  questionsFieldArray: UseFieldArrayMethods<Record<string, any>, 'indexKey'>;
 }
 
 const QuestionSection = ({
@@ -50,6 +56,7 @@ const QuestionSection = ({
   edgeId,
   parentQuestionType,
   amtSiblings,
+  questionsFieldArray,
 }: QuestionSectionProps) => {
   const { t } = useTranslation();
   const [isQuestionExpanded, setQuestionExpanded] = useState(depth === 1 || false);
@@ -59,9 +66,9 @@ const QuestionSection = ({
   };
 
   const activeChildrenIds = question.children?.map((child) => child.childNode.id) as string[];
-  const children: QuestionEntryProps[] = questionsQ.filter((childQuestion) => (
+  const children = questionsQ.filter((childQuestion) => (
     activeChildrenIds?.includes(childQuestion.id)
-  ));
+  )) as QuestionEntryProps[]; // TODO: Maybe change type to match with useFieldArray (only adding fieldIndex i think)
   const parentOptions = question.options;
 
   const getConditionOfParentQuestion = (childNodeId: string) => {
@@ -117,6 +124,7 @@ const QuestionSection = ({
         problems={problems || []}
         ctaNodes={ctaNodes}
         amtSiblings={amtSiblings}
+        questionsFieldArray={questionsFieldArray}
       />
 
       {/* Children */}
@@ -140,6 +148,7 @@ const QuestionSection = ({
           onAddQuestion={onAddQuestion}
           onDeleteQuestion={onDeleteQuestion}
           amtSiblings={children?.length || 0}
+          questionsFieldArray={questionsFieldArray}
         />
       ))}
 
@@ -177,12 +186,20 @@ const QuestionSection = ({
             problems={[]}
             questionsQ={questionsQ}
             question={{
-              id: '-1', title: '', icon: Icon, isRoot: false, isLeaf: false, type: 'Choice', extraContent: '',
+              id: '-1',
+              title: '',
+              icon: Icon,
+              isRoot: false,
+              isLeaf: false,
+              type: 'Choice',
+              extraContent: '',
+              indexKey: '',
             }}
             Icon={Icon}
             leafs={leafs}
             ctaNodes={ctaNodes}
             amtSiblings={amtSiblings}
+            questionsFieldArray={questionsFieldArray}
           />
         </Div>
       )}
