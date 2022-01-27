@@ -189,20 +189,6 @@ const DialogueBuilderQuestionForm = ({
     },
   });
 
-  const [activeCTAId, setActiveCTAId] = useState<string | undefined | null>(overrideLeaf?.id);
-
-  useEffect(() => {
-    // If undefined but there is overrideLeafID => set it as activeId
-    if (typeof activeCTAId === 'undefined' && overrideLeaf?.id) {
-      setActiveCTAId(overrideLeaf?.id);
-    }
-
-    // If there is an activeCTAId set => override the current overrideLeaf with it
-    if (activeCTAId) {
-      form.setValue('overrideLeaf', setOverrideLeaf(ctaNodes, activeCTAId));
-    }
-  }, [ctaNodes, activeCTAId, overrideLeaf, setActiveCTAId]);
-
   const toast = useToast();
   const [activeQuestionType, setActiveQuestionType] = useState(type);
 
@@ -354,7 +340,6 @@ const DialogueBuilderQuestionForm = ({
   };
 
   const handleRemoveCTA = () => {
-    setActiveCTAId(null);
     form.setValue('overrideLeaf', null);
   };
 
