@@ -1,11 +1,9 @@
 import * as UI from '@haas/ui';
-import { Button } from '@haas/ui';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-export const NewCTAButton = styled(Button)`
-  all:unset;
-  display: flex;
-  height: 10px;
-  font-size: 1px;
-  /* padding:100px; */
+export const NodePickerHeader = styled(UI.Flex)`
+   ${({ theme }) => css`
+    border-bottom: 1px solid ${theme.colors.gray[200]};
+    align-items: baseline;
+  `}
 `;

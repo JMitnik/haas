@@ -1,9 +1,7 @@
 import * as UI from '@haas/ui';
-import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-import { MappedCTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import CTAForm from 'views/ActionsOverview/CTAForm';
 
 interface NewCTAModalCardProps {
@@ -35,7 +33,7 @@ const initializeCTAType = (type: string) => {
   return { label: 'None', value: '' };
 };
 
-export const NewCTAModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) => {
+export const CreateCallToActionModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) => {
   const { t } = useTranslation();
 
   return (
@@ -55,7 +53,7 @@ export const NewCTAModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) =>
           links={[]}
           share={{ title: '', url: '', tooltip: '' }}
           onSuccess={(data) => onSuccess(data)}
-          onNewCTAChange={() => {}}
+          onNewCTAChange={() => { }}
           form={{}}
         />
       </UI.ModalBody>

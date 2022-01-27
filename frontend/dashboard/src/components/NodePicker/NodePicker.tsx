@@ -4,11 +4,14 @@ import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
+import {
+  CreateCallToActionModalCard,
+} from 'views/DialogueBuilderView/components/QuestionEntryForm/CreateCallToActionModalCard';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
 import { NodeCellContainer } from 'components/NodeCell/NodeCell';
 import { QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
 
-import { NewCTAModalCard } from 'views/DialogueBuilderView/components/QuestionEntryForm/NewCTAModalCard';
+import { NodePickerHeader } from './NodePickerStyles';
 
 const DropdownOption = (props: any) => {
   const nodeProps = MapNodeToProperties(props.data.type);
@@ -109,8 +112,9 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
   return (
     <UI.List maxWidth={300}>
       <UI.CloseButton onClose={onClose} />
-      <UI.Flex alignItems="baseline">
-        <UI.ListHeader>{t('call_to_action')}</UI.ListHeader>
+      <NodePickerHeader>
+        <UI.ListHeader style={{ borderBottom: 0 }}>{t('call_to_action')}</UI.ListHeader>
+
         <UI.Button
           leftIcon={Plus}
           variantColor="teal"
@@ -120,7 +124,8 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
         >
           {t('new')}
         </UI.Button>
-      </UI.Flex>
+
+      </NodePickerHeader>
 
       <UI.ListItem
         variant="gray"
@@ -184,7 +189,7 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
       </UI.ListItem>
 
       <UI.Modal willCloseOnOutsideClick={false} isOpen={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
-        <NewCTAModalCard
+        <CreateCallToActionModalCard
           onClose={() => setCreateModalIsOpen(false)}
           onSuccess={(callToAction: any) => {
             handleChange(callToAction);

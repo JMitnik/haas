@@ -107,8 +107,6 @@ class NodeService {
     const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(input.customerSlug, input.dialogueSlug);
     if (!dialogue?.id) throw 'No Dialogue found to add CTA to!'
 
-    // TODO: Add CTA NODE to optionId if optionId is send with input
-
     const callToAction = await this.questionNodePrismaAdapter.createCallToAction({
       dialogueId: dialogue.id,
       links: input.links,
@@ -117,11 +115,6 @@ class NodeService {
       form: input.form,
       type: input.type
     });
-
-    // TODO: Add CTA NODE to questionId if questionId is send with input
-    // if (input.questionId) {
-    //   await this.questionNodePrismaAdapter.connectCallToActionToQuestion(input.questionId, cta.id);
-    // };
 
     return callToAction;
   }
