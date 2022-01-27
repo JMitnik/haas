@@ -4,13 +4,13 @@ import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-f
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
-
 import { CircularProgress, CircularProgressLabel, useToast } from '@chakra-ui/core';
-import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
-import { Mail, Smartphone } from 'react-feather';
-import { useCustomer } from 'providers/CustomerProvider';
 import Select from 'react-select';
+import { Mail, Smartphone } from 'react-feather';
 
+import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
+import { useCustomer } from 'providers/CustomerProvider';
+import { MarkdownEditor } from 'components/Markdown/MarkdownEditor';
 import {
   CampaignVariantEnum,
   refetchGetWorkspaceCampaignsQuery,
@@ -197,7 +197,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
             control={form.control}
             defaultValue={activeVariant.body}
             render={({ value, onChange }) => (
-              <UI.MarkdownEditor
+              <MarkdownEditor
                 value={value}
                 onChange={onChange}
               />

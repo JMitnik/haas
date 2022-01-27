@@ -14,6 +14,7 @@ import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
+import { MarkdownEditor } from 'components/Markdown/MarkdownEditor';
 import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, Hr, Input, InputGrid, InputHelper, Span, Text,
@@ -488,7 +489,7 @@ const DialogueBuilderQuestionForm = ({
                   control={form.control}
                   defaultValue={title}
                   render={({ value, onChange }) => (
-                    <UI.MarkdownEditor
+                    <MarkdownEditor
                       value={value}
                       onChange={onChange}
                     />

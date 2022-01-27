@@ -1,6 +1,5 @@
 import React, { forwardRef, Ref, ReactNode, useState, useEffect, useRef } from 'react';
 // import 'antd/dist/antd.css'; // Slider,
-// import 'easymde/dist/easymde.min.css'; // Markdown
 import AntdDatePickerGenerate from 'rc-picker/lib/generate/dateFns';
 import generatePicker from 'antd/lib/date-picker/generatePicker';
 import {
@@ -8,7 +7,6 @@ import {
   // DatePicker as AntdDatepicker,
 } from 'antd';
 import { Div, Paragraph, SectionHeader, Strong } from '@haas/ui';
-import SimpleMDE from 'react-simplemde-editor';
 import {
   Checkbox as ChakraCheckbox,
   CheckboxProps as ChakraCheckboxProps,
@@ -657,62 +655,6 @@ export const RangeSlider = ({
     />
   );
 };
-
-interface MarkdownEditorOptions {
-  hideStatus?: boolean;
-  maxHeight?: number;
-}
-
-const defaultMarkdownEditorOptions: MarkdownEditorOptions = {
-  hideStatus: true,
-  maxHeight: 130,
-}
-
-interface MarkdownEditorProps {
-  value: string;
-  onChange: (val: string) => void;
-  options?: MarkdownEditorOptions;
-}
-
-export const MarkdownEditorContainer = styled(Div)`
-  ${({ theme }) => css`
-    .EasyMDEContainer {
-      border-radius: 5px;
-      background: white;
-    }
-
-    .editor-toolbar {
-      background: white;
-      border-radius: 5px 5px 0 0;
-      border: 1px solid ${theme.colors.gray[300]};
-      border-width: 1px 1px 0 1px;
-    }
-
-    .CodeMirror {
-      border: 1px solid ${theme.colors.gray[300]};
-      border-radius: 0 0 5px 5px;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .editor-statusbar {
-      display: none;
-    }
-  `}
-`;
-
-export const MarkdownEditor = ({ value, onChange, options = defaultMarkdownEditorOptions }: MarkdownEditorProps) => (
-  <MarkdownEditorContainer>
-    <SimpleMDE
-      value={value}
-      onChange={onChange}
-      options={{
-        status: options.hideStatus,
-        maxHeight: `${options.maxHeight}px`,
-        toolbar: ['bold', 'italic', 'preview'],
-      }}
-    />
-  </MarkdownEditorContainer>
-)
 
 interface TimePickerProps {
   minuteStep?: number;

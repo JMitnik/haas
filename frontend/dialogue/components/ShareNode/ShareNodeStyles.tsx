@@ -1,6 +1,7 @@
 import chroma from 'chroma-js';
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
+
 import { makeColorfulBoxShadow } from '../../utils/makeColorfulBoxShadow';
 
 
@@ -14,7 +15,7 @@ const makeLinearBackground = (color: string) => {
 
 const color = '#4f66ff';
 
-export const ShareNodeButton = motion.custom(styled.div`
+export const ShareNodeButton = motion.custom(styled.button`
   width: 250px;
   height: 250px;
   background: ${makeLinearBackground('#4f66ff')};

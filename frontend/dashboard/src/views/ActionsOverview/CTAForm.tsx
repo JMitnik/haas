@@ -14,6 +14,7 @@ import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 import Select from 'react-select';
 
+import { MarkdownEditor } from 'components/Markdown/MarkdownEditor';
 import {
   Div, Flex, Form, FormContainer,
   FormControl, FormLabel, FormSection, Input, InputGrid, InputHelper, Span, Text,
@@ -289,7 +290,7 @@ const CTAForm = ({
                     control={form.control}
                     defaultValue={title}
                     render={({ value, onChange }) => (
-                      <UI.MarkdownEditor
+                      <MarkdownEditor
                         value={value}
                         onChange={onChange}
                       />

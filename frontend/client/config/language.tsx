@@ -5,6 +5,11 @@ import { initReactI18next } from 'react-i18next';
 /* eslint-disable max-len */
 const language = {
   general: {
+    copied: {
+      en: 'Copied!',
+      de: 'Kopiert!',
+      nl: 'Gekopieerd!',
+    },
     happy: {
       en: 'Happy',
       de: 'Glücklich',
