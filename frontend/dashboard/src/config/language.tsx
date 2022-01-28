@@ -5,6 +5,38 @@ const language = {
       en: 'New',
       de: 'Neu',
     },
+    range: {
+      en: 'Range',
+      de: 'Reichweite',
+    },
+    range_helper: {
+      en: 'What is the range to trigger the following question?',
+      de: 'Was ist der Bereich, um die folgende Frage auszulösen?',
+    },
+    multiple_choice: {
+      en: 'Multiple choice',
+      de: 'Mehrfachauswah',
+    },
+    multiple_choice_helper: {
+      en: 'Answer from a list',
+      de: 'Antwort aus einer Liste',
+    },
+    slider: {
+      en: 'Slider',
+      de: 'Schieberegler',
+    },
+    slider_helper: {
+      en: 'Answer by moving a slider',
+      de: 'Antworten Sie, indem Sie einen Schieberegler bewegen',
+    },
+    video: {
+      en: 'Video',
+      de: 'Video',
+    },
+    video_helper: {
+      en: 'Multi-choice with a video',
+      de: 'Multi-Choice mit einem Video',
+    },
     last_activity: {
       en: 'Last seen',
       de: 'Zuletzt gesehen',
@@ -1166,6 +1198,12 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     edit_complete_description: {
       en: 'The Call-to-Action has been edited.',
       de: 'Der Call-to-Action wurde bearbeitet.',
+    },
+  },
+  report: {
+    name: {
+      en: 'Report',
+      de: 'Prüfbericht',
     },
   },
   register: {

@@ -5,8 +5,8 @@ datasource postgresql {
 
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
-  provider = "prisma-client-js"
-  output   = "./node_modules/@prisma/client"
+  provider        = "prisma-client-js"
+  output          = "./node_modules/@prisma/client"
   previewFeatures = ["orderByRelation"]
 }
 
@@ -63,6 +63,7 @@ model Customer {
   tags            Tag[]
   campaigns       Campaign[]
   CampaignVariant CampaignVariant[]
+  automations     Automation[]
 }
 
 enum TagEnum {
@@ -119,6 +120,9 @@ model Dialogue {
 
   wasGeneratedWithGenData Boolean           @default(value: false)
   CampaignVariant         CampaignVariant[]
+
+  automationEvents     AutomationEvent[]
+  automationConditions AutomationCondition[]
   @@unique([slug, customerId])
 }
 
@@ -263,6 +267,9 @@ model QuestionNode {
   videoEmbeddedNodeId String?
   sliderNodeId        String?
   formNodeId          String?
+
+  automationEvents     AutomationEvent[]
+  automationConditions AutomationCondition[]
 }
 
 enum LinkTypeEnum {
@@ -421,6 +428,7 @@ model SliderNodeEntry {
 
 model ChoiceNodeEntry {
   id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
   value       String?
   nodeEntryId String    @unique
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
@@ -453,6 +461,8 @@ model Permission {
 }
 
 enum SystemPermissionEnum {
+  CAN_ACCESS_REPORT_PAGE
+  CAN_DOWNLOAD_REPORTS
   CAN_ACCESS_ADMIN_PANEL
   CAN_EDIT_DIALOGUE
   CAN_BUILD_DIALOGUE
@@ -471,6 +481,10 @@ enum SystemPermissionEnum {
   CAN_VIEW_CAMPAIGNS
   CAN_CREATE_CAMPAIGNS
   CAN_CREATE_DELIVERIES
+  // Automation oriented
+  CAN_VIEW_AUTOMATIONS
+  CAN_CREATE_AUTOMATIONS
+  CAN_UPDATE_AUTOMATIONS
 }
 
 enum RoleTypeEnum {
@@ -479,6 +493,7 @@ enum RoleTypeEnum {
   USER
   GUEST
   CUSTOM
+  BOT
 }
 
 model Role {
@@ -782,4 +797,274 @@ model DeliveryEvents {
   Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
 
   failureMessage String?
+}
+
+// AUTOMATIONS
+enum AutomationType {
+  TRIGGER
+  CAMPAIGN
+}
+
+enum AutomationEventType {
+  RECURRING
+  NEW_INTERACTION_QUESTION
+  NEW_INTERACTION_DIALOGUE
+  API_CALL
+}
+
+enum RecurringPeriodType {
+  EVERY_WEEK
+  EVERY_DAY
+  START_OF_DAY
+  END_OF_DAY
+  START_OF_WEEK
+  END_OF_WEEK
+}
+
+enum AutomationConditionScopeType {
+  QUESTION
+  DIALOGUE
+  WORKSPACE
+}
+
+enum AutomationConditionOperatorType {
+  SMALLER_THAN
+  SMALLER_OR_EQUAL_THAN
+  GREATER_THAN
+  GREATER_OR_EQUAL_THAN
+  INNER_RANGE
+  OUTER_RANGE
+  IS_EQUAL
+  IS_NOT_EQUAL
+  IS_TRUE
+  IS_FALSE
+  EVERY_N_TH_TIME
+}
+
+enum OperandType {
+  STRING
+  INT
+  DATE_TIME
+}
+
+enum QuestionAspect {
+  NODE_VALUE
+  ANSWER_SPEED
+}
+
+enum DialogueAspect {
+  NR_INTERACTIONS
+  NR_VISITORS
+  GENERAL_SCORE
+  LATEST_SCORE
+}
+
+enum WorkspaceAspect {
+  NR_INTERACTIONS
+  NR_VISITORS
+  GENERAL_SCORE
+}
+
+enum ConditionPropertyAggregateType {
+  COUNT
+  MIN
+  MAX
+  AVG
+}
+
+enum AutomationActionType {
+  SEND_SMS
+  SEND_EMAIL
+  API_CALL
+  GENERATE_REPORT
+  WEBHOOK
+}
+
+model AutomationEvent {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  type AutomationEventType
+
+  // Trigger-related events
+  question   QuestionNode? @relation(fields: [questionId], references: [id])
+  questionId String?
+
+  dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
+  dialogueId String?
+
+  // Recurring-related events
+  periodType RecurringPeriodType?
+  startDate  DateTime?
+  endDate    DateTime?
+
+  automationTrigger AutomationTrigger[]
+}
+
+model AutomationConditionOperand {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  type OperandType
+
+  numberValue   Int?
+  textValue     String? // TODO: Reference an actual choice option instead of raw text here eventually
+  dateTimeValue DateTime?
+
+  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
+  automationConditionId String
+}
+
+model ConditionPropertyAggregate {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  startDate DateTime?
+  endDate   DateTime?
+  latest    Int?
+
+  type ConditionPropertyAggregateType
+
+  questionConditionScope    QuestionConditionScope?  @relation(fields: [questionConditionScopeId], references: [id])
+  dialogueConditionScope    DialogueConditionScope?  @relation(fields: [dialogueConditionScopeId], references: [id])
+  workspaceConditionScope   WorkspaceConditionScope? @relation(fields: [workspaceConditionScopeId], references: [id])
+  questionConditionScopeId  String?                  @unique
+  dialogueConditionScopeId  String?                  @unique
+  workspaceConditionScopeId String?                  @unique
+}
+
+model QuestionConditionScope {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  aspect QuestionAspect
+
+  aggregate ConditionPropertyAggregate?
+
+  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
+  automationConditionId String              @unique
+}
+
+model DialogueConditionScope {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  aspect DialogueAspect
+
+  aggregate ConditionPropertyAggregate?
+
+  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
+  automationConditionId String              @unique
+}
+
+model WorkspaceConditionScope {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  aspect WorkspaceAspect
+
+  aggregate ConditionPropertyAggregate?
+
+  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
+  automationConditionId String              @unique
+}
+
+enum AutomationConditionBuilderType {
+  AND
+  OR
+}
+
+model AutomationConditionBuilder {
+  id String @id @default(cuid())
+
+  type                   AutomationConditionBuilderType
+  conditions             AutomationCondition[]
+  parentConditionBuilder AutomationConditionBuilder?    @relation("AutomationConditionBuilderToAutomationConditionBuilder")
+
+  childConditionBuilderId String?                     @unique
+  childConditionBuilder   AutomationConditionBuilder? @relation("AutomationConditionBuilderToAutomationConditionBuilder", fields: [childConditionBuilderId], references: [id])
+
+  automationTrigger AutomationTrigger?
+}
+
+model AutomationCondition {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  scope    AutomationConditionScopeType
+  operator AutomationConditionOperatorType
+
+  operands AutomationConditionOperand[]
+
+  questionScope  QuestionConditionScope?
+  dialogueScope  DialogueConditionScope?
+  workspaceScope WorkspaceConditionScope?
+
+  question   QuestionNode? @relation(fields: [questionId], references: [id])
+  questionId String?
+
+  dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
+  dialogueId String?
+
+  // TODO: Add workspace relation so Workspace-wide conditions can be introduced
+
+  automationConditionBuilder   AutomationConditionBuilder @relation(fields: [automationConditionBuilderId], references: [id])
+  automationConditionBuilderId String
+}
+
+model AutomationAction {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  apiKey   String?
+  endpoint String?
+  payload  Json?
+
+  type               AutomationActionType
+  automationTriggers AutomationTrigger[]
+}
+
+model AutomationTrigger {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Event: When is an automation triggered
+  event   AutomationEvent @relation(fields: [eventId], references: [id])
+  eventId String
+
+  // Condition: When should an automation actually fire.
+  conditionBuilder             AutomationConditionBuilder @relation(fields: [automationConditionBuilderId], references: [id])
+  automationConditionBuilderId String                     @unique
+
+  // Action: What should happen when an automation fire.
+  actions     AutomationAction[]
+
+  automations Automation[]
+}
+
+model Automation {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  isActive    Boolean @default(false)
+  label       String
+  description String?
+
+  type AutomationType
+
+  automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id])
+  automationTriggerId String?
+
+  workspace   Customer @relation(fields: [workspaceId], references: [id])
+  workspaceId String
 }

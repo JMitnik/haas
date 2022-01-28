@@ -607,6 +607,7 @@ interface RangeSliderProps {
   isDisabled?: boolean;
   stepSize?: number;
   onChange?: (vals: [number, number] | number) => void;
+  defaultValue?: number[]
 }
 
 interface FormSliderProps {
@@ -644,15 +645,16 @@ export const RangeSlider = ({
   onChange,
   stepSize = 0.5,
   isDisabled = false,
+  defaultValue
 }: RangeSliderProps) => {
   return (
     <AntdSlider
       range
       disabled={isDisabled}
-      max={10}
-      min={0}
+      max={max}
+      min={min}
       step={stepSize}
-      defaultValue={[min, max]}
+      defaultValue={defaultValue?.length ? [defaultValue[0], defaultValue[1]] : [min, max]}
       onAfterChange={onChange}
     />
   );

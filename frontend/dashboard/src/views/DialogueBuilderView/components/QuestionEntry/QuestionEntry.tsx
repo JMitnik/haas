@@ -35,7 +35,6 @@ interface QuestionEntryItemProps {
   // eslint-disable-next-line react/no-unused-prop-types
   questionsQ: Array<QuestionEntryProps>;
   question: QuestionEntryProps;
-  leafs: any;
   // eslint-disable-next-line react/no-unused-prop-types
   index: number;
   Icon: (props: any) => JSX.Element;
@@ -89,7 +88,6 @@ const QuestionEntryItem = ({ depth,
   activeQuestion,
   onActiveQuestionChange,
   Icon,
-  leafs,
   onExpandChange,
   isExpanded,
   condition,

@@ -16,6 +16,8 @@ export type Scalars = {
   Date: any;
   /** The `Upload` scalar type represents a file upload. */
   Upload: any;
+  /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
+  JSONObject: any;
 };
 
 export type AdjustedImageInput = {
@@ -33,6 +35,11 @@ export type AppendToInteractionInput = {
   data?: Maybe<NodeEntryDataInput>;
 };
 
+export type AuthenticateLambdaInput = {
+  authenticateEmail?: Maybe<Scalars['String']>;
+  workspaceEmail?: Maybe<Scalars['String']>;
+};
+
 export type AutodeckConnectionType = DeprecatedConnectionInterface & {
   __typename?: 'AutodeckConnectionType';
   cursor?: Maybe<Scalars['String']>;
@@ -43,6 +50,187 @@ export type AutodeckConnectionType = DeprecatedConnectionInterface & {
   endDate?: Maybe<Scalars['String']>;
   jobs: Array<CreateWorkspaceJobType>;
 };
+
+export type AutomationActionInput = {
+  id?: Maybe<Scalars['ID']>;
+  type?: Maybe<AutomationActionType>;
+  apiKey?: Maybe<Scalars['String']>;
+  endpoint?: Maybe<Scalars['String']>;
+  payload?: Maybe<Scalars['JSONObject']>;
+};
+
+/** AutomationAction */
+export type AutomationActionModel = {
+  __typename?: 'AutomationActionModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  type: AutomationActionType;
+};
+
+export enum AutomationActionType {
+  SendSms = 'SEND_SMS',
+  SendEmail = 'SEND_EMAIL',
+  ApiCall = 'API_CALL',
+  GenerateReport = 'GENERATE_REPORT',
+  Webhook = 'WEBHOOK'
+}
+
+export type AutomationConditionBuilderInput = {
+  id?: Maybe<Scalars['ID']>;
+  type?: Maybe<AutomationConditionBuilderType>;
+  conditions?: Maybe<Array<CreateAutomationCondition>>;
+  childConditionBuilder?: Maybe<AutomationConditionBuilderInput>;
+};
+
+/** AutomationConditionBuilder */
+export type AutomationConditionBuilderModel = {
+  __typename?: 'AutomationConditionBuilderModel';
+  id: Scalars['ID'];
+  childConditionBuilderId?: Maybe<Scalars['String']>;
+  type: AutomationConditionBuilderType;
+  conditions: Array<AutomationConditionModel>;
+  childConditionBuilder?: Maybe<AutomationConditionBuilderModel>;
+};
+
+export enum AutomationConditionBuilderType {
+  And = 'AND',
+  Or = 'OR'
+}
+
+/** AutomationCondition */
+export type AutomationConditionModel = {
+  __typename?: 'AutomationConditionModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  scope: AutomationConditionScopeType;
+  operator: AutomationConditionOperatorType;
+  operands: Array<AutomationConditionOperandModel>;
+  questionScope?: Maybe<QuestionConditionScopeModel>;
+  dialogueScope?: Maybe<DialogueConditionScopeModel>;
+  workspaceScope?: Maybe<WorkspaceConditionScopeModel>;
+  question?: Maybe<QuestionNode>;
+  dialogue?: Maybe<Dialogue>;
+};
+
+/** AutomationConditionOperand */
+export type AutomationConditionOperandModel = {
+  __typename?: 'AutomationConditionOperandModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  type: OperandType;
+  numberValue?: Maybe<Scalars['Int']>;
+  textValue?: Maybe<Scalars['String']>;
+  dateTimeValue?: Maybe<Scalars['String']>;
+};
+
+export enum AutomationConditionOperatorType {
+  SmallerThan = 'SMALLER_THAN',
+  SmallerOrEqualThan = 'SMALLER_OR_EQUAL_THAN',
+  GreaterThan = 'GREATER_THAN',
+  GreaterOrEqualThan = 'GREATER_OR_EQUAL_THAN',
+  InnerRange = 'INNER_RANGE',
+  OuterRange = 'OUTER_RANGE',
+  IsEqual = 'IS_EQUAL',
+  IsNotEqual = 'IS_NOT_EQUAL',
+  IsTrue = 'IS_TRUE',
+  IsFalse = 'IS_FALSE',
+  EveryNThTime = 'EVERY_N_TH_TIME'
+}
+
+export enum AutomationConditionScopeType {
+  Question = 'QUESTION',
+  Dialogue = 'DIALOGUE',
+  Workspace = 'WORKSPACE'
+}
+
+export type AutomationConnection = ConnectionInterface & {
+  __typename?: 'AutomationConnection';
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo: PaginationPageInfo;
+  automations: Array<AutomationModel>;
+};
+
+export type AutomationConnectionFilterInput = {
+  label?: Maybe<Scalars['String']>;
+  search?: Maybe<Scalars['String']>;
+  type?: Maybe<AutomationType>;
+  orderBy?: Maybe<AutomationConnectionOrderByInput>;
+  offset?: Maybe<Scalars['Int']>;
+  perPage?: Maybe<Scalars['Int']>;
+};
+
+/** Sorting of UserConnection */
+export type AutomationConnectionOrderByInput = {
+  by: AutomationConnectionOrderType;
+  desc?: Maybe<Scalars['Boolean']>;
+};
+
+/** Fields to order UserConnection by. */
+export enum AutomationConnectionOrderType {
+  UpdatedAt = 'updatedAt',
+  Type = 'type'
+}
+
+export type AutomationEventInput = {
+  id?: Maybe<Scalars['ID']>;
+  eventType?: Maybe<AutomationEventType>;
+  questionId?: Maybe<Scalars['String']>;
+  dialogueId?: Maybe<Scalars['String']>;
+};
+
+/** AutomationEvent */
+export type AutomationEventModel = {
+  __typename?: 'AutomationEventModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  type: AutomationEventType;
+  question?: Maybe<QuestionNode>;
+  dialogue?: Maybe<Dialogue>;
+  periodType?: Maybe<RecurringPeriodType>;
+};
+
+export enum AutomationEventType {
+  Recurring = 'RECURRING',
+  NewInteractionQuestion = 'NEW_INTERACTION_QUESTION',
+  NewInteractionDialogue = 'NEW_INTERACTION_DIALOGUE',
+  ApiCall = 'API_CALL'
+}
+
+/** Automation */
+export type AutomationModel = {
+  __typename?: 'AutomationModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  isActive: Scalars['Boolean'];
+  label: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  type: AutomationType;
+  automationTrigger?: Maybe<AutomationTriggerModel>;
+  workspace?: Maybe<Customer>;
+};
+
+/** AutomationTrigger */
+export type AutomationTriggerModel = {
+  __typename?: 'AutomationTriggerModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  event: AutomationEventModel;
+  conditionBuilder?: Maybe<AutomationConditionBuilderModel>;
+  actions: Array<AutomationActionModel>;
+};
+
+export enum AutomationType {
+  Trigger = 'TRIGGER',
+  Campaign = 'CAMPAIGN'
+}
 
 export type AwsImageType = {
   __typename?: 'AWSImageType';
@@ -115,10 +303,90 @@ export type ColourSettings = {
   primaryAlt?: Maybe<Scalars['String']>;
 };
 
+export type ConditionDialogueScopeInput = {
+  id?: Maybe<Scalars['ID']>;
+  aspect?: Maybe<DialogueAspectType>;
+  aggregate?: Maybe<ConditionPropertyAggregateInput>;
+};
+
+export type ConditionPropertyAggregate = {
+  __typename?: 'ConditionPropertyAggregate';
+  id: Scalars['ID'];
+  createdAt: Scalars['String'];
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  latest?: Maybe<Scalars['Int']>;
+  type: ConditionPropertyAggregateType;
+};
+
+export type ConditionPropertyAggregateInput = {
+  id?: Maybe<Scalars['ID']>;
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  latest?: Maybe<Scalars['Int']>;
+  type?: Maybe<ConditionPropertyAggregateType>;
+};
+
+export enum ConditionPropertyAggregateType {
+  Count = 'COUNT',
+  Min = 'MIN',
+  Max = 'MAX',
+  Avg = 'AVG'
+}
+
+export type ConditionQuestionScopeInput = {
+  id?: Maybe<Scalars['ID']>;
+  aspect?: Maybe<QuestionAspectType>;
+  aggregate?: Maybe<ConditionPropertyAggregateInput>;
+};
+
+export type ConditionScopeInput = {
+  id?: Maybe<Scalars['ID']>;
+  type?: Maybe<AutomationConditionScopeType>;
+  questionScope?: Maybe<ConditionQuestionScopeInput>;
+  dialogueScope?: Maybe<ConditionDialogueScopeInput>;
+  workspaceScope?: Maybe<ConditionWorkspaceScopeInput>;
+};
+
+export type ConditionWorkspaceScopeInput = {
+  id?: Maybe<Scalars['ID']>;
+  aspect?: Maybe<WorkspaceAspectType>;
+  aggregate?: Maybe<ConditionPropertyAggregateInput>;
+};
+
 /** Interface all pagination-based models should implement */
 export type ConnectionInterface = {
   totalPages?: Maybe<Scalars['Int']>;
   pageInfo: PaginationPageInfo;
+};
+
+export type CreateAutomationCondition = {
+  id?: Maybe<Scalars['ID']>;
+  scope?: Maybe<ConditionScopeInput>;
+  operator?: Maybe<AutomationConditionOperatorType>;
+  operands?: Maybe<Array<CreateAutomationOperandInput>>;
+  questionId?: Maybe<Scalars['String']>;
+  dialogueId?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
+};
+
+export type CreateAutomationInput = {
+  id?: Maybe<Scalars['ID']>;
+  label?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
+  automationType?: Maybe<AutomationType>;
+  event?: Maybe<AutomationEventInput>;
+  conditionBuilder?: Maybe<AutomationConditionBuilderInput>;
+  actions?: Maybe<Array<AutomationActionInput>>;
+};
+
+export type CreateAutomationOperandInput = {
+  id?: Maybe<Scalars['ID']>;
+  operandType?: Maybe<OperandType>;
+  textValue?: Maybe<Scalars['String']>;
+  numberValue?: Maybe<Scalars['Int']>;
+  dateTimeValue?: Maybe<Scalars['String']>;
 };
 
 export type CreateBatchDeliveriesInputType = {
@@ -265,7 +533,9 @@ export type Customer = {
   slug: Scalars['String'];
   name: Scalars['String'];
   settings?: Maybe<CustomerSettings>;
+  automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
+  automations?: Maybe<Array<AutomationModel>>;
   dialogue?: Maybe<Dialogue>;
   dialogues?: Maybe<Array<Dialogue>>;
   users?: Maybe<Array<UserType>>;
@@ -273,6 +543,11 @@ export type Customer = {
   roles?: Maybe<Array<RoleType>>;
   campaign?: Maybe<CampaignType>;
   userCustomer?: Maybe<UserCustomer>;
+};
+
+
+export type CustomerAutomationConnectionArgs = {
+  filter?: Maybe<AutomationConnectionFilterInput>;
 };
 
 
@@ -487,6 +762,23 @@ export type DialogueLeafsArgs = {
   searchTerm?: Maybe<Scalars['String']>;
 };
 
+export enum DialogueAspectType {
+  NrInteractions = 'NR_INTERACTIONS',
+  NrVisitors = 'NR_VISITORS',
+  GeneralScore = 'GENERAL_SCORE',
+  LatestScore = 'LATEST_SCORE'
+}
+
+/** DialogueConditionScope */
+export type DialogueConditionScopeModel = {
+  __typename?: 'DialogueConditionScopeModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  aspect: DialogueAspectType;
+  aggregate?: Maybe<ConditionPropertyAggregate>;
+};
+
 export type DialogueFilterInputType = {
   searchTerm?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
@@ -685,6 +977,14 @@ export type GenerateAutodeckInput = {
   newCustomFields?: Maybe<Array<CustomFieldInputType>>;
 };
 
+export type GetAutomationInput = {
+  id?: Maybe<Scalars['String']>;
+};
+
+export type GetAutomationsByWorkspaceInput = {
+  workspaceId?: Maybe<Scalars['String']>;
+};
+
 export type GetCampaignsInput = {
   customerSlug?: Maybe<Scalars['String']>;
 };
@@ -763,6 +1063,7 @@ export enum JobStatusType {
   CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL'
 }
 
+
 export enum LanguageEnumType {
   English = 'ENGLISH',
   Dutch = 'DUTCH',
@@ -829,6 +1130,9 @@ export type Mutation = {
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
+  /** Creates a new automation. */
+  createAutomation: AutomationModel;
+  updateAutomation: AutomationModel;
   createCampaign: CampaignType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
   updateDeliveryStatus: Scalars['String'];
@@ -851,6 +1155,8 @@ export type Mutation = {
   editDialogue: Dialogue;
   deleteDialogue: Dialogue;
   uploadUpsellImage?: Maybe<ImageType>;
+  authenticateLambda?: Maybe<Scalars['String']>;
+  createAutomationToken?: Maybe<Scalars['String']>;
   register?: Maybe<Scalars['String']>;
   /** Given a token, checks in the database whether token has been set and has not expired yet */
   verifyUserToken: VerifyUserTokenOutput;
@@ -934,6 +1240,16 @@ export type MutationCreateTagArgs = {
 
 export type MutationDeleteTagArgs = {
   tagId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationCreateAutomationArgs = {
+  input?: Maybe<CreateAutomationInput>;
+};
+
+
+export type MutationUpdateAutomationArgs = {
+  input?: Maybe<CreateAutomationInput>;
 };
 
 
@@ -1063,6 +1379,16 @@ export type MutationUploadUpsellImageArgs = {
 };
 
 
+export type MutationAuthenticateLambdaArgs = {
+  input?: Maybe<AuthenticateLambdaInput>;
+};
+
+
+export type MutationCreateAutomationTokenArgs = {
+  email?: Maybe<Scalars['String']>;
+};
+
+
 export type MutationRegisterArgs = {
   input?: Maybe<RegisterInput>;
 };
@@ -1168,6 +1494,12 @@ export type NodeEntryValue = {
   formNodeEntry?: Maybe<FormNodeEntryType>;
 };
 
+export enum OperandType {
+  String = 'STRING',
+  Int = 'INT',
+  DateTime = 'DATE_TIME'
+}
+
 export type OptionInputType = {
   id?: Maybe<Scalars['Int']>;
   value?: Maybe<Scalars['String']>;
@@ -1270,6 +1602,8 @@ export type Query = {
   getAutodeckJobs: AutodeckConnectionType;
   getAdjustedLogo?: Maybe<AwsImageType>;
   tags: Array<Tag>;
+  automation?: Maybe<AutomationModel>;
+  automations: Array<AutomationModel>;
   delivery?: Maybe<DeliveryType>;
   triggerConnection?: Maybe<TriggerConnectionType>;
   trigger?: Maybe<TriggerType>;
@@ -1315,6 +1649,16 @@ export type QueryGetAdjustedLogoArgs = {
 export type QueryTagsArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   dialogueId?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryAutomationArgs = {
+  where?: Maybe<GetAutomationInput>;
+};
+
+
+export type QueryAutomationsArgs = {
+  where?: Maybe<GetAutomationsByWorkspaceInput>;
 };
 
 
@@ -1398,6 +1742,20 @@ export type QueryEdgeArgs = {
   id?: Maybe<Scalars['String']>;
 };
 
+export enum QuestionAspectType {
+  NodeValue = 'NODE_VALUE',
+  AnswerSpeed = 'ANSWER_SPEED'
+}
+
+/** QuestionConditionScope */
+export type QuestionConditionScopeModel = {
+  __typename?: 'QuestionConditionScopeModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  aspect: QuestionAspectType;
+  aggregate?: Maybe<ConditionPropertyAggregate>;
+};
+
 export type QuestionNode = {
   __typename?: 'QuestionNode';
   id: Scalars['ID'];
@@ -1457,6 +1815,15 @@ export type QuestionOption = {
 export type RecipientsInputType = {
   ids?: Maybe<Array<Scalars['String']>>;
 };
+
+export enum RecurringPeriodType {
+  EveryWeek = 'EVERY_WEEK',
+  EveryDay = 'EVERY_DAY',
+  StartOfDay = 'START_OF_DAY',
+  EndOfDay = 'END_OF_DAY',
+  StartOfWeek = 'START_OF_WEEK',
+  EndOfWeek = 'END_OF_WEEK'
+}
 
 export type RefreshAccessTokenOutput = {
   __typename?: 'RefreshAccessTokenOutput';
@@ -1672,6 +2039,8 @@ export type SocialNodeEntryInput = {
 };
 
 export enum SystemPermission {
+  CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
+  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
   CanEditDialogue = 'CAN_EDIT_DIALOGUE',
   CanBuildDialogue = 'CAN_BUILD_DIALOGUE',
@@ -1688,7 +2057,10 @@ export enum SystemPermission {
   CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
   CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
   CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
-  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES'
+  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES',
+  CanViewAutomations = 'CAN_VIEW_AUTOMATIONS',
+  CanCreateAutomations = 'CAN_CREATE_AUTOMATIONS',
+  CanUpdateAutomations = 'CAN_UPDATE_AUTOMATIONS'
 }
 
 export type Tag = {
@@ -1919,6 +2291,22 @@ export type VerifyUserTokenOutput = {
 /** Input type for a video node */
 export type VideoNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
+};
+
+export enum WorkspaceAspectType {
+  NrInteractions = 'NR_INTERACTIONS',
+  NrVisitors = 'NR_VISITORS',
+  GeneralScore = 'GENERAL_SCORE'
+}
+
+/** WorkspaceConditionScope */
+export type WorkspaceConditionScopeModel = {
+  __typename?: 'WorkspaceConditionScopeModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  aspect: WorkspaceAspectType;
+  aggregate?: Maybe<ConditionPropertyAggregate>;
 };
 
 export type DeliveryEventFragmentFragment = (

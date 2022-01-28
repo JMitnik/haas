@@ -13,6 +13,7 @@ export const ROUTES = {
   ADMIN_OVERVIEW: '/dashboard/admin',
   USER_VIEW: '/dashboard/b/:customerSlug/users/:userId',
   ROLE_USER_VIEW: '/dashboard/b/:customerSlug/users/:userId/role/:roleId',
+  WEEKLY_REPORT_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/_reports/weekly',
   USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
   ALERTS_OVERVIEW: '/dashboard/b/:customerSlug/triggers',
   DIALOGUE_BUILDER_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder',

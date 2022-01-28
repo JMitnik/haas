@@ -16,14 +16,17 @@ import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
+import AutomationService from '../automations/AutomationService';
 
 class SessionService {
   sessionPrismaAdapter: SessionPrismaAdapter;
   triggerService: TriggerService;
+  automationService: AutomationService;
 
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.triggerService = new TriggerService(prismaClient);
+    this.automationService = new AutomationService(prismaClient);
   };
 
   /**
@@ -79,6 +82,12 @@ class SessionService {
     } catch (error) {
       console.log('Something went wrong while handling sms triggers: ', error);
     };
+
+    try {
+      await this.automationService.handleTriggerAutomations(dialogueId);
+    } catch (error) {
+      console.log('Something went wrong checking automation triggers: ', error);
+    }
 
     return session;
   }

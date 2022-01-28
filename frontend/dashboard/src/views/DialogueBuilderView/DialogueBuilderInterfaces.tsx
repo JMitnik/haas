@@ -1,14 +1,3 @@
-// enum QuestionNodeTypeEnum {
-//   Generic = 'GENERIC',
-//   Slider = 'SLIDER',
-//   Choice = 'CHOICE',
-//   Registration = 'REGISTRATION',
-//   Form = 'FORM',
-//   Textbox = 'TEXTBOX',
-//   Link = 'LINK',
-//   Share = 'SHARE',
-// }
-
 import { QuestionNodeTypeEnum } from 'types/generated-types';
 
 export interface CTANode {
@@ -76,7 +65,7 @@ export interface EdgeChildProps {
 export interface EdgeConditionProps {
   id?: number;
   conditionType?: string;
-  renderMin?: number;
-  renderMax?: number;
-  matchValue?: string;
+  renderMin?: number | null;
+  renderMax?: number | null;
+  matchValue?: string | null;
 }

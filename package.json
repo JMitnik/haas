@@ -75,6 +75,7 @@
         "dock:test:start-db": "(cd container/test && docker-compose up -d) && sleep 10 && (export DB_STRING=postgresql://prisma:prisma@localhost:5431/postgres?schema=public && yarn migrate)",
         "dock:test:restart-db": "yarn dock:test:end-db  && yarn dock:test:start-db ",
         "dock:test:end-db": "(cd container/test && docker-compose down)",
+        "seed:basic": "yarn workspace @haas/api seed:basic",
         "tunnel:api": "ngrok http https://localhost:4000"
     },
     "devDependencies": {

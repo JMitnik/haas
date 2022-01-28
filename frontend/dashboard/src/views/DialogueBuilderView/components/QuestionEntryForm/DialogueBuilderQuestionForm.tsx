@@ -4,17 +4,21 @@ import {
   Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
-import { Controller, useForm } from 'react-hook-form';
-import { PlusCircle, Trash } from 'react-feather';
-import { debounce } from 'lodash';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { List, PlusCircle, Sliders, Trash, Youtube } from 'react-feather';
 import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
+import {
+  Div, FormControl, FormLabel,
+  InputGrid, InputHelper,
+} from '@haas/ui';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
+import { QuestionNodeTypeEnum } from 'types/generated-types';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
@@ -59,6 +63,7 @@ interface FormDataProps {
   unhappyText: string;
   happyText: string;
   useCustomerSatisfactionTexts: number;
+  range: number[];
 }
 
 const isChoiceType = (questionType: string) => {
@@ -73,16 +78,6 @@ const schema = yup.object().shape({
   questionType: yup.string().required(),
   videoEmbedded: yup.string().when(['questionType'], {
     is: (questionType: string) => questionType === 'VIDEO_EMBEDDED',
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
-  }),
-  minValue: yup.string().when(['parentQuestionType'], {
-    is: (parentQuestionType: string) => parentQuestionType === 'Slider',
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
-  }),
-  maxValue: yup.string().when(['parentQuestionType'], {
-    is: (parentQuestionType: string) => parentQuestionType === 'Slider',
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
@@ -118,12 +113,6 @@ interface QuestionEntryFormProps {
   onDeleteEntry: any;
   onScroll: () => void;
 }
-
-const questionTypes = [
-  { value: 'SLIDER', label: 'Slider' },
-  { value: 'CHOICE', label: 'Choice' },
-  { value: 'VIDEO_EMBEDDED', label: 'Video embedded' },
-];
 
 const createQuestionMutation = gql`
   mutation createQuestion($input: CreateQuestionNodeInputType!) {
@@ -186,11 +175,23 @@ const DialogueBuilderQuestionForm = ({
       happyText: question.sliderNode?.happyText,
       overrideLeaf: setOverrideLeaf(ctaNodes, overrideLeaf?.id),
       optionsFull: options,
+      range: [condition?.renderMin ?? 30, condition?.renderMax ?? 70],
+      questionType: type?.value,
+      // optionsFull: options.map((option) => ({
+      //   id: option.id,
+      //   position: option.position,
+      //   value: option.value,
+      //   publicValue: option.publicValue,
+      //   overrideLeaf: {
+      //     label: option.overrideLeaf?.title,
+      //     value: option.overrideLeaf?.id,
+      //     type: option.overrideLeaf?.type,
+      //   },
+      // })),
     },
   });
 
   const toast = useToast();
-  const [activeQuestionType, setActiveQuestionType] = useState(type);
 
   const matchValue = condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null;
   const [activeMatchValue, setActiveMatchValue] = useState<null | { label: string, value: string }>(matchValue);
@@ -200,9 +201,16 @@ const DialogueBuilderQuestionForm = ({
       label: condition.conditionType,
     } : null,
   );
+
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditionProps>(
     condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' },
   );
+
+  const questionType = useWatch({
+    control: form.control,
+    name: 'questionType',
+    defaultValue: type?.value,
+  });
 
   const setConditionType = useCallback((conditionOption: any) => {
     setActiveConditionSelect(conditionOption);
@@ -215,21 +223,10 @@ const DialogueBuilderQuestionForm = ({
     });
   }, [setActiveConditionSelect, setActiveCondition]);
 
-  const handleQuestionTypeChange = useCallback((selectOption: any) => {
-    form.setValue('questionType', selectOption?.value);
-    setActiveQuestionType(selectOption);
-  }, [setActiveQuestionType]);
-
   useEffect(() => {
     form.register({ name: 'parentQuestionType' });
     form.setValue('parentQuestionType', parentQuestionType);
   }, [parentQuestionType]);
-
-  useEffect(() => {
-    if (activeQuestionType) {
-      handleQuestionTypeChange(activeQuestionType);
-    }
-  }, [activeQuestionType, handleQuestionTypeChange]);
 
   const handleConditionTypeChange = useCallback((selectedOption: any) => {
     form.setValue('conditionType', selectedOption?.value);
@@ -343,36 +340,21 @@ const DialogueBuilderQuestionForm = ({
     form.setValue('overrideLeaf', null);
   };
 
-  const setMinValue = (event: React.FocusEvent<HTMLInputElement>) => {
-    const minValue = Number(event.target.value);
-    return setActiveCondition((prevCondition) => {
-      if (!prevCondition) {
-        return { renderMin: minValue };
-      }
-      prevCondition.renderMin = minValue;
-      return prevCondition;
-    });
-  };
-
-  const setMaxValue = useCallback(debounce((value: string) => {
-    const maxValue = Number(value);
-    return setActiveCondition((prevCondition) => {
-      if (!prevCondition) {
-        return { renderMax: maxValue };
-      }
-      prevCondition.renderMax = maxValue;
-      return prevCondition;
-    });
-  }, 250), []);
-
   const onSubmit = (formData: FormDataProps) => {
     const { title } = formData;
-    const type = activeQuestionType?.value;
-    const overrideLeafId = formData?.overrideLeaf?.value;
-    const edgeCondition = activeCondition;
+    const type = formData.questionType;
+    const overrideLeafId = formData.overrideLeaf?.value;
+    const edgeCondition: EdgeConditionProps = {
+      id: activeCondition?.id,
+      conditionType: activeCondition?.conditionType,
+      matchValue: activeCondition?.conditionType === 'match' ? activeCondition?.matchValue : null,
+      renderMin: activeCondition?.conditionType === 'valueBoundary' ? formData.range[0] : null,
+      renderMax: activeCondition?.conditionType === 'valueBoundary' ? formData.range[1] : null,
+    };
+
     const sliderNodeData = formData.sliderNode || sliderNode;
 
-    const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
+    const isSlider = type === QuestionNodeTypeEnum.Slider && sliderNodeData;
     const values = form.getValues();
     console.log('values', values);
 
@@ -504,42 +486,39 @@ const DialogueBuilderQuestionForm = ({
                     {t('dialogue:condition_helper')}
                   </UI.FormSectionHelper>
                 </UI.Div>
-                <UI.Div>
-                  <UI.InputGrid>
-                    <UI.FormControl isRequired isInvalid={!!form.errors.minValue}>
-                      <UI.FormLabel htmlFor="minValue">
-                        {t('min_value')}
-                      </UI.FormLabel>
-                      <UI.InputHelper>
-                        {t('dialogue:min_value_helper')}
-                      </UI.InputHelper>
-                      <UI.Input
-                        name="minValue"
-                        ref={form.register({ required: false })}
-                        defaultValue={condition?.renderMin}
-                        onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
-                      />
-                      <FormErrorMessage>{form.errors.minValue?.message}</FormErrorMessage>
-                    </UI.FormControl>
+                <Div>
+                  <InputGrid>
+                    <FormControl isRequired isInvalid={!!form.errors.minValue}>
+                      <FormLabel htmlFor="minValue">
+                        {t('range')}
+                      </FormLabel>
+                      <InputHelper>
+                        {t('range_helper')}
+                      </InputHelper>
+                      <UI.Div position="relative" pb={3}>
+                        <Controller
+                          control={form.control}
+                          name="range"
+                          defaultValue={[40, 69]}
+                          render={({ onChange, value }) => (
+                            <UI.RangeSlider
+                              onChange={onChange}
+                              defaultValue={value}
+                              // isDisabled
+                              stepSize={1}
+                              min={0}
+                              max={100}
+                            />
+                          )}
+                        />
+                        <FormErrorMessage>{form.errors.minValue?.message}</FormErrorMessage>
+                        <UI.Div position="absolute" bottom={0} left={0}>0</UI.Div>
+                        <UI.Div position="absolute" bottom={0} right={-7.5}>100</UI.Div>
+                      </UI.Div>
 
-                    <UI.FormControl isRequired isInvalid={!!form.errors.maxValue}>
-                      <UI.FormLabel htmlFor="maxValue">
-                        {t('max_value')}
-                      </UI.FormLabel>
-                      <UI.InputHelper>
-                        {t('dialogue:max_value_helper')}
-                      </UI.InputHelper>
-                      <UI.Input
-                        name="maxValue"
-                        ref={form.register({ required: false })}
-                        defaultValue={condition?.renderMax}
-                        onChange={(event: any) => setMaxValue(event.target.value)}
-                      />
-                      <FormErrorMessage>{form.errors.maxValue?.message}</FormErrorMessage>
-                    </UI.FormControl>
-
-                  </UI.InputGrid>
-                </UI.Div>
+                    </FormControl>
+                  </InputGrid>
+                </Div>
               </UI.FormSection>
             </>
           )}
@@ -594,35 +573,48 @@ const DialogueBuilderQuestionForm = ({
                 {t('dialogue:about_type_helper')}
               </UI.FormSectionHelper>
             </UI.Div>
-            <UI.Div>
-              <UI.InputGrid>
+            <Div>
+              <InputGrid>
                 <UI.FormControl isRequired isInvalid={!!form.errors.questionType}>
-                  <UI.FormLabel htmlFor="questionType">
-                    {t('dialogue:question_type')}
-                  </UI.FormLabel>
+                  <UI.FormLabel htmlFor="questionType">{t('dialogue:question_type')}</UI.FormLabel>
                   <UI.InputHelper>
                     {t('dialogue:question_type_helper')}
                   </UI.InputHelper>
                   <Controller
+                    control={form.control}
                     id="question-type-select"
                     name="questionType"
-                    control={form.control}
-                    defaultValue={activeQuestionType}
-                    render={({ onChange }) => (
-                      <Select
-                        options={questionTypes}
-                        value={activeQuestionType}
-                        onChange={(opt: any) => {
-                          handleQuestionTypeChange(opt);
-                          onChange(opt.value);
-                        }}
-                      />
+                    render={({ onChange, value, onBlur }) => (
+                      <UI.RadioButtons
+                        value={value}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                      >
+                        <UI.RadioButton
+                          icon={Sliders}
+                          value={QuestionNodeTypeEnum.Slider}
+                          text={t('slider')}
+                          description={t('slider_helper')}
+                        />
+                        <UI.RadioButton
+                          icon={List}
+                          value={QuestionNodeTypeEnum.Choice}
+                          text={t('multiple_choice')}
+                          description={t('multiple_choice_helper')}
+                        />
+                        <UI.RadioButton
+                          icon={Youtube}
+                          value={QuestionNodeTypeEnum.VideoEmbedded}
+                          text={t('video')}
+                          description={t('video_helper')}
+                        />
+                      </UI.RadioButtons>
                     )}
                   />
                   <FormErrorMessage>{form.errors.questionType?.message}</FormErrorMessage>
                 </UI.FormControl>
 
-                {form.watch('questionType') === 'VIDEO_EMBEDDED' && (
+                {questionType === QuestionNodeTypeEnum.VideoEmbedded && (
                   <UI.FormControl isRequired isInvalid={!!form.errors.videoEmbedded}>
                     <UI.FormLabel htmlFor="videoEmbedded">
                       {t('video_embedded')}
@@ -722,11 +714,11 @@ const DialogueBuilderQuestionForm = ({
                   </UI.Div>
                   <FormErrorMessage>{form.errors.activeLeaf?.message}</FormErrorMessage>
                 </UI.FormControl>
-              </UI.InputGrid>
-            </UI.Div>
+              </InputGrid>
+            </Div>
           </UI.FormSection>
 
-          {activeQuestionType && activeQuestionType.value === 'SLIDER' && (
+          {questionType === QuestionNodeTypeEnum.Slider && (
             <>
               <UI.Hr />
               <UI.FormSection>
@@ -743,26 +735,23 @@ const DialogueBuilderQuestionForm = ({
             </>
           )}
 
-          {activeQuestionType
-            && (activeQuestionType.value === 'CHOICE'
-              || activeQuestionType.value === 'VIDEO_EMBEDDED'
-            ) && (
-              <>
-                <UI.Hr />
-                <UI.FormSection>
-                  <UI.Div>
-                    <UI.FormSectionHeader>{t('dialogue:about_choice')}</UI.FormSectionHeader>
-                    <UI.FormSectionHelper>
-                      {t('dialogue:about_choice_helper')}
-                    </UI.FormSectionHelper>
-                  </UI.Div>
-                  <ChoiceNodeForm
-                    form={form}
-                    ctaNodes={ctaNodes}
-                  />
-                </UI.FormSection>
-              </>
-            )}
+          {(questionType === QuestionNodeTypeEnum.Choice || questionType === QuestionNodeTypeEnum.VideoEmbedded) && (
+            <>
+              <UI.Hr />
+              <UI.FormSection>
+                <UI.Div>
+                  <UI.FormSectionHeader>{t('dialogue:about_choice')}</UI.FormSectionHeader>
+                  <UI.FormSectionHelper>
+                    {t('dialogue:about_choice_helper')}
+                  </UI.FormSectionHelper>
+                </UI.Div>
+                <ChoiceNodeForm
+                  form={form}
+                  ctaNodes={ctaNodes}
+                />
+              </UI.FormSection>
+            </>
+          )}
         </UI.Div>
 
         <UI.Flex justifyContent="space-between">
