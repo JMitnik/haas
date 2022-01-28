@@ -61,16 +61,22 @@ export const Hr = styled.hr`
 `;
 
 
-export const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
+export const CloseButtonContainer = styled.button.attrs({ type: 'button' }) <{ top?: string, right?: string }>`
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: ${props => props?.top || '12px'};
+  right: ${props => props?.right || '12px'}; 
   width: 1rem;
   height: 1rem;
 `;
 
-export const CloseButton = ({ onClose }: any) => (
-  <CloseButtonContainer onClick={onClose}>
+interface CloseButtonProps {
+  onClose: any;
+  top?: string;
+  right?: string;
+}
+
+export const CloseButton = ({ onClose, top, right }: CloseButtonProps) => (
+  <CloseButtonContainer top={top} right={right} onClick={onClose}>
     <CloseIcon />
   </CloseButtonContainer>
 );

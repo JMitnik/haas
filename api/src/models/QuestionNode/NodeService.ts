@@ -103,11 +103,11 @@ export class NodeService {
   /**
    * Create call-to-action.
    * */
-  async createCTA(input: CreateCTAInputProps) {
+  async createCallToAction(input: CreateCTAInputProps) {
     const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(input.customerSlug, input.dialogueSlug);
     if (!dialogue?.id) throw 'No Dialogue found to add CTA to!'
 
-    return this.questionNodePrismaAdapter.createCTANode({
+    const callToAction = await this.questionNodePrismaAdapter.createCallToAction({
       dialogueId: dialogue.id,
       links: input.links,
       share: input.share,
@@ -115,6 +115,8 @@ export class NodeService {
       form: input.form,
       type: input.type
     });
+
+    return callToAction;
   }
 
   /**

@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    new: {
+      en: 'New',
+      de: 'Neu',
+    },
     range: {
       en: 'Range',
       de: 'Reichweite',

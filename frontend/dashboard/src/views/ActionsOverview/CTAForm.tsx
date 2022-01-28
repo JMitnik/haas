@@ -5,32 +5,33 @@ import {
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
+import {
+  Div, Flex, Form, FormContainer,
+  FormControl, FormLabel, FormSection, Input, InputGrid, InputHelper, Span, Text,
+} from '@haas/ui';
 import { Link, Trash, Type } from 'react-feather';
 import { useMutation } from '@apollo/client';
-
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 import Select from 'react-select';
 
-import {
-  Div, Flex, Form, FormContainer,
-  FormControl, FormLabel, FormSection, Input, InputGrid, InputHelper, Span, Text,
-} from '@haas/ui';
-import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { MappedCTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
+// import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { useCreateCtaMutation } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 import ShareIcon from 'components/Icons/ShareIcon';
 import boolToInt from 'utils/booleanToNumber';
-import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import intToBool from 'utils/intToBool';
 import updateCTAMutation from 'mutations/updateCTA';
 
 import { FormDataProps, LinkInputProps } from './CTATypes';
+
 import FormNodeForm from './FormNodeForm';
 import LinksOverview from './LinksOverview';
 
@@ -48,9 +49,12 @@ interface CTAFormProps {
   type: { label: string, value: string };
   share: ShareProps | null;
   form: any;
-  onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
-  onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
+  onActiveCTAChange?: React.Dispatch<React.SetStateAction<string | null>>;
+  onNewCTAChange?: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<any>;
+  onSuccess?: (callToAction: any) => void;
+  onCancel?: () => void;
+  onCTAIdFetch?: React.Dispatch<React.SetStateAction<MappedCTANode | null>>;
 }
 
 const isShareType = (ctaType: any) => ctaType?.value === 'SHARE';
@@ -114,19 +118,32 @@ const CTA_TYPES = [
   { label: 'Share', value: 'SHARE', ShareIcon },
 ];
 
+export function stopPropagate(callback: () => void) {
+  return (e: { preventDefault: () => void, stopPropagation: () => void }) => {
+    e.stopPropagation();
+    e.preventDefault();
+    callback();
+  };
+}
+
 const CTAForm = ({
   id,
   title,
   type,
   links,
   share,
+  onSuccess,
+  onCancel,
   onActiveCTAChange,
   onNewCTAChange,
   onDeleteCTA,
+  onCTAIdFetch,
   form: formNode,
 }: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
-  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
+  const { customerSlug, dialogueSlug, questionId } = useParams<
+  { customerSlug: string, dialogueSlug: string, questionId?: string }
+  >();
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -162,18 +179,19 @@ const CTAForm = ({
         searchTerm: '',
       },
     },
-    {
-      query: getTopicBuilderQuery,
-      variables: {
-        customerSlug,
-        dialogueSlug,
-      },
-    }];
+    // {
+    //   query: getTopicBuilderQuery,
+    //   variables: {
+    //     customerSlug,
+    //     dialogueSlug,
+    //   },
+    // }
+  ];
 
   const toast = useToast();
 
-  const [addCTA, { loading: addLoading }] = useMutation(createCTAMutation, {
-    onCompleted: () => {
+  const [addCTA, { loading: addLoading }] = useCreateCtaMutation({
+    onCompleted: (data) => {
       toast({
         title: t('cta:add_complete_title'),
         description: t('cta:add_complete_description'),
@@ -181,9 +199,16 @@ const CTAForm = ({
         position: 'bottom-right',
         duration: 1500,
       });
-
-      onNewCTAChange(false);
-      onActiveCTAChange(null);
+      console.log('CREATED CTA: ', data.createCTA);
+      const CTA: MappedCTANode = {
+        value: data.createCTA.id,
+        label: data.createCTA.title,
+        type: data.createCTA.type,
+      };
+      if (onCTAIdFetch) onCTAIdFetch(CTA);
+      onSuccess?.(data?.createCTA);
+      onNewCTAChange?.(false);
+      onActiveCTAChange?.(null);
     },
     onError: (serverError: any) => {
       console.log(serverError);
@@ -202,7 +227,7 @@ const CTAForm = ({
       });
 
       setTimeout(() => {
-        onActiveCTAChange(null);
+        onActiveCTAChange?.(null);
       }, 200);
     },
     onError: (serverError: any) => {
@@ -224,15 +249,16 @@ const CTAForm = ({
           input: {
             customerSlug,
             dialogueSlug,
+            questionId: questionId || null,
             title: formData.title,
             type: formData.ctaType.value || undefined,
-            links: mappedLinks,
+            links: mappedLinks as any, // TODO: Fix typing
             share: formData.share,
             form: {
               ...formData.formNode,
               fields: formData.formNode?.fields?.map(
                 (field) => ({ ...field, isRequired: intToBool(field.isRequired) }),
-              ),
+              ) as any, // TODO: Fix typing
             },
           },
         },
@@ -264,15 +290,16 @@ const CTAForm = ({
 
   const cancelCTA = () => {
     if (id === '-1') {
-      onNewCTAChange(false);
+      onNewCTAChange?.(false);
     }
-    onActiveCTAChange(null);
+    onActiveCTAChange?.(null);
+
+    onCancel?.();
   };
 
   return (
     <FormContainer expandedForm>
-      <UI.Hr />
-      <Form onSubmit={form.handleSubmit(onSubmit)}>
+      <Form onSubmit={stopPropagate(form.handleSubmit(onSubmit))}>
         <Div>
           <FormSection id="general">
             <Div>
@@ -396,42 +423,45 @@ const CTAForm = ({
             </Button>
             <Button variant="ghost" onClick={() => cancelCTA()}>Cancel</Button>
           </ButtonGroup>
-          <Span onClick={(e) => e.stopPropagation()}>
-            <Popover
-              usePortal
-            >
-              {({ onClose }) => (
-                <>
-                  <PopoverTrigger>
-                    <Button
-                      variant="outline"
-                      variantColor="red"
-                      leftIcon={Trash}
-                    >
-                      {t('delete')}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent zIndex={4}>
-                    <PopoverArrow />
-                    <PopoverHeader>{t('delete')}</PopoverHeader>
-                    <PopoverCloseButton />
-                    <PopoverBody>
-                      <Text>{t('delete_cta_popover')}</Text>
-                    </PopoverBody>
-                    <PopoverFooter>
+          {id !== '-1' && (
+            <Span onClick={(e) => e.stopPropagation()}>
+              <Popover
+                usePortal
+              >
+                {({ onClose }) => (
+                  <>
+                    <PopoverTrigger>
                       <Button
                         variant="outline"
                         variantColor="red"
-                        onClick={() => onDeleteCTA && onDeleteCTA(onClose)}
+                        leftIcon={Trash}
                       >
                         {t('delete')}
                       </Button>
-                    </PopoverFooter>
-                  </PopoverContent>
-                </>
-              )}
-            </Popover>
-          </Span>
+                    </PopoverTrigger>
+                    <PopoverContent zIndex={4}>
+                      <PopoverArrow />
+                      <PopoverHeader>{t('delete')}</PopoverHeader>
+                      <PopoverCloseButton />
+                      <PopoverBody>
+                        <Text>{t('delete_cta_popover')}</Text>
+                      </PopoverBody>
+                      <PopoverFooter>
+                        <Button
+                          variant="outline"
+                          variantColor="red"
+                          onClick={() => onDeleteCTA && onDeleteCTA(onClose)}
+                        >
+                          {t('delete')}
+                        </Button>
+                      </PopoverFooter>
+                    </PopoverContent>
+                  </>
+                )}
+              </Popover>
+            </Span>
+          )}
+
         </Flex>
       </Form>
     </FormContainer>

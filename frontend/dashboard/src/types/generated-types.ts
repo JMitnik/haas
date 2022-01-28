@@ -429,6 +429,7 @@ export type CreateCtaInputType = {
   dialogueSlug?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
+  questionId?: Maybe<Scalars['String']>;
   links?: Maybe<CtaLinksInputType>;
   share?: Maybe<ShareNodeInputType>;
   form?: Maybe<FormNodeInputType>;
@@ -2362,6 +2363,19 @@ export type SessionFragmentFragment = (
   )> }
 );
 
+export type CreateCtaMutationVariables = Exact<{
+  input?: Maybe<CreateCtaInputType>;
+}>;
+
+
+export type CreateCtaMutation = (
+  { __typename?: 'Mutation' }
+  & { createCTA: (
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id' | 'type' | 'title'>
+  ) }
+);
+
 export type GetCustomerOfUserQueryVariables = Exact<{
   input?: Maybe<UserOfCustomerInput>;
 }>;
@@ -3090,6 +3104,41 @@ export const SessionFragmentFragmentDoc = gql`
 }
     ${NodeEntryFragmentFragmentDoc}
 ${DeliveryFragmentFragmentDoc}`;
+export const CreateCtaDocument = gql`
+    mutation createCTA($input: CreateCTAInputType) {
+  createCTA(input: $input) {
+    id
+    type
+    title
+  }
+}
+    `;
+export type CreateCtaMutationFn = Apollo.MutationFunction<CreateCtaMutation, CreateCtaMutationVariables>;
+
+/**
+ * __useCreateCtaMutation__
+ *
+ * To run a mutation, you first call `useCreateCtaMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCtaMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCtaMutation, { data, loading, error }] = useCreateCtaMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateCtaMutation(baseOptions?: Apollo.MutationHookOptions<CreateCtaMutation, CreateCtaMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateCtaMutation, CreateCtaMutationVariables>(CreateCtaDocument, options);
+      }
+export type CreateCtaMutationHookResult = ReturnType<typeof useCreateCtaMutation>;
+export type CreateCtaMutationResult = Apollo.MutationResult<CreateCtaMutation>;
+export type CreateCtaMutationOptions = Apollo.BaseMutationOptions<CreateCtaMutation, CreateCtaMutationVariables>;
 export const GetCustomerOfUserDocument = gql`
     query getCustomerOfUser($input: UserOfCustomerInput) {
   UserOfCustomer(input: $input) {

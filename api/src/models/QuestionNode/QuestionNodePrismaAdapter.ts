@@ -12,6 +12,27 @@ class QuestionNodePrismaAdapter {
     this.prisma = prismaClient;
   }
 
+  /**
+   * Update a question node to have a new call-to-action as leaf.
+   * @param questionId
+   * @param ctaId
+   * @returns
+   */
+  connectCallToActionToQuestion = async (questionId: string, ctaId: string) => {
+    return this.prisma.questionNode.update({
+      where: {
+        id: questionId,
+      },
+      data: {
+        overrideLeaf: {
+          connect: {
+            id: ctaId,
+          },
+        },
+      },
+    });
+  }
+
   updateVideoNode(nodeId: string, data: Prisma.VideoEmbeddedNodeUpdateInput): Promise<VideoEmbeddedNode> {
     return this.prisma.videoEmbeddedNode.update({
       where: { id: nodeId },
@@ -230,10 +251,9 @@ class QuestionNodePrismaAdapter {
     })
   }
 
-  createCTANode(input: CreateCTAInput) {
+  createCallToAction(input: CreateCTAInput) {
     return this.prisma.questionNode.create({
-      data:
-      {
+      data: {
         title: input.title,
         type: input.type,
         isLeaf: true,
@@ -252,7 +272,7 @@ class QuestionNodePrismaAdapter {
           },
         },
       }
-    })
+    });
   }
 
   delete(id: string): Promise<QuestionNode> {

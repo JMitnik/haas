@@ -389,6 +389,9 @@ input CreateCTAInputType {
   dialogueSlug: String
   form: FormNodeInputType
   links: CTALinksInputType
+
+  """Linked question-node id"""
+  questionId: String
   share: ShareNodeInputType
   title: String
   type: String

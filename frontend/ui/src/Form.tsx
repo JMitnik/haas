@@ -515,7 +515,7 @@ export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDiv
   <FormSectionContainer
     ref={ref}
     py={4}
-    gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 3fr']}
+    gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '1fr 3fr']}
     {...props}
   >
     {props.children}

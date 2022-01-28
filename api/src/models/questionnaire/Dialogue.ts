@@ -385,6 +385,8 @@ export const DialogueRootQuery = extendType({
   },
 });
 
+console.log('pls');
+
 export default [
   DialogueWhereUniqueInput,
   DialogueMutations,

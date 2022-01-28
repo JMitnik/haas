@@ -335,8 +335,6 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
     append(appendNewField(fields.length + 1));
   };
 
-  console.log(openedField);
-
   const formNodeFields = form.watch('formNode.fields', []);
 
   return (
@@ -364,7 +362,11 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                   <UI.Div position="relative" key={field.fieldIndex}>
                     <AnimatePresence>
                       {openedField === index && (
-                        <UI.Modal isOpen={openedField === index} onClose={() => setOpenedField(null)}>
+                        <UI.Modal
+                          isOpen={openedField === index}
+                          onClose={() => setOpenedField(null)}
+                          maxWidth={1000}
+                        >
                           <FormNodeFieldFragment
                             onSubmit={(subForm: any) => {
                               form.setValue(`formNode.fields[${index}]`, subForm, { shouldDirty: true, shouldValidate: true });

@@ -5,7 +5,9 @@ import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
 import React from 'react';
 
-import { CTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
+import {
+  CTANode,
+} from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
@@ -17,7 +19,7 @@ export interface ChoiceProps {
   overrideLeafId: string;
 }
 
-const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
+export const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
   const { t } = useTranslation();
 
   return (
@@ -41,7 +43,6 @@ export interface ChoiceNodeFormProps {
 
 export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
   const { t } = useTranslation();
-
   const choicesForm = useFieldArray({
     name: 'optionsFull',
     control: form.control,
@@ -59,6 +60,24 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
       value: '',
       overrideLeaf: null,
     });
+  };
+
+  const handleRemoveCTAFromOption = (index: number) => {
+    const choice = choicesForm.fields[index];
+    const newChoice = {
+      id: choice.id,
+      overrideLeaf: {
+        label: undefined,
+        value: undefined,
+        type: undefined,
+      },
+      position: undefined,
+      publicValue: choice.publicValue,
+      value: choice.value,
+    };
+
+    choicesForm.remove(index);
+    choicesForm.insert(index, newChoice);
   };
 
   return (
@@ -150,13 +169,18 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                       control={form.control}
                       defaultValue={choice.overrideLeaf}
                       render={({ value, onChange }) => (
-                        <Dropdown renderOverlay={({ onClose }) => (
-                          <NodePicker
-                            items={formattedCtaNodes}
-                            onClose={onClose}
-                            onChange={onChange}
-                          />
-                        )}
+                        <Dropdown
+                          defaultCloseOnClickOutside={false}
+                          renderOverlay={({ onClose, setCloseClickOnOutside }) => (
+                            <NodePicker
+                              items={formattedCtaNodes}
+                              onClose={onClose}
+                              onChange={(data) => onChange(data)}
+                              onModalOpen={() => setCloseClickOnOutside(false)}
+                              onModalClose={() => setCloseClickOnOutside(true)}
+                              questionId={index}
+                            />
+                          )}
                         >
                           {({ onOpen }) => (
                             <UI.Div
@@ -166,7 +190,11 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                               alignItems="center"
                             >
                               {value?.label ? (
-                                <NodeCell onClick={onOpen} node={value} />
+                                <NodeCell
+                                  onRemove={() => handleRemoveCTAFromOption(index)}
+                                  onClick={onOpen}
+                                  node={value}
+                                />
                               ) : (
                                 <UI.Button
                                   size="sm"
