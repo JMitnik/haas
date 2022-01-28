@@ -138,7 +138,6 @@ const QuestionSection = ({
         questionsQ={questionsQ}
         question={question}
         Icon={Icon}
-        leafs={leafs}
         problems={problems || []}
         ctaNodes={ctaNodes}
       />
@@ -203,7 +202,6 @@ const QuestionSection = ({
               id: '-1', title: '', icon: Icon, isRoot: false, isLeaf: false, type: 'Choice', extraContent: '',
             }}
             Icon={Icon}
-            leafs={leafs}
             ctaNodes={ctaNodes}
           />
         </Div>
