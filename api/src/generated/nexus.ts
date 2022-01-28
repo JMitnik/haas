@@ -615,16 +615,16 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  AutomationActionType: "API_CALL" | "GENERATE_REPORT" | "SEND_EMAIL" | "SEND_SMS" | "WEBHOOK"
-  AutomationConditionBuilderType: "AND" | "OR"
-  AutomationConditionOperatorType: "EVERY_N_TH_TIME" | "GREATER_OR_EQUAL_THAN" | "GREATER_THAN" | "INNER_RANGE" | "IS_EQUAL" | "IS_FALSE" | "IS_NOT_EQUAL" | "IS_TRUE" | "OUTER_RANGE" | "SMALLER_OR_EQUAL_THAN" | "SMALLER_THAN"
-  AutomationConditionScopeType: "DIALOGUE" | "QUESTION" | "WORKSPACE"
+  AutomationActionType: prisma.AutomationActionType
+  AutomationConditionBuilderType: prisma.AutomationConditionBuilderType
+  AutomationConditionOperatorType: prisma.AutomationConditionOperatorType
+  AutomationConditionScopeType: prisma.AutomationConditionScopeType
   AutomationConnectionOrderType: "type" | "updatedAt"
-  AutomationEventType: "API_CALL" | "NEW_INTERACTION_DIALOGUE" | "NEW_INTERACTION_QUESTION" | "RECURRING"
-  AutomationType: "CAMPAIGN" | "TRIGGER"
+  AutomationEventType: prisma.AutomationEventType
+  AutomationType: prisma.AutomationType
   CampaignVariantEnum: "EMAIL" | "QUEUE" | "SMS"
   CloudReferenceType: prisma.CloudReferenceType
-  ConditionPropertyAggregateType: "AVG" | "COUNT" | "MAX" | "MIN"
+  ConditionPropertyAggregateType: prisma.ConditionPropertyAggregateType
   DeliveryConnectionOrder: "createdAt"
   DeliveryStatusEnum: "DELIVERED" | "DEPLOYED" | "FAILED" | "FINISHED" | "OPENED" | "SCHEDULED" | "SENT"
   DialogueAspectType: "GENERAL_SCORE" | "LATEST_SCORE" | "NR_INTERACTIONS" | "NR_VISITORS"
@@ -633,15 +633,15 @@ export interface NexusGenEnums {
   JobStatusType: prisma.JobStatusType
   LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
   LinkTypeEnumType: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SINGLE" | "SOCIAL" | "TWITTER" | "WHATSAPP"
-  OperandType: "DATE_TIME" | "INT" | "STRING"
+  OperandType: prisma.OperandType
   PaginationSearchEnum: "email" | "firstName" | "lastName" | "name" | "publicTitle" | "title"
   PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "scheduledAt" | "score" | "type" | "updatedAt" | "user" | "when"
   QuestionAspectType: "ANSWER_SPEED" | "NODE_VALUE"
   QuestionNodeTypeEnum: "CHOICE" | "FORM" | "GENERIC" | "LINK" | "REGISTRATION" | "SHARE" | "SLIDER" | "TEXTBOX" | "VIDEO_EMBEDDED"
-  RecurringPeriodType: "END_OF_DAY" | "END_OF_WEEK" | "EVERY_DAY" | "EVERY_WEEK" | "START_OF_DAY" | "START_OF_WEEK"
+  RecurringPeriodType: prisma.RecurringPeriodType
   SessionConnectionOrder: "createdAt"
   SessionDeliveryType: "campaigns" | "noCampaigns"
-  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ADD_USERS" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
+  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
@@ -756,14 +756,7 @@ export interface NexusGenRootTypes {
     weight: number; // Int!
   }
   ColourSettings: prisma.ColourSettings;
-  ConditionPropertyAggregate: { // root type
-    createdAt: string; // String!
-    endDate?: string | null; // String
-    id: string; // ID!
-    latest?: number | null; // Int
-    startDate?: string | null; // String
-    type: NexusGenEnums['ConditionPropertyAggregateType']; // ConditionPropertyAggregateType!
-  }
+  ConditionPropertyAggregate: prisma.ConditionPropertyAggregate;
   CreateBatchDeliveriesOutputType: { // root type
     failedDeliveries: NexusGenRootTypes['FailedDeliveryModel'][]; // [FailedDeliveryModel!]!
     nrDeliveries: number; // Int!

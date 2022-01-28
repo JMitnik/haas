@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { ColourSettings, Customer, CustomerSettings, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload, UserInputError } from 'apollo-server-express';
@@ -6,10 +5,7 @@ import { extendType, inputObjectType, mutationField, objectType, scalarType } fr
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
-// eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../../questionnaire/Dialogue';
-
-// eslint-disable-next-line import/no-cycle
 import { UserConnection } from '../../users/graphql/User';
 import DialogueService from '../../questionnaire/DialogueService';
 import isValidColor from '../../../utils/isValidColor';
@@ -157,8 +153,8 @@ export const CustomerType = objectType({
           ...campaign,
           variants: campaign.variantsEdges.map((variantEdge) => ({
             weight: variantEdge.weight,
-            ...variantEdge.campaignVariant
-          }))
+            ...variantEdge.campaignVariant,
+          })),
         })) || [];
       },
     });
@@ -168,10 +164,11 @@ export const CustomerType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
+        // TODO: Shit gets fucked with my nexus
         const roles = await ctx.services.roleService.getAllRolesForWorkspaceBySlug(parent.slug);
 
         return roles;
-      }
+      },
     });
   },
 });
@@ -250,7 +247,7 @@ export const WorkspaceMutations = Upload && extendType({
 
         const waitedFile = await file;
         const { createReadStream, filename, mimetype, encoding }:
-          { createReadStream: any, filename: string, mimetype: string, encoding: string } = waitedFile.file;
+          { createReadStream: any; filename: string; mimetype: string; encoding: string } = waitedFile.file;
 
 
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
