@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import { ReactNode } from 'react';
 
 import { QuestionNode } from '../../types/helper-types'
+import { GoBackButton } from '../Navigation/GoBackButton';
 
 interface NodeLayoutProps {
   children: ReactNode;
@@ -21,6 +22,7 @@ interface NodeLayoutProps {
 export const NodeLayout = ({ children }: NodeLayoutProps) => {
   return (
     <UI.Container height="100%">
+      <GoBackButton />
       <UI.ColumnFlex height="100%" justifyContent="space-between">
         {children}
       </UI.ColumnFlex>

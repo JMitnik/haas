@@ -57,7 +57,12 @@ export const useNavigator = ({ dialogueSlug, workspaceSlug }: UseNavigatorProps)
     }
   };
 
+  const goBack = () => {
+    navigate(-1);
+  };
+
   return {
     transition,
+    goBack,
   }
 }
