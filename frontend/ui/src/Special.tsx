@@ -165,3 +165,11 @@ export const Separator = styled(Div)`
     margin-right: ${theme.gutter / 2}px;
   `}
 `
+
+export const FullScreen = styled(Div)`
+  ${({ theme }) => css`
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  `}
+`;
