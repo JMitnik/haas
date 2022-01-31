@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect } from 'react'
 import { useNavigationType, useParams } from 'react-router';
 
-import { Dialogue, SessionEventInput } from '../../types/helper-types';
+import { QuestionNodeTypeEnum, Dialogue, SessionEventInput } from '../../types/core-types';
 import { useEventsStore } from '../DialogueEventsStore/DialogueEventsStore';
-import { QuestionNodeTypeEnum, SessionEventType } from '../../types/generated-types';
+import { SessionEventType } from '../../types/generated-types';
 import { SliderNode } from '../SliderNode/SliderNode';
 import { ChoiceNode } from '../ChoiceNode/ChoiceNode';
 import { useSession } from '../Session/SessionProvider';
@@ -12,6 +12,7 @@ import FormNode from '../FormNode/FormNode';
 import { useNavigator } from '../Navigation/useNavigator';
 import { QuestionNodeProps as GenericQuestionNodeProps, RunActionInput } from './QuestionNodeTypes';
 import { ShareNode } from '../ShareNode/ShareNode';
+import { PostLeafNode } from '../PostLeafNode/PostLeafNode';
 
 interface QuestionNodeProps {
   dialogue: Dialogue;
@@ -27,6 +28,7 @@ const NodeComponent: { [key in QuestionNodeTypeEnum]?: React.FC<GenericQuestionN
   [QuestionNodeTypeEnum.Registration]: ChoiceNode,
   [QuestionNodeTypeEnum.Share]: ShareNode,
   [QuestionNodeTypeEnum.VideoEmbedded]: ChoiceNode,
+  [QuestionNodeTypeEnum.Generic]: PostLeafNode,
 };
 
 function useDebouncedEffect(fn, deps, time) {
@@ -73,7 +75,7 @@ export const QuestionNodeRenderer = ({ dialogue, onEventUpload }: QuestionNodePr
         timestamp: new Date(),
       })
     }
-  }, [sessionId, currentNode, navigationType, logAction]);
+  }, [sessionId, currentNode.id, navigationType, logAction]);
 
   // TODO: Make this work
 //   useEffect(() => {

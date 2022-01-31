@@ -1,4 +1,4 @@
-import { QuestionNode as QuestionNodeType, SessionEventInput } from '../../types/helper-types';
+import { QuestionNode as QuestionNodeType, SessionEventInput } from '../../types/core-types';
 
 export interface RunActionInput {
   event: SessionEventInput;

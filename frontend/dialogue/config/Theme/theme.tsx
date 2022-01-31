@@ -1,12 +1,15 @@
 import { theme as chakraTheme } from '@chakra-ui/core';
 
-export const theme = {
+const defaultTheme = {
   ...chakraTheme,
   colors: {
     ...chakraTheme.colors,
     primary: '#0059f8',
+    _primary: '#0059f8',
     secondary: '#4FD1C5',
+    _secondary: '#4FD1C5',
     tertiary: 'green',
+    _tertiary: 'green',
     black: 'black',
     white: 'white',
     success: '#38B2AC',
@@ -25,7 +28,7 @@ export const theme = {
       background: '',
     },
   },
-  space: [0, 6, 12, 18, 24],
+  // space: [0, 6, 12, 18, 24],
   gutter: 24,
   containerWidth: 760,
   // TODO: Add font
@@ -51,8 +54,8 @@ export const theme = {
   fontSizes: [12, 16.0, 21.33, 28.43, 37.9, 50.52],
 };
 
-export const chakraDefaultTheme = {
-  ...theme,
+export const theme = {
+  ...defaultTheme,
   space: chakraTheme.space,
   fontSizes: chakraTheme.fontSizes,
 };

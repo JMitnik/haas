@@ -63,10 +63,8 @@ const DialogueThemer = ({ children }: DialogueThemerProps) => {
   const theme = useTheme();
   const usesGradient = true;
 
-  // @ts-ignore
-  const backgroundColor = useMemo(() => calculateBackgroundColor(theme.colors.primary), [theme]);
-  // @ts-ignore
-  const primaryAltColor = useMemo(() => calculateAltBackgroundColor(backgroundColor, theme), [backgroundColor, theme]);
+  const backgroundColor = useMemo(() => calculateBackgroundColor(theme.colors._primary), [theme]);
+  const primaryAltColor = useMemo(() => calculateAltBackgroundColor(backgroundColor), [backgroundColor]);
 
   return (
     <DialogueThemerContainer

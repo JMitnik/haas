@@ -4,7 +4,7 @@ import { Facebook, Instagram, Linkedin, Twitter, Globe } from 'react-feather';
 
 import WhatsappIcon from '../../assets/icons/icon-whatsapp.svg';
 import * as LS from './LinkNodeStyles';
-import { LinkItemType } from '../../types/helper-types'
+import { LinkItemType } from '../../types/core-types'
 import { LinkTypeEnumType } from '../../types/generated-types';
 
 interface LinkItemProps {

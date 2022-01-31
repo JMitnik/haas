@@ -1,12 +1,14 @@
 import create from 'zustand';
 
-import { Dialogue, QuestionNode as QuestionNodeType, SessionEventInput } from '../../types/helper-types';
+import { Dialogue, QuestionNode as QuestionNodeType, SessionEventInput } from '../../types/core-types';
 import {
   SessionEventType,
   SessionEventSliderValueInput,
   SessionEventChoiceValueInput,
   SessionEventFormValueInput,
 } from '../../types/generated-types';
+import { makePostLeafNode } from '../PostLeafNode/makePostLeafNode';
+import { POSTLEAFNODE_ID } from '../PostLeafNode/PostLeafNode';
 
 export interface SliderActionValue {
   value: number;
@@ -65,7 +67,7 @@ export const useEventsStore = create<DialogueState>((set, get) => ({
    * @returns
    */
   getCurrentNode: (dialogue: Dialogue, urlNodeId: string) => {
-    if (urlNodeId && urlNodeId !== '-1') {
+    if (urlNodeId && urlNodeId !== POSTLEAFNODE_ID) {
       const question = dialogue.questions.find((node) => node.id === urlNodeId);
       if (question) return question;
 
@@ -73,19 +75,10 @@ export const useEventsStore = create<DialogueState>((set, get) => ({
       return callToAction;
     }
 
-    if (urlNodeId === '-1') {
-      return dialogue.root;
+    if (urlNodeId && urlNodeId === POSTLEAFNODE_ID) {
+      const postLeafNode = makePostLeafNode(dialogue);
+      return postLeafNode;
     }
-
-    // if (urlNodeId === 'cta') {
-    //   const activeCallToAction = get().activeCallToAction;
-
-    //   // TODO: Make postleaf
-    //   // if (!activeCallToAction) {
-    //   //   return
-    //   // };
-    //   return get().activeCallToAction;
-    // }
 
     return dialogue.rootQuestion;
   },

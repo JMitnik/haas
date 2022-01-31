@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 
-import { LinkItemType } from '../../types/helper-types';
+import { LinkItemType } from '../../types/core-types';
 import { NodeLayout } from '../QuestionNode/NodeLayout';
 import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeStyles';
 import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';

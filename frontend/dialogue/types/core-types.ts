@@ -5,8 +5,13 @@ import {
   QuestionNode as GeneratedQuestionNode,
   QuestionOption as GeneratedQuestionOption,
   SessionEventInput as GeneratedSessionEventInput,
+  CustomerSettings,
   LinkType,
 } from './generated-types';
+
+export { QuestionNodeTypeEnum } from './generated-types';
+
+export type WorkspaceSettings = CustomerSettings;
 
 export type LinkItemType = LinkType;
 
@@ -16,7 +21,9 @@ export type Dialogue = GeneratedDialogue;
 
 export type Workspace = GeneratedWorkspace;
 
-export type QuestionNode = GeneratedQuestionNode;
+export interface QuestionNode extends GeneratedQuestionNode {
+  postLeafBody?: string;
+}
 
 export type Edge = GeneratedEdge;
 

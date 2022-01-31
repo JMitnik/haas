@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router';
 
+import { POSTLEAFNODE_ID } from '../PostLeafNode/PostLeafNode';
+
 export type StateType = 'Question' | 'CTA' | 'FINISHER';
 
 export interface TransitionInput {
@@ -40,13 +42,13 @@ export const useNavigator = ({ dialogueSlug, workspaceSlug }: UseNavigatorProps)
 
     // If we have no active call to action, go to the finisher.
     if (!activeCallToActionId) {
-      navigate(`/${workspaceSlug}/${dialogueSlug}/n/finisher`);
+      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${POSTLEAFNODE_ID}`);
       return;
     }
 
     // If we are on the active Call-to-action already, go to the finisher
     if (activeCallToActionId && currentNodeId === activeCallToActionId) {
-      navigate(`/${workspaceSlug}/${dialogueSlug}/n/finisher`);
+      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${POSTLEAFNODE_ID}`);
       return;
     }
 

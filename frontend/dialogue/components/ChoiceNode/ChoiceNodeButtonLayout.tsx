@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import * as UI from '@haas/ui';
 
-import { QuestionNode } from '../../types/helper-types';
+import { QuestionNode } from '../../types/core-types';
 
 interface ChoiceNodeButtonLayoutProps {
   node: QuestionNode;

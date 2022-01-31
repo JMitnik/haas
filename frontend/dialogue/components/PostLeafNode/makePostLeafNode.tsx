@@ -1,6 +1,9 @@
 import { QuestionNodeTypeEnum } from '../../types/generated-types';
-import { Dialogue, QuestionNode } from '../../types/helper-types';
+import { Dialogue, QuestionNode } from '../../types/core-types';
 
+/**
+ * Generate a post-leaf node based on the dialouge properties.
+ */
 export const makePostLeafNode = (dialogue: Dialogue): QuestionNode => ({
   id: '-1',
   children: [],
@@ -9,5 +12,6 @@ export const makePostLeafNode = (dialogue: Dialogue): QuestionNode => ({
   links: [],
   options: [],
   type: QuestionNodeTypeEnum.Generic,
-  // title: dialogue.
+  title: dialogue.postLeafNode?.header || '',
+  postLeafBody: dialogue.postLeafNode?.subtext || '',
 });

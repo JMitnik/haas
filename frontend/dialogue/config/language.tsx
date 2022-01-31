@@ -60,6 +60,16 @@ const language = {
       de: 'Danke für das Abstimmen',
       nl: 'Bedankt voor het stemmen',
     },
+    postleaf_default_title: {
+      en: 'Thank you for reaching out to us!',
+      de: 'Danke, dass Sie uns kontaktiert haben!',
+      nl: 'Bedankt dat u ons heeft bereikt!',
+    },
+    postleaf_default_subtext: {
+      en: 'We will strive towards making you happier.',
+      de: 'Wir werden versuchen, Sie zu verärgern.',
+      nl: 'We zullen ons best doen om uw feedback mee te nemen.',
+    },
   },
 };
 

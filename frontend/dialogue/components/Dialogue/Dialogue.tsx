@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Workspace, Dialogue as DialogueType, SessionEventInput } from '../../types/helper-types';
+import { Workspace, Dialogue as DialogueType, SessionEventInput } from '../../types/core-types';
 import DialogueThemer from '../../config/Theme/DialogueThemer';
 import AppProviders from '../../config/AppProviders';
 import * as LS from './DialogueStyles';
@@ -17,7 +17,7 @@ interface DialogueProps {
 
 const Dialogue = ({ dialogue, workspace, onEventUpload, sessionId }: DialogueProps) => {
   return (
-    <AppProviders sessionId={sessionId}>
+    <AppProviders workspace={workspace} sessionId={sessionId}>
       <DialogueThemer>
         <LS.DialogueContainer>
           <DialogueRoutes dialogue={dialogue} workspace={workspace} onEventUpload={onEventUpload} />

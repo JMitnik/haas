@@ -1,39 +1,40 @@
-import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
+import { CSSReset, ThemeProvider as ChakraThemeProvider  } from '@chakra-ui/core';
 import { ThemeProvider } from 'styled-components';
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 
-import { theme, chakraDefaultTheme } from './theme';
-import DialogueThemer from './DialogueThemer';
+import { theme, Theme } from './theme';
+import { Workspace, WorkspaceSettings } from '../../types/core-types';
 
-/* eslint-disable arrow-body-style */
-export const removeEmpty = (obj: any) => {
-  return Object.keys(obj).reduce((acc, key) => {
-    // value is "falsey" or is empty array
-    return !obj[key] || (Array.isArray(obj[key]) && !obj[key].length)
-      ? acc
-      : { ...acc, [key]: obj[key] };
-  }, {});
-};
-
-export const makeCustomTheme = (currTheme: any, customTheme: any) => {
-  const colors = {
-    ...currTheme?.colors,
-    ...removeEmpty({ ...customTheme?.colors }),
+/**
+ * Merge workspace theme with the base theme derived from Chakra and default settings.
+ *
+ * @param workspaceSettings Workspace settings
+ * @param baseTheme Base theme
+ * @returns The workspace theme
+ */
+export const createCustomTheme = (workspaceSettings: WorkspaceSettings, baseTheme: Theme): Theme => {
+  const customTheme = {
+    ...baseTheme,
+    colors: {
+      ...baseTheme.colors,
+      _primary: workspaceSettings?.colourSettings?.primary,
+    },
   };
 
-  return { ...currTheme, colors };
+  return customTheme;
 };
 
 interface ThemeProvidersProps {
+  workspace: Workspace;
   children?: React.ReactNode;
 }
 
-const ThemeProviders = ({ children }: ThemeProvidersProps) => {
-  const [customTheme, setCustomTheme] = useState({});
+const ThemeProviders = ({ workspace, children }: ThemeProvidersProps) => {
+  const customTheme: Theme = useMemo(() => createCustomTheme(workspace.settings, theme), [workspace.settings]);
 
   return (
-    <ThemeProvider theme={makeCustomTheme(theme, customTheme)}>
-      <ChakraThemeProvider theme={makeCustomTheme(chakraDefaultTheme, customTheme)}>
+    <ThemeProvider theme={customTheme}>
+      <ChakraThemeProvider theme={customTheme}>
         <CSSReset />
         {children}
       </ChakraThemeProvider>
