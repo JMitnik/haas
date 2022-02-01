@@ -82,6 +82,7 @@ export const parseLanguages = (lang: string, input: Record<string, unknown>, out
     const leaf = typeof value[Object.keys(value)[0]] === 'string';
 
     if (leaf) {
+      // TODO: Catch
       if (lang in value) {
         output[key] = value[lang];
       }
