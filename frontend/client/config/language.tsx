@@ -60,10 +60,20 @@ const language = {
       de: 'Danke für das Abstimmen',
       nl: 'Bedankt voor het stemmen',
     },
+    whoops: {
+      en: 'Whoops!',
+      de: 'Oops!',
+      nl: 'Oeps!',
+    },
+    whoops_description: {
+      en: 'We can’t find a dialogue here for you.',
+      de: 'Wir können hier keinen Dialog für Sie finden.',
+      nl: 'Wij kunnen geen dialoog voor u vinden hier',
+    },
   },
 };
 
-export const parseLanguages = (lang: string, input: any, output?: any) => {
+export const parseLanguages = (lang: string, input: Record<string, unknown>, output?: any) => {
   output = output || {};
 
   Object.keys(input).forEach((key) => {

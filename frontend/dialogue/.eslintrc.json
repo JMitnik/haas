@@ -1,8 +1,11 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "react"],
+  "plugins": [
+    "@typescript-eslint",
+    "react"
+  ],
   "parserOptions": {
-    "project": "frontend/dialogue/tsconfig.json"
+    "project": "tsconfig.json"
   },
   "extends": [
     "next/core-web-vitals",
@@ -11,11 +14,14 @@
   "settings": {
     "import/resolver": {
       "typescript": {
-        "project": "frontend/dialogue/tsconfig.json"
+        "project": "tsconfig.json"
       }
     },
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"]
+      "@typescript-eslint/parser": [
+        ".ts",
+        ".tsx"
+      ]
     },
     "import/extensions": [
       ".js",
@@ -27,40 +33,78 @@
   "rules": {
     // Promises/await: Ensure no promises are unawaited
     "@typescript-eslint/no-floating-promises": "error",
-
     // Typescript: Use interfaces, not types
-    "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
-
+    "@typescript-eslint/consistent-type-definitions": [
+      "error",
+      "interface"
+    ],
     // Imports: Sort by import groups
-    "import/order": ["error", {
-      "groups": [["builtin", "external"], "internal", ["parent", "sibling"], "index", "object", "type"],
-      "newlines-between": "always"
-      }],
-
-    // Typescript: Delimit Interface members
-    "@typescript-eslint/member-delimiter-style": ["error", {
-      "multiline": {
-        "delimiter": "semi",
-        "requireLast": true
-      },
-      "singleline": {
-        "delimiter": "semi",
-        "requireLast": false
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          [
+            "builtin",
+            "external"
+          ],
+          "internal",
+          [
+            "parent",
+            "sibling"
+          ],
+          "index",
+          "object",
+          "type"
+        ],
+        "newlines-between": "always"
       }
-      }],
-
-      // Typescript: Do not define explicit output types
-      "@typescript-eslint/explicit-module-boundary-types": ["off"],
-
+    ],
+    // Typescript: Delimit Interface members
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "semi",
+          "requireLast": true
+        },
+        "singleline": {
+          "delimiter": "semi",
+          "requireLast": false
+        }
+      }
+    ],
+    // Typescript: Do not define explicit output types
+    "@typescript-eslint/explicit-module-boundary-types": [
+      "off"
+    ],
     // General style
-    "@typescript-eslint/no-unused-vars": ["error"],
-    "comma-dangle": ["off", "always"],
-    "@typescript-eslint/comma-dangle": ["error", "always-multiline"],
-    "no-console": ["warn"],
-    "quotes": ["warn", "single"],
-
+    "@typescript-eslint/no-unused-vars": [
+      "error"
+    ],
+    "comma-dangle": [
+      "off",
+      "always"
+    ],
+    "@typescript-eslint/comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
+    "no-console": [
+      "warn"
+    ],
+    "quotes": [
+      "warn",
+      "single"
+    ],
     // React-specific rules
-    "jsx-quotes": ["warn", "prefer-double"], // Prefer double quotes in JSX
-    "react/prop-types": ["warn"] // Warn about missing prop types
+    "jsx-quotes": [
+      "warn",
+      "prefer-double"
+    ],
+    // Prefer double quotes in JSX
+    "react/prop-types": [
+      "warn"
+    ]
+    // Warn about missing prop types
   }
 }
