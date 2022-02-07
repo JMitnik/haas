@@ -429,6 +429,7 @@ export type CreateCtaInputType = {
   dialogueSlug?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
+  /** Linked question-node id */
   questionId?: Maybe<Scalars['String']>;
   links?: Maybe<CtaLinksInputType>;
   share?: Maybe<ShareNodeInputType>;

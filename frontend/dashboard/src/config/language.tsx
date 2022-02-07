@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    automations: {
+      en: 'Automations',
+      de: 'Automatisierungen',
+    },
     new: {
       en: 'New',
       de: 'Neu',

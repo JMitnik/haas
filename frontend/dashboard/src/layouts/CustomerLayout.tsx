@@ -26,11 +26,12 @@ import Sidenav from 'components/Sidenav';
 import useAuth from 'hooks/useAuth';
 import useMediaDevice from 'hooks/useMediaDevice';
 
+import { Cpu } from 'react-feather';
+import { Loader } from 'components/Common/Loader/Loader';
 import { NavLink } from 'react-router-dom';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import NotAuthorizedView from './NotAuthorizedView';
-import { useCustomer } from 'providers/CustomerProvider';
-import { Loader } from 'components/Common/Loader/Loader';
 
 const CustomerLayoutContainer = styled(Div) <{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
@@ -106,6 +107,7 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
     canViewCampaigns,
     canBuildDialogues,
     canEditDialogue,
+    canViewAutomations,
   } = useAuth();
   const { dialogueMatch } = useNavigator();
   const dialogueSlug = dialogueMatch?.params?.dialogueSlug;
@@ -174,6 +176,10 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
             <ChatIcon />
             {t('campaigns')}
           </NavItem>
+          <NavItem isDisabled={!canViewAutomations} to={`/dashboard/b/${customerSlug}/automations`}>
+            <Cpu />
+            {t('automations')}
+          </NavItem>
           <NavItem isDisabled={!canEditCustomer} to={`/dashboard/b/${customerSlug}/edit`}>
             <SettingsIcon />
             {t('settings')}
@@ -201,7 +207,7 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
         <CustomerLayoutContainer isMobile={device.isSmall}>
 
           {isLoading && (
-            <CornerLoaderPosition >
+            <CornerLoaderPosition>
               <Loader testId="runner" />
             </CornerLoaderPosition>
           )}

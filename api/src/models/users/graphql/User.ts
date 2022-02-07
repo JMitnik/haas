@@ -38,7 +38,11 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
     if (!args.input?.userId) throw new UserInputError('User not provided');
     if (!args.input?.customerId && !args.input?.customerSlug) throw new UserInputError('Neither slug nor id of Customer was provided');
 
-    return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId);
+    return ctx.services.userService.getUserOfCustomer(
+      args.input.customerId,
+      args.input.customerSlug,
+      args.input.userId
+    );
   },
 });
 
@@ -216,7 +220,7 @@ export const HandleUserStateInWorkspaceInput = inputObjectType({
     t.string('userId');
     t.string('workspaceId');
     t.boolean('isActive')
-  }
+  },
 })
 
 export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorkspace', {
@@ -229,7 +233,7 @@ export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorksp
 
     const input = { userId: args.input.userId, isActive: args.input.isActive, workspaceId: args.input.workspaceId }
     return ctx.services.userService.setUserStateInWorkspace(input);
-  }
+  },
 })
 
 export const UserMutations = extendType({
