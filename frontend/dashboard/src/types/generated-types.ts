@@ -222,6 +222,7 @@ export type AutomationTriggerModel = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   updatedAt: Scalars['Date'];
+  dialogueSlug?: Maybe<Scalars['String']>;
   event?: Maybe<AutomationEventModel>;
   conditionBuilder?: Maybe<AutomationConditionBuilderModel>;
   actions?: Maybe<Array<AutomationActionModel>>;
@@ -2398,6 +2399,7 @@ export type AutomationConnectionQuery = (
         & Pick<AutomationModel, 'label' | 'description' | 'updatedAt' | 'isActive' | 'type'>
         & { automationTrigger?: Maybe<(
           { __typename?: 'AutomationTriggerModel' }
+          & Pick<AutomationTriggerModel, 'dialogueSlug'>
           & { actions?: Maybe<Array<(
             { __typename?: 'AutomationActionModel' }
             & Pick<AutomationActionModel, 'type'>
@@ -3192,6 +3194,7 @@ export const AutomationConnectionDocument = gql`
         isActive
         type
         automationTrigger {
+          dialogueSlug
           actions {
             type
           }

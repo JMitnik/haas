@@ -1292,6 +1292,7 @@ export interface NexusGenFieldTypes {
     actions: NexusGenRootTypes['AutomationActionModel'][] | null; // [AutomationActionModel!]
     conditionBuilder: NexusGenRootTypes['AutomationConditionBuilderModel'] | null; // AutomationConditionBuilderModel
     createdAt: any; // Date!
+    dialogueSlug: string | null; // String
     event: NexusGenRootTypes['AutomationEventModel'] | null; // AutomationEventModel
     id: string; // ID!
     updatedAt: any; // Date!

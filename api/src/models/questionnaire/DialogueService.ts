@@ -9,7 +9,7 @@ import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import {
   HistoryDataProps, HistoryDataWithEntry, IdMapProps,
-  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType
+  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType,
 } from './DialogueTypes';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
@@ -44,6 +44,10 @@ class DialogueService {
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
+  }
+
+  findDialogueByQuestionId = async (questionId: string) => {
+    return this.dialoguePrismaAdapter.getDialogueByQuestionNodeId(questionId);
   }
 
   updateTags(dialogueId: string, entries?: string[] | null | undefined): Promise<Dialogue> {
@@ -224,7 +228,7 @@ class DialogueService {
       isWithoutGenData,
       dialogueFinisherHeading,
       dialogueFinisherSubheading,
-      language
+      language,
     } = args;
 
     const dbDialogue = await this.customerPrismaAdapter.getDialogueTags(customerSlug, dialogueSlug);
@@ -236,7 +240,7 @@ class DialogueService {
     );
 
     let updateDialogueArgs: Prisma.DialogueUpdateInput = {
-      title, description, publicTitle, isWithoutGenData, postLeafNode, language
+      title, description, publicTitle, isWithoutGenData, postLeafNode, language,
     };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
@@ -332,13 +336,13 @@ class DialogueService {
 
       const fakeSessionInputArgs: (
         {
-          createdAt: Date,
-          dialogueId: string,
-          rootNodeId: string,
-          simulatedRootVote: number,
-          simulatedChoiceNodeId: string,
-          simulatedChoiceEdgeId?: string,
-          simulatedChoice: string,
+          createdAt: Date;
+          dialogueId: string;
+          rootNodeId: string;
+          simulatedRootVote: number;
+          simulatedChoiceNodeId: string;
+          simulatedChoiceEdgeId?: string;
+          simulatedChoice: string;
         }) = { dialogueId, createdAt: backDate, rootNodeId: rootNode.id, simulatedRootVote, simulatedChoiceNodeId, simulatedChoiceEdgeId: simulatedChoiceEdge?.id, simulatedChoice }
 
       await this.sessionPrismaAdapter.createFakeSession(fakeSessionInputArgs);
@@ -519,7 +523,7 @@ class DialogueService {
           position,
           publicValue,
           value,
-          overrideLeafId: mappedOverrideLeafId || undefined
+          overrideLeafId: mappedOverrideLeafId || undefined,
         };
       });
 

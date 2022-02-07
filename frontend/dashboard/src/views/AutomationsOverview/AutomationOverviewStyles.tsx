@@ -1,6 +1,15 @@
 import { Card, Div, Flex } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
+export const TypeBadge = styled(Div)`
+  display: flex;
+  justify-content: center;
+  width: fit-content;
+  border-radius: 45px;
+  padding: 0.5em;
+  background-color: rgba(112,105,250, 0.5);
+`;
+
 export const TranslatedPlus = styled(Div)`
    ${({ theme }) => css`
       transform: translate(25px, -10px);

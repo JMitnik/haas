@@ -195,6 +195,7 @@ type AutomationTriggerModel {
   actions: [AutomationActionModel!]
   conditionBuilder: AutomationConditionBuilderModel
   createdAt: Date!
+  dialogueSlug: String
   event: AutomationEventModel
   id: ID!
   updatedAt: Date!

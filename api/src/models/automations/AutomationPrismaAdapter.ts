@@ -407,6 +407,12 @@ export class AutomationPrismaAdapter {
       include: {
         automationTrigger: {
           include: {
+            event: {
+              include: {
+                dialogue: true,
+                question: true,
+              },
+            },
             actions: true,
           },
         },
