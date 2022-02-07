@@ -1,8 +1,8 @@
-import { enumType, inputObjectType, objectType } from "@nexus/schema";
+import { enumType, inputObjectType, objectType } from '@nexus/schema';
 
-import { AutomationModel } from "..";
-import { ConnectionInterface } from "../../general/Pagination";
-import { AutomationType } from "./AutomationType";
+import { AutomationModel } from '..';
+import { ConnectionInterface } from '../../general/Pagination';
+import { AutomationType } from './AutomationType';
 
 export const AutomationConnectionOrderByInput = inputObjectType({
   name: 'AutomationConnectionOrderByInput',
@@ -18,7 +18,7 @@ export const AutomationConnectionOrderType = enumType({
   name: 'AutomationConnectionOrderType',
   description: 'Fields to order UserConnection by.',
 
-  members: ['updatedAt', 'type']
+  members: ['updatedAt', 'type'],
 });
 
 export const AutomationConnectionFilterInput = inputObjectType({
@@ -35,7 +35,7 @@ export const AutomationConnectionFilterInput = inputObjectType({
     // Paginate
     t.int('offset', { nullable: true });
     t.int('perPage', { required: false, default: 10 });
-  }
+  },
 });
 
 export const AutomationConnection = objectType({

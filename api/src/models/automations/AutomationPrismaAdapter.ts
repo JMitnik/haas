@@ -404,6 +404,13 @@ export class AutomationPrismaAdapter {
       skip: offset,
       take: perPage,
       orderBy: this.buildOrderByQuery(filter),
+      include: {
+        automationTrigger: {
+          include: {
+            actions: true,
+          },
+        },
+      },
     });
 
     return automations;

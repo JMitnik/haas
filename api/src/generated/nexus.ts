@@ -729,10 +729,10 @@ export interface NexusGenRootTypes {
     workspace?: NexusGenRootTypes['Customer'] | null; // Customer
   }
   AutomationTriggerModel: { // root type
-    actions: NexusGenRootTypes['AutomationActionModel'][]; // [AutomationActionModel!]!
+    actions?: NexusGenRootTypes['AutomationActionModel'][] | null; // [AutomationActionModel!]
     conditionBuilder?: NexusGenRootTypes['AutomationConditionBuilderModel'] | null; // AutomationConditionBuilderModel
     createdAt: any; // Date!
-    event: NexusGenRootTypes['AutomationEventModel']; // AutomationEventModel!
+    event?: NexusGenRootTypes['AutomationEventModel'] | null; // AutomationEventModel
     id: string; // ID!
     updatedAt: any; // Date!
   }
@@ -1289,10 +1289,10 @@ export interface NexusGenFieldTypes {
     workspace: NexusGenRootTypes['Customer'] | null; // Customer
   }
   AutomationTriggerModel: { // field return type
-    actions: NexusGenRootTypes['AutomationActionModel'][]; // [AutomationActionModel!]!
+    actions: NexusGenRootTypes['AutomationActionModel'][] | null; // [AutomationActionModel!]
     conditionBuilder: NexusGenRootTypes['AutomationConditionBuilderModel'] | null; // AutomationConditionBuilderModel
     createdAt: any; // Date!
-    event: NexusGenRootTypes['AutomationEventModel']; // AutomationEventModel!
+    event: NexusGenRootTypes['AutomationEventModel'] | null; // AutomationEventModel
     id: string; // ID!
     updatedAt: any; // Date!
   }

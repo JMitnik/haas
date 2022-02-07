@@ -13,6 +13,7 @@ export const AutomationTriggerModel = objectType({
 
     t.field('event', {
       type: AutomationEventModel,
+      nullable: true,
     });
 
     t.field('conditionBuilder', {
@@ -22,6 +23,7 @@ export const AutomationTriggerModel = objectType({
 
     t.list.field('actions', {
       type: AutomationActionModel,
+      nullable: true,
     });
   },
 });

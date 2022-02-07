@@ -222,9 +222,9 @@ export type AutomationTriggerModel = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   updatedAt: Scalars['Date'];
-  event: AutomationEventModel;
+  event?: Maybe<AutomationEventModel>;
   conditionBuilder?: Maybe<AutomationConditionBuilderModel>;
-  actions: Array<AutomationActionModel>;
+  actions?: Maybe<Array<AutomationActionModel>>;
 };
 
 export enum AutomationType {
@@ -2377,6 +2377,37 @@ export type CreateCtaMutation = (
   ) }
 );
 
+export type AutomationConnectionQueryVariables = Exact<{
+  workspaceSlug?: Maybe<Scalars['String']>;
+}>;
+
+
+export type AutomationConnectionQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'slug'>
+    & { automationConnection?: Maybe<(
+      { __typename?: 'AutomationConnection' }
+      & Pick<AutomationConnection, 'totalPages'>
+      & { pageInfo: (
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+      ), automations: Array<(
+        { __typename?: 'AutomationModel' }
+        & Pick<AutomationModel, 'label' | 'description' | 'updatedAt' | 'isActive' | 'type'>
+        & { automationTrigger?: Maybe<(
+          { __typename?: 'AutomationTriggerModel' }
+          & { actions?: Maybe<Array<(
+            { __typename?: 'AutomationActionModel' }
+            & Pick<AutomationActionModel, 'type'>
+          )>> }
+        )> }
+      )> }
+    )> }
+  )> }
+);
+
 export type GetCustomerOfUserQueryVariables = Exact<{
   input?: Maybe<UserOfCustomerInput>;
 }>;
@@ -3140,6 +3171,67 @@ export function useCreateCtaMutation(baseOptions?: Apollo.MutationHookOptions<Cr
 export type CreateCtaMutationHookResult = ReturnType<typeof useCreateCtaMutation>;
 export type CreateCtaMutationResult = Apollo.MutationResult<CreateCtaMutation>;
 export type CreateCtaMutationOptions = Apollo.BaseMutationOptions<CreateCtaMutation, CreateCtaMutationVariables>;
+export const AutomationConnectionDocument = gql`
+    query automationConnection($workspaceSlug: String) {
+  customer(slug: $workspaceSlug) {
+    id
+    slug
+    automationConnection {
+      totalPages
+      pageInfo {
+        hasPrevPage
+        hasNextPage
+        prevPageOffset
+        nextPageOffset
+        pageIndex
+      }
+      automations {
+        label
+        description
+        updatedAt
+        isActive
+        type
+        automationTrigger {
+          actions {
+            type
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useAutomationConnectionQuery__
+ *
+ * To run a query within a React component, call `useAutomationConnectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAutomationConnectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAutomationConnectionQuery({
+ *   variables: {
+ *      workspaceSlug: // value for 'workspaceSlug'
+ *   },
+ * });
+ */
+export function useAutomationConnectionQuery(baseOptions?: Apollo.QueryHookOptions<AutomationConnectionQuery, AutomationConnectionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AutomationConnectionQuery, AutomationConnectionQueryVariables>(AutomationConnectionDocument, options);
+      }
+export function useAutomationConnectionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AutomationConnectionQuery, AutomationConnectionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AutomationConnectionQuery, AutomationConnectionQueryVariables>(AutomationConnectionDocument, options);
+        }
+export type AutomationConnectionQueryHookResult = ReturnType<typeof useAutomationConnectionQuery>;
+export type AutomationConnectionLazyQueryHookResult = ReturnType<typeof useAutomationConnectionLazyQuery>;
+export type AutomationConnectionQueryResult = Apollo.QueryResult<AutomationConnectionQuery, AutomationConnectionQueryVariables>;
+export function refetchAutomationConnectionQuery(variables?: AutomationConnectionQueryVariables) {
+      return { query: AutomationConnectionDocument, variables: variables }
+    }
 export const GetCustomerOfUserDocument = gql`
     query getCustomerOfUser($input: UserOfCustomerInput) {
   UserOfCustomer(input: $input) {

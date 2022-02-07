@@ -192,10 +192,10 @@ type AutomationModel {
 
 """AutomationTrigger"""
 type AutomationTriggerModel {
-  actions: [AutomationActionModel!]!
+  actions: [AutomationActionModel!]
   conditionBuilder: AutomationConditionBuilderModel
   createdAt: Date!
-  event: AutomationEventModel!
+  event: AutomationEventModel
   id: ID!
   updatedAt: Date!
 }

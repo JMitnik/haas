@@ -19,6 +19,7 @@ import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AdminOverview from 'views/AdminOverview/AdminOverview';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
+import AutomationsPage from 'pages/dashboard/automations';
 import CampaignsView from 'views/CampaignsView/CampaignsView';
 import CustomerLayout from 'layouts/CustomerLayout';
 import CustomerPage from 'pages/dashboard/customer';
@@ -112,6 +113,12 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/analytics/"
                       render={() => <AnalyticsPage />}
+                    />
+
+                    <GuardedRoute
+                      // allowedPermission={SystemPermission.CanViewAutomations}
+                      path="/dashboard/b/:customerSlug/automations/"
+                      render={() => <AutomationsPage />}
                     />
 
                     <GuardedRoute

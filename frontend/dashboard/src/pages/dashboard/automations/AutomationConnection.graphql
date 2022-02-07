@@ -1,0 +1,28 @@
+query automationConnection($workspaceSlug: String) {
+  customer(slug: $workspaceSlug) {
+    id
+    slug
+    automationConnection {
+      totalPages
+      pageInfo {
+        hasPrevPage
+        hasNextPage
+        prevPageOffset
+        nextPageOffset
+        pageIndex
+      }
+      automations {
+        label
+        description
+      	updatedAt
+        isActive
+        type
+        automationTrigger {
+          actions {
+            type
+          }
+        }
+      }
+    }
+  }
+}
