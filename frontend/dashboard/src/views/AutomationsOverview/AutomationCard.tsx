@@ -13,14 +13,12 @@ import { ReactComponent as DEFlag } from 'assets/icons/flags/flag-de.svg';
 import { ReactComponent as GBFlag } from 'assets/icons/flags/flag-gb.svg';
 import { ReactComponent as NLFlag } from 'assets/icons/flags/flag-nl.svg';
 
-import { AutomationModel } from 'types/generated-types';
+import { AutomationModel, AutomationType } from 'types/generated-types';
 import { deleteDialogueMutation } from 'mutations/deleteDialogue';
 import ShowMoreButton from 'components/ShowMoreButton';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
-
-import { Tag } from './Tag';
 
 interface DialogueCardOptionsOverlayProps {
   onDelete: (e: React.MouseEvent<HTMLElement>) => void;
@@ -138,6 +136,17 @@ const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, 
     }
   };
 
+  const renderAccentBorderColor = (type: AutomationType) => {
+    switch (type) {
+      case AutomationType.Trigger:
+        return '#7069FA';
+      case AutomationType.Campaign:
+        return '#2CB1BC';
+      default:
+        return '#AFB4C6';
+    }
+  };
+
   const lastUpdated = automation.updatedAt ? new Date(Number.parseInt(automation.updatedAt, 10)) : null;
 
   return (
@@ -147,8 +156,10 @@ const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, 
       bg="white"
       useFlex
       flexDirection="column"
+      position="relative"
     // onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)} // TODO: Add back
     >
+      <UI.AccentBorder backgroundColor={renderAccentBorderColor(automation.type)} />
       <UI.CardBody flex="100%">
         <UI.ColumnFlex justifyContent="space-between" height="100%">
           <UI.Div>
