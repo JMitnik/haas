@@ -772,6 +772,10 @@ const language = {
       en: 'Question',
       de: 'Frage',
     },
+    workspace: {
+      en: 'Workspace',
+      de: 'Arbeitsplatz',
+    },
     both: {
       en: 'Both',
       de: 'Beides',
@@ -1630,6 +1634,26 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     conditions_helper: {
       en: 'Create and organize conditions that need to be met in order for the automation actions to be conducted',
       de: 'Erstellen und organisieren Sie Bedingungen, die erfüllt sein müssen, damit die Automatisierungsaktionen durchgeführt werden können',
+    },
+    create_condition_modal_title: {
+      en: 'Create new condition',
+      de: 'Neue Bedingung anlegen',
+    },
+    scope: {
+      en: 'Scope',
+      de: 'Umfang',
+    },
+    scope_helper: {
+      en: 'Information on the scope of a condition',
+      de: 'Angaben zum Geltungsbereich einer Bedingung',
+    },
+    scope_type: {
+      en: 'Scope type',
+      de: 'Bereichstyp',
+    },
+    scope_type_helper: {
+      en: 'What kind of condition do you want to create?',
+      de: 'Welche Bedingungen wollen Sie schaffen?',
     },
   },
   dialogue: {

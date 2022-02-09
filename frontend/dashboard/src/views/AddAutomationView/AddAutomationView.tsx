@@ -14,6 +14,7 @@ import React, { useState } from 'react';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { motion } from 'framer-motion';
 import { yupResolver } from '@hookform/resolvers';
+
 import { CreateConditionModalCard } from './CreateConditionModalCard';
 
 const schema = yup.object({

@@ -16,6 +16,7 @@ interface DropdownProps {
   offset?: [number, number];
   minWidth?: number;
   defaultCloseOnClickOutside?: boolean;
+  isRelative?: boolean;
 }
 
 const Dropdown = ({
@@ -25,6 +26,7 @@ const Dropdown = ({
   offset = [0, 12],
   minWidth,
   defaultCloseOnClickOutside = true,
+  isRelative,
 }: DropdownProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [overlay, setOverlay] = useState<HTMLDivElement | null>(null);
@@ -58,7 +60,27 @@ const Dropdown = ({
       <AnimatePresence>
         {isOpen ? (
           <>
-            {createPortal(
+            {isRelative ? (
+              <Div
+                ref={setOverlay}
+                style={{
+                  ...styles.popper,
+                  minWidth,
+                }}
+                {...attributes.popper}
+              >
+                <motion.div
+                  style={{ minWidth }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1, transition: { duration: 0.2 } }}
+                  exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                >
+                  <DropdownOverlayContainer minWidth={minWidth} ref={ref} onClick={(e) => e.stopPropagation()}>
+                    {renderOverlay?.({ setCloseClickOnOutside, onClose: handleClose })}
+                  </DropdownOverlayContainer>
+                </motion.div>
+              </Div>
+            ) : createPortal(
               <Div
                 ref={setOverlay}
                 style={{
