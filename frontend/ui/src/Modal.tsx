@@ -102,7 +102,7 @@ export const Modal = ({
           padding: 24,
           borderRadius: '10px',
           left: '50%',
-          top: '40%',
+          top: '35%',
           margin: '0px auto',
           overflow: 'initial',
           width: '100%',

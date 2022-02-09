@@ -635,6 +635,7 @@ export const FormSlider = ({
       step={stepSize}
       defaultValue={defaultValue}
       onAfterChange={onChange}
+      onChange={onChange}
     />
   );
 }
