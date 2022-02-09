@@ -13,6 +13,7 @@ import { SystemPermission } from 'types/generated-types';
 import { sub } from 'date-fns';
 import { useUser } from 'providers/UserProvider';
 import ActionsPage from 'pages/dashboard/actions';
+import AddAutomationView from 'views/AddAutomationView';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
@@ -113,6 +114,12 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/analytics/"
                       render={() => <AnalyticsPage />}
+                    />
+
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CanViewAutomations}
+                      path={ROUTES.NEW_AUTOMATION_VIEW}
+                      render={() => <AddAutomationView />}
                     />
 
                     <GuardedRoute

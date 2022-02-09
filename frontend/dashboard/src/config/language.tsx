@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    create_automation: {
+      en: 'Create automation',
+      de: 'Automatisierung erstellen',
+    },
     automations: {
       en: 'Automations',
       de: 'Automatisierungen',
@@ -1568,6 +1572,64 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     userPermissions: {
       en: 'Permission',
       de: 'Genehmigung',
+    },
+  },
+  automation: {
+    about: {
+      en: 'About the automation',
+      de: 'Über die Automatisierung',
+    },
+    about_helper: {
+      en: 'General information such as the name of the automation, the type etc.',
+      de: 'Allgemeine Informationen wie der Name der Automatisierung, der Typ usw.',
+    },
+    title_helper: {
+      en: 'What is the name of the automation?',
+      de: 'Wie heißt die Automatik?',
+    },
+    title_placeholder: {
+      en: 'My first automation',
+      de: 'Meine erste Automatisierung',
+    },
+    type: {
+      en: 'Automation type',
+      de: 'Automatisierungstyp',
+    },
+    type_helper: {
+      en: 'What is the type of the automation you wish to create?',
+      de: 'Welche Art von Automatisierung möchten Sie erstellen?',
+    },
+    trigger: {
+      en: 'Trigger',
+      de: 'Abzug',
+    },
+    trigger_helper: {
+      en: 'Trigger actions using dialogue events',
+      de: 'Führen Sie Aktionen durch, wenn bestimmte Auslöser erfüllt sind',
+    },
+    recurring: {
+      en: 'Recurring',
+      de: 'Wiederkehrend',
+    },
+    recurring_helper: {
+      en: 'Schedule-related actions',
+      de: 'Führen Sie Aktionen basierend auf einem festgelegten Zeitplan durch',
+    },
+    campaigner: {
+      en: 'Campaigner',
+      de: 'Campaigner',
+    },
+    campaigner_helper: {
+      en: 'Campaigner-related events',
+      de: 'Führen Sie Aktionen basierend auf bestimmten Kampagnenereignissen durch',
+    },
+    conditions: {
+      en: 'Conditions',
+      de: 'Bedingungen',
+    },
+    conditions_helper: {
+      en: 'Create and organize conditions that need to be met in order for the automation actions to be conducted',
+      de: 'Erstellen und organisieren Sie Bedingungen, die erfüllt sein müssen, damit die Automatisierungsaktionen durchgeführt werden können',
     },
   },
   dialogue: {

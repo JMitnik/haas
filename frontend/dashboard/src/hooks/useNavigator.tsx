@@ -19,6 +19,8 @@ export const ROUTES = {
   DIALOGUE_BUILDER_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder',
   NEW_QUESTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/question/:questionId/new-cta',
   NEW_OPTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/option/:optionIndex/new-cta',
+  AUTOMATION_OVERVIEW: 'dashboard/b/:customerSlug/automations',
+  NEW_AUTOMATION_VIEW: '/dashboard/b/:customerSlug/automation/add',
 };
 
 interface DashboardParams {
@@ -39,6 +41,22 @@ export const useNavigator = () => {
 
   const history = useHistory();
   const location = useLocation();
+
+  const goToAutomationOverview = () => {
+    const path = generatePath(ROUTES.AUTOMATION_OVERVIEW, {
+      customerSlug,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToNewAutomationView = () => {
+    const path = generatePath(ROUTES.NEW_AUTOMATION_VIEW, {
+      customerSlug,
+    });
+
+    history.push(path + location.search);
+  };
 
   const goToDialogueBuilderOverview = () => {
     const path = generatePath(ROUTES.DIALOGUE_BUILDER_OVERVIEW, {
@@ -144,6 +162,8 @@ export const useNavigator = () => {
   });
 
   return {
+    goToAutomationOverview,
+    goToNewAutomationView,
     goToNewOptionsCTAView,
     goToDialogueBuilderOverview,
     goToNewQuestionCTAView,

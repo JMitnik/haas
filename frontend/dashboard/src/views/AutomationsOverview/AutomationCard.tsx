@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { Activity, Bell, Briefcase, Clock } from 'react-feather';
+import { Activity, Bell, Briefcase } from 'react-feather';
 import {
   Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent,
   PopoverFooter, PopoverHeader, PopoverTrigger, Switch, useToast,

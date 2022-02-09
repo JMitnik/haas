@@ -15,6 +15,7 @@ import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import useAuth from 'hooks/useAuth';
 
 import { AddDialogueCard, TranslatedPlus } from './AutomationOverviewStyles';
+import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import AutomationCard from './AutomationCard';
 
 interface AutomationOverviewProps {
@@ -24,6 +25,7 @@ interface AutomationOverviewProps {
 const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
+  const { goToNewAutomationView } = useNavigator();
 
   const [useDialogueGridView, setUseDialogueGridView] = useState(true);
 
@@ -92,7 +94,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
 
             {canDeleteDialogue && (
               <AddDialogueCard data-cy="AddDialogueCard">
-                <Link to={`/dashboard/b/${customerSlug}/dialogue/add`} />
+                <Link to={`/dashboard/b/${customerSlug}/automation/add`} />
 
                 <Flex flexDirection="column" alignItems="center" justifyContent="center">
                   <SurveyIcon />
@@ -100,7 +102,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
                     <Plus strokeWidth="3px" />
                   </TranslatedPlus>
                   <H4 color="default.dark">
-                    {t('create_dialogue')}
+                    {t('create_automation')}
                   </H4>
                 </Flex>
               </AddDialogueCard>
@@ -108,8 +110,8 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
           </Grid>
         ) : (
           <Grid gridRowGap={2}>
-            {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-              <AutomationCard isCompact key={index} dialogue={dialogue} />
+            {filteredAutomations?.map((automation, index: any) => automation && (
+              <AutomationCard isCompact key={index} automation={automation} />
             ))}
           </Grid>
         )}
