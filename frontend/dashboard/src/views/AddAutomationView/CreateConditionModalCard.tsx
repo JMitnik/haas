@@ -11,7 +11,6 @@ import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
 import { QuestionNodeTypeEnum } from 'types/generated-types';
-import { stopPropagate } from 'views/ActionsOverview/CTAForm';
 import Dropdown from 'components/Dropdown';
 
 interface NewCTAModalCardProps {
@@ -55,6 +54,8 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
 
   const onSubmit = (formData: FormDataProps) => {
     console.log('Form data: ', formData);
+    onSuccess(formData);
+    onClose();
   };
 
   // TODO: Replace with query fetching all dialogues
@@ -76,16 +77,20 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
     defaultValue: null,
   });
 
-  console.log('getValues', form.watch());
+  const watchLatest = useWatch({
+    control: form.control,
+    name: 'latest',
+    defaultValue: 1,
+  });
 
   return (
-    <UI.ModalCard maxWidth={1200} onClose={onClose}>
+    <UI.ModalCard maxWidth={1000} onClose={onClose}>
       <UI.ModalHead>
         <UI.ViewTitle>{t('views:add_dialogue_view')}</UI.ViewTitle>
       </UI.ModalHead>
       <UI.ModalBody>
-        <UI.FormContainer expandedForm>
-          <UI.Form onSubmit={stopPropagate(form.handleSubmit(onSubmit))}>
+        <UI.Div paddingLeft={0} paddingRight="4em">
+          <UI.Form onSubmit={form.handleSubmit(onSubmit)}>
             <UI.Div>
               <UI.FormSection id="general">
                 <UI.Div>
@@ -128,12 +133,12 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                       <UI.ErrorMessage>{form.errors.scopeType?.message}</UI.ErrorMessage>
                     </UI.FormControl>
 
-                    <UI.FormControl isInvalid={!!form.errors.activeDialogue}>
-                      <UI.FormLabel htmlFor="questionType">
-                        {t('call_to_action')}
+                    <UI.FormControl isRequired isInvalid={!!form.errors.activeDialogue}>
+                      <UI.FormLabel htmlFor="activeDialogue">
+                        {t('dialogue')}
                       </UI.FormLabel>
                       <UI.InputHelper>
-                        {t('dialogue:cta_helper')}
+                        {t(`automation:dialogue_helper_${watchScopeType}`)}
                       </UI.InputHelper>
                       <UI.Div>
                         <UI.Flex>
@@ -147,7 +152,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                           >
                             <>
                               <UI.Grid gridTemplateColumns="2fr 1fr">
-                                <UI.Helper>{t('call_to_action')}</UI.Helper>
+                                <UI.Helper>{t('dialogue')}</UI.Helper>
                               </UI.Grid>
 
                               <UI.Grid
@@ -194,7 +199,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                                                 <UI.Icon mr={1}>
                                                   <PlusCircle />
                                                 </UI.Icon>
-                                                {t('add_call_to_action')}
+                                                {t('add_dialogue')}
                                               </UI.Button>
                                             )}
                                           </UI.Div>
@@ -210,12 +215,12 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                       </UI.Div>
                     </UI.FormControl>
 
-                    <UI.FormControl isInvalid={!!form.errors.activeDialogue}>
+                    <UI.FormControl isRequired isInvalid={!!form.errors.activeDialogue}>
                       <UI.FormLabel htmlFor="questionType">
-                        {t('call_to_action')}
+                        {t('question')}
                       </UI.FormLabel>
                       <UI.InputHelper>
-                        {t('dialogue:cta_helper')}
+                        {t('automation:question_helper')}
                       </UI.InputHelper>
                       <UI.Div>
                         <UI.Flex>
@@ -229,7 +234,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                           >
                             <>
                               <UI.Grid gridTemplateColumns="2fr 1fr">
-                                <UI.Helper>{t('call_to_action')}</UI.Helper>
+                                <UI.Helper>{t('question')}</UI.Helper>
                               </UI.Grid>
 
                               <UI.Grid
@@ -277,7 +282,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                                                 <UI.Icon mr={1}>
                                                   <PlusCircle />
                                                 </UI.Icon>
-                                                {t('add_call_to_action')}
+                                                {t('add_question')}
                                               </UI.Button>
                                             )}
                                           </UI.Div>
@@ -295,8 +300,8 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
 
                     {watchScopeType === 'QUESTION' && (
                       <UI.FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.aspect}>
-                        <UI.FormLabel htmlFor="aspect">{t('automation:scope_type')}</UI.FormLabel>
-                        <UI.InputHelper>{t('automation:scope_type_helper')}</UI.InputHelper>
+                        <UI.FormLabel htmlFor="aspect">{t('automation:property')}</UI.FormLabel>
+                        <UI.InputHelper>{t('automation:property_helper')}</UI.InputHelper>
                         <Controller
                           control={form.control}
                           name="aspect"
@@ -322,9 +327,9 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                       </UI.FormControl>
                     )}
 
-                    {watchAspectType === 'NODE_VALUE' && (
+                    {watchAspectType === 'NODE_VALUE' && ( // TODO: Add check if selected question is choice or videoembedded before showing this field
                       <UI.FormControl isRequired>
-                        <UI.FormLabel htmlFor="questionOption">{t('dialogue')}</UI.FormLabel>
+                        <UI.FormLabel htmlFor="questionOption">{t('automation:question_option')}</UI.FormLabel>
                         <Controller
                           name="questionOption"
                           control={form.control}
@@ -349,18 +354,18 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                   </UI.InputGrid>
                 </UI.Div>
               </UI.FormSection>
-              <UI.FormSection id="general">
+              <UI.FormSection id="aggregate">
                 <UI.Div>
-                  <UI.H3 color="default.text" fontWeight={500} pb={2}>{t('automation:scope')}</UI.H3>
+                  <UI.H3 color="default.text" fontWeight={500} pb={2}>{t('automation:aggregate')}</UI.H3>
                   <UI.Muted color="gray.600">
-                    {t('automation:scope_helper')}
+                    {t('automation:aggregate_helper')}
                   </UI.Muted>
                 </UI.Div>
                 <UI.Div>
                   <UI.InputGrid>
                     <UI.FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.scopeType}>
-                      <UI.FormLabel htmlFor="aggregate">{t('automation:scope_type')}</UI.FormLabel>
-                      <UI.InputHelper>{t('automation:scope_type_helper')}</UI.InputHelper>
+                      <UI.FormLabel htmlFor="aggregate">{t('automation:aggregate_type')}</UI.FormLabel>
+                      <UI.InputHelper>{t('automation:aggregate_type_helper')}</UI.InputHelper>
                       <Controller
                         control={form.control}
                         name="aggregate"
@@ -384,9 +389,9 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                       <UI.ErrorMessage>{form.errors.scopeType?.message}</UI.ErrorMessage>
                     </UI.FormControl>
 
-                    <UI.FormControl isRequired>
-                      <UI.FormLabel>{t('scheduled_at')}</UI.FormLabel>
-                      <UI.FormLabelHelper>{t('scheduled_at_helper')}</UI.FormLabelHelper>
+                    <UI.FormControl>
+                      <UI.FormLabel>{t('automation:date_range')}</UI.FormLabel>
+                      <UI.FormLabelHelper>{t('automation:date_range_helper')}</UI.FormLabelHelper>
                       <UI.Div>
                         <Controller
                           name="dateRange"
@@ -405,10 +410,10 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
 
                     <UI.FormControl isRequired isInvalid={!!form.errors.latest}>
                       <UI.FormLabel htmlFor="latest">
-                        {t('range')}
+                        {t('automation:latest')}
                       </UI.FormLabel>
                       <UI.InputHelper>
-                        {t('range_helper')}
+                        {t('automation:latest_helper')}
                       </UI.InputHelper>
                       <UI.Div position="relative" pb={3}>
                         <Controller
@@ -420,20 +425,45 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                               defaultValue={value}
                               // isDisabled
                               stepSize={1}
-                              min={0}
+                              min={1}
                               max={100}
                             />
                           )}
                         />
                         <UI.ErrorMessage>{form.errors.latest?.message}</UI.ErrorMessage>
-                        <UI.Div position="absolute" bottom={0} left={0}>0</UI.Div>
+                        <UI.Div position="absolute" bottom={0} left={0}>1</UI.Div>
                         <UI.Div position="absolute" bottom={0} right={-7.5}>100</UI.Div>
 
                       </UI.Div>
-                      <UI.Div>{form.watch('latest')}</UI.Div>
+                      <UI.Flex
+                        mt="1em"
+                        width="fit-content"
+                        color="#1890ff"
+                        border="1px solid #1890ff"
+                        borderRadius="6px"
+                        padding="0.5em"
+                        backgroundColor="#D3EEFF"
+                        alignItems="center"
+                      >
+                        <UI.Div mr={1} style={{ fontWeight: 'bold', fontSize: '1.3em' }}>#</UI.Div>
+                        <UI.Flex>
+                          <UI.Div mr={1}>Latest</UI.Div>
+                          <UI.Div mr={1}>{watchLatest}</UI.Div>
+                          <UI.Div mr={1}>{watchLatest === 1 ? 'entry' : 'entries'}</UI.Div>
+                          <UI.Div>will be aggregated</UI.Div>
+                        </UI.Flex>
+
+                      </UI.Flex>
                     </UI.FormControl>
                     <UI.Flex justifyContent="flex-end">
-                      <UI.Button style={{ marginRight: '0.5em' }} variant="outline" onClick={() => onClose()}>Cancel</UI.Button>
+                      <UI.Button
+                        style={{ marginRight: '0.5em' }}
+                        variant="outline"
+                        onClick={() => onClose()}
+                      >
+                        Cancel
+
+                      </UI.Button>
                       <UI.Button
                         // isLoading={createLoading || updateLoading}
                         isDisabled={!form.formState.isValid}
@@ -449,7 +479,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
               </UI.FormSection>
             </UI.Div>
           </UI.Form>
-        </UI.FormContainer>
+        </UI.Div>
       </UI.ModalBody>
     </UI.ModalCard>
   );

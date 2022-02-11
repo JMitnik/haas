@@ -899,6 +899,14 @@ const language = {
       en: 'Edit',
       de: 'Bestätigen',
     },
+    add_dialogue: {
+      en: 'Add dialogue',
+      de: 'Füge einen Dialog hinzu',
+    },
+    add_question: {
+      en: 'Add question',
+      de: 'Frage hinzufügen',
+    },
     add_call_to_action: {
       en: 'Add Call-to-Action',
       de: 'Call-to-Action hinzufügen',
@@ -1477,6 +1485,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   views: {
+    add_automation_view: {
+      en: 'Add automation',
+      de: 'Automatisierung hinzufügen',
+    },
     configurations: {
       en: 'Configurations',
       de: 'Konfigurationen',
@@ -1654,6 +1666,94 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     scope_type_helper: {
       en: 'What kind of condition do you want to create?',
       de: 'Welche Bedingungen wollen Sie schaffen?',
+    },
+    dialogue_helper_QUESTION: {
+      en: 'What is the dialogue of the question you want to scope on?',
+      de: 'Was ist der Dialog der Frage, auf den Sie sich konzentrieren möchten?',
+    },
+    dialogue_helper_DIALOGUE: {
+      en: 'What is the dialogue you want to scope on?',
+      de: 'Auf welchen Dialog möchten Sie sich konzentrieren?',
+    },
+    question_helper: {
+      en: 'What is the question you want to scope on?',
+      de: 'Was ist die Frage, der Sie nachgehen möchten?',
+    },
+    property: {
+      en: 'Property',
+      de: 'Eigenschaft',
+    },
+    property_helper: {
+      en: 'What kind of property do you want to scope on?',
+      de: 'Auf welche Art von Immobilie möchten Sie sich konzentrieren?',
+    },
+    node_value: {
+      en: 'Answer',
+      de: 'Antworten',
+    },
+    node_value_helper: {
+      en: 'The answer given to a question',
+      de: 'Die Antwort auf eine Frage',
+    },
+    answer_speed: {
+      en: 'Answer speed',
+      de: 'Antwortgeschwindigkeit',
+    },
+    answer_speed_helper: {
+      en: 'The speed with which a user answered a question',
+      de: 'Die Geschwindigkeit, mit der ein Benutzer eine Frage beantwortet hat',
+    },
+    question_option: {
+      en: 'Question option',
+      de: 'Frageoption',
+    },
+    aggregate: {
+      en: 'Aggregate',
+      de: 'Aggregat',
+    },
+    aggregate_helper: {
+      en: 'Define aggregate information to filter the out want to check against',
+      de: 'Definieren Sie aggregierte Informationen, um die zu prüfenden Informationen herauszufiltern',
+    },
+    aggregate_type: {
+      en: 'Aggregate type',
+      de: 'Aggregate type',
+    },
+    aggregate_type_helper: {
+      en: 'How do you want to aggregate your data?',
+      de: 'Wie möchten Sie Ihre Daten aggregieren?',
+    },
+    average: {
+      en: 'Average',
+      de: 'Durchschnitt',
+    },
+    average_helper: {
+      en: 'Take an average over multiple entries',
+      de: 'Nehmen Sie einen Durchschnitt über mehrere Einträge',
+    },
+    count: {
+      en: 'Count',
+      de: 'Zählen',
+    },
+    count_helper: {
+      en: 'Count the amount of ocurrences of an entry',
+      de: 'Zählen Sie die Anzahl der Vorkommen eines Eintrags',
+    },
+    date_range: {
+      en: 'Date range',
+      de: 'Datumsbereich',
+    },
+    date_range_helper: {
+      en: 'Specify between which two dates the entries should aggregated',
+      de: 'Geben Sie an, zwischen welchen zwei Daten die Einträge aggregiert werden sollen',
+    },
+    latest: {
+      en: 'Latest',
+      de: 'Neueste',
+    },
+    latest_helper: {
+      en: 'How many of the latest entries should be aggregated?',
+      de: 'Wie viele der neuesten Einträge sollen aggregiert werden?',
     },
   },
   dialogue: {
