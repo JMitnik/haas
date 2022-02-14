@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Bell, Clock, Copy, MessageSquare, MoreVertical, PlusCircle, RefreshCcw, Trash, Trash2, Type, User } from 'react-feather';
 import { Button, ButtonGroup } from '@chakra-ui/core';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted,
@@ -70,7 +70,7 @@ export const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
 
 const DEPTH_BACKGROUND_COLORS = [
   '#fbfcff',
-  '#F6F7F9',
+  '#c8cacc',
 ];
 
 const OPERATORS = [
@@ -120,8 +120,12 @@ const AddAutomationView = () => {
     console.log('Form data; ', formData);
   };
 
-  console.log('Condition fields: ', conditionFields);
-  console.log('watch', form.watch('conditions'));
+  const watchedConditions = useWatch({
+    name: 'conditions',
+    control: form.control,
+    defaultValue: [],
+  });
+  console.log('watch', watchedConditions);
 
   return (
     <>
@@ -231,6 +235,7 @@ const AddAutomationView = () => {
                             backgroundColor={DEPTH_BACKGROUND_COLORS[condition.depth]}
                             position="relative"
                           >
+                            <input defaultValue={0} type="hidden" ref={form.register()} name={`conditions[${index}].depth`} />
                             <UI.Icon
                               color="#808b9a"
                               style={{ cursor: 'pointer', position: 'absolute', right: -25, top: 20 }}
@@ -241,7 +246,7 @@ const AddAutomationView = () => {
                             </UI.Icon>
                             <UI.Div>
                               <Controller
-                                defaultValue="AND"
+                                defaultValue={{ label: 'AND', value: 'AND' }}
                                 name={`conditions[${index}].logical`}
                                 control={form.control}
                                 options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
@@ -303,6 +308,7 @@ const AddAutomationView = () => {
                             <UI.Div>
                               <Controller
                                 name={`conditions[${index}].operator`}
+                                defaultValue={null}
                                 control={form.control}
                                 options={OPERATORS}
                                 as={Select}
@@ -310,7 +316,7 @@ const AddAutomationView = () => {
                             </UI.Div>
                             <FormControl isRequired>
                               <Input
-                                name={`condition[${index}].compareTo`}
+                                name={`conditions[${index}].compareTo`}
                                 ref={form.register({ required: true })}
                               />
                             </FormControl>
@@ -372,7 +378,7 @@ const AddAutomationView = () => {
           onSuccess={(condition: any) => {
             append({
               logical: { label: 'AND', value: 'AND' },
-              depth: 0,
+              depth: '0',
               condition,
             });
           }}
@@ -406,7 +412,7 @@ const AddAutomationView = () => {
           style={{ padding: '6px 12px' }}
           disabled={false}
           onClick={() => {
-            console.log('Deleting active item: ', activeItem.arrayKey);
+            console.log('Duplicate active item: ', activeItem.arrayKey);
             const { arrayKey, ...activeConditionBuilder } = activeItem;
             append(activeConditionBuilder);
           }}
@@ -425,9 +431,12 @@ const AddAutomationView = () => {
             console.log('Turn into group: ', activeItem.arrayKey);
             const conditionIndex = conditionFields.findIndex((field) => field.arrayKey === activeItem.arrayKey);
             console.log('condition index: ', conditionIndex);
-            const newDepth = activeItem.depth + 1;
+            const newDepth = parseInt(activeItem.depth, 10) + 1;
             console.log('new depth: ', newDepth);
-            form.setValue(`conditions.${conditionIndex}.depth`, newDepth);
+            const { arrayKey, ...activeCondition } = activeItem;
+            const updatedCondition = { activeCondition, depth: newDepth };
+            form.setValue(`conditions[${conditionIndex}]`, updatedCondition);
+            form.trigger();
           }}
         >
           <UI.Flex color="#4A5568">
