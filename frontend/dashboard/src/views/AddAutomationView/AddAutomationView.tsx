@@ -110,7 +110,7 @@ const AddAutomationView = () => {
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<any>();
   const { t } = useTranslation();
 
-  const { append, remove, fields: conditionFields, insert } = useFieldArray({
+  const { append, remove, fields: conditionFields, update } = useFieldArray({
     name: 'conditions',
     control: form.control,
     keyName: 'arrayKey',
@@ -152,8 +152,7 @@ const AddAutomationView = () => {
                       <Input
                         placeholder={t('automation:title_placeholder')}
                         leftEl={<Type />}
-                        name="title"
-                        ref={form.register({ required: true })}
+                        {...form.register('title', { required: 'Error title' })}
                       />
                       <UI.ErrorMessage>{t(form.errors.title?.message || '')}</UI.ErrorMessage>
                     </FormControl>
