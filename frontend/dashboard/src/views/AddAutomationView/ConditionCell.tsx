@@ -50,10 +50,6 @@ export const ConditionCell = ({ condition, onClick, onRemove }: NodeCellProps) =
     onRemove();
   };
 
-  console.log('dates: ', condition.dateRange?.[0], condition.dateRange?.[1]);
-
-  // const [startDate, endDate] = condition.dateRange;
-
   return (
     <NodeCellContainer
       onClick={onClick}
