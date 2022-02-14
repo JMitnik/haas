@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useToast } from '@chakra-ui/core';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 
 import { CreateWorkspaceInput } from 'types/globalTypes';
@@ -60,37 +60,37 @@ const AddCustomerView = () => {
 
   const [createWorkspace, { loading, error: serverErrors }] = useMutation<null, { input: CreateWorkspaceInput }>(
     createWorkspaceMutation, {
-      onCompleted: () => {
-        toast({
-          title: 'Created!',
-          description: 'A new business has been added.',
-          status: 'success',
-          position: 'bottom-right',
-          isClosable: true,
-        });
+    onCompleted: () => {
+      toast({
+        title: 'Created!',
+        description: 'A new business has been added.',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
 
-        refreshUser();
+      refreshUser();
 
-        setTimeout(() => {
-          history.push('/');
-        }, 500);
-      },
-      onError: () => {
-        toast({
-          title: 'Unexpected error!',
-          description: 'See the form for more information.',
-          status: 'error',
-          position: 'bottom-right',
-          isClosable: true,
-        });
-      },
-      refetchQueries: [{
-        query: getCustomersOfUser,
-        variables: {
-          userId: user?.id,
-        },
-      }],
+      setTimeout(() => {
+        history.push('/');
+      }, 500);
     },
+    onError: () => {
+      toast({
+        title: 'Unexpected error!',
+        description: 'See the form for more information.',
+        status: 'error',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+    },
+    refetchQueries: [{
+      query: getCustomersOfUser,
+      variables: {
+        userId: user?.id,
+      },
+    }],
+  },
   );
 
   const onSubmit = (formData: FormDataProps) => {

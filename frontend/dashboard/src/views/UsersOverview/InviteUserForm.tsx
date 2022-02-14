@@ -6,7 +6,7 @@ import { Mail } from 'react-feather';
 import { gql, useMutation } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 import Select from 'react-select';
 

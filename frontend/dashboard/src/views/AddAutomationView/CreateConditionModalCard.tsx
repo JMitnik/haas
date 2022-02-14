@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { PlusCircle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 import Select from 'react-select';
 
@@ -23,21 +23,26 @@ const schema = yup.object().shape({
   // activeDialogue: yup.string().notRequired(),
 });
 
+type TwoDateArray = [Date, Date];
+
 export interface FormDataProps {
   scopeType: string;
   activeDialogue: {
     title: string;
     id: string;
-  };
+    label?: string;
+  } | null;
   activeQuestion: {
     title: string;
     id: string;
     type: string;
-  },
-  aspect: string;
-  questionOption: string;
+    label?: string;
+  } | null,
+  aspect: string | null;
+  questionOption: { label: string, value: string } | null;
   aggregate: string;
   latest: number;
+  dateRange: TwoDateArray
 }
 
 export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) => {
@@ -53,8 +58,18 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    console.log('Form data: ', formData);
-    onSuccess(formData);
+    const returnData = {
+      scopeType: formData.scopeType,
+      activeDialogue: formData.activeDialogue,
+      activeQuestion: formData.activeQuestion,
+      aspect: formData.aspect,
+      dateRange: formData.dateRange,
+      aggregate: formData.aggregate,
+      questionOption: formData.questionOption?.value,
+      latest: formData.latest,
+    };
+    console.log('Return data: ', returnData);
+    onSuccess(returnData);
     onClose();
   };
 
@@ -101,13 +116,13 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                 </UI.Div>
                 <UI.Div>
                   <UI.InputGrid>
-                    <UI.FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.scopeType}>
+                    <UI.FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.formState.errors.scopeType}>
                       <UI.FormLabel htmlFor="scopeType">{t('automation:scope_type')}</UI.FormLabel>
                       <UI.InputHelper>{t('automation:scope_type_helper')}</UI.InputHelper>
                       <Controller
                         control={form.control}
                         name="scopeType"
-                        render={({ onBlur, onChange, value }) => (
+                        render={({ field: { onBlur, onChange, value } }) => (
                           <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                             <UI.RadioButton
                               value="QUESTION"
@@ -130,10 +145,10 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                           </UI.RadioButtons>
                         )}
                       />
-                      <UI.ErrorMessage>{form.errors.scopeType?.message}</UI.ErrorMessage>
+                      <UI.ErrorMessage>{form.formState.errors.scopeType?.message}</UI.ErrorMessage>
                     </UI.FormControl>
 
-                    <UI.FormControl isRequired isInvalid={!!form.errors.activeDialogue}>
+                    <UI.FormControl isRequired isInvalid={!!form.formState.errors.activeDialogue}>
                       <UI.FormLabel htmlFor="activeDialogue">
                         {t('dialogue')}
                       </UI.FormLabel>
@@ -168,7 +183,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                                     name="activeDialogue"
                                     control={form.control}
                                     defaultValue={null}
-                                    render={({ value, onChange }) => (
+                                    render={({ field: { value, onChange } }) => (
                                       <Dropdown
                                         isRelative
                                         renderOverlay={({ onClose: onDialoguePickerClose }) => (
@@ -215,7 +230,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                       </UI.Div>
                     </UI.FormControl>
 
-                    <UI.FormControl isRequired isInvalid={!!form.errors.activeDialogue}>
+                    <UI.FormControl isRequired isInvalid={!!form.formState.errors.activeDialogue}>
                       <UI.FormLabel htmlFor="questionType">
                         {t('question')}
                       </UI.FormLabel>
@@ -250,7 +265,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                                     name="activeQuestion"
                                     control={form.control}
                                     defaultValue={null}
-                                    render={({ value, onChange }) => (
+                                    render={({ field: { value, onChange } }) => (
                                       <Dropdown
                                         isRelative
                                         renderOverlay={({ onClose: onDialoguePickerClose }) => (
@@ -299,13 +314,13 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                     </UI.FormControl>
 
                     {watchScopeType === 'QUESTION' && (
-                      <UI.FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.aspect}>
+                      <UI.FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.formState.errors.aspect}>
                         <UI.FormLabel htmlFor="aspect">{t('automation:property')}</UI.FormLabel>
                         <UI.InputHelper>{t('automation:property_helper')}</UI.InputHelper>
                         <Controller
                           control={form.control}
                           name="aspect"
-                          render={({ onBlur, onChange, value }) => (
+                          render={({ field: { onBlur, onChange, value } }) => (
                             <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                               <UI.RadioButton
                                 value="NODE_VALUE"
@@ -323,18 +338,19 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                             </UI.RadioButtons>
                           )}
                         />
-                        <UI.ErrorMessage>{form.errors.scopeType?.message}</UI.ErrorMessage>
+                        <UI.ErrorMessage>{form.formState.errors.scopeType?.message}</UI.ErrorMessage>
                       </UI.FormControl>
                     )}
 
-                    {watchAspectType === 'NODE_VALUE' && ( // TODO: Add check if selected question is choice or videoembedded before showing this field
+                    {watchAspectType === 'NODE_VALUE' && (
+                      // TODO: Add check if selected question is choice or videoembedded before showing this field
                       <UI.FormControl isRequired>
                         <UI.FormLabel htmlFor="questionOption">{t('automation:question_option')}</UI.FormLabel>
                         <Controller
                           name="questionOption"
                           control={form.control}
                           defaultValue={null}
-                          render={({ value, onChange, onBlur }) => (
+                          render={({ field: { value, onChange, onBlur } }) => (
                             <Select
                               placeholder="Select a dialogue"
                               id="questionOption"
@@ -363,13 +379,13 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                 </UI.Div>
                 <UI.Div>
                   <UI.InputGrid>
-                    <UI.FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.scopeType}>
+                    <UI.FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.formState.errors.scopeType}>
                       <UI.FormLabel htmlFor="aggregate">{t('automation:aggregate_type')}</UI.FormLabel>
                       <UI.InputHelper>{t('automation:aggregate_type_helper')}</UI.InputHelper>
                       <Controller
                         control={form.control}
                         name="aggregate"
-                        render={({ onBlur, onChange, value }) => (
+                        render={({ field: { onBlur, onChange, value } }) => (
                           <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                             <UI.RadioButton
                               value="AVG"
@@ -386,7 +402,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                           </UI.RadioButtons>
                         )}
                       />
-                      <UI.ErrorMessage>{form.errors.scopeType?.message}</UI.ErrorMessage>
+                      <UI.ErrorMessage>{form.formState.errors.scopeType?.message}</UI.ErrorMessage>
                     </UI.FormControl>
 
                     <UI.FormControl>
@@ -396,7 +412,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                         <Controller
                           name="dateRange"
                           control={form.control}
-                          render={({ onChange, value }) => (
+                          render={({ field: { onChange, value } }) => (
                             <UI.DatePicker
                               value={value}
                               format="DD-MM-YYYY HH:mm"
@@ -408,7 +424,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                       </UI.Div>
                     </UI.FormControl>
 
-                    <UI.FormControl isRequired isInvalid={!!form.errors.latest}>
+                    <UI.FormControl isRequired isInvalid={!!form.formState.errors.latest}>
                       <UI.FormLabel htmlFor="latest">
                         {t('automation:latest')}
                       </UI.FormLabel>
@@ -419,7 +435,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                         <Controller
                           control={form.control}
                           name="latest"
-                          render={({ onChange, value }) => (
+                          render={({ field: { onChange, value } }) => (
                             <UI.FormSlider
                               onChange={onChange}
                               defaultValue={value}
@@ -430,7 +446,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                             />
                           )}
                         />
-                        <UI.ErrorMessage>{form.errors.latest?.message}</UI.ErrorMessage>
+                        <UI.ErrorMessage>{form.formState.errors.latest?.message}</UI.ErrorMessage>
                         <UI.Div position="absolute" bottom={0} left={0}>1</UI.Div>
                         <UI.Div position="absolute" bottom={0} right={-7.5}>100</UI.Div>
 

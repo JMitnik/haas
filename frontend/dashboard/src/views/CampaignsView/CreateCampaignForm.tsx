@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 
 import { CircularProgress, CircularProgressLabel, useToast } from '@chakra-ui/core';

@@ -8,7 +8,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { List, PlusCircle, Sliders, Trash, Youtube } from 'react-feather';
 import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 

@@ -12,7 +12,7 @@ import {
   useGetPreviewDataLazyQuery,
 } from 'types/generated-types';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import boolToInt from 'utils/booleanToNumber';

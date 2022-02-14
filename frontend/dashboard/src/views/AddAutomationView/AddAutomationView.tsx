@@ -1,6 +1,9 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Bell, Clock, Copy, MessageSquare, MoreVertical, PlusCircle, RefreshCcw, Trash, Trash2, Type, User } from 'react-feather';
+import {
+  Bell,
+  Clock, Copy, MessageSquare, MoreVertical, PlusCircle, RefreshCcw, Trash2, Type,
+} from 'react-feather';
 import { Button, ButtonGroup } from '@chakra-ui/core';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import {
@@ -10,7 +13,7 @@ import {
 import { motion } from 'framer-motion';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
@@ -29,12 +32,31 @@ const schema = yup.object({
   conditions: yup.array().of(
     yup.object().required().shape(
       {
-        logic: yup.string().notRequired(),
+        logical: yup.object().shape({
+          label: yup.string().required(),
+          value: yup.string().required(),
+        }),
+        operator: yup.object().shape({
+          label: yup.string().required(),
+          value: yup.string().required(),
+        }).nullable(),
+        compareTo: yup.number().notRequired(),
+        depth: yup.number().required(),
+        condition: yup.object().shape({
+          scopeType: yup.string().required(),
+        }).required(),
+      },
+    ),
+  ).required(),
+  ietsAnders: yup.array().of(
+    yup.object().required().shape(
+      {
+        logical: yup.string().notRequired(),
         operator: yup.string().notRequired(),
         compareTo: yup.number().notRequired(),
       },
     ),
-  ),
+  ).required(),
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
@@ -70,7 +92,7 @@ export const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
 
 const DEPTH_BACKGROUND_COLORS = [
   '#fbfcff',
-  '#c8cacc',
+  '#eceef0',
 ];
 
 const OPERATORS = [
@@ -105,6 +127,7 @@ const AddAutomationView = () => {
     defaultValues: {
       automationType: 'TRIGGER',
       conditions: [],
+      ietsAnders: [],
     },
   });
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<any>();
@@ -123,7 +146,6 @@ const AddAutomationView = () => {
   const watchedConditions = useWatch({
     name: 'conditions',
     control: form.control,
-    defaultValue: [],
   });
   console.log('watch', watchedConditions);
 
@@ -146,7 +168,7 @@ const AddAutomationView = () => {
                 </Div>
                 <Div>
                   <InputGrid>
-                    <FormControl isRequired isInvalid={!!form.errors.title}>
+                    <FormControl isRequired isInvalid={!!form.formState.errors.title}>
                       <FormLabel htmlFor="title">{t('title')}</FormLabel>
                       <InputHelper>{t('automation:title_helper')}</InputHelper>
                       <Input
@@ -154,7 +176,7 @@ const AddAutomationView = () => {
                         leftEl={<Type />}
                         {...form.register('title', { required: 'Error title' })}
                       />
-                      <UI.ErrorMessage>{t(form.errors.title?.message || '')}</UI.ErrorMessage>
+                      <UI.ErrorMessage>{t(form.formState.errors.title?.message || '')}</UI.ErrorMessage>
                     </FormControl>
 
                     <UI.FormControl>
@@ -164,8 +186,8 @@ const AddAutomationView = () => {
                         control={form.control}
                         name="automationType"
                         defaultValue="TRIGGER"
-                        render={({ onBlur, onChange, value }) => (
-                          <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
+                        render={({ field }) => (
+                          <UI.RadioButtons onBlur={field.onBlur} onChange={field.onChange} value={field.value}>
                             <UI.RadioButton
                               icon={Bell}
                               value="TRIGGER"
@@ -226,7 +248,7 @@ const AddAutomationView = () => {
                         </UI.Grid>
                         {conditionFields.map((condition, index) => (
                           <UI.Grid
-                            key={condition.arrayKey}
+                            key={condition?.arrayKey}
                             p={2}
                             pl={0}
                             borderBottom="1px solid #edf2f7"
@@ -234,7 +256,7 @@ const AddAutomationView = () => {
                             backgroundColor={DEPTH_BACKGROUND_COLORS[condition.depth]}
                             position="relative"
                           >
-                            <input defaultValue={0} type="hidden" ref={form.register()} name={`conditions[${index}].depth`} />
+                            <input defaultValue={0} type="hidden" {...form.register(`conditions.${index}.depth`)} />
                             <UI.Icon
                               color="#808b9a"
                               style={{ cursor: 'pointer', position: 'absolute', right: -25, top: 20 }}
@@ -246,19 +268,24 @@ const AddAutomationView = () => {
                             <UI.Div>
                               <Controller
                                 defaultValue={{ label: 'AND', value: 'AND' }}
-                                name={`conditions[${index}].logical`}
+                                name={`conditions.${index}.logical`}
                                 control={form.control}
-                                options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
-                                as={Select}
+                                render={({ field }) => (
+                                  <Select
+                                    options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                  />
+                                )}
                               />
                             </UI.Div>
 
                             <UI.Div alignItems="center" display="flex">
                               <Controller
-                                name={`conditions[${index}].condition`}
+                                name={`conditions.${index}.condition`}
                                 control={form.control}
                                 defaultValue={condition.condition}
-                                render={({ value, onChange }) => (
+                                render={({ field: { value, onChange } }) => (
                                   <Dropdown
                                     defaultCloseOnClickOutside={false}
                                     renderOverlay={({ onClose, setCloseClickOnOutside }) => (
@@ -306,17 +333,17 @@ const AddAutomationView = () => {
                             </UI.Div>
                             <UI.Div>
                               <Controller
-                                name={`conditions[${index}].operator`}
+                                name={`conditions.${index}.operator`}
                                 defaultValue={null}
                                 control={form.control}
-                                options={OPERATORS}
-                                as={Select}
+                                render={({ field: { value, onChange } }) => (
+                                  <Select options={OPERATORS} onChange={onChange} value={value} />
+                                )}
                               />
                             </UI.Div>
                             <FormControl isRequired>
                               <Input
-                                name={`conditions[${index}].compareTo`}
-                                ref={form.register({ required: true })}
+                                {...form.register(`conditions.${index}.compareTo`, { required: true })}
                               />
                             </FormControl>
                           </UI.Grid>
@@ -325,7 +352,7 @@ const AddAutomationView = () => {
                           <UI.Button
                             variantColor="gray"
                             onClick={
-                              () => append({ logical: { label: 'AND', value: 'AND' } })
+                              () => append({ logical: { label: 'AND', value: 'AND' }, depth: 0 })
                             }
                           >
                             <UI.Icon mr={1}>
@@ -377,7 +404,7 @@ const AddAutomationView = () => {
           onSuccess={(condition: any) => {
             append({
               logical: { label: 'AND', value: 'AND' },
-              depth: '0',
+              depth: 0,
               condition,
             });
           }}
@@ -425,17 +452,18 @@ const AddAutomationView = () => {
         </Menu.Item>
         <Menu.Item
           style={{ padding: '6px 12px' }}
-          disabled={false}
+          disabled={activeItem?.depth === 1}
           onClick={() => {
             console.log('Turn into group: ', activeItem.arrayKey);
             const conditionIndex = conditionFields.findIndex((field) => field.arrayKey === activeItem.arrayKey);
             console.log('condition index: ', conditionIndex);
             const newDepth = parseInt(activeItem.depth, 10) + 1;
             console.log('new depth: ', newDepth);
-            const { arrayKey, ...activeCondition } = activeItem;
-            const updatedCondition = { activeCondition, depth: newDepth };
-            form.setValue(`conditions[${conditionIndex}]`, updatedCondition);
-            form.trigger();
+            // const { arrayKey, ...activeCondition } = activeItem;
+            // const updatedCondition = { activeCondition, depth: newDepth };
+            update(conditionIndex, { depth: newDepth });
+            // form.setValue(`conditions.${conditionIndex}.depth`, newDepth);
+            // form.trigger();
           }}
         >
           <UI.Flex color="#4A5568">

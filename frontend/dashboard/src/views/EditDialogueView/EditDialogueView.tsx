@@ -12,7 +12,7 @@ import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
 
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import Select from 'react-select';
 

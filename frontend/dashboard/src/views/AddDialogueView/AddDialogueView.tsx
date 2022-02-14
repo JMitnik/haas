@@ -18,7 +18,7 @@ import { MATCH_URL_EXTENSION_FORMAT } from 'utils/validationHelpers';
 import { createDialogue } from 'mutations/createDialogue';
 import { motion } from 'framer-motion';
 import { useUser } from 'providers/UserProvider';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import ServerError from 'components/ServerError';
 import getCustomersOfUser from 'queries/getCustomersOfUser';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';

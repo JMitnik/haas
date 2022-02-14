@@ -13,7 +13,7 @@ import { Link, Trash, Type } from 'react-feather';
 import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 import Select from 'react-select';
 
@@ -142,7 +142,7 @@ const CTAForm = ({
 }: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
   const { customerSlug, dialogueSlug, questionId } = useParams<
-  { customerSlug: string, dialogueSlug: string, questionId?: string }
+    { customerSlug: string, dialogueSlug: string, questionId?: string }
   >();
 
   const form = useForm<FormDataProps>({

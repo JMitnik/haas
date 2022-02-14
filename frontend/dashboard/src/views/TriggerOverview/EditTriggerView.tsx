@@ -7,7 +7,7 @@ import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/client';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 
 import editTriggerMutation from 'mutations/editTrigger';

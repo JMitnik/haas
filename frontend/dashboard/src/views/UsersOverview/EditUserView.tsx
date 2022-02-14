@@ -11,7 +11,7 @@ import { gql, useMutation } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 import Select from 'react-select';
 
@@ -238,7 +238,7 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
 };
 
 const EditUserView = () => {
-  console.log("Test")
+  console.log('Test');
   const { activeCustomer } = useCustomer();
   const { userId } = useParams<{ userId: string }>();
 
