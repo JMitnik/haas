@@ -44,7 +44,6 @@ interface NodeCellProps {
 
 export const NodeCell = ({ node, onClick, onRemove }: NodeCellProps) => {
   if (!node.type) return null;
-
   const nodeProps = MapNodeToProperties(node.type);
 
   const removeCTAFromOption = (e: any) => {

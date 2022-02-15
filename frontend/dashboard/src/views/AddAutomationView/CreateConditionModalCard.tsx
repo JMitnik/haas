@@ -2,16 +2,20 @@ import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { PlusCircle } from 'react-feather';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Select from 'react-select';
 
 import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
-import { QuestionNodeTypeEnum } from 'types/generated-types';
+import { QuestionNode, QuestionNodeTypeEnum, useGetWorkspaceDialoguesQuery } from 'types/generated-types';
+import { useCustomer } from 'providers/CustomerProvider';
+
 import Dropdown from 'components/Dropdown';
+import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
 interface NewCTAModalCardProps {
   onClose: () => void;
@@ -28,15 +32,14 @@ type TwoDateArray = [Date, Date];
 export interface FormDataProps {
   scopeType: string;
   activeDialogue: {
-    title: string;
-    id: string;
+    type: string;
+    value: string;
     label?: string;
   } | null;
   activeQuestion: {
-    title: string;
-    id: string;
     type: string;
-    label?: string;
+    value: string;
+    label: string;
   } | null,
   aspect: string | null;
   questionOption: { label: string, value: string } | null;
@@ -47,6 +50,7 @@ export interface FormDataProps {
 
 export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) => {
   const { t } = useTranslation();
+  const { activeCustomer } = useCustomer();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -73,12 +77,48 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
     onClose();
   };
 
+  const { data: dialoguesData, loading } = useGetWorkspaceDialoguesQuery({
+    variables: {
+      customerSlug: activeCustomer?.slug as string,
+    },
+    onCompleted: (data) => {
+      console.log('data: ', data?.customer?.dialogues);
+    },
+  });
+
+  const [getQuestions, { data: questionsData }] = useLazyQuery(getTopicBuilderQuery);
+
   // TODO: Replace with query fetching all dialogues
-  const dialogueItems = [{ value: '0x324324234', label: 'Dialogue#1', type: QuestionNodeTypeEnum.Form }];
+  const dialogueItems = dialoguesData?.customer?.dialogues?.map(
+    (dialogue) => ({ value: dialogue.slug, label: dialogue.title, type: 'DIALOGUE' }),
+  ) || [];
 
-  const questionItems = [{ value: '0x324324234', label: 'Question#1', type: QuestionNodeTypeEnum.Slider }];
+  const questionItems = questionsData?.customer?.dialogue?.questions?.map(
+    (question: QuestionNode) => ({
+      value: question.id,
+      label: question.title,
+      type: question.type,
+      questionOptions: question.options,
+    }),
+  ) || [];
 
-  const questionOptions = [{ value: 'kaas', label: 'KAAS' }] || [];
+  const watchActiveQuestion = useWatch({
+    control: form.control,
+    name: 'activeQuestion',
+    defaultValue: null,
+  });
+
+  console.log('Active question: ', watchActiveQuestion);
+
+  const questionOptions = watchActiveQuestion
+    ? questionItems.find(
+      (question: any) => question.value === watchActiveQuestion.value,
+    )?.questionOptions?.map(
+      (option: any) => ({ label: option.value, value: option.value }),
+    ) || []
+    : [];
+
+  console.log('Question options: ', questionOptions);
 
   const watchScopeType = useWatch({
     control: form.control,
@@ -97,6 +137,25 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
     name: 'latest',
     defaultValue: 1,
   });
+
+  const watchActiveDialogue = useWatch({
+    control: form.control,
+    name: 'activeDialogue',
+    defaultValue: null,
+  });
+
+  useEffect(() => {
+    if (watchActiveDialogue) {
+      getQuestions({
+        variables: {
+          customerSlug: activeCustomer?.slug,
+          dialogueSlug: watchActiveDialogue?.value,
+        },
+      });
+    } else {
+      form.setValue('activeQuestion', null);
+    }
+  }, [watchActiveDialogue]);
 
   return (
     <UI.ModalCard maxWidth={1000} onClose={onClose}>

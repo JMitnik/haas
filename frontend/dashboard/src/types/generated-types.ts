@@ -2478,6 +2478,19 @@ export type UploadUpsellImageMutation = (
   )> }
 );
 
+export type CreateAutomationMutationVariables = Exact<{
+  input?: Maybe<CreateAutomationInput>;
+}>;
+
+
+export type CreateAutomationMutation = (
+  { __typename?: 'Mutation' }
+  & { createAutomation: (
+    { __typename?: 'AutomationModel' }
+    & Pick<AutomationModel, 'id' | 'label'>
+  ) }
+);
+
 export type GetWorkspaceAdminsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
 }>;
@@ -3383,6 +3396,40 @@ export function useUploadUpsellImageMutation(baseOptions?: Apollo.MutationHookOp
 export type UploadUpsellImageMutationHookResult = ReturnType<typeof useUploadUpsellImageMutation>;
 export type UploadUpsellImageMutationResult = Apollo.MutationResult<UploadUpsellImageMutation>;
 export type UploadUpsellImageMutationOptions = Apollo.BaseMutationOptions<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>;
+export const CreateAutomationDocument = gql`
+    mutation createAutomation($input: CreateAutomationInput) {
+  createAutomation(input: $input) {
+    id
+    label
+  }
+}
+    `;
+export type CreateAutomationMutationFn = Apollo.MutationFunction<CreateAutomationMutation, CreateAutomationMutationVariables>;
+
+/**
+ * __useCreateAutomationMutation__
+ *
+ * To run a mutation, you first call `useCreateAutomationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateAutomationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createAutomationMutation, { data, loading, error }] = useCreateAutomationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateAutomationMutation(baseOptions?: Apollo.MutationHookOptions<CreateAutomationMutation, CreateAutomationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateAutomationMutation, CreateAutomationMutationVariables>(CreateAutomationDocument, options);
+      }
+export type CreateAutomationMutationHookResult = ReturnType<typeof useCreateAutomationMutation>;
+export type CreateAutomationMutationResult = Apollo.MutationResult<CreateAutomationMutation>;
+export type CreateAutomationMutationOptions = Apollo.BaseMutationOptions<CreateAutomationMutation, CreateAutomationMutationVariables>;
 export const GetWorkspaceAdminsDocument = gql`
     query GetWorkspaceAdmins($customerSlug: String!) {
   users(customerSlug: $customerSlug) {

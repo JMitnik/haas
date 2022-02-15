@@ -15,7 +15,6 @@ import { NodePickerHeader } from './NodePickerStyles';
 
 const DropdownOption = (props: any) => {
   const nodeProps = MapNodeToProperties(props.data.type);
-
   return (
     <NodeCellContainer>
       <components.Option {...props}>
@@ -77,6 +76,7 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
   const [filteredItems, setFilteredItems] = useState(items);
   const { t } = useTranslation();
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
+  console.log('ITEMS: ', items);
 
   const handleChange = (callToAction: QuestionNode) => {
     onChange({

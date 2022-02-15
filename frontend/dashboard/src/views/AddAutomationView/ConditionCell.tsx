@@ -41,6 +41,7 @@ interface NodeCellProps {
 }
 
 export const ConditionCell = ({ condition, onClick, onRemove }: NodeCellProps) => {
+  console.log('condition: ', condition);
   if (!condition.scopeType) return null;
 
   // const nodeProps = MapNodeToProperties(node.type);
@@ -74,11 +75,11 @@ export const ConditionCell = ({ condition, onClick, onRemove }: NodeCellProps) =
             {' '}
             of option
             {' '}
-            <UI.Span color="#4A5568" fontWeight="bold">{condition.questionOption.label}</UI.Span>
+            <UI.Span color="#4A5568" fontWeight="bold">{condition?.questionOption}</UI.Span>
             {' '}
             in the last
             {' '}
-            <UI.Span color="#4A5568" fontWeight="bold">{condition.latest}</UI.Span>
+            <UI.Span color="#4A5568" fontWeight="bold">{condition?.latest}</UI.Span>
             {' '}
             entries
             {condition.dateRange && (
@@ -96,6 +97,7 @@ export const ConditionCell = ({ condition, onClick, onRemove }: NodeCellProps) =
               </UI.Span>
 
             )}
+            {' '}
             should be
           </UI.Text>
           <UI.Flex pt="0.5em">

@@ -18,8 +18,19 @@ import React, { useState } from 'react';
 import Select from 'react-select';
 
 import * as Menu from 'components/Common/Menu';
+import {
+  AutomationConditionBuilderType,
+  AutomationConditionOperatorType,
+  AutomationConditionScopeType,
+  AutomationEventType, AutomationType,
+  ConditionPropertyAggregateType,
+  OperandType,
+  QuestionAspectType,
+  useCreateAutomationMutation,
+} from 'types/generated-types';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodePicker } from 'components/NodePicker';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import Dropdown from 'components/Dropdown';
 
@@ -28,35 +39,55 @@ import { CreateConditionModalCard } from './CreateConditionModalCard';
 
 const schema = yup.object({
   title: yup.string().required('Title is required'),
-  automationType: yup.string().required(),
-  conditions: yup.array().of(
-    yup.object().required().shape(
-      {
-        logical: yup.object().shape({
-          label: yup.string().required(),
-          value: yup.string().required(),
-        }),
-        operator: yup.object().shape({
-          label: yup.string().required(),
-          value: yup.string().required(),
-        }).nullable(),
-        compareTo: yup.number().notRequired(),
-        depth: yup.number().required(),
-        condition: yup.object().shape({
-          scopeType: yup.string().required(),
-        }).required(),
-      },
-    ),
-  ).required(),
-  ietsAnders: yup.array().of(
-    yup.object().required().shape(
-      {
-        logical: yup.string().notRequired(),
-        operator: yup.string().notRequired(),
-        compareTo: yup.number().notRequired(),
-      },
-    ),
-  ).required(),
+  automationType: yup.mixed<AutomationType>().oneOf(Object.values(AutomationType)),
+  conditionBuilder: yup.object().shape({
+    logical: yup.object().shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+    }).nullable(),
+    conditions: yup.array().of(
+      yup.object().required().shape(
+        {
+          operator: yup.object().shape({
+            label: yup.string().required(),
+            value: yup.string().required(),
+          }).nullable(),
+          compareTo: yup.number().notRequired(),
+          depth: yup.number().required(),
+          condition: yup.object().shape({
+            scopeType: yup.string().required(),
+            activeDialogue: yup.string().notRequired().nullable(),
+            activeQuestion: yup.string().notRequired().nullable(),
+            aspect: yup.string().required(),
+            aggregate: yup.mixed<ConditionPropertyAggregateType>().oneOf(Object.values(ConditionPropertyAggregateType)),
+            latest: yup.number().required(),
+            questionOption: yup.string().notRequired(),
+          }).required(),
+        },
+      ),
+    ).required(),
+    childBuilder: yup.object().shape({
+      logical: yup.object().shape({
+        label: yup.string().required(),
+        value: yup.string().required(),
+      }),
+      conditions: yup.array().of(
+        yup.object().required().shape(
+          {
+            operator: yup.object().shape({
+              label: yup.string().required(),
+              value: yup.string().required(),
+            }).nullable(),
+            compareTo: yup.number().notRequired(),
+            depth: yup.number().required(),
+            condition: yup.object().shape({
+              scopeType: yup.string().required(),
+            }).required(),
+          },
+        ),
+      ).required(),
+    }).nullable(),
+  }),
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
@@ -78,21 +109,9 @@ export const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
   );
 };
 
-// SMALLER_THAN
-//   SMALLER_OR_EQUAL_THAN
-//   GREATER_THAN
-//   GREATER_OR_EQUAL_THAN
-//   INNER_RANGE
-//   OUTER_RANGE
-//   IS_EQUAL
-//   IS_NOT_EQUAL
-//   IS_TRUE
-//   IS_FALSE
-//   EVERY_N_TH_TIME
-
 const DEPTH_BACKGROUND_COLORS = [
   '#fbfcff',
-  '#eceef0',
+  '#f5f8fa',
 ];
 
 const OPERATORS = [
@@ -125,29 +144,94 @@ const AddAutomationView = () => {
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
-      automationType: 'TRIGGER',
-      conditions: [],
-      ietsAnders: [],
+      automationType: AutomationType.Trigger,
+      conditionBuilder: {
+        logical: { label: 'AND', value: 'AND' },
+        childBuilder: null,
+        conditions: [],
+      },
     },
   });
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<any>();
   const { t } = useTranslation();
+  const { activeCustomer } = useCustomer();
+
+  const [createMutation, { loading }] = useCreateAutomationMutation({
+    onCompleted: (data) => {
+      console.log('return data create automation mutation: ', data?.createAutomation?.label);
+      // TODO: Go back to automations overview
+    },
+    onError: (e) => {
+      console.log('Something went wrong: ', e.message);
+    },
+  });
 
   const { append, remove, fields: conditionFields, update } = useFieldArray({
-    name: 'conditions',
+    name: 'conditionBuilder.conditions',
     control: form.control,
     keyName: 'arrayKey',
   });
 
   const onSubmit = (formData: FormDataProps) => {
     console.log('Form data; ', formData);
+    // TODO: Create a field for event type
+    // TODO: Create a picker for questionId/dialogueId for event
+
+    // createMutation({
+    //   variables: {
+    //     input: {
+    //       automationType: formData.automationType,
+    //       label: formData.title,
+    //       workspaceId: activeCustomer?.id,
+    //       event: {
+    //         eventType: AutomationEventType.NewInteractionQuestion, // TODO: Make this dynamic
+    //         questionId: formData.conditionBuilder?.conditions?.[0]?.condition.activeQuestion,
+    //       },
+    //       conditionBuilder: {
+    //         type: formData?.conditionBuilder?.logical?.value as AutomationConditionBuilderType,
+    //         conditions: [
+    //           {
+    //             scope: {
+    //               type: formData.conditionBuilder?.conditions?.[0]
+    //                 ?.condition?.scopeType as AutomationConditionScopeType,
+    //               questionScope: {
+    //                 aspect: formData.conditionBuilder?.conditions?.[0]?.condition?.aspect as QuestionAspectType,
+    //                 aggregate: {
+    //                   type: formData.conditionBuilder?.conditions?.[0]
+    //                     ?.condition?.scopeType as ConditionPropertyAggregateType,
+    //                   latest: formData.conditionBuilder?.conditions?.[0]?.condition?.latest,
+    //                 },
+    //               },
+    //             },
+    //             operator: formData.conditionBuilder?.conditions?.[0]
+    //               ?.operator?.value as AutomationConditionOperatorType,
+    //             questionId: formData.conditionBuilder?.conditions?.[0]?.condition.activeQuestion,
+    //             dialogueId: formData.conditionBuilder?.conditions?.[0]?.condition.activeDialogue,
+    //             workspaceId: activeCustomer?.id,
+    //             operands: [
+    //               {
+    //                 operandType: OperandType.Int,
+    //                 numberValue: formData.conditionBuilder?.conditions?.[0]?.compareTo,
+    //               },
+    //               {
+    //                 operandType: OperandType.String,
+    //                 textValue: formData.conditionBuilder?.conditions?.[0]?.condition?.questionOption,
+    //               },
+    //             ],
+    //           },
+    //         ],
+    //       },
+    //     },
+    //   },
+    // });
   };
 
-  const watchedConditions = useWatch({
-    name: 'conditions',
+  const watchedConditionBuilder = useWatch({
+    name: 'conditionBuilder',
     control: form.control,
   });
-  console.log('watch', watchedConditions);
+  console.log('watch', watchedConditionBuilder);
+  console.log('Condition dields: ', conditionFields);
 
   return (
     <>
@@ -185,12 +269,12 @@ const AddAutomationView = () => {
                       <Controller
                         control={form.control}
                         name="automationType"
-                        defaultValue="TRIGGER"
+                        defaultValue={AutomationType.Trigger}
                         render={({ field }) => (
                           <UI.RadioButtons onBlur={field.onBlur} onChange={field.onChange} value={field.value}>
                             <UI.RadioButton
                               icon={Bell}
-                              value="TRIGGER"
+                              value={AutomationType.Trigger}
                               mr={2}
                               text={(t('automation:trigger'))}
                               description={t('automation:trigger_helper')}
@@ -206,7 +290,7 @@ const AddAutomationView = () => {
                             <UI.RadioButton
                               icon={MessageSquare}
                               isDisabled
-                              value="CAMPAIGNER"
+                              value={AutomationType.Campaign}
                               mr={2}
                               text={(t('automation:campaigner'))}
                               description={t('automation:campaigner_helper')}
@@ -236,10 +320,12 @@ const AddAutomationView = () => {
                     border="1px solid #edf2f7"
                     borderRadius="10px"
                     padding={4}
+                    paddingLeft={0}
+                    paddingRight={0}
                   >
                     {conditionFields.length ? (
                       <>
-                        <UI.Grid gridTemplateColumns="1.2fr 4fr 1.2fr 2fr">
+                        <UI.Grid m={2} gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto">
 
                           <UI.Helper>{t('automation:logic')}</UI.Helper>
                           <UI.Helper>{t('automation:condition')}</UI.Helper>
@@ -249,42 +335,38 @@ const AddAutomationView = () => {
                         {conditionFields.map((condition, index) => (
                           <UI.Grid
                             key={condition?.arrayKey}
+                            ml={2}
+                            mr={2}
                             p={2}
-                            pl={0}
+                            borderRadius="6px"
                             borderBottom="1px solid #edf2f7"
-                            gridTemplateColumns="1.2fr 4fr 1.2fr 2fr"
-                            backgroundColor={DEPTH_BACKGROUND_COLORS[condition.depth]}
+                            gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto"
+                            backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
                             position="relative"
                           >
-                            <input defaultValue={0} type="hidden" {...form.register(`conditions.${index}.depth`)} />
-                            <UI.Icon
-                              color="#808b9a"
-                              style={{ cursor: 'pointer', position: 'absolute', right: -25, top: 20 }}
-                              mr={1}
-                              onClick={(e) => openMenu(e, condition)}
-                            >
-                              <MoreVertical />
-                            </UI.Icon>
+                            <input defaultValue={0} type="hidden" {...form.register(`conditionBuilder.conditions.${index}.depth`)} />
                             <UI.Div>
-                              <Controller
-                                defaultValue={{ label: 'AND', value: 'AND' }}
-                                name={`conditions.${index}.logical`}
-                                control={form.control}
-                                render={({ field }) => (
-                                  <Select
-                                    options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                  />
-                                )}
-                              />
+                              {index !== 0 && (
+                                <Controller
+                                  name="conditionBuilder.logical"
+                                  control={form.control}
+                                  render={({ field }) => (
+                                    <Select
+                                      options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
+                                      value={field.value}
+                                      onChange={field.onChange}
+                                    />
+                                  )}
+                                />
+                              )}
+
                             </UI.Div>
 
                             <UI.Div alignItems="center" display="flex">
                               <Controller
-                                name={`conditions.${index}.condition`}
+                                name={`conditionBuilder.conditions.${index}.condition`}
                                 control={form.control}
-                                defaultValue={condition.condition}
+                                defaultValue={(condition as any)?.condition}
                                 render={({ field: { value, onChange } }) => (
                                   <Dropdown
                                     defaultCloseOnClickOutside={false}
@@ -333,8 +415,8 @@ const AddAutomationView = () => {
                             </UI.Div>
                             <UI.Div>
                               <Controller
-                                name={`conditions.${index}.operator`}
-                                defaultValue={null}
+                                name={`conditionBuilder.conditions.${index}.operator`}
+                                defaultValue={undefined}
                                 control={form.control}
                                 render={({ field: { value, onChange } }) => (
                                   <Select options={OPERATORS} onChange={onChange} value={value} />
@@ -343,9 +425,17 @@ const AddAutomationView = () => {
                             </UI.Div>
                             <FormControl isRequired>
                               <Input
-                                {...form.register(`conditions.${index}.compareTo`, { required: true })}
+                                {...form.register(`conditionBuilder.conditions.${index}.compareTo`, { required: true })}
                               />
                             </FormControl>
+                            <UI.Icon
+                              color="#808b9a"
+                              style={{ cursor: 'pointer' }}
+                              mr={1}
+                              onClick={(e) => openMenu(e, condition)}
+                            >
+                              <MoreVertical />
+                            </UI.Icon>
                           </UI.Grid>
                         ))}
                         <UI.Div mt={4}>
@@ -403,8 +493,6 @@ const AddAutomationView = () => {
           onClose={() => setCreateModalIsOpen(false)}
           onSuccess={(condition: any) => {
             append({
-              logical: { label: 'AND', value: 'AND' },
-              depth: 0,
               condition,
             });
           }}
@@ -440,6 +528,7 @@ const AddAutomationView = () => {
           onClick={() => {
             console.log('Duplicate active item: ', activeItem.arrayKey);
             const { arrayKey, ...activeConditionBuilder } = activeItem;
+            console.log('ACTIVEEEE: ', activeConditionBuilder);
             append(activeConditionBuilder);
           }}
         >
@@ -454,16 +543,9 @@ const AddAutomationView = () => {
           style={{ padding: '6px 12px' }}
           disabled={activeItem?.depth === 1}
           onClick={() => {
-            console.log('Turn into group: ', activeItem.arrayKey);
             const conditionIndex = conditionFields.findIndex((field) => field.arrayKey === activeItem.arrayKey);
-            console.log('condition index: ', conditionIndex);
             const newDepth = parseInt(activeItem.depth, 10) + 1;
-            console.log('new depth: ', newDepth);
-            // const { arrayKey, ...activeCondition } = activeItem;
-            // const updatedCondition = { activeCondition, depth: newDepth };
             update(conditionIndex, { depth: newDepth });
-            // form.setValue(`conditions.${conditionIndex}.depth`, newDepth);
-            // form.trigger();
           }}
         >
           <UI.Flex color="#4A5568">

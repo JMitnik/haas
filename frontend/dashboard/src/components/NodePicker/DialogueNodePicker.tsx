@@ -4,46 +4,36 @@ import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
+import { Dialogue, QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
 import { NodeCellContainer } from 'components/NodeCell/NodeCell';
-import { QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
 
 import { NodePickerHeader } from './NodePickerStyles';
 
-const DropdownOption = (props: any) => {
-  const nodeProps = MapNodeToProperties(props.data.type);
-
-  return (
-    <NodeCellContainer>
-      <components.Option {...props}>
-        <UI.Flex>
-          <UI.Icon
-            bg={nodeProps.bg}
-            color={nodeProps.color}
-            height="2rem"
-            width="2rem"
-            stroke={nodeProps.stroke || undefined}
-            style={{ flexShrink: 0 }}
-            mr={3}
-          >
-            <nodeProps.icon />
-          </UI.Icon>
-          <UI.Div>
-            <UI.Text>
-              {props.label}
-            </UI.Text>
-            <UI.MicroLabel
-              bg={nodeProps.bg}
-              color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}
-            >
-              {props.data.type}
-            </UI.MicroLabel>
-          </UI.Div>
-        </UI.Flex>
-      </components.Option>
-    </NodeCellContainer>
-  );
-};
+const DropdownOption = (props: any) => (
+  <NodeCellContainer>
+    <components.Option {...props}>
+      <UI.Flex alignItems="center">
+        <UI.Div
+          display="flex"
+          justifyContent="center"
+          bg="#F7C948"
+          color="white"
+          padding="0.4em 0.8em"
+          mr={3}
+          borderRadius="10px"
+        >
+          <UI.Span fontWeight="bold">D</UI.Span>
+        </UI.Div>
+        <UI.Div>
+          <UI.Text>
+            {props.label}
+          </UI.Text>
+        </UI.Div>
+      </UI.Flex>
+    </components.Option>
+  </NodeCellContainer>
+);
 
 const DropdownSingleValue = (props: any) => (
   <components.SingleValue {...props}>
@@ -55,7 +45,7 @@ const DropdownSingleValue = (props: any) => (
   </components.SingleValue>
 );
 
-interface NodeSelect extends Partial<QuestionNode> {
+interface NodeSelect extends Partial<Dialogue> {
   label: string;
   value: string;
 }
