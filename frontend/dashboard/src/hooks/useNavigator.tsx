@@ -19,7 +19,7 @@ export const ROUTES = {
   DIALOGUE_BUILDER_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder',
   NEW_QUESTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/question/:questionId/new-cta',
   NEW_OPTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/option/:optionIndex/new-cta',
-  AUTOMATION_OVERVIEW: 'dashboard/b/:customerSlug/automations',
+  AUTOMATION_OVERVIEW: '/dashboard/b/:customerSlug/automations',
   NEW_AUTOMATION_VIEW: '/dashboard/b/:customerSlug/automation/add',
 };
 

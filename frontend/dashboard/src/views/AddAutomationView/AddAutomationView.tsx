@@ -19,13 +19,18 @@ import Select from 'react-select';
 
 import * as Menu from 'components/Common/Menu';
 import {
+  AutomationActionType,
   AutomationConditionBuilderType,
+  AutomationConditionOperandModel,
   AutomationConditionOperatorType,
   AutomationConditionScopeType,
   AutomationEventType, AutomationType,
   ConditionPropertyAggregateType,
+  CreateAutomationInput,
+  CreateAutomationOperandInput,
   OperandType,
   QuestionAspectType,
+  QuestionNodeTypeEnum,
   useCreateAutomationMutation,
 } from 'types/generated-types';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
@@ -34,6 +39,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import Dropdown from 'components/Dropdown';
 
+import { useNavigator } from 'hooks/useNavigator';
 import { ConditionCell } from './ConditionCell';
 import { CreateConditionModalCard } from './CreateConditionModalCard';
 
@@ -56,8 +62,17 @@ const schema = yup.object({
           depth: yup.number().required(),
           condition: yup.object().shape({
             scopeType: yup.string().required(),
-            activeDialogue: yup.string().notRequired().nullable(),
-            activeQuestion: yup.string().notRequired().nullable(),
+            activeDialogue: yup.object().shape({
+              id: yup.string().required(),
+              label: yup.string().notRequired().nullable(),
+              value: yup.string().notRequired().nullable(),
+              type: yup.string().notRequired().nullable(),
+            }).required(),
+            activeQuestion: yup.object().shape({
+              label: yup.string().notRequired().nullable(),
+              value: yup.string().notRequired().nullable(),
+              type: yup.string().notRequired().nullable(),
+            }).required(),
             aspect: yup.string().required(),
             aggregate: yup.mixed<ConditionPropertyAggregateType>().oneOf(Object.values(ConditionPropertyAggregateType)),
             latest: yup.number().required(),
@@ -137,8 +152,46 @@ const OPERATORS = [
   },
 ];
 
+const mapConditions = (formData: FormDataProps, workspaceId?: string) => formData.conditionBuilder?.conditions.map(
+  (condition) => {
+    const operands: CreateAutomationOperandInput[] = [
+      {
+        operandType: OperandType.Int,
+        numberValue: condition.compareTo,
+      },
+    ];
+
+    if (condition.condition.activeQuestion.type === QuestionNodeTypeEnum.Choice
+      || condition.condition.activeQuestion.type === QuestionNodeTypeEnum.VideoEmbedded) {
+      operands.push({
+        operandType: OperandType.String,
+        textValue: condition?.condition?.questionOption,
+      });
+    }
+
+    return ({
+      scope: {
+        type: condition?.condition?.scopeType as AutomationConditionScopeType,
+        questionScope: {
+          aspect: condition?.condition?.aspect as QuestionAspectType,
+          aggregate: {
+            type: condition?.condition?.aggregate as ConditionPropertyAggregateType,
+            latest: condition?.condition?.latest,
+          },
+        },
+      },
+      operator: condition?.operator?.value as AutomationConditionOperatorType,
+      questionId: condition?.condition?.activeQuestion?.value,
+      dialogueId: condition.condition?.activeDialogue?.id,
+      workspaceId,
+      operands,
+    });
+  },
+);
+
 const AddAutomationView = () => {
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
+  const { goToAutomationOverview } = useNavigator();
   const history = useHistory();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -156,9 +209,10 @@ const AddAutomationView = () => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
 
-  const [createMutation, { loading }] = useCreateAutomationMutation({
+  const [createAutomation, { loading }] = useCreateAutomationMutation({
     onCompleted: (data) => {
       console.log('return data create automation mutation: ', data?.createAutomation?.label);
+      goToAutomationOverview();
       // TODO: Go back to automations overview
     },
     onError: (e) => {
@@ -176,52 +230,32 @@ const AddAutomationView = () => {
     console.log('Form data; ', formData);
     // TODO: Create a field for event type
     // TODO: Create a picker for questionId/dialogueId for event
+    // TODO: Add childbuilder
 
-    // createMutation({
+    const input: CreateAutomationInput = {
+      automationType: formData.automationType,
+      label: formData.title,
+      workspaceId: activeCustomer?.id,
+      event: {
+        eventType: AutomationEventType.NewInteractionQuestion, // TODO: Make this dynamic
+        questionId: formData.conditionBuilder?.conditions?.[0]?.condition.activeQuestion?.value,
+      },
+      conditionBuilder: {
+        type: formData?.conditionBuilder?.logical?.value as AutomationConditionBuilderType,
+        conditions: mapConditions(formData, activeCustomer?.id),
+      },
+      actions: [
+        {
+          type: AutomationActionType.GenerateReport,
+        },
+      ],
+    };
+
+    console.log('Input data: ', input);
+
+    // createAutomation({
     //   variables: {
-    //     input: {
-    //       automationType: formData.automationType,
-    //       label: formData.title,
-    //       workspaceId: activeCustomer?.id,
-    //       event: {
-    //         eventType: AutomationEventType.NewInteractionQuestion, // TODO: Make this dynamic
-    //         questionId: formData.conditionBuilder?.conditions?.[0]?.condition.activeQuestion,
-    //       },
-    //       conditionBuilder: {
-    //         type: formData?.conditionBuilder?.logical?.value as AutomationConditionBuilderType,
-    //         conditions: [
-    //           {
-    //             scope: {
-    //               type: formData.conditionBuilder?.conditions?.[0]
-    //                 ?.condition?.scopeType as AutomationConditionScopeType,
-    //               questionScope: {
-    //                 aspect: formData.conditionBuilder?.conditions?.[0]?.condition?.aspect as QuestionAspectType,
-    //                 aggregate: {
-    //                   type: formData.conditionBuilder?.conditions?.[0]
-    //                     ?.condition?.scopeType as ConditionPropertyAggregateType,
-    //                   latest: formData.conditionBuilder?.conditions?.[0]?.condition?.latest,
-    //                 },
-    //               },
-    //             },
-    //             operator: formData.conditionBuilder?.conditions?.[0]
-    //               ?.operator?.value as AutomationConditionOperatorType,
-    //             questionId: formData.conditionBuilder?.conditions?.[0]?.condition.activeQuestion,
-    //             dialogueId: formData.conditionBuilder?.conditions?.[0]?.condition.activeDialogue,
-    //             workspaceId: activeCustomer?.id,
-    //             operands: [
-    //               {
-    //                 operandType: OperandType.Int,
-    //                 numberValue: formData.conditionBuilder?.conditions?.[0]?.compareTo,
-    //               },
-    //               {
-    //                 operandType: OperandType.String,
-    //                 textValue: formData.conditionBuilder?.conditions?.[0]?.condition?.questionOption,
-    //               },
-    //             ],
-    //           },
-    //         ],
-    //       },
-    //     },
+    //     input,
     //   },
     // });
   };
@@ -473,7 +507,7 @@ const AddAutomationView = () => {
               <ButtonGroup>
                 <Button
                   isDisabled={!form.formState.isValid}
-                  // isLoading={isLoading}
+                  isLoading={loading}
                   variantColor="teal"
                   type="submit"
                 >

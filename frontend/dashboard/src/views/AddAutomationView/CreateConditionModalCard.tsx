@@ -35,6 +35,7 @@ export interface FormDataProps {
     type: string;
     value: string;
     label?: string;
+    id: string;
   } | null;
   activeQuestion: {
     type: string;
@@ -90,7 +91,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
 
   // TODO: Replace with query fetching all dialogues
   const dialogueItems = dialoguesData?.customer?.dialogues?.map(
-    (dialogue) => ({ value: dialogue.slug, label: dialogue.title, type: 'DIALOGUE' }),
+    (dialogue) => ({ id: dialogue.id, value: dialogue.slug, label: dialogue.title, type: 'DIALOGUE' }),
   ) || [];
 
   const questionItems = questionsData?.customer?.dialogue?.questions?.map(
@@ -160,7 +161,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
   return (
     <UI.ModalCard maxWidth={1000} onClose={onClose}>
       <UI.ModalHead>
-        <UI.ViewTitle>{t('views:add_dialogue_view')}</UI.ViewTitle>
+        <UI.ViewTitle>{t('automation:add_condition')}</UI.ViewTitle>
       </UI.ModalHead>
       <UI.ModalBody>
         <UI.Div paddingLeft={0} paddingRight="4em">
