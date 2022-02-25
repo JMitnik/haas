@@ -670,7 +670,6 @@ const DialogueBuilderQuestionForm = ({
                                 render={({ value, onChange }) => (
                                   <Dropdown renderOverlay={({ setCloseClickOnOutside, onClose }) => (
                                     <NodePicker
-                                      questionId={question.id}
                                       items={formattedCtaNodes}
                                       onClose={onClose}
                                       onChange={onChange}

@@ -63,7 +63,6 @@ interface NodeSelect extends Partial<QuestionNode> {
 }
 
 interface NodePickerProps {
-  questionId: string | number;
   onChange: (node: NodeSelect) => void;
   items: NodeSelect[];
   onModalOpen?: () => void;

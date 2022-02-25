@@ -1,52 +1,72 @@
+/* eslint-disable react/destructuring-assignment */
 import * as UI from '@haas/ui';
 import { Plus } from 'react-feather';
 import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
-import {
-  CreateCallToActionModalCard,
-} from 'views/DialogueBuilderView/components/QuestionEntryForm/CreateCallToActionModalCard';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
 import { NodeCellContainer } from 'components/NodeCell/NodeCell';
 import { QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
 
-import { CreateConditionModalCard } from 'views/AddAutomationView/CreateConditionModalCard';
+import { ConditionEntry, CreateConditionModalCard } from 'views/AddAutomationView/CreateConditionModalCard';
 import { NodePickerHeader } from './NodePickerStyles';
 
-const DropdownOption = (props: any) => {
-  const nodeProps = MapNodeToProperties(props.data.type);
-  return (
-    <NodeCellContainer>
-      <components.Option {...props}>
-        <UI.Flex>
-          <UI.Icon
-            bg={nodeProps.bg}
-            color={nodeProps.color}
-            height="2rem"
-            width="2rem"
-            stroke={nodeProps.stroke || undefined}
-            style={{ flexShrink: 0 }}
-            mr={3}
-          >
-            <nodeProps.icon />
-          </UI.Icon>
-          <UI.Div>
-            <UI.Text>
-              {props.label}
-            </UI.Text>
+const DropdownOption = (props: any) => (
+  <NodeCellContainer>
+    <components.Option {...props}>
+      <UI.Flex>
+        <UI.Div>
+          <UI.Text paddingRight={2}>
+            <UI.Span color="#4A5568" fontWeight="bold">{props.data?.aggregate}</UI.Span>
+            {' '}
+            of option
+            {' '}
+            <UI.Span color="#4A5568" fontWeight="bold">{props.data?.questionOption}</UI.Span>
+            {' '}
+            in the last
+            {' '}
+            <UI.Span color="#4A5568" fontWeight="bold">{props.data?.latest}</UI.Span>
+            {' '}
+            entries
+            {props.data.dateRange && (
+              <UI.Span>
+                {' '}
+                between
+                {' '}
+                {props.data.dateRange?.[0]?.toString()}
+                {' '}
+                -
+                {' '}
+                {props.data.dateRange?.[1]?.toString()}
+                {' '}
+
+              </UI.Span>
+
+            )}
+            {' '}
+            should be
+          </UI.Text>
+          <UI.Flex pt="0.5em">
             <UI.MicroLabel
-              bg={nodeProps.bg}
-              color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}
+              bg="#FE3274"
+              color="white"
+              mr="0.5em"
             >
-              {props.data.type}
+              {props.data.scopeType}
             </UI.MicroLabel>
-          </UI.Div>
-        </UI.Flex>
-      </components.Option>
-    </NodeCellContainer>
-  );
-};
+            <UI.MicroLabel
+              bg="#40A9FF"
+              color="white"
+            >
+              {props.data.aspect?.replaceAll('_', ' ')}
+            </UI.MicroLabel>
+          </UI.Flex>
+        </UI.Div>
+      </UI.Flex>
+    </components.Option>
+  </NodeCellContainer>
+);
 
 const DropdownSingleValue = (props: any) => (
   <components.SingleValue {...props}>
@@ -65,13 +85,15 @@ interface NodeSelect extends Partial<QuestionNode> {
 
 interface NodePickerProps {
   onChange: (node: NodeSelect) => void;
-  items: NodeSelect[];
+  items: ConditionEntry[];
   onModalOpen?: () => void;
   onModalClose?: () => void;
   onClose?: () => void;
+  onAddCondition: React.Dispatch<React.SetStateAction<ConditionEntry[]>>;
 }
 
-export const ConditionNodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose }: NodePickerProps) => {
+export const ConditionNodePicker = ({ onChange,
+  onClose, items, onModalOpen, onModalClose, onAddCondition }: NodePickerProps) => {
   const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
   const { t } = useTranslation();
@@ -113,7 +135,7 @@ export const ConditionNodePicker = ({ onChange, onClose, items, onModalOpen, onM
     <UI.List maxWidth={300}>
       <UI.CloseButton onClose={onClose} />
       <NodePickerHeader>
-        <UI.ListHeader style={{ borderBottom: 0 }}>{t('call_to_action')}</UI.ListHeader>
+        <UI.ListHeader style={{ borderBottom: 0 }}>{t('conditions')}</UI.ListHeader>
 
         <UI.Button
           leftIcon={Plus}
@@ -193,6 +215,7 @@ export const ConditionNodePicker = ({ onChange, onClose, items, onModalOpen, onM
           onClose={() => setCreateModalIsOpen(false)}
           onSuccess={(condition: any) => {
             // TODO: Check if this works
+            onAddCondition((oldConditions) => [...oldConditions, condition]);
             onChange(condition);
           }}
         />

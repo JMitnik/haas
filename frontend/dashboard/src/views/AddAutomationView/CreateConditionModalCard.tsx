@@ -346,7 +346,6 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                                         isRelative
                                         renderOverlay={({ onClose: onDialoguePickerClose }) => (
                                           <NodePicker
-                                            questionId=""
                                             // Handle items (in this case dialogues)
                                             items={questionItems}
                                             onClose={onDialoguePickerClose}

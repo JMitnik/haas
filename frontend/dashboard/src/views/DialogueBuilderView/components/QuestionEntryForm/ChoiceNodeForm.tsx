@@ -178,7 +178,6 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                               onChange={(data) => onChange(data)}
                               onModalOpen={() => setCloseClickOnOutside(false)}
                               onModalClose={() => setCloseClickOnOutside(true)}
-                              questionId={index}
                             />
                           )}
                         >

@@ -33,6 +33,7 @@ import {
   QuestionNodeTypeEnum,
   useCreateAutomationMutation,
 } from 'types/generated-types';
+import { ConditionNodePicker } from 'components/NodePicker/ConditionNodePicker';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodePicker } from 'components/NodePicker';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -40,7 +41,6 @@ import { useMenu } from 'components/Common/Menu/useMenu';
 import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
 
-import { ConditionNodePicker } from 'components/NodePicker/ConditionNodePicker';
 import { ConditionCell } from './ConditionCell';
 import { ConditionEntry, CreateConditionModalCard } from './CreateConditionModalCard';
 
@@ -195,10 +195,20 @@ interface ConditionBuilderEntryProps {
   conditionFields: Record<'arrayKey', string>[];
   append: (value: Partial<unknown> | Partial<unknown>[], options?: FieldArrayMethodProps | undefined) => void;
   remove: (index?: number | number[] | undefined) => void;
-  openMenu: (event: React.MouseEvent<Element, MouseEvent>, selectedActiveItem?: any) => void
+  openMenu: (event: React.MouseEvent<Element, MouseEvent>, selectedActiveItem?: any) => void;
+  onAddCondition: React.Dispatch<React.SetStateAction<ConditionEntry[]>>;
+  activeConditions: ConditionEntry[];
 }
 
-const ChildBuilderEntry = ({ append, conditionFields, form, openMenu, remove }: ConditionBuilderEntryProps) => {
+const ChildBuilderEntry = ({
+  append,
+  conditionFields,
+  form,
+  openMenu,
+  remove,
+  onAddCondition,
+  activeConditions,
+}: ConditionBuilderEntryProps) => {
   const { t } = useTranslation();
   return (
     <UI.Div backgroundColor={DEPTH_BACKGROUND_COLORS[1]}>
@@ -250,7 +260,8 @@ const ChildBuilderEntry = ({ append, conditionFields, form, openMenu, remove }: 
                   defaultCloseOnClickOutside={false}
                   renderOverlay={({ onClose, setCloseClickOnOutside }) => (
                     <ConditionNodePicker
-                      items={[]}
+                      onAddCondition={onAddCondition}
+                      items={activeConditions}
                       onClose={onClose}
                       onChange={(data) => onChange(data)}
                       onModalOpen={() => setCloseClickOnOutside(false)}
@@ -552,6 +563,8 @@ const AddAutomationView = () => {
                             {condition?.isGrouped && (
                               <UI.Div gridColumn="2 / 7">
                                 <ChildBuilderEntry
+                                  activeConditions={activeConditions}
+                                  onAddCondition={setActiveConditions}
                                   form={form}
                                   openMenu={openMenu}
                                   append={childBuilderFieldArray.append}
@@ -572,8 +585,9 @@ const AddAutomationView = () => {
                                       <Dropdown
                                         defaultCloseOnClickOutside={false}
                                         renderOverlay={({ onClose, setCloseClickOnOutside }) => (
-                                          <NodePicker
-                                            items={[]}
+                                          <ConditionNodePicker
+                                            onAddCondition={setActiveConditions}
+                                            items={activeConditions}
                                             onClose={onClose}
                                             onChange={(data) => onChange(data)}
                                             onModalOpen={() => setCloseClickOnOutside(false)}
