@@ -41,7 +41,6 @@ interface NodeCellProps {
 }
 
 export const ConditionCell = ({ condition, onClick, onRemove }: NodeCellProps) => {
-  console.log('condition: ', condition);
   if (!condition.scopeType) return null;
 
   // const nodeProps = MapNodeToProperties(node.type);

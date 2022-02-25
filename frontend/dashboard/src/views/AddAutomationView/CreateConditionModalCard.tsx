@@ -19,7 +19,7 @@ import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
 interface NewCTAModalCardProps {
   onClose: () => void;
-  onSuccess: (data?: any) => void;
+  onSuccess: (data: ConditionEntry) => void;
 }
 
 const schema = yup.object().shape({
@@ -49,6 +49,26 @@ export interface FormDataProps {
   dateRange: TwoDateArray
 }
 
+export interface ConditionEntry {
+  scopeType: string;
+  activeDialogue: {
+    type: string;
+    value: string;
+    label?: string | undefined;
+    id: string;
+  } | null;
+  activeQuestion: {
+    type: string;
+    value: string;
+    label: string;
+  } | null;
+  aspect: string | null;
+  dateRange: TwoDateArray | null;
+  aggregate: string;
+  questionOption?: string | null;
+  latest: number;
+}
+
 export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
@@ -63,7 +83,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    const returnData = {
+    const returnData: ConditionEntry = {
       scopeType: formData.scopeType,
       activeDialogue: formData.activeDialogue,
       activeQuestion: formData.activeQuestion,
@@ -109,8 +129,6 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
     defaultValue: null,
   });
 
-  console.log('Active question: ', watchActiveQuestion);
-
   const questionOptions = watchActiveQuestion
     ? questionItems.find(
       (question: any) => question.value === watchActiveQuestion.value,
@@ -118,8 +136,6 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
       (option: any) => ({ label: option.value, value: option.value }),
     ) || []
     : [];
-
-  console.log('Question options: ', questionOptions);
 
   const watchScopeType = useWatch({
     control: form.control,
