@@ -56,7 +56,8 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
                 <Input
                   leftEl={<IconContainer><UserIcon /></IconContainer>}
                   placeholder="Jane"
-                  {...register('firstName')} />
+                  {...register('firstName')}
+                />
               </InputContainer>
 
               <InputContainer>
@@ -64,7 +65,8 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
                 <Input
                   leftEl={<IconContainer><LastNameIcon /></IconContainer>}
                   placeholder="Doe"
-                  {...register('lastName')} />
+                  {...register('lastName')}
+                />
               </InputContainer>
             </Grid>
 
@@ -73,7 +75,8 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
               <Input
                 leftEl={<IconContainer><EmailIcon /></IconContainer>}
                 placeholder="Jane@haas.live"
-                {...register('email')} />
+                {...register('email')}
+              />
             </InputContainer>
           </Grid>
           <Grid paddingTop={4} gridTemplateColumns={['1fr 1fr', '1fr 1fr']}>

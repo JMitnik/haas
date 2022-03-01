@@ -112,7 +112,8 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                           variant="outline"
                           {...register(`fields[${index}].value`, { required: field.isRequired })}
                           minHeight="150px"
-                          placeholder={field.placeholder || undefined} />
+                          placeholder={field.placeholder || undefined}
+                        />
                       ) : (
                         <UI.Input
                           id={`fields[${index}].value`}
@@ -121,7 +122,8 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                           type={mapFieldType[field?.type] || 'text'}
                           {...register(`fields[${index}].value`, { required: field.isRequired })}
                           placeholder={field.placeholder || undefined}
-                          maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'} />
+                          maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
+                        />
                       )}
                     </UI.FormControl>
                   </UI.Div>
