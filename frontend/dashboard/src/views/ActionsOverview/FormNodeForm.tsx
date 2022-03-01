@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import { AlertCircle, ArrowLeft, ArrowRight, AtSign, Circle, Feather, FileText, Hash, Link2, Phone, Type } from 'react-feather';
 import { AnimatePresence, Variants, motion } from 'framer-motion';
 import { Button } from '@chakra-ui/core';
-import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
@@ -11,7 +11,7 @@ import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
-import { CTANodeFormProps, FormDataProps } from './CTATypes';
+import { CTANodeFormProps } from './CTATypes';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -86,7 +86,7 @@ const fieldMap: FieldProps[] = [
 ];
 
 interface FormNodePreviewProps {
-  form: UseFormMethods<FormDataProps>;
+  form: any;
   field: any;
   onMoveRight: any;
   onMoveLeft: any;
@@ -243,11 +243,11 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                 <UI.InputGrid>
                   <UI.FormControl>
                     <UI.FormLabel htmlFor="label">{t('label')}</UI.FormLabel>
-                    <UI.Input ref={subform.register()} name="label" key={field.fieldIndex} />
+                    <UI.Input {...subform.register('label')} key={field.fieldIndex} />
                   </UI.FormControl>
                   <UI.FormControl>
                     <UI.FormLabel htmlFor="placeholder">{t('placeholder')}</UI.FormLabel>
-                    <UI.Input ref={subform.register()} name="placeholder" key={field.fieldIndex} />
+                    <UI.Input {...subform.register('placeholder')} key={field.fieldIndex} />
                   </UI.FormControl>
                   <UI.FormControl>
                     <UI.FormLabel htmlFor="isRequired">{t('is_required')}</UI.FormLabel>
@@ -255,8 +255,8 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                       control={subform.control}
                       name="isRequired"
                       defaultValue={field.isRequired}
-                      render={({ onBlur, onChange, value }) => (
-                        <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
+                      render={({ field: fieldJe }) => (
+                        <UI.RadioButtons onBlur={fieldJe.onBlur} onChange={fieldJe.onChange} value={fieldJe.value}>
                           <UI.RadioButton
                             icon={AlertCircle}
                             value={1}

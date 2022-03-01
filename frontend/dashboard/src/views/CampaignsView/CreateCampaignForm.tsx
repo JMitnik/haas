@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
@@ -67,7 +67,7 @@ export type CampaignFormProps = yup.InferType<typeof schema>;
 type VariantFormProps = yup.InferType<typeof variantSchema>;
 
 interface ActiveVariantFormProps {
-  form: UseFormMethods<CampaignFormProps>;
+  form: any;
   activeVariantIndex: number;
   isReadOnly?: boolean;
   variant: any;
@@ -134,7 +134,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
             key={variant.variantIndex}
             control={form.control}
             defaultValue={activeVariant.dialogue || null}
-            render={({ value, onChange, onBlur }) => (
+            render={({ field }) => (
               <Select
                 placeholder="Select a dialogue"
                 isDisabled={isReadOnly}
@@ -143,9 +143,9 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
                 className="select"
                 defaultOptions
                 options={dialogues}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
               />
             )}
           />
@@ -158,12 +158,12 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
             control={form.control}
             defaultValue={activeVariant.type}
             name={`variants[${activeVariantIndex}].type`}
-            render={({ onChange, value, onBlur }) => (
+            render={({ field }) => (
               <UI.RadioButtons
-                value={value}
+                value={field.value}
                 key={variant.variantIndex}
-                onChange={onChange}
-                onBlur={onBlur}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
               >
                 <UI.RadioButton icon={Mail} value="EMAIL" text={t('email')} description={t('campaign_email_helper')} />
                 <UI.RadioButton icon={Smartphone} value="SMS" text={t('sms')} description={t('campaign_sms_helper')} />
@@ -193,13 +193,13 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
           <Controller
             key={variant.variantIndex}
             name={`variants[${activeVariantIndex}].body`}
-            id={`variants[${activeVariantIndex}].body`}
+            // TODO: Check how id={`variants[${activeVariantIndex}].body`} can be added back
             control={form.control}
             defaultValue={activeVariant.body}
-            render={({ value, onChange }) => (
+            render={({ field }) => (
               <UI.MarkdownEditor
-                value={value}
-                onChange={onChange}
+                value={field.value}
+                onChange={field.onChange}
               />
             )}
           />
@@ -313,13 +313,13 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
     name: 'variants',
     control: form.control,
     keyName: 'variantIndex',
-  });
+  }) as { fields: any[] };
 
   const { append: addCustomVariable, fields: customVariables } = useFieldArray({
     name: 'customVariables',
     control: form.control,
     keyName: 'idKey',
-  });
+  }) as any;
 
   const handleVariantWeightChange = (event: any, currentItemIndex: number) => {
     const maxValue = Math.min(event.target.value, 100);
@@ -350,7 +350,7 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
         <UI.Stack spacing={4}>
           <UI.FormControl isRequired>
             <UI.FormLabel htmlFor="label">{t('campaign_label')}</UI.FormLabel>
-            <UI.Input name="label" id="label" ref={form.register} isDisabled={isReadOnly} />
+            <UI.Input id="label" {...form.register('label')} isDisabled={isReadOnly} />
           </UI.FormControl>
           <UI.Div>
             <UI.InputHeader>{t('variants')}</UI.InputHeader>
@@ -372,14 +372,14 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
                       defaultValue={variant.weight}
                       name={`variants.${index}.weight`}
                       control={form.control}
-                      render={({ value, onBlur }) => (
+                      render={({ field }) => (
                         <UI.Input
-                          value={value}
+                          value={field.value}
                           onChange={(e: InputEvent) => {
                             handleVariantWeightChange(e, index);
                           }}
                           isDisabled={isReadOnly}
-                          onBlur={onBlur}
+                          onBlur={field.onBlur}
                           type="number"
                           rightAddOn="%"
                         />
@@ -396,12 +396,11 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
               <UI.InputHeader>{t('custom_variables')}</UI.InputHeader>
               <UI.InputHelper>{t('custom_variables_helper')}</UI.InputHelper>
               <UI.Stack spacing={1}>
-                {customVariables.map((customVariable, index) => (
+                {customVariables.map((customVariable: any, index: number) => (
                   <UI.Input
                     key={customVariable.idKey}
                     defaultValue={customVariable.key}
-                    name={`customVariables.${index}.key`}
-                    ref={form.register()}
+                    {...form.register(`customVariables.${index}.key`)}
                   />
                 ))}
               </UI.Stack>

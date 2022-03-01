@@ -110,22 +110,18 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                         <UI.Textarea
                           id={`fields[${index}].value`}
                           variant="outline"
-                          ref={register({ required: field.isRequired })}
-                          name={`fields[${index}].value`}
+                          {...register(`fields[${index}].value`, { required: field.isRequired })}
                           minHeight="150px"
-                          placeholder={field.placeholder || undefined}
-                        />
+                          placeholder={field.placeholder || undefined} />
                       ) : (
                         <UI.Input
                           id={`fields[${index}].value`}
                           variant="outline"
                           leftEl={mapIcon[field?.type] || <Type />}
                           type={mapFieldType[field?.type] || 'text'}
-                          ref={register({ required: field.isRequired })}
-                          name={`fields[${index}].value`}
+                          {...register(`fields[${index}].value`, { required: field.isRequired })}
                           placeholder={field.placeholder || undefined}
-                          maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
-                        />
+                          maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'} />
                       )}
                     </UI.FormControl>
                   </UI.Div>

@@ -143,7 +143,7 @@ const AddDialogueView = () => {
   });
 
   const setTags = (qOption: { label: string, value: string }, index: number) => {
-    form.setValue(`tags[${index}]`, qOption?.value);
+    form.setValue(`tags.${index}`, qOption?.value);
     setActiveTags((prevTags) => {
       prevTags[index] = qOption;
       return [...prevTags];
@@ -227,19 +227,18 @@ const AddDialogueView = () => {
                 </Div>
                 <Div>
                   <InputGrid>
-                    <FormControl isRequired isInvalid={!!form.errors.title}>
+                    <FormControl isRequired isInvalid={!!form.formState.errors.title}>
                       <FormLabel htmlFor="title">{t('title')}</FormLabel>
                       <InputHelper>{t('dialogue:title_helper')}</InputHelper>
                       <Input
                         placeholder={t('dialogue:title_placeholder')}
                         leftEl={<Type />}
-                        name="title"
-                        ref={form.register({ required: true })}
+                        {...form.register('title', { required: true })}
                       />
-                      <UI.ErrorMessage>{t(form.errors.title?.message || '')}</UI.ErrorMessage>
+                      <UI.ErrorMessage>{t(form.formState.errors.title?.message || '')}</UI.ErrorMessage>
                     </FormControl>
 
-                    <FormControl isInvalid={!!form.errors.publicTitle}>
+                    <FormControl isInvalid={!!form.formState.errors.publicTitle}>
                       <FormLabel htmlFor="publicTitle">
                         {t('dialogue:public_title')}
                       </FormLabel>
@@ -249,10 +248,9 @@ const AddDialogueView = () => {
                       <Input
                         placeholder={t('dialogue:public_title_placeholder')}
                         leftEl={<Type />}
-                        name="publicTitle"
-                        ref={form.register({ required: false })}
+                        {...form.register('publicTitle', { required: false })}
                       />
-                      <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.publicTitle?.message}</FormErrorMessage>
                     </FormControl>
 
                     <FormControl isRequired>
@@ -265,35 +263,38 @@ const AddDialogueView = () => {
                       <Controller
                         name="languageOption"
                         control={form.control}
-                        as={Select}
-                        options={LANGUAGE_OPTIONS}
                         defaultValue={{ label: 'English', value: 'ENGLISH' }}
+                        render={({ field }) => (
+                          <Select
+                            options={LANGUAGE_OPTIONS}
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        )}
                       />
                     </FormControl>
 
-                    <FormControl isRequired isInvalid={!!form.errors.description}>
+                    <FormControl isRequired isInvalid={!!form.formState.errors.description}>
                       <FormLabel htmlFor="title">{t('description')}</FormLabel>
                       <InputHelper>
                         {t('dialogue:description_helper')}
                       </InputHelper>
                       <Textarea
                         placeholder="Describe your dialogue"
-                        name="description"
-                        ref={form.register({ required: true })}
+                        {...form.register('description', { required: true })}
                       />
-                      <UI.ErrorMessage>{t(form.errors.description?.message || '')}</UI.ErrorMessage>
+                      <UI.ErrorMessage>{t(form.formState.errors.description?.message || '')}</UI.ErrorMessage>
                     </FormControl>
 
-                    <FormControl isRequired isInvalid={!!form.errors.slug}>
+                    <FormControl isRequired isInvalid={!!form.formState.errors.slug}>
                       <FormLabel htmlFor="slug">{t('slug')}</FormLabel>
                       <InputHelper>{t('dialogue:slug_helper')}</InputHelper>
                       <Input
                         placeholder="peaches-or-apples"
                         leftAddOn={`https://client.haas.live/${customerSlug}/`}
-                        name="slug"
-                        ref={form.register({ required: true })}
+                        {...form.register('slug', { required: true })}
                       />
-                      <UI.ErrorMessage>{t(form.errors.slug?.message || '')}</UI.ErrorMessage>
+                      <UI.ErrorMessage>{t(form.formState.errors.slug?.message || '')}</UI.ErrorMessage>
                     </FormControl>
 
                   </InputGrid>
@@ -321,9 +322,14 @@ const AddDialogueView = () => {
                       <Controller
                         name="contentOption"
                         control={form.control}
-                        as={Select}
-                        options={DIALOGUE_CONTENT_TYPES}
                         defaultValue={{ label: 'From default template', value: 'SEED' }}
+                        render={({ field }) => (
+                          <Select
+                            options={DIALOGUE_CONTENT_TYPES}
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        )}
                       />
                     </FormControl>
 
@@ -334,9 +340,14 @@ const AddDialogueView = () => {
                         <Controller
                           name="customerOption"
                           control={form.control}
-                          as={Select}
-                          options={customerOptions}
                           defaultValue={null}
+                          render={({ field }) => (
+                            <Select
+                              options={customerOptions}
+                              value={field.value as any}
+                              onChange={field.onChange}
+                            />
+                          )}
                         />
                       </FormControl>
                     )}
@@ -348,10 +359,15 @@ const AddDialogueView = () => {
                         <Controller
                           name="dialogueOption"
                           control={form.control}
-                          as={Select}
-                          options={dialogues}
+                          render={({ field }) => (
+                            <Select
+                              options={dialogues}
+                              onChange={field.onChange}
+                              value={field.value as any}
+                            />
+                          )}
                         />
-                        <FormErrorMessage>{form.errors.dialogueOption?.message}</FormErrorMessage>
+                        <FormErrorMessage>{form.formState.errors.dialogueOption?.value?.message}</FormErrorMessage>
                       </FormControl>
                     ))}
                   </InputGrid>
@@ -386,11 +402,11 @@ const AddDialogueView = () => {
                             flexGrow={9}
                           >
                             <Select
-                              styles={form.errors.tags?.[index] && !activeTags?.[index] ? ErrorStyle : undefined}
+                              styles={form.formState.errors.tags?.[index]
+                                && !activeTags?.[index] ? ErrorStyle : undefined}
                               id={`tags[${index}]`}
                               key={index}
-                              ref={() => form.register({
-                                name: `tags[${index}]`,
+                              {...form.register(`tags.${index}`, {
                                 required: false,
                                 minLength: 1,
                               })}
@@ -400,7 +416,7 @@ const AddDialogueView = () => {
                                 setTags(qOption, index);
                               }}
                             />
-                            <FormErrorMessage>{form.errors.tags?.[index]}</FormErrorMessage>
+                            <FormErrorMessage>{form.formState.errors.tags?.[index]}</FormErrorMessage>
                           </Div>
                           <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                             <Button

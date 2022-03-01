@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { ArrowDown, ArrowUp, PlusCircle, Trash } from 'react-feather';
 
-import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
+import { Controller, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
 import React from 'react';
 
@@ -38,7 +38,7 @@ export const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
 
 export interface ChoiceNodeFormProps {
   ctaNodes: CTANode[];
-  form: UseFormMethods<any>;
+  form: any;
 }
 
 export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
@@ -63,7 +63,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
   };
 
   const handleRemoveCTAFromOption = (index: number) => {
-    const choice = choicesForm.fields[index];
+    const choice = choicesForm.fields[index] as any;
     const newChoice = {
       id: choice.id,
       overrideLeaf: {
@@ -123,30 +123,30 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                   >
                     <Controller
                       name={`optionsFull[${index}].value`}
-                      defaultValue={choice.value}
+                      defaultValue={(choice as any)?.value}
                       control={form.control}
-                      render={({ value, onChange }) => (
+                      render={({ field }) => (
                         <Dropdown
                           placement="left-start"
                           renderOverlay={({ onClose }) => (
                             <ChoiceDropdown
-                              value={value}
-                              onChange={onChange}
+                              value={field.value}
+                              onChange={field.onChange}
                               onClose={onClose}
                             />
                           )}
                         >
                           {({ onOpen, containerRef }) => (
                             <>
-                              {value ? (
+                              {field.value ? (
                                 <UI.GradientButton onClick={onOpen} ref={containerRef}>
-                                  {value}
+                                  {field.value}
                                 </UI.GradientButton>
                               ) : (
                                 <UI.Button
                                   size="sm"
                                   variantColor={
-                                    form.errors?.optionsFull?.[index].value ? 'red' : 'altGray'
+                                    form.formState.errors?.optionsFull?.[index].value ? 'red' : 'altGray'
                                   }
                                   variant="outline"
                                   onClick={onOpen}
@@ -167,15 +167,15 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                     <Controller
                       name={`optionsFull[${index}].overrideLeaf`}
                       control={form.control}
-                      defaultValue={choice.overrideLeaf}
-                      render={({ value, onChange }) => (
+                      defaultValue={(choice as any)?.overrideLeaf}
+                      render={({ field }) => (
                         <Dropdown
                           defaultCloseOnClickOutside={false}
                           renderOverlay={({ onClose, setCloseClickOnOutside }) => (
                             <NodePicker
                               items={formattedCtaNodes}
                               onClose={onClose}
-                              onChange={(data) => onChange(data)}
+                              onChange={(data) => field.onChange(data)}
                               onModalOpen={() => setCloseClickOnOutside(false)}
                               onModalClose={() => setCloseClickOnOutside(true)}
                             />
@@ -188,11 +188,11 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                               display="flex"
                               alignItems="center"
                             >
-                              {value?.label ? (
+                              {field.value?.label ? (
                                 <NodeCell
                                   onRemove={() => handleRemoveCTAFromOption(index)}
                                   onClick={onOpen}
-                                  node={value}
+                                  node={field.value}
                                 />
                               ) : (
                                 <UI.Button

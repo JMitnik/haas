@@ -36,7 +36,7 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
     <TextboxContainer>
       <NodeTitle>{node?.title}</NodeTitle>
       <Div>
-        <Textbox name="textbox" ref={register} />
+        <Textbox {...register('textbox')} />
 
         <Div mt={4}>
           <Grid gridTemplateColumns={['1fr 1fr', '1fr 1fr', '2fr 1fr']}>

@@ -119,14 +119,7 @@ const EditTriggerForm = ({ trigger }: { trigger: any }) => {
   const toast = useToast();
 
   const form = useForm<any>({
-    resolver: async (data) => {
-      const output = await yupResolver(schema)(data);
-      const hasError = output.errors;
-      if (Object.keys(hasError).length !== 0) {
-        console.log('Error:', output);
-      }
-      return output;
-    },
+    resolver: yupResolver(schema),
     defaultValues: {
       name: trigger.name,
       condition: trigger.conditions?.[0]?.type,
@@ -201,6 +194,7 @@ const EditTriggerForm = ({ trigger }: { trigger: any }) => {
       textValue: condition?.matchText || null,
     })) || [];
 
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const trigger = {
       name: formData.name,
       type: formData?.type,

@@ -3,8 +3,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-import { Checkbox, useToast } from '@chakra-ui/core';
 import { SystemPermission, useFindRoleByIdQuery, useUpdatePermissionsMutation } from 'types/generated-types';
+import { useToast } from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 
 const CheckBoxCard = styled(UI.Card) <{ isChecked?: boolean }>`
@@ -43,9 +43,8 @@ const RoleUserForm = ({
   allPermissions,
   permissionsArray,
   roleId,
-  onClose
-}: RoleUserFormProps,
-) => {
+  onClose,
+}: RoleUserFormProps) => {
   const { t } = useTranslation();
   const toast = useToast();
 
@@ -88,14 +87,14 @@ const RoleUserForm = ({
         {allPermissions?.map((permission) => (
           <Controller
             control={control}
-            name={permission}
+            name={permission as any}
             defaultValue={permissionsArray?.includes(permission)}
             key={permission}
-            render={({ onChange, value }) => (
+            render={({ field }) => (
               <CheckBoxCard
-                isChecked={value}
+                isChecked={field.value as boolean}
                 padding={1}
-                onClick={() => permission !== 'CAN_ACCESS_ADMIN_PANEL' && onChange(!value)}
+                onClick={() => permission !== 'CAN_ACCESS_ADMIN_PANEL' && field.onChange(!field.value)}
               >
                 <UI.Flex
                   justifyContent="space-between"
@@ -112,8 +111,8 @@ const RoleUserForm = ({
                     // Without stopPropagation, checkbox and checkboxcard cancel each other out
                     onClick={(e) => e.stopPropagation()}
                     isDisabled={permission === 'CAN_ACCESS_ADMIN_PANEL'}
-                    isChecked={value}
-                    onChange={() => permission !== 'CAN_ACCESS_ADMIN_PANEL' && onChange(!value)}
+                    isChecked={field.value as boolean}
+                    onChange={() => permission !== 'CAN_ACCESS_ADMIN_PANEL' && field.onChange(!field.value)}
                   />
                 </UI.Flex>
                 <UI.Text px={1} py={1}>{t(`permissions:${permission.toLowerCase()}`)}</UI.Text>
@@ -138,7 +137,8 @@ const RoleUserForm = ({
  * A modal used to display information of a user role after it being clicked on in the UsersOverview
  *
  * Note:
- * - Permissions that are derived from global permissions could be checked, but they are not "disabled" yet in the Database.
+ * - Permissions that are derived from global permissions
+ * could be checked, but they are not "disabled" yet in the Database.
  *
  * @param object with an unique identifier as well as a onClose function to close the modal
  * @returns a pop-up modal displaying User role specific information, on this modal is a form where u can set the

@@ -1,18 +1,16 @@
-import { Briefcase, ThumbsDown, ThumbsUp, Mail, PenTool, Heart } from 'react-feather';
-import { UseFormMethods } from 'react-hook-form';
+import { Briefcase, Heart, Mail, PenTool, ThumbsDown, ThumbsUp } from 'react-feather';
 import {
   FormControl, FormLabel, Input, InputHelper,
 } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
-import { FormDataProps } from '../Types';
 
-const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
+const PitchdeckFragment = ({ form }: { form: any }) => {
   const { t } = useTranslation();
 
   return (
     <>
-      <FormControl isInvalid={!!form.errors.companyName} isRequired>
+      <FormControl isInvalid={!!form.formState.errors.companyName} isRequired>
         <FormLabel htmlFor="companyName">{t('autodeck:company_name')}</FormLabel>
         <InputHelper>{t('autodeck:company_name_helper')}</InputHelper>
         <Input
@@ -21,10 +19,11 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="companyName"
           ref={form.register()}
         />
-        {form.errors.companyName?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.companyName?.message}</span>}
+        {form.formState.errors.companyName?.message
+          && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.companyName?.message}</span>}
       </FormControl>
 
-      <FormControl isInvalid={!!form.errors.answer1} isRequired>
+      <FormControl isInvalid={!!form.formState.errors.answer1} isRequired>
         <FormLabel htmlFor="answer1">{t('autodeck:answer_1')}</FormLabel>
         <InputHelper>{t('autodeck:answer_1_helper')}</InputHelper>
         <Input
@@ -33,10 +32,11 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="answer1"
           ref={form.register()}
         />
-        {form.errors.answer1?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.answer1?.message}</span>}
+        {form.formState.errors.answer1?.message
+          && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.answer1?.message}</span>}
       </FormControl>
 
-      <FormControl isInvalid={!!form.errors.answer2} isRequired>
+      <FormControl isInvalid={!!form.formState.errors.answer2} isRequired>
         <FormLabel htmlFor="answer2">{t('autodeck:answer_2')}</FormLabel>
         <InputHelper>{t('autodeck:answer_2_helper')}</InputHelper>
         <Input
@@ -45,10 +45,11 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="answer2"
           ref={form.register()}
         />
-        {form.errors.answer2?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.answer2?.message}</span>}
+        {form.formState.errors.answer2?.message
+          && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.answer2?.message}</span>}
       </FormControl>
 
-      <FormControl isInvalid={!!form.errors.answer3} isRequired>
+      <FormControl isInvalid={!!form.formState.errors.answer3} isRequired>
         <FormLabel htmlFor="name">{t('autodeck:answer_3')}</FormLabel>
         <InputHelper>{t('autodeck:answer_3_helper')}</InputHelper>
         <Input
@@ -57,10 +58,11 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="answer3"
           ref={form.register()}
         />
-        {form.errors.answer3?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.answer3?.message}</span>}
+        {form.formState.errors.answer3?.message
+          && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.answer3?.message}</span>}
       </FormControl>
 
-      <FormControl isInvalid={!!form.errors.answer4} isRequired>
+      <FormControl isInvalid={!!form.formState.errors.answer4} isRequired>
         <FormLabel htmlFor="answer4">{t('autodeck:answer_4')}</FormLabel>
         <InputHelper>{t('autodeck:answer_4_helper')}</InputHelper>
         <Input
@@ -69,10 +71,11 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="answer4"
           ref={form.register()}
         />
-        {form.errors.answer4?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.answer4?.message}</span>}
+        {form.formState.errors.answer4?.message
+          && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.answer4?.message}</span>}
       </FormControl>
 
-      <FormControl isInvalid={!!form.errors.sorryAboutX} isRequired>
+      <FormControl isInvalid={!!form.formState.errors.sorryAboutX} isRequired>
         <FormLabel htmlFor="sorryAboutX">{t('autodeck:sorry_about_x')}</FormLabel>
         <InputHelper>{t('autodeck:sorry_about_x_helper')}</InputHelper>
         <Input
@@ -81,10 +84,11 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="sorryAboutX"
           ref={form.register()}
         />
-        {form.errors.sorryAboutX?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.sorryAboutX?.message}</span>}
+        {form.formState.errors.sorryAboutX?.message
+          && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.sorryAboutX?.message}</span>}
       </FormControl>
 
-      <FormControl isInvalid={!!form.errors.youLoveX} isRequired>
+      <FormControl isInvalid={!!form.formState.errors.youLoveX} isRequired>
         <FormLabel htmlFor="youLoveX">{t('autodeck:you_love_x')}</FormLabel>
         <InputHelper>{t('autodeck:you_love_x_helper')}</InputHelper>
         <Input
@@ -93,10 +97,11 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="youLoveX"
           ref={form.register()}
         />
-        {form.errors.youLoveX?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.youLoveX?.message}</span>}
+        {form.formState.errors.youLoveX?.message
+          && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.youLoveX?.message}</span>}
       </FormControl>
 
-      <FormControl isInvalid={!!form.errors.reward} isRequired>
+      <FormControl isInvalid={!!form.formState.errors.reward} isRequired>
         <FormLabel htmlFor="reward">{t('autodeck:reward')}</FormLabel>
         <InputHelper>{t('autodeck:reward_helper')}</InputHelper>
         <Input
@@ -105,10 +110,11 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="reward"
           ref={form.register()}
         />
-        {form.errors.reward?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.reward?.message}</span>}
+        {form.formState.errors.reward?.message
+          && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.reward?.message}</span>}
       </FormControl>
 
-      <FormControl isInvalid={!!form.errors.emailContent} isRequired>
+      <FormControl isInvalid={!!form.formState.errors.emailContent} isRequired>
         <FormLabel htmlFor="emailContent">{t('autodeck:email_content')}</FormLabel>
         <InputHelper>{t('autodeck:email_content_helper')}</InputHelper>
         <Input
@@ -117,10 +123,11 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="emailContent"
           ref={form.register()}
         />
-        {form.errors.emailContent?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.emailContent?.message}</span>}
+        {form.formState.errors.emailContent?.message
+          && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.emailContent?.message}</span>}
       </FormControl>
 
-      <FormControl isInvalid={!!form.errors.textMessage} isRequired>
+      <FormControl isInvalid={!!form.formState.errors.textMessage} isRequired>
         <FormLabel htmlFor="textMessage">{t('autodeck:text_content')}</FormLabel>
         <InputHelper>{t('autodeck:text_content_helper')}</InputHelper>
         <Input
@@ -129,10 +136,11 @@ const PitchdeckFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) =>
           name="textMessage"
           ref={form.register()}
         />
-        {form.errors.textMessage?.message && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.textMessage?.message}</span>}
+        {form.formState.errors.textMessage?.message
+          && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.textMessage?.message}</span>}
       </FormControl>
     </>
   );
 };
 
-export default PitchdeckFragment
+export default PitchdeckFragment;

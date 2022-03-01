@@ -104,11 +104,11 @@ export const ImportDeliveriesForm = ({ onClose, onComplete }: ImportDeliveriesFo
             <Controller
               name="batchScheduledAt"
               control={form.control}
-              render={({ onChange, value }) => (
+              render={({ field }) => (
                 <UI.DatePicker
-                  defaultValue={value}
+                  defaultValue={field.value}
                   format="DD-MM-YYYY HH:mm"
-                  onChange={onChange}
+                  onChange={field.onChange}
                   showTime={{
                     format: 'HH:mm',
                     hourStep: 1,

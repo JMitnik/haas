@@ -903,10 +903,6 @@ const language = {
       en: 'Add dialogue',
       de: 'Füge einen Dialog hinzu',
     },
-    add_question: {
-      en: 'Add question',
-      de: 'Frage hinzufügen',
-    },
     add_call_to_action: {
       en: 'Add Call-to-Action',
       de: 'Call-to-Action hinzufügen',

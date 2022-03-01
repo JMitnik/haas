@@ -1,15 +1,17 @@
-import { UseFormMethods, Controller } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import React from "react";
-import { FormControl, FormLabel } from "@chakra-ui/core";
-import { InputHelper, RadioButton, RadioButtons } from "@haas/ui";
-import { Link2, Clipboard } from "react-feather";
-import { FormDataProps } from "../Types";
-import ColorPaletteFragment from "./ColorPalette";
+import { Clipboard, Link2 } from 'react-feather';
+import { Controller } from 'react-hook-form';
+import { FormControl, FormLabel } from '@chakra-ui/core';
+import { InputHelper, RadioButton, RadioButtons } from '@haas/ui';
+import { useTranslation } from 'react-i18next';
+import React from 'react';
+
 import ColorPickerInput from 'components/ColorPicker';
 
+import ColorPaletteFragment from './ColorPalette';
 
-const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMethods<FormDataProps>, isInEditing: boolean, palette: Array<string> }) => {
+const PrimaryColourFragment = ({ form, isInEditing, palette }: {
+  form: any, isInEditing: boolean, palette: Array<string>
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -20,17 +22,27 @@ const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMe
 
         <Controller
           control={form.control}
-          key={'customer_color_controller'}
+          key="customer_color_controller"
           name="useCustomColour"
-          render={({ onChange, onBlur, value }) => (
+          render={({ field }) => (
             <RadioButtons
-              value={value}
-              key={'customer_color_key'}
-              onChange={onChange}
-              onBlur={onBlur}
+              value={field.value}
+              key="customer_color_key"
+              onChange={field.onChange}
+              onBlur={field.onBlur}
             >
-              <RadioButton icon={Link2} value={1} text={t('autodeck:logo_color')} description={t('autodeck:logo_color_helper')} />
-              <RadioButton icon={Clipboard} value={0} text={t('autodeck:custom_color')} description={t('autodeck:custom_color_helper')} />
+              <RadioButton
+                icon={Link2}
+                value={1}
+                text={t('autodeck:logo_color')}
+                description={t('autodeck:logo_color_helper')}
+              />
+              <RadioButton
+                icon={Clipboard}
+                value={0}
+                text={t('autodeck:custom_color')}
+                description={t('autodeck:custom_color_helper')}
+              />
             </RadioButtons>
           )}
         />
@@ -44,30 +56,31 @@ const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMe
           <Controller
             control={form.control}
             name="primaryColour"
-            defaultValue={palette?.[0] || "#BEE3F8"}
-            render={({ onChange, value }) => (
-              <ColorPaletteFragment palette={palette} form={form} onChange={onChange} value={value} />
+            defaultValue={palette?.[0] || '#BEE3F8'}
+            render={({ field }) => (
+              <ColorPaletteFragment palette={palette} form={form} onChange={field.onChange} value={field.value} />
             )}
           />
         </FormControl>
       )}
 
-      {form.watch('useCustomColour') === 0 &&
-        <>
-          <FormControl isInvalid={!!form.errors.primaryColour} isRequired>
-            <FormLabel htmlFor="primaryColour">{t('branding_color')}</FormLabel>
-            <InputHelper>{t('customer:branding_color_helper')}</InputHelper>
-            <Controller
-              control={form.control}
-              name="primaryColour"
-              defaultValue="#BEE3F8"
-              as={<ColorPickerInput />}
-            />
-          </FormControl>
-        </>
-      }
+      {form.watch('useCustomColour') === 0
+        && (
+          <>
+            <FormControl isInvalid={!!form.formState.errors.primaryColour} isRequired>
+              <FormLabel htmlFor="primaryColour">{t('branding_color')}</FormLabel>
+              <InputHelper>{t('customer:branding_color_helper')}</InputHelper>
+              <Controller
+                control={form.control}
+                name="primaryColour"
+                defaultValue="#BEE3F8"
+                render={({ field }) => <ColorPickerInput {...field} />}
+              />
+            </FormControl>
+          </>
+        )}
     </>
   );
 };
 
-export default PrimaryColourFragment
+export default PrimaryColourFragment;
