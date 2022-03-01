@@ -6,7 +6,7 @@ import {
   Clock, Copy, MessageSquare, MoreVertical, PlusCircle, RefreshCcw, Trash2, Type,
 } from 'react-feather';
 import { Button, ButtonGroup } from '@chakra-ui/core';
-import { Controller, FieldArrayMethodProps, useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { Controller, FieldArrayMethodProps, useFieldArray, useForm } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted,
@@ -35,7 +35,6 @@ import {
 } from 'types/generated-types';
 import { ConditionNodePicker } from 'components/NodePicker/ConditionNodePicker';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
-import { NodePicker } from 'components/NodePicker';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import { useNavigator } from 'hooks/useNavigator';
@@ -86,7 +85,7 @@ const schema = yup.object({
       logical: yup.object().shape({
         label: yup.string().required(),
         value: yup.string().required(),
-      }),
+      }).notRequired(),
       conditions: yup.array().of(
         yup.object().required().shape(
           {
@@ -101,8 +100,8 @@ const schema = yup.object({
             }).required(),
           },
         ),
-      ).required(),
-    }).nullable(),
+      ).notRequired(),
+    }).nullable().notRequired(),
   }),
 }).required();
 
@@ -210,6 +209,7 @@ const ChildBuilderEntry = ({
   activeConditions,
 }: ConditionBuilderEntryProps) => {
   const { t } = useTranslation();
+
   return (
     <UI.Div backgroundColor={DEPTH_BACKGROUND_COLORS[1]}>
       <UI.Grid m={2} gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto">
@@ -304,7 +304,7 @@ const ChildBuilderEntry = ({
           <UI.Div>
             <Controller
               name={`childBuilder.conditions.${index}.operator`}
-              defaultValue={undefined}
+              defaultValue={(condition as any)?.operator}
               control={form.control}
               render={({ field: { value, onChange } }) => (
                 <Select options={OPERATORS} onChange={onChange} value={value} />
@@ -352,10 +352,12 @@ const AddAutomationView = () => {
     mode: 'onChange',
     defaultValues: {
       automationType: AutomationType.Trigger,
-      conditionBuilder: {
+      conditionBuilder:
+      {
         logical: { label: 'AND', value: 'AND' },
         conditions: [],
-        childBuilder: {
+        childBuilder:
+        {
           logical: { label: 'AND', value: 'AND' },
           conditions: [],
         },
@@ -416,20 +418,20 @@ const AddAutomationView = () => {
       ],
     };
 
-    console.log('Input data: ', input);
+    // console.log('Input data: ', input);
 
-    // createAutomation({
-    //   variables: {
-    //     input,
-    //   },
-    // });
+    createAutomation({
+      variables: {
+        input,
+      },
+    });
   };
 
-  const watchedConditionBuilder = useWatch({
-    name: 'conditionBuilder',
-    control: form.control,
-  });
-  console.log('watch', watchedConditionBuilder);
+  // const watchedConditionBuilder = useWatch({
+  //   name: 'conditionBuilder',
+  //   control: form.control,
+  // });
+  // console.log('watch', watchedConditionBuilder);
   // console.log('Condition dields: ', conditionFields);
 
   return (
@@ -560,7 +562,7 @@ const AddAutomationView = () => {
                               )}
 
                             </UI.Div>
-                            {condition?.isGrouped && (
+                            {(condition as any)?.isGrouped && (
                               <UI.Div gridColumn="2 / 7">
                                 <ChildBuilderEntry
                                   activeConditions={activeConditions}
@@ -574,7 +576,7 @@ const AddAutomationView = () => {
                               </UI.Div>
 
                             )}
-                            {!condition?.isGrouped && (
+                            {!(condition as any)?.isGrouped && (
                               <>
                                 <UI.Div alignItems="center" display="flex">
                                   <Controller
@@ -735,7 +737,7 @@ const AddAutomationView = () => {
               );
               if (childBuilderFieldArray.fields.length === 1) {
                 const groupCondition = conditionFields.findIndex(
-                  (condition) => (condition?.isGrouped) === true,
+                  (condition) => ((condition as any)?.isGrouped) === true,
                 );
                 if (groupCondition !== -1) {
                   remove(groupCondition);
@@ -781,12 +783,11 @@ const AddAutomationView = () => {
           disabled={activeItem?.depth === 1}
           onClick={() => {
             const conditionIndex = conditionFields.findIndex((field) => field.arrayKey === activeItem.arrayKey);
-            // const newDepth = parseInt(activeItem.depth, 10) + 1;
 
             const { arrayKey, ...activeConditionBuilder } = activeItem;
+            console.log('Active condition builder ITEM: ', activeConditionBuilder);
             const groupedCondition = { ...activeItem, isGrouped: true };
             childBuilderFieldArray.append(activeConditionBuilder);
-            // remove(conditionIndex);
             update(conditionIndex, groupedCondition);
           }}
         >

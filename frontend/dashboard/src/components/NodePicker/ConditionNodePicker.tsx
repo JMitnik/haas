@@ -5,9 +5,8 @@ import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
-import { MapNodeToProperties } from 'components/MapNodeToProperties';
 import { NodeCellContainer } from 'components/NodeCell/NodeCell';
-import { QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
+import { QuestionNodeTypeEnum } from 'types/generated-types';
 
 import { ConditionEntry, CreateConditionModalCard } from 'views/AddAutomationView/CreateConditionModalCard';
 import { NodePickerHeader } from './NodePickerStyles';
@@ -78,13 +77,8 @@ const DropdownSingleValue = (props: any) => (
   </components.SingleValue>
 );
 
-interface NodeSelect extends Partial<QuestionNode> {
-  label: string;
-  value: string;
-}
-
 interface NodePickerProps {
-  onChange: (node: NodeSelect) => void;
+  onChange: (node: ConditionEntry) => void;
   items: ConditionEntry[];
   onModalOpen?: () => void;
   onModalClose?: () => void;
@@ -98,18 +92,18 @@ export const ConditionNodePicker = ({ onChange,
   const [filteredItems, setFilteredItems] = useState(items);
   const { t } = useTranslation();
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
-  console.log('ITEMS: ', items);
+  // console.log('ITEMS: ', items);
 
-  const handleChange = (callToAction: QuestionNode) => {
-    onChange({
-      id: callToAction.id,
-      type: callToAction.type,
-      label: callToAction.title,
-      value: callToAction.id,
-    });
-    setCreateModalIsOpen(false);
-    onClose?.();
-  };
+  // const handleChange = (callToAction: QuestionNode) => {
+  //   onChange({
+  //     id: callToAction.id,
+  //     type: callToAction.type,
+  //     label: callToAction.title,
+  //     value: callToAction.id,
+  //   });
+  //   setCreateModalIsOpen(false);
+  //   onClose?.();
+  // };
 
   const handleOpenModal = () => {
     setCreateModalIsOpen(true);
