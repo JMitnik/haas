@@ -745,6 +745,14 @@ class AutomationService {
   }
 
   /**
+   * Enables/Disables an automation 
+   * @param input an object containing the automation id as well as the state (true/false) of the automation
+   */
+  public enableAutomation = (input: NexusGenInputs['EnableAutomationInput']) => {
+    return this.automationPrismaAdapter.enableAutomation(input);
+  };
+
+  /**
    * Updates an automation with the provided data after validating all
    * @param input object containing all information needed to update an automation
    * @returns updated Automation (without relationship fields)

@@ -1082,6 +1082,21 @@ export class AutomationPrismaAdapter {
   }
 
   /**
+   * Enables/Disables an automation 
+   * @param input an object containing the automation id as well as the state (true/false) of the automation
+   */
+  enableAutomation = async (input: NexusGenInputs['EnableAutomationInput']) => {
+    return this.prisma.automation.update({
+      where: {
+        id: input.automationId,
+      },
+      data: {
+        isActive: input.state,
+      },
+    });
+  };
+
+  /**
    * Updates an automation based on provided input
    * @param input an object containing all information necessary to update an automation
    * @returns an updated Automation

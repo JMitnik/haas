@@ -6,13 +6,19 @@ import {
 } from '@chakra-ui/core';
 
 import { formatDistance } from 'date-fns';
-import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/client';
+import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
 
-import { AutomationModel, AutomationType } from 'types/generated-types';
+import {
+  AutomationModel,
+  AutomationType,
+  EnableAutomationInput,
+  useEnableAutomationMutation,
+} from 'types/generated-types';
 import { deleteDialogueMutation } from 'mutations/deleteDialogue';
+import { useCustomer } from 'providers/CustomerProvider';
 import ShowMoreButton from 'components/ShowMoreButton';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
@@ -66,12 +72,14 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
 };
 
 const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, isCompact?: boolean }) => {
-  const history = useHistory();
   const { customerSlug } = useParams<{ customerSlug: string }>();
+  const { activeCustomer } = useCustomer();
   const { canAccessAdmin } = useAuth();
   const ref = useRef(null);
   const { t } = useTranslation();
   const toast = useToast();
+
+  const [enableAutomation] = useEnableAutomationMutation();
 
   const [deleteDialogue] = useMutation(deleteDialogueMutation, {
     refetchQueries: [{
@@ -119,6 +127,22 @@ const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, 
     // history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}/edit`);
   };
 
+  const handleEnableChange = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+
+    const input: EnableAutomationInput = {
+      automationId: automation.id,
+      workspaceId: activeCustomer?.id as string,
+      state: !automation.isActive,
+    };
+
+    enableAutomation({
+      variables: {
+        input,
+      },
+    });
+  };
+
   const renderAutomationTypeColor = (type: AutomationType) => {
     switch (type) {
       case AutomationType.Trigger:
@@ -151,7 +175,11 @@ const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, 
             <TypeBadge>
               <Bell color={automationTypeColour} />
             </TypeBadge>
-            <Switch size="lg" />
+            <Switch
+              isChecked={automation.isActive}
+              onClick={handleEnableChange}
+              size="lg"
+            />
           </UI.Flex>
 
           <UI.ColumnFlex height="100%" justifyContent="space-between">

@@ -12,6 +12,7 @@ query automationConnection($workspaceSlug: String) {
         pageIndex
       }
       automations {
+        id
         label
         description
       	updatedAt

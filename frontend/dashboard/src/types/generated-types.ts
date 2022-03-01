@@ -858,6 +858,12 @@ export type EditWorkspaceInput = {
   primaryColour: Scalars['String'];
 };
 
+export type EnableAutomationInput = {
+  workspaceId: Scalars['String'];
+  automationId: Scalars['String'];
+  state: Scalars['Boolean'];
+};
+
 export type FailedDeliveryModel = {
   __typename?: 'FailedDeliveryModel';
   record: Scalars['String'];
@@ -1135,6 +1141,7 @@ export type Mutation = {
   /** Creates a new automation. */
   createAutomation: AutomationModel;
   updateAutomation: AutomationModel;
+  enableAutomation?: Maybe<AutomationModel>;
   createCampaign: CampaignType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
   updateDeliveryStatus: Scalars['String'];
@@ -1252,6 +1259,11 @@ export type MutationCreateAutomationArgs = {
 
 export type MutationUpdateAutomationArgs = {
   input?: Maybe<CreateAutomationInput>;
+};
+
+
+export type MutationEnableAutomationArgs = {
+  input?: Maybe<EnableAutomationInput>;
 };
 
 
@@ -2396,7 +2408,7 @@ export type AutomationConnectionQuery = (
         & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
       ), automations: Array<(
         { __typename?: 'AutomationModel' }
-        & Pick<AutomationModel, 'label' | 'description' | 'updatedAt' | 'isActive' | 'type'>
+        & Pick<AutomationModel, 'id' | 'label' | 'description' | 'updatedAt' | 'isActive' | 'type'>
         & { automationTrigger?: Maybe<(
           { __typename?: 'AutomationTriggerModel' }
           & Pick<AutomationTriggerModel, 'dialogueSlug'>
@@ -2653,6 +2665,19 @@ export type WhitifyImageMutation = (
   & { whitifyImage?: Maybe<(
     { __typename?: 'AWSImageType' }
     & Pick<AwsImageType, 'url'>
+  )> }
+);
+
+export type EnableAutomationMutationVariables = Exact<{
+  input?: Maybe<EnableAutomationInput>;
+}>;
+
+
+export type EnableAutomationMutation = (
+  { __typename?: 'Mutation' }
+  & { enableAutomation?: Maybe<(
+    { __typename?: 'AutomationModel' }
+    & Pick<AutomationModel, 'id' | 'label' | 'isActive'>
   )> }
 );
 
@@ -3201,6 +3226,7 @@ export const AutomationConnectionDocument = gql`
         pageIndex
       }
       automations {
+        id
         label
         description
         updatedAt
@@ -3870,6 +3896,41 @@ export function useWhitifyImageMutation(baseOptions?: Apollo.MutationHookOptions
 export type WhitifyImageMutationHookResult = ReturnType<typeof useWhitifyImageMutation>;
 export type WhitifyImageMutationResult = Apollo.MutationResult<WhitifyImageMutation>;
 export type WhitifyImageMutationOptions = Apollo.BaseMutationOptions<WhitifyImageMutation, WhitifyImageMutationVariables>;
+export const EnableAutomationDocument = gql`
+    mutation enableAutomation($input: EnableAutomationInput) {
+  enableAutomation(input: $input) {
+    id
+    label
+    isActive
+  }
+}
+    `;
+export type EnableAutomationMutationFn = Apollo.MutationFunction<EnableAutomationMutation, EnableAutomationMutationVariables>;
+
+/**
+ * __useEnableAutomationMutation__
+ *
+ * To run a mutation, you first call `useEnableAutomationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEnableAutomationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [enableAutomationMutation, { data, loading, error }] = useEnableAutomationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useEnableAutomationMutation(baseOptions?: Apollo.MutationHookOptions<EnableAutomationMutation, EnableAutomationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EnableAutomationMutation, EnableAutomationMutationVariables>(EnableAutomationDocument, options);
+      }
+export type EnableAutomationMutationHookResult = ReturnType<typeof useEnableAutomationMutation>;
+export type EnableAutomationMutationResult = Apollo.MutationResult<EnableAutomationMutation>;
+export type EnableAutomationMutationOptions = Apollo.BaseMutationOptions<EnableAutomationMutation, EnableAutomationMutationVariables>;
 export const CreateBatchDeliveriesDocument = gql`
     mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
   createBatchDeliveries(input: $input) {
