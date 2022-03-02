@@ -22,6 +22,115 @@ export class AutomationPrismaAdapter {
     this.prisma = prisma;
   }
 
+  deleteAutomation = async (input: NexusGenInputs['DeleteAutomationInput']) => {
+    const automation = await this.prisma.automation.delete({
+      where: {
+        id: input.automationId,
+      },
+    });
+
+    if (automation?.automationTriggerId) {
+      const automationTrigger = await this.prisma.automationTrigger.delete({
+        where: {
+          id: automation.automationTriggerId,
+        },
+        include: {
+          conditionBuilder: {
+            include: {
+              conditions: true,
+              childConditionBuilder: {
+                include: {
+                  conditions: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const builderConditionIds = automationTrigger.conditionBuilder.conditions.map((condition) => condition.id);
+      const childBuilderConditionIds = automationTrigger.conditionBuilder.childConditionBuilder?.conditions.map(
+        (condition) => condition.id) || []
+
+      const conditionIds = [...builderConditionIds, ...childBuilderConditionIds]
+      const builderIds = [automationTrigger.conditionBuilder.id]
+
+      if (automationTrigger.conditionBuilder.childConditionBuilder?.id) {
+        builderIds.push(automationTrigger.conditionBuilder.childConditionBuilder?.id);
+      };
+
+      await this.prisma.automationEvent.deleteMany({
+        where: {
+          automationTrigger: {
+            some: {
+              id: automationTrigger.id,
+            },
+          },
+        },
+      });
+
+      await this.prisma.automationConditionOperand.deleteMany({
+        where: {
+          automationConditionId: {
+            in: conditionIds,
+          },
+        },
+      });
+
+      await this.prisma.dialogueConditionScope.deleteMany({
+        where: {
+          automationConditionId: {
+            in: conditionIds,
+          },
+        },
+      });
+
+      await this.prisma.questionConditionScope.deleteMany({
+        where: {
+          automationConditionId: {
+            in: conditionIds,
+          },
+        },
+      })
+
+      await this.prisma.workspaceConditionScope.deleteMany({
+        where: {
+          automationConditionId: {
+            in: conditionIds,
+          },
+        },
+      });
+
+      await this.prisma.automationCondition.deleteMany({
+        where: {
+          automationConditionBuilderId: {
+            in: builderIds,
+          },
+        },
+      });
+
+      await this.prisma.automationConditionBuilder.deleteMany({
+        where: {
+          id: {
+            in: builderIds,
+          },
+        },
+      });
+
+      await this.prisma.automationAction.deleteMany({
+        where: {
+          automationTriggers: {
+            some: {
+              id: automationTrigger.id,
+            },
+          },
+        },
+      });
+    }
+
+    return automation;
+  }
+
   /**
    * Finds an AutomationConditionBuilder by its ID
    * @param builderId id of a condition builder

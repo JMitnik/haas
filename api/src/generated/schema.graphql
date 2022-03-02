@@ -533,6 +533,11 @@ type CustomFieldType {
 """Date custom scalar type"""
 scalar Date
 
+input DeleteAutomationInput {
+  automationId: String!
+  workspaceId: String!
+}
+
 input DeleteDialogueInputType {
   customerSlug: String
   id: ID
@@ -1031,6 +1036,7 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(input: CreateTriggerInputType): TriggerType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
+  deleteAutomation(input: DeleteAutomationInput): AutomationModel
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!

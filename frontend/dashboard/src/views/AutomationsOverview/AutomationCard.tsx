@@ -6,7 +6,6 @@ import {
 } from '@chakra-ui/core';
 
 import { formatDistance } from 'date-fns';
-import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
@@ -14,29 +13,30 @@ import React, { useRef } from 'react';
 import {
   AutomationModel,
   AutomationType,
+  DeleteAutomationInput,
   EnableAutomationInput,
+  refetchAutomationConnectionQuery,
+  useDeleteAutomationMutation,
   useEnableAutomationMutation,
 } from 'types/generated-types';
-import { deleteDialogueMutation } from 'mutations/deleteDialogue';
 import { useCustomer } from 'providers/CustomerProvider';
 import ShowMoreButton from 'components/ShowMoreButton';
-import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
 
 import { TypeBadge } from './AutomationOverviewStyles';
 
-interface DialogueCardOptionsOverlayProps {
+interface AutomationCardOptionsOverlayProps {
   onDelete: (e: React.MouseEvent<HTMLElement>) => void;
   onEdit: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
-const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => {
+const AutomationCardOptionsOverlay = ({ onDelete, onEdit }: AutomationCardOptionsOverlayProps) => {
   const { t } = useTranslation();
 
   return (
     <UI.List>
-      <UI.ListHeader>{t('edit_dialogue')}</UI.ListHeader>
+      <UI.ListHeader>{t('edit_automation')}</UI.ListHeader>
       <Popover>
         {() => (
           <>
@@ -50,7 +50,7 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
               <PopoverHeader>{t('delete')}</PopoverHeader>
               <PopoverCloseButton />
               <PopoverBody>
-                <UI.Text>{t('delete_dialogue_popover')}</UI.Text>
+                <UI.Text>{t('delete_automation_popover')}</UI.Text>
               </PopoverBody>
               <PopoverFooter>
                 <Button
@@ -71,7 +71,7 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
   );
 };
 
-const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, isCompact?: boolean }) => {
+const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel, isCompact?: boolean }) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { activeCustomer } = useCustomer();
   const { canAccessAdmin } = useAuth();
@@ -81,17 +81,16 @@ const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, 
 
   const [enableAutomation] = useEnableAutomationMutation();
 
-  const [deleteDialogue] = useMutation(deleteDialogueMutation, {
-    refetchQueries: [{
-      query: getDialoguesOfCustomer,
-      variables: {
-        customerSlug,
-      },
-    }],
+  const [deleteAutomation] = useDeleteAutomationMutation({
+    refetchQueries: [
+      refetchAutomationConnectionQuery({
+        workspaceSlug: customerSlug,
+      }),
+    ],
     onCompleted: () => {
       toast({
-        title: 'Dialogue deleted',
-        description: 'The dialogue has been deleted.',
+        title: 'Automation deleted',
+        description: 'The automation has been deleted.',
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
@@ -100,7 +99,7 @@ const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, 
     onError: () => {
       toast({
         title: 'Something went wrong!',
-        description: 'The dialogue was not deleted.',
+        description: 'The automation was not deleted.',
         status: 'error',
         position: 'bottom-right',
         duration: 1500,
@@ -108,15 +107,16 @@ const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, 
     },
   });
 
-  const handleDeleteDialogue = async (e: React.MouseEvent<HTMLElement>) => {
+  const handleDeleteAutomation = async (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
+    const input: DeleteAutomationInput = {
+      automationId: automation.id,
+      workspaceId: activeCustomer?.id as string,
+    };
 
-    deleteDialogue({
+    deleteAutomation({
       variables: {
-        input: {
-          id: automation.id,
-          customerSlug,
-        },
+        input,
       },
     });
   };
@@ -160,7 +160,7 @@ const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, 
   return (
     <UI.Card
       ref={ref}
-      data-cy="DialogueCard"
+      data-cy="AutomationCard"
       bg="white"
       useFlex
       flexDirection="column"
@@ -241,8 +241,8 @@ const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, 
                   {canAccessAdmin && (
                     <ShowMoreButton
                       renderMenu={(
-                        <DialogueCardOptionsOverlay
-                          onDelete={handleDeleteDialogue}
+                        <AutomationCardOptionsOverlay
+                          onDelete={handleDeleteAutomation}
                           onEdit={goToEditDialogue}
                         />
                       )}
@@ -260,4 +260,4 @@ const DialogueCard = ({ automation, isCompact }: { automation: AutomationModel, 
   );
 };
 
-export default DialogueCard;
+export default AutomationCard;

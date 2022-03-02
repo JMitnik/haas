@@ -37,3 +37,25 @@ export const EnableAutomationResolver = mutationField('enableAutomation', {
     return ctx.services.automationService.enableAutomation(args.input);
   },
 });
+
+export const DeleteAutomationInput = inputObjectType({
+  name: 'DeleteAutomationInput',
+  definition(t) {
+    t.string('workspaceId', { required: true });
+    t.string('automationId', { required: true });
+  },
+});
+
+export const DeleteAutomationResolver = mutationField('deleteAutomation', {
+  type: AutomationModel,
+  args: {
+    input: DeleteAutomationInput,
+  },
+  nullable: true,
+  async resolve(parent, args, ctx) {
+
+    if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+
+    return ctx.services.automationService.deleteAutomation(args.input);
+  },
+});

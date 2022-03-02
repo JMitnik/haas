@@ -307,6 +307,10 @@ const language = {
       en: 'Edit question',
       de: 'Question bearbeiten',
     },
+    edit_automation: {
+      en: 'Edit automation',
+      de: 'Automatisierung bearbeiten',
+    },
     edit_dialogue: {
       en: 'Edit dialogue',
       de: 'Dialog bearbeiten',
@@ -972,6 +976,12 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     visit: {
       en: 'Visit',
       de: 'Besuchen',
+    },
+    delete_automation_popover: {
+      en:
+        'You are about to delete an automation and all related data. This cannot be undone! Are you sure?',
+      de:
+        'Du bist dabei ein Automatisierung mit allen dazugehörigen data zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_dialogue_popover: {
       en:

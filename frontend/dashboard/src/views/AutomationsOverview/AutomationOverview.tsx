@@ -38,7 +38,6 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
 
   const { canDeleteDialogue } = useAuth();
 
-  // TODO: Add back equivalent of data?.customer?.dialogues
   const filteredAutomations = automationConnection.automations;
 
   return (

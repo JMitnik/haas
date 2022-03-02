@@ -48,6 +48,10 @@ class AutomationService {
     this.userService = new UserService(prisma);
   }
 
+  deleteAutomation = async (input: NexusGenInputs['DeleteAutomationInput']) => {
+    return this.automationPrismaAdapter.deleteAutomation(input);
+  }
+
   /**
    * Validates all conditions in a condition builder (including its nested condition builders)
    * @param builderId ID of the root condition builder

@@ -605,6 +605,11 @@ export type CustomFieldType = {
 };
 
 
+export type DeleteAutomationInput = {
+  workspaceId: Scalars['String'];
+  automationId: Scalars['String'];
+};
+
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
   customerSlug?: Maybe<Scalars['String']>;
@@ -1142,6 +1147,7 @@ export type Mutation = {
   createAutomation: AutomationModel;
   updateAutomation: AutomationModel;
   enableAutomation?: Maybe<AutomationModel>;
+  deleteAutomation?: Maybe<AutomationModel>;
   createCampaign: CampaignType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
   updateDeliveryStatus: Scalars['String'];
@@ -1264,6 +1270,11 @@ export type MutationUpdateAutomationArgs = {
 
 export type MutationEnableAutomationArgs = {
   input?: Maybe<EnableAutomationInput>;
+};
+
+
+export type MutationDeleteAutomationArgs = {
+  input?: Maybe<DeleteAutomationInput>;
 };
 
 
@@ -2668,6 +2679,19 @@ export type WhitifyImageMutation = (
   )> }
 );
 
+export type DeleteAutomationMutationVariables = Exact<{
+  input?: Maybe<DeleteAutomationInput>;
+}>;
+
+
+export type DeleteAutomationMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteAutomation?: Maybe<(
+    { __typename?: 'AutomationModel' }
+    & Pick<AutomationModel, 'id' | 'label'>
+  )> }
+);
+
 export type EnableAutomationMutationVariables = Exact<{
   input?: Maybe<EnableAutomationInput>;
 }>;
@@ -3896,6 +3920,40 @@ export function useWhitifyImageMutation(baseOptions?: Apollo.MutationHookOptions
 export type WhitifyImageMutationHookResult = ReturnType<typeof useWhitifyImageMutation>;
 export type WhitifyImageMutationResult = Apollo.MutationResult<WhitifyImageMutation>;
 export type WhitifyImageMutationOptions = Apollo.BaseMutationOptions<WhitifyImageMutation, WhitifyImageMutationVariables>;
+export const DeleteAutomationDocument = gql`
+    mutation deleteAutomation($input: DeleteAutomationInput) {
+  deleteAutomation(input: $input) {
+    id
+    label
+  }
+}
+    `;
+export type DeleteAutomationMutationFn = Apollo.MutationFunction<DeleteAutomationMutation, DeleteAutomationMutationVariables>;
+
+/**
+ * __useDeleteAutomationMutation__
+ *
+ * To run a mutation, you first call `useDeleteAutomationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteAutomationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteAutomationMutation, { data, loading, error }] = useDeleteAutomationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteAutomationMutation(baseOptions?: Apollo.MutationHookOptions<DeleteAutomationMutation, DeleteAutomationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteAutomationMutation, DeleteAutomationMutationVariables>(DeleteAutomationDocument, options);
+      }
+export type DeleteAutomationMutationHookResult = ReturnType<typeof useDeleteAutomationMutation>;
+export type DeleteAutomationMutationResult = Apollo.MutationResult<DeleteAutomationMutation>;
+export type DeleteAutomationMutationOptions = Apollo.BaseMutationOptions<DeleteAutomationMutation, DeleteAutomationMutationVariables>;
 export const EnableAutomationDocument = gql`
     mutation enableAutomation($input: EnableAutomationInput) {
   enableAutomation(input: $input) {
