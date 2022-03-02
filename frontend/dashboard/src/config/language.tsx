@@ -1491,6 +1491,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   views: {
+    edit_automation_view: {
+      en: 'Edit automation',
+      de: 'Automatisierung bearbeiten',
+    },
     add_automation_view: {
       en: 'Add automation',
       de: 'Automatisierung hinzufügen',

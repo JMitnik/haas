@@ -32,6 +32,7 @@ import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
 import DialoguesPage from 'pages/dashboard/dialogues';
+import EditAutomationView from 'views/EditAutomationView';
 import EditCustomerView from 'views/EditCustomerView';
 import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
@@ -120,6 +121,12 @@ const CustomerRoutes = () => (
                       allowedPermission={SystemPermission.CanViewAutomations}
                       path={ROUTES.NEW_AUTOMATION_VIEW}
                       render={() => <AddAutomationView />}
+                    />
+
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CanUpdateAutomations}
+                      path={ROUTES.EDIT_AUTOMATION_VIEW}
+                      render={() => <EditAutomationView />}
                     />
 
                     <GuardedRoute

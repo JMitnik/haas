@@ -13,7 +13,11 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Table from 'components/Common/Table';
-import { AutomationConnection, useAutomationConnectionQuery } from 'types/generated-types';
+import {
+  AutomationConnection,
+  AutomationConnectionOrderType,
+  useAutomationConnectionQuery,
+} from 'types/generated-types';
 import Searchbar from 'components/SearchBar';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 import useAuth from 'hooks/useAuth';
@@ -45,6 +49,10 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
         search: filter.search,
         offset: filter.pageIndex * filter.perPage,
         perPage: filter.perPage,
+        orderBy: {
+          by: AutomationConnectionOrderType.UpdatedAt,
+          desc: true,
+        },
       },
     },
     errorPolicy: 'ignore',

@@ -20,6 +20,7 @@ import {
   useEnableAutomationMutation,
 } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useNavigator } from 'hooks/useNavigator';
 import ShowMoreButton from 'components/ShowMoreButton';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
@@ -75,6 +76,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { activeCustomer } = useCustomer();
   const { canAccessAdmin } = useAuth();
+  const { goToEditAutomationView } = useNavigator();
   const ref = useRef(null);
   const { t } = useTranslation();
   const toast = useToast();
@@ -121,10 +123,9 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
     });
   };
 
-  // TODO: Move this url to a constant or so and add back for automation
-  const goToEditDialogue = (e: React.MouseEvent<HTMLElement>) => {
+  const goToEditAutomation = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    // history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}/edit`);
+    goToEditAutomationView(automation.id);
   };
 
   const handleEnableChange = (e: React.MouseEvent<HTMLElement>) => {
@@ -243,7 +244,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
                       renderMenu={(
                         <AutomationCardOptionsOverlay
                           onDelete={handleDeleteAutomation}
-                          onEdit={goToEditDialogue}
+                          onEdit={goToEditAutomation}
                         />
                       )}
                     />

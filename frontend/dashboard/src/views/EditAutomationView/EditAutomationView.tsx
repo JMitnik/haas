@@ -9,9 +9,9 @@ import {
 } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 
-import AutomationForm from './AutomationForm';
+import AutomationForm from '../AddAutomationView/AutomationForm';
 
-const AddAutomationView = () => {
+const EditAutomationView = () => {
   const { goToAutomationOverview } = useNavigator();
   const { t } = useTranslation();
 
@@ -29,7 +29,7 @@ const AddAutomationView = () => {
   return (
     <>
       <UI.ViewHead>
-        <UI.ViewTitle>{t('views:add_automation_view')}</UI.ViewTitle>
+        <UI.ViewTitle>{t('views:edit_automation_view')}</UI.ViewTitle>
       </UI.ViewHead>
 
       <UI.ViewBody>
@@ -41,4 +41,4 @@ const AddAutomationView = () => {
   );
 };
 
-export default AddAutomationView;
+export default EditAutomationView;
