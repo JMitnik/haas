@@ -3,19 +3,22 @@ import { Button, ButtonGroup } from '@chakra-ui/core';
 import { Div, Flex, Grid, H4, ViewTitle } from '@haas/ui';
 import { Grid as GridIcon, List, Plus } from 'react-feather';
 import { Link, useParams } from 'react-router-dom';
-import { useLazyQuery } from '@apollo/client';
+import {
+  NumberParam,
+  StringParam,
+  useQueryParams,
+  withDefault,
+} from 'use-query-params';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { AutomationConnection } from 'types/generated-types';
-import { getQuestionnairesOfCustomer as CustomerData } from 'queries/__generated__/getQuestionnairesOfCustomer';
+import * as Table from 'components/Common/Table';
+import { AutomationConnection, useAutomationConnectionQuery } from 'types/generated-types';
 import Searchbar from 'components/SearchBar';
 import SurveyIcon from 'components/Icons/SurveyIcon';
-import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import useAuth from 'hooks/useAuth';
 
 import { AddDialogueCard, TranslatedPlus } from './AutomationOverviewStyles';
-import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import AutomationCard from './AutomationCard';
 
 interface AutomationOverviewProps {
@@ -25,20 +28,36 @@ interface AutomationOverviewProps {
 const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
-  const { goToNewAutomationView } = useNavigator();
+  const [activeAutomationConnection, setAutomationConnection] = useState<AutomationConnection>(automationConnection);
+  const [filter, setFilter] = useQueryParams({
+    search: StringParam,
+    pageIndex: withDefault(NumberParam, 0),
+    perPage: withDefault(NumberParam, 7),
+  });
 
   const [useDialogueGridView, setUseDialogueGridView] = useState(true);
 
-  // TODO: Handle the loading
-  const [loadCustomerData, { data }] = useLazyQuery<CustomerData>(getDialoguesOfCustomer, {
+  const { loading: isLoading } = useAutomationConnectionQuery({
+    fetchPolicy: 'network-only',
     variables: {
-      customerSlug,
+      workspaceSlug: customerSlug,
+      filter: {
+        search: filter.search,
+        offset: filter.pageIndex * filter.perPage,
+        perPage: filter.perPage,
+      },
+    },
+    errorPolicy: 'ignore',
+    notifyOnNetworkStatusChange: true,
+    onCompleted: (fetchedData) => {
+      setAutomationConnection(fetchedData.customer?.automationConnection as AutomationConnection);
     },
   });
 
   const { canDeleteDialogue } = useAuth();
 
-  const filteredAutomations = automationConnection.automations;
+  const filteredAutomations = activeAutomationConnection.automations;
+  const pageCount = activeAutomationConnection.totalPages || 0;
 
   return (
     <>
@@ -50,12 +69,16 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
       <UI.ViewBody>
 
         <Div mb={4} maxWidth="800px" width="100%">
-          <Flex>
+          <Flex alignItems="center">
             <Div mr={4}>
               <Searchbar
                 activeSearchTerm=""
-                onSearchTermChange={(newTerm) => {
-                  loadCustomerData({ variables: { customerSlug, filter: { searchTerm: newTerm } } });
+                onSearchTermChange={(search) => {
+                  setFilter((prevValues) => ({
+                    ...prevValues,
+                    search,
+                    pageIndex: 0,
+                  }));
                 }}
               />
             </Div>
@@ -77,7 +100,19 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
                 {t('list')}
               </Button>
             </ButtonGroup>
+            <UI.Flex justifyContent="flex-end" ml={4}>
+              {pageCount > 1 && (
+                <Table.Pagination
+                  pageIndex={filter.pageIndex}
+                  maxPages={pageCount}
+                  perPage={filter.perPage}
+                  isLoading={isLoading}
+                  setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+                />
+              )}
+            </UI.Flex>
           </Flex>
+
         </Div>
 
         {useDialogueGridView ? (

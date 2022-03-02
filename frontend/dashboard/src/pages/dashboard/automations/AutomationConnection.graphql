@@ -1,8 +1,8 @@
-query automationConnection($workspaceSlug: String) {
+query automationConnection($workspaceSlug: String, $filter: AutomationConnectionFilterInput) {
   customer(slug: $workspaceSlug) {
     id
     slug
-    automationConnection {
+    automationConnection(filter: $filter) {
       totalPages
       pageInfo {
         hasPrevPage

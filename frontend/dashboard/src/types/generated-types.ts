@@ -2403,6 +2403,7 @@ export type CreateCtaMutation = (
 
 export type AutomationConnectionQueryVariables = Exact<{
   workspaceSlug?: Maybe<Scalars['String']>;
+  filter?: Maybe<AutomationConnectionFilterInput>;
 }>;
 
 
@@ -3236,11 +3237,11 @@ export type CreateCtaMutationHookResult = ReturnType<typeof useCreateCtaMutation
 export type CreateCtaMutationResult = Apollo.MutationResult<CreateCtaMutation>;
 export type CreateCtaMutationOptions = Apollo.BaseMutationOptions<CreateCtaMutation, CreateCtaMutationVariables>;
 export const AutomationConnectionDocument = gql`
-    query automationConnection($workspaceSlug: String) {
+    query automationConnection($workspaceSlug: String, $filter: AutomationConnectionFilterInput) {
   customer(slug: $workspaceSlug) {
     id
     slug
-    automationConnection {
+    automationConnection(filter: $filter) {
       totalPages
       pageInfo {
         hasPrevPage
@@ -3281,6 +3282,7 @@ export const AutomationConnectionDocument = gql`
  * const { data, loading, error } = useAutomationConnectionQuery({
  *   variables: {
  *      workspaceSlug: // value for 'workspaceSlug'
+ *      filter: // value for 'filter'
  *   },
  * });
  */

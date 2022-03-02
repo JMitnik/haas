@@ -13,6 +13,10 @@ const AutomationsPage = () => {
   const { data, error, loading } = useAutomationConnectionQuery({
     variables: {
       workspaceSlug: customerSlug,
+      filter: {
+        offset: 0,
+        perPage: 7,
+      },
     },
     fetchPolicy: 'cache-and-network',
     onError: () => {
