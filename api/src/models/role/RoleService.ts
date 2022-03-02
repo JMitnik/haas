@@ -42,10 +42,6 @@ class RoleService {
     return role?.permissions || [];
   };
 
-  updatePermissions(roleId: string, permissions: SystemPermissionEnum[]) {
-    return this.rolePrismaAdapter.updatePermissions(roleId, permissions);
-  };
-
   createRole(customerId: string, roleName: string): Promise<Role> {
     const createInput: CreateRoleInput = {
       name: roleName,

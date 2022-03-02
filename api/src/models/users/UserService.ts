@@ -11,7 +11,7 @@ import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUp
 import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
-import { DeletedUserOutput, UserWithWorkspaces } from './UserServiceTypes';
+import { UserWithWorkspaces } from './UserServiceTypes';
 import { offsetPaginate } from '../general/PaginationHelpers';
 
 class UserService {
@@ -25,13 +25,6 @@ class UserService {
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
-  };
-
-  async deleteUser(userId: string, customerId: string): Promise<DeletedUserOutput> {
-    const removedUser = await this.userOfCustomerPrismaAdapter.delete(userId, customerId);
-    if (removedUser) return { deletedUser: true };
-
-    return { deletedUser: false };
   };
 
   async updateLastSeen(userId: string) {

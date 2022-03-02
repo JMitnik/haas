@@ -142,15 +142,6 @@ export const EditUserInput = inputObjectType({
   },
 });
 
-export const DeleteUserInput = inputObjectType({
-  name: 'DeleteUserInput',
-
-  definition(t) {
-    t.id('userId');
-    t.id('customerId');
-  },
-});
-
 export const DeleteUserOuput = objectType({
   name: 'DeleteUserOutput',
 
@@ -246,17 +237,6 @@ export const UserMutations = extendType({
         const userUpdateInput: Prisma.UserUpdateInput = { firstName, lastName, phone, email };
 
         return ctx.services.userService.editUser(userUpdateInput, email, args.userId, args.input.customerId, roleId);
-      },
-    });
-
-    t.field('deleteUser', {
-      type: DeleteUserOuput,
-      args: { input: DeleteUserInput },
-      async resolve(parent, args, ctx) {
-        if (!args.input?.customerId) throw new UserInputError('No workspace provided');
-        if (!args.input?.userId) throw new UserInputError('No user provided');
-
-        return ctx.services.userService.deleteUser(args.input.userId, args.input.customerId);
       },
     });
   },

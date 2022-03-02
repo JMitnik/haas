@@ -25,20 +25,6 @@ class UserOfCustomerPrismaAdapter {
   };
 
   /**
-   * Deletes a user-customer row.
-   * */
-  delete(userId: string, customerId: string): Promise<UserOfCustomer> {
-    return this.prisma.userOfCustomer.delete({
-      where: {
-        userId_customerId: {
-          customerId: customerId,
-          userId: userId,
-        },
-      },
-    });
-  };
-
-  /**
    * Creates a new user-customer role for existing customer and existing user.
    * => Returns user and customer
    * TODO: Replace this one by the connectUserToWorkspace (just include the colourSettings).

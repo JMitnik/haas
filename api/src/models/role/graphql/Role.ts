@@ -115,14 +115,6 @@ export const RoleQueries = extendType({
   },
 });
 
-export const UpdatePermissionsInput = inputObjectType({
-  name: 'UpdatePermissionsInput',
-  definition(t) {
-    t.string('roleId');
-    t.list.field('permissions', { type: SystemPermission });
-  },
-});
-
 export const PermissionIdsInput = inputObjectType({
   name: 'PermissionIdsInput',
   definition(t) {
@@ -130,64 +122,10 @@ export const PermissionIdsInput = inputObjectType({
   },
 });
 
-export const UpdatePermissionsMutationResolver = mutationField('updatePermissions', {
-  type: RoleType,
-  nullable: true,
-  args: { input: UpdatePermissionsInput },
-  resolve(parent, args, ctx) {
-    if (!args.input?.roleId) throw new UserInputError('No RoleId provided to update permissions for!');
-
-    return ctx.services.roleService.updatePermissions(args.input.roleId, args.input.permissions || []);
-  }
-})
-
-export const RoleMutations = extendType({
-  type: 'Mutation',
-  definition(t) {
-    t.field('createRole', {
-      type: RoleType,
-      args: { data: RoleInput },
-
-      async resolve(parent, args, ctx) {
-        if (!args.data?.customerId) {
-          throw new Error('Invalid customer id provided');
-        }
-
-        if (!args.data?.name) {
-          throw new Error('No role name provided');
-        }
-
-        // Rudimentary
-        return ctx.services.roleService.createRole(args.data.customerId, args.data.name);
-      },
-    });
-
-    t.field('updateRoles', {
-      type: RoleType,
-      args: { roleId: 'String', permissions: PermissionIdsInput },
-      async resolve(parent, args, ctx) {
-        if (!args.roleId) {
-          throw new Error('No role provided');
-        }
-
-        // TODO: Set to appropriate logic
-        const updateRole = await ctx.services.roleService.updatePermissions(args.roleId, []);
-
-        return updateRole;
-      },
-    });
-  },
-});
-
 export default [
-  UpdatePermissionsInput,
-  UpdatePermissionsMutationResolver,
-  // FindRoleInput,
-  // FindRoleByIdResolver,
   RoleConnection,
   RoleQueries,
   RoleDataInput,
   RoleInput,
-  RoleMutations,
   RoleType,
 ];

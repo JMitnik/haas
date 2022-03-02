@@ -30,20 +30,6 @@ class RolePrismaAdapter {
     })
   }
 
-  updatePermissions(roleId: string, permissions: SystemPermissionEnum[]) {
-    return this.prisma.role.update({
-      where: {
-        id: roleId,
-      },
-      data: {
-        permissions: {
-          // TODO: Set to appropriate logic
-          set: permissions
-        },
-      }
-    })
-  }
-
   update(roleId: string, data: Prisma.RoleUpdateInput): Promise<Role> {
     return this.prisma.role.update({
       where: {

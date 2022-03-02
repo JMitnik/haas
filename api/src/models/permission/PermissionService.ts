@@ -19,17 +19,6 @@ class PermissionService {
   getPermissionsOfCustomer(customerId: string): Promise<Permission[]> {
     return this.permissionPrismaAdapter.findPermissionsByCustomerId(customerId);
   };
-
-  deletePermissions = async (permissionIds: Array<string>) => {
-    return this.permissionPrismaAdapter.deleteMany(permissionIds);
-  };
-
-  createPermission = async (name: string, customerId: string, description?: string | null | undefined) => {
-    const input: CreatePermissionInput = { name, description, customerId };
-    const permission = await this.permissionPrismaAdapter.createPermission(input);
-    return permission;
-  };
-
 };
 
 export default PermissionService;
