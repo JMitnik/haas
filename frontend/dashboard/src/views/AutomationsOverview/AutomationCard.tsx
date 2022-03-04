@@ -193,7 +193,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
             </UI.Div>
 
             <UI.Div>
-              {automation.automationTrigger?.dialogueSlug && (
+              {automation.automationTrigger?.activeDialogue?.slug && (
                 <UI.Div mb={1}>
                   <UI.Label size="sm">
                     <UI.Flex alignItems="center">
@@ -202,7 +202,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
                       </UI.Icon>
                       <UI.Span ml={1} mt={1}>
                         <UI.Helper>
-                          {automation.automationTrigger?.dialogueSlug}
+                          {automation.automationTrigger?.activeDialogue?.slug}
                         </UI.Helper>
                       </UI.Span>
                     </UI.Flex>

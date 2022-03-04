@@ -34,7 +34,7 @@ const AddAutomationView = () => {
 
       <UI.ViewBody>
         <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-          <AutomationForm onCreateAutomation={createAutomation} onCreateAutomationLoading={loading} />
+          <AutomationForm onCreateAutomation={createAutomation} isLoading={loading} />
         </motion.div>
       </UI.ViewBody>
     </>

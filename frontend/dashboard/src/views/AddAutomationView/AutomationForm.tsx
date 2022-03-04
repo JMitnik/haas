@@ -34,7 +34,9 @@ import {
   OperandType,
   QuestionAspectType,
   QuestionNodeTypeEnum,
+  UpdateAutomationMutation,
 } from 'types/generated-types';
+import { AutomationInput } from 'views/EditAutomationView/EditAutomationView';
 import { ConditionNodePicker } from 'components/NodePicker/ConditionNodePicker';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -349,10 +351,14 @@ interface AutomationFormProps {
   onCreateAutomation?: (options?: MutationFunctionOptions<CreateAutomationMutation, Exact<{
     input?: Maybe<CreateAutomationInput> | undefined;
   }>> | undefined) => Promise<FetchResult<CreateAutomationMutation, Record<string, any>, Record<string, any>>>;
-  onCreateAutomationLoading?: boolean;
+  isLoading?: boolean;
+  onUpdateAutomation?: (options?: MutationFunctionOptions<UpdateAutomationMutation, Exact<{
+    input?: Maybe<CreateAutomationInput> | undefined;
+  }>> | undefined) => Promise<FetchResult<UpdateAutomationMutation, Record<string, any>, Record<string, any>>>;
+  automation?: AutomationInput;
 }
 
-const AutomationForm = ({ onCreateAutomation, onCreateAutomationLoading, isInEdit = false }: AutomationFormProps) => {
+const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = false }: AutomationFormProps) => {
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<any>();
 
@@ -361,15 +367,16 @@ const AutomationForm = ({ onCreateAutomation, onCreateAutomationLoading, isInEdi
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
-      automationType: AutomationType.Trigger,
+      title: automation?.label,
+      automationType: automation?.automationType || AutomationType.Trigger,
       conditionBuilder:
       {
-        logical: { label: 'AND', value: 'AND' },
-        conditions: [],
+        logical: automation?.conditionBuilder.logical,
+        conditions: automation?.conditionBuilder.conditions,
         childBuilder:
         {
-          logical: { label: 'AND', value: 'AND' },
-          conditions: [],
+          logical: automation?.conditionBuilder.childBuilder?.logical,
+          conditions: automation?.conditionBuilder.childBuilder?.conditions,
         },
       },
     },
@@ -684,13 +691,13 @@ const AutomationForm = ({ onCreateAutomation, onCreateAutomationLoading, isInEdi
           <ButtonGroup>
             <Button
               isDisabled={!form.formState.isValid}
-              isLoading={onCreateAutomationLoading}
+              isLoading={isLoading}
               variantColor="teal"
               type="submit"
             >
-              {t('create')}
+              {isInEdit ? t('update') : t('create')}
             </Button>
-            <Button variant="outline" onClick={() => history.push('/')}>
+            <Button variant="outline" onClick={() => history.goBack()}>
               {t('cancel')}
             </Button>
           </ButtonGroup>

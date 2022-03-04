@@ -808,6 +808,10 @@ const language = {
       en: 'Create',
       de: 'Erstellen',
     },
+    update: {
+      en: 'Update',
+      de: 'Aktualisieren',
+    },
     cancel: {
       en: 'Cancel',
       de: 'Abbrechen',

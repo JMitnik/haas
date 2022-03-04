@@ -19,7 +19,9 @@ query automationConnection($workspaceSlug: String, $filter: AutomationConnection
         isActive
         type
         automationTrigger {
-          dialogueSlug
+          activeDialogue {
+            slug
+          }
           actions {
             type
           }

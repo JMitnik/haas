@@ -37,7 +37,7 @@ export const GetAutomationInput = inputObjectType({
   name: 'GetAutomationInput',
   definition(t) {
     t.string('id');
-  }
+  },
 })
 
 export const GetAutomationQuery = queryField('automation', {
@@ -52,5 +52,5 @@ export const GetAutomationQuery = queryField('automation', {
     const automation = await ctx.services.automationService.findAutomationById(args.where.id);
 
     return automation as any;
-  }
+  },
 })

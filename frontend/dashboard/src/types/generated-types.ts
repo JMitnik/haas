@@ -222,7 +222,7 @@ export type AutomationTriggerModel = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   updatedAt: Scalars['Date'];
-  dialogueSlug?: Maybe<Scalars['String']>;
+  activeDialogue?: Maybe<Dialogue>;
   event?: Maybe<AutomationEventModel>;
   conditionBuilder?: Maybe<AutomationConditionBuilderModel>;
   actions?: Maybe<Array<AutomationActionModel>>;
@@ -2423,8 +2423,10 @@ export type AutomationConnectionQuery = (
         & Pick<AutomationModel, 'id' | 'label' | 'description' | 'updatedAt' | 'isActive' | 'type'>
         & { automationTrigger?: Maybe<(
           { __typename?: 'AutomationTriggerModel' }
-          & Pick<AutomationTriggerModel, 'dialogueSlug'>
-          & { actions?: Maybe<Array<(
+          & { activeDialogue?: Maybe<(
+            { __typename?: 'Dialogue' }
+            & Pick<Dialogue, 'slug'>
+          )>, actions?: Maybe<Array<(
             { __typename?: 'AutomationActionModel' }
             & Pick<AutomationActionModel, 'type'>
           )>> }
@@ -2913,6 +2915,106 @@ export type GetDialogueStatisticsQuery = (
   )> }
 );
 
+export type GetAutomationQueryVariables = Exact<{
+  input?: Maybe<GetAutomationInput>;
+}>;
+
+
+export type GetAutomationQuery = (
+  { __typename?: 'Query' }
+  & { automation?: Maybe<(
+    { __typename?: 'AutomationModel' }
+    & Pick<AutomationModel, 'id' | 'createdAt' | 'updatedAt' | 'isActive' | 'label' | 'description' | 'type'>
+    & { workspace?: Maybe<(
+      { __typename?: 'Customer' }
+      & Pick<Customer, 'slug' | 'id'>
+    )>, automationTrigger?: Maybe<(
+      { __typename?: 'AutomationTriggerModel' }
+      & Pick<AutomationTriggerModel, 'id'>
+      & { activeDialogue?: Maybe<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'title' | 'slug' | 'id'>
+      )>, actions?: Maybe<Array<(
+        { __typename?: 'AutomationActionModel' }
+        & Pick<AutomationActionModel, 'id' | 'type'>
+      )>>, event?: Maybe<(
+        { __typename?: 'AutomationEventModel' }
+        & Pick<AutomationEventModel, 'id' | 'type'>
+        & { dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'title' | 'slug' | 'id'>
+        )>, question?: Maybe<(
+          { __typename?: 'QuestionNode' }
+          & Pick<QuestionNode, 'id' | 'title' | 'type'>
+        )> }
+      )>, conditionBuilder?: Maybe<(
+        { __typename?: 'AutomationConditionBuilderModel' }
+        & Pick<AutomationConditionBuilderModel, 'id' | 'type' | 'childConditionBuilderId'>
+        & { childConditionBuilder?: Maybe<(
+          { __typename?: 'AutomationConditionBuilderModel' }
+          & Pick<AutomationConditionBuilderModel, 'id' | 'type'>
+          & { conditions: Array<(
+            { __typename?: 'AutomationConditionModel' }
+            & Pick<AutomationConditionModel, 'id' | 'scope' | 'operator'>
+            & { operands: Array<(
+              { __typename?: 'AutomationConditionOperandModel' }
+              & Pick<AutomationConditionOperandModel, 'id' | 'type' | 'numberValue' | 'textValue'>
+            )>, dialogueScope?: Maybe<(
+              { __typename?: 'DialogueConditionScopeModel' }
+              & Pick<DialogueConditionScopeModel, 'id' | 'aspect'>
+              & { aggregate?: Maybe<(
+                { __typename?: 'ConditionPropertyAggregate' }
+                & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
+              )> }
+            )>, questionScope?: Maybe<(
+              { __typename?: 'QuestionConditionScopeModel' }
+              & Pick<QuestionConditionScopeModel, 'id' | 'aspect'>
+              & { aggregate?: Maybe<(
+                { __typename?: 'ConditionPropertyAggregate' }
+                & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
+              )> }
+            )> }
+          )> }
+        )>, conditions: Array<(
+          { __typename?: 'AutomationConditionModel' }
+          & Pick<AutomationConditionModel, 'id' | 'scope' | 'operator'>
+          & { operands: Array<(
+            { __typename?: 'AutomationConditionOperandModel' }
+            & Pick<AutomationConditionOperandModel, 'id' | 'type' | 'numberValue' | 'textValue'>
+          )>, dialogueScope?: Maybe<(
+            { __typename?: 'DialogueConditionScopeModel' }
+            & Pick<DialogueConditionScopeModel, 'id' | 'aspect'>
+            & { aggregate?: Maybe<(
+              { __typename?: 'ConditionPropertyAggregate' }
+              & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
+            )> }
+          )>, questionScope?: Maybe<(
+            { __typename?: 'QuestionConditionScopeModel' }
+            & Pick<QuestionConditionScopeModel, 'id' | 'aspect'>
+            & { aggregate?: Maybe<(
+              { __typename?: 'ConditionPropertyAggregate' }
+              & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
+            )> }
+          )> }
+        )> }
+      )> }
+    )> }
+  )> }
+);
+
+export type UpdateAutomationMutationVariables = Exact<{
+  input?: Maybe<CreateAutomationInput>;
+}>;
+
+
+export type UpdateAutomationMutation = (
+  { __typename?: 'Mutation' }
+  & { updateAutomation: (
+    { __typename?: 'AutomationModel' }
+    & Pick<AutomationModel, 'id' | 'label'>
+  ) }
+);
+
 export type GetInteractionQueryVariables = Exact<{
   sessionId: Scalars['String'];
 }>;
@@ -3258,7 +3360,9 @@ export const AutomationConnectionDocument = gql`
         isActive
         type
         automationTrigger {
-          dialogueSlug
+          activeDialogue {
+            slug
+          }
           actions {
             type
           }
@@ -4420,6 +4524,181 @@ export type GetDialogueStatisticsQueryResult = Apollo.QueryResult<GetDialogueSta
 export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatisticsQueryVariables) {
       return { query: GetDialogueStatisticsDocument, variables: variables }
     }
+export const GetAutomationDocument = gql`
+    query getAutomation($input: GetAutomationInput) {
+  automation(where: $input) {
+    id
+    createdAt
+    updatedAt
+    isActive
+    label
+    description
+    type
+    workspace {
+      slug
+      id
+    }
+    automationTrigger {
+      id
+      activeDialogue {
+        title
+        slug
+        id
+      }
+      actions {
+        id
+        type
+      }
+      event {
+        id
+        type
+        dialogue {
+          title
+          slug
+          id
+        }
+        question {
+          id
+          title
+          type
+        }
+      }
+      conditionBuilder {
+        id
+        type
+        childConditionBuilderId
+        childConditionBuilder {
+          id
+          type
+          conditions {
+            id
+            scope
+            operator
+            operands {
+              id
+              type
+              numberValue
+              textValue
+            }
+            dialogueScope {
+              id
+              aspect
+              aggregate {
+                id
+                type
+                latest
+              }
+            }
+            questionScope {
+              id
+              aspect
+              aggregate {
+                id
+                type
+                latest
+              }
+            }
+          }
+        }
+        conditions {
+          id
+          scope
+          operator
+          operands {
+            id
+            type
+            numberValue
+            textValue
+          }
+          dialogueScope {
+            id
+            aspect
+            aggregate {
+              id
+              type
+              latest
+            }
+          }
+          questionScope {
+            id
+            aspect
+            aggregate {
+              id
+              type
+              latest
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAutomationQuery__
+ *
+ * To run a query within a React component, call `useGetAutomationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAutomationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAutomationQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetAutomationQuery(baseOptions?: Apollo.QueryHookOptions<GetAutomationQuery, GetAutomationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAutomationQuery, GetAutomationQueryVariables>(GetAutomationDocument, options);
+      }
+export function useGetAutomationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAutomationQuery, GetAutomationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAutomationQuery, GetAutomationQueryVariables>(GetAutomationDocument, options);
+        }
+export type GetAutomationQueryHookResult = ReturnType<typeof useGetAutomationQuery>;
+export type GetAutomationLazyQueryHookResult = ReturnType<typeof useGetAutomationLazyQuery>;
+export type GetAutomationQueryResult = Apollo.QueryResult<GetAutomationQuery, GetAutomationQueryVariables>;
+export function refetchGetAutomationQuery(variables?: GetAutomationQueryVariables) {
+      return { query: GetAutomationDocument, variables: variables }
+    }
+export const UpdateAutomationDocument = gql`
+    mutation updateAutomation($input: CreateAutomationInput) {
+  updateAutomation(input: $input) {
+    id
+    label
+  }
+}
+    `;
+export type UpdateAutomationMutationFn = Apollo.MutationFunction<UpdateAutomationMutation, UpdateAutomationMutationVariables>;
+
+/**
+ * __useUpdateAutomationMutation__
+ *
+ * To run a mutation, you first call `useUpdateAutomationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateAutomationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateAutomationMutation, { data, loading, error }] = useUpdateAutomationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateAutomationMutation(baseOptions?: Apollo.MutationHookOptions<UpdateAutomationMutation, UpdateAutomationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateAutomationMutation, UpdateAutomationMutationVariables>(UpdateAutomationDocument, options);
+      }
+export type UpdateAutomationMutationHookResult = ReturnType<typeof useUpdateAutomationMutation>;
+export type UpdateAutomationMutationResult = Apollo.MutationResult<UpdateAutomationMutation>;
+export type UpdateAutomationMutationOptions = Apollo.BaseMutationOptions<UpdateAutomationMutation, UpdateAutomationMutationVariables>;
 export const GetInteractionDocument = gql`
     query GetInteraction($sessionId: String!) {
   session(id: $sessionId) {

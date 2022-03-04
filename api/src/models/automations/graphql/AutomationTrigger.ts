@@ -2,6 +2,7 @@ import { objectType } from '@nexus/schema';
 import { AutomationEventModel } from './AutomationEvent';
 import { AutomationActionModel } from './AutomationAction'
 import { AutomationConditionBuilderModel } from './AutomationConditionBuilder';
+import { DialogueType } from '../../questionnaire/Dialogue';
 
 export const AutomationTriggerModel = objectType({
   name: 'AutomationTriggerModel',
@@ -11,18 +12,19 @@ export const AutomationTriggerModel = objectType({
     t.date('createdAt');
     t.date('updatedAt');
 
-    t.string('dialogueSlug', {
+    t.field('activeDialogue', {
+      type: DialogueType,
       nullable: true,
       async resolve(parent, args, ctx) {
         if (parent.event?.dialogue?.slug) {
-          return parent.event?.dialogue?.slug;
+          return parent.event?.dialogue;
         }
 
         if (parent.event?.question?.id) {
           const dialogue = await ctx.services.dialogueService.findDialogueByQuestionId(
             parent.event?.question?.id
           );
-          return dialogue?.slug || null;
+          return dialogue || null;
         }
 
         return null;

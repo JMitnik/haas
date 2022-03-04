@@ -11,7 +11,7 @@ import Select from 'react-select';
 import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
-import { QuestionNode, QuestionNodeTypeEnum, useGetWorkspaceDialoguesQuery } from 'types/generated-types';
+import { QuestionAspectType, QuestionNode, QuestionNodeTypeEnum, useGetWorkspaceDialoguesQuery } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 
 import Dropdown from 'components/Dropdown';
@@ -398,14 +398,14 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                           render={({ field: { onBlur, onChange, value } }) => (
                             <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                               <UI.RadioButton
-                                value="NODE_VALUE"
+                                value={QuestionAspectType.NodeValue}
                                 mr={2}
                                 text={(t('automation:node_value'))}
                                 description={(t('automation:node_value_helper'))}
                               />
                               <UI.RadioButton
                                 isDisabled
-                                value="DIALOGUE"
+                                value={QuestionAspectType.AnswerSpeed}
                                 mr={2}
                                 text={(t('automation:answer_speed'))}
                                 description={(t('automation:answer_speed_helper'))}

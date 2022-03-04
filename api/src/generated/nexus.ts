@@ -1301,9 +1301,9 @@ export interface NexusGenFieldTypes {
   }
   AutomationTriggerModel: { // field return type
     actions: NexusGenRootTypes['AutomationActionModel'][] | null; // [AutomationActionModel!]
+    activeDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     conditionBuilder: NexusGenRootTypes['AutomationConditionBuilderModel'] | null; // AutomationConditionBuilderModel
     createdAt: any; // Date!
-    dialogueSlug: string | null; // String
     event: NexusGenRootTypes['AutomationEventModel'] | null; // AutomationEventModel
     id: string; // ID!
     updatedAt: any; // Date!
