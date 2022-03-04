@@ -73,6 +73,12 @@ input ChoiceNodeEntryInput {
   value: String
 }
 
+"""Input type of a SessionEvent for Choices."""
+input ChoiceValueInput {
+  choiceId: String
+  value: String!
+}
+
 enum CloudReferenceType {
   AWS
   Azure
@@ -554,6 +560,11 @@ type FormNodeType {
   fields: [FormNodeField!]!
   helperText: String
   id: String
+}
+
+"""Input of form values"""
+input FormValueInput {
+  values: [FormNodeEntryFieldInput!]
 }
 
 """Generate savales documents"""
@@ -1076,6 +1087,22 @@ type Session {
   totalTimeInSec: Int
 }
 
+"""An action represents user input in response to a state"""
+input SessionActionInput {
+  choice: ChoiceValueInput
+  slider: SliderValueInput
+  timeSpent: Int
+  type: SessionActionType!
+}
+
+"""Types of actions that can be emitted in a user's session."""
+enum SessionActionType {
+  CHOICE_ACTION
+  FORM_ACTION
+  NAVIGATION
+  SLIDER_ACTION
+}
+
 type SessionConnection implements ConnectionInterface {
   pageInfo: PaginationPageInfo!
   sessions: [Session!]!
@@ -1111,45 +1138,20 @@ enum SessionDeliveryType {
   noCampaigns
 }
 
-"""Input type of a SessionEvent for Choices."""
-input SessionEventChoiceValueInput {
-  optionId: String
-  relatedNodeId: String!
-  timeSpent: Int
-  value: String!
-}
-
-"""Input type of a SessionEvent for a form."""
-input SessionEventFormValueInput {
-  relatedNodeId: String!
-  timeSpent: Int
-  values: [FormNodeEntryFieldInput!]
+"""
+A session event describes an action of a user during a session they had with the dialogue.
+"""
+type SessionEvent {
+  createdAt: Date!
+  id: ID!
 }
 
 """Input type of a SessionEvent"""
 input SessionEventInput {
-  choiceValue: SessionEventChoiceValueInput
-  eventType: SessionEventType!
-  formValue: SessionEventFormValueInput
+  action: SessionActionInput
   sessionId: String!
-  sliderValue: SessionEventSliderValueInput
+  state: SessionStateInput
   timestamp: Date!
-  toNodeId: String
-}
-
-"""Input type of a SessionEvent for Sliders."""
-input SessionEventSliderValueInput {
-  relatedNodeId: String!
-  timeSpent: Int
-  value: Int!
-}
-
-"""Types of events that can be emitted in a user's session."""
-enum SessionEventType {
-  CHOICE_ACTION
-  FORM_ACTION
-  NAVIGATION
-  SLIDER_ACTION
 }
 
 """Input for session"""
@@ -1166,6 +1168,11 @@ input SessionInput {
 input SessionScoreRangeFilter {
   max: Int
   min: Int
+}
+
+"""Input of states"""
+input SessionStateInput {
+  nodeId: String
 }
 
 input SessionWhereUniqueInput {
@@ -1229,6 +1236,11 @@ type SliderNodeType {
   id: ID
   markers: [SliderNodeMarkerType!]
   unhappyText: String
+}
+
+"""Input type of a SessionEvent for Sliders."""
+input SliderValueInput {
+  value: Int!
 }
 
 """Details regarding interaction with social node"""

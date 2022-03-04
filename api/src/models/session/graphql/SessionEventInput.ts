@@ -1,56 +1,7 @@
 import { inputObjectType } from '@nexus/schema';
-import { FormNodeEntryFieldInput } from '../../node-entry/NodeEntry';
-import { SessionEventType } from './SessionEventType';
 
-export const SessionEventChoiceValueInput = inputObjectType({
-  name: 'SessionEventChoiceValueInput',
-  description: 'Input type of a SessionEvent for Choices.',
-
-  definition(t) {
-    // What is the raw value of the choice?
-    t.string('value', { required: true });
-
-    // Require that the related node of the choice is specificed.
-    t.string('relatedNodeId', { required: true });
-
-    // Require that the option connected to the choice is specificed.
-    t.string('optionId');
-
-    // How much time did the user spend to create this event.
-    t.int('timeSpent');
-  },
-});
-
-export const SessionEventSliderValueInput = inputObjectType({
-  name: 'SessionEventSliderValueInput',
-  description: 'Input type of a SessionEvent for Sliders.',
-
-  definition(t) {
-    // What is the raw value of the choice?
-    t.int('value', { required: true });
-
-    // Require that the related node of the choice is specificed.
-    t.string('relatedNodeId', { required: true });
-
-    // How much time did the user spend to create this event.
-    t.int('timeSpent');
-  },
-});
-
-export const SessionEventFormValueInput = inputObjectType({
-  name: 'SessionEventFormValueInput',
-  description: 'Input type of a SessionEvent for a form.',
-
-  definition(t) {
-    t.list.field('values', { type: FormNodeEntryFieldInput });
-
-    // Require that the related node of the choice is specificed.
-    t.string('relatedNodeId', { required: true });
-
-    // How much time did the user spend to create this event.
-    t.int('timeSpent');
-  },
-});
+import { SessionActionInput } from "./SessionActionInput";
+import { SessionStateInput } from "./SessionStateInput";
 
 export const SessionEventInput = inputObjectType({
   name: 'SessionEventInput',
@@ -58,20 +9,9 @@ export const SessionEventInput = inputObjectType({
 
   definition(t) {
     t.string('sessionId', { required: true });
-
     t.date('timestamp', { required: true });
 
-    t.field('eventType', { type: SessionEventType, required: true });
-
-    // Identifier for which node the event leads to.
-    t.string('toNodeId');
-
-    t.field('choiceValue', { type: SessionEventChoiceValueInput });
-
-    // Field value for slider
-    t.field('sliderValue', { type: SessionEventSliderValueInput });
-
-    // Field value for form-node
-    t.field('formValue', { type: SessionEventFormValueInput });
+    t.field('state', { type: SessionStateInput });
+    t.field('action', { type: SessionActionInput });
   },
 });

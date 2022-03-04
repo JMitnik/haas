@@ -1,11 +1,6 @@
-import { QuestionNode as QuestionNodeType, SessionEventInput } from '../../types/core-types';
-
-export interface RunActionInput {
-  event: SessionEventInput;
-  activeCallToAction?: QuestionNodeType;
-}
+import { QuestionNode, SessionEvent } from '../../types/core-types';
 
 export interface QuestionNodeProps {
-  node: QuestionNodeType;
-  onRunAction: (input: RunActionInput) => void;
+  node: QuestionNode;
+  onRunAction: (input: SessionEvent) => void;
 }

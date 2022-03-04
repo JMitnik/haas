@@ -9,11 +9,11 @@ class MyDocument extends Document {
   render() {
     return (
       <Html>
-        <Head />
+        <Head title="haas | Happiness as a service"/>
         <body>
-          <div id="root"></div>
-          <Main />
-          <NextScript />
+        <div id="root"/>
+        <Main/>
+        <NextScript/>
         </body>
       </Html>
     )

@@ -4,9 +4,12 @@ import styled, { css } from 'styled-components';
 
 export const DrawerContainer = styled(UI.Div)`
   ${({ theme }) => css`
+    width: 100%;
     display: grid;
     row-gap: 2em;
-    background: ${Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()};
+    background: white;
+      //background: ${Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()};
+    text-align: center;
 
     padding: 24px;
     border-radius: 30px;
@@ -19,7 +22,7 @@ export const DrawerContainer = styled(UI.Div)`
 export const TextGradient = styled(UI.Div)`
   ${({ theme }) => css`
     color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
- `}
+  `}
 `;
 
 export const HeaderContainer = styled(TextGradient)`
@@ -29,6 +32,7 @@ export const HeaderContainer = styled(TextGradient)`
 
 export const SubheaderContainer = styled(TextGradient)`
   font-size: 1em;
+  font-weight: 100;
   max-width: 300px;
 `;
 
@@ -57,7 +61,6 @@ export const RedirectButton = styled.a<RedirectButtonProps>`
     border-radius: 5px;
     padding: 12px 32px;
 
-    animation: 2s pulse infinite;
     text-decoration: none;
 
     background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()});
@@ -80,52 +83,35 @@ export const RedirectButton = styled.a<RedirectButtonProps>`
       }
     `}
   `}
-
-  @keyframes pulse {
-    0% {
-      transform: scale(0.95);
-      box-shadow: 0 0 0 0 rgba(0, 0 ,0, 0.7);
-    }
-
-    70% {
-      transform: scale(1);
-      box-shadow: 0 0 0 5px rgba(0, 0 ,0, 0);
-    }
-
-    100% {
-      transform: scale(0.95);
-      box-shadow: 0 0 0 0px rgba(0, 0, 0, 0);
-    }
-  }
 `;
 
 export const ButtonIconContainer = styled(UI.Div) <RedirectButtonProps>`
-   //TODO: Adjust color of custom icon using inverse CSS property (?)
-   ${({ theme, overrideBackgroundColor }) => css`
+  //TODO: Adjust color of custom icon using inverse CSS property (?)
+  ${({ theme, overrideBackgroundColor }) => css`
+    img {
+      color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+      width: 24px;
+      height: auto
+    }
+
+    svg {
+      color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+      width: 24px;
+      height: auto;
+    }
+
+    ${overrideBackgroundColor && css`
       img {
-        color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+        color: ${Color(overrideBackgroundColor).isDark() ? Color(overrideBackgroundColor).mix(Color('white'), 0.8).saturate(1).hex() : Color(overrideBackgroundColor).mix(Color('black'), 0.5).saturate(1).hex()};
         width: 24px;
         height: auto
       }
 
       svg {
-        color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+        color: ${Color(overrideBackgroundColor).isDark() ? Color(overrideBackgroundColor).mix(Color('white'), 0.8).saturate(1).hex() : Color(overrideBackgroundColor).mix(Color('black'), 0.5).saturate(1).hex()};
         width: 24px;
         height: auto;
       }
-
-      ${overrideBackgroundColor && css`
-        img {
-          color: ${Color(overrideBackgroundColor).isDark() ? Color(overrideBackgroundColor).mix(Color('white'), 0.8).saturate(1).hex() : Color(overrideBackgroundColor).mix(Color('black'), 0.5).saturate(1).hex()};
-          width: 24px;
-          height: auto
-        }
-
-        svg {
-          color: ${Color(overrideBackgroundColor).isDark() ? Color(overrideBackgroundColor).mix(Color('white'), 0.8).saturate(1).hex() : Color(overrideBackgroundColor).mix(Color('black'), 0.5).saturate(1).hex()};
-          width: 24px;
-          height: auto;
-        }
-      `}
-   `}
+    `}
+  `}
 `;

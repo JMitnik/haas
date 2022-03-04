@@ -70,6 +70,11 @@ const language = {
       de: 'Wir können hier keinen Dialog für Sie finden.',
       nl: 'Wij kunnen geen dialoog voor u vinden hier',
     },
+    start_dialogue: {
+      en: 'Start dialogue',
+      de: 'Dialog beginnen',
+      nl: 'Dialoog beginnen',
+    },
   },
 };
 

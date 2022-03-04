@@ -100,6 +100,12 @@ export type ChoiceNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+/** Input type of a SessionEvent for Choices. */
+export type ChoiceValueInput = {
+  choiceId?: Maybe<Scalars['String']>;
+  value: Scalars['String'];
+};
+
 export enum CloudReferenceType {
   Aws = 'AWS',
   Azure = 'Azure',
@@ -652,6 +658,11 @@ export type FormNodeType = {
   fields: Array<FormNodeField>;
   helperText?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
+};
+
+/** Input of form values */
+export type FormValueInput = {
+  values?: Maybe<Array<FormNodeEntryFieldInput>>;
 };
 
 /** Generate savales documents */
@@ -1553,6 +1564,22 @@ export type Session = {
   totalTimeInSec?: Maybe<Scalars['Int']>;
 };
 
+/** An action represents user input in response to a state */
+export type SessionActionInput = {
+  choice?: Maybe<ChoiceValueInput>;
+  slider?: Maybe<SliderValueInput>;
+  timeSpent?: Maybe<Scalars['Int']>;
+  type: SessionActionType;
+};
+
+/** Types of actions that can be emitted in a user's session. */
+export enum SessionActionType {
+  ChoiceAction = 'CHOICE_ACTION',
+  FormAction = 'FORM_ACTION',
+  Navigation = 'NAVIGATION',
+  SliderAction = 'SLIDER_ACTION'
+}
+
 export type SessionConnection = ConnectionInterface & {
   __typename?: 'SessionConnection';
   pageInfo: PaginationPageInfo;
@@ -1589,46 +1616,20 @@ export enum SessionDeliveryType {
   NoCampaigns = 'noCampaigns'
 }
 
-/** Input type of a SessionEvent for Choices. */
-export type SessionEventChoiceValueInput = {
-  optionId?: Maybe<Scalars['String']>;
-  relatedNodeId: Scalars['String'];
-  timeSpent?: Maybe<Scalars['Int']>;
-  value: Scalars['String'];
-};
-
-/** Input type of a SessionEvent for a form. */
-export type SessionEventFormValueInput = {
-  relatedNodeId: Scalars['String'];
-  timeSpent?: Maybe<Scalars['Int']>;
-  values?: Maybe<Array<FormNodeEntryFieldInput>>;
+/** A session event describes an action of a user during a session they had with the dialogue. */
+export type SessionEvent = {
+  __typename?: 'SessionEvent';
+  createdAt: Scalars['Date'];
+  id: Scalars['ID'];
 };
 
 /** Input type of a SessionEvent */
 export type SessionEventInput = {
-  choiceValue?: Maybe<SessionEventChoiceValueInput>;
-  eventType: SessionEventType;
-  formValue?: Maybe<SessionEventFormValueInput>;
+  action?: Maybe<SessionActionInput>;
   sessionId: Scalars['String'];
-  sliderValue?: Maybe<SessionEventSliderValueInput>;
+  state?: Maybe<SessionStateInput>;
   timestamp: Scalars['Date'];
-  toNodeId?: Maybe<Scalars['String']>;
 };
-
-/** Input type of a SessionEvent for Sliders. */
-export type SessionEventSliderValueInput = {
-  relatedNodeId: Scalars['String'];
-  timeSpent?: Maybe<Scalars['Int']>;
-  value: Scalars['Int'];
-};
-
-/** Types of events that can be emitted in a user's session. */
-export enum SessionEventType {
-  ChoiceAction = 'CHOICE_ACTION',
-  FormAction = 'FORM_ACTION',
-  Navigation = 'NAVIGATION',
-  SliderAction = 'SLIDER_ACTION'
-}
 
 /** Input for session */
 export type SessionInput = {
@@ -1644,6 +1645,11 @@ export type SessionInput = {
 export type SessionScoreRangeFilter = {
   max?: Maybe<Scalars['Int']>;
   min?: Maybe<Scalars['Int']>;
+};
+
+/** Input of states */
+export type SessionStateInput = {
+  nodeId?: Maybe<Scalars['String']>;
 };
 
 export type SessionWhereUniqueInput = {
@@ -1711,6 +1717,11 @@ export type SliderNodeType = {
   id?: Maybe<Scalars['ID']>;
   markers?: Maybe<Array<SliderNodeMarkerType>>;
   unhappyText?: Maybe<Scalars['String']>;
+};
+
+/** Input type of a SessionEvent for Sliders. */
+export type SliderValueInput = {
+  value: Scalars['Int'];
 };
 
 /** Details regarding interaction with social node */

@@ -7,17 +7,20 @@ import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 
-import { FormNodeField, SessionEventType } from '../../types/generated-types';
-import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
-import { NodeLayout } from '../QuestionNode/NodeLayout';
-import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeStyles';
+import { FormNodeField, SessionActionType } from '../../types/generated-types';
+import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
 import { useSession } from '../Session/SessionProvider';
 import * as LS from './FormNodeStyles';
+import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeTitle';
+import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
+import { useDialogueParams } from '../Navigation/useDialogueParams';
+
+interface Field {
+  value: string | number;
+}
 
 interface FormNodeFormProps {
-  fields: {
-    value: string | number;
-  }[];
+  fields: Field[];
 }
 
 const mapFieldType: { [key: string]: string } = {
@@ -28,25 +31,25 @@ const mapFieldType: { [key: string]: string } = {
   longText: '',
 };
 
-const mapIcon: any = {
-  email: <AtSign />,
-  number: <Hash />,
-  phoneNumber: <Phone />,
-  url: <Link2 />,
-  shortText: <Type />,
-  longText: <FileText />,
+const mapIcon: Record<string, React.ReactNode> = {
+  email: <AtSign/>,
+  number: <Hash/>,
+  phoneNumber: <Phone/>,
+  url: <Link2/>,
+  shortText: <Type/>,
+  longText: <FileText/>,
 };
 
 const DrawerContainer = styled(UI.Div)`
   background: white;
   padding: 24px;
   border-radius: 30px;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0 15px 25px, rgba(0, 0, 0, 0.05) 0 5px 10px;
   backdrop-filter: blur(10px);
 `;
 
-const getFieldValue = (field: any, relatedField: any) => {
-  if (relatedField?.type === 'number') {
+const getFieldValue = (field: Field, relatedField: FormNodeField) => {
+  if (relatedField?.type === 'number' && field.value && typeof field.value === 'string') {
     try {
       return parseInt(field.value, 10) || undefined;
     } catch {
@@ -59,6 +62,7 @@ const getFieldValue = (field: any, relatedField: any) => {
 
 const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
   const startTime = useRef(new Date());
+  const { fromEdge, fromNode } = useDialogueParams();
 
   const { t } = useTranslation();
   const form = useForm<FormNodeFormProps>({
@@ -82,27 +86,28 @@ const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
     }));
 
     // TODO: Think of some logic
+    const childEdge = undefined;
     const childNode = undefined;
 
     onRunAction({
-      event: {
-        eventType: SessionEventType.FormAction,
-        sessionId,
-        timestamp: new Date(),
-        toNodeId: childNode?.id,
-        formValue: {
-          relatedNodeId: node.id,
-          timeSpent: new Date().getTime() - startTime.current.getTime(),
-          values: formFieldValues,
-        },
+      sessionId,
+      timestamp: Date.now(),
+      action: {
+        type: SessionActionType.FormAction,
+        // TODO: Add form values
+        timeSpent: Date.now(),
       },
-      activeCallToAction: undefined,
-    })
+      reward: {
+        overrideCallToActionId: node.overrideLeafId,
+        toEdge: childEdge?.id,
+        toNode: childNode?.id,
+      },
+    });
   }
 
   return (
     <LS.FormNodeContainer>
-      <NodeLayout node={node}>
+      <QuestionNodeLayout node={node}>
         <QuestionNodeTitle>
           {node.title}
         </QuestionNodeTitle>
@@ -118,7 +123,7 @@ const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
             >
               {node.form?.helperText || t('leave_your_details')}
             </UI.Text>
-            <UI.Hr />
+            <UI.Hr/>
             <UI.Form onSubmit={handleRunAction}>
               <Div>
                 <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
@@ -138,7 +143,7 @@ const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
                           <UI.Input
                             id={`fields[${index}].value`}
                             variant="outline"
-                            leftEl={mapIcon[field?.type] || <Type />}
+                            leftEl={mapIcon[field?.type] || <Type/>}
                             type={mapFieldType[field?.type] || 'text'}
                             {...form.register(`fields.${index}.value`, { required: field.isRequired })}
                             placeholder={field.placeholder || undefined}
@@ -170,7 +175,7 @@ const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
             </UI.Form>
           </DrawerContainer>
         </motion.div>
-      </NodeLayout>
+      </QuestionNodeLayout>
     </LS.FormNodeContainer>
   );
 };

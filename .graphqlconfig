@@ -1,0 +1,4 @@
+{
+  "name": "API Schema",
+  "schemaPath": "api/src/generated/schema.graphql"
+}

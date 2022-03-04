@@ -8,8 +8,20 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { CampaignVariantTypeEnum, Prisma, PrismaClient } from '@prisma/client';
 import { CampaignPrismaAdapter } from './CampaignPrismaAdapter';
-import { CampaignVariant, CampaignWithVariants, CSVDeliveryRow, DeliveryCSVProcessRecord, DeliveryInput, DeliveryOptionsProps, DeliveryUpdateItemProps, ErroredRecord, ValidateDeliveryRecordsResults } from './CampaignTypes';
+import {
+  CampaignVariant,
+  CampaignWithVariants,
+  CSVDeliveryRow,
+  DeliveryCSVProcessRecord,
+  DeliveryInput,
+  DeliveryOptionsProps,
+  DeliveryUpdateItemProps,
+  ErroredRecord,
+  ValidateDeliveryRecordsResults
+} from './CampaignTypes';
 import { parseCsv } from '../../utils/parseCsv';
+
+1
 import { nanoid } from 'nanoid';
 import { probability } from '../../utils/probability';
 import mustache from 'mustache';
@@ -342,9 +354,9 @@ export class CampaignService {
   }
 
   /**
-    * Validates uploaded CSV based on the following rules:
-    * - If only EMAIL campaigns exist, require a record to have `phone`
-    * - If only SMS campaigns exist, require a record to have `email`
+   * Validates uploaded CSV based on the following rules:
+   * - If only EMAIL campaigns exist, require a record to have `phone`
+   * - If only SMS campaigns exist, require a record to have `email`
    */
   validateDeliveryRows = (
     csvRecords: any[],

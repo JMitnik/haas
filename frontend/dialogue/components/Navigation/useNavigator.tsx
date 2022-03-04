@@ -1,12 +1,14 @@
 import { useNavigate } from 'react-router';
 
 import { POSTLEAFNODE_ID } from '../PostLeafNode/PostLeafNode';
+import { StateActionRewardTuple } from '../Dialogue/DialogueStore';
 
 export type StateType = 'Question' | 'CTA' | 'FINISHER';
 
 export interface TransitionInput {
   currentNodeId: string;
   childNodeId?: string;
+  incomingEdgeId?: string;
   activeCallToActionId?: string;
 }
 
@@ -20,6 +22,7 @@ export interface NavigationState {
 export interface UseNavigatorProps {
   dialogueSlug: string;
   workspaceSlug: string;
+  fromNode?: string;
 }
 
 /**
@@ -33,12 +36,14 @@ export const useNavigator = ({ dialogueSlug, workspaceSlug }: UseNavigatorProps)
    * The transition function dictates where to go next based on the input parameters and available state.
    * @param currentStateType State type: Node, CTA or FINISHER
    */
-  const transition = ({ currentNodeId, childNodeId, activeCallToActionId }: TransitionInput) => {
+  const transition = ({ state, reward }: StateActionRewardTuple) => {
     // If we have a child node, navigate to it.
-    if (childNodeId) {
-      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${childNodeId}`);
+    if (reward.childNodeId) {
+      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${reward.childNodeId}`);
       return;
     }
+
+    const activeCallToActionId = reward.overrideCallToActionId || state.activeCallToActionId;
 
     // If we have no active call to action, go to the finisher.
     if (!activeCallToActionId) {
@@ -47,13 +52,13 @@ export const useNavigator = ({ dialogueSlug, workspaceSlug }: UseNavigatorProps)
     }
 
     // If we are on the active Call-to-action already, go to the finisher
-    if (activeCallToActionId && currentNodeId === activeCallToActionId) {
+    if (activeCallToActionId && state.nodeId === activeCallToActionId) {
       navigate(`/${workspaceSlug}/${dialogueSlug}/n/${POSTLEAFNODE_ID}`);
       return;
     }
 
     // If we go to the activeCallToAction, go to the activeCallToAction.
-    if (activeCallToActionId && currentNodeId !== activeCallToActionId) {
+    if (activeCallToActionId && state.nodeId !== activeCallToActionId) {
       navigate(`/${workspaceSlug}/${dialogueSlug}/n/${activeCallToActionId}`);
       return;
     }
@@ -63,8 +68,18 @@ export const useNavigator = ({ dialogueSlug, workspaceSlug }: UseNavigatorProps)
     navigate(-1);
   };
 
+  const goToStart = () => {
+    navigate(`/${workspaceSlug}/${dialogueSlug}`);
+  }
+
+  const goToNotFound = () => {
+    return navigate(`/${workspaceSlug}/${dialogueSlug}/404/`);
+  }
+
   return {
     transition,
     goBack,
+    goToNotFound,
+    goToStart,
   }
 }

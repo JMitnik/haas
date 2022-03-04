@@ -3,12 +3,8 @@ import styled from 'styled-components';
 
 export const QuestionNodeContainer = styled(UI.Div)`
   height: 100%;
+  flex: 100%;
+  display: flex;
+  flex-direction: column;
 `;
 
-export const QuestionNodeTitle = styled.div.attrs({
-  className: 'question-node-title',
-})`
-  text-align: left;
-  font-size: 3rem;
-  font-weight: 50;
-`;

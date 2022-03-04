@@ -1,21 +1,44 @@
 import {
-  Edge as GeneratedEdge,
-  Dialogue as GeneratedDialogue,
   Customer as GeneratedWorkspace,
+  CustomerSettings,
+  Dialogue as GeneratedDialogue,
+  Edge as GeneratedEdge,
+  LinkType,
   QuestionNode as GeneratedQuestionNode,
   QuestionOption as GeneratedQuestionOption,
   SessionEventInput as GeneratedSessionEventInput,
-  CustomerSettings,
-  LinkType,
+  SessionStateInput as GeneratedSessionStateInput,
 } from './generated-types';
 
 export { QuestionNodeTypeEnum } from './generated-types';
+export { SessionActionType } from './generated-types';
+
+export type SessionAction = SessionActionInput;
+
+export interface SessionReward {
+  /** The optional child-edge that is derived based on the state+action of the current event */
+  toEdge?: string;
+  /** The resulting node based on `toEdge`.  */
+  toNode?: string;
+
+  /** Which call to action was set on this session-reward. */
+  overrideCallToActionId?: string;
+}
+
+export interface SessionState extends GeneratedSessionStateInput {
+  activeCallToActionId?: string;
+}
+
+export interface SessionEvent extends GeneratedSessionEventInput {
+  reward?: SessionReward;
+  state?: SessionState;
+}
 
 export type WorkspaceSettings = CustomerSettings;
 
 export type LinkItemType = LinkType;
 
-export type SessionEventInput = GeneratedSessionEventInput;
+export type SessionActionInput = GeneratedSessionEventInput;
 
 export type Dialogue = GeneratedDialogue;
 
@@ -28,3 +51,4 @@ export interface QuestionNode extends GeneratedQuestionNode {
 export type Edge = GeneratedEdge;
 
 export type Choice = GeneratedQuestionOption;
+

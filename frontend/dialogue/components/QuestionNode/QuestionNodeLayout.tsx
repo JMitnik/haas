@@ -19,13 +19,15 @@ interface NodeLayoutProps {
  * layout is used for both desktop and mobile.
  * @returns
  */
-export const NodeLayout = ({ children }: NodeLayoutProps) => {
+export const QuestionNodeLayout = ({ children }: NodeLayoutProps) => {
   return (
-    <UI.Container height="100%">
-      <GoBackButton />
-      <UI.ColumnFlex height="100%" justifyContent="space-between">
+    <UI.ColumnFlex flex="100%" height="100%">
+      <UI.Div>
+        <GoBackButton/>
+      </UI.Div>
+      <UI.ColumnFlex flexGrow={1} justifyContent={['space-between', 'center']}>
         {children}
       </UI.ColumnFlex>
-    </UI.Container>
+    </UI.ColumnFlex>
   )
 }

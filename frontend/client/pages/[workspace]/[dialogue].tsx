@@ -2,7 +2,16 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { ApolloProvider } from '@apollo/client';
 
-import { CreateSessionDocument, CreateSessionMutation, CreateSessionMutationVariables, Customer, Dialogue as DialogueType, GetDialogueDocument, GetDialogueQuery, GetDialogueQueryVariables } from 'types/generated-types';
+import {
+  CreateSessionDocument,
+  CreateSessionMutation,
+  CreateSessionMutationVariables,
+  Customer,
+  Dialogue as DialogueType,
+  GetDialogueDocument,
+  GetDialogueQuery,
+  GetDialogueQueryVariables,
+} from 'types/generated-types';
 import client from 'config/apollo';
 import { DialogueAdapter } from 'components/DialogueAdapter/DialogueAdapter';
 
@@ -17,16 +26,16 @@ const DialoguePage = ({ sessionId, dialogue, workspace }: DialogueProps) => {
     <div>
       <Head>
         <title>{`${workspace.name}: ${dialogue.title}`}</title>
-        <meta name="description" content={dialogue.description} />
-        <meta property="og:title" content={`${workspace.name}: ${dialogue.title}`} />
-        <meta property="og:description" content={dialogue.description} />
-        <meta property="og:image" content="https://haas-public-assets.s3.eu-central-1.amazonaws.com/haas-cover.png" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta name="description" content={dialogue.description}/>
+        <meta property="og:title" content={`${workspace.name}: ${dialogue.title}`}/>
+        <meta property="og:description" content={dialogue.description}/>
+        <meta property="og:image" content="https://haas-public-assets.s3.eu-central-1.amazonaws.com/haas-cover.png"/>
+        <link rel="icon" href="/favicon.ico"/>
       </Head>
 
       <ApolloProvider client={client}>
-        <div style={{ width: '100%', height: '100vh' }}>
-          <DialogueAdapter sessionId={sessionId} dialogue={dialogue} workspace={workspace} />
+        <div style={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <DialogueAdapter sessionId={sessionId} dialogue={dialogue} workspace={workspace}/>
         </div>
       </ApolloProvider>
     </div>

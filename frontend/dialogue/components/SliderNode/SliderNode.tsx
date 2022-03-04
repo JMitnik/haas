@@ -3,13 +3,15 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useRef } from 'react';
 
-import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
-import { QuestionNodeContainer, QuestionNodeTitle } from '../QuestionNode/QuestionNodeStyles';
+import { QuestionNodeContainer } from '../QuestionNode/QuestionNodeStyles';
 import { useSession } from '../Session/SessionProvider';
-import { SessionEventType } from '../../types/generated-types';
-import { NodeLayout } from '../QuestionNode/NodeLayout';
+import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
 import { findSliderChildEdge } from './findSliderChildEdge';
 import { SliderBunny } from './SliderBunny';
+import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeTitle';
+import { useDialogueParams } from '../Navigation/useDialogueParams';
+import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
+import { SessionActionType } from '../../types/generated-types';
 
 export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
   const { t } = useTranslation();
@@ -22,33 +24,36 @@ export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
   const { sessionId } = useSession();
   const getValues = form.getValues;
 
+  const { fromNode, fromEdge } = useDialogueParams();
+
   /**
    * Handles a sliding action: find child and pass that child to par
    */
   const handleRunAction = useCallback(() => {
     const sliderValue = parseInt(getValues().slider as unknown as string, 10);
-    const nextEdge = findSliderChildEdge(sliderValue, node.children);
-    const nextNodeId = nextEdge.childNode.id;
+    const childEdge = findSliderChildEdge(sliderValue, node.children);
+    const childNodeId = childEdge.childNode.id;
 
     onRunAction({
-      event: {
-        sessionId,
-        toNodeId: nextNodeId,
-        eventType: SessionEventType.SliderAction,
-        sliderValue: {
-          relatedNodeId: node.id,
+      sessionId,
+      timestamp: Date.now(),
+      action: {
+        type: SessionActionType.SliderAction,
+        slider: {
           value: sliderValue,
-          timeSpent: new Date().getTime() - startTime.current.getTime(),
         },
-        timestamp: new Date(),
       },
-      activeCallToAction: node.overrideLeaf,
-    })
-  }, [getValues, sessionId, node, onRunAction]);
+      reward: {
+        overrideCallToActionId: node.overrideLeafId,
+        toEdge: childEdge?.id,
+        toNode: childNodeId,
+      },
+    });
+  }, [getValues, sessionId, node, fromNode, fromEdge, onRunAction]);
 
   return (
     <QuestionNodeContainer>
-      <NodeLayout node={node}>
+      <QuestionNodeLayout node={node}>
         <QuestionNodeTitle>{node.title}</QuestionNodeTitle>
         <UI.Div position="relative">
           <SliderBunny
@@ -59,7 +64,7 @@ export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
             markers={node.sliderNode?.markers || []}
           />
         </UI.Div>
-      </NodeLayout>
+      </QuestionNodeLayout>
     </QuestionNodeContainer>
   )
 };

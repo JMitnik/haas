@@ -2,7 +2,7 @@
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "react"],
   "parserOptions": {
-    "project": "tsconfig.json"
+    "project": "frontend/client/tsconfig.json"
   },
   "extends": [
     "next/core-web-vitals",
@@ -11,7 +11,7 @@
   "settings": {
     "import/resolver": {
       "typescript": {
-        "project": "tsconfig.json"
+        "project": "frontend/client/tsconfig.json"
       }
     },
     "import/parsers": {

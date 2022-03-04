@@ -1,9 +1,11 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 interface DialogueParams {
   workspace: string;
   dialogue: string;
   nodeId: string;
+  fromNode?: string;
+  fromEdge?: string;
 }
 
 /**
@@ -11,10 +13,15 @@ interface DialogueParams {
  */
 export const useDialogueParams = (): DialogueParams => {
   const { workspace, dialogue, nodeId } = useParams();
+  const [searchParams] = useSearchParams();
+  const fromNode = searchParams.get('fromN');
+  const fromEdge = searchParams.get('fromE');
 
   return {
     workspace,
     dialogue,
     nodeId,
+    fromNode,
+    fromEdge,
   }
 };

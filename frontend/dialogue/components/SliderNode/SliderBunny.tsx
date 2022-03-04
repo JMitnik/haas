@@ -21,15 +21,7 @@ import { SliderText } from './SliderText';
 import { useBunnySliderAnimation } from './useBunnySliderAnimation';
 
 const adaptColor = (colorHex: string) => {
-  const color = '#444';
-  return '#ddd';
-
-  // if (color.isLight()) {
-    // return color.mix(Color('black'), 0.4).saturate(1).hex();
-  // }
-
-  // return '#ddd';
-  // return color.mix(Color('white'), 0.4).saturate(1).hex();
+  return colorHex;
 };
 
 
@@ -113,16 +105,16 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
     form.setValue('slider', val);
 
     // Start the value bubble
-    animationControls.start('active');
+    void animationControls.start('active');
 
     // Start running the bunny
     dispatchAnimationState({ type: 'run', payload: { position: val } });
 
-    // Pause the potential countdown of the the submission
+    // Pause the potential countdown of the submission
     pause();
 
     // Update the position of the popper
-    if (update) update();
+    if (update) await update();
   };
 
   /**
@@ -165,7 +157,7 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
             data-testid="unhappy"
             alignItems="center"
           >
-            <UnhappyIcon />
+            <UnhappyIcon/>
             <UI.Text fontSize="0.8rem">
               {unhappyText || t('unhappy')}
             </UI.Text>
@@ -174,7 +166,7 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
             <UI.Text mr={1} fontSize="0.8rem">
               {happyText || t('happy')}
             </UI.Text>
-            <HappyIcon />
+            <HappyIcon/>
           </UI.Flex>
         </LS.SlideHereContainer>
       )}
@@ -184,6 +176,8 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
           left: `${animationState.position}%`,
           bottom: '10px',
           transform: 'translateX(-50%)',
+          pointerEvents: 'none',
+          cursor: 'pointer',
         }}
         ref={setSliderRef}
       >
@@ -238,9 +232,9 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
                         animate={{ y: 0 }}
                       >
                         {sliderValue > 5 ? (
-                          <HappyIcon />
+                          <HappyIcon/>
                         ) : (
-                          <UnhappyIcon />
+                          <UnhappyIcon/>
                         )}
                       </motion.div>
                     )}
@@ -276,19 +270,23 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
         </UI.Div>
       </LS.HAASRabbit>
 
-      <UI.Slider
-        data-testid="slider"
-        data-cy="Slider"
-        width={1}
-        style={{ zIndex: 300 }}
-        {...form.register('slider')}
-        onChange={(e) => moveBunny(e)}
-        onMouseUp={() => handleBunnyRelease()}
-        onTouchEnd={() => handleBunnyRelease()}
-        min={1}
-        max={100}
-        defaultValue={50}
-      />
+      <UI.Div position="relative">
+        <UI.Slider
+          data-testid="slider"
+          data-cy="Slider"
+          width={1}
+          style={{ zIndex: 300, height: 90, opacity: 0, cursor: 'pointer' }}
+          {...form.register('slider')}
+          onChange={(e) => moveBunny(e)}
+          onMouseUp={() => handleBunnyRelease()}
+          onTouchEnd={() => handleBunnyRelease()}
+          min={1}
+          max={100}
+          defaultValue={50}
+        />
+
+        <LS.PseudoSliderTrack style={{ height: 15, position: 'absolute', bottom: 0, left: 0, right: 0 }}/>
+      </UI.Div>
 
       {animationState.isStopped && (
         <LS.FingerPrintContainer
@@ -304,7 +302,7 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
             },
           }}
         >
-          <FingerIcon />
+          <FingerIcon/>
         </LS.FingerPrintContainer>
       )}
 

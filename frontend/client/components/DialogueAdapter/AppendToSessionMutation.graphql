@@ -1,0 +1,5 @@
+mutation AppendToSession($input: AppendToInteractionInput!) {
+  appendToInteraction(input: $input) {
+    id
+  }
+}

@@ -1,120 +1,140 @@
 {
-    "private": true,
-    "jest": {
-        "verbose": true
-    },
-    "homepage": ".",
-    "workspaces": {
-        "packages": [
-            "api",
-            "frontend/*"
-        ],
-        "nohoist": [
-            "frontend/client/webpack-dev-server",
-            "frontend/client/react-scripts-server",
-            "frontend/dashboard/webpack-dev-server",
-            "**/babel-loader",
-            "**/babel-jest"
+  "private": true,
+  "jest": {
+    "verbose": true
+  },
+  "homepage": ".",
+  "workspaces": {
+    "packages": [
+      "api",
+      "frontend/*"
+    ],
+    "nohoist": [
+      "frontend/client/webpack-dev-server",
+      "frontend/client/react-scripts-server",
+      "frontend/dashboard/webpack-dev-server",
+      "**/babel-loader",
+      "**/babel-jest"
+    ]
+  },
+  "resolutions": {
+    "**/@typescript-eslint/eslint-plugin": "^4.1.1",
+    "**/@typescript-eslint/parser": "^4.1.1",
+    "jest-environment-jsdom": "^26.0.1"
+  },
+  "scripts": {
+    "aws:install": "cd aws/stack && yarn",
+    "aws:deploy-pipeline": "cd aws/stack && cdk deploy haasSvcPipeline --profile haas-prod",
+    "aws:deploy:campaign": "cd aws/commands && bash deploy-campaign.bash",
+    "aws:deploy:internal": "cd aws/stack && cdk deploy InternalNotifyStack --profile haas-prod",
+    "start": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn start:api\"",
+    "start:api": "yarn workspace @haas/api start",
+    "start:api:debug": "yarn workspace @haas/api start:debug",
+    "start:dialogue": "yarn workspace @haas/dialogue dev",
+    "start:client": "yarn workspace @haas/client dev",
+    "start:dashboard": "yarn workspace @haas/dashboard start",
+    "deploy:aws:campaign": "cd aws/commands && bash deploy-campaign.bash",
+    "dock:start-db": "cd container/api && docker-compose up -d",
+    "dock:up": "cd container/api && docker-compose up -d",
+    "dock:down": "cd container/api && docker-compose down",
+    "dock:test": "bash scripts/dock-test.sh",
+    "dev": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn dev:api\"",
+    "dev:api": "yarn workspace @haas/api dev",
+    "build:client": "yarn workspace @haas/client build",
+    "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
+    "clean:npm": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+    "eslint": "yarn eslint:client",
+    "eslint:api": "yarn workspace @haas/api eslint",
+    "eslint:client": "yarn workspace @haas/client eslint",
+    "eslint:dashboard": "yarn workspace @haas/dashboard eslint",
+    "gen": "turbo run gen",
+    "migrate": "yarn workspace @haas/api migrate",
+    "migrate:prod": "yarn workspace @haas/api migrate",
+    "migrate:baseline": "yarn workspace @haas/api migrate:baseline",
+    "migrate:create": "yarn workspace @haas/api migrate:create",
+    "seed:api": "yarn workspace @haas/api seed",
+    "kill": "yarn kill:api && yarn kill:client",
+    "kill:dashboard": "yarn workspace @haas/dashboard kill",
+    "kill:api": "yarn workspace @haas/api kill",
+    "kill:client": "kill $(lsof -t -i:3000) | exit 0",
+    "test": "yarn workspace @haas/api test",
+    "test:integration:api": "yarn workspace @haas/api test:integration",
+    "test:integration:dashboard": "yarn workspace @haas/dashboard test:integration",
+    "test:watch:api": "yarn workspace @haas/api test:watch",
+    "test:watch:dashboard": "yarn workspace @haas/dashboard test:watch",
+    "test:cypress-dashboard": "yarn workspace @haas/dashboard cypress open",
+    "test:cypress-client": "yarn workspace @haas/client cypress open",
+    "restart:api": "yarn kill:api && yarn start:api",
+    "types": "yarn types:api && yarn types:dashboard",
+    "types:api": "yarn workspace @haas/api types",
+    "types:dashboard": "yarn workspace @haas/dashboard types",
+    "dock:test:start-db": "(cd container/test && docker-compose up -d) && sleep 10 && (export DB_STRING=postgresql://prisma:prisma@localhost:5431/postgres?schema=public && yarn migrate)",
+    "dock:test:restart-db": "yarn dock:test:end-db  && yarn dock:test:start-db ",
+    "dock:test:end-db": "(cd container/test && docker-compose down)",
+    "dev:prep": "turbo run yarn migrate:prod gen",
+    "dev:prep:full": "turbo run yarn migrate:prod gen db:reset db:seed:basic",
+    "tunnel:api": "ngrok http https://localhost:4000"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
+    "concurrently": "^5.1.0",
+    "eslint": "^7.25.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-airbnb-typescript": "12.3.1",
+    "eslint-import-resolver-typescript": "^2.4.0",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-jsx-a11y": "6.4.1",
+    "eslint-plugin-react": "^7.23.2",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-sort-imports-es6-autofix": "^0.6.0",
+    "turbo": "^1.0.23"
+  },
+  "turbo": {
+    "pipeline": {
+      "yarn": {},
+      "migrate:prod": {
+        "dependsOn": [
+          "yarn"
         ]
-    },
-    "resolutions": {
-        "**/@typescript-eslint/eslint-plugin": "^4.1.1",
-        "**/@typescript-eslint/parser": "^4.1.1",
-        "jest-environment-jsdom": "^26.0.1"
-    },
-    "scripts": {
-        "aws:install": "cd aws/stack && yarn",
-        "aws:deploy-pipeline": "cd aws/stack && cdk deploy haasSvcPipeline --profile haas-prod",
-        "aws:deploy:campaign": "cd aws/commands && bash deploy-campaign.bash",
-        "aws:deploy:internal": "cd aws/stack && cdk deploy InternalNotifyStack --profile haas-prod",
-        "start": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn start:api\"",
-        "start:api": "yarn workspace @haas/api start",
-        "start:api:debug": "yarn workspace @haas/api start:debug",
-        "start:dialogue": "yarn workspace @haas/dialogue dev",
-        "start:client": "yarn workspace @haas/client dev",
-        "start:dashboard": "yarn workspace @haas/dashboard start",
-        "deploy:aws:campaign": "cd aws/commands && bash deploy-campaign.bash",
-        "dock:start-db": "cd container/api && docker-compose up -d",
-        "dock:up": "cd container/api && docker-compose up -d",
-        "dock:down": "cd container/api && docker-compose down",
-        "dock:test": "bash scripts/dock-test.sh",
-        "dev": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn dev:api\"",
-        "dev:api": "yarn workspace @haas/api dev",
-        "build:client": "yarn workspace @haas/client build",
-        "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
-        "clean:npm": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
-        "eslint": "yarn eslint:client",
-        "eslint:api": "yarn workspace @haas/api eslint",
-        "eslint:client": "yarn workspace @haas/client eslint",
-        "eslint:dashboard": "yarn workspace @haas/dashboard eslint",
-        "gen": "turbo run gen",
-        "migrate": "yarn workspace @haas/api migrate",
-        "migrate:prod": "yarn workspace @haas/api migrate",
-        "migrate:baseline": "yarn workspace @haas/api migrate:baseline",
-        "migrate:create": "yarn workspace @haas/api migrate:create",
-        "seed:api": "yarn workspace @haas/api seed",
-        "kill": "yarn kill:api && yarn kill:client",
-        "kill:dashboard": "yarn workspace @haas/dashboard kill",
-        "kill:api": "yarn workspace @haas/api kill",
-        "kill:client": "kill $(lsof -t -i:3000) | exit 0",
-        "test": "yarn workspace @haas/api test",
-        "test:integration:api": "yarn workspace @haas/api test:integration",
-        "test:integration:dashboard": "yarn workspace @haas/dashboard test:integration",
-        "test:watch:api": "yarn workspace @haas/api test:watch",
-        "test:watch:dashboard": "yarn workspace @haas/dashboard test:watch",
-        "test:cypress-dashboard": "yarn workspace @haas/dashboard cypress open",
-        "test:cypress-client": "yarn workspace @haas/client cypress open",
-        "restart:api": "yarn kill:api && yarn start:api",
-        "types": "yarn types:api && yarn types:dashboard",
-        "types:api": "yarn workspace @haas/api types",
-        "types:dashboard": "yarn workspace @haas/dashboard types",
-        "dock:test:start-db": "(cd container/test && docker-compose up -d) && sleep 10 && (export DB_STRING=postgresql://prisma:prisma@localhost:5431/postgres?schema=public && yarn migrate)",
-        "dock:test:restart-db": "yarn dock:test:end-db  && yarn dock:test:start-db ",
-        "dock:test:end-db": "(cd container/test && docker-compose down)",
-        "dev:prep": "turbo run yarn migrate:prod gen",
-        "dev:prep:full": "turbo run yarn migrate:prod gen db:reset db:seed:basic",
-        "tunnel:api": "ngrok http https://localhost:4000"
-    },
-    "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^4.22.1",
-        "@typescript-eslint/parser": "^4.22.1",
-        "concurrently": "^5.1.0",
-        "eslint": "^7.25.0",
-        "eslint-config-airbnb": "^18.2.1",
-        "eslint-config-airbnb-typescript": "12.3.1",
-        "eslint-import-resolver-typescript": "^2.4.0",
-        "eslint-plugin-import": "2.22.1",
-        "eslint-plugin-jsx-a11y": "6.4.1",
-        "eslint-plugin-react": "^7.23.2",
-        "eslint-plugin-react-hooks": "^4.2.0",
-        "eslint-plugin-sort-imports-es6-autofix": "^0.6.0",
-        "turbo": "^1.0.23"
-    },
-    "turbo": {
-      "pipeline": {
-        "yarn": {},
-        "migrate:prod": {
-          "dependsOn": ["yarn"]
-        },
-        "gen": {
-          "dependsOn": ["yarn"]
-        },
-        "@haas/client#gen": {
-          "dependsOn": ["@haas/api#gen"]
-        },
-        "@haas/dashboard#gen": {
-          "dependsOn": ["@haas/api#gen"]
-        },
-        "db:seed:basic": {
-          "dependsOn": ["gen"]
-        },
-        "eslint": {
-          "dependsOn": ["yarn"]
-        },
-        "db:reset": {
-          "dependsOn": ["yarn", "migrate:prod"]
-        }
+      },
+      "gen": {
+        "dependsOn": [
+          "yarn"
+        ]
+      },
+      "@haas/client#gen": {
+        "dependsOn": [
+          "@haas/api#gen"
+        ]
+      },
+      "@haas/dialogue#gen": {
+        "dependsOn": [
+          "@haas/api#gen"
+        ]
+      },
+      "@haas/dashboard#gen": {
+        "dependsOn": [
+          "@haas/api#gen"
+        ]
+      },
+      "db:seed:basic": {
+        "dependsOn": [
+          "gen"
+        ]
+      },
+      "eslint": {
+        "dependsOn": [
+          "yarn"
+        ]
+      },
+      "db:reset": {
+        "dependsOn": [
+          "yarn",
+          "migrate:prod"
+        ]
       }
-    },
-    "dependencies": {}
+    }
+  },
+  "dependencies": {}
 }

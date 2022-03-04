@@ -1,8 +1,8 @@
-import { CSSReset, ThemeProvider as ChakraThemeProvider  } from '@chakra-ui/core';
+import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
 import { ThemeProvider } from 'styled-components';
 import React, { useMemo } from 'react';
 
-import { theme, Theme } from './theme';
+import { theme, Theme } from '../../config/Theme/theme';
 import { Workspace, WorkspaceSettings } from '../../types/core-types';
 
 /**
@@ -35,7 +35,7 @@ const ThemeProviders = ({ workspace, children }: ThemeProvidersProps) => {
   return (
     <ThemeProvider theme={customTheme}>
       <ChakraThemeProvider theme={customTheme}>
-        <CSSReset />
+        <CSSReset/>
         {children}
       </ChakraThemeProvider>
     </ThemeProvider>

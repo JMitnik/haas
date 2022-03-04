@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import chroma from 'chroma-js';
 
-import { Theme } from './theme';
+import { Theme } from '../../config/Theme/theme';
 
 interface DialogueThemerContainerProps {
   usesGradient: boolean;
@@ -12,6 +12,9 @@ interface DialogueThemerContainerProps {
 
 const DialogueThemerContainer = styled.div<DialogueThemerContainerProps>`
   ${({ theme, usesGradient, bgColor, bgAltColor }) => css`
+    display: flex;
+    flex-direction: column;
+    flex: 100%;
     height: 100%;
     --bgColor: ${bgColor};
     --bgAltColor: ${bgAltColor};
@@ -22,10 +25,8 @@ const DialogueThemerContainer = styled.div<DialogueThemerContainerProps>`
     color: var(--header-color);
 
     ${usesGradient && css`
-      background: linear-gradient(
-        var(--bg-gradient-start),
-        var(--bg-gradient-to)
-      );
+      background: linear-gradient(var(--bg-gradient-start),
+      var(--bg-gradient-to));
     `}
 
     ${!usesGradient && css`

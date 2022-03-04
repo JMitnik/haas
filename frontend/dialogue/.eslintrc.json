@@ -5,7 +5,7 @@
     "react"
   ],
   "parserOptions": {
-    "project": "tsconfig.json"
+    "project": "frontend/dialogue/tsconfig.json"
   },
   "extends": [
     "next/core-web-vitals",
@@ -14,7 +14,7 @@
   "settings": {
     "import/resolver": {
       "typescript": {
-        "project": "tsconfig.json"
+        "project": "frontend/dialogue/tsconfig.json"
       }
     },
     "import/parsers": {

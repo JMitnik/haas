@@ -1,7 +1,7 @@
 {
   "name": "@haas/dialogue",
   "private": true,
-  "main": "./components/Dialogue/Dialogue.tsx",
+  "main": "./index.tsx",
   "version": "0.0.1",
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev",
@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --watch",
+    "types": "tsc --noEmit",
     "gen": "graphql-codegen --require dotenv/config"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "@chakra-ui/core": "^0.8.0",
     "@haas/ui": "*",
     "@popperjs/core": "^2.11.0",
+    "@xstate/react": "^2.0.0",
     "babel-plugin-inline-react-svg": "^2.0.1",
     "chroma-js": "^2.1.2",
     "date-fns": "^2.27.0",
@@ -34,6 +36,7 @@
     "react-timer-hook": "^3.0.5",
     "styled-components": "^5.3.3",
     "use-timer": "^2.0.1",
+    "xstate": "^4.29.0",
     "zustand": "^3.6.5"
   },
   "devDependencies": {

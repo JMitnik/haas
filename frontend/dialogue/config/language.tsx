@@ -70,6 +70,16 @@ const language = {
       de: 'Wir werden versuchen, Sie zu verärgern.',
       nl: 'We zullen ons best doen om uw feedback mee te nemen.',
     },
+    whoops: {
+      en: 'Whoops!',
+      de: 'Oops!',
+      nl: 'Oeps!',
+    },
+    whoops_description: {
+      en: 'We lost you in our dialogue',
+      nl: 'Wij zijn je kwijtgeraakt in ons dialoog',
+      de: 'Wir haben Sie in unserem Dialog verloren',
+    },
   },
 };
 

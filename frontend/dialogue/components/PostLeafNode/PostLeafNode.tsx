@@ -2,12 +2,11 @@ import * as UI from '@haas/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { NodeLayout } from '../QuestionNode/NodeLayout';
-import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeStyles';
+import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
 import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
+import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeTitle';
 
 export const POSTLEAFNODE_ID = '-1';
-
 
 
 export const PostLeafNode = ({ node }: QuestionNodeProps) => {
@@ -17,7 +16,7 @@ export const PostLeafNode = ({ node }: QuestionNodeProps) => {
   const subtext = node.postLeafBody || t('postleaf_default_subtext');
 
   return (
-    <NodeLayout node={node}>
+    <QuestionNodeLayout node={node}>
       <QuestionNodeTitle>
         {title}
       </QuestionNodeTitle>
@@ -25,6 +24,6 @@ export const PostLeafNode = ({ node }: QuestionNodeProps) => {
       <UI.Div>
         {subtext}
       </UI.Div>
-    </NodeLayout>
+    </QuestionNodeLayout>
   )
 };

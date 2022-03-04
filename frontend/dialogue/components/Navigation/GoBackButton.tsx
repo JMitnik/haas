@@ -7,6 +7,7 @@ import { ChevronLeft } from 'react-feather';
 import { useDialogueParams } from './useDialogueParams';
 import { useNavigator } from './useNavigator';
 import { makeColorfulBoxShadow } from '../../utils/makeColorfulBoxShadow';
+import { useDialogueStore } from '../Dialogue/DialogueStore';
 
 const makeLinearBackground = (color: string, endOpacity = 0.56) => {
   if (chroma(color).luminance() > 0.5) {
@@ -18,10 +19,6 @@ const makeLinearBackground = (color: string, endOpacity = 0.56) => {
 
 const GoBackButtonContainer = styled.button`
   ${({ theme }) => css`
-    position: absolute;
-    top: 0;
-    left: -80px;
-    top: 20px;
     background: ${makeLinearBackground(theme.colors._primary, 1)};
     padding: 4px 8px;
     border-radius: 10px;
@@ -29,6 +26,13 @@ const GoBackButtonContainer = styled.button`
     z-index: 40;
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     border: 1px solid #4a63dc;
+
+    @media ${theme.media.desk} {
+      position: absolute;
+      top: 0;
+      left: -80px;
+      top: 20px;
+    }
 
     &:hover {
       transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -39,13 +43,19 @@ const GoBackButtonContainer = styled.button`
 `;
 
 export const GoBackButton = () => {
-  const { workspace, dialogue } = useDialogueParams();
+  const { workspace, dialogue, fromNode } = useDialogueParams();
   const { goBack } = useNavigator({ dialogueSlug: dialogue, workspaceSlug: workspace });
 
+  // const handleGoBack = () => {
+  //   goBack();
+  // }
+
+  if (!fromNode) return null;
+
   return (
-    <GoBackButtonContainer onClick={goBack}>
+    <GoBackButtonContainer>
       <UI.Icon>
-        <ChevronLeft />
+        <ChevronLeft/>
       </UI.Icon>
     </GoBackButtonContainer>
   )

@@ -46,6 +46,7 @@ export const FingerPrintContainer = styled(motion.div)`
     svg {
       width: 36px;
       height: 36px;
+
       > g {
         stroke-width: 1;
         stroke: ${Color(theme.colors.primary).mix(Color('white'), 0.9).hex()};;
@@ -58,14 +59,13 @@ export const SliderNodeValue = styled(motion.span)`
   ${({ theme }) => css`
     background: rgba(255, 255, 255, 0.4);
     color: ${theme.colors.primary};
-    display: inline-block;
     text-align: center;
     font-size: 1.1rem;
     font-weight: 1000;
     position: relative;
     border-radius: 30px;
     display: flex;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
     overflow: hidden;
     width: 45px;
     height: 45px;
@@ -88,7 +88,6 @@ export const SliderNodeValue = styled(motion.span)`
       display: flex;
       align-items: center;
       justify-content: center;
-      display: flex;
 
       .signal {
         width: 100%;
@@ -132,10 +131,19 @@ export const SliderSpeechWrapper = styled(Div)`
     background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(5px);
     padding: 12px;
-    box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+    box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px;
 
     &:hover {
       cursor: pointer;
     }
   }
+`;
+
+export const PseudoSliderTrack = styled.div`
+  ${({ theme }) => css`
+    width: 100%;
+    border-radius: 10px;
+    background: ${theme.colors._primary};
+    box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px;
+  `}
 `;
