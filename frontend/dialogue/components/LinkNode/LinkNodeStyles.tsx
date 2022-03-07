@@ -29,9 +29,6 @@ export const LinkItemContainer = styled.a<LinkItemContainerProps>`
       padding: 12px 16px;
       display: flex;
       cursor: pointer;
-      /* border: 2px solid ${chroma(brand).darken(0.4).hex()}; */
-      /* color: ${chroma(brand).brighten().hex()}; */
-      /* color: white; */
       z-index: 1;
       transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       box-shadow: ${makeColorfulBoxShadow(brand, false)};

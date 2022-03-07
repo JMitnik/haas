@@ -14,7 +14,10 @@ const UpsellNode = ({ link }: UpsellNodeProps) => (
     <LS.DrawerContainer>
 
       <LS.ImageContainer>
-        <img src={link.imageUrl || ''} alt="product" />
+        <img
+          src={link.imageUrl || ''}
+          alt="product"
+        />
       </LS.ImageContainer>
 
       <UI.Div pb={2}>
@@ -37,7 +40,10 @@ const UpsellNode = ({ link }: UpsellNodeProps) => (
           <UI.Div mr={2}>
             {link.iconUrl ? (
               <LS.ButtonIconContainer overrideBackgroundColor={link.backgroundColor || undefined}>
-                <img alt="Icon on redirect button" src={link.iconUrl} />
+                <img
+                  alt="Icon on redirect button"
+                  src={link.iconUrl}
+                />
               </LS.ButtonIconContainer>
             ) : <ShoppingCart />}
 

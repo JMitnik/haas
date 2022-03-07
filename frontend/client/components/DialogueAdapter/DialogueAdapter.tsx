@@ -1,7 +1,7 @@
 import React from 'react'
 import { DialogueBootstrap } from '@haas/dialogue';
 
-import { useAppendToSessionMutation, useUploadSessionEventsMutation } from 'types/generated-types';
+import { useUploadSessionEventsMutation } from 'types/generated-types';
 import { Dialogue as DialogueType, Workspace, SessionEventInput } from 'types/helper-types';
 
 
@@ -12,34 +12,22 @@ interface DialogueProps {
 }
 
 export const DialogueAdapter = ({ dialogue, workspace, sessionId }: DialogueProps) => {
-  // const [uploadSessionEvents] = useUploadSessionEventsMutation();
-  // const [appendToSession] = useAppendToSessionMutation();
+  const [uploadSessionEvents] = useUploadSessionEventsMutation();
 
-  // const handleUploadEvents = async (events: SessionEventInput[]) => {
-  //   // await uploadSessionEvents({
-  //   //   variables: {
-  //   //     input: { events, sessionId },
-  //   //   },
-  //   // });
-  //   // appendToSession({
-  //   //   variables: {
-  //   //     input: {
-  //   //       data: {
-  //   //         choice: {
-  //   //           value: events[0].choiceValue.value,
-  //   //         },
-  //   //       },
-  //   //       // edgeId: events[0].no,
-  //   //     },
-  //   //   },
-  //   // })
-  // };
-
-  const handleUploadEvents = () => {
-    return;
-  }
-
-  console.log(DialogueBootstrap);
+  const handleUploadEvents = async (events: SessionEventInput[]) => {
+    try {
+      await uploadSessionEvents({
+        variables: {
+          input: {
+            sessionId,
+            events,
+          },
+        },
+      });
+    } catch (error) {
+      console.log('Session events');
+    }
+  };
 
   return (
     <DialogueBootstrap

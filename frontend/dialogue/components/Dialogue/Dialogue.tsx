@@ -81,8 +81,8 @@ export const Dialogue = ({ onEventUpload }: DialogueProps) => {
 
   // The main callback for handling an event (State + Action + Reward)
   const handleAction = useCallback((input: SessionEvent) => {
-    applyEvent(input);
-    transition(input);
+    const newEvent = applyEvent(input);
+    transition(newEvent);
   }, [applyEvent, transition]);
 
   if (!currentNode) return null;

@@ -5,6 +5,7 @@ import {
   Dialogue,
   QuestionNode as QuestionNodeType,
   SessionEvent,
+  SessionState,
 } from '../../types/core-types';
 import { QuestionNode as GeneratedQuestionNode } from '../../types/generated-types';
 import { POSTLEAFNODE_ID } from '../PostLeafNode/PostLeafNode';
@@ -22,7 +23,7 @@ interface DialogueState {
   pastEvents: SessionEvent[];
   futureEvents: SessionEvent[];
 
-  applyEvent: (event: SessionEvent) => void;
+  applyEvent: (event: SessionEvent) => SessionEvent;
   detectUndoRedo: (nodeId: string) => void;
   undoEvent: () => void;
   redoEvent: () => void;
@@ -81,21 +82,44 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
   },
 
   applyEvent: (event: SessionEvent) => {
+    let nextEvent: SessionEvent;
+
     // TODO: I need to update the "current event" with the potential new reward and action,
     // AND THEN set a new event.
-    set(currentState => ({
-      activeEvent: {
+    set(currentState => {
+      // Update the current event with the new action and reward
+      const updatedEvent: SessionEvent = {
+        state: currentState.activeEvent.state,
+        action: event.action,
+        reward: event.reward,
+        sessionId: currentState.activeEvent.sessionId,
+        timestamp: Date.now(),
+      };
+
+      // Update the state for the next event.
+      const nextState: SessionState = {
+        activeCallToActionId: event.reward?.overrideCallToActionId || currentState.activeEvent.state.activeCallToActionId,
+        nodeId: event.reward?.toNode || updatedEvent.state.activeCallToActionId || POSTLEAFNODE_ID,
+      };
+
+      console.log({ updatedEvent });
+      console.log({ nextState });
+
+      nextEvent = {
         sessionId: currentState.sessionId,
         timestamp: Date.now(),
-        state: {
-          nodeId: event.reward?.toNode || event.state.activeCallToActionId || POSTLEAFNODE_ID,
-          activeCallToActionId: event.reward?.overrideCallToActionId || currentState?.activeEvent?.state?.activeCallToActionId,
-        },
-      },
-      uploadEvents: [...currentState.uploadEvents, event],
-      pastEvents: [...currentState.pastEvents, event],
-      futureEvents: [],
-    }));
+        state: nextState,
+      };
+
+      return {
+        activeEvent: nextEvent,
+        uploadEvents: [...currentState.uploadEvents, updatedEvent],
+        pastEvents: [...currentState.pastEvents, updatedEvent],
+        futureEvents: [],
+      };
+    });
+
+    return nextEvent;
   },
   undoEvent: () => {
     set(currentState => {

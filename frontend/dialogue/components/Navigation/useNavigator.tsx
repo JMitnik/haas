@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 
 import { POSTLEAFNODE_ID } from '../PostLeafNode/PostLeafNode';
-import { StateActionRewardTuple } from '../Dialogue/DialogueStore';
+import { SessionEvent } from '../../types/core-types';
 
 export type StateType = 'Question' | 'CTA' | 'FINISHER';
 
@@ -36,14 +36,14 @@ export const useNavigator = ({ dialogueSlug, workspaceSlug }: UseNavigatorProps)
    * The transition function dictates where to go next based on the input parameters and available state.
    * @param currentStateType State type: Node, CTA or FINISHER
    */
-  const transition = ({ state, reward }: StateActionRewardTuple) => {
+  const transition = ({ state }: SessionEvent) => {
     // If we have a child node, navigate to it.
-    if (reward.childNodeId) {
-      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${reward.childNodeId}`);
+    if (state.nodeId) {
+      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${state.nodeId}`);
       return;
     }
 
-    const activeCallToActionId = reward.overrideCallToActionId || state.activeCallToActionId;
+    const activeCallToActionId = state.activeCallToActionId;
 
     // If we have no active call to action, go to the finisher.
     if (!activeCallToActionId) {

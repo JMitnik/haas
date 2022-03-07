@@ -24,8 +24,6 @@ export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
   const { sessionId } = useSession();
   const getValues = form.getValues;
 
-  const { fromNode, fromEdge } = useDialogueParams();
-
   /**
    * Handles a sliding action: find child and pass that child to par
    */
@@ -33,6 +31,8 @@ export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
     const sliderValue = parseInt(getValues().slider as unknown as string, 10);
     const childEdge = findSliderChildEdge(sliderValue, node.children);
     const childNodeId = childEdge.childNode.id;
+
+    console.log({ node });
 
     onRunAction({
       sessionId,
@@ -49,7 +49,7 @@ export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
         toNode: childNodeId,
       },
     });
-  }, [getValues, sessionId, node, fromNode, fromEdge, onRunAction]);
+  }, [getValues, sessionId, node, onRunAction]);
 
   return (
     <QuestionNodeContainer>

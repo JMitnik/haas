@@ -1,13 +1,11 @@
 import * as UI from '@haas/ui';
 
-import { useDialogueStore } from '../Dialogue/DialogueStore';
 import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
 import { SessionActionType } from '../../types/core-types';
 import { useSession } from '../Session/SessionProvider';
 import { ChoiceNodeButtonLayout } from './ChoiceNodeButtonLayout';
 import { findChoiceChildEdge } from './findChoiceChildEdge';
 import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeTitle';
-import { useDialogueParams } from '../Navigation/useDialogueParams';
 import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
 
 /**
@@ -16,24 +14,18 @@ import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
 export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
   const { sessionId } = useSession();
   const choices = node.options || [];
-  const { fromNode, fromEdge } = useDialogueParams();
-
-  const { activeEvent } = useDialogueStore(state => ({
-    activeEvent: state.activeEvent,
-  }));
 
   const handleRunAction = (choiceIndex: number) => {
     const choice = choices[choiceIndex];
     const childEdge = findChoiceChildEdge(choice, node.children);
     const childNode = childEdge?.childNode;
 
+    console.log({ node });
+    console.log({ choice });
+
     onRunAction({
       sessionId,
       timestamp: Date.now(),
-      state: {
-        activeCallToActionId: childNode?.id,
-        nodeId: node.id,
-      },
       action: {
         type: SessionActionType.ChoiceAction,
         choice: {
@@ -46,7 +38,7 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
         overrideCallToActionId: choice.overrideLeaf?.id || node.overrideLeafId,
         toEdge: childEdge?.id,
         toNode: childNode?.id,
-      }
+      },
     });
   }
 

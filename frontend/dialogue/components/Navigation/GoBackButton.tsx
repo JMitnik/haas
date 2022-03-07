@@ -7,7 +7,6 @@ import { ChevronLeft } from 'react-feather';
 import { useDialogueParams } from './useDialogueParams';
 import { useNavigator } from './useNavigator';
 import { makeColorfulBoxShadow } from '../../utils/makeColorfulBoxShadow';
-import { useDialogueStore } from '../Dialogue/DialogueStore';
 
 const makeLinearBackground = (color: string, endOpacity = 0.56) => {
   if (chroma(color).luminance() > 0.5) {
@@ -46,14 +45,14 @@ export const GoBackButton = () => {
   const { workspace, dialogue, fromNode } = useDialogueParams();
   const { goBack } = useNavigator({ dialogueSlug: dialogue, workspaceSlug: workspace });
 
-  // const handleGoBack = () => {
-  //   goBack();
-  // }
+  const handleGoBack = () => {
+    goBack();
+  }
 
   if (!fromNode) return null;
 
   return (
-    <GoBackButtonContainer>
+    <GoBackButtonContainer onClick={handleGoBack}>
       <UI.Icon>
         <ChevronLeft/>
       </UI.Icon>
