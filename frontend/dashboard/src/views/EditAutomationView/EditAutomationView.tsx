@@ -27,6 +27,7 @@ import {
 } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 
+import { ConditionEntry } from 'views/AddAutomationView/CreateConditionModalCard';
 import { useParams } from 'react-router';
 import AutomationForm from '../AddAutomationView/AutomationForm';
 
@@ -57,9 +58,11 @@ interface ConditionInput {
 }
 
 export interface AutomationInput {
+  id: string;
   label: string;
   automationType?: AutomationType;
   conditionBuilder: {
+    id?: string;
     logical: { label: string, value: string };
     conditions: ConditionInput[];
     childBuilder?: {
@@ -179,7 +182,7 @@ const mapConditionsToFormInput = (
         latest: scope?.latest,
         aggregate: scope?.aggregate,
         aspect: scope?.aspect,
-        questionOption: questionOption?.textValue,
+        questionOption: questionOption?.textValue || undefined,
         // TODO: Add dateRange
         dateRange: null,
       },
@@ -189,9 +192,11 @@ const mapConditionsToFormInput = (
 
 const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput => {
   return {
+    id: input?.id as string,
     label: input?.label as string,
     automationType: input?.type,
     conditionBuilder: {
+      id: input?.automationTrigger?.conditionBuilder?.id,
       logical: {
         label: input?.automationTrigger?.conditionBuilder?.type as AutomationConditionBuilderType,
         value: input?.automationTrigger?.conditionBuilder?.type as AutomationConditionBuilderType,
@@ -219,11 +224,32 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
   };
 };
 
+const findUniqueConditionEntries = (entries: ConditionEntry[]) => {
+  const unique: ConditionEntry[] = [];
+  entries.forEach((condition) => {
+    let isUnique = true;
+    if (unique.length === 0) {
+      unique.push(condition);
+      return;
+    }
+    unique.forEach((uniqueEntry) => {
+      if (condition.aggregate === uniqueEntry.aggregate
+        && condition.aspect === uniqueEntry.aspect
+        && condition.dateRange === uniqueEntry.dateRange
+        && condition.latest === uniqueEntry.latest
+        && condition.questionOption === uniqueEntry.questionOption
+        && condition.scopeType === uniqueEntry.scopeType
+      ) isUnique = false;
+    });
+    if (isUnique) unique.push(condition);
+  });
+  return unique;
+};
+
 const EditAutomationView = () => {
   const { goToAutomationOverview } = useNavigator();
   const { t } = useTranslation();
   const { automationId }: { automationId: string } = useParams();
-  console.log('Automation ID: ', automationId);
   const { data: automationData, loading: automationDataLoading } = useGetAutomationQuery({
     variables: {
       input: {
@@ -250,7 +276,13 @@ const EditAutomationView = () => {
   const automation: GetAutomationQuery['automation'] = automationData?.automation;
   console.log('Automation: ', automation);
   const mappedAutomation: AutomationInput = mapAutomation(automation);
-  console.log('Mapped automation: ', mappedAutomation);
+  // TODO: Add child builder
+  const conditionEntries: ConditionEntry[] = findUniqueConditionEntries(
+    mappedAutomation.conditionBuilder.conditions.map(
+      (condition) => condition.condition,
+    ),
+  );
+
   return (
     <>
       <UI.ViewHead>
@@ -260,6 +292,7 @@ const EditAutomationView = () => {
       <UI.ViewBody>
         <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
           <AutomationForm
+            mappedConditions={conditionEntries}
             automation={mappedAutomation}
             onUpdateAutomation={updateAutomation}
             isLoading={loading}

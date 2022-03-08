@@ -2,16 +2,23 @@ import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { PlusCircle } from 'react-feather';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useEffect } from 'react';
 import Select from 'react-select';
 
+import {
+  AutomationConditionScopeType,
+  ConditionPropertyAggregateType,
+  QuestionAspectType,
+  QuestionNode,
+  QuestionNodeTypeEnum,
+  useGetWorkspaceDialoguesQuery,
+} from 'types/generated-types';
 import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
-import { QuestionAspectType, QuestionNode, QuestionNodeTypeEnum, useGetWorkspaceDialoguesQuery } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 
 import Dropdown from 'components/Dropdown';
@@ -42,31 +49,37 @@ export interface FormDataProps {
     value: string;
     label: string;
   } | null,
-  aspect: string | null;
+  aspect?: string;
   questionOption: { label: string, value: string } | null;
   aggregate: string;
   latest: number;
   dateRange: TwoDateArray
 }
 
+export interface ActiveQuestion {
+  type?: QuestionNodeTypeEnum;
+  value?: string;
+  label?: string;
+}
+
 export interface ConditionEntry {
-  scopeType: string;
+  scopeType: AutomationConditionScopeType;
   activeDialogue: {
     type: string;
     value: string;
-    label?: string | undefined;
+    label: string | undefined;
     id: string;
   } | null;
   activeQuestion: {
-    type: string;
+    type: QuestionNodeTypeEnum;
     value: string;
     label: string;
   } | null;
-  aspect: string | null;
+  aspect?: string;
   dateRange: TwoDateArray | null;
-  aggregate: string;
-  questionOption?: string | null;
-  latest: number;
+  aggregate?: ConditionPropertyAggregateType;
+  questionOption?: string;
+  latest?: number;
 }
 
 export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) => {
@@ -84,12 +97,12 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
 
   const onSubmit = (formData: FormDataProps) => {
     const returnData: ConditionEntry = {
-      scopeType: formData.scopeType,
+      scopeType: formData.scopeType as AutomationConditionScopeType,
       activeDialogue: formData.activeDialogue,
-      activeQuestion: formData.activeQuestion,
+      activeQuestion: formData.activeQuestion as ActiveQuestion,
       aspect: formData.aspect,
       dateRange: formData.dateRange,
-      aggregate: formData.aggregate,
+      aggregate: formData.aggregate as ConditionPropertyAggregateType,
       questionOption: formData.questionOption?.value,
       latest: formData.latest,
     };
@@ -102,14 +115,10 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
     variables: {
       customerSlug: activeCustomer?.slug as string,
     },
-    onCompleted: (data) => {
-      console.log('data: ', data?.customer?.dialogues);
-    },
   });
 
   const [getQuestions, { data: questionsData }] = useLazyQuery(getTopicBuilderQuery);
 
-  // TODO: Replace with query fetching all dialogues
   const dialogueItems = dialoguesData?.customer?.dialogues?.map(
     (dialogue) => ({ id: dialogue.id, value: dialogue.slug, label: dialogue.title, type: 'DIALOGUE' }),
   ) || [];
@@ -146,7 +155,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
   const watchAspectType = useWatch({
     control: form.control,
     name: 'aspect',
-    defaultValue: null,
+    defaultValue: '',
   });
 
   const watchLatest = useWatch({
@@ -163,6 +172,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
 
   useEffect(() => {
     if (watchActiveDialogue) {
+      form.setValue('activeQuestion', null);
       getQuestions({
         variables: {
           customerSlug: activeCustomer?.slug,
@@ -431,6 +441,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                               id="questionOption"
                               classNamePrefix="select"
                               className="select"
+                              isLoading={loading}
                               defaultOptions
                               options={questionOptions}
                               value={value}

@@ -53,7 +53,7 @@ const schema = yup.object({
     logical: yup.object().shape({
       label: yup.string().required(),
       value: yup.string().required(),
-    }).nullable(),
+    }),
     conditions: yup.array().of(
       yup.object().required().shape(
         {
@@ -62,24 +62,24 @@ const schema = yup.object({
             value: yup.string().required(),
           }).nullable(),
           compareTo: yup.number().notRequired(),
-          depth: yup.number().required(),
+          depth: yup.number().notRequired(),
           condition: yup.object().shape({
-            scopeType: yup.string().required(),
+            scopeType: yup.mixed<AutomationConditionScopeType>().oneOf(Object.values(AutomationConditionScopeType)),
             activeDialogue: yup.object().shape({
               id: yup.string().required(),
-              label: yup.string().notRequired().nullable(),
-              value: yup.string().notRequired().nullable(),
-              type: yup.string().notRequired().nullable(),
-            }).required(),
+              label: yup.string().required(),
+              value: yup.string().required(),
+              type: yup.string().required(),
+            }).nullable(true),
             activeQuestion: yup.object().shape({
-              label: yup.string().notRequired().nullable(),
-              value: yup.string().notRequired().nullable(),
-              type: yup.string().notRequired().nullable(),
+              label: yup.string().required(),
+              value: yup.string().required(),
+              type: yup.string().required(),
             }).required(),
             aspect: yup.string().required(),
             aggregate: yup.mixed<ConditionPropertyAggregateType>().oneOf(Object.values(ConditionPropertyAggregateType)),
             latest: yup.number().required(),
-            questionOption: yup.string().notRequired(),
+            questionOption: yup.string().notRequired().nullable(false),
           }).required(),
         },
       ),
@@ -88,7 +88,7 @@ const schema = yup.object({
       logical: yup.object().shape({
         label: yup.string().required(),
         value: yup.string().required(),
-      }).notRequired(),
+      }),
       conditions: yup.array().of(
         yup.object().required().shape(
           {
@@ -105,7 +105,7 @@ const schema = yup.object({
         ),
       ).notRequired(),
     }).nullable().notRequired(),
-  }),
+  }).required(),
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
@@ -281,7 +281,10 @@ const ChildBuilderEntry = ({
                     >
                       {value ? (
                         <ConditionCell
-                          onRemove={() => remove(index)}
+                          onRemove={() => {
+                            onChange(null);
+                            // remove(index);
+                          }}
                           onClick={onOpen}
                           condition={value}
                         />
@@ -329,11 +332,11 @@ const ChildBuilderEntry = ({
           </UI.Icon>
         </UI.Grid>
       ))}
-      <UI.Div mt={4}>
+      <UI.Div ml={2} mt={4}>
         <UI.Button
           variantColor="gray"
           onClick={
-            () => append({ logical: { label: 'AND', value: 'AND' }, depth: 0 })
+            () => append({ depth: 0 })
           }
         >
           <UI.Icon mr={1}>
@@ -356,9 +359,17 @@ interface AutomationFormProps {
     input?: Maybe<CreateAutomationInput> | undefined;
   }>> | undefined) => Promise<FetchResult<UpdateAutomationMutation, Record<string, any>, Record<string, any>>>;
   automation?: AutomationInput;
+  mappedConditions?: ConditionEntry[];
 }
 
-const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = false }: AutomationFormProps) => {
+const AutomationForm = ({
+  onCreateAutomation,
+  onUpdateAutomation,
+  isLoading,
+  automation,
+  mappedConditions,
+  isInEdit = false,
+}: AutomationFormProps) => {
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<any>();
 
@@ -371,12 +382,12 @@ const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = 
       automationType: automation?.automationType || AutomationType.Trigger,
       conditionBuilder:
       {
-        logical: automation?.conditionBuilder.logical,
-        conditions: automation?.conditionBuilder.conditions,
+        logical: automation?.conditionBuilder.logical || { label: 'AND', value: 'AND' },
+        conditions: automation?.conditionBuilder.conditions || [],
         childBuilder:
         {
-          logical: automation?.conditionBuilder.childBuilder?.logical,
-          conditions: automation?.conditionBuilder.childBuilder?.conditions,
+          logical: automation?.conditionBuilder.childBuilder?.logical || { label: 'AND', value: 'AND' },
+          conditions: automation?.conditionBuilder.childBuilder?.conditions || [],
         },
       },
     },
@@ -384,7 +395,9 @@ const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = 
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
 
-  const [activeConditions, setActiveConditions] = useState<ConditionEntry[]>([]);
+  const [activeConditions, setActiveConditions] = useState<ConditionEntry[]>(
+    mappedConditions || [],
+  );
 
   const { append, remove, fields: conditionFields, update } = useFieldArray({
     name: 'conditionBuilder.conditions',
@@ -413,6 +426,7 @@ const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = 
         questionId: formData.conditionBuilder?.conditions?.[0]?.condition.activeQuestion?.value,
       },
       conditionBuilder: {
+        id: automation?.conditionBuilder?.id,
         type: formData?.conditionBuilder?.logical?.value as AutomationConditionBuilderType,
         conditions: mapConditions(formData, activeCustomer?.id),
       },
@@ -430,14 +444,18 @@ const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = 
         },
       });
     }
-  };
 
-  // const watchedConditionBuilder = useWatch({
-  //   name: 'conditionBuilder',
-  //   control: form.control,
-  // });
-  // console.log('watch', watchedConditionBuilder);
-  // console.log('Condition dields: ', conditionFields);
+    if (isInEdit && onUpdateAutomation) {
+      onUpdateAutomation({
+        variables: {
+          input: {
+            id: automation?.id,
+            ...input,
+          },
+        },
+      });
+    }
+  };
 
   return (
     <>
@@ -550,16 +568,27 @@ const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = 
                             <Controller
                               name="conditionBuilder.logical"
                               control={form.control}
-                              render={({ field }) => (
-                                <Select
-                                  options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
-                                  value={field.value}
-                                  onChange={field.onChange}
-                                />
-                              )}
+                              render={({ field }) => {
+                                if (index > 1) {
+                                  return (
+                                    <Select
+                                      isDisabled
+                                      options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
+                                      value={field.value}
+                                      onChange={field.onChange}
+                                    />
+                                  );
+                                }
+                                return (
+                                  <Select
+                                    options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                  />
+                                );
+                              }}
                             />
                           )}
-
                         </UI.Div>
                         {(condition as any)?.isGrouped && (
                           <UI.Div gridColumn="2 / 7">
@@ -605,7 +634,9 @@ const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = 
                                       >
                                         {value ? (
                                           <ConditionCell
-                                            onRemove={() => remove(index)}
+                                            onRemove={() => {
+                                              onChange(null);
+                                            }}
                                             onClick={onOpen}
                                             condition={value}
                                           />
@@ -656,11 +687,11 @@ const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = 
 
                       </UI.Grid>
                     ))}
-                    <UI.Div mt={4}>
+                    <UI.Div ml={4} mt={4}>
                       <UI.Button
                         variantColor="gray"
                         onClick={
-                          () => append({ logical: { label: 'AND', value: 'AND' }, depth: 0 })
+                          () => append({ depth: 0 })
                         }
                       >
                         <UI.Icon mr={1}>
@@ -707,10 +738,10 @@ const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = 
         <CreateConditionModalCard
           onClose={() => setCreateModalIsOpen(false)}
           onSuccess={(condition: ConditionEntry) => {
-            append({
-              condition,
-            });
+            console.log('Created condition automation form:', condition);
+            append({ condition: condition as any });
             setActiveConditions((oldConditions) => [...oldConditions, condition]);
+            // setCreateModalIsOpen(false);
           }}
         />
       </UI.Modal>
@@ -757,9 +788,9 @@ const AutomationForm = ({ onCreateAutomation, isLoading, automation, isInEdit = 
           style={{ padding: '6px 12px' }}
           disabled={false}
           onClick={() => {
-            console.log('Duplicate active item: ', activeItem.arrayKey);
             const { arrayKey, ...activeConditionBuilder } = activeItem;
             console.log('ACTIVEEEE: ', activeConditionBuilder);
+            console.log('All conditions: ', conditionFields);
             if (activeItem.isGrouped) {
               childBuilderFieldArray.append(activeConditionBuilder);
             } else {
