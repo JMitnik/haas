@@ -41,7 +41,7 @@ export interface FormDataProps {
   activeDialogue: {
     type: string;
     value: string;
-    label?: string;
+    label: string;
     id: string;
   } | null;
   activeQuestion: {
@@ -70,11 +70,7 @@ export interface ConditionEntry {
     label: string | undefined;
     id: string;
   } | null;
-  activeQuestion: {
-    type: QuestionNodeTypeEnum;
-    value: string;
-    label: string;
-  } | null;
+  activeQuestion: ActiveQuestion | null;
   aspect?: string;
   dateRange: TwoDateArray | null;
   aggregate?: ConditionPropertyAggregateType;

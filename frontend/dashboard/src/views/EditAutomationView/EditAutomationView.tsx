@@ -280,7 +280,7 @@ const EditAutomationView = () => {
   const conditionEntries: ConditionEntry[] = findUniqueConditionEntries(
     mappedAutomation.conditionBuilder.conditions.map(
       (condition) => condition.condition,
-    ),
+    ) as ConditionEntry[],
   );
 
   return (
