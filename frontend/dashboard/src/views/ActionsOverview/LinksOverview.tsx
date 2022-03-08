@@ -138,11 +138,10 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <FormLabel htmlFor={`links[${index}].url`}>{t('cta:url')}</FormLabel>
                           <UI.InputHelper>{t('cta:link_url_helper')}</UI.InputHelper>
                           <UI.Input
-                            name={`links[${index}].url`}
                             defaultValue={link.url}
                             placeholder="https://link.to/"
                             leftEl={<Type />}
-                            ref={form.register({ required: true })}
+                            {...form.register(`links[${index}].url`, { required: true })}
                           />
                           <FormErrorMessage>{!!form.formState.errors?.links?.[index]?.url?.message}</FormErrorMessage>
                         </FormControl>
@@ -180,9 +179,8 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                               <UI.InputHelper>{t('cta:upsell_header_helper')}</UI.InputHelper>
                               <UI.Input
                                 isInvalid={!!form.formState.errors.links?.[index]?.header}
-                                name={`links[${index}].header`}
                                 defaultValue={link.header}
-                                ref={form.register({ required: false })}
+                                {...form.register(`links[${index}].header`, { required: false })}
                               />
                               <FormErrorMessage>
                                 {!!form.formState.errors.links?.[index]?.header?.message}
@@ -194,9 +192,8 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                               <UI.InputHelper>{t('cta:upsell_subheader_helper')}</UI.InputHelper>
                               <UI.Input
                                 isInvalid={!!form.formState.errors.links?.[index]?.subHeader}
-                                name={`links[${index}].subHeader`}
                                 defaultValue={link.subHeader}
-                                ref={form.register({ required: false })}
+                                {...form.register(`links[${index}].subHeader`, { required: false })}
                               />
                               <FormErrorMessage>
                                 {!!form.formState.errors.links?.[index]?.subHeader?.message}
@@ -229,9 +226,8 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <UI.InputHelper>{t('cta:link_tooltip_helper')}</UI.InputHelper>
                           <UI.Input
                             isInvalid={!!form.formState.errors.links?.[index]?.title}
-                            name={`links[${index}].title`}
                             defaultValue={link.title}
-                            ref={form.register({ required: false })}
+                            {...form.register(`links[${index}].title`, { required: false })}
                           />
                           <FormErrorMessage>{!!form.formState.errors.links?.[index]?.title?.message}</FormErrorMessage>
                         </FormControl>
@@ -241,9 +237,8 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <UI.InputHelper>{t('cta:link_icon_helper')}</UI.InputHelper>
                           <UI.Input
                             isInvalid={!!form.formState.errors.links?.[index]?.iconUrl}
-                            name={`links[${index}].iconUrl`}
                             defaultValue={link.iconUrl}
-                            ref={form.register({ required: false })}
+                            {...form.register(`links[${index}].iconUrl`, { required: false })}
                           />
                           <FormErrorMessage>
                             {!!form.formState.errors.links?.[index]?.iconUrl?.message}
@@ -255,9 +250,8 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <UI.InputHelper>{t('cta:background_color_helper')}</UI.InputHelper>
                           <UI.Input
                             isInvalid={!!form.formState.errors.links?.[index]?.backgroundColor}
-                            name={`links[${index}].backgroundColor`}
                             defaultValue={link.backgroundColor}
-                            ref={form.register({ required: false })}
+                            {...form.register(`links[${index}].backgroundColor`, { required: false })}
                           />
                           <FormErrorMessage>
                             {!!form.formState.errors.links?.[index]?.backgroundColor?.message}
@@ -269,9 +263,8 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <UI.InputHelper>{t('cta:redirect_button_text_helper')}</UI.InputHelper>
                           <UI.Input
                             isInvalid={!!form.formState.errors.links?.[index]?.buttonText}
-                            name={`links[${index}].buttonText`}
                             defaultValue={link.buttonText}
-                            ref={form.register({ required: false })}
+                            {...form.register(`links[${index}].buttonText`, { required: false })}
                           />
                           <FormErrorMessage>
                             {!!form.formState.errors.links?.[index]?.buttonText?.message}

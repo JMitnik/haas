@@ -96,7 +96,7 @@ interface FormNodePreviewProps {
 }
 
 const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps) => {
-  const fieldCategory = fieldMap.find((fieldItem) => fieldItem.type === field.type);
+  const fieldCategory = fieldMap.find((fieldItem) => fieldItem?.type === field?.type);
 
   const FieldIcon = fieldCategory?.icon || Feather;
   const { t } = useTranslation();
@@ -105,7 +105,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
     <UI.Card>
       <UI.CardBody>
         <UI.Flex flexWrap="wrap" justifyContent="space-between">
-          {field.type ? (
+          {field?.type ? (
             <UI.Flex mb={[4, 0]}>
               <UI.IconBox mr={2} bg={fieldCategory?.color}><FieldIcon /></UI.IconBox>
               <UI.ColumnFlex>
@@ -349,7 +349,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
           <UI.InputHeader>{t('about_form_helpertext_header')}</UI.InputHeader>
           <UI.InputHelper>{t('about_form_helpertext_helper')}</UI.InputHelper>
           <UI.FormControl>
-            <UI.Input name="formNode.helperText" ref={form.register()} placeholder={t('form_helpertext_placeholder')} />
+            <UI.Input {...form.register('formNode.helperText')} placeholder={t('form_helpertext_placeholder')} />
           </UI.FormControl>
         </UI.Div>
         <UI.Div>

@@ -50,9 +50,8 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: {
           <Input
             // eslint-disable-next-line jsx-a11y/anchor-is-valid
             leftEl={<Link />}
-            name="logo"
             isInvalid={!!form.formState.errors.logo}
-            ref={form.register()}
+            {...form.register('logo')}
           />
         </FormControl>
 

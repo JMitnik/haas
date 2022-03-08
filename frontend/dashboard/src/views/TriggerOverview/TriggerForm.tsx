@@ -256,7 +256,7 @@ const FormConditionFragment = ({
         </UI.Div>
       </UI.Flex>
       <UI.Hr />
-      <input type="hidden" ref={form.register()} name={`conditions[${fieldIndex}].id`} />
+      <input type="hidden" {...form.register(`conditions[${fieldIndex}].id`)} />
       {form.watch('type') === TriggerQuestionType.QUESTION && activeDialogue && (
         <FormControl mb={4}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].questionId`}>{t('trigger:question')}</FormLabel>
@@ -367,8 +367,7 @@ const FormConditionFragment = ({
             defaultValue={fieldCondition.matchText}
             placeholder="Satisfied"
             leftEl={<Type />}
-            name={`conditions[${fieldIndex}].matchText`}
-            ref={form.register({ required: true })}
+            {...form.register(`conditions[${fieldIndex}].matchText`, { required: true })}
           />
         </FormControl>
       )}
@@ -584,8 +583,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <Input
                 placeholder={t('trigger:my_first_trigger')}
                 leftEl={<Type />}
-                name="name"
-                ref={form.register({ required: true })}
+                {...form.register('name', { required: true })}
               />
               <FormErrorMessage>{form.formState.errors.name?.message}</FormErrorMessage>
             </FormControl>

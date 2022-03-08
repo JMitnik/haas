@@ -73,9 +73,8 @@ const SliderNodeForm = ({ form }: { form: any }) => {
                 {t('dialogue:unhappyText_helper')}
               </UI.InputHelper>
               <UI.Input
-                name="unhappyText"
                 leftEl={<Frown />}
-                ref={form.register()}
+                {...form.register('unhappyText')}
               />
               <FormErrorMessage>{form.formState.errors.unhappyText?.message}</FormErrorMessage>
             </UI.FormControl>
@@ -88,9 +87,8 @@ const SliderNodeForm = ({ form }: { form: any }) => {
                 {t('dialogue:happyText_helper')}
               </UI.InputHelper>
               <UI.Input
-                name="happyText"
                 leftEl={<Smile />}
-                ref={form.register()}
+                {...form.register('happyText')}
               />
               <FormErrorMessage>{form.formState.errors.happyText?.message}</FormErrorMessage>
             </UI.FormControl>
@@ -105,19 +103,19 @@ const SliderNodeForm = ({ form }: { form: any }) => {
 
           {markers.fields.map((marker: any, index) => (
             <UI.Card boxShadow="lg" key={marker.fieldIndex} mb={4} noHover>
-              <input ref={form.register()} type="hidden" name={`sliderNode.markers[${index}].id`} defaultValue={marker.id} />
+              <input {...form.register(`sliderNode.markers[${index}].id`)} type="hidden" defaultValue={marker.id} />
               <UI.CardBody>
                 <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr', '1fr 2fr']}>
                   <UI.Div>
                     <UI.Div mb={2}>
                       <UI.FormControl>
                         <UI.FormLabel htmlFor={`sliderNode.markers[${index}].label`}>{t('label')}</UI.FormLabel>
-                        <UI.Input ref={form.register()} size="sm" name={`sliderNode.markers[${index}].label`} defaultValue={marker.label} />
+                        <UI.Input {...form.register(`sliderNode.markers[${index}].label`)} size="sm" defaultValue={marker.label} />
                       </UI.FormControl>
                     </UI.Div>
                     <UI.FormControl>
                       <UI.FormLabel htmlFor={`sliderNode.markers[${index}].subLabel`}>{t('sub_label')}</UI.FormLabel>
-                      <UI.Input ref={form.register()} size="sm" name={`sliderNode.markers[${index}].subLabel`} defaultValue={marker.subLabel} />
+                      <UI.Input {...form.register(`sliderNode.markers[${index}].subLabel`)} size="sm" defaultValue={marker.subLabel} />
                     </UI.FormControl>
                   </UI.Div>
 

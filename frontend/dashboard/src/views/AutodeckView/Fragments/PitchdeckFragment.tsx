@@ -16,8 +16,7 @@ const PitchdeckFragment = ({ form }: { form: any }) => {
         <Input
           placeholder="Haas inc."
           leftEl={<Briefcase />}
-          name="companyName"
-          ref={form.register()}
+          {...form.register('companyName')}
         />
         {form.formState.errors.companyName?.message
           && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.companyName?.message}</span>}
@@ -29,8 +28,7 @@ const PitchdeckFragment = ({ form }: { form: any }) => {
         <Input
           placeholder="Terrible support"
           leftEl={<Briefcase />}
-          name="answer1"
-          ref={form.register()}
+          {...form.register('answer1')}
         />
         {form.formState.errors.answer1?.message
           && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.answer1?.message}</span>}
@@ -42,8 +40,7 @@ const PitchdeckFragment = ({ form }: { form: any }) => {
         <Input
           placeholder="No space"
           leftEl={<Briefcase />}
-          name="answer2"
-          ref={form.register()}
+          {...form.register('answer2')}
         />
         {form.formState.errors.answer2?.message
           && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.answer2?.message}</span>}
@@ -55,8 +52,7 @@ const PitchdeckFragment = ({ form }: { form: any }) => {
         <Input
           placeholder="No internet"
           leftEl={<Briefcase />}
-          name="answer3"
-          ref={form.register()}
+          {...form.register('answer3')}
         />
         {form.formState.errors.answer3?.message
           && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.answer3?.message}</span>}
@@ -68,8 +64,7 @@ const PitchdeckFragment = ({ form }: { form: any }) => {
         <Input
           placeholder="Rude personnel"
           leftEl={<Briefcase />}
-          name="answer4"
-          ref={form.register()}
+          {...form.register('answer4')}
         />
         {form.formState.errors.answer4?.message
           && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.answer4?.message}</span>}
@@ -81,8 +76,7 @@ const PitchdeckFragment = ({ form }: { form: any }) => {
         <Input
           placeholder="The unfriendly service"
           leftEl={<ThumbsDown />}
-          name="sorryAboutX"
-          ref={form.register()}
+          {...form.register('sorryAboutX')}
         />
         {form.formState.errors.sorryAboutX?.message
           && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.sorryAboutX?.message}</span>}
@@ -94,8 +88,7 @@ const PitchdeckFragment = ({ form }: { form: any }) => {
         <Input
           placeholder="Our product"
           leftEl={<ThumbsUp />}
-          name="youLoveX"
-          ref={form.register()}
+          {...form.register('youLoveX')}
         />
         {form.formState.errors.youLoveX?.message
           && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.youLoveX?.message}</span>}
@@ -107,8 +100,7 @@ const PitchdeckFragment = ({ form }: { form: any }) => {
         <Input
           placeholder="And you both get a 20 percent discount"
           leftEl={<Heart />}
-          name="reward"
-          ref={form.register()}
+          {...form.register('reward')}
         />
         {form.formState.errors.reward?.message
           && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.reward?.message}</span>}
@@ -120,8 +112,7 @@ const PitchdeckFragment = ({ form }: { form: any }) => {
         <Input
           placeholder="We see that you have just used on of our services"
           leftEl={<Mail />}
-          name="emailContent"
-          ref={form.register()}
+          {...form.register('emailContent')}
         />
         {form.formState.errors.emailContent?.message
           && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.emailContent?.message}</span>}
@@ -133,8 +124,7 @@ const PitchdeckFragment = ({ form }: { form: any }) => {
         <Input
           placeholder="Hi Passi - thank you for purchasing one of our products. Why dont you tell us how you feel?"
           leftEl={<PenTool />}
-          name="textMessage"
-          ref={form.register()}
+          {...form.register('textMessage')}
         />
         {form.formState.errors.textMessage?.message
           && <span style={{ marginTop: '5px', color: 'red' }}>{form.formState.errors.textMessage?.message}</span>}

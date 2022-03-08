@@ -106,11 +106,10 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
           <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].label`}>{t('variant_label')}</UI.FormLabel>
           <UI.Input
             key={variant.variantIndex}
-            name={`variants[${activeVariantIndex}].label`}
             defaultValue={activeVariant?.label}
             id={`variants[${activeVariantIndex}].label`}
             isDisabled={isReadOnly}
-            ref={form.register()}
+            {...form.register(`variants[${activeVariantIndex}].label`)}
           />
         </UI.FormControl>
 
@@ -118,11 +117,10 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
           <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].from`}>{t('from')}</UI.FormLabel>
           <UI.Input
             key={variant.variantIndex}
-            name={`variants[${activeVariantIndex}].from`}
             defaultValue={activeVariant?.from}
             placeholder={activeVariant.type === 'SMS' ? 'HAAS' : 'noreply@haas.live'}
             id={`variants[${activeVariantIndex}].from`}
-            ref={form.register()}
+            {...form.register(`variants[${activeVariantIndex}].from`)}
             isDisabled={isReadOnly}
           />
         </UI.FormControl>

@@ -45,8 +45,7 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
           <Input
             // eslint-disable-next-line jsx-a11y/anchor-is-valid
             leftEl={<Link />}
-            name="website"
-            ref={form.register()}
+            {...form.register('website')}
           />
         </FormControl>
 

@@ -213,8 +213,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                 id="name"
                 placeholder="Peach inc."
                 leftEl={<Briefcase />}
-                name="name"
-                ref={form.register()}
+                {...form.register('name')}
               />
               <UI.ErrorMessage>
                 {t(form?.errors?.name?.message)}
@@ -228,8 +227,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                 id="slug"
                 placeholder="peach"
                 leftAddOn="https://client.haas.live/"
-                name="slug"
-                ref={form.register()}
+                {...form.register('slug')}
               />
               <UI.ErrorMessage>
                 {t(form?.errors?.slug?.message)}
