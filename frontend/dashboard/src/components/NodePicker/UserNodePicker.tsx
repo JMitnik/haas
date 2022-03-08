@@ -9,34 +9,60 @@ import { NodeCellContainer } from 'components/NodeCell/NodeCell';
 
 import { NodePickerHeader } from './NodePickerStyles';
 
-const DropdownOption = (props: any) => (
-  <NodeCellContainer>
-    <components.Option {...props}>
-      <UI.Flex>
-        <UI.Div>
-          <UI.Text paddingRight={2}>
-            <UI.Span color="#4A5568" fontWeight="bold">{props.data?.aggregate}</UI.Span>
-          </UI.Text>
-          <UI.Flex pt="0.5em">
-            <UI.MicroLabel
-              bg="#FE3274"
-              color="white"
-              mr="0.5em"
-            >
-              {props.data?.value}
-            </UI.MicroLabel>
-            <UI.MicroLabel
+export enum TargetTypeEnum {
+  User = 'USER',
+  Role = 'ROLE',
+}
+
+const DropdownOption = (props: any) => {
+  const isUser = props.data?.type === TargetTypeEnum.User;
+  return (
+    <NodeCellContainer>
+      <components.Option {...props}>
+        <UI.Flex>
+          <UI.Div>
+            <UI.Text paddingRight={2}>
+              {isUser && (
+                <>
+                  <UI.Span>User</UI.Span>
+                  {' '}
+                  <UI.Span color="#4A5568" fontWeight="bold">{props.data?.label}</UI.Span>
+                  {' '}
+                  <UI.Span>will be added as a target for this action </UI.Span>
+                </>
+
+              )}
+              {!isUser && (
+                <>
+                  <UI.Span>All users with the role</UI.Span>
+                  {' '}
+                  <UI.Span color="#4A5568" fontWeight="bold">{props.data?.label}</UI.Span>
+                  {' '}
+                  <UI.Span>will be added as a target for this action</UI.Span>
+                </>
+              )}
+            </UI.Text>
+            <UI.Flex pt="0.5em">
+              <UI.MicroLabel
+                bg={isUser ? '#FE3274' : '#40A9FF'}
+                color="white"
+                mr="0.5em"
+              >
+                {props.data?.type}
+              </UI.MicroLabel>
+              {/* <UI.MicroLabel
               bg="#40A9FF"
               color="white"
             >
               {props.data?.type}
-            </UI.MicroLabel>
-          </UI.Flex>
-        </UI.Div>
-      </UI.Flex>
-    </components.Option>
-  </NodeCellContainer>
-);
+            </UI.MicroLabel> */}
+            </UI.Flex>
+          </UI.Div>
+        </UI.Flex>
+      </components.Option>
+    </NodeCellContainer>
+  );
+};
 
 const DropdownSingleValue = (props: any) => (
   <components.SingleValue {...props}>
@@ -57,11 +83,6 @@ interface NodePickerProps {
   onChange: (node: ConditionEntry) => void;
   items: UserEntry[];
   onClose?: () => void;
-}
-
-enum TargetTypeEnum {
-  User = 'USER',
-  Role = 'ROLE',
 }
 
 export const UserNodePicker = ({

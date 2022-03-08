@@ -2517,6 +2517,30 @@ export type CreateAutomationMutation = (
   ) }
 );
 
+export type GetUsersAndRolesQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+}>;
+
+
+export type GetUsersAndRolesQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { users?: Maybe<Array<(
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'email' | 'phone'>
+      & { role?: Maybe<(
+        { __typename?: 'RoleType' }
+        & Pick<RoleType, 'id' | 'name'>
+      )> }
+    )>>, roles?: Maybe<Array<(
+      { __typename?: 'RoleType' }
+      & Pick<RoleType, 'id' | 'name'>
+    )>> }
+  )> }
+);
+
 export type GetWorkspaceAdminsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
 }>;
@@ -3586,6 +3610,59 @@ export function useCreateAutomationMutation(baseOptions?: Apollo.MutationHookOpt
 export type CreateAutomationMutationHookResult = ReturnType<typeof useCreateAutomationMutation>;
 export type CreateAutomationMutationResult = Apollo.MutationResult<CreateAutomationMutation>;
 export type CreateAutomationMutationOptions = Apollo.BaseMutationOptions<CreateAutomationMutation, CreateAutomationMutationVariables>;
+export const GetUsersAndRolesDocument = gql`
+    query getUsersAndRoles($customerSlug: String!) {
+  customer(slug: $customerSlug) {
+    id
+    users {
+      id
+      firstName
+      lastName
+      email
+      phone
+      role {
+        id
+        name
+      }
+    }
+    roles {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUsersAndRolesQuery__
+ *
+ * To run a query within a React component, call `useGetUsersAndRolesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersAndRolesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersAndRolesQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *   },
+ * });
+ */
+export function useGetUsersAndRolesQuery(baseOptions: Apollo.QueryHookOptions<GetUsersAndRolesQuery, GetUsersAndRolesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUsersAndRolesQuery, GetUsersAndRolesQueryVariables>(GetUsersAndRolesDocument, options);
+      }
+export function useGetUsersAndRolesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersAndRolesQuery, GetUsersAndRolesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUsersAndRolesQuery, GetUsersAndRolesQueryVariables>(GetUsersAndRolesDocument, options);
+        }
+export type GetUsersAndRolesQueryHookResult = ReturnType<typeof useGetUsersAndRolesQuery>;
+export type GetUsersAndRolesLazyQueryHookResult = ReturnType<typeof useGetUsersAndRolesLazyQuery>;
+export type GetUsersAndRolesQueryResult = Apollo.QueryResult<GetUsersAndRolesQuery, GetUsersAndRolesQueryVariables>;
+export function refetchGetUsersAndRolesQuery(variables?: GetUsersAndRolesQueryVariables) {
+      return { query: GetUsersAndRolesDocument, variables: variables }
+    }
 export const GetWorkspaceAdminsDocument = gql`
     query GetWorkspaceAdmins($customerSlug: String!) {
   users(customerSlug: $customerSlug) {

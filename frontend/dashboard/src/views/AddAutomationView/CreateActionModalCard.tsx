@@ -7,14 +7,16 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 
 import {
-  AutomationActionType,
+  AutomationActionType, Customer, Maybe, RoleType, UserType, useGetUsersAndRolesQuery,
 } from 'types/generated-types';
-import { UserNodePicker } from 'components/NodePicker/UserNodePicker';
+import { TargetTypeEnum, UserNodePicker } from 'components/NodePicker/UserNodePicker';
 import Dropdown from 'components/Dropdown';
 
 import { ConditionCell } from './ConditionCell';
 import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { NodeCell } from 'components/NodeCell';
+import { useCustomer } from 'providers/CustomerProvider';
+import { useParams } from 'react-router';
 
 interface NewActionModalCardProps {
   onClose: () => void;
@@ -28,23 +30,63 @@ const schema = yup.object().shape({
       target: yup.object().shape({
         type: yup.string(),
         value: yup.string(),
+        label: yup.string(),
       }),
     }),
   ),
 });
 
+export interface TargetEntry {
+  type: string;
+  value: string;
+  label: string;
+}
+
 export interface FormDataProps {
   actionType: AutomationActionType;
   targets: {
-    target: {
-      type: string;
-      value: string;
-    }
+    target: TargetEntry;
   }[];
 }
 
+const mapToUserPickerEntries = (customer: Maybe<{
+  __typename?: 'Customer' | undefined;
+} & Pick<Customer, 'id'> & {
+  users?: Maybe<({
+    __typename?: 'UserType' | undefined;
+  } & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'email' | 'phone'> & {
+    role?: Maybe<{
+      __typename?: 'RoleType' | undefined;
+    } & Pick<RoleType, 'id' | 'name'>> | undefined;
+  })[]> | undefined;
+  roles?: Maybe<({
+    __typename?: 'RoleType' | undefined;
+  } & Pick<RoleType, 'id' | 'name'>)[]> | undefined;
+}> | undefined) => {
+  const userPickerEntries: TargetEntry[] = [];
+
+  customer?.roles?.forEach((role) => {
+    userPickerEntries.push({
+      label: role.name,
+      value: role.id,
+      type: TargetTypeEnum.Role,
+    });
+  });
+
+  customer?.users?.forEach((user) => {
+    userPickerEntries.push({
+      label: `${user.firstName} ${user.lastName}`,
+      value: user.id,
+      type: TargetTypeEnum.User,
+    });
+  });
+
+  return userPickerEntries;
+};
+
 export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCardProps) => {
   const { t } = useTranslation();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -56,6 +98,12 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
   });
 
   // TODO: Query to fetch all roles
+  // TODO: Query all users
+  const { data } = useGetUsersAndRolesQuery({
+    variables: {
+      customerSlug,
+    },
+  });
 
   const onSubmit = (formData: FormDataProps) => {
     console.log('Form data: ', formData);
@@ -74,6 +122,8 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
     control: form.control,
     keyName: 'arrayKey',
   });
+
+  const userPickerEntries = mapToUserPickerEntries(data?.customer);
 
   return (
     <UI.ModalCard maxWidth={1000} onClose={onClose}>
@@ -184,7 +234,7 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
                                           renderOverlay={({ onClose: onDialoguePickerClose }) => (
                                             <UserNodePicker
                                               // Handle items (in this case dialogues)
-                                              items={[]}
+                                              items={userPickerEntries}
                                               onClose={onDialoguePickerClose}
                                               onChange={onChange}
                                             />
