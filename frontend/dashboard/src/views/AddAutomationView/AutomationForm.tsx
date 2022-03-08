@@ -6,7 +6,7 @@ import {
   Clock, Copy, MessageSquare, MoreVertical, PlusCircle, RefreshCcw, Trash2, Type,
 } from 'react-feather';
 import { Button, ButtonGroup } from '@chakra-ui/core';
-import { Controller, FieldArrayMethodProps, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted,
@@ -43,8 +43,11 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import Dropdown from 'components/Dropdown';
 
+import { ChildBuilderEntry } from './ChildBuilderEntry';
 import { ConditionCell } from './ConditionCell';
 import { ConditionEntry, CreateConditionModalCard } from './CreateConditionModalCard';
+import { CreateActionModalCard } from './CreateActionModalCard';
+import { OPERATORS } from './AutomationTypes';
 
 const schema = yup.object({
   title: yup.string().required('Title is required'),
@@ -106,6 +109,11 @@ const schema = yup.object({
       ).notRequired(),
     }).nullable().notRequired(),
   }).required(),
+  actions: yup.array().of(
+    yup.object().shape({
+      type: yup.mixed<AutomationActionType>().oneOf(Object.values(AutomationActionType)),
+    }),
+  ).notRequired(), // TODO: Change to required once front-end is ready
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
@@ -130,29 +138,6 @@ export const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
 const DEPTH_BACKGROUND_COLORS = [
   '#fbfcff',
   '#f5f8fa',
-];
-
-const OPERATORS = [
-  {
-    label: '<',
-    value: 'SMALLER_THAN',
-  },
-  {
-    label: '<=',
-    value: 'SMALLER_OR_EQUAL_THAN',
-  },
-  {
-    label: '>',
-    value: 'GREATER_THAN',
-  },
-  {
-    label: '>=',
-    value: 'GREATER_OR_EQUAL_THAN',
-  },
-  {
-    value: 'IS_EQUAL',
-    label: '==',
-  },
 ];
 
 const mapConditions = (formData: FormDataProps, workspaceId?: string) => formData.conditionBuilder?.conditions.map(
@@ -192,163 +177,6 @@ const mapConditions = (formData: FormDataProps, workspaceId?: string) => formDat
   },
 );
 
-interface ConditionBuilderEntryProps {
-  form: any;
-  conditionFields: Record<'arrayKey', string>[];
-  append: (value: Partial<unknown> | Partial<unknown>[], options?: FieldArrayMethodProps | undefined) => void;
-  remove: (index?: number | number[] | undefined) => void;
-  openMenu: (event: React.MouseEvent<Element, MouseEvent>, selectedActiveItem?: any) => void;
-  onAddCondition: React.Dispatch<React.SetStateAction<ConditionEntry[]>>;
-  activeConditions: ConditionEntry[];
-}
-
-const ChildBuilderEntry = ({
-  append,
-  conditionFields,
-  form,
-  openMenu,
-  remove,
-  onAddCondition,
-  activeConditions,
-}: ConditionBuilderEntryProps) => {
-  const { t } = useTranslation();
-
-  return (
-    <UI.Div backgroundColor={DEPTH_BACKGROUND_COLORS[1]}>
-      <UI.Grid m={2} gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto">
-
-        <UI.Helper>{t('automation:logic')}</UI.Helper>
-        <UI.Helper>{t('automation:condition')}</UI.Helper>
-        <UI.Helper>{t('automation:operator')}</UI.Helper>
-        <UI.Helper>{t('automation:compare_to')}</UI.Helper>
-      </UI.Grid>
-      {/* eslint-disable-next-line react/destructuring-assignment */}
-      {conditionFields.map((condition, index) => (
-        <UI.Grid
-          key={condition?.arrayKey}
-          ml={2}
-          mr={2}
-          p={2}
-          borderRadius="6px"
-          borderBottom="1px solid #edf2f7"
-          gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto"
-          backgroundColor={DEPTH_BACKGROUND_COLORS[1]}
-          position="relative"
-        >
-          <input defaultValue={1} type="hidden" {...form.register(`childBuilder.conditions.${index}.depth`)} />
-          <UI.Div>
-            {index !== 0 && (
-              <Controller
-                name="childBuilder.logical"
-                control={form.control}
-                render={({ field }) => (
-                  <Select
-                    options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                )}
-              />
-            )}
-
-          </UI.Div>
-
-          <UI.Div alignItems="center" display="flex">
-            <Controller
-              name={`childBuilder.conditions.${index}.condition`}
-              control={form.control}
-              defaultValue={(condition as any)?.condition}
-              render={({ field: { value, onChange } }) => (
-                <Dropdown
-                  defaultCloseOnClickOutside={false}
-                  renderOverlay={({ onClose, setCloseClickOnOutside }) => (
-                    <ConditionNodePicker
-                      onAddCondition={onAddCondition}
-                      items={activeConditions}
-                      onClose={onClose}
-                      onChange={(data) => onChange(data)}
-                      onModalOpen={() => setCloseClickOnOutside(false)}
-                      onModalClose={() => setCloseClickOnOutside(true)}
-                    />
-                  )}
-                >
-                  {({ onOpen }) => (
-                    <UI.Div
-                      width="100%"
-                      justifyContent="center"
-                      display="flex"
-                      alignItems="center"
-                    >
-                      {value ? (
-                        <ConditionCell
-                          onRemove={() => {
-                            onChange(null);
-                            // remove(index);
-                          }}
-                          onClick={onOpen}
-                          condition={value}
-                        />
-                      ) : (
-                        <UI.Button
-                          size="sm"
-                          variant="outline"
-                          onClick={onOpen}
-                          variantColor="altGray"
-                        >
-                          <UI.Icon mr={1}>
-                            <PlusCircle />
-                          </UI.Icon>
-                          {t('automation:add_condition')}
-                        </UI.Button>
-                      )}
-                    </UI.Div>
-                  )}
-                </Dropdown>
-              )}
-            />
-          </UI.Div>
-          <UI.Div>
-            <Controller
-              name={`childBuilder.conditions.${index}.operator`}
-              defaultValue={(condition as any)?.operator}
-              control={form.control}
-              render={({ field: { value, onChange } }) => (
-                <Select options={OPERATORS} onChange={onChange} value={value} />
-              )}
-            />
-          </UI.Div>
-          <FormControl isRequired>
-            <Input
-              {...form.register(`childBuilder.conditions.${index}.compareTo`, { required: true })}
-            />
-          </FormControl>
-          <UI.Icon
-            color="#808b9a"
-            style={{ cursor: 'pointer' }}
-            mr={1}
-            onClick={(e) => openMenu(e, { ...condition, isGrouped: true })}
-          >
-            <MoreVertical />
-          </UI.Icon>
-        </UI.Grid>
-      ))}
-      <UI.Div ml={2} mt={4}>
-        <UI.Button
-          variantColor="gray"
-          onClick={
-            () => append({ depth: 0 })
-          }
-        >
-          <UI.Icon mr={1}>
-            <PlusCircle />
-          </UI.Icon>
-          {t('add_choice')}
-        </UI.Button>
-      </UI.Div>
-    </UI.Div>
-  );
-};
-
 interface AutomationFormProps {
   isInEdit?: boolean;
   onCreateAutomation?: (options?: MutationFunctionOptions<CreateAutomationMutation, Exact<{
@@ -362,6 +190,16 @@ interface AutomationFormProps {
   mappedConditions?: ConditionEntry[];
 }
 
+enum ModalType {
+  CreateCondition = 'CREATE_CONDITION',
+  CreateAction = 'CREATE_ACTION',
+}
+
+interface ModalState {
+  isOpen: boolean;
+  modal?: ModalType;
+}
+
 const AutomationForm = ({
   onCreateAutomation,
   onUpdateAutomation,
@@ -370,7 +208,7 @@ const AutomationForm = ({
   mappedConditions,
   isInEdit = false,
 }: AutomationFormProps) => {
-  const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
+  const [createModalIsOpen, setCreateModalIsOpen] = useState<ModalState>({ isOpen: false });
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<any>();
 
   const history = useHistory();
@@ -390,6 +228,7 @@ const AutomationForm = ({
           conditions: automation?.conditionBuilder.childBuilder?.conditions || [],
         },
       },
+      actions: [], // TODO: Add actions from database here
     },
   });
   const { t } = useTranslation();
@@ -411,11 +250,18 @@ const AutomationForm = ({
     keyName: 'arrayKey',
   });
 
+  const actionsFieldArray = useFieldArray({
+    name: 'actions',
+    control: form.control,
+    keyName: 'arrayKey',
+  });
+
   const onSubmit = (formData: FormDataProps) => {
     console.log('Form data; ', formData);
     // TODO: Create a field for event type
     // TODO: Create a picker for questionId/dialogueId for event
     // TODO: Add childbuilder
+    // TODO: Add actions
 
     const input: CreateAutomationInput = {
       automationType: formData.automationType,
@@ -705,7 +551,7 @@ const AutomationForm = ({
                   <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
                     <Button
                       leftIcon={PlusCircle}
-                      onClick={() => setCreateModalIsOpen(true)}
+                      onClick={() => setCreateModalIsOpen({ isOpen: true, modal: ModalType.CreateCondition })}
                       size="sm"
                       variant="outline"
                       variantColor="teal"
@@ -716,7 +562,187 @@ const AutomationForm = ({
                 )}
               </UI.Div>
             </UI.Flex>
+          </FormSection>
 
+          <Hr />
+
+          <FormSection id="actions">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('automation:actions')}</H3>
+              <Muted color="gray.600">
+                {t('automation:actions_helper')}
+              </Muted>
+            </Div>
+            <UI.Flex>
+              <UI.Div
+                width="100%"
+                backgroundColor="#fbfcff"
+                border="1px solid #edf2f7"
+                borderRadius="10px"
+                padding={4}
+                paddingLeft={0}
+                paddingRight={0}
+              >
+                {(actionsFieldArray.fields.length) ? (
+                  <>
+                    <UI.Grid m={2} gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto">
+
+                      <UI.Helper>{t('automation:logic')}</UI.Helper>
+                      <UI.Helper>{t('automation:condition')}</UI.Helper>
+                      <UI.Helper>{t('automation:operator')}</UI.Helper>
+                      <UI.Helper>{t('automation:compare_to')}</UI.Helper>
+                    </UI.Grid>
+                    {actionsFieldArray.fields.map((action: any, index) => (
+                      <UI.Grid
+                        key={action?.arrayKey}
+                        ml={2}
+                        mr={2}
+                        p={2}
+                        borderRadius="6px"
+                        borderBottom="1px solid #edf2f7"
+                        gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto"
+                        backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
+                        position="relative"
+                      >
+                        <input defaultValue={0} type="hidden" {...form.register(`conditionBuilder.conditions.${index}.depth`)} />
+                        <UI.Div>
+                          {index !== 0 && (
+                            <Controller
+                              name="conditionBuilder.logical"
+                              control={form.control}
+                              render={({ field }) => {
+                                if (index > 1) {
+                                  return (
+                                    <Select
+                                      isDisabled
+                                      options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
+                                      value={field.value}
+                                      onChange={field.onChange}
+                                    />
+                                  );
+                                }
+                                return (
+                                  <Select
+                                    options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                  />
+                                );
+                              }}
+                            />
+                          )}
+                        </UI.Div>
+
+                        <>
+                          <UI.Div alignItems="center" display="flex">
+                            <Controller
+                              name={`conditionBuilder.conditions.${index}.condition`}
+                              control={form.control}
+                              defaultValue={(action as any)?.condition /* TODO: Adjust this */}
+                              render={({ field: { value, onChange } }) => (
+                                <Dropdown
+                                  defaultCloseOnClickOutside={false}
+                                  renderOverlay={({ onClose, setCloseClickOnOutside }) => (
+                                    <ConditionNodePicker
+                                      onAddCondition={setActiveConditions}
+                                      items={activeConditions}
+                                      onClose={onClose}
+                                      onChange={(data) => onChange(data)}
+                                      onModalOpen={() => setCloseClickOnOutside(false)}
+                                      onModalClose={() => setCloseClickOnOutside(true)}
+                                    />
+                                  )}
+                                >
+                                  {({ onOpen }) => (
+                                    <UI.Div
+                                      width="100%"
+                                      justifyContent="center"
+                                      display="flex"
+                                      alignItems="center"
+                                    >
+                                      {value ? (
+                                        <ConditionCell
+                                          onRemove={() => {
+                                            onChange(null);
+                                          }}
+                                          onClick={onOpen}
+                                          condition={value}
+                                        />
+                                      ) : (
+                                        <UI.Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={onOpen}
+                                          variantColor="altGray"
+                                        >
+                                          <UI.Icon mr={1}>
+                                            <PlusCircle />
+                                          </UI.Icon>
+                                          {t('automation:add_condition')}
+                                        </UI.Button>
+                                      )}
+                                    </UI.Div>
+                                  )}
+                                </Dropdown>
+                              )}
+                            />
+                          </UI.Div>
+                          <UI.Div>
+                            <Controller
+                              name={`conditionBuilder.conditions.${index}.operator`}
+                              defaultValue={undefined}
+                              control={form.control}
+                              render={({ field: { value, onChange } }) => (
+                                <Select options={OPERATORS} onChange={onChange} value={value} />
+                              )}
+                            />
+                          </UI.Div>
+                          <FormControl isRequired>
+                            <Input
+                              {...form.register(`conditionBuilder.conditions.${index}.compareTo`, { required: true })}
+                            />
+                          </FormControl>
+                          <UI.Icon
+                            color="#808b9a"
+                            style={{ cursor: 'pointer' }}
+                            mr={1}
+                            onClick={(e) => openMenu(e, action)}
+                          >
+                            <MoreVertical />
+                          </UI.Icon>
+                        </>
+
+                      </UI.Grid>
+                    ))}
+                    <UI.Div ml={4} mt={4}>
+                      <UI.Button
+                        variantColor="gray"
+                        onClick={
+                          () => append({ depth: 0 })
+                        }
+                      >
+                        <UI.Icon mr={1}>
+                          <PlusCircle />
+                        </UI.Icon>
+                        {t('add_choice')}
+                      </UI.Button>
+                    </UI.Div>
+                  </>
+                ) : (
+                  <UI.IllustrationCard svg={<EmptyIll />} text={t('automation:action_placeholder')}>
+                    <Button
+                      leftIcon={PlusCircle}
+                      onClick={() => setCreateModalIsOpen({ isOpen: true, modal: ModalType.CreateAction })}
+                      size="sm"
+                      variant="outline"
+                      variantColor="teal"
+                    >
+                      {t('automation:add_action')}
+                    </Button>
+                  </UI.IllustrationCard>
+                )}
+              </UI.Div>
+            </UI.Flex>
           </FormSection>
 
           <ButtonGroup>
@@ -734,14 +760,33 @@ const AutomationForm = ({
           </ButtonGroup>
         </Form>
       </UI.FormContainer>
-      <UI.Modal willCloseOnOutsideClick={false} isOpen={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
+
+      <UI.Modal
+        willCloseOnOutsideClick={false}
+        isOpen={createModalIsOpen.isOpen && createModalIsOpen.modal === ModalType.CreateCondition}
+        onClose={() => setCreateModalIsOpen({ isOpen: false })}
+      >
         <CreateConditionModalCard
-          onClose={() => setCreateModalIsOpen(false)}
+          onClose={() => setCreateModalIsOpen({ isOpen: false })}
           onSuccess={(condition: ConditionEntry) => {
             console.log('Created condition automation form:', condition);
             append({ condition: condition as any });
             setActiveConditions((oldConditions) => [...oldConditions, condition]);
-            // setCreateModalIsOpen(false);
+          }}
+        />
+      </UI.Modal>
+
+      <UI.Modal
+        willCloseOnOutsideClick={false}
+        isOpen={createModalIsOpen.isOpen && createModalIsOpen.modal === ModalType.CreateAction}
+        onClose={() => setCreateModalIsOpen({ isOpen: false })}
+      >
+        <CreateActionModalCard
+          onClose={() => setCreateModalIsOpen({ isOpen: false })}
+          onSuccess={(condition: ConditionEntry) => {
+            console.log('Created condition automation form:', condition);
+            append({ condition: condition as any });
+            setActiveConditions((oldConditions) => [...oldConditions, condition]);
           }}
         />
       </UI.Modal>

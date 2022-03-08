@@ -20,7 +20,6 @@ import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
 import { useCustomer } from 'providers/CustomerProvider';
-
 import Dropdown from 'components/Dropdown';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 

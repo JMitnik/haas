@@ -319,6 +319,14 @@ const language = {
       en: 'All',
       de: 'Alle',
     },
+    user: {
+      en: 'User',
+      de: 'Benutzer',
+    },
+    role: {
+      en: 'Role',
+      de: 'Rolle',
+    },
     link: {
       en: 'Link',
       de: 'Verknüpfung',
@@ -1605,6 +1613,66 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   automation: {
+    add_target: {
+      en: 'Add target',
+      de: 'Ziel hinzufügen',
+    },
+    action_type: {
+      en: 'Action type',
+      de: 'Aktionstyp',
+    },
+    action_type_helper: {
+      en: 'What kind of action do you want to create?',
+      de: 'Welche Art von Aktion möchten Sie erstellen?',
+    },
+    api_call: {
+      en: 'API call',
+      de: 'API-Aufruf',
+    },
+    api_call_helper: {
+      en: 'Sends an API call to a 3rd party',
+      de: 'Sendet einen API-Aufruf an einen Drittanbieter',
+    },
+    generate_report: {
+      en: 'Generate report',
+      de: 'Bericht generieren',
+    },
+    generate_report_helper: {
+      en: 'Sends a report to specified targets',
+      de: 'Sendet einen Bericht an angegebene Ziele',
+    },
+    send_email: {
+      en: 'Send email',
+      de: 'E-Mail senden',
+    },
+    send_email_helper: {
+      en: 'Sends an email to specified targets',
+      de: 'Sendet eine E-Mail an angegebene Ziele',
+    },
+    send_sms: {
+      en: 'Send SMS',
+      de: 'SMS senden',
+    },
+    send_sms_helper: {
+      en: 'Sends a SMS to specified targets',
+      de: 'Sendet eine SMS an bestimmte Ziele',
+    },
+    action_placeholder: {
+      en: 'Start by adding an action.',
+      de: 'Beginnen Sie mit dem Hinzufügen einer Aktion.',
+    },
+    add_action: {
+      en: 'Add action',
+      de: 'Aktion hinzufügen',
+    },
+    actions: {
+      en: 'Actions',
+      de: 'Aktionen',
+    },
+    actions_helper: {
+      en: 'Create and organize actions that need to be to be conducted when the conditions are met',
+      de: 'Erstellen und organisieren Sie Aktionen, die durchgeführt werden müssen, wenn die Bedingungen erfüllt sind',
+    },
     add_condition: {
       en: 'Add condition',
       de: 'Bedingung hinzufügen',
