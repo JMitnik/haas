@@ -1,7 +1,7 @@
 import { inputObjectType } from '@nexus/schema';
 
-import { SessionActionInput } from "./SessionActionInput";
-import { SessionStateInput } from "./SessionStateInput";
+import { SessionStateInput } from './SessionStateInput';
+import { SessionActionInput } from './SessionActionInput';
 
 export const SessionEventInput = inputObjectType({
   name: 'SessionEventInput',

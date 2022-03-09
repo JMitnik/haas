@@ -1,4 +1,4 @@
-import { enumType, unionType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, inputObjectType } from '@nexus/schema';
 
 export const SessionConnectionOrderByInput = inputObjectType({
   name: 'SessionConnectionOrderByInput',
@@ -14,7 +14,7 @@ export const SessionConnectionOrderType = enumType({
   name: 'SessionConnectionOrder',
   description: 'Fields to order SessionConnection by.',
 
-  members: ['createdAt']
+  members: ['createdAt'],
 });
 
 export const SessionDeliveryTypeFilter = enumType({
@@ -31,7 +31,7 @@ export const SessionScoreRangeFilter = inputObjectType({
   definition(t) {
     t.int('min', { required: false });
     t.int('max', { required: false });
-  }
+  },
 });
 
 export const SessionConnectionFilterInput = inputObjectType({
@@ -52,5 +52,5 @@ export const SessionConnectionFilterInput = inputObjectType({
     // Paginate
     t.int('offset', { nullable: true });
     t.int('perPage', { required: false, default: 10 });
-  }
+  },
 })

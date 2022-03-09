@@ -13,7 +13,6 @@ import { useSession } from '../Session/SessionProvider';
 import * as LS from './FormNodeStyles';
 import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeTitle';
 import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
-import { useDialogueParams } from '../Navigation/useDialogueParams';
 
 interface Field {
   value: string | number;
@@ -61,8 +60,7 @@ const getFieldValue = (field: Field, relatedField: FormNodeField) => {
 };
 
 const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
-  const startTime = useRef(new Date());
-  const { fromEdge, fromNode } = useDialogueParams();
+  const startTime = useRef(Date.now());
 
   const { t } = useTranslation();
   const form = useForm<FormNodeFormProps>({

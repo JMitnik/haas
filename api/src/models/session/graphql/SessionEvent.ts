@@ -1,5 +1,4 @@
-import { inputObjectType, mutationField, objectType } from '@nexus/schema';
-import { ChoiceValueInput } from "./ChoiceValueInput";
+import { objectType } from '@nexus/schema';
 
 export const SessionEvent = objectType({
   name: 'SessionEvent',

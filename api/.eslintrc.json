@@ -1,0 +1,104 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "import"
+  ],
+  "parserOptions": {
+    "project": "api/tsconfig.json"
+  },
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/errors", "plugin:import/warnings"
+  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "project": "api/tsconfig.json"
+      }
+    },
+    "import/parsers": {
+      "@typescript-eslint/parser": [
+        ".ts"
+      ]
+    },
+    "import/extensions": [
+      ".js",
+      ".ts"
+    ]
+  },
+  "rules": {
+    // Promises/await: Ensure no promises are unawaited
+    "@typescript-eslint/no-floating-promises": "error",
+    // Typescript: Use interfaces, not types
+    "@typescript-eslint/consistent-type-definitions": [
+      "error",
+      "interface"
+    ],
+    // Imports: Sort by import groups
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          [
+            "builtin",
+            "external"
+          ],
+          "internal",
+          [
+            "parent",
+            "sibling"
+          ],
+          "index",
+          "object",
+          "type"
+        ],
+        "newlines-between": "always"
+      }
+    ],
+    // Typescript: Delimit Interface members
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "semi",
+          "requireLast": true
+        },
+        "singleline": {
+          "delimiter": "semi",
+          "requireLast": false
+        }
+      }
+    ],
+    // Typescript: Do not define explicit output types
+    "@typescript-eslint/explicit-module-boundary-types": [
+      "off"
+    ],
+    // General style
+    "@typescript-eslint/no-unused-vars": [
+      "error"
+    ],
+    "comma-dangle": [
+      "off",
+      "always"
+    ],
+    "@typescript-eslint/comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
+    "no-console": [
+      "warn"
+    ],
+    "quotes": [
+      "warn",
+      "single"
+    ],
+    // React-specific rules
+    "jsx-quotes": [
+      "warn",
+      "prefer-double"
+    ]
+    // Prefer double quotes in JSX
+    // Warn about missing prop types
+  }
+}
