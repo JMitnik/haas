@@ -94,6 +94,7 @@ const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
         type: SessionActionType.FormAction,
         // TODO: Add form values
         timeSpent: Math.floor(Date.now() - startTime.current),
+        form: { values: formFieldValues },
       },
       reward: {
         overrideCallToActionId: node.overrideLeafId,

@@ -1,17 +1,17 @@
-import { Prisma, PrismaClient, SessionEventType } from "@prisma/client";
-import { cloneDeep } from "lodash";
-import { NexusGenInputs } from "../../generated/nexus";
+import { Prisma, PrismaClient } from '@prisma/client';
+import { cloneDeep } from 'lodash';
 
+import { NexusGenInputs } from '../../generated/nexus';
 import { Session, SessionQueryModel } from './SessionQueryModel';
-import NodeEntryService from "../node-entry/NodeEntryService";
-import { CreateSessionInput } from "./SessionPrismaAdapterType";
+import NodeEntryService from '../node-entry/NodeEntryService';
+import { CreateSessionInput } from './SessionPrismaAdapterType';
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
-  };
+  }
 
   /**
    * Create a list of session-events (belonging to a particular existing Session).
@@ -31,7 +31,7 @@ class SessionPrismaAdapter {
    * @param filter
    */
   buildOrderByQuery(filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) {
-    let orderByQuery: Prisma.SessionOrderByInput[] = [];
+    const orderByQuery: Prisma.SessionOrderByInput[] = [];
 
     if (filter?.orderBy?.by === 'createdAt') {
       orderByQuery.push({
@@ -51,7 +51,7 @@ class SessionPrismaAdapter {
       skip: offset,
       take: perPage,
       orderBy: this.buildOrderByQuery(filter),
-      include: { delivery: { include: { campaignVariant: true, } } }
+      include: { delivery: { include: { campaignVariant: true } } },
     });
 
     return sessions;
@@ -69,10 +69,10 @@ class SessionPrismaAdapter {
         id: sessionId,
       },
       data: {
-        delivery: { connect: { id: deliveryId } }
+        delivery: { connect: { id: deliveryId } },
       },
     });
-  };
+  }
 
   /**
    * Creates an empty session
@@ -91,7 +91,7 @@ class SessionPrismaAdapter {
         device: input.device,
         totalTimeInSec: input.totalTimeInSec,
         nodeEntries: {
-          create: input.entries.map((entry) => NodeEntryService.constructCreateNodeEntryFragment(entry))
+          create: input.entries.map((entry) => NodeEntryService.constructCreateNodeEntryFragment(entry)),
         },
         dialogue: {
           connect: {
@@ -101,7 +101,7 @@ class SessionPrismaAdapter {
       },
       include: SessionQueryModel.queryFull.include,
     });
-  };
+  }
 
   /**
    * Fetches single session from database.
@@ -116,7 +116,7 @@ class SessionPrismaAdapter {
       },
       include: SessionQueryModel.queryFull.include,
     });
-  };
+  }
 
   async deleteMany(sessionIds: string[]) {
     return this.prisma.session.deleteMany({
@@ -126,7 +126,7 @@ class SessionPrismaAdapter {
         },
       },
     });
-  };
+  }
 
 
   /**
@@ -135,7 +135,7 @@ class SessionPrismaAdapter {
    * @returns a Promise that resolves to the created session-event.
    */
   createSessionEvent(sessionId: string, sessionEventInput: NexusGenInputs['SessionEventInput']) {
-    let data: Prisma.NodeEntryCreateInput = {
+    const data: Prisma.NodeEntryCreateInput = {
       depth: -1,
       creationDate: sessionEventInput.timestamp,
       inputSource: 'CLIENT',
@@ -155,7 +155,15 @@ class SessionPrismaAdapter {
       }
 
       case 'FORM_ACTION': {
-        data.formNodeEntry = { create: { values: {  } } }
+        data.formNodeEntry = {
+          create: {
+            values: sessionEventInput.action?.form ? {
+              createMany: {
+                data: this.buildCreateFormValues(sessionEventInput.action.form),
+              },
+            } : undefined,
+          },
+        }
         break;
       }
 
@@ -169,13 +177,13 @@ class SessionPrismaAdapter {
 
   createFakeSession(data: (
     {
-      createdAt: Date,
-      dialogueId: string,
-      rootNodeId: string,
-      simulatedRootVote: number,
-      simulatedChoiceNodeId: string,
-      simulatedChoiceEdgeId?: string,
-      simulatedChoice: string,
+      createdAt: Date;
+      dialogueId: string;
+      rootNodeId: string;
+      simulatedRootVote: number;
+      simulatedChoiceNodeId: string;
+      simulatedChoiceEdgeId?: string;
+      simulatedChoice: string;
     })) {
 
     return this.prisma.session.create({
@@ -208,7 +216,7 @@ class SessionPrismaAdapter {
         },
       },
     });
-  };
+  }
 
   /**
    * Create a Prisma "create" for form value creation.
@@ -218,9 +226,9 @@ class SessionPrismaAdapter {
    */
   private buildCreateFormValues(
     formValueInput: NexusGenInputs['FormValueInput']
-  ): Prisma.FormNodeFieldEntryDataCreateInput[] {
+  ): Prisma.FormNodeFieldEntryDataCreateManyFormNodeEntryInput[] {
     return formValueInput.values?.map(formValue => ({
-      relatedField: { connect: formValue.relatedFieldId ? { id: formValue.relatedFieldId } : undefined },
+      relatedFieldId: formValue.relatedFieldId || '',
       email: formValue.email,
       longText: formValue.longText,
       number: formValue.number,
@@ -235,9 +243,9 @@ class SessionPrismaAdapter {
    * @param dialogueId
    * @param filter
    */
-   private buildFindSessions(dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) {
+  private buildFindSessions(dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) {
     // Required: filter by dialogueId
-    let query: Prisma.SessionWhereInput = { dialogueId, delivery: undefined, };
+    let query: Prisma.SessionWhereInput = { dialogueId, delivery: undefined };
 
     // Optional: Filter by campaigns or not
     if (filter?.deliveryType) {
@@ -255,16 +263,16 @@ class SessionPrismaAdapter {
             value: {
               gte: filter?.scoreRange?.min || undefined,
               lte: filter?.scoreRange?.max || undefined,
-            }
-          }
-        }
+            },
+          },
+        },
       }
     }
 
     // Optional: Filter by campaign-variant
     if (filter?.campaignVariantId) {
       query.delivery = {
-        campaignVariantId: filter.campaignVariantId
+        campaignVariantId: filter.campaignVariantId,
       }
     }
 
@@ -280,19 +288,6 @@ class SessionPrismaAdapter {
     if (filter?.search) {
       const [potentialFirstName, potentialLastName] = filter.search.split(' ');
 
-      const doFullSearch = () => {
-        if (potentialLastName) {
-          return {
-            AND: potentialLastName ? [
-              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
-              { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
-            ] : undefined
-          }
-        }
-
-        return
-      };
-
       query = {
         ...cloneDeep(query),
         OR: [{
@@ -301,7 +296,7 @@ class SessionPrismaAdapter {
               // Allow searching in choices and form entries
               OR: [
                 {
-                  choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } }
+                  choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } },
                 },
                 {
                   formNodeEntry: {
@@ -310,14 +305,14 @@ class SessionPrismaAdapter {
                         OR: [
                           { longText: { contains: filter.search, mode: 'insensitive' } },
                           { shortText: { contains: filter.search, mode: 'insensitive' } },
-                        ]
-                      }
-                    }
-                  }
-                }
-              ]
-            }
-          }
+                        ],
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
         },
 
         // Allow searching for delivery properties
@@ -325,28 +320,28 @@ class SessionPrismaAdapter {
         {
           delivery: {
             OR: [
-              { deliveryRecipientEmail: { equals: filter.search, mode: 'insensitive' }, },
-              { deliveryRecipientPhone: { equals: filter.search, mode: 'insensitive' }, },
+              { deliveryRecipientEmail: { equals: filter.search, mode: 'insensitive' } },
+              { deliveryRecipientPhone: { equals: filter.search, mode: 'insensitive' } },
               {
                 AND: potentialLastName ? [
-                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
-                  { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
-                ] : undefined
+                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' } },
+                  { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' } },
+                ] : undefined,
               },
               {
                 OR: !potentialLastName ? [
-                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
-                  { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' }, },
-                ] : undefined
-              }
-            ]
-          }
-        }]
+                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' } },
+                  { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' } },
+                ] : undefined,
+              },
+            ],
+          },
+        }],
       }
     }
 
     return query;
   }
-};
+}
 
 export default SessionPrismaAdapter;

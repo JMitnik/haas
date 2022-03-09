@@ -380,6 +380,7 @@ export interface NexusGenInputs {
   }
   SessionActionInput: { // input type
     choice?: NexusGenInputs['ChoiceValueInput'] | null; // ChoiceValueInput
+    form?: NexusGenInputs['FormValueInput'] | null; // FormValueInput
     slider?: NexusGenInputs['SliderValueInput'] | null; // SliderValueInput
     timeSpent?: number | null; // Int
     type: NexusGenEnums['SessionActionType']; // SessionActionType!

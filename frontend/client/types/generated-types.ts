@@ -1577,6 +1577,7 @@ export type Session = {
 /** An action represents user input in response to a state */
 export type SessionActionInput = {
   choice?: Maybe<ChoiceValueInput>;
+  form?: Maybe<FormValueInput>;
   slider?: Maybe<SliderValueInput>;
   timeSpent?: Maybe<Scalars['Int']>;
   type: SessionActionType;

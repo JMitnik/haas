@@ -1099,6 +1099,7 @@ type Session {
 """An action represents user input in response to a state"""
 input SessionActionInput {
   choice: ChoiceValueInput
+  form: FormValueInput
   slider: SliderValueInput
   timeSpent: Int
   type: SessionActionType!

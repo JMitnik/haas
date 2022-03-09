@@ -1,8 +1,9 @@
-import { inputObjectType } from "@nexus/schema";
+import { inputObjectType } from '@nexus/schema';
 
-import { ChoiceValueInput } from "./ChoiceValueInput";
-import { SliderValueInput } from "./SliderValueInput";
-import { SessionActionType } from "./SessionActionType";
+import { ChoiceValueInput } from './ChoiceValueInput';
+import { SliderValueInput } from './SliderValueInput';
+import { SessionActionType } from './SessionActionType';
+import { FormValueInput } from './FormValueInput';
 
 export const SessionActionInput = inputObjectType({
   name: 'SessionActionInput',
@@ -13,8 +14,9 @@ export const SessionActionInput = inputObjectType({
 
     t.field('choice', { type: ChoiceValueInput });
     t.field('slider', { type: SliderValueInput });
+    t.field('form', { type: FormValueInput });
 
     // How many seconds did the user spend to create this event?
     t.int('timeSpent', { required: false });
-  }
+  },
 });

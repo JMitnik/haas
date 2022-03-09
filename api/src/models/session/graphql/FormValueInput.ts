@@ -1,5 +1,6 @@
-import { inputObjectType } from "@nexus/schema";
-import { FormNodeEntryFieldInput } from "../../node-entry/NodeEntry";
+import { inputObjectType } from '@nexus/schema';
+
+import { FormNodeEntryFieldInput } from '../../node-entry/NodeEntry';
 
 export const FormValueInput = inputObjectType({
   name: 'FormValueInput',
@@ -7,5 +8,5 @@ export const FormValueInput = inputObjectType({
 
   definition(t) {
     t.list.field('values', { type: FormNodeEntryFieldInput });
-  }
+  },
 })

@@ -1,15 +1,14 @@
 import {
-  NodeEntry, Prisma, PrismaClient,
+  PrismaClient,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { sortBy } from 'lodash';
 
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
-import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
-import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
 import TriggerService from '../trigger/TriggerService';
@@ -25,14 +24,14 @@ class SessionService {
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.triggerService = new TriggerService(prismaClient);
-  };
+  }
 
   /**
    * Finds single session by passed ID.
    * */
   findSessionById(sessionId: string): Promise<Session | null> {
     return this.sessionPrismaAdapter.findSessionById(sessionId);
-  };
+  }
 
   /**
    * Get scoring entries from a list of sessions.
@@ -55,13 +54,13 @@ class SessionService {
    */
   static getScoringEntryFromSession(session: SessionWithEntries): NodeEntryWithTypes | null {
     return session.nodeEntries.find((entry) => entry.sliderNodeEntry?.value) || null;
-  };
+  }
 
   static getScoreFromSession(session: SessionWithEntries): number | null {
     const entry = SessionService.getScoringEntryFromSession(session);
 
     return entry?.sliderNodeEntry?.value || null;
-  };
+  }
 
   /**
    * Finds session score in database, based on the provided id.
@@ -89,7 +88,7 @@ class SessionService {
     ));
 
     return rootedNodeEntry?.sliderNodeEntry?.value;
-  };
+  }
 
   /**
    * Fetches all sessions of dialogue using dialogueId {dialogueId}
@@ -143,7 +142,7 @@ class SessionService {
           orderBy: {
             createdAt: 'desc',
           },
-          include: SessionQueryModel.queryFull.include
+          include: SessionQueryModel.queryFull.include,
         },
       },
     });
@@ -170,7 +169,7 @@ class SessionService {
     const totalSessions = await this.sessionPrismaAdapter.countSessions(dialogueId, filter);
 
     const {
-      totalPages, hasPrevPage, hasNextPage, nextPageOffset, pageIndex, prevPageOffset
+      totalPages, hasPrevPage, hasNextPage, nextPageOffset, pageIndex, prevPageOffset,
     } = offsetPaginate(totalSessions, offset, perPage);
 
     return {
@@ -181,10 +180,10 @@ class SessionService {
         hasNextPage,
         prevPageOffset,
         nextPageOffset,
-        pageIndex
-      }
+        pageIndex,
+      },
     };
-  };
+  }
 
   static sortSessions(
     sessions: Session[],
@@ -203,7 +202,7 @@ class SessionService {
       sorted = sortBy(sessionsWithScores, 'paths');
     } else {
       sorted = sortBy(sessionsWithScores, 'createdAt');
-    };
+    }
 
     if (paginationOpts?.orderBy?.[0].desc) return sorted.reverse();
     return sorted;
@@ -214,9 +213,9 @@ class SessionService {
    * Create session-events
    * @param sessionInput
    */
-  async addEventsToSession(sessionId: string, events: NexusGenInputs['SessionEventInput'][]) {
+  async createSessionEvents(sessionId: string, events: NexusGenInputs['SessionEventInput'][]) {
     return this.sessionPrismaAdapter.createSessionEvents(sessionId, events);
-  };
+  }
 
   async createEmptyDialogueSession(dialogueId: string) {
     return this.sessionPrismaAdapter.createEmptyDialogueSession(dialogueId);
@@ -239,35 +238,35 @@ class SessionService {
       if (sessionInput.deliveryId) {
         const deliveryUpdate = prisma.delivery.update({
           where: { id: sessionInput.deliveryId },
-          data: { currentStatus: 'FINISHED' }
+          data: { currentStatus: 'FINISHED' },
         });
 
         const deliveryEventCreation = prisma.deliveryEvents.create({
           data: {
             Delivery: { connect: { id: sessionInput.deliveryId } },
-            status: 'FINISHED'
-          }
+            status: 'FINISHED',
+          },
         });
 
         await prisma.$transaction([deliveryUpdate, deliveryEventCreation]);
       }
     } catch (error) {
       Sentry.captureException(error);
-    };
+    }
 
     try {
       if (sessionInput.deliveryId) {
         await this.sessionPrismaAdapter.updateDelivery(session.id, sessionInput.deliveryId);
-      };
+      }
     } catch (error) {
       Sentry.captureException(error);
-    };
+    }
 
     try {
       await this.triggerService.tryTriggers(session);
     } catch (error) {
       console.log('Something went wrong while handling sms triggers: ', error);
-    };
+    }
 
     return session;
   }
@@ -281,7 +280,7 @@ class SessionService {
     ): (NodeEntryWithTypes | undefined | null)[] {
       if (!sessions.length) {
         return [];
-      };
+      }
 
       const textEntries = sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
         const isTextEntry = entry?.relatedNode?.type && TEXT_NODES.includes(entry?.relatedNode?.type);
@@ -299,7 +298,7 @@ class SessionService {
       session: SessionWithEntries,
     ): Promise<NodeEntryWithTypes[] | undefined | null> {
       return session.nodeEntries.filter((entry) => entry?.relatedNode?.type && entry?.relatedNode?.type in TEXT_NODES);
-    };
-};
+    }
+}
 
 export default SessionService;
