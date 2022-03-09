@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import {
+  AutomationActionType,
   AutomationConditionBuilderType,
   AutomationConditionModel,
   AutomationConditionOperandModel,
@@ -57,6 +58,15 @@ interface ConditionInput {
   };
 }
 
+interface ActionInput {
+  type: AutomationActionType;
+  targets: {
+    label: string;
+    type: string;
+    value: string;
+  }[]
+}
+
 export interface AutomationInput {
   id: string;
   label: string;
@@ -69,7 +79,10 @@ export interface AutomationInput {
       logical: { label: string, value: string };
       conditions: ConditionInput[];
     }
-  }
+  },
+  actions: {
+    action: ActionInput;
+  }[];
 }
 
 type ConditionQueryResult = ({
@@ -195,6 +208,12 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
     id: input?.id as string,
     label: input?.label as string,
     automationType: input?.type,
+    actions: input?.automationTrigger?.actions?.map((action) => ({
+      action: {
+        type: action.type,
+        targets: action.payload.targets,
+      },
+    })) || [],
     conditionBuilder: {
       id: input?.automationTrigger?.conditionBuilder?.id,
       logical: {

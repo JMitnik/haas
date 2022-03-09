@@ -679,6 +679,7 @@ export interface NexusGenRootTypes {
   AutomationActionModel: { // root type
     createdAt: any; // Date!
     id: string; // ID!
+    payload?: any | null; // JSONObject
     type: NexusGenEnums['AutomationActionType']; // AutomationActionType!
     updatedAt: any; // Date!
   }
@@ -1240,6 +1241,7 @@ export interface NexusGenFieldTypes {
   AutomationActionModel: { // field return type
     createdAt: any; // Date!
     id: string; // ID!
+    payload: any | null; // JSONObject
     type: NexusGenEnums['AutomationActionType']; // AutomationActionType!
     updatedAt: any; // Date!
   }

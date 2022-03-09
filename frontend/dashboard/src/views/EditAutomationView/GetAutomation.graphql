@@ -21,6 +21,7 @@ query getAutomation($input: GetAutomationInput) {
       actions {
         id
         type
+        payload
       }
       event {
         id

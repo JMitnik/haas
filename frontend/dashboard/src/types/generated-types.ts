@@ -14,10 +14,10 @@ export type Scalars = {
   Float: number;
   /** Date custom scalar type */
   Date: any;
-  /** The `Upload` scalar type represents a file upload. */
-  Upload: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: any;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type AdjustedImageInput = {
@@ -66,6 +66,7 @@ export type AutomationActionModel = {
   createdAt: Scalars['Date'];
   updatedAt: Scalars['Date'];
   type: AutomationActionType;
+  payload?: Maybe<Scalars['JSONObject']>;
 };
 
 export enum AutomationActionType {
@@ -2960,7 +2961,7 @@ export type GetAutomationQuery = (
         & Pick<Dialogue, 'title' | 'slug' | 'id'>
       )>, actions?: Maybe<Array<(
         { __typename?: 'AutomationActionModel' }
-        & Pick<AutomationActionModel, 'id' | 'type'>
+        & Pick<AutomationActionModel, 'id' | 'type' | 'payload'>
       )>>, event?: Maybe<(
         { __typename?: 'AutomationEventModel' }
         & Pick<AutomationEventModel, 'id' | 'type'>
@@ -4625,6 +4626,7 @@ export const GetAutomationDocument = gql`
       actions {
         id
         type
+        payload
       }
       event {
         id

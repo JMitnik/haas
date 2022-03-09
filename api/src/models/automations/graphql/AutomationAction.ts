@@ -1,4 +1,4 @@
-import { objectType } from "@nexus/schema";
+import { objectType } from '@nexus/schema';
 import { AutomationActionType } from './AutomationActionType';
 
 export const AutomationActionModel = objectType({
@@ -12,5 +12,7 @@ export const AutomationActionModel = objectType({
     t.field('type', {
       type: AutomationActionType,
     });
+
+    t.json('payload', { nullable: true });
   },
 });

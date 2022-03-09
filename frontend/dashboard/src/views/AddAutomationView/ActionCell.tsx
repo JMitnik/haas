@@ -42,10 +42,7 @@ interface NodeCellProps {
 }
 
 export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
-  if (!action.actionType) return null;
-  console.log('Action in cell: ', action);
-
-  // const nodeProps = MapNodeToProperties(node.type);
+  if (!action.type) return null;
 
   const removeCTAFromOption = (e: any) => {
     e.stopPropagation();
@@ -78,8 +75,8 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
             {' '}
             report to:
             <ul>
-              {action.targets.map((target) => (
-                <li style={{ marginLeft: '1em' }}>
+              {action.targets.map((target, index) => (
+                <li key={index} style={{ marginLeft: '1em' }}>
                   {target.target.type}
                   :
                   {' '}
@@ -94,7 +91,7 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
               color="white"
               mr="0.5em"
             >
-              {action?.actionType}
+              {action?.type?.replaceAll('_', ' ')}
             </UI.MicroLabel>
             {/* <UI.MicroLabel
               bg="#40A9FF"

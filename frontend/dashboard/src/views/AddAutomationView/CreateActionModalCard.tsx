@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { FileText, HardDrive, Mail, PlusCircle, Smartphone } from 'react-feather';
+import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
@@ -12,8 +13,6 @@ import {
 import { TargetTypeEnum, UserNodePicker } from 'components/NodePicker/UserNodePicker';
 import Dropdown from 'components/Dropdown';
 
-import { NodeCell } from 'components/NodeCell';
-import { useParams } from 'react-router';
 import { TargetCell } from './TargetCell';
 
 interface NewActionModalCardProps {
@@ -22,7 +21,7 @@ interface NewActionModalCardProps {
 }
 
 const schema = yup.object().shape({
-  actionType: yup.string().required(),
+  type: yup.string().required(),
   targets: yup.array().of(
     yup.object().shape({
       target: yup.object().shape({
@@ -41,7 +40,7 @@ export interface TargetEntry {
 }
 
 export interface ActionEntry {
-  actionType: AutomationActionType;
+  type: AutomationActionType;
   targets: {
     target: TargetEntry;
   }[];
@@ -90,7 +89,7 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
     mode: 'onChange',
     shouldUnregister: false,
     defaultValues: {
-      actionType: AutomationActionType.GenerateReport,
+      type: AutomationActionType.GenerateReport,
       targets: [{}],
     },
   });
@@ -111,7 +110,7 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
 
   const watchActionType = useWatch({
     control: form.control,
-    name: 'actionType',
+    name: 'type',
     defaultValue: AutomationActionType.GenerateReport,
   });
 
@@ -135,12 +134,12 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
               <UI.FormSection id="general">
                 <UI.Div gridColumn="1 / -1">
                   <UI.InputGrid>
-                    <UI.FormControl isRequired isInvalid={!!form.formState.errors.actionType}>
+                    <UI.FormControl isRequired isInvalid={!!form.formState.errors.type}>
                       <UI.FormLabel htmlFor="scopeType">{t('automation:action_type')}</UI.FormLabel>
                       <UI.InputHelper>{t('automation:action_type_helper')}</UI.InputHelper>
                       <Controller
                         control={form.control}
-                        name="actionType"
+                        name="type"
                         render={({ field: { onBlur, onChange, value } }) => (
                           <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                             <UI.RadioButton
@@ -177,7 +176,7 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
                           </UI.RadioButtons>
                         )}
                       />
-                      <UI.ErrorMessage>{form.formState.errors.actionType?.message}</UI.ErrorMessage>
+                      <UI.ErrorMessage>{form.formState.errors.type?.message}</UI.ErrorMessage>
                     </UI.FormControl>
 
                     <UI.FormControl isRequired>

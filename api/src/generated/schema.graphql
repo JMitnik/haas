@@ -44,6 +44,7 @@ input AutomationActionInput {
 type AutomationActionModel {
   createdAt: Date!
   id: ID!
+  payload: JSONObject
   type: AutomationActionType!
   updatedAt: Date!
 }

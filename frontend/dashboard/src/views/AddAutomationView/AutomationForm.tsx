@@ -240,7 +240,7 @@ const AutomationForm = ({
           conditions: automation?.conditionBuilder.childBuilder?.conditions || [],
         },
       },
-      actions: [
+      actions: automation?.actions || [
       ], // TODO: Add actions from database here
     },
   });
@@ -276,6 +276,16 @@ const AutomationForm = ({
     // TODO: Add childbuilder
     // TODO: Add actions
 
+    const activeActions = formData.actions.map((action) => {
+      const actionEntry: ActionEntry = (action as any)?.action;
+      return {
+        // id: actionEntry?.id || undefined,
+        type: actionEntry.type,
+        payload: { targets: actionEntry.targets },
+      };
+    });
+    console.log('active actions: ', activeActions);
+
     const input: CreateAutomationInput = {
       automationType: formData.automationType,
       label: formData.title,
@@ -289,11 +299,7 @@ const AutomationForm = ({
         type: formData?.conditionBuilder?.logical?.value as AutomationConditionBuilderType,
         conditions: mapConditions(formData, activeCustomer?.id),
       },
-      actions: [
-        {
-          type: AutomationActionType.GenerateReport,
-        },
-      ],
+      actions: activeActions,
     };
 
     if (!isInEdit && onCreateAutomation) {
