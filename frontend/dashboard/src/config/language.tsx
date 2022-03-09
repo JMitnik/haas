@@ -295,6 +295,14 @@ const language = {
       en: 'Updated at',
       de: 'Aktualisiert am',
     },
+    add_condition: {
+      en: 'Add condition',
+      de: 'Bedingung hinzufügen',
+    },
+    add_action: {
+      en: 'Add action',
+      de: 'Aktion hinzufügen',
+    },
     add_choice: {
       en: 'Add choice',
       de: 'Wahl hinzufügen',
@@ -935,10 +943,6 @@ const language = {
       en: 'Depth',
       de: 'Tiefe',
     },
-    role: {
-      en: 'Role',
-      de: 'Rolle',
-    },
     min_value: {
       en: 'Minimum value',
       de: 'Minimalwert',
@@ -1035,10 +1039,6 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     page: {
       en: 'Page',
       de: 'Seite',
-    },
-    user: {
-      en: 'User',
-      de: 'Benutzer',
     },
     no_registration: {
       en: 'No registration',
@@ -1613,6 +1613,26 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   automation: {
+    action: {
+      en: 'Action',
+      de: 'Aktion',
+    },
+    target_helper_GENERATE_REPORT: {
+      en: 'Who are the people the report should be sent so?',
+      de: 'Wer sind die Personen, denen der Bericht gesendet werden soll?',
+    },
+    target_helper_SEND_SMS: {
+      en: 'Who are the people the SMS should be sent so?',
+      de: 'An welche Personen soll die SMS also verschickt werden?',
+    },
+    target_helper_SEND_EMAIL: {
+      en: 'Who are the people the email should be sent so?',
+      de: 'An welche Personen soll die E-Mail also gesendet werden?',
+    },
+    targets: {
+      en: 'Targets',
+      de: 'Ziele',
+    },
     add_target: {
       en: 'Add target',
       de: 'Ziel hinzufügen',

@@ -12,11 +12,9 @@ import {
 import { TargetTypeEnum, UserNodePicker } from 'components/NodePicker/UserNodePicker';
 import Dropdown from 'components/Dropdown';
 
-import { ConditionCell } from './ConditionCell';
-import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { NodeCell } from 'components/NodeCell';
-import { useCustomer } from 'providers/CustomerProvider';
 import { useParams } from 'react-router';
+import { TargetCell } from './TargetCell';
 
 interface NewActionModalCardProps {
   onClose: () => void;
@@ -42,7 +40,7 @@ export interface TargetEntry {
   label: string;
 }
 
-export interface FormDataProps {
+export interface ActionEntry {
   actionType: AutomationActionType;
   targets: {
     target: TargetEntry;
@@ -87,7 +85,7 @@ const mapToUserPickerEntries = (customer: Maybe<{
 export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCardProps) => {
   const { t } = useTranslation();
   const { customerSlug } = useParams<{ customerSlug: string }>();
-  const form = useForm<FormDataProps>({
+  const form = useForm<ActionEntry>({
     resolver: yupResolver(schema),
     mode: 'onChange',
     shouldUnregister: false,
@@ -105,10 +103,10 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
     },
   });
 
-  const onSubmit = (formData: FormDataProps) => {
+  const onSubmit = (formData: ActionEntry) => {
     console.log('Form data: ', formData);
-    // onSuccess(returnData);
-    // onClose();
+    onSuccess(formData);
+    onClose();
   };
 
   const watchActionType = useWatch({
@@ -117,7 +115,7 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
     defaultValue: AutomationActionType.GenerateReport,
   });
 
-  const { fields: targetFields, append } = useFieldArray({
+  const { fields: targetFields, append, remove } = useFieldArray({
     name: 'targets',
     control: form.control,
     keyName: 'arrayKey',
@@ -130,18 +128,12 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
       <UI.ModalHead>
         <UI.ViewTitle>{t('automation:add_action')}</UI.ViewTitle>
       </UI.ModalHead>
-      <UI.ModalBody>
+      <UI.ModalBody style={{ padding: 0 }}>
         <UI.Div paddingLeft={0}>
           <UI.Form onSubmit={form.handleSubmit(onSubmit)}>
             <UI.Div>
               <UI.FormSection id="general">
-                <UI.Div>
-                  <UI.H3 color="default.text" fontWeight={500} pb={2}>{t('automation:scope')}</UI.H3>
-                  <UI.Muted color="gray.600">
-                    {t('automation:scope_helper')}
-                  </UI.Muted>
-                </UI.Div>
-                <UI.Div>
+                <UI.Div gridColumn="1 / -1">
                   <UI.InputGrid>
                     <UI.FormControl isRequired isInvalid={!!form.formState.errors.actionType}>
                       <UI.FormLabel htmlFor="scopeType">{t('automation:action_type')}</UI.FormLabel>
@@ -190,7 +182,7 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
 
                     <UI.FormControl isRequired>
                       <UI.FormLabel htmlFor="activeDialogue">
-                        {t('dialogue')}
+                        {t('automation:targets')}
                       </UI.FormLabel>
                       <UI.InputHelper>
                         {t(`automation:target_helper_${watchActionType}`)}
@@ -202,20 +194,16 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
                             backgroundColor="#fbfcff"
                             border="1px solid #edf2f7"
                             borderRadius="10px"
-                            padding={4}
-                            paddingLeft={0}
-                            paddingRight={0}
+                            padding={2}
                           >
                             <>
-                              <UI.Grid m={2} gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto">
+                              <UI.Grid m={2} ml={0} gridTemplateColumns="1fr">
 
-                                <UI.Helper>{t('automation:logic')}</UI.Helper>
-                                <UI.Helper>{t('automation:condition')}</UI.Helper>
-                                <UI.Helper>{t('automation:operator')}</UI.Helper>
-                                <UI.Helper>{t('automation:compare_to')}</UI.Helper>
+                                <UI.Helper>{t('automation:target')}</UI.Helper>
                               </UI.Grid>
                               {targetFields.map((target, index) => (
                                 <UI.Grid
+                                  key={target.arrayKey}
                                   pt={2}
                                   pb={2}
                                   pl={0}
@@ -247,9 +235,15 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
                                               display="flex"
                                               alignItems="center"
                                             >
-                                              {value?.value /* TODO: CHange this */ ? (
-                                                <NodeCell
-                                                  onRemove={() => onChange(null)}
+                                              {value?.value ? (
+                                                <TargetCell
+                                                  onRemove={() => {
+                                                    if (targetFields.length > 1) {
+                                                      remove(index);
+                                                    } else {
+                                                      onChange(null);
+                                                    }
+                                                  }}
                                                   onClick={onOpen}
                                                   node={value}
                                                 />
@@ -274,7 +268,7 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
                                   </UI.Div>
                                 </UI.Grid>
                               ))}
-                              <UI.Div ml={4} mt={4}>
+                              <UI.Div mt={4}>
                                 <UI.Button
                                   variantColor="gray"
                                   onClick={

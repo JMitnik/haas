@@ -50,12 +50,6 @@ const DropdownOption = (props: any) => {
               >
                 {props.data?.type}
               </UI.MicroLabel>
-              {/* <UI.MicroLabel
-              bg="#40A9FF"
-              color="white"
-            >
-              {props.data?.type}
-            </UI.MicroLabel> */}
             </UI.Flex>
           </UI.Div>
         </UI.Flex>
