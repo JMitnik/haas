@@ -35,68 +35,6 @@ class SessionService {
   };
 
   /**
-   * Create session-events
-   * @param sessionInput
-   */
-  uploadSessionEvents(sessionInput: NexusGenInputs['UploadSessionEventsInput']) {
-    return this.sessionPrismaAdapter.createSessionEvents(sessionInput.events || []);
-  };
-
-  async createEmptyDialogueSession(dialogueId: string) {
-    return this.sessionPrismaAdapter.createEmptyDialogueSession(dialogueId);
-  }
-
-  /**
-   * Create a user-session from the client.
-   */
-  async createSession(sessionInput: any) {
-    const { dialogueId, entries } = sessionInput;
-    const session = await this.sessionPrismaAdapter.createSession({
-      device: sessionInput.device || '',
-      totalTimeInSec: sessionInput.totalTimeInSec,
-      originUrl: sessionInput.originUrl || '',
-      entries,
-      dialogueId,
-    });
-
-    try {
-      if (sessionInput.deliveryId) {
-        const deliveryUpdate = prisma.delivery.update({
-          where: { id: sessionInput.deliveryId },
-          data: { currentStatus: 'FINISHED' }
-        });
-
-        const deliveryEventCreation = prisma.deliveryEvents.create({
-          data: {
-            Delivery: { connect: { id: sessionInput.deliveryId } },
-            status: 'FINISHED'
-          }
-        });
-
-        await prisma.$transaction([deliveryUpdate, deliveryEventCreation]);
-      }
-    } catch (error) {
-      Sentry.captureException(error);
-    };
-
-    try {
-      if (sessionInput.deliveryId) {
-        await this.sessionPrismaAdapter.updateDelivery(session.id, sessionInput.deliveryId);
-      };
-    } catch (error) {
-      Sentry.captureException(error);
-    };
-
-    try {
-      await this.triggerService.tryTriggers(session);
-    } catch (error) {
-      console.log('Something went wrong while handling sms triggers: ', error);
-    };
-
-    return session;
-  }
-
-  /**
    * Get scoring entries from a list of sessions.
    * @param sessions
    */
@@ -126,35 +64,6 @@ class SessionService {
   };
 
   /**
-   * Get text entries from a list of sessions
-   * @param sessions
-   */
-  static getTextEntriesFromSessions(
-    sessions: Session[],
-  ): (NodeEntryWithTypes | undefined | null)[] {
-    if (!sessions.length) {
-      return [];
-    };
-
-    const textEntries = sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
-      const isTextEntry = entry?.relatedNode?.type && TEXT_NODES.includes(entry?.relatedNode?.type);
-      return isTextEntry;
-    });
-
-    return textEntries;
-  }
-
-  /**
-   * Get text entries from a single session
-   * @param session
-   */
-  static async getTextEntriesFromSession(
-    session: SessionWithEntries,
-  ): Promise<NodeEntryWithTypes[] | undefined | null> {
-    return session.nodeEntries.filter((entry) => entry?.relatedNode?.type && entry?.relatedNode?.type in TEXT_NODES);
-  };
-
-  /**
    * Finds session score in database, based on the provided id.
    * */
   static async findSessionScore(sessionId: string): Promise<number | undefined | null> {
@@ -180,17 +89,6 @@ class SessionService {
     ));
 
     return rootedNodeEntry?.sliderNodeEntry?.value;
-  };
-
-  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (Prisma.SessionOrderByInput | undefined) {
-    if (!orderByArray?.length) return undefined;
-
-    const orderBy = orderByArray[0];
-
-    return {
-      id: orderBy.by === 'id' ? orderBy.desc ? 'desc' : 'asc' : undefined,
-      createdAt: orderBy.by === 'createdAt' ? orderBy.desc ? 'desc' : 'asc' : undefined,
-    };
   };
 
   /**
@@ -261,33 +159,10 @@ class SessionService {
     return sortedSessions;
   }
 
-  static sortSessions(
-    sessions: Session[],
-    paginationOpts?: Nullable<PaginationProps>,
-  ): Session[] {
-    const sessionsWithScores = sessions.map((session) => ({
-      score: SessionService.getScoreFromSession(session),
-      paths: session.nodeEntries.length,
-      ...session,
-    }));
-
-    let sorted = sessionsWithScores;
-    if (paginationOpts?.orderBy?.[0].by === 'score') {
-      sorted = sortBy(sessionsWithScores, 'score');
-    } else if (paginationOpts?.orderBy?.[0].by === 'paths') {
-      sorted = sortBy(sessionsWithScores, 'paths');
-    } else {
-      sorted = sortBy(sessionsWithScores, 'createdAt');
-    };
-
-    if (paginationOpts?.orderBy?.[0].desc) return sorted.reverse();
-    return sorted;
-  }
-
-  getSessionConnection = async (
+  async getSessionConnection(
     dialogueId: string,
     filter?: NexusGenInputs['SessionConnectionFilterInput'] | null
-  ): Promise<NexusGenFieldTypes['SessionConnection'] | null> => {
+  ): Promise<NexusGenFieldTypes['SessionConnection'] | null> {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
 
@@ -311,48 +186,120 @@ class SessionService {
     };
   };
 
-  static async getSessionEntries(session: Session): Promise<NodeEntry[] | []> {
-    const sessionWithEntries = await prisma.session.findUnique({
-      where: { id: session.id },
-      include: {
-        nodeEntries: {
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            sliderNodeEntry: true,
-            textboxNodeEntry: true,
-            relatedNode: true,
-            relatedEdge: true,
-          },
-        },
-      },
-    });
+  static sortSessions(
+    sessions: Session[],
+    paginationOpts?: Nullable<PaginationProps>,
+  ): Session[] {
+    const sessionsWithScores = sessions.map((session) => ({
+      score: SessionService.getScoreFromSession(session),
+      paths: session.nodeEntries.length,
+      ...session,
+    }));
 
-    return sessionWithEntries?.nodeEntries || [];
-  }
-
-  // TODO: Make Utils script
-  static constructDateRangeWhereInput(startDate?: Date, endDate?: Date): Prisma.SessionWhereInput[] | [] {
-    let dateRange: Prisma.SessionWhereInput[] | [] = [];
-
-    if (startDate && !endDate) {
-      dateRange = [
-        { createdAt: { gte: startDate } },
-      ];
-    } else if (!startDate && endDate) {
-      dateRange = [
-        { createdAt: { lte: endDate } },
-      ];
-    } else if (startDate && endDate) {
-      dateRange = [
-        { createdAt: { gte: startDate } },
-        { createdAt: { lte: endDate } },
-      ];
+    let sorted = sessionsWithScores;
+    if (paginationOpts?.orderBy?.[0].by === 'score') {
+      sorted = sortBy(sessionsWithScores, 'score');
+    } else if (paginationOpts?.orderBy?.[0].by === 'paths') {
+      sorted = sortBy(sessionsWithScores, 'paths');
+    } else {
+      sorted = sortBy(sessionsWithScores, 'createdAt');
     };
 
-    return dateRange;
+    if (paginationOpts?.orderBy?.[0].desc) return sorted.reverse();
+    return sorted;
+  }
+
+
+  /**
+   * Create session-events
+   * @param sessionInput
+   */
+  async addEventsToSession(sessionId: string, events: NexusGenInputs['SessionEventInput'][]) {
+    return this.sessionPrismaAdapter.createSessionEvents(sessionId, events);
   };
+
+  async createEmptyDialogueSession(dialogueId: string) {
+    return this.sessionPrismaAdapter.createEmptyDialogueSession(dialogueId);
+  }
+
+  /**
+   * Create a user-session from the client.
+   */
+  async deprecatedCreateSession(sessionInput: any) {
+    const { dialogueId, entries } = sessionInput;
+    const session = await this.sessionPrismaAdapter.createSession({
+      device: sessionInput.device || '',
+      totalTimeInSec: sessionInput.totalTimeInSec,
+      originUrl: sessionInput.originUrl || '',
+      entries,
+      dialogueId,
+    });
+
+    try {
+      if (sessionInput.deliveryId) {
+        const deliveryUpdate = prisma.delivery.update({
+          where: { id: sessionInput.deliveryId },
+          data: { currentStatus: 'FINISHED' }
+        });
+
+        const deliveryEventCreation = prisma.deliveryEvents.create({
+          data: {
+            Delivery: { connect: { id: sessionInput.deliveryId } },
+            status: 'FINISHED'
+          }
+        });
+
+        await prisma.$transaction([deliveryUpdate, deliveryEventCreation]);
+      }
+    } catch (error) {
+      Sentry.captureException(error);
+    };
+
+    try {
+      if (sessionInput.deliveryId) {
+        await this.sessionPrismaAdapter.updateDelivery(session.id, sessionInput.deliveryId);
+      };
+    } catch (error) {
+      Sentry.captureException(error);
+    };
+
+    try {
+      await this.triggerService.tryTriggers(session);
+    } catch (error) {
+      console.log('Something went wrong while handling sms triggers: ', error);
+    };
+
+    return session;
+  }
+
+  /**
+   * Get text entries from a list of sessions
+   * @param sessions
+   */
+    static getTextEntriesFromSessions(
+      sessions: Session[],
+    ): (NodeEntryWithTypes | undefined | null)[] {
+      if (!sessions.length) {
+        return [];
+      };
+
+      const textEntries = sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
+        const isTextEntry = entry?.relatedNode?.type && TEXT_NODES.includes(entry?.relatedNode?.type);
+        return isTextEntry;
+      });
+
+      return textEntries;
+    }
+
+    /**
+     * Get text entries from a single session
+     * @param session
+     */
+    static async getTextEntriesFromSession(
+      session: SessionWithEntries,
+    ): Promise<NodeEntryWithTypes[] | undefined | null> {
+      return session.nodeEntries.filter((entry) => entry?.relatedNode?.type && entry?.relatedNode?.type in TEXT_NODES);
+    };
 };
 
 export default SessionService;

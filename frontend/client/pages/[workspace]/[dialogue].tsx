@@ -1,6 +1,7 @@
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { ApolloProvider } from '@apollo/client';
+import { LoggerProvider } from '@haas/tools';
 
 import {
   CreateSessionDocument,
@@ -33,11 +34,13 @@ const DialoguePage = ({ sessionId, dialogue, workspace }: DialogueProps) => {
         <link rel="icon" href="/favicon.ico"/>
       </Head>
 
-      <ApolloProvider client={client}>
-        <div style={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-          <DialogueAdapter sessionId={sessionId} dialogue={dialogue} workspace={workspace}/>
-        </div>
-      </ApolloProvider>
+      <LoggerProvider name="ClientDialogueWrapper">
+        <ApolloProvider client={client}>
+          <div style={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <DialogueAdapter sessionId={sessionId} dialogue={dialogue} workspace={workspace}/>
+          </div>
+        </ApolloProvider>
+      </LoggerProvider>
     </div>
   );
 }

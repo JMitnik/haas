@@ -1,0 +1,5 @@
+mutation CreateSessionEvents($input: CreateSessionEventsInput!) {
+  createSessionEvents(input: $input) {
+    status
+  }
+}

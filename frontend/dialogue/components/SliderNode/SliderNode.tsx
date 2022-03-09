@@ -9,13 +9,12 @@ import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
 import { findSliderChildEdge } from './findSliderChildEdge';
 import { SliderBunny } from './SliderBunny';
 import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeTitle';
-import { useDialogueParams } from '../Navigation/useDialogueParams';
 import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
 import { SessionActionType } from '../../types/generated-types';
 
 export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
+  const startTime = useRef(Date.now());
   const { t } = useTranslation();
-  const startTime = useRef(new Date());
   const form = useForm({
     defaultValues: {
       slider: 50,
@@ -32,11 +31,9 @@ export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
     const childEdge = findSliderChildEdge(sliderValue, node.children);
     const childNodeId = childEdge.childNode.id;
 
-    console.log({ node });
-
     onRunAction({
       sessionId,
-      timestamp: Date.now(),
+      timestamp: Math.floor(Date.now() - startTime.current),
       action: {
         type: SessionActionType.SliderAction,
         slider: {

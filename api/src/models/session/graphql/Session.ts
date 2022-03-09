@@ -154,7 +154,7 @@ export const CreateSessionMutation = mutationField('createSession', {
     }
 
     try {
-      const session = ctx.services.sessionService.createSession(args.input);
+      const session = ctx.services.sessionService.deprecatedCreateSession(args.input);
       return session;
     } catch (error) {
       throw new Error(`Failed making a session due to ${error}`);

@@ -203,6 +203,16 @@ export type CreateQuestionNodeInputType = {
   unhappyText?: Maybe<Scalars['String']>;
 };
 
+export type CreateSessionEventsInput = {
+  events?: Maybe<Array<SessionEventInput>>;
+  sessionId?: Maybe<Scalars['String']>;
+};
+
+export type CreateSessionEventsOutput = {
+  __typename?: 'CreateSessionEventsOutput';
+  status: Scalars['String'];
+};
+
 export type CreateTriggerInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   recipients?: Maybe<RecipientsInputType>;
@@ -840,6 +850,8 @@ export type Mutation = {
   createQuestion?: Maybe<QuestionNode>;
   createRole: RoleType;
   createSession: Session;
+  /** Create a number of events of a session. */
+  createSessionEvents: CreateSessionEventsOutput;
   createTag: Tag;
   createTrigger: TriggerType;
   createWorkspace: Customer;
@@ -873,8 +885,6 @@ export type Mutation = {
   updateQuestion: QuestionNode;
   updateRoles: RoleType;
   uploadJobImage?: Maybe<AwsImageType>;
-  /** Upload a number of events of a session. */
-  uploadSessionEvents: UploadSessionEventsOutput;
   uploadUpsellImage?: Maybe<ImageType>;
   /** Given a token, checks in the database whether token has been set and has not expired yet */
   verifyUserToken: VerifyUserTokenOutput;
@@ -945,6 +955,11 @@ export type MutationCreateRoleArgs = {
 
 export type MutationCreateSessionArgs = {
   input?: Maybe<SessionInput>;
+};
+
+
+export type MutationCreateSessionEventsArgs = {
+  input?: Maybe<CreateSessionEventsInput>;
 };
 
 
@@ -1120,11 +1135,6 @@ export type MutationUploadJobImageArgs = {
   file?: Maybe<Scalars['Upload']>;
   jobId?: Maybe<Scalars['String']>;
   type?: Maybe<UploadImageEnumType>;
-};
-
-
-export type MutationUploadSessionEventsArgs = {
-  input?: Maybe<UploadSessionEventsInput>;
 };
 
 
@@ -1885,16 +1895,6 @@ export enum UploadImageEnumType {
 export type UploadSellImageInputType = {
   file?: Maybe<Scalars['Upload']>;
   workspaceId?: Maybe<Scalars['String']>;
-};
-
-export type UploadSessionEventsInput = {
-  events?: Maybe<Array<SessionEventInput>>;
-  sessionId?: Maybe<Scalars['String']>;
-};
-
-export type UploadSessionEventsOutput = {
-  __typename?: 'UploadSessionEventsOutput';
-  status: Scalars['String'];
 };
 
 export type UserConnection = ConnectionInterface & {

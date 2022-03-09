@@ -1,4 +1,5 @@
 import * as UI from '@haas/ui';
+import { useRef } from 'react';
 
 import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
 import { SessionActionType } from '../../types/core-types';
@@ -14,14 +15,12 @@ import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
 export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
   const { sessionId } = useSession();
   const choices = node.options || [];
+  const startTime = useRef(Date.now());
 
   const handleRunAction = (choiceIndex: number) => {
     const choice = choices[choiceIndex];
     const childEdge = findChoiceChildEdge(choice, node.children);
     const childNode = childEdge?.childNode;
-
-    console.log({ node });
-    console.log({ choice });
 
     onRunAction({
       sessionId,
@@ -32,7 +31,7 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
           value: choice.value,
           choiceId: choice.id.toString(),
         },
-        timeSpent: Date.now(),
+        timeSpent: Math.floor(Date.now() - startTime.current),
       },
       reward: {
         overrideCallToActionId: choice.overrideLeaf?.id || node.overrideLeafId,

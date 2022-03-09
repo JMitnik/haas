@@ -1,5 +1,0 @@
-mutation UploadSessionEvents($input: UploadSessionEventsInput!) {
-  uploadSessionEvents(input: $input) {
-    status
-  }
-}

@@ -1,22 +1,21 @@
 {
-  "name": "@haas/client",
-  "private": true,
-  "version": "0.0.1",
+  "name": "@haas/tools",
+  "version": "1.0.0",
+  "main": "src/index.tsx",
   "scripts": {
-    "dev": "NODE_OPTIONS='--inspect' next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test": "jest --watch",
-    "gen": "graphql-codegen --require dotenv/config"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "generate": "graphql-codegen",
+    "eject": "react-scripts eject",
+    "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
   },
   "dependencies": {
     "@apollo/client": "3.4.16",
     "@chakra-ui/core": "^0.8.0",
-    "@haas/dialogue": "*",
     "@haas/ui": "*",
-    "@haas/tools": "*",
     "@popperjs/core": "^2.11.0",
+    "@xstate/react": "^2.0.0",
     "babel-plugin-inline-react-svg": "^2.0.1",
     "chroma-js": "^2.1.2",
     "date-fns": "^2.27.0",
@@ -26,6 +25,7 @@
     "next-plugin-svgr": "^1.0.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-feather": "^2.0.9",
     "react-hook-form": "^7.22.2",
     "react-i18next": "^11.15.1",
     "react-lottie": "^1.2.3",
@@ -33,8 +33,8 @@
     "react-router-dom": "6",
     "react-timer-hook": "^3.0.5",
     "styled-components": "^5.3.3",
-    "use-clipboard-copy": "^0.2.0",
     "use-timer": "^2.0.1",
+    "xstate": "^4.29.0",
     "zustand": "^3.6.5"
   },
   "devDependencies": {
@@ -45,15 +45,13 @@
     "@types/chroma-js": "^2.1.3",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
     "@typescript-eslint/parser": "^5.7.0",
+    "dotenv": "^14.3.2",
     "eslint": "7",
     "eslint-config-next": "12.0.2",
     "eslint-import-resolver-typescript": "^2.5.0",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-react": "^7.27.1",
-    "jest-canvas-mock": "^2.3.1",
-    "kill-port": "^1.6.1"
+    "jest-canvas-mock": "^2.3.1"
   },
-  "resolutions": {
-    "jest-environment-jsdom": "^26.0.1"
-  }
+  "license": "MIT"
 }

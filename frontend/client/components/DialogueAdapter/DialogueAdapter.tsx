@@ -1,7 +1,8 @@
 import React from 'react'
 import { DialogueBootstrap } from '@haas/dialogue';
+import { useLogger } from '@haas/tools';
 
-import { useUploadSessionEventsMutation } from 'types/generated-types';
+import { useCreateSessionEventsMutation } from 'types/generated-types';
 import { Dialogue as DialogueType, Workspace, SessionEventInput } from 'types/helper-types';
 
 
@@ -12,11 +13,12 @@ interface DialogueProps {
 }
 
 export const DialogueAdapter = ({ dialogue, workspace, sessionId }: DialogueProps) => {
-  const [uploadSessionEvents] = useUploadSessionEventsMutation();
+  const [createSessionEvents] = useCreateSessionEventsMutation();
+  const { logger } = useLogger();
 
   const handleUploadEvents = async (events: SessionEventInput[]) => {
     try {
-      await uploadSessionEvents({
+      await createSessionEvents({
         variables: {
           input: {
             sessionId,
@@ -25,7 +27,7 @@ export const DialogueAdapter = ({ dialogue, workspace, sessionId }: DialogueProp
         },
       });
     } catch (error) {
-      console.log('Session events');
+      logger.error('Error uploading events', error);
     }
   };
 

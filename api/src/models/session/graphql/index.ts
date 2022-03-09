@@ -10,4 +10,4 @@ export * from './ChoiceValueInput';
 export * from './FormValueInput';
 export * from './SliderValueInput';
 
-export * from './UploadSessionEventsResolver';
+export * from './CreateSessionEvents';

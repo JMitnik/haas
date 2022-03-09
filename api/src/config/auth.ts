@@ -103,7 +103,7 @@ const authShield = shield({
     appendToInteraction: allow,
     verifyUserToken: allow,
     requestInvite: allow,
-    uploadSessionEvents: allow,
+    createSessionEvents: allow,
     uploadUpsellImage: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
     deleteCustomer: isSuperAdmin,
 

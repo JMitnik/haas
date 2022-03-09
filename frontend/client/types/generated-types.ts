@@ -205,6 +205,16 @@ export type CreateQuestionNodeInputType = {
   unhappyText?: Maybe<Scalars['String']>;
 };
 
+export type CreateSessionEventsInput = {
+  events?: Maybe<Array<SessionEventInput>>;
+  sessionId?: Maybe<Scalars['String']>;
+};
+
+export type CreateSessionEventsOutput = {
+  __typename?: 'CreateSessionEventsOutput';
+  status: Scalars['String'];
+};
+
 export type CreateTriggerInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   recipients?: Maybe<RecipientsInputType>;
@@ -842,6 +852,8 @@ export type Mutation = {
   createQuestion?: Maybe<QuestionNode>;
   createRole: RoleType;
   createSession: Session;
+  /** Create a number of events of a session. */
+  createSessionEvents: CreateSessionEventsOutput;
   createTag: Tag;
   createTrigger: TriggerType;
   createWorkspace: Customer;
@@ -875,8 +887,6 @@ export type Mutation = {
   updateQuestion: QuestionNode;
   updateRoles: RoleType;
   uploadJobImage?: Maybe<AwsImageType>;
-  /** Upload a number of events of a session. */
-  uploadSessionEvents: UploadSessionEventsOutput;
   uploadUpsellImage?: Maybe<ImageType>;
   /** Given a token, checks in the database whether token has been set and has not expired yet */
   verifyUserToken: VerifyUserTokenOutput;
@@ -947,6 +957,11 @@ export type MutationCreateRoleArgs = {
 
 export type MutationCreateSessionArgs = {
   input?: Maybe<SessionInput>;
+};
+
+
+export type MutationCreateSessionEventsArgs = {
+  input?: Maybe<CreateSessionEventsInput>;
 };
 
 
@@ -1122,11 +1137,6 @@ export type MutationUploadJobImageArgs = {
   file?: Maybe<Scalars['Upload']>;
   jobId?: Maybe<Scalars['String']>;
   type?: Maybe<UploadImageEnumType>;
-};
-
-
-export type MutationUploadSessionEventsArgs = {
-  input?: Maybe<UploadSessionEventsInput>;
 };
 
 
@@ -1889,16 +1899,6 @@ export type UploadSellImageInputType = {
   workspaceId?: Maybe<Scalars['String']>;
 };
 
-export type UploadSessionEventsInput = {
-  events?: Maybe<Array<SessionEventInput>>;
-  sessionId?: Maybe<Scalars['String']>;
-};
-
-export type UploadSessionEventsOutput = {
-  __typename?: 'UploadSessionEventsOutput';
-  status: Scalars['String'];
-};
-
 export type UserConnection = ConnectionInterface & {
   __typename?: 'UserConnection';
   pageInfo: PaginationPageInfo;
@@ -2012,6 +2012,19 @@ export type CreateSessionMutation = (
   & { createSession: (
     { __typename?: 'Session' }
     & Pick<Session, 'id'>
+  ) }
+);
+
+export type CreateSessionEventsMutationVariables = Exact<{
+  input: CreateSessionEventsInput;
+}>;
+
+
+export type CreateSessionEventsMutation = (
+  { __typename?: 'Mutation' }
+  & { createSessionEvents: (
+    { __typename?: 'CreateSessionEventsOutput' }
+    & Pick<CreateSessionEventsOutput, 'status'>
   ) }
 );
 
@@ -2131,19 +2144,6 @@ export type QuestionNodeFragmentFragment = (
       & Pick<QuestionNode, 'id'>
     )> }
   )> }
-);
-
-export type UploadSessionEventsMutationVariables = Exact<{
-  input: UploadSessionEventsInput;
-}>;
-
-
-export type UploadSessionEventsMutation = (
-  { __typename?: 'Mutation' }
-  & { uploadSessionEvents: (
-    { __typename?: 'UploadSessionEventsOutput' }
-    & Pick<UploadSessionEventsOutput, 'status'>
-  ) }
 );
 
 export const EdgeFragmentFragmentDoc = gql`
@@ -2295,6 +2295,39 @@ export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
 export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
 export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
+export const CreateSessionEventsDocument = gql`
+    mutation CreateSessionEvents($input: CreateSessionEventsInput!) {
+  createSessionEvents(input: $input) {
+    status
+  }
+}
+    `;
+export type CreateSessionEventsMutationFn = Apollo.MutationFunction<CreateSessionEventsMutation, CreateSessionEventsMutationVariables>;
+
+/**
+ * __useCreateSessionEventsMutation__
+ *
+ * To run a mutation, you first call `useCreateSessionEventsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateSessionEventsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createSessionEventsMutation, { data, loading, error }] = useCreateSessionEventsMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateSessionEventsMutation(baseOptions?: Apollo.MutationHookOptions<CreateSessionEventsMutation, CreateSessionEventsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateSessionEventsMutation, CreateSessionEventsMutationVariables>(CreateSessionEventsDocument, options);
+      }
+export type CreateSessionEventsMutationHookResult = ReturnType<typeof useCreateSessionEventsMutation>;
+export type CreateSessionEventsMutationResult = Apollo.MutationResult<CreateSessionEventsMutation>;
+export type CreateSessionEventsMutationOptions = Apollo.BaseMutationOptions<CreateSessionEventsMutation, CreateSessionEventsMutationVariables>;
 export const GetDialogueDocument = gql`
     query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
   customer(slug: $customerSlug) {
@@ -2405,36 +2438,3 @@ export type GetDialogueQueryResult = Apollo.QueryResult<GetDialogueQuery, GetDia
 export function refetchGetDialogueQuery(variables?: GetDialogueQueryVariables) {
       return { query: GetDialogueDocument, variables: variables }
     }
-export const UploadSessionEventsDocument = gql`
-    mutation UploadSessionEvents($input: UploadSessionEventsInput!) {
-  uploadSessionEvents(input: $input) {
-    status
-  }
-}
-    `;
-export type UploadSessionEventsMutationFn = Apollo.MutationFunction<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>;
-
-/**
- * __useUploadSessionEventsMutation__
- *
- * To run a mutation, you first call `useUploadSessionEventsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUploadSessionEventsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [uploadSessionEventsMutation, { data, loading, error }] = useUploadSessionEventsMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUploadSessionEventsMutation(baseOptions?: Apollo.MutationHookOptions<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>(UploadSessionEventsDocument, options);
-      }
-export type UploadSessionEventsMutationHookResult = ReturnType<typeof useUploadSessionEventsMutation>;
-export type UploadSessionEventsMutationResult = Apollo.MutationResult<UploadSessionEventsMutation>;
-export type UploadSessionEventsMutationOptions = Apollo.BaseMutationOptions<UploadSessionEventsMutation, UploadSessionEventsMutationVariables>;
