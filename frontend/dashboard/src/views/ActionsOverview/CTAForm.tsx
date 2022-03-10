@@ -163,7 +163,7 @@ const CTAForm = ({
           placeholder: field.placeholder,
           isRequired: boolToInt(field.isRequired),
           position: field.position,
-        })),
+        })) || [],
       },
     },
   });
