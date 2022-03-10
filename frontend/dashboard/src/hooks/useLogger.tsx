@@ -10,12 +10,12 @@ const ignoreErrorCodes = ['BAD_USER_INPUT', 'UNAUTHORIZED'];
  */
 export const useLogger = () => {
   /**
-   * Method to log errors to Sentry from dashboard. 
-   * 
-   * Will standard ignore errors with "handled" error-codes such 
+   * Method to log errors to Sentry from dashboard.
+   *
+   * Will standard ignore errors with "handled" error-codes such
    * as BAD_USER_INPUT and UNAUTHORIZED.
-   * @param error 
-   * @param context 
+   * @param error
+   * @param context
    */
   const logError = (error: ApolloError | Error, context?: Partial<ScopeContext>) => {
     try {
@@ -47,7 +47,6 @@ export const useLogger = () => {
     } catch (error) {
       console.log(error);
     }
-
   }
 
   return {

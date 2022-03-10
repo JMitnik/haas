@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { ApolloProvider } from '@apollo/client';
-import { LoggerProvider } from '@haas/tools';
+import { loggerInstance, LoggerProvider } from '@haas/tools';
 
 import {
   CreateSessionDocument,
@@ -59,6 +59,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       customerSlug: context.query.workspace as string,
       dialogueSlug: context.query.dialogue as string,
     },
+  }).catch((error) => {
+    loggerInstance.error('Error getting dialogue', error, { tags: { section: 'Dialogue' } });
+    throw error;
   });
 
   if (!res.data.customer || !res.data.customer.dialogue) {
@@ -70,14 +73,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
 
+  let sessionId = '';
+  try {
+    const session = await client.mutate<CreateSessionMutation, CreateSessionMutationVariables>({
+      mutation: CreateSessionDocument,
+      variables: { input: { dialogueId: res.data.customer.dialogue.id } },
+    });
 
-  const session = await client.mutate<CreateSessionMutation, CreateSessionMutationVariables>({
-    mutation: CreateSessionDocument,
-    variables: { input: { dialogueId: res.data.customer.dialogue.id } },
-  });
+    sessionId = session.data?.createSession?.id;
 
-  const sessionId = session.data?.createSession?.id;
-  if (!sessionId) {
+    if (!sessionId) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/404',
+        },
+      }
+    }
+  } catch (error) {
+    loggerInstance.error('Error creating session', error, {
+      tags: { section: 'Session' },
+    });
+
     return {
       props: {},
       redirect: {
@@ -85,6 +102,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     }
   }
+
 
   return {
     props: {

@@ -19,7 +19,7 @@ export const CreateSessionEventsOutput = objectType({
   },
 });
 
-export const CreateSessionEventsResolver = mutationField('createSessionEvents', {
+export const CreateSessionEvents = mutationField('createSessionEvents', {
   description: 'Create a number of events of a session.',
   type: CreateSessionEventsOutput,
   args: { input: CreateSessionEventsInput },

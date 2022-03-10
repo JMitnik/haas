@@ -34,7 +34,7 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
         timeSpent: Math.floor(Date.now() - startTime.current),
       },
       reward: {
-        overrideCallToActionId: choice.overrideLeaf?.id || node.overrideLeafId,
+        overrideCallToActionId: choice.overrideLeaf?.id || node.overrideLeaf?.id,
         toEdge: childEdge?.id,
         toNode: childNode?.id,
       },

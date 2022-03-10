@@ -27,7 +27,9 @@ export const DialogueAdapter = ({ dialogue, workspace, sessionId }: DialogueProp
         },
       });
     } catch (error) {
-      logger.error('Error uploading events', error);
+      logger.error('Error creating session events', error, {
+        tags: { section: 'Session' },
+      });
     }
   };
 

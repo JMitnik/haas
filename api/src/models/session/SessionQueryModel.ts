@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from '@prisma/client';
 
 export const SessionQueryModel = {
   // Query all events, node-entries and dialogue
@@ -12,7 +12,7 @@ export const SessionQueryModel = {
         include: {
           choiceValue: true,
           sliderValue: true,
-        }
+        },
       },
       nodeEntries: {
         orderBy: { depth: 'asc' },
@@ -26,8 +26,8 @@ export const SessionQueryModel = {
           videoNodeEntry: true,
           sliderNodeEntry: true,
         },
-      }
-    }
+      },
+    },
   }),
 };
 

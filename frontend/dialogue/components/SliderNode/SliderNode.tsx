@@ -41,7 +41,7 @@ export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
         },
       },
       reward: {
-        overrideCallToActionId: node.overrideLeafId,
+        overrideCallToActionId: node.overrideLeaf?.id,
         toEdge: childEdge?.id,
         toNode: childNodeId,
       },

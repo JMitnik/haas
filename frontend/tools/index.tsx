@@ -1,1 +1,1 @@
-export { useLogger, LoggerProvider } from './providers/LoggerProvider';
+export { useLogger, LoggerProvider, loggerInstance } from './providers/LoggerProvider';

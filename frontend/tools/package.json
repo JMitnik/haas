@@ -15,6 +15,8 @@
     "@chakra-ui/core": "^0.8.0",
     "@haas/ui": "*",
     "@popperjs/core": "^2.11.0",
+    "@sentry/react": "^6.18.2",
+    "@sentry/tracing": "^6.18.2",
     "@xstate/react": "^2.0.0",
     "babel-plugin-inline-react-svg": "^2.0.1",
     "chroma-js": "^2.1.2",
