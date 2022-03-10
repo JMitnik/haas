@@ -6,7 +6,7 @@ import {
   Clock, Copy, MessageSquare, MoreVertical, PlusCircle, RefreshCcw, Trash2, Type,
 } from 'react-feather';
 import { Button, ButtonGroup } from '@chakra-ui/core';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted,
@@ -233,12 +233,12 @@ const AutomationForm = ({
       automationType: automation?.automationType || AutomationType.Trigger,
       conditionBuilder:
       {
-        logical: automation?.conditionBuilder.logical || { label: 'AND', value: 'AND' },
-        conditions: automation?.conditionBuilder.conditions || [],
+        logical: automation?.conditionBuilder?.logical || { label: 'AND', value: 'AND' },
+        conditions: automation?.conditionBuilder?.conditions || [],
         childBuilder:
         {
-          logical: automation?.conditionBuilder.childBuilder?.logical || { label: 'AND', value: 'AND' },
-          conditions: automation?.conditionBuilder.childBuilder?.conditions || [],
+          logical: automation?.conditionBuilder?.childBuilder?.logical || { label: 'AND', value: 'AND' },
+          conditions: automation?.conditionBuilder?.childBuilder?.conditions || [],
         },
       },
       actions: automation?.actions || [],
@@ -268,6 +268,11 @@ const AutomationForm = ({
     control: form.control,
     keyName: 'arrayKey',
 
+  });
+
+  const watchLogicalBuilder = useWatch({
+    name: 'conditionBuilder.logical',
+    control: form.control,
   });
 
   console.log('Acitions field array: ', actionsFieldArray.fields);
@@ -321,6 +326,8 @@ const AutomationForm = ({
       });
     }
   };
+
+  console.log('Watch logical: ', watchLogicalBuilder);
 
   return (
     <>
@@ -429,21 +436,11 @@ const AutomationForm = ({
                       >
                         <input defaultValue={0} type="hidden" {...form.register(`conditionBuilder.conditions.${index}.depth`)} />
                         <UI.Div>
-                          {index !== 0 && (
+                          {index === 1 && (
                             <Controller
                               name="conditionBuilder.logical"
                               control={form.control}
                               render={({ field }) => {
-                                if (index > 1) {
-                                  return (
-                                    <Select
-                                      isDisabled
-                                      options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
-                                      value={field.value}
-                                      onChange={field.onChange}
-                                    />
-                                  );
-                                }
                                 return (
                                   <Select
                                     options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
@@ -452,6 +449,12 @@ const AutomationForm = ({
                                   />
                                 );
                               }}
+                            />
+                          )}
+                          {index > 1 && (
+                            <Select
+                              isDisabled
+                              value={watchLogicalBuilder}
                             />
                           )}
                         </UI.Div>
