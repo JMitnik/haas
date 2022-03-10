@@ -21,13 +21,13 @@ import getUsersQuery from 'queries/getUsers';
 
 const schema = yup.object().shape({
   email: yup.string().email('Expected email format').required(),
-  firstName: yup.string().ensure(),
-  lastName: yup.string().ensure(),
-  phone: yup.string().notRequired(),
+  firstName: yup.string().required(),
+  lastName: yup.string().required(),
+  phone: yup.string().notRequired().nullable(true),
   role: yup.object().shape({
     value: yup.string().required(),
     label: yup.string().required(),
-  }),
+  }).required(),
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
@@ -71,7 +71,7 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
       email: userCustomer?.user?.email,
       firstName: userCustomer?.user?.firstName,
       lastName: userCustomer?.user?.lastName,
-      phone: userCustomer?.user?.phone,
+      phone: userCustomer?.user?.phone || null,
       role: {
         label: userCustomer?.role.name,
         value: userCustomer?.role.id,
@@ -126,6 +126,9 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
       },
     });
   };
+
+  console.log('Form watch: ', form.watch());
+  console.log('Form errors: ', form.formState.errors);
 
   return (
     <>

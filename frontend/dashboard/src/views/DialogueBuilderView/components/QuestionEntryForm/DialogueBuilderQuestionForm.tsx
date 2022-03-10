@@ -67,6 +67,8 @@ interface FormDataProps {
   range: number[];
 }
 
+const isVideoEmbeddedType = (questionType: string) => questionType === QuestionNodeTypeEnum.VideoEmbedded;
+
 const isChoiceType = (questionType: string) => {
   if (questionType === 'CHOICE') {
     return true;
@@ -89,7 +91,7 @@ const schema = yup.object().shape({
     otherwise: yup.string().notRequired(),
   }),
   optionsFull: yup.array().when(['questionType'], {
-    is: (questionType: string) => isChoiceType(questionType),
+    is: (questionType: string) => isChoiceType(questionType) || isVideoEmbeddedType(questionType),
     then: yup.array().min(1).of(yup.object({
       value: yup.string().required('form.value_required'),
     })),
