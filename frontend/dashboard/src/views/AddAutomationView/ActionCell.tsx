@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
-import { ActionEntry } from './CreateActionModalCard';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { ActionEntry } from './CreateActionModalCard';
 
 export const NodeCellContainer = styled.div`
   ${({ theme }) => css`
@@ -44,6 +44,8 @@ interface NodeCellProps {
 export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
   if (!action.type) return null;
 
+  console.log('Action Cell: ', action);
+
   const removeCTAFromOption = (e: any) => {
     e.stopPropagation();
     onRemove();
@@ -75,8 +77,8 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
             {' '}
             report to:
             <ul>
-              {action.targets.map((target, index) => (
-                <li key={index} style={{ marginLeft: '1em' }}>
+              {action.targets.map((target) => (
+                <li key={`${target.target.type}-${target.target.label}`} style={{ marginLeft: '1em' }}>
                   {target.target.type}
                   :
                   {' '}

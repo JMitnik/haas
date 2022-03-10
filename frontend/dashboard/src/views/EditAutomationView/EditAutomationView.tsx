@@ -281,7 +281,6 @@ const EditAutomationView = () => {
     onCompleted: (data) => {
       console.log('return data create automation mutation: ', data?.updateAutomation?.label);
       goToAutomationOverview();
-      // TODO: Go back to automations overview
     },
     onError: (e) => {
       console.log('Something went wrong: ', e.message);
@@ -293,7 +292,6 @@ const EditAutomationView = () => {
   }
 
   const automation: GetAutomationQuery['automation'] = automationData?.automation;
-  console.log('Automation: ', automation);
   const mappedAutomation: AutomationInput = mapAutomation(automation);
   // TODO: Add child builder
   const conditionEntries: ConditionEntry[] = findUniqueConditionEntries(

@@ -5,8 +5,8 @@ import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
+import { AutomationConditionScopeType } from 'types/generated-types';
 import { NodeCellContainer } from 'components/NodeCell/NodeCell';
-import { QuestionNodeTypeEnum } from 'types/generated-types';
 
 import { ConditionEntry, CreateConditionModalCard } from 'views/AddAutomationView/CreateConditionModalCard';
 import { NodePickerHeader } from './NodePickerStyles';
@@ -88,22 +88,10 @@ interface NodePickerProps {
 
 export const ConditionNodePicker = ({ onChange,
   onClose, items, onModalOpen, onModalClose, onAddCondition }: NodePickerProps) => {
-  const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
+  const [filteredState, setFilteredState] = useState<AutomationConditionScopeType | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
   const { t } = useTranslation();
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
-  // console.log('ITEMS: ', items);
-
-  // const handleChange = (callToAction: QuestionNode) => {
-  //   onChange({
-  //     id: callToAction.id,
-  //     type: callToAction.type,
-  //     label: callToAction.title,
-  //     value: callToAction.id,
-  //   });
-  //   setCreateModalIsOpen(false);
-  //   onClose?.();
-  // };
 
   const handleOpenModal = () => {
     setCreateModalIsOpen(true);
@@ -121,12 +109,12 @@ export const ConditionNodePicker = ({ onChange,
     if (!filteredState) {
       setFilteredItems(items);
     } else {
-      setFilteredItems(items.filter((item: any) => item.type === filteredState));
+      setFilteredItems(items.filter((item: any) => item.scopeType === filteredState));
     }
   }, [filteredState, setFilteredItems, items]);
 
   return (
-    <UI.List maxWidth={300}>
+    <UI.List maxWidth={370}>
       <UI.CloseButton onClose={onClose} />
       <NodePickerHeader>
         <UI.ListHeader style={{ borderBottom: 0 }}>{t('conditions')}</UI.ListHeader>
@@ -159,22 +147,22 @@ export const ConditionNodePicker = ({ onChange,
                 {t('all')}
               </UI.SwitchItem>
               <UI.SwitchItem
-                isActive={filteredState === QuestionNodeTypeEnum.Link}
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.Link)}
+                isActive={filteredState === AutomationConditionScopeType.Question}
+                onClick={() => setFilteredState(AutomationConditionScopeType.Question)}
               >
-                {t('link')}
+                {t('question')}
               </UI.SwitchItem>
               <UI.SwitchItem
-                isActive={filteredState === QuestionNodeTypeEnum.Share}
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.Share)}
+                isActive={filteredState === AutomationConditionScopeType.Dialogue}
+                onClick={() => setFilteredState(AutomationConditionScopeType.Dialogue)}
               >
-                {t('share')}
+                {t('dialogue')}
               </UI.SwitchItem>
               <UI.SwitchItem
-                isActive={filteredState === QuestionNodeTypeEnum.Form}
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.Form)}
+                isActive={filteredState === AutomationConditionScopeType.Workspace}
+                onClick={() => setFilteredState(AutomationConditionScopeType.Workspace)}
               >
-                {t('form')}
+                {t('workspace')}
               </UI.SwitchItem>
             </UI.Switch>
           </UI.Div>
@@ -208,7 +196,6 @@ export const ConditionNodePicker = ({ onChange,
         <CreateConditionModalCard
           onClose={() => setCreateModalIsOpen(false)}
           onSuccess={(condition: any) => {
-            // TODO: Check if this works
             onAddCondition((oldConditions) => [...oldConditions, condition]);
             onChange(condition);
           }}

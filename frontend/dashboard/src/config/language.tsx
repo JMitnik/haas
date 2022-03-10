@@ -295,6 +295,10 @@ const language = {
       en: 'Updated at',
       de: 'Aktualisiert am',
     },
+    add_target: {
+      en: 'Add target',
+      de: 'Ziel hinzufügen',
+    },
     add_condition: {
       en: 'Add condition',
       de: 'Bedingung hinzufügen',
@@ -326,6 +330,18 @@ const language = {
     all: {
       en: 'All',
       de: 'Alle',
+    },
+    question: {
+      en: 'Question',
+      de: 'Frage',
+    },
+    dialogue: {
+      en: 'Dialogue',
+      de: 'Dialog',
+    },
+    workspace: {
+      en: 'Workspace',
+      de: 'Arbeitsplatz',
     },
     user: {
       en: 'User',
@@ -466,10 +482,6 @@ const language = {
     body: {
       en: 'Body',
       de: 'Teil',
-    },
-    dialogue: {
-      en: 'Dialogue',
-      de: 'Dialog',
     },
     create_campaign: {
       en: 'Create a campaign',
@@ -787,14 +799,6 @@ const language = {
     scheduled: {
       en: 'Scheduled',
       de: 'Geplant',
-    },
-    question: {
-      en: 'Question',
-      de: 'Frage',
-    },
-    workspace: {
-      en: 'Workspace',
-      de: 'Arbeitsplatz',
     },
     both: {
       en: 'Both',
@@ -1680,6 +1684,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     action_placeholder: {
       en: 'Start by adding an action.',
       de: 'Beginnen Sie mit dem Hinzufügen einer Aktion.',
+    },
+    edit_action: {
+      en: 'Edit action',
+      de: 'Aktion bearbeiten',
     },
     add_action: {
       en: 'Add action',

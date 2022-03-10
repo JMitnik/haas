@@ -17,7 +17,9 @@ import { TargetCell } from './TargetCell';
 
 interface NewActionModalCardProps {
   onClose: () => void;
-  onSuccess: (data: any) => void;
+  onCreate: (data: any) => void;
+  onUpdate: (data: any) => void;
+  action?: () => ActionEntry | undefined;
 }
 
 const schema = yup.object().shape({
@@ -81,21 +83,20 @@ const mapToUserPickerEntries = (customer: Maybe<{
   return userPickerEntries;
 };
 
-export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCardProps) => {
+export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: NewActionModalCardProps) => {
   const { t } = useTranslation();
   const { customerSlug } = useParams<{ customerSlug: string }>();
+  const activeAction = action?.();
   const form = useForm<ActionEntry>({
     resolver: yupResolver(schema),
     mode: 'onChange',
     shouldUnregister: false,
     defaultValues: {
-      type: AutomationActionType.GenerateReport,
-      targets: [{}],
+      type: activeAction?.type || AutomationActionType.GenerateReport,
+      targets: activeAction?.targets || [{}],
     },
   });
 
-  // TODO: Query to fetch all roles
-  // TODO: Query all users
   const { data } = useGetUsersAndRolesQuery({
     variables: {
       customerSlug,
@@ -104,7 +105,12 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
 
   const onSubmit = (formData: ActionEntry) => {
     console.log('Form data: ', formData);
-    onSuccess(formData);
+    if (activeAction) {
+      onUpdate(formData);
+    } else {
+      onCreate(formData);
+    }
+
     onClose();
   };
 
@@ -125,7 +131,7 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
   return (
     <UI.ModalCard maxWidth={1000} onClose={onClose}>
       <UI.ModalHead>
-        <UI.ViewTitle>{t('automation:add_action')}</UI.ViewTitle>
+        <UI.ViewTitle>{activeAction ? t('automation:edit_action') : t('automation:add_action')}</UI.ViewTitle>
       </UI.ModalHead>
       <UI.ModalBody style={{ padding: 0 }}>
         <UI.Div paddingLeft={0}>
@@ -277,7 +283,7 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
                                   <UI.Icon mr={1}>
                                     <PlusCircle />
                                   </UI.Icon>
-                                  {t('add_choice')}
+                                  {t('add_target')}
                                 </UI.Button>
                               </UI.Div>
                             </>
@@ -301,7 +307,7 @@ export const CreateActionModalCard = ({ onClose, onSuccess }: NewActionModalCard
                         variantColor="teal"
                         type="submit"
                       >
-                        {t('save')}
+                        {activeAction ? t('update') : t('save')}
                       </UI.Button>
 
                     </UI.Flex>

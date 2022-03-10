@@ -210,6 +210,7 @@ enum ModalType {
 interface ModalState {
   isOpen: boolean;
   modal?: ModalType;
+  arrayKey?: string;
 }
 
 const AutomationForm = ({
@@ -240,8 +241,7 @@ const AutomationForm = ({
           conditions: automation?.conditionBuilder.childBuilder?.conditions || [],
         },
       },
-      actions: automation?.actions || [
-      ], // TODO: Add actions from database here
+      actions: automation?.actions || [],
     },
   });
   const { t } = useTranslation();
@@ -267,24 +267,24 @@ const AutomationForm = ({
     name: 'actions',
     control: form.control,
     keyName: 'arrayKey',
+
   });
+
+  console.log('Acitions field array: ', actionsFieldArray.fields);
 
   const onSubmit = (formData: FormDataProps) => {
     console.log('Form data; ', formData);
     // TODO: Create a field for event type
     // TODO: Create a picker for questionId/dialogueId for event
     // TODO: Add childbuilder
-    // TODO: Add actions
 
     const activeActions = formData.actions.map((action) => {
       const actionEntry: ActionEntry = (action as any)?.action;
       return {
-        // id: actionEntry?.id || undefined,
         type: actionEntry.type,
         payload: { targets: actionEntry.targets },
       };
     });
-    console.log('active actions: ', activeActions);
 
     const input: CreateAutomationInput = {
       automationType: formData.automationType,
@@ -321,8 +321,6 @@ const AutomationForm = ({
       });
     }
   };
-
-  console.log('Form watch: ', actionsFieldArray.fields);
 
   return (
     <>
@@ -622,51 +620,58 @@ const AutomationForm = ({
                         backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
                         position="relative"
                       >
-                        <>
-                          <UI.Div alignItems="center" display="flex">
-                            <Controller
-                              name={`actions.${index}.action`}
-                              control={form.control}
-                              defaultValue={action?.action}
-                              render={({ field: { value } }) => (
-                                <Dropdown
-                                  defaultCloseOnClickOutside={false}
-                                >
-                                  {({ onOpen }) => (
-                                    <UI.Div
-                                      width="100%"
-                                      justifyContent="center"
-                                      display="flex"
-                                      alignItems="center"
-                                    >
-                                      {value ? (
-                                        <ActionCell
-                                          onRemove={() => {
-                                            actionsFieldArray.remove(index);
-                                          }}
-                                          action={value}
-                                        />
-                                      ) : (
-                                        <UI.Button
-                                          size="sm"
-                                          variant="outline"
-                                          onClick={onOpen}
-                                          variantColor="altGray"
-                                        >
-                                          <UI.Icon mr={1}>
-                                            <PlusCircle />
-                                          </UI.Icon>
-                                          {t('automation:add_condition')}
-                                        </UI.Button>
-                                      )}
-                                    </UI.Div>
-                                  )}
-                                </Dropdown>
-                              )}
-                            />
-                          </UI.Div>
-                        </>
-
+                        <UI.Div alignItems="center" display="flex">
+                          <Controller
+                            key={action?.arrayKey}
+                            name={`actions.${index}.action`}
+                            control={form.control}
+                            defaultValue={action?.action}
+                            render={({ field: { value } }) => (
+                              <Dropdown
+                                defaultCloseOnClickOutside={false}
+                              >
+                                {({ onOpen }) => (
+                                  <UI.Div
+                                    key={action?.arrayKey}
+                                    width="100%"
+                                    justifyContent="center"
+                                    display="flex"
+                                    alignItems="center"
+                                  >
+                                    {value ? (
+                                      <ActionCell
+                                        key={action?.arrayKey}
+                                        onRemove={() => {
+                                          actionsFieldArray.remove(index);
+                                        }}
+                                        action={value}
+                                        onClick={
+                                          () => setCreateModalIsOpen({
+                                            isOpen: true,
+                                            modal: ModalType.CreateAction,
+                                            arrayKey: action?.arrayKey,
+                                          })
+                                        }
+                                      />
+                                    ) : (
+                                      <UI.Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={onOpen}
+                                        variantColor="altGray"
+                                      >
+                                        <UI.Icon mr={1}>
+                                          <PlusCircle />
+                                        </UI.Icon>
+                                        {t('automation:add_condition')}
+                                      </UI.Button>
+                                    )}
+                                  </UI.Div>
+                                )}
+                              </Dropdown>
+                            )}
+                          />
+                        </UI.Div>
                       </UI.Grid>
                     ))}
                     <UI.Div ml={2} mt={4}>
@@ -724,7 +729,6 @@ const AutomationForm = ({
         <CreateConditionModalCard
           onClose={() => setCreateModalIsOpen({ isOpen: false })}
           onSuccess={(condition: ConditionEntry) => {
-            console.log('Created condition automation form:', condition);
             append({ condition: condition as any });
             setActiveConditions((oldConditions) => [...oldConditions, condition]);
           }}
@@ -737,9 +741,25 @@ const AutomationForm = ({
         onClose={() => setCreateModalIsOpen({ isOpen: false })}
       >
         <CreateActionModalCard
-          onClose={() => setCreateModalIsOpen({ isOpen: false })}
-          onSuccess={(action: ActionEntry) => {
+          onClose={() => setCreateModalIsOpen({ isOpen: false, arrayKey: undefined })}
+          onCreate={(action: ActionEntry) => {
             actionsFieldArray.append({ action });
+          }}
+          onUpdate={(action: ActionEntry) => {
+            const updateIndex = actionsFieldArray.fields.findIndex(
+              (field) => field.arrayKey === createModalIsOpen.arrayKey,
+            );
+            actionsFieldArray.update(updateIndex, { action });
+          }}
+          action={() => {
+            const actionEntry = createModalIsOpen?.arrayKey
+              ? actionsFieldArray.fields.find((action) => action.arrayKey === createModalIsOpen.arrayKey)
+              : undefined as any;
+
+            if (!actionEntry) return undefined;
+
+            const action = { type: actionEntry?.action?.type, targets: actionEntry?.action?.targets };
+            return action;
           }}
         />
       </UI.Modal>
@@ -787,8 +807,6 @@ const AutomationForm = ({
           disabled={false}
           onClick={() => {
             const { arrayKey, ...activeConditionBuilder } = activeItem;
-            console.log('ACTIVEEEE: ', activeConditionBuilder);
-            console.log('All conditions: ', conditionFields);
             if (activeItem.isGrouped) {
               childBuilderFieldArray.append(activeConditionBuilder);
             } else {
@@ -805,12 +823,11 @@ const AutomationForm = ({
         </Menu.Item>
         <Menu.Item
           style={{ padding: '6px 12px' }}
-          disabled={activeItem?.depth === 1}
+          disabled // </Menu.Base>={activeItem?.depth === 1}
           onClick={() => {
             const conditionIndex = conditionFields.findIndex((field) => field.arrayKey === activeItem.arrayKey);
 
             const { arrayKey, ...activeConditionBuilder } = activeItem;
-            console.log('Active condition builder ITEM: ', activeConditionBuilder);
             const groupedCondition = { ...activeItem, isGrouped: true };
             childBuilderFieldArray.append(activeConditionBuilder);
             update(conditionIndex, groupedCondition);
