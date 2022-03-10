@@ -127,9 +127,6 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
     });
   };
 
-  console.log('Form watch: ', form.watch());
-  console.log('Form errors: ', form.formState.errors);
-
   return (
     <>
       <UI.ViewHead>

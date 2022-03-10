@@ -74,7 +74,7 @@ interface ActiveVariantFormProps {
 }
 
 const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: ActiveVariantFormProps) => {
-  const activeVariant = form.watch(`variants[${activeVariantIndex}]`) as VariantFormProps;
+  const activeVariant = form.watch(`variants.${activeVariantIndex}`) as VariantFormProps;
   const { t } = useTranslation();
 
   const { customerSlug } = useNavigator();
@@ -109,24 +109,24 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
             defaultValue={activeVariant?.label}
             id={`variants[${activeVariantIndex}].label`}
             isDisabled={isReadOnly}
-            {...form.register(`variants[${activeVariantIndex}].label`)}
+            {...form.register(`variants.${activeVariantIndex}.label`)}
           />
         </UI.FormControl>
 
         <UI.FormControl>
-          <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].from`}>{t('from')}</UI.FormLabel>
+          <UI.FormLabel htmlFor={`variants.${activeVariantIndex}.from`}>{t('from')}</UI.FormLabel>
           <UI.Input
             key={variant.variantIndex}
             defaultValue={activeVariant?.from}
             placeholder={activeVariant.type === 'SMS' ? 'HAAS' : 'noreply@haas.live'}
             id={`variants[${activeVariantIndex}].from`}
-            {...form.register(`variants[${activeVariantIndex}].from`)}
+            {...form.register(`variants.${activeVariantIndex}.from`)}
             isDisabled={isReadOnly}
           />
         </UI.FormControl>
 
         <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].dialogue`}>{t('dialogue')}</UI.FormLabel>
+          <UI.FormLabel htmlFor={`variants.${activeVariantIndex}.dialogue`}>{t('dialogue')}</UI.FormLabel>
           <Controller
             name={`variants[${activeVariantIndex}].dialogue`}
             key={variant.variantIndex}
@@ -136,7 +136,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
               <Select
                 placeholder="Select a dialogue"
                 isDisabled={isReadOnly}
-                id={`variants[${activeVariantIndex}].dialogue`}
+                id={`variants.${activeVariantIndex}.dialogue`}
                 classNamePrefix="select"
                 className="select"
                 defaultOptions
@@ -155,7 +155,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
             key={variant.variantIndex}
             control={form.control}
             defaultValue={activeVariant.type}
-            name={`variants[${activeVariantIndex}].type`}
+            name={`variants.${activeVariantIndex}.type`}
             render={({ field }) => (
               <UI.RadioButtons
                 value={field.value}
@@ -172,7 +172,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
 
         <UI.FormControl isRequired>
           <UI.Flex justifyContent="space-between" alignItems="flex-start">
-            <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].body`}>{t('body')}</UI.FormLabel>
+            <UI.FormLabel htmlFor={`variants.${activeVariantIndex}.body`}>{t('body')}</UI.FormLabel>
             {activeVariant.type === 'SMS' && (
               <UI.Div mb={2}>
                 <UI.ColumnFlex alignItems="flex-end">
@@ -190,14 +190,17 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
           </UI.Flex>
           <Controller
             key={variant.variantIndex}
-            name={`variants[${activeVariantIndex}].body`}
+            name={`variants.${activeVariantIndex}.body`}
             // TODO: Check how id={`variants[${activeVariantIndex}].body`} can be added back
             control={form.control}
             defaultValue={activeVariant.body}
             render={({ field }) => (
               <UI.MarkdownEditor
                 value={field.value}
-                onChange={field.onChange}
+                onChange={(e) => {
+                  // TODO: Fix percentage
+                  field.onChange(e);
+                }}
               />
             )}
           />
