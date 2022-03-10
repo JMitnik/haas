@@ -8,6 +8,7 @@ import {
   OperandType,
   AutomationActionType,
   AutomationConditionBuilderType,
+  Prisma,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { UserInputError } from 'apollo-server-express';
@@ -34,6 +35,7 @@ import {
   UpdateAutomationInput,
 } from './AutomationTypes'
 import { AutomationActionService } from './AutomationActionService';
+import { GenerateReportPayload, TargetsPayload, TargetType } from 'models/users/UserServiceTypes';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -380,7 +382,13 @@ class AutomationService {
   ) => {
     switch (automationAction.type) {
       case AutomationActionType.GENERATE_REPORT: {
-        return this.automationActionService.generateReport(workspaceSlug, dialogueSlug);
+        // TODO: 
+        const payload = (automationAction.payload as unknown) as GenerateReportPayload;
+
+        const users = await this.userService.findTargetUsers(workspaceSlug, payload);
+        const emailAddresses = users.map((user) => user.user.email);
+
+        return this.automationActionService.generateReport(workspaceSlug, emailAddresses, dialogueSlug);
       };
 
       default: {

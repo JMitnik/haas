@@ -1,4 +1,4 @@
-import { PrismaClient, UserOfCustomer, Prisma } from "@prisma/client";
+import { PrismaClient, UserOfCustomer, Prisma } from '@prisma/client';
 
 class UserOfCustomerPrismaAdapter {
   prisma: PrismaClient;
@@ -6,6 +6,40 @@ class UserOfCustomerPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  async findTargetUsers(workspaceSlug: string, targetIds: { userIds: string[]; roleIds: string[] }) {
+    return this.prisma.userOfCustomer.findMany({
+      where: {
+        AND: [
+          {
+            customer: {
+              slug: workspaceSlug,
+            },
+          },
+          {
+            isActive: true, // Inactive users shouldn't receive reports
+          },
+          {
+            OR: [
+              {
+                roleId: {
+                  in: targetIds.roleIds,
+                },
+              },
+              {
+                userId: {
+                  in: targetIds.userIds,
+                },
+              },
+            ],
+          },
+        ],
+      },
+      include: {
+        user: true,
+      },
+    });
+  }
 
   /**
    * Gets all userCustomers by customer-slug.
@@ -58,7 +92,7 @@ class UserOfCustomerPrismaAdapter {
         },
         customer: {
           include: {
-            settings: { include: { colourSettings: true } }
+            settings: { include: { colourSettings: true } },
           },
         },
       },
@@ -74,7 +108,7 @@ class UserOfCustomerPrismaAdapter {
         userId_customerId: {
           customerId,
           userId,
-        }
+        },
       },
       data: {
         role: {
@@ -96,7 +130,7 @@ class UserOfCustomerPrismaAdapter {
         },
         customer: {
           select: {
-            name: true
+            name: true,
           },
         },
       },

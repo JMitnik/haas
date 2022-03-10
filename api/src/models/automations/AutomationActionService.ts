@@ -1,8 +1,9 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 import UserService from '../users/UserService';
 import config from '../../config/config';
 import { ReportLambdaInput, ReportService } from '../../services/report/ReportService';
+import { TargetsPayload } from 'models/users/UserServiceTypes';
 
 export class AutomationActionService {
   private prisma: PrismaClient;
@@ -21,7 +22,9 @@ export class AutomationActionService {
    * @param dialogueSlug
    * @returns
    */
-  public async generateReport(workspaceSlug: string, dialogueSlug?: string) {
+  public async generateReport(workspaceSlug: string, targets: string[], dialogueSlug?: string) {
+    // TODO: Get all email addresses the report should be send to
+
     // Get bot user to create report with
     const botUser = await this.userService.findBotByWorkspaceName(workspaceSlug);
 
@@ -37,6 +40,7 @@ export class AutomationActionService {
       DASHBOARD_URL: dashboardUrl,
       REPORT_URL: reportUrl,
       WORKSPACE_EMAIL: botUser?.email || '',
+      TARGETS: targets,
     }
 
     return this.reportService.generateReport(reportInput);

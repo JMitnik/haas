@@ -7,6 +7,7 @@ export interface ReportLambdaInput {
   AUTHENTICATE_EMAIL: string;
   WORKSPACE_EMAIL: string;
   REPORT_URL: string;
+  TARGETS: string[];
 }
 
 export class ReportService {

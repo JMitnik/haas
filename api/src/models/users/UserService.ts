@@ -11,7 +11,7 @@ import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUp
 import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
-import { DeletedUserOutput, UserWithWorkspaces } from './UserServiceTypes';
+import { DeletedUserOutput, GenerateReportPayload, TargetsPayload, UserWithWorkspaces } from './UserServiceTypes';
 import { offsetPaginate } from '../general/PaginationHelpers';
 
 class UserService {
@@ -25,6 +25,27 @@ class UserService {
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
+  };
+
+  findTargetUsers = async (workspaceSlug: string, payload: GenerateReportPayload) => {
+    const targets = payload?.targets;
+    const roleIds: string[] = [];
+    const userIds: string[] = [];
+
+    targets.forEach((target) => {
+      const tar = target?.target;
+      if (tar.type === 'ROLE') {
+        roleIds.push(tar.value);
+      };
+
+      if (tar.type === 'USER') {
+        userIds.push(tar.value);
+      }
+    });
+
+    const targetIds = { roleIds, userIds };
+
+    return this.userOfCustomerPrismaAdapter.findTargetUsers(workspaceSlug, targetIds);
   };
 
   async deleteUser(userId: string, customerId: string): Promise<DeletedUserOutput> {
@@ -169,7 +190,7 @@ class UserService {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   };
 
-  async setUserStateInWorkspace(input: { userId: string, workspaceId: string, isActive: boolean }) {
+  async setUserStateInWorkspace(input: { userId: string; workspaceId: string; isActive: boolean }) {
     return this.userPrismaAdapter.setIsActive(input);
   }
 
@@ -203,7 +224,7 @@ class UserService {
     const emailBody = makeRoleUpdateTemplate({
       customerName: updatedUser.customer.name,
       recipientMail: updatedUser.user.email,
-      newRoleName: updatedUser.role.name
+      newRoleName: updatedUser.role.name,
     });
 
     mailService.send({
@@ -241,7 +262,7 @@ class UserService {
         firstName: string;
         lastName: string;
         email: string;
-      },
+      };
       role: {
         name: string;
       };
@@ -275,7 +296,7 @@ class UserService {
         firstName: string;
         lastName: string;
         email: string;
-      },
+      };
       role: {
         name: string;
       };
