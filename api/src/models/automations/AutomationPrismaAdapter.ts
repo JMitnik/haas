@@ -364,6 +364,7 @@ export class AutomationPrismaAdapter {
         AND: [
           {
             type: AutomationType.TRIGGER,
+            isActive: true, // Only active automations should be checked
           },
           {
             automationTrigger: {

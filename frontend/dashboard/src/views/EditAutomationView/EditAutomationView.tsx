@@ -211,7 +211,7 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
     actions: input?.automationTrigger?.actions?.map((action) => ({
       action: {
         type: action.type,
-        targets: action.payload.targets,
+        targets: action.payload?.targets || [],
       },
     })) || [],
     conditionBuilder: {

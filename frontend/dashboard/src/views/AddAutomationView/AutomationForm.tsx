@@ -556,7 +556,12 @@ const AutomationForm = ({
                       <UI.Button
                         variantColor="gray"
                         onClick={
-                          () => append({ depth: 0 })
+                          () => append({
+                            depth: 0,
+                            compareTo: undefined,
+                            operator: null,
+                            condition: undefined,
+                          })
                         }
                       >
                         <UI.Icon mr={1}>
