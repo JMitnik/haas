@@ -63,21 +63,15 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
   };
 
   const handleRemoveCTAFromOption = (index: number) => {
-    const choice = choicesForm.fields[index] as any;
     const newChoice = {
-      id: choice.id,
       overrideLeaf: {
         label: undefined,
         value: undefined,
         type: undefined,
       },
-      position: undefined,
-      publicValue: choice.publicValue,
-      value: choice.value,
     };
 
-    choicesForm.remove(index);
-    choicesForm.insert(index, newChoice);
+    choicesForm.update(index, newChoice);
   };
 
   return (
