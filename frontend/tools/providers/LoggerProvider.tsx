@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 import React, { useContext } from 'react';
-import * as Sentry from "@sentry/react";
-import { BrowserTracing } from "@sentry/tracing";
+import * as Sentry from '@sentry/react';
+import { BrowserTracing } from '@sentry/tracing';
 
 const LoggerContext = React.createContext({} as LoggerContextProps);
 
 const sentryDsn = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 if (sentryDsn) {
-  console.log({ sentryDsn });
   Sentry.init({
-    dsn: sentryDsn
+    dsn: sentryDsn,
+    integrations: [new BrowserTracing()],
   });
 }
 
@@ -43,8 +43,8 @@ export const loggerInstance = {
     Sentry.captureException(error, {
       tags: {
         ...context?.tags,
-        meta: 'error-handling'
-      }
+        meta: 'error-handling',
+      },
     });
   },
 };
