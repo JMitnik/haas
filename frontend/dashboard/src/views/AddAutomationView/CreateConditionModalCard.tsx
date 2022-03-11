@@ -19,6 +19,7 @@ import {
 import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { NodeCell } from 'components/NodeCell';
 import { NodePicker } from 'components/NodePicker';
+import { QuestionNodePicker } from 'components/NodePicker/QuestionNodePicker';
 import { useCustomer } from 'providers/CustomerProvider';
 import Dropdown from 'components/Dropdown';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
@@ -30,7 +31,34 @@ interface NewCTAModalCardProps {
 
 const schema = yup.object().shape({
   scopeType: yup.string().required(),
-  // activeDialogue: yup.string().notRequired(),
+  activeDialogue: yup.object().shape({
+    type: yup.string().required(),
+    value: yup.string().required(),
+    label: yup.string().required(),
+    id: yup.string().required(),
+  }).required(),
+  activeQuestion: yup.object().shape({
+    type: yup.string().required(),
+    value: yup.string().required(),
+    label: yup.string().required(),
+  }),
+  aspect: yup.string().required(),
+  questionOption: yup.object().when('activeQuestion', {
+    is: (activeQuestion: { type: QuestionNodeTypeEnum }) => activeQuestion?.type === QuestionNodeTypeEnum.Choice
+      || activeQuestion?.type === QuestionNodeTypeEnum.VideoEmbedded,
+    then: yup.object().shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+    }).required(),
+    otherwise: yup.object().shape({
+      label: yup.string(), // .required(),
+      value: yup.string(), // .required(),
+    }).notRequired().nullable(true),
+  }),
+  aggregate: yup.mixed<ConditionPropertyAggregateType>().oneOf(
+    Object.values(ConditionPropertyAggregateType),
+  ).required(),
+  latest: yup.number().required(),
 });
 
 type TwoDateArray = [Date, Date];
@@ -85,7 +113,8 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
     mode: 'onChange',
     shouldUnregister: false,
     defaultValues: {
-      scopeType: 'QUESTION',
+      scopeType: AutomationConditionScopeType.Question,
+      aspect: QuestionAspectType.NodeValue,
       latest: 1,
     },
   });
@@ -150,7 +179,6 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
   const watchAspectType = useWatch({
     control: form.control,
     name: 'aspect',
-    defaultValue: '',
   });
 
   const watchLatest = useWatch({
@@ -178,6 +206,17 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
       form.setValue('activeQuestion', null);
     }
   }, [watchActiveDialogue]);
+
+  useEffect(() => {
+    if (watchActiveQuestion?.type === QuestionNodeTypeEnum.Choice
+      || watchActiveQuestion?.type === QuestionNodeTypeEnum.VideoEmbedded) {
+      form.setValue('aggregate', ConditionPropertyAggregateType.Count);
+      form.trigger();
+    } else if (watchActiveQuestion?.type === QuestionNodeTypeEnum.Slider) {
+      form.setValue('aggregate', ConditionPropertyAggregateType.Avg);
+      form.trigger();
+    }
+  }, [watchActiveQuestion]);
 
   return (
     <UI.ModalCard maxWidth={1000} onClose={onClose}>
@@ -349,11 +388,11 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                                     render={({ field: { value, onChange } }) => (
                                       <Dropdown
                                         isRelative
-                                        renderOverlay={({ onClose: onDialoguePickerClose }) => (
-                                          <NodePicker
+                                        renderOverlay={({ onClose: onQuestionPickerClose }) => (
+                                          <QuestionNodePicker
                                             // Handle items (in this case dialogues)
                                             items={questionItems}
-                                            onClose={onDialoguePickerClose}
+                                            onClose={onQuestionPickerClose}
                                             onChange={onChange}
                                           />
                                         )}
@@ -422,31 +461,36 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                       </UI.FormControl>
                     )}
 
-                    {watchAspectType === 'NODE_VALUE' && (
-                      // TODO: Add check if selected question is choice or videoembedded before showing this field
-                      <UI.FormControl isRequired>
-                        <UI.FormLabel htmlFor="questionOption">{t('automation:question_option')}</UI.FormLabel>
-                        <Controller
-                          name="questionOption"
-                          control={form.control}
-                          defaultValue={null}
-                          render={({ field: { value, onChange, onBlur } }) => (
-                            <Select
-                              placeholder="Select a dialogue"
-                              id="questionOption"
-                              classNamePrefix="select"
-                              className="select"
-                              isLoading={loading}
-                              defaultOptions
-                              options={questionOptions}
-                              value={value}
-                              onChange={onChange}
-                              onBlur={onBlur}
-                            />
-                          )}
-                        />
-                      </UI.FormControl>
-                    )}
+                    {watchAspectType === 'NODE_VALUE'
+                      && (
+                        watchActiveQuestion?.type === QuestionNodeTypeEnum.Choice
+                        || watchActiveQuestion?.type === QuestionNodeTypeEnum.VideoEmbedded
+                      )
+                      && (
+                        // TODO: Add check if selected question is choice or videoembedded before showing this field
+                        <UI.FormControl isRequired>
+                          <UI.FormLabel htmlFor="questionOption">{t('automation:question_option')}</UI.FormLabel>
+                          <Controller
+                            name="questionOption"
+                            control={form.control}
+                            defaultValue={null}
+                            render={({ field: { value, onChange, onBlur } }) => (
+                              <Select
+                                placeholder="Select a question option"
+                                id="questionOption"
+                                classNamePrefix="select"
+                                className="select"
+                                isLoading={loading}
+                                defaultOptions
+                                options={questionOptions}
+                                value={value}
+                                onChange={onChange}
+                                onBlur={onBlur}
+                              />
+                            )}
+                          />
+                        </UI.FormControl>
+                      )}
 
                   </UI.InputGrid>
                 </UI.Div>
@@ -469,12 +513,15 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                         render={({ field: { onBlur, onChange, value } }) => (
                           <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                             <UI.RadioButton
+                              isDisabled={watchActiveQuestion?.type !== QuestionNodeTypeEnum.Slider}
                               value="AVG"
                               mr={2}
                               text={(t('automation:average'))}
                               description={(t('automation:average_helper'))}
                             />
                             <UI.RadioButton
+                              isDisabled={watchActiveQuestion?.type !== QuestionNodeTypeEnum.Choice
+                                && watchActiveQuestion?.type !== QuestionNodeTypeEnum.VideoEmbedded}
                               value="COUNT"
                               mr={2}
                               text={(t('automation:count'))}

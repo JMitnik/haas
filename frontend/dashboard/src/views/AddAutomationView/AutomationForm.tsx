@@ -327,8 +327,6 @@ const AutomationForm = ({
     }
   };
 
-  console.log('Watch logical: ', watchLogicalBuilder);
-
   return (
     <>
       <UI.FormContainer>

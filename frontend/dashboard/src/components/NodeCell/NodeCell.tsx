@@ -74,7 +74,7 @@ export const NodeCell = ({ node, onClick, onRemove }: NodeCellProps) => {
             bg={nodeProps.bg}
             color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}
           >
-            {node.type}
+            {node.type?.replaceAll('_', ' ')}
           </UI.MicroLabel>
         </UI.Div>
       </UI.Flex>

@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
+import { ActionEntry } from './CreateActionModalCard';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { ActionEntry } from './CreateActionModalCard';
 
 export const NodeCellContainer = styled.div`
   ${({ theme }) => css`
@@ -43,8 +43,6 @@ interface NodeCellProps {
 
 export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
   if (!action.type) return null;
-
-  console.log('Action Cell: ', action);
 
   const removeCTAFromOption = (e: any) => {
     e.stopPropagation();

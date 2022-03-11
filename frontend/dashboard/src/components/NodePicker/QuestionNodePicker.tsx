@@ -20,12 +20,13 @@ const DropdownOption = (props: any) => {
       <components.Option {...props}>
         <UI.Flex>
           <UI.Icon
+            display="flex"
             bg={nodeProps.bg}
             color={nodeProps.color}
             height="2rem"
             width="2rem"
             stroke={nodeProps.stroke || undefined}
-            style={{ flexShrink: 0 }}
+            style={{ justifyContent: 'center', flexShrink: 0 }}
             mr={3}
           >
             <nodeProps.icon />
@@ -38,7 +39,7 @@ const DropdownOption = (props: any) => {
               bg={nodeProps.bg}
               color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}
             >
-              {props.data.type}
+              {props.data?.type?.replaceAll('_', ' ')}
             </UI.MicroLabel>
           </UI.Div>
         </UI.Flex>
@@ -65,39 +66,13 @@ interface NodeSelect extends Partial<QuestionNode> {
 interface NodePickerProps {
   onChange: (node: NodeSelect) => void;
   items: NodeSelect[];
-  onModalOpen?: () => void;
-  onModalClose?: () => void;
   onClose?: () => void;
 }
 
-export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose }: NodePickerProps) => {
+export const QuestionNodePicker = ({ onChange, onClose, items }: NodePickerProps) => {
   const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
   const { t } = useTranslation();
-  const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
-
-  const handleChange = (callToAction: QuestionNode) => {
-    onChange({
-      id: callToAction.id,
-      type: callToAction.type,
-      label: callToAction.title,
-      value: callToAction.id,
-    });
-    setCreateModalIsOpen(false);
-    onClose?.();
-  };
-
-  const handleOpenModal = () => {
-    setCreateModalIsOpen(true);
-  };
-
-  useEffect(() => {
-    if (createModalIsOpen) {
-      onModalOpen?.();
-    } else {
-      onModalClose?.();
-    }
-  }, [createModalIsOpen]);
 
   useEffect(() => {
     if (!filteredState) {
@@ -111,18 +86,7 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
     <UI.List maxWidth={300}>
       <UI.CloseButton onClose={onClose} />
       <NodePickerHeader>
-        <UI.ListHeader style={{ borderBottom: 0 }}>{t('call_to_action')}</UI.ListHeader>
-
-        <UI.Button
-          leftIcon={Plus}
-          variantColor="teal"
-          ml={0}
-          size="xs"
-          onClick={() => handleOpenModal()}
-        >
-          {t('new')}
-        </UI.Button>
-
+        <UI.ListHeader style={{ borderBottom: 0 }}>{t('question')}</UI.ListHeader>
       </NodePickerHeader>
 
       <UI.ListItem
@@ -141,22 +105,22 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
                 {t('all')}
               </UI.SwitchItem>
               <UI.SwitchItem
-                isActive={filteredState === QuestionNodeTypeEnum.Link}
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.Link)}
+                isActive={filteredState === QuestionNodeTypeEnum.Slider}
+                onClick={() => setFilteredState(QuestionNodeTypeEnum.Slider)}
               >
-                {t('link')}
+                {t('slider')}
               </UI.SwitchItem>
               <UI.SwitchItem
-                isActive={filteredState === QuestionNodeTypeEnum.Share}
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.Share)}
+                isActive={filteredState === QuestionNodeTypeEnum.Choice}
+                onClick={() => setFilteredState(QuestionNodeTypeEnum.Choice)}
               >
-                {t('share')}
+                {t('choice')}
               </UI.SwitchItem>
               <UI.SwitchItem
-                isActive={filteredState === QuestionNodeTypeEnum.Form}
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.Form)}
+                isActive={filteredState === QuestionNodeTypeEnum.VideoEmbedded}
+                onClick={() => setFilteredState(QuestionNodeTypeEnum.VideoEmbedded)}
               >
-                {t('form')}
+                {t('video')}
               </UI.SwitchItem>
             </UI.Switch>
           </UI.Div>
@@ -185,15 +149,6 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
           </UI.Div>
         </UI.Div>
       </UI.ListItem>
-
-      <UI.Modal willCloseOnOutsideClick={false} isOpen={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
-        <CreateCallToActionModalCard
-          onClose={() => setCreateModalIsOpen(false)}
-          onSuccess={(callToAction: any) => {
-            handleChange(callToAction);
-          }}
-        />
-      </UI.Modal>
     </UI.List>
   );
 };
