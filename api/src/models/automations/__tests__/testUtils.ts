@@ -116,7 +116,7 @@ export const seedAutomation = async (
                   // },
                 ],
               },
-            }
+            },
           },
           actions: {
             create: [
@@ -161,7 +161,7 @@ export const seedAutomation = async (
                   question: true,
                 },
               },
-            }
+            },
           },
           actions: true,
         },
