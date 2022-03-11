@@ -3,6 +3,8 @@ export * from './graphql/AutomationType';
 export * from './graphql/GetAutomationsByWorkspaceResolver';
 export * from './graphql/CreateAutomationResolver';
 export * from './graphql/UpdateAutomationResolver';
+export * from './graphql/EnableAutomationResolver';
+export * from './graphql/DeleteAutomationResolver';
 export * from './graphql/AutomationConnection';
 export * from './graphql/AutomationEvent';
 export * from './graphql/AutomationEventType';
