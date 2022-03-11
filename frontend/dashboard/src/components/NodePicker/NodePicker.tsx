@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import * as UI from '@haas/ui';
 import { Plus } from 'react-feather';
 import { components } from 'react-select';

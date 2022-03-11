@@ -18,7 +18,6 @@ import {
 } from 'types/generated-types';
 import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { NodeCell } from 'components/NodeCell';
-import { NodePicker } from 'components/NodePicker';
 import { QuestionNodePicker } from 'components/NodePicker/QuestionNodePicker';
 import { useCustomer } from 'providers/CustomerProvider';
 import Dropdown from 'components/Dropdown';
@@ -51,8 +50,8 @@ const schema = yup.object().shape({
       value: yup.string().required(),
     }).required(),
     otherwise: yup.object().shape({
-      label: yup.string(), // .required(),
-      value: yup.string(), // .required(),
+      label: yup.string(),
+      value: yup.string(),
     }).notRequired().nullable(true),
   }),
   aggregate: yup.mixed<ConditionPropertyAggregateType>().oneOf(
@@ -467,7 +466,6 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                         || watchActiveQuestion?.type === QuestionNodeTypeEnum.VideoEmbedded
                       )
                       && (
-                        // TODO: Add check if selected question is choice or videoembedded before showing this field
                         <UI.FormControl isRequired>
                           <UI.FormLabel htmlFor="questionOption">{t('automation:question_option')}</UI.FormLabel>
                           <Controller

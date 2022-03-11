@@ -1,7 +1,8 @@
 import * as UI from '@haas/ui';
-import { ActionEntry } from './CreateActionModalCard';
 import React from 'react';
 import styled, { css } from 'styled-components';
+
+import { ActionEntry } from './CreateActionModalCard';
 
 export const NodeCellContainer = styled.div`
   ${({ theme }) => css`
