@@ -199,7 +199,6 @@ const CTAForm = ({
         position: 'bottom-right',
         duration: 1500,
       });
-      console.log('CREATED CTA: ', data.createCTA);
       const CTA: MappedCTANode = {
         value: data.createCTA.id,
         label: data.createCTA.title,

@@ -39,7 +39,7 @@ export const NodeCellContainer = styled.div`
 interface NodeCellProps {
   action: ActionEntry;
   onClick?: () => void;
-  onRemove: () => void;
+  onRemove?: () => void;
 }
 
 export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
@@ -47,7 +47,7 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
 
   const removeCTAFromOption = (e: any) => {
     e.stopPropagation();
-    onRemove();
+    onRemove?.();
   };
 
   return (
@@ -55,7 +55,9 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
       onClick={onClick}
       style={{ margin: 0, padding: '8px 12px', width: '100%', position: 'relative' }}
     >
-      <UI.CloseButton onClose={removeCTAFromOption} top="5px" right="5px" />
+      {onRemove && (
+        <UI.CloseButton onClose={removeCTAFromOption} top="5px" right="5px" />
+      )}
       <UI.Flex width="100%">
         {/* <UI.Icon
           bg={nodeProps.bg}

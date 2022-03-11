@@ -125,7 +125,7 @@ const schema = yup.object({
         ),
       }).nullable(),
     }),
-  ).required(), // TODO: Change to required once front-end is ready
+  ).required(),
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
@@ -267,7 +267,6 @@ const AutomationForm = ({
     name: 'actions',
     control: form.control,
     keyName: 'arrayKey',
-
   });
 
   const watchLogicalBuilder = useWatch({
@@ -275,10 +274,7 @@ const AutomationForm = ({
     control: form.control,
   });
 
-  console.log('Acitions field array: ', actionsFieldArray.fields);
-
   const onSubmit = (formData: FormDataProps) => {
-    console.log('Form data; ', formData);
     // TODO: Create a field for event type
     // TODO: Create a picker for questionId/dialogueId for event
     // TODO: Add childbuilder
@@ -605,8 +601,6 @@ const AutomationForm = ({
                 border="1px solid #edf2f7"
                 borderRadius="10px"
                 padding={2}
-              // paddingLeft={0}
-              // paddingRight={0}
               >
                 {(actionsFieldArray.fields.length) ? (
                   <>
@@ -617,8 +611,6 @@ const AutomationForm = ({
                     {actionsFieldArray.fields.map((action: any, index) => (
                       <UI.Grid
                         key={action?.arrayKey}
-                        // ml={2}
-                        // mr={2}
                         p={2}
                         borderRadius="6px"
                         borderBottom="1px solid #edf2f7"
@@ -626,12 +618,13 @@ const AutomationForm = ({
                         backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
                         position="relative"
                       >
-                        <UI.Div alignItems="center" display="flex">
+                        <UI.Div key={action?.arrayKey} alignItems="center" display="flex">
                           <Controller
                             key={action?.arrayKey}
                             name={`actions.${index}.action`}
                             control={form.control}
                             defaultValue={action?.action}
+                            shouldUnregister
                             render={({ field: { value } }) => (
                               <Dropdown
                                 defaultCloseOnClickOutside={false}
@@ -647,9 +640,9 @@ const AutomationForm = ({
                                     {value ? (
                                       <ActionCell
                                         key={action?.arrayKey}
-                                        onRemove={() => {
+                                        onRemove={actionsFieldArray.fields.length > 1 ? () => {
                                           actionsFieldArray.remove(index);
-                                        }}
+                                        } : undefined}
                                         action={value}
                                         onClick={
                                           () => setCreateModalIsOpen({

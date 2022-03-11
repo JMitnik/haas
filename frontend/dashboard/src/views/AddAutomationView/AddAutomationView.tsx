@@ -16,10 +16,8 @@ const AddAutomationView = () => {
   const { t } = useTranslation();
 
   const [createAutomation, { loading }] = useCreateAutomationMutation({
-    onCompleted: (data) => {
-      console.log('return data create automation mutation: ', data?.createAutomation?.label);
+    onCompleted: () => {
       goToAutomationOverview();
-      // TODO: Go back to automations overview
     },
     onError: (e) => {
       console.log('Something went wrong: ', e.message);

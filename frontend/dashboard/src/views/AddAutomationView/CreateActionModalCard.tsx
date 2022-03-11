@@ -104,7 +104,6 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
   });
 
   const onSubmit = (formData: ActionEntry) => {
-    console.log('Form data: ', formData);
     if (activeAction) {
       onUpdate(formData);
     } else {

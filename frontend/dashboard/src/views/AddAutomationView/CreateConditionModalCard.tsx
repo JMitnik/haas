@@ -129,7 +129,6 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
       questionOption: formData.questionOption?.value,
       latest: formData.latest,
     };
-    console.log('Return data: ', returnData);
     onSuccess(returnData);
     onClose();
   };
