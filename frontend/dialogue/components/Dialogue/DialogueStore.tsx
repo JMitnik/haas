@@ -1,8 +1,9 @@
 import create from 'zustand';
+import { loggerInstance } from '@haas/tools';
 
-import { logger } from '../../tools/logger';
 import {
   Dialogue,
+  Workspace,
   QuestionNode as QuestionNodeType,
   SessionEvent,
   SessionState,
@@ -13,10 +14,12 @@ import { POSTLEAFNODE_ID } from '../PostLeafNode/PostLeafNode';
 interface DialogueState {
   idToNode: Record<string, GeneratedQuestionNode> | undefined;
   dialogue: Dialogue | undefined;
+  workspace: Workspace | undefined;
+
   sessionId: string | null;
   isInitializing: boolean;
 
-  initialize: (dialogue: Dialogue, sessionId: string) => void;
+  initialize: (dialogue: Dialogue, workspace: Workspace, sessionId: string) => void;
 
   /** Track past-present-future of state-action-rewards. **/
   activeEvent: SessionEvent;
@@ -45,6 +48,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
   sessionId: null,
   idToNode: undefined,
   dialogue: undefined,
+  workspace: undefined,
   isInitializing: true,
 
   activeEvent: undefined,
@@ -53,7 +57,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
 
   uploadEvents: [],
 
-  initialize: (dialogue: Dialogue, sessionId: string,) => {
+  initialize: (dialogue: Dialogue, workspace: Workspace, sessionId: string,) => {
     const allNodes = [...dialogue?.questions, ...dialogue.leafs];
 
     const idToNode = allNodes.reduce((lookup, node) => {
@@ -76,6 +80,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
     set({
       idToNode,
       dialogue,
+      workspace,
       activeEvent: initialState,
       isInitializing: false,
     });
@@ -101,9 +106,6 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
         activeCallToActionId: event.reward?.overrideCallToActionId || currentState.activeEvent.state.activeCallToActionId,
         nodeId: event.reward?.toNode || updatedEvent.state.activeCallToActionId || POSTLEAFNODE_ID,
       };
-
-      console.log({ updatedEvent });
-      console.log({ nextState });
 
       nextEvent = {
         sessionId: currentState.sessionId,
@@ -145,7 +147,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
     } else if (nextNodeId === pastState) {
       get().undoEvent()
     } else {
-      logger.log('Not forward or backward');
+      loggerInstance.log('Not forward or backward');
     }
   },
   redoEvent: () => {

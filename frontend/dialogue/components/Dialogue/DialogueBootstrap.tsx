@@ -6,6 +6,7 @@ import AppProviders from '../../config/AppProviders';
 import * as LS from './DialogueStyles';
 import { DialogueRoutes } from '../Navigation/DialogueRoutes';
 import { useDialogueStore } from './DialogueStore';
+import { RunnerLoader } from '../RunnerLoader/RunnerLoader';
 
 interface DialogueBootstrapProps {
   onEventUpload: (events: SessionActionInput[]) => void;
@@ -26,11 +27,12 @@ export const DialogueBootstrap = ({ dialogue, workspace, onEventUpload, sessionI
   }));
 
   useEffect(() => {
-    initialize(dialogue, sessionId);
-  }, [initialize, dialogue, sessionId]);
+    initialize(dialogue, workspace, sessionId);
+  }, [initialize, dialogue, workspace, sessionId]);
 
+  // TODO: Load a runner for the dialogue.
   if (isInitializing) {
-    return null;
+    return <RunnerLoader color="#000" />;
   }
 
   return (
