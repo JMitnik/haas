@@ -35,10 +35,10 @@ export const QuestionNodeLayout = ({ children }: NodeLayoutProps) => {
       </UI.Div>
 
       {willCenterLogo && (
-        <UI.AbsoluteCentered opacity={dialogueLogoOpacity}>
+        <UI.AbsoluteCentered width={200}>
           <img
             src={dialogueLogoUrl}
-            style={{ opacity: dialogueLogoOpacity, width: 200 }}
+            style={{ opacity: dialogueLogoOpacity }}
             alt={workspace.name}
           />
         </UI.AbsoluteCentered>

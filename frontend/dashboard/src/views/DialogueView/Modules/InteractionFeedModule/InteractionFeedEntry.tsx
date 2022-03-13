@@ -12,6 +12,7 @@ import parseNodeEntryValue from 'utils/parseNodeEntryValue';
 import scoreToColors from 'utils/scoreToColors';
 
 import { InteractionFeedEntryContainer, InteractionFeedEntryValueContainer } from './InteractionFeedEntryStyles';
+import { ErrorBoundary } from 'react-error-boundary';
 
 export const NodeTypeIcon = ({ node }: { node: QuestionNode | null }) => {
   if (!node?.type) return <Div />;
@@ -84,16 +85,15 @@ export const EntryBreadCrumbContainer = styled(Div) <{ score?: number | null, is
 export const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }) => {
   const { t } = useTranslation();
   return (
-    <Flex>
-      {nodeEntries.map((entry, index) => (
-        <Tooltip
-          zIndex={400}
-          key={index}
-          hasArrow
-          aria-label={parseNodeEntryValue(entry, t)?.toString() || ''}
-          placement="top"
-          label={parseNodeEntryValue(entry, t)?.toString()}
-        >
+    <ErrorBoundary onError={(e) => {
+      console.info(e);
+    }} FallbackComponent={() => (
+      <div>
+
+      </div>
+    )}>
+      <Flex>
+        {nodeEntries.map((entry, index) => (
           <EntryBreadCrumbContainer
             isInline
             pr={3}
@@ -102,9 +102,9 @@ export const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }
           >
             <NodeTypeIcon node={entry.relatedNode || null} />
           </EntryBreadCrumbContainer>
-        </Tooltip>
-      ))}
-    </Flex>
+        ))}
+      </Flex>
+    </ErrorBoundary>
   );
 };
 
