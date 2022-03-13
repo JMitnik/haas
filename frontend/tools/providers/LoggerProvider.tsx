@@ -35,9 +35,15 @@ interface LoggerProviderProps {
 }
 
 export const loggerInstance = {
+  /**
+   * Log messages in console (allowed in production).
+   */
   log: (message: string) => {
     console.log(message);
   },
+  /**
+   * Log error messages in console (allowed in production), and send error to Sentry.
+   */
   error: (message: string, error?: Error, context?: LoggerErrorContext) => {
     if (error) {
       console.error(message, `${error.message} ${error.stack}`);
