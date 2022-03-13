@@ -74,7 +74,7 @@ const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
 
   const fields = node?.form?.fields as FormNodeField[];
 
-  const handleRunAction = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleRunAction = (event: React.FormEvent<HTMLFormElement>, ignoreFields = false) => {
     event.preventDefault();
     const formEntry = form.getValues();
 
@@ -94,7 +94,7 @@ const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
         type: SessionActionType.FormAction,
         // TODO: Add form values
         timeSpent: Math.floor(Date.now() - startTime.current),
-        form: { values: formFieldValues },
+        form: ignoreFields ? undefined : { values: formFieldValues },
       },
       reward: {
         overrideCallToActionId: node.overrideLeafId,

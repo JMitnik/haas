@@ -101,10 +101,18 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
         timestamp: Date.now(),
       };
 
+      // New active call-to-action is either the call-to-action from the latest event, or the previous one.
+      let nextActiveCallToActionId = event.reward?.overrideCallToActionId || updatedEvent.state.activeCallToActionId;
+
+      // If we are on the same node as the call-to-action node, we need to unset the call-to-action
+      if (updatedEvent.state.nodeId === nextActiveCallToActionId) {
+        nextActiveCallToActionId = undefined;
+      }
+
       // Update the state for the next event.
       const nextState: SessionState = {
-        activeCallToActionId: event.reward?.overrideCallToActionId || currentState.activeEvent.state.activeCallToActionId,
-        nodeId: event.reward?.toNode || updatedEvent.state.activeCallToActionId || POSTLEAFNODE_ID,
+        activeCallToActionId: nextActiveCallToActionId,
+        nodeId: event.reward?.toNode || nextActiveCallToActionId || POSTLEAFNODE_ID,
       };
 
       nextEvent = {

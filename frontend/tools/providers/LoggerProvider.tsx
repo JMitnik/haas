@@ -17,7 +17,7 @@ if (sentryDsn) {
 
 interface Logger {
   log: (message: string) => void;
-  error: (message: string, error: Error, context?: LoggerErrorContext) => void;
+  error: (message: string, error?: Error, context?: LoggerErrorContext) => void;
 }
 
 interface LoggerErrorContext {
@@ -38,14 +38,18 @@ export const loggerInstance = {
   log: (message: string) => {
     console.log(message);
   },
-  error: (message: string, error: Error, context?: LoggerErrorContext) => {
-    console.error(message, `${error.message} ${error.stack}`);
-    Sentry.captureException(error, {
-      tags: {
-        ...context?.tags,
-        meta: 'error-handling',
-      },
-    });
+  error: (message: string, error?: Error, context?: LoggerErrorContext) => {
+    if (error) {
+      console.error(message, `${error.message} ${error.stack}`);
+      Sentry.captureException(error, {
+        tags: {
+          ...context?.tags,
+          meta: 'error-handling',
+        },
+      });
+    } else {
+      console.error(message);
+    }
   },
 };
 

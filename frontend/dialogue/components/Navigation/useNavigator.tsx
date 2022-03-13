@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router';
+import { useLogger } from '@haas/tools';
 
 import { POSTLEAFNODE_ID } from '../PostLeafNode/PostLeafNode';
 import { SessionEvent } from '../../types/core-types';
@@ -31,35 +32,24 @@ export interface UseNavigatorProps {
  */
 export const useNavigator = ({ dialogueSlug, workspaceSlug }: UseNavigatorProps) => {
   const navigate = useNavigate();
+  const { logger } = useLogger();
 
   /**
    * The transition function dictates where to go next based on the input parameters and available state.
    * @param currentStateType State type: Node, CTA or FINISHER
    */
   const transition = ({ state }: SessionEvent) => {
-    // If we have a child node, navigate to it.
+    // If we have a node-id in the state, go there (can be regular question-node, CTA or FINISHER)
     if (state.nodeId) {
       navigate(`/${workspaceSlug}/${dialogueSlug}/n/${state.nodeId}`);
       return;
     }
 
-    const activeCallToActionId = state.activeCallToActionId;
-
-    // If we have no active call to action, go to the finisher.
-    if (!activeCallToActionId) {
+    // If we don't have any node to go to, we default to the FINISHER. This is however a bug, as the `applyEvent`,
+    // should ensure that a state.nodeID is always present, even if it is FINISHER.
+    if (!state.nodeId) {
+      logger.error('No nodeId in state, defaulting to FINISHER. This should not happen.');
       navigate(`/${workspaceSlug}/${dialogueSlug}/n/${POSTLEAFNODE_ID}`);
-      return;
-    }
-
-    // If we are on the active Call-to-action already, go to the finisher
-    if (activeCallToActionId && state.nodeId === activeCallToActionId) {
-      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${POSTLEAFNODE_ID}`);
-      return;
-    }
-
-    // If we go to the activeCallToAction, go to the activeCallToAction.
-    if (activeCallToActionId && state.nodeId !== activeCallToActionId) {
-      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${activeCallToActionId}`);
       return;
     }
   };
