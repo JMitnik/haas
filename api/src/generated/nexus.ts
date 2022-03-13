@@ -104,6 +104,7 @@ export interface NexusGenInputs {
     customerSlug?: string | null; // String
     description?: string | null; // String
     dialogueSlug?: string | null; // String
+    id?: string | null; // String
     isSeed?: boolean | null; // Boolean
     language?: NexusGenEnums['LanguageEnumType'] | null; // LanguageEnumType
     publicTitle?: string | null; // String

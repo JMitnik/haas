@@ -177,6 +177,7 @@ export type CreateDialogueInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   dialogueSlug?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
   isSeed?: Maybe<Scalars['Boolean']>;
   language?: Maybe<LanguageEnumType>;
   publicTitle?: Maybe<Scalars['String']>;

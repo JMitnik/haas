@@ -148,6 +148,7 @@ input CreateDialogueInputType {
   customerSlug: String
   description: String
   dialogueSlug: String
+  id: String
   isSeed: Boolean
   language: LanguageEnumType
   publicTitle: String

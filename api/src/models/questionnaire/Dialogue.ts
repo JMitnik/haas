@@ -40,7 +40,7 @@ export const DialogueFinisherType = objectType({
     t.id('id');
     t.string('header');
     t.string('subtext');
-  }
+  },
 });
 
 export const DialogueType = objectType({
@@ -69,13 +69,13 @@ export const DialogueType = objectType({
       resolve(parent, args, ctx) {
         if (!parent.postLeafNodeId) {
           return null
-        };
+        }
         return ctx.prisma.postLeafNode.findFirst({
           where: {
             id: parent.postLeafNodeId,
-          }
+          },
         });
-      }
+      },
     });
 
     t.field('averageScore', {
@@ -237,7 +237,7 @@ export const DialogueType = objectType({
       // @ts-ignore
       resolve: (parent, args, ctx) => {
         return ctx.services.dialogueService.getCampaignVariantsByDialogueId(parent.id);
-      }
+      },
     })
   },
 });
@@ -273,6 +273,7 @@ export const CreateDialogueInputType = inputObjectType({
     t.boolean('isSeed');
     t.string('contentType');
 
+    t.string('id', { required: false });
     t.string('templateDialogueId', { nullable: true });
     t.string('publicTitle', { nullable: true });
 

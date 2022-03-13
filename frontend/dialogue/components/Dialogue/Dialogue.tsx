@@ -19,6 +19,7 @@ import { QuestionNodeProps as GenericQuestionNodeProps } from '../QuestionNode/Q
 import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
 import { SessionEventInput } from '../../types/generated-types';
 import { useSession } from '../Session/SessionProvider';
+import { VideoNode } from '../VideoNode/VideoNode';
 
 interface DialogueProps {
   dialogue: DialogueType;
@@ -33,7 +34,7 @@ const NodeComponent: { [key in QuestionNodeTypeEnum]?: React.FC<GenericQuestionN
   [QuestionNodeTypeEnum.Link]: LinkNode,
   [QuestionNodeTypeEnum.Registration]: ChoiceNode,
   [QuestionNodeTypeEnum.Share]: ShareNode,
-  [QuestionNodeTypeEnum.VideoEmbedded]: ChoiceNode,
+  [QuestionNodeTypeEnum.VideoEmbedded]: VideoNode,
   [QuestionNodeTypeEnum.Generic]: PostLeafNode,
 };
 

@@ -97,14 +97,6 @@ export const createSeedTables = async () => {
       user: { connect: { id: 'USER_admin_1' } },
     },
   });
-
-  // await prisma.userOfCustomer.create({
-  //   data: {
-  //     customer: { connect: { id: 'WORKSPACE_1' } },
-  //     role: { connect:{ id: botRole.id }  },
-  //     user: { connect: { id: 'BOT_admin_1' } },
-  //   },
-  // });
 };
 
 export const seed = async () => {

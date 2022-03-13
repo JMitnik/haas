@@ -175,6 +175,7 @@ export type CreateDialogueInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   dialogueSlug?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
   isSeed?: Maybe<Scalars['Boolean']>;
   language?: Maybe<LanguageEnumType>;
   publicTitle?: Maybe<Scalars['String']>;
@@ -2009,7 +2010,7 @@ export type EdgeFragmentFragment = (
 
 export type QuestionNodeFragmentFragment = (
   { __typename?: 'QuestionNode' }
-  & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'isLeaf' | 'type'>
+  & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'isLeaf' | 'type' | 'extraContent'>
   & { children: Array<(
     { __typename?: 'Edge' }
     & { parentNode?: Maybe<(
@@ -2083,6 +2084,7 @@ export const QuestionNodeFragmentFragmentDoc = gql`
   isRoot
   isLeaf
   type
+  extraContent
   children {
     ...EdgeFragment
     parentNode {

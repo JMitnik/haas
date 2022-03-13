@@ -7,3 +7,7 @@ export const lighten = (color: string, fraction: number): string => {
 export const darken = (color: string, fraction: number): string => {
   return chroma(color).darken(fraction).hex();
 }
+
+export const saturate = (color: string, fraction: number): string => {
+  return chroma(color).saturate(fraction).hex();
+}

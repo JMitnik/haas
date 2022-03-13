@@ -9,7 +9,7 @@ import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import {
   HistoryDataProps, HistoryDataWithEntry, IdMapProps,
-  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType
+  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType,
 } from './DialogueTypes';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
@@ -50,7 +50,7 @@ class DialogueService {
     const tags = entries?.map((entryId) => ({ id: entryId })) || [];
 
     return this.dialoguePrismaAdapter.connectTags(dialogueId, tags);
-  };
+  }
 
   async getFilteredDialogues(searchTerm?: string | null | undefined) {
     let dialogues = await this.dialoguePrismaAdapter.getAllDialoguesWithTags();
@@ -60,11 +60,11 @@ class DialogueService {
     }
 
     return dialogues;
-  };
+  }
 
   getDialogueById(dialogueId: string): Promise<Dialogue | null> {
     return this.dialoguePrismaAdapter.getDialogueById(dialogueId);
-  };
+  }
 
   async getCTAsByDialogueId(dialogueId: string, searchTerm?: string | null | undefined) {
     const leafs = await this.dialoguePrismaAdapter.getCTAsByDialogueId(dialogueId);
@@ -72,10 +72,10 @@ class DialogueService {
     if (searchTerm) {
       const lowerCasedSearch = searchTerm.toLowerCase();
       return leafs.filter((leaf) => leaf.title.toLowerCase().includes(lowerCasedSearch));
-    };
+    }
 
     return leafs;
-  };
+  }
 
   getCampaignVariantsByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getCampaignVariantsByDialogueId(dialogueId);
@@ -83,41 +83,41 @@ class DialogueService {
 
   getQuestionsByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getQuestionsByDialogueId(dialogueId);
-  };
+  }
 
   getEdgesByDialogueId(dialogueId: string): Promise<Edge[]> {
     return this.dialoguePrismaAdapter.getEdgesByDialogueId(dialogueId);
-  };
+  }
 
   getRootQuestionByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getRootQuestionByDialogueId(dialogueId);
-  };
+  }
 
   getTagsByDialogueId(dialogueId: string) {
     return this.dialoguePrismaAdapter.getTagsByDialogueId(dialogueId);
-  };
+  }
 
   findDialoguesByCustomerId(customerId: string) {
     return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId);
-  };
+  }
 
   async delete(dialogueId: string) {
     return this.dialoguePrismaAdapter.delete(dialogueId);
-  };
+  }
 
   async findDialogueIdsByCustomerId(customerId: string) {
     const dialogueIdObjects = await this.dialoguePrismaAdapter.findDialogueIdsOfCustomer(customerId);
     const dialogueIds = dialogueIdObjects.map((dialogue) => dialogue.id);
 
     return dialogueIds;
-  };
+  }
 
   static constructDialogue(
     customerId: string,
     title: string,
     dialogueSlug: string,
     description: string,
-    publicTitle: string = '',
+    publicTitle = '',
     tags: Array<{ id: string }> = [],
     language: LanguageEnum,
   ): Prisma.DialogueCreateInput {
@@ -134,25 +134,25 @@ class DialogueService {
 
     if (tags.length) {
       constructDialogueFragment.tags = { connect: tags.map((tag) => ({ id: tag.id })) };
-    };
+    }
 
     return constructDialogueFragment;
-  };
+  }
 
   static filterDialoguesBySearchTerm = (dialogues: Array<Dialogue & {
     tags: Tag[];
   }>, searchTerm: string) => dialogues.filter((dialogue) => {
     if (dialogue.title.toLowerCase().includes(
       searchTerm.toLowerCase(),
-    )) { return true; };
+    )) { return true; }
 
     if (dialogue.publicTitle?.toLowerCase().includes(
       searchTerm.toLowerCase()
-    )) { return true; };
+    )) { return true; }
 
     if (dialogue.tags.find((tag) => tag.name.toLowerCase().includes(
       searchTerm.toLowerCase(),
-    ))) { return true; };
+    ))) { return true; }
 
     return false;
   });
@@ -174,11 +174,11 @@ class DialogueService {
     const tagUpdateArgs: any = {};
     if (newTagObjects.length > 0) {
       tagUpdateArgs.connect = newTagObjects;
-    };
+    }
 
     if (deleteTagObjects.length > 0) {
       tagUpdateArgs.disconnect = deleteTagObjects;
-    };
+    }
 
     updateDialogueArgs.tags = tagUpdateArgs;
 
@@ -224,7 +224,7 @@ class DialogueService {
       isWithoutGenData,
       dialogueFinisherHeading,
       dialogueFinisherSubheading,
-      language
+      language,
     } = args;
 
     const dbDialogue = await this.customerPrismaAdapter.getDialogueTags(customerSlug, dialogueSlug);
@@ -236,11 +236,11 @@ class DialogueService {
     );
 
     let updateDialogueArgs: Prisma.DialogueUpdateInput = {
-      title, description, publicTitle, isWithoutGenData, postLeafNode, language
+      title, description, publicTitle, isWithoutGenData, postLeafNode, language,
     };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
-    };
+    }
 
     return this.dialoguePrismaAdapter.update(dbDialogue?.id || '-1', updateDialogueArgs);
   };
@@ -250,7 +250,7 @@ class DialogueService {
    * @param entries
    * @param nPaths
    */
-  static getTopNPaths = (entries: HistoryDataWithEntry[], nPaths: number = 3, basicSentiment: string) => {
+  static getTopNPaths = (entries: HistoryDataWithEntry[], nPaths = 3, basicSentiment: string) => {
     const entryWithText = entries.map((entry) => ({
       textValue: NodeEntryService.getTextValueFromEntry(entry),
       ...entry,
@@ -332,13 +332,13 @@ class DialogueService {
 
       const fakeSessionInputArgs: (
         {
-          createdAt: Date,
-          dialogueId: string,
-          rootNodeId: string,
-          simulatedRootVote: number,
-          simulatedChoiceNodeId: string,
-          simulatedChoiceEdgeId?: string,
-          simulatedChoice: string,
+          createdAt: Date;
+          dialogueId: string;
+          rootNodeId: string;
+          simulatedRootVote: number;
+          simulatedChoiceNodeId: string;
+          simulatedChoiceEdgeId?: string;
+          simulatedChoice: string;
         }) = { dialogueId, createdAt: backDate, rootNodeId: rootNode.id, simulatedRootVote, simulatedChoiceNodeId, simulatedChoiceEdgeId: simulatedChoiceEdge?.id, simulatedChoice }
 
       await this.sessionPrismaAdapter.createFakeSession(fakeSessionInputArgs);
@@ -442,7 +442,7 @@ class DialogueService {
     title: string,
     dialogueSlug: string,
     description: string,
-    publicTitle: string = '',
+    publicTitle = '',
     tags: Array<{ id: string }> = [],
     language: LanguageEnum,
   ) => {
@@ -519,7 +519,7 @@ class DialogueService {
           position,
           publicValue,
           value,
-          overrideLeafId: mappedOverrideLeafId || undefined
+          overrideLeafId: mappedOverrideLeafId || undefined,
         };
       });
 
@@ -624,24 +624,24 @@ class DialogueService {
     // TODO: Put in validation function, or add validator service library
     if (!input.dialogueSlug) {
       throw new Error('Slug required, not found!');
-    };
+    }
 
     if (!input.title) {
       throw new Error('Title required, not found!');
-    };
+    }
 
     if (!input.description) {
       throw new Error('Description required, not found!');
-    };
+    }
 
     if (!input.language) {
       throw new Error('Language required, not found!');
-    };
+    }
 
     if (customers.length > 1) {
       // TODO: Make this a logger or something
       console.warn(`Multiple customers found with slug ${input.customerSlug}`);
-    };
+    }
 
     const customer = customers?.[0];
     if (!customer) {
@@ -709,8 +709,8 @@ class DialogueService {
     customerId: string,
     dialogueSlug: string,
     customerName: string,
-    dialogueTitle: string = 'Default dialogue',
-    dialogueDescription: string = 'Default questions',
+    dialogueTitle = 'Default dialogue',
+    dialogueDescription = 'Default questions',
     tags: Array<{ id: string }>,
     language: LanguageEnum = 'ENGLISH',
   ): Promise<Dialogue> => {
@@ -751,7 +751,7 @@ class DialogueService {
       const matchResult = question.id.match(v4) || [];
       if (matchResult.length > 0) {
         question.id = finalMapping[question.id];
-      };
+      }
 
       const updatedEdges = question.children?.map((edge) => {
         const matchParent = edge?.parentNode?.id?.match(v4) || [];
@@ -796,7 +796,7 @@ class DialogueService {
 
     if (!sessions) {
       return [];
-    };
+    }
 
     const scoringEntriesFromSessions = SessionService.getScoringEntriesFromSessions(sessions);
 

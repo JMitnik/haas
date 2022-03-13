@@ -4,6 +4,7 @@ fragment QuestionNodeFragment on QuestionNode {
   isRoot
   isLeaf
   type
+  extraContent
   children {
     ...EdgeFragment
     parentNode {
@@ -13,7 +14,6 @@ fragment QuestionNodeFragment on QuestionNode {
       id
     }
   }
-
   sliderNode {
     id
     happyText
@@ -29,7 +29,6 @@ fragment QuestionNodeFragment on QuestionNode {
       }
     }
   }
-
   form {
     id
     helperText
@@ -42,7 +41,6 @@ fragment QuestionNodeFragment on QuestionNode {
       position
     }
   }
-
   overrideLeaf {
     id
     title
