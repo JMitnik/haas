@@ -6,13 +6,13 @@ import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import Logo from 'components/Logo';
 import parseNodeEntryValue from 'utils/parseNodeEntryValue';
 import scoreToColors from 'utils/scoreToColors';
 
 import { InteractionFeedEntryContainer, InteractionFeedEntryValueContainer } from './InteractionFeedEntryStyles';
-import { ErrorBoundary } from 'react-error-boundary';
 
 export const NodeTypeIcon = ({ node }: { node: QuestionNode | null }) => {
   if (!node?.type) return <Div />;
