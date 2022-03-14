@@ -56,7 +56,8 @@ it('Deletes automation', async () => {
     }
   ).then((data) => data?.customer?.automations);
 
-  expect(automationsBeforeDeletion).toContain(automation.id);
+  const automationIdsBeforeDeletion = automationsBeforeDeletion.map((automation) => automation.id);
+  expect(automationIdsBeforeDeletion).toContain(automation.id);
 
   const input: DeleteAutomationInput = {
     automationId: automation.id,
