@@ -62,6 +62,7 @@ const Dropdown = ({
           <>
             {isRelative ? (
               <Div
+                zIndex={1}
                 ref={setOverlay}
                 style={{
                   ...styles.popper,
