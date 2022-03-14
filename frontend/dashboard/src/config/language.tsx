@@ -2676,16 +2676,28 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   permissions: {
+    can_update_automations: {
+      en: 'This permission allows a user to update automations (edit, enable/disable, remove) for a workspace',
+      de: 'Diese Berechtigung ermöglicht es einem Benutzer, Automatisierungen für einen Arbeitsbereich zu aktualisieren (bearbeiten, aktivieren/deaktivieren, entfernen).',
+    },
+    can_create_automations: {
+      en: 'This permission allows a user to create automations for a workspace',
+      de: 'Diese Berechtigung ermöglicht es einem Benutzer, Automatisierungen für einen Arbeitsbereich zu erstellen',
+    },
+    can_view_automations: {
+      en: 'This permission allows a user to view the automations of a workspace',
+      de: 'Diese Berechtigung ermöglicht es einem Benutzer, die Automatisierungen eines Arbeitsbereichs anzuzeigen',
+    },
     can_access_admin_panel: {
       en: 'This system-wide permission allows a user to do everything (overrules others) within the haas dashboard. It is specified per user and cannot be set within a workspace.',
       de: 'Diese systemweite Berechtigung ermöglicht es einem Benutzer, alles innerhalb des haas-Dashboards zu tun. Sie wird pro Benutzer angegeben und kann nicht innerhalb eines Arbeitsbereichs festgelegt werden.',
     },
     can_edit_dialogue: {
-      en: 'This permissions allows a user to change the settings of a dialogue.',
+      en: 'This permission allows a user to change the settings of a dialogue.',
       de: 'Diese Berechtigungen ermöglichen es einem Benutzer, die Einstellungen eines Dialogs zu ändern.',
     },
     can_build_dialogue: {
-      en: 'This permissions gives a user access to the dialogue builder and trigger overview',
+      en: 'This permission gives a user access to the dialogue builder and trigger overview',
       de: 'Diese Berechtigungen geben einem Benutzer Zugriff auf den Dialog-Builder und die Trigger-Übersicht',
     },
     can_view_dialogue: {

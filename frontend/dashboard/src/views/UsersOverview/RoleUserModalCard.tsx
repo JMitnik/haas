@@ -83,7 +83,7 @@ const RoleUserForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <UI.Grid paddingLeft={1} paddingRight={1} gridTemplateColumns="1fr 1fr">
+      <UI.Grid paddingLeft={1} paddingRight={1} paddingBottom={4} gridTemplateColumns="1fr 1fr">
         {allPermissions?.map((permission) => (
           <Controller
             control={control}
