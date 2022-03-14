@@ -23,8 +23,6 @@ export class AutomationActionService {
    * @returns
    */
   public async generateReport(workspaceSlug: string, targets: string[], dialogueSlug?: string) {
-    // TODO: Get all email addresses the report should be send to
-
     // Get bot user to create report with
     const botUser = await this.userService.findBotByWorkspaceName(workspaceSlug);
 

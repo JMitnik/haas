@@ -382,7 +382,6 @@ class AutomationService {
   ) => {
     switch (automationAction.type) {
       case AutomationActionType.GENERATE_REPORT: {
-        // TODO: 
         const payload = (automationAction.payload as unknown) as GenerateReportPayload;
 
         const users = await this.userService.findTargetUsers(workspaceSlug, payload);

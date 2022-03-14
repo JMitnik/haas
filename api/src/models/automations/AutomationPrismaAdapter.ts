@@ -806,8 +806,7 @@ export class AutomationPrismaAdapter {
       operator,
       operands: {
         createMany: {
-          data: operands.map((operand) =>
-          (
+          data: operands.map((operand) => (
             {
               type: operand.type,
               textValue: operand.textValue,

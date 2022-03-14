@@ -23,10 +23,12 @@ import { useCustomer } from 'providers/CustomerProvider';
 import Dropdown from 'components/Dropdown';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
-interface NewCTAModalCardProps {
-  onClose: () => void;
-  onSuccess: (data: ConditionEntry) => void;
-}
+import {
+  ActiveQuestion,
+  ConditionEntry,
+  NewCTAModalCardProps,
+  TwoDateArray,
+} from './CreateConditionModalCardTypes';
 
 const schema = yup.object().shape({
   scopeType: yup.string().required(),
@@ -60,8 +62,6 @@ const schema = yup.object().shape({
   latest: yup.number().required(),
 });
 
-type TwoDateArray = [Date, Date];
-
 export interface FormDataProps {
   scopeType: string;
   activeDialogue: {
@@ -79,29 +79,7 @@ export interface FormDataProps {
   questionOption: { label: string, value: string } | null;
   aggregate: string;
   latest: number;
-  dateRange: TwoDateArray
-}
-
-export interface ActiveQuestion {
-  type?: QuestionNodeTypeEnum;
-  value?: string;
-  label?: string;
-}
-
-export interface ConditionEntry {
-  scopeType: AutomationConditionScopeType;
-  activeDialogue: {
-    type: string;
-    value: string;
-    label: string | undefined;
-    id: string;
-  } | null;
-  activeQuestion: ActiveQuestion | null;
-  aspect?: string;
-  dateRange: TwoDateArray | null;
-  aggregate?: ConditionPropertyAggregateType;
-  questionOption?: string;
-  latest?: number;
+  dateRange: TwoDateArray;
 }
 
 export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCardProps) => {

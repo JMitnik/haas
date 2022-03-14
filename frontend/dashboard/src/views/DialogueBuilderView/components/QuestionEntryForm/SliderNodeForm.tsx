@@ -103,19 +103,19 @@ const SliderNodeForm = ({ form }: { form: any }) => {
 
           {markers.fields.map((marker: any, index) => (
             <UI.Card boxShadow="lg" key={marker.fieldIndex} mb={4} noHover>
-              <input {...form.register(`sliderNode.markers[${index}].id`)} type="hidden" defaultValue={marker.id} />
+              <input {...form.register(`sliderNode.markers.${index}.id`)} type="hidden" defaultValue={marker.id} />
               <UI.CardBody>
                 <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr', '1fr 2fr']}>
                   <UI.Div>
                     <UI.Div mb={2}>
                       <UI.FormControl>
-                        <UI.FormLabel htmlFor={`sliderNode.markers[${index}].label`}>{t('label')}</UI.FormLabel>
-                        <UI.Input {...form.register(`sliderNode.markers[${index}].label`)} size="sm" defaultValue={marker.label} />
+                        <UI.FormLabel htmlFor={`sliderNode.markers.${index}.label`}>{t('label')}</UI.FormLabel>
+                        <UI.Input {...form.register(`sliderNode.markers.${index}.label`)} size="sm" defaultValue={marker.label} />
                       </UI.FormControl>
                     </UI.Div>
                     <UI.FormControl>
-                      <UI.FormLabel htmlFor={`sliderNode.markers[${index}].subLabel`}>{t('sub_label')}</UI.FormLabel>
-                      <UI.Input {...form.register(`sliderNode.markers[${index}].subLabel`)} size="sm" defaultValue={marker.subLabel} />
+                      <UI.FormLabel htmlFor={`sliderNode.markers.${index}.subLabel`}>{t('sub_label')}</UI.FormLabel>
+                      <UI.Input {...form.register(`sliderNode.markers.${index}.subLabel`)} size="sm" defaultValue={marker.subLabel} />
                     </UI.FormControl>
                   </UI.Div>
 

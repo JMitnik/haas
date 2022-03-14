@@ -1,14 +1,11 @@
+/* eslint-disable react/destructuring-assignment */
 import * as UI from '@haas/ui';
-import { Plus } from 'react-feather';
 import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
-import {
-  CreateCallToActionModalCard,
-} from 'views/DialogueBuilderView/components/QuestionEntryForm/CreateCallToActionModalCard';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
-import { NodeCellContainer } from 'components/NodeCell/NodeCell';
+import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 import { QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
 
 import { NodePickerHeader } from './NodePickerStyles';

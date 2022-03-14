@@ -7,7 +7,7 @@ import React from 'react';
 import Select from 'react-select';
 
 import { ConditionCell } from './ConditionCell';
-import { ConditionEntry } from './CreateConditionModalCard';
+import { ConditionEntry } from './CreateConditionModalCardTypes';
 import { ConditionNodePicker } from '../../components/NodePicker/ConditionNodePicker';
 import { OPERATORS } from './AutomationTypes';
 import Dropdown from '../../components/Dropdown';
@@ -27,7 +27,6 @@ export const ChildBuilderEntry = ({
   conditionFields,
   form,
   openMenu,
-  remove,
   onAddCondition,
   activeConditions,
 }: ConditionBuilderEntryProps) => {

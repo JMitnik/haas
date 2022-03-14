@@ -166,7 +166,6 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
       useFlex
       flexDirection="column"
       position="relative"
-    // onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)} // TODO: Add back
     >
       <UI.AccentBorder backgroundColor={automationTypeColour} />
       <UI.CardBody flex="100%">

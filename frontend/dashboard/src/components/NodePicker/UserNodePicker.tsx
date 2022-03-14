@@ -4,8 +4,8 @@ import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
-import { ConditionEntry } from 'views/AddAutomationView/CreateConditionModalCard';
-import { NodeCellContainer } from 'components/NodeCell/NodeCell';
+import { ConditionEntry } from 'views/AddAutomationView/CreateConditionModalCardTypes';
+import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 
 import { NodePickerHeader } from './NodePickerStyles';
 
@@ -30,8 +30,8 @@ const DropdownOption = (props: any) => {
                   {' '}
                   <UI.Span>will be added as a target for this action </UI.Span>
                 </>
-
               )}
+
               {!isUser && (
                 <>
                   <UI.Span>All users with the role</UI.Span>
@@ -41,6 +41,7 @@ const DropdownOption = (props: any) => {
                   <UI.Span>will be added as a target for this action</UI.Span>
                 </>
               )}
+
             </UI.Text>
             <UI.Flex pt="0.5em">
               <UI.MicroLabel

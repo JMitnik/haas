@@ -141,7 +141,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                             defaultValue={link.url}
                             placeholder="https://link.to/"
                             leftEl={<Type />}
-                            {...form.register(`links[${index}].url`, { required: true })}
+                            {...form.register(`links.${index}.url`, { required: true })}
                           />
                           <FormErrorMessage>{!!form.formState.errors?.links?.[index]?.url?.message}</FormErrorMessage>
                         </FormControl>
@@ -180,7 +180,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                               <UI.Input
                                 isInvalid={!!form.formState.errors.links?.[index]?.header}
                                 defaultValue={link.header}
-                                {...form.register(`links[${index}].header`, { required: false })}
+                                {...form.register(`links.${index}.header`, { required: false })}
                               />
                               <FormErrorMessage>
                                 {!!form.formState.errors.links?.[index]?.header?.message}
@@ -193,7 +193,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                               <UI.Input
                                 isInvalid={!!form.formState.errors.links?.[index]?.subHeader}
                                 defaultValue={link.subHeader}
-                                {...form.register(`links[${index}].subHeader`, { required: false })}
+                                {...form.register(`links.${index}.subHeader`, { required: false })}
                               />
                               <FormErrorMessage>
                                 {!!form.formState.errors.links?.[index]?.subHeader?.message}
@@ -227,7 +227,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <UI.Input
                             isInvalid={!!form.formState.errors.links?.[index]?.title}
                             defaultValue={link.title}
-                            {...form.register(`links[${index}].title`, { required: false })}
+                            {...form.register(`links.${index}.title`, { required: false })}
                           />
                           <FormErrorMessage>{!!form.formState.errors.links?.[index]?.title?.message}</FormErrorMessage>
                         </FormControl>
@@ -238,7 +238,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <UI.Input
                             isInvalid={!!form.formState.errors.links?.[index]?.iconUrl}
                             defaultValue={link.iconUrl}
-                            {...form.register(`links[${index}].iconUrl`, { required: false })}
+                            {...form.register(`links.${index}.iconUrl`, { required: false })}
                           />
                           <FormErrorMessage>
                             {!!form.formState.errors.links?.[index]?.iconUrl?.message}
@@ -251,7 +251,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <UI.Input
                             isInvalid={!!form.formState.errors.links?.[index]?.backgroundColor}
                             defaultValue={link.backgroundColor}
-                            {...form.register(`links[${index}].backgroundColor`, { required: false })}
+                            {...form.register(`links.${index}.backgroundColor`, { required: false })}
                           />
                           <FormErrorMessage>
                             {!!form.formState.errors.links?.[index]?.backgroundColor?.message}
@@ -264,7 +264,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <UI.Input
                             isInvalid={!!form.formState.errors.links?.[index]?.buttonText}
                             defaultValue={link.buttonText}
-                            {...form.register(`links[${index}].buttonText`, { required: false })}
+                            {...form.register(`links.${index}.buttonText`, { required: false })}
                           />
                           <FormErrorMessage>
                             {!!form.formState.errors.links?.[index]?.buttonText?.message}

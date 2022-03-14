@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { ArrowDown, ArrowUp, PlusCircle, Trash } from 'react-feather';
 
-import { Controller, useFieldArray } from 'react-hook-form';
+import { Controller, UseFormReturn, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
 import React from 'react';
 
@@ -38,7 +38,7 @@ export const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
 
 export interface ChoiceNodeFormProps {
   ctaNodes: CTANode[];
-  form: any;
+  form: UseFormReturn<any>;
 }
 
 export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {

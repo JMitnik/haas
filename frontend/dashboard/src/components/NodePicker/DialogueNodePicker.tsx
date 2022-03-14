@@ -1,12 +1,10 @@
 import * as UI from '@haas/ui';
-import { Plus } from 'react-feather';
 import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
-import { Dialogue, QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
-import { MapNodeToProperties } from 'components/MapNodeToProperties';
-import { NodeCellContainer } from 'components/NodeCell/NodeCell';
+import { Dialogue } from 'types/generated-types';
+import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 
 import { NodePickerHeader } from './NodePickerStyles';
 

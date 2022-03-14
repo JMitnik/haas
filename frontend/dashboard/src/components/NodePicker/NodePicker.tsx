@@ -9,7 +9,7 @@ import {
   CreateCallToActionModalCard,
 } from 'views/DialogueBuilderView/components/QuestionEntryForm/CreateCallToActionModalCard';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
-import { NodeCellContainer } from 'components/NodeCell/NodeCell';
+import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 import { QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
 
 import { NodePickerHeader } from './NodePickerStyles';

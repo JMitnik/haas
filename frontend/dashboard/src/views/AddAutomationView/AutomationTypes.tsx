@@ -20,3 +20,14 @@ export const OPERATORS = [
     label: '==',
   },
 ];
+
+export enum ModalType {
+  CreateCondition = 'CREATE_CONDITION',
+  CreateAction = 'CREATE_ACTION',
+}
+
+export interface ModalState {
+  isOpen: boolean;
+  modal?: ModalType;
+  arrayKey?: string;
+}

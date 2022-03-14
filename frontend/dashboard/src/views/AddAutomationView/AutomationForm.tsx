@@ -36,7 +36,7 @@ import {
   QuestionNodeTypeEnum,
   UpdateAutomationMutation,
 } from 'types/generated-types';
-import { AutomationInput } from 'views/EditAutomationView/EditAutomationView';
+import { AutomationInput } from 'views/EditAutomationView/EditAutomationViewTypes';
 import { ConditionNodePicker } from 'components/NodePicker/ConditionNodePicker';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -47,8 +47,9 @@ import { ActionCell } from './ActionCell';
 import { ActionEntry, CreateActionModalCard } from './CreateActionModalCard';
 import { ChildBuilderEntry } from './ChildBuilderEntry';
 import { ConditionCell } from './ConditionCell';
-import { ConditionEntry, CreateConditionModalCard } from './CreateConditionModalCard';
-import { OPERATORS } from './AutomationTypes';
+import { ConditionEntry } from './CreateConditionModalCardTypes';
+import { CreateConditionModalCard } from './CreateConditionModalCard';
+import { ModalState, ModalType, OPERATORS } from './AutomationTypes';
 
 const schema = yup.object({
   title: yup.string().required('Title is required'),
@@ -200,17 +201,6 @@ interface AutomationFormProps {
   }>> | undefined) => Promise<FetchResult<UpdateAutomationMutation, Record<string, any>, Record<string, any>>>;
   automation?: AutomationInput;
   mappedConditions?: ConditionEntry[];
-}
-
-enum ModalType {
-  CreateCondition = 'CREATE_CONDITION',
-  CreateAction = 'CREATE_ACTION',
-}
-
-interface ModalState {
-  isOpen: boolean;
-  modal?: ModalType;
-  arrayKey?: string;
 }
 
 const AutomationForm = ({

@@ -6,9 +6,11 @@ import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
 import { AutomationConditionScopeType } from 'types/generated-types';
-import { NodeCellContainer } from 'components/NodeCell/NodeCell';
+import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 
-import { ConditionEntry, CreateConditionModalCard } from 'views/AddAutomationView/CreateConditionModalCard';
+import { ConditionEntry } from 'views/AddAutomationView/CreateConditionModalCardTypes';
+import { CreateConditionModalCard } from 'views/AddAutomationView/CreateConditionModalCard';
+
 import { NodePickerHeader } from './NodePickerStyles';
 
 const DropdownOption = (props: any) => (
@@ -41,7 +43,6 @@ const DropdownOption = (props: any) => (
                 {' '}
 
               </UI.Span>
-
             )}
             {' '}
             should be

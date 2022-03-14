@@ -1,5 +1,17 @@
 import * as UI from '@haas/ui';
-import { AlertCircle, ArrowLeft, ArrowRight, AtSign, Circle, Feather, FileText, Hash, Link2, Phone, Type } from 'react-feather';
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  AtSign,
+  Circle,
+  Feather,
+  FileText,
+  Hash,
+  Link2,
+  Phone,
+  Type,
+} from 'react-feather';
 import { AnimatePresence, Variants, motion } from 'framer-motion';
 import { Button } from '@chakra-ui/core';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';

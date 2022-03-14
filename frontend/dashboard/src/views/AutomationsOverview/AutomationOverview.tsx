@@ -135,7 +135,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
             ))}
 
             {canCreateAutomations && (
-              <AddDialogueCard data-cy="AddDialogueCard">
+              <AddDialogueCard data-cy="AddAutomationCard">
                 <Link to={`/dashboard/b/${customerSlug}/automation/add`} />
 
                 <Flex flexDirection="column" alignItems="center" justifyContent="center">
