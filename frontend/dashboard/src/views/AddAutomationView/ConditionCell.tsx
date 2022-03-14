@@ -57,24 +57,15 @@ export const ConditionCell = ({ condition, onClick, onRemove }: NodeCellProps) =
     >
       <UI.CloseButton onClose={removeCTAFromOption} top="5px" right="5px" />
       <UI.Flex width="100%">
-        {/* <UI.Icon
-          bg={nodeProps.bg}
-          color={nodeProps.color}
-          height="2rem"
-          width="2rem"
-          stroke={nodeProps.stroke || undefined}
-          style={{ flexShrink: 0 }}
-          mr={3}
-        >
-          <nodeProps.icon />
-        </UI.Icon> */}
         <UI.Div>
           <UI.Text paddingRight={2}>
             <UI.Span color="#4A5568" fontWeight="bold">{condition?.aggregate}</UI.Span>
             {' '}
             of option
             {' '}
-            <UI.Span color="#4A5568" fontWeight="bold">{condition?.questionOption}</UI.Span>
+            <UI.Span color="#4A5568" fontWeight="bold">
+              {condition?.questionOption || condition?.activeQuestion?.label}
+            </UI.Span>
             {' '}
             in the last
             {' '}
