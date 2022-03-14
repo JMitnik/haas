@@ -62,7 +62,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
     },
   });
 
-  const { canDeleteDialogue } = useAuth();
+  const { canCreateAutomations } = useAuth();
 
   const filteredAutomations = activeAutomationConnection.automations;
   const pageCount = activeAutomationConnection.totalPages || 0;
@@ -134,7 +134,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
               <AutomationCard key={index} automation={automation} />
             ))}
 
-            {canDeleteDialogue && (
+            {canCreateAutomations && (
               <AddDialogueCard data-cy="AddDialogueCard">
                 <Link to={`/dashboard/b/${customerSlug}/automation/add`} />
 

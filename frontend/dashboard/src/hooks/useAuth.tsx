@@ -3,6 +3,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useUser } from 'providers/UserProvider';
 
 interface UseAuthProps {
+  canCreateAutomations: boolean;
   canUpdateAutomations: boolean;
   canViewAutomations: boolean;
   canCreateCustomers: boolean;
@@ -49,6 +50,7 @@ const useAuth = (): UseAuthProps => {
   );
 
   return {
+    canCreateAutomations: hasPermission(SystemPermission.CanCreateAutomations),
     canUpdateAutomations: hasPermission(SystemPermission.CanUpdateAutomations),
     canViewAutomations: hasPermission(SystemPermission.CanViewAutomations),
     canDeleteDialogue: hasPermission(SystemPermission.CanDeleteDialogue),
