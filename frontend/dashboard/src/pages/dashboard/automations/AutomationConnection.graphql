@@ -1,5 +1,5 @@
-query automationConnection($workspaceSlug: String, $filter: AutomationConnectionFilterInput) {
-  customer(slug: $workspaceSlug) {
+query automationConnection($customerSlug: String, $filter: AutomationConnectionFilterInput) {
+  customer(slug: $customerSlug) {
     id
     slug
     automationConnection(filter: $filter) {

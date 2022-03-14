@@ -1003,6 +1003,11 @@ export type GetCampaignsInput = {
   customerSlug?: Maybe<Scalars['String']>;
 };
 
+export type HandleAutomationActionsInput = {
+  workspaceSlug: Scalars['String'];
+  automationId: Scalars['String'];
+};
+
 export type HandleUserStateInWorkspaceInput = {
   userId?: Maybe<Scalars['String']>;
   workspaceId?: Maybe<Scalars['String']>;
@@ -1147,6 +1152,7 @@ export type Mutation = {
   /** Creates a new automation. */
   createAutomation: AutomationModel;
   updateAutomation: AutomationModel;
+  handleAutomationActions?: Maybe<Scalars['Boolean']>;
   enableAutomation?: Maybe<AutomationModel>;
   deleteAutomation?: Maybe<AutomationModel>;
   createCampaign: CampaignType;
@@ -1266,6 +1272,11 @@ export type MutationCreateAutomationArgs = {
 
 export type MutationUpdateAutomationArgs = {
   input?: Maybe<CreateAutomationInput>;
+};
+
+
+export type MutationHandleAutomationActionsArgs = {
+  input?: Maybe<HandleAutomationActionsInput>;
 };
 
 
@@ -2403,7 +2414,7 @@ export type CreateCtaMutation = (
 );
 
 export type AutomationConnectionQueryVariables = Exact<{
-  workspaceSlug?: Maybe<Scalars['String']>;
+  customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<AutomationConnectionFilterInput>;
 }>;
 
@@ -3364,8 +3375,8 @@ export type CreateCtaMutationHookResult = ReturnType<typeof useCreateCtaMutation
 export type CreateCtaMutationResult = Apollo.MutationResult<CreateCtaMutation>;
 export type CreateCtaMutationOptions = Apollo.BaseMutationOptions<CreateCtaMutation, CreateCtaMutationVariables>;
 export const AutomationConnectionDocument = gql`
-    query automationConnection($workspaceSlug: String, $filter: AutomationConnectionFilterInput) {
-  customer(slug: $workspaceSlug) {
+    query automationConnection($customerSlug: String, $filter: AutomationConnectionFilterInput) {
+  customer(slug: $customerSlug) {
     id
     slug
     automationConnection(filter: $filter) {
@@ -3410,7 +3421,7 @@ export const AutomationConnectionDocument = gql`
  * @example
  * const { data, loading, error } = useAutomationConnectionQuery({
  *   variables: {
- *      workspaceSlug: // value for 'workspaceSlug'
+ *      customerSlug: // value for 'customerSlug'
  *      filter: // value for 'filter'
  *   },
  * });

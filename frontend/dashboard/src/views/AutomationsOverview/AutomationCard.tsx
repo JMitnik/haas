@@ -75,7 +75,7 @@ const AutomationCardOptionsOverlay = ({ onDelete, onEdit }: AutomationCardOption
 const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel, isCompact?: boolean }) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { activeCustomer } = useCustomer();
-  const { canAccessAdmin } = useAuth();
+  const { canAccessAdmin, canUpdateAutomations } = useAuth();
   const { goToEditAutomationView } = useNavigator();
   const ref = useRef(null);
   const { t } = useTranslation();
@@ -86,7 +86,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
   const [deleteAutomation] = useDeleteAutomationMutation({
     refetchQueries: [
       refetchAutomationConnectionQuery({
-        workspaceSlug: customerSlug,
+        customerSlug,
       }),
     ],
     onCompleted: () => {
@@ -177,8 +177,13 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
               <Bell color={automationTypeColour} />
             </TypeBadge>
             <Switch
+              isDisabled={!canUpdateAutomations && !canAccessAdmin}
               isChecked={automation.isActive}
-              onClick={handleEnableChange}
+              onClick={(e) => {
+                if (canUpdateAutomations || canAccessAdmin) {
+                  handleEnableChange(e);
+                }
+              }}
               size="lg"
             />
           </UI.Flex>
@@ -239,7 +244,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
                   )}
                 </UI.Div>
                 <UI.Div>
-                  {canAccessAdmin && (
+                  {(canAccessAdmin || canUpdateAutomations) && (
                     <ShowMoreButton
                       renderMenu={(
                         <AutomationCardOptionsOverlay

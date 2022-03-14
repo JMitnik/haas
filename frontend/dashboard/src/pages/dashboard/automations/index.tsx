@@ -12,7 +12,7 @@ const AutomationsPage = () => {
 
   const { data, error, loading } = useAutomationConnectionQuery({
     variables: {
-      workspaceSlug: customerSlug,
+      customerSlug,
       filter: {
         offset: 0,
         perPage: 7,

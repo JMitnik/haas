@@ -118,7 +118,7 @@ const CustomerRoutes = () => (
                     />
 
                     <GuardedRoute
-                      allowedPermission={SystemPermission.CanViewAutomations}
+                      allowedPermission={SystemPermission.CanCreateAutomations}
                       path={ROUTES.NEW_AUTOMATION_VIEW}
                       render={() => <AddAutomationView />}
                     />
@@ -130,7 +130,7 @@ const CustomerRoutes = () => (
                     />
 
                     <GuardedRoute
-                      // allowedPermission={SystemPermission.CanViewAutomations}
+                      allowedPermission={SystemPermission.CanViewAutomations}
                       path="/dashboard/b/:customerSlug/automations/"
                       render={() => <AutomationsPage />}
                     />

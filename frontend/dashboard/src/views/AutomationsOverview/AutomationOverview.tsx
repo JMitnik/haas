@@ -44,7 +44,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
   const { loading: isLoading } = useAutomationConnectionQuery({
     fetchPolicy: 'network-only',
     variables: {
-      workspaceSlug: customerSlug,
+      customerSlug,
       filter: {
         search: filter.search,
         offset: filter.pageIndex * filter.perPage,

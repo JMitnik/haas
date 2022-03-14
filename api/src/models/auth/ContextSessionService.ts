@@ -28,13 +28,17 @@ class ContextSessionService {
   getWorkSpaceFromReq = async () => {
     const vars = this.context.req.body.variables;
 
-    if (vars?.customerSlug || vars?.input?.customerSlug) {
-      const customer = await this.customerService.findWorkspaceBySlugs([vars?.customerSlug, vars?.input?.customerSlug])
+    if (vars?.customerSlug || vars?.input?.customerSlug || vars?.workspaceSlug || vars?.input.workspaceSlug) {
+      const customer = await this.customerService.findWorkspaceBySlugs(
+        [vars?.customerSlug, vars?.input?.customerSlug, vars?.workspaceSlug, vars?.input.workspaceSlug]
+      )
       return customer;
     };
 
     if (vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId) {
-      const customer = await this.customerService.findWorkspaceBySlugs([vars?.customerId, vars?.input?.customerId, vars?.workspaceId, vars?.input?.workspaceId])
+      const customer = await this.customerService.findWorkspaceBySlugs(
+        [vars?.customerId, vars?.input?.customerId, vars?.workspaceId, vars?.input?.workspaceId]
+      )
       return customer;
     };
 
@@ -85,6 +89,7 @@ class ContextSessionService {
     }));
 
     const workspace = await this.getWorkSpaceFromReq();
+    console.log('workspace: ', workspace);
     const activeWorkspace = customersAndPermissions?.find((userCustomer) => userCustomer.id === workspace?.id) || null;
 
     const baseUrl = process.env.ENVIRONMENT === 'local' ? await fetchTunnelUrl() : config.baseUrl;
