@@ -28,9 +28,9 @@ class ContextSessionService {
   getWorkSpaceFromReq = async () => {
     const vars = this.context.req.body.variables;
 
-    if (vars?.customerSlug || vars?.input?.customerSlug || vars?.workspaceSlug || vars?.input.workspaceSlug) {
+    if (vars?.customerSlug || vars?.input?.customerSlug || vars?.workspaceSlug || vars?.input?.workspaceSlug) {
       const customer = await this.customerService.findWorkspaceBySlugs(
-        [vars?.customerSlug, vars?.input?.customerSlug, vars?.workspaceSlug, vars?.input.workspaceSlug]
+        [vars?.customerSlug, vars?.input?.customerSlug, vars?.workspaceSlug, vars?.input?.workspaceSlug]
       )
       return customer;
     };
