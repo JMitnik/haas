@@ -6,22 +6,13 @@ export const ParentResolvePlugin = plugin({
   fieldDefTypes: `useParentResolve?: boolean`,
   onCreateFieldResolver(test) {
     return async (root, args, ctx, info, next) => {
-      try {
-        const useParentResolve = test.fieldConfig.extensions?.nexus?.config?.useParentResolve;
+      const useParentResolve = test.fieldConfig.extensions?.nexus?.config?.useParentResolve;
+      const fieldName = info.fieldName;
 
-        if (useParentResolve) {
-          const fieldName = info.fieldName;
-          if (root && fieldName && root[fieldName]) {
-            return root[fieldName];
-          }
-        } else {
-          const value = await next(root, args, ctx, info)
-          return value;
-        }
-      } catch (error) {
-        const value = await next(root, args, ctx, info)
-        return value
-      }
+      // If the field has enabled the plugin, and its parent has it already, return the parent's value.
+      if (useParentResolve && root && fieldName && root[fieldName]) return root[fieldName];
+
+      return await next(root, args, ctx, info);
     }
   }
 });

@@ -100,6 +100,7 @@ export const CustomerType = objectType({
       args: {
         filter: DialogueFilterInputType,
       },
+      useQueryCounter: true,
       async resolve(parent: Customer, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
@@ -355,7 +356,6 @@ export const CustomerQuery = extendType({
         slug: 'String',
       },
       nullable: true,
-      useQueryCounter: true,
       async resolve(parent, args, ctx) {
         if (args.slug) {
           const customer = ctx.services.customerService.findWorkspaceBySlug(args.slug);

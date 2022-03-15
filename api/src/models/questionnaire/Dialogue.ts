@@ -87,7 +87,6 @@ export const DialogueType = objectType({
       nullable: true,
       useParentResolve: true,
       resolve(parent, args, ctx) {
-
         return ctx.services.dialogueStatisticsService.initiateDialogueStatisticsSummary(
           parent.id,
           args.startDateTime || undefined,
