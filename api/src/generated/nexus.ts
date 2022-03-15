@@ -2245,6 +2245,9 @@ declare global {
   interface NexusGenPluginTypeConfig<TypeName extends string> {
   }
   interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
+    useParentResolve?: boolean
+    useTimeResolve?: boolean
+    useQueryCounter?: boolean
   }
   interface NexusGenPluginSchemaConfig {
   }

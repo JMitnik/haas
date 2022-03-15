@@ -85,10 +85,8 @@ export const DialogueType = objectType({
         refresh: 'Boolean',
       },
       nullable: true,
+      useParentResolve: true,
       resolve(parent, args, ctx) {
-        if ((parent as any)?.statisticsSummary) {
-          return (parent as any)?.statisticsSummary
-        };
 
         return ctx.services.dialogueStatisticsService.initiateDialogueStatisticsSummary(
           parent.id,

@@ -355,6 +355,7 @@ export const CustomerQuery = extendType({
         slug: 'String',
       },
       nullable: true,
+      useQueryCounter: true,
       async resolve(parent, args, ctx) {
         if (args.slug) {
           const customer = ctx.services.customerService.findWorkspaceBySlug(args.slug);
