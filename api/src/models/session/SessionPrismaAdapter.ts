@@ -1,9 +1,9 @@
-import { Prisma, PrismaClient, Session } from "@prisma/client";
-import { cloneDeep } from "lodash";
-import { NexusGenFieldTypes, NexusGenInputNames, NexusGenInputs } from "../../generated/nexus";
+import { Prisma, PrismaClient, Session } from '@prisma/client';
+import { cloneDeep } from 'lodash';
+import { NexusGenFieldTypes, NexusGenInputNames, NexusGenInputs } from '../../generated/nexus';
 
-import NodeEntryService from "../node-entry/NodeEntryService";
-import { CreateSessionInput } from "./SessionPrismaAdapterType";
+import NodeEntryService from '../node-entry/NodeEntryService';
+import { CreateSessionInput } from './SessionPrismaAdapterType';
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;
@@ -13,13 +13,66 @@ class SessionPrismaAdapter {
   };
 
   /**
+   * Finds all sessions of a dialogue within provided dates 
+   * @param dialogueId the ID of a dialogue
+   * @param startDateTime the start date from when sessions should be found
+   * @param endDateTime the end date until sessions should be found
+   * @returns a list of sessions
+   */
+  findScopedSessions = async (dialogueId: string, startDateTime?: string, endDateTime?: string) => {
+    const dialogueWithSessions = await this.prisma.dialogue.findUnique({
+      where: { id: dialogueId },
+      include: {
+        sessions: {
+          where: {
+            createdAt: (startDateTime || endDateTime) ? {
+              gte: startDateTime,
+              lte: endDateTime,
+            } : undefined,
+          },
+        },
+      },
+    });
+    return dialogueWithSessions?.sessions || [];
+  }
+
+  /**
+   * Finds all relevant node entries based on session IDs and (optionally) depth
+   * @param sessionIds a list of session Ids
+   * @param depth OPTIONAL: a number to fetch a specific depth layer
+   * @returns a list of node entries
+   */
+  findNodeEntriesBySessionIds = async (sessionIds: string[], depth?: number) => {
+    const verifiedDepth = typeof depth === 'number' ? depth : undefined;
+    return this.prisma.nodeEntry.findMany({
+      where: {
+        AND: [
+          {
+            sessionId: {
+              in: sessionIds,
+            },
+          },
+          {
+            depth: verifiedDepth,
+          },
+        ],
+      },
+      include: {
+        sliderNodeEntry: verifiedDepth === 0,
+        choiceNodeEntry: verifiedDepth ? verifiedDepth > 0 : false,
+        videoNodeEntry: verifiedDepth ? verifiedDepth > 0 : false,
+      },
+    })
+  }
+
+  /**
    * Build a session prisma query based on the filter parameters.
    * @param dialogueId
    * @param filter
    */
   buildFindSessionsQuery = (dialogueId: string, filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
     // Required: filter by dialogueId
-    let query: Prisma.SessionWhereInput = { dialogueId, delivery: undefined, };
+    let query: Prisma.SessionWhereInput = { dialogueId, delivery: undefined };
 
     // Optional: Filter by campaigns or not
     if (filter?.deliveryType) {
@@ -37,16 +90,16 @@ class SessionPrismaAdapter {
             value: {
               gte: filter?.scoreRange?.min || undefined,
               lte: filter?.scoreRange?.max || undefined,
-            }
-          }
-        }
+            },
+          },
+        },
       }
     }
 
     // Optional: Filter by campaign-variant
     if (filter?.campaignVariantId) {
       query.delivery = {
-        campaignVariantId: filter.campaignVariantId
+        campaignVariantId: filter.campaignVariantId,
       }
     }
 
@@ -66,9 +119,9 @@ class SessionPrismaAdapter {
         if (potentialLastName) {
           return {
             AND: potentialLastName ? [
-              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
-              { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
-            ] : undefined
+              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' } },
+              { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' } },
+            ] : undefined,
           }
         }
 
@@ -83,7 +136,7 @@ class SessionPrismaAdapter {
               // Allow searching in choices and form entries
               OR: [
                 {
-                  choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } }
+                  choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } },
                 },
                 {
                   formNodeEntry: {
@@ -92,14 +145,14 @@ class SessionPrismaAdapter {
                         OR: [
                           { longText: { contains: filter.search, mode: 'insensitive' } },
                           { shortText: { contains: filter.search, mode: 'insensitive' } },
-                        ]
-                      }
-                    }
-                  }
-                }
-              ]
-            }
-          }
+                        ],
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
         },
 
         // Allow searching for delivery properties
@@ -107,23 +160,23 @@ class SessionPrismaAdapter {
         {
           delivery: {
             OR: [
-              { deliveryRecipientEmail: { equals: filter.search, mode: 'insensitive' }, },
-              { deliveryRecipientPhone: { equals: filter.search, mode: 'insensitive' }, },
+              { deliveryRecipientEmail: { equals: filter.search, mode: 'insensitive' } },
+              { deliveryRecipientPhone: { equals: filter.search, mode: 'insensitive' } },
               {
                 AND: potentialLastName ? [
-                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
-                  { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
-                ] : undefined
+                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' } },
+                  { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' } },
+                ] : undefined,
               },
               {
                 OR: !potentialLastName ? [
-                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
-                  { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' }, },
-                ] : undefined
-              }
-            ]
-          }
-        }]
+                  { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' } },
+                  { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' } },
+                ] : undefined,
+              },
+            ],
+          },
+        }],
       }
     }
 
@@ -155,7 +208,7 @@ class SessionPrismaAdapter {
       skip: offset,
       take: perPage,
       orderBy: this.buildOrderByQuery(filter),
-      include: { delivery: { include: { campaignVariant: true, } } }
+      include: { delivery: { include: { campaignVariant: true } } },
     });
 
     return sessions;
@@ -173,7 +226,7 @@ class SessionPrismaAdapter {
         id: sessionId,
       },
       data: {
-        delivery: { connect: { id: deliveryId } }
+        delivery: { connect: { id: deliveryId } },
       },
     });
   };
@@ -189,7 +242,7 @@ class SessionPrismaAdapter {
         device,
         totalTimeInSec,
         nodeEntries: {
-          create: entries.map((entry) => NodeEntryService.constructCreateNodeEntryFragment(entry))
+          create: entries.map((entry) => NodeEntryService.constructCreateNodeEntryFragment(entry)),
         },
         dialogue: {
           connect: {
@@ -253,13 +306,13 @@ class SessionPrismaAdapter {
 
   createFakeSession(data: (
     {
-      createdAt: Date,
-      dialogueId: string,
-      rootNodeId: string,
-      simulatedRootVote: number,
-      simulatedChoiceNodeId: string,
-      simulatedChoiceEdgeId?: string,
-      simulatedChoice: string,
+      createdAt: Date;
+      dialogueId: string;
+      rootNodeId: string;
+      simulatedRootVote: number;
+      simulatedChoiceNodeId: string;
+      simulatedChoiceEdgeId?: string;
+      simulatedChoice: string;
     })) {
 
     return this.prisma.session.create({

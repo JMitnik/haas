@@ -30,6 +30,27 @@ class SessionService {
   };
 
   /**
+   * Finds all relevant node entries based on session IDs and (optionally) depth
+   * @param sessionIds a list of session Ids
+   * @param depth OPTIONAL: a number to fetch a specific depth layer
+   * @returns a list of node entries
+   */
+  findNodeEntriesBySessionIds = async (sessionIds: string[], depth?: number) => {
+    return this.sessionPrismaAdapter.findNodeEntriesBySessionIds(sessionIds, depth);
+  }
+
+  /**
+   * Finds all sessions of a dialogue within provided dates 
+   * @param dialogueId the ID of a dialogue
+   * @param startDateTime the start date from when sessions should be found
+   * @param endDateTime the end date until sessions should be found
+   * @returns a list of sessions
+   */
+  findScopedSessions = async (dialogueId: string, startDateTime?: string, endDateTime?: string) => {
+    return this.sessionPrismaAdapter.findScopedSessions(dialogueId, startDateTime, endDateTime);
+  }
+
+  /**
    * Finds single session by passed ID.
    * */
   findSessionById(sessionId: string): Promise<Session | null> {
@@ -53,14 +74,14 @@ class SessionService {
       if (sessionInput.deliveryId) {
         const deliveryUpdate = prisma.delivery.update({
           where: { id: sessionInput.deliveryId },
-          data: { currentStatus: 'FINISHED' }
+          data: { currentStatus: 'FINISHED' },
         });
 
         const deliveryEventCreation = prisma.deliveryEvents.create({
           data: {
             Delivery: { connect: { id: sessionInput.deliveryId } },
-            status: 'FINISHED'
-          }
+            status: 'FINISHED',
+          },
         });
 
         await prisma.$transaction([deliveryUpdate, deliveryEventCreation]);
@@ -236,7 +257,8 @@ class SessionService {
                   },
                 },
               },
-            }, {}],
+            },
+            ],
           },
           orderBy: {
             createdAt: 'desc',
@@ -308,7 +330,7 @@ class SessionService {
     const totalSessions = await this.sessionPrismaAdapter.countSessions(dialogueId, filter);
 
     const {
-      totalPages, hasPrevPage, hasNextPage, nextPageOffset, pageIndex, prevPageOffset
+      totalPages, hasPrevPage, hasNextPage, nextPageOffset, pageIndex, prevPageOffset,
     } = offsetPaginate(totalSessions, offset, perPage);
 
     return {
@@ -319,8 +341,8 @@ class SessionService {
         hasNextPage,
         prevPageOffset,
         nextPageOffset,
-        pageIndex
-      }
+        pageIndex,
+      },
     };
   };
 

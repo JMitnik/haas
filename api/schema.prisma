@@ -10,6 +10,22 @@ generator client {
   previewFeatures = ["orderByRelation"]
 }
 
+enum DialogueImpactScore {
+  AVERAGE
+}
+
+model DialogueStatisticsSummaryCache {
+  id            String    @id @default(cuid())
+  updatedAt     DateTime  @updatedAt
+  startDateTime DateTime?
+  endDateTime   DateTime?
+  impactScore   Float
+  dialogueId    String
+
+  impactScoreType DialogueImpactScore
+  dialogue        Dialogue            @relation(fields: [dialogueId], references: [id])
+}
+
 model ColourSettings {
   dark             String?
   darkest          String?
@@ -121,8 +137,9 @@ model Dialogue {
   wasGeneratedWithGenData Boolean           @default(value: false)
   CampaignVariant         CampaignVariant[]
 
-  automationEvents     AutomationEvent[]
-  automationConditions AutomationCondition[]
+  automationEvents            AutomationEvent[]
+  automationConditions        AutomationCondition[]
+  dialogueStatisticsSummaries DialogueStatisticsSummaryCache[]
   @@unique([slug, customerId])
 }
 
@@ -1046,7 +1063,7 @@ model AutomationTrigger {
   automationConditionBuilderId String                     @unique
 
   // Action: What should happen when an automation fire.
-  actions     AutomationAction[]
+  actions AutomationAction[]
 
   automations Automation[]
 }

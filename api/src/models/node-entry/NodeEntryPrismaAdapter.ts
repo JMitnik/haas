@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, NodeEntry } from "@prisma/client";
+import { PrismaClient, Prisma, NodeEntry } from '@prisma/client';
 
 class NodeEntryPrismaAdapter {
   prisma: PrismaClient;
@@ -19,10 +19,10 @@ class NodeEntryPrismaAdapter {
       include: {
         nodeEntries: {
           orderBy: {
-            depth: 'asc'
-          }
-        }
-      }
+            depth: 'asc',
+          },
+        },
+      },
     });
 
     return session?.nodeEntries || [];
@@ -32,14 +32,14 @@ class NodeEntryPrismaAdapter {
    * Count by sesion id.
    * */
   countNodeEntriesBySessionId(sessionId: string) {
-    return this.prisma.nodeEntry.count({ where: { sessionId, } });
+    return this.prisma.nodeEntry.count({ where: { sessionId } });
   };
 
   /**
    * Raw count of node-entries.
    * */
   count(where: Prisma.NodeEntryWhereInput): Promise<number> {
-    return this.prisma.nodeEntry.count({ where, });
+    return this.prisma.nodeEntry.count({ where });
   };
 
   /**
@@ -83,7 +83,7 @@ class NodeEntryPrismaAdapter {
 
   async deleteManyChoiceNodeEntries(nodeEntryIds: string[]): Promise<Prisma.BatchPayload> {
     return this.prisma.choiceNodeEntry.deleteMany({
-      where: { nodeEntryId: { in: nodeEntryIds } }
+      where: { nodeEntryId: { in: nodeEntryIds } },
     });
   };
 

@@ -3,20 +3,19 @@ import { UserInputError } from 'apollo-server-express';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { subDays } from 'date-fns';
 
-import { DialgoueStatisticsLineChartDataType, DialogueStatistics } from './graphql/DialogueStatistics';
+import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
 import { EdgeType } from '../edge/Edge';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 import { SessionConnection, SessionType } from '../session/graphql/Session';
 import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
-import { PaginationWhereInput } from '../general/Pagination';
-import PaginationService from '../general/PaginationService';
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
 import isValidDate from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
+import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -40,7 +39,7 @@ export const DialogueFinisherType = objectType({
     t.id('id');
     t.string('header');
     t.string('subtext');
-  }
+  },
 });
 
 export const DialogueType = objectType({
@@ -73,9 +72,31 @@ export const DialogueType = objectType({
         return ctx.prisma.postLeafNode.findFirst({
           where: {
             id: parent.postLeafNodeId,
-          }
+          },
         });
-      }
+      },
+    });
+
+    t.field('dialogueStatisticsSummary', {
+      type: DialogueStatisticsSummaryModel,
+      args: {
+        startDateTime: 'String',
+        endDateTime: 'String',
+        refresh: 'Boolean',
+      },
+      nullable: true,
+      resolve(parent, args, ctx) {
+        if ((parent as any)?.statisticsSummary) {
+          return (parent as any)?.statisticsSummary
+        };
+
+        return ctx.services.dialogueStatisticsService.initiateDialogueStatisticsSummary(
+          parent.id,
+          args.startDateTime || undefined,
+          args.endDateTime || undefined,
+          args.refresh || undefined,
+        );
+      },
     });
 
     t.field('averageScore', {
@@ -237,7 +258,7 @@ export const DialogueType = objectType({
       // @ts-ignore
       resolve: (parent, args, ctx) => {
         return ctx.services.dialogueService.getCampaignVariantsByDialogueId(parent.id);
-      }
+      },
     })
   },
 });
@@ -384,8 +405,6 @@ export const DialogueRootQuery = extendType({
     });
   },
 });
-
-console.log('pls');
 
 export default [
   DialogueWhereUniqueInput,

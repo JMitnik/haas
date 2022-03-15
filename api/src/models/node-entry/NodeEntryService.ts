@@ -1,7 +1,7 @@
 import {
   NodeEntry, //NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput
   PrismaClient,
-  Prisma
+  Prisma,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
@@ -225,7 +225,7 @@ class NodeEntryService {
               contains: text,
               mode: 'insensitive',
             },
-          }
+          },
         },
         {
           videoNodeEntry: {
@@ -233,7 +233,7 @@ class NodeEntryService {
               contains: text,
               mode: 'insensitive',
             },
-          }
+          },
         },
         {
           choiceNodeEntry: {
@@ -241,7 +241,7 @@ class NodeEntryService {
               contains: text,
               mode: 'insensitive',
             },
-          }
+          },
         },
         // DEPRECATED (but still included)
         {

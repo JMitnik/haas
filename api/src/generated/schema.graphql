@@ -641,6 +641,7 @@ type Dialogue {
   customer: Customer
   customerId: String!
   description: String!
+  dialogueStatisticsSummary(endDateTime: String, refresh: Boolean, startDateTime: String): DialogueStatisticsSummaryModel
   edges: [Edge!]!
   id: ID!
   isWithoutGenData: Boolean!
@@ -688,12 +689,26 @@ type DialogueFinisherObjectType {
   subtext: String!
 }
 
+enum DialogueImpactScore {
+  AVERAGE
+}
+
 type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType
   nrInteractions: Int!
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
+}
+
+"""DialogueStatisticsSummary"""
+type DialogueStatisticsSummaryModel {
+  dialogue: Dialogue
+  id: ID
+  impactScore(type: DialogueImpactScore): Float
+  nrVotes: Int!
+  sessions: [Session!]!
+  updatedAt: Date
 }
 
 input DialogueWhereUniqueInput {
