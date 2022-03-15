@@ -23,7 +23,11 @@ export const QueryCounterPlugin = plugin({
       // Reset nrQueries
       global.nrQueries = 0;
       if (useQueryCounter && global && global.nrQueries !== undefined) {
-        console.log(`Nr Queries ran: ${nrQueriesEnd - nrQueriesStart}`);
+        if (test.parentTypeConfig.name === 'Mutation') {
+          console.log(`Nr Queries ran for operation ${info.operation.name?.value} : ${nrQueriesEnd - nrQueriesStart}`);
+        } else {
+          console.log(`Nr Queries ran for field ${info.fieldName} : ${nrQueriesEnd - nrQueriesStart}`);
+        }
       }
 
       return value;
