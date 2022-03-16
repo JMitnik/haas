@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { LinkItemType } from '../../types/core-types';
 import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
@@ -7,6 +7,7 @@ import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
 import { LinkItem } from './LinkItem';
 import UpsellNode from './UpsellNode';
 import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeTitle';
+import { useDialogueStore } from '../Dialogue/DialogueStore';
 
 export const LinkNode = ({ node }: QuestionNodeProps) => {
   // TODO: Use the social capabilities of this event to enqueue
@@ -15,6 +16,12 @@ export const LinkNode = ({ node }: QuestionNodeProps) => {
 
     window.open(event.currentTarget.href, event.currentTarget.rel);
   };
+
+  const finish = useDialogueStore(state => state.finish);
+
+  useEffect(() => {
+    finish(node.id);
+  }, [finish]);
 
   return (
     <QuestionNodeLayout node={node}>

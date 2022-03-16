@@ -20,6 +20,7 @@ import { useDebouncedEffect } from '../../hooks/useDebouncedEffect';
 import { SessionEventInput } from '../../types/generated-types';
 import { useSession } from '../Session/SessionProvider';
 import { VideoNode } from '../VideoNode/VideoNode';
+import { useTrackFinished } from '../PostLeafNode/useTrackFinished';
 
 interface DialogueProps {
   dialogue: DialogueType;
@@ -47,6 +48,14 @@ export const Dialogue = ({ onEventUpload }: DialogueProps) => {
 
   // Get all main operations from the store
   const getCurrentNode = useDialogueStore(state => state.getCurrentNode);
+  // Get the current node from the store
+  const currentNode = getCurrentNode() as QuestionNodeType | undefined;
+
+  const isFinished = useDialogueStore(state => state.isFinished);
+
+  // Track if we are finished, and show finished modal if so
+  useTrackFinished();
+
   const detectUndoRedo = useDialogueStore(state => state.detectUndoRedo);
   const applyEvent = useDialogueStore(state => state.applyEvent);
   const { uploadEvents, popEventQueue } = useDialogueStore(state => ({
@@ -54,15 +63,14 @@ export const Dialogue = ({ onEventUpload }: DialogueProps) => {
     popEventQueue: state.popEventQueue,
   }));
 
-  // Get the current node from the store
-  const currentNode = getCurrentNode() as QuestionNodeType | undefined;
 
   // If the user navigates front or backwards, detect them as undo/redo, and sync with the state
   useEffect(() => {
     if (navigationType !== 'POP' || !nodeId) return;
+    if (isFinished) return;
 
     detectUndoRedo(nodeId);
-  }, [location, navigationType, nodeId, detectUndoRedo])
+  }, [location, navigationType, nodeId, isFinished, detectUndoRedo])
 
   // Upload the events to the API
   useDebouncedEffect(() => {

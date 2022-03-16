@@ -12,10 +12,12 @@ import { QuestionNode as GeneratedQuestionNode } from '../../types/generated-typ
 import { POSTLEAFNODE_ID } from '../PostLeafNode/PostLeafNode';
 
 interface DialogueState {
+  finish: (terminalNodeId?: string) => void;
+  isFinished: boolean;
   idToNode: Record<string, GeneratedQuestionNode> | undefined;
   dialogue: Dialogue | undefined;
   workspace: Workspace | undefined;
-
+  terminalNodeId: string | undefined;
   sessionId: string | null;
   isInitializing: boolean;
 
@@ -45,11 +47,15 @@ interface DialogueState {
 }
 
 export const useDialogueStore = create<DialogueState>((set, get) => ({
+  // States
+  isFinished: false,
+  isInitializing: true,
+
   sessionId: null,
+  terminalNodeId: undefined,
   idToNode: undefined,
   dialogue: undefined,
   workspace: undefined,
-  isInitializing: true,
 
   activeEvent: undefined,
   pastEvents: [],
@@ -184,5 +190,8 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
     const queuedStateActions = get().uploadEvents;
     set({ uploadEvents: [] });
     return queuedStateActions;
+  },
+  finish: (terminalNodeId: string | undefined = undefined) => {
+    set({ isFinished: true, terminalNodeId });
   },
 }));
