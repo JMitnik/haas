@@ -40,7 +40,7 @@ class SessionService {
   }
 
   /**
-   * Finds all sessions of a dialogue within provided dates 
+   * Finds all sessions of a dialogue within provided dates
    * @param dialogueId the ID of a dialogue
    * @param startDateTime the start date from when sessions should be found
    * @param endDateTime the end date until sessions should be found

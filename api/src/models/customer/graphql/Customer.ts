@@ -100,6 +100,7 @@ export const CustomerType = objectType({
       args: {
         filter: DialogueFilterInputType,
       },
+      useQueryCounter: true,
       async resolve(parent: Customer, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 

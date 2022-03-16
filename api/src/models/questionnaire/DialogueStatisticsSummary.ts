@@ -1,11 +1,11 @@
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType, plugin } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
 import { DialogueType } from './Dialogue'
 
 export const DialogueImpactScore = enumType({
   name: 'DialogueImpactScore',
   members: ['AVERAGE'],
-})
+});
 
 export const DialogueStatisticsSummaryModel = objectType({
   name: 'DialogueStatisticsSummaryModel',
@@ -20,17 +20,15 @@ export const DialogueStatisticsSummaryModel = objectType({
         type: 'DialogueImpactScore',
       },
       nullable: true,
-      async resolve(parent, args, ctx) {
+      useParentResolve: true,
+      resolve: (parent, args, ctx) => {
         if (!args.type) throw new UserInputError('No impact score type provided!');
 
         return ctx.services.dialogueStatisticsService.calculateImpactScore(args.type, parent.sessions);
       },
     });
 
-    t.field('sessions', {
-      type: 'Session',
-      list: true,
-    })
+    t.field('sessions', { type: 'Session', list: true });
 
     t.field('dialogue', { type: DialogueType, nullable: true });
   },
