@@ -21,7 +21,7 @@ export const LinkNode = ({ node }: QuestionNodeProps) => {
 
   useEffect(() => {
     finish(node.id);
-  }, [finish]);
+  }, [finish, node]);
 
   return (
     <QuestionNodeLayout node={node}>
