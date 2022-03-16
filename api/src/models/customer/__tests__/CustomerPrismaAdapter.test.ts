@@ -1,8 +1,8 @@
-import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
-import { CustomerPrismaAdapter } from "../CustomerPrismaAdapter";
-import { NexusGenInputs } from "../../../generated/nexus";
+import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
+import { CustomerPrismaAdapter } from '../CustomerPrismaAdapter';
+import { NexusGenInputs } from '../../../generated/nexus';
 import { clearCustomerDatabase } from './testUtils';
-import { UpdateCustomerInput } from "../CustomerServiceType";
+import { UpdateCustomerInput } from '../CustomerServiceType';
 
 const prisma = makeTestPrisma();
 const customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
@@ -17,7 +17,7 @@ const defaultCustomerInput: NexusGenInputs['CreateWorkspaceInput'] = {
 describe('CustomerPrismaAdapter', () => {
   afterEach(async () => {
     await clearCustomerDatabase(prisma);
-    prisma.$disconnect();
+    await prisma.$disconnect();
   });
 
   test('Creates a workspace', async () => {
@@ -50,7 +50,7 @@ describe('CustomerPrismaAdapter', () => {
     const tags = await prisma.tag.findMany({
       where: {
         customerId: createdCustomer.id,
-      }
+      },
     });
 
     expect(tags.length).not.toEqual(0);
@@ -182,15 +182,15 @@ describe('CustomerPrismaAdapter', () => {
             {
               title: 'dialogueOne',
               slug: 'dialogueOneSlug',
-              description: 'description #1'
+              description: 'description #1',
             },
             {
               title: 'dialogueTwo',
               slug: 'dialogueTwoSlug',
-              description: 'description #1'
-            }
-          ]
-        }
+              description: 'description #1',
+            },
+          ],
+        },
       },
       include: {
         dialogues: true,
@@ -218,15 +218,15 @@ describe('CustomerPrismaAdapter', () => {
             {
               title: 'dialogueOne',
               slug: 'dialogueOneSlug',
-              description: 'description #1'
+              description: 'description #1',
             },
             {
               title: 'dialogueTwo',
               slug: 'dialogueTwoSlug',
-              description: 'description #1'
-            }
-          ]
-        }
+              description: 'description #1',
+            },
+          ],
+        },
       },
       include: {
         dialogues: true,
@@ -281,17 +281,17 @@ describe('CustomerPrismaAdapter', () => {
                         slug: 'sluggy',
                       },
                     },
-                  }
-                ]
-              }
+                  },
+                ],
+              },
             },
             {
               title: 'dialogueTwo',
               slug: 'dialogueTwoSlug',
               description: 'description #1',
-            }
-          ]
-        }
+            },
+          ],
+        },
       },
       include: {
         dialogues: true,

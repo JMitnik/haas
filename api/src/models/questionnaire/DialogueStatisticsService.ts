@@ -6,8 +6,6 @@ import SessionService from '../session/SessionService';
 import NodeService from '../QuestionNode/NodeService';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 
-
-
 class DialogueStatisticsService {
   dialoguePrismaAdapter: DialoguePrismaAdapter;
   nodeService: NodeService;
