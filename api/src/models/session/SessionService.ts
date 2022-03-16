@@ -46,20 +46,20 @@ class SessionService {
    * @param endDateTime the end date until sessions should be found
    * @returns a list of sessions
    */
-  findScopedSessions = async (dialogueId: string, startDateTime?: string, endDateTime?: string) => {
-    return this.sessionPrismaAdapter.findScopedSessions(dialogueId, startDateTime, endDateTime);
+  findSessionsBetweenDates = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
+    return this.sessionPrismaAdapter.findSessionsBetweenDates(dialogueId, startDateTime, endDateTime);
   }
 
   /**
-   * Finds single session by passed ID.
-   * */
+  * Finds single session by passed ID.
+  * */
   findSessionById(sessionId: string): Promise<Session | null> {
     return this.sessionPrismaAdapter.findSessionById(sessionId);
   };
 
   /**
-   * Create a user-session from the client.
-   */
+  * Create a user-session from the client.
+  */
   async createSession(sessionInput: any) {
     const { dialogueId, entries } = sessionInput;
     const session = await this.sessionPrismaAdapter.createSession({
@@ -114,9 +114,9 @@ class SessionService {
   }
 
   /**
-   * Get scoring entries from a list of sessions.
-   * @param sessions
-   */
+  * Get scoring entries from a list of sessions.
+  * @param sessions
+  */
   static getScoringEntriesFromSessions(
     sessions: SessionWithEntries[],
   ): (NodeEntryWithTypes)[] {
@@ -129,9 +129,9 @@ class SessionService {
   }
 
   /**
-   * Get the sole scoring entry a single session.
-   * @param session
-   */
+  * Get the sole scoring entry a single session.
+  * @param session
+  */
   static getScoringEntryFromSession(session: SessionWithEntries): NodeEntryWithTypes | null {
     return session.nodeEntries.find((entry) => entry.sliderNodeEntry?.value) || null;
   };
@@ -143,9 +143,9 @@ class SessionService {
   };
 
   /**
-   * Get text entries from a list of sessions
-   * @param sessions
-   */
+  * Get text entries from a list of sessions
+  * @param sessions
+  */
   static getTextEntriesFromSessions(
     sessions: SessionWithEntries[],
   ): (NodeEntryWithTypes | undefined | null)[] {
@@ -162,9 +162,9 @@ class SessionService {
   }
 
   /**
-   * Get text entries from a single session
-   * @param session
-   */
+  * Get text entries from a single session
+  * @param session
+  */
   static async getTextEntriesFromSession(
     session: SessionWithEntries,
   ): Promise<NodeEntryWithTypes[] | undefined | null> {
@@ -172,8 +172,8 @@ class SessionService {
   };
 
   /**
-   * Finds session score in database, based on the provided id.
-   * */
+  * Finds session score in database, based on the provided id.
+  * */
   static async findSessionScore(sessionId: string): Promise<number | undefined | null> {
     // TODO: Replace with prismAdapter.findSessionById
     const session = await prisma.session.findUnique({
@@ -211,10 +211,10 @@ class SessionService {
   };
 
   /**
-   * Fetches all sessions of dialogue using dialogueId {dialogueId}
-   * @param dialogueId
-   * @param paginationOpts
-   */
+  * Fetches all sessions of dialogue using dialogueId {dialogueId}
+  * @param dialogueId
+  * @param paginationOpts
+  */
   static async fetchSessionsByDialogue(
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,

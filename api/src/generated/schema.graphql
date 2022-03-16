@@ -641,7 +641,7 @@ type Dialogue {
   customer: Customer
   customerId: String!
   description: String!
-  dialogueStatisticsSummary(endDateTime: String, refresh: Boolean, startDateTime: String): DialogueStatisticsSummaryModel
+  dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
   edges: [Edge!]!
   id: ID!
   isWithoutGenData: Boolean!
@@ -699,6 +699,12 @@ type DialogueStatistics {
   nrInteractions: Int!
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
+}
+
+input DialogueStatisticsSummaryFilterInput {
+  endDateTime: String
+  refresh: Boolean
+  startDateTime: String!
 }
 
 """DialogueStatisticsSummary"""

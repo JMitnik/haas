@@ -12,7 +12,7 @@ export const TimeResolverPlugin = plugin({
       const endTimeMs = new Date().valueOf()
 
       if (useTimeResolve) {
-        console.log(`Operation ${info.operation.name} took ${endTimeMs - startTimeMs} ms`);
+        console.log(`Operation ${info.operation.name?.value} took ${endTimeMs - startTimeMs} ms`);
       }
 
       return value;

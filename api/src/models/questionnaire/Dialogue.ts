@@ -12,7 +12,7 @@ import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
-import isValidDate from '../../utils/isValidDate';
+import isValidDate, { isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
@@ -41,6 +41,15 @@ export const DialogueFinisherType = objectType({
     t.string('subtext');
   },
 });
+
+export const DialogueStatisticsSummaryFilterInput = inputObjectType({
+  name: 'DialogueStatisticsSummaryFilterInput',
+  definition(t) {
+    t.string('startDateTime', { required: true });
+    t.string('endDateTime');
+    t.boolean('refresh');
+  },
+})
 
 export const DialogueType = objectType({
   name: 'Dialogue',
@@ -80,18 +89,31 @@ export const DialogueType = objectType({
     t.field('dialogueStatisticsSummary', {
       type: DialogueStatisticsSummaryModel,
       args: {
-        startDateTime: 'String',
-        endDateTime: 'String',
-        refresh: 'Boolean',
+        input: DialogueStatisticsSummaryFilterInput,
       },
       nullable: true,
       useParentResolve: true,
+      useQueryCounter: true,
+      useTimeResolve: true,
       resolve(parent, args, ctx) {
-        return ctx.services.dialogueStatisticsService.initiateDialogueStatisticsSummary(
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.initiate(
           parent.id,
-          args.startDateTime || undefined,
-          args.endDateTime || undefined,
-          args.refresh || undefined,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || undefined,
         );
       },
     });
@@ -99,6 +121,7 @@ export const DialogueType = objectType({
     t.field('averageScore', {
       type: 'Float',
       args: { input: DialogueFilterInputType },
+      useTimeResolve: true,
       async resolve(parent, args) {
         if (!parent.id) {
           return 0;

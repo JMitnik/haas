@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient, Session } from '@prisma/client';
 import { cloneDeep } from 'lodash';
-import { NexusGenFieldTypes, NexusGenInputNames, NexusGenInputs } from '../../generated/nexus';
+import { NexusGenInputs } from '../../generated/nexus';
 
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { CreateSessionInput } from './SessionPrismaAdapterType';
@@ -19,7 +19,7 @@ class SessionPrismaAdapter {
    * @param endDateTime the end date until sessions should be found
    * @returns a list of sessions
    */
-  findScopedSessions = async (dialogueId: string, startDateTime?: string, endDateTime?: string) => {
+  findSessionsBetweenDates = async (dialogueId: string, startDateTime: Date, endDateTime?: Date) => {
     const dialogueWithSessions = await this.prisma.dialogue.findUnique({
       where: { id: dialogueId },
       include: {

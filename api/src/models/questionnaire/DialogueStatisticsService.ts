@@ -5,6 +5,7 @@ import { mean } from 'lodash';
 import SessionService from '../session/SessionService';
 import NodeService from '../QuestionNode/NodeService';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
+import { addDays } from 'date-fns';
 
 class DialogueStatisticsService {
   dialoguePrismaAdapter: DialoguePrismaAdapter;
@@ -22,16 +23,22 @@ class DialogueStatisticsService {
    * @param dialogueId 
    * @param startDateTime 
    * @param endDateTime 
-   * @param refetch Boolean - if set to true will update cached version within database 
+   * @param refresh Boolean - if set to true will update cached version within database 
    * @returns 
    */
-  initiateDialogueStatisticsSummary = async (
+  initiate = async (
     dialogueId: string,
-    startDateTime?: string,
-    endDateTime?: string,
-    refetch: boolean = false
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false
   ) => {
-    const scopedSessions = await this.sessionService.findScopedSessions(dialogueId, startDateTime, endDateTime);
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
+
+    const scopedSessions = await this.sessionService.findSessionsBetweenDates(
+      dialogueId,
+      startDateTime,
+      endDateTimeSet
+    );
 
     return { sessions: scopedSessions, nrVotes: scopedSessions.length };
   }
