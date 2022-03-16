@@ -48,6 +48,7 @@ export const SliderNode = ({ node, onRunAction }: QuestionNodeProps) => {
     });
   }, [getValues, sessionId, node, onRunAction]);
 
+
   return (
     <QuestionNodeContainer>
       <QuestionNodeLayout node={node}>

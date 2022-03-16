@@ -12,7 +12,8 @@ export const QuestionNodeTitleContainer = styled.div.attrs({
   ${({ theme, size }) => css`
     text-align: left;
     font-size: 3rem;
-    font-weight: 50;
+    font-weight: 300;
+    letter-spacing: -1px;
     margin-bottom: ${theme.gutter}px;
     margin-top: ${theme.gutter}px;
 

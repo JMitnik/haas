@@ -1,9 +1,25 @@
+@font-face {
+  font-family: "Inter";
+  src: url("./assets/fonts/EBGaramond/Inter-Medium.ttf");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/EBGaramond/Inter-Bold.ttf");
+  font-style: medium;
+  font-weight: 800;
+  font-display: swap;
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  /* font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif; */
+  font-family: 'Inter', sans-serif;
 }
 
 a {

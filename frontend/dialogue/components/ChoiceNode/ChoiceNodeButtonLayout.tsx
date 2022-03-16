@@ -10,7 +10,7 @@ interface ChoiceNodeButtonLayoutProps {
 
 export const ChoiceNodeButtonLayout = ({ children }: ChoiceNodeButtonLayoutProps) => {
   return (
-    <UI.Grid gridTemplateColumns={['1fr']} gridGap={1}>
+    <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={1}>
       {children}
     </UI.Grid>
   );

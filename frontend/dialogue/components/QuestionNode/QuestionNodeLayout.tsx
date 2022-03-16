@@ -43,7 +43,7 @@ export const QuestionNodeLayout = ({ children }: NodeLayoutProps) => {
           />
         </UI.AbsoluteCentered>
       )}
-      <UI.ColumnFlex flexGrow={1} justifyContent={['space-between', 'center']}>
+      <UI.ColumnFlex flexGrow={1} justifyContent={['space-between', 'space-around']}>
         {children}
       </UI.ColumnFlex>
     </UI.ColumnFlex>
