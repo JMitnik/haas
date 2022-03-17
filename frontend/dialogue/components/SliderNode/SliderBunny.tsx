@@ -5,7 +5,6 @@ import {
 } from 'framer-motion';
 import { usePopper } from 'react-popper';
 import { differenceInSeconds } from 'date-fns';
-import { useTimer } from 'react-timer-hook';
 import { useTranslation } from 'react-i18next';
 import Lottie from 'react-lottie';
 import React, { useEffect, useRef, useState } from 'react';
@@ -19,6 +18,8 @@ import FingerIcon from './icon-fingerprint.svg';
 import { SlideMeAnimation } from './SliderNodeAnimations';
 import { SliderText } from './SliderText';
 import { useBunnySliderAnimation } from './useBunnySliderAnimation';
+import { useCountDown } from '../../hooks/useCountDown';
+import { linearSpring } from '../../animations/springConfigs';
 
 const adaptColor = (colorHex: string) => {
   return colorHex;
@@ -45,8 +46,8 @@ interface SliderBunnyProps {
 }
 
 // Number of seconds that are still too fast for a slide.
-const earlyReleaseThresholdSeconds = 5;
-const endTime = 5;
+const earlyReleaseThresholdSeconds = 3;
+const timerNrSeconds = 2;
 
 export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }: SliderBunnyProps) => {
   const { t } = useTranslation();
@@ -55,21 +56,24 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
   const startDate = useRef(new Date());
 
   const animationControls = useAnimation();
-  const timerProgressAbs = useSpring(endTime);
 
   const { animationState, dispatchAnimationState } = useBunnySliderAnimation();
 
-  const { pause, restart, seconds } = useTimer({
-    expiryTimestamp: new Date((new Date).getSeconds() + 15),
-    autoStart: false,
-    onExpire: () => {
-      setIsComplete(true);
-    },
-  });
+  // TODO: Replace with useTime hook from framer-motion?
+  const { timeLeft, start } = useCountDown(timerNrSeconds * 1000);
+
+  const timerProgressAbs = useSpring(0, linearSpring);
+  const timerProgress = useTransform(timerProgressAbs, [0, timerNrSeconds * 1000], [202, 151]);
 
   useEffect(() => {
-    timerProgressAbs.set(seconds);
-  }, [timerProgressAbs, seconds]);
+    if (timeLeft === 0) {
+      setIsComplete(true);
+    }
+  }, [timeLeft, setIsComplete]);
+
+  useEffect(() => {
+    timerProgressAbs.set(timeLeft);
+  }, [timerProgressAbs, timeLeft]);
 
   // Use-effect to submit: show the transition, and then submit the slider entry afterwards
   useEffect(() => {
@@ -80,11 +84,13 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
     }
   }, [isComplete, onSubmit]);
 
-  const timerProgress = useTransform(timerProgressAbs, [endTime, 0], [151, 202]);
-
   const sliderValue = Number(form.watch().slider / 10);
-  const sliderColor = transform(sliderValue, [0, 5, 10], ['#E53E3E', '#F6AD55', '#38B2AC']);
+  const adjustedScore = (Math.round(sliderValue * 2) / 2);
 
+  const sliderColor = transform(sliderValue, [0, 5, 10], ['#E53E3E', '#F6AD55', '#38B2AC']);
+  const adaptedColor = adaptColor(sliderColor);
+
+  // Dropdown
   const [overlay, setOverlay] = useState<HTMLDivElement | null>(null);
   const [sliderRef, setSliderRef] = useState<HTMLDivElement | null>(null);
   const { styles, attributes, update } = usePopper(sliderRef, overlay, {
@@ -111,7 +117,7 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
     dispatchAnimationState({ type: 'run', payload: { position: val } });
 
     // Pause the potential countdown of the submission
-    pause();
+    stop();
 
     // Update the position of the popper
     if (update) await update();
@@ -127,11 +133,7 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
 
     if (isNotEarly) {
       setShowIsEarly(false);
-
-      // Start the submission countdown
-      const time = new Date();
-      time.setSeconds(time.getSeconds() + endTime);
-      restart(time);
+      start();
     } else {
       setShowIsEarly(true);
     }
@@ -146,8 +148,6 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
     }
   };
 
-  const adaptedColor = adaptColor(sliderColor);
-  const adjustedScore = (Math.round(sliderValue * 2) / 2);
 
   return (
     <>
@@ -180,6 +180,7 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
           cursor: 'pointer',
         }}
         ref={setSliderRef}
+        onClick={() => handleEarlyClick()}
       >
         <LS.SliderSpeechWrapper
           onClick={() => handleEarlyClick()}
