@@ -1,6 +1,7 @@
 import * as UI from '@haas/ui';
 import { useRef } from 'react';
 
+import { GradientButton } from '../Button/GradientButton';
 import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
 import { SessionActionType } from '../../types/core-types';
 import { useSession } from '../Session/SessionProvider';
@@ -55,13 +56,13 @@ export const VideoNode = ({ node, onRunAction }: QuestionNodeProps) => {
 
       <ChoiceNodeButtonLayout node={node}>
         {choices.map((choice, index) => (
-          <UI.GradientButton
+          <GradientButton
             style={{ margin: '10px' }}
             key={index}
             onClick={() => handleRunAction(index)}
           >
             {choice.value}
-          </UI.GradientButton>
+          </GradientButton>
         ))}
       </ChoiceNodeButtonLayout>
     </QuestionNodeLayout>

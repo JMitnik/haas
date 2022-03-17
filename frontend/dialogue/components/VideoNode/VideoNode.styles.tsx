@@ -6,7 +6,7 @@ import { lighten, saturate } from '../Theme/colorUtils';
 export const DrawerContainer = styled(UI.Div)`
   ${({ theme }) => css`
     position: relative;
-    background: linear-gradient(45deg, ${lighten(theme.colors.primary, 0.3)}, ${saturate(lighten(theme.colors.primary, 0.3), 1)});
+    background: linear-gradient(45deg, ${lighten(theme.colors._primary, 0.3)}, ${saturate(lighten(theme.colors._primary, 0.3), 1)});
     padding: 24px;
     border-radius: 30px;
     box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;

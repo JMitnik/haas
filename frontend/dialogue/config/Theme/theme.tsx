@@ -1,10 +1,26 @@
 import { theme as chakraTheme } from '@chakra-ui/core';
 
+
+export interface Shades {
+  100: string;
+  200: string;
+  300: string;
+  400: string;
+  500: string;
+  600: string;
+  700: string;
+  800: string;
+  900: string;
+
+}
+
 const defaultTheme = {
   ...chakraTheme,
+  space: chakraTheme.space,
+  fontSizes: chakraTheme.fontSizes,
   colors: {
     ...chakraTheme.colors,
-    primary: '#0059f8',
+    primary: {} as Shades,
     _primary: '#0059f8',
     secondary: '#4FD1C5',
     _secondary: '#4FD1C5',
@@ -28,7 +44,6 @@ const defaultTheme = {
       background: '',
     },
   },
-  // space: [0, 6, 12, 18, 24],
   gutter: 24,
   containerWidth: 760,
   // TODO: Add font
@@ -51,15 +66,26 @@ const defaultTheme = {
     mob: 'only screen and (max-width: 600px)',
     desk: 'only screen and (min-width: 601px)',
   },
-  fontSizes: [12, 16.0, 21.33, 28.43, 37.9, 50.52],
 };
 
-export const theme = {
+export const themeWithChakra = {
   ...defaultTheme,
-  space: chakraTheme.space,
-  fontSizes: chakraTheme.fontSizes,
 };
 
-export type Theme = typeof theme;
+
+export enum ThemeBrightModeEnum {
+  light = 'light',
+  dark = 'dark',
+  medium = 'medium',
+}
+type Chakratheme = typeof themeWithChakra;
+
+export interface Theme extends Chakratheme {
+  brightMode: ThemeBrightModeEnum;
+}
+export const theme: Theme = {
+  ...themeWithChakra,
+  brightMode: ThemeBrightModeEnum.medium,
+}
 
 theme.colors.app.background = theme.colors.default.normal;

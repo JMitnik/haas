@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 
+import { GradientButton } from '../Button/GradientButton';
 import { FormNodeField, SessionActionType } from '../../types/generated-types';
 import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
 import { useSession } from '../Session/SessionProvider';
@@ -155,7 +156,7 @@ const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
                 </UI.Grid>
                 <UI.Div mt={4}>
                   <UI.Flex flexWrap="wrap" alignItems="center">
-                    <UI.GradientButton
+                    <GradientButton
                       flexBasis="200px"
                       mr={2}
                       width="auto"
@@ -164,10 +165,10 @@ const FormNode = ({ node, onRunAction }: QuestionNodeProps) => {
                       isActive={isValid}
                     >
                       {t('submit')}
-                    </UI.GradientButton>
-                    <UI.GradientButton size="sm" variant="ghost" onClick={(e) => handleRunAction(e)}>
+                    </GradientButton>
+                    <GradientButton size="sm" variant="ghost" onClick={(e) => handleRunAction(e)}>
                       {t('do_not_share')}
-                    </UI.GradientButton>
+                    </GradientButton>
                   </UI.Flex>
                 </UI.Div>
               </Div>

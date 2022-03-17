@@ -20,9 +20,10 @@ import { SliderText } from './SliderText';
 import { useBunnySliderAnimation } from './useBunnySliderAnimation';
 import { useCountDown } from '../../hooks/useCountDown';
 import { linearSpring } from '../../animations/springConfigs';
+import { lighten } from '../Theme/colorUtils';
 
 const adaptColor = (colorHex: string) => {
-  return colorHex;
+  return lighten(colorHex, 0.6);
 };
 
 
@@ -54,6 +55,7 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
   const [isComplete, setIsComplete] = useState(false);
   const [showIsEarly, setShowIsEarly] = useState(false);
   const startDate = useRef(new Date());
+  const [hasStarted, setHasStarted] = useState(false);
 
   const animationControls = useAnimation();
 
@@ -107,6 +109,7 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
    * Move the bunny, and update the slider value.
    */
   const moveBunny = async (event: React.FormEvent<HTMLInputElement>) => {
+    setHasStarted(true);
     const val = Number(event.currentTarget.value);
     form.setValue('slider', val);
 
@@ -183,6 +186,7 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
         onClick={() => handleEarlyClick()}
       >
         <LS.SliderSpeechWrapper
+          isOpen={hasStarted}
           onClick={() => handleEarlyClick()}
           ref={setOverlay}
           style={{
@@ -192,65 +196,67 @@ export const SliderBunny = ({ form, onSubmit, markers, happyText, unhappyText }:
           }}
           {...attributes.popper}
         >
-          {!animationState.isStopped && (
-            <motion.div
-              initial={{ opacity: 0, y: 70, x: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ scale: 1.1 }}
-            >
-              <LS.SliderNodeValue
-                initial="initial"
-                variants={sliderValueAnimeVariants}
-                animate={animationControls}
+          <LS.InnerSpeechWrapper>
+            {!animationState.isStopped && (
+              <motion.div
+                initial={{ opacity: 0, y: 70, x: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.1 }}
               >
-                <motion.svg viewBox="0 0 50 50">
-                  <motion.circle
-                    cx="25"
-                    cy="25"
-                    r="24"
-                    style={{
-                      strokeDashoffset: 453,
-                      strokeDasharray: timerProgress,
-                      fill: 'transparent',
-                      stroke: sliderColor,
-                      strokeWidth: '2px',
-                    }}
-                  />
-                </motion.svg>
+                <LS.SliderNodeValue
+                  initial="initial"
+                  variants={sliderValueAnimeVariants}
+                  animate={animationControls}
+                >
+                  <motion.svg viewBox="0 0 50 50">
+                    <motion.circle
+                      cx="25"
+                      cy="25"
+                      r="24"
+                      style={{
+                        strokeDashoffset: 453,
+                        strokeDasharray: timerProgress,
+                        fill: 'transparent',
+                        stroke: sliderColor,
+                        strokeWidth: '2px',
+                      }}
+                    />
+                  </motion.svg>
 
-                <motion.span animate={{ color: sliderColor }} style={{ width: '100%' }}>
-                  <AnimatePresence exitBeforeEnter>
-                    {!isComplete ? (
-                      <motion.div key="score" initial={{ y: 0 }} exit={{ y: -30 }} style={{ width: '100%' }}>
-                        {adjustedScore.toFixed(1)}
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        style={{ background: sliderColor, color: adaptedColor }}
-                        className="signal"
-                        key="signal"
-                        initial={{ y: 30 }}
-                        animate={{ y: 0 }}
-                      >
-                        {sliderValue > 5 ? (
-                          <HappyIcon/>
-                        ) : (
-                          <UnhappyIcon/>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.span>
-              </LS.SliderNodeValue>
-              <SliderText
-                markers={markers}
-                color={sliderColor}
-                adaptedColor={adaptedColor}
-                score={adjustedScore}
-                isEarly={showIsEarly}
-              />
-            </motion.div>
-          )}
+                  <motion.span animate={{ color: sliderColor }} style={{ width: '100%' }}>
+                    <AnimatePresence exitBeforeEnter>
+                      {!isComplete ? (
+                        <motion.div key="score" initial={{ y: 0 }} exit={{ y: -30 }} style={{ width: '100%' }}>
+                          {adjustedScore.toFixed(1)}
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          style={{ background: sliderColor, color: adaptedColor }}
+                          className="signal"
+                          key="signal"
+                          initial={{ y: 30 }}
+                          animate={{ y: 0 }}
+                        >
+                          {sliderValue > 5 ? (
+                            <HappyIcon/>
+                          ) : (
+                            <UnhappyIcon/>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.span>
+                </LS.SliderNodeValue>
+                <SliderText
+                  markers={markers}
+                  color={sliderColor}
+                  adaptedColor={adaptedColor}
+                  score={adjustedScore}
+                  isEarly={showIsEarly}
+                />
+              </motion.div>
+            )}
+          </LS.InnerSpeechWrapper>
         </LS.SliderSpeechWrapper>
         <UI.Div
           className="rabbit"

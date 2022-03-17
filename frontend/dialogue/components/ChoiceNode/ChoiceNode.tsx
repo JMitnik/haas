@@ -8,6 +8,7 @@ import { ChoiceNodeButtonLayout } from './ChoiceNodeButtonLayout';
 import { findChoiceChildEdge } from './findChoiceChildEdge';
 import { QuestionNodeTitle } from '../QuestionNode/QuestionNodeTitle';
 import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
+import { GradientButton } from '../Button/GradientButton';
 
 /**
  * ChoiceNode: dialogue segment where a button press leads to the next item.
@@ -49,13 +50,13 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
 
       <ChoiceNodeButtonLayout node={node}>
         {choices.map((choice, index) => (
-          <UI.GradientButton
+          <GradientButton
             style={{ margin: '10px' }}
             key={index}
             onClick={() => handleRunAction(index)}
           >
             {choice.value}
-          </UI.GradientButton>
+          </GradientButton>
         ))}
       </ChoiceNodeButtonLayout>
     </QuestionNodeLayout>

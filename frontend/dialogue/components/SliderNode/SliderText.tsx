@@ -43,7 +43,7 @@ export const SliderText = ({ color, adaptedColor, score, isEarly, markers }: Sli
   }
 
   return (
-    <UI.Span ml={2} textAlign="left">
+    <UI.Span textAlign="left">
       <UI.Text fontSize="1rem" color={color}>
         {text}
       </UI.Text>

@@ -2,12 +2,12 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import { ModalProvider } from 'react-modal-hook';
+import { AnimatePresence } from 'framer-motion';
 
 import { lang } from './language'
 import { SessionProvider } from '../components/Session/SessionProvider';
 import ThemeProviders from '../components/Theme/ThemeProviders';
 import { Workspace } from '../types/core-types';
-import { AnimatePresence } from 'framer-motion';
 
 interface AppProvidersProps {
   children: React.ReactNode;

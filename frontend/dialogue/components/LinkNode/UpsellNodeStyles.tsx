@@ -8,7 +8,7 @@ export const DrawerContainer = styled(UI.Div)`
     display: grid;
     row-gap: 2em;
     background: white;
-      //background: ${Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()};
+      //background: ${Color(theme.colors._primary).mix(Color('white'), 0.9).saturate(1).hex()};
     text-align: center;
 
     padding: 24px;
@@ -21,7 +21,7 @@ export const DrawerContainer = styled(UI.Div)`
 
 export const TextGradient = styled(UI.Div)`
   ${({ theme }) => css`
-    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+    color: ${Color(theme.colors._primary).isDark() ? Color(theme.colors._primary).hex() : Color(theme.colors._primary).mix(Color('black'), 0.5).saturate(1).hex()};
   `}
 `;
 
@@ -63,13 +63,13 @@ export const RedirectButton = styled.a<RedirectButtonProps>`
 
     text-decoration: none;
 
-    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()});
+    background: linear-gradient(45deg, ${Color(theme.colors._primary).lighten(0.3).hex()}, ${Color(theme.colors._primary).lighten(0.3).saturate(1).hex()});
     font-family: 'Inter', sans-serif;
-    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+    color: ${Color(theme.colors._primary).isDark() ? Color(theme.colors._primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors._primary).mix(Color('black'), 0.5).saturate(1).hex()};
 
     :hover {
       cursor: pointer;
-      color: ${Color(theme.colors.primary).isDark() ? Color('white').hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+      color: ${Color(theme.colors._primary).isDark() ? Color('white').hex() : Color(theme.colors._primary).mix(Color('black'), 0.5).saturate(1).hex()};
     }
 
     ${overrideBackgroundColor && css`
@@ -89,13 +89,13 @@ export const ButtonIconContainer = styled(UI.Div) <RedirectButtonProps>`
   //TODO: Adjust color of custom icon using inverse CSS property (?)
   ${({ theme, overrideBackgroundColor }) => css`
     img {
-      color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+      color: ${Color(theme.colors._primary).isDark() ? Color(theme.colors._primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors._primary).mix(Color('black'), 0.5).saturate(1).hex()};
       width: 24px;
       height: auto
     }
 
     svg {
-      color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+      color: ${Color(theme.colors._primary).isDark() ? Color(theme.colors._primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors._primary).mix(Color('black'), 0.5).saturate(1).hex()};
       width: 24px;
       height: auto;
     }

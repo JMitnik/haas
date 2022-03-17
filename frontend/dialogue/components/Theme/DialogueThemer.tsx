@@ -2,8 +2,6 @@ import { useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import chroma from 'chroma-js';
 
-import { Theme } from '../../config/Theme/theme';
-
 interface DialogueThemerContainerProps {
   usesGradient: boolean;
   bgColor: string;
@@ -11,7 +9,7 @@ interface DialogueThemerContainerProps {
 }
 
 const DialogueThemerContainer = styled.div<DialogueThemerContainerProps>`
-  ${({ theme, usesGradient, bgColor, bgAltColor }) => css`
+  ${({ usesGradient, bgColor, bgAltColor }) => css`
     display: flex;
     flex-direction: column;
     flex: 100%;

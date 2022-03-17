@@ -10,7 +10,7 @@ export const SlideHereContainer = styled(motion.div)`
     display: flex;
     top: -${theme.gutter}px;
     width: 100%;
-    color: ${Color(theme.colors.primary).mix(Color('white'), 0.6).hex()};
+    color: ${Color(theme.colors._primary).mix(Color('white'), 0.6).hex()};
     opacity: 0;
     font-family: 'Inter', sans-serif;
     font-size: 1rem;
@@ -47,9 +47,8 @@ export const FingerPrintContainer = styled(motion.div)`
       width: 36px;
       height: 36px;
 
-      > g {
-        stroke-width: 1;
-        stroke: ${Color(theme.colors.primary).mix(Color('white'), 0.9).hex()};;
+      path {
+        stroke: ${theme.colors.primary['100']};
       }
     }
   `}
@@ -58,7 +57,7 @@ export const FingerPrintContainer = styled(motion.div)`
 export const SliderNodeValue = styled(motion.span)`
   ${({ theme }) => css`
     background: rgba(255, 255, 255, 0.4);
-    color: ${theme.colors.primary};
+    color: ${theme.colors._primary};
     text-align: center;
     font-size: 1.1rem;
     font-weight: 1000;
@@ -69,6 +68,7 @@ export const SliderNodeValue = styled(motion.span)`
     overflow: hidden;
     width: 45px;
     height: 45px;
+    margin-right: ${theme.gutter / 2}px;
 
     > svg {
       position: absolute;
@@ -121,29 +121,62 @@ export const HAASRabbit = styled.div`
   }
 `;
 
-export const SliderSpeechWrapper = styled(Div)`
-  > div {
-    width: 100%;
-    display: flex;
-    align-items: center;
+interface SliderSpeechWrapperProps {
+  isOpen?: boolean;
+}
 
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.5);
+export const SliderSpeechWrapper = styled(Div)<SliderSpeechWrapperProps>`
+  ${({ theme, isOpen }) => css`
+    border-radius: 20px;
     backdrop-filter: blur(5px);
-    padding: 12px;
-    box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px;
+    opacity: 0;
 
-    &:hover {
-      cursor: pointer;
+    ${isOpen && css`
+      opacity: 1;
+      box-shadow: 0px 0px 0px 1px rgba(255,255, 255, 0.15);
+    `}
+
+    ${theme.brightMode === 'light' && css`
+      background: rgba(255, 255, 255, 0.5);
+      border: red;
+    `}
+
+    ${theme.brightMode === 'medium' && css`
+      background: rgba(255, 255, 255, 0.3);
+    `}
+
+    ${theme.brightMode === 'dark' && css`
+      background: rgba(0, 0, 0, 0.3);
+    `}
+  `}
+`;
+
+export const InnerSpeechWrapper = styled(Div)`
+  box-shadow: inset 0px 2px 3px rgba(255,255, 255, 0.06) !important;
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  width: 100%;
+
+  > div {
+      width: 100%;
+      display: flex;
+      align-items: center;
+
+      border-radius: 20px;
+      padding: 12px;
+
+      &:hover {
+        cursor: pointer;
+      }
     }
-  }
 `;
 
 export const PseudoSliderTrack = styled.div`
   ${({ theme }) => css`
     width: 100%;
     border-radius: 10px;
-    background: ${theme.colors._primary};
+    background: ${theme.colors.primary['300']};
     box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px;
   `}
 `;

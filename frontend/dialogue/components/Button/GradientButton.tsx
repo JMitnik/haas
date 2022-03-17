@@ -9,7 +9,6 @@ export const ButtonBody = styled.span``;
 export const GradientButton = styled(Button)<{ usePulse?: boolean; size?: Size }>`
   ${({ isActive = true, theme, usePulse = false, size }) => css`
     width: 100%;
-    grid-column: 1 / 2;
     justify-content: flex-start;
     border: none;
     max-width: 100%;
@@ -20,20 +19,18 @@ export const GradientButton = styled(Button)<{ usePulse?: boolean; size?: Size }
     position: relative;
     justify-content: flex-start;
     align-items: center;
-    padding: 0 !important;
     box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
     border-radius: 10px;
     transform: none;
-    padding: 12px !important;
+    padding: ${theme.gutter / 2}px;
     font-size: 1rem;
-    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()});
+    background: linear-gradient(45deg, ${theme.colors.primary['500']}, ${theme.colors.primary['700']});
     font-family: 'Inter', sans-serif;
-    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex()
-    : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+    color: ${theme.colors.primary['100']};
     white-space: normal !important;
 
     &:disabled {
-      background: linear-gradient(45deg, ${Color(theme.colors.gray[500]).lighten(0.3).hex()}, ${Color(theme.colors.gray[500]).lighten(0.3).saturate(1).hex()});
+      background: ${theme.colors.gray[500]};
     }
 
     > svg {
@@ -79,17 +76,17 @@ export const GradientButton = styled(Button)<{ usePulse?: boolean; size?: Size }
     @keyframes pulse {
       0% {
         transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(${Color(theme.colors.primary).array().join(',')}, 0.7);
+        /* box-shadow: 0 0 0 0 rgba(${Color(theme.colors._primary).array().join(',')}, 0.7); */
       }
 
       70% {
         transform: scale(1);
-        box-shadow: 0 0 0 50px rgba(${Color(theme.colors.primary).array().join(',')}, 0);
+        /* box-shadow: 0 0 0 50px rgba(${Color(theme.colors._primary).array().join(',')}, 0); */
       }
 
       100% {
         transform: scale(0.95);
-        box-shadow: 0 0 0 0px rgba(${Color(theme.colors.primary).array().join(',')}, 0);
+        /* box-shadow: 0 0 0 0px rgba(${Color(theme.colors._primary).array().join(',')}, 0); */
       }
     }
   `}

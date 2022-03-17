@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 
 import { theme, Theme } from '../../config/Theme/theme';
 import { Workspace, WorkspaceSettings } from '../../types/core-types';
+import { generateColorShades, getBrightMode } from './colorUtils';
 
 /**
  * Merge workspace theme with the base theme derived from Chakra and default settings.
@@ -13,10 +14,15 @@ import { Workspace, WorkspaceSettings } from '../../types/core-types';
  * @returns The workspace theme
  */
 export const createCustomTheme = (workspaceSettings: WorkspaceSettings, baseTheme: Theme): Theme => {
+  const brightMode = getBrightMode(workspaceSettings.colourSettings.primary);
+  const colorShades = generateColorShades(workspaceSettings.colourSettings.primary, brightMode);
+
   const customTheme = {
     ...baseTheme,
+    brightMode,
     colors: {
       ...baseTheme.colors,
+      primary: {...colorShades},
       _primary: workspaceSettings?.colourSettings?.primary,
     },
   };
