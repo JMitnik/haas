@@ -44,6 +44,13 @@ class DialoguePrismaAdapter {
     return statisticsSummary;
   }
 
+  /**
+   * Finds a cache entry of a dialogue statistics summary based on id and date range
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns DialogueStatisticsSummaryCache | null
+   */
   findDialogueStatisticsSummaryByDialogueId = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
     const prevStatistics = await this.prisma.dialogueStatisticsSummaryCache.findFirst({
       where: {
