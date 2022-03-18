@@ -3,9 +3,9 @@ import {
   PrismaClient,
   Dialogue,
   Edge,
-} from "@prisma/client";
+} from '@prisma/client';
 
-import { CreateQuestionsInput, CreateDialogueInput } from "./DialoguePrismaAdapterType";
+import { CreateQuestionsInput, CreateDialogueInput, UpsertDialogueStatisticsInput } from './DialoguePrismaAdapterType';
 
 class DialoguePrismaAdapter {
   prisma: PrismaClient;
@@ -13,6 +13,54 @@ class DialoguePrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  /**
+   * Upserts a dialogue statistics summary
+   * @param prevStatisticsId id of the cache entry
+   * @param data upsert data
+   * @returns DialogueStatisticsSummaryCache
+   */
+  upsertDialogueStatisticsSummary = async (prevStatisticsId: string, data: UpsertDialogueStatisticsInput) => {
+    const statisticsSummary = await this.prisma.dialogueStatisticsSummaryCache.upsert({
+      where: {
+        id: prevStatisticsId,
+      },
+      create: {
+        dialogueId: data.dialogueId,
+        impactScore: data.impactScore || 0,
+        nrVotes: data.nrVotes,
+        impactScoreType: data.impactScoreType,
+        startDateTime: data.startDateTime,
+        endDateTime: data.endDateTime,
+      },
+      update: {
+        impactScore: data.impactScore || 0,
+        nrVotes: data.nrVotes,
+        impactScoreType: data.impactScoreType,
+        startDateTime: data.startDateTime,
+        endDateTime: data.endDateTime,
+      },
+    });
+    return statisticsSummary;
+  }
+
+  findDialogueStatisticsSummaryByDialogueId = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
+    const prevStatistics = await this.prisma.dialogueStatisticsSummaryCache.findFirst({
+      where: {
+        dialogueId,
+        startDateTime: {
+          equals: startDateTime,
+        },
+        endDateTime: {
+          equals: endDateTime,
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    });
+    return prevStatistics;
+  }
 
   async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
 
@@ -31,7 +79,7 @@ class DialoguePrismaAdapter {
             videoEmbeddedNode: question.videoEmbeddedNode?.videoUrl ? {
               create: {
                 videoUrl: question.videoEmbeddedNode.videoUrl,
-              }
+              },
             } : undefined,
             links: question.links?.length ? {
               create: question.links,
@@ -104,7 +152,7 @@ class DialoguePrismaAdapter {
           some: {
             id: nodeId,
           },
-        }
+        },
       },
     });
   }
@@ -133,8 +181,8 @@ class DialoguePrismaAdapter {
         slug_customerId: {
           customerId,
           slug: dialogueSlug,
-        }
-      }
+        },
+      },
     });
   };
 
@@ -154,7 +202,7 @@ class DialoguePrismaAdapter {
 
   getCampaignVariantsByDialogueId(dialogueId: string) {
     return this.prisma.campaignVariant.findMany({
-      where: { dialogueId }
+      where: { dialogueId },
     });
   }
 
@@ -324,7 +372,7 @@ class DialoguePrismaAdapter {
           id: input?.customer?.id,
           slug: input.customer.slug,
           name: input.customer?.name,
-        }
+        },
       };
     } else if (!input.customer?.create && input.customer?.id) {
       return {
@@ -349,7 +397,7 @@ class DialoguePrismaAdapter {
       },
       include: {
         customer: true,
-      }
+      },
     });
   };
 
@@ -399,9 +447,9 @@ class DialoguePrismaAdapter {
   async createEdges(
     dialogueId: string,
     edges: {
-      parentNodeId: string,
-      childNodeId: string,
-      conditions: Array<{ conditionType: string, matchValue: string | null, renderMin: number | null, renderMax: number | null }>
+      parentNodeId: string;
+      childNodeId: string;
+      conditions: Array<{ conditionType: string; matchValue: string | null; renderMin: number | null; renderMax: number | null }>;
     }[]
   ) {
     return this.prisma.dialogue.update({
@@ -414,7 +462,7 @@ class DialoguePrismaAdapter {
             parentNode: {
               connect: {
                 id: edge.parentNodeId,
-              }
+              },
             },
             conditions: {
               create: edge.conditions,
@@ -422,7 +470,7 @@ class DialoguePrismaAdapter {
             childNode: {
               connect: {
                 id: edge.childNodeId,
-              }
+              },
             },
           })),
         },
@@ -450,7 +498,7 @@ class DialoguePrismaAdapter {
     return this.prisma.dialogue.delete({
       where: {
         id: dialogueId,
-      }
+      },
     });
   };
 

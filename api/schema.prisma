@@ -19,11 +19,12 @@ model DialogueStatisticsSummaryCache {
   updatedAt     DateTime  @updatedAt
   startDateTime DateTime?
   endDateTime   DateTime?
+  nrVotes       Int?
   impactScore   Float
   dialogueId    String
 
   impactScoreType DialogueImpactScore
-  dialogue        Dialogue            @relation(fields: [dialogueId], references: [id])
+  dialogue        Dialogue?           @relation(fields: [dialogueId], references: [id])
 }
 
 model ColourSettings {

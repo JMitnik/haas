@@ -15,7 +15,7 @@ import formatDate from '../../utils/formatDate';
 import isValidDate, { isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
-import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
+import { DialogueImpactScoreType, DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -48,6 +48,10 @@ export const DialogueStatisticsSummaryFilterInput = inputObjectType({
     t.string('startDateTime', { required: true });
     t.string('endDateTime');
     t.boolean('refresh');
+    t.field('impactType', {
+      type: DialogueImpactScoreType,
+      required: true,
+    })
   },
 })
 
@@ -97,6 +101,7 @@ export const DialogueType = objectType({
       useTimeResolve: true,
       resolve(parent, args, ctx) {
         if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -111,6 +116,7 @@ export const DialogueType = objectType({
 
         return ctx.services.dialogueStatisticsService.initiate(
           parent.id,
+          args.input.impactType,
           utcStartDateTime as Date,
           utcEndDateTime,
           args.input.refresh || undefined,

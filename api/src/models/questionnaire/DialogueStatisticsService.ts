@@ -5,17 +5,19 @@ import { mean } from 'lodash';
 import SessionService from '../session/SessionService';
 import NodeService from '../QuestionNode/NodeService';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
-import { addDays } from 'date-fns';
+import { addDays, differenceInHours } from 'date-fns';
 
 class DialogueStatisticsService {
   dialoguePrismaAdapter: DialoguePrismaAdapter;
   nodeService: NodeService;
   sessionService: SessionService;
+  prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
     this.sessionService = new SessionService(prismaClient);
+    this.prisma = prismaClient;
   }
 
   /**
@@ -28,11 +30,23 @@ class DialogueStatisticsService {
    */
   initiate = async (
     dialogueId: string,
+    type: DialogueImpactScore,
     startDateTime: Date,
     endDateTime?: Date,
     refresh: boolean = false
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
+
+    const prevStatistics = await this.dialoguePrismaAdapter.findDialogueStatisticsSummaryByDialogueId(
+      dialogueId,
+      startDateTime,
+      endDateTimeSet,
+    );
+
+    // Only if more than hour difference between last cache entry and now should we update cache
+    if (prevStatistics) {
+      if (differenceInHours(Date.now(), prevStatistics.updatedAt) == 0 && !refresh) return prevStatistics;
+    }
 
     const scopedSessions = await this.sessionService.findSessionsBetweenDates(
       dialogueId,
@@ -40,7 +54,20 @@ class DialogueStatisticsService {
       endDateTimeSet
     );
 
-    return { sessions: scopedSessions, nrVotes: scopedSessions.length };
+    const impactScore = await this.calculateImpactScore(type, scopedSessions);
+
+    const statisticsSummary = await this.dialoguePrismaAdapter.upsertDialogueStatisticsSummary(
+      prevStatistics?.id || '-1',
+      {
+        dialogueId: dialogueId,
+        impactScore: impactScore || 0,
+        nrVotes: scopedSessions.length,
+        impactScoreType: type,
+        startDateTime: startDateTime,
+        endDateTime: endDateTimeSet,
+      });
+
+    return statisticsSummary;
   }
 
   /**

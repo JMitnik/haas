@@ -34,10 +34,11 @@ describe('DialogueStatisticsSummary', () => {
             id
             slug
             dialogueStatisticsSummary(input: {
-              startDateTime: "01-03-2022"
+              startDateTime: "01-03-2022",
+              impactType: AVERAGE
               }) {
               nrVotes
-              impactScore(type: AVERAGE)
+              impactScore
             }
           }
         }
@@ -72,10 +73,11 @@ describe('DialogueStatisticsSummary', () => {
             slug
             dialogueStatisticsSummary(input: {
               startDateTime: "02-03-2022",
-              endDateTime: "03-03-2022"
+              endDateTime: "03-03-2022",
+              impactType: AVERAGE
             }) {
               nrVotes
-              impactScore(type: AVERAGE)
+              impactScore
             }
           }
         }

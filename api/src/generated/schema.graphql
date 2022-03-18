@@ -689,7 +689,7 @@ type DialogueFinisherObjectType {
   subtext: String!
 }
 
-enum DialogueImpactScore {
+enum DialogueImpactScoreType {
   AVERAGE
 }
 
@@ -703,6 +703,7 @@ type DialogueStatistics {
 
 input DialogueStatisticsSummaryFilterInput {
   endDateTime: String
+  impactType: DialogueImpactScoreType!
   refresh: Boolean
   startDateTime: String!
 }
@@ -710,10 +711,12 @@ input DialogueStatisticsSummaryFilterInput {
 """DialogueStatisticsSummary"""
 type DialogueStatisticsSummaryModel {
   dialogue: Dialogue
-  id: ID
-  impactScore(type: DialogueImpactScore): Float
-  nrVotes: Int!
-  sessions: [Session!]!
+  dialogueId: String!
+  endDateTime: Date
+  id: ID!
+  impactScore: Float
+  nrVotes: Int
+  startDateTime: Date
   updatedAt: Date
 }
 
