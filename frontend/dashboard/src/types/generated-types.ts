@@ -429,6 +429,7 @@ export type CreateCtaInputType = {
   dialogueSlug?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
+  /** Linked question-node id */
   questionId?: Maybe<Scalars['String']>;
   links?: Maybe<CtaLinksInputType>;
   share?: Maybe<ShareNodeInputType>;
@@ -723,6 +724,7 @@ export type Dialogue = {
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
+  dialogueStatisticsSummary?: Maybe<DialogueStatisticsSummaryModel>;
   averageScore: Scalars['Float'];
   statistics?: Maybe<DialogueStatistics>;
   sessionConnection?: Maybe<SessionConnection>;
@@ -735,6 +737,11 @@ export type Dialogue = {
   sessions: Array<Session>;
   leafs: Array<QuestionNode>;
   campaignVariants: Array<CampaignVariantType>;
+};
+
+
+export type DialogueDialogueStatisticsSummaryArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
 
@@ -792,6 +799,10 @@ export type DialogueFinisherObjectType = {
   subtext: Scalars['String'];
 };
 
+export enum DialogueImpactScoreType {
+  Average = 'AVERAGE'
+}
+
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
   nrInteractions: Scalars['Int'];
@@ -799,6 +810,26 @@ export type DialogueStatistics = {
   topNegativePath?: Maybe<Array<TopPathType>>;
   mostPopularPath?: Maybe<TopPathType>;
   history?: Maybe<Array<LineChartDataType>>;
+};
+
+export type DialogueStatisticsSummaryFilterInput = {
+  startDateTime: Scalars['String'];
+  endDateTime?: Maybe<Scalars['String']>;
+  refresh?: Maybe<Scalars['Boolean']>;
+  impactType: DialogueImpactScoreType;
+};
+
+/** DialogueStatisticsSummary */
+export type DialogueStatisticsSummaryModel = {
+  __typename?: 'DialogueStatisticsSummaryModel';
+  id: Scalars['ID'];
+  dialogueId: Scalars['String'];
+  updatedAt?: Maybe<Scalars['Date']>;
+  startDateTime?: Maybe<Scalars['Date']>;
+  endDateTime?: Maybe<Scalars['Date']>;
+  nrVotes?: Maybe<Scalars['Int']>;
+  impactScore?: Maybe<Scalars['Float']>;
+  dialogue?: Maybe<Dialogue>;
 };
 
 export type DialogueWhereUniqueInput = {
@@ -2752,6 +2783,28 @@ export type GetWorkspaceDialoguesQuery = (
   )> }
 );
 
+export type GetWorkspaceDialogueStatisticsQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  startDateTime: Scalars['String'];
+  endDateTime: Scalars['String'];
+}>;
+
+
+export type GetWorkspaceDialogueStatisticsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & { dialogues?: Maybe<Array<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id'>
+      & { dialogueStatisticsSummary?: Maybe<(
+        { __typename?: 'DialogueStatisticsSummaryModel' }
+        & Pick<DialogueStatisticsSummaryModel, 'id' | 'impactScore' | 'nrVotes' | 'updatedAt'>
+      )> }
+    )>> }
+  )> }
+);
+
 export type DuplicateQuestionMutationVariables = Exact<{
   questionId?: Maybe<Scalars['String']>;
 }>;
@@ -4035,6 +4088,54 @@ export type GetWorkspaceDialoguesLazyQueryHookResult = ReturnType<typeof useGetW
 export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>;
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
+    }
+export const GetWorkspaceDialogueStatisticsDocument = gql`
+    query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
+  customer(id: $workspaceId) {
+    dialogues {
+      id
+      dialogueStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE}) {
+        id
+        impactScore
+        nrVotes
+        updatedAt
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceDialogueStatisticsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceDialogueStatisticsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceDialogueStatisticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceDialogueStatisticsQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      startDateTime: // value for 'startDateTime'
+ *      endDateTime: // value for 'endDateTime'
+ *   },
+ * });
+ */
+export function useGetWorkspaceDialogueStatisticsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>(GetWorkspaceDialogueStatisticsDocument, options);
+      }
+export function useGetWorkspaceDialogueStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>(GetWorkspaceDialogueStatisticsDocument, options);
+        }
+export type GetWorkspaceDialogueStatisticsQueryHookResult = ReturnType<typeof useGetWorkspaceDialogueStatisticsQuery>;
+export type GetWorkspaceDialogueStatisticsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceDialogueStatisticsLazyQuery>;
+export type GetWorkspaceDialogueStatisticsQueryResult = Apollo.QueryResult<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>;
+export function refetchGetWorkspaceDialogueStatisticsQuery(variables?: GetWorkspaceDialogueStatisticsQueryVariables) {
+      return { query: GetWorkspaceDialogueStatisticsDocument, variables: variables }
     }
 export const DuplicateQuestionDocument = gql`
     mutation duplicateQuestion($questionId: String) {

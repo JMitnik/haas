@@ -15,6 +15,7 @@ import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notificati
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog.svg';
 import { ReactComponent as SliderIcon } from 'assets/icons/icon-slider.svg';
 import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey.svg';
+import { ReactComponent as HomeIcon } from 'assets/icons/icon-home.svg';
 import { ReactComponent as TableIcon } from 'assets/icons/icon-table.svg';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 
@@ -31,6 +32,7 @@ import { useNavigator } from 'hooks/useNavigator';
 import NotAuthorizedView from './NotAuthorizedView';
 import { useCustomer } from 'providers/CustomerProvider';
 import { Loader } from 'components/Common/Loader/Loader';
+import { Home } from 'react-feather';
 
 const CustomerLayoutContainer = styled(Div) <{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
@@ -114,6 +116,12 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
     <NavItems>
       <motion.ul layout>
         <AnimateSharedLayout>
+          <NavItem
+            to={`/dashboard/b/${customerSlug}/dashboard`}
+          >
+            <HomeIcon />
+            {t('views:dashboard')}
+          </NavItem>
           <NavItem
             isSubchildActive={!!dialogueSlug}
             exact
