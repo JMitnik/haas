@@ -1,15 +1,40 @@
-import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from "@prisma/client";
+import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from '@prisma/client';
 
-import { CreateQuestionInput } from "../questionnaire/DialoguePrismaAdapterType";
-import NodeService from "./NodeService";
-import { QuestionOptionProps } from "./NodeServiceType";
-import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput, CreateLinkInput, UpdateLinkInput, CreateShareInput, UpdateShareInput, UpdateSliderNodeInput, CreateSliderNodeInput, CreateVideoEmbeddedNodeInput } from "./QuestionNodePrismaAdapterType";
+import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
+import NodeService from './NodeService';
+import { QuestionOptionProps } from './NodeServiceType';
+import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput, CreateLinkInput, UpdateLinkInput, CreateShareInput, UpdateShareInput, UpdateSliderNodeInput, CreateSliderNodeInput, CreateVideoEmbeddedNodeInput } from './QuestionNodePrismaAdapterType';
 
 class QuestionNodePrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
+  }
+
+  /**
+   * Finds a cache entry of a dialogue statistics summary based on id and date range
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns DialogueStatisticsSummaryCache | null
+   */
+  findQuestionStatisticsSummaryByQuestionId = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
+    const prevStatistics = await this.prisma.dialogueStatisticsSummaryCache.findFirst({
+      where: {
+        dialogueId,
+        startDateTime: {
+          equals: startDateTime,
+        },
+        endDateTime: {
+          equals: endDateTime,
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    });
+    return prevStatistics;
   }
 
   /**
@@ -58,7 +83,7 @@ class QuestionNodePrismaAdapter {
     return this.prisma.videoEmbeddedNode.delete({
       where: {
         id,
-      }
+      },
     });
   };
 
@@ -66,7 +91,7 @@ class QuestionNodePrismaAdapter {
     return this.prisma.videoEmbeddedNode.findUnique({
       where: {
         id: nodeId,
-      }
+      },
     })
   }
 
@@ -128,9 +153,9 @@ class QuestionNodePrismaAdapter {
         url: create.url,
         questionNode: {
           connect: {
-            id: create.questionId
-          }
-        }
+            id: create.questionId,
+          },
+        },
       },
       update: {
         title: update.title,
@@ -188,8 +213,8 @@ class QuestionNodePrismaAdapter {
         questionNode: {
           connect: {
             id: create.questionId,
-          }
-        }
+          },
+        },
       },
       update: {
         title: update.title,
@@ -201,7 +226,7 @@ class QuestionNodePrismaAdapter {
         header: create.header,
         imageUrl: create.imageUrl,
         subHeader: create.subHeader,
-      }
+      },
     });
   };
 
@@ -227,9 +252,9 @@ class QuestionNodePrismaAdapter {
           create: {
             helperText: input.helperText,
             ...input.fields,
-          }
+          },
         },
-      }
+      },
     })
   }
 
@@ -247,7 +272,7 @@ class QuestionNodePrismaAdapter {
             },
           },
         },
-      }
+      },
     })
   }
 
@@ -271,7 +296,7 @@ class QuestionNodePrismaAdapter {
             id: input.dialogueId,
           },
         },
-      }
+      },
     });
   }
 
@@ -279,7 +304,7 @@ class QuestionNodePrismaAdapter {
     return this.prisma.questionNode.delete({
       where: {
         id,
-      }
+      },
     });
   };
 
@@ -298,8 +323,8 @@ class QuestionNodePrismaAdapter {
         position: 'asc',
       },
       include: {
-        overrideLeaf: true
-      }
+        overrideLeaf: true,
+      },
     });
   }
 
@@ -346,11 +371,11 @@ class QuestionNodePrismaAdapter {
       },
       include: {
         videoEmbeddedNode: true,
-      }
+      },
     })
   }
 
-  getDialogueBuilderNode(nodeId: string): Promise<(QuestionNode & { videoEmbeddedNode: VideoEmbeddedNode | null; children: Edge[]; options: QuestionOption[]; questionDialogue: { id: string; } | null; overrideLeaf: { id: string; } | null; }) | null> {
+  getDialogueBuilderNode(nodeId: string): Promise<(QuestionNode & { videoEmbeddedNode: VideoEmbeddedNode | null; children: Edge[]; options: QuestionOption[]; questionDialogue: { id: string } | null; overrideLeaf: { id: string } | null }) | null> {
     return this.prisma.questionNode.findUnique({
       where: { id: nodeId },
       include: {
@@ -367,7 +392,7 @@ class QuestionNodePrismaAdapter {
             id: true,
           },
         },
-      }
+      },
     });
   }
 
@@ -381,12 +406,12 @@ class QuestionNodePrismaAdapter {
         questionDialogue: question.dialogueId ? {
           connect: {
             id: question.dialogueId,
-          }
+          },
         } : undefined,
         videoEmbeddedNode: question.videoEmbeddedNode?.videoUrl ? {
           create: {
             videoUrl: question.videoEmbeddedNode.videoUrl,
-          }
+          },
         } : undefined,
         links: question.links?.length ? {
           create: question.links,
@@ -397,14 +422,14 @@ class QuestionNodePrismaAdapter {
               value,
               publicValue,
               position,
-              overrideLeaf: overrideLeafId ? { connect: { id: overrideLeafId } } : undefined
+              overrideLeaf: overrideLeafId ? { connect: { id: overrideLeafId } } : undefined,
             }
           }),
         } : undefined,
         overrideLeaf: question.overrideLeafId ? {
           connect: {
             id: question.overrideLeafId,
-          }
+          },
         } : undefined,
         form: question.form ? {
           create: {

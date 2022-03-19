@@ -21,6 +21,7 @@ import DynamoScheduleService from '../services/DynamoScheduleService'
 import LinkService from '../models/link/LinkService';
 import AutomationService from '../models/automations/AutomationService'
 import DialogueStatisticsService from '../models/questionnaire/DialogueStatisticsService'
+import QuestionStatisticsService from '../models/QuestionNode/QuestionStatisticsService'
 
 export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -43,8 +44,10 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const linkService = new LinkService(prisma);
   const automationService = new AutomationService(prisma);
   const dialogueStatisticsService = new DialogueStatisticsService(prisma);
+  const questionStatisticsService = new QuestionStatisticsService(prisma);
 
   return {
+    questionStatisticsService,
     dialogueStatisticsService,
     automationService,
     triggerService,

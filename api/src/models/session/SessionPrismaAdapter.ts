@@ -19,17 +19,36 @@ class SessionPrismaAdapter {
    * @param endDateTime the end date until sessions should be found
    * @returns a list of sessions
    */
-  findSessionsBetweenDates = async (dialogueId: string, startDateTime: Date, endDateTime?: Date) => {
+  findSessionsBetweenDates = async (
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+    performanceThreshold?: number
+  ) => {
+    const sessionWhereInput: Prisma.SessionWhereInput = {
+      createdAt: {
+        gte: startDateTime,
+        lte: endDateTime,
+      },
+    }
+
+    if (performanceThreshold) {
+      sessionWhereInput.nodeEntries = {
+        some: {
+          sliderNodeEntry: {
+            value: {
+              lte: performanceThreshold,
+            },
+          },
+        },
+      };
+    };
+
     const dialogueWithSessions = await this.prisma.dialogue.findUnique({
       where: { id: dialogueId },
       include: {
         sessions: {
-          where: {
-            createdAt: (startDateTime || endDateTime) ? {
-              gte: startDateTime,
-              lte: endDateTime,
-            } : undefined,
-          },
+          where: sessionWhereInput,
         },
       },
     });
@@ -235,9 +254,10 @@ class SessionPrismaAdapter {
    * Creates a session in the database.
    * */
   createSession(data: CreateSessionInput) {
-    const { device, originUrl, dialogueId, entries, totalTimeInSec } = data;
+    const { device, originUrl, dialogueId, entries, totalTimeInSec, createdAt } = data;
     return this.prisma.session.create({
       data: {
+        createdAt,
         originUrl,
         device,
         totalTimeInSec,

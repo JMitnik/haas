@@ -29,6 +29,10 @@ class SessionService {
     this.automationService = new AutomationService(prismaClient);
   };
 
+  findNegativeSessions = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
+
+  }
+
   /**
    * Finds all relevant node entries based on session IDs and (optionally) depth
    * @param sessionIds a list of session Ids
@@ -40,14 +44,25 @@ class SessionService {
   }
 
   /**
-   * Finds all sessions of a dialogue within provided dates
+   * Finds all sessions of a dialogue based on performance treshold
    * @param dialogueId the ID of a dialogue
    * @param startDateTime the start date from when sessions should be found
    * @param endDateTime the end date until sessions should be found
+   * @param performanceThreshold the treshold until where sessions should be filtered out
    * @returns a list of sessions
    */
-  findSessionsBetweenDates = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
-    return this.sessionPrismaAdapter.findSessionsBetweenDates(dialogueId, startDateTime, endDateTime);
+  findSessionsBetweenDates = async (
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+    performanceThreshold?: number
+  ) => {
+    return this.sessionPrismaAdapter.findSessionsBetweenDates(
+      dialogueId,
+      startDateTime,
+      endDateTime,
+      performanceThreshold
+    );
   }
 
   /**
@@ -68,6 +83,7 @@ class SessionService {
       originUrl: sessionInput.originUrl || '',
       entries,
       dialogueId,
+      createdAt: sessionInput?.createdAt,
     });
 
     try {

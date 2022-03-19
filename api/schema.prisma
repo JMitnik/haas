@@ -10,6 +10,22 @@ generator client {
   previewFeatures = ["orderByRelation"]
 }
 
+enum QuestionImpactScore {
+  PERCENTAGE
+}
+
+model QuestionStatisticsSummaryCache {
+  id            String    @id @default(cuid())
+  updatedAt     DateTime  @updatedAt
+  startDateTime DateTime?
+  endDateTime   DateTime?
+  nrVotes       Int?
+  impactScore   Float
+  questionId    String
+
+  impactScoreType QuestionImpactScore
+}
+
 enum DialogueImpactScore {
   AVERAGE
 }

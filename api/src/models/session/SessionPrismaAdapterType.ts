@@ -1,6 +1,7 @@
-import { NexusGenInputs } from "../../generated/nexus";
+import { NexusGenInputs } from '../../generated/nexus';
 
 export interface CreateSessionInput {
+  createdAt?: string;
   dialogueId: string;
   originUrl: string;
   totalTimeInSec: number;

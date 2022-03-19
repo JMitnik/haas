@@ -54,7 +54,7 @@ export const SessionType = objectType({
         if (parent.delivery) return parent.delivery
 
         return ctx.services.campaignService.findDeliveryOfSession(parent.id);
-      }
+      },
     });
 
 
@@ -136,6 +136,7 @@ export const SessionInput = inputObjectType({
     t.string('originUrl', { required: false });
     t.string('device', { required: false });
     t.int('totalTimeInSec', { required: false });
+    t.string('createdAt', { required: false });
   },
 });
 

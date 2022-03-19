@@ -1242,6 +1242,7 @@ type Query {
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
   me: UserType!
+  question(where: QuestionWhereUniqueInput): QuestionNode
   refreshAccessToken: RefreshAccessTokenOutput!
   role(input: FindRoleInput): RoleType
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
@@ -1271,6 +1272,10 @@ type QuestionConditionScopeModel {
   id: ID!
 }
 
+enum QuestionImpactScoreType {
+  PERCENTAGE
+}
+
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
@@ -1287,6 +1292,7 @@ type QuestionNode {
   overrideLeafId: String
   questionDialogue: Dialogue
   questionDialogueId: String
+  questionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): QuestionStatisticsSummary
   share: ShareNodeType
 
   """Slidernode resolver"""
@@ -1325,6 +1331,33 @@ type QuestionOption {
   publicValue: String
   questionId: String
   value: String!
+}
+
+type QuestionStatisticsScores {
+  impactScore: Float
+  nrVotes: Int
+  option: String!
+}
+
+type QuestionStatisticsSummary {
+  dialogueId: String
+  endDateTime: Date
+  id: ID
+  impactScores: [QuestionStatisticsScores!]!
+  startDateTime: Date
+  updatedAt: Date
+}
+
+input QuestionStatisticsSummaryFilterInput {
+  endDateTime: String
+  impactTreshold: Int
+  impactType: QuestionImpactScoreType!
+  refresh: Boolean
+  startDateTime: String!
+}
+
+input QuestionWhereUniqueInput {
+  id: ID!
 }
 
 input RecipientsInputType {
@@ -1461,6 +1494,7 @@ enum SessionDeliveryType {
 
 """Input for session"""
 input SessionInput {
+  createdAt: String
   deliveryId: String
   device: String
   dialogueId: String!
