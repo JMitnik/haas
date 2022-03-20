@@ -10,6 +10,7 @@ interface HexagonItemProps {
   zoomHelper: ProvidedZoom<SVGElement>;
   containerWidth: number;
   containerHeight: number;
+  containerBackgroundFill: string;
   top: number;
   left: number;
   hexSize: number;
@@ -23,9 +24,10 @@ export const HexagonItem = ({
   containerHeight,
   top,
   left,
-  hexSize,
+  hexSize = 40,
   score,
-  onZoom
+  onZoom,
+  containerBackgroundFill
 }: HexagonItemProps) => {
   const initialFill = score > 40 ? '#77ef9c' : '#f3595e'
   const [fill, setFill] = useState(initialFill);
@@ -36,10 +38,12 @@ export const HexagonItem = ({
     const scaleY = containerHeight / 40;
 
     if (localPointFound) {
+      console.log(localPointFound);
       zoomHelper.scale({ scaleX: scaleX, scaleY: scaleY, point: localPointFound });
     }
+
     setTimeout(() => {
-      setFill('#e9eff5');
+      setFill(containerBackgroundFill);
       setTimeout(() => {
         onZoom(zoomHelper);
       }, 250);

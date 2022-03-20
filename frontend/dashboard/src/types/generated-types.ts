@@ -2799,7 +2799,7 @@ export type GetWorkspaceDialogueStatisticsQuery = (
       & Pick<Dialogue, 'id'>
       & { dialogueStatisticsSummary?: Maybe<(
         { __typename?: 'DialogueStatisticsSummaryModel' }
-        & Pick<DialogueStatisticsSummaryModel, 'id' | 'impactScore' | 'nrVotes' | 'updatedAt'>
+        & Pick<DialogueStatisticsSummaryModel, 'id' | 'dialogueId' | 'impactScore' | 'nrVotes' | 'updatedAt'>
       )> }
     )>> }
   )> }
@@ -4096,6 +4096,7 @@ export const GetWorkspaceDialogueStatisticsDocument = gql`
       id
       dialogueStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE}) {
         id
+        dialogueId
         impactScore
         nrVotes
         updatedAt
