@@ -49,14 +49,13 @@ export const DashboardView = () => {
   const hexSize = 50;
 
   const zoominLevel = (zoom: any) => {
-    setTimeout(() => {
-      setGridData([]);
-      zoom.reset();
-      zoom.center();
-    }, 750);
-    setTimeout(() => {
-      setGridData(dialogueLayerTwo);
-    }, 1000);
+    // Empty canvas and unset soom
+    setGridData([]);
+    zoom.reset();
+    zoom.center();
+
+    // Set and fetch new data.
+    setGridData(dialogueLayerTwo);
   }
 
   return (
@@ -68,13 +67,8 @@ export const DashboardView = () => {
           <Zoom<SVGElement>
             width={width}
             height={height}
-            // scaleXMin={1 / 2}
-            // scaleXMax={4}
-            // scaleYMin={1 / 2}
-            // scaleYMax={4}
           >
             {(zoom) => (
-
               <svg
                 width={width}
                 height={height}
@@ -101,7 +95,10 @@ export const DashboardView = () => {
                   zoom.scale({ scaleX: 1.1, scaleY: 1.1 });
                 }}
               />
-                <motion.g initial={{ transform: 'auto', opacity: 0 }} animate={{ transform: zoom.toString(), opacity: 1 }}>
+                <motion.g
+                  initial={{ transform: 'auto', opacity: 0 }}
+                  animate={{ transform: zoom.toString(), opacity: 1 }}
+                >
                   <Group top={100} left={100}>
                   {gridData?.map((dialogue, index) => (
                     <HexagonItem
@@ -112,34 +109,9 @@ export const DashboardView = () => {
                       containerWidth={width}
                       containerHeight={height}
                       hexSize={hexSize}
-                      zoom={zoom}
+                      zoomHelper={zoom}
                       onZoom={zoominLevel}
                     />
-                    // <Group
-                    //   key={dialogue.id}
-                    //   top={index * hexSize * 0.9}
-                    //   left={index* hexSize * 1.5}
-                    // >
-                    //   <Polygon
-                    //     sides={6}
-                    //     size={hexSize}
-                    //     fill={dialogue?.dialogueStatisticsSummary?.impactScore && dialogue?.dialogueStatisticsSummary?.impactScore > 40 ? '#77ef9c' : '#f3595e'}
-                    //     onClick={(e) => {
-                    //       if (e) {
-                    //         // @ts-ignore
-                    //         const localPointFound = localPoint(e)
-
-                    //         const scaleX = width / 40;
-                    //         const scaleY = height / 40;
-
-                    //         if (localPointFound) {
-                    //           zoom.scale({ scaleX: scaleX, scaleY: scaleY, point: localPointFound });
-                    //           zoominLevel(zoom);
-                    //         }
-                    //       }
-                    //     }}
-                    //   />
-                    // </Group>
                   ))}
                 </Group>
                 </motion.g>
