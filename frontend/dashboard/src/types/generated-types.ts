@@ -2340,6 +2340,28 @@ export type WorkspaceConditionScopeModel = {
   aggregate?: Maybe<ConditionPropertyAggregate>;
 };
 
+export type GetWorkspaceDialogueStatisticsQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  startDateTime: Scalars['String'];
+  endDateTime: Scalars['String'];
+}>;
+
+
+export type GetWorkspaceDialogueStatisticsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & { dialogues?: Maybe<Array<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'title'>
+      & { dialogueStatisticsSummary?: Maybe<(
+        { __typename?: 'DialogueStatisticsSummaryModel' }
+        & Pick<DialogueStatisticsSummaryModel, 'id' | 'dialogueId' | 'impactScore' | 'nrVotes' | 'updatedAt'>
+      )> }
+    )>> }
+  )> }
+);
+
 export type DeliveryEventFragmentFragment = (
   { __typename?: 'DeliveryEventType' }
   & Pick<DeliveryEventType, 'id' | 'status' | 'createdAt' | 'failureMessage'>
@@ -2783,28 +2805,6 @@ export type GetWorkspaceDialoguesQuery = (
   )> }
 );
 
-export type GetWorkspaceDialogueStatisticsQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-  startDateTime: Scalars['String'];
-  endDateTime: Scalars['String'];
-}>;
-
-
-export type GetWorkspaceDialogueStatisticsQuery = (
-  { __typename?: 'Query' }
-  & { customer?: Maybe<(
-    { __typename?: 'Customer' }
-    & { dialogues?: Maybe<Array<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id'>
-      & { dialogueStatisticsSummary?: Maybe<(
-        { __typename?: 'DialogueStatisticsSummaryModel' }
-        & Pick<DialogueStatisticsSummaryModel, 'id' | 'dialogueId' | 'impactScore' | 'nrVotes' | 'updatedAt'>
-      )> }
-    )>> }
-  )> }
-);
-
 export type DuplicateQuestionMutationVariables = Exact<{
   questionId?: Maybe<Scalars['String']>;
 }>;
@@ -3157,6 +3157,56 @@ export const SessionFragmentFragmentDoc = gql`
 }
     ${NodeEntryFragmentFragmentDoc}
 ${DeliveryFragmentFragmentDoc}`;
+export const GetWorkspaceDialogueStatisticsDocument = gql`
+    query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
+  customer(id: $workspaceId) {
+    dialogues {
+      id
+      title
+      dialogueStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE}) {
+        id
+        dialogueId
+        impactScore
+        nrVotes
+        updatedAt
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceDialogueStatisticsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceDialogueStatisticsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceDialogueStatisticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceDialogueStatisticsQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      startDateTime: // value for 'startDateTime'
+ *      endDateTime: // value for 'endDateTime'
+ *   },
+ * });
+ */
+export function useGetWorkspaceDialogueStatisticsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>(GetWorkspaceDialogueStatisticsDocument, options);
+      }
+export function useGetWorkspaceDialogueStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>(GetWorkspaceDialogueStatisticsDocument, options);
+        }
+export type GetWorkspaceDialogueStatisticsQueryHookResult = ReturnType<typeof useGetWorkspaceDialogueStatisticsQuery>;
+export type GetWorkspaceDialogueStatisticsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceDialogueStatisticsLazyQuery>;
+export type GetWorkspaceDialogueStatisticsQueryResult = Apollo.QueryResult<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>;
+export function refetchGetWorkspaceDialogueStatisticsQuery(variables?: GetWorkspaceDialogueStatisticsQueryVariables) {
+      return { query: GetWorkspaceDialogueStatisticsDocument, variables: variables }
+    }
 export const CreateCtaDocument = gql`
     mutation createCTA($input: CreateCTAInputType) {
   createCTA(input: $input) {
@@ -4088,55 +4138,6 @@ export type GetWorkspaceDialoguesLazyQueryHookResult = ReturnType<typeof useGetW
 export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>;
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
-    }
-export const GetWorkspaceDialogueStatisticsDocument = gql`
-    query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
-  customer(id: $workspaceId) {
-    dialogues {
-      id
-      dialogueStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE}) {
-        id
-        dialogueId
-        impactScore
-        nrVotes
-        updatedAt
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useGetWorkspaceDialogueStatisticsQuery__
- *
- * To run a query within a React component, call `useGetWorkspaceDialogueStatisticsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetWorkspaceDialogueStatisticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetWorkspaceDialogueStatisticsQuery({
- *   variables: {
- *      workspaceId: // value for 'workspaceId'
- *      startDateTime: // value for 'startDateTime'
- *      endDateTime: // value for 'endDateTime'
- *   },
- * });
- */
-export function useGetWorkspaceDialogueStatisticsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>(GetWorkspaceDialogueStatisticsDocument, options);
-      }
-export function useGetWorkspaceDialogueStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>(GetWorkspaceDialogueStatisticsDocument, options);
-        }
-export type GetWorkspaceDialogueStatisticsQueryHookResult = ReturnType<typeof useGetWorkspaceDialogueStatisticsQuery>;
-export type GetWorkspaceDialogueStatisticsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceDialogueStatisticsLazyQuery>;
-export type GetWorkspaceDialogueStatisticsQueryResult = Apollo.QueryResult<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>;
-export function refetchGetWorkspaceDialogueStatisticsQuery(variables?: GetWorkspaceDialogueStatisticsQueryVariables) {
-      return { query: GetWorkspaceDialogueStatisticsDocument, variables: variables }
     }
 export const DuplicateQuestionDocument = gql`
     mutation duplicateQuestion($questionId: String) {

@@ -1,8 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 import { useCustomer } from 'providers/CustomerProvider';
 import { useGetWorkspaceDialogueStatisticsQuery } from 'types/generated-types';
-import { WorkspaceGrid, WorkspaceGridProps } from './WorkspaceGrid.tsx';
+
+import { WorkspaceGrid, WorkspaceGridProps } from './WorkspaceGrid';
 
 interface WorkspaceGridAdapterProps {
   height: number;
@@ -18,7 +19,7 @@ interface WorkspaceGridAdapterProps {
 export const WorkspaceGridAdapter = ({
   height,
   width,
-  backgroundColor
+  backgroundColor,
 }: WorkspaceGridAdapterProps) => {
   const { activeCustomer } = useCustomer();
 
@@ -31,9 +32,10 @@ export const WorkspaceGridAdapter = ({
     fetchPolicy: 'cache-and-network',
   });
 
-  const dialogues = data?.customer?.dialogues || [];
-  const dialoguesCloneSlice = dialogues.map(dialogue => ({
+  const dialogues = data?.customer?.dialogues?.map((dialogue) => ({ ...dialogue, type: 'Dialogue' })) || [];
+  const dialoguesCloneSlice = dialogues.map((dialogue) => ({
     ...dialogue,
+    type: 'QuestionNode',
     dialogueStatisticsSummary: {
       ...dialogue.dialogueStatisticsSummary,
       impactScore: 10,
@@ -41,8 +43,8 @@ export const WorkspaceGridAdapter = ({
   }));
 
   const dialogueLayerTwo = [
-    ...dialoguesCloneSlice.map(item => ({...item, id: item.id + 'a'})),
-    ...dialoguesCloneSlice.map(item => ({...item, id: item.id + 'b'}))
+    ...dialoguesCloneSlice.map((item) => ({ ...item, id: `${item.id}a` })),
+    ...dialoguesCloneSlice.map((item) => ({ ...item, id: `${item.id}b` })),
   ];
 
   return (
@@ -53,5 +55,5 @@ export const WorkspaceGridAdapter = ({
       height={height}
       width={width}
     />
-  )
-}
+  );
+};

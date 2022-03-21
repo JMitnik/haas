@@ -1,5 +1,7 @@
 declare module 'react-flagpack';
 
+declare module '*.ttf';
+
 declare module '*.svg' {
   import * as React from 'react';
 

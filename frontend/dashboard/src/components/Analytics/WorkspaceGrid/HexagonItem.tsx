@@ -1,12 +1,24 @@
 import { Group } from '@visx/group';
 import { Polygon } from '@visx/shape';
-import React from 'react';
-import { useState } from 'react';
+import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { localPoint } from '@visx/event';
 import { motion } from 'framer-motion';
-import { ProvidedZoom } from '@visx/zoom/lib/types';
+import React, { useState } from 'react';
+
+export type HexagonNode = {
+  id: string;
+  type: 'Dialogue';
+  dialogueId: string;
+  impactScore: number;
+} | {
+  id: string;
+  type: 'QuestionNode';
+  questionNodeId: string;
+  impactScore: number;
+};
 
 interface HexagonItemProps {
+  node: HexagonNode;
   zoomHelper: ProvidedZoom<SVGElement>;
   containerWidth: number;
   containerHeight: number;
@@ -15,10 +27,13 @@ interface HexagonItemProps {
   left: number;
   hexSize: number;
   score: number;
-  onZoom: (zoomHelper: ProvidedZoom<SVGElement>) => void;
+  onZoom: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
+  onMouseOver: (event: React.MouseEvent<SVGPolygonElement, MouseEvent>, node: HexagonNode) => void;
+  onMouseExit?: () => void;
 }
 
 export const HexagonItem = ({
+  node,
   zoomHelper,
   containerWidth,
   containerHeight,
@@ -27,28 +42,26 @@ export const HexagonItem = ({
   hexSize = 40,
   score,
   onZoom,
-  containerBackgroundFill
+  onMouseOver,
+  onMouseExit,
+  containerBackgroundFill,
 }: HexagonItemProps) => {
-  const initialFill = score > 40 ? '#77ef9c' : '#f3595e'
+  const initialFill = score > 40 ? 'url(#dots-green)' : 'url(#dots-pink)';
   const [fill, setFill] = useState(initialFill);
 
   const handleZoom = (event: React.MouseEvent<SVGPolygonElement, MouseEvent>) => {
-    const localPointFound = localPoint(event);
+    const localPointFound = localPoint(event) || { x: 0, y: 0 };
     const scaleX = containerWidth / 40;
     const scaleY = containerHeight / 40;
-
-    if (localPointFound) {
-      console.log(localPointFound);
-      zoomHelper.scale({ scaleX: scaleX, scaleY: scaleY, point: localPointFound });
-    }
+    zoomHelper.scale({ scaleX, scaleY, point: localPointFound });
 
     setTimeout(() => {
       setFill(containerBackgroundFill);
       setTimeout(() => {
-        onZoom(zoomHelper);
+        onZoom(zoomHelper, node);
       }, 250);
     }, 500);
-  }
+  };
 
   return (
     <Group top={top} left={left}>
@@ -58,10 +71,14 @@ export const HexagonItem = ({
             sides={6}
             size={hexSize}
             fill={fill}
+            onMouseOver={(event) => {
+              onMouseOver?.(event, node);
+            }}
+            onMouseOut={() => onMouseExit?.()}
             onClick={(e) => handleZoom(e)}
           />
         </g>
       </motion.g>
     </Group>
-  )
-}
+  );
+};
