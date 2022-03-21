@@ -6,8 +6,12 @@ generates:
       - typescript
       - typescript-operations
       - typescript-react-apollo
+      - typescript-compatibility
     config:
       withMutationOptionsType: true
       reactApolloVersion: 3
       withRefetchFn: true
       withResultType: true
+      strict: true
+      withHOC: false
+      withComponent: false

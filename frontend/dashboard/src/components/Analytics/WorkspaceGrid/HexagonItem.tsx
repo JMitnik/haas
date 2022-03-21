@@ -5,17 +5,7 @@ import { localPoint } from '@visx/event';
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 
-export type HexagonNode = {
-  id: string;
-  type: 'Dialogue';
-  dialogueId: string;
-  impactScore: number;
-} | {
-  id: string;
-  type: 'QuestionNode';
-  questionNodeId: string;
-  impactScore: number;
-};
+import { HexagonNode } from './WorkspaceGrid.types';
 
 interface HexagonItemProps {
   node: HexagonNode;

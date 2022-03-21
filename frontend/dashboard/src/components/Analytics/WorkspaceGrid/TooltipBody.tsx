@@ -1,31 +1,32 @@
 import * as UI from '@haas/ui';
-import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-import { HexagonNode } from './HexagonItem';
+import { HexagonDialogueNode, HexagonNode, HexagonNodeType } from './WorkspaceGrid.types';
 
 interface TooltipBodyProps {
   node: HexagonNode;
 }
 
-export const TooltipBody = ({ node }: TooltipBodyProps) => {
-  const { t } = useTranslation();
+export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => (
+  <UI.Div>
+    <UI.Helper>
+      Dialogue
+    </UI.Helper>
+    <UI.PaddedBody fraction={0.5}>
+      <UI.Flex>
+        {node.dialogue?.title}
+      </UI.Flex>
+    </UI.PaddedBody>
+  </UI.Div>
+);
 
-  return (
-    <UI.Div>
-      <UI.Helper>
-        Dialogue
-      </UI.Helper>
-      <UI.PaddedBody fraction={0.5}>
-        <UI.Flex>
-          {node.impactScore}
-        </UI.Flex>
-      </UI.PaddedBody>
-    </UI.Div>
-  );
+export const TooltipBody = ({ node }: TooltipBodyProps) => {
+  switch (node.type) {
+    case HexagonNodeType.Dialogue:
+      return <TooltipDialogueBody node={node} />;
+    default: {
+      return <div>Node</div>;
+    }
+  }
 };
 
-interface TooltipDialogueBodyProps {
-  dialogue:
-}
-export const TooltipDialogueBody = { dialogue }:

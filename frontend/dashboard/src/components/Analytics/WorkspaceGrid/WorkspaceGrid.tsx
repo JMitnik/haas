@@ -1,5 +1,4 @@
 import * as UI from '@haas/ui';
-import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, PieChart } from 'react-feather';
 import { GradientLightgreenGreen, GradientPinkRed } from '@visx/gradient';
 import { Group } from '@visx/group';
@@ -9,25 +8,19 @@ import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { Zoom } from '@visx/zoom';
 import { localPoint } from '@visx/event';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect } from 'react';
 
-import { DialogueStatisticsSummaryModel } from 'types/generated-types';
-
 import * as LS from './WorkspaceGrid.styles';
-
-import { HexagonItem, HexagonNode } from './HexagonItem';
+import { HexagonItem } from './HexagonItem';
+import { HexagonNode } from './WorkspaceGrid.types';
 import { TooltipBody } from './TooltipBody';
 
-interface Dialogue {
-  id: string;
-  dialogueStatisticsSummary?: DialogueStatisticsSummaryModel | null;
-}
-
 export interface WorkspaceGridProps {
-  data_L0: Dialogue[];
-  data_L1?: any[];
-  data_L2?: any[];
+  data_L0: HexagonNode[];
+  data_L1?: HexagonNode[];
+  data_L2?: HexagonNode[];
   width: number;
   height: number;
   backgroundColor: string;
@@ -56,6 +49,7 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
 
   const handleMouseOverHex = (event: React.MouseEvent<SVGPolygonElement, MouseEvent>, node: HexagonNode) => {
     const point = localPoint(event);
+    console.log({ node });
 
     if (!point) return;
 
@@ -171,12 +165,11 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
                               <HexagonItem
                                 key={dialogue.id}
                                 node={dialogue}
-                                id={dialogue.id}
                                 top={index * hexSize * 0.9}
                                 left={index * hexSize * 1.5}
                                 onMouseOver={handleMouseOverHex}
                                 onMouseExit={handleMouseOutHex}
-                                score={dialogue?.dialogueStatisticsSummary?.impactScore || 0}
+                                score={dialogue.score}
                                 containerWidth={width}
                                 containerHeight={height}
                                 hexSize={hexSize}
