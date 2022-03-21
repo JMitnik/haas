@@ -3,7 +3,7 @@ import React from 'react';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useGetWorkspaceDialogueStatisticsQuery } from 'types/generated-types';
 
-import { WorkspaceGrid, WorkspaceGridProps } from './WorkspaceGrid';
+import { WorkspaceGrid } from './WorkspaceGrid';
 
 interface WorkspaceGridAdapterProps {
   height: number;

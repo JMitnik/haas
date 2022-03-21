@@ -1,11 +1,15 @@
 import * as UI from '@haas/ui';
+import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 
 export const WorkspaceGridContainer = styled(UI.Div)`
-  svg polygon:hover {
-    stroke: red;
-    cursor: pointer;
-  }
+  ${({ theme }) => css`
+    border-bottom: 1px solid ${theme.colors.gray[200]};
+    svg polygon:hover {
+      stroke: red;
+      cursor: pointer;
+    }
+  `}
 `;
 
 export const GridControls = styled(UI.Div)`
@@ -33,11 +37,11 @@ export const IconButton = styled(Button)`
   border-radius: 100% !important;
 `;
 
-export const DetailsPane = styled(UI.Div)`
+export const DetailsPane = motion.custom(styled(UI.Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px;
     background: white;
     border-radius: 5px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075), 0 2px 8px rgba(0, 0, 0, 0.06);
   `}
-`;
+`);
