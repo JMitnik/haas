@@ -14,7 +14,12 @@ export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => 
     </UI.Helper>
     <UI.PaddedBody fraction={0.5}>
       <UI.Flex>
-        {node.dialogue?.title}
+        <UI.Div>
+          {node.score.toFixed(2)}
+        </UI.Div>
+        <UI.Div ml={2}>
+          {node.dialogue?.title}
+        </UI.Div>
       </UI.Flex>
     </UI.PaddedBody>
   </UI.Div>

@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { ArrowLeft, PieChart } from 'react-feather';
+import { ArrowLeft, PieChart, Users } from 'react-feather';
 import { GradientLightgreenGreen, GradientPinkRed } from '@visx/gradient';
 import { Group } from '@visx/group';
 import { ParentSizeModern } from '@visx/responsive';
@@ -14,7 +14,7 @@ import React, { useEffect } from 'react';
 
 import * as LS from './WorkspaceGrid.styles';
 import { HexagonItem } from './HexagonItem';
-import { HexagonNode } from './WorkspaceGrid.types';
+import { HexagonNode, HexagonNodeType } from './WorkspaceGrid.types';
 import { TooltipBody } from './TooltipBody';
 
 export interface WorkspaceGridProps {
@@ -30,7 +30,7 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
   const zoomHelper = React.useRef<ProvidedZoom<SVGElement> | null>(null);
   const [zoomLevel, setZoomLevel] = React.useState(0);
   const [dataItems, setDataItems] = React.useState(data_L0);
-  const [activeDialogue, setActiveDialogue] = React.useState<any>();
+  const [activeDialogue, setActiveDialogue] = React.useState<HexagonNode>();
 
   const hexSize = 40;
   const maxZoomLevel = 1;
@@ -76,7 +76,7 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
     setDataItems([]);
     currentZoomHelper.reset();
 
-    if (node?.type === 'Dialogue') {
+    if (node?.type === HexagonNodeType.Dialogue) {
       setActiveDialogue(node);
     }
 
@@ -98,8 +98,6 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
     const newData = zoomToData[zoomLevel];
     setDataItems(newData);
   }, [zoomLevel, zoomToData, setDataItems]);
-
-  console.log({ activeDialogue });
 
   return (
     <LS.WorkspaceGridContainer>
@@ -189,7 +187,7 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
                         left={tooltipLeft}
                       >
                         {tooltipData && (
-                        <TooltipBody node={tooltipData} />
+                          <TooltipBody node={tooltipData} />
                         )}
                       </TooltipWithBounds>
                       )}
@@ -202,36 +200,45 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
         </UI.Div>
 
         <UI.Div bg="white" borderLeft="1px solid" borderLeftColor="gray.200">
-          {activeDialogue && (
-          <LS.DetailsPane
-            animate={{ opacity: 1, y: 0 }}
-            initial={{ opacity: 0, y: 20 }}
-            m={4}
-          >
-            <UI.Text fontSize="1.1rem" color="blue.800" fontWeight={600}>
-              Insights
-            </UI.Text>
-            <UI.Muted fontWeight={800} style={{ fontWeight: 500 }}>
-              Understand your flow and how it impacts your conversations.
-            </UI.Muted>
+          {activeDialogue && activeDialogue.type === HexagonNodeType.Dialogue && (
+            <LS.DetailsPane
+              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              m={4}
+            >
+              <UI.Text fontSize="1.1rem" color="blue.800" fontWeight={600}>
+                Insights
+              </UI.Text>
+              <UI.Muted fontWeight={800} style={{ fontWeight: 500 }}>
+                Understand your flow and how it impacts your conversations.
+              </UI.Muted>
 
-            <UI.Div mt={4}>
-              <UI.Helper>{t('dialogue')}</UI.Helper>
-              <UI.Span fontWeight={500}>
-                {activeDialogue.title}
-              </UI.Span>
-            </UI.Div>
+              <UI.Div mt={4}>
+                <UI.Helper>{t('dialogue')}</UI.Helper>
+                <UI.Span fontWeight={500}>
+                  {activeDialogue.dialogue.title}
+                </UI.Span>
+              </UI.Div>
 
-            <UI.Div mt={4}>
-              <UI.Helper>{t('statistics')}</UI.Helper>
-              <UI.Span fontWeight={500}>
-                <UI.Icon stroke="gray.300" mr={1}>
-                  <PieChart />
-                </UI.Icon>
-                {activeDialogue.dialogueStatisticsSummary?.impactScore.toFixed(2)}
-              </UI.Span>
-            </UI.Div>
-          </LS.DetailsPane>
+              <UI.Div mt={4}>
+                <UI.Helper>{t('statistics')}</UI.Helper>
+                <UI.Div mt={1} fontWeight={500}>
+                  <UI.Icon stroke="#7a228a" mr={1}>
+                    <PieChart />
+                  </UI.Icon>
+                  {activeDialogue.score.toFixed(1) / 10}
+                </UI.Div>
+
+                <UI.Div mt={1}>
+                  <UI.Span fontWeight={500}>
+                    <UI.Icon stroke="#f1368a" mr={1}>
+                      <Users />
+                    </UI.Icon>
+                    {activeDialogue.dialogue.dialogueStatisticsSummary?.nrVotes}
+                  </UI.Span>
+                </UI.Div>
+              </UI.Div>
+            </LS.DetailsPane>
           )}
 
           {!activeDialogue && (
