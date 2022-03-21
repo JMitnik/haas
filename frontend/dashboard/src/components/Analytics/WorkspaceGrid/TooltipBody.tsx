@@ -13,9 +13,19 @@ export const TooltipBody = ({ node }: TooltipBodyProps) => {
 
   return (
     <UI.Div>
-      <UI.Flex>
-        {node.impactScore}
-      </UI.Flex>
+      <UI.Helper>
+        Dialogue
+      </UI.Helper>
+      <UI.PaddedBody fraction={0.5}>
+        <UI.Flex>
+          {node.impactScore}
+        </UI.Flex>
+      </UI.PaddedBody>
     </UI.Div>
   );
 };
+
+interface TooltipDialogueBodyProps {
+  dialogue:
+}
+export const TooltipDialogueBody = { dialogue }:
