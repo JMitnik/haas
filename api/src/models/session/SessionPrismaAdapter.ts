@@ -254,9 +254,10 @@ class SessionPrismaAdapter {
    * Creates a session in the database.
    * */
   createSession(data: CreateSessionInput) {
-    const { device, originUrl, dialogueId, entries, totalTimeInSec, createdAt } = data;
+    const { device, originUrl, dialogueId, entries, totalTimeInSec, createdAt, mainScore } = data;
     return this.prisma.session.create({
       data: {
+        mainScore,
         createdAt,
         originUrl,
         device,
@@ -337,6 +338,7 @@ class SessionPrismaAdapter {
 
     return this.prisma.session.create({
       data: {
+        mainScore: data.simulatedRootVote,
         nodeEntries: {
           create: [{
             depth: 0,

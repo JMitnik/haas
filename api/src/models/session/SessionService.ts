@@ -77,6 +77,8 @@ class SessionService {
   */
   async createSession(sessionInput: any) {
     const { dialogueId, entries } = sessionInput;
+    const sliderNode = entries.find((entry: any) => entry?.data?.slider && entry?.depth === 0);
+    const mainScore = sliderNode?.data?.slider?.value;
     const session = await this.sessionPrismaAdapter.createSession({
       device: sessionInput.device || '',
       totalTimeInSec: sessionInput.totalTimeInSec,
@@ -84,6 +86,7 @@ class SessionService {
       entries,
       dialogueId,
       createdAt: sessionInput?.createdAt,
+      mainScore,
     });
 
     try {

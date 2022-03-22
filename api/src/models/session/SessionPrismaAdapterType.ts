@@ -7,4 +7,5 @@ export interface CreateSessionInput {
   totalTimeInSec: number;
   device: string;
   entries: NexusGenInputs['NodeEntryInput'][];
+  mainScore?: number;
 };

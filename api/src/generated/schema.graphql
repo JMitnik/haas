@@ -913,6 +913,12 @@ type ImageType {
   url: String
 }
 
+type IndepthQuestionStatisticsSummary {
+  impactScore: Float
+  nrVotes: Int
+  option: String
+}
+
 input InviteUserInput {
   customerId: String!
   email: String!
@@ -1284,6 +1290,7 @@ type QuestionNode {
   """FormNode resolver"""
   form: FormNodeType
   id: ID!
+  indepthQuestionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): [IndepthQuestionStatisticsSummary!]
   isLeaf: Boolean!
   isRoot: Boolean!
   links: [LinkType!]!
@@ -1333,17 +1340,10 @@ type QuestionOption {
   value: String!
 }
 
-type QuestionStatisticsScores {
-  impactScore: Float
-  nrVotes: Int
-  option: String!
-}
-
 type QuestionStatisticsSummary {
   dialogueId: String
   endDateTime: Date
   id: ID
-  impactScores: [QuestionStatisticsScores!]!
   startDateTime: Date
   updatedAt: Date
 }

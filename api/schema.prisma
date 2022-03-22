@@ -405,6 +405,8 @@ model Session {
   totalTimeInSec Int?
   device         String?
 
+  mainScore Float @default(0)
+
   browser String?
 }
 
