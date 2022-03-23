@@ -1,6 +1,6 @@
-import * as UI from '@haas/ui';
 import { useRef } from 'react';
 
+import * as Motion from '../Common/Motion'
 import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
 import { SessionActionType } from '../../types/core-types';
 import { useSession } from '../Session/SessionProvider';
@@ -50,13 +50,14 @@ export const ChoiceNode = ({ node, onRunAction }: QuestionNodeProps) => {
 
       <ChoiceNodeButtonLayout node={node}>
         {choices.map((choice, index) => (
-          <GradientButton
-            style={{ margin: '10px' }}
-            key={index}
-            onClick={() => handleRunAction(index)}
-          >
-            {choice.value}
-          </GradientButton>
+          <Motion.JumpIn key={choice.id}>
+            <GradientButton
+              style={{ margin: '10px' }}
+              onClick={() => handleRunAction(index)}
+            >
+              {choice.value}
+            </GradientButton>
+          </Motion.JumpIn>
         ))}
       </ChoiceNodeButtonLayout>
     </QuestionNodeLayout>

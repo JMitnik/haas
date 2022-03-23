@@ -1,6 +1,7 @@
 import * as UI from '@haas/ui';
 import React, { useEffect } from 'react';
 
+import * as Motion from '../Common/Motion';
 import { LinkItemType } from '../../types/core-types';
 import { QuestionNodeLayout } from '../QuestionNode/QuestionNodeLayout';
 import { QuestionNodeProps } from '../QuestionNode/QuestionNodeTypes';
@@ -36,11 +37,15 @@ export const LinkNode = ({ node }: QuestionNodeProps) => {
       <UI.Flex justifyContent="center">
         <UI.Span display="inline-block">
           {(node.links?.length === 0 || node.links?.length > 1) && (
-            <UI.Flex data-testid="shareitems" justifyContent="center" alignItems="center">
-              {node.links?.map((link, index) => (
-                <LinkItem key={index} onClick={handleLinkClick} link={link}/>
-              ))}
-            </UI.Flex>
+            <Motion.StaggerParent>
+              <UI.Flex data-testid="shareitems" justifyContent="center" alignItems="center">
+                {node.links?.map((link, index) => (
+                  <Motion.JumpIn key={index}>
+                    <LinkItem key={index} onClick={handleLinkClick} link={link}/>
+                  </Motion.JumpIn>
+                ))}
+              </UI.Flex>
+            </Motion.StaggerParent>
           )}
         </UI.Span>
       </UI.Flex>

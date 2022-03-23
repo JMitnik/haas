@@ -1,11 +1,11 @@
 import * as UI from '@haas/ui';
-import { Button, ButtonGroup } from '@chakra-ui/core';
+import { Button, ButtonGroup, useToast } from '@chakra-ui/core';
 import { Div, Flex, Grid, H4, ViewTitle } from '@haas/ui';
 import { Grid as GridIcon, List, Plus } from 'react-feather';
 import { Link, useParams } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { getQuestionnairesOfCustomer as CustomerData } from 'queries/__generated__/getQuestionnairesOfCustomer';
 import Searchbar from 'components/SearchBar';
@@ -19,6 +19,17 @@ import DialogueCard from './DialogueCard';
 const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
+  const toast = useToast();
+
+  useEffect(() => {
+    toast({
+      title: 'Something went wrong!',
+      description: 'Currently unable to edit your detail. Please try again.',
+      status: 'error',
+      position: 'bottom-right',
+      duration: 1500,
+    });
+  }, [toast]);
 
   const [useDialogueGridView, setUseDialogueGridView] = useState(true);
 

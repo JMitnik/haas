@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import { useNavigationType, useParams, useLocation } from 'react-router';
 
+import * as Motion from '../Common/Motion';
 import {
   QuestionNodeTypeEnum,
   QuestionNode as QuestionNodeType,
@@ -99,6 +100,15 @@ export const Dialogue = ({ onEventUpload }: DialogueProps) => {
   const QuestionNode = NodeComponent[currentNode.type];
 
   return (
-    <QuestionNode node={currentNode} onRunAction={handleAction}/>
+    <Motion.AnimatePresence
+      exitBeforeEnter
+      key={currentNode.id}
+    >
+      <Motion.FadeIn
+        key={currentNode.id}
+        style={{ position: 'absolute', top: '0', right: '0', bottom: '0', left: '0' }}>
+        <QuestionNode node={currentNode} onRunAction={handleAction} />
+      </Motion.FadeIn>
+    </Motion.AnimatePresence>
   )
 };

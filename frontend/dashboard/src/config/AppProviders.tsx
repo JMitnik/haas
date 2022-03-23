@@ -4,6 +4,7 @@ import { I18nextProvider } from 'react-i18next';
 import { QueryParamProvider } from 'use-query-params';
 import { Route, BrowserRouter as Router } from 'react-router-dom';
 import React from 'react';
+import { Toaster } from 'react-hot-toast';
 
 import { AppContainer } from 'styles/AppStyles';
 import { DefaultThemeProviders } from 'providers/ThemeProvider';
@@ -25,6 +26,7 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => (
           <DefaultThemeProviders>
             <UserProvider>
               <AppContainer>
+                <Toaster />
                 <QueryParamProvider ReactRouterRoute={Route}>
                   <ErrorBoundary fallback={GlobalErrorFallback}>
                     {children}

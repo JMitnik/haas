@@ -47,7 +47,7 @@ const schema = yup.object().shape({
 
 type FormDataProps = yup.InferType<typeof schema>;
 
-const startsWithCloudinary = (url: string) => url.includes('cloudinary');
+const startsWithCloudinary = (url: string) => url && url.includes('cloudinary');
 
 const EditCustomerForm = ({ customer }: { customer: any }) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
@@ -64,7 +64,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         ? Math.min(Math.max(0, customer.settings?.logoOpacity / 100), 1)
         : 0.3,
       uploadLogo: customer.settings?.logoUrl,
-      useCustomUrl: boolToInt(!startsWithCloudinary(customer.settings?.logoUrl)),
+      useCustomUrl: boolToInt(!startsWithCloudinary(customer.settings?.logoUrl || '')),
       primaryColour: customer.settings?.colourSettings?.primary,
       slug: customer.slug,
     },

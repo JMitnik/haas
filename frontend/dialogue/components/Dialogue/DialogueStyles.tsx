@@ -8,6 +8,7 @@ export const DialogueRootContainer = styled.div`
 
 export const DialogueContainer = styled.div`
   ${({ theme }) => css`
+    position: relative;
     height: 100%;
     padding: ${theme.gutter}px 0;
     width: ${theme.containerWidth}px;
