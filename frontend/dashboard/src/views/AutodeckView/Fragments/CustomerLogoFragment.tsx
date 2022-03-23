@@ -34,8 +34,8 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
                 onChange={onChange}
                 display="flex"
               >
-                <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
-                <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
+                <RadioButton icon={<Link2 />} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
+                <RadioButton icon={<Upload />} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
               </RadioGroup>
             )}
           />
@@ -121,8 +121,8 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
                   onChange={onChange}
                   display="flex"
                 >
-                  <RadioButton icon={ThumbsUp} value={1} text={'Approve'} description={'Use current logo'} />
-                  <RadioButton icon={ThumbsDown} value={0} text={'Edit'} description={'Use different logo'} />
+                  <RadioButton icon={<ThumbsUp />} value={1} text={'Approve'} description={'Use current logo'} />
+                  <RadioButton icon={<ThumbsDown />} value={0} text={'Edit'} description={'Use different logo'} />
                 </RadioGroup>
               )}
             />
@@ -143,8 +143,8 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
                     onChange={onChange}
                     display="flex"
                   >
-                    <RadioButton icon={UploadCloud} value={0} text={'Upload'} description={'Upload new logo'} />
-                    <RadioButton icon={Edit2} value={1} text={'Edit'} description={'Edit current logo'} />
+                    <RadioButton icon={<UploadCloud />} value={0} text={'Upload'} description={'Upload new logo'} />
+                    <RadioButton icon={<Edit2 />} value={1} text={'Edit'} description={'Edit current logo'} />
                   </RadioGroup>
                 )}
               />
@@ -183,8 +183,8 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
                 onChange={onChange}
                 display="flex"
               >
-                <RadioButton icon={Play} value={1} text={t('autodeck:use_rembg')} description={t('autodeck:use_rembg_helper')} />
-                <RadioButton icon={Pause} value={0} text={t('autodeck:original_image')} description={t('autodeck:original_image_helper')} />
+                <RadioButton icon={<Play />} value={1} text={t('autodeck:use_rembg')} description={t('autodeck:use_rembg_helper')} />
+                <RadioButton icon={<Pause />} value={0} text={t('autodeck:original_image')} description={t('autodeck:original_image_helper')} />
               </RadioGroup>
             )}
           />

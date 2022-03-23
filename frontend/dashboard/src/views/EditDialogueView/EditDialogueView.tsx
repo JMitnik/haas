@@ -337,7 +337,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                   <InputGrid gridTemplateColumns="1fr">
                     <Div>
                       <Button
-                        leftIcon={Plus}
+                        lefticon={<Plus />}
                         onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
                       >
                         {t('add_tag')}
@@ -365,7 +365,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                               size="xs"
                               colorScheme="red"
                               variant="outline"
-                              leftIcon={Minus}
+                              lefticon={<Minus />}
                               onClick={() => deleteTag(index)}
                             >
                               {t('remove')}
@@ -400,14 +400,14 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                             render={({ onChange, onBlur, value }) => (
                               <RadioGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
                                 <RadioButton
-                                  icon={Minus}
+                                  icon={<Minus />}
                                   value={1}
                                   mr={2}
                                   text={(t('dialogue:hide_fake_data'))}
                                   description={t('dialogue:do_hide_fake_data_helper')}
                                 />
                                 <RadioButton
-                                  icon={Activity}
+                                  icon={<Activity />}
                                   value={0}
                                   text={(t('dialogue:no_hide_fake_data'))}
                                   description={t('dialogue:no_hide_fake_data_helper')}

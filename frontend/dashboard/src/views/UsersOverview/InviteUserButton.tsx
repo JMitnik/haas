@@ -28,7 +28,7 @@ const InviteUserButton = ({ children, arrowBg = 'white' }: InviteButtonProps) =>
           isDisabled={!canInviteUsers}
           size="sm"
           ml={4}
-          leftIcon={Plus}
+          lefticon={<Plus />}
           colorScheme="teal"
         >
           {t('invite_user')}

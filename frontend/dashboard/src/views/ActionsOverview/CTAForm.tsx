@@ -406,7 +406,7 @@ const CTAForm = ({
                     <Button
                       variant="outline"
                       colorScheme="red"
-                      leftIcon={Trash}
+                      lefticon={<Trash />}
                     >
                       {t('delete')}
                     </Button>

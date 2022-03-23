@@ -52,7 +52,7 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
           justifyContent="center"
         >
           <UI.Div width="auto">
-            <ClientButton leftIcon={Share2} onClick={handleCopy} usePulse size="lg">
+            <ClientButton lefticon={<Share2 />} onClick={handleCopy} usePulse size="lg">
               {share?.tooltip || 'Share'}
             </ClientButton>
           </UI.Div>

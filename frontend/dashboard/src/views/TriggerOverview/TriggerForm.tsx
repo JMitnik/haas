@@ -305,28 +305,28 @@ const FormConditionFragment = ({
                   >
                     <RadioButton
                       mr={2}
-                      icon={CornerRightDown}
+                      icon={<CornerRightDown />}
                       value="LOW_THRESHOLD"
                       text="Low threshold"
                       description="Alert under threshold"
                     />
                     <RadioButton
                       mr={2}
-                      icon={CornerRightUp}
+                      icon={<CornerRightUp />}
                       value="HIGH_THRESHOLD"
                       text="High threshold"
                       description="Alert over threshold"
                     />
                     <RadioButton
                       mr={2}
-                      icon={Minimize2}
+                      icon={<Minimize2 />}
                       value="INNER_RANGE"
                       text="Inner range"
                       description="Alert within range"
                     />
                     <RadioButton
                       mb={2}
-                      icon={Maximize2}
+                      icon={<Maximize2 />}
                       value="OUTER_RANGE"
                       text="Outer range"
                       description="Alert out of range"
@@ -343,7 +343,7 @@ const FormConditionFragment = ({
                   >
                     <RadioButton
                       mr={2}
-                      icon={Target}
+                      icon={<Target />}
                       value="TEXT_MATCH"
                       text="Match text"
                       description="Match specific text"
@@ -392,7 +392,7 @@ const FormConditionFragment = ({
             form={form}
             fieldIndex={fieldIndex}
             conditionKey="lowThreshold"
-            icon={CornerRightDown}
+            icon={<CornerRightDown />}
             defaultValue={fieldCondition?.lowThreshold}
           />
 
@@ -428,7 +428,7 @@ const FormConditionFragment = ({
             form={form}
             fieldIndex={fieldIndex}
             conditionKey="highThreshold"
-            icon={CornerRightUp}
+            icon={<CornerRightUp />}
             defaultValue={fieldCondition?.highThreshold}
           />
 
@@ -630,14 +630,14 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                       display="flex"
                     >
                       <RadioButton
-                        icon={Thermometer}
+                        icon={<Thermometer />}
                         value="QUESTION"
                         text={t('question')}
                         description={t('trigger:trigger_question_alarm')}
                       />
                       <RadioButton
                         isDisabled
-                        icon={Watch}
+                        icon={<Watch />}
                         value="SCHEDULED"
                         text={t('scheduled')}
                         description={t('trigger:trigger_schedulled_alarm')}
@@ -678,7 +678,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
             {!activeDialogue ? (
               <UI.IllustrationCard svg={<PaperIll />} text={t('trigger:select_dialogue_placeholder')}>
                 <Button
-                  leftIcon={MousePointer}
+                  lefticon={<MousePointer />}
                   onClick={() => questionSelectRef.current.focus()}
                   size="sm"
                   variant="outline"
@@ -692,7 +692,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 {fields.length === 0 ? (
                   <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
                     <Button
-                      leftIcon={PlusCircle}
+                      lefticon={<PlusCircle />}
                       onClick={addCondition}
                       isDisabled={!activeDialogue}
                       size="sm"
@@ -705,7 +705,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 ) : (
                   <UI.Div>
                     <Button
-                      leftIcon={PlusCircle}
+                      lefticon={<PlusCircle />}
                       onClick={addCondition}
                       isDisabled={!activeDialogue}
                       size="sm"
@@ -787,7 +787,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 size="sm"
                 variant="outline"
                 colorScheme="teal"
-                leftIcon={UserPlus}
+                lefticon={<UserPlus />}
               >
                 {t('add_recipient')}
               </Button>
@@ -799,7 +799,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 size="sm"
                 variant="outline"
                 colorScheme="teal"
-                leftIcon={UserPlus}
+                lefticon={<UserPlus />}
               >
                 {t('add_recipient')}
               </Button>
@@ -832,8 +832,8 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     onChange={onChange}
                     display="flex"
                   >
-                    <RadioButton icon={Mail} value="EMAIL" text={t('email')} description={t('trigger:alert_email')} />
-                    <RadioButton icon={Smartphone} value="PHONE" text={t('sms')} description={t('trigger:alert_sms')} />
+                    <RadioButton icon={<Mail />} value="EMAIL" text={t('email')} description={t('trigger:alert_email')} />
+                    <RadioButton icon={<Smartphone />} value="PHONE" text={t('sms')} description={t('trigger:alert_sms')} />
                     <RadioButton value="BOTH" text={t('both')} description={t('trigger:alert_both')} />
                   </RadioGroup>
                 )}

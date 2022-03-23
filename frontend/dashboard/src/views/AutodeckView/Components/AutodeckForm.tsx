@@ -210,9 +210,9 @@ const AutodeckForm = ({
                             onChange={onChange}
                             display="flex"
                           >
-                            <RadioButton icon={ThumbsUp} value={1} text="Yes" description="Generate workspace" />
+                            <RadioButton icon={<ThumbsUp />} value={1} text="Yes" description="Generate workspace" />
                             <RadioButton
-                              icon={ThumbsDown}
+                              icon={<ThumbsDown />}
                               value={0}
                               text="No"
                               description="Do not generate workspace"

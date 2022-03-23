@@ -165,8 +165,8 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
                 onChange={onChange}
                 onBlur={onBlur}
               >
-                <UI.RadioButton icon={Mail} value="EMAIL" text={t('email')} description={t('campaign_email_helper')} />
-                <UI.RadioButton icon={Smartphone} value="SMS" text={t('sms')} description={t('campaign_sms_helper')} />
+                <UI.RadioButton icon={<Mail />} value="EMAIL" text={t('email')} description={t('campaign_email_helper')} />
+                <UI.RadioButton icon={<Smartphone />} value="SMS" text={t('sms')} description={t('campaign_sms_helper')} />
               </UI.RadioButtons>
             )}
           />

@@ -125,7 +125,7 @@ const LoginView = () => {
 
                   <UI.Button
                     colorScheme="teal"
-                    leftIcon={Send}
+                    lefticon={<Send />}
                     type="submit"
                     isDisabled={!form.formState.isValid}
                     mt={4}

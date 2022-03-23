@@ -29,8 +29,8 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
                 onChange={onChange}
                 display="flex"
               >
-                <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
-                <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
+                <RadioButton icon={<Link2 />} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
+                <RadioButton icon={<Upload />} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
               </RadioGroup>
             )}
           />
@@ -103,8 +103,8 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
                   onChange={onChange}
                   display="flex"
                 >
-                  <RadioButton icon={ThumbsUp} value={1} text={'Approve'} description={'Use current website screenshot'} />
-                  <RadioButton icon={ThumbsDown} value={0} text={'Edit'} description={'Upload new website screenshot'} />
+                  <RadioButton icon={<ThumbsUp />} value={1} text={'Approve'} description={'Use current website screenshot'} />
+                  <RadioButton icon={<ThumbsDown />} value={0} text={'Edit'} description={'Upload new website screenshot'} />
                 </RadioGroup>
               )}
             />

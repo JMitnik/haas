@@ -104,7 +104,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
               <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
                 <UI.H4>Links</UI.H4>
                 <Button
-                  leftIcon={PlusCircle}
+                  lefticon={<PlusCircle />}
                   onClick={() => append(appendNewField())}
                   size="sm"
                 >

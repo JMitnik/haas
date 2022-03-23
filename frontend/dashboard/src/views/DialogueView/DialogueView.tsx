@@ -197,7 +197,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
             <UI.Div flexGrow={1} pt={2}>
               <UI.Input
                 rightEl={(
-                  <UI.Button width="auto" size="sm" onClick={onCopy} leftIcon={Clipboard}>
+                  <UI.Button width="auto" size="sm" onClick={onCopy} lefticon={<Clipboard />}>
                     {hasCopied ? 'Copied' : 'Copy'}
                   </UI.Button>
                 )}
@@ -288,7 +288,7 @@ const DialogueView = () => {
             </UI.ViewTitle>
             <Popover.Base>
               <Popover.Trigger>
-                <UI.Button colorScheme="teal" leftIcon={QRIcon} ml={4} size="sm">
+                <UI.Button colorScheme="teal" lefticon={<QRIcon />} ml={4} size="sm">
                   {t('share')}
                 </UI.Button>
               </Popover.Trigger>
@@ -321,7 +321,7 @@ const DialogueView = () => {
               <UI.Skeleton {...fetchStatus}>
                 <SummaryModule
                   heading={t('interactions')}
-                  renderIcon={Activity}
+                  rendericon={<Activity />}
                   onClick={() => (
                     history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)
                   )}
@@ -335,7 +335,7 @@ const DialogueView = () => {
 
                 <SummaryModule
                   heading={t('dialogue:average_score')}
-                  renderIcon={Award}
+                  rendericon={<Award />}
                   isInFallback={dialogue?.thisWeekAverageScore === 0}
                   fallbackMetric={t('dialogue:fallback_no_score')}
                   renderMetric={`${(dialogue?.thisWeekAverageScore || 0 / 10).toFixed(2)} ${t('score')}`}
@@ -368,7 +368,7 @@ const DialogueView = () => {
               <UI.Skeleton {...fetchStatus}>
                 <SummaryModule
                   heading={t('dialogue:frequently_mentioned')}
-                  renderIcon={MessageCircle}
+                  rendericon={<MessageCircle />}
                   renderFooterText={t('dialogue:view_all_mentions')}
                   isInFallback={!dialogue?.statistics?.mostPopularPath}
                   onClick={() => (

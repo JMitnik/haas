@@ -29,8 +29,8 @@ const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMe
               onChange={onChange}
               onBlur={onBlur}
             >
-              <RadioButton icon={Link2} value={1} text={t('autodeck:logo_color')} description={t('autodeck:logo_color_helper')} />
-              <RadioButton icon={Clipboard} value={0} text={t('autodeck:custom_color')} description={t('autodeck:custom_color_helper')} />
+              <RadioButton icon={<Link2 />} value={1} text={t('autodeck:logo_color')} description={t('autodeck:logo_color_helper')} />
+              <RadioButton icon={<Clipboard />} value={0} text={t('autodeck:custom_color')} description={t('autodeck:custom_color_helper')} />
             </RadioButtons>
           )}
         />

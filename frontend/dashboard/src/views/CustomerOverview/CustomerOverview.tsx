@@ -74,7 +74,7 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
           {/* TEMPORARY Disabled */}
           {/* {canAccessAdmin && (
             <Span>
-              <UI.Button bg="gray.200" mb={2} size="sm" variant="outline" leftIcon={UserCheck} onClick={goToAdminPanel}>
+              <UI.Button bg="gray.200" mb={2} size="sm" variant="outline" lefticon={<UserCheck />} onClick={goToAdminPanel}>
                 <Link to="/dashboard/b/admin">
                   {t('adminpanel')}
                 </Link>

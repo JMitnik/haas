@@ -201,7 +201,7 @@ const QuestionEntryItem = ({ depth,
         <QuestionEntryContainer flexGrow={1}>
 
           <Flex flexDirection="row" width="100%">
-            <BuilderIcon type={question.type} Icon={Icon} />
+            <BuilderIcon type={question.type} icon={<Icon />} />
 
             <Flex width="60%" flexDirection="column">
               <Span fontSize="1.4em">

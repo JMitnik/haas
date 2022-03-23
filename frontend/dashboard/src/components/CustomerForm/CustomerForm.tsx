@@ -105,12 +105,11 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
           render={({ onChange, value }) => (
             <RadioGroup
               value={value}
-              isInline
               onChange={onChange}
               display="flex"
             >
-              <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
-              <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
+              <RadioButton icon={<Link2 />} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
+              <RadioButton icon={<Upload />} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
             </RadioGroup>
           )}
         />
@@ -290,14 +289,14 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                     render={({ onChange, onBlur, value }) => (
                       <RadioGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
                         <RadioButton
-                          icon={Clipboard}
+                          icon={<Clipboard />}
                           value={1}
                           mr={2}
                           text={(t('customer:custom_template'))}
                           description={t('customer:custom_template_helper')}
                         />
                         <RadioButton
-                          icon={Loader}
+                          icon={<Loader />}
                           value={0}
                           text={(t('customer:no_custom_template'))}
                           description={t('customer:no_custom_template_helper')}
@@ -319,14 +318,14 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                       render={({ onChange, onBlur, value }) => (
                         <RadioGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
                           <RadioButton
-                            icon={Activity}
+                            icon={<Activity />}
                             value={1}
                             mr={2}
                             text={(t('customer:use_fake_data'))}
                             description={t('customer:fake_data_helper')}
                           />
                           <RadioButton
-                            icon={Minus}
+                            icon={<Minus />}
                             value={0}
                             text={(t('customer:no_use_fake_data'))}
                             description={t('customer:no_use_fake_data_helper')}

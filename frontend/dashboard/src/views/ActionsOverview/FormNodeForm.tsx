@@ -123,7 +123,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
             <UI.IconButton
               size="sm"
               aria-label="Move field left"
-              icon={ArrowLeft}
+              icon={<ArrowLeft />}
               type="button"
               isDisabled={fieldIndex === 0}
               onClick={(event) => {
@@ -137,7 +137,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
             <UI.IconButton
               size="sm"
               aria-label="Move field right"
-              icon={ArrowRight}
+              icon={<ArrowRight />}
               type="button"
               isDisabled={fieldIndex === nrFields - 1}
               onClick={(event) => {
@@ -258,14 +258,14 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                       render={({ onBlur, onChange, value }) => (
                         <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                           <UI.RadioButton
-                            icon={AlertCircle}
+                            icon={<AlertCircle />}
                             value={1}
                             mr={2}
                             text={(t('required'))}
                             description={t('required_helper')}
                           />
                           <UI.RadioButton
-                            icon={Circle}
+                            icon={<Circle />}
                             value={0}
                             mr={2}
                             text={(t('not_required'))}

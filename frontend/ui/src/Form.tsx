@@ -306,7 +306,7 @@ export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
         display="block"
         textAlign="left"
         py="8px"
-        leftIcon={icon}
+        lefticon={<icon />}
         height="auto"
         isDisabled={isDisabled}
         {...rest}

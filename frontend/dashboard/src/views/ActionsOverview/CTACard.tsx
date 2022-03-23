@@ -140,7 +140,7 @@ const CTACard = (
       <CTACardContainer noHover id={id} activeCTA={activeCTA}>
         <Flex justifyContent="space-between" flexDirection="row" width="100%">
           <UI.Flex>
-            <CTAIcon type={type} Icon={Icon} />
+            <CTAIcon type={type} icon={<Icon />} />
 
             <Flex flexDirection="column">
               <motion.span>
@@ -165,7 +165,7 @@ const CTACard = (
               variant="outline"
               colorScheme="teal"
               size="sm"
-              leftIcon={Edit3}
+              lefticon={<Edit3 />}
               isDisabled={(activeCTA && activeCTA !== id) || false}
               onClick={() => onActiveCTAChange(id)}
             >

@@ -69,7 +69,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
                 type="button"
                 onClick={() => handleSubmit(multiChoiceOption)}
                 key={index}
-                leftIcon={SpeechIcon}
+                lefticon={<SpeechIcon />}
               >
                 <ButtonBody>
                   <H5>
