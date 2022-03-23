@@ -7,6 +7,139 @@ class NodeEntryPrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  /**
+   * Finds all sub topic node entries within a date range by question id
+   * @param questionId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns a list of sliderNodeEntries as well as node entries of its children
+   */
+  findNodeEntriesByQuestionId = async (
+    questionId: string, startDateTime: Date, endDateTime: Date
+  ) => {
+    const targetNodeEntries = await this.prisma.sliderNodeEntry.findMany({
+      where: {
+        nodeEntry: {
+          creationDate: {
+            gte: startDateTime,
+            lte: endDateTime,
+          },
+          relatedNodeId: questionId,
+          NOT: {
+            inputSource: 'INIT_GENERATED',
+          },
+        },
+      },
+      include: {
+        nodeEntry: {
+          include: {
+            relatedNode: {
+              select: {
+                options: true,
+                children: {
+                  select: {
+                    childNode: {
+                      select: {
+                        options: true,
+                      },
+                    },
+                    isRelatedNodeOfNodeEntries: {
+                      select: {
+                        id: true,
+                        choiceNodeEntry: {
+                          select: {
+                            value: true,
+                          },
+                        },
+                        session: {
+                          select: {
+                            mainScore: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return targetNodeEntries;
+  }
+
+  /**
+   * Finds all node entries within a date range based on a specific topic
+   * @param dialogueId 
+   * @param topic 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns a list of node entries where answered value = input topic
+   */
+  findNodeEntriesByTopic = async (dialogueId: string, topic: string, startDateTime: Date, endDateTime: Date) => {
+    const targetNodeEntries = await this.prisma.choiceNodeEntry.findMany({
+      where: {
+        nodeEntry: {
+          creationDate: {
+            gte: startDateTime,
+            lte: endDateTime,
+          },
+          session: {
+            dialogueId: dialogueId,
+          },
+          NOT: {
+            inputSource: 'INIT_GENERATED',
+          },
+        },
+        value: topic,
+      },
+      include: {
+        nodeEntry: {
+          include: {
+            relatedNode: {
+              select: {
+                options: true,
+                children: {
+                  where: {
+                    conditions: {
+                      some: {
+                        matchValue: topic,
+                      },
+                    },
+                  },
+                  select: {
+                    childNode: {
+                      select: {
+                        options: true,
+                      },
+                    },
+                    isRelatedNodeOfNodeEntries: {
+                      select: {
+                        id: true,
+                        choiceNodeEntry: {
+                          select: {
+                            value: true,
+                          },
+                        },
+                        session: {
+                          select: {
+                            mainScore: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return targetNodeEntries;
+  }
+
   create(data: Prisma.NodeEntryCreateInput) {
     return this.prisma.nodeEntry.create({
       data,

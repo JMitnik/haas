@@ -14,6 +14,34 @@ class EdgeService {
   }
 
   /**
+   * Finds question options based on the edge condition value
+   * @param dialogueId 
+   * @param edgeConditionValue matchValue on a condition
+   * @returns a list of question options
+   */
+  findChildOptionsByEdgeCondition = async (dialogueId: string, edgeConditionValue: string) => {
+    const edge = await this.edgePrismaAdapter.prisma.edge.findFirst({
+      where: {
+        conditions: {
+          some: {
+            matchValue: edgeConditionValue,
+          },
+        },
+        dialogueId,
+      },
+      include: {
+        childNode: {
+          select: {
+            options: true,
+          },
+        },
+      },
+    });
+
+    return edge?.childNode?.options?.map((option) => ({ nrVotes: 0, impactScore: 0, subTopic: option.value })) || [];
+  }
+
+  /**
    * Finds edge by provided ID
    * @param edgeId ID of Edge
    * @returns Edge entry corresponding provided ID

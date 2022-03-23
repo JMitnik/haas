@@ -16,6 +16,9 @@ import isValidDate, { isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueImpactScoreType, DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
+import { TopicNodeEntryValue } from '../node-entry/NodeEntry';
+import { groupBy, meanBy, uniq, uniqBy } from 'lodash';
+import { isPresent } from 'ts-is-present';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -55,6 +58,25 @@ export const DialogueStatisticsSummaryFilterInput = inputObjectType({
   },
 })
 
+export const TopicType = objectType({
+  name: 'TopicType',
+  definition(t) {
+    t.string('subTopic');
+    t.float('impactScore');
+    t.int('nrVotes');
+  },
+});
+
+export const TopicInputType = inputObjectType({
+  name: 'TopicInputType',
+  definition(t) {
+    t.boolean('isRoot', { default: false });
+    t.string('value', { required: true });
+    t.string('startDateTime', { required: true });
+    t.string('endDateTime');
+  },
+});
+
 export const DialogueType = objectType({
   name: 'Dialogue',
 
@@ -87,6 +109,47 @@ export const DialogueType = objectType({
             id: parent.postLeafNodeId,
           },
         });
+      },
+    });
+
+    t.field('topic', {
+      type: TopicType,
+      list: true,
+      args: {
+        input: TopicInputType,
+      },
+      useTimeResolve: true,
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+        if (!args.input) throw new UserInputError('No input provided!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        const dialogueId = parent.id;
+
+        if (args.input.isRoot) {
+          return ctx.services.dialogueService.findSubTopicsOfRoot(
+            dialogueId,
+            utcStartDateTime as Date,
+            utcEndDateTime
+          );
+        }
+
+        return ctx.services.dialogueService.findSubTopicsByTopic(
+          dialogueId,
+          args.input.value,
+          utcStartDateTime as Date,
+          utcEndDateTime
+        ) as any;
       },
     });
 

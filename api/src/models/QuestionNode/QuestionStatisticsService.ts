@@ -44,7 +44,7 @@ class QuestionStatisticsService {
    * @param refresh Boolean - if set to true will update cached version within database 
    * @returns 
    */
-  initiate = async (
+  indepthAnalysis = async (
     input: InitiateInput
   ) => {
     const {
@@ -114,7 +114,7 @@ class QuestionStatisticsService {
     //     endDateTime: endDateTimeSet,
     //   });
 
-    return { impactScores: impactScores || [] };
+    return impactScores || [];
   }
 
   /**
@@ -133,25 +133,18 @@ class QuestionStatisticsService {
       case QuestionImpactScore.PERCENTAGE:
         const totalSessionEntries = sessions.map((session) => {
           const nodeEntries = session.nodeEntries;
-          console.log('node entries: ', nodeEntries);
           const targetEntry = nodeEntries.find((entry) => entry.relatedNodeId === questionId);
           return targetEntry?.choiceNodeEntry?.value || targetEntry?.videoNodeEntry?.value || undefined;
         }).filter(isPresent);
-        console.log('totalSessionEntries: ', totalSessionEntries);
         const counted = countBy(totalSessionEntries);
-        console.log('Counted: ', counted);
         const percentageArray: { option: string; impactScore: number; nrVotes: number }[]
           = Object.entries(counted).map((entry) =>
             ({ option: entry[0], impactScore: entry[1] / totalSessionEntries.length, nrVotes: entry[1] })
           );
-        console.log('percentage array: ', percentageArray);
-        // const sliderValues = nodeEntries.map((entry) => entry.sliderNodeEntry?.value).filter(isPresent);
-        // const average = mean(sliderValues);
-        // return average;
         return percentageArray;
 
       default:
-        return null;
+        return [];
     }
   }
 

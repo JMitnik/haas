@@ -5,8 +5,8 @@ export const QuestionImpactScoreType = enumType({
   members: ['PERCENTAGE'],
 });
 
-export const QuestionStatisticsScores = objectType({
-  name: 'QuestionStatisticsScores',
+export const IndepthQuestionStatisticsSummary = objectType({
+  name: 'IndepthQuestionStatisticsSummary',
   definition(t) {
     t.int('nrVotes', {
       nullable: true,
@@ -14,7 +14,9 @@ export const QuestionStatisticsScores = objectType({
     t.float('impactScore', {
       nullable: true,
     });
-    t.string('option');
+    t.string('option', {
+      nullable: true,
+    });
   },
 });
 
@@ -28,10 +30,10 @@ export const QuestionStatisticsSummary = objectType({
     t.date('startDateTime', { nullable: true });
     t.date('endDateTime', { nullable: true });
 
-    t.field('impactScores', {
-      type: QuestionStatisticsScores,
-      list: true,
-    });
+    // t.field('impactScores', {
+    //   type: IndepthQuestionStatisticsScores,
+    //   list: true,
+    // });
 
   },
 });

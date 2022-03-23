@@ -657,6 +657,7 @@ type Dialogue {
   statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag!]
   title: String!
+  topic(input: TopicInputType): [TopicType!]!
   updatedAt: String
   wasGeneratedWithGenData: Boolean!
 }
@@ -1622,6 +1623,26 @@ enum TagTypeEnum {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
+}
+
+input TopicInputType {
+  endDateTime: String
+  isRoot: Boolean = false
+  startDateTime: String!
+  value: String!
+}
+
+type TopicNodeEntryValue {
+  id: Int!
+  mainScore: Int!
+  nodeEntryId: String!
+  value: String!
+}
+
+type TopicType {
+  impactScore: Float!
+  nrVotes: Int!
+  subTopic: String!
 }
 
 type topPathType {

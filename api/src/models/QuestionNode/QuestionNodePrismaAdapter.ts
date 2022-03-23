@@ -12,6 +12,15 @@ class QuestionNodePrismaAdapter {
     this.prisma = prismaClient;
   }
 
+  findSliderNodeByDialogueId = async (dialogueId: string) => {
+    return this.prisma.questionNode.findFirst({
+      where: {
+        questionDialogueId: dialogueId,
+        type: 'SLIDER',
+      },
+    });
+  }
+
   /**
    * Finds a cache entry of a dialogue statistics summary based on id and date range
    * @param dialogueId 

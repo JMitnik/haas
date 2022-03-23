@@ -6,7 +6,7 @@ import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
-import { QuestionImpactScoreType, QuestionStatisticsSummary } from './QuestionStatisticsSummary';
+import { IndepthQuestionStatisticsSummary, QuestionImpactScoreType, QuestionStatisticsSummary } from './QuestionStatisticsSummary';
 import { isValidDateTime } from '../../utils/isValidDate';
 
 export const CTAShareInputObjectType = inputObjectType({
@@ -229,6 +229,41 @@ export const QuestionNodeType = objectType({
       resolve: (parent) => parent.updatedAt?.toString() || '',
     });
 
+    t.field('indepthQuestionStatisticsSummary', {
+      type: IndepthQuestionStatisticsSummary,
+      nullable: true,
+      list: true,
+      args: {
+        input: QuestionStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!parent.questionDialogueId) throw new ApolloError('No dialogue Id available for question!');
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        const analysis = await ctx.services.questionStatisticsService.indepthAnalysis({
+          dialogueId: parent.questionDialogueId,
+          questionId: parent.id,
+          startDateTime: utcStartDateTime as Date,
+          endDateTime: utcEndDateTime,
+          type: args.input.impactType,
+          impactTreshold: args.input.impactTreshold || undefined,
+        });
+        return analysis;
+      },
+    })
+
     t.field('questionStatisticsSummary', {
       type: QuestionStatisticsSummary,
       nullable: true,
@@ -252,14 +287,15 @@ export const QuestionNodeType = objectType({
           utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
         }
 
-        return ctx.services.questionStatisticsService.initiate({
-          dialogueId: parent.questionDialogueId,
-          questionId: parent.id,
-          startDateTime: utcStartDateTime as Date,
-          endDateTime: utcEndDateTime,
-          type: args.input.impactType,
-          impactTreshold: args.input.impactTreshold || undefined,
-        });
+        // return ctx.services.questionStatisticsService.initiate({
+        //   dialogueId: parent.questionDialogueId,
+        //   questionId: parent.id,
+        //   startDateTime: utcStartDateTime as Date,
+        //   endDateTime: utcEndDateTime,
+        //   type: args.input.impactType,
+        //   impactTreshold: args.input.impactTreshold || undefined,
+        // });
+        return null;
       },
     })
 
