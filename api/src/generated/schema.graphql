@@ -1627,6 +1627,7 @@ input TextboxNodeEntryInput {
 
 input TopicInputType {
   endDateTime: String
+  impactScoreType: DialogueImpactScoreType!
   isRoot: Boolean = false
   startDateTime: String!
   value: String!

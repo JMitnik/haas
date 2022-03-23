@@ -72,6 +72,10 @@ export const TopicInputType = inputObjectType({
   definition(t) {
     t.boolean('isRoot', { default: false });
     t.string('value', { required: true });
+    t.field('impactScoreType', {
+      type: DialogueImpactScoreType,
+      required: true,
+    });
     t.string('startDateTime', { required: true });
     t.string('endDateTime');
   },
@@ -139,6 +143,7 @@ export const DialogueType = objectType({
         if (args.input.isRoot) {
           return ctx.services.dialogueService.findSubTopicsOfRoot(
             dialogueId,
+            args.input.impactScoreType,
             utcStartDateTime as Date,
             utcEndDateTime
           );
@@ -146,6 +151,7 @@ export const DialogueType = objectType({
 
         return ctx.services.dialogueService.findSubTopicsByTopic(
           dialogueId,
+          args.input.impactScoreType,
           args.input.value,
           utcStartDateTime as Date,
           utcEndDateTime
