@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Div, Form, FormContainer, FormControl,
@@ -222,7 +222,7 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
                 <Button
                   isLoading={isLoading}
                   isDisabled={!form.formState.isValid}
-                  variantColor="teal"
+                  colorScheme="teal"
                   type="submit"
                 >
                   {t('edit')}

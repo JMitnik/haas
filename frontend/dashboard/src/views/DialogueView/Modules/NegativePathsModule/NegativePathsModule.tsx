@@ -4,7 +4,7 @@ import { Card, CardBody, Div, Flex, H3, Text } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
 import { Frown } from 'react-feather';
-import { Icon } from '@chakra-ui/core';
+import { Icon } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import FallbackContainer from '../FallbackContainer';
 import ModuleContainer from '../Module';

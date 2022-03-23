@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
-import { useToast } from '@chakra-ui/core';
+import { useToast } from '@chakra-ui/react';
 import React from 'react';
 
 import { useErrorHandler } from 'react-error-boundary';

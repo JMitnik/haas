@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useRemovePixelRangeMutation, useWhitifyImageMutation, useGetAdjustedLogoLazyQuery, RemovePixelRangeInput } from 'types/generated-types';
 import { Div, Flex } from '@haas/ui';
-import { Spinner, Button, useToast, Box } from '@chakra-ui/core';
+import { Spinner, Button, useToast, Box } from '@chakra-ui/react';
 
 const Canvas = ({ id, value, onChange }: any) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
@@ -188,7 +188,7 @@ const Canvas = ({ id, value, onChange }: any) => {
         />
         <Flex marginTop="5px" justifyContent="space-evenly">
           <Button
-            variantColor="teal"
+            colorScheme="teal"
             onClick={handleRemovePixel}
           >
             Remove pixel
@@ -196,7 +196,7 @@ const Canvas = ({ id, value, onChange }: any) => {
           <Button
             isLoading={whitifyLoading}
             // isDisabled={!form.formState.isValid}
-            variantColor="blue"
+            colorScheme="blue"
             onClick={handleWhitify}
           >
             Whitify
@@ -204,7 +204,7 @@ const Canvas = ({ id, value, onChange }: any) => {
           <Button
             isLoading={adjustedLoading}
             // isDisabled={!form.formState.isValid}
-            variantColor="purple"
+            colorScheme="purple"
             onClick={handleReload}
           >
             Reload
@@ -212,7 +212,7 @@ const Canvas = ({ id, value, onChange }: any) => {
           <Button
             isLoading={adjustedLoading}
             // isDisabled={!form.formState.isValid}
-            variantColor="red"
+            colorScheme="red"
             onClick={handleReset}
           >
             Reset

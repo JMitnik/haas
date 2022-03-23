@@ -18,7 +18,7 @@ import {
   position,
   SpaceProps,
 } from 'styled-system';
-import { Stack as ChakraStack, StackProps as ChakraStackProps  } from '@chakra-ui/core';
+import { Stack as ChakraStack, StackProps as ChakraStackProps  } from '@chakra-ui/react';
 import { Div, GenericProps } from './Generics';
 
 interface ContainerProps extends GenericProps {}

@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Grid, useToast } from '@chakra-ui/core';
+import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Grid, useToast } from '@chakra-ui/react';
 import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
 import { PlusCircle, Type } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -281,7 +281,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                         mt={4}
                         variant="outline"
                         size="sm"
-                        variantColor="red"
+                        colorScheme="red"
                         onClick={() => {
                           remove(index);
                         }}

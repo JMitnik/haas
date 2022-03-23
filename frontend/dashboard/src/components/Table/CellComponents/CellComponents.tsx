@@ -2,7 +2,7 @@ import { Div, Flex, Span, Text } from '@haas/ui';
 import { User } from 'react-feather';
 import React from 'react';
 
-import { Badge, Icon } from '@chakra-ui/core';
+import { Badge, Icon } from '@chakra-ui/react';
 import { GenericCellProps } from '../TableTypes';
 
 export const GenericCell = ({ value }: GenericCellProps) => (
@@ -22,7 +22,7 @@ export const CenterCell = ({ value }: GenericCellProps) => (
 export const RoleCell = ({ value }: GenericCellProps) => (
   <Div>
     {value && (
-      <Badge variantColor="cyan">
+      <Badge colorScheme="cyan">
         <Icon mr={1} as={User} />
         <Span>
           {value?.name}

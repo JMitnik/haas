@@ -4,7 +4,7 @@ import { Edit3 } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router-dom';
-import { useToast } from '@chakra-ui/core';
+import { useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -163,7 +163,7 @@ const CTACard = (
               ml={4}
               mr={4}
               variant="outline"
-              variantColor="teal"
+              colorScheme="teal"
               size="sm"
               leftIcon={Edit3}
               isDisabled={(activeCTA && activeCTA !== id) || false}

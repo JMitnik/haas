@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { Div } from '@haas/ui';
-import { Grid } from '@chakra-ui/core';
+import { Grid } from '@chakra-ui/react';
 import { TableRowProps } from 'components/Table/TableTypes';
 
 import { ExpandedRowContainer, RowContainer } from './TableStyles';

@@ -15,7 +15,7 @@ const makeLinearBackground = (color: string) => {
 
 const color = '#4f66ff';
 
-export const ShareNodeButton = motion.custom(styled.button`
+export const ShareNodeButton = motion(styled.button`
   width: 250px;
   height: 250px;
   background: ${makeLinearBackground('#4f66ff')};

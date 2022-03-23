@@ -12,7 +12,7 @@ import {
   Icon,
   Radio,
   RadioGroup,
-} from '@chakra-ui/core';
+} from '@chakra-ui/react';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
@@ -681,7 +681,7 @@ const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: Filt
         <UI.Button
           isDisabled={!form.formState.isDirty}
           type="submit"
-          variantColor="teal"
+          colorScheme="teal"
           size="sm"
           mb={4}
         >

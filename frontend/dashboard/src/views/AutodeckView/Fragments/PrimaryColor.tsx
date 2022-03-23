@@ -1,7 +1,7 @@
 import { UseFormMethods, Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import React from "react";
-import { FormControl, FormLabel } from "@chakra-ui/core";
+import { FormControl, FormLabel } from "@chakra-ui/react";
 import { InputHelper, RadioButton, RadioButtons } from "@haas/ui";
 import { Link2, Clipboard } from "react-feather";
 import { FormDataProps } from "../Types";

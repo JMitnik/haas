@@ -1,6 +1,6 @@
 import { CompactEntriesPath } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import { Div, Flex, Span, Text } from '@haas/ui';
-import { Icon } from '@chakra-ui/core';
+import { Icon } from '@chakra-ui/react';
 import { User } from 'react-feather';
 import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
 import React from 'react';

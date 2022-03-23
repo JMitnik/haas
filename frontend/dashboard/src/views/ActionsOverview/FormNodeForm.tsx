@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { AlertCircle, ArrowLeft, ArrowRight, AtSign, Circle, Feather, FileText, Hash, Link2, Phone, Type } from 'react-feather';
 import { AnimatePresence, Variants, motion } from 'framer-motion';
-import { Button } from '@chakra-ui/core';
+import { Button } from '@chakra-ui/react';
 import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
@@ -277,8 +277,8 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                   </UI.FormControl>
                 </UI.InputGrid>
                 <UI.ButtonGroup justifySelf="flex-end" display="flex">
-                  <UI.Button onClick={handleSaveValues} variantColor="teal">{t('finish_editing')}</UI.Button>
-                  <UI.Button onClick={handleDelete} variantColor="red" variant="outline">{t('delete_field')}</UI.Button>
+                  <UI.Button onClick={handleSaveValues} colorScheme="teal">{t('finish_editing')}</UI.Button>
+                  <UI.Button onClick={handleDelete} colorScheme="red" variant="outline">{t('delete_field')}</UI.Button>
                 </UI.ButtonGroup>
               </UI.CardBody>
             ) : (
@@ -289,7 +289,7 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                     <UI.Button
                       size="sm"
                       onClick={handleDelete}
-                      variantColor="red"
+                      colorScheme="red"
                       variant="outline"
                     >
                       {t('delete_field')}

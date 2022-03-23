@@ -49,20 +49,20 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
                     <UI.SectionHeader>{t('dialogue_via_delivery')}</UI.SectionHeader>
                     <UI.Div my={1}>
                       <UI.Stack isInline>
-                        <UI.Label variantColor="teal" size="sm" fontSize="0.6rem">
+                        <UI.Label colorScheme="teal" size="sm" fontSize="0.6rem">
                           <UI.Icon mr={1}><User width="0.8rem" /></UI.Icon>
                           {delivery.deliveryRecipientFirstName}
                           {' '}
                           {delivery.deliveryRecipientLastName}
                         </UI.Label>
                         {delivery.campaignVariant?.type === CampaignVariantEnum.Email && (
-                          <UI.Label variantColor="teal" size="sm" fontSize="0.6rem">
+                          <UI.Label colorScheme="teal" size="sm" fontSize="0.6rem">
                             <UI.Icon mr={1}><Mail width="0.8rem" /></UI.Icon>
                             {delivery.deliveryRecipientEmail}
                           </UI.Label>
                         )}
                         {delivery.campaignVariant?.type === CampaignVariantEnum.Sms && (
-                          <UI.Label variantColor="teal" size="sm" fontSize="0.6rem">
+                          <UI.Label colorScheme="teal" size="sm" fontSize="0.6rem">
                             <UI.Icon mr={1}><Phone width="0.8rem" /></UI.Icon>
                             {delivery.deliveryRecipientPhone}
                           </UI.Label>
@@ -96,11 +96,11 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
                     </UI.Span>
                     <UI.Div mt={1}>
                       <UI.Stack isInline>
-                        <UI.Label variantColor="blue" size="sm" fontSize="0.6rem">
+                        <UI.Label colorScheme="blue" size="sm" fontSize="0.6rem">
                           <UI.Icon mr={1}><Monitor width="0.8rem" /></UI.Icon>
                           {data.session.device}
                         </UI.Label>
-                        <UI.Label variantColor="blue" size="sm" fontSize="0.6rem">
+                        <UI.Label colorScheme="blue" size="sm" fontSize="0.6rem">
                           <UI.Icon mr={1}><Clock width="0.8rem" /></UI.Icon>
                           {data.session.totalTimeInSec}
                           {' '}

@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 import React from 'react';
-import { Skeleton as ChakraSkeleton } from '@chakra-ui/core';
+import { Skeleton as ChakraSkeleton } from '@chakra-ui/react';
 import { Text } from './Type';
 import Card from './Cards';
 import { Span } from './Span';

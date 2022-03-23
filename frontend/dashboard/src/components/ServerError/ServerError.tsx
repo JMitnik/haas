@@ -1,4 +1,4 @@
-import { Alert, AlertIcon } from '@chakra-ui/core';
+import { Alert, AlertIcon } from '@chakra-ui/react';
 import React from 'react';
 import formatServerError from 'utils/formatServerError';
 

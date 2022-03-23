@@ -1,7 +1,7 @@
 import { UseFormMethods, Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import React from "react";
-import { FormControl, FormLabel, RadioButtonGroup } from "@chakra-ui/core";
+import { FormControl, FormLabel, RadioGroup } from "@chakra-ui/react";
 import { InputHelper, RadioButton, Input } from "@haas/ui";
 import { Link2, Upload, Link, ThumbsUp, ThumbsDown } from "react-feather";
 import UploadImageInput from "./UploadImageInput";
@@ -23,7 +23,7 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
             name="useWebsiteUrl"
             defaultValue={1}
             render={({ onChange, value }) => (
-              <RadioButtonGroup
+              <RadioGroup
                 value={value}
                 isInline
                 onChange={onChange}
@@ -31,7 +31,7 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
               >
                 <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
                 <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
-              </RadioButtonGroup>
+              </RadioGroup>
             )}
           />
         </FormControl>
@@ -97,7 +97,7 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
               name="isWebsiteUrlApproved"
               defaultValue={1}
               render={({ onChange, value }) => (
-                <RadioButtonGroup
+                <RadioGroup
                   value={value}
                   isInline
                   onChange={onChange}
@@ -105,7 +105,7 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
                 >
                   <RadioButton icon={ThumbsUp} value={1} text={'Approve'} description={'Use current website screenshot'} />
                   <RadioButton icon={ThumbsDown} value={0} text={'Edit'} description={'Upload new website screenshot'} />
-                </RadioButtonGroup>
+                </RadioGroup>
               )}
             />
           </FormControl>

@@ -4,7 +4,7 @@ import {
   Button as ChakraButton, ButtonProps as ChakraButtonProps,
   ButtonGroup as ChakraButtonGroup, ButtonGroupProps as ChakraButtonGroupProps,
   IconButton as ChakraIconButton, IconButtonProps as ChakraIconButtonProps
-} from '@chakra-ui/core';
+} from '@chakra-ui/react';
 import styled, { css } from 'styled-components';
 
 

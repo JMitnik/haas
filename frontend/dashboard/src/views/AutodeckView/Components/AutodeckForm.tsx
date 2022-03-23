@@ -1,5 +1,5 @@
 import { Briefcase, Link, ThumbsDown, ThumbsUp, Trash2 } from 'react-feather';
-import { Button, ButtonGroup, RadioButtonGroup } from '@chakra-ui/core';
+import { Button, ButtonGroup, RadioGroup } from '@chakra-ui/react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted,
@@ -204,7 +204,7 @@ const AutodeckForm = ({
                         name="isGenerateWorkspace"
                         defaultValue={0}
                         render={({ onChange, value }) => (
-                          <RadioButtonGroup
+                          <RadioGroup
                             value={value}
                             isInline
                             onChange={onChange}
@@ -217,7 +217,7 @@ const AutodeckForm = ({
                               text="No"
                               description="Do not generate workspace"
                             />
-                          </RadioButtonGroup>
+                          </RadioGroup>
                         )}
                       />
 
@@ -494,7 +494,7 @@ const AutodeckForm = ({
         <Button
           isLoading={isLoading || isConfirmLoading}
           isDisabled={!form.formState.isValid}
-          variantColor="teal"
+          colorScheme="teal"
           type="submit"
         >
           Save

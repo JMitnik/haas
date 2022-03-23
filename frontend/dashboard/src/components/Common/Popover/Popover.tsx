@@ -7,7 +7,7 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
-} from '@chakra-ui/core';
+} from '@chakra-ui/react';
 import React from 'react';
 
 interface PopoverBaseProps {
@@ -19,7 +19,7 @@ interface PopoverBaseProps {
 }
 
 export const Base = ({ children, closeOnClickOutside = true, ...props }: PopoverBaseProps) => (
-  <Popover closeOnBlur={closeOnClickOutside} placement="bottom-start" usePortal {...props}>
+  <Popover closeOnBlur={closeOnClickOutside} placement="bottom-start" {...props}>
     {children}
   </Popover>
 );

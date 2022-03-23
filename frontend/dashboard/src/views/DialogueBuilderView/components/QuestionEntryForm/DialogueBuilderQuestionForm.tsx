@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import {
   Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
-} from '@chakra-ui/core';
+} from '@chakra-ui/react';
 import { Controller, useForm } from 'react-hook-form';
 import { Trash } from 'react-feather';
 import { debounce } from 'lodash';
@@ -14,11 +14,11 @@ import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
-import { MarkdownEditor } from 'components/Markdown/MarkdownEditor';
 import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, Hr, Input, InputGrid, InputHelper, Span, Text,
 } from '@haas/ui';
+import { MarkdownEditor } from 'components/Markdown/MarkdownEditor';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
@@ -718,7 +718,7 @@ const DialogueBuilderQuestionForm = ({
             <Button
               isLoading={createLoading || updateLoading}
               isDisabled={!form.formState.isValid}
-              variantColor="teal"
+              colorScheme="teal"
               type="submit"
             >
               {t('save')}
@@ -726,15 +726,13 @@ const DialogueBuilderQuestionForm = ({
             <Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</Button>
           </ButtonGroup>
           <Span onClick={(e) => e.stopPropagation()}>
-            <Popover
-              usePortal
-            >
+            <Popover>
               {({ onClose }) => (
                 <>
                   <PopoverTrigger>
                     <Button
                       variant="outline"
-                      variantColor="red"
+                      colorScheme="red"
                       leftIcon={Trash}
                     >
                       {t('delete')}
@@ -750,7 +748,7 @@ const DialogueBuilderQuestionForm = ({
                     <PopoverFooter>
                       <Button
                         variant="outline"
-                        variantColor="red"
+                        colorScheme="red"
                         onClick={() => onDeleteEntry && onDeleteEntry()}
                       >
                         {t('delete')}

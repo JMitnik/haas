@@ -1,9 +1,10 @@
-import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
+import { CSSReset, ChakraProvider } from '@chakra-ui/react';
+// import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/react';
 import { ThemeProvider } from 'styled-components';
 import React, { useEffect, useState } from 'react';
 
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
-import defaultTheme, { chakraDefaultTheme } from 'config/theme';
+import defaultTheme, { chakraDefaultTheme, DEPRECATED_breakpoints } from 'config/theme';
 
 import { ensureDarkColor, generateDefaultGradient, generatePalette, isDarkColor } from 'utils/ColorUtils';
 import { useCustomer } from './CustomerProvider';
@@ -31,12 +32,11 @@ const makeBrandTheme = (settings: any) => {
 };
 
 export const DefaultThemeProviders = ({ children }: ThemeProvidersProps) => (
-  <ChakraThemeProvider theme={chakraDefaultTheme}>
-    <CSSReset />
-    <ThemeProvider theme={defaultTheme}>
+  <ChakraProvider resetCSS theme={chakraDefaultTheme}>
+    <ThemeProvider theme={{...defaultTheme, breakpoints: DEPRECATED_breakpoints}}>
       {children}
     </ThemeProvider>
-  </ChakraThemeProvider>
+  </ChakraProvider>
 );
 
 export const CustomThemeProviders = ({ children }: { children: React.ReactNode }) => {

@@ -1,5 +1,5 @@
 import { ReactComponent as ContextButtonSVG } from 'assets/icons/icon-more.svg';
-import { Menu, MenuButton, MenuList } from '@chakra-ui/core';
+import { Menu, MenuButton, MenuList } from '@chakra-ui/react';
 import React from 'react';
 import styled from 'styled-components';
 

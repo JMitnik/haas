@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
-import { useToast } from '@chakra-ui/core';
+import { useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 

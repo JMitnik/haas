@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { Plus } from 'react-feather';
-import { useDisclosure } from '@chakra-ui/core';
+import { useDisclosure } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
@@ -29,7 +29,7 @@ const InviteUserButton = ({ children, arrowBg = 'white' }: InviteButtonProps) =>
           size="sm"
           ml={4}
           leftIcon={Plus}
-          variantColor="teal"
+          colorScheme="teal"
         >
           {t('invite_user')}
         </UI.Button>

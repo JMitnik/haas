@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
@@ -405,7 +405,7 @@ const AddDialogueView = () => {
                           <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                             <Button
                               size="xs"
-                              variantColor="red"
+                              colorScheme="red"
                               variant="outline"
                               leftIcon={Minus}
                               onClick={() => deleteTag(index)}
@@ -425,7 +425,7 @@ const AddDialogueView = () => {
                 <Button
                   isDisabled={!form.formState.isValid}
                   isLoading={isLoading}
-                  variantColor="teal"
+                  colorScheme="teal"
                   type="submit"
                 >
                   {t('create')}

@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardBody, Div, Flex, Text } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
-import { Icon } from '@chakra-ui/core';
+import { Icon } from '@chakra-ui/react';
 import { Smile } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import FallbackContainer from '../FallbackContainer';

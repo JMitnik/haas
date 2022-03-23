@@ -126,7 +126,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                               ) : (
                                 <UI.Button
                                   size="sm"
-                                  variantColor={
+                                  colorScheme={
                                     form.errors?.optionsFull?.[index].value ? 'red' : 'altGray'
                                   }
                                   variant="outline"
@@ -172,7 +172,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                                   size="sm"
                                   variant="outline"
                                   onClick={onOpen}
-                                  variantColor="altGray"
+                                  colorScheme="altGray"
                                 >
                                   <UI.Icon mr={1}>
                                     <PlusCircle />
@@ -210,7 +210,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                     <UI.Button
                       onClick={() => choicesForm.remove(index)}
                       size="sm"
-                      variantColor="red"
+                      colorScheme="red"
                       variant="outline"
                     >
                       <UI.Icon>
@@ -221,7 +221,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                 </UI.Grid>
               ))}
               <UI.Div mt={4}>
-                <UI.Button variantColor="gray" onClick={handleAddNewChoice}>
+                <UI.Button colorScheme="gray" onClick={handleAddNewChoice}>
                   <UI.Icon mr={1}>
                     <PlusCircle />
                   </UI.Icon>
@@ -231,7 +231,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
             </>
           ) : (
             <UI.IllustrationCard isFlat svg={<EmptyIll />} text={t('no_choices')}>
-              <UI.Button variantColor="gray" onClick={handleAddNewChoice}>
+              <UI.Button colorScheme="gray" onClick={handleAddNewChoice}>
                 <UI.Icon mr={1}>
                   <PlusCircle />
                 </UI.Icon>

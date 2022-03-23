@@ -1,4 +1,4 @@
-import { Button } from '@chakra-ui/core';
+import { Button } from '@chakra-ui/react';
 import { Div, Flex, Text } from '@haas/ui';
 import { ReactComponent as ServerDownImage } from 'assets/images/undraw_auth.svg';
 import { useHistory } from 'react-router-dom';

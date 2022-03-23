@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import { Flex, Span } from '@haas/ui';
 import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router';
-import { useToast } from '@chakra-ui/core';
+import { useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -217,7 +217,7 @@ const QuestionEntryItem = ({ depth,
             <Flex width="30%" alignItems="center" justifyContent="center">
               <UI.Button
                 variant="outline"
-                variantColor="teal"
+                colorScheme="teal"
                 size="sm"
                 isDisabled={(activeQuestion && activeQuestion !== question.id) || false}
                 onClick={() => onActiveQuestionChange(question.id)}

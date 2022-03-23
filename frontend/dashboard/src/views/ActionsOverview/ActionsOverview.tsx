@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
-import { Button, Icon } from '@chakra-ui/core';
+import { Button, Icon } from '@chakra-ui/react';
 import { Div, Flex, ViewTitle } from '@haas/ui';
 import { Mail, Plus } from 'react-feather';
 import { debounce } from 'lodash';
@@ -146,7 +146,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
 
             <UI.Button
               leftIcon={Plus}
-              variantColor="teal"
+              colorScheme="teal"
               ml={4}
               size="sm"
               onClick={() => handleAddCTA()}

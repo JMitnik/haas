@@ -11,7 +11,7 @@ import {
 import { ErrorBoundary } from 'react-error-boundary';
 import { Link } from 'react-router-dom';
 import { Plus, UserCheck } from 'react-feather';
-import { Skeleton } from '@chakra-ui/core';
+import { Skeleton } from '@chakra-ui/react';
 import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
 import { Variants, motion } from 'framer-motion';
 import { useHistory } from 'react-router';
@@ -47,7 +47,7 @@ const cardItemAnimation: Variants = {
   },
 };
 
-const MotionGrid = motion.custom(Grid);
+const MotionGrid = motion(Grid);
 
 const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoading: boolean }) => {
   const { t } = useTranslation();

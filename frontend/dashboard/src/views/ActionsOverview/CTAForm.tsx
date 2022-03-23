@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import {
   Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
-} from '@chakra-ui/core';
+} from '@chakra-ui/react';
 import { Controller, useForm } from 'react-hook-form';
 import { Link, Trash, Type } from 'react-feather';
 import { useMutation } from '@apollo/client';
@@ -390,7 +390,7 @@ const CTAForm = ({
             <Button
               isLoading={addLoading || updateLoading}
               isDisabled={!form.formState.isValid}
-              variantColor="teal"
+              colorScheme="teal"
               type="submit"
             >
               {t('save')}
@@ -399,14 +399,13 @@ const CTAForm = ({
           </ButtonGroup>
           <Span onClick={(e) => e.stopPropagation()}>
             <Popover
-              usePortal
             >
               {({ onClose }) => (
                 <>
                   <PopoverTrigger>
                     <Button
                       variant="outline"
-                      variantColor="red"
+                      colorScheme="red"
                       leftIcon={Trash}
                     >
                       {t('delete')}
@@ -422,7 +421,7 @@ const CTAForm = ({
                     <PopoverFooter>
                       <Button
                         variant="outline"
-                        variantColor="red"
+                        colorScheme="red"
                         onClick={() => onDeleteCTA && onDeleteCTA(onClose)}
                       >
                         {t('delete')}

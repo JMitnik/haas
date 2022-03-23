@@ -3,7 +3,7 @@ import { Plus } from 'react-feather';
 import {
   Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
-} from '@chakra-ui/core';
+} from '@chakra-ui/react';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/client';
@@ -139,7 +139,7 @@ const TriggersOverview = () => {
             <UI.Button
               onClick={handleAddUser}
               leftIcon={Plus}
-              variantColor="teal"
+              colorScheme="teal"
               size="sm"
               ml={4}
             >
@@ -195,7 +195,7 @@ const TriggersOverview = () => {
                                     </PopoverBody>
                                     <PopoverFooter>
                                       <UI.Button
-                                        variantColor="red"
+                                        colorScheme="red"
                                         onClick={(e: any) => handleDeleteTrigger(e, alertData?.id)}
                                       >
                                         {t('delete')}

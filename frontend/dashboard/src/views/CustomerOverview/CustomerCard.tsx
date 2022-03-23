@@ -1,7 +1,7 @@
 import {
   Button, ButtonGroup, Popover, PopoverArrow, PopoverBody,
   PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
-} from '@chakra-ui/core';
+} from '@chakra-ui/react';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import Color from 'color';
@@ -87,7 +87,6 @@ const CustomerCard = ({ customer }: { customer: any }) => {
             <Button
               size="xs"
               variant="outline"
-              leftIcon="arrow-forward"
               color={primaryColor.lighten(0.6).hex()}
               borderColor={primaryColor.lighten(0.6).hex()}
             >
@@ -95,16 +94,13 @@ const CustomerCard = ({ customer }: { customer: any }) => {
             </Button>
             {canDeleteCustomers && (
               <Span onClick={(e) => e.stopPropagation()}>
-                <Popover
-                  usePortal
-                >
+                <Popover>
                   {({ onClose }) => (
                     <>
                       <PopoverTrigger>
                         <Button
                           size="xs"
                           variant="outline"
-                          leftIcon="delete"
                           color={primaryColor.lighten(0.6).hex()}
                           borderColor={primaryColor.lighten(0.6).hex()}
                         >
@@ -121,7 +117,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
                         <PopoverFooter>
                           <Button
                             data-testid="DeleteWorkspaceButton"
-                            variantColor="red"
+                            colorScheme="red"
                             onClick={() => handleDeleteCustomer(customer.id, onClose)}
                           >
                             {t('delete')}

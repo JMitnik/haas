@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { ChevronDown, ChevronUp } from 'react-feather';
 import { Div, Span } from '@haas/ui';
-import { Icon } from '@chakra-ui/core';
+import { Icon } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 

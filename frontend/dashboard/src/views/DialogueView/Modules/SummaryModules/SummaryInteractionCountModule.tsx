@@ -3,7 +3,7 @@ import React from 'react';
 
 import { Activity } from 'react-feather';
 import { Card, CardBody, CardFooter, ColumnFlex, Div, Flex, Grid, H3, Paragraph, Span, Text } from '@haas/ui';
-import { Icon } from '@chakra-ui/core';
+import { Icon } from '@chakra-ui/react';
 
 const SummaryInteractionCountModule = ({ interactionCount }: { interactionCount: number }) => {
   const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();

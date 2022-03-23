@@ -1,6 +1,6 @@
 import { Clipboard, Clock, Link as LinkIcon, MessageCircle, Target, Video } from 'react-feather';
 import { Div, Flex, Span, Text } from '@haas/ui';
-import { Icon, Tooltip } from '@chakra-ui/core';
+import { Icon, Tooltip } from '@chakra-ui/react';
 import { NodeEntry, QuestionNode, Session } from 'types/generated-types';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';

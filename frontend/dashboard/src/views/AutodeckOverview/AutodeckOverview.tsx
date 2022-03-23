@@ -121,7 +121,7 @@ export const AutodeckOverview = () => {
               leftIcon={Plus}
               onClick={() => setIsOpenImportModal(true)}
               size="sm"
-              variantColor="teal"
+              colorScheme="teal"
             >
               {t('autodeck:create_job')}
 
@@ -258,7 +258,7 @@ export const AutodeckOverview = () => {
                         leftIcon={Download}
                         isDisabled={activeJob?.status !== JobStatusType.Completed || !activeJob.resourcesUrl}
                         size="sm"
-                        variantColor="green"
+                        colorScheme="green"
                       >
                         {activeJob?.resourcesUrl
                           ? (
@@ -281,7 +281,7 @@ export const AutodeckOverview = () => {
                         })}
                         leftIcon={RefreshCcw}
                         size="sm"
-                        variantColor="red"
+                        colorScheme="red"
                       >
                         Retry
                       </UI.Button>

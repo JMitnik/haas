@@ -31,7 +31,7 @@ export const DeliveryStatus = ({ delivery, onlyStatus = false }: DeliveryStatusP
   switch (status) {
     case DeliveryStatusEnum.Finished: {
       return (
-        <UI.Label variantColor="green">
+        <UI.Label colorScheme="green">
           {status}
         </UI.Label>
       );
@@ -39,7 +39,7 @@ export const DeliveryStatus = ({ delivery, onlyStatus = false }: DeliveryStatusP
 
     case DeliveryStatusEnum.Deployed: {
       return (
-        <UI.Label variantColor="blue">
+        <UI.Label colorScheme="blue">
           {status}
         </UI.Label>
       );
@@ -73,24 +73,24 @@ export const DeliveryStatus = ({ delivery, onlyStatus = false }: DeliveryStatusP
 
     case DeliveryStatusEnum.Opened: {
       return (
-        <UI.Label variantColor="yellow">{status}</UI.Label>
+        <UI.Label colorScheme="yellow">{status}</UI.Label>
       );
     }
 
     case DeliveryStatusEnum.Failed: {
       return (
-        <UI.Label variantColor="red">{status}</UI.Label>
+        <UI.Label colorScheme="red">{status}</UI.Label>
       );
     }
 
     case DeliveryStatusEnum.Delivered: {
       return (
-        <UI.Label variantColor="cyan">{status}</UI.Label>
+        <UI.Label colorScheme="cyan">{status}</UI.Label>
       );
     }
     default: {
       return (
-        <UI.Label variantColor="blue">{status}</UI.Label>
+        <UI.Label colorScheme="blue">{status}</UI.Label>
       );
     }
   }

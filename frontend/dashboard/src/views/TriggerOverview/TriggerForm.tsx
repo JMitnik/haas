@@ -3,20 +3,20 @@ import * as UI from '@haas/ui';
 import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
 import {
   CornerRightDown, CornerRightUp, Mail, Maximize2,
-  Minimize2, MousePointer, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch
+  Minimize2, MousePointer, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch,
 } from 'react-feather';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { ReactComponent as PaperIll } from 'assets/images/paper.svg';
 import { ReactComponent as SMSIll } from 'assets/images/sms.svg';
 import { Slider } from 'antd';
+import { gql, useLazyQuery, useQuery } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useQuery } from '@apollo/client';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Select from 'react-select';
 import styled from 'styled-components';
 
 import 'antd/dist/antd.css'; // Slider,
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Tag, TagIcon } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, RadioGroup, Tag } from '@chakra-ui/react';
 import {
   Div, Form, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Span,
@@ -25,7 +25,6 @@ import { SelectType } from 'types/generic';
 import { useTranslation } from 'react-i18next';
 import ServerError from 'components/ServerError';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
-import { gql } from '@apollo/client';
 
 import { getCustomerTriggerData as CustomerTriggerData } from './__generated__/getCustomerTriggerData';
 
@@ -40,8 +39,7 @@ const SingleScore = ({ form, fieldIndex, conditionKey, defaultValue, icon }: any
     <>
       {score && (
         <Span>
-          <Tag variantColor="cyan">
-            <TagIcon size="12px" icon={icon} />
+          <Tag colorScheme="cyan">
             <Span>
               {score}
             </Span>
@@ -249,7 +247,7 @@ const FormConditionFragment = ({
           <Button
             variant="outline"
             size="sm"
-            variantColor="red"
+            colorScheme="red"
             onClick={() => onDelete(fieldIndex)}
           >
             {t('delete')}
@@ -297,7 +295,7 @@ const FormConditionFragment = ({
             render={({ onBlur, onChange, value }) => (
               <>
                 {nodeType === 'SLIDER' ? (
-                  <RadioButtonGroup
+                  <RadioGroup
                     display="flex"
                     onBlur={onBlur}
                     value={value}
@@ -333,25 +331,25 @@ const FormConditionFragment = ({
                       text="Outer range"
                       description="Alert out of range"
                     />
-                  </RadioButtonGroup>
+                  </RadioGroup>
                 ) : (
-                    <RadioButtonGroup
-                      display="flex"
-                      value={value}
-                      onChange={(val) => {
-                        onChange(val);
-                        onBlur();
-                      }}
-                    >
-                      <RadioButton
-                        mr={2}
-                        icon={Target}
-                        value="TEXT_MATCH"
-                        text="Match text"
-                        description="Match specific text"
-                      />
-                    </RadioButtonGroup>
-                  )}
+                  <RadioGroup
+                    display="flex"
+                    value={value}
+                    onChange={(val) => {
+                      onChange(val);
+                      onBlur();
+                    }}
+                  >
+                    <RadioButton
+                      mr={2}
+                      icon={Target}
+                      value="TEXT_MATCH"
+                      text="Match text"
+                      description="Match specific text"
+                    />
+                  </RadioGroup>
+                )}
               </>
             )}
           />
@@ -623,7 +621,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 defaultValue="QUESTION"
                 render={({ onChange, value }) => (
                   <>
-                    <RadioButtonGroup
+                    <RadioGroup
                       defaultValue={value}
                       isInline
                       onChange={(data) => {
@@ -644,7 +642,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                         text={t('scheduled')}
                         description={t('trigger:trigger_schedulled_alarm')}
                       />
-                    </RadioButtonGroup>
+                    </RadioGroup>
                   </>
                 )}
               />
@@ -684,42 +682,42 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   onClick={() => questionSelectRef.current.focus()}
                   size="sm"
                   variant="outline"
-                  variantColor="teal"
+                  colorScheme="teal"
                 >
                   {t('trigger:select_a_dialogue')}
                 </Button>
               </UI.IllustrationCard>
             ) : (
-                <>
-                  {fields.length === 0 ? (
-                    <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
-                      <Button
-                        leftIcon={PlusCircle}
-                        onClick={addCondition}
-                        isDisabled={!activeDialogue}
-                        size="sm"
-                        variant="outline"
-                        variantColor="teal"
-                      >
-                        {t('trigger:add_condition')}
-                      </Button>
-                    </UI.IllustrationCard>
-                  ) : (
-                      <UI.Div>
-                        <Button
-                          leftIcon={PlusCircle}
-                          onClick={addCondition}
-                          isDisabled={!activeDialogue}
-                          size="sm"
-                          variant="outline"
-                          variantColor="teal"
-                        >
-                          {t('trigger:add_condition')}
-                        </Button>
-                      </UI.Div>
-                    )}
-                </>
-              )}
+              <>
+                {fields.length === 0 ? (
+                  <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
+                    <Button
+                      leftIcon={PlusCircle}
+                      onClick={addCondition}
+                      isDisabled={!activeDialogue}
+                      size="sm"
+                      variant="outline"
+                      colorScheme="teal"
+                    >
+                      {t('trigger:add_condition')}
+                    </Button>
+                  </UI.IllustrationCard>
+                ) : (
+                  <UI.Div>
+                    <Button
+                      leftIcon={PlusCircle}
+                      onClick={addCondition}
+                      isDisabled={!activeDialogue}
+                      size="sm"
+                      variant="outline"
+                      colorScheme="teal"
+                    >
+                      {t('trigger:add_condition')}
+                    </Button>
+                  </UI.Div>
+                )}
+              </>
+            )}
 
           </InputGrid>
 
@@ -754,7 +752,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
                 <Button
                   onClick={() => deleteRecipient(index)}
-                  variantColor="red"
+                  colorScheme="red"
                   variant="outline"
                   size="sm"
                 >
@@ -788,25 +786,25 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 onClick={addRecipient}
                 size="sm"
                 variant="outline"
-                variantColor="teal"
+                colorScheme="teal"
                 leftIcon={UserPlus}
               >
                 {t('add_recipient')}
               </Button>
             </UI.IllustrationCard>
           ) : (
-              <Div>
-                <Button
-                  onClick={addRecipient}
-                  size="sm"
-                  variant="outline"
-                  variantColor="teal"
-                  leftIcon={UserPlus}
-                >
-                  {t('add_recipient')}
-                </Button>
-              </Div>
-            )}
+            <Div>
+              <Button
+                onClick={addRecipient}
+                size="sm"
+                variant="outline"
+                colorScheme="teal"
+                leftIcon={UserPlus}
+              >
+                {t('add_recipient')}
+              </Button>
+            </Div>
+          )}
         </UI.InputGrid>
       </FormSection>
 
@@ -828,7 +826,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 control={form.control}
                 name="medium"
                 render={({ onChange, value }) => (
-                  <RadioButtonGroup
+                  <RadioGroup
                     defaultValue={value}
                     isInline
                     onChange={onChange}
@@ -837,7 +835,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     <RadioButton icon={Mail} value="EMAIL" text={t('email')} description={t('trigger:alert_email')} />
                     <RadioButton icon={Smartphone} value="PHONE" text={t('sms')} description={t('trigger:alert_sms')} />
                     <RadioButton value="BOTH" text={t('both')} description={t('trigger:alert_both')} />
-                  </RadioButtonGroup>
+                  </RadioGroup>
                 )}
               />
 
@@ -851,7 +849,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
         <Button
           isLoading={isLoading}
           isDisabled={!form.formState.isValid}
-          variantColor="teal"
+          colorScheme="teal"
           type="submit"
         >
           {isInEdit ? 'Save' : 'Create'}

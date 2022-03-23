@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { Button, ButtonGroup, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
 import { Div, Flex, Grid, H4, ViewTitle } from '@haas/ui';
 import { Grid as GridIcon, List, Plus } from 'react-feather';
 import { Link, useParams } from 'react-router-dom';
@@ -67,16 +67,16 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
               <Button
                 size="sm"
                 onClick={() => setUseDialogueGridView(true)}
-                variantColor={useDialogueGridView ? 'blue' : 'gray'}
-                leftIcon={GridIcon}
+                colorScheme={useDialogueGridView ? 'blue' : 'gray'}
+                leftIcon={<GridIcon />}
               >
                 {t('grid')}
               </Button>
               <Button
                 size="sm"
                 onClick={() => setUseDialogueGridView(false)}
-                variantColor={useDialogueGridView ? 'gray' : 'blue'}
-                leftIcon={List}
+                colorScheme={useDialogueGridView ? 'gray' : 'blue'}
+                leftIcon={<List />}
               >
                 {t('list')}
               </Button>

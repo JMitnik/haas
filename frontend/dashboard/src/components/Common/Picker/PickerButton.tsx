@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { useDisclosure } from '@chakra-ui/core';
+import { useDisclosure } from '@chakra-ui/react';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

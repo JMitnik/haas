@@ -73,7 +73,7 @@ export const Pagination = ({
               {pages.map((page) => (
                 <UI.Button
                   size="sm"
-                  variantColor="teal"
+                  colorScheme="teal"
                   isActive={page - 1 === pageIndex}
                   key={page}
                   isDisabled={isLoading}

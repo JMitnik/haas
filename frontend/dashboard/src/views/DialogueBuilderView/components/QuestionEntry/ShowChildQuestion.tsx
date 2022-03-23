@@ -1,7 +1,7 @@
 import { FolderMinus, FolderPlus } from 'react-feather';
 import React from 'react';
 
-import { Button } from '@chakra-ui/core';
+import { Button } from '@chakra-ui/react';
 import { Div, Span } from '@haas/ui';
 
 import { AddChildContainer } from './QuestionEntryStyles';

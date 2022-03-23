@@ -35,7 +35,7 @@ const GeneralWrappedTextContainer = styled.div`
 
 const FormNodeEmailEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <GeneralWrappedTextContainer>
-    <UI.Label textTransform="none" variantColor="gray" bg="gray.300">
+    <UI.Label textTransform="none" colorScheme="gray" bg="gray.300">
       <UI.Icon color="gray.500" mr={1}>
         <AtSign width="14px" height="14px" />
       </UI.Icon>
@@ -46,7 +46,7 @@ const FormNodeEmailEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any })
 
 const FormNodeLongTextEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <LongTextContainer>
-    <UI.Label textTransform="none" variantColor="gray" bg="gray.300">
+    <UI.Label textTransform="none" colorScheme="gray" bg="gray.300">
       <UI.Icon color="gray.500" mr={1}>
         <FileText width="14px" height="14px" />
       </UI.Icon>
@@ -57,7 +57,7 @@ const FormNodeLongTextEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any
 
 const FormNodeShortTextEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <GeneralWrappedTextContainer>
-    <UI.Label textTransform="none" variantColor="gray" bg="gray.300">
+    <UI.Label textTransform="none" colorScheme="gray" bg="gray.300">
       <UI.Icon color="gray.500" mr={1}>
         <Type width="14px" height="14px" />
       </UI.Icon>
@@ -68,7 +68,7 @@ const FormNodeShortTextEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: an
 
 const FormNodePhoneNumberEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <GeneralWrappedTextContainer>
-    <UI.Label textTransform="none" variantColor="gray" bg="gray.300">
+    <UI.Label textTransform="none" colorScheme="gray" bg="gray.300">
       <UI.Icon color="gray.500" mr={1}>
         <Phone width="14px" height="14px" />
       </UI.Icon>
@@ -79,7 +79,7 @@ const FormNodePhoneNumberEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: 
 
 const FormNodeNumberEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <GeneralWrappedTextContainer>
-    <UI.Label variantColor="gray" bg="gray.300">
+    <UI.Label colorScheme="gray" bg="gray.300">
       <UI.Icon color="gray.500" mr={1}>
         <Hash width="14px" height="14px" />
       </UI.Icon>
@@ -90,7 +90,7 @@ const FormNodeNumberEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }
 
 const FormNodeUrlEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <GeneralWrappedTextContainer>
-    <UI.Label variantColor="gray" bg="gray.300">
+    <UI.Label colorScheme="gray" bg="gray.300">
       <UI.Icon color="gray.500" mr={1}>
         <Link2 width="14px" height="14px" />
       </UI.Icon>

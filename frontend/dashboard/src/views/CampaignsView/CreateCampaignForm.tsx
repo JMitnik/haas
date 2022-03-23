@@ -4,7 +4,7 @@ import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-f
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
-import { CircularProgress, CircularProgressLabel, useToast } from '@chakra-ui/core';
+import { CircularProgress, CircularProgressLabel, useToast } from '@chakra-ui/react';
 import Select from 'react-select';
 import { Mail, Smartphone } from 'react-feather';
 

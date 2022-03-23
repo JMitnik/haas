@@ -1,4 +1,4 @@
-import { useToast } from '@chakra-ui/core';
+import { useToast } from '@chakra-ui/react';
 import { useUploadJobImageMutation } from 'types/generated-types';
 import FileDropInput from 'components/FileDropInput';
 import React, { useEffect } from 'react';

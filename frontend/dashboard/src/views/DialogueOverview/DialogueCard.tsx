@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import {
   Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
-} from '@chakra-ui/core';
+} from '@chakra-ui/react';
 import { formatDistance } from 'date-fns';
 import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/client';
@@ -49,7 +49,7 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
               </PopoverBody>
               <PopoverFooter>
                 <Button
-                  variantColor="red"
+                  colorScheme="red"
                   onClick={onDelete}
                 >
                   {t('delete')}

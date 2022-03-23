@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
 import {
   Div, Form, FormContainer,
   FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
@@ -182,7 +182,7 @@ const FirstTimeForm = () => {
           <Button
             isLoading={isLoading}
             isDisabled={!form.formState.isValid}
-            variantColor="teal"
+            colorScheme="teal"
             type="submit"
           >
             Save

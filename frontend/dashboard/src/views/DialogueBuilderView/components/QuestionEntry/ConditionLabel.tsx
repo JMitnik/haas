@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { AlertTriangle } from 'react-feather';
-import { Tooltip } from '@chakra-ui/core';
+import { Tooltip } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 

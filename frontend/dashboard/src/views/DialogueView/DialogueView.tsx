@@ -4,7 +4,7 @@ import {
   Activity, Award, Clipboard, Download, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
 } from 'react-feather';
-import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
+import { Button, Tag, TagLabel, useClipboard } from '@chakra-ui/react';
 import { ThemeContext } from 'styled-components';
 import { sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
@@ -179,7 +179,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
                 margin="0 auto"
                 onClick={handleDownload}
                 as="a"
-                variantColor="teal"
+                colorScheme="teal"
                 mt={1}
                 size="xs"
                 leftIcon={() => <Download size={12} />}
@@ -288,7 +288,7 @@ const DialogueView = () => {
             </UI.ViewTitle>
             <Popover.Base>
               <Popover.Trigger>
-                <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
+                <UI.Button colorScheme="teal" leftIcon={QRIcon} ml={4} size="sm">
                   {t('share')}
                 </UI.Button>
               </Popover.Trigger>
@@ -379,13 +379,11 @@ const DialogueView = () => {
                   renderCornerMetric={(
                     <>
                       {dialogue?.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
-                        <Tag size="sm" variantColor="green">
-                          <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
+                        <Tag size="sm" colorScheme="green">
                           <TagLabel color="green.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
                         </Tag>
                       ) : (
-                        <Tag size="sm" variantColor="red">
-                          <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
+                        <Tag size="sm" colorScheme="red">
                           <TagLabel color="red.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
                         </Tag>
                       )}

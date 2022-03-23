@@ -63,7 +63,7 @@ const AdminOverview = () => {
               justifyContent="space-between"
               alignItems="center"
             >
-              <UI.Button leftIcon={Plus} size="sm" variantColor="teal">
+              <UI.Button leftIcon={Plus} size="sm" colorScheme="teal">
                 Edit Permission
               </UI.Button>
               <Div ml={500}>

@@ -25,15 +25,15 @@ import {
   FormControlProps,
   Switch as ChakraSwitch,
   Textarea as ChakraTextArea,
-  RadioButtonGroup as ChakraRadioButtonGroup,
+  RadioGroup as ChakraRadioGroup,
   SwitchProps,
-} from '@chakra-ui/core';
+} from '@chakra-ui/react';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
 import ReactSelect from 'react-select';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
-import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
+import { FormLabelProps } from '@chakra-ui/react/dist/FormLabel';
 import { Grid, Stack } from './Container';
 import { Text } from './Type';
 
@@ -300,7 +300,7 @@ export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
       <Button
         variant="outline"
         ref={ref}
-        variantColor={isChecked ? 'blue' : 'gray'}
+        colorScheme={isChecked ? 'blue' : 'gray'}
         aria-checked={isChecked}
         role="radio"
         display="block"
@@ -551,7 +551,7 @@ interface RadioButtonsProps {
 }
 
 export const RadioButtons = forwardRef(({ children, onChange, value, defaultValue, onBlur }: RadioButtonsProps, ref) => (
-  <ChakraRadioButtonGroup
+  <ChakraRadioGroup
     display="flex"
     flexWrap="wrap"
     onChange={onChange}
@@ -563,7 +563,7 @@ export const RadioButtons = forwardRef(({ children, onChange, value, defaultValu
     onBlur={onBlur}
   >
     {children}
-  </ChakraRadioButtonGroup>
+  </ChakraRadioGroup>
 ));
 
 export const InputGrid = (props: InputGridProps) => (

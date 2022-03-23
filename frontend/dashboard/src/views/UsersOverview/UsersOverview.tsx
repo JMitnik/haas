@@ -4,7 +4,7 @@ import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, 
 import { Calendar, Filter, Search, User } from 'react-feather';
 import { Route, Switch, useHistory, useLocation } from 'react-router';
 import { endOfDay, startOfDay } from 'date-fns';
-import { useToast } from '@chakra-ui/core';
+import { useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 

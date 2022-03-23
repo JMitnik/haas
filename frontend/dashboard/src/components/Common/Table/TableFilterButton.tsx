@@ -52,7 +52,7 @@ export const FilterButton = ({ filterKey, value, onClose, condition }: FilterBut
       {value}
       <UI.IconButton
         aria-label="close"
-        icon={IconClose}
+        icon={<IconClose />}
         onClick={onClose}
         width={10}
         minWidth={10}

@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
-import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, RadioGroup, useToast } from '@chakra-ui/react';
 import { Controller, UseFormMethods } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
@@ -103,7 +103,7 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
           name="useCustomUrl"
           defaultValue={1}
           render={({ onChange, value }) => (
-            <RadioButtonGroup
+            <RadioGroup
               value={value}
               isInline
               onChange={onChange}
@@ -111,7 +111,7 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
             >
               <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
               <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
-            </RadioButtonGroup>
+            </RadioGroup>
           )}
         />
 
@@ -288,7 +288,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                   <Controller
                     name="seed"
                     render={({ onChange, onBlur, value }) => (
-                      <RadioButtonGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
+                      <RadioGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
                         <RadioButton
                           icon={Clipboard}
                           value={1}
@@ -302,7 +302,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                           text={(t('customer:no_custom_template'))}
                           description={t('customer:no_custom_template_helper')}
                         />
-                      </RadioButtonGroup>
+                      </RadioGroup>
                     )}
                     control={form.control}
                     defaultValue={1}
@@ -317,7 +317,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                     <Controller
                       name="willGenerateFakeData"
                       render={({ onChange, onBlur, value }) => (
-                        <RadioButtonGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
+                        <RadioGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
                           <RadioButton
                             icon={Activity}
                             value={1}
@@ -331,7 +331,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                             text={(t('customer:no_use_fake_data'))}
                             description={t('customer:no_use_fake_data_helper')}
                           />
-                        </RadioButtonGroup>
+                        </RadioGroup>
                       )}
                       control={form.control}
                       defaultValue={1}
@@ -349,7 +349,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
         <Button
           isLoading={isLoading}
           isDisabled={!form.formState.isValid}
-          variantColor="teal"
+          colorScheme="teal"
           type="submit"
         >
           {isInEdit ? t('edit') : t('create')}

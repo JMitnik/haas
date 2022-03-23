@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-import { Checkbox, useToast } from '@chakra-ui/core';
+import { Checkbox, useToast } from '@chakra-ui/react';
 import { SystemPermission, useFindRoleByIdQuery, useUpdatePermissionsMutation } from 'types/generated-types';
 import styled, { css } from 'styled-components';
 
@@ -125,7 +125,7 @@ const RoleUserForm = ({
       </UI.Grid>
 
       <UI.Flex justifyContent="flex-end" pr={4}>
-        <UI.Button isLoading={loading} variantColor="teal" type="submit">
+        <UI.Button isLoading={loading} colorScheme="teal" type="submit">
           {t('save')}
         </UI.Button>
       </UI.Flex>

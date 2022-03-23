@@ -1,4 +1,4 @@
-import { useToast } from '@chakra-ui/core';
+import { useToast } from '@chakra-ui/react';
 import React from 'react';
 import * as UI from '@haas/ui';
 import { Div, Form, FormControl, InputGrid, Text } from '@haas/ui';
@@ -124,7 +124,7 @@ const LoginView = () => {
                   </UI.Div>
 
                   <UI.Button
-                    variantColor="teal"
+                    colorScheme="teal"
                     leftIcon={Send}
                     type="submit"
                     isDisabled={!form.formState.isValid}

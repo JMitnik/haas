@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, useToast } from '@chakra-ui/core';
+import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, useToast } from '@chakra-ui/react';
 import { Book, ExternalLink, LogOut } from 'react-feather';
 import { Div, Flex, Text } from '@haas/ui';
 import { Link, LinkProps, NavLink, useHistory } from 'react-router-dom';
@@ -221,7 +221,7 @@ export const UsernavDropdown = () => {
                   {' '}
                   as
                   {' '}
-                  <Badge variantColor="default" fontSize="0.5rem">
+                  <Badge colorScheme="default" fontSize="0.5rem">
                     {activeCustomer?.userRole?.name}
                   </Badge>
                 </Text>

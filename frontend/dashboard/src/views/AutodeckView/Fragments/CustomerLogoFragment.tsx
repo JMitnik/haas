@@ -1,5 +1,5 @@
 import { Link, Link2, Upload, ThumbsDown, ThumbsUp, Play, Pause, AlertCircle, Edit2, UploadCloud } from 'react-feather';
-import { RadioButtonGroup } from '@chakra-ui/core';
+import { RadioGroup } from '@chakra-ui/react';
 import { Controller, UseFormMethods } from 'react-hook-form';
 import {
   Div, FormControl, FormLabel, Input, InputHelper,
@@ -28,7 +28,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
             control={form.control}
             name="useCustomUrl"
             render={({ onChange, value }) => (
-              <RadioButtonGroup
+              <RadioGroup
                 value={value}
                 isInline
                 onChange={onChange}
@@ -36,7 +36,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
               >
                 <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
                 <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
-              </RadioButtonGroup>
+              </RadioGroup>
             )}
           />
 
@@ -115,7 +115,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
               name="isLogoUrlApproved"
               defaultValue={1}
               render={({ onChange, value }) => (
-                <RadioButtonGroup
+                <RadioGroup
                   value={value}
                   isInline
                   onChange={onChange}
@@ -123,7 +123,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
                 >
                   <RadioButton icon={ThumbsUp} value={1} text={'Approve'} description={'Use current logo'} />
                   <RadioButton icon={ThumbsDown} value={0} text={'Edit'} description={'Use different logo'} />
-                </RadioButtonGroup>
+                </RadioGroup>
               )}
             />
 
@@ -137,7 +137,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
                 name="isEditingLogo"
                 defaultValue={0}
                 render={({ onChange, value }) => (
-                  <RadioButtonGroup
+                  <RadioGroup
                     value={value}
                     isInline
                     onChange={onChange}
@@ -145,7 +145,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
                   >
                     <RadioButton icon={UploadCloud} value={0} text={'Upload'} description={'Upload new logo'} />
                     <RadioButton icon={Edit2} value={1} text={'Edit'} description={'Edit current logo'} />
-                  </RadioButtonGroup>
+                  </RadioGroup>
                 )}
               />
 
@@ -177,7 +177,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
             control={form.control}
             name="useRembg"
             render={({ onChange, value }) => (
-              <RadioButtonGroup
+              <RadioGroup
                 value={value}
                 isInline
                 onChange={onChange}
@@ -185,7 +185,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
               >
                 <RadioButton icon={Play} value={1} text={t('autodeck:use_rembg')} description={t('autodeck:use_rembg_helper')} />
                 <RadioButton icon={Pause} value={0} text={t('autodeck:original_image')} description={t('autodeck:original_image_helper')} />
-              </RadioButtonGroup>
+              </RadioGroup>
             )}
           />
 

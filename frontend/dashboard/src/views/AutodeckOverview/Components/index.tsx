@@ -24,7 +24,7 @@ export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobT
   switch (status) {
     case JobStatusType.Completed: {
       return (
-        <UI.Label variantColor="green">
+        <UI.Label colorScheme="green">
           {status}
         </UI.Label>
       );
@@ -32,7 +32,7 @@ export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobT
 
     case JobStatusType.ReadyForProcessing: {
       return (
-        <UI.Label variantColor="blue">
+        <UI.Label colorScheme="blue">
           {status}
         </UI.Label>
       )
@@ -40,7 +40,7 @@ export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobT
 
     case JobStatusType.Failed: {
       return (
-        <UI.Label variantColor="red">
+        <UI.Label colorScheme="red">
           {status}
         </UI.Label>
       )
@@ -48,7 +48,7 @@ export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobT
 
     case JobStatusType.InPhotoshopQueue: {
       return (
-        <UI.Label variantColor="purple">
+        <UI.Label colorScheme="purple">
           {status}
         </UI.Label>
       )
@@ -56,7 +56,7 @@ export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobT
 
     case JobStatusType.Processing: {
       return (
-        <UI.Label variantColor="pink">
+        <UI.Label colorScheme="pink">
           {status}
         </UI.Label>
       )
@@ -64,7 +64,7 @@ export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobT
 
     default: {
       return (
-        <UI.Label variantColor="yellow">{status}</UI.Label>
+        <UI.Label colorScheme="yellow">{status}</UI.Label>
       )
     }
   }

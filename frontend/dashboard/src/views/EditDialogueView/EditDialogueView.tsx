@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Activity, Minus, Plus, Type } from 'react-feather';
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, RadioGroup, Stack } from '@chakra-ui/react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel, FormSection,
@@ -363,7 +363,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                           <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                             <Button
                               size="xs"
-                              variantColor="red"
+                              colorScheme="red"
                               variant="outline"
                               leftIcon={Minus}
                               onClick={() => deleteTag(index)}
@@ -398,7 +398,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                             name="isWithoutGenData"
                             control={form.control}
                             render={({ onChange, onBlur, value }) => (
-                              <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
+                              <RadioGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
                                 <RadioButton
                                   icon={Minus}
                                   value={1}
@@ -412,7 +412,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                                   text={(t('dialogue:no_hide_fake_data'))}
                                   description={t('dialogue:no_hide_fake_data_helper')}
                                 />
-                              </RadioButtonGroup>
+                              </RadioGroup>
                             )}
                           />
                         </FormControl>
@@ -426,7 +426,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                 <Button
                   isLoading={isLoading}
                   isDisabled={!form.formState.isValid}
-                  variantColor="teal"
+                  colorScheme="teal"
                   type="submit"
                 >
                   {t('save')}

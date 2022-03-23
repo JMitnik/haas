@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { CheckSquare, Edit, Frown, Smile } from 'react-feather';
 import { Controller, useFieldArray } from 'react-hook-form';
-import { FormErrorMessage, RadioButtonGroup } from '@chakra-ui/core';
+import { FormErrorMessage, RadioGroup } from '@chakra-ui/react';
 import { RadioButton } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
@@ -40,7 +40,7 @@ const SliderNodeForm = ({ form }: { form: any }) => {
             name="useCustomerSatisfactionTexts"
             defaultValue={hasCustomerSatisfactionTexts}
             render={({ onChange, value }) => (
-              <RadioButtonGroup
+              <RadioGroup
                 value={value}
                 isInline
                 onChange={onChange}
@@ -58,7 +58,7 @@ const SliderNodeForm = ({ form }: { form: any }) => {
                   text={t('no')}
                   description={t('dialogue:do_not_use_custom_satisfaction_text')}
                 />
-              </RadioButtonGroup>
+              </RadioGroup>
             )}
           />
           <FormErrorMessage>{form.errors.useCustomerSatisfactionTexts?.message}</FormErrorMessage>

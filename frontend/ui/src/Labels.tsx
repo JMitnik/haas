@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag as ChakraTag, TagProps as ChakraTagProps } from '@chakra-ui/core';
+import { Tag as ChakraTag, TagProps as ChakraTagProps } from '@chakra-ui/react';
 import { Span } from './Span';
 import styled, { css } from 'styled-components';
 

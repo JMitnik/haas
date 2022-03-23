@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
-import { FormErrorMessage, useToast } from '@chakra-ui/core';
+import { FormErrorMessage, useToast } from '@chakra-ui/react';
 import { Mail } from 'react-feather';
 import { gql, useMutation } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
@@ -165,7 +165,7 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
                 <UI.Button
                   isLoading={isLoading}
                   isDisabled={!form.formState.isValid}
-                  variantColor="teal"
+                  colorScheme="teal"
                   type="submit"
                 >
                   Send invite

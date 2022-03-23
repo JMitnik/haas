@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Card, CardBody, CardFooter, ColumnFlex, Div, Flex, Text } from '@haas/ui';
-import { Icon } from '@chakra-ui/core';
+import { Icon } from '@chakra-ui/react';
 import { Icon as IconType } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

@@ -1,5 +1,5 @@
 import { Div } from '@haas/ui';
-import { Spinner } from '@chakra-ui/core';
+import { Spinner } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import React from 'react';

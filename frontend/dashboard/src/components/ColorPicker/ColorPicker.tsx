@@ -1,5 +1,5 @@
 import { BlockPicker, ColorResult } from 'react-color';
-import { Button } from '@chakra-ui/core';
+import { Button } from '@chakra-ui/react';
 import { Div } from '@haas/ui';
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';

@@ -190,7 +190,7 @@ export const CampaignView = () => {
                 leftIcon={Plus}
                 onClick={() => setIsOpenImportModal(true)}
                 size="sm"
-                variantColor="teal"
+                colorScheme="teal"
               >
                 {t('import_deliveries')}
               </UI.Button>
