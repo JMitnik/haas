@@ -1,5 +1,4 @@
-import { enumType, extendType, inputObjectType, objectType, plugin } from '@nexus/schema';
-import { UserInputError } from 'apollo-server-express';
+import { enumType, objectType } from '@nexus/schema';
 import { DialogueType } from './Dialogue'
 
 export const DialogueImpactScoreType = enumType({

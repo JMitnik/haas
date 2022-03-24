@@ -1,6 +1,34 @@
-import { NodeType, LanguageEnum } from '@prisma/client';
+import { NodeType, LanguageEnum, NodeEntry, QuestionOption } from '@prisma/client';
 
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
+
+export interface ChildNodeEntry {
+  id: number;
+  value: string | number | null;
+  nodeEntryId: string;
+};
+
+export interface TopicNodeEntry extends ChildNodeEntry {
+  nodeEntry: NodeEntry & {
+    relatedNode: {
+      options: QuestionOption[];
+      children: {
+        childNode: {
+          options: QuestionOption[];
+        } | null;
+        isRelatedNodeOfNodeEntries: {
+          id: string;
+          session: {
+            mainScore: number;
+          } | null;
+          choiceNodeEntry: {
+            value: string | null;
+          } | null;
+        }[];
+      }[];
+    } | null;
+  };
+}
 
 export interface CopyDialogueInputType {
   customerSlug: string;
@@ -9,7 +37,7 @@ export interface CopyDialogueInputType {
   title: string;
   publicTitle: string;
   description: string;
-  dialogueTags: { entries?: string[] | null | undefined; } | null | undefined;
+  dialogueTags: { entries?: string[] | null | undefined } | null | undefined;
   language: LanguageEnum;
 };
 export interface LeafNodeProps {
@@ -97,5 +125,5 @@ export interface DialogueInputProps {
     contentType: 'SCRATCH' | 'TEMPLATE' | 'SEED';
     templateDialogueId?: string;
     tags: any;
-  }
+  };
 }

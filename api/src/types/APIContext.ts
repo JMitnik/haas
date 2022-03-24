@@ -21,6 +21,7 @@ import EdgeService from '../models/edge/EdgeService';
 import { CampaignService } from '../models/Campaigns/CampaignService';
 import LinkService from '../models/link/LinkService';
 import AutomationService from '../models/automations/AutomationService';
+import QuestionStatisticsService from 'models/QuestionNode/QuestionStatisticsService';
 
 export interface APIServiceContainer {
   automationService: AutomationService;
@@ -42,6 +43,7 @@ export interface APIServiceContainer {
   campaignService: CampaignService;
   linkService: LinkService;
   dialogueStatisticsService: DialogueStatisticsService;
+  questionStatisticsService: QuestionStatisticsService;
 }
 
 export interface APIContext extends ExpressContext {

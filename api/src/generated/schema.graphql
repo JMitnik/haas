@@ -657,6 +657,7 @@ type Dialogue {
   statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag!]
   title: String!
+  topic(input: TopicInputType): TopicType!
   updatedAt: String
   wasGeneratedWithGenData: Boolean!
 }
@@ -911,6 +912,12 @@ type ImageType {
   filename: String
   mimetype: String
   url: String
+}
+
+type IndepthQuestionStatisticsSummary {
+  impactScore: Float
+  nrVotes: Int
+  option: String
 }
 
 input InviteUserInput {
@@ -1242,6 +1249,7 @@ type Query {
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
   me: UserType!
+  question(where: QuestionWhereUniqueInput): QuestionNode
   refreshAccessToken: RefreshAccessTokenOutput!
   role(input: FindRoleInput): RoleType
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
@@ -1271,6 +1279,10 @@ type QuestionConditionScopeModel {
   id: ID!
 }
 
+enum QuestionImpactScoreType {
+  PERCENTAGE
+}
+
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
@@ -1279,6 +1291,7 @@ type QuestionNode {
   """FormNode resolver"""
   form: FormNodeType
   id: ID!
+  indepthQuestionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): [IndepthQuestionStatisticsSummary!]
   isLeaf: Boolean!
   isRoot: Boolean!
   links: [LinkType!]!
@@ -1287,6 +1300,7 @@ type QuestionNode {
   overrideLeafId: String
   questionDialogue: Dialogue
   questionDialogueId: String
+  questionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): QuestionStatisticsSummary
   share: ShareNodeType
 
   """Slidernode resolver"""
@@ -1325,6 +1339,26 @@ type QuestionOption {
   publicValue: String
   questionId: String
   value: String!
+}
+
+type QuestionStatisticsSummary {
+  dialogueId: String
+  endDateTime: Date
+  id: ID
+  startDateTime: Date
+  updatedAt: Date
+}
+
+input QuestionStatisticsSummaryFilterInput {
+  endDateTime: String
+  impactTreshold: Int
+  impactType: QuestionImpactScoreType!
+  refresh: Boolean
+  startDateTime: String!
+}
+
+input QuestionWhereUniqueInput {
+  id: ID!
 }
 
 input RecipientsInputType {
@@ -1461,6 +1495,7 @@ enum SessionDeliveryType {
 
 """Input for session"""
 input SessionInput {
+  createdAt: String
   deliveryId: String
   device: String
   dialogueId: String!
@@ -1588,6 +1623,28 @@ enum TagTypeEnum {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
+}
+
+input TopicInputType {
+  endDateTime: String
+  impactScoreType: DialogueImpactScoreType!
+  isRoot: Boolean = false
+  startDateTime: String!
+  value: String!
+}
+
+type TopicNodeEntryValue {
+  id: Int!
+  mainScore: Int!
+  nodeEntryId: String!
+  value: String!
+}
+
+type TopicType {
+  impactScore: Float!
+  name: String!
+  nrVotes: Int!
+  subTopics: [TopicType!]
 }
 
 type topPathType {
