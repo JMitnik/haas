@@ -1,5 +1,5 @@
 import { addDays, subDays } from 'date-fns';
-import _, { groupBy, meanBy, uniq, uniqBy } from 'lodash';
+import _, { groupBy, meanBy, sample, uniq, uniqBy } from 'lodash';
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
@@ -13,7 +13,7 @@ import {
 } from './DialogueTypes';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
-import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import defaultWorkspaceTemplate, { MassSeedTemplate, rootTopics, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { CreateQuestionsInput } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
@@ -475,6 +475,78 @@ class DialogueService {
     }));
 
     return values;
+  };
+
+  massGenerateFakeData = async (dialogueId: string, template: MassSeedTemplate, maxSessions: number = 30) => {
+    const currentDate = new Date();
+
+    const nrDaysBack = Array.from(Array(maxSessions)).map((empty, index) => index + 1);
+    const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
+
+    const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
+
+    await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueId, true);
+
+    const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
+    const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
+
+    // Stop if no rootnode
+    if (!rootNode) return;
+
+    // For every particular date, generate a fake score
+    await Promise.all(datesBackInTime.map(async (backDate) => {
+      const simulatedRootVote: number = getRandomInt(100);
+
+      const simulatedChoice = Object.keys(template.topics)[
+        Math.floor(Math.random() * Object.keys(template.topics).length)
+      ].toString();
+      const subChoices = Object.entries(template.topics).find((data) => data[0] === simulatedChoice)?.[1] as string[]
+      const simulatedSubChoice = sample(subChoices) as string;
+      const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
+        if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
+        const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+
+        return isValid;
+      }));
+
+      const simulatedSubChoiceEdge = await this.edgeService.findEdgeByConditionValue(dialogueId, simulatedSubChoice);
+
+      // console.log('simulated sub choice edge: ', simulatedSubChoiceEdge);
+      const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
+      const simulatedSubChoiceNode = simulatedChoiceEdge?.childNode.children.find(
+        (child) => child.childNode.options.find(
+          (option) => option.value === simulatedSubChoice))?.childNode
+      const simulatedSubChoiceNodeId = simulatedSubChoiceNode?.id;
+
+      if (!simulatedChoiceNodeId) return;
+
+      const fakeSessionInputArgs: (
+        {
+          createdAt: Date;
+          dialogueId: string;
+          rootNodeId: string;
+          simulatedRootVote: number;
+          simulatedChoiceNodeId: string;
+          simulatedChoiceEdgeId?: string;
+          simulatedChoice: string;
+          simulatedSubChoiceNodeId: string;
+          simulatedSubChoiceEdgeId?: string;
+          simulatedSubChoice: string;
+        }) = {
+        dialogueId,
+        createdAt: backDate,
+        rootNodeId: rootNode.id,
+        simulatedRootVote,
+        simulatedChoiceNodeId,
+        simulatedChoiceEdgeId: simulatedChoiceEdge?.id,
+        simulatedChoice,
+        simulatedSubChoiceNodeId: simulatedSubChoiceNodeId as string,
+        simulatedSubChoiceEdgeId: simulatedSubChoiceEdge?.id,
+        simulatedSubChoice,
+      }
+
+      await this.sessionPrismaAdapter.massSeedFakeSession(fakeSessionInputArgs);
+    }));
   };
 
   generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {

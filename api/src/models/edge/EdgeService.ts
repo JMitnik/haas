@@ -13,13 +13,7 @@ class EdgeService {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
   }
 
-  /**
-   * Finds question options based on the edge condition value
-   * @param dialogueId 
-   * @param edgeConditionValue matchValue on a condition
-   * @returns a list of question options
-   */
-  findChildOptionsByEdgeCondition = async (dialogueId: string, edgeConditionValue: string) => {
+  findEdgeByConditionValue = async (dialogueId: string, edgeConditionValue: string) => {
     const edge = await this.edgePrismaAdapter.prisma.edge.findFirst({
       where: {
         conditions: {
@@ -31,12 +25,23 @@ class EdgeService {
       },
       include: {
         childNode: {
-          select: {
+          include: {
             options: true,
           },
         },
       },
     });
+    return edge;
+  }
+
+  /**
+   * Finds question options based on the edge condition value
+   * @param dialogueId 
+   * @param edgeConditionValue matchValue on a condition
+   * @returns a list of question options
+   */
+  findChildOptionsByEdgeCondition = async (dialogueId: string, edgeConditionValue: string) => {
+    const edge = await this.findEdgeByConditionValue(dialogueId, edgeConditionValue);
 
     return edge?.childNode?.options?.map((option) => ({ nrVotes: 0, impactScore: 0, name: option.value })) || [];
   }

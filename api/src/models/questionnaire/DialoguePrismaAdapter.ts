@@ -417,7 +417,20 @@ class DialoguePrismaAdapter {
           include: {
             parentNode: true,
             conditions: true,
-            childNode: true,
+            childNode: {
+              include: {
+                children: {
+                  select: {
+                    childNode: {
+                      select: {
+                        id: true,
+                        options: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },

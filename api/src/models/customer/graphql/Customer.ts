@@ -314,6 +314,26 @@ export const WorkspaceMutations = Upload && extendType({
   },
 });
 
+export const MassSeedInput = inputObjectType({
+  name: 'MassSeedInput',
+  definition(t) {
+    t.string('customerId', { required: true }); // 'Group U18 - A1'
+    t.int('maxGroups', { required: true });
+    t.int('maxTeams', { required: true });
+    t.int('maxSessions', { required: true });
+  },
+})
+
+export const MassSeedMutation = mutationField('massSeed', {
+  type: CustomerType,
+  nullable: true,
+  args: { input: MassSeedInput },
+  async resolve(parent, args, ctx) {
+    if (!args.input) throw new UserInputError('No input object!');
+    return ctx.services.customerService.massSeed(args.input);
+  },
+});
+
 export const DeleteCustomerMutation = mutationField('deleteCustomer', {
   type: CustomerType,
   nullable: true,

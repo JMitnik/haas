@@ -1032,6 +1032,13 @@ type LoginOutput {
   user: UserType!
 }
 
+input MassSeedInput {
+  customerId: String!
+  maxGroups: Int!
+  maxSessions: Int!
+  maxTeams: Int!
+}
+
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
@@ -1076,6 +1083,7 @@ type Mutation {
 
   """Logs a user out by removing their refresh token"""
   logout: String!
+  massSeed(input: MassSeedInput): Customer
   register(input: RegisterInput): String
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!

@@ -4,7 +4,7 @@ import { UserInputError } from 'apollo-server-express';
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
-import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import defaultWorkspaceTemplate, { defaultMassSeedTemplate, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
 import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
@@ -12,6 +12,8 @@ import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { UpdateCustomerInput } from './CustomerServiceType';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
+import { sample } from 'lodash';
+import cuid from 'cuid';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -28,6 +30,58 @@ class CustomerService {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
+  }
+
+  massSeed = async (input: NexusGenInputs['MassSeedInput']) => {
+    const { customerId, maxGroups, maxSessions, maxTeams } = input;
+
+    const customer = await this.findWorkspaceById(customerId);
+    if (!customer) return null;
+
+    // Generate 
+    const amtGroups = Math.ceil(Math.random() * maxGroups + 1);
+    const maleDialogueNames = [...Array(amtGroups)].flatMap((number, index) => {
+      const teamAge = 8 + (4 * index);
+      const groupName = `Group U${teamAge}`;
+      const amtTeams = Math.floor(Math.random() * maxTeams + 1);
+      const teamNames = [...Array(amtTeams)].map((number, index) => `${groupName} Male - Team ${index + 1}`);
+      return teamNames;
+    });
+
+    const femaleDialogueNames = [...Array(amtGroups)].flatMap((number, index) => {
+      const teamAge = 8 + (4 * index);
+      const groupName = `Group U${teamAge}`;
+      const amtTeams = Math.floor(Math.random() * maxTeams + 1);
+      const teamNames = [...Array(amtTeams)].map((number, index) => `${groupName} Female - Team ${index + 1}`);
+      return teamNames;
+    });
+
+    const dialogueNames = [...maleDialogueNames, ...femaleDialogueNames];
+
+    await Promise.all(dialogueNames.map(async (dialogueName, index) => {
+      defaultMassSeedTemplate.title = dialogueName;
+      const slug = cuid();
+      defaultMassSeedTemplate.slug = slug;
+      const dialogueInput: CreateDialogueInput = {
+        slug,
+        title: dialogueName,
+        description: defaultMassSeedTemplate.description,
+        customer: { id: customer.id, create: false },
+      };
+
+      const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
+
+      if (!dialogue) throw 'ERROR: No dialogue created!'
+      // Step 2: Make the leafs
+      const leafs = await this.nodeService.createTemplateLeafNodes(defaultMassSeedTemplate.leafNodes, dialogue.id);
+
+      // Step 3: Make nodes
+      await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
+
+      await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate);
+    }));
+
+    return customer;
   }
 
   /**
@@ -174,7 +228,7 @@ class CustomerService {
       slug: input.slug,
       logoOpacity: input.logoOpacity,
       logoUrl: input.logo,
-      primaryColour: input.primaryColour
+      primaryColour: input.primaryColour,
     });
 
     return customer;
