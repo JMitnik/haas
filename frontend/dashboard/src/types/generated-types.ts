@@ -724,6 +724,7 @@ export type Dialogue = {
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
+  topic: TopicType;
   dialogueStatisticsSummary?: Maybe<DialogueStatisticsSummaryModel>;
   averageScore: Scalars['Float'];
   statistics?: Maybe<DialogueStatistics>;
@@ -737,6 +738,11 @@ export type Dialogue = {
   sessions: Array<Session>;
   leafs: Array<QuestionNode>;
   campaignVariants: Array<CampaignVariantType>;
+};
+
+
+export type DialogueTopicArgs = {
+  input?: Maybe<TopicInputType>;
 };
 
 
@@ -1032,6 +1038,13 @@ export type ImageType = {
   mimetype?: Maybe<Scalars['String']>;
   encoding?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
+};
+
+export type IndepthQuestionStatisticsSummary = {
+  __typename?: 'IndepthQuestionStatisticsSummary';
+  nrVotes?: Maybe<Scalars['Int']>;
+  impactScore?: Maybe<Scalars['Float']>;
+  option?: Maybe<Scalars['String']>;
 };
 
 export type InviteUserInput = {
@@ -1653,6 +1666,7 @@ export type Query = {
   sessions: Array<Session>;
   /** A session is one entire user-interaction */
   session?: Maybe<Session>;
+  question?: Maybe<QuestionNode>;
   edge?: Maybe<Edge>;
 };
 
@@ -1769,6 +1783,11 @@ export type QuerySessionArgs = {
 };
 
 
+export type QueryQuestionArgs = {
+  where?: Maybe<QuestionWhereUniqueInput>;
+};
+
+
 export type QueryEdgeArgs = {
   id?: Maybe<Scalars['String']>;
 };
@@ -1787,6 +1806,10 @@ export type QuestionConditionScopeModel = {
   aggregate?: Maybe<ConditionPropertyAggregate>;
 };
 
+export enum QuestionImpactScoreType {
+  Percentage = 'PERCENTAGE'
+}
+
 export type QuestionNode = {
   __typename?: 'QuestionNode';
   id: Scalars['ID'];
@@ -1798,6 +1821,8 @@ export type QuestionNode = {
   creationDate?: Maybe<Scalars['String']>;
   type: QuestionNodeTypeEnum;
   overrideLeafId?: Maybe<Scalars['String']>;
+  indepthQuestionStatisticsSummary?: Maybe<Array<IndepthQuestionStatisticsSummary>>;
+  questionStatisticsSummary?: Maybe<QuestionStatisticsSummary>;
   /** Slidernode resolver */
   sliderNode?: Maybe<SliderNodeType>;
   /** FormNode resolver */
@@ -1809,6 +1834,16 @@ export type QuestionNode = {
   overrideLeaf?: Maybe<QuestionNode>;
   options: Array<QuestionOption>;
   children: Array<Edge>;
+};
+
+
+export type QuestionNodeIndepthQuestionStatisticsSummaryArgs = {
+  input?: Maybe<QuestionStatisticsSummaryFilterInput>;
+};
+
+
+export type QuestionNodeQuestionStatisticsSummaryArgs = {
+  input?: Maybe<QuestionStatisticsSummaryFilterInput>;
 };
 
 /** The different types a node can assume */
@@ -1841,6 +1876,27 @@ export type QuestionOption = {
   publicValue?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
   position?: Maybe<Scalars['Int']>;
+};
+
+export type QuestionStatisticsSummary = {
+  __typename?: 'QuestionStatisticsSummary';
+  id?: Maybe<Scalars['ID']>;
+  dialogueId?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['Date']>;
+  startDateTime?: Maybe<Scalars['Date']>;
+  endDateTime?: Maybe<Scalars['Date']>;
+};
+
+export type QuestionStatisticsSummaryFilterInput = {
+  startDateTime: Scalars['String'];
+  impactType: QuestionImpactScoreType;
+  endDateTime?: Maybe<Scalars['String']>;
+  impactTreshold?: Maybe<Scalars['Int']>;
+  refresh?: Maybe<Scalars['Boolean']>;
+};
+
+export type QuestionWhereUniqueInput = {
+  id: Scalars['ID'];
 };
 
 export type RecipientsInputType = {
@@ -1989,6 +2045,7 @@ export type SessionInput = {
   originUrl?: Maybe<Scalars['String']>;
   device?: Maybe<Scalars['String']>;
   totalTimeInSec?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['String']>;
 };
 
 /** Scores to filter sessions by. */
@@ -2115,6 +2172,30 @@ export enum TagTypeEnum {
 /** Input type for a textbox node */
 export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
+};
+
+export type TopicInputType = {
+  isRoot?: Maybe<Scalars['Boolean']>;
+  value: Scalars['String'];
+  impactScoreType: DialogueImpactScoreType;
+  startDateTime: Scalars['String'];
+  endDateTime?: Maybe<Scalars['String']>;
+};
+
+export type TopicNodeEntryValue = {
+  __typename?: 'TopicNodeEntryValue';
+  id: Scalars['Int'];
+  value: Scalars['String'];
+  nodeEntryId: Scalars['String'];
+  mainScore: Scalars['Int'];
+};
+
+export type TopicType = {
+  __typename?: 'TopicType';
+  name: Scalars['String'];
+  impactScore: Scalars['Float'];
+  nrVotes: Scalars['Int'];
+  subTopics?: Maybe<Array<TopicType>>;
 };
 
 export type TopPathType = {
@@ -2339,6 +2420,28 @@ export type WorkspaceConditionScopeModel = {
   aspect: WorkspaceAspectType;
   aggregate?: Maybe<ConditionPropertyAggregate>;
 };
+
+export type GetDialogueTopicsQueryVariables = Exact<{
+  dialogueId: Scalars['ID'];
+  input: TopicInputType;
+}>;
+
+
+export type GetDialogueTopicsQuery = (
+  { __typename?: 'Query' }
+  & { dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id'>
+    & { topic: (
+      { __typename?: 'TopicType' }
+      & Pick<TopicType, 'name' | 'impactScore' | 'nrVotes'>
+      & { subTopics?: Maybe<Array<(
+        { __typename?: 'TopicType' }
+        & Pick<TopicType, 'name' | 'impactScore' | 'nrVotes'>
+      )>> }
+    ) }
+  )> }
+);
 
 export type GetWorkspaceDialogueStatisticsQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -3157,6 +3260,55 @@ export const SessionFragmentFragmentDoc = gql`
 }
     ${NodeEntryFragmentFragmentDoc}
 ${DeliveryFragmentFragmentDoc}`;
+export const GetDialogueTopicsDocument = gql`
+    query GetDialogueTopics($dialogueId: ID!, $input: TopicInputType!) {
+  dialogue(where: {id: $dialogueId}) {
+    id
+    topic(input: $input) {
+      name
+      impactScore
+      nrVotes
+      subTopics {
+        name
+        impactScore
+        nrVotes
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDialogueTopicsQuery__
+ *
+ * To run a query within a React component, call `useGetDialogueTopicsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDialogueTopicsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDialogueTopicsQuery({
+ *   variables: {
+ *      dialogueId: // value for 'dialogueId'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetDialogueTopicsQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>(GetDialogueTopicsDocument, options);
+      }
+export function useGetDialogueTopicsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>(GetDialogueTopicsDocument, options);
+        }
+export type GetDialogueTopicsQueryHookResult = ReturnType<typeof useGetDialogueTopicsQuery>;
+export type GetDialogueTopicsLazyQueryHookResult = ReturnType<typeof useGetDialogueTopicsLazyQuery>;
+export type GetDialogueTopicsQueryResult = Apollo.QueryResult<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>;
+export function refetchGetDialogueTopicsQuery(variables?: GetDialogueTopicsQueryVariables) {
+      return { query: GetDialogueTopicsDocument, variables: variables }
+    }
 export const GetWorkspaceDialogueStatisticsDocument = gql`
     query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
@@ -4713,6 +4865,15 @@ export function useUpdatePermissionsMutation(baseOptions?: Apollo.MutationHookOp
 export type UpdatePermissionsMutationHookResult = ReturnType<typeof useUpdatePermissionsMutation>;
 export type UpdatePermissionsMutationResult = Apollo.MutationResult<UpdatePermissionsMutation>;
 export type UpdatePermissionsMutationOptions = Apollo.BaseMutationOptions<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>;
+export namespace GetDialogueTopics {
+  export type Variables = GetDialogueTopicsQueryVariables;
+  export type Query = GetDialogueTopicsQuery;
+  export type Dialogue = (NonNullable<GetDialogueTopicsQuery['dialogue']>);
+  export type Topic = (NonNullable<(NonNullable<GetDialogueTopicsQuery['dialogue']>)['topic']>);
+  export type SubTopics = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueTopicsQuery['dialogue']>)['topic']>)['subTopics']>)[number]>;
+  export const Document = GetDialogueTopicsDocument;
+}
+
 export namespace GetWorkspaceDialogueStatistics {
   export type Variables = GetWorkspaceDialogueStatisticsQueryVariables;
   export type Query = GetWorkspaceDialogueStatisticsQuery;

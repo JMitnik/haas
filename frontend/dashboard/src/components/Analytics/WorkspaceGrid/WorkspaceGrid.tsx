@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { ArrowLeft, PieChart, Users } from 'react-feather';
-import { GradientLightgreenGreen, GradientPinkRed } from '@visx/gradient';
+import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
 import { Group } from '@visx/group';
 import { ParentSizeModern } from '@visx/responsive';
 import { PatternCircles } from '@visx/pattern';
@@ -12,34 +12,35 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect } from 'react';
 
+import { useFormatter } from 'hooks/useFormatter';
+
 import * as LS from './WorkspaceGrid.styles';
 import { HexagonItem } from './HexagonItem';
 import { HexagonNode, HexagonNodeType } from './WorkspaceGrid.types';
 import { TooltipBody } from './TooltipBody';
-import { useFormatter } from 'hooks/useFormatter';
+
+export interface DataLoadOptions {
+  dialogueId: string;
+  topic: string;
+}
 
 export interface WorkspaceGridProps {
-  data_L0: HexagonNode[];
-  data_L1?: HexagonNode[];
-  data_L2?: HexagonNode[];
-  onLoadLayer?: (topic: string) => void;
+  initialData: HexagonNode[];
+  onLoadData?: (options: DataLoadOptions) => Promise<HexagonNode[]>;
   width: number;
   height: number;
   backgroundColor: string;
 }
-export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: WorkspaceGridProps) => {
+export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: WorkspaceGridProps) => {
   const { t } = useTranslation();
   const zoomHelper = React.useRef<ProvidedZoom<SVGElement> | null>(null);
-  const [zoomLevel, setZoomLevel] = React.useState(0);
-  const [dataItems, setDataItems] = React.useState(data_L0);
+  const [prevNodes, setPrevNodes] = React.useState<HexagonNode[][]>([]);
+  const [dataItems, setDataItems] = React.useState(initialData);
   const [activeDialogue, setActiveDialogue] = React.useState<HexagonNode>();
   const { formatScore } = useFormatter();
 
   const hexSize = 40;
-  const maxZoomLevel = 1;
-  const minZoomLevel = 0;
-  const isAtMaxZoomLevel = zoomLevel === maxZoomLevel;
-  const isAtMinZoomLevel = zoomLevel === minZoomLevel;
+  const isAtMinZoomLevel = prevNodes.length === 0;
 
   const {
     tooltipData,
@@ -52,7 +53,6 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
 
   const handleMouseOverHex = (event: React.MouseEvent<SVGPolygonElement, MouseEvent>, node: HexagonNode) => {
     const point = localPoint(event);
-    console.log({ node });
 
     if (!point) return;
 
@@ -66,24 +66,38 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
 
   const handleMouseOutHex = () => hideTooltip();
 
-  const zoomToData: Record<number, any[]> = React.useMemo(() => ({
-    0: data_L0,
-    1: data_L1 || [],
-    // 2: data_L2 || [],
-  }), [data_L0, data_L1, data_L2]);
+  useEffect(() => {
+    console.log('SOmething rerenders');
+  });
 
-  const handleZoominLevel = (currentZoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => {
-    if (isAtMaxZoomLevel) return;
-
+  const handleZoominLevel = async (currentZoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => {
     // Empty canvas and unset soom
     setDataItems([]);
     currentZoomHelper.reset();
 
-    if (node?.type === HexagonNodeType.Dialogue) {
+    if (node.type === HexagonNodeType.Dialogue) {
       setActiveDialogue(node);
     }
 
-    setZoomLevel((currentZoomLevel) => currentZoomLevel + 1);
+    const dialogueId = node.type === HexagonNodeType.Dialogue ? node.id : activeDialogue?.id;
+    if (!dialogueId || !onLoadData) return;
+
+    const newNodes = await onLoadData({ dialogueId, topic: node.label });
+
+    setPrevNodes((nodesArray) => [dataItems, ...nodesArray]);
+    setDataItems(newNodes);
+  };
+
+  const popQueue = () => {
+    if (!prevNodes.length) return;
+
+    setDataItems(prevNodes[0]);
+    setPrevNodes((currentPrevNodes) => {
+      if (currentPrevNodes.length === 1) return [];
+
+      const [, ...rest] = currentPrevNodes;
+      return rest;
+    });
   };
 
   const handleZoomOut = () => {
@@ -91,16 +105,9 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
     if (isAtMinZoomLevel) return;
 
     // Empty canvas and unset soom
-    setDataItems([]);
-    setActiveDialogue(undefined);
     zoomHelper.current.reset();
-    setZoomLevel((currentZoomLevel) => currentZoomLevel - 1);
+    popQueue();
   };
-
-  useEffect(() => {
-    const newData = zoomToData[zoomLevel];
-    setDataItems(newData);
-  }, [zoomLevel, zoomToData, setDataItems]);
 
   return (
     <LS.WorkspaceGridContainer>
@@ -135,6 +142,7 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
                       >
                         <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
                         <GradientPinkRed id="dots-pink" />
+                        <GradientSteelPurple id="dots-gray" />
                         <GradientLightgreenGreen id="dots-green" />
                         <rect width={width} height={height} fill={backgroundColor} />
                         <rect

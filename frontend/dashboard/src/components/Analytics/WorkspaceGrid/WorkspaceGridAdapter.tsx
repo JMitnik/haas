@@ -1,10 +1,14 @@
 import React from 'react';
 
+import {
+  DialogueImpactScoreType,
+  useGetDialogueTopicsQuery,
+  useGetWorkspaceDialogueStatisticsQuery,
+} from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useGetWorkspaceDialogueStatisticsQuery } from 'types/generated-types';
 
+import { DataLoadOptions, WorkspaceGrid } from './WorkspaceGrid';
 import { HexagonNode, HexagonNodeType } from './WorkspaceGrid.types';
-import { WorkspaceGrid } from './WorkspaceGrid';
 
 interface WorkspaceGridAdapterProps {
   height: number;
@@ -33,29 +37,42 @@ export const WorkspaceGridAdapter = ({
     fetchPolicy: 'cache-and-network',
   });
 
+  const { refetch } = useGetDialogueTopicsQuery({});
+
   const dialogues: HexagonNode[] = data?.customer?.dialogues?.map((dialogue) => ({
     id: dialogue.id,
     type: HexagonNodeType.Dialogue,
+    label: dialogue.title,
     score: dialogue.dialogueStatisticsSummary?.impactScore ?? 0,
     dialogue,
   })) || [];
 
-  const dialoguesCloneSlice: HexagonNode[] = data?.customer?.dialogues?.map((dialogue) => ({
-    id: `${dialogue.id}_clone`,
-    type: HexagonNodeType.QuestionNode,
-    score: dialogue.dialogueStatisticsSummary?.impactScore ?? 0,
-  })) || [];
+  const handleLoadData = async (options: DataLoadOptions): Promise<HexagonNode[]> => {
+    const { data: loadedData } = await refetch({
+      dialogueId: options.dialogueId,
+      input: {
+        value: options.topic || '',
+        isRoot: !options.topic,
+        startDateTime: '20-03-2022',
+        impactScoreType: DialogueImpactScoreType.Average,
+      },
+    });
 
-  const dialogueLayerTwo = [
-    ...dialoguesCloneSlice.map((item) => ({ ...item, id: `${item.id}a` })),
-    ...dialoguesCloneSlice.map((item) => ({ ...item, id: `${item.id}b` })),
-  ];
+    const nodes: HexagonNode[] = loadedData?.dialogue?.topic?.subTopics?.map((topic) => ({
+      id: topic.name,
+      type: HexagonNodeType.QuestionNode,
+      score: topic.impactScore,
+      label: topic.name,
+    })) || [];
+
+    return nodes;
+  };
 
   return (
     <WorkspaceGrid
       backgroundColor={backgroundColor}
-      data_L0={dialogues}
-      data_L1={dialogueLayerTwo}
+      initialData={dialogues}
+      onLoadData={handleLoadData}
       height={height}
       width={width}
     />

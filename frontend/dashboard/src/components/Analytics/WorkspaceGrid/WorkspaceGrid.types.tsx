@@ -16,12 +16,14 @@ export type HexagonDialogueNode = {
   score: number;
   type: HexagonNodeType.Dialogue;
   dialogue: Dialogue;
+  label: string;
 };
 
 export type HexagonQuestionNodeNode = {
   id: string;
   score: number;
   type: HexagonNodeType.QuestionNode;
+  label: string;
 };
 
 export type HexagonNode = HexagonDialogueNode | HexagonQuestionNodeNode | HexagonGroupNode;

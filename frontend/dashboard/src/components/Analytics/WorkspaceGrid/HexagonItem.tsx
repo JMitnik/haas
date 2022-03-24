@@ -22,6 +22,12 @@ interface HexagonItemProps {
   onMouseExit?: () => void;
 }
 
+const getHexagonFill = (score?: number) => {
+  if (!score) return 'url(#dots-gray)';
+  if (score >= 40) return 'url(#dots-green)';
+  return 'url(#dots-pink)';
+};
+
 export const HexagonItem = ({
   node,
   zoomHelper,
@@ -36,7 +42,7 @@ export const HexagonItem = ({
   onMouseExit,
   containerBackgroundFill,
 }: HexagonItemProps) => {
-  const initialFill = score > 40 ? 'url(#dots-green)' : 'url(#dots-pink)';
+  const initialFill = getHexagonFill(score);
   const [fill, setFill] = useState(initialFill);
 
   const handleZoom = (event: React.MouseEvent<SVGPolygonElement, MouseEvent>) => {
