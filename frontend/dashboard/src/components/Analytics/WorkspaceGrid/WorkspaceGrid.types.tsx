@@ -23,7 +23,7 @@ export type HexagonQuestionNodeNode = {
   id: string;
   score: number;
   type: HexagonNodeType.QuestionNode;
-  label: string;
+  topic: string;
 };
 
 export type HexagonNode = HexagonDialogueNode | HexagonQuestionNodeNode | HexagonGroupNode;

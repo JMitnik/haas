@@ -44,7 +44,7 @@ export const TooltipQuestionNodeBody = ({ node }: { node: HexagonQuestionNodeNod
             {formatScore(node.score)}
           </UI.Div>
           <UI.Div ml={2}>
-            {node.label}
+            {node.topic}
           </UI.Div>
         </UI.Flex>
       </UI.PaddedBody>

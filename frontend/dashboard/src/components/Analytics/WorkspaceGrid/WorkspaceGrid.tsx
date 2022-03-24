@@ -66,10 +66,6 @@ export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: Work
 
   const handleMouseOutHex = () => hideTooltip();
 
-  useEffect(() => {
-    console.log('SOmething rerenders');
-  });
-
   const handleZoominLevel = async (currentZoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => {
     // Empty canvas and unset soom
     setDataItems([]);
@@ -82,7 +78,11 @@ export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: Work
     const dialogueId = node.type === HexagonNodeType.Dialogue ? node.id : activeDialogue?.id;
     if (!dialogueId || !onLoadData) return;
 
-    const newNodes = await onLoadData({ dialogueId, topic: node.label });
+    const newNodes = await onLoadData({
+      dialogueId,
+      topic: node.type === HexagonNodeType.QuestionNode ? node.topic : '',
+    });
+    console.log({ newNodes });
 
     setPrevNodes((nodesArray) => [dataItems, ...nodesArray]);
     setDataItems(newNodes);

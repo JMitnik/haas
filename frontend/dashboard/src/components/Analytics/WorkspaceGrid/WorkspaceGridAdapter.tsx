@@ -37,7 +37,9 @@ export const WorkspaceGridAdapter = ({
     fetchPolicy: 'cache-and-network',
   });
 
-  const { refetch } = useGetDialogueTopicsQuery({});
+  const { refetch } = useGetDialogueTopicsQuery({
+    skip: true,
+  });
 
   const dialogues: HexagonNode[] = data?.customer?.dialogues?.map((dialogue) => ({
     id: dialogue.id,
@@ -62,8 +64,10 @@ export const WorkspaceGridAdapter = ({
       id: topic.name,
       type: HexagonNodeType.QuestionNode,
       score: topic.impactScore,
-      label: topic.name,
+      topic: topic.name,
     })) || [];
+
+    console.log({ data });
 
     return nodes;
   };
