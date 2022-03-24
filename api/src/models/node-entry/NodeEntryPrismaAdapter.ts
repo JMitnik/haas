@@ -33,6 +33,11 @@ class NodeEntryPrismaAdapter {
       include: {
         nodeEntry: {
           include: {
+            session: {
+              select: {
+                mainScore: true,
+              },
+            },
             relatedNode: {
               select: {
                 options: true,
@@ -97,6 +102,11 @@ class NodeEntryPrismaAdapter {
       include: {
         nodeEntry: {
           include: {
+            session: {
+              select: {
+                mainScore: true,
+              },
+            },
             relatedNode: {
               select: {
                 options: true,

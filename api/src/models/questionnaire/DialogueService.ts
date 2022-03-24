@@ -72,7 +72,7 @@ class DialogueService {
         const subTopicScores = Object.entries(groupedSessions).map((entry) => {
           const option = entry[0];
           const average = meanBy(entry[1], (data) => data?.session?.mainScore);
-          return { subTopic: option, impactScore: average, nrVotes: entry[1].length };
+          return { name: option, impactScore: average, nrVotes: entry[1].length };
         });
         return subTopicScores;
 
@@ -91,7 +91,7 @@ class DialogueService {
   completementTopics = (
     targetNodeEntries: TopicNodeEntry[],
     calculatedTopics: {
-      subTopic: string;
+      name: string;
       impactScore: number;
       nrVotes: number;
     }[]
@@ -108,8 +108,8 @@ class DialogueService {
 
     // Add sub topics which don't have any node entries to complement list with rest of sub topics
     allPotentialSubTopics.forEach((option) => {
-      const targetSubTopic = calculatedTopics.find((subTopic) => subTopic.subTopic === option);
-      if (!targetSubTopic) calculatedTopics.push({ nrVotes: 0, impactScore: 0, subTopic: option });
+      const targetSubTopic = calculatedTopics.find((subTopic) => subTopic.name === option);
+      if (!targetSubTopic) calculatedTopics.push({ nrVotes: 0, impactScore: 0, name: option });
     });
 
     return calculatedTopics;
@@ -176,9 +176,16 @@ class DialogueService {
       endDateTimeSet
     );
 
+    const topicNrVotes = targetNodeEntries.length;
+    const topicImpactScore = meanBy(
+      targetNodeEntries,
+      (choiceNodeEntry) => choiceNodeEntry.nodeEntry.session?.mainScore
+    );
+    const topicName = '';
+
     const subTopicScores = await this.findSubTopicsOfNodeEntries(targetNodeEntries, dialogueId, impactScoreType);
 
-    return subTopicScores;
+    return { name: topicName, nrVotes: topicNrVotes, impactScore: topicImpactScore || 0, subTopics: subTopicScores };
   };
 
   /**
@@ -205,9 +212,16 @@ class DialogueService {
       endDateTimeSet
     );
 
+    const topicNrVotes = targetNodeEntries.length;
+    const topicImpactScore = meanBy(
+      targetNodeEntries,
+      (choiceNodeEntry) => choiceNodeEntry.nodeEntry.session?.mainScore
+    );
+    const topicName = topic;
+
     const subTopicScores = await this.findSubTopicsOfNodeEntries(targetNodeEntries, dialogueId, impactScoreType, topic);
 
-    return subTopicScores;
+    return { name: topicName, nrVotes: topicNrVotes, impactScore: topicImpactScore || 0, subTopics: subTopicScores };;
   };
 
   updateTags(dialogueId: string, entries?: string[] | null | undefined): Promise<Dialogue> {

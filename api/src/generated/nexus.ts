@@ -1054,8 +1054,9 @@ export interface NexusGenRootTypes {
   }
   TopicType: { // root type
     impactScore: number; // Float!
+    name: string; // String!
     nrVotes: number; // Int!
-    subTopic: string; // String!
+    subTopics?: NexusGenRootTypes['TopicType'][] | null; // [TopicType!]
   }
   TriggerConditionType: { // root type
     id: number; // Int!
@@ -1502,7 +1503,7 @@ export interface NexusGenFieldTypes {
     statistics: NexusGenRootTypes['DialogueStatistics'] | null; // DialogueStatistics
     tags: NexusGenRootTypes['Tag'][] | null; // [Tag!]
     title: string; // String!
-    topic: NexusGenRootTypes['TopicType'][]; // [TopicType!]!
+    topic: NexusGenRootTypes['TopicType']; // TopicType!
     updatedAt: string | null; // String
     wasGeneratedWithGenData: boolean; // Boolean!
   }
@@ -1883,8 +1884,9 @@ export interface NexusGenFieldTypes {
   }
   TopicType: { // field return type
     impactScore: number; // Float!
+    name: string; // String!
     nrVotes: number; // Int!
-    subTopic: string; // String!
+    subTopics: NexusGenRootTypes['TopicType'][] | null; // [TopicType!]
   }
   TriggerConditionType: { // field return type
     id: number; // Int!

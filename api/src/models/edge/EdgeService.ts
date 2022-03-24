@@ -38,7 +38,7 @@ class EdgeService {
       },
     });
 
-    return edge?.childNode?.options?.map((option) => ({ nrVotes: 0, impactScore: 0, subTopic: option.value })) || [];
+    return edge?.childNode?.options?.map((option) => ({ nrVotes: 0, impactScore: 0, name: option.value })) || [];
   }
 
   /**

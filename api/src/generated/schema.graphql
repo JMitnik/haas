@@ -657,7 +657,7 @@ type Dialogue {
   statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag!]
   title: String!
-  topic(input: TopicInputType): [TopicType!]!
+  topic(input: TopicInputType): TopicType!
   updatedAt: String
   wasGeneratedWithGenData: Boolean!
 }
@@ -1642,8 +1642,9 @@ type TopicNodeEntryValue {
 
 type TopicType {
   impactScore: Float!
+  name: String!
   nrVotes: Int!
-  subTopic: String!
+  subTopics: [TopicType!]
 }
 
 type topPathType {
