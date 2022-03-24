@@ -13,6 +13,45 @@ class SessionPrismaAdapter {
   };
 
   /**
+   * Finds all sessions where all pathEntry answers exist in the session's node entries
+   * @param pathEntries 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param dialogueId 
+   * @returns a list of sessions
+   */
+  findPathMatchedSessions = async (
+    pathEntries: {
+      nodeEntries: {
+        some: {
+          choiceNodeEntry: {
+            value: string;
+          };
+        };
+      };
+    }[],
+    startDateTime: Date,
+    endDateTime: Date,
+    dialogueId: string,
+  ) => {
+    const sessions = await this.prisma.session.findMany({
+      where: {
+        AND: [
+          ...pathEntries,
+          {
+            createdAt: {
+              gte: startDateTime as Date,
+              lte: endDateTime,
+            },
+            dialogueId,
+          },
+        ],
+      },
+    });
+    return sessions;
+  }
+
+  /**
    * Finds all sessions of a dialogue within provided dates 
    * @param dialogueId the ID of a dialogue
    * @param startDateTime the start date from when sessions should be found

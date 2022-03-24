@@ -16,9 +16,6 @@ import isValidDate, { isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueImpactScoreType, DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
-import { TopicNodeEntryValue } from '../node-entry/NodeEntry';
-import { groupBy, meanBy, uniq, uniqBy } from 'lodash';
-import { isPresent } from 'ts-is-present';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -86,6 +83,15 @@ export const TopicInputType = inputObjectType({
   },
 });
 
+export const PathedSessionsInput = inputObjectType({
+  name: 'PathedSessionsInput',
+  definition(t) {
+    t.list.string('path', { required: true });
+    t.string('startDateTime', { required: true });
+    t.string('endDateTime');
+  },
+});
+
 export const DialogueType = objectType({
   name: 'Dialogue',
 
@@ -118,6 +124,40 @@ export const DialogueType = objectType({
             id: parent.postLeafNodeId,
           },
         });
+      },
+    });
+
+    t.field('pathedSessions', {
+      type: SessionType,
+      list: true,
+      nullable: true,
+      args: {
+        input: PathedSessionsInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+        if (!args.input) throw new UserInputError('No input provided!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        const dialogueId = parent.id;
+        const path = args.input.path || [];
+
+        return ctx.services.sessionService.findPathMatchedSessions(
+          dialogueId,
+          path,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+        );
       },
     });
 
