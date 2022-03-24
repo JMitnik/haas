@@ -109,7 +109,7 @@ const QuestionSection = ({
         index={0}
         questionsQ={questionsQ}
         question={question}
-        icon={<Icon />}
+        Icon={<Icon />}
         leafs={leafs}
         problems={problems || []}
         ctaNodes={ctaNodes}
@@ -174,7 +174,7 @@ const QuestionSection = ({
             question={{
               id: '-1', title: '', icon: Icon, isRoot: false, isLeaf: false, type: 'Choice', extraContent: '',
             }}
-            icon={<Icon />}
+            Icon={<Icon />}
             leafs={leafs}
             ctaNodes={ctaNodes}
           />

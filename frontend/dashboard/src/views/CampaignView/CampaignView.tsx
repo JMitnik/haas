@@ -187,7 +187,7 @@ export const CampaignView = () => {
             <UI.Stack isInline alignItems="center" spacing={4}>
               <UI.ViewTitle>{campaign?.label}</UI.ViewTitle>
               <UI.Button
-                lefticon={<Plus />}
+                leftIcon={<Plus />}
                 onClick={() => setIsOpenImportModal(true)}
                 size="sm"
                 colorScheme="teal"
@@ -198,7 +198,7 @@ export const CampaignView = () => {
           </UI.Stack>
 
           <UI.Button
-            lefticon={<Settings />}
+            leftIcon={<Settings />}
             size="md"
             variant="outline"
             onClick={() => setIsOpenSettingsModal(true)}

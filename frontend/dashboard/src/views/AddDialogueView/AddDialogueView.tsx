@@ -371,7 +371,7 @@ const AddDialogueView = () => {
                   <InputGrid gridTemplateColumns="1fr">
                     <Div>
                       <Button
-                        lefticon={<Plus />}
+                        leftIcon={<Plus />}
                         onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
                       >
                         {t('add_tag')}
@@ -407,7 +407,7 @@ const AddDialogueView = () => {
                               size="xs"
                               colorScheme="red"
                               variant="outline"
-                              lefticon={<Minus />}
+                              leftIcon={<Minus />}
                               onClick={() => deleteTag(index)}
                             >
                               {t('remove')}

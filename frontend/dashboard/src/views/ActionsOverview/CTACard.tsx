@@ -39,7 +39,7 @@ interface CTACardProps {
   type: { label: string, value: string };
   links: Array<LinkInputProps>;
   share: ShareProps | null;
-  Icon: (props: any) => JSX.Element;
+  Icon: React.ReactElement;
   activeCTA: string | null;
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
@@ -140,7 +140,7 @@ const CTACard = (
       <CTACardContainer noHover id={id} activeCTA={activeCTA}>
         <Flex justifyContent="space-between" flexDirection="row" width="100%">
           <UI.Flex>
-            <CTAIcon type={type} icon={<Icon />} />
+            <CTAIcon type={type} Icon={Icon} />
 
             <Flex flexDirection="column">
               <motion.span>
@@ -165,7 +165,7 @@ const CTACard = (
               variant="outline"
               colorScheme="teal"
               size="sm"
-              lefticon={<Edit3 />}
+              leftIcon={<Edit3 />}
               isDisabled={(activeCTA && activeCTA !== id) || false}
               onClick={() => onActiveCTAChange(id)}
             >

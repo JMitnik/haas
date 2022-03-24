@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 const Svg = styled.svg <{isCTA?: Boolean, hasCTA?: Boolean}>`
   ${({ hasCTA, isCTA, theme }) => css`
     color: ${theme.colors.default.darkest};
-  
+
     path {
       ${!isCTA && css`
         fill: white;

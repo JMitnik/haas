@@ -33,7 +33,7 @@ interface QuestionEntryItemProps {
   leafs: any;
   // eslint-disable-next-line react/no-unused-prop-types
   index: number;
-  Icon: (props: any) => JSX.Element;
+  Icon: React.ReactNode;
   activeQuestion: string | null;
   // eslint-disable-next-line react/no-unused-prop-types
   onAddQuestion?: (event: any, questionUUID: string) => void;
@@ -201,7 +201,7 @@ const QuestionEntryItem = ({ depth,
         <QuestionEntryContainer flexGrow={1}>
 
           <Flex flexDirection="row" width="100%">
-            <BuilderIcon type={question.type} icon={<Icon />} />
+            <BuilderIcon type={question.type} Icon={Icon} />
 
             <Flex width="60%" flexDirection="column">
               <Span fontSize="1.4em">

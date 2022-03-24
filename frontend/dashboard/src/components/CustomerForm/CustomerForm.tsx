@@ -21,6 +21,7 @@ import intToBool from 'utils/intToBool';
 import useAuth from 'hooks/useAuth';
 
 import uploadSingleImage from '../../mutations/uploadSingleImage';
+import { useFormatter } from 'hooks/useFormatter';
 
 interface FormDataProps {
   name: string;
@@ -28,7 +29,7 @@ interface FormDataProps {
   logo?: string;
   logoOpacity?: number;
   primaryColour?: string;
-  useCustomUrl?: number;
+  useCustomUrl?: string;
   willGenerateFakeData?: number,
   uploadLogo?: string;
   seed?: number;
@@ -88,9 +89,12 @@ const CustomerUploadLogoInput = ({ onChange, value, logoOpacity, overrideColor }
 
 const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
   const { t } = useTranslation();
+  const { radioToBoolean } = useFormatter();
 
   const logoOpacity = form.watch('logoOpacity') ?? 0.3;
   const overrideColor = form.watch('primaryColour') || undefined;
+
+  const usesCustomUrl = radioToBoolean(form.watch('useCustomUrl'));
 
   return (
     <>
@@ -101,28 +105,28 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
         <Controller
           control={form.control}
           name="useCustomUrl"
-          defaultValue={1}
-          render={({ onChange, value }) => (
-            <RadioGroup
-              value={value}
+          defaultValue={'1'}
+          render={({ name, onChange, value }) => (
+            <UI.RadioGroup
+              defaultValue={value}
               onChange={onChange}
-              display="flex"
-            >
-              <RadioButton icon={<Link2 />} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
-              <RadioButton icon={<Upload />} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
-            </RadioGroup>
+              name={name}
+              options={[
+                { label: t('existing_url'), value: '0', description: t('existing_url_helper'), icon: <Link2 /> },
+                { label: t('upload_file'), value: '1', description: t('upload_file_helper'), icon: <Upload /> },
+              ]}
+            />
           )}
         />
 
       </FormControl>
 
-      {form.watch('useCustomUrl') ? (
+      {usesCustomUrl ? (
         <FormControl>
           <FormLabel htmlFor="logo">{t('logo_existing_url')}</FormLabel>
           <InputHelper>{t('logo_existing_url_helper')}</InputHelper>
           <Input
             id="logo"
-            // eslint-disable-next-line jsx-a11y/anchor-is-valid
             leftEl={<Link />}
             name="logo"
             isInvalid={!!form.errors.logo}
@@ -288,19 +292,21 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                     name="seed"
                     render={({ onChange, onBlur, value }) => (
                       <RadioGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
-                        <RadioButton
-                          icon={<Clipboard />}
-                          value={1}
-                          mr={2}
-                          text={(t('customer:custom_template'))}
-                          description={t('customer:custom_template_helper')}
-                        />
-                        <RadioButton
-                          icon={<Loader />}
-                          value={0}
-                          text={(t('customer:no_custom_template'))}
-                          description={t('customer:no_custom_template_helper')}
-                        />
+                        <UI.Stack direction="row" spacing={2}>
+                          <RadioButton
+                            icon={<Clipboard />}
+                            value={1}
+                            mr={2}
+                            text={(t('customer:custom_template'))}
+                            description={t('customer:custom_template_helper')}
+                          />
+                          <RadioButton
+                            icon={<Loader />}
+                            value={0}
+                            text={(t('customer:no_custom_template'))}
+                            description={t('customer:no_custom_template_helper')}
+                          />
+                        </UI.Stack>
                       </RadioGroup>
                     )}
                     control={form.control}
@@ -316,20 +322,22 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                     <Controller
                       name="willGenerateFakeData"
                       render={({ onChange, onBlur, value }) => (
-                        <RadioGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
-                          <RadioButton
-                            icon={<Activity />}
-                            value={1}
-                            mr={2}
-                            text={(t('customer:use_fake_data'))}
-                            description={t('customer:fake_data_helper')}
-                          />
-                          <RadioButton
-                            icon={<Minus />}
-                            value={0}
-                            text={(t('customer:no_use_fake_data'))}
-                            description={t('customer:no_use_fake_data_helper')}
-                          />
+                        <RadioGroup onBlur={onBlur} value={value} onChange={onChange}>
+                          <UI.Stack direction="row" spacing={2}>
+                            <RadioButton
+                              icon={<Activity />}
+                              value={1}
+                              mr={2}
+                              text={(t('customer:use_fake_data'))}
+                              description={t('customer:fake_data_helper')}
+                            />
+                            <RadioButton
+                              icon={<Minus />}
+                              value={0}
+                              text={(t('customer:no_use_fake_data'))}
+                              description={t('customer:no_use_fake_data_helper')}
+                            />
+                          </UI.Stack>
                         </RadioGroup>
                       )}
                       control={form.control}

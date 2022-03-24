@@ -1,14 +1,12 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import { Card, CardBody, CardFooter, ColumnFlex, Div, Flex, Text } from '@haas/ui';
-import { Icon } from '@chakra-ui/react';
-import { Icon as IconType } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 interface SummaryModuleProps {
   heading: string;
-  renderIcon: IconType;
+  renderIcon: ReactNode;
   renderMetric: string | React.ReactNode;
   fallbackMetric: string | React.ReactNode;
   isInFallback: boolean;
@@ -70,6 +68,8 @@ const SummaryModule = ({
 }: SummaryModuleProps) => {
   const { t } = useTranslation();
 
+  const Icon = renderIcon;
+
   return (
     <Card bg="white" onClick={onClick}>
       {!isInFallback ? (
@@ -77,7 +77,8 @@ const SummaryModule = ({
           <CardBody>
             <Flex>
               <Div p={2} mr={2}>
-                <Icon size="24px" color="gray.300" as={renderIcon} />
+                {renderIcon}
+                {/* <Icon size="24px" color="gray.300" /> */}
               </Div>
               <Div>
                 <ColumnFlex>
@@ -106,7 +107,7 @@ const SummaryModule = ({
         <FallbackContainer>
           <Text color="gray.400" fontWeight="600" fontSize="1rem">{fallbackMetric}</Text>
           <Div>
-            <Icon size="150px" color="gray.50" as={renderIcon} />
+            {renderIcon}
           </Div>
         </FallbackContainer>
       )}

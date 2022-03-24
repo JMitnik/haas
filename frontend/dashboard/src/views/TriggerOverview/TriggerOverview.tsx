@@ -138,7 +138,7 @@ const TriggersOverview = () => {
             <UI.ViewTitle>{t('views:trigger_overview')}</UI.ViewTitle>
             <UI.Button
               onClick={handleAddUser}
-              lefticon={<Plus />}
+              leftIcon={<Plus />}
               colorScheme="teal"
               size="sm"
               ml={4}

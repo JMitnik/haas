@@ -1,7 +1,7 @@
 import { theme as chakraTheme } from '@chakra-ui/react';
 import { generatePalette } from 'utils/ColorUtils';
 
-export const DEPRECATED_breakpoints = ['40em', '52em', '64em'];
+export const DEPRECATED_breakpoints = ['600px', '960px', '1280px', '1920px'];
 interface Breakpoints extends Array<string> {
   sm?: string;
   md?: string;
@@ -114,11 +114,11 @@ const theme = {
     somewhatRounded: '10px',
     rounded: '50px',
   },
-  // mediaQueries: {
-  //   small: `@media screen and (min-width: ${breakpoints[0]})`,
-  //   medium: `@media screen and (min-width: ${breakpoints[1]})`,
-  //   large: `@media screen and (min-width: ${breakpoints[2]})`,
-  // },
+  mediaQueries: {
+    small: `@media screen and (min-width: ${breakpoints[0]})`,
+    medium: `@media screen and (min-width: ${breakpoints[1]})`,
+    large: `@media screen and (min-width: ${breakpoints[2]})`,
+  },
   mediaSizes: {
     sm: 0,
     md: 768,

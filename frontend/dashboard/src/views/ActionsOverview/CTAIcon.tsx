@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 interface CTAIconProps {
   type: { label: string, value: string };
-  Icon: (props: any) => JSX.Element;
+  Icon: React.ReactElement;
 }
 
 const CTAEntryIcon = styled(Div)`
@@ -21,7 +21,7 @@ const CTAIcon = ({ type, Icon }: CTAIconProps) => (
   <Flex flexDirection="column" marginRight="50px">
     <Flex flexDirection="column" alignItems="center" justifyContent="center">
       <CTAEntryIcon>
-        <Icon />
+        {Icon}
       </CTAEntryIcon>
       <Span marginTop="5px" fontSize="0.6em" color="gray.400" fontWeight={700}>
         {type.label}

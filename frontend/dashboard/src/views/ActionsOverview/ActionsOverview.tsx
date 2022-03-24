@@ -145,7 +145,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
             </ViewTitle>
 
             <UI.Button
-              lefticon={<Plus />}
+              leftIcon={<Plus />}
               colorScheme="teal"
               ml={4}
               size="sm"
@@ -167,7 +167,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
                 id="-1"
                 activeCTA={activeCTA}
                 onActiveCTAChange={setActiveCTA}
-                icon={<RegisterIcon />}
+                Icon={<RegisterIcon />}
                 title=""
                 type={initializeCTAType('REGISTER')}
                 links={[]}

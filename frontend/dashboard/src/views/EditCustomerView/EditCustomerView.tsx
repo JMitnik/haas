@@ -42,7 +42,7 @@ const schema = yup.object().shape({
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
   }),
-  useCustomUrl: yup.number(),
+  useCustomUrl: yup.string(),
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;

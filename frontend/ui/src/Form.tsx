@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, ReactNode, useState, useEffect, useRef } from 'react';
+import React, { Context, forwardRef, Ref, ReactNode, useState, useEffect, useRef, useContext } from 'react';
 // import 'antd/dist/antd.css'; // Slider,
 import AntdDatePickerGenerate from 'rc-picker/lib/generate/dateFns';
 import generatePicker from 'antd/lib/date-picker/generatePicker';
@@ -8,6 +8,7 @@ import {
 } from 'antd';
 import { Div, Paragraph, SectionHeader, Strong } from '@haas/ui';
 import {
+  Box,
   Checkbox as ChakraCheckbox,
   CheckboxProps as ChakraCheckboxProps,
   ButtonProps as ChakraButtonProps,
@@ -27,6 +28,9 @@ import {
   Textarea as ChakraTextArea,
   RadioGroup as ChakraRadioGroup,
   SwitchProps,
+  useRadio,
+  useRadioGroup,
+  HStack,
 } from '@chakra-ui/react';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
@@ -36,6 +40,7 @@ import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/react/dist/FormLabel';
 import { Grid, Stack } from './Container';
 import { Text } from './Type';
+import { formatWithOptions } from 'util';
 
 const AntdDatepicker = generatePicker<Date>(AntdDatePickerGenerate);
 const { RangePicker: AntdRangePicker } = AntdDatepicker;
@@ -279,11 +284,49 @@ const ButtonRadioContainer = styled.div`
   }
 `;
 
+interface RadioGroupOption {
+  label: string;
+  value: any;
+  description?: string;
+  icon?: React.ReactNode;
+}
+
+interface RadioGroupProps {
+  name: string;
+  options: RadioGroupOption[];
+  defaultValue?: any;
+  onChange?: (val: any) => void;
+}
+
+export const RadioGroup = ({ name, defaultValue, options, onChange }: RadioGroupProps) => {
+  const { getRootProps, getRadioProps } = useRadioGroup({
+    name,
+    defaultValue,
+    onChange,
+  })
+
+  const group = getRootProps();
+
+  return (
+    <HStack {...group} spacing={2}>
+      {options.map(option => {
+        const radio = getRadioProps({ value: option.value });
+
+        return (
+          <RadioButton {...option} key={option.value} {...radio} />
+        );
+      })}
+    </HStack>
+  )
+}
+
+
 interface RadioButtonProps {
   isChecked?: boolean;
   isDisabled?: boolean;
   value?: any;
   text?: string;
+  label?: string;
   description?: string;
   icon?: any;
   mr?: any;
@@ -292,31 +335,35 @@ interface RadioButtonProps {
   mt?: any;
 }
 
-export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
-  const { isChecked, isDisabled, value, text, description, icon, ...rest } = props;
+export const RadioButton = (props: RadioButtonProps) => {
+  const { isChecked, isDisabled, value, text, label, description, icon, ...rest } = props;
+  const { getInputProps, getCheckboxProps } = useRadio(props)
+
+  const checkbox = getCheckboxProps();
+  const input = getInputProps();
 
   return (
-    <ButtonRadioContainer>
-      <Button
-        variant="outline"
-        ref={ref}
-        colorScheme={isChecked ? 'blue' : 'gray'}
-        aria-checked={isChecked}
-        role="radio"
+    <Box as='label'>
+      <input {...input} />
+      <Box
+        {...checkbox}
+        _checked={{
+          borderColor: 'teal.400',
+        }}
+        border="2px solid"
+        borderColor="gray.500"
+        p={2}
+        rounded="md"
         display="block"
         textAlign="left"
         py="8px"
-        lefticon={<icon />}
         height="auto"
-        isDisabled={isDisabled}
-        {...rest}
       >
         <Div>
-          <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">
-            {text}
+          <Paragraph color={'gray.600'} fontSize="0.9rem">
+            {label}
           </Paragraph>
           <Paragraph
-            color={!isChecked ? 'gray.500' : 'auto'}
             fontWeight={400}
             mt={2}
             fontSize="0.7rem"
@@ -324,10 +371,43 @@ export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
             {description}
           </Paragraph>
         </Div>
-      </Button>
-    </ButtonRadioContainer>
+      </Box>
+    </Box>
   );
-});
+
+  // return (
+  //   <ButtonRadioContainer>
+  //     <input {...input} />
+  //     <Button
+  //       {...checkbox}
+  //       variant="outline"
+  //       colorScheme={isChecked ? 'blue' : 'gray'}
+  //       aria-checked={isChecked}
+  //       role="radio"
+  //       display="block"
+  //       textAlign="left"
+  //       py="8px"
+  //       height="auto"
+  //       isDisabled={isDisabled}
+  //       {...rest}
+  //     >
+  //       <Div>
+  //         <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">
+  //           {text}
+  //         </Paragraph>
+  //         <Paragraph
+  //           color={!isChecked ? 'gray.500' : 'auto'}
+  //           fontWeight={400}
+  //           mt={2}
+  //           fontSize="0.7rem"
+  //         >
+  //           {description}
+  //         </Paragraph>
+  //       </Div>
+  //     </Button>
+  //   </ButtonRadioContainer>
+  // );
+};
 
 export const DeprecatedInputStyled = styled.input`
   ${({ theme }) => css`
