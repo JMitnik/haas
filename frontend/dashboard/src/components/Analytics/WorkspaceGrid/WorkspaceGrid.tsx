@@ -16,11 +16,13 @@ import * as LS from './WorkspaceGrid.styles';
 import { HexagonItem } from './HexagonItem';
 import { HexagonNode, HexagonNodeType } from './WorkspaceGrid.types';
 import { TooltipBody } from './TooltipBody';
+import { useFormatter } from 'hooks/useFormatter';
 
 export interface WorkspaceGridProps {
   data_L0: HexagonNode[];
   data_L1?: HexagonNode[];
   data_L2?: HexagonNode[];
+  onLoadLayer?: (topic: string) => void;
   width: number;
   height: number;
   backgroundColor: string;
@@ -31,6 +33,7 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
   const [zoomLevel, setZoomLevel] = React.useState(0);
   const [dataItems, setDataItems] = React.useState(data_L0);
   const [activeDialogue, setActiveDialogue] = React.useState<HexagonNode>();
+  const { formatScore } = useFormatter();
 
   const hexSize = 40;
   const maxZoomLevel = 1;
@@ -181,15 +184,15 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
                       </svg>
 
                       {tooltipOpen && (
-                      <TooltipWithBounds
-                        key={Math.random()}
-                        top={tooltipTop}
-                        left={tooltipLeft}
-                      >
-                        {tooltipData && (
-                          <TooltipBody node={tooltipData} />
-                        )}
-                      </TooltipWithBounds>
+                        <TooltipWithBounds
+                          key={Math.random()}
+                          top={tooltipTop}
+                          left={tooltipLeft}
+                        >
+                          {tooltipData && (
+                            <TooltipBody node={tooltipData} />
+                          )}
+                        </TooltipWithBounds>
                       )}
                     </UI.Div>
                   );
@@ -222,11 +225,11 @@ export const WorkspaceGrid = ({ data_L0, data_L1, data_L2, backgroundColor }: Wo
 
               <UI.Div mt={4}>
                 <UI.Helper>{t('statistics')}</UI.Helper>
-                <UI.Div mt={1} fontWeight={500}>
+                <UI.Div mt={1}>
                   <UI.Icon stroke="#7a228a" mr={1}>
                     <PieChart />
                   </UI.Icon>
-                  {activeDialogue.score.toFixed(1) / 10}
+                  {formatScore(activeDialogue.score)}
                 </UI.Div>
 
                 <UI.Div mt={1}>
