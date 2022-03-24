@@ -95,6 +95,9 @@ export const WorkspaceGridAdapter = ({
 
   const initialViewMode = HexagonViewMode.Dialogue;
 
+  // Add spinner
+  if (!dialogues.length) return null;
+
   return (
     <WorkspaceGrid
       backgroundColor={backgroundColor}
