@@ -647,6 +647,7 @@ type Dialogue {
   isWithoutGenData: Boolean!
   language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
+  pathedSessions(input: PathedSessionsInput): [Session!]
   postLeafNode: DialogueFinisherObjectType
   publicTitle: String
   questions: [QuestionNode!]!
@@ -1209,6 +1210,12 @@ input PaginationWhereInput {
   search: String
   searchTerm: String
   startDate: String
+}
+
+input PathedSessionsInput {
+  endDateTime: String
+  path: [String!]!
+  startDateTime: String!
 }
 
 input PermissionIdsInput {

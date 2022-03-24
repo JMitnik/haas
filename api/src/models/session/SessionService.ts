@@ -17,6 +17,7 @@ import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 import AutomationService from '../automations/AutomationService';
+import { addDays } from 'date-fns';
 
 class SessionService {
   sessionPrismaAdapter: SessionPrismaAdapter;
@@ -29,8 +30,28 @@ class SessionService {
     this.automationService = new AutomationService(prismaClient);
   };
 
-  findNegativeSessions = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
+  /**
+   * Finds all sessions where all pathEntry answers exist in the session's node entries
+   * @param dialogueId 
+   * @param path 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns 
+   */
+  findPathMatchedSessions = async (dialogueId: string, path: string[], startDateTime: Date, endDateTime?: Date) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
+    const pathEntries = path.length ? path.map((entry) => ({
+      nodeEntries: {
+        some: {
+          choiceNodeEntry: {
+            value: entry,
+          },
+        },
+      },
+    })) : [];
+
+    return this.sessionPrismaAdapter.findPathMatchedSessions(pathEntries, startDateTime, endDateTimeSet, dialogueId);
   }
 
   /**
