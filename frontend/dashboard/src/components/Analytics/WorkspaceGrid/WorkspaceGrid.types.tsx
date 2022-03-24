@@ -35,8 +35,10 @@ export type HexagonSessionNode = {
 export type HexagonNode = HexagonDialogueNode | HexagonQuestionNodeNode | HexagonGroupNode | HexagonSessionNode;
 
 export interface HexagonState {
-  parentNode: HexagonNode;
+  currentNode?: HexagonNode;
+  selectedNode?: HexagonNode;
   childNodes: HexagonNode[];
+  viewMode: HexagonViewMode;
 }
 
 export enum HexagonNodeType {
@@ -44,4 +46,12 @@ export enum HexagonNodeType {
   Dialogue = 'Dialogue',
   QuestionNode = 'QuestionNode',
   Session = 'Session',
+}
+
+export enum HexagonViewMode {
+  Group = 'Group',
+  Dialogue = 'Dialogue',
+  QuestionNode = 'QuestionNode',
+  Session = 'Session',
+  Final = 'Final',
 }

@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { ArrowLeft, PieChart, Users } from 'react-feather';
+import { ArrowLeft } from 'react-feather';
 import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
 import { Group } from '@visx/group';
 import { ParentSizeModern } from '@visx/responsive';
@@ -10,13 +10,20 @@ import { Zoom } from '@visx/zoom';
 import { localPoint } from '@visx/event';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useFormatter } from 'hooks/useFormatter';
 
 import * as LS from './WorkspaceGrid.styles';
+import {
+  HexagonDialogueNode,
+  HexagonNode,
+  HexagonNodeType,
+  HexagonQuestionNodeNode,
+  HexagonState,
+  HexagonViewMode,
+} from './WorkspaceGrid.types';
 import { HexagonItem } from './HexagonItem';
-import { HexagonNode, HexagonNodeType, HexagonState } from './WorkspaceGrid.types';
 import { TooltipBody } from './TooltipBody';
 
 export interface DataLoadOptions {
@@ -27,22 +34,38 @@ export interface DataLoadOptions {
 
 export interface WorkspaceGridProps {
   initialData: HexagonNode[];
-  onLoadData?: (options: DataLoadOptions) => Promise<HexagonNode[]>;
   width: number;
   height: number;
   backgroundColor: string;
+  initialViewMode?: HexagonViewMode;
+  onLoadData?: (options: DataLoadOptions) => Promise<[HexagonNode[], HexagonViewMode]>;
 }
-export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: WorkspaceGridProps) => {
+
+export const WorkspaceGrid = ({
+  initialData,
+  backgroundColor,
+  onLoadData,
+  initialViewMode = HexagonViewMode.Group,
+}: WorkspaceGridProps) => {
   const { t } = useTranslation();
-  const zoomHelper = React.useRef<ProvidedZoom<SVGElement> | null>(null);
-  const [prevNodes, setPrevNodes] = React.useState<HexagonState[]>([]);
-  const [dataItems, setDataItems] = React.useState(initialData);
-  const [activeDialogue, setActiveDialogue] = React.useState<HexagonNode>();
   const { formatScore } = useFormatter();
-  const topics = prevNodes.map(({ parentNode }) => parentNode.topic).filter((val) => !!val);
+
+  const zoomHelper = React.useRef<ProvidedZoom<SVGElement> | null>(null);
+
+  const [stateHistory, setStateHistory] = React.useState<HexagonState[]>([]);
+  const [currentState, setCurrentState] = React.useState<HexagonState>({
+    currentNode: undefined,
+    childNodes: initialData,
+    viewMode: initialViewMode,
+  });
+
+  const activeDialogue = useMemo(() => {
+    const activeNode = stateHistory.find((state) => state.selectedNode?.type === HexagonNodeType.Dialogue);
+    return (activeNode?.selectedNode as HexagonDialogueNode)?.dialogue || undefined;
+  }, [currentState]);
 
   const hexSize = 40;
-  const isAtMinZoomLevel = prevNodes.length === 0;
+  const isAtMinZoomLevel = stateHistory.length === 0;
 
   const {
     tooltipData,
@@ -68,36 +91,42 @@ export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: Work
 
   const handleMouseOutHex = () => hideTooltip();
 
-  const handleZoominLevel = async (currentZoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => {
+  const handleZoominLevel = async (currentZoomHelper: ProvidedZoom<SVGElement>, clickedNode: HexagonNode) => {
     // Empty canvas and unset soom
     currentZoomHelper.reset();
+    const newStateHistory = [{
+      currentNode: currentState.currentNode,
+      childNodes: currentState.childNodes,
+      selectedNode: clickedNode,
+      viewMode: currentState.viewMode,
+    }, ...stateHistory];
+    setStateHistory(newStateHistory);
 
-    if (node.type === HexagonNodeType.Dialogue) {
-      setActiveDialogue(node);
-    }
+    const topics = newStateHistory
+      .filter((state) => state.selectedNode?.type === HexagonNodeType.QuestionNode)
+      .map((state) => (state.selectedNode as HexagonQuestionNodeNode)?.topic);
 
-    const dialogueId = node.type === HexagonNodeType.Dialogue ? node.id : activeDialogue?.id;
+    const dialogueId = clickedNode.type === HexagonNodeType.Dialogue ? clickedNode.id : activeDialogue?.id;
     if (!dialogueId || !onLoadData) return;
 
-    const newNodes = await onLoadData({
+    const [newNodes, hexagonViewMode] = await onLoadData({
       dialogueId,
-      topic: node.type === HexagonNodeType.QuestionNode ? node.topic : '',
+      topic: clickedNode.type === HexagonNodeType.QuestionNode ? clickedNode.topic : '',
       topics,
     });
 
-    setPrevNodes((nodesArray) => ([{ parentNode: node, childNodes: newNodes }, ...nodesArray]));
-    setDataItems(newNodes);
+    setCurrentState({ currentNode: clickedNode, childNodes: newNodes, viewMode: hexagonViewMode });
   };
 
   const popQueue = () => {
-    if (!prevNodes.length) return;
+    if (!stateHistory.length) return;
 
-    console.log({ prevNodes });
-    setDataItems(prevNodes?.[0].childNodes);
-    setPrevNodes((currentPrevNodes) => {
-      if (currentPrevNodes.length === 1) return [];
+    const latestState = stateHistory[0];
+    setCurrentState(latestState);
+    setStateHistory((currentHistory) => {
+      if (currentHistory.length === 1) return [];
 
-      const [, ...rest] = currentPrevNodes;
+      const [, ...rest] = currentHistory;
       return rest;
     });
   };
@@ -172,7 +201,7 @@ export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: Work
                         >
 
                           <Group top={100} left={100}>
-                            {dataItems?.map((dialogue, index) => (
+                            {currentState.childNodes?.map((dialogue, index) => (
                               <HexagonItem
                                 key={dialogue.id}
                                 node={dialogue}
@@ -213,7 +242,7 @@ export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: Work
         </UI.Div>
 
         <UI.Div bg="white" borderLeft="1px solid" borderLeftColor="gray.200">
-          {activeDialogue && activeDialogue.type === HexagonNodeType.Dialogue && (
+          {activeDialogue && (
             <LS.DetailsPane
               animate={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 20 }}
@@ -229,7 +258,7 @@ export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: Work
               <UI.Div mt={4}>
                 <UI.Helper>{t('dialogue')}</UI.Helper>
                 <UI.Span fontWeight={500}>
-                  {activeDialogue.dialogue.title}
+                  {activeDialogue.title}
                 </UI.Span>
               </UI.Div>
 
@@ -237,17 +266,17 @@ export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: Work
                 <UI.Helper>{t('statistics')}</UI.Helper>
                 <UI.Div mt={1}>
                   <UI.Icon stroke="#7a228a" mr={1}>
-                    <PieChart />
+                    {/* <PieChart /> */}
                   </UI.Icon>
-                  {formatScore(activeDialogue.score)}
+                  {formatScore(activeDialogue.dialogueStatisticsSummary?.impactScore || undefined)}
                 </UI.Div>
 
                 <UI.Div mt={1}>
                   <UI.Span fontWeight={500}>
                     <UI.Icon stroke="#f1368a" mr={1}>
-                      <Users />
+                      {/* <Users /> */}
                     </UI.Icon>
-                    {activeDialogue.dialogue.dialogueStatisticsSummary?.nrVotes}
+                    {activeDialogue.dialogueStatisticsSummary?.nrVotes}
                   </UI.Span>
                 </UI.Div>
               </UI.Div>

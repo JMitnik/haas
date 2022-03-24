@@ -9,7 +9,7 @@ import {
 import { useCustomer } from 'providers/CustomerProvider';
 
 import { DataLoadOptions, WorkspaceGrid } from './WorkspaceGrid';
-import { HexagonNode, HexagonNodeType } from './WorkspaceGrid.types';
+import { HexagonNode, HexagonNodeType, HexagonViewMode } from './WorkspaceGrid.types';
 
 interface WorkspaceGridAdapterProps {
   height: number;
@@ -54,7 +54,7 @@ export const WorkspaceGridAdapter = ({
     dialogue,
   })) || [];
 
-  const handleLoadData = async (options: DataLoadOptions): Promise<HexagonNode[]> => {
+  const handleLoadData = async (options: DataLoadOptions): Promise<[HexagonNode[], HexagonViewMode]> => {
     const { data: loadedData } = await fetchGetDialogues({
       dialogueId: options.dialogueId,
       input: {
@@ -72,7 +72,7 @@ export const WorkspaceGridAdapter = ({
       topic: topic.name,
     })) || [];
 
-    if (nodes.length) return nodes;
+    if (nodes.length) return [nodes, HexagonViewMode.QuestionNode];
 
     const { data: sessionData } = await fetchGetSessions({
       input: {
@@ -88,12 +88,17 @@ export const WorkspaceGridAdapter = ({
       score: session.score,
     })) || [];
 
-    return fetchNodes;
+    if (fetchNodes.length) return [fetchNodes, HexagonViewMode.Session];
+
+    return [[], HexagonViewMode.Final];
   };
+
+  const initialViewMode = HexagonViewMode.Dialogue;
 
   return (
     <WorkspaceGrid
       backgroundColor={backgroundColor}
+      initialViewMode={initialViewMode}
       initialData={dialogues}
       onLoadData={handleLoadData}
       height={height}
