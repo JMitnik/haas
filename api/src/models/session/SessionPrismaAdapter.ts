@@ -408,6 +408,64 @@ class SessionPrismaAdapter {
       },
     });
   };
+
+  massSeedFakeSession(data: (
+    {
+      createdAt: Date;
+      dialogueId: string;
+      rootNodeId: string;
+      simulatedRootVote: number;
+      simulatedChoiceNodeId: string;
+      simulatedChoiceEdgeId?: string;
+      simulatedChoice: string;
+      simulatedSubChoiceNodeId: string;
+      simulatedSubChoiceEdgeId?: string;
+      simulatedSubChoice: string;
+    })) {
+
+    return this.prisma.session.create({
+      data: {
+        mainScore: data.simulatedRootVote,
+        nodeEntries: {
+          create: [{
+            depth: 0,
+            creationDate: data.createdAt,
+            relatedNode: {
+              connect: { id: data.rootNodeId },
+            },
+            sliderNodeEntry: {
+              create: { value: data.simulatedRootVote },
+            },
+            inputSource: 'INIT_GENERATED',
+          },
+          {
+            depth: 1,
+            creationDate: data.createdAt,
+            relatedNode: { connect: { id: data.simulatedChoiceNodeId } },
+            relatedEdge: { connect: { id: data.simulatedChoiceEdgeId } },
+            choiceNodeEntry: {
+              create: { value: data.simulatedChoice },
+            },
+          },
+          {
+            depth: 2,
+            creationDate: data.createdAt,
+            relatedNode: { connect: { id: data.simulatedSubChoiceNodeId } },
+            relatedEdge: data.simulatedSubChoiceEdgeId ? { connect: { id: data.simulatedSubChoiceEdgeId } } : undefined,
+            choiceNodeEntry: {
+              create: { value: data.simulatedSubChoice },
+            },
+          },
+          ],
+        },
+        dialogue: {
+          connect: { id: data.dialogueId },
+        },
+      },
+    });
+  };
 };
+
+
 
 export default SessionPrismaAdapter;
