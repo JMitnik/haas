@@ -724,6 +724,7 @@ export type Dialogue = {
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
+  pathedSessions?: Maybe<Array<Session>>;
   topic: TopicType;
   dialogueStatisticsSummary?: Maybe<DialogueStatisticsSummaryModel>;
   averageScore: Scalars['Float'];
@@ -738,6 +739,11 @@ export type Dialogue = {
   sessions: Array<Session>;
   leafs: Array<QuestionNode>;
   campaignVariants: Array<CampaignVariantType>;
+};
+
+
+export type DialoguePathedSessionsArgs = {
+  input?: Maybe<PathedSessionsInput>;
 };
 
 
@@ -1613,6 +1619,12 @@ export type PaginationWhereInput = {
   orderBy?: Maybe<Array<PaginationSortInput>>;
 };
 
+export type PathedSessionsInput = {
+  path: Array<Scalars['String']>;
+  startDateTime: Scalars['String'];
+  endDateTime?: Maybe<Scalars['String']>;
+};
+
 export type PermissionIdsInput = {
   ids?: Maybe<Array<Scalars['String']>>;
 };
@@ -2440,6 +2452,24 @@ export type GetDialogueTopicsQuery = (
         & Pick<TopicType, 'name' | 'impactScore' | 'nrVotes'>
       )>> }
     ) }
+  )> }
+);
+
+export type GetSessionPathsQueryVariables = Exact<{
+  dialogueId: Scalars['ID'];
+  input: PathedSessionsInput;
+}>;
+
+
+export type GetSessionPathsQuery = (
+  { __typename?: 'Query' }
+  & { dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id'>
+    & { pathedSessions?: Maybe<Array<(
+      { __typename?: 'Session' }
+      & Pick<Session, 'id' | 'score' | 'dialogueId' | 'device'>
+    )>> }
   )> }
 );
 
@@ -3308,6 +3338,51 @@ export type GetDialogueTopicsLazyQueryHookResult = ReturnType<typeof useGetDialo
 export type GetDialogueTopicsQueryResult = Apollo.QueryResult<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>;
 export function refetchGetDialogueTopicsQuery(variables?: GetDialogueTopicsQueryVariables) {
       return { query: GetDialogueTopicsDocument, variables: variables }
+    }
+export const GetSessionPathsDocument = gql`
+    query GetSessionPaths($dialogueId: ID!, $input: PathedSessionsInput!) {
+  dialogue(where: {id: $dialogueId}) {
+    id
+    pathedSessions(input: $input) {
+      id
+      score
+      dialogueId
+      device
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetSessionPathsQuery__
+ *
+ * To run a query within a React component, call `useGetSessionPathsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSessionPathsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSessionPathsQuery({
+ *   variables: {
+ *      dialogueId: // value for 'dialogueId'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetSessionPathsQuery(baseOptions: Apollo.QueryHookOptions<GetSessionPathsQuery, GetSessionPathsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetSessionPathsQuery, GetSessionPathsQueryVariables>(GetSessionPathsDocument, options);
+      }
+export function useGetSessionPathsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSessionPathsQuery, GetSessionPathsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetSessionPathsQuery, GetSessionPathsQueryVariables>(GetSessionPathsDocument, options);
+        }
+export type GetSessionPathsQueryHookResult = ReturnType<typeof useGetSessionPathsQuery>;
+export type GetSessionPathsLazyQueryHookResult = ReturnType<typeof useGetSessionPathsLazyQuery>;
+export type GetSessionPathsQueryResult = Apollo.QueryResult<GetSessionPathsQuery, GetSessionPathsQueryVariables>;
+export function refetchGetSessionPathsQuery(variables?: GetSessionPathsQueryVariables) {
+      return { query: GetSessionPathsDocument, variables: variables }
     }
 export const GetWorkspaceDialogueStatisticsDocument = gql`
     query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
@@ -4872,6 +4947,14 @@ export namespace GetDialogueTopics {
   export type Topic = (NonNullable<(NonNullable<GetDialogueTopicsQuery['dialogue']>)['topic']>);
   export type SubTopics = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueTopicsQuery['dialogue']>)['topic']>)['subTopics']>)[number]>;
   export const Document = GetDialogueTopicsDocument;
+}
+
+export namespace GetSessionPaths {
+  export type Variables = GetSessionPathsQueryVariables;
+  export type Query = GetSessionPathsQuery;
+  export type Dialogue = (NonNullable<GetSessionPathsQuery['dialogue']>);
+  export type PathedSessions = NonNullable<(NonNullable<(NonNullable<GetSessionPathsQuery['dialogue']>)['pathedSessions']>)[number]>;
+  export const Document = GetSessionPathsDocument;
 }
 
 export namespace GetWorkspaceDialogueStatistics {

@@ -10,18 +10,19 @@ import { Zoom } from '@visx/zoom';
 import { localPoint } from '@visx/event';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useFormatter } from 'hooks/useFormatter';
 
 import * as LS from './WorkspaceGrid.styles';
 import { HexagonItem } from './HexagonItem';
-import { HexagonNode, HexagonNodeType } from './WorkspaceGrid.types';
+import { HexagonNode, HexagonNodeType, HexagonState } from './WorkspaceGrid.types';
 import { TooltipBody } from './TooltipBody';
 
 export interface DataLoadOptions {
   dialogueId: string;
   topic: string;
+  topics: string[];
 }
 
 export interface WorkspaceGridProps {
@@ -34,10 +35,11 @@ export interface WorkspaceGridProps {
 export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: WorkspaceGridProps) => {
   const { t } = useTranslation();
   const zoomHelper = React.useRef<ProvidedZoom<SVGElement> | null>(null);
-  const [prevNodes, setPrevNodes] = React.useState<HexagonNode[][]>([]);
+  const [prevNodes, setPrevNodes] = React.useState<HexagonState[]>([]);
   const [dataItems, setDataItems] = React.useState(initialData);
   const [activeDialogue, setActiveDialogue] = React.useState<HexagonNode>();
   const { formatScore } = useFormatter();
+  const topics = prevNodes.map(({ parentNode }) => parentNode.topic).filter((val) => !!val);
 
   const hexSize = 40;
   const isAtMinZoomLevel = prevNodes.length === 0;
@@ -68,7 +70,6 @@ export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: Work
 
   const handleZoominLevel = async (currentZoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => {
     // Empty canvas and unset soom
-    setDataItems([]);
     currentZoomHelper.reset();
 
     if (node.type === HexagonNodeType.Dialogue) {
@@ -81,17 +82,18 @@ export const WorkspaceGrid = ({ initialData, backgroundColor, onLoadData }: Work
     const newNodes = await onLoadData({
       dialogueId,
       topic: node.type === HexagonNodeType.QuestionNode ? node.topic : '',
+      topics,
     });
-    console.log({ newNodes });
 
-    setPrevNodes((nodesArray) => [dataItems, ...nodesArray]);
+    setPrevNodes((nodesArray) => ([{ parentNode: node, childNodes: newNodes }, ...nodesArray]));
     setDataItems(newNodes);
   };
 
   const popQueue = () => {
     if (!prevNodes.length) return;
 
-    setDataItems(prevNodes[0]);
+    console.log({ prevNodes });
+    setDataItems(prevNodes?.[0].childNodes);
     setPrevNodes((currentPrevNodes) => {
       if (currentPrevNodes.length === 1) return [];
 

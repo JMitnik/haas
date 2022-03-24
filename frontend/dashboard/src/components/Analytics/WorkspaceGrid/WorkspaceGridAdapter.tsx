@@ -3,6 +3,7 @@ import React from 'react';
 import {
   DialogueImpactScoreType,
   useGetDialogueTopicsQuery,
+  useGetSessionPathsQuery,
   useGetWorkspaceDialogueStatisticsQuery,
 } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -37,7 +38,11 @@ export const WorkspaceGridAdapter = ({
     fetchPolicy: 'cache-and-network',
   });
 
-  const { refetch } = useGetDialogueTopicsQuery({
+  const { refetch: fetchGetDialogues } = useGetDialogueTopicsQuery({
+    skip: true,
+  });
+
+  const { refetch: fetchGetSessions } = useGetSessionPathsQuery({
     skip: true,
   });
 
@@ -50,7 +55,7 @@ export const WorkspaceGridAdapter = ({
   })) || [];
 
   const handleLoadData = async (options: DataLoadOptions): Promise<HexagonNode[]> => {
-    const { data: loadedData } = await refetch({
+    const { data: loadedData } = await fetchGetDialogues({
       dialogueId: options.dialogueId,
       input: {
         value: options.topic || '',
@@ -67,9 +72,23 @@ export const WorkspaceGridAdapter = ({
       topic: topic.name,
     })) || [];
 
-    console.log({ data });
+    if (nodes.length) return nodes;
 
-    return nodes;
+    const { data: sessionData } = await fetchGetSessions({
+      input: {
+        startDateTime: '20-03-2022',
+        path: options.topics || [],
+      },
+      dialogueId: options.dialogueId,
+    });
+
+    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessions?.map((session) => ({
+      id: session.id,
+      type: HexagonNodeType.Session,
+      score: session.score,
+    })) || [];
+
+    return fetchNodes;
   };
 
   return (

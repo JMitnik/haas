@@ -26,10 +26,22 @@ export type HexagonQuestionNodeNode = {
   topic: string;
 };
 
-export type HexagonNode = HexagonDialogueNode | HexagonQuestionNodeNode | HexagonGroupNode;
+export type HexagonSessionNode = {
+  id: string;
+  score: number;
+  type: HexagonNodeType.Session;
+};
+
+export type HexagonNode = HexagonDialogueNode | HexagonQuestionNodeNode | HexagonGroupNode | HexagonSessionNode;
+
+export interface HexagonState {
+  parentNode: HexagonNode;
+  childNodes: HexagonNode[];
+}
 
 export enum HexagonNodeType {
   Group = 'Group',
   Dialogue = 'Dialogue',
   QuestionNode = 'QuestionNode',
+  Session = 'Session',
 }

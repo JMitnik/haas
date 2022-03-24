@@ -1,0 +1,11 @@
+query GetSessionPaths($dialogueId: ID!, $input: PathedSessionsInput!) {
+  dialogue(where: { id: $dialogueId }) {
+		id
+		pathedSessions(input: $input) {
+			id
+			score
+			dialogueId
+			device
+		}
+	}
+}
