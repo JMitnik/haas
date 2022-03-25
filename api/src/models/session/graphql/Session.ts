@@ -12,6 +12,8 @@ export const SessionType = objectType({
     t.date('createdAt');
     t.string('dialogueId');
 
+    t.float('mainScore');
+
     t.string('browser', { resolve: (parent) => parent?.browser || '' });
 
     // t.int('index');

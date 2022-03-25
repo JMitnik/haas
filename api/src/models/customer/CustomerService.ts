@@ -78,7 +78,7 @@ class CustomerService {
       // Step 3: Make nodes
       await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
 
-      await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate);
+      await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate, maxSessions);
     }));
 
     return customer;

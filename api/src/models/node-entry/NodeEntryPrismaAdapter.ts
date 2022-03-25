@@ -25,9 +25,9 @@ class NodeEntryPrismaAdapter {
             lte: endDateTime,
           },
           relatedNodeId: questionId,
-          NOT: {
-            inputSource: 'INIT_GENERATED',
-          },
+          // NOT: {
+          //   inputSource: 'INIT_GENERATED',
+          // },
         },
       },
       include: {
@@ -71,6 +71,7 @@ class NodeEntryPrismaAdapter {
         },
       },
     });
+
     return targetNodeEntries;
   }
 
@@ -93,9 +94,9 @@ class NodeEntryPrismaAdapter {
           session: {
             dialogueId: dialogueId,
           },
-          NOT: {
-            inputSource: 'INIT_GENERATED',
-          },
+          // NOT: {
+          //   inputSource: 'INIT_GENERATED',
+          // },
         },
         value: topic,
       },
