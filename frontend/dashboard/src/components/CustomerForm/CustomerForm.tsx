@@ -98,63 +98,66 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
 
   return (
     <>
-      <FormControl>
-        <FormLabel>{t('logo')}</FormLabel>
-        <InputHelper>{t('customer:logo_helper')}</InputHelper>
-
-        <Controller
-          control={form.control}
-          name="useCustomUrl"
-          defaultValue="false"
-          render={({ name, onChange, value }) => (
-            <UI.RadioGroup
-              defaultValue={value}
-              onChange={onChange}
-              name={name}
-              options={[
-                { label: t('existing_url'), value: 'true', description: t('existing_url_helper'), icon: <Link2 /> },
-                { label: t('upload_file'), value: 'false', description: t('upload_file_helper'), icon: <Upload /> },
-              ]}
-            />
-          )}
-        />
-
-      </FormControl>
-
-      {usesCustomUrl ? (
+      <UI.Div>
         <FormControl>
-          <FormLabel htmlFor="logo">{t('logo_existing_url')}</FormLabel>
-          <InputHelper>{t('logo_existing_url_helper')}</InputHelper>
-          <Input
-            id="logo"
-            leftEl={<Link />}
-            name="logo"
-            isInvalid={!!form.errors.logo}
-            ref={form.register()}
+          <FormLabel>{t('logo')}</FormLabel>
+          <InputHelper>{t('customer:logo_helper')}</InputHelper>
+          <Controller
+            control={form.control}
+            name="useCustomUrl"
+            defaultValue="false"
+            render={({ name, onChange, value }) => (
+              <UI.RadioGroup
+                defaultValue={value}
+                onChange={onChange}
+                name={name}
+                options={[
+                  { label: t('existing_url'), value: 'true', description: t('existing_url_helper'), icon: <Link2 /> },
+                  { label: t('upload_file'), value: 'false', description: t('upload_file_helper'), icon: <Upload /> },
+                ]}
+              />
+            )}
           />
-        </FormControl>
-      ) : (
-        <>
-          <FormControl>
-            <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
-            <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
-            <Controller
-              control={form.control}
-              name="uploadLogo"
-              defaultValue=""
-              render={({ onChange, value }) => (
-                <CustomerUploadLogoInput
-                  value={value}
-                  onChange={onChange}
-                  logoOpacity={logoOpacity}
-                  overrideColor={overrideColor}
-                />
-              )}
+        </FormControl>
+      </UI.Div>
+
+      <UI.Div>
+        {usesCustomUrl ? (
+          <FormControl>
+            <FormLabel htmlFor="logo">{t('logo_existing_url')}</FormLabel>
+            <InputHelper>{t('logo_existing_url_helper')}</InputHelper>
+            <Input
+              id="logo"
+              leftEl={<Link />}
+              name="logo"
+              isInvalid={!!form.errors.logo}
+              ref={form.register()}
             />
           </FormControl>
-        </>
-      )}
+        ) : (
+          <>
+            <FormControl>
+              <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+              <InputHelper>{t('logo_upload_helper')}</InputHelper>
+
+              <Controller
+                control={form.control}
+                name="uploadLogo"
+                defaultValue=""
+                render={({ onChange, value }) => (
+                  <CustomerUploadLogoInput
+                    value={value}
+                    onChange={onChange}
+                    logoOpacity={logoOpacity}
+                    overrideColor={overrideColor}
+                  />
+                )}
+              />
+            </FormControl>
+          </>
+        )}
+      </UI.Div>
 
       <UI.Div>
         <UI.FormControl>
@@ -252,7 +255,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
             {t('customer:branding_helper')}
           </Muted>
         </Div>
-        <Div>
+        <InputGrid>
           <InputGrid>
             <FormControl isInvalid={!!form.errors.primaryColour} isRequired>
               <FormLabel htmlFor="primaryColour">{t('branding_color')}</FormLabel>
@@ -269,7 +272,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
           <InputGrid>
             <CustomerLogoFormFragment form={form} />
           </InputGrid>
-        </Div>
+        </InputGrid>
       </FormSection>
 
       {!isInEdit && canAccessAdmin && (
