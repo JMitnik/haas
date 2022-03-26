@@ -20,8 +20,8 @@ import ServerError from 'components/ServerError';
 import intToBool from 'utils/intToBool';
 import useAuth from 'hooks/useAuth';
 
-import uploadSingleImage from '../../mutations/uploadSingleImage';
 import { useFormatter } from 'hooks/useFormatter';
+import uploadSingleImage from '../../mutations/uploadSingleImage';
 
 interface FormDataProps {
   name: string;
@@ -105,15 +105,15 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
         <Controller
           control={form.control}
           name="useCustomUrl"
-          defaultValue={'1'}
+          defaultValue="false"
           render={({ name, onChange, value }) => (
             <UI.RadioGroup
               defaultValue={value}
               onChange={onChange}
               name={name}
               options={[
-                { label: t('existing_url'), value: '0', description: t('existing_url_helper'), icon: <Link2 /> },
-                { label: t('upload_file'), value: '1', description: t('upload_file_helper'), icon: <Upload /> },
+                { label: t('existing_url'), value: 'true', description: t('existing_url_helper'), icon: <Link2 /> },
+                { label: t('upload_file'), value: 'false', description: t('upload_file_helper'), icon: <Upload /> },
               ]}
             />
           )}

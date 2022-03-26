@@ -37,9 +37,10 @@ import { SpaceProps, GridProps } from 'styled-system';
 import ReactSelect from 'react-select';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
-import { Grid, Stack } from './Container';
+import { Flex, Grid, Stack } from './Container';
 import { Text } from './Type';
 import { formatWithOptions } from 'util';
+import { Icon } from './Icon';
 
 const AntdDatepicker = generatePicker<Date>(AntdDatePickerGenerate);
 const { RangePicker: AntdRangePicker } = AntdDatepicker;
@@ -337,6 +338,35 @@ interface RadioButtonProps {
   mt?: any;
 }
 
+interface RadioButtonContainerProps {
+  isChecked?: boolean;
+}
+
+const RadioButtonContainer = styled(Div)<RadioButtonContainerProps>`
+  ${({ theme, isChecked }) => css`
+    border-radius: ${theme.borderRadiuses.md};
+    border-color: ${theme.colors.gray[100]};
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075), 0 2px 8px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: all 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    &:hover {
+      transition: all 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.095), 0 4px 8px rgba(0, 0, 0, 0.09);
+      border-color: ${theme.colors.blue[100]};
+    }
+
+    &[data-checked] {
+      border-color: ${theme.colors.blue[300]};
+      background: ${theme.colors.blue[50]};
+
+      &:hover {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075), 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+    }
+  `}
+`;
+
 export const RadioButton = (props: RadioButtonProps) => {
   const { isChecked, isDisabled, value, text, label, description, icon, ...rest } = props;
   const { getInputProps, getCheckboxProps } = useRadio(props)
@@ -345,70 +375,44 @@ export const RadioButton = (props: RadioButtonProps) => {
   const input = getInputProps();
 
   return (
-    <Box as='label'>
+    <Div as='label'>
       <input {...input} />
-      <Box
+      <RadioButtonContainer
         {...checkbox}
-        _checked={{
-          borderColor: 'teal.400',
-        }}
+        // _checked={{
+        //   borderColor: 'teal.400',
+        // }}
         border="2px solid"
-        borderColor="gray.500"
-        p={2}
-        rounded="md"
+        px={4}
+        py={2}
         display="block"
-        textAlign="left"
-        py="8px"
         height="auto"
       >
         <Div>
-          <Paragraph color={'gray.600'} fontSize="0.9rem">
-            {label}
-          </Paragraph>
-          <Paragraph
-            fontWeight={400}
-            mt={2}
-            fontSize="0.7rem"
-          >
-            {description}
-          </Paragraph>
-        </Div>
-      </Box>
-    </Box>
-  );
+          <Flex>
+            <Flex display="flex" alignItems="center">
+              <Icon mr={4}>
+                {icon}
+              </Icon>
+            </Flex>
 
-  // return (
-  //   <ButtonRadioContainer>
-  //     <input {...input} />
-  //     <Button
-  //       {...checkbox}
-  //       variant="outline"
-  //       colorScheme={isChecked ? 'blue' : 'gray'}
-  //       aria-checked={isChecked}
-  //       role="radio"
-  //       display="block"
-  //       textAlign="left"
-  //       py="8px"
-  //       height="auto"
-  //       isDisabled={isDisabled}
-  //       {...rest}
-  //     >
-  //       <Div>
-  //         <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">
-  //           {text}
-  //         </Paragraph>
-  //         <Paragraph
-  //           color={!isChecked ? 'gray.500' : 'auto'}
-  //           fontWeight={400}
-  //           mt={2}
-  //           fontSize="0.7rem"
-  //         >
-  //           {description}
-  //         </Paragraph>
-  //       </Div>
-  //     </Button>
-  //   </ButtonRadioContainer>
-  // );
+            <Div>
+              <Paragraph fontWeight={700} color={'gray.600'} fontSize="0.9rem">
+                {label}
+              </Paragraph>
+              <Paragraph
+                fontWeight={400}
+                mt={1}
+                fontSize="0.7rem"
+              >
+                {description}
+              </Paragraph>
+            </Div>
+          </Flex>
+        </Div>
+      </RadioButtonContainer>
+    </Div>
+  );
 };
 
 export const DeprecatedInputStyled = styled.input`
