@@ -12,7 +12,7 @@ interface WorkspaceGridPaneProps {
 
 export const WorkspaceGridPane = ({ stateHistory }: WorkspaceGridPaneProps) => {
   const reversedStateHistory = useMemo(() => (
-    reverse(stateHistory)
+    reverse([...stateHistory])
   ), [stateHistory]);
 
   return (

@@ -1167,6 +1167,13 @@ export type LoginOutput = {
   user: UserType;
 };
 
+export type MassSeedInput = {
+  customerId: Scalars['String'];
+  maxGroups: Scalars['Int'];
+  maxTeams: Scalars['Int'];
+  maxSessions: Scalars['Int'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createJobProcessLocation: JobProcessLocation;
@@ -1196,6 +1203,7 @@ export type Mutation = {
   singleUpload: ImageType;
   createWorkspace: Customer;
   editWorkspace: Customer;
+  massSeed?: Maybe<Customer>;
   deleteCustomer?: Maybe<Customer>;
   handleUserStateInWorkspace: UserCustomer;
   editUser: UserType;
@@ -1371,6 +1379,11 @@ export type MutationCreateWorkspaceArgs = {
 
 export type MutationEditWorkspaceArgs = {
   input?: Maybe<EditWorkspaceInput>;
+};
+
+
+export type MutationMassSeedArgs = {
+  input?: Maybe<MassSeedInput>;
 };
 
 
@@ -2468,7 +2481,7 @@ export type GetSessionPathsQuery = (
     & Pick<Dialogue, 'id'>
     & { pathedSessions?: Maybe<Array<(
       { __typename?: 'Session' }
-      & Pick<Session, 'id' | 'score' | 'dialogueId' | 'device'>
+      & Pick<Session, 'id' | 'score' | 'dialogueId' | 'device' | 'createdAt'>
     )>> }
   )> }
 );
@@ -3348,6 +3361,7 @@ export const GetSessionPathsDocument = gql`
       score
       dialogueId
       device
+      createdAt
     }
   }
 }

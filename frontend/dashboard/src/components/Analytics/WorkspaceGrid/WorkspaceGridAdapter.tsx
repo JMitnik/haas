@@ -86,6 +86,7 @@ export const WorkspaceGridAdapter = ({
       id: session.id,
       type: HexagonNodeType.Session,
       score: session.score,
+      session,
     })) || [];
 
     if (fetchNodes.length) return [fetchNodes, HexagonViewMode.Session];

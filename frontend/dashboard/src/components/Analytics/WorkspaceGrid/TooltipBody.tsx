@@ -1,8 +1,10 @@
 import * as UI from '@haas/ui';
+import { format } from 'date-fns';
 import { useFormatter } from 'hooks/useFormatter';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { Calendar, TrendingDown, TrendingUp } from 'react-feather';
 import {
   HexagonDialogueNode,
   HexagonNode,
@@ -65,20 +67,54 @@ export const TooltipSessionBody = ({ node }: { node: HexagonSessionNode }) => {
   const { formatScore } = useFormatter();
   const { t } = useTranslation();
 
+  const date = format(new Date(node.session.createdAt), 'dd/MM/yyyy HH:mm:ss');
+
   return (
     <UI.Div>
-      <UI.Helper>
-        {t('session')}
-      </UI.Helper>
+      <UI.Div>
+        <UI.Div borderBottom="1px solid" borderColor="gray.100" pb={1}>
+          <UI.Span fontWeight={700}>
+            Session
+          </UI.Span>
+        </UI.Div>
+      </UI.Div>
       <UI.PaddedBody fraction={0.5}>
-        <UI.Flex>
+        <UI.Stack spacing={2}>
           <UI.Div>
-            {formatScore(node.score)}
+            <UI.Div mr={1}>
+              <UI.Helper>
+                {t('score')}
+              </UI.Helper>
+            </UI.Div>
+            <UI.Flex alignItems="center">
+              <UI.Icon mr={1}>
+                {node.score < 40 ? (
+                  <TrendingDown width={16} />
+                ) : (
+                  <TrendingUp width={16} />
+                )}
+              </UI.Icon>
+              <UI.Div>
+                {formatScore(node.score)}
+              </UI.Div>
+            </UI.Flex>
           </UI.Div>
-          <UI.Div ml={2}>
-            {node.id}
+          <UI.Div>
+            <UI.Div>
+              <UI.Helper>
+                {t('date')}
+              </UI.Helper>
+            </UI.Div>
+            <UI.Flex alignItems="center">
+              <UI.Icon display="inline-block" mr={1}>
+                <Calendar width={16} />
+              </UI.Icon>
+              <UI.Muted>
+                {date}
+              </UI.Muted>
+            </UI.Flex>
           </UI.Div>
-        </UI.Flex>
+        </UI.Stack>
       </UI.PaddedBody>
     </UI.Div>
   );

@@ -1,6 +1,7 @@
-import { GetWorkspaceDialogueStatistics } from 'types/generated-types';
+import { GetSessionPaths, GetWorkspaceDialogueStatistics } from 'types/generated-types';
 
 export type Dialogue = GetWorkspaceDialogueStatistics.Dialogues;
+export type Session = GetSessionPaths.PathedSessions;
 
 export type HexagonGroupNode = {
   id: string;
@@ -29,6 +30,7 @@ export type HexagonQuestionNodeNode = {
 export type HexagonSessionNode = {
   id: string;
   score: number;
+  session: Session;
   type: HexagonNodeType.Session;
 };
 
