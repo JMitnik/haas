@@ -1,14 +1,11 @@
 import * as UI from '@haas/ui';
 import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
-import { Button, Icon } from '@chakra-ui/react';
-import { Div, Flex, ViewTitle } from '@haas/ui';
 import { Mail, Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
 
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -35,12 +32,10 @@ const actionsAnimation: Variants = {
   },
 };
 
-const DialogueViewContainer = styled(Div)``;
-
 const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
   if (leaf.type === 'LINK') {
     const mappedLinks = leaf.links?.map((link: any) => {
-      const { __typename, ...linkedData } = link;
+      const { __typename: ignore, ...linkedData } = link;
       return { ...linkedData, type: { label: link.type, value: link.type } };
     });
 
@@ -140,9 +135,9 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
       <UI.ViewHead>
         <UI.Flex justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <ViewTitle leftIcon={<Mail />}>
+            <UI.ViewTitle leftIcon={<Mail />}>
               {t('views:cta_view')}
-            </ViewTitle>
+            </UI.ViewTitle>
 
             <UI.Button
               leftIcon={<Plus />}
@@ -183,7 +178,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
                   activeCTA={activeCTA}
                   onActiveCTAChange={setActiveCTA}
                   id={leaf.id}
-                  Icon={leaf.icon}
+                  Icon={<leaf.icon />}
                   title={leaf.title}
                   type={initializeCTAType(leaf.type)}
                   links={leaf.links}
@@ -201,7 +196,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
                   activeCTA={activeCTA}
                   onActiveCTAChange={setActiveCTA}
                   id={leaf.id}
-                  Icon={leaf.icon}
+                  Icon={<leaf.icon />}
                   title={leaf.title}
                   type={initializeCTAType(leaf.type)}
                   links={leaf.links}

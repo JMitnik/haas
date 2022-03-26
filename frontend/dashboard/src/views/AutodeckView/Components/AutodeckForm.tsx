@@ -103,7 +103,7 @@ const AutodeckForm = ({
         },
       });
     }
-    onConfirmJob({
+    return onConfirmJob({
       variables: {
         input: {
           id: job?.id || activeJobId || '',
@@ -206,7 +206,6 @@ const AutodeckForm = ({
                         render={({ onChange, value }) => (
                           <RadioGroup
                             value={value}
-                            isInline
                             onChange={onChange}
                             display="flex"
                           >

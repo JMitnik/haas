@@ -37,7 +37,6 @@ import { SpaceProps, GridProps } from 'styled-system';
 import ReactSelect from 'react-select';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
-import { FormLabelProps } from '@chakra-ui/react/dist/FormLabel';
 import { Grid, Stack } from './Container';
 import { Text } from './Type';
 import { formatWithOptions } from 'util';
@@ -127,7 +126,7 @@ export const InputLabel = styled.label`
   `}
 `;
 
-export const FormLabel = forwardRef((props: FormLabelProps, ref) => (
+export const FormLabel = forwardRef((props: any, ref) => (
   <ChakraFormLabel fontSize="0.9rem" color="gray.600" fontWeight="600" {...props} ref={ref} />
 ));
 
@@ -139,6 +138,7 @@ interface InputProps extends ChakraInputProps {
 }
 
 export const Textarea = forwardRef(
+  // @ts-ignore
   (props: ChakraInputProps<HTMLTextAreaElement>, ref: Ref<HTMLTextAreaElement>) => (
     <ChakraTextArea {...props} fontSize="0.8rem" ref={ref} />
   )
@@ -190,7 +190,9 @@ export const Input = forwardRef(({ id, ...props }: InputProps, ref: Ref<HTMLInpu
   </InputGroup>
 ));
 
+// @ts-ignore
 export const InputGroup = forwardRef((props: InputGroupProps, ref) => (
+  // @ts-ignore
   <ChakraInputGroup {...props} ref={ref} />
 ));
 
@@ -637,6 +639,7 @@ export const RadioButtons = forwardRef(({ children, onChange, value, defaultValu
     onChange={onChange}
     defaultValue={defaultValue}
     value={value}
+    // @ts-ignore
     ref={ref}
     isInline
     spacing={2}
@@ -898,6 +901,7 @@ export const Toggle = forwardRef((props: SwitchProps, ref) => {
   const { children, ...restProps } = props;
 
   return (
+    // @ts-ignore
     <ChakraSwitch ref={ref} color="teal" {...restProps}>
       {children}
     </ChakraSwitch>
@@ -953,6 +957,7 @@ export const FormControl = forwardRef((props: FormControlProps, ref) => {
   const { children, ...restProps } = props;
 
   return (
+    // @ts-ignore
     <ChakraFormControl display="flex" flexDirection="column" ref={ref} {...restProps}>
       {children}
     </ChakraFormControl>

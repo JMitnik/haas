@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MutableRefObject } from 'react';
 import Color from 'color';
 import {
   Button as ChakraButton, ButtonProps as ChakraButtonProps,
@@ -16,8 +16,10 @@ const ButtonContainer = styled.div`
   }
 `;
 
-export const Button = React.forwardRef((props: ButtonProps, ref) => (
+// @ts-ignore
+export const Button = React.forwardRef((props: ButtonProps, ref: MutableRefObject<HTMLButtonElement>) => (
   <ButtonContainer>
+    {/* @ts-ignore */}
     <ChakraButton {...props} ref={ref} />
   </ButtonContainer>
 ));

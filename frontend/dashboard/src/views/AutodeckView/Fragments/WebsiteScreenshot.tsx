@@ -1,11 +1,12 @@
-import { UseFormMethods, Controller } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import React from "react";
-import { FormControl, FormLabel, RadioGroup } from "@chakra-ui/react";
-import { InputHelper, RadioButton, Input } from "@haas/ui";
-import { Link2, Upload, Link, ThumbsUp, ThumbsDown } from "react-feather";
-import UploadImageInput from "./UploadImageInput";
-import { FormDataProps } from "../Types";
+import { Controller, UseFormMethods } from 'react-hook-form';
+import { FormControl, FormLabel, RadioGroup } from '@chakra-ui/react';
+import { Input, InputHelper, RadioButton } from '@haas/ui';
+import { Link, Link2, ThumbsDown, ThumbsUp, Upload } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import React from 'react';
+
+import { FormDataProps } from '../Types';
+import UploadImageInput from './UploadImageInput';
 
 const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
   form: UseFormMethods<FormDataProps>, jobId: string, isInEditing: boolean,
@@ -14,7 +15,8 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
 
   return (
     <>
-      {!isInEditing &&
+      {!isInEditing
+        && (
         <FormControl>
           <FormLabel>{t('website_screenshot')}</FormLabel>
           <InputHelper>{t('website_screenshot_subtext')}</InputHelper>
@@ -25,18 +27,26 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
             render={({ onChange, value }) => (
               <RadioGroup
                 value={value}
-                isInline
                 onChange={onChange}
                 display="flex"
               >
-                <RadioButton icon={<Link2 />} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
-                <RadioButton icon={<Upload />} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
+                <RadioButton
+                  icon={<Link2 />}
+                  value={1}
+                  text={t('existing_url')}
+                  description={t('existing_url_helper')}
+                />
+                <RadioButton
+                  icon={<Upload />}
+                  value={0}
+                  text={t('upload_file')}
+                  description={t('upload_file_helper')}
+                />
               </RadioGroup>
             )}
           />
         </FormControl>
-      }
-
+        )}
 
       {!isInEditing && form.watch('useWebsiteUrl') === 1 && (
         <FormControl isInvalid={!!form.errors.website} isRequired>
@@ -50,22 +60,30 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
           />
         </FormControl>
 
-      )}  {!isInEditing && form.watch('useWebsiteUrl') === 0 && (
-        <>
-          <FormControl>
-            <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
-            <InputHelper>{t('logo_upload_helper')}</InputHelper>
+      )}
+      {' '}
+      {!isInEditing && form.watch('useWebsiteUrl') === 0 && (
+      <>
+        <FormControl>
+          <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+          <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
-            <Controller
-              control={form.control}
-              name="uploadWebsite"
-              defaultValue=""
-              render={({ onChange, value }) => (
-                <UploadImageInput isInEditing={isInEditing} jobId={jobId} value={value} onChange={onChange} imageType="WEBSITE_SCREENSHOT" />
-              )}
-            />
-          </FormControl>
-        </>
+          <Controller
+            control={form.control}
+            name="uploadWebsite"
+            defaultValue=""
+            render={({ onChange, value }) => (
+              <UploadImageInput
+                isInEditing={isInEditing}
+                jobId={jobId}
+                value={value}
+                onChange={onChange}
+                imageType="WEBSITE_SCREENSHOT"
+              />
+            )}
+          />
+        </FormControl>
+      </>
       )}
 
       {isInEditing && (
@@ -90,8 +108,8 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
             />
           </FormControl>
           <FormControl>
-            <FormLabel>{'Website screenshot approval'}</FormLabel>
-            <InputHelper>{'Approve or edit the website screenshot used for document generation'}</InputHelper>
+            <FormLabel>Website screenshot approval</FormLabel>
+            <InputHelper>Approve or edit the website screenshot used for document generation</InputHelper>
             <Controller
               control={form.control}
               name="isWebsiteUrlApproved"
@@ -99,12 +117,21 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
               render={({ onChange, value }) => (
                 <RadioGroup
                   value={value}
-                  isInline
                   onChange={onChange}
                   display="flex"
                 >
-                  <RadioButton icon={<ThumbsUp />} value={1} text={'Approve'} description={'Use current website screenshot'} />
-                  <RadioButton icon={<ThumbsDown />} value={0} text={'Edit'} description={'Upload new website screenshot'} />
+                  <RadioButton
+                    icon={<ThumbsUp />}
+                    value={1}
+                    text="Approve"
+                    description="Use current website screenshot"
+                  />
+                  <RadioButton
+                    icon={<ThumbsDown />}
+                    value={0}
+                    text="Edit"
+                    description="Upload new website screenshot"
+                  />
                 </RadioGroup>
               )}
             />
@@ -115,4 +142,4 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
   );
 };
 
-export default WebsiteScreenshotFragment
+export default WebsiteScreenshotFragment;

@@ -208,7 +208,7 @@ export const UsernavDropdown = () => {
           <Flex justifyContent="space-between">
             <Div>
               <ChakraAvatar bg="gray.300" size="md" name={`${user?.firstName} ${user?.lastName}`}>
-                <AvatarBadge size="1em" bg="green.400" />
+                <AvatarBadge width="1em" bg="green.400" />
               </ChakraAvatar>
             </Div>
             <Div ml={4}>
@@ -281,9 +281,7 @@ export const Usernav = () => {
               size="md"
               name={`${user?.firstName} ${user?.lastName}`}
               onClick={onOpen}
-            >
-              <AvatarBadge size="1em" bg="green.400" />
-            </ChakraAvatar>
+            />
           </AvatarContainer>
         )}
       </Dropdown>

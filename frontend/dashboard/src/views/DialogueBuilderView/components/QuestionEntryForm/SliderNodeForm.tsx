@@ -42,7 +42,6 @@ const SliderNodeForm = ({ form }: { form: any }) => {
             render={({ onChange, value }) => (
               <RadioGroup
                 value={value}
-                isInline
                 onChange={onChange}
                 display="flex"
               >

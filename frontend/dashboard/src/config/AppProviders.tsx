@@ -3,8 +3,8 @@ import { ErrorBoundary } from '@sentry/react';
 import { I18nextProvider } from 'react-i18next';
 import { QueryParamProvider } from 'use-query-params';
 import { Route, BrowserRouter as Router } from 'react-router-dom';
-import React from 'react';
 import { Toaster } from 'react-hot-toast';
+import React from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
 import { DefaultThemeProviders } from 'providers/ThemeProvider';
@@ -19,6 +19,7 @@ import lang from './i18n-config';
  * AppProviders give all if not `most` context providers.
  */
 export const AppProviders = ({ children }: { children: React.ReactNode }) => (
+  // @ts-ignore
   <I18nextProvider i18n={lang}>
     <Router>
       <ErrorBoundary fallback={GlobalErrorFallback}>
