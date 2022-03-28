@@ -1,6 +1,3 @@
-import { addSeconds, format } from 'date-fns';
-
-import { isValidDateTime } from '../../../utils/isValidDate';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { clearDialogueDatabase } from './testUtils';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
@@ -12,7 +9,7 @@ jest.setTimeout(30000);
 const prisma = makeTestPrisma();
 const ctx = makeTestContext(prisma);
 
-describe('DialogueStatisticsSummary', () => {
+describe('Dialogue Statistics Summary', () => {
   afterEach(async () => {
     await clearDialogueDatabase(prisma);
     await prisma.$disconnect();

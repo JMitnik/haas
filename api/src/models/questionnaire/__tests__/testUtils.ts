@@ -350,10 +350,6 @@ export const prepDefaultCreateData = async (prisma: PrismaClient) => {
     },
   });
 
-  console.log('Questions: ', dialogue?.questions);
-  const choiceQuestion = dialogue?.questions.find((question) => question.id === 'CHOICE_QUESTION_ID');
-  console.log('Choice question: ', choiceQuestion);
-
   return {
     user,
     userRole,
