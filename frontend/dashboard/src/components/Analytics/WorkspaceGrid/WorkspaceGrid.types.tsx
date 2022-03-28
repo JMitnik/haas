@@ -10,6 +10,7 @@ export type HexagonGroupNode = {
   label: string
   groups: HexagonGroupNode[];
   dialogues: Dialogue[];
+  points?: string;
 };
 
 export type HexagonDialogueNode = {
@@ -18,6 +19,7 @@ export type HexagonDialogueNode = {
   type: HexagonNodeType.Dialogue;
   dialogue: Dialogue;
   label: string;
+  points?: string;
 };
 
 export type HexagonQuestionNodeNode = {
@@ -25,6 +27,7 @@ export type HexagonQuestionNodeNode = {
   score: number;
   type: HexagonNodeType.QuestionNode;
   topic: string;
+  points?: string;
 };
 
 export type HexagonSessionNode = {
@@ -32,6 +35,7 @@ export type HexagonSessionNode = {
   score: number;
   session: Session;
   type: HexagonNodeType.Session;
+  points?: string;
 };
 
 export type HexagonNode = HexagonDialogueNode | HexagonQuestionNodeNode | HexagonGroupNode | HexagonSessionNode;

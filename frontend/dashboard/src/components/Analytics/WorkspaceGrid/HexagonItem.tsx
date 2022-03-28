@@ -1,8 +1,5 @@
-import { Group } from '@visx/group';
-import { Polygon } from '@visx/shape';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { localPoint } from '@visx/event';
-import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 
 import { HexagonNode } from './WorkspaceGrid.types';
@@ -13,9 +10,7 @@ interface HexagonItemProps {
   containerWidth: number;
   containerHeight: number;
   containerBackgroundFill: string;
-  top: number;
-  left: number;
-  hexSize: number;
+  points: string;
   score: number;
   onZoom: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
   onMouseOver: (event: React.MouseEvent<SVGPolygonElement, MouseEvent>, node: HexagonNode) => void;
@@ -33,9 +28,7 @@ export const HexagonItem = ({
   zoomHelper,
   containerWidth,
   containerHeight,
-  top,
-  left,
-  hexSize = 40,
+  points,
   score,
   onZoom,
   onMouseOver,
@@ -60,21 +53,18 @@ export const HexagonItem = ({
   };
 
   return (
-    <Group top={top} left={left}>
-      <motion.g animate={{ opacity: 1 }} initial={{ opacity: 0 }} exit={{ opacity: 0 }}>
-        <g fill="blue">
-          <Polygon
-            sides={6}
-            size={hexSize}
-            fill={fill}
-            onMouseOver={(event) => {
-              onMouseOver?.(event, node);
-            }}
-            onMouseOut={() => onMouseExit?.()}
-            onClick={(e) => handleZoom(e)}
-          />
-        </g>
-      </motion.g>
-    </Group>
+    <g>
+      <g fill="blue">
+        <polygon
+          points={points}
+          fill={fill}
+          onMouseOver={(event) => {
+            onMouseOver?.(event, node);
+          }}
+          onMouseOut={() => onMouseExit?.()}
+          onClick={(e) => handleZoom(e)}
+        />
+      </g>
+    </g>
   );
 };

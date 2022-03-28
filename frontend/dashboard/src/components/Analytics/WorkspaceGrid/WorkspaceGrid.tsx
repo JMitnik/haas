@@ -1,6 +1,8 @@
 import * as UI from '@haas/ui';
 import { ArrowLeft } from 'react-feather';
 import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
+import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
+
 import { Group } from '@visx/group';
 import { ParentSizeModern } from '@visx/responsive';
 import { PatternCircles } from '@visx/pattern';
@@ -39,6 +41,39 @@ export interface WorkspaceGridProps {
   onLoadData?: (options: DataLoadOptions) => Promise<[HexagonNode[], HexagonViewMode]>;
 }
 
+const calcHexagonWidth = (nrItems: number) => {
+  if (nrItems < 100) {
+    return 30;
+  } if (nrItems >= 100 && nrItems < 500) {
+    return 15;
+  } if (nrItems >= 500 && nrItems < 1000) {
+    return 5;
+  }
+  return 0;
+};
+
+const createGrid = (nrItems: number, windowHeight: number, windowWidth: number) => {
+  const gridItems: any[] = [];
+  const squareRoot = Math.sqrt(nrItems);
+  const ratioWindow = windowWidth / windowHeight;
+  const itemsPerRow = Math.ceil(squareRoot * ratioWindow) || 1;
+  const itemsPerColumn = Math.ceil(squareRoot) || 1;
+  const dimensions = Math.floor((windowWidth / itemsPerRow) / 2);
+
+  const hexPrototype = createHexPrototype({
+    dimensions,
+    offset: 1,
+  });
+
+  new Grid(hexPrototype, rectangle({ start: [0, 0], width: itemsPerRow, height: itemsPerColumn }))
+    .each((hex: Hex) => {
+      const corners = hex.corners.map(({ x, y }) => `${x},${y}`);
+      gridItems.push(corners.join(' '));
+    }).run();
+
+  return gridItems;
+};
+
 export const WorkspaceGrid = ({
   initialData,
   backgroundColor,
@@ -46,7 +81,7 @@ export const WorkspaceGrid = ({
   initialViewMode = HexagonViewMode.Group,
 }: WorkspaceGridProps) => {
   const zoomHelper = React.useRef<ProvidedZoom<SVGElement> | null>(null);
-
+  const initialRef = React.useRef<HTMLDivElement>();
   const [stateHistory, setStateHistory] = React.useState<HexagonState[]>([]);
   const [currentState, setCurrentState] = React.useState<HexagonState>({
     currentNode: undefined,
@@ -54,7 +89,6 @@ export const WorkspaceGrid = ({
     viewMode: initialViewMode,
   });
 
-  const hexSize = 40;
   const isAtMinZoomLevel = stateHistory.length === 0;
 
   const activeDialogue = useMemo(() => {
@@ -130,6 +164,14 @@ export const WorkspaceGrid = ({
     });
   };
 
+  const gridItems = useMemo(() => (
+    createGrid(
+      currentState?.childNodes?.length || 0,
+      initialRef.current?.clientHeight || 495,
+      initialRef.current?.clientWidth || 495,
+    )
+  ), [currentState.childNodes]);
+
   const handleZoomOut = () => {
     if (!zoomHelper.current) return;
     if (isAtMinZoomLevel) return;
@@ -139,10 +181,15 @@ export const WorkspaceGrid = ({
     popQueue();
   };
 
+  const hexagonNodes = currentState.childNodes?.map((node, index) => ({
+    ...node,
+    points: gridItems[index],
+  })) || [];
+
   return (
     <LS.WorkspaceGridContainer>
       <UI.Grid gridTemplateColumns="2fr 1fr" gridGap="0">
-        <UI.Div height="70vh" position="relative">
+        <UI.Div ref={initialRef} height="70vh" position="relative">
           <LS.GridControls>
             {!isAtMinZoomLevel && (
               <LS.IconButton onClick={() => handleZoomOut()}>
@@ -198,20 +245,17 @@ export const WorkspaceGrid = ({
                           style={{ transform: 'matrix(1, 0, 0, 1, 0, 0' }}
                           animate={{ transform: zoom.toString(), opacity: 1 }}
                         >
-
                           <Group top={100} left={100}>
-                            {currentState.childNodes?.map((dialogue, index) => (
+                            {hexagonNodes.map((node) => (
                               <HexagonItem
-                                key={dialogue.id}
-                                node={dialogue}
-                                top={index * hexSize * 0.9}
-                                left={index * hexSize * 1.5}
+                                key={node.id}
+                                node={node}
+                                points={node.points}
                                 onMouseOver={handleMouseOverHex}
                                 onMouseExit={handleMouseOutHex}
-                                score={dialogue.score}
+                                score={node.score}
                                 containerWidth={width}
                                 containerHeight={height}
-                                hexSize={hexSize}
                                 zoomHelper={zoom}
                                 onZoom={handleZoominLevel}
                                 containerBackgroundFill={backgroundColor}

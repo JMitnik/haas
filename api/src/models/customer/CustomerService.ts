@@ -38,7 +38,7 @@ class CustomerService {
     const customer = await this.findWorkspaceById(customerId);
     if (!customer) return null;
 
-    // Generate 
+    // Generate
     const amtGroups = Math.ceil(Math.random() * maxGroups + 1);
     const maleDialogueNames = [...Array(amtGroups)].flatMap((number, index) => {
       const teamAge = 8 + (4 * index);
