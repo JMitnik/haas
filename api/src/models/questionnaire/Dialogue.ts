@@ -163,7 +163,6 @@ export const DialogueType = objectType({
 
     t.field('topic', {
       type: TopicType,
-      // list: true,
       args: {
         input: TopicInputType,
       },

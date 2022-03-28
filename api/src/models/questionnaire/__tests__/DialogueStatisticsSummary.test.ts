@@ -20,9 +20,40 @@ describe('DialogueStatisticsSummary', () => {
 
   it('can calculate impact score for last week', async () => {
     const { user, workspace, dialogue, sliderQuestion, choiceQuestion } = await prepDefaultCreateData(prisma);
-    await seedSession(prisma, dialogue.id, sliderQuestion.id, 70, choiceQuestion.id, 'Facilities', '2022-03-01T06:33:27.899Z');
-    await seedSession(prisma, dialogue.id, sliderQuestion.id, 30, choiceQuestion.id, 'Facilities', '2022-03-02T06:33:27.899Z');
-    await seedSession(prisma, dialogue.id, sliderQuestion.id, 40, choiceQuestion.id, 'Facilities', '2022-03-10T06:33:27.899Z');
+    const rootEdgeId = dialogue.questions[0].children[0].id;
+
+    await seedSession({
+      prisma,
+      dialogueId: dialogue.id,
+      sliderQuestionId: sliderQuestion.id,
+      choiceQuestionId: choiceQuestion.id,
+      choiceValue: 'Facilities',
+      createdAt: '2022-03-01T06:33:27.899Z',
+      edgeId: rootEdgeId,
+      sliderValue: 70,
+    });
+
+    await seedSession({
+      prisma,
+      dialogueId: dialogue.id,
+      sliderQuestionId: sliderQuestion.id,
+      choiceQuestionId: choiceQuestion.id,
+      choiceValue: 'Facilities',
+      createdAt: '2022-03-02T06:33:27.899Z',
+      edgeId: rootEdgeId,
+      sliderValue: 30,
+    });
+
+    await seedSession({
+      prisma,
+      dialogueId: dialogue.id,
+      sliderQuestionId: sliderQuestion.id,
+      choiceQuestionId: choiceQuestion.id,
+      choiceValue: 'Facilities',
+      createdAt: '2022-03-10T06:33:27.899Z',
+      edgeId: rootEdgeId,
+      sliderValue: 40,
+    });
 
     // Generate token for API access
     const token = AuthService.createUserToken(user.id, 22);
@@ -59,9 +90,40 @@ describe('DialogueStatisticsSummary', () => {
 
   it('can calculate impact score within 2 days', async () => {
     const { user, workspace, dialogue, sliderQuestion, choiceQuestion } = await prepDefaultCreateData(prisma);
-    await seedSession(prisma, dialogue.id, sliderQuestion.id, 70, choiceQuestion.id, 'Facilities', '2022-03-01T06:33:27.899Z');
-    await seedSession(prisma, dialogue.id, sliderQuestion.id, 10, choiceQuestion.id, 'Facilities', '2022-03-02T06:33:27.899Z');
-    await seedSession(prisma, dialogue.id, sliderQuestion.id, 40, choiceQuestion.id, 'Facilities', '2022-03-03T06:33:27.899Z');
+    const rootEdgeId = dialogue.questions[0].children[0].id;
+
+    await seedSession({
+      prisma,
+      dialogueId: dialogue.id,
+      sliderQuestionId: sliderQuestion.id,
+      choiceQuestionId: choiceQuestion.id,
+      choiceValue: 'Facilities',
+      createdAt: '2022-03-01T06:33:27.899Z',
+      edgeId: rootEdgeId,
+      sliderValue: 70,
+    });
+
+    await seedSession({
+      prisma,
+      dialogueId: dialogue.id,
+      sliderQuestionId: sliderQuestion.id,
+      choiceQuestionId: choiceQuestion.id,
+      choiceValue: 'Facilities',
+      createdAt: '2022-03-02T06:33:27.899Z',
+      edgeId: rootEdgeId,
+      sliderValue: 10,
+    });
+
+    await seedSession({
+      prisma,
+      dialogueId: dialogue.id,
+      sliderQuestionId: sliderQuestion.id,
+      choiceQuestionId: choiceQuestion.id,
+      choiceValue: 'Facilities',
+      createdAt: '2022-03-03T06:33:27.899Z',
+      edgeId: rootEdgeId,
+      sliderValue: 40,
+    });
 
     // Generate token for API access
     const token = AuthService.createUserToken(user.id, 22);
