@@ -1,11 +1,10 @@
 import * as UI from '@haas/ui';
-import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
-import { Button, ButtonGroup, RadioGroup, useToast } from '@chakra-ui/react';
+import { Activity, Briefcase, Clipboard, Link2, Link as LinkLogo, Loader, Minus, Upload } from 'react-feather';
+import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
 import { Controller, UseFormMethods } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
   Muted,
-  RadioButton,
 } from '@haas/ui';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/client';
@@ -17,7 +16,6 @@ import { UploadPreviewContainer } from 'components/FileDropInput/FileDropInput';
 import ColorPickerInput from 'components/ColorPicker';
 import FileDropInput from 'components/FileDropInput';
 import ServerError from 'components/ServerError';
-import intToBool from 'utils/intToBool';
 import useAuth from 'hooks/useAuth';
 
 import { useFormatter } from 'hooks/useFormatter';
@@ -106,11 +104,9 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
             control={form.control}
             name="useCustomUrl"
             defaultValue="false"
-            render={({ name, onChange, value }) => (
+            render={(props) => (
               <UI.RadioGroup
-                defaultValue={value}
-                onChange={onChange}
-                name={name}
+                {...props}
                 options={[
                   { label: t('existing_url'), value: 'true', description: t('existing_url_helper'), icon: <Link2 /> },
                   { label: t('upload_file'), value: 'false', description: t('upload_file_helper'), icon: <Upload /> },
@@ -129,7 +125,7 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
             <InputHelper>{t('logo_existing_url_helper')}</InputHelper>
             <Input
               id="logo"
-              leftEl={<Link />}
+              leftEl={<LinkLogo />}
               name="logo"
               isInvalid={!!form.errors.logo}
               ref={form.register()}
@@ -198,8 +194,10 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
   const history = useHistory();
   const { t } = useTranslation();
   const { canAccessAdmin } = useAuth();
+  const { radioToBoolean } = useFormatter();
 
-  const usesSeed = intToBool(form.watch('seed'));
+  const usesSeed = radioToBoolean(form.watch('seed'));
+  console.log({ usesSeed });
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -293,27 +291,26 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                   <InputHelper>{t('customer:use_template_helper')}</InputHelper>
                   <Controller
                     name="seed"
-                    render={({ onChange, onBlur, value }) => (
-                      <RadioGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
-                        <UI.Stack direction="row" spacing={2}>
-                          <RadioButton
-                            icon={<Clipboard />}
-                            value={1}
-                            mr={2}
-                            text={(t('customer:custom_template'))}
-                            description={t('customer:custom_template_helper')}
-                          />
-                          <RadioButton
-                            icon={<Loader />}
-                            value={0}
-                            text={(t('customer:no_custom_template'))}
-                            description={t('customer:no_custom_template_helper')}
-                          />
-                        </UI.Stack>
-                      </RadioGroup>
+                    render={(props) => (
+                      <UI.RadioGroup
+                        {...props}
+                        options={[
+                          {
+                            label: t('customer:custom_template'),
+                            value: 'true',
+                            description: t('customer:custom_template_helper'),
+                            icon: <Clipboard />,
+                          },
+                          {
+                            label: t('customer:no_custom_template'),
+                            value: 'false',
+                            description: t('customer:no_custom_template_helper'),
+                            icon: <Loader />,
+                          },
+                        ]}
+                      />
                     )}
                     control={form.control}
-                    defaultValue={1}
                   />
 
                 </FormControl>
@@ -324,27 +321,27 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                     <InputHelper>{t('customer:fake_data_helper')}</InputHelper>
                     <Controller
                       name="willGenerateFakeData"
-                      render={({ onChange, onBlur, value }) => (
-                        <RadioGroup onBlur={onBlur} value={value} onChange={onChange}>
-                          <UI.Stack direction="row" spacing={2}>
-                            <RadioButton
-                              icon={<Activity />}
-                              value={1}
-                              mr={2}
-                              text={(t('customer:use_fake_data'))}
-                              description={t('customer:fake_data_helper')}
-                            />
-                            <RadioButton
-                              icon={<Minus />}
-                              value={0}
-                              text={(t('customer:no_use_fake_data'))}
-                              description={t('customer:no_use_fake_data_helper')}
-                            />
-                          </UI.Stack>
-                        </RadioGroup>
+                      defaultValue="false"
+                      render={(props) => (
+                        <UI.RadioGroup
+                          {...props}
+                          options={[
+                            {
+                              label: t('customer:no_use_fake_data'),
+                              value: 'false',
+                              description: t('customer:no_use_fake_data_helper'),
+                              icon: <Minus />,
+                            },
+                            {
+                              label: t('customer:use_fake_data'),
+                              value: 'true',
+                              description: t('customer:use_fake_data_helper'),
+                              icon: <Activity />,
+                            },
+                          ]}
+                        />
                       )}
                       control={form.control}
-                      defaultValue={1}
                     />
 
                   </FormControl>

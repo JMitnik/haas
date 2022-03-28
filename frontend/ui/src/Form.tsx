@@ -298,13 +298,14 @@ interface RadioGroupProps {
   name: string;
   options: RadioGroupOption[];
   defaultValue?: any;
+  value?: any;
   onChange?: (val: any) => void;
 }
 
-export const RadioGroup = ({ name, defaultValue, options, onChange }: RadioGroupProps) => {
+export const RadioGroup = ({ name, defaultValue, value, options, onChange }: RadioGroupProps) => {
   const { getRootProps, getRadioProps } = useRadioGroup({
     name,
-    defaultValue,
+    defaultValue: defaultValue ?? value,
     onChange,
   })
 
@@ -379,9 +380,6 @@ export const RadioButton = (props: RadioButtonProps) => {
       <input {...input} />
       <RadioButtonContainer
         {...checkbox}
-        // _checked={{
-        //   borderColor: 'teal.400',
-        // }}
         border="2px solid"
         px={4}
         py={2}

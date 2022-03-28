@@ -15,6 +15,7 @@ import { MATCH_COLOR_FORMAT, MATCH_URL_EXTENSION_FORMAT } from 'utils/validation
 import CustomerForm from 'components/CustomerForm';
 import intToBool from 'utils/intToBool';
 
+import { useFormatter } from 'hooks/useFormatter';
 import { useUser } from '../../providers/UserProvider';
 import getCustomersOfUser from '../../queries/getCustomersOfUser';
 
@@ -49,12 +50,14 @@ const AddCustomerView = () => {
   const history = useHistory();
   const toast = useToast();
   const { user, refreshUser } = useUser();
+  const { booleanToRadio } = useFormatter();
 
   const form = useForm<FormDataProps>({
     mode: 'onChange',
     resolver: yupResolver(schema),
     defaultValues: {
       logoOpacity: 0.3,
+      seed: booleanToRadio(true),
     },
   });
 
