@@ -1849,6 +1849,7 @@ export interface NexusGenFieldTypes {
     device: string | null; // String
     dialogueId: string; // String!
     id: string; // ID!
+    mainScore: number; // Float!
     nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!
     originUrl: string | null; // String
     paths: number; // Int!

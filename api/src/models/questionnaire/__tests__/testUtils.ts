@@ -1,34 +1,64 @@
-import { NodeType, PrismaClient } from '@prisma/client';
+import { Dialogue, Edge, NodeType, PrismaClient, QuestionCondition, QuestionNode } from '@prisma/client';
 import { sample } from 'lodash';
 
+interface SeedSessionInput {
+  prisma: PrismaClient;
+  dialogueId: string;
+  sliderQuestionId?: string;
+  sliderValue?: number;
+  choiceQuestionId?: string;
+  choiceValue?: string;
+  createdAt?: string;
+  edgeId?: string;
+  subChoiceQuestionId?: string;
+  subChoiceValue?: string;
+  subEdgeId?: string;
+}
+
 export const seedSession = async (
-  prisma: PrismaClient,
-  dialogueId: string,
-  sliderQuestionId?: string,
-  sliderValue?: number,
-  choiceQuestionId?: string,
-  choiceValue?: string,
-  createdAt?: string,
+  input: SeedSessionInput,
 ) => {
-  const session = prisma.session.create({
+  const {
+    dialogueId,
+    createdAt,
+    prisma,
+    choiceQuestionId,
+    choiceValue,
+    edgeId,
+    sliderQuestionId,
+    sliderValue,
+    subChoiceQuestionId,
+    subChoiceValue,
+    subEdgeId,
+  } = input;
+  const mainScore = sliderValue || Math.floor(Math.random() * 100);
+  const session = await prisma.session.create({
     data: {
+      mainScore,
       createdAt: createdAt,
       browser: sample(['Firefox', 'IEEdge', 'Chrome', 'Safari']),
       dialogueId,
       device: sample(['iPhone', 'Android', 'Mac', 'Windows ']),
       nodeEntries: {
         create: [{
+          creationDate: createdAt,
           depth: 0,
           relatedNode: {
             create: !sliderQuestionId ? { title: 'Test', type: NodeType.SLIDER } : undefined,
             connect: sliderQuestionId ? { id: sliderQuestionId } : undefined,
           },
           sliderNodeEntry: {
-            create: { value: sliderValue || Math.floor(Math.random() * 100) },
+            create: { value: mainScore },
           },
         },
         {
+          creationDate: createdAt,
           depth: 1,
+          relatedEdge: {
+            connect: {
+              id: edgeId,
+            },
+          },
           choiceNodeEntry: {
             create: {
               value: choiceValue || sample(['Customer support', 'Facilities', 'Website', 'Application']),
@@ -39,6 +69,25 @@ export const seedSession = async (
             connect: choiceQuestionId ? { id: choiceQuestionId } : undefined,
           },
         },
+        subChoiceQuestionId && subChoiceValue && subEdgeId ? {
+          creationDate: createdAt,
+          depth: 2,
+          relatedEdge: {
+            connect: {
+              id: subEdgeId,
+            },
+          },
+          relatedNode: {
+            connect: {
+              id: subChoiceQuestionId,
+            },
+          },
+          choiceNodeEntry: {
+            create: {
+              value: subChoiceValue,
+            },
+          },
+        } : undefined,
         ],
       },
     },
@@ -59,20 +108,113 @@ export const prepDefaultCreateData = async (prisma: PrismaClient) => {
           slug: 'dialogueSlug',
           title: 'test',
           questions: {
-            createMany: {
-              data: [
-                {
+            connectOrCreate: [
+              {
+                where: {
+                  id: 'SLIDER_QUESTION_ID',
+                },
+                create: {
                   id: 'SLIDER_QUESTION_ID',
                   title: 'Slider question',
                   type: 'SLIDER',
+                  children: {
+                    create: [
+                      {
+                        dialogue: {
+                          connect: {
+                            id: 'TEST_DIALOGUE',
+                          },
+                        },
+                        parentNode: {
+                          connect: {
+                            id: 'SLIDER_QUESTION_ID',
+                          },
+                        },
+                        conditions: {
+                          create: {
+                            conditionType: 'valueBoundary',
+                            renderMax: 50,
+                            renderMin: 0,
+                          },
+                        },
+                        childNode: {
+                          connectOrCreate: {
+                            create: {
+                              questionDialogue: {
+                                connect: {
+                                  id: 'TEST_DIALOGUE',
+                                },
+                              },
+                              id: 'CHOICE_QUESTION_ID',
+                              title: 'Choice question #1',
+                              type: 'CHOICE',
+                              options: {
+                                create: [
+                                  {
+                                    value: 'Facilities',
+                                  },
+                                  {
+                                    value: 'Website',
+                                  },
+                                  {
+                                    value: 'Services',
+                                  },
+                                ],
+                              },
+                            },
+                            where: {
+                              id: 'CHOICE_QUESTION_ID',
+                            },
+                          },
+                        },
+                      },
+                    ],
+                  },
                 },
-                {
-                  id: 'CHOICE_QUESTION_ID',
-                  title: 'Choice question',
+              },
+
+              {
+                create: {
+                  id: 'SUB_CHOICE_QUESTION_ONE_ID',
+                  title: 'Sub choice question #1',
                   type: 'CHOICE',
+                  options: {
+                    create: [
+                      {
+                        value: 'Cleanliness',
+                      },
+                      {
+                        value: 'Atmosphere',
+                      },
+                    ],
+                  },
                 },
-              ],
-            },
+                where: {
+                  id: 'SUB_CHOICE_QUESTION_ONE_ID',
+                },
+              },
+
+              {
+                create: {
+                  id: 'SUB_CHOICE_QUESTION_TWO_ID',
+                  title: 'Sub choice quesiton #2',
+                  type: 'CHOICE',
+                  options: {
+                    create: [
+                      {
+                        value: 'Speed',
+                      },
+                      {
+                        value: 'Responsive',
+                      },
+                    ],
+                  },
+                },
+                where: {
+                  id: 'SUB_CHOICE_QUESTION_TWO_ID',
+                },
+              },
+            ],
           },
         },
       },
@@ -80,11 +222,86 @@ export const prepDefaultCreateData = async (prisma: PrismaClient) => {
     include: {
       dialogues: {
         include: {
-          questions: true,
+          edges: {
+            include: {
+              conditions: true,
+            },
+          },
+          questions: {
+            include: {
+              children: {
+                include: {
+                  parentNode: true,
+                  childNode: true,
+                  conditions: true,
+                },
+              },
+            },
+          },
         },
       },
     },
   });
+
+  await prisma.questionNode.update({
+    where: {
+      id: 'CHOICE_QUESTION_ID',
+    },
+    data: {
+      children: {
+        create: [
+          {
+            dialogue: {
+              connect: {
+                id: 'TEST_DIALOGUE',
+              },
+            },
+            parentNode: {
+              connect: {
+                id: 'CHOICE_QUESTION_ID',
+              },
+            },
+            childNode: {
+              connect: {
+                id: 'SUB_CHOICE_QUESTION_ONE_ID',
+              },
+            },
+            conditions: {
+              create: {
+                conditionType: 'match',
+                matchValue: 'Facilities',
+              },
+            },
+          },
+
+          {
+            dialogue: {
+              connect: {
+                id: 'TEST_DIALOGUE',
+              },
+            },
+            parentNode: {
+              connect: {
+                id: 'CHOICE_QUESTION_ID',
+              },
+            },
+            childNode: {
+              connect: {
+                id: 'SUB_CHOICE_QUESTION_TWO_ID',
+              },
+            },
+            conditions: {
+              create: {
+                conditionType: 'match',
+                matchValue: 'Website',
+              },
+            },
+          },
+
+        ],
+      },
+    },
+  })
 
   const user = await prisma.user.create({
     data: {
@@ -109,13 +326,48 @@ export const prepDefaultCreateData = async (prisma: PrismaClient) => {
     },
   });
 
+  const dialogue = await prisma.dialogue.findUnique({
+    where: {
+      id: 'TEST_DIALOGUE',
+    },
+    include: {
+      edges: {
+        include: {
+          conditions: true,
+        },
+      },
+      questions: {
+        include: {
+          children: {
+            include: {
+              parentNode: true,
+              childNode: true,
+              conditions: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
   return {
     user,
     userRole,
     workspace,
-    dialogue: workspace?.dialogues[0],
-    sliderQuestion: workspace?.dialogues[0]?.questions[0],
-    choiceQuestion: workspace?.dialogues[0]?.questions[1],
+    dialogue: dialogue as (Dialogue & {
+      edges: (Edge & {
+        conditions: QuestionCondition[];
+      })[];
+      questions: (QuestionNode & {
+        children: (Edge & {
+          conditions: QuestionCondition[];
+          childNode: QuestionNode;
+          parentNode: QuestionNode;
+        })[];
+      })[];
+    }),
+    sliderQuestion: workspace?.dialogues[0]?.questions.find((question) => question.id === 'SLIDER_QUESTION_ID') as QuestionNode,
+    choiceQuestion: workspace?.dialogues[0]?.questions.find((question) => question.id === 'CHOICE_QUESTION_ID') as QuestionNode,
   }
 };
 
@@ -140,6 +392,7 @@ export const clearDialogueDatabase = async (prisma: PrismaClient) => {
     prisma.questionOption.deleteMany({}),
     prisma.userOfCustomer.deleteMany({}),
     prisma.user.deleteMany({}),
+    prisma.questionStatisticsSummaryCache.deleteMany({}),
     prisma.questionNode.deleteMany({}),
     prisma.tag.deleteMany({}),
     prisma.dialogue.deleteMany({}),

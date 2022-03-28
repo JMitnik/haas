@@ -62,6 +62,12 @@ class NodeEntryPrismaAdapter {
                           },
                         },
                       },
+                      where: {
+                        creationDate: {
+                          gte: startDateTime,
+                          lte: endDateTime,
+                        },
+                      },
                     },
                   },
                 },
@@ -71,6 +77,7 @@ class NodeEntryPrismaAdapter {
         },
       },
     });
+
     return targetNodeEntries;
   }
 
@@ -136,6 +143,12 @@ class NodeEntryPrismaAdapter {
                           select: {
                             mainScore: true,
                           },
+                        },
+                      },
+                      where: {
+                        creationDate: {
+                          gte: startDateTime,
+                          lte: endDateTime,
                         },
                       },
                     },

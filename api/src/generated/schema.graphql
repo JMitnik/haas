@@ -1466,6 +1466,7 @@ type Session {
   device: String
   dialogueId: String!
   id: ID!
+  mainScore: Float!
   nodeEntries: [NodeEntry!]!
   originUrl: String
   paths: Int!
