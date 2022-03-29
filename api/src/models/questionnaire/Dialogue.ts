@@ -69,6 +69,21 @@ export const TopicType = objectType({
   },
 });
 
+export const PathedSessionsType = objectType({
+  name: 'PathedSessionsType',
+  definition(t) {
+    t.string('id');
+    t.string('updatedAt');
+    t.string('startDateTime');
+    t.string('endDateTime');
+
+    t.list.string('path');
+    t.list.field('pathedSessions', {
+      type: SessionType,
+    });
+  },
+})
+
 export const TopicInputType = inputObjectType({
   name: 'TopicInputType',
   definition(t) {
@@ -89,6 +104,7 @@ export const PathedSessionsInput = inputObjectType({
     t.list.string('path', { required: true });
     t.string('startDateTime', { required: true });
     t.string('endDateTime');
+    t.boolean('refresh', { default: false });
   },
 });
 
@@ -128,8 +144,7 @@ export const DialogueType = objectType({
     });
 
     t.field('pathedSessions', {
-      type: SessionType,
-      list: true,
+      type: PathedSessionsType,
       nullable: true,
       args: {
         input: PathedSessionsInput,
@@ -152,12 +167,15 @@ export const DialogueType = objectType({
         const dialogueId = parent.id;
         const path = args.input.path || [];
 
-        return ctx.services.sessionService.findPathMatchedSessions(
+        const pathedSessions = await ctx.services.sessionService.findPathMatchedSessions(
           dialogueId,
           path,
           utcStartDateTime as Date,
           utcEndDateTime,
+          args.input.refresh || false,
         );
+
+        return (pathedSessions || null) as any;
       },
     });
 

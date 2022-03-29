@@ -17,7 +17,7 @@ import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 import AutomationService from '../automations/AutomationService';
-import { addDays } from 'date-fns';
+import { addDays, differenceInHours } from 'date-fns';
 
 class SessionService {
   sessionPrismaAdapter: SessionPrismaAdapter;
@@ -38,8 +38,33 @@ class SessionService {
    * @param endDateTime 
    * @returns 
    */
-  findPathMatchedSessions = async (dialogueId: string, path: string[], startDateTime: Date, endDateTime?: Date) => {
+  findPathMatchedSessions = async (
+    dialogueId: string,
+    path: string[],
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const prevStatistics = await this.sessionPrismaAdapter.findPathedSessionsCache(
+      dialogueId,
+      startDateTime,
+      endDateTimeSet,
+      path,
+    );
+
+    // Only if more than hour difference between last cache entry and now should we update cache
+    if (prevStatistics) {
+      if (differenceInHours(Date.now(), prevStatistics.updatedAt) == 0 && !refresh) {
+        return {
+          ...prevStatistics,
+          startDateTime: prevStatistics.startDateTime as Date,
+          endDateTime: prevStatistics.endDateTime as Date,
+          pathedSessions: prevStatistics.pathedSessions || [],
+        };
+      }
+    }
 
     const pathEntries = path.length ? path.map((entry) => ({
       nodeEntries: {
@@ -51,7 +76,29 @@ class SessionService {
       },
     })) : [];
 
-    return this.sessionPrismaAdapter.findPathMatchedSessions(pathEntries, startDateTime, endDateTimeSet, dialogueId);
+    const pathedSessions = await this.sessionPrismaAdapter.findPathMatchedSessions(
+      pathEntries,
+      startDateTime,
+      endDateTimeSet,
+      dialogueId
+    );
+
+    // Create a pathed session cache object
+    const upsertedPathedSession = await this.sessionPrismaAdapter.upsertPathedSessionCache(
+      prevStatistics?.id || '-1',
+      dialogueId,
+      startDateTime,
+      endDateTimeSet,
+      path,
+      pathedSessions,
+    );
+
+    return {
+      ...upsertedPathedSession,
+      startDateTime: upsertedPathedSession.startDateTime as Date,
+      endDateTime: upsertedPathedSession.endDateTime as Date,
+      pathedSessions: upsertedPathedSession.pathedSessions || [],
+    };;
   }
 
   /**
