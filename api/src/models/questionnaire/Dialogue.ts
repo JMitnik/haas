@@ -144,7 +144,7 @@ export const DialogueType = objectType({
       },
     });
 
-    t.field('pathedSessions', {
+    t.field('pathedSessionsConnection', {
       type: PathedSessionsType,
       nullable: true,
       args: {
@@ -185,6 +185,7 @@ export const DialogueType = objectType({
       args: {
         input: TopicInputType,
       },
+      useQueryCounter: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;

@@ -1516,7 +1516,7 @@ export interface NexusGenFieldTypes {
     isWithoutGenData: boolean; // Boolean!
     language: NexusGenEnums['LanguageEnumType']; // LanguageEnumType!
     leafs: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
-    pathedSessions: NexusGenRootTypes['PathedSessionsType'] | null; // PathedSessionsType
+    pathedSessionsConnection: NexusGenRootTypes['PathedSessionsType'] | null; // PathedSessionsType
     postLeafNode: NexusGenRootTypes['DialogueFinisherObjectType'] | null; // DialogueFinisherObjectType
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
@@ -2049,7 +2049,7 @@ export interface NexusGenArgTypes {
     leafs: { // args
       searchTerm?: string | null; // String
     }
-    pathedSessions: { // args
+    pathedSessionsConnection: { // args
       input?: NexusGenInputs['PathedSessionsInput'] | null; // PathedSessionsInput
     }
     sessionConnection: { // args
