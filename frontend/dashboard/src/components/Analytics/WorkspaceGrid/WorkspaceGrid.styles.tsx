@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 export const WorkspaceGridContainer = styled(UI.Div)`
   ${({ theme }) => css`
     border-bottom: 1px solid ${theme.colors.gray[200]};
+    position: relative;
     svg polygon:hover {
       stroke: red;
       cursor: pointer;

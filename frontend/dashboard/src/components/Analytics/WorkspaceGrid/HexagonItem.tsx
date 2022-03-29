@@ -1,5 +1,4 @@
 import { ProvidedZoom } from '@visx/zoom/lib/types';
-import { localPoint } from '@visx/event';
 import React, { useState } from 'react';
 
 import { HexagonNode } from './WorkspaceGrid.types';
@@ -7,9 +6,6 @@ import { HexagonNode } from './WorkspaceGrid.types';
 interface HexagonItemProps {
   node: HexagonNode;
   zoomHelper: ProvidedZoom<SVGElement>;
-  containerWidth: number;
-  containerHeight: number;
-  containerBackgroundFill: string;
   points: string;
   score: number;
   onZoom: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
@@ -26,31 +22,14 @@ const getHexagonFill = (score?: number) => {
 export const HexagonItem = ({
   node,
   zoomHelper,
-  containerWidth,
-  containerHeight,
   points,
   score,
   onZoom,
   onMouseOver,
   onMouseExit,
-  containerBackgroundFill,
 }: HexagonItemProps) => {
   const initialFill = getHexagonFill(score);
-  const [fill, setFill] = useState(initialFill);
-
-  const handleZoom = (event: React.MouseEvent<SVGPolygonElement, MouseEvent>) => {
-    const localPointFound = localPoint(event) || { x: 0, y: 0 };
-    const scaleX = containerWidth / 40;
-    const scaleY = containerHeight / 40;
-    zoomHelper.scale({ scaleX, scaleY, point: localPointFound });
-
-    setTimeout(() => {
-      setFill(containerBackgroundFill);
-      setTimeout(() => {
-        onZoom(zoomHelper, node);
-      }, 250);
-    }, 500);
-  };
+  const [fill] = useState(initialFill);
 
   return (
     <g>
@@ -62,7 +41,7 @@ export const HexagonItem = ({
             onMouseOver?.(event, node);
           }}
           onMouseOut={() => onMouseExit?.()}
-          onClick={(e) => handleZoom(e)}
+          onClick={() => onZoom(zoomHelper, node)}
         />
       </g>
     </g>

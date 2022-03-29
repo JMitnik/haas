@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import {
   DialogueImpactScoreType,
@@ -95,6 +95,27 @@ export const WorkspaceGridAdapter = ({
   };
 
   const initialViewMode = HexagonViewMode.Dialogue;
+
+  const initialData = useMemo(() => {
+    const detectGroups = dialogues.map((dialogue) => {
+      if (dialogue.type !== HexagonNodeType.Dialogue) return { ...dialogue, group: undefined };
+
+      const groups = dialogue.dialogue.title.split('-');
+
+      if (groups.length === 1) return { ...dialogue, group: undefined };
+
+      const groupName = groups[0].trim();
+
+      return {
+        ...dialogue,
+        group: groupName,
+      };
+    });
+
+    console.log(detectGroups);
+
+    return detectGroups;
+  }, [dialogues]);
 
   // Add spinner
   if (!dialogues.length) return null;

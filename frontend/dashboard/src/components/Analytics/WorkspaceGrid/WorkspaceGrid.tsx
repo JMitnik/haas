@@ -3,6 +3,7 @@ import { ArrowLeft } from 'react-feather';
 import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
 import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { Group } from '@visx/group';
 import { ParentSizeModern } from '@visx/responsive';
 import { PatternCircles } from '@visx/pattern';
@@ -10,10 +11,10 @@ import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { Zoom } from '@visx/zoom';
 import { localPoint } from '@visx/event';
-import { motion } from 'framer-motion';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import * as LS from './WorkspaceGrid.styles';
+
 import {
   HexagonDialogueNode,
   HexagonNode,
@@ -37,20 +38,10 @@ export interface WorkspaceGridProps {
   width: number;
   height: number;
   backgroundColor: string;
+  isLoading?: boolean;
   initialViewMode?: HexagonViewMode;
   onLoadData?: (options: DataLoadOptions) => Promise<[HexagonNode[], HexagonViewMode]>;
 }
-
-const calcHexagonWidth = (nrItems: number) => {
-  if (nrItems < 100) {
-    return 30;
-  } if (nrItems >= 100 && nrItems < 500) {
-    return 15;
-  } if (nrItems >= 500 && nrItems < 1000) {
-    return 5;
-  }
-  return 0;
-};
 
 const createGrid = (nrItems: number, windowHeight: number, windowWidth: number) => {
   const gridItems: any[] = [];
@@ -83,6 +74,7 @@ export const WorkspaceGrid = ({
   const zoomHelper = React.useRef<ProvidedZoom<SVGElement> | null>(null);
   const initialRef = React.useRef<HTMLDivElement>();
   const [stateHistory, setStateHistory] = React.useState<HexagonState[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentState, setCurrentState] = React.useState<HexagonState>({
     currentNode: undefined,
     childNodes: initialData,
@@ -124,9 +116,10 @@ export const WorkspaceGrid = ({
     if (
       currentState.viewMode === HexagonViewMode.Final
       || currentState.viewMode === HexagonViewMode.Session) return;
+    hideTooltip();
 
     // Empty canvas and unset soom
-    currentZoomHelper.reset();
+    // currentZoomHelper.reset();
     const newStateHistory = [{
       currentNode: currentState.currentNode,
       childNodes: currentState.childNodes,
@@ -141,15 +134,20 @@ export const WorkspaceGrid = ({
 
     const dialogueId = clickedNode.type === HexagonNodeType.Dialogue ? clickedNode.id : activeDialogue?.id;
     if (!dialogueId || !onLoadData) return;
+    setIsLoading(true);
 
     const [newNodes, hexagonViewMode] = await onLoadData({
       dialogueId,
       topic: clickedNode.type === HexagonNodeType.QuestionNode ? clickedNode.topic : '',
       topics,
-    });
+    }).finally(() => setIsLoading(false));
 
     setCurrentState({ currentNode: clickedNode, childNodes: newNodes, viewMode: hexagonViewMode });
   };
+
+  useEffect(() => {
+    hideTooltip();
+  }, [currentState.currentNode?.id, hideTooltip]);
 
   const popQueue = () => {
     if (!stateHistory.length) return;
@@ -175,9 +173,10 @@ export const WorkspaceGrid = ({
   const handleZoomOut = () => {
     if (!zoomHelper.current) return;
     if (isAtMinZoomLevel) return;
+    hideTooltip();
 
     // Empty canvas and unset soom
-    zoomHelper.current.reset();
+    // zoomHelper.current.reset();
     popQueue();
   };
 
@@ -188,6 +187,7 @@ export const WorkspaceGrid = ({
 
   return (
     <LS.WorkspaceGridContainer>
+      <AnimatePresence />
       <UI.Grid gridTemplateColumns="2fr 1fr" gridGap="0">
         <UI.Div ref={initialRef} height="70vh" position="relative">
           <LS.GridControls>
@@ -210,6 +210,24 @@ export const WorkspaceGrid = ({
                   zoomHelper.current = zoom;
                   return (
                     <UI.Div>
+                      {isLoading && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        exit={{ opacity: 0 }}
+                        style={{
+                          position: 'absolute',
+                          top: '0',
+                          left: '0',
+                          right: '0',
+                          bottom: '0',
+                          background: 'rgba(0, 0, 0, 0.12)',
+                        }}
+                      >
+                        loading
+                      </motion.div>
+                      )}
                       <svg
                         width={width}
                         height={height}
@@ -246,21 +264,28 @@ export const WorkspaceGrid = ({
                           animate={{ transform: zoom.toString(), opacity: 1 }}
                         >
                           <Group top={100} left={100}>
-                            {hexagonNodes.map((node) => (
-                              <HexagonItem
-                                key={node.id}
-                                node={node}
-                                points={node.points}
-                                onMouseOver={handleMouseOverHex}
-                                onMouseExit={handleMouseOutHex}
-                                score={node.score}
-                                containerWidth={width}
-                                containerHeight={height}
-                                zoomHelper={zoom}
-                                onZoom={handleZoominLevel}
-                                containerBackgroundFill={backgroundColor}
-                              />
-                            ))}
+                            <AnimatePresence>
+                              <motion.g
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                initial={{ opacity: 0 }}
+                                key={currentState.currentNode?.id}
+                              >
+                                {hexagonNodes.map((node) => (
+                                  <HexagonItem
+                                    key={node.id}
+                                    node={node}
+                                    points={node.points}
+                                    onMouseOver={handleMouseOverHex}
+                                    onMouseExit={handleMouseOutHex}
+                                    score={node.score}
+                                    zoomHelper={zoom}
+                                    onZoom={handleZoominLevel}
+                                  />
+                                ))}
+                              </motion.g>
+                            </AnimatePresence>
+
                           </Group>
                         </motion.g>
                       </svg>
