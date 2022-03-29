@@ -562,6 +562,7 @@ export interface NexusGenInputs {
     endDateTime?: string | null; // String
     impactScoreType: NexusGenEnums['DialogueImpactScoreType']; // DialogueImpactScoreType!
     isRoot?: boolean | null; // Boolean
+    refresh?: boolean | null; // Boolean
     startDateTime: string; // String!
     value: string; // String!
   }

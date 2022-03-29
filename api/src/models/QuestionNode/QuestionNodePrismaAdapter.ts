@@ -18,6 +18,9 @@ class QuestionNodePrismaAdapter {
         questionDialogueId: dialogueId,
         type: 'SLIDER',
       },
+      include: {
+        options: true,
+      },
     });
   }
 

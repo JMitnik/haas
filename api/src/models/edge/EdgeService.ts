@@ -13,6 +13,17 @@ class EdgeService {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
   }
 
+  findEdgesByParentQuestionId = async (parentNodeId: string) => {
+    return this.edgePrismaAdapter.prisma.edge.findMany({
+      where: {
+        parentNodeId,
+      },
+      include: {
+        conditions: true,
+      },
+    });
+  };
+
   findEdgeByConditionValue = async (dialogueId: string, edgeConditionValue: string) => {
     const edge = await this.edgePrismaAdapter.prisma.edge.findFirst({
       where: {

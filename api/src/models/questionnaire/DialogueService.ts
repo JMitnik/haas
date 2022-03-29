@@ -1,9 +1,9 @@
-import { addDays, subDays } from 'date-fns';
+import { addDays, differenceInHours, subDays } from 'date-fns';
 import _, { groupBy, meanBy, sample, uniq, uniqBy } from 'lodash';
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
-import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, QuestionOption, DialogueImpactScore } from '@prisma/client';
+import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, QuestionOption, DialogueImpactScore, DialogueTopicCache, QuestionNode } from '@prisma/client';
 
 import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
@@ -124,8 +124,15 @@ class DialogueService {
     targetNodeEntries: TopicNodeEntry[],
     dialogueId: string,
     impactScoreType: DialogueImpactScore,
-    topic?: string
+    topic?: string,
+    rootQuestion?: (QuestionNode & {
+      options: QuestionOption[];
+    }),
   ) => {
+    if (!topic && rootQuestion && targetNodeEntries.length === 0) {
+      return rootQuestion.options.map((option) => ({ nrVotes: 0, impactScore: 0, name: option.value }));
+    }
+
     // If no nodeEntries are found we need to find the sub topics through edge condition string comparison
     if (topic && targetNodeEntries.length === 0) {
       return this.edgeService.findChildOptionsByEdgeCondition(dialogueId, topic);
@@ -151,6 +158,24 @@ class DialogueService {
   }
 
   /**
+   * Merges new scores with existing sub topics
+   * @param scores 
+   * @param subTopics 
+   * @returns updated sub topic 
+   */
+  mergeScoresWithTopicIds = (
+    scores: {
+      nrVotes: number;
+      impactScore: number;
+      name: string;
+    }[],
+    subTopics: DialogueTopicCache[]
+  ) => {
+    const merged = _.merge(_.keyBy(subTopics, 'name'), _.keyBy(scores, 'name'));
+    return _.values(merged);
+  }
+
+  /**
    * Finds all unique sub topics of the root question and calculate their impact scores
    * @param dialogueId 
    * @param startDateTime 
@@ -161,14 +186,32 @@ class DialogueService {
     dialogueId: string,
     impactScoreType: DialogueImpactScore,
     startDateTime: Date,
-    endDateTime?: Date
+    endDateTime?: Date,
+    refresh: boolean = false,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
 
     // TODO: At the moment only slider node but maybe in future different type of node as root
     const rootNode = await this.nodeService.findSliderNode(dialogueId);
 
-    if (!rootNode?.id) return [];
+    if (!rootNode?.id) return { name: '', nrVotes: 0, impactScore: 0, subTopics: [] };
+
+    const prevStatistics = await this.dialoguePrismaAdapter.findDialogueTopicStatistics(
+      startDateTime,
+      endDateTimeSet,
+      '',
+      dialogueId,
+      impactScoreType,
+    );
+
+    // Only if more than hour difference between last cache entry and now should we update cache
+    if (prevStatistics) {
+      if (differenceInHours(Date.now(), prevStatistics.updatedAt) == 0
+        && !refresh
+        && prevStatistics.subTopics.length > 0) {
+        return prevStatistics;
+      }
+    }
 
     const targetNodeEntries = await this.nodeEntryPrismaAdapter.findNodeEntriesByQuestionId(
       rootNode.id,
@@ -183,9 +226,25 @@ class DialogueService {
     );
     const topicName = '';
 
-    const subTopicScores = await this.findSubTopicsOfNodeEntries(targetNodeEntries, dialogueId, impactScoreType);
+    const subTopicScores = await this.findSubTopicsOfNodeEntries(
+      targetNodeEntries, dialogueId, impactScoreType, undefined, rootNode
+    );
 
-    return { name: topicName, nrVotes: topicNrVotes, impactScore: topicImpactScore || 0, subTopics: subTopicScores };
+    const mergedSubTopics = this.mergeScoresWithTopicIds(subTopicScores, prevStatistics?.subTopics || []);
+
+    const topic = await this.dialoguePrismaAdapter.upsertDialogueTopicStatistics({
+      dialogueId,
+      endDateTime: endDateTimeSet,
+      startDateTime,
+      impactScore: topicImpactScore || 0,
+      impactScoreType,
+      name: topicName,
+      nrVotes: topicNrVotes,
+      id: prevStatistics?.id,
+      subTopics: mergedSubTopics,
+    })
+
+    return { ...topic, subTopics: topic.subTopics };
   };
 
   /**
@@ -201,9 +260,30 @@ class DialogueService {
     impactScoreType: DialogueImpactScore,
     topic: string,
     startDateTime: Date,
-    endDateTime?: Date
+    endDateTime?: Date,
+    refresh: boolean = false,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
+
+    const prevStatistics = await this.dialoguePrismaAdapter.findDialogueTopicStatistics(
+      startDateTime,
+      endDateTimeSet,
+      topic,
+      dialogueId,
+      impactScoreType,
+    );
+
+
+    // Only if more than hour difference between last cache entry and now should we update cache 
+    // AND if there is already subtopics found 
+    // AND if refresh is set to false
+    if (prevStatistics) {
+      if (differenceInHours(Date.now(), prevStatistics.updatedAt) == 0
+        && prevStatistics.subTopics.length > 0
+        && !refresh) {
+        return prevStatistics;
+      }
+    }
 
     const targetNodeEntries = await this.nodeEntryPrismaAdapter.findNodeEntriesByTopic(
       dialogueId,
@@ -220,8 +300,21 @@ class DialogueService {
     const topicName = topic;
 
     const subTopicScores = await this.findSubTopicsOfNodeEntries(targetNodeEntries, dialogueId, impactScoreType, topic);
+    const mergedSubTopics = this.mergeScoresWithTopicIds(subTopicScores, prevStatistics?.subTopics || []);
 
-    return { name: topicName, nrVotes: topicNrVotes, impactScore: topicImpactScore || 0, subTopics: subTopicScores };;
+    const topicCache = await this.dialoguePrismaAdapter.upsertDialogueTopicStatistics({
+      dialogueId,
+      endDateTime: endDateTimeSet,
+      startDateTime,
+      impactScore: topicImpactScore || 0,
+      impactScoreType,
+      name: topicName,
+      nrVotes: topicNrVotes,
+      id: prevStatistics?.id,
+      subTopics: mergedSubTopics,
+    })
+
+    return { ...topicCache, subTopics: topicCache.subTopics };
   };
 
   updateTags(dialogueId: string, entries?: string[] | null | undefined): Promise<Dialogue> {

@@ -1655,6 +1655,7 @@ input TopicInputType {
   endDateTime: String
   impactScoreType: DialogueImpactScoreType!
   isRoot: Boolean = false
+  refresh: Boolean
   startDateTime: String!
   value: String!
 }

@@ -3,9 +3,10 @@ import {
   PrismaClient,
   Dialogue,
   Edge,
+  DialogueImpactScore,
 } from '@prisma/client';
 
-import { CreateQuestionsInput, CreateDialogueInput, UpsertDialogueStatisticsInput } from './DialoguePrismaAdapterType';
+import { CreateQuestionsInput, CreateDialogueInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';
 
 class DialoguePrismaAdapter {
   prisma: PrismaClient;
@@ -13,6 +14,118 @@ class DialoguePrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  /**
+   * Upserts a dialogue topic and its sub topics
+   * @param input 
+   * @returns Dialogue Topic Statistics
+   */
+  upsertDialogueTopicStatistics = async (
+    input: UpsertDialogueTopicCacheInput,
+  ) => {
+    const {
+      dialogueId,
+      endDateTime,
+      name,
+      impactScore,
+      impactScoreType,
+      nrVotes,
+      startDateTime,
+      subTopics,
+      id,
+    } = input;
+    return this.prisma.dialogueTopicCache.upsert({
+      where: {
+        id: id || '-1',
+      },
+      create: {
+        impactScore,
+        impactScoreType: impactScoreType as DialogueImpactScore,
+        name,
+        nrVotes,
+        dialogueId,
+        endDateTime,
+        startDateTime,
+        subTopics: {
+          connectOrCreate: subTopics?.map((subTopic) => ({
+            where: {
+              id: subTopic.id || '-1',
+            },
+            create: {
+              dialogueId,
+              endDateTime,
+              startDateTime,
+              impactScoreType: impactScoreType as DialogueImpactScore,
+              impactScore: subTopic.impactScore,
+              name: subTopic.name,
+              nrVotes: subTopic.nrVotes,
+            },
+          })),
+        },
+      },
+      update: {
+        impactScore,
+        impactScoreType: impactScoreType as DialogueImpactScore,
+        name,
+        nrVotes,
+        dialogueId,
+        endDateTime,
+        startDateTime,
+        subTopics: {
+          upsert: subTopics?.map((subTopic) => ({
+            where: {
+              id: subTopic.id || '-1',
+            },
+            create: {
+              dialogueId: dialogueId,
+              endDateTime,
+              startDateTime,
+              impactScoreType: impactScoreType as DialogueImpactScore,
+              impactScore: subTopic.impactScore,
+              name: subTopic.name,
+              nrVotes: subTopic.nrVotes,
+            },
+            update: {
+              impactScore: subTopic.impactScore,
+              name: subTopic.name,
+              nrVotes: subTopic.nrVotes,
+            },
+          })),
+        },
+      },
+      include: {
+        subTopics: true,
+      },
+    });
+  };
+
+  findDialogueTopicStatistics = async (
+    startDateTime: Date,
+    endDateTime: Date,
+    name: string,
+    dialogueId: string,
+    impactScoreType: DialogueImpactScore,
+  ) => {
+    return this.prisma.dialogueTopicCache.findFirst({
+      where: {
+        name,
+        dialogueId,
+        startDateTime: {
+          equals: startDateTime,
+        },
+        endDateTime: {
+          equals: endDateTime,
+        },
+        impactScoreType: impactScoreType,
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      include: {
+        subTopics: true,
+      },
+    });
+  }
 
   /**
    * Upserts a dialogue statistics summary

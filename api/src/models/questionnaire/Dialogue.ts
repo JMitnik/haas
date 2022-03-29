@@ -95,6 +95,7 @@ export const TopicInputType = inputObjectType({
     });
     t.string('startDateTime', { required: true });
     t.string('endDateTime');
+    t.boolean('refresh', { required: false });
   },
 });
 
@@ -207,7 +208,8 @@ export const DialogueType = objectType({
             dialogueId,
             args.input.impactScoreType,
             utcStartDateTime as Date,
-            utcEndDateTime
+            utcEndDateTime,
+            args.input.refresh || false
           );
         }
 
@@ -216,7 +218,8 @@ export const DialogueType = objectType({
           args.input.impactScoreType,
           args.input.value,
           utcStartDateTime as Date,
-          utcEndDateTime
+          utcEndDateTime,
+          args.input.refresh || false,
         ) as any;
       },
     });
