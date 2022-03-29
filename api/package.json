@@ -27,6 +27,7 @@
     "gen:prisma": "prisma generate",
     "seed": "ts-node --transpile-only src/data/main-seed.ts",
     "seed:basic": "ts-node src/scripts/seed.ts",
+    "usp:mapSessionScores": "ts-node src/scripts/mapSliderScoreToSession.ts",
     "types": "tsc --noEmit",
     "prisma": "prisma"
   },

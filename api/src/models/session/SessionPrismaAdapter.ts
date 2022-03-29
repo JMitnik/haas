@@ -13,6 +13,88 @@ class SessionPrismaAdapter {
   };
 
   /**
+   * Upserts a pathed sessions cache
+   * @param cacheId 
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param path 
+   * @param pathedSessions 
+   * @returns 
+   */
+  upsertPathedSessionCache = async (
+    cacheId: string,
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+    path: string[],
+    pathedSessions: Session[],
+  ) => {
+    return this.prisma.pathedSessionsCache.upsert({
+      where: {
+        id: cacheId || '-1',
+      },
+      create: {
+        dialogueId,
+        startDateTime,
+        endDateTime,
+        path,
+        pathedSessions: {
+          connect: pathedSessions.map((session) => ({ id: session.id })),
+        },
+      },
+      update: {
+        dialogueId,
+        startDateTime,
+        endDateTime,
+        path,
+        pathedSessions: {
+          connect: pathedSessions.map((session) => ({ id: session.id })),
+        },
+      },
+      include: {
+        pathedSessions: true,
+      },
+    });
+  };
+
+  /**
+   * Finds a cache for a pathed sessions entry
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param path 
+   * @returns 
+   */
+  findPathedSessionsCache = async (
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+    path: string[],
+  ) => {
+    return this.prisma.pathedSessionsCache.findFirst({
+      where: {
+        dialogueId,
+        startDateTime: {
+          equals: startDateTime,
+        },
+        endDateTime: {
+          equals: endDateTime,
+        },
+        path: {
+          equals: path,
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      include: {
+        pathedSessions: true,
+      },
+    });
+  };
+
+  /**
    * Finds all sessions where all pathEntry answers exist in the session's node entries
    * @param pathEntries
    * @param startDateTime

@@ -10,6 +10,18 @@ generator client {
   previewFeatures = ["orderByRelation"]
 }
 
+model PathedSessionsCache {
+  id            String    @id @default(cuid())
+  updatedAt     DateTime  @updatedAt
+  startDateTime DateTime?
+  endDateTime   DateTime?
+
+  path       String[]
+  dialogueId String
+
+  pathedSessions Session[]
+}
+
 enum QuestionImpactScore {
   PERCENTAGE
 }
@@ -408,6 +420,8 @@ model Session {
   mainScore Float @default(0)
 
   browser String?
+
+  isInPathedSessionsCaches PathedSessionsCache[]
 }
 
 // Node-entry types
