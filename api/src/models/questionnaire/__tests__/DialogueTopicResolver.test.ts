@@ -101,6 +101,7 @@ describe('Dialogue Topic', () => {
       impactScore: 40,
     });
     const subTopics: { name: string; impactScore: number; nrVotes: number }[] = resWeekly?.subTopics;
+    console.log('SUB TOPICS: ', resWeekly?.subTopics);
     expect(resWeekly?.subTopics).toHaveLength(3);
 
     // Expect only 2 entries to be available cus one falls out of provided ate range

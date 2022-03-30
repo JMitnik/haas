@@ -84,7 +84,7 @@ class SessionService {
     );
 
     // Create a pathed session cache object
-    const upsertedPathedSession = await this.sessionPrismaAdapter.upsertPathedSessionCache(
+    void this.sessionPrismaAdapter.upsertPathedSessionCache(
       prevStatistics?.id || '-1',
       dialogueId,
       startDateTime,
@@ -94,10 +94,10 @@ class SessionService {
     );
 
     return {
-      ...upsertedPathedSession,
-      startDateTime: upsertedPathedSession.startDateTime as Date,
-      endDateTime: upsertedPathedSession.endDateTime as Date,
-      pathedSessions: upsertedPathedSession.pathedSessions || [],
+      ...prevStatistics,
+      startDateTime: startDateTime as Date,
+      endDateTime: endDateTimeSet as Date,
+      pathedSessions: pathedSessions || [],
     };;
   }
 

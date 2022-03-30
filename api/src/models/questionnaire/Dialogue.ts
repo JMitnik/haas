@@ -150,6 +150,8 @@ export const DialogueType = objectType({
       args: {
         input: PathedSessionsInput,
       },
+      useTimeResolve: true,
+      useQueryCounter: true,
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
         if (!args.input) throw new UserInputError('No input provided!');
