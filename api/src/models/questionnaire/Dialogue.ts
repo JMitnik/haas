@@ -72,8 +72,6 @@ export const TopicType = objectType({
 export const PathedSessionsType = objectType({
   name: 'PathedSessionsType',
   definition(t) {
-    t.string('id');
-    t.string('updatedAt');
     t.string('startDateTime');
     t.string('endDateTime');
 

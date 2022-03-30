@@ -90,12 +90,12 @@ class DialogueService {
       impactScore: number;
       nrVotes: number;
     }[],
-    rootOptions: { value: string }[],
+    options: string[],
   ) => {
-    const allPotentialSubTopics: string[] = rootOptions.map((option) => option.value);
+    // const allPotentialSubTopics: string[] = rootOptions.map((option) => option.value);
 
     // Add sub topics which don't have any node entries to complement list with rest of sub topics
-    allPotentialSubTopics.forEach((option) => {
+    options.forEach((option) => {
       const targetSubTopic = calculatedTopics.find((subTopic) => subTopic.name === option);
       if (!targetSubTopic) calculatedTopics.push({ nrVotes: 0, impactScore: 0, name: option });
     });
@@ -113,7 +113,7 @@ class DialogueService {
     dialogueId: string,
     impactScoreType: DialogueImpactScore,
     topic: string = '',
-    options?: { id: number; value: string }[],
+    options?: string[],
   ) => {
     // If no nodeEntries are found we need to find the sub topics through edge condition string comparison
     if (topicSessions.length === 0 && topic) {
@@ -123,7 +123,7 @@ class DialogueService {
     const parentOptions = options?.length
       ? options
       : await this.edgeService.findEdgeByConditionValue(dialogueId, topic)
-        .then((edge) => edge?.childNode.options);
+        .then((edge) => edge?.childNode.options.map((option) => option.value).filter(isPresent));
 
     const nodeEntries = topicSessions.flatMap((session) => session.nodeEntries.map(
       (nodeEntry) => ({ ...nodeEntry, mainScore: session.mainScore })));
@@ -240,8 +240,12 @@ class DialogueService {
     );
     const topicName = '';
 
+    const options = rootNode.children.flatMap(
+      (child) => child.childNode.options.map(
+        (option) => option.value)).filter(isPresent);
+
     const subTopicScores = await this.findSubTopicsOfNodeEntries(
-      sessions, dialogueId, impactScoreType, topicName, rootNode.options,
+      sessions, dialogueId, impactScoreType, topicName, options,
     );
 
     const mergedSubTopics = this.mergeScoresWithTopicIds(subTopicScores, prevStatistics?.subTopics || []);

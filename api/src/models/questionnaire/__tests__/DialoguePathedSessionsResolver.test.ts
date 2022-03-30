@@ -105,8 +105,6 @@ describe('Dialogue Pathed Sessions', () => {
             refresh: true,
             startDateTime: "01-03-2022"
           }) {
-            id
-            updatedAt
             startDateTime
             endDateTime
             path
@@ -142,8 +140,6 @@ describe('Dialogue Pathed Sessions', () => {
             refresh: true,
             startDateTime: "01-03-2022"
           }) {
-            id
-            updatedAt
             startDateTime
             endDateTime
             path
@@ -179,8 +175,6 @@ describe('Dialogue Pathed Sessions', () => {
             refresh: true,
             startDateTime: "01-03-2022"
           }) {
-            id
-            updatedAt
             startDateTime
             endDateTime
             path

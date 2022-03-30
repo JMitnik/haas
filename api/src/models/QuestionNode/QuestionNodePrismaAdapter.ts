@@ -20,13 +20,17 @@ class QuestionNodePrismaAdapter {
         isRoot: true,
       },
       select: {
-        id: true,
-        options: {
+        children: {
+          take: 1, // Assumption: Options of all children of slider are the same
           select: {
-            id: true,
-            value: true,
+            childNode: {
+              select: {
+                options: true,
+              },
+            },
           },
         },
+        id: true,
       },
     });
   }

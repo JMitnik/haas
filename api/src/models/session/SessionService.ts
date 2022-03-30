@@ -57,12 +57,7 @@ class SessionService {
     // Only if more than hour difference between last cache entry and now should we update cache
     if (prevStatistics) {
       if (differenceInHours(Date.now(), prevStatistics.updatedAt) == 0 && !refresh) {
-        return {
-          ...prevStatistics,
-          startDateTime: prevStatistics.startDateTime as Date,
-          endDateTime: prevStatistics.endDateTime as Date,
-          pathedSessions: prevStatistics.pathedSessions || [],
-        };
+        return prevStatistics;
       }
     }
 
@@ -94,7 +89,7 @@ class SessionService {
     );
 
     return {
-      ...prevStatistics,
+      path,
       startDateTime: startDateTime as Date,
       endDateTime: endDateTimeSet as Date,
       pathedSessions: pathedSessions || [],

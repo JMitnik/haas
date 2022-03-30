@@ -1229,11 +1229,9 @@ input PathedSessionsInput {
 
 type PathedSessionsType {
   endDateTime: String!
-  id: String!
   path: [String!]!
   pathedSessions: [Session!]!
   startDateTime: String!
-  updatedAt: String!
 }
 
 input PermissionIdsInput {

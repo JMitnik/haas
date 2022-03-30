@@ -980,11 +980,9 @@ export interface NexusGenRootTypes {
   }
   PathedSessionsType: { // root type
     endDateTime: string; // String!
-    id: string; // String!
     path: string[]; // [String!]!
     pathedSessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDateTime: string; // String!
-    updatedAt: string; // String!
   }
   PermssionType: { // root type
     customer?: NexusGenRootTypes['Customer'] | null; // Customer
@@ -1745,11 +1743,9 @@ export interface NexusGenFieldTypes {
   }
   PathedSessionsType: { // field return type
     endDateTime: string; // String!
-    id: string; // String!
     path: string[]; // [String!]!
     pathedSessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDateTime: string; // String!
-    updatedAt: string; // String!
   }
   PermssionType: { // field return type
     customer: NexusGenRootTypes['Customer'] | null; // Customer
