@@ -117,6 +117,7 @@ export const prepDefaultCreateData = async (prisma: PrismaClient) => {
                   id: 'SLIDER_QUESTION_ID',
                   title: 'Slider question',
                   type: 'SLIDER',
+                  isRoot: true,
                   children: {
                     create: [
                       {
