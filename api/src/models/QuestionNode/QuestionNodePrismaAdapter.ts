@@ -12,14 +12,21 @@ class QuestionNodePrismaAdapter {
     this.prisma = prismaClient;
   }
 
+
   findSliderNodeByDialogueId = async (dialogueId: string) => {
     return this.prisma.questionNode.findFirst({
       where: {
         questionDialogueId: dialogueId,
-        type: 'SLIDER',
+        isRoot: true,
       },
-      include: {
-        options: true,
+      select: {
+        id: true,
+        options: {
+          select: {
+            id: true,
+            value: true,
+          },
+        },
       },
     });
   }

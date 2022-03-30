@@ -17,68 +17,33 @@ class NodeEntryPrismaAdapter {
   findNodeEntriesByQuestionId = async (
     questionId: string, startDateTime: Date, endDateTime: Date
   ) => {
-    const targetNodeEntries = await this.prisma.sliderNodeEntry.findMany({
+
+    const sessions = await this.prisma.session.findMany({
       where: {
-        nodeEntry: {
-          creationDate: {
-            gte: startDateTime,
-            lte: endDateTime,
+        createdAt: {
+          gte: startDateTime,
+          lte: endDateTime,
+        },
+        nodeEntries: {
+          some: {
+            relatedNodeId: questionId,
           },
-          relatedNodeId: questionId,
-          // NOT: {
-          //   inputSource: 'INIT_GENERATED',
-          // },
         },
       },
       include: {
-        nodeEntry: {
+        nodeEntries: {
+          where: {
+            relatedEdge: {
+              parentNodeId: questionId,
+            },
+          },
           include: {
-            session: {
-              select: {
-                mainScore: true,
-              },
-            },
-            relatedNode: {
-              select: {
-                options: true,
-                children: {
-                  select: {
-                    childNode: {
-                      select: {
-                        options: true,
-                      },
-                    },
-                    isRelatedNodeOfNodeEntries: {
-                      select: {
-                        id: true,
-                        choiceNodeEntry: {
-                          select: {
-                            value: true,
-                          },
-                        },
-                        session: {
-                          select: {
-                            mainScore: true,
-                          },
-                        },
-                      },
-                      where: {
-                        creationDate: {
-                          gte: startDateTime,
-                          lte: endDateTime,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+            choiceNodeEntry: true,
           },
         },
       },
     });
-
-    return targetNodeEntries;
+    return sessions;
   }
 
   /**

@@ -9,7 +9,7 @@ import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import {
   HistoryDataProps, HistoryDataWithEntry, IdMapProps,
-  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType, ChildNodeEntry, TopicNodeEntry,
+  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType, ChildNodeEntry, TopicNodeEntry, TopicSession,
 } from './DialogueTypes';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
@@ -49,6 +49,29 @@ class DialogueService {
     this.nodeService = new NodeService(prismaClient);
   }
 
+  calculateSessionTopicImpactScores = (
+    type: DialogueImpactScore,
+    groupedNodeEntries: _.Dictionary<{
+      mainScore: number;
+      id: string;
+      choiceNodeEntry: ChoiceNodeEntry | null;
+    }[]>) => {
+    switch (type) {
+
+      case DialogueImpactScore.AVERAGE:
+        const subTopicScores = Object.entries(groupedNodeEntries).map((entry) => {
+          const option = entry[0];
+          const average = meanBy(entry[1], (data) => data?.mainScore);
+          return { name: option, impactScore: average, nrVotes: entry[1].length };
+        });
+        return subTopicScores;
+
+      default:
+        return [];
+
+    };
+  };
+
   /**
    * Calculates an impact score for all provided topics based on impact type
    * @param type DialogueImpactType
@@ -82,6 +105,25 @@ class DialogueService {
     };
   };
 
+  completementSessionTopics = (
+    calculatedTopics: {
+      name: string;
+      impactScore: number;
+      nrVotes: number;
+    }[],
+    rootOptions: { value: string }[],
+  ) => {
+    const allPotentialSubTopics = rootOptions.map((option) => option.value)
+
+    // Add sub topics which don't have any node entries to complement list with rest of sub topics
+    allPotentialSubTopics.forEach((option) => {
+      const targetSubTopic = calculatedTopics.find((subTopic) => subTopic.name === option);
+      if (!targetSubTopic) calculatedTopics.push({ nrVotes: 0, impactScore: 0, name: option });
+    });
+
+    return calculatedTopics;
+  }
+
   /**
    * Finds all the potential sub topics available for a topic and creates an placeholder entry for the missing ones
    * @param targetNodeEntries a list of node entries with their child node entries
@@ -94,17 +136,24 @@ class DialogueService {
       name: string;
       impactScore: number;
       nrVotes: number;
-    }[]
+    }[],
+    rootOptions?: { value: string }[],
   ) => {
-    // Get all child nodes
-    const childNodes = targetNodeEntries.flatMap(
-      (targetNodeEntry) => targetNodeEntry?.nodeEntry?.relatedNode?.children
-    ).filter(isPresent);
+    let allPotentialSubTopics;
 
-    // All unique sub topics available within the childNodes
-    const allPotentialSubTopics = uniq(childNodes?.flatMap(
-      (child) => child.childNode?.options.length ? child.childNode?.options.map((option) => option.value) : undefined)
-    ).filter(isPresent);
+    if (rootOptions) {
+      allPotentialSubTopics = rootOptions.map((option) => option.value);
+    } else {
+      // Get all child nodes
+      const childNodes = targetNodeEntries.flatMap(
+        (targetNodeEntry) => targetNodeEntry?.nodeEntry?.relatedNode?.children
+      ).filter(isPresent);
+
+      // All unique sub topics available within the childNodes
+      allPotentialSubTopics = uniq(childNodes?.flatMap(
+        (child) => child.childNode?.options.length ? child.childNode?.options.map((option) => option.value) : undefined)
+      ).filter(isPresent);
+    }
 
     // Add sub topics which don't have any node entries to complement list with rest of sub topics
     allPotentialSubTopics.forEach((option) => {
@@ -113,6 +162,36 @@ class DialogueService {
     });
 
     return calculatedTopics;
+  }
+
+  findSubTopicsOfSessions = async (
+    topicSessions: TopicSession[],
+    dialogueId: string,
+    impactScoreType: DialogueImpactScore,
+    rootQuestion: {
+      id: string;
+      options: { id: number; value: string }[];
+    },
+  ): Promise<{
+    name: string;
+    impactScore: number;
+    nrVotes: number;
+  }[]> => {
+    if (rootQuestion && topicSessions.length === 0) {
+      return rootQuestion.options.map((option) => ({ nrVotes: 0, impactScore: 0, name: option.value }));
+    }
+
+    const nodeEntries = topicSessions.flatMap((session) => session.nodeEntries.map(
+      (nodeEntry) => ({ ...nodeEntry, mainScore: session.mainScore })));
+
+    const groupedNodeEntries = groupBy(nodeEntries,
+      (nodeEntry) => nodeEntry?.choiceNodeEntry?.value
+    );
+
+    const subTopicScores = this.calculateSessionTopicImpactScores(impactScoreType, groupedNodeEntries);
+
+    const complementedSubTopic = this.completementSessionTopics(subTopicScores, rootQuestion.options);
+    return complementedSubTopic;
   }
 
   /**
@@ -125,9 +204,10 @@ class DialogueService {
     dialogueId: string,
     impactScoreType: DialogueImpactScore,
     topic?: string,
-    rootQuestion?: (QuestionNode & {
-      options: QuestionOption[];
-    }),
+    rootQuestion?: {
+      id: string;
+      options: { id: number; value: string }[];
+    },
   ) => {
     if (!topic && rootQuestion && targetNodeEntries.length === 0) {
       return rootQuestion.options.map((option) => ({ nrVotes: 0, impactScore: 0, name: option.value }));
@@ -135,6 +215,7 @@ class DialogueService {
 
     // If no nodeEntries are found we need to find the sub topics through edge condition string comparison
     if (topic && targetNodeEntries.length === 0) {
+      // TODO: Replace with rootQuestion.options maybe? (Still needs to be fetched for subTopic option)
       return this.edgeService.findChildOptionsByEdgeCondition(dialogueId, topic);
     }
 
@@ -152,7 +233,7 @@ class DialogueService {
 
     // In case an answer has never been given, it wont be possible to find the sub topic in one of the node entries
     // The next code finds all the potential sub topics available and creates an entry for the missing ones
-    const complementedSubTopic = this.completementTopics(targetNodeEntries, subTopicScores);
+    const complementedSubTopic = this.completementTopics(targetNodeEntries, subTopicScores, rootQuestion?.options);
 
     return complementedSubTopic;
   }
@@ -169,7 +250,7 @@ class DialogueService {
       impactScore: number;
       name: string;
     }[],
-    subTopics: DialogueTopicCache[]
+    subTopics: { id: string; name: string }[]
   ) => {
     const merged = _.merge(_.keyBy(subTopics, 'name'), _.keyBy(scores, 'name'));
     return _.values(merged);
@@ -213,26 +294,26 @@ class DialogueService {
       }
     }
 
-    const targetNodeEntries = await this.nodeEntryPrismaAdapter.findNodeEntriesByQuestionId(
+    const sessions = await this.nodeEntryPrismaAdapter.findNodeEntriesByQuestionId(
       rootNode.id,
       startDateTime,
       endDateTimeSet
     );
 
-    const topicNrVotes = targetNodeEntries.length;
+    const topicNrVotes = sessions.length;
     const topicImpactScore = meanBy(
-      targetNodeEntries,
-      (choiceNodeEntry) => choiceNodeEntry.nodeEntry.session?.mainScore
+      sessions,
+      (session) => session.mainScore, //choiceNodeEntry.nodeEntry.session?.mainScore
     );
     const topicName = '';
 
-    const subTopicScores = await this.findSubTopicsOfNodeEntries(
-      targetNodeEntries, dialogueId, impactScoreType, undefined, rootNode
+    const subTopicScores = await this.findSubTopicsOfSessions(
+      sessions, dialogueId, impactScoreType, rootNode
     );
 
     const mergedSubTopics = this.mergeScoresWithTopicIds(subTopicScores, prevStatistics?.subTopics || []);
 
-    const topic = await this.dialoguePrismaAdapter.upsertDialogueTopicStatistics({
+    void this.dialoguePrismaAdapter.upsertDialogueTopicStatistics({
       dialogueId,
       endDateTime: endDateTimeSet,
       startDateTime,
@@ -242,9 +323,14 @@ class DialogueService {
       nrVotes: topicNrVotes,
       id: prevStatistics?.id,
       subTopics: mergedSubTopics,
-    })
+    });
 
-    return { ...topic, subTopics: topic.subTopics };
+    return {
+      impactScore: topicImpactScore || 0,
+      name: topicName,
+      nrVotes: topicNrVotes,
+      subTopics: mergedSubTopics,
+    };
   };
 
   /**

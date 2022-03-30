@@ -86,7 +86,7 @@ export const CustomerType = objectType({
         if (args?.where?.id) {
           const dialogueId: string = args.where.id;
 
-          const customer = await ctx.services.customerService.getDialogueById(parent.id, dialogueId);
+          const customer = await ctx.services.dialogueService.getDialogueById(dialogueId);
           return customer || null as any;
         }
 

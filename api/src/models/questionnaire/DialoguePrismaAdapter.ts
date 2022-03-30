@@ -65,12 +65,12 @@ class DialoguePrismaAdapter {
       },
       update: {
         impactScore,
-        impactScoreType: impactScoreType as DialogueImpactScore,
-        name,
+        // impactScoreType: impactScoreType as DialogueImpactScore,
+        // name,
         nrVotes,
-        dialogueId,
-        endDateTime,
-        startDateTime,
+        // dialogueId,
+        // endDateTime,
+        // startDateTime,
         subTopics: {
           upsert: subTopics?.map((subTopic) => ({
             where: {
@@ -118,11 +118,15 @@ class DialoguePrismaAdapter {
         },
         impactScoreType: impactScoreType,
       },
-      orderBy: {
-        updatedAt: 'desc',
-      },
       include: {
-        subTopics: true,
+        subTopics: {
+          select: {
+            id: true,
+            name: true,
+            nrVotes: true,
+            impactScore: true,
+          },
+        },
       },
     });
   }
