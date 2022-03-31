@@ -1,4 +1,4 @@
-import { ColourSettings, Customer, CustomerSettings, PrismaClient } from '@prisma/client';
+import { ColourSettings, Customer, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, SliderNodeEntry } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
@@ -13,6 +13,10 @@ import { CampaignModel } from '../../Campaigns';
 import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
 import { AutomationModel } from '../../automations/graphql/AutomationModel';
 import { AutomationConnection, AutomationConnectionFilterInput } from '../../automations/graphql/AutomationConnection';
+import { isValidDateTime } from '../../../utils/isValidDate';
+import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel } from '../../questionnaire';
+import { addDays, differenceInHours, isEqual } from 'date-fns';
+import { groupBy, meanBy } from 'lodash';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -67,6 +71,154 @@ export const CustomerType = objectType({
       type: AutomationModel,
       async resolve(parent, args, ctx) {
         return ctx.services.automationService.findAutomationsByWorkspace(parent.id);
+      },
+    });
+
+    t.field('dialogueStatisticsSummary', {
+      type: DialogueStatisticsSummaryModel,
+      list: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      nullable: true,
+      useParentResolve: true,
+      useQueryCounter: true,
+      useTimeResolve: true,
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        const dialogues = await ctx.prisma.dialogue.findMany({
+          where: {
+            customerId: parent.id,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        const dialogueIds = dialogues.map((dialogue) => dialogue.id);
+
+        const endDateTimeSet = !utcEndDateTime ? addDays(utcStartDateTime as Date, 7) : utcEndDateTime;
+        const cachedSummaries: DialogueStatisticsSummaryCache[] = [];
+        const caches = await ctx.services.dialogueStatisticsService.dialoguePrismaAdapter
+          .findDialogueStatisticsSummaries(
+            dialogueIds,
+            utcStartDateTime as Date,
+            endDateTimeSet,
+            args.input.impactType
+          )
+
+        if (!args.input.refresh) {
+          caches.forEach((cache) => {
+            if (differenceInHours(Date.now(), cache.updatedAt) == 0) {
+              dialogueIds.splice(dialogueIds.indexOf(cache.dialogueId), 1);
+              return cachedSummaries.push(cache);
+            };
+          });
+        }
+
+        if (caches.length === cachedSummaries.length || dialogueIds.length === 0) {
+          return caches;
+        }
+
+        const scopedSessions = await ctx.services.sessionService.findSessionsForDialogues(
+          dialogueIds,
+          utcStartDateTime as Date,
+          endDateTimeSet
+        );
+
+        const sessionIds = scopedSessions.map((session) => session.id);
+        const nodeEntries = await ctx.prisma.nodeEntry.findMany({
+          where: {
+            AND: [
+              {
+                sessionId: {
+                  in: sessionIds,
+                },
+              },
+              {
+                depth: 0,
+              },
+              {
+                sliderNodeEntry: {
+                  isNot: null,
+                },
+              },
+            ],
+          },
+          include: {
+            session: {
+              select: {
+                dialogueId: true,
+              },
+            },
+            sliderNodeEntry: true,
+          },
+        });
+
+        const sessionContext = groupBy(nodeEntries, (nodeEntry) => nodeEntry.session?.dialogueId);
+        dialogueIds.forEach((dialogueId) => {
+          if (!sessionContext[dialogueId]) {
+            sessionContext[dialogueId] = []
+          }
+        });
+
+        const newCaches: DialogueStatisticsSummaryCache[] = [];
+
+        Object.entries(sessionContext).forEach((context) => {
+          const dialogueId = context[0];
+          const nodeEntries: (NodeEntry & {
+            session: {
+              dialogueId: string;
+            } | null;
+            sliderNodeEntry: SliderNodeEntry | null;
+          })[] = context[1];
+          const average = meanBy(nodeEntries, (entry) => entry?.sliderNodeEntry?.value);
+
+          const cacheId = caches.find((cache) => {
+            return cache.dialogueId === dialogueId &&
+              cache.impactScoreType === args.input?.impactType &&
+              isEqual(cache.startDateTime as Date, utcStartDateTime as Date) &&
+              isEqual(cache.endDateTime as Date, endDateTimeSet)
+          })?.id;
+
+          const res: DialogueStatisticsSummaryCache = {
+            id: cacheId || '-1',
+            dialogueId,
+            updatedAt: new Date(Date.now()),
+            impactScore: average || 0,
+            impactScoreType: args.input?.impactType as DialogueImpactScore,
+            nrVotes: nodeEntries.length,
+            startDateTime: utcStartDateTime as Date,
+            endDateTime: endDateTimeSet,
+          }
+          newCaches.push(res);
+          void ctx.services.dialogueService.dialoguePrismaAdapter.upsertDialogueStatisticsSummary(
+            res.id,
+            {
+              dialogueId: res.dialogueId,
+              impactScore: res.impactScore || 0,
+              nrVotes: res.nrVotes || 0,
+              impactScoreType: res.impactScoreType,
+              startDateTime: res.startDateTime as Date,
+              endDateTime: res.endDateTime as Date,
+            }
+          )
+        })
+
+        return [...cachedSummaries, ...newCaches]
       },
     });
 

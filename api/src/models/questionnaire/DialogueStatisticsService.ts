@@ -41,6 +41,7 @@ class DialogueStatisticsService {
       dialogueId,
       startDateTime,
       endDateTimeSet,
+      type,
     );
 
     // Only if more than hour difference between last cache entry and now should we update cache

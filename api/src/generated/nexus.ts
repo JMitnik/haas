@@ -877,7 +877,7 @@ export interface NexusGenRootTypes {
     dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string; // String!
     endDateTime?: any | null; // Date
-    id: string; // ID!
+    id?: string | null; // ID
     impactScore?: number | null; // Float
     nrVotes?: number | null; // Int
     startDateTime?: any | null; // Date
@@ -1453,6 +1453,7 @@ export interface NexusGenFieldTypes {
     campaigns: NexusGenRootTypes['CampaignType'][]; // [CampaignType!]!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
+    dialogueStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][] | null; // [DialogueStatisticsSummaryModel!]
     id: string; // ID!
     name: string; // String!
     roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
@@ -1552,7 +1553,7 @@ export interface NexusGenFieldTypes {
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string; // String!
     endDateTime: any | null; // Date
-    id: string; // ID!
+    id: string | null; // ID
     impactScore: number | null; // Float
     nrVotes: number | null; // Int
     startDateTime: any | null; // Date
@@ -2026,6 +2027,9 @@ export interface NexusGenArgTypes {
     }
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+    }
+    dialogueStatisticsSummary: { // args
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     userCustomer: { // args
       userId?: string | null; // String

@@ -168,19 +168,48 @@ class DialoguePrismaAdapter {
    * @param endDateTime 
    * @returns DialogueStatisticsSummaryCache | null
    */
-  findDialogueStatisticsSummaryByDialogueId = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
-    const prevStatistics = await this.prisma.dialogueStatisticsSummaryCache.findFirst({
+  findDialogueStatisticsSummaries = async (
+    dialogueIds: string[],
+    startDateTime: Date,
+    endDateTime: Date,
+    type: DialogueImpactScore
+  ) => {
+    const prevStatistics = await this.prisma.dialogueStatisticsSummaryCache.findMany({
       where: {
-        dialogueId,
-        startDateTime: {
-          equals: startDateTime,
+        dialogue: {
+          id: {
+            in: dialogueIds,
+          },
         },
-        endDateTime: {
-          equals: endDateTime,
-        },
+        startDateTime,
+        endDateTime,
+        impactScoreType: type,
       },
-      orderBy: {
-        updatedAt: 'desc',
+    });
+    return prevStatistics;
+  }
+
+  /**
+   * Finds a cache entry of a dialogue statistics summary based on id and date range
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns DialogueStatisticsSummaryCache | null
+   */
+  findDialogueStatisticsSummaryByDialogueId = async (
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+    type: DialogueImpactScore
+  ) => {
+    const prevStatistics = await this.prisma.dialogueStatisticsSummaryCache.findUnique({
+      where: {
+        filterId: {
+          dialogueId,
+          startDateTime,
+          endDateTime,
+          impactScoreType: type,
+        },
       },
     });
     return prevStatistics;

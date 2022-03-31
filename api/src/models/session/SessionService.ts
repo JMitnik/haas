@@ -106,6 +106,24 @@ class SessionService {
     return this.sessionPrismaAdapter.findNodeEntriesBySessionIds(sessionIds, depth);
   }
 
+  findSessionsForDialogues = async (
+    dialogueIds: string[],
+    startDateTime: Date,
+    endDateTime: Date,
+  ) => {
+    return this.sessionPrismaAdapter.prisma.session.findMany({
+      where: {
+        dialogueId: {
+          in: dialogueIds,
+        },
+        createdAt: {
+          gte: startDateTime,
+          lte: endDateTime,
+        },
+      },
+    })
+  }
+
   /**
    * Finds all sessions of a dialogue based on performance treshold
    * @param dialogueId the ID of a dialogue

@@ -495,6 +495,7 @@ type Customer {
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
+  dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
   id: ID!
   name: String!
   roles: [RoleType!]
@@ -715,7 +716,7 @@ type DialogueStatisticsSummaryModel {
   dialogue: Dialogue
   dialogueId: String!
   endDateTime: Date
-  id: ID!
+  id: ID
   impactScore: Float
   nrVotes: Int
   startDateTime: Date

@@ -70,6 +70,8 @@ model DialogueStatisticsSummaryCache {
 
   impactScoreType DialogueImpactScore
   dialogue        Dialogue?           @relation(fields: [dialogueId], references: [id])
+
+  @@unique([startDateTime, endDateTime, dialogueId, impactScoreType], name: "filterId")
 }
 
 model ColourSettings {
