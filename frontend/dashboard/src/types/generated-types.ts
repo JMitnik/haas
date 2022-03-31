@@ -724,7 +724,7 @@ export type Dialogue = {
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
-  pathedSessions?: Maybe<Array<Session>>;
+  pathedSessions?: Maybe<PathedSessionsType>;
   topic: TopicType;
   dialogueStatisticsSummary?: Maybe<DialogueStatisticsSummaryModel>;
   averageScore: Scalars['Float'];
@@ -1636,6 +1636,17 @@ export type PathedSessionsInput = {
   path: Array<Scalars['String']>;
   startDateTime: Scalars['String'];
   endDateTime?: Maybe<Scalars['String']>;
+  refresh?: Maybe<Scalars['Boolean']>;
+};
+
+export type PathedSessionsType = {
+  __typename?: 'PathedSessionsType';
+  id: Scalars['String'];
+  updatedAt: Scalars['String'];
+  startDateTime: Scalars['String'];
+  endDateTime: Scalars['String'];
+  path: Array<Scalars['String']>;
+  pathedSessions: Array<Session>;
 };
 
 export type PermissionIdsInput = {
@@ -2015,6 +2026,7 @@ export type Session = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   dialogueId: Scalars['String'];
+  mainScore: Scalars['Float'];
   browser: Scalars['String'];
   paths: Scalars['Int'];
   score: Scalars['Float'];
@@ -2479,10 +2491,14 @@ export type GetSessionPathsQuery = (
   & { dialogue?: Maybe<(
     { __typename?: 'Dialogue' }
     & Pick<Dialogue, 'id'>
-    & { pathedSessions?: Maybe<Array<(
-      { __typename?: 'Session' }
-      & Pick<Session, 'id' | 'score' | 'dialogueId' | 'device' | 'createdAt'>
-    )>> }
+    & { pathedSessions?: Maybe<(
+      { __typename?: 'PathedSessionsType' }
+      & Pick<PathedSessionsType, 'id' | 'startDateTime' | 'endDateTime' | 'path'>
+      & { pathedSessions: Array<(
+        { __typename?: 'Session' }
+        & Pick<Session, 'id' | 'score' | 'createdAt'>
+      )> }
+    )> }
   )> }
 );
 
@@ -3358,10 +3374,14 @@ export const GetSessionPathsDocument = gql`
     id
     pathedSessions(input: $input) {
       id
-      score
-      dialogueId
-      device
-      createdAt
+      startDateTime
+      endDateTime
+      path
+      pathedSessions {
+        id
+        score
+        createdAt
+      }
     }
   }
 }
@@ -4967,7 +4987,8 @@ export namespace GetSessionPaths {
   export type Variables = GetSessionPathsQueryVariables;
   export type Query = GetSessionPathsQuery;
   export type Dialogue = (NonNullable<GetSessionPathsQuery['dialogue']>);
-  export type PathedSessions = NonNullable<(NonNullable<(NonNullable<GetSessionPathsQuery['dialogue']>)['pathedSessions']>)[number]>;
+  export type PathedSessions = (NonNullable<(NonNullable<GetSessionPathsQuery['dialogue']>)['pathedSessions']>);
+  export type _PathedSessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetSessionPathsQuery['dialogue']>)['pathedSessions']>)['pathedSessions']>)[number]>;
   export const Document = GetSessionPathsDocument;
 }
 

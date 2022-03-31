@@ -10,6 +10,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 
 import { DataLoadOptions, WorkspaceGrid } from './WorkspaceGrid';
 import { HexagonNode, HexagonNodeType, HexagonViewMode } from './WorkspaceGrid.types';
+import { groupsFromDialogues } from './WorkspaceGrid.helpers';
 
 interface WorkspaceGridAdapterProps {
   height: number;
@@ -46,21 +47,20 @@ export const WorkspaceGridAdapter = ({
     skip: true,
   });
 
-  const dialogues: HexagonNode[] = data?.customer?.dialogues?.map((dialogue) => ({
-    id: dialogue.id,
-    type: HexagonNodeType.Dialogue,
-    label: dialogue.title,
-    score: dialogue.dialogueStatisticsSummary?.impactScore ?? 0,
-    dialogue,
-  })) || [];
+  const dialogues = data?.customer?.dialogues || [];
 
   const handleLoadData = async (options: DataLoadOptions): Promise<[HexagonNode[], HexagonViewMode]> => {
+    console.log(options);
+
+    if (options.clickedGroup) {
+      return [options.clickedGroup.subGroups, HexagonViewMode.Group];
+    }
     const { data: loadedData } = await fetchGetDialogues({
       dialogueId: options.dialogueId,
       input: {
         value: options.topic || '',
         isRoot: !options.topic,
-        startDateTime: '20-03-2022',
+        startDateTime: '24-03-2022',
         impactScoreType: DialogueImpactScoreType.Average,
       },
     });
@@ -76,13 +76,14 @@ export const WorkspaceGridAdapter = ({
 
     const { data: sessionData } = await fetchGetSessions({
       input: {
-        startDateTime: '20-03-2022',
+        startDateTime: '24-03-2022',
         path: options.topics || [],
+        refresh: false,
       },
       dialogueId: options.dialogueId,
     });
 
-    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessions?.map((session) => ({
+    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessions?.pathedSessions?.map((session) => ({
       id: session.id,
       type: HexagonNodeType.Session,
       score: session.score,
@@ -96,26 +97,7 @@ export const WorkspaceGridAdapter = ({
 
   const initialViewMode = HexagonViewMode.Dialogue;
 
-  const initialData = useMemo(() => {
-    const detectGroups = dialogues.map((dialogue) => {
-      if (dialogue.type !== HexagonNodeType.Dialogue) return { ...dialogue, group: undefined };
-
-      const groups = dialogue.dialogue.title.split('-');
-
-      if (groups.length === 1) return { ...dialogue, group: undefined };
-
-      const groupName = groups[0].trim();
-
-      return {
-        ...dialogue,
-        group: groupName,
-      };
-    });
-
-    console.log(detectGroups);
-
-    return detectGroups;
-  }, [dialogues]);
+  const initialData = useMemo(() => groupsFromDialogues(dialogues), [dialogues]);
 
   // Add spinner
   if (!dialogues.length) return null;
@@ -124,7 +106,7 @@ export const WorkspaceGridAdapter = ({
     <WorkspaceGrid
       backgroundColor={backgroundColor}
       initialViewMode={initialViewMode}
-      initialData={dialogues}
+      initialData={initialData}
       onLoadData={handleLoadData}
       height={height}
       width={width}

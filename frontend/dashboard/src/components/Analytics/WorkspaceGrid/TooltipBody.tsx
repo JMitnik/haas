@@ -7,6 +7,7 @@ import React from 'react';
 import { Calendar, TrendingDown, TrendingUp } from 'react-feather';
 import {
   HexagonDialogueNode,
+  HexagonGroupNode,
   HexagonNode,
   HexagonNodeType,
   HexagonQuestionNodeNode,
@@ -32,7 +33,7 @@ export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => 
             {formatScore(node.score)}
           </UI.Div>
           <UI.Div ml={2}>
-            {node.dialogue?.title}
+            {node.label}
           </UI.Div>
         </UI.Flex>
       </UI.PaddedBody>
@@ -56,6 +57,29 @@ export const TooltipQuestionNodeBody = ({ node }: { node: HexagonQuestionNodeNod
           </UI.Div>
           <UI.Div ml={2}>
             {node.topic}
+          </UI.Div>
+        </UI.Flex>
+      </UI.PaddedBody>
+    </UI.Div>
+  );
+};
+
+export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => {
+  const { t } = useTranslation();
+
+  return (
+    <UI.Div>
+      <UI.Helper>
+        {t('group')}
+      </UI.Helper>
+      <UI.PaddedBody fraction={0.5}>
+        <UI.Flex>
+          <UI.Div>
+            test
+            {/* {formatScore(node.score)} */}
+          </UI.Div>
+          <UI.Div ml={2}>
+            {node.label}
           </UI.Div>
         </UI.Flex>
       </UI.PaddedBody>
@@ -122,6 +146,8 @@ export const TooltipSessionBody = ({ node }: { node: HexagonSessionNode }) => {
 
 export const TooltipBody = ({ node }: TooltipBodyProps) => {
   switch (node.type) {
+    case HexagonNodeType.Group:
+      return <TooltipGroupNodeBody node={node} />;
     case HexagonNodeType.Dialogue:
       return <TooltipDialogueBody node={node} />;
     case HexagonNodeType.QuestionNode:

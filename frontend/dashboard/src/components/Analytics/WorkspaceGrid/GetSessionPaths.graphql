@@ -7,11 +7,9 @@ query GetSessionPaths($dialogueId: ID!, $input: PathedSessionsInput!) {
       endDateTime
       path
       pathedSessions {
-        nodeEntries {
-          value {
-            choiceNodeEntry
-          }
-        }
+        id
+        score
+        createdAt
       }
 		}
 	}

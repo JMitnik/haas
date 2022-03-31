@@ -1,18 +1,21 @@
 import { GetSessionPaths, GetWorkspaceDialogueStatistics } from 'types/generated-types';
 
 export type Dialogue = GetWorkspaceDialogueStatistics.Dialogues;
-export type Session = GetSessionPaths.PathedSessions;
+export type Session = GetSessionPaths._PathedSessions;
 
+/** Hexagon representing a Group node (layer above Dialogue) */
 export type HexagonGroupNode = {
   id: string;
   score: number;
   type: HexagonNodeType.Group;
-  label: string
-  groups: HexagonGroupNode[];
-  dialogues: Dialogue[];
+  label: string;
+  subGroups: HexagonGroupNode[] | HexagonDialogueNode[];
+  subGroupType: HexagonNodeType;
+  depth: number;
   points?: string;
 };
 
+/** Hexagon representing a Dialogue */
 export type HexagonDialogueNode = {
   id: string;
   score: number;
@@ -22,6 +25,7 @@ export type HexagonDialogueNode = {
   points?: string;
 };
 
+/** Hexagon representing a Topic */
 export type HexagonQuestionNodeNode = {
   id: string;
   score: number;
@@ -30,6 +34,7 @@ export type HexagonQuestionNodeNode = {
   points?: string;
 };
 
+/** Hexagon representing a Session */
 export type HexagonSessionNode = {
   id: string;
   score: number;

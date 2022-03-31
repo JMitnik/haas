@@ -17,6 +17,7 @@ import * as LS from './WorkspaceGrid.styles';
 
 import {
   HexagonDialogueNode,
+  HexagonGroupNode,
   HexagonNode,
   HexagonNodeType,
   HexagonQuestionNodeNode,
@@ -28,9 +29,10 @@ import { TooltipBody } from './TooltipBody';
 import { WorkspaceGridPane } from './WorkspaceGridPane';
 
 export interface DataLoadOptions {
-  dialogueId: string;
-  topic: string;
-  topics: string[];
+  dialogueId?: string;
+  topic?: string;
+  topics?: string[];
+  clickedGroup?: HexagonGroupNode;
 }
 
 export interface WorkspaceGridProps {
@@ -132,6 +134,17 @@ export const WorkspaceGrid = ({
       .filter((state) => state.selectedNode?.type === HexagonNodeType.QuestionNode)
       .map((state) => (state.selectedNode as HexagonQuestionNodeNode)?.topic);
 
+    if (!onLoadData) return;
+
+    if (clickedNode.type === HexagonNodeType.Group) {
+      const [newNodes, hexagonViewMode] = await onLoadData({
+        clickedGroup: clickedNode.type === HexagonNodeType.Group ? clickedNode : undefined,
+      }).finally(() => setIsLoading(false));
+
+      setCurrentState({ currentNode: clickedNode, childNodes: newNodes, viewMode: hexagonViewMode });
+      return;
+    }
+
     const dialogueId = clickedNode.type === HexagonNodeType.Dialogue ? clickedNode.id : activeDialogue?.id;
     if (!dialogueId || !onLoadData) return;
     setIsLoading(true);
@@ -189,7 +202,7 @@ export const WorkspaceGrid = ({
     <LS.WorkspaceGridContainer>
       <AnimatePresence />
       <UI.Grid gridTemplateColumns="2fr 1fr" gridGap="0">
-        <UI.Div ref={initialRef} height="70vh" position="relative">
+        <UI.Div height="70vh" position="relative">
           <LS.GridControls>
             {!isAtMinZoomLevel && (
               <LS.IconButton onClick={() => handleZoomOut()}>
