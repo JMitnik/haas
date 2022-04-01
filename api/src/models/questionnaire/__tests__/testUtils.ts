@@ -87,33 +87,34 @@ export const seedSession = async (
     },
   });
 
-  await prisma.nodeEntry.create({
-    data: {
-      session: {
-        connect: {
-          id: session.id,
+  if (subEdgeId && subChoiceQuestionId && subChoiceValue) {
+    await prisma.nodeEntry.create({
+      data: {
+        session: {
+          connect: {
+            id: session.id,
+          },
+        },
+        creationDate: createdAt,
+        depth: 2,
+        relatedEdge: {
+          connect: {
+            id: subEdgeId,
+          },
+        },
+        relatedNode: {
+          connect: {
+            id: subChoiceQuestionId,
+          },
+        },
+        choiceNodeEntry: {
+          create: {
+            value: subChoiceValue,
+          },
         },
       },
-      creationDate: createdAt,
-      depth: 2,
-      relatedEdge: {
-        connect: {
-          id: subEdgeId,
-        },
-      },
-      relatedNode: {
-        connect: {
-          id: subChoiceQuestionId,
-        },
-      },
-      choiceNodeEntry: {
-        create: {
-          value: subChoiceValue,
-        },
-      },
-    },
-  })
-
+    })
+  }
   return session;
 }
 
