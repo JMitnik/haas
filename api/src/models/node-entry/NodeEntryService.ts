@@ -19,6 +19,18 @@ class NodeEntryService {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
   };
 
+  findDialogueStatisticsRootEntries = async (
+    dialogueIds: string[],
+    startDate: Date,
+    endDate: Date,
+  ) => {
+    return this.nodeEntryPrismaAdapter.findDialogueStatisticsRootEntries(
+      dialogueIds,
+      startDate,
+      endDate,
+    )
+  }
+
   /**
    * Create node-entries.
    * */

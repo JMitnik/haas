@@ -1,6 +1,6 @@
-import { DialogueImpactScore, PrismaClient, Session } from '@prisma/client';
+import { DialogueImpactScore, NodeEntry, PrismaClient, Session, SliderNodeEntry } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { mean } from 'lodash';
+import { mean, meanBy } from 'lodash';
 
 import SessionService from '../session/SessionService';
 import NodeService from '../QuestionNode/NodeService';
@@ -88,6 +88,25 @@ class DialogueStatisticsService {
 
       default:
         return null;
+    }
+  }
+
+  calculateNodeEntriesImpactScore = (
+    type: DialogueImpactScore,
+    nodeEntries: (NodeEntry & {
+      sliderNodeEntry: SliderNodeEntry | null;
+      session: {
+        dialogueId: string;
+      } | null;
+    })[]
+  ) => {
+    switch (type) {
+      case DialogueImpactScore.AVERAGE:
+        const average = meanBy(nodeEntries, (entry) => entry?.sliderNodeEntry?.value);
+        return average;
+
+      default:
+        return 0;
     }
   }
 

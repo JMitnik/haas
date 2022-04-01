@@ -7,6 +7,46 @@ class NodeEntryPrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  findDialogueStatisticsRootEntries = async (
+    dialogueIds: string[],
+    startDate: Date,
+    endDate: Date,
+  ) => {
+    return this.prisma.nodeEntry.findMany({
+      where: {
+        AND: [
+          {
+            session: {
+              dialogueId: {
+                in: dialogueIds,
+              },
+            },
+            creationDate: {
+              gte: startDate,
+              lte: endDate,
+            },
+          },
+          {
+            depth: 0,
+          },
+          {
+            sliderNodeEntry: {
+              isNot: null,
+            },
+          },
+        ],
+      },
+      include: {
+        session: {
+          select: {
+            dialogueId: true,
+          },
+        },
+        sliderNodeEntry: true,
+      },
+    });
+  }
+
   /**
    * Finds all sub topic node entries within a date range by question id
    * @param questionId 

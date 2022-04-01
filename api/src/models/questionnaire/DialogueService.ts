@@ -15,7 +15,7 @@ import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
 import defaultWorkspaceTemplate, { MassSeedTemplate, rootTopics, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
-import { CreateQuestionsInput } from './DialoguePrismaAdapterType';
+import { CreateQuestionsInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
@@ -193,6 +193,13 @@ class DialogueService {
     }
 
     return { prevStatistics, needRefresh: true }
+  }
+
+  upsertDialogueStatisticsSummary = async (
+    prevStatisticsId: string,
+    data: UpsertDialogueStatisticsInput,
+  ) => {
+    return this.dialoguePrismaAdapter.upsertDialogueStatisticsSummary(prevStatisticsId, data);
   }
 
   /**
