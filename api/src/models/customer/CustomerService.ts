@@ -425,7 +425,6 @@ class CustomerService {
     // TODO: RegistrationNodeEntry, Session, Share, SliderNode, SliderNodeEntry, SliderNodeMarker, SliderNodeRange, TextboxNodeEntry
     // TODO: Trigger, User, VideoEmbeddedNode, VideoNodeEntry,
     const deleteTagsTest = this.tagPrismaAdapter.deleteAllByCustomerId(customerId);
-    const deletionOfTags = prisma.tag.deleteMany({ where: { customerId } });
     const deletionOfTriggers = prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
     const deletionOfPermissions = prisma.permission.deleteMany({ where: { customerId } });
     const deletionOfUserCustomerRoles = prisma.userOfCustomer.deleteMany({
@@ -438,7 +437,6 @@ class CustomerService {
     const deletionOfCustomer = this.customerPrismaAdapter.delete(customerId);
 
     await prisma.$transaction([
-      deletionOfTags,
       deletionOfTriggers,
       deletionOfPermissions,
       deletionOfUserCustomerRoles,
