@@ -328,7 +328,7 @@ class SessionPrismaAdapter {
    * @param filter
    */
   buildOrderByQuery = (filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
-    let orderByQuery: Prisma.SessionOrderByInput[] = [];
+    let orderByQuery: Prisma.SessionOrderByWithRelationInput[] = [];
 
     if (filter?.orderBy?.by === 'createdAt') {
       orderByQuery.push({
