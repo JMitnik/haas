@@ -668,11 +668,40 @@ class DialoguePrismaAdapter {
     });
   };
 
-  async findDialoguesByCustomerId(customerId: string) {
+  async findDialoguesByCustomerId(customerId: string, searchTerm?: string) {
+    const whereInput: Prisma.DialogueWhereInput = {
+      customerId,
+    }
+
+    if (searchTerm) {
+      whereInput.OR = [
+        {
+          tags: {
+            some: {
+              name: {
+                mode: 'insensitive',
+                contains: searchTerm,
+              },
+            },
+          },
+        },
+        {
+          title: {
+            mode: 'insensitive',
+            contains: searchTerm,
+          },
+        },
+        {
+          publicTitle: {
+            mode: 'insensitive',
+            contains: searchTerm,
+          },
+        },
+      ];
+    };
+
     return this.prisma.dialogue.findMany({
-      where: {
-        customerId,
-      },
+      where: whereInput,
       include: {
         tags: true,
       },

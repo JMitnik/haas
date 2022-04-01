@@ -140,16 +140,14 @@ export const CustomerType = objectType({
         filter: DialogueFilterInputType,
       },
       useQueryCounter: true,
+      useTimeResolve: true,
       async resolve(parent: Customer, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+        let dialogues = await ctx.services.dialogueService.findDialoguesByCustomerId(
+          parent.id,
+          args.filter?.searchTerm || undefined,
+        );
 
-        let dialogues = await ctx.services.dialogueService.findDialoguesByCustomerId(parent.id);
-
-        if (args.filter && args.filter.searchTerm) {
-          dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
-        }
-
-        return dialogues as any;
+        return dialogues;
       },
     });
 

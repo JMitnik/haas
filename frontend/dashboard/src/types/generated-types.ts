@@ -429,6 +429,7 @@ export type CreateCtaInputType = {
   dialogueSlug?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
+  /** Linked question-node id */
   questionId?: Maybe<Scalars['String']>;
   links?: Maybe<CtaLinksInputType>;
   share?: Maybe<ShareNodeInputType>;
@@ -536,6 +537,7 @@ export type Customer = {
   automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
   automations?: Maybe<Array<AutomationModel>>;
+  nestedDialogueStatisticsSummary?: Maybe<Array<DialogueStatisticsSummaryModel>>;
   dialogue?: Maybe<Dialogue>;
   dialogues?: Maybe<Array<Dialogue>>;
   users?: Maybe<Array<UserType>>;
@@ -554,6 +556,11 @@ export type CustomerAutomationConnectionArgs = {
 export type CustomerUsersConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<UserConnectionFilterInput>;
+};
+
+
+export type CustomerNestedDialogueStatisticsSummaryArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
 
@@ -723,6 +730,9 @@ export type Dialogue = {
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
+  pathedSessionsConnection?: Maybe<PathedSessionsType>;
+  topic: TopicType;
+  dialogueStatisticsSummary?: Maybe<DialogueStatisticsSummaryModel>;
   averageScore: Scalars['Float'];
   statistics?: Maybe<DialogueStatistics>;
   sessionConnection?: Maybe<SessionConnection>;
@@ -735,6 +745,21 @@ export type Dialogue = {
   sessions: Array<Session>;
   leafs: Array<QuestionNode>;
   campaignVariants: Array<CampaignVariantType>;
+};
+
+
+export type DialoguePathedSessionsConnectionArgs = {
+  input?: Maybe<PathedSessionsInput>;
+};
+
+
+export type DialogueTopicArgs = {
+  input?: Maybe<TopicInputType>;
+};
+
+
+export type DialogueDialogueStatisticsSummaryArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
 
@@ -792,6 +817,10 @@ export type DialogueFinisherObjectType = {
   subtext: Scalars['String'];
 };
 
+export enum DialogueImpactScoreType {
+  Average = 'AVERAGE'
+}
+
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
   nrInteractions: Scalars['Int'];
@@ -799,6 +828,26 @@ export type DialogueStatistics = {
   topNegativePath?: Maybe<Array<TopPathType>>;
   mostPopularPath?: Maybe<TopPathType>;
   history?: Maybe<Array<LineChartDataType>>;
+};
+
+export type DialogueStatisticsSummaryFilterInput = {
+  startDateTime: Scalars['String'];
+  endDateTime?: Maybe<Scalars['String']>;
+  refresh?: Maybe<Scalars['Boolean']>;
+  impactType: DialogueImpactScoreType;
+};
+
+/** DialogueStatisticsSummary */
+export type DialogueStatisticsSummaryModel = {
+  __typename?: 'DialogueStatisticsSummaryModel';
+  id?: Maybe<Scalars['ID']>;
+  dialogueId: Scalars['String'];
+  updatedAt?: Maybe<Scalars['Date']>;
+  startDateTime?: Maybe<Scalars['Date']>;
+  endDateTime?: Maybe<Scalars['Date']>;
+  nrVotes?: Maybe<Scalars['Int']>;
+  impactScore?: Maybe<Scalars['Float']>;
+  dialogue?: Maybe<Dialogue>;
 };
 
 export type DialogueWhereUniqueInput = {
@@ -1003,6 +1052,13 @@ export type ImageType = {
   url?: Maybe<Scalars['String']>;
 };
 
+export type IndepthQuestionStatisticsSummary = {
+  __typename?: 'IndepthQuestionStatisticsSummary';
+  nrVotes?: Maybe<Scalars['Int']>;
+  impactScore?: Maybe<Scalars['Float']>;
+  option?: Maybe<Scalars['String']>;
+};
+
 export type InviteUserInput = {
   roleId: Scalars['String'];
   email: Scalars['String'];
@@ -1117,6 +1173,13 @@ export type LoginOutput = {
   user: UserType;
 };
 
+export type MassSeedInput = {
+  customerId: Scalars['String'];
+  maxGroups: Scalars['Int'];
+  maxTeams: Scalars['Int'];
+  maxSessions: Scalars['Int'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createJobProcessLocation: JobProcessLocation;
@@ -1146,6 +1209,7 @@ export type Mutation = {
   singleUpload: ImageType;
   createWorkspace: Customer;
   editWorkspace: Customer;
+  massSeed?: Maybe<Customer>;
   deleteCustomer?: Maybe<Customer>;
   handleUserStateInWorkspace: UserCustomer;
   editUser: UserType;
@@ -1321,6 +1385,11 @@ export type MutationCreateWorkspaceArgs = {
 
 export type MutationEditWorkspaceArgs = {
   input?: Maybe<EditWorkspaceInput>;
+};
+
+
+export type MutationMassSeedArgs = {
+  input?: Maybe<MassSeedInput>;
 };
 
 
@@ -1569,6 +1638,21 @@ export type PaginationWhereInput = {
   orderBy?: Maybe<Array<PaginationSortInput>>;
 };
 
+export type PathedSessionsInput = {
+  path: Array<Scalars['String']>;
+  startDateTime: Scalars['String'];
+  endDateTime?: Maybe<Scalars['String']>;
+  refresh?: Maybe<Scalars['Boolean']>;
+};
+
+export type PathedSessionsType = {
+  __typename?: 'PathedSessionsType';
+  startDateTime: Scalars['String'];
+  endDateTime: Scalars['String'];
+  path: Array<Scalars['String']>;
+  pathedSessions: Array<Session>;
+};
+
 export type PermissionIdsInput = {
   ids?: Maybe<Array<Scalars['String']>>;
 };
@@ -1622,6 +1706,7 @@ export type Query = {
   sessions: Array<Session>;
   /** A session is one entire user-interaction */
   session?: Maybe<Session>;
+  question?: Maybe<QuestionNode>;
   edge?: Maybe<Edge>;
 };
 
@@ -1738,6 +1823,11 @@ export type QuerySessionArgs = {
 };
 
 
+export type QueryQuestionArgs = {
+  where?: Maybe<QuestionWhereUniqueInput>;
+};
+
+
 export type QueryEdgeArgs = {
   id?: Maybe<Scalars['String']>;
 };
@@ -1756,6 +1846,10 @@ export type QuestionConditionScopeModel = {
   aggregate?: Maybe<ConditionPropertyAggregate>;
 };
 
+export enum QuestionImpactScoreType {
+  Percentage = 'PERCENTAGE'
+}
+
 export type QuestionNode = {
   __typename?: 'QuestionNode';
   id: Scalars['ID'];
@@ -1767,6 +1861,8 @@ export type QuestionNode = {
   creationDate?: Maybe<Scalars['String']>;
   type: QuestionNodeTypeEnum;
   overrideLeafId?: Maybe<Scalars['String']>;
+  indepthQuestionStatisticsSummary?: Maybe<Array<IndepthQuestionStatisticsSummary>>;
+  questionStatisticsSummary?: Maybe<QuestionStatisticsSummary>;
   /** Slidernode resolver */
   sliderNode?: Maybe<SliderNodeType>;
   /** FormNode resolver */
@@ -1778,6 +1874,16 @@ export type QuestionNode = {
   overrideLeaf?: Maybe<QuestionNode>;
   options: Array<QuestionOption>;
   children: Array<Edge>;
+};
+
+
+export type QuestionNodeIndepthQuestionStatisticsSummaryArgs = {
+  input?: Maybe<QuestionStatisticsSummaryFilterInput>;
+};
+
+
+export type QuestionNodeQuestionStatisticsSummaryArgs = {
+  input?: Maybe<QuestionStatisticsSummaryFilterInput>;
 };
 
 /** The different types a node can assume */
@@ -1810,6 +1916,27 @@ export type QuestionOption = {
   publicValue?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
   position?: Maybe<Scalars['Int']>;
+};
+
+export type QuestionStatisticsSummary = {
+  __typename?: 'QuestionStatisticsSummary';
+  id?: Maybe<Scalars['ID']>;
+  dialogueId?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['Date']>;
+  startDateTime?: Maybe<Scalars['Date']>;
+  endDateTime?: Maybe<Scalars['Date']>;
+};
+
+export type QuestionStatisticsSummaryFilterInput = {
+  startDateTime: Scalars['String'];
+  impactType: QuestionImpactScoreType;
+  endDateTime?: Maybe<Scalars['String']>;
+  impactTreshold?: Maybe<Scalars['Int']>;
+  refresh?: Maybe<Scalars['Boolean']>;
+};
+
+export type QuestionWhereUniqueInput = {
+  id: Scalars['ID'];
 };
 
 export type RecipientsInputType = {
@@ -1903,6 +2030,7 @@ export type Session = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   dialogueId: Scalars['String'];
+  mainScore: Scalars['Float'];
   browser: Scalars['String'];
   paths: Scalars['Int'];
   score: Scalars['Float'];
@@ -1958,6 +2086,7 @@ export type SessionInput = {
   originUrl?: Maybe<Scalars['String']>;
   device?: Maybe<Scalars['String']>;
   totalTimeInSec?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<Scalars['String']>;
 };
 
 /** Scores to filter sessions by. */
@@ -2084,6 +2213,31 @@ export enum TagTypeEnum {
 /** Input type for a textbox node */
 export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
+};
+
+export type TopicInputType = {
+  isRoot?: Maybe<Scalars['Boolean']>;
+  value: Scalars['String'];
+  impactScoreType: DialogueImpactScoreType;
+  startDateTime: Scalars['String'];
+  endDateTime?: Maybe<Scalars['String']>;
+  refresh?: Maybe<Scalars['Boolean']>;
+};
+
+export type TopicNodeEntryValue = {
+  __typename?: 'TopicNodeEntryValue';
+  id: Scalars['Int'];
+  value: Scalars['String'];
+  nodeEntryId: Scalars['String'];
+  mainScore: Scalars['Int'];
+};
+
+export type TopicType = {
+  __typename?: 'TopicType';
+  name: Scalars['String'];
+  impactScore: Scalars['Float'];
+  nrVotes: Scalars['Int'];
+  subTopics?: Maybe<Array<TopicType>>;
 };
 
 export type TopPathType = {

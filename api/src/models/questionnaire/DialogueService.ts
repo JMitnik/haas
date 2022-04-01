@@ -394,8 +394,8 @@ class DialogueService {
     return this.dialoguePrismaAdapter.getTagsByDialogueId(dialogueId);
   };
 
-  findDialoguesByCustomerId(customerId: string) {
-    return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId);
+  findDialoguesByCustomerId(customerId: string, searchTerm?: string) {
+    return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId, searchTerm);
   };
 
   async delete(dialogueId: string) {
