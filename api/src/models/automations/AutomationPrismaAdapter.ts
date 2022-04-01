@@ -793,7 +793,7 @@ export class AutomationPrismaAdapter {
             type: action.type,
             apiKey: action.apiKey,
             endpoint: action.endpoint,
-            payload: action.payload as Prisma.InputJsonObject || null,
+            payload: action.payload as Prisma.InputJsonObject || undefined,
           }
         }),
       },
