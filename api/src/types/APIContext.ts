@@ -22,6 +22,7 @@ import { CampaignService } from '../models/Campaigns/CampaignService';
 import LinkService from '../models/link/LinkService';
 import AutomationService from '../models/automations/AutomationService';
 import QuestionStatisticsService from 'models/QuestionNode/QuestionStatisticsService';
+import { FastifyContext } from 'fastify';
 
 export interface APIServiceContainer {
   automationService: AutomationService;
@@ -46,7 +47,7 @@ export interface APIServiceContainer {
   questionStatisticsService: QuestionStatisticsService;
 }
 
-export interface APIContext extends ExpressContext {
+export interface APIContext extends FastifyContext {
   prisma: PrismaClient;
   session: ContextSessionType | null;
   services: APIServiceContainer;

@@ -1,7 +1,10 @@
-import { ApolloServer, UserInputError } from 'apollo-server-express';
 import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
 import { PrismaClient } from '@prisma/client';
+import { ApolloServer, UserInputError } from 'apollo-server-fastify';
+import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
+import { ApolloServerPlugin } from 'apollo-server-plugin-base';
+import { FastifyInstance } from 'fastify';
 
 import { APIContext } from '../types/APIContext';
 import Sentry from './sentry';
@@ -9,6 +12,18 @@ import authShield from './auth';
 import ContextSessionService from '../models/auth/ContextSessionService';
 import schema from './schema';
 import { bootstrapServices } from './bootstrap';
+
+function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
+  return {
+    async serverWillStart() {
+      return {
+        async drainServer() {
+          await app.close();
+        },
+      };
+    },
+  };
+}
 
 const handleError = (ctx: any, error: GraphQLError) => {
   // Filter out user-input-errors (not interesting)
@@ -43,31 +58,38 @@ const handleError = (ctx: any, error: GraphQLError) => {
   });
 }
 
+const SentryPlugin: ApolloServerPlugin = {
+  async requestDidStart(requestContext) {
+    return {
+      async didEncounterErrors(ctx) {
+        if (!ctx.operation) return;
 
-export const makeApollo = async (prisma: PrismaClient) => {
+        ctx.errors.forEach((error) => {
+          handleError(ctx, error);
+        });
+      },
+    };
+  },
+};
+
+
+export const makeApollo = async (prisma: PrismaClient, app: FastifyInstance) => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
 
   const apollo: ApolloServer = new ApolloServer({
-    uploads: false,
+    // uploads: false,
     schema: applyMiddleware(schema, authShield),
     context: async (ctx): Promise<APIContext> => ({
       ...ctx,
+      config: ctx,
       session: await new ContextSessionService(ctx, prisma).constructContextSession(),
       prisma,
       services: bootstrapServices(prisma),
     }),
     plugins: [
-      {
-        requestDidStart: () => ({
-          didEncounterErrors: (ctx) => {
-            if (!ctx.operation) return;
-
-            ctx.errors.forEach((error) => {
-              handleError(ctx, error);
-            });
-          },
-        }),
-      },
+      fastifyAppClosePlugin(app),
+      ApolloServerPluginDrainHttpServer({ httpServer: app.server }),
+      SentryPlugin,
     ],
   });
 

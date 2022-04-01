@@ -1,5 +1,5 @@
 import { AuthenticationError } from 'apollo-server-express';
-import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
+import { FastifyContext } from 'apollo-server-fastify';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 
@@ -13,9 +13,9 @@ import UserService from '../users/UserService';
 class ContextSessionService {
   customerService: CustomerService;
   userService: UserService;
-  context: ExpressContext;
+  context: FastifyContext;
 
-  constructor(context: ExpressContext, prismaClient: PrismaClient) {
+  constructor(context: FastifyContext, prismaClient: PrismaClient) {
     this.customerService = new CustomerService(prismaClient);
     this.userService = new UserService(prismaClient);
     this.context = context;
@@ -26,7 +26,8 @@ class ContextSessionService {
    * @returns A workspace
    */
   getWorkSpaceFromReq = async () => {
-    const vars = this.context.req.body.variables;
+    const body = this.context.request.body as any
+    const vars = body.variables;
 
     if (vars?.customerSlug || vars?.input?.customerSlug) {
       const customerSlug = vars?.customerSlug || vars?.input?.customerSlug;
@@ -49,10 +50,11 @@ class ContextSessionService {
    */
   constructContextSession = async (): Promise<ContextSessionType | null> => {
     // Support auth use-case if a token is supported using cookie (should be HTTP-only)
-    const cookieToken: string | null = this.context.req.cookies?.access_token;
+    const request = this.context.request as any;
+    const cookieToken: string | null = request.cookies?.access_token;
 
     // Support auth-use case if a token is submitted using a Bearer token
-    const authHeader = this.context.req.headers.authorization || '';
+    const authHeader = this.context.request.headers.authorization || '';
     const bearerToken = readBearerToken(authHeader);
 
     // Prefer cookie-token over bearer-token
@@ -64,7 +66,8 @@ class ContextSessionService {
     try {
       isValid = jwt.verify(authToken, config.jwtSecret);
     } catch (e) {
-      this.context.res.cookie('access_token', '');
+      // this.context.res.cookie('access_token', '');
+      await this.context.reply.header('access_token', '');
       throw new AuthenticationError('UNAUTHENTICATED');
     }
 

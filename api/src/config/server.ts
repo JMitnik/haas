@@ -1,18 +1,33 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import https from 'https';
-import cookieParser from "cookie-parser";
-import cors, { CorsOptions } from "cors";
-import express from "express";
-import { graphqlUploadExpress } from "graphql-upload";
+import cookieParser from 'cookie-parser';
+import cors, { CorsOptions } from 'cors';
+import Fastify from 'fastify';
+import ExpressPlugin from 'fastify-express';
+import MultiPartPlugin from 'fastify-multipart';
+
+import { processRequest } from 'graphql-upload';
 
 import DeliveryWebhookRoute from '../routes/webhooks/DeliveryWebhookRoute';
 import { makeApollo } from './apollo';
-import config from "./config";
+import config from './config';
 
 export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   console.log('🏳️\tStarting application');
-  const app = express();
+  const app = Fastify();
+
+  await app.register(ExpressPlugin);
+  await app.register(MultiPartPlugin);
+
+  // Format the request body to follow graphql-upload's
+  app.addHook('preValidation', async function (request, reply) {
+    if (!request.isMultipart()) {
+      return;
+    }
+
+    request.body = await processRequest(request.raw, reply.raw);
+  });
 
   const corsOptions: CorsOptions = {
     // Hardcoded for the moment
@@ -28,33 +43,33 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
     credentials: true,
   };
 
-  app.get('/', (req, res, next) => { res.json({ status: 'HAAS API V2.1.0' }); });
-  app.get('/health', (req, res, next) => { res.json({ status: 'Health check' }); });
+  app.get('/', async (req, res) => res.send({ status: 'HAAS API V2.1.0' }));
+  app.get('/health', async (req, res) => res.send({ status: 'Health check' }));
 
   // Webhooks route
-  app.post('/webhooks', express.json(), async (req, res) => { res.send('success'); });
+  app.post('/webhooks', async (req, res) => res.send('success'))
   app.use('/webhooks/delivery', DeliveryWebhookRoute);
 
   app.use(cookieParser());
   app.use(cors(corsOptions));
 
-  // Add /graphql and graphqlUploadExpress
-  const apollo = await makeApollo(prismaClient);
-  app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
-  apollo.applyMiddleware({ app, cors: false, });
+  const apollo = await makeApollo(prismaClient, app);
 
-  if (config.useSSL) {
-    const key: any = process.env.HTTPS_SERVER_KEY_PATH;
-    const certificate: any = process.env.HTTPS_SERVER_CERT_PATH;
+  // if (config.useSSL) {
+  //   const key: any = process.env.HTTPS_SERVER_KEY_PATH;
+  //   const certificate: any = process.env.HTTPS_SERVER_CERT_PATH;
 
-    https.createServer({
-      key: fs.readFileSync(key),
-      cert: fs.readFileSync(certificate),
-    }, app).listen(port, () => {
-      console.log('🏁\Listening on https server!');
-      console.log(`Listening on port ${port}!`);
-    });
-  }
+  //   https.createServer({
+  //     key: fs.readFileSync(key),
+  //     cert: fs.readFileSync(certificate),
+  //   }, app).listen(port, () => {
+  //     console.log('🏁\Listening on https server!');
+  //     console.log(`Listening on port ${port}!`);
+  //   });
+  // }
+
+  await apollo.start();
+  await app.register(apollo.createHandler({ cors: false }));
 
   const serverInstance = app.listen(port);
   console.log('🏁\Listening on standard server!');
