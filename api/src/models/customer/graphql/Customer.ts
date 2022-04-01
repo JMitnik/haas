@@ -74,7 +74,7 @@ export const CustomerType = objectType({
       },
     });
 
-    t.field('dialogueStatisticsSummary', {
+    t.field('nestedDialogueStatisticsSummary', {
       type: DialogueStatisticsSummaryModel,
       list: true,
       args: {
@@ -82,7 +82,7 @@ export const CustomerType = objectType({
       },
       nullable: true,
       useParentResolve: true,
-      useQueryCounter: true,
+      // useQueryCounter: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
         if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
@@ -133,20 +133,27 @@ export const CustomerType = objectType({
           return caches;
         }
 
-        const scopedSessions = await ctx.services.sessionService.findSessionsForDialogues(
-          dialogueIds,
-          utcStartDateTime as Date,
-          endDateTimeSet
-        );
+        // const scopedSessions = await ctx.services.sessionService.findSessionsForDialogues(
+        //   dialogueIds,
+        //   utcStartDateTime as Date,
+        //   endDateTimeSet
+        // );
 
-        const sessionIds = scopedSessions.map((session) => session.id);
+        // const sessionIds = scopedSessions.map((session) => session.id);
         const nodeEntries = await ctx.prisma.nodeEntry.findMany({
           where: {
             AND: [
               {
-                sessionId: {
-                  in: sessionIds,
+                session: {
+                  dialogueId: {
+                    in: dialogueIds,
+                  },
                 },
+                creationDate: {
+                  gte: utcStartDateTime as Date,
+                  lte: endDateTimeSet,
+                },
+
               },
               {
                 depth: 0,
@@ -169,6 +176,8 @@ export const CustomerType = objectType({
         });
 
         const sessionContext = groupBy(nodeEntries, (nodeEntry) => nodeEntry.session?.dialogueId);
+
+        // If no node entries/sessions exist for a dialogue return empty list so cache entry can get created
         dialogueIds.forEach((dialogueId) => {
           if (!sessionContext[dialogueId]) {
             sessionContext[dialogueId] = []

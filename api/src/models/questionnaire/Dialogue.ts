@@ -232,7 +232,7 @@ export const DialogueType = objectType({
       },
       nullable: true,
       useParentResolve: true,
-      useQueryCounter: true,
+      // useQueryCounter: true,
       useTimeResolve: true,
       resolve(parent, args, ctx) {
         if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
