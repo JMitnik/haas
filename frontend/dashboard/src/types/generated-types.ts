@@ -2938,7 +2938,7 @@ export type GetDialogueStatisticsQuery = (
       & { thisWeekAverageScore: Dialogue['averageScore'], previousScore: Dialogue['averageScore'] }
       & { sessions: Array<(
         { __typename?: 'Session' }
-        & Pick<Session, 'id' | 'createdAt' | 'score'>
+        & Pick<Session, 'id' | 'createdAt' | 'mainScore'>
         & { nodeEntries: Array<(
           { __typename?: 'NodeEntry' }
           & { relatedNode?: Maybe<(
@@ -4235,7 +4235,7 @@ export const GetDialogueStatisticsDocument = gql`
       sessions(take: 3) {
         id
         createdAt
-        score
+        mainScore
         nodeEntries {
           relatedNode {
             title

@@ -263,6 +263,7 @@ export const DialogueType = objectType({
       type: 'Float',
       args: { input: DialogueFilterInputType },
       useTimeResolve: true,
+      useQueryCounter: true,
       async resolve(parent, args) {
         if (!parent.id) {
           return 0;
@@ -289,7 +290,8 @@ export const DialogueType = objectType({
       type: DialogueStatistics,
       args: { input: DialogueFilterInputType },
       nullable: true,
-
+      useQueryCounter: true,
+      useTimeResolve: true,
       async resolve(parent, args) {
         const startDate = args.input?.startDate ? formatDate(args.input.startDate) : subDays(new Date(), 7);
         const endDate = args.input?.endDate ? formatDate(args.input.endDate) : null;

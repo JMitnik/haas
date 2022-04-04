@@ -9,7 +9,7 @@ query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $pre
       sessions(take: 3) {
         id
         createdAt
-        score
+        mainScore
         nodeEntries {
           relatedNode {
             title
