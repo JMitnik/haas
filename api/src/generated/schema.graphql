@@ -1432,6 +1432,7 @@ input RequestInviteInput {
 
 type RequestInviteOutput {
   didInvite: Boolean!
+  loginToken: String
   userExists: Boolean!
 }
 

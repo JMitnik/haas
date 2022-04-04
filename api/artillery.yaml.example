@@ -1,0 +1,48 @@
+# Run by running: artillery run <file_name>.yaml
+config:
+  target: "http://localhost:4000"
+  phases:
+    - duration: 1
+      arrivalRate: 1
+      name: Warm up # This phase will send five virtual users to your backend every second for 60 seconds.
+    - duration: 1
+      arrivalRate: 1
+      # rampTo: 50
+      name: Ramp up load # The second phase that follows will start with five virtual users and gradually send more users every second for the next two minutes, peaking at 50 virtual users at the end of the phase.
+    - duration: 1
+      arrivalRate: 1
+      name: Sustained load # The final phase simulates a sustained spike of 50 virtual users every second for the next ten minutes. This phase is meant to stress test your backend to check the system's sustainability over a more extended period.
+
+scenarios:
+  - name: "Loggingin"
+    flow:
+      - post:
+          url: "/graphql"
+          json:
+            query: |
+              mutation request {
+                requestInvite(input: { email: "daan@haas.live"}) {
+                  loginToken
+                }
+              }
+            variables:
+              input:
+                username: "{{ $randomString() }}"
+                email: "user-{{ $randomString() }}@artillery.io"
+                password: "my-useful-password"
+          capture:
+            - json: "$.data.requestInvite.loginToken"
+              as: "loginToken"
+      - think: 5 # simulate a user spending time on the website after making the previous request
+      - post:
+          url: "/graphql"
+          json:
+            query: |
+              mutation verifyToken {
+                verifyUserToken(token: "{{ loginToken }}") {
+                  accessToken
+                }
+              }
+            capture:
+              - json: "$.data.verifyUserToken.accessToken"
+                as: "accessToken"

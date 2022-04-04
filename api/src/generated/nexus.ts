@@ -1016,6 +1016,7 @@ export interface NexusGenRootTypes {
   }
   RequestInviteOutput: { // root type
     didInvite: boolean; // Boolean!
+    loginToken?: string | null; // String
     userExists: boolean; // Boolean!
   }
   RoleConnection: { // root type
@@ -1836,6 +1837,7 @@ export interface NexusGenFieldTypes {
   }
   RequestInviteOutput: { // field return type
     didInvite: boolean; // Boolean!
+    loginToken: string | null; // String
     userExists: boolean; // Boolean!
   }
   RoleConnection: { // field return type
