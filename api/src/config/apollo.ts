@@ -77,13 +77,11 @@ export const makeApollo = async (prisma: PrismaClient, app: FastifyInstance) => 
   console.log('💼\tBootstrapping Graphql Engine Apollo');
 
   const apollo: ApolloServer = new ApolloServer({
-    // uploads: false,
     schema: applyMiddleware(schema, authShield),
     context: async (ctx): Promise<APIContext> => ({
       req: ctx.request,
       res: ctx.reply,
       ...ctx,
-      config: ctx,
       session: await new ContextSessionService(ctx, prisma).constructContextSession(),
       prisma,
       services: bootstrapServices(prisma),

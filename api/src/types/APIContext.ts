@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { FastifyContext, FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyContext } from 'apollo-server-fastify'
 import { RouteGenericInterface } from 'fastify/types/route';
 
 

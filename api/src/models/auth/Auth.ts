@@ -134,7 +134,6 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
 
     // It seems all is good now. We can remove the token from the database, and set a refresh token on the user
     await ctx.services.userService.login(validUser.id, refreshToken);
-
     Promise.resolve(ctx.res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
     })).catch((e) => console.log('Something went wrong setting refresh_token: ', e));
