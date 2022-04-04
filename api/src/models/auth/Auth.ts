@@ -38,13 +38,16 @@ export const AuthenticateLambda = mutationField('authenticateLambda', {
   nullable: true,
   args: { input: AuthenticateLambdaInput },
   async resolve(parent, args, ctx) {
-    const authorizationHeader = ctx.req.header('lambda');
+    const authorizationHeader = ctx.req.headers['lambda'];
     if (!authorizationHeader) throw new Error('No authorization header available');
     if (!args.input?.authenticateEmail) throw new Error('No authenticate email provided');
     if (!args.input?.workspaceEmail) throw new Error('No workspace email provided');
-    const token = await ctx.services.authService.getWorkspaceAuthorizationToken(authorizationHeader, args.input.workspaceEmail);
+    const token = await ctx.services.authService.getWorkspaceAuthorizationToken(
+      authorizationHeader,
+      args.input.workspaceEmail
+    );
     return token || null;
-  }
+  },
 })
 
 export const CreateAutomationToken = mutationField('createAutomationToken', {
@@ -55,7 +58,7 @@ export const CreateAutomationToken = mutationField('createAutomationToken', {
   async resolve(parent, args, ctx) {
     if (!args.email) throw new ApolloError('No email address provided!');
     return ctx.services.authService.createAutomationToken(args.email, 262974);
-  }
+  },
 });
 
 export const RegisterMutation = mutationField('register', {
@@ -132,9 +135,9 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
     // It seems all is good now. We can remove the token from the database, and set a refresh token on the user
     await ctx.services.userService.login(validUser.id, refreshToken);
 
-    ctx.res.cookie('refresh_token', refreshToken, {
+    Promise.resolve(ctx.res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-    });
+    })).catch((e) => console.log('Something went wrong setting refresh_token: ', e));
 
     return {
       userData: {
@@ -190,7 +193,7 @@ export const RequestInviteMutation = mutationField('requestInvite', {
 
     if (!user) return { didInvite: false, userExists: false };
 
-    const loginToken = AuthService.createUserToken(user.id);
+    const loginToken = AuthService.createUserToken(user.id, 60);
     await ctx.services.userService.setLoginToken(user.id, loginToken);
 
     const loginBody = makeSignInTemplate({
@@ -206,7 +209,7 @@ export const RequestInviteMutation = mutationField('requestInvite', {
 
     return {
       didInvite: true,
-      userExists: true
+      userExists: true,
     };
   },
 });
@@ -245,7 +248,8 @@ export const LogoutMutation = mutationField('logout', {
 
   async resolve(parent, args, ctx) {
     if (!ctx.session?.user?.id) throw new ApolloError('No user found');
-    ctx.res.cookie('refresh_token', null);
+    Promise.resolve(ctx.res.header('refresh_token', null))
+      .catch((e) => console.log('Error removing refresh token: ', e));
     await ctx.services.userService.logout(ctx.session.user.id);
 
     return 'Logged out';

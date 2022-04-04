@@ -1,11 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-import fs from 'fs';
-import https from 'https';
 import cookieParser from 'cookie-parser';
 import cors, { CorsOptions } from 'cors';
 import Fastify from 'fastify';
 import ExpressPlugin from 'fastify-express';
 import MultiPartPlugin from 'fastify-multipart';
+import CookiePlugin from 'fastify-cookie';
 
 import { processRequest } from 'graphql-upload';
 
@@ -19,6 +18,7 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
 
   await app.register(ExpressPlugin);
   await app.register(MultiPartPlugin);
+  await app.register(CookiePlugin);
 
   // Format the request body to follow graphql-upload's
   app.addHook('preValidation', async function (request, reply) {
@@ -71,9 +71,9 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   await apollo.start();
   await app.register(apollo.createHandler({ cors: false }));
 
-  const serverInstance = app.listen(port);
+  await app.listen(port);
   console.log('🏁\Listening on standard server!');
   console.log('🏁\tStarted the server!');
 
-  return serverInstance;
+  return app.server;
 };

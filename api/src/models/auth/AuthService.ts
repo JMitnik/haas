@@ -53,7 +53,7 @@ class AuthService {
       firstName: userInput.firstName,
       lastName: userInput.lastName,
       password: hashedPassword,
-      workspaceId: userInput.customerId
+      workspaceId: userInput.customerId,
     }
 
     const user = await this.userPrismaAdapter.registerUser(registerUserInput);

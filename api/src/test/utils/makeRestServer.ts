@@ -20,7 +20,7 @@ export const makeRestServer = (prisma: PrismaClient) => {
 
     Object.assign(restContext, {
       serverInstance: serverInstance,
-      port
+      port,
     })
   });
 

@@ -5,10 +5,10 @@ import { GraphQLClient } from 'graphql-request';
 
 import { makeServer } from '../../config/server';
 
-type TestContext = {
+interface TestContext {
   client: GraphQLClient;
   port: number;
-};
+}
 
 export const makeTestContext = (prisma: PrismaClient): TestContext => {
   let ctx = {} as TestContext;

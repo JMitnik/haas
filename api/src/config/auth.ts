@@ -29,9 +29,10 @@ const isFromClient = rule({ cache: 'contextual' })(
     // console.log(ctx.req.get('origin'));
     if (config.env === 'local') return true;
 
-    if (ctx.req.get('origin') === config.clientUrl) {
-      return true;
-    }
+    // TODO: Create fix for fastify but since all condition are returning true I will wait for now
+    // if (ctx.req.get('origin') === config.clientUrl) {
+    //     return true;
+    //   }
 
     return true;
   },

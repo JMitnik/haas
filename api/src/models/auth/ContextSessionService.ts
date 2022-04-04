@@ -52,22 +52,22 @@ class ContextSessionService {
     // Support auth use-case if a token is supported using cookie (should be HTTP-only)
     const request = this.context.request as any;
     const cookieToken: string | null = request.cookies?.access_token;
-
     // Support auth-use case if a token is submitted using a Bearer token
     const authHeader = this.context.request.headers.authorization || '';
+
     const bearerToken = readBearerToken(authHeader);
 
     // Prefer cookie-token over bearer-token
     const authToken = cookieToken || bearerToken || null;
 
     if (!authToken) return null;
-
     let isValid = null;
     try {
       isValid = jwt.verify(authToken, config.jwtSecret);
     } catch (e) {
-      // this.context.res.cookie('access_token', '');
-      await this.context.reply.header('access_token', '');
+      console.log('Error verifying jwt: ', e);
+      Promise.resolve(this.context.reply.cookie('access_token', ''))
+        .catch(() => { return });
       throw new AuthenticationError('UNAUTHENTICATED');
     }
 

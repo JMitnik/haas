@@ -216,7 +216,7 @@ export const HandleUserStateInWorkspaceInput = inputObjectType({
     t.string('userId');
     t.string('workspaceId');
     t.boolean('isActive')
-  }
+  },
 })
 
 export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorkspace', {
@@ -229,7 +229,7 @@ export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorksp
 
     const input = { userId: args.input.userId, isActive: args.input.isActive, workspaceId: args.input.workspaceId }
     return ctx.services.userService.setUserStateInWorkspace(input);
-  }
+  },
 })
 
 export const UserMutations = extendType({

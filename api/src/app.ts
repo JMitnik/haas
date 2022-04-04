@@ -16,7 +16,9 @@ process.on('SIGTERM', async () => {
 
 try {
   console.log('App Lifecycle: Starting app');
-  makeServer(config.port, prisma);
+  makeServer(config.port, prisma).then(() => { return; }
+  ).catch(() =>
+    console.log('Something went wrong loading server'));
 } catch (e) {
   console.log(e);
 }
