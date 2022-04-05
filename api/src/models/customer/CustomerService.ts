@@ -138,18 +138,18 @@ class CustomerService {
     return [...cachedSummaries, ...newCaches];
   }
 
-  massSeed = async (input: NexusGenInputs['MassSeedInput']) => {
+  massSeed = async (input: NexusGenInputs['MassSeedInput'], isStrict: boolean = false) => {
     const { customerId, maxGroups, maxSessions, maxTeams } = input;
 
     const customer = await this.findWorkspaceById(customerId);
     if (!customer) return null;
 
     // Generate 
-    const amtGroups = Math.ceil(Math.random() * maxGroups + 1);
+    const amtGroups = !isStrict ? Math.ceil(Math.random() * maxGroups + 1) : maxGroups;
     const maleDialogueNames = [...Array(amtGroups)].flatMap((number, index) => {
       const teamAge = 8 + (4 * index);
       const groupName = `Group U${teamAge}`;
-      const amtTeams = Math.floor(Math.random() * maxTeams + 1);
+      const amtTeams = !isStrict ? Math.floor(Math.random() * maxTeams + 1) : maxTeams;
       const teamNames = [...Array(amtTeams)].map((number, index) => `${groupName} Male - Team ${index + 1}`);
       return teamNames;
     });
@@ -157,7 +157,7 @@ class CustomerService {
     const femaleDialogueNames = [...Array(amtGroups)].flatMap((number, index) => {
       const teamAge = 8 + (4 * index);
       const groupName = `Group U${teamAge}`;
-      const amtTeams = Math.floor(Math.random() * maxTeams + 1);
+      const amtTeams = !isStrict ? Math.floor(Math.random() * maxTeams + 1) : maxTeams;
       const teamNames = [...Array(amtTeams)].map((number, index) => `${groupName} Female - Team ${index + 1}`);
       return teamNames;
     });
@@ -184,7 +184,7 @@ class CustomerService {
       // Step 3: Make nodes
       await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
 
-      await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate, maxSessions);
+      await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate, maxSessions, isStrict);
     }));
 
     return customer;

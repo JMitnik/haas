@@ -18,7 +18,7 @@ const argv = yargs
       alias: 'g',
       description: 'Flag to indicate you want to generate new users',
       type: 'boolean',
-      default: true,
+      default: false,
     },
   })
   .option('amount', {

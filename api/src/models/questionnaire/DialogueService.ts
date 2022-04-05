@@ -596,11 +596,16 @@ class DialogueService {
     return values;
   };
 
-  massGenerateFakeData = async (dialogueId: string, template: MassSeedTemplate, maxSessions: number = 30) => {
+  massGenerateFakeData = async (
+    dialogueId: string,
+    template: MassSeedTemplate,
+    maxSessions: number = 30,
+    isStrict: boolean = false
+  ) => {
     const currentDate = new Date();
 
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
-    const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
+    const datesBackInTime = nrDaysBack.map((amtDaysBack, index) => subDays(currentDate, index));
     const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
     await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueId, true);
 
@@ -612,7 +617,8 @@ class DialogueService {
 
     // For every particular date, generate a fake score
     await Promise.all(datesBackInTime.map(async (backDate) => {
-      await Promise.all([...Array(Math.ceil(Math.random() * maxSessions + 1))].map(async () => {
+      const amtSessions = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
+      await Promise.all([...Array(amtSessions)].map(async () => {
         const simulatedRootVote: number = getRandomInt(100);
 
         const simulatedChoice = Object.keys(template.topics)[
