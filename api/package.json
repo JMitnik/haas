@@ -28,6 +28,7 @@
     "seed": "ts-node --transpile-only src/data/main-seed.ts",
     "seed:basic": "ts-node src/scripts/seed.ts",
     "usp:mapSessionScores": "ts-node src/scripts/mapSliderScoreToSession.ts",
+    "artillery:generateUsersPayload": "ts-node src/scripts/generateArtilleryUsersPayload.ts",
     "types": "tsc --noEmit",
     "prisma": "prisma"
   },
@@ -132,7 +133,8 @@
     "prisma": "2.30.3",
     "regenerator-runtime": "^0.13.9",
     "ts-jest": "^25.4.0",
-    "typescript": "^3.7.3"
+    "typescript": "^3.7.3",
+    "yargs": "^17.4.0"
   },
   "resolutions": {
     "**/**/fs-capacitor": "^6.2.0",
