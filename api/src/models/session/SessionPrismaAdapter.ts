@@ -142,8 +142,8 @@ class SessionPrismaAdapter {
    */
   findSessionsBetweenDates = async (
     dialogueId: string,
-    startDateTime: Date,
-    endDateTime: Date,
+    startDateTime?: Date,
+    endDateTime?: Date,
     performanceThreshold?: number
   ) => {
     const sessionWhereInput: Prisma.SessionWhereInput = {

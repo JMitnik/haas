@@ -1148,22 +1148,21 @@ class DialogueService {
     return finalQuestions;
   };
 
-  static calculateAverageDialogueScore = async (dialogueId: string, filters?: NexusGenInputs['DialogueFilterInputType']) => {
-    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, {
-      startDate: filters?.startDate ? new Date(filters?.startDate) : null,
-      endDate: filters?.endDate ? new Date(filters?.endDate) : null,
-    });
+  calculateAverageScore = async (dialogueId: string, filters: {
+    startDate?: Date;
+    endDate?: Date;
+  }) => {
+    const sessions = await this.sessionPrismaAdapter.findSessionsBetweenDates(
+      dialogueId, filters.startDate, filters.endDate
+    );
 
     if (!sessions) {
       return 0;
     }
 
-    const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions);
-
-    const scores = _.mean((scoringEntries).map((entry) => entry?.sliderNodeEntry?.value)) || 0;
-
-    return scores;
-  };
+    const average = _.meanBy(sessions, (session) => session.mainScore);
+    return average;
+  }
 
   static getDialogueInteractionFeedItems = async (
     dialogueId: string,

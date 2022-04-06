@@ -1504,7 +1504,7 @@ export interface NexusGenFieldTypes {
     pageIndex: number; // Int!
   }
   Dialogue: { // field return type
-    averageScore: number; // Float!
+    averageScore: number | null; // Float
     campaignVariants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
     creationDate: string | null; // String
     customer: NexusGenRootTypes['Customer'] | null; // Customer

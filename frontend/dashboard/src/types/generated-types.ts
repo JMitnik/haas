@@ -733,7 +733,8 @@ export type Dialogue = {
   pathedSessionsConnection?: Maybe<PathedSessionsType>;
   topic: TopicType;
   dialogueStatisticsSummary?: Maybe<DialogueStatisticsSummaryModel>;
-  averageScore: Scalars['Float'];
+  averageScore?: Maybe<Scalars['Float']>;
+  sessions: Array<Session>;
   statistics?: Maybe<DialogueStatistics>;
   sessionConnection?: Maybe<SessionConnection>;
   tags?: Maybe<Array<Tag>>;
@@ -742,7 +743,6 @@ export type Dialogue = {
   rootQuestion: QuestionNode;
   edges: Array<Edge>;
   questions: Array<QuestionNode>;
-  sessions: Array<Session>;
   leafs: Array<QuestionNode>;
   campaignVariants: Array<CampaignVariantType>;
 };
@@ -768,6 +768,11 @@ export type DialogueAverageScoreArgs = {
 };
 
 
+export type DialogueSessionsArgs = {
+  take?: Maybe<Scalars['Int']>;
+};
+
+
 export type DialogueStatisticsArgs = {
   input?: Maybe<DialogueFilterInputType>;
 };
@@ -775,11 +780,6 @@ export type DialogueStatisticsArgs = {
 
 export type DialogueSessionConnectionArgs = {
   filter?: Maybe<SessionConnectionFilterInput>;
-};
-
-
-export type DialogueSessionsArgs = {
-  take?: Maybe<Scalars['Int']>;
 };
 
 
@@ -805,6 +805,7 @@ export type DialogueConditionScopeModel = {
 };
 
 export type DialogueFilterInputType = {
+  dateLabel?: Maybe<Scalars['String']>;
   searchTerm?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
@@ -1989,6 +1990,7 @@ export type RequestInviteOutput = {
   __typename?: 'RequestInviteOutput';
   didInvite: Scalars['Boolean'];
   userExists: Scalars['Boolean'];
+  loginToken?: Maybe<Scalars['String']>;
 };
 
 export type RoleConnection = DeprecatedConnectionInterface & {

@@ -636,7 +636,7 @@ type DeprecatedPaginationPageInfo {
 }
 
 type Dialogue {
-  averageScore(input: DialogueFilterInputType): Float!
+  averageScore(input: DialogueFilterInputType): Float
   campaignVariants: [CampaignVariantType!]!
   creationDate: String
   customer: Customer
