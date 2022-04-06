@@ -41,21 +41,21 @@ export class CampaignPrismaAdapter {
       query = {
         ...cloneDeep(query),
         OR: [
-          { deliveryRecipientEmail: { contains: filter.search, mode: 'insensitive' }, },
-          { deliveryRecipientPhone: { contains: filter.search, mode: 'insensitive' }, },
+          { deliveryRecipientEmail: { contains: filter.search, mode: 'insensitive' } },
+          { deliveryRecipientPhone: { contains: filter.search, mode: 'insensitive' } },
           {
             AND: potentialLastName ? [
-              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
-              { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' }, },
-            ] : undefined
+              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' } },
+              { deliveryRecipientLastName: { contains: potentialLastName, mode: 'insensitive' } },
+            ] : undefined,
           },
           {
             OR: !potentialLastName ? [
-              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' }, },
-              { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' }, },
-            ] : undefined
-          }
-        ]
+              { deliveryRecipientFirstName: { contains: potentialFirstName, mode: 'insensitive' } },
+              { deliveryRecipientLastName: { contains: potentialFirstName, mode: 'insensitive' } },
+            ] : undefined,
+          },
+        ],
       }
     }
 
@@ -93,8 +93,8 @@ export class CampaignPrismaAdapter {
         events: {
           create: {
             status: 'SCHEDULED',
-          }
-        }
+          },
+        },
       },
     });
   }
@@ -104,7 +104,7 @@ export class CampaignPrismaAdapter {
    * @param filter
    */
   buildOrderByQuery = (filter?: NexusGenInputs['DeliveryConnectionFilterInput'] | null) => {
-    let orderByQuery: Prisma.DeliveryOrderByInput[] = [];
+    let orderByQuery: Prisma.DeliveryOrderByWithRelationInput[] = [];
 
     if (filter?.orderBy?.by === 'createdAt') {
       orderByQuery.push({
@@ -130,7 +130,7 @@ export class CampaignPrismaAdapter {
       skip: offset,
       take: perPage,
       orderBy: this.buildOrderByQuery(filter),
-      include: { campaignVariant: true, campaign: true }
+      include: { campaignVariant: true, campaign: true },
     });
 
     return deliveries;
@@ -161,9 +161,9 @@ export class CampaignPrismaAdapter {
         CampaignVariantToCampaign: {
           include: {
             campaign: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     return edges?.CampaignVariantToCampaign[0]?.campaign;
@@ -175,7 +175,7 @@ export class CampaignPrismaAdapter {
    */
   findCampaignVariantOfDelivery = async (deliveryId: string) => {
     return this.prisma.delivery.findUnique({
-      where: { id: deliveryId }
+      where: { id: deliveryId },
     }).campaignVariant();
   }
 
@@ -185,7 +185,7 @@ export class CampaignPrismaAdapter {
    */
   findWorkspaceOfCampaignVariant = async (campaignVariantId: string) => {
     return this.prisma.campaignVariant.findUnique({
-      where: { id: campaignVariantId }
+      where: { id: campaignVariantId },
     }).workspace();
   }
 
@@ -195,7 +195,7 @@ export class CampaignPrismaAdapter {
    */
   findDialogueOfCampaignVariant = async (campaignVariantId: string) => {
     return this.prisma.campaignVariant.findUnique({
-      where: { id: campaignVariantId }
+      where: { id: campaignVariantId },
     }).dialogue();
   }
 
@@ -225,7 +225,7 @@ export class CampaignPrismaAdapter {
                   createMany: {
                     data: variant.customVariables?.map(variable => ({
                       key: variable.key || '',
-                    })) || []
+                    })) || [],
                   },
                 },
                 dialogue: {
@@ -246,12 +246,12 @@ export class CampaignPrismaAdapter {
               include: {
                 dialogue: true,
                 workspace: true,
-                customVariables: true
-              }
-            }
-          }
-        }
-      }
+                customVariables: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
@@ -264,7 +264,7 @@ export class CampaignPrismaAdapter {
         status: eventType,
         Delivery: { connect: { id: deliveryId } },
         createdAt: new Date(Date.now()),
-      }
+      },
     });
   }
 
@@ -283,7 +283,7 @@ export class CampaignPrismaAdapter {
                   include: {
                     dialogue: true,
                     workspace: true,
-                  }
+                  },
                 },
               },
             },
@@ -301,7 +301,7 @@ export class CampaignPrismaAdapter {
    */
   findDeliveryOfSession = async (sessionId: string) => {
     return this.prisma.session.findUnique({
-      where: { id: sessionId }
+      where: { id: sessionId },
     }).delivery();
   }
 
@@ -312,7 +312,7 @@ export class CampaignPrismaAdapter {
    */
   findDeliveryEventsOfDelivery = async (deliveryId: string) => {
     return this.prisma.delivery.findFirst({
-      where: { id: deliveryId }
+      where: { id: deliveryId },
     }).events();
   }
 
@@ -330,7 +330,7 @@ export class CampaignPrismaAdapter {
       include: {
         campaign: true,
         campaignVariant: true,
-      }
+      },
     })
   }
 
@@ -349,11 +349,11 @@ export class CampaignPrismaAdapter {
                 dialogue: true,
                 workspace: true,
                 customVariables: true,
-              }
+              },
             },
-          }
-        }
-      }
+          },
+        },
+      },
     });
   }
 }

@@ -497,6 +497,7 @@ type Customer {
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
+  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
   roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
@@ -635,7 +636,7 @@ type DeprecatedPaginationPageInfo {
 }
 
 type Dialogue {
-  averageScore(input: DialogueFilterInputType): Float!
+  averageScore(input: DialogueFilterInputType): Float
   campaignVariants: [CampaignVariantType!]!
   creationDate: String
   customer: Customer
@@ -647,7 +648,7 @@ type Dialogue {
   isWithoutGenData: Boolean!
   language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
-  pathedSessions(input: PathedSessionsInput): PathedSessionsType
+  pathedSessionsConnection(input: PathedSessionsInput): PathedSessionsType
   postLeafNode: DialogueFinisherObjectType
   publicTitle: String
   questions: [QuestionNode!]!
@@ -715,7 +716,7 @@ type DialogueStatisticsSummaryModel {
   dialogue: Dialogue
   dialogueId: String!
   endDateTime: Date
-  id: ID!
+  id: ID
   impactScore: Float
   nrVotes: Int
   startDateTime: Date
@@ -1229,11 +1230,9 @@ input PathedSessionsInput {
 
 type PathedSessionsType {
   endDateTime: String!
-  id: String!
   path: [String!]!
   pathedSessions: [Session!]!
   startDateTime: String!
-  updatedAt: String!
 }
 
 input PermissionIdsInput {
@@ -1433,6 +1432,7 @@ input RequestInviteInput {
 
 type RequestInviteOutput {
   didInvite: Boolean!
+  loginToken: String
   userExists: Boolean!
 }
 
@@ -1655,6 +1655,7 @@ input TopicInputType {
   endDateTime: String
   impactScoreType: DialogueImpactScoreType!
   isRoot: Boolean = false
+  refresh: Boolean
   startDateTime: String!
   value: String!
 }

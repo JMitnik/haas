@@ -142,8 +142,8 @@ class SessionPrismaAdapter {
    */
   findSessionsBetweenDates = async (
     dialogueId: string,
-    startDateTime: Date,
-    endDateTime: Date,
+    startDateTime?: Date,
+    endDateTime?: Date,
     performanceThreshold?: number
   ) => {
     const sessionWhereInput: Prisma.SessionWhereInput = {
@@ -329,7 +329,7 @@ class SessionPrismaAdapter {
    * @param filter
    */
   buildOrderByQuery = (filter?: NexusGenInputs['SessionConnectionFilterInput'] | null) => {
-    let orderByQuery: Prisma.SessionOrderByInput[] = [];
+    let orderByQuery: Prisma.SessionOrderByWithRelationInput[] = [];
 
     if (filter?.orderBy?.by === 'createdAt') {
       orderByQuery.push({
@@ -349,7 +349,18 @@ class SessionPrismaAdapter {
       skip: offset,
       take: perPage,
       orderBy: this.buildOrderByQuery(filter),
-      include: { delivery: { include: { campaignVariant: true } } },
+      include: {
+        delivery: {
+          include: {
+            campaignVariant: true,
+          },
+        },
+        nodeEntries: {
+          orderBy: {
+            depth: 'asc',
+          },
+        },
+      },
     });
 
     return sessions;
@@ -507,6 +518,7 @@ class SessionPrismaAdapter {
 
     return this.prisma.session.create({
       data: {
+        createdAt: data.createdAt,
         mainScore: data.simulatedRootVote,
         nodeEntries: {
           create: [{
@@ -528,6 +540,7 @@ class SessionPrismaAdapter {
             choiceNodeEntry: {
               create: { value: data.simulatedChoice },
             },
+            inputSource: 'INIT_GENERATED',
           },
           {
             depth: 2,
@@ -537,6 +550,7 @@ class SessionPrismaAdapter {
             choiceNodeEntry: {
               create: { value: data.simulatedSubChoice },
             },
+            inputSource: 'INIT_GENERATED',
           },
           ],
         },

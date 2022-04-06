@@ -10,6 +10,15 @@ const isValidDate = (dateString: string): boolean => {
   return date instanceof Date && !Number.isNaN(date.getSeconds());
 };
 
+export const isADate = (dateString: string) => {
+  const date = new Date(dateString);
+  if (!(date instanceof Date && !Number.isNaN(date.getSeconds()))) {
+    throw new UserInputError('Date invalid');
+  }
+
+  return date;
+};
+
 const setTime = (date: Date, isStartDate: boolean, isWithTime: boolean) => {
   if (isStartDate) {
     return isWithTime ? date : startOfDay(date);

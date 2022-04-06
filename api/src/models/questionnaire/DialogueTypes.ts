@@ -1,4 +1,4 @@
-import { NodeType, LanguageEnum, NodeEntry, QuestionOption } from '@prisma/client';
+import { NodeType, LanguageEnum, NodeEntry, QuestionOption, Session, ChoiceNodeEntry, Edge } from '@prisma/client';
 
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 
@@ -8,10 +8,17 @@ export interface ChildNodeEntry {
   nodeEntryId: string;
 };
 
+export interface TopicSession extends Session {
+  nodeEntries: {
+    id: string;
+    choiceNodeEntry: ChoiceNodeEntry | null;
+  }[];
+}
+
 export interface TopicNodeEntry extends ChildNodeEntry {
   nodeEntry: NodeEntry & {
     relatedNode: {
-      options: QuestionOption[];
+      // options: QuestionOption[];
       children: {
         childNode: {
           options: QuestionOption[];

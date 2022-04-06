@@ -1,15 +1,14 @@
 import {
-  NodeEntry, Session, Prisma, PrismaClient,
+  NodeEntry, Session, Prisma, PrismaClient, ChoiceNodeEntry, QuestionNode, SliderNodeEntry, VideoNodeEntry,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { sortBy } from 'lodash';
 
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
-import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
-import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
 import TriggerService from '../trigger/TriggerService';
@@ -57,12 +56,7 @@ class SessionService {
     // Only if more than hour difference between last cache entry and now should we update cache
     if (prevStatistics) {
       if (differenceInHours(Date.now(), prevStatistics.updatedAt) == 0 && !refresh) {
-        return {
-          ...prevStatistics,
-          startDateTime: prevStatistics.startDateTime as Date,
-          endDateTime: prevStatistics.endDateTime as Date,
-          pathedSessions: prevStatistics.pathedSessions || [],
-        };
+        return prevStatistics;
       }
     }
 
@@ -84,7 +78,7 @@ class SessionService {
     );
 
     // Create a pathed session cache object
-    const upsertedPathedSession = await this.sessionPrismaAdapter.upsertPathedSessionCache(
+    void this.sessionPrismaAdapter.upsertPathedSessionCache(
       prevStatistics?.id || '-1',
       dialogueId,
       startDateTime,
@@ -94,10 +88,10 @@ class SessionService {
     );
 
     return {
-      ...upsertedPathedSession,
-      startDateTime: upsertedPathedSession.startDateTime as Date,
-      endDateTime: upsertedPathedSession.endDateTime as Date,
-      pathedSessions: upsertedPathedSession.pathedSessions || [],
+      path,
+      startDateTime: startDateTime as Date,
+      endDateTime: endDateTimeSet as Date,
+      pathedSessions: pathedSessions || [],
     };;
   }
 
@@ -109,6 +103,24 @@ class SessionService {
    */
   findNodeEntriesBySessionIds = async (sessionIds: string[], depth?: number) => {
     return this.sessionPrismaAdapter.findNodeEntriesBySessionIds(sessionIds, depth);
+  }
+
+  findSessionsForDialogues = async (
+    dialogueIds: string[],
+    startDateTime: Date,
+    endDateTime: Date,
+  ) => {
+    return this.sessionPrismaAdapter.prisma.session.findMany({
+      where: {
+        dialogueId: {
+          in: dialogueIds,
+        },
+        createdAt: {
+          gte: startDateTime,
+          lte: endDateTime,
+        },
+      },
+    })
   }
 
   /**
@@ -205,8 +217,15 @@ class SessionService {
   * @param sessions
   */
   static getScoringEntriesFromSessions(
-    sessions: SessionWithEntries[],
-  ): (NodeEntryWithTypes)[] {
+    sessions: (Session & {
+      nodeEntries: (NodeEntry & {
+        choiceNodeEntry: ChoiceNodeEntry | null;
+        sliderNodeEntry: SliderNodeEntry | null;
+        relatedNode: QuestionNode | null;
+        videoNodeEntry: VideoNodeEntry | null;
+      })[];
+    })[],
+  ) {
     if (!sessions.length) return [];
 
     const entries = sessions.map((session) => SessionService.getScoringEntryFromSession(session));
@@ -219,11 +238,25 @@ class SessionService {
   * Get the sole scoring entry a single session.
   * @param session
   */
-  static getScoringEntryFromSession(session: SessionWithEntries): NodeEntryWithTypes | null {
+  static getScoringEntryFromSession(session: (Session & {
+    nodeEntries: (NodeEntry & {
+      choiceNodeEntry: ChoiceNodeEntry | null;
+      sliderNodeEntry: SliderNodeEntry | null;
+      relatedNode: QuestionNode | null;
+      videoNodeEntry: VideoNodeEntry | null;
+    })[];
+  })) {
     return session.nodeEntries.find((entry) => entry.sliderNodeEntry?.value) || null;
   };
 
-  static getScoreFromSession(session: SessionWithEntries): number | null {
+  static getScoreFromSession(session: (Session & {
+    nodeEntries: (NodeEntry & {
+      choiceNodeEntry: ChoiceNodeEntry | null;
+      sliderNodeEntry: SliderNodeEntry | null;
+      relatedNode: QuestionNode | null;
+      videoNodeEntry: VideoNodeEntry | null;
+    })[];
+  })): number | null {
     const entry = SessionService.getScoringEntryFromSession(session);
 
     return entry?.sliderNodeEntry?.value || null;
@@ -234,8 +267,15 @@ class SessionService {
   * @param sessions
   */
   static getTextEntriesFromSessions(
-    sessions: SessionWithEntries[],
-  ): (NodeEntryWithTypes | undefined | null)[] {
+    sessions: (Session & {
+      nodeEntries: (NodeEntry & {
+        choiceNodeEntry: ChoiceNodeEntry | null;
+        sliderNodeEntry: SliderNodeEntry | null;
+        relatedNode: QuestionNode | null;
+        videoNodeEntry: VideoNodeEntry | null;
+      })[];
+    })[],
+  ) {
     if (!sessions.length) {
       return [];
     };
@@ -286,7 +326,7 @@ class SessionService {
     return rootedNodeEntry?.sliderNodeEntry?.value;
   };
 
-  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (Prisma.SessionOrderByInput | undefined) {
+  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (Prisma.SessionOrderByWithRelationInput | undefined) {
     if (!orderByArray?.length) return undefined;
 
     const orderBy = orderByArray[0];
@@ -305,75 +345,41 @@ class SessionService {
   static async fetchSessionsByDialogue(
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
-  ): Promise<Array<SessionWithEntries> | null | undefined> {
-    const dialogue = await prisma.dialogue.findUnique({
+    take?: number | null,
+  ) {
+    const sessions = await prisma.session.findMany({
+      take: take || undefined,
       where: {
-        id: dialogueId,
+        dialogueId,
+        AND: [{
+          nodeEntries: {
+            some: paginationOpts?.searchTerm
+              ? NodeEntryService.constructFindWhereTextNodeEntryFragment(paginationOpts?.searchTerm)
+              : undefined,
+          },
+        }, {
+          createdAt: {
+            gte: paginationOpts?.startDate || undefined,
+            lte: paginationOpts?.endDate || undefined,
+          } || undefined,
+        },
+        ],
       },
-    });
-
-    const dialougeWithSessionWithEntries = await prisma.dialogue.findUnique({
-      where: { id: dialogueId },
       include: {
-        sessions: {
-          where: {
-            AND: [{
-              nodeEntries: {
-                some: paginationOpts?.searchTerm
-                  ? NodeEntryService.constructFindWhereTextNodeEntryFragment(paginationOpts?.searchTerm)
-                  : undefined,
-              },
-            }, {
-              createdAt: {
-                gte: paginationOpts?.startDate || undefined,
-                lte: paginationOpts?.endDate || undefined,
-              } || undefined,
-            },
-            {
-              nodeEntries: {
-                every: dialogue?.isWithoutGenData ? {
-                  inputSource: 'CLIENT',
-                } : undefined,
-              },
-            },
-            {
-              nodeEntries: {
-                some: {
-                  sliderNodeEntry: {
-                    value: { gt: 0 },
-                  },
-                },
-              },
-            },
-            ],
+        nodeEntries: {
+          include: {
+            choiceNodeEntry: true,
+            sliderNodeEntry: true,
+            relatedNode: true,
+            videoNodeEntry: true,
           },
           orderBy: {
-            createdAt: 'desc',
-          },
-          include: {
-            delivery: true,
-            nodeEntries: {
-              include: {
-                choiceNodeEntry: true,
-                linkNodeEntry: true,
-                registrationNodeEntry: true,
-                formNodeEntry: { include: { values: true } },
-                sliderNodeEntry: true,
-                textboxNodeEntry: true,
-                relatedNode: true,
-                videoNodeEntry: true,
-              },
-              orderBy: {
-                depth: 'asc',
-              },
-            },
+            depth: 'asc',
           },
         },
       },
-    });
 
-    const sessions = dialougeWithSessionWithEntries?.sessions;
-    if (!sessions) return [];
+    })
 
     if (!paginationOpts) return sessions;
 
@@ -384,11 +390,18 @@ class SessionService {
   }
 
   static sortSessions(
-    sessions: SessionWithEntries[],
+    sessions: (Session & {
+      nodeEntries: (NodeEntry & {
+        choiceNodeEntry: ChoiceNodeEntry | null;
+        sliderNodeEntry: SliderNodeEntry | null;
+        relatedNode: QuestionNode | null;
+        videoNodeEntry: VideoNodeEntry | null;
+      })[];
+    })[],
     paginationOpts?: Nullable<PaginationProps>,
-  ): SessionWithEntries[] {
+  ) {
     const sessionsWithScores = sessions.map((session) => ({
-      score: SessionService.getScoreFromSession(session),
+      score: session.mainScore,
       paths: session.nodeEntries.length,
       ...session,
     }));

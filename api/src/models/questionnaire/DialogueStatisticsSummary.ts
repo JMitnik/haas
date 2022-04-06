@@ -10,7 +10,7 @@ export const DialogueStatisticsSummaryModel = objectType({
   name: 'DialogueStatisticsSummaryModel',
   description: 'DialogueStatisticsSummary',
   definition(t) {
-    t.id('id');
+    t.id('id', { nullable: true });
     t.string('dialogueId');
 
     t.date('updatedAt', { nullable: true });

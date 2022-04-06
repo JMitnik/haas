@@ -100,13 +100,11 @@ describe('Dialogue Pathed Sessions', () => {
       customer(slug: "${workspace.slug}") {
         id
         dialogue(where: { slug: "${dialogue.slug}"}) {
-          pathedSessions(input: {
+          pathedSessionsConnection(input: {
             path: ["Facilities"],
             refresh: true,
             startDateTime: "01-03-2022"
           }) {
-            id
-            updatedAt
             startDateTime
             endDateTime
             path
@@ -127,7 +125,7 @@ describe('Dialogue Pathed Sessions', () => {
       {
         'Authorization': `Bearer ${token}`,
       }
-    ).then((data) => data?.customer?.dialogue.pathedSessions.pathedSessions);
+    ).then((data) => data?.customer?.dialogue.pathedSessionsConnection.pathedSessions);
 
     // All with Facilities within date range
     expect(resRootWeekly).toHaveLength(3);
@@ -137,13 +135,11 @@ describe('Dialogue Pathed Sessions', () => {
       customer(slug: "${workspace.slug}") {
         id
         dialogue(where: { slug: "${dialogue.slug}"}) {
-          pathedSessions(input: {
+          pathedSessionsConnection(input: {
             path: ["Facilities", "Atmosphere"],
             refresh: true,
             startDateTime: "01-03-2022"
           }) {
-            id
-            updatedAt
             startDateTime
             endDateTime
             path
@@ -164,7 +160,7 @@ describe('Dialogue Pathed Sessions', () => {
       {
         'Authorization': `Bearer ${token}`,
       }
-    ).then((data) => data?.customer?.dialogue.pathedSessions.pathedSessions);
+    ).then((data) => data?.customer?.dialogue.pathedSessionsConnection.pathedSessions);
 
     // All with Facilities & Atmosphere 
     expect(resSubWeekly).toHaveLength(2);
@@ -174,13 +170,11 @@ describe('Dialogue Pathed Sessions', () => {
       customer(slug: "${workspace.slug}") {
         id
         dialogue(where: { slug: "${dialogue.slug}"}) {
-          pathedSessions(input: {
+          pathedSessionsConnection(input: {
             path: ["Facilities", "Atmosphere", "NOT_FOUND"],
             refresh: true,
             startDateTime: "01-03-2022"
           }) {
-            id
-            updatedAt
             startDateTime
             endDateTime
             path
@@ -201,7 +195,7 @@ describe('Dialogue Pathed Sessions', () => {
       {
         'Authorization': `Bearer ${token}`,
       }
-    ).then((data) => data?.customer?.dialogue.pathedSessions.pathedSessions);
+    ).then((data) => data?.customer?.dialogue.pathedSessionsConnection.pathedSessions);
 
     // All with Facilities & Atmosphere & NOT_FOUND
     expect(resNotFoundWeekly).toHaveLength(0);

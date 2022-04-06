@@ -1,5 +1,17 @@
 import { DialogueImpactScore, FormNodeFieldType, LinkTypeEnum, NodeType, Prisma } from '@prisma/client';
 
+export interface UpsertDialogueTopicCacheInput {
+  id?: string;
+  dialogueId?: string | null;
+  impactScore: any;
+  name: string;
+  nrVotes: number;
+  impactScoreType?: DialogueImpactScore;
+  startDateTime?: Date | null;
+  endDateTime?: Date | null;
+  subTopics?: UpsertDialogueTopicCacheInput[];
+};
+
 export interface UpsertDialogueStatisticsInput {
   dialogueId: string;
   impactScore: any;

@@ -28,6 +28,8 @@ export const SessionType = objectType({
       async resolve(parent) {
         // @ts-ignore
         if (parent.score) return parent.score;
+        if (parent.mainScore) return parent.mainScore;
+
 
         const score = await SessionService.findSessionScore(parent.id) || 0.0;
 

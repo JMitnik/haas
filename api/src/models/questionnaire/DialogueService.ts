@@ -1,21 +1,21 @@
-import { addDays, subDays } from 'date-fns';
+import { addDays, differenceInHours, subDays } from 'date-fns';
 import _, { groupBy, meanBy, sample, uniq, uniqBy } from 'lodash';
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
-import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, QuestionOption, DialogueImpactScore } from '@prisma/client';
+import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, QuestionOption, DialogueImpactScore, DialogueTopicCache, QuestionNode, Session } from '@prisma/client';
 
 import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import {
   HistoryDataProps, HistoryDataWithEntry, IdMapProps,
-  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType, ChildNodeEntry, TopicNodeEntry,
+  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType, ChildNodeEntry, TopicNodeEntry, TopicSession,
 } from './DialogueTypes';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
 import defaultWorkspaceTemplate, { MassSeedTemplate, rootTopics, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
-import { CreateQuestionsInput } from './DialoguePrismaAdapterType';
+import { CreateQuestionsInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
@@ -55,23 +55,19 @@ class DialogueService {
    * @param groupedSessions A dictionary where key = topic and value = data of topic
    * @returns a list of impact scores for every topic
    */
-  calculateTopicImpactScores = (
+  calculateSessionTopicImpactScores = (
     type: DialogueImpactScore,
-    groupedSessions: _.Dictionary<{
+    groupedNodeEntries: _.Dictionary<{
+      mainScore: number;
       id: string;
-      session: {
-        mainScore: number;
-      } | null;
-      choiceNodeEntry: {
-        value: string | null;
-      } | null;
+      choiceNodeEntry: ChoiceNodeEntry | null;
     }[]>) => {
     switch (type) {
 
       case DialogueImpactScore.AVERAGE:
-        const subTopicScores = Object.entries(groupedSessions).map((entry) => {
+        const subTopicScores = Object.entries(groupedNodeEntries).map((entry) => {
           const option = entry[0];
-          const average = meanBy(entry[1], (data) => data?.session?.mainScore);
+          const average = meanBy(entry[1], (data) => data?.mainScore);
           return { name: option, impactScore: average, nrVotes: entry[1].length };
         });
         return subTopicScores;
@@ -88,26 +84,18 @@ class DialogueService {
    * @param calculatedTopics a list of topics with their impactScore
    * @returns a complemented list of topics with their impact score
    */
-  completementTopics = (
-    targetNodeEntries: TopicNodeEntry[],
+  complementTopics = (
     calculatedTopics: {
       name: string;
       impactScore: number;
       nrVotes: number;
-    }[]
+    }[],
+    options: string[],
   ) => {
-    // Get all child nodes
-    const childNodes = targetNodeEntries.flatMap(
-      (targetNodeEntry) => targetNodeEntry?.nodeEntry?.relatedNode?.children
-    ).filter(isPresent);
-
-    // All unique sub topics available within the childNodes
-    const allPotentialSubTopics = uniq(childNodes?.flatMap(
-      (child) => child.childNode?.options.length ? child.childNode?.options.map((option) => option.value) : undefined)
-    ).filter(isPresent);
+    // const allPotentialSubTopics: string[] = rootOptions.map((option) => option.value);
 
     // Add sub topics which don't have any node entries to complement list with rest of sub topics
-    allPotentialSubTopics.forEach((option) => {
+    options.forEach((option) => {
       const targetSubTopic = calculatedTopics.find((subTopic) => subTopic.name === option);
       if (!targetSubTopic) calculatedTopics.push({ nrVotes: 0, impactScore: 0, name: option });
     });
@@ -121,33 +109,97 @@ class DialogueService {
    * @returns an impact score for every sub topic
    */
   findSubTopicsOfNodeEntries = async (
-    targetNodeEntries: TopicNodeEntry[],
+    topicSessions: TopicSession[],
     dialogueId: string,
     impactScoreType: DialogueImpactScore,
-    topic?: string
+    topic: string = '',
+    options?: string[],
   ) => {
     // If no nodeEntries are found we need to find the sub topics through edge condition string comparison
-    if (topic && targetNodeEntries.length === 0) {
+    if (topicSessions.length === 0 && topic) {
       return this.edgeService.findChildOptionsByEdgeCondition(dialogueId, topic);
     }
 
-    // Map all node entries connected to the the children of our node entry
-    const childRelatedNodeEntries = targetNodeEntries.flatMap(
-      (targetNodeEntry) => targetNodeEntry?.nodeEntry?.relatedNode?.children.flatMap(
-        (child) => child.isRelatedNodeOfNodeEntries || undefined,
-      )).filter(isPresent);
+    const parentOptions = options?.length
+      ? options
+      : await this.edgeService.findEdgeByConditionValue(dialogueId, topic)
+        .then((edge) => edge?.childNode.options.map((option) => option.value).filter(isPresent));
 
-    // Make sure there are no double node entries that could influence the impactScore
-    const uniqueNodeEntries = uniqBy(childRelatedNodeEntries, (nodeEntry) => nodeEntry.id);
-    const groupedSessions = groupBy(uniqueNodeEntries, (nodeEntry) => nodeEntry.choiceNodeEntry?.value);
+    const nodeEntries = topicSessions.flatMap((session) => session.nodeEntries.map(
+      (nodeEntry) => ({ ...nodeEntry, mainScore: session.mainScore })));
 
-    const subTopicScores = this.calculateTopicImpactScores(impactScoreType, groupedSessions);
+    const groupedNodeEntries = groupBy(nodeEntries,
+      (nodeEntry) => nodeEntry?.choiceNodeEntry?.value
+    );
 
-    // In case an answer has never been given, it wont be possible to find the sub topic in one of the node entries
-    // The next code finds all the potential sub topics available and creates an entry for the missing ones
-    const complementedSubTopic = this.completementTopics(targetNodeEntries, subTopicScores);
+    const subTopicScores = this.calculateSessionTopicImpactScores(impactScoreType, groupedNodeEntries);
+
+    const complementedSubTopic = this.complementTopics(subTopicScores, parentOptions || []);
 
     return complementedSubTopic;
+  }
+
+  /**
+   * Merges new scores with existing sub topics
+   * @param scores 
+   * @param subTopics 
+   * @returns updated sub topic 
+   */
+  mergeScoresWithTopicIds = (
+    scores: {
+      nrVotes: number;
+      impactScore: number;
+      name: string;
+    }[],
+    subTopics: { id: string; name: string }[]
+  ) => {
+    const merged = _.merge(_.keyBy(subTopics, 'name'), _.keyBy(scores, 'name'));
+    return _.values(merged);
+  }
+
+  /**
+   * Checks whether cache needs to be updated
+   * @param dialogueId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @param topic 
+   * @returns the cached if exists, and a boolean whether a refresh should happen
+   */
+  checkRefreshDialogueTopicCache = async (
+    dialogueId: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime: Date,
+    refresh: boolean = false,
+    topic: string = '',
+  ) => {
+    const prevStatistics = await this.dialoguePrismaAdapter.findDialogueTopicStatistics(
+      startDateTime,
+      endDateTime,
+      topic,
+      dialogueId,
+      impactScoreType,
+    );
+
+    // Only if more than hour difference between last cache entry and now should we update cache
+    if (prevStatistics) {
+      if (differenceInHours(Date.now(), prevStatistics.updatedAt) == 0
+        && !refresh
+        && prevStatistics.subTopics.length > 0) {
+        return { prevStatistics, needRefresh: false };
+      }
+    }
+
+    return { prevStatistics, needRefresh: true }
+  }
+
+  upsertDialogueStatisticsSummary = async (
+    prevStatisticsId: string,
+    data: UpsertDialogueStatisticsInput,
+  ) => {
+    return this.dialoguePrismaAdapter.upsertDialogueStatisticsSummary(prevStatisticsId, data);
   }
 
   /**
@@ -161,31 +213,68 @@ class DialogueService {
     dialogueId: string,
     impactScoreType: DialogueImpactScore,
     startDateTime: Date,
-    endDateTime?: Date
+    endDateTime?: Date,
+    refresh: boolean = false,
+    topic: string = '',
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
 
-    // TODO: At the moment only slider node but maybe in future different type of node as root
     const rootNode = await this.nodeService.findSliderNode(dialogueId);
 
-    if (!rootNode?.id) return [];
+    if (!rootNode?.id) return { name: '', nrVotes: 0, impactScore: 0, subTopics: [] };
 
-    const targetNodeEntries = await this.nodeEntryPrismaAdapter.findNodeEntriesByQuestionId(
+    const { needRefresh, prevStatistics } = await this.checkRefreshDialogueTopicCache(
+      dialogueId,
+      impactScoreType,
+      startDateTime,
+      endDateTimeSet,
+      refresh,
+      topic
+    );
+
+    if (!needRefresh) return prevStatistics;
+
+    const sessions = await this.nodeEntryPrismaAdapter.findNodeEntriesByQuestionId(
       rootNode.id,
       startDateTime,
       endDateTimeSet
     );
 
-    const topicNrVotes = targetNodeEntries.length;
+    const topicNrVotes = sessions.length;
     const topicImpactScore = meanBy(
-      targetNodeEntries,
-      (choiceNodeEntry) => choiceNodeEntry.nodeEntry.session?.mainScore
+      sessions,
+      (session) => session.mainScore, //choiceNodeEntry.nodeEntry.session?.mainScore
     );
     const topicName = '';
 
-    const subTopicScores = await this.findSubTopicsOfNodeEntries(targetNodeEntries, dialogueId, impactScoreType);
+    const options = rootNode.children.flatMap(
+      (child) => child.childNode.options.map(
+        (option) => option.value)).filter(isPresent);
 
-    return { name: topicName, nrVotes: topicNrVotes, impactScore: topicImpactScore || 0, subTopics: subTopicScores };
+    const subTopicScores = await this.findSubTopicsOfNodeEntries(
+      sessions, dialogueId, impactScoreType, topicName, options,
+    );
+
+    const mergedSubTopics = this.mergeScoresWithTopicIds(subTopicScores, prevStatistics?.subTopics || []);
+
+    void this.dialoguePrismaAdapter.upsertDialogueTopicStatistics({
+      dialogueId,
+      endDateTime: endDateTimeSet,
+      startDateTime,
+      impactScore: topicImpactScore || 0,
+      impactScoreType,
+      name: topicName,
+      nrVotes: topicNrVotes,
+      id: prevStatistics?.id,
+      subTopics: mergedSubTopics,
+    });
+
+    return {
+      impactScore: topicImpactScore || 0,
+      name: topicName,
+      nrVotes: topicNrVotes,
+      subTopics: mergedSubTopics,
+    };
   };
 
   /**
@@ -201,27 +290,57 @@ class DialogueService {
     impactScoreType: DialogueImpactScore,
     topic: string,
     startDateTime: Date,
-    endDateTime?: Date
+    endDateTime?: Date,
+    refresh: boolean = false,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
 
-    const targetNodeEntries = await this.nodeEntryPrismaAdapter.findNodeEntriesByTopic(
+    const { needRefresh, prevStatistics } = await this.checkRefreshDialogueTopicCache(
+      dialogueId,
+      impactScoreType,
+      startDateTime,
+      endDateTimeSet,
+      refresh,
+      topic
+    );
+
+    if (!needRefresh) return prevStatistics;
+
+    const sessions = await this.nodeEntryPrismaAdapter.findNodeEntriesByTopic(
       dialogueId,
       topic,
       startDateTime,
       endDateTimeSet
     );
 
-    const topicNrVotes = targetNodeEntries.length;
+    const topicNrVotes = sessions.length;
     const topicImpactScore = meanBy(
-      targetNodeEntries,
-      (choiceNodeEntry) => choiceNodeEntry.nodeEntry.session?.mainScore
+      sessions,
+      (session) => session.mainScore,
     );
     const topicName = topic;
 
-    const subTopicScores = await this.findSubTopicsOfNodeEntries(targetNodeEntries, dialogueId, impactScoreType, topic);
+    const subTopicScores = await this.findSubTopicsOfNodeEntries(sessions, dialogueId, impactScoreType, topic);
+    const mergedSubTopics = this.mergeScoresWithTopicIds(subTopicScores, prevStatistics?.subTopics || []);
 
-    return { name: topicName, nrVotes: topicNrVotes, impactScore: topicImpactScore || 0, subTopics: subTopicScores };;
+    void this.dialoguePrismaAdapter.upsertDialogueTopicStatistics({
+      dialogueId,
+      endDateTime: endDateTimeSet,
+      startDateTime,
+      impactScore: topicImpactScore || 0,
+      impactScoreType,
+      name: topicName,
+      nrVotes: topicNrVotes,
+      id: prevStatistics?.id,
+      subTopics: mergedSubTopics,
+    })
+
+    return {
+      impactScore: topicImpactScore || 0,
+      name: topicName,
+      nrVotes: topicNrVotes,
+      subTopics: mergedSubTopics,
+    };
   };
 
   updateTags(dialogueId: string, entries?: string[] | null | undefined): Promise<Dialogue> {
@@ -275,8 +394,8 @@ class DialogueService {
     return this.dialoguePrismaAdapter.getTagsByDialogueId(dialogueId);
   };
 
-  findDialoguesByCustomerId(customerId: string) {
-    return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId);
+  findDialoguesByCustomerId(customerId: string, searchTerm?: string) {
+    return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId, searchTerm);
   };
 
   async delete(dialogueId: string) {
@@ -477,11 +596,16 @@ class DialogueService {
     return values;
   };
 
-  massGenerateFakeData = async (dialogueId: string, template: MassSeedTemplate, maxSessions: number = 30) => {
+  massGenerateFakeData = async (
+    dialogueId: string,
+    template: MassSeedTemplate,
+    maxSessions: number = 30,
+    isStrict: boolean = false
+  ) => {
     const currentDate = new Date();
 
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
-    const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
+    const datesBackInTime = nrDaysBack.map((amtDaysBack, index) => subDays(currentDate, index));
     const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
     await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueId, true);
 
@@ -493,7 +617,8 @@ class DialogueService {
 
     // For every particular date, generate a fake score
     await Promise.all(datesBackInTime.map(async (backDate) => {
-      await Promise.all([...Array(Math.ceil(Math.random() * maxSessions + 1))].map(async () => {
+      const amtSessions = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
+      await Promise.all([...Array(amtSessions)].map(async () => {
         const simulatedRootVote: number = getRandomInt(100);
 
         const simulatedChoice = Object.keys(template.topics)[
@@ -1023,22 +1148,21 @@ class DialogueService {
     return finalQuestions;
   };
 
-  static calculateAverageDialogueScore = async (dialogueId: string, filters?: NexusGenInputs['DialogueFilterInputType']) => {
-    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, {
-      startDate: filters?.startDate ? new Date(filters?.startDate) : null,
-      endDate: filters?.endDate ? new Date(filters?.endDate) : null,
-    });
+  calculateAverageScore = async (dialogueId: string, filters: {
+    startDate?: Date;
+    endDate?: Date;
+  }) => {
+    const sessions = await this.sessionPrismaAdapter.findSessionsBetweenDates(
+      dialogueId, filters.startDate, filters.endDate
+    );
 
     if (!sessions) {
       return 0;
     }
 
-    const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions);
-
-    const scores = _.mean((scoringEntries).map((entry) => entry?.sliderNodeEntry?.value)) || 0;
-
-    return scores;
-  };
+    const average = _.meanBy(sessions, (session) => session.mainScore);
+    return average;
+  }
 
   static getDialogueInteractionFeedItems = async (
     dialogueId: string,

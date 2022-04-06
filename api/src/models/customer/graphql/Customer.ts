@@ -1,4 +1,4 @@
-import { ColourSettings, Customer, CustomerSettings, PrismaClient } from '@prisma/client';
+import { ColourSettings, Customer, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, SliderNodeEntry } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
@@ -13,6 +13,10 @@ import { CampaignModel } from '../../Campaigns';
 import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
 import { AutomationModel } from '../../automations/graphql/AutomationModel';
 import { AutomationConnection, AutomationConnectionFilterInput } from '../../automations/graphql/AutomationConnection';
+import { isValidDateTime } from '../../../utils/isValidDate';
+import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel } from '../../questionnaire';
+import { addDays, differenceInHours, isEqual } from 'date-fns';
+import { groupBy, meanBy } from 'lodash';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -70,6 +74,41 @@ export const CustomerType = objectType({
       },
     });
 
+    t.field('nestedDialogueStatisticsSummary', {
+      type: DialogueStatisticsSummaryModel,
+      list: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      nullable: true,
+      useParentResolve: true,
+      // useQueryCounter: true,
+      useTimeResolve: true,
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.customerService.findNestedDialogueStatisticsSummary(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        )
+      },
+    });
+
     t.field('dialogue', {
       type: DialogueType,
       nullable: true,
@@ -86,7 +125,7 @@ export const CustomerType = objectType({
         if (args?.where?.id) {
           const dialogueId: string = args.where.id;
 
-          const customer = await ctx.services.customerService.getDialogueById(parent.id, dialogueId);
+          const customer = await ctx.services.dialogueService.getDialogueById(dialogueId);
           return customer || null as any;
         }
 
@@ -101,16 +140,14 @@ export const CustomerType = objectType({
         filter: DialogueFilterInputType,
       },
       useQueryCounter: true,
+      useTimeResolve: true,
       async resolve(parent: Customer, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+        let dialogues = await ctx.services.dialogueService.findDialoguesByCustomerId(
+          parent.id,
+          args.filter?.searchTerm || undefined,
+        );
 
-        let dialogues = await ctx.services.dialogueService.findDialoguesByCustomerId(parent.id);
-
-        if (args.filter && args.filter.searchTerm) {
-          dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
-        }
-
-        return dialogues as any;
+        return dialogues;
       },
     });
 

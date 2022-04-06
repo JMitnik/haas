@@ -75,6 +75,7 @@ describe('Dialogue Topic', () => {
             isRoot: true,
             value: "",
             startDateTime: "01-03-2022",
+            refresh: true
           }) {
             name
             impactScore
@@ -188,6 +189,7 @@ describe('Dialogue Topic', () => {
             isRoot: false,
             value: "Facilities",
             startDateTime: "01-03-2022",
+            refresh: true
           }) {
             name
             impactScore
@@ -231,6 +233,7 @@ describe('Dialogue Topic', () => {
             isRoot: false,
             value: "Website",
             startDateTime: "01-03-2022",
+            refresh: true
           }) {
             name
             impactScore

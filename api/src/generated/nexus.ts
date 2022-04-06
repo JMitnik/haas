@@ -562,6 +562,7 @@ export interface NexusGenInputs {
     endDateTime?: string | null; // String
     impactScoreType: NexusGenEnums['DialogueImpactScoreType']; // DialogueImpactScoreType!
     isRoot?: boolean | null; // Boolean
+    refresh?: boolean | null; // Boolean
     startDateTime: string; // String!
     value: string; // String!
   }
@@ -876,7 +877,7 @@ export interface NexusGenRootTypes {
     dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string; // String!
     endDateTime?: any | null; // Date
-    id: string; // ID!
+    id?: string | null; // ID
     impactScore?: number | null; // Float
     nrVotes?: number | null; // Int
     startDateTime?: any | null; // Date
@@ -979,11 +980,9 @@ export interface NexusGenRootTypes {
   }
   PathedSessionsType: { // root type
     endDateTime: string; // String!
-    id: string; // String!
     path: string[]; // [String!]!
     pathedSessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDateTime: string; // String!
-    updatedAt: string; // String!
   }
   PermssionType: { // root type
     customer?: NexusGenRootTypes['Customer'] | null; // Customer
@@ -1017,6 +1016,7 @@ export interface NexusGenRootTypes {
   }
   RequestInviteOutput: { // root type
     didInvite: boolean; // Boolean!
+    loginToken?: string | null; // String
     userExists: boolean; // Boolean!
   }
   RoleConnection: { // root type
@@ -1456,6 +1456,7 @@ export interface NexusGenFieldTypes {
     dialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
     id: string; // ID!
     name: string; // String!
+    nestedDialogueStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][] | null; // [DialogueStatisticsSummaryModel!]
     roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
     slug: string; // String!
@@ -1503,7 +1504,7 @@ export interface NexusGenFieldTypes {
     pageIndex: number; // Int!
   }
   Dialogue: { // field return type
-    averageScore: number; // Float!
+    averageScore: number | null; // Float
     campaignVariants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
     creationDate: string | null; // String
     customer: NexusGenRootTypes['Customer'] | null; // Customer
@@ -1515,7 +1516,7 @@ export interface NexusGenFieldTypes {
     isWithoutGenData: boolean; // Boolean!
     language: NexusGenEnums['LanguageEnumType']; // LanguageEnumType!
     leafs: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
-    pathedSessions: NexusGenRootTypes['PathedSessionsType'] | null; // PathedSessionsType
+    pathedSessionsConnection: NexusGenRootTypes['PathedSessionsType'] | null; // PathedSessionsType
     postLeafNode: NexusGenRootTypes['DialogueFinisherObjectType'] | null; // DialogueFinisherObjectType
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
@@ -1553,7 +1554,7 @@ export interface NexusGenFieldTypes {
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string; // String!
     endDateTime: any | null; // Date
-    id: string; // ID!
+    id: string | null; // ID
     impactScore: number | null; // Float
     nrVotes: number | null; // Int
     startDateTime: any | null; // Date
@@ -1744,11 +1745,9 @@ export interface NexusGenFieldTypes {
   }
   PathedSessionsType: { // field return type
     endDateTime: string; // String!
-    id: string; // String!
     path: string[]; // [String!]!
     pathedSessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDateTime: string; // String!
-    updatedAt: string; // String!
   }
   PermssionType: { // field return type
     customer: NexusGenRootTypes['Customer'] | null; // Customer
@@ -1838,6 +1837,7 @@ export interface NexusGenFieldTypes {
   }
   RequestInviteOutput: { // field return type
     didInvite: boolean; // Boolean!
+    loginToken: string | null; // String
     userExists: boolean; // Boolean!
   }
   RoleConnection: { // field return type
@@ -2030,6 +2030,9 @@ export interface NexusGenArgTypes {
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
     }
+    nestedDialogueStatisticsSummary: { // args
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
     userCustomer: { // args
       userId?: string | null; // String
     }
@@ -2048,7 +2051,7 @@ export interface NexusGenArgTypes {
     leafs: { // args
       searchTerm?: string | null; // String
     }
-    pathedSessions: { // args
+    pathedSessionsConnection: { // args
       input?: NexusGenInputs['PathedSessionsInput'] | null; // PathedSessionsInput
     }
     sessionConnection: { // args

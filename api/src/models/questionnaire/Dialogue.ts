@@ -12,7 +12,7 @@ import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
-import isValidDate, { isValidDateTime } from '../../utils/isValidDate';
+import { isADate, isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueImpactScoreType, DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
@@ -72,8 +72,6 @@ export const TopicType = objectType({
 export const PathedSessionsType = objectType({
   name: 'PathedSessionsType',
   definition(t) {
-    t.string('id');
-    t.string('updatedAt');
     t.string('startDateTime');
     t.string('endDateTime');
 
@@ -95,6 +93,7 @@ export const TopicInputType = inputObjectType({
     });
     t.string('startDateTime', { required: true });
     t.string('endDateTime');
+    t.boolean('refresh', { required: false });
   },
 });
 
@@ -143,12 +142,14 @@ export const DialogueType = objectType({
       },
     });
 
-    t.field('pathedSessions', {
+    t.field('pathedSessionsConnection', {
       type: PathedSessionsType,
       nullable: true,
       args: {
         input: PathedSessionsInput,
       },
+      useTimeResolve: true,
+      useQueryCounter: true,
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
         if (!args.input) throw new UserInputError('No input provided!');
@@ -184,6 +185,7 @@ export const DialogueType = objectType({
       args: {
         input: TopicInputType,
       },
+      useQueryCounter: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
@@ -207,7 +209,8 @@ export const DialogueType = objectType({
             dialogueId,
             args.input.impactScoreType,
             utcStartDateTime as Date,
-            utcEndDateTime
+            utcEndDateTime,
+            args.input.refresh || false
           );
         }
 
@@ -216,7 +219,8 @@ export const DialogueType = objectType({
           args.input.impactScoreType,
           args.input.value,
           utcStartDateTime as Date,
-          utcEndDateTime
+          utcEndDateTime,
+          args.input.refresh || false,
         ) as any;
       },
     });
@@ -228,7 +232,7 @@ export const DialogueType = objectType({
       },
       nullable: true,
       useParentResolve: true,
-      useQueryCounter: true,
+      // useQueryCounter: true,
       useTimeResolve: true,
       resolve(parent, args, ctx) {
         if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
@@ -259,25 +263,34 @@ export const DialogueType = objectType({
       type: 'Float',
       args: { input: DialogueFilterInputType },
       useTimeResolve: true,
-      async resolve(parent, args) {
+      useQueryCounter: true,
+      nullable: true,
+      async resolve(parent, args, ctx) {
         if (!parent.id) {
           return 0;
         }
 
-        if (args.input?.startDate && !isValidDate(args.input.startDate)) {
-          throw new UserInputError('Start date invalid');
-        }
+        const startDate = args.input?.startDate ? isADate(args.input.startDate) : undefined;
+        const endDate = args.input?.endDate ? isADate(args.input.endDate) : undefined
 
-        if (args.input?.endDate && !isValidDate(args.input.endDate)) {
-          throw new UserInputError('End date invalid');
-        }
+        const average = await ctx.services.dialogueService.calculateAverageScore(parent.id, {
+          startDate,
+          endDate,
+        })
 
-        const score = await DialogueService.calculateAverageDialogueScore(parent.id, {
-          startDate: args.input?.startDate,
-          endDate: args.input?.endDate,
-        });
+        return average;
+      },
+    });
 
-        return score;
+    t.list.field('sessions', {
+      type: SessionType,
+      useTimeResolve: true,
+      args: { take: 'Int' },
+
+      async resolve(parent, args) {
+        const dialogueWithSessions = await SessionService.fetchSessionsByDialogue(parent.id, undefined, args.take);
+
+        return dialogueWithSessions || [];
       },
     });
 
@@ -285,7 +298,8 @@ export const DialogueType = objectType({
       type: DialogueStatistics,
       args: { input: DialogueFilterInputType },
       nullable: true,
-
+      useQueryCounter: true,
+      useTimeResolve: true,
       async resolve(parent, args) {
         const startDate = args.input?.startDate ? formatDate(args.input.startDate) : subDays(new Date(), 7);
         const endDate = args.input?.endDate ? formatDate(args.input.endDate) : null;
@@ -382,21 +396,6 @@ export const DialogueType = objectType({
       async resolve(parent, args, ctx) {
         const questions = await ctx.services.dialogueService.getQuestionsByDialogueId(parent.id);
         return questions;
-      },
-    });
-
-    t.list.field('sessions', {
-      type: SessionType,
-      args: { take: 'Int' },
-
-      async resolve(parent, args) {
-        const dialogueWithSessions = await SessionService.fetchSessionsByDialogue(parent.id);
-
-        if (args.take) {
-          return dialogueWithSessions?.length ? dialogueWithSessions.slice(0, args.take) || [] : [];
-        }
-
-        return dialogueWithSessions || [];
       },
     });
 

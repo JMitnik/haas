@@ -7,6 +7,46 @@ class NodeEntryPrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  findDialogueStatisticsRootEntries = async (
+    dialogueIds: string[],
+    startDate: Date,
+    endDate: Date,
+  ) => {
+    return this.prisma.nodeEntry.findMany({
+      where: {
+        AND: [
+          {
+            session: {
+              dialogueId: {
+                in: dialogueIds,
+              },
+            },
+            creationDate: {
+              gte: startDate,
+              lte: endDate,
+            },
+          },
+          {
+            depth: 0,
+          },
+          {
+            sliderNodeEntry: {
+              isNot: null,
+            },
+          },
+        ],
+      },
+      include: {
+        session: {
+          select: {
+            dialogueId: true,
+          },
+        },
+        sliderNodeEntry: true,
+      },
+    });
+  }
+
   /**
    * Finds all sub topic node entries within a date range by question id
    * @param questionId
@@ -17,68 +57,33 @@ class NodeEntryPrismaAdapter {
   findNodeEntriesByQuestionId = async (
     questionId: string, startDateTime: Date, endDateTime: Date
   ) => {
-    const targetNodeEntries = await this.prisma.sliderNodeEntry.findMany({
+
+    const sessions = await this.prisma.session.findMany({
       where: {
-        nodeEntry: {
-          creationDate: {
-            gte: startDateTime,
-            lte: endDateTime,
+        createdAt: {
+          gte: startDateTime,
+          lte: endDateTime,
+        },
+        nodeEntries: {
+          some: {
+            relatedNodeId: questionId,
           },
-          relatedNodeId: questionId,
-          // NOT: {
-          //   inputSource: 'INIT_GENERATED',
-          // },
         },
       },
       include: {
-        nodeEntry: {
+        nodeEntries: {
+          where: {
+            relatedEdge: {
+              parentNodeId: questionId,
+            },
+          },
           include: {
-            session: {
-              select: {
-                mainScore: true,
-              },
-            },
-            relatedNode: {
-              select: {
-                options: true,
-                children: {
-                  select: {
-                    childNode: {
-                      select: {
-                        options: true,
-                      },
-                    },
-                    isRelatedNodeOfNodeEntries: {
-                      select: {
-                        id: true,
-                        choiceNodeEntry: {
-                          select: {
-                            value: true,
-                          },
-                        },
-                        session: {
-                          select: {
-                            mainScore: true,
-                          },
-                        },
-                      },
-                      where: {
-                        creationDate: {
-                          gte: startDateTime,
-                          lte: endDateTime,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+            choiceNodeEntry: true,
           },
         },
       },
     });
-
-    return targetNodeEntries;
+    return sessions;
   }
 
   /**
@@ -90,77 +95,112 @@ class NodeEntryPrismaAdapter {
    * @returns a list of node entries where answered value = input topic
    */
   findNodeEntriesByTopic = async (dialogueId: string, topic: string, startDateTime: Date, endDateTime: Date) => {
-    const targetNodeEntries = await this.prisma.choiceNodeEntry.findMany({
+    const sessions = await this.prisma.session.findMany({
       where: {
-        nodeEntry: {
-          creationDate: {
-            gte: startDateTime,
-            lte: endDateTime,
-          },
-          session: {
-            dialogueId: dialogueId,
-          },
-          // NOT: {
-          //   inputSource: 'INIT_GENERATED',
-          // },
+        createdAt: {
+          gte: startDateTime,
+          lte: endDateTime,
         },
-        value: topic,
+        dialogueId: dialogueId,
+        nodeEntries: {
+          some: {
+            choiceNodeEntry: {
+              value: topic,
+            },
+          },
+        },
       },
       include: {
-        nodeEntry: {
-          include: {
-            session: {
-              select: {
-                mainScore: true,
-              },
-            },
-            relatedNode: {
-              select: {
-                options: true,
-                children: {
-                  where: {
-                    conditions: {
-                      some: {
-                        matchValue: topic,
-                      },
-                    },
-                  },
-                  select: {
-                    childNode: {
-                      select: {
-                        options: true,
-                      },
-                    },
-                    isRelatedNodeOfNodeEntries: {
-                      select: {
-                        id: true,
-                        choiceNodeEntry: {
-                          select: {
-                            value: true,
-                          },
-                        },
-                        session: {
-                          select: {
-                            mainScore: true,
-                          },
-                        },
-                      },
-                      where: {
-                        creationDate: {
-                          gte: startDateTime,
-                          lte: endDateTime,
-                        },
-                      },
-                    },
-                  },
+        nodeEntries: {
+          where: {
+            relatedEdge: {
+              conditions: {
+                some: {
+                  matchValue: topic,
                 },
               },
             },
           },
+          include: {
+            choiceNodeEntry: true,
+          },
         },
       },
     });
-    return targetNodeEntries;
+
+    return sessions;
+
+    // const targetNodeEntries = await this.prisma.choiceNodeEntry.findMany({
+    //   where: {
+    //     nodeEntry: {
+    //       creationDate: {
+    //         gte: startDateTime,
+    //         lte: endDateTime,
+    //       },
+    //       session: {
+    //         dialogueId: dialogueId,
+    //       },
+    //       // NOT: {
+    //       //   inputSource: 'INIT_GENERATED',
+    //       // },
+    //     },
+    //     value: topic,
+    //   },
+    //   include: {
+    //     nodeEntry: {
+    //       include: {
+    //         session: {
+    //           select: {
+    //             mainScore: true,
+    //           },
+    //         },
+    //         relatedNode: {
+    //           select: {
+    //             options: true,
+    //             children: {
+    //               where: {
+    //                 conditions: {
+    //                   some: {
+    //                     matchValue: topic,
+    //                   },
+    //                 },
+    //               },
+    //               select: {
+    //                 childNode: {
+    //                   select: {
+    //                     options: true,
+    //                   },
+    //                 },
+    //                 isRelatedNodeOfNodeEntries: {
+    //                   select: {
+    //                     id: true,
+    //                     choiceNodeEntry: {
+    //                       select: {
+    //                         value: true,
+    //                       },
+    //                     },
+    //                     session: {
+    //                       select: {
+    //                         mainScore: true,
+    //                       },
+    //                     },
+    //                   },
+    //                   where: {
+    //                     creationDate: {
+    //                       gte: startDateTime,
+    //                       lte: endDateTime,
+    //                     },
+    //                   },
+    //                 },
+    //               },
+    //             },
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    // });
+    // return targetNodeEntries;
   }
 
   create(data: Prisma.NodeEntryCreateInput) {
