@@ -348,7 +348,18 @@ class SessionPrismaAdapter {
       skip: offset,
       take: perPage,
       orderBy: this.buildOrderByQuery(filter),
-      include: { delivery: { include: { campaignVariant: true } } },
+      include: {
+        delivery: {
+          include: {
+            campaignVariant: true,
+          },
+        },
+        nodeEntries: {
+          orderBy: {
+            depth: 'asc',
+          },
+        },
+      },
     });
 
     return sessions;
@@ -528,6 +539,7 @@ class SessionPrismaAdapter {
             choiceNodeEntry: {
               create: { value: data.simulatedChoice },
             },
+            inputSource: 'INIT_GENERATED',
           },
           {
             depth: 2,
@@ -537,6 +549,7 @@ class SessionPrismaAdapter {
             choiceNodeEntry: {
               create: { value: data.simulatedSubChoice },
             },
+            inputSource: 'INIT_GENERATED',
           },
           ],
         },
