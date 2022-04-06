@@ -12,13 +12,13 @@ export const DashboardView = () => {
       <UI.ViewHead>
         <UI.ViewTitle>{t('views:dashboard')}</UI.ViewTitle>
       </UI.ViewHead>
-      <UI.ViewBody padding={0}>
+      <UI.ViewBody>
         <UI.Div>
-          <UI.Grid>
+          <UI.Grid gridTemplateRows="1fr 2fr">
             <UI.Div>
               <WorkspaceGridAdapter
                 backgroundColor="#f5f3fa"
-                height={800}
+                height={600}
                 width={900}
               />
             </UI.Div>

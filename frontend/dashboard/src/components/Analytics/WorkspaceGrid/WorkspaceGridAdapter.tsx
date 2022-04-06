@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import React, { useMemo } from 'react';
 
 import {
@@ -6,10 +7,13 @@ import {
   useGetSessionPathsQuery,
   useGetWorkspaceDialogueStatisticsQuery,
 } from 'types/generated-types';
+import { ReactComponent as HoneyComb } from 'assets/icons/honeycomb.svg';
 import { useCustomer } from 'providers/CustomerProvider';
 
+import * as LS from './WorkspaceGrid.styles';
 import { DataLoadOptions, WorkspaceGrid } from './WorkspaceGrid';
 import { HexagonNode, HexagonNodeType, HexagonViewMode } from './WorkspaceGrid.types';
+import { SingleHexagon } from './SingleHexagon';
 import { groupsFromDialogues } from './WorkspaceGrid.helpers';
 
 interface WorkspaceGridAdapterProps {
@@ -103,13 +107,46 @@ export const WorkspaceGridAdapter = ({
   if (!dialogues.length) return null;
 
   return (
-    <WorkspaceGrid
-      backgroundColor={backgroundColor}
-      initialViewMode={initialViewMode}
-      initialData={initialData}
-      onLoadData={handleLoadData}
-      height={height}
-      width={width}
-    />
+    <LS.WorkspaceGridAdapterContainer>
+      <LS.WidgetHeader>
+        <UI.Flex>
+          <UI.Div>
+            <UI.Div
+              px={1}
+              py={1}
+              border="1px solid"
+              borderColor="cyan.300"
+              backgroundColor="cyan.100"
+              style={{ borderRadius: '10px' }}
+              mr={3}
+            >
+              <UI.Icon width={30} height={30} color="cyan.400">
+                <HoneyComb fill="currentColor" />
+              </UI.Icon>
+            </UI.Div>
+          </UI.Div>
+          <UI.Div>
+            <UI.H4 mb={1}>Team overview</UI.H4>
+            <UI.Div display="flex" alignItems="center">
+              Discover and detect patterns in your teams. Red hexagons
+              {' '}
+              <UI.Span ml={1} mr={1}>
+                <SingleHexagon fill="red" />
+              </UI.Span>
+              {' '}
+              indicate trouble.
+            </UI.Div>
+          </UI.Div>
+        </UI.Flex>
+      </LS.WidgetHeader>
+      <WorkspaceGrid
+        backgroundColor="#f5f5f5"
+        initialViewMode={initialViewMode}
+        initialData={initialData}
+        onLoadData={handleLoadData}
+        height={height}
+        width={width}
+      />
+    </LS.WorkspaceGridAdapterContainer>
   );
 };

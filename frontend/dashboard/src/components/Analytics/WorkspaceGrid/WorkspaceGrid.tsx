@@ -1,9 +1,8 @@
 import * as UI from '@haas/ui';
-import { ArrowLeft } from 'react-feather';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowLeft, ChevronRight } from 'react-feather';
 import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
 import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
-
-import { AnimatePresence, motion } from 'framer-motion';
 import { Group } from '@visx/group';
 import { ParentSizeModern } from '@visx/responsive';
 import { PatternCircles } from '@visx/pattern';
@@ -13,8 +12,9 @@ import { Zoom } from '@visx/zoom';
 import { localPoint } from '@visx/event';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import * as LS from './WorkspaceGrid.styles';
+import { useFormatter } from 'hooks/useFormatter';
 
+import * as LS from './WorkspaceGrid.styles';
 import {
   HexagonDialogueNode,
   HexagonGroupNode,
@@ -67,6 +67,18 @@ const createGrid = (nrItems: number, windowHeight: number, windowWidth: number) 
   return gridItems;
 };
 
+const getLabelFill = (score?: number) => {
+  if (!score) return '#4b1c54';
+  if (score >= 40) return '#34aea3';
+  return '#fb5a66';
+};
+
+const getLabelColor = (score?: number) => {
+  if (!score) return '#f9ecff';
+  if (score >= 40) return '#deffde';
+  return 'white';
+};
+
 export const WorkspaceGrid = ({
   initialData,
   backgroundColor,
@@ -82,6 +94,7 @@ export const WorkspaceGrid = ({
     childNodes: initialData,
     viewMode: initialViewMode,
   });
+  const { formatScore } = useFormatter();
 
   const isAtMinZoomLevel = stateHistory.length === 0;
 
@@ -198,20 +211,93 @@ export const WorkspaceGrid = ({
     points: gridItems[index],
   })) || [];
 
+  const reversedHistory = [...stateHistory].reverse();
+
+  const popToIndex = (index: number) => {
+    // TODO: Ensure that if click on self, it does not do anything
+    const newStateHistory = [...reversedHistory.slice(0, index + 2)].reverse();
+    const newState = newStateHistory?.[0];
+    setStateHistory([...reversedHistory.slice(0, index + 1)].reverse());
+
+    if (newState) {
+      setCurrentState(newState);
+    }
+  };
+
   return (
-    <LS.WorkspaceGridContainer>
+    <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       <AnimatePresence />
       <UI.Grid gridTemplateColumns="2fr 1fr" gridGap="0">
-        <UI.Div height="70vh" position="relative">
-          <LS.GridControls>
-            {!isAtMinZoomLevel && (
-              <LS.IconButton onClick={() => handleZoomOut()}>
-                <UI.Icon>
-                  <ArrowLeft />
-                </UI.Icon>
-              </LS.IconButton>
-            )}
-          </LS.GridControls>
+        <UI.Div borderRadius={10} height="60vh" position="relative">
+          {stateHistory.length > 0 && (
+          <LS.BreadCrumbContainer
+            display="inline-block"
+            my={1}
+            border="1px solid"
+            borderColor="gray.100"
+            borderRadius={12}
+            pl={2}
+            pr={2}
+            py={1}
+          >
+            <UI.Stack alignItems="center" isInline>
+              {reversedHistory.map((state, index) => (
+                <React.Fragment key={index}>
+                  {index !== 0 && (
+                    <UI.Icon
+                      bg="gray.200"
+                      color="gray.500"
+                      width="1.2rem"
+                      height="1.2rem"
+                      fontSize="0.9rem"
+                      mx={1}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '100%' }}
+                    >
+                      <ChevronRight />
+                    </UI.Icon>
+                  )}
+                  <UI.Flex>
+                    <UI.Label
+                      color={getLabelColor(state?.selectedNode?.score || 0)}
+                      bg={getLabelFill(state?.selectedNode?.score)}
+                      key={index}
+                      onClick={() => { popToIndex(index); }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <UI.Span>
+                        {formatScore(state.selectedNode?.score)}
+                      </UI.Span>
+                      {' '}
+                      {/* <SingleHexagon fill={getHexagonFill(state.selectedNode?.score)} /> */}
+                      <UI.Span ml={1}>
+                        {state.selectedNode?.type === HexagonNodeType.Group && (
+                          <>
+                            {state.selectedNode.label}
+                          </>
+                        )}
+                        {state.selectedNode?.type === HexagonNodeType.Dialogue && (
+                          <>
+                            {state.selectedNode.label}
+                          </>
+                        )}
+                        {state.selectedNode?.type === HexagonNodeType.QuestionNode && (
+                          <>
+                            {state.selectedNode.topic}
+                          </>
+                        )}
+                        {state.selectedNode?.type === HexagonNodeType.Session && (
+                          <>
+                            {state.selectedNode.session.id}
+                          </>
+                        )}
+                      </UI.Span>
+                    </UI.Label>
+                  </UI.Flex>
+                </React.Fragment>
+              ))}
+            </UI.Stack>
+          </LS.BreadCrumbContainer>
+          )}
           <ParentSizeModern>
             {({ width, height }) => (
 
@@ -252,7 +338,7 @@ export const WorkspaceGrid = ({
                         <GradientPinkRed id="dots-pink" />
                         <GradientSteelPurple id="dots-gray" />
                         <GradientLightgreenGreen id="dots-green" />
-                        <rect width={width} height={height} fill={backgroundColor} />
+                        <rect width={width} height={height} fill="#f7f7f7" stroke={backgroundColor} />
                         <rect
                           width={width}
                           height={height}
@@ -322,7 +408,9 @@ export const WorkspaceGrid = ({
           </ParentSizeModern>
         </UI.Div>
 
-        <WorkspaceGridPane stateHistory={stateHistory} />
+        <UI.Div px={2} mt={2}>
+          <WorkspaceGridPane stateHistory={stateHistory} currentState={currentState} />
+        </UI.Div>
       </UI.Grid>
     </LS.WorkspaceGridContainer>
   );
