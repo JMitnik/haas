@@ -2,6 +2,7 @@ import { ProvidedZoom } from '@visx/zoom/lib/types';
 import React, { useState } from 'react';
 
 import { HexagonNode } from './WorkspaceGrid.types';
+import { getHexagonSVGFill } from './WorkspaceGrid.helpers';
 
 interface HexagonItemProps {
   node: HexagonNode;
@@ -13,12 +14,6 @@ interface HexagonItemProps {
   onMouseExit?: () => void;
 }
 
-const getHexagonFill = (score?: number) => {
-  if (!score) return 'url(#dots-gray)';
-  if (score >= 40) return 'url(#dots-green)';
-  return 'url(#dots-pink)';
-};
-
 export const HexagonItem = ({
   node,
   zoomHelper,
@@ -28,7 +23,7 @@ export const HexagonItem = ({
   onMouseOver,
   onMouseExit,
 }: HexagonItemProps) => {
-  const initialFill = getHexagonFill(score);
+  const initialFill = getHexagonSVGFill(score);
   const [fill] = useState(initialFill);
 
   return (

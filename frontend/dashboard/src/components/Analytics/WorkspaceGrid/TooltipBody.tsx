@@ -66,6 +66,7 @@ export const TooltipQuestionNodeBody = ({ node }: { node: HexagonQuestionNodeNod
 
 export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => {
   const { t } = useTranslation();
+  const { formatScore } = useFormatter();
 
   return (
     <UI.Div>
@@ -75,8 +76,8 @@ export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => {
       <UI.PaddedBody fraction={0.5}>
         <UI.Flex>
           <UI.Div>
-            test
-            {/* {formatScore(node.score)} */}
+            {/* test */}
+            {formatScore(node.score)}
           </UI.Div>
           <UI.Div ml={2}>
             {node.label}

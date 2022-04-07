@@ -1,4 +1,4 @@
-import { uniqBy } from 'lodash';
+import { meanBy, orderBy, uniqBy } from 'lodash';
 
 import { Dialogue, HexagonDialogueNode, HexagonGroupNode, HexagonNode, HexagonNodeType } from './WorkspaceGrid.types';
 
@@ -28,6 +28,34 @@ export const parseDialogueGroup = (dialogueGroup: DialogueGroup): GroupToChild[]
   }))
 );
 
+export const calcGroupAverage = (group: HexagonGroupNode): number => {
+  if (typeof group.subGroups === 'undefined') return 0;
+
+  // @ts-ignore
+  return meanBy(group.subGroups, (subGroup) => {
+    // @ts-ignore
+    if (typeof subGroup === 'object' && subGroup.type === HexagonNodeType.Dialogue) {
+      // @ts-ignore
+      return subGroup.dialogue.dialogueStatisticsSummary?.impactScore ?? 0;
+    }
+
+    return 0;
+  });
+};
+
+export const calcGroupTotal = (group: HexagonGroupNode): number => {
+  if (typeof group.subGroups === 'undefined') return 0;
+
+  // @ts-ignore
+  return group.subGroups.reduce<number>((acc, subGroup) => {
+    if (typeof subGroup === 'object' && subGroup.type === HexagonNodeType.Dialogue) {
+      acc += subGroup.dialogue.dialogueStatisticsSummary?.nrVotes ?? 0;
+    }
+
+    return acc;
+  }, 0 as number);
+};
+
 export const recursiveBuildGroup = (
   groupName: string,
   dialogueTitle: string,
@@ -50,7 +78,7 @@ export const recursiveBuildGroup = (
     } as HexagonDialogueNode;
   }
 
-  return {
+  const group = {
     id: groupName,
     type: HexagonNodeType.Group,
     label: groupName,
@@ -61,6 +89,8 @@ export const recursiveBuildGroup = (
       dialogues,
     )),
   } as HexagonGroupNode;
+
+  return { ...group, score: calcGroupAverage(group) };
 };
 
 export const dialogueToNode = (dialogue: Dialogue): HexagonNode => ({
@@ -89,4 +119,46 @@ export const groupsFromDialogues = (dialogues: Dialogue[]): HexagonNode[] => {
   ));
 
   return topGroupNodes;
+};
+
+export const orderNodesByVoteCount = (nodes: HexagonNode[]): HexagonNode[] => orderBy(nodes, ((node) => {
+  if (typeof node !== 'object') return 0;
+
+  if (node.type === HexagonNodeType.Dialogue) {
+    return node.dialogue.dialogueStatisticsSummary?.nrVotes;
+  }
+
+  if (node.type === HexagonNodeType.QuestionNode) {
+    return 0;
+  }
+
+  if (node.type === HexagonNodeType.Session) {
+    return 0;
+  }
+
+  return 0;
+}), 'desc');
+
+export const orderNodesByScore = (nodes: HexagonNode[]): HexagonNode[] => orderBy(nodes, ((node) => {
+  if (typeof node !== 'object') return 0;
+
+  if (node.type === HexagonNodeType.Dialogue) {
+    return node.dialogue.dialogueStatisticsSummary?.impactScore;
+  }
+
+  if (node.type === HexagonNodeType.QuestionNode) {
+    return node.score;
+  }
+
+  if (node.type === HexagonNodeType.Session) {
+    return node.score;
+  }
+
+  return node.score;
+}), 'desc');
+
+export const getHexagonSVGFill = (score?: number) => {
+  if (!score) return 'url(#dots-gray)';
+  if (score >= 40) return 'url(#dots-green)';
+  return 'url(#dots-pink)';
 };

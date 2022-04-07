@@ -140,7 +140,7 @@ export const WorkspaceGridAdapter = ({
         </UI.Flex>
       </LS.WidgetHeader>
       <WorkspaceGrid
-        backgroundColor="#f5f5f5"
+        backgroundColor={backgroundColor}
         initialViewMode={initialViewMode}
         initialData={initialData}
         onLoadData={handleLoadData}

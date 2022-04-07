@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, ChevronRight } from 'react-feather';
+import { ChevronRight } from 'react-feather';
 import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
 import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
 import { Group } from '@visx/group';
@@ -195,16 +195,6 @@ export const WorkspaceGrid = ({
       initialRef.current?.clientWidth || 495,
     )
   ), [currentState.childNodes]);
-
-  const handleZoomOut = () => {
-    if (!zoomHelper.current) return;
-    if (isAtMinZoomLevel) return;
-    hideTooltip();
-
-    // Empty canvas and unset soom
-    // zoomHelper.current.reset();
-    popQueue();
-  };
 
   const hexagonNodes = currentState.childNodes?.map((node, index) => ({
     ...node,
