@@ -18,15 +18,9 @@ import DialogueCard from './DialogueCard';
 
 interface DialogueOverviewProps {
   dialogueConnection: any;
-  // isLoading: boolean;
 }
 
 const DialogueOverview = (
-  {
-    dialogueConnection,
-    // onFetchDialogues,
-    // isLoading,
-  }: DialogueOverviewProps,
 ) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
@@ -36,7 +30,7 @@ const DialogueOverview = (
     perPage: withDefault(NumberParam, 10),
   });
 
-  const [activeDialogueConnection, setDialogueConnection] = useState<DialogueConnection>(dialogueConnection);
+  const [activeDialogueConnection, setDialogueConnection] = useState<DialogueConnection>();
   const [useDialogueGridView, setUseDialogueGridView] = useState(true);
 
   const { loading: isLoading } = useDialogueConnectionQuery({
@@ -80,7 +74,7 @@ const DialogueOverview = (
           <Flex>
             <Div mr={4}>
               <Searchbar
-                activeSearchTerm=""
+                activeSearchTerm={filter.search}
                 onSearchTermChange={(newTerm) => {
                   setFilter(
                     (newFilter) => ({ ...newFilter, pageIndex: 0, search: newTerm }),
