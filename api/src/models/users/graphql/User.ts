@@ -60,6 +60,16 @@ export const DateScalar = scalarType({
   },
 });
 
+export const AssignedDialogues = objectType({
+  name: 'AssignedDialogues',
+  definition(t) {
+    t.list.field('workspaceDialogues', {
+      type: 'Dialogue',
+    });
+    t.list.string('assignedDialogueIds');
+  },
+})
+
 export const UserType = objectType({
   name: 'UserType',
   definition(t) {
@@ -71,9 +81,43 @@ export const UserType = objectType({
     t.date('lastLoggedIn', { nullable: true });
     t.date('lastActivity', { nullable: true });
 
-    t.list.field('isAssignedTo', {
-      type: 'Dialogue',
+    t.field('privateDialogues', {
+      type: AssignedDialogues,
       nullable: true,
+      args: { workspaceId: 'ID' },
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+        // @ts-ignore
+        if (!args.workspaceId) return null;
+
+        const allPrivateDialoguesWorkspace = await ctx.prisma.customer.findUnique({
+          where: {
+            id: args?.workspaceId,
+          },
+          include: {
+            dialogues: {
+              where: {
+                isPrivate: true,
+              },
+            },
+          },
+        });
+
+        const user = await ctx.prisma.user.findUnique({
+          where: {
+            id: parent.id,
+          },
+          include: {
+            isAssignedTo: true,
+          },
+        });
+
+        const assignedDialogueIds = user?.isAssignedTo.map((dialogue) => dialogue.id);
+        return {
+          assignedDialogueIds: assignedDialogueIds || [],
+          workspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+        }
+      },
     })
 
     t.list.field('globalPermissions', {
@@ -169,14 +213,22 @@ export const RootUserQueries = extendType({
   definition(t) {
     t.field('me', {
       type: UserType,
-
+      args: { 'workspaceId': 'String' },
       async resolve(parent, args, ctx) {
         if (!ctx.session?.user?.id) throw new ApolloError('No valid user');
         const userId = ctx.session?.user?.id;
 
-        const user = await ctx.services.userService.findUserContext(userId);
+        const user = await ctx.services.userService.findUserContext(userId, args.workspaceId || undefined); //args.workspaceId
 
         if (!user) throw new ApolloError('There is something wrong in our records. Please contact an admin.', 'UNAUTHENTIC');
+
+        const assignedDialogueIds = user?.isAssignedTo.map((dialogue) => dialogue.id);
+        const privateDialogues = {
+          assignedDialogueIds: assignedDialogueIds || [],
+          workspaceDialogues: user.customers[0].customer?.dialogues || [],
+        }
+
+        console.log('Private dialogues: ', privateDialogues);
 
         return {
           email: user?.email,
@@ -184,6 +236,7 @@ export const RootUserQueries = extendType({
           firstName: user?.firstName,
           lastName: user?.lastName,
           phone: user?.phone,
+          privateDialogues,
         };
       },
     });
@@ -231,7 +284,8 @@ export const AssignUserToDialogues = mutationField('assignUserToDialogues', {
   nullable: true,
   async resolve(parent, args, ctx) {
     // TODO: Probably want to check if set dialogues belong to specified workspace
-    return ctx.prisma.user.update({
+
+    const updatedUser = await ctx.prisma.user.update({
       where: {
         id: args.input?.userId,
       },
@@ -249,7 +303,29 @@ export const AssignUserToDialogues = mutationField('assignUserToDialogues', {
       include: {
         isAssignedTo: true,
       },
-    })
+    });
+
+    const allPrivateDialoguesWorkspace = await ctx.prisma.customer.findUnique({
+      where: {
+        id: args.input?.workspaceId,
+      },
+      include: {
+        dialogues: {
+          where: {
+            isPrivate: true,
+          },
+        },
+      },
+    });
+
+    const assignedDialogueIds = updatedUser.isAssignedTo.map((dialogue) => dialogue.id);
+    return {
+      ...updatedUser,
+      privateDialogues: {
+        assignedDialogueIds: assignedDialogueIds || [],
+        workspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+      },
+    }
   },
 })
 

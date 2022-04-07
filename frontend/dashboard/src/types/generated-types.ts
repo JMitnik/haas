@@ -35,6 +35,19 @@ export type AppendToInteractionInput = {
   data?: Maybe<NodeEntryDataInput>;
 };
 
+export type AssignedDialogues = {
+  __typename?: 'AssignedDialogues';
+  workspaceDialogues: Array<Dialogue>;
+  assignedDialogueIds: Array<Scalars['String']>;
+};
+
+export type AssignUserToDialoguesInput = {
+  userId: Scalars['String'];
+  workspaceId: Scalars['String'];
+  assignedDialogueIds: Array<Scalars['String']>;
+  delistedDialogueIds: Array<Scalars['String']>;
+};
+
 export type AuthenticateLambdaInput = {
   authenticateEmail?: Maybe<Scalars['String']>;
   workspaceEmail?: Maybe<Scalars['String']>;
@@ -1181,6 +1194,7 @@ export type Mutation = {
   createWorkspace: Customer;
   editWorkspace: Customer;
   deleteCustomer?: Maybe<Customer>;
+  assignUserToDialogues?: Maybe<UserType>;
   handleUserStateInWorkspace: UserCustomer;
   editUser: UserType;
   deleteUser: DeleteUserOutput;
@@ -1360,6 +1374,11 @@ export type MutationEditWorkspaceArgs = {
 
 export type MutationDeleteCustomerArgs = {
   where?: Maybe<CustomerWhereUniqueInput>;
+};
+
+
+export type MutationAssignUserToDialoguesArgs = {
+  input?: Maybe<AssignUserToDialoguesInput>;
 };
 
 
@@ -1742,6 +1761,11 @@ export type QueryUserOfCustomerArgs = {
 };
 
 
+export type QueryMeArgs = {
+  workspaceId?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryUsersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
 };
@@ -2073,6 +2097,7 @@ export type SocialNodeEntryInput = {
 };
 
 export enum SystemPermission {
+  CanAssignUsersToDialogue = 'CAN_ASSIGN_USERS_TO_DIALOGUE',
   CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
   CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
@@ -2308,11 +2333,17 @@ export type UserType = {
   lastName?: Maybe<Scalars['String']>;
   lastLoggedIn?: Maybe<Scalars['Date']>;
   lastActivity?: Maybe<Scalars['Date']>;
+  privateDialogues?: Maybe<AssignedDialogues>;
   globalPermissions?: Maybe<Array<SystemPermission>>;
   userCustomers: Array<UserCustomer>;
   customers: Array<Customer>;
   roleId?: Maybe<Scalars['String']>;
   role?: Maybe<RoleType>;
+};
+
+
+export type UserTypePrivateDialoguesArgs = {
+  workspaceId?: Maybe<Scalars['ID']>;
 };
 
 export type VerifyUserTokenOutput = {
@@ -2961,6 +2992,27 @@ export type RequestInviteMutation = (
   ) }
 );
 
+export type AssignUserToDialoguesMutationVariables = Exact<{
+  input?: Maybe<AssignUserToDialoguesInput>;
+}>;
+
+
+export type AssignUserToDialoguesMutation = (
+  { __typename?: 'Mutation' }
+  & { assignUserToDialogues?: Maybe<(
+    { __typename?: 'UserType' }
+    & Pick<UserType, 'email'>
+    & { privateDialogues?: Maybe<(
+      { __typename?: 'AssignedDialogues' }
+      & Pick<AssignedDialogues, 'assignedDialogueIds'>
+      & { workspaceDialogues: Array<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'id' | 'title'>
+      )> }
+    )> }
+  )> }
+);
+
 export type DeleteUserMutationVariables = Exact<{
   input: DeleteUserInput;
 }>;
@@ -3052,6 +3104,14 @@ export type GetUserCustomerFromCustomerQuery = (
       & { user: (
         { __typename?: 'UserType' }
         & Pick<UserType, 'id' | 'email' | 'phone' | 'firstName' | 'lastName'>
+        & { privateDialogues?: Maybe<(
+          { __typename?: 'AssignedDialogues' }
+          & Pick<AssignedDialogues, 'assignedDialogueIds'>
+          & { workspaceDialogues: Array<(
+            { __typename?: 'Dialogue' }
+            & Pick<Dialogue, 'id' | 'title' | 'slug' | 'description'>
+          )> }
+        )> }
       ), role: (
         { __typename?: 'RoleType' }
         & Pick<RoleType, 'name' | 'id'>
@@ -4442,6 +4502,46 @@ export function useRequestInviteMutation(baseOptions?: Apollo.MutationHookOption
 export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInviteMutation>;
 export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
 export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;
+export const AssignUserToDialoguesDocument = gql`
+    mutation assignUserToDialogues($input: AssignUserToDialoguesInput) {
+  assignUserToDialogues(input: $input) {
+    email
+    privateDialogues {
+      assignedDialogueIds
+      workspaceDialogues {
+        id
+        title
+      }
+    }
+  }
+}
+    `;
+export type AssignUserToDialoguesMutationFn = Apollo.MutationFunction<AssignUserToDialoguesMutation, AssignUserToDialoguesMutationVariables>;
+
+/**
+ * __useAssignUserToDialoguesMutation__
+ *
+ * To run a mutation, you first call `useAssignUserToDialoguesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignUserToDialoguesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignUserToDialoguesMutation, { data, loading, error }] = useAssignUserToDialoguesMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAssignUserToDialoguesMutation(baseOptions?: Apollo.MutationHookOptions<AssignUserToDialoguesMutation, AssignUserToDialoguesMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AssignUserToDialoguesMutation, AssignUserToDialoguesMutationVariables>(AssignUserToDialoguesDocument, options);
+      }
+export type AssignUserToDialoguesMutationHookResult = ReturnType<typeof useAssignUserToDialoguesMutation>;
+export type AssignUserToDialoguesMutationResult = Apollo.MutationResult<AssignUserToDialoguesMutation>;
+export type AssignUserToDialoguesMutationOptions = Apollo.BaseMutationOptions<AssignUserToDialoguesMutation, AssignUserToDialoguesMutationVariables>;
 export const DeleteUserDocument = gql`
     mutation deleteUser($input: DeleteUserInput!) {
   deleteUser(input: $input) {
@@ -4635,6 +4735,15 @@ export const GetUserCustomerFromCustomerDocument = gql`
         phone
         firstName
         lastName
+        privateDialogues(workspaceId: $id) {
+          assignedDialogueIds
+          workspaceDialogues {
+            id
+            title
+            slug
+            description
+          }
+        }
       }
       role {
         name

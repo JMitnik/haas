@@ -1,0 +1,12 @@
+mutation assignUserToDialogues ($input: AssignUserToDialoguesInput){
+	assignUserToDialogues(input: $input) {
+		email
+		privateDialogues {
+			assignedDialogueIds
+			workspaceDialogues {
+				id
+				title
+			}
+		}
+	}
+}

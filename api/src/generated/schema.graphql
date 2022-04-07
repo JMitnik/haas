@@ -17,6 +17,11 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+type AssignedDialogues {
+  assignedDialogueIds: [String!]!
+  workspaceDialogues: [Dialogue!]!
+}
+
 input AssignUserToDialoguesInput {
   assignedDialogueIds: [String!]!
   delistedDialogueIds: [String!]!
@@ -1252,7 +1257,7 @@ type Query {
   getJob(id: String): CreateWorkspaceJobType
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
-  me: UserType!
+  me(workspaceId: String): UserType!
   refreshAccessToken: RefreshAccessTokenOutput!
   role(input: FindRoleInput): RoleType
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
@@ -1783,11 +1788,11 @@ type UserType {
   firstName: String
   globalPermissions: [SystemPermission!]
   id: ID!
-  isAssignedTo: [Dialogue!]
   lastActivity: Date
   lastLoggedIn: Date
   lastName: String
   phone: String
+  privateDialogues(workspaceId: ID): AssignedDialogues
   role: RoleType
   roleId: String
   userCustomers: [UserCustomer!]!

@@ -367,6 +367,10 @@ const language = {
       en: 'Role Permissions',
       de: 'Rollenberechtigungen',
     },
+    assigned_dialogues: {
+      en: 'Assigned dialogues',
+      de: 'Zugewiesene Dialoge',
+    },
     details: {
       en: 'Details',
       de: 'Detail',
@@ -1940,6 +1944,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
+    updated_assigned_dialogues: {
+      en: 'Updated assigned dialogues',
+      de: 'Zugewiesene Dialoge aktualisiert',
+    },
+    updated_assigned_dialogues_helper: {
+      en: 'The assigned dialogues have been succesfully updated.',
+      de: 'Die zugeordneten Dialoge wurden erfolgreich aktualisiert.',
+    },
     updated_permissions: {
       en: 'Updated permissions',
       de: 'Berechtigungen aktualisiert',

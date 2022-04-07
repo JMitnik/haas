@@ -8,6 +8,15 @@ query GetUserCustomerFromCustomer($id: ID!, $userId: String!) {
         phone
         firstName
         lastName
+        privateDialogues(workspaceId: $id) {
+          assignedDialogueIds
+          workspaceDialogues {
+            id
+            title
+            slug
+            description
+          }
+		    }
       }
       role {
         name

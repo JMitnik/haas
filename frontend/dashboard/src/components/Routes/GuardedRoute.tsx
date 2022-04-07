@@ -20,6 +20,7 @@ const GuardedRoute = ({ allowedPermission, redirectRoute, ...routeProps }: Guard
   const { isLoggedIn } = useUser();
   const { hasPermission } = useAuth();
   const params = useParams();
+  console.log('params: ', params);
 
   if (!isLoggedIn) return <Redirect to="/logged_out" />;
 

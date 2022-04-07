@@ -137,8 +137,8 @@ class UserService {
     return this.userPrismaAdapter.getUsersByTriggerId(triggerId);
   };
 
-  findUserContext(userId: string) {
-    return this.userPrismaAdapter.findUserContext(userId);
+  findUserContext(userId: string, workspaceId?: string) {
+    return this.userPrismaAdapter.findUserContext(userId, workspaceId);
   };
 
   findEmailWithinWorkspace(emailAddress: string, workspaceId: string) {
@@ -169,7 +169,7 @@ class UserService {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   };
 
-  async setUserStateInWorkspace(input: { userId: string, workspaceId: string, isActive: boolean }) {
+  async setUserStateInWorkspace(input: { userId: string; workspaceId: string; isActive: boolean }) {
     return this.userPrismaAdapter.setIsActive(input);
   }
 
@@ -203,7 +203,7 @@ class UserService {
     const emailBody = makeRoleUpdateTemplate({
       customerName: updatedUser.customer.name,
       recipientMail: updatedUser.user.email,
-      newRoleName: updatedUser.role.name
+      newRoleName: updatedUser.role.name,
     });
 
     mailService.send({
@@ -241,7 +241,7 @@ class UserService {
         firstName: string;
         lastName: string;
         email: string;
-      },
+      };
       role: {
         name: string;
       };
@@ -275,7 +275,7 @@ class UserService {
         firstName: string;
         lastName: string;
         email: string;
-      },
+      };
       role: {
         name: string;
       };
