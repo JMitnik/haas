@@ -40,7 +40,7 @@ export const DialogueFinisherType = objectType({
     t.id('id');
     t.string('header');
     t.string('subtext');
-  }
+  },
 });
 
 export const DialogueType = objectType({
@@ -73,9 +73,9 @@ export const DialogueType = objectType({
         return ctx.prisma.postLeafNode.findFirst({
           where: {
             id: parent.postLeafNodeId,
-          }
+          },
         });
-      }
+      },
     });
 
     t.field('averageScore', {
@@ -237,7 +237,7 @@ export const DialogueType = objectType({
       // @ts-ignore
       resolve: (parent, args, ctx) => {
         return ctx.services.dialogueService.getCampaignVariantsByDialogueId(parent.id);
-      }
+      },
     })
   },
 });
@@ -384,8 +384,6 @@ export const DialogueRootQuery = extendType({
     });
   },
 });
-
-console.log('pls');
 
 export default [
   DialogueWhereUniqueInput,

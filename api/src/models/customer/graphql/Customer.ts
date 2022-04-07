@@ -13,6 +13,7 @@ import { CampaignModel } from '../../Campaigns';
 import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
 import { AutomationModel } from '../../automations/graphql/AutomationModel';
 import { AutomationConnection, AutomationConnectionFilterInput } from '../../automations/graphql/AutomationConnection';
+import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -36,6 +37,17 @@ export const CustomerType = objectType({
       async resolve(parent: Customer, args, ctx) {
         const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
         return customerSettings;
+      },
+    });
+
+    t.field('dialogueConnection', {
+      type: DialogueConnection,
+      args: { filter: DialogueConnectionFilterInput },
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        console.log('FILTER: ', args.filter);
+        let dialogues = await ctx.services.dialogueService.paginatedDialogues(parent.slug, args.filter);
+        return dialogues;
       },
     });
 

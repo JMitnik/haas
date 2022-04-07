@@ -3,9 +3,11 @@ import {
   PrismaClient,
   Dialogue,
   Edge,
-} from "@prisma/client";
+} from '@prisma/client';
+import { NexusGenInputs } from 'generated/nexus';
+import { cloneDeep } from 'lodash';
 
-import { CreateQuestionsInput, CreateDialogueInput } from "./DialoguePrismaAdapterType";
+import { CreateQuestionsInput, CreateDialogueInput } from './DialoguePrismaAdapterType';
 
 class DialoguePrismaAdapter {
   prisma: PrismaClient;
@@ -31,7 +33,7 @@ class DialoguePrismaAdapter {
             videoEmbeddedNode: question.videoEmbeddedNode?.videoUrl ? {
               create: {
                 videoUrl: question.videoEmbeddedNode.videoUrl,
-              }
+              },
             } : undefined,
             links: question.links?.length ? {
               create: question.links,
@@ -104,7 +106,7 @@ class DialoguePrismaAdapter {
           some: {
             id: nodeId,
           },
-        }
+        },
       },
     });
   }
@@ -133,8 +135,8 @@ class DialoguePrismaAdapter {
         slug_customerId: {
           customerId,
           slug: dialogueSlug,
-        }
-      }
+        },
+      },
     });
   };
 
@@ -154,7 +156,7 @@ class DialoguePrismaAdapter {
 
   getCampaignVariantsByDialogueId(dialogueId: string) {
     return this.prisma.campaignVariant.findMany({
-      where: { dialogueId }
+      where: { dialogueId },
     });
   }
 
@@ -324,7 +326,7 @@ class DialoguePrismaAdapter {
           id: input?.customer?.id,
           slug: input.customer.slug,
           name: input.customer?.name,
-        }
+        },
       };
     } else if (!input.customer?.create && input.customer?.id) {
       return {
@@ -349,7 +351,7 @@ class DialoguePrismaAdapter {
       },
       include: {
         customer: true,
-      }
+      },
     });
   };
 
@@ -399,9 +401,9 @@ class DialoguePrismaAdapter {
   async createEdges(
     dialogueId: string,
     edges: {
-      parentNodeId: string,
-      childNodeId: string,
-      conditions: Array<{ conditionType: string, matchValue: string | null, renderMin: number | null, renderMax: number | null }>
+      parentNodeId: string;
+      childNodeId: string;
+      conditions: Array<{ conditionType: string; matchValue: string | null; renderMin: number | null; renderMax: number | null }>;
     }[]
   ) {
     return this.prisma.dialogue.update({
@@ -414,7 +416,7 @@ class DialoguePrismaAdapter {
             parentNode: {
               connect: {
                 id: edge.parentNodeId,
-              }
+              },
             },
             conditions: {
               create: edge.conditions,
@@ -422,7 +424,7 @@ class DialoguePrismaAdapter {
             childNode: {
               connect: {
                 id: edge.childNodeId,
-              }
+              },
             },
           })),
         },
@@ -450,7 +452,7 @@ class DialoguePrismaAdapter {
     return this.prisma.dialogue.delete({
       where: {
         id: dialogueId,
-      }
+      },
     });
   };
 
@@ -475,6 +477,92 @@ class DialoguePrismaAdapter {
       },
     });
   };
+
+  /**
+  * Build a dialogueConnection prisma query based on the filter parameters.
+  * @param customerSlug the slug of a workspace
+  * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
+  */
+  buildFindDialoguesQuery = (workspaceSlug: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null): Prisma.DialogueWhereInput => {
+    let dialogueWhereInput: Prisma.DialogueWhereInput = {
+      customer: {
+        slug: workspaceSlug,
+      },
+      //TODO: Add private option here
+    }
+
+    if (filter?.searchTerm) {
+      dialogueWhereInput = {
+        ...cloneDeep(dialogueWhereInput),
+        OR: [
+          { title: { contains: filter.searchTerm, mode: 'insensitive' } },
+          { description: { contains: filter.searchTerm, mode: 'insensitive' } },
+          {
+            tags: {
+              some: {
+                name: {
+                  contains: filter.searchTerm,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          },
+        ],
+      }
+    }
+
+    return dialogueWhereInput;
+  }
+
+
+  /**
+  * Order automation by AutomationConnectionFilterInput
+  * @param filter
+  */
+  buildOrderByQuery = (filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null) => {
+    let orderByQuery: Prisma.DialogueOrderByWithRelationInput[] = [];
+
+    if (filter?.orderBy?.by === 'createdAt') {
+      orderByQuery.push({
+        updatedAt: filter.orderBy.desc ? 'desc' : 'asc',
+      });
+    }
+
+    return orderByQuery;
+  };
+
+  /**
+ * Finds a subset of automations of a workspace using filter boundaries
+ * @param workspaceSlug the slug of a workspace
+ * @param filter an filter object
+ * @returns A list of automations
+ */
+  findPaginatedDialogues = async (workspaceSlug: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 10;
+
+    const dialogues = await this.prisma.dialogue.findMany({
+      where: this.buildFindDialoguesQuery(workspaceSlug, filter),
+      skip: offset,
+      take: perPage,
+      orderBy: this.buildOrderByQuery(filter),
+    });
+
+    return dialogues;
+  }
+
+  /**
+   * Counts the amount of automation within specific filter boundaries
+   * @param workspaceSlug the slug of a workspace
+   * @param filter an filter object to determine boundaries to look within
+   * @returns The amount of automations within a specific set of filter boundaries
+   */
+  countDialogues = async (workspaceSlug: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null) => {
+    const totalAutomations = await this.prisma.dialogue.count({
+      where: this.buildFindDialoguesQuery(workspaceSlug, filter),
+    });
+    return totalAutomations;
+  }
 
 };
 

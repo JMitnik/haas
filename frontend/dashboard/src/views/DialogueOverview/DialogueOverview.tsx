@@ -3,35 +3,69 @@ import { Button, ButtonGroup } from '@chakra-ui/core';
 import { Div, Flex, Grid, H4, ViewTitle } from '@haas/ui';
 import { Grid as GridIcon, List, Plus } from 'react-feather';
 import { Link, useParams } from 'react-router-dom';
-import { useLazyQuery } from '@apollo/client';
+import { NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { getQuestionnairesOfCustomer as CustomerData } from 'queries/__generated__/getQuestionnairesOfCustomer';
+import * as Table from 'components/Common/Table';
+import { DialogueConnection, DialogueConnectionOrder, useDialogueConnectionQuery } from 'types/generated-types';
 import Searchbar from 'components/SearchBar';
 import SurveyIcon from 'components/Icons/SurveyIcon';
-import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import useAuth from 'hooks/useAuth';
 
 import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
-const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
+interface DialogueOverviewProps {
+  dialogueConnection: any;
+  // isLoading: boolean;
+}
+
+const DialogueOverview = (
+  {
+    dialogueConnection,
+    // onFetchDialogues,
+    // isLoading,
+  }: DialogueOverviewProps,
+) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
+  const [filter, setFilter] = useQueryParams({
+    search: StringParam,
+    pageIndex: withDefault(NumberParam, 0),
+    perPage: withDefault(NumberParam, 10),
+  });
 
+  const [activeDialogueConnection, setDialogueConnection] = useState<DialogueConnection>(dialogueConnection);
   const [useDialogueGridView, setUseDialogueGridView] = useState(true);
 
-  // TODO: Handle the loading
-  const [loadCustomerData, { data, loading: isSearching }] = useLazyQuery<CustomerData>(getDialoguesOfCustomer, {
+  const { loading: isLoading } = useDialogueConnectionQuery({
+    fetchPolicy: 'network-only',
     variables: {
       customerSlug,
+      filter: {
+        searchTerm: filter.search,
+        offset: filter.pageIndex * filter.perPage,
+        perPage: filter.perPage,
+        orderBy: {
+          by: DialogueConnectionOrder.CreatedAt,
+          desc: true,
+        },
+      },
+    },
+    errorPolicy: 'ignore',
+    notifyOnNetworkStatusChange: true,
+    onCompleted: (fetchedData) => {
+      setDialogueConnection(fetchedData.customer?.dialogueConnection as DialogueConnection);
     },
   });
 
   const { canDeleteDialogue } = useAuth();
 
-  const filteredDialogues = data?.customer?.dialogues || dialogues;
+  console.log('active dialogue connection', activeDialogueConnection);
+
+  const filteredDialogues = activeDialogueConnection?.dialogues;
+  const pageCount = activeDialogueConnection?.totalPages || 0;
 
   return (
     <>
@@ -48,7 +82,9 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
               <Searchbar
                 activeSearchTerm=""
                 onSearchTermChange={(newTerm) => {
-                  loadCustomerData({ variables: { customerSlug, filter: { searchTerm: newTerm } } });
+                  setFilter(
+                    (newFilter) => ({ ...newFilter, pageIndex: 0, search: newTerm }),
+                  );
                 }}
               />
             </Div>
@@ -70,6 +106,17 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
                 {t('list')}
               </Button>
             </ButtonGroup>
+            <UI.Flex justifyContent="flex-end" ml={4}>
+              {pageCount > 1 && (
+                <Table.Pagination
+                  pageIndex={filter.pageIndex}
+                  maxPages={pageCount}
+                  perPage={filter.perPage}
+                  isLoading={isLoading}
+                  setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+                />
+              )}
+            </UI.Flex>
           </Flex>
         </Div>
 

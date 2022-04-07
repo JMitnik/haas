@@ -100,6 +100,7 @@ model Dialogue {
   title          String
   slug           String
   description    String
+  isPrivate      Boolean        @default(false)
   creationDate   DateTime       @default(now())
   updatedAt      DateTime?      @updatedAt
   publicTitle    String?
@@ -118,8 +119,10 @@ model Dialogue {
 
   endScreenText String?
 
-  wasGeneratedWithGenData Boolean           @default(value: false)
-  CampaignVariant         CampaignVariant[]
+  wasGeneratedWithGenData Boolean @default(value: false)
+
+  assignees       User[]
+  CampaignVariant CampaignVariant[]
 
   automationEvents     AutomationEvent[]
   automationConditions AutomationCondition[]
@@ -510,23 +513,26 @@ model Role {
 }
 
 model User {
-  id                 String                 @id @default(cuid())
-  createdAt          DateTime               @default(now())
-  updatedAt          DateTime?              @updatedAt
-  email              String                 @unique
-  lastLoggedIn       DateTime?
-  password           String?
-  phone              String?
-  firstName          String?
-  lastName           String?
-  triggers           Trigger[]
-  customers          UserOfCustomer[]
-  globalPermissions  SystemPermissionEnum[]
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
+  email        String    @unique
+  lastLoggedIn DateTime?
+  password     String?
+  phone        String?
+  firstName    String?
+  lastName     String?
+
   loginToken         String?
   loginTokenExpiry   DateTime?
   refreshToken       String?
   refreshTokenExpiry DateTime?
   lastActivity       DateTime?
+
+  isAssignedTo      Dialogue[]
+  triggers          Trigger[]
+  customers         UserOfCustomer[]
+  globalPermissions SystemPermissionEnum[]
 }
 
 model UserOfCustomer {
@@ -1046,7 +1052,7 @@ model AutomationTrigger {
   automationConditionBuilderId String                     @unique
 
   // Action: What should happen when an automation fire.
-  actions     AutomationAction[]
+  actions AutomationAction[]
 
   automations Automation[]
 }

@@ -429,6 +429,7 @@ export type CreateCtaInputType = {
   dialogueSlug?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
+  /** Linked question-node id */
   questionId?: Maybe<Scalars['String']>;
   links?: Maybe<CtaLinksInputType>;
   share?: Maybe<ShareNodeInputType>;
@@ -533,6 +534,7 @@ export type Customer = {
   slug: Scalars['String'];
   name: Scalars['String'];
   settings?: Maybe<CustomerSettings>;
+  dialogueConnection?: Maybe<DialogueConnection>;
   automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
   automations?: Maybe<Array<AutomationModel>>;
@@ -543,6 +545,11 @@ export type Customer = {
   roles?: Maybe<Array<RoleType>>;
   campaign?: Maybe<CampaignType>;
   userCustomer?: Maybe<UserCustomer>;
+};
+
+
+export type CustomerDialogueConnectionArgs = {
+  filter?: Maybe<DialogueConnectionFilterInput>;
 };
 
 
@@ -777,6 +784,33 @@ export type DialogueConditionScopeModel = {
   updatedAt: Scalars['Date'];
   aspect: DialogueAspectType;
   aggregate?: Maybe<ConditionPropertyAggregate>;
+};
+
+export type DialogueConnection = ConnectionInterface & {
+  __typename?: 'DialogueConnection';
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo: PaginationPageInfo;
+  dialogues: Array<Dialogue>;
+};
+
+export type DialogueConnectionFilterInput = {
+  searchTerm?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  orderBy?: Maybe<DialogueConnectionOrderByInput>;
+  offset?: Maybe<Scalars['Int']>;
+  perPage?: Maybe<Scalars['Int']>;
+};
+
+/** Fields to order UserConnection by. */
+export enum DialogueConnectionOrder {
+  CreatedAt = 'createdAt'
+}
+
+/** Sorting of DialogueConnection */
+export type DialogueConnectionOrderByInput = {
+  by: DialogueConnectionOrder;
+  desc?: Maybe<Scalars['Boolean']>;
 };
 
 export type DialogueFilterInputType = {
@@ -2765,6 +2799,38 @@ export type DuplicateQuestionMutation = (
   )> }
 );
 
+export type DialogueConnectionQueryVariables = Exact<{
+  customerSlug?: Maybe<Scalars['String']>;
+  filter?: Maybe<DialogueConnectionFilterInput>;
+}>;
+
+
+export type DialogueConnectionQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'slug'>
+    & { dialogueConnection?: Maybe<(
+      { __typename?: 'DialogueConnection' }
+      & Pick<DialogueConnection, 'totalPages'>
+      & { pageInfo: (
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+      ), dialogues: Array<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'id' | 'title' | 'language' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId' | 'averageScore'>
+        & { customer?: Maybe<(
+          { __typename?: 'Customer' }
+          & Pick<Customer, 'slug'>
+        )>, tags?: Maybe<Array<(
+          { __typename?: 'Tag' }
+          & Pick<Tag, 'id' | 'type' | 'name'>
+        )>> }
+      )> }
+    )> }
+  )> }
+);
+
 export type GetDialogueStatisticsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   dialogueSlug: Scalars['String'];
@@ -4069,6 +4135,75 @@ export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOp
 export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
 export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
 export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
+export const DialogueConnectionDocument = gql`
+    query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilterInput) {
+  customer(slug: $customerSlug) {
+    id
+    slug
+    dialogueConnection(filter: $filter) {
+      totalPages
+      pageInfo {
+        hasPrevPage
+        hasNextPage
+        prevPageOffset
+        nextPageOffset
+        pageIndex
+      }
+      dialogues {
+        id
+        title
+        language
+        slug
+        publicTitle
+        creationDate
+        updatedAt
+        customerId
+        averageScore
+        customer {
+          slug
+        }
+        tags {
+          id
+          type
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useDialogueConnectionQuery__
+ *
+ * To run a query within a React component, call `useDialogueConnectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDialogueConnectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDialogueConnectionQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useDialogueConnectionQuery(baseOptions?: Apollo.QueryHookOptions<DialogueConnectionQuery, DialogueConnectionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DialogueConnectionQuery, DialogueConnectionQueryVariables>(DialogueConnectionDocument, options);
+      }
+export function useDialogueConnectionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DialogueConnectionQuery, DialogueConnectionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DialogueConnectionQuery, DialogueConnectionQueryVariables>(DialogueConnectionDocument, options);
+        }
+export type DialogueConnectionQueryHookResult = ReturnType<typeof useDialogueConnectionQuery>;
+export type DialogueConnectionLazyQueryHookResult = ReturnType<typeof useDialogueConnectionLazyQuery>;
+export type DialogueConnectionQueryResult = Apollo.QueryResult<DialogueConnectionQuery, DialogueConnectionQueryVariables>;
+export function refetchDialogueConnectionQuery(variables?: DialogueConnectionQueryVariables) {
+      return { query: DialogueConnectionDocument, variables: variables }
+    }
 export const GetDialogueStatisticsDocument = gql`
     query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
   customer(slug: $customerSlug) {
