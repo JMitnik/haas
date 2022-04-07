@@ -96,8 +96,6 @@ export const WorkspaceGrid = ({
   });
   const { formatScore } = useFormatter();
 
-  const isAtMinZoomLevel = stateHistory.length === 0;
-
   const activeDialogue = useMemo(() => {
     const activeNode = stateHistory.find((state) => state.selectedNode?.type === HexagonNodeType.Dialogue);
     return (activeNode?.selectedNode as HexagonDialogueNode)?.dialogue || undefined;
@@ -174,19 +172,6 @@ export const WorkspaceGrid = ({
   useEffect(() => {
     hideTooltip();
   }, [currentState.currentNode?.id, hideTooltip]);
-
-  const popQueue = () => {
-    if (!stateHistory.length) return;
-
-    const latestState = stateHistory[0];
-    setCurrentState(latestState);
-    setStateHistory((currentHistory) => {
-      if (currentHistory.length === 1) return [];
-
-      const [, ...rest] = currentHistory;
-      return rest;
-    });
-  };
 
   const gridItems = useMemo(() => (
     createGrid(
@@ -399,7 +384,7 @@ export const WorkspaceGrid = ({
         </UI.Div>
 
         <UI.Div px={2} mt={2}>
-          <WorkspaceGridPane stateHistory={stateHistory} currentState={currentState} />
+          <WorkspaceGridPane currentState={currentState} />
         </UI.Div>
       </UI.Grid>
     </LS.WorkspaceGridContainer>

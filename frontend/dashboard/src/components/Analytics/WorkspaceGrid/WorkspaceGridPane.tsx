@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { Briefcase, MessageCircle, User, Users } from 'react-feather';
-import { reverse, slice } from 'lodash';
+import { slice } from 'lodash';
 import React, { useMemo } from 'react';
 
 import { useFormatter } from 'hooks/useFormatter';
@@ -17,11 +17,10 @@ import {
 import { calcGroupTotal, orderNodesByScore, orderNodesByVoteCount } from './WorkspaceGrid.helpers';
 
 interface WorkspaceGridPaneProps {
-  stateHistory: HexagonState[];
   currentState: HexagonState;
 }
 
-export const GroupPane = ({ stateHistory, currentState }: WorkspaceGridPaneProps) => {
+export const GroupPane = ({ currentState }: WorkspaceGridPaneProps) => {
   const currentNode = currentState.currentNode as HexagonGroupNode;
 
   const sortedGroups = useMemo(() => orderNodesByVoteCount(currentNode.subGroups), [currentNode]);
@@ -253,10 +252,9 @@ export const TopicPane = ({ currentState }: WorkspaceGridPaneProps) => {
   );
 };
 
-export const SessionPane = ({ stateHistory, currentState }: WorkspaceGridPaneProps) => {
+export const SessionPane = ({ currentState }: WorkspaceGridPaneProps) => {
   const [activeTab, setActiveTab] = React.useState<GroupSwitchItem>('metadata');
   const currentNode = currentState.currentNode as HexagonGroupNode;
-  const { formatScore } = useFormatter();
 
   return (
     <LS.WorkspaceGridPaneContainer>
@@ -344,18 +342,13 @@ export const SessionPane = ({ stateHistory, currentState }: WorkspaceGridPanePro
   );
 };
 
-export const WorkspaceGridPane = ({ stateHistory, currentState }: WorkspaceGridPaneProps) => {
-  const reversedStateHistory = useMemo(() => (
-    reverse([...stateHistory])
-  ), [stateHistory]);
-
+export const WorkspaceGridPane = ({ currentState }: WorkspaceGridPaneProps) => {
   const currentStateType = currentState?.currentNode?.type || undefined;
 
   switch (currentStateType) {
     case HexagonNodeType.Dialogue: {
       return (
         <DialoguePane
-          stateHistory={reversedStateHistory}
           currentState={currentState}
         />
       );
@@ -363,7 +356,6 @@ export const WorkspaceGridPane = ({ stateHistory, currentState }: WorkspaceGridP
     case HexagonNodeType.Group: {
       return (
         <GroupPane
-          stateHistory={reversedStateHistory}
           currentState={currentState}
         />
       );
@@ -371,7 +363,6 @@ export const WorkspaceGridPane = ({ stateHistory, currentState }: WorkspaceGridP
     case HexagonNodeType.QuestionNode: {
       return (
         <TopicPane
-          stateHistory={reversedStateHistory}
           currentState={currentState}
         />
       );
@@ -379,7 +370,6 @@ export const WorkspaceGridPane = ({ stateHistory, currentState }: WorkspaceGridP
     case HexagonNodeType.Session: {
       return (
         <SessionPane
-          stateHistory={reversedStateHistory}
           currentState={currentState}
         />
       );
