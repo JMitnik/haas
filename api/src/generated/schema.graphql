@@ -17,6 +17,13 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+input AssignUserToDialoguesInput {
+  assignedDialogueIds: [String!]!
+  delistedDialogueIds: [String!]!
+  userId: String!
+  workspaceId: String!
+}
+
 input AuthenticateLambdaInput {
   authenticateEmail: String
   workspaceEmail: String
@@ -1030,6 +1037,7 @@ type LoginOutput {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
@@ -1550,6 +1558,7 @@ enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
   CAN_ACCESS_REPORT_PAGE
   CAN_ADD_USERS
+  CAN_ASSIGN_USERS_TO_DIALOGUE
   CAN_BUILD_DIALOGUE
   CAN_CREATE_AUTOMATIONS
   CAN_CREATE_CAMPAIGNS
@@ -1774,6 +1783,7 @@ type UserType {
   firstName: String
   globalPermissions: [SystemPermission!]
   id: ID!
+  isAssignedTo: [Dialogue!]
   lastActivity: Date
   lastLoggedIn: Date
   lastName: String

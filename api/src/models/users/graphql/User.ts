@@ -71,6 +71,11 @@ export const UserType = objectType({
     t.date('lastLoggedIn', { nullable: true });
     t.date('lastActivity', { nullable: true });
 
+    t.list.field('isAssignedTo', {
+      type: 'Dialogue',
+      nullable: true,
+    })
+
     t.list.field('globalPermissions', {
       nullable: true,
       type: SystemPermission,
@@ -210,13 +215,51 @@ export const RootUserQueries = extendType({
   },
 });
 
+export const AssignUserToDialoguesInput = inputObjectType({
+  name: 'AssignUserToDialoguesInput',
+  definition(t) {
+    t.string('userId', { required: true });
+    t.string('workspaceId', { required: true });
+    t.list.string('assignedDialogueIds', { required: true });
+    t.list.string('delistedDialogueIds', { required: true });
+  },
+})
+
+export const AssignUserToDialogues = mutationField('assignUserToDialogues', {
+  type: UserType,
+  args: { input: AssignUserToDialoguesInput },
+  nullable: true,
+  async resolve(parent, args, ctx) {
+    // TODO: Probably want to check if set dialogues belong to specified workspace
+    return ctx.prisma.user.update({
+      where: {
+        id: args.input?.userId,
+      },
+      data: {
+        isAssignedTo: {
+          disconnect: args.input?.delistedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
+          deleteMany: {
+            id: {
+              in: args.input?.delistedDialogueIds,
+            },
+          },
+          connect: args.input?.assignedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
+        },
+      },
+      include: {
+        isAssignedTo: true,
+      },
+    })
+  },
+})
+
 export const HandleUserStateInWorkspaceInput = inputObjectType({
   name: 'HandleUserStateInWorkspaceInput',
   definition(t) {
     t.string('userId');
     t.string('workspaceId');
     t.boolean('isActive')
-  }
+  },
 })
 
 export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorkspace', {
@@ -229,7 +272,7 @@ export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorksp
 
     const input = { userId: args.input.userId, isActive: args.input.isActive, workspaceId: args.input.workspaceId }
     return ctx.services.userService.setUserStateInWorkspace(input);
-  }
+  },
 })
 
 export const UserMutations = extendType({

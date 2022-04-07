@@ -1,6 +1,6 @@
 import { ColourSettings, Customer, CustomerSettings, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { GraphQLUpload, UserInputError } from 'apollo-server-express';
+import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
@@ -46,7 +46,14 @@ export const CustomerType = objectType({
       nullable: true,
       async resolve(parent, args, ctx) {
         console.log('FILTER: ', args.filter);
-        let dialogues = await ctx.services.dialogueService.paginatedDialogues(parent.slug, args.filter);
+
+        if (!ctx.session?.user?.id) throw new ApolloError('No user in session found!');
+
+        let dialogues = await ctx.services.dialogueService.paginatedDialogues(
+          parent.slug,
+          ctx.session?.user?.id,
+          args.filter
+        );
         return dialogues;
       },
     });
