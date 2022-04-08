@@ -26,6 +26,7 @@ export const UserOfCustomerInput = inputObjectType({
     // Provide one of the two
     t.string('customerId', { required: false });
     t.string('customerSlug', { required: false });
+    t.string('workspaceId', { required: false });
   },
 });
 
@@ -63,10 +64,12 @@ export const DateScalar = scalarType({
 export const AssignedDialogues = objectType({
   name: 'AssignedDialogues',
   definition(t) {
-    t.list.field('workspaceDialogues', {
+    t.list.field('privateWorkspaceDialogues', {
       type: 'Dialogue',
     });
-    t.list.string('assignedDialogueIds');
+    t.list.field('assignedDialogues', {
+      type: 'Dialogue',
+    });
   },
 })
 
@@ -84,15 +87,19 @@ export const UserType = objectType({
     t.field('privateDialogues', {
       type: AssignedDialogues,
       nullable: true,
-      args: { workspaceId: 'ID' },
+      args: { input: UserOfCustomerInput },
       async resolve(parent, args, ctx) {
+        // @ts-ignore
+        if (parent.privateDialogues) return parent.privateDialogues;
+        // @ts-ignore
         if (!parent.id) return null;
         // @ts-ignore
-        if (!args.workspaceId) return null;
+        if (!args.input?.workspaceId && !args.input?.customerId && !args.input?.customerSlug) return null;
 
         const allPrivateDialoguesWorkspace = await ctx.prisma.customer.findUnique({
           where: {
-            id: args?.workspaceId,
+            id: args?.input?.workspaceId || args.input?.customerId || undefined,
+            slug: args.input?.customerSlug || undefined,
           },
           include: {
             dialogues: {
@@ -105,17 +112,16 @@ export const UserType = objectType({
 
         const user = await ctx.prisma.user.findUnique({
           where: {
-            id: parent.id,
+            id: parent.id || args.input?.userId as string,
           },
           include: {
             isAssignedTo: true,
           },
         });
 
-        const assignedDialogueIds = user?.isAssignedTo.map((dialogue) => dialogue.id);
         return {
-          assignedDialogueIds: assignedDialogueIds || [],
-          workspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+          assignedDialogues: user?.isAssignedTo || [],
+          privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
         }
       },
     })
@@ -228,7 +234,7 @@ export const RootUserQueries = extendType({
           workspaceDialogues: user.customers[0].customer?.dialogues || [],
         }
 
-        console.log('Private dialogues: ', privateDialogues);
+        // console.log('Private dialogues: ', privateDialogues);
 
         return {
           email: user?.email,
@@ -318,12 +324,11 @@ export const AssignUserToDialogues = mutationField('assignUserToDialogues', {
       },
     });
 
-    const assignedDialogueIds = updatedUser.isAssignedTo.map((dialogue) => dialogue.id);
     return {
       ...updatedUser,
       privateDialogues: {
-        assignedDialogueIds: assignedDialogueIds || [],
-        workspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+        assignedDialogues: updatedUser.isAssignedTo || [],
+        privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
       },
     }
   },

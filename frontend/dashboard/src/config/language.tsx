@@ -2384,6 +2384,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   permissions: {
+    can_assign_users_to_dialogue: {
+      en: 'This permission allows a user to make private dialogues (in)-accessible for other users',
+      de: 'Diese Berechtigung erlaubt es einem Benutzer, private Dialoge für andere Benutzer (un)zugänglich zu machen',
+    },
     can_access_admin_panel: {
       en: 'This system-wide permission allows a user to do everything (overrules others) within the haas dashboard. It is specified per user and cannot be set within a workspace.',
       de: 'Diese systemweite Berechtigung ermöglicht es einem Benutzer, alles innerhalb des haas-Dashboards zu tun. Sie wird pro Benutzer angegeben und kann nicht innerhalb eines Arbeitsbereichs festgelegt werden.',

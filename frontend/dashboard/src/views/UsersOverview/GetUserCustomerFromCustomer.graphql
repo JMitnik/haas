@@ -1,4 +1,4 @@
-query GetUserCustomerFromCustomer($id: ID!, $userId: String!) {
+query GetUserCustomerFromCustomer($id: ID!, $userId: String!, $input: UserOfCustomerInput) {
   customer(id: $id) {
     id
     userCustomer(userId: $userId) {
@@ -8,13 +8,16 @@ query GetUserCustomerFromCustomer($id: ID!, $userId: String!) {
         phone
         firstName
         lastName
-        privateDialogues(workspaceId: $id) {
-          assignedDialogueIds
-          workspaceDialogues {
-            id
+        privateDialogues(input: $input) {
+          privateWorkspaceDialogues {
             title
             slug
+            id
             description
+          }
+          assignedDialogues {
+            slug
+            id
           }
 		    }
       }

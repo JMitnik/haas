@@ -621,6 +621,7 @@ export interface NexusGenInputs {
     customerId?: string | null; // String
     customerSlug?: string | null; // String
     userId?: string | null; // String
+    workspaceId?: string | null; // String
   }
   VideoNodeEntryInput: { // input type
     value?: string | null; // String
@@ -678,8 +679,8 @@ export interface NexusGenRootTypes {
     url?: string | null; // String
   }
   AssignedDialogues: { // root type
-    assignedDialogueIds: string[]; // [String!]!
-    workspaceDialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
+    assignedDialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
+    privateWorkspaceDialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
   }
   AutodeckConnectionType: { // root type
     cursor?: string | null; // String
@@ -1250,8 +1251,8 @@ export interface NexusGenFieldTypes {
     url: string | null; // String
   }
   AssignedDialogues: { // field return type
-    assignedDialogueIds: string[]; // [String!]!
-    workspaceDialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
+    assignedDialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
+    privateWorkspaceDialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
   }
   AutodeckConnectionType: { // field return type
     cursor: string | null; // String
@@ -2225,7 +2226,7 @@ export interface NexusGenArgTypes {
   }
   UserType: {
     privateDialogues: { // args
-      workspaceId?: string | null; // ID
+      input?: NexusGenInputs['UserOfCustomerInput'] | null; // UserOfCustomerInput
     }
   }
 }

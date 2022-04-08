@@ -33,7 +33,7 @@ interface AuthContextProps {
   setAccessToken: (token: string) => void;
   setUser: (userData: MeUserType) => void;
   refreshUser: (variables?: Partial<Exact<{
-    workspaceId?: Maybe<string> | undefined;
+    [key: string]: never;
   }>> | undefined) => Promise<ApolloQueryResult<MeQuery>>
   hardRefreshUser: () => void;
 }

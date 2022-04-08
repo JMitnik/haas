@@ -37,8 +37,8 @@ export type AppendToInteractionInput = {
 
 export type AssignedDialogues = {
   __typename?: 'AssignedDialogues';
-  workspaceDialogues: Array<Dialogue>;
-  assignedDialogueIds: Array<Scalars['String']>;
+  privateWorkspaceDialogues: Array<Dialogue>;
+  assignedDialogues: Array<Dialogue>;
 };
 
 export type AssignUserToDialoguesInput = {
@@ -2322,6 +2322,7 @@ export type UserOfCustomerInput = {
   userId?: Maybe<Scalars['String']>;
   customerId?: Maybe<Scalars['String']>;
   customerSlug?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
 };
 
 export type UserType = {
@@ -2343,7 +2344,7 @@ export type UserType = {
 
 
 export type UserTypePrivateDialoguesArgs = {
-  workspaceId?: Maybe<Scalars['ID']>;
+  input?: Maybe<UserOfCustomerInput>;
 };
 
 export type VerifyUserTokenOutput = {
@@ -2470,6 +2471,16 @@ export type GetCustomerOfUserQuery = (
     ), user: (
       { __typename?: 'UserType' }
       & Pick<UserType, 'id'>
+      & { privateDialogues?: Maybe<(
+        { __typename?: 'AssignedDialogues' }
+        & { privateWorkspaceDialogues: Array<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'title' | 'slug' | 'id'>
+        )>, assignedDialogues: Array<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'slug' | 'id'>
+        )> }
+      )> }
     ) }
   )> }
 );
@@ -3004,10 +3015,12 @@ export type AssignUserToDialoguesMutation = (
     & Pick<UserType, 'email'>
     & { privateDialogues?: Maybe<(
       { __typename?: 'AssignedDialogues' }
-      & Pick<AssignedDialogues, 'assignedDialogueIds'>
-      & { workspaceDialogues: Array<(
+      & { privateWorkspaceDialogues: Array<(
         { __typename?: 'Dialogue' }
-        & Pick<Dialogue, 'id' | 'title'>
+        & Pick<Dialogue, 'title' | 'slug' | 'id'>
+      )>, assignedDialogues: Array<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'slug' | 'id'>
       )> }
     )> }
   )> }
@@ -3091,6 +3104,7 @@ export type GetRolesQuery = (
 export type GetUserCustomerFromCustomerQueryVariables = Exact<{
   id: Scalars['ID'];
   userId: Scalars['String'];
+  input?: Maybe<UserOfCustomerInput>;
 }>;
 
 
@@ -3106,10 +3120,12 @@ export type GetUserCustomerFromCustomerQuery = (
         & Pick<UserType, 'id' | 'email' | 'phone' | 'firstName' | 'lastName'>
         & { privateDialogues?: Maybe<(
           { __typename?: 'AssignedDialogues' }
-          & Pick<AssignedDialogues, 'assignedDialogueIds'>
-          & { workspaceDialogues: Array<(
+          & { privateWorkspaceDialogues: Array<(
             { __typename?: 'Dialogue' }
-            & Pick<Dialogue, 'id' | 'title' | 'slug' | 'description'>
+            & Pick<Dialogue, 'title' | 'slug' | 'id' | 'description'>
+          )>, assignedDialogues: Array<(
+            { __typename?: 'Dialogue' }
+            & Pick<Dialogue, 'slug' | 'id'>
           )> }
         )> }
       ), role: (
@@ -3291,6 +3307,17 @@ export const GetCustomerOfUserDocument = gql`
     }
     user {
       id
+      privateDialogues(input: $input) {
+        privateWorkspaceDialogues {
+          title
+          slug
+          id
+        }
+        assignedDialogues {
+          slug
+          id
+        }
+      }
     }
   }
 }
@@ -4507,10 +4534,14 @@ export const AssignUserToDialoguesDocument = gql`
   assignUserToDialogues(input: $input) {
     email
     privateDialogues {
-      assignedDialogueIds
-      workspaceDialogues {
-        id
+      privateWorkspaceDialogues {
         title
+        slug
+        id
+      }
+      assignedDialogues {
+        slug
+        id
       }
     }
   }
@@ -4725,7 +4756,7 @@ export function refetchGetRolesQuery(variables?: GetRolesQueryVariables) {
       return { query: GetRolesDocument, variables: variables }
     }
 export const GetUserCustomerFromCustomerDocument = gql`
-    query GetUserCustomerFromCustomer($id: ID!, $userId: String!) {
+    query GetUserCustomerFromCustomer($id: ID!, $userId: String!, $input: UserOfCustomerInput) {
   customer(id: $id) {
     id
     userCustomer(userId: $userId) {
@@ -4735,13 +4766,16 @@ export const GetUserCustomerFromCustomerDocument = gql`
         phone
         firstName
         lastName
-        privateDialogues(workspaceId: $id) {
-          assignedDialogueIds
-          workspaceDialogues {
-            id
+        privateDialogues(input: $input) {
+          privateWorkspaceDialogues {
             title
             slug
+            id
             description
+          }
+          assignedDialogues {
+            slug
+            id
           }
         }
       }
@@ -4768,6 +4802,7 @@ export const GetUserCustomerFromCustomerDocument = gql`
  *   variables: {
  *      id: // value for 'id'
  *      userId: // value for 'userId'
+ *      input: // value for 'input'
  *   },
  * });
  */

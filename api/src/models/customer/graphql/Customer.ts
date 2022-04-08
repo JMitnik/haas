@@ -45,8 +45,6 @@ export const CustomerType = objectType({
       args: { filter: DialogueConnectionFilterInput },
       nullable: true,
       async resolve(parent, args, ctx) {
-        console.log('FILTER: ', args.filter);
-
         if (!ctx.session?.user?.id) throw new ApolloError('No user in session found!');
 
         let dialogues = await ctx.services.dialogueService.paginatedDialogues(

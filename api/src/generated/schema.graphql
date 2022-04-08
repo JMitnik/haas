@@ -18,8 +18,8 @@ input AppendToInteractionInput {
 }
 
 type AssignedDialogues {
-  assignedDialogueIds: [String!]!
-  workspaceDialogues: [Dialogue!]!
+  assignedDialogues: [Dialogue!]!
+  privateWorkspaceDialogues: [Dialogue!]!
 }
 
 input AssignUserToDialoguesInput {
@@ -1780,6 +1780,7 @@ input UserOfCustomerInput {
   customerId: String
   customerSlug: String
   userId: String
+  workspaceId: String
 }
 
 type UserType {
@@ -1792,7 +1793,7 @@ type UserType {
   lastLoggedIn: Date
   lastName: String
   phone: String
-  privateDialogues(workspaceId: ID): AssignedDialogues
+  privateDialogues(input: UserOfCustomerInput): AssignedDialogues
   role: RoleType
   roleId: String
   userCustomers: [UserCustomer!]!

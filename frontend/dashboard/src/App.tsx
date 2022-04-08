@@ -37,7 +37,7 @@ import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
 import FirstTimePage from 'pages/dashboard/first_time';
 import GlobalLoader from 'components/GlobalLoader';
-import GuardedRoute from 'components/Routes/GuardedRoute';
+import GuardedRoute, { BotRoute } from 'components/Routes/GuardedRoute';
 import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
@@ -192,7 +192,7 @@ const ReportRoutes = () => (
     <CustomerProvider>
       <DialogueProvider>
         <Switch>
-          <GuardedRoute
+          <BotRoute
             allowedPermission={SystemPermission.CanAccessReportPage}
             path={ROUTES.WEEKLY_REPORT_VIEW}
             render={() => (

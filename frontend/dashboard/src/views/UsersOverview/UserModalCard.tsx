@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { Controller, useForm } from 'react-hook-form';
-import { useAssignUserToDialoguesMutation, useGetUserCustomerFromCustomerQuery } from 'types/generated-types';
+import { Dialogue, useAssignUserToDialoguesMutation, useGetUserCustomerFromCustomerQuery } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
+import useAuth from 'hooks/useAuth';
 
 interface UserModalCardProps {
   id: string;
@@ -14,7 +15,9 @@ interface UserModalCardProps {
 }
 
 interface PrivateDialoguesUserFormProps {
-  assignedDialogueIds: string[];
+  assignedDialogues: ({
+    __typename?: 'Dialogue' | undefined;
+  } & Pick<Dialogue, 'id' | 'slug'>)[];
   workspaceDialogues: { id: string, title: string, slug: string, description: string }[];
   onClose: () => void;
   userId: string;
@@ -33,7 +36,7 @@ const CheckBoxCard = styled(UI.Card) <{ isChecked?: boolean }>`
 `;
 
 const PrivateDialoguesUserForm = ({
-  assignedDialogueIds,
+  assignedDialogues,
   workspaceDialogues,
   onClose,
   userId,
@@ -58,7 +61,7 @@ const PrivateDialoguesUserForm = ({
   const { handleSubmit, control } = useForm({
     defaultValues: {
       workspaceDialogues,
-      assignedDialogueIds,
+      assignedDialogues,
     },
   });
 
@@ -78,6 +81,10 @@ const PrivateDialoguesUserForm = ({
       },
     });
   };
+
+  const assignedDialogueIds = assignedDialogues.map(
+    (dialogue) => dialogue.id,
+  ) || [];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -138,10 +145,15 @@ const PrivateDialoguesUserForm = ({
 export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
+  const { CanAssignUsersToDialogue } = useAuth();
   const { data, loading, error } = useGetUserCustomerFromCustomerQuery({
     variables: {
       id: activeCustomer?.id || '',
       userId: id,
+      input: {
+        customerId: activeCustomer?.id || '',
+        userId: id,
+      },
     },
     fetchPolicy: 'cache-and-network',
   });
@@ -195,15 +207,22 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
           </>
         )}
         <UI.Hr />
-        <UI.ModalHead style={{ borderBottom: 'none', paddingBottom: '1em' }}>
-          <UI.ModalTitle>{t('assigned_dialogues')}</UI.ModalTitle>
-        </UI.ModalHead>
-        <PrivateDialoguesUserForm
-          onClose={onClose}
-          assignedDialogueIds={userOfCustomer?.user.privateDialogues?.assignedDialogueIds || []}
-          workspaceDialogues={userOfCustomer?.user.privateDialogues?.workspaceDialogues || []}
-          userId={id}
-        />
+        {
+          CanAssignUsersToDialogue && (
+            <>
+              <UI.ModalHead style={{ borderBottom: 'none', paddingBottom: '1em' }}>
+                <UI.ModalTitle>{t('assigned_dialogues')}</UI.ModalTitle>
+              </UI.ModalHead>
+              <PrivateDialoguesUserForm
+                onClose={onClose}
+                assignedDialogues={userOfCustomer?.user.privateDialogues?.assignedDialogues || []}
+                workspaceDialogues={userOfCustomer?.user.privateDialogues?.privateWorkspaceDialogues || []}
+                userId={id}
+              />
+            </>
+          )
+        }
+
       </UI.ModalBody>
     </UI.ModalCard>
   );
