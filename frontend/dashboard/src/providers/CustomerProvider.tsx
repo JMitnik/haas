@@ -75,7 +75,6 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
       const role = data.UserOfCustomer?.role;
       const newUser = data.UserOfCustomer?.user;
 
-      console.log('NEW USER: ', newUser);
       if (!customer) {
         history.push('unauthorized');
         return;
@@ -98,7 +97,7 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
   const activePermissions = [...(user?.globalPermissions || []), ...(activeCustomer?.userRole?.permissions || [])];
 
   const privateDialogues = activeCustomer?.user?.privateDialogues;
-  console.log('User private: ', privateDialogues);
+
   return (
     <CustomerContext.Provider value={{
       activeCustomer, setActiveCustomer, activePermissions, isLoading, privateDialogues,
