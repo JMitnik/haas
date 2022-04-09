@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
 import { ChevronRight } from 'react-feather';
 import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
 import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
@@ -11,6 +11,7 @@ import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { Zoom } from '@visx/zoom';
 import { localPoint } from '@visx/event';
 import React, { useEffect, useMemo, useState } from 'react';
+import styled from 'styled-components';
 
 import { useFormatter } from 'hooks/useFormatter';
 
@@ -27,6 +28,13 @@ import {
 import { HexagonItem } from './HexagonItem';
 import { TooltipBody } from './TooltipBody';
 import { WorkspaceGridPane } from './WorkspaceGridPane';
+
+const Tooltip = motion.custom(styled.div`
+  > * {
+    padding: 0 !important;
+    border-radius: 8px;
+  }
+`);
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -190,7 +198,7 @@ export const WorkspaceGrid = ({
 
   const popToIndex = (index: number) => {
     // TODO: Ensure that if click on self, it does not do anything
-    const newStateHistory = [...reversedHistory.slice(0, index + 2)].reverse();
+    const newStateHistory = [...reversedHistory.slice(0, index)].reverse();
     const newState = newStateHistory?.[0];
     setStateHistory([...reversedHistory.slice(0, index + 1)].reverse());
 
@@ -216,9 +224,19 @@ export const WorkspaceGrid = ({
             py={1}
           >
             <UI.Stack alignItems="center" isInline>
-              {reversedHistory.map((state, index) => (
-                <React.Fragment key={index}>
-                  {index !== 0 && (
+              <UI.Flex alignItems="center">
+                <UI.Label
+                  color="black"
+                  bg="white"
+                  onClick={() => { popToIndex(0); }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <UI.Span ml={1}>
+                    Home
+                  </UI.Span>
+                </UI.Label>
+                {reversedHistory.map((state, index) => (
+                  <React.Fragment key={index}>
                     <UI.Icon
                       bg="gray.200"
                       color="gray.500"
@@ -226,50 +244,55 @@ export const WorkspaceGrid = ({
                       height="1.2rem"
                       fontSize="0.9rem"
                       mx={1}
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '100%' }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '100%',
+                      }}
                     >
                       <ChevronRight />
                     </UI.Icon>
-                  )}
-                  <UI.Flex>
-                    <UI.Label
-                      color={getLabelColor(state?.selectedNode?.score || 0)}
-                      bg={getLabelFill(state?.selectedNode?.score)}
-                      key={index}
-                      onClick={() => { popToIndex(index); }}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <UI.Span>
-                        {formatScore(state.selectedNode?.score)}
-                      </UI.Span>
-                      {' '}
-                      {/* <SingleHexagon fill={getHexagonFill(state.selectedNode?.score)} /> */}
-                      <UI.Span ml={1}>
-                        {state.selectedNode?.type === HexagonNodeType.Group && (
-                          <>
-                            {state.selectedNode.label}
-                          </>
-                        )}
-                        {state.selectedNode?.type === HexagonNodeType.Dialogue && (
-                          <>
-                            {state.selectedNode.label}
-                          </>
-                        )}
-                        {state.selectedNode?.type === HexagonNodeType.QuestionNode && (
-                          <>
-                            {state.selectedNode.topic}
-                          </>
-                        )}
-                        {state.selectedNode?.type === HexagonNodeType.Session && (
-                          <>
-                            {state.selectedNode.session.id}
-                          </>
-                        )}
-                      </UI.Span>
-                    </UI.Label>
-                  </UI.Flex>
-                </React.Fragment>
-              ))}
+                    <UI.Flex>
+                      <UI.Label
+                        color={getLabelColor(state?.selectedNode?.score || 0)}
+                        bg={getLabelFill(state?.selectedNode?.score)}
+                        key={index}
+                        onClick={() => { popToIndex(index + 1); }}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <UI.Span>
+                          {formatScore(state.selectedNode?.score)}
+                        </UI.Span>
+                        {' '}
+                        {/* <SingleHexagon fill={getHexagonFill(state.selectedNode?.score)} /> */}
+                        <UI.Span ml={1}>
+                          {state.selectedNode?.type === HexagonNodeType.Group && (
+                            <>
+                              {state.selectedNode.label}
+                            </>
+                          )}
+                          {state.selectedNode?.type === HexagonNodeType.Dialogue && (
+                            <>
+                              {state.selectedNode.label}
+                            </>
+                          )}
+                          {state.selectedNode?.type === HexagonNodeType.QuestionNode && (
+                            <>
+                              {state.selectedNode.topic}
+                            </>
+                          )}
+                          {state.selectedNode?.type === HexagonNodeType.Session && (
+                            <>
+                              {state.selectedNode.session.id}
+                            </>
+                          )}
+                        </UI.Span>
+                      </UI.Label>
+                    </UI.Flex>
+                  </React.Fragment>
+                ))}
+              </UI.Flex>
             </UI.Stack>
           </LS.BreadCrumbContainer>
           )}
@@ -364,17 +387,29 @@ export const WorkspaceGrid = ({
                         </motion.g>
                       </svg>
 
-                      {tooltipOpen && (
-                        <TooltipWithBounds
-                          key={Math.random()}
-                          top={tooltipTop}
-                          left={tooltipLeft}
-                        >
-                          {tooltipData && (
-                            <TooltipBody node={tooltipData} />
+                      <AnimateSharedLayout>
+                        <AnimatePresence>
+                          {tooltipOpen && (
+                            <Tooltip
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              initial={{ opacity: 0 }}
+                              layoutId="tooltip"
+                            >
+                              <TooltipWithBounds
+                                key={Math.random()}
+                                top={tooltipTop}
+                                left={tooltipLeft}
+                              >
+                                {tooltipData && (
+                                <TooltipBody node={tooltipData} />
+                                )}
+                              </TooltipWithBounds>
+                            </Tooltip>
                           )}
-                        </TooltipWithBounds>
-                      )}
+                        </AnimatePresence>
+                      </AnimateSharedLayout>
+
                     </UI.Div>
                   );
                 }}

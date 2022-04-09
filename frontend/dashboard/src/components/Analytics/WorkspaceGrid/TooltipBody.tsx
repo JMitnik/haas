@@ -23,12 +23,12 @@ export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => 
   const { t } = useTranslation();
 
   return (
-    <UI.Div>
-      <UI.Helper>
+    <UI.Div bg="blue.800" borderRadius={8}>
+      <UI.Helper color="white">
         {t('dialogue')}
       </UI.Helper>
       <UI.PaddedBody fraction={0.5}>
-        <UI.Flex>
+        <UI.Flex color="white">
           <UI.Div>
             {formatScore(node.score)}
           </UI.Div>
@@ -69,7 +69,7 @@ export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => {
   const { formatScore } = useFormatter();
 
   return (
-    <UI.Div>
+    <UI.Div bg="gray.800">
       <UI.Helper>
         {t('group')}
       </UI.Helper>
