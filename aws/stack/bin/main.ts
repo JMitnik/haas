@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import { App } from 'aws-cdk-lib';
+import { App, Aws } from 'aws-cdk-lib';
 import { APIStack } from '../lib/main-stack';
 import { MainPipelineStack } from '../lib/pipeline/main-pipeline-stack';
 import { HaasCampaignStack } from '../lib/stacks/campaign-stack';
@@ -10,13 +10,22 @@ import { StagingCoreTemp } from '../lib/stacks/Core/StagingCoreTemp';
 
 const app = new App();
 
+const stagingEnv = {
+  account: process.env.CDK_DEFAULT_ACCOUNT,
+  region: process.env.CDK_DEFAULT_REGION,
+}
+
+console.log(stagingEnv);
+
 // Main stack and pipeline
 // const api = new APIStack(app, 'HaasAPIMainStack');
-const stagingCoreFixed = new StagingCoreFixed(app, 'StagingCoreFixed');
+const stagingCoreFixed = new StagingCoreFixed(app, 'StagingCoreFixed', { env: stagingEnv });
 const stagingCoreTemp = new StagingCoreTemp(app, 'StagingCoreTemp', {
   vpc: stagingCoreFixed.vpc.vpc,
-  databaseEndpoint: stagingCoreFixed.databaseEndpoint,
+  db: stagingCoreFixed.db.rdsDb,
   repo: stagingCoreFixed.repo.repo,
+  dbSecurityGroup: stagingCoreFixed.db.dbSecurityGroup,
+  env: stagingEnv,
 });
 // const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
 //     prefix: 'haas_svc_api',

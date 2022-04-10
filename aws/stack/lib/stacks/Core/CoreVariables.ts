@@ -1,6 +1,9 @@
 interface CoreVariables {
+  env: string;
   vpcName: string;
+  domainName: string;
 
+  databaseName: string;
   databaseUsername: string;
   databasePasswordSecretName: string;
 
@@ -17,8 +20,11 @@ export interface APIOptions {
   environment: string;
 }
 
-export const variables: CoreVariables = {
+export const stagingVariables: CoreVariables = {
+  env: 'staging',
   vpcName: 'CORE_VPC',
+  domainName: 'staging.haas.live',
+  databaseName: 'CORE_DB_Staging',
   databaseUsername: 'HAAS_ADMIN',
   databasePasswordSecretName: 'CORE_DATABASE_PASSWORD',
   repoName: 'haas_core_repo',

@@ -29,6 +29,7 @@ export class CoreVPC extends Construct {
 
     this.addAccessToS3();
     this.addAccessToSecretsManager();
+    this.addAccessToSessionsManager();
   }
 
   private addAccessToS3() {
@@ -43,6 +44,24 @@ export class CoreVPC extends Construct {
     // We allow our VPC Access to Secrets Manager this way.
     this.vpc.addInterfaceEndpoint('secretAccess', {
       service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER
+    });
+  }
+
+  private addAccessToSessionsManager() {
+    this.vpc.addInterfaceEndpoint('sessionAccess', {
+      service: ec2.InterfaceVpcEndpointAwsService.SSM
+    });
+
+    this.vpc.addInterfaceEndpoint('sessionMessageAccess', {
+      service: ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES
+    });
+
+    this.vpc.addInterfaceEndpoint('EC2Access', {
+      service: ec2.InterfaceVpcEndpointAwsService.EC2
+    });
+
+    this.vpc.addInterfaceEndpoint('EC2MessageAccess', {
+      service: ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES
     });
   }
 }
