@@ -1,15 +1,19 @@
 import * as cdk from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as ecr from '@aws-cdk/aws-ecr';
-import * as rds from '@aws-cdk/aws-rds';
-import * as acm from '@aws-cdk/aws-certificatemanager';
-import { SubnetType } from '@aws-cdk/aws-ec2';
-import * as ecs from '@aws-cdk/aws-ecs';
-import * as route53 from '@aws-cdk/aws-route53';
-import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
-import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
-import { Duration } from '@aws-cdk/core';
-
+import {
+  aws_ec2 as ec2,
+  Stack,
+  StackProps,
+  aws_ecr as ecr,
+  aws_rds as rds,
+  aws_certificatemanager as acm,
+  aws_ecs as ecs,
+  aws_route53 as route53,
+  aws_ecs_patterns as ecs_patterns,
+  aws_secretsmanager as secretsmanager,
+  Duration,
+} from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { SubnetType } from 'aws-cdk-lib/aws-ec2'
 
 // Prerequisites:
 // 1. You have an Ec2 Keyname-pair created (HaasAPI_RemoteBastionAccess)
@@ -27,7 +31,7 @@ const hostedZoneId = 'Z02703531WCURDDQ4Z46S';
 const hostedZoneName = 'haas.live';
 const bastionKeyName = 'HaasAPI_RemoteBastionAccess';
 
-export class APIStack extends cdk.Stack {
+export class APIStack extends Stack {
   apiService: ecs_patterns.ApplicationLoadBalancedFargateService;
   dbUrl: string;
   vpc: ec2.Vpc;
@@ -35,7 +39,7 @@ export class APIStack extends cdk.Stack {
   rdsPassword: secretsmanager.Secret;
   rdsSecurityGroup: ec2.SecurityGroup;
 
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     // Reference to our hosted-zone (haas.live)
@@ -52,80 +56,80 @@ export class APIStack extends cdk.Stack {
 
     const svcRepo = ecr.Repository.fromRepositoryName(this, 'ServiceRepo', 'haas-svc-api');
 
-    // Our VPC: private subnet for sensitive space such as DB, and public for our services and bastion
-    const vpc = new ec2.Vpc(this, "API_VPC", {
-      maxAzs: 2,
-      subnetConfiguration: [
-        {
-          name: 'API_VPC_PUBLIC_DEFAULT',
-          subnetType: SubnetType.PUBLIC,
-        },
-        {
-          name: 'API_VPC_PRIVATE_DEFAULT',
-          subnetType: SubnetType.ISOLATED,
-        },
-      ],
-    });
+    // // Our VPC: private subnet for sensitive space such as DB, and public for our services and bastion
+    // const vpc = new ec2.Vpc(this, "API_VPC", {
+    //   maxAzs: 2,
+    //   subnetConfiguration: [
+    //     {
+    //       name: 'API_VPC_PUBLIC_DEFAULT',
+    //       subnetType: SubnetType.PUBLIC,
+    //     },
+    //     {
+    //       name: 'API_VPC_PRIVATE_DEFAULT',
+    //       subnetType: SubnetType.ISOLATED,
+    //     },
+    //   ],
+    // });
 
-    // We allow our VPC Access to S3 this way.
-    vpc.addGatewayEndpoint('S3Access', {
-      service: ec2.GatewayVpcEndpointAwsService.S3
-    });
+    // // We allow our VPC Access to S3 this way.
+    // vpc.addGatewayEndpoint('S3Access', {
+    //   service: ec2.GatewayVpcEndpointAwsService.S3
+    // });
 
-    // TODO: Find cheaper alternative
-    // We allow our VPC Access to Secrets Manager this way.
-    vpc.addInterfaceEndpoint('secretAccess', {
-      service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER
-    });
+    // // TODO: Find cheaper alternative
+    // // We allow our VPC Access to Secrets Manager this way.
+    // vpc.addInterfaceEndpoint('secretAccess', {
+    //   service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER
+    // });
 
-    this.vpc = vpc;
+    // this.vpc = vpc;
 
     // We preconfigure our RDS credentials, and will upload this to `API_MAIN_RDS_SECRET`.
-    const rdsUsername = 'HAAS_ADMIN';
-    const rdsPassword = new secretsmanager.Secret(this, 'API_RDS_SECRET', {
-      secretName: 'API_MAIN_RDS_SECRET'
-    });
+    // const rdsUsername = 'HAAS_ADMIN';
+    // const rdsPassword = new secretsmanager.Secret(this, 'API_RDS_SECRET', {
+    //   secretName: 'API_MAIN_RDS_SECRET'
+    // });
 
-    this.rdsPassword = rdsPassword;
+    // this.rdsPassword = rdsPassword;
 
     // Our RDS Endpoint
-    const rdsDb = new rds.DatabaseInstance(this, 'API_RDS', {
-      vpc,
-      engine: rds.DatabaseInstanceEngine.postgres({ version: rds.PostgresEngineVersion.VER_12 }),
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.SMALL),
-      deletionProtection: false,
-      storageType: rds.StorageType.GP2,
-      vpcSubnets: { subnetType: SubnetType.ISOLATED },
-      credentials: {
-        username: rdsUsername,
-        password: rdsPassword.secretValue,
-      },
-    });
+    // const rdsDb = new rds.DatabaseInstance(this, 'API_RDS', {
+    //   vpc,
+    //   engine: rds.DatabaseInstanceEngine.postgres({ version: rds.PostgresEngineVersion.VER_12 }),
+    //   instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.SMALL),
+    //   deletionProtection: false,
+    //   storageType: rds.StorageType.GP2,
+    //   vpcSubnets: { subnetType: SubnetType.ISOLATED },
+    //   credentials: {
+    //     username: rdsUsername,
+    //     password: rdsPassword.secretValue,
+    //   },
+    // });
 
     // Database endpoint
-    const rdsEndpoint = rdsDb.instanceEndpoint.hostname;
+    // const rdsEndpoint = rdsDb.instanceEndpoint.hostname;
 
-    // Our ECS cluster, housing our various Fargate Services
-    const cluster = new ecs.Cluster(this, "API_MAIN_CLUSTER", {
-      vpc,
-      clusterName: "API_MAIN_CLUSTER",
-      containerInsights: true
-    });
+    // // Our ECS cluster, housing our various Fargate Services
+    // const cluster = new ecs.Cluster(this, "API_MAIN_CLUSTER", {
+    //   vpc,
+    //   clusterName: "API_MAIN_CLUSTER",
+    //   containerInsights: true
+    // });
 
     // Environment values for our API service: access to DB and JWT.
     const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this,
       'SecretFromName',
       'HAAS_JWT'
     );
-    const dbUrl = `postgresql://${rdsUsername}:${rdsPassword.secretValue.toString()}@${rdsEndpoint}/postgres?schema=public`;
+    // const dbUrl = `postgresql://${rdsUsername}:${rdsPassword.secretValue.toString()}@${rdsEndpoint}/postgres?schema=public`;
 
-    const dbString = new secretsmanager.Secret(this, 'API_RDS_String', {
-      secretName: 'API_RDS_String',
-      generateSecretString: {
-        secretStringTemplate: JSON.stringify({ url: dbUrl }),
-        generateStringKey: 'SECRET_URL'
-      }
-    });
+    // const dbString = new secretsmanager.Secret(this, 'API_RDS_String', {
+    //   secretName: 'API_RDS_String',
+    //   generateSecretString: {
+    //     secretStringTemplate: JSON.stringify({ url: dbUrl }),
+    //     generateStringKey: 'SECRET_URL'
+    //   }
+    // });
 
     const awsSecret = secretsmanager.Secret.fromSecretNameV2(
       this, 'API_KEY', 'ProdAwsKey'

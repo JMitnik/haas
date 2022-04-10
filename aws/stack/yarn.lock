@@ -1737,6 +1737,21 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
+aws-cdk-lib@2.20.0:
+  version "2.20.0"
+  resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.20.0.tgz#bb22702cc3748d8ed7eb42646f473ff740311bfe"
+  integrity sha512-jACK/1UJxtWWl6QH+I1V8Oc8F1EEL6aFQYk24DIrzNyB1Aj9LIs9/NyDu5zN00QFKrR6aDE7WAv1VG3sa6wWdg==
+  dependencies:
+    "@balena/dockerignore" "^1.0.2"
+    case "1.6.3"
+    fs-extra "^9.1.0"
+    ignore "^5.2.0"
+    jsonschema "^1.4.0"
+    minimatch "^3.1.2"
+    punycode "^2.1.1"
+    semver "^7.3.5"
+    yaml "1.10.2"
+
 aws-cdk@1.120.0:
   version "1.120.0"
   resolved "https://registry.yarnpkg.com/aws-cdk/-/aws-cdk-1.120.0.tgz#57f87edc760c0b30168e422a5e721f86a57c1da2"
@@ -2258,6 +2273,11 @@ concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
   integrity sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=
+
+constructs@^10.0.109:
+  version "10.0.109"
+  resolved "https://registry.yarnpkg.com/constructs/-/constructs-10.0.109.tgz#8f665a231f23546a4cd66e707f5e7d0e7943387e"
+  integrity sha512-jnalQa5GGD8G34rfOxYMr7B7rY4Q6W7UGwUdxyMM4bKwZEEDTh0TL8eFPUA/G6O3oL3rBm16lP/Ijm3Nn06uxg==
 
 constructs@^3.2.0, constructs@^3.3.69:
   version "3.3.71"
@@ -3123,6 +3143,11 @@ ignore@^5.1.8:
   version "5.1.8"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.1.8.tgz#f150a8b50a34289b33e22f5889abd4d8016f0e57"
   integrity sha512-BMpfD7PpiETpBl/A6S498BaIJ6Y/ABT93ETbby2fP00v4EbvPBXWEoaR1UBPKs3iR53pJY7EtZk5KACI57i1Uw==
+
+ignore@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.0.tgz#6d3bac8fa7fe0d45d9f9be7bac2fc279577e345a"
+  integrity sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==
 
 import-local@^3.0.2:
   version "3.0.2"
@@ -4174,6 +4199,13 @@ minimatch@>=3.0, minimatch@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
   integrity sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==
+  dependencies:
+    brace-expansion "^1.1.7"
+
+minimatch@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.2.tgz#19cd194bfd3e428f049a70817c038d89ab4be35b"
+  integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
   dependencies:
     brace-expansion "^1.1.7"
 

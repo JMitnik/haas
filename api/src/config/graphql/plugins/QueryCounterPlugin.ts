@@ -1,5 +1,9 @@
 import { plugin } from '@nexus/schema';
-
+declare global {
+  namespace NodeJS {
+    interface Global {}
+  }
+}
 
 interface CustomNodeJsGlobal extends NodeJS.Global {
   nrQueries: number;
@@ -11,7 +15,7 @@ declare const global: CustomNodeJsGlobal;
 export const QueryCounterPlugin = plugin({
   name: 'QueryCounterPlugin',
   description: 'Counts number of queries performed in the current field',
-  fieldDefTypes: `useQueryCounter?: boolean`,
+  fieldDefTypes: 'useQueryCounter?: boolean',
   onCreateFieldResolver(test) {
     return async (root, args, ctx, info, next) => {
       const useQueryCounter = test.fieldConfig.extensions?.nexus?.config?.useQueryCounter;
@@ -32,5 +36,5 @@ export const QueryCounterPlugin = plugin({
 
       return value;
     }
-  }
+  },
 });

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { ApolloError } from 'apollo-server';
 
 import { clearDatabase } from './testUtils';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
@@ -71,10 +72,10 @@ test('user has minimal permissions to access ', async () => {
   const res = await ctx.client.request(getSessionConnectionQuery,
     {
       customerSlug: workspace.slug,
-      dialogueSlug: dialogue.slug
+      dialogueSlug: dialogue.slug,
     },
     {
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
     }
   );
 
@@ -90,10 +91,10 @@ test('all default roles have permissions to access data', async () => {
     const res = await ctx.client.request(getSessionConnectionQuery,
       {
         customerSlug: workspace.slug,
-        dialogueSlug: dialogue.slug
+        dialogueSlug: dialogue.slug,
       },
       {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
       }
     );
 
@@ -105,7 +106,7 @@ test('user has no permissions to access interactions', async () => {
   const { workspace, dialogue } = await prepEnvironment(prisma);
   const { user } = await seedUser(prisma, workspace.id, {
     name: 'Guest',
-    permissions: { set: ['CAN_ADD_USERS'] }
+    permissions: { set: ['CAN_ADD_USERS'] },
   });
   const token = AuthService.createUserToken(user.id, 22);
 
@@ -113,15 +114,17 @@ test('user has no permissions to access interactions', async () => {
     await ctx.client.request(getSessionConnectionQuery,
       {
         customerSlug: workspace.slug,
-        dialogueSlug: dialogue.slug
+        dialogueSlug: dialogue.slug,
       },
       {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
       }
     );
   } catch (error) {
-    expect(error.response.errors).toHaveLength(1);
-    expectUnauthorizedErrorOnResolver(error.response.errors[0], 'sessionConnection');
+    if (error instanceof ApolloError) {
+      expect(error.response.errors).toHaveLength(1);
+      expectUnauthorizedErrorOnResolver(error.response.errors[0], 'sessionConnection');
+    }
   }
 });
 
@@ -141,10 +144,10 @@ test('sessionConnection performs pagination', async () => {
   const res = await ctx.client.request(getSessionConnectionQuery,
     {
       customerSlug: workspace.slug,
-      dialogueSlug: dialogue.slug
+      dialogueSlug: dialogue.slug,
     },
     {
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
     }
   );
 
@@ -167,10 +170,10 @@ test('sessionConnection performs pagination', async () => {
       sessionsFilter: {
         perPage: 5,
         offset: 5,
-      }
+      },
     },
     {
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
     }
   );
 
