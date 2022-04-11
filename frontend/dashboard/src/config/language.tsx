@@ -887,6 +887,14 @@ const language = {
       en: 'End',
       de: 'Ende',
     },
+    make_dialogue_private: {
+      en: 'Make private',
+      de: 'Privatisieren',
+    },
+    make_dialogue_public: {
+      en: 'Make public',
+      de: 'Veröffentlichen',
+    },
     edit: {
       en: 'Edit',
       de: 'Bestätigen',

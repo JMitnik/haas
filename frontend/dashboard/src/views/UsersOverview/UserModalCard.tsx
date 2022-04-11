@@ -145,7 +145,7 @@ const PrivateDialoguesUserForm = ({
 export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
-  const { CanAssignUsersToDialogue } = useAuth();
+  const { canAssignUsersToDialogue } = useAuth();
   const { data, loading, error } = useGetUserCustomerFromCustomerQuery({
     variables: {
       id: activeCustomer?.id || '',
@@ -208,7 +208,7 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
         )}
         <UI.Hr />
         {
-          CanAssignUsersToDialogue && (
+          canAssignUsersToDialogue && (
             <>
               <UI.ModalHead style={{ borderBottom: 'none', paddingBottom: '1em' }}>
                 <UI.ModalTitle>{t('assigned_dialogues')}</UI.ModalTitle>

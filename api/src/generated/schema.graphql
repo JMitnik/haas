@@ -656,6 +656,7 @@ type Dialogue {
   description: String!
   edges: [Edge!]!
   id: ID!
+  isPrivate: Boolean!
   isWithoutGenData: Boolean!
   language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!

@@ -14,6 +14,7 @@ query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilte
       dialogues {
         id
         title
+        isPrivate
         language
         slug
         publicTitle

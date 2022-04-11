@@ -3,7 +3,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useUser } from 'providers/UserProvider';
 
 interface UseAuthProps {
-  CanAssignUsersToDialogue: boolean;
+  canAssignUsersToDialogue: boolean;
   canCreateCustomers: boolean;
   canDeleteDialogue: boolean;
   canDeleteCustomers: boolean;
@@ -76,7 +76,7 @@ const useAuth = (): UseAuthProps => {
   );
 
   return {
-    CanAssignUsersToDialogue: hasPermission(SystemPermission.CanAssignUsersToDialogue),
+    canAssignUsersToDialogue: hasPermission(SystemPermission.CanAssignUsersToDialogue),
     canDeleteDialogue: hasPermission(SystemPermission.CanDeleteDialogue),
     canEditDialogue: hasPermission(SystemPermission.CanEditDialogue),
     canViewCampaigns: hasPermission(SystemPermission.CanViewCampaigns),

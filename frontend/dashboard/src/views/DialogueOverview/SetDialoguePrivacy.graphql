@@ -1,0 +1,7 @@
+query setDialoguePrivacy($customerSlug: String, $dialogueSlug: String, $state: Boolean) {
+  setDialoguePrivacy(customerSlug: $customerSlug, dialogueSlug: $dialogueSlug, state: $state) {
+    slug
+    title
+    isPrivate
+  }
+} 

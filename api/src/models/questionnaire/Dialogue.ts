@@ -1,6 +1,6 @@
 
 import { UserInputError } from 'apollo-server-express';
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, mutationField, objectType, stringArg } from '@nexus/schema';
 import { subDays } from 'date-fns';
 
 import { DialgoueStatisticsLineChartDataType, DialogueStatistics } from './graphql/DialogueStatistics';
@@ -58,6 +58,7 @@ export const DialogueType = objectType({
     t.field('language', {
       type: LanguageEnumType,
     });
+    t.boolean('isPrivate');
 
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
@@ -285,6 +286,15 @@ export const CreateDialogueInputType = inputObjectType({
   },
 });
 
+export const SetDialoguePrivacyMutation = mutationField('setDialoguePrivacy', {
+  type: 'Dialogue',
+  args: { customerSlug: 'String', dialogueSlug: 'String', state: 'Boolean' },
+  nullable: true,
+  async resolve(parent, args, ctx) {
+    return null;
+  },
+})
+
 export const DialogueMutations = extendType({
   type: 'Mutation',
   definition(t) {
@@ -384,6 +394,7 @@ export const DialogueRootQuery = extendType({
     });
   },
 });
+
 
 export default [
   DialogueWhereUniqueInput,

@@ -16,10 +16,6 @@ import useAuth from 'hooks/useAuth';
 import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
-interface DialogueOverviewProps {
-  dialogueConnection: any;
-}
-
 const DialogueOverview = (
 ) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
@@ -34,7 +30,7 @@ const DialogueOverview = (
   const [useDialogueGridView, setUseDialogueGridView] = useState(true);
 
   const { loading: isLoading } = useDialogueConnectionQuery({
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-and-network',
     variables: {
       customerSlug,
       filter: {
@@ -55,8 +51,6 @@ const DialogueOverview = (
   });
 
   const { canDeleteDialogue } = useAuth();
-
-  console.log('active dialogue connection', activeDialogueConnection);
 
   const filteredDialogues = activeDialogueConnection?.dialogues;
   const pageCount = activeDialogueConnection?.totalPages || 0;

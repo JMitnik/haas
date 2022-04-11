@@ -24,10 +24,14 @@ import { Tag } from './Tag';
 interface DialogueCardOptionsOverlayProps {
   onDelete: (e: React.MouseEvent<HTMLElement>) => void;
   onEdit: (e: React.MouseEvent<HTMLElement>) => void;
+  isPrivate: string;
 }
 
-const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => {
+const DialogueCardOptionsOverlay = ({ onDelete, onEdit, isPrivate }: DialogueCardOptionsOverlayProps) => {
   const { t } = useTranslation();
+
+  const { canAssignUsersToDialogue } = useAuth();
+  console.log('isPrivate: ', isPrivate);
 
   return (
     <UI.List>
@@ -62,6 +66,12 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
       <UI.ListItem onClick={onEdit}>
         {t('edit')}
       </UI.ListItem>
+      {canAssignUsersToDialogue && (
+        <UI.ListItem onClick={onEdit}>
+          {t(`make_dialogue_${isPrivate ? 'public' : 'private'}`)}
+        </UI.ListItem>
+      )}
+
     </UI.List>
   );
 };
@@ -209,6 +219,7 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
                   <ShowMoreButton
                     renderMenu={(
                       <DialogueCardOptionsOverlay
+                        isPrivate={dialogue.isPrivate}
                         onDelete={handleDeleteDialogue}
                         onEdit={goToEditDialogue}
                       />

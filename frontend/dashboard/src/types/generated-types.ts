@@ -739,6 +739,7 @@ export type Dialogue = {
   isWithoutGenData: Scalars['Boolean'];
   wasGeneratedWithGenData: Scalars['Boolean'];
   language: LanguageEnumType;
+  isPrivate: Scalars['Boolean'];
   publicTitle?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
@@ -2860,7 +2861,7 @@ export type DialogueConnectionQuery = (
         & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
       ), dialogues: Array<(
         { __typename?: 'Dialogue' }
-        & Pick<Dialogue, 'id' | 'title' | 'language' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId' | 'averageScore'>
+        & Pick<Dialogue, 'id' | 'title' | 'isPrivate' | 'language' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId' | 'averageScore'>
         & { customer?: Maybe<(
           { __typename?: 'Customer' }
           & Pick<Customer, 'slug'>
@@ -4239,6 +4240,7 @@ export const DialogueConnectionDocument = gql`
       dialogues {
         id
         title
+        isPrivate
         language
         slug
         publicTitle

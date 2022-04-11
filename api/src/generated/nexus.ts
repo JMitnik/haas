@@ -1461,6 +1461,7 @@ export interface NexusGenFieldTypes {
     description: string; // String!
     edges: NexusGenRootTypes['Edge'][]; // [Edge!]!
     id: string; // ID!
+    isPrivate: boolean; // Boolean!
     isWithoutGenData: boolean; // Boolean!
     language: NexusGenEnums['LanguageEnumType']; // LanguageEnumType!
     leafs: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
