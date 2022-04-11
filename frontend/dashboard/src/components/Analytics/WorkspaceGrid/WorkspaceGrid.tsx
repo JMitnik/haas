@@ -21,8 +21,8 @@ import {
   HexagonGroupNode,
   HexagonNode,
   HexagonNodeType,
-  HexagonQuestionNodeNode,
   HexagonState,
+  HexagonTopicNode,
   HexagonViewMode,
 } from './WorkspaceGrid.types';
 import { HexagonItem } from './HexagonItem';
@@ -150,8 +150,8 @@ export const WorkspaceGrid = ({
     setStateHistoryStack(newStateHistory);
 
     const topics = newStateHistory
-      .filter((state) => state.selectedNode?.type === HexagonNodeType.QuestionNode)
-      .map((state) => (state.selectedNode as HexagonQuestionNodeNode)?.topic);
+      .filter((state) => state.selectedNode?.type === HexagonNodeType.Topic)
+      .map((state) => (state.selectedNode as HexagonTopicNode)?.topic);
 
     if (!onLoadData) return;
 
@@ -170,8 +170,8 @@ export const WorkspaceGrid = ({
 
     const [newNodes, hexagonViewMode] = await onLoadData({
       dialogueId,
-      topic: clickedNode.type === HexagonNodeType.QuestionNode ? clickedNode.topic : '',
-      topics,
+      topic: clickedNode.type === HexagonNodeType.Topic ? clickedNode.topic.name : '',
+      topics: topics.map((topic) => topic.name),
     }).finally(() => setIsLoading(false));
 
     setCurrentState({ currentNode: clickedNode, childNodes: newNodes, viewMode: hexagonViewMode });
@@ -289,9 +289,9 @@ export const WorkspaceGrid = ({
                                 {state.selectedNode.label}
                               </>
                             )}
-                            {state.selectedNode?.type === HexagonNodeType.QuestionNode && (
+                            {state.selectedNode?.type === HexagonNodeType.Topic && (
                               <>
-                                {state.selectedNode.topic}
+                                {state.selectedNode.topic.name}
                               </>
                             )}
                             {state.selectedNode?.type === HexagonNodeType.Session && (

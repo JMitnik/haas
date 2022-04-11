@@ -127,7 +127,7 @@ export const orderNodesByVoteCount = (nodes: HexagonNode[]): HexagonNode[] => or
     return node.dialogue.dialogueStatisticsSummary?.nrVotes;
   }
 
-  if (node.type === HexagonNodeType.QuestionNode) {
+  if (node.type === HexagonNodeType.Topic) {
     return 0;
   }
 
@@ -145,7 +145,7 @@ export const orderNodesByScore = (nodes: HexagonNode[]): HexagonNode[] => orderB
     return node.dialogue.dialogueStatisticsSummary?.impactScore;
   }
 
-  if (node.type === HexagonNodeType.QuestionNode) {
+  if (node.type === HexagonNodeType.Topic) {
     return node.score;
   }
 
@@ -160,4 +160,10 @@ export const getHexagonSVGFill = (score?: number) => {
   if (!score) return 'url(#dots-gray)';
   if (score >= 40) return 'url(#dots-green)';
   return 'url(#dots-pink)';
+};
+
+export const getColorScoreBrand = (score?: number) => {
+  if (!score) return 'gray.700';
+  if (score >= 40) return 'green.600';
+  return 'red.600';
 };

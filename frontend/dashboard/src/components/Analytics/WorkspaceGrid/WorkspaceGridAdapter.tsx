@@ -69,12 +69,12 @@ export const WorkspaceGridAdapter = ({
 
     const nodes: HexagonNode[] = loadedData?.dialogue?.topic?.subTopics?.map((topic) => ({
       id: topic.name,
-      type: HexagonNodeType.QuestionNode,
+      type: HexagonNodeType.Topic,
       score: topic.impactScore,
-      topic: topic.name,
+      topic,
     })) || [];
 
-    if (nodes.length) return [nodes, HexagonViewMode.QuestionNode];
+    if (nodes.length) return [nodes, HexagonViewMode.Topic];
 
     const { data: sessionData } = await fetchGetSessions({
       input: {

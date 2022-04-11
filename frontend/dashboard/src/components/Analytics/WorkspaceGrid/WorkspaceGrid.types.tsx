@@ -1,7 +1,8 @@
-import { GetSessionPaths, GetWorkspaceDialogueStatistics } from 'types/generated-types';
+import { GetDialogueTopics, GetSessionPaths, GetWorkspaceDialogueStatistics } from 'types/generated-types';
 
+export type Topic = GetDialogueTopics.Topic;
 export type Dialogue = GetWorkspaceDialogueStatistics.Dialogues;
-export type Session = GetSessionPaths._PathedSessions;
+export type Session = GetSessionPaths.PathedSessions;
 
 /** Hexagon representing a Group node (layer above Dialogue) */
 export type HexagonGroupNode = {
@@ -26,11 +27,11 @@ export type HexagonDialogueNode = {
 };
 
 /** Hexagon representing a Topic */
-export type HexagonQuestionNodeNode = {
+export type HexagonTopicNode = {
   id: string;
   score: number;
-  type: HexagonNodeType.QuestionNode;
-  topic: string;
+  type: HexagonNodeType.Topic;
+  topic: Topic;
   points?: string;
 };
 
@@ -43,7 +44,7 @@ export type HexagonSessionNode = {
   points?: string;
 };
 
-export type HexagonNode = HexagonDialogueNode | HexagonQuestionNodeNode | HexagonGroupNode | HexagonSessionNode;
+export type HexagonNode = HexagonDialogueNode | HexagonTopicNode | HexagonGroupNode | HexagonSessionNode;
 
 export interface HexagonState {
   currentNode?: HexagonNode;
@@ -55,14 +56,14 @@ export interface HexagonState {
 export enum HexagonNodeType {
   Group = 'Group',
   Dialogue = 'Dialogue',
-  QuestionNode = 'QuestionNode',
+  Topic = 'Topic',
   Session = 'Session',
 }
 
 export enum HexagonViewMode {
   Group = 'Group',
   Dialogue = 'Dialogue',
-  QuestionNode = 'QuestionNode',
+  Topic = 'Topic',
   Session = 'Session',
   Final = 'Final',
 }

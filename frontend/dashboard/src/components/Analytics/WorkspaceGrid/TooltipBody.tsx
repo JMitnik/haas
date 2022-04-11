@@ -4,17 +4,17 @@ import { useFormatter } from 'hooks/useFormatter';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-import { Calendar, TrendingDown, TrendingUp } from 'react-feather';
+import * as LS from './WorkspaceGrid.styles';
 import {
   HexagonDialogueNode,
   HexagonGroupNode,
   HexagonNode,
   HexagonNodeType,
-  HexagonQuestionNodeNode,
   HexagonSessionNode,
+  HexagonTopicNode,
 } from './WorkspaceGrid.types';
-
-import * as LS from './WorkspaceGrid.styles';
+import { SingleHexagon } from './SingleHexagon';
+import { getColorScoreBrand, getHexagonSVGFill } from './WorkspaceGrid.helpers';
 
 interface TooltipBodyProps {
   node: HexagonNode;
@@ -27,10 +27,10 @@ export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => 
   return (
     <LS.TooltipContainer>
       <LS.TooltipHeader>
-        <UI.Flex>
+        <UI.Flex justifyContent="space-between" alignItems="flex-end">
           <UI.Div>
             <UI.Helper>
-              {t('dialogue')}
+              {t('team')}
             </UI.Helper>
             <UI.Span>
               {node.label}
@@ -38,36 +38,92 @@ export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => 
           </UI.Div>
 
           <UI.Div>
-            {formatScore(node.score)}
+            <UI.Flex>
+              <SingleHexagon fill={getHexagonSVGFill(node.score)} />
+              <UI.Span ml={1} color={getColorScoreBrand(node.score)}>
+                {formatScore(node.score)}
+              </UI.Span>
+            </UI.Flex>
           </UI.Div>
         </UI.Flex>
       </LS.TooltipHeader>
+
+      <LS.TooltipBody>
+        <UI.Div>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div
+              mr={2}
+              px={1}
+              py={1}
+              borderRadius={5}
+              color="gray.700"
+            >
+              Responses
+            </UI.Div>
+
+            <UI.Span fontWeight={600} color="gray.400">
+              <UI.Span color="gray.500">
+                {node.dialogue.dialogueStatisticsSummary?.nrVotes}
+              </UI.Span>
+              {' responses'}
+            </UI.Span>
+          </UI.Flex>
+        </UI.Div>
+      </LS.TooltipBody>
     </LS.TooltipContainer>
   );
 };
 
-export const TooltipQuestionNodeBody = ({ node }: { node: HexagonQuestionNodeNode }) => {
+export const TooltipTopicBody = ({ node }: { node: HexagonTopicNode }) => {
   const { formatScore } = useFormatter();
   const { t } = useTranslation();
 
   return (
     <LS.TooltipContainer>
       <LS.TooltipHeader>
-        <UI.Flex>
+        <UI.Flex justifyContent="space-between" alignItems="flex-end">
           <UI.Div>
             <UI.Helper>
               {t('topic')}
             </UI.Helper>
             <UI.Span>
-              {node.topic}
+              {node.topic.name}
             </UI.Span>
           </UI.Div>
 
           <UI.Div>
-            {formatScore(node.score)}
+            <UI.Flex>
+              <SingleHexagon fill={getHexagonSVGFill(node.score)} />
+              <UI.Span ml={1} color={getColorScoreBrand(node.score)}>
+                {formatScore(node.score)}
+              </UI.Span>
+            </UI.Flex>
           </UI.Div>
         </UI.Flex>
       </LS.TooltipHeader>
+
+      <LS.TooltipBody>
+        <UI.Div>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div
+              mr={2}
+              px={1}
+              py={1}
+              borderRadius={5}
+              color="gray.700"
+            >
+              Responses
+            </UI.Div>
+
+            <UI.Span fontWeight={600} color="gray.400">
+              <UI.Span color="gray.500">
+                {node.topic.nrVotes}
+              </UI.Span>
+              {' responses'}
+            </UI.Span>
+          </UI.Flex>
+        </UI.Div>
+      </LS.TooltipBody>
     </LS.TooltipContainer>
   );
 };
@@ -90,13 +146,37 @@ export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => {
           </UI.Div>
 
           <UI.Div>
-            {formatScore(node.score)}
+            <UI.Flex>
+              <SingleHexagon fill={getHexagonSVGFill(node.score)} />
+              <UI.Span ml={1} color={getColorScoreBrand(node.score)}>
+                {formatScore(node.score)}
+              </UI.Span>
+            </UI.Flex>
           </UI.Div>
         </UI.Flex>
       </LS.TooltipHeader>
 
       <LS.TooltipBody>
-        Test
+        <UI.Div>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div
+              mr={2}
+              px={1}
+              py={1}
+              borderRadius={5}
+              color="gray.700"
+            >
+              Teams
+            </UI.Div>
+
+            <UI.Span fontWeight={600} color="gray.400">
+              <UI.Span color="gray.500">
+                {node.subGroups.length}
+              </UI.Span>
+              {' teams'}
+            </UI.Span>
+          </UI.Flex>
+        </UI.Div>
       </LS.TooltipBody>
     </LS.TooltipContainer>
   );
@@ -109,53 +189,52 @@ export const TooltipSessionBody = ({ node }: { node: HexagonSessionNode }) => {
   const date = format(new Date(node.session.createdAt), 'dd/MM/yyyy HH:mm:ss');
 
   return (
-    <UI.Div>
-      <UI.Div>
-        <UI.Div borderBottom="1px solid" borderColor="gray.100" pb={1}>
-          <UI.Span fontWeight={700}>
-            Session
-          </UI.Span>
-        </UI.Div>
-      </UI.Div>
-      <UI.PaddedBody fraction={0.5}>
-        <UI.Stack spacing={2}>
+    <LS.TooltipContainer>
+      <LS.TooltipHeader>
+        <UI.Flex justifyContent="space-between" alignItems="flex-end">
           <UI.Div>
-            <UI.Div mr={1}>
-              <UI.Helper>
-                {t('score')}
-              </UI.Helper>
-            </UI.Div>
-            <UI.Flex alignItems="center">
-              <UI.Icon mr={1}>
-                {node.score < 40 ? (
-                  <TrendingDown width={16} />
-                ) : (
-                  <TrendingUp width={16} />
-                )}
-              </UI.Icon>
-              <UI.Div>
+            <UI.Helper>
+              {t('session')}
+            </UI.Helper>
+            <UI.Span>
+              {date}
+            </UI.Span>
+          </UI.Div>
+
+          <UI.Div>
+            <UI.Flex>
+              <SingleHexagon fill={getHexagonSVGFill(node.score)} />
+              <UI.Span ml={1} color={getColorScoreBrand(node.score)}>
                 {formatScore(node.score)}
-              </UI.Div>
+              </UI.Span>
             </UI.Flex>
           </UI.Div>
-          <UI.Div>
-            <UI.Div>
-              <UI.Helper>
-                {t('date')}
-              </UI.Helper>
+        </UI.Flex>
+      </LS.TooltipHeader>
+
+      <LS.TooltipBody>
+        <UI.Div>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div
+              mr={2}
+              px={1}
+              py={1}
+              borderRadius={5}
+              color="gray.700"
+            >
+              Time spent
             </UI.Div>
-            <UI.Flex alignItems="center">
-              <UI.Icon display="inline-block" mr={1}>
-                <Calendar width={16} />
-              </UI.Icon>
-              <UI.Muted>
-                {date}
-              </UI.Muted>
-            </UI.Flex>
-          </UI.Div>
-        </UI.Stack>
-      </UI.PaddedBody>
-    </UI.Div>
+
+            <UI.Span fontWeight={600} color="gray.400">
+              <UI.Span color="gray.500">
+                {node.session.totalTimeInSec}
+              </UI.Span>
+              {' seconds'}
+            </UI.Span>
+          </UI.Flex>
+        </UI.Div>
+      </LS.TooltipBody>
+    </LS.TooltipContainer>
   );
 };
 
@@ -165,8 +244,8 @@ export const TooltipBody = ({ node }: TooltipBodyProps) => {
       return <TooltipGroupNodeBody node={node} />;
     case HexagonNodeType.Dialogue:
       return <TooltipDialogueBody node={node} />;
-    case HexagonNodeType.QuestionNode:
-      return <TooltipQuestionNodeBody node={node} />;
+    case HexagonNodeType.Topic:
+      return <TooltipTopicBody node={node} />;
     case HexagonNodeType.Session:
       return <TooltipSessionBody node={node} />;
     default: {

@@ -11,8 +11,8 @@ import {
   HexagonDialogueNode,
   HexagonGroupNode,
   HexagonNodeType,
-  HexagonQuestionNodeNode,
   HexagonState,
+  HexagonTopicNode,
 } from './WorkspaceGrid.types';
 import { calcGroupTotal, orderNodesByScore, orderNodesByVoteCount } from './WorkspaceGrid.helpers';
 
@@ -133,10 +133,10 @@ export const DialoguePane = ({ currentState }: WorkspaceGridPaneProps) => {
               <UI.Stack>
                 {selectedTopics.map((group, index) => (
                   <UI.Div key={index} width="100%">
-                    {typeof group === 'object' && group.type === HexagonNodeType.QuestionNode && (
+                    {typeof group === 'object' && group.type === HexagonNodeType.Topic && (
                       <>
                         <UI.Span fontWeight={500} color="gray.600">
-                          {group.topic}
+                          {group.topic.name}
                         </UI.Span>
                       </>
                     )}
@@ -177,7 +177,7 @@ export const DialoguePane = ({ currentState }: WorkspaceGridPaneProps) => {
 type GroupSwitchItem = 'metadata' | 'actions' | 'activity';
 
 export const TopicPane = ({ currentState }: WorkspaceGridPaneProps) => {
-  const currentNode = currentState.currentNode as HexagonQuestionNodeNode;
+  const currentNode = currentState.currentNode as HexagonTopicNode;
   const { formatScore } = useFormatter();
 
   return (
@@ -192,7 +192,7 @@ export const TopicPane = ({ currentState }: WorkspaceGridPaneProps) => {
           <UI.Grid gridGap={1} width="100%">
             <UI.Div>
               <UI.H4>
-                {currentNode.topic}
+                {currentNode.topic.name}
               </UI.H4>
 
               <UI.Label bg="white" border="1px solid" borderColor="gray.300" mt={2}>
@@ -360,7 +360,7 @@ export const WorkspaceGridPane = ({ currentState }: WorkspaceGridPaneProps) => {
         />
       );
     }
-    case HexagonNodeType.QuestionNode: {
+    case HexagonNodeType.Topic: {
       return (
         <TopicPane
           currentState={currentState}
