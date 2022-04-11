@@ -1,4 +1,4 @@
-import { clearDialogueDatabase as clearDatabase, prepDefaultCreateData, seedDialogue, assignUserToDialogue } from './testUtils';
+import { clearDialogueDatabase, prepDefaultCreateData, seedDialogue, assignUserToDialogue } from './testUtils';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
@@ -25,21 +25,7 @@ query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilte
       dialogues {
         id
         title
-        language
         slug
-        publicTitle
-        creationDate
-        updatedAt
-        customerId
-        averageScore
-        customer {
-          slug
-        }
-        tags {
-          id
-          type
-          name
-        }
       }
     }
   }
@@ -47,21 +33,19 @@ query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilte
 `;
 
 describe('DialogueConnection resolver', () => {
-  afterEach(async (done) => {
-    await clearDatabase(prisma);
+  afterEach(async () => {
+    await clearDialogueDatabase(prisma);
     await prisma.$disconnect();
-    done();
   });
 
   afterAll(async (done) => {
-    await clearDatabase(prisma);
+    await clearDialogueDatabase(prisma);
     await prisma.$disconnect();
-    console.log('Done with clearing db and disconnected prisma')
     done();
   });
 
   test('unable to query dialogue-connection unauthorized', async () => {
-    const { user, workspace, dialogue, userRole } = await prepDefaultCreateData(prisma);
+    const { user, workspace, userRole } = await prepDefaultCreateData(prisma);
 
     await prisma.role.update({
       where: { id: userRole.id },
@@ -90,7 +74,7 @@ describe('DialogueConnection resolver', () => {
 
     const token = AuthService.createUserToken(user.id, 22);
 
-    let res = await ctx.client.request(Query, {
+    const res = await ctx.client.request(Query, {
       customerSlug: workspace.slug,
       filter: { offset: 0, perPage: 3 },
     }, { 'Authorization': `Bearer ${token}` });
@@ -100,19 +84,19 @@ describe('DialogueConnection resolver', () => {
     expect(res.customer.dialogueConnection.pageInfo.hasNextPage).toBe(true);
 
     // Go to next page
-    res = await ctx.client.request(Query, {
+    const nextRes = await ctx.client.request(Query, {
       customerSlug: workspace.slug,
       filter: { offset: 3, perPage: 3 },
     }, { 'Authorization': `Bearer ${token}` });
 
-    expect(res.customer.dialogueConnection.totalPages).toBe(2);
-    expect(res.customer.dialogueConnection.pageInfo.hasPrevPage).toBe(true);
-    expect(res.customer.dialogueConnection.pageInfo.hasNextPage).toBe(false);
-    expect(res.customer.dialogueConnection.pageInfo.pageIndex).toBe(1);
+    expect(nextRes.customer.dialogueConnection.totalPages).toBe(2);
+    expect(nextRes.customer.dialogueConnection.pageInfo.hasPrevPage).toBe(true);
+    expect(nextRes.customer.dialogueConnection.pageInfo.hasNextPage).toBe(false);
+    expect(nextRes.customer.dialogueConnection.pageInfo.pageIndex).toBe(1);
   });
 
   test('Private dialogues are not shown if not assinged to user', async () => {
-    const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);
+    const { user, workspace } = await prepDefaultCreateData(prisma);
     await seedDialogue(prisma, workspace.id, 'dialogue_two');
     await seedDialogue(prisma, workspace.id, 'dialogue_three', true);
 
@@ -131,10 +115,9 @@ describe('DialogueConnection resolver', () => {
   });
 
   test('Private dialogues are shown if assinged to user', async () => {
-    const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);
+    const { user, workspace } = await prepDefaultCreateData(prisma);
     await seedDialogue(prisma, workspace.id, 'dialogue_two');
     const privateDialogue = await seedDialogue(prisma, workspace.id, 'dialogue_three', true);
-
     const token = AuthService.createUserToken(user.id, 22);
 
     let res = await ctx.client.request(Query, {
