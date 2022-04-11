@@ -1203,6 +1203,7 @@ export type Mutation = {
   createDialogue: Dialogue;
   editDialogue: Dialogue;
   deleteDialogue: Dialogue;
+  setDialoguePrivacy?: Maybe<Dialogue>;
   uploadUpsellImage?: Maybe<ImageType>;
   authenticateLambda?: Maybe<Scalars['String']>;
   createAutomationToken?: Maybe<Scalars['String']>;
@@ -1425,6 +1426,11 @@ export type MutationEditDialogueArgs = {
 
 export type MutationDeleteDialogueArgs = {
   input?: Maybe<DeleteDialogueInputType>;
+};
+
+
+export type MutationSetDialoguePrivacyArgs = {
+  input?: Maybe<SetDialoguePrivacyInput>;
 };
 
 
@@ -2028,6 +2034,12 @@ export type SessionScoreRangeFilter = {
 export type SessionWhereUniqueInput = {
   id?: Maybe<Scalars['ID']>;
   dialogueId?: Maybe<Scalars['ID']>;
+};
+
+export type SetDialoguePrivacyInput = {
+  customerId: Scalars['String'];
+  dialogueSlug: Scalars['String'];
+  state: Scalars['Boolean'];
 };
 
 export type ShareNodeInputType = {
@@ -2871,6 +2883,19 @@ export type DialogueConnectionQuery = (
         )>> }
       )> }
     )> }
+  )> }
+);
+
+export type SetDialoguePrivacyMutationVariables = Exact<{
+  input?: Maybe<SetDialoguePrivacyInput>;
+}>;
+
+
+export type SetDialoguePrivacyMutation = (
+  { __typename?: 'Mutation' }
+  & { setDialoguePrivacy?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'slug' | 'title' | 'isPrivate'>
   )> }
 );
 
@@ -4293,6 +4318,41 @@ export type DialogueConnectionQueryResult = Apollo.QueryResult<DialogueConnectio
 export function refetchDialogueConnectionQuery(variables?: DialogueConnectionQueryVariables) {
       return { query: DialogueConnectionDocument, variables: variables }
     }
+export const SetDialoguePrivacyDocument = gql`
+    mutation setDialoguePrivacy($input: SetDialoguePrivacyInput) {
+  setDialoguePrivacy(input: $input) {
+    slug
+    title
+    isPrivate
+  }
+}
+    `;
+export type SetDialoguePrivacyMutationFn = Apollo.MutationFunction<SetDialoguePrivacyMutation, SetDialoguePrivacyMutationVariables>;
+
+/**
+ * __useSetDialoguePrivacyMutation__
+ *
+ * To run a mutation, you first call `useSetDialoguePrivacyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetDialoguePrivacyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setDialoguePrivacyMutation, { data, loading, error }] = useSetDialoguePrivacyMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSetDialoguePrivacyMutation(baseOptions?: Apollo.MutationHookOptions<SetDialoguePrivacyMutation, SetDialoguePrivacyMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SetDialoguePrivacyMutation, SetDialoguePrivacyMutationVariables>(SetDialoguePrivacyDocument, options);
+      }
+export type SetDialoguePrivacyMutationHookResult = ReturnType<typeof useSetDialoguePrivacyMutation>;
+export type SetDialoguePrivacyMutationResult = Apollo.MutationResult<SetDialoguePrivacyMutation>;
+export type SetDialoguePrivacyMutationOptions = Apollo.BaseMutationOptions<SetDialoguePrivacyMutation, SetDialoguePrivacyMutationVariables>;
 export const GetDialogueStatisticsDocument = gql`
     query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
   customer(slug: $customerSlug) {

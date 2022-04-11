@@ -1089,6 +1089,7 @@ type Mutation {
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload): ImageType!
   updateAutomation(input: CreateAutomationInput): AutomationModel!
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
@@ -1495,6 +1496,12 @@ input SessionScoreRangeFilter {
 input SessionWhereUniqueInput {
   dialogueId: ID
   id: ID
+}
+
+input SetDialoguePrivacyInput {
+  customerId: String!
+  dialogueSlug: String!
+  state: Boolean!
 }
 
 input ShareNodeInputType {

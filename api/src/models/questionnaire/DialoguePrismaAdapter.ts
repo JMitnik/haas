@@ -16,8 +16,21 @@ class DialoguePrismaAdapter {
     this.prisma = prismaClient;
   };
 
-  async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
+  setDialoguePrivacy = async (input: NexusGenInputs['SetDialoguePrivacyInput']) => {
+    return this.prisma.dialogue.update({
+      where: {
+        slug_customerId: {
+          slug: input.dialogueSlug,
+          customerId: input.customerId,
+        },
+      },
+      data: {
+        isPrivate: input.state,
+      },
+    });
+  };
 
+  async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
     const dialogue = await this.prisma.dialogue.update({
       where: {
         id: dialogueId,

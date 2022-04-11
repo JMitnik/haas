@@ -47,6 +47,10 @@ class DialogueService {
     this.nodeService = new NodeService(prismaClient);
   }
 
+  setDialoguePrivacy = async (input: NexusGenInputs['SetDialoguePrivacyInput']) => {
+    return this.dialoguePrismaAdapter.setDialoguePrivacy(input);
+  }
+
   /**
    * Function to paginate through all automations of a workspace
    * @param workspaceSlug the slug of the workspace

@@ -19,19 +19,58 @@ import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
 
+import { useCustomer } from 'providers/CustomerProvider';
+import { useSetDialoguePrivacyMutation } from 'types/generated-types';
+
 import { Tag } from './Tag';
 
 interface DialogueCardOptionsOverlayProps {
   onDelete: (e: React.MouseEvent<HTMLElement>) => void;
   onEdit: (e: React.MouseEvent<HTMLElement>) => void;
-  isPrivate: string;
+  isPrivate: boolean;
+  dialogueSlug: string;
 }
 
-const DialogueCardOptionsOverlay = ({ onDelete, onEdit, isPrivate }: DialogueCardOptionsOverlayProps) => {
+const DialogueCardOptionsOverlay = ({ onDelete, onEdit, isPrivate, dialogueSlug }: DialogueCardOptionsOverlayProps) => {
   const { t } = useTranslation();
-
+  const { activeCustomer } = useCustomer();
   const { canAssignUsersToDialogue } = useAuth();
-  console.log('isPrivate: ', isPrivate);
+  const toast = useToast();
+
+  const [setDialoguePrivacy] = useSetDialoguePrivacyMutation({
+    variables: {
+      input: {
+        dialogueSlug,
+        customerId: activeCustomer?.id as string,
+        state: !isPrivate,
+      },
+    },
+    refetchQueries: [{
+      query: getDialoguesOfCustomer,
+      variables: {
+        customerSlug: activeCustomer?.slug as string,
+      },
+    }],
+    onCompleted: (data) => {
+      const state = data.setDialoguePrivacy?.isPrivate ? 'private' : 'public';
+      toast({
+        title: 'Dialogue privacy change',
+        description: `The dialogue privacy settings have been changed to ${state}.`,
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Something went wrong!',
+        description: 'The dialogue privacy settings were not changed.',
+        status: 'error',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
+  });
 
   return (
     <UI.List>
@@ -67,7 +106,7 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit, isPrivate }: DialogueCar
         {t('edit')}
       </UI.ListItem>
       {canAssignUsersToDialogue && (
-        <UI.ListItem onClick={onEdit}>
+        <UI.ListItem onClick={() => setDialoguePrivacy()}>
           {t(`make_dialogue_${isPrivate ? 'public' : 'private'}`)}
         </UI.ListItem>
       )}
@@ -219,6 +258,7 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
                   <ShowMoreButton
                     renderMenu={(
                       <DialogueCardOptionsOverlay
+                        dialogueSlug={dialogue.slug}
                         isPrivate={dialogue.isPrivate}
                         onDelete={handleDeleteDialogue}
                         onEdit={goToEditDialogue}
