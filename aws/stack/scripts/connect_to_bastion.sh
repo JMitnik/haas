@@ -19,5 +19,5 @@ aws ssm start-session \
   --target=$BASTION_INSTANCE_ID \
   --region=eu-central-1 \
   --profile haas-staging
-  # --document-name AWS-StartPortForwardingSession \
-  # --parameters '{"portNumber":["22"], "localPortNumber":["9999"]}' \
+  --document-name AWS-StartPortForwardingSession \
+  --parameters '{"portNumber":["22"], "localPortNumber":["9999"]}' \
