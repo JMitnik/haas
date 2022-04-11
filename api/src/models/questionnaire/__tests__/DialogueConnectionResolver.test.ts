@@ -57,7 +57,7 @@ describe('DialogueConnection resolver', () => {
     await prisma.$disconnect();
   });
 
-  test('unable to query automation-connection unauthorized', async () => {
+  test('unable to query dialogue-connection unauthorized', async () => {
     const { user, workspace, dialogue, userRole } = await prepDefaultCreateData(prisma);
 
     await prisma.role.update({
@@ -79,7 +79,7 @@ describe('DialogueConnection resolver', () => {
     }
   });
 
-  test('user can access automation-connection', async () => {
+  test('user can access dialogue-connection', async () => {
     const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);
 
     const token = AuthService.createUserToken(user.id, 22);
