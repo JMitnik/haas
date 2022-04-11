@@ -32,7 +32,7 @@ import { WorkspaceGridPane } from './WorkspaceGridPane';
 const Tooltip = motion.custom(styled.div`
   > * {
     padding: 0 !important;
-    border-radius: 8px;
+    border-radius: 20px !important;
   }
 `);
 
@@ -95,7 +95,7 @@ export const WorkspaceGrid = ({
 }: WorkspaceGridProps) => {
   const zoomHelper = React.useRef<ProvidedZoom<SVGElement> | null>(null);
   const initialRef = React.useRef<HTMLDivElement>();
-  const [stateHistory, setStateHistory] = React.useState<HexagonState[]>([]);
+  const [stateHistoryStack, setStateHistoryStack] = React.useState<HexagonState[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentState, setCurrentState] = React.useState<HexagonState>({
     currentNode: undefined,
@@ -105,7 +105,7 @@ export const WorkspaceGrid = ({
   const { formatScore } = useFormatter();
 
   const activeDialogue = useMemo(() => {
-    const activeNode = stateHistory.find((state) => state.selectedNode?.type === HexagonNodeType.Dialogue);
+    const activeNode = stateHistoryStack.find((state) => state.selectedNode?.type === HexagonNodeType.Dialogue);
     return (activeNode?.selectedNode as HexagonDialogueNode)?.dialogue || undefined;
   }, [currentState]);
 
@@ -146,8 +146,8 @@ export const WorkspaceGrid = ({
       childNodes: currentState.childNodes,
       selectedNode: clickedNode,
       viewMode: currentState.viewMode,
-    }, ...stateHistory];
-    setStateHistory(newStateHistory);
+    }, ...stateHistoryStack];
+    setStateHistoryStack(newStateHistory);
 
     const topics = newStateHistory
       .filter((state) => state.selectedNode?.type === HexagonNodeType.QuestionNode)
@@ -194,16 +194,28 @@ export const WorkspaceGrid = ({
     points: gridItems[index],
   })) || [];
 
-  const reversedHistory = [...stateHistory].reverse();
+  // ReversedHistory: Session => Dialogue => Group
+  const historyQueue = [...stateHistoryStack].reverse();
 
   const popToIndex = (index: number) => {
-    // TODO: Ensure that if click on self, it does not do anything
-    const newStateHistory = [...reversedHistory.slice(0, index)].reverse();
-    const newState = newStateHistory?.[0];
-    setStateHistory([...reversedHistory.slice(0, index + 1)].reverse());
+    if (index === historyQueue.length) return;
+
+    // The zeroth index means we are at the root
+    const newQueue = [...historyQueue].slice(0, index + 1);
+    const newStack = [...newQueue].reverse();
+
+    setStateHistoryStack([...historyQueue].slice(0, index).reverse());
+
+    const newState = newStack.length > 0 ? newStack[0] : undefined;
 
     if (newState) {
       setCurrentState(newState);
+    } else {
+      setCurrentState({
+        currentNode: undefined,
+        childNodes: initialData,
+        viewMode: initialViewMode,
+      });
     }
   };
 
@@ -212,93 +224,92 @@ export const WorkspaceGrid = ({
       <AnimatePresence />
       <UI.Grid gridTemplateColumns="2fr 1fr" gridGap="0">
         <UI.Div borderRadius={10} height="60vh" position="relative">
-          {stateHistory.length > 0 && (
-          <LS.BreadCrumbContainer
-            display="inline-block"
-            my={1}
-            border="1px solid"
-            borderColor="gray.100"
-            borderRadius={12}
-            pl={2}
-            pr={2}
-            py={1}
-          >
-            <UI.Stack alignItems="center" isInline>
-              <UI.Flex alignItems="center">
-                <UI.Label
-                  color="black"
-                  bg="white"
-                  onClick={() => { popToIndex(0); }}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <UI.Span ml={1}>
-                    Home
-                  </UI.Span>
-                </UI.Label>
-                {reversedHistory.map((state, index) => (
-                  <React.Fragment key={index}>
-                    <UI.Icon
-                      bg="gray.200"
-                      color="gray.500"
-                      width="1.2rem"
-                      height="1.2rem"
-                      fontSize="0.9rem"
-                      mx={1}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '100%',
-                      }}
-                    >
-                      <ChevronRight />
-                    </UI.Icon>
-                    <UI.Flex>
-                      <UI.Label
-                        color={getLabelColor(state?.selectedNode?.score || 0)}
-                        bg={getLabelFill(state?.selectedNode?.score)}
-                        key={index}
-                        onClick={() => { popToIndex(index + 1); }}
-                        style={{ cursor: 'pointer' }}
+          {stateHistoryStack.length > 0 && (
+            <LS.BreadCrumbContainer
+              display="inline-block"
+              my={1}
+              border="1px solid"
+              borderColor="gray.100"
+              borderRadius={12}
+              pl={2}
+              pr={2}
+              py={1}
+            >
+              <UI.Stack alignItems="center" isInline>
+                <UI.Flex alignItems="center">
+                  <UI.Label
+                    color="black"
+                    bg="white"
+                    onClick={() => { popToIndex(0); }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <UI.Span ml={1}>
+                      Home
+                    </UI.Span>
+                  </UI.Label>
+                  {historyQueue.map((state, index) => (
+                    <React.Fragment key={index}>
+                      <UI.Icon
+                        bg="gray.200"
+                        color="gray.500"
+                        width="1.2rem"
+                        height="1.2rem"
+                        fontSize="0.9rem"
+                        mx={1}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: '100%',
+                        }}
                       >
-                        <UI.Span>
-                          {formatScore(state.selectedNode?.score)}
-                        </UI.Span>
-                        {' '}
-                        {/* <SingleHexagon fill={getHexagonFill(state.selectedNode?.score)} /> */}
-                        <UI.Span ml={1}>
-                          {state.selectedNode?.type === HexagonNodeType.Group && (
-                            <>
-                              {state.selectedNode.label}
-                            </>
-                          )}
-                          {state.selectedNode?.type === HexagonNodeType.Dialogue && (
-                            <>
-                              {state.selectedNode.label}
-                            </>
-                          )}
-                          {state.selectedNode?.type === HexagonNodeType.QuestionNode && (
-                            <>
-                              {state.selectedNode.topic}
-                            </>
-                          )}
-                          {state.selectedNode?.type === HexagonNodeType.Session && (
-                            <>
-                              {state.selectedNode.session.id}
-                            </>
-                          )}
-                        </UI.Span>
-                      </UI.Label>
-                    </UI.Flex>
-                  </React.Fragment>
-                ))}
-              </UI.Flex>
-            </UI.Stack>
-          </LS.BreadCrumbContainer>
+                        <ChevronRight />
+                      </UI.Icon>
+                      <UI.Flex>
+                        <UI.Label
+                          color={getLabelColor(state?.selectedNode?.score || 0)}
+                          bg={getLabelFill(state?.selectedNode?.score)}
+                          key={index}
+                          onClick={() => { popToIndex(index + 1); }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <UI.Span>
+                            {formatScore(state.selectedNode?.score)}
+                          </UI.Span>
+                          {' '}
+                          {/* <SingleHexagon fill={getHexagonFill(state.selectedNode?.score)} /> */}
+                          <UI.Span ml={1}>
+                            {state.selectedNode?.type === HexagonNodeType.Group && (
+                              <>
+                                {state.selectedNode.label}
+                              </>
+                            )}
+                            {state.selectedNode?.type === HexagonNodeType.Dialogue && (
+                              <>
+                                {state.selectedNode.label}
+                              </>
+                            )}
+                            {state.selectedNode?.type === HexagonNodeType.QuestionNode && (
+                              <>
+                                {state.selectedNode.topic}
+                              </>
+                            )}
+                            {state.selectedNode?.type === HexagonNodeType.Session && (
+                              <>
+                                {state.selectedNode.session.id}
+                              </>
+                            )}
+                          </UI.Span>
+                        </UI.Label>
+                      </UI.Flex>
+                    </React.Fragment>
+                  ))}
+                </UI.Flex>
+              </UI.Stack>
+            </LS.BreadCrumbContainer>
           )}
           <ParentSizeModern>
             {({ width, height }) => (
-
               <Zoom<SVGElement>
                 width={width}
                 height={height}
@@ -360,7 +371,7 @@ export const WorkspaceGrid = ({
                           style={{ transform: 'matrix(1, 0, 0, 1, 0, 0' }}
                           animate={{ transform: zoom.toString(), opacity: 1 }}
                         >
-                          <Group top={100} left={100}>
+                          <Group top={200} left={200}>
                             <AnimatePresence>
                               <motion.g
                                 animate={{ opacity: 1 }}
@@ -402,7 +413,7 @@ export const WorkspaceGrid = ({
                                 left={tooltipLeft}
                               >
                                 {tooltipData && (
-                                <TooltipBody node={tooltipData} />
+                                  <TooltipBody node={tooltipData} />
                                 )}
                               </TooltipWithBounds>
                             </Tooltip>

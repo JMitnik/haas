@@ -14,6 +14,8 @@ import {
   HexagonSessionNode,
 } from './WorkspaceGrid.types';
 
+import * as LS from './WorkspaceGrid.styles';
+
 interface TooltipBodyProps {
   node: HexagonNode;
 }
@@ -23,21 +25,24 @@ export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => 
   const { t } = useTranslation();
 
   return (
-    <UI.Div bg="blue.800" borderRadius={8}>
-      <UI.Helper color="white">
-        {t('dialogue')}
-      </UI.Helper>
-      <UI.PaddedBody fraction={0.5}>
-        <UI.Flex color="white">
+    <LS.TooltipContainer>
+      <LS.TooltipHeader>
+        <UI.Flex>
+          <UI.Div>
+            <UI.Helper>
+              {t('dialogue')}
+            </UI.Helper>
+            <UI.Span>
+              {node.label}
+            </UI.Span>
+          </UI.Div>
+
           <UI.Div>
             {formatScore(node.score)}
           </UI.Div>
-          <UI.Div ml={2}>
-            {node.label}
-          </UI.Div>
         </UI.Flex>
-      </UI.PaddedBody>
-    </UI.Div>
+      </LS.TooltipHeader>
+    </LS.TooltipContainer>
   );
 };
 
@@ -46,21 +51,24 @@ export const TooltipQuestionNodeBody = ({ node }: { node: HexagonQuestionNodeNod
   const { t } = useTranslation();
 
   return (
-    <UI.Div>
-      <UI.Helper>
-        {t('topic')}
-      </UI.Helper>
-      <UI.PaddedBody fraction={0.5}>
+    <LS.TooltipContainer>
+      <LS.TooltipHeader>
         <UI.Flex>
+          <UI.Div>
+            <UI.Helper>
+              {t('topic')}
+            </UI.Helper>
+            <UI.Span>
+              {node.topic}
+            </UI.Span>
+          </UI.Div>
+
           <UI.Div>
             {formatScore(node.score)}
           </UI.Div>
-          <UI.Div ml={2}>
-            {node.topic}
-          </UI.Div>
         </UI.Flex>
-      </UI.PaddedBody>
-    </UI.Div>
+      </LS.TooltipHeader>
+    </LS.TooltipContainer>
   );
 };
 
@@ -69,22 +77,28 @@ export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => {
   const { formatScore } = useFormatter();
 
   return (
-    <UI.Div bg="gray.800">
-      <UI.Helper>
-        {t('group')}
-      </UI.Helper>
-      <UI.PaddedBody fraction={0.5}>
-        <UI.Flex>
+    <LS.TooltipContainer>
+      <LS.TooltipHeader>
+        <UI.Flex justifyContent="space-between" alignItems="flex-end">
           <UI.Div>
-            {/* test */}
+            <UI.Helper>
+              {t('group')}
+            </UI.Helper>
+            <UI.Span>
+              {node.label}
+            </UI.Span>
+          </UI.Div>
+
+          <UI.Div>
             {formatScore(node.score)}
           </UI.Div>
-          <UI.Div ml={2}>
-            {node.label}
-          </UI.Div>
         </UI.Flex>
-      </UI.PaddedBody>
-    </UI.Div>
+      </LS.TooltipHeader>
+
+      <LS.TooltipBody>
+        Test
+      </LS.TooltipBody>
+    </LS.TooltipContainer>
   );
 };
 

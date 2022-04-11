@@ -203,3 +203,34 @@ export const MetadataLabel = styled(UI.Span)`
     border: 1px solid ${theme.colors.gray[200]};
   `}
 `;
+
+export const TooltipContainer = styled(UI.Div)`
+  ${({ theme }) => css`
+    min-width: 300px;
+    background: ${theme.colors.white};
+    border-radius: 0 20px 20px 20px !important;
+  `}
+`;
+
+export const TooltipHeader = styled(UI.Div)`
+  ${({ theme }) => css`
+    padding: 12px 16px;
+    background: ${theme.colors.gray[200]};
+    border-radius: 0 20px 0 0 !important;
+    color: ${theme.colors.gray[600]};
+    font-weight: 600;
+    border-bottom: 1px solid ${theme.colors.gray[200]};
+
+    ${UI.Helper} {
+      font-size: 0.7rem !important;
+      color: ${theme.colors.gray[400]};
+    }
+  `}
+`;
+
+export const TooltipBody = styled(UI.Div)`
+  ${({ theme }) => css`
+    padding: 12px 16px;
+    margin-bottom: 6px;
+  `}
+`;

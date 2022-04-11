@@ -54,8 +54,6 @@ export const WorkspaceGridAdapter = ({
   const dialogues = data?.customer?.dialogues || [];
 
   const handleLoadData = async (options: DataLoadOptions): Promise<[HexagonNode[], HexagonViewMode]> => {
-    console.log(options);
-
     if (options.clickedGroup) {
       return [options.clickedGroup.subGroups, HexagonViewMode.Group];
     }
@@ -87,12 +85,14 @@ export const WorkspaceGridAdapter = ({
       dialogueId: options.dialogueId,
     });
 
-    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessions?.pathedSessions?.map((session) => ({
-      id: session.id,
-      type: HexagonNodeType.Session,
-      score: session.score,
-      session,
-    })) || [];
+    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessionsConnection?.pathedSessions?.map(
+      (session) => ({
+        id: session.id,
+        type: HexagonNodeType.Session,
+        score: session.score,
+        session,
+      }),
+    ) || [];
 
     if (fetchNodes.length) return [fetchNodes, HexagonViewMode.Session];
 
