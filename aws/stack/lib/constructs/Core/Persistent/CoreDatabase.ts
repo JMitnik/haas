@@ -1,4 +1,4 @@
-import { aws_rds as rds, aws_ec2 as ec2 } from 'aws-cdk-lib';
+import { aws_rds as rds, aws_ec2 as ec2, aws_secretsmanager as ssm } from 'aws-cdk-lib';
 import { SubnetType } from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 

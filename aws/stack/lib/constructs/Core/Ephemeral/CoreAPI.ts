@@ -2,6 +2,7 @@ import {
   aws_ecs as ecs,
   aws_ec2 as ec2,
   aws_ecr as ecr,
+  aws_rds as rds,
   aws_certificatemanager as acm,
   aws_route53 as route53,
   aws_secretsmanager as secretsmanager,
@@ -21,6 +22,7 @@ interface CoreApiProps {
   databaseCredentialSecretName: string;
   jwtSecretName: string;
 
+  db: rds.DatabaseInstance;
   dbSecurityGroup: ec2.SecurityGroup;
   apiOptions: APIOptions;
 }
@@ -77,7 +79,7 @@ export class CoreAPI extends Construct {
           BASE_URL: props.apiOptions.baseUrl,
           CLIENT_URL: props.apiOptions.clientUrL,
           DASHBOARD_URL: props.apiOptions.dashboardUrl,
-          CLOUDINARY_URL: 'cloudinary://591617433181475:rGNg80eDICKoUKgzrMlSPQitZw8@dx8khik9g',
+          CLOUDINARY_URL: '',
           MAIL_SENDER: props.apiOptions.mailSenderMail,
           ENVIRONMENT: props.apiOptions.environment,
         },
@@ -85,19 +87,12 @@ export class CoreAPI extends Construct {
           DB_STRING: ecs.Secret.fromSecretsManager(dbUrlSecret, 'url'),
           JWT_SECRET: ecs.Secret.fromSecretsManager(jwtSecret),
           API_SECRET: ecs.Secret.fromSecretsManager(apiSecret),
-          // TODO: Use IAM Roles instead, this is not reliable
-          // AWS_ACCESS_KEY_ID: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_ACCESS_KEY_ID'),
-          // AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_SECRET_ACCESS_KEY'),
-          // AUTODECK_AWS_ACCESS_KEY_ID: ecs.Secret.fromSecretsManager(autodeckAWSSecret, 'AUTODECK_AWS_ACCESS_KEY_ID'),
-          // AUTODECK_AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(autodeckAWSSecret, 'AUTODECK_AWS_SECRET_ACCESS_KEY'),
         },
       },
     });
 
     this.service = apiService.service;
-    apiService.loadBalancer.addSecurityGroup(props.dbSecurityGroup);
-    // apiService.service.connections.addSecurityGroup(props.dbSecurityGroup);
-    // apiService.
+    apiService.service.connections.allowTo(props.db, ec2.Port.tcp(5432), 'RDS Connection');
   }
 
   /**
@@ -110,7 +105,7 @@ export class CoreAPI extends Construct {
       databaseCredentialSecretName
     );
 
-    const dbUrl = `postgresql://${databaseUserName}:${databasePasswordSecret.secretValue.toJSON().password}@${databaseEndpoint}/postgres?schema=public`;
+    const dbUrl = `postgresql://${databaseUserName}:${databasePasswordSecret.secretValueFromJson('password').toString()}@${databaseEndpoint}/postgres?schema=public`;
 
     const dbStringSecret = new secretsmanager.Secret(this, 'API_RDS_String', {
       secretName: 'API_RDS_String',

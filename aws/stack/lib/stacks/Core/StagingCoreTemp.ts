@@ -24,6 +24,7 @@ export class StagingCoreTemp extends Stack {
       apiOptions: stagingVariables.api,
       dbSecurityGroup: props.dbSecurityGroup,
       domainName: stagingVariables.domainName,
+      db: props.db,
     });
 
     const bastion = new CoreBastion(this, 'CORE_BASTION', {
