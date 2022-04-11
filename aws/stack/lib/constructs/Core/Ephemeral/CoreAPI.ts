@@ -3,6 +3,7 @@ import {
   aws_ec2 as ec2,
   aws_ecr as ecr,
   aws_rds as rds,
+  aws_iam as iam,
   aws_certificatemanager as acm,
   aws_route53 as route53,
   aws_secretsmanager as secretsmanager,
@@ -82,6 +83,7 @@ export class CoreAPI extends Construct {
           CLOUDINARY_URL: '',
           MAIL_SENDER: props.apiOptions.mailSenderMail,
           ENVIRONMENT: props.apiOptions.environment,
+          test: 'test'
         },
         secrets: {
           DB_STRING: ecs.Secret.fromSecretsManager(dbUrlSecret, 'url'),
@@ -92,7 +94,30 @@ export class CoreAPI extends Construct {
     });
 
     this.service = apiService.service;
-    apiService.service.connections.allowTo(props.db, ec2.Port.tcp(5432), 'RDS Connection');
+    this.grantDatabasePermission(props.db);
+    this.grantIAMPermissions();
+  }
+
+  /**
+   * Grants all necessary permissions to access database.
+   */
+  grantDatabasePermission(db: rds.DatabaseInstance) {
+    this.service.connections.allowTo(db, ec2.Port.tcp(5432), 'RDS Connection');
+  }
+
+  /**
+   * Grants all necessary AWS IAM Permissions (for managed AWS services)
+   * - Allows the API to send Emails using SES
+   */
+  grantIAMPermissions() {
+    if (!this.service.taskDefinition.executionRole) return;
+
+    // Grant permissions to send Emails usins SES
+    this.service.taskDefinition.taskRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      resources: ['arn:aws:ses:eu-central-1:*:identity/*'],
+      actions: ['ses:SendEmail'],
+      effect: iam.Effect.ALLOW,
+    }));
   }
 
   /**

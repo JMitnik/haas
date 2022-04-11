@@ -24,7 +24,6 @@ export class CoreDatabase extends Construct {
 
     this.rdsDb = new rds.DatabaseInstance(this, 'API_RDS', {
       vpc: props.vpc,
-      // TODO: Needs to be unique across env
       engine: rds.DatabaseInstanceEngine.postgres({ version: rds.PostgresEngineVersion.VER_12 }),
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.SMALL),
       deletionProtection: true,

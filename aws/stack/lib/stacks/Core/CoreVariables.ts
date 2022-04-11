@@ -29,9 +29,9 @@ export const stagingVariables: CoreVariables = {
   databasePasswordSecretName: 'CORE_DATABASE_PASSWORD_V2',
   repoName: 'haas_core_repo',
   api: {
-    baseUrl: 'https://staging.api.haas.live',
-    clientUrL: 'https://staging.client.haas.live',
-    dashboardUrl: 'https://staging.dashboard.haas.live',
+    baseUrl: 'https://api.staging.haas.live',
+    clientUrL: 'https://client.staging.haas.live',
+    dashboardUrl: 'https://dashboard.staging.haas.live',
     mailSenderMail: 'noreply@staging.haas.live',
     environment: 'staging',
   },

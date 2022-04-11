@@ -1,3 +1,9 @@
+/**
+ * NOTICE: THIS HAS BEEN DEPRECATED
+ * FROM NOW ONWARDS, WE USE the CORE STACK STRUCTURE FOUND IN aws/stack/lib/stacks/Core.
+ * NEEDS TO BE REFACTORED ASAP.
+ */
+
 import * as cdk from '@aws-cdk/core';
 import {
   aws_ec2 as ec2,
@@ -42,173 +48,173 @@ export class APIStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    // // Reference to our hosted-zone (haas.live)
-    // const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, 'HaasLiveZone', {
-    //   hostedZoneId,
-    //   zoneName: hostedZoneName
-    // })
+    // Reference to our hosted-zone (haas.live)
+    const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, 'HaasLiveZone', {
+      hostedZoneId,
+      zoneName: hostedZoneName
+    })
 
-    // // Certificate necessary for HTTPS registration of our API.
-    // const tlsCertificate = new acm.Certificate(this, 'HAASLiveCertificate', {
-    //   domainName: 'api.haas.live',
-    //   validation: acm.CertificateValidation.fromDns(hostedZone)
-    // });
+    // Certificate necessary for HTTPS registration of our API.
+    const tlsCertificate = new acm.Certificate(this, 'HAASLiveCertificate', {
+      domainName: 'api.haas.live',
+      validation: acm.CertificateValidation.fromDns(hostedZone)
+    });
 
-    // const svcRepo = ecr.Repository.fromRepositoryName(this, 'ServiceRepo', 'haas-svc-api');
+    const svcRepo = ecr.Repository.fromRepositoryName(this, 'ServiceRepo', 'haas-svc-api');
 
-    // // Our VPC: private subnet for sensitive space such as DB, and public for our services and bastion
-    // const vpc = new ec2.Vpc(this, "API_VPC", {
-    //   maxAzs: 2,
-    //   subnetConfiguration: [
-    //     {
-    //       name: 'API_VPC_PUBLIC_DEFAULT',
-    //       subnetType: SubnetType.PUBLIC,
-    //     },
-    //     {
-    //       name: 'API_VPC_PRIVATE_DEFAULT',
-    //       subnetType: SubnetType.ISOLATED,
-    //     },
-    //   ],
-    // });
+    // Our VPC: private subnet for sensitive space such as DB, and public for our services and bastion
+    const vpc = new ec2.Vpc(this, "API_VPC", {
+      maxAzs: 2,
+      subnetConfiguration: [
+        {
+          name: 'API_VPC_PUBLIC_DEFAULT',
+          subnetType: SubnetType.PUBLIC,
+        },
+        {
+          name: 'API_VPC_PRIVATE_DEFAULT',
+          subnetType: SubnetType.ISOLATED,
+        },
+      ],
+    });
 
-    // // We allow our VPC Access to S3 this way.
-    // vpc.addGatewayEndpoint('S3Access', {
-    //   service: ec2.GatewayVpcEndpointAwsService.S3
-    // });
+    // We allow our VPC Access to S3 this way.
+    vpc.addGatewayEndpoint('S3Access', {
+      service: ec2.GatewayVpcEndpointAwsService.S3
+    });
 
-    // // TODO: Find cheaper alternative
-    // // We allow our VPC Access to Secrets Manager this way.
-    // vpc.addInterfaceEndpoint('secretAccess', {
-    //   service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER
-    // });
+    // TODO: Find cheaper alternative
+    // We allow our VPC Access to Secrets Manager this way.
+    vpc.addInterfaceEndpoint('secretAccess', {
+      service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER
+    });
 
-    // this.vpc = vpc;
+    this.vpc = vpc;
 
     // We preconfigure our RDS credentials, and will upload this to `API_MAIN_RDS_SECRET`.
-    // const rdsUsername = 'HAAS_ADMIN';
-    // const rdsPassword = new secretsmanager.Secret(this, 'API_RDS_SECRET', {
-    //   secretName: 'API_MAIN_RDS_SECRET'
-    // });
+    const rdsUsername = 'HAAS_ADMIN';
+    const rdsPassword = new secretsmanager.Secret(this, 'API_RDS_SECRET', {
+      secretName: 'API_MAIN_RDS_SECRET'
+    });
 
-    // this.rdsPassword = rdsPassword;
+    this.rdsPassword = rdsPassword;
 
     // Our RDS Endpoint
-    // const rdsDb = new rds.DatabaseInstance(this, 'API_RDS', {
-    //   vpc,
-    //   engine: rds.DatabaseInstanceEngine.postgres({ version: rds.PostgresEngineVersion.VER_12 }),
-    //   instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.SMALL),
-    //   deletionProtection: false,
-    //   storageType: rds.StorageType.GP2,
-    //   vpcSubnets: { subnetType: SubnetType.ISOLATED },
-    //   credentials: {
-    //     username: rdsUsername,
-    //     password: rdsPassword.secretValue,
-    //   },
-    // });
+    const rdsDb = new rds.DatabaseInstance(this, 'API_RDS', {
+      vpc,
+      engine: rds.DatabaseInstanceEngine.postgres({ version: rds.PostgresEngineVersion.VER_12 }),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.SMALL),
+      deletionProtection: false,
+      storageType: rds.StorageType.GP2,
+      vpcSubnets: { subnetType: SubnetType.ISOLATED },
+      credentials: {
+        username: rdsUsername,
+        password: rdsPassword.secretValue,
+      },
+    });
 
     // Database endpoint
-    // const rdsEndpoint = rdsDb.instanceEndpoint.hostname;
+    const rdsEndpoint = rdsDb.instanceEndpoint.hostname;
 
-    // // Our ECS cluster, housing our various Fargate Services
-    // const cluster = new ecs.Cluster(this, "API_MAIN_CLUSTER", {
-    //   vpc,
-    //   clusterName: "API_MAIN_CLUSTER",
-    //   containerInsights: true
-    // });
+    // Our ECS cluster, housing our various Fargate Services
+    const cluster = new ecs.Cluster(this, "API_MAIN_CLUSTER", {
+      vpc,
+      clusterName: "API_MAIN_CLUSTER",
+      containerInsights: true
+    });
 
     // Environment values for our API service: access to DB and JWT.
-    // const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this,
-    //   'SecretFromName',
-    //   'HAAS_JWT'
-    // );
-    // const dbUrl = `postgresql://${rdsUsername}:${rdsPassword.secretValue.toString()}@${rdsEndpoint}/postgres?schema=public`;
+    const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this,
+      'SecretFromName',
+      'HAAS_JWT'
+    );
+    const dbUrl = `postgresql://${rdsUsername}:${rdsPassword.secretValue.toString()}@${rdsEndpoint}/postgres?schema=public`;
 
-    // const dbString = new secretsmanager.Secret(this, 'API_RDS_String', {
-    //   secretName: 'API_RDS_String',
-    //   generateSecretString: {
-    //     secretStringTemplate: JSON.stringify({ url: dbUrl }),
-    //     generateStringKey: 'SECRET_URL'
-    //   }
-    // });
+    const dbString = new secretsmanager.Secret(this, 'API_RDS_String', {
+      secretName: 'API_RDS_String',
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({ url: dbUrl }),
+        generateStringKey: 'SECRET_URL'
+      }
+    });
 
-    // const awsSecret = secretsmanager.Secret.fromSecretNameV2(
-    //   this, 'API_KEY', 'ProdAwsKey'
-    // );
-    // const autodeckAWSSecret = secretsmanager.Secret.fromSecretNameV2(
-    //   this, 'AUTODECK_API_KEY', 'prod/AutoDeckAWSKeys'
-    // );
+    const awsSecret = secretsmanager.Secret.fromSecretNameV2(
+      this, 'API_KEY', 'ProdAwsKey'
+    );
+    const autodeckAWSSecret = secretsmanager.Secret.fromSecretNameV2(
+      this, 'AUTODECK_API_KEY', 'prod/AutoDeckAWSKeys'
+    );
 
-    // // Our main API service; we will adjust this as necessary to deal with more load.
-    // const apiService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "API_SERVICE", {
-    //   cluster,
-    //   cpu: 512,
-    //   memoryLimitMiB: 2048,
-    //   desiredCount: 1,
-    //   assignPublicIp: true,
-    //   domainZone: hostedZone,
-    //   domainName: 'api.haas.live',
-    //   certificate: tlsCertificate,
-    //   taskImageOptions: {
-    //     image: ecs.ContainerImage.fromEcrRepository(svcRepo),
-    //     containerPort: 4000,
-    //     environment: {
-    //       BASE_URL: 'https://api.haas.live',
-    //       CLIENT_URL: 'https://client.haas.live',
-    //       DASHBOARD_URL: 'https://dashboard.haas.live',
-    //       CLOUDINARY_URL: 'cloudinary://591617433181475:rGNg80eDICKoUKgzrMlSPQitZw8@dx8khik9g',
-    //       MAIL_SENDER: 'noreply@haas.live',
-    //       ENVIRONMENT: 'prod',
-    //     },
-    //     secrets: {
-    //       DB_STRING: ecs.Secret.fromSecretsManager(dbString, 'url'),
-    //       JWT_SECRET: ecs.Secret.fromSecretsManager(jwtSecret),
-    //       // TODO: Use IAM Roles instead, this is not reliable
-    //       AWS_ACCESS_KEY_ID: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_ACCESS_KEY_ID'),
-    //       AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_SECRET_ACCESS_KEY'),
-    //       AUTODECK_AWS_ACCESS_KEY_ID: ecs.Secret.fromSecretsManager(autodeckAWSSecret, 'AUTODECK_AWS_ACCESS_KEY_ID'),
-    //       AUTODECK_AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(autodeckAWSSecret, 'AUTODECK_AWS_SECRET_ACCESS_KEY'),
-    //     },
-    //   },
-    // });
+    // Our main API service; we will adjust this as necessary to deal with more load.
+    const apiService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "API_SERVICE", {
+      cluster,
+      cpu: 512,
+      memoryLimitMiB: 2048,
+      desiredCount: 1,
+      assignPublicIp: true,
+      domainZone: hostedZone,
+      domainName: 'api.haas.live',
+      certificate: tlsCertificate,
+      taskImageOptions: {
+        image: ecs.ContainerImage.fromEcrRepository(svcRepo),
+        containerPort: 4000,
+        environment: {
+          BASE_URL: 'https://api.haas.live',
+          CLIENT_URL: 'https://client.haas.live',
+          DASHBOARD_URL: 'https://dashboard.haas.live',
+          CLOUDINARY_URL: 'cloudinary://591617433181475:rGNg80eDICKoUKgzrMlSPQitZw8@dx8khik9g',
+          MAIL_SENDER: 'noreply@haas.live',
+          ENVIRONMENT: 'prod',
+        },
+        secrets: {
+          DB_STRING: ecs.Secret.fromSecretsManager(dbString, 'url'),
+          JWT_SECRET: ecs.Secret.fromSecretsManager(jwtSecret),
+          // TODO: Use IAM Roles instead, this is not reliable
+          AWS_ACCESS_KEY_ID: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_ACCESS_KEY_ID'),
+          AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_SECRET_ACCESS_KEY'),
+          AUTODECK_AWS_ACCESS_KEY_ID: ecs.Secret.fromSecretsManager(autodeckAWSSecret, 'AUTODECK_AWS_ACCESS_KEY_ID'),
+          AUTODECK_AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(autodeckAWSSecret, 'AUTODECK_AWS_SECRET_ACCESS_KEY'),
+        },
+      },
+    });
 
-    // // Setup AutoScaling policy
-    // const scaling = apiService.service.autoScaleTaskCount({ maxCapacity: 3 });
-    // scaling.scaleOnCpuUtilization('CpuScaling', {
-    //   targetUtilizationPercent: 50,
-    //   scaleInCooldown: Duration.seconds(60)
-    // });
+    // Setup AutoScaling policy
+    const scaling = apiService.service.autoScaleTaskCount({ maxCapacity: 3 });
+    scaling.scaleOnCpuUtilization('CpuScaling', {
+      targetUtilizationPercent: 50,
+      scaleInCooldown: Duration.seconds(60)
+    });
 
-    // this.apiService = apiService;
-    // this.dbUrl = dbUrl;
+    this.apiService = apiService;
+    this.dbUrl = dbUrl;
 
-    // const rdsSecurityGroup = new ec2.SecurityGroup(this, 'RDS_Access_Security_Group', {
-    //   vpc,
-    //   securityGroupName: 'RDS_SECURITY_GROUP',
-    // });
+    const rdsSecurityGroup = new ec2.SecurityGroup(this, 'RDS_Access_Security_Group', {
+      vpc,
+      securityGroupName: 'RDS_SECURITY_GROUP',
+    });
 
-    // this.rdsSecurityGroup = rdsSecurityGroup;
+    this.rdsSecurityGroup = rdsSecurityGroup;
 
-    // // Public Bastion for accessing the database
-    // // Note: we will use the client to adjust the security-groups allowed ingress connections
-    // const remoteBastion = new ec2.Instance(this, 'API_VPC_BASTION', {
-    //   instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO),
-    //   machineImage: ec2.MachineImage.latestAmazonLinux(),
-    //   vpc,
-    //   vpcSubnets: {
-    //     subnetType: SubnetType.PUBLIC,
-    //   },
-    //   securityGroup: new ec2.SecurityGroup(this, 'API_VC_BASTION_SG', {
-    //     vpc,
-    //     securityGroupName: 'API_VC_BASTION_SG',
-    //   }),
-    //   keyName: bastionKeyName
-    // });
+    // Public Bastion for accessing the database
+    // Note: we will use the client to adjust the security-groups allowed ingress connections
+    const remoteBastion = new ec2.Instance(this, 'API_VPC_BASTION', {
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO),
+      machineImage: ec2.MachineImage.latestAmazonLinux(),
+      vpc,
+      vpcSubnets: {
+        subnetType: SubnetType.PUBLIC,
+      },
+      securityGroup: new ec2.SecurityGroup(this, 'API_VC_BASTION_SG', {
+        vpc,
+        securityGroupName: 'API_VC_BASTION_SG',
+      }),
+      keyName: bastionKeyName
+    });
 
-    // this.db = rdsDb;
+    this.db = rdsDb;
 
-    // // Who can access the database?
-    // rdsDb.connections.allowFrom(apiService.service, ec2.Port.tcp(5432));
-    // rdsDb.connections.allowFrom(remoteBastion, ec2.Port.tcp(5432));
-    // rdsDb.connections.allowFrom(rdsSecurityGroup, ec2.Port.tcp(5432));
+    // Who can access the database?
+    rdsDb.connections.allowFrom(apiService.service, ec2.Port.tcp(5432));
+    rdsDb.connections.allowFrom(remoteBastion, ec2.Port.tcp(5432));
+    rdsDb.connections.allowFrom(rdsSecurityGroup, ec2.Port.tcp(5432));
   }
 }
