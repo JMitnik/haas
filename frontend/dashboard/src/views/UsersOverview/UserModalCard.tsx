@@ -66,7 +66,6 @@ const PrivateDialoguesUserForm = ({
   });
 
   const onSubmit = (data: any) => {
-    console.log('DATA: ', data);
     const filteredDialogues = Object.entries(data).filter((entry) => entry[1] === true).map((entry) => entry[0]);
     const notAssignDialogues = Object.entries(data).filter((entry) => entry[1] === false).map((entry) => entry[0]);
 
@@ -163,8 +162,6 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
   }
 
   const userOfCustomer = data?.customer?.userCustomer;
-
-  console.log('userOfCustomer: ', userOfCustomer);
 
   return (
     <UI.ModalCard onClose={onClose}>

@@ -501,7 +501,6 @@ class DialoguePrismaAdapter {
       customer: {
         slug: workspaceSlug,
       },
-      //TODO: Add private option here
       OR: [
         {
           isPrivate: true,

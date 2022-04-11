@@ -1,7 +1,4 @@
-import { Customer, Dialogue, PrismaClient } from '@prisma/client';
-import { range } from 'lodash';
-
-import { clearDialogueDatabase as clearDatabase, prepDefaultCreateData } from './testUtils';
+import { clearDialogueDatabase as clearDatabase, prepDefaultCreateData, seedDialogue, assignUserToDialogue } from './testUtils';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
@@ -49,12 +46,18 @@ query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilte
 } 
 `;
 
-// FIXME: Add filtering out of private dialogue with the dialogue connection query
-
 describe('DialogueConnection resolver', () => {
-  afterEach(async () => {
+  afterEach(async (done) => {
     await clearDatabase(prisma);
     await prisma.$disconnect();
+    done();
+  });
+
+  afterAll(async (done) => {
+    await clearDatabase(prisma);
+    await prisma.$disconnect();
+    console.log('Done with clearing db and disconnected prisma')
+    done();
   });
 
   test('unable to query dialogue-connection unauthorized', async () => {
@@ -81,96 +84,107 @@ describe('DialogueConnection resolver', () => {
 
   test('user can access dialogue-connection', async () => {
     const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);
+    await seedDialogue(prisma, workspace.id, 'dialogue_two');
+    await seedDialogue(prisma, workspace.id, 'dialogue_three');
+    await seedDialogue(prisma, workspace.id, 'dialogue_four');
 
     const token = AuthService.createUserToken(user.id, 22);
 
     let res = await ctx.client.request(Query, {
       customerSlug: workspace.slug,
+      filter: { offset: 0, perPage: 3 },
     }, { 'Authorization': `Bearer ${token}` });
 
-    expect(res.customer.automationConnection.totalPages).toBe(5);
-    expect(res.customer.automationConnection.pageInfo.hasPrevPage).toBe(false);
-    expect(res.customer.automationConnection.pageInfo.hasNextPage).toBe(true);
-    expect(res.customer.automationConnection.pageInfo.nextPageOffset).toBe(5);
+    expect(res.customer.dialogueConnection.totalPages).toBe(2);
+    expect(res.customer.dialogueConnection.pageInfo.hasPrevPage).toBe(false);
+    expect(res.customer.dialogueConnection.pageInfo.hasNextPage).toBe(true);
 
     // Go to next page
     res = await ctx.client.request(Query, {
       customerSlug: workspace.slug,
-      filter: { offset: 5, perPage: 5 },
+      filter: { offset: 3, perPage: 3 },
     }, { 'Authorization': `Bearer ${token}` });
 
-    expect(res.customer.automationConnection.totalPages).toBe(5);
-    expect(res.customer.automationConnection.pageInfo.hasPrevPage).toBe(true);
-    expect(res.customer.automationConnection.pageInfo.hasNextPage).toBe(true);
-    expect(res.customer.automationConnection.pageInfo.nextPageOffset).toBe(10);
-    expect(res.customer.automationConnection.pageInfo.pageIndex).toBe(1);
+    expect(res.customer.dialogueConnection.totalPages).toBe(2);
+    expect(res.customer.dialogueConnection.pageInfo.hasPrevPage).toBe(true);
+    expect(res.customer.dialogueConnection.pageInfo.hasNextPage).toBe(false);
+    expect(res.customer.dialogueConnection.pageInfo.pageIndex).toBe(1);
   });
 
-  test('user can filter automation-connection by generic search', async () => {
+  test('Private dialogues are not shown if not assinged to user', async () => {
     const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);
+    await seedDialogue(prisma, workspace.id, 'dialogue_two');
+    await seedDialogue(prisma, workspace.id, 'dialogue_three', true);
 
     const token = AuthService.createUserToken(user.id, 22);
 
-    // Search by generic: automation label
     let res = await ctx.client.request(Query, {
       customerSlug: workspace.slug,
-      filter: { search: '2' },
+      filter: { offset: 0, perPage: 2 },
     }, { 'Authorization': `Bearer ${token}` });
 
-    expect(res.customer.automationConnection.totalPages).toBe(1);
-    expect(res.customer.automationConnection.automations).toHaveLength(4); // 2, 12, 20 & 21
-
-    // Search by generic: automation desciption
-    res = await ctx.client.request(Query, {
-      customerSlug: workspace.slug,
-      filter: { search: 'AUTOMATION_DESCRIPTION_LOOKUP#20' },
-    }, { 'Authorization': `Bearer ${token}` });
-
-    expect(res.customer.automationConnection.totalPages).toBeGreaterThanOrEqual(1);
-    expect(res.customer.automationConnection.automations.length).toBeGreaterThanOrEqual(1);
+    // Although 3 dialogues created, only 2 should show up and therefore there is
+    // only 1 page available dialogue connection 
+    expect(res.customer.dialogueConnection.totalPages).toBe(1);
+    expect(res.customer.dialogueConnection.pageInfo.hasPrevPage).toBe(false);
+    expect(res.customer.dialogueConnection.pageInfo.hasNextPage).toBe(false);
   });
 
-  test('user can order automation-connection by updatedAt', async () => {
+  test('Private dialogues are shown if assinged to user', async () => {
     const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);
+    await seedDialogue(prisma, workspace.id, 'dialogue_two');
+    const privateDialogue = await seedDialogue(prisma, workspace.id, 'dialogue_three', true);
 
     const token = AuthService.createUserToken(user.id, 22);
 
-    // Order by generic: updatedAt ascending
-    let resAsc = await ctx.client.request(Query, {
+    let res = await ctx.client.request(Query, {
       customerSlug: workspace.slug,
-      filter: {
-        orderBy: {
-          by: 'updatedAt',
-          desc: false,
-        },
-      },
+      filter: { offset: 0, perPage: 2 },
     }, { 'Authorization': `Bearer ${token}` });
 
-    expect(resAsc.customer.automationConnection.totalPages).toBeGreaterThanOrEqual(1);
-    expect(resAsc.customer.automationConnection.automations.length).toEqual(3);
-    const firstAutomation = resAsc.customer.automationConnection.automations?.[0]
-    const secondAutomation = resAsc.customer.automationConnection.automations?.[1]
-    const thirdAutomation = resAsc.customer.automationConnection.automations?.[2]
-    expect(firstAutomation?.updatedAt).toBeLessThan(secondAutomation?.updatedAt);
-    expect(secondAutomation?.updatedAt).toBeLessThan(thirdAutomation?.updatedAt);
+    // Although 3 dialogues created, only 2 should show up and therefore there is
+    // only 1 page available dialogue connection 
+    expect(res.customer.dialogueConnection.totalPages).toBe(1);
 
-    // Order by generic: updatedAt descending
-    let resDesc = await ctx.client.request(Query, {
+    await assignUserToDialogue(prisma, privateDialogue.id, user.id);
+
+    let resWithPrivate = await ctx.client.request(Query, {
       customerSlug: workspace.slug,
-      filter: {
-        orderBy: {
-          by: 'updatedAt',
-          desc: true,
-        },
-      },
+      filter: { offset: 0, perPage: 2 },
     }, { 'Authorization': `Bearer ${token}` });
-    expect(resDesc.customer.automationConnection.totalPages).toBeGreaterThanOrEqual(1);
-    expect(resDesc.customer.automationConnection.automations.length).toEqual(3);
-    const firstAutomationDesc = resDesc.customer.automationConnection.automations?.[0]
-    const secondAutomationDesc = resDesc.customer.automationConnection.automations?.[1]
-    const thirdAutomationDesc = resDesc.customer.automationConnection.automations?.[2]
-    expect(firstAutomationDesc?.updatedAt).toBeGreaterThan(secondAutomationDesc?.updatedAt);
-    expect(secondAutomationDesc?.updatedAt).toBeGreaterThan(thirdAutomationDesc?.updatedAt);
+
+    // Now that user is assigned to private dialogue it should appear in connection 
+    // and therefor there will be 2 pages now
+    expect(resWithPrivate.customer.dialogueConnection.totalPages).toBe(2);
+
+  });
+
+  test('user can filter dialogue-connection by generic search', async () => {
+    const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);
+    await seedDialogue(prisma, workspace.id, 'dialogue_two', false, 'sear');
+    await seedDialogue(prisma, workspace.id, 'dialogue_three', false, 'sear');
+    await seedDialogue(prisma, workspace.id, 'dialogue_four', false, 'nope', 'description_test');
+    await seedDialogue(prisma, workspace.id, 'dialogue_five', false, 'nope', 'descr_test');
+    await seedDialogue(prisma, workspace.id, 'dialogue_six', false, 'nope', 'descri_test');
+
+    const token = AuthService.createUserToken(user.id, 22);
+
+    // Search by generic: dialogue title
+    let res = await ctx.client.request(Query, {
+      customerSlug: workspace.slug,
+      filter: { searchTerm: 'sear' },
+    }, { 'Authorization': `Bearer ${token}` });
+
+    expect(res.customer.dialogueConnection.totalPages).toBe(1);
+    expect(res.customer.dialogueConnection.dialogues).toHaveLength(2);
+
+    // Search by generic: dialogue desciption
+    res = await ctx.client.request(Query, {
+      customerSlug: workspace.slug,
+      filter: { searchTerm: 'desc' },
+    }, { 'Authorization': `Bearer ${token}` });
+
+    expect(res.customer.dialogueConnection.dialogues).toHaveLength(3)
   });
 
 
