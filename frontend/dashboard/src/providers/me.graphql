@@ -7,17 +7,6 @@ query me {
       phone
       globalPermissions
       userCustomers {
-        # user {
-        #   privateDialogues(workspaceId: $workspaceId) {
-        #   assignedDialogueIds
-        #   workspaceDialogues {
-        #     id
-        #     title
-        #     slug
-        #     description
-        #   }
-		    # }
-        # }
         isActive
         customer {
           id
