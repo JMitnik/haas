@@ -15,35 +15,35 @@ const standardOptions = [
   { value: 'Facilities', position: 1 },
   { value: 'Website/Mobile app', position: 2 },
   { value: 'Product/Services', position: 3 },
-  { value: 'Customer Support', position: 4 }
+  { value: 'Customer Support', position: 4 },
 ];
 
 const facilityOptions = [
   { value: 'Cleanliness', position: 1 },
   { value: 'Atmosphere', position: 2 },
   { value: 'Location', position: 3 },
-  { value: 'Other', position: 4 }
+  { value: 'Other', position: 4 },
 ];
 
 const websiteOptions = [
   { value: 'Design', position: 1 },
   { value: 'Functionality', position: 2 },
   { value: 'Informative', position: 3 },
-  { value: 'Other', position: 4 }
+  { value: 'Other', position: 4 },
 ];
 
 const customerSupportOptions = [
   { value: 'Friendliness', position: 1 },
   { value: 'Competence', position: 2 },
   { value: 'Speed', position: 3 },
-  { value: 'Other', position: 4 }
+  { value: 'Other', position: 4 },
 ];
 
 const productServicesOptions = [
   { value: 'Quality', position: 1 },
   { value: 'Price', position: 2 },
   { value: 'Friendliness', position: 3 },
-  { value: 'Other', position: 4 }
+  { value: 'Other', position: 4 },
 ];
 
 export interface IdMapProps {
@@ -64,6 +64,16 @@ export class NodeService {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.prisma = prismaClient;
   }
+
+  /**
+   * Finds the slider node of a dialogue
+   * @param dialogueId 
+   * @returns question node
+   */
+  findSliderNode = async (dialogueId: string) => {
+    return this.questionNodePrismaAdapter.findSliderNodeByDialogueId(dialogueId);
+  }
+
 
   /**
    * Find node by its own id.
@@ -113,7 +123,7 @@ export class NodeService {
       share: input.share,
       title: input.title,
       form: input.form,
-      type: input.type
+      type: input.type,
     });
 
     return callToAction;
@@ -524,7 +534,7 @@ export class NodeService {
             isRequired: field.isRequired || false,
             type: field.type || 'shortText',
           })) : [],
-        }
+        },
       })
     });
 
@@ -587,10 +597,10 @@ export class NodeService {
    * Get delete ids (?)
    * */
   static getDeleteIDs = (
-    edges: Array<{ id: string, childNodeId: string, parentNodeId: string }>,
+    edges: Array<{ id: string; childNodeId: string; parentNodeId: string }>,
     questions: Array<{ id: string }>, foundEdgeIds: Array<string>,
     foundQuestionIds: Array<string>,
-  ): { edgeIds: Array<string>, questionIds: Array<string> } => {
+  ): { edgeIds: Array<string>; questionIds: Array<string> } => {
     const newlyFoundEdgeIds: Array<string> = [];
     const newlyFoundQuestionIds: Array<string> = [];
 
@@ -661,11 +671,11 @@ export class NodeService {
     parentQuestionId: string,
     options: QuestionOptionProps[],
     edgeCondition: {
-      id: number | null,
-      conditionType: string,
-      renderMin: number | null,
-      renderMax: number | null,
-      matchValue: string | null
+      id: number | null;
+      conditionType: string;
+      renderMin: number | null;
+      renderMax: number | null;
+      matchValue: string | null;
     },
     extraContent: string | null,
   ) => {
@@ -816,7 +826,7 @@ export class NodeService {
       overrideLeafId: overrideLeafId || undefined,
       currentOverrideLeafId: currentOverrideLeafId,
       videoEmbeddedNode: {
-        id: activeQuestion?.videoEmbeddedNodeId || undefined
+        id: activeQuestion?.videoEmbeddedNodeId || undefined,
       },
     };
 

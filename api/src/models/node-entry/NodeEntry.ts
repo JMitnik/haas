@@ -2,6 +2,16 @@ import { inputObjectType, objectType } from '@nexus/schema';
 
 import { FormNodeField, QuestionNodeType } from '../QuestionNode/QuestionNode';
 
+export const TopicNodeEntryValue = objectType({
+  name: 'TopicNodeEntryValue',
+  definition(t) {
+    t.int('id');
+    t.string('value');
+    t.string('nodeEntryId');
+    t.int('mainScore');
+  },
+});
+
 export const FormNodeEntryValueType = objectType({
   name: 'FormNodeEntryValueType',
 

@@ -105,7 +105,7 @@ export class CustomerPrismaAdapter {
   };
 
   async exists(customerId: string): Promise<Boolean> {
-    const customerExists = await this.prisma.customer.findFirst({
+    const customerExists = await this.prisma.customer.findUnique({
       where: { id: customerId },
     });
 
@@ -115,7 +115,7 @@ export class CustomerPrismaAdapter {
   async getAllCustomersBySlug(customerSlug?: string | null) {
     return this.prisma.customer.findMany({
       where: {
-        slug: customerSlug || undefined
+        slug: customerSlug || undefined,
       },
     });
   };
@@ -173,10 +173,10 @@ export class CustomerPrismaAdapter {
             colourSettings: input.primaryColour ? {
               update: {
                 primary: input.primaryColour,
-              }
+              },
             } : undefined,
-          }
-        } : undefined
+          },
+        } : undefined,
       },
       include: {
         settings: {

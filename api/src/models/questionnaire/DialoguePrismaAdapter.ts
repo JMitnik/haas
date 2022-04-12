@@ -3,9 +3,10 @@ import {
   PrismaClient,
   Dialogue,
   Edge,
-} from "@prisma/client";
+  DialogueImpactScore,
+} from '@prisma/client';
 
-import { CreateQuestionsInput, CreateDialogueInput } from "./DialoguePrismaAdapterType";
+import { CreateQuestionsInput, CreateDialogueInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';
 
 class DialoguePrismaAdapter {
   prisma: PrismaClient;
@@ -13,6 +14,206 @@ class DialoguePrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  /**
+   * Upserts a dialogue topic and its sub topics
+   * @param input 
+   * @returns Dialogue Topic Statistics
+   */
+  upsertDialogueTopicStatistics = async (
+    input: UpsertDialogueTopicCacheInput,
+  ) => {
+    const {
+      dialogueId,
+      endDateTime,
+      name,
+      impactScore,
+      impactScoreType,
+      nrVotes,
+      startDateTime,
+      subTopics,
+      id,
+    } = input;
+    return this.prisma.dialogueTopicCache.upsert({
+      where: {
+        id: id || '-1',
+      },
+      create: {
+        impactScore,
+        impactScoreType: impactScoreType as DialogueImpactScore,
+        name,
+        nrVotes,
+        dialogueId,
+        endDateTime,
+        startDateTime,
+        subTopics: {
+          connectOrCreate: subTopics?.map((subTopic) => ({
+            where: {
+              id: subTopic.id || '-1',
+            },
+            create: {
+              dialogueId,
+              endDateTime,
+              startDateTime,
+              impactScoreType: impactScoreType as DialogueImpactScore,
+              impactScore: subTopic.impactScore,
+              name: subTopic.name,
+              nrVotes: subTopic.nrVotes,
+            },
+          })),
+        },
+      },
+      update: {
+        impactScore,
+        // impactScoreType: impactScoreType as DialogueImpactScore,
+        // name,
+        nrVotes,
+        // dialogueId,
+        // endDateTime,
+        // startDateTime,
+        subTopics: {
+          upsert: subTopics?.map((subTopic) => ({
+            where: {
+              id: subTopic.id || '-1',
+            },
+            create: {
+              dialogueId: dialogueId,
+              endDateTime,
+              startDateTime,
+              impactScoreType: impactScoreType as DialogueImpactScore,
+              impactScore: subTopic.impactScore,
+              name: subTopic.name,
+              nrVotes: subTopic.nrVotes,
+            },
+            update: {
+              impactScore: subTopic.impactScore,
+              name: subTopic.name,
+              nrVotes: subTopic.nrVotes,
+            },
+          })),
+        },
+      },
+      include: {
+        subTopics: true,
+      },
+    });
+  };
+
+  findDialogueTopicStatistics = async (
+    startDateTime: Date,
+    endDateTime: Date,
+    name: string,
+    dialogueId: string,
+    impactScoreType: DialogueImpactScore,
+  ) => {
+    return this.prisma.dialogueTopicCache.findFirst({
+      where: {
+        name,
+        dialogueId,
+        startDateTime: {
+          equals: startDateTime,
+        },
+        endDateTime: {
+          equals: endDateTime,
+        },
+        impactScoreType: impactScoreType,
+      },
+      include: {
+        subTopics: {
+          select: {
+            id: true,
+            name: true,
+            nrVotes: true,
+            impactScore: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Upserts a dialogue statistics summary
+   * @param prevStatisticsId id of the cache entry
+   * @param data upsert data
+   * @returns DialogueStatisticsSummaryCache
+   */
+  upsertDialogueStatisticsSummary = async (prevStatisticsId: string, data: UpsertDialogueStatisticsInput) => {
+    const statisticsSummary = await this.prisma.dialogueStatisticsSummaryCache.upsert({
+      where: {
+        id: prevStatisticsId,
+      },
+      create: {
+        dialogueId: data.dialogueId,
+        impactScore: data.impactScore || 0,
+        nrVotes: data.nrVotes,
+        impactScoreType: data.impactScoreType,
+        startDateTime: data.startDateTime,
+        endDateTime: data.endDateTime,
+      },
+      update: {
+        impactScore: data.impactScore || 0,
+        nrVotes: data.nrVotes,
+        impactScoreType: data.impactScoreType,
+        startDateTime: data.startDateTime,
+        endDateTime: data.endDateTime,
+      },
+    });
+    return statisticsSummary;
+  }
+
+  /**
+   * Finds a cache entry of a dialogue statistics summary based on id and date range
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns DialogueStatisticsSummaryCache | null
+   */
+  findDialogueStatisticsSummaries = async (
+    dialogueIds: string[],
+    startDateTime: Date,
+    endDateTime: Date,
+    type: DialogueImpactScore
+  ) => {
+    const prevStatistics = await this.prisma.dialogueStatisticsSummaryCache.findMany({
+      where: {
+        dialogue: {
+          id: {
+            in: dialogueIds,
+          },
+        },
+        startDateTime,
+        endDateTime,
+        impactScoreType: type,
+      },
+    });
+    return prevStatistics;
+  }
+
+  /**
+   * Finds a cache entry of a dialogue statistics summary based on id and date range
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns DialogueStatisticsSummaryCache | null
+   */
+  findDialogueStatisticsSummaryByDialogueId = async (
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+    type: DialogueImpactScore
+  ) => {
+    const prevStatistics = await this.prisma.dialogueStatisticsSummaryCache.findUnique({
+      where: {
+        filterId: {
+          dialogueId,
+          startDateTime,
+          endDateTime,
+          impactScoreType: type,
+        },
+      },
+    });
+    return prevStatistics;
+  }
 
   async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
 
@@ -31,7 +232,7 @@ class DialoguePrismaAdapter {
             videoEmbeddedNode: question.videoEmbeddedNode?.videoUrl ? {
               create: {
                 videoUrl: question.videoEmbeddedNode.videoUrl,
-              }
+              },
             } : undefined,
             links: question.links?.length ? {
               create: question.links,
@@ -104,7 +305,7 @@ class DialoguePrismaAdapter {
           some: {
             id: nodeId,
           },
-        }
+        },
       },
     });
   }
@@ -133,8 +334,8 @@ class DialoguePrismaAdapter {
         slug_customerId: {
           customerId,
           slug: dialogueSlug,
-        }
-      }
+        },
+      },
     });
   };
 
@@ -154,7 +355,7 @@ class DialoguePrismaAdapter {
 
   getCampaignVariantsByDialogueId(dialogueId: string) {
     return this.prisma.campaignVariant.findMany({
-      where: { dialogueId }
+      where: { dialogueId },
     });
   }
 
@@ -324,7 +525,7 @@ class DialoguePrismaAdapter {
           id: input?.customer?.id,
           slug: input.customer.slug,
           name: input.customer?.name,
-        }
+        },
       };
     } else if (!input.customer?.create && input.customer?.id) {
       return {
@@ -349,7 +550,7 @@ class DialoguePrismaAdapter {
       },
       include: {
         customer: true,
-      }
+      },
     });
   };
 
@@ -362,7 +563,20 @@ class DialoguePrismaAdapter {
           include: {
             parentNode: true,
             conditions: true,
-            childNode: true,
+            childNode: {
+              include: {
+                children: {
+                  select: {
+                    childNode: {
+                      select: {
+                        id: true,
+                        options: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -399,9 +613,9 @@ class DialoguePrismaAdapter {
   async createEdges(
     dialogueId: string,
     edges: {
-      parentNodeId: string,
-      childNodeId: string,
-      conditions: Array<{ conditionType: string, matchValue: string | null, renderMin: number | null, renderMax: number | null }>
+      parentNodeId: string;
+      childNodeId: string;
+      conditions: Array<{ conditionType: string; matchValue: string | null; renderMin: number | null; renderMax: number | null }>;
     }[]
   ) {
     return this.prisma.dialogue.update({
@@ -414,7 +628,7 @@ class DialoguePrismaAdapter {
             parentNode: {
               connect: {
                 id: edge.parentNodeId,
-              }
+              },
             },
             conditions: {
               create: edge.conditions,
@@ -422,7 +636,7 @@ class DialoguePrismaAdapter {
             childNode: {
               connect: {
                 id: edge.childNodeId,
-              }
+              },
             },
           })),
         },
@@ -450,15 +664,44 @@ class DialoguePrismaAdapter {
     return this.prisma.dialogue.delete({
       where: {
         id: dialogueId,
-      }
+      },
     });
   };
 
-  async findDialoguesByCustomerId(customerId: string) {
+  async findDialoguesByCustomerId(customerId: string, searchTerm?: string) {
+    const whereInput: Prisma.DialogueWhereInput = {
+      customerId,
+    }
+
+    if (searchTerm) {
+      whereInput.OR = [
+        {
+          tags: {
+            some: {
+              name: {
+                mode: 'insensitive',
+                contains: searchTerm,
+              },
+            },
+          },
+        },
+        {
+          title: {
+            mode: 'insensitive',
+            contains: searchTerm,
+          },
+        },
+        {
+          publicTitle: {
+            mode: 'insensitive',
+            contains: searchTerm,
+          },
+        },
+      ];
+    };
+
     return this.prisma.dialogue.findMany({
-      where: {
-        customerId,
-      },
+      where: whereInput,
       include: {
         tags: true,
       },

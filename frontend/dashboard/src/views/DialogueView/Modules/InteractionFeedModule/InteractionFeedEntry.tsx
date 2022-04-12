@@ -117,8 +117,8 @@ const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
     <InteractionFeedEntryContainer>
       <Flex flexWrap="wrap" width="100%" justifyContent="space-between">
         <Flex>
-          <InteractionFeedEntryValueContainer value={interaction.score}>
-            {Number(interaction.score / 10).toFixed(1)}
+          <InteractionFeedEntryValueContainer value={interaction.mainScore}>
+            {Number(interaction.mainScore / 10).toFixed(1)}
           </InteractionFeedEntryValueContainer>
 
           {interaction?.nodeEntries[1]?.value ? (

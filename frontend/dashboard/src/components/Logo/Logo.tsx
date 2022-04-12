@@ -23,6 +23,33 @@ export const LogoContainer = styled(Div) <{ fill?: string }>`
   `}
 `;
 
+export const FilledLogoContainer = styled(Div) <{ fill?: string }>`
+  ${({ theme }) => css`
+    display: flex;
+    background: ${theme.colors.primary};
+    border-radius: 15px;
+    padding: 0px;
+    align-items: center;
+
+    ${theme && css`
+      svg {
+        height: auto;
+      }
+
+      svg path {
+        fill: white;
+      }
+    `}
+
+    /* Manual size */
+    /* width: 60px; */
+
+    img {
+      max-width: 100%;
+    }
+  `}
+`;
+
 export const FullLogoContainer = styled(Div) <GenericProps>`
   ${({ theme }) => css`
     display: flex;
@@ -56,6 +83,12 @@ export const Logo = (props: any) => (
   <LogoContainer {...props}>
     <SVGLogo />
   </LogoContainer>
+);
+
+export const FilledLogo = (props: any) => (
+  <FilledLogoContainer {...props}>
+    <SVGLogo />
+  </FilledLogoContainer>
 );
 
 export default Logo;

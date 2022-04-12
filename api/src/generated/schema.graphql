@@ -497,6 +497,7 @@ type Customer {
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
+  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
   roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
@@ -635,17 +636,19 @@ type DeprecatedPaginationPageInfo {
 }
 
 type Dialogue {
-  averageScore(input: DialogueFilterInputType): Float!
+  averageScore(input: DialogueFilterInputType): Float
   campaignVariants: [CampaignVariantType!]!
   creationDate: String
   customer: Customer
   customerId: String!
   description: String!
+  dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
   edges: [Edge!]!
   id: ID!
   isWithoutGenData: Boolean!
   language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
+  pathedSessionsConnection(input: PathedSessionsInput): PathedSessionsType
   postLeafNode: DialogueFinisherObjectType
   publicTitle: String
   questions: [QuestionNode!]!
@@ -656,6 +659,7 @@ type Dialogue {
   statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag!]
   title: String!
+  topic(input: TopicInputType): TopicType!
   updatedAt: String
   wasGeneratedWithGenData: Boolean!
 }
@@ -688,12 +692,35 @@ type DialogueFinisherObjectType {
   subtext: String!
 }
 
+enum DialogueImpactScoreType {
+  AVERAGE
+}
+
 type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType
   nrInteractions: Int!
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
+}
+
+input DialogueStatisticsSummaryFilterInput {
+  endDateTime: String
+  impactType: DialogueImpactScoreType!
+  refresh: Boolean
+  startDateTime: String!
+}
+
+"""DialogueStatisticsSummary"""
+type DialogueStatisticsSummaryModel {
+  dialogue: Dialogue
+  dialogueId: String!
+  endDateTime: Date
+  id: ID
+  impactScore: Float
+  nrVotes: Int
+  startDateTime: Date
+  updatedAt: Date
 }
 
 input DialogueWhereUniqueInput {
@@ -889,6 +916,12 @@ type ImageType {
   url: String
 }
 
+type IndepthQuestionStatisticsSummary {
+  impactScore: Float
+  nrVotes: Int
+  option: String
+}
+
 input InviteUserInput {
   customerId: String!
   email: String!
@@ -1000,6 +1033,13 @@ type LoginOutput {
   user: UserType!
 }
 
+input MassSeedInput {
+  customerId: String!
+  maxGroups: Int!
+  maxSessions: Int!
+  maxTeams: Int!
+}
+
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
@@ -1044,6 +1084,7 @@ type Mutation {
 
   """Logs a user out by removing their refresh token"""
   logout: String!
+  massSeed(input: MassSeedInput): Customer
   register(input: RegisterInput): String
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
@@ -1180,6 +1221,20 @@ input PaginationWhereInput {
   startDate: String
 }
 
+input PathedSessionsInput {
+  endDateTime: String
+  path: [String!]!
+  refresh: Boolean = false
+  startDateTime: String!
+}
+
+type PathedSessionsType {
+  endDateTime: String!
+  path: [String!]!
+  pathedSessions: [Session!]!
+  startDateTime: String!
+}
+
 input PermissionIdsInput {
   ids: [String!]
 }
@@ -1218,6 +1273,7 @@ type Query {
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
   me: UserType!
+  question(where: QuestionWhereUniqueInput): QuestionNode
   refreshAccessToken: RefreshAccessTokenOutput!
   role(input: FindRoleInput): RoleType
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
@@ -1247,6 +1303,10 @@ type QuestionConditionScopeModel {
   id: ID!
 }
 
+enum QuestionImpactScoreType {
+  PERCENTAGE
+}
+
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
@@ -1255,6 +1315,7 @@ type QuestionNode {
   """FormNode resolver"""
   form: FormNodeType
   id: ID!
+  indepthQuestionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): [IndepthQuestionStatisticsSummary!]
   isLeaf: Boolean!
   isRoot: Boolean!
   links: [LinkType!]!
@@ -1263,6 +1324,7 @@ type QuestionNode {
   overrideLeafId: String
   questionDialogue: Dialogue
   questionDialogueId: String
+  questionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): QuestionStatisticsSummary
   share: ShareNodeType
 
   """Slidernode resolver"""
@@ -1301,6 +1363,26 @@ type QuestionOption {
   publicValue: String
   questionId: String
   value: String!
+}
+
+type QuestionStatisticsSummary {
+  dialogueId: String
+  endDateTime: Date
+  id: ID
+  startDateTime: Date
+  updatedAt: Date
+}
+
+input QuestionStatisticsSummaryFilterInput {
+  endDateTime: String
+  impactTreshold: Int
+  impactType: QuestionImpactScoreType!
+  refresh: Boolean
+  startDateTime: String!
+}
+
+input QuestionWhereUniqueInput {
+  id: ID!
 }
 
 input RecipientsInputType {
@@ -1350,6 +1432,7 @@ input RequestInviteInput {
 
 type RequestInviteOutput {
   didInvite: Boolean!
+  loginToken: String
   userExists: Boolean!
 }
 
@@ -1393,6 +1476,7 @@ type Session {
   device: String
   dialogueId: String!
   id: ID!
+  mainScore: Float!
   nodeEntries: [NodeEntry!]!
   originUrl: String
   paths: Int!
@@ -1437,6 +1521,7 @@ enum SessionDeliveryType {
 
 """Input for session"""
 input SessionInput {
+  createdAt: String
   deliveryId: String
   device: String
   dialogueId: String!
@@ -1564,6 +1649,29 @@ enum TagTypeEnum {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
+}
+
+input TopicInputType {
+  endDateTime: String
+  impactScoreType: DialogueImpactScoreType!
+  isRoot: Boolean = false
+  refresh: Boolean
+  startDateTime: String!
+  value: String!
+}
+
+type TopicNodeEntryValue {
+  id: Int!
+  mainScore: Int!
+  nodeEntryId: String!
+  value: String!
+}
+
+type TopicType {
+  impactScore: Float!
+  name: String!
+  nrVotes: Int!
+  subTopics: [TopicType!]
 }
 
 type topPathType {
