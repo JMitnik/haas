@@ -6,6 +6,11 @@ const GlobalStyle = createGlobalStyle`
     position: relative;
   }
 
+  @font-face {
+    font-family: 'Inter';
+    src: url('/assets/fonts/inter/Inter.ttf') format('ttf'),
+  }
+
   body {
     margin: 0;
     font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -32,7 +37,7 @@ const GlobalStyle = createGlobalStyle`
   svg {
     display: block;
   }
-  
+
   /* For react-modal */
   .ReactModal__Body--open {
     overflow: hidden;

@@ -29,12 +29,14 @@ class ContextSessionService {
     const vars = this.context.req.body.variables;
 
     if (vars?.customerSlug || vars?.input?.customerSlug) {
-      const customer = await this.customerService.findWorkspaceBySlugs([vars?.customerSlug, vars?.input?.customerSlug])
+      const customerSlug = vars?.customerSlug || vars?.input?.customerSlug;
+      const customer = await this.customerService.findWorkspaceBySlug(customerSlug);
       return customer;
     };
 
     if (vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId) {
-      const customer = await this.customerService.findWorkspaceBySlugs([vars?.customerId, vars?.input?.customerId, vars?.workspaceId, vars?.input?.workspaceId])
+      const customerId = vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId;
+      const customer = await this.customerService.findWorkspaceById(customerId);
       return customer;
     };
 

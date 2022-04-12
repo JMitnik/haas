@@ -45,6 +45,7 @@ import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 import VerifyTokenPage from 'pages/verify_token';
+import { DashboardView } from 'views/DashboardView';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
@@ -159,6 +160,11 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d"
                       render={() => <DialoguesPage />}
+                    />
+
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/dashboard"
+                      render={() => <DashboardView />}
                     />
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/"

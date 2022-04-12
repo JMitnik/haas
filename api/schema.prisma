@@ -1,13 +1,62 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "./node_modules/@prisma/client"
+  previewFeatures = ["orderByRelation"]
+}
+
 datasource postgresql {
   provider = "postgresql"
   url      = env("DB_STRING")
 }
 
-// binaryTargets = ["debian-openssl-1.1.x"]
-generator client {
-  provider        = "prisma-client-js"
-  output          = "./node_modules/@prisma/client"
-  previewFeatures = ["orderByRelation"]
+model DialogueTopicCache {
+  id              String               @id @default(cuid())
+  updatedAt       DateTime             @updatedAt
+  startDateTime   DateTime?
+  endDateTime     DateTime?
+  dialogueId      String?
+  name            String
+  nrVotes         Int
+  impactScore     Float
+  impactScoreType DialogueImpactScore
+  parentTopicId   String?
+  parentTopic     DialogueTopicCache?  @relation("DialogueTopicToDialogueTopic", fields: [parentTopicId], references: [id])
+  subTopics       DialogueTopicCache[] @relation("DialogueTopicToDialogueTopic")
+}
+
+model PathedSessionsCache {
+  id             String    @id @default(cuid())
+  updatedAt      DateTime  @updatedAt
+  startDateTime  DateTime?
+  endDateTime    DateTime?
+  path           String[]
+  dialogueId     String
+  pathedSessions Session[]
+}
+
+model QuestionStatisticsSummaryCache {
+  id              String              @id @default(cuid())
+  updatedAt       DateTime            @updatedAt
+  startDateTime   DateTime?
+  endDateTime     DateTime?
+  nrVotes         Int?
+  impactScore     Float
+  questionId      String
+  impactScoreType QuestionImpactScore
+}
+
+model DialogueStatisticsSummaryCache {
+  id              String              @id @default(cuid())
+  updatedAt       DateTime            @updatedAt
+  startDateTime   DateTime?
+  endDateTime     DateTime?
+  impactScore     Float
+  dialogueId      String
+  impactScoreType DialogueImpactScore
+  nrVotes         Int?
+  dialogue        Dialogue            @relation(fields: [dialogueId], references: [id], onDelete: Cascade)
+
+  @@unique([startDateTime, endDateTime, dialogueId, impactScoreType], name: "filterId", map: "filterId")
 }
 
 model ColourSettings {
@@ -42,28 +91,690 @@ model CustomerSettings {
   id               Int             @id @default(autoincrement())
   logoUrl          String?
   logoOpacity      Int?            @default(30)
-  colourSettingsId Int?            @unique
+  colourSettingsId Int?            @unique(map: "CustomerSettings.colourSettingsId_unique")
+  fontSettingsId   Int?            @unique(map: "CustomerSettings.fontSettingsId_unique")
+  customerId       String?         @unique(map: "CustomerSettings.customerId_unique")
   colourSettings   ColourSettings? @relation(fields: [colourSettingsId], references: [id])
-  fontSettingsId   Int?            @unique
-  fontSettings     FontSettings?   @relation(fields: [fontSettingsId], references: [id])
-  customerId       String?         @unique
   customer         Customer?       @relation(fields: [customerId], references: [id])
+  fontSettings     FontSettings?   @relation(fields: [fontSettingsId], references: [id])
 }
 
 model Customer {
   id              String            @id @default(cuid())
-  slug            String            @unique
+  slug            String            @unique(map: "Customer.slug_unique")
   name            String
-  settings        CustomerSettings?
-  dialogues       Dialogue[]
-  users           UserOfCustomer[]
-  roles           Role[]
-  permissions     Permission[]
-  triggers        Trigger[]
-  tags            Tag[]
+  automations     Automation[]
   campaigns       Campaign[]
   CampaignVariant CampaignVariant[]
-  automations     Automation[]
+  settings        CustomerSettings?
+  dialogues       Dialogue[]
+  permissions     Permission[]
+  roles           Role[]
+  tags            Tag[]
+  triggers        Trigger[]
+  users           UserOfCustomer[]
+}
+
+model Tag {
+  id         String     @id @default(cuid())
+  type       TagEnum    @default(DEFAULT)
+  name       String
+  customerId String
+  customer   Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  isTagOf    Dialogue[]
+}
+
+model PostLeafNode {
+  id       String    @id @default(cuid())
+  header   String
+  subtext  String
+  dialogue Dialogue?
+}
+
+model Dialogue {
+  id                          String                           @id @default(cuid())
+  title                       String
+  slug                        String
+  description                 String
+  creationDate                DateTime                         @default(now())
+  updatedAt                   DateTime?                        @updatedAt
+  publicTitle                 String?
+  customerId                  String
+  postLeafNodeId              String?                          @unique(map: "Dialogue.postLeafNodeId_unique")
+  language                    LanguageEnum                     @default(ENGLISH)
+  isOnline                    Boolean                          @default(false)
+  isWithoutGenData            Boolean                          @default(false)
+  endScreenText               String?
+  wasGeneratedWithGenData     Boolean                          @default(false)
+  customer                    Customer                         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  postLeafNode                PostLeafNode?                    @relation(fields: [postLeafNodeId], references: [id])
+  automationConditions        AutomationCondition[]
+  automationEvents            AutomationEvent[]
+  CampaignVariant             CampaignVariant[]
+  dialogueStatisticsSummaries DialogueStatisticsSummaryCache[]
+  edges                       Edge[]
+  questions                   QuestionNode[]
+  sessions                    Session[]
+  tags                        Tag[]
+
+  @@unique([slug, customerId], map: "Dialogue.slug_customerId_unique")
+}
+
+model FormNodeField {
+  id                     String                   @id @default(cuid())
+  label                  String
+  placeholder            String?
+  type                   FormNodeFieldType        @default(shortText)
+  isRequired             Boolean                  @default(false)
+  position               Int
+  formNodeId             String?
+  FormNode               FormNode?                @relation(fields: [formNodeId], references: [id])
+  FormNodeFieldEntryData FormNodeFieldEntryData[]
+}
+
+model FormNode {
+  id           String          @id @default(cuid())
+  helperText   String?
+  createdAt    DateTime        @default(now())
+  fields       FormNodeField[]
+  QuestionNode QuestionNode[]
+}
+
+model FormNodeFieldEntryData {
+  id              Int            @id @default(autoincrement())
+  email           String?
+  phoneNumber     String?
+  url             String?
+  shortText       String?
+  longText        String?
+  number          Int?
+  relatedFieldId  String
+  formNodeEntryId Int?
+  FormNodeEntry   FormNodeEntry? @relation(fields: [formNodeEntryId], references: [id])
+  relatedField    FormNodeField  @relation(fields: [relatedFieldId], references: [id], onDelete: Cascade)
+}
+
+model FormNodeEntry {
+  id          Int                      @id @default(autoincrement())
+  nodeEntryId String                   @unique(map: "FormNodeEntry.nodeEntryId_unique")
+  nodeEntry   NodeEntry                @relation(fields: [nodeEntryId], references: [id], onDelete: Cascade)
+  values      FormNodeFieldEntryData[]
+}
+
+model SliderNodeRange {
+  id               String             @id @default(cuid())
+  start            Float?
+  end              Float?
+  SliderNodeMarker SliderNodeMarker[]
+}
+
+model SliderNodeMarker {
+  id                String          @id @default(cuid())
+  label             String
+  subLabel          String
+  sliderNodeId      String
+  sliderNodeRangeId String
+  sliderNode        SliderNode      @relation(fields: [sliderNodeId], references: [id], onDelete: Cascade)
+  range             SliderNodeRange @relation(fields: [sliderNodeRangeId], references: [id], onDelete: Cascade)
+}
+
+model SliderNode {
+  id               String             @id @default(cuid())
+  unhappyText      String?
+  happyText        String?
+  earlyReleaseText String?
+  QuestionNode     QuestionNode[]
+  markers          SliderNodeMarker[]
+}
+
+model VideoEmbeddedNode {
+  id           String         @id @default(cuid())
+  videoUrl     String?
+  QuestionNode QuestionNode[]
+}
+
+model QuestionNode {
+  id                         String                @id @default(cuid())
+  creationDate               DateTime              @default(now())
+  updatedAt                  DateTime              @updatedAt
+  isLeaf                     Boolean               @default(false)
+  isRoot                     Boolean               @default(false)
+  title                      String
+  type                       NodeType              @default(GENERIC)
+  overrideLeafId             String?
+  questionDialogueId         String?
+  edgeId                     String?
+  videoEmbeddedNodeId        String?
+  sliderNodeId               String?
+  formNodeId                 String?
+  Edge                       Edge?                 @relation("EdgeChildrenRelation", fields: [edgeId], references: [id])
+  form                       FormNode?             @relation(fields: [formNodeId], references: [id])
+  overrideLeaf               QuestionNode?         @relation("QNodeToOverrideLeaf", fields: [overrideLeafId], references: [id])
+  questionDialogue           Dialogue?             @relation(fields: [questionDialogueId], references: [id])
+  sliderNode                 SliderNode?           @relation(fields: [sliderNodeId], references: [id])
+  videoEmbeddedNode          VideoEmbeddedNode?    @relation(fields: [videoEmbeddedNodeId], references: [id])
+  automationConditions       AutomationCondition[]
+  automationEvents           AutomationEvent[]
+  isChildNodeOf              Edge[]                @relation("Edge_childNodeToQuestionNode")
+  isParentNodeOf             Edge[]                @relation("Edge_parentNodeToQuestionNode")
+  children                   Edge[]
+  links                      Link[]
+  isRelatedNodeOfNodeEntries NodeEntry[]
+  isOverrideLeafOf           QuestionNode[]        @relation("QNodeToOverrideLeaf")
+  QuestionOfTrigger          QuestionOfTrigger[]
+  overridesChoices           QuestionOption[]      @relation("ChoiceCTANode")
+  QuestionOption             QuestionOption[]      @relation("QuestionNodeOptions")
+  options                    QuestionOption[]
+  share                      Share?
+  triggers                   Trigger[]
+}
+
+model Share {
+  id             String        @id @default(cuid())
+  createdAt      DateTime?     @default(now())
+  updatedAt      DateTime?     @updatedAt
+  url            String
+  title          String
+  tooltip        String?
+  questionNodeId String?       @unique(map: "Share.questionNodeId_unique")
+  questionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
+}
+
+model Link {
+  id              String        @id @default(cuid())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime?     @updatedAt
+  title           String?
+  type            LinkTypeEnum
+  url             String
+  iconUrl         String?
+  backgroundColor String?
+  questionNodeId  String?
+  buttonText      String?
+  header          String?
+  imageUrl        String?
+  subHeader       String?
+  questionNode    QuestionNode? @relation(fields: [questionNodeId], references: [id])
+}
+
+model Edge {
+  childNodeId                String
+  createdAt                  DateTime            @default(now())
+  updatedAt                  DateTime            @updatedAt
+  id                         String              @id @default(cuid())
+  parentNodeId               String
+  dialogueId                 String?
+  questionNodeId             String?
+  childNode                  QuestionNode        @relation("Edge_childNodeToQuestionNode", fields: [childNodeId], references: [id], onDelete: Cascade)
+  dialogue                   Dialogue?           @relation(fields: [dialogueId], references: [id])
+  parentNode                 QuestionNode        @relation("Edge_parentNodeToQuestionNode", fields: [parentNodeId], references: [id], onDelete: Cascade)
+  QuestionNode               QuestionNode?       @relation(fields: [questionNodeId], references: [id])
+  isRelatedNodeOfNodeEntries NodeEntry[]
+  conditions                 QuestionCondition[]
+  isEdgeOf                   QuestionNode[]      @relation("EdgeChildrenRelation")
+}
+
+model QuestionCondition {
+  conditionType String
+  id            Int     @id @default(autoincrement())
+  matchValue    String?
+  renderMax     Int?
+  renderMin     Int?
+  edgeId        String?
+  Edge          Edge?   @relation(fields: [edgeId], references: [id])
+}
+
+model QuestionOption {
+  id             Int           @id @default(autoincrement())
+  publicValue    String?
+  value          String
+  overrideLeafId String?
+  questionId     String?
+  questionNodeId String?
+  position       Int?
+  overrideLeaf   QuestionNode? @relation("ChoiceCTANode", fields: [overrideLeafId], references: [id])
+  question       QuestionNode? @relation("QuestionNodeOptions", fields: [questionId], references: [id])
+  QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
+}
+
+model Session {
+  createdAt                DateTime              @default(now())
+  id                       String                @id @default(cuid())
+  dialogueId               String
+  deliveryId               String?
+  originUrl                String?
+  totalTimeInSec           Int?
+  device                   String?
+  browser                  String?
+  mainScore                Float                 @default(0)
+  delivery                 Delivery?             @relation(fields: [deliveryId], references: [id])
+  dialogue                 Dialogue              @relation(fields: [dialogueId], references: [id], onDelete: Cascade)
+  nodeEntries              NodeEntry[]
+  isInPathedSessionsCaches PathedSessionsCache[]
+}
+
+model NodeEntry {
+  id                    String                 @id @default(cuid())
+  creationDate          DateTime               @default(now())
+  depth                 Int?
+  relatedEdgeId         String?
+  relatedNodeId         String?
+  sessionId             String?
+  inputSource           InputSource            @default(CLIENT)
+  relatedEdge           Edge?                  @relation(fields: [relatedEdgeId], references: [id])
+  relatedNode           QuestionNode?          @relation(fields: [relatedNodeId], references: [id])
+  session               Session?               @relation(fields: [sessionId], references: [id])
+  choiceNodeEntry       ChoiceNodeEntry?
+  formNodeEntry         FormNodeEntry?
+  linkNodeEntry         LinkNodeEntry?
+  registrationNodeEntry RegistrationNodeEntry?
+  sliderNodeEntry       SliderNodeEntry?
+  textboxNodeEntry      TextboxNodeEntry?
+  videoNodeEntry        VideoNodeEntry?
+}
+
+model VideoNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       String?
+  nodeEntryId String    @unique(map: "VideoNodeEntry.nodeEntryId_unique")
+  nodeEntry   NodeEntry @relation(fields: [nodeEntryId], references: [id], onDelete: Cascade)
+}
+
+model LinkNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       Json?
+  nodeEntryId String    @unique(map: "LinkNodeEntry.nodeEntryId_unique")
+  nodeEntry   NodeEntry @relation(fields: [nodeEntryId], references: [id], onDelete: Cascade)
+}
+
+model SliderNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       Int?
+  nodeEntryId String    @unique(map: "SliderNodeEntry.nodeEntryId_unique")
+  nodeEntry   NodeEntry @relation(fields: [nodeEntryId], references: [id], onDelete: Cascade)
+}
+
+model ChoiceNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       String?
+  nodeEntryId String    @unique(map: "ChoiceNodeEntry.nodeEntryId_unique")
+  createdAt   DateTime  @default(now())
+  nodeEntry   NodeEntry @relation(fields: [nodeEntryId], references: [id], onDelete: Cascade)
+}
+
+model TextboxNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       String?
+  nodeEntryId String    @unique(map: "TextboxNodeEntry.nodeEntryId_unique")
+  nodeEntry   NodeEntry @relation(fields: [nodeEntryId], references: [id], onDelete: Cascade)
+}
+
+model RegistrationNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       Json?
+  nodeEntryId String    @unique(map: "RegistrationNodeEntry.nodeEntryId_unique")
+  nodeEntry   NodeEntry @relation(fields: [nodeEntryId], references: [id], onDelete: Cascade)
+}
+
+model Permission {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  customerId  String?
+  Customer    Customer? @relation(fields: [customerId], references: [id])
+}
+
+model Role {
+  id          String                 @id @default(cuid())
+  name        String
+  type        RoleTypeEnum           @default(USER)
+  isPrivate   Boolean                @default(false)
+  permissions SystemPermissionEnum[]
+  customerId  String?
+  Customer    Customer?              @relation(fields: [customerId], references: [id])
+  users       UserOfCustomer[]
+
+  @@unique([id, name], map: "Role.id_name_unique")
+}
+
+model User {
+  id                 String                 @id @default(cuid())
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime?              @updatedAt
+  email              String                 @unique(map: "User.email_unique")
+  password           String?
+  phone              String?
+  firstName          String?
+  lastName           String?
+  globalPermissions  SystemPermissionEnum[]
+  loginToken         String?
+  loginTokenExpiry   DateTime?
+  refreshToken       String?
+  refreshTokenExpiry DateTime?
+  lastActivity       DateTime?
+  lastLoggedIn       DateTime?
+  customers          UserOfCustomer[]
+  triggers           Trigger[]
+}
+
+model UserOfCustomer {
+  userId     String
+  customerId String
+  roleId     String
+  createdAt  DateTime @default(now())
+  isActive   Boolean  @default(true)
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, customerId])
+}
+
+model TriggerCondition {
+  id                Int                  @id @default(autoincrement())
+  createdAt         DateTime?            @default(now())
+  type              TriggerConditionEnum @default(LOW_THRESHOLD)
+  minValue          Int?
+  maxValue          Int?
+  textValue         String?
+  triggerId         String
+  trigger           Trigger              @relation(fields: [triggerId], references: [id], onDelete: Cascade)
+  QuestionOfTrigger QuestionOfTrigger[]
+}
+
+model Trigger {
+  id                String              @id @default(cuid())
+  lastSent          DateTime?
+  name              String
+  type              TriggerEnum         @default(QUESTION)
+  medium            TriggerMedium
+  relatedNodeId     String?
+  customerId        String?
+  customer          Customer?           @relation(fields: [customerId], references: [id])
+  relatedNode       QuestionNode?       @relation(fields: [relatedNodeId], references: [id])
+  QuestionOfTrigger QuestionOfTrigger[]
+  conditions        TriggerCondition[]
+  recipients        User[]
+}
+
+model QuestionOfTrigger {
+  questionId         String
+  triggerId          String
+  triggerConditionId Int
+  createdAt          DateTime         @default(now())
+  question           QuestionNode     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  triggerCondition   TriggerCondition @relation(fields: [triggerConditionId], references: [id], onDelete: Cascade)
+  trigger            Trigger          @relation(fields: [triggerId], references: [id], onDelete: Cascade)
+
+  @@id([questionId, triggerId])
+}
+
+model Job {
+  id                   String              @id @default(cuid())
+  createdAt            DateTime?           @default(now())
+  updatedAt            DateTime?           @updatedAt
+  type                 JobType
+  createWorkspaceJobId String?             @unique(map: "Job.createWorkspaceJobId_unique")
+  createWorkspaceJob   CreateWorkspaceJob? @relation(fields: [createWorkspaceJobId], references: [id])
+}
+
+model JobProcessLocation {
+  id                 String                 @id @default(cuid())
+  name               String
+  path               String
+  xMaterialDimension Int                    @default(0)
+  yMaterialDimension Int                    @default(0)
+  type               JobProcessLocationType
+  job                CreateWorkspaceJob[]
+  fields             CustomField[]
+}
+
+model CustomField {
+  id                   String             @id @default(cuid())
+  key                  String
+  value                String
+  jobProcessLocationId String
+  jobProcessLocation   JobProcessLocation @relation(fields: [jobProcessLocationId], references: [id], onDelete: Cascade)
+}
+
+model CreateWorkspaceJob {
+  id                      String             @id @default(cuid())
+  createdAt               DateTime?          @default(now())
+  updatedAt               DateTime?          @updatedAt
+  name                    String?
+  referenceId             String?
+  message                 String?
+  errorMessage            String?
+  referenceType           CloudReferenceType
+  status                  JobStatusType      @default(PENDING)
+  resourcesUrl            String?
+  requiresRembg           Boolean            @default(true)
+  requiresScreenshot      Boolean            @default(true)
+  requiresColorExtraction Boolean            @default(true)
+  jobProcessLocationId    String
+  processLocation         JobProcessLocation @relation(fields: [jobProcessLocationId], references: [id], onDelete: Cascade)
+  Job                     Job?
+}
+
+model Campaign {
+  id            String                      @id @default(cuid())
+  label         String
+  workspaceId   String
+  createdAt     DateTime                    @default(now())
+  updatedAt     DateTime                    @updatedAt
+  workspace     Customer                    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  variantsEdges CampaignVariantToCampaign[]
+  deliveries    Delivery[]
+}
+
+model CampaignVariantToCampaign {
+  campaignId        String
+  campaignVariantId String
+  weight            Int
+  campaign          Campaign        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignVariant   CampaignVariant @relation(fields: [campaignVariantId], references: [id], onDelete: Cascade)
+
+  @@id([campaignId, campaignVariantId])
+}
+
+model CampaignVariantCustomVariable {
+  id                String          @id @default(cuid())
+  campaignVariantId String
+  key               String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  campaignVariant   CampaignVariant @relation(fields: [campaignVariantId], references: [id], onDelete: Cascade)
+}
+
+model CampaignVariant {
+  id                        String                          @id @default(cuid())
+  label                     String
+  body                      String
+  from                      String?
+  subject                   String?
+  type                      CampaignVariantTypeEnum
+  customerId                String
+  dialogueId                String
+  workspace                 Customer                        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  dialogue                  Dialogue                        @relation(fields: [dialogueId], references: [id], onDelete: Cascade)
+  customVariables           CampaignVariantCustomVariable[]
+  CampaignVariantToCampaign CampaignVariantToCampaign[]
+  Delivery                  Delivery[]
+}
+
+model Delivery {
+  id                         String                 @id
+  deliveryRecipientFirstName String?
+  deliveryRecipientLastName  String?
+  deliveryRecipientEmail     String?
+  deliveryRecipientPhone     String?
+  deliveryRecipientPrefix    String?
+  campaignId                 String
+  campaignVariantId          String
+  currentStatus              DeliveryStatusTypeEnum
+  scheduledAt                DateTime
+  createdAt                  DateTime               @default(now())
+  updatedAt                  DateTime?              @updatedAt
+  customVariables            Json?
+  campaign                   Campaign               @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignVariant            CampaignVariant        @relation(fields: [campaignVariantId], references: [id], onDelete: Cascade)
+  events                     DeliveryEvents[]
+  Session                    Session[]
+}
+
+model DeliveryEvents {
+  id             String                 @id @default(cuid())
+  status         DeliveryStatusTypeEnum
+  createdAt      DateTime               @default(now())
+  deliveryId     String?
+  failureMessage String?
+  Delivery       Delivery?              @relation(fields: [deliveryId], references: [id])
+}
+
+model AutomationEvent {
+  id                String               @id @default(cuid())
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime?            @updatedAt
+  type              AutomationEventType
+  questionId        String?
+  dialogueId        String?
+  periodType        RecurringPeriodType?
+  startDate         DateTime?
+  endDate           DateTime?
+  dialogue          Dialogue?            @relation(fields: [dialogueId], references: [id])
+  question          QuestionNode?        @relation(fields: [questionId], references: [id])
+  automationTrigger AutomationTrigger[]
+}
+
+model AutomationConditionOperand {
+  id                    String              @id @default(cuid())
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime?           @updatedAt
+  type                  OperandType
+  numberValue           Int?
+  textValue             String?
+  dateTimeValue         DateTime?
+  automationConditionId String
+  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id], onDelete: Cascade)
+}
+
+model ConditionPropertyAggregate {
+  id                        String                         @id @default(cuid())
+  createdAt                 DateTime                       @default(now())
+  updatedAt                 DateTime?                      @updatedAt
+  startDate                 DateTime?
+  endDate                   DateTime?
+  latest                    Int?
+  type                      ConditionPropertyAggregateType
+  dialogueConditionScopeId  String?                        @unique(map: "ConditionPropertyAggregate.dialogueConditionScopeId_unique")
+  questionConditionScopeId  String?                        @unique(map: "ConditionPropertyAggregate.questionConditionScopeId_unique")
+  workspaceConditionScopeId String?                        @unique(map: "ConditionPropertyAggregate.workspaceConditionScopeId_unique")
+  dialogueConditionScope    DialogueConditionScope?        @relation(fields: [dialogueConditionScopeId], references: [id])
+  questionConditionScope    QuestionConditionScope?        @relation(fields: [questionConditionScopeId], references: [id])
+  workspaceConditionScope   WorkspaceConditionScope?       @relation(fields: [workspaceConditionScopeId], references: [id])
+}
+
+model QuestionConditionScope {
+  id                    String                      @id @default(cuid())
+  createdAt             DateTime                    @default(now())
+  updatedAt             DateTime?                   @updatedAt
+  aspect                QuestionAspect
+  automationConditionId String                      @unique(map: "QuestionConditionScope.automationConditionId_unique")
+  automationCondition   AutomationCondition         @relation(fields: [automationConditionId], references: [id], onDelete: Cascade)
+  aggregate             ConditionPropertyAggregate?
+}
+
+model DialogueConditionScope {
+  id                    String                      @id @default(cuid())
+  createdAt             DateTime                    @default(now())
+  updatedAt             DateTime?                   @updatedAt
+  aspect                DialogueAspect
+  automationConditionId String                      @unique(map: "DialogueConditionScope.automationConditionId_unique")
+  automationCondition   AutomationCondition         @relation(fields: [automationConditionId], references: [id], onDelete: Cascade)
+  aggregate             ConditionPropertyAggregate?
+}
+
+model WorkspaceConditionScope {
+  id                    String                      @id @default(cuid())
+  createdAt             DateTime                    @default(now())
+  updatedAt             DateTime?                   @updatedAt
+  aspect                WorkspaceAspect
+  automationConditionId String                      @unique(map: "WorkspaceConditionScope.automationConditionId_unique")
+  automationCondition   AutomationCondition         @relation(fields: [automationConditionId], references: [id], onDelete: Cascade)
+  aggregate             ConditionPropertyAggregate?
+}
+
+model AutomationConditionBuilder {
+  id                      String                         @id @default(cuid())
+  type                    AutomationConditionBuilderType
+  childConditionBuilderId String?                        @unique(map: "AutomationConditionBuilder.childConditionBuilderId_unique")
+  childConditionBuilder   AutomationConditionBuilder?    @relation("AutomationConditionBuilderToAutomationConditionBuilder", fields: [childConditionBuilderId], references: [id])
+  conditions              AutomationCondition[]
+  parentConditionBuilder  AutomationConditionBuilder?    @relation("AutomationConditionBuilderToAutomationConditionBuilder")
+  automationTrigger       AutomationTrigger?
+}
+
+model AutomationCondition {
+  id                           String                          @id @default(cuid())
+  createdAt                    DateTime                        @default(now())
+  updatedAt                    DateTime?                       @updatedAt
+  scope                        AutomationConditionScopeType
+  operator                     AutomationConditionOperatorType
+  questionId                   String?
+  dialogueId                   String?
+  automationConditionBuilderId String
+  automationConditionBuilder   AutomationConditionBuilder      @relation(fields: [automationConditionBuilderId], references: [id], onDelete: Cascade)
+  dialogue                     Dialogue?                       @relation(fields: [dialogueId], references: [id])
+  question                     QuestionNode?                   @relation(fields: [questionId], references: [id])
+  operands                     AutomationConditionOperand[]
+  dialogueScope                DialogueConditionScope?
+  questionScope                QuestionConditionScope?
+  workspaceScope               WorkspaceConditionScope?
+}
+
+model AutomationAction {
+  id                 String               @id @default(cuid())
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime?            @updatedAt
+  type               AutomationActionType
+  apiKey             String?
+  endpoint           String?
+  payload            Json?
+  automationTriggers AutomationTrigger[]
+}
+
+model AutomationTrigger {
+  id                           String                     @id @default(cuid())
+  createdAt                    DateTime                   @default(now())
+  updatedAt                    DateTime?                  @updatedAt
+  eventId                      String
+  automationConditionBuilderId String                     @unique(map: "AutomationTrigger.automationConditionBuilderId_unique")
+  conditionBuilder             AutomationConditionBuilder @relation(fields: [automationConditionBuilderId], references: [id], onDelete: Cascade)
+  event                        AutomationEvent            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  automations                  Automation[]
+  actions                      AutomationAction[]
+}
+
+model Automation {
+  id                  String             @id @default(cuid())
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime?          @updatedAt
+  isActive            Boolean            @default(false)
+  label               String
+  description         String?
+  type                AutomationType
+  automationTriggerId String?
+  workspaceId         String
+  automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id], onDelete: SetNull)
+  workspace           Customer           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+enum QuestionImpactScore {
+  PERCENTAGE
+}
+
+enum DialogueImpactScore {
+  AVERAGE
 }
 
 enum TagEnum {
@@ -72,58 +783,10 @@ enum TagEnum {
   LOCATION
 }
 
-model Tag {
-  id         String     @id @default(cuid())
-  type       TagEnum    @default(value: DEFAULT)
-  name       String
-  isTagOf    Dialogue[] @relation(references: [id])
-  customer   Customer   @relation(fields: [customerId], references: [id])
-  customerId String
-}
-
 enum LanguageEnum {
   DUTCH
   GERMAN
   ENGLISH
-}
-
-model PostLeafNode {
-  id      String @id @default(cuid())
-  header  String
-  subtext String
-
-  dialogue Dialogue?
-}
-
-model Dialogue {
-  id             String         @id @default(cuid())
-  title          String
-  slug           String
-  description    String
-  creationDate   DateTime       @default(now())
-  updatedAt      DateTime?      @updatedAt
-  publicTitle    String?
-  customerId     String
-  postLeafNodeId String?        @unique
-  customer       Customer       @relation(fields: [customerId], references: [id])
-  edges          Edge[]
-  questions      QuestionNode[]
-  sessions       Session[]
-  tags           Tag[]
-  postLeafNode   PostLeafNode?  @relation(fields: [postLeafNodeId], references: [id])
-  language       LanguageEnum   @default(ENGLISH)
-
-  isOnline         Boolean @default(value: false)
-  isWithoutGenData Boolean @default(value: false)
-
-  endScreenText String?
-
-  wasGeneratedWithGenData Boolean           @default(value: false)
-  CampaignVariant         CampaignVariant[]
-
-  automationEvents     AutomationEvent[]
-  automationConditions AutomationCondition[]
-  @@unique([slug, customerId])
 }
 
 enum NodeType {
@@ -138,7 +801,6 @@ enum NodeType {
   VIDEO_EMBEDDED
 }
 
-// NodeType: Form
 enum FormNodeFieldType {
   email
   phoneNumber
@@ -148,132 +810,7 @@ enum FormNodeFieldType {
   number
 }
 
-model FormNodeField {
-  id                     String                   @id @default(cuid())
-  label                  String
-  placeholder            String?
-  type                   FormNodeFieldType        @default(shortText)
-  isRequired             Boolean                  @default(false)
-  position               Int
-  FormNode               FormNode?                @relation(fields: [formNodeId], references: [id])
-  formNodeId             String?
-  FormNodeFieldEntryData FormNodeFieldEntryData[]
-}
-
-model FormNode {
-  id           String          @id @default(cuid())
-  helperText   String?
-  createdAt    DateTime        @default(now())
-  fields       FormNodeField[]
-  QuestionNode QuestionNode[]
-}
-
-model FormNodeFieldEntryData {
-  id Int @id @default(autoincrement())
-
-  // Data property (belonging to a specific field)
-  email       String?
-  phoneNumber String?
-  url         String?
-  shortText   String?
-  longText    String?
-  number      Int?
-
-  relatedFieldId  String
-  relatedField    FormNodeField  @relation(references: [id], fields: [relatedFieldId])
-  FormNodeEntry   FormNodeEntry? @relation(fields: [formNodeEntryId], references: [id])
-  formNodeEntryId Int?
-}
-
-model FormNodeEntry {
-  id     Int                      @id @default(autoincrement())
-  values FormNodeFieldEntryData[]
-
-  // Relation to node
-  nodeEntryId String    @unique
-  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
-}
-
-model SliderNodeRange {
-  id               String             @id @default(cuid())
-  start            Float?
-  end              Float?
-  SliderNodeMarker SliderNodeMarker[]
-}
-
-model SliderNodeMarker {
-  id                String          @id @default(cuid())
-  range             SliderNodeRange @relation(fields: [sliderNodeRangeId], references: [id])
-  label             String
-  subLabel          String
-  sliderNodeId      String
-  sliderNode        SliderNode      @relation(fields: [sliderNodeId], references: [id])
-  sliderNodeRangeId String
-}
-
-model SliderNode {
-  id               String             @id @default(cuid())
-  markers          SliderNodeMarker[]
-  QuestionNode     QuestionNode[]
-  unhappyText      String?
-  happyText        String?
-  earlyReleaseText String?
-}
-
-model VideoEmbeddedNode {
-  id           String         @id @default(cuid())
-  videoUrl     String?
-  QuestionNode QuestionNode[]
-}
-
-model QuestionNode {
-  id           String           @id @default(cuid())
-  creationDate DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-  isLeaf       Boolean          @default(false)
-  isRoot       Boolean          @default(false)
-  title        String
-  type         NodeType         @default(value: GENERIC)
-  options      QuestionOption[]
-  children     Edge[]
-
-  overrideLeafId   String?
-  overrideLeaf     QuestionNode?  @relation("QNodeToOverrideLeaf", fields: [overrideLeafId], references: [id])
-  isOverrideLeafOf QuestionNode[] @relation("QNodeToOverrideLeaf")
-
-  questionDialogue   Dialogue? @relation(fields: [questionDialogueId], references: [id])
-  questionDialogueId String?
-
-
-  isChildNodeOf              Edge[]      @relation("Edge_childNodeToQuestionNode")
-  isParentNodeOf             Edge[]      @relation("Edge_parentNodeToQuestionNode")
-  isRelatedNodeOfNodeEntries NodeEntry[]
-
-  edgeId String?
-  Edge   Edge?   @relation("EdgeChildrenRelation", fields: [edgeId], references: [id])
-
-  QuestionOption   QuestionOption[] @relation("QuestionNodeOptions")
-  triggers         Trigger[]
-  overridesChoices QuestionOption[] @relation("ChoiceCTANode")
-
-  // Node-types
-  share             Share?
-  videoEmbeddedNode VideoEmbeddedNode? @relation(fields: [videoEmbeddedNodeId], references: [id])
-  sliderNode        SliderNode?        @relation(fields: [sliderNodeId], references: [id])
-  form              FormNode?          @relation(fields: [formNodeId], references: [id])
-
-  links               Link[]
-  QuestionOfTrigger   QuestionOfTrigger[]
-  videoEmbeddedNodeId String?
-  sliderNodeId        String?
-  formNodeId          String?
-
-  automationEvents     AutomationEvent[]
-  automationConditions AutomationCondition[]
-}
-
 enum LinkTypeEnum {
-  SINGLE
   SOCIAL
   API
   FACEBOOK
@@ -281,188 +818,15 @@ enum LinkTypeEnum {
   WHATSAPP
   INSTAGRAM
   TWITTER
+  SINGLE
 }
 
-model Share {
-  id        String    @id @default(cuid())
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-
-  url     String
-  title   String
-  tooltip String?
-
-  questionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
-  questionNodeId String?       @unique
-}
-
-model Link {
-  id              String        @id @default(cuid())
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime?     @updatedAt
-  title           String?
-  type            LinkTypeEnum
-  url             String
-  iconUrl         String?
-  backgroundColor String?
-  imageUrl        String?
-  header          String?
-  subHeader       String?
-  buttonText      String?
-  questionNode    QuestionNode? @relation(fields: [questionNodeId], references: [id])
-  questionNodeId  String?
-}
-
-model Edge {
-  childNodeId                String
-  createdAt                  DateTime            @default(now())
-  updatedAt                  DateTime            @updatedAt
-  id                         String              @id @default(cuid())
-  parentNodeId               String
-  dialogueId                 String?
-  conditions                 QuestionCondition[]
-  isEdgeOf                   QuestionNode[]      @relation("EdgeChildrenRelation")
-  childNode                  QuestionNode        @relation("Edge_childNodeToQuestionNode", fields: [childNodeId], references: [id])
-  parentNode                 QuestionNode        @relation("Edge_parentNodeToQuestionNode", fields: [parentNodeId], references: [id])
-  dialogue                   Dialogue?           @relation(fields: [dialogueId], references: [id])
-  isRelatedNodeOfNodeEntries NodeEntry[]
-  questionNodeId             String?
-  QuestionNode               QuestionNode?       @relation(fields: [questionNodeId], references: [id])
-}
-
-model QuestionCondition {
-  conditionType String
-  id            Int     @id @default(autoincrement())
-  matchValue    String?
-  renderMax     Int?
-  renderMin     Int?
-  edgeId        String?
-  Edge          Edge?   @relation(fields: [edgeId], references: [id])
-}
-
-model QuestionOption {
-  id          Int     @id @default(autoincrement())
-  publicValue String?
-  value       String
-
-  overrideLeafId String?
-  overrideLeaf   QuestionNode? @relation("ChoiceCTANode", fields: [overrideLeafId], references: [id])
-
-  questionId String?
-  question   QuestionNode? @relation("QuestionNodeOptions", fields: [questionId], references: [id])
-
-  questionNodeId String?
-  QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
-
-  position Int?
-}
-
-model Session {
-  createdAt   DateTime    @default(now())
-  id          String      @id @default(cuid())
-  dialogueId  String
-  dialogue    Dialogue    @relation(fields: [dialogueId], references: [id])
-  nodeEntries NodeEntry[]
-
-  deliveryId String?
-  delivery   Delivery? @relation(fields: [deliveryId], references: [id])
-
-  originUrl      String?
-  totalTimeInSec Int?
-  device         String?
-
-  browser String?
-}
-
-// Node-entry types
 enum InputSource {
   CLIENT
   INIT_GENERATED
 }
 
-model NodeEntry {
-  id            String        @id @default(cuid())
-  creationDate  DateTime      @default(now())
-  depth         Int?
-  relatedEdgeId String?
-  relatedNodeId String?
-  sessionId     String?
-  session       Session?      @relation(fields: [sessionId], references: [id])
-  relatedNode   QuestionNode? @relation(fields: [relatedNodeId], references: [id])
-  relatedEdge   Edge?         @relation(fields: [relatedEdgeId], references: [id])
-  inputSource   InputSource   @default(value: CLIENT)
-
-  // Entry types
-  sliderNodeEntry  SliderNodeEntry?
-  choiceNodeEntry  ChoiceNodeEntry?
-  textboxNodeEntry TextboxNodeEntry?
-  videoNodeEntry   VideoNodeEntry?
-
-  // @Deprecated => FormNodeEntry
-  registrationNodeEntry RegistrationNodeEntry?
-
-  formNodeEntry FormNodeEntry?
-  linkNodeEntry LinkNodeEntry?
-}
-
-model VideoNodeEntry {
-  id          Int       @id @default(autoincrement())
-  value       String?
-  nodeEntryId String    @unique
-  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
-}
-
-model LinkNodeEntry {
-  id          Int       @id @default(autoincrement())
-  value       Json?
-  nodeEntryId String    @unique
-  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
-}
-
-model SliderNodeEntry {
-  id          Int       @id @default(autoincrement())
-  value       Int?
-  nodeEntryId String    @unique
-  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
-}
-
-model ChoiceNodeEntry {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  value       String?
-  nodeEntryId String    @unique
-  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
-}
-
-model TextboxNodeEntry {
-  id          Int       @id @default(autoincrement())
-  value       String?
-  nodeEntryId String    @unique
-  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
-}
-
-// @DEPRECATED
-model RegistrationNodeEntry {
-  id          Int       @id @default(autoincrement())
-  value       Json?
-  nodeEntryId String    @unique
-  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
-}
-
-// Permissions
-model Permission {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-
-  // type       SystemPermissionEnum TODO: Add enum type, and start using these permissions EVERYWHERE instead of enum
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
-}
-
 enum SystemPermissionEnum {
-  CAN_ACCESS_REPORT_PAGE
-  CAN_DOWNLOAD_REPORTS
   CAN_ACCESS_ADMIN_PANEL
   CAN_EDIT_DIALOGUE
   CAN_BUILD_DIALOGUE
@@ -477,14 +841,14 @@ enum SystemPermissionEnum {
   CAN_DELETE_TRIGGERS
   CAN_DELETE_WORKSPACE
   CAN_EDIT_WORKSPACE
-  // Campaign oriented
   CAN_VIEW_CAMPAIGNS
   CAN_CREATE_CAMPAIGNS
   CAN_CREATE_DELIVERIES
-  // Automation oriented
-  CAN_VIEW_AUTOMATIONS
   CAN_CREATE_AUTOMATIONS
   CAN_UPDATE_AUTOMATIONS
+  CAN_VIEW_AUTOMATIONS
+  CAN_ACCESS_REPORT_PAGE
+  CAN_DOWNLOAD_REPORTS
 }
 
 enum RoleTypeEnum {
@@ -494,55 +858,6 @@ enum RoleTypeEnum {
   GUEST
   CUSTOM
   BOT
-}
-
-model Role {
-  id          String                 @id @default(cuid())
-  name        String
-  type        RoleTypeEnum           @default(value: USER)
-  isPrivate   Boolean                @default(false)
-  permissions SystemPermissionEnum[]
-  users       UserOfCustomer[]
-  Customer    Customer?              @relation(fields: [customerId], references: [id])
-  customerId  String?
-
-  @@unique([id, name])
-}
-
-model User {
-  id                 String                 @id @default(cuid())
-  createdAt          DateTime               @default(now())
-  updatedAt          DateTime?              @updatedAt
-  email              String                 @unique
-  lastLoggedIn       DateTime?
-  password           String?
-  phone              String?
-  firstName          String?
-  lastName           String?
-  triggers           Trigger[]
-  customers          UserOfCustomer[]
-  globalPermissions  SystemPermissionEnum[]
-  loginToken         String?
-  loginTokenExpiry   DateTime?
-  refreshToken       String?
-  refreshTokenExpiry DateTime?
-  lastActivity       DateTime?
-}
-
-model UserOfCustomer {
-  userId   String
-  user     User    @relation(fields: [userId], references: [id])
-  isActive Boolean @default(true)
-
-  customerId String
-  customer   Customer @relation(fields: [customerId], references: [id])
-
-  roleId String
-  role   Role   @relation(fields: [roleId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@id([userId, customerId])
 }
 
 enum TriggerEnum {
@@ -564,59 +879,8 @@ enum TriggerConditionEnum {
   TEXT_MATCH
 }
 
-model TriggerCondition {
-  id                Int                  @id @default(autoincrement())
-  createdAt         DateTime?            @default(now())
-  type              TriggerConditionEnum @default(value: LOW_THRESHOLD)
-  minValue          Int?
-  maxValue          Int?
-  textValue         String?
-  trigger           Trigger              @relation(fields: [triggerId], references: [id])
-  triggerId         String
-  QuestionOfTrigger QuestionOfTrigger[]
-}
-
-model Trigger {
-  id                String              @id @default(cuid())
-  lastSent          DateTime?
-  name              String
-  type              TriggerEnum         @default(value: QUESTION)
-  medium            TriggerMedium
-  conditions        TriggerCondition[]
-  relatedNodeId     String?
-  relatedNode       QuestionNode?       @relation(fields: [relatedNodeId], references: [id])
-  recipients        User[]
-  customer          Customer?           @relation(fields: [customerId], references: [id])
-  customerId        String?
-  QuestionOfTrigger QuestionOfTrigger[]
-}
-
-model QuestionOfTrigger {
-  questionId String
-  question   QuestionNode @relation(fields: [questionId], references: [id])
-
-  triggerId String
-  trigger   Trigger @relation(fields: [triggerId], references: [id])
-
-  triggerConditionId Int
-  triggerCondition   TriggerCondition @relation(fields: [triggerConditionId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@id([questionId, triggerId])
-}
-
 enum JobType {
   CREATE_WORKSPACE_JOB
-}
-
-model Job {
-  id                   String              @id @default(cuid())
-  createdAt            DateTime?           @default(now())
-  updatedAt            DateTime?           @updatedAt
-  type                 JobType
-  createWorkspaceJob   CreateWorkspaceJob? @relation(references: [id], fields: [createWorkspaceJobId])
-  createWorkspaceJobId String?             @unique
 }
 
 enum CloudReferenceType {
@@ -643,113 +907,16 @@ enum JobStatusType {
   COMPRESSING_SALES_MATERIAL
 }
 
-model JobProcessLocation {
-  id                 String                 @id @default(cuid())
-  name               String
-  path               String
-  xMaterialDimension Int                    @default(0)
-  yMaterialDimension Int                    @default(0)
-  type               JobProcessLocationType
-  job                CreateWorkspaceJob[]
-  fields             CustomField[]
-}
-
-model CustomField {
-  id                   String             @id @default(cuid())
-  key                  String
-  value                String
-  jobProcessLocation   JobProcessLocation @relation(fields: [jobProcessLocationId], references: [id])
-  jobProcessLocationId String
-}
-
 enum JobProcessLocationType {
   ONE_PAGER
   PITCHDECK
   BROCHURE
 }
 
-model CreateWorkspaceJob {
-  id                      String             @id @default(cuid())
-  createdAt               DateTime?          @default(now())
-  updatedAt               DateTime?          @updatedAt
-  name                    String?
-  referenceId             String?
-  message                 String?
-  errorMessage            String?
-  referenceType           CloudReferenceType
-  status                  JobStatusType      @default(PENDING)
-  resourcesUrl            String?
-  requiresRembg           Boolean            @default(true)
-  requiresScreenshot      Boolean            @default(true)
-  requiresColorExtraction Boolean            @default(true)
-  Job                     Job?
-  processLocation         JobProcessLocation @relation(fields: [jobProcessLocationId], references: [id])
-  jobProcessLocationId    String
-}
-
-// Campaigns
 enum CampaignVariantTypeEnum {
   EMAIL
   SMS
   QUEUE
-}
-
-model Campaign {
-  id            String                      @id @default(cuid())
-  label         String
-  deliveries    Delivery[]
-  variantsEdges CampaignVariantToCampaign[]
-
-  workspaceId String
-  workspace   Customer @relation(fields: [workspaceId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model CampaignVariantToCampaign {
-  campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id])
-
-  campaignVariantId String
-  campaignVariant   CampaignVariant @relation(fields: [campaignVariantId], references: [id])
-
-  // Weight decides in A/B testing which
-  weight Int
-
-  @@id([campaignId, campaignVariantId])
-}
-
-// Custom variable for campaign-variants
-model CampaignVariantCustomVariable {
-  id String @id @default(cuid())
-
-  campaignVariantId String
-  campaignVariant   CampaignVariant @relation(fields: [campaignVariantId], references: [id])
-
-  key String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model CampaignVariant {
-  id    String @id @default(cuid())
-  label String
-  body  String
-
-  workspace Customer @relation(fields: [customerId], references: [id])
-  dialogue  Dialogue @relation(fields: [dialogueId], references: [id])
-
-  from                      String?
-  subject                   String?
-  type                      CampaignVariantTypeEnum
-  CampaignVariantToCampaign CampaignVariantToCampaign[]
-  Delivery                  Delivery[]
-  customerId                String
-  dialogueId                String
-
-  customVariables CampaignVariantCustomVariable[]
 }
 
 enum DeliveryStatusTypeEnum {
@@ -762,44 +929,6 @@ enum DeliveryStatusTypeEnum {
   DELIVERED
 }
 
-model Delivery {
-  // We generated the ID ourselves
-  id String @id
-
-  deliveryRecipientFirstName String?
-  deliveryRecipientLastName  String?
-  deliveryRecipientEmail     String?
-  deliveryRecipientPhone     String?
-  deliveryRecipientPrefix    String?
-
-  campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id])
-
-  campaignVariantId String
-  campaignVariant   CampaignVariant @relation(fields: [campaignVariantId], references: [id])
-  customVariables   Json?
-
-  currentStatus DeliveryStatusTypeEnum
-
-  events DeliveryEvents[]
-
-  scheduledAt DateTime
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime? @updatedAt
-  Session     Session[]
-}
-
-model DeliveryEvents {
-  id         String                 @id @default(cuid())
-  status     DeliveryStatusTypeEnum
-  createdAt  DateTime               @default(now())
-  deliveryId String?
-  Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
-
-  failureMessage String?
-}
-
-// AUTOMATIONS
 enum AutomationType {
   TRIGGER
   CAMPAIGN
@@ -880,191 +1009,7 @@ enum AutomationActionType {
   WEBHOOK
 }
 
-model AutomationEvent {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  type AutomationEventType
-
-  // Trigger-related events
-  question   QuestionNode? @relation(fields: [questionId], references: [id])
-  questionId String?
-
-  dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
-  dialogueId String?
-
-  // Recurring-related events
-  periodType RecurringPeriodType?
-  startDate  DateTime?
-  endDate    DateTime?
-
-  automationTrigger AutomationTrigger[]
-}
-
-model AutomationConditionOperand {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  type OperandType
-
-  numberValue   Int?
-  textValue     String? // TODO: Reference an actual choice option instead of raw text here eventually
-  dateTimeValue DateTime?
-
-  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
-  automationConditionId String
-}
-
-model ConditionPropertyAggregate {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  startDate DateTime?
-  endDate   DateTime?
-  latest    Int?
-
-  type ConditionPropertyAggregateType
-
-  questionConditionScope    QuestionConditionScope?  @relation(fields: [questionConditionScopeId], references: [id])
-  dialogueConditionScope    DialogueConditionScope?  @relation(fields: [dialogueConditionScopeId], references: [id])
-  workspaceConditionScope   WorkspaceConditionScope? @relation(fields: [workspaceConditionScopeId], references: [id])
-  questionConditionScopeId  String?                  @unique
-  dialogueConditionScopeId  String?                  @unique
-  workspaceConditionScopeId String?                  @unique
-}
-
-model QuestionConditionScope {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  aspect QuestionAspect
-
-  aggregate ConditionPropertyAggregate?
-
-  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
-  automationConditionId String              @unique
-}
-
-model DialogueConditionScope {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  aspect DialogueAspect
-
-  aggregate ConditionPropertyAggregate?
-
-  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
-  automationConditionId String              @unique
-}
-
-model WorkspaceConditionScope {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  aspect WorkspaceAspect
-
-  aggregate ConditionPropertyAggregate?
-
-  automationCondition   AutomationCondition @relation(fields: [automationConditionId], references: [id])
-  automationConditionId String              @unique
-}
-
 enum AutomationConditionBuilderType {
   AND
   OR
-}
-
-model AutomationConditionBuilder {
-  id String @id @default(cuid())
-
-  type                   AutomationConditionBuilderType
-  conditions             AutomationCondition[]
-  parentConditionBuilder AutomationConditionBuilder?    @relation("AutomationConditionBuilderToAutomationConditionBuilder")
-
-  childConditionBuilderId String?                     @unique
-  childConditionBuilder   AutomationConditionBuilder? @relation("AutomationConditionBuilderToAutomationConditionBuilder", fields: [childConditionBuilderId], references: [id])
-
-  automationTrigger AutomationTrigger?
-}
-
-model AutomationCondition {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  scope    AutomationConditionScopeType
-  operator AutomationConditionOperatorType
-
-  operands AutomationConditionOperand[]
-
-  questionScope  QuestionConditionScope?
-  dialogueScope  DialogueConditionScope?
-  workspaceScope WorkspaceConditionScope?
-
-  question   QuestionNode? @relation(fields: [questionId], references: [id])
-  questionId String?
-
-  dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
-  dialogueId String?
-
-  // TODO: Add workspace relation so Workspace-wide conditions can be introduced
-
-  automationConditionBuilder   AutomationConditionBuilder @relation(fields: [automationConditionBuilderId], references: [id])
-  automationConditionBuilderId String
-}
-
-model AutomationAction {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  apiKey   String?
-  endpoint String?
-  payload  Json?
-
-  type               AutomationActionType
-  automationTriggers AutomationTrigger[]
-}
-
-model AutomationTrigger {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // Event: When is an automation triggered
-  event   AutomationEvent @relation(fields: [eventId], references: [id])
-  eventId String
-
-  // Condition: When should an automation actually fire.
-  conditionBuilder             AutomationConditionBuilder @relation(fields: [automationConditionBuilderId], references: [id])
-  automationConditionBuilderId String                     @unique
-
-  // Action: What should happen when an automation fire.
-  actions     AutomationAction[]
-
-  automations Automation[]
-}
-
-model Automation {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  isActive    Boolean @default(false)
-  label       String
-  description String?
-
-  type AutomationType
-
-  automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id])
-  automationTriggerId String?
-
-  workspace   Customer @relation(fields: [workspaceId], references: [id])
-  workspaceId String
 }

@@ -64,7 +64,7 @@ export const Hr = styled.hr`
 export const CloseButtonContainer = styled.button.attrs({ type: 'button' }) <{ top?: string, right?: string }>`
   position: absolute;
   top: ${props => props?.top || '12px'};
-  right: ${props => props?.right || '12px'}; 
+  right: ${props => props?.right || '12px'};
   width: 1rem;
   height: 1rem;
 `;
@@ -171,3 +171,13 @@ export const Separator = styled(Div)`
     margin-right: ${theme.gutter / 2}px;
   `}
 `
+
+
+interface PaddedBodyProps {
+  fraction?: number;
+}
+export const PaddedBody = styled(Div)<PaddedBodyProps>`
+  ${({ theme, fraction = 1 }) => css`
+    padding: ${theme.gutter * fraction}px;
+  `}
+`;

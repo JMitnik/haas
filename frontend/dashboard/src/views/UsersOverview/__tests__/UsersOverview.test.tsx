@@ -1,12 +1,12 @@
+import { expectWorkspaceLoaded, fireEvent, render, screen, server, userEvent, waitFor } from 'test';
 import { graphql } from 'msw';
 import { name } from 'faker';
 import { range } from 'lodash';
-import { expectWorkspaceLoaded, fireEvent, userEvent, render, screen, server, waitFor } from 'test';
+import { useLocation } from 'react-router-dom';
 import React from 'react';
 
 import { DeleteUserMutation, DeleteUserMutationVariables, GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables, UserCustomer } from 'types/generated-types';
 import UsersOverview from '../UsersOverview';
-import { useLocation } from 'react-router-dom';
 
 const generateUserCustomer: (index: number) => UserCustomer = (index: number) => ({
   __typename: 'UserCustomer',

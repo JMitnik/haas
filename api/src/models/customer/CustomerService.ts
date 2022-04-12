@@ -1,17 +1,21 @@
-import { Customer, PrismaClient, Prisma, CustomerSettings } from '@prisma/client';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
-import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import defaultWorkspaceTemplate, { defaultMassSeedTemplate, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
 import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
-import { UpdateCustomerInput } from './CustomerServiceType';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
+import { groupBy } from 'lodash';
+import cuid from 'cuid';
+import { addDays, differenceInHours, isEqual } from 'date-fns';
+import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
+import NodeEntryService from '../node-entry/NodeEntryService';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -20,14 +24,170 @@ class CustomerService {
   dialoguePrismaAdapter: DialoguePrismaAdapter;
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
   nodeService: NodeService;
+  dialogueStatisticsService: DialogueStatisticsService;
+  nodeEntryService: NodeEntryService;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.dialogueService = new DialogueService(prismaClient);
+    this.dialogueStatisticsService = new DialogueStatisticsService(prismaClient);
     this.tagPrismaAdapter = new TagPrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
+    this.nodeEntryService = new NodeEntryService(prismaClient);
+  }
+
+  findNestedDialogueStatisticsSummary = async (
+    customerId: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const dialogueIds = await this.dialogueService.findDialogueIdsByCustomerId(customerId);
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const cachedSummaries: DialogueStatisticsSummaryCache[] = [];
+    const caches = await this.dialogueStatisticsService.dialoguePrismaAdapter
+      .findDialogueStatisticsSummaries(
+        dialogueIds,
+        startDateTime as Date,
+        endDateTimeSet,
+        impactScoreType
+      )
+
+    if (!refresh) {
+      caches.forEach((cache) => {
+        if (differenceInHours(Date.now(), cache.updatedAt) == 0) {
+          dialogueIds.splice(dialogueIds.indexOf(cache.dialogueId), 1);
+          return cachedSummaries.push(cache);
+        };
+      });
+    }
+
+    if (caches.length === cachedSummaries.length && dialogueIds.length === 0) {
+      return caches;
+    }
+
+    const nodeEntries = await this.nodeEntryService.findDialogueStatisticsRootEntries(
+      dialogueIds,
+      startDateTime as Date,
+      endDateTimeSet,
+    );
+
+    // Group node entries by their dialogue ids so we can calculate impact score
+    const sessionContext = groupBy(nodeEntries, (nodeEntry) => nodeEntry.session?.dialogueId);
+
+    // If no node entries/sessions exist for a dialogue return empty list so cache entry can still get created
+    dialogueIds.forEach((dialogueId) => {
+      if (!sessionContext[dialogueId]) {
+        sessionContext[dialogueId] = [];
+      }
+    });
+
+    const newCaches: DialogueStatisticsSummaryCache[] = [];
+
+    // For every dialogue, calculate impact score and upsert a cache entry
+    Object.entries(sessionContext).forEach((context) => {
+      const dialogueId = context[0];
+      const nodeEntries = context[1];
+      const impactScore = this.dialogueStatisticsService.calculateNodeEntriesImpactScore(
+        impactScoreType,
+        nodeEntries
+      );
+
+      // Since we have a unique key based on dialogue id, impact score type, start/end date
+      // We can find a unique cache id based on these variables if there is already entry
+      const cacheId = caches.find((cache) => {
+        return cache.dialogueId === dialogueId &&
+          cache.impactScoreType === impactScoreType &&
+          isEqual(cache.startDateTime as Date, startDateTime) &&
+          isEqual(cache.endDateTime as Date, endDateTimeSet)
+      })?.id;
+
+      const res: DialogueStatisticsSummaryCache = {
+        id: cacheId || '-1',
+        dialogueId,
+        updatedAt: new Date(Date.now()),
+        impactScore: impactScore || 0,
+        impactScoreType: impactScoreType,
+        nrVotes: nodeEntries.length || 0,
+        startDateTime: startDateTime,
+        endDateTime: endDateTimeSet,
+      }
+
+      newCaches.push(res);
+
+      // Turn promise in a void to increase performance
+      // There is no need to wait for the updated data from DB because you already have the data you need
+      void this.dialogueService.upsertDialogueStatisticsSummary(
+        res.id,
+        {
+          dialogueId: res.dialogueId,
+          impactScore: res.impactScore || 0,
+          nrVotes: res.nrVotes || 0,
+          impactScoreType: res.impactScoreType,
+          startDateTime: res.startDateTime as Date,
+          endDateTime: res.endDateTime as Date,
+        }
+      );
+
+    });
+
+    return [...cachedSummaries, ...newCaches];
+  }
+
+  massSeed = async (input: NexusGenInputs['MassSeedInput'], isStrict: boolean = false) => {
+    const { customerId, maxGroups, maxSessions, maxTeams } = input;
+
+    const customer = await this.findWorkspaceById(customerId);
+    if (!customer) return null;
+
+    // Generate
+    const amtGroups = !isStrict ? Math.ceil(Math.random() * maxGroups + 1) : maxGroups;
+    const maleDialogueNames = [...Array(amtGroups)].flatMap((number, index) => {
+      const teamAge = 8 + (4 * index);
+      const groupName = `Group U${teamAge}`;
+      const amtTeams = !isStrict ? Math.floor(Math.random() * maxTeams + 1) : maxTeams;
+      const teamNames = [...Array(amtTeams)].map((number, index) => `${groupName} Male - Team ${index + 1}`);
+      return teamNames;
+    });
+
+    const femaleDialogueNames = [...Array(amtGroups)].flatMap((number, index) => {
+      const teamAge = 8 + (4 * index);
+      const groupName = `Group U${teamAge}`;
+      const amtTeams = !isStrict ? Math.floor(Math.random() * maxTeams + 1) : maxTeams;
+      const teamNames = [...Array(amtTeams)].map((number, index) => `${groupName} Female - Team ${index + 1}`);
+      return teamNames;
+    });
+
+    const dialogueNames = [...maleDialogueNames, ...femaleDialogueNames];
+
+    await Promise.all(dialogueNames.map(async (dialogueName, index) => {
+      defaultMassSeedTemplate.title = dialogueName;
+      const slug = cuid();
+      defaultMassSeedTemplate.slug = slug;
+      const dialogueInput: CreateDialogueInput = {
+        slug,
+        title: dialogueName,
+        description: defaultMassSeedTemplate.description,
+        customer: { id: customer.id, create: false },
+      };
+
+      const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
+
+      if (!dialogue) throw 'ERROR: No dialogue created!'
+      // Step 2: Make the leafs
+      const leafs = await this.nodeService.createTemplateLeafNodes(defaultMassSeedTemplate.leafNodes, dialogue.id);
+
+      // Step 3: Make nodes
+      await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
+
+      await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate, maxSessions, isStrict);
+    }));
+
+    return customer;
   }
 
   /**
@@ -174,7 +334,7 @@ class CustomerService {
       slug: input.slug,
       logoOpacity: input.logoOpacity,
       logoUrl: input.logo,
-      primaryColour: input.primaryColour
+      primaryColour: input.primaryColour,
     });
 
     return customer;
@@ -265,7 +425,6 @@ class CustomerService {
     // TODO: RegistrationNodeEntry, Session, Share, SliderNode, SliderNodeEntry, SliderNodeMarker, SliderNodeRange, TextboxNodeEntry
     // TODO: Trigger, User, VideoEmbeddedNode, VideoNodeEntry,
     const deleteTagsTest = this.tagPrismaAdapter.deleteAllByCustomerId(customerId);
-    const deletionOfTags = prisma.tag.deleteMany({ where: { customerId } });
     const deletionOfTriggers = prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
     const deletionOfPermissions = prisma.permission.deleteMany({ where: { customerId } });
     const deletionOfUserCustomerRoles = prisma.userOfCustomer.deleteMany({
@@ -278,7 +437,6 @@ class CustomerService {
     const deletionOfCustomer = this.customerPrismaAdapter.delete(customerId);
 
     await prisma.$transaction([
-      deletionOfTags,
       deletionOfTriggers,
       deletionOfPermissions,
       deletionOfUserCustomerRoles,

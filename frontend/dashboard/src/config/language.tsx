@@ -1465,6 +1465,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   views: {
+    dashboard: {
+      en: 'Dashboard',
+      de: 'Dashboard',
+    },
     configurations: {
       en: 'Configurations',
       de: 'Konfigurationen',

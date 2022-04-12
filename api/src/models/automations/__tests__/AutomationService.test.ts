@@ -149,7 +149,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
                   },
                 ],
               },
-            }
+            },
 
           },
           actions: {
