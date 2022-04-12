@@ -85,6 +85,7 @@ export const GroupPane = ({ currentState }: WorkspaceGridPaneProps) => {
                       outerRadius={80}
                       paddingAngle={10}
                       dataKey="value"
+                      isAnimationActive
                     >
                       {selectedGroups.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={getHexagonSVGFill(entry.score)} />
