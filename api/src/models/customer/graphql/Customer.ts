@@ -7,16 +7,15 @@ import cloudinary, { UploadApiResponse } from 'cloudinary';
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../../questionnaire/Dialogue';
 import { UserConnection } from '../../users/graphql/User';
-import DialogueService from '../../questionnaire/DialogueService';
 import isValidColor from '../../../utils/isValidColor';
 import { CampaignModel } from '../../Campaigns';
 import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
 import { AutomationModel } from '../../automations/graphql/AutomationModel';
 import { AutomationConnection, AutomationConnectionFilterInput } from '../../automations/graphql/AutomationConnection';
 import { isValidDateTime } from '../../../utils/isValidDate';
-import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel } from '../../questionnaire';
-import { addDays, differenceInHours, isEqual } from 'date-fns';
-import { groupBy, meanBy } from 'lodash';
+import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostPopularPath } from '../../questionnaire';
+import { addDays } from 'date-fns';
+import { groupBy, maxBy, meanBy } from 'lodash';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -71,6 +70,77 @@ export const CustomerType = objectType({
       type: AutomationModel,
       async resolve(parent, args, ctx) {
         return ctx.services.automationService.findAutomationsByWorkspace(parent.id);
+      },
+    });
+
+    t.field('nestedMostPopular', {
+      type: MostPopularPath,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      useParentResolve: true,
+      useTimeResolve: true,
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        const endDateTimeSet = !utcEndDateTime ? addDays(utcStartDateTime as Date, 7) : utcEndDateTime;
+
+        const sessions = await ctx.prisma.session.findMany({
+          where: {
+            dialogue: {
+              customerId: parent.id,
+            },
+            createdAt: {
+              gte: utcStartDateTime as Date,
+              lte: endDateTimeSet,
+            },
+          },
+          include: {
+            nodeEntries: {
+              include: {
+                choiceNodeEntry: true,
+              },
+            },
+          },
+        });
+
+        const sessionWithDeepestEntry = sessions.map((session) => {
+          const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
+          return {
+            sessionId: session.id,
+            dialogueId: session.dialogueId,
+            mainScore: session.mainScore,
+            entry: deepest,
+          };
+        });
+
+        const groupedDeepEntrySessions = groupBy(sessionWithDeepestEntry, (session) => {
+          return session.entry?.choiceNodeEntry?.value;
+        });
+
+        const mostPrevalent = maxBy(Object.entries(groupedDeepEntrySessions), (entry) => {
+          return entry[1].length;
+        })
+
+        const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore);
+        const nrVotes = mostPrevalent?.[1].length;
+        const path: string[] = [mostPrevalent?.[0] as string]
+        const group = 'No group yet';
+
+        return { group, path, nrVotes: nrVotes || 0, impactScore: averageScore || 0 };
       },
     });
 

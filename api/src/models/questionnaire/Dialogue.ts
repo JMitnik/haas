@@ -16,7 +16,7 @@ import { isADate, isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueImpactScoreType, DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
-import { countBy, groupBy, maxBy, meanBy } from 'lodash';
+import { groupBy, maxBy, meanBy } from 'lodash';
 
 export const TEXT_NODES = [
   'TEXTBOX',

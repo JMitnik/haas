@@ -498,6 +498,7 @@ type Customer {
   id: ID!
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
+  nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
