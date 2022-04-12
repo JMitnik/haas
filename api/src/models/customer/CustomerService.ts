@@ -11,7 +11,7 @@ import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
-import { groupBy } from 'lodash';
+import { groupBy, maxBy, meanBy } from 'lodash';
 import cuid from 'cuid';
 import { addDays, differenceInHours, isEqual } from 'date-fns';
 import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
@@ -37,6 +37,52 @@ class CustomerService {
     this.nodeService = new NodeService(prismaClient);
     this.nodeEntryService = new NodeEntryService(prismaClient);
   }
+
+  findNestedMostPopularPath = async (
+    customerId: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const sessions = await this.customerPrismaAdapter.findChoiceNodeSessionsWithinDates(
+      customerId,
+      startDateTime,
+      endDateTimeSet,
+    );
+
+    const sessionWithDeepestEntry = sessions.map((session) => {
+      const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
+      return {
+        sessionId: session.id,
+        dialogueId: session.dialogueId,
+        mainScore: session.mainScore,
+        entry: deepest,
+      };
+    });
+
+    const groupedDeepEntrySessions = groupBy(sessionWithDeepestEntry, (session) => {
+      return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;
+    });
+
+    const mostPrevalent = maxBy(Object.entries(groupedDeepEntrySessions), (entry) => {
+      return entry[1].length;
+    })
+
+    const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore);
+    const nrVotes = mostPrevalent?.[1].length;
+    const dialogueNodeEntryValue = mostPrevalent?.[0]?.split('_');
+    const dialogueId = dialogueNodeEntryValue?.[0] as string;
+
+    const dialogue = await this.dialogueService.getDialogueById(dialogueId);
+
+    const path: string[] = [dialogueNodeEntryValue?.[1] as string]
+    const group = dialogue?.title || 'No group found';
+
+    return { group, path, nrVotes: nrVotes || 0, impactScore: averageScore || 0 };
+  };
 
   findNestedDialogueStatisticsSummary = async (
     customerId: string,

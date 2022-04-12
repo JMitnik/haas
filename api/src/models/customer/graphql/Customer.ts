@@ -96,51 +96,13 @@ export const CustomerType = objectType({
           utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
         }
 
-        const endDateTimeSet = !utcEndDateTime ? addDays(utcStartDateTime as Date, 7) : utcEndDateTime;
-
-        const sessions = await ctx.prisma.session.findMany({
-          where: {
-            dialogue: {
-              customerId: parent.id,
-            },
-            createdAt: {
-              gte: utcStartDateTime as Date,
-              lte: endDateTimeSet,
-            },
-          },
-          include: {
-            nodeEntries: {
-              include: {
-                choiceNodeEntry: true,
-              },
-            },
-          },
-        });
-
-        const sessionWithDeepestEntry = sessions.map((session) => {
-          const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
-          return {
-            sessionId: session.id,
-            dialogueId: session.dialogueId,
-            mainScore: session.mainScore,
-            entry: deepest,
-          };
-        });
-
-        const groupedDeepEntrySessions = groupBy(sessionWithDeepestEntry, (session) => {
-          return session.entry?.choiceNodeEntry?.value;
-        });
-
-        const mostPrevalent = maxBy(Object.entries(groupedDeepEntrySessions), (entry) => {
-          return entry[1].length;
-        })
-
-        const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore);
-        const nrVotes = mostPrevalent?.[1].length;
-        const path: string[] = [mostPrevalent?.[0] as string]
-        const group = 'No group yet';
-
-        return { group, path, nrVotes: nrVotes || 0, impactScore: averageScore || 0 };
+        return ctx.services.customerService.findNestedMostPopularPath(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        )
       },
     });
 

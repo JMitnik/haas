@@ -1,4 +1,4 @@
-import { PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings } from '@prisma/client';
+import { PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings, DialogueImpactScore } from '@prisma/client';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import defaultWorkspaceTemplate from '../templates/defaultWorkspaceTemplate';
@@ -9,6 +9,31 @@ export class CustomerPrismaAdapter {
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
+  }
+
+  findChoiceNodeSessionsWithinDates = async (
+    customerId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+  ) => {
+    return this.prisma.session.findMany({
+      where: {
+        dialogue: {
+          customerId,
+        },
+        createdAt: {
+          gte: startDateTime as Date,
+          lte: endDateTime,
+        },
+      },
+      include: {
+        nodeEntries: {
+          include: {
+            choiceNodeEntry: true,
+          },
+        },
+      },
+    });
   }
 
   async deleteFontSettings(fontSettingsId: number): Promise<FontSettings> {

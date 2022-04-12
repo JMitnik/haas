@@ -12,6 +12,29 @@ class SessionPrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  findSessionByDialogueIdBetweenDates = async (
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime: Date
+  ) => {
+    return this.prisma.session.findMany({
+      where: {
+        dialogueId: dialogueId,
+        createdAt: {
+          gte: startDateTime as Date,
+          lte: endDateTime,
+        },
+      },
+      include: {
+        nodeEntries: {
+          include: {
+            choiceNodeEntry: true,
+          },
+        },
+      },
+    });
+  }
+
   /**
    * Upserts a pathed sessions cache
    * @param cacheId 

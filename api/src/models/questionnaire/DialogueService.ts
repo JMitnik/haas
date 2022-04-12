@@ -1,5 +1,5 @@
 import { addDays, differenceInHours, subDays } from 'date-fns';
-import _, { groupBy, meanBy, sample, uniq, uniqBy } from 'lodash';
+import _, { groupBy, maxBy, meanBy, sample, uniq, uniqBy } from 'lodash';
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
@@ -47,6 +47,43 @@ class DialogueService {
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
+  }
+
+  findMostPopularPath = async (
+    dialogueId: string,
+    dialogueTitle: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const sessions = await this.sessionPrismaAdapter.findSessionByDialogueIdBetweenDates(
+      dialogueId,
+      startDateTime,
+      endDateTimeSet,
+    );
+
+    const sessionWithDeepestEntry = sessions.map((session) => {
+      const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
+      return { sessionId: session.id, mainScore: session.mainScore, entry: deepest };
+    });
+
+    const groupedDeepEntrySessions = groupBy(sessionWithDeepestEntry, (session) => {
+      return session.entry?.choiceNodeEntry?.value;
+    });
+
+    const mostPrevalent = maxBy(Object.entries(groupedDeepEntrySessions), (entry) => {
+      return entry[1].length;
+    })
+
+    const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore);
+    const nrVotes = mostPrevalent?.[1].length;
+    const path: string[] = [mostPrevalent?.[0] as string]
+    const group = dialogueTitle;
+
+    return { group, path, nrVotes: nrVotes || 0, impactScore: averageScore || 0 };
   }
 
   /**
