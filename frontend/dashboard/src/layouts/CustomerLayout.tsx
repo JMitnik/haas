@@ -10,29 +10,29 @@ import { ReactComponent as CursorClickIcon } from 'assets/icons/icon-cursorclick
 import { CustomThemeProviders } from 'providers/ThemeProvider';
 import { Div, PageHeading } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
+import { ReactComponent as HomeIcon } from 'assets/icons/icon-home.svg';
 import { NavItem, NavItems, Usernav } from 'components/Sidenav/Sidenav';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification.svg';
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog.svg';
 import { ReactComponent as SliderIcon } from 'assets/icons/icon-slider.svg';
 import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey.svg';
-import { ReactComponent as HomeIcon } from 'assets/icons/icon-home.svg';
 import { ReactComponent as TableIcon } from 'assets/icons/icon-table.svg';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 
 import { ReactComponent as WrenchIcon } from 'assets/icons/icon-wrench.svg';
 import { useTranslation } from 'react-i18next';
-import Logo from 'components/Logo/Logo';
+import Logo, { FilledLogo } from 'components/Logo/Logo';
 import MobileBottomNav from 'components/MobileBottomNav';
 import Sidenav from 'components/Sidenav';
 import useAuth from 'hooks/useAuth';
 import useMediaDevice from 'hooks/useMediaDevice';
 
+import { Home } from 'react-feather';
+import { Loader } from 'components/Common/Loader/Loader';
 import { NavLink } from 'react-router-dom';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import NotAuthorizedView from './NotAuthorizedView';
-import { useCustomer } from 'providers/CustomerProvider';
-import { Loader } from 'components/Common/Loader/Loader';
-import { Home } from 'react-feather';
 
 const CustomerLayoutContainer = styled(Div) <{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
@@ -209,7 +209,7 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
         <CustomerLayoutContainer isMobile={device.isSmall}>
 
           {isLoading && (
-            <CornerLoaderPosition >
+            <CornerLoaderPosition>
               <Loader testId="runner" />
             </CornerLoaderPosition>
           )}
@@ -221,6 +221,8 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
                     <UI.Flex alignItems="center">
                       <Logo width="60px" height="60px" justifyContent="center" />
                       <UI.Text>haas</UI.Text>
+                      {/* <FilledLogo mb={4} width="50px" height="50px" justifyContent="center" /> */}
+                      {/* <UI.Text>haas</UI.Text> */}
                     </UI.Flex>
                     <DashboardNav customerSlug={params.customerSlug} />
                   </Div>

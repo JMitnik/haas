@@ -1,5 +1,6 @@
 import * as UI from '@haas/ui';
-import { Briefcase, MessageCircle, User } from 'react-feather';
+import { Cell, Pie, PieChart } from 'recharts';
+import { User } from 'react-feather';
 import { slice } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useMemo } from 'react';
@@ -7,7 +8,6 @@ import React, { useMemo } from 'react';
 import { useFormatter } from 'hooks/useFormatter';
 
 import * as LS from './WorkspaceGrid.styles';
-import { BarStat } from './BarStat';
 import {
   HexagonDialogueNode,
   HexagonGroupNode,
@@ -15,13 +15,15 @@ import {
   HexagonState,
   HexagonTopicNode,
 } from './WorkspaceGrid.types';
-import { calcGroupTotal, orderNodesByScore, orderNodesByVoteCount } from './WorkspaceGrid.helpers';
+import { calcGroupTotal, getHexagonSVGFill, orderNodesByScore, orderNodesByVoteCount } from './WorkspaceGrid.helpers';
 
 interface WorkspaceGridPaneProps {
   currentState: HexagonState;
 }
 
 export const GroupPane = ({ currentState }: WorkspaceGridPaneProps) => {
+  const { t } = useTranslation();
+  const { formatScore } = useFormatter();
   const currentNode = currentState.currentNode as HexagonGroupNode;
 
   const sortedGroups = useMemo(() => orderNodesByVoteCount(currentNode.subGroups), [currentNode]);
@@ -30,61 +32,70 @@ export const GroupPane = ({ currentState }: WorkspaceGridPaneProps) => {
 
   return (
     <LS.WorkspaceGridPaneContainer>
+      <LS.PaneHeader>
+        <UI.Helper>
+          {t('group')}
+        </UI.Helper>
+        <UI.H4 mt={1}>
+          {currentNode.label}
+        </UI.H4>
+      </LS.PaneHeader>
       <UI.Div bg="white" pb={4}>
         <UI.Flex>
-          <UI.Div mr={2}>
-            <UI.Icon color="gray.500">
-              <Briefcase />
-            </UI.Icon>
-          </UI.Div>
-          <UI.Grid gridGap={1} style={{ flex: '100%' }}>
+          <UI.Grid gridGap={1} width="100%">
             <UI.Div>
-              <UI.H4>
-                {currentNode.label}
-              </UI.H4>
+              <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
+                <LS.WidgetCell>
+                  <UI.Span>
+                    Average rating
+                  </UI.Span>
+                  <UI.Span>
+                    {formatScore(currentNode.score)}
+                  </UI.Span>
+                  <UI.Span>
+                    score
+                  </UI.Span>
+                </LS.WidgetCell>
+              </UI.Grid>
+            </UI.Div>
 
-              <UI.Label bg="white" border="1px solid" borderColor="gray.300" mt={2}>
-                Group
-              </UI.Label>
+            <UI.Div mt={4} width="100%">
+              <UI.Flex alignItems="center" justifyContent="space-between">
+                <LS.WidgetCell>
+                  <UI.Span>
+                    Response count
+                  </UI.Span>
+                  <UI.Span>
+                    {totalVotes}
+                  </UI.Span>
+                  <UI.Span>
+                    responses
+                  </UI.Span>
+                </LS.WidgetCell>
 
-              <UI.Div mt={2}>
-                <UI.Flex>
-                  <UI.Div>
-                    <UI.Div>
-                      <UI.Span fontWeight={600} fontSize="2rem" color="gray.800">
-                        {totalVotes}
-                      </UI.Span>
-                    </UI.Div>
-                    <UI.Div color="gray.600">
-                      votes
-                    </UI.Div>
-                  </UI.Div>
-                </UI.Flex>
-              </UI.Div>
-
-              <UI.Div mt={4}>
-                <UI.Stack>
-                  {selectedGroups.map((group, index) => (
-                    <UI.Div key={index} width="100%">
-                      {typeof group === 'object' && group.type === HexagonNodeType.Dialogue && (
-                        <>
-                          <UI.Span fontWeight={500} color="gray.600">
-                            {group.label}
-                          </UI.Span>
-                          <BarStat
-                            brand="green"
-                            fraction={(group.dialogue.dialogueStatisticsSummary?.nrVotes ?? 0) / (totalVotes || 1)}
-                          />
-                        </>
-                      )}
-                    </UI.Div>
-                  ))}
-                </UI.Stack>
-              </UI.Div>
+                <UI.Div>
+                  <PieChart width={200} height={150}>
+                    <Pie
+                      data={selectedGroups.map((group) => ({ name: 'asdas', value: group.score }))}
+                      cx={100}
+                      cy={100}
+                      startAngle={180}
+                      endAngle={0}
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={10}
+                      dataKey="value"
+                    >
+                      {selectedGroups.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={getHexagonSVGFill(entry.score)} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </UI.Div>
+              </UI.Flex>
             </UI.Div>
           </UI.Grid>
         </UI.Flex>
-
       </UI.Div>
     </LS.WorkspaceGridPaneContainer>
   );
@@ -112,7 +123,7 @@ export const DialoguePane = ({ currentState }: WorkspaceGridPaneProps) => {
         <UI.Flex>
           <UI.Grid gridGap={1} width="100%">
             <UI.Div>
-              <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr 1fr']}>
+              <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <LS.WidgetCell>
                   <UI.Span>
                     Average rating
@@ -124,7 +135,11 @@ export const DialoguePane = ({ currentState }: WorkspaceGridPaneProps) => {
                     score
                   </UI.Span>
                 </LS.WidgetCell>
+              </UI.Grid>
+            </UI.Div>
 
+            <UI.Div mt={4} width="100%">
+              <UI.Flex alignItems="center" justifyContent="space-between">
                 <LS.WidgetCell>
                   <UI.Span>
                     Response count
@@ -136,23 +151,27 @@ export const DialoguePane = ({ currentState }: WorkspaceGridPaneProps) => {
                     responses
                   </UI.Span>
                 </LS.WidgetCell>
-              </UI.Grid>
-            </UI.Div>
 
-            <UI.Div mt={4}>
-              <UI.Stack>
-                {selectedTopics.map((group, index) => (
-                  <UI.Div key={index} width="100%">
-                    {typeof group === 'object' && group.type === HexagonNodeType.Topic && (
-                      <>
-                        <UI.Span fontWeight={500} color="gray.600">
-                          {group.topic.name}
-                        </UI.Span>
-                      </>
-                    )}
-                  </UI.Div>
-                ))}
-              </UI.Stack>
+                <UI.Div>
+                  <PieChart width={200} height={150}>
+                    <Pie
+                      data={selectedTopics.map((topic) => ({ name: 'asdas', value: topic.score }))}
+                      cx={100}
+                      cy={100}
+                      startAngle={180}
+                      endAngle={0}
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={10}
+                      dataKey="value"
+                    >
+                      {selectedTopics.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={getHexagonSVGFill(entry.score)} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </UI.Div>
+              </UI.Flex>
             </UI.Div>
           </UI.Grid>
         </UI.Flex>
@@ -166,30 +185,30 @@ type GroupSwitchItem = 'metadata' | 'actions' | 'activity';
 export const TopicPane = ({ currentState }: WorkspaceGridPaneProps) => {
   const currentNode = currentState.currentNode as HexagonTopicNode;
   const { formatScore } = useFormatter();
+  const { t } = useTranslation();
+
+  const sortedTopics = useMemo(() => orderNodesByScore(currentState.childNodes), [currentNode]);
+  const selectedTopics = useMemo(() => slice(sortedTopics, 0, 3), [sortedTopics]);
 
   return (
     <LS.WorkspaceGridPaneContainer>
+      <LS.PaneHeader>
+        <UI.Helper>
+          {t('topic')}
+        </UI.Helper>
+        <UI.H4 mt={1}>
+          {currentNode.topic.name}
+        </UI.H4>
+      </LS.PaneHeader>
       <UI.Div bg="white" pb={4}>
         <UI.Flex>
-          <UI.Div mr={2}>
-            <UI.Icon color="gray.500">
-              <MessageCircle />
-            </UI.Icon>
-          </UI.Div>
           <UI.Grid gridGap={1} width="100%">
             <UI.Div>
-              <UI.H4>
-                {currentNode.topic.name}
-              </UI.H4>
-
-              <UI.Label bg="white" border="1px solid" borderColor="gray.300" mt={2}>
-                Topic
-              </UI.Label>
-            </UI.Div>
-
-            <UI.Div>
-              <UI.Flex justifyContent="space-between">
+              <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <LS.WidgetCell>
+                  <UI.Span>
+                    Average rating
+                  </UI.Span>
                   <UI.Span>
                     {formatScore(currentNode.score)}
                   </UI.Span>
@@ -197,43 +216,46 @@ export const TopicPane = ({ currentState }: WorkspaceGridPaneProps) => {
                     score
                   </UI.Span>
                 </LS.WidgetCell>
-
-                <LS.WidgetCell>
-                  <UI.Span>
-                    Template
-                  </UI.Span>
-                  <UI.Span>
-                    Topic
-                  </UI.Span>
-                </LS.WidgetCell>
-              </UI.Flex>
+              </UI.Grid>
             </UI.Div>
 
+            <UI.Div mt={4} width="100%">
+              <UI.Flex alignItems="center" justifyContent="space-between">
+                <LS.WidgetCell>
+                  <UI.Span>
+                    Response count
+                  </UI.Span>
+                  <UI.Span>
+                    {currentNode.topic.nrVotes}
+                  </UI.Span>
+                  <UI.Span>
+                    responses
+                  </UI.Span>
+                </LS.WidgetCell>
+
+                <UI.Div>
+                  <PieChart width={200} height={150}>
+                    <Pie
+                      data={selectedTopics.map((topic) => ({ name: 'asdas', value: topic.score }))}
+                      cx={100}
+                      cy={100}
+                      startAngle={180}
+                      endAngle={0}
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={10}
+                      dataKey="value"
+                    >
+                      {selectedTopics.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={getHexagonSVGFill(entry.score)} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </UI.Div>
+              </UI.Flex>
+            </UI.Div>
           </UI.Grid>
         </UI.Flex>
-      </UI.Div>
-      <UI.Div
-        style={{ backgroundColor: '#f7f9fb' }}
-        borderTop="1px solid"
-        borderColor="gray.100"
-      >
-        <LS.SwitchWrapper>
-          <UI.Switch>
-            <UI.SwitchItem
-              className="active"
-            >
-              Metadata
-            </UI.SwitchItem>
-
-            <UI.SwitchItem>
-              Actions
-            </UI.SwitchItem>
-
-            <UI.SwitchItem>
-              Activity
-            </UI.SwitchItem>
-          </UI.Switch>
-        </LS.SwitchWrapper>
       </UI.Div>
     </LS.WorkspaceGridPaneContainer>
   );
