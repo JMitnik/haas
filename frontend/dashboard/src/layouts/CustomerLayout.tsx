@@ -21,13 +21,12 @@ import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 
 import { ReactComponent as WrenchIcon } from 'assets/icons/icon-wrench.svg';
 import { useTranslation } from 'react-i18next';
-import Logo, { FilledLogo } from 'components/Logo/Logo';
+import Logo from 'components/Logo/Logo';
 import MobileBottomNav from 'components/MobileBottomNav';
 import Sidenav from 'components/Sidenav';
 import useAuth from 'hooks/useAuth';
 import useMediaDevice from 'hooks/useMediaDevice';
 
-import { Home } from 'react-feather';
 import { Loader } from 'components/Common/Loader/Loader';
 import { NavLink } from 'react-router-dom';
 import { useCustomer } from 'providers/CustomerProvider';

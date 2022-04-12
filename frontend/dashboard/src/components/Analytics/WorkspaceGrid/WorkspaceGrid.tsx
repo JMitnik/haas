@@ -13,6 +13,7 @@ import { localPoint } from '@visx/event';
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
+import { Loader } from 'components/Common/Loader/Loader';
 import { useFormatter } from 'hooks/useFormatter';
 
 import * as LS from './WorkspaceGrid.styles';
@@ -26,7 +27,6 @@ import {
   HexagonViewMode,
 } from './WorkspaceGrid.types';
 import { HexagonItem } from './HexagonItem';
-import { Loader } from 'components/Common/Loader/Loader';
 import { TooltipBody } from './TooltipBody';
 import { WorkspaceGridPane } from './WorkspaceGridPane';
 
