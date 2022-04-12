@@ -1,7 +1,7 @@
 
 import { UserInputError } from 'apollo-server-express';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
-import { subDays } from 'date-fns';
+import { addDays, subDays } from 'date-fns';
 
 import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
@@ -16,6 +16,7 @@ import { isADate, isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueImpactScoreType, DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
+import { countBy, groupBy, maxBy, meanBy } from 'lodash';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -104,6 +105,16 @@ export const PathedSessionsInput = inputObjectType({
     t.string('startDateTime', { required: true });
     t.string('endDateTime');
     t.boolean('refresh', { default: false });
+  },
+});
+
+export const MostPopularPath = objectType({
+  name: 'MostPopularPath',
+  definition(t) {
+    t.list.string('path');
+    t.int('nrVotes');
+    t.string('group');
+    t.float('impactScore');
   },
 });
 
@@ -222,6 +233,68 @@ export const DialogueType = objectType({
           utcEndDateTime,
           args.input.refresh || false,
         ) as any;
+      },
+    });
+
+    t.field('mostPopularPath', {
+      type: MostPopularPath,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        const endDateTimeSet = !utcEndDateTime ? addDays(utcStartDateTime as Date, 7) : utcEndDateTime;
+
+        const sessions = await ctx.prisma.session.findMany({
+          where: {
+            dialogueId: parent.id,
+            createdAt: {
+              gte: utcStartDateTime as Date,
+              lte: endDateTimeSet,
+            },
+          },
+          include: {
+            nodeEntries: {
+              include: {
+                choiceNodeEntry: true,
+              },
+            },
+          },
+        });
+
+        const sessionWithDeepestEntry = sessions.map((session) => {
+          const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
+          return { sessionId: session.id, mainScore: session.mainScore, entry: deepest };
+        });
+
+        const groupedDeepEntrySessions = groupBy(sessionWithDeepestEntry, (session) => {
+          return session.entry?.choiceNodeEntry?.value;
+        });
+
+        const mostPrevalent = maxBy(Object.entries(groupedDeepEntrySessions), (entry) => {
+          return entry[1].length;
+        })
+
+        const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore);
+        const nrVotes = mostPrevalent?.[1].length;
+        const path: string[] = [mostPrevalent?.[0] as string]
+        const group = parent.title;
+
+        return { group, path, nrVotes: nrVotes || 0, impactScore: averageScore || 0 };
       },
     });
 

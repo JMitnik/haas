@@ -470,6 +470,7 @@ class SessionPrismaAdapter {
 
     return this.prisma.session.create({
       data: {
+        totalTimeInSec: Math.floor(Math.random() * 45 + 1),
         mainScore: data.simulatedRootVote,
         nodeEntries: {
           create: [{
