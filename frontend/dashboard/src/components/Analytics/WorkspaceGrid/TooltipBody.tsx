@@ -53,7 +53,6 @@ export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => 
           <UI.Flex alignItems="center" justifyContent="space-between">
             <UI.Div
               mr={2}
-              px={1}
               py={1}
               borderRadius={5}
               color="gray.700"
@@ -107,7 +106,6 @@ export const TooltipTopicBody = ({ node }: { node: HexagonTopicNode }) => {
           <UI.Flex alignItems="center" justifyContent="space-between">
             <UI.Div
               mr={2}
-              px={1}
               py={1}
               borderRadius={5}
               color="gray.700"
@@ -161,7 +159,6 @@ export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => {
           <UI.Flex alignItems="center" justifyContent="space-between">
             <UI.Div
               mr={2}
-              px={1}
               py={1}
               borderRadius={5}
               color="gray.700"
