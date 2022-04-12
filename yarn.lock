@@ -22486,6 +22486,11 @@ react-markdown@^5.0.2:
     unist-util-visit "^2.0.0"
     xtend "^4.0.1"
 
+react-modal-hook@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/react-modal-hook/-/react-modal-hook-3.0.0.tgz#24b2ff2acf288ef25c11e4fb11b329458a823ea3"
+  integrity sha512-mNkJwgEtOoIabuILlWnGAto993WVkimZASBWk/rAGZ6tNIqjx4faQtNdr/X31vw+QGfKhspXc4vPi1jbfkk2Yg==
+
 react-modal@3.12.1:
   version "3.12.1"
   resolved "https://registry.yarnpkg.com/react-modal/-/react-modal-3.12.1.tgz#38c33f70d81c33d02ff1ed115530443a3dc2afd3"

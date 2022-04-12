@@ -10,9 +10,11 @@ import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { Zoom } from '@visx/zoom';
 import { localPoint } from '@visx/event';
+import { useModal } from 'react-modal-hook';
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
+import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { Loader } from 'components/Common/Loader/Loader';
 import { useFormatter } from 'hooks/useFormatter';
 
@@ -104,6 +106,7 @@ export const WorkspaceGrid = ({
     viewMode: initialViewMode,
   });
   const { formatScore } = useFormatter();
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
 
   const activeDialogue = useMemo(() => {
     const activeNode = stateHistoryStack.find((state) => state.selectedNode?.type === HexagonNodeType.Dialogue);
@@ -132,13 +135,34 @@ export const WorkspaceGrid = ({
     });
   };
 
+  const [openInteractionModal, closeInteractionModal] = useModal(() => (
+    <UI.Modal isOpen onClose={() => setSessionId(undefined)}>
+      <InteractionModalCard
+        sessionId={sessionId || ''}
+        onClose={() => setSessionId(undefined)}
+      />
+    </UI.Modal>
+  ), [sessionId, setSessionId]);
+
+  useEffect(() => {
+    if (sessionId) {
+      openInteractionModal();
+    } else {
+      closeInteractionModal();
+    }
+  }, [sessionId]);
+
   const handleMouseOutHex = () => hideTooltip();
 
   const handleZoominLevel = async (currentZoomHelper: ProvidedZoom<SVGElement>, clickedNode: HexagonNode) => {
-    if (
-      currentState.viewMode === HexagonViewMode.Final
-      || currentState.viewMode === HexagonViewMode.Session) return;
     hideTooltip();
+
+    if (currentState.viewMode === HexagonViewMode.Final) return;
+
+    if (currentState.viewMode === HexagonViewMode.Session && clickedNode.type === HexagonNodeType.Session) {
+      setSessionId(clickedNode.session.id);
+      return;
+    }
 
     // Empty canvas and unset soom
     // currentZoomHelper.reset();
