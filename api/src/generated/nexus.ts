@@ -2192,9 +2192,6 @@ export interface NexusGenArgTypes {
     getPreviewData: { // args
       id?: string | null; // String
     }
-    me: { // args
-      workspaceId?: string | null; // String
-    }
     role: { // args
       input?: NexusGenInputs['FindRoleInput'] | null; // FindRoleInput
     }

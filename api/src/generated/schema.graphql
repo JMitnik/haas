@@ -1259,7 +1259,7 @@ type Query {
   getJob(id: String): CreateWorkspaceJobType
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
-  me(workspaceId: String): UserType!
+  me: UserType!
   refreshAccessToken: RefreshAccessTokenOutput!
   role(input: FindRoleInput): RoleType
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!

@@ -120,14 +120,19 @@ const PrivateDialoguesUserForm = ({
                 </UI.Flex>
                 <UI.Text px={1} py={1}>{dialogue.description}</UI.Text>
               </CheckBoxCard>
-
             )}
           />
         ))}
+
+        {!workspaceDialogues?.length && (
+          <UI.Flex gridColumn="1/-1" justifyContent="center">
+            No private dialogues available in this workspace...
+          </UI.Flex>
+        )}
       </UI.Grid>
 
       <UI.Flex justifyContent="flex-end" pt={2} pr={2}>
-        <UI.Button isLoading={loading} variantColor="teal" type="submit">
+        <UI.Button isLoading={loading} isDisabled={!workspaceDialogues?.length} variantColor="teal" type="submit">
           {t('save')}
         </UI.Button>
       </UI.Flex>

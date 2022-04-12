@@ -219,20 +219,13 @@ export const RootUserQueries = extendType({
   definition(t) {
     t.field('me', {
       type: UserType,
-      args: { 'workspaceId': 'String' },
       async resolve(parent, args, ctx) {
         if (!ctx.session?.user?.id) throw new ApolloError('No valid user');
         const userId = ctx.session?.user?.id;
 
-        const user = await ctx.services.userService.findUserContext(userId, args.workspaceId || undefined); //args.workspaceId
+        const user = await ctx.services.userService.findUserContext(userId);
 
         if (!user) throw new ApolloError('There is something wrong in our records. Please contact an admin.', 'UNAUTHENTIC');
-
-        const assignedDialogueIds = user?.isAssignedTo.map((dialogue) => dialogue.id);
-        const privateDialogues = {
-          assignedDialogueIds: assignedDialogueIds || [],
-          workspaceDialogues: user.customers[0].customer?.dialogues || [],
-        }
 
         return {
           email: user?.email,
@@ -240,7 +233,6 @@ export const RootUserQueries = extendType({
           firstName: user?.firstName,
           lastName: user?.lastName,
           phone: user?.phone,
-          privateDialogues,
         };
       },
     });

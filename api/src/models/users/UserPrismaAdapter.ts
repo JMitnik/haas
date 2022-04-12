@@ -259,33 +259,18 @@ class UserPrismaAdapter {
     });
   };
 
-  findUserContext(userId: string, workspaceId?: string) {
+  findUserContext(userId: string) {
     return this.prisma.user.findUnique({
       where: {
         id: userId,
       },
       include: {
-        isAssignedTo: {
-          where: {
-            customerId: workspaceId,
-          },
-        },
         customers: {
           include: {
-            customer: {
-              include: {
-                dialogues: {
-                  where: {
-                    isPrivate: true,
-                    customerId: workspaceId,
-                  },
-                },
-              },
-            },
+            customer: true,
             role: true,
           },
         },
-
       },
     });
   };

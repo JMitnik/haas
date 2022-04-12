@@ -153,8 +153,8 @@ class UserService {
     return this.userPrismaAdapter.getUsersByTriggerId(triggerId);
   };
 
-  findUserContext(userId: string, workspaceId?: string) {
-    return this.userPrismaAdapter.findUserContext(userId, workspaceId);
+  findUserContext(userId: string) {
+    return this.userPrismaAdapter.findUserContext(userId);
   };
 
   findEmailWithinWorkspace(emailAddress: string, workspaceId: string) {

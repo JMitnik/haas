@@ -1768,11 +1768,6 @@ export type QueryUserOfCustomerArgs = {
 };
 
 
-export type QueryMeArgs = {
-  workspaceId?: Maybe<Scalars['String']>;
-};
-
-
 export type QueryUsersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
 };
