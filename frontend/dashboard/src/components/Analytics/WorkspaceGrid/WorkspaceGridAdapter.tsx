@@ -1,4 +1,5 @@
 import * as UI from '@haas/ui';
+import { format, parse, sub } from 'date-fns';
 import React, { useMemo } from 'react';
 
 import {
@@ -22,6 +23,26 @@ interface WorkspaceGridAdapterProps {
   backgroundColor: string;
 }
 
+export const isValidDateTime = (dateString: string) => {
+  const formatString = dateString.split(':').length > 1 ? 'dd-MM-yyyy HH:mm' : 'dd-MM-yyyy';
+  const isStartDate = type === 'START_DATE';
+  const isWithTime = formatString === 'dd-MM-yyyy HH:mm';
+
+  const dateObject = parse(
+    dateString,
+    formatString,
+    new Date(),
+  );
+
+  const utcDate = zonedTimeToUtc(dateObject, 'UTC');
+
+  if (!(utcDate instanceof Date) || Number.isNaN(utcDate.getSeconds())) {
+    throw new UserInputError(isStartDate ? 'Start date invalid' : 'End date invalid');
+  }
+
+  return utcDate;
+};
+
 /**
  * Implements the WorkspaceGrid component, by fetching data.
  * @param param0
@@ -36,8 +57,8 @@ export const WorkspaceGridAdapter = ({
 
   const { data } = useGetWorkspaceDialogueStatisticsQuery({
     variables: {
-      startDateTime: '01-01-2022',
-      endDateTime: '01-07-2022',
+      startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
+      endDateTime: format(new Date(), 'dd-MM-yyyy'),
       workspaceId: activeCustomer?.id || '',
     },
     fetchPolicy: 'cache-and-network',
