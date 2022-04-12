@@ -1,4 +1,5 @@
 import * as UI from '@haas/ui';
+import { format, sub } from 'date-fns';
 import React, { useMemo } from 'react';
 
 import {
@@ -36,8 +37,8 @@ export const WorkspaceGridAdapter = ({
 
   const { data } = useGetWorkspaceDialogueStatisticsQuery({
     variables: {
-      startDateTime: '01-01-2022',
-      endDateTime: '01-07-2022',
+      startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
+      endDateTime: format(new Date(), 'dd-MM-yyyy'),
       workspaceId: activeCustomer?.id || '',
     },
     fetchPolicy: 'cache-and-network',
@@ -62,7 +63,8 @@ export const WorkspaceGridAdapter = ({
       input: {
         value: options.topic || '',
         isRoot: !options.topic,
-        startDateTime: '24-03-2022',
+        startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
+        endDateTime: format(new Date(), 'dd-MM-yyyy'),
         impactScoreType: DialogueImpactScoreType.Average,
       },
     });
