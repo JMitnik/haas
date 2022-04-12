@@ -80,7 +80,8 @@ export const WorkspaceGridAdapter = ({
 
     const { data: sessionData } = await fetchGetSessions({
       input: {
-        startDateTime: '24-03-2022',
+        startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
+        endDateTime: format(new Date(), 'dd-MM-yyyy'),
         path: options.topics || [],
         refresh: false,
       },
