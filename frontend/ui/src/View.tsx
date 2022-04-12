@@ -83,7 +83,7 @@ ${({ theme, isCompact }) => css`
 export const ViewBody = styled(Div) <{ isCompact?: boolean; }>`
 ${({ theme, isCompact, padding }) => css`
   margin: 0 auto;
-  padding: ${padding ?? theme.gutter}px;
+  padding: ${theme.gutter}px;
   background: ${theme.colors.gray[50]};
 
   ${isCompact && css`
