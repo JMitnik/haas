@@ -27,6 +27,22 @@ class UserService {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
   };
 
+  assignUserToPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
+    const updatedUser = await this.userPrismaAdapter.updateUserPrivateDialogues(input);
+
+    const allPrivateDialoguesWorkspace = await this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(
+      input.workspaceId
+    );
+
+    return {
+      ...updatedUser,
+      privateDialogues: {
+        assignedDialogues: updatedUser.isAssignedTo || [],
+        privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+      },
+    }
+  }
+
   async deleteUser(userId: string, customerId: string): Promise<DeletedUserOutput> {
     const removedUser = await this.userOfCustomerPrismaAdapter.delete(userId, customerId);
     if (removedUser) return { deletedUser: true };

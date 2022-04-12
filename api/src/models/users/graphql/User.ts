@@ -234,8 +234,6 @@ export const RootUserQueries = extendType({
           workspaceDialogues: user.customers[0].customer?.dialogues || [],
         }
 
-        // console.log('Private dialogues: ', privateDialogues);
-
         return {
           email: user?.email,
           id: user?.id,
@@ -289,48 +287,10 @@ export const AssignUserToDialogues = mutationField('assignUserToDialogues', {
   args: { input: AssignUserToDialoguesInput },
   nullable: true,
   async resolve(parent, args, ctx) {
+    if (!args.input) throw new UserInputError('No input provided!');
+
     // TODO: Probably want to check if set dialogues belong to specified workspace
-
-    const updatedUser = await ctx.prisma.user.update({
-      where: {
-        id: args.input?.userId,
-      },
-      data: {
-        isAssignedTo: {
-          disconnect: args.input?.delistedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
-          deleteMany: {
-            id: {
-              in: args.input?.delistedDialogueIds,
-            },
-          },
-          connect: args.input?.assignedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
-        },
-      },
-      include: {
-        isAssignedTo: true,
-      },
-    });
-
-    const allPrivateDialoguesWorkspace = await ctx.prisma.customer.findUnique({
-      where: {
-        id: args.input?.workspaceId,
-      },
-      include: {
-        dialogues: {
-          where: {
-            isPrivate: true,
-          },
-        },
-      },
-    });
-
-    return {
-      ...updatedUser,
-      privateDialogues: {
-        assignedDialogues: updatedUser.isAssignedTo || [],
-        privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
-      },
-    }
+    return ctx.services.userService.assignUserToPrivateDialogues(args.input)
   },
 })
 

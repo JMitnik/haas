@@ -15,6 +15,28 @@ class UserPrismaAdapter {
     this.roleService = new RoleService(prismaClient);
   }
 
+  updateUserPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
+    return this.prisma.user.update({
+      where: {
+        id: input?.userId,
+      },
+      data: {
+        isAssignedTo: {
+          disconnect: input?.delistedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
+          deleteMany: {
+            id: {
+              in: input?.delistedDialogueIds,
+            },
+          },
+          connect: input?.assignedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
+        },
+      },
+      include: {
+        isAssignedTo: true,
+      },
+    });
+  }
+
   /**
    * Find all workspaces belonging to user id.
    * @param userId

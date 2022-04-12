@@ -11,6 +11,21 @@ export class CustomerPrismaAdapter {
     this.prisma = prisma;
   }
 
+  findPrivateDialoguesOfWorkspace = async (workspaceId: string) => {
+    return this.prisma.customer.findUnique({
+      where: {
+        id: workspaceId,
+      },
+      include: {
+        dialogues: {
+          where: {
+            isPrivate: true,
+          },
+        },
+      },
+    });
+  }
+
   async deleteFontSettings(fontSettingsId: number): Promise<FontSettings> {
     return this.prisma.fontSettings.delete({
       where: {
@@ -115,7 +130,7 @@ export class CustomerPrismaAdapter {
   async getAllCustomersBySlug(customerSlug?: string | null) {
     return this.prisma.customer.findMany({
       where: {
-        slug: customerSlug || undefined
+        slug: customerSlug || undefined,
       },
     });
   };
@@ -173,10 +188,10 @@ export class CustomerPrismaAdapter {
             colourSettings: input.primaryColour ? {
               update: {
                 primary: input.primaryColour,
-              }
+              },
             } : undefined,
-          }
-        } : undefined
+          },
+        } : undefined,
       },
       include: {
         settings: {

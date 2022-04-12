@@ -30,6 +30,10 @@ class CustomerService {
     this.nodeService = new NodeService(prismaClient);
   }
 
+  findPrivateDialoguesOfWorkspace = async (workspaceId: string) => {
+    return this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(workspaceId);
+  }
+
   /**
    * Get a dialogue based on workspace ID and dialogue Slug.
    * @param customerId Workspace ID
@@ -174,7 +178,7 @@ class CustomerService {
       slug: input.slug,
       logoOpacity: input.logoOpacity,
       logoUrl: input.logo,
-      primaryColour: input.primaryColour
+      primaryColour: input.primaryColour,
     });
 
     return customer;
