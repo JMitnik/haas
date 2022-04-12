@@ -1,6 +1,7 @@
 import * as UI from '@haas/ui';
-import { Briefcase, MessageCircle, User, Users } from 'react-feather';
+import { Briefcase, MessageCircle, User } from 'react-feather';
 import { slice } from 'lodash';
+import { useTranslation } from 'react-i18next';
 import React, { useMemo } from 'react';
 
 import { useFormatter } from 'hooks/useFormatter';
@@ -90,6 +91,7 @@ export const GroupPane = ({ currentState }: WorkspaceGridPaneProps) => {
 };
 
 export const DialoguePane = ({ currentState }: WorkspaceGridPaneProps) => {
+  const { t } = useTranslation();
   const currentNode = currentState.currentNode as HexagonDialogueNode;
   const { formatScore } = useFormatter();
 
@@ -98,27 +100,23 @@ export const DialoguePane = ({ currentState }: WorkspaceGridPaneProps) => {
 
   return (
     <LS.WorkspaceGridPaneContainer>
+      <LS.PaneHeader>
+        <UI.Helper>
+          {t('team')}
+        </UI.Helper>
+        <UI.H4 mt={1}>
+          {currentNode.label}
+        </UI.H4>
+      </LS.PaneHeader>
       <UI.Div bg="white" pb={4}>
         <UI.Flex>
-          <UI.Div mr={2}>
-            <UI.Icon color="gray.500">
-              <Users />
-            </UI.Icon>
-          </UI.Div>
           <UI.Grid gridGap={1} width="100%">
             <UI.Div>
-              <UI.H4>
-                {currentNode.label}
-              </UI.H4>
-
-              <UI.Label bg="white" border="1px solid" borderColor="gray.300" mt={2}>
-                Team
-              </UI.Label>
-            </UI.Div>
-
-            <UI.Div>
-              <UI.Flex justifyContent="space-between">
-                <LS.WidgetCell brand="good">
+              <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr 1fr']}>
+                <LS.WidgetCell>
+                  <UI.Span>
+                    Average rating
+                  </UI.Span>
                   <UI.Span>
                     {formatScore(currentNode.dialogue.dialogueStatisticsSummary?.impactScore || undefined)}
                   </UI.Span>
@@ -126,7 +124,19 @@ export const DialoguePane = ({ currentState }: WorkspaceGridPaneProps) => {
                     score
                   </UI.Span>
                 </LS.WidgetCell>
-              </UI.Flex>
+
+                <LS.WidgetCell>
+                  <UI.Span>
+                    Response count
+                  </UI.Span>
+                  <UI.Span>
+                    {currentNode.dialogue.dialogueStatisticsSummary?.nrVotes}
+                  </UI.Span>
+                  <UI.Span>
+                    responses
+                  </UI.Span>
+                </LS.WidgetCell>
+              </UI.Grid>
             </UI.Div>
 
             <UI.Div mt={4}>
@@ -146,29 +156,6 @@ export const DialoguePane = ({ currentState }: WorkspaceGridPaneProps) => {
             </UI.Div>
           </UI.Grid>
         </UI.Flex>
-      </UI.Div>
-      <UI.Div
-        style={{ backgroundColor: '#f7f9fb' }}
-        borderTop="1px solid"
-        borderColor="gray.100"
-      >
-        <LS.SwitchWrapper>
-          <UI.Switch>
-            <UI.SwitchItem
-              className="active"
-            >
-              Metadata
-            </UI.SwitchItem>
-
-            <UI.SwitchItem>
-              Actions
-            </UI.SwitchItem>
-
-            <UI.SwitchItem>
-              Activity
-            </UI.SwitchItem>
-          </UI.Switch>
-        </LS.SwitchWrapper>
       </UI.Div>
     </LS.WorkspaceGridPaneContainer>
   );
@@ -202,7 +189,7 @@ export const TopicPane = ({ currentState }: WorkspaceGridPaneProps) => {
 
             <UI.Div>
               <UI.Flex justifyContent="space-between">
-                <LS.WidgetCell brand="good">
+                <LS.WidgetCell>
                   <UI.Span>
                     {formatScore(currentNode.score)}
                   </UI.Span>
@@ -211,7 +198,7 @@ export const TopicPane = ({ currentState }: WorkspaceGridPaneProps) => {
                   </UI.Span>
                 </LS.WidgetCell>
 
-                <LS.WidgetCell brand="good">
+                <LS.WidgetCell>
                   <UI.Span>
                     Template
                   </UI.Span>

@@ -102,7 +102,6 @@ export const WorkspaceGridPaneContainer = styled(UI.Div)`
 
     > *:first-child {
       border-radius: 12px 12px 0 0;
-      padding-bottom: 54px;
     }
 
     > *:last-child {
@@ -120,6 +119,24 @@ export const WorkspaceGridPaneContainer = styled(UI.Div)`
       font-size: 0.9rem;
       font-weight: 400;
       color: ${theme.colors.gray[500]};
+    }
+  `}
+`;
+
+export const PaneHeader = styled(UI.Div)`
+  ${({ theme }) => css`
+    background: ${theme.colors.gray[50]};
+    border-radius: 20px 20px 0 0;
+    padding: ${theme.gutter / 2}px ${theme.gutter}px;
+    border-bottom: ${theme.colors.gray[100]} 1px solid;
+
+    ${UI.H4} {
+      font-weight: 600;
+      color: ${theme.colors.gray[600]};
+    }
+
+    ${UI.Helper} {
+      color: ${theme.colors.gray[400]};
     }
   `}
 `;
@@ -156,38 +173,27 @@ export const SwitchWrapper = styled(UI.Div)`
   `}
 `;
 
-type Brand = 'bad' | 'good' | 'neutral';
-
-interface WidgetCellProps {
-  brand: Brand;
-}
-
-export const WidgetCell = styled(UI.Div)<WidgetCellProps>`
-  ${({ theme, brand }) => css`
-    border-radius: 6px;
-    /* border: 1px solid ${theme.colors.gray[100]}; */
-
-    ${brand === 'bad' && css`
-      color: #fc5985;
-    `}
-
-    ${brand === 'neutral' && css`
-      color: #50507b;
-    `}
-
-    ${brand === 'good' && css`
-      color: #17897b;
-    `}
-
+export const WidgetCell = styled(UI.Div)`
+  ${({ theme }) => css`
     ${UI.Span}:first-child {
+      font-weight: 400;
+      font-size: 0.9rem;
+      color: ${theme.colors.gray[500]};
+    }
+
+    ${UI.Span}:nth-child(2) {
       font-size: 2rem;
       font-weight: 600;
+      line-height: 1.5;
       display: block;
       margin-bottom: 0;
+      color: ${theme.colors.gray[600]};
     }
 
     ${UI.Span}:last-child {
-      font-size: 1rem;
+      font-weight: 400;
+      font-size: 0.9rem;
+      color: ${theme.colors.gray[400]};
     }
   `}
 `;
