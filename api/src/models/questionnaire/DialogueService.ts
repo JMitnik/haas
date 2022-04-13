@@ -1,5 +1,5 @@
 import { addDays, differenceInHours, subDays } from 'date-fns';
-import _, { groupBy, maxBy, meanBy, sample, uniq, uniqBy } from 'lodash';
+import _, { groupBy, maxBy, meanBy, merge, sample, uniq, uniqBy } from 'lodash';
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
@@ -49,6 +49,92 @@ class DialogueService {
     this.nodeService = new NodeService(prismaClient);
   }
 
+  findMostChangedPath = async (
+    dialogueId: string,
+    dialogueTitle: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const groupedDeepEntrySessions = await this.findGroupedDeepestEntrySessions(
+      dialogueId,
+      startDateTime,
+      endDateTimeSet,
+      false
+    );
+
+    // This week/month/24hr should be set through front-end but for now hardcoded 7 days
+    const prevStartDateTime = subDays(startDateTime as Date, 7);
+    const prevEndDateTime = startDateTime;
+
+    const prevGroupedDeepEntrySessions = await this.findGroupedDeepestEntrySessions(
+      dialogueId,
+      prevStartDateTime,
+      prevEndDateTime,
+      true
+    );
+
+    const uniqueKeys = uniq([...Object.keys(groupedDeepEntrySessions), ...Object.keys(prevGroupedDeepEntrySessions)])
+
+    const optionDeltas = uniqueKeys.map((key) => {
+      const optionSessionArray = groupedDeepEntrySessions[key];
+      const optionPrevSessionArray = prevGroupedDeepEntrySessions[key];
+
+      // If doesn't exist in one of the two dictionaries => cannot calculate average nor delta
+      if (!groupedDeepEntrySessions[key] || !prevGroupedDeepEntrySessions[key]) {
+        return undefined;
+      }
+
+      const averageCurr = meanBy(optionSessionArray, (entry) => entry.mainScore);
+      const averagePrev = meanBy(optionPrevSessionArray, (entry) => entry.mainScore);
+      const delta = Math.max(averageCurr, averagePrev) - Math.min(averageCurr, averagePrev);
+      const percentageChange = ((averageCurr - averagePrev) / averagePrev) * 100;
+
+      return { option: key, averageCurr, averagePrev, delta, percentageChange };
+    }).filter(isPresent);
+
+    const mostChanged = maxBy(optionDeltas, (optionDelta) => {
+      if (!optionDelta?.percentageChange) return 0;
+      return Math.sign(optionDelta.percentageChange) === -1
+        ? -1 * optionDelta.percentageChange
+        : optionDelta.percentageChange;
+    });
+
+    console.log('Most changed: ', mostChanged);
+
+    const group = dialogueTitle;
+    const path: string[] = [mostChanged?.option as string];
+
+    return { group, path, percentageChanged: mostChanged?.percentageChange || 0 };
+  };
+
+  findGroupedDeepestEntrySessions = async (
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+    isPrev: boolean
+  ) => {
+    const sessions = await this.sessionPrismaAdapter.findSessionByDialogueIdBetweenDates(
+      dialogueId,
+      startDateTime,
+      endDateTime,
+    );
+
+    const sessionWithDeepestEntry = sessions.map((session) => {
+      const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
+      return { sessionId: session.id, mainScore: session.mainScore, entry: deepest, prev: isPrev };
+    });
+
+    const groupedDeepEntrySessions = groupBy(sessionWithDeepestEntry, (session) => {
+      return session.entry?.choiceNodeEntry?.value;
+    });
+
+    return groupedDeepEntrySessions;
+  }
+
   findMostPopularPath = async (
     dialogueId: string,
     dialogueTitle: string,
@@ -59,20 +145,12 @@ class DialogueService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
-    const sessions = await this.sessionPrismaAdapter.findSessionByDialogueIdBetweenDates(
+    const groupedDeepEntrySessions = await this.findGroupedDeepestEntrySessions(
       dialogueId,
       startDateTime,
       endDateTimeSet,
+      false
     );
-
-    const sessionWithDeepestEntry = sessions.map((session) => {
-      const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
-      return { sessionId: session.id, mainScore: session.mainScore, entry: deepest };
-    });
-
-    const groupedDeepEntrySessions = groupBy(sessionWithDeepestEntry, (session) => {
-      return session.entry?.choiceNodeEntry?.value;
-    });
 
     const mostPrevalent = maxBy(Object.entries(groupedDeepEntrySessions), (entry) => {
       return entry[1].length;

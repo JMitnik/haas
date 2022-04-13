@@ -118,6 +118,15 @@ export const MostPopularPath = objectType({
   },
 });
 
+export const MostChangedPath = objectType({
+  name: 'MostChangedPath',
+  definition(t) {
+    t.list.string('path');
+    t.string('group');
+    t.float('percentageChanged');
+  },
+});
+
 export const DialogueType = objectType({
   name: 'Dialogue',
 
@@ -233,6 +242,38 @@ export const DialogueType = objectType({
           utcEndDateTime,
           args.input.refresh || false,
         ) as any;
+      },
+    });
+
+    t.field('mostChangedPath', {
+      type: MostChangedPath,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueService.findMostChangedPath(
+          parent.id,
+          parent.title,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
       },
     });
 

@@ -649,6 +649,7 @@ type Dialogue {
   isWithoutGenData: Boolean!
   language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
+  mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   pathedSessionsConnection(input: PathedSessionsInput): PathedSessionsType
   postLeafNode: DialogueFinisherObjectType
@@ -1040,6 +1041,12 @@ input MassSeedInput {
   maxGroups: Int!
   maxSessions: Int!
   maxTeams: Int!
+}
+
+type MostChangedPath {
+  group: String!
+  path: [String!]!
+  percentageChanged: Float!
 }
 
 type MostPopularPath {
