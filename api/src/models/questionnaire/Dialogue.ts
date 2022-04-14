@@ -108,13 +108,33 @@ export const PathedSessionsInput = inputObjectType({
   },
 });
 
-export const MostPopularPath = objectType({
-  name: 'MostPopularPath',
+export const MostTrendingTopic = objectType({
+  name: 'MostTrendingTopic',
   definition(t) {
     t.list.string('path');
     t.int('nrVotes');
     t.string('group');
     t.float('impactScore');
+  },
+});
+
+export const PathTopic = objectType({
+  name: 'PathTopic',
+  definition(t) {
+    t.int('nrVotes');
+    t.int('depth');
+    t.string('topic');
+    t.float('impactScore');
+  },
+});
+
+export const MostPopularPath = objectType({
+  name: 'MostPopularPath',
+  definition(t) {
+    t.list.field('path', {
+      type: PathTopic,
+    });
+    t.string('group');
   },
 });
 
@@ -245,6 +265,38 @@ export const DialogueType = objectType({
       },
     });
 
+    t.field('mostPopularPath', {
+      type: MostPopularPath,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueService.findMostPopularPath(
+          parent.id,
+          parent.title,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
+      },
+    });
+
     t.field('mostChangedPath', {
       type: MostChangedPath,
       nullable: true,
@@ -277,8 +329,8 @@ export const DialogueType = objectType({
       },
     });
 
-    t.field('mostPopularPath', {
-      type: MostPopularPath,
+    t.field('mostTrendingTopic', {
+      type: MostTrendingTopic,
       nullable: true,
       args: {
         input: DialogueStatisticsSummaryFilterInput,
@@ -298,7 +350,7 @@ export const DialogueType = objectType({
           utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
         }
 
-        return ctx.services.dialogueService.findMostPopularPath(
+        return ctx.services.dialogueService.findMostTrendingTopic(
           parent.id,
           parent.title,
           args.input.impactType,

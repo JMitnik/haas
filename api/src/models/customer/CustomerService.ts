@@ -143,7 +143,7 @@ class CustomerService {
 
   }
 
-  findNestedMostPopularPath = async (
+  findNestedMostTrendingTopic = async (
     customerId: string,
     impactScoreType: DialogueImpactScore,
     startDateTime: Date,

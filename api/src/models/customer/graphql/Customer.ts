@@ -1,4 +1,4 @@
-import { ColourSettings, Customer, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, SliderNodeEntry } from '@prisma/client';
+import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
@@ -13,9 +13,7 @@ import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
 import { AutomationModel } from '../../automations/graphql/AutomationModel';
 import { AutomationConnection, AutomationConnectionFilterInput } from '../../automations/graphql/AutomationConnection';
 import { isValidDateTime } from '../../../utils/isValidDate';
-import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostPopularPath } from '../../questionnaire';
-import { addDays } from 'date-fns';
-import { groupBy, maxBy, meanBy } from 'lodash';
+import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -106,8 +104,8 @@ export const CustomerType = objectType({
       },
     });
 
-    t.field('nestedMostPopular', {
-      type: MostPopularPath,
+    t.field('nestedMostTrendingTopic', {
+      type: MostTrendingTopic,
       nullable: true,
       args: {
         input: DialogueStatisticsSummaryFilterInput,
@@ -129,7 +127,7 @@ export const CustomerType = objectType({
           utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
         }
 
-        return ctx.services.customerService.findNestedMostPopularPath(
+        return ctx.services.customerService.findNestedMostTrendingTopic(
           parent.id,
           args.input.impactType,
           utcStartDateTime as Date,

@@ -499,7 +499,7 @@ type Customer {
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
-  nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
@@ -652,6 +652,7 @@ type Dialogue {
   leafs(searchTerm: String): [QuestionNode!]!
   mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   pathedSessionsConnection(input: PathedSessionsInput): PathedSessionsType
   postLeafNode: DialogueFinisherObjectType
   publicTitle: String
@@ -1052,6 +1053,11 @@ type MostChangedPath {
 
 type MostPopularPath {
   group: String!
+  path: [PathTopic!]!
+}
+
+type MostTrendingTopic {
+  group: String!
   impactScore: Float!
   nrVotes: Int!
   path: [String!]!
@@ -1250,6 +1256,13 @@ type PathedSessionsType {
   path: [String!]!
   pathedSessions: [Session!]!
   startDateTime: String!
+}
+
+type PathTopic {
+  depth: Int!
+  impactScore: Float!
+  nrVotes: Int!
+  topic: String!
 }
 
 input PermissionIdsInput {

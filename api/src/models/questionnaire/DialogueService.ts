@@ -1,5 +1,5 @@
 import { addDays, differenceInHours, subDays } from 'date-fns';
-import _, { groupBy, maxBy, meanBy, merge, sample, uniq, uniqBy } from 'lodash';
+import _, { countBy, groupBy, maxBy, meanBy, merge, sample, uniq, uniqBy } from 'lodash';
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
@@ -49,6 +49,105 @@ class DialogueService {
     this.nodeService = new NodeService(prismaClient);
   }
 
+  /**
+   * Finds the most popular traversed path between two dates for a dialogue
+   * @param dialogueId 
+   * @param dialogueTitle 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
+  findMostPopularPath = async (
+    dialogueId: string,
+    dialogueTitle: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const sessions = await this.sessionPrismaAdapter.findSessionByDialogueIdBetweenDates(
+      dialogueId,
+      startDateTime,
+      endDateTimeSet,
+    );
+
+    const mostPopularTopicPath = this.findMostPopularTopic(sessions);
+
+    return { path: mostPopularTopicPath, group: dialogueTitle };
+  };
+
+  /**
+   * Recursively find the most iterated path taken within a list of sessions
+   * @param sessions 
+   * @param path a list of path entries containing info on the topic, frequency and impactScore
+   * @param depth the depth of node entries which should be looked at
+   * @returns a list of path entries containing info on the topic, frequency and impactScore
+   */
+  findMostPopularTopic = (
+    sessions: (Session & {
+      nodeEntries: (NodeEntry & {
+        sliderNodeEntry: SliderNodeEntry | null;
+        choiceNodeEntry: ChoiceNodeEntry | null;
+      })[];
+    })[],
+    path: { topic: string; nrVotes: number; depth: number; impactScore: number }[] = [],
+    depth: number = 1,
+  ): { topic: string; nrVotes: number; depth: number; impactScore: number }[] => {
+    const targetDepthEntries = sessions.map((session) => {
+      const targetEntry = session.nodeEntries.find((entry) => entry.depth === depth);
+      if (!targetEntry) return undefined;
+
+      return { sessionMainScore: session.mainScore, targetEntry };
+    }).filter(isPresent);
+
+    if (!targetDepthEntries.length) return path;
+
+    const groupedTargetDepthEntries = groupBy(targetDepthEntries,
+      (entry) => entry.targetEntry?.choiceNodeEntry?.value
+    );
+    const topicOccurences = Object.entries(groupedTargetDepthEntries).map((entry) => {
+      const topic = entry[0];
+      const occurences = entry[1]?.length;
+      const impactScore = meanBy(entry[1], (entry) => entry.sessionMainScore);
+      return { topic, occurences, impactScore };
+    });
+
+    const winnerTopic = maxBy(topicOccurences, (topic) => topic.occurences);
+    if (!winnerTopic?.topic) return path;
+
+    path.push({
+      topic: winnerTopic.topic,
+      nrVotes: winnerTopic.occurences,
+      depth,
+      impactScore: winnerTopic.impactScore,
+    });
+
+    const sessionsFilteredByTopic = sessions.filter(
+      (session) => {
+        return session.nodeEntries.find(
+          (entry) => entry.depth === depth && entry.choiceNodeEntry?.value === winnerTopic?.topic
+        );
+      });
+
+    depth++;
+
+    return this.findMostPopularTopic(sessionsFilteredByTopic, path, depth);
+  };
+
+  /**
+   * Finds the percentage change of the frequency of a path topic between two dates
+   * @param dialogueId 
+   * @param dialogueTitle 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
   findMostChangedPath = async (
     dialogueId: string,
     dialogueTitle: string,
@@ -103,8 +202,6 @@ class DialogueService {
         : optionDelta.percentageChange;
     });
 
-    console.log('Most changed: ', mostChanged);
-
     const group = dialogueTitle;
     const path: string[] = [mostChanged?.option as string];
 
@@ -135,7 +232,7 @@ class DialogueService {
     return groupedDeepEntrySessions;
   }
 
-  findMostPopularPath = async (
+  findMostTrendingTopic = async (
     dialogueId: string,
     dialogueTitle: string,
     impactScoreType: DialogueImpactScore,
