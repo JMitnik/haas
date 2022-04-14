@@ -1468,6 +1468,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     name: string; // String!
     nestedDialogueStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][] | null; // [DialogueStatisticsSummaryModel!]
+    nestedMostChanged: NexusGenRootTypes['MostChangedPath'] | null; // MostChangedPath
     nestedMostPopular: NexusGenRootTypes['MostPopularPath'] | null; // MostPopularPath
     roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
@@ -2056,6 +2057,9 @@ export interface NexusGenArgTypes {
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
     }
     nestedDialogueStatisticsSummary: { // args
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
+    nestedMostChanged: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     nestedMostPopular: { // args

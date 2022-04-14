@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache } from '@prisma/client';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, ChoiceNodeEntry, NodeEntry, Session } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -11,11 +11,12 @@ import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
-import { groupBy, maxBy, meanBy } from 'lodash';
+import { groupBy, maxBy, meanBy, uniq } from 'lodash';
 import cuid from 'cuid';
-import { addDays, differenceInHours, isEqual } from 'date-fns';
+import { addDays, differenceInHours, isEqual, subDays } from 'date-fns';
 import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
 import NodeEntryService from '../node-entry/NodeEntryService';
+import { isPresent } from 'ts-is-present';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -36,6 +37,110 @@ class CustomerService {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
     this.nodeEntryService = new NodeEntryService(prismaClient);
+  }
+
+  findNestedMostChangedPath = async (
+    customerId: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    // This week/month/24hr should be set through front-end but for now hardcoded 7 days
+    const prevStartDateTime = subDays(startDateTime as Date, 7);
+
+    const sessions = await this.customerPrismaAdapter.findChoiceNodeSessionsWithinDates(
+      customerId,
+      prevStartDateTime,
+      endDateTimeSet,
+    );
+
+    const splittedSessions = sessions.reduce(
+      (previousValue, session) => {
+        const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
+        const item = {
+          sessionId: session.id,
+          dialogueId: session.dialogueId,
+          mainScore: session.mainScore,
+          entry: deepest,
+          prev: true,
+        };
+        if (session.createdAt < startDateTime) {
+          previousValue.prevData.push(item);
+          return previousValue;
+        } else {
+          item.prev = false;
+          previousValue.currData.push(item);
+          return previousValue;
+        }
+      }, {
+      prevData: [] as ({
+        sessionId: string;
+        dialogueId: string;
+        mainScore: number;
+        entry: (NodeEntry & {
+          choiceNodeEntry: ChoiceNodeEntry | null;
+        }) | undefined;
+        prev: boolean;
+      })[], currData: [] as ({
+        sessionId: string;
+        dialogueId: string;
+        mainScore: number;
+        entry: (NodeEntry & {
+          choiceNodeEntry: ChoiceNodeEntry | null;
+        }) | undefined;
+        prev: boolean;
+      })[],
+    });
+
+    const prevDataGroupedOptions = groupBy(splittedSessions.prevData, (session) => {
+      return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;
+    });
+
+    const currDataGroupedOptions = groupBy(splittedSessions.currData, (session) => {
+      return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;
+    });
+
+    const uniqueKeys = uniq([...Object.keys(prevDataGroupedOptions), ...Object.keys(currDataGroupedOptions)])
+
+    const optionDeltas = uniqueKeys.map((key) => {
+      const optionSessionArray = currDataGroupedOptions[key];
+      const optionPrevSessionArray = prevDataGroupedOptions[key];
+
+      // If doesn't exist in one of the two dictionaries => cannot calculate average nor delta
+      if (!currDataGroupedOptions[key] || !prevDataGroupedOptions[key]) {
+        return undefined;
+      }
+
+      const averageCurr = meanBy(optionSessionArray, (entry) => entry.mainScore);
+      const averagePrev = meanBy(optionPrevSessionArray, (entry) => entry.mainScore);
+      const delta = Math.max(averageCurr, averagePrev) - Math.min(averageCurr, averagePrev);
+      const percentageChange = ((averageCurr - averagePrev) / averagePrev) * 100;
+
+      const dialogueId = key.split('_')?.[0] || '';
+
+      return { option: key, averageCurr, averagePrev, delta, percentageChange, dialogueId: dialogueId };
+    }).filter(isPresent);
+
+    const mostChanged = maxBy(optionDeltas, (optionDelta) => {
+      if (!optionDelta?.percentageChange) return 0;
+      return Math.sign(optionDelta.percentageChange) === -1
+        ? -1 * optionDelta.percentageChange
+        : optionDelta.percentageChange;
+    });
+
+    console.log('Most changed: ', mostChanged);
+
+    const dialogue = await this.dialogueService.getDialogueById(mostChanged?.dialogueId as string);
+
+    const group = dialogue?.title || 'No Dialogue found';
+    const path: string[] = [mostChanged?.option as string];
+
+    return { group, path, percentageChanged: mostChanged?.percentageChange || 0 };
+
+
   }
 
   findNestedMostPopularPath = async (
