@@ -855,66 +855,76 @@ class DialogueService {
     const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
 
     // Stop if no rootnode
-    if (!rootNode) return;
+    if (!rootNode) throw 'No root';
 
     // For every particular date, generate a fake score
-    await Promise.all(datesBackInTime.map(async (backDate) => {
-      const amtSessions = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
-      await Promise.all([...Array(amtSessions)].map(async () => {
-        const simulatedRootVote: number = getRandomInt(100);
+    for (var i = 0, n = datesBackInTime.length; i < n; i++) {
+      try {
+        const amtSessions = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for (var k = 0, z = amtSessions; k < z; k++) {
+          const simulatedRootVote: number = getRandomInt(100);
 
-        const simulatedChoice = Object.keys(template.topics)[
-          Math.floor(Math.random() * Object.keys(template.topics).length)
-        ].toString();
-        const subChoices = Object.entries(template.topics).find((data) => data[0] === simulatedChoice)?.[1] as string[]
-        const simulatedSubChoice = sample(subChoices) as string;
-        const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
-          if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
-          const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+          const simulatedChoice = Object.keys(template.topics)[
+            Math.floor(Math.random() * Object.keys(template.topics).length)
+          ].toString();
 
-          return isValid;
-        }));
+          const subChoices = Object.entries(template.topics).find(
+            (data) => data[0] === simulatedChoice)?.[1] as string[]
 
-        const edgeOfSubChoice = dialogueWithNodes?.edges.find(
-          (edge) => edge.parentNodeId === simulatedChoiceEdge?.childNodeId
-            && edge.conditions.some((condition) => condition.matchValue === simulatedChoice));
+          const simulatedSubChoice = sample(subChoices) as string;
 
-        const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
-        const simulatedSubChoiceNode = simulatedChoiceEdge?.childNode.children.find(
-          (child) => child.childNode.options.find(
-            (option) => option.value === simulatedSubChoice))?.childNode
-        const simulatedSubChoiceNodeId = simulatedSubChoiceNode?.id;
+          const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
+            if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
+            const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+            return isValid;
+          }));
 
-        if (!simulatedChoiceNodeId) return;
+          const edgeOfSubChoice = dialogueWithNodes?.edges.find(
+            (edge) => edge.parentNodeId === simulatedChoiceEdge?.childNodeId
+              && edge.conditions.some((condition) => condition.matchValue === simulatedChoice));
 
-        const fakeSessionInputArgs: (
-          {
-            createdAt: Date;
-            dialogueId: string;
-            rootNodeId: string;
-            simulatedRootVote: number;
-            simulatedChoiceNodeId: string;
-            simulatedChoiceEdgeId?: string;
-            simulatedChoice: string;
-            simulatedSubChoiceNodeId: string;
-            simulatedSubChoiceEdgeId?: string;
-            simulatedSubChoice: string;
-          }) = {
-          dialogueId,
-          createdAt: backDate,
-          rootNodeId: rootNode.id,
-          simulatedRootVote,
-          simulatedChoiceNodeId,
-          simulatedChoiceEdgeId: simulatedChoiceEdge?.id,
-          simulatedChoice,
-          simulatedSubChoiceNodeId: simulatedSubChoiceNodeId as string,
-          simulatedSubChoiceEdgeId: edgeOfSubChoice?.id,
-          simulatedSubChoice,
+          const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
+
+          const simulatedSubChoiceNode = simulatedChoiceEdge?.childNode.children.find(
+            (child) => child.childNode.options.find(
+              (option) => option.value === simulatedSubChoice))?.childNode;
+
+          const simulatedSubChoiceNodeId = simulatedSubChoiceNode?.id;
+
+          if (!simulatedChoiceNodeId) continue;
+
+          const fakeSessionInputArgs: (
+            {
+              createdAt: Date;
+              dialogueId: string;
+              rootNodeId: string;
+              simulatedRootVote: number;
+              simulatedChoiceNodeId: string;
+              simulatedChoiceEdgeId?: string;
+              simulatedChoice: string;
+              simulatedSubChoiceNodeId: string;
+              simulatedSubChoiceEdgeId?: string;
+              simulatedSubChoice: string;
+            }) = {
+            dialogueId,
+            createdAt: datesBackInTime[i],
+            rootNodeId: rootNode.id,
+            simulatedRootVote,
+            simulatedChoiceNodeId,
+            simulatedChoiceEdgeId: simulatedChoiceEdge?.id,
+            simulatedChoice,
+            simulatedSubChoiceNodeId: simulatedSubChoiceNodeId as string,
+            simulatedSubChoiceEdgeId: edgeOfSubChoice?.id,
+            simulatedSubChoice,
+          }
+
+          await this.sessionPrismaAdapter.massSeedFakeSession(fakeSessionInputArgs);
         }
-
-        await this.sessionPrismaAdapter.massSeedFakeSession(fakeSessionInputArgs);
-      }));
-    }));
+      } catch (e) {
+        throw e;
+      }
+    }
   };
 
   generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {

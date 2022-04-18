@@ -426,7 +426,8 @@ class CustomerService {
 
     const dialogueNames = [...maleDialogueNames, ...femaleDialogueNames];
 
-    await Promise.all(dialogueNames.map(async (dialogueName, index) => {
+    for (const dialogueName of dialogueNames) {
+      console.log('Dialogue: ', dialogueName);
       defaultMassSeedTemplate.title = dialogueName;
       const slug = cuid();
       defaultMassSeedTemplate.slug = slug;
@@ -445,9 +446,8 @@ class CustomerService {
 
       // Step 3: Make nodes
       await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
-
       await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate, maxSessions, isStrict);
-    }));
+    }
 
     return customer;
   }
