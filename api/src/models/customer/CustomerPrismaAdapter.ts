@@ -11,32 +11,6 @@ export class CustomerPrismaAdapter {
     this.prisma = prisma;
   }
 
-  findChoiceNodeSessionsWithinDates = async (
-    customerId: string,
-    startDateTime: Date,
-    endDateTime: Date,
-  ) => {
-    return this.prisma.session.findMany({
-      where: {
-        dialogue: {
-          customerId,
-        },
-        createdAt: {
-          gte: startDateTime as Date,
-          lte: endDateTime,
-        },
-      },
-      include: {
-        nodeEntries: {
-          include: {
-            sliderNodeEntry: true,
-            choiceNodeEntry: true,
-          },
-        },
-      },
-    });
-  }
-
   async deleteFontSettings(fontSettingsId: number): Promise<FontSettings> {
     return this.prisma.fontSettings.delete({
       where: {

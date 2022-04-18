@@ -12,6 +12,32 @@ class SessionPrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  findSessionsByCustomerIdBetweenDates = async (
+    customerId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+  ) => {
+    return this.prisma.session.findMany({
+      where: {
+        dialogue: {
+          customerId,
+        },
+        createdAt: {
+          gte: startDateTime as Date,
+          lte: endDateTime,
+        },
+      },
+      include: {
+        nodeEntries: {
+          include: {
+            sliderNodeEntry: true,
+            choiceNodeEntry: true,
+          },
+        },
+      },
+    });
+  }
+
   findSessionByDialogueIdBetweenDates = async (
     dialogueId: string,
     startDateTime: Date,

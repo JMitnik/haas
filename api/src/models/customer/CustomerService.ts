@@ -1,5 +1,9 @@
 import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, ChoiceNodeEntry, NodeEntry, Session } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
+import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
+import cuid from 'cuid';
+import { addDays, differenceInHours, isEqual, subDays } from 'date-fns';
+import { isPresent } from 'ts-is-present';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
@@ -11,12 +15,10 @@ import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
-import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
-import cuid from 'cuid';
-import { addDays, differenceInHours, isEqual, subDays } from 'date-fns';
+import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
 import NodeEntryService from '../node-entry/NodeEntryService';
-import { isPresent } from 'ts-is-present';
+
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -27,6 +29,7 @@ class CustomerService {
   nodeService: NodeService;
   dialogueStatisticsService: DialogueStatisticsService;
   nodeEntryService: NodeEntryService;
+  sessionPrismaAdapter: SessionPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -37,8 +40,18 @@ class CustomerService {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
     this.nodeEntryService = new NodeEntryService(prismaClient);
+    this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
   }
 
+  /**
+   * Finds the most popular path over all dialogues within a workspace
+   * @param customerId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
   findNestedMostPopularPath = async (
     customerId: string,
     impactScoreType: DialogueImpactScore,
@@ -48,7 +61,7 @@ class CustomerService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
-    const sessions = await this.customerPrismaAdapter.findChoiceNodeSessionsWithinDates(
+    const sessions = await this.sessionPrismaAdapter.findSessionsByCustomerIdBetweenDates(
       customerId,
       startDateTime,
       endDateTimeSet,
@@ -87,6 +100,16 @@ class CustomerService {
     return { group: dialogue?.title || '', path: mostPopularTopicPath };
   }
 
+  /**
+   * Finds the most changed path between two weeks over all dialogues within a workspace
+   * @param customerId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @param cutoff 
+   * @returns 
+   */
   findNestedMostChangedPath = async (
     customerId: string,
     impactScoreType: DialogueImpactScore,
@@ -100,12 +123,13 @@ class CustomerService {
     // This week/month/24hr should be set through front-end but for now hardcoded 7 days
     const prevStartDateTime = subDays(startDateTime as Date, 7);
 
-    const sessions = await this.customerPrismaAdapter.findChoiceNodeSessionsWithinDates(
+    const sessions = await this.sessionPrismaAdapter.findSessionsByCustomerIdBetweenDates(
       customerId,
       prevStartDateTime,
       endDateTimeSet,
     );
 
+    // Split sessions in two parts: Last week and the week before that
     const splittedSessions = sessions.reduce(
       (previousValue, session) => {
         const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
@@ -206,6 +230,15 @@ class CustomerService {
     return { topPositiveChanged: mappedTopChangedPositive, topNegativeChanged: mappedTopChangedNegative };
   }
 
+  /**
+   * Finds most trending topic of a workspace
+   * @param customerId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
   findNestedMostTrendingTopic = async (
     customerId: string,
     impactScoreType: DialogueImpactScore,
@@ -215,7 +248,7 @@ class CustomerService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
-    const sessions = await this.customerPrismaAdapter.findChoiceNodeSessionsWithinDates(
+    const sessions = await this.sessionPrismaAdapter.findSessionsByCustomerIdBetweenDates(
       customerId,
       startDateTime,
       endDateTimeSet,
@@ -252,6 +285,15 @@ class CustomerService {
     return { group, path, nrVotes: nrVotes || 0, impactScore: averageScore || 0 };
   };
 
+  /**
+   * Calculates the impact score of all dialogues within a workspace
+   * @param customerId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
   findNestedDialogueStatisticsSummary = async (
     customerId: string,
     impactScoreType: DialogueImpactScore,
@@ -352,6 +394,12 @@ class CustomerService {
     return [...cachedSummaries, ...newCaches];
   }
 
+  /**
+   * Helper function to generate a big amount of dialogues and sessions for a workspace
+   * @param input 
+   * @param isStrict 
+   * @returns 
+   */
   massSeed = async (input: NexusGenInputs['MassSeedInput'], isStrict: boolean = false) => {
     const { customerId, maxGroups, maxSessions, maxTeams } = input;
 
