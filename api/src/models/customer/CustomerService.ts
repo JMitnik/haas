@@ -11,7 +11,7 @@ import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
-import { groupBy, maxBy, meanBy, uniq } from 'lodash';
+import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
 import cuid from 'cuid';
 import { addDays, differenceInHours, isEqual, subDays } from 'date-fns';
 import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
@@ -39,12 +39,61 @@ class CustomerService {
     this.nodeEntryService = new NodeEntryService(prismaClient);
   }
 
+  findNestedMostPopularPath = async (
+    customerId: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const sessions = await this.customerPrismaAdapter.findChoiceNodeSessionsWithinDates(
+      customerId,
+      startDateTime,
+      endDateTimeSet,
+    );
+
+    const groupedSessions = groupBy(sessions, (session) => session.dialogueId);
+
+    // Finds the amount of occurences per topic for the first choice layer of every dialogue in workspace
+    const mostPopularTopicPathPerDialogue = Object.entries(groupedSessions).map((entry) => {
+      const dialogueId = entry[0];
+      const dialogueSessions = entry[1];
+      const mostPopularTopicPath = this.dialogueService.findMostPopularTopic(dialogueSessions, [], 1, 1);
+      return { dialogueId, path: mostPopularTopicPath };
+    });
+
+    // Find most occuring topic
+    const mostOccuringFirstLayerDialogue = maxBy(mostPopularTopicPathPerDialogue, (topic) => topic.path?.[0]?.nrVotes)
+
+    // Use the sessions that have most occuring topic in their first choice layer
+    const filteredByTopicSessions = groupedSessions[mostOccuringFirstLayerDialogue?.dialogueId as string].filter(
+      (target) => target.nodeEntries.find(
+        (entry) => entry.choiceNodeEntry?.value === mostOccuringFirstLayerDialogue?.path[0].topic
+          && entry.depth === 1
+      )
+    );
+
+    // Recursively find rest of the path
+    const mostPopularTopicPath = this.dialogueService.findMostPopularTopic(
+      filteredByTopicSessions,
+      mostOccuringFirstLayerDialogue?.path || [],
+      2
+    );
+
+    const dialogue = await this.dialogueService.getDialogueById(mostOccuringFirstLayerDialogue?.dialogueId as string);
+
+    return { group: dialogue?.title || '', path: mostPopularTopicPath };
+  }
+
   findNestedMostChangedPath = async (
     customerId: string,
     impactScoreType: DialogueImpactScore,
     startDateTime: Date,
     endDateTime?: Date,
     refresh: boolean = false,
+    cutoff: number = 1,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
@@ -114,33 +163,47 @@ class CustomerService {
         return undefined;
       }
 
-      const averageCurr = meanBy(optionSessionArray, (entry) => entry.mainScore);
-      const averagePrev = meanBy(optionPrevSessionArray, (entry) => entry.mainScore);
-      const delta = Math.max(averageCurr, averagePrev) - Math.min(averageCurr, averagePrev);
-      const percentageChange = ((averageCurr - averagePrev) / averagePrev) * 100;
+      const nrVotes = optionSessionArray.length
+      const averageCurrent = meanBy(optionSessionArray, (entry) => entry.mainScore);
+      const averagePrevious = meanBy(optionPrevSessionArray, (entry) => entry.mainScore);
+      const delta = Math.max(averageCurrent, averagePrevious) - Math.min(averageCurrent, averagePrevious);
+      const percentageChanged = ((averageCurrent - averagePrevious) / averagePrevious) * 100;
 
       const dialogueId = key.split('_')?.[0] || '';
+      const topic = key.split('_')?.[1] || '';
 
-      return { option: key, averageCurr, averagePrev, delta, percentageChange, dialogueId: dialogueId };
+      return {
+        topic: topic,
+        nrVotes,
+        averageCurrent,
+        averagePrevious,
+        delta,
+        percentageChanged,
+        dialogueId: dialogueId,
+      };
     }).filter(isPresent);
 
-    const mostChanged = maxBy(optionDeltas, (optionDelta) => {
-      if (!optionDelta?.percentageChange) return 0;
-      return Math.sign(optionDelta.percentageChange) === -1
-        ? -1 * optionDelta.percentageChange
-        : optionDelta.percentageChange;
-    });
+    const orderedChangedAsc = orderBy(optionDeltas, (optionDelta) => {
+      if (!optionDelta?.percentageChanged) return 0;
+      return optionDelta.percentageChanged;
+    }, 'asc');
 
-    console.log('Most changed: ', mostChanged);
+    const orderedChangedDesc = clone(orderedChangedAsc).reverse();
 
-    const dialogue = await this.dialogueService.getDialogueById(mostChanged?.dialogueId as string);
+    const topChangedNegative = orderedChangedAsc.slice(0, cutoff);
+    const topChangedPositive = orderedChangedDesc.slice(0, cutoff);
 
-    const group = dialogue?.title || 'No Dialogue found';
-    const path: string[] = [mostChanged?.option as string];
+    const mappedTopChangedPositive = await Promise.all(topChangedPositive.map(async (entry) => {
+      const dialogue = await this.dialogueService.getDialogueById(entry?.dialogueId as string);
+      return { ...entry, group: dialogue?.title };
+    }));
 
-    return { group, path, percentageChanged: mostChanged?.percentageChange || 0 };
+    const mappedTopChangedNegative = await Promise.all(topChangedNegative.map(async (entry) => {
+      const dialogue = await this.dialogueService.getDialogueById(entry?.dialogueId as string);
+      return { ...entry, group: dialogue?.title };
+    }));
 
-
+    return { topPositiveChanged: mappedTopChangedPositive, topNegativeChanged: mappedTopChangedNegative };
   }
 
   findNestedMostTrendingTopic = async (

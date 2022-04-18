@@ -499,6 +499,7 @@ type Customer {
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
+  nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   roles: [RoleType!]
   settings: CustomerSettings
@@ -710,6 +711,7 @@ type DialogueStatistics {
 }
 
 input DialogueStatisticsSummaryFilterInput {
+  cutoff: Int
   endDateTime: String
   impactType: DialogueImpactScoreType!
   refresh: Boolean
@@ -1046,9 +1048,9 @@ input MassSeedInput {
 }
 
 type MostChangedPath {
-  group: String!
-  path: [String!]!
-  percentageChanged: Float!
+  group: String
+  topNegativeChanged: [TopicDelta!]!
+  topPositiveChanged: [TopicDelta!]!
 }
 
 type MostPopularPath {
@@ -1679,6 +1681,16 @@ enum TagTypeEnum {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
+}
+
+type TopicDelta {
+  averageCurrent: Float!
+  averagePrevious: Float!
+  delta: Float!
+  group: String
+  nrVotes: Int!
+  percentageChanged: Float!
+  topic: String!
 }
 
 input TopicInputType {

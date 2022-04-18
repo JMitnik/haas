@@ -29,6 +29,7 @@ export class CustomerPrismaAdapter {
       include: {
         nodeEntries: {
           include: {
+            sliderNodeEntry: true,
             choiceNodeEntry: true,
           },
         },

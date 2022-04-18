@@ -71,6 +71,37 @@ export const CustomerType = objectType({
       },
     });
 
+    t.field('nestedMostPopular', {
+      type: 'MostPopularPath',
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE') as Date;
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.customerService.findNestedMostPopularPath(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
+      },
+    });
+
     t.field('nestedMostChanged', {
       type: 'MostChangedPath',
       nullable: true,
@@ -82,6 +113,7 @@ export const CustomerType = objectType({
       async resolve(parent, args, ctx) {
         if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
         if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (args?.input?.cutoff && args.input.cutoff < 1) throw new UserInputError('Cutoff cannot be a negative number!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -100,6 +132,7 @@ export const CustomerType = objectType({
           utcStartDateTime as Date,
           utcEndDateTime,
           args.input.refresh || false,
+          args.input.cutoff || undefined,
         );
       },
     });

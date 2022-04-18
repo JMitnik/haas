@@ -52,7 +52,8 @@ export const DialogueStatisticsSummaryFilterInput = inputObjectType({
     t.field('impactType', {
       type: DialogueImpactScoreType,
       required: true,
-    })
+    });
+    t.int('cutoff');
   },
 })
 
@@ -138,12 +139,29 @@ export const MostPopularPath = objectType({
   },
 });
 
+export const TopicDelta = objectType({
+  name: 'TopicDelta',
+  definition(t) {
+    t.string('topic');
+    t.int('nrVotes');
+    t.float('averageCurrent');
+    t.float('averagePrevious');
+    t.float('delta');
+    t.float('percentageChanged');
+    t.string('group', { nullable: true });
+  },
+})
+
 export const MostChangedPath = objectType({
   name: 'MostChangedPath',
   definition(t) {
-    t.list.string('path');
-    t.string('group');
-    t.float('percentageChanged');
+    t.string('group', { nullable: true });
+    t.list.field('topPositiveChanged', {
+      type: TopicDelta,
+    });
+    t.list.field('topNegativeChanged', {
+      type: TopicDelta,
+    });
   },
 });
 
@@ -306,6 +324,7 @@ export const DialogueType = objectType({
       async resolve(parent, args, ctx) {
         if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
         if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (args?.input?.cutoff && args.input.cutoff < 1) throw new UserInputError('Cutoff cannot be a negative number!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -325,6 +344,7 @@ export const DialogueType = objectType({
           utcStartDateTime as Date,
           utcEndDateTime,
           args.input.refresh || false,
+          args.input.cutoff || undefined,
         );
       },
     });

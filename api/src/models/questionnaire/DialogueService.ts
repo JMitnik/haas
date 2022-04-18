@@ -1,5 +1,5 @@
 import { addDays, differenceInHours, subDays } from 'date-fns';
-import _, { countBy, groupBy, maxBy, meanBy, merge, sample, uniq, uniqBy } from 'lodash';
+import _, { clone, countBy, groupBy, maxBy, meanBy, merge, orderBy, sample, uniq, uniqBy } from 'lodash';
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
@@ -96,7 +96,9 @@ class DialogueService {
     })[],
     path: { topic: string; nrVotes: number; depth: number; impactScore: number }[] = [],
     depth: number = 1,
+    maxDepth?: number,
   ): { topic: string; nrVotes: number; depth: number; impactScore: number }[] => {
+    // Map the current depth node entry + session score
     const targetDepthEntries = sessions.map((session) => {
       const targetEntry = session.nodeEntries.find((entry) => entry.depth === depth);
       if (!targetEntry) return undefined;
@@ -106,9 +108,12 @@ class DialogueService {
 
     if (!targetDepthEntries.length) return path;
 
+    // Group per topic
     const groupedTargetDepthEntries = groupBy(targetDepthEntries,
       (entry) => entry.targetEntry?.choiceNodeEntry?.value
     );
+
+    // Calculate impact score + amount of occurences per topic
     const topicOccurences = Object.entries(groupedTargetDepthEntries).map((entry) => {
       const topic = entry[0];
       const occurences = entry[1]?.length;
@@ -125,6 +130,9 @@ class DialogueService {
       depth,
       impactScore: winnerTopic.impactScore,
     });
+
+    // If max depth cut off point is specified and reached return data
+    if (maxDepth && maxDepth === depth) return path;
 
     const sessionsFilteredByTopic = sessions.filter(
       (session) => {
@@ -155,6 +163,7 @@ class DialogueService {
     startDateTime: Date,
     endDateTime?: Date,
     refresh: boolean = false,
+    cutoff: number = 1,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
@@ -187,25 +196,28 @@ class DialogueService {
         return undefined;
       }
 
-      const averageCurr = meanBy(optionSessionArray, (entry) => entry.mainScore);
-      const averagePrev = meanBy(optionPrevSessionArray, (entry) => entry.mainScore);
-      const delta = Math.max(averageCurr, averagePrev) - Math.min(averageCurr, averagePrev);
-      const percentageChange = ((averageCurr - averagePrev) / averagePrev) * 100;
+      const nrVotes = groupedDeepEntrySessions[key].length;
+      const averageCurrent = meanBy(optionSessionArray, (entry) => entry.mainScore);
+      const averagePrevious = meanBy(optionPrevSessionArray, (entry) => entry.mainScore);
+      const delta = Math.max(averageCurrent, averagePrevious) - Math.min(averageCurrent, averagePrevious);
+      const percentageChanged = ((averageCurrent - averagePrevious) / averagePrevious) * 100;
 
-      return { option: key, averageCurr, averagePrev, delta, percentageChange };
+      return { topic: key, nrVotes: nrVotes, averageCurrent, averagePrevious, delta, percentageChanged };
     }).filter(isPresent);
 
-    const mostChanged = maxBy(optionDeltas, (optionDelta) => {
-      if (!optionDelta?.percentageChange) return 0;
-      return Math.sign(optionDelta.percentageChange) === -1
-        ? -1 * optionDelta.percentageChange
-        : optionDelta.percentageChange;
-    });
+    const orderedChangedAsc = orderBy(optionDeltas, (optionDelta) => {
+      if (!optionDelta?.percentageChanged) return 0;
+      return optionDelta.percentageChanged;
+    }, 'asc');
+
+    const orderedChangedDesc = clone(orderedChangedAsc).reverse();
+
+    const topChangedNegative = orderedChangedAsc.slice(0, cutoff);
+    const topChangedPositive = orderedChangedDesc.slice(0, cutoff);
 
     const group = dialogueTitle;
-    const path: string[] = [mostChanged?.option as string];
 
-    return { group, path, percentageChanged: mostChanged?.percentageChange || 0 };
+    return { group, topPositiveChanged: topChangedPositive, topNegativeChanged: topChangedNegative };
   };
 
   findGroupedDeepestEntrySessions = async (
