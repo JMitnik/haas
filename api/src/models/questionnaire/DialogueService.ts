@@ -1,21 +1,21 @@
 import { addDays, differenceInHours, subDays } from 'date-fns';
-import _, { clone, countBy, groupBy, maxBy, meanBy, merge, orderBy, sample, uniq, uniqBy } from 'lodash';
+import _, { clone, groupBy, maxBy, meanBy, orderBy, sample, uniq } from 'lodash';
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
-import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, QuestionOption, DialogueImpactScore, DialogueTopicCache, QuestionNode, Session } from '@prisma/client';
+import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, DialogueImpactScore, Session } from '@prisma/client';
 
 import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import {
   HistoryDataProps, HistoryDataWithEntry, IdMapProps,
-  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType, ChildNodeEntry, TopicNodeEntry, TopicSession,
+  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType, TopicSession,
 } from './DialogueTypes';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
-import defaultWorkspaceTemplate, { MassSeedTemplate, rootTopics, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import defaultWorkspaceTemplate, { MassSeedTemplate, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
-import { CreateQuestionsInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';
+import { CreateQuestionsInput, UpsertDialogueStatisticsInput } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
@@ -220,6 +220,14 @@ class DialogueService {
     return { group, topPositiveChanged: topChangedPositive, topNegativeChanged: topChangedNegative };
   };
 
+  /**
+   * Finds the deepest entries of a list of sessions and groups them per topic
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param isPrev 
+   * @returns 
+   */
   findGroupedDeepestEntrySessions = async (
     dialogueId: string,
     startDateTime: Date,
@@ -244,6 +252,16 @@ class DialogueService {
     return groupedDeepEntrySessions;
   }
 
+  /**
+   * Finds the most trending topic for a dialogue
+   * @param dialogueId 
+   * @param dialogueTitle 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
   findMostTrendingTopic = async (
     dialogueId: string,
     dialogueTitle: string,

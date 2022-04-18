@@ -12,6 +12,13 @@ class SessionPrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  /**
+   * Finds sessions by customer ID between two dates
+   * @param customerId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns 
+   */
   findSessionsByCustomerIdBetweenDates = async (
     customerId: string,
     startDateTime: Date,
@@ -38,6 +45,13 @@ class SessionPrismaAdapter {
     });
   }
 
+  /**
+   * Finds sessions by dialogue ID between two dates
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns 
+   */
   findSessionByDialogueIdBetweenDates = async (
     dialogueId: string,
     startDateTime: Date,
