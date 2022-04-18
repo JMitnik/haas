@@ -119,7 +119,7 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
             to={`/dashboard/b/${customerSlug}/dashboard`}
           >
             <HomeIcon />
-            {t('views:dashboard')}
+            {/* {t('views:dashboard')} */}
           </NavItem>
           <NavItem
             isSubchildActive={!!dialogueSlug}
@@ -167,23 +167,23 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
             )}
           >
             <SurveyIcon />
-            {t('dialogues')}
+            {/* {t('dialogues')} */}
           </NavItem>
           <NavItem isDisabled={!canViewUsers} to={`/dashboard/b/${customerSlug}/users`}>
             <UsersIcon />
-            {t('users')}
+            {/* {t('users')} */}
           </NavItem>
           <NavItem isDisabled={!canCreateTriggers} to={`/dashboard/b/${customerSlug}/triggers`}>
             <NotificationIcon />
-            {t('alerts')}
+            {/* {t('alerts')} */}
           </NavItem>
           <NavItem isDisabled={!canViewCampaigns} to={`/dashboard/b/${customerSlug}/campaigns`}>
             <ChatIcon />
-            {t('campaigns')}
+            {/* {t('campaigns')} */}
           </NavItem>
           <NavItem isDisabled={!canEditCustomer} to={`/dashboard/b/${customerSlug}/edit`}>
             <SettingsIcon />
-            {t('settings')}
+            {/* {t('settings')} */}
           </NavItem>
         </AnimateSharedLayout>
       </motion.ul>
@@ -216,10 +216,11 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
             {!device.isSmall ? (
               <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
                 <Sidenav>
-                  <Div padding={2}>
+                  {/* padding={2} */}
+                  <Div>
                     <UI.Flex alignItems="center">
-                      <Logo width="60px" height="60px" justifyContent="center" />
-                      <UI.Text>haas</UI.Text>
+                      <Logo width="70px" height="70px" justifyContent="center" />
+                      {/* <UI.Text>haas</UI.Text> */}
                       {/* <FilledLogo mb={4} width="50px" height="50px" justifyContent="center" /> */}
                       {/* <UI.Text>haas</UI.Text> */}
                     </UI.Flex>

@@ -22,6 +22,7 @@ interface NavItemContainerProps {
 
 export const NavItemContainer = styled.li<NavItemContainerProps>`
   ${({ theme, isSubchildActive }) => css`
+    display: flex;
     position: relative;
 
     ${isSubchildActive && css`
@@ -75,7 +76,7 @@ export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
 
     /* For the icons */
     svg {
-      margin-right: ${theme.gutter / 2}px;
+      /* margin-right: ${theme.gutter / 2}px; */
       width: 24px;
       fill: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['500']};
 
@@ -140,7 +141,7 @@ export const UsernavContainer = styled.div`
 
 export const AvatarContainer = styled(Div)`
   ${({ theme }) => css`
-    padding: ${theme.gutter}px;
+    padding-bottom: ${theme.gutter}px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -299,7 +300,7 @@ export const SidenavContainer = styled.div`
     position: fixed;
     z-index: 1200;
     font-weight: 1000;
-    width: ${theme.sidenav.width}px;
+    /* width: ${theme.sidenav.width}px; */
     background: ${theme.colors.gray[100]};
     border-right: 1px solid ${theme.colors.gray['200']};
 
@@ -333,6 +334,9 @@ export const SidenavContainer = styled.div`
     }
 
     ul {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       a {
         text-decoration: none;
 
