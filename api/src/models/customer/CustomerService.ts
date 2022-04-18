@@ -302,7 +302,7 @@ class CustomerService {
 
     const newCaches: DialogueStatisticsSummaryCache[] = [];
 
-    // For every dialogue, calculate impact score and upsert a cache entry 
+    // For every dialogue, calculate impact score and upsert a cache entry
     Object.entries(sessionContext).forEach((context) => {
       const dialogueId = context[0];
       const nodeEntries = context[1];
@@ -358,7 +358,7 @@ class CustomerService {
     const customer = await this.findWorkspaceById(customerId);
     if (!customer) return null;
 
-    // Generate 
+    // Generate
     const amtGroups = !isStrict ? Math.ceil(Math.random() * maxGroups + 1) : maxGroups;
     const maleDialogueNames = [...Array(amtGroups)].flatMap((number, index) => {
       const teamAge = 8 + (4 * index);

@@ -120,10 +120,10 @@ class SessionPrismaAdapter {
 
   /**
    * Finds all sessions where all pathEntry answers exist in the session's node entries
-   * @param pathEntries 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @param dialogueId 
+   * @param pathEntries
+   * @param startDateTime
+   * @param endDateTime
+   * @param dialogueId
    * @returns a list of sessions
    */
   findPathMatchedSessions = async (
@@ -158,7 +158,7 @@ class SessionPrismaAdapter {
   }
 
   /**
-   * Finds all sessions of a dialogue within provided dates 
+   * Finds all sessions of a dialogue within provided dates
    * @param dialogueId the ID of a dialogue
    * @param startDateTime the start date from when sessions should be found
    * @param endDateTime the end date until sessions should be found
@@ -197,6 +197,7 @@ class SessionPrismaAdapter {
         },
       },
     });
+
     return dialogueWithSessions?.sessions || [];
   }
 

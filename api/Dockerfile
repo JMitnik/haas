@@ -1,7 +1,7 @@
 ###
 # Base: Prep our base image
 ###
-FROM 649621042808.dkr.ecr.eu-central-1.amazonaws.com/node-base:14 AS base
+FROM node:16-alpine AS base
 ENV PORT 4000
 
 RUN apk add --update openssl

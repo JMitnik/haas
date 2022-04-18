@@ -105,6 +105,7 @@
     "yup": "^0.29.1"
   },
   "devDependencies": {
+    "artillery": "^2.0.0-14",
     "@swc/cli": "^0.1.55",
     "@swc/core": "^1.2.124",
     "@swc/helpers": "^0.3.2",

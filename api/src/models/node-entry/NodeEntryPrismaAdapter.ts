@@ -49,9 +49,9 @@ class NodeEntryPrismaAdapter {
 
   /**
    * Finds all sub topic node entries within a date range by question id
-   * @param questionId 
-   * @param startDateTime 
-   * @param endDateTime 
+   * @param questionId
+   * @param startDateTime
+   * @param endDateTime
    * @returns a list of sliderNodeEntries as well as node entries of its children
    */
   findNodeEntriesByQuestionId = async (
@@ -88,10 +88,10 @@ class NodeEntryPrismaAdapter {
 
   /**
    * Finds all node entries within a date range based on a specific topic
-   * @param dialogueId 
-   * @param topic 
-   * @param startDateTime 
-   * @param endDateTime 
+   * @param dialogueId
+   * @param topic
+   * @param startDateTime
+   * @param endDateTime
    * @returns a list of node entries where answered value = input topic
    */
   findNodeEntriesByTopic = async (dialogueId: string, topic: string, startDateTime: Date, endDateTime: Date) => {

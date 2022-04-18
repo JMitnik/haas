@@ -860,7 +860,10 @@ export const SwitchItem = styled.button.attrs({ type: 'button' }) <SwitchItemPro
     font-weight: 700;
     padding: 4px 8px;
     border-radius: 10px;
-    margin-right: 12px;
+
+    & + & {
+      margin-left: ${theme.gutter / 2}px;
+    }
 
     &:active, &:focus {
       outline: none;

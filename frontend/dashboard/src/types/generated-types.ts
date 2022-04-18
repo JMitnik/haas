@@ -2464,6 +2464,72 @@ export type WorkspaceConditionScopeModel = {
   aggregate?: Maybe<ConditionPropertyAggregate>;
 };
 
+export type GetDialogueTopicsQueryVariables = Exact<{
+  dialogueId: Scalars['ID'];
+  input: TopicInputType;
+}>;
+
+
+export type GetDialogueTopicsQuery = (
+  { __typename?: 'Query' }
+  & { dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id'>
+    & { topic: (
+      { __typename?: 'TopicType' }
+      & Pick<TopicType, 'name' | 'impactScore' | 'nrVotes'>
+      & { subTopics?: Maybe<Array<(
+        { __typename?: 'TopicType' }
+        & Pick<TopicType, 'name' | 'impactScore' | 'nrVotes'>
+      )>> }
+    ) }
+  )> }
+);
+
+export type GetSessionPathsQueryVariables = Exact<{
+  dialogueId: Scalars['ID'];
+  input: PathedSessionsInput;
+}>;
+
+
+export type GetSessionPathsQuery = (
+  { __typename?: 'Query' }
+  & { dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id'>
+    & { pathedSessionsConnection?: Maybe<(
+      { __typename?: 'PathedSessionsType' }
+      & Pick<PathedSessionsType, 'startDateTime' | 'endDateTime' | 'path'>
+      & { pathedSessions: Array<(
+        { __typename?: 'Session' }
+        & Pick<Session, 'id' | 'mainScore' | 'createdAt' | 'score' | 'totalTimeInSec'>
+      )> }
+    )> }
+  )> }
+);
+
+export type GetWorkspaceDialogueStatisticsQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  startDateTime: Scalars['String'];
+  endDateTime: Scalars['String'];
+}>;
+
+
+export type GetWorkspaceDialogueStatisticsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & { dialogues?: Maybe<Array<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'title'>
+      & { dialogueStatisticsSummary?: Maybe<(
+        { __typename?: 'DialogueStatisticsSummaryModel' }
+        & Pick<DialogueStatisticsSummaryModel, 'id' | 'dialogueId' | 'impactScore' | 'nrVotes' | 'updatedAt'>
+      )> }
+    )>> }
+  )> }
+);
+
 export type DeliveryEventFragmentFragment = (
   { __typename?: 'DeliveryEventType' }
   & Pick<DeliveryEventType, 'id' | 'status' | 'createdAt' | 'failureMessage'>
@@ -3259,6 +3325,156 @@ export const SessionFragmentFragmentDoc = gql`
 }
     ${NodeEntryFragmentFragmentDoc}
 ${DeliveryFragmentFragmentDoc}`;
+export const GetDialogueTopicsDocument = gql`
+    query GetDialogueTopics($dialogueId: ID!, $input: TopicInputType!) {
+  dialogue(where: {id: $dialogueId}) {
+    id
+    topic(input: $input) {
+      name
+      impactScore
+      nrVotes
+      subTopics {
+        name
+        impactScore
+        nrVotes
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDialogueTopicsQuery__
+ *
+ * To run a query within a React component, call `useGetDialogueTopicsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDialogueTopicsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDialogueTopicsQuery({
+ *   variables: {
+ *      dialogueId: // value for 'dialogueId'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetDialogueTopicsQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>(GetDialogueTopicsDocument, options);
+      }
+export function useGetDialogueTopicsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>(GetDialogueTopicsDocument, options);
+        }
+export type GetDialogueTopicsQueryHookResult = ReturnType<typeof useGetDialogueTopicsQuery>;
+export type GetDialogueTopicsLazyQueryHookResult = ReturnType<typeof useGetDialogueTopicsLazyQuery>;
+export type GetDialogueTopicsQueryResult = Apollo.QueryResult<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>;
+export function refetchGetDialogueTopicsQuery(variables?: GetDialogueTopicsQueryVariables) {
+      return { query: GetDialogueTopicsDocument, variables: variables }
+    }
+export const GetSessionPathsDocument = gql`
+    query GetSessionPaths($dialogueId: ID!, $input: PathedSessionsInput!) {
+  dialogue(where: {id: $dialogueId}) {
+    id
+    pathedSessionsConnection(input: $input) {
+      startDateTime
+      endDateTime
+      path
+      pathedSessions {
+        id
+        mainScore
+        createdAt
+        score
+        totalTimeInSec
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetSessionPathsQuery__
+ *
+ * To run a query within a React component, call `useGetSessionPathsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSessionPathsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSessionPathsQuery({
+ *   variables: {
+ *      dialogueId: // value for 'dialogueId'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetSessionPathsQuery(baseOptions: Apollo.QueryHookOptions<GetSessionPathsQuery, GetSessionPathsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetSessionPathsQuery, GetSessionPathsQueryVariables>(GetSessionPathsDocument, options);
+      }
+export function useGetSessionPathsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSessionPathsQuery, GetSessionPathsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetSessionPathsQuery, GetSessionPathsQueryVariables>(GetSessionPathsDocument, options);
+        }
+export type GetSessionPathsQueryHookResult = ReturnType<typeof useGetSessionPathsQuery>;
+export type GetSessionPathsLazyQueryHookResult = ReturnType<typeof useGetSessionPathsLazyQuery>;
+export type GetSessionPathsQueryResult = Apollo.QueryResult<GetSessionPathsQuery, GetSessionPathsQueryVariables>;
+export function refetchGetSessionPathsQuery(variables?: GetSessionPathsQueryVariables) {
+      return { query: GetSessionPathsDocument, variables: variables }
+    }
+export const GetWorkspaceDialogueStatisticsDocument = gql`
+    query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
+  customer(id: $workspaceId) {
+    dialogues {
+      id
+      title
+      dialogueStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE}) {
+        id
+        dialogueId
+        impactScore
+        nrVotes
+        updatedAt
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceDialogueStatisticsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceDialogueStatisticsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceDialogueStatisticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceDialogueStatisticsQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      startDateTime: // value for 'startDateTime'
+ *      endDateTime: // value for 'endDateTime'
+ *   },
+ * });
+ */
+export function useGetWorkspaceDialogueStatisticsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>(GetWorkspaceDialogueStatisticsDocument, options);
+      }
+export function useGetWorkspaceDialogueStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>(GetWorkspaceDialogueStatisticsDocument, options);
+        }
+export type GetWorkspaceDialogueStatisticsQueryHookResult = ReturnType<typeof useGetWorkspaceDialogueStatisticsQuery>;
+export type GetWorkspaceDialogueStatisticsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceDialogueStatisticsLazyQuery>;
+export type GetWorkspaceDialogueStatisticsQueryResult = Apollo.QueryResult<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>;
+export function refetchGetWorkspaceDialogueStatisticsQuery(variables?: GetWorkspaceDialogueStatisticsQueryVariables) {
+      return { query: GetWorkspaceDialogueStatisticsDocument, variables: variables }
+    }
 export const CreateCtaDocument = gql`
     mutation createCTA($input: CreateCTAInputType) {
   createCTA(input: $input) {
@@ -4765,3 +4981,347 @@ export function useUpdatePermissionsMutation(baseOptions?: Apollo.MutationHookOp
 export type UpdatePermissionsMutationHookResult = ReturnType<typeof useUpdatePermissionsMutation>;
 export type UpdatePermissionsMutationResult = Apollo.MutationResult<UpdatePermissionsMutation>;
 export type UpdatePermissionsMutationOptions = Apollo.BaseMutationOptions<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>;
+export namespace GetDialogueTopics {
+  export type Variables = GetDialogueTopicsQueryVariables;
+  export type Query = GetDialogueTopicsQuery;
+  export type Dialogue = (NonNullable<GetDialogueTopicsQuery['dialogue']>);
+  export type Topic = (NonNullable<(NonNullable<GetDialogueTopicsQuery['dialogue']>)['topic']>);
+  export type SubTopics = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueTopicsQuery['dialogue']>)['topic']>)['subTopics']>)[number]>;
+  export const Document = GetDialogueTopicsDocument;
+}
+
+export namespace GetSessionPaths {
+  export type Variables = GetSessionPathsQueryVariables;
+  export type Query = GetSessionPathsQuery;
+  export type Dialogue = (NonNullable<GetSessionPathsQuery['dialogue']>);
+  export type PathedSessionsConnection = (NonNullable<(NonNullable<GetSessionPathsQuery['dialogue']>)['pathedSessionsConnection']>);
+  export type PathedSessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetSessionPathsQuery['dialogue']>)['pathedSessionsConnection']>)['pathedSessions']>)[number]>;
+  export const Document = GetSessionPathsDocument;
+}
+
+export namespace GetWorkspaceDialogueStatistics {
+  export type Variables = GetWorkspaceDialogueStatisticsQueryVariables;
+  export type Query = GetWorkspaceDialogueStatisticsQuery;
+  export type Customer = (NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>);
+  export type Dialogues = NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['dialogues']>)[number]>;
+  export type DialogueStatisticsSummary = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['dialogues']>)[number]>['dialogueStatisticsSummary']>);
+  export const Document = GetWorkspaceDialogueStatisticsDocument;
+}
+
+export namespace DeliveryEventFragment {
+  export type Fragment = DeliveryEventFragmentFragment;
+}
+
+export namespace DeliveryFragment {
+  export type Fragment = DeliveryFragmentFragment;
+  export type CampaignVariant = (NonNullable<DeliveryFragmentFragment['campaignVariant']>);
+  export type Campaign = (NonNullable<(NonNullable<DeliveryFragmentFragment['campaignVariant']>)['campaign']>);
+}
+
+export namespace NodeEntryFragment {
+  export type Fragment = NodeEntryFragmentFragment;
+  export type RelatedNode = (NonNullable<NodeEntryFragmentFragment['relatedNode']>);
+  export type Value = (NonNullable<NodeEntryFragmentFragment['value']>);
+  export type FormNodeEntry = (NonNullable<(NonNullable<NodeEntryFragmentFragment['value']>)['formNodeEntry']>);
+  export type Values = NonNullable<(NonNullable<(NonNullable<(NonNullable<NodeEntryFragmentFragment['value']>)['formNodeEntry']>)['values']>)[number]>;
+  export type RelatedField = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<NodeEntryFragmentFragment['value']>)['formNodeEntry']>)['values']>)[number]>['relatedField']>);
+}
+
+export namespace SessionFragment {
+  export type Fragment = SessionFragmentFragment;
+  export type NodeEntries = NonNullable<(NonNullable<SessionFragmentFragment['nodeEntries']>)[number]>;
+  export type Delivery = (NonNullable<SessionFragmentFragment['delivery']>);
+}
+
+export namespace CreateCta {
+  export type Variables = CreateCtaMutationVariables;
+  export type Mutation = CreateCtaMutation;
+  export type CreateCta = (NonNullable<CreateCtaMutation['createCTA']>);
+  export const Document = CreateCtaDocument;
+}
+
+export namespace GetCustomerOfUser {
+  export type Variables = GetCustomerOfUserQueryVariables;
+  export type Query = GetCustomerOfUserQuery;
+  export type UserOfCustomer = (NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>);
+  export type Customer = (NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['customer']>);
+  export type Settings = (NonNullable<(NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['customer']>)['settings']>);
+  export type ColourSettings = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['customer']>)['settings']>)['colourSettings']>);
+  export type Campaigns = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['customer']>)['campaigns']>)[number]>;
+  export type Role = (NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['role']>);
+  export type User = (NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['user']>);
+  export const Document = GetCustomerOfUserDocument;
+}
+
+export namespace Me {
+  export type Variables = MeQueryVariables;
+  export type Query = MeQuery;
+  export type Me = (NonNullable<MeQuery['me']>);
+  export type UserCustomers = NonNullable<(NonNullable<(NonNullable<MeQuery['me']>)['userCustomers']>)[number]>;
+  export type Customer = (NonNullable<NonNullable<(NonNullable<(NonNullable<MeQuery['me']>)['userCustomers']>)[number]>['customer']>);
+  export type Role = (NonNullable<NonNullable<(NonNullable<(NonNullable<MeQuery['me']>)['userCustomers']>)[number]>['role']>);
+  export const Document = MeDocument;
+}
+
+export namespace UploadUpsellImage {
+  export type Variables = UploadUpsellImageMutationVariables;
+  export type Mutation = UploadUpsellImageMutation;
+  export type UploadUpsellImage = (NonNullable<UploadUpsellImageMutation['uploadUpsellImage']>);
+  export const Document = UploadUpsellImageDocument;
+}
+
+export namespace GetWorkspaceAdmins {
+  export type Variables = GetWorkspaceAdminsQueryVariables;
+  export type Query = GetWorkspaceAdminsQuery;
+  export type Users = NonNullable<(NonNullable<GetWorkspaceAdminsQuery['users']>)[number]>;
+  export const Document = GetWorkspaceAdminsDocument;
+}
+
+export namespace ConfirmWorkspaceJob {
+  export type Variables = ConfirmWorkspaceJobMutationVariables;
+  export type Mutation = ConfirmWorkspaceJobMutation;
+  export type ConfirmCreateWorkspaceJob = (NonNullable<ConfirmWorkspaceJobMutation['confirmCreateWorkspaceJob']>);
+  export const Document = ConfirmWorkspaceJobDocument;
+}
+
+export namespace CreateWorkspaceJob {
+  export type Variables = CreateWorkspaceJobMutationVariables;
+  export type Mutation = CreateWorkspaceJobMutation;
+  export type GenerateAutodeck = (NonNullable<CreateWorkspaceJobMutation['generateAutodeck']>);
+  export const Document = CreateWorkspaceJobDocument;
+}
+
+export namespace GetAutodeckJobs {
+  export type Variables = GetAutodeckJobsQueryVariables;
+  export type Query = GetAutodeckJobsQuery;
+  export type GetAutodeckJobs = (NonNullable<GetAutodeckJobsQuery['getAutodeckJobs']>);
+  export type Jobs = NonNullable<(NonNullable<(NonNullable<GetAutodeckJobsQuery['getAutodeckJobs']>)['jobs']>)[number]>;
+  export type ProcessLocation = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetAutodeckJobsQuery['getAutodeckJobs']>)['jobs']>)[number]>['processLocation']>);
+  export type CustomFields = NonNullable<(NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<GetAutodeckJobsQuery['getAutodeckJobs']>)['jobs']>)[number]>['processLocation']>)['customFields']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<GetAutodeckJobsQuery['getAutodeckJobs']>)['pageInfo']>);
+  export const Document = GetAutodeckJobsDocument;
+}
+
+export namespace UploadJobImage {
+  export type Variables = UploadJobImageMutationVariables;
+  export type Mutation = UploadJobImageMutation;
+  export type UploadJobImage = (NonNullable<UploadJobImageMutation['uploadJobImage']>);
+  export const Document = UploadJobImageDocument;
+}
+
+export namespace RetryAutodeckJob {
+  export type Variables = RetryAutodeckJobMutationVariables;
+  export type Mutation = RetryAutodeckJobMutation;
+  export type RetryAutodeckJob = (NonNullable<RetryAutodeckJobMutation['retryAutodeckJob']>);
+  export const Document = RetryAutodeckJobDocument;
+}
+
+export namespace GetAdjustedLogo {
+  export type Variables = GetAdjustedLogoQueryVariables;
+  export type Query = GetAdjustedLogoQuery;
+  export type GetAdjustedLogo = (NonNullable<GetAdjustedLogoQuery['getAdjustedLogo']>);
+  export const Document = GetAdjustedLogoDocument;
+}
+
+export namespace GetJobProcessLocations {
+  export type Variables = GetJobProcessLocationsQueryVariables;
+  export type Query = GetJobProcessLocationsQuery;
+  export type GetJobProcessLocations = (NonNullable<GetJobProcessLocationsQuery['getJobProcessLocations']>);
+  export type JobProcessLocations = NonNullable<(NonNullable<(NonNullable<GetJobProcessLocationsQuery['getJobProcessLocations']>)['jobProcessLocations']>)[number]>;
+  export type CustomFields = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<GetJobProcessLocationsQuery['getJobProcessLocations']>)['jobProcessLocations']>)[number]>['customFields']>)[number]>;
+  export const Document = GetJobProcessLocationsDocument;
+}
+
+export namespace GetPreviewData {
+  export type Variables = GetPreviewDataQueryVariables;
+  export type Query = GetPreviewDataQuery;
+  export type GetPreviewData = (NonNullable<GetPreviewDataQuery['getPreviewData']>);
+  export const Document = GetPreviewDataDocument;
+}
+
+export namespace RemovePixelRange {
+  export type Variables = RemovePixelRangeMutationVariables;
+  export type Mutation = RemovePixelRangeMutation;
+  export type RemovePixelRange = (NonNullable<RemovePixelRangeMutation['removePixelRange']>);
+  export const Document = RemovePixelRangeDocument;
+}
+
+export namespace WhitifyImage {
+  export type Variables = WhitifyImageMutationVariables;
+  export type Mutation = WhitifyImageMutation;
+  export type WhitifyImage = (NonNullable<WhitifyImageMutation['whitifyImage']>);
+  export const Document = WhitifyImageDocument;
+}
+
+export namespace CreateBatchDeliveries {
+  export type Variables = CreateBatchDeliveriesMutationVariables;
+  export type Mutation = CreateBatchDeliveriesMutation;
+  export type CreateBatchDeliveries = (NonNullable<CreateBatchDeliveriesMutation['createBatchDeliveries']>);
+  export type FailedDeliveries = NonNullable<(NonNullable<(NonNullable<CreateBatchDeliveriesMutation['createBatchDeliveries']>)['failedDeliveries']>)[number]>;
+  export const Document = CreateBatchDeliveriesDocument;
+}
+
+export namespace GetDelivery {
+  export type Variables = GetDeliveryQueryVariables;
+  export type Query = GetDeliveryQuery;
+  export type Delivery = (NonNullable<GetDeliveryQuery['delivery']>);
+  export type Events = NonNullable<(NonNullable<(NonNullable<GetDeliveryQuery['delivery']>)['events']>)[number]>;
+  export const Document = GetDeliveryDocument;
+}
+
+export namespace GetWorkspaceCampaign {
+  export type Variables = GetWorkspaceCampaignQueryVariables;
+  export type Query = GetWorkspaceCampaignQuery;
+  export type Customer = (NonNullable<GetWorkspaceCampaignQuery['customer']>);
+  export type Campaign = (NonNullable<(NonNullable<GetWorkspaceCampaignQuery['customer']>)['campaign']>);
+  export type DeliveryConnection = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignQuery['customer']>)['campaign']>)['deliveryConnection']>);
+  export type Deliveries = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignQuery['customer']>)['campaign']>)['deliveryConnection']>)['deliveries']>)[number]>;
+  export type CampaignVariant = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignQuery['customer']>)['campaign']>)['deliveryConnection']>)['deliveries']>)[number]>['campaignVariant']>);
+  export type Events = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignQuery['customer']>)['campaign']>)['deliveryConnection']>)['deliveries']>)[number]>['events']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignQuery['customer']>)['campaign']>)['deliveryConnection']>)['pageInfo']>);
+  export type Variants = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignQuery['customer']>)['campaign']>)['variants']>)[number]>;
+  export type CustomVariables = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignQuery['customer']>)['campaign']>)['variants']>)[number]>['customVariables']>)[number]>;
+  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignQuery['customer']>)['campaign']>)['variants']>)[number]>['dialogue']>);
+  export type Workspace = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignQuery['customer']>)['campaign']>)['variants']>)[number]>['workspace']>);
+  export const Document = GetWorkspaceCampaignDocument;
+}
+
+export namespace CreateCampaign {
+  export type Variables = CreateCampaignMutationVariables;
+  export type Mutation = CreateCampaignMutation;
+  export type CreateCampaign = (NonNullable<CreateCampaignMutation['createCampaign']>);
+  export const Document = CreateCampaignDocument;
+}
+
+export namespace GetWorkspaceCampaigns {
+  export type Variables = GetWorkspaceCampaignsQueryVariables;
+  export type Query = GetWorkspaceCampaignsQuery;
+  export type Customer = (NonNullable<GetWorkspaceCampaignsQuery['customer']>);
+  export type Campaigns = NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignsQuery['customer']>)['campaigns']>)[number]>;
+  export type Variants = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<GetWorkspaceCampaignsQuery['customer']>)['campaigns']>)[number]>['variants']>)[number]>;
+  export const Document = GetWorkspaceCampaignsDocument;
+}
+
+export namespace GetWorkspaceDialogues {
+  export type Variables = GetWorkspaceDialoguesQueryVariables;
+  export type Query = GetWorkspaceDialoguesQuery;
+  export type Customer = (NonNullable<GetWorkspaceDialoguesQuery['customer']>);
+  export type Dialogues = NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialoguesQuery['customer']>)['dialogues']>)[number]>;
+  export type _Customer = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialoguesQuery['customer']>)['dialogues']>)[number]>['customer']>);
+  export type Tags = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialoguesQuery['customer']>)['dialogues']>)[number]>['tags']>)[number]>;
+  export const Document = GetWorkspaceDialoguesDocument;
+}
+
+export namespace DuplicateQuestion {
+  export type Variables = DuplicateQuestionMutationVariables;
+  export type Mutation = DuplicateQuestionMutation;
+  export type DuplicateQuestion = (NonNullable<DuplicateQuestionMutation['duplicateQuestion']>);
+  export const Document = DuplicateQuestionDocument;
+}
+
+export namespace GetDialogueStatistics {
+  export type Variables = GetDialogueStatisticsQueryVariables;
+  export type Query = GetDialogueStatisticsQuery;
+  export type Customer = (NonNullable<GetDialogueStatisticsQuery['customer']>);
+  export type Dialogue = (NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>);
+  export type Sessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>;
+  export type NodeEntries = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>['nodeEntries']>)[number]>;
+  export type RelatedNode = (NonNullable<NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>['nodeEntries']>)[number]>['relatedNode']>);
+  export type Value = (NonNullable<NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>['nodeEntries']>)[number]>['value']>);
+  export type Statistics = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>);
+  export type TopPositivePath = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['topPositivePath']>)[number]>;
+  export type MostPopularPath = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['mostPopularPath']>);
+  export type TopNegativePath = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['topNegativePath']>)[number]>;
+  export type History = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['history']>)[number]>;
+  export const Document = GetDialogueStatisticsDocument;
+}
+
+export namespace GetInteraction {
+  export type Variables = GetInteractionQueryVariables;
+  export type Query = GetInteractionQuery;
+  export type Session = (NonNullable<GetInteractionQuery['session']>);
+  export type Delivery = (NonNullable<(NonNullable<GetInteractionQuery['session']>)['delivery']>);
+  export type CampaignVariant = (NonNullable<(NonNullable<(NonNullable<GetInteractionQuery['session']>)['delivery']>)['campaignVariant']>);
+  export type Campaign = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionQuery['session']>)['delivery']>)['campaignVariant']>)['campaign']>);
+  export type Events = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionQuery['session']>)['delivery']>)['events']>)[number]>;
+  export const Document = GetInteractionDocument;
+}
+
+export namespace GetInteractionsQuery {
+  export type Variables = GetInteractionsQueryQueryVariables;
+  export type Query = GetInteractionsQueryQuery;
+  export type Customer = (NonNullable<GetInteractionsQueryQuery['customer']>);
+  export type Dialogue = (NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>);
+  export type CampaignVariants = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>)['campaignVariants']>)[number]>;
+  export type Campaign = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>)['campaignVariants']>)[number]>['campaign']>);
+  export type SessionConnection = (NonNullable<(NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>)['sessionConnection']>);
+  export type Sessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>)['sessionConnection']>)['sessions']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>)['sessionConnection']>)['pageInfo']>);
+  export const Document = GetInteractionsQueryDocument;
+}
+
+export namespace RequestInvite {
+  export type Variables = RequestInviteMutationVariables;
+  export type Mutation = RequestInviteMutation;
+  export type RequestInvite = (NonNullable<RequestInviteMutation['requestInvite']>);
+  export const Document = RequestInviteDocument;
+}
+
+export namespace DeleteUser {
+  export type Variables = DeleteUserMutationVariables;
+  export type Mutation = DeleteUserMutation;
+  export type DeleteUser = (NonNullable<DeleteUserMutation['deleteUser']>);
+  export const Document = DeleteUserDocument;
+}
+
+export namespace GetPaginatedUsers {
+  export type Variables = GetPaginatedUsersQueryVariables;
+  export type Query = GetPaginatedUsersQuery;
+  export type Customer = (NonNullable<GetPaginatedUsersQuery['customer']>);
+  export type UsersConnection = (NonNullable<(NonNullable<GetPaginatedUsersQuery['customer']>)['usersConnection']>);
+  export type UserCustomers = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetPaginatedUsersQuery['customer']>)['usersConnection']>)['userCustomers']>)[number]>;
+  export type User = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetPaginatedUsersQuery['customer']>)['usersConnection']>)['userCustomers']>)[number]>['user']>);
+  export type Role = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetPaginatedUsersQuery['customer']>)['usersConnection']>)['userCustomers']>)[number]>['role']>);
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetPaginatedUsersQuery['customer']>)['usersConnection']>)['pageInfo']>);
+  export const Document = GetPaginatedUsersDocument;
+}
+
+export namespace FindRoleById {
+  export type Variables = FindRoleByIdQueryVariables;
+  export type Query = FindRoleByIdQuery;
+  export type Role = (NonNullable<FindRoleByIdQuery['role']>);
+  export const Document = FindRoleByIdDocument;
+}
+
+export namespace GetRoles {
+  export type Variables = GetRolesQueryVariables;
+  export type Query = GetRolesQuery;
+  export type Customer = (NonNullable<GetRolesQuery['customer']>);
+  export type Roles = NonNullable<(NonNullable<(NonNullable<GetRolesQuery['customer']>)['roles']>)[number]>;
+  export const Document = GetRolesDocument;
+}
+
+export namespace GetUserCustomerFromCustomer {
+  export type Variables = GetUserCustomerFromCustomerQueryVariables;
+  export type Query = GetUserCustomerFromCustomerQuery;
+  export type Customer = (NonNullable<GetUserCustomerFromCustomerQuery['customer']>);
+  export type UserCustomer = (NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>);
+  export type User = (NonNullable<(NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>)['user']>);
+  export type Role = (NonNullable<(NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>)['role']>);
+  export const Document = GetUserCustomerFromCustomerDocument;
+}
+
+export namespace HandleUserStateInWorkspace {
+  export type Variables = HandleUserStateInWorkspaceMutationVariables;
+  export type Mutation = HandleUserStateInWorkspaceMutation;
+  export type HandleUserStateInWorkspace = (NonNullable<HandleUserStateInWorkspaceMutation['handleUserStateInWorkspace']>);
+  export type User = (NonNullable<(NonNullable<HandleUserStateInWorkspaceMutation['handleUserStateInWorkspace']>)['user']>);
+  export const Document = HandleUserStateInWorkspaceDocument;
+}
+
+export namespace UpdatePermissions {
+  export type Variables = UpdatePermissionsMutationVariables;
+  export type Mutation = UpdatePermissionsMutation;
+  export type UpdatePermissions = (NonNullable<UpdatePermissionsMutation['updatePermissions']>);
+  export const Document = UpdatePermissionsDocument;
+}

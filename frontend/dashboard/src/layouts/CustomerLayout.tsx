@@ -10,6 +10,7 @@ import { ReactComponent as CursorClickIcon } from 'assets/icons/icon-cursorclick
 import { CustomThemeProviders } from 'providers/ThemeProvider';
 import { Div, PageHeading } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
+import { ReactComponent as HomeIcon } from 'assets/icons/icon-home.svg';
 import { NavItem, NavItems, Usernav } from 'components/Sidenav/Sidenav';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification.svg';
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog.svg';
@@ -26,11 +27,11 @@ import Sidenav from 'components/Sidenav';
 import useAuth from 'hooks/useAuth';
 import useMediaDevice from 'hooks/useMediaDevice';
 
+import { Loader } from 'components/Common/Loader/Loader';
 import { NavLink } from 'react-router-dom';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import NotAuthorizedView from './NotAuthorizedView';
-import { useCustomer } from 'providers/CustomerProvider';
-import { Loader } from 'components/Common/Loader/Loader';
 
 const CustomerLayoutContainer = styled(Div) <{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
@@ -114,6 +115,12 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
     <NavItems>
       <motion.ul layout>
         <AnimateSharedLayout>
+          <NavItem
+            to={`/dashboard/b/${customerSlug}/dashboard`}
+          >
+            <HomeIcon />
+            {t('views:dashboard')}
+          </NavItem>
           <NavItem
             isSubchildActive={!!dialogueSlug}
             exact
@@ -201,7 +208,7 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
         <CustomerLayoutContainer isMobile={device.isSmall}>
 
           {isLoading && (
-            <CornerLoaderPosition >
+            <CornerLoaderPosition>
               <Loader testId="runner" />
             </CornerLoaderPosition>
           )}
@@ -213,6 +220,8 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
                     <UI.Flex alignItems="center">
                       <Logo width="60px" height="60px" justifyContent="center" />
                       <UI.Text>haas</UI.Text>
+                      {/* <FilledLogo mb={4} width="50px" height="50px" justifyContent="center" /> */}
+                      {/* <UI.Text>haas</UI.Text> */}
                     </UI.Flex>
                     <DashboardNav customerSlug={params.customerSlug} />
                   </Div>

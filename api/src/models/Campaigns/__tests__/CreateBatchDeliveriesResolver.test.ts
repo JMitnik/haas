@@ -34,21 +34,21 @@ it('send deliveries', async () => {
       }
     }
   `,
-    {
-      input: {
-        workspaceId: workspace.id,
-        uploadedCsv: file,
-        campaignId: campaign.id,
-        batchScheduledAt: '2011-10-05T14:48:00.000Z'
-      }
+  {
+    input: {
+      workspaceId: workspace.id,
+      uploadedCsv: file,
+      campaignId: campaign.id,
+      batchScheduledAt: '2011-10-05T14:48:00.000Z',
     },
-    {
-      'Authorization': `Bearer ${token}`
-    }
+  },
+  {
+    'Authorization': `Bearer ${token}`,
+  }
   );
 
   expect(res).toMatchObject({
-    createBatchDeliveries: { failedDeliveries: [], nrDeliveries: 1 }
+    createBatchDeliveries: { failedDeliveries: [], nrDeliveries: 1 },
   });
 })
 
@@ -58,8 +58,8 @@ it('unable to send deliveries unauthorized', async () => {
   await prisma.role.update({
     where: { id: userRole.id },
     data: {
-      permissions: []
-    }
+      permissions: [],
+    },
   })
 
   // Generate token for API access
@@ -79,19 +79,21 @@ it('unable to send deliveries unauthorized', async () => {
         }
       }
     `,
-      {
-        input: {
-          workspaceId: workspace.id,
-          uploadedCsv: file,
-          campaignId: campaign.id,
-          batchScheduledAt: '2011-10-05T14:48:00.000Z'
-        }
+    {
+      input: {
+        workspaceId: workspace.id,
+        uploadedCsv: file,
+        campaignId: campaign.id,
+        batchScheduledAt: '2011-10-05T14:48:00.000Z',
       },
-      {
-        'Authorization': `Bearer ${token}`
-      }
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
-    expect(error.message).toContain('Not Authorised!');
+    if (error instanceof Error) {
+      expect(error.message).toContain('Not Authorised!');
+    }
   }
 })
