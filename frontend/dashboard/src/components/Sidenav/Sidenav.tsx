@@ -1,14 +1,20 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowLeft, Book, ExternalLink, LogOut } from 'react-feather';
 import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, useToast } from '@chakra-ui/core';
-import { Book, ExternalLink, LogOut } from 'react-feather';
 import { Div, Flex, Text } from '@haas/ui';
-import { Link, LinkProps, NavLink, useHistory } from 'react-router-dom';
+import { Link, LinkProps, NavLink, useHistory, useParams } from 'react-router-dom';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import { ReactComponent as ChartIcon } from 'assets/icons/icon-chartbar.svg';
+import { ReactComponent as CursorClickIcon } from 'assets/icons/icon-cursorclick.svg';
 import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
+import { ReactComponent as SliderIcon } from 'assets/icons/icon-slider.svg';
+import { ReactComponent as TableIcon } from 'assets/icons/icon-table.svg';
+import { ReactComponent as WrenchIcon } from 'assets/icons/icon-wrench.svg';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
 import { useUser } from 'providers/UserProvider';
 import Dropdown from 'components/Dropdown';
@@ -59,6 +65,48 @@ interface NavLinkProps extends LinkProps {
   // Styled-components does not pass props with a dollar sign to the underlying element.
   $isDisabled?: boolean;
 }
+
+export const MenuLinkContainer = styled(UI.Div) <{ isDisabled?: boolean }>`
+  ${({ theme, isDisabled }) => css`
+    color: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['600']};
+    padding: 8px 11px;
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+
+    ${isDisabled && css`
+      opacity: 0.3;
+      pointer-events: none;
+      cursor: not-allowed;
+    `}
+
+    /* For the icons */
+    svg {
+      /* margin-right: ${theme.gutter / 2}px; */
+      width: 24px;
+      fill: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['500']};
+
+      .secondary {
+        fill: ${theme.isDarkColor ? theme.colors.primaries['200'] : theme.colors.primaries['700']};
+      }
+    }
+
+    &:hover {
+      color: ${theme.isDarkColor ? theme.colors.primaries['200'] : theme.colors.primaries['700']};
+    }
+
+    /* If active react router */
+    &.active {
+      background: ${theme.colors.primaryGradient};
+      border-radius: ${theme.borderRadiuses.somewhatRounded};
+      color: white;
+
+      svg {
+        fill: white;
+      }
+    }
+  `}
+`;
 
 export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
   ${({ theme, $isDisabled }) => css`
@@ -158,6 +206,98 @@ export const AvatarContainer = styled(Div)`
   `}
 `;
 
+export const SubMenuDropdown = ({ onClose }: { onClose: () => void }) => {
+  const { user } = useUser();
+  const { canAccessAdmin } = useAuth();
+  const {
+    goToDialoguesOverview,
+    goToCTAOverview,
+    goToDialogueBuilderOverview,
+    goToDialogueView,
+    goToInteractionsOverview,
+    goToDialogueSettings,
+    dialogueMatch,
+  } = useNavigator();
+
+  const dialogueSlug = dialogueMatch?.params.dialogueSlug;
+  return (
+    <List>
+      <Div>
+        {((user?.userCustomers?.length && user?.userCustomers.length > 1) || canAccessAdmin) && (
+          <ListItem
+            renderLeftIcon={<ArrowLeft />}
+            onClick={() => {
+              goToDialoguesOverview();
+              onClose();
+            }}
+          >
+            <Text>
+              Go back to dialogues overview
+            </Text>
+          </ListItem>
+        )}
+        <ListItem
+          renderLeftIcon={<ChartIcon />}
+          onClick={() => {
+            if (dialogueSlug) {
+              goToDialogueView(dialogueSlug);
+            }
+            onClose();
+          }}
+        >
+          <Text>
+            Go to dialogue dashboard
+          </Text>
+        </ListItem>
+        <ListItem
+          renderLeftIcon={<TableIcon />}
+          onClick={() => {
+            goToInteractionsOverview(dialogueSlug);
+            onClose();
+          }}
+        >
+          <Text>
+            Interactions
+          </Text>
+        </ListItem>
+        <ListItem
+          renderLeftIcon={<CursorClickIcon />}
+          onClick={() => {
+            goToCTAOverview(dialogueSlug);
+            onClose();
+          }}
+        >
+          <Text>
+            Call-To-Actions
+          </Text>
+        </ListItem>
+        <ListItem
+          renderLeftIcon={<WrenchIcon />}
+          onClick={() => {
+            goToDialogueBuilderOverview(dialogueSlug);
+            onClose();
+          }}
+        >
+          <Text>
+            Dialogue Builder
+          </Text>
+        </ListItem>
+        <ListItem
+          renderLeftIcon={<SliderIcon />}
+          onClick={() => {
+            goToDialogueSettings(dialogueSlug);
+            onClose();
+          }}
+        >
+          <Text>
+            Configurations
+          </Text>
+        </ListItem>
+      </Div>
+    </List>
+  );
+};
+
 export const UsernavDropdown = () => {
   const history = useHistory();
   const { user, logout } = useUser();
@@ -255,7 +395,7 @@ export const UsernavDropdown = () => {
         </ListItem>
       </Div>
       <Div>
-        {((user?.userCustomers?.length && user?.userCustomers.length > 1) || canAccessAdmin) && setActiveCustomer && (
+        {((user?.userCustomers?.length && user?.userCustomers.length > 1) || canAccessAdmin) && (
           <ListItem renderLeftIcon={<ExternalLink />} onClick={goToDialoguesOverview}>
             <Text>
               {t('switch_project')}

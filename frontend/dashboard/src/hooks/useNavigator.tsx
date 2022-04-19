@@ -19,6 +19,8 @@ export const ROUTES = {
   DIALOGUE_BUILDER_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder',
   NEW_QUESTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/question/:questionId/new-cta',
   NEW_OPTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/option/:optionIndex/new-cta',
+  CTA_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/actions',
+  DIALOGUE_SETTINGS_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/edit',
 };
 
 interface DashboardParams {
@@ -40,10 +42,10 @@ export const useNavigator = () => {
   const history = useHistory();
   const location = useLocation();
 
-  const goToDialogueBuilderOverview = () => {
+  const goToDialogueBuilderOverview = (dialogueslugg?: string) => {
     const path = generatePath(ROUTES.DIALOGUE_BUILDER_OVERVIEW, {
       customerSlug,
-      dialogueSlug,
+      dialogueSlug: dialogueslugg || dialogueSlug,
     });
 
     history.push(path + location.search);
@@ -130,10 +132,44 @@ export const useNavigator = () => {
     }
   };
 
+  const goToInteractionsOverview = (dialogueSlugg?: string) => {
+    history.push(generatePath(ROUTES.INTERACTIONS_VIEW, {
+      customerSlug,
+      dialogueSlug: dialogueSlugg || dialogueSlug,
+    }) + location.search);
+  };
+
+  const goToCTAOverview = (dialogueSlugg?: string) => {
+    history.push(generatePath(ROUTES.CTA_OVERVIEW, {
+      customerSlug,
+      dialogueSlug: dialogueSlugg || dialogueSlug,
+    }) + location.search);
+  };
+
+  const goToDialogueSettings = (dialogueSlugg?: string) => {
+    history.push(generatePath(ROUTES.DIALOGUE_SETTINGS_VIEW, {
+      customerSlug,
+      dialogueSlug: dialogueSlugg || dialogueSlug,
+    }) + location.search);
+  };
+
   const getCampaignsPath = () => generatePath(ROUTES.CAMPAIGNS_VIEW, { customerSlug, campaignId });
   const getUsersPath = () => generatePath(ROUTES.USERS_OVERVIEW, { customerSlug });
   const getDialoguesPath = () => generatePath(ROUTES.DIALOGUES_VIEW, { customerSlug });
   const getAlertsPath = () => generatePath(ROUTES.ALERTS_OVERVIEW, { customerSlug });
+
+  const goToDialoguesOverview = () => {
+    history.push(getDialoguesPath() + location.search);
+  };
+
+  const goToDialogueView = (dialogueSlugg: string) => {
+    const path = generatePath(ROUTES.DIALOGUE_ROOT, {
+      customerSlug,
+      dialogueSlug: dialogueSlugg,
+    });
+
+    history.push(path + location.search);
+  };
 
   const dialoguesMatch = useRouteMatch({
     path: ROUTES.DIALOGUES_VIEW,
@@ -144,6 +180,11 @@ export const useNavigator = () => {
   });
 
   return {
+    goToDialogueSettings,
+    goToCTAOverview,
+    goToInteractionsOverview,
+    goToDialogueView,
+    goToDialoguesOverview,
     goToNewOptionsCTAView,
     goToDialogueBuilderOverview,
     goToNewQuestionCTAView,
