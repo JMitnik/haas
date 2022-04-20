@@ -185,6 +185,7 @@ const DashboardNav = ({ customerSlug, isExpanded }: { customerSlug: string, isEx
               >
                 {({ onOpen }) => (
                   <Div
+                    // style={{ pointerEvents: dialogueMatch ? 'none' : 'auto' }}
                     display="flex"
                     alignItems="center"
                     onMouseEnter={(e) => {

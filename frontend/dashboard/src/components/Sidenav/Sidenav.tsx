@@ -24,11 +24,18 @@ import useAuth from 'hooks/useAuth';
 
 interface NavItemContainerProps {
   isSubchildActive?: boolean;
+  $isExpanded?: boolean;
 }
 
 export const NavItemContainer = styled.li<NavItemContainerProps>`
-  ${({ theme, isSubchildActive }) => css`
+  ${({ theme, isSubchildActive, $isExpanded }) => css`
     position: relative;
+
+    ${!$isExpanded && isSubchildActive && css`
+      a:active {
+        pointer-events: none;
+      }
+    `}
 
     ${isSubchildActive && css`
       border-radius: 5px;
@@ -113,7 +120,7 @@ export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
 export const NavItem = (
   { children, renderSibling, isDisabled, isExpanded, isSubchildActive, ...props }: NavItemProps,
 ) => (
-  <NavItemContainer isSubchildActive={isSubchildActive}>
+  <NavItemContainer $isExpanded={isExpanded} isSubchildActive={isSubchildActive}>
     <NavLinkContainer $isExpanded={isExpanded} $isDisabled={isDisabled} {...props}>
       {children}
     </NavLinkContainer>
