@@ -3,7 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Book, ExternalLink, LogOut } from 'react-feather';
 import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, useToast } from '@chakra-ui/core';
 import { Div, Flex, Text } from '@haas/ui';
-import { Link, LinkProps, NavLink, useHistory, useParams } from 'react-router-dom';
+import { Link, LinkProps, NavLink, useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -15,7 +16,6 @@ import { ReactComponent as TableIcon } from 'assets/icons/icon-table.svg';
 import { ReactComponent as WrenchIcon } from 'assets/icons/icon-wrench.svg';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
-import { useTranslation } from 'react-i18next';
 import { useUser } from 'providers/UserProvider';
 import Dropdown from 'components/Dropdown';
 import List from 'components/List/List';
@@ -28,7 +28,6 @@ interface NavItemContainerProps {
 
 export const NavItemContainer = styled.li<NavItemContainerProps>`
   ${({ theme, isSubchildActive }) => css`
-    /* display: flex; */
     position: relative;
 
     ${isSubchildActive && css`
@@ -464,12 +463,9 @@ export const SidenavContainer = styled.div<{ isExpanded: boolean }>`
   `}
 `;
 
-const Sidenav = ({ isExpanded, children }: { isExpanded: boolean, children: React.ReactNode }) => {
-  console.log('Is expanded SIDE NAV: ', isExpanded);
-  return (
-    <SidenavContainer isExpanded={isExpanded} data-cy="Sidenav">
-      {children}
-    </SidenavContainer>
-  );
-};
+const Sidenav = ({ isExpanded, children }: { isExpanded: boolean, children: React.ReactNode }) => (
+  <SidenavContainer isExpanded={isExpanded} data-cy="Sidenav">
+    {children}
+  </SidenavContainer>
+);
 export default Sidenav;
