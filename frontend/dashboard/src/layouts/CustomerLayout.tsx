@@ -156,14 +156,13 @@ const DashboardNav = ({ customerSlug, isExpanded }: { customerSlug: string, isEx
     canBuildDialogues,
     canEditDialogue,
   } = useAuth();
-  const { dialogueMatch, goToUsersOverview, goToDialoguesOverview, dialoguesMatch } = useNavigator();
+  const { dialogueMatch } = useNavigator();
   const dialogueSlug = dialogueMatch?.params?.dialogueSlug;
-  console.log('Dialogue slug customer layout: ', dialogueSlug);
 
   return (
     <>
       <NavItems>
-        <motion.ul layout>
+        <motion.ul>
           <AnimateSharedLayout>
             <NavItem
               isExpanded={isExpanded}

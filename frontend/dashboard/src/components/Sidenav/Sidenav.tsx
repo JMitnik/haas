@@ -73,7 +73,6 @@ export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
     color: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['600']};
     padding: 8px 11px;
     display: flex;
-    align-items: center;
     font-size: 0.8rem;
 
     ${$isDisabled && css`
@@ -444,7 +443,11 @@ export const SidenavContainer = styled.div<{ isExpanded: boolean }>`
     ul {
       display: flex;
       flex-direction: column;
-      align-items: center;
+
+      ${!isExpanded && css`
+        align-items: center;
+      `}
+      
       a {
         text-decoration: none;
 
