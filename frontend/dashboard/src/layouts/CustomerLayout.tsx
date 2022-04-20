@@ -209,14 +209,6 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
                 </>
               )}
             >
-              <SurveyIcon />
-              {/* {t('dialogues')} */}
-            </NavItem>
-            <MenuLinkContainer
-              // isDisabled={!canViewUsers}
-              // to={`/dashboard/b/${customerSlug}/users`}
-              style={{ fontWeight: 900 }}
-            >
               <Dropdown
                 renderOverlay={({ onClose }) => <SubMenuDropdown onClose={onClose} />}
                 placement="bottom-end"
@@ -225,29 +217,31 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
                 {({ onOpen }) => (
                   <Div
                     onMouseEnter={(e) => {
-                      if (!dialoguesMatch) {
-                        goToDialoguesOverview();
-                      }
                       if (dialogueMatch) {
                         onOpen(e);
                       }
                     }}
                     onClick={(e) => {
-                      if (!dialoguesMatch) {
-                        goToDialoguesOverview();
-                      }
                       if (dialogueMatch) {
                         onOpen(e);
                       }
                     }}
                   >
-                    <UsersIcon />
+                    <SurveyIcon />
                   </Div>
                 )}
               </Dropdown>
 
+              {/* {t('dialogues')} */}
+            </NavItem>
+            <NavItem
+              isDisabled={!canViewUsers}
+              to={`/dashboard/b/${customerSlug}/users`}
+              style={{ fontWeight: 900 }}
+            >
+              <UsersIcon />
               {/* {t('users')} */}
-            </MenuLinkContainer>
+            </NavItem>
             <NavItem isDisabled={!canCreateTriggers} to={`/dashboard/b/${customerSlug}/triggers`}>
               <NotificationIcon />
               {/* {t('alerts')} */}
