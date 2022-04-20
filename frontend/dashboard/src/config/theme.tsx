@@ -78,7 +78,7 @@ const theme = {
   sidenav: {
     // Note-sidenav: uncomment to get back old sidenav
     // width: 200,
-    width: 70,
+    width: 200,
   },
   // zIndices: {
   //   dropdown: 200,

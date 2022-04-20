@@ -36,16 +36,24 @@ import { useNavigator } from 'hooks/useNavigator';
 import { ArrowLeftCircle, ArrowRightCircle } from 'react-feather';
 import NotAuthorizedView from './NotAuthorizedView';
 
-const CustomerLayoutContainer = styled(Div) <{ isMobile?: boolean }>`
-  ${({ theme, isMobile = false }) => css`
+const CustomerLayoutContainer = styled(Div) <{ isMobile?: boolean, isExpanded?: boolean }>`
+  ${({ theme, isMobile = false, isExpanded }) => css`
     display: grid;
     background: ${theme.colors.app.background};
     min-height: 100vh;
 
-    ${isMobile ? css`
+    ${isMobile && !isExpanded ? css`
       grid-template-columns: '1fr';
     ` : css`
       grid-template-columns: ${theme.sidenav.width}px 1fr;
+    `}
+
+    ${!isMobile && isExpanded && css`
+      grid-template-columns: ${theme.sidenav.width}px 1fr;
+    `}
+
+    ${!isMobile && !isExpanded && css`
+      grid-template-columns: 70px 1fr;
     `}
 
   `}
@@ -217,13 +225,15 @@ const DashboardNav = ({ customerSlug, isExpanded }: { customerSlug: string, isEx
               >
                 {({ onOpen }) => (
                   <Div
+                    display="flex"
+                    alignItems="center"
                     onMouseEnter={(e) => {
-                      if (dialogueMatch && isExpanded) {
+                      if (dialogueMatch && !isExpanded) {
                         onOpen(e);
                       }
                     }}
                     onClick={(e) => {
-                      if (dialogueMatch && isExpanded) {
+                      if (dialogueMatch && !isExpanded) {
                         onOpen(e);
                       }
                     }}
@@ -311,7 +321,7 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <ErrorBoundary FallbackComponent={NotAuthorizedView}>
       <CustomThemeProviders>
-        <CustomerLayoutContainer isMobile={device.isSmall}>
+        <CustomerLayoutContainer isExpanded={isExpanded} isMobile={device.isSmall}>
 
           {isLoading && (
             <CornerLoaderPosition>
@@ -321,15 +331,12 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
           <Div>
             {!device.isSmall ? (
               <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
-                <Sidenav>
-                  {/* padding={2} */}
-                  <Div position="relative">
+                <Sidenav isExpanded={isExpanded}>
+                  <Div pl={isExpanded ? 2 : 0} pr={isExpanded ? 2 : 0} paddingTop={2} position="relative">
                     <ExpandArrow isExpanded={isExpanded} onExpandChange={setIsExpanded} />
                     <UI.Flex alignItems="center">
                       <Logo width="70px" height="70px" justifyContent="center" />
-                      {/* <UI.Text>haas</UI.Text> */}
-                      {/* <FilledLogo mb={4} width="50px" height="50px" justifyContent="center" /> */}
-                      {/* <UI.Text>haas</UI.Text> */}
+                      {isExpanded && <UI.Text>haas</UI.Text>}
                     </UI.Flex>
                     <DashboardNav isExpanded={isExpanded} customerSlug={params.customerSlug} />
                   </Div>

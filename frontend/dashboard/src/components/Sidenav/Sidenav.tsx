@@ -28,7 +28,7 @@ interface NavItemContainerProps {
 
 export const NavItemContainer = styled.li<NavItemContainerProps>`
   ${({ theme, isSubchildActive }) => css`
-    display: flex;
+    /* display: flex; */
     position: relative;
 
     ${isSubchildActive && css`
@@ -461,10 +461,12 @@ export const SidenavContainer = styled.div<{ isExpanded: boolean }>`
   `}
 `;
 
-const Sidenav = ({ children }: { children: React.ReactNode }) => (
-  <SidenavContainer data-cy="Sidenav">
-    {children}
-  </SidenavContainer>
-);
-
+const Sidenav = ({ isExpanded, children }: { isExpanded: boolean, children: React.ReactNode }) => {
+  console.log('Is expanded SIDE NAV: ', isExpanded);
+  return (
+    <SidenavContainer isExpanded={isExpanded} data-cy="Sidenav">
+      {children}
+    </SidenavContainer>
+  );
+};
 export default Sidenav;
