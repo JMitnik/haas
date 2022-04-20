@@ -59,57 +59,17 @@ interface NavItemProps extends LinkProps {
   exact?: boolean;
   isSubchildActive?: boolean;
   isDisabled?: boolean;
+  isExpanded?: boolean;
 }
 
 interface NavLinkProps extends LinkProps {
   // Styled-components does not pass props with a dollar sign to the underlying element.
   $isDisabled?: boolean;
+  $isExpanded?: boolean;
 }
 
-export const MenuLinkContainer = styled(UI.Div) <{ isDisabled?: boolean }>`
-  ${({ theme, isDisabled }) => css`
-    color: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['600']};
-    padding: 8px 11px;
-    display: flex;
-    align-items: center;
-    font-size: 0.8rem;
-
-    ${isDisabled && css`
-      opacity: 0.3;
-      pointer-events: none;
-      cursor: not-allowed;
-    `}
-
-    /* For the icons */
-    svg {
-      /* margin-right: ${theme.gutter / 2}px; */
-      width: 24px;
-      fill: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['500']};
-
-      .secondary {
-        fill: ${theme.isDarkColor ? theme.colors.primaries['200'] : theme.colors.primaries['700']};
-      }
-    }
-
-    &:hover {
-      color: ${theme.isDarkColor ? theme.colors.primaries['200'] : theme.colors.primaries['700']};
-    }
-
-    /* If active react router */
-    &.active {
-      background: ${theme.colors.primaryGradient};
-      border-radius: ${theme.borderRadiuses.somewhatRounded};
-      color: white;
-
-      svg {
-        fill: white;
-      }
-    }
-  `}
-`;
-
 export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
-  ${({ theme, $isDisabled }) => css`
+  ${({ theme, $isDisabled, $isExpanded }) => css`
     color: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['600']};
     padding: 8px 11px;
     display: flex;
@@ -124,7 +84,9 @@ export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
 
     /* For the icons */
     svg {
-      /* margin-right: ${theme.gutter / 2}px; */
+      ${$isExpanded && css`
+        margin-right: ${theme.gutter / 2}px;
+      `}
       width: 24px;
       fill: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['500']};
 
@@ -150,9 +112,11 @@ export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
   `}
 `;
 
-export const NavItem = ({ children, renderSibling, isDisabled, isSubchildActive, ...props }: NavItemProps) => (
+export const NavItem = (
+  { children, renderSibling, isDisabled, isExpanded, isSubchildActive, ...props }: NavItemProps,
+) => (
   <NavItemContainer isSubchildActive={isSubchildActive}>
-    <NavLinkContainer $isDisabled={isDisabled} {...props}>
+    <NavLinkContainer $isExpanded={isExpanded} $isDisabled={isDisabled} {...props}>
       {children}
     </NavLinkContainer>
     {!isDisabled && (
@@ -435,12 +399,16 @@ export const Usernav = () => {
   );
 };
 
-export const SidenavContainer = styled.div`
-  ${({ theme }) => css`
+export const SidenavContainer = styled.div<{ isExpanded: boolean }>`
+  ${({ theme, isExpanded }) => css`
     position: fixed;
     z-index: 1200;
     font-weight: 1000;
-    /* width: ${theme.sidenav.width}px; */
+
+    ${isExpanded && css`
+      width: ${theme.sidenav.width}px;
+    `}
+    
     background: ${theme.colors.gray[100]};
     border-right: 1px solid ${theme.colors.gray['200']};
 

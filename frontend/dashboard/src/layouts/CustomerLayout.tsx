@@ -11,7 +11,7 @@ import { CustomThemeProviders } from 'providers/ThemeProvider';
 import { Div, PageHeading } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ReactComponent as HomeIcon } from 'assets/icons/icon-home.svg';
-import { MenuLinkContainer, NavItem, NavItems, NavLinkContainer, SubMenuDropdown, Usernav } from 'components/Sidenav/Sidenav';
+import { NavItem, NavItems, SubMenuDropdown, Usernav } from 'components/Sidenav/Sidenav';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification.svg';
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog.svg';
 import { ReactComponent as SliderIcon } from 'assets/icons/icon-slider.svg';
@@ -33,6 +33,7 @@ import { NavLink } from 'react-router-dom';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 
+import { ArrowLeftCircle, ArrowRightCircle } from 'react-feather';
 import NotAuthorizedView from './NotAuthorizedView';
 
 const CustomerLayoutContainer = styled(Div) <{ isMobile?: boolean }>`
@@ -137,7 +138,7 @@ const SubNavItem = styled.li<SubNavItemProps>`
   `}
 `;
 
-const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
+const DashboardNav = ({ customerSlug, isExpanded }: { customerSlug: string, isExpanded: boolean }) => {
   const { t } = useTranslation();
   const {
     canViewUsers,
@@ -148,7 +149,6 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
     canEditDialogue,
   } = useAuth();
   const { dialogueMatch, goToUsersOverview, goToDialoguesOverview, dialoguesMatch } = useNavigator();
-  const [isCompact, setIsCompact] = useState(true);
   const dialogueSlug = dialogueMatch?.params?.dialogueSlug;
   console.log('Dialogue slug customer layout: ', dialogueSlug);
 
@@ -158,19 +158,20 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
         <motion.ul layout>
           <AnimateSharedLayout>
             <NavItem
+              isExpanded={isExpanded}
               to={`/dashboard/b/${customerSlug}/dashboard`}
             >
               <HomeIcon />
-
-              {/* {t('views:dashboard')} */}
+              {isExpanded && t('views:dashboard')}
             </NavItem>
             <NavItem
+              isExpanded={isExpanded}
               isSubchildActive={!!dialogueSlug}
               exact
               to={`/dashboard/b/${customerSlug}/d`}
               renderSibling={(
                 <>
-                  {!isCompact && dialogueMatch && (
+                  {isExpanded && dialogueMatch && (
                     <motion.div>
                       <SubNav>
                         <SubNavItem>
@@ -217,42 +218,42 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
                 {({ onOpen }) => (
                   <Div
                     onMouseEnter={(e) => {
-                      if (dialogueMatch) {
+                      if (dialogueMatch && isExpanded) {
                         onOpen(e);
                       }
                     }}
                     onClick={(e) => {
-                      if (dialogueMatch) {
+                      if (dialogueMatch && isExpanded) {
                         onOpen(e);
                       }
                     }}
                   >
                     <SurveyIcon />
+                    {isExpanded && t('dialogues')}
                   </Div>
                 )}
               </Dropdown>
 
-              {/* {t('dialogues')} */}
             </NavItem>
             <NavItem
+              isExpanded={isExpanded}
               isDisabled={!canViewUsers}
               to={`/dashboard/b/${customerSlug}/users`}
-              style={{ fontWeight: 900 }}
             >
               <UsersIcon />
-              {/* {t('users')} */}
+              {isExpanded && t('users')}
             </NavItem>
-            <NavItem isDisabled={!canCreateTriggers} to={`/dashboard/b/${customerSlug}/triggers`}>
+            <NavItem isExpanded={isExpanded} isDisabled={!canCreateTriggers} to={`/dashboard/b/${customerSlug}/triggers`}>
               <NotificationIcon />
-              {/* {t('alerts')} */}
+              {isExpanded && t('alerts')}
             </NavItem>
-            <NavItem isDisabled={!canViewCampaigns} to={`/dashboard/b/${customerSlug}/campaigns`}>
+            <NavItem isExpanded={isExpanded} isDisabled={!canViewCampaigns} to={`/dashboard/b/${customerSlug}/campaigns`}>
               <ChatIcon />
-              {/* {t('campaigns')} */}
+              {isExpanded && t('campaigns')}
             </NavItem>
-            <NavItem isDisabled={!canEditCustomer} to={`/dashboard/b/${customerSlug}/edit`}>
+            <NavItem isExpanded={isExpanded} isDisabled={!canEditCustomer} to={`/dashboard/b/${customerSlug}/edit`}>
               <SettingsIcon />
-              {/* {t('settings')} */}
+              {isExpanded && t('settings')}
             </NavItem>
           </AnimateSharedLayout>
         </motion.ul>
@@ -267,10 +268,45 @@ const CornerLoaderPosition = styled.div`
   right: 0;
 `;
 
+const ExpandArrowContainer = styled.div`
+  position: absolute;
+  cursor: pointer;
+
+  right:-12px;
+  top: 3em;
+
+  color:lightgrey;
+  background-color:#EDF2F7;
+`;
+
+interface ExpandArrowProps {
+  onExpandChange: (value: React.SetStateAction<boolean>) => void;
+  isExpanded: boolean;
+}
+
+const ExpandArrow = ({ isExpanded, onExpandChange }: ExpandArrowProps) => {
+  const handleExpandChange = () => {
+    onExpandChange((prevValue) => {
+      localStorage.setItem('nav_expanded', `${!prevValue}`);
+      return !prevValue;
+    });
+  };
+
+  return (
+    <ExpandArrowContainer onClick={() => handleExpandChange()}>
+      {isExpanded ? <ArrowLeftCircle /> : <ArrowRightCircle />}
+    </ExpandArrowContainer>
+  );
+};
+
 const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
   const params: { topicId: string, customerSlug: string, dialogueSlug: string } = useParams<any>();
   const device = useMediaDevice();
   const { isLoading } = useCustomer();
+
+  const [isExpanded, setIsExpanded] = useState<boolean>(
+    JSON.parse(localStorage.getItem('nav_expanded') || 'false'),
+  );
 
   return (
     <ErrorBoundary FallbackComponent={NotAuthorizedView}>
@@ -287,14 +323,15 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
               <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
                 <Sidenav>
                   {/* padding={2} */}
-                  <Div>
+                  <Div position="relative">
+                    <ExpandArrow isExpanded={isExpanded} onExpandChange={setIsExpanded} />
                     <UI.Flex alignItems="center">
                       <Logo width="70px" height="70px" justifyContent="center" />
                       {/* <UI.Text>haas</UI.Text> */}
                       {/* <FilledLogo mb={4} width="50px" height="50px" justifyContent="center" /> */}
                       {/* <UI.Text>haas</UI.Text> */}
                     </UI.Flex>
-                    <DashboardNav customerSlug={params.customerSlug} />
+                    <DashboardNav isExpanded={isExpanded} customerSlug={params.customerSlug} />
                   </Div>
 
                   <Usernav />
@@ -302,7 +339,7 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
               </motion.div>
             ) : (
               <MobileBottomNav>
-                <DashboardNav customerSlug={params.customerSlug} />
+                <DashboardNav isExpanded={isExpanded} customerSlug={params.customerSlug} />
               </MobileBottomNav>
             )}
           </Div>
