@@ -245,13 +245,14 @@ const ExpandArrowContainer = styled.div`
 
   right:-12px;
   top: 3em;
+  border-radius: 45px;
 
   color:#d5dce6;
 
   :hover {
     color: #4A5568;
   }
-  background-color:#EDF2F7;
+  background-color: #EDF2F7;
 `;
 
 interface ExpandArrowProps {
