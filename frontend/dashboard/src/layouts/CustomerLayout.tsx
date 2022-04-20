@@ -180,12 +180,11 @@ const DashboardNav = ({ customerSlug, isExpanded }: { customerSlug: string, isEx
             >
               <Dropdown
                 renderOverlay={({ onClose }) => <SubMenuDropdown onClose={onClose} />}
-                placement="bottom-end"
-                offset={[12, 10]}
+                placement="left-start"
+                offset={[-10, 10]}
               >
                 {({ onOpen }) => (
                   <Div
-                    // style={{ pointerEvents: dialogueMatch ? 'none' : 'auto' }}
                     display="flex"
                     alignItems="center"
                     onMouseEnter={(e) => {
