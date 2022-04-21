@@ -17,6 +17,18 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+type AssignedDialogues {
+  assignedDialogues: [Dialogue!]!
+  privateWorkspaceDialogues: [Dialogue!]!
+}
+
+input AssignUserToDialoguesInput {
+  assignedDialogueIds: [String!]!
+  delistedDialogueIds: [String!]!
+  userId: String!
+  workspaceId: String!
+}
+
 input AuthenticateLambdaInput {
   authenticateEmail: String
   workspaceEmail: String
@@ -494,6 +506,7 @@ type Customer {
   campaign(campaignId: String): CampaignType
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
+  dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
@@ -648,6 +661,7 @@ type Dialogue {
   dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
   edges: [Edge!]!
   id: ID!
+  isPrivate: Boolean!
   isWithoutGenData: Boolean!
   language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
@@ -684,6 +698,32 @@ type DialogueConditionScopeModel {
   createdAt: Date!
   id: ID!
   updatedAt: Date!
+}
+
+type DialogueConnection implements ConnectionInterface {
+  dialogues: [Dialogue!]!
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
+}
+
+input DialogueConnectionFilterInput {
+  endDate: String
+  offset: Int
+  orderBy: DialogueConnectionOrderByInput
+  perPage: Int = 10
+  searchTerm: String
+  startDate: String
+}
+
+"""Fields to order UserConnection by."""
+enum DialogueConnectionOrder {
+  createdAt
+}
+
+"""Sorting of DialogueConnection"""
+input DialogueConnectionOrderByInput {
+  by: DialogueConnectionOrder!
+  desc: Boolean = true
 }
 
 input DialogueFilterInputType {
@@ -1074,6 +1114,7 @@ type MostTrendingTopic {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
@@ -1121,6 +1162,7 @@ type Mutation {
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload): ImageType!
   updateAutomation(input: CreateAutomationInput): AutomationModel!
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
@@ -1580,6 +1622,12 @@ input SessionWhereUniqueInput {
   id: ID
 }
 
+input SetDialoguePrivacyInput {
+  customerId: String!
+  dialogueSlug: String!
+  state: Boolean!
+}
+
 input ShareNodeInputType {
   id: String
   title: String
@@ -1647,6 +1695,7 @@ enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
   CAN_ACCESS_REPORT_PAGE
   CAN_ADD_USERS
+  CAN_ASSIGN_USERS_TO_DIALOGUE
   CAN_BUILD_DIALOGUE
   CAN_CREATE_AUTOMATIONS
   CAN_CREATE_CAMPAIGNS
@@ -1896,6 +1945,7 @@ input UserOfCustomerInput {
   customerId: String
   customerSlug: String
   userId: String
+  workspaceId: String
 }
 
 type UserType {
@@ -1908,6 +1958,7 @@ type UserType {
   lastLoggedIn: Date
   lastName: String
   phone: String
+  privateDialogues(input: UserOfCustomerInput): AssignedDialogues
   role: RoleType
   roleId: String
   userCustomers: [UserCustomer!]!

@@ -2,7 +2,8 @@ import { ApolloQueryResult, gql, useMutation, useQuery } from '@apollo/client';
 import { useHistory } from 'react-router';
 import React, { useContext, useEffect, useState } from 'react';
 
-import { Exact, MeQuery, useMeQuery } from 'types/generated-types';
+import { Exact, Maybe, MeQuery, useMeQuery } from 'types/generated-types';
+import { useCustomer } from './CustomerProvider';
 
 const POLL_INTERVAL_SECONDS = 60;
 
@@ -33,7 +34,7 @@ interface AuthContextProps {
   setUser: (userData: MeUserType) => void;
   refreshUser: (variables?: Partial<Exact<{
     [key: string]: never;
-  }>> | undefined) => Promise<ApolloQueryResult<MeQuery>>;
+  }>> | undefined) => Promise<ApolloQueryResult<MeQuery>>
   hardRefreshUser: () => void;
 }
 
@@ -43,7 +44,6 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const history = useHistory();
   const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem('access_token'));
   const [isInitializingUser, setIsInitializingUser] = useState<boolean>(() => !!accessToken);
-
   const stopInitializingUser = () => {
     setTimeout(() => {
       setIsInitializingUser(false);

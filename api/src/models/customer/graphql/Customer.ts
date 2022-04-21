@@ -1,6 +1,6 @@
 import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { GraphQLUpload, UserInputError } from 'apollo-server-express';
+import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
@@ -14,6 +14,7 @@ import { AutomationModel } from '../../automations/graphql/AutomationModel';
 import { AutomationConnection, AutomationConnectionFilterInput } from '../../automations/graphql/AutomationConnection';
 import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
+import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -37,6 +38,22 @@ export const CustomerType = objectType({
       async resolve(parent: Customer, args, ctx) {
         const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
         return customerSettings;
+      },
+    });
+
+    t.field('dialogueConnection', {
+      type: DialogueConnection,
+      args: { filter: DialogueConnectionFilterInput },
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        if (!ctx.session?.user?.id) throw new ApolloError('No user in session found!');
+
+        let dialogues = await ctx.services.dialogueService.paginatedDialogues(
+          parent.slug,
+          ctx.session?.user?.id,
+          args.filter
+        );
+        return dialogues;
       },
     });
 

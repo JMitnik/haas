@@ -1,0 +1,7 @@
+mutation setDialoguePrivacy($input: SetDialoguePrivacyInput) {
+  setDialoguePrivacy(input: $input) {
+    slug
+    title
+    isPrivate
+  }
+} 

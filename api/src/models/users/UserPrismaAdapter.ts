@@ -1,9 +1,9 @@
-import { PrismaClient, User, Prisma, UserOfCustomer } from "@prisma/client";
-import _, { cloneDeep } from "lodash";
+import { PrismaClient, User, Prisma, UserOfCustomer } from '@prisma/client';
+import _, { cloneDeep } from 'lodash';
 
-import { RegisterUserInput } from "./UserPrismaAdapterType";
+import { RegisterUserInput } from './UserPrismaAdapterType';
 import RoleService from '../role/RoleService';
-import { NexusGenInputs } from "../../generated/nexus";
+import { NexusGenInputs } from '../../generated/nexus';
 
 
 class UserPrismaAdapter {
@@ -13,6 +13,28 @@ class UserPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
+  }
+
+  updateUserPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
+    return this.prisma.user.update({
+      where: {
+        id: input?.userId,
+      },
+      data: {
+        isAssignedTo: {
+          disconnect: input?.delistedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
+          deleteMany: {
+            id: {
+              in: input?.delistedDialogueIds,
+            },
+          },
+          connect: input?.assignedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
+        },
+      },
+      include: {
+        isAssignedTo: true,
+      },
+    });
   }
 
   /**
@@ -63,7 +85,7 @@ class UserPrismaAdapter {
           { user: { email: { contains: filter.search, mode: 'insensitive' } } },
           { user: { firstName: { contains: filter.search, mode: 'insensitive' } } },
           { user: { lastName: { contains: filter.search, mode: 'insensitive' } } },
-        ]
+        ],
       }
     }
 
@@ -91,7 +113,7 @@ class UserPrismaAdapter {
         firstName: string | null;
         lastName: string | null;
         email: string;
-      },
+      };
       role: {
         name: string;
       };
@@ -128,31 +150,31 @@ class UserPrismaAdapter {
       orderByQuery.push({
         user: {
           lastActivity: filter.orderBy.desc ? 'desc' : 'asc',
-        }
+        },
       });
     }
 
     if (filter?.orderBy?.by === 'firstName') {
       orderByQuery.push({
-        user: { firstName: filter.orderBy.desc ? 'desc' : 'asc', }
+        user: { firstName: filter.orderBy.desc ? 'desc' : 'asc' },
       });
     }
 
     if (filter?.orderBy?.by === 'lastName') {
       orderByQuery.push({
-        user: { lastName: filter.orderBy.desc ? 'desc' : 'asc', }
+        user: { lastName: filter.orderBy.desc ? 'desc' : 'asc' },
       });
     }
 
     if (filter?.orderBy?.by === 'email') {
       orderByQuery.push({
-        user: { email: filter.orderBy.desc ? 'desc' : 'asc', }
+        user: { email: filter.orderBy.desc ? 'desc' : 'asc' },
       });
     }
 
     if (filter?.orderBy?.by === 'role') {
       orderByQuery.push({
-        role: { name: filter.orderBy.desc ? 'desc' : 'asc', }
+        role: { name: filter.orderBy.desc ? 'desc' : 'asc' },
       });
     }
 
@@ -344,7 +366,7 @@ class UserPrismaAdapter {
         email: {
           equals: email,
           mode: 'insensitive',
-        }
+        },
       },
       include: {
         customers: {
@@ -408,13 +430,13 @@ class UserPrismaAdapter {
     });
   };
 
-  async setIsActive(input: { userId: string, workspaceId: string, isActive: boolean }) {
+  async setIsActive(input: { userId: string; workspaceId: string; isActive: boolean }) {
     const result = await this.prisma.userOfCustomer.update({
       where: {
         userId_customerId: {
           userId: input.userId,
           customerId: input.workspaceId,
-        }
+        },
       },
       data: {
         isActive: input.isActive,
@@ -423,7 +445,7 @@ class UserPrismaAdapter {
         user: true,
         role: true,
         customer: true,
-      }
+      },
     });
 
     return result;
@@ -478,7 +500,7 @@ class UserPrismaAdapter {
             equals: loginToken,
           },
           id: { equals: userId },
-        }
+        },
       },
       include: {
         customers: {

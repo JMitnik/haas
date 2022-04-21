@@ -22,6 +22,7 @@ import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
 import EdgeService from '../edge/EdgeService';
+import { offsetPaginate } from '../general/PaginationHelpers';
 
 
 function getRandomInt(max: number) {
@@ -582,6 +583,36 @@ class DialogueService {
       name: topicName,
       nrVotes: topicNrVotes,
       subTopics: mergedSubTopics,
+    }
+  }
+
+  setDialoguePrivacy = async (input: NexusGenInputs['SetDialoguePrivacyInput']) => {
+    return this.dialoguePrismaAdapter.setDialoguePrivacy(input);
+  }
+
+  /**
+   * Function to paginate through all automations of a workspace
+   * @param workspaceSlug the slug of the workspace
+   * @param filter a filter object used to paginate through automations of a workspace
+   * @returns a list of paginated automations
+   */
+  public paginatedDialogues = async (
+    workspaceSlug: string,
+    userId: string,
+    filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null,
+  ) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 15;
+
+    const dialogues = await this.dialoguePrismaAdapter.findPaginatedDialogues(workspaceSlug, userId, filter);
+    const totalDialogues = await this.dialoguePrismaAdapter.countDialogues(workspaceSlug, userId, filter);
+
+    const { totalPages, ...pageInfo } = offsetPaginate(totalDialogues, offset, perPage);
+
+    return {
+      dialogues: dialogues,
+      totalPages,
+      pageInfo,
     };
   };
 

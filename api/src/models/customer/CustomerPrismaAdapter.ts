@@ -11,6 +11,21 @@ export class CustomerPrismaAdapter {
     this.prisma = prisma;
   }
 
+  findPrivateDialoguesOfWorkspace = async (workspaceId: string) => {
+    return this.prisma.customer.findUnique({
+      where: {
+        id: workspaceId,
+      },
+      include: {
+        dialogues: {
+          where: {
+            isPrivate: true,
+          },
+        },
+      },
+    });
+  }
+
   async deleteFontSettings(fontSettingsId: number): Promise<FontSettings> {
     return this.prisma.fontSettings.delete({
       where: {

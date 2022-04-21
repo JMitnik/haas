@@ -1,7 +1,7 @@
 import { useHistory, useParams } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 
-import { Customer, RoleType, SystemPermission, useGetCustomerOfUserQuery } from 'types/generated-types';
+import { Customer, Dialogue, RoleType, SystemPermission, useGetCustomerOfUserQuery } from 'types/generated-types';
 
 import { useUser } from './UserProvider';
 
@@ -11,6 +11,15 @@ interface CustomerProps extends Customer {
   userRole: {
     __typename?: 'RoleType' | undefined;
   } & Pick<RoleType, 'name' | 'permissions'>;
+  user?: {
+    id: string | undefined;
+    privateDialogues?: PrivateDialogueProps | null;
+  }
+}
+
+interface PrivateDialogueProps {
+  privateWorkspaceDialogues?: ({} & Pick<Dialogue, 'title' | 'slug' | 'id'>)[];
+  assignedDialogues?: ({} & Pick<Dialogue, 'slug' | 'id'>)[];
 }
 
 interface CustomerContextProps {
@@ -18,6 +27,7 @@ interface CustomerContextProps {
   setActiveCustomer: (customer: CustomerProps | null) => void;
   activeCustomer?: CustomerProps | null;
   activePermissions?: SystemPermission[];
+  privateDialogues?: PrivateDialogueProps | null;
 }
 
 interface CustomerProviderProps {
@@ -63,6 +73,7 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
     onCompleted: (data) => {
       const customer = data.UserOfCustomer?.customer;
       const role = data.UserOfCustomer?.role;
+      const newUser = data.UserOfCustomer?.user;
 
       if (!customer) {
         history.push('unauthorized');
@@ -77,6 +88,7 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
 
       setActiveCustomer({
         ...customer,
+        user: newUser,
         userRole: role,
       });
     },
@@ -84,8 +96,13 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
 
   const activePermissions = [...(user?.globalPermissions || []), ...(activeCustomer?.userRole?.permissions || [])];
 
+  const privateDialogues = activeCustomer?.user?.privateDialogues;
+
   return (
-    <CustomerContext.Provider value={{ activeCustomer, setActiveCustomer, activePermissions, isLoading }}>
+    <CustomerContext.Provider value={{
+      activeCustomer, setActiveCustomer, activePermissions, isLoading, privateDialogues,
+    }}
+    >
       {children}
     </CustomerContext.Provider>
   );

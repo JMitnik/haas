@@ -367,6 +367,10 @@ const language = {
       en: 'Role Permissions',
       de: 'Rollenberechtigungen',
     },
+    assigned_dialogues: {
+      en: 'Assigned dialogues',
+      de: 'Zugewiesene Dialoge',
+    },
     details: {
       en: 'Details',
       de: 'Detail',
@@ -882,6 +886,14 @@ const language = {
     end: {
       en: 'End',
       de: 'Ende',
+    },
+    make_dialogue_private: {
+      en: 'Make private',
+      de: 'Privatisieren',
+    },
+    make_dialogue_public: {
+      en: 'Make public',
+      de: 'Veröffentlichen',
     },
     edit: {
       en: 'Edit',
@@ -1944,6 +1956,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
+    updated_assigned_dialogues: {
+      en: 'Updated assigned dialogues',
+      de: 'Zugewiesene Dialoge aktualisiert',
+    },
+    updated_assigned_dialogues_helper: {
+      en: 'The assigned dialogues have been succesfully updated.',
+      de: 'Die zugeordneten Dialoge wurden erfolgreich aktualisiert.',
+    },
     updated_permissions: {
       en: 'Updated permissions',
       de: 'Berechtigungen aktualisiert',
@@ -2376,6 +2396,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   permissions: {
+    can_assign_users_to_dialogue: {
+      en: 'This permission allows a user to make private dialogues (in)-accessible for other users',
+      de: 'Diese Berechtigung erlaubt es einem Benutzer, private Dialoge für andere Benutzer (un)zugänglich zu machen',
+    },
     can_access_admin_panel: {
       en: 'This system-wide permission allows a user to do everything (overrules others) within the haas dashboard. It is specified per user and cannot be set within a workspace.',
       de: 'Diese systemweite Berechtigung ermöglicht es einem Benutzer, alles innerhalb des haas-Dashboards zu tun. Sie wird pro Benutzer angegeben und kann nicht innerhalb eines Arbeitsbereichs festgelegt werden.',

@@ -2,10 +2,10 @@ import { expectWorkspaceLoaded, fireEvent, render, screen, server, userEvent, wa
 import { graphql } from 'msw';
 import { name } from 'faker';
 import { range } from 'lodash';
-import { useLocation } from 'react-router-dom';
 import React from 'react';
 
-import { DeleteUserMutation, DeleteUserMutationVariables, GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables, UserCustomer } from 'types/generated-types';
+import { GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables, UserCustomer } from 'types/generated-types';
+
 import UsersOverview from '../UsersOverview';
 
 const generateUserCustomer: (index: number) => UserCustomer = (index: number) => ({
@@ -33,6 +33,10 @@ const generateUserCustomer: (index: number) => UserCustomer = (index: number) =>
     customers: [],
     lastLoggedIn: new Date().toISOString(),
     userCustomers: [],
+    privateDialogues: {
+      assignedDialogues: [],
+      privateWorkspaceDialogues: [],
+    },
   },
 });
 

@@ -1,7 +1,7 @@
 
 import { UserInputError } from 'apollo-server-express';
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { addDays, subDays } from 'date-fns';
+import { enumType, extendType, inputObjectType, mutationField, objectType, stringArg } from '@nexus/schema';
 
 import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
@@ -180,6 +180,7 @@ export const DialogueType = objectType({
     t.field('language', {
       type: LanguageEnumType,
     });
+    t.boolean('isPrivate');
 
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
@@ -618,6 +619,25 @@ export const CreateDialogueInputType = inputObjectType({
   },
 });
 
+export const SetDialoguePrivacyInput = inputObjectType({
+  name: 'SetDialoguePrivacyInput',
+  definition(t) {
+    t.string('customerId', { required: true });
+    t.string('dialogueSlug', { required: true });
+    t.boolean('state', { required: true });
+  },
+})
+
+export const SetDialoguePrivacyMutation = mutationField('setDialoguePrivacy', {
+  type: 'Dialogue',
+  args: { input: SetDialoguePrivacyInput },
+  nullable: true,
+  async resolve(parent, args, ctx) {
+    if (!args.input) throw new UserInputError('No input object provided!');
+    return ctx.services.dialogueService.setDialoguePrivacy(args.input);
+  },
+})
+
 export const DialogueMutations = extendType({
   type: 'Mutation',
   definition(t) {
@@ -724,4 +744,6 @@ export default [
   DialogueType,
   DialogueRootQuery,
   DialogueStatistics,
+  SetDialoguePrivacyMutation,
+  SetDialoguePrivacyInput,
 ];

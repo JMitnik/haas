@@ -531,6 +531,10 @@ class CustomerService {
     return customer;
   }
 
+  findPrivateDialoguesOfWorkspace = async (workspaceId: string) => {
+    return this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(workspaceId);
+  }
+
   /**
    * Get a dialogue based on workspace ID and dialogue Slug.
    * @param customerId Workspace ID

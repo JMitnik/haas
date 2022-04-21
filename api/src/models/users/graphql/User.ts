@@ -26,6 +26,7 @@ export const UserOfCustomerInput = inputObjectType({
     // Provide one of the two
     t.string('customerId', { required: false });
     t.string('customerSlug', { required: false });
+    t.string('workspaceId', { required: false });
   },
 });
 
@@ -60,6 +61,18 @@ export const DateScalar = scalarType({
   },
 });
 
+export const AssignedDialogues = objectType({
+  name: 'AssignedDialogues',
+  definition(t) {
+    t.list.field('privateWorkspaceDialogues', {
+      type: 'Dialogue',
+    });
+    t.list.field('assignedDialogues', {
+      type: 'Dialogue',
+    });
+  },
+})
+
 export const UserType = objectType({
   name: 'UserType',
   definition(t) {
@@ -70,6 +83,48 @@ export const UserType = objectType({
     t.string('lastName', { nullable: true });
     t.date('lastLoggedIn', { nullable: true });
     t.date('lastActivity', { nullable: true });
+
+    t.field('privateDialogues', {
+      type: AssignedDialogues,
+      nullable: true,
+      args: { input: UserOfCustomerInput },
+      async resolve(parent, args, ctx) {
+        // @ts-ignore
+        if (parent.privateDialogues) return parent.privateDialogues;
+        // @ts-ignore
+        if (!parent.id) return null;
+        // @ts-ignore
+        if (!args.input?.workspaceId && !args.input?.customerId && !args.input?.customerSlug) return null;
+
+        const allPrivateDialoguesWorkspace = await ctx.prisma.customer.findUnique({
+          where: {
+            id: args?.input?.workspaceId || args.input?.customerId || undefined,
+            slug: args.input?.customerSlug || undefined,
+          },
+          include: {
+            dialogues: {
+              where: {
+                isPrivate: true,
+              },
+            },
+          },
+        });
+
+        const user = await ctx.prisma.user.findUnique({
+          where: {
+            id: parent.id || args.input?.userId as string,
+          },
+          include: {
+            isAssignedTo: true,
+          },
+        });
+
+        return {
+          assignedDialogues: user?.isAssignedTo || [],
+          privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+        }
+      },
+    })
 
     t.list.field('globalPermissions', {
       nullable: true,
@@ -164,7 +219,6 @@ export const RootUserQueries = extendType({
   definition(t) {
     t.field('me', {
       type: UserType,
-
       async resolve(parent, args, ctx) {
         if (!ctx.session?.user?.id) throw new ApolloError('No valid user');
         const userId = ctx.session?.user?.id;
@@ -210,13 +264,35 @@ export const RootUserQueries = extendType({
   },
 });
 
+export const AssignUserToDialoguesInput = inputObjectType({
+  name: 'AssignUserToDialoguesInput',
+  definition(t) {
+    t.string('userId', { required: true });
+    t.string('workspaceId', { required: true });
+    t.list.string('assignedDialogueIds', { required: true });
+    t.list.string('delistedDialogueIds', { required: true });
+  },
+})
+
+export const AssignUserToDialogues = mutationField('assignUserToDialogues', {
+  type: UserType,
+  args: { input: AssignUserToDialoguesInput },
+  nullable: true,
+  async resolve(parent, args, ctx) {
+    if (!args.input) throw new UserInputError('No input provided!');
+
+    // TODO: Probably want to check if set dialogues belong to specified workspace
+    return ctx.services.userService.assignUserToPrivateDialogues(args.input)
+  },
+})
+
 export const HandleUserStateInWorkspaceInput = inputObjectType({
   name: 'HandleUserStateInWorkspaceInput',
   definition(t) {
     t.string('userId');
     t.string('workspaceId');
     t.boolean('isActive')
-  }
+  },
 })
 
 export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorkspace', {
@@ -229,7 +305,7 @@ export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorksp
 
     const input = { userId: args.input.userId, isActive: args.input.isActive, workspaceId: args.input.workspaceId }
     return ctx.services.userService.setUserStateInWorkspace(input);
-  }
+  },
 })
 
 export const UserMutations = extendType({

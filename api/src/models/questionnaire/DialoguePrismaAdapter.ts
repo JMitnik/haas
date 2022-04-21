@@ -6,7 +6,10 @@ import {
   DialogueImpactScore,
 } from '@prisma/client';
 
-import { CreateQuestionsInput, CreateDialogueInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';
+import { CreateDialogueInput, CreateQuestionsInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';
+import { NexusGenInputs } from 'generated/nexus';
+import { cloneDeep } from 'lodash';
+
 
 class DialoguePrismaAdapter {
   prisma: PrismaClient;
@@ -215,8 +218,21 @@ class DialoguePrismaAdapter {
     return prevStatistics;
   }
 
-  async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
+  setDialoguePrivacy = async (input: NexusGenInputs['SetDialoguePrivacyInput']) => {
+    return this.prisma.dialogue.update({
+      where: {
+        slug_customerId: {
+          slug: input.dialogueSlug,
+          customerId: input.customerId,
+        },
+      },
+      data: {
+        isPrivate: input.state,
+      },
+    });
+  };
 
+  async createNodes(dialogueId: string, questions: CreateQuestionsInput) {
     const dialogue = await this.prisma.dialogue.update({
       where: {
         id: dialogueId,
@@ -718,6 +734,104 @@ class DialoguePrismaAdapter {
       },
     });
   };
+
+  /**
+  * Build a dialogueConnection prisma query based on the filter parameters.
+  * @param customerSlug the slug of a workspace
+  * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
+  */
+  buildFindDialoguesQuery = (workspaceSlug: string, userId: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null): Prisma.DialogueWhereInput => {
+    let dialogueWhereInput: Prisma.DialogueWhereInput = {
+      customer: {
+        slug: workspaceSlug,
+      },
+      OR: [
+        {
+          isPrivate: true,
+          assignees: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+        {
+          isPrivate: false,
+        },
+      ],
+    }
+
+    if (filter?.searchTerm) {
+      dialogueWhereInput = {
+        ...cloneDeep(dialogueWhereInput),
+        OR: [
+          { title: { contains: filter.searchTerm, mode: 'insensitive' } },
+          { description: { contains: filter.searchTerm, mode: 'insensitive' } },
+          {
+            tags: {
+              some: {
+                name: {
+                  contains: filter.searchTerm,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          },
+        ],
+      }
+    }
+
+    return dialogueWhereInput;
+  }
+
+
+  /**
+  * Order automation by AutomationConnectionFilterInput
+  * @param filter
+  */
+  buildOrderByQuery = (filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null) => {
+    let orderByQuery: Prisma.DialogueOrderByWithRelationInput[] = [];
+
+    if (filter?.orderBy?.by === 'createdAt') {
+      orderByQuery.push({
+        updatedAt: filter.orderBy.desc ? 'desc' : 'asc',
+      });
+    }
+
+    return orderByQuery;
+  };
+
+  /**
+ * Finds a subset of automations of a workspace using filter boundaries
+ * @param workspaceSlug the slug of a workspace
+ * @param filter an filter object
+ * @returns A list of automations
+ */
+  findPaginatedDialogues = async (workspaceSlug: string, userId: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 10;
+
+    const dialogues = await this.prisma.dialogue.findMany({
+      where: this.buildFindDialoguesQuery(workspaceSlug, userId, filter),
+      skip: offset,
+      take: perPage,
+      orderBy: this.buildOrderByQuery(filter),
+    });
+
+    return dialogues;
+  }
+
+  /**
+   * Counts the amount of automation within specific filter boundaries
+   * @param workspaceSlug the slug of a workspace
+   * @param filter an filter object to determine boundaries to look within
+   * @returns The amount of automations within a specific set of filter boundaries
+   */
+  countDialogues = async (workspaceSlug: string, userId: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null) => {
+    const totalAutomations = await this.prisma.dialogue.count({
+      where: this.buildFindDialoguesQuery(workspaceSlug, userId, filter),
+    });
+    return totalAutomations;
+  }
 
 };
 

@@ -23,6 +23,17 @@ query getCustomerOfUser($input: UserOfCustomerInput) {
       }
       user {
         id
+        privateDialogues(input: $input) { 
+          privateWorkspaceDialogues {
+            title
+            slug
+            id
+          }
+          assignedDialogues {
+            slug
+            id
+          }
+        }
       }
     }
   }
