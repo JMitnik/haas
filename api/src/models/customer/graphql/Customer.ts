@@ -450,18 +450,21 @@ export const WorkspaceMutations = Upload && extendType({
 export const GroupGenerationInputType = inputObjectType({
   name: 'GroupGenerationInputType',
   definition(t) {
-    t.string('workspaceSlug');
-    t.string('workspaceTitle');
-    t.upload('uploadedCsv');
+    t.string('workspaceSlug', { required: true });
+    t.string('workspaceTitle', { required: true });
+    t.upload('uploadedCsv', { required: true });
   },
 });
 
-export const GenerateGroupsMutation = mutationField('generateGroups', {
+export const GenerateGroupsMutation = mutationField('generateWorkspaceFromCSV', {
   type: CustomerType,
-  nullable: true,
+  // nullable: true,
   args: { input: GroupGenerationInputType },
   async resolve(parent, args, ctx) {
-    return null;
+    if (!args.input) throw new UserInputError('No input object provided');
+    console.log('INPUT: ', args.input);
+
+    return ctx.services.customerService.generateWorkspaceFromCSV(args.input);
   },
 });
 

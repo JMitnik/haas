@@ -372,9 +372,9 @@ export interface NexusGenInputs {
     customerSlug?: string | null; // String
   }
   GroupGenerationInputType: { // input type
-    uploadedCsv?: any | null; // Upload
-    workspaceSlug?: string | null; // String
-    workspaceTitle?: string | null; // String
+    uploadedCsv: any; // Upload!
+    workspaceSlug: string; // String!
+    workspaceTitle: string; // String!
   }
   HandleUserStateInWorkspaceInput: { // input type
     isActive?: boolean | null; // Boolean
@@ -1755,7 +1755,7 @@ export interface NexusGenFieldTypes {
     editUser: NexusGenRootTypes['UserType']; // UserType!
     editWorkspace: NexusGenRootTypes['Customer']; // Customer!
     generateAutodeck: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
-    generateGroups: NexusGenRootTypes['Customer'] | null; // Customer
+    generateWorkspaceFromCSV: NexusGenRootTypes['Customer']; // Customer!
     handleUserStateInWorkspace: NexusGenRootTypes['UserCustomer']; // UserCustomer!
     inviteUser: NexusGenRootTypes['InviteUserOutput']; // InviteUserOutput!
     logout: string; // String!
@@ -2273,7 +2273,7 @@ export interface NexusGenArgTypes {
     generateAutodeck: { // args
       input?: NexusGenInputs['GenerateAutodeckInput'] | null; // GenerateAutodeckInput
     }
-    generateGroups: { // args
+    generateWorkspaceFromCSV: { // args
       input?: NexusGenInputs['GroupGenerationInputType'] | null; // GroupGenerationInputType
     }
     handleUserStateInWorkspace: { // args

@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, ChoiceNodeEntry, NodeEntry, Session } from '@prisma/client';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, ChoiceNodeEntry, NodeEntry, Session, RoleTypeEnum } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
 import cuid from 'cuid';
@@ -18,7 +18,8 @@ import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType'
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
 import NodeEntryService from '../node-entry/NodeEntryService';
-
+import { parseCsv } from '../../utils/parseCsv';
+import { RoleType } from 'models/role';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -42,6 +43,84 @@ class CustomerService {
     this.nodeEntryService = new NodeEntryService(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
   }
+
+
+
+  generateWorkspaceFromCSV = async (input: NexusGenInputs['GroupGenerationInputType']) => {
+    const { uploadedCsv, workspaceSlug, workspaceTitle } = input;
+    const records = await parseCsv(await uploadedCsv, { delimiter: ',' });
+    console.log('records: ', records);
+
+    // Create customer 
+    // TODO: Allow for adjustment of template roles
+    const workspace = await this.customerPrismaAdapter.createWorkspace({
+      name: workspaceTitle,
+      primaryColour: '#7266EE',
+      slug: workspaceSlug,
+    });
+
+    // For every record generate dialogue, users + assign to dialogue
+    for (let i = 0; i < records.length; i++) {
+      const record = records[i];
+      const layers = Object.entries(record).filter((entry) => entry[0].includes('layer'));
+      const layersContent = layers.map((layer) => layer[1] as string);
+      const dialogueSlug = layersContent.join('-');
+      const dialogueTitle = `Group ${layersContent.join(' - ')}`
+      console.log(dialogueSlug, dialogueTitle);
+
+      const dialogueInput: CreateDialogueInput = {
+        slug: dialogueSlug,
+        title: dialogueTitle,
+        description: '',
+        customer: { id: workspace.id, create: false },
+      };
+
+      // Create initial dialogue
+      const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
+
+      if (!dialogue) throw 'ERROR: No dialogue created!'
+      // Make the leafs
+      const leafs = await this.nodeService.createTemplateLeafNodes(defaultMassSeedTemplate.leafNodes, dialogue.id);
+
+      // Make nodes
+      await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs);
+
+      // Check if user already exists
+      // If not create new user entry + userOfCustomer entry
+      // If exists => connect existing user when creating new userOfCustomer entry
+      const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'emailAssignee');
+      const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER);
+      console.log('User email: ', userEmailEntry, 'manager role: ', managerRole);
+      if (userEmailEntry && typeof userEmailEntry[1] === 'string' && managerRole) {
+        await this.userOfCustomerPrismaAdapter.create({
+
+          user: {
+            connectOrCreate: {
+              where: {
+                email: userEmailEntry[1],
+              },
+              create: {
+                email: userEmailEntry[1],
+
+              },
+            },
+          },
+          customer: {
+            connect: {
+              id: workspace.id,
+            },
+          },
+          role: {
+            connect: {
+              id: managerRole.id,
+            },
+          },
+        })
+      }
+    }
+
+    return workspace;
+  };
 
   /**
    * Finds the most popular path over all dialogues within a workspace
