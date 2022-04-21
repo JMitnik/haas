@@ -16,9 +16,7 @@ afterEach(async () => {
 });
 
 it('Group generation using CSV', async () => {
-  const { user, workspace } = await prepDefaultCreateData(prisma);
-
-
+  const { user } = await prepDefaultCreateData(prisma);
   await prisma.user.update({
     data: {
       globalPermissions: ['CAN_ACCESS_ADMIN_PANEL'],

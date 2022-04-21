@@ -21,6 +21,7 @@ import React from 'react';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 import useAuth from 'hooks/useAuth';
 
+import { useNavigator } from 'hooks/useNavigator';
 import { CustomerOverviewContainer } from './CustomerOverviewStyles';
 import CustomerCard from './CustomerCard';
 
@@ -51,8 +52,10 @@ const MotionGrid = motion.custom(Grid);
 
 const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoading: boolean }) => {
   const { t } = useTranslation();
-  const { canCreateCustomers, canAccessAdmin } = useAuth();
+  const { canCreateCustomers, canAccessAdmin, canGenerateWorkspaceFromCsv } = useAuth();
   const history = useHistory();
+  const { goToGenerateWorkspaceOverview } = useNavigator();
+
   const goToAdminPanel = () => {
     history.push('/dashboard/admin');
   };
@@ -67,9 +70,16 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
           justifyContent="space-between"
           alignItems="center"
         >
-          <H4 mb={2} color="gray.500">
-            {t('active_projects')}
-          </H4>
+          <UI.Flex mb={2}>
+            <H4 mr={2} color="gray.500">
+              {t('active_projects')}
+            </H4>
+            {canGenerateWorkspaceFromCsv && (
+              <UI.Button onClick={() => goToGenerateWorkspaceOverview()}>
+                Generate workspace
+              </UI.Button>
+            )}
+          </UI.Flex>
 
           {/* TEMPORARY Disabled */}
           {/* {canAccessAdmin && (

@@ -1,0 +1,6 @@
+mutation GenerateWorkspaceFromCSV($input: GroupGenerationInputType) {
+  generateWorkspaceFromCSV(input: $input) {
+    id
+    slug
+  }
+}

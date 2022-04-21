@@ -66,13 +66,20 @@ class CustomerService {
       const layersContent = layers.map((layer) => layer[1] as string);
       const dialogueSlug = layersContent.join('-');
       const dialogueTitle = `Group ${layersContent.join(' - ')}`
-      console.log(dialogueSlug, dialogueTitle);
+
+      const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'emailAssignee');
+      const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'phoneAssignee');
+      const hasEmailAssignee = !!userEmailEntry?.[1];
+      const emailAssignee = userEmailEntry?.[1] as string;
+      const phoneAssignee = userPhoneEntry?.[1] as string | undefined;
+      const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER);
 
       const dialogueInput: CreateDialogueInput = {
         slug: dialogueSlug,
         title: dialogueTitle,
         description: '',
         customer: { id: workspace.id, create: false },
+        isPrivate: hasEmailAssignee,
       };
 
       // Create initial dialogue
@@ -88,31 +95,69 @@ class CustomerService {
       // Check if user already exists
       // If not create new user entry + userOfCustomer entry
       // If exists => connect existing user when creating new userOfCustomer entry
-      const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'emailAssignee');
-      const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER);
-      console.log('User email: ', userEmailEntry, 'manager role: ', managerRole);
-      if (userEmailEntry && typeof userEmailEntry[1] === 'string' && managerRole) {
-        await this.userOfCustomerPrismaAdapter.create({
-
-          user: {
-            connectOrCreate: {
-              where: {
-                email: userEmailEntry[1],
-              },
-              create: {
-                email: userEmailEntry[1],
-
+      console.log('User email: ', emailAssignee, 'manager role: ', managerRole);
+      if (hasEmailAssignee && emailAssignee && managerRole) {
+        const user = await this.userOfCustomerPrismaAdapter.prisma.user.upsert({
+          where: {
+            email: emailAssignee,
+          },
+          create: {
+            email: emailAssignee,
+            phone: phoneAssignee,
+            isAssignedTo: {
+              connect: {
+                id: dialogue.id,
               },
             },
           },
-          customer: {
-            connect: {
-              id: workspace.id,
+          update: {
+            isAssignedTo: {
+              connect: {
+                id: dialogue.id,
+              },
             },
           },
-          role: {
-            connect: {
-              id: managerRole.id,
+        });
+
+        await this.userOfCustomerPrismaAdapter.prisma.userOfCustomer.upsert({
+          where: {
+            userId_customerId: {
+              userId: user.id,
+              customerId: workspace.id,
+            },
+          },
+          update: {
+            user: {
+              connect: {
+                id: user.id,
+              },
+            },
+            customer: {
+              connect: {
+                id: workspace.id,
+              },
+            },
+            role: {
+              connect: {
+                id: managerRole.id,
+              },
+            },
+          },
+          create: {
+            user: {
+              connect: {
+                id: user.id,
+              },
+            },
+            customer: {
+              connect: {
+                id: workspace.id,
+              },
+            },
+            role: {
+              connect: {
+                id: managerRole.id,
+              },
             },
           },
         })

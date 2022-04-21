@@ -5,7 +5,10 @@ import React, { FC } from 'react';
 
 import { AppProviders } from 'config/AppProviders';
 import { CampaignView } from 'views/CampaignView/CampaignView';
+import { DashboardView } from 'views/DashboardView';
 import { DialogueProvider } from 'providers/DialogueProvider';
+import { ImportDeliveriesForm } from 'views/CampaignView/ImportDeliveriesForm';
+import { ImportWorkspaceCSVForm } from 'views/CustomerOverview/ImportWorkspaceCSVForm';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
 import { ReportView } from 'views/ReportView';
@@ -45,7 +48,6 @@ import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 import VerifyTokenPage from 'pages/verify_token';
-import { DashboardView } from 'views/DashboardView';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
@@ -234,6 +236,12 @@ const RootApp = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => (
   <RootApp>
     <Switch>
+      <GuardedRoute
+        allowedPermission={SystemPermission.CanGenerateWorkspaceFromCsv}
+        path={ROUTES.GENERATE_WORKSPACE_VIEW}
+        render={() => <ImportWorkspaceCSVForm />}
+      />
+
       <Route
         path="/dashboard/b/add"
         render={() => (

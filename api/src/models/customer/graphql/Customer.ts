@@ -480,6 +480,7 @@ export const GenerateGroupsMutation = mutationField('generateWorkspaceFromCSV', 
   async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('No input object provided');
     console.log('INPUT: ', args.input);
+    console.log('Ctx: ', ctx.session?.user?.id);
 
     return ctx.services.customerService.generateWorkspaceFromCSV(args.input);
   },

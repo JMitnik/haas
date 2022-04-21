@@ -1,6 +1,7 @@
 import { generatePath, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
 
 export const ROUTES = {
+  GENERATE_WORKSPACE_VIEW: '/dashboard/b/generate-workspace',
   WORKSPACE_ROOT: '/dashboard/b/:customerSlug',
   DIALOGUES_VIEW: '/dashboard/b/:customerSlug/d',
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
@@ -78,6 +79,14 @@ export const useNavigator = () => {
     history.push(path + location.search);
   };
 
+  const goToGenerateWorkspaceOverview = () => {
+    const path = generatePath(ROUTES.GENERATE_WORKSPACE_VIEW, {
+      customerSlug,
+    });
+
+    history.push(path + location.search);
+  };
+
   const goToUsersOverview = () => {
     const path = generatePath(ROUTES.USERS_OVERVIEW, {
       customerSlug,
@@ -144,6 +153,7 @@ export const useNavigator = () => {
   });
 
   return {
+    goToGenerateWorkspaceOverview,
     goToNewOptionsCTAView,
     goToDialogueBuilderOverview,
     goToNewQuestionCTAView,

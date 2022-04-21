@@ -379,6 +379,16 @@ const language = {
       en: 'Upload deliveries',
       de: 'Lieferungen hochladen.',
     },
+    upload_workspace_csv: {
+      en: 'Upload workspace generation csv',
+      de: 'CSV-Datei für die Arbeitsbereichsgenerierung hochladen.',
+    },
+    upload_workspace_csv_helper: {
+      en:
+        'Upload a CSV file with details about your workspace. \n - The appropriate format is to use "," as delimiter \n - Use layer_0,layer_1,layer_etc,emailAssignee,phoneAssignee as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+      de:
+        'Laden Sie eine CSV-Datei mit Details zu Ihrem Arbeitsbereich hoch. \n - Das geeignete Format ist "," als Trennzeichen zu verwenden. \n - Verwenden Sie Layer_0, Layer_1, Layer_etc, EmailAssignee, PhoneAssignee als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820',
+    },
     upload_deliveries_helper: {
       en:
         'Upload a CSV file with details about your recipients. \n - The appropriate format is to use ";" as delimiter \n - Use firstName;lastName;email;phone as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',

@@ -558,6 +558,7 @@ class DialoguePrismaAdapter {
       data: {
         slug: input.slug,
         title: input.title,
+        isPrivate: input.isPrivate,
         description: input.description,
         customer: customerType,
         questions: {
