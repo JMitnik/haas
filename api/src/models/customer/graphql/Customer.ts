@@ -447,6 +447,24 @@ export const WorkspaceMutations = Upload && extendType({
   },
 });
 
+export const GroupGenerationInputType = inputObjectType({
+  name: 'GroupGenerationInputType',
+  definition(t) {
+    t.string('workspaceSlug');
+    t.string('workspaceTitle');
+    t.upload('uploadedCsv');
+  },
+});
+
+export const GenerateGroupsMutation = mutationField('generateGroups', {
+  type: CustomerType,
+  nullable: true,
+  args: { input: GroupGenerationInputType },
+  async resolve(parent, args, ctx) {
+    return null;
+  },
+});
+
 export const MassSeedInput = inputObjectType({
   name: 'MassSeedInput',
   definition(t) {

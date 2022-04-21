@@ -910,6 +910,12 @@ input GetCampaignsInput {
   customerSlug: String
 }
 
+input GroupGenerationInputType {
+  uploadedCsv: Upload
+  workspaceSlug: String
+  workspaceTitle: String
+}
+
 input HandleUserStateInWorkspaceInput {
   isActive: Boolean
   userId: String
@@ -1102,6 +1108,7 @@ type Mutation {
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
+  generateGroups(input: GroupGenerationInputType): Customer
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
 
   """Invite a user to a particular customer domain, given an email and role"""
