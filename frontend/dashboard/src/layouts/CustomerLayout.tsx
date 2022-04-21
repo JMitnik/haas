@@ -133,6 +133,7 @@ const DashboardNav = ({ customerSlug, isExpanded }: { customerSlug: string, isEx
               {isExpanded && t('views:dashboard')}
             </NavItem>
             <NavItem
+              style={{ padding: !isExpanded ? 0 : 'auto' }}
               isExpanded={isExpanded}
               isSubchildActive={!!dialogueSlug}
               exact
@@ -181,10 +182,11 @@ const DashboardNav = ({ customerSlug, isExpanded }: { customerSlug: string, isEx
               <Dropdown
                 renderOverlay={({ onClose }) => <SubMenuDropdown onClose={onClose} />}
                 placement="left-start"
-                offset={[-10, 10]}
+                offset={[-2, 0]}
               >
                 {({ onOpen }) => (
                   <Div
+                    padding="8px 11px"
                     display="flex"
                     alignItems="center"
                     onMouseEnter={(e) => {

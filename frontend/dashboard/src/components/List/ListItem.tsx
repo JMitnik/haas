@@ -6,10 +6,11 @@ interface ListItemContainerProps {
   isNotClickable?: boolean;
   hasNoIcon?: boolean;
   isHeader?: boolean;
+  isDisabled?: boolean;
 }
 
-export const ListItemContainer = styled(Div)<ListItemContainerProps>`
-  ${({ theme, isHeader = false }) => css`
+export const ListItemContainer = styled(Div) <ListItemContainerProps>`
+  ${({ theme, isHeader = false, isDisabled = false }) => css`
     padding: 8px 20px;
     background: white;
     color: ${theme.colors.gray[400]};
@@ -32,6 +33,11 @@ export const ListItemContainer = styled(Div)<ListItemContainerProps>`
       color: ${theme.colors.primaries[700]};
       transition: all cubic-bezier(0.6, -0.28, 0.735, 0.045) 0.2s;
     }
+
+    ${isDisabled && css`
+      pointer-events: none;
+      color: ${theme.colors.gray[200]};
+    `}
   `}
 `;
 
@@ -40,10 +46,11 @@ interface ListItemProps {
   renderLeftIcon?: ReactNode;
   onClick?: any;
   isHeader?: boolean;
+  isDisabled?: boolean;
 }
 
-const ListItem = ({ children, renderLeftIcon, onClick, isHeader }: ListItemProps) => (
-  <ListItemContainer hasNoIcon={!renderLeftIcon} isHeader={isHeader} onClick={onClick}>
+const ListItem = ({ children, renderLeftIcon, onClick, isHeader, isDisabled }: ListItemProps) => (
+  <ListItemContainer isDisabled={isDisabled} hasNoIcon={!renderLeftIcon} isHeader={isHeader} onClick={onClick}>
     {renderLeftIcon}
     <Span pl={2}>
       {children}

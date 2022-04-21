@@ -177,7 +177,6 @@ export const AvatarContainer = styled(Div)`
 
 export const SubMenuDropdown = ({ onClose }: { onClose: () => void }) => {
   const { user } = useUser();
-  const { canAccessAdmin } = useAuth();
   const {
     goToDialoguesOverview,
     goToCTAOverview,
@@ -188,12 +187,23 @@ export const SubMenuDropdown = ({ onClose }: { onClose: () => void }) => {
     dialogueMatch,
   } = useNavigator();
 
+  const {
+    canAccessAdmin,
+    canViewUsers,
+    canEditCustomer,
+    canCreateTriggers,
+    canViewCampaigns,
+    canBuildDialogues,
+    canEditDialogue,
+  } = useAuth();
+
   const dialogueSlug = dialogueMatch?.params.dialogueSlug;
   return (
     <List>
       <Div>
         {((user?.userCustomers?.length && user?.userCustomers.length > 1) || canAccessAdmin) && (
           <ListItem
+            isHeader
             renderLeftIcon={<ArrowLeft />}
             onClick={() => {
               goToDialoguesOverview();
@@ -230,6 +240,7 @@ export const SubMenuDropdown = ({ onClose }: { onClose: () => void }) => {
           </Text>
         </ListItem>
         <ListItem
+          isDisabled={!canBuildDialogues && !canAccessAdmin}
           renderLeftIcon={<CursorClickIcon />}
           onClick={() => {
             goToCTAOverview(dialogueSlug);
@@ -241,6 +252,7 @@ export const SubMenuDropdown = ({ onClose }: { onClose: () => void }) => {
           </Text>
         </ListItem>
         <ListItem
+          isDisabled={!canBuildDialogues}
           renderLeftIcon={<WrenchIcon />}
           onClick={() => {
             goToDialogueBuilderOverview(dialogueSlug);
@@ -252,6 +264,7 @@ export const SubMenuDropdown = ({ onClose }: { onClose: () => void }) => {
           </Text>
         </ListItem>
         <ListItem
+          isDisabled={!canEditDialogue}
           renderLeftIcon={<SliderIcon />}
           onClick={() => {
             goToDialogueSettings(dialogueSlug);
