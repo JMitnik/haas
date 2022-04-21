@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import {
-  Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  Button, Avatar as ChakraAvatar, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { formatDistance } from 'date-fns';
@@ -21,6 +21,7 @@ import useAuth from 'hooks/useAuth';
 
 import { useCustomer } from 'providers/CustomerProvider';
 import { useSetDialoguePrivacyMutation } from 'types/generated-types';
+import { useUser } from 'providers/UserProvider';
 
 import { Tag } from './Tag';
 
@@ -117,6 +118,7 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit, isPrivate, dialogueSlug 
 
 const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: boolean }) => {
   const history = useHistory();
+  const { user } = useUser();
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { canAccessAdmin } = useAuth();
   const ref = useRef(null);
@@ -198,6 +200,12 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
       onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}
     >
       <UI.CardBody flex="100%">
+        {dialogue.isPrivate && (
+          <UI.Div position="absolute" right="5px" top="5px">
+            <ChakraAvatar bg="gray.300" size="xs" name={`${user?.firstName} ${user?.lastName}`} />
+          </UI.Div>
+
+        )}
         <UI.ColumnFlex justifyContent="space-between" height="100%">
           <UI.Div>
             <UI.Flex justifyContent="space-between" alignItems="center">
