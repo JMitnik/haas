@@ -907,7 +907,7 @@ export enum DialogueImpactScoreType {
 }
 
 export type DialogueLinksInput = {
-  workspaceSlug?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
 };
 
 export type DialogueStatistics = {

@@ -289,7 +289,7 @@ export interface NexusGenInputs {
     startDate?: string | null; // String
   }
   DialogueLinksInput: { // input type
-    workspaceSlug?: string | null; // String
+    workspaceId?: string | null; // String
   }
   DialogueStatisticsSummaryFilterInput: { // input type
     cutoff?: number | null; // Int
@@ -1628,7 +1628,6 @@ export interface NexusGenFieldTypes {
     title: string; // String!
     topic: NexusGenRootTypes['TopicType']; // TopicType!
     updatedAt: string | null; // String
-    url: string | null; // String
     wasGeneratedWithGenData: boolean; // Boolean!
   }
   DialogueConditionScopeModel: { // field return type

@@ -186,13 +186,6 @@ export const DialogueType = objectType({
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
 
-    t.string('url', {
-      nullable: true,
-      resolve(parent) {
-        if (parent.url) return parent.url;
-      },
-    })
-
     t.list.field('assignees', {
       nullable: true,
       type: UserType,
@@ -753,7 +746,7 @@ export const DialogueRootQuery = extendType({
 export const DialogueLinksInput = inputObjectType({
   name: 'DialogueLinksInput',
   definition(t) {
-    t.string('workspaceSlug');
+    t.string('workspaceId');
   },
 });
 
@@ -775,8 +768,8 @@ export const DialogueLinksQuery = queryField('dialogueLinks', {
   },
   nullable: true,
   async resolve(parent, args, ctx) {
-    if (!args.input?.workspaceSlug) return [];
-    return ctx.services.dialogueService.findDialogueUrlsByWorkspaceSlug(args.input.workspaceSlug);
+    if (!args.input?.workspaceId) return [];
+    return ctx.services.dialogueService.findDialogueUrlsByWorkspaceId(args.input.workspaceId);
   },
 });
 

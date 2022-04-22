@@ -51,8 +51,8 @@ class DialogueService {
     this.nodeService = new NodeService(prismaClient);
   }
 
-  findDialogueUrlsByWorkspaceSlug = async (workspaceSlug: string) => {
-    const strippedDialogues = await this.dialoguePrismaAdapter.findDialogueUrlsByWorkspaceSlug(workspaceSlug);
+  findDialogueUrlsByWorkspaceId = async (workspaceId: string) => {
+    const strippedDialogues = await this.dialoguePrismaAdapter.findDialogueUrlsByWorkspaceId(workspaceId);
     const mappedStrippedDialogues = strippedDialogues.map((dialogue) => ({
       slug: dialogue.slug,
       title: dialogue.title,

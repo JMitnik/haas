@@ -12,10 +12,20 @@ interface CardProps {
   outline?: boolean;
   boxShadow?: BoxShadowSize;
   willFocusWithin?: boolean;
+  useOverlay?: boolean;
 }
 
+export const CardOverlay = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100px;
+  height: 100px;
+  background-color: rgba(0, 0, 0, 0.25);
+`;
+
 export const Card = styled(Div) <CardProps>`
-  ${({ theme, noHover, boxShadow, outline, isFlat, willFocusWithin }) => css`
+  ${({ theme, noHover, boxShadow, outline, isFlat, willFocusWithin, useOverlay }) => css`
     position: relative;
     display: flex;
     flex-direction: column;
@@ -39,7 +49,12 @@ export const Card = styled(Div) <CardProps>`
       &:hover {
         transition: all .3s cubic-bezier(.55,0,.1,1);
         box-shadow: rgba(0, 0, 0, 0.20) 0px 4px 12px;
+        /* .overlay {
+          display: ${useOverlay ? 'auto' : 'none'};
+        } */
       }
+
+      
     `}
   `}
 `;

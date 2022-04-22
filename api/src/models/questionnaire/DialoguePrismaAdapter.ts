@@ -18,12 +18,10 @@ class DialoguePrismaAdapter {
     this.prisma = prismaClient;
   };
 
-  findDialogueUrlsByWorkspaceSlug = async (workspaceSlug: string) => {
+  findDialogueUrlsByWorkspaceId = async (workspaceId: string) => {
     return this.prisma.dialogue.findMany({
       where: {
-        customer: {
-          slug: workspaceSlug,
-        },
+        customerId: workspaceId,
       },
       select: {
         id: true,

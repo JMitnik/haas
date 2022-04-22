@@ -682,7 +682,6 @@ type Dialogue {
   title: String!
   topic(input: TopicInputType): TopicType!
   updatedAt: String
-  url: String
   wasGeneratedWithGenData: Boolean!
 }
 
@@ -745,7 +744,7 @@ enum DialogueImpactScoreType {
 }
 
 input DialogueLinksInput {
-  workspaceSlug: String
+  workspaceId: String
 }
 
 type DialogueStatistics {
