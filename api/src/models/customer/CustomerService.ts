@@ -56,6 +56,7 @@ class CustomerService {
     const workspace = await this.customerPrismaAdapter.createWorkspace({
       name: workspaceTitle,
       primaryColour: '#7266EE',
+      logo: '',
       slug: workspaceSlug,
     });
 

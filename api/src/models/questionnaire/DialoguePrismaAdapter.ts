@@ -18,6 +18,27 @@ class DialoguePrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  findDialogueUrlsByWorkspaceSlug = async (workspaceSlug: string) => {
+    return this.prisma.dialogue.findMany({
+      where: {
+        customer: {
+          slug: workspaceSlug,
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        slug: true,
+        customer: {
+          select: {
+            slug: true,
+          },
+        },
+      },
+    })
+  }
+
   /**
    * Upserts a dialogue topic and its sub topics
    * @param input 

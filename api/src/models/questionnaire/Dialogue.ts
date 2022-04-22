@@ -1,7 +1,7 @@
 
 import { UserInputError } from 'apollo-server-express';
 import { addDays, subDays } from 'date-fns';
-import { enumType, extendType, inputObjectType, mutationField, objectType, stringArg } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, mutationField, objectType, queryField, stringArg } from '@nexus/schema';
 
 import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
@@ -16,7 +16,7 @@ import { isADate, isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueImpactScoreType, DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
-import { groupBy, maxBy, meanBy } from 'lodash';
+import { UserType } from '../users/graphql/User';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -185,6 +185,18 @@ export const DialogueType = objectType({
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+
+    t.string('url', {
+      nullable: true,
+      resolve(parent) {
+        if (parent.url) return parent.url;
+      },
+    })
+
+    t.list.field('assignees', {
+      nullable: true,
+      type: UserType,
+    })
 
     t.field('postLeafNode', {
       type: DialogueFinisherType,
@@ -738,7 +750,38 @@ export const DialogueRootQuery = extendType({
   },
 });
 
+export const DialogueLinksInput = inputObjectType({
+  name: 'DialogueLinksInput',
+  definition(t) {
+    t.string('workspaceSlug');
+  },
+});
+
+export const PublicDialogueInfo = objectType({
+  name: 'PublicDialogueInfo',
+  definition(t) {
+    t.string('title');
+    t.string('slug');
+    t.string('description', { nullable: true });
+    t.string('url');
+  },
+})
+
+export const DialogueLinksQuery = queryField('dialogueLinks', {
+  type: PublicDialogueInfo,
+  list: true,
+  args: {
+    input: DialogueLinksInput,
+  },
+  nullable: true,
+  async resolve(parent, args, ctx) {
+    if (!args.input?.workspaceSlug) return [];
+    return ctx.services.dialogueService.findDialogueUrlsByWorkspaceSlug(args.input.workspaceSlug);
+  },
+});
+
 export default [
+  DialogueLinksInput,
   DialogueWhereUniqueInput,
   DialogueMutations,
   DialogueType,
@@ -746,4 +789,5 @@ export default [
   DialogueStatistics,
   SetDialoguePrivacyMutation,
   SetDialoguePrivacyInput,
+  DialogueLinksQuery,
 ];

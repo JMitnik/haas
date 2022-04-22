@@ -23,6 +23,7 @@ import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
 import EdgeService from '../edge/EdgeService';
 import { offsetPaginate } from '../general/PaginationHelpers';
+import config from '../../config/config';
 
 
 function getRandomInt(max: number) {
@@ -48,6 +49,17 @@ class DialogueService {
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
+  }
+
+  findDialogueUrlsByWorkspaceSlug = async (workspaceSlug: string) => {
+    const strippedDialogues = await this.dialoguePrismaAdapter.findDialogueUrlsByWorkspaceSlug(workspaceSlug);
+    const mappedStrippedDialogues = strippedDialogues.map((dialogue) => ({
+      slug: dialogue.slug,
+      title: dialogue.title,
+      description: dialogue.description,
+      url: config.env === 'local' ? `http://localhost:3000/${dialogue.customer.slug}/${dialogue.slug}` : `https://client.haas.live/${dialogue.customer.slug}/${dialogue.slug}`,
+    }));
+    return mappedStrippedDialogues;
   }
 
   /**

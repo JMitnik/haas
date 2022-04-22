@@ -652,6 +652,7 @@ type DeprecatedPaginationPageInfo {
 }
 
 type Dialogue {
+  assignees: [UserType!]
   averageScore(input: DialogueFilterInputType): Float
   campaignVariants: [CampaignVariantType!]!
   creationDate: String
@@ -681,6 +682,7 @@ type Dialogue {
   title: String!
   topic(input: TopicInputType): TopicType!
   updatedAt: String
+  url: String
   wasGeneratedWithGenData: Boolean!
 }
 
@@ -740,6 +742,10 @@ type DialogueFinisherObjectType {
 
 enum DialogueImpactScoreType {
   AVERAGE
+}
+
+input DialogueLinksInput {
+  workspaceSlug: String
 }
 
 type DialogueStatistics {
@@ -1339,6 +1345,13 @@ type PreviewDataType {
   websiteScreenshotUrl: String!
 }
 
+type PublicDialogueInfo {
+  description: String
+  slug: String!
+  title: String!
+  url: String!
+}
+
 type Query {
   automation(where: GetAutomationInput): AutomationModel
   automations(where: GetAutomationsByWorkspaceInput): [AutomationModel!]!
@@ -1346,6 +1359,7 @@ type Query {
   customers: [Customer!]!
   delivery(deliveryId: String): DeliveryType
   dialogue(where: DialogueWhereUniqueInput): Dialogue
+  dialogueLinks(input: DialogueLinksInput): [PublicDialogueInfo!]
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType

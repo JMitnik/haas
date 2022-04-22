@@ -81,6 +81,7 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
 
 const authShield = shield({
   Query: {
+    dialogueLinks: allow,
     users: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
     user: or(isSelf, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
   },

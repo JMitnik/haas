@@ -227,7 +227,7 @@ export class CustomerPrismaAdapter {
         tags: { create: defaultWorkspaceTemplate.tags },
         settings: {
           create: {
-            logoUrl: input.logo,
+            logoUrl: input.logo || '',
             logoOpacity: input.logoOpacity || 30,
             colourSettings: {
               create: {
