@@ -767,6 +767,8 @@ export type Dialogue = {
   publicTitle?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+  assignees?: Maybe<Array<UserType>>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
   pathedSessionsConnection?: Maybe<PathedSessionsType>;
   topic: TopicType;
@@ -903,6 +905,10 @@ export type DialogueFinisherObjectType = {
 export enum DialogueImpactScoreType {
   Average = 'AVERAGE'
 }
+
+export type DialogueLinksInput = {
+  workspaceSlug?: Maybe<Scalars['String']>;
+};
 
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
@@ -1815,6 +1821,14 @@ export type PreviewDataType = {
   websiteScreenshotUrl: Scalars['String'];
 };
 
+export type PublicDialogueInfo = {
+  __typename?: 'PublicDialogueInfo';
+  title: Scalars['String'];
+  slug: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  url: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   getJobProcessLocations: JobProcessLocations;
@@ -1839,6 +1853,7 @@ export type Query = {
   user?: Maybe<UserType>;
   dialogue?: Maybe<Dialogue>;
   dialogues: Array<Dialogue>;
+  dialogueLinks?: Maybe<Array<PublicDialogueInfo>>;
   refreshAccessToken: RefreshAccessTokenOutput;
   sessions: Array<Session>;
   /** A session is one entire user-interaction */
@@ -1947,6 +1962,11 @@ export type QueryDialogueArgs = {
 
 export type QueryDialoguesArgs = {
   filter?: Maybe<DialogueFilterInputType>;
+};
+
+
+export type QueryDialogueLinksArgs = {
+  input?: Maybe<DialogueLinksInput>;
 };
 
 
@@ -3170,6 +3190,19 @@ export type DuplicateQuestionMutation = (
     { __typename?: 'QuestionNode' }
     & Pick<QuestionNode, 'id'>
   )> }
+);
+
+export type GetDialogueLinksQueryVariables = Exact<{
+  input?: Maybe<DialogueLinksInput>;
+}>;
+
+
+export type GetDialogueLinksQuery = (
+  { __typename?: 'Query' }
+  & { dialogueLinks?: Maybe<Array<(
+    { __typename?: 'PublicDialogueInfo' }
+    & Pick<PublicDialogueInfo, 'title' | 'slug' | 'description' | 'url'>
+  )>> }
 );
 
 export type DialogueConnectionQueryVariables = Exact<{
@@ -4750,6 +4783,47 @@ export function useDuplicateQuestionMutation(baseOptions?: Apollo.MutationHookOp
 export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicateQuestionMutation>;
 export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
 export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
+export const GetDialogueLinksDocument = gql`
+    query GetDialogueLinks($input: DialogueLinksInput) {
+  dialogueLinks(input: $input) {
+    title
+    slug
+    description
+    url
+  }
+}
+    `;
+
+/**
+ * __useGetDialogueLinksQuery__
+ *
+ * To run a query within a React component, call `useGetDialogueLinksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDialogueLinksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDialogueLinksQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetDialogueLinksQuery(baseOptions?: Apollo.QueryHookOptions<GetDialogueLinksQuery, GetDialogueLinksQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDialogueLinksQuery, GetDialogueLinksQueryVariables>(GetDialogueLinksDocument, options);
+      }
+export function useGetDialogueLinksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueLinksQuery, GetDialogueLinksQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDialogueLinksQuery, GetDialogueLinksQueryVariables>(GetDialogueLinksDocument, options);
+        }
+export type GetDialogueLinksQueryHookResult = ReturnType<typeof useGetDialogueLinksQuery>;
+export type GetDialogueLinksLazyQueryHookResult = ReturnType<typeof useGetDialogueLinksLazyQuery>;
+export type GetDialogueLinksQueryResult = Apollo.QueryResult<GetDialogueLinksQuery, GetDialogueLinksQueryVariables>;
+export function refetchGetDialogueLinksQuery(variables?: GetDialogueLinksQueryVariables) {
+      return { query: GetDialogueLinksDocument, variables: variables }
+    }
 export const DialogueConnectionDocument = gql`
     query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilterInput) {
   customer(slug: $customerSlug) {
@@ -5699,6 +5773,13 @@ export namespace DuplicateQuestion {
   export type Mutation = DuplicateQuestionMutation;
   export type DuplicateQuestion = (NonNullable<DuplicateQuestionMutation['duplicateQuestion']>);
   export const Document = DuplicateQuestionDocument;
+}
+
+export namespace GetDialogueLinks {
+  export type Variables = GetDialogueLinksQueryVariables;
+  export type Query = GetDialogueLinksQuery;
+  export type DialogueLinks = NonNullable<(NonNullable<GetDialogueLinksQuery['dialogueLinks']>)[number]>;
+  export const Document = GetDialogueLinksDocument;
 }
 
 export namespace DialogueConnection {

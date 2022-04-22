@@ -9,6 +9,7 @@ import { Usernav, UsernavContainer } from '../components/Sidenav/Sidenav';
 
 interface PreCustomerLayoutProps {
   children: React.ReactNode;
+  hideUserNav?: boolean;
 }
 
 const PreCustomerLayoutContainer = styled(Div)`
@@ -28,12 +29,15 @@ const PreCustomerLayoutContainer = styled(Div)`
   `}
 `;
 
-const PreCustomerLayout = ({ children }: PreCustomerLayoutProps) => (
+const PreCustomerLayout = ({ hideUserNav, children }: PreCustomerLayoutProps) => (
   <PreCustomerLayoutContainer>
     <Container mb="48px">
       <Logo justifyContent="flex-start" />
     </Container>
-    <Usernav />
+    {!hideUserNav && (
+      <Usernav />
+    )}
+
     {children}
   </PreCustomerLayoutContainer>
 );

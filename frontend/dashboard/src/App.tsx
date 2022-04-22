@@ -31,6 +31,7 @@ import CustomersPage from 'pages/dashboard/customers';
 import DashboardPage from 'pages/dashboard';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
+import DialogueLinkFetchOverview from 'views/DialogueLinkFetchOverview';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
 import DialoguesPage from 'pages/dashboard/dialogues';
 import EditCustomerView from 'views/EditCustomerView';
@@ -185,6 +186,12 @@ const CustomerRoutes = () => (
 
 const PublicRoutes = () => (
   <Switch>
+    <Route path="/public/dialogue-link-fetch">
+      <PreCustomerLayout hideUserNav>
+        <DialogueLinkFetchOverview />
+      </PreCustomerLayout>
+    </Route>
+
     <Route path="/public/login">
       <LoginPage />
     </Route>
