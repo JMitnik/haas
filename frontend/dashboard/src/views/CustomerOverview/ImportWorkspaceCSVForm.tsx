@@ -1,15 +1,13 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
+import { useHistory } from 'react-router';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { useCustomer } from 'providers/CustomerProvider';
-import { useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
-import { useHistory } from 'react-router';
+import { refetchMeQuery, useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
 import { useLogger } from 'hooks/useLogger';
-import { useNavigator } from 'hooks/useNavigator';
 import FileDropInput from 'components/FileDropInput';
 
 const schema = yup.object({
@@ -24,14 +22,15 @@ export const ImportWorkspaceCSVForm = () => {
   const form = useForm<FormProps>({
     mode: 'all',
   });
-
   const logger = useLogger();
   const { t } = useTranslation();
-
   const toast = useToast();
 
   const [activeCSV, setActiveCSV] = useState<File | null>(null);
   const [importWorkspaceCSV, { loading }] = useGenerateWorkspaceFromCsvMutation({
+    refetchQueries: [
+      refetchMeQuery(),
+    ],
     onCompleted: () => {
       history.push('/dashboard');
       toast({
@@ -64,7 +63,6 @@ export const ImportWorkspaceCSVForm = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
-    console.log('formData: ', formData);
     console.log(activeCSV);
     importWorkspaceCSV({
       variables: {

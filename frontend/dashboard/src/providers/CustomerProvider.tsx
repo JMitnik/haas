@@ -64,6 +64,7 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
 
   const { loading: isLoading } = useGetCustomerOfUserQuery({
     skip: !workspaceSlug,
+    fetchPolicy: 'cache-and-network',
     variables: {
       input: {
         customerSlug: workspaceSlug,
