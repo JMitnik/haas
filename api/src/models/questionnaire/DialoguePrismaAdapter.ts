@@ -18,6 +18,11 @@ class DialoguePrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  /**
+   * Finds all dialogues stripped down their potential sensitive information within a workspace
+   * @param workspaceId 
+   * @returns 
+   */
   findDialogueUrlsByWorkspaceId = async (workspaceId: string) => {
     return this.prisma.dialogue.findMany({
       where: {
@@ -237,6 +242,11 @@ class DialoguePrismaAdapter {
     return prevStatistics;
   }
 
+  /**
+   * Sets the privacy settings of a dialogue based on the provided input
+   * @param input 
+   * @returns 
+   */
   setDialoguePrivacy = async (input: NexusGenInputs['SetDialoguePrivacyInput']) => {
     return this.prisma.dialogue.update({
       where: {

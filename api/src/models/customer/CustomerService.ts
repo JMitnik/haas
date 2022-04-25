@@ -495,7 +495,6 @@ class CustomerService {
     const dialogueNames = [...maleDialogueNames, ...femaleDialogueNames];
 
     for (const dialogueName of dialogueNames) {
-      console.log('Dialogue: ', dialogueName);
       defaultMassSeedTemplate.title = dialogueName;
       const slug = cuid();
       defaultMassSeedTemplate.slug = slug;
@@ -520,6 +519,11 @@ class CustomerService {
     return customer;
   }
 
+  /**
+   * Finds all private dialogues within a workspace
+   * @param workspaceId 
+   * @returns 
+   */
   findPrivateDialoguesOfWorkspace = async (workspaceId: string) => {
     return this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(workspaceId);
   }

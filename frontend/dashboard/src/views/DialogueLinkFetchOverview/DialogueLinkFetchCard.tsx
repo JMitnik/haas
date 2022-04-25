@@ -2,17 +2,12 @@ import * as UI from '@haas/ui';
 import {
   useClipboard, useToast,
 } from '@chakra-ui/core';
-import { useHistory } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
-import styled from 'styled-components';
 
 const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: boolean }) => {
-  const history = useHistory();
   const ref = useRef(null);
-  const { t } = useTranslation();
   const toast = useToast();
-  const { onCopy, hasCopied } = useClipboard(dialogue.url);
+  const { onCopy } = useClipboard(dialogue.url);
 
   const handleCardClick = () => {
     onCopy?.();
@@ -27,7 +22,6 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
 
   return (
     <UI.Card
-      // useOverlay
       ref={ref}
       data-cy="DialogueCard"
       bg="white"
@@ -35,7 +29,6 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
       flexDirection="column"
       onClick={() => handleCardClick()}
     >
-      {/* <UI.CardOverlay className="overlay" /> */}
       <UI.CardBody flex="100%">
         <UI.ColumnFlex justifyContent="space-between" height="100%">
           <UI.Div>

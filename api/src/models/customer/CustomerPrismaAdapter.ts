@@ -16,10 +16,11 @@ export class CustomerPrismaAdapter {
    * @param workspaceId 
    * @returns a list of private dialogues
    */
-  findPrivateDialoguesOfWorkspace = async (workspaceId: string) => {
+  findPrivateDialoguesOfWorkspace = async (workspaceId?: string, workspaceSlug?: string) => {
     return this.prisma.customer.findUnique({
       where: {
-        id: workspaceId,
+        id: workspaceId || undefined,
+        slug: workspaceSlug || undefined,
       },
       include: {
         dialogues: {

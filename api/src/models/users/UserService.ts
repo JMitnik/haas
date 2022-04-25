@@ -27,6 +27,31 @@ class UserService {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
   };
 
+  /**
+   * Finds the private dialogues of a user as well as all private dialogues within a workspace
+   * @param input 
+   * @param userId 
+   * @returns 
+   */
+  findPrivateDialoguesOfUser = async (input: NexusGenInputs['UserOfCustomerInput'], userId?: string) => {
+    const allPrivateDialoguesWorkspace = await this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(
+      input?.workspaceId || input?.customerId || undefined,
+      input?.customerSlug || undefined,
+    );
+
+    const user = await this.userPrismaAdapter.findPrivateDialogueOfUser(userId || input?.userId as string);
+
+    return {
+      assignedDialogues: user?.isAssignedTo || [],
+      privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+    }
+  }
+
+  /**
+   * Adjusts the dialogue privacy settings of a user based on the input.
+   * @param input 
+   * @returns 
+   */
   assignUserToPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
     const updatedUser = await this.userPrismaAdapter.updateUserPrivateDialogues(input);
 

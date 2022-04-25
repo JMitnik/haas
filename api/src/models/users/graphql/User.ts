@@ -96,33 +96,7 @@ export const UserType = objectType({
         // @ts-ignore
         if (!args.input?.workspaceId && !args.input?.customerId && !args.input?.customerSlug) return null;
 
-        const allPrivateDialoguesWorkspace = await ctx.prisma.customer.findUnique({
-          where: {
-            id: args?.input?.workspaceId || args.input?.customerId || undefined,
-            slug: args.input?.customerSlug || undefined,
-          },
-          include: {
-            dialogues: {
-              where: {
-                isPrivate: true,
-              },
-            },
-          },
-        });
-
-        const user = await ctx.prisma.user.findUnique({
-          where: {
-            id: parent.id || args.input?.userId as string,
-          },
-          include: {
-            isAssignedTo: true,
-          },
-        });
-
-        return {
-          assignedDialogues: user?.isAssignedTo || [],
-          privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
-        }
+        return ctx.services.userService.findPrivateDialoguesOfUser(args.input, parent.id);
       },
     })
 

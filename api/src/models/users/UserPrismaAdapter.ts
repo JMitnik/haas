@@ -15,6 +15,30 @@ class UserPrismaAdapter {
     this.roleService = new RoleService(prismaClient);
   }
 
+  /**
+   * Finds the private dialogues assigned to an user
+   * @param userId 
+   */
+  findPrivateDialogueOfUser = async (userId: string) => {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        isAssignedTo: true,
+      },
+    });
+
+    return user;
+  }
+
+  /**
+   * Upserts a user and assignes it to a private dialogue
+   * @param emailAddress 
+   * @param dialogueId 
+   * @param phoneNumber 
+   * @returns 
+  */
   addUserToPrivateDialogue = (emailAddress: string, dialogueId: string, phoneNumber?: string) => {
     return this.prisma.user.upsert({
       where: {
@@ -39,6 +63,12 @@ class UserPrismaAdapter {
     });
   }
 
+  /**
+   * Adjusts the dialogue privacy settings of a user based on the input. The input consits one list of dialogue ids 
+   * which should be disconnected and another which should be connected to the user 
+   * @param input 
+   * @returns 
+   */
   updateUserPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
     return this.prisma.user.update({
       where: {
