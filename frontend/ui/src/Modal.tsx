@@ -131,7 +131,7 @@ export const ModalHead = styled(Div)`
     border-bottom: 1px solid ${theme.colors.gray[100]};
 
     ${ModalTitle} {
-      color: ${theme.colors.gray[800]};
+      color: ${theme.colors.gray[600]};
       font-size: 1.5rem;
       font-weight: 600;
     }
@@ -143,6 +143,7 @@ interface ModalCardProps {
   onClose: () => void;
   minWidth?: number;
   maxWidth?: number;
+  breakout?: boolean;
 }
 
 const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
@@ -179,13 +180,13 @@ const ModalCardContainer = styled(Div)`
   }
 `;
 
-export const ModalCard = ({ children, onClose, maxWidth = 600 }: ModalCardProps) => (
+export const ModalCard = ({ children, onClose, maxWidth = 600, breakout = false }: ModalCardProps) => (
   <ModalCardContainer>
-    <Card bg="white" noHover maxWidth={maxWidth} padding={4}>
+    <Card bg="white" noHover maxWidth={maxWidth} padding={breakout ? 0 : 4}>
       {!!onClose && (
         <CloseButton onClose={onClose} />
       )}
       {children}
     </Card>
   </ModalCardContainer>
-)
+);

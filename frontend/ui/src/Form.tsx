@@ -7,7 +7,7 @@ import {
   Slider as AntdSlider,
   // DatePicker as AntdDatepicker,
 } from 'antd';
-import { Div, Paragraph, SectionHeader, Strong } from '@haas/ui';
+import { Div, Icon, Paragraph, SectionHeader, Span, Strong } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
 import {
   Checkbox as ChakraCheckbox,
@@ -941,3 +941,25 @@ export const FormControl = forwardRef((props: FormControlProps, ref) => {
     </ChakraFormControl>
   );
 });
+
+export const FieldLabel = styled(Span)`
+  ${({ theme }) => css`
+    margin: 0;
+    /* color: #3f4750;
+    background: #d7d7d7; */
+
+    color: ${theme.colors.main[600]};
+    background: ${theme.colors.main[100]};
+    /* background: ${theme.colors.main[600]}; */
+    /* background: ${theme.colors.main[600]}; */
+    font-weight: 700;
+    line-height: 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    border-radius: 5px;
+    padding: 4px 8px;
+    font-weight: 600;
+    display: inline-block;
+    letter-spacing: 0.05em;
+  `}
+`;

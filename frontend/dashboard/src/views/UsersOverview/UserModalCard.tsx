@@ -4,6 +4,7 @@ import React from 'react';
 
 import { Controller, useForm } from 'react-hook-form';
 import { Dialogue, useAssignUserToDialoguesMutation, useGetUserCustomerFromCustomerQuery } from 'types/generated-types';
+import { Mail } from 'react-feather';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
@@ -27,10 +28,18 @@ const CheckBoxCard = styled(UI.Card) <{ isChecked?: boolean }>`
   ${({ theme, isChecked }) => css`
     width: 100%;
     min-height: 100px;
-    border: 1px solid #F9F6EE;
+    border: 1px solid transparent;
+    padding: 0;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    &:hover {
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 6px 0px, rgba(0, 0, 0, 0.06) 0px 1px 5px 0px;
+    }
 
     ${isChecked && css`
-      border: 1px solid ${theme.colors.blue[500]};
+      border: 2px solid ${theme.colors.off[500]};
     `}
   `}
 `;
@@ -87,7 +96,7 @@ const PrivateDialoguesUserForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <UI.Grid paddingLeft={1} paddingRight={1} gridTemplateColumns="1fr 1fr">
+      <UI.Grid gridTemplateColumns="1fr">
         {workspaceDialogues?.map((dialogue) => (
           <Controller
             control={control}
@@ -104,9 +113,11 @@ const PrivateDialoguesUserForm = ({
                   justifyContent="space-between"
                   alignItems="center"
                   borderBottom="1px solid"
+                  backgroundColor="neutral.100"
+                  borderRadius="10px 10px 0 0"
                   borderBottomColor="gray.100"
-                  py={1}
-                  px={1}
+                  py={2}
+                  px={2}
                 >
                   <UI.Helper>
                     {dialogue.title}
@@ -116,9 +127,11 @@ const PrivateDialoguesUserForm = ({
                     onClick={(e) => e.stopPropagation()}
                     isChecked={value}
                     onChange={() => onChange(!value)}
+                    ml={1}
+                    variantColor="main"
                   />
                 </UI.Flex>
-                <UI.Text px={1} py={1}>{dialogue.description}</UI.Text>
+                <UI.Text px={2} py={1}>{dialogue.description}</UI.Text>
               </CheckBoxCard>
             )}
           />
@@ -131,12 +144,11 @@ const PrivateDialoguesUserForm = ({
         )}
       </UI.Grid>
 
-      <UI.Flex justifyContent="flex-end" pt={2} pr={2}>
-        <UI.Button isLoading={loading} isDisabled={!workspaceDialogues?.length} variantColor="teal" type="submit">
+      <UI.Flex mt={4} justifyContent="flex-end" pt={2} pr={2}>
+        <UI.Button isLoading={loading} isDisabled={!workspaceDialogues?.length} variantColor="main" type="submit">
           {t('save')}
         </UI.Button>
       </UI.Flex>
-
     </form>
   );
 };
@@ -169,24 +181,70 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
   const userOfCustomer = data?.customer?.userCustomer;
 
   return (
-    <UI.ModalCard onClose={onClose}>
-      <UI.ModalHead>
+    <UI.ModalCard onClose={onClose} breakout>
+      {/* <UI.ModalHead>
         <UI.ModalTitle>{t('details')}</UI.ModalTitle>
-      </UI.ModalHead>
-      <UI.ModalBody>
-        {error && (
-          <UI.ErrorPane header="Server Error" text={error.message} />
-        )}
+      </UI.ModalHead> */}
+
+      {error && (
+        <UI.ErrorPane header="Server Error" text={error.message} />
+      )}
+      <UI.Div p={36} bg="neutral.100" borderRadius="10px 10px 0 0">
+        <UI.H3 mb={2} fontWeight={600} color="main.500">
+          {userOfCustomer?.user.firstName}
+          {' '}
+          {userOfCustomer?.user.lastName}
+        </UI.H3>
         {userOfCustomer && (
-          <>
-            <UI.Stack mb={4}>
+          <UI.Stack mb={4}>
+            <UI.Grid gridTemplateColumns="auto 1fr" gridColumnGap={4} gridRowGap={2}>
               <UI.Div>
-                <UI.Helper mb={1}>{t('first_name')}</UI.Helper>
-                {userOfCustomer?.user?.firstName || 'None'}
+                <UI.FieldLabel>{t('first_name')}</UI.FieldLabel>
               </UI.Div>
               <UI.Div>
-                <UI.Helper mb={1}>{t('last_name')}</UI.Helper>
+                {userOfCustomer?.user?.firstName || 'None'}
+              </UI.Div>
+
+              <UI.Div>
+                <UI.FieldLabel>{t('last_name')}</UI.FieldLabel>
+              </UI.Div>
+
+              <UI.Div>
                 {userOfCustomer?.user?.lastName || 'None'}
+              </UI.Div>
+
+              <UI.Div>
+                <UI.FieldLabel>
+                  {t('email')}
+                </UI.FieldLabel>
+              </UI.Div>
+
+              <UI.Div>
+                {userOfCustomer?.user?.email}
+              </UI.Div>
+
+              {userOfCustomer?.user?.phone && (
+                <>
+                  <UI.Div>
+                    <UI.FieldLabel>{t('phone')}</UI.FieldLabel>
+                  </UI.Div>
+
+                  <UI.Div>
+                    {userOfCustomer.user.phone}
+                  </UI.Div>
+                </>
+              )}
+
+              <UI.Div>
+                <UI.FieldLabel>{t('role')}</UI.FieldLabel>
+              </UI.Div>
+
+              <UI.Div>
+                {userOfCustomer?.role?.name}
+              </UI.Div>
+            </UI.Grid>
+            {/* <UI.Div>
+                <UI.Helper mb={1}>{t('last_name')}</UI.Helper>
               </UI.Div>
 
               <UI.Div>
@@ -202,30 +260,23 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
               <UI.Div>
                 <UI.Helper mb={1}>{t('role')}</UI.Helper>
                 {userOfCustomer?.role?.name || 'None'}
-              </UI.Div>
-
-            </UI.Stack>
-
-          </>
+              </UI.Div> */}
+          </UI.Stack>
         )}
-        <UI.Hr />
-        {
-          canAssignUsersToDialogue && (
-            <>
-              <UI.ModalHead style={{ borderBottom: 'none', paddingBottom: '1em' }}>
-                <UI.ModalTitle>{t('assigned_dialogues')}</UI.ModalTitle>
-              </UI.ModalHead>
-              <PrivateDialoguesUserForm
-                onClose={onClose}
-                assignedDialogues={userOfCustomer?.user.privateDialogues?.assignedDialogues || []}
-                workspaceDialogues={userOfCustomer?.user.privateDialogues?.privateWorkspaceDialogues || []}
-                userId={id}
-              />
-            </>
-          )
-        }
-
-      </UI.ModalBody>
+      </UI.Div>
+      {canAssignUsersToDialogue && (
+        <UI.Div p={36} style={{ boxShadow: 'rgb(0 0 0 / 6%) 0px 1px 4px 0px inset' }}>
+          <UI.Span color="off.500" fontWeight={600} mb={2} fontSize="1.1rem" display="inline-block">
+            {t('assigned_dialogues')}
+          </UI.Span>
+          <PrivateDialoguesUserForm
+            onClose={onClose}
+            assignedDialogues={userOfCustomer?.user.privateDialogues?.assignedDialogues || []}
+            workspaceDialogues={userOfCustomer?.user.privateDialogues?.privateWorkspaceDialogues || []}
+            userId={id}
+          />
+        </UI.Div>
+      )}
     </UI.ModalCard>
   );
 };
