@@ -11,6 +11,11 @@ export class CustomerPrismaAdapter {
     this.prisma = prisma;
   }
 
+  /**
+   * Find all the private dialogues within a workspace
+   * @param workspaceId 
+   * @returns a list of private dialogues
+   */
   findPrivateDialoguesOfWorkspace = async (workspaceId: string) => {
     return this.prisma.customer.findUnique({
       where: {

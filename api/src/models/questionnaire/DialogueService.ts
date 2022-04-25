@@ -51,6 +51,11 @@ class DialogueService {
     this.nodeService = new NodeService(prismaClient);
   }
 
+  /**
+   * Finds all dialogues of a workspace but strips them off all sensitive information
+   * @param workspaceId 
+   * @returns a list of dialogues including a url to their client version
+   */
   findDialogueUrlsByWorkspaceId = async (workspaceId: string) => {
     const strippedDialogues = await this.dialoguePrismaAdapter.findDialogueUrlsByWorkspaceId(workspaceId);
     const mappedStrippedDialogues = strippedDialogues.map((dialogue) => ({

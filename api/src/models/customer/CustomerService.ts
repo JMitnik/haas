@@ -19,7 +19,6 @@ import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { parseCsv } from '../../utils/parseCsv';
-import { RoleType } from 'models/role';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -44,12 +43,14 @@ class CustomerService {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
   }
 
-
-
+  /**
+   * Generates a workspace based on the content of a CSV
+   * @param input 
+   * @returns the created workspace
+   */
   generateWorkspaceFromCSV = async (input: NexusGenInputs['GroupGenerationInputType']) => {
     const { uploadedCsv, workspaceSlug, workspaceTitle } = input;
     const records = await parseCsv(await uploadedCsv, { delimiter: ',' });
-    console.log('records: ', records);
 
     // Create customer 
     // TODO: Allow for adjustment of template roles
@@ -66,7 +67,7 @@ class CustomerService {
       const layers = Object.entries(record).filter((entry) => entry[0].includes('layer'));
       const layersContent = layers.map((layer) => layer[1] as string);
       const dialogueSlug = layersContent.join('-');
-      const dialogueTitle = `Group ${layersContent.join(' - ')}`
+      const dialogueTitle = `${layersContent.join(' - ')}`
 
       const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'emailAssignee');
       const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'phoneAssignee');
@@ -96,72 +97,14 @@ class CustomerService {
       // Check if user already exists
       // If not create new user entry + userOfCustomer entry
       // If exists => connect existing user when creating new userOfCustomer entry
-      console.log('User email: ', emailAssignee, 'manager role: ', managerRole);
       if (hasEmailAssignee && emailAssignee && managerRole) {
-        const user = await this.userOfCustomerPrismaAdapter.prisma.user.upsert({
-          where: {
-            email: emailAssignee,
-          },
-          create: {
-            email: emailAssignee,
-            phone: phoneAssignee,
-            isAssignedTo: {
-              connect: {
-                id: dialogue.id,
-              },
-            },
-          },
-          update: {
-            isAssignedTo: {
-              connect: {
-                id: dialogue.id,
-              },
-            },
-          },
-        });
+        const user = await this.userOfCustomerPrismaAdapter.addUserToPrivateDialogue(
+          emailAssignee,
+          dialogue.id,
+          phoneAssignee
+        );
 
-        await this.userOfCustomerPrismaAdapter.prisma.userOfCustomer.upsert({
-          where: {
-            userId_customerId: {
-              userId: user.id,
-              customerId: workspace.id,
-            },
-          },
-          update: {
-            user: {
-              connect: {
-                id: user.id,
-              },
-            },
-            customer: {
-              connect: {
-                id: workspace.id,
-              },
-            },
-            role: {
-              connect: {
-                id: managerRole.id,
-              },
-            },
-          },
-          create: {
-            user: {
-              connect: {
-                id: user.id,
-              },
-            },
-            customer: {
-              connect: {
-                id: workspace.id,
-              },
-            },
-            role: {
-              connect: {
-                id: managerRole.id,
-              },
-            },
-          },
-        })
+        await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(workspace.id, user.id, managerRole.id);
       }
     }
 
@@ -582,11 +525,11 @@ class CustomerService {
   }
 
   /**
-   * Get a dialogue based on workspace ID and dialogue Slug.
-   * @param customerId Workspace ID
-   * @param dialogueSlug Dialogue Slug
-   * @returns A dialogue including question Ids and edges
-   */
+ * Get a dialogue based on workspace ID and dialogue Slug.
+ * @param customerId Workspace ID
+ * @param dialogueSlug Dialogue Slug
+ * @returns A dialogue including question Ids and edges
+ */
   async getDialogue(customerId: string, dialogueSlug: string) {
     const customer = await prisma.customer.findUnique({
       where: {
@@ -656,9 +599,9 @@ class CustomerService {
   }
 
   /**
-   * Finds all workspaces available
-   * @returns workspaces
-   */
+ * Finds all workspaces available
+ * @returns workspaces
+ */
   async findAll() {
     return this.customerPrismaAdapter.findAll();
   }
@@ -682,10 +625,10 @@ class CustomerService {
   }
 
   /**
-   * Deletes a workspace from the database
-   * @param customerId
-   * @returns the deleted workspace
-   */
+ * Deletes a workspace from the database
+ * @param customerId
+ * @returns the deleted workspace
+ */
   async delete(customerId: string): Promise<Customer> {
     return this.customerPrismaAdapter.delete(customerId);
   }
@@ -764,20 +707,20 @@ class CustomerService {
   };
 
   /**
-   * Gets a dialogue from the customer, by using a slug
-   * @param customerId
-   * @param dialogueSlug
-   */
+ * Gets a dialogue from the customer, by using a slug
+ * @param customerId
+ * @param dialogueSlug
+ */
   async getDialogueBySlug(customerId: string, dialogueSlug: string) {
     const dialogueOfWorkspace = await this.customerPrismaAdapter.getDialogueBySlug(customerId, dialogueSlug);
     return dialogueOfWorkspace;
   }
 
   /**
-   * Deletes a workspace
-   * @param customerId ID of workspace to be deleted
-   * @returns deleted workspace
-   */
+ * Deletes a workspace
+ * @param customerId ID of workspace to be deleted
+ * @returns deleted workspace
+ */
   async deleteWorkspace(customerId: string) {
     if (!customerId) return null;
 
@@ -839,10 +782,10 @@ class CustomerService {
   }
 
   /**
-   * Gets a dialogue from the customer, by using an ID
-   * @param customerId
-   * @param dialogueSlug
-   */
+ * Gets a dialogue from the customer, by using an ID
+ * @param customerId
+ * @param dialogueSlug
+ */
   async getDialogueById(customerId: string, dialogueId: string) {
     return this.customerPrismaAdapter.getDialogueById(customerId, dialogueId);
   }

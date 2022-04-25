@@ -15,6 +15,30 @@ class UserPrismaAdapter {
     this.roleService = new RoleService(prismaClient);
   }
 
+  addUserToPrivateDialogue = (emailAddress: string, dialogueId: string, phoneNumber?: string) => {
+    return this.prisma.user.upsert({
+      where: {
+        email: emailAddress,
+      },
+      create: {
+        email: emailAddress,
+        phone: phoneNumber,
+        isAssignedTo: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+      },
+      update: {
+        isAssignedTo: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+      },
+    });
+  }
+
   updateUserPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
     return this.prisma.user.update({
       where: {
