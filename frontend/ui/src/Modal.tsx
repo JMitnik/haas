@@ -171,6 +171,9 @@ const CloseButton = ({ onClose }: any) => (
 
 const ModalCardContainer = styled(Div)`
   position: relative;
+  height: 80vh;
+  overflow: auto;
+  border-radius: 0 0 10px 10px;
 
   ${Card} {
     margin: 0 auto;
@@ -182,12 +185,14 @@ const ModalCardContainer = styled(Div)`
 
 export const ModalCard = ({ children, onClose, maxWidth = 600, breakout = false }: ModalCardProps) => (
   <ModalCardContainer>
-    <Card bg="white" noHover maxWidth={maxWidth} padding={breakout ? 0 : 4}>
-      {!!onClose && (
-        <CloseButton onClose={onClose} />
-      )}
-      {children}
-    </Card>
+    <div style={{ height: '80vh', overflow: 'auto', borderRadius: '0 0 10px 10px' }}>
+      <Card bg="white" noHover maxWidth={maxWidth} padding={breakout ? 0 : 4}>
+        {!!onClose && (
+          <CloseButton onClose={onClose} />
+        )}
+        {children}
+      </Card>
+    </div>
   </ModalCardContainer>
 );
 
@@ -204,7 +209,7 @@ interface ModalHeadProps {
 
 const ModalHeadContainer = styled(Div)`
   ${({ theme }) => css`
-    padding: ${theme.gutter * 1.5}px;
+    padding: ${theme.gutter * 1}px ${theme.gutter * 1.5}px;
     background: ${theme.colors.neutral[100]};
     border-radius: 10px 10px 0 0;
 

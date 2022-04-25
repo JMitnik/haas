@@ -7,7 +7,7 @@ import {
   Slider as AntdSlider,
   // DatePicker as AntdDatepicker,
 } from 'antd';
-import { Div, Icon, Paragraph, SectionHeader, Span, Strong } from '@haas/ui';
+import { Card, Div, Icon, Paragraph, SectionHeader, Span, Strong } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
 import {
   Checkbox as ChakraCheckbox,
@@ -36,8 +36,8 @@ import ReactSelect from 'react-select';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
-import { Grid, Stack } from './Container';
-import { Text } from './Type';
+import { Flex, Grid, Stack } from './Container';
+import { Helper, Text } from './Type';
 
 const AntdDatepicker = generatePicker<Date>(AntdDatePickerGenerate);
 const { RangePicker: AntdRangePicker } = AntdDatepicker;
@@ -963,3 +963,64 @@ export const FieldLabel = styled(Span)`
     letter-spacing: 0.05em;
   `}
 `;
+
+export const CheckBoxCardContainer = styled(Card) <{ isChecked?: boolean }>`
+  ${({ theme, isChecked }) => css`
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid transparent;
+    padding: 0;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    &:hover {
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 6px 0px, rgba(0, 0, 0, 0.06) 0px 1px 5px 0px;
+    }
+
+    ${isChecked && css`
+      border: 2px solid ${theme.colors.off[500]};
+    `}
+  `}
+`;
+
+interface CheckboxCardProps {
+  value: any;
+  onChange: (value: any) => void;
+  title: string;
+  isDisabled?: boolean;
+  description: string;
+}
+
+export const CheckboxCard = ({ title, description, value, onChange, isDisabled = false }: CheckboxCardProps) => (
+  <CheckBoxCardContainer
+    isChecked={value}
+    padding={1}
+    onClick={() => onChange(!value)}
+  >
+    <Flex
+      justifyContent="space-between"
+      alignItems="center"
+      borderBottom="1px solid"
+      backgroundColor="neutral.100"
+      borderRadius="10px 10px 0 0"
+      borderBottomColor="gray.100"
+      py={2}
+      px={2}
+    >
+      <Helper>
+        {title}
+      </Helper>
+      <Checkbox
+        // Without stopPropagation, checkbox and checkboxcard cancel each other out
+        onClick={(e) => e.stopPropagation()}
+        isChecked={value}
+        onChange={() => onChange(!value)}
+        isDisabled={isDisabled}
+        ml={1}
+        variantColor="main"
+      />
+    </Flex>
+    <Text px={2} py={1}>{description}</Text>
+  </CheckBoxCardContainer>
+);
