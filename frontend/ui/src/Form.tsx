@@ -5,7 +5,6 @@ import AntdDatePickerGenerate from 'rc-picker/lib/generate/dateFns';
 import generatePicker from 'antd/lib/date-picker/generatePicker';
 import {
   Slider as AntdSlider,
-  // DatePicker as AntdDatepicker,
 } from 'antd';
 import { Card, Div, Icon, Paragraph, SectionHeader, Span, Strong } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
@@ -36,7 +35,7 @@ import ReactSelect from 'react-select';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
-import { Flex, Grid, Stack } from './Container';
+import { Flex, Grid } from './Container';
 import { Helper, Text } from './Type';
 
 const AntdDatepicker = generatePicker<Date>(AntdDatePickerGenerate);
