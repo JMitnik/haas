@@ -43,9 +43,8 @@ const RoleUserForm = ({
   allPermissions,
   permissionsArray,
   roleId,
-  onClose
-}: RoleUserFormProps,
-) => {
+  onClose,
+}: RoleUserFormProps) => {
   const { t } = useTranslation();
   const toast = useToast();
 
@@ -169,7 +168,7 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
 
   return (
     <UI.ModalCard onClose={onClose}>
-      <UI.ModalHead>
+      <UI.DeprecatedModalHead>
         <UI.ModalTitle>
           {t('role_permissions')}
           {' '}
@@ -177,8 +176,8 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
           {' '}
           {role?.name}
         </UI.ModalTitle>
-      </UI.ModalHead>
-      <UI.ModalBody>
+      </UI.DeprecatedModalHead>
+      <UI.DeprecatedModalBody>
         {error && (
           <UI.ErrorPane header="Server Error" text={error.message} />
         )}
@@ -190,7 +189,7 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
           roleId={id}
           onClose={onClose}
         />
-      </UI.ModalBody>
+      </UI.DeprecatedModalBody>
     </UI.ModalCard>
   );
 };

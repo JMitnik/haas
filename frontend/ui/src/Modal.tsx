@@ -8,7 +8,7 @@ import { Paragraph } from './Type';
 import { Div } from './Generics';
 import { Card } from '.';
 
-export const ModalBody = styled(Div)`
+export const DeprecatedModalBody = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px 0;
     overflow-y: scroll;
@@ -126,7 +126,7 @@ export const Modal = ({
 
 export const ModalTitle = styled(Paragraph)``;
 
-export const ModalHead = styled(Div)`
+export const DeprecatedModalHead = styled(Div)`
   ${({ theme }) => css`
     border-bottom: 1px solid ${theme.colors.gray[100]};
 
@@ -190,3 +190,39 @@ export const ModalCard = ({ children, onClose, maxWidth = 600, breakout = false 
     </Card>
   </ModalCardContainer>
 );
+
+
+export const ModalBody = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter * 1.5}px;
+  `}
+`;
+
+interface ModalHeadProps {
+  children: React.ReactNode;
+}
+
+const ModalHeadContainer = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter * 1.5}px;
+    background: ${theme.colors.neutral[100]};
+    border-radius: 10px 10px 0 0;
+
+    ${ModalTitle} {
+      font-size: 1.5rem;
+      color: ${theme.colors.main[500]};
+      font-weight: 600;
+    }
+
+    & + ${ModalBody} {
+      /* Give it some inset box-shadow for a bit of spiciness */
+      box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px 0px inset;
+    }
+  `}
+`;
+
+export const ModalHead = ({ children }: ModalHeadProps) => (
+  <ModalHeadContainer>
+    {children}
+  </ModalHeadContainer>
+)

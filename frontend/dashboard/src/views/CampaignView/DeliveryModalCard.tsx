@@ -26,10 +26,10 @@ export const DeliveryModalCard = ({ id, onClose }: DeliveryModalCardProps) => {
 
   return (
     <UI.ModalCard onClose={onClose}>
-      <UI.ModalHead>
+      <UI.DeprecatedModalHead>
         <UI.ModalTitle>{t('details')}</UI.ModalTitle>
-      </UI.ModalHead>
-      <UI.ModalBody>
+      </UI.DeprecatedModalHead>
+      <UI.DeprecatedModalBody>
         {error && (
           <UI.ErrorPane header="Server Error" text={error.message} />
         )}
@@ -64,7 +64,7 @@ export const DeliveryModalCard = ({ id, onClose }: DeliveryModalCardProps) => {
           </>
         )}
 
-      </UI.ModalBody>
+      </UI.DeprecatedModalBody>
     </UI.ModalCard>
   );
 };

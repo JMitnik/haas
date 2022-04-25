@@ -38,12 +38,12 @@ export const CreateCallToActionModalCard = ({ onClose, onSuccess }: NewCTAModalC
 
   return (
     <UI.ModalCard maxWidth={1200} onClose={onClose}>
-      <UI.ModalHead>
+      <UI.DeprecatedModalHead>
         <UI.ModalTitle>
           Create new CTA
         </UI.ModalTitle>
-      </UI.ModalHead>
-      <UI.ModalBody>
+      </UI.DeprecatedModalHead>
+      <UI.DeprecatedModalBody>
         <CTAForm
           onCancel={() => onClose()}
           onDeleteCTA={() => undefined}
@@ -56,7 +56,7 @@ export const CreateCallToActionModalCard = ({ onClose, onSuccess }: NewCTAModalC
           onNewCTAChange={() => { }}
           form={{}}
         />
-      </UI.ModalBody>
+      </UI.DeprecatedModalBody>
     </UI.ModalCard>
   );
 };

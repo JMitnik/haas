@@ -4,7 +4,6 @@ import React from 'react';
 
 import { Controller, useForm } from 'react-hook-form';
 import { Dialogue, useAssignUserToDialoguesMutation, useGetUserCustomerFromCustomerQuery } from 'types/generated-types';
-import { Mail } from 'react-feather';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
@@ -162,7 +161,7 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
   const { canAssignUsersToDialogue } = useAuth();
-  const { data, loading, error } = useGetUserCustomerFromCustomerQuery({
+  const { data, loading } = useGetUserCustomerFromCustomerQuery({
     variables: {
       id: activeCustomer?.id || '',
       userId: id,
@@ -174,108 +173,83 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
     fetchPolicy: 'cache-and-network',
   });
 
-  if (loading) {
+  const userOfCustomer = data?.customer?.userCustomer;
+
+  if (loading || !userOfCustomer) {
     return <UI.Loader />;
   }
 
-  const userOfCustomer = data?.customer?.userCustomer;
+  const { user } = userOfCustomer;
+
+  const fullName = `${userOfCustomer?.user.firstName} ${userOfCustomer?.user.lastName}`;
 
   return (
     <UI.ModalCard onClose={onClose} breakout>
-      {/* <UI.ModalHead>
-        <UI.ModalTitle>{t('details')}</UI.ModalTitle>
-      </UI.ModalHead> */}
+      <UI.ModalHead>
+        <UI.ModalTitle mb={2}>{fullName}</UI.ModalTitle>
 
-      {error && (
-        <UI.ErrorPane header="Server Error" text={error.message} />
-      )}
-      <UI.Div p={36} bg="neutral.100" borderRadius="10px 10px 0 0">
-        <UI.H3 mb={2} fontWeight={600} color="main.500">
-          {userOfCustomer?.user.firstName}
-          {' '}
-          {userOfCustomer?.user.lastName}
-        </UI.H3>
-        {userOfCustomer && (
-          <UI.Stack mb={4}>
-            <UI.Grid gridTemplateColumns="auto 1fr" gridColumnGap={4} gridRowGap={2}>
-              <UI.Div>
-                <UI.FieldLabel>{t('first_name')}</UI.FieldLabel>
-              </UI.Div>
-              <UI.Div>
-                {userOfCustomer?.user?.firstName || 'None'}
-              </UI.Div>
+        <UI.Stack>
+          <UI.Grid gridTemplateColumns="auto 1fr" gridColumnGap={4} gridRowGap={2}>
+            <UI.Div>
+              <UI.FieldLabel>{t('first_name')}</UI.FieldLabel>
+            </UI.Div>
+            <UI.Div>
+              {user.firstName || t('unknown')}
+            </UI.Div>
 
-              <UI.Div>
-                <UI.FieldLabel>{t('last_name')}</UI.FieldLabel>
-              </UI.Div>
+            <UI.Div>
+              <UI.FieldLabel>{t('last_name')}</UI.FieldLabel>
+            </UI.Div>
 
-              <UI.Div>
-                {userOfCustomer?.user?.lastName || 'None'}
-              </UI.Div>
+            <UI.Div>
+              {user.lastName || t('unknown')}
+            </UI.Div>
 
-              <UI.Div>
-                <UI.FieldLabel>
-                  {t('email')}
-                </UI.FieldLabel>
-              </UI.Div>
+            <UI.Div>
+              <UI.FieldLabel>
+                {t('email')}
+              </UI.FieldLabel>
+            </UI.Div>
 
-              <UI.Div>
-                {userOfCustomer?.user?.email}
-              </UI.Div>
+            <UI.Div>
+              {user.email}
+            </UI.Div>
 
-              {userOfCustomer?.user?.phone && (
-                <>
-                  <UI.Div>
-                    <UI.FieldLabel>{t('phone')}</UI.FieldLabel>
-                  </UI.Div>
+            {user.phone && (
+              <>
+                <UI.Div>
+                  <UI.FieldLabel>{t('phone')}</UI.FieldLabel>
+                </UI.Div>
 
-                  <UI.Div>
-                    {userOfCustomer.user.phone}
-                  </UI.Div>
-                </>
-              )}
+                <UI.Div>
+                  {user.phone}
+                </UI.Div>
+              </>
+            )}
 
-              <UI.Div>
-                <UI.FieldLabel>{t('role')}</UI.FieldLabel>
-              </UI.Div>
+            <UI.Div>
+              <UI.FieldLabel>{t('role')}</UI.FieldLabel>
+            </UI.Div>
 
-              <UI.Div>
-                {userOfCustomer?.role?.name}
-              </UI.Div>
-            </UI.Grid>
-            {/* <UI.Div>
-                <UI.Helper mb={1}>{t('last_name')}</UI.Helper>
-              </UI.Div>
+            <UI.Div>
+              {userOfCustomer.role?.name}
+            </UI.Div>
+          </UI.Grid>
+        </UI.Stack>
+      </UI.ModalHead>
 
-              <UI.Div>
-                <UI.Helper mb={1}>{t('email')}</UI.Helper>
-                {userOfCustomer?.user?.email}
-              </UI.Div>
-
-              <UI.Div>
-                <UI.Helper mb={1}>{t('phone')}</UI.Helper>
-                {userOfCustomer?.user?.phone || 'None'}
-              </UI.Div>
-
-              <UI.Div>
-                <UI.Helper mb={1}>{t('role')}</UI.Helper>
-                {userOfCustomer?.role?.name || 'None'}
-              </UI.Div> */}
-          </UI.Stack>
-        )}
-      </UI.Div>
       {canAssignUsersToDialogue && (
-        <UI.Div p={36} style={{ boxShadow: 'rgb(0 0 0 / 6%) 0px 1px 4px 0px inset' }}>
-          <UI.Span color="off.500" fontWeight={600} mb={2} fontSize="1.1rem" display="inline-block">
+        <UI.ModalBody>
+          <UI.SectionHeader mb={2}>
             {t('assigned_dialogues')}
-          </UI.Span>
+          </UI.SectionHeader>
           <PrivateDialoguesUserForm
             onClose={onClose}
             assignedDialogues={userOfCustomer?.user.privateDialogues?.assignedDialogues || []}
             workspaceDialogues={userOfCustomer?.user.privateDialogues?.privateWorkspaceDialogues || []}
             userId={id}
           />
-        </UI.Div>
+        </UI.ModalBody>
       )}
     </UI.ModalCard>
   );
