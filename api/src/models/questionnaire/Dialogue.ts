@@ -1,7 +1,7 @@
 
 import { UserInputError } from 'apollo-server-express';
-import { addDays, subDays } from 'date-fns';
-import { enumType, extendType, inputObjectType, mutationField, objectType, queryField, stringArg } from '@nexus/schema';
+import { subDays } from 'date-fns';
+import { enumType, extendType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
 
 import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';

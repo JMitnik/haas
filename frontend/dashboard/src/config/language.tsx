@@ -23,6 +23,10 @@ const language = {
       en: 'Workspace URL Extension',
       de: 'Workspace URL Extension',
     },
+    no_dialogues_message: {
+      en: 'No Dialogues available for this workspace...',
+      de: 'Keine Dialogues für diesen Workspace verfügbar...',
+    },
     no_private_dialogue_message: {
       en: 'No private dialogues available in this workspace...',
       de: 'Keine private Dialogues in diesem Workspace verfügbar...',
