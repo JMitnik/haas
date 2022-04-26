@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    create_new_cta: {
+      en: 'Create Call-to-Action',
+      de: 'Neuen Call-to-Action erstellen',
+    },
     workspace_title: {
       en: 'Name of workspace',
       de: 'Name des Workspace',
