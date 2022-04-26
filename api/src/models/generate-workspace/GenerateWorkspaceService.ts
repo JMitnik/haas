@@ -28,7 +28,7 @@ class GenerateWorkspaceService {
    * @returns the created workspace
    */
   async generateWorkspaceFromCSV(input: NexusGenInputs['GenerateWorkspaceCSVInputType']) {
-    const { uploadedCsv, workspaceSlug, workspaceTitle } = input;
+    const { uploadedCsv, workspaceSlug, workspaceTitle, type } = input;
     const records = await parseCsv(await uploadedCsv, { delimiter: ',' });
 
     // Create customer 
@@ -71,7 +71,7 @@ class GenerateWorkspaceService {
       const leafs = await this.nodeService.createTemplateLeafNodes(defaultMassSeedTemplate.leafNodes, dialogue.id);
 
       // Make nodes
-      await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs);
+      await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
 
       // Check if user already exists
       // If not create new user entry + userOfCustomer entry
