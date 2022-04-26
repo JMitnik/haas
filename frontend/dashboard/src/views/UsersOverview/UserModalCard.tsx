@@ -106,8 +106,8 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
           </UI.SectionHeader>
           <AssignDialoguePicker
             onClose={onClose}
-            assignedDialogues={userOfCustomer?.user.privateDialogues?.assignedDialogues || []}
-            workspaceDialogues={userOfCustomer?.user.privateDialogues?.privateWorkspaceDialogues || []}
+            assignedDialogues={userOfCustomer?.user.assignedDialogues?.assignedDialogues || []}
+            workspaceDialogues={userOfCustomer?.user.assignedDialogues?.privateWorkspaceDialogues || []}
             userId={id}
           />
         </UI.ModalBody>
