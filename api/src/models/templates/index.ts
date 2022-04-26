@@ -1,11 +1,13 @@
 import businessWorkspaceTemplate from './businessWorkspaceTemplate';
 import defaultWorkspaceTemplate from './defaultWorkspaceTemplate';
-import sportWorkspaceTemplate from './sportWorkspaceTemplate';
+import sportWorkspaceEngTemplate from './sportWorkspaceEngTemplate';
 import { defaultMassSeedTemplate } from './defaultWorkspaceTemplate';
+import sportWorkspaceNlTemplate from './sportWorkspaceNlTemplate';
 
 export default {
   business: businessWorkspaceTemplate,
-  sport: sportWorkspaceTemplate,
+  sportEng: sportWorkspaceEngTemplate,
+  sportNl: sportWorkspaceNlTemplate,
   massSeed: defaultMassSeedTemplate,
   default: defaultWorkspaceTemplate,
 }

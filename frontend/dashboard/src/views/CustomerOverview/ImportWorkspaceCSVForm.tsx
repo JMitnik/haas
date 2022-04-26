@@ -17,7 +17,7 @@ const schema = yup.object({
   dialogueType: yup.object().shape({
     label: yup.string().notRequired(),
     value: yup.string().notRequired(),
-  }).required(true),
+  }).required(),
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
@@ -32,8 +32,12 @@ const DIALOGUE_TYPE_OPTIONS = [
     value: 'BUSINESS',
   },
   {
-    label: 'SPORT',
-    value: 'SPORT',
+    label: 'SPORT (ENG)',
+    value: 'SPORT_ENG',
+  },
+  {
+    label: 'SPORT (NL)',
+    value: 'SPORT_NL',
   },
 ];
 
