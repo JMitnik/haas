@@ -469,6 +469,7 @@ export const GroupGenerationInputType = inputObjectType({
   definition(t) {
     t.string('workspaceSlug', { required: true });
     t.string('workspaceTitle', { required: true });
+    t.string('type', { default: 'DEFAULT' });
     t.upload('uploadedCsv', { required: true });
   },
 });

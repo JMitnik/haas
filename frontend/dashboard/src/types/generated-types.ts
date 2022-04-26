@@ -767,7 +767,6 @@ export type Dialogue = {
   publicTitle?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
   assignees?: Maybe<Array<UserType>>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
   pathedSessionsConnection?: Maybe<PathedSessionsType>;
@@ -1131,6 +1130,7 @@ export type GetCampaignsInput = {
 export type GroupGenerationInputType = {
   workspaceSlug: Scalars['String'];
   workspaceTitle: Scalars['String'];
+  type?: Maybe<Scalars['String']>;
   uploadedCsv: Scalars['Upload'];
 };
 

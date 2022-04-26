@@ -393,6 +393,7 @@ export interface NexusGenInputs {
     customerSlug?: string | null; // String
   }
   GroupGenerationInputType: { // input type
+    type?: string | null; // String
     uploadedCsv: any; // Upload!
     workspaceSlug: string; // String!
     workspaceTitle: string; // String!

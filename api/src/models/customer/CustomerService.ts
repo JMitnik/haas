@@ -49,11 +49,10 @@ class CustomerService {
    * @returns the created workspace
    */
   generateWorkspaceFromCSV = async (input: NexusGenInputs['GroupGenerationInputType']) => {
-    const { uploadedCsv, workspaceSlug, workspaceTitle } = input;
+    const { uploadedCsv, workspaceSlug, workspaceTitle, type } = input;
     const records = await parseCsv(await uploadedCsv, { delimiter: ',' });
 
     // Create customer 
-    // TODO: Allow for adjustment of template roles
     const workspace = await this.customerPrismaAdapter.createWorkspace({
       name: workspaceTitle,
       primaryColour: '#7266EE',
@@ -83,13 +82,13 @@ class CustomerService {
         customer: { id: workspace.id, create: false },
         isPrivate: hasEmailAssignee,
       };
-
+      // TODO: ADD TEMPLATE TYPE TO CREATE TEMPLATE FUNCTION SO IT CAN SUPPORT NEW BUSINESS TEMPLATE
       // Create initial dialogue
       const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
 
       if (!dialogue) throw 'ERROR: No dialogue created!'
       // Make the leafs
-      const leafs = await this.nodeService.createTemplateLeafNodes(defaultMassSeedTemplate.leafNodes, dialogue.id);
+      const leafs = await this.nodeService.createTemplateLeafNodes(type as string, dialogue.id);
 
       // Make nodes
       await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs);
@@ -509,7 +508,7 @@ class CustomerService {
 
       if (!dialogue) throw 'ERROR: No dialogue created!'
       // Step 2: Make the leafs
-      const leafs = await this.nodeService.createTemplateLeafNodes(defaultMassSeedTemplate.leafNodes, dialogue.id);
+      const leafs = await this.nodeService.createTemplateLeafNodes('MASS_SEED', dialogue.id);
 
       // Step 3: Make nodes
       await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
@@ -650,7 +649,7 @@ class CustomerService {
 
     if (!dialogue) throw 'ERROR: No dialogue created!'
     // Step 2: Make the leafs
-    const leafs = await this.nodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
+    const leafs = await this.nodeService.createTemplateLeafNodes('DEFAULT', dialogue.id);
 
     // Step 3: Make nodes
     await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);

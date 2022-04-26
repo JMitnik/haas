@@ -1376,7 +1376,7 @@ class DialogueService {
     })
 
     // TODO: Make this dependent on input "template"
-    await this.nodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
+    await this.nodeService.createTemplateLeafNodes('DEFAULT', dialogue.id);
 
     return dialogue;
   };
@@ -1397,7 +1397,7 @@ class DialogueService {
     if (!dialogue) throw new Error('Dialogue not seeded');
 
     // TODO: Make this dependent on input "template"
-    const leafs = await this.nodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
+    const leafs = await this.nodeService.createTemplateLeafNodes('DEFAULT', dialogue.id);
     await this.nodeService.createTemplateNodes(dialogue.id, customerName, leafs);
 
     return dialogue;

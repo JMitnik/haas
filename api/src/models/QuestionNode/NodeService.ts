@@ -10,6 +10,7 @@ import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionsInput, CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import { CreateCTAInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
+import templates from '../templates/index';
 
 const standardOptions = [
   { value: 'Facilities', position: 1 },
@@ -511,13 +512,29 @@ export class NodeService {
     return this.questionNodePrismaAdapter.createQuestion(params);
   };
 
+  findTemplateLeadNodes = (templateType: string): LeafNodeDataEntryProps[] => {
+    switch (templateType) {
+      case 'BUSINESS':
+        return templates.business.leafNodes;
+      case 'SPORT':
+        return templates.sport.leafNodes;
+      case 'MASS_SEED':
+        return templates.massSeed.leafNodes;
+      case 'DEFAULT':
+        return templates.default.leafNodes;
+      default:
+        return templates.default.leafNodes;
+    }
+  }
+
   /**
    * Create template call-to-actions.
    * */
   createTemplateLeafNodes = async (
-    leafNodesArray: LeafNodeDataEntryProps[],
+    templateType: string,
     dialogueId: string,
   ) => {
+    const leafNodesArray = this.findTemplateLeadNodes(templateType);
     const mappedLeafs: CreateQuestionsInput = leafNodesArray.map((leaf) => {
       return ({
         ...leaf,

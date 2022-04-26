@@ -956,6 +956,7 @@ input GetCampaignsInput {
 }
 
 input GroupGenerationInputType {
+  type: String = "DEFAULT"
   uploadedCsv: Upload!
   workspaceSlug: String!
   workspaceTitle: String!
