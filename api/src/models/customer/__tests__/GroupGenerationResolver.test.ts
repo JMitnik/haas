@@ -31,7 +31,7 @@ it('Group generation using CSV', async () => {
   const file = createReadStream(`${__dirname}/testCsv.csv`);
 
   const res = await ctx.client.request(`
-    mutation GenerateWorkspaceFromCSV($input: GroupGenerationInputType) {
+    mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
       generateWorkspaceFromCSV(input: $input) {
         id
         slug

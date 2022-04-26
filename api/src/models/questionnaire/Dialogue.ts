@@ -1,7 +1,7 @@
 
 import { UserInputError } from 'apollo-server-express';
 import { subDays } from 'date-fns';
-import { enumType, extendType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
@@ -15,14 +15,14 @@ import formatDate from '../../utils/formatDate';
 import { isADate, isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
-import { DialogueImpactScoreType, DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
+import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
 import { UserType } from '../users/graphql/User';
+import { PathedSessionsType, PathedSessionsInput, TopicType, TopicInputType, MostPopularPath, DialogueStatisticsSummaryFilterInput, MostChangedPath, MostTrendingTopic } from './DialogueStatisticsResolver';
 
 export const TEXT_NODES = [
   'TEXTBOX',
   'CHOICE',
 ];
-
 
 export const DialogueFilterInputType = inputObjectType({
   name: 'DialogueFilterInputType',
@@ -43,131 +43,8 @@ export const DialogueFinisherType = objectType({
   },
 });
 
-export const DialogueStatisticsSummaryFilterInput = inputObjectType({
-  name: 'DialogueStatisticsSummaryFilterInput',
-  definition(t) {
-    t.string('startDateTime', { required: true });
-    t.string('endDateTime');
-    t.boolean('refresh');
-    t.field('impactType', {
-      type: DialogueImpactScoreType,
-      required: true,
-    });
-    t.int('cutoff');
-  },
-})
-
-export const TopicType = objectType({
-  name: 'TopicType',
-  definition(t) {
-    t.string('name');
-    t.float('impactScore');
-    t.int('nrVotes');
-    t.field('subTopics', {
-      list: true,
-      nullable: true,
-      type: TopicType,
-    });
-  },
-});
-
-export const PathedSessionsType = objectType({
-  name: 'PathedSessionsType',
-  definition(t) {
-    t.string('startDateTime');
-    t.string('endDateTime');
-
-    t.list.string('path');
-    t.list.field('pathedSessions', {
-      type: SessionType,
-    });
-  },
-})
-
-export const TopicInputType = inputObjectType({
-  name: 'TopicInputType',
-  definition(t) {
-    t.boolean('isRoot', { default: false });
-    t.string('value', { required: true });
-    t.field('impactScoreType', {
-      type: DialogueImpactScoreType,
-      required: true,
-    });
-    t.string('startDateTime', { required: true });
-    t.string('endDateTime');
-    t.boolean('refresh', { required: false });
-  },
-});
-
-export const PathedSessionsInput = inputObjectType({
-  name: 'PathedSessionsInput',
-  definition(t) {
-    t.list.string('path', { required: true });
-    t.string('startDateTime', { required: true });
-    t.string('endDateTime');
-    t.boolean('refresh', { default: false });
-  },
-});
-
-export const MostTrendingTopic = objectType({
-  name: 'MostTrendingTopic',
-  definition(t) {
-    t.list.string('path');
-    t.int('nrVotes');
-    t.string('group');
-    t.float('impactScore');
-  },
-});
-
-export const PathTopic = objectType({
-  name: 'PathTopic',
-  definition(t) {
-    t.int('nrVotes');
-    t.int('depth');
-    t.string('topic');
-    t.float('impactScore');
-  },
-});
-
-export const MostPopularPath = objectType({
-  name: 'MostPopularPath',
-  definition(t) {
-    t.list.field('path', {
-      type: PathTopic,
-    });
-    t.string('group');
-  },
-});
-
-export const TopicDelta = objectType({
-  name: 'TopicDelta',
-  definition(t) {
-    t.string('topic');
-    t.int('nrVotes');
-    t.float('averageCurrent');
-    t.float('averagePrevious');
-    t.float('delta');
-    t.float('percentageChanged');
-    t.string('group', { nullable: true });
-  },
-})
-
-export const MostChangedPath = objectType({
-  name: 'MostChangedPath',
-  definition(t) {
-    t.string('group', { nullable: true });
-    t.list.field('topPositiveChanged', {
-      type: TopicDelta,
-    });
-    t.list.field('topNegativeChanged', {
-      type: TopicDelta,
-    });
-  },
-});
-
 export const DialogueType = objectType({
   name: 'Dialogue',
-
   definition(t) {
     t.id('id');
     t.string('title');
@@ -624,25 +501,6 @@ export const CreateDialogueInputType = inputObjectType({
   },
 });
 
-export const SetDialoguePrivacyInput = inputObjectType({
-  name: 'SetDialoguePrivacyInput',
-  definition(t) {
-    t.string('customerId', { required: true });
-    t.string('dialogueSlug', { required: true });
-    t.boolean('state', { required: true });
-  },
-})
-
-export const SetDialoguePrivacyMutation = mutationField('setDialoguePrivacy', {
-  type: 'Dialogue',
-  args: { input: SetDialoguePrivacyInput },
-  nullable: true,
-  async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input object provided!');
-    return ctx.services.dialogueService.setDialoguePrivacy(args.input);
-  },
-})
-
 export const DialogueMutations = extendType({
   type: 'Mutation',
   definition(t) {
@@ -743,44 +601,10 @@ export const DialogueRootQuery = extendType({
   },
 });
 
-export const DialogueLinksInput = inputObjectType({
-  name: 'DialogueLinksInput',
-  definition(t) {
-    t.string('workspaceId');
-  },
-});
-
-export const PublicDialogueInfo = objectType({
-  name: 'PublicDialogueInfo',
-  definition(t) {
-    t.string('title');
-    t.string('slug');
-    t.string('description', { nullable: true });
-    t.string('url');
-  },
-})
-
-export const DialogueLinksQuery = queryField('dialogueLinks', {
-  type: PublicDialogueInfo,
-  list: true,
-  args: {
-    input: DialogueLinksInput,
-  },
-  nullable: true,
-  async resolve(parent, args, ctx) {
-    if (!args.input?.workspaceId) return [];
-    return ctx.services.dialogueService.findDialogueUrlsByWorkspaceId(args.input.workspaceId);
-  },
-});
-
 export default [
-  DialogueLinksInput,
   DialogueWhereUniqueInput,
   DialogueMutations,
   DialogueType,
   DialogueRootQuery,
   DialogueStatistics,
-  SetDialoguePrivacyMutation,
-  SetDialoguePrivacyInput,
-  DialogueLinksQuery,
 ];

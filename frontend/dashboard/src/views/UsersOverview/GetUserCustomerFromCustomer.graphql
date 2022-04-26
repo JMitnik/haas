@@ -8,7 +8,7 @@ query GetUserCustomerFromCustomer($id: ID!, $userId: String!, $input: UserOfCust
         phone
         firstName
         lastName
-        privateDialogues(input: $input) {
+        assignedDialogues(input: $input) {
           privateWorkspaceDialogues {
             title
             slug

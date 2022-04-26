@@ -4,6 +4,7 @@ import { NexusGenInputs } from '../../generated/nexus';
 
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { CreateSessionInput } from './SessionPrismaAdapterType';
+import { generateTimeSpent } from './SessionHelpers';
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;
@@ -19,7 +20,7 @@ class SessionPrismaAdapter {
    * @param endDateTime 
    * @returns 
    */
-  findSessionsByCustomerIdBetweenDates = async (
+  findCustomerSessions = async (
     customerId: string,
     startDateTime: Date,
     endDateTime: Date,
@@ -52,7 +53,7 @@ class SessionPrismaAdapter {
    * @param endDateTime 
    * @returns 
    */
-  findSessionByDialogueIdBetweenDates = async (
+  findDialogueSessions = async (
     dialogueId: string,
     startDateTime: Date,
     endDateTime: Date
@@ -535,7 +536,7 @@ class SessionPrismaAdapter {
 
     return this.prisma.session.create({
       data: {
-        totalTimeInSec: Math.floor(Math.random() * 45 + 1),
+        totalTimeInSec: generateTimeSpent(),
         mainScore: data.simulatedRootVote,
         nodeEntries: {
           create: [{
@@ -583,7 +584,7 @@ class SessionPrismaAdapter {
 
     return this.prisma.session.create({
       data: {
-        totalTimeInSec: Math.floor(Math.random() * 45 + 1),
+        totalTimeInSec: generateTimeSpent(),
         createdAt: data.createdAt,
         mainScore: data.simulatedRootVote,
         nodeEntries: {

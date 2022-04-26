@@ -45,7 +45,6 @@ export type AssignUserToDialoguesInput = {
   userId: Scalars['String'];
   workspaceId: Scalars['String'];
   assignedDialogueIds: Array<Scalars['String']>;
-  delistedDialogueIds: Array<Scalars['String']>;
 };
 
 export type AuthenticateLambdaInput = {
@@ -1115,6 +1114,13 @@ export type GenerateAutodeckInput = {
   newCustomFields?: Maybe<Array<CustomFieldInputType>>;
 };
 
+export type GenerateWorkspaceCsvInputType = {
+  workspaceSlug: Scalars['String'];
+  workspaceTitle: Scalars['String'];
+  uploadedCsv: Scalars['Upload'];
+  type?: Maybe<Scalars['String']>;
+};
+
 export type GetAutomationInput = {
   id?: Maybe<Scalars['String']>;
 };
@@ -1125,13 +1131,6 @@ export type GetAutomationsByWorkspaceInput = {
 
 export type GetCampaignsInput = {
   customerSlug?: Maybe<Scalars['String']>;
-};
-
-export type GroupGenerationInputType = {
-  workspaceSlug: Scalars['String'];
-  workspaceTitle: Scalars['String'];
-  type?: Maybe<Scalars['String']>;
-  uploadedCsv: Scalars['Upload'];
 };
 
 export type HandleUserStateInWorkspaceInput = {
@@ -1299,6 +1298,7 @@ export type MostTrendingTopic = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  generateWorkspaceFromCSV: Customer;
   createJobProcessLocation: JobProcessLocation;
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
   retryAutodeckJob?: Maybe<CreateWorkspaceJobType>;
@@ -1326,18 +1326,17 @@ export type Mutation = {
   singleUpload: ImageType;
   createWorkspace: Customer;
   editWorkspace: Customer;
-  generateWorkspaceFromCSV: Customer;
   massSeed?: Maybe<Customer>;
   deleteCustomer?: Maybe<Customer>;
-  assignUserToDialogues?: Maybe<UserType>;
   handleUserStateInWorkspace: UserCustomer;
   editUser: UserType;
   deleteUser: DeleteUserOutput;
-  setDialoguePrivacy?: Maybe<Dialogue>;
+  assignUserToDialogues?: Maybe<UserType>;
   copyDialogue: Dialogue;
   createDialogue: Dialogue;
   editDialogue: Dialogue;
   deleteDialogue: Dialogue;
+  setDialoguePrivacy?: Maybe<Dialogue>;
   uploadUpsellImage?: Maybe<ImageType>;
   authenticateLambda?: Maybe<Scalars['String']>;
   createAutomationToken?: Maybe<Scalars['String']>;
@@ -1359,6 +1358,11 @@ export type Mutation = {
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
+};
+
+
+export type MutationGenerateWorkspaceFromCsvArgs = {
+  input?: Maybe<GenerateWorkspaceCsvInputType>;
 };
 
 
@@ -1508,11 +1512,6 @@ export type MutationEditWorkspaceArgs = {
 };
 
 
-export type MutationGenerateWorkspaceFromCsvArgs = {
-  input?: Maybe<GroupGenerationInputType>;
-};
-
-
 export type MutationMassSeedArgs = {
   input?: Maybe<MassSeedInput>;
 };
@@ -1520,11 +1519,6 @@ export type MutationMassSeedArgs = {
 
 export type MutationDeleteCustomerArgs = {
   where?: Maybe<CustomerWhereUniqueInput>;
-};
-
-
-export type MutationAssignUserToDialoguesArgs = {
-  input?: Maybe<AssignUserToDialoguesInput>;
 };
 
 
@@ -1544,8 +1538,8 @@ export type MutationDeleteUserArgs = {
 };
 
 
-export type MutationSetDialoguePrivacyArgs = {
-  input?: Maybe<SetDialoguePrivacyInput>;
+export type MutationAssignUserToDialoguesArgs = {
+  input?: Maybe<AssignUserToDialoguesInput>;
 };
 
 
@@ -1575,6 +1569,11 @@ export type MutationEditDialogueArgs = {
 
 export type MutationDeleteDialogueArgs = {
   input?: Maybe<DeleteDialogueInputType>;
+};
+
+
+export type MutationSetDialoguePrivacyArgs = {
+  input?: Maybe<SetDialoguePrivacyInput>;
 };
 
 
@@ -2606,7 +2605,7 @@ export type UserType = {
   lastName?: Maybe<Scalars['String']>;
   lastLoggedIn?: Maybe<Scalars['Date']>;
   lastActivity?: Maybe<Scalars['Date']>;
-  privateDialogues?: Maybe<AssignedDialogues>;
+  assignedDialogues?: Maybe<AssignedDialogues>;
   globalPermissions?: Maybe<Array<SystemPermission>>;
   userCustomers: Array<UserCustomer>;
   customers: Array<Customer>;
@@ -2615,7 +2614,7 @@ export type UserType = {
 };
 
 
-export type UserTypePrivateDialoguesArgs = {
+export type UserTypeAssignedDialoguesArgs = {
   input?: Maybe<UserOfCustomerInput>;
 };
 
@@ -2809,7 +2808,7 @@ export type GetCustomerOfUserQuery = (
     ), user: (
       { __typename?: 'UserType' }
       & Pick<UserType, 'id'>
-      & { privateDialogues?: Maybe<(
+      & { assignedDialogues?: Maybe<(
         { __typename?: 'AssignedDialogues' }
         & { privateWorkspaceDialogues: Array<(
           { __typename?: 'Dialogue' }
@@ -3167,7 +3166,7 @@ export type GetWorkspaceDialoguesQuery = (
 );
 
 export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
-  input?: Maybe<GroupGenerationInputType>;
+  input?: Maybe<GenerateWorkspaceCsvInputType>;
 }>;
 
 
@@ -3390,7 +3389,7 @@ export type AssignUserToDialoguesMutation = (
   & { assignUserToDialogues?: Maybe<(
     { __typename?: 'UserType' }
     & Pick<UserType, 'email'>
-    & { privateDialogues?: Maybe<(
+    & { assignedDialogues?: Maybe<(
       { __typename?: 'AssignedDialogues' }
       & { privateWorkspaceDialogues: Array<(
         { __typename?: 'Dialogue' }
@@ -3495,7 +3494,7 @@ export type GetUserCustomerFromCustomerQuery = (
       & { user: (
         { __typename?: 'UserType' }
         & Pick<UserType, 'id' | 'email' | 'phone' | 'firstName' | 'lastName'>
-        & { privateDialogues?: Maybe<(
+        & { assignedDialogues?: Maybe<(
           { __typename?: 'AssignedDialogues' }
           & { privateWorkspaceDialogues: Array<(
             { __typename?: 'Dialogue' }
@@ -3834,7 +3833,7 @@ export const GetCustomerOfUserDocument = gql`
     }
     user {
       id
-      privateDialogues(input: $input) {
+      assignedDialogues(input: $input) {
         privateWorkspaceDialogues {
           title
           slug
@@ -4717,7 +4716,7 @@ export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialog
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
     }
 export const GenerateWorkspaceFromCsvDocument = gql`
-    mutation GenerateWorkspaceFromCSV($input: GroupGenerationInputType) {
+    mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
   generateWorkspaceFromCSV(input: $input) {
     id
     slug
@@ -5171,7 +5170,7 @@ export const AssignUserToDialoguesDocument = gql`
     mutation assignUserToDialogues($input: AssignUserToDialoguesInput) {
   assignUserToDialogues(input: $input) {
     email
-    privateDialogues {
+    assignedDialogues {
       privateWorkspaceDialogues {
         title
         slug
@@ -5404,7 +5403,7 @@ export const GetUserCustomerFromCustomerDocument = gql`
         phone
         firstName
         lastName
-        privateDialogues(input: $input) {
+        assignedDialogues(input: $input) {
           privateWorkspaceDialogues {
             title
             slug
@@ -5596,9 +5595,9 @@ export namespace GetCustomerOfUser {
   export type Campaigns = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['customer']>)['campaigns']>)[number]>;
   export type Role = (NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['role']>);
   export type User = (NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['user']>);
-  export type PrivateDialogues = (NonNullable<(NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['user']>)['privateDialogues']>);
-  export type PrivateWorkspaceDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['user']>)['privateDialogues']>)['privateWorkspaceDialogues']>)[number]>;
-  export type AssignedDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['user']>)['privateDialogues']>)['assignedDialogues']>)[number]>;
+  export type AssignedDialogues = (NonNullable<(NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['user']>)['assignedDialogues']>);
+  export type PrivateWorkspaceDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['user']>)['assignedDialogues']>)['privateWorkspaceDialogues']>)[number]>;
+  export type _AssignedDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerOfUserQuery['UserOfCustomer']>)['user']>)['assignedDialogues']>)['assignedDialogues']>)[number]>;
   export const Document = GetCustomerOfUserDocument;
 }
 
@@ -5853,9 +5852,9 @@ export namespace AssignUserToDialogues {
   export type Variables = AssignUserToDialoguesMutationVariables;
   export type Mutation = AssignUserToDialoguesMutation;
   export type AssignUserToDialogues = (NonNullable<AssignUserToDialoguesMutation['assignUserToDialogues']>);
-  export type PrivateDialogues = (NonNullable<(NonNullable<AssignUserToDialoguesMutation['assignUserToDialogues']>)['privateDialogues']>);
-  export type PrivateWorkspaceDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<AssignUserToDialoguesMutation['assignUserToDialogues']>)['privateDialogues']>)['privateWorkspaceDialogues']>)[number]>;
-  export type AssignedDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<AssignUserToDialoguesMutation['assignUserToDialogues']>)['privateDialogues']>)['assignedDialogues']>)[number]>;
+  export type AssignedDialogues = (NonNullable<(NonNullable<AssignUserToDialoguesMutation['assignUserToDialogues']>)['assignedDialogues']>);
+  export type PrivateWorkspaceDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<AssignUserToDialoguesMutation['assignUserToDialogues']>)['assignedDialogues']>)['privateWorkspaceDialogues']>)[number]>;
+  export type _AssignedDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<AssignUserToDialoguesMutation['assignUserToDialogues']>)['assignedDialogues']>)['assignedDialogues']>)[number]>;
   export const Document = AssignUserToDialoguesDocument;
 }
 
@@ -5899,9 +5898,9 @@ export namespace GetUserCustomerFromCustomer {
   export type Customer = (NonNullable<GetUserCustomerFromCustomerQuery['customer']>);
   export type UserCustomer = (NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>);
   export type User = (NonNullable<(NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>)['user']>);
-  export type PrivateDialogues = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>)['user']>)['privateDialogues']>);
-  export type PrivateWorkspaceDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>)['user']>)['privateDialogues']>)['privateWorkspaceDialogues']>)[number]>;
-  export type AssignedDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>)['user']>)['privateDialogues']>)['assignedDialogues']>)[number]>;
+  export type AssignedDialogues = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>)['user']>)['assignedDialogues']>);
+  export type PrivateWorkspaceDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>)['user']>)['assignedDialogues']>)['privateWorkspaceDialogues']>)[number]>;
+  export type _AssignedDialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>)['user']>)['assignedDialogues']>)['assignedDialogues']>)[number]>;
   export type Role = (NonNullable<(NonNullable<(NonNullable<GetUserCustomerFromCustomerQuery['customer']>)['userCustomer']>)['role']>);
   export const Document = GetUserCustomerFromCustomerDocument;
 }

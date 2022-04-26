@@ -45,73 +45,6 @@ class CustomerService {
   }
 
   /**
-   * Generates a workspace based on the content of a CSV
-   * @param input 
-   * @returns the created workspace
-   */
-  generateWorkspaceFromCSV = async (input: NexusGenInputs['GroupGenerationInputType']) => {
-    const { uploadedCsv, workspaceSlug, workspaceTitle, type } = input;
-    const records = await parseCsv(await uploadedCsv, { delimiter: ',' });
-
-    // Create customer 
-    const workspace = await this.customerPrismaAdapter.createWorkspace({
-      name: workspaceTitle,
-      primaryColour: '#7266EE',
-      logo: '',
-      slug: workspaceSlug,
-    });
-
-    // For every record generate dialogue, users + assign to dialogue
-    for (let i = 0; i < records.length; i++) {
-      const record = records[i];
-      const layers = Object.entries(record).filter((entry) => entry[0].includes('layer'));
-      const layersContent = layers.map((layer) => layer[1] as string);
-      const dialogueSlug = layersContent.join('-');
-      const dialogueTitle = `${layersContent.join(' - ')}`
-
-      const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'emailAssignee');
-      const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'phoneAssignee');
-      const hasEmailAssignee = !!userEmailEntry?.[1];
-      const emailAssignee = userEmailEntry?.[1] as string;
-      const phoneAssignee = userPhoneEntry?.[1] as string | undefined;
-      const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER);
-
-      const dialogueInput: CreateDialogueInput = {
-        slug: dialogueSlug,
-        title: dialogueTitle,
-        description: '',
-        customer: { id: workspace.id, create: false },
-        isPrivate: hasEmailAssignee,
-      };
-      // TODO: ADD TEMPLATE TYPE TO CREATE TEMPLATE FUNCTION SO IT CAN SUPPORT NEW BUSINESS TEMPLATE
-      // Create initial dialogue
-      const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
-
-      if (!dialogue) throw 'ERROR: No dialogue created!'
-      // Make the leafs
-      const leafs = await this.nodeService.createTemplateLeafNodes(type as string, dialogue.id);
-
-      // Make nodes
-      await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
-
-      // Check if user already exists
-      // If not create new user entry + userOfCustomer entry
-      // If exists => connect existing user when creating new userOfCustomer entry
-      if (hasEmailAssignee && emailAssignee && managerRole) {
-        const user = await this.userOfCustomerPrismaAdapter.addUserToPrivateDialogue(
-          emailAssignee,
-          dialogue.id,
-          phoneAssignee
-        );
-
-        await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(workspace.id, user.id, managerRole.id);
-      }
-    }
-
-    return workspace;
-  };
-
-  /**
    * Finds the most popular path over all dialogues within a workspace
    * @param customerId 
    * @param impactScoreType 
@@ -129,7 +62,7 @@ class CustomerService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
-    const sessions = await this.sessionPrismaAdapter.findSessionsByCustomerIdBetweenDates(
+    const sessions = await this.sessionPrismaAdapter.findCustomerSessions(
       customerId,
       startDateTime,
       endDateTimeSet,
@@ -191,7 +124,7 @@ class CustomerService {
     // This week/month/24hr should be set through front-end but for now hardcoded 7 days
     const prevStartDateTime = subDays(startDateTime as Date, 7);
 
-    const sessions = await this.sessionPrismaAdapter.findSessionsByCustomerIdBetweenDates(
+    const sessions = await this.sessionPrismaAdapter.findCustomerSessions(
       customerId,
       prevStartDateTime,
       endDateTimeSet,
@@ -316,7 +249,7 @@ class CustomerService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
-    const sessions = await this.sessionPrismaAdapter.findSessionsByCustomerIdBetweenDates(
+    const sessions = await this.sessionPrismaAdapter.findCustomerSessions(
       customerId,
       startDateTime,
       endDateTimeSet,

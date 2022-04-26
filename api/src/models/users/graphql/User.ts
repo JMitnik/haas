@@ -84,7 +84,7 @@ export const UserType = objectType({
     t.date('lastLoggedIn', { nullable: true });
     t.date('lastActivity', { nullable: true });
 
-    t.field('privateDialogues', {
+    t.field('assignedDialogues', {
       type: AssignedDialogues,
       nullable: true,
       args: { input: UserOfCustomerInput },
@@ -237,28 +237,6 @@ export const RootUserQueries = extendType({
     });
   },
 });
-
-export const AssignUserToDialoguesInput = inputObjectType({
-  name: 'AssignUserToDialoguesInput',
-  definition(t) {
-    t.string('userId', { required: true });
-    t.string('workspaceId', { required: true });
-    t.list.string('assignedDialogueIds', { required: true });
-    t.list.string('delistedDialogueIds', { required: true });
-  },
-})
-
-export const AssignUserToDialogues = mutationField('assignUserToDialogues', {
-  type: UserType,
-  args: { input: AssignUserToDialoguesInput },
-  nullable: true,
-  async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input provided!');
-
-    // TODO: Probably want to check if set dialogues belong to specified workspace
-    return ctx.services.userService.assignUserToPrivateDialogues(args.input)
-  },
-})
 
 export const HandleUserStateInWorkspaceInput = inputObjectType({
   name: 'HandleUserStateInWorkspaceInput',
