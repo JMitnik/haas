@@ -1,11 +1,11 @@
 import * as UI from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
-import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { Dialogue, useAssignUserToDialoguesMutation } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useToast } from 'hooks/useToast';
 
 interface AssignDialoguePickerProps {
   assignedDialogues: ({
@@ -29,13 +29,7 @@ export const AssignDialoguePicker = ({
   const [assignUserToDialogues, { loading }] = useAssignUserToDialoguesMutation({
     onCompleted: () => {
       onClose();
-      toast({
-        title: t('toast:updated_assigned_dialogues'),
-        description: t('toast:updated_assigned_dialogues_helper'),
-        status: 'success',
-        position: 'bottom-right',
-        duration: 1500,
-      });
+      toast.success({ description: t('toast:updated_assigned_dialogues_helper') });
     },
   });
 
