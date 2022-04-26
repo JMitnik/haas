@@ -25,11 +25,11 @@ export const DeliveryModalCard = ({ id, onClose }: DeliveryModalCardProps) => {
   const delivery = data?.delivery;
 
   return (
-    <UI.ModalCard onClose={onClose}>
-      <UI.DeprecatedModalHead>
+    <UI.ModalCard breakout maxWidth={1200} onClose={onClose}>
+      <UI.ModalHead>
         <UI.ModalTitle>{t('details')}</UI.ModalTitle>
-      </UI.DeprecatedModalHead>
-      <UI.DeprecatedModalBody>
+      </UI.ModalHead>
+      <UI.ModalBody>
         {error && (
           <UI.ErrorPane header="Server Error" text={error.message} />
         )}
@@ -64,7 +64,7 @@ export const DeliveryModalCard = ({ id, onClose }: DeliveryModalCardProps) => {
           </>
         )}
 
-      </UI.DeprecatedModalBody>
+      </UI.ModalBody>
     </UI.ModalCard>
   );
 };
