@@ -89,7 +89,7 @@ export const AssignDialoguePicker = ({
 
         {!workspaceDialogues?.length && (
           <UI.Flex gridColumn="1/-1" justifyContent="center">
-            No private dialogues available in this workspace...
+            {t('no_private_dialogue_message')}
           </UI.Flex>
         )}
       </UI.Grid>

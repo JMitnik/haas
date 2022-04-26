@@ -31,8 +31,8 @@ import DashboardPage from 'pages/dashboard';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
 import DialogueLinkFetchOverview from 'views/DialogueLinkFetchOverview';
+import DialogueOverview from 'views/DialogueOverview';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
-import DialoguesPage from 'pages/dashboard/dialogues';
 import EditCustomerView from 'views/EditCustomerView';
 import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
@@ -161,7 +161,7 @@ const CustomerRoutes = () => (
 
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d"
-                      render={() => <DialoguesPage />}
+                      render={() => <DialogueOverview />}
                     />
 
                     <GuardedRoute

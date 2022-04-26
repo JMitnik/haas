@@ -6,7 +6,7 @@ import generatePicker from 'antd/lib/date-picker/generatePicker';
 import {
   Slider as AntdSlider,
 } from 'antd';
-import { Card, Div, Icon, Paragraph, SectionHeader, Span, Strong } from '@haas/ui';
+import { Div, Paragraph, SectionHeader, Strong } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
 import {
   Checkbox as ChakraCheckbox,
@@ -36,6 +36,8 @@ import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
 import { Flex, Grid } from './Container';
+import { Card } from './Cards';
+import { Span } from './Span';
 import { Helper, Text } from './Type';
 
 const AntdDatepicker = generatePicker<Date>(AntdDatePickerGenerate);

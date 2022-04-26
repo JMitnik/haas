@@ -63,7 +63,6 @@ export const ImportWorkspaceCSVForm = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
-    console.log(activeCSV);
     importWorkspaceCSV({
       variables: {
         input: {
@@ -81,12 +80,12 @@ export const ImportWorkspaceCSVForm = () => {
 
       <UI.InputGrid>
         <UI.FormControl isRequired>
-          <UI.FormLabel>Workspace title</UI.FormLabel>
+          <UI.FormLabel>{t('workspace_title')}</UI.FormLabel>
           <UI.Input name="workspaceTitle" ref={form.register()} placeholder={t('form_helpertext_placeholder')} />
         </UI.FormControl>
 
         <UI.FormControl isRequired>
-          <UI.FormLabel>Workspace slug</UI.FormLabel>
+          <UI.FormLabel>{t('workspace_slug')}</UI.FormLabel>
           <UI.Input name="workspaceSlug" ref={form.register()} placeholder={t('form_helpertext_placeholder')} />
         </UI.FormControl>
 

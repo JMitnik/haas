@@ -1,9 +1,21 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    workspace_title: {
+      en: 'Name of workspace',
+      de: 'Name des Workspace',
+    },
+    workspace_slug: {
+      en: 'Workspace URL Extension',
+      de: 'Workspace URL Extension',
+    },
+    no_private_dialogue_message: {
+      en: 'No private dialogues available in this workspace...',
+      de: 'Keine private Dialogues in diesem Workspace verfügbar...',
+    },
     generate_workspace: {
       en: 'Generate workspace',
-      nl: 'Genereer workspace',
+      de: 'Workspace generieren',
     },
     new: {
       en: 'New',
