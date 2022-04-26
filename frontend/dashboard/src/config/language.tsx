@@ -1,5 +1,15 @@
 /* eslint-disable max-len */
 const language = {
+  default_values: {
+    workspace_placeholder: {
+      en: 'Club Hades',
+      de: 'Club Hades',
+    },
+    workspace_slug: {
+      en: 'club-hades',
+      de: 'club-hades',
+    },
+  },
   general: {
     create_new_cta: {
       en: 'Create Call-to-Action',
@@ -1986,6 +1996,26 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
+    general_error: {
+      en: 'Something went wrong!',
+      de: 'Irgendetwas ist schief gelaufen!',
+    },
+    general_error_helper: {
+      en: 'Currently unable to edit your detail. Please try again.',
+      de: 'Aktuell kann deine Detail nicht bearbeitet werden. Bitte versuche es erneut.',
+    },
+    general_success: {
+      en: 'Success!',
+      de: 'Erfolg!',
+    },
+    general_success_helper: {
+      en: 'The task has been finished successfully.',
+      de: 'Die Aufgabe wurde erfolgreich abgeschlossen.',
+    },
+    workspace_generated_helper: {
+      en: 'Workspace has been generated',
+      de: 'Workspace wurde erstellt',
+    },
     updated_assigned_dialogues: {
       en: 'Updated assigned dialogues',
       de: 'Zugewiesene Dialoge aktualisiert',

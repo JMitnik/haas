@@ -245,7 +245,11 @@ const AppRoutes = () => (
       <GuardedRoute
         allowedPermission={SystemPermission.CanGenerateWorkspaceFromCsv}
         path={ROUTES.GENERATE_WORKSPACE_VIEW}
-        render={() => <ImportWorkspaceCSVForm />}
+        render={() => (
+          <PreCustomerLayout>
+            <ImportWorkspaceCSVForm />
+          </PreCustomerLayout>
+        )}
       />
 
       <Route
