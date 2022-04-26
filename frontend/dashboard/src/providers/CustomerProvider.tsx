@@ -13,7 +13,7 @@ interface CustomerProps extends Customer {
   } & Pick<RoleType, 'name' | 'permissions'>;
   user?: {
     id: string | undefined;
-    privateDialogues?: PrivateDialogueProps | null;
+    assignedDialogues?: PrivateDialogueProps | null;
   }
 }
 
@@ -27,7 +27,7 @@ interface CustomerContextProps {
   setActiveCustomer: (customer: CustomerProps | null) => void;
   activeCustomer?: CustomerProps | null;
   activePermissions?: SystemPermission[];
-  privateDialogues?: PrivateDialogueProps | null;
+  assignedDialogues?: PrivateDialogueProps | null;
 }
 
 interface CustomerProviderProps {
@@ -97,11 +97,11 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
 
   const activePermissions = [...(user?.globalPermissions || []), ...(activeCustomer?.userRole?.permissions || [])];
 
-  const privateDialogues = activeCustomer?.user?.privateDialogues;
+  const assignedDialogues = activeCustomer?.user?.assignedDialogues;
 
   return (
     <CustomerContext.Provider value={{
-      activeCustomer, setActiveCustomer, activePermissions, isLoading, privateDialogues,
+      activeCustomer, setActiveCustomer, activePermissions, isLoading, assignedDialogues,
     }}
     >
       {children}
