@@ -19,6 +19,15 @@ const standardOptions = [
   { value: 'Customer Support', position: 4 },
 ];
 
+const businessOptions = [
+  { value: 'Physical & Mental', position: 1 },
+  { value: 'Management', position: 2 },
+  { value: 'Home Situation', position: 3 },
+  { value: 'Colleagues', position: 4 },
+  { value: 'Performance', position: 5 },
+  { value: 'Work Pressure', position: 6 },
+]
+
 const facilityOptions = [
   { value: 'Cleanliness', position: 1 },
   { value: 'Atmosphere', position: 2 },
@@ -513,6 +522,7 @@ export class NodeService {
   };
 
   findTemplateLeadNodes = (templateType: string): LeafNodeDataEntryProps[] => {
+    console.log('FIND TEMPLATE LEAFNODES FOR: ', templateType);
     switch (templateType) {
       case 'BUSINESS':
         return templates.business.leafNodes;
@@ -898,9 +908,294 @@ export class NodeService {
   };
 
   /**
+   * Creates a set of nodes based on the provided template type
+   * @param dialogueId 
+   * @param workspaceName 
+   * @param leafs 
+   * @param templateType 
+   * @returns 
+   */
+  createTemplateNodes = async (
+    dialogueId: string,
+    workspaceName: string,
+    leafs: QuestionNode[],
+    templateType: string
+  ) => {
+    switch (templateType) {
+      case 'BUSINESS':
+        return this.createBusinessTemplateNodes(dialogueId, workspaceName, leafs);
+      case 'SPORT':
+        return this.createSportTemplateNodes(dialogueId, workspaceName, leafs);
+      case 'MASS_SEED':
+        return this.createDefaultTemplateNodes(dialogueId, workspaceName, leafs);
+      case 'DEFAULT':
+        return this.createDefaultTemplateNodes(dialogueId, workspaceName, leafs);
+      default:
+        return this.createDefaultTemplateNodes(dialogueId, workspaceName, leafs);
+    };
+  };
+
+  /**
    * Create nodes from a default template.
    * */
-  createTemplateNodes = async (
+  createSportTemplateNodes = async (
+    dialogueId: string,
+    workspaceName: string,
+    leafs: QuestionNode[],
+  ) => {
+    // Root question (How do you feel about?)
+    const rootQuestion = await this.createQuestionNode(
+      `How do you feel about ${workspaceName}?`,
+      dialogueId, NodeType.SLIDER, standardOptions, true,
+    );
+
+    // Positive Sub child 1 (What did you like?)
+    const instagramNodeId = NodeService.findLeafIdContainingText(leafs, 'Follow us on Instagram and stay');
+    const rootToWhatDidYou = await this.createQuestionNode(
+      'What did you like?', dialogueId, NodeType.CHOICE, standardOptions, false,
+      instagramNodeId,
+    );
+
+    // Positive Sub sub child 1 (Facilities)
+    const comeAndJoin1stAprilId = NodeService.findLeafIdContainingText(leafs,
+      'Come and join us on 1st April for our great event');
+    const whatDidYouToFacilities = await this.createQuestionNode(
+      'What exactly did you like about the facilities?', dialogueId,
+      NodeType.CHOICE, facilityOptions, false, comeAndJoin1stAprilId,
+    );
+
+    // Positive Sub sub child 2 (Website)
+    const whatDidYouToWebsite = await this.createQuestionNode(
+      'What exactly did you like about the website?', dialogueId,
+      NodeType.CHOICE, websiteOptions, false, instagramNodeId,
+    );
+
+    // Positive Sub sub child 3 (Product/Services)
+    const weThinkYouMightLikeThis = NodeService.findLeafIdContainingText(
+      leafs,
+      'We think you might like this as',
+    );
+
+    const whatDidYouToProduct = await this.createQuestionNode(
+      'What exactly did you like about the product / services?',
+      dialogueId,
+      NodeType.CHOICE,
+      productServicesOptions,
+      false,
+      weThinkYouMightLikeThis,
+    );
+
+    // Positive Sub sub child 4 (Customer Support)
+    const yourEmailBelowForNewsletter = NodeService.findLeafIdContainingText(leafs,
+      'your email below to receive our newsletter');
+    const whatDidYouToCustomerSupport = await this.createQuestionNode(
+      'What exactly did you like about the customer support?', dialogueId,
+      NodeType.CHOICE, customerSupportOptions, false, yourEmailBelowForNewsletter,
+    );
+
+    // Neutral Sub child 2
+    const leaveYourEmailBelowToReceive = NodeService.findLeafIdContainingText(leafs,
+      'Leave your email below to receive our');
+    const rootToWhatWouldYouLikeToTalkAbout = await this.createQuestionNode(
+      'What would you like to talk about?', dialogueId, NodeType.CHOICE,
+      standardOptions, false, leaveYourEmailBelowToReceive,
+    );
+
+    // Neutral Sub sub child 1 (Facilities)
+    const whatWouldYouLikeToTalkAboutToFacilities = await this.createQuestionNode('Please specify.',
+      dialogueId, NodeType.CHOICE, facilityOptions);
+
+    // Neutral Sub sub child 2 (Website)
+    const whatWouldYouLikeToTalkAboutToWebsite = await this.createQuestionNode(
+      'Please specify.', dialogueId, NodeType.CHOICE, websiteOptions,
+    );
+
+    // Neutral Sub sub child 3 (Product/Services)
+    const whatWouldYouLikeToTalkAboutToProduct = await this.createQuestionNode(
+      'Please specify.', dialogueId, NodeType.CHOICE, productServicesOptions,
+    );
+
+    // Neutral Sub sub child 4 (Customer Support)
+    const whatWouldYouLikeToTalkAboutToCustomerSupport = await this.createQuestionNode(
+      'Please specify.', dialogueId, NodeType.CHOICE, customerSupportOptions,
+    );
+
+    // Negative Sub child 3
+    const rootToWeAreSorryToHearThat = await this.createQuestionNode(
+      'We are sorry to hear that! Where can we improve?', dialogueId,
+      NodeType.CHOICE, standardOptions,
+    );
+
+    // Negative Sub sub child 1 (Facilities)
+    const ourTeamIsOnIt = NodeService.findLeafIdContainingText(leafs, 'Our team is on it');
+    const weAreSorryToHearThatToFacilities = await this.createQuestionNode(
+      'Please elaborate.', dialogueId, NodeType.CHOICE, facilityOptions, false, ourTeamIsOnIt,
+    );
+
+    // Negative Sub sub child 2 (Website)
+    const pleaseClickWhatsappLink = NodeService.findLeafIdContainingText(leafs,
+      'Please click on the Whatsapp link below so our service');
+    const weAreSorryToHearThatToWebsite = await this.createQuestionNode(
+      'Please elaborate.', dialogueId, NodeType.CHOICE, websiteOptions,
+      false, pleaseClickWhatsappLink,
+    );
+
+    // Negative Sub sub child 3 (Product/Services)
+    const clickBelowForRefund = NodeService.findLeafIdContainingText(leafs, 'Click below for your refund');
+    const weAreSorryToHearThatToProduct = await this.createQuestionNode(
+      'Please elaborate.', dialogueId, NodeType.CHOICE, productServicesOptions,
+      false, clickBelowForRefund,
+    );
+
+    // Negative Sub sub child 4 (Customer Support)
+    const ourCustomerExperienceSupervisor = NodeService.findLeafIdContainingText(leafs,
+      'Our customer experience supervisor is');
+    const weAreSorryToHearThatToCustomerSupport = await this.createQuestionNode(
+      'Please elaborate', dialogueId, NodeType.CHOICE, customerSupportOptions,
+      false, ourCustomerExperienceSupervisor,
+    );
+
+    // ################################### EDGES ################################
+
+    // Positive edges
+    await this.edgeService.createEdge(rootQuestion, rootToWhatDidYou,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 70, renderMax: 100 });
+
+    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToFacilities,
+      { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToWebsite,
+      {
+        conditionType: 'match',
+        matchValue: 'Website/Mobile app',
+        renderMin: null,
+        renderMax: null,
+      });
+
+    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToProduct,
+      { conditionType: 'match', matchValue: 'Product/Services', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToCustomerSupport,
+      { conditionType: 'match', matchValue: 'Customer Support', renderMin: null, renderMax: null });
+
+    // Neutral edges
+    await this.edgeService.createEdge(rootQuestion, rootToWhatWouldYouLikeToTalkAbout,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 50, renderMax: 70 });
+
+    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout, whatWouldYouLikeToTalkAboutToFacilities,
+      { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
+      whatWouldYouLikeToTalkAboutToWebsite,
+      {
+        conditionType: 'match',
+        matchValue: 'Website/Mobile app',
+        renderMin: null,
+        renderMax: null,
+      });
+
+    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
+      whatWouldYouLikeToTalkAboutToProduct, {
+      conditionType: 'match',
+      matchValue: 'Product/Services',
+      renderMin: null,
+      renderMax: null,
+    });
+
+    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
+      whatWouldYouLikeToTalkAboutToCustomerSupport, {
+      conditionType: 'match',
+      matchValue: 'Customer Support',
+      renderMin: null,
+      renderMax: null,
+    });
+
+    // Negative edges
+    await this.edgeService.createEdge(rootQuestion, rootToWeAreSorryToHearThat,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 50 });
+
+    await this.edgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToFacilities,
+      { conditionType: 'match', matchValue: 'Facilities', renderMax: null, renderMin: null });
+
+    await this.edgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToWebsite,
+      {
+        conditionType: 'match',
+        matchValue: 'Website/Mobile app',
+        renderMax: null,
+        renderMin: null,
+      });
+
+    await this.edgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToProduct,
+      { conditionType: 'match', matchValue: 'Product/Services', renderMax: null, renderMin: null });
+
+    await this.edgeService.createEdge(rootToWeAreSorryToHearThat,
+      weAreSorryToHearThatToCustomerSupport, {
+      conditionType: 'match',
+      matchValue: 'Customer Support',
+      renderMax: null,
+      renderMin: null,
+    });
+  };
+
+  /**
+ * Create nodes from a default template.
+ * */
+  createBusinessTemplateNodes = async (
+    dialogueId: string,
+    workspaceName: string,
+    leafs: QuestionNode[],
+  ) => {
+    // Root question (How do you feel about?)
+    const rootQuestion = await this.createQuestionNode(
+      'How are you feeling?',
+      dialogueId, NodeType.SLIDER, [], true,
+    );
+
+    const hrWillContactCTA = NodeService.findLeafIdContainingText(leafs, 'from HR will contact you');
+
+    // Very Positive Sub child 1 (Great to hear! What are you most satisfied about?)
+    const greatToHear = await this.createQuestionNode(
+      'Great to hear! What are you most satisfied about?', dialogueId, NodeType.CHOICE, businessOptions, false);
+
+    // Positive Sub child 2
+    const notCompletelySatisfied = await this.createQuestionNode(
+      'You\'re not completely satisfied. What can be improved?', dialogueId, NodeType.CHOICE, businessOptions, false);
+
+    // Negative Sub child 3
+    const negative = await this.createQuestionNode(
+      'That\'s unfortunate! What went wrong?', dialogueId, NodeType.CHOICE,
+      businessOptions, false, hrWillContactCTA,
+    );
+
+    // Very Negative Sub child 4
+    const veryNegative = await this.createQuestionNode(
+      'That\'s unfortunate! What went wrong?', dialogueId,
+      NodeType.CHOICE, businessOptions, false, hrWillContactCTA
+    );
+
+    // ################################### EDGES ################################
+
+    // Positive edges
+    await this.edgeService.createEdge(rootQuestion, greatToHear,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 70, renderMax: 100 });
+
+    // Neutral edges
+    await this.edgeService.createEdge(rootQuestion, notCompletelySatisfied,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 55, renderMax: 70 });
+
+    // Negative edges
+    await this.edgeService.createEdge(rootQuestion, negative,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 25, renderMax: 55 });
+
+    await this.edgeService.createEdge(rootQuestion, veryNegative,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 25 });
+
+  };
+
+  /**
+   * Create nodes from a default template.
+   * */
+  createDefaultTemplateNodes = async (
     dialogueId: string,
     workspaceName: string,
     leafs: QuestionNode[],

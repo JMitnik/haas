@@ -8,7 +8,8 @@ import { isPresent } from 'ts-is-present';
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
-import defaultWorkspaceTemplate, { defaultMassSeedTemplate, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import defaultWorkspaceTemplate, { defaultMassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
+import { WorkspaceTemplate } from '../templates/TemplateTypes';
 import prisma from '../../config/prisma';
 import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
@@ -91,7 +92,7 @@ class CustomerService {
       const leafs = await this.nodeService.createTemplateLeafNodes(type as string, dialogue.id);
 
       // Make nodes
-      await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs);
+      await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
 
       // Check if user already exists
       // If not create new user entry + userOfCustomer entry
@@ -511,7 +512,7 @@ class CustomerService {
       const leafs = await this.nodeService.createTemplateLeafNodes('MASS_SEED', dialogue.id);
 
       // Step 3: Make nodes
-      await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
+      await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs, 'MASS_SEED');
       await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate, maxSessions, isStrict);
     }
 
@@ -652,7 +653,7 @@ class CustomerService {
     const leafs = await this.nodeService.createTemplateLeafNodes('DEFAULT', dialogue.id);
 
     // Step 3: Make nodes
-    await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
+    await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs, 'DEFAULT');
 
     // Step 4: possibly
     if (willGenerateFakeData) {

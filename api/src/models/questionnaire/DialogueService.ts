@@ -13,7 +13,8 @@ import {
 } from './DialogueTypes';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
-import defaultWorkspaceTemplate, { MassSeedTemplate, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import defaultWorkspaceTemplate, { MassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
+import { WorkspaceTemplate } from '../templates/TemplateTypes';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { CreateQuestionsInput, UpsertDialogueStatisticsInput } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
@@ -1365,7 +1366,7 @@ class DialogueService {
     if (!dialogue) throw new ApolloError('customer:unable_to_create');
 
     // TODO: "Include "
-    this.dialoguePrismaAdapter.update(dialogue.id, {
+    void this.dialoguePrismaAdapter.update(dialogue.id, {
       questions: {
         create: {
           title: `What do you think about ${customer?.name} ?`,
@@ -1398,7 +1399,7 @@ class DialogueService {
 
     // TODO: Make this dependent on input "template"
     const leafs = await this.nodeService.createTemplateLeafNodes('DEFAULT', dialogue.id);
-    await this.nodeService.createTemplateNodes(dialogue.id, customerName, leafs);
+    await this.nodeService.createTemplateNodes(dialogue.id, customerName, leafs, 'DEFAULT');
 
     return dialogue;
   };
