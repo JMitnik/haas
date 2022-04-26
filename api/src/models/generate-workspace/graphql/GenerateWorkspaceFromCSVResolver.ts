@@ -11,9 +11,8 @@ export const GenerateWorkspaceCSVInputType = inputObjectType({
   },
 });
 
-export const GenerateGroupsMutation = mutationField('generateWorkspaceFromCSV', {
+export const GenerateWorkspaceFromCSVMutation = mutationField('generateWorkspaceFromCSV', {
   type: CustomerType,
-  // nullable: true,
   args: { input: GenerateWorkspaceCSVInputType },
   async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('No input object provided');
