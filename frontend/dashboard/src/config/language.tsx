@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    generate_workspace: {
+      en: 'Generate workspace',
+      nl: 'Genereer workspace',
+    },
     new: {
       en: 'New',
       de: 'Neu',

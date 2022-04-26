@@ -249,7 +249,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
             {t('customer:branding_helper')}
           </Muted>
         </Div>
-        <Div>
+        <InputGrid>
           <InputGrid>
             <FormControl isInvalid={!!form.errors.primaryColour} isRequired>
               <FormLabel htmlFor="primaryColour">{t('branding_color')}</FormLabel>
@@ -266,7 +266,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
           <InputGrid>
             <CustomerLogoFormFragment form={form} />
           </InputGrid>
-        </Div>
+        </InputGrid>
       </FormSection>
 
       {!isInEdit && canAccessAdmin && (

@@ -6,22 +6,20 @@ import {
   Grid,
   H4,
   PageHeading,
-  Span,
 } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Link } from 'react-router-dom';
-import { Plus, UserCheck } from 'react-feather';
+import { Plus } from 'react-feather';
 import { Skeleton } from '@chakra-ui/core';
 import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
 import { Variants, motion } from 'framer-motion';
-import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { useNavigator } from 'hooks/useNavigator';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 import useAuth from 'hooks/useAuth';
 
-import { useNavigator } from 'hooks/useNavigator';
 import { CustomerOverviewContainer } from './CustomerOverviewStyles';
 import CustomerCard from './CustomerCard';
 
@@ -53,12 +51,7 @@ const MotionGrid = motion.custom(Grid);
 const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoading: boolean }) => {
   const { t } = useTranslation();
   const { canCreateCustomers, canAccessAdmin, canGenerateWorkspaceFromCsv } = useAuth();
-  const history = useHistory();
   const { goToGenerateWorkspaceOverview } = useNavigator();
-
-  const goToAdminPanel = () => {
-    history.push('/dashboard/admin');
-  };
 
   return (
     <CustomerOverviewContainer>
@@ -75,22 +68,11 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
               {t('active_projects')}
             </H4>
             {canGenerateWorkspaceFromCsv && (
-              <UI.Button onClick={() => goToGenerateWorkspaceOverview()}>
-                Generate workspace
+              <UI.Button variantColor="off" onClick={() => goToGenerateWorkspaceOverview()}>
+                {t('generate_workspace')}
               </UI.Button>
             )}
           </UI.Flex>
-
-          {/* TEMPORARY Disabled */}
-          {/* {canAccessAdmin && (
-            <Span>
-              <UI.Button bg="gray.200" mb={2} size="sm" variant="outline" leftIcon={UserCheck} onClick={goToAdminPanel}>
-                <Link to="/dashboard/b/admin">
-                  {t('adminpanel')}
-                </Link>
-              </UI.Button>
-            </Span>
-          )} */}
         </Flex>
 
         <MotionGrid
@@ -109,15 +91,13 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
             </>
           ) : (
             <>
-              {customers?.map(
-                (customer: any, index: any) => customer && (
-                  <motion.div style={{ height: '100%' }} key={index} variants={cardItemAnimation}>
-                    <ErrorBoundary key={index} FallbackComponent={() => <></>}>
-                      <CustomerCard key={index} customer={customer} />
-                    </ErrorBoundary>
-                  </motion.div>
-                ),
-              )}
+              {customers?.map((customer: any, index: any) => customer && (
+                <motion.div style={{ height: '100%' }} key={index} variants={cardItemAnimation}>
+                  <ErrorBoundary key={index} FallbackComponent={() => <></>}>
+                    <CustomerCard key={index} customer={customer} />
+                  </ErrorBoundary>
+                </motion.div>
+              ))}
 
               {(canCreateCustomers || canAccessAdmin) && (
                 <AddCard>
