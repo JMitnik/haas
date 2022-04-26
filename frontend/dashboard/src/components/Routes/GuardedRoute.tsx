@@ -48,13 +48,12 @@ const GuardedRoute = ({ allowedPermission, redirectRoute, ...routeProps }: Guard
 
   if (!isLoggedIn) return <Redirect to="/logged_out" />;
 
-  if (params.dialogueSlug) {
-    if (!canAccessDialogue(params?.dialogueSlug)) {
-      if (!redirectRoute) {
-        return <Redirect to="/" />;
-      }
-      return <Redirect to={generatePath(redirectRoute, params)} />;
-    }
+  if (params.dialogueSlug && !canAccessDialogue(params.dialogueSlug) && !redirectRoute) {
+    return <Redirect to="/" />;
+  }
+
+  if (params.dialogueSlug && !canAccessDialogue(params.dialogueSlug) && redirectRoute) {
+    return <Redirect to={generatePath(redirectRoute, params)} />;
   }
 
   if (allowedPermission && !hasPermission(allowedPermission)) {

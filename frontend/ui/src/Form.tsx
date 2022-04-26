@@ -944,13 +944,8 @@ export const FormControl = forwardRef((props: FormControlProps, ref) => {
 export const FieldLabel = styled(Span)`
   ${({ theme }) => css`
     margin: 0;
-    /* color: #3f4750;
-    background: #d7d7d7; */
-
     color: ${theme.colors.main[600]};
     background: ${theme.colors.main[100]};
-    /* background: ${theme.colors.main[600]}; */
-    /* background: ${theme.colors.main[600]}; */
     font-weight: 700;
     line-height: 1rem;
     font-size: 0.8rem;
