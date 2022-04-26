@@ -16,8 +16,7 @@ import useAuth from 'hooks/useAuth';
 import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
-const DialogueOverview = (
-) => {
+const DialogueOverview = () => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
   const [filter, setFilter] = useQueryParams({

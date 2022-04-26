@@ -37,9 +37,8 @@ export const Helper = styled(Text) <HelperProps>`
  */
 export const SectionHeader = styled(Text)`
   ${({ theme }) => css`
-    font-size: 1rem;
-    color: ${theme.colors.gray[700]};
-    color: var(--active-brand);
+    font-size: 1.1rem;
+    color: ${theme.colors.off[500]};
     font-weight: 600;
   `}
 `;

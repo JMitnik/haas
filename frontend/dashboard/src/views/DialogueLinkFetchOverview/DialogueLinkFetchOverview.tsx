@@ -1,5 +1,4 @@
 import * as UI from '@haas/ui';
-import { Grid, ViewTitle } from '@haas/ui';
 import { StringParam, useQueryParams } from 'use-query-params';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
@@ -9,8 +8,7 @@ import GlobalLoader from 'components/GlobalLoader';
 
 import DialogueCard from './DialogueLinkFetchCard';
 
-const DialogueLinkFetchOverview = (
-) => {
+export const DialogueLinkFetchOverview = () => {
   const { t } = useTranslation();
   const [filter] = useQueryParams({
     workspaceId: StringParam,
@@ -29,30 +27,29 @@ const DialogueLinkFetchOverview = (
   if (loading) return <GlobalLoader />;
 
   return (
-    <>
+    <UI.Container>
       <UI.Div padding="1em">
         <UI.ViewTitle>
-          <ViewTitle>{t('dialogues')}</ViewTitle>
+          {t('dialogues')}
         </UI.ViewTitle>
       </UI.Div>
 
       <UI.ViewBody padding="1em">
         {filteredDialogues?.length === 0 && (
-          <UI.Flex justifyContent="center">No Dialogues available for this workspace...</UI.Flex>
+          <UI.Flex justifyContent="center">
+            {t('no_dialogues_message')}
+          </UI.Flex>
         )}
-        <Grid
+        <UI.Grid
           gridGap={4}
           gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
           gridAutoRows="minmax(200px, 1fr)"
         >
-          {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
+          {filteredDialogues?.map((dialogue, index) => dialogue && (
             <DialogueCard key={index} dialogue={dialogue} />
           ))}
-        </Grid>
-
+        </UI.Grid>
       </UI.ViewBody>
-    </>
+    </UI.Container>
   );
 };
-
-export default DialogueLinkFetchOverview;

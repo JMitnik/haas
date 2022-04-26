@@ -2,12 +2,12 @@ import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import { refetchMeQuery, useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
 import { useLogger } from 'hooks/useLogger';
+import { useToast } from 'hooks/useToast';
 import FileDropInput from 'components/FileDropInput';
 
 const schema = yup.object({
@@ -33,25 +33,15 @@ export const ImportWorkspaceCSVForm = () => {
     ],
     onCompleted: () => {
       history.push('/dashboard');
-      toast({
-        title: t('toast:delivery_imported'),
-        description: t('toast:delivery_imported_helper'),
-        status: 'success',
-        position: 'bottom-right',
-        duration: 1500,
+      toast.success({
+        description: t('toast:workspace_generated_helper'),
       });
     },
     onError: (error) => {
       logger.logError(error, {
         tags: { section: 'campaign' },
       });
-      toast({
-        title: 'Something went wrong!',
-        description: 'Currently unable to edit your detail. Please try again.',
-        status: 'error',
-        position: 'bottom-right',
-        duration: 1500,
-      });
+      toast.templates.error();
     },
   });
 
@@ -63,7 +53,6 @@ export const ImportWorkspaceCSVForm = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
-    console.log(activeCSV);
     importWorkspaceCSV({
       variables: {
         input: {
@@ -76,36 +65,50 @@ export const ImportWorkspaceCSVForm = () => {
   };
 
   return (
-    <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
-      <UI.FormSectionHeader>{t('upload_workspace_csv')}</UI.FormSectionHeader>
+    <UI.Container>
+      <UI.SectionHeader mb={2}>{t('upload_workspace_csv')}</UI.SectionHeader>
 
-      <UI.InputGrid>
-        <UI.FormControl isRequired>
-          <UI.FormLabel>Workspace title</UI.FormLabel>
-          <UI.Input name="workspaceTitle" ref={form.register()} placeholder={t('form_helpertext_placeholder')} />
-        </UI.FormControl>
+      <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
 
-        <UI.FormControl isRequired>
-          <UI.FormLabel>Workspace slug</UI.FormLabel>
-          <UI.Input name="workspaceSlug" ref={form.register()} placeholder={t('form_helpertext_placeholder')} />
-        </UI.FormControl>
+        <UI.InputGrid>
+          <UI.FormControl isRequired>
+            <UI.FormLabel>{t('workspace_title')}</UI.FormLabel>
+            <UI.Input
+              name="workspaceTitle"
+              ref={form.register()}
+              placeholder={t('default_values:workspace_placeholder')}
+            />
+          </UI.FormControl>
 
-        <UI.FormControl isRequired>
-          <UI.FormLabel>{t('upload_workspace_csv')}</UI.FormLabel>
-          <UI.FormLabelHelper>{t('upload_workspace_csv_helper')}</UI.FormLabelHelper>
-          <FileDropInput
-            onDrop={handleDrop}
-          />
-        </UI.FormControl>
-      </UI.InputGrid>
-      <UI.Button
-        type="submit"
-        isDisabled={!form.formState.isValid}
-        isLoading={loading}
-      >
-        {t('save')}
+          <UI.FormControl isRequired>
+            <UI.FormLabel>{t('workspace_slug')}</UI.FormLabel>
 
-      </UI.Button>
-    </UI.Form>
+            <UI.Input
+              placeholder={t('default_values:workspace_slug')}
+              leftAddOn="https://client.haas.live/"
+              name="workspaceSlug"
+              ref={form.register({ required: true })}
+            />
+          </UI.FormControl>
+
+          <UI.FormControl isRequired>
+            <UI.FormLabel>{t('upload_workspace_csv')}</UI.FormLabel>
+            <UI.FormLabelHelper>{t('upload_workspace_csv_helper')}</UI.FormLabelHelper>
+            <FileDropInput
+              onDrop={handleDrop}
+            />
+          </UI.FormControl>
+        </UI.InputGrid>
+        <UI.Button
+          mt={4}
+          variantColor="main"
+          type="submit"
+          isDisabled={!form.formState.isValid}
+          isLoading={loading}
+        >
+          {t('save')}
+        </UI.Button>
+      </UI.Form>
+    </UI.Container>
   );
 };

@@ -8,7 +8,7 @@ import { Paragraph } from './Type';
 import { Div } from './Generics';
 import { Card } from '.';
 
-export const ModalBody = styled(Div)`
+export const DeprecatedModalBody = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px 0;
     overflow-y: scroll;
@@ -126,12 +126,12 @@ export const Modal = ({
 
 export const ModalTitle = styled(Paragraph)``;
 
-export const ModalHead = styled(Div)`
+export const DeprecatedModalHead = styled(Div)`
   ${({ theme }) => css`
     border-bottom: 1px solid ${theme.colors.gray[100]};
 
     ${ModalTitle} {
-      color: ${theme.colors.gray[800]};
+      color: ${theme.colors.gray[600]};
       font-size: 1.5rem;
       font-weight: 600;
     }
@@ -143,6 +143,7 @@ interface ModalCardProps {
   onClose: () => void;
   minWidth?: number;
   maxWidth?: number;
+  breakout?: boolean;
 }
 
 const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
@@ -170,6 +171,9 @@ const CloseButton = ({ onClose }: any) => (
 
 const ModalCardContainer = styled(Div)`
   position: relative;
+  height: 80vh;
+  overflow: auto;
+  border-radius: 0 0 10px 10px;
 
   ${Card} {
     margin: 0 auto;
@@ -179,13 +183,51 @@ const ModalCardContainer = styled(Div)`
   }
 `;
 
-export const ModalCard = ({ children, onClose, maxWidth = 600 }: ModalCardProps) => (
+export const ModalCard = ({ children, onClose, maxWidth = 600, breakout = false }: ModalCardProps) => (
   <ModalCardContainer>
-    <Card bg="white" noHover maxWidth={maxWidth} padding={4}>
-      {!!onClose && (
-        <CloseButton onClose={onClose} />
-      )}
-      {children}
-    </Card>
+    <div style={{ height: '80vh', overflow: 'auto', borderRadius: '0 0 10px 10px' }}>
+      <Card bg="white" noHover maxWidth={maxWidth} padding={breakout ? 0 : 4}>
+        {!!onClose && (
+          <CloseButton onClose={onClose} />
+        )}
+        {children}
+      </Card>
+    </div>
   </ModalCardContainer>
+);
+
+
+export const ModalBody = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter * 1.5}px;
+  `}
+`;
+
+interface ModalHeadProps {
+  children: React.ReactNode;
+}
+
+const ModalHeadContainer = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter * 1}px ${theme.gutter * 1.5}px;
+    background: ${theme.colors.neutral[100]};
+    border-radius: 10px 10px 0 0;
+
+    ${ModalTitle} {
+      font-size: 1.5rem;
+      color: ${theme.colors.main[500]};
+      font-weight: 600;
+    }
+
+    & + ${ModalBody} {
+      /* Give it some inset box-shadow for a bit of spiciness */
+      box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px 0px inset;
+    }
+  `}
+`;
+
+export const ModalHead = ({ children }: ModalHeadProps) => (
+  <ModalHeadContainer>
+    {children}
+  </ModalHeadContainer>
 )

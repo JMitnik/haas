@@ -6,8 +6,8 @@ import React, { FC } from 'react';
 import { AppProviders } from 'config/AppProviders';
 import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
+import { DialogueLinkFetchOverview } from 'views/DialogueLinkFetchOverview';
 import { DialogueProvider } from 'providers/DialogueProvider';
-import { ImportDeliveriesForm } from 'views/CampaignView/ImportDeliveriesForm';
 import { ImportWorkspaceCSVForm } from 'views/CustomerOverview/ImportWorkspaceCSVForm';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
@@ -31,9 +31,8 @@ import CustomersPage from 'pages/dashboard/customers';
 import DashboardPage from 'pages/dashboard';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
-import DialogueLinkFetchOverview from 'views/DialogueLinkFetchOverview';
+import DialogueOverview from 'views/DialogueOverview';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
-import DialoguesPage from 'pages/dashboard/dialogues';
 import EditCustomerView from 'views/EditCustomerView';
 import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
@@ -162,7 +161,7 @@ const CustomerRoutes = () => (
 
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d"
-                      render={() => <DialoguesPage />}
+                      render={() => <DialogueOverview />}
                     />
 
                     <GuardedRoute
@@ -246,7 +245,11 @@ const AppRoutes = () => (
       <GuardedRoute
         allowedPermission={SystemPermission.CanGenerateWorkspaceFromCsv}
         path={ROUTES.GENERATE_WORKSPACE_VIEW}
-        render={() => <ImportWorkspaceCSVForm />}
+        render={() => (
+          <PreCustomerLayout>
+            <ImportWorkspaceCSVForm />
+          </PreCustomerLayout>
+        )}
       />
 
       <Route

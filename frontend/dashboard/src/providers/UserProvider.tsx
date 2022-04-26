@@ -2,8 +2,7 @@ import { ApolloQueryResult, gql, useMutation, useQuery } from '@apollo/client';
 import { useHistory } from 'react-router';
 import React, { useContext, useEffect, useState } from 'react';
 
-import { Exact, Maybe, MeQuery, useMeQuery } from 'types/generated-types';
-import { useCustomer } from './CustomerProvider';
+import { Exact, MeQuery, useMeQuery } from 'types/generated-types';
 
 const POLL_INTERVAL_SECONDS = 60;
 

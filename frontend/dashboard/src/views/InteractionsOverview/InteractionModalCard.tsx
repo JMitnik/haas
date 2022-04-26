@@ -30,7 +30,7 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
   const delivery = data?.session?.delivery;
 
   return (
-    <UI.ModalCard maxWidth={1200} onClose={onClose}>
+    <UI.ModalCard breakout maxWidth={1200} onClose={onClose}>
       <UI.ModalHead>
         <UI.ModalTitle>
           {t('interaction')}

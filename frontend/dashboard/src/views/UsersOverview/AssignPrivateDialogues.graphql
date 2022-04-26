@@ -1,7 +1,7 @@
 mutation assignUserToDialogues ($input: AssignUserToDialoguesInput){
 	assignUserToDialogues(input: $input) {
 		email
-		privateDialogues { 
+		privateDialogues {
       privateWorkspaceDialogues {
         title
         slug

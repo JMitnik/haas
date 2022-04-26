@@ -19,7 +19,7 @@ query GetUserCustomerFromCustomer($id: ID!, $userId: String!, $input: UserOfCust
             slug
             id
           }
-		    }
+        }
       }
       role {
         name
