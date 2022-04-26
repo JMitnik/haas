@@ -24,7 +24,6 @@ type AssignedDialogues {
 
 input AssignUserToDialoguesInput {
   assignedDialogueIds: [String!]!
-  delistedDialogueIds: [String!]!
   userId: String!
   workspaceId: String!
 }
@@ -943,6 +942,12 @@ input GenerateAutodeckInput {
   youLoveX: String
 }
 
+input GenerateWorkspaceCSVInputType {
+  uploadedCsv: Upload!
+  workspaceSlug: String!
+  workspaceTitle: String!
+}
+
 input GetAutomationInput {
   id: String
 }
@@ -953,12 +958,6 @@ input GetAutomationsByWorkspaceInput {
 
 input GetCampaignsInput {
   customerSlug: String
-}
-
-input GroupGenerationInputType {
-  uploadedCsv: Upload!
-  workspaceSlug: String!
-  workspaceTitle: String!
 }
 
 input HandleUserStateInWorkspaceInput {
@@ -1154,7 +1153,7 @@ type Mutation {
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
-  generateWorkspaceFromCSV(input: GroupGenerationInputType): Customer!
+  generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer!
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
 
   """Invite a user to a particular customer domain, given an email and role"""
@@ -1963,6 +1962,7 @@ input UserOfCustomerInput {
 }
 
 type UserType {
+  assignedDialogues(input: UserOfCustomerInput): AssignedDialogues
   customers: [Customer!]!
   email: String!
   firstName: String
@@ -1972,7 +1972,6 @@ type UserType {
   lastLoggedIn: Date
   lastName: String
   phone: String
-  privateDialogues(input: UserOfCustomerInput): AssignedDialogues
   role: RoleType
   roleId: String
   userCustomers: [UserCustomer!]!

@@ -1,5 +1,5 @@
 import { PrismaClient, User, Prisma, UserOfCustomer } from '@prisma/client';
-import _, { cloneDeep } from 'lodash';
+import _, { cloneDeep, reject } from 'lodash';
 
 import { RegisterUserInput } from './UserPrismaAdapterType';
 import RoleService from '../role/RoleService';
@@ -70,18 +70,30 @@ class UserPrismaAdapter {
    * @returns 
    */
   updateUserPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: input.userId,
+      },
+      include: {
+        isAssignedTo: {
+          where: {
+            customerId: input.workspaceId,
+          },
+        },
+      },
+    });
+
+    const dbAssignedDialogues = user?.isAssignedTo.map((dialogue) => ({ id: dialogue.id })) || [];
+    const disconnectedDialogues = reject(dbAssignedDialogues,
+      (dialogue) => input.assignedDialogueIds.includes(dialogue.id)) || [];
+
     return this.prisma.user.update({
       where: {
         id: input?.userId,
       },
       data: {
         isAssignedTo: {
-          disconnect: input?.delistedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
-          deleteMany: {
-            id: {
-              in: input?.delistedDialogueIds,
-            },
-          },
+          disconnect: disconnectedDialogues,
           connect: input?.assignedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
         },
       },

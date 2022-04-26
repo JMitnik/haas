@@ -99,15 +99,17 @@ export const ImportWorkspaceCSVForm = () => {
             />
           </UI.FormControl>
         </UI.InputGrid>
-        <UI.Button
-          mt={4}
-          variantColor="main"
-          type="submit"
-          isDisabled={!form.formState.isValid}
-          isLoading={loading}
-        >
-          {t('save')}
-        </UI.Button>
+        <UI.Flex justifyContent="flex-end">
+          <UI.Button
+            mt={4}
+            variantColor="main"
+            type="submit"
+            isDisabled={!form.formState.isValid}
+            isLoading={loading}
+          >
+            {t('save')}
+          </UI.Button>
+        </UI.Flex>
       </UI.Form>
     </UI.Container>
   );

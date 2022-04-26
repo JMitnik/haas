@@ -1,4 +1,4 @@
-mutation GenerateWorkspaceFromCSV($input: GroupGenerationInputType) {
+mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
   generateWorkspaceFromCSV(input: $input) {
     id
     slug

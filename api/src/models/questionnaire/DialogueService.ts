@@ -87,7 +87,7 @@ class DialogueService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
-    const sessions = await this.sessionPrismaAdapter.findSessionByDialogueIdBetweenDates(
+    const sessions = await this.sessionPrismaAdapter.findDialogueSessions(
       dialogueId,
       startDateTime,
       endDateTimeSet,
@@ -252,7 +252,7 @@ class DialogueService {
     endDateTime: Date,
     isPrev: boolean
   ) => {
-    const sessions = await this.sessionPrismaAdapter.findSessionByDialogueIdBetweenDates(
+    const sessions = await this.sessionPrismaAdapter.findDialogueSessions(
       dialogueId,
       startDateTime,
       endDateTime,
@@ -895,7 +895,7 @@ class DialogueService {
     const currentDate = new Date();
 
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
-    const datesBackInTime = nrDaysBack.map((amtDaysBack, index) => subDays(currentDate, index));
+    const datesBackInTime = nrDaysBack.map((daysBackCount, index) => subDays(currentDate, index));
     const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
     await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueId, true);
 
@@ -908,9 +908,9 @@ class DialogueService {
     // For every particular date, generate a fake score
     for (var i = 0, n = datesBackInTime.length; i < n; i++) {
       try {
-        const amtSessions = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
+        const sessionCount = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        for (var k = 0, z = amtSessions; k < z; k++) {
+        for (var k = 0, z = sessionCount; k < z; k++) {
           const simulatedRootVote: number = getRandomInt(100);
 
           const simulatedChoice = Object.keys(template.topics)[

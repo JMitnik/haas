@@ -14,15 +14,6 @@ interface CardProps {
   willFocusWithin?: boolean;
 }
 
-export const CardOverlay = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100px;
-  height: 100px;
-  background-color: rgba(0, 0, 0, 0.25);
-`;
-
 export const Card = styled(Div) <CardProps>`
   ${({ theme, noHover, isFlat, willFocusWithin }) => css`
     position: relative;

@@ -42,13 +42,11 @@ export const AssignDialoguePicker = ({
 
   const onSubmit = (data: any) => {
     const filteredDialogues = Object.entries(data).filter((entry) => entry[1] === true).map((entry) => entry[0]);
-    const notAssignDialogues = Object.entries(data).filter((entry) => entry[1] === false).map((entry) => entry[0]);
 
     assignUserToDialogues({
       variables: {
         input: {
           assignedDialogueIds: filteredDialogues,
-          delistedDialogueIds: notAssignDialogues,
           userId,
           workspaceId: activeCustomer?.id as string,
         },

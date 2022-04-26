@@ -22,8 +22,10 @@ import { CampaignService } from '../models/Campaigns/CampaignService';
 import LinkService from '../models/link/LinkService';
 import AutomationService from '../models/automations/AutomationService';
 import QuestionStatisticsService from 'models/QuestionNode/QuestionStatisticsService';
+import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
 
 export interface APIServiceContainer {
+  generateWorkspaceService: GenerateWorkspaceService;
   automationService: AutomationService;
   userService: UserService;
   customerService: CustomerService;
