@@ -4,4 +4,4 @@ mutation setDialoguePrivacy($input: SetDialoguePrivacyInput) {
     title
     isPrivate
   }
-} 
+}

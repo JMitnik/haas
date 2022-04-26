@@ -68,7 +68,7 @@ export const AssignDialoguePicker = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <UI.Grid gridTemplateColumns="1fr">
+      <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr']}>
         {workspaceDialogues?.map((dialogue) => (
           <Controller
             control={control}

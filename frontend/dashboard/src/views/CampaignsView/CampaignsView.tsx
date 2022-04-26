@@ -86,13 +86,13 @@ const CampaignsView = () => {
           isOpen={openedModal}
           onClose={() => setIsOpenedModal(false)}
         >
-          <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenedModal(false)}>
-            <UI.DeprecatedModalHead>
+          <UI.ModalCard breakout maxWidth={1200} onClose={() => setIsOpenedModal(false)}>
+            <UI.ModalHead>
               <UI.ModalTitle>{t('create_campaign')}</UI.ModalTitle>
-            </UI.DeprecatedModalHead>
-            <UI.DeprecatedModalBody>
+            </UI.ModalHead>
+            <UI.ModalBody>
               <CreateCampaignForm onClose={() => setIsOpenedModal(false)} />
-            </UI.DeprecatedModalBody>
+            </UI.ModalBody>
           </UI.ModalCard>
         </UI.Modal>
       </UI.ViewContainer>

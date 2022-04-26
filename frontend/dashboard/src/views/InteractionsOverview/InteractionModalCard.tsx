@@ -30,13 +30,13 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
   const delivery = data?.session?.delivery;
 
   return (
-    <UI.ModalCard maxWidth={1200} onClose={onClose}>
-      <UI.DeprecatedModalHead>
+    <UI.ModalCard breakout maxWidth={1200} onClose={onClose}>
+      <UI.ModalHead>
         <UI.ModalTitle>
           {t('interaction')}
         </UI.ModalTitle>
-      </UI.DeprecatedModalHead>
-      <UI.DeprecatedModalBody>
+      </UI.ModalHead>
+      <UI.ModalBody>
         {data && (
           <Timeline>
             {!!delivery && (
@@ -120,7 +120,7 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
         {error && (
           <UI.ErrorPane header="Server problem" text={error.message} />
         )}
-      </UI.DeprecatedModalBody>
+      </UI.ModalBody>
     </UI.ModalCard>
   );
 };

@@ -70,7 +70,7 @@ const RoleUserForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <UI.Grid gridTemplateColumns="1fr">
+      <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr']}>
         {allPermissions?.map((permission) => (
           <Controller
             control={control}
@@ -135,7 +135,7 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
   })) || [];
 
   return (
-    <UI.ModalCard breakout onClose={onClose}>
+    <UI.ModalCard maxWidth={1200} breakout onClose={onClose}>
       <UI.ModalHead>
         <UI.ModalTitle>
           {t('role_permissions')}

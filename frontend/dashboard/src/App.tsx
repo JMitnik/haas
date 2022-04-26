@@ -7,7 +7,6 @@ import { AppProviders } from 'config/AppProviders';
 import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
 import { DialogueProvider } from 'providers/DialogueProvider';
-import { ImportDeliveriesForm } from 'views/CampaignView/ImportDeliveriesForm';
 import { ImportWorkspaceCSVForm } from 'views/CustomerOverview/ImportWorkspaceCSVForm';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
