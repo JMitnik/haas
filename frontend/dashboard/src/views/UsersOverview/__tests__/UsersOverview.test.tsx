@@ -33,7 +33,7 @@ const generateUserCustomer: (index: number) => UserCustomer = (index: number) =>
     customers: [],
     lastLoggedIn: new Date().toISOString(),
     userCustomers: [],
-    privateDialogues: {
+    assignedDialogues: {
       assignedDialogues: [],
       privateWorkspaceDialogues: [],
     },
