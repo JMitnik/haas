@@ -1,6 +1,6 @@
-export function cartesian(...args) {
-  var r = [], max = args.length - 1;
-  function helper(arr, i) {
+export function cartesian(...args: any) {
+  var r: any = [], max = args.length - 1;
+  function helper(arr: any[], i: any) {
     for (var j = 0, l = args[i].length; j < l; j++) {
       var a = arr.slice(0); // clone arr
       a.push(args[i][j]);
