@@ -1,5 +1,5 @@
-import { Prisma, TagEnum } from "@prisma/client";
-import { NexusGenInputs } from "../../generated/nexus";
+import { Prisma, TagEnum } from '@prisma/client';
+import { NexusGenInputs } from '../../generated/nexus';
 
 export interface Tag {
   name: string;
@@ -19,7 +19,15 @@ export interface WorkspaceTemplate {
   leafNodes: any;
   roles: Prisma.RoleCreateInput[];
   tags: Tag[];
-  rootSliderOptions: any;
+  rootSliderOptions: {
+    markers: any[];
+  };
+}
+
+export interface DemoWorkspaceTemplate extends WorkspaceTemplate {
+  rootLayer: string[];
+  subLayer: string[];
+  subSubLayer: string[];
 }
 
 export const defaultForm: NexusGenInputs['FormNodeInputType'] = {

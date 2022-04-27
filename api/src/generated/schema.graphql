@@ -943,8 +943,9 @@ input GenerateAutodeckInput {
 }
 
 input GenerateWorkspaceCSVInputType {
-  type: String = "DEFAULT"
-  uploadedCsv: Upload!
+  generateDemoData: Boolean = false
+  type: String! = "DEFAULT"
+  uploadedCsv: Upload
   workspaceSlug: String!
   workspaceTitle: String!
 }
@@ -1154,7 +1155,7 @@ type Mutation {
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
-  generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer!
+  generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
 
   """Invite a user to a particular customer domain, given an email and role"""

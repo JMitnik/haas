@@ -943,11 +943,17 @@ export class NodeService {
   ) => {
     switch (templateType) {
       case 'BUSINESS':
-        return this.createBusinessTemplateNodes(dialogueId, workspaceName, leafs);
+        return this.createBusinessTemplateNodes(
+          dialogueId, workspaceName, leafs, templates.business.rootSliderOptions.markers
+        );
       case 'SPORT_ENG':
-        return this.createSportTemplateNodes(dialogueId, workspaceName, leafs);
+        return this.createSportTemplateNodes(
+          dialogueId, workspaceName, leafs, templates.sportEng.rootSliderOptions.markers
+        );
       case 'SPORT_NL':
-        return this.createSportNlTemplateNodes(dialogueId, workspaceName, leafs);
+        return this.createSportNlTemplateNodes(
+          dialogueId, workspaceName, leafs, templates.sportNl.rootSliderOptions.markers
+        );
       case 'MASS_SEED':
         return this.createDefaultTemplateNodes(dialogueId, workspaceName, leafs);
       case 'DEFAULT':
@@ -964,12 +970,28 @@ export class NodeService {
     dialogueId: string,
     workspaceName: string,
     leafs: QuestionNode[],
+    sliderMarkers?: any[],
   ) => {
     // Root question (How do you feel about?)
     const rootQuestion = await this.createQuestionNode(
       'Hoe gaat het met je?',
       dialogueId, NodeType.SLIDER, [], true,
     );
+
+    if (sliderMarkers?.length) {
+      await this.prisma.sliderNode.create({
+        data: {
+          QuestionNode: {
+            connect: {
+              id: rootQuestion.id,
+            },
+          },
+          markers: {
+            create: sliderMarkers,
+          },
+        },
+      });
+    }
 
     const hrWillContactCTA = NodeService.findLeafIdContainingText(leafs, 'laat dan je naam');
 
@@ -1018,12 +1040,28 @@ export class NodeService {
     dialogueId: string,
     workspaceName: string,
     leafs: QuestionNode[],
+    sliderMarkers?: any[],
   ) => {
     // Root question (How do you feel about?)
     const rootQuestion = await this.createQuestionNode(
       'How are you feeling?',
       dialogueId, NodeType.SLIDER, [], true,
     );
+
+    if (sliderMarkers?.length) {
+      await this.prisma.sliderNode.create({
+        data: {
+          QuestionNode: {
+            connect: {
+              id: rootQuestion.id,
+            },
+          },
+          markers: {
+            create: sliderMarkers,
+          },
+        },
+      });
+    }
 
     const hrWillContactCTA = NodeService.findLeafIdContainingText(leafs, 'unless you want to talk to someone');
 
@@ -1072,12 +1110,29 @@ export class NodeService {
     dialogueId: string,
     workspaceName: string,
     leafs: QuestionNode[],
+    sliderMarkers?: any[],
   ) => {
     // Root question (How do you feel about?)
     const rootQuestion = await this.createQuestionNode(
       'How are you feeling?',
       dialogueId, NodeType.SLIDER, [], true,
     );
+
+    if (sliderMarkers?.length) {
+      await this.prisma.sliderNode.create({
+        data: {
+          QuestionNode: {
+            connect: {
+              id: rootQuestion.id,
+            },
+          },
+          markers: {
+            create: sliderMarkers,
+          },
+        },
+      });
+    }
+
 
     const hrWillContactCTA = NodeService.findLeafIdContainingText(leafs, 'from HR will contact you');
 

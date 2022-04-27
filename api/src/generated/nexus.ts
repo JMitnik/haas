@@ -383,8 +383,9 @@ export interface NexusGenInputs {
     youLoveX?: string | null; // String
   }
   GenerateWorkspaceCSVInputType: { // input type
-    type?: string | null; // String
-    uploadedCsv: any; // Upload!
+    generateDemoData?: boolean | null; // Boolean
+    type: string; // String!
+    uploadedCsv?: any | null; // Upload
     workspaceSlug: string; // String!
     workspaceTitle: string; // String!
   }
@@ -1817,7 +1818,7 @@ export interface NexusGenFieldTypes {
     editUser: NexusGenRootTypes['UserType']; // UserType!
     editWorkspace: NexusGenRootTypes['Customer']; // Customer!
     generateAutodeck: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
-    generateWorkspaceFromCSV: NexusGenRootTypes['Customer']; // Customer!
+    generateWorkspaceFromCSV: NexusGenRootTypes['Customer'] | null; // Customer
     handleUserStateInWorkspace: NexusGenRootTypes['UserCustomer']; // UserCustomer!
     inviteUser: NexusGenRootTypes['InviteUserOutput']; // InviteUserOutput!
     logout: string; // String!

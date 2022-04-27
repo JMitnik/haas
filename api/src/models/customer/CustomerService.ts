@@ -619,7 +619,7 @@ class CustomerService {
    */
   createWorkspace = async (input: NexusGenInputs['CreateWorkspaceInput'], createdUserId?: string) => {
     try {
-      const customer = await this.customerPrismaAdapter.createWorkspace(input);
+      const customer = await this.customerPrismaAdapter.createWorkspace(input, defaultWorkspaceTemplate);
 
       if (input.isSeed) {
         await this.seedByTemplate(customer, defaultWorkspaceTemplate, input.willGenerateFakeData || false);
