@@ -1,6 +1,9 @@
-bash push_ecr.sh
+DIR="$(dirname "$(realpath "$0")")"
+push_file="$DIR/push-ecr.sh"
 
-# TODO: Fetch
+bash "$push_file"
+
+# # TODO: Fetch
 CLUSTER_NAME="CORE_CLUSTER"
 SERVICE_NAME="StagingCoreTemp-COREAPIAPISERVICEServiceBA2271D8-IsUSGTyhOoQ2"
 
