@@ -1,12 +1,13 @@
 import { PrismaClient, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
+
+import TemplateService from '../templates/TemplateService';
 import { NexusGenEnums, NexusGenInputs } from '../../generated/nexus';
 import { parseCsv } from '../../utils/parseCsv';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
 import NodeService from '../QuestionNode/NodeService';
-import { defaultMassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 
 class GenerateWorkspaceService {
@@ -14,12 +15,14 @@ class GenerateWorkspaceService {
   dialoguePrismaAdapter: DialoguePrismaAdapter;
   nodeService: NodeService;
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
+  templateService: TemplateService;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
+    this.templateService = new TemplateService(prismaClient);
   };
 
   /**
@@ -68,10 +71,10 @@ class GenerateWorkspaceService {
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
       // Make the leafs
-      const leafs = await this.nodeService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id);
 
       // Make nodes
-      await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
+      await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
 
       // Check if user already exists
       // If not create new user entry + userOfCustomer entry
