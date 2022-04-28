@@ -157,15 +157,15 @@ class TemplateService {
     templateType: string
   ) => {
     switch (templateType) {
-      case 'BUSINESS':
+      case DialogueTemplateType.BUSINESS_ENG:
         return this.createBusinessTemplateNodes(dialogueId, workspaceName, leafs);
-      case 'SPORT_ENG':
+      case DialogueTemplateType.SPORT_ENG:
         return this.createSportTemplateNodes(dialogueId, workspaceName, leafs);
-      case 'SPORT_NL':
+      case DialogueTemplateType.SPORT_NL:
         return this.createSportNlTemplateNodes(dialogueId, workspaceName, leafs);
-      case 'MASS_SEED':
+      case DialogueTemplateType.MASS_SEED:
         return this.createDefaultTemplateNodes(dialogueId, workspaceName, leafs);
-      case 'DEFAULT':
+      case DialogueTemplateType.DEFAULT:
         return this.createDefaultTemplateNodes(dialogueId, workspaceName, leafs);
       default:
         return this.createDefaultTemplateNodes(dialogueId, workspaceName, leafs);

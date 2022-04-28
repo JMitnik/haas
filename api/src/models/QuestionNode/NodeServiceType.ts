@@ -1,16 +1,15 @@
-import { Dialogue, LinkTypeEnum, NodeType, QuestionCondition } from '@prisma/client';
+import { Dialogue, LinkTypeEnum, NodeType } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import { QuestionConditionProps } from '../questionnaire/DialogueTypes';
 
 export enum DialogueTemplateType {
-  'BUSINESS_ENG' = 'BUSINESS_ENG',
-  'BUSINESS_NL' = 'BUSINESS_NL',
-  'DEFAULT' = 'DEFAULT',
-  'MASS_SEED' = 'MASS_SEED',
-  'SPORT_ENG' = 'SPORT_ENG',
-  'SPORT_NL' = 'SPORT_NL',
+  BUSINESS_ENG = 'BUSINESS_ENG',
+  BUSINESS_NL = 'BUSINESS_NL',
+  DEFAULT = 'DEFAULT',
+  MASS_SEED = 'MASS_SEED',
+  SPORT_ENG = 'SPORT_ENG',
+  SPORT_NL = 'SPORT_NL',
 }
-
 
 export interface QuestionOptionProps {
   id?: number;

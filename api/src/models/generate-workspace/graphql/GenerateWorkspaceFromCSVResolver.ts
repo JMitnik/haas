@@ -22,7 +22,6 @@ export const GenerateWorkspaceFromCSVMutation = mutationField('generateWorkspace
   args: { input: GenerateWorkspaceCSVInputType },
   async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('No input object provided');
-
     return ctx.services.generateWorkspaceService.generateWorkspaceFromCSV(args.input);
   },
 });
