@@ -781,6 +781,7 @@ enum DialogueTemplateType {
   BUSINESS_NL
   DEFAULT
   MASS_SEED
+  TEST
 }
 
 enum QuestionImpactScore {

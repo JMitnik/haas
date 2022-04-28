@@ -25,19 +25,19 @@ type FormProps = yup.InferType<typeof schema>;
 const DIALOGUE_TYPE_OPTIONS = [
   {
     label: 'DEFAULT',
-    value: TemplateType.Default,
+    value: DialogueTemplateType.Default,
   },
   {
     label: 'BUSINESS (ENG)',
-    value: TemplateType.BusinessEng,
+    value: DialogueTemplateType.BusinessEng,
   },
   {
     label: 'SPORT (ENG)',
-    value: TemplateType.SportEng,
+    value: DialogueTemplateType.SportEng,
   },
   {
     label: 'SPORT (NL)',
-    value: TemplateType.SportNl,
+    value: DialogueTemplateType.SportNl,
   },
 ];
 

@@ -1,6 +1,6 @@
 import { PrismaClient, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
-import { NexusGenInputs } from '../../generated/nexus';
+import { NexusGenEnums, NexusGenInputs } from '../../generated/nexus';
 import { parseCsv } from '../../utils/parseCsv';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
@@ -68,7 +68,7 @@ class GenerateWorkspaceService {
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
       // Make the leafs
-      const leafs = await this.nodeService.createTemplateLeafNodes(defaultMassSeedTemplate.leafNodes, dialogue.id);
+      const leafs = await this.nodeService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id);
 
       // Make nodes
       await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);

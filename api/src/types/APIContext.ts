@@ -23,8 +23,10 @@ import LinkService from '../models/link/LinkService';
 import AutomationService from '../models/automations/AutomationService';
 import QuestionStatisticsService from 'models/QuestionNode/QuestionStatisticsService';
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
+import TemplateService from '../models/templates/TemplateService';
 
 export interface APIServiceContainer {
+  templateService: TemplateService;
   generateWorkspaceService: GenerateWorkspaceService;
   automationService: AutomationService;
   userService: UserService;
