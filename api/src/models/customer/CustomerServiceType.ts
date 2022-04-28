@@ -1,5 +1,3 @@
-import { NexusGenInputs } from 'generated/nexus';
-
 export interface UpdateCustomerInput {
   name: string;
   slug: string;
