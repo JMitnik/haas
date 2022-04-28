@@ -1,5 +1,9 @@
-import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache } from '@prisma/client';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, ChoiceNodeEntry, NodeEntry, Session, RoleTypeEnum } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
+import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
+import cuid from 'cuid';
+import { addDays, differenceInHours, isEqual, subDays } from 'date-fns';
+import { isPresent } from 'ts-is-present';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
@@ -11,11 +15,10 @@ import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
-import { groupBy } from 'lodash';
-import cuid from 'cuid';
-import { addDays, differenceInHours, isEqual } from 'date-fns';
+import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
 import NodeEntryService from '../node-entry/NodeEntryService';
+import { parseCsv } from '../../utils/parseCsv';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -26,6 +29,7 @@ class CustomerService {
   nodeService: NodeService;
   dialogueStatisticsService: DialogueStatisticsService;
   nodeEntryService: NodeEntryService;
+  sessionPrismaAdapter: SessionPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -36,8 +40,260 @@ class CustomerService {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
     this.nodeEntryService = new NodeEntryService(prismaClient);
+    this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
   }
 
+  /**
+   * Finds the most popular path over all dialogues within a workspace
+   * @param customerId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
+  findNestedMostPopularPath = async (
+    customerId: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const sessions = await this.sessionPrismaAdapter.findCustomerSessions(
+      customerId,
+      startDateTime,
+      endDateTimeSet,
+    );
+
+    const groupedSessions = groupBy(sessions, (session) => session.dialogueId);
+
+    // Finds the amount of occurences per topic for the first choice layer of every dialogue in workspace
+    const mostPopularTopicPathPerDialogue = Object.entries(groupedSessions).map((entry) => {
+      const dialogueId = entry[0];
+      const dialogueSessions = entry[1];
+      const mostPopularTopicPath = this.dialogueService.findMostPopularTopic(dialogueSessions, [], 1, 1);
+      return { dialogueId, path: mostPopularTopicPath };
+    });
+
+    // Find most occuring topic
+    const mostOccuringFirstLayerDialogue = maxBy(mostPopularTopicPathPerDialogue, (topic) => topic.path?.[0]?.nrVotes)
+
+    // Use the sessions that have most occuring topic in their first choice layer
+    const filteredByTopicSessions = groupedSessions[mostOccuringFirstLayerDialogue?.dialogueId as string].filter(
+      (target) => target.nodeEntries.find(
+        (entry) => entry.choiceNodeEntry?.value === mostOccuringFirstLayerDialogue?.path[0].topic
+          && entry.depth === 1
+      )
+    );
+
+    // Recursively find rest of the path
+    const mostPopularTopicPath = this.dialogueService.findMostPopularTopic(
+      filteredByTopicSessions,
+      mostOccuringFirstLayerDialogue?.path || [],
+      2
+    );
+
+    const dialogue = await this.dialogueService.getDialogueById(mostOccuringFirstLayerDialogue?.dialogueId as string);
+
+    return { group: dialogue?.title || '', path: mostPopularTopicPath };
+  }
+
+  /**
+   * Finds the most changed path between two weeks over all dialogues within a workspace
+   * @param customerId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @param cutoff 
+   * @returns 
+   */
+  findNestedMostChangedPath = async (
+    customerId: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+    cutoff: number = 1,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    // This week/month/24hr should be set through front-end but for now hardcoded 7 days
+    const prevStartDateTime = subDays(startDateTime as Date, 7);
+
+    const sessions = await this.sessionPrismaAdapter.findCustomerSessions(
+      customerId,
+      prevStartDateTime,
+      endDateTimeSet,
+    );
+
+    // Split sessions in two parts: Last week and the week before that
+    const splittedSessions = sessions.reduce(
+      (previousValue, session) => {
+        const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
+        const item = {
+          sessionId: session.id,
+          dialogueId: session.dialogueId,
+          mainScore: session.mainScore,
+          entry: deepest,
+          prev: true,
+        };
+        if (session.createdAt < startDateTime) {
+          previousValue.prevData.push(item);
+          return previousValue;
+        } else {
+          item.prev = false;
+          previousValue.currData.push(item);
+          return previousValue;
+        }
+      }, {
+      prevData: [] as ({
+        sessionId: string;
+        dialogueId: string;
+        mainScore: number;
+        entry: (NodeEntry & {
+          choiceNodeEntry: ChoiceNodeEntry | null;
+        }) | undefined;
+        prev: boolean;
+      })[], currData: [] as ({
+        sessionId: string;
+        dialogueId: string;
+        mainScore: number;
+        entry: (NodeEntry & {
+          choiceNodeEntry: ChoiceNodeEntry | null;
+        }) | undefined;
+        prev: boolean;
+      })[],
+    });
+
+    const prevDataGroupedOptions = groupBy(splittedSessions.prevData, (session) => {
+      return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;
+    });
+
+    const currDataGroupedOptions = groupBy(splittedSessions.currData, (session) => {
+      return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;
+    });
+
+    const uniqueKeys = uniq([...Object.keys(prevDataGroupedOptions), ...Object.keys(currDataGroupedOptions)])
+
+    const optionDeltas = uniqueKeys.map((key) => {
+      const optionSessionArray = currDataGroupedOptions[key];
+      const optionPrevSessionArray = prevDataGroupedOptions[key];
+
+      // If doesn't exist in one of the two dictionaries => cannot calculate average nor delta
+      if (!currDataGroupedOptions[key] || !prevDataGroupedOptions[key]) {
+        return undefined;
+      }
+
+      const nrVotes = optionSessionArray.length
+      const averageCurrent = meanBy(optionSessionArray, (entry) => entry.mainScore);
+      const averagePrevious = meanBy(optionPrevSessionArray, (entry) => entry.mainScore);
+      const delta = Math.max(averageCurrent, averagePrevious) - Math.min(averageCurrent, averagePrevious);
+      const percentageChanged = ((averageCurrent - averagePrevious) / averagePrevious) * 100;
+
+      const dialogueId = key.split('_')?.[0] || '';
+      const topic = key.split('_')?.[1] || '';
+
+      return {
+        topic: topic,
+        nrVotes,
+        averageCurrent,
+        averagePrevious,
+        delta,
+        percentageChanged,
+        dialogueId: dialogueId,
+      };
+    }).filter(isPresent);
+
+    const orderedChangedAsc = orderBy(optionDeltas, (optionDelta) => {
+      if (!optionDelta?.percentageChanged) return 0;
+      return optionDelta.percentageChanged;
+    }, 'asc');
+
+    const orderedChangedDesc = clone(orderedChangedAsc).reverse();
+
+    const topChangedNegative = orderedChangedAsc.slice(0, cutoff);
+    const topChangedPositive = orderedChangedDesc.slice(0, cutoff);
+
+    const mappedTopChangedPositive = await Promise.all(topChangedPositive.map(async (entry) => {
+      const dialogue = await this.dialogueService.getDialogueById(entry?.dialogueId as string);
+      return { ...entry, group: dialogue?.title };
+    }));
+
+    const mappedTopChangedNegative = await Promise.all(topChangedNegative.map(async (entry) => {
+      const dialogue = await this.dialogueService.getDialogueById(entry?.dialogueId as string);
+      return { ...entry, group: dialogue?.title };
+    }));
+
+    return { topPositiveChanged: mappedTopChangedPositive, topNegativeChanged: mappedTopChangedNegative };
+  }
+
+  /**
+   * Finds most trending topic of a workspace
+   * @param customerId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
+  findNestedMostTrendingTopic = async (
+    customerId: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const sessions = await this.sessionPrismaAdapter.findCustomerSessions(
+      customerId,
+      startDateTime,
+      endDateTimeSet,
+    );
+
+    const sessionWithDeepestEntry = sessions.map((session) => {
+      const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
+      return {
+        sessionId: session.id,
+        dialogueId: session.dialogueId,
+        mainScore: session.mainScore,
+        entry: deepest,
+      };
+    });
+
+    const groupedDeepEntrySessions = groupBy(sessionWithDeepestEntry, (session) => {
+      return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;
+    });
+
+    const mostPrevalent = maxBy(Object.entries(groupedDeepEntrySessions), (entry) => {
+      return entry[1].length;
+    })
+
+    const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore);
+    const nrVotes = mostPrevalent?.[1].length;
+    const dialogueNodeEntryValue = mostPrevalent?.[0]?.split('_');
+    const dialogueId = dialogueNodeEntryValue?.[0] as string;
+
+    const dialogue = await this.dialogueService.getDialogueById(dialogueId);
+
+    const path: string[] = [dialogueNodeEntryValue?.[1] as string]
+    const group = dialogue?.title || 'No group found';
+
+    return { group, path, nrVotes: nrVotes || 0, impactScore: averageScore || 0 };
+  };
+
+  /**
+   * Calculates the impact score of all dialogues within a workspace
+   * @param customerId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
   findNestedDialogueStatisticsSummary = async (
     customerId: string,
     impactScoreType: DialogueImpactScore,
@@ -138,6 +394,12 @@ class CustomerService {
     return [...cachedSummaries, ...newCaches];
   }
 
+  /**
+   * Helper function to generate a big amount of dialogues and sessions for a workspace
+   * @param input 
+   * @param isStrict 
+   * @returns 
+   */
   massSeed = async (input: NexusGenInputs['MassSeedInput'], isStrict: boolean = false) => {
     const { customerId, maxGroups, maxSessions, maxTeams } = input;
 
@@ -164,7 +426,7 @@ class CustomerService {
 
     const dialogueNames = [...maleDialogueNames, ...femaleDialogueNames];
 
-    await Promise.all(dialogueNames.map(async (dialogueName, index) => {
+    for (const dialogueName of dialogueNames) {
       defaultMassSeedTemplate.title = dialogueName;
       const slug = cuid();
       defaultMassSeedTemplate.slug = slug;
@@ -183,19 +445,27 @@ class CustomerService {
 
       // Step 3: Make nodes
       await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
-
       await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate, maxSessions, isStrict);
-    }));
+    }
 
     return customer;
   }
 
   /**
-   * Get a dialogue based on workspace ID and dialogue Slug.
-   * @param customerId Workspace ID
-   * @param dialogueSlug Dialogue Slug
-   * @returns A dialogue including question Ids and edges
+   * Finds all private dialogues within a workspace
+   * @param workspaceId 
+   * @returns 
    */
+  findPrivateDialoguesOfWorkspace = async (workspaceId: string) => {
+    return this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(workspaceId);
+  }
+
+  /**
+ * Get a dialogue based on workspace ID and dialogue Slug.
+ * @param customerId Workspace ID
+ * @param dialogueSlug Dialogue Slug
+ * @returns A dialogue including question Ids and edges
+ */
   async getDialogue(customerId: string, dialogueSlug: string) {
     const customer = await prisma.customer.findUnique({
       where: {
@@ -265,9 +535,9 @@ class CustomerService {
   }
 
   /**
-   * Finds all workspaces available
-   * @returns workspaces
-   */
+ * Finds all workspaces available
+ * @returns workspaces
+ */
   async findAll() {
     return this.customerPrismaAdapter.findAll();
   }
@@ -291,10 +561,10 @@ class CustomerService {
   }
 
   /**
-   * Deletes a workspace from the database
-   * @param customerId
-   * @returns the deleted workspace
-   */
+ * Deletes a workspace from the database
+ * @param customerId
+ * @returns the deleted workspace
+ */
   async delete(customerId: string): Promise<Customer> {
     return this.customerPrismaAdapter.delete(customerId);
   }
@@ -373,20 +643,20 @@ class CustomerService {
   };
 
   /**
-   * Gets a dialogue from the customer, by using a slug
-   * @param customerId
-   * @param dialogueSlug
-   */
+ * Gets a dialogue from the customer, by using a slug
+ * @param customerId
+ * @param dialogueSlug
+ */
   async getDialogueBySlug(customerId: string, dialogueSlug: string) {
     const dialogueOfWorkspace = await this.customerPrismaAdapter.getDialogueBySlug(customerId, dialogueSlug);
     return dialogueOfWorkspace;
   }
 
   /**
-   * Deletes a workspace
-   * @param customerId ID of workspace to be deleted
-   * @returns deleted workspace
-   */
+ * Deletes a workspace
+ * @param customerId ID of workspace to be deleted
+ * @returns deleted workspace
+ */
   async deleteWorkspace(customerId: string) {
     if (!customerId) return null;
 
@@ -448,10 +718,10 @@ class CustomerService {
   }
 
   /**
-   * Gets a dialogue from the customer, by using an ID
-   * @param customerId
-   * @param dialogueSlug
-   */
+ * Gets a dialogue from the customer, by using an ID
+ * @param customerId
+ * @param dialogueSlug
+ */
   async getDialogueById(customerId: string, dialogueId: string) {
     return this.customerPrismaAdapter.getDialogueById(customerId, dialogueId);
   }

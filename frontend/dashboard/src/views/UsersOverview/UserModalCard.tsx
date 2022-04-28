@@ -4,6 +4,9 @@ import React from 'react';
 
 import { useCustomer } from 'providers/CustomerProvider';
 import { useGetUserCustomerFromCustomerQuery } from 'types/generated-types';
+import useAuth from 'hooks/useAuth';
+
+import { AssignDialoguePicker } from './AssignDialoguePicker';
 
 interface UserModalCardProps {
   id: string;
@@ -18,62 +21,97 @@ interface UserModalCardProps {
 export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
-  const { data, loading, error } = useGetUserCustomerFromCustomerQuery({
+  const { canAssignUsersToDialogue } = useAuth();
+  const { data, loading } = useGetUserCustomerFromCustomerQuery({
     variables: {
       id: activeCustomer?.id || '',
       userId: id,
+      input: {
+        customerId: activeCustomer?.id || '',
+        userId: id,
+      },
     },
+    fetchPolicy: 'cache-and-network',
   });
-
-  if (loading) {
-    return <UI.Loader />;
-  }
 
   const userOfCustomer = data?.customer?.userCustomer;
 
+  if (loading || !userOfCustomer) {
+    return <UI.Loader />;
+  }
+
+  const { user } = userOfCustomer;
+
+  const fullName = `${userOfCustomer?.user.firstName} ${userOfCustomer?.user.lastName}`;
+
   return (
-    <UI.ModalCard onClose={onClose}>
+    <UI.ModalCard maxWidth={1200} onClose={onClose} breakout>
       <UI.ModalHead>
-        <UI.ModalTitle>{t('details')}</UI.ModalTitle>
+        <UI.ModalTitle mb={2}>{fullName}</UI.ModalTitle>
+
+        <UI.Stack>
+          <UI.Grid gridTemplateColumns="auto 1fr" gridColumnGap={4} gridRowGap={2}>
+            <UI.Div>
+              <UI.FieldLabel>{t('first_name')}</UI.FieldLabel>
+            </UI.Div>
+            <UI.Div>
+              {user.firstName || t('unknown')}
+            </UI.Div>
+
+            <UI.Div>
+              <UI.FieldLabel>{t('last_name')}</UI.FieldLabel>
+            </UI.Div>
+
+            <UI.Div>
+              {user.lastName || t('unknown')}
+            </UI.Div>
+
+            <UI.Div>
+              <UI.FieldLabel>
+                {t('email')}
+              </UI.FieldLabel>
+            </UI.Div>
+
+            <UI.Div>
+              {user.email}
+            </UI.Div>
+
+            {user.phone && (
+              <>
+                <UI.Div>
+                  <UI.FieldLabel>{t('phone')}</UI.FieldLabel>
+                </UI.Div>
+
+                <UI.Div>
+                  {user.phone}
+                </UI.Div>
+              </>
+            )}
+
+            <UI.Div>
+              <UI.FieldLabel>{t('role')}</UI.FieldLabel>
+            </UI.Div>
+
+            <UI.Div>
+              {userOfCustomer.role?.name}
+            </UI.Div>
+          </UI.Grid>
+        </UI.Stack>
       </UI.ModalHead>
-      <UI.ModalBody>
-        {error && (
-          <UI.ErrorPane header="Server Error" text={error.message} />
-        )}
-        {userOfCustomer && (
-          <>
-            <UI.Stack mb={4}>
-              <UI.Div>
-                <UI.Helper mb={1}>{t('first_name')}</UI.Helper>
-                {userOfCustomer?.user?.firstName || 'None'}
-              </UI.Div>
-              <UI.Div>
-                <UI.Helper mb={1}>{t('last_name')}</UI.Helper>
-                {userOfCustomer?.user?.lastName || 'None'}
-              </UI.Div>
 
-              <UI.Div>
-                <UI.Helper mb={1}>{t('email')}</UI.Helper>
-                {userOfCustomer?.user?.email}
-              </UI.Div>
-
-              <UI.Div>
-                <UI.Helper mb={1}>{t('phone')}</UI.Helper>
-                {userOfCustomer?.user?.phone || 'None'}
-              </UI.Div>
-
-              <UI.Div>
-                <UI.Helper mb={1}>{t('role')}</UI.Helper>
-                {userOfCustomer?.role?.name || 'None'}
-              </UI.Div>
-
-            </UI.Stack>
-
-            <UI.Hr />
-          </>
-        )}
-
-      </UI.ModalBody>
+      {canAssignUsersToDialogue && (
+        <UI.ModalBody>
+          <UI.SectionHeader mb={2}>
+            {t('assigned_dialogues')}
+          </UI.SectionHeader>
+          <AssignDialoguePicker
+            onClose={onClose}
+            assignedDialogues={userOfCustomer?.user.assignedDialogues?.assignedDialogues || []}
+            workspaceDialogues={userOfCustomer?.user.assignedDialogues?.privateWorkspaceDialogues || []}
+            userId={id}
+          />
+        </UI.ModalBody>
+      )}
     </UI.ModalCard>
   );
 };

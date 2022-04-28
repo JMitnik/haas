@@ -9,6 +9,7 @@ import * as PaginationAPI from '../models/general/Pagination';
 import * as QuestionNodeAPI from '../models/QuestionNode';
 import * as UserAPI from '../models/users/graphql';
 import * as WorkspaceAPI from '../models/customer';
+import * as GenerateWorkspaceAPI from '../models/generate-workspace';
 import config from './config';
 import customerSettingsNexus from '../models/settings/CustomerSettings';
 import * as DialogueAPI from '../models/questionnaire';
@@ -21,6 +22,7 @@ import triggerNexus from '../models/trigger/Trigger';
 import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
 
 const nexus = [
+  ...Array(GenerateWorkspaceAPI),
   ...Array(AutodeckAPI),
   ...linkNexus,
   ...tagNexus,

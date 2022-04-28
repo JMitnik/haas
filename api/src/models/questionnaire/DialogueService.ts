@@ -1,27 +1,29 @@
 import { addDays, differenceInHours, subDays } from 'date-fns';
-import _, { groupBy, meanBy, sample, uniq, uniqBy } from 'lodash';
+import _, { clone, groupBy, maxBy, meanBy, orderBy, sample, uniq } from 'lodash';
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
-import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, QuestionOption, DialogueImpactScore, DialogueTopicCache, QuestionNode, Session } from '@prisma/client';
+import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, DialogueImpactScore, Session } from '@prisma/client';
 
 import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import {
   HistoryDataProps, HistoryDataWithEntry, IdMapProps,
-  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType, ChildNodeEntry, TopicNodeEntry, TopicSession,
+  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType, TopicSession,
 } from './DialogueTypes';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
-import defaultWorkspaceTemplate, { MassSeedTemplate, rootTopics, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import defaultWorkspaceTemplate, { MassSeedTemplate, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
-import { CreateQuestionsInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';
+import { CreateQuestionsInput, UpsertDialogueStatisticsInput } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
 import EdgeService from '../edge/EdgeService';
+import { offsetPaginate } from '../general/PaginationHelpers';
+import config from '../../config/config';
 
 
 function getRandomInt(max: number) {
@@ -47,6 +49,264 @@ class DialogueService {
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
+  }
+
+  /**
+   * Finds all dialogues of a workspace but strips them off all sensitive information
+   * @param workspaceId 
+   * @returns a list of dialogues including a url to their client version
+   */
+  findDialogueUrlsByWorkspaceId = async (workspaceId: string) => {
+    const strippedDialogues = await this.dialoguePrismaAdapter.findDialogueUrlsByWorkspaceId(workspaceId);
+    const mappedStrippedDialogues = strippedDialogues.map((dialogue) => ({
+      slug: dialogue.slug,
+      title: dialogue.title,
+      description: dialogue.description,
+      url: config.env === 'local' ? `http://localhost:3000/${dialogue.customer.slug}/${dialogue.slug}` : `https://client.haas.live/${dialogue.customer.slug}/${dialogue.slug}`,
+    }));
+    return mappedStrippedDialogues;
+  }
+
+  /**
+   * Finds the most popular traversed path between two dates for a dialogue
+   * @param dialogueId 
+   * @param dialogueTitle 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
+  findMostPopularPath = async (
+    dialogueId: string,
+    dialogueTitle: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const sessions = await this.sessionPrismaAdapter.findDialogueSessions(
+      dialogueId,
+      startDateTime,
+      endDateTimeSet,
+    );
+
+    const mostPopularTopicPath = this.findMostPopularTopic(sessions);
+
+    return { path: mostPopularTopicPath, group: dialogueTitle };
+  };
+
+  /**
+   * Recursively find the most iterated path taken within a list of sessions
+   * @param sessions 
+   * @param path a list of path entries containing info on the topic, frequency and impactScore
+   * @param depth the depth of node entries which should be looked at
+   * @returns a list of path entries containing info on the topic, frequency and impactScore
+   */
+  findMostPopularTopic = (
+    sessions: (Session & {
+      nodeEntries: (NodeEntry & {
+        sliderNodeEntry: SliderNodeEntry | null;
+        choiceNodeEntry: ChoiceNodeEntry | null;
+      })[];
+    })[],
+    path: { topic: string; nrVotes: number; depth: number; impactScore: number }[] = [],
+    depth: number = 1,
+    maxDepth?: number,
+  ): { topic: string; nrVotes: number; depth: number; impactScore: number }[] => {
+    // Map the current depth node entry + session score
+    const targetDepthEntries = sessions.map((session) => {
+      const targetEntry = session.nodeEntries.find((entry) => entry.depth === depth);
+      if (!targetEntry) return undefined;
+
+      return { sessionMainScore: session.mainScore, targetEntry };
+    }).filter(isPresent);
+
+    if (!targetDepthEntries.length) return path;
+
+    // Group per topic
+    const groupedTargetDepthEntries = groupBy(targetDepthEntries,
+      (entry) => entry.targetEntry?.choiceNodeEntry?.value
+    );
+
+    // Calculate impact score + amount of occurences per topic
+    const topicOccurences = Object.entries(groupedTargetDepthEntries).map((entry) => {
+      const topic = entry[0];
+      const occurences = entry[1]?.length;
+      const impactScore = meanBy(entry[1], (entry) => entry.sessionMainScore);
+      return { topic, occurences, impactScore };
+    });
+
+    const winnerTopic = maxBy(topicOccurences, (topic) => topic.occurences);
+    if (!winnerTopic?.topic) return path;
+
+    path.push({
+      topic: winnerTopic.topic,
+      nrVotes: winnerTopic.occurences,
+      depth,
+      impactScore: winnerTopic.impactScore,
+    });
+
+    // If max depth cut off point is specified and reached return data
+    if (maxDepth && maxDepth === depth) return path;
+
+    const sessionsFilteredByTopic = sessions.filter(
+      (session) => {
+        return session.nodeEntries.find(
+          (entry) => entry.depth === depth && entry.choiceNodeEntry?.value === winnerTopic?.topic
+        );
+      });
+
+    depth++;
+
+    return this.findMostPopularTopic(sessionsFilteredByTopic, path, depth);
+  };
+
+  /**
+   * Finds the percentage change of the frequency of a path topic between two dates
+   * @param dialogueId 
+   * @param dialogueTitle 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
+  findMostChangedPath = async (
+    dialogueId: string,
+    dialogueTitle: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+    cutoff: number = 1,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const groupedDeepEntrySessions = await this.findGroupedDeepestEntrySessions(
+      dialogueId,
+      startDateTime,
+      endDateTimeSet,
+      false
+    );
+
+    // This week/month/24hr should be set through front-end but for now hardcoded 7 days
+    const prevStartDateTime = subDays(startDateTime as Date, 7);
+    const prevEndDateTime = startDateTime;
+
+    const prevGroupedDeepEntrySessions = await this.findGroupedDeepestEntrySessions(
+      dialogueId,
+      prevStartDateTime,
+      prevEndDateTime,
+      true
+    );
+
+    const uniqueKeys = uniq([...Object.keys(groupedDeepEntrySessions), ...Object.keys(prevGroupedDeepEntrySessions)])
+
+    const optionDeltas = uniqueKeys.map((key) => {
+      const optionSessionArray = groupedDeepEntrySessions[key];
+      const optionPrevSessionArray = prevGroupedDeepEntrySessions[key];
+
+      // If doesn't exist in one of the two dictionaries => cannot calculate average nor delta
+      if (!groupedDeepEntrySessions[key] || !prevGroupedDeepEntrySessions[key]) {
+        return undefined;
+      }
+
+      const nrVotes = groupedDeepEntrySessions[key].length;
+      const averageCurrent = meanBy(optionSessionArray, (entry) => entry.mainScore);
+      const averagePrevious = meanBy(optionPrevSessionArray, (entry) => entry.mainScore);
+      const delta = Math.max(averageCurrent, averagePrevious) - Math.min(averageCurrent, averagePrevious);
+      const percentageChanged = ((averageCurrent - averagePrevious) / averagePrevious) * 100;
+
+      return { topic: key, nrVotes: nrVotes, averageCurrent, averagePrevious, delta, percentageChanged };
+    }).filter(isPresent);
+
+    const orderedChangedAsc = orderBy(optionDeltas, (optionDelta) => {
+      if (!optionDelta?.percentageChanged) return 0;
+      return optionDelta.percentageChanged;
+    }, 'asc');
+
+    const orderedChangedDesc = clone(orderedChangedAsc).reverse();
+
+    const topChangedNegative = orderedChangedAsc.slice(0, cutoff);
+    const topChangedPositive = orderedChangedDesc.slice(0, cutoff);
+
+    const group = dialogueTitle;
+
+    return { group, topPositiveChanged: topChangedPositive, topNegativeChanged: topChangedNegative };
+  };
+
+  /**
+   * Finds the deepest entries of a list of sessions and groups them per topic
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param isPrev 
+   * @returns 
+   */
+  findGroupedDeepestEntrySessions = async (
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+    isPrev: boolean
+  ) => {
+    const sessions = await this.sessionPrismaAdapter.findDialogueSessions(
+      dialogueId,
+      startDateTime,
+      endDateTime,
+    );
+
+    const sessionWithDeepestEntry = sessions.map((session) => {
+      const deepest = maxBy(session.nodeEntries, (entry) => entry.depth);
+      return { sessionId: session.id, mainScore: session.mainScore, entry: deepest, prev: isPrev };
+    });
+
+    const groupedDeepEntrySessions = groupBy(sessionWithDeepestEntry, (session) => {
+      return session.entry?.choiceNodeEntry?.value;
+    });
+
+    return groupedDeepEntrySessions;
+  }
+
+  /**
+   * Finds the most trending topic for a dialogue
+   * @param dialogueId 
+   * @param dialogueTitle 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @param refresh 
+   * @returns 
+   */
+  findMostTrendingTopic = async (
+    dialogueId: string,
+    dialogueTitle: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+    refresh: boolean = false,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const groupedDeepEntrySessions = await this.findGroupedDeepestEntrySessions(
+      dialogueId,
+      startDateTime,
+      endDateTimeSet,
+      false
+    );
+
+    const mostPrevalent = maxBy(Object.entries(groupedDeepEntrySessions), (entry) => {
+      return entry[1].length;
+    })
+
+    const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore);
+    const nrVotes = mostPrevalent?.[1].length;
+    const path: string[] = [mostPrevalent?.[0] as string]
+    const group = dialogueTitle;
+
+    return { group, path, nrVotes: nrVotes || 0, impactScore: averageScore || 0 };
   }
 
   /**
@@ -340,6 +600,36 @@ class DialogueService {
       name: topicName,
       nrVotes: topicNrVotes,
       subTopics: mergedSubTopics,
+    }
+  }
+
+  setDialoguePrivacy = async (input: NexusGenInputs['SetDialoguePrivacyInput']) => {
+    return this.dialoguePrismaAdapter.setDialoguePrivacy(input);
+  }
+
+  /**
+   * Function to paginate through all automations of a workspace
+   * @param workspaceSlug the slug of the workspace
+   * @param filter a filter object used to paginate through automations of a workspace
+   * @returns a list of paginated automations
+   */
+  public paginatedDialogues = async (
+    workspaceSlug: string,
+    userId: string,
+    filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null,
+  ) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 15;
+
+    const dialogues = await this.dialoguePrismaAdapter.findPaginatedDialogues(workspaceSlug, userId, filter);
+    const totalDialogues = await this.dialoguePrismaAdapter.countDialogues(workspaceSlug, userId, filter);
+
+    const { totalPages, ...pageInfo } = offsetPaginate(totalDialogues, offset, perPage);
+
+    return {
+      dialogues: dialogues,
+      totalPages,
+      pageInfo,
     };
   };
 
@@ -605,7 +895,7 @@ class DialogueService {
     const currentDate = new Date();
 
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
-    const datesBackInTime = nrDaysBack.map((amtDaysBack, index) => subDays(currentDate, index));
+    const datesBackInTime = nrDaysBack.map((daysBackCount, index) => subDays(currentDate, index));
     const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
     await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueId, true);
 
@@ -613,66 +903,76 @@ class DialogueService {
     const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
 
     // Stop if no rootnode
-    if (!rootNode) return;
+    if (!rootNode) throw 'No root';
 
     // For every particular date, generate a fake score
-    await Promise.all(datesBackInTime.map(async (backDate) => {
-      const amtSessions = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
-      await Promise.all([...Array(amtSessions)].map(async () => {
-        const simulatedRootVote: number = getRandomInt(100);
+    for (var i = 0, n = datesBackInTime.length; i < n; i++) {
+      try {
+        const sessionCount = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for (var k = 0, z = sessionCount; k < z; k++) {
+          const simulatedRootVote: number = getRandomInt(100);
 
-        const simulatedChoice = Object.keys(template.topics)[
-          Math.floor(Math.random() * Object.keys(template.topics).length)
-        ].toString();
-        const subChoices = Object.entries(template.topics).find((data) => data[0] === simulatedChoice)?.[1] as string[]
-        const simulatedSubChoice = sample(subChoices) as string;
-        const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
-          if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
-          const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+          const simulatedChoice = Object.keys(template.topics)[
+            Math.floor(Math.random() * Object.keys(template.topics).length)
+          ].toString();
 
-          return isValid;
-        }));
+          const subChoices = Object.entries(template.topics).find(
+            (data) => data[0] === simulatedChoice)?.[1] as string[]
 
-        const edgeOfSubChoice = dialogueWithNodes?.edges.find(
-          (edge) => edge.parentNodeId === simulatedChoiceEdge?.childNodeId
-            && edge.conditions.some((condition) => condition.matchValue === simulatedChoice));
+          const simulatedSubChoice = sample(subChoices) as string;
 
-        const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
-        const simulatedSubChoiceNode = simulatedChoiceEdge?.childNode.children.find(
-          (child) => child.childNode.options.find(
-            (option) => option.value === simulatedSubChoice))?.childNode
-        const simulatedSubChoiceNodeId = simulatedSubChoiceNode?.id;
+          const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
+            if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
+            const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+            return isValid;
+          }));
 
-        if (!simulatedChoiceNodeId) return;
+          const edgeOfSubChoice = dialogueWithNodes?.edges.find(
+            (edge) => edge.parentNodeId === simulatedChoiceEdge?.childNodeId
+              && edge.conditions.some((condition) => condition.matchValue === simulatedChoice));
 
-        const fakeSessionInputArgs: (
-          {
-            createdAt: Date;
-            dialogueId: string;
-            rootNodeId: string;
-            simulatedRootVote: number;
-            simulatedChoiceNodeId: string;
-            simulatedChoiceEdgeId?: string;
-            simulatedChoice: string;
-            simulatedSubChoiceNodeId: string;
-            simulatedSubChoiceEdgeId?: string;
-            simulatedSubChoice: string;
-          }) = {
-          dialogueId,
-          createdAt: backDate,
-          rootNodeId: rootNode.id,
-          simulatedRootVote,
-          simulatedChoiceNodeId,
-          simulatedChoiceEdgeId: simulatedChoiceEdge?.id,
-          simulatedChoice,
-          simulatedSubChoiceNodeId: simulatedSubChoiceNodeId as string,
-          simulatedSubChoiceEdgeId: edgeOfSubChoice?.id,
-          simulatedSubChoice,
+          const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
+
+          const simulatedSubChoiceNode = simulatedChoiceEdge?.childNode.children.find(
+            (child) => child.childNode.options.find(
+              (option) => option.value === simulatedSubChoice))?.childNode;
+
+          const simulatedSubChoiceNodeId = simulatedSubChoiceNode?.id;
+
+          if (!simulatedChoiceNodeId) continue;
+
+          const fakeSessionInputArgs: (
+            {
+              createdAt: Date;
+              dialogueId: string;
+              rootNodeId: string;
+              simulatedRootVote: number;
+              simulatedChoiceNodeId: string;
+              simulatedChoiceEdgeId?: string;
+              simulatedChoice: string;
+              simulatedSubChoiceNodeId: string;
+              simulatedSubChoiceEdgeId?: string;
+              simulatedSubChoice: string;
+            }) = {
+            dialogueId,
+            createdAt: datesBackInTime[i],
+            rootNodeId: rootNode.id,
+            simulatedRootVote,
+            simulatedChoiceNodeId,
+            simulatedChoiceEdgeId: simulatedChoiceEdge?.id,
+            simulatedChoice,
+            simulatedSubChoiceNodeId: simulatedSubChoiceNodeId as string,
+            simulatedSubChoiceEdgeId: edgeOfSubChoice?.id,
+            simulatedSubChoice,
+          }
+
+          await this.sessionPrismaAdapter.massSeedFakeSession(fakeSessionInputArgs);
         }
-
-        await this.sessionPrismaAdapter.massSeedFakeSession(fakeSessionInputArgs);
-      }));
-    }));
+      } catch (e) {
+        throw e;
+      }
+    }
   };
 
   generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {

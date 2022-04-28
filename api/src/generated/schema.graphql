@@ -17,6 +17,17 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+type AssignedDialogues {
+  assignedDialogues: [Dialogue!]!
+  privateWorkspaceDialogues: [Dialogue!]!
+}
+
+input AssignUserToDialoguesInput {
+  assignedDialogueIds: [String!]!
+  userId: String!
+  workspaceId: String!
+}
+
 input AuthenticateLambdaInput {
   authenticateEmail: String
   workspaceEmail: String
@@ -494,10 +505,14 @@ type Customer {
   campaign(campaignId: String): CampaignType
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
+  dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
+  nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
+  nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
@@ -636,6 +651,7 @@ type DeprecatedPaginationPageInfo {
 }
 
 type Dialogue {
+  assignees: [UserType!]
   averageScore(input: DialogueFilterInputType): Float
   campaignVariants: [CampaignVariantType!]!
   creationDate: String
@@ -645,9 +661,13 @@ type Dialogue {
   dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
   edges: [Edge!]!
   id: ID!
+  isPrivate: Boolean!
   isWithoutGenData: Boolean!
   language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
+  mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
+  mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   pathedSessionsConnection(input: PathedSessionsInput): PathedSessionsType
   postLeafNode: DialogueFinisherObjectType
   publicTitle: String
@@ -680,6 +700,32 @@ type DialogueConditionScopeModel {
   updatedAt: Date!
 }
 
+type DialogueConnection implements ConnectionInterface {
+  dialogues: [Dialogue!]!
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
+}
+
+input DialogueConnectionFilterInput {
+  endDate: String
+  offset: Int
+  orderBy: DialogueConnectionOrderByInput
+  perPage: Int = 10
+  searchTerm: String
+  startDate: String
+}
+
+"""Fields to order UserConnection by."""
+enum DialogueConnectionOrder {
+  createdAt
+}
+
+"""Sorting of DialogueConnection"""
+input DialogueConnectionOrderByInput {
+  by: DialogueConnectionOrder!
+  desc: Boolean = true
+}
+
 input DialogueFilterInputType {
   endDate: String
   searchTerm: String
@@ -696,6 +742,10 @@ enum DialogueImpactScoreType {
   AVERAGE
 }
 
+input DialogueLinksInput {
+  workspaceId: String
+}
+
 type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType
@@ -705,6 +755,7 @@ type DialogueStatistics {
 }
 
 input DialogueStatisticsSummaryFilterInput {
+  cutoff: Int
   endDateTime: String
   impactType: DialogueImpactScoreType!
   refresh: Boolean
@@ -891,6 +942,12 @@ input GenerateAutodeckInput {
   youLoveX: String
 }
 
+input GenerateWorkspaceCSVInputType {
+  uploadedCsv: Upload!
+  workspaceSlug: String!
+  workspaceTitle: String!
+}
+
 input GetAutomationInput {
   id: String
 }
@@ -1040,9 +1097,28 @@ input MassSeedInput {
   maxTeams: Int!
 }
 
+type MostChangedPath {
+  group: String
+  topNegativeChanged: [TopicDelta!]!
+  topPositiveChanged: [TopicDelta!]!
+}
+
+type MostPopularPath {
+  group: String!
+  path: [PathTopic!]!
+}
+
+type MostTrendingTopic {
+  group: String!
+  impactScore: Float!
+  nrVotes: Int!
+  path: [String!]!
+}
+
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
@@ -1077,6 +1153,7 @@ type Mutation {
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
+  generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer!
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
 
   """Invite a user to a particular customer domain, given an email and role"""
@@ -1089,6 +1166,7 @@ type Mutation {
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload): ImageType!
   updateAutomation(input: CreateAutomationInput): AutomationModel!
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
@@ -1235,6 +1313,13 @@ type PathedSessionsType {
   startDateTime: String!
 }
 
+type PathTopic {
+  depth: Int!
+  impactScore: Float!
+  nrVotes: Int!
+  topic: String!
+}
+
 input PermissionIdsInput {
   ids: [String!]
 }
@@ -1258,6 +1343,13 @@ type PreviewDataType {
   websiteScreenshotUrl: String!
 }
 
+type PublicDialogueInfo {
+  description: String
+  slug: String!
+  title: String!
+  url: String!
+}
+
 type Query {
   automation(where: GetAutomationInput): AutomationModel
   automations(where: GetAutomationsByWorkspaceInput): [AutomationModel!]!
@@ -1265,6 +1357,7 @@ type Query {
   customers: [Customer!]!
   delivery(deliveryId: String): DeliveryType
   dialogue(where: DialogueWhereUniqueInput): Dialogue
+  dialogueLinks(input: DialogueLinksInput): [PublicDialogueInfo!]
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
@@ -1541,6 +1634,12 @@ input SessionWhereUniqueInput {
   id: ID
 }
 
+input SetDialoguePrivacyInput {
+  customerId: String!
+  dialogueSlug: String!
+  state: Boolean!
+}
+
 input ShareNodeInputType {
   id: String
   title: String
@@ -1608,6 +1707,7 @@ enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
   CAN_ACCESS_REPORT_PAGE
   CAN_ADD_USERS
+  CAN_ASSIGN_USERS_TO_DIALOGUE
   CAN_BUILD_DIALOGUE
   CAN_CREATE_AUTOMATIONS
   CAN_CREATE_CAMPAIGNS
@@ -1621,6 +1721,7 @@ enum SystemPermission {
   CAN_EDIT_DIALOGUE
   CAN_EDIT_USERS
   CAN_EDIT_WORKSPACE
+  CAN_GENERATE_WORKSPACE_FROM_CSV
   CAN_UPDATE_AUTOMATIONS
   CAN_VIEW_AUTOMATIONS
   CAN_VIEW_CAMPAIGNS
@@ -1649,6 +1750,16 @@ enum TagTypeEnum {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
+}
+
+type TopicDelta {
+  averageCurrent: Float!
+  averagePrevious: Float!
+  delta: Float!
+  group: String
+  nrVotes: Int!
+  percentageChanged: Float!
+  topic: String!
 }
 
 input TopicInputType {
@@ -1847,9 +1958,11 @@ input UserOfCustomerInput {
   customerId: String
   customerSlug: String
   userId: String
+  workspaceId: String
 }
 
 type UserType {
+  assignedDialogues(input: UserOfCustomerInput): AssignedDialogues
   customers: [Customer!]!
   email: String!
   firstName: String

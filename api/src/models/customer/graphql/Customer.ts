@@ -1,22 +1,20 @@
-import { ColourSettings, Customer, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, SliderNodeEntry } from '@prisma/client';
+import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { GraphQLUpload, UserInputError } from 'apollo-server-express';
+import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../../questionnaire/Dialogue';
 import { UserConnection } from '../../users/graphql/User';
-import DialogueService from '../../questionnaire/DialogueService';
 import isValidColor from '../../../utils/isValidColor';
 import { CampaignModel } from '../../Campaigns';
 import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
 import { AutomationModel } from '../../automations/graphql/AutomationModel';
 import { AutomationConnection, AutomationConnectionFilterInput } from '../../automations/graphql/AutomationConnection';
 import { isValidDateTime } from '../../../utils/isValidDate';
-import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel } from '../../questionnaire';
-import { addDays, differenceInHours, isEqual } from 'date-fns';
-import { groupBy, meanBy } from 'lodash';
+import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
+import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -40,6 +38,22 @@ export const CustomerType = objectType({
       async resolve(parent: Customer, args, ctx) {
         const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
         return customerSettings;
+      },
+    });
+
+    t.field('dialogueConnection', {
+      type: DialogueConnection,
+      args: { filter: DialogueConnectionFilterInput },
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        if (!ctx.session?.user?.id) throw new ApolloError('No user in session found!');
+
+        let dialogues = await ctx.services.dialogueService.paginatedDialogues(
+          parent.slug,
+          ctx.session?.user?.id,
+          args.filter
+        );
+        return dialogues;
       },
     });
 
@@ -71,6 +85,105 @@ export const CustomerType = objectType({
       type: AutomationModel,
       async resolve(parent, args, ctx) {
         return ctx.services.automationService.findAutomationsByWorkspace(parent.id);
+      },
+    });
+
+    t.field('nestedMostPopular', {
+      type: 'MostPopularPath',
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE') as Date;
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.customerService.findNestedMostPopularPath(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
+      },
+    });
+
+    t.field('nestedMostChanged', {
+      type: 'MostChangedPath',
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      useParentResolve: true,
+      useTimeResolve: true,
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (args?.input?.cutoff && args.input.cutoff < 1) throw new UserInputError('Cutoff cannot be a negative number!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE') as Date;
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.customerService.findNestedMostChangedPath(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+          args.input.cutoff || undefined,
+        );
+      },
+    });
+
+    t.field('nestedMostTrendingTopic', {
+      type: MostTrendingTopic,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      useParentResolve: true,
+      useTimeResolve: true,
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.customerService.findNestedMostTrendingTopic(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        )
       },
     });
 

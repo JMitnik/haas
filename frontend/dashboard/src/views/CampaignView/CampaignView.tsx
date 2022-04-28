@@ -488,26 +488,26 @@ export const CampaignView = () => {
 
         <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
           <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenImportModal(false)}>
-            <UI.ModalBody>
+            <UI.DeprecatedModalBody>
               <ImportDeliveriesForm
                 onComplete={() => refetch()}
                 onClose={() => setIsOpenImportModal(false)}
               />
-            </UI.ModalBody>
+            </UI.DeprecatedModalBody>
           </UI.ModalCard>
         </UI.Modal>
 
         {!!campaign && (
           <UI.Modal isOpen={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
             <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenSettingsModal(false)}>
-              <UI.ModalBody>
+              <UI.DeprecatedModalBody>
                 <CreateCampaignForm
                   onClose={() => setIsOpenSettingsModal(false)}
                   // @ts-ignore
                   campaign={campaignToForm(campaign)}
                   isReadOnly
                 />
-              </UI.ModalBody>
+              </UI.DeprecatedModalBody>
             </UI.ModalCard>
           </UI.Modal>
         )}

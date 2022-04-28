@@ -4,6 +4,7 @@ import { NexusGenInputs } from '../../generated/nexus';
 
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { CreateSessionInput } from './SessionPrismaAdapterType';
+import { generateTimeSpent } from './SessionHelpers';
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;
@@ -11,6 +12,70 @@ class SessionPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  /**
+   * Finds sessions by customer ID between two dates
+   * @param customerId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns 
+   */
+  findCustomerSessions = async (
+    customerId: string,
+    startDateTime: Date,
+    endDateTime: Date,
+  ) => {
+    return this.prisma.session.findMany({
+      where: {
+        dialogue: {
+          customerId,
+        },
+        createdAt: {
+          gte: startDateTime as Date,
+          lte: endDateTime,
+        },
+      },
+      include: {
+        nodeEntries: {
+          include: {
+            sliderNodeEntry: true,
+            choiceNodeEntry: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Finds sessions by dialogue ID between two dates
+   * @param dialogueId 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns 
+   */
+  findDialogueSessions = async (
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime: Date
+  ) => {
+    return this.prisma.session.findMany({
+      where: {
+        dialogueId: dialogueId,
+        createdAt: {
+          gte: startDateTime as Date,
+          lte: endDateTime,
+        },
+      },
+      include: {
+        nodeEntries: {
+          include: {
+            sliderNodeEntry: true,
+            choiceNodeEntry: true,
+          },
+        },
+      },
+    });
+  }
 
   /**
    * Upserts a pathed sessions cache
@@ -471,6 +536,7 @@ class SessionPrismaAdapter {
 
     return this.prisma.session.create({
       data: {
+        totalTimeInSec: generateTimeSpent(),
         mainScore: data.simulatedRootVote,
         nodeEntries: {
           create: [{
@@ -518,6 +584,7 @@ class SessionPrismaAdapter {
 
     return this.prisma.session.create({
       data: {
+        totalTimeInSec: generateTimeSpent(),
         createdAt: data.createdAt,
         mainScore: data.simulatedRootVote,
         nodeEntries: {

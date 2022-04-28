@@ -1,6 +1,40 @@
 /* eslint-disable max-len */
 const language = {
+  default_values: {
+    workspace_placeholder: {
+      en: 'Club Hades',
+      de: 'Club Hades',
+    },
+    workspace_slug: {
+      en: 'club-hades',
+      de: 'club-hades',
+    },
+  },
   general: {
+    create_new_cta: {
+      en: 'Create Call-to-Action',
+      de: 'Neuen Call-to-Action erstellen',
+    },
+    workspace_title: {
+      en: 'Name of workspace',
+      de: 'Name des Workspace',
+    },
+    workspace_slug: {
+      en: 'Workspace URL Extension',
+      de: 'Workspace URL Extension',
+    },
+    no_dialogues_message: {
+      en: 'No Dialogues available for this workspace...',
+      de: 'Keine Dialogues für diesen Workspace verfügbar...',
+    },
+    no_private_dialogue_message: {
+      en: 'No private dialogues available in this workspace...',
+      de: 'Keine private Dialogues in diesem Workspace verfügbar...',
+    },
+    generate_workspace: {
+      en: 'Generate workspace',
+      de: 'Workspace generieren',
+    },
     new: {
       en: 'New',
       de: 'Neu',
@@ -367,6 +401,10 @@ const language = {
       en: 'Role Permissions',
       de: 'Rollenberechtigungen',
     },
+    assigned_dialogues: {
+      en: 'Assigned dialogues',
+      de: 'Zugewiesene Dialoge',
+    },
     details: {
       en: 'Details',
       de: 'Detail',
@@ -374,6 +412,16 @@ const language = {
     upload_deliveries: {
       en: 'Upload deliveries',
       de: 'Lieferungen hochladen.',
+    },
+    upload_workspace_csv: {
+      en: 'Upload workspace generation csv',
+      de: 'CSV-Datei für die Arbeitsbereichsgenerierung hochladen.',
+    },
+    upload_workspace_csv_helper: {
+      en:
+        'Upload a CSV file with details about your workspace. \n - The appropriate format is to use "," as delimiter \n - Use layer_0,layer_1,layer_etc,emailAssignee,phoneAssignee as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+      de:
+        'Laden Sie eine CSV-Datei mit Details zu Ihrem Arbeitsbereich hoch. \n - Das geeignete Format ist "," als Trennzeichen zu verwenden. \n - Verwenden Sie Layer_0, Layer_1, Layer_etc, EmailAssignee, PhoneAssignee als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820',
     },
     upload_deliveries_helper: {
       en:
@@ -882,6 +930,14 @@ const language = {
     end: {
       en: 'End',
       de: 'Ende',
+    },
+    make_dialogue_private: {
+      en: 'Make private',
+      de: 'Privatisieren',
+    },
+    make_dialogue_public: {
+      en: 'Make public',
+      de: 'Veröffentlichen',
     },
     edit: {
       en: 'Edit',
@@ -1944,6 +2000,34 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
+    general_error: {
+      en: 'Something went wrong!',
+      de: 'Irgendetwas ist schief gelaufen!',
+    },
+    general_error_helper: {
+      en: 'Currently unable to edit your detail. Please try again.',
+      de: 'Aktuell kann deine Detail nicht bearbeitet werden. Bitte versuche es erneut.',
+    },
+    general_success: {
+      en: 'Success!',
+      de: 'Erfolg!',
+    },
+    general_success_helper: {
+      en: 'The task has been finished successfully.',
+      de: 'Die Aufgabe wurde erfolgreich abgeschlossen.',
+    },
+    workspace_generated_helper: {
+      en: 'Workspace has been generated',
+      de: 'Workspace wurde erstellt',
+    },
+    updated_assigned_dialogues: {
+      en: 'Updated assigned dialogues',
+      de: 'Zugewiesene Dialoge aktualisiert',
+    },
+    updated_assigned_dialogues_helper: {
+      en: 'The assigned dialogues have been succesfully updated.',
+      de: 'Die zugeordneten Dialoge wurden erfolgreich aktualisiert.',
+    },
     updated_permissions: {
       en: 'Updated permissions',
       de: 'Berechtigungen aktualisiert',
@@ -2376,6 +2460,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   permissions: {
+    can_assign_users_to_dialogue: {
+      en: 'This permission allows a user to make private dialogues (in)-accessible for other users',
+      de: 'Diese Berechtigung erlaubt es einem Benutzer, private Dialoge für andere Benutzer (un)zugänglich zu machen',
+    },
     can_access_admin_panel: {
       en: 'This system-wide permission allows a user to do everything (overrules others) within the haas dashboard. It is specified per user and cannot be set within a workspace.',
       de: 'Diese systemweite Berechtigung ermöglicht es einem Benutzer, alles innerhalb des haas-Dashboards zu tun. Sie wird pro Benutzer angegeben und kann nicht innerhalb eines Arbeitsbereichs festgelegt werden.',

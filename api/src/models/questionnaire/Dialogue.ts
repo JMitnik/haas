@@ -1,7 +1,7 @@
 
 import { UserInputError } from 'apollo-server-express';
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { subDays } from 'date-fns';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
@@ -15,13 +15,14 @@ import formatDate from '../../utils/formatDate';
 import { isADate, isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
-import { DialogueImpactScoreType, DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
+import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
+import { UserType } from '../users/graphql/User';
+import { PathedSessionsType, PathedSessionsInput, TopicType, TopicInputType, MostPopularPath, DialogueStatisticsSummaryFilterInput, MostChangedPath, MostTrendingTopic } from './DialogueStatisticsResolver';
 
 export const TEXT_NODES = [
   'TEXTBOX',
   'CHOICE',
 ];
-
 
 export const DialogueFilterInputType = inputObjectType({
   name: 'DialogueFilterInputType',
@@ -42,74 +43,8 @@ export const DialogueFinisherType = objectType({
   },
 });
 
-export const DialogueStatisticsSummaryFilterInput = inputObjectType({
-  name: 'DialogueStatisticsSummaryFilterInput',
-  definition(t) {
-    t.string('startDateTime', { required: true });
-    t.string('endDateTime');
-    t.boolean('refresh');
-    t.field('impactType', {
-      type: DialogueImpactScoreType,
-      required: true,
-    })
-  },
-})
-
-export const TopicType = objectType({
-  name: 'TopicType',
-  definition(t) {
-    t.string('name');
-    t.float('impactScore');
-    t.int('nrVotes');
-    t.field('subTopics', {
-      list: true,
-      nullable: true,
-      type: TopicType,
-    });
-  },
-});
-
-export const PathedSessionsType = objectType({
-  name: 'PathedSessionsType',
-  definition(t) {
-    t.string('startDateTime');
-    t.string('endDateTime');
-
-    t.list.string('path');
-    t.list.field('pathedSessions', {
-      type: SessionType,
-    });
-  },
-})
-
-export const TopicInputType = inputObjectType({
-  name: 'TopicInputType',
-  definition(t) {
-    t.boolean('isRoot', { default: false });
-    t.string('value', { required: true });
-    t.field('impactScoreType', {
-      type: DialogueImpactScoreType,
-      required: true,
-    });
-    t.string('startDateTime', { required: true });
-    t.string('endDateTime');
-    t.boolean('refresh', { required: false });
-  },
-});
-
-export const PathedSessionsInput = inputObjectType({
-  name: 'PathedSessionsInput',
-  definition(t) {
-    t.list.string('path', { required: true });
-    t.string('startDateTime', { required: true });
-    t.string('endDateTime');
-    t.boolean('refresh', { default: false });
-  },
-});
-
 export const DialogueType = objectType({
   name: 'Dialogue',
-
   definition(t) {
     t.id('id');
     t.string('title');
@@ -122,10 +57,16 @@ export const DialogueType = objectType({
     t.field('language', {
       type: LanguageEnumType,
     });
+    t.boolean('isPrivate');
 
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+
+    t.list.field('assignees', {
+      nullable: true,
+      type: UserType,
+    })
 
     t.field('postLeafNode', {
       type: DialogueFinisherType,
@@ -222,6 +163,104 @@ export const DialogueType = objectType({
           utcEndDateTime,
           args.input.refresh || false,
         ) as any;
+      },
+    });
+
+    t.field('mostPopularPath', {
+      type: MostPopularPath,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueService.findMostPopularPath(
+          parent.id,
+          parent.title,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
+      },
+    });
+
+    t.field('mostChangedPath', {
+      type: MostChangedPath,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (args?.input?.cutoff && args.input.cutoff < 1) throw new UserInputError('Cutoff cannot be a negative number!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueService.findMostChangedPath(
+          parent.id,
+          parent.title,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+          args.input.cutoff || undefined,
+        );
+      },
+    });
+
+    t.field('mostTrendingTopic', {
+      type: MostTrendingTopic,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueService.findMostTrendingTopic(
+          parent.id,
+          parent.title,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
       },
     });
 

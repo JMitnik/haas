@@ -6,18 +6,17 @@ import {
   Grid,
   H4,
   PageHeading,
-  Span,
 } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Link } from 'react-router-dom';
-import { Plus, UserCheck } from 'react-feather';
+import { Plus } from 'react-feather';
 import { Skeleton } from '@chakra-ui/core';
 import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
 import { Variants, motion } from 'framer-motion';
-import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { useNavigator } from 'hooks/useNavigator';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 import useAuth from 'hooks/useAuth';
 
@@ -51,11 +50,8 @@ const MotionGrid = motion.custom(Grid);
 
 const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoading: boolean }) => {
   const { t } = useTranslation();
-  const { canCreateCustomers, canAccessAdmin } = useAuth();
-  const history = useHistory();
-  const goToAdminPanel = () => {
-    history.push('/dashboard/admin');
-  };
+  const { canCreateCustomers, canAccessAdmin, canGenerateWorkspaceFromCsv } = useAuth();
+  const { goToGenerateWorkspaceOverview } = useNavigator();
 
   return (
     <CustomerOverviewContainer>
@@ -67,20 +63,16 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
           justifyContent="space-between"
           alignItems="center"
         >
-          <H4 mb={2} color="gray.500">
-            {t('active_projects')}
-          </H4>
-
-          {/* TEMPORARY Disabled */}
-          {/* {canAccessAdmin && (
-            <Span>
-              <UI.Button bg="gray.200" mb={2} size="sm" variant="outline" leftIcon={UserCheck} onClick={goToAdminPanel}>
-                <Link to="/dashboard/b/admin">
-                  {t('adminpanel')}
-                </Link>
+          <UI.Flex mb={2}>
+            <H4 mr={2} color="gray.500">
+              {t('active_projects')}
+            </H4>
+            {canGenerateWorkspaceFromCsv && (
+              <UI.Button variantColor="off" onClick={() => goToGenerateWorkspaceOverview()}>
+                {t('generate_workspace')}
               </UI.Button>
-            </Span>
-          )} */}
+            )}
+          </UI.Flex>
         </Flex>
 
         <MotionGrid
@@ -99,15 +91,13 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[]; isLoadin
             </>
           ) : (
             <>
-              {customers?.map(
-                (customer: any, index: any) => customer && (
-                  <motion.div style={{ height: '100%' }} key={index} variants={cardItemAnimation}>
-                    <ErrorBoundary key={index} FallbackComponent={() => <></>}>
-                      <CustomerCard key={index} customer={customer} />
-                    </ErrorBoundary>
-                  </motion.div>
-                ),
-              )}
+              {customers?.map((customer: any, index: any) => customer && (
+                <motion.div style={{ height: '100%' }} key={index} variants={cardItemAnimation}>
+                  <ErrorBoundary key={index} FallbackComponent={() => <></>}>
+                    <CustomerCard key={index} customer={customer} />
+                  </ErrorBoundary>
+                </motion.div>
+              ))}
 
               {(canCreateCustomers || canAccessAdmin) && (
                 <AddCard>

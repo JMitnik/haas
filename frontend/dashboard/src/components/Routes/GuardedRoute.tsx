@@ -16,12 +16,45 @@ interface GuardedRouteProps extends RouteProps {
  *    Note: ensure params that are expected can be found in current route
  *  )
  */
-const GuardedRoute = ({ allowedPermission, redirectRoute, ...routeProps }: GuardedRouteProps) => {
+export const BotRoute = ({ allowedPermission, redirectRoute, ...routeProps }: GuardedRouteProps) => {
   const { isLoggedIn } = useUser();
   const { hasPermission } = useAuth();
-  const params = useParams();
+  const params: { customerSlug: string, dialogueSlug: string } = useParams();
 
   if (!isLoggedIn) return <Redirect to="/logged_out" />;
+
+  if (allowedPermission && !hasPermission(allowedPermission)) {
+    if (!redirectRoute) {
+      return <Redirect to="unauthorized" />;
+    }
+    return <Redirect to={generatePath(redirectRoute, params)} />;
+  }
+
+  return (
+    <Route {...routeProps} />
+  );
+};
+
+/**
+ * Guards routes given specific permission `allowedPermission`.
+ * - If `redirectRoute` is specified, will reach that route instead (
+ *    Note: ensure params that are expected can be found in current route
+ *  )
+ */
+const GuardedRoute = ({ allowedPermission, redirectRoute, ...routeProps }: GuardedRouteProps) => {
+  const { isLoggedIn } = useUser();
+  const { hasPermission, canAccessDialogue } = useAuth();
+  const params: { customerSlug: string, dialogueSlug: string } = useParams();
+
+  if (!isLoggedIn) return <Redirect to="/logged_out" />;
+
+  if (params.dialogueSlug && !canAccessDialogue(params.dialogueSlug) && !redirectRoute) {
+    return <Redirect to="/" />;
+  }
+
+  if (params.dialogueSlug && !canAccessDialogue(params.dialogueSlug) && redirectRoute) {
+    return <Redirect to={generatePath(redirectRoute, params)} />;
+  }
 
   if (allowedPermission && !hasPermission(allowedPermission)) {
     if (!redirectRoute) {

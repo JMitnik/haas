@@ -29,6 +29,7 @@ export interface CreateDialogueInput {
   creationDate?: Date | string;
   updatedAt?: Date | string | null;
   publicTitle?: string | null;
+  isPrivate?: boolean;
   isOnline?: boolean;
   isWithoutGenData?: boolean;
   endScreenText?: string | null;

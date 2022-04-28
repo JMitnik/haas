@@ -2,10 +2,10 @@ import { expectWorkspaceLoaded, fireEvent, render, screen, server, userEvent, wa
 import { graphql } from 'msw';
 import { name } from 'faker';
 import { range } from 'lodash';
-import { useLocation } from 'react-router-dom';
 import React from 'react';
 
-import { DeleteUserMutation, DeleteUserMutationVariables, GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables, UserCustomer } from 'types/generated-types';
+import { GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables, GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables, SystemPermission, UserCustomer } from 'types/generated-types';
+
 import UsersOverview from '../UsersOverview';
 
 const generateUserCustomer: (index: number) => UserCustomer = (index: number) => ({
@@ -88,6 +88,54 @@ describe('UsersOverview (happy path)', () => {
   });
 
   it('renders multiple pages', async () => {
+    server.use(graphql.query<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(
+      'getCustomerOfUser', (req, res, ctx) => res(ctx.data({
+        UserOfCustomer: {
+          customer: {
+            id: 'cl1vs0dd10002xczgbx999ehj',
+            name: 'Metrics',
+            slug: 'cl1vs0dcr0000xczg6gmj6dfn',
+            settings:
+            {
+              id: '2',
+              logoUrl: null,
+              colourSettings: { id: '2', primary: '#f47373', __typename: 'ColourSettings' },
+              __typename: 'CustomerSettings',
+            },
+            campaigns: [],
+            __typename: 'Customer',
+          },
+          role: {
+            name: 'Admin',
+            permissions: [
+              SystemPermission.CanViewUsers,
+              SystemPermission.CanAddUsers,
+              SystemPermission.CanEditUsers,
+              SystemPermission.CanDeleteUsers,
+            ],
+            __typename: 'RoleType',
+          },
+          user: {
+            id: 'IDEETJE',
+            assignedDialogues: {
+              privateWorkspaceDialogues: [],
+              assignedDialogues:
+                [
+                  { slug: 'Female-U18-MA1', id: 'cl296bdxg0209kmoircogwhew', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA3', id: 'cl296bfc92497kmoiatuig34o', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA1', id: 'cl296cl423851kmoi45n5egs5', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA3', id: 'cl296cmhg6132kmoikduvcn9z', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA1', id: 'cl296kuns0066n6oizs6w4xcr', __typename: 'Dialogue' },
+                ],
+              __typename: 'AssignedDialogues',
+            },
+            __typename: 'UserType',
+          },
+          __typename: 'UserCustomer',
+        },
+      })),
+    ));
+
     server.use(graphql.query<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(
       'getPaginatedUsers', (req, res, ctx) => res(ctx.data({
         __typename: 'Query',
@@ -138,6 +186,54 @@ describe('UsersOverview (happy path)', () => {
   });
 
   it('user can be edited', async () => {
+    server.use(graphql.query<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(
+      'getCustomerOfUser', (req, res, ctx) => res(ctx.data({
+        UserOfCustomer: {
+          customer: {
+            id: 'cl1vs0dd10002xczgbx999ehj',
+            name: 'Metrics',
+            slug: 'cl1vs0dcr0000xczg6gmj6dfn',
+            settings:
+            {
+              id: '2',
+              logoUrl: null,
+              colourSettings: { id: '2', primary: '#f47373', __typename: 'ColourSettings' },
+              __typename: 'CustomerSettings',
+            },
+            campaigns: [],
+            __typename: 'Customer',
+          },
+          role: {
+            name: 'Admin',
+            permissions: [
+              SystemPermission.CanViewUsers,
+              SystemPermission.CanAddUsers,
+              SystemPermission.CanEditUsers,
+              SystemPermission.CanDeleteUsers,
+            ],
+            __typename: 'RoleType',
+          },
+          user: {
+            id: 'IDEETJE',
+            assignedDialogues: {
+              privateWorkspaceDialogues: [],
+              assignedDialogues:
+                [
+                  { slug: 'Female-U18-MA1', id: 'cl296bdxg0209kmoircogwhew', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA3', id: 'cl296bfc92497kmoiatuig34o', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA1', id: 'cl296cl423851kmoi45n5egs5', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA3', id: 'cl296cmhg6132kmoikduvcn9z', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA1', id: 'cl296kuns0066n6oizs6w4xcr', __typename: 'Dialogue' },
+                ],
+              __typename: 'AssignedDialogues',
+            },
+            __typename: 'UserType',
+          },
+          __typename: 'UserCustomer',
+        },
+      })),
+    ));
+
     server.use(graphql.query<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(
       'getPaginatedUsers', (req, res, ctx) => res(ctx.data({
         __typename: 'Query',
@@ -194,6 +290,54 @@ describe('UsersOverview (happy path)', () => {
   });
 
   it('user can be removed', async () => {
+    server.use(graphql.query<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(
+      'getCustomerOfUser', (req, res, ctx) => res(ctx.data({
+        UserOfCustomer: {
+          customer: {
+            id: 'cl1vs0dd10002xczgbx999ehj',
+            name: 'Metrics',
+            slug: 'cl1vs0dcr0000xczg6gmj6dfn',
+            settings:
+            {
+              id: '2',
+              logoUrl: null,
+              colourSettings: { id: '2', primary: '#f47373', __typename: 'ColourSettings' },
+              __typename: 'CustomerSettings',
+            },
+            campaigns: [],
+            __typename: 'Customer',
+          },
+          role: {
+            name: 'Admin',
+            permissions: [
+              SystemPermission.CanViewUsers,
+              SystemPermission.CanAddUsers,
+              SystemPermission.CanEditUsers,
+              SystemPermission.CanDeleteUsers,
+            ],
+            __typename: 'RoleType',
+          },
+          user: {
+            id: 'IDEETJE',
+            assignedDialogues: {
+              privateWorkspaceDialogues: [],
+              assignedDialogues:
+                [
+                  { slug: 'Female-U18-MA1', id: 'cl296bdxg0209kmoircogwhew', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA3', id: 'cl296bfc92497kmoiatuig34o', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA1', id: 'cl296cl423851kmoi45n5egs5', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA3', id: 'cl296cmhg6132kmoikduvcn9z', __typename: 'Dialogue' },
+                  { slug: 'Female-U18-MA1', id: 'cl296kuns0066n6oizs6w4xcr', __typename: 'Dialogue' },
+                ],
+              __typename: 'AssignedDialogues',
+            },
+            __typename: 'UserType',
+          },
+          __typename: 'UserCustomer',
+        },
+      })),
+    ));
+
     server.use(graphql.query<GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables>(
       'getPaginatedUsers', (req, res, ctx) => res(ctx.data({
         __typename: 'Query',

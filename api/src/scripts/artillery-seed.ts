@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import cuid from 'cuid';
-import { random } from 'faker';
+import { company } from 'faker';
 import * as yargs from 'yargs';
 
 import CustomerService from '../models/customer/CustomerService';
@@ -56,7 +56,7 @@ export const generateArtillerySeed = async () => {
   let totalDone = 0;
 
   await Promise.all([...Array(amtWorkspaces)].map(async (value, index) => {
-    const workspaceTitle = random.word();
+    const workspaceTitle = company.companyName();
     const workspace = await customerService.createWorkspace({
       name: workspaceTitle,
       slug: cuid(),

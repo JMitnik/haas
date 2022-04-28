@@ -86,7 +86,7 @@ const CampaignsView = () => {
           isOpen={openedModal}
           onClose={() => setIsOpenedModal(false)}
         >
-          <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenedModal(false)}>
+          <UI.ModalCard breakout maxWidth={1200} onClose={() => setIsOpenedModal(false)}>
             <UI.ModalHead>
               <UI.ModalTitle>{t('create_campaign')}</UI.ModalTitle>
             </UI.ModalHead>

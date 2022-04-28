@@ -1,4 +1,4 @@
-import { Dialogue, Edge, NodeType, PrismaClient, QuestionCondition, QuestionNode } from '@prisma/client';
+import { Dialogue, Edge, NodeType, PrismaClient, QuestionCondition, QuestionNode, SystemPermissionEnum } from '@prisma/client';
 import { sample } from 'lodash';
 
 interface SeedSessionInput {
@@ -13,6 +13,51 @@ interface SeedSessionInput {
   subChoiceQuestionId?: string;
   subChoiceValue?: string;
   subEdgeId?: string;
+}
+
+export const assignUserToDialogue = async (prisma: PrismaClient, dialogueId: string, userId: string) => {
+  return prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      isAssignedTo: {
+        connect: {
+          id: dialogueId,
+        },
+      },
+    },
+    include: {
+      isAssignedTo: true,
+    },
+  });
+}
+
+/**
+ * Generates a dialogue, connected to a specific dialogue.
+ * @param prisma
+ * @param customerId
+ * @returns
+ */
+export const seedDialogue = async (
+  prisma: PrismaClient,
+  workspaceId: string,
+  slug: string,
+  isPrivate: boolean = false,
+  title: string = 'Test dialogue',
+  description: string = 'none',
+) => {
+  const dialogue = await prisma.dialogue.create({
+    data: {
+      customerId: workspaceId,
+      title,
+      slug,
+      description: description,
+      isPrivate,
+    },
+  });
+
+  return dialogue;
 }
 
 export const seedSession = async (
@@ -337,7 +382,7 @@ export const prepDefaultCreateData = async (prisma: PrismaClient) => {
   const userRole = await prisma.role.create({
     data: {
       name: 'UserRole',
-      permissions: ['CAN_VIEW_AUTOMATIONS', 'CAN_CREATE_AUTOMATIONS'],
+      permissions: ['CAN_VIEW_AUTOMATIONS', 'CAN_CREATE_AUTOMATIONS', 'CAN_VIEW_DIALOGUE'],
     },
   });
 

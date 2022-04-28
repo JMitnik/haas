@@ -5,7 +5,10 @@ import React, { FC } from 'react';
 
 import { AppProviders } from 'config/AppProviders';
 import { CampaignView } from 'views/CampaignView/CampaignView';
+import { DashboardView } from 'views/DashboardView';
+import { DialogueLinkFetchOverview } from 'views/DialogueLinkFetchOverview';
 import { DialogueProvider } from 'providers/DialogueProvider';
+import { ImportWorkspaceCSVForm } from 'views/CustomerOverview/ImportWorkspaceCSVForm';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
 import { ReportView } from 'views/ReportView';
@@ -28,8 +31,8 @@ import CustomersPage from 'pages/dashboard/customers';
 import DashboardPage from 'pages/dashboard';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
+import DialogueOverview from 'views/DialogueOverview';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
-import DialoguesPage from 'pages/dashboard/dialogues';
 import EditCustomerView from 'views/EditCustomerView';
 import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
@@ -37,7 +40,7 @@ import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
 import FirstTimePage from 'pages/dashboard/first_time';
 import GlobalLoader from 'components/GlobalLoader';
-import GuardedRoute from 'components/Routes/GuardedRoute';
+import GuardedRoute, { BotRoute } from 'components/Routes/GuardedRoute';
 import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
@@ -45,7 +48,6 @@ import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 import VerifyTokenPage from 'pages/verify_token';
-import { DashboardView } from 'views/DashboardView';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
@@ -159,7 +161,7 @@ const CustomerRoutes = () => (
 
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d"
-                      render={() => <DialoguesPage />}
+                      render={() => <DialogueOverview />}
                     />
 
                     <GuardedRoute
@@ -183,6 +185,12 @@ const CustomerRoutes = () => (
 
 const PublicRoutes = () => (
   <Switch>
+    <Route path="/public/dialogue-link-fetch">
+      <PreCustomerLayout hideUserNav>
+        <DialogueLinkFetchOverview />
+      </PreCustomerLayout>
+    </Route>
+
     <Route path="/public/login">
       <LoginPage />
     </Route>
@@ -198,7 +206,7 @@ const ReportRoutes = () => (
     <CustomerProvider>
       <DialogueProvider>
         <Switch>
-          <GuardedRoute
+          <BotRoute
             allowedPermission={SystemPermission.CanAccessReportPage}
             path={ROUTES.WEEKLY_REPORT_VIEW}
             render={() => (
@@ -234,6 +242,16 @@ const RootApp = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => (
   <RootApp>
     <Switch>
+      <GuardedRoute
+        allowedPermission={SystemPermission.CanGenerateWorkspaceFromCsv}
+        path={ROUTES.GENERATE_WORKSPACE_VIEW}
+        render={() => (
+          <PreCustomerLayout>
+            <ImportWorkspaceCSVForm />
+          </PreCustomerLayout>
+        )}
+      />
+
       <Route
         path="/dashboard/b/add"
         render={() => (

@@ -15,7 +15,7 @@ interface CardProps {
 }
 
 export const Card = styled(Div) <CardProps>`
-  ${({ theme, noHover, boxShadow, outline, isFlat, willFocusWithin }) => css`
+  ${({ theme, noHover, isFlat, willFocusWithin }) => css`
     position: relative;
     display: flex;
     flex-direction: column;
