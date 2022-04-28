@@ -77,8 +77,8 @@ export const ImportWorkspaceCSVForm = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
-    console.log('form data: ', formData);
     const type = formData.dialogueType.value;
+
     importWorkspaceCSV({
       variables: {
         input: {

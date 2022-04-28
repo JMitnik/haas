@@ -95,7 +95,7 @@ export class NodeService {
 
   /**
    * Finds the slider node of a dialogue
-   * @param dialogueId 
+   * @param dialogueId
    * @returns question node
    */
   findSliderNode = async (dialogueId: string) => {
@@ -540,7 +540,6 @@ export class NodeService {
   };
 
   findTemplateLeadNodes = (templateType: string): LeafNodeDataEntryProps[] => {
-    console.log('FIND TEMPLATE LEAFNODES FOR: ', templateType);
     switch (templateType) {
       case 'BUSINESS':
         return templates.business.leafNodes;
@@ -929,11 +928,11 @@ export class NodeService {
 
   /**
    * Creates a set of nodes based on the provided template type
-   * @param dialogueId 
-   * @param workspaceName 
-   * @param leafs 
-   * @param templateType 
-   * @returns 
+   * @param dialogueId
+   * @param workspaceName
+   * @param leafs
+   * @param templateType
+   * @returns
    */
   createTemplateNodes = async (
     dialogueId: string,
