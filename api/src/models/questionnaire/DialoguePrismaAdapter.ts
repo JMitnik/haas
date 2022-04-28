@@ -600,6 +600,40 @@ class DialoguePrismaAdapter {
     });
   };
 
+  async getFullDialogueBySlug(dialogueSlug: string, workspaceId: string) {
+    return this.prisma.dialogue.findUnique({
+      where: {
+        slug_customerId: {
+          customerId: workspaceId,
+          slug: dialogueSlug,
+        },
+      },
+      include: {
+        questions: true,
+        edges: {
+          include: {
+            parentNode: true,
+            conditions: true,
+            childNode: {
+              include: {
+                children: {
+                  select: {
+                    childNode: {
+                      select: {
+                        id: true,
+                        options: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async getDialogueWithNodesAndEdges(dialogueId: string) {
     return this.prisma.dialogue.findUnique({
       where: { id: dialogueId },

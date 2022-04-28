@@ -1,5 +1,6 @@
 import { Customer, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
+
 import templates from '../templates';
 import { NexusGenInputs } from '../../generated/nexus';
 import { parseCsv } from '../../utils/parseCsv';
@@ -10,20 +11,23 @@ import NodeService from '../QuestionNode/NodeService';
 import { defaultMassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { cartesian } from './DemoHelpers';
+import { subDays } from 'date-fns';
+import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
   dialoguePrismaAdapter: DialoguePrismaAdapter;
   nodeService: NodeService;
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
+  sessionPrismaAdapter: SessionPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
+    this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
   };
-
 
   getTemplate(templateType: string) {
     switch (templateType) {
@@ -40,15 +44,21 @@ class GenerateWorkspaceService {
     }
   }
 
-
   async generateDemoData(
     templateType: string,
     workspace: Customer & {
       roles: Role[];
     },
     userId?: string) {
+    const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN);
+    await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
+      workspace.id,
+      adminRole?.id as string,
+      userId as string
+    );
+
     const template = this.getTemplate(templateType);
-    const uniqueDialogues = cartesian(template.rootLayer, template.subLayer, template.subSubLayer);
+    const uniqueDialogues: string[][] = cartesian(template.rootLayer, template.subLayer, template.subSubLayer);
 
     const mappedDialogueInputData = uniqueDialogues.map(
       (dialogue: string[]) => ({ slug: dialogue.join('-'), title: dialogue.join(' - ') }));
@@ -74,12 +84,81 @@ class GenerateWorkspaceService {
       await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs, templateType);
     }
 
-    const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN);
-    await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
-      workspace.id,
-      adminRole?.id as string,
-      userId as string
-    );
+    // GENERATING STATIC DATA TIME
+
+    // Extreme case
+    const currentDate = new Date();
+    const yesterdayDate = subDays(currentDate, 1);
+    const dialogueSlug = mappedDialogueInputData?.[0]?.slug;
+    const dialogueWithNodes = await this.dialoguePrismaAdapter.getFullDialogueBySlug(dialogueSlug, workspace.id);
+
+    if (dialogueWithNodes) {
+      await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueWithNodes?.id, true);
+      const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
+      const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
+
+      // Stop if no rootnode
+      if (!rootNode) throw new ApolloError(`No root node found for ${dialogueWithNodes.slug}. Abort.`);
+
+      const simulatedRootVote: number = 13;
+      const simulatedChoice = template.topics[0]; // Physical & Mental
+      const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
+        if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
+        const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+        return isValid;
+      }));
+
+      const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
+
+      if (!simulatedChoiceNodeId) throw new ApolloError('No edge found for selected option. Please contact an admin.');
+
+      const fakeSessionInputArgs: (
+        {
+          createdAt: Date;
+          dialogueId: string;
+          rootNodeId: string;
+          simulatedRootVote: number;
+          simulatedChoiceNodeId: string;
+          simulatedChoiceEdgeId?: string;
+          simulatedChoice: string;
+        }) = {
+        dialogueId: dialogueWithNodes.id,
+        createdAt: yesterdayDate,
+        rootNodeId: rootNode.id,
+        simulatedRootVote,
+        simulatedChoiceNodeId,
+        simulatedChoiceEdgeId: simulatedChoiceEdge?.id,
+        simulatedChoice,
+      }
+      const emergencySession = await this.sessionPrismaAdapter.createFakeSession(fakeSessionInputArgs);
+      // TODO: Get correct node ID maybe 🤔 maybe not necessary for form CTA 
+      const formCTAData = {
+        'sessionId': emergencySession.id,
+        'nodeId': 'cl2fygcnb1182bgoikg4nozz0',
+        'data': {
+          'form': {
+            'values': [
+              {
+                'relatedFieldId': 'cl2fygcnb1184bgoiv637jja0',
+                'shortText': 'Daan',
+              },
+              {
+                'relatedFieldId': 'cl2fygcnb1185bgoi9rcr308t',
+                'shortText': 'Helsloot',
+              },
+              {
+                'relatedFieldId': 'cl2fygcnb1186bgoi50v2t3mv',
+                'email': 'daan.998@hotmail.com',
+              },
+            ],
+          },
+        },
+      }
+
+
+    }
+
+
     return null;
   }
 

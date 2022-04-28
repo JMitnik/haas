@@ -536,6 +536,7 @@ class SessionPrismaAdapter {
 
     return this.prisma.session.create({
       data: {
+        createdAt: data.createdAt,
         totalTimeInSec: generateTimeSpent(),
         mainScore: data.simulatedRootVote,
         nodeEntries: {
