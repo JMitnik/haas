@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
-import { refetchMeQuery, useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
+import { DialogueTemplateType, refetchMeQuery, useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
 import { useLogger } from 'hooks/useLogger';
 import { useToast } from 'hooks/useToast';
 import FileDropInput from 'components/FileDropInput';
@@ -16,7 +16,7 @@ const schema = yup.object({
   workspaceSlug: yup.string().required(),
   dialogueType: yup.object().shape({
     label: yup.string().notRequired(),
-    value: yup.string().notRequired(),
+    value: yup.mixed<DialogueTemplateType>().oneOf(Object.values(DialogueTemplateType)),
   }).required(),
 }).required();
 
@@ -25,19 +25,19 @@ type FormProps = yup.InferType<typeof schema>;
 const DIALOGUE_TYPE_OPTIONS = [
   {
     label: 'DEFAULT',
-    value: 'DEFAULT',
+    value: TemplateType.Default,
   },
   {
-    label: 'BUSINESS',
-    value: 'BUSINESS',
+    label: 'BUSINESS (ENG)',
+    value: TemplateType.BusinessEng,
   },
   {
     label: 'SPORT (ENG)',
-    value: 'SPORT_ENG',
+    value: TemplateType.SportEng,
   },
   {
     label: 'SPORT (NL)',
-    value: 'SPORT_NL',
+    value: TemplateType.SportNl,
   },
 ];
 

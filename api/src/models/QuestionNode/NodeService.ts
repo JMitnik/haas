@@ -9,7 +9,7 @@ import { findDifference } from '../../utils/findDifference';
 import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionsInput, CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
-import { CreateCTAInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
+import { UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
 import templates from '../templates/index';
 
 const standardOptions = [
@@ -540,7 +540,6 @@ export class NodeService {
   };
 
   findTemplateLeadNodes = (templateType: string): LeafNodeDataEntryProps[] => {
-    console.log('FIND TEMPLATE LEAFNODES FOR: ', templateType);
     switch (templateType) {
       case 'BUSINESS':
         return templates.business.leafNodes;

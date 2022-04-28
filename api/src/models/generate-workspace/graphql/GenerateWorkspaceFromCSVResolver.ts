@@ -1,6 +1,11 @@
-import { inputObjectType, mutationField } from '@nexus/schema';
+import { enumType, inputObjectType, mutationField } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
 import { CustomerType } from '../../customer/graphql/Customer'
+
+export const DialogueTemplateType = enumType({
+  name: 'DialogueTemplateType',
+  members: ['SPORT_ENG', 'SPORT_NL', 'BUSINESS_ENG', 'BUSINESS_NL', 'DEFAULT', 'MASS_SEED'],
+})
 
 export const GenerateWorkspaceCSVInputType = inputObjectType({
   name: 'GenerateWorkspaceCSVInputType',
@@ -8,7 +13,7 @@ export const GenerateWorkspaceCSVInputType = inputObjectType({
     t.string('workspaceSlug', { required: true });
     t.string('workspaceTitle', { required: true });
     t.upload('uploadedCsv', { required: true });
-    t.string('type', { default: 'DEFAULT' });
+    t.field('type', { type: DialogueTemplateType, default: 'DEFAULT' });
   },
 });
 

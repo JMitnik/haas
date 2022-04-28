@@ -774,6 +774,15 @@ model Automation {
   workspace           Customer           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
+enum DialogueTemplateType {
+  SPORT_ENG
+  SPORT_NL
+  BUSINESS_ENG
+  BUSINESS_NL
+  DEFAULT
+  MASS_SEED
+}
+
 enum QuestionImpactScore {
   PERCENTAGE
 }
