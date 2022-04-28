@@ -13,7 +13,7 @@ import {
 } from './DialogueTypes';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
-import defaultWorkspaceTemplate, { MassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
+import { MassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
 import { WorkspaceTemplate } from '../templates/TemplateTypes';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { CreateQuestionsInput, UpsertDialogueStatisticsInput } from './DialoguePrismaAdapterType';
@@ -26,6 +26,7 @@ import EdgeService from '../edge/EdgeService';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import config from '../../config/config';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
+import TemplateService from '../templates/TemplateService';
 
 
 function getRandomInt(max: number) {
@@ -40,6 +41,7 @@ class DialogueService {
   edgePrismaAdapter: EdgePrismaAdapter;
   edgeService: EdgeService;
   questionNodePrismaAdapter: QuestionNodePrismaAdapter;
+  templateService: TemplateService;
   nodeService: NodeService;
 
   constructor(prismaClient: PrismaClient) {
@@ -50,6 +52,7 @@ class DialogueService {
     this.edgeService = new EdgeService(prismaClient);
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
+    this.templateService = new TemplateService(prismaClient);
     this.nodeService = new NodeService(prismaClient);
   }
 
@@ -1378,7 +1381,7 @@ class DialogueService {
     })
 
     // TODO: Make this dependent on input "template"
-    await this.nodeService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
+    await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
 
     return dialogue;
   };
@@ -1399,8 +1402,8 @@ class DialogueService {
     if (!dialogue) throw new Error('Dialogue not seeded');
 
     // TODO: Make this dependent on input "template"
-    const leafs = await this.nodeService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
-    await this.nodeService.createTemplateNodes(dialogue.id, customerName, leafs, 'DEFAULT');
+    const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
+    await this.templateService.createTemplateNodes(dialogue.id, customerName, leafs, 'DEFAULT');
 
     return dialogue;
   };
