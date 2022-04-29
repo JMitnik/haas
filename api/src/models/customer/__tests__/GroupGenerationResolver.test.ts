@@ -1,4 +1,4 @@
-import { createReadStream, existsSync } from 'fs';
+import { createReadStream } from 'fs';
 
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
@@ -27,11 +27,10 @@ it('Group generation using CSV', async () => {
   })
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
-  console.log(`Current dir: ${__dirname}`);
-  console.log('File exists: ', existsSync(`${__dirname}/testCsv.csv`));
-  const file = createReadStream(`${__dirname}/testCsv.csv`);
 
-  const res = await ctx.client.request(`
+  const file = createReadStream(`${__dirname}/testCsv.csv`);
+  file.addListener('end', async () => {
+    const res = await ctx.client.request(`
     mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
       generateWorkspaceFromCSV(input: $input) {
         id
@@ -39,23 +38,25 @@ it('Group generation using CSV', async () => {
       }
     }
   `,
-    {
-      input: {
-        uploadedCsv: file,
-        workspaceSlug: 'newWorkspaceSlug',
-        workspaceTitle: 'newWorkspaceTitle',
+      {
+        input: {
+          uploadedCsv: file,
+          workspaceSlug: 'newWorkspaceSlug',
+          workspaceTitle: 'newWorkspaceTitle',
+        },
       },
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
-  );
+      {
+        'Authorization': `Bearer ${token}`,
+      }
+    );
 
-  expect(res).toMatchObject({
-    generateWorkspaceFromCSV: {
-      slug: 'newWorkspaceSlug',
-    },
-  });
+    expect(res).toMatchObject({
+      generateWorkspaceFromCSV: {
+        slug: 'newWorkspaceSlug',
+      },
+    });
+
+  })
 
 });
 
