@@ -1,4 +1,4 @@
-import { createReadStream } from 'fs';
+import { createReadStream, existsSync } from 'fs';
 
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
@@ -27,7 +27,8 @@ it('Group generation using CSV', async () => {
   })
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
-
+  console.log(`Current dir: ${__dirname}`);
+  console.log('File exists: ', existsSync(`${__dirname}/testCsv.csv`));
   const file = createReadStream(`${__dirname}/testCsv.csv`);
 
   const res = await ctx.client.request(`
