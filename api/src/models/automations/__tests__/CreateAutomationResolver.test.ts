@@ -29,12 +29,12 @@ it('creates automation', async () => {
       }
     }
   `,
-  {
-    input: input,
-  },
-  {
-    'Authorization': `Bearer ${token}`,
-  }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
   ).then((data) => data?.createAutomation);
 
   expect(res).toMatchObject({
@@ -61,12 +61,12 @@ it('unable to create automation when no workspace id is provided', async () => {
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -93,12 +93,12 @@ it('unable to create automation when no automation label is provided', async () 
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -125,12 +125,12 @@ it('unable to create automation when no automation type is provided', async () =
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -157,12 +157,12 @@ it('unable to create automation when no actions are provided', async () => {
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -189,12 +189,12 @@ it('unable to create automation when no action type is provided for an action', 
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -221,12 +221,12 @@ it('unable to create automation when no event type is provided for a condition',
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -253,12 +253,12 @@ it('unable to create automation when no event type is provided for a condition',
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -273,7 +273,7 @@ it('unable to create automation when no targets are provided for a SEND_SMS acti
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
   const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
-  const payload = input?.actions?.find((action) => action.type === 'SEND_SMS')?.payload as { targets: Array<string> };
+  const payload = input?.actions?.find((action) => action?.type === 'SEND_SMS')?.payload as { targets: Array<string> };
   payload.targets = [];
 
   try {
@@ -286,12 +286,12 @@ it('unable to create automation when no targets are provided for a SEND_SMS acti
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -324,12 +324,12 @@ it('unable to create automations unauthorized', async () => {
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {

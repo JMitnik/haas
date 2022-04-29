@@ -531,11 +531,11 @@ class AutomationService {
     if (input?.actions?.length === 0) throw new UserInputError('No actions provided for automation!');
 
     input.actions?.forEach((action) => {
-      const hasNoTarget = action.payload ? (Object.entries(action.payload).length === 0
+      const hasNoTarget = action?.payload ? (Object.entries(action.payload).length === 0
         || !Object.keys(action.payload).find((key) => key === 'targets')
         || this.hasEmptyTargetList(action.payload)) : true;
 
-      switch (action.type) {
+      switch (action?.type) {
         case undefined: {
           throw new UserInputError('No action type provided for automation action!');
         }
@@ -584,12 +584,12 @@ class AutomationService {
     if (input.conditionBuilder?.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
 
     input.conditionBuilder?.conditions?.forEach((condition) => {
-      if (!condition.operator) {
+      if (!condition?.operator) {
         throw new UserInputError('No operator type is provided for a condition');
       }
       if (condition.operands?.length === 0) throw new UserInputError('No match values provided for an automation condition!');
       condition.operands?.forEach((operand) => {
-        if (!operand.operandType) {
+        if (!operand?.operandType) {
           throw new UserInputError('No match value type was provided for a condition!');
         }
       });
@@ -606,10 +606,10 @@ class AutomationService {
       mappedConditions = input.conditions.map((condition) => {
         return {
           ...condition,
-          operator: condition.operator as Required<AutomationConditionOperatorType>,
-          scope: this.constructCreateAutomationConditionScopeInput(condition),
-          operands: condition.operands?.map((operand) => {
-            const { dateTimeValue, operandType, numberValue, textValue, id } = operand;
+          operator: condition?.operator as Required<AutomationConditionOperatorType>,
+          scope: this.constructCreateAutomationConditionScopeInput(condition!),
+          operands: condition?.operands?.map((operand) => {
+            const { dateTimeValue, operandType, numberValue, textValue, id } = operand!;
 
             return {
               id,
@@ -652,7 +652,7 @@ class AutomationService {
         operator: condition.operator as Required<AutomationConditionOperatorType>,
         scope: this.constructCreateAutomationConditionScopeInput(condition),
         operands: condition.operands?.map((operand) => {
-          const { dateTimeValue, operandType, numberValue, textValue } = operand;
+          const { dateTimeValue, operandType, numberValue, textValue } = operand!;
 
           return {
             dateTimeValue,

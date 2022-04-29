@@ -1,4 +1,4 @@
-import { inputObjectType, objectType, queryField } from '@nexus/schema';
+import { inputObjectType, objectType, queryField } from 'nexus';
 
 export const DialogueLinksInput = inputObjectType({
   name: 'DialogueLinksInput',

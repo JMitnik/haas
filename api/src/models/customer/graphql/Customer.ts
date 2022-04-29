@@ -1,7 +1,7 @@
 import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
+import { extendType, inputObjectType, mutationField, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
@@ -390,9 +390,9 @@ export const WorkspaceMutations = Upload && extendType({
   definition(t) {
     t.field('singleUpload', {
       type: ImageType,
-      args: {
-        file: Upload,
-      },
+      // args: {
+      //   file: Upload,
+      // }, FIXME: Use Graphql-Yoga upload
       async resolve(parent, args) {
         const { file } = args;
 

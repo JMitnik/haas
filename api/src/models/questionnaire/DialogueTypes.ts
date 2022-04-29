@@ -44,7 +44,7 @@ export interface CopyDialogueInputType {
   title: string;
   publicTitle: string;
   description: string;
-  dialogueTags: { entries?: string[] | null | undefined } | null | undefined;
+  dialogueTags: any;
   language: LanguageEnum;
 };
 export interface LeafNodeProps {

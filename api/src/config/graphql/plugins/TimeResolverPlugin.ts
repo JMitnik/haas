@@ -1,9 +1,9 @@
-import { plugin } from '@nexus/schema';
+import { plugin } from 'nexus';
 
 export const TimeResolverPlugin = plugin({
   name: 'TimeResolvePlugin',
   description: 'Measures the time it takes before the field is finished',
-  fieldDefTypes: `useTimeResolve?: boolean`,
+  fieldDefTypes: 'useTimeResolve?: boolean',
   onCreateFieldResolver(test) {
     return async (root, args, ctx, info, next) => {
       const useTimeResolve = test.fieldConfig.extensions?.nexus?.config?.useTimeResolve;
@@ -17,5 +17,5 @@ export const TimeResolverPlugin = plugin({
 
       return value;
     }
-  }
+  },
 });

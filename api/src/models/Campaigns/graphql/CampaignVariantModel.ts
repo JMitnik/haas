@@ -1,4 +1,4 @@
-import { enumType, objectType } from '@nexus/schema';
+import { enumType, objectType } from 'nexus';
 
 import { CampaignModel } from './CampaignModel';
 import { CustomerType } from '../../customer/graphql/Customer';
@@ -17,7 +17,7 @@ export const CampaignVariantCustomVariableType = objectType({
   definition(t) {
     t.id('id');
     t.string('key');
-  }
+  },
 });
 
 export const CampaignVariantModel = objectType({
@@ -37,8 +37,10 @@ export const CampaignVariantModel = objectType({
       resolve: (parent, _, ctx) => {
         // @ts-ignore
         if (parent.workspace) return parent.workspace;
+        if (!parent.id) return null;
+
         return ctx.services.campaignService.findWorkspaceOfCampaignVariant(parent.id);
-      }
+      },
     });
     t.field('dialogue', {
       type: DialogueType,
@@ -46,8 +48,10 @@ export const CampaignVariantModel = objectType({
       resolve: (parent, _, ctx) => {
         // @ts-ignore
         if (parent.dialogue) return parent.dialogue;
+        if (!parent.id) return null;
+
         return ctx.services.campaignService.findDialogueOfCampaignVariant(parent.id);
-      }
+      },
     });
     t.field('campaign', {
       type: CampaignModel,
@@ -55,13 +59,14 @@ export const CampaignVariantModel = objectType({
       resolve: (parent, _, ctx) => {
         // @ts-ignore
         if (parent.campaign) return parent.campaign;
+        if (!parent.id) return null;
 
         return ctx.services.campaignService.findCampaignOfVariantId(parent.id);
-      }
+      },
     });
 
     t.field('deliveryConnection', { type: DeliveryConnectionModel, nullable: true });
 
     t.list.field('customVariables', { type: CampaignVariantCustomVariableType, nullable: true });
-  }
+  },
 });

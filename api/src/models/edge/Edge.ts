@@ -1,4 +1,4 @@
-import { extendType, objectType } from '@nexus/schema';
+import { extendType, objectType } from 'nexus';
 
 // eslint-disable-next-line import/no-cycle
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';

@@ -1,4 +1,4 @@
-import { inputObjectType, mutationField, objectType, queryField, unionType } from '@nexus/schema';
+import { inputObjectType, mutationField, objectType, queryField, unionType } from 'nexus';
 
 import { ApolloError, AuthenticationError, UserInputError } from 'apollo-server-express';
 import { UserInput, UserType } from '../users/graphql/User';
@@ -15,11 +15,11 @@ export const RegisterInput = inputObjectType({
   description: 'Registration credentials',
 
   definition(t) {
-    t.string('email', { required: true });
-    t.string('password', { required: true });
-    t.string('firstName', { required: true });
-    t.string('lastName', { required: true });
-    t.string('customerId', { required: true });
+    t.nonNull.string('email');
+    t.nonNull.string('password');
+    t.nonNull.string('firstName');
+    t.nonNull.string('lastName');
+    t.nonNull.string('customerId');
 
     t.string('roleId');
   },
@@ -35,7 +35,6 @@ export const AuthenticateLambdaInput = inputObjectType({
 
 export const AuthenticateLambda = mutationField('authenticateLambda', {
   type: 'String',
-  nullable: true,
   args: { input: AuthenticateLambdaInput },
   async resolve(parent, args, ctx) {
     const authorizationHeader = ctx.req.header('lambda');
@@ -49,7 +48,6 @@ export const AuthenticateLambda = mutationField('authenticateLambda', {
 
 export const CreateAutomationToken = mutationField('createAutomationToken', {
   type: 'String',
-  nullable: true,
   args: { 'email': 'String' },
 
   async resolve(parent, args, ctx) {
@@ -60,7 +58,6 @@ export const CreateAutomationToken = mutationField('createAutomationToken', {
 
 export const RegisterMutation = mutationField('register', {
   type: 'String',
-  nullable: true,
   args: { input: RegisterInput },
 
   async resolve(parent, args, ctx) {
@@ -78,7 +75,7 @@ export const LoginInput = inputObjectType({
   description: 'Login credential',
 
   definition(t) {
-    t.string('email', { required: true });
+    t.nonNull.string('email');
   },
 });
 
@@ -158,16 +155,16 @@ export const InviteUserOutput = objectType({
 export const InviteUserInput = inputObjectType({
   name: 'InviteUserInput',
   definition(t) {
-    t.string('roleId', { required: true });
-    t.string('email', { required: true });
-    t.string('customerId', { required: true });
+    t.nonNull.string('roleId');
+    t.nonNull.string('email');
+    t.nonNull.string('customerId');
   },
 });
 
 export const RequestInviteInput = inputObjectType({
   name: 'RequestInviteInput',
   definition(t) {
-    t.string('email', { required: true });
+    t.nonNull.string('email');
   },
 });
 
@@ -177,17 +174,16 @@ export const RequestInviteOutput = objectType({
   definition(t) {
     t.boolean('didInvite');
     t.boolean('userExists');
-    t.string('loginToken', { nullable: true });
+    t.string('loginToken');
   },
 });
 
 export const RequestInviteMutation = mutationField('requestInvite', {
   type: RequestInviteOutput,
   args: { input: RequestInviteInput },
-
+  nullable: true,
   async resolve(parent, args, ctx) {
     if (!args?.input?.email) throw new UserInputError('No email provided');
-
     const user = await ctx.services.userService.getUserByEmail(args.input.email);
 
     if (!user) return { didInvite: false, userExists: false };
@@ -209,7 +205,7 @@ export const RequestInviteMutation = mutationField('requestInvite', {
     return {
       didInvite: true,
       userExists: true,
-      loginToken,
+      loginToken: loginToken,
     };
   },
 });

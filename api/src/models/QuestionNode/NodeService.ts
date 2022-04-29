@@ -10,6 +10,7 @@ import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import { UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
+import { isPresent } from 'ts-is-present';
 
 export interface IdMapProps {
   [details: string]: string;
@@ -109,19 +110,19 @@ export class NodeService {
   saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Prisma.FormNodeFieldUpsertArgs[] | undefined => (
     input.fields?.map((field) => ({
       create: {
-        type: field.type || 'shortText',
-        label: field.label || 'Generic',
-        position: field.position || -1,
-        isRequired: field.isRequired || false,
+        type: field?.type || 'shortText',
+        label: field?.label || 'Generic',
+        position: field?.position || -1,
+        isRequired: field?.isRequired || false,
       },
       update: {
-        type: field.type || 'shortText',
-        label: field.label || 'Generic',
-        position: field.position || -1,
-        isRequired: field.isRequired || false,
+        type: field?.type || 'shortText',
+        label: field?.label || 'Generic',
+        position: field?.position || -1,
+        isRequired: field?.isRequired || false,
       },
       where: {
-        id: field.id || '-1',
+        id: field?.id || '-1',
       },
     })) || undefined
   );
@@ -160,17 +161,17 @@ export class NodeService {
 
     // If we have links associated, remove "non-existing links"
     if (existingNode?.links && input?.links?.linkTypes?.length) {
-      await this.removeNonExistingLinks(existingNode?.links, input?.links?.linkTypes);
+      await this.removeNonExistingLinks(existingNode?.links, input?.links?.linkTypes as any);
     }
 
     // Upsert links in g eneral
     if (input?.links?.linkTypes?.length) {
-      await this.upsertLinks(input?.links?.linkTypes, input?.id);
+      await this.upsertLinks(input?.links?.linkTypes as any, input?.id);
     }
 
     // If form is passed
     if (input?.form && input.id) {
-      const removedFields = findDifference(existingNode?.form?.fields, input?.form?.fields);
+      const removedFields = findDifference(existingNode?.form?.fields, input?.form?.fields as any);
 
       if (removedFields.length) {
         const mappedFields = removedFields.map((field) => ({ id: field?.id?.toString() || '' }))
@@ -358,11 +359,11 @@ export class NodeService {
     helperText: input.helperText,
     fields: {
       create: input.fields?.map((field) => ({
-        type: field.type || 'shortText',
-        label: field.label || '',
-        position: field.position || -1,
-        placeholder: field.placeholder || '',
-        isRequired: field.isRequired || false,
+        type: field?.type || 'shortText',
+        label: field?.label || '',
+        position: field?.position || -1,
+        placeholder: field?.placeholder || '',
+        isRequired: field?.isRequired || false,
       })),
     },
   });
@@ -771,14 +772,14 @@ export class NodeService {
         await this.questionNodePrismaAdapter.updateSliderNode(updatedNode.sliderNodeId, {
           happyText: happyText || null,
           unhappyText: unhappyText || null,
-          markers: sliderNode?.markers,
+          markers: sliderNode?.markers?.filter(isPresent),
         });
       } else {
         await this.questionNodePrismaAdapter.createSliderNode({
           happyText: happyText || null,
           unhappyText: unhappyText || null,
           parentNodeId: questionId,
-          markers: sliderNode?.markers,
+          markers: sliderNode?.markers?.filter(isPresent),
         });
       };
     };

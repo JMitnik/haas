@@ -1,4 +1,4 @@
-import { enumType, objectType } from '@nexus/schema';
+import { enumType, objectType } from 'nexus';
 
 export const QuestionImpactScoreType = enumType({
   name: 'QuestionImpactScoreType',

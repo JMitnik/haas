@@ -1,4 +1,4 @@
-import { enumType, unionType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, unionType, inputObjectType, objectType } from 'nexus';
 
 export const SessionConnectionOrderByInput = inputObjectType({
   name: 'SessionConnectionOrderByInput',

@@ -2,6 +2,8 @@ import { ApolloServer, UserInputError } from 'apollo-server-express';
 import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
 import { PrismaClient } from '@prisma/client';
+import { createServer } from '@graphql-yoga/node'
+import { useApolloServerErrors } from '@envelop/apollo-server-errors'
 
 import { APIContext } from '../types/APIContext';
 import Sentry from './sentry';
@@ -47,27 +49,29 @@ const handleError = (ctx: any, error: GraphQLError) => {
 export const makeApollo = async (prisma: PrismaClient) => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
 
-  const apollo: ApolloServer = new ApolloServer({
-    uploads: false,
+  const apollo = createServer({
+    // uploads: false,
+    cors: false,
     schema: applyMiddleware(schema, authShield),
-    context: async (ctx): Promise<APIContext> => ({
+    context: async (ctx: any): Promise<APIContext> => ({
       ...ctx,
       session: await new ContextSessionService(ctx, prisma).constructContextSession(),
       prisma,
       services: bootstrapServices(prisma),
     }),
     plugins: [
-      {
-        requestDidStart: () => ({
-          didEncounterErrors: (ctx) => {
-            if (!ctx.operation) return;
+      useApolloServerErrors(),
+      // {
+      //   requestDidStart: () => ({
+      //     didEncounterErrors: (ctx) => {
+      //       if (!ctx.operation) return;
 
-            ctx.errors.forEach((error) => {
-              handleError(ctx, error);
-            });
-          },
-        }),
-      },
+      //       ctx.errors.forEach((error) => {
+      //         handleError(ctx, error);
+      //       });
+      //     },
+      //   }),
+      // },
     ],
   });
 

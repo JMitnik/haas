@@ -1,4 +1,4 @@
-import { enumType, objectType } from '@nexus/schema';
+import { enumType, objectType } from 'nexus';
 import { DialogueType } from './Dialogue'
 
 export const DialogueImpactScoreType = enumType({

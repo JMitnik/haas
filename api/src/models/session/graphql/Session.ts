@@ -1,4 +1,4 @@
-import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
+import { extendType, inputObjectType, mutationField, objectType } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 
 import { NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../../node-entry/NodeEntry';

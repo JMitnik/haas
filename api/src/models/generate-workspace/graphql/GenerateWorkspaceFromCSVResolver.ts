@@ -1,4 +1,4 @@
-import { enumType, inputObjectType, mutationField } from '@nexus/schema';
+import { enumType, inputObjectType, mutationField } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 import { CustomerType } from '../../customer/graphql/Customer'
 

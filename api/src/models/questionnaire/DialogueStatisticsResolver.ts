@@ -1,4 +1,4 @@
-import { inputObjectType, objectType } from '@nexus/schema';
+import { inputObjectType, objectType } from 'nexus';
 import { SessionType } from '../session/graphql';
 import { DialogueImpactScoreType } from './DialogueStatisticsSummary';
 

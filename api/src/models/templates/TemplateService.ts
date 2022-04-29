@@ -118,10 +118,10 @@ class TemplateService {
         form: {
           helperText: '',
           fields: leaf?.form?.fields?.length ? leaf.form?.fields.map((field) => ({
-            label: field.label || '',
-            position: field.position || -1,
-            isRequired: field.isRequired || false,
-            type: field.type || 'shortText',
+            label: field?.label || '',
+            position: field?.position || -1,
+            isRequired: field?.isRequired || false,
+            type: field?.type || 'shortText',
           })) : [],
         },
       })

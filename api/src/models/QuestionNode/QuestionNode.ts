@@ -1,5 +1,5 @@
 import { PrismaClient, NodeType } from '@prisma/client';
-import { enumType, extendType, inputObjectType, objectType, queryField } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType, queryField } from 'nexus';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 
 import { CTALinksInputType, LinkType } from '../link/Link';
@@ -8,6 +8,7 @@ import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
 import { IndepthQuestionStatisticsSummary, QuestionImpactScoreType, QuestionStatisticsSummary } from './QuestionStatisticsSummary';
 import { isValidDateTime } from '../../utils/isValidDate';
+import { isPresent } from 'ts-is-present';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -665,7 +666,7 @@ export const QuestionNodeMutations = extendType({
         } : undefined;
 
 
-        const mappedLinks = links?.linkTypes?.map(({ backgroundColor, iconUrl, id, title, type, url, buttonText, subHeader, header, imageUrl }) => ({
+        const mappedLinks = links?.linkTypes?.filter(isPresent).map(({ backgroundColor, iconUrl, id, title, type, url, buttonText, subHeader, header, imageUrl }) => ({
           id: id || undefined,
           backgroundColor: backgroundColor || undefined,
           iconUrl: iconUrl || undefined,

@@ -1,7 +1,7 @@
-import { plugin } from '@nexus/schema';
+import { plugin } from 'nexus';
 declare global {
   namespace NodeJS {
-    interface Global {}
+    interface Global { }
   }
 }
 

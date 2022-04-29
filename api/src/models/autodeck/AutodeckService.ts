@@ -2,13 +2,11 @@ import * as AWS from 'aws-sdk';
 import * as fs from 'fs';
 import * as papaparse from 'papaparse';
 import { StringStream } from 'scramjet';
-import archiver from 'archiver';
-import fetch from 'node-fetch';
 import request from 'request';
 
 import config from '../../config/config';
 import { NexusGenInputs } from '../../generated/nexus';
-import { CustomField, JobProcessLocation, Prisma, PrismaClient } from '@prisma/client';
+import { CustomField, Prisma, PrismaClient } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import CustomerService from '../customer/CustomerService';
 import JobProcessLocationPrismaAdapter from './JobProcessLocationPrismaAdapter';
@@ -18,7 +16,7 @@ import { CreateWorkspaceJobProps, ScreenshotProps } from './AutodeckServiceType'
 const s3 = new AWS.S3({
   accessKeyId: config.autodeckAwsAccessKeyId,
   secretAccessKey: config.autodeckAwsSecretAccessKey,
-  region: 'eu-central-1'
+  region: 'eu-central-1',
 });
 const sns = new AWS.SNS({
   region: 'eu-central-1',
@@ -42,7 +40,7 @@ class AutodeckService {
    * @param input Update input containing status, resourceUrl and/or errorMessage 
    * @returns An updated CreateWorkspaceJob
    */
-  update(input: { id: string; resourceUrl: string | null | undefined; status: "PRE_PROCESSING" | "PRE_PROCESSING_LOGO" | "PRE_PROCESSING_WEBSITE_SCREENSHOT" | "READY_FOR_PROCESSING" | "IN_PHOTOSHOP_QUEUE" | "PHOTOSHOP_PROCESSING" | "PROCESSING" | "WRAPPING_UP" | "PENDING" | "COMPLETED" | "FAILED" | "TRANSFORMING_PSDS_TO_PNGS" | "STITCHING_SLIDES" | "COMPRESSING_SALES_MATERIAL"; errorMessage: string | undefined; }) {
+  update(input: { id: string; resourceUrl: string | null | undefined; status: 'PRE_PROCESSING' | 'PRE_PROCESSING_LOGO' | 'PRE_PROCESSING_WEBSITE_SCREENSHOT' | 'READY_FOR_PROCESSING' | 'IN_PHOTOSHOP_QUEUE' | 'PHOTOSHOP_PROCESSING' | 'PROCESSING' | 'WRAPPING_UP' | 'PENDING' | 'COMPLETED' | 'FAILED' | 'TRANSFORMING_PSDS_TO_PNGS' | 'STITCHING_SLIDES' | 'COMPRESSING_SALES_MATERIAL'; errorMessage: string | undefined }) {
     return this.createWorkspaceJobPrismaAdapter.update(input.id, {
       resourcesUrl: input.resourceUrl,
       status: input.status,
@@ -106,11 +104,11 @@ class AutodeckService {
     const findManyTriggerArgs: Prisma.CreateWorkspaceJobFindManyArgs = {
       where: {
         id: {
-          not: undefined
+          not: undefined,
         },
       },
       orderBy: {
-        updatedAt: 'desc'
+        updatedAt: 'desc',
       },
     };
 
@@ -146,7 +144,7 @@ class AutodeckService {
    * @returns An updated JobProcessLocation entry
    */
   addNewCustomFieldsToTemplate = async (input: NexusGenInputs['GenerateAutodeckInput'], processLocationId: string) => {
-    const newCustomFields = input.newCustomFields?.map(({ key, value }) => ({ key: key || '', value: value || '' })) || [];
+    const newCustomFields = input.newCustomFields?.map((data) => ({ key: data?.key || '', value: data?.value || '' })) || [];
     return this.jobProcessLocationPrismaAdapter.addNewCustomFields(processLocationId, newCustomFields);
   }
 
@@ -158,8 +156,8 @@ class AutodeckService {
   static generateKeyValuePair = (input: NexusGenInputs['GenerateAutodeckInput']) => {
     const mergedCustomFields = input.customFields?.concat(input?.newCustomFields || []).concat(input?.standardFields || []) || [];
     let mappedKeyValuePairs = {}
-    mergedCustomFields.forEach(({ key, value }) => {
-      if (key) Object.assign(mappedKeyValuePairs, { [key]: value });
+    mergedCustomFields.forEach((data) => {
+      if (data?.key) Object.assign(mappedKeyValuePairs, { [data.key]: data.value });
     });
 
     return mappedKeyValuePairs;
@@ -173,7 +171,7 @@ class AutodeckService {
   static usesAdjustedLogo = async (id: string) => {
     const params = {
       Bucket: 'haas-autodeck-logos',
-      Prefix: `${id}/`
+      Prefix: `${id}/`,
     };
 
     return await new Promise((resolve, reject) => {
@@ -202,7 +200,7 @@ class AutodeckService {
     const sNSParams = {
       Message: strEvent,
       // TODO: Track this as dependency
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel",
+      TopicArn: 'arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel',
     }
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
@@ -252,13 +250,13 @@ class AutodeckService {
     const photoshopInput = {
       jobId: updatedWorkspaceJob.id,
       usesAdjustedLogo: input.usesAdjustedLogo,
-      rootFolder: updatedWorkspaceJob.processLocation.path
+      rootFolder: updatedWorkspaceJob.processLocation.path,
     };
     const strEvent = JSON.stringify(photoshopInput, null, 2);
     const sNSParams = {
       Message: strEvent,
       // TODO: Track this as dependency
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel",
+      TopicArn: 'arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel',
     };
 
     sns.publish(sNSParams, (err, data) => {
@@ -274,7 +272,7 @@ class AutodeckService {
           slug: input.slug,
           isSeed: true,
           logo: pitchdeckData?.uploadLogo,
-          willGenerateFakeData: true
+          willGenerateFakeData: true,
         };
         await this.customerService.createWorkspace(workspaceInput, userId)
       } catch (e) {
@@ -300,7 +298,7 @@ class AutodeckService {
 
     const params = {
       Bucket: adjusedLogoInput.bucket,
-      Prefix: `${adjusedLogoInput.id}/`
+      Prefix: `${adjusedLogoInput.id}/`,
     };
 
     const logoKey = await new Promise((resolve, reject) => {
@@ -349,7 +347,7 @@ class AutodeckService {
     const strEvent = JSON.stringify(whitifyImageInput, null, 2);
     const sNSParams = {
       Message: strEvent,
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:WhitifyImageChannel",
+      TopicArn: 'arn:aws:sns:eu-central-1:118627563984:WhitifyImageChannel',
     }
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
@@ -360,12 +358,12 @@ class AutodeckService {
    * Starts the resizeImage lambda
    * @param input object containing S3 bucket and S3 key properties
    */
-  static resizeImage = (input: { bucket: string, key: string }) => {
+  static resizeImage = (input: { bucket: string; key: string }) => {
 
     const strEvent = JSON.stringify(input, null, 2);
     const sNSParams = {
       Message: strEvent,
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:ResizeImageChannel"
+      TopicArn: 'arn:aws:sns:eu-central-1:118627563984:ResizeImageChannel',
     }
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
@@ -381,7 +379,7 @@ class AutodeckService {
     const strEvent = JSON.stringify(removePixelRangeEventInput, null, 2);
     const sNSParams = {
       Message: strEvent,
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PixalAdjustmentChannel"
+      TopicArn: 'arn:aws:sns:eu-central-1:118627563984:PixalAdjustmentChannel',
     }
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
@@ -402,7 +400,7 @@ class AutodeckService {
       requiresRembg: input.requiresRembg || false,
       requiresScreenshot: input.requiresWebsiteScreenshot || false,
       requiresColorExtraction: input.requiresColorExtraction || false,
-      processLocationId: input.jobLocationId || '-1'
+      processLocationId: input.jobLocationId || '-1',
     });
 
     if (!input.requiresColorExtraction) {
@@ -420,13 +418,13 @@ class AutodeckService {
         bucket: 'haas-autodeck-logos',
         requiresRembg: input.requiresRembg,
         requiresScreenshot: input.requiresWebsiteScreenshot,
-        requiresColorExtraction: input.requiresColorExtraction
+        requiresColorExtraction: input.requiresColorExtraction,
       }
       const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
       const logoManipulationSNSParams = {
         Message: strLogoManipulationEvent,
         // TODO: Track this as dependency
-        TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
+        TopicArn: 'arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel',
       }
       sns.publish(logoManipulationSNSParams, (err, data) => {
         if (err) console.log('ERROR: ', err);
@@ -441,13 +439,13 @@ class AutodeckService {
         jobId: input.id || '',
         requiresRembg: input.requiresRembg,
         requiresScreenshot: input.requiresWebsiteScreenshot,
-        requiresColorExtraction: input.requiresColorExtraction
+        requiresColorExtraction: input.requiresColorExtraction,
       }
       const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
       const screenshotSNSParams = {
         Message: strScreenshotEvent,
         // TODO: Track this as dependency
-        TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
+        TopicArn: 'arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel',
       };
       sns.publish(screenshotSNSParams, (err, data) => {
         if (err) console.log('ERROR: ', err);
@@ -470,7 +468,7 @@ class AutodeckService {
 
     const params = {
       Bucket: 'haas-autodeck-logos',
-      Prefix: `${id}/`
+      Prefix: `${id}/`,
     };
 
     const logoKey = await new Promise((resolve, reject) => {
@@ -511,7 +509,7 @@ class AutodeckService {
       })
 
     const colorPalette = dominantColorsCSV.length > 0 ? dominantColorsCSV[1] : [];
-    const result: { colors: Array<string>, rembgLogoUrl: string, websiteScreenshotUrl: string }
+    const result: { colors: Array<string>; rembgLogoUrl: string; websiteScreenshotUrl: string }
       = { colors: colorPalette, rembgLogoUrl, websiteScreenshotUrl };
     return result;
   };

@@ -1,4 +1,4 @@
-import { enumType, inputObjectType } from '@nexus/schema';
+import { enumType, inputObjectType } from 'nexus';
 
 export const DeliveryConnectionOrderByInput = inputObjectType({
   name: 'DeliveryConnectionOrderByInput',
@@ -14,7 +14,7 @@ export const DeliveryConnectionOrderType = enumType({
   name: 'DeliveryConnectionOrder',
   description: 'Fields to order DeliveryConnection by.',
 
-  members: ['createdAt']
+  members: ['createdAt'],
 });
 
 export const DeliveryConnectionFilterInput = inputObjectType({
@@ -38,5 +38,5 @@ export const DeliveryConnectionFilterInput = inputObjectType({
     // Paginate
     t.int('offset', { nullable: true });
     t.int('perPage', { required: false, default: 10 });
-  }
+  },
 })
