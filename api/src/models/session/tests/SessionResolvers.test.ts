@@ -7,7 +7,7 @@ import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { seedDialogue, seedSessions, seedUser, seedWorkspace } from '../../../test/utils/seedTestData';
 import AuthService from '../../auth/AuthService';
 import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
-import { defaultAdminRole, defaultManagerRole, defaultUserRole } from '../../templates/defaultWorkspaceTemplate';
+import { defaultAdminRole, defaultManagerRole, defaultUserRole } from '../../templates/TemplateTypes';
 
 jest.setTimeout(30000);
 
