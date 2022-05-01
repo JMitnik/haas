@@ -8,7 +8,8 @@ import { isPresent } from 'ts-is-present';
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
-import defaultWorkspaceTemplate, { defaultMassSeedTemplate, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import defaultWorkspaceTemplate, { defaultMassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
+import { WorkspaceTemplate } from '../templates/TemplateTypes';
 import prisma from '../../config/prisma';
 import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
@@ -18,7 +19,8 @@ import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType'
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
 import NodeEntryService from '../node-entry/NodeEntryService';
-import { parseCsv } from '../../utils/parseCsv';
+import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
+import TemplateService from '../templates/TemplateService';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -30,6 +32,7 @@ class CustomerService {
   dialogueStatisticsService: DialogueStatisticsService;
   nodeEntryService: NodeEntryService;
   sessionPrismaAdapter: SessionPrismaAdapter;
+  templateService: TemplateService;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -41,6 +44,7 @@ class CustomerService {
     this.nodeService = new NodeService(prismaClient);
     this.nodeEntryService = new NodeEntryService(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
+    this.templateService = new TemplateService(prismaClient);
   }
 
   /**
@@ -441,10 +445,10 @@ class CustomerService {
 
       if (!dialogue) throw 'ERROR: No dialogue created!'
       // Step 2: Make the leafs
-      const leafs = await this.nodeService.createTemplateLeafNodes(defaultMassSeedTemplate.leafNodes, dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.MASS_SEED, dialogue.id);
 
       // Step 3: Make nodes
-      await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
+      await this.templateService.createTemplateNodes(dialogue.id, customer.name, leafs, 'MASS_SEED');
       await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate, maxSessions, isStrict);
     }
 
@@ -582,10 +586,10 @@ class CustomerService {
 
     if (!dialogue) throw 'ERROR: No dialogue created!'
     // Step 2: Make the leafs
-    const leafs = await this.nodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
+    const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
 
     // Step 3: Make nodes
-    await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
+    await this.templateService.createTemplateNodes(dialogue.id, customer.name, leafs, 'DEFAULT');
 
     // Step 4: possibly
     if (willGenerateFakeData) {

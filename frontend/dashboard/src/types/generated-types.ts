@@ -938,6 +938,15 @@ export type DialogueStatisticsSummaryModel = {
   dialogue?: Maybe<Dialogue>;
 };
 
+export enum DialogueTemplateType {
+  SportEng = 'SPORT_ENG',
+  SportNl = 'SPORT_NL',
+  BusinessEng = 'BUSINESS_ENG',
+  BusinessNl = 'BUSINESS_NL',
+  Default = 'DEFAULT',
+  MassSeed = 'MASS_SEED'
+}
+
 export type DialogueWhereUniqueInput = {
   id?: Maybe<Scalars['ID']>;
   slug?: Maybe<Scalars['String']>;
@@ -1118,6 +1127,7 @@ export type GenerateWorkspaceCsvInputType = {
   workspaceSlug: Scalars['String'];
   workspaceTitle: Scalars['String'];
   uploadedCsv: Scalars['Upload'];
+  type?: Maybe<DialogueTemplateType>;
 };
 
 export type GetAutomationInput = {

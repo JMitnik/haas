@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
 import DialogueService from '../models/questionnaire/DialogueService';
-import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultUserRole } from '../models/templates/defaultWorkspaceTemplate';
+import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultUserRole } from '../models/templates/TemplateTypes';
 
 const prisma = new PrismaClient();
 const dialogueService = new DialogueService(prisma);
@@ -28,7 +28,7 @@ export const createSeedTables = async () => {
     data: {
       id: 'USER_admin_1',
       email: 'admin@haas.live',
-      globalPermissions: { set: ['CAN_ACCESS_ADMIN_PANEL']},
+      globalPermissions: { set: ['CAN_ACCESS_ADMIN_PANEL'] },
       firstName: 'Jojo',
       lastName: 'Rabbit',
     },
@@ -38,7 +38,7 @@ export const createSeedTables = async () => {
     data: {
       id: 'BOT_admin_1',
       email: 'bot@haas.live',
-      globalPermissions: { set: ['CAN_ACCESS_ADMIN_PANEL']},
+      globalPermissions: { set: ['CAN_ACCESS_ADMIN_PANEL'] },
       firstName: 'Bot',
       lastName: '',
     },
@@ -93,7 +93,7 @@ export const createSeedTables = async () => {
   await prisma.userOfCustomer.create({
     data: {
       customer: { connect: { id: 'WORKSPACE_1' } },
-      role: { connect:{ id: adminRole.id }  },
+      role: { connect: { id: adminRole.id } },
       user: { connect: { id: 'USER_admin_1' } },
     },
   });
@@ -101,7 +101,7 @@ export const createSeedTables = async () => {
   await prisma.userOfCustomer.create({
     data: {
       customer: { connect: { id: 'WORKSPACE_1' } },
-      role: { connect:{ id: botRole.id }  },
+      role: { connect: { id: botRole.id } },
       user: { connect: { id: 'BOT_admin_1' } },
     },
   });
@@ -114,4 +114,4 @@ export const seed = async () => {
   process.exit(0);
 };
 
-seed().then(() => {}).catch(err => {console.log(err)}).finally(() => {});
+seed().then(() => { }).catch(err => { console.log(err) }).finally(() => { });

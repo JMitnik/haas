@@ -1,11 +1,12 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
+import Select from 'react-select';
 
-import { refetchMeQuery, useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
+import { DialogueTemplateType, refetchMeQuery, useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
 import { useLogger } from 'hooks/useLogger';
 import { useToast } from 'hooks/useToast';
 import FileDropInput from 'components/FileDropInput';
@@ -13,9 +14,32 @@ import FileDropInput from 'components/FileDropInput';
 const schema = yup.object({
   workspaceTitle: yup.string().required(),
   workspaceSlug: yup.string().required(),
+  dialogueType: yup.object().shape({
+    label: yup.string().notRequired(),
+    value: yup.mixed<DialogueTemplateType>().oneOf(Object.values(DialogueTemplateType)),
+  }).required(),
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
+
+const DIALOGUE_TYPE_OPTIONS = [
+  {
+    label: 'DEFAULT',
+    value: DialogueTemplateType.Default,
+  },
+  {
+    label: 'BUSINESS (ENG)',
+    value: DialogueTemplateType.BusinessEng,
+  },
+  {
+    label: 'SPORT (ENG)',
+    value: DialogueTemplateType.SportEng,
+  },
+  {
+    label: 'SPORT (NL)',
+    value: DialogueTemplateType.SportNl,
+  },
+];
 
 export const ImportWorkspaceCSVForm = () => {
   const history = useHistory();
@@ -53,12 +77,15 @@ export const ImportWorkspaceCSVForm = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
+    const type = formData.dialogueType.value;
+
     importWorkspaceCSV({
       variables: {
         input: {
           workspaceTitle: formData.workspaceTitle,
           workspaceSlug: formData.workspaceSlug,
           uploadedCsv: activeCSV,
+          type,
         },
       },
     });
@@ -88,6 +115,27 @@ export const ImportWorkspaceCSVForm = () => {
               leftAddOn="https://client.haas.live/"
               name="workspaceSlug"
               ref={form.register({ required: true })}
+            />
+          </UI.FormControl>
+
+          <UI.FormControl isRequired>
+            <UI.FormLabel htmlFor="dialogueType">{t('dialogue')}</UI.FormLabel>
+            <Controller
+              name="dialogueType"
+              control={form.control}
+              defaultValue={{ label: 'DEFAULT', value: 'DEFAULT' }}
+              render={({ value, onChange, onBlur }) => (
+                <Select
+                  placeholder="Select a template type"
+                  classNamePrefix="select"
+                  className="select"
+                  defaultOptions
+                  options={DIALOGUE_TYPE_OPTIONS}
+                  value={value}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                />
+              )}
             />
           </UI.FormControl>
 
