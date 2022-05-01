@@ -74,7 +74,9 @@ export const SubtlePageSubHeading = styled(Text)`
   `}
 `;
 
-export const Paragraph = styled(GenericType).attrs({ as: 'p' })``;
+export const Paragraph = styled(GenericType).attrs({ as: 'p' })`
+  font-size: 1rem;
+`;
 
 export const H1 = styled(GenericType).attrs({ as: 'h1' })`
   ${({ theme }) => css`
@@ -97,6 +99,7 @@ export const PageHeading = styled(H2).attrs({ 'data-cy': 'PageHeading', role: 'h
 export const H3 = styled(GenericType).attrs({ as: 'h3' })`
   ${({ theme }) => css`
     font-size: ${theme.fontSizes[3]}px;
+    letter-spacing: 0.014em;
   `}
 `;
 

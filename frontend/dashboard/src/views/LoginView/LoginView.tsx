@@ -1,28 +1,27 @@
 import * as UI from '@haas/ui';
-import { Div, Form, FormControl, InputGrid, Text } from '@haas/ui';
-import { Mail, Send } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useToast } from '@chakra-ui/core';
 import React from 'react';
 
+import { LogoThumbnail } from 'components/Logo';
+import { useDocumentTitle } from 'hooks/useDocumentTitle';
 import { useLogger } from 'hooks/useLogger';
 import { useRequestInviteMutation } from 'types/generated-types';
+import { useToast } from 'hooks/useToast';
 import AnimatedRoute from 'components/Routes/AnimatedRoute';
 import AnimatedRoutes from 'components/Routes/AnimatedRoutes';
-import LogoIcon from 'components/Logo/Logo';
 import ServerError from 'components/ServerError';
 
-import * as LS from './LoginViewStyles';
+import * as LS from './LoginView.styles';
 
 interface FormData {
   email: string;
-  password: string;
 }
 
 const baseRoute = '/public/login';
 
 const LoginView = () => {
+  useDocumentTitle('haas | Login');
   const history = useHistory();
   const toast = useToast();
   const logger = useLogger();
@@ -35,12 +34,9 @@ const LoginView = () => {
   const [requestInvite, { error: loginServerError, loading: isRequestingInvite }] = useRequestInviteMutation({
     onCompleted: (data) => {
       if (data.requestInvite.didInvite) {
-        toast({
+        toast.success({
           title: 'Invite has been sent in case the mail matches!',
           description: 'Check your email for your invitation',
-          status: 'success',
-          position: 'bottom-right',
-          isClosable: true,
         });
 
         history.push(`${baseRoute}/waiting`);
@@ -49,13 +45,7 @@ const LoginView = () => {
       }
     },
     onError: (error) => {
-      toast({
-        title: 'Unexpected error!',
-        description: 'See the form for more information.',
-        status: 'error',
-        position: 'bottom-right',
-        isClosable: true,
-      });
+      toast.templates.error();
 
       logger.logError(error, {
         tags: {
@@ -69,138 +59,70 @@ const LoginView = () => {
   });
 
   const handleRequestInvite = async (data: FormData) => {
-    requestInvite({
-      variables: {
-        input: { email: data.email },
-      },
-    });
+    history.push(`${baseRoute}/waiting`);
+    // requestInvite({
+    //   variables: {
+    //     input: { email: data.email },
+    //   },
+    // });
   };
 
   const sentEmail = form.watch('email');
 
   return (
-    <LS.LoginViewContainer>
-      <LS.LoginContentContainer>
-        <LogoIcon color="gray.500" mb={4} />
-        <UI.Text fontSize="2rem" fontWeight="800" color="gray.800" mb={2}>
-          Sign in to Haas
-        </UI.Text>
-        <UI.Card minHeight="250px" width="100%" maxWidth={600} bg="white" noHover>
-          <UI.CardBody
-            overflow="hidden"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <AnimatedRoutes>
-              <AnimatedRoute exact path={`${baseRoute}`}>
-                <Form onSubmit={form.handleSubmit(handleRequestInvite)}>
-                  <ServerError serverError={loginServerError} />
-
-                  <UI.FormSectionHelper>
-                    Welcome to Haas Dashboard! To continue, input your email below, and we will send you a login link
-                  </UI.FormSectionHelper>
-
-                  <UI.Div mt={2}>
-                    <InputGrid gridTemplateColumns="1fr">
-                      <Div>
-                        <FormControl>
-                          <UI.FormLabel
-                            fontSize="1rem"
-                            htmlFor="email"
-                          >
-                            Email
-                          </UI.FormLabel>
-                          <UI.Input
-                            name="email"
-                            id="email"
-                            autoFocus
-                            variant="filled"
-                            type="email"
-                            autoComplete="username"
-                            ref={form.register({ required: true })}
-                            leftEl={<Mail />}
-                            placeholder="bunny@haas.live"
-                          />
-                        </FormControl>
-                      </Div>
-                    </InputGrid>
+    <LS.FullHeight>
+      <UI.Grid height="100%" gridTemplateColumns={['1fr', '1fr', '4fr 3fr']}>
+        <UI.Flex height="100%" maxWidth={900} alignItems="center" justifyContent="center" px={[4]}>
+          <AnimatedRoutes>
+            <AnimatedRoute exact path={`${baseRoute}`}>
+              <UI.Flex alignItems="center" style={{ height: '100%' }}>
+                <UI.Form onSubmit={form.handleSubmit(handleRequestInvite)}>
+                  <UI.Div maxWidth={500}>
+                    <LogoThumbnail />
+                    <UI.H3 mt={4} color="off.600" fontWeight={800}>Sign in with your email</UI.H3>
+                    <UI.Paragraph color="off.500">
+                      Enter your email and we will send you a login link to access the dashboard.
+                    </UI.Paragraph>
+                    <UI.Div mt={4}>
+                      <UI.FormControl mb={4}>
+                        <UI.FormLabel htmlFor="email">Email</UI.FormLabel>
+                        <UI.Input name="email" ref={form.register()} />
+                      </UI.FormControl>
+                      <UI.Button width="100%" variantColor="main" type="submit">
+                        Continue
+                      </UI.Button>
+                    </UI.Div>
                   </UI.Div>
+                </UI.Form>
+              </UI.Flex>
+            </AnimatedRoute>
 
-                  <UI.Button
-                    variantColor="teal"
-                    leftIcon={Send}
-                    type="submit"
-                    isDisabled={!form.formState.isValid}
-                    mt={4}
-                    isLoading={isRequestingInvite}
-                    loadingText="Logging in"
-                  >
-                    Send login link
-                  </UI.Button>
-                </Form>
-              </AnimatedRoute>
-              <AnimatedRoute path={`${baseRoute}/waiting`}>
-                <UI.Flex height="100%" alignItems="center" justifyContent="center">
-                  <UI.Div>
-                    <Text fontSize="1.8rem" color="gray.600" textAlign="center">
-                      Check your mail!
-                    </Text>
-                    { }
-                    <Text textAlign="center" fontSize="1rem" fontWeight="300" color="gray.500">
-                      <>
-                        {sentEmail && (
-                          <UI.Span>
-                            We sent an email to
-                            {' '}
-                            <UI.Span fontWeight="700">
-                              {sentEmail}
-                              .
-                            </UI.Span>
-                          </UI.Span>
-                        )}
-                        <br />
-                        You should receive an invitation link very soon!
-                      </>
-                    </Text>
-                  </UI.Div>
-                </UI.Flex>
-              </AnimatedRoute>
-              <AnimatedRoute path={`${baseRoute}/not-exist`}>
-                <UI.Flex height="100%" alignItems="center" justifyContent="center">
-                  <UI.Div>
-                    <Text fontSize="1.8rem" color="gray.600" textAlign="left">
-                      User not found!
-                    </Text>
-                    { }
-                    <Text textAlign="left" fontSize="1rem" fontWeight="300" color="gray.500">
-                      <>
-                        {sentEmail && (
-                          <>
-                            We cannot find an email by
-                            {' '}
-                            <UI.Span fontWeight="700">{sentEmail}</UI.Span>
-                            .
-                            <br />
-                          </>
-                        )}
-                        Please check if the mail is correct, and otherwise reach us for more help.
-                      </>
-                    </Text>
-                    <UI.Button
-                      mt={3}
-                      onClick={() => history.push(baseRoute)}
-                    >
-                      Go back
-                    </UI.Button>
-                  </UI.Div>
-                </UI.Flex>
-              </AnimatedRoute>
-            </AnimatedRoutes>
-          </UI.CardBody>
-        </UI.Card>
-      </LS.LoginContentContainer>
-    </LS.LoginViewContainer>
+            <AnimatedRoute exact path={`${baseRoute}/waiting`}>
+              <UI.Flex height="100%" alignItems="center" maxWidth={500}>
+                Test
+              </UI.Flex>
+            </AnimatedRoute>
+          </AnimatedRoutes>
+        </UI.Flex>
+
+        <LS.LoginFeatures display={['none', 'none', 'block']}>
+          <UI.Flex height="100%" alignItems="center" justifyContent="center">
+            <UI.Div px={4} py={100} maxWidth={750}>
+              <img src="/assets/images/login-feature-1.svg" alt="Login feature 1" />
+
+              <UI.Div mt={75}>
+                <UI.H2 color="white" fontWeight={800} textAlign="center">
+                  Observable insights
+                </UI.H2>
+                <UI.Paragraph color="white" textAlign="center">
+                  The haas dashboard makes observing and maintaining the happiness of your accessible and observable.
+                </UI.Paragraph>
+              </UI.Div>
+            </UI.Div>
+          </UI.Flex>
+        </LS.LoginFeatures>
+      </UI.Grid>
+    </LS.FullHeight>
   );
 };
 

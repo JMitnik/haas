@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+import theme from 'config/theme';
 
 const GlobalStyle = createGlobalStyle`
   :root {
@@ -30,17 +31,12 @@ const GlobalStyle = createGlobalStyle`
     position: relative;
   }
 
-  @font-face {
-    font-family: 'Inter';
-    src: url('/assets/fonts/inter/Inter.ttf') format('ttf'),
-  }
-
   body {
     margin: 0;
     font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-    font-family: 'Inter', sans-serif;
+    font-family: ${theme.fontFamilies.body};
 
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

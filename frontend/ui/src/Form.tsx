@@ -182,7 +182,7 @@ export const Input = forwardRef(({ id, ...props }: InputProps, ref: Ref<HTMLInpu
       roundedTopRight={props.rightAddOn ? '0' : 'auto'}
       id={id}
       {...props}
-      fontSize="0.8rem"
+      fontSize="0.9rem"
       ref={ref}
     />
   </InputGroup>

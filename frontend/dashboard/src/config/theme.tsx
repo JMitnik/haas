@@ -69,6 +69,7 @@ const theme = {
     },
     strongPrimary: '#8cb6ff',
     primaryGradient: undefined,
+    mainGradient: 'linear-gradient(180deg, #90A2F3 0%, #6074CC 100%);',
     secondary: '#6f6594',
     tertiary: '#3182CE',
     black: 'black',
@@ -148,7 +149,7 @@ const theme = {
   containerWidth: 1400,
   // TODO: Add
   fontFamilies: {
-    body: '',
+    body: 'Lato, sans-serif',
     title: '',
     special: '',
   },
@@ -160,7 +161,7 @@ const theme = {
   // zIndices: {
   //   dropdown: 200,
   // },
-  fontSizes: [8, 12, 22, 28, 36, 48],
+  fontSizes: [8, 14, 20, 24, 32, 40],
   buttonSizes: {
     sm: '8px 12px',
     md: '9px 14px',
@@ -186,7 +187,7 @@ const theme = {
   },
   boxShadows: {
     sm: 'var(--shadow-elevation-low)',
-    md: 'var(--shadow-elevation-medium)',
+    md: '0px 2px 5px -1px rgba(50, 50, 93, 0.25), 0px 1px 3px -1px rgba(0, 0, 0, 0.3)',
     lg: 'var(--shadow-elevation-high)',
   },
 };

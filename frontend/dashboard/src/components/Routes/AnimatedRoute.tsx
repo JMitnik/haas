@@ -4,16 +4,22 @@ import React from 'react';
 
 const routeAnimation: Variants = {
   initial: {
-    x: '-10%',
     opacity: 0,
+    transition: {
+      opacity: { duration: 0.2, type: 'tween' },
+    },
   },
   enter: {
-    x: 0,
     opacity: 1,
+    transition: {
+      opacity: { duration: 0.2, type: 'tween' },
+    },
   },
   exit: {
-    x: '-10%',
     opacity: 0,
+    transition: {
+      opacity: { duration: 0.2, type: 'tween' },
+    },
   },
 };
 

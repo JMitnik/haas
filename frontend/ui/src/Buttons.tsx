@@ -18,7 +18,7 @@ const ButtonContainer = styled.div`
 
 export const Button = React.forwardRef((props: ButtonProps, ref) => (
   <ButtonContainer>
-    <ChakraButton {...props} ref={ref} />
+    <ChakraButton borderRadius={10} variantColor="main" {...props} ref={ref} />
   </ButtonContainer>
 ));
 

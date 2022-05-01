@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 
 import { Div, GenericProps, H2 } from '@haas/ui';
 import { ReactComponent as SVGLogo } from 'assets/logo.svg';
+import { ReactComponent as SVGLogoThumbnail } from 'assets/images/logo-thumbnail.svg';
 
 export const LogoIconContainer = styled(Div) <{ fill?: string }>`
   ${({ theme }) => css`
@@ -121,6 +122,10 @@ export const FilledLogo = (props: any) => (
   <FilledLogoContainer {...props}>
     <SVGLogo />
   </FilledLogoContainer>
+);
+
+export const LogoThumbnail = (props: any) => (
+  <SVGLogoThumbnail />
 );
 
 export default LogoIcon;
