@@ -1,10 +1,11 @@
+import * as UI from '@haas/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Div, GenericProps, H2 } from '@haas/ui';
 import { ReactComponent as SVGLogo } from 'assets/logo.svg';
 
-export const LogoContainer = styled(Div) <{ fill?: string }>`
+export const LogoIconContainer = styled(Div) <{ fill?: string }>`
   ${({ theme }) => css`
     display: flex;
 
@@ -79,9 +80,40 @@ export const FullLogo = (props: any) => (
   </FullLogoContainer>
 );
 
+export const LogoIcon = (props: any) => (
+  <LogoIconContainer {...props}>
+    <SVGLogo />
+  </LogoIconContainer>
+);
+
+export const LogoContainer = styled(Div)`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    font-weight: 900;
+    font-size: 1.5rem;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    ${theme && css`
+      svg path {
+        fill: currentColor;
+      }
+    `}
+
+    img {
+      max-width: 100%;
+    }
+  `}
+`;
+
 export const Logo = (props: any) => (
   <LogoContainer {...props}>
-    <SVGLogo />
+    <LogoIcon width="60px" height="60px" justifyContent="center" />
+    <UI.Text>haas</UI.Text>
   </LogoContainer>
 );
 
@@ -91,4 +123,4 @@ export const FilledLogo = (props: any) => (
   </FilledLogoContainer>
 );
 
-export default Logo;
+export default LogoIcon;

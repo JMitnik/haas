@@ -38,15 +38,15 @@ export const ViewTitle = ({ leftIcon, children, ...props }: ViewTitleProps) => (
 
 const ViewHeadContainer = styled(Div)`
   ${({ theme }) => css`
-    background: ${theme.colors.gray[100]};
-    padding: ${theme.gutter / 2}px ${theme.gutter}px;
-    border-bottom: 1px solid ${theme.colors.gray[200]};
+    /* background: ${theme.colors.gray[100]}; */
+    padding: ${theme.gutter}px ${theme.gutter}px;
+    /* border-bottom: 1px solid ${theme.colors.gray[200]}; */
     position: sticky;
     top: 0;
     left: 0;
     right: 0;
     z-index: 100;
-    box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+    /* box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px; */
 
     ${ViewTitleContainer} {
       margin-bottom: 0;
@@ -84,7 +84,7 @@ export const ViewBody = styled(Div) <{ isCompact?: boolean; }>`
 ${({ theme, isCompact, padding }) => css`
   margin: 0 auto;
   padding: ${padding ? padding.toString() : `${theme.gutter}px`};
-  background: ${theme.colors.gray[50]};
+  background: ${theme.colors.app.background};
 
   ${isCompact && css`
     max-width: 1400px;

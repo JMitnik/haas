@@ -111,7 +111,7 @@ export const WorkspaceGridAdapter = ({
 
   return (
     <LS.WorkspaceGridAdapterContainer>
-      <LS.WidgetHeader>
+      {/* <LS.WidgetHeader>
         <UI.Flex>
           <UI.Div>
             <UI.Div
@@ -141,7 +141,7 @@ export const WorkspaceGridAdapter = ({
             </UI.Div>
           </UI.Div>
         </UI.Flex>
-      </LS.WidgetHeader>
+      </LS.WidgetHeader> */}
       <WorkspaceGrid
         backgroundColor={backgroundColor}
         initialViewMode={initialViewMode}

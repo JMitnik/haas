@@ -21,6 +21,8 @@ export const Card = styled(Div) <CardProps>`
     flex-direction: column;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
     box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+    box-shadow: ${theme.boxShadows.md};
+    border: 1px solid ${theme.colors.gray[100]};
 
     ${willFocusWithin && css`
       &:focus-within {

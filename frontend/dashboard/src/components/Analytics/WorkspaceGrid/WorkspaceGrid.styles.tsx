@@ -4,11 +4,15 @@ import styled, { css } from 'styled-components';
 
 export const WorkspaceGridAdapterContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    background: white;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    /* background: white; */
+    /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px; */
     /* padding: ${theme.gutter * 1.5}px; */
-    border-radius: 8px;
-    border: 1px solid #f7f6f6;
+    border-radius: 20px;
+    border: 1px solid ${theme.colors.gray[200]};
+
+    svg {
+      border-radius: 20px;
+    }
   `}
 `;
 
@@ -45,10 +49,11 @@ interface WorkspaceGridContainerProps {
   backgroundColor: string;
 }
 
-export const WorkspaceGridContainer = styled(UI.Div)<WorkspaceGridContainerProps>`
+export const WorkspaceGridContainer = styled(UI.Div) <WorkspaceGridContainerProps>`
   ${({ theme, backgroundColor }) => css`
     /* border-bottom: 1px solid ${theme.colors.gray[200]}; */
     background: ${backgroundColor};
+    border-radius: 20px;
     position: relative;
     svg polygon:hover {
       stroke: red;
@@ -94,7 +99,7 @@ export const WorkspaceGridPaneContainer = styled(UI.Div)`
   ${({ theme }) => css`
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075), 0 2px 8px rgba(0, 0, 0, 0.06);
     background: white;
-    border-radius: 12px;
+    border-radius: 20px;
 
     > * {
       padding: 36px;

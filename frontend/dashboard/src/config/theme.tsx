@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 import { theme as chakraTheme } from '@chakra-ui/core';
 import { generatePalette } from 'utils/ColorUtils';
 
@@ -13,16 +14,25 @@ const theme = {
     primaryAlt: '#8cb6ff',
     primaries: generatePalette('#426b3a'),
     main: {
-      50: '#eef0f9',
-      100: '#dee1f4',
-      200: '#bdc2e8',
-      300: '#9ba4dd',
-      400: '#7a85d1',
-      500: '#5967c6',
-      600: '#47529e',
-      700: '#353e77',
-      800: '#24294f',
-      900: '#121528',
+      50: '#eceefa',
+      100: '#d8ddf5',
+      150: '#c5cdf0',
+      200: '#b1bceb',
+      250: '#9eabe6',
+      300: '#8b9ae0',
+      350: '#7789db',
+      400: '#6479d6',
+      450: '#5068d1',
+      500: '#3d57cc',
+      550: '#374eb8',
+      600: '#3146a3',
+      650: '#2b3d8f',
+      700: '#25347a',
+      750: '#1f2c66',
+      800: '#182352',
+      850: '#121a3d',
+      900: '#0c1129',
+      950: '#060914',
     },
     off: {
       50: '#ffffff',
@@ -37,15 +47,25 @@ const theme = {
       900: '#151620',
     },
     neutral: {
-      100: '#f1f4ff',
-      200: '#eff3ff',
-      300: '#d7dbe6',
-      400: '#bfc2cc',
-      500: '#a7aab3',
-      600: '#8f9299',
-      700: '#787a80',
+      50: '#FDFEFF',
+      100: '#FCFDFF',
+      150: '#FAFBFF',
+      200: '#F9FAFF',
+      250: '#F7F9FF',
+      300: '#F5F8FF',
+      350: '#F4F7FF',
+      400: '#F2F5FF',
+      450: '#F1F4FF',
+      500: '#EFF3FF',
+      550: '#D7DBE6',
+      600: '#BFC2CC',
+      650: '#A7AAB3',
+      700: '#8F9299',
+      750: '#787A80',
       800: '#606166',
-      900: '#48494c',
+      850: '#48494C',
+      900: '#303133',
+      950: '#181819',
     },
     strongPrimary: '#8cb6ff',
     primaryGradient: undefined,
@@ -56,6 +76,27 @@ const theme = {
     success: '#38B2AC',
     warning: '#ECC94B',
     error: '#F56565',
+    red: {
+      50: '#feedf1',
+      100: '#fddbe4',
+      150: '#fdc9d6',
+      200: '#fcb7c9',
+      250: '#fba5bb',
+      300: '#fa92ad',
+      350: '#f980a0',
+      400: '#f96e92',
+      450: '#f85c85',
+      500: '#f74a77',
+      550: '#de436b',
+      600: '#c63b5f',
+      650: '#ad3453',
+      700: '#942c47',
+      750: '#7c253c',
+      800: '#631e30',
+      850: '#4a1624',
+      900: '#310f18',
+      950: '#19070c',
+    },
     altGray: {
       50: '#edf2f7',
       100: '#cedae2',
@@ -91,6 +132,7 @@ const theme = {
       text: '#4f5d6e',
     },
     app: {
+      topbar: '',
       sidebar: '',
       background: '',
       onWhite: '',
@@ -113,7 +155,7 @@ const theme = {
   sidenav: {
     // Note-sidenav: uncomment to get back old sidenav
     // width: 200,
-    width: 220,
+    width: 250,
   },
   // zIndices: {
   //   dropdown: 200,
@@ -125,9 +167,9 @@ const theme = {
     lg: '18px 24px',
   },
   borderRadiuses: {
-    sm: '3px',
-    md: '7px',
-    lg: '20px',
+    sm: 5,
+    md: 10,
+    lg: 20,
     subtleRounded: '3px',
     somewhatRounded: '10px',
     rounded: '50px',
@@ -142,6 +184,11 @@ const theme = {
     md: 768,
     lg: 1280,
   },
+  boxShadows: {
+    sm: 'var(--shadow-elevation-low)',
+    md: 'var(--shadow-elevation-medium)',
+    lg: 'var(--shadow-elevation-high)',
+  },
 };
 
 export const chakraDefaultTheme = {
@@ -151,8 +198,9 @@ export const chakraDefaultTheme = {
 };
 
 // Dependent variables - Generic
-theme.colors.app.background = theme.colors.default.normal;
-theme.colors.app.sidebar = theme.colors.white;
+theme.colors.app.background = theme.colors.white;
+theme.colors.app.sidebar = theme.colors.neutral[300];
+theme.colors.app.topbar = theme.colors.white;
 
 // Dependent variables - colors on white
 theme.colors.app.onWhite = theme.colors.default.darkest;

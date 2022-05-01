@@ -1,10 +1,12 @@
 import { Div } from '@haas/ui';
-import { NavItemContainer, NavItems } from 'components/Sidenav/Sidenav';
+import { NavItemContainer } from 'layouts/WorkspaceLayout/WorkspaceNav';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import * as LS from './WorkpaceLayout.styles';
+
 const MobileBottomNavContainer = styled(Div)`
-	${({ theme }) => css`
+  ${({ theme }) => css`
     position: fixed;
     height: 80px;
     left: 0;
@@ -14,10 +16,10 @@ const MobileBottomNavContainer = styled(Div)`
     background: ${theme.colors.primary};
     display: flex;
 
-    ${NavItems} {
+    ${LS.NavItems} {
       display: flex;
       align-items: center;
-      
+
       ${NavItemContainer} {
         margin-top: 0;
       }

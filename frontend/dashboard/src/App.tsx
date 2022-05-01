@@ -23,7 +23,6 @@ import AdminOverview from 'views/AdminOverview/AdminOverview';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
 import CampaignsView from 'views/CampaignsView/CampaignsView';
-import CustomerLayout from 'layouts/CustomerLayout';
 import CustomerPage from 'pages/dashboard/customer';
 import CustomerProvider from 'providers/CustomerProvider';
 import CustomerRoute from 'components/Routes/CustomerRoute';
@@ -48,12 +47,13 @@ import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 import VerifyTokenPage from 'pages/verify_token';
+import WorkspaceLayout from 'layouts/WorkspaceLayout/WorkspaceLayout';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
     <CustomerProvider>
       <DialogueProvider>
-        <CustomerLayout>
+        <WorkspaceLayout>
           <Switch>
             <CustomerRoute
               path="/dashboard/b/:customerSlug/d/:dialogueSlug"
@@ -177,7 +177,7 @@ const CustomerRoutes = () => (
               )}
             />
           </Switch>
-        </CustomerLayout>
+        </WorkspaceLayout>
       </DialogueProvider>
     </CustomerProvider>
   </AnimatePresence>

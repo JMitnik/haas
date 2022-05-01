@@ -1,11 +1,11 @@
 import { Container, Div } from '@haas/ui';
 
-import { LogoContainer } from 'components/Logo/Logo';
-import Logo from 'components/Logo';
+import { LogoIcon } from 'components/Logo';
+import { LogoIconContainer } from 'components/Logo/Logo';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Usernav, UsernavContainer } from '../components/Sidenav/Sidenav';
+import { Usernav, UsernavContainer } from './WorkspaceLayout/UserNav';
 
 interface PreCustomerLayoutProps {
   children: React.ReactNode;
@@ -23,7 +23,7 @@ const PreCustomerLayoutContainer = styled(Div)`
       left: ${theme.gutter}px;
     }
 
-    ${LogoContainer} svg path {
+    ${LogoIconContainer} svg path {
       fill: ${theme.colors.gray[500]} !important;
     }
   `}
@@ -32,7 +32,7 @@ const PreCustomerLayoutContainer = styled(Div)`
 const PreCustomerLayout = ({ hideUserNav, children }: PreCustomerLayoutProps) => (
   <PreCustomerLayoutContainer>
     <Container mb="48px">
-      <Logo justifyContent="flex-start" />
+      <LogoIcon justifyContent="flex-start" />
     </Container>
     {!hideUserNav && (
       <Usernav />
