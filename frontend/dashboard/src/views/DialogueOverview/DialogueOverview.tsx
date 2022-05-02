@@ -14,6 +14,7 @@ import SurveyIcon from 'components/Icons/SurveyIcon';
 import useAuth from 'hooks/useAuth';
 
 import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
+import { View } from 'layouts/View';
 import DialogueCard from './DialogueCard';
 
 const DialogueOverview = () => {
@@ -55,7 +56,7 @@ const DialogueOverview = () => {
   const pageCount = activeDialogueConnection?.totalPages || 0;
 
   return (
-    <>
+    <View documentTitle="haas | Dialogues">
       <UI.ViewHead>
         <UI.ViewTitle>
           <ViewTitle>{t('dialogues')}</ViewTitle>
@@ -142,7 +143,7 @@ const DialogueOverview = () => {
           </Grid>
         )}
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

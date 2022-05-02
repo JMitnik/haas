@@ -10,7 +10,7 @@ export const useDocumentTitle = (title: string, retainOnUnmount: boolean = false
 
   useEffect(() => () => {
     if (!retainOnUnmount) {
-      document.title = `${envPrefix}${defaultTitle.current}`;
+      document.title = `${defaultTitle.current}`;
     }
   }, []);
 };

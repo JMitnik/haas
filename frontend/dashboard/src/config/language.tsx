@@ -11,6 +11,46 @@ const language = {
     },
   },
   general: {
+    continue: {
+      en: 'Continue',
+      de: 'Weiter',
+    },
+    login_header: {
+      en: 'Sign in with your email',
+      de: 'Mit E-Mail-Adresse anmelden',
+    },
+    login_description: {
+      en: 'Enter your email and we will send you a login link to access the dashboard.',
+      de: 'Gib deine E-Mail-Adresse ein und wir senden dir einen Login-Link zum Dashboard.',
+    },
+    general_success: {
+      en: 'Success!',
+      de: 'Erfolg!',
+    },
+    whoops: {
+      en: 'Whoops!',
+      de: 'Whoops!',
+    },
+    user_received_mail: {
+      en: 'We just sent a mail to {{ user }} with a link to access the dashboard. This link is only accessible for 3 days.',
+      de: 'Wir haben eine Mail an {{ user }} mit einem Link zum Zugriff auf das Dashboard geschickt. Dieser Link ist nur für 3 Tage gültig.',
+    },
+    user_not_exist: {
+      en: 'It seems that the user with mail {{ user }} does not exist in our user-base.',
+      de: 'Es scheint, dass der Benutzer mit der Mail {{ user }} nicht in unserer Benutzer-Datenbank existiert.',
+    },
+    go_back: {
+      en: 'Go back',
+      de: 'Zurück',
+    },
+    observable_insights: {
+      en: 'Observable insights',
+      de: 'Observable insights',
+    },
+    observable_insights_description: {
+      en: 'The haas dashboard makes observing and maintaining the happiness of your accessible and observable.',
+      de: 'Das haas dashboard macht die Beobachtung und Aufrechterhaltung des Glücks Ihres Unternehmens zugänglich und beobachtbar.',
+    },
     create_new_cta: {
       en: 'Create Call-to-Action',
       de: 'Neuen Call-to-Action erstellen',

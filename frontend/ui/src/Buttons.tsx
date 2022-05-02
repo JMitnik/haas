@@ -48,3 +48,7 @@ export const GradientButton = styled(Button)`
 export const IconButton = (props: ChakraIconButtonProps) => (
   <ChakraIconButton {...props} />
 );
+
+interface NavButtonProps extends ButtonProps {
+  to?: string;
+}

@@ -42,6 +42,7 @@ import GlobalLoader from 'components/GlobalLoader';
 import GuardedRoute, { BotRoute } from 'components/Routes/GuardedRoute';
 import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
+import LoginView from 'views/LoginView';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
@@ -192,7 +193,7 @@ const PublicRoutes = () => (
     </Route>
 
     <Route path="/public/login">
-      <LoginPage />
+      <LoginView />
     </Route>
 
     <Route path="/public">

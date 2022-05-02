@@ -87,6 +87,7 @@ export const H1 = styled(GenericType).attrs({ as: 'h1' })`
 export const H2 = styled(GenericType).attrs({ as: 'h2' })`
   ${({ theme }) => css`
     font-size: ${theme.fontSizes[4]}px;
+    font-weight: 800;
   `}
 `;
 
@@ -99,6 +100,7 @@ export const PageHeading = styled(H2).attrs({ 'data-cy': 'PageHeading', role: 'h
 export const H3 = styled(GenericType).attrs({ as: 'h3' })`
   ${({ theme }) => css`
     font-size: ${theme.fontSizes[3]}px;
+    font-weight: 800;
     letter-spacing: 0.014em;
   `}
 `;
@@ -125,8 +127,7 @@ export const Muted = styled(GenericType).attrs({ as: 'p' })`
 
 export const Strong = styled(GenericType).attrs({ as: 'p' })`
   ${({ theme }) => css`
+    display: inline;
     font-weight: 700;
-    font-size: 0.9rem;
-    color: ${theme.colors.gray['600']};
   `}
 `;
