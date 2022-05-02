@@ -175,11 +175,16 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
             <ChatIcon />
             {t('campaigns')}
           </NavItem>
-          <NavItem isDisabled={!canEditCustomer} to={`/dashboard/b/${customerSlug}/edit`}>
-            <SettingsIcon />
-            {t('settings')}
-          </NavItem>
         </AnimateSharedLayout>
+      </motion.ul>
+
+      <UI.Hr />
+
+      <motion.ul>
+        <NavItem isDisabled={!canEditCustomer} to={`/dashboard/b/${customerSlug}/edit`}>
+          <SettingsIcon />
+          {t('settings')}
+        </NavItem>
       </motion.ul>
     </LS.NavItems>
   );

@@ -43,13 +43,13 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
     <ErrorBoundary FallbackComponent={NotAuthorizedView}>
       <CustomThemeProviders>
         <WorkspaceLayoutContainer isMobile={device.isSmall}>
+
           {isLoading && (
             <UI.Div position="absolute" bottom={0} right={0}>
               <Loader testId="runner" />
             </UI.Div>
           )}
           <UI.Div>
-
             {!device.isSmall ? (
               <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
                 <WorkspaceSidenav />

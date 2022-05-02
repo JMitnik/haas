@@ -19,55 +19,62 @@ export const SidenavContainer = styled.div`
     flex-direction: column;
 
     width: ${theme.sidenav.width}px;
-    padding: ${theme.gutter}px;
+    /* padding: ${theme.gutter}px; */
     height: 100%;
 
     background: ${theme.colors.app.sidebar};
 
     ${LogoContainer} {
       color: ${theme.colors.gray[600]};
-      /* color: ${theme.colors.strongPrimary}; */
+      padding: ${theme.gutter}px ${theme.gutter / 2}px;
     }
 
     /* Sidenav list container */
     ${LS.NavItems} {
-      margin-top: ${theme.gutter / 2}px;
     }
 
     /* Sidenav list */
     ${LS.NavItems} ul {
       display: grid;
+      padding: 0 ${theme.gutter / 2}px;
       grid-gap: ${theme.gutter / 4}px;
       list-style: none;
     }
 
+    ${UI.Hr} {
+      margin: ${theme.gutter / 2}px 0;
+      padding: 0;
+    }
+
     /* The actual link items */
     ${NavLinkContainer} {
-      color: ${theme.colors.gray[600]};
-      padding: 4px 11px;
-      font-size: 0.8rem;
-      font-weight: 700;
+      color: #60708b; // TODO: Find a color in the palette for this
+      padding: 6px 11px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: color 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 
       /* For the icons */
       svg {
+        transition: color 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         margin-right: ${theme.gutter / 2}px;
-        width: 21px;
-        fill: ${theme.colors.gray[500]};
+        width: 22px;
 
-        .secondary {
-          fill: ${theme.colors.gray[400]};
-        }
+        fill: #92a0b6; // TODO: Find a color in the palette for this
       }
 
       /* If the link is active (according to react-router) */
       &.active {
-        /* background: ${theme.colors.primaryGradient}; */
         background: linear-gradient(298.18deg, #4C5ABB 0.84%, rgba(96, 111, 219, 0.8) 100%);
         border-radius: ${theme.borderRadiuses.somewhatRounded};
         color: white;
 
-        .secondary {
-          fill: ${theme.colors.main[200]};
+        &:hover {
+          color: white;
+
+          svg {
+            fill: white;
+          }
         }
 
         svg {
@@ -77,11 +84,12 @@ export const SidenavContainer = styled.div`
 
       &:hover {
         color: ${theme.colors.main[600]};
+        transition: color 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 
         svg {
-          fill: ${theme.colors.gray[600]};
+          transition: color 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+          fill: ${theme.colors.main[600]};
         }
-        /* color: ${theme.isDarkColor ? theme.colors.primaries['200'] : theme.colors.primaries['700']}; */
       }
     }
 
