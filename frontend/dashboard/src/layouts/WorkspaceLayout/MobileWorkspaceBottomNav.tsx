@@ -1,5 +1,4 @@
 import { Div } from '@haas/ui';
-import { NavItemContainer } from 'layouts/WorkspaceLayout/WorkspaceNav';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -20,7 +19,7 @@ const MobileBottomNavContainer = styled(Div)`
       display: flex;
       align-items: center;
 
-      ${NavItemContainer} {
+      ${LS.NavItemContainer} {
         margin-top: 0;
       }
     }

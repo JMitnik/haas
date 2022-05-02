@@ -12,11 +12,11 @@ const WorkspaceSwitcherContainer = styled(UI.Div)`
     padding: ${theme.gutter}px;
     border-top: 1px solid ${theme.colors.gray[200]};
     border-right: 1px solid ${theme.colors.neutral[500]};
-    transition: all 0.2s ease-in;
+    transition: all ${theme.transitions.slow};
 
     &:hover {
       background: ${theme.colors.off[100]};
-      transition: all 0.2s ease-in;
+      transition: all ${theme.transitions.slow};
 
       cursor: pointer;
     }

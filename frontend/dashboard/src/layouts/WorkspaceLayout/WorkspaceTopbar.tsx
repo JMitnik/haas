@@ -1,15 +1,10 @@
 import * as UI from '@haas/ui';
-import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Logo, LogoContainer } from 'components/Logo';
 
 import { Usernav } from './UserNav';
-
-interface WorkspaceTopbarProps {
-
-}
 
 const TopbarContainer = styled(UI.Div)`
   ${({ theme }) => css`
@@ -24,20 +19,16 @@ const TopbarContainer = styled(UI.Div)`
   `}
 `;
 
-const WorkspaceTopbar = ({ }: WorkspaceTopbarProps) => {
-  const { t } = useTranslation();
+const WorkspaceTopbar = () => (
+  <TopbarContainer>
+    <UI.Flex justifyContent="space-between" alignItems="center">
+      <Logo />
 
-  return (
-    <TopbarContainer>
-      <UI.Flex justifyContent="space-between" alignItems="center">
-        <Logo />
-
-        <UI.Flex>
-          <Usernav />
-        </UI.Flex>
+      <UI.Flex>
+        <Usernav />
       </UI.Flex>
-    </TopbarContainer>
-  );
-};
+    </UI.Flex>
+  </TopbarContainer>
+);
 
 export { WorkspaceTopbar };

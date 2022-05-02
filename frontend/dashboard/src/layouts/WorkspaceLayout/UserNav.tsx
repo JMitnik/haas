@@ -14,28 +14,27 @@ import ListItem from 'components/List/ListItem';
 import useAuth from 'hooks/useAuth';
 
 export const UsernavContainer = styled.div`
-display: flex;
-align-items: center;
-justify-content: center;
-`;
-
-export const AvatarContainer = styled(Div)`
-${({ theme }) => css`
-  /* padding: ${theme.gutter}px; */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1200;
+`;
 
-  &:hover {
-    cursor: pointer;
+export const AvatarContainer = styled(Div)`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
 
-    > * {
-      transition: all cubic-bezier(0.6, -0.28, 0.735, 0.045) 0.2s;
-      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.45);
+    &:hover {
+      cursor: pointer;
+
+      > * {
+        transition: all cubic-bezier(0.6, -0.28, 0.735, 0.045) 0.2s;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.45);
+      }
     }
-  }
-`}
+  `}
 `;
 
 export const UsernavDropdown = () => {

@@ -190,6 +190,10 @@ const theme = {
     md: '0px 2px 5px -1px rgba(50, 50, 93, 0.25), 0px 1px 3px -1px rgba(0, 0, 0, 0.3)',
     lg: 'var(--shadow-elevation-high)',
   },
+  transitions: {
+    slow: '0.2s ease-in-out',
+    normal: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+  },
 };
 
 export const chakraDefaultTheme = {
