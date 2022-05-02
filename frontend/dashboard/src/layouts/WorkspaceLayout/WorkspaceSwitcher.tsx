@@ -1,56 +1,60 @@
 import * as UI from '@haas/ui';
-import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import { Avatar } from 'components/Common/Avatar';
 import { ReactComponent as SwitchIcon } from 'assets/icons/icon-switch.svg';
+import { useCustomer } from 'providers/CustomerProvider';
+import { useUser } from 'providers/UserProvider';
 
 const WorkspaceSwitcherContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    background: ${theme.colors.neutral[100]};
-    padding: ${theme.gutter / 2}px;
-    border-radius: ${theme.borderRadiuses.md}px;
-    border: 1px solid ${theme.colors.neutral[500]};
-    box-shadow: ${theme.boxShadows.md};
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: ${theme.gutter}px;
+    border-top: 1px solid ${theme.colors.gray[200]};
+    border-right: 1px solid ${theme.colors.neutral[500]};
+    transition: all 0.2s ease-in;
 
     &:hover {
+      background: ${theme.colors.off[100]};
+      transition: all 0.2s ease-in;
+
       cursor: pointer;
-      box-shadow: ${theme.boxShadows.lg};
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    color: ${theme.colors.gray[500]};
-    font-weight: 700;
-
-    ${UI.Icon} {
-      width: 23px;
-      height: 23px;
-      object-fit: contain;
-      display: flex;
-
-
-      svg {
-        width: 100%;
-      }
-
-      svg, svg path {
-        stroke: ${theme.colors.gray[400]};
-      }
+    ${UI.Icon} svg path {
+      stroke: currentColor;
     }
   `}
 `;
 
 export const WorkspaceSwitcher = () => {
-  const { t } = useTranslation();
+  const { user } = useUser();
+  const { activeCustomer } = useCustomer();
+
   return (
     <WorkspaceSwitcherContainer>
-      <UI.Flex alignItems="center">
+      <UI.Flex alignItems="center" justifyContent="space-between">
+        <UI.Flex alignItems="center">
+          <UI.Div>
+            <Avatar
+              name={user?.firstName || 'N'}
+              brand="main"
+            />
+          </UI.Div>
+          <UI.Div ml={2}>
+            <UI.Strong color="off.600">
+              {user?.firstName}
+            </UI.Strong>
+            <UI.Muted>
+              {activeCustomer?.name}
+            </UI.Muted>
+          </UI.Div>
+        </UI.Flex>
+
         <UI.Div>
-          Jonathan Mitnik
-          <UI.Muted>
-            haas Inc
-          </UI.Muted>
+          <UI.Icon fontSize="0.2rem" color="off.500">
+            <SwitchIcon width="1rem" />
+          </UI.Icon>
         </UI.Div>
       </UI.Flex>
     </WorkspaceSwitcherContainer>

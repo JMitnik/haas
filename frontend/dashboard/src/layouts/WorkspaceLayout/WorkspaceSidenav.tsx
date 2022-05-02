@@ -7,7 +7,7 @@ import { Logo } from 'components/Logo';
 import { LogoContainer } from 'components/Logo/Logo';
 
 import * as LS from './WorkpaceLayout.styles';
-import { NavLinkContainer, WorkspaceNav } from './WorkspaceNav';
+import { WorkspaceNav } from './WorkspaceNav';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 
 export const SidenavContainer = styled.div`
@@ -47,7 +47,7 @@ export const SidenavContainer = styled.div`
     }
 
     /* The actual link items */
-    ${NavLinkContainer} {
+    ${LS.NavLinkContainer}, ${LS.SubNavItem} {
       color: #60708b; // TODO: Find a color in the palette for this
       padding: 6px 11px;
       font-size: 1rem;
