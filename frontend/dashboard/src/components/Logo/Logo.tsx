@@ -125,7 +125,7 @@ export const FilledLogo = (props: any) => (
 );
 
 export const LogoThumbnail = (props: any) => (
-  <SVGLogoThumbnail />
+  <SVGLogoThumbnail {...props} />
 );
 
 export default LogoIcon;
