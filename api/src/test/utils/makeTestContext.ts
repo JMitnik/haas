@@ -1,5 +1,5 @@
 import { Server } from 'http';
-import getPort, { makeRange } from 'get-port';
+import getPort, { portNumbers } from 'get-port';
 import { PrismaClient } from '@prisma/client';
 import { GraphQLClient } from 'graphql-request';
 
@@ -39,7 +39,7 @@ function graphqlTestContext(prisma: PrismaClient) {
 
   return {
     async before() {
-      const port = await getPort({ port: makeRange(4002, 6000) });
+      const port = await getPort({ port: portNumbers(4002, 6000) });
       serverInstance = await makeServer(port, prisma);
 
       return { client: new GraphQLClient(`http://localhost:${port}/graphql`), port: port };
