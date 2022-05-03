@@ -52,6 +52,10 @@ export const makeApollo = async (prisma: PrismaClient) => {
   const apollo = createServer({
     // uploads: false,
     cors: false,
+    logging: true,
+    // schema,
+    maskedErrors: false, // TODO: Remove again
+
     schema: applyMiddleware(schema, authShield),
     context: async (ctx: any): Promise<APIContext> => ({
       ...ctx,
@@ -60,18 +64,9 @@ export const makeApollo = async (prisma: PrismaClient) => {
       services: bootstrapServices(prisma),
     }),
     plugins: [
-      useApolloServerErrors(),
-      // {
-      //   requestDidStart: () => ({
-      //     didEncounterErrors: (ctx) => {
-      //       if (!ctx.operation) return;
-
-      //       ctx.errors.forEach((error) => {
-      //         handleError(ctx, error);
-      //       });
-      //     },
-      //   }),
-      // },
+      useApolloServerErrors({
+        debug: true,
+      }),
     ],
   });
 

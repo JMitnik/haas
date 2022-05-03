@@ -317,7 +317,7 @@ export const DialogueType = objectType({
           endDate,
         })
 
-        return average;
+        return average || 0;
       },
     });
 

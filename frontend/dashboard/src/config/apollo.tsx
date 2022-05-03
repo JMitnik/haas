@@ -1,6 +1,6 @@
-import { ApolloClient, ApolloLink, from } from '@apollo/client';
+import { ApolloClient, ApolloLink, HttpLink } from '@apollo/client';
 import { InMemoryCache } from '@apollo/client/cache';
-import { createUploadLink } from 'apollo-upload-client';
+// import { createUploadLink } from 'apollo-upload-client';
 import { onError } from '@apollo/client/link/error';
 
 import { getApiEndpoint } from 'utils/getApiEndpoint';
@@ -20,7 +20,8 @@ const authorizeLink = new ApolloLink((operation, forward) => {
 });
 
 const client = new ApolloClient({
-  link: from([
+  link: ApolloLink.from([
+
     onError(({ graphQLErrors, networkError }) => {
       if (graphQLErrors) {
         const authorizedErrors = graphQLErrors.filter((error) => (
@@ -37,10 +38,11 @@ const client = new ApolloClient({
       }
     }),
     authorizeLink,
-    createUploadLink({
-      credentials: 'include',
-      uri: getApiEndpoint(),
-    }),
+    new HttpLink({ uri: getApiEndpoint() }),
+    // createUploadLink({
+    //   credentials: 'include',
+    //   uri: getApiEndpoint(),
+    // }),
   ]),
   cache: new InMemoryCache(),
 });

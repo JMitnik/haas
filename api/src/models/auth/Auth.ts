@@ -170,7 +170,6 @@ export const RequestInviteInput = inputObjectType({
 
 export const RequestInviteOutput = objectType({
   name: 'RequestInviteOutput',
-
   definition(t) {
     t.boolean('didInvite');
     t.boolean('userExists');
