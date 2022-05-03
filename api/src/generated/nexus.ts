@@ -751,7 +751,7 @@ export interface NexusGenScalars {
   ID: string
   Date: any
   JSONObject: any
-  Upload: any
+  Upload: File
 }
 
 export interface NexusGenObjects {
@@ -3034,6 +3034,9 @@ export interface NexusGenArgTypes {
     setDialoguePrivacy: { // args
       input?: NexusGenInputs['SetDialoguePrivacyInput'] | null; // SetDialoguePrivacyInput
     }
+    singleUpload: { // args
+      file: NexusGenScalars['Upload']; // Upload!
+    }
     updateAutomation: { // args
       input?: NexusGenInputs['CreateAutomationInput'] | null; // CreateAutomationInput
     }
@@ -3063,6 +3066,7 @@ export interface NexusGenArgTypes {
     }
     uploadJobImage: { // args
       disapproved?: boolean | null; // Boolean
+      file?: NexusGenScalars['Upload'] | null; // Upload
       jobId?: string | null; // String
       type?: NexusGenEnums['UploadImageEnumType'] | null; // UploadImageEnumType
     }

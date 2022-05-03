@@ -1,7 +1,7 @@
 import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, mutationField, objectType, scalarType } from 'nexus';
+import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
@@ -341,15 +341,6 @@ export const ImageType = objectType({
   },
 });
 
-export const Upload = GraphQLUpload && scalarType({
-  name: GraphQLUpload.name,
-  asNexusMethod: 'upload', // We set this to be used as a method later as `t.upload()` if needed
-  description: GraphQLUpload.description,
-  serialize: GraphQLUpload.serialize,
-  parseValue: GraphQLUpload.parseValue,
-  parseLiteral: GraphQLUpload.parseLiteral,
-});
-
 const EditWorkspaceInput = inputObjectType({
   name: 'EditWorkspaceInput',
   description: 'Edit a workspace',
@@ -384,21 +375,40 @@ const CreateWorkspaceInput = inputObjectType({
   },
 });
 
-export const WorkspaceMutations = Upload && extendType({
+// export const Upload = GraphQLUpload && scalarType({
+//   name: GraphQLUpload.name,
+//   asNexusMethod: 'upload', // We set this to be used as a method later as `t.upload()` if needed
+//   description: GraphQLUpload.description,
+//   serialize: GraphQLUpload.serialize,
+//   parseValue: GraphQLUpload.parseValue,
+//   parseLiteral: GraphQLUpload.parseLiteral,
+// });
+
+
+export const UploadScalar = scalarType({
+  name: 'Upload',
+  asNexusMethod: 'upload',
+  description: 'The `Upload` scalar type represents a file upload.',
+  sourceType: 'File',
+})
+
+export const WorkspaceMutations = extendType({
   type: 'Mutation',
 
   definition(t) {
     t.field('singleUpload', {
       type: ImageType,
-      // args: {
-      //   file: Upload,
-      // }, FIXME: Use Graphql-Yoga upload
+      args: {
+        file: nonNull(arg({ type: 'Upload' })),
+      },
       async resolve(parent, args) {
         const { file } = args;
-
+        console.log('File before await: ', typeof file);
         const waitedFile = await file;
+
+        console.log('waitedFile: ', waitedFile);
         const { createReadStream, filename, mimetype, encoding }:
-          { createReadStream: any; filename: string; mimetype: string; encoding: string } = waitedFile.file;
+          { createReadStream: any; filename: string; mimetype: string; encoding: string } = waitedFile;
 
 
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
@@ -416,6 +426,7 @@ export const WorkspaceMutations = Upload && extendType({
 
         const result = await stream;
         const { secure_url } = result;
+        console.log('RESULT: ', result);
         return { filename, mimetype, encoding, url: secure_url };
       },
     });

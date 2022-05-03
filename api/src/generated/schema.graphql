@@ -1165,7 +1165,7 @@ type Mutation {
   requestInvite(input: RequestInviteInput): RequestInviteOutput
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
-  singleUpload: ImageType
+  singleUpload(file: Upload!): ImageType
   updateAutomation(input: CreateAutomationInput): AutomationModel
   updateCTA(input: UpdateCTAInputType): QuestionNode
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
@@ -1173,7 +1173,7 @@ type Mutation {
   updatePermissions(input: UpdatePermissionsInput): RoleType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType
-  uploadJobImage(disapproved: Boolean, jobId: String, type: UploadImageEnumType): AWSImageType
+  uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
   uploadUpsellImage(input: UploadSellImageInputType): ImageType
 
   """

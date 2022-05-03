@@ -389,11 +389,11 @@ export const UploadImageEnumType = enumType({
   members: ['LOGO', 'WEBSITE_SCREENSHOT'],
 })
 
-export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
+export const UploadImageMutation = mutationField('uploadJobImage', {
   type: AWSImageType,
 
   args: {
-    // file: Upload,
+    file: 'Upload',
     jobId: 'String',
     type: UploadImageEnumType,
     disapproved: 'Boolean',

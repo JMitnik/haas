@@ -1,16 +1,16 @@
 import { inputObjectType, mutationField } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
-import { ImageType, Upload } from '../../customer';
+import { ImageType } from '../../customer';
 
 export const UploadSellImageInputType = inputObjectType({
   name: 'UploadSellImageInputType',
   definition(t) {
     t.upload('file');
     t.string('workspaceId');
-  }
+  },
 })
 
-export const UploadSellImageResolver = Upload && mutationField('uploadUpsellImage', {
+export const UploadSellImageResolver = mutationField('uploadUpsellImage', {
   type: ImageType,
   nullable: true,
   args: {
