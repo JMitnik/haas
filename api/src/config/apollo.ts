@@ -50,8 +50,7 @@ export const makeApollo = async (prisma: PrismaClient) => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
 
   const apollo = createServer({
-    // uploads: false,
-    cors: false,
+    cors: true,
     logging: true,
     // schema,
     maskedErrors: false, // TODO: Remove again

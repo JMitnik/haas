@@ -61,7 +61,8 @@ const CustomerUploadLogoInput = ({ onChange, value, logoOpacity, overrideColor }
 
       onChange(result.singleUpload.url);
     },
-    onError: () => {
+    onError: (e) => {
+      console.log('ERROR: ', e);
       toast({
         title: 'Something went wrong',
         description: 'We were unable to upload file. Try again',
@@ -76,6 +77,7 @@ const CustomerUploadLogoInput = ({ onChange, value, logoOpacity, overrideColor }
     if (!files.length) return;
 
     const [file] = files;
+    console.log('FILE: ', file);
     uploadFile({ variables: { file } });
   };
 

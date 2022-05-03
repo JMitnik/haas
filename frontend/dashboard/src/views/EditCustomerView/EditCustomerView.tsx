@@ -85,8 +85,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         duration: 1500,
       });
     },
-    onError: (e) => {
-      console.log(e);
+    onError: () => {
       toast({
         title: 'Error',
         description: 'See form for more information',

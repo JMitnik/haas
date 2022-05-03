@@ -1,6 +1,6 @@
 import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-express';
+import { ApolloError, UserInputError } from 'apollo-server-express';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
@@ -375,21 +375,11 @@ const CreateWorkspaceInput = inputObjectType({
   },
 });
 
-// export const Upload = GraphQLUpload && scalarType({
-//   name: GraphQLUpload.name,
-//   asNexusMethod: 'upload', // We set this to be used as a method later as `t.upload()` if needed
-//   description: GraphQLUpload.description,
-//   serialize: GraphQLUpload.serialize,
-//   parseValue: GraphQLUpload.parseValue,
-//   parseLiteral: GraphQLUpload.parseLiteral,
-// });
-
-
 export const UploadScalar = scalarType({
   name: 'Upload',
   asNexusMethod: 'upload',
   description: 'The `Upload` scalar type represents a file upload.',
-  sourceType: 'File',
+  // sourceType: 'File',
 })
 
 export const WorkspaceMutations = extendType({
@@ -403,13 +393,9 @@ export const WorkspaceMutations = extendType({
       },
       async resolve(parent, args) {
         const { file } = args;
-        console.log('File before await: ', typeof file);
-        const waitedFile = await file;
 
-        console.log('waitedFile: ', waitedFile);
         const { createReadStream, filename, mimetype, encoding }:
-          { createReadStream: any; filename: string; mimetype: string; encoding: string } = waitedFile;
-
+          { createReadStream: any; filename: string; mimetype: string; encoding: string } = await file.file;
 
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
