@@ -6,10 +6,10 @@ export const fetchTunnelUrl = async () => {
     const tunnelData = await (await fetch('http://localhost:4040/api/tunnels')).json();
 
     if (!tunnelData) return 'http://localhost:4000';
-    
-    const tunnel = tunnelData.tunnels.find((tunnel: any) => tunnel.public_url);
+
+    const tunnel = (tunnelData as any).tunnels.find((tunnel: any) => tunnel.public_url);
     return tunnel.public_url;
   } catch (error) {
     return '';
-  } 
+  }
 };
