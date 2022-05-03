@@ -85,9 +85,7 @@ class ContextSessionService {
       id: customer.customer.id,
     }));
 
-    // FIXME: Workspace always seems null 🤔
     const workspace = await this.getWorkSpaceFromReq();
-    console.log('workspace: ', workspace);
     const activeWorkspace = customersAndPermissions?.find((userCustomer) => userCustomer.id === workspace?.id) || null;
 
     const baseUrl = process.env.ENVIRONMENT === 'local' ? await fetchTunnelUrl() : config.baseUrl;
