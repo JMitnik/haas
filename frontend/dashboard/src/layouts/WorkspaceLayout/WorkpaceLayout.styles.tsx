@@ -81,3 +81,41 @@ export const NavLinkContainer = styled(NavLink) <NavLinkProps>`
     `}
   `}
 `;
+
+export const Card = styled(UI.Div)`
+  ${({ theme }) => css`
+    background: ${theme.colors.white};
+    border-radius: ${theme.borderRadiuses.md}px;
+    box-shadow: ${theme.boxShadows.md};
+    padding: ${theme.gutter / 1.5}px;
+  `}
+`;
+
+export const Item = styled(UI.Div)`
+  ${({ theme }) => css`
+    color: ${theme.colors.gray[500]};
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: ${theme.borderRadiuses.md}px;
+    padding: 4px 8px;
+    transition: all ${theme.transitions.normal};
+
+    & + & {
+      margin-top: 2px;
+    }
+
+    &:focus, &:hover {
+      cursor: pointer;
+      background: ${theme.colors.gray[100]};
+      transition: all ${theme.transitions.normal};
+    }
+
+    ${UI.Icon} {
+      width: 18px;
+      margin-right: ${theme.gutter / 2}px;
+    }
+    ${UI.Icon} svg {
+      max-width: 100%;
+    }
+  `}
+`;

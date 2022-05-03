@@ -5,14 +5,14 @@ import {
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
 } from 'react-feather';
 import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
-import { ThemeContext } from 'styled-components';
 import { sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
 import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
+import styled, { ThemeContext } from 'styled-components';
 
-import * as Popover from 'components/Common/Popover';
+import * as Popover from '@radix-ui/react-popover';
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
 import { GetDialogueStatisticsQuery, useGetDialogueStatisticsQuery } from 'types/generated-types';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
@@ -20,12 +20,19 @@ import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
+import { AnimatePresence, motion } from 'framer-motion';
+
+import { slideUpFadeMotion } from 'components/animation/config';
 import { useNavigator } from 'hooks/useNavigator';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
 import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryModule from './Modules/SummaryModules/SummaryModule';
+
+const Content = styled(Popover.Content)`
+  transformOrigin: var(--radix-popover-content-transform-origin);
+`;
 
 type ActiveDateType = 'last_hour' | 'last_day' | 'last_week' | 'last_month' | 'last_year';
 
@@ -159,9 +166,9 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
   const { t } = useTranslation();
 
   return (
-    <>
-      <>
-        <UI.Div />
+    <UI.Card>
+      <UI.CardBody>
+
         <UI.Div mb={4}>
           <UI.Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_qr')}</UI.Text>
           <UI.Hr />
@@ -208,8 +215,8 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
 
           </UI.Flex>
         </UI.Div>
-      </>
-    </>
+      </UI.CardBody>
+    </UI.Card>
   );
 };
 
@@ -256,6 +263,7 @@ const DialogueView = () => {
       setCachedDialogueCustomer(data?.customer);
     }
   }, [data, loading]);
+  const [isShareDialogueOpen, setIsShareDialogueOpen] = useState(false);
 
   if (!cachedDialogueCustomer) return <UI.Loader />;
   const { dialogue } = cachedDialogueCustomer;
@@ -288,16 +296,28 @@ const DialogueView = () => {
             <UI.ViewTitle leftIcon={<ChartbarIcon />}>
               {t('views:dialogue_view')}
             </UI.ViewTitle>
-            <Popover.Base>
-              <Popover.Trigger>
+            <Popover.Root open={isShareDialogueOpen} onOpenChange={setIsShareDialogueOpen}>
+              <Popover.Trigger asChild>
                 <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
                   {t('share')}
                 </UI.Button>
               </Popover.Trigger>
-              <Popover.Body hasArrow>
-                <ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />
-              </Popover.Body>
-            </Popover.Base>
+              <AnimatePresence>
+                {isShareDialogueOpen && (
+                  <Content
+                    align="start"
+                    asChild
+                    forceMount
+                    forwardedAs={motion.div}
+                    {...slideUpFadeMotion}
+                  >
+                    <motion.div style={{ background: 'white' }}>
+                      <ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />
+                    </motion.div>
+                  </Content>
+                )}
+              </AnimatePresence>
+            </Popover.Root>
           </UI.Flex>
 
           <UI.Flex justifyContent="space-between" flexWrap="wrap">
