@@ -8,7 +8,7 @@ import SessionService from '../SessionService';
 export const SessionType = objectType({
   name: 'Session',
   definition(t) {
-    t.id('id');
+    t.nonNull.id('id');
     t.date('createdAt');
     t.string('dialogueId');
 

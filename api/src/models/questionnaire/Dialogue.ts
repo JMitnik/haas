@@ -46,10 +46,10 @@ export const DialogueFinisherType = objectType({
 export const DialogueType = objectType({
   name: 'Dialogue',
   definition(t) {
-    t.id('id');
-    t.string('title');
-    t.string('slug');
-    t.string('description');
+    t.nonNull.id('id');
+    t.nonNull.string('title');
+    t.nonNull.string('slug');
+    t.nonNull.string('description');
 
     // Placeholder data related properties
     t.boolean('isWithoutGenData');

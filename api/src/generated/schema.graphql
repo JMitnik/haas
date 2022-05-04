@@ -31,8 +31,8 @@ input AssignUserToDialoguesInput {
 }
 
 type AssignedDialogues {
-  assignedDialogues: [Dialogue]
-  privateWorkspaceDialogues: [Dialogue]
+  assignedDialogues: [Dialogue!]
+  privateWorkspaceDialogues: [Dialogue!]
 }
 
 input AuthenticateLambdaInput {
@@ -274,8 +274,8 @@ type CampaignVariantType {
   deliveryConnection: DeliveryConnectionType
   dialogue: Dialogue
   from: String
-  id: ID
-  label: String
+  id: ID!
+  label: String!
   type: CampaignVariantEnum
   weight: Int
   workspace: Customer
@@ -651,10 +651,10 @@ type Dialogue {
   creationDate: String
   customer: Customer
   customerId: String
-  description: String
+  description: String!
   dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
   edges: [Edge]
-  id: ID
+  id: ID!
   isPrivate: Boolean
   isWithoutGenData: Boolean
   language: LanguageEnumType
@@ -669,10 +669,10 @@ type Dialogue {
   rootQuestion: QuestionNode
   sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   sessions(take: Int): [Session]
-  slug: String
+  slug: String!
   statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag]
-  title: String
+  title: String!
   topic(input: TopicInputType): TopicType
   updatedAt: String
   wasGeneratedWithGenData: Boolean
@@ -1566,7 +1566,7 @@ type Session {
   deliveryId: String
   device: String
   dialogueId: String
-  id: ID
+  id: ID!
   mainScore: Float
   nodeEntries: [NodeEntry]
   originUrl: String
@@ -1778,7 +1778,7 @@ type TopicNodeEntryValue {
 
 type TopicType {
   impactScore: Float
-  name: String
+  name: String!
   nrVotes: Int
   subTopics: [TopicType]
 }
@@ -1959,7 +1959,7 @@ type UserType {
   email: String
   firstName: String
   globalPermissions: [SystemPermission]
-  id: ID
+  id: ID!
   lastActivity: Date
   lastLoggedIn: Date
   lastName: String

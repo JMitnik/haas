@@ -25,8 +25,8 @@ export const CampaignVariantModel = objectType({
   description: 'Variant of campaign',
 
   definition(t) {
-    t.id('id');
-    t.string('label');
+    t.nonNull.id('id');
+    t.nonNull.string('label');
     t.int('weight');
     t.string('body');
     t.string('from', { nullable: true });

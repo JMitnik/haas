@@ -16,6 +16,7 @@ import {
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
+import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -248,11 +249,11 @@ export const InteractionsOverview = () => {
     errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
       setCampaignVariants(
-        fetchedData?.customer?.dialogue?.campaignVariants || [],
+        fetchedData?.customer?.dialogue?.campaignVariants?.filter(isPresent) as any || [],
       );
 
       setSessions(
-        fetchedData?.customer?.dialogue?.sessionConnection?.sessions || [],
+        fetchedData?.customer?.dialogue?.sessionConnection?.sessions as any || [],
       );
 
       setTotalPages(fetchedData.customer?.dialogue?.sessionConnection?.totalPages || 0);

@@ -19,7 +19,7 @@ export const DialogueStatisticsSummaryFilterInput = inputObjectType({
 export const TopicType = objectType({
   name: 'TopicType',
   definition(t) {
-    t.string('name');
+    t.nonNull.string('name');
     t.float('impactScore');
     t.int('nrVotes');
     t.field('subTopics', {

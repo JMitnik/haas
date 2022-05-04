@@ -2,14 +2,24 @@
 
 import * as UI from '@haas/ui';
 import { ArrowLeft, Download, Plus, RefreshCcw } from 'react-feather';
-import { CreateWorkspaceJobType, JobStatusType, PaginationSortByEnum, PaginationWhereInput, useConfirmWorkspaceJobMutation, useCreateWorkspaceJobMutation, useGetAutodeckJobsQuery, useRetryAutodeckJobMutation } from 'types/generated-types';
-import { DeepPartial } from 'types/customTypes';
-import { useEffect } from 'react';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+
+import {
+  CreateWorkspaceJobType,
+  JobStatusType,
+  PaginationSortByEnum,
+  PaginationWhereInput,
+  useConfirmWorkspaceJobMutation,
+  useCreateWorkspaceJobMutation,
+  useGetAutodeckJobsQuery,
+  useRetryAutodeckJobMutation,
+} from 'types/generated-types';
+import { DeepPartial } from 'types/customTypes';
+import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm';
+
 import { DateLabel, ProcessingStatus } from './Components';
 
 export const paginationFilter: PaginationWhereInput = {
@@ -149,22 +159,22 @@ export const AutodeckOverview = () => {
               </UI.TableHeading>
 
               <UI.TableBody>
-                {data?.getAutodeckJobs?.jobs.map((job) => (
-                  <UI.TableRow hasHover key={job.id} onClick={() => handleActiveJob(job, job.status)}>
+                {data?.getAutodeckJobs?.jobs?.map((job) => (
+                  <UI.TableRow hasHover key={job!.id} onClick={() => handleActiveJob(job!, job!.status!)}>
                     <UI.TableCell>
                       {job?.name || ''}
                     </UI.TableCell>
                     <UI.TableCell>
-                      <DateLabel dateString={job.createdAt} />
+                      <DateLabel dateString={job!.createdAt!} />
                     </UI.TableCell>
                     <UI.TableCell>
-                      {job.updatedAt
-                        ? <DateLabel dateString={job.updatedAt} />
+                      {job!.updatedAt
+                        ? <DateLabel dateString={job!.updatedAt} />
                         : 'Not updated yet'}
                     </UI.TableCell>
                     <UI.TableCell>
                       <ProcessingStatus
-                        job={job}
+                        job={job!}
                       />
                     </UI.TableCell>
                   </UI.TableRow>

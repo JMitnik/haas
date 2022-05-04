@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 import { makeRestServer } from '../../../test/utils/makeRestServer';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 
@@ -10,7 +10,7 @@ test('webhook requires updates', async () => {
   const { port } = server;
   const res = await fetch(`http://localhost:${port}/webhooks/delivery`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
   });
 
   expect(res.status).toBe(400);
@@ -22,7 +22,7 @@ test('webhook requires updates', async () => {
   const { port } = server;
   const res = await fetch(`http://localhost:${port}/webhooks/delivery`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
   });
 
   expect(res.status).toBe(400);

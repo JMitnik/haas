@@ -1,10 +1,11 @@
 import * as UI from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
+import { isPresent } from 'ts-is-present';
+import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { SystemPermission, useFindRoleByIdQuery, useUpdatePermissionsMutation } from 'types/generated-types';
-import { useToast } from '@chakra-ui/core';
 
 interface RoleUserModalCardProps {
   id: string;
@@ -131,7 +132,7 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
 
   const permissions: PermissionsType[] = role?.allPermissions?.map((permission) => ({
     isActive: role?.permissions?.includes(permission) || false,
-    permission,
+    permission: permission!,
   })) || [];
 
   return (
@@ -151,8 +152,8 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
         )}
         <RoleUserForm
           permissionsState={permissions}
-          allPermissions={role?.allPermissions}
-          permissionsArray={role?.permissions || []}
+          allPermissions={role?.allPermissions?.filter(isPresent)}
+          permissionsArray={role?.permissions?.filter(isPresent) || []}
           roleId={id}
           onClose={onClose}
         />

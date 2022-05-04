@@ -96,7 +96,7 @@ const AdminOverview = () => {
 
               <UI.TableBody>
                 {data?.users?.map((item) => (
-                  <UI.TableRow hasHover key={item.id}>
+                  <UI.TableRow hasHover key={item!.id}>
                     <UI.TableCell>{item?.id || ''}</UI.TableCell>
                     <UI.TableCell>{item?.firstName || ''}</UI.TableCell>
                     <UI.TableCell>{item?.lastName || ''}</UI.TableCell>

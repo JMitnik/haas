@@ -1,5 +1,6 @@
 import * as UI from '@haas/ui';
 import { format, sub } from 'date-fns';
+import { isPresent } from 'ts-is-present';
 import React, { useMemo } from 'react';
 
 import {
@@ -69,10 +70,10 @@ export const WorkspaceGridAdapter = ({
       },
     });
 
-    const nodes: HexagonNode[] = loadedData?.dialogue?.topic?.subTopics?.map((topic) => ({
+    const nodes: HexagonNode[] = loadedData?.dialogue?.topic?.subTopics?.filter(isPresent).map((topic) => ({
       id: topic.name,
       type: HexagonNodeType.Topic,
-      score: topic.impactScore,
+      score: topic.impactScore!,
       topic,
     })) || [];
 
@@ -88,14 +89,15 @@ export const WorkspaceGridAdapter = ({
       dialogueId: options.dialogueId,
     });
 
-    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessionsConnection?.pathedSessions?.map(
-      (session) => ({
-        id: session.id,
-        type: HexagonNodeType.Session,
-        score: session.score,
-        session,
-      }),
-    ) || [];
+    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessionsConnection?.pathedSessions?.filter(isPresent)
+      .map(
+        (session) => ({
+          id: session.id,
+          type: HexagonNodeType.Session,
+          score: session.score!,
+          session,
+        }),
+      ) || [];
 
     if (fetchNodes.length) return [fetchNodes, HexagonViewMode.Session];
 
@@ -104,7 +106,7 @@ export const WorkspaceGridAdapter = ({
 
   const initialViewMode = HexagonViewMode.Dialogue;
 
-  const initialData = useMemo(() => groupsFromDialogues(dialogues), [dialogues]);
+  const initialData = useMemo(() => groupsFromDialogues(dialogues.filter(isPresent)), [dialogues]);
 
   // Add spinner
   if (!dialogues.length) return null;

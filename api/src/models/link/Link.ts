@@ -1,6 +1,4 @@
-import { enumType, inputObjectType, mutationField, objectType } from 'nexus';
-import cloudinary, { UploadApiResponse } from 'cloudinary';
-import { ImageType, Upload } from '../customer';
+import { enumType, inputObjectType, objectType } from 'nexus';
 
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 

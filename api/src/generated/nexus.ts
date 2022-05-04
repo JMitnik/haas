@@ -762,8 +762,8 @@ export interface NexusGenObjects {
     url?: string | null; // String
   }
   AssignedDialogues: { // root type
-    assignedDialogues?: Array<NexusGenRootTypes['Dialogue'] | null> | null; // [Dialogue]
-    privateWorkspaceDialogues?: Array<NexusGenRootTypes['Dialogue'] | null> | null; // [Dialogue]
+    assignedDialogues?: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
+    privateWorkspaceDialogues?: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
   }
   AutodeckConnectionType: { // root type
     cursor?: string | null; // String
@@ -857,8 +857,8 @@ export interface NexusGenObjects {
     customVariables?: Array<NexusGenRootTypes['CampaignVariantCustomVariableType'] | null> | null; // [CampaignVariantCustomVariableType]
     deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     from?: string | null; // String
-    id?: string | null; // ID
-    label?: string | null; // String
+    id: string; // ID!
+    label: string; // String!
     type?: NexusGenEnums['CampaignVariantEnum'] | null; // CampaignVariantEnum
     weight?: number | null; // Int
   }
@@ -1183,7 +1183,7 @@ export interface NexusGenObjects {
   }
   TopicType: { // root type
     impactScore?: number | null; // Float
-    name?: string | null; // String
+    name: string; // String!
     nrVotes?: number | null; // Int
     subTopics?: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
   }
@@ -1226,7 +1226,7 @@ export interface NexusGenObjects {
   UserType: { // root type
     email?: string | null; // String
     firstName?: string | null; // String
-    id?: string | null; // ID
+    id: string; // ID!
     lastActivity?: NexusGenScalars['Date'] | null; // Date
     lastLoggedIn?: NexusGenScalars['Date'] | null; // Date
     lastName?: string | null; // String
@@ -1277,8 +1277,8 @@ export interface NexusGenFieldTypes {
     url: string | null; // String
   }
   AssignedDialogues: { // field return type
-    assignedDialogues: Array<NexusGenRootTypes['Dialogue'] | null> | null; // [Dialogue]
-    privateWorkspaceDialogues: Array<NexusGenRootTypes['Dialogue'] | null> | null; // [Dialogue]
+    assignedDialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
+    privateWorkspaceDialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
   }
   AutodeckConnectionType: { // field return type
     cursor: string | null; // String
@@ -1376,8 +1376,8 @@ export interface NexusGenFieldTypes {
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     from: string | null; // String
-    id: string | null; // ID
-    label: string | null; // String
+    id: string; // ID!
+    label: string; // String!
     type: NexusGenEnums['CampaignVariantEnum'] | null; // CampaignVariantEnum
     weight: number | null; // Int
     workspace: NexusGenRootTypes['Customer'] | null; // Customer
@@ -1489,10 +1489,10 @@ export interface NexusGenFieldTypes {
     creationDate: string | null; // String
     customer: NexusGenRootTypes['Customer'] | null; // Customer
     customerId: string | null; // String
-    description: string | null; // String
+    description: string; // String!
     dialogueStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'] | null; // DialogueStatisticsSummaryModel
     edges: Array<NexusGenRootTypes['Edge'] | null> | null; // [Edge]
-    id: string | null; // ID
+    id: string; // ID!
     isPrivate: boolean | null; // Boolean
     isWithoutGenData: boolean | null; // Boolean
     language: NexusGenEnums['LanguageEnumType'] | null; // LanguageEnumType
@@ -1507,10 +1507,10 @@ export interface NexusGenFieldTypes {
     rootQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     sessionConnection: NexusGenRootTypes['SessionConnection'] | null; // SessionConnection
     sessions: Array<NexusGenRootTypes['Session'] | null> | null; // [Session]
-    slug: string | null; // String
+    slug: string; // String!
     statistics: NexusGenRootTypes['DialogueStatistics'] | null; // DialogueStatistics
     tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
-    title: string | null; // String
+    title: string; // String!
     topic: NexusGenRootTypes['TopicType'] | null; // TopicType
     updatedAt: string | null; // String
     wasGeneratedWithGenData: boolean | null; // Boolean
@@ -1885,7 +1885,7 @@ export interface NexusGenFieldTypes {
     deliveryId: string | null; // String
     device: string | null; // String
     dialogueId: string | null; // String
-    id: string | null; // ID
+    id: string; // ID!
     mainScore: number | null; // Float
     nodeEntries: Array<NexusGenRootTypes['NodeEntry'] | null> | null; // [NodeEntry]
     originUrl: string | null; // String
@@ -1946,7 +1946,7 @@ export interface NexusGenFieldTypes {
   }
   TopicType: { // field return type
     impactScore: number | null; // Float
-    name: string | null; // String
+    name: string; // String!
     nrVotes: number | null; // Int
     subTopics: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
   }
@@ -1996,7 +1996,7 @@ export interface NexusGenFieldTypes {
     email: string | null; // String
     firstName: string | null; // String
     globalPermissions: Array<NexusGenEnums['SystemPermission'] | null> | null; // [SystemPermission]
-    id: string | null; // ID
+    id: string; // ID!
     lastActivity: NexusGenScalars['Date'] | null; // Date
     lastLoggedIn: NexusGenScalars['Date'] | null; // Date
     lastName: string | null; // String

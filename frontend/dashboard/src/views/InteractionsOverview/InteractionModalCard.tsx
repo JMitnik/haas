@@ -76,7 +76,7 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
                       {t('go_to_delivery')}
                     </UI.Button> */}
                   </UI.Div>
-                  <CampaignTimeline delivery={delivery} />
+                  <CampaignTimeline delivery={delivery as any} />
                 </UI.Div>
               </TimelineItem>
             )}

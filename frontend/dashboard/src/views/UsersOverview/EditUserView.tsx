@@ -62,7 +62,7 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
     variables: { id: activeCustomer?.id },
   });
 
-  const selectRoles = data?.customer?.roles?.map(({ name, id }) => ({ label: name, value: id }));
+  const selectRoles = data?.customer?.roles?.map((role) => ({ label: role?.name, value: role?.id }));
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -238,7 +238,6 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
 };
 
 const EditUserView = () => {
-  console.log("Test")
   const { activeCustomer } = useCustomer();
   const { userId } = useParams<{ userId: string }>();
 

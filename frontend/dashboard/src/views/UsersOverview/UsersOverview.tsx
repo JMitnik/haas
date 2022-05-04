@@ -227,11 +227,11 @@ const UsersOverview = () => {
   };
 
   const tableData = activePaginatedUsersResult?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
-    ...userCustomer.user,
-    isActive: userCustomer.isActive,
-    createdAt: userCustomer.createdAt,
-    userId: userCustomer.user.id,
-    role: userCustomer.role,
+    ...userCustomer!.user,
+    isActive: userCustomer!.isActive,
+    createdAt: userCustomer!.createdAt,
+    userId: userCustomer!.user!.id,
+    role: userCustomer!.role,
   })) || [];
 
   const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
@@ -470,9 +470,9 @@ const UsersOverview = () => {
           </Menu.Base>
           {tableData.map((user) => (
             <Table.Row
-              onContextMenu={(e) => openMenu(e, { userId: user.userId })}
+              onContextMenu={(e) => openMenu(e, { userId: user.userId! })}
               isDisabled={!user.isActive}
-              onClick={() => goToUserView(user.id)}
+              onClick={() => goToUserView(user.id!)}
               isLoading={isLoading}
               key={user.id}
               gridTemplateColumns={columns}
@@ -496,7 +496,7 @@ const UsersOverview = () => {
               <Table.Cell>
 
                 <Table.InnerCell isDisabled={!canAccessAdmin && !canEditUsers}>
-                  <UI.Div onClick={() => goToRoleUserView(user.id, user.role.id)}>
+                  <UI.Div onClick={() => goToRoleUserView(user.id!, user.role!.id!)}>
                     <UI.Helper>
                       {user?.role?.name}
                     </UI.Helper>
@@ -516,7 +516,7 @@ const UsersOverview = () => {
               <Table.Cell onClick={(e) => e.stopPropagation()}>
                 <UI.Toggle
                   size="lg"
-                  isChecked={user.isActive}
+                  isChecked={user.isActive!}
                   color="teal"
                   isDisabled={!canAccessAdmin && !canEditUsers}
                   onChange={() => {

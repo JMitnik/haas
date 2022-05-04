@@ -1,4 +1,5 @@
 import * as UI from '@haas/ui';
+import { isPresent } from 'ts-is-present';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -156,7 +157,7 @@ const InteractionTimelineContainer = styled.div`
 export const InteractionTimeline = ({ interaction }: InteractionTimelineProps) => (
   <InteractionTimelineContainer>
     <Timeline enableFold isBlock nrItems={interaction.nodeEntries?.length} brand="blue">
-      {interaction.nodeEntries.map((nodeEntry) => (
+      {interaction?.nodeEntries?.filter(isPresent).map((nodeEntry) => (
         <TimelineItem gridTemplateColumns="40px 1fr" key={nodeEntry.id}>
           <Circle brand="blue">
             {nodeEntry.relatedNode?.type && (

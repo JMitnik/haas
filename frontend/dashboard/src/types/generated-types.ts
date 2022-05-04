@@ -51,8 +51,8 @@ export type AssignUserToDialoguesInput = {
 
 export type AssignedDialogues = {
   __typename?: 'AssignedDialogues';
-  privateWorkspaceDialogues?: Maybe<Array<Maybe<Dialogue>>>;
-  assignedDialogues?: Maybe<Array<Maybe<Dialogue>>>;
+  privateWorkspaceDialogues?: Maybe<Array<Dialogue>>;
+  assignedDialogues?: Maybe<Array<Dialogue>>;
 };
 
 export type AuthenticateLambdaInput = {
@@ -306,8 +306,8 @@ export enum CampaignVariantEnum {
 /** Variant of campaign */
 export type CampaignVariantType = {
   __typename?: 'CampaignVariantType';
-  id?: Maybe<Scalars['ID']>;
-  label?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  label: Scalars['String'];
   weight?: Maybe<Scalars['Int']>;
   body?: Maybe<Scalars['String']>;
   from?: Maybe<Scalars['String']>;
@@ -749,10 +749,10 @@ export type DeprecatedPaginationPageInfo = {
 
 export type Dialogue = {
   __typename?: 'Dialogue';
-  id?: Maybe<Scalars['ID']>;
-  title?: Maybe<Scalars['String']>;
-  slug?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  title: Scalars['String'];
+  slug: Scalars['String'];
+  description: Scalars['String'];
   isWithoutGenData?: Maybe<Scalars['Boolean']>;
   wasGeneratedWithGenData?: Maybe<Scalars['Boolean']>;
   language?: Maybe<LanguageEnumType>;
@@ -2180,7 +2180,7 @@ export type RoleType = {
 
 export type Session = {
   __typename?: 'Session';
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   createdAt?: Maybe<Scalars['Date']>;
   dialogueId?: Maybe<Scalars['String']>;
   mainScore?: Maybe<Scalars['Float']>;
@@ -2406,7 +2406,7 @@ export type TopicNodeEntryValue = {
 
 export type TopicType = {
   __typename?: 'TopicType';
-  name?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
   impactScore?: Maybe<Scalars['Float']>;
   nrVotes?: Maybe<Scalars['Int']>;
   subTopics?: Maybe<Array<Maybe<TopicType>>>;
@@ -2587,7 +2587,7 @@ export type UserOfCustomerInput = {
 
 export type UserType = {
   __typename?: 'UserType';
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   email?: Maybe<Scalars['String']>;
   phone?: Maybe<Scalars['String']>;
   firstName?: Maybe<Scalars['String']>;
@@ -2819,13 +2819,13 @@ export type GetCustomerOfUserQuery = (
       & Pick<UserType, 'id'>
       & { assignedDialogues?: Maybe<(
         { __typename?: 'AssignedDialogues' }
-        & { privateWorkspaceDialogues?: Maybe<Array<Maybe<(
+        & { privateWorkspaceDialogues?: Maybe<Array<(
           { __typename?: 'Dialogue' }
           & Pick<Dialogue, 'title' | 'slug' | 'id'>
-        )>>>, assignedDialogues?: Maybe<Array<Maybe<(
+        )>>, assignedDialogues?: Maybe<Array<(
           { __typename?: 'Dialogue' }
           & Pick<Dialogue, 'slug' | 'id'>
-        )>>> }
+        )>> }
       )> }
     )> }
   )> }
@@ -3400,13 +3400,13 @@ export type AssignUserToDialoguesMutation = (
     & Pick<UserType, 'email'>
     & { assignedDialogues?: Maybe<(
       { __typename?: 'AssignedDialogues' }
-      & { privateWorkspaceDialogues?: Maybe<Array<Maybe<(
+      & { privateWorkspaceDialogues?: Maybe<Array<(
         { __typename?: 'Dialogue' }
         & Pick<Dialogue, 'title' | 'slug' | 'id'>
-      )>>>, assignedDialogues?: Maybe<Array<Maybe<(
+      )>>, assignedDialogues?: Maybe<Array<(
         { __typename?: 'Dialogue' }
         & Pick<Dialogue, 'slug' | 'id'>
-      )>>> }
+      )>> }
     )> }
   )> }
 );
@@ -3505,13 +3505,13 @@ export type GetUserCustomerFromCustomerQuery = (
         & Pick<UserType, 'id' | 'email' | 'phone' | 'firstName' | 'lastName'>
         & { assignedDialogues?: Maybe<(
           { __typename?: 'AssignedDialogues' }
-          & { privateWorkspaceDialogues?: Maybe<Array<Maybe<(
+          & { privateWorkspaceDialogues?: Maybe<Array<(
             { __typename?: 'Dialogue' }
             & Pick<Dialogue, 'title' | 'slug' | 'id' | 'description'>
-          )>>>, assignedDialogues?: Maybe<Array<Maybe<(
+          )>>, assignedDialogues?: Maybe<Array<(
             { __typename?: 'Dialogue' }
             & Pick<Dialogue, 'slug' | 'id'>
-          )>>> }
+          )>> }
         )> }
       )>, role?: Maybe<(
         { __typename?: 'RoleType' }

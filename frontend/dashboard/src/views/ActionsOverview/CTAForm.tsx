@@ -142,7 +142,7 @@ const CTAForm = ({
 }: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
   const { customerSlug, dialogueSlug, questionId } = useParams<
-  { customerSlug: string, dialogueSlug: string, questionId?: string }
+    { customerSlug: string, dialogueSlug: string, questionId?: string }
   >();
 
   const form = useForm<FormDataProps>({
@@ -199,11 +199,11 @@ const CTAForm = ({
         position: 'bottom-right',
         duration: 1500,
       });
-      console.log('CREATED CTA: ', data.createCTA);
+
       const CTA: MappedCTANode = {
-        value: data.createCTA.id,
-        label: data.createCTA.title,
-        type: data.createCTA.type,
+        value: data?.createCTA?.id || undefined,
+        label: data?.createCTA?.title || undefined,
+        type: data?.createCTA?.type || undefined,
       };
       if (onCTAIdFetch) onCTAIdFetch(CTA);
       onSuccess?.(data?.createCTA);

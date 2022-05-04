@@ -42,9 +42,9 @@ const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
     dialogue: { label: variant.dialogue.title, value: variant.dialogue.id },
     from: variant.from || '',
     label: variant.label,
-    type: variant.type,
+    type: variant.type!,
     weight: variant.weight,
-  })),
+  })) as any,
 });
 
 export const CampaignView = () => {
@@ -444,32 +444,32 @@ export const CampaignView = () => {
                 {t('last_update')}
               </Table.HeadingCell>
             </Table.HeadingRow>
-            {deliveryConnection?.deliveries.map((delivery) => (
+            {deliveryConnection?.deliveries?.map((delivery) => (
               <Table.Row
-                onClick={() => goToDeliveryView(campaignId, delivery.id)}
+                onClick={() => goToDeliveryView(campaignId, delivery!.id!)}
                 isLoading={isLoading}
-                key={delivery.id}
+                key={delivery!.id!}
                 gridTemplateColumns={columns}
-                onContextMenu={(e) => openMenu(e, delivery)}
+                onContextMenu={(e) => openMenu(e, delivery!)}
               >
                 <Table.Cell>
-                  <DeliveryRecipient delivery={delivery} />
+                  <DeliveryRecipient delivery={delivery!} />
                 </Table.Cell>
                 <Table.Cell>
-                  <DeliveryRecipientAddress delivery={delivery} />
+                  <DeliveryRecipientAddress delivery={delivery!} />
                 </Table.Cell>
                 <Table.Cell>
                   <Table.InnerCell>
                     <UI.Helper>
-                      {delivery.campaignVariant?.label}
+                      {delivery!.campaignVariant?.label}
                     </UI.Helper>
                   </Table.InnerCell>
                 </Table.Cell>
                 <Table.Cell>
-                  <DeliveryStatus delivery={delivery} />
+                  <DeliveryStatus delivery={delivery!} />
                 </Table.Cell>
                 <Table.Cell>
-                  <FormatTimestamp timestamp={delivery.updatedAt} />
+                  <FormatTimestamp timestamp={delivery!.updatedAt} />
                 </Table.Cell>
               </Table.Row>
             ))}

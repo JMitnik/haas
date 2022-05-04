@@ -4,7 +4,6 @@ import { enumType, inputObjectType, mutationField, objectType, queryField } from
 import AutodeckService from './AutodeckService';
 import { PaginationWhereInput } from '../general/Pagination';
 import { NexusGenFieldTypes } from '../../generated/nexus';
-import { Upload } from '../customer/graphql/Customer';
 
 export const JobProcessLocationType = enumType({
   name: 'JobProcessLocationType',

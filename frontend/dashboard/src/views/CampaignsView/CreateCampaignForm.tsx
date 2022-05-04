@@ -87,8 +87,8 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
   });
 
   const dialogues = data?.customer?.dialogues?.map((dialogue) => ({
-    label: dialogue.title,
-    value: dialogue.id,
+    label: dialogue!.title,
+    value: dialogue!.id,
   })) || [];
 
   const percentageFull = Math.min(Math.floor((activeVariant.body.length / SMS_LIMIT_CHARACTERS) * 100), 100);

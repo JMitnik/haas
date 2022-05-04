@@ -82,8 +82,8 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
     onChange({
       id: callToAction.id,
       type: callToAction.type,
-      label: callToAction.title,
-      value: callToAction.id,
+      label: callToAction.title!,
+      value: callToAction.id!,
     });
     setCreateModalIsOpen(false);
     onClose?.();

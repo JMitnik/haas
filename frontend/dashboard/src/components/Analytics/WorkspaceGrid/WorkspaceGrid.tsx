@@ -160,7 +160,7 @@ export const WorkspaceGrid = ({
     if (currentState.viewMode === HexagonViewMode.Final) return;
 
     if (currentState.viewMode === HexagonViewMode.Session && clickedNode.type === HexagonNodeType.Session) {
-      setSessionId(clickedNode.session.id);
+      setSessionId(clickedNode.session.id || undefined);
       return;
     }
 
@@ -195,7 +195,7 @@ export const WorkspaceGrid = ({
 
     const [newNodes, hexagonViewMode] = await onLoadData({
       dialogueId,
-      topic: clickedNode.type === HexagonNodeType.Topic ? clickedNode.topic.name : '',
+      topic: clickedNode.type === HexagonNodeType.Topic ? clickedNode.topic.name || undefined : '',
       topics: topics.map((topic) => topic.name),
     }).finally(() => setIsLoading(false));
 
@@ -248,24 +248,24 @@ export const WorkspaceGrid = ({
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       <AnimatePresence />
       {isLoading && (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        exit={{ opacity: 0 }}
-        style={{
-          position: 'absolute',
-          top: '0',
-          left: '0',
-          right: '0',
-          bottom: '0',
-          zIndex: 1000,
-        }}
-      >
-        <UI.Div style={{ position: 'absolute', bottom: '0' }}>
-          <Loader testId="load" />
-        </UI.Div>
-      </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          exit={{ opacity: 0 }}
+          style={{
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            right: '0',
+            bottom: '0',
+            zIndex: 1000,
+          }}
+        >
+          <UI.Div style={{ position: 'absolute', bottom: '0' }}>
+            <Loader testId="load" />
+          </UI.Div>
+        </motion.div>
       )}
       <UI.Grid gridTemplateColumns="2fr 1fr" gridGap="0">
         <UI.Div borderRadius={10} height="60vh" position="relative">
@@ -367,7 +367,7 @@ export const WorkspaceGrid = ({
                         width={width}
                         height={height}
                         style={{ cursor: zoom.isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
-                      // @ts-ignore
+                        // @ts-ignore
                         ref={zoom.containerRef}
                       >
                         <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />

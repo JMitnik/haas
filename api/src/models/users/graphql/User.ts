@@ -66,9 +66,11 @@ export const AssignedDialogues = objectType({
   definition(t) {
     t.list.field('privateWorkspaceDialogues', {
       type: 'Dialogue',
+      required: true,
     });
     t.list.field('assignedDialogues', {
       type: 'Dialogue',
+      required: true,
     });
   },
 })
@@ -76,7 +78,7 @@ export const AssignedDialogues = objectType({
 export const UserType = objectType({
   name: 'UserType',
   definition(t) {
-    t.id('id');
+    t.nonNull.id('id');
     t.string('email');
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
