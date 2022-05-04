@@ -1,5 +1,7 @@
 import * as UI from '@haas/ui';
+import { Check } from 'react-feather';
 import { LinkProps, NavLink } from 'react-router-dom';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 export const SubNav = styled.ul``;
@@ -91,7 +93,7 @@ export const Card = styled(UI.Div)`
   `}
 `;
 
-export const Item = styled(UI.Div)`
+const ItemStyles = css`
   ${({ theme }) => css`
     color: ${theme.colors.gray[500]};
     font-size: 1rem;
@@ -99,6 +101,11 @@ export const Item = styled(UI.Div)`
     border-radius: ${theme.borderRadiuses.md}px;
     padding: 4px 8px;
     transition: all ${theme.transitions.normal};
+
+    &:hover {
+      color: ${theme.colors.main[500]};
+      transition: all ${theme.transitions.normal};
+    }
 
     & + & {
       margin-top: 2px;
@@ -116,6 +123,58 @@ export const Item = styled(UI.Div)`
     }
     ${UI.Icon} svg {
       max-width: 100%;
+    }
+  `}
+`;
+
+export const Item = styled(UI.Div)`
+  ${ItemStyles}
+`;
+
+interface CheckedItemProps {
+  isChecked: boolean;
+}
+
+export const CheckedItemContainer = styled(Item) <CheckedItemProps>`
+  ${({ theme, isChecked }) => css`
+    ${isChecked && css`
+      color: ${theme.colors.main[500]};
+    `}
+  `}
+`;
+
+interface CheckedItemProps {
+  isChecked: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+export const CheckedItem = ({ children, isChecked, onClick }: CheckedItemProps) => (
+  <CheckedItemContainer isChecked={isChecked} onClick={onClick}>
+    <UI.Flex justifyContent="space-between" alignItems="center">
+      {children}
+
+      {isChecked && (
+        <UI.Icon>
+          <Check />
+        </UI.Icon>
+      )}
+    </UI.Flex>
+  </CheckedItemContainer>
+);
+
+export const NavItem = styled(NavLink)`
+  ${({ theme }) => css`
+    ${ItemStyles}
+    display: block;
+
+    &:hover {
+      color: ${theme.colors.main[500]};
+      transition: all ${theme.transitions.normal};
+    }
+
+    & + ${Item}, ${Item} + & {
+      margin-top: 2px;
     }
   `}
 `;

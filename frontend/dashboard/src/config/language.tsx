@@ -11,6 +11,26 @@ const language = {
     },
   },
   general: {
+    workspace_role: {
+      en: '{{workspace}} as {{role}}',
+      de: '{{workspace}} als {{role}}',
+    },
+    to_language_de: {
+      en: 'Switch to German',
+      de: 'Wechseln zu Deutsch',
+    },
+    to_language_en: {
+      en: 'Switch to English',
+      de: 'Wechseln zu Englisch',
+    },
+    account_settings: {
+      en: 'Account settings',
+      de: 'Konto-Einstellungen',
+    },
+    switch_workspace: {
+      en: 'Switch workspace',
+      de: 'Workspace wechseln',
+    },
     continue: {
       en: 'Continue',
       de: 'Weiter',

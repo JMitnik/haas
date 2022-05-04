@@ -1,12 +1,16 @@
 import * as Popover from '@radix-ui/react-popover';
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Flag, LogOut, Settings, Sidebar } from 'react-feather';
+import { LogOut, Settings, Sidebar } from 'react-feather';
+import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Avatar } from 'components/Common/Avatar';
+import { ReactComponent as GermanyFlag } from 'assets/images/de.svg';
 import { ReactComponent as SwitchIcon } from 'assets/icons/icon-switch.svg';
+import { ReactComponent as UKFlag } from 'assets/images/uk.svg';
 import { slideUpFadeMotion } from 'components/animation/config';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useUser } from 'providers/UserProvider';
@@ -41,9 +45,17 @@ const Content = styled(Popover.Content)`
 `;
 
 export const WorkspaceSwitcher = () => {
-  const { user } = useUser();
-  const { activeCustomer } = useCustomer();
+  const { user, logout } = useUser();
+  const { activeCustomer, setActiveCustomer } = useCustomer();
   const [open, setOpen] = React.useState(false);
+  const history = useHistory();
+
+  const { t, i18n } = useTranslation();
+
+  const goToWorkspaceOverview = () => {
+    setActiveCustomer(null);
+    history.push('/dashboard');
+  };
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -107,11 +119,7 @@ export const WorkspaceSwitcher = () => {
                       </UI.Strong>
                       {activeCustomer && (
                         <UI.Muted>
-                          {activeCustomer.name}
-                          {' '}
-                          as
-                          {' '}
-                          {activeCustomer.userRole?.name}
+                          {t('workspace_role', { workspace: activeCustomer.name, role: activeCustomer.userRole?.name })}
                         </UI.Muted>
                       )}
                     </UI.Div>
@@ -120,42 +128,51 @@ export const WorkspaceSwitcher = () => {
 
                 <UI.Hr />
 
-                <LS.Item>
-                  <UI.Icon>
-                    <Flag />
-                  </UI.Icon>
-                  Switch to German
-                </LS.Item>
+                <LS.CheckedItem
+                  onClick={() => i18n.changeLanguage('en')}
+                  isChecked={i18n.language === 'en'}
+                >
+                  <UI.Flex alignItems="center">
+                    <UI.Icon>
+                      <UKFlag />
+                    </UI.Icon>
+                    {t('to_language_en')}
+                  </UI.Flex>
+                </LS.CheckedItem>
 
-                <LS.Item>
-                  <UI.Icon>
-                    <Flag />
-                  </UI.Icon>
-                  Switch to English
-                </LS.Item>
+                <LS.CheckedItem
+                  onClick={() => i18n.changeLanguage('de')}
+                  isChecked={i18n.language === 'de'}
+                >
+                  <UI.Flex alignItems="center">
+                    <UI.Icon>
+                      <GermanyFlag />
+                    </UI.Icon>
+                    {t('to_language_de')}
+                  </UI.Flex>
+                </LS.CheckedItem>
 
                 <UI.Hr />
 
-                <LS.Item>
-
+                <LS.NavItem to="/dashboard/me/edit">
                   <UI.Icon>
                     <Settings />
                   </UI.Icon>
-                  Account settings
-                </LS.Item>
+                  {t('account_settings')}
+                </LS.NavItem>
 
-                <LS.Item>
+                <LS.Item onClick={goToWorkspaceOverview}>
                   <UI.Icon>
                     <Sidebar />
                   </UI.Icon>
-                  Change workspace
+                  {t('switch_workspace')}
                 </LS.Item>
 
-                <LS.Item>
+                <LS.Item onClick={logout}>
                   <UI.Icon>
                     <LogOut />
                   </UI.Icon>
-                  Logout
+                  {t('logout')}
                 </LS.Item>
               </LS.Card>
             </motion.div>
