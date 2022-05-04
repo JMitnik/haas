@@ -9,7 +9,6 @@ import { graphqlUploadExpress } from 'graphql-upload';
 import DeliveryWebhookRoute from '../routes/webhooks/DeliveryWebhookRoute';
 import { makeApollo } from './apollo';
 import config from './config';
-import bodyParser from 'body-parser';
 
 export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   console.log('🏳️\tStarting application');
@@ -45,7 +44,6 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
 
   app.use('/graphql', apollo)
-  // apollo.applyMiddleware({ app });
 
   if (config.useSSL) {
     const key: any = process.env.HTTPS_SERVER_KEY_PATH;

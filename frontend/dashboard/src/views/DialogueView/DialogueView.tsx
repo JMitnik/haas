@@ -214,7 +214,6 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
 };
 
 const calcScoreIncrease = (currentScore: number, prevScore: number) => {
-  console.log(currentScore, prevScore);
   if (!prevScore) return 100;
 
   return currentScore / prevScore || 0;

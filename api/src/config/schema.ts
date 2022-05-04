@@ -31,14 +31,10 @@ const schema = makeSchema({
         alias: 'APIContext',
       },
     ],
-
-
   },
   contextType: {
-    // ''
     export: 'APIContext',
     module: path.join(__dirname, '../types/APIContext.ts'),
-    // alias: 'APIContext',
   },
   outputs: {
     schema: path.join(__dirname, '../generated/schema.graphql'),

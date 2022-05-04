@@ -412,7 +412,7 @@ export const WorkspaceMutations = extendType({
 
         const result = await stream;
         const { secure_url } = result;
-        console.log('RESULT: ', result);
+
         return { filename, mimetype, encoding, url: secure_url };
       },
     });

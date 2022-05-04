@@ -77,7 +77,6 @@ const CustomerUploadLogoInput = ({ onChange, value, logoOpacity, overrideColor }
     if (!files.length) return;
 
     const [file] = files;
-    console.log('FILE: ', file);
     uploadFile({ variables: { file } });
   };
 
