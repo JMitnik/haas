@@ -48,5 +48,13 @@ function graphqlTestContext(prisma: PrismaClient) {
     async after() {
       serverInstance?.close();
     },
+
+    afterAll() {
+      serverInstance?.close();
+    },
+
+    afterEach() {
+      serverInstance?.close();
+    },
   };
 }

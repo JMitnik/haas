@@ -28,5 +28,9 @@ export const makeRestServer = (prisma: PrismaClient) => {
     serverInstance?.close();
   });
 
+  afterAll(async () => {
+    serverInstance?.close();
+  })
+
   return restContext;
 }
