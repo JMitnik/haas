@@ -1,5 +1,5 @@
 import { Server } from 'http';
-import getPort, { portNumbers } from 'get-port';
+import getPort, { makeRange } from 'get-port';
 import { PrismaClient } from '@prisma/client';
 
 import { makeServer } from '../../config/server';
@@ -15,7 +15,7 @@ export const makeRestServer = (prisma: PrismaClient) => {
   let restContext = {} as RestContextProps;
 
   beforeEach(async () => {
-    const port = await getPort({ port: portNumbers(4002, 6000) });
+    const port = await getPort({ port: makeRange(4002, 6000) });
     serverInstance = await makeServer(port, prisma);
 
     Object.assign(restContext, {
