@@ -1,9 +1,14 @@
-import { ApolloServer, UserInputError } from 'apollo-server-express';
+import { UserInputError } from 'apollo-server-express';
 import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
 import { PrismaClient } from '@prisma/client';
 import { createServer } from '@graphql-yoga/node'
 import { useApolloServerErrors } from '@envelop/apollo-server-errors'
+import { useResponseCache } from '@envelop/response-cache'
+import { useSentry } from '@envelop/sentry';
+import { useParserCache } from '@envelop/parser-cache';
+import { useValidationCache } from '@envelop/validation-cache';
+import { useGraphQlJit } from '@envelop/graphql-jit';
 
 import { APIContext } from '../types/APIContext';
 import Sentry from './sentry';
@@ -52,9 +57,7 @@ export const makeApollo = async (prisma: PrismaClient) => {
   const apollo = createServer({
     cors: true,
     logging: true,
-    // schema,
-    maskedErrors: false, // TODO: Remove again
-
+    maskedErrors: false,
     schema: applyMiddleware(schema, authShield),
     context: async (ctx: any): Promise<APIContext> => ({
       ...ctx,
@@ -63,6 +66,21 @@ export const makeApollo = async (prisma: PrismaClient) => {
       services: bootstrapServices(prisma),
     }),
     plugins: [
+      useGraphQlJit(),
+      useValidationCache(),
+      useParserCache(),
+      useSentry(),
+      useResponseCache({
+        includeExtensionMetadata: true,
+        idFields: [
+          'id',
+          'userId',
+          'customerId',
+          'roleId',
+          'questionId',
+          'dialogueId',
+        ],
+      }),
       useApolloServerErrors({
         debug: true,
       }),
