@@ -135,7 +135,7 @@ const TriggersOverview = () => {
       <UI.ViewHead>
         <UI.Flex justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <UI.ViewTitle>{t('views:trigger_overview')}</UI.ViewTitle>
+            <UI.DeprecatedViewTitle>{t('views:trigger_overview')}</UI.DeprecatedViewTitle>
             <UI.Button
               onClick={handleAddUser}
               leftIcon={Plus}

@@ -116,7 +116,7 @@ export const AutodeckOverview = () => {
             <BackButtonContainer onClick={() => history.goBack()}>
               <ArrowLeft />
             </BackButtonContainer>
-            <UI.ViewTitle>Autodeck overview</UI.ViewTitle>
+            <UI.DeprecatedViewTitle>Autodeck overview</UI.DeprecatedViewTitle>
             <UI.Button
               leftIcon={Plus}
               onClick={() => setIsOpenImportModal(true)}

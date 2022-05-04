@@ -29,9 +29,9 @@ export const DialogueLinkFetchOverview = () => {
   return (
     <UI.Container>
       <UI.Div padding="1em">
-        <UI.ViewTitle>
+        <UI.DeprecatedViewTitle>
           {t('dialogues')}
-        </UI.ViewTitle>
+        </UI.DeprecatedViewTitle>
       </UI.Div>
 
       <UI.ViewBody padding="1em">

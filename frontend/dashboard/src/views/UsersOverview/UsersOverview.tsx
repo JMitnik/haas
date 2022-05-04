@@ -241,7 +241,7 @@ const UsersOverview = () => {
       <UI.ViewHead>
         <UI.Flex width="100%" justifyContent="space-between">
           <UI.Flex alignItems="center">
-            <UI.ViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.ViewTitle>
+            <UI.DeprecatedViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.DeprecatedViewTitle>
             <InviteUserButton>
               {(onClose) => (
                 <InviteUserForm onRefetch={refetch} onClose={onClose} />

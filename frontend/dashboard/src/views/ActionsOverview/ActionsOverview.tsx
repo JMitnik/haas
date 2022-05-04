@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
 import { Button, Icon } from '@chakra-ui/core';
-import { Div, Flex, ViewTitle } from '@haas/ui';
+import { DeprecatedViewTitle, Div, Flex } from '@haas/ui';
 import { Mail, Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/client';
@@ -140,9 +140,9 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
       <UI.ViewHead>
         <UI.Flex justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <ViewTitle leftIcon={<Mail />}>
+            <DeprecatedViewTitle leftIcon={<Mail />}>
               {t('views:cta_view')}
-            </ViewTitle>
+            </DeprecatedViewTitle>
 
             <UI.Button
               leftIcon={Plus}

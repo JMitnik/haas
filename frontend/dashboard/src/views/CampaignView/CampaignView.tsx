@@ -185,7 +185,7 @@ export const CampaignView = () => {
           <UI.Stack>
             <UI.Breadcrumb to={campaignsPath}>{t('back_to_campaigns')}</UI.Breadcrumb>
             <UI.Stack isInline alignItems="center" spacing={4}>
-              <UI.ViewTitle>{campaign?.label}</UI.ViewTitle>
+              <UI.DeprecatedViewTitle>{campaign?.label}</UI.DeprecatedViewTitle>
               <UI.Button
                 leftIcon={Plus}
                 onClick={() => setIsOpenImportModal(true)}

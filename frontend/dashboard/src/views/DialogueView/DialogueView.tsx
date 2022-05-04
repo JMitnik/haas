@@ -293,9 +293,9 @@ const DialogueView = () => {
       <UI.ViewHead renderBreadCrumb={<UI.Breadcrumb to={getDialoguesPath()}>{t('go_to_dialogues')}</UI.Breadcrumb>}>
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <UI.ViewTitle leftIcon={<ChartbarIcon />}>
+            <UI.DeprecatedViewTitle leftIcon={<ChartbarIcon />}>
               {t('views:dialogue_view')}
-            </UI.ViewTitle>
+            </UI.DeprecatedViewTitle>
             <Popover.Root open={isShareDialogueOpen} onOpenChange={setIsShareDialogueOpen}>
               <Popover.Trigger asChild>
                 <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">

@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { ArrowLeft, Plus } from 'react-feather';
-import { Div, Flex, ViewTitle } from '@haas/ui';
+import { DeprecatedViewTitle, Div, Flex } from '@haas/ui';
 import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 
@@ -57,7 +57,7 @@ const AdminOverview = () => {
               <ArrowLeft />
             </BackButtonContainer>
 
-            <ViewTitle>{t('views:admin_overview')}</ViewTitle>
+            <DeprecatedViewTitle>{t('views:admin_overview')}</DeprecatedViewTitle>
             <Flex
               flexDirection="row"
               justifyContent="space-between"

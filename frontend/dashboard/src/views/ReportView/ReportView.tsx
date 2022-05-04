@@ -92,9 +92,9 @@ export const ReportView = ({ compareStatisticStartDate, dateLabel, startDate }: 
       <UI.ViewHead>
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <UI.ViewTitle leftIcon={<ChartbarIcon />}>
+            <UI.DeprecatedViewTitle leftIcon={<ChartbarIcon />}>
               {`${t('report:name')}: ${dialogueSlug} (${compareStatisticStartDate.toLocaleDateString()} - ${startDate.toLocaleDateString()})`}
-            </UI.ViewTitle>
+            </UI.DeprecatedViewTitle>
           </UI.Flex>
         </UI.Flex>
       </UI.ViewHead>

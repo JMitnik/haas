@@ -34,7 +34,7 @@ const CampaignsView = () => {
   return (
     <>
       <UI.ViewHead>
-        <UI.ViewTitle>{t('campaigns')}</UI.ViewTitle>
+        <UI.DeprecatedViewTitle>{t('campaigns')}</UI.DeprecatedViewTitle>
         {canCreateCampaigns && (
           <UI.Button
             size="sm"

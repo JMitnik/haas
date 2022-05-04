@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { ReactComponent as ChatIcon } from 'assets/icons/icon-chat-group-sm.svg';
-import { ReactComponent as HomeIcon } from 'assets/icons/icon-home-sm.svg';
+import { ReactComponent as HomeIcon } from 'assets/icons/icon-view-grid-sm.svg';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification-sm.svg';
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog-sm.svg';
 import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey-sm.svg';

@@ -1,10 +1,10 @@
-import { Div } from '@haas/ui';
+import * as UI from '@haas/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import * as LS from './WorkpaceLayout.styles';
 
-const MobileBottomNavContainer = styled(Div)`
+const MobileBottomNavContainer = styled(UI.Div)`
   ${({ theme }) => css`
     position: fixed;
     height: 80px;

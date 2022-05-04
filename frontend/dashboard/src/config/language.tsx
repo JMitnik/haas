@@ -11,6 +11,22 @@ const language = {
     },
   },
   general: {
+    overview: {
+      en: 'Overview',
+      de: 'Übersicht',
+    },
+    good_morning_user: {
+      en: 'Good morning, {{ user }}.',
+      de: 'Guten Morgen, {{ user }}.',
+    },
+    good_afternoon_user: {
+      en: 'Good afternoon, {{ user }}.',
+      de: 'Guten Tag, {{ user }}.',
+    },
+    good_evening_user: {
+      en: 'Good evening, {{ user }}.',
+      de: 'Guten Abend, {{ user }}.',
+    },
     workspace_role: {
       en: '{{workspace}} as {{role}}',
       de: '{{workspace}} als {{role}}',
@@ -1582,8 +1598,8 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
   },
   views: {
     dashboard: {
-      en: 'Dashboard',
-      de: 'Dashboard',
+      en: 'Overview',
+      de: 'Overview',
     },
     configurations: {
       en: 'Configurations',

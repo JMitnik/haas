@@ -133,7 +133,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
   return (
     <>
       <UI.ViewHead>
-        <UI.ViewTitle>{t('views:edit_business_settings_view')}</UI.ViewTitle>
+        <UI.DeprecatedViewTitle>{t('views:edit_business_settings_view')}</UI.DeprecatedViewTitle>
       </UI.ViewHead>
       <UI.ViewBody>
         <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>

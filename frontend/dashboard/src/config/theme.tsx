@@ -203,7 +203,7 @@ export const chakraDefaultTheme = {
 };
 
 // Dependent variables - Generic
-theme.colors.app.background = theme.colors.white;
+theme.colors.app.background = theme.colors.neutral[200];
 theme.colors.app.sidebar = theme.colors.neutral[300];
 theme.colors.app.topbar = theme.colors.white;
 

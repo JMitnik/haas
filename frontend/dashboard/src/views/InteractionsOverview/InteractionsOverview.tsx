@@ -7,7 +7,7 @@ import { Activity, Calendar, Filter, Link2, Mail, MessageCircle, Plus, Search, S
 import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { Controller, useForm } from 'react-hook-form';
-import { Flex, ViewTitle } from '@haas/ui';
+import { DeprecatedViewTitle, Flex } from '@haas/ui';
 import {
   Icon,
   Radio,
@@ -320,10 +320,10 @@ export const InteractionsOverview = () => {
       <UI.ViewHead>
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <ViewTitle>
+            <DeprecatedViewTitle>
               <Icon as={Activity} mr={1} />
               {t('views:interactions_view')}
-            </ViewTitle>
+            </DeprecatedViewTitle>
           </UI.Flex>
 
           <Flex alignItems="center">
