@@ -10,6 +10,7 @@ import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 import useAuth from 'hooks/useAuth';
 
+import { View } from 'layouts/View';
 import CreateCampaignForm from './CreateCampaignForm';
 
 const CampaignsView = () => {
@@ -32,21 +33,31 @@ const CampaignsView = () => {
   };
 
   return (
-    <>
+    <View documentTitle="haas | Campaigns">
       <UI.ViewHead>
-        <UI.DeprecatedViewTitle>{t('campaigns')}</UI.DeprecatedViewTitle>
-        {canCreateCampaigns && (
-          <UI.Button
-            size="sm"
-            onClick={() => setIsOpenedModal(true)}
-            variantColor="teal"
-            leftIcon={Plus}
-          >
-            {t('create_campaign')}
-          </UI.Button>
-        )}
+        <UI.Flex alignItems="flex-end">
+          <UI.Div>
+            <UI.ViewTitle>{t('campaigns')}</UI.ViewTitle>
+            <UI.ViewSubTitle>
+              {t('campaigns_subtitle')}
+            </UI.ViewSubTitle>
+          </UI.Div>
+          {canCreateCampaigns && (
+            <UI.Div>
+              <UI.Button
+                ml={8}
+                size="sm"
+                onClick={() => setIsOpenedModal(true)}
+                variantColor="main"
+                leftIcon={Plus}
+              >
+                {t('create_campaign')}
+              </UI.Button>
+            </UI.Div>
+          )}
+        </UI.Flex>
       </UI.ViewHead>
-      <UI.ViewContainer>
+      <UI.ViewBody>
         {/* TODO: Set proper close */}
         {campaigns.length === 0 ? (
           <UI.IllustrationCard
@@ -57,7 +68,6 @@ const CampaignsView = () => {
             <UI.Button
               size="sm"
               onClick={() => setIsOpenedModal(true)}
-              variantColor="teal"
               leftIcon={Plus}
             >
               {t('create_campaign')}
@@ -95,8 +105,8 @@ const CampaignsView = () => {
             </UI.ModalBody>
           </UI.ModalCard>
         </UI.Modal>
-      </UI.ViewContainer>
-    </>
+      </UI.ViewBody>
+    </View>
   );
 };
 

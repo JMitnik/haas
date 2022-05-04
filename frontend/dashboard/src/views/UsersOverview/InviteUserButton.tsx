@@ -29,7 +29,6 @@ const InviteUserButton = ({ children, arrowBg = 'white' }: InviteButtonProps) =>
           size="sm"
           ml={4}
           leftIcon={Plus}
-          variantColor="teal"
         >
           {t('invite_user')}
         </UI.Button>

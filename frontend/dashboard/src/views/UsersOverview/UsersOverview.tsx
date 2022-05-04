@@ -23,7 +23,7 @@ import {
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { TabbedMenu } from 'components/Common/TabMenu';
-import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
+import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
@@ -237,22 +237,33 @@ const UsersOverview = () => {
   const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
 
   return (
-    <>
+    <View documentTitle="haas | Users">
       <UI.ViewHead>
         <UI.Flex width="100%" justifyContent="space-between">
-          <UI.Flex alignItems="center">
-            <UI.DeprecatedViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.DeprecatedViewTitle>
-            <InviteUserButton>
-              {(onClose) => (
-                <InviteUserForm onRefetch={refetch} onClose={onClose} />
-              )}
-            </InviteUserButton>
+          <UI.Flex alignItems="flex-end">
+            <UI.Div>
+              <UI.ViewTitle>{t('views:users_overview')}</UI.ViewTitle>
+              <UI.ViewSubTitle>
+                {t('users_subtitle')}
+              </UI.ViewSubTitle>
+            </UI.Div>
+
+            <UI.Div ml={8}>
+              <InviteUserButton>
+                {(onClose) => (
+                  <InviteUserForm onRefetch={refetch} onClose={onClose} />
+                )}
+              </InviteUserButton>
+            </UI.Div>
           </UI.Flex>
 
-          <SearchBar
-            activeSearchTerm={filter.search}
-            onSearchTermChange={handleSearchTermChange}
-          />
+          <UI.Div>
+            <SearchBar
+              activeSearchTerm={filter.search}
+              onSearchTermChange={handleSearchTermChange}
+            />
+          </UI.Div>
+
         </UI.Flex>
       </UI.ViewHead>
 
@@ -599,7 +610,7 @@ const UsersOverview = () => {
         )}
 
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

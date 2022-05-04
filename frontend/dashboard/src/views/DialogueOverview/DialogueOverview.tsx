@@ -57,94 +57,94 @@ const DialogueOverview = () => {
 
   return (
     <View documentTitle="haas | Dialogues">
-      <UI.FadeIn>
-
-        <UI.ViewHead>
-          <UI.ViewTitle>
-            {t('dialogues')}
-          </UI.ViewTitle>
-        </UI.ViewHead>
-        <UI.ViewBody>
-          <Div mb={4} maxWidth="800px" width="100%">
-            <Flex>
-              <Div mr={4}>
-                <Searchbar
-                  activeSearchTerm={filter.search}
-                  onSearchTermChange={(newTerm) => {
-                    setFilter(
-                      (newFilter) => ({ ...newFilter, pageIndex: 0, search: newTerm }),
-                    );
-                  }}
+      <UI.ViewHead>
+        <UI.ViewTitle>
+          {t('dialogues')}
+        </UI.ViewTitle>
+        <UI.ViewSubTitle>
+          {t('dialogues_subtitle')}
+        </UI.ViewSubTitle>
+      </UI.ViewHead>
+      <UI.ViewBody>
+        <Div mb={4} maxWidth="800px" width="100%">
+          <Flex>
+            <Div mr={4}>
+              <Searchbar
+                activeSearchTerm={filter.search}
+                onSearchTermChange={(newTerm) => {
+                  setFilter(
+                    (newFilter) => ({ ...newFilter, pageIndex: 0, search: newTerm }),
+                  );
+                }}
+              />
+            </Div>
+            <ButtonGroup display="flex" alignItems="center">
+              <Button
+                size="sm"
+                onClick={() => setUseDialogueGridView(true)}
+                variantColor={useDialogueGridView ? 'blue' : 'gray'}
+                leftIcon={GridIcon}
+              >
+                {t('grid')}
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setUseDialogueGridView(false)}
+                variantColor={useDialogueGridView ? 'gray' : 'blue'}
+                leftIcon={List}
+              >
+                {t('list')}
+              </Button>
+            </ButtonGroup>
+            <UI.Flex justifyContent="flex-end" ml={4}>
+              {pageCount > 1 && (
+                <Table.Pagination
+                  pageIndex={filter.pageIndex}
+                  maxPages={pageCount}
+                  perPage={filter.perPage}
+                  isLoading={isLoading}
+                  setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
                 />
-              </Div>
-              <ButtonGroup display="flex" alignItems="center">
-                <Button
-                  size="sm"
-                  onClick={() => setUseDialogueGridView(true)}
-                  variantColor={useDialogueGridView ? 'blue' : 'gray'}
-                  leftIcon={GridIcon}
-                >
-                  {t('grid')}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => setUseDialogueGridView(false)}
-                  variantColor={useDialogueGridView ? 'gray' : 'blue'}
-                  leftIcon={List}
-                >
-                  {t('list')}
-                </Button>
-              </ButtonGroup>
-              <UI.Flex justifyContent="flex-end" ml={4}>
-                {pageCount > 1 && (
-                  <Table.Pagination
-                    pageIndex={filter.pageIndex}
-                    maxPages={pageCount}
-                    perPage={filter.perPage}
-                    isLoading={isLoading}
-                    setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
-                  />
-                )}
-              </UI.Flex>
-            </Flex>
-          </Div>
-
-          {useDialogueGridView ? (
-            <Grid
-              gridGap={4}
-              gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(250px, 1fr))']}
-              gridAutoRows="minmax(300px, 1fr)"
-            >
-
-              {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-                <DialogueCard key={index} dialogue={dialogue} />
-              ))}
-
-              {canDeleteDialogue && (
-                <AddDialogueCard data-cy="AddDialogueCard">
-                  <Link to={`/dashboard/b/${customerSlug}/dialogue/add`} />
-
-                  <Flex flexDirection="column" alignItems="center" justifyContent="center">
-                    <SurveyIcon />
-                    <TranslatedPlus>
-                      <Plus strokeWidth="3px" />
-                    </TranslatedPlus>
-                    <H4 color="default.dark">
-                      {t('create_dialogue')}
-                    </H4>
-                  </Flex>
-                </AddDialogueCard>
               )}
-            </Grid>
-          ) : (
-            <Grid gridRowGap={2}>
-              {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-                <DialogueCard isCompact key={index} dialogue={dialogue} />
-              ))}
-            </Grid>
-          )}
-        </UI.ViewBody>
-      </UI.FadeIn>
+            </UI.Flex>
+          </Flex>
+        </Div>
+
+        {useDialogueGridView ? (
+          <Grid
+            gridGap={4}
+            gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(250px, 1fr))']}
+            gridAutoRows="minmax(300px, 1fr)"
+          >
+
+            {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
+              <DialogueCard key={index} dialogue={dialogue} />
+            ))}
+
+            {canDeleteDialogue && (
+              <AddDialogueCard data-cy="AddDialogueCard">
+                <Link to={`/dashboard/b/${customerSlug}/dialogue/add`} />
+
+                <Flex flexDirection="column" alignItems="center" justifyContent="center">
+                  <SurveyIcon />
+                  <TranslatedPlus>
+                    <Plus strokeWidth="3px" />
+                  </TranslatedPlus>
+                  <H4 color="default.dark">
+                    {t('create_dialogue')}
+                  </H4>
+                </Flex>
+              </AddDialogueCard>
+            )}
+          </Grid>
+        ) : (
+          <Grid gridRowGap={2}>
+            {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
+              <DialogueCard isCompact key={index} dialogue={dialogue} />
+            ))}
+          </Grid>
+        )}
+      </UI.ViewBody>
     </View>
   );
 };

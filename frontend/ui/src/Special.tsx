@@ -13,7 +13,7 @@ import { Flex } from './Container';
 const IllustrationCardWrapper = styled.div`
   ${({ theme }) => css`
     ${Span} {
-      color: ${theme.colors.gray['500']};
+      color: ${theme.colors.gray['800']};
       bottom: ${theme.gutter}px;
       font-weight: 200;
       font-size: 1.3rem;
@@ -22,6 +22,11 @@ const IllustrationCardWrapper = styled.div`
       display: block;
       max-width: 80%;
       margin: 0 auto;
+    }
+
+    ${Text} {
+      color: ${theme.colors.off['500']};
+      font-weight: 300;
     }
 
     > svg {
@@ -176,7 +181,7 @@ export const Separator = styled(Div)`
 interface PaddedBodyProps {
   fraction?: number;
 }
-export const PaddedBody = styled(Div)<PaddedBodyProps>`
+export const PaddedBody = styled(Div) <PaddedBodyProps>`
   ${({ theme, fraction = 1 }) => css`
     padding: ${theme.gutter * fraction}px;
   `}

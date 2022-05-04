@@ -73,13 +73,13 @@ interface ViewHeadProps {
 }
 
 export const ViewTitle = ({ children }: ViewHeadProps) => (
-  <H2 forwardedAs={motion.div} color="main.500">
+  <H2 lineHeight={1.4} style={{ display: 'inline-block' }} forwardedAs={motion.div} color="main.500">
     {children}
   </H2>
 )
 
 export const ViewSubTitle = ({ children }: ViewHeadProps) => (
-  <Text fontSize="1.1rem" color="off.500" fontWeight={500} mb={4}>
+  <Text fontSize="1.1rem" color="off.500" fontWeight={500}>
     {children}
   </Text>
 );

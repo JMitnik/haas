@@ -601,6 +601,10 @@ const language = {
       en: 'Campaigns',
       de: 'Kampagnen',
     },
+    campaigns_subtitle: {
+      en: 'View, edit, and create campaigns',
+      de: 'Kampagnen anzeigen, bearbeiten und erstellen',
+    },
     placeholder: {
       en: 'Field placeholder',
       de: 'Feldplatzhalter',
@@ -1154,6 +1158,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Dialogues',
       de: 'Dialog',
     },
+    dialogues_subtitle: {
+      en: 'Create, edit and manage dialogues',
+      de: 'Erstellen, bearbeiten und verwalten von Dialogen',
+    },
     score: {
       en: 'Score',
       de: 'Ergebnis',
@@ -1198,6 +1206,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Users',
       de: 'Benutzer',
     },
+    users_subtitle: {
+      en: 'Manage users, roles, and permissions',
+      de: 'Benutzer, Rollen und Berechtigungen verwalten',
+    },
     alerts: {
       en: 'Alerts',
       de: 'Alerts',
@@ -1209,10 +1221,6 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     latest_interactions: {
       en: 'Latest interactions',
       de: 'Die letzten Interaktionen',
-    },
-    overview: {
-      en: 'Overview',
-      de: 'Übersicht',
     },
     interactions: {
       en: 'Interactions',
