@@ -1,7 +1,6 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 
@@ -14,6 +13,7 @@ import CustomerForm from 'components/CustomerForm';
 import boolToInt from 'utils/booleanToNumber';
 import intToBool from 'utils/intToBool';
 
+import { View } from 'layouts/View';
 import getEditCustomerData from '../../queries/getEditCustomer';
 
 const editWorkspaceMutation = gql`
@@ -49,10 +49,9 @@ type FormDataProps = yup.InferType<typeof schema>;
 
 const startsWithCloudinary = (url: string) => url.includes('cloudinary');
 
-const EditCustomerForm = ({ customer }: { customer: any }) => {
+const WorkspaceSettingsForm = ({ customer }: { customer: any }) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const history = useHistory();
-  const { t } = useTranslation();
   const toast = useToast();
 
   const form = useForm<FormDataProps>({
@@ -73,9 +72,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
   const [editWorkspace, { loading: isLoading, error: serverErrors }] = useMutation(editWorkspaceMutation, {
     onCompleted: (result: any) => {
-      const customer: any = result.editCustomer;
+      const editedWorkspace = result.editCustomer;
 
-      localStorage.setItem('customer', JSON.stringify(customer));
+      localStorage.setItem('customer', JSON.stringify(editedWorkspace));
 
       toast({
         title: 'Your business edited',
@@ -131,29 +130,21 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
   };
 
   return (
-    <>
-      <UI.ViewHead>
-        <UI.DeprecatedViewTitle>{t('views:edit_business_settings_view')}</UI.DeprecatedViewTitle>
-      </UI.ViewHead>
-      <UI.ViewBody>
-        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-          <UI.FormContainer>
-            <CustomerForm
-              form={form}
-              isLoading={isLoading}
-              onFormSubmit={onSubmit}
-              serverErrors={serverErrors}
-              isInEdit
-            />
-          </UI.FormContainer>
-        </motion.div>
-      </UI.ViewBody>
-    </>
+    <UI.FormContainer>
+      <CustomerForm
+        form={form}
+        isLoading={isLoading}
+        onFormSubmit={onSubmit}
+        serverErrors={serverErrors}
+        isInEdit
+      />
+    </UI.FormContainer>
   );
 };
 
-const EditCustomerView = () => {
+export const WorkspaceSettingsView = () => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
+  const { t } = useTranslation();
 
   const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
     variables: {
@@ -166,7 +157,18 @@ const EditCustomerView = () => {
 
   const customer = customerData?.customer;
 
-  return <EditCustomerForm customer={customer} />;
-};
+  return (
+    <View documentTitle="haas | Settings">
+      <UI.ViewHead>
+        <UI.Div>
+          <UI.ViewTitle>{t('views:edit_business_settings_view')}</UI.ViewTitle>
+          <UI.ViewSubTitle>{t('views:edit_business_settings_subtitle')}</UI.ViewSubTitle>
+        </UI.Div>
+      </UI.ViewHead>
 
-export default EditCustomerView;
+      <UI.ViewBody>
+        <WorkspaceSettingsForm customer={customer} />
+      </UI.ViewBody>
+    </View>
+  );
+};

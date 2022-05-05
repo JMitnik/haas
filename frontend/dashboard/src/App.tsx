@@ -14,6 +14,7 @@ import { ROUTES } from 'hooks/useNavigator';
 import { ReportView } from 'views/ReportView';
 import { SystemPermission } from 'types/generated-types';
 import { VerifyTokenView } from 'views/VerifyTokenView';
+import { WorkspaceSettingsView } from 'views/WorkspaceSettingsView';
 import { sub } from 'date-fns';
 import { useUser } from 'providers/UserProvider';
 import ActionsPage from 'pages/dashboard/actions';
@@ -32,7 +33,6 @@ import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
 import DialogueOverview from 'views/DialogueOverview';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
-import EditCustomerView from 'views/EditCustomerView';
 import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
@@ -137,7 +137,7 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       allowedPermission={SystemPermission.CanEditWorkspace}
                       path="/dashboard/b/:customerSlug/edit"
-                      render={() => <EditCustomerView />}
+                      render={() => <WorkspaceSettingsView />}
                     />
 
                     <GuardedRoute

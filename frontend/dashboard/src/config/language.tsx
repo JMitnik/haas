@@ -1682,8 +1682,12 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Alerts',
     },
     edit_business_settings_view: {
-      en: 'Edit workspace settings',
-      de: 'Wähle Unternehmenseinstellungen',
+      en: 'Settings',
+      de: 'Einstellungen',
+    },
+    edit_business_settings_subtitle: {
+      en: 'Manage your workspace, including the name, url extension, and branding.',
+      de: 'Verwalte dein Unternehmen, inklusive der Name, URL-Erweiterung und Marke.',
     },
     create_trigger_view: {
       en: 'Create alert',
