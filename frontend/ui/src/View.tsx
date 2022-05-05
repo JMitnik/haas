@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Div } from './Generics';
-import { Stack } from './Container';
+import { Container, Stack } from './Container';
 import { Icon } from './Icon';
 import { Span } from './Span';
 import { H2, Text } from './Type';
@@ -56,15 +56,26 @@ export const ViewHeadContainer = styled(Div)`
 interface ViewHeadProps {
   children: React.ReactNode;
   renderBreadCrumb?: React.ReactNode;
+  compact?: boolean;
 }
 
-export const ViewHead = ({ children, renderBreadCrumb }: ViewHeadProps) => (
+export const ViewHead = ({ children, renderBreadCrumb, compact = false }: ViewHeadProps) => (
   <ViewHeadContainer>
     {!!renderBreadCrumb && renderBreadCrumb}
 
-    <Stack spacing={4}>
-      {children}
-    </Stack>
+    {compact && (
+      <Container>
+        <Stack spacing={4}>
+          {children}
+        </Stack>
+      </Container>
+    )}
+
+    {!compact && (
+      <Stack spacing={4}>
+        {children}
+      </Stack>
+    )}
   </ViewHeadContainer>
 );
 
@@ -95,14 +106,33 @@ export const ViewContainer = styled(Div) <{ isCompact?: boolean; }>`
   `}
 `;
 
-export const ViewBody = styled(Div) <{ isCompact?: boolean; }>`
-  ${({ theme, isCompact, padding }) => css`
+export const ViewBodyContainer = styled(Div)`
+  ${({ theme, padding }) => css`
     margin: 0 auto;
     padding: ${theme.gutter}px ${theme.gutter * 1.5}px;
     background: ${theme.colors.app.background};
-
-    ${isCompact && css`
-      max-width: 1400px;
-    `}
   `}
 `;
+
+interface ViewBodyProps {
+  children: React.ReactNode;
+  compact?: boolean;
+}
+
+export const ViewBody = ({ children, compact = false }: ViewBodyProps) => {
+  return (
+    <ViewBodyContainer>
+      {compact && (
+        <Container>
+          {children}
+        </Container>
+      )}
+
+      {!compact && (
+        <>
+          {children}
+        </>
+      )}
+    </ViewBodyContainer>
+  )
+}

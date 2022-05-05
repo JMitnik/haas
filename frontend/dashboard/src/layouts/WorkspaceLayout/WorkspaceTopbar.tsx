@@ -6,7 +6,7 @@ import { Logo, LogoContainer } from 'components/Logo';
 
 export const TopbarContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    padding: ${theme.gutter / 4}px ${theme.gutter / 2}px;
+    padding: ${theme.gutter / 4}px ${theme.gutter * 1.5}px;
     background: ${theme.colors.app.topbar};
     border-bottom: 1px solid ${theme.colors.gray[100]};
     width: 100%;

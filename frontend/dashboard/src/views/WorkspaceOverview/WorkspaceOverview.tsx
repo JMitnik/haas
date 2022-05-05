@@ -8,6 +8,7 @@ import { Variants, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { View } from 'layouts/View';
 import { useNavigator } from 'hooks/useNavigator';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 import useAuth from 'hooks/useAuth';
@@ -46,83 +47,85 @@ export const WorkspaceOverview = ({ customers, isLoading }: { customers: any[]; 
   const { goToGenerateWorkspaceOverview } = useNavigator();
 
   return (
-    <LS.WorkspaceOverviewContainer>
-      <UI.ViewHead>
-        <UI.Container>
-          <UI.Flex alignItems="flex-end">
-            <UI.Div>
-              <UI.ViewTitle>
-                {t('workspaces')}
-              </UI.ViewTitle>
-              <UI.ViewSubTitle>
-                {t('workspaces_subtitle')}
-              </UI.ViewSubTitle>
-            </UI.Div>
+    <View documentTitle="haas | Workspaces">
+      <LS.WorkspaceOverviewContainer>
+        <UI.ViewHead>
+          <UI.Container>
+            <UI.Flex alignItems="flex-end">
+              <UI.Div>
+                <UI.ViewTitle>
+                  {t('workspaces')}
+                </UI.ViewTitle>
+                <UI.ViewSubTitle>
+                  {t('workspaces_subtitle')}
+                </UI.ViewSubTitle>
+              </UI.Div>
 
-            <UI.Div ml={4}>
-              {canGenerateWorkspaceFromCsv && (
-                <UI.Button size="sm" onClick={() => goToGenerateWorkspaceOverview()}>
-                  {t('generate_workspace')}
-                </UI.Button>
-              )}
-            </UI.Div>
-          </UI.Flex>
-        </UI.Container>
-      </UI.ViewHead>
-      <UI.ViewBody>
-        <UI.Container>
-          {isLoading ? (
-            <MotionGrid
-              gridGap={4}
-              gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
-              gridAutoRows="minmax(200px, 1fr)"
-              variants={cardContainerAnimation}
-              animate="animate"
-              initial="initial"
-            >
-              <Skeleton />
-              <Skeleton />
-              <Skeleton />
-            </MotionGrid>
-          ) : (
-            <MotionGrid
-              gridGap={4}
-              gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
-              gridAutoRows="minmax(200px, 1fr)"
-              variants={cardContainerAnimation}
-              animate="animate"
-              initial="initial"
-            >
-              {customers?.map((customer: any, index: any) => customer && (
-                <motion.div
-                  animate="animate"
-                  initial="initial"
-                  style={{ height: '100%' }}
-                  key={index}
-                  variants={cardItemAnimation}
-                >
-                  <ErrorBoundary key={index} FallbackComponent={() => <></>}>
-                    <WorkspaceCard key={index} customer={customer} />
-                  </ErrorBoundary>
-                </motion.div>
-              ))}
+              <UI.Div ml={4}>
+                {canGenerateWorkspaceFromCsv && (
+                  <UI.Button size="sm" onClick={() => goToGenerateWorkspaceOverview()}>
+                    {t('generate_workspace')}
+                  </UI.Button>
+                )}
+              </UI.Div>
+            </UI.Flex>
+          </UI.Container>
+        </UI.ViewHead>
+        <UI.ViewBody>
+          <UI.Container>
+            {isLoading ? (
+              <MotionGrid
+                gridGap={4}
+                gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
+                gridAutoRows="minmax(200px, 1fr)"
+                variants={cardContainerAnimation}
+                animate="animate"
+                initial="initial"
+              >
+                <Skeleton />
+                <Skeleton />
+                <Skeleton />
+              </MotionGrid>
+            ) : (
+              <MotionGrid
+                gridGap={4}
+                gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
+                gridAutoRows="minmax(200px, 1fr)"
+                variants={cardContainerAnimation}
+                animate="animate"
+                initial="initial"
+              >
+                {customers?.map((customer: any, index: any) => customer && (
+                  <motion.div
+                    animate="animate"
+                    initial="initial"
+                    style={{ height: '100%' }}
+                    key={index}
+                    variants={cardItemAnimation}
+                  >
+                    <ErrorBoundary key={index} FallbackComponent={() => <></>}>
+                      <WorkspaceCard key={index} customer={customer} />
+                    </ErrorBoundary>
+                  </motion.div>
+                ))}
 
-              {(canCreateCustomers || canAccessAdmin) && (
-                <UI.AddCard>
-                  <Link to="/dashboard/b/add" />
-                  <UI.Flex flexDirection="column" alignItems="center" justifyContent="center">
-                    <SurveyIcon />
-                    <TranslatedPlus>
-                      <Plus strokeWidth="3px" />
-                    </TranslatedPlus>
-                    <UI.H4 color="default.dark">{t('customer:create_customer')}</UI.H4>
-                  </UI.Flex>
-                </UI.AddCard>
-              )}
-            </MotionGrid>
-          )}
-        </UI.Container>
-      </UI.ViewBody>
-    </LS.WorkspaceOverviewContainer>
+                {(canCreateCustomers || canAccessAdmin) && (
+                  <UI.AddCard>
+                    <Link to="/dashboard/b/add" />
+                    <UI.Flex flexDirection="column" alignItems="center" justifyContent="center">
+                      <SurveyIcon />
+                      <TranslatedPlus>
+                        <Plus strokeWidth="3px" />
+                      </TranslatedPlus>
+                      <UI.H4 color="default.dark">{t('customer:create_customer')}</UI.H4>
+                    </UI.Flex>
+                  </UI.AddCard>
+                )}
+              </MotionGrid>
+            )}
+          </UI.Container>
+        </UI.ViewBody>
+      </LS.WorkspaceOverviewContainer>
+    </View>
   );
 };

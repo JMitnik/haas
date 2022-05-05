@@ -32,35 +32,31 @@ export const DialogueLinkFetchOverview = () => {
 
   return (
     <View documentTitle="haas | Guest dialogues">
-      <UI.Container>
-        <UI.ViewHead>
-          <UI.ViewTitle>
-            {t(dialogueUnit)}
-          </UI.ViewTitle>
-          <UI.ViewSubTitle>
-            {t('dialogues_guest_helper', { unit: visitorUnit })}
-          </UI.ViewSubTitle>
-        </UI.ViewHead>
-      </UI.Container>
+      <UI.ViewHead compact>
+        <UI.ViewTitle>
+          {t(dialogueUnit)}
+        </UI.ViewTitle>
+        <UI.ViewSubTitle>
+          {t('dialogues_guest_helper', { unit: visitorUnit })}
+        </UI.ViewSubTitle>
+      </UI.ViewHead>
 
-      <UI.Container>
-        <UI.ViewBody>
-          {filteredDialogues?.length === 0 && (
-            <UI.Flex justifyContent="center">
-              {t('no_dialogues_message')}
-            </UI.Flex>
-          )}
-          <UI.Grid
-            gridGap={4}
-            gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
-            gridAutoRows="minmax(200px, 1fr)"
-          >
-            {filteredDialogues?.map((dialogue, index) => dialogue && (
-              <DialogueCard key={index} dialogue={dialogue} />
-            ))}
-          </UI.Grid>
-        </UI.ViewBody>
-      </UI.Container>
+      <UI.ViewBody compact>
+        {filteredDialogues?.length === 0 && (
+          <UI.Flex justifyContent="center">
+            {t('no_dialogues_message')}
+          </UI.Flex>
+        )}
+        <UI.Grid
+          gridGap={4}
+          gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
+          gridAutoRows="minmax(200px, 1fr)"
+        >
+          {filteredDialogues?.map((dialogue, index) => dialogue && (
+            <DialogueCard key={index} dialogue={dialogue} />
+          ))}
+        </UI.Grid>
+      </UI.ViewBody>
     </View>
   );
 };

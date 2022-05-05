@@ -72,6 +72,7 @@ const WorkspaceCard = ({ customer }: { customer: any }) => {
       flexDirection="column"
       backgroundColor={primaryColor.hex()}
       onClick={() => setCustomerSlug(customer.slug)}
+      style={{ borderColor: 'transparent', borderRadius: 20 }}
       data-cy="CustomerCard"
       data-testid="CustomerCard"
     >

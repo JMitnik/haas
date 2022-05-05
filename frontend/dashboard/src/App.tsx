@@ -8,7 +8,7 @@ import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
 import { DialogueLinkFetchOverview } from 'views/DialogueLinkFetchOverview';
 import { DialogueProvider } from 'providers/DialogueProvider';
-import { ImportWorkspaceCSVForm } from 'views/WorkspaceOverview/ImportWorkspaceCSVForm';
+import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
 import { ReportView } from 'views/ReportView';
@@ -246,7 +246,7 @@ const AppRoutes = () => (
         path={ROUTES.GENERATE_WORKSPACE_VIEW}
         render={() => (
           <PreCustomerLayout>
-            <ImportWorkspaceCSVForm />
+            <GenerateWorkspaceView />
           </PreCustomerLayout>
         )}
       />

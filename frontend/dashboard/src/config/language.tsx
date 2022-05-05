@@ -127,6 +127,10 @@ const language = {
       en: 'Generate workspace',
       de: 'Workspace generieren',
     },
+    generate_workspace_subtitle: {
+      en: 'Create a new workspace based on one of our predefined templates',
+      de: 'Erstellen Sie einen neuen Workspace basierend auf einem von uns vordefinierten Templates',
+    },
     new: {
       en: 'New',
       de: 'Neu',

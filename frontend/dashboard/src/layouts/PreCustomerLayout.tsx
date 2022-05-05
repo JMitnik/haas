@@ -32,14 +32,6 @@ const PreCustomerLayoutContainer = styled(UI.Div)`
     ${LogoIconContainer} svg path {
       fill: ${theme.colors.gray[500]} !important;
     }
-
-    ${UI.ViewBody} {
-      padding: ${theme.gutter}px 0;
-    }
-
-    ${UI.ViewHeadContainer} {
-      padding: ${theme.gutter}px 0;
-    }
   `}
 `;
 
