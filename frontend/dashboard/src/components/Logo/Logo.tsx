@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 
 import { Div, GenericProps, H2 } from '@haas/ui';
 import { ReactComponent as SVGLogo } from 'assets/logo.svg';
+import { ReactComponent as SVGLogoText } from 'assets/icons/logo-text.svg';
 import { ReactComponent as SVGLogoThumbnail } from 'assets/images/logo-thumbnail.svg';
 
 export const LogoIconContainer = styled(Div) <{ fill?: string }>`
@@ -113,8 +114,9 @@ export const LogoContainer = styled(Div)`
 
 export const Logo = (props: any) => (
   <LogoContainer {...props}>
-    <LogoIcon width="60px" height="60px" justifyContent="center" />
-    <UI.Text>haas</UI.Text>
+    <SVGLogoText />
+    {/* <LogoIcon width="60px" height="60px" justifyContent="center" />
+    <UI.Text>haas</UI.Text> */}
   </LogoContainer>
 );
 

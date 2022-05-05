@@ -25,8 +25,9 @@ export const SidenavContainer = styled.div`
     background: ${theme.colors.app.sidebar};
 
     ${LogoContainer} {
-      color: ${theme.colors.gray[600]};
-      padding: ${theme.gutter}px ${theme.gutter / 2}px;
+      color: ${theme.colors.off[500]};
+      padding: ${theme.gutter}px;
+      width: 170px;
     }
 
     /* Sidenav list container */

@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { LogoIconContainer } from 'components/Logo/Logo';
+import { LogoContainer, LogoIconContainer } from 'components/Logo/Logo';
 
 import { TopbarContainer, WorkspaceTopbar } from './WorkspaceLayout/WorkspaceTopbar';
 import { UsernavContainer } from './WorkspaceLayout/UserNav';
@@ -30,7 +30,11 @@ const PreCustomerLayoutContainer = styled(UI.Div)`
     }
 
     ${LogoIconContainer} svg path {
-      fill: ${theme.colors.gray[500]} !important;
+      fill: ${theme.colors.off[500]} !important;
+    }
+
+    ${LogoContainer} {
+      padding: ${theme.gutter / 2}px;
     }
   `}
 `;
