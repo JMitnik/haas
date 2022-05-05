@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    copied: {
+      en: 'Copied!',
+      de: 'Kopiert!',
+    },
+    copy_link: {
+      en: 'Copy link',
+      de: 'Link kopieren',
+    },
     workspaces: {
       en: 'Workspaces',
       de: 'Workspaces',

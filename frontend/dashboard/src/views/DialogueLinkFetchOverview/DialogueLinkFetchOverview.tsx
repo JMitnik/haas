@@ -50,7 +50,7 @@ export const DialogueLinkFetchOverview = () => {
         <UI.Grid
           gridGap={4}
           gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
-          gridAutoRows="minmax(200px, 1fr)"
+          gridAutoRows="minmax(150px, 1fr)"
         >
           {filteredDialogues?.map((dialogue, index) => dialogue && (
             <DialogueCard key={index} dialogue={dialogue} />

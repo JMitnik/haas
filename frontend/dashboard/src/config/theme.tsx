@@ -192,7 +192,7 @@ const theme = {
   },
   transitions: {
     slow: '0.2s ease-in-out',
-    normal: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+    normal: '0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
   },
 };
 
