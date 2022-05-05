@@ -1,23 +1,23 @@
+import * as UI from '@haas/ui';
 import {
   Button, ButtonGroup, Popover, PopoverArrow, PopoverBody,
   PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { useHistory } from 'react-router';
+import { useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import Color from 'color';
 import React from 'react';
 
-import { Card, CardBody, ColumnFlex, H3, Span, Text } from '@haas/ui';
 import { deleteFullCustomerQuery } from 'mutations/deleteFullCustomer';
 import { isValidColor } from 'utils/ColorUtils';
-import { useMutation } from '@apollo/client';
 import { useUser } from 'providers/UserProvider';
 import getCustomersOfUser from 'queries/getCustomersOfUser';
 import useAuth from 'hooks/useAuth';
 
-import { CustomerCardImage } from './CustomerOverviewStyles';
+import { WorkspaceCardImage } from './WorkspaceOverview.styles';
 
-const CustomerCard = ({ customer }: { customer: any }) => {
+const WorkspaceCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
   const toast = useToast();
   const { t } = useTranslation();
@@ -66,7 +66,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
     : Color('white');
 
   return (
-    <Card
+    <UI.Card
       useFlex
       height="100%"
       flexDirection="column"
@@ -75,14 +75,14 @@ const CustomerCard = ({ customer }: { customer: any }) => {
       data-cy="CustomerCard"
       data-testid="CustomerCard"
     >
-      <CardBody flex="100%">
-        <ColumnFlex justifyContent="space-between">
-          <H3
+      <UI.CardBody flex="100%">
+        <UI.ColumnFlex justifyContent="space-between">
+          <UI.H3
             color={primaryColor.isDark() ? 'white' : '#444'}
             fontWeight={500}
           >
             {customer.name}
-          </H3>
+          </UI.H3>
           <ButtonGroup zIndex={150} mt={2}>
             <Button
               size="xs"
@@ -94,7 +94,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
               {t('visit')}
             </Button>
             {canDeleteCustomers && (
-              <Span onClick={(e) => e.stopPropagation()}>
+              <UI.Span onClick={(e) => e.stopPropagation()}>
                 <Popover
                   usePortal
                 >
@@ -116,7 +116,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
                         <PopoverHeader>{t('delete')}</PopoverHeader>
                         <PopoverCloseButton />
                         <PopoverBody>
-                          <Text>{t('delete_customer_popover')}</Text>
+                          <UI.Text>{t('delete_customer_popover')}</UI.Text>
                         </PopoverBody>
                         <PopoverFooter>
                           <Button
@@ -131,15 +131,15 @@ const CustomerCard = ({ customer }: { customer: any }) => {
                     </>
                   )}
                 </Popover>
-              </Span>
+              </UI.Span>
             )}
           </ButtonGroup>
-        </ColumnFlex>
+        </UI.ColumnFlex>
 
-        {customer?.settings?.logoUrl && <CustomerCardImage src={customer?.settings?.logoUrl} />}
-      </CardBody>
-    </Card>
+        {customer?.settings?.logoUrl && <WorkspaceCardImage src={customer?.settings?.logoUrl} />}
+      </UI.CardBody>
+    </UI.Card>
   );
 };
 
-export default CustomerCard;
+export default WorkspaceCard;

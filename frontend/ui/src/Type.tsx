@@ -98,9 +98,9 @@ export const PageHeading = styled(H2).attrs({ 'data-cy': 'PageHeading', role: 'h
 `;
 
 export const H3 = styled(GenericType).attrs({ as: 'h3' })`
-  ${({ theme }) => css`
+  ${({ theme, fontWeight }) => css`
     font-size: ${theme.fontSizes[3]}px;
-    font-weight: 800;
+    font-weight: ${fontWeight?.toString() || 800};
     letter-spacing: 0.014em;
   `}
 `;

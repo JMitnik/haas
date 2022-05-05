@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    workspaces: {
+      en: 'Workspaces',
+      de: 'Workspaces',
+    },
+    workspaces_subtitle: {
+      en: 'Manage your workspaces',
+      de: 'Manage your workspaces',
+    },
     teams: {
       en: 'Teams',
       de: 'Teams',
