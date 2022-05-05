@@ -4,7 +4,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
-import Select from 'react-select';
 
 import { DialogueTemplateType, refetchMeQuery, useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
 import { View } from 'layouts/View';
@@ -12,32 +11,35 @@ import { useLogger } from 'hooks/useLogger';
 import { useToast } from 'hooks/useToast';
 import FileDropInput from 'components/FileDropInput';
 
+import * as LS from './GenerateWorkspaceView.styles';
+
 const schema = yup.object({
   workspaceTitle: yup.string().required(),
   workspaceSlug: yup.string().required(),
-  dialogueType: yup.object().shape({
-    label: yup.string().notRequired(),
-    value: yup.mixed<DialogueTemplateType>().oneOf(Object.values(DialogueTemplateType)),
-  }).required(),
+  dialogueType: yup.string().required(),
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
 
 const DIALOGUE_TYPE_OPTIONS = [
   {
-    label: 'DEFAULT',
+    label: 'Default',
+    description: 'The original haas dialogue, regarding Facilities, Cleanliness, and co.',
     value: DialogueTemplateType.Default,
   },
   {
-    label: 'BUSINESS (ENG)',
+    label: 'Business Template',
+    description: 'For business-related dialogues.',
     value: DialogueTemplateType.BusinessEng,
   },
   {
-    label: 'SPORT (ENG)',
+    label: 'Sport team (English)',
+    description: 'The Club Hades sports team model (in English).',
     value: DialogueTemplateType.SportEng,
   },
   {
-    label: 'SPORT (NL)',
+    label: 'Sport team (Dutch)',
+    description: 'The Club Hades sports team model (in Dutch).',
     value: DialogueTemplateType.SportNl,
   },
 ];
@@ -46,6 +48,9 @@ export const GenerateWorkspaceView = () => {
   const history = useHistory();
   const form = useForm<FormProps>({
     mode: 'all',
+    defaultValues: {
+      dialogueType: DialogueTemplateType.Default,
+    },
   });
   const logger = useLogger();
   const { t } = useTranslation();
@@ -78,15 +83,13 @@ export const GenerateWorkspaceView = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
-    const type = formData.dialogueType.value;
-
     importWorkspaceCSV({
       variables: {
         input: {
           workspaceTitle: formData.workspaceTitle,
           workspaceSlug: formData.workspaceSlug,
           uploadedCsv: activeCSV,
-          type,
+          type: formData.dialogueType as DialogueTemplateType,
         },
       },
     });
@@ -126,22 +129,39 @@ export const GenerateWorkspaceView = () => {
             </UI.FormControl>
 
             <UI.FormControl isRequired>
-              <UI.FormLabel htmlFor="dialogueType">{t('dialogue')}</UI.FormLabel>
+              <UI.FormLabel htmlFor="dialogueType">{t('template')}</UI.FormLabel>
               <Controller
                 name="dialogueType"
                 control={form.control}
-                defaultValue={{ label: 'DEFAULT', value: 'DEFAULT' }}
                 render={({ value, onChange, onBlur }) => (
-                  <Select
-                    placeholder="Select a template type"
-                    classNamePrefix="select"
-                    className="select"
-                    defaultOptions
-                    options={DIALOGUE_TYPE_OPTIONS}
-                    value={value}
-                    onChange={onChange}
+                  <LS.RadioGroupRoot
+                    defaultValue={value}
+                    onValueChange={onChange}
                     onBlur={onBlur}
-                  />
+                    variant="spaced"
+                  >
+                    {DIALOGUE_TYPE_OPTIONS.map((option) => (
+                      <LS.RadioGroupBox
+                        htmlFor={option.value}
+                        key={option.value}
+                        isActive={value === option.value}
+                        contentVariant="twoLine"
+                        variant="boxed"
+                      >
+                        <LS.RadioGroupItem id={option.value} key={option.value} value={option.value}>
+                          <LS.RadioGroupIndicator />
+                        </LS.RadioGroupItem>
+                        <UI.Div>
+                          <LS.RadioGroupLabel>
+                            {option.label}
+                          </LS.RadioGroupLabel>
+                          <LS.RadioGroupSubtitle>
+                            {option.description}
+                          </LS.RadioGroupSubtitle>
+                        </UI.Div>
+                      </LS.RadioGroupBox>
+                    ))}
+                  </LS.RadioGroupRoot>
                 )}
               />
             </UI.FormControl>
@@ -159,7 +179,7 @@ export const GenerateWorkspaceView = () => {
               mt={4}
               variantColor="main"
               type="submit"
-              isDisabled={!form.formState.isValid}
+              isDisabled={!form.formState.isValid || !activeCSV}
               isLoading={loading}
             >
               {t('save')}
