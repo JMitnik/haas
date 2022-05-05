@@ -1,4 +1,3 @@
-import * as UI from '@haas/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -16,9 +15,6 @@ export const LogoIconContainer = styled(Div) <{ fill?: string }>`
         fill: currentColor;
       }
     `}
-
-    /* Manual size */
-    /* width: 60px; */
 
     img {
       max-width: 100%;
