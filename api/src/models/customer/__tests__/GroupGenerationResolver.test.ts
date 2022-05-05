@@ -15,6 +15,11 @@ afterEach(async () => {
   await prisma.$disconnect();
 });
 
+afterAll(async () => {
+  await clearDatabase(prisma);
+  await prisma.$disconnect();
+});
+
 it('Group generation using CSV', async () => {
   const { user } = await prepDefaultCreateData(prisma);
   await prisma.user.update({

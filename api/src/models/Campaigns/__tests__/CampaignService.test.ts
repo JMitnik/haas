@@ -10,10 +10,10 @@ import DynamoScheduleService from '../../../services/DynamoScheduleService';
 
 jest.mock('../../../services/DynamoScheduleService', () => {
   return jest.fn().mockImplementation(() => {
-      return {
-        batchScheduleOneOffs: jest.fn(),
-      }
+    return {
+      batchScheduleOneOffs: jest.fn(),
     }
+  }
   )
 });
 
@@ -61,6 +61,11 @@ describe('CampaignService', () => {
   });
 
   afterEach(async () => {
+    await clearDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
+  afterAll(async () => {
     await clearDatabase(prisma);
     await prisma.$disconnect();
   });
@@ -120,7 +125,7 @@ describe('CampaignService', () => {
       variants: [{
         weight: 100,
         customVariables: [{
-          key: 'energyLabel'
+          key: 'energyLabel',
         }],
         dialogueId: SAMPLE_DIALOGUE?.id || '',
         type: 'QUEUE',
@@ -130,7 +135,7 @@ describe('CampaignService', () => {
     });
 
     const { successRecords, erroredRecords } = campaignService.validateDeliveryRows(
-      [{ email: 'jason@jason.com', age: 22, energyLabel: 'Test'  }],
+      [{ email: 'jason@jason.com', age: 22, energyLabel: 'Test' }],
       campaign?.variantsEdges.map(edge => ({
         ...edge.campaignVariant,
         type: 'EMAIL',
@@ -152,7 +157,7 @@ describe('CampaignService', () => {
       variants: [{
         weight: 100,
         customVariables: [{
-          key: 'energyLabel'
+          key: 'energyLabel',
         }],
         dialogueId: SAMPLE_DIALOGUE?.id || '',
         type: 'QUEUE',
@@ -185,7 +190,7 @@ describe('CampaignService', () => {
       variants: [{
         weight: 100,
         customVariables: [{
-          key: 'energyLabel'
+          key: 'energyLabel',
         }],
         dialogueId: SAMPLE_DIALOGUE?.id || '',
         type: 'QUEUE',
@@ -229,7 +234,7 @@ describe('CampaignService', () => {
       variants: [{
         weight: 100,
         customVariables: [{
-          key: 'energyLabel'
+          key: 'energyLabel',
         }],
         dialogueId: SAMPLE_DIALOGUE?.id || '',
         type: 'QUEUE',
@@ -252,7 +257,7 @@ describe('CampaignService', () => {
     const deliveryStats = await campaignService.createBatchDeliveries(
       campaign.id,
       records,
-      new Date("2021-08-17").toISOString(),
+      new Date('2021-08-17').toISOString(),
       ''
     );
 
@@ -261,8 +266,8 @@ describe('CampaignService', () => {
 
     expect(campaignService.dynamoScheduleService.batchScheduleOneOffs).toHaveBeenCalledTimes(1);
     expect(campaignService.dynamoScheduleService.batchScheduleOneOffs).toHaveBeenCalledWith(
-      [{"attributes": [{"key": "DeliveryDate", "type": "string", "value": "17082021"}, {"key": "DeliveryDate_DeliveryID", "type": "string", "value": expect.any(String)}, {"key": "DeliveryRecipient", "type": "string", "value": ""}, {"key": "DeliveryBody", "type": "string", "value": "Dear Joseph, happy to hear you join us at Private Corp."}, {"key": "DeliveryFrom", "type": "string", "value": ""}, {"key": "DeliveryStatus", "type": "string", "value": "SCHEDULED"}, {"key": "DeliveryType", "type": "string", "value": "QUEUE"}, {"key": "callback", "type": "string", "value": ""}, {"key": "phoneNumber", "type": "string", "value": ""}]}, {"attributes": [{"key": "DeliveryDate", "type": "string", "value": "17082021"}, {"key": "DeliveryDate_DeliveryID", "type": "string", "value": expect.any(String)}, {"key": "DeliveryRecipient", "type": "string", "value": ""}, {"key": "DeliveryBody", "type": "string", "value": "Dear Josuke, happy to hear you join us at ."}, {"key": "DeliveryFrom", "type": "string", "value": ""}, {"key": "DeliveryStatus", "type": "string", "value": "SCHEDULED"}, {"key": "DeliveryType", "type": "string", "value": "QUEUE"}, {"key": "callback", "type": "string", "value": ""}, {"key": "phoneNumber", "type": "string", "value": ""}]}],
-      {"tableName": "CampaignDeliveries"}
+      [{ 'attributes': [{ 'key': 'DeliveryDate', 'type': 'string', 'value': '17082021' }, { 'key': 'DeliveryDate_DeliveryID', 'type': 'string', 'value': expect.any(String) }, { 'key': 'DeliveryRecipient', 'type': 'string', 'value': '' }, { 'key': 'DeliveryBody', 'type': 'string', 'value': 'Dear Joseph, happy to hear you join us at Private Corp.' }, { 'key': 'DeliveryFrom', 'type': 'string', 'value': '' }, { 'key': 'DeliveryStatus', 'type': 'string', 'value': 'SCHEDULED' }, { 'key': 'DeliveryType', 'type': 'string', 'value': 'QUEUE' }, { 'key': 'callback', 'type': 'string', 'value': '' }, { 'key': 'phoneNumber', 'type': 'string', 'value': '' }] }, { 'attributes': [{ 'key': 'DeliveryDate', 'type': 'string', 'value': '17082021' }, { 'key': 'DeliveryDate_DeliveryID', 'type': 'string', 'value': expect.any(String) }, { 'key': 'DeliveryRecipient', 'type': 'string', 'value': '' }, { 'key': 'DeliveryBody', 'type': 'string', 'value': 'Dear Josuke, happy to hear you join us at .' }, { 'key': 'DeliveryFrom', 'type': 'string', 'value': '' }, { 'key': 'DeliveryStatus', 'type': 'string', 'value': 'SCHEDULED' }, { 'key': 'DeliveryType', 'type': 'string', 'value': 'QUEUE' }, { 'key': 'callback', 'type': 'string', 'value': '' }, { 'key': 'phoneNumber', 'type': 'string', 'value': '' }] }],
+      { 'tableName': 'CampaignDeliveries' }
     );
   });
 });

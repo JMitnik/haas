@@ -57,6 +57,11 @@ describe('AutomationConnection resolvers', () => {
     await prisma.$disconnect();
   });
 
+  afterAll(async () => {
+    await clearDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
   test('unable to query automation-connection unauthorized', async () => {
     const { user, workspace, dialogue, userRole } = await prepDefaultCreateData(prisma);
     await seedAutomations(prisma, workspace, dialogue, 1);

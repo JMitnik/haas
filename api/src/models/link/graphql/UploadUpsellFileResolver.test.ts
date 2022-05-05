@@ -23,6 +23,11 @@ describe('UploadUpsellFileResolver', () => {
     await prisma.$disconnect();
   });
 
+  afterAll(async () => {
+    await clearDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
   test(`Uploads upsell file to cloudinary`, async () => {
     const { user, workspace } = await prepDefaultData(prisma);
 

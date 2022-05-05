@@ -20,6 +20,11 @@ describe('CustomerPrismaAdapter', () => {
     await prisma.$disconnect();
   });
 
+  afterAll(async () => {
+    await clearCustomerDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
   test('Creates a workspace', async () => {
     const createdCustomer = await customerPrismaAdapter.createWorkspace(defaultCustomerInput);
 

@@ -16,6 +16,7 @@ import authShield from './auth';
 import ContextSessionService from '../models/auth/ContextSessionService';
 import schema from './schema';
 import { bootstrapServices } from './bootstrap';
+import config from './config';
 
 const handleError = (ctx: any, error: GraphQLError) => {
   // Filter out user-input-errors (not interesting)
@@ -65,7 +66,7 @@ export const makeApollo = async (prisma: PrismaClient) => {
       prisma,
       services: bootstrapServices(prisma),
     }),
-    plugins: [
+    plugins: process.env.NODE_ENV === 'test' ? [] : [
       useGraphQlJit(),
       useValidationCache(),
       useParserCache(),

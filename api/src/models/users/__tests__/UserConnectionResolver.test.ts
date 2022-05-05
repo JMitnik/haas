@@ -104,6 +104,11 @@ describe('UserConnection resolvers', () => {
     await prisma.$disconnect();
   });
 
+  afterAll(async () => {
+    await clearDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
   test('user with no valid has no access to users-connection', async () => {
     const { workspace } = await prepEnvironment(prisma);
     const user = await seedUsers(prisma, workspace);
@@ -112,7 +117,7 @@ describe('UserConnection resolvers', () => {
     try {
       await ctx.client.request(Query, {
         customerSlug: workspace.slug,
-      },{ 'Authorization': `Bearer ${token}`});
+      }, { 'Authorization': `Bearer ${token}` });
     } catch (error) {
       if (error instanceof ApolloError) {
         expect(error.response.errors).toHaveLength(1);

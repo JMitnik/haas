@@ -15,6 +15,12 @@ describe('Dialogue Statistics Summary', () => {
     await prisma.$disconnect();
   });
 
+  afterAll(async () => {
+    await clearDialogueDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
+
   it('can calculate impact score for last week', async () => {
     const { user, workspace, dialogue, sliderQuestion, choiceQuestion } = await prepDefaultCreateData(prisma);
     const rootEdgeId = dialogue.questions[0].children[0].id;

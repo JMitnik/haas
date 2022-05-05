@@ -37,6 +37,12 @@ describe('DialoguePrismaAdapter', () => {
     await prisma.$disconnect();
   });
 
+  afterAll(async () => {
+    await clearDialogueDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
+
   test('Creates a dialogue', async () => {
     const dialogue = await dialoguePrismaAdapter.createTemplate(defaultCreateDialogueInput);
     expect(dialogue).not.toBeNull();

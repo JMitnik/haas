@@ -14,6 +14,11 @@ afterEach(async () => {
   await prisma.$disconnect();
 });
 
+afterAll(async () => {
+  await clearDatabase(prisma);
+  await prisma.$disconnect();
+});
+
 it('updates automation', async () => {
   const { user, workspace, dialogue, question, userRole } = await prepDefaultCreateData(prisma);
   const { automation } = await prepDefaultUpdateData(prisma, userRole.id, workspace.id, dialogue.id, question.id);
@@ -30,12 +35,12 @@ it('updates automation', async () => {
       }
     }
   `,
-  {
-    input: input,
-  },
-  {
-    'Authorization': `Bearer ${token}`,
-  }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
   ).then((data) => data?.updateAutomation);
 
   expect(res).toMatchObject({
@@ -63,12 +68,12 @@ it('unable to update automation when no automation id is provided', async () => 
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -102,12 +107,12 @@ it('unable to create automations unauthorized', async () => {
         }
       }
     `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        input: input,
+      },
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {

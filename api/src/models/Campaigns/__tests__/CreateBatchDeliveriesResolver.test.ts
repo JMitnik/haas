@@ -15,6 +15,11 @@ afterEach(async () => {
   await prisma.$disconnect();
 });
 
+afterAll(async () => {
+  await clearDatabase(prisma);
+  await prisma.$disconnect();
+});
+
 it('send deliveries', async () => {
   const { user, campaign, workspace } = await prepDefaultData(prisma);
 
@@ -34,17 +39,17 @@ it('send deliveries', async () => {
       }
     }
   `,
-  {
-    input: {
-      workspaceId: workspace.id,
-      uploadedCsv: file,
-      campaignId: campaign.id,
-      batchScheduledAt: '2011-10-05T14:48:00.000Z',
+    {
+      input: {
+        workspaceId: workspace.id,
+        uploadedCsv: file,
+        campaignId: campaign.id,
+        batchScheduledAt: '2011-10-05T14:48:00.000Z',
+      },
     },
-  },
-  {
-    'Authorization': `Bearer ${token}`,
-  }
+    {
+      'Authorization': `Bearer ${token}`,
+    }
   );
 
   expect(res).toMatchObject({
@@ -79,17 +84,17 @@ it('unable to send deliveries unauthorized', async () => {
         }
       }
     `,
-    {
-      input: {
-        workspaceId: workspace.id,
-        uploadedCsv: file,
-        campaignId: campaign.id,
-        batchScheduledAt: '2011-10-05T14:48:00.000Z',
+      {
+        input: {
+          workspaceId: workspace.id,
+          uploadedCsv: file,
+          campaignId: campaign.id,
+          batchScheduledAt: '2011-10-05T14:48:00.000Z',
+        },
       },
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+      {
+        'Authorization': `Bearer ${token}`,
+      }
     );
   } catch (error) {
     if (error instanceof Error) {

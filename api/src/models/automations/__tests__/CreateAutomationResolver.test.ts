@@ -14,6 +14,11 @@ afterEach(async () => {
   await prisma.$disconnect();
 });
 
+afterAll(async () => {
+  await clearDatabase(prisma);
+  await prisma.$disconnect();
+});
+
 it('creates automation', async () => {
   const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
 

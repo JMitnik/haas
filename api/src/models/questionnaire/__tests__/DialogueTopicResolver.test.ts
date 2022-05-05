@@ -15,6 +15,12 @@ describe('Dialogue Topic', () => {
     await prisma.$disconnect();
   });
 
+  afterAll(async () => {
+    await clearDialogueDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
+
   it('can find average impact scores of root question sub topics', async () => {
     const { user, workspace, dialogue, sliderQuestion, choiceQuestion } = await prepDefaultCreateData(prisma);
     const rootEdgeId = dialogue.questions[0].children[0].id;
