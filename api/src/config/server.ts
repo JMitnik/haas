@@ -11,7 +11,6 @@ import { makeApollo } from './apollo';
 import config from './config';
 
 export const makeServer = async (port: number, prismaClient: PrismaClient) => {
-  console.log('🏳️\tStarting application');
   const app = express();
 
   const corsOptions: CorsOptions = {
@@ -53,14 +52,14 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
       key: fs.readFileSync(key),
       cert: fs.readFileSync(certificate),
     }, app).listen(port, () => {
-      console.log('🏁\Listening on https server!');
-      console.log(`Listening on port ${port}!`);
     });
   }
 
   const serverInstance = app.listen(port);
-  console.log('🏁\Listening on standard server!');
-  console.log('🏁\tStarted the server!');
+
+  if (process.env.NODE_ENV !== 'test') {
+    console.log('🏁\tStarted the server!');
+  }
 
   return serverInstance;
 };

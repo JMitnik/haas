@@ -53,8 +53,6 @@ const handleError = (ctx: any, error: GraphQLError) => {
 
 
 export const makeApollo = async (prisma: PrismaClient) => {
-  console.log('💼\tBootstrapping Graphql Engine Apollo');
-
   const apollo = createServer({
     cors: true,
     logging: true,
@@ -71,24 +69,22 @@ export const makeApollo = async (prisma: PrismaClient) => {
       useValidationCache(),
       useParserCache(),
       useSentry(),
-      useResponseCache({
-        includeExtensionMetadata: true,
-        idFields: [
-          'id',
-          'userId',
-          'customerId',
-          'roleId',
-          'questionId',
-          'dialogueId',
-        ],
-      }),
+      // useResponseCache({
+      //   includeExtensionMetadata: true,
+      //   idFields: [
+      //     'id',
+      //     'userId',
+      //     'customerId',
+      //     'roleId',
+      //     'questionId',
+      //     'dialogueId',
+      //   ],
+      // }),
       useApolloServerErrors({
         debug: true,
       }),
     ],
   });
-
-  console.log('🏁\tFinished bootstrapping Graphql Engine Apollo');
 
   return apollo;
 };

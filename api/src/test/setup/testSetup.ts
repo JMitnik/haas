@@ -1,8 +1,4 @@
-const rand = 'test' + Math.random();
-console.log("INIITIALIZE: RAND is " + rand);
-
-beforeAll(() => {
-  console.log("BeforeAll: RAND is " + rand);
-  // @ts-ignore
-  global.rand = rand;
-})
+// Mock dependency module
+// @ts-ignore
+jest.mock('test/setup/singletonDeps', () => global.singletonDepsModule);
+jest.setTimeout(30000);

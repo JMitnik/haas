@@ -6,8 +6,9 @@ import { prepDefaultCreateData, seedSession } from './testUtils';
 
 jest.setTimeout(30000);
 
-const prisma = makeTestPrisma();
+import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
+
 
 describe('Dialogue Topic', () => {
   afterEach(async () => {

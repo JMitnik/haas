@@ -13,8 +13,9 @@ import { ApolloError } from 'apollo-server-express';
 
 jest.setTimeout(30000);
 
-const prisma = makeTestPrisma();
+import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
+
 
 /**
  * Prepare the database by seeding, etc.

@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { ApolloError } from 'apollo-server';
 
+import { rand } from 'test/setup/singletonDeps';
+
 import { clearDatabase } from './testUtils';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
@@ -9,10 +11,9 @@ import AuthService from '../../auth/AuthService';
 import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
 import { defaultAdminRole, defaultManagerRole, defaultUserRole } from '../../templates/TemplateTypes';
 
-jest.setTimeout(30000);
-
-const prisma = makeTestPrisma();
+import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
+
 
 const prepEnvironment = async (prisma: PrismaClient) => {
   const workspace = await seedWorkspace(prisma);

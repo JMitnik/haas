@@ -7,8 +7,9 @@ import AuthService from '../../auth/AuthService';
 
 jest.setTimeout(30000);
 
-const prisma = makeTestPrisma();
+import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
+
 
 afterEach(async () => {
   await clearDatabase(prisma);

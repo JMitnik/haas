@@ -13,8 +13,9 @@ jest.mock('../../..//utils/upload/uploadCloudinary', () => {
   }
 });
 
-const prisma = makeTestPrisma();
+import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
+
 
 describe('UploadUpsellFileResolver', () => {
 
@@ -28,7 +29,7 @@ describe('UploadUpsellFileResolver', () => {
     await prisma.$disconnect();
   });
 
-  test(`Uploads upsell file to cloudinary`, async () => {
+  test('Uploads upsell file to cloudinary', async () => {
     const { user, workspace } = await prepDefaultData(prisma);
 
     const image = createReadStream(`${__dirname}/earbuds.webp`);
@@ -48,10 +49,10 @@ describe('UploadUpsellFileResolver', () => {
         input: {
           workspaceId: workspace.id,
           file: image,
-        }
+        },
       },
       {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
       }
     );
 
@@ -66,8 +67,8 @@ describe('UploadUpsellFileResolver', () => {
     await prisma.role.update({
       where: { id: userRole.id },
       data: {
-        permissions: []
-      }
+        permissions: [],
+      },
     })
 
     // Generate token for API access
@@ -84,10 +85,10 @@ describe('UploadUpsellFileResolver', () => {
         input: {
           workspaceId: workspace.id,
           file: image,
-        }
+        },
       },
       {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
       }
     )
       .catch((reason) => expect(reason.message).toContain('Not Authorised!'));

@@ -6,12 +6,14 @@ export const TimeResolverPlugin = plugin({
   fieldDefTypes: 'useTimeResolve?: boolean',
   onCreateFieldResolver(test) {
     return async (root, args, ctx, info, next) => {
+      const isTest = process.env.NODE_ENV === 'test';
+
       const useTimeResolve = test.fieldConfig.extensions?.nexus?.config?.useTimeResolve;
       const startTimeMs = new Date().valueOf()
       const value = await next(root, args, ctx, info);
       const endTimeMs = new Date().valueOf()
 
-      if (useTimeResolve) {
+      if (!isTest && useTimeResolve) {
         console.log(`Operation ${info.operation.name?.value} took ${endTimeMs - startTimeMs} ms`);
       }
 

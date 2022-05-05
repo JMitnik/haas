@@ -1,13 +1,12 @@
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { clearDialogueDatabase } from './testUtils';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
 import { prepDefaultCreateData, seedSession } from './testUtils';
 
-jest.setTimeout(30000);
-
-const prisma = makeTestPrisma();
+import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
+
+
 
 describe('Dialogue Pathed Sessions', () => {
   afterEach(async () => {

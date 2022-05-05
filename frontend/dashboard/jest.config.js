@@ -6,6 +6,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less)$': '<rootDir>/src/mocks/styleMock.js',
     '\\.(svg)$': '<rootDir>/src/mocks/svgMock.ts',
+    // "src/(.*)": "<rootDir>/src/$1"
   },
   modulePaths: ["node_modules", "<rootDir>/src"],
   testMatch: [
@@ -13,7 +14,7 @@ module.exports = {
     '**/?(*.)+(spec|test).+(ts|tsx|js)',
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(ts|tsx)$': 'babel-jest',
     "^.+\\.js?$": "babel-jest"
   },
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.tsx'],

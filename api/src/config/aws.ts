@@ -1,7 +1,6 @@
 import AWS from 'aws-sdk';
 import config from './config';
 
-console.log('🤹\tBootstrapping AWS');
 try {
   // if (config.env !== 'local') {
   AWS.config.update({
@@ -11,10 +10,7 @@ try {
   });
   // }
 } catch (e) {
-  console.log('Unable to set AWS, wont use AWS services');
 }
-
-console.log('🏁\tFinished bootstrapping AWS');
 
 
 export default AWS;
