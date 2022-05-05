@@ -187,7 +187,7 @@ const CustomerRoutes = () => (
 const PublicRoutes = () => (
   <Switch>
     <Route path="/public/dialogue-link-fetch">
-      <PreCustomerLayout hideUserNav>
+      <PreCustomerLayout>
         <DialogueLinkFetchOverview />
       </PreCustomerLayout>
     </Route>

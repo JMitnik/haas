@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    teams: {
+      en: 'Teams',
+      de: 'Teams',
+    },
+    dialogues_guest_helper: {
+      en: 'Send your {{ unit }} a link to the dialogue by clicking on the corresponding dialogue card below here.',
+      de: 'Senden Sie Ihren {{ unit }} einen Link zur Dialogeseite, indem Sie auf die entsprechende Dialogeseitekarte klicken.',
+    },
     overview: {
       en: 'Overview',
       de: 'Übersicht',

@@ -38,7 +38,7 @@ export const DeprecatedViewTitle = ({ leftIcon, children, ...props }: ViewTitleP
   </DeprecatedViewTitleContainer>
 );
 
-const ViewHeadContainer = styled(Div)`
+export const ViewHeadContainer = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px ${theme.gutter * 1.5}px;
     position: sticky;

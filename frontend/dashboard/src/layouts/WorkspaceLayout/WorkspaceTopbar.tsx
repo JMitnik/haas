@@ -4,9 +4,7 @@ import styled, { css } from 'styled-components';
 
 import { Logo, LogoContainer } from 'components/Logo';
 
-import { Usernav } from './UserNav';
-
-const TopbarContainer = styled(UI.Div)`
+export const TopbarContainer = styled(UI.Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter / 4}px ${theme.gutter / 2}px;
     background: ${theme.colors.app.topbar};
@@ -21,13 +19,11 @@ const TopbarContainer = styled(UI.Div)`
 
 const WorkspaceTopbar = () => (
   <TopbarContainer>
-    <UI.Flex justifyContent="space-between" alignItems="center">
-      <Logo />
-
-      <UI.Flex>
-        <Usernav />
+    <UI.Container>
+      <UI.Flex justifyContent="space-between" alignItems="center">
+        <Logo />
       </UI.Flex>
-    </UI.Flex>
+    </UI.Container>
   </TopbarContainer>
 );
 

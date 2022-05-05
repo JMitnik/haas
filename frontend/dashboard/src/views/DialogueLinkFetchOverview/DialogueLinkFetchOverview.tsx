@@ -3,6 +3,7 @@ import { StringParam, useQueryParams } from 'use-query-params';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { View } from 'layouts/View';
 import { useGetDialogueLinksQuery } from 'types/generated-types';
 import GlobalLoader from 'components/GlobalLoader';
 
@@ -26,30 +27,40 @@ export const DialogueLinkFetchOverview = () => {
 
   if (loading) return <GlobalLoader />;
 
-  return (
-    <UI.Container>
-      <UI.Div padding="1em">
-        <UI.DeprecatedViewTitle>
-          {t('dialogues')}
-        </UI.DeprecatedViewTitle>
-      </UI.Div>
+  const dialogueUnit = 'teams'; // TODO: Make this dependent on the data
+  const visitorUnit = 'people'; // TODO: Make this dependent on the data
 
-      <UI.ViewBody padding="1em">
-        {filteredDialogues?.length === 0 && (
-          <UI.Flex justifyContent="center">
-            {t('no_dialogues_message')}
-          </UI.Flex>
-        )}
-        <UI.Grid
-          gridGap={4}
-          gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
-          gridAutoRows="minmax(200px, 1fr)"
-        >
-          {filteredDialogues?.map((dialogue, index) => dialogue && (
-            <DialogueCard key={index} dialogue={dialogue} />
-          ))}
-        </UI.Grid>
-      </UI.ViewBody>
-    </UI.Container>
+  return (
+    <View documentTitle="haas | Guest dialogues">
+      <UI.Container>
+        <UI.ViewHead>
+          <UI.ViewTitle>
+            {t(dialogueUnit)}
+          </UI.ViewTitle>
+          <UI.ViewSubTitle>
+            {t('dialogues_guest_helper', { unit: visitorUnit })}
+          </UI.ViewSubTitle>
+        </UI.ViewHead>
+      </UI.Container>
+
+      <UI.Container>
+        <UI.ViewBody>
+          {filteredDialogues?.length === 0 && (
+            <UI.Flex justifyContent="center">
+              {t('no_dialogues_message')}
+            </UI.Flex>
+          )}
+          <UI.Grid
+            gridGap={4}
+            gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(300px, 1fr))']}
+            gridAutoRows="minmax(200px, 1fr)"
+          >
+            {filteredDialogues?.map((dialogue, index) => dialogue && (
+              <DialogueCard key={index} dialogue={dialogue} />
+            ))}
+          </UI.Grid>
+        </UI.ViewBody>
+      </UI.Container>
+    </View>
   );
 };
