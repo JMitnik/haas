@@ -1,15 +1,11 @@
+import * as UI from '@haas/ui';
 import * as qs from 'qs';
-import {
-  Div,
-  Loader, PageContainer, SubtlePageHeading
-} from '@haas/ui';
+import { gql, useMutation } from '@apollo/client';
 import { useHistory, useLocation } from 'react-router';
-import { useMutation } from '@apollo/client';
+
 import { useUser } from 'providers/UserProvider';
 import React, { useEffect, useRef } from 'react';
 import formatServerError from 'utils/formatServerError';
-import { gql } from '@apollo/client';
-import styled from 'styled-components';
 
 const verifyUserTokenQuery = gql`
   mutation verifyUserToken($token: String!) {
@@ -35,13 +31,7 @@ const verifyUserTokenQuery = gql`
   }
 `;
 
-const VerifyTokenPageContainer = styled(PageContainer)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const VerifyTokenPage = () => {
+export const VerifyTokenView = () => {
   const location = useLocation();
   const history = useHistory();
   const { setAccessToken, isLoggedIn, user } = useUser();
@@ -79,27 +69,25 @@ const VerifyTokenPage = () => {
 
   if (loading) {
     return (
-      <VerifyTokenPageContainer>
-        <Div>
-          <Loader />
-        </Div>
-      </VerifyTokenPageContainer>
+      <UI.Flex alignItems="center" justifyContent="center">
+        <UI.Div>
+          <UI.Loader />
+        </UI.Div>
+      </UI.Flex>
     );
   }
 
   if (error) {
     return (
-      <VerifyTokenPageContainer>
-        <Div>
-          <SubtlePageHeading>{formatServerError(error.message)}</SubtlePageHeading>
-        </Div>
-      </VerifyTokenPageContainer>
+      <UI.Flex alignItems="center" justifyContent="center">
+        <UI.Div>
+          <UI.SubtlePageHeading>{formatServerError(error.message)}</UI.SubtlePageHeading>
+        </UI.Div>
+      </UI.Flex>
     );
   }
 
   return (
-    <VerifyTokenPageContainer />
+    <UI.Flex alignItems="center" justifyContent="center" />
   );
 };
-
-export default VerifyTokenPage;

@@ -13,6 +13,7 @@ import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
 import { ReportView } from 'views/ReportView';
 import { SystemPermission } from 'types/generated-types';
+import { VerifyTokenView } from 'views/VerifyTokenView';
 import { sub } from 'date-fns';
 import { useUser } from 'providers/UserProvider';
 import ActionsPage from 'pages/dashboard/actions';
@@ -47,7 +48,6 @@ import NotAuthorizedView from 'layouts/NotAuthorizedView';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
-import VerifyTokenPage from 'pages/verify_token';
 import WorkspaceLayout from 'layouts/WorkspaceLayout/WorkspaceLayout';
 
 const CustomerRoutes = () => (
@@ -295,11 +295,11 @@ const AppRoutes = () => (
       </GuardedRoute>
 
       <GuardedRoute path="/dashboard">
-        <DashboardPage />
+        <Redirect to="/dashboard/b" />
       </GuardedRoute>
 
       <Route path="/verify_token">
-        <VerifyTokenPage />
+        <VerifyTokenView />
       </Route>
 
       <Route path="/public">

@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { GenericCell } from 'components/Table/CellComponents/CellComponents';
+import { View } from 'layouts/View';
 import SearchBar from 'components/SearchBar/SearchBar';
 import ShowMoreButton from 'components/ShowMoreButton';
 import Table from 'components/Table/Table';
@@ -131,15 +132,16 @@ const TriggersOverview = () => {
   const { t } = useTranslation();
 
   return (
-    <>
+    <View documentTitle="haas | Alerts">
       <UI.ViewHead>
         <UI.Flex justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <UI.DeprecatedViewTitle>{t('views:trigger_overview')}</UI.DeprecatedViewTitle>
+            <UI.ViewTitle>
+              {t('views:trigger_overview')}
+            </UI.ViewTitle>
             <UI.Button
               onClick={handleAddUser}
               leftIcon={Plus}
-              variantColor="teal"
               size="sm"
               ml={4}
             >
@@ -217,7 +219,7 @@ const TriggersOverview = () => {
           />
         </UI.Div>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 
