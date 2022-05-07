@@ -25,7 +25,7 @@ import { formatSimpleDate } from 'utils/dateUtils';
 import { useLogger } from 'hooks/useLogger';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
-import Searchbar from 'components/SearchBar';
+import Searchbar from 'components/Common/SearchBar';
 
 import { CampaignType } from './CampaignViewTypes';
 import { DeliveryModalCard } from './DeliveryModalCard';

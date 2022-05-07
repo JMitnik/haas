@@ -13,7 +13,7 @@ import styled from 'styled-components';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
-import SearchBar from 'components/SearchBar/SearchBar';
+import SearchBar from 'components/Common/SearchBar/SearchBar';
 import ShareIcon from 'components/Icons/ShareIcon';
 import getCTANodesQuery from 'queries/getCTANodes';
 

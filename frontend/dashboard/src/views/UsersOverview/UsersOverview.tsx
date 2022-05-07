@@ -27,8 +27,8 @@ import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
-import SearchBar from 'components/SearchBar/SearchBar';
-import Searchbar from 'components/SearchBar';
+import SearchBar from 'components/Common/SearchBar/SearchBar';
+import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
 import { UserModalCard } from './UserModalCard';

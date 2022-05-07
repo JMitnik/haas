@@ -8,7 +8,7 @@ import React, { useRef, useState } from 'react';
 import { ReactComponent as DEFlag } from 'assets/icons/flags/flag-de.svg';
 import { ReactComponent as GBFlag } from 'assets/icons/flags/flag-gb.svg';
 import { ReactComponent as NLFlag } from 'assets/icons/flags/flag-nl.svg';
-import { ShowMoreButton } from 'components/ShowMoreButton';
+import { ShowMoreButton } from 'components/Common/ShowMoreButton';
 
 import { Avatar } from 'components/Common/Avatar';
 import { useCustomer } from 'providers/CustomerProvider';

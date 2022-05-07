@@ -36,7 +36,7 @@ import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useMenu } from 'components/Common/Menu/useMenu';
-import SearchBar from 'components/SearchBar/SearchBar';
+import SearchBar from 'components/Common/SearchBar/SearchBar';
 
 import { InteractionModalCard } from './InteractionModalCard';
 

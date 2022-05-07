@@ -12,8 +12,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { GenericCell } from 'components/Table/CellComponents/CellComponents';
 import { View } from 'layouts/View';
-import SearchBar from 'components/SearchBar/SearchBar';
-import ShowMoreButton from 'components/ShowMoreButton';
+import SearchBar from 'components/Common/SearchBar/SearchBar';
+import ShowMoreButton from 'components/Common/ShowMoreButton';
 import Table from 'components/Table/Table';
 import deleteTriggerMutation from 'mutations/deleteTrigger';
 import getTriggerTableQuery from 'queries/getTriggerTable';

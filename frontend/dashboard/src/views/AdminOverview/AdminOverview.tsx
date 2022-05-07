@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import { useGetWorkspaceAdminsQuery } from 'types/generated-types';
-import SearchBar from 'components/SearchBar/SearchBar';
+import SearchBar from 'components/Common/SearchBar/SearchBar';
 
 const TableHeaderContainer = styled(UI.TableHeading)`
   background: grey !important;

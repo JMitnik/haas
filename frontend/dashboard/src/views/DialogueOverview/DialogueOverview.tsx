@@ -9,7 +9,7 @@ import * as Table from 'components/Common/Table';
 import { DialogueConnection, DialogueConnectionOrder, useDialogueConnectionQuery } from 'types/generated-types';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { View } from 'layouts/View';
-import Searchbar from 'components/SearchBar';
+import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
 import DialogueCard from './DialogueCard';
