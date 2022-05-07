@@ -157,9 +157,11 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
               </UI.Flex>
             </UI.Div>
 
-            <UI.Div>
-              <Avatar brand="off" name={`${user?.firstName} ${user?.lastName}`} />
-            </UI.Div>
+            {dialogue.isPrivate && (
+              <UI.Div>
+                <Avatar brand="off" name={`${user?.firstName} ${user?.lastName}`} />
+              </UI.Div>
+            )}
           </UI.Flex>
         </UI.ColumnFlex>
       </UI.CardBody>

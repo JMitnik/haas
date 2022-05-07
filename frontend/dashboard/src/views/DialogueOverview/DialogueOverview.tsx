@@ -19,7 +19,7 @@ const DialogueOverview = () => {
   const [filter, setFilter] = useQueryParams({
     search: StringParam,
     pageIndex: withDefault(NumberParam, 0),
-    perPage: withDefault(NumberParam, 10),
+    perPage: withDefault(NumberParam, 9),
   });
 
   const [activeDialogueConnection, setDialogueConnection] = useState<DialogueConnection>();
@@ -53,43 +53,59 @@ const DialogueOverview = () => {
   return (
     <View documentTitle="haas | Dialogues">
       <UI.ViewHead>
-        <UI.Flex alignItems="flex-end">
+        <UI.Flex justifyContent="space-between">
           <UI.Div>
-            <UI.ViewTitle>
-              {t('dialogues')}
-            </UI.ViewTitle>
-            <UI.ViewSubTitle>
-              {t('dialogues_subtitle')}
-            </UI.ViewSubTitle>
+            <UI.Flex alignItems="flex-end" flexWrap="wrap">
+              <UI.Div mr={4}>
+                <UI.ViewTitle>
+                  {t('dialogues')}
+                </UI.ViewTitle>
+                <UI.ViewSubTitle>
+                  {t('dialogues_subtitle')}
+                </UI.ViewSubTitle>
+              </UI.Div>
+
+              {canDeleteDialogue && (
+                <UI.Div>
+                  <UI.NavButton
+                    leftIcon={Plus}
+                    size="sm"
+                    to={`/dashboard/b/${customerSlug}/dialogue/add`}
+                  >
+                    {t('add_dialogue')}
+                  </UI.NavButton>
+                </UI.Div>
+              )}
+            </UI.Flex>
           </UI.Div>
 
-          {canDeleteDialogue && (
-            <UI.Div ml={4}>
-              <UI.NavButton
-                leftIcon={Plus}
-                size="sm"
-                to={`/dashboard/b/${customerSlug}/dialogue/add`}
-              >
-                {t('add_dialogue')}
-              </UI.NavButton>
-            </UI.Div>
-          )}
+          <UI.Div>
+            <Searchbar
+              activeSearchTerm={filter.search}
+              onSearchTermChange={(newTerm) => {
+                setFilter(
+                  (newFilter) => ({ ...newFilter, pageIndex: 0, search: newTerm }),
+                );
+              }}
+            />
+          </UI.Div>
         </UI.Flex>
       </UI.ViewHead>
 
       <UI.ViewBody>
-        <UI.Div mb={4} width="100%">
+        <UI.Grid
+          gridGap={4}
+          gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
+          gridAutoRows="minmax(200px, 1fr)"
+        >
+          {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
+            <DialogueCard key={index} dialogue={dialogue} />
+          ))}
+        </UI.Grid>
+
+        <UI.Div mt={4} width="100%">
           <UI.Flex alignItems="center" justifyContent="space-between">
-            <UI.Div mr={4}>
-              <Searchbar
-                activeSearchTerm={filter.search}
-                onSearchTermChange={(newTerm) => {
-                  setFilter(
-                    (newFilter) => ({ ...newFilter, pageIndex: 0, search: newTerm }),
-                  );
-                }}
-              />
-            </UI.Div>
+            <UI.Div mr={4} />
             <UI.Flex alignItems="center">
               <UI.Div ml={4}>
                 {pageCount > 1 && (
@@ -106,15 +122,6 @@ const DialogueOverview = () => {
           </UI.Flex>
         </UI.Div>
 
-        <UI.Grid
-          gridGap={4}
-          gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
-          gridAutoRows="minmax(200px, 1fr)"
-        >
-          {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-            <DialogueCard key={index} dialogue={dialogue} />
-          ))}
-        </UI.Grid>
       </UI.ViewBody>
     </View>
   );
