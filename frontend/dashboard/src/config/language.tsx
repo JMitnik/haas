@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    set_private: {
+      en: 'Make private',
+      de: 'Make private',
+    },
+    set_assignable: {
+      en: 'Set assignable',
+      de: 'Set assignable',
+    },
     add_dialogue: {
       en: 'Add dialogue',
       de: 'Dialog hinzufügen',

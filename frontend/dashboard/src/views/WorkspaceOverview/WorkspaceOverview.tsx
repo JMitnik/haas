@@ -3,7 +3,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { Link } from 'react-router-dom';
 import { Plus } from 'react-feather';
 import { Skeleton } from '@chakra-ui/core';
-import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
+import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverview.styles';
 import { Variants, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import React from 'react';

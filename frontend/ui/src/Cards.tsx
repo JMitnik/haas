@@ -148,3 +148,31 @@ export const CardScore = styled(Span)`
 `;
 
 export default Card;
+
+
+/**
+ * New card
+ *
+ * TODO: Deprecate old card and rename this to Card.
+ */
+interface NewCardProps {
+  hasHover?: boolean;
+}
+
+export const NewCard = styled(Div) <NewCardProps>`
+  ${({ theme, hasHover }) => css`
+    background: ${theme.colors.white};
+    border-radius: ${theme.borderRadiuses.md}px;
+    box-shadow: ${theme.boxShadows.md};
+    transition: all ${theme.transitions.normal};
+
+    ${hasHover && css`
+      cursor: pointer;
+
+      &:hover {
+        transition: all ${theme.transitions.normal};
+        box-shadow: ${theme.boxShadows.lg};
+      }
+    `}
+  `}
+`;

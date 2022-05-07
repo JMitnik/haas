@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
-import { Grid as GridIcon, List, Plus } from 'react-feather';
-import { Link, useParams } from 'react-router-dom';
 import { NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
+import { Plus } from 'react-feather';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -9,10 +9,8 @@ import * as Table from 'components/Common/Table';
 import { DialogueConnection, DialogueConnectionOrder, useDialogueConnectionQuery } from 'types/generated-types';
 import { View } from 'layouts/View';
 import Searchbar from 'components/SearchBar';
-import SurveyIcon from 'components/Icons/SurveyIcon';
 import useAuth from 'hooks/useAuth';
 
-import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
 const DialogueOverview = () => {
@@ -25,7 +23,6 @@ const DialogueOverview = () => {
   });
 
   const [activeDialogueConnection, setDialogueConnection] = useState<DialogueConnection>();
-  const [useDialogueGridView, setUseDialogueGridView] = useState(true);
 
   const { loading: isLoading } = useDialogueConnectionQuery({
     fetchPolicy: 'cache-and-network',
@@ -66,15 +63,17 @@ const DialogueOverview = () => {
             </UI.ViewSubTitle>
           </UI.Div>
 
-          <UI.Div ml={4}>
-            <UI.NavButton
-              leftIcon={Plus}
-              size="sm"
-              to={`/dashboard/b/${customerSlug}/dialogue/add`}
-            >
-              {t('add_dialogue')}
-            </UI.NavButton>
-          </UI.Div>
+          {canDeleteDialogue && (
+            <UI.Div ml={4}>
+              <UI.NavButton
+                leftIcon={Plus}
+                size="sm"
+                to={`/dashboard/b/${customerSlug}/dialogue/add`}
+              >
+                {t('add_dialogue')}
+              </UI.NavButton>
+            </UI.Div>
+          )}
         </UI.Flex>
       </UI.ViewHead>
 
@@ -92,24 +91,6 @@ const DialogueOverview = () => {
               />
             </UI.Div>
             <UI.Flex alignItems="center">
-              <UI.Button
-                size="sm"
-                mr={2}
-                onClick={() => setUseDialogueGridView(true)}
-                variantColor={useDialogueGridView ? 'main' : 'gray'}
-                leftIcon={GridIcon}
-              >
-                {t('grid')}
-              </UI.Button>
-              <UI.Button
-                size="sm"
-                onClick={() => setUseDialogueGridView(false)}
-                variantColor={useDialogueGridView ? 'gray' : 'main'}
-                leftIcon={List}
-              >
-                {t('list')}
-              </UI.Button>
-
               <UI.Div ml={4}>
                 {pageCount > 1 && (
                   <Table.Pagination
@@ -125,39 +106,15 @@ const DialogueOverview = () => {
           </UI.Flex>
         </UI.Div>
 
-        {useDialogueGridView ? (
-          <UI.Grid
-            gridGap={4}
-            gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
-            gridAutoRows="minmax(200px, 1fr)"
-          >
-            {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-              <DialogueCard key={index} dialogue={dialogue} />
-            ))}
-
-            {canDeleteDialogue && (
-              <AddDialogueCard data-cy="AddDialogueCard">
-                <Link to={`/dashboard/b/${customerSlug}/dialogue/add`} />
-
-                <UI.Flex flexDirection="column" alignItems="center" justifyContent="center">
-                  <SurveyIcon />
-                  <TranslatedPlus>
-                    <Plus strokeWidth="3px" />
-                  </TranslatedPlus>
-                  <UI.H4 color="default.dark">
-                    {t('create_dialogue')}
-                  </UI.H4>
-                </UI.Flex>
-              </AddDialogueCard>
-            )}
-          </UI.Grid>
-        ) : (
-          <UI.Grid gridRowGap={2}>
-            {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-              <DialogueCard isCompact key={index} dialogue={dialogue} />
-            ))}
-          </UI.Grid>
-        )}
+        <UI.Grid
+          gridGap={4}
+          gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
+          gridAutoRows="minmax(200px, 1fr)"
+        >
+          {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
+            <DialogueCard key={index} dialogue={dialogue} />
+          ))}
+        </UI.Grid>
       </UI.ViewBody>
     </View>
   );
