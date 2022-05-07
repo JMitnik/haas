@@ -155,7 +155,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
             </UI.Button>
           </UI.Flex>
 
-          <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
+          <SearchBar search={activeSearchTerm} onSearchChange={handleSearchTermChange} />
         </UI.Flex>
       </UI.ViewHead>
 

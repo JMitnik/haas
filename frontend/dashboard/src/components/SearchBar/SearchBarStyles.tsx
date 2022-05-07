@@ -25,27 +25,34 @@ export const EmptyInputIcon = styled(InputIcon)`
   right: 0;
 `;
 
-export const SearchbarInput = styled.input`
-  ${({ theme }) => css`
+interface SearchbarInputProps {
+  muted?: boolean;
+}
+
+export const SearchbarInput = styled.input<SearchbarInputProps>`
+  ${({ theme, muted }) => css`
     width: 100%;
     padding: 8px 12px;
-    border-radius: 6px;
-    border: 0;
-    background: ${theme.colors.app.mutedOnDefault};
+    border-radius: ${theme.borderRadiuses.md}px;
+    box-shadow: ${theme.boxShadows.sm};
+    background: ${theme.colors.neutral[500]};
     outline: none;
-    border: 1px solid transparent;
-    transition: all 0.2s ease-in;
+    border: 1px solid ${theme.colors.neutral[500]};
+    transition: ${theme.transitions.normal};
     padding-right: 2.5rem;
+
+    ${muted && css`
+      color: ${theme.colors.neutral[200]};
+    `}
 
     ${InputIcon} + & {
       padding-left: 2.5rem;
     }
 
-
     &:focus {
-      transition: all 0.2s ease-in;
-      border: 1px solid ${theme.colors.app.mutedAltOnDefault};
-      box-shadow: 0 0 0 1px ${theme.colors.app.mutedAltOnDefault};
+      transition: ${theme.transitions.normal};
+      background: ${theme.colors.neutral[100]};
+      box-shadow: ${theme.boxShadows.md};
     }
   `}
 `;

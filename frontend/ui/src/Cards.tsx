@@ -4,7 +4,7 @@ import { Flex } from './Container';
 import { Span } from './Span';
 import { Button } from './Buttons';
 
-type BoxShadowSize = 'sm' | 'md' | 'lg';
+export type BoxShadowSize = 'sm' | 'md' | 'lg';
 
 interface CardProps {
   noHover?: boolean;
@@ -149,7 +149,6 @@ export const CardScore = styled(Span)`
 
 export default Card;
 
-
 /**
  * New card
  *
@@ -157,13 +156,14 @@ export default Card;
  */
 interface NewCardProps {
   hasHover?: boolean;
+  boxShadow?: BoxShadowSize;
 }
 
 export const NewCard = styled(Div) <NewCardProps>`
-  ${({ theme, hasHover }) => css`
+  ${({ theme, hasHover, boxShadow = 'md' }) => css`
     background: ${theme.colors.white};
     border-radius: ${theme.borderRadiuses.md}px;
-    box-shadow: ${theme.boxShadows.md};
+    box-shadow: ${theme.boxShadows[boxShadow]};
     transition: all ${theme.transitions.normal};
 
     ${hasHover && css`

@@ -68,8 +68,8 @@ const AdminOverview = () => {
               </UI.Button>
               <Div ml={500}>
                 <SearchBar
-                  activeSearchTerm={activeSearchTerm}
-                  onSearchTermChange={handleChange}
+                  search={activeSearchTerm}
+                  onSearchChange={handleChange}
                 />
               </Div>
             </Flex>

@@ -149,8 +149,8 @@ const TriggersOverview = () => {
             </UI.Button>
           </UI.Flex>
           <SearchBar
-            activeSearchTerm={paginationProps.activeSearchTerm}
-            onSearchTermChange={handleSearchTermChange}
+            search={paginationProps.activeSearchTerm}
+            onSearchChange={handleSearchTermChange}
           />
         </UI.Flex>
       </UI.ViewHead>

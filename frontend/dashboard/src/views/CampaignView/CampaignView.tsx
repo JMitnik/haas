@@ -226,8 +226,8 @@ export const CampaignView = () => {
                       {t('filter_by_search')}
                     </UI.RadioHeader>
                     <Searchbar
-                      activeSearchTerm={filter.search}
-                      onSearchTermChange={handleSearchChange}
+                      search={filter.search}
+                      onSearchChange={handleSearchChange}
                     />
                   </UI.Div>
 
@@ -252,8 +252,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_first_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientFirstName}
-                          onSearchTermChange={handleRecipientFirstName}
+                          search={filter.recipientFirstName}
+                          onSearchChange={handleRecipientFirstName}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -261,8 +261,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_last_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientLastName}
-                          onSearchTermChange={handleRecipientLastName}
+                          search={filter.recipientLastName}
+                          onSearchChange={handleRecipientLastName}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -270,8 +270,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_email')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientEmail}
-                          onSearchTermChange={handleRecipientEmail}
+                          search={filter.recipientEmail}
+                          onSearchChange={handleRecipientEmail}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -279,8 +279,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_phone')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientPhone}
-                          onSearchTermChange={handleRecipientPhone}
+                          search={filter.recipientPhone}
+                          onSearchChange={handleRecipientPhone}
                         />
                       </UI.Div>
                     </UI.Stack>

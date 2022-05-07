@@ -1,8 +1,8 @@
 import styled, { css } from 'styled-components';
 import React from 'react';
 import { Skeleton as ChakraSkeleton } from '@chakra-ui/core';
-import { Text } from './Type';
-import Card from './Cards';
+import { H4, Text } from './Type';
+import Card, { BoxShadowSize, NewCard } from './Cards';
 import { Span } from './Span';
 import { CloseIcon } from './assets/icon-close';
 import { Div } from './Generics';
@@ -44,17 +44,24 @@ const IllustrationCardWrapper = styled.div`
   `}
 `;
 
-export const IllustrationCard = ({ svg, text, children, isFlat }: { svg: any, text: string, children?: React.ReactNode, isFlat?: boolean; }) => {
+interface IllustrationCardProps {
+  svg: any;
+  text: string;
+  children?: React.ReactNode;
+  boxShadow?: BoxShadowSize;
+}
+
+export const IllustrationCard = ({ svg, text, children, boxShadow }: IllustrationCardProps) => {
   return (
-    <Card noHover isFlat={isFlat}>
+    <NewCard boxShadow={boxShadow}>
       <IllustrationCardWrapper>
         {svg}
         <Span>
-          <Text pb={2}>{text}</Text>
+          <H4 color="off.400" pt={4} fontWeight={500} pb={2}>{text}</H4>
           {children}
         </Span>
       </IllustrationCardWrapper>
-    </Card>
+    </NewCard>
   );
 };
 

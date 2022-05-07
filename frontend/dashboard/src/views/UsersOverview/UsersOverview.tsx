@@ -259,8 +259,8 @@ const UsersOverview = () => {
 
           <UI.Div>
             <SearchBar
-              activeSearchTerm={filter.search}
-              onSearchTermChange={handleSearchTermChange}
+              search={filter.search}
+              onSearchChange={handleSearchTermChange}
             />
           </UI.Div>
 
@@ -286,8 +286,8 @@ const UsersOverview = () => {
                       {t('filter_by_search')}
                     </UI.RadioHeader>
                     <Searchbar
-                      activeSearchTerm={filter.search}
-                      onSearchTermChange={handleSearchChange}
+                      search={filter.search}
+                      onSearchChange={handleSearchChange}
                     />
                   </UI.Div>
 
@@ -312,8 +312,8 @@ const UsersOverview = () => {
                           {t('filter_by_recipient_first_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.firstName}
-                          onSearchTermChange={handleRecipientFirstName}
+                          search={filter.firstName}
+                          onSearchChange={handleRecipientFirstName}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -321,8 +321,8 @@ const UsersOverview = () => {
                           {t('filter_by_recipient_last_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.lastName}
-                          onSearchTermChange={handleRecipientLastName}
+                          search={filter.lastName}
+                          onSearchChange={handleRecipientLastName}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -330,8 +330,8 @@ const UsersOverview = () => {
                           {t('filter_by_recipient_email')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.email}
-                          onSearchTermChange={handleRecipientEmail}
+                          search={filter.email}
+                          onSearchChange={handleRecipientEmail}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -339,8 +339,8 @@ const UsersOverview = () => {
                           {t('filter_by_role_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.role}
-                          onSearchTermChange={handleRole}
+                          search={filter.role}
+                          onSearchChange={handleRole}
                         />
                       </UI.Div>
                     </UI.Stack>

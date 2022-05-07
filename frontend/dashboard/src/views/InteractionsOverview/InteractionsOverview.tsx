@@ -328,8 +328,8 @@ export const InteractionsOverview = () => {
 
           <Flex alignItems="center">
             <SearchBar
-              activeSearchTerm={filter.search}
-              onSearchTermChange={handleSearchTermChange}
+              search={filter.search}
+              onSearchChange={handleSearchTermChange}
             />
           </Flex>
         </UI.Flex>
@@ -357,8 +357,8 @@ export const InteractionsOverview = () => {
                         <UI.Muted>{t('filter_by_search_helper')}</UI.Muted>
                       </UI.Div>
                       <SearchBar
-                        activeSearchTerm={filter.search}
-                        onSearchTermChange={handleSearchTermChange}
+                        search={filter.search}
+                        onSearchChange={handleSearchTermChange}
                       />
                     </UI.Stack>
                   </UI.Div>

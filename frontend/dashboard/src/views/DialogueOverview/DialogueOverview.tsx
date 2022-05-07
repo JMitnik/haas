@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 
 import * as Table from 'components/Common/Table';
 import { DialogueConnection, DialogueConnectionOrder, useDialogueConnectionQuery } from 'types/generated-types';
+import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { View } from 'layouts/View';
 import Searchbar from 'components/SearchBar';
 import useAuth from 'hooks/useAuth';
@@ -47,7 +48,7 @@ const DialogueOverview = () => {
 
   const { canDeleteDialogue } = useAuth();
 
-  const filteredDialogues = activeDialogueConnection?.dialogues;
+  const filteredDialogues = activeDialogueConnection?.dialogues || [];
   const pageCount = activeDialogueConnection?.totalPages || 0;
 
   return (
@@ -81,8 +82,9 @@ const DialogueOverview = () => {
 
           <UI.Div>
             <Searchbar
-              activeSearchTerm={filter.search}
-              onSearchTermChange={(newTerm) => {
+              search={filter.search}
+              isLoading={isLoading}
+              onSearchChange={(newTerm) => {
                 setFilter(
                   (newFilter) => ({ ...newFilter, pageIndex: 0, search: newTerm }),
                 );
@@ -98,10 +100,22 @@ const DialogueOverview = () => {
           gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
           gridAutoRows="minmax(200px, 1fr)"
         >
-          {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
+          {filteredDialogues.map((dialogue: any, index: any) => dialogue && (
             <DialogueCard key={index} dialogue={dialogue} />
           ))}
         </UI.Grid>
+
+        {filteredDialogues.length === 0 && (
+          <UI.IllustrationCard
+            boxShadow="sm"
+            svg={<NoDataIll />}
+            text={t('no_dialogues_found')}
+          >
+            <UI.Button variant="outline" onClick={() => setFilter({ pageIndex: 0, search: '' })}>
+              {t('clear_filters')}
+            </UI.Button>
+          </UI.IllustrationCard>
+        )}
 
         <UI.Div mt={4} width="100%">
           <UI.Flex alignItems="center" justifyContent="space-between">

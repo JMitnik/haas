@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    clear_filters: {
+      en: 'Clear filters',
+      de: 'Clear filters',
+    },
+    no_dialogues_found: {
+      en: 'We could not find any dialogues with the current filters.',
+      de: 'We could not find any dialogues with the current filters.',
+    },
     set_private: {
       en: 'Make private',
       de: 'Make private',
