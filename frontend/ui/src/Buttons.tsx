@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import Color from 'color';
 import {
   Button as ChakraButton, ButtonProps as ChakraButtonProps,
@@ -52,3 +53,18 @@ export const IconButton = (props: ChakraIconButtonProps) => (
 interface NavButtonProps extends ButtonProps {
   to?: string;
 }
+
+const NavButtonLink = styled(NavLink)`
+  color: white;
+
+  &:hover {
+    color: white;
+  }
+`;
+
+export const NavButton = ({ to, children, ...props }: NavButtonProps) => (
+  // @ts-ignore
+  <Button as={NavButtonLink} to={to} {...props}>
+    {children}
+  </Button>
+)

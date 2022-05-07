@@ -3,10 +3,10 @@ import Dropdown from 'components/Dropdown';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-const ShowMoreButtonContainer = styled.div`
+const ShowMoreButtonContainer = styled.button`
   ${({ theme }) => css`
     height: 25px;
-    width: 40px;
+    /* width: 40px; */
 
     display: flex;
     align-items: center;

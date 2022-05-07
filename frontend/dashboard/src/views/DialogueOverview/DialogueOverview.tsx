@@ -1,6 +1,4 @@
 import * as UI from '@haas/ui';
-import { Button, ButtonGroup } from '@chakra-ui/core';
-import { Div, Flex, Grid, H4 } from '@haas/ui';
 import { Grid as GridIcon, List, Plus } from 'react-feather';
 import { Link, useParams } from 'react-router-dom';
 import { NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
@@ -58,17 +56,32 @@ const DialogueOverview = () => {
   return (
     <View documentTitle="haas | Dialogues">
       <UI.ViewHead>
-        <UI.ViewTitle>
-          {t('dialogues')}
-        </UI.ViewTitle>
-        <UI.ViewSubTitle>
-          {t('dialogues_subtitle')}
-        </UI.ViewSubTitle>
+        <UI.Flex alignItems="flex-end">
+          <UI.Div>
+            <UI.ViewTitle>
+              {t('dialogues')}
+            </UI.ViewTitle>
+            <UI.ViewSubTitle>
+              {t('dialogues_subtitle')}
+            </UI.ViewSubTitle>
+          </UI.Div>
+
+          <UI.Div ml={4}>
+            <UI.NavButton
+              leftIcon={Plus}
+              size="sm"
+              to={`/dashboard/b/${customerSlug}/dialogue/add`}
+            >
+              {t('add_dialogue')}
+            </UI.NavButton>
+          </UI.Div>
+        </UI.Flex>
       </UI.ViewHead>
+
       <UI.ViewBody>
-        <Div mb={4} maxWidth="800px" width="100%">
-          <Flex>
-            <Div mr={4}>
+        <UI.Div mb={4} width="100%">
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div mr={4}>
               <Searchbar
                 activeSearchTerm={filter.search}
                 onSearchTermChange={(newTerm) => {
@@ -77,46 +90,47 @@ const DialogueOverview = () => {
                   );
                 }}
               />
-            </Div>
-            <ButtonGroup display="flex" alignItems="center">
-              <Button
+            </UI.Div>
+            <UI.Flex alignItems="center">
+              <UI.Button
                 size="sm"
+                mr={2}
                 onClick={() => setUseDialogueGridView(true)}
-                variantColor={useDialogueGridView ? 'blue' : 'gray'}
+                variantColor={useDialogueGridView ? 'main' : 'gray'}
                 leftIcon={GridIcon}
               >
                 {t('grid')}
-              </Button>
-              <Button
+              </UI.Button>
+              <UI.Button
                 size="sm"
                 onClick={() => setUseDialogueGridView(false)}
-                variantColor={useDialogueGridView ? 'gray' : 'blue'}
+                variantColor={useDialogueGridView ? 'gray' : 'main'}
                 leftIcon={List}
               >
                 {t('list')}
-              </Button>
-            </ButtonGroup>
-            <UI.Flex justifyContent="flex-end" ml={4}>
-              {pageCount > 1 && (
-                <Table.Pagination
-                  pageIndex={filter.pageIndex}
-                  maxPages={pageCount}
-                  perPage={filter.perPage}
-                  isLoading={isLoading}
-                  setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
-                />
-              )}
+              </UI.Button>
+
+              <UI.Div ml={4}>
+                {pageCount > 1 && (
+                  <Table.Pagination
+                    pageIndex={filter.pageIndex}
+                    maxPages={pageCount}
+                    perPage={filter.perPage}
+                    isLoading={isLoading}
+                    setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+                  />
+                )}
+              </UI.Div>
             </UI.Flex>
-          </Flex>
-        </Div>
+          </UI.Flex>
+        </UI.Div>
 
         {useDialogueGridView ? (
-          <Grid
+          <UI.Grid
             gridGap={4}
-            gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(250px, 1fr))']}
-            gridAutoRows="minmax(300px, 1fr)"
+            gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
+            gridAutoRows="minmax(200px, 1fr)"
           >
-
             {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
               <DialogueCard key={index} dialogue={dialogue} />
             ))}
@@ -125,24 +139,24 @@ const DialogueOverview = () => {
               <AddDialogueCard data-cy="AddDialogueCard">
                 <Link to={`/dashboard/b/${customerSlug}/dialogue/add`} />
 
-                <Flex flexDirection="column" alignItems="center" justifyContent="center">
+                <UI.Flex flexDirection="column" alignItems="center" justifyContent="center">
                   <SurveyIcon />
                   <TranslatedPlus>
                     <Plus strokeWidth="3px" />
                   </TranslatedPlus>
-                  <H4 color="default.dark">
+                  <UI.H4 color="default.dark">
                     {t('create_dialogue')}
-                  </H4>
-                </Flex>
+                  </UI.H4>
+                </UI.Flex>
               </AddDialogueCard>
             )}
-          </Grid>
+          </UI.Grid>
         ) : (
-          <Grid gridRowGap={2}>
+          <UI.Grid gridRowGap={2}>
             {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
               <DialogueCard isCompact key={index} dialogue={dialogue} />
             ))}
-          </Grid>
+          </UI.Grid>
         )}
       </UI.ViewBody>
     </View>

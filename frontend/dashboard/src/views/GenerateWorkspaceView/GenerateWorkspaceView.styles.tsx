@@ -90,13 +90,12 @@ export const RadioGroupBox = styled.label<RadioGroupBoxProps>`
       }
     `}
 
-
     ${variant === 'unboxed' && css`
       padding: ${theme.gutter / 2}px 0;
     `}
 
     ${RadioGroupItem} {
-      margin-right: ${theme.gutter / 2}px;
+      margin-right: ${theme.gutter}px;
     }
   `}
 `;

@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    add_dialogue: {
+      en: 'Add dialogue',
+      de: 'Dialog hinzufügen',
+    },
     copied: {
       en: 'Copied!',
       de: 'Kopiert!',

@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import {
-  Button, Avatar as ChakraAvatar, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { formatDistance } from 'date-fns';
@@ -8,22 +8,19 @@ import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React, { useRef } from 'react';
+import styled, { css } from 'styled-components';
 
 import { ReactComponent as DEFlag } from 'assets/icons/flags/flag-de.svg';
 import { ReactComponent as GBFlag } from 'assets/icons/flags/flag-gb.svg';
 import { ReactComponent as NLFlag } from 'assets/icons/flags/flag-nl.svg';
-
 import { deleteDialogueMutation } from 'mutations/deleteDialogue';
+import { useCustomer } from 'providers/CustomerProvider';
+import { useSetDialoguePrivacyMutation } from 'types/generated-types';
+import { useUser } from 'providers/UserProvider';
 import ShowMoreButton from 'components/ShowMoreButton';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
-
-import { useCustomer } from 'providers/CustomerProvider';
-import { useSetDialoguePrivacyMutation } from 'types/generated-types';
-import { useUser } from 'providers/UserProvider';
-
-import { Tag } from './Tag';
 
 interface DialogueCardOptionsOverlayProps {
   onDelete: (e: React.MouseEvent<HTMLElement>) => void;
@@ -116,6 +113,21 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit, isPrivate, dialogueSlug 
   );
 };
 
+const DialogueCardContainer = styled(UI.Div)`
+  ${({ theme }) => css`
+    background: white;
+    box-shadow: ${theme.boxShadows.md};
+    border-radius: ${theme.borderRadiuses.md}px;
+    transition: all ${theme.transitions.normal};
+
+    &:hover {
+      box-shadow: ${theme.boxShadows.lg};
+      cursor: pointer;
+      transition: all ${theme.transitions.normal};
+    }
+  `}
+`;
+
 const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: boolean }) => {
   const history = useHistory();
   const { user } = useUser();
@@ -191,49 +203,45 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
   const lastUpdated = dialogue.updatedAt ? new Date(Number.parseInt(dialogue.updatedAt, 10)) : null;
 
   return (
-    <UI.Card
+    <DialogueCardContainer
       ref={ref}
       data-cy="DialogueCard"
       bg="white"
-      useFlex
-      flexDirection="column"
       onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}
     >
-      <UI.CardBody flex="100%">
-        {dialogue.isPrivate && (
-          <UI.Div position="absolute" right="5px" top="5px">
-            <ChakraAvatar bg="gray.300" size="xs" name={`${user?.firstName} ${user?.lastName}`} />
-          </UI.Div>
-
-        )}
+      <UI.CardBody height="100%" flex="100%">
         <UI.ColumnFlex justifyContent="space-between" height="100%">
           <UI.Div>
-            <UI.Flex justifyContent="space-between" alignItems="center">
-              <UI.Text fontSize={isCompact ? '1.1rem' : '1.4rem'} color="app.onWhite" mb={2} fontWeight={500}>
-                {dialogue.title}
-              </UI.Text>
-            </UI.Flex>
-
-            {!isCompact && (
-              <UI.Paragraph fontSize="0.8rem" color="app.mutedOnWhite" fontWeight="100">
-                <UI.ExtLink to={`https://client.haas.live/${dialogue.customer.slug}/${dialogue.slug}`}>
-                  {`haas.live/${dialogue.customer.slug}/${dialogue.slug}`}
+            <UI.Flex justifyContent="space-between">
+              <UI.Div style={{ wordBreak: 'break-all' }}>
+                <UI.H4 color="off.600" fontWeight="700">
+                  {dialogue.title}
+                </UI.H4>
+                <UI.ExtLink to={`https://client.haas.live/${dialogue.customer.slug}/${dialogue.slug}`} color="off.300">
+                  {`${dialogue.customer.slug}/${dialogue.slug}`}
                 </UI.ExtLink>
-              </UI.Paragraph>
-            )}
+              </UI.Div>
+
+              <UI.Div ml={2}>
+                {canAccessAdmin && (
+                  <ShowMoreButton
+                    renderMenu={(
+                      <DialogueCardOptionsOverlay
+                        dialogueSlug={dialogue.slug}
+                        isPrivate={dialogue.isPrivate}
+                        onDelete={handleDeleteDialogue}
+                        onEdit={goToEditDialogue}
+                      />
+                    )}
+                  />
+                )}
+              </UI.Div>
+            </UI.Flex>
           </UI.Div>
 
-          <UI.Div>
-            {!isCompact && (
-              <UI.Flex mb={4} flex="100%">
-                <UI.Flex flexWrap="wrap" alignSelf="flex-end" marginTop="5px" flexDirection="row">
-                  {dialogue.tags.map((tag: any, index: number) => <Tag key={index} tag={tag} />)}
-                </UI.Flex>
-              </UI.Flex>
-            )}
-
+          <UI.Div style={{ marginTop: 'auto' }}>
             {!!dialogue.language && (
-              <UI.Div mb={1}>
+              <UI.Div mt="auto">
                 <UI.Label size="sm">
                   <UI.Flex alignItems="center">
                     <UI.Icon verticalAlign="middle" mt="4px">
@@ -261,25 +269,17 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
                   </UI.Text>
                 )}
               </UI.Div>
-              <UI.Div>
-                {canAccessAdmin && (
-                  <ShowMoreButton
-                    renderMenu={(
-                      <DialogueCardOptionsOverlay
-                        dialogueSlug={dialogue.slug}
-                        isPrivate={dialogue.isPrivate}
-                        onDelete={handleDeleteDialogue}
-                        onEdit={goToEditDialogue}
-                      />
-                    )}
-                  />
-                )}
-              </UI.Div>
             </UI.Flex>
           </UI.Div>
         </UI.ColumnFlex>
+        {/*
+      {dialogue.isPrivate && (
+        <UI.Div position="absolute" right="5px" top="5px">
+          <ChakraAvatar bg="gray.300" size="xs" name={`${user?.firstName} ${user?.lastName}`} />
+        </UI.Div>
+      )} */}
       </UI.CardBody>
-    </UI.Card>
+    </DialogueCardContainer>
   );
 };
 

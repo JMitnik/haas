@@ -51,7 +51,7 @@ export const ExtLinkContainer = styled.a<ColorProps>`
   `}
 `;
 
-export const ExtLink = ({ children, to, color }: { children: React.ReactNode, to: string, color: string }) => (
+export const ExtLink = ({ children, to, color }: { children: React.ReactNode, to: string, color?: string }) => (
   <ExtLinkContainer color={color} as="a" href={to} target="_blank" rel="noopener noreferrer">{children}</ExtLinkContainer>
 );
 
