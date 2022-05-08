@@ -30,7 +30,7 @@ export const DashboardView = () => {
           <UI.Grid gridTemplateRows="1fr 2fr">
             <UI.Div>
               <WorkspaceGridAdapter
-                backgroundColor={theme.colors.gray[50]}
+                backgroundColor={theme.colors.neutral[500]}
                 height={600}
                 width={900}
               />

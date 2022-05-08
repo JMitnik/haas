@@ -111,37 +111,6 @@ export const WorkspaceGridAdapter = ({
 
   return (
     <LS.WorkspaceGridAdapterContainer>
-      {/* <LS.WidgetHeader>
-        <UI.Flex>
-          <UI.Div>
-            <UI.Div
-              px={1}
-              py={1}
-              border="1px solid"
-              borderColor="cyan.300"
-              backgroundColor="cyan.100"
-              style={{ borderRadius: '10px' }}
-              mr={3}
-            >
-              <UI.Icon width={30} height={30} color="cyan.400">
-                <HoneyComb fill="currentColor" />
-              </UI.Icon>
-            </UI.Div>
-          </UI.Div>
-          <UI.Div>
-            <UI.H4 mb={1}>Team overview</UI.H4>
-            <UI.Div display="flex" alignItems="center">
-              Discover and detect patterns in your teams. Red hexagons
-              {' '}
-              <UI.Span ml={1} mr={1}>
-                <SingleHexagon fill="red" />
-              </UI.Span>
-              {' '}
-              indicate trouble.
-            </UI.Div>
-          </UI.Div>
-        </UI.Flex>
-      </LS.WidgetHeader> */}
       <WorkspaceGrid
         backgroundColor={backgroundColor}
         initialViewMode={initialViewMode}

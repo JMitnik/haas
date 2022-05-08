@@ -4,9 +4,6 @@ import styled, { css } from 'styled-components';
 
 export const WorkspaceGridAdapterContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    /* background: white; */
-    /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px; */
-    /* padding: ${theme.gutter * 1.5}px; */
     border-radius: 20px;
     border: 1px solid ${theme.colors.gray[200]};
 
@@ -55,6 +52,7 @@ export const WorkspaceGridContainer = styled(UI.Div) <WorkspaceGridContainerProp
     background: ${backgroundColor};
     border-radius: 20px;
     position: relative;
+
     svg polygon:hover {
       stroke: red;
       cursor: pointer;
@@ -219,22 +217,22 @@ export const TooltipContainer = styled(UI.Div)`
   ${({ theme }) => css`
     min-width: 300px;
     background: ${theme.colors.white};
-    border-radius: 5px 20px 20px 20px !important;
+    border-radius: ${theme.borderRadiuses.md}px !important;
   `}
 `;
 
 export const TooltipHeader = styled(UI.Div)`
   ${({ theme }) => css`
     padding: 12px 16px;
-    background: ${theme.colors.gray[200]};
-    border-radius: 5px 20px 0 0 !important;
-    color: ${theme.colors.gray[600]};
+    background: ${theme.colors.neutral[200]};
+    border-radius: ${theme.borderRadiuses.md}px ${theme.borderRadiuses.md}px 0 0;
+    color: ${theme.colors.off[600]};
     font-weight: 600;
     border-bottom: 1px solid ${theme.colors.gray[200]};
 
     ${UI.Helper} {
       font-size: 0.7rem !important;
-      color: ${theme.colors.gray[400]};
+      color: ${theme.colors.off[300]};
     }
   `}
 `;
@@ -243,3 +241,14 @@ export const TooltipBody = styled(UI.Div)`
   padding: 12px 16px;
   margin-bottom: 6px;
 `;
+
+export const Tooltip = motion.custom(styled.div`
+  ${({ theme }) => css`
+    box-shadow: ${theme.boxShadows.md} !important;
+
+    > * {
+      padding: 0 !important;
+      border-radius: 20px !important;
+    }
+  `}
+`);

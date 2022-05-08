@@ -9,7 +9,6 @@ import React from 'react';
 import { AppContainer } from 'styles/AppStyles';
 import { DefaultThemeProviders } from 'providers/ThemeProvider';
 import { GlobalErrorFallback } from 'components/Error/GlobalErrorFallback';
-import { ModalContainer } from 'components/Common/Modal/ModalContainer';
 import UserProvider from 'providers/UserProvider';
 
 import GlobalStyle from './global-styles';
@@ -26,7 +25,7 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => (
         <ApolloProvider client={client}>
           <DefaultThemeProviders>
             <UserProvider>
-              <ModalProvider rootComponent={ModalContainer}>
+              <ModalProvider>
                 <AppContainer>
                   <QueryParamProvider ReactRouterRoute={Route}>
                     <ErrorBoundary fallback={GlobalErrorFallback}>

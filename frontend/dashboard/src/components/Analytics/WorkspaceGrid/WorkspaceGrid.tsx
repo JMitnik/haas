@@ -2,7 +2,6 @@ import * as UI from '@haas/ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
 import { ChevronRight } from 'react-feather';
 import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
-import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
 import { Group } from '@visx/group';
 import { ParentSizeModern } from '@visx/responsive';
 import { PatternCircles } from '@visx/pattern';
@@ -12,7 +11,6 @@ import { Zoom } from '@visx/zoom';
 import { localPoint } from '@visx/event';
 import { useModal } from 'react-modal-hook';
 import React, { useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
 
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { Loader } from 'components/Common/Loader/Loader';
@@ -29,15 +27,10 @@ import {
   HexagonViewMode,
 } from './WorkspaceGrid.types';
 import { HexagonItem } from './HexagonItem';
+import { Layers } from './Layers';
 import { TooltipBody } from './TooltipBody';
 import { WorkspaceGridPane } from './WorkspaceGridPane';
-
-const Tooltip = motion.custom(styled.div`
-  > * {
-    padding: 0 !important;
-    border-radius: 20px !important;
-  }
-`);
+import { createGrid } from './WorkspaceGrid.helpers';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -55,28 +48,6 @@ export interface WorkspaceGridProps {
   initialViewMode?: HexagonViewMode;
   onLoadData?: (options: DataLoadOptions) => Promise<[HexagonNode[], HexagonViewMode]>;
 }
-
-const createGrid = (nrItems: number, windowHeight: number, windowWidth: number) => {
-  const gridItems: any[] = [];
-  const squareRoot = Math.sqrt(nrItems);
-  const ratioWindow = windowWidth / windowHeight;
-  const itemsPerRow = Math.ceil(squareRoot * ratioWindow) || 1;
-  const itemsPerColumn = Math.ceil(squareRoot) || 1;
-  const dimensions = Math.floor((windowWidth / itemsPerRow) / 2);
-
-  const hexPrototype = createHexPrototype({
-    dimensions,
-    offset: 1,
-  });
-
-  new Grid(hexPrototype, rectangle({ start: [0, 0], width: itemsPerRow, height: itemsPerColumn }))
-    .each((hex: Hex) => {
-      const corners = hex.corners.map(({ x, y }) => `${x},${y}`);
-      gridItems.push(corners.join(' '));
-    }).run();
-
-  return gridItems;
-};
 
 const getLabelFill = (score?: number) => {
   if (!score) return '#4b1c54';
@@ -428,10 +399,11 @@ export const WorkspaceGrid = ({
                       <AnimateSharedLayout>
                         <AnimatePresence>
                           {tooltipOpen && (
-                            <Tooltip
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              initial={{ opacity: 0 }}
+                            <LS.Tooltip
+                              key="tooltip"
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.95 }}
+                              initial={{ opacity: 0, scale: 0.95 }}
                               layoutId="tooltip"
                             >
                               <TooltipWithBounds
@@ -443,17 +415,20 @@ export const WorkspaceGrid = ({
                                   <TooltipBody node={tooltipData} />
                                 )}
                               </TooltipWithBounds>
-                            </Tooltip>
+                            </LS.Tooltip>
                           )}
                         </AnimatePresence>
                       </AnimateSharedLayout>
-
                     </UI.Div>
                   );
                 }}
               </Zoom>
             )}
           </ParentSizeModern>
+        </UI.Div>
+
+        <UI.Div position="absolute" bottom={24} left={24}>
+          <Layers onClick={(index) => popToIndex(index + 1)} historyQueue={historyQueue} />
         </UI.Div>
 
         <UI.Div px={2} mt={2}>
