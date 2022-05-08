@@ -3,6 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { Loader } from 'components/Common/Loader/Loader';
 import { SystemPermission, useFindRoleByIdQuery, useUpdatePermissionsMutation } from 'types/generated-types';
 import { useToast } from '@chakra-ui/core';
 
@@ -125,9 +126,9 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
 
   const role = data?.role;
 
-  if (loading) {
-    return <UI.Loader />;
-  }
+  // if (loading) {
+  //   return <UI.Loader />;
+  // }
 
   const permissions: PermissionsType[] = role?.allPermissions?.map((permission) => ({
     isActive: role?.permissions?.includes(permission) || false,
@@ -149,13 +150,19 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
         {error && (
           <UI.ErrorPane header="Server Error" text={error.message} />
         )}
-        <RoleUserForm
-          permissionsState={permissions}
-          allPermissions={role?.allPermissions}
-          permissionsArray={role?.permissions || []}
-          roleId={id}
-          onClose={onClose}
-        />
+        {loading && (
+          <Loader testId="haas-runner" />
+        )}
+
+        {!loading && (
+          <RoleUserForm
+            permissionsState={permissions}
+            allPermissions={role?.allPermissions}
+            permissionsArray={role?.permissions || []}
+            roleId={id}
+            onClose={onClose}
+          />
+        )}
       </UI.ModalBody>
     </>
   );

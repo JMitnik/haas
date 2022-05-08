@@ -10,14 +10,14 @@ interface RootProps extends DialogPrimitive.DialogContentProps {
   children: React.ReactNode;
   open: boolean;
   onClose: () => void;
+  minWidth?: number;
   onOpenChange?: (open: boolean) => void;
 }
 
 const RootContainer = styled(DialogPrimitive.Root)``;
 
 const ContentContainer = styled(DialogPrimitive.Content)`
-  width: 90vw;
-  max-width: 800px;
+  max-width: 80%;
   min-height: 300px;
   max-height: 85vh;
 `;
@@ -36,7 +36,7 @@ const Overlay = styled(DialogPrimitive.DialogOverlay)`
   z-index: 10000;
 `;
 
-export const Root = ({ children, open, onClose, ...props }: RootProps) => (
+export const Root = ({ children, open, onClose, minWidth = 600, ...props }: RootProps) => (
   <RootContainer
     open={open}
     onOpenChange={onClose}
@@ -70,7 +70,7 @@ export const Root = ({ children, open, onClose, ...props }: RootProps) => (
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
                 >
-                  <UI.NewCard minWidth={600} minHeight={300}>
+                  <UI.NewCard minWidth={minWidth} minHeight={300}>
                     {children}
                   </UI.NewCard>
                 </motion.div>
