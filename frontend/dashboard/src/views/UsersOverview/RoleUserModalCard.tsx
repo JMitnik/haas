@@ -135,7 +135,7 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
   })) || [];
 
   return (
-    <UI.ModalCard maxWidth={1200} breakout onClose={onClose}>
+    <>
       <UI.ModalHead>
         <UI.ModalTitle>
           {t('role_permissions')}
@@ -157,7 +157,7 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
           onClose={onClose}
         />
       </UI.ModalBody>
-    </UI.ModalCard>
+    </>
   );
 };
 

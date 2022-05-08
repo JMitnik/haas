@@ -105,7 +105,7 @@ const DialogueOverview = () => {
           ))}
         </UI.Grid>
 
-        {filteredDialogues.length === 0 && (
+        {!isLoading && filteredDialogues.length === 0 && (
           <UI.IllustrationCard
             boxShadow="sm"
             svg={<NoDataIll />}

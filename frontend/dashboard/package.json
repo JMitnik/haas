@@ -15,6 +15,7 @@
     "@nivo/core": "0.73.0",
     "@nivo/line": "^0.73.0",
     "@popperjs/core": "^2.5.3",
+    "@radix-ui/react-dialog": "^0.1.7",
     "@radix-ui/react-dropdown-menu": "^0.1.6",
     "@radix-ui/react-popover": "^0.1.6",
     "@radix-ui/react-radio-group": "^0.1.5",
