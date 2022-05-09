@@ -1,4 +1,3 @@
-import * as UI from '@haas/ui';
 import { format, sub } from 'date-fns';
 import React, { useMemo } from 'react';
 
@@ -8,13 +7,11 @@ import {
   useGetSessionPathsQuery,
   useGetWorkspaceDialogueStatisticsQuery,
 } from 'types/generated-types';
-import { ReactComponent as HoneyComb } from 'assets/icons/honeycomb.svg';
 import { useCustomer } from 'providers/CustomerProvider';
 
 import * as LS from './WorkspaceGrid.styles';
 import { DataLoadOptions, WorkspaceGrid } from './WorkspaceGrid';
 import { HexagonNode, HexagonNodeType, HexagonViewMode } from './WorkspaceGrid.types';
-import { SingleHexagon } from './SingleHexagon';
 import { groupsFromDialogues } from './WorkspaceGrid.helpers';
 
 interface WorkspaceGridAdapterProps {

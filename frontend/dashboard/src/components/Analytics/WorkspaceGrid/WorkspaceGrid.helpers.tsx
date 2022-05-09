@@ -163,10 +163,10 @@ export const getHexagonSVGFill = (score?: number) => {
   return 'url(#dots-pink)';
 };
 
-export const getColorScoreBrand = (score?: number) => {
-  if (!score) return 'gray.700';
-  if (score >= 40) return 'green.600';
-  return 'red.600';
+export const getColorScoreBrand = (score?: number, darker?: boolean) => {
+  if (!score) return 'gray.500';
+  if (score >= 40) return `green.${darker ? '500' : '500'}`;
+  return `red.${darker ? '700' : '500'}`;
 };
 
 /**

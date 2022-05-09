@@ -1,7 +1,6 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
-import { ChevronRight } from 'react-feather';
-import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
+import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple, LinearGradient } from '@visx/gradient';
 import { Group } from '@visx/group';
 import { ParentSizeModern } from '@visx/responsive';
 import { PatternCircles } from '@visx/pattern';
@@ -14,7 +13,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { Loader } from 'components/Common/Loader/Loader';
-import { useFormatter } from 'hooks/useFormatter';
 
 import * as LS from './WorkspaceGrid.styles';
 import {
@@ -49,18 +47,6 @@ export interface WorkspaceGridProps {
   onLoadData?: (options: DataLoadOptions) => Promise<[HexagonNode[], HexagonViewMode]>;
 }
 
-const getLabelFill = (score?: number) => {
-  if (!score) return '#4b1c54';
-  if (score >= 40) return '#34aea3';
-  return '#fb5a66';
-};
-
-const getLabelColor = (score?: number) => {
-  if (!score) return '#f9ecff';
-  if (score >= 40) return '#deffde';
-  return 'white';
-};
-
 export const WorkspaceGrid = ({
   initialData,
   backgroundColor,
@@ -76,7 +62,6 @@ export const WorkspaceGrid = ({
     childNodes: initialData,
     viewMode: initialViewMode,
   });
-  const { formatScore } = useFormatter();
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
 
   const activeDialogue = useMemo(() => {
@@ -240,90 +225,6 @@ export const WorkspaceGrid = ({
       )}
       <UI.Grid gridTemplateColumns="2fr 1fr" gridGap="0">
         <UI.Div borderRadius={20} height="80vh" position="relative">
-          {stateHistoryStack.length > 0 && (
-            <LS.BreadCrumbContainer
-              display="inline-block"
-              my={1}
-              border="1px solid"
-              borderColor="gray.100"
-              borderRadius={12}
-              pl={2}
-              pr={2}
-              py={1}
-            >
-              <UI.Stack alignItems="center" isInline>
-                <UI.Flex alignItems="center">
-                  <UI.Label
-                    color="black"
-                    bg="white"
-                    onClick={() => { popToIndex(0); }}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <UI.Span ml={1}>
-                      Home
-                    </UI.Span>
-                  </UI.Label>
-                  {historyQueue.map((state, index) => (
-                    <React.Fragment key={index}>
-                      <UI.Icon
-                        bg="gray.200"
-                        color="gray.500"
-                        width="1.2rem"
-                        height="1.2rem"
-                        fontSize="0.9rem"
-                        mx={1}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: '100%',
-                        }}
-                      >
-                        <ChevronRight />
-                      </UI.Icon>
-                      <UI.Flex>
-                        <UI.Label
-                          color={getLabelColor(state?.selectedNode?.score || 0)}
-                          bg={getLabelFill(state?.selectedNode?.score)}
-                          key={index}
-                          onClick={() => { popToIndex(index + 1); }}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <UI.Span>
-                            {formatScore(state.selectedNode?.score)}
-                          </UI.Span>
-                          {' '}
-                          {/* <SingleHexagon fill={getHexagonFill(state.selectedNode?.score)} /> */}
-                          <UI.Span ml={1}>
-                            {state.selectedNode?.type === HexagonNodeType.Group && (
-                              <>
-                                {state.selectedNode.label}
-                              </>
-                            )}
-                            {state.selectedNode?.type === HexagonNodeType.Dialogue && (
-                              <>
-                                {state.selectedNode.label}
-                              </>
-                            )}
-                            {state.selectedNode?.type === HexagonNodeType.Topic && (
-                              <>
-                                {state.selectedNode.topic.name}
-                              </>
-                            )}
-                            {state.selectedNode?.type === HexagonNodeType.Session && (
-                              <>
-                                {state.selectedNode.session.id}
-                              </>
-                            )}
-                          </UI.Span>
-                        </UI.Label>
-                      </UI.Flex>
-                    </React.Fragment>
-                  ))}
-                </UI.Flex>
-              </UI.Stack>
-            </LS.BreadCrumbContainer>
-          )}
           <ParentSizeModern>
             {({ width, height }) => (
               <Zoom<SVGElement>
@@ -344,6 +245,7 @@ export const WorkspaceGrid = ({
                         <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
                         <GradientPinkRed id="dots-pink" />
                         <GradientSteelPurple id="dots-gray" />
+                        <LinearGradient id="grays" from="#757F9A" to="#939bb1" />
                         <GradientLightgreenGreen id="dots-green" />
                         <rect width={width} height={height} fill={backgroundColor} stroke={backgroundColor} />
                         <rect
@@ -426,9 +328,8 @@ export const WorkspaceGrid = ({
             )}
           </ParentSizeModern>
         </UI.Div>
-
         <UI.Div position="absolute" bottom={24} left={24}>
-          <Layers onClick={(index) => popToIndex(index + 1)} historyQueue={historyQueue} />
+          <Layers currentState={currentState} onClick={(index) => popToIndex(index)} historyQueue={historyQueue} />
         </UI.Div>
 
         <UI.Div px={2} mt={2}>

@@ -83,13 +83,14 @@ export const GenerateWorkspaceView = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
+    const { workspaceTitle, workspaceSlug, dialogueType } = formData;
     importWorkspaceCSV({
       variables: {
         input: {
-          workspaceTitle: formData.workspaceTitle,
-          workspaceSlug: formData.workspaceSlug,
+          workspaceTitle,
+          workspaceSlug,
           uploadedCsv: activeCSV,
-          type: formData.dialogueType as DialogueTemplateType,
+          type: dialogueType as DialogueTemplateType,
         },
       },
     });

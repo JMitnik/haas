@@ -27,14 +27,14 @@ class GenerateWorkspaceService {
 
   /**
    * Generates a workspace based on the content of a CSV
-   * @param input 
+   * @param input
    * @returns the created workspace
    */
   async generateWorkspaceFromCSV(input: NexusGenInputs['GenerateWorkspaceCSVInputType']) {
     const { uploadedCsv, workspaceSlug, workspaceTitle, type } = input;
     const records = await parseCsv(await uploadedCsv, { delimiter: ',' });
 
-    // Create customer 
+    // Create customer
     // TODO: Allow for adjustment of template roles
     const workspace = await this.customerPrismaAdapter.createWorkspace({
       name: workspaceTitle,

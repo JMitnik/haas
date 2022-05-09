@@ -34,7 +34,7 @@ prisma.$on('beforeExit', () => {
   console.log('Prisma: BeforeExit is being run (it is disconnecting)');
 })
 
-if (process.env.DEBUG_PRISMA) {
+if (process.env.DEBUG_PRISMA === 'true') {
   // @ts-ignore
   prisma.$on('query', (event) => {
     // @ts-ignore
