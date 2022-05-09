@@ -124,8 +124,8 @@ const language = {
       de: 'Zurück',
     },
     observable_insights: {
-      en: 'Observable insights',
-      de: 'Observable insights',
+      en: 'Actionable insights',
+      de: 'Actionable insights',
     },
     observable_insights_description: {
       en: 'The haas dashboard makes observing and maintaining the happiness of your accessible and observable.',
