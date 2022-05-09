@@ -47,7 +47,8 @@ export const ExtLinkContainer = styled.a<ColorProps>`
 
     text-decoration: none;
     font-weight: 600;
-    color: ${color ? theme.colors[color] : theme.colors.blue[300]};
+    /* @ts-ignore */
+    color: ${color ? (theme as unknown as Record<string, Record<string, string>>).colors[color as string] : theme.colors.blue[300]};
   `}
 `;
 
