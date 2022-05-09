@@ -8,7 +8,6 @@ import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { Zoom } from '@visx/zoom';
 import { localPoint } from '@visx/event';
-import { useModal } from 'react-modal-hook';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
@@ -324,7 +323,6 @@ export const WorkspaceGrid = ({
       <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
         <InteractionModalCard
           sessionId={sessionId || ''}
-          onClose={() => setSessionId(undefined)}
         />
       </Modal.Root>
     </LS.WorkspaceGridContainer>

@@ -3,23 +3,21 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { Activity, Calendar, Filter, Link2, Mail, MessageCircle, Plus, Search, Smartphone } from 'react-feather';
-import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
+import { Calendar, Filter, Link2, Mail, MessageCircle, Plus, Search, Smartphone } from 'react-feather';
 import { Controller, useForm } from 'react-hook-form';
-import { DeprecatedViewTitle, Flex } from '@haas/ui';
+import { Flex } from '@haas/ui';
+import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import {
-  Icon,
   Radio,
   RadioGroup,
 } from '@chakra-ui/core';
-import { ROUTES, useNavigator } from 'hooks/useNavigator';
-import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Menu from 'components/Common/Menu';
+import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
 import {
@@ -34,8 +32,10 @@ import {
 import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { TabbedMenu } from 'components/Common/TabMenu';
+import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useMenu } from 'components/Common/Menu/useMenu';
+import { useRouteModal } from 'components/Common/Modal';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
 import { InteractionModalCard } from './InteractionModalCard';
@@ -207,8 +207,7 @@ interface CampaignVariant {
 
 export const InteractionsOverview = () => {
   const { t } = useTranslation();
-  const { customerSlug, dialogueSlug, goToInteractionsView } = useNavigator();
-  const location = useLocation();
+  const { customerSlug, dialogueSlug } = useNavigator();
 
   const [campaignVariants, setCampaignVariants] = useState<CampaignVariant[]>([]);
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
@@ -315,15 +314,19 @@ export const InteractionsOverview = () => {
   const { menuProps, openMenu, closeMenu, activeItem: contextInteraction } = useMenu<SessionFragmentFragment>();
   const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
+  const [openModal, closeModal, isOpenModal, params] = useRouteModal<{ interactionId: string }>({
+    matchUrlKey: ROUTES.INTERACTION_VIEW,
+    exitUrl: `/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`,
+  });
+
   return (
-    <>
+    <View documentTitle="haas | Interactions">
       <UI.ViewHead>
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <DeprecatedViewTitle>
-              <Icon as={Activity} mr={1} />
+            <UI.ViewTitle>
               {t('views:interactions_view')}
-            </DeprecatedViewTitle>
+            </UI.ViewTitle>
           </UI.Flex>
 
           <Flex alignItems="center">
@@ -532,7 +535,7 @@ export const InteractionsOverview = () => {
             {sessions.map((session) => (
               <Table.Row
                 isLoading={isLoading}
-                onClick={() => goToInteractionsView(session.id)}
+                onClick={() => openModal({ interactionId: session.id })}
                 gridTemplateColumns={columns}
                 key={session.id}
                 onContextMenu={(e) => openMenu(e, session)}
@@ -569,37 +572,13 @@ export const InteractionsOverview = () => {
             )}
           </UI.Flex>
         </UI.Div>
-
-        <AnimatePresence>
-          <Switch
-            location={location}
-            key={location.pathname}
-          >
-            <Route
-              path={ROUTES.INTERACTION_VIEW}
-            >
-              {({ match }) => (
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <UI.Modal isOpen onClose={() => goToInteractionsView()}>
-                    <InteractionModalCard
-                      onClose={() => goToInteractionsView()}
-                      // @ts-ignore
-                      sessionId={match?.params?.interactionId}
-                    />
-                  </UI.Modal>
-                </motion.div>
-              )}
-            </Route>
-          </Switch>
-        </AnimatePresence>
-
+        <Modal.Root onClose={closeModal} open={isOpenModal}>
+          <InteractionModalCard
+            sessionId={params?.interactionId}
+          />
+        </Modal.Root>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

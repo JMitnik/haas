@@ -13,7 +13,6 @@ import React, { useContext, useEffect, useReducer, useRef, useState } from 'reac
 import styled, { ThemeContext } from 'styled-components';
 
 import * as Popover from '@radix-ui/react-popover';
-import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
 import { GetDialogueStatisticsQuery, useGetDialogueStatisticsQuery } from 'types/generated-types';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
@@ -22,6 +21,7 @@ import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
+import { View } from 'layouts/View';
 import { slideUpFadeMotion } from 'components/animation/config';
 import { useNavigator } from 'hooks/useNavigator';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
@@ -232,7 +232,7 @@ const DialogueView = () => {
     compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
     dateLabel: 'last_week',
   });
-  const { dialogueSlug, customerSlug, getDialoguesPath } = useNavigator();
+  const { dialogueSlug, customerSlug } = useNavigator();
   const history = useHistory();
   const { t } = useTranslation();
 
@@ -289,16 +289,21 @@ const DialogueView = () => {
   };
 
   return (
-    <>
-      <UI.ViewHead renderBreadCrumb={<UI.Breadcrumb to={getDialoguesPath()}>{t('go_to_dialogues')}</UI.Breadcrumb>}>
+    <View documentTitle="haas | Dialogue">
+      <UI.ViewHead>
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
-          <UI.Flex alignItems="center">
-            <UI.DeprecatedViewTitle leftIcon={<ChartbarIcon />}>
-              {t('views:dialogue_view')}
-            </UI.DeprecatedViewTitle>
+          <UI.Flex alignItems="flex-end">
+            <UI.Div mr={4}>
+              <UI.ViewTitle>
+                {t('views:dialogue_view')}
+              </UI.ViewTitle>
+              <UI.ViewSubTitle>
+                {dialogue?.title}
+              </UI.ViewSubTitle>
+            </UI.Div>
             <Popover.Root open={isShareDialogueOpen} onOpenChange={setIsShareDialogueOpen}>
               <Popover.Trigger asChild>
-                <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
+                <UI.Button leftIcon={QRIcon} ml={4} size="sm">
                   {t('share')}
                 </UI.Button>
               </Popover.Trigger>
@@ -474,7 +479,7 @@ const DialogueView = () => {
           </UI.Div>
         </UI.Grid>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 
