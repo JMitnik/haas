@@ -11,6 +11,7 @@ import { localPoint } from '@visx/event';
 import { useModal } from 'react-modal-hook';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import * as Modal from 'components/Common/Modal';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { Loader } from 'components/Common/Loader/Loader';
 
@@ -90,23 +91,6 @@ export const WorkspaceGrid = ({
       tooltipTop: y,
     });
   };
-
-  const [openInteractionModal, closeInteractionModal] = useModal(() => (
-    <UI.Modal isOpen onClose={() => setSessionId(undefined)}>
-      <InteractionModalCard
-        sessionId={sessionId || ''}
-        onClose={() => setSessionId(undefined)}
-      />
-    </UI.Modal>
-  ), [sessionId, setSessionId]);
-
-  useEffect(() => {
-    if (sessionId) {
-      openInteractionModal();
-    } else {
-      closeInteractionModal();
-    }
-  }, [sessionId]);
 
   const handleMouseOutHex = () => hideTooltip();
 
@@ -336,6 +320,13 @@ export const WorkspaceGrid = ({
           <WorkspaceGridPane currentState={currentState} />
         </UI.Div>
       </UI.Grid>
+
+      <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
+        <InteractionModalCard
+          sessionId={sessionId || ''}
+          onClose={() => setSessionId(undefined)}
+        />
+      </Modal.Root>
     </LS.WorkspaceGridContainer>
   );
 };

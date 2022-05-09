@@ -1,13 +1,11 @@
 import { format, sub } from 'date-fns';
 import React, { useMemo } from 'react';
 
+import { useCustomer } from 'providers/CustomerProvider';
 import {
-  DialogueImpactScoreType,
-  useGetDialogueTopicsQuery,
   useGetSessionPathsQuery,
   useGetWorkspaceDialogueStatisticsQuery,
 } from 'types/generated-types';
-import { useCustomer } from 'providers/CustomerProvider';
 
 import * as LS from './WorkspaceGrid.styles';
 import { DataLoadOptions, WorkspaceGrid } from './WorkspaceGrid';
@@ -41,7 +39,6 @@ export const WorkspaceGridAdapter = ({
     fetchPolicy: 'cache-and-network',
   });
 
-  const { refetch: fetchGetDialogues } = useGetDialogueTopicsQuery({ skip: true });
   const { refetch: fetchGetSessions } = useGetSessionPathsQuery({ skip: true });
 
   const dialogues = data?.customer?.dialogues || [];
@@ -57,27 +54,6 @@ export const WorkspaceGridAdapter = ({
       const subGroupType = options.clickedGroup.subGroups[0].type;
       return [options.clickedGroup.subGroups, mapNodeTypeToViewType(subGroupType)];
     }
-
-    // If not, fetch all dialogues
-    const { data: loadedData } = await fetchGetDialogues({
-      dialogueId: options.dialogueId,
-      input: {
-        value: options.topic || '',
-        isRoot: !options.topic,
-        startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
-        endDateTime: format(new Date(), 'dd-MM-yyyy'),
-        impactScoreType: DialogueImpactScoreType.Average,
-      },
-    });
-
-    // Checkpoint two: Check if the current node has any sub-topics, and if so, return it.
-    const nodes: HexagonNode[] = loadedData?.dialogue?.topic?.subTopics?.map((topic) => ({
-      id: topic.name,
-      type: HexagonNodeType.Topic,
-      score: topic.impactScore,
-      topic,
-    })) || [];
-    if (nodes.length) return [nodes, HexagonViewMode.Topic];
 
     // Checkpoint three: Fetch all sessions for the current selected topics
     const { data: sessionData } = await fetchGetSessions({

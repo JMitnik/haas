@@ -16,28 +16,25 @@ interface InteractionModalCardProps {
   onClose: () => void;
 }
 
-export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCardProps) => {
+export const InteractionModalCard = ({ sessionId }: InteractionModalCardProps) => {
   // const { goToDeliveryView } = useNavigator();
   const { t } = useTranslation();
   const { data, loading, error } = useGetInteractionQuery({
     variables: { sessionId },
   });
 
-  if (loading) {
-    return <UI.Loader />;
-  }
-
   const delivery = data?.session?.delivery;
 
   return (
-    <UI.ModalCard breakout maxWidth={1200} onClose={onClose}>
+    <>
       <UI.ModalHead>
         <UI.ModalTitle>
           {t('interaction')}
         </UI.ModalTitle>
       </UI.ModalHead>
       <UI.ModalBody>
-        {data && (
+        {loading && !data && <UI.Loader />}
+        {!loading && data && (
           <Timeline>
             {!!delivery && (
               <TimelineItem gridTemplateColumns="40px 1fr">
@@ -121,6 +118,6 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
           <UI.ErrorPane header="Server problem" text={error.message} />
         )}
       </UI.ModalBody>
-    </UI.ModalCard>
+    </>
   );
 };
