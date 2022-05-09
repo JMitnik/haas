@@ -774,6 +774,15 @@ type DialogueStatisticsSummaryModel {
   updatedAt: Date
 }
 
+enum DialogueTemplateType {
+  BUSINESS_ENG
+  BUSINESS_NL
+  DEFAULT
+  MASS_SEED
+  SPORT_ENG
+  SPORT_NL
+}
+
 input DialogueWhereUniqueInput {
   id: ID
   slug: String

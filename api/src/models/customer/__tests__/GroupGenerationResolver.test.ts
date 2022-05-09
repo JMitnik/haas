@@ -29,8 +29,8 @@ it('Group generation using CSV', async () => {
   const token = AuthService.createUserToken(user.id, 22);
 
   const file = createReadStream(`${__dirname}/testCsv.csv`);
-
-  const res = await ctx.client.request(`
+  file.addListener('end', async () => {
+    const res = await ctx.client.request(`
     mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
       generateWorkspaceFromCSV(input: $input) {
         id
@@ -38,23 +38,25 @@ it('Group generation using CSV', async () => {
       }
     }
   `,
-    {
-      input: {
-        uploadedCsv: file,
-        workspaceSlug: 'newWorkspaceSlug',
-        workspaceTitle: 'newWorkspaceTitle',
+      {
+        input: {
+          uploadedCsv: file,
+          workspaceSlug: 'newWorkspaceSlug',
+          workspaceTitle: 'newWorkspaceTitle',
+        },
       },
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
-  );
+      {
+        'Authorization': `Bearer ${token}`,
+      }
+    );
 
-  expect(res).toMatchObject({
-    generateWorkspaceFromCSV: {
-      slug: 'newWorkspaceSlug',
-    },
-  });
+    expect(res).toMatchObject({
+      generateWorkspaceFromCSV: {
+        slug: 'newWorkspaceSlug',
+      },
+    });
+
+  })
 
 });
 
