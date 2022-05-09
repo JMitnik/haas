@@ -1,7 +1,14 @@
 import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
 import { meanBy, orderBy, uniqBy } from 'lodash';
 
-import { Dialogue, HexagonDialogueNode, HexagonGroupNode, HexagonNode, HexagonNodeType } from './WorkspaceGrid.types';
+import {
+  Dialogue,
+  HexagonDialogueNode,
+  HexagonGroupNode,
+  HexagonNode,
+  HexagonNodeType,
+  HexagonViewMode,
+} from './WorkspaceGrid.types';
 
 export const parseGroupNames = (title: string): string[] => {
   const groups = title.split('-').map((group) => group.trim());
@@ -196,4 +203,19 @@ export const createGrid = (nrItems: number, windowHeight: number, windowWidth: n
     }).run();
 
   return gridItems;
+};
+
+export const mapNodeTypeToViewType = (nodeType: HexagonNodeType): HexagonViewMode => {
+  switch (nodeType) {
+    case HexagonNodeType.Dialogue:
+      return HexagonViewMode.Dialogue;
+    case HexagonNodeType.Topic:
+      return HexagonViewMode.Topic;
+    case HexagonNodeType.Session:
+      return HexagonViewMode.Session;
+    case HexagonNodeType.Group:
+      return HexagonViewMode.Group;
+    default:
+      return HexagonViewMode.Dialogue;
+  }
 };

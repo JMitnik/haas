@@ -12,7 +12,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 import * as LS from './WorkspaceGrid.styles';
 import { DataLoadOptions, WorkspaceGrid } from './WorkspaceGrid';
 import { HexagonNode, HexagonNodeType, HexagonViewMode } from './WorkspaceGrid.types';
-import { groupsFromDialogues } from './WorkspaceGrid.helpers';
+import { groupsFromDialogues, mapNodeTypeToViewType } from './WorkspaceGrid.helpers';
 
 interface WorkspaceGridAdapterProps {
   height: number;
@@ -41,20 +41,18 @@ export const WorkspaceGridAdapter = ({
     fetchPolicy: 'cache-and-network',
   });
 
-  const { refetch: fetchGetDialogues } = useGetDialogueTopicsQuery({
-    skip: true,
-  });
-
-  const { refetch: fetchGetSessions } = useGetSessionPathsQuery({
-    skip: true,
-  });
+  const { refetch: fetchGetDialogues } = useGetDialogueTopicsQuery({ skip: true });
+  const { refetch: fetchGetSessions } = useGetSessionPathsQuery({ skip: true });
 
   const dialogues = data?.customer?.dialogues || [];
 
   const handleLoadData = async (options: DataLoadOptions): Promise<[HexagonNode[], HexagonViewMode]> => {
+    // If we clicked a group, return its subgroups
     if (options.clickedGroup) {
-      return [options.clickedGroup.subGroups, HexagonViewMode.Group];
+      const subGroupType = options.clickedGroup.subGroups[0].type;
+      return [options.clickedGroup.subGroups, mapNodeTypeToViewType(subGroupType)];
     }
+
     const { data: loadedData } = await fetchGetDialogues({
       dialogueId: options.dialogueId,
       input: {
@@ -99,9 +97,8 @@ export const WorkspaceGridAdapter = ({
     return [[], HexagonViewMode.Final];
   };
 
-  const initialViewMode = HexagonViewMode.Dialogue;
-
   const initialData = useMemo(() => groupsFromDialogues(dialogues), [dialogues]);
+  const initialViewMode = mapNodeTypeToViewType(initialData?.[0]?.type);
 
   // Add spinner
   if (!dialogues.length) return null;
