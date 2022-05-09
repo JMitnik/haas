@@ -46,13 +46,19 @@ export const WorkspaceGridAdapter = ({
 
   const dialogues = data?.customer?.dialogues || [];
 
+  /**
+   * Fetches the various loading data requirements for the underlying WorkspaceGrid.
+   *
+   * Returns a Tuple consisting of Nodes and a View Mode
+   */
   const handleLoadData = async (options: DataLoadOptions): Promise<[HexagonNode[], HexagonViewMode]> => {
-    // If we clicked a group, return its subgroups
+    // Checkpoint one: If we clicked a group, return its subgroups (Groups or Dialogues)
     if (options.clickedGroup) {
       const subGroupType = options.clickedGroup.subGroups[0].type;
       return [options.clickedGroup.subGroups, mapNodeTypeToViewType(subGroupType)];
     }
 
+    // If not, fetch all dialogues
     const { data: loadedData } = await fetchGetDialogues({
       dialogueId: options.dialogueId,
       input: {
@@ -64,15 +70,16 @@ export const WorkspaceGridAdapter = ({
       },
     });
 
+    // Checkpoint two: Check if the current node has any sub-topics, and if so, return it.
     const nodes: HexagonNode[] = loadedData?.dialogue?.topic?.subTopics?.map((topic) => ({
       id: topic.name,
       type: HexagonNodeType.Topic,
       score: topic.impactScore,
       topic,
     })) || [];
-
     if (nodes.length) return [nodes, HexagonViewMode.Topic];
 
+    // Checkpoint three: Fetch all sessions for the current selected topics
     const { data: sessionData } = await fetchGetSessions({
       input: {
         startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
@@ -94,13 +101,14 @@ export const WorkspaceGridAdapter = ({
 
     if (fetchNodes.length) return [fetchNodes, HexagonViewMode.Session];
 
+    // Final checkpoint: Return a "Final" state
     return [[], HexagonViewMode.Final];
   };
 
   const initialData = useMemo(() => groupsFromDialogues(dialogues), [dialogues]);
   const initialViewMode = mapNodeTypeToViewType(initialData?.[0]?.type);
 
-  // Add spinner
+  // TODO: Add spinner
   if (!dialogues.length) return null;
 
   return (
