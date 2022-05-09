@@ -151,7 +151,7 @@ const LoginView = () => {
 
           <LS.LoginFeatures display={['none', 'none', 'block']}>
             <UI.Flex height="100%" alignItems="center" justifyContent="center">
-              <UI.Div px={4} py={100} maxWidth={750}>
+              <UI.Div px={4} maxWidth={750}>
                 <img src="/assets/images/login-feature-1.svg" alt="Login feature 1" />
 
                 <UI.Div mt={75}>
