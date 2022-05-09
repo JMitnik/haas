@@ -166,9 +166,8 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
   const { t } = useTranslation();
 
   return (
-    <UI.Card>
+    <UI.NewCard maxWidth={500}>
       <UI.CardBody>
-
         <UI.Div mb={4}>
           <UI.Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_qr')}</UI.Text>
           <UI.Hr />
@@ -216,7 +215,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
           </UI.Flex>
         </UI.Div>
       </UI.CardBody>
-    </UI.Card>
+    </UI.NewCard>
   );
 };
 
