@@ -202,7 +202,10 @@ export const createGrid = (nrItems: number, windowHeight: number, windowWidth: n
       gridItems.push(corners.join(' '));
     }).run();
 
-  return gridItems;
+  return {
+    points: gridItems,
+    strokeWidth: itemsPerRow,
+  };
 };
 
 export const mapNodeTypeToViewType = (nodeType: HexagonNodeType): HexagonViewMode => {

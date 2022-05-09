@@ -48,14 +48,23 @@ interface WorkspaceGridContainerProps {
 
 export const WorkspaceGridContainer = styled(UI.Div) <WorkspaceGridContainerProps>`
   ${({ theme, backgroundColor }) => css`
-    /* border-bottom: 1px solid ${theme.colors.gray[200]}; */
     background: ${backgroundColor};
     border-radius: 20px;
     position: relative;
 
-    svg polygon:hover {
-      stroke: red;
-      cursor: pointer;
+    #items {
+      opacity: 1;
+      transition: all ${theme.transitions.normal};
+    }
+
+    #items:hover polygon {
+      opacity: 0.4;
+      transition: all ${theme.transitions.normal};
+    }
+
+    #items polygon:hover {
+      opacity: 1;
+      transition: all ${theme.transitions.normal};
     }
   `}
 `;

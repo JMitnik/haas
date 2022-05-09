@@ -155,7 +155,7 @@ export const WorkspaceGrid = ({
 
   const hexagonNodes = currentState.childNodes?.map((node, index) => ({
     ...node,
-    points: gridItems[index],
+    points: gridItems.points[index],
   })) || [];
 
   // ReversedHistory: Session => Dialogue => Group
@@ -262,18 +262,21 @@ export const WorkspaceGrid = ({
                                 initial={{ opacity: 0 }}
                                 key={currentState.currentNode?.id}
                               >
-                                {hexagonNodes.map((node) => (
-                                  <HexagonItem
-                                    key={node.id}
-                                    node={node}
-                                    points={node.points}
-                                    onMouseOver={handleMouseOverHex}
-                                    onMouseExit={handleMouseOutHex}
-                                    score={node.score}
-                                    zoomHelper={zoom}
-                                    onZoom={handleZoominLevel}
-                                  />
-                                ))}
+                                <Group id="items">
+                                  {hexagonNodes.map((node) => (
+                                    <HexagonItem
+                                      strokeWidth={5}
+                                      key={node.id}
+                                      node={node}
+                                      points={node.points}
+                                      onMouseOver={handleMouseOverHex}
+                                      onMouseExit={handleMouseOutHex}
+                                      score={node.score}
+                                      zoomHelper={zoom}
+                                      onZoom={handleZoominLevel}
+                                    />
+                                  ))}
+                                </Group>
                               </motion.g>
                             </AnimatePresence>
 
