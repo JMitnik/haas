@@ -6,7 +6,6 @@ import cuid from 'cuid';
 import { CreateDialogueInput } from '../DialoguePrismaAdapterType';
 
 import { prisma } from 'test/setup/singletonDeps';
-const ctx = makeTestContext(prisma);
 const dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
 
 const defaultDialogueCreateInput: Prisma.DialogueCreateInput = {

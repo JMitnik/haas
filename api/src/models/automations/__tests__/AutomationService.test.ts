@@ -8,7 +8,7 @@ import { sample } from 'lodash';
 import { cloneDeep } from 'lodash';
 
 import { prisma } from 'test/setup/singletonDeps';
-const ctx = makeTestContext(prisma);
+
 const automationService = new AutomationService(prisma);
 
 export const seedWorkspace = async (prisma: PrismaClient) => {

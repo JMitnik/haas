@@ -18,7 +18,7 @@ jest.mock('../../../services/DynamoScheduleService', () => {
 });
 
 import { prisma } from 'test/setup/singletonDeps';
-const ctx = makeTestContext(prisma);
+
 const dynamoScheduleService = new DynamoScheduleService();
 const campaignService = new CampaignService(prisma, dynamoScheduleService);
 

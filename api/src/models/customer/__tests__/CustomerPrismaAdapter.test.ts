@@ -5,7 +5,7 @@ import { clearCustomerDatabase } from './testUtils';
 import { UpdateCustomerInput } from '../CustomerServiceType';
 
 import { prisma } from 'test/setup/singletonDeps';
-const ctx = makeTestContext(prisma);
+
 const customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
 
 const defaultCustomerInput: NexusGenInputs['CreateWorkspaceInput'] = {

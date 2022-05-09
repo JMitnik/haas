@@ -38,19 +38,25 @@ export function graphqlTestContext(prisma: PrismaClient) {
   let serverInstance: Server | null = null;
   let client: GraphQLClient | null = null;
   let port: number | null = null;
+  let rand = 'test' + Math.random();
+  let isRun = false;
 
   return {
     server() {
       if (!client) throw Error('Not initialized yet; run before');
 
-      return { client, port }
+      return { client, port, rand }
+    },
+    isRun() {
+      return isRun
     },
     async before() {
+      isRun = true;
       port = await getPort({ port: makeRange(4002, 6000) });
       serverInstance = await makeServer(port, prisma);
       client = new GraphQLClient(`http://localhost:${port}/graphql`);
 
-      return { client, port: port };
+      return { isRun, client, port: port, rand };
     },
 
     async after() {

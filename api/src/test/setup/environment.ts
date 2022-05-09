@@ -1,4 +1,4 @@
-const NodeEnvironment = require('jest-environment-node').default;
+import NodeEnvironment from 'jest-environment-node';
 import * as singletonDepsModule from './singletonDeps';
 
 export class CustomEnvironment extends NodeEnvironment {
@@ -11,13 +11,23 @@ export class CustomEnvironment extends NodeEnvironment {
     this.global.singletonDepsModule = singletonDepsModule;
     // @ts-ignore
     this.globalThis = { singletonDepsModule };
+    const ctx = singletonDepsModule.graphqlContext;
+    const isRun = ctx.isRun();
 
-    console.log('HMMM, AM I BEING RUN THEN TWICE OR MORE????')
+    process.on('SIGTERM', () => {
+      console.log('Got SIGTERM');
+    });
+
+    if (!isRun) {
+      console.log('i am running now the before call');
+      // await ctx.before();
+    }
   }
 
   async teardown() {
     await super.teardown();
-
+    // await ctx.after();
+    console.log('TEARDOWN?');
   }
 }
 

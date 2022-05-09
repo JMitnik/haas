@@ -39,10 +39,9 @@ describe('DialogueConnection resolver', () => {
     await prisma.$disconnect();
   });
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await clearDialogueDatabase(prisma);
     await prisma.$disconnect();
-    done();
   });
 
   test('unable to query dialogue-connection unauthorized', async () => {

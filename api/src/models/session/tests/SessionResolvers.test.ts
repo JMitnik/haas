@@ -1,8 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ApolloError } from 'apollo-server';
 
-import { rand } from 'test/setup/singletonDeps';
-
 import { clearDatabase } from './testUtils';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
