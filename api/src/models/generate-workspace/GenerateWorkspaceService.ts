@@ -83,7 +83,7 @@ class GenerateWorkspaceService {
       const leafs = await this.templateService.createTemplateLeafNodes(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
 
       // Make nodes
-      await this.nodeService.createTemplateNodes(dialogue.id, workspace.name, leafs, templateType);
+      await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, templateType);
     }
 
     // GENERATING STATIC DATA TIME
