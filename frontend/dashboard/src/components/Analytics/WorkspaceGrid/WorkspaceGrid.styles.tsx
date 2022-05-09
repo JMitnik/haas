@@ -59,6 +59,7 @@ export const WorkspaceGridContainer = styled(UI.Div) <WorkspaceGridContainerProp
 
     #items:hover polygon {
       opacity: 0.4;
+      cursor: pointer;
       transition: all ${theme.transitions.normal};
     }
 

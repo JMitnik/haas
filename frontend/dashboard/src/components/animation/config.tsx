@@ -1,4 +1,4 @@
-import { Transition, Variant, Variants } from 'framer-motion';
+import { Transition, Variant } from 'framer-motion';
 import React from 'react';
 
 interface MotionConfig {
@@ -23,6 +23,9 @@ const makeMotionConfig = (config: MotionConfig) => ({
  *
  * Example usage:
  * <motion.div {...expandingHeightsMotion}>
+ *
+ * Useful for:
+ * - Components that expand and contact.
  */
 export const expandingHeightsMotion = makeMotionConfig({
   variants: {
@@ -34,11 +37,32 @@ export const expandingHeightsMotion = makeMotionConfig({
   style: { overflow: 'hidden' },
 });
 
+/**
+ * Vertical sliding in motion.
+ *
+ * Useful for:
+ * - Animating elements that are placed relative to something else (like Popovers).
+ */
 export const slideUpFadeMotion = makeMotionConfig({
   variants: {
     initial: { opacity: 0, y: '5px' },
     animate: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: '5px' },
+  },
+  transition: { ease: [0.16, 1, 0.3, 1], duration: 0.4 },
+});
+
+/**
+ * Simple fade-in fadout-out motion.
+ *
+ * Useful for:
+ * - Any fades.
+ */
+export const fadeMotion = makeMotionConfig({
+  variants: {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
   },
   transition: { ease: [0.16, 1, 0.3, 1], duration: 0.4 },
 });

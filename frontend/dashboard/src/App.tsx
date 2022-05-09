@@ -1,4 +1,4 @@
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { ViewContainer } from '@haas/ui';
 import React, { FC } from 'react';
@@ -15,6 +15,7 @@ import { ReportView } from 'views/ReportView';
 import { SystemPermission } from 'types/generated-types';
 import { VerifyTokenView } from 'views/VerifyTokenView';
 import { WorkspaceSettingsView } from 'views/WorkspaceSettingsView';
+import { fadeMotion } from 'components/animation/config';
 import { sub } from 'date-fns';
 import { useUser } from 'providers/UserProvider';
 import ActionsPage from 'pages/dashboard/actions';
@@ -233,9 +234,23 @@ const RootAppRoute = () => {
 const RootApp = ({ children }: { children: React.ReactNode }) => {
   const { isInitializingUser } = useUser();
 
-  if (isInitializingUser) return <GlobalLoader />;
-
-  return <>{children}</>;
+  return (
+    <AnimatePresence>
+      {isInitializingUser ? (
+        <motion.div
+          {...fadeMotion}
+        >
+          <GlobalLoader />
+        </motion.div>
+      ) : (
+        <motion.div
+          {...fadeMotion}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 };
 
 const AppRoutes = () => (
