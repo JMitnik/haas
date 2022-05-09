@@ -8,6 +8,7 @@ import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
 import { DialogueLinkFetchOverview } from 'views/DialogueLinkFetchOverview';
 import { DialogueProvider } from 'providers/DialogueProvider';
+import { FirstTimeView } from 'views/FirstTimeView';
 import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
@@ -38,7 +39,6 @@ import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
-import FirstTimePage from 'pages/dashboard/first_time';
 import GlobalLoader from 'components/GlobalLoader';
 import GuardedRoute, { BotRoute } from 'components/Routes/GuardedRoute';
 import LoggedOutView from 'layouts/LoggedOutView';
@@ -304,7 +304,7 @@ const AppRoutes = () => (
       </GuardedRoute>
 
       <GuardedRoute path="/dashboard/first_time">
-        <FirstTimePage />
+        <FirstTimeView />
       </GuardedRoute>
 
       <GuardedRoute path="/dashboard">
