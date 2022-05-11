@@ -31,6 +31,11 @@ export class NodeService {
     this.prisma = prismaClient;
   }
 
+  /**
+   * Creates a slider node and connects it to a question
+   * @param data 
+   * @returns 
+   */
   createSliderNode = async (data: CreateSliderNodeInput) => {
     return this.questionNodePrismaAdapter.createSliderNode(data);
   };

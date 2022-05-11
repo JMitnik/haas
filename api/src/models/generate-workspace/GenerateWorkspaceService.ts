@@ -14,6 +14,7 @@ import { cartesian } from './DemoHelpers';
 import { subDays } from 'date-fns';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
+import { DemoWorkspaceTemplate } from 'models/templates/TemplateTypes';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -34,7 +35,12 @@ class GenerateWorkspaceService {
     this.dialogueService = new DialogueService(prismaClient);
   };
 
-  getTemplate(templateType: string) {
+  /**
+   * Finds the correct template based a provided type
+   * @param templateType 
+   * @returns 
+   */
+  getTemplate(templateType: string): DemoWorkspaceTemplate {
     switch (templateType) {
       case 'BUSINESS':
         return templates.business;
@@ -42,13 +48,20 @@ class GenerateWorkspaceService {
         return templates.sportEng;
       case 'SPORT_NL':
         return templates.sportNl;
-      // case 'DEFAULT':
-      //   return templates.default;
+      case 'DEFAULT':
+        return templates.default;
       default:
-        return templates.business; // TODO: Change to default when default template is mapped (if ever happens)
+        return templates.default;
     }
   }
 
+  /**
+   * Generates demo data for a specific template
+   * @param templateType 
+   * @param workspace 
+   * @param userId 
+   * @returns 
+   */
   async generateDemoData(
     templateType: string,
     workspace: Customer & {
@@ -64,8 +77,14 @@ class GenerateWorkspaceService {
 
     const template = this.getTemplate(templateType);
     const uniqueDialogues: string[][] = cartesian(template.rootLayer, template.subLayer, template.subSubLayer);
+
     const mappedDialogueInputData = uniqueDialogues.map(
-      (dialogue: string[]) => ({ slug: dialogue.join('-'), title: dialogue.join(' - ') }));
+      (dialogue: string[]) => {
+        if (dialogue?.[0].length && dialogue?.[1].length) {
+          return { slug: dialogue.join('-'), title: dialogue.join(' - ') };
+        }
+        return { slug: dialogue[0], title: dialogue[0] };
+      });
 
     for (let i = 0; i < mappedDialogueInputData.length; i++) {
       const { slug, title } = mappedDialogueInputData[i];
