@@ -24,7 +24,6 @@ const SliderNodeForm = ({ form }: { form: any }) => {
   const hasCustomerSatisfactionTexts = form.watch('happyText') ? 1 : 0;
 
   const sliderNodeMarkers = form.watch('sliderNode.markers');
-  console.log('Slider node markers: ', sliderNodeMarkers);
   return (
     <UI.Div>
       <UI.InputGrid>
@@ -104,7 +103,6 @@ const SliderNodeForm = ({ form }: { form: any }) => {
           </UI.InputHelper>
 
           {markers.fields.map((marker, index) => {
-            console.log('Marker: ', marker.range?.start, marker.range?.end);
             return (
               <UI.Card boxShadow="lg" key={marker.fieldIndex} mb={4} noHover>
                 <input ref={form.register()} type="hidden" name={`sliderNode.markers[${index}].id`} defaultValue={marker.id} />
