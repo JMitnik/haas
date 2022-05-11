@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Camera, CameraOff } from 'react-feather';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
@@ -76,6 +76,12 @@ export const GenerateWorkspaceView = () => {
       });
       toast.templates.error();
     },
+  });
+
+  const usesSnapshotData = useWatch({
+    control: form.control,
+    name: 'generateDemoData',
+    defaultValue: 1,
   });
 
   const handleDrop = (files: File[]) => {
@@ -203,7 +209,7 @@ export const GenerateWorkspaceView = () => {
 
             </UI.FormControl>
 
-            <UI.FormControl isRequired>
+            <UI.FormControl isRequired={usesSnapshotData === 0}>
               <UI.FormLabel>{t('upload_workspace_csv')}</UI.FormLabel>
               <UI.FormLabelHelper>{t('upload_workspace_csv_helper')}</UI.FormLabelHelper>
               <FileDropInput
@@ -216,7 +222,7 @@ export const GenerateWorkspaceView = () => {
               mt={4}
               variantColor="main"
               type="submit"
-              isDisabled={!form.formState.isValid || !activeCSV}
+              isDisabled={!form.formState.isValid || (usesSnapshotData === 0 && !activeCSV)}
               isLoading={loading}
             >
               {t('save')}
