@@ -1126,8 +1126,9 @@ export type GenerateAutodeckInput = {
 export type GenerateWorkspaceCsvInputType = {
   workspaceSlug: Scalars['String'];
   workspaceTitle: Scalars['String'];
-  uploadedCsv: Scalars['Upload'];
-  type?: Maybe<DialogueTemplateType>;
+  uploadedCsv?: Maybe<Scalars['Upload']>;
+  type?: Scalars['String'];
+  generateDemoData?: Maybe<Scalars['Boolean']>;
 };
 
 export type GetAutomationInput = {
@@ -1307,7 +1308,7 @@ export type MostTrendingTopic = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  generateWorkspaceFromCSV: Customer;
+  generateWorkspaceFromCSV?: Maybe<Customer>;
   createJobProcessLocation: JobProcessLocation;
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
   retryAutodeckJob?: Maybe<CreateWorkspaceJobType>;
@@ -3181,10 +3182,10 @@ export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
 
 export type GenerateWorkspaceFromCsvMutation = (
   { __typename?: 'Mutation' }
-  & { generateWorkspaceFromCSV: (
+  & { generateWorkspaceFromCSV?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id' | 'slug'>
-  ) }
+  )> }
 );
 
 export type DuplicateQuestionMutationVariables = Exact<{

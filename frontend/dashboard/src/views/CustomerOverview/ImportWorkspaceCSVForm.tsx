@@ -6,10 +6,12 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
+import { Camera, CameraOff } from 'react-feather';
 import { DialogueTemplateType, refetchMeQuery, useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
 import { useLogger } from 'hooks/useLogger';
 import { useToast } from 'hooks/useToast';
 import FileDropInput from 'components/FileDropInput';
+import intToBool from 'utils/intToBool';
 
 const schema = yup.object({
   workspaceTitle: yup.string().required(),
@@ -18,6 +20,7 @@ const schema = yup.object({
     label: yup.string().notRequired(),
     value: yup.mixed<DialogueTemplateType>().oneOf(Object.values(DialogueTemplateType)),
   }).required(),
+  generateDemoData: yup.number().required(),
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
@@ -78,6 +81,7 @@ export const ImportWorkspaceCSVForm = () => {
 
   const handleSubmit = (formData: FormProps) => {
     const type = formData.dialogueType.value;
+    const generateDemoData = intToBool(formData.generateDemoData);
 
     importWorkspaceCSV({
       variables: {
@@ -86,6 +90,7 @@ export const ImportWorkspaceCSVForm = () => {
           workspaceSlug: formData.workspaceSlug,
           uploadedCsv: activeCSV,
           type,
+          generateDemoData,
         },
       },
     });
@@ -139,7 +144,37 @@ export const ImportWorkspaceCSVForm = () => {
             />
           </UI.FormControl>
 
-          <UI.FormControl isRequired>
+          <UI.FormControl>
+            <UI.FormLabel>{t('create_demo_data')}</UI.FormLabel>
+            <UI.InputHelper>{t('create_demo_data_helper')}</UI.InputHelper>
+
+            <Controller
+              control={form.control}
+              name="generateDemoData"
+              defaultValue={1}
+              render={({ onChange, value, onBlur }) => (
+                <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
+                  <UI.RadioButton
+                    icon={Camera}
+                    value={1}
+                    mr={2}
+                    text={(t('snapshot'))}
+                    description={t('snapshot_helper')}
+                  />
+                  <UI.RadioButton
+                    icon={CameraOff}
+                    value={0}
+                    mr={2}
+                    text={(t('no_snapshot'))}
+                    description={t('no_snapshot_helper')}
+                  />
+                </UI.RadioButtons>
+              )}
+            />
+
+          </UI.FormControl>
+
+          <UI.FormControl>
             <UI.FormLabel>{t('upload_workspace_csv')}</UI.FormLabel>
             <UI.FormLabelHelper>{t('upload_workspace_csv_helper')}</UI.FormLabelHelper>
             <FileDropInput
