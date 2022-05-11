@@ -937,8 +937,8 @@ class DialogueService {
           const simulatedSubChoice = sample(subChoices) as string;
 
           const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
-            if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
-            const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+            if ((!condition.renderMin && typeof condition.renderMin !== 'number') || !condition.renderMax) return false;
+            const isValid = simulatedRootVote >= condition?.renderMin && simulatedRootVote <= condition?.renderMax;
             return isValid;
           }));
 

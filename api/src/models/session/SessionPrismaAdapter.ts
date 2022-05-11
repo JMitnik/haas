@@ -628,6 +628,11 @@ class SessionPrismaAdapter {
             create: { value: data.simulatedSubChoice },
           },
           inputSource: 'INIT_GENERATED',
+          session: {
+            connect: {
+              id: session.id,
+            },
+          },
         },
       })
     }
