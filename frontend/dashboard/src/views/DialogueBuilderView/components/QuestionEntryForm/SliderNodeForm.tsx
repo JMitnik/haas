@@ -104,7 +104,7 @@ const SliderNodeForm = ({ form }: { form: any }) => {
           </UI.InputHelper>
 
           {markers.fields.map((marker, index) => {
-            console.log('Marker: ', marker.range);
+            console.log('Marker: ', marker.range?.start, marker.range?.end);
             return (
               <UI.Card boxShadow="lg" key={marker.fieldIndex} mb={4} noHover>
                 <input ref={form.register()} type="hidden" name={`sliderNode.markers[${index}].id`} defaultValue={marker.id} />
@@ -127,8 +127,9 @@ const SliderNodeForm = ({ form }: { form: any }) => {
                       <UI.RangeSlider
                         isDisabled
                         stepSize={0.5}
-                        min={marker.range?.start}
-                        max={marker.range?.end || 10}
+                        defaultValue={[marker.range?.start || 0, marker.range?.end || 10]}
+                        min={0}
+                        max={10}
                       />
                     </UI.Div>
                   </UI.Grid>
