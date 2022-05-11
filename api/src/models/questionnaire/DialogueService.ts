@@ -989,7 +989,10 @@ class DialogueService {
     }
   };
 
-  generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {
+  generateFakeData = async (
+    dialogueId: string,
+    template: WorkspaceTemplate
+  ) => {
     const currentDate = new Date();
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
