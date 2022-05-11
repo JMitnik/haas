@@ -777,6 +777,10 @@ class DialogueService {
     return updateDialogueArgs;
   };
 
+  createPostLeafNode = async (dialogueId: string, postLeafNodeContent: { header: string, subHeader: string }) => {
+    return this.dialoguePrismaAdapter.createPostLeafNode(dialogueId, postLeafNodeContent);
+  }
+
   static updatePostLeafNode(
     dbPostLeaf: PostLeafNode | null | undefined,
     heading: string | null | undefined,

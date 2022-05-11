@@ -41,32 +41,36 @@ const defaultWorkspaceTemplate: WorkspaceTemplate = {
     defaultUserRole,
     defaultBotRole,
   ],
+  postLeafText: {
+    header: 'Thank you for your input!',
+    subHeader: 'Work should be fulfilling'
+  },
   rootSliderOptions: {
     markers: [
       {
         label: 'Good!',
         subLabel: 'This is good.',
-        range: { create: { start: 6, end: 9.5 } },
+        range: { start: 6, end: 9.5 },
       },
       {
         label: 'Amazing!',
         subLabel: 'This is excellent.',
-        range: { create: { start: 9.5 } },
+        range: { start: 9.5 },
       },
       {
         label: 'Neutral!',
         subLabel: 'Something is not great.',
-        range: { create: { start: 5, end: 6 } },
+        range: { start: 5, end: 6 },
       },
       {
         label: 'Bad',
         subLabel: 'This is bad.',
-        range: { create: { start: 3, end: 5 } },
+        range: { start: 3, end: 5 },
       },
       {
         label: 'Terrible',
         subLabel: 'This is terrible',
-        range: { create: { end: 3 } },
+        range: { end: 3 },
       },
     ],
   },

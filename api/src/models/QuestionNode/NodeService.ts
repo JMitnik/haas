@@ -9,7 +9,7 @@ import { findDifference } from '../../utils/findDifference';
 import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
-import { UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
+import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
 import templates from '../templates/index';
 
 export interface IdMapProps {
@@ -30,6 +30,10 @@ export class NodeService {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.prisma = prismaClient;
   }
+
+  createSliderNode = async (data: CreateSliderNodeInput) => {
+    return this.questionNodePrismaAdapter.createSliderNode(data);
+  };
 
   /**
    * Finds the slider node of a dialogue

@@ -7,6 +7,7 @@ import templates from '.';
 import { CreateQuestionsInput } from '../questionnaire/DialoguePrismaAdapterType';
 import EdgeService from '../edge/EdgeService';
 import NodeService from '../QuestionNode/NodeService';
+import WorkspaceTemplate, { DemoWorkspaceTemplate } from './TemplateTypes';
 
 const standardOptions = [
   { value: 'Facilities', position: 1 },
@@ -82,6 +83,21 @@ class TemplateService {
     this.nodeService = new NodeService(prismaClient);
   };
 
+  findTemplate = (templateType: NexusGenEnums['DialogueTemplateType']): WorkspaceTemplate => {
+    switch (templateType) {
+      case DialogueTemplateType.BUSINESS_ENG:
+        return templates.business;
+      case DialogueTemplateType.SPORT_ENG:
+        return templates.sportEng;
+      case DialogueTemplateType.SPORT_NL:
+        return templates.sportNl;
+      case DialogueTemplateType.DEFAULT:
+        return templates.default;
+      default:
+        return templates.default;
+    }
+  };
+
   findTemplateLeadNodes = (templateType: NexusGenEnums['DialogueTemplateType']): LeafNodeDataEntryProps[] => {
     switch (templateType) {
       case DialogueTemplateType.BUSINESS_ENG:
@@ -97,6 +113,22 @@ class TemplateService {
       default:
         return templates.default.leafNodes;
     }
+  };
+
+  /**
+   * Creates a post leaf node based on template type and whether content for the node is specified. 
+   * If not, default settings are used
+   * @param templateType 
+   * @param dialogueId 
+   */
+  createTemplatePostLeafNode = async (
+    templateType: NexusGenEnums['DialogueTemplateType'],
+    dialogueId: string,
+  ) => {
+    const template = this.findTemplate(templateType);
+    if (!template.postLeafText) return;
+
+    await this.dialoguePrismaAdapter.createPostLeafNode(dialogueId, template.postLeafText);
   }
 
   /**
@@ -186,6 +218,16 @@ class TemplateService {
       dialogueId, NodeType.SLIDER, [], true,
     );
 
+    const { markers, happyText, unhappyText } = templates.sportNl.rootSliderOptions;
+    if (markers.length || happyText || unhappyText) {
+      await this.nodeService.createSliderNode({
+        markers,
+        happyText: happyText || null,
+        unhappyText: unhappyText || null,
+        parentNodeId: rootQuestion.id,
+      });
+    }
+
     const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'laat dan je naam');
 
     // Very Positive Sub child 1 (Great to hear! What are you most satisfied about?)
@@ -240,6 +282,16 @@ class TemplateService {
       dialogueId, NodeType.SLIDER, [], true,
     );
 
+    const { markers, happyText, unhappyText } = templates.sportEng.rootSliderOptions;
+    if (markers.length || happyText || unhappyText) {
+      await this.nodeService.createSliderNode({
+        markers,
+        happyText: happyText || null,
+        unhappyText: unhappyText || null,
+        parentNodeId: rootQuestion.id,
+      });
+    }
+
     const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'unless you want to talk to someone');
 
     // Very Positive Sub child 1 (Great to hear! What are you most satisfied about?)
@@ -290,9 +342,19 @@ class TemplateService {
   ) => {
     // Root question (How do you feel about?)
     const rootQuestion = await this.nodeService.createQuestionNode(
-      'How are you feeling?',
+      'How are you doing?',
       dialogueId, NodeType.SLIDER, [], true,
     );
+
+    const { markers, happyText, unhappyText } = templates.business.rootSliderOptions;
+    if (markers.length || happyText || unhappyText) {
+      await this.nodeService.createSliderNode({
+        markers,
+        happyText: happyText || null,
+        unhappyText: unhappyText || null,
+        parentNodeId: rootQuestion.id,
+      });
+    }
 
     const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'from HR will contact you');
 

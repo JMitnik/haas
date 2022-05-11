@@ -18,6 +18,25 @@ class DialoguePrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  createPostLeafNode = async (dialogueId: string, postLeafNodeContent: { header: string, subHeader: string }) => {
+    return this.prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: {
+        postLeafNode: {
+          create: {
+            header: postLeafNodeContent.header,
+            subtext: postLeafNodeContent.subHeader,
+          }
+        }
+      },
+      include: {
+        postLeafNode: true,
+      }
+    })
+  }
+
   /**
    * Finds all dialogues stripped down their potential sensitive information within a workspace
    * @param workspaceId 

@@ -21,6 +21,12 @@ export interface WorkspaceTemplate {
   tags: Tag[];
   rootSliderOptions: {
     markers: any[];
+    happyText?: string,
+    unhappyText?: string,
+  };
+  postLeafText?: {
+    header: string;
+    subHeader: string;
   };
 }
 

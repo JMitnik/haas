@@ -31,33 +31,39 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
     defaultBotRole,
   ],
   rootSliderOptions: {
+    unhappyText: 'Slecht',
+    happyText: 'Goed',
     markers: [
       {
         label: 'Goed!',
-        subLabel: 'Dit is goed.',
-        range: { create: { start: 6, end: 9.5 } },
+        subLabel: 'Het gaat goed.',
+        range: { start: 6, end: 9.5 },
       },
       {
         label: 'Geweldig!',
-        subLabel: 'Dit is geweldig.',
-        range: { create: { start: 9.5 } },
+        subLabel: 'Het gaat geweldig.',
+        range: { start: 9.5 },
       },
       {
         label: 'Neutraal!',
-        subLabel: 'Iets is niet helemaal okee.',
-        range: { create: { start: 5, end: 6 } },
+        subLabel: 'Het kan beter.',
+        range: { start: 5, end: 6 },
       },
       {
         label: 'Slecht',
-        subLabel: 'Dit is slecht.',
-        range: { create: { start: 3, end: 5 } },
+        subLabel: 'Het gaat slecht.',
+        range: { start: 3, end: 5 },
       },
       {
-        label: 'Verschrikkelijk',
-        subLabel: 'Dit is verschrikkelijk.',
-        range: { create: { end: 3 } },
+        label: 'Heel slecht',
+        subLabel: 'Het gaat heel slecht.',
+        range: { end: 3 },
       },
     ],
+  },
+  postLeafText: {
+    header: 'Dankjewel voor je feedback!',
+    subHeader: 'Werk moet voldoening geven'
   },
   leafNodes: [
     {

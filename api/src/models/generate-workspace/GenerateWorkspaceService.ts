@@ -13,6 +13,7 @@ import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { cartesian } from './DemoHelpers';
 import { subDays } from 'date-fns';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
+import DialogueService from 'models/questionnaire/DialogueService';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -79,6 +80,9 @@ class GenerateWorkspaceService {
       const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
+      // Make post leaf node if data specified in template
+      await this.templateService.createTemplatePostLeafNode(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+
       // Make the leafs
       const leafs = await this.templateService.createTemplateLeafNodes(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
 
