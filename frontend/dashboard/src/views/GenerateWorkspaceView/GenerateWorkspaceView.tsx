@@ -1,5 +1,6 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
+import { Camera, CameraOff } from 'react-feather';
 import { Controller, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +11,7 @@ import { View } from 'layouts/View';
 import { useLogger } from 'hooks/useLogger';
 import { useToast } from 'hooks/useToast';
 import FileDropInput from 'components/FileDropInput';
+import intToBool from 'utils/intToBool';
 
 import * as LS from './GenerateWorkspaceView.styles';
 
@@ -17,6 +19,7 @@ const schema = yup.object({
   workspaceTitle: yup.string().required(),
   workspaceSlug: yup.string().required(),
   dialogueType: yup.string().required(),
+  generateDemoData: yup.number().required(),
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
@@ -83,7 +86,9 @@ export const GenerateWorkspaceView = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
-    const { workspaceTitle, workspaceSlug, dialogueType } = formData;
+    const { workspaceTitle, workspaceSlug, dialogueType, generateDemoData } = formData;
+    const generateDemoDataCheck = intToBool(generateDemoData);
+
     importWorkspaceCSV({
       variables: {
         input: {
@@ -91,6 +96,7 @@ export const GenerateWorkspaceView = () => {
           workspaceSlug,
           uploadedCsv: activeCSV,
           type: dialogueType as DialogueTemplateType,
+          generateDemoData: generateDemoDataCheck,
         },
       },
     });
@@ -165,6 +171,36 @@ export const GenerateWorkspaceView = () => {
                   </LS.RadioGroupRoot>
                 )}
               />
+            </UI.FormControl>
+
+            <UI.FormControl>
+              <UI.FormLabel>{t('create_demo_data')}</UI.FormLabel>
+              <UI.InputHelper>{t('create_demo_data_helper')}</UI.InputHelper>
+
+              <Controller
+                control={form.control}
+                name="generateDemoData"
+                defaultValue={1}
+                render={({ onChange, value, onBlur }) => (
+                  <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
+                    <UI.RadioButton
+                      icon={Camera}
+                      value={1}
+                      mr={2}
+                      text={(t('snapshot'))}
+                      description={t('snapshot_helper')}
+                    />
+                    <UI.RadioButton
+                      icon={CameraOff}
+                      value={0}
+                      mr={2}
+                      text={(t('no_snapshot'))}
+                      description={t('no_snapshot_helper')}
+                    />
+                  </UI.RadioButtons>
+                )}
+              />
+
             </UI.FormControl>
 
             <UI.FormControl isRequired>
