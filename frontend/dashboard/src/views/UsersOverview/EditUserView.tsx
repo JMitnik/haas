@@ -3,8 +3,8 @@ import * as yup from 'yup';
 import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import {
-  Div, Form, FormContainer, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Loader, Muted, ViewTitle,
+  DeprecatedViewTitle, Div, Form, FormContainer,
+  FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Loader, Muted,
 } from '@haas/ui';
 import { Mail, Phone, User } from 'react-feather';
 import { gql, useMutation } from '@apollo/client';
@@ -130,7 +130,7 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
   return (
     <>
       <UI.ViewHead>
-        <ViewTitle>{t('edit_user')}</ViewTitle>
+        <DeprecatedViewTitle>{t('edit_user')}</DeprecatedViewTitle>
       </UI.ViewHead>
 
       <UI.ViewBody>
@@ -238,7 +238,7 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
 };
 
 const EditUserView = () => {
-  console.log("Test")
+  console.log('Test');
   const { activeCustomer } = useCustomer();
   const { userId } = useParams<{ userId: string }>();
 

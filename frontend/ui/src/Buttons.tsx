@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import Color from 'color';
 import {
   Button as ChakraButton, ButtonProps as ChakraButtonProps,
@@ -18,7 +19,7 @@ const ButtonContainer = styled.div`
 
 export const Button = React.forwardRef((props: ButtonProps, ref) => (
   <ButtonContainer>
-    <ChakraButton {...props} ref={ref} />
+    <ChakraButton borderRadius={10} variantColor="main" {...props} ref={ref} />
   </ButtonContainer>
 ));
 
@@ -48,3 +49,22 @@ export const GradientButton = styled(Button)`
 export const IconButton = (props: ChakraIconButtonProps) => (
   <ChakraIconButton {...props} />
 );
+
+interface NavButtonProps extends ButtonProps {
+  to?: string;
+}
+
+const NavButtonLink = styled(NavLink)`
+  color: white;
+
+  &:hover {
+    color: white;
+  }
+`;
+
+export const NavButton = ({ to, children, ...props }: NavButtonProps) => (
+  // @ts-ignore
+  <Button as={NavButtonLink} to={to} {...props}>
+    {children}
+  </Button>
+)

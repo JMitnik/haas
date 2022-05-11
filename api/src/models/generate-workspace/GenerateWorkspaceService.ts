@@ -174,7 +174,7 @@ class GenerateWorkspaceService {
 
   /**
    * Generates a workspace based on the content of a CSV
-   * @param input 
+   * @param input
    * @returns the created workspace
    */
   async generateWorkspaceFromCSV(input: NexusGenInputs['GenerateWorkspaceCSVInputType'], userId?: string) {

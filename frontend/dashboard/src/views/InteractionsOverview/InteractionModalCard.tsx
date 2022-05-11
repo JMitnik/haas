@@ -8,36 +8,30 @@ import React from 'react';
 import { CampaignVariantEnum, useGetInteractionQuery } from 'types/generated-types';
 import { InteractionTimeline } from 'components/Interaction/InteractionTimeline';
 import { formatSimpleDate } from 'utils/dateUtils';
-// import { useNavigator } from 'hooks/useNavigator';
 import { useTranslation } from 'react-i18next';
 
 interface InteractionModalCardProps {
   sessionId: string;
-  onClose: () => void;
 }
 
-export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCardProps) => {
-  // const { goToDeliveryView } = useNavigator();
+export const InteractionModalCard = ({ sessionId }: InteractionModalCardProps) => {
   const { t } = useTranslation();
   const { data, loading, error } = useGetInteractionQuery({
     variables: { sessionId },
   });
 
-  if (loading) {
-    return <UI.Loader />;
-  }
-
   const delivery = data?.session?.delivery;
 
   return (
-    <UI.ModalCard breakout maxWidth={1200} onClose={onClose}>
+    <>
       <UI.ModalHead>
         <UI.ModalTitle>
           {t('interaction')}
         </UI.ModalTitle>
       </UI.ModalHead>
       <UI.ModalBody>
-        {data && (
+        {loading && !data && <UI.Loader />}
+        {!loading && data && (
           <Timeline>
             {!!delivery && (
               <TimelineItem gridTemplateColumns="40px 1fr">
@@ -69,12 +63,6 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
                         )}
                       </UI.Stack>
                     </UI.Div>
-                    {/* <UI.Button
-                      size="xs"
-                      onClick={() => goToDeliveryView(delivery.campaignVariant?.campaign?.id || '', delivery.id)}
-                    >
-                      {t('go_to_delivery')}
-                    </UI.Button> */}
                   </UI.Div>
                   <CampaignTimeline delivery={delivery} />
                 </UI.Div>
@@ -121,6 +109,6 @@ export const InteractionModalCard = ({ onClose, sessionId }: InteractionModalCar
           <UI.ErrorPane header="Server problem" text={error.message} />
         )}
       </UI.ModalBody>
-    </UI.ModalCard>
+    </>
   );
 };

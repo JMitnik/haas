@@ -1,8 +1,6 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
-import { ChevronRight } from 'react-feather';
-import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
-import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
+import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple, LinearGradient } from '@visx/gradient';
 import { Group } from '@visx/group';
 import { ParentSizeModern } from '@visx/responsive';
 import { PatternCircles } from '@visx/pattern';
@@ -10,13 +8,11 @@ import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { Zoom } from '@visx/zoom';
 import { localPoint } from '@visx/event';
-import { useModal } from 'react-modal-hook';
 import React, { useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
 
+import * as Modal from 'components/Common/Modal';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { Loader } from 'components/Common/Loader/Loader';
-import { useFormatter } from 'hooks/useFormatter';
 
 import * as LS from './WorkspaceGrid.styles';
 import {
@@ -29,15 +25,10 @@ import {
   HexagonViewMode,
 } from './WorkspaceGrid.types';
 import { HexagonItem } from './HexagonItem';
+import { Layers } from './Layers';
 import { TooltipBody } from './TooltipBody';
 import { WorkspaceGridPane } from './WorkspaceGridPane';
-
-const Tooltip = motion.custom(styled.div`
-  > * {
-    padding: 0 !important;
-    border-radius: 20px !important;
-  }
-`);
+import { createGrid } from './WorkspaceGrid.helpers';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -56,40 +47,6 @@ export interface WorkspaceGridProps {
   onLoadData?: (options: DataLoadOptions) => Promise<[HexagonNode[], HexagonViewMode]>;
 }
 
-const createGrid = (nrItems: number, windowHeight: number, windowWidth: number) => {
-  const gridItems: any[] = [];
-  const squareRoot = Math.sqrt(nrItems);
-  const ratioWindow = windowWidth / windowHeight;
-  const itemsPerRow = Math.ceil(squareRoot * ratioWindow) || 1;
-  const itemsPerColumn = Math.ceil(squareRoot) || 1;
-  const dimensions = Math.floor((windowWidth / itemsPerRow) / 2);
-
-  const hexPrototype = createHexPrototype({
-    dimensions,
-    offset: 1,
-  });
-
-  new Grid(hexPrototype, rectangle({ start: [0, 0], width: itemsPerRow, height: itemsPerColumn }))
-    .each((hex: Hex) => {
-      const corners = hex.corners.map(({ x, y }) => `${x},${y}`);
-      gridItems.push(corners.join(' '));
-    }).run();
-
-  return gridItems;
-};
-
-const getLabelFill = (score?: number) => {
-  if (!score) return '#4b1c54';
-  if (score >= 40) return '#34aea3';
-  return '#fb5a66';
-};
-
-const getLabelColor = (score?: number) => {
-  if (!score) return '#f9ecff';
-  if (score >= 40) return '#deffde';
-  return 'white';
-};
-
 export const WorkspaceGrid = ({
   initialData,
   backgroundColor,
@@ -105,7 +62,6 @@ export const WorkspaceGrid = ({
     childNodes: initialData,
     viewMode: initialViewMode,
   });
-  const { formatScore } = useFormatter();
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
 
   const activeDialogue = useMemo(() => {
@@ -134,23 +90,6 @@ export const WorkspaceGrid = ({
       tooltipTop: y,
     });
   };
-
-  const [openInteractionModal, closeInteractionModal] = useModal(() => (
-    <UI.Modal isOpen onClose={() => setSessionId(undefined)}>
-      <InteractionModalCard
-        sessionId={sessionId || ''}
-        onClose={() => setSessionId(undefined)}
-      />
-    </UI.Modal>
-  ), [sessionId, setSessionId]);
-
-  useEffect(() => {
-    if (sessionId) {
-      openInteractionModal();
-    } else {
-      closeInteractionModal();
-    }
-  }, [sessionId]);
 
   const handleMouseOutHex = () => hideTooltip();
 
@@ -216,7 +155,7 @@ export const WorkspaceGrid = ({
 
   const hexagonNodes = currentState.childNodes?.map((node, index) => ({
     ...node,
-    points: gridItems[index],
+    points: gridItems.points[index],
   })) || [];
 
   // ReversedHistory: Session => Dialogue => Group
@@ -248,111 +187,27 @@ export const WorkspaceGrid = ({
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       <AnimatePresence />
       {isLoading && (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        exit={{ opacity: 0 }}
-        style={{
-          position: 'absolute',
-          top: '0',
-          left: '0',
-          right: '0',
-          bottom: '0',
-          zIndex: 1000,
-        }}
-      >
-        <UI.Div style={{ position: 'absolute', bottom: '0' }}>
-          <Loader testId="load" />
-        </UI.Div>
-      </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          exit={{ opacity: 0 }}
+          style={{
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            right: '0',
+            bottom: '0',
+            zIndex: 1000,
+          }}
+        >
+          <UI.Div style={{ position: 'absolute', bottom: '0' }}>
+            <Loader testId="load" />
+          </UI.Div>
+        </motion.div>
       )}
       <UI.Grid gridTemplateColumns="2fr 1fr" gridGap="0">
-        <UI.Div borderRadius={10} height="60vh" position="relative">
-          {stateHistoryStack.length > 0 && (
-            <LS.BreadCrumbContainer
-              display="inline-block"
-              my={1}
-              border="1px solid"
-              borderColor="gray.100"
-              borderRadius={12}
-              pl={2}
-              pr={2}
-              py={1}
-            >
-              <UI.Stack alignItems="center" isInline>
-                <UI.Flex alignItems="center">
-                  <UI.Label
-                    color="black"
-                    bg="white"
-                    onClick={() => { popToIndex(0); }}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <UI.Span ml={1}>
-                      Home
-                    </UI.Span>
-                  </UI.Label>
-                  {historyQueue.map((state, index) => (
-                    <React.Fragment key={index}>
-                      <UI.Icon
-                        bg="gray.200"
-                        color="gray.500"
-                        width="1.2rem"
-                        height="1.2rem"
-                        fontSize="0.9rem"
-                        mx={1}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: '100%',
-                        }}
-                      >
-                        <ChevronRight />
-                      </UI.Icon>
-                      <UI.Flex>
-                        <UI.Label
-                          color={getLabelColor(state?.selectedNode?.score || 0)}
-                          bg={getLabelFill(state?.selectedNode?.score)}
-                          key={index}
-                          onClick={() => { popToIndex(index + 1); }}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <UI.Span>
-                            {formatScore(state.selectedNode?.score)}
-                          </UI.Span>
-                          {' '}
-                          {/* <SingleHexagon fill={getHexagonFill(state.selectedNode?.score)} /> */}
-                          <UI.Span ml={1}>
-                            {state.selectedNode?.type === HexagonNodeType.Group && (
-                              <>
-                                {state.selectedNode.label}
-                              </>
-                            )}
-                            {state.selectedNode?.type === HexagonNodeType.Dialogue && (
-                              <>
-                                {state.selectedNode.label}
-                              </>
-                            )}
-                            {state.selectedNode?.type === HexagonNodeType.Topic && (
-                              <>
-                                {state.selectedNode.topic.name}
-                              </>
-                            )}
-                            {state.selectedNode?.type === HexagonNodeType.Session && (
-                              <>
-                                {state.selectedNode.session.id}
-                              </>
-                            )}
-                          </UI.Span>
-                        </UI.Label>
-                      </UI.Flex>
-                    </React.Fragment>
-                  ))}
-                </UI.Flex>
-              </UI.Stack>
-            </LS.BreadCrumbContainer>
-          )}
+        <UI.Div borderRadius={20} height="80vh" position="relative">
           <ParentSizeModern>
             {({ width, height }) => (
               <Zoom<SVGElement>
@@ -367,14 +222,15 @@ export const WorkspaceGrid = ({
                         width={width}
                         height={height}
                         style={{ cursor: zoom.isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
-                      // @ts-ignore
+                        // @ts-ignore
                         ref={zoom.containerRef}
                       >
                         <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
                         <GradientPinkRed id="dots-pink" />
                         <GradientSteelPurple id="dots-gray" />
+                        <LinearGradient id="grays" from="#757F9A" to="#939bb1" />
                         <GradientLightgreenGreen id="dots-green" />
-                        <rect width={width} height={height} fill="#f7f7f7" stroke={backgroundColor} />
+                        <rect width={width} height={height} fill={backgroundColor} stroke={backgroundColor} />
                         <rect
                           width={width}
                           height={height}
@@ -406,18 +262,21 @@ export const WorkspaceGrid = ({
                                 initial={{ opacity: 0 }}
                                 key={currentState.currentNode?.id}
                               >
-                                {hexagonNodes.map((node) => (
-                                  <HexagonItem
-                                    key={node.id}
-                                    node={node}
-                                    points={node.points}
-                                    onMouseOver={handleMouseOverHex}
-                                    onMouseExit={handleMouseOutHex}
-                                    score={node.score}
-                                    zoomHelper={zoom}
-                                    onZoom={handleZoominLevel}
-                                  />
-                                ))}
+                                <Group id="items">
+                                  {hexagonNodes.map((node) => (
+                                    <HexagonItem
+                                      strokeWidth={5}
+                                      key={node.id}
+                                      node={node}
+                                      points={node.points}
+                                      onMouseOver={handleMouseOverHex}
+                                      onMouseExit={handleMouseOutHex}
+                                      score={node.score}
+                                      zoomHelper={zoom}
+                                      onZoom={handleZoominLevel}
+                                    />
+                                  ))}
+                                </Group>
                               </motion.g>
                             </AnimatePresence>
 
@@ -428,10 +287,11 @@ export const WorkspaceGrid = ({
                       <AnimateSharedLayout>
                         <AnimatePresence>
                           {tooltipOpen && (
-                            <Tooltip
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              initial={{ opacity: 0 }}
+                            <LS.Tooltip
+                              key="tooltip"
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.95 }}
+                              initial={{ opacity: 0, scale: 0.95 }}
                               layoutId="tooltip"
                             >
                               <TooltipWithBounds
@@ -443,11 +303,10 @@ export const WorkspaceGrid = ({
                                   <TooltipBody node={tooltipData} />
                                 )}
                               </TooltipWithBounds>
-                            </Tooltip>
+                            </LS.Tooltip>
                           )}
                         </AnimatePresence>
                       </AnimateSharedLayout>
-
                     </UI.Div>
                   );
                 }}
@@ -455,11 +314,20 @@ export const WorkspaceGrid = ({
             )}
           </ParentSizeModern>
         </UI.Div>
+        <UI.Div position="absolute" bottom={24} left={24}>
+          <Layers currentState={currentState} onClick={(index) => popToIndex(index)} historyQueue={historyQueue} />
+        </UI.Div>
 
         <UI.Div px={2} mt={2}>
           <WorkspaceGridPane currentState={currentState} />
         </UI.Div>
       </UI.Grid>
+
+      <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
+        <InteractionModalCard
+          sessionId={sessionId || ''}
+        />
+      </Modal.Root>
     </LS.WorkspaceGridContainer>
   );
 };

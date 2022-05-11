@@ -85,7 +85,7 @@ const Table = ({
       )}
 
       {data.length === 0 && !loading && (
-        <UI.IllustrationCard isFlat svg={<NoDataIll />} text={t('no_data')} />
+        <UI.IllustrationCard svg={<NoDataIll />} text={t('no_data')} />
       )}
 
       {!hidePagination && (

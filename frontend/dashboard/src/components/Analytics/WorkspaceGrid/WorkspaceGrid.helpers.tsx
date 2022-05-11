@@ -1,6 +1,14 @@
+import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
 import { meanBy, orderBy, uniqBy } from 'lodash';
 
-import { Dialogue, HexagonDialogueNode, HexagonGroupNode, HexagonNode, HexagonNodeType } from './WorkspaceGrid.types';
+import {
+  Dialogue,
+  HexagonDialogueNode,
+  HexagonGroupNode,
+  HexagonNode,
+  HexagonNodeType,
+  HexagonViewMode,
+} from './WorkspaceGrid.types';
 
 export const parseGroupNames = (title: string): string[] => {
   const groups = title.split('-').map((group) => group.trim());
@@ -162,8 +170,55 @@ export const getHexagonSVGFill = (score?: number) => {
   return 'url(#dots-pink)';
 };
 
-export const getColorScoreBrand = (score?: number) => {
-  if (!score) return 'gray.700';
-  if (score >= 40) return 'green.600';
-  return 'red.600';
+export const getColorScoreBrand = (score?: number, darker?: boolean) => {
+  if (!score) return 'gray.500';
+  if (score >= 40) return `green.${darker ? '500' : '500'}`;
+  return `red.${darker ? '700' : '500'}`;
+};
+
+/**
+ * Creates a grid of hexagons with the given number of rows and columns.
+ * @param nrItems
+ * @param windowHeight
+ * @param windowWidth
+ * @returns
+ */
+export const createGrid = (nrItems: number, windowHeight: number, windowWidth: number) => {
+  const gridItems: any[] = [];
+  const squareRoot = Math.sqrt(nrItems);
+  const ratioWindow = windowWidth / windowHeight;
+  const itemsPerRow = Math.ceil(squareRoot * ratioWindow) || 1;
+  const itemsPerColumn = Math.ceil(squareRoot) || 1;
+  const dimensions = Math.floor((windowWidth / itemsPerRow) / 2);
+
+  const hexPrototype = createHexPrototype({
+    dimensions,
+    offset: 1,
+  });
+
+  new Grid(hexPrototype, rectangle({ start: [0, 0], width: itemsPerRow, height: itemsPerColumn }))
+    .each((hex: Hex) => {
+      const corners = hex.corners.map(({ x, y }) => `${x},${y}`);
+      gridItems.push(corners.join(' '));
+    }).run();
+
+  return {
+    points: gridItems,
+    strokeWidth: itemsPerRow,
+  };
+};
+
+export const mapNodeTypeToViewType = (nodeType: HexagonNodeType): HexagonViewMode => {
+  switch (nodeType) {
+    case HexagonNodeType.Dialogue:
+      return HexagonViewMode.Dialogue;
+    case HexagonNodeType.Topic:
+      return HexagonViewMode.Topic;
+    case HexagonNodeType.Session:
+      return HexagonViewMode.Session;
+    case HexagonNodeType.Group:
+      return HexagonViewMode.Group;
+    default:
+      return HexagonViewMode.Dialogue;
+  }
 };
