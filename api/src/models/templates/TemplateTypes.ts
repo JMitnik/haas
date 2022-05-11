@@ -13,7 +13,7 @@ export interface RootSliderOptions {
 export interface WorkspaceTemplate {
   title: string;
   slug: string;
-  topics: string[];
+  topics: { [K in any]: string[] };
   description: string;
   primaryColor: string;
   leafNodes: any;
