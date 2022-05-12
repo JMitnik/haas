@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
@@ -10,6 +10,7 @@ import { View } from 'layouts/View';
 import { useLogger } from 'hooks/useLogger';
 import { useToast } from 'hooks/useToast';
 import FileDropInput from 'components/FileDropInput';
+import intToBool from 'utils/intToBool';
 
 import * as LS from './GenerateWorkspaceView.styles';
 
@@ -17,6 +18,7 @@ const schema = yup.object({
   workspaceTitle: yup.string().required(),
   workspaceSlug: yup.string().required(),
   dialogueType: yup.string().required(),
+  generateDemoData: yup.number().required(),
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
@@ -75,6 +77,14 @@ export const GenerateWorkspaceView = () => {
     },
   });
 
+  const usesGeneratedData = useWatch({
+    control: form.control,
+    name: 'generateDemoData',
+    defaultValue: 0,
+  });
+
+  console.log({ usesGeneratedData });
+
   const handleDrop = (files: File[]) => {
     if (!files.length) return;
 
@@ -83,7 +93,9 @@ export const GenerateWorkspaceView = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
-    const { workspaceTitle, workspaceSlug, dialogueType } = formData;
+    const { workspaceTitle, workspaceSlug, dialogueType, generateDemoData } = formData;
+    const generateDemoDataCheck = intToBool(generateDemoData);
+
     importWorkspaceCSV({
       variables: {
         input: {
@@ -91,6 +103,7 @@ export const GenerateWorkspaceView = () => {
           workspaceSlug,
           uploadedCsv: activeCSV,
           type: dialogueType as DialogueTemplateType,
+          generateDemoData: generateDemoDataCheck,
         },
       },
     });
@@ -167,10 +180,38 @@ export const GenerateWorkspaceView = () => {
               />
             </UI.FormControl>
 
-            <UI.FormControl isRequired>
+            <UI.FormControl>
+              <UI.Flex alignItems="center">
+                <UI.Div>
+                  <UI.FormLabel>{t('create_demo_data')}</UI.FormLabel>
+                  <UI.InputHelper>{t('create_demo_data_helper')}</UI.InputHelper>
+                </UI.Div>
+
+                <UI.Div ml={120}>
+                  <Controller
+                    control={form.control}
+                    name="generateDemoData"
+                    defaultValue={0}
+                    render={({ onChange, value, onBlur }) => (
+                      <UI.Toggle
+                        size="lg"
+                        onChange={() => (value === 1 ? onChange(0) : onChange(1))}
+                        value={value}
+                        onBlur={onBlur}
+                      />
+                    )}
+                  />
+                </UI.Div>
+
+              </UI.Flex>
+
+            </UI.FormControl>
+
+            <UI.FormControl isRequired={usesGeneratedData === 0} opacity={usesGeneratedData ? 0.5 : 1}>
               <UI.FormLabel>{t('upload_workspace_csv')}</UI.FormLabel>
               <UI.FormLabelHelper>{t('upload_workspace_csv_helper')}</UI.FormLabelHelper>
               <FileDropInput
+                isDisabled={!!usesGeneratedData}
                 onDrop={handleDrop}
               />
             </UI.FormControl>
@@ -180,7 +221,7 @@ export const GenerateWorkspaceView = () => {
               mt={4}
               variantColor="main"
               type="submit"
-              isDisabled={!form.formState.isValid || !activeCSV}
+              isDisabled={!form.formState.isValid || (usesGeneratedData === 0 && !activeCSV)}
               isLoading={loading}
             >
               {t('save')}

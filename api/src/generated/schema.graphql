@@ -510,6 +510,7 @@ type Customer {
   id: ID!
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
+  nestedHealthScore(input: HealthScoreInput): HealthScore
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
@@ -660,6 +661,7 @@ type Dialogue {
   description: String!
   dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
   edges: [Edge!]!
+  healthScore(input: HealthScoreInput): HealthScore
   id: ID!
   isPrivate: Boolean!
   isWithoutGenData: Boolean!
@@ -952,8 +954,9 @@ input GenerateAutodeckInput {
 }
 
 input GenerateWorkspaceCSVInputType {
-  type: DialogueTemplateType = DEFAULT
-  uploadedCsv: Upload!
+  generateDemoData: Boolean = false
+  type: String! = "DEFAULT"
+  uploadedCsv: Upload
   workspaceSlug: String!
   workspaceTitle: String!
 }
@@ -974,6 +977,17 @@ input HandleUserStateInWorkspaceInput {
   isActive: Boolean
   userId: String
   workspaceId: String
+}
+
+type HealthScore {
+  nrVotes: Int!
+  score: Float!
+}
+
+input HealthScoreInput {
+  endDateTime: String
+  startDateTime: String!
+  threshold: Float = 70
 }
 
 type ImageType {
@@ -1163,7 +1177,7 @@ type Mutation {
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
-  generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer!
+  generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
 
   """Invite a user to a particular customer domain, given an email and role"""

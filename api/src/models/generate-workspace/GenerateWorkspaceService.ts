@@ -1,6 +1,7 @@
-import { PrismaClient, RoleTypeEnum } from '@prisma/client';
+import { Customer, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 
+import templates from '../templates';
 import TemplateService from '../templates/TemplateService';
 import { NexusGenEnums, NexusGenInputs } from '../../generated/nexus';
 import { parseCsv } from '../../utils/parseCsv';
@@ -9,39 +10,134 @@ import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
 import NodeService from '../QuestionNode/NodeService';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
+import { cartesian } from './DemoHelpers';
+import { subDays } from 'date-fns';
+import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
+import DialogueService from '../questionnaire/DialogueService';
+import { DemoWorkspaceTemplate } from 'models/templates/TemplateTypes';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
   dialoguePrismaAdapter: DialoguePrismaAdapter;
   nodeService: NodeService;
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
+  sessionPrismaAdapter: SessionPrismaAdapter;
   templateService: TemplateService;
+  dialogueService: DialogueService;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
+    this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.templateService = new TemplateService(prismaClient);
+    this.dialogueService = new DialogueService(prismaClient);
   };
+
+  /**
+   * Finds the correct template based a provided type
+   * @param templateType
+   * @returns
+   */
+  getTemplate(templateType: string): DemoWorkspaceTemplate {
+    switch (templateType) {
+      case 'BUSINESS':
+        return templates.business;
+      case 'SPORT_ENG':
+        return templates.sportEng;
+      case 'SPORT_NL':
+        return templates.sportNl;
+      case 'DEFAULT':
+        return templates.default;
+      default:
+        return templates.default;
+    }
+  }
+
+  /**
+   * Generates demo data for a specific template
+   * @param templateType
+   * @param workspace
+   * @param userId
+   * @returns
+   */
+  async generateDemoData(
+    templateType: string,
+    workspace: Customer & {
+      roles: Role[];
+    },
+    userId?: string) {
+    const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN);
+    await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
+      workspace.id,
+      adminRole?.id as string,
+      userId as string
+    );
+
+    const template = this.getTemplate(templateType);
+    const uniqueDialogues: string[][] = cartesian(template.rootLayer, template.subLayer, template.subSubLayer);
+
+    const mappedDialogueInputData = uniqueDialogues.map(
+      (dialogue: string[]) => {
+        if (dialogue?.[0].length && dialogue?.[1].length) {
+          return { slug: dialogue.join('-'), title: dialogue.join(' - ') };
+        }
+        return { slug: dialogue[0], title: dialogue[0] };
+      });
+
+    for (let i = 0; i < mappedDialogueInputData.length; i++) {
+      const { slug, title } = mappedDialogueInputData[i];
+      const dialogueInput: CreateDialogueInput = {
+        slug: slug,
+        title: title,
+        description: '',
+        customer: { id: workspace.id, create: false },
+        isPrivate: false,
+      };
+
+      // Create initial dialogue
+      const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
+
+      const template = this.templateService.findTemplate(templateType as NexusGenEnums['DialogueTemplateType']);
+
+      if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
+      // Make post leaf node if data specified in template
+      await this.templateService.createTemplatePostLeafNode(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+
+      // Make the leafs
+      const leafs = await this.templateService.createTemplateLeafNodes(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+
+      // Make nodes
+      await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, templateType);
+
+      // Generate data
+      await this.dialogueService.massGenerateFakeData(dialogue.id, template, 1, true, 5, 70, 80);
+    }
+
+    return null;
+  }
 
   /**
    * Generates a workspace based on the content of a CSV
    * @param input
    * @returns the created workspace
    */
-  async generateWorkspaceFromCSV(input: NexusGenInputs['GenerateWorkspaceCSVInputType']) {
+  async generateWorkspaceFromCSV(input: NexusGenInputs['GenerateWorkspaceCSVInputType'], userId?: string) {
     const { uploadedCsv, workspaceSlug, workspaceTitle, type } = input;
+    // TODO: Allow for adjustment of template roles
+    const template = this.getTemplate(type);
+    const workspace = await this.customerPrismaAdapter.createWorkspace({
+      name: workspaceTitle,
+      primaryColour: '',
+      logo: '',
+      slug: workspaceSlug,
+    }, template);
+
+    if (input.generateDemoData) return this.generateDemoData(type, workspace, userId);
     const records = await parseCsv(await uploadedCsv, { delimiter: ',' });
 
     // Create customer
-    // TODO: Allow for adjustment of template roles
-    const workspace = await this.customerPrismaAdapter.createWorkspace({
-      name: workspaceTitle,
-      primaryColour: '#7266EE',
-      logo: '',
-      slug: workspaceSlug,
-    });
 
     // For every record generate dialogue, users + assign to dialogue
     for (let i = 0; i < records.length; i++) {
@@ -75,6 +171,7 @@ class GenerateWorkspaceService {
 
       // Make nodes
       await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
+
 
       // Check if user already exists
       // If not create new user entry + userOfCustomer entry

@@ -18,6 +18,7 @@ import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
 import { UserType } from '../users/graphql/User';
 import { PathedSessionsType, PathedSessionsInput, TopicType, TopicInputType, MostPopularPath, DialogueStatisticsSummaryFilterInput, MostChangedPath, MostTrendingTopic } from './DialogueStatisticsResolver';
+import { HealthScore, HealthScoreInput } from '../customer/graphql/HealthScore';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -81,6 +82,35 @@ export const DialogueType = objectType({
           },
         });
       },
+    });
+
+    t.field('healthScore', {
+      nullable: true,
+      type: HealthScore,
+      args: {
+        input: HealthScoreInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('Not input object!');
+        const { startDateTime, endDateTime, threshold } = args.input;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (startDateTime) {
+          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
+        }
+
+        if (endDateTime) {
+          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.findDialogueHealthScore(
+          parent.id,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          threshold || undefined,
+        );
+      }
     });
 
     t.field('pathedSessionsConnection', {

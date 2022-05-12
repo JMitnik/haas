@@ -536,6 +536,7 @@ class SessionPrismaAdapter {
 
     return this.prisma.session.create({
       data: {
+        createdAt: data.createdAt,
         totalTimeInSec: generateTimeSpent(),
         mainScore: data.simulatedRootVote,
         nodeEntries: {
@@ -568,7 +569,7 @@ class SessionPrismaAdapter {
     });
   };
 
-  massSeedFakeSession(data: (
+  massSeedFakeSession = async (data: (
     {
       createdAt: Date;
       dialogueId: string;
@@ -580,9 +581,9 @@ class SessionPrismaAdapter {
       simulatedSubChoiceNodeId: string;
       simulatedSubChoiceEdgeId?: string;
       simulatedSubChoice: string;
-    })) {
+    })) => {
 
-    return this.prisma.session.create({
+    const session = await this.prisma.session.create({
       data: {
         totalTimeInSec: generateTimeSpent(),
         createdAt: data.createdAt,
@@ -608,25 +609,36 @@ class SessionPrismaAdapter {
               create: { value: data.simulatedChoice },
             },
             inputSource: 'INIT_GENERATED',
-          },
-          {
-            depth: 2,
-            creationDate: data.createdAt,
-            relatedNode: { connect: { id: data.simulatedSubChoiceNodeId } },
-            relatedEdge: data.simulatedSubChoiceEdgeId ? { connect: { id: data.simulatedSubChoiceEdgeId } } : undefined,
-            choiceNodeEntry: {
-              create: { value: data.simulatedSubChoice },
-            },
-            inputSource: 'INIT_GENERATED',
-          },
-          ],
+          }],
         },
         dialogue: {
           connect: { id: data.dialogueId },
         },
       },
     });
+
+    if (data.simulatedSubChoice) {
+      await this.prisma.nodeEntry.create({
+        data: {
+          depth: 2,
+          creationDate: data.createdAt,
+          relatedNode: { connect: { id: data.simulatedSubChoiceNodeId } },
+          relatedEdge: data.simulatedSubChoiceEdgeId ? { connect: { id: data.simulatedSubChoiceEdgeId } } : undefined,
+          choiceNodeEntry: {
+            create: { value: data.simulatedSubChoice },
+          },
+          inputSource: 'INIT_GENERATED',
+          session: {
+            connect: {
+              id: session.id,
+            },
+          },
+        },
+      })
+    }
+    return session;
   };
+
 };
 
 

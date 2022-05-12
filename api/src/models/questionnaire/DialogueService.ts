@@ -28,7 +28,9 @@ import config from '../../config/config';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import TemplateService from '../templates/TemplateService';
 
-
+function getRandomIntFromInterval(min: number, max: number) { // min and max included 
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
@@ -777,6 +779,10 @@ class DialogueService {
     return updateDialogueArgs;
   };
 
+  createPostLeafNode = async (dialogueId: string, postLeafNodeContent: { header: string, subHeader: string }) => {
+    return this.dialoguePrismaAdapter.createPostLeafNode(dialogueId, postLeafNodeContent);
+  }
+
   static updatePostLeafNode(
     dbPostLeaf: PostLeafNode | null | undefined,
     heading: string | null | undefined,
@@ -895,11 +901,14 @@ class DialogueService {
     dialogueId: string,
     template: MassSeedTemplate,
     maxSessions: number = 30,
-    isStrict: boolean = false
+    isStrict: boolean = false,
+    nrDays: number = 30,
+    minSliderValue: number = 1,
+    maxSliderValue: number = 100,
   ) => {
     const currentDate = new Date();
 
-    const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
+    const nrDaysBack = Array.from(Array(nrDays)).map((empty, index) => index + 1);
     const datesBackInTime = nrDaysBack.map((daysBackCount, index) => subDays(currentDate, index));
     const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
     await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueId, true);
@@ -916,7 +925,7 @@ class DialogueService {
         const sessionCount = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for (var k = 0, z = sessionCount; k < z; k++) {
-          const simulatedRootVote: number = getRandomInt(100);
+          const simulatedRootVote: number = getRandomIntFromInterval(minSliderValue, maxSliderValue);
 
           const simulatedChoice = Object.keys(template.topics)[
             Math.floor(Math.random() * Object.keys(template.topics).length)
@@ -928,8 +937,8 @@ class DialogueService {
           const simulatedSubChoice = sample(subChoices) as string;
 
           const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
-            if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
-            const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+            if ((!condition.renderMin && typeof condition.renderMin !== 'number') || !condition.renderMax) return false;
+            const isValid = simulatedRootVote >= condition?.renderMin && simulatedRootVote <= condition?.renderMax;
             return isValid;
           }));
 
@@ -980,7 +989,10 @@ class DialogueService {
     }
   };
 
-  generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {
+  generateFakeData = async (
+    dialogueId: string,
+    template: WorkspaceTemplate
+  ) => {
     const currentDate = new Date();
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
@@ -999,7 +1011,10 @@ class DialogueService {
     await Promise.all(datesBackInTime.map(async (backDate) => {
       const simulatedRootVote: number = getRandomInt(100);
 
-      const simulatedChoice = template.topics[Math.floor(Math.random() * template.topics.length)];
+      const simulatedChoice = Object.keys(template.topics)[
+        Math.floor(Math.random() * Object.keys(template.topics).length)
+      ].toString();
+
       const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
         if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
         const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;

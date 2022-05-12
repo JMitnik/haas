@@ -11,6 +11,30 @@ const language = {
     },
   },
   general: {
+    create_demo_data: {
+      en: 'Generate prefilled data',
+      de: 'Verwenden Sie Demodaten',
+    },
+    create_demo_data_helper: {
+      en: 'Prefil each generated dialogue with static data. This is useful for generating demo data for your workspace.',
+      de: 'Generieren Sie Demodaten für Verkaufsgespräche',
+    },
+    snapshot: {
+      en: 'Generate data',
+      de: 'Daten generieren',
+    },
+    snapshot_helper: {
+      en: 'Generate demo data for every dialogue',
+      de: 'Generieren Sie Demodaten für jeden Dialog',
+    },
+    no_snapshot: {
+      en: 'Don\'t generate data',
+      de: 'Keine Daten generieren',
+    },
+    no_snapshot_helper: {
+      en: 'No demo data will be generated for dialogues',
+      de: 'Für Dialoge werden keine Demodaten generiert',
+    },
     unknown: {
       en: 'Not available',
       de: 'Nicht verfügbar',
