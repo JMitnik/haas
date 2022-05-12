@@ -57,13 +57,13 @@ export enum HexagonNodeType {
   Group = 'Group',
   Dialogue = 'Dialogue',
   Topic = 'Topic',
-  Session = 'Session',
+  Session = 'Individual',
 }
 
 export enum HexagonViewMode {
   Group = 'Group',
   Dialogue = 'Dialogue',
   Topic = 'Topic',
-  Session = 'Session',
+  Session = 'Individual',
   Final = 'Final',
 }
