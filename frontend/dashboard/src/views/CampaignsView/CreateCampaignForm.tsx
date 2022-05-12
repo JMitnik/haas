@@ -363,7 +363,7 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
                   <UI.ButtonCard
                     onClick={() => switchActiveVariant(index)}
                     isActive={activeVariantIndex === index}
-                    bg="white"
+                    variant={activeVariantIndex === index ? 'solid' : 'outline'}
                   >
                     {`${t('variant')} ${mapVariantIndexToLabel[index]}`}
                   </UI.ButtonCard>

@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    unknown: {
+      en: 'Not available',
+      de: 'Nicht verfügbar',
+    },
     clear_filters: {
       en: 'Clear filters',
       de: 'Clear filters',
