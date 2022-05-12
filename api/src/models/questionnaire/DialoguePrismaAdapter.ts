@@ -18,7 +18,7 @@ class DialoguePrismaAdapter {
     this.prisma = prismaClient;
   };
 
-  createPostLeafNode = async (dialogueId: string, postLeafNodeContent: { header: string, subHeader: string }) => {
+  createPostLeafNode = async (dialogueId: string, postLeafNodeContent: { header: string; subHeader: string }) => {
     return this.prisma.dialogue.update({
       where: {
         id: dialogueId,
@@ -28,19 +28,19 @@ class DialoguePrismaAdapter {
           create: {
             header: postLeafNodeContent.header,
             subtext: postLeafNodeContent.subHeader,
-          }
-        }
+          },
+        },
       },
       include: {
         postLeafNode: true,
-      }
+      },
     })
   }
 
   /**
    * Finds all dialogues stripped down their potential sensitive information within a workspace
-   * @param workspaceId 
-   * @returns 
+   * @param workspaceId
+   * @returns
    */
   findDialogueUrlsByWorkspaceId = async (workspaceId: string) => {
     return this.prisma.dialogue.findMany({
@@ -63,7 +63,7 @@ class DialoguePrismaAdapter {
 
   /**
    * Upserts a dialogue topic and its sub topics
-   * @param input 
+   * @param input
    * @returns Dialogue Topic Statistics
    */
   upsertDialogueTopicStatistics = async (
@@ -209,9 +209,9 @@ class DialoguePrismaAdapter {
 
   /**
    * Finds a cache entry of a dialogue statistics summary based on id and date range
-   * @param dialogueId 
-   * @param startDateTime 
-   * @param endDateTime 
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
    * @returns DialogueStatisticsSummaryCache | null
    */
   findDialogueStatisticsSummaries = async (
@@ -237,9 +237,9 @@ class DialoguePrismaAdapter {
 
   /**
    * Finds a cache entry of a dialogue statistics summary based on id and date range
-   * @param dialogueId 
-   * @param startDateTime 
-   * @param endDateTime 
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
    * @returns DialogueStatisticsSummaryCache | null
    */
   findDialogueStatisticsSummaryByDialogueId = async (
@@ -263,8 +263,8 @@ class DialoguePrismaAdapter {
 
   /**
    * Sets the privacy settings of a dialogue based on the provided input
-   * @param input 
-   * @returns 
+   * @param input
+   * @returns
    */
   setDialoguePrivacy = async (input: NexusGenInputs['SetDialoguePrivacyInput']) => {
     return this.prisma.dialogue.update({

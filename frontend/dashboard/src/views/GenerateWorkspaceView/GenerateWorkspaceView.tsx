@@ -1,6 +1,5 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Camera, CameraOff } from 'react-feather';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -78,11 +77,13 @@ export const GenerateWorkspaceView = () => {
     },
   });
 
-  const usesSnapshotData = useWatch({
+  const usesGeneratedData = useWatch({
     control: form.control,
     name: 'generateDemoData',
-    defaultValue: 1,
+    defaultValue: 0,
   });
+
+  console.log({ usesGeneratedData });
 
   const handleDrop = (files: File[]) => {
     if (!files.length) return;
@@ -180,39 +181,37 @@ export const GenerateWorkspaceView = () => {
             </UI.FormControl>
 
             <UI.FormControl>
-              <UI.FormLabel>{t('create_demo_data')}</UI.FormLabel>
-              <UI.InputHelper>{t('create_demo_data_helper')}</UI.InputHelper>
+              <UI.Flex alignItems="center">
+                <UI.Div>
+                  <UI.FormLabel>{t('create_demo_data')}</UI.FormLabel>
+                  <UI.InputHelper>{t('create_demo_data_helper')}</UI.InputHelper>
+                </UI.Div>
 
-              <Controller
-                control={form.control}
-                name="generateDemoData"
-                defaultValue={1}
-                render={({ onChange, value, onBlur }) => (
-                  <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
-                    <UI.RadioButton
-                      icon={Camera}
-                      value={1}
-                      mr={2}
-                      text={(t('snapshot'))}
-                      description={t('snapshot_helper')}
-                    />
-                    <UI.RadioButton
-                      icon={CameraOff}
-                      value={0}
-                      mr={2}
-                      text={(t('no_snapshot'))}
-                      description={t('no_snapshot_helper')}
-                    />
-                  </UI.RadioButtons>
-                )}
-              />
+                <UI.Div ml={120}>
+                  <Controller
+                    control={form.control}
+                    name="generateDemoData"
+                    defaultValue={0}
+                    render={({ onChange, value, onBlur }) => (
+                      <UI.Toggle
+                        size="lg"
+                        onChange={() => (value === 1 ? onChange(0) : onChange(1))}
+                        value={value}
+                        onBlur={onBlur}
+                      />
+                    )}
+                  />
+                </UI.Div>
+
+              </UI.Flex>
 
             </UI.FormControl>
 
-            <UI.FormControl isRequired={usesSnapshotData === 0}>
+            <UI.FormControl isRequired={usesGeneratedData === 0} opacity={usesGeneratedData ? 0.5 : 1}>
               <UI.FormLabel>{t('upload_workspace_csv')}</UI.FormLabel>
               <UI.FormLabelHelper>{t('upload_workspace_csv_helper')}</UI.FormLabelHelper>
               <FileDropInput
+                isDisabled={!!usesGeneratedData}
                 onDrop={handleDrop}
               />
             </UI.FormControl>
@@ -222,7 +221,7 @@ export const GenerateWorkspaceView = () => {
               mt={4}
               variantColor="main"
               type="submit"
-              isDisabled={!form.formState.isValid || (usesSnapshotData === 0 && !activeCSV)}
+              isDisabled={!form.formState.isValid || (usesGeneratedData === 0 && !activeCSV)}
               isLoading={loading}
             >
               {t('save')}

@@ -12,11 +12,11 @@ const language = {
   },
   general: {
     create_demo_data: {
-      en: 'Use demo data',
+      en: 'Generate prefilled data',
       de: 'Verwenden Sie Demodaten',
     },
     create_demo_data_helper: {
-      en: 'Generate demo data for sales pitch',
+      en: 'Prefil each generated dialogue with static data. This is useful for generating demo data for your workspace.',
       de: 'Generieren Sie Demodaten für Verkaufsgespräche',
     },
     snapshot: {

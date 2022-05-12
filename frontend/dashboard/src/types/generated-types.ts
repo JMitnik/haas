@@ -550,6 +550,7 @@ export type Customer = {
   automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
   automations?: Maybe<Array<AutomationModel>>;
+  nestedHealthScore?: Maybe<HealthScore>;
   nestedMostPopular?: Maybe<MostPopularPath>;
   nestedMostChanged?: Maybe<MostChangedPath>;
   nestedMostTrendingTopic?: Maybe<MostTrendingTopic>;
@@ -577,6 +578,11 @@ export type CustomerAutomationConnectionArgs = {
 export type CustomerUsersConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<UserConnectionFilterInput>;
+};
+
+
+export type CustomerNestedHealthScoreArgs = {
+  input?: Maybe<HealthScoreInput>;
 };
 
 
@@ -768,6 +774,7 @@ export type Dialogue = {
   updatedAt?: Maybe<Scalars['String']>;
   assignees?: Maybe<Array<UserType>>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
+  healthScore?: Maybe<HealthScore>;
   pathedSessionsConnection?: Maybe<PathedSessionsType>;
   topic: TopicType;
   mostPopularPath?: Maybe<MostPopularPath>;
@@ -786,6 +793,11 @@ export type Dialogue = {
   questions: Array<QuestionNode>;
   leafs: Array<QuestionNode>;
   campaignVariants: Array<CampaignVariantType>;
+};
+
+
+export type DialogueHealthScoreArgs = {
+  input?: Maybe<HealthScoreInput>;
 };
 
 
@@ -1147,6 +1159,18 @@ export type HandleUserStateInWorkspaceInput = {
   userId?: Maybe<Scalars['String']>;
   workspaceId?: Maybe<Scalars['String']>;
   isActive?: Maybe<Scalars['Boolean']>;
+};
+
+export type HealthScore = {
+  __typename?: 'HealthScore';
+  score: Scalars['Float'];
+  nrVotes: Scalars['Int'];
+};
+
+export type HealthScoreInput = {
+  threshold?: Maybe<Scalars['Float']>;
+  startDateTime: Scalars['String'];
+  endDateTime?: Maybe<Scalars['String']>;
 };
 
 export type ImageType = {
@@ -3175,19 +3199,6 @@ export type GetWorkspaceDialoguesQuery = (
   )> }
 );
 
-export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
-  input?: Maybe<GenerateWorkspaceCsvInputType>;
-}>;
-
-
-export type GenerateWorkspaceFromCsvMutation = (
-  { __typename?: 'Mutation' }
-  & { generateWorkspaceFromCSV?: Maybe<(
-    { __typename?: 'Customer' }
-    & Pick<Customer, 'id' | 'slug'>
-  )> }
-);
-
 export type DuplicateQuestionMutationVariables = Exact<{
   questionId?: Maybe<Scalars['String']>;
 }>;
@@ -3307,6 +3318,19 @@ export type GetDialogueStatisticsQuery = (
         )>> }
       )> }
     )> }
+  )> }
+);
+
+export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
+  input?: Maybe<GenerateWorkspaceCsvInputType>;
+}>;
+
+
+export type GenerateWorkspaceFromCsvMutation = (
+  { __typename?: 'Mutation' }
+  & { generateWorkspaceFromCSV?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'slug'>
   )> }
 );
 
@@ -4725,40 +4749,6 @@ export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDi
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
     }
-export const GenerateWorkspaceFromCsvDocument = gql`
-    mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
-  generateWorkspaceFromCSV(input: $input) {
-    id
-    slug
-  }
-}
-    `;
-export type GenerateWorkspaceFromCsvMutationFn = Apollo.MutationFunction<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
-
-/**
- * __useGenerateWorkspaceFromCsvMutation__
- *
- * To run a mutation, you first call `useGenerateWorkspaceFromCsvMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useGenerateWorkspaceFromCsvMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [generateWorkspaceFromCsvMutation, { data, loading, error }] = useGenerateWorkspaceFromCsvMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useGenerateWorkspaceFromCsvMutation(baseOptions?: Apollo.MutationHookOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>(GenerateWorkspaceFromCsvDocument, options);
-      }
-export type GenerateWorkspaceFromCsvMutationHookResult = ReturnType<typeof useGenerateWorkspaceFromCsvMutation>;
-export type GenerateWorkspaceFromCsvMutationResult = Apollo.MutationResult<GenerateWorkspaceFromCsvMutation>;
-export type GenerateWorkspaceFromCsvMutationOptions = Apollo.BaseMutationOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
 export const DuplicateQuestionDocument = gql`
     mutation duplicateQuestion($questionId: String) {
   duplicateQuestion(questionId: $questionId) {
@@ -5025,6 +5015,40 @@ export type GetDialogueStatisticsQueryResult = Apollo.QueryResult<GetDialogueSta
 export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatisticsQueryVariables) {
       return { query: GetDialogueStatisticsDocument, variables: variables }
     }
+export const GenerateWorkspaceFromCsvDocument = gql`
+    mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
+  generateWorkspaceFromCSV(input: $input) {
+    id
+    slug
+  }
+}
+    `;
+export type GenerateWorkspaceFromCsvMutationFn = Apollo.MutationFunction<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
+
+/**
+ * __useGenerateWorkspaceFromCsvMutation__
+ *
+ * To run a mutation, you first call `useGenerateWorkspaceFromCsvMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateWorkspaceFromCsvMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [generateWorkspaceFromCsvMutation, { data, loading, error }] = useGenerateWorkspaceFromCsvMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGenerateWorkspaceFromCsvMutation(baseOptions?: Apollo.MutationHookOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>(GenerateWorkspaceFromCsvDocument, options);
+      }
+export type GenerateWorkspaceFromCsvMutationHookResult = ReturnType<typeof useGenerateWorkspaceFromCsvMutation>;
+export type GenerateWorkspaceFromCsvMutationResult = Apollo.MutationResult<GenerateWorkspaceFromCsvMutation>;
+export type GenerateWorkspaceFromCsvMutationOptions = Apollo.BaseMutationOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
 export const GetInteractionDocument = gql`
     query GetInteraction($sessionId: String!) {
   session(id: $sessionId) {
@@ -5770,13 +5794,6 @@ export namespace GetWorkspaceDialogues {
   export const Document = GetWorkspaceDialoguesDocument;
 }
 
-export namespace GenerateWorkspaceFromCsv {
-  export type Variables = GenerateWorkspaceFromCsvMutationVariables;
-  export type Mutation = GenerateWorkspaceFromCsvMutation;
-  export type GenerateWorkspaceFromCsv = (NonNullable<GenerateWorkspaceFromCsvMutation['generateWorkspaceFromCSV']>);
-  export const Document = GenerateWorkspaceFromCsvDocument;
-}
-
 export namespace DuplicateQuestion {
   export type Variables = DuplicateQuestionMutationVariables;
   export type Mutation = DuplicateQuestionMutation;
@@ -5825,6 +5842,13 @@ export namespace GetDialogueStatistics {
   export type TopNegativePath = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['topNegativePath']>)[number]>;
   export type History = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['history']>)[number]>;
   export const Document = GetDialogueStatisticsDocument;
+}
+
+export namespace GenerateWorkspaceFromCsv {
+  export type Variables = GenerateWorkspaceFromCsvMutationVariables;
+  export type Mutation = GenerateWorkspaceFromCsvMutation;
+  export type GenerateWorkspaceFromCsv = (NonNullable<GenerateWorkspaceFromCsvMutation['generateWorkspaceFromCSV']>);
+  export const Document = GenerateWorkspaceFromCsvDocument;
 }
 
 export namespace GetInteraction {

@@ -37,8 +37,8 @@ class GenerateWorkspaceService {
 
   /**
    * Finds the correct template based a provided type
-   * @param templateType 
-   * @returns 
+   * @param templateType
+   * @returns
    */
   getTemplate(templateType: string): DemoWorkspaceTemplate {
     switch (templateType) {
@@ -57,10 +57,10 @@ class GenerateWorkspaceService {
 
   /**
    * Generates demo data for a specific template
-   * @param templateType 
-   * @param workspace 
-   * @param userId 
-   * @returns 
+   * @param templateType
+   * @param workspace
+   * @param userId
+   * @returns
    */
   async generateDemoData(
     templateType: string,
@@ -115,79 +115,6 @@ class GenerateWorkspaceService {
       await this.dialogueService.massGenerateFakeData(dialogue.id, template, 1, true, 5, 70, 80);
     }
 
-    // Extreme case
-    // const currentDate = new Date();
-    // const yesterdayDate = subDays(currentDate, 1);
-    // const dialogueSlug = mappedDialogueInputData?.[0]?.slug;
-    // const dialogueWithNodes = await this.dialoguePrismaAdapter.getFullDialogueBySlug(dialogueSlug, workspace.id);
-
-    // if (dialogueWithNodes) {
-    //   await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueWithNodes?.id, true);
-    //   const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
-    //   const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
-
-    //   // Stop if no rootnode
-    //   if (!rootNode) throw new ApolloError(`No root node found for ${dialogueWithNodes.slug}. Abort.`);
-
-    //   const simulatedRootVote: number = 13;
-    //   const simulatedChoice = template.topics[0]; // Physical & Mental
-    //   const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
-    //     if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
-    //     const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
-    //     return isValid;
-    //   }));
-
-    //   const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
-
-    //   if (!simulatedChoiceNodeId) throw new ApolloError('No edge found for selected option. Please contact an admin.');
-
-    //   const fakeSessionInputArgs: (
-    //     {
-    //       createdAt: Date;
-    //       dialogueId: string;
-    //       rootNodeId: string;
-    //       simulatedRootVote: number;
-    //       simulatedChoiceNodeId: string;
-    //       simulatedChoiceEdgeId?: string;
-    //       simulatedChoice: string;
-    //     }) = {
-    //     dialogueId: dialogueWithNodes.id,
-    //     createdAt: yesterdayDate,
-    //     rootNodeId: rootNode.id,
-    //     simulatedRootVote,
-    //     simulatedChoiceNodeId,
-    //     simulatedChoiceEdgeId: simulatedChoiceEdge?.id,
-    //     simulatedChoice,
-    //   }
-    //   const emergencySession = await this.sessionPrismaAdapter.createFakeSession(fakeSessionInputArgs);
-    //   // TODO: Get correct node ID maybe 🤔 maybe not necessary for form CTA 
-    //   const formCTAData = {
-    //     'sessionId': emergencySession.id,
-    //     'nodeId': 'cl2fygcnb1182bgoikg4nozz0',
-    //     'data': {
-    //       'form': {
-    //         'values': [
-    //           {
-    //             'relatedFieldId': 'cl2fygcnb1184bgoiv637jja0',
-    //             'shortText': 'Daan',
-    //           },
-    //           {
-    //             'relatedFieldId': 'cl2fygcnb1185bgoi9rcr308t',
-    //             'shortText': 'Helsloot',
-    //           },
-    //           {
-    //             'relatedFieldId': 'cl2fygcnb1186bgoi50v2t3mv',
-    //             'email': 'daan.998@hotmail.com',
-    //           },
-    //         ],
-    //       },
-    //     },
-    //   }
-
-
-    // }
-
-
     return null;
   }
 
@@ -210,7 +137,7 @@ class GenerateWorkspaceService {
     if (input.generateDemoData) return this.generateDemoData(type, workspace, userId);
     const records = await parseCsv(await uploadedCsv, { delimiter: ',' });
 
-    // Create customer 
+    // Create customer
 
     // For every record generate dialogue, users + assign to dialogue
     for (let i = 0; i < records.length; i++) {

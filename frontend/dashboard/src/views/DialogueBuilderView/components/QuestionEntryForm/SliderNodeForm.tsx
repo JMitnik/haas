@@ -23,7 +23,6 @@ const SliderNodeForm = ({ form }: { form: any }) => {
 
   const hasCustomerSatisfactionTexts = form.watch('happyText') ? 1 : 0;
 
-  const sliderNodeMarkers = form.watch('sliderNode.markers');
   return (
     <UI.Div>
       <UI.InputGrid>
@@ -102,39 +101,37 @@ const SliderNodeForm = ({ form }: { form: any }) => {
             {t('dialogue:markers_helper')}
           </UI.InputHelper>
 
-          {markers.fields.map((marker, index) => {
-            return (
-              <UI.Card boxShadow="lg" key={marker.fieldIndex} mb={4} noHover>
-                <input ref={form.register()} type="hidden" name={`sliderNode.markers[${index}].id`} defaultValue={marker.id} />
-                <UI.CardBody>
-                  <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr', '1fr 2fr']}>
-                    <UI.Div>
-                      <UI.Div mb={2}>
-                        <UI.FormControl>
-                          <UI.FormLabel htmlFor={`sliderNode.markers[${index}].label`}>{t('label')}</UI.FormLabel>
-                          <UI.Input ref={form.register()} size="sm" name={`sliderNode.markers[${index}].label`} defaultValue={marker.label} />
-                        </UI.FormControl>
-                      </UI.Div>
+          {markers.fields.map((marker, index) => (
+            <UI.Card boxShadow="lg" key={marker.fieldIndex} mb={4} noHover>
+              <input ref={form.register()} type="hidden" name={`sliderNode.markers[${index}].id`} defaultValue={marker.id} />
+              <UI.CardBody>
+                <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr', '1fr 2fr']}>
+                  <UI.Div>
+                    <UI.Div mb={2}>
                       <UI.FormControl>
-                        <UI.FormLabel htmlFor={`sliderNode.markers[${index}].subLabel`}>{t('sub_label')}</UI.FormLabel>
-                        <UI.Input ref={form.register()} size="sm" name={`sliderNode.markers[${index}].subLabel`} defaultValue={marker.subLabel} />
+                        <UI.FormLabel htmlFor={`sliderNode.markers[${index}].label`}>{t('label')}</UI.FormLabel>
+                        <UI.Input ref={form.register()} size="sm" name={`sliderNode.markers[${index}].label`} defaultValue={marker.label} />
                       </UI.FormControl>
                     </UI.Div>
+                    <UI.FormControl>
+                      <UI.FormLabel htmlFor={`sliderNode.markers[${index}].subLabel`}>{t('sub_label')}</UI.FormLabel>
+                      <UI.Input ref={form.register()} size="sm" name={`sliderNode.markers[${index}].subLabel`} defaultValue={marker.subLabel} />
+                    </UI.FormControl>
+                  </UI.Div>
 
-                    <UI.Div>
-                      <UI.RangeSlider
-                        isDisabled
-                        stepSize={0.5}
-                        defaultValue={[marker.range?.start || 0, marker.range?.end || 10]}
-                        min={0}
-                        max={10}
-                      />
-                    </UI.Div>
-                  </UI.Grid>
-                </UI.CardBody>
-              </UI.Card>
-            )
-          })}
+                  <UI.Div>
+                    <UI.RangeSlider
+                      isDisabled
+                      stepSize={0.5}
+                      defaultValue={[marker.range?.start || 0, marker.range?.end || 10]}
+                      min={0}
+                      max={10}
+                    />
+                  </UI.Div>
+                </UI.Grid>
+              </UI.CardBody>
+            </UI.Card>
+          ))}
 
         </UI.Div>
       </UI.InputGrid>
