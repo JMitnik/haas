@@ -1,7 +1,8 @@
 # TODO: Check IAM permissions
 # TODO: Chcek environment, this should not be possible in prod (unless the Master account is used)
-read -p "This will deploy the latest Docker container to the ECR. Are you sure you wish to continue? (yes/no)"
+read -p "This will deploy the latest Docker container to the ECR. Are you sure you wish to continue? (yes/no) "
 if [ "$REPLY" != "yes" ]; then
+  echo "Understandable, have a good day."
   exit
 fi
 

@@ -35,6 +35,7 @@
         "start:client": "yarn workspace @haas/client start",
         "start:dashboard": "yarn workspace @haas/dashboard start",
         "deploy:aws:campaign": "cd aws/commands && bash deploy-campaign.bash",
+        "deploy:api:staging": "bash aws/stack/scripts/update_ecs.sh",
         "dock:start-db": "cd container/api && docker-compose up -d",
         "dock:up": "cd container/api && docker-compose up -d",
         "dock:down": "cd container/api && docker-compose down",
