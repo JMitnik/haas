@@ -422,7 +422,6 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
             <UI.IllustrationCard
               svg={<DecideIll />}
               text={t('select_a_variant')}
-              isFlat
             />
           )}
         </UI.Card>

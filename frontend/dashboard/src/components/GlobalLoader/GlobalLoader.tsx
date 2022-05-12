@@ -14,7 +14,7 @@ const GlobalLoaderContainer = styled.div`
     justify-content: center;
 
     svg path {
-      fill: ${theme.colors.gray[500]};
+      fill: ${theme.colors.off[500]};
     }
 
     svg {
@@ -25,18 +25,25 @@ const GlobalLoaderContainer = styled.div`
 `;
 
 const GlobalLoader = () => (
-  <motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }}>
-    <GlobalLoaderContainer>
-      <Lottie
-        options={{
-          animationData: HAASRun,
-          loop: true,
-        }}
-        isClickToPauseDisabled
-        speed={1}
-      />
-    </GlobalLoaderContainer>
-  </motion.div>
+  <div style={{
+    height: '100vh',
+    width: '100vw',
+    background: 'linear-gradient(to right, #ece9e6, #ffffff)',
+  }}
+  >
+    <motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }}>
+      <GlobalLoaderContainer>
+        <Lottie
+          options={{
+            animationData: HAASRun,
+            loop: true,
+          }}
+          isClickToPauseDisabled
+          speed={1}
+        />
+      </GlobalLoaderContainer>
+    </motion.div>
+  </div>
 );
 
 export default GlobalLoader;

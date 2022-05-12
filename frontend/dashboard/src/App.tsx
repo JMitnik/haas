@@ -1,4 +1,4 @@
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { ViewContainer } from '@haas/ui';
 import React, { FC } from 'react';
@@ -8,11 +8,15 @@ import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
 import { DialogueLinkFetchOverview } from 'views/DialogueLinkFetchOverview';
 import { DialogueProvider } from 'providers/DialogueProvider';
-import { ImportWorkspaceCSVForm } from 'views/CustomerOverview/ImportWorkspaceCSVForm';
+import { FirstTimeView } from 'views/FirstTimeView';
+import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
 import { ReportView } from 'views/ReportView';
 import { SystemPermission } from 'types/generated-types';
+import { VerifyTokenView } from 'views/VerifyTokenView';
+import { WorkspaceSettingsView } from 'views/WorkspaceSettingsView';
+import { fadeMotion } from 'components/animation/config';
 import { sub } from 'date-fns';
 import { useUser } from 'providers/UserProvider';
 import ActionsPage from 'pages/dashboard/actions';
@@ -23,37 +27,33 @@ import AdminOverview from 'views/AdminOverview/AdminOverview';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
 import CampaignsView from 'views/CampaignsView/CampaignsView';
-import CustomerLayout from 'layouts/CustomerLayout';
 import CustomerPage from 'pages/dashboard/customer';
 import CustomerProvider from 'providers/CustomerProvider';
 import CustomerRoute from 'components/Routes/CustomerRoute';
 import CustomersPage from 'pages/dashboard/customers';
-import DashboardPage from 'pages/dashboard';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
 import DialogueOverview from 'views/DialogueOverview';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
-import EditCustomerView from 'views/EditCustomerView';
 import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
-import FirstTimePage from 'pages/dashboard/first_time';
 import GlobalLoader from 'components/GlobalLoader';
 import GuardedRoute, { BotRoute } from 'components/Routes/GuardedRoute';
 import LoggedOutView from 'layouts/LoggedOutView';
-import LoginPage from 'pages/login';
+import LoginView from 'views/LoginView';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
-import VerifyTokenPage from 'pages/verify_token';
+import WorkspaceLayout from 'layouts/WorkspaceLayout/WorkspaceLayout';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
     <CustomerProvider>
       <DialogueProvider>
-        <CustomerLayout>
+        <WorkspaceLayout>
           <Switch>
             <CustomerRoute
               path="/dashboard/b/:customerSlug/d/:dialogueSlug"
@@ -138,7 +138,7 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       allowedPermission={SystemPermission.CanEditWorkspace}
                       path="/dashboard/b/:customerSlug/edit"
-                      render={() => <EditCustomerView />}
+                      render={() => <WorkspaceSettingsView />}
                     />
 
                     <GuardedRoute
@@ -177,7 +177,7 @@ const CustomerRoutes = () => (
               )}
             />
           </Switch>
-        </CustomerLayout>
+        </WorkspaceLayout>
       </DialogueProvider>
     </CustomerProvider>
   </AnimatePresence>
@@ -186,13 +186,13 @@ const CustomerRoutes = () => (
 const PublicRoutes = () => (
   <Switch>
     <Route path="/public/dialogue-link-fetch">
-      <PreCustomerLayout hideUserNav>
+      <PreCustomerLayout>
         <DialogueLinkFetchOverview />
       </PreCustomerLayout>
     </Route>
 
     <Route path="/public/login">
-      <LoginPage />
+      <LoginView />
     </Route>
 
     <Route path="/public">
@@ -234,9 +234,23 @@ const RootAppRoute = () => {
 const RootApp = ({ children }: { children: React.ReactNode }) => {
   const { isInitializingUser } = useUser();
 
-  if (isInitializingUser) return <GlobalLoader />;
-
-  return <>{children}</>;
+  return (
+    <AnimatePresence>
+      {isInitializingUser ? (
+        <motion.div
+          {...fadeMotion}
+        >
+          <GlobalLoader />
+        </motion.div>
+      ) : (
+        <motion.div
+          {...fadeMotion}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 };
 
 const AppRoutes = () => (
@@ -247,7 +261,7 @@ const AppRoutes = () => (
         path={ROUTES.GENERATE_WORKSPACE_VIEW}
         render={() => (
           <PreCustomerLayout>
-            <ImportWorkspaceCSVForm />
+            <GenerateWorkspaceView />
           </PreCustomerLayout>
         )}
       />
@@ -290,15 +304,15 @@ const AppRoutes = () => (
       </GuardedRoute>
 
       <GuardedRoute path="/dashboard/first_time">
-        <FirstTimePage />
+        <FirstTimeView />
       </GuardedRoute>
 
       <GuardedRoute path="/dashboard">
-        <DashboardPage />
+        <Redirect to="/dashboard/b" />
       </GuardedRoute>
 
       <Route path="/verify_token">
-        <VerifyTokenPage />
+        <VerifyTokenView />
       </Route>
 
       <Route path="/public">

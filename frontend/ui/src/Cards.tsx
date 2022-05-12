@@ -4,7 +4,7 @@ import { Flex } from './Container';
 import { Span } from './Span';
 import { Button } from './Buttons';
 
-type BoxShadowSize = 'sm' | 'md' | 'lg';
+export type BoxShadowSize = 'sm' | 'md' | 'lg';
 
 interface CardProps {
   noHover?: boolean;
@@ -21,6 +21,8 @@ export const Card = styled(Div) <CardProps>`
     flex-direction: column;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
     box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+    box-shadow: ${theme.boxShadows.md};
+    border: 1px solid ${theme.colors.gray[100]};
 
     ${willFocusWithin && css`
       &:focus-within {
@@ -146,3 +148,31 @@ export const CardScore = styled(Span)`
 `;
 
 export default Card;
+
+/**
+ * New card
+ *
+ * TODO: Deprecate old card and rename this to Card.
+ */
+interface NewCardProps {
+  hasHover?: boolean;
+  boxShadow?: BoxShadowSize;
+}
+
+export const NewCard = styled(Div) <NewCardProps>`
+  ${({ theme, hasHover, boxShadow = 'md' }) => css`
+    background: ${theme.colors.white};
+    border-radius: ${theme.borderRadiuses.md}px;
+    box-shadow: ${theme.boxShadows[boxShadow]};
+    transition: all ${theme.transitions.normal};
+
+    ${hasHover && css`
+      cursor: pointer;
+
+      &:hover {
+        transition: all ${theme.transitions.normal};
+        box-shadow: ${theme.boxShadows.lg};
+      }
+    `}
+  `}
+`;

@@ -25,7 +25,7 @@ import { formatSimpleDate } from 'utils/dateUtils';
 import { useLogger } from 'hooks/useLogger';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
-import Searchbar from 'components/SearchBar';
+import Searchbar from 'components/Common/SearchBar';
 
 import { CampaignType } from './CampaignViewTypes';
 import { DeliveryModalCard } from './DeliveryModalCard';
@@ -185,7 +185,7 @@ export const CampaignView = () => {
           <UI.Stack>
             <UI.Breadcrumb to={campaignsPath}>{t('back_to_campaigns')}</UI.Breadcrumb>
             <UI.Stack isInline alignItems="center" spacing={4}>
-              <UI.ViewTitle>{campaign?.label}</UI.ViewTitle>
+              <UI.DeprecatedViewTitle>{campaign?.label}</UI.DeprecatedViewTitle>
               <UI.Button
                 leftIcon={Plus}
                 onClick={() => setIsOpenImportModal(true)}
@@ -226,8 +226,8 @@ export const CampaignView = () => {
                       {t('filter_by_search')}
                     </UI.RadioHeader>
                     <Searchbar
-                      activeSearchTerm={filter.search}
-                      onSearchTermChange={handleSearchChange}
+                      search={filter.search}
+                      onSearchChange={handleSearchChange}
                     />
                   </UI.Div>
 
@@ -252,8 +252,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_first_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientFirstName}
-                          onSearchTermChange={handleRecipientFirstName}
+                          search={filter.recipientFirstName}
+                          onSearchChange={handleRecipientFirstName}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -261,8 +261,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_last_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientLastName}
-                          onSearchTermChange={handleRecipientLastName}
+                          search={filter.recipientLastName}
+                          onSearchChange={handleRecipientLastName}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -270,8 +270,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_email')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientEmail}
-                          onSearchTermChange={handleRecipientEmail}
+                          search={filter.recipientEmail}
+                          onSearchChange={handleRecipientEmail}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -279,8 +279,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_phone')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientPhone}
-                          onSearchTermChange={handleRecipientPhone}
+                          search={filter.recipientPhone}
+                          onSearchChange={handleRecipientPhone}
                         />
                       </UI.Div>
                     </UI.Stack>

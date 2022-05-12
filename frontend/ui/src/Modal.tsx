@@ -210,7 +210,7 @@ interface ModalHeadProps {
 const ModalHeadContainer = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter * 1}px ${theme.gutter * 1.5}px;
-    background: ${theme.colors.neutral[100]};
+    background: ${theme.colors.neutral[300]};
     border-radius: 10px 10px 0 0;
 
     ${ModalTitle} {

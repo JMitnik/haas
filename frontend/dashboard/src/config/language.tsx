@@ -11,6 +11,126 @@ const language = {
     },
   },
   general: {
+    clear_filters: {
+      en: 'Clear filters',
+      de: 'Clear filters',
+    },
+    no_dialogues_found: {
+      en: 'We could not find any dialogues with the current filters.',
+      de: 'We could not find any dialogues with the current filters.',
+    },
+    set_private: {
+      en: 'Make private',
+      de: 'Make private',
+    },
+    set_assignable: {
+      en: 'Set assignable',
+      de: 'Set assignable',
+    },
+    add_dialogue: {
+      en: 'Add dialogue',
+      de: 'Dialog hinzufügen',
+    },
+    copied: {
+      en: 'Copied!',
+      de: 'Kopiert!',
+    },
+    copy_link: {
+      en: 'Copy link',
+      de: 'Link kopieren',
+    },
+    workspaces: {
+      en: 'Workspaces',
+      de: 'Workspaces',
+    },
+    workspaces_subtitle: {
+      en: 'Manage your workspaces',
+      de: 'Manage your workspaces',
+    },
+    teams: {
+      en: 'Teams',
+      de: 'Teams',
+    },
+    dialogues_guest_helper: {
+      en: 'Send your {{ unit }} a link to the dialogue by clicking on the corresponding dialogue card below here.',
+      de: 'Senden Sie Ihren {{ unit }} einen Link zur Dialogeseite, indem Sie auf die entsprechende Dialogeseitekarte klicken.',
+    },
+    overview: {
+      en: 'Overview',
+      de: 'Übersicht',
+    },
+    good_morning_user: {
+      en: 'Good morning, {{ user }}.',
+      de: 'Guten Morgen, {{ user }}.',
+    },
+    good_afternoon_user: {
+      en: 'Good afternoon, {{ user }}.',
+      de: 'Guten Tag, {{ user }}.',
+    },
+    good_evening_user: {
+      en: 'Good evening, {{ user }}.',
+      de: 'Guten Abend, {{ user }}.',
+    },
+    workspace_role: {
+      en: '{{workspace}} as {{role}}',
+      de: '{{workspace}} als {{role}}',
+    },
+    to_language_de: {
+      en: 'Switch to German',
+      de: 'Wechseln zu Deutsch',
+    },
+    to_language_en: {
+      en: 'Switch to English',
+      de: 'Wechseln zu Englisch',
+    },
+    account_settings: {
+      en: 'Account settings',
+      de: 'Konto-Einstellungen',
+    },
+    switch_workspace: {
+      en: 'Switch workspace',
+      de: 'Workspace wechseln',
+    },
+    continue: {
+      en: 'Continue',
+      de: 'Weiter',
+    },
+    login_header: {
+      en: 'Sign in with your email',
+      de: 'Mit E-Mail-Adresse anmelden',
+    },
+    login_description: {
+      en: 'Enter your email and we will send you a login link to access the dashboard.',
+      de: 'Gib deine E-Mail-Adresse ein und wir senden dir einen Login-Link zum Dashboard.',
+    },
+    general_success: {
+      en: 'Success!',
+      de: 'Erfolg!',
+    },
+    whoops: {
+      en: 'Whoops!',
+      de: 'Whoops!',
+    },
+    user_received_mail: {
+      en: 'We just sent a mail to {{ user }} with a link to access the dashboard. This link is only accessible for 3 days.',
+      de: 'Wir haben eine Mail an {{ user }} mit einem Link zum Zugriff auf das Dashboard geschickt. Dieser Link ist nur für 3 Tage gültig.',
+    },
+    user_not_exist: {
+      en: 'It seems that the user with mail {{ user }} does not exist in our user-base.',
+      de: 'Es scheint, dass der Benutzer mit der Mail {{ user }} nicht in unserer Benutzer-Datenbank existiert.',
+    },
+    go_back: {
+      en: 'Go back',
+      de: 'Zurück',
+    },
+    observable_insights: {
+      en: 'Actionable insights',
+      de: 'Actionable insights',
+    },
+    observable_insights_description: {
+      en: 'The haas dashboard makes observing and maintaining the happiness of your accessible and observable.',
+      de: 'Das haas dashboard macht die Beobachtung und Aufrechterhaltung des Glücks Ihres Unternehmens zugänglich und beobachtbar.',
+    },
     create_new_cta: {
       en: 'Create Call-to-Action',
       de: 'Neuen Call-to-Action erstellen',
@@ -34,6 +154,10 @@ const language = {
     generate_workspace: {
       en: 'Generate workspace',
       de: 'Workspace generieren',
+    },
+    generate_workspace_subtitle: {
+      en: 'Create a new workspace based on one of our predefined templates',
+      de: 'Erstellen Sie einen neuen Workspace basierend auf einem von uns vordefinierten Templates',
     },
     new: {
       en: 'New',
@@ -524,6 +648,10 @@ const language = {
     campaigns: {
       en: 'Campaigns',
       de: 'Kampagnen',
+    },
+    campaigns_subtitle: {
+      en: 'View, edit, and create campaigns',
+      de: 'Kampagnen anzeigen, bearbeiten und erstellen',
     },
     placeholder: {
       en: 'Field placeholder',
@@ -1078,6 +1206,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Dialogues',
       de: 'Dialog',
     },
+    dialogues_subtitle: {
+      en: 'Create, edit and manage dialogues',
+      de: 'Erstellen, bearbeiten und verwalten von Dialogen',
+    },
     score: {
       en: 'Score',
       de: 'Ergebnis',
@@ -1122,6 +1254,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Users',
       de: 'Benutzer',
     },
+    users_subtitle: {
+      en: 'Manage users, roles, and permissions',
+      de: 'Benutzer, Rollen und Berechtigungen verwalten',
+    },
     alerts: {
       en: 'Alerts',
       de: 'Alerts',
@@ -1133,10 +1269,6 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     latest_interactions: {
       en: 'Latest interactions',
       de: 'Die letzten Interaktionen',
-    },
-    overview: {
-      en: 'Overview',
-      de: 'Übersicht',
     },
     interactions: {
       en: 'Interactions',
@@ -1522,8 +1654,8 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
   },
   views: {
     dashboard: {
-      en: 'Dashboard',
-      de: 'Dashboard',
+      en: 'Overview',
+      de: 'Overview',
     },
     configurations: {
       en: 'Configurations',
@@ -1570,8 +1702,12 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Alerts',
     },
     edit_business_settings_view: {
-      en: 'Edit workspace settings',
-      de: 'Wähle Unternehmenseinstellungen',
+      en: 'Settings',
+      de: 'Einstellungen',
+    },
+    edit_business_settings_subtitle: {
+      en: 'Manage your workspace, including the name, url extension, and branding.',
+      de: 'Verwalte dein Unternehmen, inklusive der Name, URL-Erweiterung und Marke.',
     },
     create_trigger_view: {
       en: 'Create alert',

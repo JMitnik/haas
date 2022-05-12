@@ -45,7 +45,7 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
   const fullName = `${userOfCustomer?.user.firstName} ${userOfCustomer?.user.lastName}`;
 
   return (
-    <UI.ModalCard maxWidth={1200} onClose={onClose} breakout>
+    <>
       <UI.ModalHead>
         <UI.ModalTitle mb={2}>{fullName}</UI.ModalTitle>
 
@@ -112,6 +112,6 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
           />
         </UI.ModalBody>
       )}
-    </UI.ModalCard>
+    </>
   );
 };

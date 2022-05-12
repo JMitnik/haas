@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { ArrowLeft, Plus } from 'react-feather';
-import { Div, Flex, ViewTitle } from '@haas/ui';
+import { DeprecatedViewTitle, Div, Flex } from '@haas/ui';
 import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 
@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import { useGetWorkspaceAdminsQuery } from 'types/generated-types';
-import SearchBar from 'components/SearchBar/SearchBar';
+import SearchBar from 'components/Common/SearchBar/SearchBar';
 
 const TableHeaderContainer = styled(UI.TableHeading)`
   background: grey !important;
@@ -57,7 +57,7 @@ const AdminOverview = () => {
               <ArrowLeft />
             </BackButtonContainer>
 
-            <ViewTitle>{t('views:admin_overview')}</ViewTitle>
+            <DeprecatedViewTitle>{t('views:admin_overview')}</DeprecatedViewTitle>
             <Flex
               flexDirection="row"
               justifyContent="space-between"
@@ -68,8 +68,8 @@ const AdminOverview = () => {
               </UI.Button>
               <Div ml={500}>
                 <SearchBar
-                  activeSearchTerm={activeSearchTerm}
-                  onSearchTermChange={handleChange}
+                  search={activeSearchTerm}
+                  onSearchChange={handleChange}
                 />
               </Div>
             </Flex>
