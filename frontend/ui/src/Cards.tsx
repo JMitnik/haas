@@ -49,7 +49,7 @@ export const Card = styled(Div) <CardProps>`
 export const ButtonCard = styled(Button) <{ isActive: boolean }>`
   ${({ theme, isActive }) => css`
     border-radius: ${theme.borderRadiuses.md};
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: ${theme.boxShadows.md};
     border: 1px solid #ebebeb;
     padding: 4px 8px;
     outline: none;

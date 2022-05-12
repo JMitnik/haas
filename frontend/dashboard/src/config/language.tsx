@@ -35,6 +35,10 @@ const language = {
       en: 'No demo data will be generated for dialogues',
       de: 'Für Dialoge werden keine Demodaten generiert',
     },
+    unknown: {
+      en: 'Not available',
+      de: 'Nicht verfügbar',
+    },
     clear_filters: {
       en: 'Clear filters',
       de: 'Clear filters',
