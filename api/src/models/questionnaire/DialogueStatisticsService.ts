@@ -20,6 +20,52 @@ class DialogueStatisticsService {
     this.prisma = prismaClient;
   }
 
+  findDialogueHealthScore = async (
+    dialogueId: string,
+    startDateTime: Date,
+    endDateTime?: Date,
+    threshold: number = 70,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
+
+    const scopedSessions = await this.sessionService.findSessionsBetweenDates(
+      dialogueId,
+      startDateTime,
+      endDateTimeSet
+    );
+
+    const nrVotes = scopedSessions.length;
+    const sessionsHigherThanTreshold = scopedSessions.filter((session) => session.mainScore >= threshold);
+
+    const healthScore = nrVotes === 0 ? 0 : sessionsHigherThanTreshold.length / nrVotes * 100;
+
+    return { score: healthScore, nrVotes };
+  };
+
+  findWorkspaceHealthScore = async (
+    workspaceId: string,
+    startDateTime: Date,
+    endDateTime?: Date,
+    threshold: number = 70,
+  ) => {
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
+    const dialogues = await this.dialoguePrismaAdapter.findDialogueIdsOfCustomer(workspaceId);
+    const mappedDialogueIds = dialogues.map((dialogue) => dialogue.id);
+
+    const scopedSessions = await this.sessionService.findSessionsForDialogues(
+      mappedDialogueIds,
+      startDateTime,
+      endDateTimeSet
+    );
+
+    const nrVotes = scopedSessions.length;
+    const sessionsHigherThanTreshold = scopedSessions.filter((session) => session.mainScore >= threshold);
+
+    const healthScore = nrVotes === 0 ? 0 : sessionsHigherThanTreshold.length / nrVotes * 100;
+
+    return { score: healthScore, nrVotes };
+  };
+
   /**
    * Finds sessions and number of votes based on provided start/end date
    * @param dialogueId 

@@ -510,6 +510,7 @@ type Customer {
   id: ID!
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
+  nestedHealthScore(input: HealthScoreInput): HealthScore
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
@@ -660,6 +661,7 @@ type Dialogue {
   description: String!
   dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
   edges: [Edge!]!
+  healthScore(input: HealthScoreInput): HealthScore
   id: ID!
   isPrivate: Boolean!
   isWithoutGenData: Boolean!
@@ -975,6 +977,17 @@ input HandleUserStateInWorkspaceInput {
   isActive: Boolean
   userId: String
   workspaceId: String
+}
+
+type HealthScore {
+  nrVotes: Int!
+  score: Float!
+}
+
+input HealthScoreInput {
+  endDateTime: String
+  startDateTime: String!
+  threshold: Float = 70
 }
 
 type ImageType {

@@ -15,6 +15,7 @@ import { AutomationConnection, AutomationConnectionFilterInput } from '../../aut
 import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
+import { HealthScore, HealthScoreInput } from './HealthScore';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -86,6 +87,36 @@ export const CustomerType = objectType({
       async resolve(parent, args, ctx) {
         return ctx.services.automationService.findAutomationsByWorkspace(parent.id);
       },
+    });
+
+    t.field('nestedHealthScore', {
+      nullable: true,
+      type: HealthScore,
+      args: {
+        input: HealthScoreInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('Not input object!');
+        const { startDateTime, endDateTime, threshold } = args.input;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (startDateTime) {
+          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
+        }
+
+        if (endDateTime) {
+          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
+        }
+
+
+        return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
+          parent.id,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          threshold || undefined,
+        );
+      }
     });
 
     t.field('nestedMostPopular', {
