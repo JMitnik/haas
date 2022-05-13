@@ -71,6 +71,7 @@ export const recursiveBuildGroup = (
   dialogues: Dialogue[],
 ): HexagonGroupNode | HexagonDialogueNode => {
   const groupToChilds = allGroups.filter((group) => group.groupName === groupName);
+  const uniqueGroupToChilds = uniqBy(groupToChilds, 'childGroupName');
 
   if (groupToChilds.length === 0 || groupToChilds[0].height === 0) {
     const relevantDialogue = dialogues.find((dialogue) => dialogue.title === dialogueTitle) as Dialogue;
@@ -89,7 +90,7 @@ export const recursiveBuildGroup = (
     id: groupName,
     type: HexagonNodeType.Group,
     label: groupName,
-    subGroups: groupToChilds.map((groupToChild) => recursiveBuildGroup(
+    subGroups: uniqueGroupToChilds.map((groupToChild) => recursiveBuildGroup(
       groupToChild.childGroupName!,
       groupToChild.dialogueTitle,
       allGroups,
