@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render, screen } from 'test';
+import { render, screen, userEvent } from 'test';
 
 import { WorkspaceGridAdapter } from '../WorkspaceGridAdapter';
 import { mockGetWorkspaceDialogueStatistics, mockQueryDialogueConnection } from './helpers';
@@ -15,4 +15,8 @@ test('render layers', async () => {
   renderComponent();
 
   expect(await screen.findByText('Layers')).toBeInTheDocument();
+
+  userEvent.click(screen.getByLabelText('Male'));
+
+  expect(await screen.findByText('Average rating')).toBeInTheDocument();
 });
