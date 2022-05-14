@@ -24,6 +24,8 @@ interface GroupToChild {
   height: number;
   dialogueTitle: string;
   groupName: string;
+  groupFragments: string;
+  childGroupFragments: string | null;
   childGroupName: string | null;
 }
 
@@ -32,6 +34,12 @@ export const parseDialogueGroup = (dialogueGroup: DialogueGroup): GroupToChild[]
     height: dialogueGroup.groupFragments.length - index - 1,
     dialogueTitle: dialogueGroup.dialogueTitle,
     groupName: groupFragment,
+    groupFragments: dialogueGroup.groupFragments.slice(0, index + 1).join(' - '),
+    childGroupFragments: (
+      index === dialogueGroup.groupFragments.length - 1
+        ? null
+        : dialogueGroup.groupFragments.slice(0, index + 2).join(' - ')
+    ),
     childGroupName: index === dialogueGroup.groupFragments.length - 1 ? null : dialogueGroup.groupFragments[index + 1],
   }))
 );
@@ -64,13 +72,26 @@ export const calcGroupTotal = (group: HexagonGroupNode): number => {
   }, 0 as number);
 };
 
+/**
+ * Traverses all dialogues based on a shared group-name.
+ */
 export const recursiveBuildGroup = (
   groupName: string,
+  groupFragments: string,
   dialogueTitle: string,
   allGroups: GroupToChild[],
   dialogues: Dialogue[],
 ): HexagonGroupNode | HexagonDialogueNode => {
-  const groupToChilds = allGroups.filter((group) => group.groupName === groupName);
+  const groupToChilds = allGroups.filter((group) => group.groupFragments === groupFragments);
+
+  const numberVotes = groupToChilds.reduce<number>((acc, groupToChild) => {
+    const matchedDialogue = dialogues.find((dialogue) => dialogue.title === groupToChild.dialogueTitle);
+    if (!matchedDialogue) return acc;
+
+    // @ts-ignore
+    return acc + matchedDialogue.dialogueStatisticsSummary?.nrVotes ?? 0;
+  }, 0 as number);
+
   const uniqueGroupToChilds = uniqBy(groupToChilds, 'childGroupName');
 
   if (groupToChilds.length === 0 || groupToChilds[0].height === 0) {
@@ -90,8 +111,10 @@ export const recursiveBuildGroup = (
     id: groupName,
     type: HexagonNodeType.Group,
     label: groupName,
+    nrVotes: numberVotes,
     subGroups: uniqueGroupToChilds.map((groupToChild) => recursiveBuildGroup(
       groupToChild.childGroupName!,
+      groupToChild.childGroupFragments || '',
       groupToChild.dialogueTitle,
       allGroups,
       dialogues,
@@ -109,6 +132,9 @@ export const dialogueToNode = (dialogue: Dialogue): HexagonNode => ({
   dialogue,
 });
 
+/**
+ * Group dialogues into hierarchical groups.
+ */
 export const groupsFromDialogues = (dialogues: Dialogue[]): HexagonNode[] => {
   const dialogueGroups: DialogueGroup[] = dialogues.map((dialogue) => ({
     groupFragments: parseGroupNames(dialogue.title),
@@ -123,7 +149,13 @@ export const groupsFromDialogues = (dialogues: Dialogue[]): HexagonNode[] => {
   const topGroups = uniqBy(groupToChild.filter((group) => group.height === maxHeight), 'groupName');
 
   const topGroupNodes = topGroups.map((group) => (
-    recursiveBuildGroup(group.groupName, group.dialogueTitle, groupToChild, dialogues)
+    recursiveBuildGroup(
+      group.groupName,
+      group.groupFragments,
+      group.dialogueTitle,
+      groupToChild,
+      dialogues,
+    )
   ));
 
   return topGroupNodes;

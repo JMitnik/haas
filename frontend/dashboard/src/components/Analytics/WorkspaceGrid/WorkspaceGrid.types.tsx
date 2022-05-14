@@ -13,6 +13,7 @@ export type HexagonGroupNode = {
   subGroups: HexagonGroupNode[] | HexagonDialogueNode[];
   subGroupType: HexagonNodeType;
   depth: number;
+  nrVotes?: number;
   points?: string;
 };
 

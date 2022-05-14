@@ -15,7 +15,7 @@ import {
   HexagonState,
   HexagonTopicNode,
 } from './WorkspaceGrid.types';
-import { calcGroupTotal, getHexagonSVGFill, orderNodesByScore, orderNodesByVoteCount } from './WorkspaceGrid.helpers';
+import { getHexagonSVGFill, orderNodesByScore, orderNodesByVoteCount } from './WorkspaceGrid.helpers';
 
 interface WorkspaceGridPaneProps {
   currentState: HexagonState;
@@ -28,7 +28,6 @@ export const GroupPane = ({ currentState }: WorkspaceGridPaneProps) => {
 
   const sortedGroups = useMemo(() => orderNodesByVoteCount(currentNode.subGroups), [currentNode]);
   const selectedGroups = useMemo(() => slice(sortedGroups, 0, 3), [sortedGroups]);
-  const totalVotes = useMemo(() => calcGroupTotal(currentNode), [sortedGroups]);
 
   return (
     <LS.WorkspaceGridPaneContainer>
@@ -66,7 +65,7 @@ export const GroupPane = ({ currentState }: WorkspaceGridPaneProps) => {
                     Response count
                   </UI.Span>
                   <UI.Span>
-                    {totalVotes}
+                    {currentNode.nrVotes}
                   </UI.Span>
                   <UI.Span>
                     responses

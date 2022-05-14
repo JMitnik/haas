@@ -34,6 +34,7 @@ export const HexagonItem = ({
       <g fill="blue">
         <polygon
           aria-label={node.id}
+          role="button"
           strokeWidth={strokeWidth}
           points={points}
           stroke="white"
