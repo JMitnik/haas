@@ -12,7 +12,7 @@ import { DataLoadOptions, WorkspaceGrid } from './WorkspaceGrid';
 import { HexagonNode, HexagonNodeType, HexagonViewMode } from './WorkspaceGrid.types';
 import { groupsFromDialogues, mapNodeTypeToViewType } from './WorkspaceGrid.helpers';
 
-interface WorkspaceGridAdapterProps {
+export interface WorkspaceGridAdapterProps {
   height: number;
   width: number;
   backgroundColor: string;

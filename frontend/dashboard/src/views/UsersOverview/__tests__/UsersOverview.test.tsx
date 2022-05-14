@@ -4,7 +4,14 @@ import { name } from 'faker';
 import { range } from 'lodash';
 import React from 'react';
 
-import { GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables, GetPaginatedUsersQuery, GetPaginatedUsersQueryVariables, SystemPermission, UserCustomer } from 'types/generated-types';
+import {
+  GetCustomerOfUserQuery,
+  GetCustomerOfUserQueryVariables,
+  GetPaginatedUsersQuery,
+  GetPaginatedUsersQueryVariables,
+  SystemPermission,
+  UserCustomer,
+} from 'types/generated-types';
 
 import UsersOverview from '../UsersOverview';
 

@@ -1,57 +1,56 @@
-import { Dialogue, HexagonDialogueNode, HexagonGroupNode, HexagonNodeType } from '../WorkspaceGrid.types';
-import { groupsFromDialogues } from '../WorkspaceGrid.helpers';
+import { HexagonDialogueNode, HexagonGroupNode } from '../WorkspaceGrid.types';
+import { groupsFromDialogues, parseDialogueGroup } from '../WorkspaceGrid.helpers';
 
-const sampleDialouges: Dialogue[] = [
-  {
-    id: '1',
-    title: 'Group U8 Male - Team 1',
-    dialogueStatisticsSummary: { id: '1', dialogueId: '1', impactScore: 20, nrVotes: 20 },
-  },
-  {
-    id: '2',
-    title: 'Group U8 Male - Team 2',
-    dialogueStatisticsSummary: { id: '2', dialogueId: '2', impactScore: 50, nrVotes: 11 },
-  },
-  {
-    id: '3',
-    title: 'Group U8 Female - Team 1',
-    dialogueStatisticsSummary: { id: '3', dialogueId: '3', impactScore: 42, nrVotes: 11 },
-  },
-  {
-    id: '4',
-    title: 'Group U8 Female - Team 2',
-    dialogueStatisticsSummary: { id: '4', dialogueId: '4', impactScore: 32, nrVotes: 11 },
-  },
-  {
-    id: '5',
-    title: 'Group U9 Female - Team 1',
-    dialogueStatisticsSummary: { id: '5', dialogueId: '5', impactScore: 37, nrVotes: 11 },
-  },
-];
+import { dialogues } from './helpers';
 
-describe('WorkspaceGrid helpers', () => {
-  it('should find groups', () => {
-    const groups = groupsFromDialogues(sampleDialouges);
+test('groups sub-groups appropriately without duplicate groups', () => {
+  const topNode = groupsFromDialogues(dialogues);
+  expect((topNode[0]).type).toBe('Group');
+  expect((topNode[0] as HexagonGroupNode).label).toBe('Male');
 
-    expect(groups).toHaveLength(3);
-    expect(groups[0].type).toBe(HexagonNodeType.Group);
-    expect((groups[0] as HexagonGroupNode).label).toBe('Group U8 Male');
-    expect((groups[0] as HexagonGroupNode).subGroups).toHaveLength(2);
-    expect((groups[0] as HexagonGroupNode).subGroups[0].type).toBe(HexagonNodeType.Dialogue);
-    expect(((groups[0] as HexagonGroupNode).subGroups[0] as HexagonDialogueNode).dialogue.id).toBe('1');
-    expect((groups[0] as HexagonGroupNode).subGroups[1].type).toBe(HexagonNodeType.Dialogue);
-    expect(((groups[0] as HexagonGroupNode).subGroups[1] as HexagonDialogueNode).dialogue.id).toBe('2');
-    expect((groups[0] as HexagonGroupNode).subGroups[0].label).toBe('Team 1');
-    expect((groups[0] as HexagonGroupNode).subGroups[1].label).toBe('Team 2');
+  // Ensure we have all the ratings from the underlying dialogues
+  expect((topNode[0] as HexagonGroupNode).statistics?.voteCount).toBe(60);
 
-    expect(groups[1].type).toBe(HexagonNodeType.Group);
-    expect((groups[1] as HexagonGroupNode).label).toBe('Group U8 Female');
-    expect((groups[1] as HexagonGroupNode).subGroups).toHaveLength(2);
-    expect((groups[1] as HexagonGroupNode).subGroups[0].type).toBe(HexagonNodeType.Dialogue);
-    expect(((groups[1] as HexagonGroupNode).subGroups[0] as HexagonDialogueNode).dialogue.id).toBe('3');
-    expect((groups[1] as HexagonGroupNode).subGroups[1].type).toBe(HexagonNodeType.Dialogue);
-    expect(((groups[1] as HexagonGroupNode).subGroups[1] as HexagonDialogueNode).dialogue.id).toBe('4');
-    expect((groups[1] as HexagonGroupNode).subGroups[0].label).toBe('Team 1');
-    expect((groups[1] as HexagonGroupNode).subGroups[1].label).toBe('Team 2');
+  // Ensure we have no more than 4 sub-groups
+  expect((topNode[0] as HexagonGroupNode).subGroups).toHaveLength(4);
+  expect((topNode[0] as HexagonGroupNode).subGroups[0].type).toBe('Group');
+  expect((topNode[0] as HexagonGroupNode).subGroups[0].label).toBe('U8');
+
+  // Ensure our sub-groups have the correct number of votes
+  expect(((topNode[0] as HexagonGroupNode).subGroups[0] as HexagonGroupNode).statistics?.voteCount).toBe(15);
+
+  // Ensure we have no more than 3 sub-grups
+  expect(((topNode[0] as HexagonGroupNode).subGroups[0] as HexagonGroupNode).subGroups).toHaveLength(3);
+  expect(((topNode[0] as HexagonGroupNode).subGroups[0] as HexagonGroupNode).subGroups[0].type).toBe('Dialogue');
+  expect(((topNode[0] as HexagonGroupNode).subGroups[0] as HexagonGroupNode).subGroups[0].label).toBe('Team1');
+  expect(
+    (((
+      topNode[0] as HexagonGroupNode).subGroups[0] as HexagonGroupNode).subGroups[0] as HexagonDialogueNode
+    ).dialogue.title,
+  ).toBe('Male - U8 - Team1');
+});
+
+test('group fragments appropriately', () => {
+  const groups = parseDialogueGroup({
+    dialogueTitle: 'Male - U8 - Team1',
+    groupFragments: ['Male', 'U8', 'Team1'],
   });
+
+  expect(groups[0].groupName).toBe('Male');
+  expect(groups[0].groupFragments).toBe('Male');
+  expect(groups[0].height).toBe(2);
+  expect(groups[0].childGroupName).toBe('U8');
+  expect(groups[0].childGroupFragments).toBe('Male - U8');
+
+  expect(groups[1].groupName).toBe('U8');
+  expect(groups[1].groupFragments).toBe('Male - U8');
+  expect(groups[1].height).toBe(1);
+  expect(groups[1].childGroupName).toBe('Team1');
+  expect(groups[1].childGroupFragments).toBe('Male - U8 - Team1');
+
+  expect(groups[2].groupName).toBe('Team1');
+  expect(groups[2].groupFragments).toBe('Male - U8 - Team1');
+  expect(groups[2].height).toBe(0);
+  expect(groups[2].childGroupName).toBe(null);
+  expect(groups[2].childGroupFragments).toBe(null);
 });

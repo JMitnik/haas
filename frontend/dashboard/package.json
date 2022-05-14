@@ -86,7 +86,7 @@
     "start": "vite --host",
     "build": "tsc --noEmit && vite build",
     "serve": "vite preview",
-    "test": "react-scripts test",
+    "test": "jest --maxWorkers=0",
     "kill": "npx kill-port 3002",
     "start:msw": "REACT_APP_IS_MSW=true cra-workspaces start",
     "test:watch": "jest --watch --maxWorkers=0",

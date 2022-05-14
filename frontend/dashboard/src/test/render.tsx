@@ -1,7 +1,7 @@
-import { History, createMemoryHistory } from 'history';
 import { I18nextProvider } from 'react-i18next';
-import { MemoryRouter, Route, Router } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
+import { Route, Router } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
 // @eslint-ignore-next-line
 import { ApolloProvider } from '@apollo/client';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -29,7 +29,7 @@ export const TestProviders = ({ children, history }: TestProvidersProps) => (
     <QueryParamProvider ReactRouterRoute={Route}>
       <ApolloProvider client={client}>
         <UserProvider>
-          <CustomerProvider workspaceOverrideSlug="workspace_1">
+          <CustomerProvider workspaceOverrideSlug="workspace_1" __test__>
             <I18nextProvider i18n={lang}>
               <ThemeProvider>
                 <WorkspaceLayout>

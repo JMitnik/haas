@@ -4,6 +4,16 @@ export type Topic = GetDialogueTopics.Topic;
 export type Dialogue = GetWorkspaceDialogueStatistics.Dialogues;
 export type Session = GetSessionPaths.PathedSessions;
 
+export interface DialogueGroup {
+  groupFragments: string[];
+  dialogueTitle: string;
+}
+
+export interface HexagonGroupNodeStatics {
+  voteCount: number;
+  score: number;
+}
+
 /** Hexagon representing a Group node (layer above Dialogue) */
 export type HexagonGroupNode = {
   id: string;
@@ -12,7 +22,7 @@ export type HexagonGroupNode = {
   label: string;
   subGroups: HexagonGroupNode[] | HexagonDialogueNode[];
   subGroupType: HexagonNodeType;
-  depth: number;
+  statistics?: HexagonGroupNodeStatics;
   points?: string;
 };
 

@@ -13,6 +13,7 @@ interface HexagonItemProps {
   onZoom: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
   onMouseOver: (event: React.MouseEvent<SVGPolygonElement, MouseEvent>, node: HexagonNode) => void;
   onMouseExit?: () => void;
+  id?: string;
 }
 
 export const HexagonItem = ({
@@ -32,6 +33,8 @@ export const HexagonItem = ({
     <g>
       <g fill="blue">
         <polygon
+          aria-label={node.id}
+          role="button"
           strokeWidth={strokeWidth}
           points={points}
           stroke="white"
