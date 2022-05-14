@@ -3,22 +3,23 @@ import { meanBy, orderBy, uniqBy } from 'lodash';
 
 import {
   Dialogue,
+  DialogueGroup,
   HexagonDialogueNode,
   HexagonGroupNode,
+  HexagonGroupNodeStatics,
   HexagonNode,
   HexagonNodeType,
   HexagonViewMode,
 } from './WorkspaceGrid.types';
 
+/**
+ * Parse group names based on agreed dialogue standard.
+ * Example: "Fold 1 - Group 1 - Team 1" => Fold 1, Group 1, Team 1
+ */
 export const parseGroupNames = (title: string): string[] => {
   const groups = title.split('-').map((group) => group.trim());
   return groups;
 };
-
-interface DialogueGroup {
-  groupFragments: string[];
-  dialogueTitle: string;
-}
 
 interface GroupToChild {
   height: number;
@@ -29,6 +30,9 @@ interface GroupToChild {
   childGroupName: string | null;
 }
 
+/**
+ * Parses a dialogue-group into a list of group relations.
+ */
 export const parseDialogueGroup = (dialogueGroup: DialogueGroup): GroupToChild[] => (
   dialogueGroup.groupFragments.map((groupFragment, index) => ({
     height: dialogueGroup.groupFragments.length - index - 1,
@@ -73,6 +77,32 @@ export const calcGroupTotal = (group: HexagonGroupNode): number => {
 };
 
 /**
+ * Gets all dialogues belonging to a particular group.
+ *
+ * NOTE: This is very instable, as it only works for dialogues following the A - B - C pattern.
+ * TODO: Refactor this to work for any number of groups, and any dialogue titles.
+ */
+const filterDialogues = (groupFragments: string, dialogues: Dialogue[]): Dialogue[] => (
+  dialogues.filter((dialogue) => dialogue.title.startsWith(groupFragments))
+);
+
+/**
+ * Calculate statistics for a group node.
+ */
+export const calcGroupStatistics = (dialogues: Dialogue[]): HexagonGroupNodeStatics => {
+  const voteCount = dialogues.reduce<number>((acc, dialogue) => (
+    acc + (dialogue.dialogueStatisticsSummary?.nrVotes ?? 0)
+  ), 0);
+
+  const average = meanBy(dialogues, (dialogue) => dialogue.dialogueStatisticsSummary?.impactScore ?? 0);
+
+  return {
+    voteCount,
+    score: average,
+  };
+};
+
+/**
  * Traverses all dialogues based on a shared group-name.
  */
 export const recursiveBuildGroup = (
@@ -84,16 +114,10 @@ export const recursiveBuildGroup = (
 ): HexagonGroupNode | HexagonDialogueNode => {
   const groupToChilds = allGroups.filter((group) => group.groupFragments === groupFragments);
 
-  const numberVotes = groupToChilds.reduce<number>((acc, groupToChild) => {
-    const matchedDialogue = dialogues.find((dialogue) => dialogue.title === groupToChild.dialogueTitle);
-    if (!matchedDialogue) return acc;
+  // Ensure only unique groups are considered
+  const uniqueGroupToChilds = uniqBy(groupToChilds, 'childGroupFragments');
 
-    // @ts-ignore
-    return acc + matchedDialogue.dialogueStatisticsSummary?.nrVotes ?? 0;
-  }, 0 as number);
-
-  const uniqueGroupToChilds = uniqBy(groupToChilds, 'childGroupName');
-
+  // If no child groups, we are at the "dialogue title" level: return a dialogue node
   if (groupToChilds.length === 0 || groupToChilds[0].height === 0) {
     const relevantDialogue = dialogues.find((dialogue) => dialogue.title === dialogueTitle) as Dialogue;
 
@@ -107,11 +131,15 @@ export const recursiveBuildGroup = (
     } as HexagonDialogueNode;
   }
 
-  const group = {
+  const groupDialogues = filterDialogues(groupFragments, dialogues);
+  const groupStatistics = calcGroupStatistics(groupDialogues);
+
+  return {
     id: groupName,
     type: HexagonNodeType.Group,
     label: groupName,
-    nrVotes: numberVotes,
+    statistics: groupStatistics,
+    score: groupStatistics.score,
     subGroups: uniqueGroupToChilds.map((groupToChild) => recursiveBuildGroup(
       groupToChild.childGroupName!,
       groupToChild.childGroupFragments || '',
@@ -120,8 +148,6 @@ export const recursiveBuildGroup = (
       dialogues,
     )),
   } as HexagonGroupNode;
-
-  return { ...group, score: calcGroupAverage(group) };
 };
 
 export const dialogueToNode = (dialogue: Dialogue): HexagonNode => ({

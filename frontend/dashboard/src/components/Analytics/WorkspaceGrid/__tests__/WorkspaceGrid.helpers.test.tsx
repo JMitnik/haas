@@ -9,7 +9,7 @@ test('groups sub-groups appropriately without duplicate groups', () => {
   expect((topNode[0] as HexagonGroupNode).label).toBe('Male');
 
   // Ensure we have all the ratings from the underlying dialogues
-  expect((topNode[0] as HexagonGroupNode).nrVotes).toBe(60);
+  expect((topNode[0] as HexagonGroupNode).statistics?.voteCount).toBe(60);
 
   // Ensure we have no more than 4 sub-groups
   expect((topNode[0] as HexagonGroupNode).subGroups).toHaveLength(4);
@@ -17,7 +17,7 @@ test('groups sub-groups appropriately without duplicate groups', () => {
   expect((topNode[0] as HexagonGroupNode).subGroups[0].label).toBe('U8');
 
   // Ensure our sub-groups have the correct number of votes
-  expect(((topNode[0] as HexagonGroupNode).subGroups[0] as HexagonGroupNode).nrVotes).toBe(15);
+  expect(((topNode[0] as HexagonGroupNode).subGroups[0] as HexagonGroupNode).statistics?.voteCount).toBe(15);
 
   // Ensure we have no more than 3 sub-grups
   expect(((topNode[0] as HexagonGroupNode).subGroups[0] as HexagonGroupNode).subGroups).toHaveLength(3);
