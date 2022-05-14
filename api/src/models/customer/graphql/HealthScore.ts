@@ -1,4 +1,4 @@
-import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
+import { inputObjectType, objectType } from '@nexus/schema';
 
 export const HealthScoreInput = inputObjectType({
   name: 'HealthScoreInput',
@@ -14,6 +14,6 @@ export const HealthScore = objectType({
   definition(t) {
     t.float('score');
     t.int('nrVotes');
-  }
+  },
 });
 

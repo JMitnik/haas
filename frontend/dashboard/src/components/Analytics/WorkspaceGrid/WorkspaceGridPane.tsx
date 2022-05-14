@@ -15,6 +15,7 @@ import {
   HexagonState,
   HexagonTopicNode,
 } from './WorkspaceGrid.types';
+import { WorkspaceSummaryPane } from './SummaryPane/WorkspaceSummaryPane';
 import { getHexagonSVGFill, orderNodesByScore, orderNodesByVoteCount } from './WorkspaceGrid.helpers';
 
 interface WorkspaceGridPaneProps {
@@ -384,7 +385,9 @@ export const WorkspaceGridPane = ({ currentState }: WorkspaceGridPaneProps) => {
       );
     }
     default: {
-      return null;
+      return (
+        <WorkspaceSummaryPane currentState={currentState} />
+      );
     }
   }
 };

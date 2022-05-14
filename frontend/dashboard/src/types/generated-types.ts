@@ -546,6 +546,8 @@ export type Customer = {
   slug: Scalars['String'];
   name: Scalars['String'];
   settings?: Maybe<CustomerSettings>;
+  /** Workspace statistics */
+  statistics: WorkspaceStatistics;
   dialogueConnection?: Maybe<DialogueConnection>;
   automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
@@ -2680,6 +2682,37 @@ export type WorkspaceConditionScopeModel = {
   aggregate?: Maybe<ConditionPropertyAggregate>;
 };
 
+export type WorkspaceStatistics = {
+  __typename?: 'WorkspaceStatistics';
+  id: Scalars['ID'];
+  /** Gets the health score of the workspace */
+  health: HealthScore;
+  /** Get the path (sequence of topics) with the most changed impact score. */
+  mostChangedPath: MostChangedPath;
+  mostTrendingTopic?: Maybe<MostTrendingTopic>;
+  mostPopularPath?: Maybe<MostPopularPath>;
+};
+
+
+export type WorkspaceStatisticsHealthArgs = {
+  input?: Maybe<HealthScoreInput>;
+};
+
+
+export type WorkspaceStatisticsMostChangedPathArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+
+export type WorkspaceStatisticsMostTrendingTopicArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+
+export type WorkspaceStatisticsMostPopularPathArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
 export type GetDialogueTopicsQueryVariables = Exact<{
   dialogueId: Scalars['ID'];
   input: TopicInputType;
@@ -2743,6 +2776,49 @@ export type GetWorkspaceDialogueStatisticsQuery = (
         & Pick<DialogueStatisticsSummaryModel, 'id' | 'dialogueId' | 'impactScore' | 'nrVotes' | 'updatedAt'>
       )> }
     )>> }
+  )> }
+);
+
+export type GetWorkspaceSummaryDetailsQueryVariables = Exact<{
+  id?: Maybe<Scalars['ID']>;
+  summaryInput: DialogueStatisticsSummaryFilterInput;
+  healthInput: HealthScoreInput;
+}>;
+
+
+export type GetWorkspaceSummaryDetailsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { statistics: (
+      { __typename?: 'WorkspaceStatistics' }
+      & Pick<WorkspaceStatistics, 'id'>
+      & { health: (
+        { __typename?: 'HealthScore' }
+        & Pick<HealthScore, 'nrVotes' | 'score'>
+      ), mostTrendingTopic?: Maybe<(
+        { __typename?: 'MostTrendingTopic' }
+        & Pick<MostTrendingTopic, 'group' | 'impactScore' | 'path' | 'nrVotes'>
+      )>, mostChangedPath: (
+        { __typename?: 'MostChangedPath' }
+        & Pick<MostChangedPath, 'group'>
+        & { topNegativeChanged: Array<(
+          { __typename?: 'TopicDelta' }
+          & Pick<TopicDelta, 'topic' | 'percentageChanged' | 'averageCurrent' | 'averagePrevious' | 'delta' | 'group' | 'nrVotes'>
+        )>, topPositiveChanged: Array<(
+          { __typename?: 'TopicDelta' }
+          & Pick<TopicDelta, 'topic' | 'averageCurrent' | 'averagePrevious' | 'delta' | 'group' | 'percentageChanged'>
+        )> }
+      ), mostPopularPath?: Maybe<(
+        { __typename?: 'MostPopularPath' }
+        & Pick<MostPopularPath, 'group'>
+        & { path: Array<(
+          { __typename?: 'PathTopic' }
+          & Pick<PathTopic, 'depth' | 'impactScore' | 'nrVotes' | 'topic'>
+        )> }
+      )> }
+    ) }
   )> }
 );
 
@@ -3805,6 +3881,88 @@ export type GetWorkspaceDialogueStatisticsLazyQueryHookResult = ReturnType<typeo
 export type GetWorkspaceDialogueStatisticsQueryResult = Apollo.QueryResult<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>;
 export function refetchGetWorkspaceDialogueStatisticsQuery(variables?: GetWorkspaceDialogueStatisticsQueryVariables) {
       return { query: GetWorkspaceDialogueStatisticsDocument, variables: variables }
+    }
+export const GetWorkspaceSummaryDetailsDocument = gql`
+    query GetWorkspaceSummaryDetails($id: ID, $summaryInput: DialogueStatisticsSummaryFilterInput!, $healthInput: HealthScoreInput!) {
+  customer(id: $id) {
+    id
+    statistics {
+      id
+      health(input: $healthInput) {
+        nrVotes
+        score
+      }
+      mostTrendingTopic(input: $summaryInput) {
+        group
+        impactScore
+        path
+        nrVotes
+      }
+      mostChangedPath(input: $summaryInput) {
+        group
+        topNegativeChanged {
+          topic
+          percentageChanged
+          averageCurrent
+          averagePrevious
+          delta
+          group
+          nrVotes
+        }
+        topPositiveChanged {
+          topic
+          averageCurrent
+          averagePrevious
+          delta
+          group
+          percentageChanged
+        }
+      }
+      mostPopularPath(input: $summaryInput) {
+        group
+        path {
+          depth
+          impactScore
+          nrVotes
+          topic
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceSummaryDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceSummaryDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceSummaryDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceSummaryDetailsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      summaryInput: // value for 'summaryInput'
+ *      healthInput: // value for 'healthInput'
+ *   },
+ * });
+ */
+export function useGetWorkspaceSummaryDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>(GetWorkspaceSummaryDetailsDocument, options);
+      }
+export function useGetWorkspaceSummaryDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>(GetWorkspaceSummaryDetailsDocument, options);
+        }
+export type GetWorkspaceSummaryDetailsQueryHookResult = ReturnType<typeof useGetWorkspaceSummaryDetailsQuery>;
+export type GetWorkspaceSummaryDetailsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceSummaryDetailsLazyQuery>;
+export type GetWorkspaceSummaryDetailsQueryResult = Apollo.QueryResult<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>;
+export function refetchGetWorkspaceSummaryDetailsQuery(variables?: GetWorkspaceSummaryDetailsQueryVariables) {
+      return { query: GetWorkspaceSummaryDetailsDocument, variables: variables }
     }
 export const CreateCtaDocument = gql`
     mutation createCTA($input: CreateCTAInputType) {
@@ -5585,6 +5743,21 @@ export namespace GetWorkspaceDialogueStatistics {
   export type Dialogues = NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['dialogues']>)[number]>;
   export type DialogueStatisticsSummary = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['dialogues']>)[number]>['dialogueStatisticsSummary']>);
   export const Document = GetWorkspaceDialogueStatisticsDocument;
+}
+
+export namespace GetWorkspaceSummaryDetails {
+  export type Variables = GetWorkspaceSummaryDetailsQueryVariables;
+  export type Query = GetWorkspaceSummaryDetailsQuery;
+  export type Customer = (NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>);
+  export type Statistics = (NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>);
+  export type Health = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['health']>);
+  export type MostTrendingTopic = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['mostTrendingTopic']>);
+  export type MostChangedPath = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['mostChangedPath']>);
+  export type TopNegativeChanged = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['mostChangedPath']>)['topNegativeChanged']>)[number]>;
+  export type TopPositiveChanged = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['mostChangedPath']>)['topPositiveChanged']>)[number]>;
+  export type MostPopularPath = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['mostPopularPath']>);
+  export type Path = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['mostPopularPath']>)['path']>)[number]>;
+  export const Document = GetWorkspaceSummaryDetailsDocument;
 }
 
 export namespace DeliveryEventFragment {

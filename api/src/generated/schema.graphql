@@ -517,6 +517,9 @@ type Customer {
   roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
+
+  """Workspace statistics"""
+  statistics: WorkspaceStatistics!
   userCustomer(userId: String): UserCustomer
   users: [UserType!]
   usersConnection(customerSlug: String, filter: UserConnectionFilterInput): UserConnection
@@ -2025,4 +2028,19 @@ type WorkspaceConditionScopeModel {
   createdAt: Date!
   id: ID!
   updatedAt: Date!
+}
+
+type WorkspaceStatistics {
+  """Gets the health score of the workspace"""
+  health(input: HealthScoreInput): HealthScore!
+  id: ID!
+
+  """
+  
+          Get the path (sequence of topics) with the most changed impact score.
+        
+  """
+  mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath!
+  mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
 }

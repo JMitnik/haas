@@ -4,6 +4,7 @@ import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-expres
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
+import { WorkspaceStatistics } from './WorkspaceStatistics';
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../../questionnaire/Dialogue';
 import { UserConnection } from '../../users/graphql/User';
@@ -41,6 +42,20 @@ export const CustomerType = objectType({
         return customerSettings;
       },
     });
+
+    /**
+     * Workspace-statistics
+     * - Note: These statistics share the same ID as the Workspace / Customer.
+     */
+    t.field('statistics', {
+      type: WorkspaceStatistics,
+      description: 'Workspace statistics',
+
+      resolve: async (parent) => {
+        return { id: parent.id }
+      },
+    })
+
 
     t.field('dialogueConnection', {
       type: DialogueConnection,
@@ -109,14 +124,13 @@ export const CustomerType = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
         }
 
-
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
           parent.id,
           utcStartDateTime as Date,
           utcEndDateTime,
           threshold || undefined,
         );
-      }
+      },
     });
 
     t.field('nestedMostPopular', {
