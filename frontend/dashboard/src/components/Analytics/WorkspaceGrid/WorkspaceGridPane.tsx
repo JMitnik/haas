@@ -94,6 +94,31 @@ export const GroupPane = ({ currentState }: WorkspaceGridPaneProps) => {
                   </PieChart>
                 </UI.Div>
               </UI.Flex>
+              <UI.Div
+                position="relative"
+                width="150px"
+                height="150px"
+                flexDirection="column"
+                display="flex"
+              >
+                <UI.Div
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  position="absolute"
+                  top="50%"
+                  left="50%"
+                  style={{ transform: 'translate(-50%, -50%)' }}
+                >
+                  <UI.Div>Score</UI.Div>
+                  <UI.Div>86</UI.Div>
+                </UI.Div>
+                <LS.HealthMeterBase>
+                  <circle id="base" cx="75" cy="75" r="70" />
+                  <circle id="value" cx="75" cy="75" r="70" />
+                </LS.HealthMeterBase>
+              </UI.Div>
             </UI.Div>
           </UI.Grid>
         </UI.Flex>

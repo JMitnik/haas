@@ -2,6 +2,32 @@ import * as UI from '@haas/ui';
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 
+export const HealthMeterBase = styled.svg`
+   ${({ theme }) => css`
+    fill: transparent;
+    position: relative;
+
+  #base {
+    stroke: lightgrey;
+    stroke-width: 10;
+  }
+
+  #value {
+    stroke: ${theme.colors.main['500']};
+    stroke-width: 10;
+    stroke-dasharray: 1200;
+    stroke-dashoffset: 1090; // Every 110 less compared to 1200 is 25% more drawn 😬
+    /* animation: rotate 5s linear infinite; */
+  }
+  `}
+
+  @keyframes rotate {
+    to {
+      stroke-dashoffset: 0;
+    }
+}
+`;
+
 export const WorkspaceGridAdapterContainer = styled(UI.Div)`
   ${({ theme }) => css`
     border-radius: 20px;
