@@ -37,9 +37,8 @@ class SessionService {
   countTopicsFromSessions(sessions: SessionWithEntries[]): Record<string, TopicCount> {
     const topicCount = sessions.reduce((acc, session) => {
       const topics = session.nodeEntries.map(nodeEntry => nodeEntry.choiceNodeEntry?.value).filter(isPresent);
-
       topics.forEach((topic) => {
-        let count = 0;
+        let count = 1;
         let relatedTopics = topics;
         let dialogueIds = [session.dialogueId];
         let score = session.mainScore;
