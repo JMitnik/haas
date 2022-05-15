@@ -169,7 +169,7 @@ interface NewCardProps {
 
 export const NewCard = styled(Div) <NewCardProps>`
   ${({ theme, hasHover, boxShadow = 'md', bg = 'white' }) => css`
-    background: ${theme.colors[bg]};
+    background: ${theme.colors[bg]}; // @ts-ignore
     border-radius: ${theme.borderRadiuses.md}px;
     box-shadow: ${theme.boxShadows[boxShadow]};
     transition: all ${theme.transitions.normal};

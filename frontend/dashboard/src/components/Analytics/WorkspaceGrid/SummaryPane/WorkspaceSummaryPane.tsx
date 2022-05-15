@@ -12,7 +12,7 @@ import { ProgressCircle } from './ProgressCircle';
 import { SummaryPaneProps } from './WorkspaceSummaryPane.types';
 import { getColorScoreBrand, getHexagonSVGFill } from '../WorkspaceGrid.helpers';
 
-export const WorkspaceSummaryPane = ({ currentState }: SummaryPaneProps) => {
+export const WorkspaceSummaryPane = ({ currentState, onDialogueChange }: SummaryPaneProps) => {
   const { activeCustomer } = useCustomer();
   const { getTomorrow, getStartOfWeek, format } = useDate();
   const { formatFractionToPercentage } = useFormatter();
@@ -51,7 +51,7 @@ export const WorkspaceSummaryPane = ({ currentState }: SummaryPaneProps) => {
 
   return (
     <UI.Div mt={4}>
-      <UI.H2 fontWeight={600} mb={4} color="main.500">Club hades</UI.H2>
+      <UI.H2 fontWeight={600} mb={4} color="off.500">Club hades</UI.H2>
 
       <UI.Grid gridTemplateColumns="1fr">
 
@@ -173,7 +173,7 @@ export const WorkspaceSummaryPane = ({ currentState }: SummaryPaneProps) => {
                       </UI.Text>
                     </UI.Div>
 
-                    <UI.Div color="red.100" mt={3} display="flex" alignItems="center">
+                    <UI.Div onClick={async () => await onDialogueChange?.(urgentPath.dialogue?.id || '')} color="red.100" mt={3} display="flex" alignItems="center">
                       <UI.Icon color="red.200" mr={2} fontSize={0.8}>
                         <ArrowRightCircle />
                       </UI.Icon>

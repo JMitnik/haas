@@ -64,6 +64,9 @@ export const WorkspaceGrid = ({
   });
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
 
+  /**
+   * If the current state has a DialogueNode, then sets the dialogueNode.
+   */
   const activeDialogue = useMemo(() => {
     const activeNode = stateHistoryStack.find((state) => state.selectedNode?.type === HexagonNodeType.Dialogue);
     return (activeNode?.selectedNode as HexagonDialogueNode)?.dialogue || undefined;
@@ -78,6 +81,9 @@ export const WorkspaceGrid = ({
     hideTooltip,
   } = useTooltip<HexagonNode>();
 
+  /**
+   * Shows the tooltip for a hexagon.
+   */
   const handleMouseOverHex = (event: React.MouseEvent<SVGPolygonElement, MouseEvent>, node: HexagonNode) => {
     const point = localPoint(event);
 
@@ -93,7 +99,10 @@ export const WorkspaceGrid = ({
 
   const handleMouseOutHex = () => hideTooltip();
 
-  const handleZoominLevel = async (currentZoomHelper: ProvidedZoom<SVGElement>, clickedNode: HexagonNode) => {
+  /**
+   * If a user clicks on a hex.
+   */
+  const handleHexClick = async (currentZoomHelper: ProvidedZoom<SVGElement>, clickedNode: HexagonNode) => {
     hideTooltip();
 
     if (currentState.viewMode === HexagonViewMode.Final) return;
@@ -181,6 +190,17 @@ export const WorkspaceGrid = ({
         viewMode: initialViewMode,
       });
     }
+  };
+
+  const jumpToDialogue = async (dialogueId: string, topics?: string[]) => {
+    if (!onLoadData) return;
+
+    const [sessions, viewMode] = await onLoadData({
+      dialogueId,
+      topics,
+    });
+
+    setCurrentState({ childNodes: sessions, viewMode });
   };
 
   return (
@@ -273,7 +293,7 @@ export const WorkspaceGrid = ({
                                       onMouseExit={handleMouseOutHex}
                                       score={node.score}
                                       zoomHelper={zoom}
-                                      onZoom={handleZoominLevel}
+                                      onZoom={handleHexClick}
                                     />
                                   ))}
                                 </Group>
@@ -319,7 +339,7 @@ export const WorkspaceGrid = ({
         </UI.Div>
 
         <UI.Div px={2} mt={2}>
-          <WorkspaceGridPane currentState={currentState} />
+          <WorkspaceGridPane currentState={currentState} onDialogueChange={jumpToDialogue} />
         </UI.Div>
       </UI.Grid>
 

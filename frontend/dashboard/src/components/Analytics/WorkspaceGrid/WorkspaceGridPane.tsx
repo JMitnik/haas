@@ -20,6 +20,7 @@ import { getHexagonSVGFill, orderNodesByScore, orderNodesByVoteCount } from './W
 
 interface WorkspaceGridPaneProps {
   currentState: HexagonState;
+  onDialogueChange?: any;
 }
 
 export const GroupPane = ({ currentState }: WorkspaceGridPaneProps) => {
@@ -352,7 +353,7 @@ export const SessionPane = ({ currentState }: WorkspaceGridPaneProps) => {
   );
 };
 
-export const WorkspaceGridPane = ({ currentState }: WorkspaceGridPaneProps) => {
+export const WorkspaceGridPane = ({ currentState, onDialogueChange }: WorkspaceGridPaneProps) => {
   const currentStateType = currentState?.currentNode?.type || undefined;
 
   switch (currentStateType) {
@@ -386,7 +387,7 @@ export const WorkspaceGridPane = ({ currentState }: WorkspaceGridPaneProps) => {
     }
     default: {
       return (
-        <WorkspaceSummaryPane currentState={currentState} />
+        <WorkspaceSummaryPane currentState={currentState} onDialogueChange={onDialogueChange} />
       );
     }
   }
