@@ -123,6 +123,14 @@ export const CardBody = styled(Div)`
   `}
 `;
 
+export const CardBodyLarge = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter * 1.25}px;
+    flex-grow: 1;
+    position: relative;
+  `}
+`;
+
 export const CardFooter = styled(Div)`
   ${({ theme }) => css`
     padding: 8px ${theme.gutter * 0.75}px;
@@ -160,8 +168,8 @@ interface NewCardProps {
 }
 
 export const NewCard = styled(Div) <NewCardProps>`
-  ${({ theme, hasHover, boxShadow = 'md' }) => css`
-    background: ${theme.colors.white};
+  ${({ theme, hasHover, boxShadow = 'md', bg = 'white' }) => css`
+    background: ${theme.colors[bg]};
     border-radius: ${theme.borderRadiuses.md}px;
     box-shadow: ${theme.boxShadows[boxShadow]};
     transition: all ${theme.transitions.normal};

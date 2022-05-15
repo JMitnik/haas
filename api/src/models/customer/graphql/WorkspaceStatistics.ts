@@ -1,5 +1,6 @@
 import { objectType } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
+import { DialogueImpactScore } from '@prisma/client';
 
 import { BasicStatistics } from './BasicStatistics';
 import { UrgentPath } from './UrgentPath';
@@ -11,8 +12,6 @@ import {
 } from '../../questionnaire/DialogueStatisticsResolver';
 import { isValidDateTime } from '../../../utils/isValidDate';
 import { HealthScore, HealthScoreInput } from './HealthScore';
-import formatDate from '../../../utils/formatDate';
-import { DialogueImpactScore } from '@prisma/client';
 
 export const WorkspaceStatistics = objectType({
   name: 'WorkspaceStatistics',
@@ -28,16 +27,28 @@ export const WorkspaceStatistics = objectType({
       type: BasicStatistics,
       args: { input: DialogueStatisticsSummaryFilterInput },
       description: 'Basic statistics of a workspace (e.g. number of responses, average general score, etc)',
-      resolve: async (parent, args, ctx) => (
-        ctx.services.dialogueStatisticsService.calculateWorkspaceBasicStatistics(
+      resolve: async (parent, args, ctx) => {
+        if (!args.input) throw new UserInputError('Not input object!');
+        const { startDateTime, endDateTime } = args.input;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (startDateTime) {
+          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
+        }
+
+        if (endDateTime) {
+          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.calculateWorkspaceBasicStatistics(
           parent.id,
           DialogueImpactScore.AVERAGE,
-          // TODO: Add validator in middleware field
-          formatDate(args?.input?.startDateTime || ''), // @ts-ignore
-          formatDate(args?.input?.endDateTime || ''), // @ts-ignore
-          args.input.refresh
-        )
-      ),
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
+      },
     });
 
     /**
@@ -80,19 +91,34 @@ export const WorkspaceStatistics = objectType({
       useParentResolve: true,
       // TODO: Middleware for validation
 
-      resolve: async (parent, args, ctx) => (
-        ctx.services.dialogueStatisticsService.calculateUrgentPath(
-          parent.id,
-          // TODO: Add validator in middleware field
-          formatDate(args?.input?.startDateTime || ''), // @ts-ignore
-          formatDate(args?.input?.endDateTime || ''), // @ts-ignore
-        )
-      ),
+      resolve: async (parent, args, ctx) => {
+        if (!args.input) throw new UserInputError('Not input object!');
+        const { startDateTime, endDateTime } = args.input;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (startDateTime) {
+          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
+        }
+
+        if (endDateTime) {
+          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE') as Date;
+        }
+
+        return (
+          ctx.services.dialogueStatisticsService.calculateUrgentPath(
+            parent.id,
+            // TODO: Add validator in middleware field
+            utcStartDateTime as Date,
+            utcEndDateTime as Date,
+          )
+        );
+      },
     })
 
     /**
-     * Get the path (sequence of topics) with the most changed impact score.
-     */
+ * Get the path (sequence of topics) with the most changed impact score.
+ */
     t.field('mostChangedPath', {
       type: MostChangedPath,
       args: { input: DialogueStatisticsSummaryFilterInput },
@@ -129,8 +155,8 @@ export const WorkspaceStatistics = objectType({
     });
 
     /**
-     * Get the path (sequence of topics) with the most changed impact score.
-     */
+ * Get the path (sequence of topics) with the most changed impact score.
+ */
     t.field('mostTrendingTopic', {
       type: MostTrendingTopic,
       nullable: true,
@@ -164,8 +190,8 @@ export const WorkspaceStatistics = objectType({
     });
 
     /**
-     * Get the path that has been visited the most by all users.
-     */
+ * Get the path that has been visited the most by all users.
+ */
     t.field('mostPopularPath', {
       type: MostPopularPath,
       nullable: true,
