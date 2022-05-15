@@ -1808,6 +1808,13 @@ export type PaginationWhereInput = {
   orderBy?: Maybe<Array<PaginationSortInput>>;
 };
 
+/** A path is the traversal of topics in a dialogue. */
+export type Path = {
+  __typename?: 'Path';
+  id: Scalars['ID'];
+  topicStrings: Array<Scalars['String']>;
+};
+
 export type PathedSessionsInput = {
   path: Array<Scalars['String']>;
   startDateTime: Scalars['String'];
@@ -2569,6 +2576,15 @@ export type UploadSellImageInputType = {
   workspaceId?: Maybe<Scalars['String']>;
 };
 
+/** An urgent path is a path which was considered urgent */
+export type UrgentPath = {
+  __typename?: 'UrgentPath';
+  id: Scalars['ID'];
+  path: Path;
+  voteCount: Scalars['Int'];
+  score: Scalars['Float'];
+};
+
 export type UserConnection = ConnectionInterface & {
   __typename?: 'UserConnection';
   totalPages?: Maybe<Scalars['Int']>;
@@ -2687,6 +2703,8 @@ export type WorkspaceStatistics = {
   id: Scalars['ID'];
   /** Gets the health score of the workspace */
   health: HealthScore;
+  /** Returns potentially the most urgent path of the workspace (one at most) */
+  urgentPath?: Maybe<UrgentPath>;
   /** Get the path (sequence of topics) with the most changed impact score. */
   mostChangedPath: MostChangedPath;
   mostTrendingTopic?: Maybe<MostTrendingTopic>;
@@ -2696,6 +2714,11 @@ export type WorkspaceStatistics = {
 
 export type WorkspaceStatisticsHealthArgs = {
   input?: Maybe<HealthScoreInput>;
+};
+
+
+export type WorkspaceStatisticsUrgentPathArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
 

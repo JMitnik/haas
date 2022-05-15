@@ -1,6 +1,8 @@
 import { objectType } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
 
+import { BasicStatistics } from './BasicStatistics';
+import { UrgentPath } from './UrgentPath';
 import {
   DialogueStatisticsSummaryFilterInput,
   MostChangedPath,
@@ -9,6 +11,8 @@ import {
 } from '../../questionnaire/DialogueStatisticsResolver';
 import { isValidDateTime } from '../../../utils/isValidDate';
 import { HealthScore, HealthScoreInput } from './HealthScore';
+import formatDate from '../../../utils/formatDate';
+import { DialogueImpactScore } from '@prisma/client';
 
 export const WorkspaceStatistics = objectType({
   name: 'WorkspaceStatistics',
@@ -16,6 +20,25 @@ export const WorkspaceStatistics = objectType({
   definition(t) {
     // This ID is the same as the ID of the Customer / Workspace
     t.id('id');
+
+    /**
+     * Basic stats about the workspace
+     */
+    t.field('basicStats', {
+      type: BasicStatistics,
+      args: { input: DialogueStatisticsSummaryFilterInput },
+      description: 'Basic statistics of a workspace (e.g. number of responses, average general score, etc)',
+      resolve: async (parent, args, ctx) => (
+        ctx.services.dialogueStatisticsService.calculateWorkspaceBasicStatistics(
+          parent.id,
+          DialogueImpactScore.AVERAGE,
+          // TODO: Add validator in middleware field
+          formatDate(args?.input?.startDateTime || ''), // @ts-ignore
+          formatDate(args?.input?.endDateTime || ''), // @ts-ignore
+          args.input.refresh
+        )
+      ),
+    });
 
     /**
      * Get the health score of a workspace.
@@ -48,6 +71,24 @@ export const WorkspaceStatistics = objectType({
         );
       },
     });
+
+    t.field('urgentPath', {
+      type: UrgentPath,
+      args: { input: DialogueStatisticsSummaryFilterInput },
+      description: 'Returns potentially the most urgent path of the workspace (one at most)',
+      nullable: true,
+      useParentResolve: true,
+      // TODO: Middleware for validation
+
+      resolve: async (parent, args, ctx) => (
+        ctx.services.dialogueStatisticsService.calculateUrgentPath(
+          parent.id,
+          // TODO: Add validator in middleware field
+          formatDate(args?.input?.startDateTime || ''), // @ts-ignore
+          formatDate(args?.input?.endDateTime || ''), // @ts-ignore
+        )
+      ),
+    })
 
     /**
      * Get the path (sequence of topics) with the most changed impact score.

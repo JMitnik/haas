@@ -223,6 +223,15 @@ type AWSImageType {
   url: String
 }
 
+"""Basic statistics for a general statistics"""
+type BasicStatistics {
+  """Average value of summarizable statistic"""
+  average: Float!
+
+  """Number of responses"""
+  responseCount: Int!
+}
+
 """Campaign"""
 type CampaignType {
   deliveryConnection(filter: DeliveryConnectionFilterInput): DeliveryConnectionType
@@ -1326,6 +1335,12 @@ input PaginationWhereInput {
   startDate: String
 }
 
+"""A path is the traversal of topics in a dialogue."""
+type Path {
+  id: ID!
+  topicStrings: [String!]!
+}
+
 input PathedSessionsInput {
   endDateTime: String
   path: [String!]!
@@ -1927,6 +1942,22 @@ input UploadSellImageInputType {
   workspaceId: String
 }
 
+"""
+
+    An urgent path is a path which was considered urgent. It currently follows a simple heuristic:
+    1. Get all sessions of the workspace.
+    2. Find sessions with a score below 4. If there is no such session, then no urgency is reported.
+    3. Find the topic that has the most negative responses.
+  
+"""
+type UrgentPath {
+  basicStats: BasicStatistics!
+  dialogue: Dialogue
+  dialogueId: String!
+  id: ID!
+  path: Path!
+}
+
 type UserConnection implements ConnectionInterface {
   pageInfo: PaginationPageInfo!
   totalPages: Int
@@ -2031,6 +2062,11 @@ type WorkspaceConditionScopeModel {
 }
 
 type WorkspaceStatistics {
+  """
+  Basic statistics of a workspace (e.g. number of responses, average general score, etc)
+  """
+  basicStats(input: DialogueStatisticsSummaryFilterInput): BasicStatistics!
+
   """Gets the health score of the workspace"""
   health(input: HealthScoreInput): HealthScore!
   id: ID!
@@ -2043,4 +2079,9 @@ type WorkspaceStatistics {
   mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath!
   mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+
+  """
+  Returns potentially the most urgent path of the workspace (one at most)
+  """
+  urgentPath(input: DialogueStatisticsSummaryFilterInput): UrgentPath
 }

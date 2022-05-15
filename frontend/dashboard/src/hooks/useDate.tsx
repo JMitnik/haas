@@ -8,5 +8,6 @@ export enum DateFormat {
 export const useDate = () => ({
   format: (date: Date, format: DateFormat = DateFormat.DayFormat) => dateFormat(date, format),
   getNow: () => new Date(),
+  getTomorrow: () => sub(new Date(), { days: -1 }),
   getStartOfWeek: () => sub(new Date(), { weeks: 1 }),
 });

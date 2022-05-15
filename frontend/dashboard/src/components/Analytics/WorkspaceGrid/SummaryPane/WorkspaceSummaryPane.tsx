@@ -10,19 +10,20 @@ import { SummaryPaneProps } from './WorkspaceSummaryPane.types';
 
 export const WorkspaceSummaryPane = ({ currentState }: SummaryPaneProps) => {
   const { activeCustomer } = useCustomer();
-  const { getNow, getStartOfWeek, format } = useDate();
+  const { getTomorrow, getStartOfWeek, format } = useDate();
 
   const { data, loading } = useGetWorkspaceSummaryDetailsQuery({
     variables: {
       id: activeCustomer?.id,
       healthInput: {
         startDateTime: format(getStartOfWeek(), DateFormat.DayFormat),
-        endDateTime: format(getNow(), DateFormat.DayFormat),
+        endDateTime: format(getTomorrow(), DateFormat.DayFormat),
       },
       summaryInput: {
         impactType: DialogueImpactScoreType.Average,
         startDateTime: format(getStartOfWeek(), DateFormat.DayFormat),
-        endDateTime: format(getNow(), DateFormat.DayFormat),
+        endDateTime: format(getTomorrow(), DateFormat.DayFormat),
+        refresh: true,
       },
     },
   });

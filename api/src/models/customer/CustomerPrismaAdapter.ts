@@ -13,8 +13,17 @@ export class CustomerPrismaAdapter {
   }
 
   /**
+   * Fetches all dialogues
+   */
+  async getDialogues(workspaceId: string) {
+    return this.prisma.dialogue.findMany({
+      where: { customerId: workspaceId },
+    });
+  }
+
+  /**
    * Find all the private dialogues within a workspace
-   * @param workspaceId 
+   * @param workspaceId
    * @returns a list of private dialogues
    */
   findPrivateDialoguesOfWorkspace = async (workspaceId?: string, workspaceSlug?: string) => {

@@ -5,3 +5,4 @@ export * from './DialogueStatisticsSummary';
 export * from './SetDialoguePrivacyResolver';
 export * from './DialogueLinksResolver';
 export * from './DialogueStatisticsResolver';
+export * from './graphql/Path';
