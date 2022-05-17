@@ -15,6 +15,10 @@ const language = {
       en: 'Create automation',
       de: 'Automatisierung erstellen',
     },
+    automation: {
+      en: 'Automation',
+      de: 'Automatisierung',
+    },
     automations: {
       en: 'Automations',
       de: 'Automatisierungen',

@@ -94,7 +94,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
 
           <UI.Div>
             <Searchbar
-              search=""
+              search={filter.search}
               onSearchChange={(search) => {
                 setFilter((prevValues) => ({
                   ...prevValues,
@@ -109,8 +109,8 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
       <UI.ViewBody>
         <UI.Grid
           gridGap={4}
-          gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(250px, 1fr))']}
-          gridAutoRows="minmax(300px, 1fr)"
+          gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
+          gridAutoRows="minmax(200px, 1fr)"
         >
           {filteredAutomations?.map((automation, index) => automation && (
             <AutomationCard key={index} automation={automation} />

@@ -1,3 +1,4 @@
+import * as Dropdown from 'components/Common/Dropdown';
 import * as UI from '@haas/ui';
 import { Activity, Bell, Briefcase } from 'react-feather';
 import {
@@ -8,7 +9,7 @@ import {
 import { formatDistance } from 'date-fns';
 import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 import {
   AutomationModel,
@@ -76,6 +77,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { activeCustomer } = useCustomer();
   const { canAccessAdmin, canUpdateAutomations } = useAuth();
+  const [openDropdown, setIsOpenDropdown] = useState(false);
   const { goToEditAutomationView } = useNavigator();
   const ref = useRef(null);
   const { t } = useTranslation();
@@ -159,10 +161,11 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
   const lastUpdated = automation.updatedAt ? new Date(Number.parseInt(automation.updatedAt, 10)) : null;
 
   return (
-    <UI.Card
+    <UI.NewCard
       ref={ref}
       data-cy="AutomationCard"
       bg="white"
+      hasHover
       useFlex
       flexDirection="column"
       position="relative"
@@ -244,14 +247,20 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
                 </UI.Div>
                 <UI.Div>
                   {(canAccessAdmin || canUpdateAutomations) && (
-                    <ShowMoreButton
-                      renderMenu={(
-                        <AutomationCardOptionsOverlay
-                          onDelete={handleDeleteAutomation}
-                          onEdit={goToEditAutomation}
-                        />
-                      )}
-                    />
+                    <UI.Div onClick={(e) => e.stopPropagation()} ml={2} position="relative">
+                      <Dropdown.Root open={openDropdown} onOpenChange={setIsOpenDropdown}>
+                        <Dropdown.Trigger asChild>
+                          <ShowMoreButton />
+                        </Dropdown.Trigger>
+
+                        <Dropdown.Content open={openDropdown}>
+                          <Dropdown.Label>{t('automation')}</Dropdown.Label>
+                          <Dropdown.Item onClick={(e) => goToEditAutomation(e)}>{t('edit')}</Dropdown.Item>
+                          <UI.Hr />
+                          <Dropdown.Item onClick={(e) => handleDeleteAutomation(e)}>{t('delete')}</Dropdown.Item>
+                        </Dropdown.Content>
+                      </Dropdown.Root>
+                    </UI.Div>
                   )}
                 </UI.Div>
               </UI.Flex>
@@ -261,7 +270,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
         </UI.ColumnFlex>
 
       </UI.CardBody>
-    </UI.Card>
+    </UI.NewCard>
   );
 };
 
