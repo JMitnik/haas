@@ -173,7 +173,14 @@ export const WorkspaceSummaryPane = ({ currentState, onDialogueChange }: Summary
                       </UI.Text>
                     </UI.Div>
 
-                    <UI.Div onClick={async () => await onDialogueChange?.(urgentPath.dialogue?.id || '')} color="red.100" mt={3} display="flex" alignItems="center">
+                    <UI.Div
+                      style={{ cursor: 'pointer' }}
+                      onClick={async () => await onDialogueChange?.(urgentPath.dialogue?.id || '')}
+                      color="red.100"
+                      mt={3}
+                      display="flex"
+                      alignItems="center"
+                    >
                       <UI.Icon color="red.200" mr={2} fontSize={0.8}>
                         <ArrowRightCircle />
                       </UI.Icon>

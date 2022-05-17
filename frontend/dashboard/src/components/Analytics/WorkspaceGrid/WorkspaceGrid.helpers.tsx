@@ -113,7 +113,6 @@ export const recursiveBuildGroup = (
   dialogues: Dialogue[],
 ): HexagonGroupNode | HexagonDialogueNode => {
   const groupToChilds = allGroups.filter((group) => group.groupFragments === groupFragments);
-
   // Ensure only unique groups are considered
   const uniqueGroupToChilds = uniqBy(groupToChilds, 'childGroupFragments');
 
@@ -168,6 +167,7 @@ export const groupsFromDialogues = (dialogues: Dialogue[]): HexagonNode[] => {
   }));
 
   const groupToChild: GroupToChild[] = dialogueGroups.flatMap(parseDialogueGroup);
+
   const maxHeight = Math.max(...groupToChild.map((group) => group.height));
 
   if (maxHeight === 0) return dialogues.map((dialogue) => dialogueToNode(dialogue));
