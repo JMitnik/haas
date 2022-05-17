@@ -1,7 +1,7 @@
 ###
 # Base: Prep our base image
 ###
-FROM node:16-alpine AS base
+FROM node:lts AS base
 ENV PORT 4000
 
 RUN apk add --update openssl
@@ -13,6 +13,8 @@ WORKDIR /app
 # Production Builder: Prep an image containing a production-ready build
 ###
 FROM base as prodBuilder
+
+RUN apk --no-cache add --virtual .builds-deps build-base python3
 
 # Copy package and install production deps (these will be put later in final image)
 COPY ./package.json tsconfig.json schema.prisma  ./
