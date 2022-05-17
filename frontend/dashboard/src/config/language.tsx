@@ -1139,10 +1139,6 @@ const language = {
       en: 'Edit',
       de: 'Bestätigen',
     },
-    add_dialogue: {
-      en: 'Add dialogue',
-      de: 'Füge einen Dialog hinzu',
-    },
     add_call_to_action: {
       en: 'Add Call-to-Action',
       de: 'Call-to-Action hinzufügen',

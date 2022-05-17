@@ -18,6 +18,7 @@ export interface HexagonGroupNodeStatics {
 export type HexagonGroupNode = {
   id: string;
   score: number;
+  nrVotes: number;
   type: HexagonNodeType.Group;
   label: string;
   subGroups: HexagonGroupNode[] | HexagonDialogueNode[];

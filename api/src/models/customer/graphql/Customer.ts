@@ -258,7 +258,7 @@ export const CustomerType = objectType({
           utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
         }
 
-        return ctx.services.customerService.findNestedDialogueStatisticsSummary(
+        return ctx.services.dialogueStatisticsService.findNestedDialogueStatisticsSummary(
           parent.id,
           args.input.impactType,
           utcStartDateTime as Date,
