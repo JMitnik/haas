@@ -229,7 +229,7 @@ export const WorkspaceGrid = ({
    * @param states a list of HexagonState[] entries representing the HistoryStack
    * @returns a HistoryStack based on the provided HexagonNode IDs
    */
-  const recursiveReconstruct = (
+  const pathToHistoryStack = (
     data: HexagonNode[],
     path: string[],
     states: HexagonState[] = [],
@@ -261,18 +261,24 @@ export const WorkspaceGrid = ({
     }
 
     // Continue adding HistoryStack entries until we run out of HexagonNode IDs
-    return recursiveReconstruct(
+    return pathToHistoryStack(
       (groupNode as HexagonGroupNode)?.subGroups || [] as any,
       path,
       states,
     );
   };
 
-  const reconstructHistoryState = (dialogueId: string, data: HexagonNode[]): HexagonState[] => {
+  /**
+   * Finds path (HexagonNode ID[]) to a dialogue hexagon node and uses that to reconstruct a History Stack
+   * @param dialogueId the ID of a dialogue
+   * @param data HexagonNode data set
+   * @returns a HistoryStack
+   */
+  const reconstructHistoryStack = (dialogueId: string, data: HexagonNode[]): HexagonState[] => {
     const path = findDialoguePath(dialogueId, data);
     if (!path) return [];
 
-    return recursiveReconstruct(
+    return pathToHistoryStack(
       data,
       path,
     );
@@ -286,7 +292,7 @@ export const WorkspaceGrid = ({
       topics,
     });
 
-    const reconstructedHistoryStack = reconstructHistoryState(dialogueId, initialData);
+    const reconstructedHistoryStack = reconstructHistoryStack(dialogueId, initialData);
     setStateHistoryStack(reconstructedHistoryStack);
 
     setCurrentState({ childNodes: sessions, viewMode });
