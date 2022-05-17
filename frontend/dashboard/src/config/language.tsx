@@ -19,6 +19,14 @@ const language = {
       en: 'Automations',
       de: 'Automatisierungen',
     },
+    automations_subtitle: {
+      en: 'View, edit, and create automations',
+      de: 'Automatisierungen anzeigen, bearbeiten und erstellen',
+    },
+    no_automations_found: {
+      en: 'We could not find any automations with the current filters.',
+      de: 'We could not find any automations with the current filters.',
+    },
     create_demo_data: {
       en: 'Generate prefilled data',
       de: 'Verwenden Sie Demodaten',

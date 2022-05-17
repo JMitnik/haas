@@ -1,14 +1,12 @@
 import * as UI from '@haas/ui';
-import { Button, ButtonGroup } from '@chakra-ui/core';
-import { Div, Flex, Grid, H4, ViewTitle } from '@haas/ui';
-import { Grid as GridIcon, List, Plus } from 'react-feather';
-import { Link, useParams } from 'react-router-dom';
 import {
   NumberParam,
   StringParam,
   useQueryParams,
   withDefault,
 } from 'use-query-params';
+import { Plus } from 'react-feather';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -18,11 +16,11 @@ import {
   AutomationConnectionOrderType,
   useAutomationConnectionQuery,
 } from 'types/generated-types';
+import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import Searchbar from 'components/Common/SearchBar';
-import SurveyIcon from 'components/Icons/SurveyIcon';
 import useAuth from 'hooks/useAuth';
 
-import { AddDialogueCard, TranslatedPlus } from './AutomationOverviewStyles';
+import { View } from 'layouts/View';
 import AutomationCard from './AutomationCard';
 
 interface AutomationOverviewProps {
@@ -38,8 +36,6 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 7),
   });
-
-  const [useDialogueGridView, setUseDialogueGridView] = useState(true);
 
   const { loading: isLoading } = useAutomationConnectionQuery({
     fetchPolicy: 'network-only',
@@ -68,97 +64,91 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
   const pageCount = activeAutomationConnection.totalPages || 0;
 
   return (
-    <>
+    <View documentTitle="haas | Automations">
       <UI.ViewHead>
-        <UI.ViewTitle>
-          <ViewTitle>{t('dialogues')}</ViewTitle>
-        </UI.ViewTitle>
-      </UI.ViewHead>
-      <UI.ViewBody>
+        <UI.Flex justifyContent="space-between">
+          <UI.Div>
+            <UI.Flex alignItems="flex-end" flexWrap="wrap">
+              <UI.Div mr={4}>
+                <UI.ViewTitle>
+                  {t('automations')}
+                </UI.ViewTitle>
+                <UI.ViewSubTitle>
+                  {t('automations_subtitle')}
+                </UI.ViewSubTitle>
+              </UI.Div>
 
-        <Div mb={4} maxWidth="800px" width="100%">
-          <Flex alignItems="center">
-            <Div mr={4}>
-              <Searchbar
-                search=""
-                onSearchChange={(search) => {
-                  setFilter((prevValues) => ({
-                    ...prevValues,
-                    search,
-                    pageIndex: 0,
-                  }));
-                }}
-              />
-            </Div>
-            <ButtonGroup display="flex" alignItems="center">
-              <Button
-                size="sm"
-                onClick={() => setUseDialogueGridView(true)}
-                variantColor={useDialogueGridView ? 'blue' : 'gray'}
-                leftIcon={GridIcon}
-              >
-                {t('grid')}
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => setUseDialogueGridView(false)}
-                variantColor={useDialogueGridView ? 'gray' : 'blue'}
-                leftIcon={List}
-              >
-                {t('list')}
-              </Button>
-            </ButtonGroup>
-            <UI.Flex justifyContent="flex-end" ml={4}>
-              {pageCount > 1 && (
-                <Table.Pagination
-                  pageIndex={filter.pageIndex}
-                  maxPages={pageCount}
-                  perPage={filter.perPage}
-                  isLoading={isLoading}
-                  setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
-                />
+              {canCreateAutomations && (
+                <UI.Div>
+                  <UI.NavButton
+                    leftIcon={Plus}
+                    size="sm"
+                    to={`/dashboard/b/${customerSlug}/automation/add`}
+                  >
+                    {t('create_automation')}
+                  </UI.NavButton>
+                </UI.Div>
               )}
             </UI.Flex>
-          </Flex>
+          </UI.Div>
 
-        </Div>
+          <UI.Div>
+            <Searchbar
+              search=""
+              onSearchChange={(search) => {
+                setFilter((prevValues) => ({
+                  ...prevValues,
+                  search,
+                  pageIndex: 0,
+                }));
+              }}
+            />
+          </UI.Div>
+        </UI.Flex>
+      </UI.ViewHead>
+      <UI.ViewBody>
+        <UI.Grid
+          gridGap={4}
+          gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(250px, 1fr))']}
+          gridAutoRows="minmax(300px, 1fr)"
+        >
+          {filteredAutomations?.map((automation, index) => automation && (
+            <AutomationCard key={index} automation={automation} />
+          ))}
+        </UI.Grid>
 
-        {useDialogueGridView ? (
-          <Grid
-            gridGap={4}
-            gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(250px, 1fr))']}
-            gridAutoRows="minmax(300px, 1fr)"
+        {!isLoading && filteredAutomations.length === 0 && (
+          <UI.IllustrationCard
+            boxShadow="sm"
+            svg={<NoDataIll />}
+            text={t('no_automations_found')}
           >
-
-            {filteredAutomations?.map((automation, index) => automation && (
-              <AutomationCard key={index} automation={automation} />
-            ))}
-
-            {canCreateAutomations && (
-              <AddDialogueCard data-cy="AddAutomationCard">
-                <Link to={`/dashboard/b/${customerSlug}/automation/add`} />
-
-                <Flex flexDirection="column" alignItems="center" justifyContent="center">
-                  <SurveyIcon />
-                  <TranslatedPlus>
-                    <Plus strokeWidth="3px" />
-                  </TranslatedPlus>
-                  <H4 color="default.dark">
-                    {t('create_automation')}
-                  </H4>
-                </Flex>
-              </AddDialogueCard>
-            )}
-          </Grid>
-        ) : (
-          <Grid gridRowGap={2}>
-            {filteredAutomations?.map((automation, index: any) => automation && (
-              <AutomationCard isCompact key={index} automation={automation} />
-            ))}
-          </Grid>
+            <UI.Button variant="outline" onClick={() => setFilter({ pageIndex: 0, search: '' })}>
+              {t('clear_filters')}
+            </UI.Button>
+          </UI.IllustrationCard>
         )}
+
+        <UI.Div mt={4} width="100%">
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div mr={4} />
+            <UI.Flex alignItems="center">
+              <UI.Div ml={4}>
+                {pageCount > 1 && (
+                  <Table.Pagination
+                    pageIndex={filter.pageIndex}
+                    maxPages={pageCount}
+                    perPage={filter.perPage}
+                    isLoading={isLoading}
+                    setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+                  />
+                )}
+              </UI.Div>
+            </UI.Flex>
+          </UI.Flex>
+        </UI.Div>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 
