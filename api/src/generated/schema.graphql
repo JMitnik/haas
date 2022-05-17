@@ -17,6 +17,17 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+type AssignedDialogues {
+  assignedDialogues: [Dialogue!]!
+  privateWorkspaceDialogues: [Dialogue!]!
+}
+
+input AssignUserToDialoguesInput {
+  assignedDialogueIds: [String!]!
+  userId: String!
+  workspaceId: String!
+}
+
 input AuthenticateLambdaInput {
   authenticateEmail: String
   workspaceEmail: String
@@ -212,6 +223,15 @@ type AWSImageType {
   filename: String
   mimetype: String
   url: String
+}
+
+"""Basic statistics for a general statistics"""
+type BasicStatistics {
+  """Average value of summarizable statistic"""
+  average: Float!
+
+  """Number of responses"""
+  responseCount: Int!
 }
 
 """Campaign"""
@@ -496,12 +516,21 @@ type Customer {
   campaign(campaignId: String): CampaignType
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
+  dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
+  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
+  nestedHealthScore(input: HealthScoreInput): HealthScore
+  nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
+  nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
+
+  """Workspace statistics"""
+  statistics: WorkspaceStatistics!
   userCustomer(userId: String): UserCustomer
   users: [UserType!]
   usersConnection(customerSlug: String, filter: UserConnectionFilterInput): UserConnection
@@ -642,17 +671,25 @@ type DeprecatedPaginationPageInfo {
 }
 
 type Dialogue {
-  averageScore(input: DialogueFilterInputType): Float!
+  assignees: [UserType!]
+  averageScore(input: DialogueFilterInputType): Float
   campaignVariants: [CampaignVariantType!]!
   creationDate: String
   customer: Customer
   customerId: String!
   description: String!
+  dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
   edges: [Edge!]!
+  healthScore(input: HealthScoreInput): HealthScore
   id: ID!
+  isPrivate: Boolean!
   isWithoutGenData: Boolean!
   language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
+  mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
+  mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+  pathedSessionsConnection(input: PathedSessionsInput): PathedSessionsType
   postLeafNode: DialogueFinisherObjectType
   publicTitle: String
   questions: [QuestionNode!]!
@@ -663,6 +700,7 @@ type Dialogue {
   statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag!]
   title: String!
+  topic(input: TopicInputType): TopicType!
   updatedAt: String
   wasGeneratedWithGenData: Boolean!
 }
@@ -683,6 +721,32 @@ type DialogueConditionScopeModel {
   updatedAt: Date!
 }
 
+type DialogueConnection implements ConnectionInterface {
+  dialogues: [Dialogue!]!
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
+}
+
+input DialogueConnectionFilterInput {
+  endDate: String
+  offset: Int
+  orderBy: DialogueConnectionOrderByInput
+  perPage: Int = 10
+  searchTerm: String
+  startDate: String
+}
+
+"""Fields to order UserConnection by."""
+enum DialogueConnectionOrder {
+  createdAt
+}
+
+"""Sorting of DialogueConnection"""
+input DialogueConnectionOrderByInput {
+  by: DialogueConnectionOrder!
+  desc: Boolean = true
+}
+
 input DialogueFilterInputType {
   endDate: String
   searchTerm: String
@@ -695,12 +759,49 @@ type DialogueFinisherObjectType {
   subtext: String!
 }
 
+enum DialogueImpactScoreType {
+  AVERAGE
+}
+
+input DialogueLinksInput {
+  workspaceId: String
+}
+
 type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType
   nrInteractions: Int!
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
+}
+
+input DialogueStatisticsSummaryFilterInput {
+  cutoff: Int
+  endDateTime: String
+  impactType: DialogueImpactScoreType!
+  refresh: Boolean
+  startDateTime: String!
+}
+
+"""DialogueStatisticsSummary"""
+type DialogueStatisticsSummaryModel {
+  dialogue: Dialogue
+  dialogueId: String!
+  endDateTime: Date
+  id: ID
+  impactScore: Float
+  nrVotes: Int
+  startDateTime: Date
+  updatedAt: Date
+}
+
+enum DialogueTemplateType {
+  BUSINESS_ENG
+  BUSINESS_NL
+  DEFAULT
+  MASS_SEED
+  SPORT_ENG
+  SPORT_NL
 }
 
 input DialogueWhereUniqueInput {
@@ -877,6 +978,14 @@ input GenerateAutodeckInput {
   youLoveX: String
 }
 
+input GenerateWorkspaceCSVInputType {
+  generateDemoData: Boolean = false
+  type: String! = "DEFAULT"
+  uploadedCsv: Upload
+  workspaceSlug: String!
+  workspaceTitle: String!
+}
+
 input GetAutomationInput {
   id: String
 }
@@ -900,11 +1009,28 @@ input HandleUserStateInWorkspaceInput {
   workspaceId: String
 }
 
+type HealthScore {
+  nrVotes: Int!
+  score: Float!
+}
+
+input HealthScoreInput {
+  endDateTime: String
+  startDateTime: String!
+  threshold: Float = 70
+}
+
 type ImageType {
   encoding: String
   filename: String
   mimetype: String
   url: String
+}
+
+type IndepthQuestionStatisticsSummary {
+  impactScore: Float
+  nrVotes: Int
+  option: String
 }
 
 input InviteUserInput {
@@ -1018,9 +1144,35 @@ type LoginOutput {
   user: UserType!
 }
 
+input MassSeedInput {
+  customerId: String!
+  maxGroups: Int!
+  maxSessions: Int!
+  maxTeams: Int!
+}
+
+type MostChangedPath {
+  group: String
+  topNegativeChanged: [TopicDelta!]!
+  topPositiveChanged: [TopicDelta!]!
+}
+
+type MostPopularPath {
+  group: String!
+  path: [PathTopic!]!
+}
+
+type MostTrendingTopic {
+  group: String!
+  impactScore: Float!
+  nrVotes: Int!
+  path: [String!]!
+}
+
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
@@ -1057,6 +1209,7 @@ type Mutation {
   editWorkspace(input: EditWorkspaceInput): Customer!
   enableAutomation(input: EnableAutomationInput): AutomationModel
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
+  generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer
   handleAutomationActions(input: HandleAutomationActionsInput): Boolean
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
 
@@ -1065,10 +1218,12 @@ type Mutation {
 
   """Logs a user out by removing their refresh token"""
   logout: String!
+  massSeed(input: MassSeedInput): Customer
   register(input: RegisterInput): String
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload): ImageType!
   updateAutomation(input: CreateAutomationInput): AutomationModel!
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
@@ -1201,6 +1356,33 @@ input PaginationWhereInput {
   startDate: String
 }
 
+"""A path is the traversal of topics in a dialogue."""
+type Path {
+  id: ID!
+  topicStrings: [String!]!
+}
+
+input PathedSessionsInput {
+  endDateTime: String
+  path: [String!]!
+  refresh: Boolean = false
+  startDateTime: String!
+}
+
+type PathedSessionsType {
+  endDateTime: String!
+  path: [String!]!
+  pathedSessions: [Session!]!
+  startDateTime: String!
+}
+
+type PathTopic {
+  depth: Int!
+  impactScore: Float!
+  nrVotes: Int!
+  topic: String!
+}
+
 input PermissionIdsInput {
   ids: [String!]
 }
@@ -1224,6 +1406,13 @@ type PreviewDataType {
   websiteScreenshotUrl: String!
 }
 
+type PublicDialogueInfo {
+  description: String
+  slug: String!
+  title: String!
+  url: String!
+}
+
 type Query {
   automation(where: GetAutomationInput): AutomationModel
   automations(where: GetAutomationsByWorkspaceInput): [AutomationModel!]!
@@ -1231,6 +1420,7 @@ type Query {
   customers: [Customer!]!
   delivery(deliveryId: String): DeliveryType
   dialogue(where: DialogueWhereUniqueInput): Dialogue
+  dialogueLinks(input: DialogueLinksInput): [PublicDialogueInfo!]
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
@@ -1239,6 +1429,7 @@ type Query {
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
   me: UserType!
+  question(where: QuestionWhereUniqueInput): QuestionNode
   refreshAccessToken: RefreshAccessTokenOutput!
   role(input: FindRoleInput): RoleType
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
@@ -1268,6 +1459,10 @@ type QuestionConditionScopeModel {
   id: ID!
 }
 
+enum QuestionImpactScoreType {
+  PERCENTAGE
+}
+
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
@@ -1276,6 +1471,7 @@ type QuestionNode {
   """FormNode resolver"""
   form: FormNodeType
   id: ID!
+  indepthQuestionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): [IndepthQuestionStatisticsSummary!]
   isLeaf: Boolean!
   isRoot: Boolean!
   links: [LinkType!]!
@@ -1284,6 +1480,7 @@ type QuestionNode {
   overrideLeafId: String
   questionDialogue: Dialogue
   questionDialogueId: String
+  questionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): QuestionStatisticsSummary
   share: ShareNodeType
 
   """Slidernode resolver"""
@@ -1322,6 +1519,26 @@ type QuestionOption {
   publicValue: String
   questionId: String
   value: String!
+}
+
+type QuestionStatisticsSummary {
+  dialogueId: String
+  endDateTime: Date
+  id: ID
+  startDateTime: Date
+  updatedAt: Date
+}
+
+input QuestionStatisticsSummaryFilterInput {
+  endDateTime: String
+  impactTreshold: Int
+  impactType: QuestionImpactScoreType!
+  refresh: Boolean
+  startDateTime: String!
+}
+
+input QuestionWhereUniqueInput {
+  id: ID!
 }
 
 input RecipientsInputType {
@@ -1371,6 +1588,7 @@ input RequestInviteInput {
 
 type RequestInviteOutput {
   didInvite: Boolean!
+  loginToken: String
   userExists: Boolean!
 }
 
@@ -1414,6 +1632,7 @@ type Session {
   device: String
   dialogueId: String!
   id: ID!
+  mainScore: Float!
   nodeEntries: [NodeEntry!]!
   originUrl: String
   paths: Int!
@@ -1458,6 +1677,7 @@ enum SessionDeliveryType {
 
 """Input for session"""
 input SessionInput {
+  createdAt: String
   deliveryId: String
   device: String
   dialogueId: String!
@@ -1475,6 +1695,12 @@ input SessionScoreRangeFilter {
 input SessionWhereUniqueInput {
   dialogueId: ID
   id: ID
+}
+
+input SetDialoguePrivacyInput {
+  customerId: String!
+  dialogueSlug: String!
+  state: Boolean!
 }
 
 input ShareNodeInputType {
@@ -1544,6 +1770,7 @@ enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
   CAN_ACCESS_REPORT_PAGE
   CAN_ADD_USERS
+  CAN_ASSIGN_USERS_TO_DIALOGUE
   CAN_BUILD_DIALOGUE
   CAN_CREATE_AUTOMATIONS
   CAN_CREATE_CAMPAIGNS
@@ -1557,6 +1784,7 @@ enum SystemPermission {
   CAN_EDIT_DIALOGUE
   CAN_EDIT_USERS
   CAN_EDIT_WORKSPACE
+  CAN_GENERATE_WORKSPACE_FROM_CSV
   CAN_UPDATE_AUTOMATIONS
   CAN_VIEW_AUTOMATIONS
   CAN_VIEW_CAMPAIGNS
@@ -1585,6 +1813,39 @@ enum TagTypeEnum {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
+}
+
+type TopicDelta {
+  averageCurrent: Float!
+  averagePrevious: Float!
+  delta: Float!
+  group: String
+  nrVotes: Int!
+  percentageChanged: Float!
+  topic: String!
+}
+
+input TopicInputType {
+  endDateTime: String
+  impactScoreType: DialogueImpactScoreType!
+  isRoot: Boolean = false
+  refresh: Boolean
+  startDateTime: String!
+  value: String!
+}
+
+type TopicNodeEntryValue {
+  id: Int!
+  mainScore: Int!
+  nodeEntryId: String!
+  value: String!
+}
+
+type TopicType {
+  impactScore: Float!
+  name: String!
+  nrVotes: Int!
+  subTopics: [TopicType!]
 }
 
 type topPathType {
@@ -1702,6 +1963,22 @@ input UploadSellImageInputType {
   workspaceId: String
 }
 
+"""
+
+    An urgent path is a path which was considered urgent. It currently follows a simple heuristic:
+    1. Get all sessions of the workspace.
+    2. Find sessions with a score below 4. If there is no such session, then no urgency is reported.
+    3. Find the topic that has the most negative responses.
+  
+"""
+type UrgentPath {
+  basicStats: BasicStatistics!
+  dialogue: Dialogue
+  dialogueId: String!
+  id: ID!
+  path: Path!
+}
+
 type UserConnection implements ConnectionInterface {
   pageInfo: PaginationPageInfo!
   totalPages: Int
@@ -1760,9 +2037,11 @@ input UserOfCustomerInput {
   customerId: String
   customerSlug: String
   userId: String
+  workspaceId: String
 }
 
 type UserType {
+  assignedDialogues(input: UserOfCustomerInput): AssignedDialogues
   customers: [Customer!]!
   email: String!
   firstName: String
@@ -1801,4 +2080,29 @@ type WorkspaceConditionScopeModel {
   createdAt: Date!
   id: ID!
   updatedAt: Date!
+}
+
+type WorkspaceStatistics {
+  """
+  Basic statistics of a workspace (e.g. number of responses, average general score, etc)
+  """
+  basicStats(input: DialogueStatisticsSummaryFilterInput): BasicStatistics!
+
+  """Gets the health score of the workspace"""
+  health(input: HealthScoreInput): HealthScore!
+  id: ID!
+
+  """
+  
+          Get the path (sequence of topics) with the most changed impact score.
+        
+  """
+  mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath!
+  mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+
+  """
+  Returns potentially the most urgent path of the workspace (one at most)
+  """
+  urgentPath(input: DialogueStatisticsSummaryFilterInput): UrgentPath
 }

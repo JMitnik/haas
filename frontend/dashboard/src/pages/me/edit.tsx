@@ -183,7 +183,7 @@ const EditMePage = () => {
   return (
     <>
       <UI.ViewHead>
-        <UI.ViewTitle>{t('edit_user')}</UI.ViewTitle>
+        <UI.DeprecatedViewTitle>{t('edit_user')}</UI.DeprecatedViewTitle>
       </UI.ViewHead>
       <UI.ViewBody>
         <motion.div variants={EditMeAnimation} initial="initial" animate="animate">

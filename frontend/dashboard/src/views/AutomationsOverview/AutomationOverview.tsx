@@ -18,7 +18,7 @@ import {
   AutomationConnectionOrderType,
   useAutomationConnectionQuery,
 } from 'types/generated-types';
-import Searchbar from 'components/SearchBar';
+import Searchbar from 'components/Common/SearchBar';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 import useAuth from 'hooks/useAuth';
 
@@ -80,8 +80,8 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
           <Flex alignItems="center">
             <Div mr={4}>
               <Searchbar
-                activeSearchTerm=""
-                onSearchTermChange={(search) => {
+                search=""
+                onSearchChange={(search) => {
                   setFilter((prevValues) => ({
                     ...prevValues,
                     search,

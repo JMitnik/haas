@@ -114,8 +114,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
               </Flex>
               <UI.Hr />
               {linkFields.length === 0 && (
-
-                <UI.IllustrationCard isFlat svg={<NoDataIll />} text={t('no_data')} />
+                <UI.IllustrationCard svg={<NoDataIll />} text={t('no_data')} />
               )}
               <AnimatePresence>
                 {linkFields.map((link: any, index) => (

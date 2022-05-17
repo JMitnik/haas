@@ -10,7 +10,7 @@ import VideoIcon from 'components/Icons/VideoIcon';
 
 const FormIcon = () => (
   <>
-    <FormNodeIcon style={{ margin: '0 auto', maxWidth: '70%' }} />
+    <FormNodeIcon style={{ margin: '0 auto', width: '70%' }} />
   </>
 );
 

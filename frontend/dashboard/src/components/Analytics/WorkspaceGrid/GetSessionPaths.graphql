@@ -1,0 +1,17 @@
+query GetSessionPaths($dialogueId: ID!, $input: PathedSessionsInput!) {
+  dialogue(where: { id: $dialogueId }) {
+		id
+		pathedSessionsConnection(input: $input) {
+			startDateTime
+			endDateTime
+			path
+			pathedSessions {
+				id
+				mainScore
+				createdAt
+				score
+				totalTimeInSec
+			}
+		}
+	}
+}

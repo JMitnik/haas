@@ -1,15 +1,19 @@
 import * as UI from '@haas/ui';
-import { useTranslation } from 'react-i18next';
 import React, { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { paginate } from 'utils/paginate';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
 const PaginationContainer = styled(UI.Div)`
-  box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
-  display: inline-block;
-  border-radius: 10px;
+  ${({ theme }) => css`
+    box-shadow: ${theme.boxShadows.sm};
+    background: ${theme.colors.neutral[100]};
+    border: 1px solid ${theme.colors.neutral[400]};
+    display: inline-block;
+    border-radius: ${theme.borderRadiuses.md}px;
+    padding: ${theme.gutter / 3}px ${theme.gutter / 2}px;
+  `}
 `;
 
 interface PaginationProps {
@@ -27,7 +31,6 @@ export const Pagination = ({
   setPageIndex,
   isLoading,
 }: PaginationProps) => {
-  const { t } = useTranslation();
   const { pages } = paginate(maxPages, pageIndex + 1, perPage, 5);
   const startedRef = useRef<boolean>(false);
   const [inputPageIndex, setInputPageIndex] = useState(1);
@@ -49,21 +52,22 @@ export const Pagination = ({
   if (pages.length <= 1) return null;
 
   return (
-    <PaginationContainer bg="white" padding={2}>
+    <PaginationContainer bg="white">
       <UI.Flex alignItems="center">
         <UI.Div mr={2}>
-          {t('page')}
-          {' '}
-          {pageIndex + 1}
-          {' '}
-          {t('out_of')}
-          {' '}
-          {maxPages}
+          <UI.Text color="off.500">
+            {pageIndex + 1}
+            {' '}
+            /
+            {' '}
+            {maxPages}
+          </UI.Text>
         </UI.Div>
         <UI.Input
           type="number"
           value={inputPageIndex}
-          width={40}
+          width={75}
+          height={35}
           // @ts-ignore
           onChange={(e) => { startedRef.current = true; setInputPageIndex(e.target.value); }}
         />
@@ -73,8 +77,8 @@ export const Pagination = ({
               {pages.map((page) => (
                 <UI.Button
                   size="sm"
-                  variantColor="teal"
                   isActive={page - 1 === pageIndex}
+                  variant="outline"
                   key={page}
                   isDisabled={isLoading}
                   onClick={() => setPageIndex(page)}

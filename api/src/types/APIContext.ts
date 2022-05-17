@@ -8,6 +8,7 @@ import MailService from '../services/mailings/MailService';
 import { LoginService } from '../models/auth/LoginService';
 import AutodeckService from '../models/autodeck/AutodeckService';
 import DialogueService from '../models/questionnaire/DialogueService';
+import DialogueStatisticsService from '../models/questionnaire/DialogueStatisticsService';
 import AuthService from '../models/auth/AuthService';
 import NodeService from '../models/QuestionNode/NodeService';
 import NodeEntryService from '../models/node-entry/NodeEntryService';
@@ -20,8 +21,13 @@ import EdgeService from '../models/edge/EdgeService';
 import { CampaignService } from '../models/Campaigns/CampaignService';
 import LinkService from '../models/link/LinkService';
 import AutomationService from '../models/automations/AutomationService';
+import QuestionStatisticsService from 'models/QuestionNode/QuestionStatisticsService';
+import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
+import TemplateService from '../models/templates/TemplateService';
 
 export interface APIServiceContainer {
+  templateService: TemplateService;
+  generateWorkspaceService: GenerateWorkspaceService;
   automationService: AutomationService;
   userService: UserService;
   customerService: CustomerService;
@@ -40,6 +46,8 @@ export interface APIServiceContainer {
   triggerService: TriggerService;
   campaignService: CampaignService;
   linkService: LinkService;
+  dialogueStatisticsService: DialogueStatisticsService;
+  questionStatisticsService: QuestionStatisticsService;
 }
 
 export interface APIContext extends ExpressContext {

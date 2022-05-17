@@ -6,6 +6,8 @@ interface UseAuthProps {
   canCreateAutomations: boolean;
   canUpdateAutomations: boolean;
   canViewAutomations: boolean;
+  canGenerateWorkspaceFromCsv: boolean;
+  canAssignUsersToDialogue: boolean;
   canCreateCustomers: boolean;
   canDeleteDialogue: boolean;
   canDeleteCustomers: boolean;
@@ -26,16 +28,44 @@ interface UseAuthProps {
   canDeleteUsers: boolean;
   canViewDialogueView: boolean;
   hasPermission: (permission: SystemPermission) => boolean;
+  canAccessDialogue: (dialogueSlug: string) => boolean;
 }
 
 const useAuth = (): UseAuthProps => {
   const { user } = useUser();
 
   // Technically this should not work in views without CustomerProvider <- Will return undefined thus
-  const { activePermissions } = useCustomer();
+  const { activePermissions, assignedDialogues: privateDialogues } = useCustomer();
 
   const authPermissions = activePermissions || user?.globalPermissions;
   const isSuperAdmin = user?.globalPermissions?.includes(SystemPermission.CanAccessAdminPanel);
+
+  const canAccessDialogue = (dialogueSlug: string) => {
+    const privateDialoguesInWorkspace = privateDialogues?.privateWorkspaceDialogues || [];
+    const assignedDialogues = privateDialogues?.assignedDialogues || [];
+
+    const privateDialogue = privateDialoguesInWorkspace?.find(
+      (dialogue) => dialogue.slug === dialogueSlug,
+    );
+
+    // Dialogue is not private => It is allowed to see dialogue
+    if (!privateDialogue) return true;
+
+    const isPrivateDialogue = !!privateDialogue;
+
+    // Dialogue is private && no assigned dialogues for user => Not allowed to see dialogue
+    if (assignedDialogues.length === 0 && privateDialoguesInWorkspace.length > 0) return false;
+
+    const privateDialogueIds = privateDialogues?.privateWorkspaceDialogues?.map((dialogue) => dialogue.id) || [];
+
+    const isAssignedToPrivateDialogue = isPrivateDialogue
+      ? privateDialogueIds.includes(privateDialogue?.id)
+      : true;
+
+    return isSuperAdmin
+      || !isPrivateDialogue
+      || isAssignedToPrivateDialogue;
+  };
 
   /**
    * Check if user has permission to features,
@@ -53,6 +83,8 @@ const useAuth = (): UseAuthProps => {
     canCreateAutomations: hasPermission(SystemPermission.CanCreateAutomations),
     canUpdateAutomations: hasPermission(SystemPermission.CanUpdateAutomations),
     canViewAutomations: hasPermission(SystemPermission.CanViewAutomations),
+    canGenerateWorkspaceFromCsv: hasPermission(SystemPermission.CanGenerateWorkspaceFromCsv),
+    canAssignUsersToDialogue: hasPermission(SystemPermission.CanAssignUsersToDialogue),
     canDeleteDialogue: hasPermission(SystemPermission.CanDeleteDialogue),
     canEditDialogue: hasPermission(SystemPermission.CanEditDialogue),
     canViewCampaigns: hasPermission(SystemPermission.CanViewCampaigns),
@@ -73,6 +105,7 @@ const useAuth = (): UseAuthProps => {
     canViewDialogueBuilder: hasPermission(SystemPermission.CanViewDialogue),
     canBuildDialogues: hasPermission(SystemPermission.CanBuildDialogue),
     hasPermission,
+    canAccessDialogue,
   };
 };
 

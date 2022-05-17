@@ -98,7 +98,6 @@ const fieldMap: FieldProps[] = [
 ];
 
 interface FormNodePreviewProps {
-  form: any;
   field: any;
   onMoveRight: any;
   onMoveLeft: any;
@@ -295,7 +294,7 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
               </UI.CardBody>
             ) : (
               <UI.CardBody>
-                <IllustrationCard text={t('select_a_field_type')} svg={<SelectIll />} isFlat>
+                <IllustrationCard text={t('select_a_field_type')} svg={<SelectIll />}>
                   <UI.Text fontWeight={200} pb={2}>or</UI.Text>
                   <UI.ButtonGroup justifySelf="flex-end">
                     <UI.Button
@@ -398,7 +397,6 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                       fieldIndex={index}
                       nrFields={fields.length}
                       field={formNodeFields[index]}
-                      form={form}
                       onOpen={() => setOpenedField(index)}
                       onMoveLeft={() => move(index, Math.max(index - 1, 0))}
                       onMoveRight={() => {

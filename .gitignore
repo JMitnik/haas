@@ -59,6 +59,7 @@ types.d.ts
 
 .now
 
+.env.staging
 **/.env.prod
 api/.env.prod
 expose

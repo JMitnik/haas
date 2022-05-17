@@ -4,7 +4,7 @@ import { Flex } from './Container';
 import { Span } from './Span';
 import { Button } from './Buttons';
 
-type BoxShadowSize = 'sm' | 'md' | 'lg';
+export type BoxShadowSize = 'sm' | 'md' | 'lg';
 
 interface CardProps {
   noHover?: boolean;
@@ -15,12 +15,14 @@ interface CardProps {
 }
 
 export const Card = styled(Div) <CardProps>`
-  ${({ theme, noHover, boxShadow, outline, isFlat, willFocusWithin }) => css`
+  ${({ theme, noHover, isFlat, willFocusWithin }) => css`
     position: relative;
     display: flex;
     flex-direction: column;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
     box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+    box-shadow: ${theme.boxShadows.md};
+    border: 1px solid ${theme.colors.gray[100]};
 
     ${willFocusWithin && css`
       &:focus-within {
@@ -47,7 +49,7 @@ export const Card = styled(Div) <CardProps>`
 export const ButtonCard = styled(Button) <{ isActive: boolean }>`
   ${({ theme, isActive }) => css`
     border-radius: ${theme.borderRadiuses.md};
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: ${theme.boxShadows.md};
     border: 1px solid #ebebeb;
     padding: 4px 8px;
     outline: none;
@@ -121,6 +123,14 @@ export const CardBody = styled(Div)`
   `}
 `;
 
+export const CardBodyLarge = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter * 1.25}px;
+    flex-grow: 1;
+    position: relative;
+  `}
+`;
+
 export const CardFooter = styled(Div)`
   ${({ theme }) => css`
     padding: 8px ${theme.gutter * 0.75}px;
@@ -146,3 +156,31 @@ export const CardScore = styled(Span)`
 `;
 
 export default Card;
+
+/**
+ * New card
+ *
+ * TODO: Deprecate old card and rename this to Card.
+ */
+interface NewCardProps {
+  hasHover?: boolean;
+  boxShadow?: BoxShadowSize;
+}
+
+export const NewCard = styled(Div) <NewCardProps>`
+  ${({ theme, hasHover, boxShadow = 'md', bg = 'white' }) => css`
+    background: ${theme.colors[bg]}; // @ts-ignore
+    border-radius: ${theme.borderRadiuses.md}px;
+    box-shadow: ${theme.boxShadows[boxShadow]};
+    transition: all ${theme.transitions.normal};
+
+    ${hasHover && css`
+      cursor: pointer;
+
+      &:hover {
+        transition: all ${theme.transitions.normal};
+        box-shadow: ${theme.boxShadows.lg};
+      }
+    `}
+  `}
+`;

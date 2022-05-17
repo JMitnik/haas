@@ -21,7 +21,7 @@ import {
 } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
-import ShowMoreButton from 'components/ShowMoreButton';
+import ShowMoreButton from 'components/Common/ShowMoreButton';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
 

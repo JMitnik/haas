@@ -12,6 +12,8 @@ export const SessionType = objectType({
     t.date('createdAt');
     t.string('dialogueId');
 
+    t.float('mainScore');
+
     t.string('browser', { resolve: (parent) => parent?.browser || '' });
 
     // t.int('index');
@@ -26,6 +28,8 @@ export const SessionType = objectType({
       async resolve(parent) {
         // @ts-ignore
         if (parent.score) return parent.score;
+        if (parent.mainScore) return parent.mainScore;
+
 
         const score = (await SessionService.findSessionScore(parent.id)) || 0.0;
 
@@ -54,7 +58,7 @@ export const SessionType = objectType({
         if (parent.delivery) return parent.delivery
 
         return ctx.services.campaignService.findDeliveryOfSession(parent.id);
-      }
+      },
     });
 
 
@@ -136,6 +140,7 @@ export const SessionInput = inputObjectType({
     t.string('originUrl', { required: false });
     t.string('device', { required: false });
     t.int('totalTimeInSec', { required: false });
+    t.string('createdAt', { required: false });
   },
 });
 

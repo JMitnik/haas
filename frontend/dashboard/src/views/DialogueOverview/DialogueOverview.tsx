@@ -1,114 +1,143 @@
 import * as UI from '@haas/ui';
-import { Button, ButtonGroup } from '@chakra-ui/core';
-import { Div, Flex, Grid, H4, ViewTitle } from '@haas/ui';
-import { Grid as GridIcon, List, Plus } from 'react-feather';
-import { Link, useParams } from 'react-router-dom';
-import { useLazyQuery } from '@apollo/client';
+import { NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
+import { Plus } from 'react-feather';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { getQuestionnairesOfCustomer as CustomerData } from 'queries/__generated__/getQuestionnairesOfCustomer';
-import Searchbar from 'components/SearchBar';
-import SurveyIcon from 'components/Icons/SurveyIcon';
-import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
+import * as Table from 'components/Common/Table';
+import { DialogueConnection, DialogueConnectionOrder, useDialogueConnectionQuery } from 'types/generated-types';
+import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
+import { View } from 'layouts/View';
+import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
-import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
-const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
+const DialogueOverview = () => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
+  const [filter, setFilter] = useQueryParams({
+    search: StringParam,
+    pageIndex: withDefault(NumberParam, 0),
+    perPage: withDefault(NumberParam, 9),
+  });
 
-  const [useDialogueGridView, setUseDialogueGridView] = useState(true);
+  const [activeDialogueConnection, setDialogueConnection] = useState<DialogueConnection>();
 
-  // TODO: Handle the loading
-  const [loadCustomerData, { data, loading: isSearching }] = useLazyQuery<CustomerData>(getDialoguesOfCustomer, {
+  const { loading: isLoading } = useDialogueConnectionQuery({
+    fetchPolicy: 'cache-and-network',
     variables: {
       customerSlug,
+      filter: {
+        searchTerm: filter.search,
+        offset: filter.pageIndex * filter.perPage,
+        perPage: filter.perPage,
+        orderBy: {
+          by: DialogueConnectionOrder.CreatedAt,
+          desc: true,
+        },
+      },
+    },
+    errorPolicy: 'ignore',
+    notifyOnNetworkStatusChange: true,
+    onCompleted: (fetchedData) => {
+      setDialogueConnection(fetchedData.customer?.dialogueConnection as DialogueConnection);
     },
   });
 
   const { canDeleteDialogue } = useAuth();
 
-  const filteredDialogues = data?.customer?.dialogues || dialogues;
+  const filteredDialogues = activeDialogueConnection?.dialogues || [];
+  const pageCount = activeDialogueConnection?.totalPages || 0;
 
   return (
-    <>
+    <View documentTitle="haas | Dialogues">
       <UI.ViewHead>
-        <UI.ViewTitle>
-          <ViewTitle>{t('dialogues')}</ViewTitle>
-        </UI.ViewTitle>
+        <UI.Flex justifyContent="space-between">
+          <UI.Div>
+            <UI.Flex alignItems="flex-end" flexWrap="wrap">
+              <UI.Div mr={4}>
+                <UI.ViewTitle>
+                  {t('dialogues')}
+                </UI.ViewTitle>
+                <UI.ViewSubTitle>
+                  {t('dialogues_subtitle')}
+                </UI.ViewSubTitle>
+              </UI.Div>
+
+              {canDeleteDialogue && (
+                <UI.Div>
+                  <UI.NavButton
+                    leftIcon={Plus}
+                    size="sm"
+                    to={`/dashboard/b/${customerSlug}/dialogue/add`}
+                  >
+                    {t('add_dialogue')}
+                  </UI.NavButton>
+                </UI.Div>
+              )}
+            </UI.Flex>
+          </UI.Div>
+
+          <UI.Div>
+            <Searchbar
+              search={filter.search}
+              isLoading={isLoading}
+              onSearchChange={(newTerm) => {
+                setFilter(
+                  (newFilter) => ({ ...newFilter, pageIndex: 0, search: newTerm }),
+                );
+              }}
+            />
+          </UI.Div>
+        </UI.Flex>
       </UI.ViewHead>
+
       <UI.ViewBody>
+        <UI.Grid
+          gridGap={4}
+          gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
+          gridAutoRows="minmax(200px, 1fr)"
+        >
+          {filteredDialogues.map((dialogue: any, index: any) => dialogue && (
+            <DialogueCard key={index} dialogue={dialogue} />
+          ))}
+        </UI.Grid>
 
-        <Div mb={4} maxWidth="800px" width="100%">
-          <Flex>
-            <Div mr={4}>
-              <Searchbar
-                activeSearchTerm=""
-                onSearchTermChange={(newTerm) => {
-                  loadCustomerData({ variables: { customerSlug, filter: { searchTerm: newTerm } } });
-                }}
-              />
-            </Div>
-            <ButtonGroup display="flex" alignItems="center">
-              <Button
-                size="sm"
-                onClick={() => setUseDialogueGridView(true)}
-                variantColor={useDialogueGridView ? 'blue' : 'gray'}
-                leftIcon={GridIcon}
-              >
-                {t('grid')}
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => setUseDialogueGridView(false)}
-                variantColor={useDialogueGridView ? 'gray' : 'blue'}
-                leftIcon={List}
-              >
-                {t('list')}
-              </Button>
-            </ButtonGroup>
-          </Flex>
-        </Div>
-
-        {useDialogueGridView ? (
-          <Grid
-            gridGap={4}
-            gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(250px, 1fr))']}
-            gridAutoRows="minmax(300px, 1fr)"
+        {!isLoading && filteredDialogues.length === 0 && (
+          <UI.IllustrationCard
+            boxShadow="sm"
+            svg={<NoDataIll />}
+            text={t('no_dialogues_found')}
           >
-
-            {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-              <DialogueCard key={index} dialogue={dialogue} />
-            ))}
-
-            {canDeleteDialogue && (
-              <AddDialogueCard data-cy="AddDialogueCard">
-                <Link to={`/dashboard/b/${customerSlug}/dialogue/add`} />
-
-                <Flex flexDirection="column" alignItems="center" justifyContent="center">
-                  <SurveyIcon />
-                  <TranslatedPlus>
-                    <Plus strokeWidth="3px" />
-                  </TranslatedPlus>
-                  <H4 color="default.dark">
-                    {t('create_dialogue')}
-                  </H4>
-                </Flex>
-              </AddDialogueCard>
-            )}
-          </Grid>
-        ) : (
-          <Grid gridRowGap={2}>
-            {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-              <DialogueCard isCompact key={index} dialogue={dialogue} />
-            ))}
-          </Grid>
+            <UI.Button variant="outline" onClick={() => setFilter({ pageIndex: 0, search: '' })}>
+              {t('clear_filters')}
+            </UI.Button>
+          </UI.IllustrationCard>
         )}
+
+        <UI.Div mt={4} width="100%">
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div mr={4} />
+            <UI.Flex alignItems="center">
+              <UI.Div ml={4}>
+                {pageCount > 1 && (
+                  <Table.Pagination
+                    pageIndex={filter.pageIndex}
+                    maxPages={pageCount}
+                    perPage={filter.perPage}
+                    isLoading={isLoading}
+                    setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+                  />
+                )}
+              </UI.Div>
+            </UI.Flex>
+          </UI.Flex>
+        </UI.Div>
+
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

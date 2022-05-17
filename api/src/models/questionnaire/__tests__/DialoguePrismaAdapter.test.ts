@@ -1,9 +1,9 @@
-import { makeTestPrisma } from "../../../test/utils/makeTestPrisma";
-import DialoguePrismaAdapter from "../DialoguePrismaAdapter";
+import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
+import DialoguePrismaAdapter from '../DialoguePrismaAdapter';
 import { clearDialogueDatabase } from './testUtils';
-import { Prisma } from "@prisma/client";
+import { Prisma } from '@prisma/client';
 import cuid from 'cuid';
-import { CreateDialogueInput } from "../DialoguePrismaAdapterType";
+import { CreateDialogueInput } from '../DialoguePrismaAdapterType';
 
 const prisma = makeTestPrisma();
 const dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
@@ -16,8 +16,8 @@ const defaultDialogueCreateInput: Prisma.DialogueCreateInput = {
     create: {
       name: 'DEFAULT_CUSTOMER',
       slug: 'customerSlug',
-    }
-  }
+    },
+  },
 }
 
 const defaultCreateDialogueInput: CreateDialogueInput = {
@@ -28,13 +28,13 @@ const defaultCreateDialogueInput: CreateDialogueInput = {
     name: 'DEFAULT_CUSTOMER',
     slug: 'customerSlug',
     create: true,
-  }
+  },
 }
 
 describe('DialoguePrismaAdapter', () => {
   afterEach(async () => {
     await clearDialogueDatabase(prisma);
-    prisma.$disconnect();
+    await prisma.$disconnect();
   });
 
   test('Creates a dialogue', async () => {
@@ -67,9 +67,9 @@ describe('DialoguePrismaAdapter', () => {
           create: {
             name: 'TARGET_CUSTOMER',
             slug: 'TARGET_CUSTOMER_SLUG',
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     await prisma.dialogue.create({
@@ -79,10 +79,10 @@ describe('DialoguePrismaAdapter', () => {
         description: '',
         customer: {
           connect: {
-            id: targetDialogueOne.customerId
-          }
+            id: targetDialogueOne.customerId,
+          },
         },
-      }
+      },
     });
 
     const dialogueIds = await dialoguePrismaAdapter.findDialogueIdsOfCustomer(targetDialogueOne.customerId);
@@ -100,9 +100,9 @@ describe('DialoguePrismaAdapter', () => {
           create: {
             name: 'TARGET_CUSTOMER',
             slug: 'TARGET_CUSTOMER_SLUG',
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     const targetDialogueTwo = await prisma.dialogue.create({
@@ -112,10 +112,10 @@ describe('DialoguePrismaAdapter', () => {
         description: '',
         customer: {
           connect: {
-            id: targetDialogueOne.customerId
-          }
+            id: targetDialogueOne.customerId,
+          },
         },
-      }
+      },
     });
     const dialogues = await dialoguePrismaAdapter.findDialoguesByCustomerId(targetDialogueOne.customerId);
     expect(dialogues).toHaveLength(2);
@@ -153,15 +153,15 @@ describe('DialoguePrismaAdapter', () => {
               type: 'SHARE',
               isLeaf: true,
             },
-          ]
+          ],
         },
         customer: {
           create: {
             name: 'TARGET_CUSTOMER',
             slug: 'TARGET_CUSTOMER_SLUG',
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     const ctas = await dialoguePrismaAdapter.getCTAsByDialogueId(targetDialogueOne.id);
@@ -184,7 +184,7 @@ describe('DialoguePrismaAdapter', () => {
     await prisma.dialogue.create({
       data: defaultDialogueCreateInput,
       include: {
-        questions: true
+        questions: true,
       },
     });
     const targetDialogueOne = await prisma.dialogue.create({
@@ -199,17 +199,17 @@ describe('DialoguePrismaAdapter', () => {
               type: 'SLIDER',
               isLeaf: false,
             },
-          ]
+          ],
         },
         customer: {
           create: {
             name: 'TARGET_CUSTOMER',
             slug: 'TARGET_CUSTOMER_SLUG',
-          }
-        }
+          },
+        },
       },
       include: {
-        questions: true
+        questions: true,
       },
     });
 
@@ -232,9 +232,9 @@ describe('DialoguePrismaAdapter', () => {
           create: {
             name: 'TARGET_CUSTOMER',
             slug: 'TARGET_CUSTOMER_SLUG',
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     // customer id is incorrect, dialogueSlug is correct
@@ -261,8 +261,8 @@ describe('DialoguePrismaAdapter', () => {
           create: {
             name: 'TARGET_CUSTOMER',
             slug: 'TARGET_CUSTOMER_SLUG',
-          }
-        }
+          },
+        },
       },
       include: {
         customer: true,
@@ -291,7 +291,7 @@ describe('DialoguePrismaAdapter', () => {
       questions: {
         create: {
           title: 'firstQuestion',
-        }
+        },
       },
       edges: {
         create: {
@@ -302,9 +302,9 @@ describe('DialoguePrismaAdapter', () => {
               questionDialogue: {
                 connect: {
                   id: dialogueId,
-                }
-              }
-            }
+                },
+              },
+            },
           },
           childNode: {
             create: {
@@ -313,12 +313,12 @@ describe('DialoguePrismaAdapter', () => {
               questionDialogue: {
                 connect: {
                   id: dialogueId,
-                }
-              }
-            }
+                },
+              },
+            },
           },
-        }
-      }
+        },
+      },
     }
     const dialogue = await prisma.dialogue.create({ data: dialogueCreateInputWithEdgesAndQuestions });
     const foundDialogue = await dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogue.id);
@@ -335,7 +335,7 @@ describe('DialoguePrismaAdapter', () => {
       questions: {
         create: {
           title: 'firstQuestion',
-        }
+        },
       },
       edges: {
         create: {
@@ -346,9 +346,9 @@ describe('DialoguePrismaAdapter', () => {
               questionDialogue: {
                 connect: {
                   id: defaultDialogueId,
-                }
-              }
-            }
+                },
+              },
+            },
           },
           childNode: {
             create: {
@@ -357,12 +357,12 @@ describe('DialoguePrismaAdapter', () => {
               questionDialogue: {
                 connect: {
                   id: defaultDialogueId,
-                }
-              }
-            }
+                },
+              },
+            },
           },
-        }
-      }
+        },
+      },
     };
 
     await dialoguePrismaAdapter.create({ data: dialogueCreateInputWithEdgesAndQuestions });
@@ -377,7 +377,7 @@ describe('DialoguePrismaAdapter', () => {
         create: {
           name: 'EDGES_CUSTOMER',
           slug: 'customerEdgesSlug',
-        }
+        },
       },
       edges: {
         create: [
@@ -389,8 +389,8 @@ describe('DialoguePrismaAdapter', () => {
                   connect: {
                     id: edgesTestDialogueId,
                   },
-                }
-              }
+                },
+              },
             },
             childNode: {
               create: {
@@ -399,9 +399,9 @@ describe('DialoguePrismaAdapter', () => {
                   connect: {
                     id: edgesTestDialogueId,
                   },
-                }
-              }
-            }
+                },
+              },
+            },
           },
           {
             parentNode: {
@@ -411,7 +411,7 @@ describe('DialoguePrismaAdapter', () => {
                   connect: {
                     id: edgesTestDialogueId,
                   },
-                }
+                },
               },
             },
             childNode: {
@@ -421,12 +421,12 @@ describe('DialoguePrismaAdapter', () => {
                   connect: {
                     id: edgesTestDialogueId,
                   },
-                }
-              }
-            }
-          }
-        ]
-      }
+                },
+              },
+            },
+          },
+        ],
+      },
     }
 
     const dialogueWithEdges = await dialoguePrismaAdapter.create({ data: edgesTestDialogueInput });
@@ -440,7 +440,7 @@ describe('DialoguePrismaAdapter', () => {
       questions: {
         create: [
           { title: 'defaultQuestion' },
-        ]
+        ],
       },
     };
 
@@ -461,7 +461,7 @@ describe('DialoguePrismaAdapter', () => {
           { title: 'targetOne' },
           { title: 'targetTwo' },
         ],
-      }
+      },
     };
 
     const questionsDialogue = await dialoguePrismaAdapter.create({ data: questionsDialogueCreateInput });
@@ -477,7 +477,7 @@ describe('DialoguePrismaAdapter', () => {
       questions: {
         create: [
           { title: 'defaultQuestion', isRoot: true },
-        ]
+        ],
       },
     };
 
@@ -498,7 +498,7 @@ describe('DialoguePrismaAdapter', () => {
           { title: 'normalQuestion' },
           { title: 'targetRootQuestion', isRoot: true },
         ],
-      }
+      },
     }
 
     const targetRootQuestionDialogue = await dialoguePrismaAdapter.create({ data: targetDialogueCreateInput });
@@ -517,7 +517,7 @@ describe('DialoguePrismaAdapter', () => {
         create: {
           name: 'DEFAULT_CUSTOMER',
           slug: 'customerSlug',
-        }
+        },
       },
       tags: {
         create: [
@@ -526,19 +526,19 @@ describe('DialoguePrismaAdapter', () => {
             customer: {
               connect: {
                 slug: 'customerSlug',
-              }
-            }
+              },
+            },
           },
           {
             name: 'defaultTwo',
             customer: {
               connect: {
                 slug: 'customerSlug',
-              }
-            }
-          }
-        ]
-      }
+              },
+            },
+          },
+        ],
+      },
     };
 
     await dialoguePrismaAdapter.create({ data: defaultTagsDialogueInput });
@@ -560,27 +560,27 @@ describe('DialoguePrismaAdapter', () => {
             customer: {
               connect: {
                 slug: 'customerTagsSlug',
-              }
-            }
+              },
+            },
           },
           {
             name: 'targetTwo',
             customer: {
               connect: {
                 slug: 'customerTagsSlug',
-              }
-            }
+              },
+            },
           },
           {
             name: 'targetThree',
             customer: {
               connect: {
                 slug: 'customerTagsSlug',
-              }
-            }
-          }
-        ]
-      }
+              },
+            },
+          },
+        ],
+      },
     }
 
     const dialogue = await dialoguePrismaAdapter.create({ data: targetDialogueCreateInput });
@@ -598,7 +598,7 @@ describe('DialoguePrismaAdapter', () => {
       questions: {
         create: {
           title: 'firstQuestion',
-        }
+        },
       },
       edges: {
         create: {
@@ -609,9 +609,9 @@ describe('DialoguePrismaAdapter', () => {
               questionDialogue: {
                 connect: {
                   id: defaultDialogueId,
-                }
-              }
-            }
+                },
+              },
+            },
           },
           childNode: {
             create: {
@@ -620,12 +620,12 @@ describe('DialoguePrismaAdapter', () => {
               questionDialogue: {
                 connect: {
                   id: defaultDialogueId,
-                }
-              }
-            }
+                },
+              },
+            },
           },
-        }
-      }
+        },
+      },
     };
 
     await dialoguePrismaAdapter.create({ data: dialogueCreateInputWithEdgesAndQuestions });
@@ -641,12 +641,12 @@ describe('DialoguePrismaAdapter', () => {
         create: {
           name: 'EDGES_CUSTOMER',
           slug: 'customerEdgesSlug',
-        }
+        },
       },
       questions: {
         create: {
-          title: 'questionOne'
-        }
+          title: 'questionOne',
+        },
       },
       edges: {
         create: [
@@ -659,14 +659,14 @@ describe('DialoguePrismaAdapter', () => {
                   connect: {
                     id: edgesTestDialogueId,
                   },
-                }
-              }
+                },
+              },
             },
             conditions: {
               create: {
                 conditionType: 'TEXT_MATCH',
-                matchValue: 'text'
-              }
+                matchValue: 'text',
+              },
             },
             childNode: {
               create: {
@@ -675,9 +675,9 @@ describe('DialoguePrismaAdapter', () => {
                   connect: {
                     id: edgesTestDialogueId,
                   },
-                }
-              }
-            }
+                },
+              },
+            },
           },
           {
             parentNode: {
@@ -687,7 +687,7 @@ describe('DialoguePrismaAdapter', () => {
                   connect: {
                     id: edgesTestDialogueId,
                   },
-                }
+                },
               },
             },
             childNode: {
@@ -697,12 +697,12 @@ describe('DialoguePrismaAdapter', () => {
                   connect: {
                     id: edgesTestDialogueId,
                   },
-                }
-              }
-            }
-          }
-        ]
-      }
+                },
+              },
+            },
+          },
+        ],
+      },
     }
 
     const dialogueWithEdges = await dialoguePrismaAdapter.create({ data: edgesTestDialogueInput });

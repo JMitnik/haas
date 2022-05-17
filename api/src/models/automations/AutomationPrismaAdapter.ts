@@ -915,7 +915,7 @@ export class AutomationPrismaAdapter {
             type: action.type,
             apiKey: action.apiKey,
             endpoint: action.endpoint,
-            payload: action.payload,
+            payload: action.payload as Prisma.InputJsonObject || Prisma.JsonNull,
           }
         }),
       },
@@ -1176,13 +1176,13 @@ export class AutomationPrismaAdapter {
               type: action.type,
               apiKey: action?.apiKey,
               endpoint: action?.endpoint,
-              payload: action?.payload,
+              payload: action?.payload as Prisma.InputJsonObject || Prisma.JsonNull,
             },
             update: {
               type: action.type,
               apiKey: action?.apiKey,
               endpoint: action?.endpoint,
-              payload: action?.payload,
+              payload: action?.payload as Prisma.InputJsonObject || Prisma.JsonNull,
             },
           };
         }),

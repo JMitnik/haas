@@ -1,10 +1,9 @@
 import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
 import { UserInputError } from 'apollo-server';
-import _, { cloneDeep } from 'lodash';
+import _ from 'lodash';
 
-import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
-import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenInputs } from '../../generated/nexus';
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
@@ -47,6 +46,47 @@ class UserService {
 
     return this.userOfCustomerPrismaAdapter.findTargetUsers(workspaceSlug, targetIds);
   };
+
+  /**
+   * Finds the private dialogues of a user as well as all private dialogues within a workspace
+   * @param input
+   * @param userId
+   * @returns
+   */
+  findPrivateDialoguesOfUser = async (input: NexusGenInputs['UserOfCustomerInput'], userId?: string) => {
+    const allPrivateDialoguesWorkspace = await this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(
+      input?.workspaceId || input?.customerId || undefined,
+      input?.customerSlug || undefined,
+    );
+
+    const user = await this.userPrismaAdapter.findPrivateDialogueOfUser(userId || input?.userId as string);
+
+    return {
+      assignedDialogues: user?.isAssignedTo || [],
+      privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+    }
+  }
+
+  /**
+   * Adjusts the dialogue privacy settings of a user based on the input.
+   * @param input
+   * @returns
+   */
+  assignUserToPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
+    const updatedUser = await this.userPrismaAdapter.updateUserPrivateDialogues(input);
+
+    const allPrivateDialoguesWorkspace = await this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(
+      input.workspaceId
+    );
+
+    return {
+      ...updatedUser,
+      privateDialogues: {
+        assignedDialogues: updatedUser.isAssignedTo || [],
+        privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+      },
+    }
+  }
 
   async deleteUser(userId: string, customerId: string): Promise<DeletedUserOutput> {
     const removedUser = await this.userOfCustomerPrismaAdapter.delete(userId, customerId);
@@ -131,7 +171,7 @@ class UserService {
   };
 
   /**
-   * Finds the bot account within a workspace 
+   * Finds the bot account within a workspace
    * @param workspaceName the slug of the workspace
    * @returns the bot account within a workspace
    */

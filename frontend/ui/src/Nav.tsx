@@ -6,11 +6,11 @@ import { ChevronLeft, Settings } from 'react-feather';
 import { GenericProps, Div } from './Generics';
 import { ProfilePic } from './User';
 import { Helper, Paragraph } from './Type';
-import { color, ColorProps } from 'styled-system';
+import { color as colorMixin, ColorProps } from 'styled-system';
 import { Icon } from './Icon';
 import { Flex } from './Container';
 
-const TopNavContainer = styled(Div)<GenericProps>`
+const TopNavContainer = styled(Div) <GenericProps>`
   ${({ theme }) => css`
     box-shadow: 0px 5px 7px -2px rgba(0, 0, 0, 0.4);
     border-top: 5px solid ${theme.colors.primary};
@@ -42,17 +42,18 @@ export const Breadcrumb = ({ children, ...props }: LinkProps) => (
 )
 
 export const ExtLinkContainer = styled.a<ColorProps>`
-  ${({ theme }) => css`
-    ${color};
+  ${({ theme, color }) => css`
+    ${colorMixin};
 
     text-decoration: none;
     font-weight: 600;
-    color: ${theme.colors.blue[300]};
+    /* @ts-ignore */
+    color: ${color ? (theme as unknown as Record<string, Record<string, string>>).colors[color as string] : theme.colors.blue[300]};
   `}
 `;
 
-export const ExtLink = ({ children, to }: { children: React.ReactNode, to: string }) => (
-  <ExtLinkContainer as="a" href={to}  target="_blank" rel="noopener noreferrer">{children}</ExtLinkContainer>
+export const ExtLink = ({ children, to, color }: { children: React.ReactNode, to: string, color?: string }) => (
+  <ExtLinkContainer color={color} as="a" href={to} target="_blank" rel="noopener noreferrer">{children}</ExtLinkContainer>
 );
 
 export const TopNav: FC = () => (

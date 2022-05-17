@@ -13,6 +13,50 @@ class EdgeService {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
   }
 
+  findEdgesByParentQuestionId = async (parentNodeId: string) => {
+    return this.edgePrismaAdapter.prisma.edge.findMany({
+      where: {
+        parentNodeId,
+      },
+      include: {
+        conditions: true,
+      },
+    });
+  };
+
+  findEdgeByConditionValue = async (dialogueId: string, edgeConditionValue: string) => {
+    const edge = await this.edgePrismaAdapter.prisma.edge.findFirst({
+      where: {
+        conditions: {
+          some: {
+            matchValue: edgeConditionValue,
+          },
+        },
+        dialogueId,
+      },
+      include: {
+        childNode: {
+          include: {
+            options: true,
+          },
+        },
+      },
+    });
+    return edge;
+  }
+
+  /**
+   * Finds question options based on the edge condition value
+   * @param dialogueId 
+   * @param edgeConditionValue matchValue on a condition
+   * @returns a list of question options
+   */
+  findChildOptionsByEdgeCondition = async (dialogueId: string, edgeConditionValue: string) => {
+    const edge = await this.findEdgeByConditionValue(dialogueId, edgeConditionValue);
+
+    return edge?.childNode?.options?.map((option) => ({ nrVotes: 0, impactScore: 0, name: option.value })) || [];
+  }
+
   /**
    * Finds edge by provided ID
    * @param edgeId ID of Edge

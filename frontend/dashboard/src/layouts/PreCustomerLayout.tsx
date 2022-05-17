@@ -1,19 +1,26 @@
-import { Container, Div } from '@haas/ui';
-
-import { LogoContainer } from 'components/Logo/Logo';
-import Logo from 'components/Logo';
+import * as UI from '@haas/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Usernav, UsernavContainer } from '../components/Sidenav/Sidenav';
+import { LogoContainer, LogoIconContainer } from 'components/Logo/Logo';
+
+import { TopbarContainer, WorkspaceTopbar } from './WorkspaceLayout/WorkspaceTopbar';
+import { UsernavContainer } from './WorkspaceLayout/UserNav';
 
 interface PreCustomerLayoutProps {
   children: React.ReactNode;
 }
 
-const PreCustomerLayoutContainer = styled(Div)`
+const PreCustomerLayoutContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    padding: ${theme.gutter}px;
+    background-color: ${theme.colors.app.background};
+    min-height: 100vh;
+
+    ${TopbarContainer} {
+      max-width: 100%;
+      background-color: ${theme.colors.app.sidebar};
+      box-shadow: inset 2px 1px 4px 0px rgb(0 0 0 / 10%);
+    }
 
     ${UsernavContainer} {
       position: fixed;
@@ -22,18 +29,20 @@ const PreCustomerLayoutContainer = styled(Div)`
       left: ${theme.gutter}px;
     }
 
-    ${LogoContainer} svg path {
-      fill: ${theme.colors.gray[500]} !important;
+    ${LogoIconContainer} svg path {
+      fill: ${theme.colors.off[500]} !important;
+    }
+
+    ${LogoContainer} {
+      padding: ${theme.gutter / 2}px;
     }
   `}
 `;
 
 const PreCustomerLayout = ({ children }: PreCustomerLayoutProps) => (
   <PreCustomerLayoutContainer>
-    <Container mb="48px">
-      <Logo justifyContent="flex-start" />
-    </Container>
-    <Usernav />
+    <WorkspaceTopbar />
+
     {children}
   </PreCustomerLayoutContainer>
 );

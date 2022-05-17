@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 export const AppContainer = styled.div`
   ${({ theme }) => css`
     min-height: 100vh;
-    background: ${theme.colors.default.lightest};
+    background: ${theme.colors.white};
     margin: 0 auto;
   `}
 `;

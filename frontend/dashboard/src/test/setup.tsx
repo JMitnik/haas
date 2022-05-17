@@ -18,17 +18,33 @@ jest.mock('utils/getApiEndpoint', () => ({
 }));
 
 // Mock react-lottie
-jest.mock("react-lottie", () => {
-  return () => <div>Lottie</div>
-});
+jest.mock('react-lottie', () => () => <div>Lottie</div>);
 
 // Setup MSW listener
-beforeAll(() => server.listen());
+beforeAll(() => {
+  server.listen();
+  // @ts-ignore
+
+  // Delet resizeobserver (used to cancel out SVG resizes)
+  delete window.ResizeObserver;
+  window.ResizeObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+  }));
+});
 
 // Reset all server handlers
 afterEach(() => server.resetHandlers());
 
 // Close MSW listener
-afterAll(() => server.close());
+afterAll(() => {
+  server.close();
+
+  // Reset resizeobserver (used to cancel out SVG resizes)
+  window.ResizeObserver = ResizeObserver;
+  jest.restoreAllMocks();
+});
 
 export default {};
+
