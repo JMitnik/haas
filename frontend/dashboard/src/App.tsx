@@ -54,7 +54,7 @@ import WorkspaceLayout from 'layouts/WorkspaceLayout/WorkspaceLayout';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
-    <CustomerProvider __test__={false}>
+    <CustomerProvider>
       <DialogueProvider>
         <WorkspaceLayout>
           <Switch>
@@ -224,7 +224,7 @@ const PublicRoutes = () => (
 
 const ReportRoutes = () => (
   <AnimatePresence>
-    <CustomerProvider __test__={false}>
+    <CustomerProvider>
       <DialogueProvider>
         <Switch>
           <BotRoute

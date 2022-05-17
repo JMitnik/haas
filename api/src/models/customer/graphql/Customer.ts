@@ -48,6 +48,7 @@ export const CustomerType = objectType({
      * - Note: These statistics share the same ID as the Workspace / Customer.
      */
     t.field('statistics', {
+      nullable: true,
       type: WorkspaceStatistics,
       description: 'Workspace statistics',
 

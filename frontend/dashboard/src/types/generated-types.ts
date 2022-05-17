@@ -558,7 +558,7 @@ export type Customer = {
   name: Scalars['String'];
   settings?: Maybe<CustomerSettings>;
   /** Workspace statistics */
-  statistics: WorkspaceStatistics;
+  statistics?: Maybe<WorkspaceStatistics>;
   dialogueConnection?: Maybe<DialogueConnection>;
   automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
@@ -2872,7 +2872,7 @@ export type GetWorkspaceSummaryDetailsQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
-    & { statistics: (
+    & { statistics?: Maybe<(
       { __typename?: 'WorkspaceStatistics' }
       & Pick<WorkspaceStatistics, 'id'>
       & { health: (
@@ -2915,7 +2915,7 @@ export type GetWorkspaceSummaryDetailsQuery = (
           & Pick<BasicStatistics, 'responseCount' | 'average'>
         ) }
       )> }
-    ) }
+    )> }
   )> }
 );
 
