@@ -175,12 +175,16 @@ class UserService {
    * @param workspaceName the slug of the workspace
    * @returns the bot account within a workspace
    */
-  async findBotByWorkspaceName(workspaceName: string) {
-    const botEmail = `${workspaceName}@haas.live`
+  async findBotByWorkspaceName(workspaceSlug: string) {
+    const botEmail = `${workspaceSlug}@haas.live`
     return this.userPrismaAdapter.getUserByEmail(botEmail);
   }
 
-  async getUserOfCustomer(workspaceId: string | null | undefined, customerSlug: string | null | undefined, userId: string) {
+  async getUserOfCustomer(
+    workspaceId: string | null | undefined,
+    customerSlug: string | null | undefined,
+    userId: string
+  ) {
     let customerId = '';
     if (!workspaceId && customerSlug) {
       const customer = await this.customerPrismaAdapter.findWorkspaceBySlug(customerSlug)
