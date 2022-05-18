@@ -1,7 +1,7 @@
 ###
 # Base: Prep our base image
 ###
-FROM node:16-alpine AS base
+FROM amd64/node:16.3-alpine3.12 AS base
 ENV PORT 4000
 
 RUN apk add --update openssl
