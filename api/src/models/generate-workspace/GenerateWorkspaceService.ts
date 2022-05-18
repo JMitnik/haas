@@ -11,10 +11,10 @@ import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType'
 import NodeService from '../QuestionNode/NodeService';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { cartesian } from './DemoHelpers';
-import { subDays } from 'date-fns';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
-import { DemoWorkspaceTemplate } from 'models/templates/TemplateTypes';
+import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
+import CustomerService from '../customer/CustomerService';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -24,6 +24,7 @@ class GenerateWorkspaceService {
   sessionPrismaAdapter: SessionPrismaAdapter;
   templateService: TemplateService;
   dialogueService: DialogueService;
+  customerService: CustomerService;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -33,6 +34,7 @@ class GenerateWorkspaceService {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.templateService = new TemplateService(prismaClient);
     this.dialogueService = new DialogueService(prismaClient);
+    this.customerService = new CustomerService(prismaClient);
   };
 
   /**
@@ -74,6 +76,9 @@ class GenerateWorkspaceService {
       adminRole?.id as string,
       userId as string
     );
+
+    // create bot role
+    await this.customerService.createBotUser(workspace.id, workspace.slug, workspace.roles);
 
     const template = this.getTemplate(templateType);
     const uniqueDialogues: string[][] = cartesian(template.rootLayer, template.subLayer, template.subSubLayer);
@@ -186,6 +191,9 @@ class GenerateWorkspaceService {
 
       await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(workspace.id, user.id, managerRole.id);
     };
+
+    // Add bot user
+    await this.customerService.createBotUser(workspace.id, workspaceSlug, workspace.roles);
 
     return workspace;
   };
