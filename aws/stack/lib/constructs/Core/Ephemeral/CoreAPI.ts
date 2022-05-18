@@ -36,7 +36,7 @@ export class CoreAPI extends Construct {
 
     const vpc = props.vpc;
 
-     // Our ECS cluster, housing our various Fargate Services
+    // Our ECS cluster, housing our various Fargate Services
     const cluster = new ecs.Cluster(this, "CORE_CLUSTER", {
       vpc,
       clusterName: "CORE_CLUSTER",

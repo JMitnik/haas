@@ -7,6 +7,7 @@ import { HaasCampaignStack } from '../lib/stacks/campaign-stack';
 import { InternalNotifyStack } from '../lib/stacks/Internal/InternalNotifyStack';
 import { StagingCoreFixed } from '../lib/stacks/Core/StagingCoreFixed';
 import { StagingCoreTemp } from '../lib/stacks/Core/StagingCoreTemp';
+import { StagingAutomations } from '../lib/stacks/Core/StagingAutomations';
 
 const app = new App();
 
@@ -27,6 +28,15 @@ const stagingCoreTemp = new StagingCoreTemp(app, 'StagingCoreTemp', {
   dbSecurityGroup: stagingCoreFixed.db.dbSecurityGroup,
   env: stagingEnv,
 });
+
+const stagingAutomations = new StagingAutomations(app, 'StagingAutomations', {
+  vpc: stagingCoreFixed.vpc.vpc,
+  db: stagingCoreFixed.db.rdsDb,
+  repo: stagingCoreFixed.repo.repo,
+  dbSecurityGroup: stagingCoreFixed.db.dbSecurityGroup,
+  env: stagingEnv,
+});
+
 // const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
 //     prefix: 'haas_svc_api',
 //     apiService: api.apiService,
