@@ -61,7 +61,7 @@ export const WorkspaceGridAdapter = ({
         startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
         endDateTime: format(new Date(), 'dd-MM-yyyy'),
         path: options.topics || [],
-        refresh: false,
+        refresh: true,
       },
       dialogueId: options.dialogueId,
     });

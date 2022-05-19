@@ -15,6 +15,7 @@ import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
 import CustomerService from '../customer/CustomerService';
+import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -44,13 +45,13 @@ class GenerateWorkspaceService {
    */
   getTemplate(templateType: string): DemoWorkspaceTemplate {
     switch (templateType) {
-      case 'BUSINESS':
+      case DialogueTemplateType.BUSINESS_ENG:
         return templates.business;
-      case 'SPORT_ENG':
+      case DialogueTemplateType.SPORT_ENG:
         return templates.sportEng;
-      case 'SPORT_NL':
+      case DialogueTemplateType.SPORT_NL:
         return templates.sportNl;
-      case 'DEFAULT':
+      case DialogueTemplateType.DEFAULT:
         return templates.default;
       default:
         return templates.default;
