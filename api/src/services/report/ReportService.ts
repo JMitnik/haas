@@ -30,7 +30,7 @@ export class ReportService {
     const snsParams: AWS.SNS.PublishInput = {
       Message: stringifiedPayload,
       // TODO: Track this as dependency
-      TopicArn: 'arn:aws:sns:eu-central-1:118627563984:haasApiReport',
+      TopicArn: 'arn:aws:sns:eu-central-1:356797133903:haasApiReport',
     }
     if (config.env === 'local') return console.log('payload for generating report: ', stringifiedPayload);
 
