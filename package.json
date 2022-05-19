@@ -54,6 +54,7 @@
         "gen:api": "yarn workspace @haas/api gen",
         "gen:api:prisma": "yarn workspace @haas/api gen:prisma",
         "gen:dashboard": "yarn workspace @haas/dashboard gen",
+        "install:aws": "cd aws/stack && yarn",
         "staging:migrate": "~/.config/yarn/global/node_modules/.bin/dotenv -e api/.env.staging -- yarn migrate",
         "migrate": "yarn workspace @haas/api migrate",
         "migrate:baseline": "yarn workspace @haas/api migrate:baseline",

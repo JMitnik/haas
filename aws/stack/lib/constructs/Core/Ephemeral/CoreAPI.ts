@@ -118,6 +118,14 @@ export class CoreAPI extends Construct {
       actions: ['ses:SendEmail'],
       effect: iam.Effect.ALLOW,
     }));
+
+    // TODO: Make more scalable
+    // Grand SNS permissions to generate API reports.
+    this.service.taskDefinition.taskRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      resources: ['arn:aws:sns:eu-central-1:*:haasApiReport'],
+      actions: ['sns:Publish'],
+      effect: iam.Effect.ALLOW,
+    }));
   }
 
   /**
