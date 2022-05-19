@@ -11,10 +11,10 @@ import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType'
 import NodeService from '../QuestionNode/NodeService';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { cartesian } from './DemoHelpers';
-import { subDays } from 'date-fns';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
-import { DemoWorkspaceTemplate } from 'models/templates/TemplateTypes';
+import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
+import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -42,13 +42,13 @@ class GenerateWorkspaceService {
    */
   getTemplate(templateType: string): DemoWorkspaceTemplate {
     switch (templateType) {
-      case 'BUSINESS':
+      case DialogueTemplateType.BUSINESS_ENG:
         return templates.business;
-      case 'SPORT_ENG':
+      case DialogueTemplateType.SPORT_ENG:
         return templates.sportEng;
-      case 'SPORT_NL':
+      case DialogueTemplateType.SPORT_NL:
         return templates.sportNl;
-      case 'DEFAULT':
+      case DialogueTemplateType.DEFAULT:
         return templates.default;
       default:
         return templates.default;
