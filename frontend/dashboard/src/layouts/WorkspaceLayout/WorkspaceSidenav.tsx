@@ -10,8 +10,12 @@ import * as LS from './WorkpaceLayout.styles';
 import { WorkspaceNav } from './WorkspaceNav';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 
-export const SidenavContainer = styled.div`
-  ${({ theme }) => css`
+interface SidenavContainerProps {
+  isExpanded: boolean;
+}
+
+export const SidenavContainer = styled.div<SidenavContainerProps>`
+  ${({ theme, isExpanded }) => css`
     position: fixed;
     z-index: 1200;
     display: flex;
@@ -19,7 +23,6 @@ export const SidenavContainer = styled.div`
     flex-direction: column;
 
     width: ${theme.sidenav.width}px;
-    /* padding: ${theme.gutter}px; */
     height: 100%;
 
     background: ${theme.colors.app.sidebar};
@@ -98,14 +101,25 @@ export const SidenavContainer = styled.div`
     @media print {
       border-right: none;
     }
+
+    ${isExpanded && css`
+      ${LS.NavItems} {
+        max-width:  70px;
+      }
+    `}
   `}
 `;
 
-export const WorkspaceSidenav = () => {
+interface WorkspaceSidenavProps {
+  isExpanded: boolean;
+  onIsExpandedChange: (isExpanded: boolean) => void;
+}
+
+export const WorkspaceSidenav = ({ isExpanded, onIsExpandedChange }: WorkspaceSidenavProps) => {
   const params: { customerSlug: string } = useParams<any>();
 
   return (
-    <SidenavContainer data-cy="Sidenav">
+    <SidenavContainer data-cy="Sidenav" isExpanded={isExpanded}>
       <UI.ColumnFlex justifyContent="space-between" height="100%">
         <UI.Div>
           <Logo />

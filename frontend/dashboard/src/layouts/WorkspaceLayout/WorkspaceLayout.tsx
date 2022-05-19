@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { useParams } from 'react-router';
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { CustomThemeProviders } from 'providers/ThemeProvider';
@@ -16,13 +16,22 @@ import { WorkspaceSidenav } from './WorkspaceSidenav';
 import MobileBottomNav from './MobileWorkspaceBottomNav';
 import NotAuthorizedView from '../NotAuthorizedView';
 
-const WorkspaceLayoutContainer = styled(UI.Div) <{ isMobile?: boolean }>`
-  ${({ theme, isMobile = false }) => css`
+interface WorkspaceLayoutContainerProps {
+  isMobile?: boolean;
+  isExpanded?: boolean;
+}
+
+const WorkspaceLayoutContainer = styled(UI.Div) <WorkspaceLayoutContainerProps>`
+  ${({ theme, isMobile = false, isExpanded = true }) => css`
     display: grid;
     background: ${theme.colors.app.background};
     min-height: 100vh;
     grid-template-columns: ${theme.sidenav.width}px 1fr;
     grid-gap: ${theme.gutter}px;
+
+    ${!isMobile && !isExpanded && css`
+      grid-template-columns: 70px 1fr;
+    `}
 
     ${isMobile && css`
       grid-template-columns: '1fr';
@@ -39,11 +48,14 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
   const device = useMediaDevice();
   const { isLoading } = useCustomer();
 
+  const [isExpanded, setIsExpanded] = useState<boolean>(
+    () => device.isLarge && JSON.parse(localStorage.getItem('nav_expanded') || 'true'),
+  );
+
   return (
     <ErrorBoundary FallbackComponent={NotAuthorizedView}>
       <CustomThemeProviders>
-        <WorkspaceLayoutContainer isMobile={device.isSmall}>
-
+        <WorkspaceLayoutContainer isMobile={device.isSmall} isExpanded={isExpanded}>
           {isLoading && (
             <UI.Div position="absolute" bottom={0} right={0}>
               <Loader testId="runner" />
@@ -52,7 +64,7 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
           <UI.Div>
             {!device.isSmall ? (
               <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
-                <WorkspaceSidenav />
+                <WorkspaceSidenav isExpanded={isExpanded} onExpandedChange={setIsExpanded} />
               </motion.div>
             ) : (
               <MobileBottomNav>
