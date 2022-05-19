@@ -1,6 +1,15 @@
-bash push_ecr.sh
+read -p "This will build an image from your LOCAL environment, push it to ECR, and update the ECS cluster. Are you sure you wish to continue? (yes/no) "
+if [ "$REPLY" != "yes" ]; then
+  echo "Understandable, have a good day."
+  exit
+fi
 
-# TODO: Fetch
+DIR="$(dirname "$(realpath "$0")")"
+push_file="$DIR/push-ecr.sh"
+
+bash "$push_file"
+
+# # TODO: Fetch
 CLUSTER_NAME="CORE_CLUSTER"
 SERVICE_NAME="StagingCoreTemp-COREAPIAPISERVICEServiceBA2271D8-IsUSGTyhOoQ2"
 

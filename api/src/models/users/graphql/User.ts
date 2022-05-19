@@ -26,6 +26,7 @@ export const UserOfCustomerInput = inputObjectType({
     // Provide one of the two
     t.string('customerId', { required: false });
     t.string('customerSlug', { required: false });
+    t.string('workspaceId', { required: false });
   },
 });
 
@@ -60,6 +61,18 @@ export const DateScalar = scalarType({
   },
 });
 
+export const AssignedDialogues = objectType({
+  name: 'AssignedDialogues',
+  definition(t) {
+    t.list.field('privateWorkspaceDialogues', {
+      type: 'Dialogue',
+    });
+    t.list.field('assignedDialogues', {
+      type: 'Dialogue',
+    });
+  },
+})
+
 export const UserType = objectType({
   name: 'UserType',
   definition(t) {
@@ -70,6 +83,22 @@ export const UserType = objectType({
     t.string('lastName', { nullable: true });
     t.date('lastLoggedIn', { nullable: true });
     t.date('lastActivity', { nullable: true });
+
+    t.field('assignedDialogues', {
+      type: AssignedDialogues,
+      nullable: true,
+      args: { input: UserOfCustomerInput },
+      async resolve(parent, args, ctx) {
+        // @ts-ignore
+        if (parent.privateDialogues) return parent.privateDialogues;
+        // @ts-ignore
+        if (!parent.id) return null;
+        // @ts-ignore
+        if (!args.input?.workspaceId && !args.input?.customerId && !args.input?.customerSlug) return null;
+
+        return ctx.services.userService.findPrivateDialoguesOfUser(args.input, parent.id);
+      },
+    })
 
     t.list.field('globalPermissions', {
       nullable: true,
@@ -164,7 +193,6 @@ export const RootUserQueries = extendType({
   definition(t) {
     t.field('me', {
       type: UserType,
-
       async resolve(parent, args, ctx) {
         if (!ctx.session?.user?.id) throw new ApolloError('No valid user');
         const userId = ctx.session?.user?.id;
@@ -216,7 +244,7 @@ export const HandleUserStateInWorkspaceInput = inputObjectType({
     t.string('userId');
     t.string('workspaceId');
     t.boolean('isActive')
-  }
+  },
 })
 
 export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorkspace', {
@@ -229,7 +257,7 @@ export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorksp
 
     const input = { userId: args.input.userId, isActive: args.input.isActive, workspaceId: args.input.workspaceId }
     return ctx.services.userService.setUserStateInWorkspace(input);
-  }
+  },
 })
 
 export const UserMutations = extendType({

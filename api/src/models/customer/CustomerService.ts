@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, ChoiceNodeEntry, NodeEntry, Session } from '@prisma/client';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, ChoiceNodeEntry, NodeEntry, Session, RoleTypeEnum } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
 import cuid from 'cuid';
@@ -8,7 +8,8 @@ import { isPresent } from 'ts-is-present';
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
-import defaultWorkspaceTemplate, { defaultMassSeedTemplate, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import defaultWorkspaceTemplate, { defaultMassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
+import { WorkspaceTemplate } from '../templates/TemplateTypes';
 import prisma from '../../config/prisma';
 import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
@@ -18,7 +19,8 @@ import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType'
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
 import NodeEntryService from '../node-entry/NodeEntryService';
-
+import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
+import TemplateService from '../templates/TemplateService';
 
 class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -30,6 +32,7 @@ class CustomerService {
   dialogueStatisticsService: DialogueStatisticsService;
   nodeEntryService: NodeEntryService;
   sessionPrismaAdapter: SessionPrismaAdapter;
+  templateService: TemplateService;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -41,6 +44,7 @@ class CustomerService {
     this.nodeService = new NodeService(prismaClient);
     this.nodeEntryService = new NodeEntryService(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
+    this.templateService = new TemplateService(prismaClient);
   }
 
   /**
@@ -61,7 +65,7 @@ class CustomerService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
-    const sessions = await this.sessionPrismaAdapter.findSessionsByCustomerIdBetweenDates(
+    const sessions = await this.sessionPrismaAdapter.findCustomerSessions(
       customerId,
       startDateTime,
       endDateTimeSet,
@@ -123,7 +127,7 @@ class CustomerService {
     // This week/month/24hr should be set through front-end but for now hardcoded 7 days
     const prevStartDateTime = subDays(startDateTime as Date, 7);
 
-    const sessions = await this.sessionPrismaAdapter.findSessionsByCustomerIdBetweenDates(
+    const sessions = await this.sessionPrismaAdapter.findCustomerSessions(
       customerId,
       prevStartDateTime,
       endDateTimeSet,
@@ -248,7 +252,7 @@ class CustomerService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
-    const sessions = await this.sessionPrismaAdapter.findSessionsByCustomerIdBetweenDates(
+    const sessions = await this.sessionPrismaAdapter.findCustomerSessions(
       customerId,
       startDateTime,
       endDateTimeSet,
@@ -427,7 +431,6 @@ class CustomerService {
     const dialogueNames = [...maleDialogueNames, ...femaleDialogueNames];
 
     for (const dialogueName of dialogueNames) {
-      console.log('Dialogue: ', dialogueName);
       defaultMassSeedTemplate.title = dialogueName;
       const slug = cuid();
       defaultMassSeedTemplate.slug = slug;
@@ -442,10 +445,10 @@ class CustomerService {
 
       if (!dialogue) throw 'ERROR: No dialogue created!'
       // Step 2: Make the leafs
-      const leafs = await this.nodeService.createTemplateLeafNodes(defaultMassSeedTemplate.leafNodes, dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.MASS_SEED, dialogue.id);
 
       // Step 3: Make nodes
-      await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
+      await this.templateService.createTemplateNodes(dialogue.id, customer.name, leafs, 'MASS_SEED');
       await this.dialogueService.massGenerateFakeData(dialogue.id, defaultMassSeedTemplate, maxSessions, isStrict);
     }
 
@@ -453,11 +456,20 @@ class CustomerService {
   }
 
   /**
-   * Get a dialogue based on workspace ID and dialogue Slug.
-   * @param customerId Workspace ID
-   * @param dialogueSlug Dialogue Slug
-   * @returns A dialogue including question Ids and edges
+   * Finds all private dialogues within a workspace
+   * @param workspaceId 
+   * @returns 
    */
+  findPrivateDialoguesOfWorkspace = async (workspaceId: string) => {
+    return this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(workspaceId);
+  }
+
+  /**
+ * Get a dialogue based on workspace ID and dialogue Slug.
+ * @param customerId Workspace ID
+ * @param dialogueSlug Dialogue Slug
+ * @returns A dialogue including question Ids and edges
+ */
   async getDialogue(customerId: string, dialogueSlug: string) {
     const customer = await prisma.customer.findUnique({
       where: {
@@ -527,9 +539,9 @@ class CustomerService {
   }
 
   /**
-   * Finds all workspaces available
-   * @returns workspaces
-   */
+ * Finds all workspaces available
+ * @returns workspaces
+ */
   async findAll() {
     return this.customerPrismaAdapter.findAll();
   }
@@ -553,10 +565,10 @@ class CustomerService {
   }
 
   /**
-   * Deletes a workspace from the database
-   * @param customerId
-   * @returns the deleted workspace
-   */
+ * Deletes a workspace from the database
+ * @param customerId
+ * @returns the deleted workspace
+ */
   async delete(customerId: string): Promise<Customer> {
     return this.customerPrismaAdapter.delete(customerId);
   }
@@ -574,10 +586,10 @@ class CustomerService {
 
     if (!dialogue) throw 'ERROR: No dialogue created!'
     // Step 2: Make the leafs
-    const leafs = await this.nodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
+    const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
 
     // Step 3: Make nodes
-    await this.nodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
+    await this.templateService.createTemplateNodes(dialogue.id, customer.name, leafs, 'DEFAULT');
 
     // Step 4: possibly
     if (willGenerateFakeData) {
@@ -610,7 +622,7 @@ class CustomerService {
    */
   createWorkspace = async (input: NexusGenInputs['CreateWorkspaceInput'], createdUserId?: string) => {
     try {
-      const customer = await this.customerPrismaAdapter.createWorkspace(input);
+      const customer = await this.customerPrismaAdapter.createWorkspace(input, defaultWorkspaceTemplate);
 
       if (input.isSeed) {
         await this.seedByTemplate(customer, defaultWorkspaceTemplate, input.willGenerateFakeData || false);
@@ -635,20 +647,20 @@ class CustomerService {
   };
 
   /**
-   * Gets a dialogue from the customer, by using a slug
-   * @param customerId
-   * @param dialogueSlug
-   */
+ * Gets a dialogue from the customer, by using a slug
+ * @param customerId
+ * @param dialogueSlug
+ */
   async getDialogueBySlug(customerId: string, dialogueSlug: string) {
     const dialogueOfWorkspace = await this.customerPrismaAdapter.getDialogueBySlug(customerId, dialogueSlug);
     return dialogueOfWorkspace;
   }
 
   /**
-   * Deletes a workspace
-   * @param customerId ID of workspace to be deleted
-   * @returns deleted workspace
-   */
+ * Deletes a workspace
+ * @param customerId ID of workspace to be deleted
+ * @returns deleted workspace
+ */
   async deleteWorkspace(customerId: string) {
     if (!customerId) return null;
 
@@ -710,10 +722,10 @@ class CustomerService {
   }
 
   /**
-   * Gets a dialogue from the customer, by using an ID
-   * @param customerId
-   * @param dialogueSlug
-   */
+ * Gets a dialogue from the customer, by using an ID
+ * @param customerId
+ * @param dialogueSlug
+ */
   async getDialogueById(customerId: string, dialogueId: string) {
     return this.customerPrismaAdapter.getDialogueById(customerId, dialogueId);
   }

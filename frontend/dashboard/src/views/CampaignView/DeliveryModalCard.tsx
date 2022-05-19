@@ -25,7 +25,7 @@ export const DeliveryModalCard = ({ id, onClose }: DeliveryModalCardProps) => {
   const delivery = data?.delivery;
 
   return (
-    <UI.ModalCard onClose={onClose}>
+    <UI.ModalCard breakout maxWidth={1200} onClose={onClose}>
       <UI.ModalHead>
         <UI.ModalTitle>{t('details')}</UI.ModalTitle>
       </UI.ModalHead>

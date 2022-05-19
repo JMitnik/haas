@@ -210,7 +210,7 @@ const AddDialogueView = () => {
   return (
     <>
       <UI.ViewHead>
-        <UI.ViewTitle>{t('views:add_dialogue_view')}</UI.ViewTitle>
+        <UI.DeprecatedViewTitle>{t('views:add_dialogue_view')}</UI.DeprecatedViewTitle>
       </UI.ViewHead>
 
       <UI.ViewBody>

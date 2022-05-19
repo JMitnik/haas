@@ -1,50 +1,16 @@
-import { Prisma, Link, NodeType, QuestionCondition, QuestionNode, PrismaClient, Share, Edge, QuestionOption, VideoEmbeddedNode } from '@prisma/client';
+import { Prisma, Link, NodeType, QuestionCondition, QuestionNode, PrismaClient, Edge, QuestionOption, VideoEmbeddedNode } from '@prisma/client';
 import cuid from 'cuid';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
-import { QuestionOptionProps, LeafNodeDataEntryProps, CreateCTAInputProps, DialogueWithEdges } from './NodeServiceType';
+import { QuestionOptionProps, CreateCTAInputProps, DialogueWithEdges } from './NodeServiceType';
 import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
 import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
-import { CreateQuestionsInput, CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
-import { CreateCTAInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
-
-const standardOptions = [
-  { value: 'Facilities', position: 1 },
-  { value: 'Website/Mobile app', position: 2 },
-  { value: 'Product/Services', position: 3 },
-  { value: 'Customer Support', position: 4 },
-];
-
-const facilityOptions = [
-  { value: 'Cleanliness', position: 1 },
-  { value: 'Atmosphere', position: 2 },
-  { value: 'Location', position: 3 },
-  { value: 'Other', position: 4 },
-];
-
-const websiteOptions = [
-  { value: 'Design', position: 1 },
-  { value: 'Functionality', position: 2 },
-  { value: 'Informative', position: 3 },
-  { value: 'Other', position: 4 },
-];
-
-const customerSupportOptions = [
-  { value: 'Friendliness', position: 1 },
-  { value: 'Competence', position: 2 },
-  { value: 'Speed', position: 3 },
-  { value: 'Other', position: 4 },
-];
-
-const productServicesOptions = [
-  { value: 'Quality', position: 1 },
-  { value: 'Price', position: 2 },
-  { value: 'Friendliness', position: 3 },
-  { value: 'Other', position: 4 },
-];
+import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
+import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
+import templates from '../templates/index';
 
 export interface IdMapProps {
   [details: string]: string;
@@ -66,8 +32,17 @@ export class NodeService {
   }
 
   /**
+   * Creates a slider node and connects it to a question
+   * @param data 
+   * @returns 
+   */
+  createSliderNode = async (data: CreateSliderNodeInput) => {
+    return this.questionNodePrismaAdapter.createSliderNode(data);
+  };
+
+  /**
    * Finds the slider node of a dialogue
-   * @param dialogueId 
+   * @param dialogueId
    * @returns question node
    */
   findSliderNode = async (dialogueId: string) => {
@@ -512,48 +487,6 @@ export class NodeService {
   };
 
   /**
-   * Create template call-to-actions.
-   * */
-  createTemplateLeafNodes = async (
-    leafNodesArray: LeafNodeDataEntryProps[],
-    dialogueId: string,
-  ) => {
-    const mappedLeafs: CreateQuestionsInput = leafNodesArray.map((leaf) => {
-      return ({
-        ...leaf,
-        title: leaf.title,
-        type: leaf.type,
-        dialogueId: dialogueId,
-        isRoot: false,
-        isLeaf: true,
-        form: {
-          helperText: '',
-          fields: leaf?.form?.fields?.length ? leaf.form?.fields.map((field) => ({
-            label: field.label || '',
-            position: field.position || -1,
-            isRequired: field.isRequired || false,
-            type: field.type || 'shortText',
-          })) : [],
-        },
-      })
-    });
-
-    // Make leafs based on array
-    const updatedNodes = await this.dialoguePrismaAdapter.createNodes(dialogueId, mappedLeafs);
-    const finalLeafNodes = updatedNodes.filter((node) => node.isLeaf);
-
-    return finalLeafNodes;
-  };
-
-  /**
-   * Find a call-to-action containing text.
-   * */
-  static findLeafIdContainingText = (leafs: QuestionNode[], titleSubset: string) => {
-    const correctLeaf = leafs.find((leaf) => leaf.title.includes(titleSubset));
-    return correctLeaf?.id;
-  };
-
-  /**
    * Construct update leaf state to use in Prisma call.
    *
    * TODO: Move to prisma-adapter.
@@ -880,207 +813,6 @@ export class NodeService {
     }
   };
 
-  /**
-   * Create nodes from a default template.
-   * */
-  createTemplateNodes = async (
-    dialogueId: string,
-    workspaceName: string,
-    leafs: QuestionNode[],
-  ) => {
-    // Root question (How do you feel about?)
-    const rootQuestion = await this.createQuestionNode(
-      `How do you feel about ${workspaceName}?`,
-      dialogueId, NodeType.SLIDER, standardOptions, true,
-    );
-
-    // Positive Sub child 1 (What did you like?)
-    const instagramNodeId = NodeService.findLeafIdContainingText(leafs, 'Follow us on Instagram and stay');
-    const rootToWhatDidYou = await this.createQuestionNode(
-      'What did you like?', dialogueId, NodeType.CHOICE, standardOptions, false,
-      instagramNodeId,
-    );
-
-    // Positive Sub sub child 1 (Facilities)
-    const comeAndJoin1stAprilId = NodeService.findLeafIdContainingText(leafs,
-      'Come and join us on 1st April for our great event');
-    const whatDidYouToFacilities = await this.createQuestionNode(
-      'What exactly did you like about the facilities?', dialogueId,
-      NodeType.CHOICE, facilityOptions, false, comeAndJoin1stAprilId,
-    );
-
-    // Positive Sub sub child 2 (Website)
-    const whatDidYouToWebsite = await this.createQuestionNode(
-      'What exactly did you like about the website?', dialogueId,
-      NodeType.CHOICE, websiteOptions, false, instagramNodeId,
-    );
-
-    // Positive Sub sub child 3 (Product/Services)
-    const weThinkYouMightLikeThis = NodeService.findLeafIdContainingText(
-      leafs,
-      'We think you might like this as',
-    );
-
-    const whatDidYouToProduct = await this.createQuestionNode(
-      'What exactly did you like about the product / services?',
-      dialogueId,
-      NodeType.CHOICE,
-      productServicesOptions,
-      false,
-      weThinkYouMightLikeThis,
-    );
-
-    // Positive Sub sub child 4 (Customer Support)
-    const yourEmailBelowForNewsletter = NodeService.findLeafIdContainingText(leafs,
-      'your email below to receive our newsletter');
-    const whatDidYouToCustomerSupport = await this.createQuestionNode(
-      'What exactly did you like about the customer support?', dialogueId,
-      NodeType.CHOICE, customerSupportOptions, false, yourEmailBelowForNewsletter,
-    );
-
-    // Neutral Sub child 2
-    const leaveYourEmailBelowToReceive = NodeService.findLeafIdContainingText(leafs,
-      'Leave your email below to receive our');
-    const rootToWhatWouldYouLikeToTalkAbout = await this.createQuestionNode(
-      'What would you like to talk about?', dialogueId, NodeType.CHOICE,
-      standardOptions, false, leaveYourEmailBelowToReceive,
-    );
-
-    // Neutral Sub sub child 1 (Facilities)
-    const whatWouldYouLikeToTalkAboutToFacilities = await this.createQuestionNode('Please specify.',
-      dialogueId, NodeType.CHOICE, facilityOptions);
-
-    // Neutral Sub sub child 2 (Website)
-    const whatWouldYouLikeToTalkAboutToWebsite = await this.createQuestionNode(
-      'Please specify.', dialogueId, NodeType.CHOICE, websiteOptions,
-    );
-
-    // Neutral Sub sub child 3 (Product/Services)
-    const whatWouldYouLikeToTalkAboutToProduct = await this.createQuestionNode(
-      'Please specify.', dialogueId, NodeType.CHOICE, productServicesOptions,
-    );
-
-    // Neutral Sub sub child 4 (Customer Support)
-    const whatWouldYouLikeToTalkAboutToCustomerSupport = await this.createQuestionNode(
-      'Please specify.', dialogueId, NodeType.CHOICE, customerSupportOptions,
-    );
-
-    // Negative Sub child 3
-    const rootToWeAreSorryToHearThat = await this.createQuestionNode(
-      'We are sorry to hear that! Where can we improve?', dialogueId,
-      NodeType.CHOICE, standardOptions,
-    );
-
-    // Negative Sub sub child 1 (Facilities)
-    const ourTeamIsOnIt = NodeService.findLeafIdContainingText(leafs, 'Our team is on it');
-    const weAreSorryToHearThatToFacilities = await this.createQuestionNode(
-      'Please elaborate.', dialogueId, NodeType.CHOICE, facilityOptions, false, ourTeamIsOnIt,
-    );
-
-    // Negative Sub sub child 2 (Website)
-    const pleaseClickWhatsappLink = NodeService.findLeafIdContainingText(leafs,
-      'Please click on the Whatsapp link below so our service');
-    const weAreSorryToHearThatToWebsite = await this.createQuestionNode(
-      'Please elaborate.', dialogueId, NodeType.CHOICE, websiteOptions,
-      false, pleaseClickWhatsappLink,
-    );
-
-    // Negative Sub sub child 3 (Product/Services)
-    const clickBelowForRefund = NodeService.findLeafIdContainingText(leafs, 'Click below for your refund');
-    const weAreSorryToHearThatToProduct = await this.createQuestionNode(
-      'Please elaborate.', dialogueId, NodeType.CHOICE, productServicesOptions,
-      false, clickBelowForRefund,
-    );
-
-    // Negative Sub sub child 4 (Customer Support)
-    const ourCustomerExperienceSupervisor = NodeService.findLeafIdContainingText(leafs,
-      'Our customer experience supervisor is');
-    const weAreSorryToHearThatToCustomerSupport = await this.createQuestionNode(
-      'Please elaborate', dialogueId, NodeType.CHOICE, customerSupportOptions,
-      false, ourCustomerExperienceSupervisor,
-    );
-
-    // ################################### EDGES ################################
-
-    // Positive edges
-    await this.edgeService.createEdge(rootQuestion, rootToWhatDidYou,
-      { conditionType: 'valueBoundary', matchValue: null, renderMin: 70, renderMax: 100 });
-
-    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToFacilities,
-      { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToWebsite,
-      {
-        conditionType: 'match',
-        matchValue: 'Website/Mobile app',
-        renderMin: null,
-        renderMax: null,
-      });
-
-    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToProduct,
-      { conditionType: 'match', matchValue: 'Product/Services', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(rootToWhatDidYou, whatDidYouToCustomerSupport,
-      { conditionType: 'match', matchValue: 'Customer Support', renderMin: null, renderMax: null });
-
-    // Neutral edges
-    await this.edgeService.createEdge(rootQuestion, rootToWhatWouldYouLikeToTalkAbout,
-      { conditionType: 'valueBoundary', matchValue: null, renderMin: 50, renderMax: 70 });
-
-    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout, whatWouldYouLikeToTalkAboutToFacilities,
-      { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
-      whatWouldYouLikeToTalkAboutToWebsite,
-      {
-        conditionType: 'match',
-        matchValue: 'Website/Mobile app',
-        renderMin: null,
-        renderMax: null,
-      });
-
-    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
-      whatWouldYouLikeToTalkAboutToProduct, {
-      conditionType: 'match',
-      matchValue: 'Product/Services',
-      renderMin: null,
-      renderMax: null,
-    });
-
-    await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
-      whatWouldYouLikeToTalkAboutToCustomerSupport, {
-      conditionType: 'match',
-      matchValue: 'Customer Support',
-      renderMin: null,
-      renderMax: null,
-    });
-
-    // Negative edges
-    await this.edgeService.createEdge(rootQuestion, rootToWeAreSorryToHearThat,
-      { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 50 });
-
-    await this.edgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToFacilities,
-      { conditionType: 'match', matchValue: 'Facilities', renderMax: null, renderMin: null });
-
-    await this.edgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToWebsite,
-      {
-        conditionType: 'match',
-        matchValue: 'Website/Mobile app',
-        renderMax: null,
-        renderMin: null,
-      });
-
-    await this.edgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToProduct,
-      { conditionType: 'match', matchValue: 'Product/Services', renderMax: null, renderMin: null });
-
-    await this.edgeService.createEdge(rootToWeAreSorryToHearThat,
-      weAreSorryToHearThatToCustomerSupport, {
-      conditionType: 'match',
-      matchValue: 'Customer Support',
-      renderMax: null,
-      renderMin: null,
-    });
-  };
 }
 
 export default NodeService;

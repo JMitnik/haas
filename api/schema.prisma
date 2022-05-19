@@ -135,6 +135,7 @@ model Dialogue {
   id                          String                           @id @default(cuid())
   title                       String
   slug                        String
+  isPrivate                   Boolean                          @default(false)
   description                 String
   creationDate                DateTime                         @default(now())
   updatedAt                   DateTime?                        @updatedAt
@@ -154,6 +155,7 @@ model Dialogue {
   dialogueStatisticsSummaries DialogueStatisticsSummaryCache[]
   edges                       Edge[]
   questions                   QuestionNode[]
+  assignees                   User[]
   sessions                    Session[]
   tags                        Tag[]
 
@@ -438,23 +440,26 @@ model Role {
 }
 
 model User {
-  id                 String                 @id @default(cuid())
-  createdAt          DateTime               @default(now())
-  updatedAt          DateTime?              @updatedAt
-  email              String                 @unique(map: "User.email_unique")
-  password           String?
-  phone              String?
-  firstName          String?
-  lastName           String?
-  globalPermissions  SystemPermissionEnum[]
+  id                String                 @id @default(cuid())
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime?              @updatedAt
+  email             String                 @unique(map: "User.email_unique")
+  password          String?
+  phone             String?
+  firstName         String?
+  lastName          String?
+  globalPermissions SystemPermissionEnum[]
+
   loginToken         String?
   loginTokenExpiry   DateTime?
+  lastLoggedIn       DateTime?
   refreshToken       String?
   refreshTokenExpiry DateTime?
   lastActivity       DateTime?
-  lastLoggedIn       DateTime?
   customers          UserOfCustomer[]
   triggers           Trigger[]
+
+  isAssignedTo Dialogue[]
 }
 
 model UserOfCustomer {
@@ -769,6 +774,16 @@ model Automation {
   workspace           Customer           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
+enum DialogueTemplateType {
+  SPORT_ENG
+  SPORT_NL
+  BUSINESS_ENG
+  BUSINESS_NL
+  DEFAULT
+  MASS_SEED
+  TEST
+}
+
 enum QuestionImpactScore {
   PERCENTAGE
 }
@@ -828,6 +843,8 @@ enum InputSource {
 
 enum SystemPermissionEnum {
   CAN_ACCESS_ADMIN_PANEL
+  CAN_GENERATE_WORKSPACE_FROM_CSV
+  CAN_ASSIGN_USERS_TO_DIALOGUE
   CAN_EDIT_DIALOGUE
   CAN_BUILD_DIALOGUE
   CAN_VIEW_DIALOGUE

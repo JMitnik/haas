@@ -9,9 +9,11 @@ interface HexagonItemProps {
   zoomHelper: ProvidedZoom<SVGElement>;
   points: string;
   score: number;
+  strokeWidth: number;
   onZoom: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
   onMouseOver: (event: React.MouseEvent<SVGPolygonElement, MouseEvent>, node: HexagonNode) => void;
   onMouseExit?: () => void;
+  id?: string;
 }
 
 export const HexagonItem = ({
@@ -22,6 +24,7 @@ export const HexagonItem = ({
   onZoom,
   onMouseOver,
   onMouseExit,
+  strokeWidth,
 }: HexagonItemProps) => {
   const initialFill = getHexagonSVGFill(score);
   const [fill] = useState(initialFill);
@@ -30,7 +33,11 @@ export const HexagonItem = ({
     <g>
       <g fill="blue">
         <polygon
+          aria-label={node.id}
+          role="button"
+          strokeWidth={strokeWidth}
           points={points}
+          stroke="white"
           fill={fill}
           onMouseOver={(event) => {
             onMouseOver?.(event, node);

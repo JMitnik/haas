@@ -1,0 +1,8 @@
+query GetDialogueLinks($input: DialogueLinksInput) {
+	dialogueLinks(input: $input) {
+		title
+		slug
+		description
+		url
+	}
+}

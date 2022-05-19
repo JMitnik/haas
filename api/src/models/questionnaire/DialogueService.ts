@@ -13,7 +13,8 @@ import {
 } from './DialogueTypes';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
-import defaultWorkspaceTemplate, { MassSeedTemplate, WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
+import { MassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
+import { WorkspaceTemplate } from '../templates/TemplateTypes';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { CreateQuestionsInput, UpsertDialogueStatisticsInput } from './DialoguePrismaAdapterType';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
@@ -22,8 +23,14 @@ import NodeEntryPrismaAdapter from '../node-entry/NodeEntryPrismaAdapter';
 import EdgePrismaAdapter from '../edge/EdgePrismaAdapter';
 import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
 import EdgeService from '../edge/EdgeService';
+import { offsetPaginate } from '../general/PaginationHelpers';
+import config from '../../config/config';
+import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
+import TemplateService from '../templates/TemplateService';
 
-
+function getRandomIntFromInterval(min: number, max: number) { // min and max included 
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
@@ -36,6 +43,7 @@ class DialogueService {
   edgePrismaAdapter: EdgePrismaAdapter;
   edgeService: EdgeService;
   questionNodePrismaAdapter: QuestionNodePrismaAdapter;
+  templateService: TemplateService;
   nodeService: NodeService;
 
   constructor(prismaClient: PrismaClient) {
@@ -46,7 +54,24 @@ class DialogueService {
     this.edgeService = new EdgeService(prismaClient);
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
+    this.templateService = new TemplateService(prismaClient);
     this.nodeService = new NodeService(prismaClient);
+  }
+
+  /**
+   * Finds all dialogues of a workspace but strips them off all sensitive information
+   * @param workspaceId 
+   * @returns a list of dialogues including a url to their client version
+   */
+  findDialogueUrlsByWorkspaceId = async (workspaceId: string) => {
+    const strippedDialogues = await this.dialoguePrismaAdapter.findDialogueUrlsByWorkspaceId(workspaceId);
+    const mappedStrippedDialogues = strippedDialogues.map((dialogue) => ({
+      slug: dialogue.slug,
+      title: dialogue.title,
+      description: dialogue.description,
+      url: config.env === 'local' ? `http://localhost:3000/${dialogue.customer.slug}/${dialogue.slug}` : `https://client.haas.live/${dialogue.customer.slug}/${dialogue.slug}`,
+    }));
+    return mappedStrippedDialogues;
   }
 
   /**
@@ -69,7 +94,7 @@ class DialogueService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
-    const sessions = await this.sessionPrismaAdapter.findSessionByDialogueIdBetweenDates(
+    const sessions = await this.sessionPrismaAdapter.findDialogueSessions(
       dialogueId,
       startDateTime,
       endDateTimeSet,
@@ -234,7 +259,7 @@ class DialogueService {
     endDateTime: Date,
     isPrev: boolean
   ) => {
-    const sessions = await this.sessionPrismaAdapter.findSessionByDialogueIdBetweenDates(
+    const sessions = await this.sessionPrismaAdapter.findDialogueSessions(
       dialogueId,
       startDateTime,
       endDateTime,
@@ -582,6 +607,36 @@ class DialogueService {
       name: topicName,
       nrVotes: topicNrVotes,
       subTopics: mergedSubTopics,
+    }
+  }
+
+  setDialoguePrivacy = async (input: NexusGenInputs['SetDialoguePrivacyInput']) => {
+    return this.dialoguePrismaAdapter.setDialoguePrivacy(input);
+  }
+
+  /**
+   * Function to paginate through all automations of a workspace
+   * @param workspaceSlug the slug of the workspace
+   * @param filter a filter object used to paginate through automations of a workspace
+   * @returns a list of paginated automations
+   */
+  public paginatedDialogues = async (
+    workspaceSlug: string,
+    userId: string,
+    filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null,
+  ) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 15;
+
+    const dialogues = await this.dialoguePrismaAdapter.findPaginatedDialogues(workspaceSlug, userId, filter);
+    const totalDialogues = await this.dialoguePrismaAdapter.countDialogues(workspaceSlug, userId, filter);
+
+    const { totalPages, ...pageInfo } = offsetPaginate(totalDialogues, offset, perPage);
+
+    return {
+      dialogues: dialogues,
+      totalPages,
+      pageInfo,
     };
   };
 
@@ -724,6 +779,10 @@ class DialogueService {
     return updateDialogueArgs;
   };
 
+  createPostLeafNode = async (dialogueId: string, postLeafNodeContent: { header: string, subHeader: string }) => {
+    return this.dialoguePrismaAdapter.createPostLeafNode(dialogueId, postLeafNodeContent);
+  }
+
   static updatePostLeafNode(
     dbPostLeaf: PostLeafNode | null | undefined,
     heading: string | null | undefined,
@@ -842,12 +901,15 @@ class DialogueService {
     dialogueId: string,
     template: MassSeedTemplate,
     maxSessions: number = 30,
-    isStrict: boolean = false
+    isStrict: boolean = false,
+    nrDays: number = 30,
+    minSliderValue: number = 1,
+    maxSliderValue: number = 100,
   ) => {
     const currentDate = new Date();
 
-    const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
-    const datesBackInTime = nrDaysBack.map((amtDaysBack, index) => subDays(currentDate, index));
+    const nrDaysBack = Array.from(Array(nrDays)).map((empty, index) => index + 1);
+    const datesBackInTime = nrDaysBack.map((daysBackCount, index) => subDays(currentDate, index));
     const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
     await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueId, true);
 
@@ -860,10 +922,10 @@ class DialogueService {
     // For every particular date, generate a fake score
     for (var i = 0, n = datesBackInTime.length; i < n; i++) {
       try {
-        const amtSessions = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
+        const sessionCount = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        for (var k = 0, z = amtSessions; k < z; k++) {
-          const simulatedRootVote: number = getRandomInt(100);
+        for (var k = 0, z = sessionCount; k < z; k++) {
+          const simulatedRootVote: number = getRandomIntFromInterval(minSliderValue, maxSliderValue);
 
           const simulatedChoice = Object.keys(template.topics)[
             Math.floor(Math.random() * Object.keys(template.topics).length)
@@ -875,8 +937,8 @@ class DialogueService {
           const simulatedSubChoice = sample(subChoices) as string;
 
           const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
-            if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
-            const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+            if ((!condition.renderMin && typeof condition.renderMin !== 'number') || !condition.renderMax) return false;
+            const isValid = simulatedRootVote >= condition?.renderMin && simulatedRootVote <= condition?.renderMax;
             return isValid;
           }));
 
@@ -927,7 +989,10 @@ class DialogueService {
     }
   };
 
-  generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {
+  generateFakeData = async (
+    dialogueId: string,
+    template: WorkspaceTemplate
+  ) => {
     const currentDate = new Date();
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
@@ -946,7 +1011,10 @@ class DialogueService {
     await Promise.all(datesBackInTime.map(async (backDate) => {
       const simulatedRootVote: number = getRandomInt(100);
 
-      const simulatedChoice = template.topics[Math.floor(Math.random() * template.topics.length)];
+      const simulatedChoice = Object.keys(template.topics)[
+        Math.floor(Math.random() * Object.keys(template.topics).length)
+      ].toString();
+
       const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
         if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
         const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
@@ -1317,7 +1385,7 @@ class DialogueService {
     if (!dialogue) throw new ApolloError('customer:unable_to_create');
 
     // TODO: "Include "
-    this.dialoguePrismaAdapter.update(dialogue.id, {
+    void this.dialoguePrismaAdapter.update(dialogue.id, {
       questions: {
         create: {
           title: `What do you think about ${customer?.name} ?`,
@@ -1328,7 +1396,7 @@ class DialogueService {
     })
 
     // TODO: Make this dependent on input "template"
-    await this.nodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
+    await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
 
     return dialogue;
   };
@@ -1349,8 +1417,8 @@ class DialogueService {
     if (!dialogue) throw new Error('Dialogue not seeded');
 
     // TODO: Make this dependent on input "template"
-    const leafs = await this.nodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
-    await this.nodeService.createTemplateNodes(dialogue.id, customerName, leafs);
+    const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
+    await this.templateService.createTemplateNodes(dialogue.id, customerName, leafs, 'DEFAULT');
 
     return dialogue;
   };

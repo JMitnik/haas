@@ -39,6 +39,11 @@ export interface NexusGenInputs {
     nodeId?: string | null; // String
     sessionId?: string | null; // ID
   }
+  AssignUserToDialoguesInput: { // input type
+    assignedDialogueIds: string[]; // [String!]!
+    userId: string; // String!
+    workspaceId: string; // String!
+  }
   AuthenticateLambdaInput: { // input type
     authenticateEmail?: string | null; // String
     workspaceEmail?: string | null; // String
@@ -265,10 +270,25 @@ export interface NexusGenInputs {
     by: NexusGenEnums['DeliveryConnectionOrder']; // DeliveryConnectionOrder!
     desc?: boolean | null; // Boolean
   }
+  DialogueConnectionFilterInput: { // input type
+    endDate?: string | null; // String
+    offset?: number | null; // Int
+    orderBy?: NexusGenInputs['DialogueConnectionOrderByInput'] | null; // DialogueConnectionOrderByInput
+    perPage?: number | null; // Int
+    searchTerm?: string | null; // String
+    startDate?: string | null; // String
+  }
+  DialogueConnectionOrderByInput: { // input type
+    by: NexusGenEnums['DialogueConnectionOrder']; // DialogueConnectionOrder!
+    desc?: boolean | null; // Boolean
+  }
   DialogueFilterInputType: { // input type
     endDate?: string | null; // String
     searchTerm?: string | null; // String
     startDate?: string | null; // String
+  }
+  DialogueLinksInput: { // input type
+    workspaceId?: string | null; // String
   }
   DialogueStatisticsSummaryFilterInput: { // input type
     cutoff?: number | null; // Int
@@ -362,6 +382,13 @@ export interface NexusGenInputs {
     website?: string | null; // String
     youLoveX?: string | null; // String
   }
+  GenerateWorkspaceCSVInputType: { // input type
+    generateDemoData?: boolean | null; // Boolean
+    type: string; // String!
+    uploadedCsv?: any | null; // Upload
+    workspaceSlug: string; // String!
+    workspaceTitle: string; // String!
+  }
   GetAutomationInput: { // input type
     id?: string | null; // String
   }
@@ -375,6 +402,11 @@ export interface NexusGenInputs {
     isActive?: boolean | null; // Boolean
     userId?: string | null; // String
     workspaceId?: string | null; // String
+  }
+  HealthScoreInput: { // input type
+    endDateTime?: string | null; // String
+    startDateTime: string; // String!
+    threshold?: number | null; // Float
   }
   InviteUserInput: { // input type
     customerId: string; // String!
@@ -527,6 +559,11 @@ export interface NexusGenInputs {
     dialogueId?: string | null; // ID
     id?: string | null; // ID
   }
+  SetDialoguePrivacyInput: { // input type
+    customerId: string; // String!
+    dialogueSlug: string; // String!
+    state: boolean; // Boolean!
+  }
   ShareNodeInputType: { // input type
     id?: string | null; // String
     title?: string | null; // String
@@ -641,6 +678,7 @@ export interface NexusGenInputs {
     customerId?: string | null; // String
     customerSlug?: string | null; // String
     userId?: string | null; // String
+    workspaceId?: string | null; // String
   }
   VideoNodeEntryInput: { // input type
     value?: string | null; // String
@@ -666,7 +704,9 @@ export interface NexusGenEnums {
   DeliveryConnectionOrder: "createdAt"
   DeliveryStatusEnum: "DELIVERED" | "DEPLOYED" | "FAILED" | "FINISHED" | "OPENED" | "SCHEDULED" | "SENT"
   DialogueAspectType: "GENERAL_SCORE" | "LATEST_SCORE" | "NR_INTERACTIONS" | "NR_VISITORS"
+  DialogueConnectionOrder: "createdAt"
   DialogueImpactScoreType: "AVERAGE"
+  DialogueTemplateType: "BUSINESS_ENG" | "BUSINESS_NL" | "DEFAULT" | "MASS_SEED" | "SPORT_ENG" | "SPORT_NL"
   FormNodeFieldTypeEnum: "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
@@ -681,7 +721,7 @@ export interface NexusGenEnums {
   RecurringPeriodType: prisma.RecurringPeriodType
   SessionConnectionOrder: "createdAt"
   SessionDeliveryType: "campaigns" | "noCampaigns"
-  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
+  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
@@ -697,6 +737,10 @@ export interface NexusGenRootTypes {
     filename?: string | null; // String
     mimetype?: string | null; // String
     url?: string | null; // String
+  }
+  AssignedDialogues: { // root type
+    assignedDialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
+    privateWorkspaceDialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
   }
   AutodeckConnectionType: { // root type
     cursor?: string | null; // String
@@ -862,6 +906,11 @@ export interface NexusGenRootTypes {
     id: string; // ID!
     updatedAt: any; // Date!
   }
+  DialogueConnection: { // root type
+    dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    totalPages?: number | null; // Int
+  }
   DialogueFinisherObjectType: { // root type
     header: string; // String!
     id: string; // ID!
@@ -916,6 +965,10 @@ export interface NexusGenRootTypes {
     fields: NexusGenRootTypes['FormNodeField'][]; // [FormNodeField!]!
     helperText?: string | null; // String
     id?: string | null; // String
+  }
+  HealthScore: { // root type
+    nrVotes: number; // Int!
+    score: number; // Float!
   }
   ImageType: { // root type
     encoding?: string | null; // String
@@ -1016,6 +1069,12 @@ export interface NexusGenRootTypes {
     colors: string[]; // [String!]!
     rembgLogoUrl: string; // String!
     websiteScreenshotUrl: string; // String!
+  }
+  PublicDialogueInfo: { // root type
+    description?: string | null; // String
+    slug: string; // String!
+    title: string; // String!
+    url: string; // String!
   }
   Query: {};
   QuestionConditionScopeModel: { // root type
@@ -1177,7 +1236,7 @@ export interface NexusGenRootTypes {
     basicSentiment?: string | null; // String
     quantity?: number | null; // Int
   }
-  ConnectionInterface: NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['AutomationConnection'] | NexusGenRootTypes['UserConnection'] | NexusGenRootTypes['SessionConnection'];
+  ConnectionInterface: NexusGenRootTypes['AutomationConnection'] | NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['DialogueConnection'] | NexusGenRootTypes['UserConnection'] | NexusGenRootTypes['SessionConnection'];
   DeprecatedConnectionInterface: NexusGenRootTypes['AutodeckConnectionType'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
   String: string;
   Int: number;
@@ -1192,6 +1251,7 @@ export interface NexusGenRootTypes {
 export interface NexusGenAllTypes extends NexusGenRootTypes {
   AdjustedImageInput: NexusGenInputs['AdjustedImageInput'];
   AppendToInteractionInput: NexusGenInputs['AppendToInteractionInput'];
+  AssignUserToDialoguesInput: NexusGenInputs['AssignUserToDialoguesInput'];
   AuthenticateLambdaInput: NexusGenInputs['AuthenticateLambdaInput'];
   AutomationActionInput: NexusGenInputs['AutomationActionInput'];
   AutomationConditionBuilderInput: NexusGenInputs['AutomationConditionBuilderInput'];
@@ -1226,7 +1286,10 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   DeleteUserInput: NexusGenInputs['DeleteUserInput'];
   DeliveryConnectionFilterInput: NexusGenInputs['DeliveryConnectionFilterInput'];
   DeliveryConnectionOrderByInput: NexusGenInputs['DeliveryConnectionOrderByInput'];
+  DialogueConnectionFilterInput: NexusGenInputs['DialogueConnectionFilterInput'];
+  DialogueConnectionOrderByInput: NexusGenInputs['DialogueConnectionOrderByInput'];
   DialogueFilterInputType: NexusGenInputs['DialogueFilterInputType'];
+  DialogueLinksInput: NexusGenInputs['DialogueLinksInput'];
   DialogueStatisticsSummaryFilterInput: NexusGenInputs['DialogueStatisticsSummaryFilterInput'];
   DialogueWhereUniqueInput: NexusGenInputs['DialogueWhereUniqueInput'];
   EdgeConditionInputType: NexusGenInputs['EdgeConditionInputType'];
@@ -1238,10 +1301,12 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   FormNodeFieldInput: NexusGenInputs['FormNodeFieldInput'];
   FormNodeInputType: NexusGenInputs['FormNodeInputType'];
   GenerateAutodeckInput: NexusGenInputs['GenerateAutodeckInput'];
+  GenerateWorkspaceCSVInputType: NexusGenInputs['GenerateWorkspaceCSVInputType'];
   GetAutomationInput: NexusGenInputs['GetAutomationInput'];
   GetAutomationsByWorkspaceInput: NexusGenInputs['GetAutomationsByWorkspaceInput'];
   GetCampaignsInput: NexusGenInputs['GetCampaignsInput'];
   HandleUserStateInWorkspaceInput: NexusGenInputs['HandleUserStateInWorkspaceInput'];
+  HealthScoreInput: NexusGenInputs['HealthScoreInput'];
   InviteUserInput: NexusGenInputs['InviteUserInput'];
   LoginInput: NexusGenInputs['LoginInput'];
   MassSeedInput: NexusGenInputs['MassSeedInput'];
@@ -1270,6 +1335,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   SessionInput: NexusGenInputs['SessionInput'];
   SessionScoreRangeFilter: NexusGenInputs['SessionScoreRangeFilter'];
   SessionWhereUniqueInput: NexusGenInputs['SessionWhereUniqueInput'];
+  SetDialoguePrivacyInput: NexusGenInputs['SetDialoguePrivacyInput'];
   ShareNodeInputType: NexusGenInputs['ShareNodeInputType'];
   SlideNodeMarkerInput: NexusGenInputs['SlideNodeMarkerInput'];
   SliderNodeEntryInput: NexusGenInputs['SliderNodeEntryInput'];
@@ -1304,7 +1370,9 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   DeliveryConnectionOrder: NexusGenEnums['DeliveryConnectionOrder'];
   DeliveryStatusEnum: NexusGenEnums['DeliveryStatusEnum'];
   DialogueAspectType: NexusGenEnums['DialogueAspectType'];
+  DialogueConnectionOrder: NexusGenEnums['DialogueConnectionOrder'];
   DialogueImpactScoreType: NexusGenEnums['DialogueImpactScoreType'];
+  DialogueTemplateType: NexusGenEnums['DialogueTemplateType'];
   FormNodeFieldTypeEnum: NexusGenEnums['FormNodeFieldTypeEnum'];
   JobProcessLocationType: NexusGenEnums['JobProcessLocationType'];
   JobStatusType: NexusGenEnums['JobStatusType'];
@@ -1335,6 +1403,10 @@ export interface NexusGenFieldTypes {
     filename: string | null; // String
     mimetype: string | null; // String
     url: string | null; // String
+  }
+  AssignedDialogues: { // field return type
+    assignedDialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
+    privateWorkspaceDialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
   }
   AutodeckConnectionType: { // field return type
     cursor: string | null; // String
@@ -1484,10 +1556,12 @@ export interface NexusGenFieldTypes {
     campaign: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     campaigns: NexusGenRootTypes['CampaignType'][]; // [CampaignType!]!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    dialogueConnection: NexusGenRootTypes['DialogueConnection'] | null; // DialogueConnection
     dialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
     id: string; // ID!
     name: string; // String!
     nestedDialogueStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][] | null; // [DialogueStatisticsSummaryModel!]
+    nestedHealthScore: NexusGenRootTypes['HealthScore'] | null; // HealthScore
     nestedMostChanged: NexusGenRootTypes['MostChangedPath'] | null; // MostChangedPath
     nestedMostPopular: NexusGenRootTypes['MostPopularPath'] | null; // MostPopularPath
     nestedMostTrendingTopic: NexusGenRootTypes['MostTrendingTopic'] | null; // MostTrendingTopic
@@ -1538,6 +1612,7 @@ export interface NexusGenFieldTypes {
     pageIndex: number; // Int!
   }
   Dialogue: { // field return type
+    assignees: NexusGenRootTypes['UserType'][] | null; // [UserType!]
     averageScore: number | null; // Float
     campaignVariants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
     creationDate: string | null; // String
@@ -1546,7 +1621,9 @@ export interface NexusGenFieldTypes {
     description: string; // String!
     dialogueStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'] | null; // DialogueStatisticsSummaryModel
     edges: NexusGenRootTypes['Edge'][]; // [Edge!]!
+    healthScore: NexusGenRootTypes['HealthScore'] | null; // HealthScore
     id: string; // ID!
+    isPrivate: boolean; // Boolean!
     isWithoutGenData: boolean; // Boolean!
     language: NexusGenEnums['LanguageEnumType']; // LanguageEnumType!
     leafs: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
@@ -1574,6 +1651,11 @@ export interface NexusGenFieldTypes {
     createdAt: any; // Date!
     id: string; // ID!
     updatedAt: any; // Date!
+  }
+  DialogueConnection: { // field return type
+    dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    totalPages: number | null; // Int
   }
   DialogueFinisherObjectType: { // field return type
     header: string; // String!
@@ -1648,6 +1730,10 @@ export interface NexusGenFieldTypes {
     helperText: string | null; // String
     id: string | null; // String
   }
+  HealthScore: { // field return type
+    nrVotes: number; // Int!
+    score: number; // Float!
+  }
   ImageType: { // field return type
     encoding: string | null; // String
     filename: string | null; // String
@@ -1719,6 +1805,7 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     appendToInteraction: NexusGenRootTypes['Session']; // Session!
     assignTags: NexusGenRootTypes['Dialogue']; // Dialogue!
+    assignUserToDialogues: NexusGenRootTypes['UserType'] | null; // UserType
     authenticateLambda: string | null; // String
     confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     copyDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
@@ -1749,6 +1836,7 @@ export interface NexusGenFieldTypes {
     editUser: NexusGenRootTypes['UserType']; // UserType!
     editWorkspace: NexusGenRootTypes['Customer']; // Customer!
     generateAutodeck: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
+    generateWorkspaceFromCSV: NexusGenRootTypes['Customer'] | null; // Customer
     handleUserStateInWorkspace: NexusGenRootTypes['UserCustomer']; // UserCustomer!
     inviteUser: NexusGenRootTypes['InviteUserOutput']; // InviteUserOutput!
     logout: string; // String!
@@ -1757,6 +1845,7 @@ export interface NexusGenFieldTypes {
     removePixelRange: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
     requestInvite: NexusGenRootTypes['RequestInviteOutput']; // RequestInviteOutput!
     retryAutodeckJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
+    setDialoguePrivacy: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
     updateAutomation: NexusGenRootTypes['AutomationModel']; // AutomationModel!
     updateCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -1818,6 +1907,12 @@ export interface NexusGenFieldTypes {
     rembgLogoUrl: string; // String!
     websiteScreenshotUrl: string; // String!
   }
+  PublicDialogueInfo: { // field return type
+    description: string | null; // String
+    slug: string; // String!
+    title: string; // String!
+    url: string; // String!
+  }
   Query: { // field return type
     automation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     automations: NexusGenRootTypes['AutomationModel'][]; // [AutomationModel!]!
@@ -1825,6 +1920,7 @@ export interface NexusGenFieldTypes {
     customers: NexusGenRootTypes['Customer'][]; // [Customer!]!
     delivery: NexusGenRootTypes['DeliveryType'] | null; // DeliveryType
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    dialogueLinks: NexusGenRootTypes['PublicDialogueInfo'][] | null; // [PublicDialogueInfo!]
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
     edge: NexusGenRootTypes['Edge'] | null; // Edge
     getAdjustedLogo: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
@@ -2029,6 +2125,7 @@ export interface NexusGenFieldTypes {
     user: NexusGenRootTypes['UserType']; // UserType!
   }
   UserType: { // field return type
+    assignedDialogues: NexusGenRootTypes['AssignedDialogues'] | null; // AssignedDialogues
     customers: NexusGenRootTypes['Customer'][]; // [Customer!]!
     email: string; // String!
     firstName: string | null; // String
@@ -2094,11 +2191,17 @@ export interface NexusGenArgTypes {
     dialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
     }
+    dialogueConnection: { // args
+      filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null; // DialogueConnectionFilterInput
+    }
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
     }
     nestedDialogueStatisticsSummary: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
+    nestedHealthScore: { // args
+      input?: NexusGenInputs['HealthScoreInput'] | null; // HealthScoreInput
     }
     nestedMostChanged: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
@@ -2123,6 +2226,9 @@ export interface NexusGenArgTypes {
     }
     dialogueStatisticsSummary: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
+    healthScore: { // args
+      input?: NexusGenInputs['HealthScoreInput'] | null; // HealthScoreInput
     }
     leafs: { // args
       searchTerm?: string | null; // String
@@ -2159,6 +2265,9 @@ export interface NexusGenArgTypes {
     assignTags: { // args
       dialogueId?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
+    }
+    assignUserToDialogues: { // args
+      input?: NexusGenInputs['AssignUserToDialoguesInput'] | null; // AssignUserToDialoguesInput
     }
     authenticateLambda: { // args
       input?: NexusGenInputs['AuthenticateLambdaInput'] | null; // AuthenticateLambdaInput
@@ -2266,6 +2375,9 @@ export interface NexusGenArgTypes {
     generateAutodeck: { // args
       input?: NexusGenInputs['GenerateAutodeckInput'] | null; // GenerateAutodeckInput
     }
+    generateWorkspaceFromCSV: { // args
+      input?: NexusGenInputs['GenerateWorkspaceCSVInputType'] | null; // GenerateWorkspaceCSVInputType
+    }
     handleUserStateInWorkspace: { // args
       input?: NexusGenInputs['HandleUserStateInWorkspaceInput'] | null; // HandleUserStateInWorkspaceInput
     }
@@ -2286,6 +2398,9 @@ export interface NexusGenArgTypes {
     }
     retryAutodeckJob: { // args
       jobId?: string | null; // String
+    }
+    setDialoguePrivacy: { // args
+      input?: NexusGenInputs['SetDialoguePrivacyInput'] | null; // SetDialoguePrivacyInput
     }
     singleUpload: { // args
       file?: any | null; // Upload
@@ -2349,6 +2464,9 @@ export interface NexusGenArgTypes {
     }
     dialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
+    }
+    dialogueLinks: { // args
+      input?: NexusGenInputs['DialogueLinksInput'] | null; // DialogueLinksInput
     }
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
@@ -2419,20 +2537,25 @@ export interface NexusGenArgTypes {
       input?: NexusGenInputs['QuestionStatisticsSummaryFilterInput'] | null; // QuestionStatisticsSummaryFilterInput
     }
   }
+  UserType: {
+    assignedDialogues: { // args
+      input?: NexusGenInputs['UserOfCustomerInput'] | null; // UserOfCustomerInput
+    }
+  }
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  ConnectionInterface: "DeliveryConnectionType" | "AutomationConnection" | "UserConnection" | "SessionConnection"
+  ConnectionInterface: "AutomationConnection" | "DeliveryConnectionType" | "DialogueConnection" | "UserConnection" | "SessionConnection"
   DeprecatedConnectionInterface: "AutodeckConnectionType" | "RoleConnection" | "TriggerConnectionType"
 }
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "AWSImageType" | "AutodeckConnectionType" | "AutomationActionModel" | "AutomationConditionBuilderModel" | "AutomationConditionModel" | "AutomationConditionOperandModel" | "AutomationConnection" | "AutomationEventModel" | "AutomationModel" | "AutomationTriggerModel" | "CampaignType" | "CampaignVariantCustomVariableType" | "CampaignVariantType" | "ColourSettings" | "ConditionPropertyAggregate" | "CreateBatchDeliveriesOutputType" | "CreateWorkspaceJobType" | "CustomFieldType" | "Customer" | "CustomerSettings" | "DeleteUserOutput" | "DeliveryConnectionType" | "DeliveryEventType" | "DeliveryType" | "DeprecatedPaginationPageInfo" | "Dialogue" | "DialogueConditionScopeModel" | "DialogueFinisherObjectType" | "DialogueStatistics" | "DialogueStatisticsSummaryModel" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "IndepthQuestionStatisticsSummary" | "InviteUserOutput" | "JobObjectType" | "JobProcessLocation" | "JobProcessLocations" | "LinkType" | "LoginOutput" | "MostChangedPath" | "MostPopularPath" | "MostTrendingTopic" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PathTopic" | "PathedSessionsType" | "PermssionType" | "PreviewDataType" | "Query" | "QuestionConditionScopeModel" | "QuestionNode" | "QuestionOption" | "QuestionStatisticsSummary" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TopicDelta" | "TopicNodeEntryValue" | "TopicType" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "WorkspaceConditionScopeModel" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "AWSImageType" | "AssignedDialogues" | "AutodeckConnectionType" | "AutomationActionModel" | "AutomationConditionBuilderModel" | "AutomationConditionModel" | "AutomationConditionOperandModel" | "AutomationConnection" | "AutomationEventModel" | "AutomationModel" | "AutomationTriggerModel" | "CampaignType" | "CampaignVariantCustomVariableType" | "CampaignVariantType" | "ColourSettings" | "ConditionPropertyAggregate" | "CreateBatchDeliveriesOutputType" | "CreateWorkspaceJobType" | "CustomFieldType" | "Customer" | "CustomerSettings" | "DeleteUserOutput" | "DeliveryConnectionType" | "DeliveryEventType" | "DeliveryType" | "DeprecatedPaginationPageInfo" | "Dialogue" | "DialogueConditionScopeModel" | "DialogueConnection" | "DialogueFinisherObjectType" | "DialogueStatistics" | "DialogueStatisticsSummaryModel" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "HealthScore" | "ImageType" | "IndepthQuestionStatisticsSummary" | "InviteUserOutput" | "JobObjectType" | "JobProcessLocation" | "JobProcessLocations" | "LinkType" | "LoginOutput" | "MostChangedPath" | "MostPopularPath" | "MostTrendingTopic" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PathTopic" | "PathedSessionsType" | "PermssionType" | "PreviewDataType" | "PublicDialogueInfo" | "Query" | "QuestionConditionScopeModel" | "QuestionNode" | "QuestionOption" | "QuestionStatisticsSummary" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TopicDelta" | "TopicNodeEntryValue" | "TopicType" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "WorkspaceConditionScopeModel" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AdjustedImageInput" | "AppendToInteractionInput" | "AuthenticateLambdaInput" | "AutomationActionInput" | "AutomationConditionBuilderInput" | "AutomationConnectionFilterInput" | "AutomationConnectionOrderByInput" | "AutomationEventInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "ConditionDialogueScopeInput" | "ConditionPropertyAggregateInput" | "ConditionQuestionScopeInput" | "ConditionScopeInput" | "ConditionWorkspaceScopeInput" | "CreateAutomationCondition" | "CreateAutomationInput" | "CreateAutomationOperandInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignCustomVariable" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomFieldInputType" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DeliveryConnectionFilterInput" | "DeliveryConnectionOrderByInput" | "DialogueFilterInputType" | "DialogueStatisticsSummaryFilterInput" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FindRoleInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GenerateAutodeckInput" | "GetAutomationInput" | "GetAutomationsByWorkspaceInput" | "GetCampaignsInput" | "HandleUserStateInWorkspaceInput" | "InviteUserInput" | "LoginInput" | "MassSeedInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PathedSessionsInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "QuestionStatisticsSummaryFilterInput" | "QuestionWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RemovePixelRangeInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionConnectionFilterInput" | "SessionConnectionOrderByInput" | "SessionInput" | "SessionScoreRangeFilter" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TopicInputType" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdatePermissionsInput" | "UpdateQuestionNodeInputType" | "UploadSellImageInputType" | "UserConnectionFilterInput" | "UserConnectionOrderByInput" | "UserInput" | "UserOfCustomerInput" | "VideoNodeEntryInput" | "createJobProcessLocationInput";
+export type NexusGenInputNames = "AdjustedImageInput" | "AppendToInteractionInput" | "AssignUserToDialoguesInput" | "AuthenticateLambdaInput" | "AutomationActionInput" | "AutomationConditionBuilderInput" | "AutomationConnectionFilterInput" | "AutomationConnectionOrderByInput" | "AutomationEventInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "ConditionDialogueScopeInput" | "ConditionPropertyAggregateInput" | "ConditionQuestionScopeInput" | "ConditionScopeInput" | "ConditionWorkspaceScopeInput" | "CreateAutomationCondition" | "CreateAutomationInput" | "CreateAutomationOperandInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignCustomVariable" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomFieldInputType" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DeliveryConnectionFilterInput" | "DeliveryConnectionOrderByInput" | "DialogueConnectionFilterInput" | "DialogueConnectionOrderByInput" | "DialogueFilterInputType" | "DialogueLinksInput" | "DialogueStatisticsSummaryFilterInput" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FindRoleInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GenerateAutodeckInput" | "GenerateWorkspaceCSVInputType" | "GetAutomationInput" | "GetAutomationsByWorkspaceInput" | "GetCampaignsInput" | "HandleUserStateInWorkspaceInput" | "HealthScoreInput" | "InviteUserInput" | "LoginInput" | "MassSeedInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PathedSessionsInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "QuestionStatisticsSummaryFilterInput" | "QuestionWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RemovePixelRangeInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionConnectionFilterInput" | "SessionConnectionOrderByInput" | "SessionInput" | "SessionScoreRangeFilter" | "SessionWhereUniqueInput" | "SetDialoguePrivacyInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TopicInputType" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdatePermissionsInput" | "UpdateQuestionNodeInputType" | "UploadSellImageInputType" | "UserConnectionFilterInput" | "UserConnectionOrderByInput" | "UserInput" | "UserOfCustomerInput" | "VideoNodeEntryInput" | "createJobProcessLocationInput";
 
-export type NexusGenEnumNames = "AutomationActionType" | "AutomationConditionBuilderType" | "AutomationConditionOperatorType" | "AutomationConditionScopeType" | "AutomationConnectionOrderType" | "AutomationEventType" | "AutomationType" | "CampaignVariantEnum" | "CloudReferenceType" | "ConditionPropertyAggregateType" | "DeliveryConnectionOrder" | "DeliveryStatusEnum" | "DialogueAspectType" | "DialogueImpactScoreType" | "FormNodeFieldTypeEnum" | "JobProcessLocationType" | "JobStatusType" | "LanguageEnumType" | "LinkTypeEnumType" | "OperandType" | "PaginationSearchEnum" | "PaginationSortByEnum" | "QuestionAspectType" | "QuestionImpactScoreType" | "QuestionNodeTypeEnum" | "RecurringPeriodType" | "SessionConnectionOrder" | "SessionDeliveryType" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum" | "UploadImageEnumType" | "UserConnectionOrder" | "WorkspaceAspectType";
+export type NexusGenEnumNames = "AutomationActionType" | "AutomationConditionBuilderType" | "AutomationConditionOperatorType" | "AutomationConditionScopeType" | "AutomationConnectionOrderType" | "AutomationEventType" | "AutomationType" | "CampaignVariantEnum" | "CloudReferenceType" | "ConditionPropertyAggregateType" | "DeliveryConnectionOrder" | "DeliveryStatusEnum" | "DialogueAspectType" | "DialogueConnectionOrder" | "DialogueImpactScoreType" | "DialogueTemplateType" | "FormNodeFieldTypeEnum" | "JobProcessLocationType" | "JobStatusType" | "LanguageEnumType" | "LinkTypeEnumType" | "OperandType" | "PaginationSearchEnum" | "PaginationSortByEnum" | "QuestionAspectType" | "QuestionImpactScoreType" | "QuestionNodeTypeEnum" | "RecurringPeriodType" | "SessionConnectionOrder" | "SessionDeliveryType" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum" | "UploadImageEnumType" | "UserConnectionOrder" | "WorkspaceAspectType";
 
 export type NexusGenInterfaceNames = "ConnectionInterface" | "DeprecatedConnectionInterface";
 

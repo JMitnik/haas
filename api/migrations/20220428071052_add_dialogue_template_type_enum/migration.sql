@@ -1,0 +1,2 @@
+-- CreateEnum
+CREATE TYPE "DialogueTemplateType" AS ENUM ('SPORT_ENG', 'SPORT_NL', 'BUSINESS_ENG', 'BUSINESS_NL', 'DEFAULT', 'MASS_SEED');

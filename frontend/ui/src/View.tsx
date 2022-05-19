@@ -1,9 +1,11 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Div } from './Generics';
-import { Stack } from './Container';
+import { Container, Stack } from './Container';
 import { Icon } from './Icon';
 import { Span } from './Span';
+import { H2, Text } from './Type';
+import { motion } from 'framer-motion';
 
 
 interface ViewTitleProps {
@@ -11,7 +13,7 @@ interface ViewTitleProps {
   children?: React.ReactNode;
 }
 
-export const ViewTitleContainer = styled(Span)`
+export const DeprecatedViewTitleContainer = styled(Span)`
   ${({ theme }) => css`
     color: ${theme.colors.gray[600]};
     font-size: 1.8rem;
@@ -25,30 +27,28 @@ export const ViewTitleContainer = styled(Span)`
   `}
 `;
 
-export const ViewTitle = ({ leftIcon, children, ...props }: ViewTitleProps) => (
-  <ViewTitleContainer {...props}>
+export const DeprecatedViewTitle = ({ leftIcon, children, ...props }: ViewTitleProps) => (
+  <DeprecatedViewTitleContainer {...props}>
     {!!leftIcon && (
       <Icon display="inline-block" width="24px" mr={1}>
         {leftIcon}
       </Icon>
     )}
     {children}
-  </ViewTitleContainer>
+  </DeprecatedViewTitleContainer>
 );
 
-const ViewHeadContainer = styled(Div)`
+export const ViewHeadContainer = styled(Div)`
   ${({ theme }) => css`
-    background: ${theme.colors.gray[100]};
-    padding: ${theme.gutter / 2}px ${theme.gutter}px;
-    border-bottom: 1px solid ${theme.colors.gray[200]};
+    background: ${theme.colors.app.background};
+    padding: ${theme.gutter}px ${theme.gutter * 1.5}px;
     position: sticky;
     top: 0;
     left: 0;
     right: 0;
     z-index: 100;
-    box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
 
-    ${ViewTitleContainer} {
+    ${DeprecatedViewTitleContainer} {
       margin-bottom: 0;
     }
   `}
@@ -57,37 +57,83 @@ const ViewHeadContainer = styled(Div)`
 interface ViewHeadProps {
   children: React.ReactNode;
   renderBreadCrumb?: React.ReactNode;
+  compact?: boolean;
 }
 
-export const ViewHead = ({ children, renderBreadCrumb }: ViewHeadProps) => (
+export const ViewHead = ({ children, renderBreadCrumb, compact = false }: ViewHeadProps) => (
   <ViewHeadContainer>
     {!!renderBreadCrumb && renderBreadCrumb}
 
-    <Stack spacing={4} isInline alignItems="center">
-      {children}
-    </Stack>
+    {compact && (
+      <Container>
+        <Stack spacing={4}>
+          {children}
+        </Stack>
+      </Container>
+    )}
+
+    {!compact && (
+      <Stack spacing={4}>
+        {children}
+      </Stack>
+    )}
   </ViewHeadContainer>
 );
 
+interface ViewHeadProps {
+  children: React.ReactNode;
+}
+
+export const ViewTitle = ({ children }: ViewHeadProps) => (
+  <H2 lineHeight={1.4} style={{ display: 'inline-block' }} forwardedAs={motion.div} color="main.500">
+    {children}
+  </H2>
+)
+
+export const ViewSubTitle = ({ children }: ViewHeadProps) => (
+  <Text fontSize="1.1rem" color="off.500" fontWeight={500}>
+    {children}
+  </Text>
+);
+
 export const ViewContainer = styled(Div) <{ isCompact?: boolean; }>`
-${({ theme, isCompact }) => css`
-  margin: 0 auto;
-  min-height: 100vh;
+  ${({ theme, isCompact }) => css`
+    margin: 0 auto;
+    min-height: 100vh;
 
-  ${isCompact && css`
-    max-width: 1400px;
+    ${isCompact && css`
+      max-width: 1400px;
+    `}
   `}
-`}
 `;
 
-export const ViewBody = styled(Div) <{ isCompact?: boolean; }>`
-${({ theme, isCompact, padding }) => css`
-  margin: 0 auto;
-  padding: ${theme.gutter}px;
-  background: ${theme.colors.gray[50]};
-
-  ${isCompact && css`
-    max-width: 1400px;
+export const ViewBodyContainer = styled(Div)`
+  ${({ theme, padding }) => css`
+    margin: 0 auto;
+    padding: ${theme.gutter}px ${theme.gutter * 1.5}px;
+    background: ${theme.colors.app.background};
   `}
-`}
 `;
+
+interface ViewBodyProps {
+  children: React.ReactNode;
+  compact?: boolean;
+}
+
+export const ViewBody = ({ children, compact = false }: ViewBodyProps) => {
+  return (
+    <ViewBodyContainer>
+      {compact && (
+        <Container>
+          {children}
+        </Container>
+      )}
+
+      {!compact && (
+        <>
+          {children}
+        </>
+      )}
+    </ViewBodyContainer>
+  )
+}

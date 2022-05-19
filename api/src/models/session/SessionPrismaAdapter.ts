@@ -4,6 +4,7 @@ import { NexusGenInputs } from '../../generated/nexus';
 
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { CreateSessionInput } from './SessionPrismaAdapterType';
+import { generateTimeSpent } from './SessionHelpers';
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;
@@ -19,7 +20,7 @@ class SessionPrismaAdapter {
    * @param endDateTime 
    * @returns 
    */
-  findSessionsByCustomerIdBetweenDates = async (
+  findCustomerSessions = async (
     customerId: string,
     startDateTime: Date,
     endDateTime: Date,
@@ -52,7 +53,7 @@ class SessionPrismaAdapter {
    * @param endDateTime 
    * @returns 
    */
-  findSessionByDialogueIdBetweenDates = async (
+  findDialogueSessions = async (
     dialogueId: string,
     startDateTime: Date,
     endDateTime: Date
@@ -535,7 +536,8 @@ class SessionPrismaAdapter {
 
     return this.prisma.session.create({
       data: {
-        totalTimeInSec: Math.floor(Math.random() * 45 + 1),
+        createdAt: data.createdAt,
+        totalTimeInSec: generateTimeSpent(),
         mainScore: data.simulatedRootVote,
         nodeEntries: {
           create: [{
@@ -567,7 +569,7 @@ class SessionPrismaAdapter {
     });
   };
 
-  massSeedFakeSession(data: (
+  massSeedFakeSession = async (data: (
     {
       createdAt: Date;
       dialogueId: string;
@@ -579,11 +581,11 @@ class SessionPrismaAdapter {
       simulatedSubChoiceNodeId: string;
       simulatedSubChoiceEdgeId?: string;
       simulatedSubChoice: string;
-    })) {
+    })) => {
 
-    return this.prisma.session.create({
+    const session = await this.prisma.session.create({
       data: {
-        totalTimeInSec: Math.floor(Math.random() * 45 + 1),
+        totalTimeInSec: generateTimeSpent(),
         createdAt: data.createdAt,
         mainScore: data.simulatedRootVote,
         nodeEntries: {
@@ -607,25 +609,36 @@ class SessionPrismaAdapter {
               create: { value: data.simulatedChoice },
             },
             inputSource: 'INIT_GENERATED',
-          },
-          {
-            depth: 2,
-            creationDate: data.createdAt,
-            relatedNode: { connect: { id: data.simulatedSubChoiceNodeId } },
-            relatedEdge: data.simulatedSubChoiceEdgeId ? { connect: { id: data.simulatedSubChoiceEdgeId } } : undefined,
-            choiceNodeEntry: {
-              create: { value: data.simulatedSubChoice },
-            },
-            inputSource: 'INIT_GENERATED',
-          },
-          ],
+          }],
         },
         dialogue: {
           connect: { id: data.dialogueId },
         },
       },
     });
+
+    if (data.simulatedSubChoice) {
+      await this.prisma.nodeEntry.create({
+        data: {
+          depth: 2,
+          creationDate: data.createdAt,
+          relatedNode: { connect: { id: data.simulatedSubChoiceNodeId } },
+          relatedEdge: data.simulatedSubChoiceEdgeId ? { connect: { id: data.simulatedSubChoiceEdgeId } } : undefined,
+          choiceNodeEntry: {
+            create: { value: data.simulatedSubChoice },
+          },
+          inputSource: 'INIT_GENERATED',
+          session: {
+            connect: {
+              id: session.id,
+            },
+          },
+        },
+      })
+    }
+    return session;
   };
+
 };
 
 

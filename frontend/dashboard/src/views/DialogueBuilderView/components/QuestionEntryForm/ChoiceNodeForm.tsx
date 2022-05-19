@@ -258,7 +258,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
               </UI.Div>
             </>
           ) : (
-            <UI.IllustrationCard isFlat svg={<EmptyIll />} text={t('no_choices')}>
+            <UI.IllustrationCard svg={<EmptyIll />} text={t('no_choices')}>
               <UI.Button variantColor="gray" onClick={handleAddNewChoice}>
                 <UI.Icon mr={1}>
                   <PlusCircle />

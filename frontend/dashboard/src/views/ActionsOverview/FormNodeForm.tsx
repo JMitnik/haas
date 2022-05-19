@@ -1,8 +1,20 @@
 import * as UI from '@haas/ui';
-import { AlertCircle, ArrowLeft, ArrowRight, AtSign, Circle, Feather, FileText, Hash, Link2, Phone, Type } from 'react-feather';
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  AtSign,
+  Circle,
+  Feather,
+  FileText,
+  Hash,
+  Link2,
+  Phone,
+  Type,
+} from 'react-feather';
 import { AnimatePresence, Variants, motion } from 'framer-motion';
 import { Button } from '@chakra-ui/core';
-import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
@@ -11,7 +23,7 @@ import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
-import { CTANodeFormProps, FormDataProps } from './CTATypes';
+import { CTANodeFormProps } from './CTATypes';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -86,7 +98,6 @@ const fieldMap: FieldProps[] = [
 ];
 
 interface FormNodePreviewProps {
-  form: UseFormMethods<FormDataProps>;
   field: any;
   onMoveRight: any;
   onMoveLeft: any;
@@ -283,7 +294,7 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
               </UI.CardBody>
             ) : (
               <UI.CardBody>
-                <IllustrationCard text={t('select_a_field_type')} svg={<SelectIll />} isFlat>
+                <IllustrationCard text={t('select_a_field_type')} svg={<SelectIll />}>
                   <UI.Text fontWeight={200} pb={2}>or</UI.Text>
                   <UI.ButtonGroup justifySelf="flex-end">
                     <UI.Button
@@ -386,7 +397,6 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                       fieldIndex={index}
                       nrFields={fields.length}
                       field={formNodeFields[index]}
-                      form={form}
                       onOpen={() => setOpenedField(index)}
                       onMoveLeft={() => move(index, Math.max(index - 1, 0))}
                       onMoveRight={() => {

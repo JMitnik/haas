@@ -1,9 +1,9 @@
-import { PrismaClient, User, Prisma, UserOfCustomer } from "@prisma/client";
-import _, { cloneDeep } from "lodash";
+import { PrismaClient, User, Prisma, UserOfCustomer } from '@prisma/client';
+import _, { cloneDeep, reject } from 'lodash';
 
-import { RegisterUserInput } from "./UserPrismaAdapterType";
+import { RegisterUserInput } from './UserPrismaAdapterType';
 import RoleService from '../role/RoleService';
-import { NexusGenInputs } from "../../generated/nexus";
+import { NexusGenInputs } from '../../generated/nexus';
 
 
 class UserPrismaAdapter {
@@ -13,6 +13,94 @@ class UserPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
+  }
+
+  /**
+   * Finds the private dialogues assigned to an user
+   * @param userId 
+   */
+  findPrivateDialogueOfUser = async (userId: string) => {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        isAssignedTo: true,
+      },
+    });
+
+    return user;
+  }
+
+  /**
+   * Upserts a user and assignes it to a private dialogue
+   * @param emailAddress 
+   * @param dialogueId 
+   * @param phoneNumber 
+   * @returns 
+  */
+  addUserToPrivateDialogue = (emailAddress: string, dialogueId: string, phoneNumber?: string) => {
+    return this.prisma.user.upsert({
+      where: {
+        email: emailAddress,
+      },
+      create: {
+        email: emailAddress,
+        phone: phoneNumber,
+        isAssignedTo: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+      },
+      update: {
+        isAssignedTo: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Adjusts the dialogue privacy settings of a user based on the input. The input consits one list of dialogue ids 
+   * which should be disconnected and another which should be connected to the user 
+   * @param input 
+   * @returns 
+   */
+  updateUserPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: input.userId,
+      },
+      include: {
+        isAssignedTo: {
+          where: {
+            customerId: input.workspaceId,
+          },
+        },
+      },
+    });
+
+    const dbAssignedDialogues = user?.isAssignedTo.map((dialogue) => ({ id: dialogue.id })) || [];
+    const disconnectedDialogues = reject(dbAssignedDialogues,
+      (dialogue) => input.assignedDialogueIds.includes(dialogue.id)) || [];
+
+    return this.prisma.user.update({
+      where: {
+        id: input?.userId,
+      },
+      data: {
+        isAssignedTo: {
+          disconnect: disconnectedDialogues,
+          connect: input?.assignedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
+        },
+      },
+      include: {
+        isAssignedTo: true,
+      },
+    });
   }
 
   /**
@@ -63,7 +151,7 @@ class UserPrismaAdapter {
           { user: { email: { contains: filter.search, mode: 'insensitive' } } },
           { user: { firstName: { contains: filter.search, mode: 'insensitive' } } },
           { user: { lastName: { contains: filter.search, mode: 'insensitive' } } },
-        ]
+        ],
       }
     }
 
@@ -91,7 +179,7 @@ class UserPrismaAdapter {
         firstName: string | null;
         lastName: string | null;
         email: string;
-      },
+      };
       role: {
         name: string;
       };
@@ -128,31 +216,31 @@ class UserPrismaAdapter {
       orderByQuery.push({
         user: {
           lastActivity: filter.orderBy.desc ? 'desc' : 'asc',
-        }
+        },
       });
     }
 
     if (filter?.orderBy?.by === 'firstName') {
       orderByQuery.push({
-        user: { firstName: filter.orderBy.desc ? 'desc' : 'asc', }
+        user: { firstName: filter.orderBy.desc ? 'desc' : 'asc' },
       });
     }
 
     if (filter?.orderBy?.by === 'lastName') {
       orderByQuery.push({
-        user: { lastName: filter.orderBy.desc ? 'desc' : 'asc', }
+        user: { lastName: filter.orderBy.desc ? 'desc' : 'asc' },
       });
     }
 
     if (filter?.orderBy?.by === 'email') {
       orderByQuery.push({
-        user: { email: filter.orderBy.desc ? 'desc' : 'asc', }
+        user: { email: filter.orderBy.desc ? 'desc' : 'asc' },
       });
     }
 
     if (filter?.orderBy?.by === 'role') {
       orderByQuery.push({
-        role: { name: filter.orderBy.desc ? 'desc' : 'asc', }
+        role: { name: filter.orderBy.desc ? 'desc' : 'asc' },
       });
     }
 
@@ -344,7 +432,7 @@ class UserPrismaAdapter {
         email: {
           equals: email,
           mode: 'insensitive',
-        }
+        },
       },
       include: {
         customers: {
@@ -408,13 +496,13 @@ class UserPrismaAdapter {
     });
   };
 
-  async setIsActive(input: { userId: string, workspaceId: string, isActive: boolean }) {
+  async setIsActive(input: { userId: string; workspaceId: string; isActive: boolean }) {
     const result = await this.prisma.userOfCustomer.update({
       where: {
         userId_customerId: {
           userId: input.userId,
           customerId: input.workspaceId,
-        }
+        },
       },
       data: {
         isActive: input.isActive,
@@ -423,7 +511,7 @@ class UserPrismaAdapter {
         user: true,
         role: true,
         customer: true,
-      }
+      },
     });
 
     return result;
@@ -478,7 +566,7 @@ class UserPrismaAdapter {
             equals: loginToken,
           },
           id: { equals: userId },
-        }
+        },
       },
       include: {
         customers: {
