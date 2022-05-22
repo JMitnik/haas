@@ -9,6 +9,7 @@ import {
   HexagonGroupNodeStatics,
   HexagonNode,
   HexagonNodeType,
+  HexagonState,
   HexagonViewMode,
 } from './WorkspaceGrid.types';
 
@@ -113,7 +114,6 @@ export const recursiveBuildGroup = (
   dialogues: Dialogue[],
 ): HexagonGroupNode | HexagonDialogueNode => {
   const groupToChilds = allGroups.filter((group) => group.groupFragments === groupFragments);
-
   // Ensure only unique groups are considered
   const uniqueGroupToChilds = uniqBy(groupToChilds, 'childGroupFragments');
 
@@ -168,6 +168,7 @@ export const groupsFromDialogues = (dialogues: Dialogue[]): HexagonNode[] => {
   }));
 
   const groupToChild: GroupToChild[] = dialogueGroups.flatMap(parseDialogueGroup);
+
   const maxHeight = Math.max(...groupToChild.map((group) => group.height));
 
   if (maxHeight === 0) return dialogues.map((dialogue) => dialogueToNode(dialogue));
@@ -280,4 +281,96 @@ export const mapNodeTypeToViewType = (nodeType: HexagonNodeType): HexagonViewMod
     default:
       return HexagonViewMode.Dialogue;
   }
+};
+
+/**
+   * Traverses HexagonNode data set to find the path to the Dialogue HexagonNode
+   * matching dialogue ID provided as parameter
+   * @param dialogueId
+   * @param data the root HexagonNode[] data set
+   * @param path an array to store the traversed HexagonNode IDs
+   * @returns a list of HexagonNode IDs to reach the Dialogue HexagonNode
+   */
+export const findDialoguePath = (dialogueId: string, data: HexagonNode[], path: string[] = []): string[] => {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const node of data) {
+    if (node.type === HexagonNodeType.Dialogue) {
+      if (node.id === dialogueId) {
+        path = [...path, node.id];
+        break;
+      }
+    }
+
+    // If current node is a group node we have to go one layer deeper while keep tracking the traversed node IDs
+    if (node.type === HexagonNodeType.Group) {
+      return findDialoguePath(dialogueId, node.subGroups, [...path, node.id]);
+    }
+
+    return [];
+  }
+
+  return path;
+};
+
+/**
+ * Recursively traverses the HexagonNode data set and reconstructs the history stack
+ * based on a list of provided HexagonNode IDs (the 'path')
+ * @param data the root HexagonNode[] data set
+ * @param path an array containing HexagonNode IDs
+ * @param states a list of HexagonState[] entries representing the HistoryStack
+ * @returns a HistoryStack based on the provided HexagonNode IDs
+ */
+export const pathToHistoryStack = (
+  data: HexagonNode[],
+  path: string[],
+  states: HexagonState[] = [],
+): HexagonState[] => {
+  const nodeId = path[0];
+
+  // Pop first entry from path list
+  path.shift();
+
+  if (!nodeId) return states;
+
+  const groupNode = data.find((node) => node.id === nodeId) as HexagonGroupNode | HexagonDialogueNode;
+
+  if (!groupNode) return states;
+
+  // Use last added state as currentNode to mimic 'clicking' on it in the overview
+  const hexagonStateEntry: HexagonState = {
+    currentNode: states?.[0]?.selectedNode,
+    childNodes: data,
+    selectedNode: groupNode,
+    viewMode: mapNodeTypeToViewType(groupNode.type),
+  };
+
+  // Add new HistoryStack entry on top of the stack
+  states.unshift(hexagonStateEntry);
+
+  if (path.length === 0) {
+    return states;
+  }
+
+  // Continue adding HistoryStack entries until we run out of HexagonNode IDs
+  return pathToHistoryStack(
+    (groupNode as HexagonGroupNode)?.subGroups || [] as any,
+    path,
+    states,
+  );
+};
+
+/**
+ * Finds path (HexagonNode ID[]) to a dialogue hexagon node and uses that to reconstruct a History Stack
+ * @param dialogueId the ID of a dialogue
+ * @param data HexagonNode data set
+ * @returns a HistoryStack
+ */
+export const reconstructHistoryStack = (dialogueId: string, data: HexagonNode[]): HexagonState[] => {
+  const path = findDialoguePath(dialogueId, data);
+  if (!path) return [];
+
+  return pathToHistoryStack(
+    data,
+    path,
+  );
 };

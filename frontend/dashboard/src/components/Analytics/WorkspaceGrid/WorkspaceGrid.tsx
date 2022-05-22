@@ -28,7 +28,7 @@ import { HexagonItem } from './HexagonItem';
 import { Layers } from './Layers';
 import { TooltipBody } from './TooltipBody';
 import { WorkspaceGridPane } from './WorkspaceGridPane';
-import { createGrid } from './WorkspaceGrid.helpers';
+import { createGrid, reconstructHistoryStack } from './WorkspaceGrid.helpers';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -199,6 +199,9 @@ export const WorkspaceGrid = ({
       dialogueId,
       topics,
     });
+
+    const reconstructedHistoryStack = reconstructHistoryStack(dialogueId, initialData);
+    setStateHistoryStack(reconstructedHistoryStack);
 
     setCurrentState({ childNodes: sessions, viewMode });
   };
