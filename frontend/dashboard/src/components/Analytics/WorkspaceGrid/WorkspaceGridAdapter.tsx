@@ -69,6 +69,7 @@ export const WorkspaceGridAdapter = ({
     const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessionsConnection?.pathedSessions?.map(
       (session) => ({
         id: session.id,
+        label: session.id,
         type: HexagonNodeType.Session,
         score: session.score,
         session,
@@ -82,7 +83,7 @@ export const WorkspaceGridAdapter = ({
   };
 
   const initialData = useMemo(() => groupsFromDialogues(dialogues), [dialogues]);
-  const initialViewMode = mapNodeTypeToViewType(initialData?.[0]?.type);
+  const initialViewMode = HexagonViewMode.Workspace;
 
   // TODO: Add spinner
   if (!dialogues.length) return null;

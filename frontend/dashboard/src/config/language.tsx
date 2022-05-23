@@ -11,6 +11,18 @@ const language = {
     },
   },
   general: {
+    groups: {
+      en: 'Groups',
+      de: 'Groups',
+    },
+    dialogues: {
+      en: 'Dialogues',
+      de: 'Dialogues',
+    },
+    teams: {
+      en: 'Teams',
+      de: 'Teams',
+    },
     create_demo_data: {
       en: 'Generate prefilled data',
       de: 'Verwenden Sie Demodaten',

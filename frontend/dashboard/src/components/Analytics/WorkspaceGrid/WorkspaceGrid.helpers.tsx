@@ -247,21 +247,11 @@ type HexagonTitleState = 'workspace' | 'groups' | 'dialogues' | 'individuals';
  * @returns The state of the title of the hexagon grid.
  */
 export const getTitleKey = (state: HexagonState): HexagonTitleState => {
-  if (!state.selectedNode) return 'workspace';
-  console.log(state.selectedNode);
-
-  if (state.childNodes.length === 0) return 'individuals';
-
-  switch (state.childNodes[0].type) {
-    case (HexagonNodeType.Group): {
-      return 'groups';
-    }
-    case (HexagonNodeType.Dialogue): {
-      return 'dialogues';
-    }
-    default: {
-      return 'individuals';
-    }
+  switch (state.viewMode) {
+    case (HexagonViewMode.Workspace): { return 'workspace'; }
+    case (HexagonViewMode.Group): { return 'groups'; }
+    case (HexagonViewMode.Dialogue): { return 'dialogues'; }
+    default: { return 'individuals'; }
   }
 };
 

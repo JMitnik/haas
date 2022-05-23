@@ -19,6 +19,7 @@ import {
   HexagonState,
   HexagonTopicNode,
   HexagonViewMode,
+  HexagonWorkspaceNode,
 } from './WorkspaceGrid.types';
 import { HexagonGrid } from './HexagonGrid';
 import { Layers } from './Layers';
@@ -46,7 +47,7 @@ export const WorkspaceGrid = ({
   initialData,
   backgroundColor,
   onLoadData,
-  initialViewMode = HexagonViewMode.Group,
+  initialViewMode = HexagonViewMode.Workspace,
 }: WorkspaceGridProps) => {
   const { activeCustomer } = useCustomer();
   const initialRef = React.useRef<HTMLDivElement>();
@@ -54,7 +55,12 @@ export const WorkspaceGrid = ({
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = React.useState<string | undefined>(undefined);
   const [currentState, setCurrentState] = React.useState<HexagonState>({
-    currentNode: undefined,
+    currentNode: {
+      id: activeCustomer?.id,
+      label: activeCustomer?.name,
+      score: 0,
+      type: HexagonNodeType.Workspace,
+    } as HexagonWorkspaceNode,
     childNodes: initialData,
     viewMode: initialViewMode,
   });
@@ -74,6 +80,7 @@ export const WorkspaceGrid = ({
 
   // ReversedHistory: Session => Dialogue => Group
   const historyQueue = [...stateHistoryStack].reverse();
+  const previousLabels: string[] = historyQueue.map((state) => state.currentNode?.label || '');
 
   const popToIndex = (index: number) => {
     if (index === historyQueue.length) return;
@@ -202,6 +209,7 @@ export const WorkspaceGrid = ({
           {(zoom) => (
             <UI.ColumnFlex alignItems="center">
               <WorkspaceGridHeader
+                previousStateLabels={previousLabels}
                 currentState={currentState}
                 workspaceName={activeCustomer?.name || ''}
               />
