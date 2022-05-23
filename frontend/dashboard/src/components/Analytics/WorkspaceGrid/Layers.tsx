@@ -100,12 +100,7 @@ const Layer = ({ state, onClick, hide, hideAll, zIndex }: LayerProps) => (
                 </>
               ) : (
                 <>
-                  {state?.viewMode !== HexagonViewMode.Final && (
-                    <>
-                      Select your {' '}
-                      {state?.viewMode}
-                    </>
-                  )}
+                {' '}
                 </>
               )}
             </UI.Text>
@@ -127,7 +122,7 @@ const LayersContainer = styled(UI.Div)``;
 export const Layers = ({ currentState, historyQueue, onClick }: LayersProps) => (
   <AnimateSharedLayout>
     <UI.Div>
-      <UI.Div mb={1}>
+      <UI.Div>
         <UI.Helper color="off.300" fontSize="0.7rem !important" fontWeight={700}>Layers</UI.Helper>
       </UI.Div>
       <LayersContainer>

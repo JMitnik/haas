@@ -236,6 +236,35 @@ export const getColorScoreBrand = (score?: number, darker?: boolean) => {
   return `red.${darker ? '700' : '500'}`;
 };
 
+type HexagonTitleState = 'workspace' | 'groups' | 'dialogues' | 'individuals';
+
+/**
+ * Gets the state of the title of the hexagon grid.
+ *
+ * This is based on whether we have any selected-node (if not, 'workspace-level'), and else on the type of any child.
+ * Note: If any child have different types, then this function is not sutiable any longer.
+ * @param state - The current state of the hexagon grid.
+ * @returns The state of the title of the hexagon grid.
+ */
+export const getTitleKey = (state: HexagonState): HexagonTitleState => {
+  if (!state.selectedNode) return 'workspace';
+  console.log(state.selectedNode);
+
+  if (state.childNodes.length === 0) return 'individuals';
+
+  switch (state.childNodes[0].type) {
+    case (HexagonNodeType.Group): {
+      return 'groups';
+    }
+    case (HexagonNodeType.Dialogue): {
+      return 'dialogues';
+    }
+    default: {
+      return 'individuals';
+    }
+  }
+};
+
 /**
  * Creates a grid of hexagons with the given number of rows and columns.
  * @param nrItems
