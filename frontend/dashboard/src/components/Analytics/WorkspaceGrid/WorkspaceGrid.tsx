@@ -9,6 +9,7 @@ import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModa
 import { Loader } from 'components/Common/Loader/Loader';
 import { useCustomer } from 'providers/CustomerProvider';
 
+import { DatePicker } from 'components/Common/DatePicker';
 import * as LS from './WorkspaceGrid.styles';
 import { HealthCard } from '../HealthCard/HealthCard';
 import {
@@ -213,6 +214,10 @@ export const WorkspaceGrid = ({
                 currentState={currentState}
                 workspaceName={activeCustomer?.name || ''}
               />
+
+              <UI.Div mt={2}>
+                <DatePicker />
+              </UI.Div>
 
               <UI.Div>
                 <HexagonGrid

@@ -59,6 +59,7 @@
         "migrate:baseline": "yarn workspace @haas/api migrate:baseline",
         "migrate:create": "yarn workspace @haas/api migrate:create",
         "seed:api": "yarn workspace @haas/api seed",
+        "install:dashboard": "yarn workspace @haas/dashboard add",
         "kill": "yarn kill:api && yarn kill:client",
         "kill:dashboard": "yarn workspace @haas/dashboard kill",
         "kill:api": "yarn workspace @haas/api kill",
