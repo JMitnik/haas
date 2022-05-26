@@ -34,9 +34,9 @@ COPY jest.config.js package*.json tsconfig.json ${LAMBDA_TASK_ROOT}/
 COPY test/app.test.ts ${LAMBDA_TASK_ROOT}/test/
 
 COPY --from=node ${LAMBDA_TASK_ROOT}/node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/
-RUN ls ${LAMBDA_TASK_ROOT}/node_modules/
-RUN npm test
 
-COPY bin/app.ts ${LAMBDA_TASK_ROOT}/bin/
+# RUN npm test
+
+COPY bin/* ${LAMBDA_TASK_ROOT}/bin/
 
 CMD [ "bin/app.lambdaHandler" ]

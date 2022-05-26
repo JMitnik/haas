@@ -39,6 +39,8 @@ export class AutomationActionService {
       REPORT_URL: reportUrl,
       WORKSPACE_EMAIL: botUser?.email || '',
       TARGETS: targets,
+      WORKSPACE_SLUG: workspaceSlug,
+      USER_ID: botUser?.id as string,
     }
 
     return this.reportService.generateReport(reportInput);

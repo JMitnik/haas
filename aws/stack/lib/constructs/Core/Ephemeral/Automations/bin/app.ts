@@ -27,60 +27,94 @@ const authenticateLambda = async (apiUrl: string, authenticateEmail: string, wor
     });
 }
 
-// const getCustomerData = async (apiUrl: string, customerSlug: string, userId: string, bearerToken: string) => {
-//   return axios.post(apiUrl, {
-//     query: `
-//     query getCustomerOfUser($input: UserOfCustomerInput) {
-//       UserOfCustomer(input: $input) {
-//         customer {
-//           id
-//           name
-//           slug
-//           settings {
-//             id
-//             logoUrl
-//             colourSettings {
-//               id
-//               primary
-//             }
-//           }
-//           campaigns {
-//             id
-//             label
-//           }
-//         }
-//         role {
-//           name
-//           permissions
-//         }
-//         user {
-//           id
-//         }
-//       }
-//     }
-//     `,
-//     operationName: "getCustomerOfUser",
-//     variables: {
-//       input: {
-//         "customerSlug": customerSlug,
-//         "userId": userId
-//       }
-//     }
-//   }, {
-//     headers: {
-//       Authorization: `Bearer ${bearerToken}`,
-//     },
-//   })
-//     .then(function (response) {
-//       console.log('RESPONSE: ', response.data);
-//       return response.data;
-//     })
-//     .catch(function (error) {
-//       console.log('ERROR AXIOS', error);
-//     });
-// }
+const verifyToken = async (apiUrl: string, token: string) => {
+  return axios.post(apiUrl, {
+    query: `
+    mutation verifyUserToken($token: String!) {
+      verifyUserToken(token: $token) {
+        accessToken
+        userData {
+          email
+        }
+      }
+    }`,
+    operationName: "verifyUserToken",
+    variables: {
+      token: token,
+    }
+  })
+    .then(function (response) {
+      console.log('verifyToken RESPONSE: ', response.data);
+      return response.data;
+    })
+    .catch(function (error) {
+      console.log('ERROR AXIOS', error);
+    });
+}
 
-
+const getCustomerData = async (apiUrl: string, customerSlug: string, userId: string, bearerToken: string) => {
+  return axios.post(apiUrl, {
+    query: `
+    query getCustomerOfUser($input: UserOfCustomerInput) {
+      UserOfCustomer(input: $input) {
+        customer {
+          id
+          name
+          slug
+          settings {
+            id
+            logoUrl
+            colourSettings {
+              id
+              primary
+            }
+          }
+          campaigns {
+            id
+            label
+          }
+        }
+        role {
+          name
+          permissions
+        }
+        user {
+          id
+          assignedDialogues(input: $input) {
+            privateWorkspaceDialogues {
+              title
+              slug
+              id
+            }
+            assignedDialogues {
+              slug
+              id
+            }
+          }
+        }
+      }
+    }
+    `,
+    operationName: "getCustomerOfUser",
+    variables: {
+      input: {
+        "customerSlug": customerSlug,
+        "userId": userId
+      }
+    }
+  }, {
+    headers: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .then(function (response) {
+      console.log('RESPONSE: ', response.data);
+      return response.data;
+    })
+    .catch(function (error) {
+      console.log('ERROR AXIOS', error);
+    });
+}
 
 export const lambdaHandler = async (event: any, context: Context) => {
   const url = event.url;
@@ -94,6 +128,8 @@ export const lambdaHandler = async (event: any, context: Context) => {
   const authenticateEmail: string = message.AUTHENTICATE_EMAIL;
   const workspaceEmail: string = message.WORKSPACE_EMAIL;
   const reportUrl: string = message.REPORT_URL;
+  const workspaceSlug: string = message.WORKSPACE_SLUG;
+  const botUserId: string = message.USER_ID;
 
   const authorizationKey: string = process.env.AUTOMATION_API_KEY;
 
@@ -119,54 +155,28 @@ export const lambdaHandler = async (event: any, context: Context) => {
 
   const result = await authenticateLambda(apiUrl, authenticateEmail, workspaceEmail, authorizationKey);
   console.log('result: ', result?.data);
+  const token = result?.data.authenticateLambda;
+  const verifyTokenMutation = await verifyToken(apiUrl, token);
+  const accessToken = verifyTokenMutation?.data?.verifyUserToken?.accessToken;
+  console.log('Access token: ', accessToken);
 
-  if (!result?.data.authenticateLambda) return {
+  if (!token) return {
     statusCode: 400,
     body: 'Error: No authenticate token for provided workspace email available!'
   }
 
-  // const customerResult = await getCustomerData(apiUrl, 'lufthansa2', 'ckxfrb3tt2441qzoi47ri808w', result?.data.authenticateLambda);
+  const customerResult = await getCustomerData(apiUrl, workspaceSlug, botUserId, accessToken);
+  const customer = customerResult.data.UserOfCustomer?.customer;
+  const role = customerResult.data.UserOfCustomer?.role;
+  const newUser = customerResult.data.UserOfCustomer?.user;
 
-  // console.log('Customer result: ', customerResult);
+  const customerLocalStorage = {
+    ...customer,
+    user: newUser,
+    userRole: role,
+  }
 
-  const verifyUrl = `${dashboardUrl}/verify_token?token=${result?.data.authenticateLambda}`
-  console.log('verify url: ', verifyUrl);
-
-  const setDomainLocalStorage = async (browser: puppeteer.Browser, url: string) => {
-    const page: puppeteer.Page = await browser.newPage();
-    page.setDefaultNavigationTimeout(60000);
-
-    console.log('Going to url: ', url);
-    await page.goto(url, { waitUntil: 'networkidle0' });
-
-    await page.waitForTimeout(20000);
-
-    const localStorageData = await page.evaluate(() => {
-      let json = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        json[key] = localStorage.getItem(key);
-      }
-      return json;
-    });
-
-    console.log('local storage after visiting verify page: ', localStorageData)
-
-    const localStorageSecond = await page.evaluate(() => Object.assign({}, window.localStorage));
-    console.log('Local storage after evaluating verify page: ', localStorageSecond)
-
-    // await page.evaluate(values => {
-    //   for (const key in values) {
-    //     console.log('KEY: ', key, values[key]);
-    //     localStorage.setItem(key, values[key]);
-    //   }
-    // }, values);
-
-
-    // const localStorageThird = await page.evaluate(() => Object.assign({}, window.localStorage));
-    // console.log('local storage after custom assign: ', localStorageThird)
-    await page.close();
-  };
+  console.log('Customer Local Storage: ', customerLocalStorage);
 
   let attempt = 0;
   do {
@@ -182,54 +192,49 @@ export const lambdaHandler = async (event: any, context: Context) => {
       });
       const browserVersion = await browser.version()
 
-      // const localStorageData = {
-      //   access_token: result?.data.authenticateLambda,
-      //   help: 'ME'
-      // };
-
-      await setDomainLocalStorage(browser, verifyUrl);
       console.log(`Started ${browserVersion}`);
+
+      // const result = await authenticateLambda(apiUrl, authenticateEmail, workspaceEmail, authorizationKey);
+      // const token = result?.data.authenticateLambda;
+      // const verifyTokenMutation = await verifyToken(apiUrl, token);
+
+      console.log('Access Token: ', verifyTokenMutation?.data?.verifyUserToken?.accessToken);
+      const accessToken = verifyTokenMutation?.data?.verifyUserToken?.accessToken;
+      const bearerToken = `Bearer:${accessToken}`
+
+      console.log('Bearer token: ', bearerToken);
 
       const page = await browser.newPage();
 
+      page.on("pageerror", function (err) {
+        const theTempValue = err.toString();
+        console.log("Page error: " + theTempValue);
+      });
+
+      page.on("error", function (err) {
+        const theTempValue = err.toString();
+        console.log("Error: " + theTempValue);
+      });
+
+      // await page.setExtraHTTPHeaders(headers);
       await page.setViewport({ width: 1920, height: 1080 });
-      page.setDefaultNavigationTimeout(60000);
-
-      // const verifyResponse = await page.goto(verifyUrl, { waitUntil: 'networkidle0' });
-      // console.log('verifyResponse: ', verifyResponse)
-      // // const screenshot = await page.screenshot({ fullPage: true }) as Buffer;
-      // await page.evaluateOnNewDocument(
-      //   () => {
-      //     const l = localStorage.getItem('access_token');
-      //     console.log('BIG L: ', l);
-      //   });
-      // const ls = await page.evaluate(() => {
-      //   console.log('Local storage #1: ', localStorage)
-      //   return JSON.stringify(localStorage)
-      // });
-
-      // await page.evaluate(() => {
-      //   const data = window.localStorage.getItem('access_token');
-      //   console.log(JSON.parse(data));
-      // })
-
-      // console.log('Local storage #2: ', ls);
-      // TODO: Try below snippet store in localstorage the token
-      // await page.evaluateOnNewDocument(
-      //   token => {
-      //     localStorage.setItem('access_token', token);
-      //   }, result?.data.authenticateLambda);
 
       console.log('Going to: ', reportUrl);
       await page.goto(reportUrl, { waitUntil: 'networkidle0' });
+      console.log('Access token before evaluate: ', accessToken);
+
+      await page.evaluateOnNewDocument(
+        (token, customer) => {
+          localStorage.clear();
+          localStorage.setItem('access_token', token);
+          localStorage.setItem('customer', JSON.stringify(customer));
+        }, accessToken, customerLocalStorage);
+
+      await page.goto(reportUrl, { waitUntil: ['networkidle0', 'domcontentloaded'], });
       const localStorageFourth = await page.evaluate(() => JSON.stringify(Object.assign({}, window.localStorage)));
       console.log('New page storage: ', localStorageFourth)
 
-      await page.waitForTimeout(20000);
-      // await page.goto(reportUrl, { waitUntil: 'networkidle0' });
-      // await page.waitForSelector('#report', {
-      //   visible: true,
-      // });
+      // await page.waitForTimeout(15000);
 
       const pdf = await page.pdf({ format: 'A4' }) as Buffer;
       await page.close();
