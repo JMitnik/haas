@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
 import { DatePicker } from 'components/Common/DatePicker';
@@ -10,6 +10,7 @@ import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModa
 import { Loader } from 'components/Common/Loader/Loader';
 import { useCustomer } from 'providers/CustomerProvider';
 
+import { uniqueId } from 'lodash';
 import * as LS from './WorkspaceGrid.styles';
 import { HealthCard } from '../HealthCard/HealthCard';
 import {
@@ -54,6 +55,7 @@ export const WorkspaceGrid = ({
   setDateRange,
   initialViewMode = HexagonViewMode.Workspace,
 }: WorkspaceGridProps) => {
+  const [id, setId] = useState('');
   const { activeCustomer } = useCustomer();
   const initialRef = React.useRef<HTMLDivElement>();
   const [stateHistoryStack, setStateHistoryStack] = React.useState<HexagonState[]>([]);
@@ -70,16 +72,52 @@ export const WorkspaceGrid = ({
     viewMode: initialViewMode,
   });
 
+  const resetWorkspaceGrid = useCallback(() => {
+    setCurrentState({
+      currentNode: {
+        id: activeCustomer?.id,
+        label: activeCustomer?.name,
+        score: 0,
+        type: HexagonNodeType.Workspace,
+      } as HexagonWorkspaceNode,
+      childNodes: initialData,
+      viewMode: initialViewMode,
+    });
+    setStateHistoryStack([]);
+    setId(uniqueId());
+  }, [activeCustomer, initialData, initialViewMode, setStateHistoryStack]);
+
+  useEffect(() => {
+    resetWorkspaceGrid();
+  }, [resetWorkspaceGrid]);
+
+  console.log({ currentState });
+  // useEffect(() => {
+  //   if (currentState.viewMode === HexagonViewMode.Workspace) {
+  //     setCurrentState({
+  //       currentNode: {
+  //         id: activeCustomer?.id,
+  //         label: activeCustomer?.name,
+  //         score: 0,
+  //         type: HexagonNodeType.Workspace,
+  //       } as HexagonWorkspaceNode,
+  //       childNodes: initialData,
+  //       viewMode: initialViewMode,
+  //     });
+  //   }
+  // }, [initialData, currentState/]);
+
   const gridItems = useMemo(() => (
     createGrid(
       currentState?.childNodes?.length || 0,
       initialRef.current?.clientHeight || 495,
       initialRef.current?.clientWidth || 495,
     )
-  ), [currentState.childNodes]);
+  ), [initialData, currentState.childNodes]);
 
   const hexagonNodes = currentState.childNodes?.map((node, index) => ({
     ...node,
+    id: `${id}_${node.id}`,
     points: gridItems.points[index],
   })) || [];
 

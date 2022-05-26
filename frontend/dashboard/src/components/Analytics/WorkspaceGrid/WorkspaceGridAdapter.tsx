@@ -1,8 +1,7 @@
-import { format, sub } from 'date-fns';
 import React, { useMemo, useState } from 'react';
 
+import { DateFormat, useDate } from 'hooks/useDate';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useDate } from 'hooks/useDate';
 import {
   useGetSessionPathsQuery,
   useGetWorkspaceDialogueStatisticsQuery,
@@ -10,7 +9,7 @@ import {
 
 import * as LS from './WorkspaceGrid.styles';
 import { DataLoadOptions, WorkspaceGrid } from './WorkspaceGrid';
-import { HexagonNode, HexagonNodeType, HexagonViewMode } from './WorkspaceGrid.types';
+import { Dialogue, HexagonNode, HexagonNodeType, HexagonViewMode } from './WorkspaceGrid.types';
 import { groupsFromDialogues, mapNodeTypeToViewType } from './WorkspaceGrid.helpers';
 
 export interface WorkspaceGridAdapterProps {
@@ -29,7 +28,7 @@ export const WorkspaceGridAdapter = ({
   width,
   backgroundColor,
 }: WorkspaceGridAdapterProps) => {
-  const { getStartOfWeek } = useDate();
+  const { getStartOfWeek, format } = useDate();
   const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
     const startDate = getStartOfWeek();
     const endDate = new Date();
@@ -37,22 +36,25 @@ export const WorkspaceGridAdapter = ({
     return [startDate, endDate];
   });
 
-  console.log(dateRange);
+  const [selectedStartDate, selectedEndDate] = dateRange;
+  const [dialogues, setDialogues] = useState<Dialogue[]>([]);
 
   const { activeCustomer } = useCustomer();
 
-  const { data } = useGetWorkspaceDialogueStatisticsQuery({
+  useGetWorkspaceDialogueStatisticsQuery({
     variables: {
-      startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
-      endDateTime: format(new Date(), 'dd-MM-yyyy'),
+      startDateTime: format(selectedStartDate, DateFormat.DayFormat),
+      endDateTime: format(selectedEndDate, DateFormat.DayFormat),
       workspaceId: activeCustomer?.id || '',
     },
     fetchPolicy: 'cache-and-network',
+    skip: !(!!selectedStartDate && !!selectedEndDate),
+    onCompleted: (data) => {
+      setDialogues(data.customer?.dialogues || []);
+    },
   });
 
   const { refetch: fetchGetSessions } = useGetSessionPathsQuery({ skip: true });
-
-  const dialogues = data?.customer?.dialogues || [];
 
   /**
    * Fetches the various loading data requirements for the underlying WorkspaceGrid.
@@ -69,8 +71,8 @@ export const WorkspaceGridAdapter = ({
     // Checkpoint three: Fetch all sessions for the current selected topics
     const { data: sessionData } = await fetchGetSessions({
       input: {
-        startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
-        endDateTime: format(new Date(), 'dd-MM-yyyy'),
+        startDateTime: format(selectedStartDate, DateFormat.DayFormat),
+        endDateTime: format(selectedEndDate, DateFormat.DayFormat),
         path: options.topics || [],
         refresh: true,
       },

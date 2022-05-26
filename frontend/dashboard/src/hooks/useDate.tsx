@@ -12,10 +12,16 @@ export const useDate = () => ({
   parse: (date: string, format: DateFormat) => parse(date, format, new Date()),
   parseRangeString: (date: string, format: DateFormat) => {
     const [start, end] = date.split(' - ');
-    console.log(start);
+    console.log({ start });
     return [parse(start, format, new Date()), parse(end, format, new Date())];
   },
-  format: (date: Date, format: DateFormat = DateFormat.DayFormat) => dateFormat(date, format),
+  format: (date: Date, format: DateFormat = DateFormat.DayFormat) => {
+    try {
+      return dateFormat(date, format);
+    } catch (e) {
+      return '';
+    }
+  },
   getNow: () => new Date(),
   getTomorrow: () => sub(new Date(), { days: -1 }),
   getStartOfWeek: (date = new Date()) => startOfWeek(date, {

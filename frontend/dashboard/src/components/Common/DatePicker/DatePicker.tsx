@@ -1,5 +1,5 @@
 import { DateFormat, useDate } from 'hooks/useDate';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 
 import * as LS from './DatePicker.styles';
@@ -41,7 +41,6 @@ const SingleDatePickerButton = React.forwardRef<HTMLButtonElement, CustomInputPr
   const { format, parse, isValid } = useDate();
 
   const parsedValue = parse(value, DateFormat.DayFormat);
-  console.log(value);
 
   const valueFormatted = isValid(parsedValue) ? format(parsedValue, dateFormat) : null;
   // const valueFormatted = null;
@@ -69,6 +68,8 @@ export interface RangeDatePickerProps extends BaseDatePickerProps {
   startDate: Date;
   endDate: Date;
   onChange: (dateRange: [Date, Date]) => void;
+  /** If true, will call onChange only when the entire range has been selected. */
+  changeWhenFullRange?: boolean;
 }
 
 type DatePickerProps = SingleDatePickerProps | RangeDatePickerProps;
@@ -84,19 +85,47 @@ const SingleDatePicker = ({ date, onChange }: SingleDatePickerProps) => (
   </LS.DatePickerContainer>
 );
 
-const RangeDatePicker = ({ startDate, endDate, onChange }: RangeDatePickerProps) => (
-  <LS.DatePickerContainer>
-    <ReactDatePicker
-      selected={startDate}
-      selectsRange /** @ts-ignore */
-      startDate={startDate}
-      endDate={endDate || null}
-      dateFormat={DateFormat.DayFormat}
-      customInput={<RangeDatePickerButton />}
-      onChange={(dates) => onChange(dates as unknown as [Date, Date])}
-    />
-  </LS.DatePickerContainer>
-);
+const RangeDatePicker = ({ startDate, endDate, onChange, changeWhenFullRange = true }: RangeDatePickerProps) => {
+  const [localDates, setLocalDates] = useState([startDate, endDate]);
+  const [localStartDate, localEndDate] = localDates;
+
+  /**
+   * This is a workaround to prevent the onChange handle from pushing any "unfinished" calendar events.
+   */
+  useEffect(() => {
+    // If `changeWhenFullRange` is disabled, always synchronize with local datepicker.
+    if (!changeWhenFullRange) {
+      onChange([localStartDate, localEndDate]);
+      return;
+    }
+
+    // If `changeWhenFullRange` is enabled, only synchronize with local datepicker if the range is complete.
+    if (localStartDate && localEndDate) {
+      onChange([localStartDate, localEndDate]);
+    }
+  }, [localStartDate, localEndDate, onChange, changeWhenFullRange]);
+
+  return (
+    <LS.DatePickerContainer>
+      <ReactDatePicker
+        selected={localStartDate}
+        selectsRange
+        startDate={localStartDate}
+        endDate={localEndDate || null}
+        dateFormat={DateFormat.DayFormat}
+        onCalendarClose={() => {
+          if (!localEndDate) {
+            setLocalDates([startDate, endDate]);
+          }
+        }}
+        customInput={<RangeDatePickerButton />}
+        onChange={(dates) => {
+          setLocalDates(dates as unknown as [Date, Date]);
+        }}
+      />
+    </LS.DatePickerContainer>
+  );
+};
 
 export const DatePicker = (props: DatePickerProps) => {
   switch (props.type) {

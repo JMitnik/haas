@@ -1,4 +1,4 @@
-import { ReactDatePickerProps } from 'react-datepicker';
+import { ReactDatePickerProps as BaseReactDatePickerProps } from 'react-datepicker';
 
 declare module 'react-flagpack';
 
@@ -12,8 +12,11 @@ declare module '*.svg' {
   >;
 }
 
+/**
+ * React datepicker seems to be missing a prop for their range picker.
+ */
 declare module 'react-datepicker' {
-  export interface ReactDatePickerExtraProps extends ReactDatePickerProps {
+  export interface ReactDatePickerProps extends BaseReactDatePickerProps {
     selectsRange?: boolean;
   }
 }
