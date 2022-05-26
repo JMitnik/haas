@@ -5,11 +5,11 @@ import { Zoom } from '@visx/zoom';
 import React, { useMemo, useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
+import { DatePicker } from 'components/Common/DatePicker';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { Loader } from 'components/Common/Loader/Loader';
 import { useCustomer } from 'providers/CustomerProvider';
 
-import { DatePicker } from 'components/Common/DatePicker';
 import * as LS from './WorkspaceGrid.styles';
 import { HealthCard } from '../HealthCard/HealthCard';
 import {
@@ -39,6 +39,8 @@ export interface WorkspaceGridProps {
   width: number;
   height: number;
   backgroundColor: string;
+  dateRange: [Date, Date];
+  setDateRange: (dateRange: [Date, Date]) => void;
   isLoading?: boolean;
   initialViewMode?: HexagonViewMode;
   onLoadData?: (options: DataLoadOptions) => Promise<[HexagonNode[], HexagonViewMode]>;
@@ -48,6 +50,8 @@ export const WorkspaceGrid = ({
   initialData,
   backgroundColor,
   onLoadData,
+  dateRange: [startDate, endDate],
+  setDateRange,
   initialViewMode = HexagonViewMode.Workspace,
 }: WorkspaceGridProps) => {
   const { activeCustomer } = useCustomer();
@@ -216,7 +220,12 @@ export const WorkspaceGrid = ({
               />
 
               <UI.Div mt={2}>
-                <DatePicker />
+                <DatePicker
+                  type="range"
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChange={setDateRange}
+                />
               </UI.Div>
 
               <UI.Div>

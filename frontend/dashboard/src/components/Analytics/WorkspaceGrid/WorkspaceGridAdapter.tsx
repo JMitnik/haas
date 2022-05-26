@@ -1,7 +1,8 @@
 import { format, sub } from 'date-fns';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { useCustomer } from 'providers/CustomerProvider';
+import { useDate } from 'hooks/useDate';
 import {
   useGetSessionPathsQuery,
   useGetWorkspaceDialogueStatisticsQuery,
@@ -28,6 +29,16 @@ export const WorkspaceGridAdapter = ({
   width,
   backgroundColor,
 }: WorkspaceGridAdapterProps) => {
+  const { getStartOfWeek } = useDate();
+  const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
+    const startDate = getStartOfWeek();
+    const endDate = new Date();
+
+    return [startDate, endDate];
+  });
+
+  console.log(dateRange);
+
   const { activeCustomer } = useCustomer();
 
   const { data } = useGetWorkspaceDialogueStatisticsQuery({
@@ -91,6 +102,8 @@ export const WorkspaceGridAdapter = ({
   return (
     <LS.WorkspaceGridAdapterContainer>
       <WorkspaceGrid
+        dateRange={dateRange}
+        setDateRange={setDateRange}
         backgroundColor={backgroundColor}
         initialViewMode={initialViewMode}
         initialData={initialData}

@@ -9,7 +9,7 @@ export const DatePickerContainer = styled.div`
 
     /* Main container */
     .react-datepicker {
-      background-color: #fff;
+      background-color: ${theme.colors.white};;
       color: ${theme.colors.off[500]};
       border: 1px solid ${theme.colors.neutral[400]};
       border-radius: ${theme.borderRadiuses.md}px;
@@ -112,17 +112,17 @@ export const DatePickerContainer = styled.div`
     .react-datepicker__year-text--in-range {
       border-radius: 0.3rem;
       background-color: ${theme.colors.main[500]};
-      color: #fff;
+      color: ${theme.colors.white};
     }
 
-    .react-datepicker__day--keyboard-selected,
+    /* .react-datepicker__day--keyboard-selected,
     .react-datepicker__month-text--keyboard-selected,
     .react-datepicker__quarter-text--keyboard-selected,
     .react-datepicker__year-text--keyboard-selected {
       border-radius: 0.3rem;
-      background-color: ${theme.colors.main[500]};
-      color: #fff;
-    }
+      background-color: ${theme.colors.main[300]};
+      color: ${theme.colors.white};
+    } */
 
     .react-datepicker__day-names, .react-datepicker__week {
       white-space: nowrap;

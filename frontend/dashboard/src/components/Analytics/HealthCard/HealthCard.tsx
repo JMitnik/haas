@@ -34,7 +34,7 @@ export const HealthCard = ({ score, responseCount }: HealthCardProps) => {
 
           <UI.Div ml={72} maxWidth={400}>
             <UI.H3 fontWeight={700} color="green.500">Your people are feeling healthy!</UI.H3>
-            <UI.Text color="off.400" fontWeight={500} fontSize="1rem">
+            <UI.Span color="off.400" fontWeight={500} fontSize="1rem">
               Good job, this week, due to a total of
               {' '}
               <UI.Strong>
@@ -42,7 +42,7 @@ export const HealthCard = ({ score, responseCount }: HealthCardProps) => {
               </UI.Strong>
               {' '}
               responses, you are doing much better.
-            </UI.Text>
+            </UI.Span>
           </UI.Div>
         </UI.Flex>
       </UI.CardBodyLarge>
