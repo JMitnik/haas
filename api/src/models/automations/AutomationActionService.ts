@@ -36,7 +36,6 @@ export class AutomationActionService {
 
   sendReport = async (automationActionId: string, workspaceSlug: string, reportUrl: string) => {
     const recipients = await this.findRecipients(automationActionId, workspaceSlug);
-
     recipients.forEach((recipient) => {
       const triggerBody = makeReportMailTemplate(
         {
@@ -48,7 +47,7 @@ export class AutomationActionService {
       mailService.send({
         body: triggerBody,
         recipient: recipient.user.email,
-        subject: 'A HAAS alert has been triggered',
+        subject: 'A new HAAS Report Has been released',
       });
     })
 

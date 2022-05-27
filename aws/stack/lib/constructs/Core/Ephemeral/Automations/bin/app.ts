@@ -2,6 +2,7 @@ import { Context } from 'aws-lambda';
 import * as aws from 'aws-sdk';
 import * as puppeteer from 'puppeteer';
 import axios from 'axios';
+import { report } from 'process';
 
 const authenticateLambda = async (apiUrl: string, authenticateEmail: string, workspaceEmail: string, authorizationHeader: string) => {
   return axios.post(apiUrl, {
@@ -45,6 +46,41 @@ const verifyToken = async (apiUrl: string, token: string) => {
   })
     .then(function (response) {
       console.log('verifyToken RESPONSE: ', response.data);
+      return response.data;
+    })
+    .catch(function (error) {
+      console.log('ERROR AXIOS', error);
+    });
+}
+
+const sendAutomationReport = async (
+  apiUrl: string,
+  automationActionId: string,
+  reportUrl: string,
+  workspaceSlug: string,
+  bearerToken: string
+) => {
+  return axios.post(apiUrl, {
+    query: `
+    mutation sendAutomationReport ($input: SendAutomationReportInput!) {
+      sendAutomationReport(input: $input)
+    }
+    `,
+    operationName: "sendAutomationReport",
+    variables: {
+      input: {
+        "workspaceSlug": workspaceSlug,
+        "automationActionId": automationActionId,
+        "reportUrl": reportUrl,
+      }
+    }
+  }, {
+    headers: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .then(function (response) {
+      console.log('RESPONSE: ', response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -130,8 +166,11 @@ export const lambdaHandler = async (event: any, context: Context) => {
   const reportUrl: string = message.REPORT_URL;
   const workspaceSlug: string = message.WORKSPACE_SLUG;
   const botUserId: string = message.USER_ID;
+  const automationActionId: string = message.AUTOMATION_ACTION_ID;
 
   const authorizationKey: string = process.env.AUTOMATION_API_KEY;
+
+  console.log('Automation action Id: ', automationActionId);
 
   if (!reportUrl) return {
     statusCode: 400,
@@ -200,9 +239,6 @@ export const lambdaHandler = async (event: any, context: Context) => {
 
       console.log('Access Token: ', verifyTokenMutation?.data?.verifyUserToken?.accessToken);
       const accessToken = verifyTokenMutation?.data?.verifyUserToken?.accessToken;
-      const bearerToken = `Bearer:${accessToken}`
-
-      console.log('Bearer token: ', bearerToken);
 
       const page = await browser.newPage();
 
@@ -250,6 +286,9 @@ export const lambdaHandler = async (event: any, context: Context) => {
         Body: pdf,
         ContentType: 'image'
       }).promise();
+
+      const s3ReportUrl = `https://stagingautomations-automationsbucketbb8c4ff5-1rgju9vwmmeyd.s3.eu-central-1.amazonaws.com/${process.env.bucketName}/${key}`
+      await sendAutomationReport(apiUrl, automationActionId, s3ReportUrl, workspaceSlug, accessToken);
 
       return {
         statusCode: 200,

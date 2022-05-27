@@ -48,7 +48,7 @@ const makeReportMailTemplate = ({ recipientMail, reportUrl, bgColor = '#0059f8' 
                 To sign in, please click on the following link:
                 </mj-text>
                 <mj-button href="${reportUrl}" background-color="#36d399">
-                ✨ Report link
+                📄 Report link
                 </mj-button>
             `}
                 </mj-column>
