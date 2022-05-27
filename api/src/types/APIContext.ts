@@ -24,8 +24,10 @@ import AutomationService from '../models/automations/AutomationService';
 import QuestionStatisticsService from 'models/QuestionNode/QuestionStatisticsService';
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
 import TemplateService from '../models/templates/TemplateService';
+import { AutomationActionService } from '../models/automations/AutomationActionService';
 
 export interface APIServiceContainer {
+  automationActionService: AutomationActionService;
   templateService: TemplateService;
   generateWorkspaceService: GenerateWorkspaceService;
   automationService: AutomationService;

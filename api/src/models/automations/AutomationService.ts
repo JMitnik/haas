@@ -387,7 +387,12 @@ class AutomationService {
         const users = await this.userService.findTargetUsers(workspaceSlug, payload);
         const emailAddresses = users.map((user) => user.user.email);
 
-        return this.automationActionService.generateReport(workspaceSlug, emailAddresses, dialogueSlug);
+        return this.automationActionService.generateReport(
+          automationAction.id,
+          workspaceSlug,
+          emailAddresses,
+          dialogueSlug,
+        );
       };
 
       default: {

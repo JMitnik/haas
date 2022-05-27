@@ -2,7 +2,7 @@ FROM amazon/aws-lambda-nodejs:12 as node
 
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
-ARG AWS_REGION=us-east-1
+ARG AWS_REGION=eu-central-1
 
 ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
@@ -19,7 +19,7 @@ COPY --from=node ${LAMBDA_TASK_ROOT}/node_modules/ ${LAMBDA_TASK_ROOT}/
 
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
-ARG AWS_REGION=us-east-1
+ARG AWS_REGION=eu-central-1
 
 # Install Chrome to get all of the dependencies installed
 RUN yum install -y amazon-linux-extras

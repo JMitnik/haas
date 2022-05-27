@@ -1,9 +1,12 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { ApolloError } from 'apollo-server-express';
 
 import UserService from '../users/UserService';
 import config from '../../config/config';
 import { ReportLambdaInput, ReportService } from '../../services/report/ReportService';
-import { TargetsPayload } from 'models/users/UserServiceTypes';
+import { GenerateReportPayload } from '../../models/users/UserServiceTypes';
+import makeReportMailTemplate from '../../services/mailings/templates/makeReportTemplate';
+import { mailService } from '../../services/mailings/MailService';
 
 export class AutomationActionService {
   private prisma: PrismaClient;
@@ -16,13 +19,54 @@ export class AutomationActionService {
     this.reportService = new ReportService()
   }
 
+  findRecipients = async (automationActionId: string, workspaceSlug: string) => {
+    const automationAction = await this.prisma.automationAction.findUnique({
+      where: {
+        id: automationActionId,
+      },
+    });
+
+    if (!automationAction) throw new ApolloError('No automation action found for ID!');
+
+    const payload = (automationAction.payload as unknown) as GenerateReportPayload;
+    const users = await this.userService.findTargetUsers(workspaceSlug, payload);
+
+    return users;
+  }
+
+  sendReport = async (automationActionId: string, workspaceSlug: string, reportUrl: string) => {
+    const recipients = await this.findRecipients(automationActionId, workspaceSlug);
+
+    recipients.forEach((recipient) => {
+      const triggerBody = makeReportMailTemplate(
+        {
+          recipientMail: recipient.user.firstName || 'User',
+          reportUrl,
+        }
+      );
+
+      mailService.send({
+        body: triggerBody,
+        recipient: recipient.user.email,
+        subject: 'A HAAS alert has been triggered',
+      });
+    })
+
+    return true;
+  };
+
   /**
    * Send a report by going to the dashboard's report.
    * @param workspaceSlug
    * @param dialogueSlug
    * @returns
    */
-  public async generateReport(workspaceSlug: string, targets: string[], dialogueSlug?: string) {
+  public async generateReport(
+    automationActionId: string,
+    workspaceSlug: string,
+    targets: string[],
+    dialogueSlug?: string
+  ) {
     // Get bot user to create report with
     const botUser = await this.userService.findBotByWorkspaceName(workspaceSlug);
 
@@ -41,8 +85,11 @@ export class AutomationActionService {
       TARGETS: targets,
       WORKSPACE_SLUG: workspaceSlug,
       USER_ID: botUser?.id as string,
+      AUTOMATION_ACTION_ID: automationActionId,
     }
 
     return this.reportService.generateReport(reportInput);
   }
 }
+
+export default AutomationActionService;

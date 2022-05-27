@@ -234,7 +234,8 @@ export const lambdaHandler = async (event: any, context: Context) => {
       const localStorageFourth = await page.evaluate(() => JSON.stringify(Object.assign({}, window.localStorage)));
       console.log('New page storage: ', localStorageFourth)
 
-      // await page.waitForTimeout(15000);
+      // TODO: Find a better way to wait for page to load
+      await page.waitForTimeout(10000);
 
       const pdf = await page.pdf({ format: 'A4' }) as Buffer;
       await page.close();

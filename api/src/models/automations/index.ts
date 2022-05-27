@@ -27,3 +27,4 @@ export * from './graphql/AutomationConditionOperatorType';
 export * from './graphql/AutomationConditionScopeType';
 export * from './graphql/AutomationConditionBuilderType';
 export * from './graphql/AutomationConditionBuilder';
+export * from './graphql/SendAutomationReportResolver';

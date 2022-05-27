@@ -67,7 +67,11 @@ export class Automations extends Construct {
       { mutable: false },
     );
 
-    const imageRepresentation = new lambda.AssetImageCode(`${__dirname}/Automations/`, { exclude: ['node_modules', 'infra'] });
+    const imageRepresentation = new lambda.AssetImageCode(`${__dirname}/Automations/`, {
+      exclude: ['node_modules', 'infra'], invalidation: {
+        file: true,
+      }
+    });
 
     const app2Fn = new lambda.Function(this, 'PuppeteerFunctionTwo', {
       code: imageRepresentation,

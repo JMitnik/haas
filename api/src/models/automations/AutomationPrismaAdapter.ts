@@ -1283,7 +1283,15 @@ export class AutomationPrismaAdapter {
         id: workspaceId,
       },
       include: {
-        automations: true,
+        automations: {
+          include: {
+            automationTrigger: {
+              include: {
+                actions: true,
+              },
+            },
+          },
+        },
       },
     });
 

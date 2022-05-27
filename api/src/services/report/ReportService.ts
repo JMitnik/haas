@@ -10,6 +10,7 @@ export interface ReportLambdaInput {
   TARGETS: string[];
   WORKSPACE_SLUG: string;
   USER_ID: string;
+  AUTOMATION_ACTION_ID: string;
 }
 
 export class ReportService {
