@@ -2,7 +2,6 @@ import { Context } from 'aws-lambda';
 import * as aws from 'aws-sdk';
 import * as puppeteer from 'puppeteer';
 import axios from 'axios';
-import { report } from 'process';
 
 const authenticateLambda = async (apiUrl: string, authenticateEmail: string, workspaceEmail: string, authorizationHeader: string) => {
   return axios.post(apiUrl, {
@@ -288,6 +287,7 @@ export const lambdaHandler = async (event: any, context: Context) => {
       }).promise();
 
       const s3ReportUrl = `https://stagingautomations-automationsbucketbb8c4ff5-1rgju9vwmmeyd.s3.eu-central-1.amazonaws.com/${process.env.bucketName}/${key}`
+      console.log('URL To PDF on S3: ', s3ReportUrl);
       await sendAutomationReport(apiUrl, automationActionId, s3ReportUrl, workspaceSlug, accessToken);
 
       return {
