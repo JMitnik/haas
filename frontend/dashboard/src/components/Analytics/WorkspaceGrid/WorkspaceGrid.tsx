@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
+import { uniqueId } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
@@ -10,7 +11,6 @@ import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModa
 import { Loader } from 'components/Common/Loader/Loader';
 import { useCustomer } from 'providers/CustomerProvider';
 
-import { uniqueId } from 'lodash';
 import * as LS from './WorkspaceGrid.styles';
 import { HealthCard } from '../HealthCard/HealthCard';
 import {
@@ -43,6 +43,7 @@ export interface WorkspaceGridProps {
   dateRange: [Date, Date];
   setDateRange: (dateRange: [Date, Date]) => void;
   isLoading?: boolean;
+  isServerLoading?: boolean;
   initialViewMode?: HexagonViewMode;
   onLoadData?: (options: DataLoadOptions) => Promise<[HexagonNode[], HexagonViewMode]>;
 }
@@ -54,6 +55,7 @@ export const WorkspaceGrid = ({
   dateRange: [startDate, endDate],
   setDateRange,
   initialViewMode = HexagonViewMode.Workspace,
+  isServerLoading = false,
 }: WorkspaceGridProps) => {
   const [id, setId] = useState('');
   const { activeCustomer } = useCustomer();
@@ -90,22 +92,6 @@ export const WorkspaceGrid = ({
   useEffect(() => {
     resetWorkspaceGrid();
   }, [resetWorkspaceGrid]);
-
-  console.log({ currentState });
-  // useEffect(() => {
-  //   if (currentState.viewMode === HexagonViewMode.Workspace) {
-  //     setCurrentState({
-  //       currentNode: {
-  //         id: activeCustomer?.id,
-  //         label: activeCustomer?.name,
-  //         score: 0,
-  //         type: HexagonNodeType.Workspace,
-  //       } as HexagonWorkspaceNode,
-  //       childNodes: initialData,
-  //       viewMode: initialViewMode,
-  //     });
-  //   }
-  // }, [initialData, currentState/]);
 
   const gridItems = useMemo(() => (
     createGrid(
@@ -256,14 +242,30 @@ export const WorkspaceGrid = ({
                 currentState={currentState}
                 workspaceName={activeCustomer?.name || ''}
               />
+              <UI.Div position="relative">
+                <UI.Flex mt={2}>
+                  <DatePicker
+                    type="range"
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={setDateRange}
+                  />
 
-              <UI.Div mt={2}>
-                <DatePicker
-                  type="range"
-                  startDate={startDate}
-                  endDate={endDate}
-                  onChange={setDateRange}
-                />
+                  <UI.LoaderSlot
+                    mr={1}
+                    position="absolute"
+                    left={-36}
+                    top="50%"
+                    style={{ transform: 'translateY(-20%)' }}
+                  >
+                    {isServerLoading && (
+                      <UI.Div display="inline-block">
+                        <UI.Loader data-testId="load" />
+                      </UI.Div>
+                    )}
+                  </UI.LoaderSlot>
+
+                </UI.Flex>
               </UI.Div>
 
               <UI.Div>

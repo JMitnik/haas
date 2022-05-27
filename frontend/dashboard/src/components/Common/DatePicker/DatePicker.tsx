@@ -1,57 +1,9 @@
-import { DateFormat, useDate } from 'hooks/useDate';
+import { DateFormat } from 'hooks/useDate';
 import React, { useEffect, useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 
 import * as LS from './DatePicker.styles';
-
-interface CustomInputProps {
-  dateFormat?: DateFormat;
-  value?: any;
-  onClick?: any;
-}
-
-const RangeDatePickerButton = React.forwardRef<HTMLButtonElement, CustomInputProps>(({
-  value,
-  onClick,
-  dateFormat = DateFormat.HumanGlobalWeekDayFormat,
-}: CustomInputProps, ref) => {
-  const { format, parseRangeString, isValid } = useDate();
-
-  const [startDate, endDate] = parseRangeString(value, DateFormat.DayFormat);
-
-  const valueStartDate = isValid(startDate) ? format(startDate, dateFormat) : null;
-  const valueEndDate = isValid(endDate) ? format(endDate, dateFormat) : null;
-
-  return (
-    <LS.DatePickerButton onClick={onClick} ref={ref}>
-      {valueStartDate}
-      {' '}
-      -
-      {' '}
-      {valueEndDate}
-    </LS.DatePickerButton>
-  );
-});
-
-const SingleDatePickerButton = React.forwardRef<HTMLButtonElement, CustomInputProps>(({
-  value,
-  onClick,
-  dateFormat = DateFormat.HumanGlobalWeekDayFormat,
-}: CustomInputProps, ref) => {
-  const { format, parse, isValid } = useDate();
-
-  const parsedValue = parse(value, DateFormat.DayFormat);
-
-  const valueFormatted = isValid(parsedValue) ? format(parsedValue, dateFormat) : null;
-  // const valueFormatted = null;
-  // console.log(typeof value);
-
-  return (
-    <LS.DatePickerButton onClick={onClick} ref={ref}>
-      {valueFormatted}
-    </LS.DatePickerButton>
-  );
-});
+import { RangeDatePickerButton, SingleDatePickerButton } from './DatePickerButton';
 
 interface BaseDatePickerProps {
   format?: DateFormat;
@@ -63,17 +15,6 @@ export interface SingleDatePickerProps extends BaseDatePickerProps {
   onChange: (date: Date) => void;
 }
 
-export interface RangeDatePickerProps extends BaseDatePickerProps {
-  type: 'range';
-  startDate: Date;
-  endDate: Date;
-  onChange: (dateRange: [Date, Date]) => void;
-  /** If true, will call onChange only when the entire range has been selected. */
-  changeWhenFullRange?: boolean;
-}
-
-type DatePickerProps = SingleDatePickerProps | RangeDatePickerProps;
-
 const SingleDatePicker = ({ date, onChange }: SingleDatePickerProps) => (
   <LS.DatePickerContainer>
     <ReactDatePicker
@@ -84,6 +25,15 @@ const SingleDatePicker = ({ date, onChange }: SingleDatePickerProps) => (
     />
   </LS.DatePickerContainer>
 );
+
+export interface RangeDatePickerProps extends BaseDatePickerProps {
+  type: 'range';
+  startDate: Date;
+  endDate: Date;
+  onChange: (dateRange: [Date, Date]) => void;
+  /** If true, will call onChange only when the entire range has been selected. */
+  changeWhenFullRange?: boolean;
+}
 
 const RangeDatePicker = ({ startDate, endDate, onChange, changeWhenFullRange = true }: RangeDatePickerProps) => {
   const [localDates, setLocalDates] = useState([startDate, endDate]);
@@ -126,6 +76,8 @@ const RangeDatePicker = ({ startDate, endDate, onChange, changeWhenFullRange = t
     </LS.DatePickerContainer>
   );
 };
+
+type DatePickerProps = SingleDatePickerProps | RangeDatePickerProps;
 
 export const DatePicker = (props: DatePickerProps) => {
   switch (props.type) {

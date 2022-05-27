@@ -41,7 +41,7 @@ export const WorkspaceGridAdapter = ({
 
   const { activeCustomer } = useCustomer();
 
-  useGetWorkspaceDialogueStatisticsQuery({
+  const { loading: workspaceLoading } = useGetWorkspaceDialogueStatisticsQuery({
     variables: {
       startDateTime: format(selectedStartDate, DateFormat.DayFormat),
       endDateTime: format(selectedEndDate, DateFormat.DayFormat),
@@ -101,9 +101,12 @@ export const WorkspaceGridAdapter = ({
   // TODO: Add spinner
   if (!dialogues.length) return null;
 
+  const isServerLoading = workspaceLoading;
+
   return (
     <LS.WorkspaceGridAdapterContainer>
       <WorkspaceGrid
+        isServerLoading={isServerLoading}
         dateRange={dateRange}
         setDateRange={setDateRange}
         backgroundColor={backgroundColor}

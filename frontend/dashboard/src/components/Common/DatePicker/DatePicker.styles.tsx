@@ -1,4 +1,5 @@
 // import 'react-datepicker/dist/react-datepicker.css';
+import * as UI from '@haas/ui';
 import styled, { css } from 'styled-components';
 
 import { saneDefaults } from './defaultDatePickerStyles';
@@ -115,15 +116,6 @@ export const DatePickerContainer = styled.div`
       color: ${theme.colors.white};
     }
 
-    /* .react-datepicker__day--keyboard-selected,
-    .react-datepicker__month-text--keyboard-selected,
-    .react-datepicker__quarter-text--keyboard-selected,
-    .react-datepicker__year-text--keyboard-selected {
-      border-radius: 0.3rem;
-      background-color: ${theme.colors.main[300]};
-      color: ${theme.colors.white};
-    } */
-
     .react-datepicker__day-names, .react-datepicker__week {
       white-space: nowrap;
     }
@@ -132,10 +124,29 @@ export const DatePickerContainer = styled.div`
 
 export const DatePickerButton = styled.button`
   ${({ theme }) => css`
-    padding: ${theme.gutter / 3}px ${theme.gutter / 2}px;
+    padding: ${theme.gutter / 4}px ${theme.gutter / 1.5}px;
     border-radius: ${theme.borderRadiuses.md}px;
-    border: 1px solid ${theme.colors.off[200]};
+    border: 1px solid ${theme.colors.off[300]};
     color: ${theme.colors.off[500]};
-    font-weight: 500;
+    transition: all ${theme.transitions.normal};
+    background-color: transparent;
+    background-color: ${theme.colors.neutral[500]};
+
+    &:hover {
+      background-color: ${theme.colors.off[300]};
+      color: ${theme.colors.off[600]};
+      transition: all ${theme.transitions.normal};
+    }
+
+    ${UI.Icon} {
+      width: 18px;
+      display: inline-block;
+      align-items: center;
+      vertical-align: top;
+
+      svg {
+        max-width: 100%;
+      }
+    }
   `}
 `;
