@@ -48,7 +48,6 @@ export const HexagonGrid = ({
    */
   const handleMouseOverHex = (event: React.MouseEvent<SVGPolygonElement, MouseEvent>, node: HexagonNode) => {
     const point = localPoint(event);
-
     if (!point) return;
 
     const { x, y } = point;
@@ -65,8 +64,10 @@ export const HexagonGrid = ({
     hideTooltip();
   }, [stateKey, hideTooltip]);
 
+  console.log({ tooltipLeft, tooltipTop });
+
   return (
-    <UI.Div data-test-id="HexagonGrid">
+    <UI.Div position="relative" data-test-id="HexagonGrid" width={width} height={height}>
       <svg
         width={width}
         height={height}
@@ -133,31 +134,31 @@ export const HexagonGrid = ({
 
           </Group>
         </motion.g>
-
-        <AnimateSharedLayout>
-          <AnimatePresence>
-            {tooltipOpen && (
-              <LS.Tooltip
-                key="tooltip"
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                initial={{ opacity: 0, scale: 0.95 }}
-                layoutId="tooltip"
-              >
-                <TooltipWithBounds
-                  key={Math.random()}
-                  top={tooltipTop}
-                  left={tooltipLeft}
-                >
-                  {tooltipData && (
-                    <TooltipBody node={tooltipData} />
-                  )}
-                </TooltipWithBounds>
-              </LS.Tooltip>
-            )}
-          </AnimatePresence>
-        </AnimateSharedLayout>
       </svg>
+
+      <AnimateSharedLayout>
+        <AnimatePresence>
+          {tooltipOpen && (
+          <LS.Tooltip
+            key="tooltip"
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            layoutId="tooltip"
+          >
+            <TooltipWithBounds
+              key={Math.random()}
+              top={tooltipTop}
+              left={tooltipLeft}
+            >
+              {tooltipData && (
+                <TooltipBody node={tooltipData} />
+              )}
+            </TooltipWithBounds>
+          </LS.Tooltip>
+          )}
+        </AnimatePresence>
+      </AnimateSharedLayout>
     </UI.Div>
   );
 };

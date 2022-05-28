@@ -7,7 +7,7 @@ import { ReactComponent as SVGLayer } from 'assets/icons/layer.svg';
 import { slideUpFadeMotion } from 'components/animation/config';
 
 import { HexagonState, HexagonViewMode } from './WorkspaceGrid.types';
-import { getColorScoreBrand, getHexagonSVGFill } from './WorkspaceGrid.helpers';
+import { getColorScoreBrandVariable, getHexagonSVGFill } from './WorkspaceGrid.helpers';
 
 interface LayerContainerProps {
   hide?: boolean;
@@ -80,7 +80,7 @@ const Layer = ({ state, onClick, hide, hideAll, zIndex }: LayerProps) => (
         <UI.Flex alignItems="center">
           <UI.Label
             width={100}
-            color={getColorScoreBrand(hide ? state.selectedNode?.score : undefined)}
+            color={getColorScoreBrandVariable(hide ? state.selectedNode?.score : undefined)}
           >
             {!hideAll && (
               <>
@@ -90,7 +90,7 @@ const Layer = ({ state, onClick, hide, hideAll, zIndex }: LayerProps) => (
           </UI.Label>
           {!hideAll && (
             <UI.Text
-              color={getColorScoreBrand(hide ? state.selectedNode?.score : undefined)}
+              color={getColorScoreBrandVariable(hide ? state.selectedNode?.score : undefined)}
               textAlign="left"
             >
               {hide ? (

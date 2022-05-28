@@ -4,7 +4,7 @@ import React from 'react';
 import { useFormatter } from 'hooks/useFormatter';
 
 import { ProgressCircle } from '../WorkspaceGrid/SummaryPane/ProgressCircle';
-import { getColorScoreBrand, getHexagonSVGFill } from '../WorkspaceGrid/WorkspaceGrid.helpers';
+import { getColorScoreBrandVariable, getHexagonSVGFill } from '../WorkspaceGrid/WorkspaceGrid.helpers';
 
 interface HealthCardProps {
   score: number;
@@ -26,7 +26,7 @@ export const HealthCard = ({ score, responseCount }: HealthCardProps) => {
               radius={45}
               strokeWidth={10}
             >
-              <UI.Text fontSize="1.7rem" fontWeight={700} color={getColorScoreBrand(score, true)}>
+              <UI.Text fontSize="1.7rem" fontWeight={700} color={getColorScoreBrandVariable(score, true)}>
                 {formatFractionToPercentage(score / 100)}
               </UI.Text>
             </ProgressCircle>

@@ -1,8 +1,11 @@
 import * as UI from '@haas/ui';
+import { MessageCircle } from 'react-feather';
 import { format } from 'date-fns';
 import { useFormatter } from 'hooks/useFormatter';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
+
+import { ScoreBox } from 'components/ScoreBox';
 
 import * as LS from './WorkspaceGrid.styles';
 import {
@@ -14,64 +17,44 @@ import {
   HexagonTopicNode,
 } from './WorkspaceGrid.types';
 import { SingleHexagon } from './SingleHexagon';
-import { getColorScoreBrand, getHexagonSVGFill } from './WorkspaceGrid.helpers';
+import { getColorScoreBrandVariable, getHexagonSVGFill } from './WorkspaceGrid.helpers';
 
 interface TooltipBodyProps {
   node: HexagonNode;
 }
 
-export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => {
-  const { formatScore } = useFormatter();
-  const { t } = useTranslation();
+export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => (
+  <LS.TooltipContainer>
+    <LS.TooltipBody>
+      <UI.Div>
+        <UI.Flex>
+          <ScoreBox score={node.score} />
 
-  return (
-    <LS.TooltipContainer>
-      <LS.TooltipHeader>
-        <UI.Flex justifyContent="space-between" alignItems="flex-end">
-          <UI.Div>
-            <UI.Helper>
-              {t('team')}
-            </UI.Helper>
-            <UI.Span>
-              {node.label}
-            </UI.Span>
-          </UI.Div>
-
-          <UI.Div>
-            <UI.Flex>
-              <SingleHexagon fill={getHexagonSVGFill(node.score)} />
-              <UI.Span ml={1} color={getColorScoreBrand(node.score)}>
-                {formatScore(node.score)}
+          <UI.Div ml={2}>
+            <UI.Div>
+              <UI.Span fontSize="0.9rem" fontWeight="700" color="off.500">
+                {node.label}
               </UI.Span>
-            </UI.Flex>
+            </UI.Div>
+            <UI.Div>
+              <UI.Span color="gray.400">
+                <UI.Flex alignItems="center">
+
+                  <UI.Icon width="16px">
+                    <MessageCircle />
+                  </UI.Icon>
+                  <UI.Span ml={0.5}>
+                    {node.dialogue.dialogueStatisticsSummary?.nrVotes}
+                  </UI.Span>
+                </UI.Flex>
+              </UI.Span>
+            </UI.Div>
           </UI.Div>
         </UI.Flex>
-      </LS.TooltipHeader>
-
-      <LS.TooltipBody>
-        <UI.Div>
-          <UI.Flex alignItems="center" justifyContent="space-between">
-            <UI.Div
-              mr={2}
-              py={1}
-              borderRadius={5}
-              color="gray.700"
-            >
-              Responses
-            </UI.Div>
-
-            <UI.Span fontWeight={600} color="gray.400">
-              <UI.Span color="gray.500">
-                {node.dialogue.dialogueStatisticsSummary?.nrVotes}
-              </UI.Span>
-              {' responses'}
-            </UI.Span>
-          </UI.Flex>
-        </UI.Div>
-      </LS.TooltipBody>
-    </LS.TooltipContainer>
-  );
-};
+      </UI.Div>
+    </LS.TooltipBody>
+  </LS.TooltipContainer>
+);
 
 export const TooltipTopicBody = ({ node }: { node: HexagonTopicNode }) => {
   const { formatScore } = useFormatter();
@@ -93,7 +76,7 @@ export const TooltipTopicBody = ({ node }: { node: HexagonTopicNode }) => {
           <UI.Div>
             <UI.Flex>
               <SingleHexagon fill={getHexagonSVGFill(node.score)} />
-              <UI.Span ml={1} color={getColorScoreBrand(node.score)}>
+              <UI.Span ml={1} color={getColorScoreBrandVariable(node.score)}>
                 {formatScore(node.score)}
               </UI.Span>
             </UI.Flex>
@@ -126,58 +109,38 @@ export const TooltipTopicBody = ({ node }: { node: HexagonTopicNode }) => {
   );
 };
 
-export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => {
-  const { t } = useTranslation();
-  const { formatScore } = useFormatter();
+export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => (
+  <LS.TooltipContainer>
+    <LS.TooltipBody>
+      <UI.Div>
+        <UI.Flex>
+          <ScoreBox score={node.statistics?.score} />
 
-  return (
-    <LS.TooltipContainer>
-      <LS.TooltipHeader>
-        <UI.Flex justifyContent="space-between" alignItems="flex-end">
-          <UI.Div>
-            <UI.Helper>
-              {t('group')}
-            </UI.Helper>
-            <UI.Span>
-              {node.label}
-            </UI.Span>
-          </UI.Div>
-
-          <UI.Div>
-            <UI.Flex>
-              <SingleHexagon fill={getHexagonSVGFill(node.score)} />
-              <UI.Span ml={1} color={getColorScoreBrand(node.score)}>
-                {formatScore(node.score)}
+          <UI.Div ml={2}>
+            <UI.Div>
+              <UI.Span fontSize="0.9rem" fontWeight="700" color="off.500">
+                {node.label}
               </UI.Span>
-            </UI.Flex>
+            </UI.Div>
+            <UI.Div>
+              <UI.Span color="gray.400">
+                <UI.Flex alignItems="center">
+
+                  <UI.Icon width="16px">
+                    <MessageCircle />
+                  </UI.Icon>
+                  <UI.Span ml={0.5}>
+                    {node.statistics?.voteCount}
+                  </UI.Span>
+                </UI.Flex>
+              </UI.Span>
+            </UI.Div>
           </UI.Div>
         </UI.Flex>
-      </LS.TooltipHeader>
-
-      <LS.TooltipBody>
-        <UI.Div>
-          <UI.Flex alignItems="center" justifyContent="space-between">
-            <UI.Div
-              mr={2}
-              py={1}
-              borderRadius={5}
-              color="gray.700"
-            >
-              Teams
-            </UI.Div>
-
-            <UI.Span fontWeight={600} color="gray.400">
-              <UI.Span color="gray.500">
-                {node.subGroups.length}
-              </UI.Span>
-              {' teams'}
-            </UI.Span>
-          </UI.Flex>
-        </UI.Div>
-      </LS.TooltipBody>
-    </LS.TooltipContainer>
-  );
-};
+      </UI.Div>
+    </LS.TooltipBody>
+  </LS.TooltipContainer>
+);
 
 export const TooltipSessionBody = ({ node }: { node: HexagonSessionNode }) => {
   const { formatScore } = useFormatter();
@@ -201,7 +164,7 @@ export const TooltipSessionBody = ({ node }: { node: HexagonSessionNode }) => {
           <UI.Div>
             <UI.Flex>
               <SingleHexagon fill={getHexagonSVGFill(node.score)} />
-              <UI.Span ml={1} color={getColorScoreBrand(node.score)}>
+              <UI.Span ml={1} color={getColorScoreBrandVariable(node.score)}>
                 {formatScore(node.score)}
               </UI.Span>
             </UI.Flex>

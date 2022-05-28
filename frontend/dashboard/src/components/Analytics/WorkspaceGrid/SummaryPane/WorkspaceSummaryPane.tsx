@@ -10,7 +10,7 @@ import { ArrowRightCircle } from 'react-feather';
 import { HexagonNodeType } from '../WorkspaceGrid.types';
 import { ProgressCircle } from './ProgressCircle';
 import { SummaryPaneProps } from './WorkspaceSummaryPane.types';
-import { getColorScoreBrand, getHexagonSVGFill } from '../WorkspaceGrid.helpers';
+import { getColorScoreBrandVariable, getHexagonSVGFill } from '../WorkspaceGrid.helpers';
 
 export const WorkspaceSummaryPane = ({ currentState, onDialogueChange }: SummaryPaneProps) => {
   const { activeCustomer } = useCustomer();
@@ -69,7 +69,7 @@ export const WorkspaceSummaryPane = ({ currentState, onDialogueChange }: Summary
                       radius={45}
                       strokeWidth={10}
                     >
-                      <UI.Text fontSize="1.7rem" fontWeight={700} color={getColorScoreBrand(health.score, true)}>
+                      <UI.Text fontSize="1.7rem" fontWeight={700} color={getColorScoreBrandVariable(health.score, true)}>
                         {formatFractionToPercentage(health?.score / 100)}
                       </UI.Text>
                     </ProgressCircle>

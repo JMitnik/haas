@@ -225,9 +225,16 @@ export const MetadataLabel = styled(UI.Span)`
 
 export const TooltipContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    min-width: 300px;
+    min-width: 200px;
     background: ${theme.colors.white};
     border-radius: ${theme.borderRadiuses.md}px !important;
+
+    ${UI.Icon} {
+      svg {
+        max-width: 100%;
+        max-height: 100%;
+      }
+    }
   `}
 `;
 

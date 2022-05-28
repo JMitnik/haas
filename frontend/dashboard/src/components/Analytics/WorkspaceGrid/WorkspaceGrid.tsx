@@ -242,7 +242,7 @@ export const WorkspaceGrid = ({
                 currentState={currentState}
                 workspaceName={activeCustomer?.name || ''}
               />
-              <UI.Div position="relative">
+              <UI.Div zIndex={1000} position="relative">
                 <UI.Flex mt={2}>
                   <DatePicker
                     type="range"

@@ -230,10 +230,19 @@ export const getHexagonSVGFill = (score?: number) => {
   return 'url(#dots-pink)';
 };
 
-export const getColorScoreBrand = (score?: number, darker?: boolean) => {
+export const getColorScoreBrandVariable = (score?: number, darker?: boolean) => {
   if (!score) return 'gray.500';
   if (score >= 40) return `green.${darker ? '500' : '500'}`;
   return `red.${darker ? '700' : '500'}`;
+};
+
+export const getColorScoreState = (score?: number) => {
+  if (!score) return 'gray';
+
+  if (score >= 40) return 'green';
+  if (score <= 70 && score >= 50) return 'orange';
+
+  return 'red';
 };
 
 type HexagonTitleState = 'workspace' | 'groups' | 'dialogues' | 'individuals';
