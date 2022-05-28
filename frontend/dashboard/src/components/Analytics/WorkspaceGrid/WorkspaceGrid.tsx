@@ -2,7 +2,6 @@ import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
-import { uniqueId } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
@@ -57,7 +56,6 @@ export const WorkspaceGrid = ({
   initialViewMode = HexagonViewMode.Workspace,
   isServerLoading = false,
 }: WorkspaceGridProps) => {
-  const [id, setId] = useState('');
   const { activeCustomer } = useCustomer();
   const initialRef = React.useRef<HTMLDivElement>();
   const [stateHistoryStack, setStateHistoryStack] = React.useState<HexagonState[]>([]);
@@ -86,7 +84,6 @@ export const WorkspaceGrid = ({
       viewMode: initialViewMode,
     });
     setStateHistoryStack([]);
-    setId(uniqueId());
   }, [activeCustomer, initialData, initialViewMode, setStateHistoryStack]);
 
   useEffect(() => {
