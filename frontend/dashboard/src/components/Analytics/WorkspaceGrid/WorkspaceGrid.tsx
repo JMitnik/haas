@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import useMeasure from 'react-use-measure';
 
 import * as Modal from 'components/Common/Modal';
 import { DatePicker } from 'components/Common/DatePicker';
@@ -58,9 +59,22 @@ export const WorkspaceGrid = ({
 }: WorkspaceGridProps) => {
   const { activeCustomer } = useCustomer();
   const initialRef = React.useRef<HTMLDivElement>();
-  const [stateHistoryStack, setStateHistoryStack] = React.useState<HexagonState[]>([]);
+  // Local loading
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId, setSessionId] = React.useState<string | undefined>(undefined);
+
+  // Session-id if currently being tracked.
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
+
+  const [ref, bounds] = useMeasure();
+  const width = bounds.width || 600;
+  const height = 700;
+  console.log({ width, height });
+
+  /**
+   * The current state describes that state of the workspace grid component, including the node
+   * that was clicked just now, the candidate child nodes that can be clicked next, and a general global "state" what
+   * type of view is currently being shown.
+   */
   const [currentState, setCurrentState] = React.useState<HexagonState>({
     currentNode: {
       id: activeCustomer?.id,
@@ -72,6 +86,31 @@ export const WorkspaceGrid = ({
     viewMode: initialViewMode,
   });
 
+  /**
+   * The history stack tracks previous states of the workspace grid component. Utilized for things like the layers,
+   * breadcrumb navigations, and such.
+   *
+   * Can be read as queue by reversing the stack, via `historyQueue`.
+   * The `previousLabels` are the queue labels.
+   */
+  const [stateHistoryStack, setStateHistoryStack] = React.useState<HexagonState[]>([]);
+  const historyQueue = [...stateHistoryStack].reverse();
+  const previousLabels: string[] = historyQueue.map((state) => state.currentNode?.label || '');
+
+  /**
+   * If the last selected node was a dialogue, then the activeDialogue will point to that dialogue.
+   */
+  const activeDialogue = useMemo(() => {
+    const activeNode = stateHistoryStack.find((state) => state.selectedNode?.type === HexagonNodeType.Dialogue);
+    return (activeNode?.selectedNode as HexagonDialogueNode)?.dialogue || undefined;
+  }, [currentState]);
+
+  /**
+   * Resets the entire grid state to the beginning.
+   * Used when one of the following changes:
+   * - Initial data (think of filters)
+   * - The workspace changes.
+   */
   const resetWorkspaceGrid = useCallback(() => {
     setCurrentState({
       currentNode: {
@@ -90,6 +129,11 @@ export const WorkspaceGrid = ({
     resetWorkspaceGrid();
   }, [resetWorkspaceGrid]);
 
+  /**
+   * Generates an array of Hexagon SVG coordinates according to the desired shape.
+   *
+   * The entries in the array correspond to `currentState.childNodes`, and can be accessed by the indices.
+   */
   const gridItems = useMemo(() => (
     createGrid(
       currentState?.childNodes?.length || 0,
@@ -98,16 +142,18 @@ export const WorkspaceGrid = ({
     )
   ), [initialData, currentState.childNodes]);
 
+  /**
+   * Adds the generated SVG coordinates to the hexagon nodes.
+   */
   const hexagonNodes = currentState.childNodes?.map((node, index) => ({
     ...node,
     id: node.id,
     points: gridItems.points[index],
   })) || [];
 
-  // ReversedHistory: Session => Dialogue => Group
-  const historyQueue = [...stateHistoryStack].reverse();
-  const previousLabels: string[] = historyQueue.map((state) => state.currentNode?.label || '');
-
+  /**
+   * Method for traversing the `historyStack` backwards by using an index to jump to the appropriate position.
+   */
   const popToIndex = (index: number) => {
     if (index === historyQueue.length) return;
 
@@ -130,6 +176,11 @@ export const WorkspaceGrid = ({
     }
   };
 
+  /**
+   * Method for traversing the `historyStack` forwards until a particular dialogue.
+   * - Useful for skipping groups.
+   * - Allows for additional filtering, by only retrieving sessions mentioning certain `topics`.
+   */
   const jumpToDialogue = async (dialogueId: string, topics?: string[]) => {
     if (!onLoadData) return;
 
@@ -145,26 +196,25 @@ export const WorkspaceGrid = ({
   };
 
   /**
-   * If the current state has a DialogueNode, then sets the dialogueNode.
-   */
-  const activeDialogue = useMemo(() => {
-    const activeNode = stateHistoryStack.find((state) => state.selectedNode?.type === HexagonNodeType.Dialogue);
-    return (activeNode?.selectedNode as HexagonDialogueNode)?.dialogue || undefined;
-  }, [currentState]);
-
-  /**
-   * If a user clicks on a hex.
+   * Method for when a user clicks on a node. This will typically zoom in on the hexagon node (drill-down).
    */
   const handleHexClick = async (currentZoomHelper: ProvidedZoom<SVGElement>, clickedNode: HexagonNode) => {
+    // PHASE 1: Prevent termination states from being clicked.
+
+    // If we somehow trigger this while being in the termination state (Final), ignore the click.
+    // NOTE: This should generally never happen, but it's here just in case.
     if (currentState.viewMode === HexagonViewMode.Final) return;
 
+    // If we are at the other termination state (Session), and the node clicked was a session, set it to be active.
+    // This will trigger the modal.
     if (currentState.viewMode === HexagonViewMode.Session && clickedNode.type === HexagonNodeType.Session) {
       setSessionId(clickedNode.session.id);
       return;
     }
 
-    // Empty canvas and unset soom
-    // currentZoomHelper.reset();
+    // PHASE 2: Update History Stack
+
+    // Update the history with the last state.
     const newStateHistory = [{
       currentNode: currentState.currentNode,
       childNodes: currentState.childNodes,
@@ -173,12 +223,11 @@ export const WorkspaceGrid = ({
     }, ...stateHistoryStack];
     setStateHistoryStack(newStateHistory);
 
-    const topics = newStateHistory
-      .filter((state) => state.selectedNode?.type === HexagonNodeType.Topic)
-      .map((state) => (state.selectedNode as HexagonTopicNode)?.topic);
-
     if (!onLoadData) return;
 
+    // PHASE 3: Fetch the children
+
+    // If we clicked on group, load the groups children (other groups / dialogues), and set that state.
     if (clickedNode.type === HexagonNodeType.Group) {
       const [newNodes, hexagonViewMode] = await onLoadData({
         clickedGroup: clickedNode.type === HexagonNodeType.Group ? clickedNode : undefined,
@@ -188,9 +237,14 @@ export const WorkspaceGrid = ({
       return;
     }
 
+    // If we clicked on a dialogue, load the underlying topics or sessions.
     const dialogueId = clickedNode.type === HexagonNodeType.Dialogue ? clickedNode.id : activeDialogue?.id;
-    if (!dialogueId || !onLoadData) return;
+    if (!dialogueId) return;
     setIsLoading(true);
+
+    const topics = newStateHistory
+      .filter((state) => state.selectedNode?.type === HexagonNodeType.Topic)
+      .map((state) => (state.selectedNode as HexagonTopicNode)?.topic);
 
     const [newNodes, hexagonViewMode] = await onLoadData({
       dialogueId,
@@ -200,9 +254,6 @@ export const WorkspaceGrid = ({
 
     setCurrentState({ currentNode: clickedNode, childNodes: newNodes, viewMode: hexagonViewMode });
   };
-
-  const width = 600;
-  const height = 700;
 
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
@@ -227,7 +278,7 @@ export const WorkspaceGrid = ({
           </UI.Div>
         </motion.div>
       )}
-      <UI.Div borderRadius={20} position="relative">
+      <UI.Div ref={ref} borderRadius={20} position="relative">
         <Zoom<SVGElement>
           width={width}
           height={height}
