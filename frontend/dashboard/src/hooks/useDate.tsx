@@ -5,6 +5,9 @@ export enum DateFormat {
   DayFormat = 'dd-MM-yyyy',
   /** Example: Monday 16th */
   HumanGlobalWeekDayFormat = 'EEEE do',
+
+  /** Example: Monday 16 July, 20:00 */
+  HumanDateTime = 'EEEE do, HH:mm',
 }
 
 export const useDate = () => ({
@@ -12,7 +15,6 @@ export const useDate = () => ({
   parse: (date: string, format: DateFormat) => parse(date, format, new Date()),
   parseRangeString: (date: string, format: DateFormat) => {
     const [start, end] = date.split(' - ');
-    console.log({ start });
     return [parse(start, format, new Date()), parse(end, format, new Date())];
   },
   format: (date: Date, format: DateFormat = DateFormat.DayFormat) => {

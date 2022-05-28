@@ -64,8 +64,6 @@ export const HexagonGrid = ({
     hideTooltip();
   }, [stateKey, hideTooltip]);
 
-  console.log({ tooltipLeft, tooltipTop });
-
   return (
     <UI.Div position="relative" data-test-id="HexagonGrid" width={width} height={height}>
       <svg

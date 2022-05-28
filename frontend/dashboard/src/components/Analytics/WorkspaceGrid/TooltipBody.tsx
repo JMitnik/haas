@@ -1,12 +1,12 @@
 import * as UI from '@haas/ui';
-import { MessageCircle } from 'react-feather';
-import { format } from 'date-fns';
+import { Clock, MessageCircle } from 'react-feather';
 import { useFormatter } from 'hooks/useFormatter';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { ScoreBox } from 'components/ScoreBox';
 
+import { DateFormat, useDate } from 'hooks/useDate';
 import * as LS from './WorkspaceGrid.styles';
 import {
   HexagonDialogueNode,
@@ -144,53 +144,88 @@ export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => (
 
 export const TooltipSessionBody = ({ node }: { node: HexagonSessionNode }) => {
   const { formatScore } = useFormatter();
+  const { format } = useDate();
   const { t } = useTranslation();
 
-  const date = format(new Date(node.session.createdAt), 'dd/MM/yyyy HH:mm:ss');
+  const date = format(new Date(node.session.createdAt), DateFormat.HumanDateTime);
 
   return (
+  // <LS.TooltipContainer>
+  //   <LS.TooltipHeader>
+  //     <UI.Flex justifyContent="space-between" alignItems="flex-end">
+  //       <UI.Div>
+  //         <UI.Helper>
+  //           {t('session')}
+  //         </UI.Helper>
+  //         <UI.Span>
+  //           {date}
+  //         </UI.Span>
+  //       </UI.Div>
+
+  //       <UI.Div>
+  //         <UI.Flex>
+  //           <SingleHexagon fill={getHexagonSVGFill(node.score)} />
+  //           <UI.Span ml={1} color={getColorScoreBrandVariable(node.score)}>
+  //             {formatScore(node.score)}
+  //           </UI.Span>
+  //         </UI.Flex>
+  //       </UI.Div>
+  //     </UI.Flex>
+  //   </LS.TooltipHeader>
+
+  //   <LS.TooltipBody>
+  //     <UI.Div>
+  //       <UI.Flex alignItems="center" justifyContent="space-between">
+  //         <UI.Div
+  //           mr={2}
+  //           px={1}
+  //           py={1}
+  //           borderRadius={5}
+  //           color="gray.700"
+  //         >
+  //           Time spent
+  //         </UI.Div>
+
+  //         <UI.Span fontWeight={600} color="gray.400">
+  //           <UI.Span color="gray.500">
+  //             {node.session.totalTimeInSec}
+  //           </UI.Span>
+  //           {' seconds'}
+  //         </UI.Span>
+  //       </UI.Flex>
+  //     </UI.Div>
+  //   </LS.TooltipBody>
+  // </LS.TooltipContainer>
+
     <LS.TooltipContainer>
-      <LS.TooltipHeader>
-        <UI.Flex justifyContent="space-between" alignItems="flex-end">
-          <UI.Div>
-            <UI.Helper>
-              {t('session')}
-            </UI.Helper>
-            <UI.Span>
-              {date}
-            </UI.Span>
-          </UI.Div>
-
-          <UI.Div>
-            <UI.Flex>
-              <SingleHexagon fill={getHexagonSVGFill(node.score)} />
-              <UI.Span ml={1} color={getColorScoreBrandVariable(node.score)}>
-                {formatScore(node.score)}
-              </UI.Span>
-            </UI.Flex>
-          </UI.Div>
-        </UI.Flex>
-      </LS.TooltipHeader>
-
       <LS.TooltipBody>
         <UI.Div>
-          <UI.Flex alignItems="center" justifyContent="space-between">
-            <UI.Div
-              mr={2}
-              px={1}
-              py={1}
-              borderRadius={5}
-              color="gray.700"
-            >
-              Time spent
-            </UI.Div>
+          <UI.Flex>
+            <ScoreBox score={node.score} />
 
-            <UI.Span fontWeight={600} color="gray.400">
-              <UI.Span color="gray.500">
-                {node.session.totalTimeInSec}
-              </UI.Span>
-              {' seconds'}
-            </UI.Span>
+            <UI.Div ml={2}>
+              <UI.Div>
+                <UI.Span fontSize="0.9rem" fontWeight="700" color="off.500">
+                  {date}
+                </UI.Span>
+              </UI.Div>
+              <UI.Div>
+                <UI.Span color="gray.400">
+                  <UI.Flex alignItems="center">
+
+                    <UI.Icon width="16px">
+                      <Clock />
+                    </UI.Icon>
+                    <UI.Span ml={1}>
+                      {' '}
+                      {node.session.totalTimeInSec}
+                      {' '}
+                      {t('seconds')}
+                    </UI.Span>
+                  </UI.Flex>
+                </UI.Span>
+              </UI.Div>
+            </UI.Div>
           </UI.Flex>
         </UI.Div>
       </LS.TooltipBody>

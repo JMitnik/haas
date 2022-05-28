@@ -103,7 +103,7 @@ export const WorkspaceGrid = ({
 
   const hexagonNodes = currentState.childNodes?.map((node, index) => ({
     ...node,
-    id: `${id}_${node.id}`,
+    id: node.id,
     points: gridItems.points[index],
   })) || [];
 
