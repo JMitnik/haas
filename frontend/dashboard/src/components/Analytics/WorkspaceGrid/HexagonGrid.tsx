@@ -4,29 +4,58 @@ import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple, LinearGr
 import { Group } from '@visx/group';
 import { PatternCircles } from '@visx/pattern';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
+import React from 'react';
 import useMeasure from 'react-use-measure';
 
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
-
-import React, { useEffect } from 'react';
+import theme from 'config/theme';
 
 import * as LS from './WorkspaceGrid.styles';
 import { HexagonItem } from './HexagonItem';
-import { HexagonNode } from './WorkspaceGrid.types';
+import { HexagonNode, ZoomProps } from './WorkspaceGrid.types';
 import { TooltipBody } from './TooltipBody';
 
 interface HexagonGridProps {
-  x: number;
-  y: number;
   stateKey: string;
   nodes: HexagonNode[];
   onHexClick: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
   width: number;
   height: number;
-  zoom: ProvidedZoom<SVGElement>;
+  zoom: ZoomProps;
   backgroundColor: string;
+  useBackgroundPattern: boolean;
 }
+
+interface GridBackgroundPatternProps {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  dotWidth: number;
+  dotHeight: number;
+  dotY: number;
+  dotX: number;
+  dotFill: string;
+  dotOpacity: number;
+}
+
+const GridBackgroundPattern = ({
+  x = 0,
+  y = 0,
+  width,
+  height,
+  dotWidth,
+  dotHeight,
+  dotY,
+  dotX,
+  dotFill,
+  dotOpacity,
+}: GridBackgroundPatternProps) => (
+  <pattern id="dot-pattern" patternUnits="userSpaceOnUse" x={x} y={y} width={width} height={height}>
+    <rect width={dotWidth} height={dotHeight} fill={dotFill} x={dotX} y={dotY} opacity={dotOpacity} />
+  </pattern>
+);
 
 export const HexagonGrid = ({
   stateKey,
@@ -36,6 +65,7 @@ export const HexagonGrid = ({
   height,
   zoom,
   backgroundColor,
+  useBackgroundPattern = false,
 }: HexagonGridProps) => {
   const [ref, bounds] = useMeasure({
     debounce: {
@@ -70,14 +100,21 @@ export const HexagonGrid = ({
 
   const handleMouseOutHex = () => hideTooltip();
 
+  const gridDotSize = 3;
+  const gridSize = 50;
+
   return (
     <UI.Div position="relative" data-test-id="HexagonGrid" width={width} height={height}>
       <svg
         width={width}
         height={height}
+        style={{
+          cursor: zoom.isDragging ? 'grabbing' : 'grab',
+          touchAction: 'none',
+          borderRadius: '10px',
+          border: '1px solid #D6DCF2',
+        }}
         // @ts-ignore
-        style={{ cursor: zoom.isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
-                            // @ts-ignore
         ref={zoom.containerRef}
       >
         <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
@@ -86,6 +123,29 @@ export const HexagonGrid = ({
         <LinearGradient id="grays" from="#757F9A" to="#939bb1" />
         <GradientLightgreenGreen id="dots-green" />
         <rect width={width} height={height} fill={backgroundColor} stroke={backgroundColor} />
+
+        {useBackgroundPattern && (
+          <>
+            <GridBackgroundPattern
+              x={zoom.transformMatrix.translateX}
+              y={zoom.transformMatrix.translateY}
+              width={gridSize * zoom.transformMatrix.scaleX}
+              height={gridSize * zoom.transformMatrix.scaleY}
+              dotWidth={gridDotSize}
+              dotHeight={gridDotSize}
+              dotX={((gridSize * zoom.transformMatrix.scaleX) / 2) - (gridDotSize / 2)}
+              dotY={((gridSize * zoom.transformMatrix.scaleY) / 2) - (gridDotSize / 2)}
+              dotFill={theme.colors.off[300]}
+              dotOpacity={0.5}
+            />
+
+            <rect
+              fill="url(#dot-pattern)"
+              width={width}
+              height={height}
+            />
+          </>
+        )}
         <rect
           width={width}
           height={height}
@@ -117,7 +177,6 @@ export const HexagonGrid = ({
               x={-10 + (width - bounds.width) / 2}
               y={(height - bounds.height) / 2}
             >
-
               <AnimatePresence>
                 <motion.g
                   animate={{ opacity: 1 }}

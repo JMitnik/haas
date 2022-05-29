@@ -24,7 +24,7 @@ export const HealthCard = ({
 }: HealthCardProps) => {
   const { formatFractionToPercentage } = useFormatter();
   return (
-    <UI.NewCard boxShadow="md" hasBlur>
+    <UI.NewCard boxShadow="md" hasBlur maxWidth={250}>
       <UI.CardBodyLarge>
         <UI.Flex justifyContent="center">
           <ProgressCircle

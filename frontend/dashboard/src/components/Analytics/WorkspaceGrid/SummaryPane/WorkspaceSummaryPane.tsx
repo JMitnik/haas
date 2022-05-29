@@ -6,7 +6,7 @@ import React from 'react';
 import { DialogueImpactScoreType, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
 
 import { HealthCard } from 'components/Analytics/Common/HealthCard/HealthCard';
-import { UrgentTopicWidget } from 'components/Analytics/UrgentPathWidget';
+import { UrgentTopicWidget } from 'components/Analytics/Topic/UrgentTopicWidget';
 
 import { SummaryPaneProps } from './WorkspaceSummaryPane.types';
 
@@ -37,18 +37,20 @@ export const WorkspaceSummaryPane = ({ currentState, onDialogueChange, startDate
   const urgentPath = summary?.urgentPath;
 
   return (
-    <UI.Div>
+    <UI.Flex>
       {health && (
-        <HealthCard
-          score={health.score}
-          responseCount={health.nrVotes}
-          negativeResponseCount={health.negativeResponseCount}
-          positiveResponseCount={health.nrVotes - health.negativeResponseCount}
-        />
+        <UI.Div minWidth={250}>
+          <HealthCard
+            score={health.score}
+            responseCount={health.nrVotes}
+            negativeResponseCount={health.negativeResponseCount}
+            positiveResponseCount={health.nrVotes - health.negativeResponseCount}
+          />
+        </UI.Div>
       )}
 
       {urgentPath && (
-        <UI.Div mt={2}>
+        <UI.Div width={300} height={250} ml={4}>
           <UrgentTopicWidget
             topic={urgentPath.path.topicStrings[0]}
             dialogueLabel="Team"
@@ -58,6 +60,6 @@ export const WorkspaceSummaryPane = ({ currentState, onDialogueChange, startDate
           />
         </UI.Div>
       )}
-    </UI.Div>
+    </UI.Flex>
   );
 };

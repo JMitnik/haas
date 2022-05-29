@@ -134,10 +134,10 @@ export const CardBodyLarge = styled(Div)`
 `;
 
 export const CardFooter = styled(Div)`
-  ${({ theme }) => css`
-    padding: 8px ${theme.gutter * 0.75}px;
-    border-radius: 0 0 ${theme.borderRadiuses.md} ${theme.borderRadiuses.md};
-    color: ${theme.colors.default.text};
+  ${({ theme, color = 'default.text' }) => css`
+    padding: ${theme.gutter * 0.75}px;
+    border-radius: 0 0 ${theme.borderRadiuses.md}px ${theme.borderRadiuses.md}px;
+    color: ${get(theme.colors, color)};
   `}
 `;
 

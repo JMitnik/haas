@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    individuals: {
+      en: 'Individuals',
+      de: 'Individuals',
+    },
     groups: {
       en: 'Groups',
       de: 'Groups',

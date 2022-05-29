@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
-import { AnimatePresence, motion } from 'framer-motion';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
+import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useMeasure from 'react-use-measure';
 
@@ -10,6 +10,7 @@ import { DatePicker } from 'components/Common/DatePicker';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { Loader } from 'components/Common/Loader/Loader';
 import { useCustomer } from 'providers/CustomerProvider';
+import theme from 'config/theme';
 
 import * as LS from './WorkspaceGrid.styles';
 import { HealthCard } from '../Common/HealthCard/HealthCard';
@@ -67,9 +68,8 @@ export const WorkspaceGrid = ({
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
 
   const [ref, bounds] = useMeasure();
-  console.log({ bounds2: bounds });
   const width = bounds.width || 600;
-  const height = 800;
+  const height = Math.max(bounds.height, 800);
 
   /**
    * The current state describes that state of the workspace grid component, including the node
@@ -258,7 +258,6 @@ export const WorkspaceGrid = ({
 
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
-      <AnimatePresence />
       {isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -279,7 +278,8 @@ export const WorkspaceGrid = ({
           </UI.Div>
         </motion.div>
       )}
-      <UI.Div ref={ref} borderRadius={20} position="relative">
+
+      <UI.Div borderRadius={20} position="relative">
         <Zoom<SVGElement>
           width={width}
           height={height}
@@ -293,7 +293,7 @@ export const WorkspaceGrid = ({
                 currentState={currentState}
                 workspaceName={activeCustomer?.name || ''}
               />
-              <UI.Div zIndex={1000} position="relative">
+              <UI.Div mb={4} zIndex={1000} position="relative">
                 <UI.Flex mt={2}>
                   <DatePicker
                     type="range"
@@ -319,19 +319,31 @@ export const WorkspaceGrid = ({
                 </UI.Flex>
               </UI.Div>
 
-              <UI.Grid>
-                <HexagonGrid
-                  x={bounds.x}
-                  y={bounds.y}
-                  width={width}
-                  height={height}
-                  backgroundColor={backgroundColor}
-                  nodes={hexagonNodes}
-                  onHexClick={handleHexClick}
-                  stateKey={currentState.currentNode?.id || ''}
-                  zoom={zoom}
-                />
-              </UI.Grid>
+              <UI.Container mt={2}>
+                <UI.Grid gridTemplateRows="1fr 250px">
+                  <UI.Div ref={ref}>
+                    <HexagonGrid
+                      width={width}
+                      height={height}
+                      backgroundColor="#ebf0ff"
+                      nodes={hexagonNodes}
+                      onHexClick={handleHexClick}
+                      stateKey={currentState.currentNode?.id || ''}
+                      zoom={zoom}
+                      useBackgroundPattern
+                    />
+                  </UI.Div>
+                    <UI.Div mt={4}>
+                      <WorkspaceSummaryPane
+                        startDate={startDate}
+                        endDate={endDate}
+                        onDialogueChange={jumpToDialogue}
+                        currentState={currentState}
+                      />
+                  </UI.Div>
+                </UI.Grid>
+
+              </UI.Container>
             </UI.ColumnFlex>
           )}
         </Zoom>
@@ -342,15 +354,6 @@ export const WorkspaceGrid = ({
             historyQueue={historyQueue}
           />
         </UI.Div>
-      </UI.Div>
-
-      <UI.Div position="absolute" left={24} top="30%">
-        <WorkspaceSummaryPane
-          startDate={startDate}
-          endDate={endDate}
-          onDialogueChange={jumpToDialogue}
-          currentState={currentState}
-        />
       </UI.Div>
 
       <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
