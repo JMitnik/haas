@@ -2467,6 +2467,7 @@ export type TopicType = {
   impactScore: Scalars['Float'];
   nrVotes: Scalars['Int'];
   subTopics?: Maybe<Array<TopicType>>;
+  basicStats?: Maybe<BasicStatistics>;
 };
 
 export type TopPathType = {
@@ -2719,6 +2720,8 @@ export type WorkspaceStatistics = {
   id: Scalars['ID'];
   /** Basic statistics of a workspace (e.g. number of responses, average general score, etc) */
   basicStats: BasicStatistics;
+  /** Topics of a workspace ranked by either impact score or number of responses */
+  rankedTopics: Array<TopicType>;
   /** Gets the health score of the workspace */
   health: HealthScore;
   /** Returns potentially the most urgent path of the workspace (one at most) */
@@ -2731,6 +2734,11 @@ export type WorkspaceStatistics = {
 
 
 export type WorkspaceStatisticsBasicStatsArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+
+export type WorkspaceStatisticsRankedTopicsArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
@@ -2853,7 +2861,14 @@ export type GetWorkspaceSummaryDetailsQuery = (
           { __typename?: 'TopicDelta' }
           & Pick<TopicDelta, 'topic' | 'averageCurrent' | 'averagePrevious' | 'delta' | 'group' | 'percentageChanged'>
         )> }
-      ), basicStats: (
+      ), rankedTopics: Array<(
+        { __typename?: 'TopicType' }
+        & Pick<TopicType, 'name'>
+        & { basicStats?: Maybe<(
+          { __typename?: 'BasicStatistics' }
+          & Pick<BasicStatistics, 'average' | 'responseCount'>
+        )> }
+      )>, basicStats: (
         { __typename?: 'BasicStatistics' }
         & Pick<BasicStatistics, 'responseCount' | 'average'>
       ), urgentPath?: Maybe<(
@@ -3963,6 +3978,13 @@ export const GetWorkspaceSummaryDetailsDocument = gql`
           delta
           group
           percentageChanged
+        }
+      }
+      rankedTopics(input: $summaryInput) {
+        name
+        basicStats {
+          average
+          responseCount
         }
       }
       basicStats(input: $summaryInput) {
@@ -5815,12 +5837,14 @@ export namespace GetWorkspaceSummaryDetails {
   export type MostChangedPath = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['mostChangedPath']>);
   export type TopNegativeChanged = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['mostChangedPath']>)['topNegativeChanged']>)[number]>;
   export type TopPositiveChanged = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['mostChangedPath']>)['topPositiveChanged']>)[number]>;
-  export type BasicStats = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['basicStats']>);
+  export type RankedTopics = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['rankedTopics']>)[number]>;
+  export type BasicStats = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['rankedTopics']>)[number]>['basicStats']>);
+  export type _BasicStats = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['basicStats']>);
   export type UrgentPath = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>);
   export type Path = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>)['path']>);
   export type Dialogue = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>)['dialogue']>);
   export type _Path = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>)['path']>);
-  export type _BasicStats = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>)['basicStats']>);
+  export type __BasicStats = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>)['basicStats']>);
   export const Document = GetWorkspaceSummaryDetailsDocument;
 }
 

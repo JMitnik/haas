@@ -22,10 +22,16 @@ export const TopicType = objectType({
     t.string('name');
     t.float('impactScore');
     t.int('nrVotes');
+
     t.field('subTopics', {
       list: true,
       nullable: true,
       type: TopicType,
+    });
+
+    t.field('basicStats', {
+      type: 'BasicStatistics',
+      nullable: true,
     });
   },
 });

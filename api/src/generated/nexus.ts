@@ -1172,6 +1172,7 @@ export interface NexusGenRootTypes {
     value: string; // String!
   }
   TopicType: { // root type
+    basicStats?: NexusGenRootTypes['BasicStatistics'] | null; // BasicStatistics
     impactScore: number; // Float!
     name: string; // String!
     nrVotes: number; // Int!
@@ -2107,6 +2108,7 @@ export interface NexusGenFieldTypes {
     value: string; // String!
   }
   TopicType: { // field return type
+    basicStats: NexusGenRootTypes['BasicStatistics'] | null; // BasicStatistics
     impactScore: number; // Float!
     name: string; // String!
     nrVotes: number; // Int!
@@ -2193,6 +2195,7 @@ export interface NexusGenFieldTypes {
     mostChangedPath: NexusGenRootTypes['MostChangedPath']; // MostChangedPath!
     mostPopularPath: NexusGenRootTypes['MostPopularPath'] | null; // MostPopularPath
     mostTrendingTopic: NexusGenRootTypes['MostTrendingTopic'] | null; // MostTrendingTopic
+    rankedTopics: NexusGenRootTypes['TopicType'][]; // [TopicType!]!
     urgentPath: NexusGenRootTypes['UrgentPath'] | null; // UrgentPath
   }
   lineChartDataType: { // field return type
@@ -2600,6 +2603,9 @@ export interface NexusGenArgTypes {
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     mostTrendingTopic: { // args
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
+    rankedTopics: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     urgentPath: { // args

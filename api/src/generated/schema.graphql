@@ -1822,6 +1822,7 @@ type TopicNodeEntryValue {
 }
 
 type TopicType {
+  basicStats: BasicStatistics
   impactScore: Float!
   name: String!
   nrVotes: Int!
@@ -2080,6 +2081,11 @@ type WorkspaceStatistics {
   mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath!
   mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+
+  """
+  Topics of a workspace ranked by either impact score or number of responses
+  """
+  rankedTopics(input: DialogueStatisticsSummaryFilterInput): [TopicType!]!
 
   """
   Returns potentially the most urgent path of the workspace (one at most)

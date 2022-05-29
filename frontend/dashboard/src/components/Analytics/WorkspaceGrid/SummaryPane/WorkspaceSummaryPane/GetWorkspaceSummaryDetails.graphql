@@ -34,15 +34,13 @@ query GetWorkspaceSummaryDetails($id: ID, $summaryInput: DialogueStatisticsSumma
           percentageChanged
         }
       }
-      # mostPopularPath(input: $summaryInput) {
-      #   group
-      #   path {
-      #     depth
-      #     impactScore
-      #     nrVotes
-      #     topic
-      #   }
-      # }
+      rankedTopics(input: $summaryInput) {
+				name
+				basicStats {
+					average
+					responseCount
+				}
+			}
       basicStats(input: $summaryInput) {
 				responseCount
 				average

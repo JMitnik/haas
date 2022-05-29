@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AlertTriangle, ArrowRightCircle } from 'react-feather';
+import { ArrowRightCircle } from 'react-feather';
 import React from 'react';
 
 interface UrgentPathWidgetProps {
@@ -31,15 +31,6 @@ export const UrgentTopicWidget = ({
         <UI.Helper fontSize="1.1rem" fontWeight={600} color="red.100" mb={2}>
           Urgent issue
         </UI.Helper>
-        {/* <UI.Helper color="red.100">
-            <UI.Span ml={4}>
-              in
-              {' '}
-              {dialogueLabel}
-              {' '}
-              {dialogueTitle}
-            </UI.Span>
-          </UI.Helper> */}
       </UI.Flex>
       <UI.Div maxWidth={500} mt={4}>
         <UI.Text fontSize="1.2rem" color="white" fontWeight={700}>
