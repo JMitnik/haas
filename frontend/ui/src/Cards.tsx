@@ -1,4 +1,6 @@
 import styled, { css } from 'styled-components';
+import { get } from 'lodash';
+
 import { Div } from './Generics';
 import { Flex } from './Container';
 import { Span } from './Span';
@@ -165,12 +167,13 @@ export default Card;
 interface NewCardProps {
   hasHover?: boolean;
   boxShadow?: BoxShadowSize;
+  hasBlur?: boolean;
 }
 
 export const NewCard = styled(Div) <NewCardProps>`
-  ${({ theme, hasHover, boxShadow = 'md', bg = 'white' }) => css`
-    background: ${theme.colors[bg]}; // @ts-ignore
-    border-radius: ${theme.borderRadiuses.md}px;
+  ${({ theme, hasHover, boxShadow = 'md', bg = 'white', hasBlur = false }) => css`
+    background: ${get(theme.colors, bg as string)};
+    border-radius: ${theme.borderRadiuses.lg}px;
     box-shadow: ${theme.boxShadows[boxShadow]};
     transition: all ${theme.transitions.normal};
 
@@ -181,6 +184,11 @@ export const NewCard = styled(Div) <NewCardProps>`
         transition: all ${theme.transitions.normal};
         box-shadow: ${theme.boxShadows.lg};
       }
+    `}
+
+    ${hasBlur && css`
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(30px);
     `}
   `}
 `;

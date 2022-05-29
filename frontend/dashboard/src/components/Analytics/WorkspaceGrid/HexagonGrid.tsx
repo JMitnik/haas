@@ -4,6 +4,7 @@ import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple, LinearGr
 import { Group } from '@visx/group';
 import { PatternCircles } from '@visx/pattern';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
+import useMeasure from 'react-use-measure';
 
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
@@ -16,6 +17,8 @@ import { HexagonNode } from './WorkspaceGrid.types';
 import { TooltipBody } from './TooltipBody';
 
 interface HexagonGridProps {
+  x: number;
+  y: number;
   stateKey: string;
   nodes: HexagonNode[];
   onHexClick: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
@@ -34,6 +37,13 @@ export const HexagonGrid = ({
   zoom,
   backgroundColor,
 }: HexagonGridProps) => {
+  const [ref, bounds] = useMeasure({
+    debounce: {
+      resize: 2,
+      scroll: 1,
+    },
+  });
+
   const {
     tooltipData,
     tooltipLeft,
@@ -59,10 +69,6 @@ export const HexagonGrid = ({
   };
 
   const handleMouseOutHex = () => hideTooltip();
-
-  useEffect(() => {
-    hideTooltip();
-  }, [stateKey, hideTooltip]);
 
   return (
     <UI.Div position="relative" data-test-id="HexagonGrid" width={width} height={height}>
@@ -99,37 +105,47 @@ export const HexagonGrid = ({
             zoom.scale({ scaleX: 1.1, scaleY: 1.1 });
           }}
         />
+
         <motion.g
           initial={{ transform: 'matrix(1, 0, 0, 1, 0, 0', opacity: 0 }}
           style={{ transform: 'matrix(1, 0, 0, 1, 0, 0' }}
           animate={{ transform: zoom.toString(), opacity: 1 }}
         >
-          <Group top={200} left={200}>
-            <AnimatePresence>
-              <motion.g
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                initial={{ opacity: 0 }}
-                key={stateKey}
-              >
-                <Group id="items">
-                  {nodes.map((node) => (
-                    <HexagonItem
-                      strokeWidth={5}
-                      key={node.id}
-                      node={node}
-                      points={node.points as string}
-                      onMouseOver={handleMouseOverHex}
-                      onMouseExit={handleMouseOutHex}
-                      score={node.score}
-                      zoomHelper={zoom}
-                      onZoom={onHexClick}
-                    />
-                  ))}
-                </Group>
-              </motion.g>
-            </AnimatePresence>
+          <Group top={130} left={130}>
+            <motion.g
+              ref={ref}
+              x={-10 + (width - bounds.width) / 2}
+              y={(height - bounds.height) / 2}
+            >
 
+              <AnimatePresence>
+                <motion.g
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0 }}
+                  key={stateKey}
+                >
+                  <Group id="items">
+                    {nodes.map((node) => (
+                      <HexagonItem
+                        strokeWidth={5}
+                        key={node.id}
+                        node={node}
+                        points={node.points as string}
+                        onMouseOver={handleMouseOverHex}
+                        onMouseExit={handleMouseOutHex}
+                        score={node.score}
+                        zoomHelper={zoom}
+                        onZoom={() => {
+                          hideTooltip();
+                          onHexClick(zoom, node);
+                        }}
+                      />
+                    ))}
+                  </Group>
+                </motion.g>
+              </AnimatePresence>
+            </motion.g>
           </Group>
         </motion.g>
       </svg>
@@ -137,23 +153,22 @@ export const HexagonGrid = ({
       <AnimateSharedLayout>
         <AnimatePresence>
           {tooltipOpen && (
-          <LS.Tooltip
-            key="tooltip"
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            initial={{ opacity: 0, scale: 0.95 }}
-            layoutId="tooltip"
-          >
-            <TooltipWithBounds
-              key={Math.random()}
-              top={tooltipTop}
-              left={tooltipLeft}
+            <LS.Tooltip
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              layoutId="tooltip"
             >
-              {tooltipData && (
-                <TooltipBody node={tooltipData} />
-              )}
-            </TooltipWithBounds>
-          </LS.Tooltip>
+              <TooltipWithBounds
+                key={Math.random()}
+                top={tooltipTop}
+                left={tooltipLeft}
+              >
+                {tooltipData && (
+                  <TooltipBody node={tooltipData} />
+                )}
+              </TooltipWithBounds>
+            </LS.Tooltip>
           )}
         </AnimatePresence>
       </AnimateSharedLayout>

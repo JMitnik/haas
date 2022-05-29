@@ -12,7 +12,7 @@ import { Loader } from 'components/Common/Loader/Loader';
 import { useCustomer } from 'providers/CustomerProvider';
 
 import * as LS from './WorkspaceGrid.styles';
-import { HealthCard } from '../HealthCard/HealthCard';
+import { HealthCard } from '../Common/HealthCard/HealthCard';
 import {
   HexagonDialogueNode,
   HexagonGroupNode,
@@ -26,6 +26,7 @@ import {
 import { HexagonGrid } from './HexagonGrid';
 import { Layers } from './Layers';
 import { WorkspaceGridHeader } from './WorkspaceGridHeader';
+import { WorkspaceSummaryPane } from './SummaryPane/WorkspaceSummaryPane';
 import { createGrid, reconstructHistoryStack } from './WorkspaceGrid.helpers';
 
 export interface DataLoadOptions {
@@ -66,9 +67,9 @@ export const WorkspaceGrid = ({
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
 
   const [ref, bounds] = useMeasure();
+  console.log({ bounds2: bounds });
   const width = bounds.width || 600;
-  const height = 700;
-  console.log({ width, height });
+  const height = 800;
 
   /**
    * The current state describes that state of the workspace grid component, including the node
@@ -282,6 +283,8 @@ export const WorkspaceGrid = ({
         <Zoom<SVGElement>
           width={width}
           height={height}
+          scaleYMax={1.5}
+          scaleYMin={0.5}
         >
           {(zoom) => (
             <UI.ColumnFlex alignItems="center">
@@ -316,8 +319,10 @@ export const WorkspaceGrid = ({
                 </UI.Flex>
               </UI.Div>
 
-              <UI.Div>
+              <UI.Grid>
                 <HexagonGrid
+                  x={bounds.x}
+                  y={bounds.y}
                   width={width}
                   height={height}
                   backgroundColor={backgroundColor}
@@ -326,11 +331,11 @@ export const WorkspaceGrid = ({
                   stateKey={currentState.currentNode?.id || ''}
                   zoom={zoom}
                 />
-              </UI.Div>
+              </UI.Grid>
             </UI.ColumnFlex>
           )}
         </Zoom>
-        <UI.Div position="absolute" top="50%" right={24} style={{ transform: 'translateY(-50%)' }}>
+        <UI.Div position="absolute" bottom={0} right={24} style={{ transform: 'translateY(-50%)' }}>
           <Layers
             currentState={currentState}
             onClick={(index) => popToIndex(index)}
@@ -339,29 +344,15 @@ export const WorkspaceGrid = ({
         </UI.Div>
       </UI.Div>
 
-      <UI.Div
-        bg="off.100"
-        borderBottomLeftRadius={10}
-        borderBottomRightRadius={10}
-        style={{ boxShadow: 'rgba(0, 0, 0, 0.06) 0px 2px 4px 0px inset' }}
-      >
-        <UI.PaddedBody>
-          <UI.Div mb={4}>
-            <UI.Helper>
-              Trends
-            </UI.Helper>
-          </UI.Div>
-          <UI.Flex flexWrap="wrap">
-            <UI.FadeIn>
-              <HealthCard
-                score={80}
-                responseCount={100}
-              />
-            </UI.FadeIn>
-
-          </UI.Flex>
-        </UI.PaddedBody>
+      <UI.Div position="absolute" left={24} top="30%">
+        <WorkspaceSummaryPane
+          startDate={startDate}
+          endDate={endDate}
+          onDialogueChange={jumpToDialogue}
+          currentState={currentState}
+        />
       </UI.Div>
+
       <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
         <InteractionModalCard
           sessionId={sessionId || ''}

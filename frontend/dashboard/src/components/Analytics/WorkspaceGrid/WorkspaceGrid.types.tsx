@@ -1,4 +1,4 @@
-import { GetDialogueTopics, GetSessionPaths, GetWorkspaceDialogueStatistics } from 'types/generated-types';
+import { GetDialogueTopics, GetSessionPaths, GetWorkspaceDialogueStatistics, WorkspaceStatistics } from 'types/generated-types';
 
 export type Topic = GetDialogueTopics.Topic;
 export type Dialogue = GetWorkspaceDialogueStatistics.Dialogues;
@@ -36,6 +36,7 @@ export type HexagonWorkspaceNode = {
   label: string;
   type: HexagonNodeType.Workspace;
   score: number;
+  statistics?: WorkspaceStatistics;
 };
 
 /** Hexagon representing a Group node (layer above Dialogue) */

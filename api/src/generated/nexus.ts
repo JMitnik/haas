@@ -971,6 +971,7 @@ export interface NexusGenRootTypes {
     id?: string | null; // String
   }
   HealthScore: { // root type
+    negativeResponseCount: number; // Int!
     nrVotes: number; // Int!
     score: number; // Float!
   }
@@ -1753,6 +1754,7 @@ export interface NexusGenFieldTypes {
     id: string | null; // String
   }
   HealthScore: { // field return type
+    negativeResponseCount: number; // Int!
     nrVotes: number; // Int!
     score: number; // Float!
   }

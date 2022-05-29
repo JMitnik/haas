@@ -6,8 +6,8 @@ import React from 'react';
 
 import { ScoreBox } from 'components/ScoreBox';
 
-import { DateFormat, useDate } from 'hooks/useDate';
 import * as LS from './WorkspaceGrid.styles';
+import { DateFormat, useDate } from 'hooks/useDate';
 import {
   HexagonDialogueNode,
   HexagonGroupNode,
@@ -43,7 +43,7 @@ export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => 
                   <UI.Icon width="16px">
                     <MessageCircle />
                   </UI.Icon>
-                  <UI.Span ml={0.5}>
+                  <UI.Span ml={1}>
                     {node.dialogue.dialogueStatisticsSummary?.nrVotes}
                   </UI.Span>
                 </UI.Flex>
@@ -129,7 +129,7 @@ export const TooltipGroupNodeBody = ({ node }: { node: HexagonGroupNode }) => (
                   <UI.Icon width="16px">
                     <MessageCircle />
                   </UI.Icon>
-                  <UI.Span ml={0.5}>
+                  <UI.Span ml={1}>
                     {node.statistics?.voteCount}
                   </UI.Span>
                 </UI.Flex>

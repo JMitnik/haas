@@ -4,19 +4,13 @@ import styled, { css } from 'styled-components';
 
 export const WorkspaceGridAdapterContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    border-radius: 20px;
     border: 1px solid ${theme.colors.gray[200]};
-
-    svg {
-      border-radius: 20px;
-    }
   `}
 `;
 
 export const WidgetHeader = styled(UI.Div)`
   ${({ theme }) => css`
     border-bottom: 1px solid ${theme.colors.gray[100]};
-    /* padding-bottom: ${theme.gutter / 2}px; */
     padding: 24px;
 
     ${UI.H4} {
@@ -49,8 +43,10 @@ interface WorkspaceGridContainerProps {
 export const WorkspaceGridContainer = styled(UI.Div) <WorkspaceGridContainerProps>`
   ${({ theme, backgroundColor }) => css`
     background: ${backgroundColor};
-    border-radius: 20px;
+    /* border-radius: 20px; */
     position: relative;
+    height: 100%;
+    min-height: 100vh;
 
     #items {
       opacity: 1;

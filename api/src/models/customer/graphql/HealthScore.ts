@@ -13,6 +13,7 @@ export const HealthScore = objectType({
   name: 'HealthScore',
   definition(t) {
     t.float('score');
+    t.int('negativeResponseCount');
     t.int('nrVotes');
   },
 });

@@ -5,14 +5,15 @@ query GetWorkspaceSummaryDetails($id: ID, $summaryInput: DialogueStatisticsSumma
       id
       health(input: $healthInput) {
         nrVotes
+        negativeResponseCount
         score
       }
-      mostTrendingTopic(input: $summaryInput) {
-        group
-        impactScore
-        path
-        nrVotes
-      }
+      # mostTrendingTopic(input: $summaryInput) {
+      #   group
+      #   impactScore
+      #   path
+      #   nrVotes
+      # }
       mostChangedPath(input: $summaryInput) {
         group
         topNegativeChanged {
@@ -33,15 +34,15 @@ query GetWorkspaceSummaryDetails($id: ID, $summaryInput: DialogueStatisticsSumma
           percentageChanged
         }
       }
-      mostPopularPath(input: $summaryInput) {
-        group
-        path {
-          depth
-          impactScore
-          nrVotes
-          topic
-        }
-      }
+      # mostPopularPath(input: $summaryInput) {
+      #   group
+      #   path {
+      #     depth
+      #     impactScore
+      #     nrVotes
+      #     topic
+      #   }
+      # }
       basicStats(input: $summaryInput) {
 				responseCount
 				average

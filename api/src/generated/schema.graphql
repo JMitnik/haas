@@ -992,6 +992,7 @@ input HandleUserStateInWorkspaceInput {
 }
 
 type HealthScore {
+  negativeResponseCount: Int!
   nrVotes: Int!
   score: Float!
 }

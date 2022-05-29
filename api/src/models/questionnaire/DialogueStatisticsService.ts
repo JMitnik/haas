@@ -128,7 +128,11 @@ class DialogueStatisticsService {
 
     const healthScore = nrVotes === 0 ? 0 : sessionsHigherThanTreshold.length / nrVotes * 100;
 
-    return { score: healthScore, nrVotes };
+    return {
+      score: healthScore,
+      nrVotes,
+      negativeResponseCount: nrVotes - sessionsHigherThanTreshold.length,
+    };
   };
 
   /**
