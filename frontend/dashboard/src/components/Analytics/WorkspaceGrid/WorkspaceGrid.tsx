@@ -10,10 +10,8 @@ import { DatePicker } from 'components/Common/DatePicker';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { Loader } from 'components/Common/Loader/Loader';
 import { useCustomer } from 'providers/CustomerProvider';
-import theme from 'config/theme';
 
 import * as LS from './WorkspaceGrid.styles';
-import { HealthCard } from '../Common/HealthCard/HealthCard';
 import {
   HexagonDialogueNode,
   HexagonGroupNode,
@@ -333,13 +331,13 @@ export const WorkspaceGrid = ({
                       useBackgroundPattern
                     />
                   </UI.Div>
-                    <UI.Div mt={4}>
-                      <WorkspaceSummaryPane
-                        startDate={startDate}
-                        endDate={endDate}
-                        onDialogueChange={jumpToDialogue}
-                        currentState={currentState}
-                      />
+                  <UI.Div>
+                    <WorkspaceSummaryPane
+                      startDate={startDate}
+                      endDate={endDate}
+                      onDialogueChange={jumpToDialogue}
+                      currentState={currentState}
+                    />
                   </UI.Div>
                 </UI.Grid>
 
