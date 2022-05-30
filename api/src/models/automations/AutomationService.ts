@@ -12,8 +12,9 @@ import {
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { UserInputError } from 'apollo-server-express';
+import * as AWS from 'aws-sdk';
 
-
+import config from '../../config/config';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
@@ -48,6 +49,34 @@ class AutomationService {
     this.dialogueService = new DialogueService(prisma);
     this.automationActionService = new AutomationActionService(prisma);
     this.userService = new UserService(prisma);
+  }
+
+  createScheduled = async () => {
+    // TODO: Remove accessKeys and replace it with something that lets deployed account run this
+    const clientEvent = new AWS.EventBridge({
+      region: 'eu-central-1',
+      accessKeyId: config.autodeckAwsAccessKeyId,
+      secretAccessKey: config.autodeckAwsSecretAccessKey,
+    });
+
+    const rules = await clientEvent.listRules({
+      NamePrefix: 'NEW_EVENT_BRIDGE_TEST',
+      Limit: 1,
+    }).promise();
+
+    console.log('Rules: ', rules.Rules);
+
+    await clientEvent.deleteRule({
+      Name: 'NEW_EVENT_BRIDGE_TEST',
+    }).promise()
+
+    const rule = await clientEvent.putRule({
+      Name: 'NEW_EVENT_BRIDGE_TEST',
+      ScheduleExpression: 'cron(* * ? * MON-FRI *)',
+      State: 'DISABLED',
+    }).promise();
+
+    return rule.RuleArn;
   }
 
   deleteAutomation = async (input: NexusGenInputs['DeleteAutomationInput']) => {

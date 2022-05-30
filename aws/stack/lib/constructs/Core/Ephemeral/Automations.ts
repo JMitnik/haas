@@ -12,6 +12,8 @@ import {
   aws_sns_subscriptions as snsSubs,
   CfnOutput,
   Stack,
+  aws_events as events,
+  aws_events_targets as eventTargets,
 } from 'aws-cdk-lib'
 import * as cdk from '@aws-cdk/core';
 import * as crpm from 'crpm';
@@ -138,6 +140,18 @@ export class Automations extends Construct {
     });
 
     snsTopic.addSubscription(snsLambdaSubscription);
+
+    // const rule = new events.Rule(this, 'ScheduleRule', {
+    //   schedule: events.Schedule.cron({ minute: '0', hour: '4' }),
+    //   targets: [new eventTargets.SnsTopic(snsTopic)],
+    // });
+
+    // const ruleTwo = new events.Rule(this, 'ScheduleRuleTwo', {
+    //   schedule: events.Schedule.expression('cron(* * ? * MON-FRI *)'),
+    //   targets: [new eventTargets.SnsTopic(snsTopic)],
+    //   enabled: false,
+
+    // });
 
     new CfnOutput(this, 'ECRImageURI', { value: dockerImage.imageUri });
     new CfnOutput(this, 'LambdaFunctionName', { value: appFn.ref });

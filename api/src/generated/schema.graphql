@@ -452,6 +452,10 @@ input CreateQuestionNodeInputType {
   unhappyText: String
 }
 
+input CreateScheduledAutomationInput {
+  workspaceSlug: String!
+}
+
 input CreateTriggerInputType {
   customerSlug: String
   recipients: RecipientsInputType
@@ -1190,6 +1194,7 @@ type Mutation {
   createPermission(data: PermissionInput): PermssionType
   createQuestion(input: CreateQuestionNodeInputType): QuestionNode
   createRole(data: RoleInput): RoleType!
+  createScheduledAutomationResolver(input: CreateScheduledAutomationInput): String
   createSession(input: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(input: CreateTriggerInputType): TriggerType!
