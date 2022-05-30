@@ -14,6 +14,7 @@ import { useNavigator } from 'hooks/useNavigator';
 import useAuth from 'hooks/useAuth';
 
 import * as LS from './WorkpaceLayout.styles';
+import { ChevronDown } from 'react-feather';
 
 interface NavItemProps extends LinkProps {
   renderSibling?: React.ReactNode;
@@ -62,7 +63,6 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
           </NavItem>
           <NavItem
             isSubchildActive={!!dialogueSlug}
-            exact
             to={`/dashboard/b/${customerSlug}/d`}
             renderSibling={(
               <>
@@ -102,6 +102,12 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
           >
             <SurveyIcon />
             {t('dialogues')}
+
+            {dialogueMatch && (
+              <UI.Icon ml={1}>
+                <ChevronDown className="chevron-down" fill="none" />
+              </UI.Icon>
+            )}
           </NavItem>
           <NavItem isDisabled={!canViewUsers} to={`/dashboard/b/${customerSlug}/users`}>
             <UsersIcon />

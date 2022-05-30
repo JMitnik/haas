@@ -17,10 +17,11 @@ import { useUser } from 'providers/UserProvider';
 
 import * as LS from './WorkpaceLayout.styles';
 
-const WorkspaceSwitcherContainer = styled(UI.Div)`
+export const WorkspaceSwitcherContainer = styled(UI.Div)`
   ${({ theme }) => css`
     text-align: left;
     width: 100%;
+    position: relative;
     padding: ${theme.gutter}px;
     border-top: 1px solid ${theme.colors.gray[200]};
     border-right: 1px solid ${theme.colors.neutral[500]};
@@ -41,6 +42,7 @@ const WorkspaceSwitcherContainer = styled(UI.Div)`
 
 const Content = styled(Popover.Content)`
   transform-origin: top left;
+  z-index: 10000;
   width: 100%;
 `;
 
@@ -59,7 +61,7 @@ export const WorkspaceSwitcher = () => {
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger style={{ width: '100%' }}>
+      <Popover.Trigger style={{ width: '100%', zIndex: 1000 }}>
         <WorkspaceSwitcherContainer>
           <UI.Flex alignItems="center" justifyContent="space-between">
             <UI.Flex alignItems="center">
@@ -97,9 +99,8 @@ export const WorkspaceSwitcher = () => {
             align="start"
             alignOffset={12}
             side="bottom"
-            portalled={false}
             {...slideUpFadeMotion}
-            style={{ minWidth: '320px' }}
+            style={{ minWidth: '320px', zIndex: 10000 }}
           >
             <motion.div>
               <LS.Card>

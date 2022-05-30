@@ -56,7 +56,7 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
         </UI.Div>
         )}
         <UI.Div>
-          <WorkspaceTopbar />
+          <WorkspaceTopbar withNav />
         </UI.Div>
         <WorkspaceLayoutContainer isMobile={device.isSmall}>
 
