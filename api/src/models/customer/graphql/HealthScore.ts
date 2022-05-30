@@ -1,4 +1,5 @@
-import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
+import { inputObjectType, objectType } from '@nexus/schema';
+import { TopicFilterInput } from '../../Topic/graphql';
 
 export const HealthScoreInput = inputObjectType({
   name: 'HealthScoreInput',
@@ -6,6 +7,8 @@ export const HealthScoreInput = inputObjectType({
     t.float('threshold', { default: 70 });
     t.string('startDateTime', { required: true });
     t.string('endDateTime');
+
+    t.field('topicFilter', { type: TopicFilterInput });
   },
 });
 
@@ -13,7 +16,8 @@ export const HealthScore = objectType({
   name: 'HealthScore',
   definition(t) {
     t.float('score');
+    t.int('negativeResponseCount');
     t.int('nrVotes');
-  }
+  },
 });
 

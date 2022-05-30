@@ -4,6 +4,7 @@ import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-expres
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
+import { WorkspaceStatistics } from './WorkspaceStatistics';
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../../questionnaire/Dialogue';
 import { UserConnection } from '../../users/graphql/User';
@@ -41,6 +42,21 @@ export const CustomerType = objectType({
         return customerSettings;
       },
     });
+
+    /**
+     * Workspace-statistics
+     * - Note: These statistics share the same ID as the Workspace / Customer.
+     */
+    t.field('statistics', {
+      type: WorkspaceStatistics,
+      nullable: true,
+      description: 'Workspace statistics',
+
+      resolve: async (parent) => {
+        return { id: parent.id }
+      },
+    })
+
 
     t.field('dialogueConnection', {
       type: DialogueConnection,
@@ -91,6 +107,7 @@ export const CustomerType = objectType({
 
     t.field('nestedHealthScore', {
       nullable: true,
+      deprecation: 'Deprectaed, see statistics',
       type: HealthScore,
       args: {
         input: HealthScoreInput,
@@ -109,14 +126,14 @@ export const CustomerType = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
         }
 
-
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
           parent.id,
           utcStartDateTime as Date,
           utcEndDateTime,
+          undefined,
           threshold || undefined,
         );
-      }
+      },
     });
 
     t.field('nestedMostPopular', {
@@ -220,6 +237,7 @@ export const CustomerType = objectType({
 
     t.field('nestedDialogueStatisticsSummary', {
       type: DialogueStatisticsSummaryModel,
+      deprecation: 'Deprecated, see statistics',
       list: true,
       args: {
         input: DialogueStatisticsSummaryFilterInput,
@@ -229,27 +247,7 @@ export const CustomerType = objectType({
       // useQueryCounter: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
-
-        let utcStartDateTime: Date | undefined;
-        let utcEndDateTime: Date | undefined;
-
-        if (args.input?.startDateTime) {
-          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
-        }
-
-        if (args.input?.endDateTime) {
-          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
-        }
-
-        return ctx.services.customerService.findNestedDialogueStatisticsSummary(
-          parent.id,
-          args.input.impactType,
-          utcStartDateTime as Date,
-          utcEndDateTime,
-          args.input.refresh || false,
-        )
+        return null;
       },
     });
 
@@ -436,11 +434,11 @@ export const WorkspaceMutations = Upload && extendType({
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
           },
-            (error, result: UploadApiResponse | undefined) => {
-              if (result) return resolve(result);
+          (error, result: UploadApiResponse | undefined) => {
+            if (result) return resolve(result);
 
-              return reject(error);
-            });
+            return reject(error);
+          });
 
           return createReadStream().pipe(cld_upload_stream);
         });

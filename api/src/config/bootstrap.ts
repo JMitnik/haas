@@ -24,6 +24,7 @@ import DialogueStatisticsService from '../models/questionnaire/DialogueStatistic
 import QuestionStatisticsService from '../models/QuestionNode/QuestionStatisticsService'
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService'
 import TemplateService from '../models/templates/TemplateService'
+import { TopicService } from '../models/Topic/TopicService'
 
 export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -49,6 +50,7 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const questionStatisticsService = new QuestionStatisticsService(prisma);
   const generateWorkspaceService = new GenerateWorkspaceService(prisma);
   const templateService = new TemplateService(prisma);
+  const topicService = new TopicService(prisma);
 
   return {
     templateService,
@@ -73,5 +75,6 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
     mailService,
     campaignService,
     linkService,
+    topicService,
   }
 }

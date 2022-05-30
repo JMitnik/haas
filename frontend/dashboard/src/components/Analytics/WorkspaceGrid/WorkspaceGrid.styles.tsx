@@ -4,19 +4,14 @@ import styled, { css } from 'styled-components';
 
 export const WorkspaceGridAdapterContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    border-radius: 20px;
     border: 1px solid ${theme.colors.gray[200]};
-
-    svg {
-      border-radius: 20px;
-    }
+    height: 100vh;
   `}
 `;
 
 export const WidgetHeader = styled(UI.Div)`
   ${({ theme }) => css`
     border-bottom: 1px solid ${theme.colors.gray[100]};
-    /* padding-bottom: ${theme.gutter / 2}px; */
     padding: 24px;
 
     ${UI.H4} {
@@ -49,8 +44,10 @@ interface WorkspaceGridContainerProps {
 export const WorkspaceGridContainer = styled(UI.Div) <WorkspaceGridContainerProps>`
   ${({ theme, backgroundColor }) => css`
     background: ${backgroundColor};
-    border-radius: 20px;
+    /* border-radius: 20px; */
     position: relative;
+    height: 100%;
+    min-height: 100vh;
 
     #items {
       opacity: 1;
@@ -225,9 +222,16 @@ export const MetadataLabel = styled(UI.Span)`
 
 export const TooltipContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    min-width: 300px;
+    min-width: 200px;
     background: ${theme.colors.white};
     border-radius: ${theme.borderRadiuses.md}px !important;
+
+    ${UI.Icon} {
+      svg {
+        max-width: 100%;
+        max-height: 100%;
+      }
+    }
   `}
 `;
 
@@ -262,3 +266,30 @@ export const Tooltip = motion.custom(styled.div`
     }
   `}
 `);
+
+export const ControlButton = styled(UI.Button)`
+  ${({ theme }) => css`
+    background-color: ${theme.colors.white} !important;
+    box-shadow: ${theme.boxShadows.md};
+    border-radius: ${theme.borderRadiuses.md}px;
+    color: ${theme.colors.main[500]} !important;
+    width: 30px;
+    height: 30px;
+    transition: all ${theme.transitions.normal};
+
+    &[aria-disabled='true'] {
+      opacity: 0.5;
+      background: ${theme.colors.off[200]} !important;
+      box-shadow: ${theme.boxShadows.md} !important;
+    }
+
+    &:hover {
+      box-shadow: ${theme.boxShadows.lg};
+      transition: all ${theme.transitions.normal};
+    }
+
+    ${UI.Icon} svg {
+      width: 21px !important;
+    }
+  `}
+`;

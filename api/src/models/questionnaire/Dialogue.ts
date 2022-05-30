@@ -110,7 +110,7 @@ export const DialogueType = objectType({
           utcEndDateTime,
           threshold || undefined,
         );
-      }
+      },
     });
 
     t.field('pathedSessionsConnection', {

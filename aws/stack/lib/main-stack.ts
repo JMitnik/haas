@@ -35,7 +35,7 @@ import { SubnetType } from 'aws-cdk-lib/aws-ec2'
 // Constants
 const hostedZoneId = 'Z02703531WCURDDQ4Z46S';
 const hostedZoneName = 'haas.live';
-const bastionKeyName = 'HaasAPI_RemoteBastionAccess';
+const bastionKeyName = 'SSH Bastion';
 
 export class APIStack extends Stack {
   apiService: ecs_patterns.ApplicationLoadBalancedFargateService;

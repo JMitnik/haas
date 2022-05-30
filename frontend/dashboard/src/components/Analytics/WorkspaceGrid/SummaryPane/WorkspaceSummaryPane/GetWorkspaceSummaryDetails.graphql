@@ -1,0 +1,69 @@
+query GetWorkspaceSummaryDetails($id: ID, $summaryInput: DialogueStatisticsSummaryFilterInput!, $healthInput: HealthScoreInput!) {
+  customer(id: $id) {
+    id
+    statistics {
+      id
+      health(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+      }
+      # mostTrendingTopic(input: $summaryInput) {
+      #   group
+      #   impactScore
+      #   path
+      #   nrVotes
+      # }
+      mostChangedPath(input: $summaryInput) {
+        group
+        topNegativeChanged {
+          topic
+          percentageChanged
+          averageCurrent
+          averagePrevious
+          delta
+          group
+          nrVotes
+        }
+        topPositiveChanged {
+          topic
+          averageCurrent
+          averagePrevious
+          delta
+          group
+          percentageChanged
+        }
+      }
+      rankedTopics(input: $summaryInput) {
+				name
+				basicStats {
+					average
+					responseCount
+				}
+			}
+      basicStats(input: $summaryInput) {
+				responseCount
+				average
+			}
+			urgentPath(input: $summaryInput) {
+				id
+				path {
+					id
+					topicStrings
+				}
+				dialogue {
+					id
+          title
+				}
+				path {
+					id
+					topicStrings
+				}
+				basicStats {
+					responseCount
+					average
+				}
+			}
+    }
+  }
+}

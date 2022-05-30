@@ -4,7 +4,7 @@ import { useDisclosure } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-import * as Popover from 'components/Common/Popover';
+import * as Popover from 'components/Common/DeprecatedPopover';
 import useAuth from 'hooks/useAuth';
 
 interface InviteButtonProps {

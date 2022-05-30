@@ -3,7 +3,7 @@ import { useDisclosure } from '@chakra-ui/core';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import * as Popover from 'components/Common/Popover';
+import * as Popover from 'components/Common/DeprecatedPopover';
 
 const PickerButtonContainer = styled(UI.Div)`
   ${({ theme }) => css`

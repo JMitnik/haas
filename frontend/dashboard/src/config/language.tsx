@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    individuals: {
+      en: 'Individuals',
+      de: 'Individuals',
+    },
+    groups: {
+      en: 'Groups',
+      de: 'Groups',
+    },
     create_demo_data: {
       en: 'Generate prefilled data',
       de: 'Verwenden Sie Demodaten',
@@ -57,6 +65,10 @@ const language = {
     },
     add_dialogue: {
       en: 'Add dialogue',
+      de: 'Dialog hinzufügen',
+    },
+    add_team: {
+      en: 'Add team',
       de: 'Dialog hinzufügen',
     },
     copied: {
@@ -1236,6 +1248,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
     dialogues_subtitle: {
       en: 'Create, edit and manage dialogues',
+      de: 'Erstellen, bearbeiten und verwalten von Dialogen',
+    },
+    teams_subtitle: {
+      en: 'Create, edit and manage your teams',
       de: 'Erstellen, bearbeiten und verwalten von Dialogen',
     },
     score: {

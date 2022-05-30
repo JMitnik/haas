@@ -10,6 +10,7 @@ import * as QuestionNodeAPI from '../models/QuestionNode';
 import * as UserAPI from '../models/users/graphql';
 import * as WorkspaceAPI from '../models/customer';
 import * as GenerateWorkspaceAPI from '../models/generate-workspace';
+import * as TopicAPI from '../models/Topic/graphql';
 import config from './config';
 import customerSettingsNexus from '../models/settings/CustomerSettings';
 import * as DialogueAPI from '../models/questionnaire';
@@ -26,6 +27,7 @@ const nexus = [
   ...Array(AutodeckAPI),
   ...linkNexus,
   ...tagNexus,
+  ...Array(TopicAPI),
   ...Array(AutomationAPI),
   ...Array(CampaignAPI),
   ...triggerNexus,

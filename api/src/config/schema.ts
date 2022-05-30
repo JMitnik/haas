@@ -8,10 +8,10 @@ import nexus from './nexus';
 const jsonScalar = asNexusMethod(JSONObjectResolver, 'json')
 
 const schema = makeSchema({
-  shouldGenerateArtifacts: process.env.NODE_ENV === "development",
+  shouldGenerateArtifacts: process.env.NODE_ENV === 'development',
   types: [
     ...nexus,
-    jsonScalar
+    jsonScalar,
   ],
   plugins: [
     ParentResolvePlugin,

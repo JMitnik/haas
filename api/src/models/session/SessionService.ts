@@ -2,7 +2,7 @@ import {
   NodeEntry, Session, Prisma, PrismaClient, ChoiceNodeEntry, QuestionNode, SliderNodeEntry, VideoNodeEntry,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { sortBy } from 'lodash';
+import { sortBy, uniq } from 'lodash';
 
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
@@ -10,7 +10,7 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionWithEntries } from './SessionTypes';
+import { SessionWithEntries, TopicCount } from './SessionTypes';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
@@ -30,12 +30,55 @@ class SessionService {
   };
 
   /**
+   * Given a list of sessions with node-entries, return an object which maps topics to their "frequency".
+   *
+   * Note: this can be applied both within a workspace as well as outside.
+   */
+  countTopicsFromSessions(sessions: SessionWithEntries[]): Record<string, TopicCount> {
+    const topicCount = sessions.reduce((acc, session) => {
+      const topics = session.nodeEntries.map(nodeEntry => nodeEntry.choiceNodeEntry?.value).filter(isPresent);
+      topics.forEach((topic) => {
+        let count = 1;
+        let relatedTopics = topics;
+        let dialogueIds = [session.dialogueId];
+        let score = session.mainScore;
+
+        if (acc[topic]) {
+          relatedTopics = acc[topic].relatedTopics;
+          score = acc[topic].score + score;
+          count = acc[topic].count + 1;
+          dialogueIds = [...acc[topic].dialogueIds, session.dialogueId];
+        }
+
+        acc[topic] = {
+          relatedTopics,
+          score,
+          count,
+          topic,
+          dialogueIds,
+        };
+      });
+
+      return acc;
+    }, {} as Record<string, TopicCount>);
+
+    // Normalize the topic counts (by averaging the cumulative `score`)
+    // And ensure unique dialogue-ids
+    Object.entries(topicCount).forEach(([topic]) => {
+      topicCount[topic].score = topicCount[topic].score / topicCount[topic].count;
+      topicCount[topic].dialogueIds = uniq(topicCount[topic].dialogueIds);
+    });
+
+    return topicCount;
+  }
+
+  /**
    * Finds all sessions where all pathEntry answers exist in the session's node entries
-   * @param dialogueId 
-   * @param path 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @returns 
+   * @param dialogueId
+   * @param path
+   * @param startDateTime
+   * @param endDateTime
+   * @returns
    */
   findPathMatchedSessions = async (
     dialogueId: string,
@@ -105,12 +148,18 @@ class SessionService {
     return this.sessionPrismaAdapter.findNodeEntriesBySessionIds(sessionIds, depth);
   }
 
+  /**
+   * Gets all sessions for all dialogues, between certain dates
+   */
   findSessionsForDialogues = async (
     dialogueIds: string[],
     startDateTime: Date,
     endDateTime: Date,
+    where?: Prisma.SessionWhereInput,
+    include?: Prisma.SessionInclude
   ) => {
     return this.sessionPrismaAdapter.prisma.session.findMany({
+      include: include ? { ...include } : undefined,
       where: {
         dialogueId: {
           in: dialogueIds,
@@ -119,8 +168,9 @@ class SessionService {
           gte: startDateTime,
           lte: endDateTime,
         },
+        ...where,
       },
-    })
+    });
   }
 
   /**
