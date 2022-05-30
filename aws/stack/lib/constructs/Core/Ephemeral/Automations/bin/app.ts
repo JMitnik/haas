@@ -280,13 +280,14 @@ export const lambdaHandler = async (event: any, context: Context) => {
       const key = `screenshots/${context.awsRequestId}.pdf`;
       console.log(`Screenshot location: ${process.env.bucketName}/${key}`);
       await s3.putObject({
+        ContentDisposition: 'attachment',
         Bucket: process.env.bucketName,
         Key: key,
         Body: pdf,
         ContentType: 'image'
       }).promise();
 
-      const s3ReportUrl = `https://stagingautomations-automationsbucketbb8c4ff5-1rgju9vwmmeyd.s3.eu-central-1.amazonaws.com/${process.env.bucketName}/${key}`
+      const s3ReportUrl = `https://stagingautomations-automationsbucketbb8c4ff5-1rgju9vwmmeyd.s3.eu-central-1.amazonaws.com/${key}`
       console.log('URL To PDF on S3: ', s3ReportUrl);
       await sendAutomationReport(apiUrl, automationActionId, s3ReportUrl, workspaceSlug, accessToken);
 

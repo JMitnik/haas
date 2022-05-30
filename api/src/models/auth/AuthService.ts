@@ -53,7 +53,7 @@ class AuthService {
       firstName: userInput.firstName,
       lastName: userInput.lastName,
       password: hashedPassword,
-      workspaceId: userInput.customerId
+      workspaceId: userInput.customerId,
     }
 
     const user = await this.userPrismaAdapter.registerUser(registerUserInput);
@@ -91,6 +91,17 @@ class AuthService {
     const token = AuthService.createUserToken(user.id);
     await this.userService.setLoginToken(user.id, token);
     return token;
+  }
+
+  /**
+   * Verify whether a provided refreshToken matches the refresh token in the database
+   * @param email 
+   * @param refreshToken 
+   * @returns 
+   */
+  isVerifiedUser = async (email: string, refreshToken: string) => {
+    const user = await this.userService.getUserByEmail(email);
+    return user?.refreshToken === refreshToken;
   }
 
   /**

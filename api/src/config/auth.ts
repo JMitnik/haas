@@ -37,6 +37,15 @@ const isFromClient = rule({ cache: 'contextual' })(
   },
 )
 
+const isVerifiedUser = rule({ cache: 'no_cache' })(
+  async (parent, args, ctx: APIContext) => {
+    return ctx.services.authService.isVerifiedUser(
+      ctx.session?.user?.email as string,
+      ctx.session?.user?.refreshToken as string
+    );
+  }
+)
+
 const belongsToWorkspace = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
     if (!ctx.session?.user?.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
@@ -108,7 +117,7 @@ const authShield = shield({
     verifyUserToken: allow,
     requestInvite: allow,
     authenticateLambda: allow,
-    sendAutomationReport: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_REPORT_PAGE)),
+    sendAutomationReport: or(isSuperAdmin, isVerifiedUser, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_REPORT_PAGE)),
     assignUserToDialogues: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_ASSIGN_USERS_TO_DIALOGUE)),
     uploadUpsellImage: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
     deleteCustomer: isSuperAdmin,
