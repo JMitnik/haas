@@ -15,6 +15,7 @@ import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
+import { addWeeks } from 'date-fns';
 import { useNavigator } from 'hooks/useNavigator';
 import NegativePathsModule from 'views/DialogueView/Modules/NegativePathsModule/NegativePathsModule';
 import PositivePathsModule from 'views/DialogueView/Modules/PositivePathsModule';
@@ -93,7 +94,7 @@ export const ReportView = ({ compareStatisticStartDate, dateLabel, startDate }: 
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
             <UI.DeprecatedViewTitle leftIcon={<ChartbarIcon />}>
-              {`${t('report:name')}: ${dialogueSlug} (${compareStatisticStartDate.toLocaleDateString()} - ${startDate.toLocaleDateString()})`}
+              {`${t('report:name')}: ${dialogueSlug} (${addWeeks(compareStatisticStartDate, 1).toLocaleDateString()} - ${addWeeks(startDate, 1).toLocaleDateString()})`}
             </UI.DeprecatedViewTitle>
           </UI.Flex>
         </UI.Flex>
@@ -226,7 +227,7 @@ export const ReportView = ({ compareStatisticStartDate, dateLabel, startDate }: 
             </UI.H4>
           </UI.Div>
 
-          <UI.Div gridColumn="span 3">
+          <UI.Div gridColumn="span">
             <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
               <UI.Div>
                 {dialogue?.statistics?.history ? (
