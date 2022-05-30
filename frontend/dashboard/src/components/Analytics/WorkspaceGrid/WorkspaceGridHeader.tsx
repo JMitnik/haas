@@ -50,7 +50,6 @@ export const WorkspaceGridHeader = ({
       ) : (
         <UI.Div height="30px" />
       )}
-      {/* {currentState.} */}
     </UI.Div>
   );
 };
