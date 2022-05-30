@@ -27,7 +27,7 @@ export const WorkspaceGridHeader = ({
       <UI.H1 textAlign="center" fontWeight="900" pt={4} color="off.500" lineHeight="1.2">
         {title}
       </UI.H1>
-      {previousStateLabels.length > 0 && (
+      {previousStateLabels.length > 0 ? (
         <UI.Span color="off.400" fontSize="1.1rem">
           <UI.Flex justifyContent="center">
             <UI.Span mr={1}>
@@ -47,6 +47,8 @@ export const WorkspaceGridHeader = ({
             ))}
           </UI.Flex>
         </UI.Span>
+      ) : (
+        <UI.Div height="30px" />
       )}
       {/* {currentState.} */}
     </UI.Div>

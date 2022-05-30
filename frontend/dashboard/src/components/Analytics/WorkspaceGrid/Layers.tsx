@@ -68,44 +68,37 @@ const Layer = ({ state, onClick, hide, hideAll, zIndex }: LayerProps) => (
     {...slideUpFadeMotion}
   >
     <UI.Flex>
-      <UI.Div position="relative" mr={2}>
+      <UI.Div style={{ textAlign: 'right' }}>
+        <UI.Flex alignItems="center" justifyContent="flex-end">
+          <UI.Span
+            width={100}
+            color={getColorScoreBrandVariable(hide ? state.selectedNode?.score : undefined)}
+          />
+          {!hideAll && (
+          <UI.Text
+            color={getColorScoreBrandVariable(hide ? state.selectedNode?.score : undefined)}
+            textAlign="left"
+          >
+            {hide ? (
+              <>
+                {/* @ts-ignore */}
+                {state?.selectedNode?.label}
+              </>
+            ) : (
+              <>
+                {' '}
+              </>
+            )}
+          </UI.Text>
+          )}
+        </UI.Flex>
+      </UI.Div>
+      <UI.Div position="relative" ml={2}>
         {(hide && !hideAll) ? (
           <SVGLayer fill={getHexagonSVGFill(state.selectedNode?.score)} />
         ) : (
           <SVGLayer fill="url('#grays')" />
         )}
-      </UI.Div>
-
-      <UI.Div style={{ textAlign: 'left' }}>
-        <UI.Flex alignItems="center">
-          <UI.Label
-            width={100}
-            color={getColorScoreBrandVariable(hide ? state.selectedNode?.score : undefined)}
-          >
-            {!hideAll && (
-              <>
-                {state?.viewMode}
-              </>
-            )}
-          </UI.Label>
-          {!hideAll && (
-            <UI.Text
-              color={getColorScoreBrandVariable(hide ? state.selectedNode?.score : undefined)}
-              textAlign="left"
-            >
-              {hide ? (
-                <>
-                  {/* @ts-ignore */}
-                  {state?.selectedNode?.label}
-                </>
-              ) : (
-                <>
-                {' '}
-                </>
-              )}
-            </UI.Text>
-          )}
-        </UI.Flex>
       </UI.Div>
     </UI.Flex>
   </LayerContainer>
@@ -117,13 +110,17 @@ interface LayersProps {
   onClick: (index: number) => void;
 }
 
-const LayersContainer = styled(UI.Div)``;
+const LayersContainer = styled(UI.Div)`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`;
 
 export const Layers = ({ currentState, historyQueue, onClick }: LayersProps) => (
   <AnimateSharedLayout>
-    <UI.Div>
-      <UI.Div>
-        <UI.Helper color="off.300" fontSize="0.7rem !important" fontWeight={700}>Layers</UI.Helper>
+    <UI.Div style={{ textAlign: 'right' }}>
+      <UI.Div style={{ textAlign: 'right' }}>
+        <UI.Helper textAlign="right" color="off.300" fontSize="0.7rem !important" fontWeight={700}>Layers</UI.Helper>
       </UI.Div>
       <LayersContainer>
         {historyQueue.map((state, index) => (

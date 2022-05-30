@@ -7,7 +7,7 @@ import theme from 'config/theme';
 
 export const DashboardView = () => (
   <View documentTitle="haas | Overview">
-    <UI.Div>
+    <UI.Div height="100vh">
       <UI.Div>
         <WorkspaceGridAdapter
           backgroundColor={theme.colors.neutral[500]}

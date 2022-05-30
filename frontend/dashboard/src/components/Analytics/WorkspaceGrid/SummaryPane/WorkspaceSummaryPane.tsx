@@ -16,6 +16,7 @@ export const WorkspaceSummaryPane = ({
   onDialogueChange,
   startDate,
   endDate,
+  currentState,
   historyQueue,
 }: SummaryPaneProps) => {
   const { activeCustomer } = useCustomer();
@@ -61,7 +62,19 @@ export const WorkspaceSummaryPane = ({
         <UI.Helper fontSize="1.1rem" textAlign="center" mb={4} color="off.500">
           Trends in
           {' '}
-          {activeCustomer?.name}
+          {visitedDialogueFragments.length > 0 ? (
+            <>
+              {currentState.currentNode?.type}
+              {' '}
+              <i>
+                {visitedDialogueFragments.join(' - ')}
+              </i>
+            </>
+          ) : (
+            <>
+              {activeCustomer?.name}
+            </>
+          )}
         </UI.Helper>
       </UI.Div>
       <UI.Flex justifyContent="center">

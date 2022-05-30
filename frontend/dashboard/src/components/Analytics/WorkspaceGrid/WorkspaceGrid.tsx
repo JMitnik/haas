@@ -26,7 +26,7 @@ import { HexagonGrid } from './HexagonGrid';
 import { Layers } from './Layers';
 import { WorkspaceGridHeader } from './WorkspaceGridHeader';
 import { WorkspaceSummaryPane } from './SummaryPane/WorkspaceSummaryPane';
-import { createGrid, reconstructHistoryStack } from './WorkspaceGrid.helpers';
+import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -94,7 +94,7 @@ export const WorkspaceGrid = ({
    */
   const [stateHistoryStack, setStateHistoryStack] = React.useState<HexagonState[]>([]);
   const historyQueue = [...stateHistoryStack].reverse();
-  const previousLabels: string[] = historyQueue.map((state) => state.currentNode?.label || '');
+  const previousLabels: string[] = extractDialogueFragments(historyQueue);
 
   /**
    * If the last selected node was a dialogue, then the activeDialogue will point to that dialogue.
@@ -277,7 +277,7 @@ export const WorkspaceGrid = ({
         </motion.div>
       )}
 
-      <UI.Div borderRadius={20} position="relative">
+      <UI.Div height="calc(100vh - 30px)" borderRadius={20} position="relative">
         <Zoom<SVGElement>
           width={width}
           height={height}
@@ -318,41 +318,43 @@ export const WorkspaceGrid = ({
               </UI.Div>
 
               <UI.Container px={4} style={{ width: '100%', maxWidth: 1400 }} mt={2}>
-                <UI.Grid gridTemplateRows="1fr 250px">
-                  <UI.Div ref={ref}>
-                    <HexagonGrid
-                      width={width}
-                      height={height}
-                      backgroundColor="#ebf0ff"
-                      nodes={hexagonNodes}
-                      onHexClick={handleHexClick}
-                      stateKey={currentState.currentNode?.id || ''}
-                      zoom={zoom}
-                      useBackgroundPattern
-                    />
-                  </UI.Div>
-                  <UI.Div>
-                    <WorkspaceSummaryPane
-                      startDate={startDate}
-                      endDate={endDate}
-                      onDialogueChange={jumpToDialogue}
-                      currentState={currentState}
-                      historyQueue={historyQueue}
-                    />
-                  </UI.Div>
-                </UI.Grid>
+                <UI.Div ref={ref}>
+                  <HexagonGrid
+                    width={width}
+                    height={height}
+                    backgroundColor="#ebf0ff"
+                    nodes={hexagonNodes}
+                    onHexClick={handleHexClick}
+                    stateKey={currentState.currentNode?.id || ''}
+                    zoom={zoom}
+                    useBackgroundPattern
+                    onGoBack={() => popToIndex(stateHistoryStack.length - 1)}
+                    isAtRoot={historyQueue.length === 0}
+                  >
+                    <UI.Div position="absolute" bottom={24} right={24}>
+                      <Layers
+                        currentState={currentState}
+                        onClick={(index) => popToIndex(index)}
+                        historyQueue={historyQueue}
+                      />
+                    </UI.Div>
+                  </HexagonGrid>
+
+                </UI.Div>
+                <UI.Div mt={4}>
+                  <WorkspaceSummaryPane
+                    startDate={startDate}
+                    endDate={endDate}
+                    onDialogueChange={jumpToDialogue}
+                    currentState={currentState}
+                    historyQueue={historyQueue}
+                  />
+                </UI.Div>
 
               </UI.Container>
             </UI.ColumnFlex>
           )}
         </Zoom>
-        <UI.Div position="absolute" bottom={0} right={24} style={{ transform: 'translateY(-50%)' }}>
-          <Layers
-            currentState={currentState}
-            onClick={(index) => popToIndex(index)}
-            historyQueue={historyQueue}
-          />
-        </UI.Div>
       </UI.Div>
 
       <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>

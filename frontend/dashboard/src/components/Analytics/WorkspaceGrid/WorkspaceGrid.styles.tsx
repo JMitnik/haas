@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 export const WorkspaceGridAdapterContainer = styled(UI.Div)`
   ${({ theme }) => css`
     border: 1px solid ${theme.colors.gray[200]};
+    height: 100vh;
   `}
 `;
 
@@ -265,3 +266,30 @@ export const Tooltip = motion.custom(styled.div`
     }
   `}
 `);
+
+export const ControlButton = styled(UI.Button)`
+  ${({ theme }) => css`
+    background-color: ${theme.colors.white} !important;
+    box-shadow: ${theme.boxShadows.md};
+    border-radius: ${theme.borderRadiuses.md}px;
+    color: ${theme.colors.main[500]} !important;
+    width: 30px;
+    height: 30px;
+    transition: all ${theme.transitions.normal};
+
+    &[aria-disabled='true'] {
+      opacity: 0.5;
+      background: ${theme.colors.off[200]} !important;
+      box-shadow: ${theme.boxShadows.md} !important;
+    }
+
+    &:hover {
+      box-shadow: ${theme.boxShadows.lg};
+      transition: all ${theme.transitions.normal};
+    }
+
+    ${UI.Icon} svg {
+      width: 21px !important;
+    }
+  `}
+`;

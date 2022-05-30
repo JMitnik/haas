@@ -1,6 +1,11 @@
 import { ProvidedZoom, TransformMatrix } from '@visx/zoom/lib/types';
 
-import { GetDialogueTopics, GetSessionPaths, GetWorkspaceDialogueStatistics, WorkspaceStatistics } from 'types/generated-types';
+import {
+  GetDialogueTopics,
+  GetSessionPaths,
+  GetWorkspaceDialogueStatistics,
+  WorkspaceStatistics,
+} from 'types/generated-types';
 
 export type Topic = GetDialogueTopics.Topic;
 export type Dialogue = GetWorkspaceDialogueStatistics.Dialogues;
@@ -44,6 +49,7 @@ export type HexagonWorkspaceNode = {
   type: HexagonNodeType.Workspace;
   score: number;
   statistics?: WorkspaceStatistics;
+  points?: string;
 };
 
 /** Hexagon representing a Dialogue */

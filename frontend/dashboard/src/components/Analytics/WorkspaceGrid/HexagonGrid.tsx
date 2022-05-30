@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
 import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple, LinearGradient } from '@visx/gradient';
 import { Group } from '@visx/group';
+import { MapPin, Minus } from 'react-feather';
 import { PatternCircles } from '@visx/pattern';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import React from 'react';
@@ -19,12 +20,15 @@ import { TooltipBody } from './TooltipBody';
 interface HexagonGridProps {
   stateKey: string;
   nodes: HexagonNode[];
+  isAtRoot: boolean;
   onHexClick: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
   width: number;
   height: number;
   zoom: ZoomProps;
   backgroundColor: string;
+  onGoBack: () => void;
   useBackgroundPattern: boolean;
+  children?: React.ReactNode;
 }
 
 interface GridBackgroundPatternProps {
@@ -66,6 +70,9 @@ export const HexagonGrid = ({
   zoom,
   backgroundColor,
   useBackgroundPattern = false,
+  isAtRoot = false,
+  onGoBack,
+  children,
 }: HexagonGridProps) => {
   const [ref, bounds] = useMeasure({
     debounce: {
@@ -208,6 +215,21 @@ export const HexagonGrid = ({
           </Group>
         </motion.g>
       </svg>
+
+      {children}
+
+      <UI.Div position="absolute" right={24} top="40%">
+        <LS.ControlButton onClick={onGoBack} aria-disabled={isAtRoot}>
+          <UI.Icon>
+            <Minus />
+          </UI.Icon>
+        </LS.ControlButton>
+        <LS.ControlButton onClick={() => zoom.reset()} mt={2}>
+          <UI.Icon>
+            <MapPin />
+          </UI.Icon>
+        </LS.ControlButton>
+      </UI.Div>
 
       <AnimateSharedLayout>
         <AnimatePresence>
