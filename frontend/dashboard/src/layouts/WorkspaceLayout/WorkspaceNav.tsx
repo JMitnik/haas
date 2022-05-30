@@ -101,7 +101,7 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
             )}
           >
             <SurveyIcon />
-            {t('dialogues')}
+            {t('teams')}
 
             {dialogueMatch && (
               <UI.Icon ml={1}>

@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import * as Popover from 'components/Common/Popover';
+import * as Popover from 'components/Common/DeprecatedPopover';
 
 export const TableCellButtonContainer = styled(UI.Div) <{ isDisabled?: boolean }>`
   ${({ isDisabled }) => css`

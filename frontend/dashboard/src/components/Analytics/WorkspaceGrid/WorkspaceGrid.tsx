@@ -150,8 +150,6 @@ export const WorkspaceGrid = ({
     points: gridItems.points[index],
   })) || [];
 
-  console.log(currentState);
-
   /**
    * Method for traversing the `historyStack` backwards by using an index to jump to the appropriate position.
    */
