@@ -408,6 +408,7 @@ export interface NexusGenInputs {
     endDateTime?: string | null; // String
     startDateTime: string; // String!
     threshold?: number | null; // Float
+    topicFilter?: NexusGenInputs['TopicFilterInput'] | null; // TopicFilterInput
   }
   InviteUserInput: { // input type
     customerId: string; // String!

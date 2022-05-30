@@ -108,10 +108,13 @@ export const WorkspaceStatistics = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
         }
 
+        const topicFilter = args.input.topicFilter || undefined;
+
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
           parent.id,
           utcStartDateTime as Date,
           utcEndDateTime,
+          topicFilter,
           threshold || undefined,
         );
       },
@@ -139,12 +142,15 @@ export const WorkspaceStatistics = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE') as Date;
         }
 
+        const topicFilter = args.input.topicsFilter || undefined;
+
         return (
           ctx.services.dialogueStatisticsService.calculateUrgentPath(
             parent.id,
             // TODO: Add validator in middleware field
             utcStartDateTime as Date,
             utcEndDateTime as Date,
+            topicFilter,
           )
         );
       },

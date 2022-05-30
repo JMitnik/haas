@@ -47,25 +47,16 @@ class DialogueStatisticsService {
   async calculateUrgentPath(
     workspaceId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
+    topicFilter: TopicFilterInput = {},
   ): Promise<UrgentPath | null> {
     // An urgent path is a path which was considered urgent. This can be either one of the following:
     // TODO: 1. A particular subject was triggered which was marked as "important" (this takes precedence)
 
-    // 2. A subject was flagged multiple times <- needs to be improved obviously (
-    // let's say, ratings threshold is set to 4. Any items that are negative are considered candidates.)
-    // Grab the lowest-scoring one.
-    const dialogueIds = (await this.workspaceService.getDialogues(workspaceId)).map(dialogue => dialogue.id);
-    const sessions = await this.sessionService.findSessionsForDialogues(dialogueIds, startDate, endDate, {
-      AND: [{
-        mainScore: { lte: THRESHOLD },
-      }],
-    }, {
-      nodeEntries: { include: { choiceNodeEntry: true } },
-    }) as unknown as SessionWithEntries[];
-
-    // Calculate all the candidate topic-counts.
-    const topicCounts = this.sessionService.countTopicsFromSessions(sessions);
+    const topicCounts = await this.topicService.countWorkspaceTopics(workspaceId, startDate, endDate, {
+      ...topicFilter,
+      relatedSessionScoreLowerThreshold: THRESHOLD,
+    });
 
     // This is where the decision is made "what" is considered most urgent to report on.
     const urgentTopic = maxBy(Object.values(topicCounts), 'count');
@@ -116,10 +107,11 @@ class DialogueStatisticsService {
     workspaceId: string,
     startDateTime: Date,
     endDateTime?: Date,
+    topicFilter?: TopicFilterInput,
     threshold: number = 70,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
-    const dialogues = await this.dialoguePrismaAdapter.findDialogueIdsOfCustomer(workspaceId);
+    const dialogues = await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined);
     const mappedDialogueIds = dialogues.map((dialogue) => dialogue.id);
 
     const scopedSessions = await this.sessionService.findSessionsForDialogues(

@@ -1002,6 +1002,7 @@ input HealthScoreInput {
   endDateTime: String
   startDateTime: String!
   threshold: Float = 70
+  topicFilter: TopicFilterInput
 }
 
 type ImageType {

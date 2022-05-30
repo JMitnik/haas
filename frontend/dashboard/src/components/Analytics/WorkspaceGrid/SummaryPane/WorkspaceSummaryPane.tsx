@@ -30,6 +30,9 @@ export const WorkspaceSummaryPane = ({
       healthInput: {
         startDateTime: format(startDate, DateFormat.DayFormat),
         endDateTime: format(endDate, DateFormat.DayFormat),
+        topicFilter: {
+          dialogueStrings: visitedDialogueFragments,
+        },
       },
       summaryInput: {
         impactType: DialogueImpactScoreType.Average,

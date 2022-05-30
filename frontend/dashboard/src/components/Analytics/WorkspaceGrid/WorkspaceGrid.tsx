@@ -26,7 +26,7 @@ import { HexagonGrid } from './HexagonGrid';
 import { Layers } from './Layers';
 import { WorkspaceGridHeader } from './WorkspaceGridHeader';
 import { WorkspaceSummaryPane } from './SummaryPane/WorkspaceSummaryPane';
-import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
+import { createGrid, reconstructHistoryStack } from './WorkspaceGrid.helpers';
 
 export interface DataLoadOptions {
   dialogueId?: string;

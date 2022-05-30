@@ -1184,6 +1184,7 @@ export type HealthScoreInput = {
   threshold?: Maybe<Scalars['Float']>;
   startDateTime: Scalars['String'];
   endDateTime?: Maybe<Scalars['String']>;
+  topicFilter?: Maybe<TopicFilterInput>;
 };
 
 export type ImageType = {
