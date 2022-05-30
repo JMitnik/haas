@@ -7,5 +7,10 @@
   "hosted-zone:account=356797133903:domainName=staging.haas.live:region=eu-central-1": {
     "Id": "/hostedzone/Z06245841V1IQD0CW2EPM",
     "Name": "staging.haas.live."
-  }
+  },
+  "availability-zones:account=649621042808:region=eu-central-1": [
+    "eu-central-1a",
+    "eu-central-1b",
+    "eu-central-1c"
+  ]
 }

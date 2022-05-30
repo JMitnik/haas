@@ -18,7 +18,7 @@ const stagingEnv = {
 console.log(stagingEnv);
 
 // Main stack and pipeline
-// const api = new APIStack(app, 'HaasAPIMainStack');
+const api = new APIStack(app, 'HaasAPIMainStack');
 const stagingCoreFixed = new StagingCoreFixed(app, 'StagingCoreFixed', { env: stagingEnv });
 const stagingCoreTemp = new StagingCoreTemp(app, 'StagingCoreTemp', {
   vpc: stagingCoreFixed.vpc.vpc,
@@ -27,15 +27,15 @@ const stagingCoreTemp = new StagingCoreTemp(app, 'StagingCoreTemp', {
   dbSecurityGroup: stagingCoreFixed.db.dbSecurityGroup,
   env: stagingEnv,
 });
-// const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
-//     prefix: 'haas_svc_api',
-//     apiService: api.apiService,
-//     dbUrl: api.dbUrl,
-//     vpc: api.vpc,
-//     rdsPassword: api.rdsPassword,
-//     db: api.db,
-//     rdsSecurityGroup: api.rdsSecurityGroup
-// });
+const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
+    prefix: 'haas_svc_api',
+    apiService: api.apiService,
+    dbUrl: api.dbUrl,
+    vpc: api.vpc,
+    rdsPassword: api.rdsPassword,
+    db: api.db,
+    rdsSecurityGroup: api.rdsSecurityGroup
+});
 
 // // // Campaign stack
 // const campaign = new HaasCampaignStack(app, 'HAASCampaign', {
