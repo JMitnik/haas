@@ -49,6 +49,7 @@ export const CustomerType = objectType({
      */
     t.field('statistics', {
       type: WorkspaceStatistics,
+      nullable: true,
       description: 'Workspace statistics',
 
       resolve: async (parent) => {

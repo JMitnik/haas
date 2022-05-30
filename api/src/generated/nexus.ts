@@ -1599,7 +1599,7 @@ export interface NexusGenFieldTypes {
     roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
     slug: string; // String!
-    statistics: NexusGenRootTypes['WorkspaceStatistics']; // WorkspaceStatistics!
+    statistics: NexusGenRootTypes['WorkspaceStatistics'] | null; // WorkspaceStatistics
     userCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     users: NexusGenRootTypes['UserType'][] | null; // [UserType!]
     usersConnection: NexusGenRootTypes['UserConnection'] | null; // UserConnection

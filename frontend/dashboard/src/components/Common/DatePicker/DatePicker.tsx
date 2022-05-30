@@ -35,7 +35,7 @@ export interface RangeDatePickerProps extends BaseDatePickerProps {
   changeWhenFullRange?: boolean;
 }
 
-const RangeDatePicker = ({ startDate, endDate, onChange, changeWhenFullRange = true }: RangeDatePickerProps) => {
+export const RangeDatePicker = ({ startDate, endDate, onChange, changeWhenFullRange = true }: RangeDatePickerProps) => {
   const [localDates, setLocalDates] = useState([startDate, endDate]);
   const [localStartDate, localEndDate] = localDates;
 

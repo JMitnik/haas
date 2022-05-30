@@ -33,7 +33,7 @@ interface CustomerContextProps {
 interface CustomerProviderProps {
   children: React.ReactNode;
   workspaceOverrideSlug?: string;
-  __test__: boolean;
+  __test__?: boolean;
 }
 
 const CustomerProvider = ({ children, workspaceOverrideSlug, __test__ = false }: CustomerProviderProps) => {
@@ -92,6 +92,7 @@ const CustomerProvider = ({ children, workspaceOverrideSlug, __test__ = false }:
         ...customer,
         user: newUser,
         userRole: role,
+        statistics: null,
       });
     },
   });
