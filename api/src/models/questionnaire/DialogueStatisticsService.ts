@@ -10,7 +10,6 @@ import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import DialogueService from './DialogueService';
 import NodeEntryService from '../node-entry/NodeEntryService';
-import { SessionWithEntries } from '../session/SessionTypes';
 import { TopicService } from '../Topic/TopicService';
 import { TopicFilterInput } from '../Topic/Topic.types';
 import { Topic } from './DialogueTypes';
@@ -100,7 +99,7 @@ class DialogueStatisticsService {
 
     const healthScore = nrVotes === 0 ? 0 : sessionsHigherThanTreshold.length / nrVotes * 100;
 
-    return { score: healthScore, nrVotes };
+    return { score: healthScore, nrVotes, negativeResponseCount: nrVotes - sessionsHigherThanTreshold.length };
   };
 
   findWorkspaceHealthScore = async (

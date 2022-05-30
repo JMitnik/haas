@@ -518,8 +518,8 @@ type Customer {
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
-  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
-  nestedHealthScore(input: HealthScoreInput): HealthScore
+  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!] @deprecated(reason: "Deprecated, see statistics")
+  nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
