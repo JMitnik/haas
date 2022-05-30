@@ -126,7 +126,7 @@ export const WorkspaceGrid = ({
 
   useEffect(() => {
     resetWorkspaceGrid();
-  }, [resetWorkspaceGrid]);
+  }, [resetWorkspaceGrid, startDate, endDate]);
 
   /**
    * Generates an array of Hexagon SVG coordinates according to the desired shape.
@@ -149,6 +149,8 @@ export const WorkspaceGrid = ({
     id: node.id,
     points: gridItems.points[index],
   })) || [];
+
+  console.log(currentState);
 
   /**
    * Method for traversing the `historyStack` backwards by using an index to jump to the appropriate position.
@@ -320,6 +322,7 @@ export const WorkspaceGrid = ({
               <UI.Container px={4} style={{ width: '100%', maxWidth: 1400 }} mt={2}>
                 <UI.Div ref={ref}>
                   <HexagonGrid
+                    key={`${startDate.toISOString()} - ${endDate.toISOString()}`}
                     width={width}
                     height={height}
                     backgroundColor="#ebf0ff"

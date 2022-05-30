@@ -110,6 +110,7 @@ export const HexagonGrid = ({
   const gridDotSize = 3;
   const gridSize = 50;
 
+  console.log({ nodes });
   return (
     <UI.Div position="relative" data-test-id="HexagonGrid" width={width} height={height}>
       <svg
