@@ -67,7 +67,7 @@ export const WorkspaceGrid = ({
 
   const [ref, bounds] = useMeasure();
   const width = bounds.width || 600;
-  const height = Math.max(bounds.height, 800);
+  const height = Math.max(bounds.height, 600);
 
   /**
    * The current state describes that state of the workspace grid component, including the node
@@ -317,7 +317,7 @@ export const WorkspaceGrid = ({
                 </UI.Flex>
               </UI.Div>
 
-              <UI.Container mt={2}>
+              <UI.Container px={4} style={{ width: '100%', maxWidth: 1400 }} mt={2}>
                 <UI.Grid gridTemplateRows="1fr 250px">
                   <UI.Div ref={ref}>
                     <HexagonGrid

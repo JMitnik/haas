@@ -3,8 +3,8 @@ import { format as dateFormat, isValid, parse, startOfWeek, sub } from 'date-fns
 export enum DateFormat {
   /** Example: 02-12-2021 */
   DayFormat = 'dd-MM-yyyy',
-  /** Example: Monday 16th */
-  HumanGlobalWeekDayFormat = 'EEEE do',
+  /** Example: Monday, June 16th */
+  HumanGlobalWeekDayFormat = 'EEEE, MMMM do',
 
   /** Example: Monday 16 July, 20:00 */
   HumanDateTime = 'EEEE do, HH:mm',

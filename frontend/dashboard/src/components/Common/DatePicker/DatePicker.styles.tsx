@@ -130,6 +130,7 @@ export const DatePickerButton = styled.button`
     color: ${theme.colors.off[500]};
     transition: all ${theme.transitions.normal};
     background-color: transparent;
+    min-width: 300px;
     background-color: ${theme.colors.neutral[500]};
 
     &:hover {

@@ -1,8 +1,8 @@
-import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, ChoiceNodeEntry, NodeEntry, Session, RoleTypeEnum } from '@prisma/client';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
 import cuid from 'cuid';
-import { addDays, differenceInHours, isEqual, subDays } from 'date-fns';
+import { addDays, subDays } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -17,7 +17,6 @@ import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
-import DialogueStatisticsService from '../questionnaire/DialogueStatisticsService';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import TemplateService from '../templates/TemplateService';
