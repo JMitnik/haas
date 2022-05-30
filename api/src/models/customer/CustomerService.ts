@@ -45,8 +45,8 @@ export class CustomerService {
     this.templateService = new TemplateService(prismaClient);
   }
 
-  async getDialogues(workspaceId: string) {
-    return this.customerPrismaAdapter.getDialogues(workspaceId);
+  async getDialogues(workspaceId: string, dialogueFragments?: string[]) {
+    return this.customerPrismaAdapter.getDialogues(workspaceId, dialogueFragments);
   }
 
   /**
@@ -155,7 +155,7 @@ export class CustomerService {
           return previousValue;
         }
       }, {
-      prevData: [] as ({
+        prevData: [] as ({
         sessionId: string;
         dialogueId: string;
         mainScore: number;
@@ -172,7 +172,7 @@ export class CustomerService {
         }) | undefined;
         prev: boolean;
       })[],
-    });
+      });
 
     const prevDataGroupedOptions = groupBy(splittedSessions.prevData, (session) => {
       return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;

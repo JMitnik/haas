@@ -402,3 +402,20 @@ export const reconstructHistoryStack = (dialogueId: string, data: HexagonNode[])
     path,
   );
 };
+
+export const extractDialogueFragments = (historyQueue: HexagonState[]): string[] => {
+  const fragments: string[] = [];
+
+  historyQueue.forEach((pastState) => {
+    if (!pastState.selectedNode) return;
+
+    if (
+      pastState.selectedNode.type === HexagonNodeType.Group
+      || pastState.selectedNode.type === HexagonNodeType.Dialogue
+    ) {
+      fragments.push(pastState.selectedNode.label);
+    }
+  });
+
+  return fragments;
+};

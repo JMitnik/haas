@@ -10,12 +10,21 @@ import { TopicRankingWidget } from 'components/Analytics/Topic/TopicRankingWidge
 import { UrgentTopicWidget } from 'components/Analytics/Topic/UrgentTopicWidget';
 
 import { SummaryPaneProps } from './WorkspaceSummaryPane.types';
+import { extractDialogueFragments } from '../WorkspaceGrid.helpers';
 
-export const WorkspaceSummaryPane = ({ onDialogueChange, startDate, endDate }: SummaryPaneProps) => {
+export const WorkspaceSummaryPane = ({
+  onDialogueChange,
+  startDate,
+  endDate,
+  historyQueue,
+}: SummaryPaneProps) => {
   const { activeCustomer } = useCustomer();
   const { format } = useDate();
 
+  const visitedDialogueFragments = extractDialogueFragments(historyQueue);
+
   const { data } = useGetWorkspaceSummaryDetailsQuery({
+    fetchPolicy: 'no-cache',
     variables: {
       id: activeCustomer?.id,
       healthInput: {
@@ -26,6 +35,9 @@ export const WorkspaceSummaryPane = ({ onDialogueChange, startDate, endDate }: S
         impactType: DialogueImpactScoreType.Average,
         startDateTime: format(startDate, DateFormat.DayFormat),
         endDateTime: format(endDate, DateFormat.DayFormat),
+        topicsFilter: {
+          dialogueStrings: visitedDialogueFragments,
+        },
         refresh: true,
       },
     },
@@ -53,8 +65,8 @@ export const WorkspaceSummaryPane = ({ onDialogueChange, startDate, endDate }: S
         {health && (
           <UI.Div minWidth={250}>
             <HealthCard
+              key={health.score}
               score={health.score}
-              responseCount={health.nrVotes}
               negativeResponseCount={health.negativeResponseCount}
               positiveResponseCount={health.nrVotes - health.negativeResponseCount}
             />

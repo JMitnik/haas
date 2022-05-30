@@ -26,7 +26,7 @@ import { HexagonGrid } from './HexagonGrid';
 import { Layers } from './Layers';
 import { WorkspaceGridHeader } from './WorkspaceGridHeader';
 import { WorkspaceSummaryPane } from './SummaryPane/WorkspaceSummaryPane';
-import { createGrid, reconstructHistoryStack } from './WorkspaceGrid.helpers';
+import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -337,6 +337,7 @@ export const WorkspaceGrid = ({
                       endDate={endDate}
                       onDialogueChange={jumpToDialogue}
                       currentState={currentState}
+                      historyQueue={historyQueue}
                     />
                   </UI.Div>
                 </UI.Grid>

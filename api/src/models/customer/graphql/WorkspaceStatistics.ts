@@ -51,6 +51,9 @@ export const WorkspaceStatistics = objectType({
       },
     });
 
+    /**
+     * Topics of a workspace ranked by either impact score or number of responses.
+     */
     t.list.field('rankedTopics', {
       type: 'TopicType',
       args: { input: DialogueStatisticsSummaryFilterInput },
@@ -70,10 +73,13 @@ export const WorkspaceStatistics = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
         }
 
+        const topicFilter = args.input.topicsFilter || undefined;
+
         return ctx.services.dialogueStatisticsService.rankTopics(
           parent.id,
           utcStartDateTime as Date,
           utcEndDateTime as Date,
+          topicFilter,
           args.input.cutoff || undefined,
         );
       },

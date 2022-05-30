@@ -47,7 +47,7 @@ export const WorkspaceGridAdapter = ({
       endDateTime: format(selectedEndDate, DateFormat.DayFormat),
       workspaceId: activeCustomer?.id || '',
     },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'no-cache',
     skip: !(!!selectedStartDate && !!selectedEndDate),
     onCompleted: (data) => {
       setDialogues(data.customer?.dialogues || []);

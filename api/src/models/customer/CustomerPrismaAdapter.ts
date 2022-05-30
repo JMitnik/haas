@@ -1,4 +1,4 @@
-import { PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings, DialogueImpactScore } from '@prisma/client';
+import { Prisma, PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings, DialogueImpactScore } from '@prisma/client';
 import WorkspaceTemplate, { DemoWorkspaceTemplate } from 'models/templates/TemplateTypes';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -15,9 +15,15 @@ export class CustomerPrismaAdapter {
   /**
    * Fetches all dialogues
    */
-  async getDialogues(workspaceId: string) {
+  async getDialogues(workspaceId: string, dialogueFragments?: string[]) {
+    let query: Prisma.DialogueWhereInput = { customerId: workspaceId };
+
+    if (dialogueFragments?.length) {
+      query.title = { contains: dialogueFragments.join(' - ') };
+    }
+
     return this.prisma.dialogue.findMany({
-      where: { customerId: workspaceId },
+      where: query,
     });
   }
 

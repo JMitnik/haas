@@ -945,6 +945,7 @@ export type DialogueStatisticsSummaryFilterInput = {
   endDateTime?: Maybe<Scalars['String']>;
   refresh?: Maybe<Scalars['Boolean']>;
   impactType: DialogueImpactScoreType;
+  topicsFilter?: Maybe<TopicFilterInput>;
   cutoff?: Maybe<Scalars['Int']>;
 };
 
@@ -2442,6 +2443,13 @@ export type TopicDelta = {
   delta: Scalars['Float'];
   percentageChanged: Scalars['Float'];
   group?: Maybe<Scalars['String']>;
+};
+
+/** Generic filter object for filtering topics */
+export type TopicFilterInput = {
+  topicStrings?: Maybe<Array<Scalars['String']>>;
+  relatedSessionScoreLowerThreshold?: Maybe<Scalars['Float']>;
+  dialogueStrings?: Maybe<Array<Scalars['String']>>;
 };
 
 export type TopicInputType = {

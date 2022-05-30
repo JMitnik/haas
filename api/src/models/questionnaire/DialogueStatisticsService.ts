@@ -12,7 +12,8 @@ import DialogueService from './DialogueService';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { SessionWithEntries } from '../session/SessionTypes';
 import { TopicService } from '../Topic/TopicService';
-import { DialogueStatisticsSummaryFilterInput, Topic } from './DialogueTypes';
+import { TopicFilterInput } from '../Topic/Topic.types';
+import { Topic } from './DialogueTypes';
 
 const THRESHOLD = 40;
 
@@ -270,11 +271,18 @@ class DialogueStatisticsService {
   /**
    * Calculate and ranks most popular topics of a workspace
    */
-  async rankTopics(workspaceId: string, startDate: Date, endDate: Date, cutoff = 5): Promise<Topic[]> {
+  async rankTopics(
+    workspaceId: string,
+    startDate: Date,
+    endDate: Date,
+    topicFilter?: TopicFilterInput,
+    cutoff = 5
+  ): Promise<Topic[]> {
     const topicCounts = await this.topicService.countWorkspaceTopics(
       workspaceId,
       startDate,
       endDate,
+      topicFilter,
     );
 
     // Rank topics (without using index, not efficient)

@@ -3,13 +3,11 @@ import React from 'react';
 
 import { useFormatter } from 'hooks/useFormatter';
 
-import { MessageCircle } from 'react-feather';
 import { ProgressCircle } from '../../WorkspaceGrid/SummaryPane/ProgressCircle';
 import { getColorScoreBrandVariable, getHexagonSVGFill } from '../../WorkspaceGrid/WorkspaceGrid.helpers';
 
 interface HealthCardProps {
   score: number;
-  responseCount: number;
   negativeResponseCount: number;
   positiveResponseCount: number;
   isPreview?: boolean;
@@ -17,10 +15,9 @@ interface HealthCardProps {
 
 export const HealthCard = ({
   score,
-  responseCount,
   positiveResponseCount,
   negativeResponseCount,
-  isPreview
+  isPreview,
 }: HealthCardProps) => {
   const { formatFractionToPercentage } = useFormatter();
   return (
@@ -52,17 +49,6 @@ export const HealthCard = ({
             Happiness score
           </UI.Helper>
         </UI.Div>
-
-        {/* <UI.Div mt={1} width="100%" style={{ textAlign: 'center' }}>
-          <UI.Flex justifyContent="center" alignItems="center">
-            <UI.Icon color="off.600">
-              <MessageCircle width={21} />
-            </UI.Icon>
-            <UI.Span ml={1} fontWeight={700} fontSize="1.2rem" color="off.700">
-              {responseCount}
-            </UI.Span>
-          </UI.Flex>
-        </UI.Div> */}
 
         {!isPreview && (
           <UI.Div>

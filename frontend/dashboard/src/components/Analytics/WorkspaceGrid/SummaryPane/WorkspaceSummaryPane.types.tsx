@@ -4,5 +4,6 @@ export interface SummaryPaneProps {
   startDate: Date;
   endDate: Date;
   currentState: HexagonState;
+  historyQueue: HexagonState[];
   onDialogueChange?: any;
 }

@@ -27,7 +27,7 @@ export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingW
         <UI.Div ref={ref} mt={2}>
           <svg width={bounds.width} height={160}>
             {topics.map((topic, index) => (
-              <React.Fragment key={topic.name}>
+              <React.Fragment key={index}>
                 <motion.rect
                   key={topic.name}
                   x={0}
@@ -41,6 +41,7 @@ export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingW
                     width: `${(topic.basicStats?.responseCount ?? 0 / totalResponseCount)}%`,
                     opacity: 1,
                   }}
+                  rx={5}
                   fill={theme.colors.main[100]}
                 />
 
@@ -49,6 +50,12 @@ export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingW
                   height={barHeight / 1.5}
                   dominantBaseline="middle"
                   x={bounds.width - 335}
+                  initial={{
+                    opacity: 0,
+                  }}
+                  animate={{
+                    opacity: 1,
+                  }}
                   fill={theme.colors.main[800]}
                 >
                   {topic.name}
@@ -65,7 +72,7 @@ export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingW
                   animate={{
                     opacity: 1,
                   }}
-                  fill={theme.colors.main[800]}
+                  fill={theme.colors.off[600]}
                 >
                   {topic.basicStats?.responseCount}
                 </motion.text>

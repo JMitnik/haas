@@ -774,6 +774,7 @@ input DialogueStatisticsSummaryFilterInput {
   impactType: DialogueImpactScoreType!
   refresh: Boolean
   startDateTime: String!
+  topicsFilter: TopicFilterInput
 }
 
 """DialogueStatisticsSummary"""
@@ -1803,6 +1804,13 @@ type TopicDelta {
   nrVotes: Int!
   percentageChanged: Float!
   topic: String!
+}
+
+"""Generic filter object for filtering topics"""
+input TopicFilterInput {
+  dialogueStrings: [String!]
+  relatedSessionScoreLowerThreshold: Float
+  topicStrings: [String!]
 }
 
 input TopicInputType {

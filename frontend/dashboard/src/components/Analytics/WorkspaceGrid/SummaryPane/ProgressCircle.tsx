@@ -28,6 +28,8 @@ export const ProgressCircle = ({
 
   const { transition } = fadeMotion;
 
+  console.log({ percentage, stroke, fillPercentage });
+
   const variants = {
     hidden: {
       strokeDashoffset: circumference,
