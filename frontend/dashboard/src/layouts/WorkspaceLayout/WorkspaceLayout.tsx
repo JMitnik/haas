@@ -1,20 +1,15 @@
 import * as UI from '@haas/ui';
-import { useParams } from 'react-router';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { CustomThemeProviders } from 'providers/ThemeProvider';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Loader } from 'components/Common/Loader/Loader';
-import { motion } from 'framer-motion';
 import { useCustomer } from 'providers/CustomerProvider';
 import useMediaDevice from 'hooks/useMediaDevice';
 
 import * as LS from './WorkpaceLayout.styles';
 import { TopbarContainer, WorkspaceTopbar } from './WorkspaceTopbar';
-import { WorkspaceNav } from './WorkspaceNav';
-import { WorkspaceSidenav } from './WorkspaceSidenav';
-import MobileBottomNav from './MobileWorkspaceBottomNav';
 import NotAuthorizedView from '../NotAuthorizedView';
 
 const WorkspaceLayoutContainer = styled(UI.Div) <{ isMobile?: boolean }>`
@@ -28,8 +23,6 @@ const WorkspaceLayoutContainer = styled(UI.Div) <{ isMobile?: boolean }>`
       background-color: ${theme.colors.app.sidebar};
       box-shadow: inset 2px 1px 4px 0px rgb(0 0 0 / 10%);
     }
-    /* grid-template-columns: ${theme.sidenav.width}px 1fr; */
-    /* grid-gap: ${theme.gutter}px; */
 
     ${isMobile && css`
       grid-template-columns: '1fr';
@@ -42,7 +35,6 @@ interface WorskpaceLayoutProps {
 }
 
 const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
-  const params: { topicId: string, customerSlug: string, dialogueSlug: string } = useParams<any>();
   const device = useMediaDevice();
   const { isLoading } = useCustomer();
 
@@ -51,33 +43,14 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
       <CustomThemeProviders>
         {/* With topbar */}
         {isLoading && (
-        <UI.Div position="absolute" bottom={0} right={0}>
-          <Loader testId="runner" />
-        </UI.Div>
+          <UI.Div position="absolute" bottom={0} right={0}>
+            <Loader testId="runner" />
+          </UI.Div>
         )}
-        <UI.Div>
+        <UI.Div position="relative" zIndex={100000}>
           <WorkspaceTopbar withNav />
         </UI.Div>
         <WorkspaceLayoutContainer isMobile={device.isSmall}>
-
-          {/* With sidebar
-          {isLoading && (
-            <UI.Div position="absolute" bottom={0} right={0}>
-              <Loader testId="runner" />
-            </UI.Div>
-          )}
-          <UI.Div>
-            {!device.isSmall ? (
-              <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
-                <WorkspaceSidenav />
-              </motion.div>
-            ) : (
-              <MobileBottomNav>
-                <WorkspaceNav customerSlug={params.customerSlug} />
-              </MobileBottomNav>
-            )}
-          </UI.Div> */}
-
           <LS.DashboardViewContainer>
             {children}
           </LS.DashboardViewContainer>

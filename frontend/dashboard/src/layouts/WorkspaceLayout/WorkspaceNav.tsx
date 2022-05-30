@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { ReactComponent as ChatIcon } from 'assets/icons/icon-chat-group-sm.svg';
+import { ChevronDown } from 'react-feather';
 import { ReactComponent as HomeIcon } from 'assets/icons/icon-view-grid-sm.svg';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification-sm.svg';
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog-sm.svg';
@@ -14,7 +15,6 @@ import { useNavigator } from 'hooks/useNavigator';
 import useAuth from 'hooks/useAuth';
 
 import * as LS from './WorkpaceLayout.styles';
-import { ChevronDown } from 'react-feather';
 
 interface NavItemProps extends LinkProps {
   renderSibling?: React.ReactNode;

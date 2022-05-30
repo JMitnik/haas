@@ -46,10 +46,9 @@ const Content = styled(Popover.Content)`
   width: 100%;
 `;
 
-export const WorkspaceSwitcher = () => {
+export const WorkspaceSwitchContent = () => {
   const { user, logout } = useUser();
   const { activeCustomer, setActiveCustomer } = useCustomer();
-  const [open, setOpen] = React.useState(false);
   const history = useHistory();
 
   const { t, i18n } = useTranslation();
@@ -58,6 +57,88 @@ export const WorkspaceSwitcher = () => {
     setActiveCustomer(null);
     history.push('/dashboard');
   };
+
+  return (
+    <>
+      <LS.Item>
+        <UI.Flex alignItems="center">
+          <UI.Div>
+            <Avatar
+              name={user?.firstName || 'N'}
+              brand="main"
+            />
+          </UI.Div>
+          <UI.Div ml={2}>
+            <UI.Strong color="off.600">
+              {user?.firstName}
+              {' '}
+              {user?.lastName}
+            </UI.Strong>
+            {activeCustomer && (
+            <UI.Muted>
+              {t('workspace_role', { workspace: activeCustomer.name, role: activeCustomer.userRole?.name })}
+            </UI.Muted>
+            )}
+          </UI.Div>
+        </UI.Flex>
+      </LS.Item>
+
+      <UI.Hr />
+
+      <LS.CheckedItem
+        onClick={() => i18n.changeLanguage('en')}
+        isChecked={i18n.language === 'en'}
+      >
+        <UI.Flex alignItems="center">
+          <UI.Icon>
+            <UKFlag />
+          </UI.Icon>
+          {t('to_language_en')}
+        </UI.Flex>
+      </LS.CheckedItem>
+
+      <LS.CheckedItem
+        onClick={() => i18n.changeLanguage('de')}
+        isChecked={i18n.language === 'de'}
+      >
+        <UI.Flex alignItems="center">
+          <UI.Icon>
+            <GermanyFlag />
+          </UI.Icon>
+          {t('to_language_de')}
+        </UI.Flex>
+      </LS.CheckedItem>
+
+      <UI.Hr />
+
+      <LS.NavItem to="/dashboard/me/edit">
+        <UI.Icon>
+          <Settings />
+        </UI.Icon>
+        {t('account_settings')}
+      </LS.NavItem>
+
+      <LS.Item onClick={goToWorkspaceOverview}>
+        <UI.Icon>
+          <Sidebar />
+        </UI.Icon>
+        {t('switch_workspace')}
+      </LS.Item>
+
+      <LS.Item onClick={logout}>
+        <UI.Icon>
+          <LogOut />
+        </UI.Icon>
+        {t('logout')}
+      </LS.Item>
+    </>
+  );
+};
+
+export const WorkspaceSwitcher = () => {
+  const { user } = useUser();
+  const { activeCustomer } = useCustomer();
+  const [open, setOpen] = React.useState(false);
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -104,77 +185,7 @@ export const WorkspaceSwitcher = () => {
           >
             <motion.div>
               <LS.Card>
-                <LS.Item>
-                  <UI.Flex alignItems="center">
-                    <UI.Div>
-                      <Avatar
-                        name={user?.firstName || 'N'}
-                        brand="main"
-                      />
-                    </UI.Div>
-                    <UI.Div ml={2}>
-                      <UI.Strong color="off.600">
-                        {user?.firstName}
-                        {' '}
-                        {user?.lastName}
-                      </UI.Strong>
-                      {activeCustomer && (
-                        <UI.Muted>
-                          {t('workspace_role', { workspace: activeCustomer.name, role: activeCustomer.userRole?.name })}
-                        </UI.Muted>
-                      )}
-                    </UI.Div>
-                  </UI.Flex>
-                </LS.Item>
-
-                <UI.Hr />
-
-                <LS.CheckedItem
-                  onClick={() => i18n.changeLanguage('en')}
-                  isChecked={i18n.language === 'en'}
-                >
-                  <UI.Flex alignItems="center">
-                    <UI.Icon>
-                      <UKFlag />
-                    </UI.Icon>
-                    {t('to_language_en')}
-                  </UI.Flex>
-                </LS.CheckedItem>
-
-                <LS.CheckedItem
-                  onClick={() => i18n.changeLanguage('de')}
-                  isChecked={i18n.language === 'de'}
-                >
-                  <UI.Flex alignItems="center">
-                    <UI.Icon>
-                      <GermanyFlag />
-                    </UI.Icon>
-                    {t('to_language_de')}
-                  </UI.Flex>
-                </LS.CheckedItem>
-
-                <UI.Hr />
-
-                <LS.NavItem to="/dashboard/me/edit">
-                  <UI.Icon>
-                    <Settings />
-                  </UI.Icon>
-                  {t('account_settings')}
-                </LS.NavItem>
-
-                <LS.Item onClick={goToWorkspaceOverview}>
-                  <UI.Icon>
-                    <Sidebar />
-                  </UI.Icon>
-                  {t('switch_workspace')}
-                </LS.Item>
-
-                <LS.Item onClick={logout}>
-                  <UI.Icon>
-                    <LogOut />
-                  </UI.Icon>
-                  {t('logout')}
-                </LS.Item>
+                <WorkspaceSwitchContent />
               </LS.Card>
             </motion.div>
           </Content>
