@@ -173,7 +173,7 @@ const AddTriggerView = () => {
         <UI.Breadcrumb to={getAlertsPath()}>{t('go_to_alerts')}</UI.Breadcrumb>
       )}
       >
-        <UI.ViewTitle>{t('views:create_trigger_view')}</UI.ViewTitle>
+        <UI.DeprecatedViewTitle>{t('views:create_trigger_view')}</UI.DeprecatedViewTitle>
       </UI.ViewHead>
 
       <UI.ViewBody>

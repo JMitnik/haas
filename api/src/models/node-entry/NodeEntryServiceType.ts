@@ -1,4 +1,4 @@
-import { Prisma, NodeEntry, QuestionNode, SliderNodeEntry, ChoiceNodeEntry, RegistrationNodeEntry, TextboxNodeEntry, LinkNodeEntry } from "@prisma/client";
+import { NodeEntry, QuestionNode, SliderNodeEntry, ChoiceNodeEntry, RegistrationNodeEntry, TextboxNodeEntry, LinkNodeEntry } from '@prisma/client';
 
 export interface NodeEntryWithTypes extends NodeEntry {
   session?: {
@@ -8,8 +8,4 @@ export interface NodeEntryWithTypes extends NodeEntry {
   relatedNode?: QuestionNode | null;
   sliderNodeEntry: SliderNodeEntry | null;
   choiceNodeEntry: ChoiceNodeEntry | null;
-  formNodeEntry: Prisma.FormNodeEntryGetPayload<{ include: { values: true } }> | null;
-  registrationNodeEntry: RegistrationNodeEntry | null;
-  textboxNodeEntry: TextboxNodeEntry | null;
-  linkNodeEntry: LinkNodeEntry | null;
 }

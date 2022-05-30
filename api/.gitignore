@@ -1,3 +1,6 @@
 .now
 .env.prod
 secrets
+artillery/*.json
+artillery/*.json.html
+artillery/artillery_users.csv

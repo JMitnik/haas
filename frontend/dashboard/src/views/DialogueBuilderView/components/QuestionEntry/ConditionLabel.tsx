@@ -17,7 +17,7 @@ interface ConditionLabelProps {
   problems: (QuestionNodeProblem | undefined)[];
 }
 
-const ConditionLabel = ({ activeCTA, id, condition, problems } : ConditionLabelProps) => {
+const ConditionLabel = ({ activeCTA, id, condition, problems }: ConditionLabelProps) => {
   const { t } = useTranslation();
 
   // Temporarily focus on one problem.
@@ -29,7 +29,7 @@ const ConditionLabel = ({ activeCTA, id, condition, problems } : ConditionLabelP
 
       {condition?.conditionType === 'match' && (
         <LS.ConditionSpan fontSize="0.6em">
-          <abbr title={condition.matchValue}>{condition.matchValue}</abbr>
+          <abbr title={condition.matchValue || undefined}>{condition.matchValue}</abbr>
         </LS.ConditionSpan>
       )}
 

@@ -17,6 +17,22 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+type AssignedDialogues {
+  assignedDialogues: [Dialogue!]!
+  privateWorkspaceDialogues: [Dialogue!]!
+}
+
+input AssignUserToDialoguesInput {
+  assignedDialogueIds: [String!]!
+  userId: String!
+  workspaceId: String!
+}
+
+input AuthenticateLambdaInput {
+  authenticateEmail: String
+  workspaceEmail: String
+}
+
 type AutodeckConnectionType implements DeprecatedConnectionInterface {
   cursor: String
   endDate: String
@@ -27,11 +43,193 @@ type AutodeckConnectionType implements DeprecatedConnectionInterface {
   startDate: String
 }
 
+input AutomationActionInput {
+  apiKey: String
+  endpoint: String
+  id: ID
+  payload: JSONObject
+  type: AutomationActionType
+}
+
+"""AutomationAction"""
+type AutomationActionModel {
+  createdAt: Date!
+  id: ID!
+  type: AutomationActionType!
+  updatedAt: Date!
+}
+
+enum AutomationActionType {
+  API_CALL
+  GENERATE_REPORT
+  SEND_EMAIL
+  SEND_SMS
+  WEBHOOK
+}
+
+input AutomationConditionBuilderInput {
+  childConditionBuilder: AutomationConditionBuilderInput
+  conditions: [CreateAutomationCondition!]
+  id: ID
+  type: AutomationConditionBuilderType
+}
+
+"""AutomationConditionBuilder"""
+type AutomationConditionBuilderModel {
+  childConditionBuilder: AutomationConditionBuilderModel
+  childConditionBuilderId: String
+  conditions: [AutomationConditionModel!]!
+  id: ID!
+  type: AutomationConditionBuilderType!
+}
+
+enum AutomationConditionBuilderType {
+  AND
+  OR
+}
+
+"""AutomationCondition"""
+type AutomationConditionModel {
+  createdAt: Date!
+  dialogue: Dialogue
+  dialogueScope: DialogueConditionScopeModel
+  id: ID!
+  operands: [AutomationConditionOperandModel!]!
+  operator: AutomationConditionOperatorType!
+  question: QuestionNode
+  questionScope: QuestionConditionScopeModel
+  scope: AutomationConditionScopeType!
+  updatedAt: Date!
+  workspaceScope: WorkspaceConditionScopeModel
+}
+
+"""AutomationConditionOperand"""
+type AutomationConditionOperandModel {
+  createdAt: Date!
+  dateTimeValue: String
+  id: ID!
+  numberValue: Int
+  textValue: String
+  type: OperandType!
+  updatedAt: Date!
+}
+
+enum AutomationConditionOperatorType {
+  EVERY_N_TH_TIME
+  GREATER_OR_EQUAL_THAN
+  GREATER_THAN
+  INNER_RANGE
+  IS_EQUAL
+  IS_FALSE
+  IS_NOT_EQUAL
+  IS_TRUE
+  OUTER_RANGE
+  SMALLER_OR_EQUAL_THAN
+  SMALLER_THAN
+}
+
+enum AutomationConditionScopeType {
+  DIALOGUE
+  QUESTION
+  WORKSPACE
+}
+
+type AutomationConnection implements ConnectionInterface {
+  automations: [AutomationModel!]!
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
+}
+
+input AutomationConnectionFilterInput {
+  label: String
+  offset: Int
+  orderBy: AutomationConnectionOrderByInput
+  perPage: Int = 10
+  search: String
+  type: AutomationType
+}
+
+"""Sorting of UserConnection"""
+input AutomationConnectionOrderByInput {
+  by: AutomationConnectionOrderType!
+  desc: Boolean = true
+}
+
+"""Fields to order UserConnection by."""
+enum AutomationConnectionOrderType {
+  type
+  updatedAt
+}
+
+input AutomationEventInput {
+  dialogueId: String
+  eventType: AutomationEventType
+  id: ID
+  questionId: String
+}
+
+"""AutomationEvent"""
+type AutomationEventModel {
+  createdAt: Date!
+  dialogue: Dialogue
+  endDate: String
+  id: ID!
+  periodType: RecurringPeriodType
+  question: QuestionNode
+  startDate: String
+  type: AutomationEventType!
+  updatedAt: Date!
+}
+
+enum AutomationEventType {
+  API_CALL
+  NEW_INTERACTION_DIALOGUE
+  NEW_INTERACTION_QUESTION
+  RECURRING
+}
+
+"""Automation"""
+type AutomationModel {
+  automationTrigger: AutomationTriggerModel
+  createdAt: Date!
+  description: String
+  id: ID!
+  isActive: Boolean!
+  label: String!
+  type: AutomationType!
+  updatedAt: Date!
+  workspace: Customer
+}
+
+"""AutomationTrigger"""
+type AutomationTriggerModel {
+  actions: [AutomationActionModel!]!
+  conditionBuilder: AutomationConditionBuilderModel
+  createdAt: Date!
+  event: AutomationEventModel!
+  id: ID!
+  updatedAt: Date!
+}
+
+enum AutomationType {
+  CAMPAIGN
+  TRIGGER
+}
+
 type AWSImageType {
   encoding: String
   filename: String
   mimetype: String
   url: String
+}
+
+"""Basic statistics for a general statistics"""
+type BasicStatistics {
+  """Average value of summarizable statistic"""
+  average: Float!
+
+  """Number of responses"""
+  responseCount: Int!
 }
 
 """Campaign"""
@@ -87,10 +285,89 @@ type ColourSettings {
   secondary: String
 }
 
+input ConditionDialogueScopeInput {
+  aggregate: ConditionPropertyAggregateInput
+  aspect: DialogueAspectType
+  id: ID
+}
+
+type ConditionPropertyAggregate {
+  createdAt: String!
+  endDate: String
+  id: ID!
+  latest: Int
+  startDate: String
+  type: ConditionPropertyAggregateType!
+}
+
+input ConditionPropertyAggregateInput {
+  endDate: String
+  id: ID
+  latest: Int
+  startDate: String
+  type: ConditionPropertyAggregateType
+}
+
+enum ConditionPropertyAggregateType {
+  AVG
+  COUNT
+  MAX
+  MIN
+}
+
+input ConditionQuestionScopeInput {
+  aggregate: ConditionPropertyAggregateInput
+  aspect: QuestionAspectType
+  id: ID
+}
+
+input ConditionScopeInput {
+  dialogueScope: ConditionDialogueScopeInput
+  id: ID
+  questionScope: ConditionQuestionScopeInput
+  type: AutomationConditionScopeType
+  workspaceScope: ConditionWorkspaceScopeInput
+}
+
+input ConditionWorkspaceScopeInput {
+  aggregate: ConditionPropertyAggregateInput
+  aspect: WorkspaceAspectType
+  id: ID
+}
+
 """Interface all pagination-based models should implement"""
 interface ConnectionInterface {
   pageInfo: PaginationPageInfo!
   totalPages: Int
+}
+
+input CreateAutomationCondition {
+  dialogueId: String
+  id: ID
+  operands: [CreateAutomationOperandInput!]
+  operator: AutomationConditionOperatorType
+  questionId: String
+  scope: ConditionScopeInput
+  workspaceId: String
+}
+
+input CreateAutomationInput {
+  actions: [AutomationActionInput!]
+  automationType: AutomationType
+  conditionBuilder: AutomationConditionBuilderInput
+  description: String
+  event: AutomationEventInput
+  id: ID
+  label: String
+  workspaceId: String
+}
+
+input CreateAutomationOperandInput {
+  dateTimeValue: String
+  id: ID
+  numberValue: Int
+  operandType: OperandType
+  textValue: String
 }
 
 input CreateBatchDeliveriesInputType {
@@ -132,6 +409,9 @@ input CreateCTAInputType {
   dialogueSlug: String
   form: FormNodeInputType
   links: CTALinksInputType
+
+  """Linked question-node id"""
+  questionId: String
   share: ShareNodeInputType
   title: String
   type: String
@@ -229,15 +509,26 @@ input CTAShareInputObjectType {
 }
 
 type Customer {
+  automationConnection(filter: AutomationConnectionFilterInput): AutomationConnection
+  automations: [AutomationModel!]
   campaign(campaignId: String): CampaignType
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
+  dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
+  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!] @deprecated(reason: "Deprecated, see statistics")
+  nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
+  nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
+  nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
+
+  """Workspace statistics"""
+  statistics: WorkspaceStatistics
   userCustomer(userId: String): UserCustomer
   users: [UserType!]
   usersConnection(customerSlug: String, filter: UserConnectionFilterInput): UserConnection
@@ -373,17 +664,25 @@ type DeprecatedPaginationPageInfo {
 }
 
 type Dialogue {
-  averageScore(input: DialogueFilterInputType): Float!
+  assignees: [UserType!]
+  averageScore(input: DialogueFilterInputType): Float
   campaignVariants: [CampaignVariantType!]!
   creationDate: String
   customer: Customer
   customerId: String!
   description: String!
+  dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
   edges: [Edge!]!
+  healthScore(input: HealthScoreInput): HealthScore
   id: ID!
+  isPrivate: Boolean!
   isWithoutGenData: Boolean!
   language: LanguageEnumType!
   leafs(searchTerm: String): [QuestionNode!]!
+  mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
+  mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+  pathedSessionsConnection(input: PathedSessionsInput): PathedSessionsType
   postLeafNode: DialogueFinisherObjectType
   publicTitle: String
   questions: [QuestionNode!]!
@@ -394,8 +693,51 @@ type Dialogue {
   statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag!]
   title: String!
+  topic(input: TopicInputType): TopicType!
   updatedAt: String
   wasGeneratedWithGenData: Boolean!
+}
+
+enum DialogueAspectType {
+  GENERAL_SCORE
+  LATEST_SCORE
+  NR_INTERACTIONS
+  NR_VISITORS
+}
+
+"""DialogueConditionScope"""
+type DialogueConditionScopeModel {
+  aggregate: ConditionPropertyAggregate
+  aspect: DialogueAspectType!
+  createdAt: Date!
+  id: ID!
+  updatedAt: Date!
+}
+
+type DialogueConnection implements ConnectionInterface {
+  dialogues: [Dialogue!]!
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
+}
+
+input DialogueConnectionFilterInput {
+  endDate: String
+  offset: Int
+  orderBy: DialogueConnectionOrderByInput
+  perPage: Int = 10
+  searchTerm: String
+  startDate: String
+}
+
+"""Fields to order UserConnection by."""
+enum DialogueConnectionOrder {
+  createdAt
+}
+
+"""Sorting of DialogueConnection"""
+input DialogueConnectionOrderByInput {
+  by: DialogueConnectionOrder!
+  desc: Boolean = true
 }
 
 input DialogueFilterInputType {
@@ -410,12 +752,50 @@ type DialogueFinisherObjectType {
   subtext: String!
 }
 
+enum DialogueImpactScoreType {
+  AVERAGE
+}
+
+input DialogueLinksInput {
+  workspaceId: String
+}
+
 type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType
   nrInteractions: Int!
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
+}
+
+input DialogueStatisticsSummaryFilterInput {
+  cutoff: Int
+  endDateTime: String
+  impactType: DialogueImpactScoreType!
+  refresh: Boolean
+  startDateTime: String!
+  topicsFilter: TopicFilterInput
+}
+
+"""DialogueStatisticsSummary"""
+type DialogueStatisticsSummaryModel {
+  dialogue: Dialogue
+  dialogueId: String!
+  endDateTime: Date
+  id: ID
+  impactScore: Float
+  nrVotes: Int
+  startDateTime: Date
+  updatedAt: Date
+}
+
+enum DialogueTemplateType {
+  BUSINESS_ENG
+  BUSINESS_NL
+  DEFAULT
+  MASS_SEED
+  SPORT_ENG
+  SPORT_NL
 }
 
 input DialogueWhereUniqueInput {
@@ -586,6 +966,22 @@ input GenerateAutodeckInput {
   youLoveX: String
 }
 
+input GenerateWorkspaceCSVInputType {
+  generateDemoData: Boolean = false
+  type: String! = "DEFAULT"
+  uploadedCsv: Upload
+  workspaceSlug: String!
+  workspaceTitle: String!
+}
+
+input GetAutomationInput {
+  id: String
+}
+
+input GetAutomationsByWorkspaceInput {
+  workspaceId: String
+}
+
 input GetCampaignsInput {
   customerSlug: String
 }
@@ -596,11 +992,30 @@ input HandleUserStateInWorkspaceInput {
   workspaceId: String
 }
 
+type HealthScore {
+  negativeResponseCount: Int!
+  nrVotes: Int!
+  score: Float!
+}
+
+input HealthScoreInput {
+  endDateTime: String
+  startDateTime: String!
+  threshold: Float = 70
+  topicFilter: TopicFilterInput
+}
+
 type ImageType {
   encoding: String
   filename: String
   mimetype: String
   url: String
+}
+
+type IndepthQuestionStatisticsSummary {
+  impactScore: Float
+  nrVotes: Int
+  option: String
 }
 
 input InviteUserInput {
@@ -659,6 +1074,11 @@ enum JobStatusType {
   WRAPPING_UP
 }
 
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
 enum LanguageEnumType {
   DUTCH
   ENGLISH
@@ -709,11 +1129,42 @@ type LoginOutput {
   user: UserType!
 }
 
+input MassSeedInput {
+  customerId: String!
+  maxGroups: Int!
+  maxSessions: Int!
+  maxTeams: Int!
+}
+
+type MostChangedPath {
+  group: String
+  topNegativeChanged: [TopicDelta!]!
+  topPositiveChanged: [TopicDelta!]!
+}
+
+type MostPopularPath {
+  group: String!
+  path: [PathTopic!]!
+}
+
+type MostTrendingTopic {
+  group: String!
+  impactScore: Float!
+  nrVotes: Int!
+  path: [String!]!
+}
+
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
+  authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
+
+  """Creates a new automation."""
+  createAutomation(input: CreateAutomationInput): AutomationModel!
+  createAutomationToken(email: String): String
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
   createCampaign(input: CreateCampaignInputType): CampaignType!
 
@@ -741,6 +1192,7 @@ type Mutation {
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
+  generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
 
   """Invite a user to a particular customer domain, given an email and role"""
@@ -748,11 +1200,14 @@ type Mutation {
 
   """Logs a user out by removing their refresh token"""
   logout: String!
+  massSeed(input: MassSeedInput): Customer
   register(input: RegisterInput): String
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload): ImageType!
+  updateAutomation(input: CreateAutomationInput): AutomationModel!
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
@@ -807,6 +1262,12 @@ type NodeEntryValue {
   sliderNodeEntry: Int
   textboxNodeEntry: String
   videoNodeEntry: String
+}
+
+enum OperandType {
+  DATE_TIME
+  INT
+  STRING
 }
 
 input OptionInputType {
@@ -877,6 +1338,33 @@ input PaginationWhereInput {
   startDate: String
 }
 
+"""A path is the traversal of topics in a dialogue."""
+type Path {
+  id: ID!
+  topicStrings: [String!]!
+}
+
+input PathedSessionsInput {
+  endDateTime: String
+  path: [String!]!
+  refresh: Boolean = false
+  startDateTime: String!
+}
+
+type PathedSessionsType {
+  endDateTime: String!
+  path: [String!]!
+  pathedSessions: [Session!]!
+  startDateTime: String!
+}
+
+type PathTopic {
+  depth: Int!
+  impactScore: Float!
+  nrVotes: Int!
+  topic: String!
+}
+
 input PermissionIdsInput {
   ids: [String!]
 }
@@ -900,11 +1388,21 @@ type PreviewDataType {
   websiteScreenshotUrl: String!
 }
 
+type PublicDialogueInfo {
+  description: String
+  slug: String!
+  title: String!
+  url: String!
+}
+
 type Query {
+  automation(where: GetAutomationInput): AutomationModel
+  automations(where: GetAutomationsByWorkspaceInput): [AutomationModel!]!
   customer(id: ID, slug: String): Customer
   customers: [Customer!]!
   delivery(deliveryId: String): DeliveryType
   dialogue(where: DialogueWhereUniqueInput): Dialogue
+  dialogueLinks(input: DialogueLinksInput): [PublicDialogueInfo!]
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
@@ -913,6 +1411,7 @@ type Query {
   getJobProcessLocations: JobProcessLocations!
   getPreviewData(id: String): PreviewDataType
   me: UserType!
+  question(where: QuestionWhereUniqueInput): QuestionNode
   refreshAccessToken: RefreshAccessTokenOutput!
   role(input: FindRoleInput): RoleType
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
@@ -929,6 +1428,23 @@ type Query {
   users(customerSlug: String): [UserType!]!
 }
 
+enum QuestionAspectType {
+  ANSWER_SPEED
+  NODE_VALUE
+}
+
+"""QuestionConditionScope"""
+type QuestionConditionScopeModel {
+  aggregate: ConditionPropertyAggregate
+  aspect: QuestionAspectType!
+  createdAt: Date!
+  id: ID!
+}
+
+enum QuestionImpactScoreType {
+  PERCENTAGE
+}
+
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
@@ -937,6 +1453,7 @@ type QuestionNode {
   """FormNode resolver"""
   form: FormNodeType
   id: ID!
+  indepthQuestionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): [IndepthQuestionStatisticsSummary!]
   isLeaf: Boolean!
   isRoot: Boolean!
   links: [LinkType!]!
@@ -945,6 +1462,7 @@ type QuestionNode {
   overrideLeafId: String
   questionDialogue: Dialogue
   questionDialogueId: String
+  questionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): QuestionStatisticsSummary
   share: ShareNodeType
 
   """Slidernode resolver"""
@@ -985,8 +1503,37 @@ type QuestionOption {
   value: String!
 }
 
+type QuestionStatisticsSummary {
+  dialogueId: String
+  endDateTime: Date
+  id: ID
+  startDateTime: Date
+  updatedAt: Date
+}
+
+input QuestionStatisticsSummaryFilterInput {
+  endDateTime: String
+  impactTreshold: Int
+  impactType: QuestionImpactScoreType!
+  refresh: Boolean
+  startDateTime: String!
+}
+
+input QuestionWhereUniqueInput {
+  id: ID!
+}
+
 input RecipientsInputType {
   ids: [String!]
+}
+
+enum RecurringPeriodType {
+  END_OF_DAY
+  END_OF_WEEK
+  EVERY_DAY
+  EVERY_WEEK
+  START_OF_DAY
+  START_OF_WEEK
 }
 
 type RefreshAccessTokenOutput {
@@ -1023,6 +1570,7 @@ input RequestInviteInput {
 
 type RequestInviteOutput {
   didInvite: Boolean!
+  loginToken: String
   userExists: Boolean!
 }
 
@@ -1066,6 +1614,7 @@ type Session {
   device: String
   dialogueId: String!
   id: ID!
+  mainScore: Float!
   nodeEntries: [NodeEntry!]!
   originUrl: String
   paths: Int!
@@ -1110,6 +1659,7 @@ enum SessionDeliveryType {
 
 """Input for session"""
 input SessionInput {
+  createdAt: String
   deliveryId: String
   device: String
   dialogueId: String!
@@ -1127,6 +1677,12 @@ input SessionScoreRangeFilter {
 input SessionWhereUniqueInput {
   dialogueId: ID
   id: ID
+}
+
+input SetDialoguePrivacyInput {
+  customerId: String!
+  dialogueSlug: String!
+  state: Boolean!
 }
 
 input ShareNodeInputType {
@@ -1194,8 +1750,11 @@ input SocialNodeEntryInput {
 
 enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
+  CAN_ACCESS_REPORT_PAGE
   CAN_ADD_USERS
+  CAN_ASSIGN_USERS_TO_DIALOGUE
   CAN_BUILD_DIALOGUE
+  CAN_CREATE_AUTOMATIONS
   CAN_CREATE_CAMPAIGNS
   CAN_CREATE_DELIVERIES
   CAN_CREATE_TRIGGERS
@@ -1203,9 +1762,13 @@ enum SystemPermission {
   CAN_DELETE_TRIGGERS
   CAN_DELETE_USERS
   CAN_DELETE_WORKSPACE
+  CAN_DOWNLOAD_REPORTS
   CAN_EDIT_DIALOGUE
   CAN_EDIT_USERS
   CAN_EDIT_WORKSPACE
+  CAN_GENERATE_WORKSPACE_FROM_CSV
+  CAN_UPDATE_AUTOMATIONS
+  CAN_VIEW_AUTOMATIONS
   CAN_VIEW_CAMPAIGNS
   CAN_VIEW_DIALOGUE
   CAN_VIEW_DIALOGUE_ANALYTICS
@@ -1232,6 +1795,47 @@ enum TagTypeEnum {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
+}
+
+type TopicDelta {
+  averageCurrent: Float!
+  averagePrevious: Float!
+  delta: Float!
+  group: String
+  nrVotes: Int!
+  percentageChanged: Float!
+  topic: String!
+}
+
+"""Generic filter object for filtering topics"""
+input TopicFilterInput {
+  dialogueStrings: [String!]
+  relatedSessionScoreLowerThreshold: Float
+  topicStrings: [String!]
+}
+
+input TopicInputType {
+  endDateTime: String
+  impactScoreType: DialogueImpactScoreType!
+  isRoot: Boolean = false
+  refresh: Boolean
+  startDateTime: String!
+  value: String!
+}
+
+type TopicNodeEntryValue {
+  id: Int!
+  mainScore: Int!
+  nodeEntryId: String!
+  value: String!
+}
+
+type TopicType {
+  basicStats: BasicStatistics
+  impactScore: Float!
+  name: String!
+  nrVotes: Int!
+  subTopics: [TopicType!]
 }
 
 type topPathType {
@@ -1349,6 +1953,22 @@ input UploadSellImageInputType {
   workspaceId: String
 }
 
+"""
+
+    An urgent path is a path which was considered urgent. It currently follows a simple heuristic:
+    1. Get all sessions of the workspace.
+    2. Find sessions with a score below 4. If there is no such session, then no urgency is reported.
+    3. Find the topic that has the most negative responses.
+  
+"""
+type UrgentPath {
+  basicStats: BasicStatistics!
+  dialogue: Dialogue
+  dialogueId: String!
+  id: ID!
+  path: Path!
+}
+
 type UserConnection implements ConnectionInterface {
   pageInfo: PaginationPageInfo!
   totalPages: Int
@@ -1407,9 +2027,11 @@ input UserOfCustomerInput {
   customerId: String
   customerSlug: String
   userId: String
+  workspaceId: String
 }
 
 type UserType {
+  assignedDialogues(input: UserOfCustomerInput): AssignedDialogues
   customers: [Customer!]!
   email: String!
   firstName: String
@@ -1433,4 +2055,49 @@ type VerifyUserTokenOutput {
 """Input type for a video node"""
 input VideoNodeEntryInput {
   value: String
+}
+
+enum WorkspaceAspectType {
+  GENERAL_SCORE
+  NR_INTERACTIONS
+  NR_VISITORS
+}
+
+"""WorkspaceConditionScope"""
+type WorkspaceConditionScopeModel {
+  aggregate: ConditionPropertyAggregate
+  aspect: WorkspaceAspectType!
+  createdAt: Date!
+  id: ID!
+  updatedAt: Date!
+}
+
+type WorkspaceStatistics {
+  """
+  Basic statistics of a workspace (e.g. number of responses, average general score, etc)
+  """
+  basicStats(input: DialogueStatisticsSummaryFilterInput): BasicStatistics!
+
+  """Gets the health score of the workspace"""
+  health(input: HealthScoreInput): HealthScore!
+  id: ID!
+
+  """
+  
+          Get the path (sequence of topics) with the most changed impact score.
+        
+  """
+  mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath!
+  mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+
+  """
+  Topics of a workspace ranked by either impact score or number of responses
+  """
+  rankedTopics(input: DialogueStatisticsSummaryFilterInput): [TopicType!]!
+
+  """
+  Returns potentially the most urgent path of the workspace (one at most)
+  """
+  urgentPath(input: DialogueStatisticsSummaryFilterInput): UrgentPath
 }

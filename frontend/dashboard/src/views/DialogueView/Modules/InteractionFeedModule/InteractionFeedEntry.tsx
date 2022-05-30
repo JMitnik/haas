@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import Logo from 'components/Logo';
+import { LogoIcon } from 'components/Logo';
 import parseNodeEntryValue from 'utils/parseNodeEntryValue';
 import scoreToColors from 'utils/scoreToColors';
 
@@ -18,7 +18,7 @@ export const NodeTypeIcon = ({ node }: { node: QuestionNode | null }) => {
 
   switch (node.type) {
     case 'SLIDER':
-      return <Logo />;
+      return <LogoIcon />;
     case 'CHOICE':
       return <Target />;
     case 'VIDEO_EMBEDDED':
@@ -32,7 +32,7 @@ export const NodeTypeIcon = ({ node }: { node: QuestionNode | null }) => {
     case 'FORM':
       return <Clipboard />;
     default:
-      return <Logo />;
+      return <LogoIcon />;
   }
 };
 
@@ -117,8 +117,8 @@ const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
     <InteractionFeedEntryContainer>
       <Flex flexWrap="wrap" width="100%" justifyContent="space-between">
         <Flex>
-          <InteractionFeedEntryValueContainer value={interaction.score}>
-            {Number(interaction.score / 10).toFixed(1)}
+          <InteractionFeedEntryValueContainer value={interaction.mainScore}>
+            {Number(interaction.mainScore / 10).toFixed(1)}
           </InteractionFeedEntryValueContainer>
 
           {interaction?.nodeEntries[1]?.value ? (

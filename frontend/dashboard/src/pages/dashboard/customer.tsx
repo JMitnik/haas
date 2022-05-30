@@ -5,7 +5,7 @@ const CustomerPage = () => {
   const { customerSlug } = useParams<any>();
 
   return (
-    <Redirect to={`/dashboard/b/${customerSlug}/d`} />
+    <Redirect to={`/dashboard/b/${customerSlug}/dashboard`} />
   );
 };
 

@@ -1,0 +1,36 @@
+query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilterInput) {
+  customer(slug: $customerSlug) {
+    id
+    slug
+    dialogueConnection(filter: $filter) {
+      totalPages
+      pageInfo {
+        hasPrevPage
+        hasNextPage
+        prevPageOffset
+        nextPageOffset
+        pageIndex
+      }
+      dialogues {
+        id
+        title
+        isPrivate
+        language
+        slug
+        publicTitle
+        creationDate
+        updatedAt
+        customerId
+        averageScore
+        customer {
+          slug
+        }
+        tags {
+          id
+          type
+          name
+        }
+      }
+    }
+  }
+} 

@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, NodeEntry } from "@prisma/client";
+import { PrismaClient, Prisma, NodeEntry } from '@prisma/client';
 
 class NodeEntryPrismaAdapter {
   prisma: PrismaClient;
@@ -6,6 +6,202 @@ class NodeEntryPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  findDialogueStatisticsRootEntries = async (
+    dialogueIds: string[],
+    startDate: Date,
+    endDate: Date,
+  ) => {
+    return this.prisma.nodeEntry.findMany({
+      where: {
+        AND: [
+          {
+            session: {
+              dialogueId: {
+                in: dialogueIds,
+              },
+            },
+            creationDate: {
+              gte: startDate,
+              lte: endDate,
+            },
+          },
+          {
+            depth: 0,
+          },
+          {
+            sliderNodeEntry: {
+              isNot: null,
+            },
+          },
+        ],
+      },
+      include: {
+        session: {
+          select: {
+            dialogueId: true,
+          },
+        },
+        sliderNodeEntry: true,
+      },
+    });
+  }
+
+  /**
+   * Finds all sub topic node entries within a date range by question id
+   * @param questionId
+   * @param startDateTime
+   * @param endDateTime
+   * @returns a list of sliderNodeEntries as well as node entries of its children
+   */
+  findNodeEntriesByQuestionId = async (
+    questionId: string, startDateTime: Date, endDateTime: Date
+  ) => {
+
+    const sessions = await this.prisma.session.findMany({
+      where: {
+        createdAt: {
+          gte: startDateTime,
+          lte: endDateTime,
+        },
+        nodeEntries: {
+          some: {
+            relatedNodeId: questionId,
+          },
+        },
+      },
+      include: {
+        nodeEntries: {
+          where: {
+            relatedEdge: {
+              parentNodeId: questionId,
+            },
+          },
+          include: {
+            choiceNodeEntry: true,
+          },
+        },
+      },
+    });
+    return sessions;
+  }
+
+  /**
+   * Finds all node entries within a date range based on a specific topic
+   * @param dialogueId
+   * @param topic
+   * @param startDateTime
+   * @param endDateTime
+   * @returns a list of node entries where answered value = input topic
+   */
+  findNodeEntriesByTopic = async (dialogueId: string, topic: string, startDateTime: Date, endDateTime: Date) => {
+    const sessions = await this.prisma.session.findMany({
+      where: {
+        createdAt: {
+          gte: startDateTime,
+          lte: endDateTime,
+        },
+        dialogueId: dialogueId,
+        nodeEntries: {
+          some: {
+            choiceNodeEntry: {
+              value: topic,
+            },
+          },
+        },
+      },
+      include: {
+        nodeEntries: {
+          where: {
+            relatedEdge: {
+              conditions: {
+                some: {
+                  matchValue: topic,
+                },
+              },
+            },
+          },
+          include: {
+            choiceNodeEntry: true,
+          },
+        },
+      },
+    });
+
+    return sessions;
+
+    // const targetNodeEntries = await this.prisma.choiceNodeEntry.findMany({
+    //   where: {
+    //     nodeEntry: {
+    //       creationDate: {
+    //         gte: startDateTime,
+    //         lte: endDateTime,
+    //       },
+    //       session: {
+    //         dialogueId: dialogueId,
+    //       },
+    //       // NOT: {
+    //       //   inputSource: 'INIT_GENERATED',
+    //       // },
+    //     },
+    //     value: topic,
+    //   },
+    //   include: {
+    //     nodeEntry: {
+    //       include: {
+    //         session: {
+    //           select: {
+    //             mainScore: true,
+    //           },
+    //         },
+    //         relatedNode: {
+    //           select: {
+    //             options: true,
+    //             children: {
+    //               where: {
+    //                 conditions: {
+    //                   some: {
+    //                     matchValue: topic,
+    //                   },
+    //                 },
+    //               },
+    //               select: {
+    //                 childNode: {
+    //                   select: {
+    //                     options: true,
+    //                   },
+    //                 },
+    //                 isRelatedNodeOfNodeEntries: {
+    //                   select: {
+    //                     id: true,
+    //                     choiceNodeEntry: {
+    //                       select: {
+    //                         value: true,
+    //                       },
+    //                     },
+    //                     session: {
+    //                       select: {
+    //                         mainScore: true,
+    //                       },
+    //                     },
+    //                   },
+    //                   where: {
+    //                     creationDate: {
+    //                       gte: startDateTime,
+    //                       lte: endDateTime,
+    //                     },
+    //                   },
+    //                 },
+    //               },
+    //             },
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    // });
+    // return targetNodeEntries;
+  }
 
   create(data: Prisma.NodeEntryCreateInput) {
     return this.prisma.nodeEntry.create({
@@ -19,10 +215,10 @@ class NodeEntryPrismaAdapter {
       include: {
         nodeEntries: {
           orderBy: {
-            depth: 'asc'
-          }
-        }
-      }
+            depth: 'asc',
+          },
+        },
+      },
     });
 
     return session?.nodeEntries || [];
@@ -32,14 +228,14 @@ class NodeEntryPrismaAdapter {
    * Count by sesion id.
    * */
   countNodeEntriesBySessionId(sessionId: string) {
-    return this.prisma.nodeEntry.count({ where: { sessionId, } });
+    return this.prisma.nodeEntry.count({ where: { sessionId } });
   };
 
   /**
    * Raw count of node-entries.
    * */
   count(where: Prisma.NodeEntryWhereInput): Promise<number> {
-    return this.prisma.nodeEntry.count({ where, });
+    return this.prisma.nodeEntry.count({ where });
   };
 
   /**
@@ -83,7 +279,7 @@ class NodeEntryPrismaAdapter {
 
   async deleteManyChoiceNodeEntries(nodeEntryIds: string[]): Promise<Prisma.BatchPayload> {
     return this.prisma.choiceNodeEntry.deleteMany({
-      where: { nodeEntryId: { in: nodeEntryIds } }
+      where: { nodeEntryId: { in: nodeEntryIds } },
     });
   };
 

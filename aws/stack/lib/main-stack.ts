@@ -1,15 +1,25 @@
-import * as cdk from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as ecr from '@aws-cdk/aws-ecr';
-import * as rds from '@aws-cdk/aws-rds';
-import * as acm from '@aws-cdk/aws-certificatemanager';
-import { SubnetType } from '@aws-cdk/aws-ec2';
-import * as ecs from '@aws-cdk/aws-ecs';
-import * as route53 from '@aws-cdk/aws-route53';
-import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
-import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
-import { Duration } from '@aws-cdk/core';
+/**
+ * NOTICE: THIS HAS BEEN DEPRECATED
+ * FROM NOW ONWARDS, WE USE the CORE STACK STRUCTURE FOUND IN aws/stack/lib/stacks/Core.
+ * NEEDS TO BE REFACTORED ASAP.
+ */
 
+import * as cdk from '@aws-cdk/core';
+import {
+  aws_ec2 as ec2,
+  Stack,
+  StackProps,
+  aws_ecr as ecr,
+  aws_rds as rds,
+  aws_certificatemanager as acm,
+  aws_ecs as ecs,
+  aws_route53 as route53,
+  aws_ecs_patterns as ecs_patterns,
+  aws_secretsmanager as secretsmanager,
+  Duration,
+} from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { SubnetType } from 'aws-cdk-lib/aws-ec2'
 
 // Prerequisites:
 // 1. You have an Ec2 Keyname-pair created (HaasAPI_RemoteBastionAccess)
@@ -25,9 +35,9 @@ import { Duration } from '@aws-cdk/core';
 // Constants
 const hostedZoneId = 'Z02703531WCURDDQ4Z46S';
 const hostedZoneName = 'haas.live';
-const bastionKeyName = 'HaasAPI_RemoteBastionAccess';
+const bastionKeyName = 'SSH Bastion';
 
-export class APIStack extends cdk.Stack {
+export class APIStack extends Stack {
   apiService: ecs_patterns.ApplicationLoadBalancedFargateService;
   dbUrl: string;
   vpc: ec2.Vpc;
@@ -35,7 +45,7 @@ export class APIStack extends cdk.Stack {
   rdsPassword: secretsmanager.Secret;
   rdsSecurityGroup: ec2.SecurityGroup;
 
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     // Reference to our hosted-zone (haas.live)

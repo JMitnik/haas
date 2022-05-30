@@ -1,12 +1,22 @@
-import { makeSchema } from '@nexus/schema';
+import { makeSchema, asNexusMethod } from '@nexus/schema';
 import path from 'path';
+import { JSONObjectResolver } from 'graphql-scalars'
 
+import { ParentResolvePlugin, TimeResolverPlugin, QueryCounterPlugin } from './graphql/plugins';
 import nexus from './nexus';
 
+const jsonScalar = asNexusMethod(JSONObjectResolver, 'json')
+
 const schema = makeSchema({
-  shouldGenerateArtifacts: process.env.NODE_ENV === "development",
+  shouldGenerateArtifacts: process.env.NODE_ENV === 'development',
   types: [
     ...nexus,
+    jsonScalar,
+  ],
+  plugins: [
+    ParentResolvePlugin,
+    TimeResolverPlugin,
+    QueryCounterPlugin,
   ],
   typegenAutoConfig: {
     sources: [

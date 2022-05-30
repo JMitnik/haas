@@ -81,7 +81,7 @@ export const RoleQueries = extendType({
         if (!role) throw new UserInputError('Role not found!');
 
         return role as any;
-      }
+      },
     });
 
     t.field('roleConnection', {
@@ -104,7 +104,7 @@ export const RoleQueries = extendType({
 
         return {
           roles,
-          permissions,
+          permissions: [],
           pageInfo,
           // TODO: Figure out what to do with these?
           limit: args.filter?.limit || 0,
@@ -137,8 +137,8 @@ export const UpdatePermissionsMutationResolver = mutationField('updatePermission
   resolve(parent, args, ctx) {
     if (!args.input?.roleId) throw new UserInputError('No RoleId provided to update permissions for!');
 
-    return ctx.services.roleService.updatePermissions(args.input.roleId, args.input.permissions || []);
-  }
+    return ctx.services.roleService.updatePermissions(args.input.roleId, args.input.permissions as any || []);
+  },
 })
 
 export const RoleMutations = extendType({

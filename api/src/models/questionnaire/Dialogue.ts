@@ -1,28 +1,29 @@
 
 import { UserInputError } from 'apollo-server-express';
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import { subDays } from 'date-fns';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
-import { DialgoueStatisticsLineChartDataType, DialogueStatistics } from './graphql/DialogueStatistics';
+import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
 import { EdgeType } from '../edge/Edge';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 import { SessionConnection, SessionType } from '../session/graphql/Session';
 import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
-import { PaginationWhereInput } from '../general/Pagination';
-import PaginationService from '../general/PaginationService';
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
-import isValidDate from '../../utils/isValidDate';
+import { isADate, isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './DialogueTypes';
 import { SessionConnectionFilterInput } from '../session/graphql';
+import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
+import { UserType } from '../users/graphql/User';
+import { PathedSessionsType, PathedSessionsInput, TopicType, TopicInputType, MostPopularPath, DialogueStatisticsSummaryFilterInput, MostChangedPath, MostTrendingTopic } from './DialogueStatisticsResolver';
+import { HealthScore, HealthScoreInput } from '../customer/graphql/HealthScore';
 
 export const TEXT_NODES = [
   'TEXTBOX',
   'CHOICE',
 ];
-
 
 export const DialogueFilterInputType = inputObjectType({
   name: 'DialogueFilterInputType',
@@ -40,12 +41,11 @@ export const DialogueFinisherType = objectType({
     t.id('id');
     t.string('header');
     t.string('subtext');
-  }
+  },
 });
 
 export const DialogueType = objectType({
   name: 'Dialogue',
-
   definition(t) {
     t.id('id');
     t.string('title');
@@ -58,10 +58,16 @@ export const DialogueType = objectType({
     t.field('language', {
       type: LanguageEnumType,
     });
+    t.boolean('isPrivate');
 
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+
+    t.list.field('assignees', {
+      nullable: true,
+      type: UserType,
+    })
 
     t.field('postLeafNode', {
       type: DialogueFinisherType,
@@ -73,33 +79,287 @@ export const DialogueType = objectType({
         return ctx.prisma.postLeafNode.findFirst({
           where: {
             id: parent.postLeafNodeId,
-          }
+          },
         });
-      }
+      },
+    });
+
+    t.field('healthScore', {
+      nullable: true,
+      type: HealthScore,
+      args: {
+        input: HealthScoreInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('Not input object!');
+        const { startDateTime, endDateTime, threshold } = args.input;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (startDateTime) {
+          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
+        }
+
+        if (endDateTime) {
+          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.findDialogueHealthScore(
+          parent.id,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          threshold || undefined,
+        );
+      },
+    });
+
+    t.field('pathedSessionsConnection', {
+      type: PathedSessionsType,
+      nullable: true,
+      args: {
+        input: PathedSessionsInput,
+      },
+      useTimeResolve: true,
+      useQueryCounter: true,
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+        if (!args.input) throw new UserInputError('No input provided!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        const dialogueId = parent.id;
+        const path = args.input.path || [];
+
+        const pathedSessions = await ctx.services.sessionService.findPathMatchedSessions(
+          dialogueId,
+          path,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
+
+        return (pathedSessions || null) as any;
+      },
+    });
+
+    t.field('topic', {
+      type: TopicType,
+      args: {
+        input: TopicInputType,
+      },
+      useQueryCounter: true,
+      useTimeResolve: true,
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+        if (!args.input) throw new UserInputError('No input provided!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        const dialogueId = parent.id;
+
+        if (args.input.isRoot) {
+          return ctx.services.dialogueService.findSubTopicsOfRoot(
+            dialogueId,
+            args.input.impactScoreType,
+            utcStartDateTime as Date,
+            utcEndDateTime,
+            args.input.refresh || false
+          );
+        }
+
+        return ctx.services.dialogueService.findSubTopicsByTopic(
+          dialogueId,
+          args.input.impactScoreType,
+          args.input.value,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        ) as any;
+      },
+    });
+
+    t.field('mostPopularPath', {
+      type: MostPopularPath,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueService.findMostPopularPath(
+          parent.id,
+          parent.title,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
+      },
+    });
+
+    t.field('mostChangedPath', {
+      type: MostChangedPath,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (args?.input?.cutoff && args.input.cutoff < 1) throw new UserInputError('Cutoff cannot be a negative number!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueService.findMostChangedPath(
+          parent.id,
+          parent.title,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+          args.input.cutoff || undefined,
+        );
+      },
+    });
+
+    t.field('mostTrendingTopic', {
+      type: MostTrendingTopic,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueService.findMostTrendingTopic(
+          parent.id,
+          parent.title,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
+      },
+    });
+
+    t.field('dialogueStatisticsSummary', {
+      type: DialogueStatisticsSummaryModel,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      nullable: true,
+      useParentResolve: true,
+      // useQueryCounter: true,
+      useTimeResolve: true,
+      resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.initiate(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || undefined,
+        );
+      },
     });
 
     t.field('averageScore', {
       type: 'Float',
       args: { input: DialogueFilterInputType },
-      async resolve(parent, args) {
+      useTimeResolve: true,
+      useQueryCounter: true,
+      nullable: true,
+      async resolve(parent, args, ctx) {
         if (!parent.id) {
           return 0;
         }
 
-        if (args.input?.startDate && !isValidDate(args.input.startDate)) {
-          throw new UserInputError('Start date invalid');
-        }
+        const startDate = args.input?.startDate ? isADate(args.input.startDate) : undefined;
+        const endDate = args.input?.endDate ? isADate(args.input.endDate) : undefined
 
-        if (args.input?.endDate && !isValidDate(args.input.endDate)) {
-          throw new UserInputError('End date invalid');
-        }
+        const average = await ctx.services.dialogueService.calculateAverageScore(parent.id, {
+          startDate,
+          endDate,
+        })
 
-        const score = await DialogueService.calculateAverageDialogueScore(parent.id, {
-          startDate: args.input?.startDate,
-          endDate: args.input?.endDate,
-        });
+        return average;
+      },
+    });
 
-        return score;
+    t.list.field('sessions', {
+      type: SessionType,
+      useTimeResolve: true,
+      args: { take: 'Int' },
+
+      async resolve(parent, args) {
+        const dialogueWithSessions = await SessionService.fetchSessionsByDialogue(parent.id, undefined, args.take);
+
+        return dialogueWithSessions || [];
       },
     });
 
@@ -107,7 +367,8 @@ export const DialogueType = objectType({
       type: DialogueStatistics,
       args: { input: DialogueFilterInputType },
       nullable: true,
-
+      useQueryCounter: true,
+      useTimeResolve: true,
       async resolve(parent, args) {
         const startDate = args.input?.startDate ? formatDate(args.input.startDate) : subDays(new Date(), 7);
         const endDate = args.input?.endDate ? formatDate(args.input.endDate) : null;
@@ -207,21 +468,6 @@ export const DialogueType = objectType({
       },
     });
 
-    t.list.field('sessions', {
-      type: SessionType,
-      args: { take: 'Int' },
-
-      async resolve(parent, args) {
-        const dialogueWithSessions = await SessionService.fetchSessionsByDialogue(parent.id);
-
-        if (args.take) {
-          return dialogueWithSessions?.length ? dialogueWithSessions.slice(0, args.take) || [] : [];
-        }
-
-        return dialogueWithSessions || [];
-      },
-    });
-
     t.list.field('leafs', {
       type: QuestionNodeType,
       args: {
@@ -237,7 +483,7 @@ export const DialogueType = objectType({
       // @ts-ignore
       resolve: (parent, args, ctx) => {
         return ctx.services.dialogueService.getCampaignVariantsByDialogueId(parent.id);
-      }
+      },
     })
   },
 });

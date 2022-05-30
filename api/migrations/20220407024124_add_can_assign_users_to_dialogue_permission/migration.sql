@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "SystemPermissionEnum" ADD VALUE 'CAN_ASSIGN_USERS_TO_DIALOGUE';

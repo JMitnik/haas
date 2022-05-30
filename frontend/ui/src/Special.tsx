@@ -1,8 +1,8 @@
 import styled, { css } from 'styled-components';
 import React from 'react';
 import { Skeleton as ChakraSkeleton } from '@chakra-ui/core';
-import { Text } from './Type';
-import Card from './Cards';
+import { H4, Text } from './Type';
+import Card, { BoxShadowSize, NewCard } from './Cards';
 import { Span } from './Span';
 import { CloseIcon } from './assets/icon-close';
 import { Div } from './Generics';
@@ -13,7 +13,7 @@ import { Flex } from './Container';
 const IllustrationCardWrapper = styled.div`
   ${({ theme }) => css`
     ${Span} {
-      color: ${theme.colors.gray['500']};
+      color: ${theme.colors.gray['800']};
       bottom: ${theme.gutter}px;
       font-weight: 200;
       font-size: 1.3rem;
@@ -22,6 +22,11 @@ const IllustrationCardWrapper = styled.div`
       display: block;
       max-width: 80%;
       margin: 0 auto;
+    }
+
+    ${Text} {
+      color: ${theme.colors.off['500']};
+      font-weight: 300;
     }
 
     > svg {
@@ -39,17 +44,24 @@ const IllustrationCardWrapper = styled.div`
   `}
 `;
 
-export const IllustrationCard = ({ svg, text, children, isFlat }: { svg: any, text: string, children?: React.ReactNode, isFlat?: boolean; }) => {
+interface IllustrationCardProps {
+  svg: any;
+  text: string;
+  children?: React.ReactNode;
+  boxShadow?: BoxShadowSize;
+}
+
+export const IllustrationCard = ({ svg, text, children, boxShadow }: IllustrationCardProps) => {
   return (
-    <Card noHover isFlat={isFlat}>
+    <NewCard boxShadow={boxShadow}>
       <IllustrationCardWrapper>
         {svg}
         <Span>
-          <Text pb={2}>{text}</Text>
+          <H4 color="off.400" pt={4} fontWeight={500} pb={2}>{text}</H4>
           {children}
         </Span>
       </IllustrationCardWrapper>
-    </Card>
+    </NewCard>
   );
 };
 
@@ -61,16 +73,22 @@ export const Hr = styled.hr`
 `;
 
 
-export const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
+export const CloseButtonContainer = styled.button.attrs({ type: 'button' }) <{ top?: string, right?: string }>`
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: ${props => props?.top || '12px'};
+  right: ${props => props?.right || '12px'};
   width: 1rem;
   height: 1rem;
 `;
 
-export const CloseButton = ({ onClose }: any) => (
-  <CloseButtonContainer onClick={onClose}>
+interface CloseButtonProps {
+  onClose: any;
+  top?: string;
+  right?: string;
+}
+
+export const CloseButton = ({ onClose, top, right }: CloseButtonProps) => (
+  <CloseButtonContainer top={top} right={right} onClick={onClose}>
     <CloseIcon />
   </CloseButtonContainer>
 );
@@ -165,3 +183,13 @@ export const Separator = styled(Div)`
     margin-right: ${theme.gutter / 2}px;
   `}
 `
+
+
+interface PaddedBodyProps {
+  fraction?: number;
+}
+export const PaddedBody = styled(Div) <PaddedBodyProps>`
+  ${({ theme, fraction = 1 }) => css`
+    padding: ${theme.gutter * fraction}px;
+  `}
+`;

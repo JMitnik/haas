@@ -1,6 +1,7 @@
 import { generatePath, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
 
 export const ROUTES = {
+  GENERATE_WORKSPACE_VIEW: '/dashboard/b/generate-workspace',
   WORKSPACE_ROOT: '/dashboard/b/:customerSlug',
   DIALOGUES_VIEW: '/dashboard/b/:customerSlug/d',
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
@@ -13,8 +14,12 @@ export const ROUTES = {
   ADMIN_OVERVIEW: '/dashboard/admin',
   USER_VIEW: '/dashboard/b/:customerSlug/users/:userId',
   ROLE_USER_VIEW: '/dashboard/b/:customerSlug/users/:userId/role/:roleId',
+  WEEKLY_REPORT_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/_reports/weekly',
   USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
   ALERTS_OVERVIEW: '/dashboard/b/:customerSlug/triggers',
+  DIALOGUE_BUILDER_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder',
+  NEW_QUESTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/question/:questionId/new-cta',
+  NEW_OPTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/option/:optionIndex/new-cta',
 };
 
 interface DashboardParams {
@@ -36,10 +41,47 @@ export const useNavigator = () => {
   const history = useHistory();
   const location = useLocation();
 
+  const goToDialogueBuilderOverview = () => {
+    const path = generatePath(ROUTES.DIALOGUE_BUILDER_OVERVIEW, {
+      customerSlug,
+      dialogueSlug,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToNewOptionsCTAView = (optionIndex: number) => {
+    const path = generatePath(ROUTES.NEW_OPTION_CTA_VIEW, {
+      customerSlug,
+      dialogueSlug,
+      optionIndex,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToNewQuestionCTAView = (questionId: string) => {
+    const path = generatePath(ROUTES.NEW_QUESTION_CTA_VIEW, {
+      customerSlug,
+      dialogueSlug,
+      questionId,
+    });
+
+    history.push(path + location.search);
+  };
+
   const goToCampaignView = (nextCampaignId: string) => {
     const path = generatePath(ROUTES.CAMPAIGN_VIEW, {
       customerSlug,
       campaignId: nextCampaignId,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToGenerateWorkspaceOverview = () => {
+    const path = generatePath(ROUTES.GENERATE_WORKSPACE_VIEW, {
+      customerSlug,
     });
 
     history.push(path + location.search);
@@ -111,6 +153,10 @@ export const useNavigator = () => {
   });
 
   return {
+    goToGenerateWorkspaceOverview,
+    goToNewOptionsCTAView,
+    goToDialogueBuilderOverview,
+    goToNewQuestionCTAView,
     goToUsersOverview,
     goToUserView,
     goToRoleUserView,

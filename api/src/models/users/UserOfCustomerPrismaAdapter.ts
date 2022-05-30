@@ -1,4 +1,4 @@
-import { PrismaClient, UserOfCustomer, Prisma } from "@prisma/client";
+import { PrismaClient, UserOfCustomer, Prisma } from '@prisma/client';
 
 class UserOfCustomerPrismaAdapter {
   prisma: PrismaClient;
@@ -6,6 +6,89 @@ class UserOfCustomerPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  /**
+   * Upserts an entry in UserOfCustomer table
+   * @param workspaceId 
+   * @param userId 
+   * @param roleId 
+   * @returns 
+   */
+  upsertUserOfCustomer = (workspaceId: string, userId: string, roleId: string) => {
+    return this.prisma.userOfCustomer.upsert({
+      where: {
+        userId_customerId: {
+          userId: userId,
+          customerId: workspaceId,
+        },
+      },
+      update: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        customer: {
+          connect: {
+            id: workspaceId,
+          },
+        },
+        role: {
+          connect: {
+            id: roleId,
+          },
+        },
+      },
+      create: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        customer: {
+          connect: {
+            id: workspaceId,
+          },
+        },
+        role: {
+          connect: {
+            id: roleId,
+          },
+        },
+      },
+    })
+  }
+
+  /**
+   * Upserts a user and assignes it to a private dialogue
+   * @param emailAddress 
+   * @param dialogueId 
+   * @param phoneNumber 
+   * @returns 
+   */
+  addUserToPrivateDialogue = (emailAddress: string, dialogueId: string, phoneNumber?: string) => {
+    return this.prisma.user.upsert({
+      where: {
+        email: emailAddress,
+      },
+      create: {
+        email: emailAddress,
+        phone: phoneNumber,
+        isAssignedTo: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+      },
+      update: {
+        isAssignedTo: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+      },
+    });
+  }
 
   /**
    * Gets all userCustomers by customer-slug.
@@ -58,7 +141,7 @@ class UserOfCustomerPrismaAdapter {
         },
         customer: {
           include: {
-            settings: { include: { colourSettings: true } }
+            settings: { include: { colourSettings: true } },
           },
         },
       },
@@ -74,7 +157,7 @@ class UserOfCustomerPrismaAdapter {
         userId_customerId: {
           customerId,
           userId,
-        }
+        },
       },
       data: {
         role: {
@@ -96,7 +179,7 @@ class UserOfCustomerPrismaAdapter {
         },
         customer: {
           select: {
-            name: true
+            name: true,
           },
         },
       },

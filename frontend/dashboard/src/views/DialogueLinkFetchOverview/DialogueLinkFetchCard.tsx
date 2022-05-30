@@ -1,0 +1,67 @@
+import * as UI from '@haas/ui';
+import {
+  useClipboard,
+} from '@chakra-ui/core';
+import { useToast } from 'hooks/useToast';
+import { useTranslation } from 'react-i18next';
+import React from 'react';
+import styled, { css } from 'styled-components';
+
+import { stripPrefixFromUrl } from './DialogueLinkFetchCard.helpers';
+
+const DialogueCardContainer = styled(UI.Div)`
+  ${({ theme }) => css`
+    background: white;
+    box-shadow: ${theme.boxShadows.md};
+    border-radius: ${theme.borderRadiuses.md}px;
+    transition: all ${theme.transitions.normal};
+
+    &:hover {
+      box-shadow: ${theme.boxShadows.lg};
+      cursor: pointer;
+      transition: all ${theme.transitions.normal};
+    }
+  `}
+`;
+
+const DialogueCard = ({ dialogue }: { dialogue: any }) => {
+  const toast = useToast();
+  const { onCopy, hasCopied } = useClipboard(dialogue.url);
+  const { t } = useTranslation();
+
+  const handleCardClick = () => {
+    onCopy?.();
+    toast.success({ title: 'Dialogue url copied', description: 'Copied the url of the selected dialogue' });
+  };
+
+  const urlBase = stripPrefixFromUrl(dialogue.url);
+
+  return (
+    <DialogueCardContainer
+      data-cy="DialogueCard"
+      bg="white"
+      onClick={() => handleCardClick()}
+    >
+      <UI.CardBody height="100%">
+        <UI.ColumnFlex justifyContent="space-between" height="100%">
+          <UI.Div>
+            <UI.H4 color="off.600" fontWeight="700">
+              {dialogue.title}
+            </UI.H4>
+            <UI.ExtLink to={dialogue.url} color="off.300">
+              {urlBase}
+            </UI.ExtLink>
+          </UI.Div>
+
+          <UI.Div>
+            <UI.Button size="sm" variant="outline">
+              {hasCopied ? t('copied') : t('copy_link')}
+            </UI.Button>
+          </UI.Div>
+        </UI.ColumnFlex>
+      </UI.CardBody>
+    </DialogueCardContainer>
+  );
+};
+
+export default DialogueCard;

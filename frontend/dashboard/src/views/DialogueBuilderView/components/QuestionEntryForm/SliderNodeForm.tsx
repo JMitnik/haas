@@ -23,8 +23,6 @@ const SliderNodeForm = ({ form }: { form: any }) => {
 
   const hasCustomerSatisfactionTexts = form.watch('happyText') ? 1 : 0;
 
-  const sliderNodeMarkers = form.watch('sliderNode.markers');
-
   return (
     <UI.Div>
       <UI.InputGrid>
@@ -125,14 +123,16 @@ const SliderNodeForm = ({ form }: { form: any }) => {
                     <UI.RangeSlider
                       isDisabled
                       stepSize={0.5}
-                      min={sliderNodeMarkers[index].range?.start}
-                      max={sliderNodeMarkers[index].range?.end || 10}
+                      defaultValue={[marker.range?.start || 0, marker.range?.end || 10]}
+                      min={0}
+                      max={10}
                     />
                   </UI.Div>
                 </UI.Grid>
               </UI.CardBody>
             </UI.Card>
           ))}
+
         </UI.Div>
       </UI.InputGrid>
 

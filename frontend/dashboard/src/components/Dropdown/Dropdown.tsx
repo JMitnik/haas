@@ -15,15 +15,25 @@ interface DropdownProps {
   placement?: Placement;
   offset?: [number, number];
   minWidth?: number;
+  defaultCloseOnClickOutside?: boolean;
 }
 
-const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset = [0, 12], minWidth }: DropdownProps) => {
+const Dropdown = ({
+  children,
+  renderOverlay,
+  placement = 'right-start',
+  offset = [0, 12],
+  minWidth,
+  defaultCloseOnClickOutside = true,
+}: DropdownProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [overlay, setOverlay] = useState<HTMLDivElement | null>(null);
   const [toggleRef, setToggleRef] = useState<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  useOnClickOutside(ref, () => setIsOpen(false));
+  const [closeClickOnOutside, setCloseClickOnOutside] = useState(defaultCloseOnClickOutside);
+
+  useOnClickOutside(ref, () => !!closeClickOnOutside && setIsOpen(false));
   const { styles, attributes } = usePopper(toggleRef, overlay, {
     placement,
     strategy: 'fixed',
@@ -64,7 +74,7 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
                   exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                 >
                   <DropdownOverlayContainer minWidth={minWidth} ref={ref} onClick={(e) => e.stopPropagation()}>
-                    {renderOverlay?.({ onClose: handleClose })}
+                    {renderOverlay?.({ setCloseClickOnOutside, onClose: handleClose })}
                   </DropdownOverlayContainer>
                 </motion.div>
               </Div>,
@@ -79,7 +89,7 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
         ref={setToggleRef}
       >
         <>
-          {children?.({ onOpen: handleToggleDropdown, onClose: handleClose })}
+          {children?.({ setCloseClickOnOutside, onOpen: handleToggleDropdown, onClose: handleClose })}
         </>
       </Div>
     </>

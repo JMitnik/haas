@@ -7,7 +7,8 @@ export const ButtonBody = styled.span``;
 
 export const OutlineButton = styled(Button)`
   ${({ theme }) => css`
-    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
+    color: ${Color(theme.colors.primary).isDark()
+    ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
     : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
     background: transparent;
     border-radius: 10px;
@@ -20,7 +21,7 @@ export const OutlineButton = styled(Button)`
 
 type Size = 'sm' | 'md' | 'lg';
 
-export const ClientButton = styled(Button)<{ usePulse?: boolean, size?: Size }>`
+export const ClientButton = styled(Button) <{ usePulse?: boolean, size?: Size }>`
   ${({ isActive = true, theme, usePulse = false, size }) => css`
     width: 100%;
     grid-column: 1 / 2;
@@ -40,14 +41,14 @@ export const ClientButton = styled(Button)<{ usePulse?: boolean, size?: Size }>`
     transform: none;
     padding: 12px !important;
     font-size: 1rem;
-    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()}); 
+    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()});
     font-family: 'Inter', sans-serif;
     color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex()
-    : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+    : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()} !important;
     white-space: normal !important;
 
     &:disabled {
-      background: linear-gradient(45deg, ${Color(theme.colors.gray[500]).lighten(0.3).hex()}, ${Color(theme.colors.gray[500]).lighten(0.3).saturate(1).hex()}); 
+      background: linear-gradient(45deg, ${Color(theme.colors.gray[500]).lighten(0.3).hex()}, ${Color(theme.colors.gray[500]).lighten(0.3).saturate(1).hex()});
     }
 
     > svg {
@@ -58,7 +59,7 @@ export const ClientButton = styled(Button)<{ usePulse?: boolean, size?: Size }>`
     ${size && size === 'lg' && css`
       font-size: 1.5rem;
       padding: 30px !important;
-    `} 
+    `}
 
     ${ButtonBody} {
       width: 100%;
@@ -95,7 +96,7 @@ export const ClientButton = styled(Button)<{ usePulse?: boolean, size?: Size }>`
         transform: scale(0.95);
         box-shadow: 0 0 0 0 rgba(${Color(theme.colors.primary).array().join(',')}, 0.7);
       }
-      
+
       70% {
         transform: scale(1);
         box-shadow: 0 0 0 50px rgba(${Color(theme.colors.primary).array().join(',')}, 0);
@@ -105,6 +106,6 @@ export const ClientButton = styled(Button)<{ usePulse?: boolean, size?: Size }>`
         transform: scale(0.95);
         box-shadow: 0 0 0 0px rgba(${Color(theme.colors.primary).array().join(',')}, 0);
       }
-    } 
+    }
   `}
 `;
