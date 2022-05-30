@@ -27,15 +27,15 @@ const stagingCoreTemp = new StagingCoreTemp(app, 'StagingCoreTemp', {
   dbSecurityGroup: stagingCoreFixed.db.dbSecurityGroup,
   env: stagingEnv,
 });
-const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
-    prefix: 'haas_svc_api',
-    apiService: api.apiService,
-    dbUrl: api.dbUrl,
-    vpc: api.vpc,
-    rdsPassword: api.rdsPassword,
-    db: api.db,
-    rdsSecurityGroup: api.rdsSecurityGroup
-});
+// const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
+//     prefix: 'haas_svc_api',
+//     apiService: api.apiService,
+//     dbUrl: api.dbUrl,
+//     vpc: api.vpc,
+//     rdsPassword: api.rdsPassword,
+//     db: api.db,
+//     rdsSecurityGroup: api.rdsSecurityGroup
+// });
 
 // // // Campaign stack
 // const campaign = new HaasCampaignStack(app, 'HAASCampaign', {
