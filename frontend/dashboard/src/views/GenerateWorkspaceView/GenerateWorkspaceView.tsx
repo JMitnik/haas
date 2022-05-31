@@ -83,8 +83,6 @@ export const GenerateWorkspaceView = () => {
     defaultValue: 0,
   });
 
-  console.log({ usesGeneratedData });
-
   const handleDrop = (files: File[]) => {
     if (!files.length) return;
 

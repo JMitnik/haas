@@ -18,6 +18,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
+import * as LS from 'views/GenerateWorkspaceView/GenerateWorkspaceView.styles';
 import * as Menu from 'components/Common/Menu';
 import {
   AutomationActionType,
@@ -34,6 +35,7 @@ import {
   OperandType,
   QuestionAspectType,
   QuestionNodeTypeEnum,
+  RecurringPeriodType,
   UpdateAutomationMutation,
 } from 'types/generated-types';
 import { AutomationInput } from 'views/EditAutomationView/EditAutomationViewTypes';
@@ -111,6 +113,15 @@ const schema = yup.object({
       ).notRequired(),
     }).nullable().notRequired(),
   }).required(),
+  schedule: yup.object().shape({
+    type: yup.mixed<RecurringPeriodType>().oneOf(Object.values(RecurringPeriodType)),
+    minutes: yup.string(),
+    hours: yup.string(),
+    dayOfMonth: yup.string(),
+    month: yup.string(),
+    dayOfWeek: yup.string(),
+    year: yup.string(),
+  }),
   actions: yup.array().of(
     yup.object().shape({
       action: yup.object().shape({
@@ -128,6 +139,49 @@ const schema = yup.object({
     }),
   ).required(),
 }).required();
+
+const SCHEDULE_TYPE_OPTIONS = [
+  {
+    label: 'End of the day',
+    description: 'Run this every day at 18:00',
+    value: RecurringPeriodType.EndOfDay,
+  },
+  {
+    label: 'End of the week',
+    description: 'Run this at the end of the week (Friday) at 18:00',
+    value: RecurringPeriodType.EndOfWeek,
+  },
+  {
+    label: 'Start of the day',
+    description: 'Run this every day at 09:00',
+    value: RecurringPeriodType.StartOfDay,
+  },
+  {
+    label: 'Start of the week',
+    description: 'Run this at the start of the week (Monday) at 09:00',
+    value: RecurringPeriodType.StartOfWeek,
+  },
+  {
+    label: 'Custom',
+    description: 'Run this based on a custom schedule',
+    value: RecurringPeriodType.Custom,
+  },
+];
+
+const getCronByScheduleType = (scheduleType: RecurringPeriodType) => {
+  switch (scheduleType) {
+    case RecurringPeriodType.EndOfDay:
+      return '0 18 ? * MON-FRI *';
+    case RecurringPeriodType.EndOfWeek:
+      return '0 18 ? * FRI *';
+    case RecurringPeriodType.StartOfDay:
+      return '0 9 ? * MON-FRI *';
+    case RecurringPeriodType.StartOfWeek:
+      return '0 9 ? * MON *';
+    default:
+      return '';
+  }
+};
 
 type FormDataProps = yup.InferType<typeof schema>;
 
@@ -264,6 +318,16 @@ const AutomationForm = ({
     control: form.control,
   });
 
+  const watchAutomationType = useWatch({
+    name: 'automationType',
+    control: form.control,
+  });
+
+  const watchScheduleType = useWatch({
+    name: 'schedule.type',
+    control: form.control,
+  });
+
   const onSubmit = (formData: FormDataProps) => {
     // TODO: Create a field for event type
     // TODO: Create a picker for questionId/dialogueId for event
@@ -313,6 +377,8 @@ const AutomationForm = ({
     }
   };
 
+  console.log('watchScheduleType: ', watchScheduleType);
+
   return (
     <>
       <UI.FormContainer>
@@ -355,8 +421,7 @@ const AutomationForm = ({
                         />
                         <UI.RadioButton
                           icon={Clock}
-                          isDisabled
-                          value="RECURRING"
+                          value={AutomationType.Scheduled}
                           mr={2}
                           text={(t('automation:recurring'))}
                           description={t('automation:recurring_helper')}
@@ -379,204 +444,331 @@ const AutomationForm = ({
           </FormSection>
 
           <Hr />
+          {watchAutomationType === AutomationType.Trigger && (
+            <FormSection id="conditions">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('automation:conditions')}</H3>
+                <Muted color="gray.600">
+                  {t('automation:conditions_helper')}
+                </Muted>
+              </Div>
+              <UI.Flex>
+                <UI.Div
+                  width="100%"
+                  backgroundColor="#fbfcff"
+                  border="1px solid #edf2f7"
+                  borderRadius="10px"
+                  padding={4}
+                  paddingLeft={0}
+                  paddingRight={0}
+                >
+                  {(conditionFields.length) ? (
+                    <>
+                      <UI.Grid m={2} gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto">
 
-          <FormSection id="conditions">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('automation:conditions')}</H3>
-              <Muted color="gray.600">
-                {t('automation:conditions_helper')}
-              </Muted>
-            </Div>
-            <UI.Flex>
-              <UI.Div
-                width="100%"
-                backgroundColor="#fbfcff"
-                border="1px solid #edf2f7"
-                borderRadius="10px"
-                padding={4}
-                paddingLeft={0}
-                paddingRight={0}
-              >
-                {(conditionFields.length) ? (
-                  <>
-                    <UI.Grid m={2} gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto">
-
-                      <UI.Helper>{t('automation:logic')}</UI.Helper>
-                      <UI.Helper>{t('automation:condition')}</UI.Helper>
-                      <UI.Helper>{t('automation:operator')}</UI.Helper>
-                      <UI.Helper>{t('automation:compare_to')}</UI.Helper>
-                    </UI.Grid>
-                    {conditionFields.map((condition, index) => (
-                      <UI.Grid
-                        key={condition?.arrayKey}
-                        ml={2}
-                        mr={2}
-                        p={2}
-                        borderRadius="6px"
-                        borderBottom="1px solid #edf2f7"
-                        gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto"
-                        backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
-                        position="relative"
-                      >
-                        <input defaultValue={0} type="hidden" {...form.register(`conditionBuilder.conditions.${index}.depth`)} />
-                        <UI.Div>
-                          {index === 1 && (
-                            <Controller
-                              name="conditionBuilder.logical"
-                              control={form.control}
-                              render={({ field }) => {
-                                return (
-                                  <Select
-                                    options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                  />
-                                );
-                              }}
-                            />
-                          )}
-                          {index > 1 && (
-                            <Select
-                              isDisabled
-                              value={watchLogicalBuilder}
-                            />
-                          )}
-                        </UI.Div>
-                        {(condition as any)?.isGrouped && (
-                          <UI.Div gridColumn="2 / 7">
-                            <ChildBuilderEntry
-                              activeConditions={activeConditions}
-                              onAddCondition={setActiveConditions}
-                              form={form}
-                              openMenu={openMenu}
-                              append={childBuilderFieldArray.append}
-                              remove={childBuilderFieldArray.remove}
-                              conditionFields={childBuilderFieldArray.fields}
-                            />
-                          </UI.Div>
-
-                        )}
-                        {!(condition as any)?.isGrouped && (
-                          <>
-                            <UI.Div alignItems="center" display="flex">
-                              <Controller
-                                name={`conditionBuilder.conditions.${index}.condition`}
-                                control={form.control}
-                                defaultValue={(condition as any)?.condition}
-                                render={({ field: { value, onChange } }) => (
-                                  <Dropdown
-                                    defaultCloseOnClickOutside={false}
-                                    renderOverlay={({ onClose, setCloseClickOnOutside }) => (
-                                      <ConditionNodePicker
-                                        onAddCondition={setActiveConditions}
-                                        items={activeConditions}
-                                        onClose={onClose}
-                                        onChange={(data) => onChange(data)}
-                                        onModalOpen={() => setCloseClickOnOutside(false)}
-                                        onModalClose={() => setCloseClickOnOutside(true)}
-                                      />
-                                    )}
-                                  >
-                                    {({ onOpen }) => (
-                                      <UI.Div
-                                        width="100%"
-                                        justifyContent="center"
-                                        display="flex"
-                                        alignItems="center"
-                                      >
-                                        {value ? (
-                                          <ConditionCell
-                                            onRemove={() => {
-                                              onChange(null);
-                                            }}
-                                            onClick={onOpen}
-                                            condition={value}
-                                          />
-                                        ) : (
-                                          <UI.Button
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={onOpen}
-                                            variantColor="altGray"
-                                          >
-                                            <UI.Icon mr={1}>
-                                              <PlusCircle />
-                                            </UI.Icon>
-                                            {t('automation:add_condition')}
-                                          </UI.Button>
-                                        )}
-                                      </UI.Div>
-                                    )}
-                                  </Dropdown>
-                                )}
-                              />
-                            </UI.Div>
-                            <UI.Div>
-                              <Controller
-                                name={`conditionBuilder.conditions.${index}.operator`}
-                                defaultValue={undefined}
-                                control={form.control}
-                                render={({ field: { value, onChange } }) => (
-                                  <Select options={OPERATORS} onChange={onChange} value={value} />
-                                )}
-                              />
-                            </UI.Div>
-                            <FormControl isRequired>
-                              <Input
-                                {...form.register(`conditionBuilder.conditions.${index}.compareTo`, { required: true })}
-                              />
-                            </FormControl>
-                            <UI.Icon
-                              color="#808b9a"
-                              style={{ cursor: 'pointer' }}
-                              mr={1}
-                              onClick={(e) => openMenu(e, condition)}
-                            >
-                              <MoreVertical />
-                            </UI.Icon>
-                          </>
-                        )}
-
+                        <UI.Helper>{t('automation:logic')}</UI.Helper>
+                        <UI.Helper>{t('automation:condition')}</UI.Helper>
+                        <UI.Helper>{t('automation:operator')}</UI.Helper>
+                        <UI.Helper>{t('automation:compare_to')}</UI.Helper>
                       </UI.Grid>
-                    ))}
-                    <UI.Div ml={4} mt={4}>
-                      <UI.Button
-                        variantColor="gray"
-                        onClick={
-                          () => append({
-                            depth: 0,
-                            compareTo: undefined,
-                            operator: null,
-                            condition: undefined,
-                          })
-                        }
+                      {conditionFields.map((condition, index) => (
+                        <UI.Grid
+                          key={condition?.arrayKey}
+                          ml={2}
+                          mr={2}
+                          p={2}
+                          borderRadius="6px"
+                          borderBottom="1px solid #edf2f7"
+                          gridTemplateColumns="1.2fr 4fr 1.2fr 2fr auto"
+                          backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
+                          position="relative"
+                        >
+                          <input defaultValue={0} type="hidden" {...form.register(`conditionBuilder.conditions.${index}.depth`)} />
+                          <UI.Div>
+                            {index === 1 && (
+                              <Controller
+                                name="conditionBuilder.logical"
+                                control={form.control}
+                                render={({ field }) => {
+                                  return (
+                                    <Select
+                                      options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
+                                      value={field.value}
+                                      onChange={field.onChange}
+                                    />
+                                  );
+                                }}
+                              />
+                            )}
+                            {index > 1 && (
+                              <Select
+                                isDisabled
+                                value={watchLogicalBuilder}
+                              />
+                            )}
+                          </UI.Div>
+                          {(condition as any)?.isGrouped && (
+                            <UI.Div gridColumn="2 / 7">
+                              <ChildBuilderEntry
+                                activeConditions={activeConditions}
+                                onAddCondition={setActiveConditions}
+                                form={form}
+                                openMenu={openMenu}
+                                append={childBuilderFieldArray.append}
+                                remove={childBuilderFieldArray.remove}
+                                conditionFields={childBuilderFieldArray.fields}
+                              />
+                            </UI.Div>
+
+                          )}
+                          {!(condition as any)?.isGrouped && (
+                            <>
+                              <UI.Div alignItems="center" display="flex">
+                                <Controller
+                                  name={`conditionBuilder.conditions.${index}.condition`}
+                                  control={form.control}
+                                  defaultValue={(condition as any)?.condition}
+                                  render={({ field: { value, onChange } }) => (
+                                    <Dropdown
+                                      defaultCloseOnClickOutside={false}
+                                      renderOverlay={({ onClose, setCloseClickOnOutside }) => (
+                                        <ConditionNodePicker
+                                          onAddCondition={setActiveConditions}
+                                          items={activeConditions}
+                                          onClose={onClose}
+                                          onChange={(data) => onChange(data)}
+                                          onModalOpen={() => setCloseClickOnOutside(false)}
+                                          onModalClose={() => setCloseClickOnOutside(true)}
+                                        />
+                                      )}
+                                    >
+                                      {({ onOpen }) => (
+                                        <UI.Div
+                                          width="100%"
+                                          justifyContent="center"
+                                          display="flex"
+                                          alignItems="center"
+                                        >
+                                          {value ? (
+                                            <ConditionCell
+                                              onRemove={() => {
+                                                onChange(null);
+                                              }}
+                                              onClick={onOpen}
+                                              condition={value}
+                                            />
+                                          ) : (
+                                            <UI.Button
+                                              size="sm"
+                                              variant="outline"
+                                              onClick={onOpen}
+                                              variantColor="altGray"
+                                            >
+                                              <UI.Icon mr={1}>
+                                                <PlusCircle />
+                                              </UI.Icon>
+                                              {t('automation:add_condition')}
+                                            </UI.Button>
+                                          )}
+                                        </UI.Div>
+                                      )}
+                                    </Dropdown>
+                                  )}
+                                />
+                              </UI.Div>
+                              <UI.Div>
+                                <Controller
+                                  name={`conditionBuilder.conditions.${index}.operator`}
+                                  defaultValue={undefined}
+                                  control={form.control}
+                                  render={({ field: { value, onChange } }) => (
+                                    <Select options={OPERATORS} onChange={onChange} value={value} />
+                                  )}
+                                />
+                              </UI.Div>
+                              <FormControl isRequired>
+                                <Input
+                                  {...form.register(`conditionBuilder.conditions.${index}.compareTo`, { required: true })}
+                                />
+                              </FormControl>
+                              <UI.Icon
+                                color="#808b9a"
+                                style={{ cursor: 'pointer' }}
+                                mr={1}
+                                onClick={(e) => openMenu(e, condition)}
+                              >
+                                <MoreVertical />
+                              </UI.Icon>
+                            </>
+                          )}
+
+                        </UI.Grid>
+                      ))}
+                      <UI.Div ml={4} mt={4}>
+                        <UI.Button
+                          variantColor="gray"
+                          onClick={
+                            () => append({
+                              depth: 0,
+                              compareTo: undefined,
+                              operator: null,
+                              condition: undefined,
+                            })
+                          }
+                        >
+                          <UI.Icon mr={1}>
+                            <PlusCircle />
+                          </UI.Icon>
+                          {t('add_condition')}
+                        </UI.Button>
+                      </UI.Div>
+                    </>
+                  ) : (
+                    <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
+                      <Button
+                        leftIcon={PlusCircle}
+                        onClick={() => setCreateModalIsOpen({ isOpen: true, modal: ModalType.CreateCondition })}
+                        size="sm"
+                        variant="outline"
+                        variantColor="teal"
                       >
-                        <UI.Icon mr={1}>
-                          <PlusCircle />
-                        </UI.Icon>
-                        {t('add_condition')}
-                      </UI.Button>
-                    </UI.Div>
-                  </>
-                ) : (
-                  <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
-                    <Button
-                      leftIcon={PlusCircle}
-                      onClick={() => setCreateModalIsOpen({ isOpen: true, modal: ModalType.CreateCondition })}
-                      size="sm"
-                      variant="outline"
-                      variantColor="teal"
-                    >
-                      {t('trigger:add_condition')}
-                    </Button>
-                  </UI.IllustrationCard>
+                        {t('trigger:add_condition')}
+                      </Button>
+                    </UI.IllustrationCard>
+                  )}
+                </UI.Div>
+              </UI.Flex>
+              <Hr />
+            </FormSection>
+          )}
+          {watchAutomationType === AutomationType.Scheduled && (
+            <UI.FormSection id="scheduled">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('automation:schedule')}</H3>
+                <Muted color="gray.600">
+                  {t('automation:schedule_helper')}
+                </Muted>
+              </Div>
+              <InputGrid>
+                <UI.FormControl>
+                  <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
+                  <InputHelper>{t('automation:type_helper')}</InputHelper>
+                  <Controller
+                    name="schedule.type"
+                    control={form.control}
+                    render={({ field: { value, onChange, onBlur } }) => (
+                      <LS.RadioGroupRoot
+                        defaultValue={value}
+                        onValueChange={onChange}
+                        onBlur={onBlur}
+                        variant="spaced"
+                      >
+                        {SCHEDULE_TYPE_OPTIONS.map((option) => (
+                          <LS.RadioGroupBox
+                            htmlFor={option.value}
+                            key={option.value}
+                            isActive={value === option.value}
+                            contentVariant="twoLine"
+                            variant="boxed"
+                          >
+                            <LS.RadioGroupItem id={option.value} key={option.value} value={option.value}>
+                              <LS.RadioGroupIndicator />
+                            </LS.RadioGroupItem>
+                            <UI.Div>
+                              <LS.RadioGroupLabel>
+                                {option.label}
+                              </LS.RadioGroupLabel>
+                              <LS.RadioGroupSubtitle>
+                                {option.description}
+                              </LS.RadioGroupSubtitle>
+                            </UI.Div>
+                          </LS.RadioGroupBox>
+                        ))}
+                      </LS.RadioGroupRoot>
+                    )}
+                  />
+                </UI.FormControl>
+                {watchScheduleType === RecurringPeriodType.Custom && (
+                  <UI.Grid
+                    gridTemplateColumns="1fr 1fr"
+                    p={2}
+                    borderRadius="6px"
+                    border="1px solid #edf2f7"
+                    backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
+                  >
+                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.minutes}>
+                      <FormLabel htmlFor="minutes">{t('minutes')}</FormLabel>
+                      <InputHelper>{t('minutes_helper')}</InputHelper>
+                      <Input
+                        placeholder={t('cron_minutes_placeholder')}
+                        leftEl={<Type />}
+                        {...form.register('schedule.minutes')}
+                      />
+                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.minutes?.message || '')}</UI.ErrorMessage>
+                    </FormControl>
+
+                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.hours}>
+                      <FormLabel htmlFor="hours">{t('hours')}</FormLabel>
+                      <InputHelper>{t('hours_helper')}</InputHelper>
+                      <Input
+                        placeholder={t('cron_hours_placeholder')}
+                        leftEl={<Type />}
+                        {...form.register('schedule.hours')}
+                      />
+                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.hours?.message || '')}</UI.ErrorMessage>
+                    </FormControl>
+
+                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.dayOfMonth}>
+                      <FormLabel htmlFor="day_of_month">{t('day_of_month')}</FormLabel>
+                      <InputHelper>{t('day_of_month_helper')}</InputHelper>
+                      <Input
+                        placeholder={t('cron_day_of_month_placeholder')}
+                        leftEl={<Type />}
+                        {...form.register('schedule.dayOfMonth')}
+                      />
+                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.dayOfMonth?.message || '')}</UI.ErrorMessage>
+                    </FormControl>
+
+                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.month}>
+                      <FormLabel htmlFor="month">{t('month')}</FormLabel>
+                      <InputHelper>{t('month_helper')}</InputHelper>
+                      <Input
+                        placeholder={t('cron_month_placeholder')}
+                        leftEl={<Type />}
+                        {...form.register('schedule.month')}
+                      />
+                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.month?.message || '')}</UI.ErrorMessage>
+                    </FormControl>
+
+                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.dayOfWeek}>
+                      <FormLabel htmlFor="dayOfWeek">{t('day_of_week')}</FormLabel>
+                      <InputHelper>{t('day_of_week_helper')}</InputHelper>
+                      <Input
+                        placeholder={t('cron_day_of_week_placeholder')}
+                        leftEl={<Type />}
+                        {...form.register('schedule.dayOfWeek')}
+                      />
+                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.dayOfWeek?.message || '')}</UI.ErrorMessage>
+                    </FormControl>
+
+                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.year}>
+                      <FormLabel htmlFor="year">{t('year')}</FormLabel>
+                      <InputHelper>{t('year_helper')}</InputHelper>
+                      <Input
+                        placeholder={t('cron_year_placeholder')}
+                        leftEl={<Type />}
+                        {...form.register('schedule.year')}
+                      />
+                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.year?.message || '')}</UI.ErrorMessage>
+                    </FormControl>
+
+                  </UI.Grid>
+
                 )}
-              </UI.Div>
-            </UI.Flex>
-          </FormSection>
 
-          <Hr />
-
+              </InputGrid>
+            </UI.FormSection>
+          )}
           <FormSection id="actions">
             <Div>
               <H3 color="default.text" fontWeight={500} pb={2}>{t('automation:actions')}</H3>

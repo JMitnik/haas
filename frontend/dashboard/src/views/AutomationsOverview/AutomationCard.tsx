@@ -1,6 +1,6 @@
 import * as Dropdown from 'components/Common/Dropdown';
 import * as UI from '@haas/ui';
-import { Activity, Bell, Briefcase } from 'react-feather';
+import { Activity, Bell, Briefcase, Clock, Watch } from 'react-feather';
 import {
   Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent,
   PopoverFooter, PopoverHeader, PopoverTrigger, Switch, useToast,
@@ -149,11 +149,11 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
   const renderAutomationTypeColor = (type: AutomationType) => {
     switch (type) {
       case AutomationType.Trigger:
-        return '#7069FA';
-      case AutomationType.Campaign:
-        return '#2CB1BC';
+        return { primary: '#7069FA', secondary: '#B0ADF2' };
+      case AutomationType.Scheduled:
+        return { primary: '#2CB1BC', secondary: '#73D6DE' };
       default:
-        return '#AFB4C6';
+        return { primary: '#AFB4C6', secondary: '#DEDFE1' };
     }
   };
 
@@ -170,13 +170,19 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
       flexDirection="column"
       position="relative"
     >
-      <UI.AccentBorder backgroundColor={automationTypeColour} />
+      <UI.AccentBorder backgroundColor={automationTypeColour.primary} />
       <UI.CardBody flex="100%">
         <UI.ColumnFlex height="100%">
 
           <UI.Flex paddingBottom="1em" alignItems="baseline" justifyContent="space-between">
-            <TypeBadge>
-              <Bell color={automationTypeColour} />
+            <TypeBadge backgroundColor={automationTypeColour.secondary}>
+              {automation.type === AutomationType.Trigger && (
+                <Bell color={automationTypeColour.primary} />
+              )}
+
+              {automation.type === AutomationType.Scheduled && (
+                <Clock color={automationTypeColour.primary} />
+              )}
             </TypeBadge>
             <Switch
               isDisabled={!canUpdateAutomations && !canAccessAdmin}

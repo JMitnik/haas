@@ -243,7 +243,8 @@ export type AutomationTriggerModel = {
 
 export enum AutomationType {
   Trigger = 'TRIGGER',
-  Campaign = 'CAMPAIGN'
+  Campaign = 'CAMPAIGN',
+  Scheduled = 'SCHEDULED'
 }
 
 export type AwsImageType = {
@@ -490,6 +491,10 @@ export type CreateQuestionNodeInputType = {
   happyText?: Maybe<Scalars['String']>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
+};
+
+export type CreateScheduledAutomationInput = {
+  workspaceSlug: Scalars['String'];
 };
 
 export type CreateTriggerInputType = {
@@ -1379,6 +1384,8 @@ export type Mutation = {
   handleAutomationActions?: Maybe<Scalars['Boolean']>;
   enableAutomation?: Maybe<AutomationModel>;
   deleteAutomation?: Maybe<AutomationModel>;
+  sendAutomationReport?: Maybe<Scalars['Boolean']>;
+  createScheduledAutomationResolver?: Maybe<Scalars['String']>;
   createCampaign: CampaignType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
   updateDeliveryStatus: Scalars['String'];
@@ -1519,6 +1526,16 @@ export type MutationEnableAutomationArgs = {
 
 export type MutationDeleteAutomationArgs = {
   input?: Maybe<DeleteAutomationInput>;
+};
+
+
+export type MutationSendAutomationReportArgs = {
+  input?: Maybe<SendAutomationReportInput>;
+};
+
+
+export type MutationCreateScheduledAutomationResolverArgs = {
+  input?: Maybe<CreateScheduledAutomationInput>;
 };
 
 
@@ -2193,7 +2210,8 @@ export enum RecurringPeriodType {
   StartOfDay = 'START_OF_DAY',
   EndOfDay = 'END_OF_DAY',
   StartOfWeek = 'START_OF_WEEK',
-  EndOfWeek = 'END_OF_WEEK'
+  EndOfWeek = 'END_OF_WEEK',
+  Custom = 'CUSTOM'
 }
 
 export type RefreshAccessTokenOutput = {
@@ -2268,6 +2286,12 @@ export type RoleType = {
   nrPermissions?: Maybe<Scalars['Int']>;
   allPermissions: Array<SystemPermission>;
   permissions?: Maybe<Array<SystemPermission>>;
+};
+
+export type SendAutomationReportInput = {
+  workspaceSlug: Scalars['String'];
+  automationActionId: Scalars['String'];
+  reportUrl: Scalars['String'];
 };
 
 export type Session = {

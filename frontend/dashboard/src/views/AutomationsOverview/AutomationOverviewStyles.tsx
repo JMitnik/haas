@@ -2,12 +2,14 @@ import { Card, Div, Flex } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
 export const TypeBadge = styled(Div)`
-  display: flex;
-  justify-content: center;
-  width: fit-content;
-  border-radius: 45px;
-  padding: 0.5em;
-  background-color: rgba(112,105,250, 0.5);
+ ${({ backgroundColor }) => css`
+    display: flex;
+    justify-content: center;
+    width: fit-content;
+    border-radius: 45px;
+    padding: 0.5em;
+    background-color: ${backgroundColor as string || 'rgba(112,105,250, 0.5)'} ;
+ `}
 `;
 
 export const TranslatedPlus = styled(Div)`

@@ -215,6 +215,7 @@ type AutomationTriggerModel {
 
 enum AutomationType {
   CAMPAIGN
+  SCHEDULED
   TRIGGER
 }
 
@@ -1552,6 +1553,7 @@ input RecipientsInputType {
 }
 
 enum RecurringPeriodType {
+  CUSTOM
   END_OF_DAY
   END_OF_WEEK
   EVERY_DAY

@@ -9,6 +9,7 @@ import {
   AutomationActionType,
   AutomationConditionBuilderType,
   Prisma,
+  AutomationType,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { UserInputError } from 'apollo-server-express';
@@ -43,15 +44,17 @@ class AutomationService {
   dialogueService: DialogueService;
   userService: UserService;
   automationActionService: AutomationActionService;
+  prisma: PrismaClient;
 
   constructor(prisma: PrismaClient) {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
     this.dialogueService = new DialogueService(prisma);
     this.automationActionService = new AutomationActionService(prisma);
     this.userService = new UserService(prisma);
+    this.prisma = prisma;
   }
 
-  createScheduled = async () => {
+  createScheduled = async (workspaceSlug: string) => {
     // TODO: Remove accessKeys and replace it with something that lets deployed account run this
     const clientEvent = new AWS.EventBridge({
       region: 'eu-central-1',
@@ -68,7 +71,7 @@ class AutomationService {
 
     await clientEvent.deleteRule({
       Name: 'NEW_EVENT_BRIDGE_TEST',
-    }).promise()
+    }).promise();
 
     const rule = await clientEvent.putRule({
       Name: 'NEW_EVENT_BRIDGE_TEST',
@@ -76,7 +79,47 @@ class AutomationService {
       State: 'DISABLED',
     }).promise();
 
-    return rule.RuleArn;
+    const ruleArn = rule.RuleArn;
+    console.log('workspaceSlug: ', workspaceSlug);
+
+    await this.prisma.automation.create({
+      data: {
+        type: AutomationType.SCHEDULED,
+        label: 'Scheduled automation',
+        description: 'My first scheduled automation',
+        workspace: {
+          connect: {
+            slug: workspaceSlug,
+          },
+        },
+        automationScheduled: {
+          create: {
+            actions: {
+              create: {
+                type: 'SEND_EMAIL',
+                payload: {
+                  targets: [
+                    {
+                      type: 'USER',
+                      value: 'daan@haas.live',
+                      label: 'Daan Helsloot',
+                    },
+                  ],
+                },
+              },
+            },
+            minutes: '*',
+            hours: '*',
+            dayOfMonth: '?',
+            month: '*',
+            dayOfWeek: 'MON-FRI',
+            year: '*',
+          },
+        },
+      },
+    })
+
+    return ruleArn;
   }
 
   deleteAutomation = async (input: NexusGenInputs['DeleteAutomationInput']) => {

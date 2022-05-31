@@ -11,6 +11,78 @@ const language = {
     },
   },
   general: {
+    day_of_week: {
+      en: 'Day of the week',
+      de: 'Wochentag',
+    },
+    day_of_week_helper: {
+      en: 'Select which days of the week this automation should run',
+      de: 'Wählen Sie aus, an welchen Wochentagen diese Automatisierung ausgeführt werden soll',
+    },
+    cron_day_of_week_placeholder: {
+      en: 'Value between 1-7 or SUN-SAT with , - * ? L #',
+      de: 'Wert zwischen 1-7 oder SO-SA mit , - * ? L # Platzhalter',
+    },
+    year: {
+      en: 'Year',
+      de: 'Jahr',
+    },
+    year_helper: {
+      en: 'Select which year(s) this automation should run',
+      de: 'Wählen Sie aus, in welchen Jahren diese Automatisierung ausgeführt werden soll',
+    },
+    cron_year_placeholder: {
+      en: 'Value between 1970 and 2199 with , - * / wildcards',
+      de: 'Wert zwischen 1970 und 2199 mit , - * / Wildcards',
+    },
+    month: {
+      en: 'Month',
+      de: 'Monat',
+    },
+    month_helper: {
+      en: 'Select which month(s) this automation should run',
+      de: 'Wählen Sie aus, in welchen Monaten diese Automatisierung ausgeführt werden soll',
+    },
+    cron_month_placeholder: {
+      en: 'Value between 1-12 or JAN-DEC with , - * / wildcards',
+      de: 'Wert zwischen 1-12 oder JAN-DEC mit , - * / Wildcards',
+    },
+    day_of_month: {
+      en: 'Day of month',
+      de: 'Day of month',
+    },
+    day_of_month_helper: {
+      en: 'Select which day(s) of the month this automation should run',
+      de: 'Wählen Sie aus, an welchen Tage(n) im Monat diese Automatisierung ausgeführt werden soll',
+    },
+    cron_day_of_month_placeholder: {
+      en: 'Value between 1 and 31 with , - * ? / L W wildcards',
+      de: 'Wert zwischen 0 und 23 mit , - * ? / L W Wildcards',
+    },
+    hours: {
+      en: 'Hours',
+      de: 'Stunde',
+    },
+    hours_helper: {
+      en: 'Which hour(s) should the automation run?',
+      de: 'Welche Stunde soll die Automatisierung laufen?',
+    },
+    cron_hours_placeholder: {
+      en: 'Value between 0 and 23 with , - * / wildcards',
+      de: 'Wert zwischen 0 und 23 mit , - * / Wildcards',
+    },
+    minutes: {
+      en: 'Minutes',
+      de: 'Minute',
+    },
+    minutes_helper: {
+      en: 'Which minute(s) should the automation run?',
+      de: 'Welche Minute(n) soll die Automatisierung laufen?',
+    },
+    cron_minutes_placeholder: {
+      en: 'Value between 0 and 59 with , - * / wildcards',
+      de: 'Wert zwischen 0 und 59 mit , - * / Wildcards',
+    },
     create_automation: {
       en: 'Create automation',
       de: 'Automatisierung erstellen',
@@ -1849,6 +1921,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   automation: {
+    schedule: {
+      en: 'Schedule',
+      de: 'Zeitlicher Ablauf',
+    },
+    schedule_helper: {
+      en: 'Determine what the schedule is for which the automation should be recurring',
+      de: 'Bestimmen Sie den Zeitplan, für den die Automatisierung wiederkehrend sein soll',
+    },
     action: {
       en: 'Action',
       de: 'Aktion',

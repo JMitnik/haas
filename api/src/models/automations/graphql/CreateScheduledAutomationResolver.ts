@@ -17,8 +17,9 @@ export const CreateScheduledAutomationResolver = mutationField('createScheduledA
   async resolve(parent, args, ctx) {
 
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+    console.log('Args.input', args.input.workspaceSlug);
 
-    const RuleArn = await ctx.services.automationService.createScheduled() || null;
+    const RuleArn = await ctx.services.automationService.createScheduled(args.input.workspaceSlug) || null;
     return RuleArn;
   },
 });
