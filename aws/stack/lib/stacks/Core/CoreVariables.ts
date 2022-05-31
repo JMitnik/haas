@@ -47,8 +47,8 @@ export const prodVariables: CoreVariables = {
   repoName: 'haas_core_repo_prod',
   api: {
     baseUrl: 'https://api.haas.live',
-    clientUrL: 'https://client.haas.live',
-    dashboardUrl: 'https://dashboard.haas.live',
+    clientUrL: 'https://www.client.haas.live',
+    dashboardUrl: 'https://www.dashboard.haas.live',
     mailSenderMail: 'hello@haas.live',
     environment: 'production',
   },
