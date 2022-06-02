@@ -11,6 +11,22 @@ query getAutomation($input: GetAutomationInput) {
       slug
       id
     }
+    automationScheduled {
+      id
+      createdAt
+      updatedAt
+      type
+      minutes
+      hours
+      dayOfMonth
+      dayOfWeek
+      month
+      actions {
+        id
+        payload
+        type
+      }
+    }
     automationTrigger {
       id
       activeDialogue {

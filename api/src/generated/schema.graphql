@@ -191,6 +191,7 @@ enum AutomationEventType {
 
 """Automation"""
 type AutomationModel {
+  automationScheduled: AutomationScheduledModel
   automationTrigger: AutomationTriggerModel
   createdAt: Date!
   description: String
@@ -200,6 +201,20 @@ type AutomationModel {
   type: AutomationType!
   updatedAt: Date!
   workspace: Customer
+}
+
+"""AutomationScheduled"""
+type AutomationScheduledModel {
+  actions: [AutomationActionModel!]
+  createdAt: Date!
+  dayOfMonth: String!
+  dayOfWeek: String!
+  hours: String!
+  id: ID!
+  minutes: String!
+  month: String!
+  type: RecurringPeriodType!
+  updatedAt: Date!
 }
 
 input AutomationScheduleInput {

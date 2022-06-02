@@ -162,7 +162,7 @@ export const CreateAutomationInput = inputObjectType({
     // Trigger: condition related fields
     t.field('conditionBuilder', { type: AutomationConditionBuilderInput });
 
-    t.field('schedule', { type: AutomationScheduleInput });
+    t.field('schedule', { type: AutomationScheduleInput, nullable: true });
 
     // Automation Actions
     t.list.field('actions', { type: AutomationActionInput });

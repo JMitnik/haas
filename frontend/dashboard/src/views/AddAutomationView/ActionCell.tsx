@@ -37,11 +37,11 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
             report to:
             <ul>
               {action.targets.map((target) => (
-                <li key={`${target.target.type}-${target.target.label}`} style={{ marginLeft: '1em' }}>
-                  {target.target.type}
+                <li key={`${target.target?.type}-${target.target?.label}`} style={{ marginLeft: '1em' }}>
+                  {target.target?.type}
                   :
                   {' '}
-                  <UI.Span color="#4A5568" fontWeight="bold">{target.target.label}</UI.Span>
+                  <UI.Span color="#4A5568" fontWeight="bold">{target.target?.label}</UI.Span>
                 </li>
               ))}
             </ul>

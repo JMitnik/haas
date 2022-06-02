@@ -774,7 +774,6 @@ model AutomationScheduled {
   dayOfMonth String
   month      String
   dayOfWeek  String
-  year       String
 
   automations Automation[]
   actions     AutomationAction[]

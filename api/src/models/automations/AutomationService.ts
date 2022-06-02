@@ -113,7 +113,6 @@ class AutomationService {
             dayOfMonth: '?',
             month: '*',
             dayOfWeek: 'MON-FRI',
-            year: '*',
           },
         },
       },
@@ -798,11 +797,16 @@ class AutomationService {
     const label: CreateAutomationInput['label'] = validatedInput.label;
     const workspaceId: CreateAutomationInput['workspaceId'] = validatedInput.workspaceId;
     const automationType: CreateAutomationInput['automationType'] = validatedInput.automationType;
-    const conditions: CreateAutomationInput['conditions'] = this.constructCreateAutomationConditionsInput(input);
+    const conditions: CreateAutomationInput['conditions'] = automationType === AutomationType.TRIGGER ? this.constructCreateAutomationConditionsInput(input) : undefined;
 
-    const builderInput = input.conditionBuilder as Required<NexusGenInputs['AutomationConditionBuilderInput']>;
-    const conditionBuilder: CreateAutomationInput['conditionBuilder'] = this.constructBuilderRecursive(builderInput)
+    const builderInput = automationType === AutomationType.TRIGGER ? input.conditionBuilder as Required<NexusGenInputs['AutomationConditionBuilderInput']> : undefined;
+    const conditionBuilder: CreateAutomationInput['conditionBuilder'] = builderInput ? this.constructBuilderRecursive(builderInput) : undefined;
     const event: CreateAutomationInput['event'] = this.constructCreateAutomationEventInput(input);
+
+    const schedule: CreateAutomationInput['schedule'] = input?.schedule
+      ? { ...input?.schedule, id: input.schedule?.id || undefined }
+      : undefined;
+
     const actions: CreateAutomationInput['actions'] = this.constructAutomationActionsInput(input);
 
     return {
@@ -814,6 +818,7 @@ class AutomationService {
       actions,
       description: input.description,
       conditionBuilder,
+      schedule,
     }
   }
 
@@ -829,7 +834,7 @@ class AutomationService {
 
     const id: UpdateAutomationInput['id'] = input.id;
     const createInput = this.constructCreateAutomationInput(input);
-    return { ...createInput, id: id, conditions: createInput.conditions || [] }
+    return { ...createInput, id: id }
   }
 
   /**

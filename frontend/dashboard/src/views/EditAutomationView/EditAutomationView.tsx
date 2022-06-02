@@ -10,6 +10,7 @@ import {
   AutomationConditionOperatorType,
   AutomationConditionScopeType,
   AutomationEventModel,
+  AutomationType,
   ConditionPropertyAggregateType,
   Dialogue,
   GetAutomationQuery,
@@ -128,12 +129,28 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
     id: input?.id as string,
     label: input?.label as string,
     automationType: input?.type,
-    actions: input?.automationTrigger?.actions?.map((action) => ({
-      action: {
-        type: action.type,
-        targets: action.payload?.targets || [],
-      },
-    })) || [],
+    actions: input?.type === AutomationType.Trigger
+      ? input?.automationTrigger?.actions?.map((action) => ({
+        action: {
+          type: action.type,
+          targets: action.payload?.targets || [],
+        },
+      })) || []
+      : input?.automationScheduled?.actions?.map((action) => ({
+        action: {
+          type: action?.type,
+          targets: action.payload?.targets || [],
+        },
+      })) || [],
+    schedule: {
+      id: input?.automationScheduled?.id,
+      dayOfMonth: input?.automationScheduled?.dayOfMonth,
+      dayOfWeek: input?.automationScheduled?.dayOfWeek,
+      hours: input?.automationScheduled?.hours,
+      minutes: input?.automationScheduled?.minutes,
+      month: input?.automationScheduled?.month,
+      type: input?.automationScheduled?.type,
+    },
     conditionBuilder: {
       id: input?.automationTrigger?.conditionBuilder?.id,
       logical: {
@@ -195,6 +212,7 @@ const EditAutomationView = () => {
         id: automationId,
       },
     },
+    fetchPolicy: 'cache-and-network',
   });
 
   const [updateAutomation, { loading }] = useUpdateAutomationMutation({

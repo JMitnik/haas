@@ -10,6 +10,7 @@ import {
   Maybe,
   QuestionConditionScopeModel,
   QuestionNodeTypeEnum,
+  RecurringPeriodType,
 } from 'types/generated-types';
 
 import { TwoDateArray } from 'views/AddAutomationView/CreateConditionModalCardTypes';
@@ -51,6 +52,15 @@ export interface AutomationInput {
   id: string;
   label: string;
   automationType?: AutomationType;
+  schedule?: {
+    id?: string;
+    type?: RecurringPeriodType;
+    minutes?: string,
+    hours?: string,
+    dayOfMonth?: string,
+    month?: string,
+    dayOfWeek?: string,
+  }
   conditionBuilder: {
     id?: string;
     logical: { label: string, value: string };

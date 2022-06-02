@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable arrow-body-style */
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
@@ -12,13 +13,11 @@ import {
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted,
 } from '@haas/ui';
 import { FetchResult, MutationFunctionOptions } from '@apollo/client';
-import { isValidCron } from 'cron-validator';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import Select from 'react-select';
-import later from '@breejs/later';
 
 import * as LS from 'views/GenerateWorkspaceView/GenerateWorkspaceView.styles';
 import * as Menu from 'components/Common/Menu';
@@ -357,6 +356,14 @@ const AutomationForm = ({
     defaultValues: {
       title: automation?.label,
       automationType: automation?.automationType || AutomationType.Trigger,
+      schedule: {
+        type: automation?.schedule?.type,
+        month: automation?.schedule?.month,
+        dayOfMonth: automation?.schedule?.dayOfMonth,
+        dayOfWeek: automation?.schedule?.dayOfWeek,
+        hours: automation?.schedule?.hours,
+        minutes: automation?.schedule?.minutes,
+      },
       conditionBuilder:
       {
         logical: automation?.conditionBuilder?.logical || { label: 'AND', value: 'AND' },
@@ -409,7 +416,7 @@ const AutomationForm = ({
     name: 'schedule',
     control: form.control,
   });
-
+  console.log('Watch schedule: ', watchSchedule);
   const cronners = useCronSchedule(`${watchSchedule?.minutes} ${watchSchedule?.hours} ${watchSchedule?.dayOfMonth} ${watchSchedule?.month} ${watchSchedule?.dayOfWeek}`);
 
   const onSubmit = (formData: FormDataProps) => {
@@ -418,25 +425,6 @@ const AutomationForm = ({
     // TODO: Add childbuilder
 
     console.log('Form data: ', formData.schedule);
-    // let schedule;
-    // later.date.localTime();
-
-    // if (formData.schedule?.type) {
-    //   if (formData.schedule?.type !== RecurringPeriodType.Custom) {
-    //     schedule = getCronByScheduleType(formData.schedule?.type as RecurringPeriodType);
-    //   } else {
-    //     schedule = formData.schedule;
-    //   }
-    // }
-
-    // if (schedule) {
-    //   const cronString = `${schedule.minutes} ${schedule.hours} ${schedule.dayOfMonth} ${schedule.month} ${schedule.dayOfWeek}`;
-    //   const cron = later.parse.cron(cronString);
-    //   console.log('later cron: ', cron);
-    //   const cronSchedule = later.schedule(cron).next(5);
-    //   console.log('later schedule: ', cronSchedule);
-    //   console.log('Exception cron: ', isValidCron('* * ? * *'));
-    // }
 
     const activeActions = formData.actions.map((action) => {
       const actionEntry: ActionEntry = (action as any)?.action;
@@ -460,6 +448,15 @@ const AutomationForm = ({
         conditions: mapConditions(formData, activeCustomer?.id),
       },
       actions: activeActions,
+      schedule: formData.automationType === AutomationType.Scheduled ? {
+        type: formData?.schedule?.type as RecurringPeriodType,
+        month: formData?.schedule?.month as string,
+        dayOfMonth: formData?.schedule?.dayOfMonth as string,
+        dayOfWeek: formData?.schedule?.dayOfWeek as string,
+        hours: formData?.schedule?.hours as string,
+        minutes: formData?.schedule?.minutes as string,
+        id: automation?.schedule?.id
+      } : undefined,
     };
 
     if (!isInEdit && onCreateAutomation) {
@@ -761,6 +758,7 @@ const AutomationForm = ({
                   <Controller
                     name="schedule.type"
                     control={form.control}
+                    // defaultValue={automation?.schedule?.type as RecurringPeriodType}
                     render={({ field: { value, onChange, onBlur } }) => (
                       <LS.RadioGroupRoot
                         defaultValue={value}

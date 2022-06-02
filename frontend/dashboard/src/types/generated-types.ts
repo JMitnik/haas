@@ -226,7 +226,33 @@ export type AutomationModel = {
   description?: Maybe<Scalars['String']>;
   type: AutomationType;
   automationTrigger?: Maybe<AutomationTriggerModel>;
+  automationScheduled?: Maybe<AutomationScheduledModel>;
   workspace?: Maybe<Customer>;
+};
+
+/** AutomationScheduled */
+export type AutomationScheduledModel = {
+  __typename?: 'AutomationScheduledModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  type: RecurringPeriodType;
+  minutes: Scalars['String'];
+  hours: Scalars['String'];
+  dayOfMonth: Scalars['String'];
+  month: Scalars['String'];
+  dayOfWeek: Scalars['String'];
+  actions?: Maybe<Array<AutomationActionModel>>;
+};
+
+export type AutomationScheduleInput = {
+  id?: Maybe<Scalars['ID']>;
+  type: RecurringPeriodType;
+  minutes: Scalars['String'];
+  hours: Scalars['String'];
+  dayOfMonth: Scalars['String'];
+  month: Scalars['String'];
+  dayOfWeek: Scalars['String'];
 };
 
 /** AutomationTrigger */
@@ -402,6 +428,7 @@ export type CreateAutomationInput = {
   automationType?: Maybe<AutomationType>;
   event?: Maybe<AutomationEventInput>;
   conditionBuilder?: Maybe<AutomationConditionBuilderInput>;
+  schedule?: Maybe<AutomationScheduleInput>;
   actions?: Maybe<Array<AutomationActionInput>>;
 };
 
@@ -3629,6 +3656,13 @@ export type GetAutomationQuery = (
     & { workspace?: Maybe<(
       { __typename?: 'Customer' }
       & Pick<Customer, 'slug' | 'id'>
+    )>, automationScheduled?: Maybe<(
+      { __typename?: 'AutomationScheduledModel' }
+      & Pick<AutomationScheduledModel, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'minutes' | 'hours' | 'dayOfMonth' | 'dayOfWeek' | 'month'>
+      & { actions?: Maybe<Array<(
+        { __typename?: 'AutomationActionModel' }
+        & Pick<AutomationActionModel, 'id' | 'payload' | 'type'>
+      )>> }
     )>, automationTrigger?: Maybe<(
       { __typename?: 'AutomationTriggerModel' }
       & Pick<AutomationTriggerModel, 'id'>
@@ -5751,6 +5785,22 @@ export const GetAutomationDocument = gql`
       slug
       id
     }
+    automationScheduled {
+      id
+      createdAt
+      updatedAt
+      type
+      minutes
+      hours
+      dayOfMonth
+      dayOfWeek
+      month
+      actions {
+        id
+        payload
+        type
+      }
+    }
     automationTrigger {
       id
       activeDialogue {
@@ -6812,9 +6862,11 @@ export namespace GetAutomation {
   export type Query = GetAutomationQuery;
   export type Automation = (NonNullable<GetAutomationQuery['automation']>);
   export type Workspace = (NonNullable<(NonNullable<GetAutomationQuery['automation']>)['workspace']>);
+  export type AutomationScheduled = (NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationScheduled']>);
+  export type Actions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationScheduled']>)['actions']>)[number]>;
   export type AutomationTrigger = (NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>);
   export type ActiveDialogue = (NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['activeDialogue']>);
-  export type Actions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['actions']>)[number]>;
+  export type _Actions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['actions']>)[number]>;
   export type Event = (NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>);
   export type Dialogue = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>)['dialogue']>);
   export type Question = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>)['question']>);

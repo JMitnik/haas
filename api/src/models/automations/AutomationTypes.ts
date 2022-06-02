@@ -1,6 +1,6 @@
 import {
   AutomationActionType, AutomationConditionBuilder, AutomationConditionOperand, AutomationConditionOperatorType,
-  AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate,
+  AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate, Prisma,
   Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
   WorkspaceConditionScope, AutomationCondition as PrismaAutomationCondition, AutomationConditionBuilderType,
 } from '@prisma/client';
@@ -131,8 +131,11 @@ export interface CreateAutomationInput {
     eventType: NexusGenEnums['AutomationEventType']; // AutomationEventType
     questionId?: string | null; // String
   };
-  conditionBuilder: CreateConditionBuilderInput;
+  conditionBuilder?: CreateConditionBuilderInput;
   conditions?: CreateAutomationConditionInput[];
+
+  schedule?: Prisma.AutomationScheduledCreateInput;
+
   actions: CreateAutomationActionInput[];
 };
 
@@ -152,8 +155,8 @@ export interface UpdateAutomationInput extends CreateAutomationInput {
   automationTriggerId?: string;
   automationCampaignId?: string;
   actions: UpdateAutomationActionInput[];
-  conditions: UpdateAutomationConditionInput[];
-  conditionBuilder: UpdateConditionBuilderInput;
+  conditions?: UpdateAutomationConditionInput[];
+  conditionBuilder?: UpdateConditionBuilderInput;
 }
 
 export type MoreXOR = CreateQuestionScopeInput['aspect'] | CreateDialogueScopeInput['aspect'] | CreateWorkspaceScopeInput['aspect']

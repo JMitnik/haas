@@ -3,6 +3,7 @@ import { AutomationType } from './AutomationType';
 import { AutomationTriggerModel } from './AutomationTrigger'
 import { CustomerType } from '../../customer/index'
 import { UserInputError } from 'apollo-server-express';
+import { AutomationScheduledModel } from './AutomationScheduled';
 
 export const AutomationModel = objectType({
   name: 'AutomationModel',
@@ -25,6 +26,11 @@ export const AutomationModel = objectType({
       type: AutomationTriggerModel,
       nullable: true,
     });
+
+    t.field('automationScheduled', {
+      type: AutomationScheduledModel,
+      nullable: true,
+    })
 
     t.field('workspace', {
       type: CustomerType,

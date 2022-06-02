@@ -29,3 +29,4 @@ export * from './graphql/AutomationConditionBuilderType';
 export * from './graphql/AutomationConditionBuilder';
 export * from './graphql/SendAutomationReportResolver';
 export * from './graphql/CreateScheduledAutomationResolver';
+export * from './graphql/AutomationScheduled';
