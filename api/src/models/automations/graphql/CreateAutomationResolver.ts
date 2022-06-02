@@ -12,6 +12,7 @@ import { AutomationActionType } from './AutomationActionType';
 import { AutomationModel } from './AutomationModel';
 import { UserInputError } from 'apollo-server-express';
 import { AutomationConditionBuilderType } from './AutomationConditionBuilderType';
+import { RecurringPeriodType } from './RecurringPeriodType';
 
 export const CreateAutomationOperandInput = inputObjectType({
   name: 'CreateAutomationOperandInput',
@@ -130,6 +131,19 @@ export const AutomationConditionBuilderInput = inputObjectType({
   },
 });
 
+export const AutomationScheduleInput = inputObjectType({
+  name: 'AutomationScheduleInput',
+  definition(t) {
+    t.id('id', { nullable: true });
+    t.field('type', { type: RecurringPeriodType, required: true });
+    t.string('minutes', { required: true });
+    t.string('hours', { required: true });
+    t.string('dayOfMonth', { required: true });
+    t.string('month', { required: true });
+    t.string('dayOfWeek', { required: true });
+  },
+})
+
 export const CreateAutomationInput = inputObjectType({
   name: 'CreateAutomationInput',
   definition(t) {
@@ -148,10 +162,13 @@ export const CreateAutomationInput = inputObjectType({
     // Trigger: condition related fields
     t.field('conditionBuilder', { type: AutomationConditionBuilderInput });
 
+    t.field('schedule', { type: AutomationScheduleInput });
+
     // Automation Actions
     t.list.field('actions', { type: AutomationActionInput });
 
     // Trigger:
+
     // TODO: Add fields for Trigger:recurring as wel as Campaign
   },
 });

@@ -202,6 +202,16 @@ type AutomationModel {
   workspace: Customer
 }
 
+input AutomationScheduleInput {
+  dayOfMonth: String!
+  dayOfWeek: String!
+  hours: String!
+  id: ID
+  minutes: String!
+  month: String!
+  type: RecurringPeriodType!
+}
+
 """AutomationTrigger"""
 type AutomationTriggerModel {
   actions: [AutomationActionModel!]
@@ -362,6 +372,7 @@ input CreateAutomationInput {
   event: AutomationEventInput
   id: ID
   label: String
+  schedule: AutomationScheduleInput
   workspaceId: String
 }
 

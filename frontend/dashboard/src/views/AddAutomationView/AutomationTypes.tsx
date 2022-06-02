@@ -1,3 +1,13 @@
+import * as UI from '@haas/ui';
+import styled, { css } from 'styled-components';
+
+export const CronScheduleHeader = styled(UI.Div)`
+  ${({ theme }) => css`
+      color: ${theme.colors.off[600]};
+      font-weight: bold;
+  `}
+`;
+
 export const OPERATORS = [
   {
     label: '<',

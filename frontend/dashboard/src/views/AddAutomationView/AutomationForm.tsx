@@ -12,11 +12,13 @@ import {
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted,
 } from '@haas/ui';
 import { FetchResult, MutationFunctionOptions } from '@apollo/client';
+import { isValidCron } from 'cron-validator';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import Select from 'react-select';
+import later from '@breejs/later';
 
 import * as LS from 'views/GenerateWorkspaceView/GenerateWorkspaceView.styles';
 import * as Menu from 'components/Common/Menu';
@@ -51,15 +53,16 @@ import { ChildBuilderEntry } from './ChildBuilderEntry';
 import { ConditionCell } from './ConditionCell';
 import { ConditionEntry } from './CreateConditionModalCardTypes';
 import { CreateConditionModalCard } from './CreateConditionModalCard';
-import { ModalState, ModalType, OPERATORS } from './AutomationTypes';
+import { CronScheduleHeader, ModalState, ModalType, OPERATORS } from './AutomationTypes';
+import useCronSchedule from './useCronSchedule';
 
 const schema = yup.object({
   title: yup.string().required('Title is required'),
   automationType: yup.mixed<AutomationType>().oneOf(Object.values(AutomationType)),
   conditionBuilder: yup.object().shape({
     logical: yup.object().shape({
-      label: yup.string().required(),
-      value: yup.string().required(),
+      label: yup.string().notRequired(),
+      value: yup.string().notRequired(),
     }),
     conditions: yup.array().of(
       yup.object().required().shape(
@@ -90,7 +93,7 @@ const schema = yup.object({
           }).required(),
         },
       ),
-    ).required(),
+    ).notRequired(),
     childBuilder: yup.object().shape({
       logical: yup.object().shape({
         label: yup.string().required(),
@@ -112,7 +115,66 @@ const schema = yup.object({
         ),
       ).notRequired(),
     }).nullable().notRequired(),
-  }).required(),
+  }).notRequired().when('automationType', {
+    is: (autoType) => autoType === AutomationType.Trigger,
+    then: yup.object().shape({
+      logical: yup.object().shape({
+        label: yup.string().required(),
+        value: yup.string().required(),
+      }),
+      conditions: yup.array().of(
+        yup.object().required().shape(
+          {
+            operator: yup.object().shape({
+              label: yup.string().required(),
+              value: yup.string().required(),
+            }).nullable(),
+            compareTo: yup.number().notRequired(),
+            depth: yup.number().notRequired(),
+            condition: yup.object().shape({
+              scopeType: yup.mixed<AutomationConditionScopeType>().oneOf(Object.values(AutomationConditionScopeType)),
+              activeDialogue: yup.object().shape({
+                id: yup.string().required(),
+                label: yup.string().required(),
+                value: yup.string().required(),
+                type: yup.string().required(),
+              }).nullable(true),
+              activeQuestion: yup.object().shape({
+                label: yup.string().required(),
+                value: yup.string().required(),
+                type: yup.string().required(),
+              }).required(),
+              aspect: yup.string().required(),
+              aggregate: yup.mixed<ConditionPropertyAggregateType>().oneOf(Object.values(ConditionPropertyAggregateType)),
+              latest: yup.number().required(),
+              questionOption: yup.string().notRequired().nullable(false),
+            }).required(),
+          },
+        ),
+      ).required(),
+      childBuilder: yup.object().shape({
+        logical: yup.object().shape({
+          label: yup.string().required(),
+          value: yup.string().required(),
+        }),
+        conditions: yup.array().of(
+          yup.object().required().shape(
+            {
+              operator: yup.object().shape({
+                label: yup.string().required(),
+                value: yup.string().required(),
+              }).nullable(),
+              compareTo: yup.number().notRequired(),
+              depth: yup.number().required(),
+              condition: yup.object().shape({
+                scopeType: yup.string().required(),
+              }).required(),
+            },
+          ),
+        ).notRequired(),
+      }).nullable().notRequired(),
+    }).required(),
+  }),
   schedule: yup.object().shape({
     type: yup.mixed<RecurringPeriodType>().oneOf(Object.values(RecurringPeriodType)),
     minutes: yup.string(),
@@ -120,7 +182,16 @@ const schema = yup.object({
     dayOfMonth: yup.string(),
     month: yup.string(),
     dayOfWeek: yup.string(),
-    year: yup.string(),
+  }).when('automationType', {
+    is: (autoType) => autoType === AutomationType.Scheduled,
+    then: yup.object().shape({
+      type: yup.mixed<RecurringPeriodType>().oneOf(Object.values(RecurringPeriodType)).required(),
+      minutes: yup.string().required(),
+      hours: yup.string().required(),
+      dayOfMonth: yup.string().required(),
+      month: yup.string().required(),
+      dayOfWeek: yup.string().required(),
+    }).required(),
   }),
   actions: yup.array().of(
     yup.object().shape({
@@ -171,15 +242,23 @@ const SCHEDULE_TYPE_OPTIONS = [
 const getCronByScheduleType = (scheduleType: RecurringPeriodType) => {
   switch (scheduleType) {
     case RecurringPeriodType.EndOfDay:
-      return '0 18 ? * MON-FRI *';
+      return {
+        minutes: '0', hours: '18', dayOfMonth: '*', month: '*', dayOfWeek: 'MON-FRI',
+      };
     case RecurringPeriodType.EndOfWeek:
-      return '0 18 ? * FRI *';
+      return {
+        minutes: '0', hours: '18', dayOfMonth: '*', month: '*', dayOfWeek: 'FRI',
+      };
     case RecurringPeriodType.StartOfDay:
-      return '0 9 ? * MON-FRI *';
+      return {
+        minutes: '0', hours: '9', dayOfMonth: '*', month: '*', dayOfWeek: 'MON-FRI',
+      };
     case RecurringPeriodType.StartOfWeek:
-      return '0 9 ? * MON *';
+      return {
+        minutes: '0', hours: '9', dayOfMonth: '*', month: '*', dayOfWeek: 'MON',
+      };
     default:
-      return '';
+      return null;
   }
 };
 
@@ -207,42 +286,45 @@ const DEPTH_BACKGROUND_COLORS = [
   '#f5f8fa',
 ];
 
-const mapConditions = (formData: FormDataProps, workspaceId?: string) => formData.conditionBuilder?.conditions.map(
-  (condition) => {
-    const operands: CreateAutomationOperandInput[] = [
-      {
-        operandType: OperandType.Int,
-        numberValue: condition.compareTo,
-      },
-    ];
+const mapConditions = (formData: FormDataProps, workspaceId?: string) => {
+  const { conditions } = formData.conditionBuilder as any;
+  return conditions.map(
+    (condition: any) => {
+      const operands: CreateAutomationOperandInput[] = [
+        {
+          operandType: OperandType.Int,
+          numberValue: condition.compareTo,
+        },
+      ];
 
-    if (condition.condition.activeQuestion.type === QuestionNodeTypeEnum.Choice
-      || condition.condition.activeQuestion.type === QuestionNodeTypeEnum.VideoEmbedded) {
-      operands.push({
-        operandType: OperandType.String,
-        textValue: condition?.condition?.questionOption,
-      });
-    }
+      if (condition.condition.activeQuestion.type === QuestionNodeTypeEnum.Choice
+        || condition.condition.activeQuestion.type === QuestionNodeTypeEnum.VideoEmbedded) {
+        operands.push({
+          operandType: OperandType.String,
+          textValue: condition?.condition?.questionOption,
+        });
+      }
 
-    return ({
-      scope: {
-        type: condition?.condition?.scopeType as AutomationConditionScopeType,
-        questionScope: {
-          aspect: condition?.condition?.aspect as QuestionAspectType,
-          aggregate: {
-            type: condition?.condition?.aggregate as ConditionPropertyAggregateType,
-            latest: condition?.condition?.latest,
+      return ({
+        scope: {
+          type: condition?.condition?.scopeType as AutomationConditionScopeType,
+          questionScope: {
+            aspect: condition?.condition?.aspect as QuestionAspectType,
+            aggregate: {
+              type: condition?.condition?.aggregate as ConditionPropertyAggregateType,
+              latest: condition?.condition?.latest,
+            },
           },
         },
-      },
-      operator: condition?.operator?.value as AutomationConditionOperatorType,
-      questionId: condition?.condition?.activeQuestion?.value,
-      dialogueId: condition.condition?.activeDialogue?.id,
-      workspaceId,
-      operands,
-    });
-  },
-);
+        operator: condition?.operator?.value as AutomationConditionOperatorType,
+        questionId: condition?.condition?.activeQuestion?.value,
+        dialogueId: condition.condition?.activeDialogue?.id,
+        workspaceId,
+        operands,
+      });
+    },
+  );
+};
 
 interface AutomationFormProps {
   isInEdit?: boolean;
@@ -323,15 +405,38 @@ const AutomationForm = ({
     control: form.control,
   });
 
-  const watchScheduleType = useWatch({
-    name: 'schedule.type',
+  const watchSchedule = useWatch({
+    name: 'schedule',
     control: form.control,
   });
+
+  const cronners = useCronSchedule(`${watchSchedule?.minutes} ${watchSchedule?.hours} ${watchSchedule?.dayOfMonth} ${watchSchedule?.month} ${watchSchedule?.dayOfWeek}`);
 
   const onSubmit = (formData: FormDataProps) => {
     // TODO: Create a field for event type
     // TODO: Create a picker for questionId/dialogueId for event
     // TODO: Add childbuilder
+
+    console.log('Form data: ', formData.schedule);
+    // let schedule;
+    // later.date.localTime();
+
+    // if (formData.schedule?.type) {
+    //   if (formData.schedule?.type !== RecurringPeriodType.Custom) {
+    //     schedule = getCronByScheduleType(formData.schedule?.type as RecurringPeriodType);
+    //   } else {
+    //     schedule = formData.schedule;
+    //   }
+    // }
+
+    // if (schedule) {
+    //   const cronString = `${schedule.minutes} ${schedule.hours} ${schedule.dayOfMonth} ${schedule.month} ${schedule.dayOfWeek}`;
+    //   const cron = later.parse.cron(cronString);
+    //   console.log('later cron: ', cron);
+    //   const cronSchedule = later.schedule(cron).next(5);
+    //   console.log('later schedule: ', cronSchedule);
+    //   console.log('Exception cron: ', isValidCron('* * ? * *'));
+    // }
 
     const activeActions = formData.actions.map((action) => {
       const actionEntry: ActionEntry = (action as any)?.action;
@@ -377,7 +482,7 @@ const AutomationForm = ({
     }
   };
 
-  console.log('watchScheduleType: ', watchScheduleType);
+  console.log('errors: ', form.formState.errors);
 
   return (
     <>
@@ -659,7 +764,13 @@ const AutomationForm = ({
                     render={({ field: { value, onChange, onBlur } }) => (
                       <LS.RadioGroupRoot
                         defaultValue={value}
-                        onValueChange={onChange}
+                        onValueChange={(e: any) => {
+                          const data = getCronByScheduleType(e);
+                          if (data) {
+                            form.setValue('schedule', { ...data, type: watchSchedule?.type as RecurringPeriodType });
+                          }
+                          return onChange(e);
+                        }}
                         onBlur={onBlur}
                         variant="spaced"
                       >
@@ -688,7 +799,7 @@ const AutomationForm = ({
                     )}
                   />
                 </UI.FormControl>
-                {watchScheduleType === RecurringPeriodType.Custom && (
+                {watchSchedule?.type === RecurringPeriodType.Custom && (
                   <UI.Grid
                     gridTemplateColumns="1fr 1fr"
                     p={2}
@@ -750,21 +861,19 @@ const AutomationForm = ({
                       />
                       <UI.ErrorMessage>{t(form.formState.errors.schedule?.dayOfWeek?.message || '')}</UI.ErrorMessage>
                     </FormControl>
-
-                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.year}>
-                      <FormLabel htmlFor="year">{t('year')}</FormLabel>
-                      <InputHelper>{t('year_helper')}</InputHelper>
-                      <Input
-                        placeholder={t('cron_year_placeholder')}
-                        leftEl={<Type />}
-                        {...form.register('schedule.year')}
-                      />
-                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.year?.message || '')}</UI.ErrorMessage>
-                    </FormControl>
-
                   </UI.Grid>
 
                 )}
+
+                <UI.Div
+                  p={2}
+                  borderRadius="6px"
+                  border="1px solid #edf2f7"
+                  backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
+                >
+                  <CronScheduleHeader pb={2}>Next 5 dates this automation will be ran:</CronScheduleHeader>
+                  {cronners?.map((entry) => <UI.Div pb={1}>{entry.toString()}</UI.Div>)}
+                </UI.Div>
 
               </InputGrid>
             </UI.FormSection>
@@ -888,7 +997,7 @@ const AutomationForm = ({
 
           <ButtonGroup>
             <Button
-              isDisabled={!form.formState.isValid}
+              // isDisabled={!form.formState.isValid}
               isLoading={isLoading}
               variantColor="teal"
               type="submit"
