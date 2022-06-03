@@ -19,6 +19,7 @@ import * as cdk from '@aws-cdk/core';
 import * as crpm from 'crpm';
 import { Construct } from "constructs";
 import { Handler, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { HaasDialogueLinkHandleService } from '../../../lambdas/haas-dialogue-link-handler/haas-dialogue-link-handle-service';
 
 interface StagingAutomationProps {
   vpc: ec2.Vpc;
@@ -152,6 +153,15 @@ export class Automations extends Construct {
     //   enabled: false,
 
     // });
+
+    // TODO: Add the following to the lambda
+    // environment: {
+    //   bucketName: bucket.ref,
+    //   AUTOMATION_API_KEY: jwtSecret.secretValueFromJson('AUTOMATION_API_KEY').toString(),
+    // },
+    new HaasDialogueLinkHandleService(this, 'HaasDialogueLinkHandleService', {
+      AUTOMATION_API_KEY: jwtSecret.secretValueFromJson('AUTOMATION_API_KEY').toString()
+    });
 
     new CfnOutput(this, 'ECRImageURI', { value: dockerImage.imageUri });
     new CfnOutput(this, 'LambdaFunctionName', { value: appFn.ref });
