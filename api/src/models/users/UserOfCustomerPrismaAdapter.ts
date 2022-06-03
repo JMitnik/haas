@@ -37,6 +37,7 @@ class UserOfCustomerPrismaAdapter {
       },
       include: {
         user: true,
+        customer: true,
       },
     });
   }

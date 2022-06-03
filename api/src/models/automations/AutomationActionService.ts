@@ -1,22 +1,82 @@
-import { PrismaClient } from '@prisma/client';
+import { AutomationActionType, PrismaClient } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
+import { uniqBy } from 'lodash';
 
 import UserService from '../users/UserService';
 import config from '../../config/config';
 import { ReportLambdaInput, ReportService } from '../../services/report/ReportService';
 import { GenerateReportPayload } from '../../models/users/UserServiceTypes';
+import makeDialogueLinkReminderTemplate from '../../services/mailings/templates/makeDialogueLinkReminderTemplate';
 import makeReportMailTemplate from '../../services/mailings/templates/makeReportTemplate';
 import { mailService } from '../../services/mailings/MailService';
+import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
+import { CustomerPrismaAdapter } from '../../models/customer/CustomerPrismaAdapter';
+import UserPrismaAdapter from '../../models/users/UserPrismaAdapter';
 
 export class AutomationActionService {
   private prisma: PrismaClient;
   private userService: UserService;
   private reportService: ReportService;
+  automationPrismaAdapter: AutomationPrismaAdapter;
+  customerPrismaAdapter: CustomerPrismaAdapter;
+  userPrismaAdapter: UserPrismaAdapter;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
     this.userService = new UserService(prisma);
-    this.reportService = new ReportService()
+    this.reportService = new ReportService();
+    this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
+    this.customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
+    this.userPrismaAdapter = new UserPrismaAdapter(prisma);
+  }
+
+  sendDialogueLink = async (automationScheduleId: string, workspaceSlug: string) => {
+    const scheduledAutomation = await this.automationPrismaAdapter.findScheduledAutomationById(automationScheduleId);
+    const sendEmailActions = scheduledAutomation?.actions.filter(
+      (action) => action.type === AutomationActionType.SEND_EMAIL
+    ) || [];
+
+    if (!sendEmailActions.length) {
+      console.log('No email actions available for: ', automationScheduleId, '. Abort.');
+      return false;
+    };
+    const actionIds = sendEmailActions.map((action) => action.id);
+
+    const recipients = await Promise.all(actionIds.map(async (actionId) => {
+      const actionRecipients = await this.findRecipients(actionId, workspaceSlug);
+      return actionRecipients;
+    }));
+
+    const flattenedRecipients = recipients.flat();
+    const uniqueFlattenedRecipients = uniqBy(flattenedRecipients, (recipient) => recipient.user.email);
+
+    await Promise.all(uniqueFlattenedRecipients.map(async (recipient) => {
+      const user = await this.userPrismaAdapter.findPrivateDialogueOfUser(recipient.userId, workspaceSlug);
+
+      // TODO: Add support for multiple client URLs if a user is assinged to multipled dialogues
+      const privateDialogues = user?.isAssignedTo;
+      if (!privateDialogues?.length) {
+        console.log('User ', user?.email, 'Is not assigned to a dialogue so cannot be sent dialogue url');
+        return;
+      };
+
+      const targetDialogue = privateDialogues[0];
+      const constructedDialogueLink = `${config.clientUrl}/${workspaceSlug}/${targetDialogue.slug}`
+      const triggerBody = makeDialogueLinkReminderTemplate(
+        {
+          recipientMail: recipient.user.firstName || 'User',
+          dialogueClientUrl: constructedDialogueLink,
+        }
+      );
+
+      mailService.send({
+        body: triggerBody,
+        recipient: recipient.user.email,
+        subject: 'A new HAAS survey has been released for your team',
+      });
+    }));
+
+    return true;
   }
 
   findRecipients = async (automationActionId: string, workspaceSlug: string) => {
