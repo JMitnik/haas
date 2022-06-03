@@ -76,7 +76,6 @@ class AutomationService {
 
 
     const scheduledExpression = `cron(${minutes} ${hours} ${dayOfMonth === '*' ? '?' : dayOfMonth} ${month} ${dayOfWeek} *)`
-    console.log('Scheduled Expression: ', scheduledExpression);
 
     // Find the state of the automation and adjust event bridge rule to that
     let state = 'DISABLED';

@@ -4,6 +4,7 @@ import React from 'react';
 import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 
 import { ActionEntry } from './CreateActionModalCard';
+import { AutomationActionType } from 'types/generated-types';
 
 interface NodeCellProps {
   action: ActionEntry;
@@ -29,23 +30,46 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
       )}
       <UI.Flex width="100%">
         <UI.Div>
-          <UI.Text paddingRight={2}>
-            Sending a
-            {' '}
-            <UI.Span color="#4A5568" fontWeight="bold">weekly</UI.Span>
-            {' '}
-            report to:
-            <ul>
-              {action.targets.map((target) => (
-                <li key={`${target.target?.type}-${target.target?.label}`} style={{ marginLeft: '1em' }}>
-                  {target.target?.type}
-                  :
-                  {' '}
-                  <UI.Span color="#4A5568" fontWeight="bold">{target.target?.label}</UI.Span>
-                </li>
-              ))}
-            </ul>
-          </UI.Text>
+          {action.type === AutomationActionType.GenerateReport && (
+            <UI.Text paddingRight={2}>
+              Sending a
+              {' '}
+              <UI.Span color="#4A5568" fontWeight="bold">weekly</UI.Span>
+              {' '}
+              report to:
+              <ul>
+                {action.targets.map((target) => (
+                  <li key={`${target.target?.type}-${target.target?.label}`} style={{ marginLeft: '1em' }}>
+                    {target.target?.type}
+                    :
+                    {' '}
+                    <UI.Span color="#4A5568" fontWeight="bold">{target.target?.label}</UI.Span>
+                  </li>
+                ))}
+              </ul>
+            </UI.Text>
+          )}
+
+          {action.type === AutomationActionType.SendEmail && (
+            <UI.Text paddingRight={2}>
+              Sending an
+              {' '}
+              <UI.Span color="#4A5568" fontWeight="bold">dialogue link</UI.Span>
+              {' '}
+              email to:
+              <ul>
+                {action.targets.map((target) => (
+                  <li key={`${target.target?.type}-${target.target?.label}`} style={{ marginLeft: '1em' }}>
+                    {target.target?.type}
+                    :
+                    {' '}
+                    <UI.Span color="#4A5568" fontWeight="bold">{target.target?.label}</UI.Span>
+                  </li>
+                ))}
+              </ul>
+            </UI.Text>
+          )}
+
           <UI.Flex pt="0.5em">
             <UI.MicroLabel
               bg="#FE3274"

@@ -116,7 +116,7 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
   const watchActionType = useWatch({
     control: form.control,
     name: 'type',
-    defaultValue: AutomationActionType.GenerateReport,
+    defaultValue: activeAction?.type,
   });
 
   const { fields: targetFields, append, remove } = useFieldArray({
@@ -155,7 +155,6 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
                               icon={FileText}
                             />
                             <UI.RadioButton
-                              isDisabled
                               value={AutomationActionType.SendEmail}
                               mr={2}
                               text={(t('automation:send_email'))}
