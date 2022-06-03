@@ -29,6 +29,24 @@ export class AutomationPrismaAdapter {
       },
     });
 
+    if (automation.automationScheduledId) {
+      await this.prisma.automationScheduled.delete({
+        where: {
+          id: automation.automationScheduledId,
+        },
+      });
+
+      await this.prisma.automationAction.deleteMany({
+        where: {
+          automationTriggers: {
+            some: {
+              id: automation.automationScheduledId,
+            },
+          },
+        },
+      });
+    }
+
     if (automation?.automationTriggerId) {
       const automationTrigger = await this.prisma.automationTrigger.delete({
         where: {
@@ -1324,6 +1342,9 @@ export class AutomationPrismaAdapter {
           },
         } : undefined,
       },
+      include: {
+        automationScheduled: true,
+      },
     });
   }
 
@@ -1350,6 +1371,9 @@ export class AutomationPrismaAdapter {
             id: workspaceId,
           },
         },
+      },
+      include: {
+        automationScheduled: true,
       },
     });
   };

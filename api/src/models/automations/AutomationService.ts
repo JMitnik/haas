@@ -8,11 +8,11 @@ import {
   OperandType,
   AutomationActionType,
   AutomationConditionBuilderType,
-  Prisma,
   AutomationType,
+  AutomationScheduled,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { UserInputError } from 'apollo-server-express';
+import { ApolloError, UserInputError } from 'apollo-server-express';
 import * as AWS from 'aws-sdk';
 
 import config from '../../config/config';
@@ -45,6 +45,7 @@ class AutomationService {
   userService: UserService;
   automationActionService: AutomationActionService;
   prisma: PrismaClient;
+  eventBridge: AWS.EventBridge;
 
   constructor(prisma: PrismaClient) {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
@@ -52,77 +53,71 @@ class AutomationService {
     this.automationActionService = new AutomationActionService(prisma);
     this.userService = new UserService(prisma);
     this.prisma = prisma;
-  }
 
-  createScheduled = async (workspaceSlug: string) => {
-    // TODO: Remove accessKeys and replace it with something that lets deployed account run this
-    const clientEvent = new AWS.EventBridge({
+    this.eventBridge = new AWS.EventBridge({
       region: 'eu-central-1',
       accessKeyId: config.autodeckAwsAccessKeyId,
       secretAccessKey: config.autodeckAwsSecretAccessKey,
     });
+  }
 
-    const rules = await clientEvent.listRules({
-      NamePrefix: 'NEW_EVENT_BRIDGE_TEST',
-      Limit: 1,
-    }).promise();
+  upsertEventBridge = async (automationScheduled: AutomationScheduled, parentAutomationId?: string) => {
+    const { minutes, hours, dayOfMonth, dayOfWeek, month } = automationScheduled;
+    // TODO: Remove accessKeys and replace it with something that lets deployed account run this
+    // const clientEvent = 
 
-    console.log('Rules: ', rules.Rules);
+    // const rules = await clientEvent.listRules({
+    //   NamePrefix: 'NEW_EVENT_BRIDGE_TEST',
+    //   Limit: 1,
+    // }).promise();
 
-    await clientEvent.deleteRule({
-      Name: 'NEW_EVENT_BRIDGE_TEST',
-    }).promise();
+    // console.log('Rules: ', rules.Rules);
 
-    const rule = await clientEvent.putRule({
-      Name: 'NEW_EVENT_BRIDGE_TEST',
-      ScheduleExpression: 'cron(* * ? * MON-FRI *)',
-      State: 'DISABLED',
-    }).promise();
 
-    const ruleArn = rule.RuleArn;
-    console.log('workspaceSlug: ', workspaceSlug);
 
-    await this.prisma.automation.create({
-      data: {
-        type: AutomationType.SCHEDULED,
-        label: 'Scheduled automation',
-        description: 'My first scheduled automation',
-        workspace: {
-          connect: {
-            slug: workspaceSlug,
-          },
-        },
-        automationScheduled: {
-          create: {
-            actions: {
-              create: {
-                type: 'SEND_EMAIL',
-                payload: {
-                  targets: [
-                    {
-                      type: 'USER',
-                      value: 'daan@haas.live',
-                      label: 'Daan Helsloot',
-                    },
-                  ],
-                },
-              },
-            },
-            minutes: '*',
-            hours: '*',
-            dayOfMonth: '?',
-            month: '*',
-            dayOfWeek: 'MON-FRI',
-          },
-        },
-      },
-    })
+    const scheduledExpression = `cron(${minutes} ${hours} ${dayOfMonth === '*' ? '?' : dayOfMonth} ${month} ${dayOfWeek} *)`
+    console.log('Scheduled Expression: ', scheduledExpression);
 
-    return ruleArn;
+    // Find the state of the automation and adjust event bridge rule to that
+    let state = 'DISABLED';
+
+    if (parentAutomationId) {
+      const parentAutomation = await this.automationPrismaAdapter.findAutomationById(parentAutomationId);
+      state = parentAutomation?.isActive ? 'ENABLED' : 'DISABLED';
+    };
+
+    await this.eventBridge.putRule({
+      Name: automationScheduled.id,
+      ScheduleExpression: scheduledExpression,
+      State: state,
+    }).promise().catch(() => {
+      throw new ApolloError(`Something went wrong upserting a event bridge rule for automation schedule: ${automationScheduled.id}`)
+    });
+
+    // await this.eventBridge.putTargets({
+    //   Rule: automationScheduled.id,
+    //   Targets: [{
+    //     Id: `${automationScheduled.id}_to_send_reminder_lambda`,
+    //     Arn: '',
+    //     Input: JSON.stringify({ automationScheduled: automationScheduled.id }),
+    //   }],
+    // }).promise();
+
+    // console.log('Rule arn: ', rule.RuleArn);
+
+    // return rule.RuleArn;
   }
 
   deleteAutomation = async (input: NexusGenInputs['DeleteAutomationInput']) => {
-    return this.automationPrismaAdapter.deleteAutomation(input);
+    const deleteAutomation = await this.automationPrismaAdapter.deleteAutomation(input);
+
+    if (deleteAutomation.automationScheduledId) {
+      await this.eventBridge.deleteRule({
+        Name: deleteAutomation.automationScheduledId,
+      }).promise();
+    }
+
+    return deleteAutomation;
   }
 
   /**
@@ -841,8 +836,18 @@ class AutomationService {
    * Enables/Disables an automation 
    * @param input an object containing the automation id as well as the state (true/false) of the automation
    */
-  public enableAutomation = (input: NexusGenInputs['EnableAutomationInput']) => {
-    return this.automationPrismaAdapter.enableAutomation(input);
+  public enableAutomation = async (input: NexusGenInputs['EnableAutomationInput']) => {
+    const enabledAutomation = await this.automationPrismaAdapter.enableAutomation(input);
+
+    if (enabledAutomation.type === AutomationType.SCHEDULED && enabledAutomation.automationScheduledId) {
+      input.state
+        ? await this.eventBridge.enableRule({ Name: enabledAutomation.automationScheduledId }).promise()
+          .catch((e) => console.log(e))
+        : await this.eventBridge.disableRule({ Name: enabledAutomation.automationScheduledId }).promise()
+          .catch((e) => console.log(e));
+    }
+
+    return enabledAutomation;
   };
 
   /**
@@ -851,10 +856,16 @@ class AutomationService {
    * @returns updated Automation (without relationship fields)
    * @throws UserInputError if not all information is required
    */
-  public updateAutomation = (input: NexusGenInputs['CreateAutomationInput']) => {
+  public updateAutomation = async (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to update an automation
     const validatedInput = this.constructUpdateAutomationInput(input);
-    return this.automationPrismaAdapter.updateAutomation(validatedInput);
+    const updatedAutomation = await this.automationPrismaAdapter.updateAutomation(validatedInput);
+
+    if (updatedAutomation.type === AutomationType.SCHEDULED && updatedAutomation.automationScheduled) {
+      await this.upsertEventBridge(updatedAutomation.automationScheduled, validatedInput.id);
+    }
+
+    return updatedAutomation;
   }
 
   /**
@@ -863,10 +874,16 @@ class AutomationService {
    * @returns created Automation (without relationship fields)
    * @throws UserInputError if not all information is required
    */
-  public createAutomation = (input: NexusGenInputs['CreateAutomationInput']) => {
+  public createAutomation = async (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to create an automation
     const validatedInput = this.constructCreateAutomationInput(input);
-    return this.automationPrismaAdapter.createAutomation(validatedInput);
+    const createdAutomation = await this.automationPrismaAdapter.createAutomation(validatedInput);
+
+    if (createdAutomation.type === AutomationType.SCHEDULED && createdAutomation.automationScheduled) {
+      await this.upsertEventBridge(createdAutomation.automationScheduled);
+    }
+
+    return createdAutomation;
   }
 
   /**
