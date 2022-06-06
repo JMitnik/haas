@@ -1355,7 +1355,11 @@ export class AutomationPrismaAdapter {
         } : undefined,
       },
       include: {
-        automationScheduled: true,
+        automationScheduled: {
+          include: {
+            actions: true,
+          },
+        },
       },
     });
   }
@@ -1385,7 +1389,11 @@ export class AutomationPrismaAdapter {
         },
       },
       include: {
-        automationScheduled: true,
+        automationScheduled: {
+          include: {
+            actions: true,
+          },
+        },
       },
     });
   };

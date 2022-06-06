@@ -8,7 +8,8 @@ import {
   aws_route53 as route53,
   aws_secretsmanager as secretsmanager,
   aws_ecs_patterns as ecs_patterns,
-  Duration
+  Duration,
+  aws_ssm as ssm,
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -45,6 +46,25 @@ export class CoreAPI extends Construct {
 
     const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this, 'CORE_JWT_SECRET', 'JWT_SECRET');
     const apiSecret = secretsmanager.Secret.fromSecretNameV2(this, 'CORE_API_SECRET', 'API_SECRET');
+
+    const runAllLambdasEventBridgeRoleArn = ssm.StringParameter.fromStringParameterName(
+      this,
+      'ImportedEventBridgeRoleArn',
+      'EventBridgeRunAllLambdasRoleArn'
+    );
+
+    const generateReportLambdaArn = ssm.StringParameter.fromStringParameterName(
+      this,
+      'ImportedGenerateReportLambdaArn',
+      'GenerateReportLambdaArn'
+    );
+
+    const sendDialogueLinkLambdaArn = ssm.StringParameter.fromStringParameterName(
+      this,
+      'ImportedDialogueLinkLambdaArn',
+      'DialogueLinkLambdaArn'
+    );
+
 
     const dbUrlSecret = this.syncDatabaseUrlSecret(
       props.databaseEndpoint,
@@ -83,6 +103,9 @@ export class CoreAPI extends Construct {
           CLOUDINARY_URL: '',
           MAIL_SENDER: props.apiOptions.mailSenderMail,
           ENVIRONMENT: props.apiOptions.environment,
+          EVENT_BRIDGE_RUN_ALL_LAMBDAS_ROLE_ARN: runAllLambdasEventBridgeRoleArn.stringValue,
+          GENERATE_REPORT_LAMBDA_ARN: generateReportLambdaArn.stringValue,
+          SEND_DIALOGUE_LINK_LAMBDA_ARN: sendDialogueLinkLambdaArn.stringValue,
           test: 'test'
         },
         secrets: {
@@ -126,6 +149,32 @@ export class CoreAPI extends Construct {
       actions: ['sns:Publish'],
       effect: iam.Effect.ALLOW,
     }));
+
+    this.service.taskDefinition.taskRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      resources: ['arn:aws:events:eu-central-1:*:event-bus/*'],
+      actions: [
+        'events:*',
+      ],
+      effect: iam.Effect.ALLOW,
+    }));
+
+    this.service.taskDefinition.taskRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      resources: ['arn:aws:events:eu-central-1:*:rule/*'],
+      actions: [
+        'events:*',
+      ],
+      effect: iam.Effect.ALLOW,
+    }));
+
+    this.service.taskDefinition.taskRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      resources: ['arn:aws:iam::*:role/*'],
+      actions: [
+        'iam:PassRole',
+      ],
+      effect: iam.Effect.ALLOW,
+    }));
+
+    //
   }
 
   /**

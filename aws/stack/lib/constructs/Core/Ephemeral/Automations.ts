@@ -14,6 +14,7 @@ import {
   Stack,
   aws_events as events,
   aws_events_targets as eventTargets,
+  aws_ssm as ssm,
 } from 'aws-cdk-lib'
 import * as cdk from '@aws-cdk/core';
 import * as crpm from 'crpm';
@@ -154,19 +155,46 @@ export class Automations extends Construct {
 
     // });
 
-    // TODO: Add the following to the lambda
-    // environment: {
-    //   bucketName: bucket.ref,
-    //   AUTOMATION_API_KEY: jwtSecret.secretValueFromJson('AUTOMATION_API_KEY').toString(),
-    // },
     new HaasDialogueLinkHandleService(this, 'HaasDialogueLinkHandleService', {
       AUTOMATION_API_KEY: jwtSecret.secretValueFromJson('AUTOMATION_API_KEY').toString()
     });
+
+    const canInvokeAllLambdasRole = new iam.Role(this, 'invoke-all-lambdas-role', {
+      roleName: 'InvokeAllLambdasRole',
+      assumedBy: new iam.ServicePrincipal('events.amazonaws.com'),
+    })
+
+    canInvokeAllLambdasRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      resources: ['arn:aws:lambda:eu-central-1:*:function:*'],
+      actions: ['lambda:InvokeFunction'],
+      effect: iam.Effect.ALLOW,
+    }));
+
+    const generateReportLambdaArnParam = new ssm.StringParameter(this, 'generate-report-lambda-arn', {
+      parameterName: 'GenerateReportLambdaArn',
+      stringValue: app2Fn.functionArn,
+      description: 'the arn of the lambda used to generate reports',
+      type: ssm.ParameterType.STRING,
+      tier: ssm.ParameterTier.STANDARD,
+      allowedPattern: '.*',
+    });
+
+    const eventBridgeRunAllLambdasArnParam = new ssm.StringParameter(this, 'event-bridge-run-all-lambdas-role-arn', {
+      parameterName: 'EventBridgeRunAllLambdasRoleArn',
+      stringValue: canInvokeAllLambdasRole.roleArn,
+      description: 'the arn of the role used by all EventBridge rules to execute automation lambdas',
+      type: ssm.ParameterType.STRING,
+      tier: ssm.ParameterTier.STANDARD,
+      allowedPattern: '.*',
+    });
+
+    // 
 
     new CfnOutput(this, 'ECRImageURI', { value: dockerImage.imageUri });
     new CfnOutput(this, 'LambdaFunctionName', { value: appFn.ref });
     new CfnOutput(this, 'LambdaPuppeteerFunctionName', { value: app2Fn.functionName });
     new CfnOutput(this, 'Sns', { value: snsTopic.topicName });
     new CfnOutput(this, 'BucketName', { value: bucket.ref });
+    new CfnOutput(this, 'RunAllLambdasArnParam', { value: eventBridgeRunAllLambdasArnParam.parameterName })
   }
 }

@@ -416,7 +416,7 @@ const AutomationForm = ({
     name: 'schedule',
     control: form.control,
   });
-  console.log('Watch schedule: ', watchSchedule);
+
   const cronners = useCronSchedule(`${watchSchedule?.minutes} ${watchSchedule?.hours} ${watchSchedule?.dayOfMonth} ${watchSchedule?.month} ${watchSchedule?.dayOfWeek}`);
 
   const onSubmit = (formData: FormDataProps) => {
@@ -479,7 +479,7 @@ const AutomationForm = ({
     }
   };
 
-  console.log('errors: ', form.formState.errors);
+  // console.log('errors: ', form.formState.errors);
 
   return (
     <>

@@ -1,14 +1,14 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import https from 'https';
-import cookieParser from "cookie-parser";
-import cors, { CorsOptions } from "cors";
-import express from "express";
-import { graphqlUploadExpress } from "graphql-upload";
+import cookieParser from 'cookie-parser';
+import cors, { CorsOptions } from 'cors';
+import express from 'express';
+import { graphqlUploadExpress } from 'graphql-upload';
 
 import DeliveryWebhookRoute from '../routes/webhooks/DeliveryWebhookRoute';
 import { makeApollo } from './apollo';
-import config from "./config";
+import config from './config';
 
 export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   console.log('🏳️\tStarting application');
@@ -41,7 +41,7 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   // Add /graphql and graphqlUploadExpress
   const apollo = await makeApollo(prismaClient);
   app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
-  apollo.applyMiddleware({ app, cors: false, });
+  apollo.applyMiddleware({ app, cors: false });
 
   if (config.useSSL) {
     const key: any = process.env.HTTPS_SERVER_KEY_PATH;

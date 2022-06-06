@@ -5,6 +5,7 @@ import {
   aws_sns as sns,
   aws_sns_subscriptions as snsSubs,
   aws_lambda_nodejs,
+  aws_ssm as ssm,
 } from 'aws-cdk-lib'
 import { Construct } from "constructs";
 import { SqsDestination } from 'aws-cdk-lib/aws-lambda-destinations';
@@ -42,6 +43,15 @@ export class HaasDialogueLinkHandleService extends Construct {
       environment: {
         AUTOMATION_API_KEY: props.AUTOMATION_API_KEY,
       }
+    });
+
+    const dialogueLinkLambdaArnParam = new ssm.StringParameter(this, 'dialogue-link-lambda-arn', {
+      parameterName: 'DialogueLinkLambdaArn',
+      stringValue: haasDialogueLinkSenderLambda.functionArn,
+      description: 'the arn of the lambda used to send dialogue links to the correct people',
+      type: ssm.ParameterType.STRING,
+      tier: ssm.ParameterTier.STANDARD,
+      allowedPattern: '.*',
     });
 
     // // SNS Subscription
