@@ -184,7 +184,8 @@ export type AutomationConnectionOrderByInput = {
 /** Fields to order UserConnection by. */
 export enum AutomationConnectionOrderType {
   UpdatedAt = 'updatedAt',
-  Type = 'type'
+  Type = 'type',
+  CreatedAt = 'createdAt'
 }
 
 export type AutomationEventInput = {
@@ -521,10 +522,6 @@ export type CreateQuestionNodeInputType = {
   happyText?: Maybe<Scalars['String']>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
-};
-
-export type CreateScheduledAutomationInput = {
-  workspaceSlug: Scalars['String'];
 };
 
 export type CreateTriggerInputType = {
@@ -1217,11 +1214,6 @@ export type GetCampaignsInput = {
   customerSlug?: Maybe<Scalars['String']>;
 };
 
-export type HandleAutomationActionsInput = {
-  workspaceSlug: Scalars['String'];
-  automationId: Scalars['String'];
-};
-
 export type HandleUserStateInWorkspaceInput = {
   userId?: Maybe<Scalars['String']>;
   workspaceId?: Maybe<Scalars['String']>;
@@ -1416,11 +1408,9 @@ export type Mutation = {
   /** Creates a new automation. */
   createAutomation: AutomationModel;
   updateAutomation: AutomationModel;
-  handleAutomationActions?: Maybe<Scalars['Boolean']>;
   enableAutomation?: Maybe<AutomationModel>;
   deleteAutomation?: Maybe<AutomationModel>;
   sendAutomationDialogueLink?: Maybe<Scalars['Boolean']>;
-  createScheduledAutomationResolver?: Maybe<Scalars['String']>;
   sendAutomationReport?: Maybe<Scalars['Boolean']>;
   createCampaign: CampaignType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
@@ -1550,11 +1540,6 @@ export type MutationUpdateAutomationArgs = {
 };
 
 
-export type MutationHandleAutomationActionsArgs = {
-  input?: Maybe<HandleAutomationActionsInput>;
-};
-
-
 export type MutationEnableAutomationArgs = {
   input?: Maybe<EnableAutomationInput>;
 };
@@ -1567,11 +1552,6 @@ export type MutationDeleteAutomationArgs = {
 
 export type MutationSendAutomationDialogueLinkArgs = {
   input?: Maybe<SendAutomationDialogueLinkInput>;
-};
-
-
-export type MutationCreateScheduledAutomationResolverArgs = {
-  input?: Maybe<CreateScheduledAutomationInput>;
 };
 
 

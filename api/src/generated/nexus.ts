@@ -731,7 +731,7 @@ export interface NexusGenEnums {
   AutomationConditionBuilderType: prisma.AutomationConditionBuilderType
   AutomationConditionOperatorType: prisma.AutomationConditionOperatorType
   AutomationConditionScopeType: prisma.AutomationConditionScopeType
-  AutomationConnectionOrderType: "type" | "updatedAt"
+  AutomationConnectionOrderType: "createdAt" | "type" | "updatedAt"
   AutomationEventType: prisma.AutomationEventType
   AutomationType: prisma.AutomationType
   CampaignVariantEnum: "EMAIL" | "QUEUE" | "SMS"

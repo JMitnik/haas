@@ -46,7 +46,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
         offset: filter.pageIndex * filter.perPage,
         perPage: filter.perPage,
         orderBy: {
-          by: AutomationConnectionOrderType.UpdatedAt,
+          by: AutomationConnectionOrderType.CreatedAt,
           desc: true,
         },
       },

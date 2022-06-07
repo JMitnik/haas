@@ -158,6 +158,7 @@ input AutomationConnectionOrderByInput {
 
 """Fields to order UserConnection by."""
 enum AutomationConnectionOrderType {
+  createdAt
   type
   updatedAt
 }
