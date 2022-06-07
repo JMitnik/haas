@@ -12,7 +12,7 @@ export const UpdateAutomationResolver = mutationField('updateAutomation', {
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
 
     const automation = await ctx.services.automationService.updateAutomation(args.input);
-    return automation;
+    return automation as any;
   },
 });
 

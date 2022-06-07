@@ -179,11 +179,11 @@ const schema = yup.object({
   }),
   schedule: yup.object().shape({
     activeDialogue: yup.object().shape({
-      type: yup.string().required(),
-      value: yup.string().required(),
-      label: yup.string().required(),
-      id: yup.string().required(),
-    }).required(),
+      type: yup.string(),
+      value: yup.string(),
+      label: yup.string(),
+      id: yup.string(),
+    }).nullable(true),
     type: yup.mixed<RecurringPeriodType>().oneOf(Object.values(RecurringPeriodType)),
     minutes: yup.string(),
     hours: yup.string(),
@@ -199,6 +199,12 @@ const schema = yup.object({
       dayOfMonth: yup.string().required(),
       month: yup.string().required(),
       dayOfWeek: yup.string().required(),
+      activeDialogue: yup.object().shape({
+        type: yup.string().required(),
+        value: yup.string().required(),
+        label: yup.string().required(),
+        id: yup.string().required(),
+      }).required()
     }).required(),
   }),
   actions: yup.array().of(
@@ -372,7 +378,7 @@ const AutomationForm = ({
         dayOfWeek: automation?.schedule?.dayOfWeek,
         hours: automation?.schedule?.hours,
         minutes: automation?.schedule?.minutes,
-        activeDialogue: automation?.schedule?.activeDialogue,
+        activeDialogue: automation?.schedule?.activeDialogue || null,
       },
       conditionBuilder:
       {
@@ -476,7 +482,7 @@ const AutomationForm = ({
         hours: formData?.schedule?.hours as string,
         minutes: formData?.schedule?.minutes as string,
         id: automation?.schedule?.id,
-        dialogueId: formData.schedule?.activeDialogue.id
+        dialogueId: formData.schedule?.activeDialogue?.id
       } : undefined,
     };
 
@@ -616,7 +622,7 @@ const AutomationForm = ({
                                           display="flex"
                                           alignItems="center"
                                         >
-                                          {value?.label ? (
+                                          {(value as any)?.label ? (
                                             <NodeCell onRemove={() => onChange(null)} onClick={onOpen} node={value} />
                                           ) : (
                                             <UI.Button

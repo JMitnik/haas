@@ -65,7 +65,7 @@ export interface AutomationInput {
       label?: string;
       type?: string;
       value?: string;
-    };
+    } | null;
   }
   conditionBuilder: {
     id?: string;

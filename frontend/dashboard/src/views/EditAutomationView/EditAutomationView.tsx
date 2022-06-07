@@ -150,12 +150,12 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
       minutes: input?.automationScheduled?.minutes,
       month: input?.automationScheduled?.month,
       type: input?.automationScheduled?.type,
-      activeDialogue: {
+      activeDialogue: input?.automationScheduled?.activeDialogue?.id ? {
         label: input?.automationScheduled?.activeDialogue?.title,
         type: 'DIALOGUE',
         value: input?.automationScheduled?.activeDialogue?.slug,
         id: input?.automationScheduled?.activeDialogue?.id,
-      },
+      } : null,
     },
     conditionBuilder: {
       id: input?.automationTrigger?.conditionBuilder?.id,
