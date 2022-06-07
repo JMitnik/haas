@@ -27,6 +27,7 @@ import {
   ConditionEntry,
 } from '../AddAutomationView/CreateConditionModalCardTypes';
 import AutomationForm from '../AddAutomationView/AutomationForm';
+import cuid from 'cuid';
 
 const mapConditionOperator = (type: AutomationConditionOperatorType) => {
   switch (type) {
@@ -242,7 +243,7 @@ const EditAutomationView = () => {
   // TODO: Add child builder
   const conditionEntries: ConditionEntry[] = findUniqueConditionEntries(
     mappedAutomation.conditionBuilder.conditions.map(
-      (condition) => condition.condition,
+      (condition) => ({ ...condition.condition, label: cuid() }),
     ) as ConditionEntry[],
   );
 

@@ -1937,6 +1937,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   automation: {
+    compare_to: {
+      en: 'Compare value',
+      de: 'Wert vergleichen',
+    },
     schedule: {
       en: 'Schedule',
       de: 'Zeitlicher Ablauf',

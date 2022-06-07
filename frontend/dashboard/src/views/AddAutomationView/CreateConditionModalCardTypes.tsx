@@ -31,4 +31,5 @@ export interface ConditionEntry {
   aggregate?: ConditionPropertyAggregateType;
   questionOption?: string;
   latest?: number;
+  label?: string;
 }

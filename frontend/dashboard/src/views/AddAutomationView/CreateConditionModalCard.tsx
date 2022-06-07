@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useEffect } from 'react';
 import Select from 'react-select';
+import cuid from 'cuid';
 
 import {
   AutomationConditionScopeType,
@@ -96,7 +97,8 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
     },
   });
 
-  const onSubmit = (formData: FormDataProps) => {
+  const onSubmit = () => {
+    const formData = form.getValues();
     const returnData: ConditionEntry = {
       scopeType: formData.scopeType as AutomationConditionScopeType,
       activeDialogue: formData.activeDialogue,
@@ -106,6 +108,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
       aggregate: formData.aggregate as ConditionPropertyAggregateType,
       questionOption: formData.questionOption?.value,
       latest: formData.latest,
+      label: cuid(),
     };
     onSuccess(returnData);
     onClose();
@@ -201,7 +204,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
       </UI.ModalHead>
       <UI.ModalBody>
         <UI.Div paddingLeft={0} paddingRight="4em">
-          <UI.Form onSubmit={form.handleSubmit(onSubmit)}>
+          <UI.Form>
             <UI.Div>
               <UI.FormSection id="general">
                 <UI.Div>
@@ -409,7 +412,12 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                     </UI.FormControl>
 
                     {watchScopeType === 'QUESTION' && (
-                      <UI.FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.formState.errors.aspect}>
+                      <UI.FormControl
+                        display="none"
+                        gridColumn="1 / -1"
+                        isRequired
+                        isInvalid={!!form.formState.errors.aspect}
+                      >
                         <UI.FormLabel htmlFor="aspect">{t('automation:property')}</UI.FormLabel>
                         <UI.InputHelper>{t('automation:property_helper')}</UI.InputHelper>
                         <Controller
@@ -479,7 +487,12 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                 </UI.Div>
                 <UI.Div>
                   <UI.InputGrid>
-                    <UI.FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.formState.errors.scopeType}>
+                    <UI.FormControl
+                      display="none"
+                      gridColumn="1 / -1"
+                      isRequired
+                      isInvalid={!!form.formState.errors.scopeType}
+                    >
                       <UI.FormLabel htmlFor="aggregate">{t('automation:aggregate_type')}</UI.FormLabel>
                       <UI.InputHelper>{t('automation:aggregate_type_helper')}</UI.InputHelper>
                       <Controller
@@ -508,7 +521,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                       <UI.ErrorMessage>{form.formState.errors.scopeType?.message}</UI.ErrorMessage>
                     </UI.FormControl>
 
-                    <UI.FormControl>
+                    <UI.FormControl display="none">
                       <UI.FormLabel>{t('automation:date_range')}</UI.FormLabel>
                       <UI.FormLabelHelper>{t('automation:date_range_helper')}</UI.FormLabelHelper>
                       <UI.Div>
@@ -587,7 +600,8 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                         // isLoading={createLoading || updateLoading}
                         isDisabled={!form.formState.isValid}
                         variantColor="teal"
-                        type="submit"
+                        // type="submit"
+                        onClick={() => onSubmit()}
                       >
                         {t('save')}
                       </UI.Button>
