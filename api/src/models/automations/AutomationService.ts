@@ -103,7 +103,7 @@ class AutomationService {
         AUTOMATION_ACTION_ID: action.id,
         DASHBOARD_URL: 'NOT_USED_BUT_NEEDED_FOR_CHECK_IN_LAMBDA',
         REPORT_URL: reportUrl,
-        API_URL: config.baseUrl,
+        API_URL: `${config.baseUrl}/graphql`,
         WORKSPACE_EMAIL: botUser.email,
         WORKSPACE_SLUG: workspaceSlug,
         AUTHENTICATE_EMAIL: 'automations@haas.live',
@@ -112,7 +112,7 @@ class AutomationService {
       const sendDialogueLinkParams = {
         AUTOMATION_SCHEDULE_ID: automationScheduledId,
         AUTHENTICATE_EMAIL: 'automations@haas.live',
-        API_URL: config.baseUrl,
+        API_URL: `${config.baseUrl}/graphql`,
         WORKSPACE_EMAIL: botUser.email,
         WORKSPACE_SLUG: workspaceSlug,
       }
@@ -157,8 +157,11 @@ class AutomationService {
       State: state,
       RoleArn: process.env.EVENT_BRIDGE_RUN_ALL_LAMBDAS_ROLE_ARN,
     }).promise().catch((e) => {
+      console.log(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
       throw new ApolloError(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
     });
+
+    console.log('upsertedRule: ', upsertedRule.RuleArn);
 
     const targets =
       await this.eventBridge.putTargets({

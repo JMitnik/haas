@@ -100,7 +100,8 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
         duration: 1500,
       });
     },
-    onError: () => {
+    onError: (e) => {
+      console.log('Something went wrong deleting automation: ', e.message);
       toast({
         title: 'Something went wrong!',
         description: 'The automation was not deleted.',

@@ -170,9 +170,15 @@ export class Automations extends Construct {
       effect: iam.Effect.ALLOW,
     }));
 
+    canInvokeAllLambdasRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      resources: ['arn:aws:sns:eu-central-1:*:haasApiReport'],
+      actions: ['sns:Publish'],
+      effect: iam.Effect.ALLOW,
+    }));
+
     const generateReportLambdaArnParam = new ssm.StringParameter(this, 'generate-report-lambda-arn', {
       parameterName: 'GenerateReportLambdaArn',
-      stringValue: app2Fn.functionArn,
+      stringValue: snsTopic.topicArn,
       description: 'the arn of the lambda used to generate reports',
       type: ssm.ParameterType.STRING,
       tier: ssm.ParameterTier.STANDARD,
