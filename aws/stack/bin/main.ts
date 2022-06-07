@@ -29,13 +29,7 @@ const stagingCoreTemp = new StagingCoreTemp(app, 'StagingCoreTemp', {
   env: stagingEnv,
 });
 
-const stagingAutomations = new StagingAutomations(app, 'StagingAutomations', {
-  vpc: stagingCoreFixed.vpc.vpc,
-  db: stagingCoreFixed.db.rdsDb,
-  repo: stagingCoreFixed.repo.repo,
-  dbSecurityGroup: stagingCoreFixed.db.dbSecurityGroup,
-  env: stagingEnv,
-});
+const stagingAutomations = new StagingAutomations(app, 'StagingAutomations');
 
 // const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
 //     prefix: 'haas_svc_api',

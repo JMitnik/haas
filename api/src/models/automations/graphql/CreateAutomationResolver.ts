@@ -168,9 +168,7 @@ export const CreateAutomationInput = inputObjectType({
     // Automation Actions
     t.list.field('actions', { type: AutomationActionInput });
 
-    // Trigger:
-
-    // TODO: Add fields for Trigger:recurring as wel as Campaign
+    // TODO: Add fields Campaign
   },
 });
 

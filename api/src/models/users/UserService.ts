@@ -26,6 +26,12 @@ class UserService {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
   };
 
+  /**
+   * Finds all users based on a AutomationAction payload
+   * @param workspaceSlug 
+   * @param targetIds 
+   * @returns a list of users
+   */
   findTargetUsers = async (workspaceSlug: string, payload: GenerateReportPayload) => {
     const targets = payload?.targets;
     const roleIds: string[] = [];

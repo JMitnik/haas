@@ -4,9 +4,7 @@ import later from '@breejs/later';
 
 // Hook
 function useCronSchedule(cronString: string) {
-  // State and setters for debounced value
   const [schedule, setSchedule] = useState<string[] | undefined>();
-  // later.date.localTime();
 
   useEffect(
     () => {

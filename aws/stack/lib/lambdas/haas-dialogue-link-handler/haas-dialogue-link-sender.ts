@@ -1,6 +1,5 @@
 import fetch from "node-fetch";
-import { APIError, JSONInputError, NetworkError } from "../../helpers/errors";
-import { sendToCallbackUrl } from "../../helpers/helpers";
+import { JSONInputError } from "../../helpers/errors";
 
 interface MessageProps {
   payload: any;
@@ -71,12 +70,7 @@ const sendAutomationDialogueLink = async (apiUrl: string, accessToken: string, a
 }
 
 exports.main = async function (event: any, context: any) {
-  // if (!event?.Records[0]?.Sns?.Message) {
-  //   throw new Error(`No record found for ${event?.Records[0]?.Sns}`);
-  // }
-
-  // const { payload, callbackUrl }: MessageProps = JSON.parse(event?.Records[0]?.Sns?.Message);
-  const message = event; // JSON.parse(event);
+  const message = event;
   const apiUrl: string = message.API_URL;
   const authenticateEmail: string = message.AUTHENTICATE_EMAIL;
   const workspaceEmail: string = message.WORKSPACE_EMAIL;

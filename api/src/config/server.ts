@@ -59,6 +59,5 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   const serverInstance = app.listen(port);
   console.log('🏁\Listening on standard server!');
   console.log('🏁\tStarted the server!');
-  console.log('process.env: ', process.env);
   return serverInstance;
 };

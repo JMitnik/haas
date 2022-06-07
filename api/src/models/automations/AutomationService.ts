@@ -65,13 +65,19 @@ class AutomationService {
     this.prisma = prisma;
 
     this.iam = new AWS.IAM();
-    this.eventBridge = new AWS.EventBridge({
-    });
-
-    this.lambda = new AWS.Lambda({
-    });
+    this.eventBridge = new AWS.EventBridge();
+    this.lambda = new AWS.Lambda();
   }
 
+  /**
+   * Maps the actions of a scheduled automation to valid AWS EventBridge rule targets
+   * @param automationScheduledId the id of a scheduled automation
+   * @param actions a list of automation actions
+   * @param botUser the bot user of a workspace
+   * @param workspaceSlug the slug of a workspace
+   * @param dialogueSlug the slug of a dialogue
+   * @returns a list of targets for an AWS EventBridge rule
+   */
   mapActionsToRuleTargets = (
     automationScheduledId: string,
     actions: AutomationAction[],
@@ -90,9 +96,6 @@ class AutomationService {
         ? process.env.GENERATE_REPORT_LAMBDA_ARN as string
         : process.env.SEND_DIALOGUE_LINK_LAMBDA_ARN as string;
 
-      // TODO: Add input data for generate report
-      // TODO: Change lambdaTargetArn for generateReport to the SNS that is supposed to call the lambda
-      // + check where and whether the static content is send to the SNS and maybe need different way to access it
       const dashboardUrl = config.dashboardUrl;
 
       // TODO: Create a workspace scoped url instead dialogue scoped url when no dialogueSlug provided
@@ -129,6 +132,13 @@ class AutomationService {
     })
   }
 
+  /**
+   * Upserts an AWS EventBridge (and its targets) based on a scheduled automation
+   * @param workspaceId 
+   * @param automationScheduled a scheduled automation
+   * @param parentAutomation the parent automation the scheduled automation is connected to
+   * @param dialogueId 
+   */
   upsertEventBridge = async (
     workspaceId: string,
     automationScheduled: AutomationScheduled,
@@ -141,6 +151,7 @@ class AutomationService {
   ) => {
     const { minutes, hours, dayOfMonth, dayOfWeek, month } = automationScheduled;
 
+    // Transform the CRON expression to one supported by AWS (? indicator is not part of cron-validator)
     const scheduledExpression = `cron(${minutes} ${hours} ${dayOfMonth === '*' ? '?' : dayOfMonth} ${month} ${dayOfWeek} *)`
 
     // Find the state of the automation and adjust event bridge rule to that
@@ -151,7 +162,7 @@ class AutomationService {
 
     const user = await this.userService.findBotByWorkspaceName(workspace.slug);
 
-    const upsertedRule = await this.eventBridge.putRule({
+    await this.eventBridge.putRule({
       Name: automationScheduled.id,
       ScheduleExpression: scheduledExpression,
       State: state,
@@ -161,30 +172,31 @@ class AutomationService {
       throw new ApolloError(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
     });
 
-    const targets =
-      await this.eventBridge.putTargets({
-        Rule: automationScheduled.id,
-        Targets: this.mapActionsToRuleTargets(
-          automationScheduled.id,
-          parentAutomation.automationScheduled?.actions || [],
-          user!,
-          workspace.slug,
-          dialogue?.slug,
-        ),
-      }).promise().catch((e) => {
-        throw new ApolloError(`upserting targets automation schedule: ${automationScheduled.id} with error ${e}`)
-      });;
+    await this.eventBridge.putTargets({
+      Rule: automationScheduled.id,
+      Targets: this.mapActionsToRuleTargets(
+        automationScheduled.id,
+        parentAutomation.automationScheduled?.actions || [],
+        user!,
+        workspace.slug,
+        dialogue?.slug,
+      ),
+    }).promise().catch((e) => {
+      throw new ApolloError(`upserting targets automation schedule: ${automationScheduled.id} with error ${e}`)
+    });;
 
-    console.log('Targets: ', targets);
-
-    // return rule.RuleArn;
   }
 
+  /**
+   * Deletes an automation as well as its related AWS resources
+   * @param input 
+   * @returns the deleted automation
+   */
   deleteAutomation = async (input: NexusGenInputs['DeleteAutomationInput']) => {
     const deleteAutomation = await this.automationPrismaAdapter.deleteAutomation(input);
 
     if (deleteAutomation.automationScheduledId) {
-      // Disable in case removing fails for some reason so we don't create orphan rule
+      // Disable in case removing fails for some reason so we don't create orphan rules which still run
       await this.eventBridge.disableRule({
         Name: deleteAutomation.automationScheduledId,
       }).promise();

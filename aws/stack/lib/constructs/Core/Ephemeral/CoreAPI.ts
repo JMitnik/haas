@@ -174,7 +174,6 @@ export class CoreAPI extends Construct {
       effect: iam.Effect.ALLOW,
     }));
 
-    //
   }
 
   /**

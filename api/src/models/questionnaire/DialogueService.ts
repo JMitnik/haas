@@ -58,6 +58,11 @@ class DialogueService {
     this.nodeService = new NodeService(prismaClient);
   }
 
+  /**
+   * Finds dialogue by a question ID
+   * @param questionId 
+   * @returns 
+   */
   findDialogueByQuestionId = async (questionId: string) => {
     return this.dialoguePrismaAdapter.getDialogueByQuestionNodeId(questionId);
   }

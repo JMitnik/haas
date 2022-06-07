@@ -7,6 +7,12 @@ class UserOfCustomerPrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  /**
+   * Finds all users based on either user ID(s) and/or role ID(s)
+   * @param workspaceSlug 
+   * @param targetIds 
+   * @returns a list of users
+   */
   async findTargetUsers(workspaceSlug: string, targetIds: { userIds: string[]; roleIds: string[] }) {
     return this.prisma.userOfCustomer.findMany({
       where: {
@@ -17,7 +23,7 @@ class UserOfCustomerPrismaAdapter {
             },
           },
           {
-            isActive: true, // Inactive users shouldn't receive reports
+            isActive: true,
           },
           {
             OR: [

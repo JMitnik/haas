@@ -22,6 +22,11 @@ export class AutomationPrismaAdapter {
     this.prisma = prisma;
   }
 
+  /**
+   * Finds a scheduled automation by its id
+   * @param automationScheduledId 
+   * @returns 
+   */
   findScheduledAutomationById = async (automationScheduledId: string) => {
     const automationScheduled = await this.prisma.automationScheduled.findUnique({
       where: {
@@ -34,6 +39,11 @@ export class AutomationPrismaAdapter {
     return automationScheduled;
   };
 
+  /**
+   * Deletes an automation from the database
+   * @param input 
+   * @returns the deleted automation
+   */
   deleteAutomation = async (input: NexusGenInputs['DeleteAutomationInput']) => {
     const automation = await this.prisma.automation.delete({
       where: {

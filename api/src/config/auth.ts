@@ -37,6 +37,9 @@ const isFromClient = rule({ cache: 'contextual' })(
   },
 )
 
+/**
+ * Rule which checks whether user is a user by matching provided refresh token with db value
+ */
 const isVerifiedUser = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
     return ctx.services.authService.isVerifiedUser(

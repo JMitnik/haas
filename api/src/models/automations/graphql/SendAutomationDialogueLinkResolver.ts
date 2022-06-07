@@ -18,9 +18,8 @@ export const SendAutomationDialogueLinkResolver = mutationField('sendAutomationD
   async resolve(parent, args, ctx) {
 
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
-    const { automationScheduleId, workspaceSlug } = args.input;
 
-    console.log('Running sendAUtomationDialogueLInk with input: ', args.input);
+    const { automationScheduleId, workspaceSlug } = args.input;
 
     return ctx.services.automationActionService.sendDialogueLink(automationScheduleId, workspaceSlug);
   },

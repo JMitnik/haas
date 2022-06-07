@@ -204,7 +204,7 @@ const schema = yup.object({
         value: yup.string().required(),
         label: yup.string().required(),
         id: yup.string().required(),
-      }).required()
+      }).required(),
     }).required(),
   }),
   actions: yup.array().of(
@@ -450,8 +450,6 @@ const AutomationForm = ({
     // TODO: Create a picker for questionId/dialogueId for event
     // TODO: Add childbuilder
 
-    console.log('Form data: ', formData.schedule);
-
     const activeActions = formData.actions.map((action) => {
       const actionEntry: ActionEntry = (action as any)?.action;
       return {
@@ -482,7 +480,7 @@ const AutomationForm = ({
         hours: formData?.schedule?.hours as string,
         minutes: formData?.schedule?.minutes as string,
         id: automation?.schedule?.id,
-        dialogueId: formData.schedule?.activeDialogue?.id
+        dialogueId: formData.schedule?.activeDialogue?.id,
       } : undefined,
     };
 
@@ -505,8 +503,6 @@ const AutomationForm = ({
       });
     }
   };
-
-  // console.log('errors: ', form.formState.errors);
 
   return (
     <>
@@ -881,7 +877,7 @@ const AutomationForm = ({
                             form.setValue('schedule', {
                               ...data,
                               activeDialogue: watchSchedule?.activeDialogue as any,
-                              type: watchSchedule?.type as RecurringPeriodType
+                              type: watchSchedule?.type as RecurringPeriodType,
                             });
                           }
                           return onChange(e);

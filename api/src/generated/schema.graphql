@@ -482,10 +482,6 @@ input CreateQuestionNodeInputType {
   unhappyText: String
 }
 
-input CreateScheduledAutomationInput {
-  workspaceSlug: String!
-}
-
 input CreateTriggerInputType {
   customerSlug: String
   recipients: RecipientsInputType
@@ -1033,11 +1029,6 @@ input GetCampaignsInput {
   customerSlug: String
 }
 
-input HandleAutomationActionsInput {
-  automationId: String!
-  workspaceSlug: String!
-}
-
 input HandleUserStateInWorkspaceInput {
   isActive: Boolean
   userId: String
@@ -1227,7 +1218,6 @@ type Mutation {
   createPermission(data: PermissionInput): PermssionType
   createQuestion(input: CreateQuestionNodeInputType): QuestionNode
   createRole(data: RoleInput): RoleType!
-  createScheduledAutomationResolver(input: CreateScheduledAutomationInput): String
   createSession(input: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(input: CreateTriggerInputType): TriggerType!
@@ -1248,7 +1238,6 @@ type Mutation {
   enableAutomation(input: EnableAutomationInput): AutomationModel
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
   generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer
-  handleAutomationActions(input: HandleAutomationActionsInput): Boolean
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
 
   """Invite a user to a particular customer domain, given an email and role"""

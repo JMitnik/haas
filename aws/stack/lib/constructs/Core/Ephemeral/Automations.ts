@@ -22,46 +22,40 @@ import { Construct } from "constructs";
 import { Handler, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { HaasDialogueLinkHandleService } from '../../../lambdas/haas-dialogue-link-handler/haas-dialogue-link-handle-service';
 
-interface StagingAutomationProps {
-  vpc: ec2.Vpc;
-  db: rds.DatabaseInstance;
-  dbSecurityGroup: ec2.SecurityGroup;
-}
-
 const name = 'Puppeteer'
 
 export class Automations extends Construct {
-  constructor(scope: Construct, id: string, props: StagingAutomationProps) {
+  constructor(scope: Construct, id: string) {
     super(scope, id);
 
     const bucketProps = crpm.load<s3.CfnBucketProps>(`${__dirname}/Automations/infra/res/storage/s3/bucket/props.yaml`);
     const bucket = new s3.CfnBucket(this, 'Bucket', bucketProps);
 
-    const dockerImage = new ecra.DockerImageAsset(this, 'DockerImage', { directory: `${__dirname}/Automations/`, exclude: ['node_modules', 'infra'], });
+    // const dockerImage = new ecra.DockerImageAsset(this, 'DockerImage', { directory: `${__dirname}/Automations/`, exclude: ['node_modules', 'infra'], });
 
     const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this,
       'AUTOMATION_API_KEY',
       'SecretOfAutomation',
     );
 
-    const fnRoleProps = crpm.load<iam.CfnRoleProps>(`${__dirname}/Automations/infra/res/security-identity-compliance/iam/role-lambda/props.yaml`);
-    const fnRole = new iam.CfnRole(this, 'LambdaRole', fnRoleProps);
+    // const fnRoleProps = crpm.load<iam.CfnRoleProps>(`${__dirname}/Automations/infra/res/security-identity-compliance/iam/role-lambda/props.yaml`);
+    // const fnRole = new iam.CfnRole(this, 'LambdaRole', fnRoleProps);
 
-    const appFnProps = crpm.load<lambda.CfnFunctionProps>(`${__dirname}/Automations/infra/res/compute/lambda/function-puppeteer/props.yaml`);
+    // const appFnProps = crpm.load<lambda.CfnFunctionProps>(`${__dirname}/Automations/infra/res/compute/lambda/function-puppeteer/props.yaml`);
 
 
-    appFnProps.code = {
-      imageUri: dockerImage.imageUri,
-    };
-    appFnProps.role = fnRole.attrArn;
-    appFnProps.environment = {
-      variables: {
-        bucketName: bucket.ref,
-        AUTOMATION_API_KEY: jwtSecret.secretValueFromJson('AUTOMATION_API_KEY').toString(),
-      },
-    }
+    // appFnProps.code = {
+    //   imageUri: dockerImage.imageUri,
+    // };
+    // appFnProps.role = fnRole.attrArn;
+    // appFnProps.environment = {
+    //   variables: {
+    //     bucketName: bucket.ref,
+    //     AUTOMATION_API_KEY: jwtSecret.secretValueFromJson('AUTOMATION_API_KEY').toString(),
+    //   },
+    // }
 
-    const appFn = new lambda.CfnFunction(this, 'PuppeteerFunction', appFnProps);
+    // const appFn = new lambda.CfnFunction(this, 'PuppeteerFunction', appFnProps);
 
     // 👇 import existing IAM Role
     const importedRole = iam.Role.fromRoleArn(
@@ -108,13 +102,6 @@ export class Automations extends Construct {
       topicName: `haasApiReport`,
     });
 
-    //   senderHandler.role?.addToPrincipalPolicy(new iam.PolicyStatement({
-    //     resources: [`arn:aws:ssm:eu-central-1:${props.accountId}:parameter/TWILIO_CALLBACK_URL`],
-    //     effect: iam.Effect.ALLOW,
-    //     actions: ['ssm:GetParameter']
-    // }));
-
-    console.log('topic name: ', snsTopic.topicArn);
     snsTopic.addToResourcePolicy(new iam.PolicyStatement({
       resources: [snsTopic.topicArn],
       actions: [
@@ -130,7 +117,7 @@ export class Automations extends Construct {
       effect: iam.Effect.ALLOW,
       principals: [
         new iam.AccountRootPrincipal(),
-        new iam.AccountPrincipal('356797133903'), // FIXME: Moet gefixed (dit is StagingCoreTemp en zal dus niet werken in productie)
+        new iam.AccountPrincipal('356797133903'),
         new iam.AccountPrincipal('649621042808'), //TODO: Moet gefixed (dit is Jonathan's accountId)
         new iam.AccountPrincipal(cdk.Stack.of(this).account),
       ],
@@ -142,18 +129,6 @@ export class Automations extends Construct {
     });
 
     snsTopic.addSubscription(snsLambdaSubscription);
-
-    // const rule = new events.Rule(this, 'ScheduleRule', {
-    //   schedule: events.Schedule.cron({ minute: '0', hour: '4' }),
-    //   targets: [new eventTargets.SnsTopic(snsTopic)],
-    // });
-
-    // const ruleTwo = new events.Rule(this, 'ScheduleRuleTwo', {
-    //   schedule: events.Schedule.expression('cron(* * ? * MON-FRI *)'),
-    //   targets: [new eventTargets.SnsTopic(snsTopic)],
-    //   enabled: false,
-
-    // });
 
     new HaasDialogueLinkHandleService(this, 'HaasDialogueLinkHandleService', {
       AUTOMATION_API_KEY: jwtSecret.secretValueFromJson('AUTOMATION_API_KEY').toString()
@@ -194,10 +169,6 @@ export class Automations extends Construct {
       allowedPattern: '.*',
     });
 
-    // 
-
-    new CfnOutput(this, 'ECRImageURI', { value: dockerImage.imageUri });
-    new CfnOutput(this, 'LambdaFunctionName', { value: appFn.ref });
     new CfnOutput(this, 'LambdaPuppeteerFunctionName', { value: app2Fn.functionName });
     new CfnOutput(this, 'Sns', { value: snsTopic.topicName });
     new CfnOutput(this, 'BucketName', { value: bucket.ref });
