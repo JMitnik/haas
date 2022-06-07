@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { ReactComponent as ChatIcon } from 'assets/icons/icon-chat-group-sm.svg';
+import { ChevronDown } from 'react-feather';
 import { ReactComponent as HomeIcon } from 'assets/icons/icon-view-grid-sm.svg';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification-sm.svg';
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog-sm.svg';
@@ -64,7 +65,6 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
           </NavItem>
           <NavItem
             isSubchildActive={!!dialogueSlug}
-            exact
             to={`/dashboard/b/${customerSlug}/d`}
             renderSibling={(
               <>
@@ -103,7 +103,13 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
             )}
           >
             <SurveyIcon />
-            {t('dialogues')}
+            {t('teams')}
+
+            {dialogueMatch && (
+              <UI.Icon ml={1}>
+                <ChevronDown className="chevron-down" fill="none" />
+              </UI.Icon>
+            )}
           </NavItem>
           <NavItem isDisabled={!canViewUsers} to={`/dashboard/b/${customerSlug}/users`}>
             <UsersIcon />

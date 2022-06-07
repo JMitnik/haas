@@ -19,7 +19,7 @@ const stagingEnv = {
 console.log(stagingEnv);
 
 // Main stack and pipeline
-// const api = new APIStack(app, 'HaasAPIMainStack');
+const api = new APIStack(app, 'HaasAPIMainStack');
 const stagingCoreFixed = new StagingCoreFixed(app, 'StagingCoreFixed', { env: stagingEnv });
 const stagingCoreTemp = new StagingCoreTemp(app, 'StagingCoreTemp', {
   vpc: stagingCoreFixed.vpc.vpc,

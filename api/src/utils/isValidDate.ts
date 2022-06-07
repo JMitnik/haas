@@ -44,6 +44,7 @@ export const isValidDateTime = (dateString: string, type: dateType) => {
     throw new UserInputError(isStartDate ? 'Start date invalid' : 'End date invalid');
   }
 
+
   return utcDate;
 };
 

@@ -554,8 +554,8 @@ type Customer {
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
-  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
-  nestedHealthScore(input: HealthScoreInput): HealthScore
+  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!] @deprecated(reason: "Deprecated, see statistics")
+  nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
@@ -815,6 +815,7 @@ input DialogueStatisticsSummaryFilterInput {
   impactType: DialogueImpactScoreType!
   refresh: Boolean
   startDateTime: String!
+  topicsFilter: TopicFilterInput
 }
 
 """DialogueStatisticsSummary"""
@@ -1044,6 +1045,7 @@ input HandleUserStateInWorkspaceInput {
 }
 
 type HealthScore {
+  negativeResponseCount: Int!
   nrVotes: Int!
   score: Float!
 }
@@ -1052,6 +1054,7 @@ input HealthScoreInput {
   endDateTime: String
   startDateTime: String!
   threshold: Float = 70
+  topicFilter: TopicFilterInput
 }
 
 type ImageType {
@@ -1874,6 +1877,13 @@ type TopicDelta {
   topic: String!
 }
 
+"""Generic filter object for filtering topics"""
+input TopicFilterInput {
+  dialogueStrings: [String!]
+  relatedSessionScoreLowerThreshold: Float
+  topicStrings: [String!]
+}
+
 input TopicInputType {
   endDateTime: String
   impactScoreType: DialogueImpactScoreType!
@@ -1891,6 +1901,7 @@ type TopicNodeEntryValue {
 }
 
 type TopicType {
+  basicStats: BasicStatistics
   impactScore: Float!
   name: String!
   nrVotes: Int!
@@ -2149,6 +2160,11 @@ type WorkspaceStatistics {
   mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath!
   mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+
+  """
+  Topics of a workspace ranked by either impact score or number of responses
+  """
+  rankedTopics(input: DialogueStatisticsSummaryFilterInput): [TopicType!]!
 
   """
   Returns potentially the most urgent path of the workspace (one at most)

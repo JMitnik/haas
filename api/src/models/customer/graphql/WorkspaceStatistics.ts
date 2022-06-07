@@ -52,6 +52,40 @@ export const WorkspaceStatistics = objectType({
     });
 
     /**
+     * Topics of a workspace ranked by either impact score or number of responses.
+     */
+    t.list.field('rankedTopics', {
+      type: 'TopicType',
+      args: { input: DialogueStatisticsSummaryFilterInput },
+      description: 'Topics of a workspace ranked by either impact score or number of responses',
+
+      resolve: async (parent, args, ctx) => {
+        if (!args.input) throw new UserInputError('Not input object!');
+        const { startDateTime, endDateTime } = args.input;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (startDateTime) {
+          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
+        }
+
+        if (endDateTime) {
+          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
+        }
+
+        const topicFilter = args.input.topicsFilter || undefined;
+
+        return ctx.services.dialogueStatisticsService.rankTopics(
+          parent.id,
+          utcStartDateTime as Date,
+          utcEndDateTime as Date,
+          topicFilter,
+          args.input.cutoff || undefined,
+        );
+      },
+    })
+
+    /**
      * Get the health score of a workspace.
      */
     t.field('health', {
@@ -74,10 +108,13 @@ export const WorkspaceStatistics = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
         }
 
+        const topicFilter = args.input.topicFilter || undefined;
+
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
           parent.id,
           utcStartDateTime as Date,
           utcEndDateTime,
+          topicFilter,
           threshold || undefined,
         );
       },
@@ -105,12 +142,15 @@ export const WorkspaceStatistics = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE') as Date;
         }
 
+        const topicFilter = args.input.topicsFilter || undefined;
+
         return (
           ctx.services.dialogueStatisticsService.calculateUrgentPath(
             parent.id,
             // TODO: Add validator in middleware field
             utcStartDateTime as Date,
             utcEndDateTime as Date,
+            topicFilter,
           )
         );
       },

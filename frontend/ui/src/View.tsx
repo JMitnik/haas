@@ -48,6 +48,10 @@ export const ViewHeadContainer = styled(Div)`
     right: 0;
     z-index: 100;
 
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+
     ${DeprecatedViewTitleContainer} {
       margin-bottom: 0;
     }
@@ -110,7 +114,9 @@ export const ViewContainer = styled(Div) <{ isCompact?: boolean; }>`
 export const ViewBodyContainer = styled(Div)`
   ${({ theme, padding }) => css`
     margin: 0 auto;
-    padding: ${theme.gutter}px ${theme.gutter * 1.5}px;
+    max-width: 1400px;
+    width: 100%;
+    padding: ${theme.gutter}px ${theme.gutter}px;
     background: ${theme.colors.app.background};
   `}
 `;

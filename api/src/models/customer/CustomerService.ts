@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, ChoiceNodeEntry, NodeEntry, Session, RoleTypeEnum, Role } from '@prisma/client';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry, Session, RoleTypeEnum, Role } from '@prisma/client';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
 import cuid from 'cuid';
@@ -44,8 +44,8 @@ export class CustomerService {
     this.templateService = new TemplateService(prismaClient);
   }
 
-  async getDialogues(workspaceId: string) {
-    return this.customerPrismaAdapter.getDialogues(workspaceId);
+  async getDialogues(workspaceId: string, dialogueFragments?: string[]) {
+    return this.customerPrismaAdapter.getDialogues(workspaceId, dialogueFragments);
   }
 
   /**

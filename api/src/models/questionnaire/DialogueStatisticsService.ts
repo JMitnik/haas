@@ -1,6 +1,6 @@
 import { DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, Session, SliderNodeEntry } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { groupBy, maxBy, mean, meanBy } from 'lodash';
+import { groupBy, maxBy, mean, meanBy, orderBy } from 'lodash';
 import { addDays, differenceInHours, isEqual } from 'date-fns';
 
 import { CustomerService } from '../customer/CustomerService';
@@ -10,7 +10,9 @@ import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import DialogueService from './DialogueService';
 import NodeEntryService from '../node-entry/NodeEntryService';
-import { SessionWithEntries } from '../session/SessionTypes';
+import { TopicService } from '../Topic/TopicService';
+import { TopicFilterInput } from '../Topic/Topic.types';
+import { Topic } from './DialogueTypes';
 
 const THRESHOLD = 40;
 
@@ -24,6 +26,7 @@ class DialogueStatisticsService {
   dialoguePrismaAdapter: DialoguePrismaAdapter;
   nodeService: NodeService;
   sessionService: SessionService;
+  topicService: TopicService;
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
@@ -33,6 +36,7 @@ class DialogueStatisticsService {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.nodeService = new NodeService(prismaClient);
     this.sessionService = new SessionService(prismaClient);
+    this.topicService = new TopicService(prismaClient);
     this.prisma = prismaClient;
   }
 
@@ -42,25 +46,16 @@ class DialogueStatisticsService {
   async calculateUrgentPath(
     workspaceId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
+    topicFilter: TopicFilterInput = {},
   ): Promise<UrgentPath | null> {
     // An urgent path is a path which was considered urgent. This can be either one of the following:
     // TODO: 1. A particular subject was triggered which was marked as "important" (this takes precedence)
 
-    // 2. A subject was flagged multiple times <- needs to be improved obviously (
-    // let's say, ratings threshold is set to 4. Any items that are negative are considered candidates.)
-    // Grab the lowest-scoring one.
-    const dialogueIds = (await this.workspaceService.getDialogues(workspaceId)).map(dialogue => dialogue.id);
-    const sessions = await this.sessionService.findSessionsForDialogues(dialogueIds, startDate, endDate, {
-      AND: [{
-        mainScore: { lte: THRESHOLD },
-      }],
-    }, {
-      nodeEntries: { include: { choiceNodeEntry: true } },
-    }) as unknown as SessionWithEntries[];
-
-    // Calculate all the candidate topic-counts.
-    const topicCounts = this.sessionService.countTopicsFromSessions(sessions);
+    const topicCounts = await this.topicService.countWorkspaceTopics(workspaceId, startDate, endDate, {
+      ...topicFilter,
+      relatedSessionScoreLowerThreshold: THRESHOLD,
+    });
 
     // This is where the decision is made "what" is considered most urgent to report on.
     const urgentTopic = maxBy(Object.values(topicCounts), 'count');
@@ -104,17 +99,18 @@ class DialogueStatisticsService {
 
     const healthScore = nrVotes === 0 ? 0 : sessionsHigherThanTreshold.length / nrVotes * 100;
 
-    return { score: healthScore, nrVotes };
+    return { score: healthScore, nrVotes, negativeResponseCount: nrVotes - sessionsHigherThanTreshold.length };
   };
 
   findWorkspaceHealthScore = async (
     workspaceId: string,
     startDateTime: Date,
     endDateTime?: Date,
+    topicFilter?: TopicFilterInput,
     threshold: number = 70,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
-    const dialogues = await this.dialoguePrismaAdapter.findDialogueIdsOfCustomer(workspaceId);
+    const dialogues = await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined);
     const mappedDialogueIds = dialogues.map((dialogue) => dialogue.id);
 
     const scopedSessions = await this.sessionService.findSessionsForDialogues(
@@ -128,7 +124,11 @@ class DialogueStatisticsService {
 
     const healthScore = nrVotes === 0 ? 0 : sessionsHigherThanTreshold.length / nrVotes * 100;
 
-    return { score: healthScore, nrVotes };
+    return {
+      score: healthScore,
+      nrVotes,
+      negativeResponseCount: nrVotes - sessionsHigherThanTreshold.length,
+    };
   };
 
   /**
@@ -257,6 +257,38 @@ class DialogueStatisticsService {
       average: statisticSummaries.length ? (cumulativeStats.scoreSum / statisticSummaries.length) : 0,
       responseCount: cumulativeStats.responseCount,
     }
+  }
+
+  /**
+   * Calculate and ranks most popular topics of a workspace
+   */
+  async rankTopics(
+    workspaceId: string,
+    startDate: Date,
+    endDate: Date,
+    topicFilter?: TopicFilterInput,
+    cutoff = 5
+  ): Promise<Topic[]> {
+    const topicCounts = await this.topicService.countWorkspaceTopics(
+      workspaceId,
+      startDate,
+      endDate,
+      topicFilter,
+    );
+
+    // Rank topics (without using index, not efficient)
+    const rankedTopics: Topic[] = orderBy(Object.values(topicCounts), 'count', 'desc').map(topicCount => ({
+      name: topicCount.topic,
+      impactScore: topicCount.score,
+      nrVotes: topicCount.count,
+      subTopics: [],
+      basicStats: {
+        average: topicCount.score,
+        responseCount: topicCount.count,
+      },
+    })).slice(0, cutoff);
+
+    return rankedTopics;
   }
 
   /**

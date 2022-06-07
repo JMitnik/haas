@@ -92,6 +92,7 @@ const CustomerProvider = ({ children, workspaceOverrideSlug, __test__ = false }:
         ...customer,
         user: newUser,
         userRole: role,
+        statistics: null,
       });
     },
   });

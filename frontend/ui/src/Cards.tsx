@@ -1,4 +1,6 @@
 import styled, { css } from 'styled-components';
+import { get } from 'lodash';
+
 import { Div } from './Generics';
 import { Flex } from './Container';
 import { Span } from './Span';
@@ -132,10 +134,10 @@ export const CardBodyLarge = styled(Div)`
 `;
 
 export const CardFooter = styled(Div)`
-  ${({ theme }) => css`
-    padding: 8px ${theme.gutter * 0.75}px;
-    border-radius: 0 0 ${theme.borderRadiuses.md} ${theme.borderRadiuses.md};
-    color: ${theme.colors.default.text};
+  ${({ theme, color = 'default.text' }) => css`
+    padding: ${theme.gutter * 0.75}px;
+    border-radius: 0 0 ${theme.borderRadiuses.md}px ${theme.borderRadiuses.md}px;
+    color: ${get(theme.colors, color)};
   `}
 `;
 
@@ -165,11 +167,13 @@ export default Card;
 interface NewCardProps {
   hasHover?: boolean;
   boxShadow?: BoxShadowSize;
+  hasBlur?: boolean;
 }
 
 export const NewCard = styled(Div) <NewCardProps>`
-  ${({ theme, hasHover, boxShadow = 'md', bg = 'white' }) => css`
-    border-radius: ${theme.borderRadiuses.md}px;
+  ${({ theme, hasHover, boxShadow = 'md', bg = 'white', hasBlur = false }) => css`
+    background: ${get(theme.colors, bg as string)};
+    border-radius: ${theme.borderRadiuses.lg}px;
     box-shadow: ${theme.boxShadows[boxShadow]};
     transition: all ${theme.transitions.normal};
 
@@ -180,6 +184,11 @@ export const NewCard = styled(Div) <NewCardProps>`
         transition: all ${theme.transitions.normal};
         box-shadow: ${theme.boxShadows.lg};
       }
+    `}
+
+    ${hasBlur && css`
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(30px);
     `}
   `}
 `;

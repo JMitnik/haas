@@ -1,4 +1,5 @@
 import { inputObjectType, objectType } from '@nexus/schema';
+import { TopicFilterInput } from '../Topic/graphql/TopicFilterInput';
 import { SessionType } from '../session/graphql';
 import { DialogueImpactScoreType } from './DialogueStatisticsSummary';
 
@@ -12,6 +13,8 @@ export const DialogueStatisticsSummaryFilterInput = inputObjectType({
       type: DialogueImpactScoreType,
       required: true,
     });
+
+    t.field('topicsFilter', { type: TopicFilterInput, required: false });
     t.int('cutoff');
   },
 })
@@ -22,10 +25,16 @@ export const TopicType = objectType({
     t.string('name');
     t.float('impactScore');
     t.int('nrVotes');
+
     t.field('subTopics', {
       list: true,
       nullable: true,
       type: TopicType,
+    });
+
+    t.field('basicStats', {
+      type: 'BasicStatistics',
+      nullable: true,
     });
   },
 });

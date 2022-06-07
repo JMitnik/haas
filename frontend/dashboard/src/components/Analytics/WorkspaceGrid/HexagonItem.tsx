@@ -1,5 +1,5 @@
 import { ProvidedZoom } from '@visx/zoom/lib/types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { HexagonNode } from './WorkspaceGrid.types';
 import { getHexagonSVGFill } from './WorkspaceGrid.helpers';
@@ -27,7 +27,6 @@ export const HexagonItem = ({
   strokeWidth,
 }: HexagonItemProps) => {
   const initialFill = getHexagonSVGFill(score);
-  const [fill] = useState(initialFill);
 
   return (
     <g>
@@ -38,7 +37,7 @@ export const HexagonItem = ({
           strokeWidth={strokeWidth}
           points={points}
           stroke="white"
-          fill={fill}
+          fill={initialFill}
           onMouseOver={(event) => {
             onMouseOver?.(event, node);
           }}

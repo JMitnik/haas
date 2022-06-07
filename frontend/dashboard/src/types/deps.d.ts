@@ -1,3 +1,5 @@
+import { ReactDatePickerProps as BaseReactDatePickerProps } from 'react-datepicker';
+
 declare module 'react-flagpack';
 
 declare module '*.ttf';
@@ -14,4 +16,13 @@ declare module '@breejs/later' {
   let later;
 
   export = later;
+}
+
+/**
+ * React datepicker seems to be missing a prop for their range picker.
+ */
+declare module 'react-datepicker' {
+  export interface ReactDatePickerProps extends BaseReactDatePickerProps {
+    selectsRange?: boolean;
+  }
 }

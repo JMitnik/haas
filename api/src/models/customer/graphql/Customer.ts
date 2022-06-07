@@ -48,8 +48,8 @@ export const CustomerType = objectType({
      * - Note: These statistics share the same ID as the Workspace / Customer.
      */
     t.field('statistics', {
-      nullable: true,
       type: WorkspaceStatistics,
+      nullable: true,
       description: 'Workspace statistics',
 
       resolve: async (parent) => {
@@ -79,7 +79,7 @@ export const CustomerType = objectType({
       args: { filter: AutomationConnectionFilterInput },
       nullable: true,
       async resolve(parent, args, ctx) {
-        return ctx.services.automationService.paginatedAutomations(parent.slug, args.filter);
+        return ctx.services.automationService.paginatedAutomations(parent.slug, args.filter) as any;
       },
     });
 
@@ -107,6 +107,7 @@ export const CustomerType = objectType({
 
     t.field('nestedHealthScore', {
       nullable: true,
+      deprecation: 'Deprectaed, see statistics',
       type: HealthScore,
       args: {
         input: HealthScoreInput,
@@ -129,6 +130,7 @@ export const CustomerType = objectType({
           parent.id,
           utcStartDateTime as Date,
           utcEndDateTime,
+          undefined,
           threshold || undefined,
         );
       },
@@ -235,6 +237,7 @@ export const CustomerType = objectType({
 
     t.field('nestedDialogueStatisticsSummary', {
       type: DialogueStatisticsSummaryModel,
+      deprecation: 'Deprecated, see statistics',
       list: true,
       args: {
         input: DialogueStatisticsSummaryFilterInput,

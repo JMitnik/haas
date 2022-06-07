@@ -230,10 +230,38 @@ export const getHexagonSVGFill = (score?: number) => {
   return 'url(#dots-pink)';
 };
 
-export const getColorScoreBrand = (score?: number, darker?: boolean) => {
+export const getColorScoreBrandVariable = (score?: number, darker?: boolean) => {
   if (!score) return 'gray.500';
   if (score >= 40) return `green.${darker ? '500' : '500'}`;
   return `red.${darker ? '700' : '500'}`;
+};
+
+export const getColorScoreState = (score?: number) => {
+  if (!score) return 'gray';
+
+  if (score >= 40) return 'green';
+  if (score <= 70 && score >= 50) return 'orange';
+
+  return 'red';
+};
+
+type HexagonTitleState = 'workspace' | 'groups' | 'dialogues' | 'individuals';
+
+/**
+ * Gets the state of the title of the hexagon grid.
+ *
+ * This is based on whether we have any selected-node (if not, 'workspace-level'), and else on the type of any child.
+ * Note: If any child have different types, then this function is not sutiable any longer.
+ * @param state - The current state of the hexagon grid.
+ * @returns The state of the title of the hexagon grid.
+ */
+export const getTitleKey = (state: HexagonState): HexagonTitleState => {
+  switch (state.viewMode) {
+    case (HexagonViewMode.Workspace): { return 'workspace'; }
+    case (HexagonViewMode.Group): { return 'groups'; }
+    case (HexagonViewMode.Dialogue): { return 'dialogues'; }
+    default: { return 'individuals'; }
+  }
 };
 
 /**
@@ -373,4 +401,21 @@ export const reconstructHistoryStack = (dialogueId: string, data: HexagonNode[])
     data,
     path,
   );
+};
+
+export const extractDialogueFragments = (historyQueue: HexagonState[]): string[] => {
+  const fragments: string[] = [];
+
+  historyQueue.forEach((pastState) => {
+    if (!pastState.selectedNode) return;
+
+    if (
+      pastState.selectedNode.type === HexagonNodeType.Group
+      || pastState.selectedNode.type === HexagonNodeType.Dialogue
+    ) {
+      fragments.push(pastState.selectedNode.label);
+    }
+  });
+
+  return fragments;
 };
