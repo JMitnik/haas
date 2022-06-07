@@ -83,6 +83,7 @@ class AutomationService {
       })[];
     }),
     workspaceSlug: string,
+    dialogueSlug?: string,
   ): AWS.EventBridge.TargetList => {
     return actions.map((action, index) => {
       const lambdaTargetArn = action.type === AutomationActionType.GENERATE_REPORT
@@ -94,9 +95,7 @@ class AutomationService {
       // + check where and whether the static content is send to the SNS and maybe need different way to access it
       const dashboardUrl = config.dashboardUrl;
 
-      //TODO: Need to be able to select dialogue in dashboard when scheduled type is picked
-      // FIXME: Add dialogueSlug from front-end instead of hardcoded 😬
-      const dialogueSlug = 'lufthansa';
+      // TODO: Create a workspace scoped url instead dialogue scoped url when no dialogueSlug provided
       const reportUrl = `${dashboardUrl}/dashboard/b/${workspaceSlug}/d/${dialogueSlug}/_reports/weekly`;
 
       const extraGenerateParams = {
@@ -110,7 +109,7 @@ class AutomationService {
         AUTHENTICATE_EMAIL: 'automations@haas.live',
       }
 
-      const jsonInput = {
+      const sendDialogueLinkParams = {
         AUTOMATION_SCHEDULE_ID: automationScheduledId,
         AUTHENTICATE_EMAIL: 'automations@haas.live',
         API_URL: config.baseUrl,
@@ -118,10 +117,14 @@ class AutomationService {
         WORKSPACE_SLUG: workspaceSlug,
       }
 
+      const finalInput = action.type === AutomationActionType.GENERATE_REPORT
+        ? extraGenerateParams
+        : sendDialogueLinkParams;
+
       return {
         Id: `${automationScheduledId}-${index}-action`,
         Arn: lambdaTargetArn,
-        Input: JSON.stringify(jsonInput),
+        Input: JSON.stringify(finalInput),
       }
     })
   }
@@ -133,7 +136,9 @@ class AutomationService {
       automationScheduled: (AutomationScheduled & {
         actions: AutomationAction[];
       }) | null;
-    }) => {
+    },
+    dialogueId?: string
+  ) => {
     const { minutes, hours, dayOfMonth, dayOfWeek, month } = automationScheduled;
 
     const scheduledExpression = `cron(${minutes} ${hours} ${dayOfMonth === '*' ? '?' : dayOfMonth} ${month} ${dayOfWeek} *)`
@@ -142,6 +147,8 @@ class AutomationService {
     const state = parentAutomation?.isActive ? 'ENABLED' : 'DISABLED';
 
     const workspace = await this.customerService.findWorkspaceById(workspaceId) as Customer;
+    const dialogue = dialogueId ? await this.dialogueService.getDialogueById(dialogueId) : undefined;
+
     const user = await this.userService.findBotByWorkspaceName(workspace.slug);
 
     const upsertedRule = await this.eventBridge.putRule({
@@ -161,6 +168,7 @@ class AutomationService {
           parentAutomation.automationScheduled?.actions || [],
           user!,
           workspace.slug,
+          dialogue?.slug,
         ),
       }).promise().catch((e) => {
         throw new ApolloError(`upserting targets automation schedule: ${automationScheduled.id} with error ${e}`)
@@ -940,7 +948,8 @@ class AutomationService {
       await this.upsertEventBridge(
         input.workspaceId as string,
         updatedAutomation.automationScheduled,
-        updatedAutomation
+        updatedAutomation,
+        input.schedule?.dialogueId || undefined,
       );
     }
 
@@ -962,7 +971,8 @@ class AutomationService {
       await this.upsertEventBridge(
         input.workspaceId as string,
         createdAutomation.automationScheduled,
-        createdAutomation
+        createdAutomation,
+        input.schedule?.dialogueId || undefined,
       );
     }
 
