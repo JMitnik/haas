@@ -1108,7 +1108,7 @@ const AutomationForm = ({
 
           <ButtonGroup>
             <Button
-              // isDisabled={!form.formState.isValid}
+              isDisabled={!form.formState.isValid}
               isLoading={isLoading}
               variantColor="teal"
               type="submit"
@@ -1222,9 +1222,9 @@ const AutomationForm = ({
             {t('automation:duplicate')}
           </UI.Flex>
         </Menu.Item>
-        <Menu.Item
+        {/* <Menu.Item
           style={{ padding: '6px 12px' }}
-          disabled // </Menu.Base>={activeItem?.depth === 1}
+          disabled
           onClick={() => {
             const conditionIndex = conditionFields.findIndex((field) => field.arrayKey === activeItem.arrayKey);
 
@@ -1240,7 +1240,7 @@ const AutomationForm = ({
             </UI.Icon>
             {t('automation:turn_into_group')}
           </UI.Flex>
-        </Menu.Item>
+        </Menu.Item> */}
       </Menu.Base>
     </>
   );

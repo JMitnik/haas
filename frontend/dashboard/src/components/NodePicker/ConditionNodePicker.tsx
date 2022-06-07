@@ -23,7 +23,9 @@ const DropdownOption = (props: any) => (
             {' '}
             of option
             {' '}
-            <UI.Span color="#4A5568" fontWeight="bold">{props.data?.questionOption}</UI.Span>
+            <UI.Span color="#4A5568" fontWeight="bold">
+              {props.data?.questionOption || props.data?.activeQuestion?.label}
+            </UI.Span>
             {' '}
             in the last
             {' '}

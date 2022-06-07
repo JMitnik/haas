@@ -376,6 +376,9 @@ class AutomationService {
       aspect,
       aggregate
     );
+
+    console.log('Scoped choice node entries: ', scopedChoiceNodeEntries);
+    console.log('Operands: ', operands);
     const amountOperand = operands.find((operand) => operand.type === OperandType.INT);
     const textOperand = operands.find((operand) => operand.type === OperandType.STRING)?.textValue;
 
@@ -402,6 +405,7 @@ class AutomationService {
   setupQuestionCompareData = async (
     input: SetupQuestionCompareDataInput
   ): Promise<SetupQuestionCompareDataOutput | undefined> => {
+    console.log('Input setup question compare: ', input);
     switch (input.type) {
       case NodeType.SLIDER: {
         return this.setupSliderCompareData(input);
@@ -450,6 +454,8 @@ class AutomationService {
       scopedData.totalEntries % condition.questionScope?.aggregate?.latest !== 0
     );
 
+    console.log('Has not enough latest: ', hasNotEnoughLatest);
+
     if (hasNotEnoughLatest) {
       return false;
     }
@@ -477,6 +483,7 @@ class AutomationService {
       }
 
       case AutomationConditionOperatorType.IS_EQUAL: {
+        console.log(scopedData.compareValue, '===', scopedData.operand)
         return scopedData.compareValue === scopedData.operand;
       }
 
