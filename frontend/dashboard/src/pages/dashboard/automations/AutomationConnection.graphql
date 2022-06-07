@@ -18,6 +18,14 @@ query automationConnection($customerSlug: String, $filter: AutomationConnectionF
       	updatedAt
         isActive
         type
+        automationScheduled {
+          activeDialogue {
+            slug
+          }
+          actions {
+            type
+          }
+        }
         automationTrigger {
           activeDialogue {
             slug

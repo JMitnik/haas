@@ -3071,7 +3071,16 @@ export type AutomationConnectionQuery = (
       ), automations: Array<(
         { __typename?: 'AutomationModel' }
         & Pick<AutomationModel, 'id' | 'label' | 'description' | 'updatedAt' | 'isActive' | 'type'>
-        & { automationTrigger?: Maybe<(
+        & { automationScheduled?: Maybe<(
+          { __typename?: 'AutomationScheduledModel' }
+          & { activeDialogue?: Maybe<(
+            { __typename?: 'Dialogue' }
+            & Pick<Dialogue, 'slug'>
+          )>, actions?: Maybe<Array<(
+            { __typename?: 'AutomationActionModel' }
+            & Pick<AutomationActionModel, 'type'>
+          )>> }
+        )>, automationTrigger?: Maybe<(
           { __typename?: 'AutomationTriggerModel' }
           & { activeDialogue?: Maybe<(
             { __typename?: 'Dialogue' }
@@ -4413,6 +4422,14 @@ export const AutomationConnectionDocument = gql`
         updatedAt
         isActive
         type
+        automationScheduled {
+          activeDialogue {
+            slug
+          }
+          actions {
+            type
+          }
+        }
         automationTrigger {
           activeDialogue {
             slug
@@ -6617,9 +6634,12 @@ export namespace AutomationConnection {
   export type AutomationConnection = (NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>);
   export type PageInfo = (NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['pageInfo']>);
   export type Automations = NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>;
+  export type AutomationScheduled = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationScheduled']>);
+  export type ActiveDialogue = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationScheduled']>)['activeDialogue']>);
+  export type Actions = NonNullable<(NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationScheduled']>)['actions']>)[number]>;
   export type AutomationTrigger = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationTrigger']>);
-  export type ActiveDialogue = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationTrigger']>)['activeDialogue']>);
-  export type Actions = NonNullable<(NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationTrigger']>)['actions']>)[number]>;
+  export type _ActiveDialogue = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationTrigger']>)['activeDialogue']>);
+  export type _Actions = NonNullable<(NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationTrigger']>)['actions']>)[number]>;
   export const Document = AutomationConnectionDocument;
 }
 

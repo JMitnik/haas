@@ -83,7 +83,17 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
   const { t } = useTranslation();
   const toast = useToast();
 
-  const [enableAutomation] = useEnableAutomationMutation();
+  const [enableAutomation] = useEnableAutomationMutation({
+    onCompleted: () => {
+      toast({
+        title: 'Automation state changed',
+        description: 'The automation has been updated.',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
+  });
 
   const [deleteAutomation] = useDeleteAutomationMutation({
     refetchQueries: [
@@ -207,38 +217,77 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
             </UI.Div>
 
             <UI.Div>
-              {automation.automationTrigger?.activeDialogue?.slug && (
-                <UI.Div mb={1}>
-                  <UI.Label size="sm">
-                    <UI.Flex alignItems="center">
-                      <UI.Icon stroke="#718096" verticalAlign="middle" mt="4px">
-                        <Briefcase />
-                      </UI.Icon>
-                      <UI.Span ml={1} mt={1}>
-                        <UI.Helper>
-                          {automation.automationTrigger?.activeDialogue?.slug}
-                        </UI.Helper>
-                      </UI.Span>
-                    </UI.Flex>
-                  </UI.Label>
-                </UI.Div>
-              )}
-              {automation.automationTrigger?.actions?.length && automation.automationTrigger?.actions.map((action) => (
-                <UI.Div mb={1}>
-                  <UI.Label size="sm">
-                    <UI.Flex alignItems="center">
-                      <UI.Icon stroke="#718096" verticalAlign="middle" mt="4px">
-                        <Activity />
-                      </UI.Icon>
-                      <UI.Span ml={1}>
-                        <UI.Helper>
-                          {action.type?.replaceAll('_', ' ')}
-                        </UI.Helper>
-                      </UI.Span>
-                    </UI.Flex>
-                  </UI.Label>
-                </UI.Div>
-              ))}
+              {(automation.type === AutomationType.Trigger && automation.automationTrigger?.activeDialogue?.slug)
+                && (
+                  <UI.Div mb={1}>
+                    <UI.Label size="sm">
+                      <UI.Flex alignItems="center">
+                        <UI.Icon stroke="#718096" verticalAlign="middle" mt="4px">
+                          <Briefcase />
+                        </UI.Icon>
+                        <UI.Span ml={1} mt={1}>
+                          <UI.Helper>
+                            {automation.automationTrigger?.activeDialogue?.slug}
+                          </UI.Helper>
+                        </UI.Span>
+                      </UI.Flex>
+                    </UI.Label>
+                  </UI.Div>
+                )}
+
+              {(automation.type === AutomationType.Scheduled
+                || automation.automationScheduled?.activeDialogue?.slug) && (
+                  <UI.Div mb={1}>
+                    <UI.Label size="sm">
+                      <UI.Flex alignItems="center">
+                        <UI.Icon stroke="#718096" verticalAlign="middle" mt="4px">
+                          <Briefcase />
+                        </UI.Icon>
+                        <UI.Span ml={1} mt={1}>
+                          <UI.Helper>
+                            {automation.automationScheduled?.activeDialogue?.slug}
+                          </UI.Helper>
+                        </UI.Span>
+                      </UI.Flex>
+                    </UI.Label>
+                  </UI.Div>
+                )}
+
+              {automation.type === AutomationType.Trigger && automation.automationTrigger?.actions?.length
+                && automation.automationTrigger?.actions.map((action) => (
+                  <UI.Div mb={1}>
+                    <UI.Label size="sm">
+                      <UI.Flex alignItems="center">
+                        <UI.Icon stroke="#718096" verticalAlign="middle" mt="4px">
+                          <Activity />
+                        </UI.Icon>
+                        <UI.Span ml={1}>
+                          <UI.Helper>
+                            {action.type?.replaceAll('_', ' ')}
+                          </UI.Helper>
+                        </UI.Span>
+                      </UI.Flex>
+                    </UI.Label>
+                  </UI.Div>
+                ))}
+
+              {automation.type === AutomationType.Scheduled && automation.automationScheduled?.actions?.length
+                && automation.automationScheduled?.actions.map((action) => (
+                  <UI.Div mb={1}>
+                    <UI.Label size="sm">
+                      <UI.Flex alignItems="center">
+                        <UI.Icon stroke="#718096" verticalAlign="middle" mt="4px">
+                          <Activity />
+                        </UI.Icon>
+                        <UI.Span ml={1}>
+                          <UI.Helper>
+                            {action.type?.replaceAll('_', ' ')}
+                          </UI.Helper>
+                        </UI.Span>
+                      </UI.Flex>
+                    </UI.Label>
+                  </UI.Div>
+                ))}
 
               <UI.Flex alignItems="center" justifyContent="space-between">
                 <UI.Div>

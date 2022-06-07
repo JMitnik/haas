@@ -542,6 +542,7 @@ const AutomationForm = ({
                     render={({ field }) => (
                       <UI.RadioButtons onBlur={field.onBlur} onChange={field.onChange} value={field.value}>
                         <UI.RadioButton
+                          isDisabled={!!automation?.automationType}
                           icon={Bell}
                           value={AutomationType.Trigger}
                           mr={2}
@@ -549,6 +550,7 @@ const AutomationForm = ({
                           description={t('automation:trigger_helper')}
                         />
                         <UI.RadioButton
+                          isDisabled={!!automation?.automationType}
                           icon={Clock}
                           value={AutomationType.Scheduled}
                           mr={2}

@@ -161,8 +161,6 @@ class AutomationService {
       throw new ApolloError(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
     });
 
-    console.log('upsertedRule: ', upsertedRule.RuleArn);
-
     const targets =
       await this.eventBridge.putTargets({
         Rule: automationScheduled.id,
@@ -186,6 +184,23 @@ class AutomationService {
     const deleteAutomation = await this.automationPrismaAdapter.deleteAutomation(input);
 
     if (deleteAutomation.automationScheduledId) {
+      // Disable in case removing fails for some reason so we don't create orphan rule
+      await this.eventBridge.disableRule({
+        Name: deleteAutomation.automationScheduledId,
+      }).promise();
+
+      const targets = await this.eventBridge.listTargetsByRule({
+        Rule: deleteAutomation.automationScheduledId,
+      }).promise();
+
+      const targetIds = targets.Targets?.map((target) => target.Id) || [];
+
+      await this.eventBridge.removeTargets({
+        Force: true,
+        Rule: deleteAutomation.automationScheduledId,
+        Ids: targetIds,
+      }).promise();
+
       await this.eventBridge.deleteRule({
         Name: deleteAutomation.automationScheduledId,
       }).promise();

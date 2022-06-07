@@ -556,6 +556,12 @@ export class AutomationPrismaAdapter {
             actions: true,
           },
         },
+        automationScheduled: {
+          include: {
+            actions: true,
+            dialogueScope: true,
+          },
+        },
       },
     });
 
