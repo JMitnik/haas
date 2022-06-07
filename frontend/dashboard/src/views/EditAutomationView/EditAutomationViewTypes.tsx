@@ -60,6 +60,12 @@ export interface AutomationInput {
     dayOfMonth?: string,
     month?: string,
     dayOfWeek?: string,
+    activeDialogue: {
+      id?: string;
+      label?: string;
+      type?: string;
+      value?: string;
+    };
   }
   conditionBuilder: {
     id?: string;

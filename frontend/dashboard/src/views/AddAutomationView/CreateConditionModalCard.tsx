@@ -117,11 +117,11 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
     },
   });
 
-  const [getQuestions, { data: questionsData }] = useLazyQuery(getTopicBuilderQuery);
-
   const dialogueItems = dialoguesData?.customer?.dialogues?.map(
     (dialogue) => ({ id: dialogue.id, value: dialogue.slug, label: dialogue.title, type: 'DIALOGUE' }),
   ) || [];
+
+  const [getQuestions, { data: questionsData }] = useLazyQuery(getTopicBuilderQuery);
 
   const questionItems = questionsData?.customer?.dialogue?.questions?.map(
     (question: QuestionNode) => ({

@@ -82,6 +82,7 @@ export interface NexusGenInputs {
   AutomationScheduleInput: { // input type
     dayOfMonth: string; // String!
     dayOfWeek: string; // String!
+    dialogueId?: string | null; // String
     hours: string; // String!
     id?: string | null; // ID
     minutes: string; // String!
@@ -854,6 +855,7 @@ export interface NexusGenRootTypes {
     createdAt: any; // Date!
     dayOfMonth: string; // String!
     dayOfWeek: string; // String!
+    dialogueId: string; // String!
     hours: string; // String!
     id: string; // ID!
     minutes: string; // String!
@@ -1556,9 +1558,11 @@ export interface NexusGenFieldTypes {
   }
   AutomationScheduledModel: { // field return type
     actions: NexusGenRootTypes['AutomationActionModel'][] | null; // [AutomationActionModel!]
+    activeDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     createdAt: any; // Date!
     dayOfMonth: string; // String!
     dayOfWeek: string; // String!
+    dialogueId: string; // String!
     hours: string; // String!
     id: string; // ID!
     minutes: string; // String!

@@ -206,9 +206,11 @@ type AutomationModel {
 """AutomationScheduled"""
 type AutomationScheduledModel {
   actions: [AutomationActionModel!]
+  activeDialogue: Dialogue
   createdAt: Date!
   dayOfMonth: String!
   dayOfWeek: String!
+  dialogueId: String!
   hours: String!
   id: ID!
   minutes: String!
@@ -220,6 +222,7 @@ type AutomationScheduledModel {
 input AutomationScheduleInput {
   dayOfMonth: String!
   dayOfWeek: String!
+  dialogueId: String
   hours: String!
   id: ID
   minutes: String!

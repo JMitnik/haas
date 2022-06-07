@@ -16,10 +16,21 @@ export const AutomationScheduledModel = objectType({
     t.string('dayOfMonth');
     t.string('month');
     t.string('dayOfWeek');
+    t.string('dialogueId');
 
     t.list.field('actions', {
       type: AutomationActionModel,
       nullable: true,
     });
+
+    t.field('activeDialogue', {
+      type: 'Dialogue',
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        if (!parent.dialogueId) return null;
+
+        return ctx.services.dialogueService.getDialogueById(parent.dialogueId);
+      },
+    })
   },
 });

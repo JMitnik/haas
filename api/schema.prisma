@@ -159,6 +159,7 @@ model Dialogue {
   sessions                    Session[]
   tags                        Tag[]
 
+  AutomationScheduled AutomationScheduled[]
   @@unique([slug, customerId], map: "Dialogue.slug_customerId_unique")
 }
 
@@ -774,6 +775,9 @@ model AutomationScheduled {
   dayOfMonth String
   month      String
   dayOfWeek  String
+
+  dialogueId    String?
+  dialogueScope Dialogue? @relation(fields: [dialogueId], references: [id])
 
   automations Automation[]
   actions     AutomationAction[]

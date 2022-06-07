@@ -150,6 +150,12 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
       minutes: input?.automationScheduled?.minutes,
       month: input?.automationScheduled?.month,
       type: input?.automationScheduled?.type,
+      activeDialogue: {
+        label: input?.automationScheduled?.activeDialogue?.title,
+        type: 'DIALOGUE',
+        value: input?.automationScheduled?.activeDialogue?.slug,
+        id: input?.automationScheduled?.activeDialogue?.id,
+      },
     },
     conditionBuilder: {
       id: input?.automationTrigger?.conditionBuilder?.id,
@@ -231,6 +237,8 @@ const EditAutomationView = () => {
 
   const automation: GetAutomationQuery['automation'] = automationData?.automation;
   const mappedAutomation: AutomationInput = mapAutomation(automation);
+
+  console.log('mapped automation: ', mappedAutomation.schedule?.activeDialogue);
   // TODO: Add child builder
   const conditionEntries: ConditionEntry[] = findUniqueConditionEntries(
     mappedAutomation.conditionBuilder.conditions.map(

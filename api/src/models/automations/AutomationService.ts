@@ -11,6 +11,10 @@ import {
   AutomationType,
   AutomationScheduled,
   Automation,
+  Customer,
+  Role,
+  User,
+  UserOfCustomer,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { ApolloError, UserInputError } from 'apollo-server-express';
@@ -38,14 +42,15 @@ import {
   UpdateAutomationInput,
 } from './AutomationTypes'
 import { AutomationActionService } from './AutomationActionService';
-import { GenerateReportPayload, TargetsPayload, TargetType } from 'models/users/UserServiceTypes';
-import cuid from 'cuid';
+import { GenerateReportPayload } from 'models/users/UserServiceTypes';
+import CustomerService from '../../models/customer/CustomerService';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
   dialogueService: DialogueService;
   userService: UserService;
   automationActionService: AutomationActionService;
+  customerService: CustomerService;
   prisma: PrismaClient;
   eventBridge: AWS.EventBridge;
   lambda: AWS.Lambda;
@@ -56,9 +61,10 @@ class AutomationService {
     this.dialogueService = new DialogueService(prisma);
     this.automationActionService = new AutomationActionService(prisma);
     this.userService = new UserService(prisma);
+    this.customerService = new CustomerService(prisma);
     this.prisma = prisma;
-    this.iam = new AWS.IAM();
 
+    this.iam = new AWS.IAM();
     this.eventBridge = new AWS.EventBridge({
     });
 
@@ -68,22 +74,60 @@ class AutomationService {
 
   mapActionsToRuleTargets = (
     automationScheduledId: string,
-    actions: AutomationAction[]
+    actions: AutomationAction[],
+    botUser: (User & {
+      customers: (UserOfCustomer & {
+        customer: Customer;
+        role: Role;
+        user: User;
+      })[];
+    }),
+    workspaceSlug: string,
   ): AWS.EventBridge.TargetList => {
     return actions.map((action, index) => {
       const lambdaTargetArn = action.type === AutomationActionType.GENERATE_REPORT
         ? process.env.GENERATE_REPORT_LAMBDA_ARN as string
         : process.env.SEND_DIALOGUE_LINK_LAMBDA_ARN as string;
 
+      // TODO: Add input data for generate report
+      // TODO: Change lambdaTargetArn for generateReport to the SNS that is supposed to call the lambda
+      // + check where and whether the static content is send to the SNS and maybe need different way to access it
+      const dashboardUrl = config.dashboardUrl;
+
+      //TODO: Need to be able to select dialogue in dashboard when scheduled type is picked
+      // FIXME: Add dialogueSlug from front-end instead of hardcoded 😬
+      const dialogueSlug = 'lufthansa';
+      const reportUrl = `${dashboardUrl}/dashboard/b/${workspaceSlug}/d/${dialogueSlug}/_reports/weekly`;
+
+      const extraGenerateParams = {
+        USER_ID: botUser.id,
+        AUTOMATION_ACTION_ID: action.id,
+        DASHBOARD_URL: 'NOT_USED_BUT_NEEDED_FOR_CHECK_IN_LAMBDA',
+        REPORT_URL: reportUrl,
+        API_URL: config.baseUrl,
+        WORKSPACE_EMAIL: botUser.email,
+        WORKSPACE_SLUG: workspaceSlug,
+        AUTHENTICATE_EMAIL: 'automations@haas.live',
+      }
+
+      const jsonInput = {
+        AUTOMATION_SCHEDULE_ID: automationScheduledId,
+        AUTHENTICATE_EMAIL: 'automations@haas.live',
+        API_URL: config.baseUrl,
+        WORKSPACE_EMAIL: botUser.email,
+        WORKSPACE_SLUG: workspaceSlug,
+      }
+
       return {
         Id: `${automationScheduledId}-${index}-action`,
         Arn: lambdaTargetArn,
-        Input: JSON.stringify({ automationScheduled: automationScheduledId }),
+        Input: JSON.stringify(jsonInput),
       }
     })
   }
 
   upsertEventBridge = async (
+    workspaceId: string,
     automationScheduled: AutomationScheduled,
     parentAutomation: Automation & {
       automationScheduled: (AutomationScheduled & {
@@ -97,6 +141,9 @@ class AutomationService {
     // Find the state of the automation and adjust event bridge rule to that
     const state = parentAutomation?.isActive ? 'ENABLED' : 'DISABLED';
 
+    const workspace = await this.customerService.findWorkspaceById(workspaceId) as Customer;
+    const user = await this.userService.findBotByWorkspaceName(workspace.slug);
+
     const upsertedRule = await this.eventBridge.putRule({
       Name: automationScheduled.id,
       ScheduleExpression: scheduledExpression,
@@ -106,19 +153,20 @@ class AutomationService {
       throw new ApolloError(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
     });
 
-
-
-    const lambdaTargetArn =
+    const targets =
       await this.eventBridge.putTargets({
         Rule: automationScheduled.id,
         Targets: this.mapActionsToRuleTargets(
           automationScheduled.id,
-          parentAutomation.automationScheduled?.actions || []
+          parentAutomation.automationScheduled?.actions || [],
+          user!,
+          workspace.slug,
         ),
-      }).promise();
+      }).promise().catch((e) => {
+        throw new ApolloError(`upserting targets automation schedule: ${automationScheduled.id} with error ${e}`)
+      });;
 
-
-    console.log('Rule arn: ', lambdaTargetArn);
+    console.log('Targets: ', targets);
 
     // return rule.RuleArn;
   }
@@ -812,9 +860,21 @@ class AutomationService {
     const builderInput = automationType === AutomationType.TRIGGER ? input.conditionBuilder as Required<NexusGenInputs['AutomationConditionBuilderInput']> : undefined;
     const conditionBuilder: CreateAutomationInput['conditionBuilder'] = builderInput ? this.constructBuilderRecursive(builderInput) : undefined;
     const event: CreateAutomationInput['event'] = this.constructCreateAutomationEventInput(input);
-
     const schedule: CreateAutomationInput['schedule'] = input?.schedule
-      ? { ...input?.schedule, id: input.schedule?.id || undefined }
+      ? {
+        dayOfMonth: input.schedule.dayOfMonth,
+        dayOfWeek: input.schedule.dayOfWeek,
+        hours: input.schedule.hours,
+        minutes: input.schedule.minutes,
+        month: input.schedule.month,
+        type: input.schedule.type,
+        id: input.schedule?.id || undefined,
+        dialogueScope: input.schedule.dialogueId ? {
+          connect: {
+            id: input.schedule.dialogueId,
+          },
+        } : undefined,
+      }
       : undefined;
 
     const actions: CreateAutomationInput['actions'] = this.constructAutomationActionsInput(input);
@@ -877,7 +937,11 @@ class AutomationService {
     const updatedAutomation = await this.automationPrismaAdapter.updateAutomation(validatedInput);
 
     if (updatedAutomation.type === AutomationType.SCHEDULED && updatedAutomation.automationScheduled) {
-      await this.upsertEventBridge(updatedAutomation.automationScheduled, updatedAutomation);
+      await this.upsertEventBridge(
+        input.workspaceId as string,
+        updatedAutomation.automationScheduled,
+        updatedAutomation
+      );
     }
 
     return updatedAutomation;
@@ -895,7 +959,11 @@ class AutomationService {
     const createdAutomation = await this.automationPrismaAdapter.createAutomation(validatedInput);
 
     if (createdAutomation.type === AutomationType.SCHEDULED && createdAutomation.automationScheduled) {
-      await this.upsertEventBridge(createdAutomation.automationScheduled, createdAutomation);
+      await this.upsertEventBridge(
+        input.workspaceId as string,
+        createdAutomation.automationScheduled,
+        createdAutomation
+      );
     }
 
     return createdAutomation;

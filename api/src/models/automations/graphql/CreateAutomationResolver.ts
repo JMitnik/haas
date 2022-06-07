@@ -141,6 +141,7 @@ export const AutomationScheduleInput = inputObjectType({
     t.string('dayOfMonth', { required: true });
     t.string('month', { required: true });
     t.string('dayOfWeek', { required: true });
+    t.string('dialogueId', { nullable: true });
   },
 })
 
@@ -182,6 +183,6 @@ export const CreateAutomationResolver = mutationField('createAutomation', {
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
 
     const automation = await ctx.services.automationService.createAutomation(args.input);
-    return automation;
+    return automation as any;
   },
 });

@@ -21,6 +21,11 @@ query getAutomation($input: GetAutomationInput) {
       dayOfMonth
       dayOfWeek
       month
+      activeDialogue {
+        id
+        slug
+        title
+      }
       actions {
         id
         payload

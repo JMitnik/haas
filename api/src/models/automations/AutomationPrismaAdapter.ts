@@ -1205,6 +1205,9 @@ export class AutomationPrismaAdapter {
 
     return {
       ...schedule,
+      dialogueScope: schedule?.dialogueScope || {
+        disconnect: true,
+      },
       minutes: schedule?.minutes,
       hours: schedule?.hours,
       dayOfMonth: schedule?.dayOfMonth,

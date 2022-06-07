@@ -38,10 +38,13 @@ import {
   QuestionNodeTypeEnum,
   RecurringPeriodType,
   UpdateAutomationMutation,
+  useGetWorkspaceDialoguesQuery,
 } from 'types/generated-types';
 import { AutomationInput } from 'views/EditAutomationView/EditAutomationViewTypes';
 import { ConditionNodePicker } from 'components/NodePicker/ConditionNodePicker';
+import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
+import { NodeCell } from 'components/NodeCell';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import Dropdown from 'components/Dropdown';
@@ -175,6 +178,12 @@ const schema = yup.object({
     }).required(),
   }),
   schedule: yup.object().shape({
+    activeDialogue: yup.object().shape({
+      type: yup.string().required(),
+      value: yup.string().required(),
+      label: yup.string().required(),
+      id: yup.string().required(),
+    }).required(),
     type: yup.mixed<RecurringPeriodType>().oneOf(Object.values(RecurringPeriodType)),
     minutes: yup.string(),
     hours: yup.string(),
@@ -363,6 +372,7 @@ const AutomationForm = ({
         dayOfWeek: automation?.schedule?.dayOfWeek,
         hours: automation?.schedule?.hours,
         minutes: automation?.schedule?.minutes,
+        activeDialogue: automation?.schedule?.activeDialogue,
       },
       conditionBuilder:
       {
@@ -379,6 +389,16 @@ const AutomationForm = ({
   });
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
+
+  const { data: dialoguesData, loading } = useGetWorkspaceDialoguesQuery({
+    variables: {
+      customerSlug: activeCustomer?.slug as string,
+    },
+  });
+
+  const dialogueItems = dialoguesData?.customer?.dialogues?.map(
+    (dialogue) => ({ id: dialogue.id, value: dialogue.slug, label: dialogue.title, type: 'DIALOGUE' }),
+  ) || [];
 
   const [activeConditions, setActiveConditions] = useState<ConditionEntry[]>(
     mappedConditions || [],
@@ -455,7 +475,8 @@ const AutomationForm = ({
         dayOfWeek: formData?.schedule?.dayOfWeek as string,
         hours: formData?.schedule?.hours as string,
         minutes: formData?.schedule?.minutes as string,
-        id: automation?.schedule?.id
+        id: automation?.schedule?.id,
+        dialogueId: formData.schedule?.activeDialogue.id
       } : undefined,
     };
 
@@ -540,6 +561,90 @@ const AutomationForm = ({
                     )}
                   />
                 </UI.FormControl>
+
+                {watchAutomationType === AutomationType.Scheduled && (
+                  <UI.FormControl isRequired isInvalid={!!form.formState.errors.schedule?.activeDialogue}>
+                    <UI.FormLabel htmlFor="activeDialogue">
+                      {t('dialogue')}
+                    </UI.FormLabel>
+                    <UI.InputHelper>
+                      {t('automation:dialogue_helper_DIALOGUE')}
+                    </UI.InputHelper>
+                    <UI.Div>
+                      <UI.Flex>
+                        {/* TODO: Make a theme out of it */}
+                        <UI.Div
+                          width="100%"
+                          backgroundColor="#fbfcff"
+                          border="1px solid #edf2f7"
+                          borderRadius="10px"
+                          padding={4}
+                        >
+                          <>
+                            <UI.Grid gridTemplateColumns="2fr 1fr">
+                              <UI.Helper>{t('dialogue')}</UI.Helper>
+                            </UI.Grid>
+
+                            <UI.Grid
+                              pt={2}
+                              pb={2}
+                              pl={0}
+                              pr={0}
+                              borderBottom="1px solid #edf2f7"
+                              gridTemplateColumns="1fr"
+                            >
+                              <UI.Div alignItems="center" display="flex">
+                                <Controller
+                                  name="schedule.activeDialogue"
+                                  control={form.control}
+                                  render={({ field: { value, onChange } }) => (
+                                    <Dropdown
+                                      isRelative
+                                      renderOverlay={({ onClose: onDialoguePickerClose }) => (
+                                        <DialogueNodePicker
+                                          // Handle items (in this case dialogues)
+                                          items={dialogueItems}
+                                          onClose={onDialoguePickerClose}
+                                          onChange={onChange}
+                                        />
+                                      )}
+                                    >
+                                      {({ onOpen }) => (
+                                        <UI.Div
+                                          width="100%"
+                                          justifyContent="center"
+                                          display="flex"
+                                          alignItems="center"
+                                        >
+                                          {value?.label ? (
+                                            <NodeCell onRemove={() => onChange(null)} onClick={onOpen} node={value} />
+                                          ) : (
+                                            <UI.Button
+                                              size="sm"
+                                              variant="outline"
+                                              onClick={onOpen}
+                                              variantColor="altGray"
+                                            >
+                                              <UI.Icon mr={1}>
+                                                <PlusCircle />
+                                              </UI.Icon>
+                                              {t('add_dialogue')}
+                                            </UI.Button>
+                                          )}
+                                        </UI.Div>
+                                      )}
+                                    </Dropdown>
+                                  )}
+                                />
+                              </UI.Div>
+                            </UI.Grid>
+                          </>
+                        </UI.Div>
+                      </UI.Flex>
+                    </UI.Div>
+                  </UI.FormControl>
+
+                )}
 
               </InputGrid>
             </Div>
@@ -765,7 +870,11 @@ const AutomationForm = ({
                         onValueChange={(e: any) => {
                           const data = getCronByScheduleType(e);
                           if (data) {
-                            form.setValue('schedule', { ...data, type: watchSchedule?.type as RecurringPeriodType });
+                            form.setValue('schedule', {
+                              ...data,
+                              activeDialogue: watchSchedule?.activeDialogue as any,
+                              type: watchSchedule?.type as RecurringPeriodType
+                            });
                           }
                           return onChange(e);
                         }}
