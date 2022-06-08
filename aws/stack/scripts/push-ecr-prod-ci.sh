@@ -1,11 +1,3 @@
-# TODO: Check IAM permissions
-# TODO: Chcek environment, this should not be possible in prod (unless the Master account is used)
-read -p "This will deploy the latest Docker container to the ECR. Are you sure you wish to continue? (yes/no) "
-if [ "$REPLY" != "yes" ]; then
-  echo "Understandable, have a good day."
-  exit
-fi
-
 # TODO: Replace haas-staging with args flag
 AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query 'Account' --output text)"
 REGION="eu-central-1"
