@@ -95,7 +95,12 @@ export const calcGroupStatistics = (dialogues: Dialogue[]): HexagonGroupNodeStat
     acc + (dialogue.dialogueStatisticsSummary?.nrVotes ?? 0)
   ), 0);
 
-  const average = meanBy(dialogues, (dialogue) => dialogue.dialogueStatisticsSummary?.impactScore ?? 0);
+  const filteredDialogues = dialogues.filter((dialogue) => dialogue.dialogueStatisticsSummary?.impactScore
+    && dialogue.dialogueStatisticsSummary?.impactScore > 0);
+
+  const average = voteCount > 0
+    ? meanBy(filteredDialogues, (dialogue) => dialogue.dialogueStatisticsSummary?.impactScore)
+    : 0;
 
   return {
     voteCount,
