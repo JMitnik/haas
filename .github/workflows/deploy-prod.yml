@@ -13,6 +13,13 @@ jobs:
           repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
           ref: ${{ github.event.client_payload.pull_request.head.ref }}
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.PROD_DEPLOYMENT_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_DEPLOYMENT_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v2
         with:
