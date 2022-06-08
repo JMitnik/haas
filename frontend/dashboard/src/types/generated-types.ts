@@ -3916,7 +3916,7 @@ export const GetWorkspaceDialogueStatisticsDocument = gql`
     dialogues {
       id
       title
-      dialogueStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE}) {
+      dialogueStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true}) {
         id
         dialogueId
         impactScore
