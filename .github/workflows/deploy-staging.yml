@@ -23,13 +23,16 @@ jobs:
       - name: Deploy to ECR and ECS
         run: bash aws/stack/scripts/update_ecs_staging_ci.sh
 
-      - name: Add reaction
+      - name: Complete comment
         uses: peter-evans/create-or-update-comment@v2
         with:
           token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            >Deployment successful!
           reaction-type: hooray
+
       - name: Note fail
         if: ${{ failure() }}
         uses: peter-evans/create-or-update-comment@v2
