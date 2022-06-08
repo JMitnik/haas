@@ -103,7 +103,8 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
     },
   });
 
-  const onSubmit = (formData: ActionEntry) => {
+  const onSubmit = () => {
+    const formData = form.getValues();
     if (activeAction) {
       onUpdate(formData);
     } else {
@@ -134,7 +135,7 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
       </UI.ModalHead>
       <UI.ModalBody style={{ padding: 0 }}>
         <UI.Div paddingLeft={0}>
-          <UI.Form onSubmit={form.handleSubmit(onSubmit)}>
+          <UI.Form>
             <UI.Div>
               <UI.FormSection id="general">
                 <UI.Div gridColumn="1 / -1">
@@ -303,7 +304,7 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
                         // isLoading={createLoading || updateLoading}
                         isDisabled={!form.formState.isValid}
                         variantColor="teal"
-                        type="submit"
+                        onClick={() => onSubmit()}
                       >
                         {activeAction ? t('update') : t('save')}
                       </UI.Button>

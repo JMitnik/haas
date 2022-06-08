@@ -180,7 +180,6 @@ const schema = yup.object({
   schedule: yup.object().shape({
     activeDialogue: yup.object().shape({
       type: yup.string(),
-      value: yup.string(),
       label: yup.string(),
       id: yup.string(),
     }).nullable(true),
@@ -201,7 +200,6 @@ const schema = yup.object({
       dayOfWeek: yup.string().required(),
       activeDialogue: yup.object().shape({
         type: yup.string().required(),
-        value: yup.string().required(),
         label: yup.string().required(),
         id: yup.string().required(),
       }).required(),
@@ -1145,12 +1143,14 @@ const AutomationForm = ({
           onClose={() => setCreateModalIsOpen({ isOpen: false, arrayKey: undefined })}
           onCreate={(action: ActionEntry) => {
             actionsFieldArray.append({ action });
+            form.trigger();
           }}
           onUpdate={(action: ActionEntry) => {
             const updateIndex = actionsFieldArray.fields.findIndex(
               (field) => field.arrayKey === createModalIsOpen.arrayKey,
             );
             actionsFieldArray.update(updateIndex, { action });
+            form.trigger();
           }}
           action={() => {
             const actionEntry = createModalIsOpen?.arrayKey

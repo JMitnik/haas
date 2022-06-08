@@ -536,6 +536,12 @@ export class AutomationPrismaAdapter {
       });
     }
 
+    if (filter?.orderBy?.by === 'createdAt') {
+      orderByQuery.push({
+        createdAt: filter.orderBy.desc ? 'desc' : 'asc',
+      });
+    }
+
     return orderByQuery;
   };
 
