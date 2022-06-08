@@ -20,7 +20,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_DEPLOYMENT_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
 
-      - run: bash aws/stack/scripts/update_ecs_prod_ci.sh
+      - name: Deploy to ECR and ECS
+        run: bash aws/stack/scripts/update_ecs_prod_ci.sh
 
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v2
@@ -29,3 +30,13 @@ jobs:
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           reaction-type: hooray
+      - name: Note fail
+        if: ${{ failure() }}
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            >Deployment failed
+          reaction-type: -1
