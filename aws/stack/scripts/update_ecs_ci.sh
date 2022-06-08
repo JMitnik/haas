@@ -5,17 +5,15 @@ if [ "$REPLY" != "yes" ]; then
 fi
 
 DIR="$(dirname "$(realpath "$0")")"
-push_file="$DIR/push-ecr-prod.sh"
+push_file="$DIR/push-ecr-ci.sh"
 
 bash "$push_file"
 
 # # TODO: Fetch
 CLUSTER_NAME="CORE_CLUSTER"
-SERVICE_NAME="ProdCoreTemp-COREAPIAPISERVICEServiceBA2271D8-0Kk4hvIJx9bx"
+SERVICE_NAME="StagingCoreTemp-COREAPIAPISERVICEServiceBA2271D8-IsUSGTyhOoQ2"
 
 aws ecs update-service \
   --cluster $CLUSTER_NAME \
   --service $SERVICE_NAME \
-  --force-new-deployment \
-  --profile haas-prod \
-  --region eu-central-1
+  --force-new-deployment
