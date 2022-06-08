@@ -5,7 +5,7 @@ if [ "$REPLY" != "yes" ]; then
 fi
 
 DIR="$(dirname "$(realpath "$0")")"
-push_file="$DIR/push-ecr.sh"
+push_file="$DIR/push-ecr-staging.sh"
 
 bash "$push_file"
 
