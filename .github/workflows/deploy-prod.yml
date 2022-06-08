@@ -20,7 +20,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_DEPLOYMENT_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
 
-      - run: bash aws/stack/scripts/push_ecs_prod_ci.sh
+      - run: bash aws/stack/scripts/update_ecs_prod_ci.sh
 
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v2
