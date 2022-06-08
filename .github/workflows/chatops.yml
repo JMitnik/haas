@@ -12,3 +12,4 @@ jobs:
           token: ${{ secrets.PAT }}
           commands: |
             deploy-prod
+            deploy-staging
