@@ -1,4 +1,4 @@
-interface CoreVariables {
+export interface CoreVariables {
   env: string;
   vpcName: string;
   domainName: string;
@@ -34,5 +34,22 @@ export const stagingVariables: CoreVariables = {
     dashboardUrl: 'https://dashboard.staging.haas.live',
     mailSenderMail: 'noreply@staging.haas.live',
     environment: 'staging',
+  },
+}
+
+export const prodVariables: CoreVariables = {
+  env: 'production',
+  vpcName: 'CORE_VPC',
+  domainName: 'haas.live',
+  databaseName: 'CORE_DB',
+  databaseUsername: 'HAAS_ADMIN',
+  databasePasswordSecretName: 'CORE_DATABASE_PASSWORD_V2',
+  repoName: 'haas_core_repo_prod',
+  api: {
+    baseUrl: 'https://api.haas.live',
+    clientUrL: 'https://www.client.haas.live',
+    dashboardUrl: 'https://www.dashboard.haas.live',
+    mailSenderMail: 'hello@haas.live',
+    environment: 'production',
   },
 }

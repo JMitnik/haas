@@ -2,30 +2,33 @@ import { App, Stack, StackProps, aws_route53 as route53, aws_certificatemanager 
 
 import { CoreDatabase } from "../../constructs/Core/Persistent/CoreDatabase";
 import { CoreVPC } from "../../constructs/Core/Persistent/CoreVPC";
-import { CoreAPI } from "../../constructs/Core/Ephemeral/CoreAPI";
-import { stagingVariables } from './CoreVariables';
+import { CoreVariables } from './CoreVariables';
 import { CoreRepo } from "../../constructs/Core/Persistent/CoreRepo";
 
+interface CoreFixedProps extends StackProps {
+  variables: CoreVariables;
+};
 
-export class StagingCoreFixed extends Stack {
+
+export class CoreFixed extends Stack {
   vpc: CoreVPC;
   repo: CoreRepo;
   db: CoreDatabase;
 
-  constructor(scope: App, id: string, props?: StackProps) {
+  constructor(scope: App, id: string, props: CoreFixedProps) {
     super(scope, id, props);
 
     this.vpc = new CoreVPC(this, 'CORE_VPC', {
-      vpcName: stagingVariables.vpcName,
+      vpcName: props.variables.vpcName,
     });
 
     this.db = new CoreDatabase(this, 'CORE_DATABASE', {
-      databaseUsername: stagingVariables.databaseUsername,
-      credentialsSecretName: stagingVariables.databasePasswordSecretName,
+      databaseUsername: props.variables.databaseUsername,
+      credentialsSecretName: props.variables.databasePasswordSecretName,
       vpc: this.vpc.vpc,
-      databaseName: stagingVariables.databaseName,
+      databaseName: props.variables.databaseName,
     });
 
-    this.repo = new CoreRepo(this, 'CORE_REPO', { repoName: stagingVariables.repoName });
+    this.repo = new CoreRepo(this, 'CORE_REPO', { repoName: props.variables.repoName });
   }
 }
