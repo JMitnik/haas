@@ -1,4 +1,4 @@
-import { AutomationActionType, PrismaClient } from '@prisma/client';
+import { AutomationActionType, PrismaClient, UserOfCustomer } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 import { uniqBy } from 'lodash';
 
@@ -36,7 +36,7 @@ export class AutomationActionService {
    * @param workspaceSlug
    * @returns a boolean indicating whether the call was a succes or not
    */
-  sendDialogueLink = async (automationScheduleId: string, workspaceSlug: string) => {
+  sendDialogueLink = async (automationScheduleId: string, workspaceSlug: string): Promise<boolean> => {
     const scheduledAutomation = await this.automationPrismaAdapter.findScheduledAutomationById(automationScheduleId);
     const sendEmailActions = scheduledAutomation?.actions.filter(
       (action) => action.type === AutomationActionType.SEND_EMAIL
@@ -46,18 +46,25 @@ export class AutomationActionService {
       console.log('No email actions available for: ', automationScheduleId, '. Abort.');
       return false;
     };
+
+    // Get all recipients for the SEND EMAIL actions
     const actionIds = sendEmailActions.map((action) => action.id);
+    const recipients = await this.findActionsRecipients(actionIds, workspaceSlug);
 
-    const recipients = await Promise.all(actionIds.map(async (actionId) => {
-      const actionRecipients = await this.findRecipients(actionId, workspaceSlug);
-      return actionRecipients;
-    }));
+    await this.dispatchMailsToRecipients(recipients, workspaceSlug);
 
-    const flattenedRecipients = recipients.flat();
-    const uniqueFlattenedRecipients = uniqBy(flattenedRecipients, (recipient) => recipient.user.email);
+    return true;
+  }
 
-    await Promise.all(uniqueFlattenedRecipients.map(async (recipient) => {
+  /**
+   * Send mails out to each recipient of the actions.
+   * @param recipients List of users who receive the mail
+   * @param workspaceSlug Workspace slug
+   */
+  async dispatchMailsToRecipients(recipients: UserOfCustomer[], workspaceSlug: string): Promise<void[]> {
+    return await Promise.all(recipients.map(async (recipient) => {
       const user = await this.userPrismaAdapter.findPrivateDialogueOfUser(recipient.userId, workspaceSlug);
+      if (!user) return;
 
       // TODO: Add support for multiple client URLs if a user is assinged to multipled dialogues
       const privateDialogues = user?.isAssignedTo;
@@ -67,22 +74,31 @@ export class AutomationActionService {
       };
 
       const targetDialogue = privateDialogues[0];
-      const constructedDialogueLink = `${config.clientUrl}/${workspaceSlug}/${targetDialogue.slug}`
-      const triggerBody = makeDialogueLinkReminderTemplate(
-        {
-          recipientMail: recipient.user.firstName || 'User',
-          dialogueClientUrl: constructedDialogueLink,
-        }
-      );
 
       mailService.send({
-        body: triggerBody,
-        recipient: recipient.user.email,
+        body: makeDialogueLinkReminderTemplate({
+          recipientMail: user.firstName || 'User',
+          dialogueClientUrl: `${config.clientUrl}/${workspaceSlug}/${targetDialogue.slug}`,
+        }),
+        recipient: user.email,
         subject: 'A new HAAS survey has been released for your team',
       });
     }));
+  }
 
-    return true;
+  /**
+   * Find recipients of all actions.
+   * @param actionIds
+   * @param workspaceSlug
+   * @returns
+   */
+  async findActionsRecipients(actionIds: string[], workspaceSlug: string) {
+    const recipients = await Promise.all(actionIds.map(async (actionId) => {
+      const actionRecipients = await this.findActionRecipients(actionId, workspaceSlug);
+      return actionRecipients;
+    }));
+
+    return uniqBy(recipients.flat(), (recipient) => recipient.user.email);
   }
 
   /**
@@ -91,7 +107,7 @@ export class AutomationActionService {
    * @param workspaceSlug
    * @returns
    */
-  findRecipients = async (automationActionId: string, workspaceSlug: string) => {
+  private async findActionRecipients(automationActionId: string, workspaceSlug: string) {
     const automationAction = await this.prisma.automationAction.findUnique({
       where: {
         id: automationActionId,
@@ -114,7 +130,7 @@ export class AutomationActionService {
    * @returns
    */
   sendReport = async (automationActionId: string, workspaceSlug: string, reportUrl: string) => {
-    const recipients = await this.findRecipients(automationActionId, workspaceSlug);
+    const recipients = await this.findActionRecipients(automationActionId, workspaceSlug);
     recipients.forEach((recipient) => {
       const triggerBody = makeReportMailTemplate(
         {
