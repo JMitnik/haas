@@ -17,7 +17,6 @@ export const SendAutomationReportResolver = mutationField('sendAutomationReport'
   },
   nullable: true,
   async resolve(parent, args, ctx) {
-
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
     const { automationActionId, reportUrl, workspaceSlug } = args.input;
 

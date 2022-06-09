@@ -61,6 +61,7 @@
         "install:aws": "cd aws/stack && yarn",
         "staging:migrate": "~/.config/yarn/global/node_modules/.bin/dotenv -e api/.env.staging -- yarn migrate",
         "db-connect-bastion:prod": "bash aws/stack/scripts/connect_to_bastion_prod.sh",
+        "db-migrate:dev": "yarn workspace @haas/api db-migrate:dev",
         "db-migrate:prod": "~/.config/yarn/global/node_modules/.bin/dotenv -e api/.env.prod -- yarn workspace @haas/api db-migrate:prod",
         "migrate": "yarn workspace @haas/api migrate",
         "migrate:baseline": "yarn workspace @haas/api migrate:baseline",
