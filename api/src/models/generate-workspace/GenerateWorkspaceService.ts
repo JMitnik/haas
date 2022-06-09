@@ -16,6 +16,7 @@ import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
 import CustomerService from '../customer/CustomerService';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
+import UserService from '../../models/users/UserService';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -26,6 +27,7 @@ class GenerateWorkspaceService {
   templateService: TemplateService;
   dialogueService: DialogueService;
   customerService: CustomerService;
+  userService: UserService;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -36,6 +38,7 @@ class GenerateWorkspaceService {
     this.templateService = new TemplateService(prismaClient);
     this.dialogueService = new DialogueService(prismaClient);
     this.customerService = new CustomerService(prismaClient);
+    this.userService = new UserService(prismaClient);
   };
 
   /**
@@ -131,7 +134,16 @@ class GenerateWorkspaceService {
    */
   async generateWorkspaceFromCSV(input: NexusGenInputs['GenerateWorkspaceCSVInputType'], userId?: string) {
     const { uploadedCsv, workspaceSlug, workspaceTitle, type } = input;
-    // TODO: Allow for adjustment of template roles
+
+    let records = await parseCsv(await uploadedCsv, { delimiter: ',' });
+
+    // If 'wrong' delimeter is used (;) => parse again based with that delimeter
+    if (records.find((record: string | {}) => {
+      return typeof record === 'object' && Object.keys(record).find((entry) => entry.includes(';'));
+    })) {
+      records = await parseCsv(await uploadedCsv, { delimiter: ';' });
+    }
+
     const template = this.getTemplate(type);
     const workspace = await this.customerPrismaAdapter.createWorkspace({
       name: workspaceTitle,
@@ -141,9 +153,13 @@ class GenerateWorkspaceService {
     }, template);
 
     if (input.generateDemoData) return this.generateDemoData(type, workspace, userId);
-    const records = await parseCsv(await uploadedCsv, { delimiter: ',' });
 
-    // Create customer
+    const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
+    await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
+      workspace.id,
+      adminRole?.id as string,
+      userId as string
+    );
 
     // For every record generate dialogue, users + assign to dialogue
     for (let i = 0; i < records.length; i++) {
@@ -178,7 +194,6 @@ class GenerateWorkspaceService {
       // Make nodes
       await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
 
-
       // Check if user already exists
       // If not create new user entry + userOfCustomer entry
       // If exists => connect existing user when creating new userOfCustomer entry
@@ -190,7 +205,14 @@ class GenerateWorkspaceService {
         phoneAssignee
       );
 
-      await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(workspace.id, user.id, managerRole.id);
+      const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
+        workspace.id,
+        user.id,
+        user.id === userId ? adminRole?.id as string : managerRole.id, // If user generating is upserted => give admin role
+      );
+
+      void this.userService.sendInvitationMail(invitedUser);
+
     };
 
     // Add bot user

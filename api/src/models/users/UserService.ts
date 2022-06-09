@@ -1,4 +1,4 @@
-import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
+import { UserOfCustomer, PrismaClient, Customer, Prisma, User, CustomerSettings } from '@prisma/client';
 import { UserInputError } from 'apollo-server';
 import _ from 'lodash';
 
@@ -242,6 +242,40 @@ class UserService {
 
   async setUserStateInWorkspace(input: { userId: string; workspaceId: string; isActive: boolean }) {
     return this.userPrismaAdapter.setIsActive(input);
+  }
+
+  /**
+   * Send an invitation email to a user of a customer
+   * @param invitedUser 
+   */
+  sendInvitationMail = async (
+    invitedUser: UserOfCustomer & {
+      customer: {
+        id: string;
+        name: string;
+        settings: {
+          colourSettings: {
+            primary: string;
+          } | null;
+        } | null;
+      };
+      user: User;
+    }) => {
+    const inviteLoginToken = AuthService.createUserToken(invitedUser.userId);
+    await this.userPrismaAdapter.setLoginToken(invitedUser.userId, inviteLoginToken);
+
+    const emailBody = makeInviteTemplate({
+      customerName: invitedUser.customer.name,
+      recipientMail: invitedUser.user.email,
+      token: inviteLoginToken,
+      bgColor: invitedUser.customer.settings?.colourSettings?.primary,
+    });
+
+    mailService.send({
+      recipient: invitedUser.user.email,
+      subject: `HAAS: You have been invited to ${invitedUser.customer.name}`,
+      body: emailBody,
+    });
   }
 
   /**

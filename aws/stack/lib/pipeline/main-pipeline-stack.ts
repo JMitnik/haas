@@ -22,7 +22,7 @@ interface MainPipelineStackProps extends StackProps {
 }
 
 export class MainPipelineStack extends Stack {
-  constructor(scope: App, id: string, props?: MainPipelineStackProps) {
+  constructor(scope: Construct, id: string, props?: MainPipelineStackProps) {
     super(scope, id, props);
 
     // Define artifacts where the checkout output will be

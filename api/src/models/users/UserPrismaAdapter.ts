@@ -422,7 +422,7 @@ class UserPrismaAdapter {
   };
 
   async findUserWithinWorkspace(email: string, workspaceId: string) {
-    return this.prisma.user.findFirst({
+    return this.prisma.user.findUnique({
       where: { email },
       include: {
         customers: {
