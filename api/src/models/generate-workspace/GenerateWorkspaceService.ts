@@ -15,6 +15,7 @@ import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
+import UserService from '../../models/users/UserService';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -24,6 +25,7 @@ class GenerateWorkspaceService {
   sessionPrismaAdapter: SessionPrismaAdapter;
   templateService: TemplateService;
   dialogueService: DialogueService;
+  userService: UserService;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -33,6 +35,7 @@ class GenerateWorkspaceService {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.templateService = new TemplateService(prismaClient);
     this.dialogueService = new DialogueService(prismaClient);
+    this.userService = new UserService(prismaClient);
   };
 
   /**
@@ -196,11 +199,14 @@ class GenerateWorkspaceService {
         phoneAssignee
       );
 
-      await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
+      const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
         workspace.id,
         user.id,
         user.id === userId ? adminRole?.id as string : managerRole.id, // If user generating is upserted => give admin role
       );
+
+      void this.userService.sendInvitationMail(invitedUser);
+
     };
 
     return workspace;
