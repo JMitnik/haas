@@ -3,7 +3,7 @@ import { ApolloError } from 'apollo-server-express';
 
 import templates from '../templates';
 import TemplateService from '../templates/TemplateService';
-import { NexusGenEnums, NexusGenInputs } from '../../generated/nexus';
+import { NexusGenEnums } from '../../generated/nexus';
 import { parseCsv } from '../../utils/parseCsv';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
@@ -17,6 +17,7 @@ import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
 import CustomerService from '../customer/CustomerService';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import UserService from '../../models/users/UserService';
+import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -128,38 +129,22 @@ class GenerateWorkspaceService {
   }
 
   /**
-   * Generates a workspace based on the content of a CSV
-   * @param input
-   * @returns the created workspace
+   * Parse an input CSV and generate dialogues / user structure based on each row.
+   * @param input - A CSV following the appropriate spec
+   * @param workspace - Created workspace to be matched
+   * @param userId Id of user requesting the generate
    */
-  async generateWorkspaceFromCSV(input: NexusGenInputs['GenerateWorkspaceCSVInputType'], userId?: string) {
-    const { uploadedCsv, workspaceSlug, workspaceTitle, type } = input;
+  private async parseInputCSV(input: GenerateWorkspaceCSVInput, workspace: Workspace, userId?: string) {
+    const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN);
 
-    let records = await parseCsv(await uploadedCsv, { delimiter: ',' });
+    let records = await parseCsv(await input.uploadedCsv, { delimiter: ',' });
 
     // If 'wrong' delimeter is used (;) => parse again based with that delimeter
     if (records.find((record: string | {}) => {
       return typeof record === 'object' && Object.keys(record).find((entry) => entry.includes(';'));
     })) {
-      records = await parseCsv(await uploadedCsv, { delimiter: ';' });
+      records = await parseCsv(await input.uploadedCsv, { delimiter: ';' });
     }
-
-    const template = this.getTemplate(type);
-    const workspace = await this.customerPrismaAdapter.createWorkspace({
-      name: workspaceTitle,
-      primaryColour: '',
-      logo: '',
-      slug: workspaceSlug,
-    }, template);
-
-    if (input.generateDemoData) return this.generateDemoData(type, workspace, userId);
-
-    const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
-    await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
-      workspace.id,
-      adminRole?.id as string,
-      userId as string
-    );
 
     // For every record generate dialogue, users + assign to dialogue
     for (let i = 0; i < records.length; i++) {
@@ -189,10 +174,10 @@ class GenerateWorkspaceService {
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
       // Make the leafs
-      const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(input.type as NexusGenEnums['DialogueTemplateType'], dialogue.id);
 
       // Make nodes
-      await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
+      await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, input.type);
 
       // Check if user already exists
       // If not create new user entry + userOfCustomer entry
@@ -214,13 +199,42 @@ class GenerateWorkspaceService {
       void this.userService.sendInvitationMail(invitedUser);
 
     };
+  }
+
+  /**
+   * Generates a workspace based on the content of a CSV or generate using prefilled data.
+   * @param input
+   * @returns the created workspace
+   */
+  async generateWorkspace(input: GenerateWorkspaceCSVInput, userId?: string) {
+    // Get template based on workspace type, and generate the basic setup
+    const template = this.getTemplate(input.type);
+    const workspace = await this.customerPrismaAdapter.createWorkspace({
+      name: input.workspaceTitle,
+      primaryColour: '',
+      logo: '',
+      slug: input.workspaceSlug,
+    }, template);
+
+    // If we generate dialogues using demo data, do that and stop the rest of the flow
+    if (input.generateDemoData) return this.generateDemoData(input.type, workspace, userId);
+
+    // Else, continue by parsing the input CSV
+    await this.parseInputCSV(input, workspace, userId);
+
+    // Connect user to workspace as Admin
+    const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN);
+    await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
+      workspace.id,
+      adminRole?.id as string,
+      userId as string
+    );
 
     // Add bot user
-    await this.customerService.createBotUser(workspace.id, workspaceSlug, workspace.roles);
+    await this.customerService.createBotUser(workspace.id, workspace.slug, workspace.roles);
 
     return workspace;
   };
-
 };
 
 export default GenerateWorkspaceService;
