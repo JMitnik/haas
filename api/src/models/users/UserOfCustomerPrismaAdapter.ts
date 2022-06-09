@@ -56,6 +56,24 @@ class UserOfCustomerPrismaAdapter {
           },
         },
       },
+      include: {
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            settings: {
+              select: {
+                colourSettings: {
+                  select: {
+                    primary: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        user: true,
+      },
     })
   }
 
