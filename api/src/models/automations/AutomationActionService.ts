@@ -31,9 +31,9 @@ export class AutomationActionService {
   }
 
   /**
-   * Sends an email with a url to all users (who have an assigned dialogue) provided in an automation action 
-   * @param automationScheduleId 
-   * @param workspaceSlug 
+   * Sends an email with a url to all users (who have an assigned dialogue) provided in an automation action
+   * @param automationScheduleId
+   * @param workspaceSlug
    * @returns a boolean indicating whether the call was a succes or not
    */
   sendDialogueLink = async (automationScheduleId: string, workspaceSlug: string) => {
@@ -87,9 +87,9 @@ export class AutomationActionService {
 
   /**
    * Finds all recipients for an automation action
-   * @param automationActionId 
-   * @param workspaceSlug 
-   * @returns 
+   * @param automationActionId
+   * @param workspaceSlug
+   * @returns
    */
   findRecipients = async (automationActionId: string, workspaceSlug: string) => {
     const automationAction = await this.prisma.automationAction.findUnique({
@@ -108,10 +108,10 @@ export class AutomationActionService {
 
   /**
    * Sends an email with a report to all users provided in an automation action
-   * @param automationActionId 
-   * @param workspaceSlug 
-   * @param reportUrl 
-   * @returns 
+   * @param automationActionId
+   * @param workspaceSlug
+   * @param reportUrl
+   * @returns
    */
   sendReport = async (automationActionId: string, workspaceSlug: string, reportUrl: string) => {
     const recipients = await this.findRecipients(automationActionId, workspaceSlug);
@@ -169,5 +169,3 @@ export class AutomationActionService {
     return this.reportService.generateReport(reportInput);
   }
 }
-
-export default AutomationActionService;
