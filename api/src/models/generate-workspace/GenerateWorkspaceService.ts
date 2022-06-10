@@ -156,8 +156,8 @@ class GenerateWorkspaceService {
       const dialogueSlug = layersContent.join('-').replaceAll(/[^a-zA-Z0-9&]/g, '-').replaceAll(/[--]+/g, '-').toLowerCase();
       const dialogueTitle = layersContent.join(' - ');
 
-      const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'emailAssignee');
-      const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'phoneAssignee');
+      const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_email?');
+      const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_phone?');
       const hasEmailAssignee = !!userEmailEntry?.[1];
       const emailAssignee = userEmailEntry?.[1] as string;
       const phoneAssignee = userPhoneEntry?.[1] as string | undefined;
