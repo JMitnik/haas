@@ -77,6 +77,12 @@ class UserOfCustomerPrismaAdapter {
     })
   };
 
+  /**
+   * Connects a list of private dialogues to a user
+   * @param userId 
+   * @param dialogueIds 
+   * @returns 
+   */
   connectPrivateDialoguesToUser = async (userId: string, dialogueIds: { id: string }[]) => {
     return this.prisma.user.update({
       data: {

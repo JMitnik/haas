@@ -30,12 +30,22 @@ class UserService {
     this.customerService = new CustomerService(prismaClient);
   };
 
+  /**
+   * Finds all private dialogues of a workspace and connects them to a user
+   * @param userId 
+   * @param workspaceId 
+   */
   connectPrivateDialoguesToUser = async (userId: string, workspaceId: string) => {
     const customerWithDialogues = await this.customerService.findPrivateDialoguesOfWorkspace(workspaceId);
     const privateDialogueIds = customerWithDialogues?.dialogues.map((dialogue) => ({ id: dialogue.id })) || [];
     await this.userOfCustomerPrismaAdapter.connectPrivateDialoguesToUser(userId, privateDialogueIds);
   }
 
+  /**
+   * Upserts a user by checking if the email already exists or not
+   * @param input 
+   * @returns 
+   */
   upsertUserByEmail = async (input: Prisma.UserCreateInput) => {
     return this.userPrismaAdapter.upsertUserByEmail(input);
   }

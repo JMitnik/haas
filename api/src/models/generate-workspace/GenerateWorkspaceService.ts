@@ -122,6 +122,11 @@ class GenerateWorkspaceService {
     return null;
   }
 
+  /**
+   * Based on a top down user csv, upsert available users and assign all existing private dialogues to them
+   * @param managerCsv 
+   * @param workspace 
+   */
   addManagersFromCSV = async (managerCsv: any, workspace: Workspace) => {
     let records = await parseCsv(await managerCsv, { delimiter: ';' });
 

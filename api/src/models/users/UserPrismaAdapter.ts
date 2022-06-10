@@ -15,6 +15,11 @@ class UserPrismaAdapter {
     this.roleService = new RoleService(prismaClient);
   }
 
+  /**
+   * Upserts a user by checking if the email already exists or not
+   * @param input 
+   * @returns 
+   */
   upsertUserByEmail = async (input: Prisma.UserCreateInput) => {
     return this.prisma.user.upsert({
       where: {
