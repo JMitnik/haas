@@ -15,6 +15,16 @@ class UserPrismaAdapter {
     this.roleService = new RoleService(prismaClient);
   }
 
+  upsertUserByEmail = async (input: Prisma.UserCreateInput) => {
+    return this.prisma.user.upsert({
+      where: {
+        email: input.email,
+      },
+      create: { ...input, id: input.id },
+      update: { ...input, id: input.id },
+    })
+  }
+
   /**
    * Finds the private dialogues assigned to an user
    * @param userId 

@@ -59,6 +59,7 @@ export const GenerateWorkspaceView = () => {
   const toast = useToast();
 
   const [activeCSV, setActiveCSV] = useState<File | null>(null);
+  const [activeManagerCSV, setActiveManagerCSV] = useState<File | null>(null);
   const [importWorkspaceCSV, { loading }] = useGenerateWorkspaceFromCsvMutation({
     refetchQueries: [
       refetchMeQuery(),
@@ -85,6 +86,13 @@ export const GenerateWorkspaceView = () => {
 
   console.log({ usesGeneratedData });
 
+  const handleManagerDrop = (files: File[]) => {
+    if (!files.length) return;
+
+    const [file] = files;
+    setActiveManagerCSV(file);
+  };
+
   const handleDrop = (files: File[]) => {
     if (!files.length) return;
 
@@ -102,6 +110,7 @@ export const GenerateWorkspaceView = () => {
           workspaceTitle,
           workspaceSlug,
           uploadedCsv: activeCSV,
+          managerCsv: activeManagerCSV,
           type: dialogueType as DialogueTemplateType,
           generateDemoData: generateDemoDataCheck,
         },
@@ -205,6 +214,15 @@ export const GenerateWorkspaceView = () => {
 
               </UI.Flex>
 
+            </UI.FormControl>
+
+            <UI.FormControl isRequired={usesGeneratedData === 0} opacity={usesGeneratedData ? 0.5 : 1}>
+              <UI.FormLabel>{t('upload_user_csv')}</UI.FormLabel>
+              <UI.FormLabelHelper>{t('upload_user_csv_helper')}</UI.FormLabelHelper>
+              <FileDropInput
+                isDisabled={!!usesGeneratedData}
+                onDrop={handleManagerDrop}
+              />
             </UI.FormControl>
 
             <UI.FormControl isRequired={usesGeneratedData === 0} opacity={usesGeneratedData ? 0.5 : 1}>

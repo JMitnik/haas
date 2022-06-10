@@ -13,6 +13,7 @@ export const GenerateWorkspaceCSVInputType = inputObjectType({
     t.string('workspaceSlug', { required: true });
     t.string('workspaceTitle', { required: true });
     t.upload('uploadedCsv', { required: false });
+    t.upload('managerCsv', { required: false });
     t.string('type', { required: true, default: 'DEFAULT' });
     t.boolean('generateDemoData', { required: false, default: false });
   },
