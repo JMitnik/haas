@@ -216,7 +216,7 @@ export const GenerateWorkspaceView = () => {
 
             </UI.FormControl>
 
-            <UI.FormControl isRequired={usesGeneratedData === 0} opacity={usesGeneratedData ? 0.5 : 1}>
+            <UI.FormControl opacity={usesGeneratedData ? 0.5 : 1}>
               <UI.FormLabel>{t('upload_user_csv')}</UI.FormLabel>
               <UI.FormLabelHelper>{t('upload_user_csv_helper')}</UI.FormLabelHelper>
               <FileDropInput

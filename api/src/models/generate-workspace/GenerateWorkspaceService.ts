@@ -246,7 +246,7 @@ class GenerateWorkspaceService {
       void this.userService.sendInvitationMail(invitedUser);
     };
 
-    await this.addManagersFromCSV(managerCsv, workspace);
+    if (managerCsv) await this.addManagersFromCSV(managerCsv, workspace);
 
     return workspace;
   };
