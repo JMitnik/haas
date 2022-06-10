@@ -129,15 +129,6 @@ class GenerateWorkspaceService {
   async generateWorkspaceFromCSV(input: NexusGenInputs['GenerateWorkspaceCSVInputType'], userId?: string) {
     const { uploadedCsv, workspaceSlug, workspaceTitle, type } = input;
 
-    let records = await parseCsv(await uploadedCsv, { delimiter: ',' });
-
-    // If 'wrong' delimeter is used (;) => parse again based with that delimeter
-    if (records.find((record: string | {}) => {
-      return typeof record === 'object' && Object.keys(record).find((entry) => entry.includes(';'));
-    })) {
-      records = await parseCsv(await uploadedCsv, { delimiter: ';' });
-    }
-
     const template = this.getTemplate(type);
     const workspace = await this.customerPrismaAdapter.createWorkspace({
       name: workspaceTitle,
@@ -147,6 +138,8 @@ class GenerateWorkspaceService {
     }, template);
 
     if (input.generateDemoData) return this.generateDemoData(type, workspace, userId);
+
+    let records = await parseCsv(await uploadedCsv, { delimiter: ';' });
 
     const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
     await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
@@ -158,10 +151,10 @@ class GenerateWorkspaceService {
     // For every record generate dialogue, users + assign to dialogue
     for (let i = 0; i < records.length; i++) {
       const record = records[i];
-      const layers = Object.entries(record).filter((entry) => entry[0].includes('layer'));
-      const layersContent = layers.map((layer) => layer[1] as string);
-      const dialogueSlug = layersContent.join('-');
-      const dialogueTitle = `${layersContent.join(' - ')}`
+      const layers = Object.entries(record).filter((entry) => entry[0].includes('layer') && (entry[1] as string)?.length > 0);
+      const layersContent = layers.map((layer) => (layer[1] as string).replaceAll('-', ''));
+      const dialogueSlug = layersContent.join('-').replaceAll(/[^a-zA-Z0-9&]/g, '-').replaceAll(/[--]+/g, '-').toLowerCase();
+      const dialogueTitle = layersContent.join(' - ');
 
       const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'emailAssignee');
       const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'phoneAssignee');
