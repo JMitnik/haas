@@ -149,7 +149,7 @@ const DialogueOverview = () => {
           gridAutoRows="minmax(200px, 1fr)"
         >
           {filteredDialogues.map((dialogue: any, index: any) => dialogue && (
-            <DialogueCard key={index} dialogue={dialogue} />
+            <DialogueCard key={index} filter={filter} dialogue={dialogue} />
           ))}
         </UI.Grid>
 

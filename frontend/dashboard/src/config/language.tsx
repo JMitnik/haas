@@ -1181,6 +1181,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Visit',
       de: 'Besuchen',
     },
+    delete_dialogue_complete: {
+      en: 'Dialogue deleted',
+      de: 'Dialog gelöscht',
+    },
+    delete_dialogue_complete_helper: {
+      en: 'The selected dialogue has been successfully removed',
+      de: 'Der ausgewählte Dialog wurde erfolgreich entfernt',
+    },
     delete_dialogue_popover: {
       en:
         'You are about to delete a dialogue and all related data. This cannot be undone! Are you sure?',

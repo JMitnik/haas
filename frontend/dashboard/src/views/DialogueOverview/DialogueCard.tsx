@@ -11,16 +11,20 @@ import { ReactComponent as NLFlag } from 'assets/icons/flags/flag-nl.svg';
 import { ShowMoreButton } from 'components/Common/ShowMoreButton';
 
 import { Avatar } from 'components/Common/Avatar';
+import {
+  refetchDialogueConnectionQuery,
+  useDeleteDialogueMutation,
+  useSetDialoguePrivacyMutation,
+} from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
-import { useSetDialoguePrivacyMutation } from 'types/generated-types';
 import { useToast } from 'hooks/useToast';
 import { useUser } from 'providers/UserProvider';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
 
-const DialogueCard = ({ dialogue }: { dialogue: any }) => {
+const DialogueCard = ({ dialogue, filter }: { dialogue: any, filter: any }) => {
   const history = useHistory();
   const { user } = useUser();
   const { activeCustomer } = useCustomer();
@@ -54,6 +58,29 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
     onError: () => {
       toast.templates.error();
     },
+  });
+
+  const [deleteDialogue] = useDeleteDialogueMutation({
+    onCompleted: () => {
+      toast.success({
+        title: t('delete_dialogue_complete'),
+        description: t('delete_dialogue_complete_helper'),
+      });
+    },
+    onError: (serverError: any) => {
+      console.log(serverError);
+    },
+    refetchQueries: [
+      refetchDialogueConnectionQuery({
+        customerSlug,
+        filter: {
+          searchTerm: filter?.search,
+          offset: filter?.pageIndex * filter?.perPage,
+          perPage: filter?.perPage,
+          orderBy: filter?.orderBy,
+        },
+      }),
+    ],
   });
 
   const renderFlag = (language: string): JSX.Element => {
@@ -116,6 +143,24 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
                       <Dropdown.CheckedItem isChecked={dialogue.isPrivate} onClick={() => setDialoguePrivacy()}>
                         {t('set_private')}
                       </Dropdown.CheckedItem>
+
+                      <UI.Hr />
+
+                      <Dropdown.Item
+                        onClick={() => deleteDialogue(
+                          {
+                            variables: {
+                              input: {
+                                customerSlug: activeCustomer?.slug as string,
+                                id: dialogue?.id,
+                              },
+                            },
+                          },
+                        )}
+                      >
+                        {t('delete')}
+                      </Dropdown.Item>
+
                     </Dropdown.Content>
                   </Dropdown.Root>
                 </UI.Div>

@@ -1,0 +1,6 @@
+mutation deleteDialogue($input: DeleteDialogueInputType) {
+	deleteDialogue(input: $input) {
+		id
+		slug
+	}
+}
