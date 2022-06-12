@@ -60,6 +60,12 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
         description: t('delete_dialogue_complete_helper'),
       });
     },
+    variables: {
+      input: {
+        customerSlug,
+        id: dialogue.id,
+      },
+    },
     onError: (serverError: any) => {
       console.log(serverError);
     },
@@ -130,16 +136,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
                       <UI.Hr />
 
                       <Dropdown.Item
-                        onClick={() => deleteDialogue(
-                          {
-                            variables: {
-                              input: {
-                                customerSlug: activeCustomer?.slug as string,
-                                id: dialogue?.id,
-                              },
-                            },
-                          },
-                        )}
+                        onClick={() => deleteDialogue()}
                       >
                         {t('delete')}
                       </Dropdown.Item>
