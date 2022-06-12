@@ -1,10 +1,12 @@
+import { GREEN_LOWER_BOUND, ORANGE_LOWER_BOUND, ORANGE_UPPER_BOUND } from 'config/constants';
+
 export type ScoreContainerState = 'gray' | 'green' | 'orange' | 'red';
 
 export const getColorScoreState = (score?: number) => {
   if (!score) return 'gray';
 
-  if (score >= 76) return 'green';
-  if (score <= 75 && score >= 51) return 'orange';
+  if (score >= GREEN_LOWER_BOUND) return 'green';
+  if (score <= ORANGE_UPPER_BOUND && score >= ORANGE_LOWER_BOUND) return 'orange';
 
   return 'red';
 };
