@@ -11,20 +11,18 @@ import { ReactComponent as NLFlag } from 'assets/icons/flags/flag-nl.svg';
 import { ShowMoreButton } from 'components/Common/ShowMoreButton';
 
 import { Avatar } from 'components/Common/Avatar';
+import { useCustomer } from 'providers/CustomerProvider';
 import {
-  refetchDialogueConnectionQuery,
   useDeleteDialogueMutation,
   useSetDialoguePrivacyMutation,
 } from 'types/generated-types';
-import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import { useToast } from 'hooks/useToast';
 import { useUser } from 'providers/UserProvider';
-import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
 
-const DialogueCard = ({ dialogue, filter }: { dialogue: any, filter: any }) => {
+const DialogueCard = ({ dialogue }: { dialogue: any }) => {
   const history = useHistory();
   const { user } = useUser();
   const { activeCustomer } = useCustomer();
@@ -42,12 +40,7 @@ const DialogueCard = ({ dialogue, filter }: { dialogue: any, filter: any }) => {
         state: !dialogue.isPrivate,
       },
     },
-    refetchQueries: [{
-      query: getDialoguesOfCustomer,
-      variables: {
-        customerSlug: activeCustomer?.slug as string,
-      },
-    }],
+    refetchQueries: ['dialogueConnection'],
     onCompleted: (data) => {
       const state = data.setDialoguePrivacy?.isPrivate ? 'private' : 'public';
       toast.success({
@@ -70,17 +63,7 @@ const DialogueCard = ({ dialogue, filter }: { dialogue: any, filter: any }) => {
     onError: (serverError: any) => {
       console.log(serverError);
     },
-    refetchQueries: [
-      refetchDialogueConnectionQuery({
-        customerSlug,
-        filter: {
-          searchTerm: filter?.search,
-          offset: filter?.pageIndex * filter?.perPage,
-          perPage: filter?.perPage,
-          orderBy: filter?.orderBy,
-        },
-      }),
-    ],
+    refetchQueries: ['dialogueConnection'],
   });
 
   const renderFlag = (language: string): JSX.Element => {
