@@ -509,12 +509,14 @@ export const CampaignView = () => {
         <Modal.Root open={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
           <UI.NewCard>
             <UI.CardBody>
-              <CreateCampaignForm
-                onClose={() => setIsOpenSettingsModal(false)}
-                    // @ts-ignore
-                campaign={campaignToForm(campaign)}
-                isReadOnly
-              />
+              {campaign && (
+                <CreateCampaignForm
+                  onClose={() => setIsOpenSettingsModal(false)}
+                      // @ts-ignore
+                  campaign={campaignToForm(campaign)}
+                  isReadOnly
+                />
+              )}
             </UI.CardBody>
           </UI.NewCard>
         </Modal.Root>
