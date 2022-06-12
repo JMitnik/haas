@@ -1,14 +1,13 @@
 import * as UI from '@haas/ui';
 import { Calendar, Plus, Search, Settings, User } from 'react-feather';
-import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, startOfDay } from 'date-fns';
 import { union } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Menu from 'components/Common/Menu';
+import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
-import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import {
   DeliveryConnectionOrder, DeliveryFragmentFragment,
@@ -24,6 +23,7 @@ import { TabbedMenu } from 'components/Common/TabMenu';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useLogger } from 'hooks/useLogger';
 import { useMenu } from 'components/Common/Menu/useMenu';
+import { useRouteModal } from 'components/Common/Modal';
 import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
 import Searchbar from 'components/Common/SearchBar';
 
@@ -52,9 +52,8 @@ export const CampaignView = () => {
   const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false);
   const { t } = useTranslation();
   const logger = useLogger();
-  const location = useLocation();
 
-  const { customerSlug, campaignId, getCampaignsPath, goToCampaignView, goToDeliveryView } = useNavigator();
+  const { customerSlug, campaignId, getCampaignsPath } = useNavigator();
   const campaignsPath = getCampaignsPath();
 
   const [filter, setFilter] = useQueryParams({
@@ -177,6 +176,16 @@ export const CampaignView = () => {
   };
 
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<DeliveryFragmentFragment>();
+
+  const [
+    openDeliveryModal,
+    closeDeliveryModal,
+    isOpenDeliveryModal,
+    params,
+  ] = useRouteModal<{ campaignId: string, deliveryId: string }>({
+    matchUrlKey: ROUTES.DELIVERY_VIEW,
+    exitUrl: `/dashboard/b/${customerSlug}/campaign/${campaignId}`,
+  });
 
   return (
     <>
@@ -446,7 +455,7 @@ export const CampaignView = () => {
             </Table.HeadingRow>
             {deliveryConnection?.deliveries.map((delivery) => (
               <Table.Row
-                onClick={() => goToDeliveryView(campaignId, delivery.id)}
+                onClick={() => openDeliveryModal({ campaignId, deliveryId: delivery.id })}
                 isLoading={isLoading}
                 key={delivery.id}
                 gridTemplateColumns={columns}
@@ -486,59 +495,35 @@ export const CampaignView = () => {
           />
         </UI.Flex>
 
-        <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
-          <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenImportModal(false)}>
-            <UI.DeprecatedModalBody>
+        <Modal.Root open={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
+          <UI.NewCard>
+            <UI.CardBody>
               <ImportDeliveriesForm
                 onComplete={() => refetch()}
                 onClose={() => setIsOpenImportModal(false)}
               />
-            </UI.DeprecatedModalBody>
-          </UI.ModalCard>
-        </UI.Modal>
+            </UI.CardBody>
+          </UI.NewCard>
+        </Modal.Root>
 
-        {!!campaign && (
-          <UI.Modal isOpen={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
-            <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenSettingsModal(false)}>
-              <UI.DeprecatedModalBody>
-                <CreateCampaignForm
-                  onClose={() => setIsOpenSettingsModal(false)}
-                  // @ts-ignore
-                  campaign={campaignToForm(campaign)}
-                  isReadOnly
-                />
-              </UI.DeprecatedModalBody>
-            </UI.ModalCard>
-          </UI.Modal>
-        )}
+        <Modal.Root open={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
+          <UI.NewCard>
+            <UI.CardBody>
+              <CreateCampaignForm
+                onClose={() => setIsOpenSettingsModal(false)}
+                    // @ts-ignore
+                campaign={campaignToForm(campaign)}
+                isReadOnly
+              />
+            </UI.CardBody>
+          </UI.NewCard>
+        </Modal.Root>
 
-        <AnimatePresence>
-          <Switch
-            location={location}
-            key={location.pathname}
-          >
-            <Route
-              path={ROUTES.DELIVERY_VIEW}
-            >
-              {({ match }) => (
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <UI.Modal isOpen onClose={() => goToCampaignView(campaignId)}>
-                    <DeliveryModalCard
-                      onClose={() => goToCampaignView(campaignId)}
-                      // @ts-ignore
-                      id={match?.params?.deliveryId}
-                    />
-                  </UI.Modal>
-                </motion.div>
-              )}
-            </Route>
-          </Switch>
-        </AnimatePresence>
+        <Modal.Root open={isOpenDeliveryModal} onClose={closeDeliveryModal}>
+          <DeliveryModalCard
+            id={params?.deliveryId}
+          />
+        </Modal.Root>
       </UI.ViewBody>
     </>
   );

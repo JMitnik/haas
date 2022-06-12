@@ -2,51 +2,10 @@ import styled, { css } from 'styled-components';
 import { get } from 'lodash';
 
 import { Div } from './Generics';
-import { Flex } from './Container';
 import { Span } from './Span';
 import { Button } from './Buttons';
 
 export type BoxShadowSize = 'sm' | 'md' | 'lg';
-
-interface CardProps {
-  noHover?: boolean;
-  isFlat?: boolean;
-  outline?: boolean;
-  boxShadow?: BoxShadowSize;
-  willFocusWithin?: boolean;
-}
-
-export const Card = styled(Div) <CardProps>`
-  ${({ theme, noHover, isFlat, willFocusWithin }) => css`
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    border-radius: ${theme.borderRadiuses.somewhatRounded};
-    box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
-    box-shadow: ${theme.boxShadows.md};
-    border: 1px solid ${theme.colors.gray[100]};
-
-    ${willFocusWithin && css`
-      &:focus-within {
-        transition: all .3s cubic-bezier(.55,0,.1,1);
-        box-shadow: rgba(0, 0, 0, 0.20) 0px 4px 12px;
-      }
-    `}
-
-    ${isFlat && css`
-      box-shadow: none;
-    `}
-
-    ${!noHover && css`
-      cursor: pointer;
-
-      &:hover {
-        transition: all .3s cubic-bezier(.55,0,.1,1);
-        box-shadow: rgba(0, 0, 0, 0.20) 0px 4px 12px;
-      }
-    `}
-  `}
-`;
 
 export const ButtonCard = styled(Button) <{ isActive: boolean }>`
   ${({ theme, isActive }) => css`
@@ -83,40 +42,6 @@ export const ButtonCard = styled(Button) <{ isActive: boolean }>`
   `}
 `;
 
-export const AddCard = styled(Card)`
-  ${({ theme }) => css`
-    position: relative;
-
-    background: none;
-    border: none;
-    border-radius: none;
-
-    ${Flex} {
-      height: 100%;
-      border-radius: ${theme.borderRadiuses.md};
-      border: 5px solid ${theme.colors.default.normalAlt};
-      transition: all 0.2s ease-in;
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      justify-content: center;
-
-      svg {
-        color: ${theme.colors.default.dark};
-      }
-    }
-
-    a {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      top: 0;
-      text-decoration: none;
-    }
-  `}
-`;
-
 export const CardBody = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter * 0.75}px;
@@ -136,7 +61,7 @@ export const CardBodyLarge = styled(Div)`
 export const CardFooter = styled(Div)`
   ${({ theme, color = 'default.text' }) => css`
     padding: ${theme.gutter * 0.75}px;
-    border-radius: 0 0 ${theme.borderRadiuses.md}px ${theme.borderRadiuses.md}px;
+    border-radius: 0 0 ${theme.borderRadiuses.lg}px ${theme.borderRadiuses.lg}px;
     color: ${get(theme.colors, color)};
   `}
 `;
@@ -157,8 +82,6 @@ export const CardScore = styled(Span)`
   `}
 `;
 
-export default Card;
-
 /**
  * New card
  *
@@ -170,7 +93,7 @@ interface NewCardProps {
   hasBlur?: boolean;
 }
 
-export const NewCard = styled(Div) <NewCardProps>`
+export const NewCard = styled(Div)<NewCardProps>`
   ${({ theme, hasHover, boxShadow = 'md', bg = 'white', hasBlur = false }) => css`
     background: ${get(theme.colors, bg as string)};
     border-radius: ${theme.borderRadiuses.lg}px;

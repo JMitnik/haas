@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 import React from 'react';
 import { Skeleton as ChakraSkeleton } from '@chakra-ui/core';
 import { H4, Text } from './Type';
-import Card, { BoxShadowSize, NewCard } from './Cards';
+import { BoxShadowSize, NewCard } from './Cards';
 import { Span } from './Span';
 import { CloseIcon } from './assets/icon-close';
 import { Div } from './Generics';

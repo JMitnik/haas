@@ -7,10 +7,9 @@ import { useGetDeliveryQuery } from 'types/generated-types';
 
 interface DeliveryModalCardProps {
   id: string;
-  onClose: () => void;
 }
 
-export const DeliveryModalCard = ({ id, onClose }: DeliveryModalCardProps) => {
+export const DeliveryModalCard = ({ id }: DeliveryModalCardProps) => {
   const { t } = useTranslation();
   const { data, loading, error } = useGetDeliveryQuery({
     variables: {
@@ -25,7 +24,7 @@ export const DeliveryModalCard = ({ id, onClose }: DeliveryModalCardProps) => {
   const delivery = data?.delivery;
 
   return (
-    <UI.ModalCard breakout maxWidth={1200} onClose={onClose}>
+    <UI.NewCard maxWidth={1200} mx="auto">
       <UI.ModalHead>
         <UI.ModalTitle>{t('details')}</UI.ModalTitle>
       </UI.ModalHead>
@@ -65,6 +64,6 @@ export const DeliveryModalCard = ({ id, onClose }: DeliveryModalCardProps) => {
         )}
 
       </UI.ModalBody>
-    </UI.ModalCard>
+    </UI.NewCard>
   );
 };

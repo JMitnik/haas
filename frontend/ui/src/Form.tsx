@@ -11,7 +11,6 @@ import SimpleMDE from 'react-simplemde-editor';
 import {
   Checkbox as ChakraCheckbox,
   CheckboxProps as ChakraCheckboxProps,
-  ButtonProps as ChakraButtonProps,
   Button,
   FormControl as ChakraFormControl,
   FormLabel as ChakraFormLabel,
@@ -36,7 +35,7 @@ import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
 import { Flex, Grid } from './Container';
-import { Card } from './Cards';
+import { NewCard } from './Cards';
 import { Span } from './Span';
 import { Helper, Text } from './Type';
 
@@ -585,7 +584,7 @@ export const CardForm = styled(Div) <CardFormProps>`
     css`
       display: flex;
 
-      > *:first-child {
+      > *:first-of-type {
         border-right: 1px solid ${theme.colors.gray[200]};
       }
     `}
@@ -960,7 +959,7 @@ export const FieldLabel = styled(Span)`
   `}
 `;
 
-export const CheckBoxCardContainer = styled(Card) <{ isChecked?: boolean }>`
+export const CheckBoxCardContainer = styled(NewCard) <{ isChecked?: boolean }>`
   ${({ theme, isChecked }) => css`
     width: 100%;
     min-height: 100px;

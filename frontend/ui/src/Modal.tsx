@@ -1,12 +1,10 @@
-import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import React, { useEffect, useRef } from 'react';
-import { X } from 'react-feather';
 import { CloseIcon } from './assets/icon-close';
 import ReactModal from 'react-modal';
 import styled, { css } from 'styled-components';
 import { Paragraph } from './Type';
 import { Div } from './Generics';
-import { Card } from '.';
 
 export const DeprecatedModalBody = styled(Div)`
   ${({ theme }) => css`
@@ -168,34 +166,6 @@ const CloseButton = ({ onClose }: any) => (
     <CloseIcon />
   </CloseButtonContainer>
 );
-
-const ModalCardContainer = styled(Div)`
-  position: relative;
-  height: 80vh;
-  overflow: auto;
-  border-radius: 0 0 10px 10px;
-
-  ${Card} {
-    margin: 0 auto;
-  }
-
-  ${CloseButtonContainer} {
-  }
-`;
-
-export const ModalCard = ({ children, onClose, maxWidth = 600, breakout = false }: ModalCardProps) => (
-  <ModalCardContainer>
-    <div style={{ height: '80vh', overflow: 'auto', borderRadius: '0 0 10px 10px' }}>
-      <Card bg="white" noHover maxWidth={maxWidth} padding={breakout ? 0 : 4}>
-        {!!onClose && (
-          <CloseButton onClose={onClose} />
-        )}
-        {children}
-      </Card>
-    </div>
-  </ModalCardContainer>
-);
-
 
 export const ModalBody = styled(Div)`
   ${({ theme }) => css`

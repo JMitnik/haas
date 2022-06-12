@@ -733,9 +733,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
         </Div>
         <UI.InputGrid>
           {activeRecipients.map((recipient, index) => (
-            <UI.DeprecatedCard
-              noHover
-              outline
+            <UI.NewCard
               borderTop="3px solid"
               borderColor="tertiary"
               key={index}
@@ -777,7 +775,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
-            </UI.DeprecatedCard>
+            </UI.NewCard>
           ))}
 
           {activeRecipients.length === 0 ? (
