@@ -1,6 +1,12 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
-import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple, LinearGradient } from '@visx/gradient';
+import {
+  GradientLightgreenGreen,
+  GradientOrangeRed,
+  GradientPinkRed,
+  GradientSteelPurple,
+  LinearGradient,
+} from '@visx/gradient';
 import { Group } from '@visx/group';
 import { MapPin, Minus } from 'react-feather';
 import { PatternCircles } from '@visx/pattern';
@@ -125,6 +131,7 @@ export const HexagonGrid = ({
         ref={zoom.containerRef}
       >
         <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
+        <GradientOrangeRed id="dots-orange" />
         <GradientPinkRed id="dots-pink" />
         <GradientSteelPurple id="dots-gray" />
         <LinearGradient id="grays" from="#757F9A" to="#939bb1" />
