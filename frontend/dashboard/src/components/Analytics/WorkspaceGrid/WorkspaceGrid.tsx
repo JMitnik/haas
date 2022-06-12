@@ -277,7 +277,7 @@ export const WorkspaceGrid = ({
         </motion.div>
       )}
 
-      <UI.Div height="calc(100vh - 30px)" borderRadius={20} position="relative">
+      <UI.Div minHeight="calc(100vh - 30px)" borderRadius={20} position="relative">
         <Zoom<SVGElement>
           width={width}
           height={height}
@@ -342,7 +342,7 @@ export const WorkspaceGrid = ({
                   </HexagonGrid>
 
                 </UI.Div>
-                <UI.Div mt={4}>
+                <UI.Div my={4}>
                   <WorkspaceSummaryPane
                     startDate={startDate}
                     endDate={endDate}
