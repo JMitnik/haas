@@ -16,19 +16,21 @@ import {
 } from 'react-feather';
 import { AnimatePresence, Variants, motion } from 'framer-motion';
 import { Button } from '@chakra-ui/core';
-import { Controller, UseFieldArrayMethods, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, FieldValues, UseFieldArrayReturn, useFieldArray, useForm } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
 
+import { Customer, Maybe, RoleType, UserType, useGetUsersAndRolesQuery } from 'types/generated-types';
 import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
+import { TargetTypeEnum, UserNodePicker } from 'components/NodePicker/UserNodePicker';
+import { useNavigator } from 'hooks/useNavigator';
+import Dropdown from 'components/Dropdown/Dropdown';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
+import { TargetCell } from 'views/AddAutomationView/TargetCell';
 import { CTANodeFormProps } from './CTATypes';
-import { Customer, Maybe, RoleType, UserType } from 'types/generated-types';
-import { TargetTypeEnum, UserNodePicker } from 'components/NodePicker/UserNodePicker';
-import Dropdown from 'components/Dropdown/Dropdown';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -254,15 +256,23 @@ interface FormNodeFieldFragmentProps {
   onDelete: () => void;
 }
 
-interface FormNodeCommunicationUserFragment {
-  targetFieldArray: UseFieldArrayMethods<Record<string, any>, 'arrayKey'>;
+interface FormNodeCommunicationUserFragmentProps {
+  targetFieldArray: UseFieldArrayReturn<FieldValues, 'targets', 'arrayKey'>;
   form: any;
 }
 
-const FormNodeCommunicationUserFragment = ({ targetFieldArray, form }: FormNodeCommunicationUserFragment) => {
-  const [state, setState] = useState('');
+const FormNodeCommunicationUserFragment = ({ targetFieldArray, form }: FormNodeCommunicationUserFragmentProps) => {
   const { t } = useTranslation();
+  const { customerSlug } = useNavigator();
   const { fields: targetFields, append, remove } = targetFieldArray;
+
+  const { data } = useGetUsersAndRolesQuery({
+    variables: {
+      customerSlug,
+    },
+  });
+
+  const userPickerEntries = mapToUserPickerEntries(data?.customer);
 
   return (
     <UI.FormControl isRequired>
