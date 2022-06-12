@@ -324,26 +324,22 @@ export const mapNodeTypeToViewType = (nodeType: HexagonNodeType): HexagonViewMod
    * @param path an array to store the traversed HexagonNode IDs
    * @returns a list of HexagonNode IDs to reach the Dialogue HexagonNode
    */
-export const findDialoguePath = (dialogueId: string, data: HexagonNode[], path: string[] = []): string[] => {
-  // eslint-disable-next-line no-restricted-syntax
-  for (const node of data) {
-    if (node.type === HexagonNodeType.Dialogue) {
-      if (node.id === dialogueId) {
-        path = [...path, node.id];
-        break;
-      }
+export const findDialoguePath = (
+  dialogueId: string, data: HexagonNode[], path: string[] = [],
+): string[] => data.flatMap((node) => {
+  // If current node is a group node we have to go one layer deeper while keep tracking the traversed node IDs
+  if (node.type === HexagonNodeType.Dialogue) {
+    if (node.id === dialogueId) {
+      return [...path, node.id];
     }
-
-    // If current node is a group node we have to go one layer deeper while keep tracking the traversed node IDs
-    if (node.type === HexagonNodeType.Group) {
-      return findDialoguePath(dialogueId, node.subGroups, [...path, node.id]);
-    }
-
-    return [];
   }
 
-  return path;
-};
+  if (node.type === HexagonNodeType.Group) {
+    return findDialoguePath(dialogueId, node.subGroups, [...path, node.id]);
+  }
+
+  return undefined;
+}).filter((entry: any) => entry) as string[];
 
 /**
  * Recursively traverses the HexagonNode data set and reconstructs the history stack
