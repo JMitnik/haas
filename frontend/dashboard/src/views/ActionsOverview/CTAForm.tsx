@@ -13,7 +13,7 @@ import { Link, Trash, Type } from 'react-feather';
 import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 import Select from 'react-select';
 
@@ -141,9 +141,9 @@ const CTAForm = ({
   form: formNode,
 }: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
-  const { customerSlug, dialogueSlug, questionId } = useParams<
-  { customerSlug: string, dialogueSlug: string, questionId?: string }
-  >();
+  const { customerSlug, dialogueSlug, questionId } = useParams<{
+    customerSlug: string, dialogueSlug: string, questionId?: string
+  }>();
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -163,7 +163,7 @@ const CTAForm = ({
           placeholder: field.placeholder,
           isRequired: boolToInt(field.isRequired),
           position: field.position,
-        })),
+        })) || [],
       },
     },
   });
@@ -199,7 +199,6 @@ const CTAForm = ({
         position: 'bottom-right',
         duration: 1500,
       });
-      console.log('CREATED CTA: ', data.createCTA);
       const CTA: MappedCTANode = {
         value: data.createCTA.id,
         label: data.createCTA.title,
@@ -308,21 +307,21 @@ const CTAForm = ({
             </Div>
             <Div>
               <InputGrid>
-                <FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.title}>
+                <FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.formState.errors.title}>
                   <FormLabel htmlFor="title">{t('title')}</FormLabel>
                   <InputHelper>{t('cta:title_helper')}</InputHelper>
                   <Controller
                     name="title"
                     control={form.control}
                     defaultValue={title}
-                    render={({ value, onChange }) => (
+                    render={({ field }) => (
                       <UI.MarkdownEditor
-                        value={value}
-                        onChange={onChange}
+                        value={field.value}
+                        onChange={field.onChange}
                       />
                     )}
                   />
-                  <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.formState.errors.title?.message}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isRequired>
@@ -332,11 +331,16 @@ const CTAForm = ({
                   <Controller
                     name="ctaType"
                     control={form.control}
-                    options={CTA_TYPES}
-                    as={Select}
+                    render={({ field }) => (
+                      <Select
+                        options={CTA_TYPES}
+                        value={field.value as any}
+                        onChange={field.onChange}
+                      />
+                    )}
                   />
 
-                  <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.formState.errors.ctaType?.value?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
             </Div>
@@ -355,13 +359,12 @@ const CTAForm = ({
                     <FormLabel htmlFor="share.title">{t('cta:text')}</FormLabel>
                     <InputHelper>{t('cta:shared_item_text_helper')}</InputHelper>
                     <Input
-                      name="share.title"
                       placeholder="Get a discount..."
                       leftEl={<Type />}
                       defaultValue={share?.title}
-                      ref={form.register({ required: true })}
+                      {...form.register('share.title', { required: true })}
                     />
-                    <FormErrorMessage>{form.errors.share?.title}</FormErrorMessage>
+                    <FormErrorMessage>{form.formState.errors.share?.title}</FormErrorMessage>
                   </FormControl>
 
                   {/* TODO: Change default value and error */}
@@ -369,27 +372,25 @@ const CTAForm = ({
                     <FormLabel htmlFor="share.url">{t('url')}</FormLabel>
                     <InputHelper>{t('cta:url_share_helper')}</InputHelper>
                     <Input
-                      name="share.url"
                       placeholder="https://share/url"
                       // eslint-disable-next-line jsx-a11y/anchor-is-valid
                       leftEl={<Link />}
                       defaultValue={share?.url}
-                      ref={form.register({ required: true })}
+                      {...form.register('share.url', { required: true })}
                     />
-                    <FormErrorMessage>{form.errors.share?.url}</FormErrorMessage>
+                    <FormErrorMessage>{form.formState.errors.share?.url}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired>
                     <FormLabel htmlFor="share.tooltip">{t('cta:button_text')}</FormLabel>
                     <InputHelper>{t('cta:button_text_helper')}</InputHelper>
                     <Input
-                      name="share.tooltip"
                       placeholder="Share..."
                       leftEl={<Type />}
                       defaultValue={share?.tooltip}
-                      ref={form.register({ required: true })}
+                      {...form.register('share.tooltip', { required: true })}
                     />
-                    <FormErrorMessage>{form.errors.share?.tooltip}</FormErrorMessage>
+                    <FormErrorMessage>{form.formState.errors.share?.tooltip}</FormErrorMessage>
                   </FormControl>
                 </UI.InputGrid>
               </FormSection>

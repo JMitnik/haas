@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { allow, deny, or, rule, shield } from 'graphql-shield';
+import { allow, or, rule, shield } from 'graphql-shield';
 
 import { ApolloError } from 'apollo-server-express';
 import { SystemPermissionEnum } from '@prisma/client';
@@ -37,22 +37,17 @@ const isFromClient = rule({ cache: 'contextual' })(
   },
 )
 
-const belongsToWorkspace = rule({ cache: 'no_cache' })(
+/**
+ * Rule which checks whether user is a user by matching provided refresh token with db value
+ */
+const isVerifiedUser = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
-    if (!ctx.session?.user?.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
-    if (!ctx.session?.activeWorkspace) return false;
-
-    if (ctx.session.user.customers.find(workspace => workspace.customerId === ctx.session?.activeWorkspace?.id)) {
-      return true;
-    }
-
-    return false;
-  },
-);
-
-const isLocal = rule({ cache: 'no_cache' })(
-  async () => config.env === 'local',
-);
+    return ctx.services.authService.verifyUserToken(
+      ctx.session?.user?.email as string,
+      ctx.session?.user?.refreshToken as string
+    );
+  }
+)
 
 /**
  * Rule which takes a permission.
@@ -108,6 +103,8 @@ const authShield = shield({
     verifyUserToken: allow,
     requestInvite: allow,
     authenticateLambda: allow,
+    sendAutomationDialogueLink: or(isSuperAdmin, isVerifiedUser, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_REPORT_PAGE)),
+    sendAutomationReport: or(isSuperAdmin, isVerifiedUser, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_REPORT_PAGE)),
     assignUserToDialogues: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_ASSIGN_USERS_TO_DIALOGUE)),
     uploadUpsellImage: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
     deleteCustomer: isSuperAdmin,
@@ -115,6 +112,8 @@ const authShield = shield({
 
     createAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_AUTOMATIONS)),
     updateAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_UPDATE_AUTOMATIONS)),
+    enableAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_UPDATE_AUTOMATIONS)),
+    deleteAutomation: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_UPDATE_AUTOMATIONS)),
 
     createCampaign: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_CAMPAIGNS)),
     createBatchDeliveries: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES)),

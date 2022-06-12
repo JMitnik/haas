@@ -11,6 +11,98 @@ const language = {
     },
   },
   general: {
+    day_of_week: {
+      en: 'Day of the week',
+      de: 'Wochentag',
+    },
+    day_of_week_helper: {
+      en: 'Select which days of the week this automation should run',
+      de: 'Wählen Sie aus, an welchen Wochentagen diese Automatisierung ausgeführt werden soll',
+    },
+    cron_day_of_week_placeholder: {
+      en: 'Value between 1-7 or SUN-SAT with , - * ? L #',
+      de: 'Wert zwischen 1-7 oder SO-SA mit , - * ? L # Platzhalter',
+    },
+    year: {
+      en: 'Year',
+      de: 'Jahr',
+    },
+    year_helper: {
+      en: 'Select which year(s) this automation should run',
+      de: 'Wählen Sie aus, in welchen Jahren diese Automatisierung ausgeführt werden soll',
+    },
+    cron_year_placeholder: {
+      en: 'Value between 1970 and 2199 with , - * / wildcards',
+      de: 'Wert zwischen 1970 und 2199 mit , - * / Wildcards',
+    },
+    month: {
+      en: 'Month',
+      de: 'Monat',
+    },
+    month_helper: {
+      en: 'Select which month(s) this automation should run',
+      de: 'Wählen Sie aus, in welchen Monaten diese Automatisierung ausgeführt werden soll',
+    },
+    cron_month_placeholder: {
+      en: 'Value between 1-12 or JAN-DEC with , - * / wildcards',
+      de: 'Wert zwischen 1-12 oder JAN-DEC mit , - * / Wildcards',
+    },
+    day_of_month: {
+      en: 'Day of month',
+      de: 'Day of month',
+    },
+    day_of_month_helper: {
+      en: 'Select which day(s) of the month this automation should run',
+      de: 'Wählen Sie aus, an welchen Tage(n) im Monat diese Automatisierung ausgeführt werden soll',
+    },
+    cron_day_of_month_placeholder: {
+      en: 'Value between 1 and 31 with , - * ? / L W wildcards',
+      de: 'Wert zwischen 0 und 23 mit , - * ? / L W Wildcards',
+    },
+    hours: {
+      en: 'Hours',
+      de: 'Stunde',
+    },
+    hours_helper: {
+      en: 'Which hour(s) should the automation run?',
+      de: 'Welche Stunde soll die Automatisierung laufen?',
+    },
+    cron_hours_placeholder: {
+      en: 'Value between 0 and 23 with , - * / wildcards',
+      de: 'Wert zwischen 0 und 23 mit , - * / Wildcards',
+    },
+    minutes: {
+      en: 'Minutes',
+      de: 'Minute',
+    },
+    minutes_helper: {
+      en: 'Which minute(s) should the automation run?',
+      de: 'Welche Minute(n) soll die Automatisierung laufen?',
+    },
+    cron_minutes_placeholder: {
+      en: 'Value between 0 and 59 with , - * / wildcards',
+      de: 'Wert zwischen 0 und 59 mit , - * / Wildcards',
+    },
+    create_automation: {
+      en: 'Create automation',
+      de: 'Automatisierung erstellen',
+    },
+    automation: {
+      en: 'Automation',
+      de: 'Automatisierung',
+    },
+    automations: {
+      en: 'Automations',
+      de: 'Automatisierungen',
+    },
+    automations_subtitle: {
+      en: 'View, edit, and create automations',
+      de: 'Automatisierungen anzeigen, bearbeiten und erstellen',
+    },
+    no_automations_found: {
+      en: 'We could not find any automations with the current filters.',
+      de: 'We could not find any automations with the current filters.',
+    },
     individuals: {
       en: 'Individuals',
       de: 'Individuals',
@@ -485,6 +577,18 @@ const language = {
       en: 'Updated at',
       de: 'Aktualisiert am',
     },
+    add_target: {
+      en: 'Add target',
+      de: 'Ziel hinzufügen',
+    },
+    add_condition: {
+      en: 'Add condition',
+      de: 'Bedingung hinzufügen',
+    },
+    add_action: {
+      en: 'Add action',
+      de: 'Aktion hinzufügen',
+    },
     add_choice: {
       en: 'Add choice',
       de: 'Wahl hinzufügen',
@@ -497,6 +601,10 @@ const language = {
       en: 'Edit question',
       de: 'Question bearbeiten',
     },
+    edit_automation: {
+      en: 'Edit automation',
+      de: 'Automatisierung bearbeiten',
+    },
     edit_dialogue: {
       en: 'Edit dialogue',
       de: 'Dialog bearbeiten',
@@ -504,6 +612,26 @@ const language = {
     all: {
       en: 'All',
       de: 'Alle',
+    },
+    question: {
+      en: 'Question',
+      de: 'Frage',
+    },
+    dialogue: {
+      en: 'Dialogue',
+      de: 'Dialog',
+    },
+    workspace: {
+      en: 'Workspace',
+      de: 'Arbeitsplatz',
+    },
+    user: {
+      en: 'User',
+      de: 'Benutzer',
+    },
+    role: {
+      en: 'Role',
+      de: 'Rolle',
     },
     link: {
       en: 'Link',
@@ -650,10 +778,6 @@ const language = {
     body: {
       en: 'Body',
       de: 'Teil',
-    },
-    dialogue: {
-      en: 'Dialogue',
-      de: 'Dialog',
     },
     create_campaign: {
       en: 'Create a campaign',
@@ -984,10 +1108,6 @@ const language = {
       en: 'Scheduled',
       de: 'Geplant',
     },
-    question: {
-      en: 'Question',
-      de: 'Frage',
-    },
     both: {
       en: 'Both',
       de: 'Beides',
@@ -1015,6 +1135,10 @@ const language = {
     create: {
       en: 'Create',
       de: 'Erstellen',
+    },
+    update: {
+      en: 'Update',
+      de: 'Aktualisieren',
     },
     cancel: {
       en: 'Cancel',
@@ -1135,10 +1259,6 @@ const language = {
       en: 'Depth',
       de: 'Tiefe',
     },
-    role: {
-      en: 'Role',
-      de: 'Rolle',
-    },
     min_value: {
       en: 'Minimum value',
       de: 'Minimalwert',
@@ -1189,6 +1309,12 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Visit',
       de: 'Besuchen',
     },
+    delete_automation_popover: {
+      en:
+        'You are about to delete an automation and all related data. This cannot be undone! Are you sure?',
+      de:
+        'Du bist dabei ein Automatisierung mit allen dazugehörigen data zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+    },
     delete_dialogue_popover: {
       en:
         'You are about to delete a dialogue and all related data. This cannot be undone! Are you sure?',
@@ -1229,10 +1355,6 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     page: {
       en: 'Page',
       de: 'Seite',
-    },
-    user: {
-      en: 'User',
-      de: 'Benutzer',
     },
     no_registration: {
       en: 'No registration',
@@ -1705,6 +1827,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   views: {
+    edit_automation_view: {
+      en: 'Edit automation',
+      de: 'Automatisierung bearbeiten',
+    },
+    add_automation_view: {
+      en: 'Add automation',
+      de: 'Automatisierung hinzufügen',
+    },
     dashboard: {
       en: 'Overview',
       de: 'Overview',
@@ -1812,6 +1942,272 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     userPermissions: {
       en: 'Permission',
       de: 'Genehmigung',
+    },
+  },
+  automation: {
+    compare_to: {
+      en: 'Compare value',
+      de: 'Wert vergleichen',
+    },
+    schedule: {
+      en: 'Schedule',
+      de: 'Zeitlicher Ablauf',
+    },
+    schedule_helper: {
+      en: 'Determine what the schedule is for which the automation should be recurring',
+      de: 'Bestimmen Sie den Zeitplan, für den die Automatisierung wiederkehrend sein soll',
+    },
+    action: {
+      en: 'Action',
+      de: 'Aktion',
+    },
+    target_helper_GENERATE_REPORT: {
+      en: 'Who are the people the report should be sent so?',
+      de: 'Wer sind die Personen, denen der Bericht gesendet werden soll?',
+    },
+    target_helper_SEND_SMS: {
+      en: 'Who are the people the SMS should be sent so?',
+      de: 'An welche Personen soll die SMS also verschickt werden?',
+    },
+    target_helper_SEND_EMAIL: {
+      en: 'Who are the people the email should be sent so?',
+      de: 'An welche Personen soll die E-Mail also gesendet werden?',
+    },
+    targets: {
+      en: 'Targets',
+      de: 'Ziele',
+    },
+    add_target: {
+      en: 'Add target',
+      de: 'Ziel hinzufügen',
+    },
+    action_type: {
+      en: 'Action type',
+      de: 'Aktionstyp',
+    },
+    action_type_helper: {
+      en: 'What kind of action do you want to create?',
+      de: 'Welche Art von Aktion möchten Sie erstellen?',
+    },
+    api_call: {
+      en: 'API call',
+      de: 'API-Aufruf',
+    },
+    api_call_helper: {
+      en: 'Sends an API call to a 3rd party',
+      de: 'Sendet einen API-Aufruf an einen Drittanbieter',
+    },
+    generate_report: {
+      en: 'Generate report',
+      de: 'Bericht generieren',
+    },
+    generate_report_helper: {
+      en: 'Sends a report to specified targets',
+      de: 'Sendet einen Bericht an angegebene Ziele',
+    },
+    send_email: {
+      en: 'Send email',
+      de: 'E-Mail senden',
+    },
+    send_email_helper: {
+      en: 'Sends an email to specified targets',
+      de: 'Sendet eine E-Mail an angegebene Ziele',
+    },
+    send_sms: {
+      en: 'Send SMS',
+      de: 'SMS senden',
+    },
+    send_sms_helper: {
+      en: 'Sends a SMS to specified targets',
+      de: 'Sendet eine SMS an bestimmte Ziele',
+    },
+    action_placeholder: {
+      en: 'Start by adding an action.',
+      de: 'Beginnen Sie mit dem Hinzufügen einer Aktion.',
+    },
+    edit_action: {
+      en: 'Edit action',
+      de: 'Aktion bearbeiten',
+    },
+    add_action: {
+      en: 'Add action',
+      de: 'Aktion hinzufügen',
+    },
+    actions: {
+      en: 'Actions',
+      de: 'Aktionen',
+    },
+    actions_helper: {
+      en: 'Create and organize actions that need to be to be conducted when the conditions are met',
+      de: 'Erstellen und organisieren Sie Aktionen, die durchgeführt werden müssen, wenn die Bedingungen erfüllt sind',
+    },
+    add_condition: {
+      en: 'Add condition',
+      de: 'Bedingung hinzufügen',
+    },
+    about: {
+      en: 'About the automation',
+      de: 'Über die Automatisierung',
+    },
+    about_helper: {
+      en: 'General information such as the name of the automation, the type etc.',
+      de: 'Allgemeine Informationen wie der Name der Automatisierung, der Typ usw.',
+    },
+    title_helper: {
+      en: 'What is the name of the automation?',
+      de: 'Wie heißt die Automatik?',
+    },
+    title_placeholder: {
+      en: 'My first automation',
+      de: 'Meine erste Automatisierung',
+    },
+    type: {
+      en: 'Automation type',
+      de: 'Automatisierungstyp',
+    },
+    type_helper: {
+      en: 'What is the type of the automation you wish to create?',
+      de: 'Welche Art von Automatisierung möchten Sie erstellen?',
+    },
+    trigger: {
+      en: 'Trigger',
+      de: 'Abzug',
+    },
+    trigger_helper: {
+      en: 'Trigger actions using dialogue events',
+      de: 'Führen Sie Aktionen durch, wenn bestimmte Auslöser erfüllt sind',
+    },
+    recurring: {
+      en: 'Recurring',
+      de: 'Wiederkehrend',
+    },
+    recurring_helper: {
+      en: 'Schedule-related actions',
+      de: 'Führen Sie Aktionen basierend auf einem festgelegten Zeitplan durch',
+    },
+    campaigner: {
+      en: 'Campaigner',
+      de: 'Campaigner',
+    },
+    campaigner_helper: {
+      en: 'Campaigner-related events',
+      de: 'Führen Sie Aktionen basierend auf bestimmten Kampagnenereignissen durch',
+    },
+    conditions: {
+      en: 'Conditions',
+      de: 'Bedingungen',
+    },
+    conditions_helper: {
+      en: 'Create and organize conditions that need to be met in order for the automation actions to be conducted',
+      de: 'Erstellen und organisieren Sie Bedingungen, die erfüllt sein müssen, damit die Automatisierungsaktionen durchgeführt werden können',
+    },
+    create_condition_modal_title: {
+      en: 'Create new condition',
+      de: 'Neue Bedingung anlegen',
+    },
+    scope: {
+      en: 'Scope',
+      de: 'Umfang',
+    },
+    scope_helper: {
+      en: 'Information on the scope of a condition',
+      de: 'Angaben zum Geltungsbereich einer Bedingung',
+    },
+    scope_type: {
+      en: 'Scope type',
+      de: 'Bereichstyp',
+    },
+    scope_type_helper: {
+      en: 'What kind of condition do you want to create?',
+      de: 'Welche Bedingungen wollen Sie schaffen?',
+    },
+    dialogue_helper_QUESTION: {
+      en: 'What is the dialogue of the question you want to scope on?',
+      de: 'Was ist der Dialog der Frage, auf den Sie sich konzentrieren möchten?',
+    },
+    dialogue_helper_DIALOGUE: {
+      en: 'What is the dialogue you want to scope on?',
+      de: 'Auf welchen Dialog möchten Sie sich konzentrieren?',
+    },
+    question_helper: {
+      en: 'What is the question you want to scope on?',
+      de: 'Was ist die Frage, der Sie nachgehen möchten?',
+    },
+    property: {
+      en: 'Property',
+      de: 'Eigenschaft',
+    },
+    property_helper: {
+      en: 'What kind of property do you want to scope on?',
+      de: 'Auf welche Art von Immobilie möchten Sie sich konzentrieren?',
+    },
+    node_value: {
+      en: 'Answer',
+      de: 'Antworten',
+    },
+    node_value_helper: {
+      en: 'The answer given to a question',
+      de: 'Die Antwort auf eine Frage',
+    },
+    answer_speed: {
+      en: 'Answer speed',
+      de: 'Antwortgeschwindigkeit',
+    },
+    answer_speed_helper: {
+      en: 'The speed with which a user answered a question',
+      de: 'Die Geschwindigkeit, mit der ein Benutzer eine Frage beantwortet hat',
+    },
+    question_option: {
+      en: 'Question option',
+      de: 'Frageoption',
+    },
+    aggregate: {
+      en: 'Aggregate',
+      de: 'Aggregat',
+    },
+    aggregate_helper: {
+      en: 'Define aggregate information to filter the out want to check against',
+      de: 'Definieren Sie aggregierte Informationen, um die zu prüfenden Informationen herauszufiltern',
+    },
+    aggregate_type: {
+      en: 'Aggregate type',
+      de: 'Aggregate type',
+    },
+    aggregate_type_helper: {
+      en: 'How do you want to aggregate your data?',
+      de: 'Wie möchten Sie Ihre Daten aggregieren?',
+    },
+    average: {
+      en: 'Average',
+      de: 'Durchschnitt',
+    },
+    average_helper: {
+      en: 'Take an average over multiple entries',
+      de: 'Nehmen Sie einen Durchschnitt über mehrere Einträge',
+    },
+    count: {
+      en: 'Count',
+      de: 'Zählen',
+    },
+    count_helper: {
+      en: 'Count the amount of ocurrences of an entry',
+      de: 'Zählen Sie die Anzahl der Vorkommen eines Eintrags',
+    },
+    date_range: {
+      en: 'Date range',
+      de: 'Datumsbereich',
+    },
+    date_range_helper: {
+      en: 'Specify between which two dates the entries should aggregated',
+      de: 'Geben Sie an, zwischen welchen zwei Daten die Einträge aggregiert werden sollen',
+    },
+    latest: {
+      en: 'Latest',
+      de: 'Neueste',
+    },
+    latest_helper: {
+      en: 'How many of the latest entries should be aggregated?',
+      de: 'Wie viele der neuesten Einträge sollen aggregiert werden?',
     },
   },
   dialogue: {
@@ -2648,6 +3044,18 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   permissions: {
+    can_update_automations: {
+      en: 'This permission allows a user to update automations (edit, enable/disable, remove) for a workspace',
+      de: 'Diese Berechtigung ermöglicht es einem Benutzer, Automatisierungen für einen Arbeitsbereich zu aktualisieren (bearbeiten, aktivieren/deaktivieren, entfernen).',
+    },
+    can_create_automations: {
+      en: 'This permission allows a user to create automations for a workspace',
+      de: 'Diese Berechtigung ermöglicht es einem Benutzer, Automatisierungen für einen Arbeitsbereich zu erstellen',
+    },
+    can_view_automations: {
+      en: 'This permission allows a user to view the automations of a workspace',
+      de: 'Diese Berechtigung ermöglicht es einem Benutzer, die Automatisierungen eines Arbeitsbereichs anzuzeigen',
+    },
     can_assign_users_to_dialogue: {
       en: 'This permission allows a user to make private dialogues (in)-accessible for other users',
       de: 'Diese Berechtigung erlaubt es einem Benutzer, private Dialoge für andere Benutzer (un)zugänglich zu machen',
@@ -2657,11 +3065,11 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Diese systemweite Berechtigung ermöglicht es einem Benutzer, alles innerhalb des haas-Dashboards zu tun. Sie wird pro Benutzer angegeben und kann nicht innerhalb eines Arbeitsbereichs festgelegt werden.',
     },
     can_edit_dialogue: {
-      en: 'This permissions allows a user to change the settings of a dialogue.',
+      en: 'This permission allows a user to change the settings of a dialogue.',
       de: 'Diese Berechtigungen ermöglichen es einem Benutzer, die Einstellungen eines Dialogs zu ändern.',
     },
     can_build_dialogue: {
-      en: 'This permissions gives a user access to the dialogue builder and trigger overview',
+      en: 'This permission gives a user access to the dialogue builder and trigger overview',
       de: 'Diese Berechtigungen geben einem Benutzer Zugriff auf den Dialog-Builder und die Trigger-Übersicht',
     },
     can_view_dialogue: {

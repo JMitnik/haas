@@ -23,6 +23,155 @@ export class AutomationPrismaAdapter {
   }
 
   /**
+   * Finds a scheduled automation by its id
+   * @param automationScheduledId 
+   * @returns 
+   */
+  findScheduledAutomationById = async (automationScheduledId: string) => {
+    const automationScheduled = await this.prisma.automationScheduled.findUnique({
+      where: {
+        id: automationScheduledId,
+      },
+      include: {
+        actions: true,
+      },
+    });
+    return automationScheduled;
+  };
+
+  /**
+   * Deletes an automation from the database
+   * @param input 
+   * @returns the deleted automation
+   */
+  deleteAutomation = async (input: NexusGenInputs['DeleteAutomationInput']) => {
+    const automation = await this.prisma.automation.delete({
+      where: {
+        id: input.automationId,
+      },
+    });
+
+    if (automation.automationScheduledId) {
+      await this.prisma.automationScheduled.delete({
+        where: {
+          id: automation.automationScheduledId,
+        },
+      });
+
+      await this.prisma.automationAction.deleteMany({
+        where: {
+          automationTriggers: {
+            some: {
+              id: automation.automationScheduledId,
+            },
+          },
+        },
+      });
+    }
+
+    if (automation?.automationTriggerId) {
+      const automationTrigger = await this.prisma.automationTrigger.delete({
+        where: {
+          id: automation.automationTriggerId,
+        },
+        include: {
+          conditionBuilder: {
+            include: {
+              conditions: true,
+              childConditionBuilder: {
+                include: {
+                  conditions: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const builderConditionIds = automationTrigger.conditionBuilder.conditions.map((condition) => condition.id);
+      const childBuilderConditionIds = automationTrigger.conditionBuilder.childConditionBuilder?.conditions.map(
+        (condition) => condition.id) || []
+
+      const conditionIds = [...builderConditionIds, ...childBuilderConditionIds]
+      const builderIds = [automationTrigger.conditionBuilder.id]
+
+      if (automationTrigger.conditionBuilder.childConditionBuilder?.id) {
+        builderIds.push(automationTrigger.conditionBuilder.childConditionBuilder?.id);
+      };
+
+      await this.prisma.automationEvent.deleteMany({
+        where: {
+          automationTrigger: {
+            some: {
+              id: automationTrigger.id,
+            },
+          },
+        },
+      });
+
+      await this.prisma.automationConditionOperand.deleteMany({
+        where: {
+          automationConditionId: {
+            in: conditionIds,
+          },
+        },
+      });
+
+      await this.prisma.dialogueConditionScope.deleteMany({
+        where: {
+          automationConditionId: {
+            in: conditionIds,
+          },
+        },
+      });
+
+      await this.prisma.questionConditionScope.deleteMany({
+        where: {
+          automationConditionId: {
+            in: conditionIds,
+          },
+        },
+      })
+
+      await this.prisma.workspaceConditionScope.deleteMany({
+        where: {
+          automationConditionId: {
+            in: conditionIds,
+          },
+        },
+      });
+
+      await this.prisma.automationCondition.deleteMany({
+        where: {
+          automationConditionBuilderId: {
+            in: builderIds,
+          },
+        },
+      });
+
+      await this.prisma.automationConditionBuilder.deleteMany({
+        where: {
+          id: {
+            in: builderIds,
+          },
+        },
+      });
+
+      await this.prisma.automationAction.deleteMany({
+        where: {
+          automationTriggers: {
+            some: {
+              id: automationTrigger.id,
+            },
+          },
+        },
+      });
+    }
+
+    return automation;
+  }
+
+  /**
    * Finds an AutomationConditionBuilder by its ID
    * @param builderId id of a condition builder
    * @returns an AutomationConditionBuilder including its conditions
@@ -255,6 +404,7 @@ export class AutomationPrismaAdapter {
         AND: [
           {
             type: AutomationType.TRIGGER,
+            isActive: true, // Only active automations should be checked
           },
           {
             automationTrigger: {
@@ -386,6 +536,12 @@ export class AutomationPrismaAdapter {
       });
     }
 
+    if (filter?.orderBy?.by === 'createdAt') {
+      orderByQuery.push({
+        createdAt: filter.orderBy.desc ? 'desc' : 'asc',
+      });
+    }
+
     return orderByQuery;
   };
 
@@ -404,6 +560,25 @@ export class AutomationPrismaAdapter {
       skip: offset,
       take: perPage,
       orderBy: this.buildOrderByQuery(filter),
+      include: {
+        automationTrigger: {
+          include: {
+            event: {
+              include: {
+                dialogue: true,
+                question: true,
+              },
+            },
+            actions: true,
+          },
+        },
+        automationScheduled: {
+          include: {
+            actions: true,
+            dialogueScope: true,
+          },
+        },
+      },
     });
 
     return automations;
@@ -421,6 +596,11 @@ export class AutomationPrismaAdapter {
       },
       include: {
         workspace: true,
+        automationScheduled: {
+          include: {
+            actions: true,
+          },
+        },
         automationTrigger: {
           include: {
             event: {
@@ -683,8 +863,7 @@ export class AutomationPrismaAdapter {
       operator,
       operands: {
         createMany: {
-          data: operands.map((operand) =>
-          (
+          data: operands.map((operand) => (
             {
               type: operand.type,
               textValue: operand.textValue,
@@ -759,6 +938,31 @@ export class AutomationPrismaAdapter {
   }
 
   /**
+   * Creates a prisma-ready data object for creation of an AutomationScheduled
+   * @param input an object containing all information necessary to create an AutomationScheduled
+   * @returns a Prisma-ready data object for creation of an AutomationScheduled
+   */
+  buildCreateAutomationScheduleData = (
+    input: CreateAutomationInput
+  ): Prisma.AutomationScheduledCreateWithoutAutomationsInput => {
+    const { actions, schedule } = input;
+
+    return {
+      ...schedule as Prisma.AutomationScheduledCreateInput,
+      actions: {
+        create: actions.map((action) => {
+          return {
+            type: action.type,
+            apiKey: action.apiKey,
+            endpoint: action.endpoint,
+            payload: action.payload as Prisma.InputJsonObject || Prisma.JsonNull,
+          }
+        }),
+      },
+    }
+  }
+
+  /**
    * Creates a prisma-ready data object for creation of an AutomationTrigger
    * @param input an object containing all information necessary to create an AutomationTrigger
    * @returns a Prisma-ready data object for creation of an AutomationTrigger
@@ -785,7 +989,7 @@ export class AutomationPrismaAdapter {
         },
       },
       conditionBuilder: {
-        create: this.constructCreateConditionBuilderData(conditionBuilder),
+        create: this.constructCreateConditionBuilderData(conditionBuilder as CreateConditionBuilderInput),
       },
       actions: {
         create: actions.map((action) => {
@@ -1010,6 +1214,58 @@ export class AutomationPrismaAdapter {
   };
 
   /**
+   * Constructs a prisma-ready data object for updating of an AutomationScheduled
+   * @param input the update input data
+   * @returns A prisma-ready object used to update an AutomationScheduled
+   */
+  buildUpdateAutomationScheduledData(
+    input: UpdateAutomationInput
+  ): Prisma.AutomationScheduledUpdateInput {
+    const { actions: inputActions, schedule } = input;
+
+    const inputActionIds = inputActions.map((action) => action.id).filter(isPresent);
+
+    return {
+      ...schedule,
+      dialogueScope: schedule?.dialogueScope || {
+        disconnect: true,
+      },
+      minutes: schedule?.minutes,
+      hours: schedule?.hours,
+      dayOfMonth: schedule?.dayOfMonth,
+      dayOfWeek: schedule?.dayOfWeek,
+      month: schedule?.month,
+      type: schedule?.type,
+      actions: {
+        deleteMany: {
+          id: {
+            notIn: inputActionIds,
+          },
+        },
+        upsert: inputActions.map((action) => {
+          return {
+            where: {
+              id: action?.id || '-1',
+            },
+            create: {
+              type: action.type,
+              apiKey: action?.apiKey,
+              endpoint: action?.endpoint,
+              payload: action?.payload as Prisma.InputJsonObject || Prisma.JsonNull,
+            },
+            update: {
+              type: action.type,
+              apiKey: action?.apiKey,
+              endpoint: action?.endpoint,
+              payload: action?.payload as Prisma.InputJsonObject || Prisma.JsonNull,
+            },
+          };
+        }),
+      },
+    }
+  }
+
+  /**
    * Constructs a prisma-ready data object for updating of an AutomationTrigger
    * @param input the update input data
    * @returns A prisma-ready object used to update an AutomationTrigger
@@ -1018,12 +1274,14 @@ export class AutomationPrismaAdapter {
     const { event, actions: inputActions, conditionBuilder } = input;
 
     const inputActionIds = inputActions.map((action) => action.id).filter(isPresent);
-    const updateConditionBuilderData = await this.buildUpdateAutomationConditionBuilderData(conditionBuilder);
+    const updateConditionBuilderData = conditionBuilder
+      ? await this.buildUpdateAutomationConditionBuilderData(conditionBuilder)
+      : undefined;
 
     return {
-      conditionBuilder: {
+      conditionBuilder: updateConditionBuilderData ? {
         update: updateConditionBuilderData,
-      },
+      } : undefined,
       event: {
         update: {
           type: event.eventType,
@@ -1069,6 +1327,21 @@ export class AutomationPrismaAdapter {
   }
 
   /**
+   * Enables/Disables an automation 
+   * @param input an object containing the automation id as well as the state (true/false) of the automation
+   */
+  enableAutomation = async (input: NexusGenInputs['EnableAutomationInput']) => {
+    return this.prisma.automation.update({
+      where: {
+        id: input.automationId,
+      },
+      data: {
+        isActive: input.state,
+      },
+    });
+  };
+
+  /**
    * Updates an automation based on provided input
    * @param input an object containing all information necessary to update an automation
    * @returns an updated Automation
@@ -1076,7 +1349,13 @@ export class AutomationPrismaAdapter {
   updateAutomation = async (input: UpdateAutomationInput) => {
     const { description, label, automationType } = input;
     const automation = await this.findAutomationById(input.id);
-    const automationTriggerUpdateArgs = await this.buildUpdateAutomationTriggerData(input);
+    const automationTriggerUpdateArgs = automationType === AutomationType.TRIGGER
+      ? await this.buildUpdateAutomationTriggerData(input)
+      : undefined;
+
+    const automationScheduledUpdateArgs = automationType === AutomationType.SCHEDULED
+      ? this.buildUpdateAutomationScheduledData(input)
+      : undefined;
 
     return this.prisma.automation.update({
       where: {
@@ -1087,9 +1366,25 @@ export class AutomationPrismaAdapter {
         type: automationType,
         description,
         // TODO: Upgrade this when campaignAutomation is introduced (delete other automation entry on swap)
-        automationTrigger: automation ? {
-          update: automationTriggerUpdateArgs,
+        automationTrigger: automationTriggerUpdateArgs && automation ? {
+          upsert: {
+            create: this.buildCreateAutomationTriggerData(input),
+            update: automationTriggerUpdateArgs,
+          },
         } : undefined,
+        automationScheduled: automationScheduledUpdateArgs && automation ? {
+          upsert: {
+            create: this.buildCreateAutomationScheduleData(input) as Prisma.AutomationScheduledCreateInput,
+            update: automationScheduledUpdateArgs,
+          },
+        } : undefined,
+      },
+      include: {
+        automationScheduled: {
+          include: {
+            actions: true,
+          },
+        },
       },
     });
   }
@@ -1106,12 +1401,22 @@ export class AutomationPrismaAdapter {
         label: label,
         type: automationType,
         description,
-        automationTrigger: {
+        automationTrigger: automationType === AutomationType.TRIGGER ? {
           create: this.buildCreateAutomationTriggerData(input),
-        },
+        } : undefined,
+        automationScheduled: automationType === AutomationType.SCHEDULED ? {
+          create: this.buildCreateAutomationScheduleData(input),
+        } : undefined,
         workspace: {
           connect: {
             id: workspaceId,
+          },
+        },
+      },
+      include: {
+        automationScheduled: {
+          include: {
+            actions: true,
           },
         },
       },
@@ -1146,7 +1451,15 @@ export class AutomationPrismaAdapter {
         id: workspaceId,
       },
       include: {
-        automations: true,
+        automations: {
+          include: {
+            automationTrigger: {
+              include: {
+                actions: true,
+              },
+            },
+          },
+        },
       },
     });
 

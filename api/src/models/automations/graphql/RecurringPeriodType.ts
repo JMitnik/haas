@@ -1,4 +1,4 @@
-import { enumType } from "@nexus/schema";
+import { enumType } from '@nexus/schema';
 
 export const RecurringPeriodType = enumType({
   name: 'RecurringPeriodType',
@@ -9,5 +9,6 @@ export const RecurringPeriodType = enumType({
     'END_OF_DAY',
     'START_OF_WEEK',
     'END_OF_WEEK',
+    'CUSTOM',
   ],
 })

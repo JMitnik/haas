@@ -14,6 +14,7 @@ import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group-sm.svg
 import { useNavigator } from 'hooks/useNavigator';
 import useAuth from 'hooks/useAuth';
 
+import { Cpu } from 'react-feather';
 import * as LS from './WorkpaceLayout.styles';
 
 interface NavItemProps extends LinkProps {
@@ -47,6 +48,7 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
     canViewCampaigns,
     canBuildDialogues,
     canEditDialogue,
+    canViewAutomations,
   } = useAuth();
   const { dialogueMatch } = useNavigator();
   const dialogueSlug = dialogueMatch?.params?.dialogueSlug;
@@ -120,6 +122,10 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
           <NavItem isDisabled={!canViewCampaigns} to={`/dashboard/b/${customerSlug}/campaigns`}>
             <ChatIcon />
             {t('campaigns')}
+          </NavItem>
+          <NavItem isDisabled={!canViewAutomations} to={`/dashboard/b/${customerSlug}/automations`}>
+            <Cpu />
+            {t('automations')}
           </NavItem>
         </AnimateSharedLayout>
       </motion.ul>

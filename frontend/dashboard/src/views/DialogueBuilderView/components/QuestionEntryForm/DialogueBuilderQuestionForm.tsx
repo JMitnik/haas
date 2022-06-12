@@ -8,7 +8,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { List, PlusCircle, Sliders, Trash, Youtube } from 'react-feather';
 import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
@@ -50,6 +50,7 @@ interface FormDataProps {
   maxValue: string;
   videoEmbedded: string;
   questionType: string;
+  conditionType: string;
   matchText: string;
   activeLeaf: string;
   overrideLeaf?: { label: string, value: string, type: string } | null;
@@ -66,6 +67,8 @@ interface FormDataProps {
   range: number[];
 }
 
+const isVideoEmbeddedType = (questionType: string) => questionType === QuestionNodeTypeEnum.VideoEmbedded;
+
 const isChoiceType = (questionType: string) => {
   if (questionType === 'CHOICE') {
     return true;
@@ -76,6 +79,7 @@ const isChoiceType = (questionType: string) => {
 const schema = yup.object().shape({
   title: yup.string().required(),
   questionType: yup.string().required(),
+  conditionType: yup.string().notRequired(),
   videoEmbedded: yup.string().when(['questionType'], {
     is: (questionType: string) => questionType === 'VIDEO_EMBEDDED',
     then: yup.string().required(),
@@ -87,7 +91,7 @@ const schema = yup.object().shape({
     otherwise: yup.string().notRequired(),
   }),
   optionsFull: yup.array().when(['questionType'], {
-    is: (questionType: string) => isChoiceType(questionType),
+    is: (questionType: string) => isChoiceType(questionType) || isVideoEmbeddedType(questionType),
     then: yup.array().min(1).of(yup.object({
       value: yup.string().required('form.value_required'),
     })),
@@ -224,7 +228,7 @@ const DialogueBuilderQuestionForm = ({
   }, [setActiveConditionSelect, setActiveCondition]);
 
   useEffect(() => {
-    form.register({ name: 'parentQuestionType' });
+    form.register('parentQuestionType');
     form.setValue('parentQuestionType', parentQuestionType);
   }, [parentQuestionType]);
 
@@ -456,21 +460,21 @@ const DialogueBuilderQuestionForm = ({
               </UI.FormSectionHelper>
             </UI.Div>
             <UI.InputGrid>
-              <UI.FormControl isRequired isInvalid={!!form.errors.title}>
+              <UI.FormControl isRequired isInvalid={!!form.formState.errors.title}>
                 <UI.FormLabel htmlFor="title">{t('title')}</UI.FormLabel>
                 <UI.InputHelper>{t('dialogue:title_question_helper')}</UI.InputHelper>
                 <Controller
                   name="title"
                   control={form.control}
                   defaultValue={title}
-                  render={({ value, onChange }) => (
+                  render={({ field }) => (
                     <UI.MarkdownEditor
-                      value={value}
-                      onChange={onChange}
+                      value={field.value}
+                      onChange={field.onChange}
                     />
                   )}
                 />
-                <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.formState.errors.title?.message}</FormErrorMessage>
               </UI.FormControl>
             </UI.InputGrid>
           </UI.FormSection>
@@ -488,7 +492,7 @@ const DialogueBuilderQuestionForm = ({
                 </UI.Div>
                 <Div>
                   <InputGrid>
-                    <FormControl isRequired isInvalid={!!form.errors.minValue}>
+                    <FormControl isRequired isInvalid={!!form.formState.errors.minValue}>
                       <FormLabel htmlFor="minValue">
                         {t('range')}
                       </FormLabel>
@@ -500,10 +504,10 @@ const DialogueBuilderQuestionForm = ({
                           control={form.control}
                           name="range"
                           defaultValue={[40, 69]}
-                          render={({ onChange, value }) => (
+                          render={({ field }) => (
                             <UI.RangeSlider
-                              onChange={onChange}
-                              defaultValue={value}
+                              onChange={field.onChange}
+                              defaultValue={field.value}
                               // isDisabled
                               stepSize={1}
                               min={0}
@@ -511,7 +515,7 @@ const DialogueBuilderQuestionForm = ({
                             />
                           )}
                         />
-                        <FormErrorMessage>{form.errors.minValue?.message}</FormErrorMessage>
+                        <FormErrorMessage>{form.formState.errors.minValue?.message}</FormErrorMessage>
                         <UI.Div position="absolute" bottom={0} left={0}>0</UI.Div>
                         <UI.Div position="absolute" bottom={0} right={-7.5}>100</UI.Div>
                       </UI.Div>
@@ -535,15 +539,15 @@ const DialogueBuilderQuestionForm = ({
                 </UI.Div>
                 <UI.Div>
                   <UI.InputGrid>
-                    <UI.FormControl isRequired isInvalid={!!form.errors.matchText}>
+                    <UI.FormControl isRequired isInvalid={!!form.formState.errors.matchText}>
                       <UI.FormLabel htmlFor="matchText">{t('match_value')}</UI.FormLabel>
                       <UI.InputHelper>What is the multi-choice question to trigger this question?</UI.InputHelper>
 
                       <Controller
-                        id="question-match-select"
+                        // TODO: HOw to add back id="question-match-select"
                         name="matchText"
                         control={form.control}
-                        defaultValue={activeMatchValue}
+                        defaultValue={activeMatchValue as any}
                         render={() => (
                           <Select
                             options={parentOptionsSelect}
@@ -554,7 +558,7 @@ const DialogueBuilderQuestionForm = ({
                           />
                         )}
                       />
-                      <FormErrorMessage>{form.errors.matchText?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.matchText?.message}</FormErrorMessage>
                     </UI.FormControl>
                   </UI.InputGrid>
                 </UI.Div>
@@ -575,20 +579,20 @@ const DialogueBuilderQuestionForm = ({
             </UI.Div>
             <Div>
               <InputGrid>
-                <UI.FormControl isRequired isInvalid={!!form.errors.questionType}>
+                <UI.FormControl isRequired isInvalid={!!form.formState.errors.questionType}>
                   <UI.FormLabel htmlFor="questionType">{t('dialogue:question_type')}</UI.FormLabel>
                   <UI.InputHelper>
                     {t('dialogue:question_type_helper')}
                   </UI.InputHelper>
                   <Controller
                     control={form.control}
-                    id="question-type-select"
+                    // TODO: How to add back id="question-type-select"
                     name="questionType"
-                    render={({ onChange, value, onBlur }) => (
+                    render={({ field }) => (
                       <UI.RadioButtons
-                        value={value}
-                        onChange={onChange}
-                        onBlur={onBlur}
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
                       >
                         <UI.RadioButton
                           icon={Sliders}
@@ -611,11 +615,11 @@ const DialogueBuilderQuestionForm = ({
                       </UI.RadioButtons>
                     )}
                   />
-                  <FormErrorMessage>{form.errors.questionType?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.formState.errors.questionType?.message}</FormErrorMessage>
                 </UI.FormControl>
 
                 {questionType === QuestionNodeTypeEnum.VideoEmbedded && (
-                  <UI.FormControl isRequired isInvalid={!!form.errors.videoEmbedded}>
+                  <UI.FormControl isRequired isInvalid={!!form.formState.errors.videoEmbedded}>
                     <UI.FormLabel htmlFor="videoEmbedded">
                       {t('video_embedded')}
                     </UI.FormLabel>
@@ -623,16 +627,15 @@ const DialogueBuilderQuestionForm = ({
                       {t('video_embedded_helper')}
                     </UI.InputHelper>
                     <UI.Input
-                      name="videoEmbedded"
                       leftAddOn="https://www.youtube.com/watch?v="
-                      ref={form.register()}
+                      {...form.register('videoEmbedded')}
                       defaultValue={question.extraContent || undefined}
                     />
-                    <FormErrorMessage>{form.errors.videoEmbedded?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.formState.errors.videoEmbedded?.message}</FormErrorMessage>
                   </UI.FormControl>
                 )}
 
-                <UI.FormControl isInvalid={!!form.errors.activeLeaf}>
+                <UI.FormControl isInvalid={!!form.formState.errors.activeLeaf}>
                   <UI.FormLabel htmlFor="questionType">
                     {t('call_to_action')}
                   </UI.FormLabel>
@@ -667,13 +670,12 @@ const DialogueBuilderQuestionForm = ({
                                 name="overrideLeaf"
                                 control={form.control}
                                 // defaultValue={currentOverrideLeaf}
-                                render={({ value, onChange }) => (
+                                render={({ field }) => (
                                   <Dropdown renderOverlay={({ setCloseClickOnOutside, onClose }) => (
                                     <NodePicker
-                                      questionId={question.id}
                                       items={formattedCtaNodes}
                                       onClose={onClose}
-                                      onChange={onChange}
+                                      onChange={field.onChange}
                                       onModalOpen={() => setCloseClickOnOutside(false)}
                                       onModalClose={() => setCloseClickOnOutside(true)}
                                     />
@@ -686,8 +688,8 @@ const DialogueBuilderQuestionForm = ({
                                         display="flex"
                                         alignItems="center"
                                       >
-                                        {value?.label ? (
-                                          <NodeCell onRemove={handleRemoveCTA} onClick={onOpen} node={value} />
+                                        {field.value?.label ? (
+                                          <NodeCell onRemove={handleRemoveCTA} onClick={onOpen} node={field.value} />
                                         ) : (
                                           <UI.Button
                                             size="sm"
@@ -712,7 +714,7 @@ const DialogueBuilderQuestionForm = ({
                       </UI.Div>
                     </UI.Flex>
                   </UI.Div>
-                  <FormErrorMessage>{form.errors.activeLeaf?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.formState.errors.activeLeaf?.message}</FormErrorMessage>
                 </UI.FormControl>
               </InputGrid>
             </Div>

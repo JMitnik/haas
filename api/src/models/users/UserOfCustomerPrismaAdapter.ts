@@ -8,6 +8,47 @@ class UserOfCustomerPrismaAdapter {
   };
 
   /**
+   * Finds all users based on either user ID(s) and/or role ID(s)
+   * @param workspaceSlug 
+   * @param targetIds 
+   * @returns a list of users
+   */
+  async findTargetUsers(workspaceSlug: string, targetIds: { userIds: string[]; roleIds: string[] }) {
+    return this.prisma.userOfCustomer.findMany({
+      where: {
+        AND: [
+          {
+            customer: {
+              slug: workspaceSlug,
+            },
+          },
+          {
+            isActive: true,
+          },
+          {
+            OR: [
+              {
+                roleId: {
+                  in: targetIds.roleIds,
+                },
+              },
+              {
+                userId: {
+                  in: targetIds.userIds,
+                },
+              },
+            ],
+          },
+        ],
+      },
+      include: {
+        user: true,
+        customer: true,
+      },
+    });
+  }
+
+  /**
    * Upserts an entry in UserOfCustomer table
    * @param workspaceId 
    * @param userId 

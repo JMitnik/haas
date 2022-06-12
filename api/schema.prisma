@@ -159,6 +159,7 @@ model Dialogue {
   sessions                    Session[]
   tags                        Tag[]
 
+  AutomationScheduled AutomationScheduled[]
   @@unique([slug, customerId], map: "Dialogue.slug_customerId_unique")
 }
 
@@ -738,14 +739,16 @@ model AutomationCondition {
 }
 
 model AutomationAction {
-  id                 String               @id @default(cuid())
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime?            @updatedAt
-  type               AutomationActionType
-  apiKey             String?
-  endpoint           String?
-  payload            Json?
-  automationTriggers AutomationTrigger[]
+  id                    String               @id @default(cuid())
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime?            @updatedAt
+  type                  AutomationActionType
+  apiKey                String?
+  endpoint              String?
+  payload               Json?
+  automationTriggers    AutomationTrigger[]
+  AutomationScheduled   AutomationScheduled? @relation(fields: [automationScheduledId], references: [id])
+  automationScheduledId String?
 }
 
 model AutomationTrigger {
@@ -760,18 +763,43 @@ model AutomationTrigger {
   actions                      AutomationAction[]
 }
 
+model AutomationScheduled {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  type RecurringPeriodType @default(CUSTOM)
+
+  minutes    String
+  hours      String
+  dayOfMonth String
+  month      String
+  dayOfWeek  String
+
+  dialogueId    String?
+  dialogueScope Dialogue? @relation(fields: [dialogueId], references: [id])
+
+  automations Automation[]
+  actions     AutomationAction[]
+}
+
 model Automation {
-  id                  String             @id @default(cuid())
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime?          @updatedAt
-  isActive            Boolean            @default(false)
-  label               String
-  description         String?
-  type                AutomationType
+  id          String         @id @default(cuid())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime?      @updatedAt
+  isActive    Boolean        @default(false)
+  label       String
+  description String?
+  type        AutomationType
+
   automationTriggerId String?
-  workspaceId         String
   automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id], onDelete: SetNull)
-  workspace           Customer           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  automationScheduledId String?
+  automationScheduled   AutomationScheduled? @relation(fields: [automationScheduledId], references: [id])
+
+  workspaceId String
+  workspace   Customer @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 enum DialogueTemplateType {
@@ -948,6 +976,7 @@ enum DeliveryStatusTypeEnum {
 
 enum AutomationType {
   TRIGGER
+  SCHEDULED
   CAMPAIGN
 }
 
@@ -965,6 +994,7 @@ enum RecurringPeriodType {
   END_OF_DAY
   START_OF_WEEK
   END_OF_WEEK
+  CUSTOM
 }
 
 enum AutomationConditionScopeType {

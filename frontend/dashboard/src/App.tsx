@@ -20,12 +20,14 @@ import { fadeMotion } from 'components/animation/config';
 import { sub } from 'date-fns';
 import { useUser } from 'providers/UserProvider';
 import ActionsPage from 'pages/dashboard/actions';
+import AddAutomationView from 'views/AddAutomationView';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AdminOverview from 'views/AdminOverview/AdminOverview';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
+import AutomationsPage from 'pages/dashboard/automations';
 import CampaignsView from 'views/CampaignsView/CampaignsView';
 import CustomerPage from 'pages/dashboard/customer';
 import CustomerProvider from 'providers/CustomerProvider';
@@ -35,6 +37,7 @@ import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
 import DialogueOverview from 'views/DialogueOverview';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
+import EditAutomationView from 'views/EditAutomationView';
 import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
@@ -115,6 +118,24 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/analytics/"
                       render={() => <AnalyticsPage />}
+                    />
+
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CanCreateAutomations}
+                      path={ROUTES.NEW_AUTOMATION_VIEW}
+                      render={() => <AddAutomationView />}
+                    />
+
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CanUpdateAutomations}
+                      path={ROUTES.EDIT_AUTOMATION_VIEW}
+                      render={() => <EditAutomationView />}
+                    />
+
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CanViewAutomations}
+                      path="/dashboard/b/:customerSlug/automations/"
+                      render={() => <AutomationsPage />}
                     />
 
                     <GuardedRoute

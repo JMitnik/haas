@@ -12,7 +12,7 @@ import {
   useGetPreviewDataLazyQuery,
 } from 'types/generated-types';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import boolToInt from 'utils/booleanToNumber';
@@ -58,13 +58,13 @@ const AutodeckForm = ({
     control: form.control,
     name: 'customFields',
     keyName: 'arrayKey',
-  });
+  }) as { fields: any[] };
 
   const { fields: newCustomFields, append, remove } = useFieldArray({
     control: form.control,
     name: 'newCustomFields',
     keyName: 'arrayKey',
-  });
+  }) as { fields: any[], append: any, remove: any };
 
   const { setValue } = form;
 
@@ -161,7 +161,7 @@ const AutodeckForm = ({
     const jobLocation = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations.find(
       (location) => location.id === id,
     );
-    form.setValue('customFields', jobLocation?.customFields || []);
+    form.setValue('customFields', jobLocation?.customFields as any[] || []);
     return setActiveTemplateType(jobLocation?.type);
   };
 
@@ -177,7 +177,7 @@ const AutodeckForm = ({
           </Div>
           <Div py={4}>
             <InputGrid>
-              <FormControl isInvalid={!!form.errors.name} isRequired>
+              <FormControl isInvalid={!!form.formState.errors.name} isRequired>
                 <FormLabel htmlFor="name">{t('job_name')}</FormLabel>
                 <InputHelper>{t('job_name_helper')}</InputHelper>
                 <Input
@@ -185,8 +185,7 @@ const AutodeckForm = ({
                   placeholder="Peach inc."
                   leftEl={<Briefcase />}
                   defaultValue="job"
-                  name="name"
-                  ref={form.register()}
+                  {...form.register('name')}
                 />
               </FormControl>
 
@@ -203,11 +202,11 @@ const AutodeckForm = ({
                         control={form.control}
                         name="isGenerateWorkspace"
                         defaultValue={0}
-                        render={({ onChange, value }) => (
+                        render={({ field }) => (
                           <RadioButtonGroup
-                            value={value}
+                            value={field.value}
                             isInline
-                            onChange={onChange}
+                            onChange={field.onChange}
                             display="flex"
                           >
                             <RadioButton icon={ThumbsUp} value={1} text="Yes" description="Generate workspace" />
@@ -226,14 +225,13 @@ const AutodeckForm = ({
                     {form.watch('isGenerateWorkspace') === 1
                       && (
                         <>
-                          <FormControl isInvalid={!!form.errors.slug} isRequired>
+                          <FormControl isInvalid={!!form.formState.errors.slug} isRequired>
                             <FormLabel htmlFor="name">{t('slug')}</FormLabel>
                             <InputHelper>{t('customer:slug_helper')}</InputHelper>
                             <Input
                               placeholder="peach"
                               leftAddOn="https://client.haas.live/"
-                              name="slug"
-                              ref={form.register()}
+                              {...form.register('slug')}
                             />
                           </FormControl>
                         </>
@@ -241,16 +239,16 @@ const AutodeckForm = ({
                   </>
                 )}
 
-              <FormControl isInvalid={!!form.errors.jobLocation} isRequired>
+              <FormControl isInvalid={!!form.formState.errors.jobLocation} isRequired>
                 <FormLabel htmlFor="jobLocation">{t('process_location')}</FormLabel>
                 <InputHelper>{t('process_location_helper')}</InputHelper>
                 <Controller
                   name="jobLocation"
-                  defaultValue={activeJobLocation}
+                  defaultValue={activeJobLocation as any}
                   control={form.control}
-                  render={({ onChange, value }) => (
+                  render={({ field }) => (
                     <Select
-                      styles={form.errors.jobLocation ? {
+                      styles={form.formState.errors.jobLocation ? {
                         control: (base) => ({
                           ...base,
                           border: '1px solid red',
@@ -261,15 +259,15 @@ const AutodeckForm = ({
                       } : undefined}
                       isDisabled={isInEditing}
                       options={mappedJobLocations}
-                      value={value}
+                      value={field.value}
                       onChange={(opt: any) => {
-                        onChange(opt);
+                        field.onChange(opt);
                         handleJobLocationChange(opt?.value);
                       }}
                     />
                   )}
                 />
-                {form.errors.jobLocation
+                {form.formState.errors.jobLocation
                   && <span style={{ color: 'red', marginTop: '5px' }}>Please select job type</span>}
               </FormControl>
             </InputGrid>
@@ -341,17 +339,22 @@ const AutodeckForm = ({
               </Div>
               <Div>
                 <InputGrid>
-                  <FormControl isInvalid={!!form.errors.firstName} isRequired>
+                  <FormControl isInvalid={!!form.formState.errors.firstName} isRequired>
                     <FormLabel htmlFor="name">{t('autodeck:client_first_name')}</FormLabel>
                     <InputHelper>{t('autodeck:client_first_name_helper')}</InputHelper>
                     <Input
                       // eslint-disable-next-line jsx-a11y/anchor-is-valid
                       leftEl={<Link />}
-                      name="firstName"
-                      ref={form.register()}
+                      {...form.register('firstName')}
                     />
-                    {form.errors.firstName?.message
-                      && <span style={{ marginTop: '5px', color: 'red' }}>{form.errors.firstName?.message}</span>}
+                    {form.formState.errors.firstName?.message
+                      && (
+                        <span
+                          style={{ marginTop: '5px', color: 'red' }}
+                        >
+                          {form.formState.errors.firstName?.message}
+                        </span>
+                      )}
                   </FormControl>
                   <PitchdeckFragment form={form} />
                 </InputGrid>
@@ -377,15 +380,14 @@ const AutodeckForm = ({
               </Div>
               <Div>
                 <InputGrid>
-                  <FormControl isInvalid={!!form.errors.firstName} isRequired>
+                  <FormControl isInvalid={!!form.formState.errors.firstName} isRequired>
                     <FormLabel htmlFor="name">{t('autodeck:client_first_name')}</FormLabel>
                     <InputHelper>{t('autodeck:client_first_name_helper')}</InputHelper>
                     <Input
                       // eslint-disable-next-line jsx-a11y/anchor-is-valid
                       leftEl={<Link />}
-                      name="firstName"
-                      // isInvalid={!!form.errors.logo}
-                      ref={form.register()}
+                      // isInvalid={!!form.formState.errors.logo}
+                      {...form.register('firstName')}
                     />
                   </FormControl>
                 </InputGrid>
@@ -412,13 +414,13 @@ const AutodeckForm = ({
               <Div>
                 <InputGrid>
                   {fields.map((customField, index) => {
-                    const error: any = form.errors.customFields?.[index];
+                    const error: any = form.formState.errors.customFields?.[index];
                     const errorTwo = error?.value?.message;
                     console.log('err: ', error, 'errTwo: ', errorTwo);
                     return (
                       <>
-                        <input type="hidden" name={`customFields[${index}].key`} defaultValue={fields[index]?.key} ref={form.register()} />
-                        <FormControl isInvalid={!!form.errors.customFields?.[index]}>
+                        <input type="hidden" defaultValue={fields[index]?.key} {...form.register(`customFields.${index}.key`)} />
+                        <FormControl isInvalid={!!form.formState.errors.customFields?.[index]}>
                           <FormLabel htmlFor={`customFields[${index}].key`}>{fields[index]?.key}</FormLabel>
                           <InputHelper>Fill in a value corresponding with a layer in Photoshop</InputHelper>
                           <Input
@@ -426,8 +428,7 @@ const AutodeckForm = ({
                             defaultValue=""
                             // eslint-disable-next-line jsx-a11y/anchor-is-valid
                             leftEl={<Link />}
-                            name={`customFields[${index}].value`}
-                            ref={form.register()}
+                            {...form.register(`customFields.${index}.value`)}
                           />
                         </FormControl>
                         {errorTwo && <span style={{ marginTop: '5px', color: 'red' }}>{errorTwo}</span>}
@@ -436,7 +437,7 @@ const AutodeckForm = ({
                   })}
 
                   {newCustomFields.map((newCustomField, index) => {
-                    const error: any = form.errors.newCustomFields?.[index];
+                    const error: any = form.formState.errors.newCustomFields?.[index];
                     const errorTwo = error?.key?.message;
                     const errorValue = error?.value?.message;
                     return (
@@ -456,14 +457,14 @@ const AutodeckForm = ({
                           >
                             <Trash2 color="red" />
                           </Div>
-                          <FormControl isInvalid={!!form.errors.newCustomFields?.[index]} isRequired>
+                          <FormControl isInvalid={!!form.formState.errors.newCustomFields?.[index]} isRequired>
                             <FormLabel htmlFor="key">Key</FormLabel>
                             <InputHelper>Fill in a key corresponding with a layer in Photoshop</InputHelper>
                             <Input
                               // eslint-disable-next-line jsx-a11y/anchor-is-valid
                               leftEl={<Link />}
-                              name={`newCustomFields[${index}].key`} // TODO: CHeck this newCustomFields[${index}].value
-                              ref={form.register()}
+                              //  TODO: CHeck this newCustomFields[${index}].value
+                              {...form.register(`newCustomFields.${index}.key`)}
                             />
                             {errorTwo && <span style={{ marginTop: '5px', color: 'red' }}>{errorTwo}</span>}
                           </FormControl>
@@ -474,8 +475,7 @@ const AutodeckForm = ({
                           <InputHelper>Fill in a value a layer in Photoshop should get</InputHelper>
                           <Textarea
                             // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                            name={`newCustomFields[${index}].value`}
-                            ref={form.register({ required: false })}
+                            {...form.register(`newCustomFields.${index}.value`, { required: false })}
                           />
                           {errorValue && <span style={{ marginTop: '5px', color: 'red' }}>{errorValue}</span>}
                         </FormControl>

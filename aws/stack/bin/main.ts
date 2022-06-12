@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import { App, Aws } from 'aws-cdk-lib';
-import { APIStack } from '../lib/main-stack';
-import { MainPipelineStack } from '../lib/pipeline/main-pipeline-stack';
-import { HaasCampaignStack } from '../lib/stacks/campaign-stack';
-import { InternalNotifyStack } from '../lib/stacks/Internal/InternalNotifyStack';
+import { App } from 'aws-cdk-lib';
 import { CoreFixed } from '../lib/stacks/Core/CoreFixed';
 import { CoreTempStack } from '../lib/stacks/Core/CoreTempStack';
 import { prodVariables, stagingVariables } from '../lib/stacks/Core/CoreVariables';
+import { StagingAutomations } from '../lib/stacks/Core/StagingAutomations';
 
 const app = new App();
 
@@ -42,25 +39,4 @@ const prodCoreTemp = new CoreTempStack(app, 'ProdCoreTemp', {
   env: prodEnv,
   variables: prodVariables
 });
-
-
-// const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
-//     prefix: 'haas_svc_api',
-//     apiService: api.apiService,
-//     dbUrl: api.dbUrl,
-//     vpc: api.vpc,
-//     rdsPassword: api.rdsPassword,
-//     db: api.db,
-//     rdsSecurityGroup: api.rdsSecurityGroup
-// });
-
-// // // Campaign stack
-// const campaign = new HaasCampaignStack(app, 'HAASCampaign', {
-//   accountId: '649621042808'
-// });
-
-// // // Internal stack
-// const internalStack = new InternalNotifyStack(app, 'InternalNotifyStack', {
-//   accountId: '649621042808',
-//   secretSlackKey: 'internal/SLACK_URL'
-// });
+const stagingAutomations = new StagingAutomations(app, 'StagingAutomations');

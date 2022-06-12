@@ -105,13 +105,12 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                 {fields?.map((field, index) => (
                   <UI.Div key={index} gridColumn={field.type === 'longText' ? 'span 2' : '1fr'}>
                     <UI.FormControl isRequired={field.isRequired}>
-                      <UI.FormLabel htmlFor={`fields[${index}].value`}>{field.label}</UI.FormLabel>
+                      <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
                       {field.type === 'longText' ? (
                         <UI.Textarea
                           id={`fields[${index}].value`}
                           variant="outline"
-                          ref={register({ required: field.isRequired })}
-                          name={`fields[${index}].value`}
+                          {...register(`fields.${index}.value`, { required: field.isRequired })}
                           minHeight="150px"
                           placeholder={field.placeholder || undefined}
                         />
@@ -121,8 +120,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                           variant="outline"
                           leftEl={mapIcon[field?.type] || <Type />}
                           type={mapFieldType[field?.type] || 'text'}
-                          ref={register({ required: field.isRequired })}
-                          name={`fields[${index}].value`}
+                          {...register(`fields.${index}.value`, { required: field.isRequired })}
                           placeholder={field.placeholder || undefined}
                           maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
                         />

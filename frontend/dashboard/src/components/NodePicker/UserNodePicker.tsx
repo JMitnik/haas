@@ -4,39 +4,10 @@ import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
-import {
-  AutomationConditionScopeType,
-  ConditionPropertyAggregateType,
-  QuestionNodeTypeEnum,
-} from 'types/generated-types';
+import { ConditionEntry } from 'views/AddAutomationView/CreateConditionModalCardTypes';
 import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 
 import { NodePickerHeader } from './NodePickerStyles';
-
-export type TwoDateArray = [Date, Date];
-
-export interface ActiveQuestion {
-  type?: QuestionNodeTypeEnum;
-  value?: string;
-  label?: string;
-}
-
-export interface ConditionEntry {
-  scopeType: AutomationConditionScopeType;
-  activeDialogue: {
-    type: string;
-    value: string;
-    label: string | undefined;
-    id: string;
-  } | null;
-  activeQuestion: ActiveQuestion | null;
-  aspect?: string;
-  dateRange: TwoDateArray | null;
-  aggregate?: ConditionPropertyAggregateType;
-  questionOption?: string;
-  latest?: number;
-  label?: string;
-}
 
 export enum TargetTypeEnum {
   User = 'USER',

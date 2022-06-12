@@ -55,6 +55,7 @@ input AutomationActionInput {
 type AutomationActionModel {
   createdAt: Date!
   id: ID!
+  payload: JSONObject
   type: AutomationActionType!
   updatedAt: Date!
 }
@@ -157,6 +158,7 @@ input AutomationConnectionOrderByInput {
 
 """Fields to order UserConnection by."""
 enum AutomationConnectionOrderType {
+  createdAt
   type
   updatedAt
 }
@@ -190,6 +192,7 @@ enum AutomationEventType {
 
 """Automation"""
 type AutomationModel {
+  automationScheduled: AutomationScheduledModel
   automationTrigger: AutomationTriggerModel
   createdAt: Date!
   description: String
@@ -201,18 +204,47 @@ type AutomationModel {
   workspace: Customer
 }
 
+"""AutomationScheduled"""
+type AutomationScheduledModel {
+  actions: [AutomationActionModel!]
+  activeDialogue: Dialogue
+  createdAt: Date!
+  dayOfMonth: String!
+  dayOfWeek: String!
+  dialogueId: String!
+  hours: String!
+  id: ID!
+  minutes: String!
+  month: String!
+  type: RecurringPeriodType!
+  updatedAt: Date!
+}
+
+input AutomationScheduleInput {
+  dayOfMonth: String!
+  dayOfWeek: String!
+  dialogueId: String
+  hours: String!
+  id: ID
+  minutes: String!
+  month: String!
+  type: RecurringPeriodType!
+}
+
 """AutomationTrigger"""
 type AutomationTriggerModel {
-  actions: [AutomationActionModel!]!
+  actions: [AutomationActionModel!]
+  activeDialogue: Dialogue
   conditionBuilder: AutomationConditionBuilderModel
   createdAt: Date!
-  event: AutomationEventModel!
+  event: AutomationEventModel
   id: ID!
   updatedAt: Date!
 }
 
 enum AutomationType {
   CAMPAIGN
+  SCHEDULED
   TRIGGER
 }
 
@@ -359,6 +391,7 @@ input CreateAutomationInput {
   event: AutomationEventInput
   id: ID
   label: String
+  schedule: AutomationScheduleInput
   workspaceId: String
 }
 
@@ -560,6 +593,11 @@ type CustomFieldType {
 
 """Date custom scalar type"""
 scalar Date
+
+input DeleteAutomationInput {
+  automationId: String!
+  workspaceId: String!
+}
 
 input DeleteDialogueInputType {
   customerSlug: String
@@ -849,6 +887,12 @@ input EditWorkspaceInput {
   name: String!
   primaryColour: String!
   slug: String!
+}
+
+input EnableAutomationInput {
+  automationId: String!
+  state: Boolean!
+  workspaceId: String!
 }
 
 type FailedDeliveryModel {
@@ -1179,6 +1223,7 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(input: CreateTriggerInputType): TriggerType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
+  deleteAutomation(input: DeleteAutomationInput): AutomationModel
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!
@@ -1191,6 +1236,7 @@ type Mutation {
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
+  enableAutomation(input: EnableAutomationInput): AutomationModel
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
   generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
@@ -1205,6 +1251,8 @@ type Mutation {
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  sendAutomationDialogueLink(input: SendAutomationDialogueLinkInput): Boolean
+  sendAutomationReport(input: SendAutomationReportInput): Boolean
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload): ImageType!
   updateAutomation(input: CreateAutomationInput): AutomationModel!
@@ -1528,6 +1576,7 @@ input RecipientsInputType {
 }
 
 enum RecurringPeriodType {
+  CUSTOM
   END_OF_DAY
   END_OF_WEEK
   EVERY_DAY
@@ -1604,6 +1653,17 @@ type RoleType {
   nrPermissions: Int
   permissions: [SystemPermission!]
   roleId: String
+}
+
+input SendAutomationDialogueLinkInput {
+  automationScheduleId: String!
+  workspaceSlug: String!
+}
+
+input SendAutomationReportInput {
+  automationActionId: String!
+  reportUrl: String!
+  workspaceSlug: String!
 }
 
 type Session {

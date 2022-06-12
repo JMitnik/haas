@@ -79,7 +79,7 @@ export const CustomerType = objectType({
       args: { filter: AutomationConnectionFilterInput },
       nullable: true,
       async resolve(parent, args, ctx) {
-        return ctx.services.automationService.paginatedAutomations(parent.slug, args.filter);
+        return ctx.services.automationService.paginatedAutomations(parent.slug, args.filter) as any;
       },
     });
 
@@ -247,7 +247,27 @@ export const CustomerType = objectType({
       // useQueryCounter: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
-        return null;
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.findNestedDialogueStatisticsSummary(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        )
       },
     });
 
@@ -434,11 +454,11 @@ export const WorkspaceMutations = Upload && extendType({
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
           },
-          (error, result: UploadApiResponse | undefined) => {
-            if (result) return resolve(result);
+            (error, result: UploadApiResponse | undefined) => {
+              if (result) return resolve(result);
 
-            return reject(error);
-          });
+              return reject(error);
+            });
 
           return createReadStream().pipe(cld_upload_stream);
         });

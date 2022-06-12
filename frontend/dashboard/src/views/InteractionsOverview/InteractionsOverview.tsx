@@ -620,8 +620,8 @@ const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: Filt
             control={form.control}
             name="filterCampaigns"
             defaultValue={defaultValues.filterCampaigns}
-            render={({ onChange, value }) => (
-              <RadioGroup size="sm" onChange={onChange} value={value}>
+            render={({ field }) => (
+              <RadioGroup size="sm" onChange={field.onChange} value={field.value}>
                 <Radio value="all" mb={0}>All</Radio>
                 <Radio value={SessionDeliveryType.Campaigns} mb={0}>Only campaigns</Radio>
                 <Radio value={SessionDeliveryType.NoCampaigns} mb={0}>Only link-clicks</Radio>
@@ -638,8 +638,8 @@ const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: Filt
                 control={form.control}
                 name="filterCampaignVariant"
                 defaultValue={defaultValues.filterCampaignVariant}
-                render={({ onChange, value }) => (
-                  <RadioGroup size="sm" onChange={onChange} value={value}>
+                render={({ field }) => (
+                  <RadioGroup size="sm" onChange={field.onChange} value={field.value}>
                     <Radio value="all" mb={0}>All</Radio>
                     {campaignVariants.map((variant) => (
                       <Radio key={variant.id} value={variant.id} mb={0}>

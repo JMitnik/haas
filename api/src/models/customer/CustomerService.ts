@@ -1,5 +1,5 @@
-import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry } from '@prisma/client';
-import { UserInputError } from 'apollo-server-express';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry, RoleTypeEnum, Role } from '@prisma/client';
+import { ApolloError, UserInputError } from 'apollo-server-express';
 import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
 import cuid from 'cuid';
 import { addDays, subDays } from 'date-fns';
@@ -154,7 +154,7 @@ export class CustomerService {
           return previousValue;
         }
       }, {
-        prevData: [] as ({
+      prevData: [] as ({
         sessionId: string;
         dialogueId: string;
         mainScore: number;
@@ -171,7 +171,7 @@ export class CustomerService {
         }) | undefined;
         prev: boolean;
       })[],
-      });
+    });
 
     const prevDataGroupedOptions = groupBy(splittedSessions.prevData, (session) => {
       return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;
@@ -507,6 +507,38 @@ export class CustomerService {
   };
 
   /**
+   * Creates a user with the 'BOT' role and connects it to a workspace
+   * @param workspaceId 
+   * @param workspaceSlug 
+   * @param roles 
+   * @returns 
+   */
+  createBotUser = async (workspaceId: string, workspaceSlug: string, roles: Role[]) => {
+    const botRole = roles.find((role) => role.type === RoleTypeEnum.BOT);
+
+    if (!botRole) throw new ApolloError('No BOT role available for workspace!');
+
+    return this.userOfCustomerPrismaAdapter.create({
+      customer: {
+        connect: {
+          id: workspaceId,
+        },
+      },
+      role: {
+        connect: {
+          id: botRole?.id,
+        },
+      },
+      user: {
+        create: {
+          email: `${workspaceSlug}@haas.live`,
+          firstName: 'bot',
+        },
+      },
+    })
+  }
+
+  /**
    * Creates a new workspace
    * @param input workspace properties
    * @param createdUserId the user ID creating the new workspace
@@ -522,10 +554,12 @@ export class CustomerService {
 
       // If customer is created by user, make them an "Admin"
       if (createdUserId) {
-        const adminRole = customer.roles.find((role) => role.type === 'ADMIN');
-
+        const adminRole = customer.roles.find((role) => role.type === RoleTypeEnum.ADMIN);
         await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(customer.id, adminRole?.id || '', createdUserId)
       }
+
+      // Add 'bot' user to workspace so we can perform automations later using this account
+      await this.createBotUser(customer.id, customer.slug, customer.roles);
 
       return customer;
     } catch (error) {

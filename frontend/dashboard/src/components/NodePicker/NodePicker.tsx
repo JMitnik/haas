@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import * as UI from '@haas/ui';
 import { Plus } from 'react-feather';
 import { components } from 'react-select';
@@ -8,14 +9,13 @@ import {
   CreateCallToActionModalCard,
 } from 'views/DialogueBuilderView/components/QuestionEntryForm/CreateCallToActionModalCard';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
-import { NodeCellContainer } from 'components/NodeCell/NodeCell';
+import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 import { QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
 
 import { NodePickerHeader } from './NodePickerStyles';
 
 const DropdownOption = (props: any) => {
   const nodeProps = MapNodeToProperties(props.data.type);
-
   return (
     <NodeCellContainer>
       <components.Option {...props}>
@@ -64,7 +64,6 @@ interface NodeSelect extends Partial<QuestionNode> {
 }
 
 interface NodePickerProps {
-  questionId: string | number;
   onChange: (node: NodeSelect) => void;
   items: NodeSelect[];
   onModalOpen?: () => void;

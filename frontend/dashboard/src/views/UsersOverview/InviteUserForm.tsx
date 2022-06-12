@@ -6,7 +6,7 @@ import { Mail } from 'react-feather';
 import { gql, useMutation } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 import Select from 'react-select';
 
@@ -137,16 +137,15 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
         <UI.InputGrid>
           <UI.Div>
             <UI.InputGrid>
-              <UI.FormControl isRequired isInvalid={!!form.errors.email}>
+              <UI.FormControl isRequired isInvalid={!!form.formState.errors.email}>
                 <UI.FormLabel htmlFor="email">{t('email')}</UI.FormLabel>
                 <UI.InputHelper>{t('email_helper')}</UI.InputHelper>
                 <UI.Input
                   placeholder="Doe"
                   leftEl={<Mail />}
-                  name="email"
-                  ref={form.register()}
+                  {...form.register('email')}
                 />
-                <FormErrorMessage>{form.errors?.email?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.formState.errors?.email?.message}</FormErrorMessage>
               </UI.FormControl>
               <UI.Div>
                 <UI.FormControl>
@@ -154,9 +153,14 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
                   <UI.InputHelper>{t('role_selector_helper')}</UI.InputHelper>
                   <Controller
                     name="role"
-                    as={Select}
                     control={form.control}
-                    options={selectRoles}
+                    render={({ field }) => (
+                      <Select
+                        options={selectRoles}
+                        onChange={field.onChange}
+                        value={field.value}
+                      />
+                    )}
                   />
                 </UI.FormControl>
               </UI.Div>

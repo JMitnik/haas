@@ -299,7 +299,7 @@ export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
   const { isChecked, isDisabled, value, text, description, icon, ...rest } = props;
 
   return (
-    <ButtonRadioContainer>
+    <ButtonRadioContainer style={{ marginTop: '0.4em' }}>
       <Button
         variant="outline"
         ref={ref}
@@ -636,6 +636,7 @@ export const FormSlider = ({
       step={stepSize}
       defaultValue={defaultValue}
       onAfterChange={onChange}
+      onChange={onChange}
     />
   );
 }

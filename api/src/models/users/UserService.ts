@@ -10,7 +10,7 @@ import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUp
 import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
-import { DeletedUserOutput, UserWithWorkspaces } from './UserServiceTypes';
+import { DeletedUserOutput, GenerateReportPayload, TargetsPayload, UserWithWorkspaces } from './UserServiceTypes';
 import { offsetPaginate } from '../general/PaginationHelpers';
 
 class UserService {
@@ -24,6 +24,33 @@ class UserService {
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
+  };
+
+  /**
+   * Finds all users based on a AutomationAction payload
+   * @param workspaceSlug 
+   * @param targetIds 
+   * @returns a list of users
+   */
+  findTargetUsers = async (workspaceSlug: string, payload: GenerateReportPayload) => {
+    const targets = payload?.targets;
+    const roleIds: string[] = [];
+    const userIds: string[] = [];
+
+    targets.forEach((target) => {
+      const tar = target?.target;
+      if (tar.type === 'ROLE') {
+        roleIds.push(tar.value);
+      };
+
+      if (tar.type === 'USER') {
+        userIds.push(tar.value);
+      }
+    });
+
+    const targetIds = { roleIds, userIds };
+
+    return this.userOfCustomerPrismaAdapter.findTargetUsers(workspaceSlug, targetIds);
   };
 
   /**
@@ -154,12 +181,16 @@ class UserService {
    * @param workspaceName the slug of the workspace
    * @returns the bot account within a workspace
    */
-  async findBotByWorkspaceName(workspaceName: string) {
-    const botEmail = `${workspaceName}@haas.live`
+  async findBotByWorkspaceName(workspaceSlug: string) {
+    const botEmail = `${workspaceSlug}@haas.live`
     return this.userPrismaAdapter.getUserByEmail(botEmail);
   }
 
-  async getUserOfCustomer(workspaceId: string | null | undefined, customerSlug: string | null | undefined, userId: string) {
+  async getUserOfCustomer(
+    workspaceId: string | null | undefined,
+    customerSlug: string | null | undefined,
+    userId: string
+  ) {
     let customerId = '';
     if (!workspaceId && customerSlug) {
       const customer = await this.customerPrismaAdapter.findWorkspaceBySlug(customerSlug)

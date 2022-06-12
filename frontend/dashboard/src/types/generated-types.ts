@@ -14,10 +14,10 @@ export type Scalars = {
   Float: number;
   /** Date custom scalar type */
   Date: any;
-  /** The `Upload` scalar type represents a file upload. */
-  Upload: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: any;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type AdjustedImageInput = {
@@ -78,6 +78,7 @@ export type AutomationActionModel = {
   createdAt: Scalars['Date'];
   updatedAt: Scalars['Date'];
   type: AutomationActionType;
+  payload?: Maybe<Scalars['JSONObject']>;
 };
 
 export enum AutomationActionType {
@@ -183,7 +184,8 @@ export type AutomationConnectionOrderByInput = {
 /** Fields to order UserConnection by. */
 export enum AutomationConnectionOrderType {
   UpdatedAt = 'updatedAt',
-  Type = 'type'
+  Type = 'type',
+  CreatedAt = 'createdAt'
 }
 
 export type AutomationEventInput = {
@@ -225,7 +227,36 @@ export type AutomationModel = {
   description?: Maybe<Scalars['String']>;
   type: AutomationType;
   automationTrigger?: Maybe<AutomationTriggerModel>;
+  automationScheduled?: Maybe<AutomationScheduledModel>;
   workspace?: Maybe<Customer>;
+};
+
+/** AutomationScheduled */
+export type AutomationScheduledModel = {
+  __typename?: 'AutomationScheduledModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  type: RecurringPeriodType;
+  minutes: Scalars['String'];
+  hours: Scalars['String'];
+  dayOfMonth: Scalars['String'];
+  month: Scalars['String'];
+  dayOfWeek: Scalars['String'];
+  dialogueId: Scalars['String'];
+  actions?: Maybe<Array<AutomationActionModel>>;
+  activeDialogue?: Maybe<Dialogue>;
+};
+
+export type AutomationScheduleInput = {
+  id?: Maybe<Scalars['ID']>;
+  type: RecurringPeriodType;
+  minutes: Scalars['String'];
+  hours: Scalars['String'];
+  dayOfMonth: Scalars['String'];
+  month: Scalars['String'];
+  dayOfWeek: Scalars['String'];
+  dialogueId?: Maybe<Scalars['String']>;
 };
 
 /** AutomationTrigger */
@@ -234,14 +265,16 @@ export type AutomationTriggerModel = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   updatedAt: Scalars['Date'];
-  event: AutomationEventModel;
+  activeDialogue?: Maybe<Dialogue>;
+  event?: Maybe<AutomationEventModel>;
   conditionBuilder?: Maybe<AutomationConditionBuilderModel>;
-  actions: Array<AutomationActionModel>;
+  actions?: Maybe<Array<AutomationActionModel>>;
 };
 
 export enum AutomationType {
   Trigger = 'TRIGGER',
-  Campaign = 'CAMPAIGN'
+  Campaign = 'CAMPAIGN',
+  Scheduled = 'SCHEDULED'
 }
 
 export type AwsImageType = {
@@ -399,6 +432,7 @@ export type CreateAutomationInput = {
   automationType?: Maybe<AutomationType>;
   event?: Maybe<AutomationEventInput>;
   conditionBuilder?: Maybe<AutomationConditionBuilderInput>;
+  schedule?: Maybe<AutomationScheduleInput>;
   actions?: Maybe<Array<AutomationActionInput>>;
 };
 
@@ -664,6 +698,11 @@ export type CustomFieldType = {
   jobProcessLocationId: Scalars['String'];
 };
 
+
+export type DeleteAutomationInput = {
+  workspaceId: Scalars['String'];
+  automationId: Scalars['String'];
+};
 
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
@@ -1028,6 +1067,12 @@ export type EditWorkspaceInput = {
   primaryColour: Scalars['String'];
 };
 
+export type EnableAutomationInput = {
+  workspaceId: Scalars['String'];
+  automationId: Scalars['String'];
+  state: Scalars['Boolean'];
+};
+
 export type FailedDeliveryModel = {
   __typename?: 'FailedDeliveryModel';
   record: Scalars['String'];
@@ -1363,6 +1408,10 @@ export type Mutation = {
   /** Creates a new automation. */
   createAutomation: AutomationModel;
   updateAutomation: AutomationModel;
+  enableAutomation?: Maybe<AutomationModel>;
+  deleteAutomation?: Maybe<AutomationModel>;
+  sendAutomationDialogueLink?: Maybe<Scalars['Boolean']>;
+  sendAutomationReport?: Maybe<Scalars['Boolean']>;
   createCampaign: CampaignType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
   updateDeliveryStatus: Scalars['String'];
@@ -1488,6 +1537,26 @@ export type MutationCreateAutomationArgs = {
 
 export type MutationUpdateAutomationArgs = {
   input?: Maybe<CreateAutomationInput>;
+};
+
+
+export type MutationEnableAutomationArgs = {
+  input?: Maybe<EnableAutomationInput>;
+};
+
+
+export type MutationDeleteAutomationArgs = {
+  input?: Maybe<DeleteAutomationInput>;
+};
+
+
+export type MutationSendAutomationDialogueLinkArgs = {
+  input?: Maybe<SendAutomationDialogueLinkInput>;
+};
+
+
+export type MutationSendAutomationReportArgs = {
+  input?: Maybe<SendAutomationReportInput>;
 };
 
 
@@ -2162,7 +2231,8 @@ export enum RecurringPeriodType {
   StartOfDay = 'START_OF_DAY',
   EndOfDay = 'END_OF_DAY',
   StartOfWeek = 'START_OF_WEEK',
-  EndOfWeek = 'END_OF_WEEK'
+  EndOfWeek = 'END_OF_WEEK',
+  Custom = 'CUSTOM'
 }
 
 export type RefreshAccessTokenOutput = {
@@ -2237,6 +2307,17 @@ export type RoleType = {
   nrPermissions?: Maybe<Scalars['Int']>;
   allPermissions: Array<SystemPermission>;
   permissions?: Maybe<Array<SystemPermission>>;
+};
+
+export type SendAutomationDialogueLinkInput = {
+  workspaceSlug: Scalars['String'];
+  automationScheduleId: Scalars['String'];
+};
+
+export type SendAutomationReportInput = {
+  workspaceSlug: Scalars['String'];
+  automationActionId: Scalars['String'];
+  reportUrl: Scalars['String'];
 };
 
 export type Session = {
@@ -2967,6 +3048,50 @@ export type CreateCtaMutation = (
   ) }
 );
 
+export type AutomationConnectionQueryVariables = Exact<{
+  customerSlug?: Maybe<Scalars['String']>;
+  filter?: Maybe<AutomationConnectionFilterInput>;
+}>;
+
+
+export type AutomationConnectionQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'slug'>
+    & { automationConnection?: Maybe<(
+      { __typename?: 'AutomationConnection' }
+      & Pick<AutomationConnection, 'totalPages'>
+      & { pageInfo: (
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+      ), automations: Array<(
+        { __typename?: 'AutomationModel' }
+        & Pick<AutomationModel, 'id' | 'label' | 'description' | 'updatedAt' | 'isActive' | 'type'>
+        & { automationScheduled?: Maybe<(
+          { __typename?: 'AutomationScheduledModel' }
+          & { activeDialogue?: Maybe<(
+            { __typename?: 'Dialogue' }
+            & Pick<Dialogue, 'slug'>
+          )>, actions?: Maybe<Array<(
+            { __typename?: 'AutomationActionModel' }
+            & Pick<AutomationActionModel, 'type'>
+          )>> }
+        )>, automationTrigger?: Maybe<(
+          { __typename?: 'AutomationTriggerModel' }
+          & { activeDialogue?: Maybe<(
+            { __typename?: 'Dialogue' }
+            & Pick<Dialogue, 'slug'>
+          )>, actions?: Maybe<Array<(
+            { __typename?: 'AutomationActionModel' }
+            & Pick<AutomationActionModel, 'type'>
+          )>> }
+        )> }
+      )> }
+    )> }
+  )> }
+);
+
 export type GetCustomerOfUserQueryVariables = Exact<{
   input?: Maybe<UserOfCustomerInput>;
 }>;
@@ -3042,6 +3167,43 @@ export type UploadUpsellImageMutation = (
   & { uploadUpsellImage?: Maybe<(
     { __typename?: 'ImageType' }
     & Pick<ImageType, 'url'>
+  )> }
+);
+
+export type CreateAutomationMutationVariables = Exact<{
+  input?: Maybe<CreateAutomationInput>;
+}>;
+
+
+export type CreateAutomationMutation = (
+  { __typename?: 'Mutation' }
+  & { createAutomation: (
+    { __typename?: 'AutomationModel' }
+    & Pick<AutomationModel, 'id' | 'label'>
+  ) }
+);
+
+export type GetUsersAndRolesQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+}>;
+
+
+export type GetUsersAndRolesQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { users?: Maybe<Array<(
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'email' | 'phone'>
+      & { role?: Maybe<(
+        { __typename?: 'RoleType' }
+        & Pick<RoleType, 'id' | 'name'>
+      )> }
+    )>>, roles?: Maybe<Array<(
+      { __typename?: 'RoleType' }
+      & Pick<RoleType, 'id' | 'name'>
+    )>> }
   )> }
 );
 
@@ -3207,6 +3369,32 @@ export type WhitifyImageMutation = (
   & { whitifyImage?: Maybe<(
     { __typename?: 'AWSImageType' }
     & Pick<AwsImageType, 'url'>
+  )> }
+);
+
+export type DeleteAutomationMutationVariables = Exact<{
+  input?: Maybe<DeleteAutomationInput>;
+}>;
+
+
+export type DeleteAutomationMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteAutomation?: Maybe<(
+    { __typename?: 'AutomationModel' }
+    & Pick<AutomationModel, 'id' | 'label'>
+  )> }
+);
+
+export type EnableAutomationMutationVariables = Exact<{
+  input?: Maybe<EnableAutomationInput>;
+}>;
+
+
+export type EnableAutomationMutation = (
+  { __typename?: 'Mutation' }
+  & { enableAutomation?: Maybe<(
+    { __typename?: 'AutomationModel' }
+    & Pick<AutomationModel, 'id' | 'label' | 'isActive'>
   )> }
 );
 
@@ -3473,6 +3661,116 @@ export type GetDialogueStatisticsQuery = (
       )> }
     )> }
   )> }
+);
+
+export type GetAutomationQueryVariables = Exact<{
+  input?: Maybe<GetAutomationInput>;
+}>;
+
+
+export type GetAutomationQuery = (
+  { __typename?: 'Query' }
+  & { automation?: Maybe<(
+    { __typename?: 'AutomationModel' }
+    & Pick<AutomationModel, 'id' | 'createdAt' | 'updatedAt' | 'isActive' | 'label' | 'description' | 'type'>
+    & { workspace?: Maybe<(
+      { __typename?: 'Customer' }
+      & Pick<Customer, 'slug' | 'id'>
+    )>, automationScheduled?: Maybe<(
+      { __typename?: 'AutomationScheduledModel' }
+      & Pick<AutomationScheduledModel, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'minutes' | 'hours' | 'dayOfMonth' | 'dayOfWeek' | 'month'>
+      & { activeDialogue?: Maybe<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'id' | 'slug' | 'title'>
+      )>, actions?: Maybe<Array<(
+        { __typename?: 'AutomationActionModel' }
+        & Pick<AutomationActionModel, 'id' | 'payload' | 'type'>
+      )>> }
+    )>, automationTrigger?: Maybe<(
+      { __typename?: 'AutomationTriggerModel' }
+      & Pick<AutomationTriggerModel, 'id'>
+      & { activeDialogue?: Maybe<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'title' | 'slug' | 'id'>
+      )>, actions?: Maybe<Array<(
+        { __typename?: 'AutomationActionModel' }
+        & Pick<AutomationActionModel, 'id' | 'type' | 'payload'>
+      )>>, event?: Maybe<(
+        { __typename?: 'AutomationEventModel' }
+        & Pick<AutomationEventModel, 'id' | 'type'>
+        & { dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'title' | 'slug' | 'id'>
+        )>, question?: Maybe<(
+          { __typename?: 'QuestionNode' }
+          & Pick<QuestionNode, 'id' | 'title' | 'type'>
+        )> }
+      )>, conditionBuilder?: Maybe<(
+        { __typename?: 'AutomationConditionBuilderModel' }
+        & Pick<AutomationConditionBuilderModel, 'id' | 'type' | 'childConditionBuilderId'>
+        & { childConditionBuilder?: Maybe<(
+          { __typename?: 'AutomationConditionBuilderModel' }
+          & Pick<AutomationConditionBuilderModel, 'id' | 'type'>
+          & { conditions: Array<(
+            { __typename?: 'AutomationConditionModel' }
+            & Pick<AutomationConditionModel, 'id' | 'scope' | 'operator'>
+            & { operands: Array<(
+              { __typename?: 'AutomationConditionOperandModel' }
+              & Pick<AutomationConditionOperandModel, 'id' | 'type' | 'numberValue' | 'textValue'>
+            )>, dialogueScope?: Maybe<(
+              { __typename?: 'DialogueConditionScopeModel' }
+              & Pick<DialogueConditionScopeModel, 'id' | 'aspect'>
+              & { aggregate?: Maybe<(
+                { __typename?: 'ConditionPropertyAggregate' }
+                & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
+              )> }
+            )>, questionScope?: Maybe<(
+              { __typename?: 'QuestionConditionScopeModel' }
+              & Pick<QuestionConditionScopeModel, 'id' | 'aspect'>
+              & { aggregate?: Maybe<(
+                { __typename?: 'ConditionPropertyAggregate' }
+                & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
+              )> }
+            )> }
+          )> }
+        )>, conditions: Array<(
+          { __typename?: 'AutomationConditionModel' }
+          & Pick<AutomationConditionModel, 'id' | 'scope' | 'operator'>
+          & { operands: Array<(
+            { __typename?: 'AutomationConditionOperandModel' }
+            & Pick<AutomationConditionOperandModel, 'id' | 'type' | 'numberValue' | 'textValue'>
+          )>, dialogueScope?: Maybe<(
+            { __typename?: 'DialogueConditionScopeModel' }
+            & Pick<DialogueConditionScopeModel, 'id' | 'aspect'>
+            & { aggregate?: Maybe<(
+              { __typename?: 'ConditionPropertyAggregate' }
+              & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
+            )> }
+          )>, questionScope?: Maybe<(
+            { __typename?: 'QuestionConditionScopeModel' }
+            & Pick<QuestionConditionScopeModel, 'id' | 'aspect'>
+            & { aggregate?: Maybe<(
+              { __typename?: 'ConditionPropertyAggregate' }
+              & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
+            )> }
+          )> }
+        )> }
+      )> }
+    )> }
+  )> }
+);
+
+export type UpdateAutomationMutationVariables = Exact<{
+  input?: Maybe<CreateAutomationInput>;
+}>;
+
+
+export type UpdateAutomationMutation = (
+  { __typename?: 'Mutation' }
+  & { updateAutomation: (
+    { __typename?: 'AutomationModel' }
+    & Pick<AutomationModel, 'id' | 'label'>
+  ) }
 );
 
 export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
@@ -4093,6 +4391,80 @@ export function useCreateCtaMutation(baseOptions?: Apollo.MutationHookOptions<Cr
 export type CreateCtaMutationHookResult = ReturnType<typeof useCreateCtaMutation>;
 export type CreateCtaMutationResult = Apollo.MutationResult<CreateCtaMutation>;
 export type CreateCtaMutationOptions = Apollo.BaseMutationOptions<CreateCtaMutation, CreateCtaMutationVariables>;
+export const AutomationConnectionDocument = gql`
+    query automationConnection($customerSlug: String, $filter: AutomationConnectionFilterInput) {
+  customer(slug: $customerSlug) {
+    id
+    slug
+    automationConnection(filter: $filter) {
+      totalPages
+      pageInfo {
+        hasPrevPage
+        hasNextPage
+        prevPageOffset
+        nextPageOffset
+        pageIndex
+      }
+      automations {
+        id
+        label
+        description
+        updatedAt
+        isActive
+        type
+        automationScheduled {
+          activeDialogue {
+            slug
+          }
+          actions {
+            type
+          }
+        }
+        automationTrigger {
+          activeDialogue {
+            slug
+          }
+          actions {
+            type
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useAutomationConnectionQuery__
+ *
+ * To run a query within a React component, call `useAutomationConnectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAutomationConnectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAutomationConnectionQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useAutomationConnectionQuery(baseOptions?: Apollo.QueryHookOptions<AutomationConnectionQuery, AutomationConnectionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AutomationConnectionQuery, AutomationConnectionQueryVariables>(AutomationConnectionDocument, options);
+      }
+export function useAutomationConnectionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AutomationConnectionQuery, AutomationConnectionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AutomationConnectionQuery, AutomationConnectionQueryVariables>(AutomationConnectionDocument, options);
+        }
+export type AutomationConnectionQueryHookResult = ReturnType<typeof useAutomationConnectionQuery>;
+export type AutomationConnectionLazyQueryHookResult = ReturnType<typeof useAutomationConnectionLazyQuery>;
+export type AutomationConnectionQueryResult = Apollo.QueryResult<AutomationConnectionQuery, AutomationConnectionQueryVariables>;
+export function refetchAutomationConnectionQuery(variables?: AutomationConnectionQueryVariables) {
+      return { query: AutomationConnectionDocument, variables: variables }
+    }
 export const GetCustomerOfUserDocument = gql`
     query getCustomerOfUser($input: UserOfCustomerInput) {
   UserOfCustomer(input: $input) {
@@ -4252,6 +4624,93 @@ export function useUploadUpsellImageMutation(baseOptions?: Apollo.MutationHookOp
 export type UploadUpsellImageMutationHookResult = ReturnType<typeof useUploadUpsellImageMutation>;
 export type UploadUpsellImageMutationResult = Apollo.MutationResult<UploadUpsellImageMutation>;
 export type UploadUpsellImageMutationOptions = Apollo.BaseMutationOptions<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>;
+export const CreateAutomationDocument = gql`
+    mutation createAutomation($input: CreateAutomationInput) {
+  createAutomation(input: $input) {
+    id
+    label
+  }
+}
+    `;
+export type CreateAutomationMutationFn = Apollo.MutationFunction<CreateAutomationMutation, CreateAutomationMutationVariables>;
+
+/**
+ * __useCreateAutomationMutation__
+ *
+ * To run a mutation, you first call `useCreateAutomationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateAutomationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createAutomationMutation, { data, loading, error }] = useCreateAutomationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateAutomationMutation(baseOptions?: Apollo.MutationHookOptions<CreateAutomationMutation, CreateAutomationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateAutomationMutation, CreateAutomationMutationVariables>(CreateAutomationDocument, options);
+      }
+export type CreateAutomationMutationHookResult = ReturnType<typeof useCreateAutomationMutation>;
+export type CreateAutomationMutationResult = Apollo.MutationResult<CreateAutomationMutation>;
+export type CreateAutomationMutationOptions = Apollo.BaseMutationOptions<CreateAutomationMutation, CreateAutomationMutationVariables>;
+export const GetUsersAndRolesDocument = gql`
+    query getUsersAndRoles($customerSlug: String!) {
+  customer(slug: $customerSlug) {
+    id
+    users {
+      id
+      firstName
+      lastName
+      email
+      phone
+      role {
+        id
+        name
+      }
+    }
+    roles {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUsersAndRolesQuery__
+ *
+ * To run a query within a React component, call `useGetUsersAndRolesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersAndRolesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersAndRolesQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *   },
+ * });
+ */
+export function useGetUsersAndRolesQuery(baseOptions: Apollo.QueryHookOptions<GetUsersAndRolesQuery, GetUsersAndRolesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUsersAndRolesQuery, GetUsersAndRolesQueryVariables>(GetUsersAndRolesDocument, options);
+      }
+export function useGetUsersAndRolesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersAndRolesQuery, GetUsersAndRolesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUsersAndRolesQuery, GetUsersAndRolesQueryVariables>(GetUsersAndRolesDocument, options);
+        }
+export type GetUsersAndRolesQueryHookResult = ReturnType<typeof useGetUsersAndRolesQuery>;
+export type GetUsersAndRolesLazyQueryHookResult = ReturnType<typeof useGetUsersAndRolesLazyQuery>;
+export type GetUsersAndRolesQueryResult = Apollo.QueryResult<GetUsersAndRolesQuery, GetUsersAndRolesQueryVariables>;
+export function refetchGetUsersAndRolesQuery(variables?: GetUsersAndRolesQueryVariables) {
+      return { query: GetUsersAndRolesDocument, variables: variables }
+    }
 export const GetWorkspaceAdminsDocument = gql`
     query GetWorkspaceAdmins($customerSlug: String!) {
   users(customerSlug: $customerSlug) {
@@ -4692,6 +5151,75 @@ export function useWhitifyImageMutation(baseOptions?: Apollo.MutationHookOptions
 export type WhitifyImageMutationHookResult = ReturnType<typeof useWhitifyImageMutation>;
 export type WhitifyImageMutationResult = Apollo.MutationResult<WhitifyImageMutation>;
 export type WhitifyImageMutationOptions = Apollo.BaseMutationOptions<WhitifyImageMutation, WhitifyImageMutationVariables>;
+export const DeleteAutomationDocument = gql`
+    mutation deleteAutomation($input: DeleteAutomationInput) {
+  deleteAutomation(input: $input) {
+    id
+    label
+  }
+}
+    `;
+export type DeleteAutomationMutationFn = Apollo.MutationFunction<DeleteAutomationMutation, DeleteAutomationMutationVariables>;
+
+/**
+ * __useDeleteAutomationMutation__
+ *
+ * To run a mutation, you first call `useDeleteAutomationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteAutomationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteAutomationMutation, { data, loading, error }] = useDeleteAutomationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteAutomationMutation(baseOptions?: Apollo.MutationHookOptions<DeleteAutomationMutation, DeleteAutomationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteAutomationMutation, DeleteAutomationMutationVariables>(DeleteAutomationDocument, options);
+      }
+export type DeleteAutomationMutationHookResult = ReturnType<typeof useDeleteAutomationMutation>;
+export type DeleteAutomationMutationResult = Apollo.MutationResult<DeleteAutomationMutation>;
+export type DeleteAutomationMutationOptions = Apollo.BaseMutationOptions<DeleteAutomationMutation, DeleteAutomationMutationVariables>;
+export const EnableAutomationDocument = gql`
+    mutation enableAutomation($input: EnableAutomationInput) {
+  enableAutomation(input: $input) {
+    id
+    label
+    isActive
+  }
+}
+    `;
+export type EnableAutomationMutationFn = Apollo.MutationFunction<EnableAutomationMutation, EnableAutomationMutationVariables>;
+
+/**
+ * __useEnableAutomationMutation__
+ *
+ * To run a mutation, you first call `useEnableAutomationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEnableAutomationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [enableAutomationMutation, { data, loading, error }] = useEnableAutomationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useEnableAutomationMutation(baseOptions?: Apollo.MutationHookOptions<EnableAutomationMutation, EnableAutomationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EnableAutomationMutation, EnableAutomationMutationVariables>(EnableAutomationDocument, options);
+      }
+export type EnableAutomationMutationHookResult = ReturnType<typeof useEnableAutomationMutation>;
+export type EnableAutomationMutationResult = Apollo.MutationResult<EnableAutomationMutation>;
+export type EnableAutomationMutationOptions = Apollo.BaseMutationOptions<EnableAutomationMutation, EnableAutomationMutationVariables>;
 export const CreateBatchDeliveriesDocument = gql`
     mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
   createBatchDeliveries(input: $input) {
@@ -5267,6 +5795,203 @@ export type GetDialogueStatisticsQueryResult = Apollo.QueryResult<GetDialogueSta
 export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatisticsQueryVariables) {
       return { query: GetDialogueStatisticsDocument, variables: variables }
     }
+export const GetAutomationDocument = gql`
+    query getAutomation($input: GetAutomationInput) {
+  automation(where: $input) {
+    id
+    createdAt
+    updatedAt
+    isActive
+    label
+    description
+    type
+    workspace {
+      slug
+      id
+    }
+    automationScheduled {
+      id
+      createdAt
+      updatedAt
+      type
+      minutes
+      hours
+      dayOfMonth
+      dayOfWeek
+      month
+      activeDialogue {
+        id
+        slug
+        title
+      }
+      actions {
+        id
+        payload
+        type
+      }
+    }
+    automationTrigger {
+      id
+      activeDialogue {
+        title
+        slug
+        id
+      }
+      actions {
+        id
+        type
+        payload
+      }
+      event {
+        id
+        type
+        dialogue {
+          title
+          slug
+          id
+        }
+        question {
+          id
+          title
+          type
+        }
+      }
+      conditionBuilder {
+        id
+        type
+        childConditionBuilderId
+        childConditionBuilder {
+          id
+          type
+          conditions {
+            id
+            scope
+            operator
+            operands {
+              id
+              type
+              numberValue
+              textValue
+            }
+            dialogueScope {
+              id
+              aspect
+              aggregate {
+                id
+                type
+                latest
+              }
+            }
+            questionScope {
+              id
+              aspect
+              aggregate {
+                id
+                type
+                latest
+              }
+            }
+          }
+        }
+        conditions {
+          id
+          scope
+          operator
+          operands {
+            id
+            type
+            numberValue
+            textValue
+          }
+          dialogueScope {
+            id
+            aspect
+            aggregate {
+              id
+              type
+              latest
+            }
+          }
+          questionScope {
+            id
+            aspect
+            aggregate {
+              id
+              type
+              latest
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAutomationQuery__
+ *
+ * To run a query within a React component, call `useGetAutomationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAutomationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAutomationQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetAutomationQuery(baseOptions?: Apollo.QueryHookOptions<GetAutomationQuery, GetAutomationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAutomationQuery, GetAutomationQueryVariables>(GetAutomationDocument, options);
+      }
+export function useGetAutomationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAutomationQuery, GetAutomationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAutomationQuery, GetAutomationQueryVariables>(GetAutomationDocument, options);
+        }
+export type GetAutomationQueryHookResult = ReturnType<typeof useGetAutomationQuery>;
+export type GetAutomationLazyQueryHookResult = ReturnType<typeof useGetAutomationLazyQuery>;
+export type GetAutomationQueryResult = Apollo.QueryResult<GetAutomationQuery, GetAutomationQueryVariables>;
+export function refetchGetAutomationQuery(variables?: GetAutomationQueryVariables) {
+      return { query: GetAutomationDocument, variables: variables }
+    }
+export const UpdateAutomationDocument = gql`
+    mutation updateAutomation($input: CreateAutomationInput) {
+  updateAutomation(input: $input) {
+    id
+    label
+  }
+}
+    `;
+export type UpdateAutomationMutationFn = Apollo.MutationFunction<UpdateAutomationMutation, UpdateAutomationMutationVariables>;
+
+/**
+ * __useUpdateAutomationMutation__
+ *
+ * To run a mutation, you first call `useUpdateAutomationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateAutomationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateAutomationMutation, { data, loading, error }] = useUpdateAutomationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateAutomationMutation(baseOptions?: Apollo.MutationHookOptions<UpdateAutomationMutation, UpdateAutomationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateAutomationMutation, UpdateAutomationMutationVariables>(UpdateAutomationDocument, options);
+      }
+export type UpdateAutomationMutationHookResult = ReturnType<typeof useUpdateAutomationMutation>;
+export type UpdateAutomationMutationResult = Apollo.MutationResult<UpdateAutomationMutation>;
+export type UpdateAutomationMutationOptions = Apollo.BaseMutationOptions<UpdateAutomationMutation, UpdateAutomationMutationVariables>;
 export const GenerateWorkspaceFromCsvDocument = gql`
     mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
   generateWorkspaceFromCSV(input: $input) {
@@ -5891,6 +6616,22 @@ export namespace CreateCta {
   export const Document = CreateCtaDocument;
 }
 
+export namespace AutomationConnection {
+  export type Variables = AutomationConnectionQueryVariables;
+  export type Query = AutomationConnectionQuery;
+  export type Customer = (NonNullable<AutomationConnectionQuery['customer']>);
+  export type AutomationConnection = (NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>);
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['pageInfo']>);
+  export type Automations = NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>;
+  export type AutomationScheduled = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationScheduled']>);
+  export type ActiveDialogue = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationScheduled']>)['activeDialogue']>);
+  export type Actions = NonNullable<(NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationScheduled']>)['actions']>)[number]>;
+  export type AutomationTrigger = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationTrigger']>);
+  export type _ActiveDialogue = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationTrigger']>)['activeDialogue']>);
+  export type _Actions = NonNullable<(NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>['automationTrigger']>)['actions']>)[number]>;
+  export const Document = AutomationConnectionDocument;
+}
+
 export namespace GetCustomerOfUser {
   export type Variables = GetCustomerOfUserQueryVariables;
   export type Query = GetCustomerOfUserQuery;
@@ -5922,6 +6663,23 @@ export namespace UploadUpsellImage {
   export type Mutation = UploadUpsellImageMutation;
   export type UploadUpsellImage = (NonNullable<UploadUpsellImageMutation['uploadUpsellImage']>);
   export const Document = UploadUpsellImageDocument;
+}
+
+export namespace CreateAutomation {
+  export type Variables = CreateAutomationMutationVariables;
+  export type Mutation = CreateAutomationMutation;
+  export type CreateAutomation = (NonNullable<CreateAutomationMutation['createAutomation']>);
+  export const Document = CreateAutomationDocument;
+}
+
+export namespace GetUsersAndRoles {
+  export type Variables = GetUsersAndRolesQueryVariables;
+  export type Query = GetUsersAndRolesQuery;
+  export type Customer = (NonNullable<GetUsersAndRolesQuery['customer']>);
+  export type Users = NonNullable<(NonNullable<(NonNullable<GetUsersAndRolesQuery['customer']>)['users']>)[number]>;
+  export type Role = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetUsersAndRolesQuery['customer']>)['users']>)[number]>['role']>);
+  export type Roles = NonNullable<(NonNullable<(NonNullable<GetUsersAndRolesQuery['customer']>)['roles']>)[number]>;
+  export const Document = GetUsersAndRolesDocument;
 }
 
 export namespace GetWorkspaceAdmins {
@@ -6005,6 +6763,20 @@ export namespace WhitifyImage {
   export type Mutation = WhitifyImageMutation;
   export type WhitifyImage = (NonNullable<WhitifyImageMutation['whitifyImage']>);
   export const Document = WhitifyImageDocument;
+}
+
+export namespace DeleteAutomation {
+  export type Variables = DeleteAutomationMutationVariables;
+  export type Mutation = DeleteAutomationMutation;
+  export type DeleteAutomation = (NonNullable<DeleteAutomationMutation['deleteAutomation']>);
+  export const Document = DeleteAutomationDocument;
+}
+
+export namespace EnableAutomation {
+  export type Variables = EnableAutomationMutationVariables;
+  export type Mutation = EnableAutomationMutation;
+  export type EnableAutomation = (NonNullable<EnableAutomationMutation['enableAutomation']>);
+  export const Document = EnableAutomationDocument;
 }
 
 export namespace CreateBatchDeliveries {
@@ -6114,6 +6886,44 @@ export namespace GetDialogueStatistics {
   export type TopNegativePath = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['topNegativePath']>)[number]>;
   export type History = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['history']>)[number]>;
   export const Document = GetDialogueStatisticsDocument;
+}
+
+export namespace GetAutomation {
+  export type Variables = GetAutomationQueryVariables;
+  export type Query = GetAutomationQuery;
+  export type Automation = (NonNullable<GetAutomationQuery['automation']>);
+  export type Workspace = (NonNullable<(NonNullable<GetAutomationQuery['automation']>)['workspace']>);
+  export type AutomationScheduled = (NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationScheduled']>);
+  export type ActiveDialogue = (NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationScheduled']>)['activeDialogue']>);
+  export type Actions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationScheduled']>)['actions']>)[number]>;
+  export type AutomationTrigger = (NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>);
+  export type _ActiveDialogue = (NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['activeDialogue']>);
+  export type _Actions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['actions']>)[number]>;
+  export type Event = (NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>);
+  export type Dialogue = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>)['dialogue']>);
+  export type Question = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>)['question']>);
+  export type ConditionBuilder = (NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>);
+  export type ChildConditionBuilder = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>);
+  export type Conditions = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>;
+  export type Operands = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['operands']>)[number]>;
+  export type DialogueScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['dialogueScope']>);
+  export type Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['dialogueScope']>)['aggregate']>);
+  export type QuestionScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['questionScope']>);
+  export type _Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['questionScope']>)['aggregate']>);
+  export type _Conditions = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>;
+  export type _Operands = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['operands']>)[number]>;
+  export type _DialogueScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['dialogueScope']>);
+  export type __Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['dialogueScope']>)['aggregate']>);
+  export type _QuestionScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['questionScope']>);
+  export type ___Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['questionScope']>)['aggregate']>);
+  export const Document = GetAutomationDocument;
+}
+
+export namespace UpdateAutomation {
+  export type Variables = UpdateAutomationMutationVariables;
+  export type Mutation = UpdateAutomationMutation;
+  export type UpdateAutomation = (NonNullable<UpdateAutomationMutation['updateAutomation']>);
+  export const Document = UpdateAutomationDocument;
 }
 
 export namespace GenerateWorkspaceFromCsv {

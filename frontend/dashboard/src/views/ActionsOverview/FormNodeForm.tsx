@@ -162,7 +162,7 @@ const mapToUserPickerEntries = (customer: Maybe<{
 };
 
 const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps) => {
-  const fieldCategory = fieldMap.find((fieldItem) => fieldItem.type === field.type);
+  const fieldCategory = fieldMap.find((fieldItem) => fieldItem?.type === field?.type);
 
   const FieldIcon = fieldCategory?.icon || Feather;
   const { t } = useTranslation();
@@ -171,7 +171,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
     <UI.Card>
       <UI.CardBody>
         <UI.Flex flexWrap="wrap" justifyContent="space-between">
-          {field.type ? (
+          {field?.type ? (
             <UI.Flex mb={[4, 0]}>
               <UI.IconBox mr={2} bg={fieldCategory?.color}><FieldIcon /></UI.IconBox>
               <UI.ColumnFlex>
@@ -438,11 +438,11 @@ const FormNodeFieldFragment = ({ form, field, onClose, onSubmit, onDelete }: For
                 <UI.InputGrid>
                   <UI.FormControl>
                     <UI.FormLabel htmlFor="label">{t('label')}</UI.FormLabel>
-                    <UI.Input ref={subform.register()} name="label" key={field.fieldIndex} />
+                    <UI.Input {...subform.register('label')} key={field.fieldIndex} />
                   </UI.FormControl>
                   <UI.FormControl>
                     <UI.FormLabel htmlFor="placeholder">{t('placeholder')}</UI.FormLabel>
-                    <UI.Input ref={subform.register()} name="placeholder" key={field.fieldIndex} />
+                    <UI.Input {...subform.register('placeholder')} key={field.fieldIndex} />
                   </UI.FormControl>
                   <UI.FormControl>
                     <UI.FormLabel htmlFor="isRequired">{t('is_required')}</UI.FormLabel>
@@ -450,7 +450,7 @@ const FormNodeFieldFragment = ({ form, field, onClose, onSubmit, onDelete }: For
                       control={subform.control}
                       name="isRequired"
                       defaultValue={field.isRequired}
-                      render={({ onBlur, onChange, value }) => (
+                      render={({ field: { value, onChange, onBlur } }) => (
                         <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                           <UI.RadioButton
                             icon={AlertCircle}
@@ -549,7 +549,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
           <UI.InputHeader>{t('about_form_helpertext_header')}</UI.InputHeader>
           <UI.InputHelper>{t('about_form_helpertext_helper')}</UI.InputHelper>
           <UI.FormControl>
-            <UI.Input name="formNode.helperText" ref={form.register()} placeholder={t('form_helpertext_placeholder')} />
+            <UI.Input {...form.register('formNode.helperText')} placeholder={t('form_helpertext_placeholder')} />
           </UI.FormControl>
         </UI.Div>
         <UI.Div>

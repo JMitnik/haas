@@ -75,14 +75,14 @@ const RoleUserForm = ({
         {allPermissions?.map((permission) => (
           <Controller
             control={control}
-            name={permission}
+            name={permission as any}
             defaultValue={permissionsArray?.includes(permission)}
             key={permission}
-            render={({ onChange, value }) => (
+            render={({ field }) => (
               <UI.CheckboxCard
-                value={value}
+                value={field.value}
                 key={permission}
-                onChange={() => permission !== 'CAN_ACCESS_ADMIN_PANEL' && onChange(!value)}
+                onChange={() => permission !== 'CAN_ACCESS_ADMIN_PANEL' && field.onChange(!field.value)}
                 isDisabled={permission === 'CAN_ACCESS_ADMIN_PANEL'}
                 title={permission.replaceAll('_', ' ')}
                 description={t(`permissions:${permission.toLowerCase()}`)}

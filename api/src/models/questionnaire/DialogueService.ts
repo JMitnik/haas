@@ -59,6 +59,15 @@ class DialogueService {
   }
 
   /**
+   * Finds dialogue by a question ID
+   * @param questionId 
+   * @returns 
+   */
+  findDialogueByQuestionId = async (questionId: string) => {
+    return this.dialoguePrismaAdapter.getDialogueByQuestionNodeId(questionId);
+  }
+
+  /**
    * Finds all dialogues of a workspace but strips them off all sensitive information
    * @param workspaceId 
    * @returns a list of dialogues including a url to their client version
@@ -779,7 +788,7 @@ class DialogueService {
     return updateDialogueArgs;
   };
 
-  createPostLeafNode = async (dialogueId: string, postLeafNodeContent: { header: string, subHeader: string }) => {
+  createPostLeafNode = async (dialogueId: string, postLeafNodeContent: { header: string; subHeader: string }) => {
     return this.dialoguePrismaAdapter.createPostLeafNode(dialogueId, postLeafNodeContent);
   }
 

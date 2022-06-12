@@ -120,44 +120,40 @@ const EditMeForm = () => {
           </Div>
           <Div>
             <InputGrid>
-              <FormControl isRequired isInvalid={!!form.errors.firstName}>
+              <FormControl isRequired isInvalid={!!form.formState.errors.firstName}>
                 <FormLabel htmlFor="firstName">{t('first_name')}</FormLabel>
                 <InputHelper>{t('first_name_helper')}</InputHelper>
                 <Input
                   placeholder="Jane"
                   leftEl={<User />}
-                  name="firstName"
-                  ref={form.register()}
+                  {...form.register('firstName')}
                 />
               </FormControl>
-              <FormControl isRequired isInvalid={!!form.errors.lastName}>
+              <FormControl isRequired isInvalid={!!form.formState.errors.lastName}>
                 <FormLabel htmlFor="lastName">{t('last_name')}</FormLabel>
                 <InputHelper>{t('last_name_helper')}</InputHelper>
                 <Input
                   placeholder="Doe"
                   leftEl={<User />}
-                  name="lastName"
-                  ref={form.register()}
+                  {...form.register('lastName')}
                 />
               </FormControl>
-              <FormControl isRequired isInvalid={!!form.errors.email}>
+              <FormControl isRequired isInvalid={!!form.formState.errors.email}>
                 <FormLabel htmlFor="email">{t('email')}</FormLabel>
                 <InputHelper>{t('email_helper')}</InputHelper>
                 <Input
                   placeholder="Doe"
                   leftEl={<Mail />}
-                  name="email"
-                  ref={form.register()}
+                  {...form.register('email')}
                 />
               </FormControl>
-              <FormControl isInvalid={!!form.errors.phone}>
+              <FormControl isInvalid={!!form.formState.errors.phone}>
                 <FormLabel htmlFor="phone">{t('phone')}</FormLabel>
                 <InputHelper>{t('phone_helper')}</InputHelper>
                 <Input
                   placeholder="Doe"
                   leftEl={<Phone />}
-                  name="phone"
-                  ref={form.register()}
+                  {...form.register('phone')}
                 />
               </FormControl>
             </InputGrid>

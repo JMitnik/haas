@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
-import { Controller, UseFormMethods } from 'react-hook-form';
+import { Controller, UseFormReturn } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
   Muted,
@@ -86,7 +86,7 @@ const CustomerUploadLogoInput = ({ onChange, value, logoOpacity, overrideColor }
   );
 };
 
-const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
+const CustomerLogoFormFragment = ({ form }: { form: UseFormReturn<FormDataProps> }) => {
   const { t } = useTranslation();
 
   const logoOpacity = form.watch('logoOpacity') ?? 0.3;
@@ -102,11 +102,11 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
           control={form.control}
           name="useCustomUrl"
           defaultValue={1}
-          render={({ onChange, value }) => (
+          render={({ field }) => (
             <RadioButtonGroup
-              value={value}
+              value={field.value}
               isInline
-              onChange={onChange}
+              onChange={field.onChange}
               display="flex"
             >
               <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
@@ -125,9 +125,8 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
             id="logo"
             // eslint-disable-next-line jsx-a11y/anchor-is-valid
             leftEl={<Link />}
-            name="logo"
-            isInvalid={!!form.errors.logo}
-            ref={form.register()}
+            isInvalid={!!form.formState.errors.logo}
+            {...form.register('logo')}
           />
         </FormControl>
       ) : (
@@ -140,10 +139,10 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
               control={form.control}
               name="uploadLogo"
               defaultValue=""
-              render={({ onChange, value }) => (
+              render={({ field }) => (
                 <CustomerUploadLogoInput
-                  value={value}
-                  onChange={onChange}
+                  value={field.value}
+                  onChange={field.onChange}
                   logoOpacity={logoOpacity}
                   overrideColor={overrideColor}
                 />
@@ -161,10 +160,10 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
           <Controller
             name="logoOpacity"
             control={form.control}
-            render={({ value, onChange }) => (
+            render={({ field }) => (
               <UI.FormSlider
-                defaultValue={value}
-                onChange={onChange}
+                defaultValue={field.value}
+                onChange={field.onChange}
                 stepSize={0.1}
                 min={0}
                 max={1}
@@ -207,30 +206,28 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
         </Div>
         <Div py={4}>
           <InputGrid>
-            <FormControl isInvalid={!!form.errors.name} isRequired>
+            <FormControl isInvalid={!!form.formState.errors.name} isRequired>
               <FormLabel htmlFor="name">{t('name')}</FormLabel>
               <InputHelper>{t('customer:name_helper')}</InputHelper>
               <Input
                 id="name"
                 placeholder="Peach inc."
                 leftEl={<Briefcase />}
-                name="name"
-                ref={form.register()}
+                {...form.register('name')}
               />
               <UI.ErrorMessage>
                 {t(form?.errors?.name?.message)}
               </UI.ErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!form.errors.slug} isRequired>
+            <FormControl isInvalid={!!form.formState.errors.slug} isRequired>
               <FormLabel htmlFor="slug">{t('slug')}</FormLabel>
               <InputHelper>{t('customer:slug_helper')}</InputHelper>
               <Input
                 id="slug"
                 placeholder="peach"
                 leftAddOn="https://client.haas.live/"
-                name="slug"
-                ref={form.register()}
+                {...form.register('slug')}
               />
               <UI.ErrorMessage>
                 {t(form?.errors?.slug?.message)}
@@ -251,14 +248,16 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
         </Div>
         <InputGrid>
           <InputGrid>
-            <FormControl isInvalid={!!form.errors.primaryColour} isRequired>
+            <FormControl isInvalid={!!form.formState.errors.primaryColour} isRequired>
               <FormLabel htmlFor="primaryColour">{t('branding_color')}</FormLabel>
               <InputHelper>{t('customer:branding_color_helper')}</InputHelper>
               <Controller
                 control={form.control}
                 name="primaryColour"
                 defaultValue="#BEE3F8"
-                as={<ColorPickerInput />}
+                render={({ field }) => (
+                  <ColorPickerInput {...field} />
+                )}
               />
             </FormControl>
           </InputGrid>
@@ -287,8 +286,13 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                   <InputHelper>{t('customer:use_template_helper')}</InputHelper>
                   <Controller
                     name="seed"
-                    render={({ onChange, onBlur, value }) => (
-                      <RadioButtonGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
+                    render={({ field }) => (
+                      <RadioButtonGroup
+                        display="flex"
+                        onBlur={field.onBlur}
+                        value={field.value}
+                        onChange={field.onChange}
+                      >
                         <RadioButton
                           icon={Clipboard}
                           value={1}
@@ -316,8 +320,13 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                     <InputHelper>{t('customer:fake_data_helper')}</InputHelper>
                     <Controller
                       name="willGenerateFakeData"
-                      render={({ onChange, onBlur, value }) => (
-                        <RadioButtonGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
+                      render={({ field }) => (
+                        <RadioButtonGroup
+                          display="flex"
+                          onBlur={field.onBlur}
+                          value={field.value}
+                          onChange={field.onChange}
+                        >
                           <RadioButton
                             icon={Activity}
                             value={1}

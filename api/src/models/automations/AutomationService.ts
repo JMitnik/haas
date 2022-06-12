@@ -8,11 +8,19 @@ import {
   OperandType,
   AutomationActionType,
   AutomationConditionBuilderType,
+  AutomationType,
+  AutomationScheduled,
+  Automation,
+  Customer,
+  Role,
+  User,
+  UserOfCustomer,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { UserInputError } from 'apollo-server-express';
+import { ApolloError, UserInputError } from 'apollo-server-express';
+import * as AWS from 'aws-sdk';
 
-
+import config from '../../config/config';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
@@ -34,18 +42,185 @@ import {
   UpdateAutomationInput,
 } from './AutomationTypes'
 import { AutomationActionService } from './AutomationActionService';
+import { GenerateReportPayload } from 'models/users/UserServiceTypes';
+import CustomerService from '../../models/customer/CustomerService';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
   dialogueService: DialogueService;
   userService: UserService;
   automationActionService: AutomationActionService;
+  customerService: CustomerService;
+  prisma: PrismaClient;
+  eventBridge: AWS.EventBridge;
+  lambda: AWS.Lambda;
+  iam: AWS.IAM;
 
   constructor(prisma: PrismaClient) {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
     this.dialogueService = new DialogueService(prisma);
     this.automationActionService = new AutomationActionService(prisma);
     this.userService = new UserService(prisma);
+    this.customerService = new CustomerService(prisma);
+    this.prisma = prisma;
+
+    this.iam = new AWS.IAM();
+    this.eventBridge = new AWS.EventBridge();
+    this.lambda = new AWS.Lambda();
+  }
+
+  /**
+   * Maps the actions of a scheduled automation to valid AWS EventBridge rule targets
+   * @param automationScheduledId the id of a scheduled automation
+   * @param actions a list of automation actions
+   * @param botUser the bot user of a workspace
+   * @param workspaceSlug the slug of a workspace
+   * @param dialogueSlug the slug of a dialogue
+   * @returns a list of targets for an AWS EventBridge rule
+   */
+  mapActionsToRuleTargets = (
+    automationScheduledId: string,
+    actions: AutomationAction[],
+    // TODO: Not scalable type, need to establish this as a core type
+    botUser: (User & {
+      customers: (UserOfCustomer & {
+        customer: Customer;
+        role: Role;
+        user: User;
+      })[];
+    }),
+    workspaceSlug: string,
+    dialogueSlug?: string,
+  ): AWS.EventBridge.TargetList => {
+    return actions.map((action, index) => {
+      // TODO: Not very scalable, need to split this up
+      const lambdaTargetArn = action.type === AutomationActionType.GENERATE_REPORT
+        ? process.env.GENERATE_REPORT_LAMBDA_ARN as string
+        : process.env.SEND_DIALOGUE_LINK_LAMBDA_ARN as string;
+
+      const dashboardUrl = config.dashboardUrl;
+
+      // TODO: Create a workspace scoped url instead dialogue scoped url when no dialogueSlug provided
+      const reportUrl = `${dashboardUrl}/dashboard/b/${workspaceSlug}/d/${dialogueSlug}/_reports/weekly`;
+
+      const extraGenerateParams = {
+        USER_ID: botUser.id,
+        AUTOMATION_ACTION_ID: action.id,
+        DASHBOARD_URL: 'NOT_USED_BUT_NEEDED_FOR_CHECK_IN_LAMBDA',
+        REPORT_URL: reportUrl,
+        API_URL: `${config.baseUrl}/graphql`,
+        WORKSPACE_EMAIL: botUser.email,
+        WORKSPACE_SLUG: workspaceSlug,
+        AUTHENTICATE_EMAIL: 'automations@haas.live',
+      }
+
+      const sendDialogueLinkParams = {
+        AUTOMATION_SCHEDULE_ID: automationScheduledId,
+        AUTHENTICATE_EMAIL: 'automations@haas.live',
+        API_URL: `${config.baseUrl}/graphql`,
+        WORKSPACE_EMAIL: botUser.email,
+        WORKSPACE_SLUG: workspaceSlug,
+      }
+
+      const finalInput = action.type === AutomationActionType.GENERATE_REPORT
+        ? extraGenerateParams
+        : sendDialogueLinkParams;
+
+      return {
+        Id: `${automationScheduledId}-${index}-action`,
+        Arn: lambdaTargetArn,
+        Input: JSON.stringify(finalInput),
+      }
+    })
+  }
+
+  /**
+   * Upserts an AWS EventBridge (and its targets) based on a scheduled automation
+   * @param workspaceId
+   * @param automationScheduled a scheduled automation
+   * @param parentAutomation the parent automation the scheduled automation is connected to
+   * @param dialogueId
+   */
+  upsertEventBridge = async (
+    workspaceId: string,
+    automationScheduled: AutomationScheduled,
+    // TODO: Not scalable type, need to establish this as a core type
+    parentAutomation: Automation & {
+      automationScheduled: (AutomationScheduled & {
+        actions: AutomationAction[];
+      }) | null;
+    },
+    dialogueId?: string
+  ) => {
+    const { minutes, hours, dayOfMonth, dayOfWeek, month } = automationScheduled;
+
+    // Transform the CRON expression to one supported by AWS (? indicator is not part of cron-validator)
+    const scheduledExpression = `cron(${minutes} ${hours} ${dayOfMonth === '*' ? '?' : dayOfMonth} ${month} ${dayOfWeek} *)`
+
+    // Find the state of the automation and adjust event bridge rule to that
+    const state = parentAutomation?.isActive ? 'ENABLED' : 'DISABLED';
+
+    const workspace = await this.customerService.findWorkspaceById(workspaceId) as Customer;
+    const dialogue = dialogueId ? await this.dialogueService.getDialogueById(dialogueId) : undefined;
+
+    const user = await this.userService.findBotByWorkspaceName(workspace.slug);
+
+    await this.eventBridge.putRule({
+      Name: automationScheduled.id,
+      ScheduleExpression: scheduledExpression,
+      State: state,
+      RoleArn: process.env.EVENT_BRIDGE_RUN_ALL_LAMBDAS_ROLE_ARN,
+    }).promise().catch((e) => {
+      console.log(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
+      throw new ApolloError(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
+    });
+
+    await this.eventBridge.putTargets({
+      Rule: automationScheduled.id,
+      Targets: this.mapActionsToRuleTargets(
+        automationScheduled.id,
+        parentAutomation.automationScheduled?.actions || [],
+        user!,
+        workspace.slug,
+        dialogue?.slug,
+      ),
+    }).promise().catch((e) => {
+      throw new ApolloError(`upserting targets automation schedule: ${automationScheduled.id} with error ${e}`)
+    });
+  }
+
+  /**
+   * Deletes an automation as well as its related AWS resources
+   * @param input
+   * @returns the deleted automation
+   */
+  deleteAutomation = async (input: NexusGenInputs['DeleteAutomationInput']) => {
+    const deleteAutomation = await this.automationPrismaAdapter.deleteAutomation(input);
+
+    if (deleteAutomation.automationScheduledId) {
+      // Disable in case removing fails for some reason so we don't create orphan rules which still run
+      await this.eventBridge.disableRule({
+        Name: deleteAutomation.automationScheduledId,
+      }).promise();
+
+      const targets = await this.eventBridge.listTargetsByRule({
+        Rule: deleteAutomation.automationScheduledId,
+      }).promise();
+
+      const targetIds = targets.Targets?.map((target) => target.Id) || [];
+
+      await this.eventBridge.removeTargets({
+        Force: true,
+        Rule: deleteAutomation.automationScheduledId,
+        Ids: targetIds,
+      }).promise();
+
+      await this.eventBridge.deleteRule({
+        Name: deleteAutomation.automationScheduledId,
+      }).promise();
+    }
+
+    return deleteAutomation;
   }
 
   /**
@@ -57,17 +232,15 @@ class AutomationService {
     const conditionBuilder = await this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
     const destructedData = await this.destructureBuilder(conditionBuilder as BuilderEntry);
     const validatedObjects = await this.validateConditions(destructedData, {});
-    console.log('Validated Objects: ', validatedObjects);
 
     const builderConditionsPassed = AutomationConditionBuilderService.checkConditions(validatedObjects);
-    console.log('Builder condition passed: ', builderConditionsPassed)
     return builderConditionsPassed;
   };
 
   /**
    * Restructures conditions in builder (and its nested builders) in a format more easily looped over when validating conditions
-   * e.g. 
-   * { 
+   * e.g.
+   * {
    *  AND: [
    *    condition1,
    *    {
@@ -203,6 +376,7 @@ class AutomationService {
       aspect,
       aggregate
     );
+
     const amountOperand = operands.find((operand) => operand.type === OperandType.INT);
     const textOperand = operands.find((operand) => operand.type === OperandType.STRING)?.textValue;
 
@@ -212,9 +386,9 @@ class AutomationService {
       ) ? scopedChoiceNodeEntries.aggregatedValues[textOperand] : 0;
     }
 
+    // if matchValue doesn't exist that's a condition problem -> returning null.
+    // if key doesn't exist in scopedChoiceNodeEntries.aggregatedValues -> returning 0.
     return {
-      // if matchValue doesn't exist that's a condition problem -> returning null.
-      // if key doesn't exist in scopedChoiceNodeEntries.aggregatedValues -> returning 0.
       compareValue: textOperand ? compareValue : null,
       operand: amountOperand?.numberValue,
       totalEntries: scopedChoiceNodeEntries.totalEntries,
@@ -266,7 +440,6 @@ class AutomationService {
       (!scopedData?.compareValue && typeof scopedData?.compareValue !== 'number')
       || !scopedData?.operand
     ) {
-      console.log('Some of the data necessary to validate condition is missing. Returning false');
       return false;
     }
 
@@ -376,11 +549,20 @@ class AutomationService {
   ) => {
     switch (automationAction.type) {
       case AutomationActionType.GENERATE_REPORT: {
-        return this.automationActionService.generateReport(workspaceSlug, dialogueSlug);
+        const payload = (automationAction.payload as unknown) as GenerateReportPayload;
+
+        const users = await this.userService.findTargetUsers(workspaceSlug, payload);
+        const emailAddresses = users.map((user) => user.user.email);
+
+        return this.automationActionService.generateReport(
+          automationAction.id,
+          workspaceSlug,
+          emailAddresses,
+          dialogueSlug,
+        );
       };
 
       default: {
-        console.log(`No action handler implemented for action type: ${automationAction.type}. abort.`);
         return new Promise((resolve) => resolve(''));
       }
     };
@@ -430,7 +612,6 @@ class AutomationService {
   handleTriggerAutomations = async (dialogueId: string) => {
     const candidateAutomations = await this.getCandidateTriggers(dialogueId);
     if (!candidateAutomations) {
-      console.log('No potential trigger automations found. abort');
       return;
     }
 
@@ -445,8 +626,6 @@ class AutomationService {
         await Promise.all(trigger?.actions?.map((automationAction) => {
           return this.handleAutomationAction(automationAction, workspaceSlug, dialogueSlug)
         }));
-
-        console.log('All conditions of automation trigger confirmed. Do action');
       } else {
         console.log('One or more conditions have failed. No action done');
       }
@@ -698,6 +877,25 @@ class AutomationService {
     return input as Required<CreateAutomationInput>;
   }
 
+  buildSchedule(input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['schedule'] | undefined {
+    return input?.schedule
+      ? {
+        dayOfMonth: input.schedule.dayOfMonth,
+        dayOfWeek: input.schedule.dayOfWeek,
+        hours: input.schedule.hours,
+        minutes: input.schedule.minutes,
+        month: input.schedule.month,
+        type: input.schedule.type,
+        id: input.schedule?.id || undefined,
+        dialogueScope: input.schedule.dialogueId ? {
+          connect: {
+            id: input.schedule.dialogueId,
+          },
+        } : undefined,
+      }
+      : undefined;
+  }
+
   /**
    * Constructs the Automation prisma data object for CREATING of an automation by checking the existence of fields which could be potentially be undefined or null
    * @param input object containing all information needed to create an automation
@@ -707,25 +905,21 @@ class AutomationService {
   constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput => {
     const validatedInput = this.validateCreateAutomationInput(input);
 
-    const label: CreateAutomationInput['label'] = validatedInput.label;
-    const workspaceId: CreateAutomationInput['workspaceId'] = validatedInput.workspaceId;
-    const automationType: CreateAutomationInput['automationType'] = validatedInput.automationType;
-    const conditions: CreateAutomationInput['conditions'] = this.constructCreateAutomationConditionsInput(input);
-
-    const builderInput = input.conditionBuilder as Required<NexusGenInputs['AutomationConditionBuilderInput']>;
-    const conditionBuilder: CreateAutomationInput['conditionBuilder'] = this.constructBuilderRecursive(builderInput)
-    const event: CreateAutomationInput['event'] = this.constructCreateAutomationEventInput(input);
-    const actions: CreateAutomationInput['actions'] = this.constructAutomationActionsInput(input);
+    const conditionBuilder = validatedInput. automationType === AutomationType.TRIGGER
+      ? this.constructBuilderRecursive(input.conditionBuilder as Required<NexusGenInputs['AutomationConditionBuilderInput']>)
+      : undefined;
 
     return {
-      label,
-      workspaceId,
-      automationType,
-      conditions,
-      event,
-      actions,
+      label: validatedInput.label,
+      workspaceId: validatedInput.workspaceId,
+      automationType: validatedInput.automationType,
+      conditions: validatedInput.automationType === AutomationType.TRIGGER
+        ? this.constructCreateAutomationConditionsInput(input) : undefined,
+      event: this.constructCreateAutomationEventInput(input),
+      actions: this.constructAutomationActionsInput(input),
       description: input.description,
       conditionBuilder,
+      schedule: this.buildSchedule(input),
     }
   }
 
@@ -737,12 +931,28 @@ class AutomationService {
    */
   constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): UpdateAutomationInput => {
     if (!input.id) throw new UserInputError('No ID provided for automation that should be updated!');
-    if (!input.conditionBuilder?.id) throw new UserInputError('No ID provided for the root condition builder');
+    if (input.automationType === AutomationType.TRIGGER && !input.conditionBuilder?.id) throw new UserInputError('No ID provided for the root condition builder');
 
-    const id: UpdateAutomationInput['id'] = input.id;
-    const createInput = this.constructCreateAutomationInput(input);
-    return { ...createInput, id: id, conditions: createInput.conditions || [] }
+    return { ...this.constructCreateAutomationInput(input), id: input.id }
   }
+
+  /**
+   * Enables/Disables an automation
+   * @param input an object containing the automation id as well as the state (true/false) of the automation
+   */
+  public enableAutomation = async (input: NexusGenInputs['EnableAutomationInput']) => {
+    const enabledAutomation = await this.automationPrismaAdapter.enableAutomation(input);
+
+    if (enabledAutomation.type === AutomationType.SCHEDULED && enabledAutomation.automationScheduledId) {
+      input.state
+        ? await this.eventBridge.enableRule({ Name: enabledAutomation.automationScheduledId }).promise()
+          .catch((e) => console.log(e))
+        : await this.eventBridge.disableRule({ Name: enabledAutomation.automationScheduledId }).promise()
+          .catch((e) => console.log(e));
+    }
+
+    return enabledAutomation;
+  };
 
   /**
    * Updates an automation with the provided data after validating all
@@ -750,10 +960,21 @@ class AutomationService {
    * @returns updated Automation (without relationship fields)
    * @throws UserInputError if not all information is required
    */
-  public updateAutomation = (input: NexusGenInputs['CreateAutomationInput']) => {
+  public updateAutomation = async (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to update an automation
     const validatedInput = this.constructUpdateAutomationInput(input);
-    return this.automationPrismaAdapter.updateAutomation(validatedInput);
+    const updatedAutomation = await this.automationPrismaAdapter.updateAutomation(validatedInput);
+
+    if (updatedAutomation.type === AutomationType.SCHEDULED && updatedAutomation.automationScheduled) {
+      await this.upsertEventBridge(
+        input.workspaceId as string,
+        updatedAutomation.automationScheduled,
+        updatedAutomation,
+        input.schedule?.dialogueId || undefined,
+      );
+    }
+
+    return updatedAutomation;
   }
 
   /**
@@ -762,10 +983,21 @@ class AutomationService {
    * @returns created Automation (without relationship fields)
    * @throws UserInputError if not all information is required
    */
-  public createAutomation = (input: NexusGenInputs['CreateAutomationInput']) => {
+  public createAutomation = async (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to create an automation
     const validatedInput = this.constructCreateAutomationInput(input);
-    return this.automationPrismaAdapter.createAutomation(validatedInput);
+    const createdAutomation = await this.automationPrismaAdapter.createAutomation(validatedInput);
+
+    if (createdAutomation.type === AutomationType.SCHEDULED && createdAutomation.automationScheduled) {
+      await this.upsertEventBridge(
+        input.workspaceId as string,
+        createdAutomation.automationScheduled,
+        createdAutomation,
+        input.schedule?.dialogueId || undefined,
+      );
+    }
+
+    return createdAutomation;
   }
 
   /**
