@@ -231,21 +231,24 @@ export const orderNodesByScore = (nodes: HexagonNode[]): HexagonNode[] => orderB
 
 export const getHexagonSVGFill = (score?: number) => {
   if (!score) return 'url(#dots-gray)';
-  if (score >= 40) return 'url(#dots-green)';
+  if (score >= 76) return 'url(#dots-green)';
+  if (score <= 75 && score >= 51) return 'url(#dots-orange)';
+
   return 'url(#dots-pink)';
 };
 
 export const getColorScoreBrandVariable = (score?: number, darker?: boolean) => {
   if (!score) return 'gray.500';
-  if (score >= 40) return `green.${darker ? '500' : '500'}`;
+  if (score >= 76) return `green.${darker ? '500' : '500'}`;
+  if (score <= 75 && score >= 51) return 'warning';
   return `red.${darker ? '700' : '500'}`;
 };
 
 export const getColorScoreState = (score?: number) => {
   if (!score) return 'gray';
 
-  if (score >= 40) return 'green';
-  if (score <= 70 && score >= 50) return 'orange';
+  if (score >= 76) return 'green';
+  if (score <= 75 && score >= 51) return 'orange';
 
   return 'red';
 };
