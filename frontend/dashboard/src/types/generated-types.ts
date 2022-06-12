@@ -1153,6 +1153,7 @@ export type GenerateWorkspaceCsvInputType = {
   workspaceSlug: Scalars['String'];
   workspaceTitle: Scalars['String'];
   uploadedCsv?: Maybe<Scalars['Upload']>;
+  managerCsv?: Maybe<Scalars['Upload']>;
   type?: Scalars['String'];
   generateDemoData?: Maybe<Scalars['Boolean']>;
 };

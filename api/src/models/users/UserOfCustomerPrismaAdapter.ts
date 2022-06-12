@@ -75,7 +75,26 @@ class UserOfCustomerPrismaAdapter {
         user: true,
       },
     })
-  }
+  };
+
+  /**
+   * Connects a list of private dialogues to a user
+   * @param userId 
+   * @param dialogueIds 
+   * @returns 
+   */
+  connectPrivateDialoguesToUser = async (userId: string, dialogueIds: { id: string }[]) => {
+    return this.prisma.user.update({
+      data: {
+        isAssignedTo: {
+          connect: dialogueIds,
+        },
+      },
+      where: {
+        id: userId,
+      },
+    });
+  };
 
   /**
    * Upserts a user and assignes it to a private dialogue
