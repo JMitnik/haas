@@ -28,7 +28,7 @@ export const TopbarHamburger = () => {
   return (
     <HamburgerContainer className="hamburger" px={4}>
       <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
-        <Popover.Trigger>
+        <Popover.Trigger asChild>
           <UI.Button variant="outline">
             <UI.Icon>
               <HamburgerIcon />

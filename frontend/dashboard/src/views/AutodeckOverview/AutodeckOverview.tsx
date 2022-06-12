@@ -2,14 +2,24 @@
 
 import * as UI from '@haas/ui';
 import { ArrowLeft, Download, Plus, RefreshCcw } from 'react-feather';
-import { CreateWorkspaceJobType, JobStatusType, PaginationSortByEnum, PaginationWhereInput, useConfirmWorkspaceJobMutation, useCreateWorkspaceJobMutation, useGetAutodeckJobsQuery, useRetryAutodeckJobMutation } from 'types/generated-types';
-import { DeepPartial } from 'types/customTypes';
-import { useEffect } from 'react';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+
+import {
+  CreateWorkspaceJobType,
+  JobStatusType,
+  PaginationSortByEnum,
+  PaginationWhereInput,
+  useConfirmWorkspaceJobMutation,
+  useCreateWorkspaceJobMutation,
+  useGetAutodeckJobsQuery,
+  useRetryAutodeckJobMutation,
+} from 'types/generated-types';
+import { DeepPartial } from 'types/customTypes';
+import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm';
+
 import { DateLabel, ProcessingStatus } from './Components';
 
 export const paginationFilter: PaginationWhereInput = {
@@ -130,7 +140,7 @@ export const AutodeckOverview = () => {
         </UI.Stack>
       </UI.ViewHead>
       <UI.ViewContainer>
-        <UI.Card noHover>
+        <UI.NewCard>
           <UI.Div p={2}>
             <UI.Table width="100%">
               <UI.TableHeading>
@@ -217,10 +227,10 @@ export const AutodeckOverview = () => {
               </UI.Div>
             </UI.PaginationFooter>
           )}
-        </UI.Card>
+        </UI.NewCard>
 
         <UI.Modal isOpen={isOpenDetailModel} onClose={() => setActiveJob(null)}>
-          <UI.Card bg="white" width={600} noHover>
+          <UI.NewCard bg="white" width={600}>
             <UI.CardBody>
               <UI.FormSectionHeader>{t('details')}</UI.FormSectionHeader>
               <UI.Stack mb={4}>
@@ -262,7 +272,11 @@ export const AutodeckOverview = () => {
                       >
                         {activeJob?.resourcesUrl
                           ? (
-                            <a style={{ color: 'white', textDecoration: 'none' }} href={activeJob?.resourcesUrl} download>
+                            <a
+                              style={{ color: 'white', textDecoration: 'none' }}
+                              href={activeJob?.resourcesUrl}
+                              download
+                            >
                               {t('autodeck:download_result')}
                             </a>
                           )
@@ -290,7 +304,7 @@ export const AutodeckOverview = () => {
                 </UI.Div>
               </UI.Stack>
             </UI.CardBody>
-          </UI.Card>
+          </UI.NewCard>
         </UI.Modal>
 
         <UI.Modal
@@ -300,7 +314,7 @@ export const AutodeckOverview = () => {
             setActiveJob(null);
           }}
         >
-          <UI.Card bg="white" noHover overflowY="scroll" height={800} width={1200}>
+          <UI.NewCard bg="white" overflowY="scroll" height={800} width={1200}>
             <UI.CardBody>
               <AutodeckForm
                 job={activeJob}
@@ -312,7 +326,7 @@ export const AutodeckOverview = () => {
                 onClose={() => setIsOpenImportModal(false)}
               />
             </UI.CardBody>
-          </UI.Card>
+          </UI.NewCard>
         </UI.Modal>
       </UI.ViewContainer>
     </>

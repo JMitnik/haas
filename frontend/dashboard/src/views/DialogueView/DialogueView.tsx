@@ -358,7 +358,6 @@ const DialogueView = () => {
               </UI.Skeleton>
 
               <UI.Skeleton {...fetchStatus}>
-
                 <SummaryModule
                   heading={t('dialogue:average_score')}
                   renderIcon={Award}

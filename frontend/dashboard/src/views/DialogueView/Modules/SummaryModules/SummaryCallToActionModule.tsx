@@ -1,40 +1,38 @@
+import * as UI from '@haas/ui';
 import { useHistory, useParams } from 'react-router';
 import React from 'react';
-
-import { Card, CardBody, Flex, H2, H3, Paragraph, Span } from '@haas/ui';
 
 const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: number }) => {
   const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const history = useHistory();
 
   return (
-    <Card bg="white" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)}>
-      <CardBody useFlex flexDirection="column" justifyContent="space-between" height="100%">
-        <H3 color="tertiary">
-          <Flex justifyContent="space-between" alignItems="center">
-            <Span>Call to actions</Span>
-            {/* <ChevronRight /> */}
-          </Flex>
-        </H3>
-        <Paragraph color="app.onWhite" mt={4}>
+    <UI.NewCard bg="white" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)}>
+      <UI.CardBody useFlex flexDirection="column" justifyContent="space-between" height="100%">
+        <UI.H3 color="tertiary">
+          <UI.Flex justifyContent="space-between" alignItems="center">
+            <UI.Span>Call to actions</UI.Span>
+          </UI.Flex>
+        </UI.H3>
+        <UI.Paragraph color="app.onWhite" mt={4}>
           {!callToActionCount ? (
-            <H2 color="default.darkest" mb={2}>No call to actions yet</H2>
+            <UI.H2 color="default.darkest" mb={2}>No call to actions yet</UI.H2>
           ) : (
-              <p>
-                <H2 color="default.darkest">
-                  {callToActionCount}
-                </H2>
-                {' '}
-                <Span color="default.darker">
-                  user(s) have interacted with the call to actions
+            <p>
+              <UI.H2 color="default.darkest">
+                {callToActionCount}
+              </UI.H2>
+              {' '}
+              <UI.Span color="default.darker">
+                user(s) have interacted with the call to actions
 
-                  is the score of this dialogue
-              </Span>
-              </p>
-            )}
-        </Paragraph>
-      </CardBody>
-    </Card>
+                is the score of this dialogue
+              </UI.Span>
+            </p>
+          )}
+        </UI.Paragraph>
+      </UI.CardBody>
+    </UI.NewCard>
   );
 };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card, CardBody, Div, Flex, Text } from '@haas/ui';
+import * as UI from '@haas/ui';
 import styled, { css } from 'styled-components';
 
 import { Icon } from '@chakra-ui/core';
@@ -11,10 +11,10 @@ import ModuleContainer from '../Module';
 
 const PostivePathsModuleList = styled.ol`
   ${({ theme }) => css`
-   list-style: none;
-   padding: 12px 0 0 0 !important;
-   counter-reset: item;
- 
+    list-style: none;
+    padding: 12px 0 0 0 !important;
+    counter-reset: item;
+
     li {
       counter-increment: item;
       color: ${theme.colors.default.darkest};
@@ -35,7 +35,7 @@ const PostivePathsModuleList = styled.ol`
         font-size: 0.7rem;
       }
     }
-  `} 
+  `}
 `;
 
 const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => {
@@ -43,10 +43,10 @@ const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => {
 
   return (
     <ModuleContainer>
-      <Card bg="white">
-        <CardBody display="flex" flexDirection="column">
-          <Text fontSize="1.3rem" color="teal.200">{t('dialogue:top_positive_paths')}</Text>
-          <Flex marginTop="10px" flexGrow={1} flexDirection="column">
+      <UI.NewCard>
+        <UI.CardBody display="flex" flexDirection="column">
+          <UI.Text fontSize="1.3rem" color="teal.200">{t('dialogue:top_positive_paths')}</UI.Text>
+          <UI.Flex marginTop="10px" flexGrow={1} flexDirection="column">
             {positivePaths.length > 0 && (
               <PostivePathsModuleList>
                 {positivePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
@@ -57,17 +57,24 @@ const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => {
               </PostivePathsModuleList>
             )}
 
-          </Flex>
-        </CardBody>
+          </UI.Flex>
+        </UI.CardBody>
         {!positivePaths.length && (
           <FallbackContainer>
-            <Text fontWeight="600" fontSize="1.2rem" color="gray.400">{t('dialogue:fallback_no_positive_paths')}</Text>
-            <Div>
+            <UI.Text
+              fontWeight="600"
+              fontSize="1.2rem"
+              color="gray.400"
+            >
+              {t('dialogue:fallback_no_positive_paths')}
+
+            </UI.Text>
+            <UI.Div>
               <Icon size="175px" color="gray.50" as={Smile} />
-            </Div>
+            </UI.Div>
           </FallbackContainer>
         )}
-      </Card>
+      </UI.NewCard>
     </ModuleContainer>
   );
 };

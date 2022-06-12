@@ -1,4 +1,4 @@
-import { Card, CardBody, Flex, Span, Text } from '@haas/ui';
+import * as UI from '@haas/ui';
 import { ResponsiveLine as NivoLineChart } from '@nivo/line';
 import {
   dialogueStatistics_customer_dialogue_statistics_history as SessionHistory,
@@ -23,13 +23,13 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
   ];
 
   return (
-    <Card height="400px" bg="white">
-      <CardBody height="100%">
-        <Text fontSize="1.2rem" color="gray.400">
-          <Flex justifyContent="space-between" alignItems="center">
-            <Span>{t('dialogue:score_over_time')}</Span>
-          </Flex>
-        </Text>
+    <UI.NewCard height="400px" bg="white">
+      <UI.CardBody height="100%">
+        <UI.Span fontSize="1.2rem" color="gray.400">
+          <UI.Flex justifyContent="space-between" alignItems="center">
+            <UI.Span>{t('dialogue:score_over_time')}</UI.Span>
+          </UI.Flex>
+        </UI.Span>
         <NivoLineChart
           data={data}
           margin={{ top: 50, right: 30, bottom: 70, left: 60 }}
@@ -42,15 +42,6 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
           axisRight={null}
           enableArea
           axisBottom={null}
-          // axisLeft={{
-          //   orient: 'left',
-          //   tickSize: 5,
-          //   tickPadding: 5,
-          //   tickRotation: 0,
-          //   legend: 'dialogue score',
-          //   legendOffset: -40,
-          //   legendPosition: 'middle',
-          // }}
           colors={{ scheme: 'spectral' }}
           pointSize={10}
           pointBorderWidth={2}
@@ -61,8 +52,8 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
           useMesh
 
         />
-      </CardBody>
-    </Card>
+      </UI.CardBody>
+    </UI.NewCard>
   );
 };
 

@@ -410,7 +410,7 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
             </UI.FormControl>
           </UI.Div>
         </UI.Stack>
-        <UI.Card isFlat noHover bg="gray.100">
+        <UI.NewCard bg="gray.100">
           {(activeVariantIndex === 0 || activeVariantIndex) ? (
             <ActiveVariantForm
               isReadOnly={isReadOnly}
@@ -424,7 +424,7 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
               text={t('select_a_variant')}
             />
           )}
-        </UI.Card>
+        </UI.NewCard>
         <UI.Button type="submit" isDisabled={!form.formState.isValid || isReadOnly}>
           {t('save')}
         </UI.Button>

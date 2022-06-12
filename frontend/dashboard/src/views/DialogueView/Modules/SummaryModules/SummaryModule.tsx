@@ -1,6 +1,6 @@
+import * as UI from '@haas/ui';
 import React from 'react';
 
-import { Card, CardBody, CardFooter, ColumnFlex, Div, Flex, Text } from '@haas/ui';
 import { Icon } from '@chakra-ui/core';
 import { Icon as IconType } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ interface SummaryModuleProps {
   onClick?: () => void;
 }
 
-const FallbackContainer = styled(Div)`
+const FallbackContainer = styled(UI.Div)`
   ${({ theme }) => css`
     overflow: hidden;
     position: relative;
@@ -25,13 +25,13 @@ const FallbackContainer = styled(Div)`
     display: flex;
     align-items: flex-end;
 
-    > ${Text} {
+    > ${UI.Text} {
       padding: ${theme.gutter}px;
       position: relative;
       z-index: 300;
     }
 
-    > ${Div} {
+    > ${UI.Div} {
       position: absolute;
       bottom: 0;
       right: 0;
@@ -40,7 +40,7 @@ const FallbackContainer = styled(Div)`
   `}
 `;
 
-const CornerMetricContainer = styled(Div)`
+const CornerMetricContainer = styled(UI.Div)`
   ${({ theme }) => css`
     position: absolute;
     top: ${theme.gutter / 2}px;
@@ -71,46 +71,46 @@ const SummaryModule = ({
   const { t } = useTranslation();
 
   return (
-    <Card bg="white" onClick={onClick}>
+    <UI.NewCard onClick={onClick}>
       {!isInFallback ? (
         <>
-          <CardBody>
-            <Flex>
-              <Div p={2} mr={2}>
+          <UI.CardBody>
+            <UI.Flex>
+              <UI.Div p={2} mr={2}>
                 <Icon size="24px" color="gray.300" as={renderIcon} />
-              </Div>
-              <Div>
-                <ColumnFlex>
-                  <Text fontSize="1rem" fontWeight="400" color="gray.400">
+              </UI.Div>
+              <UI.Div>
+                <UI.ColumnFlex>
+                  <UI.Text fontSize="1rem" fontWeight="400" color="gray.400">
                     {heading}
-                  </Text>
+                  </UI.Text>
                   {typeof renderMetric === 'string' ? (
-                    <Text color="gray.500" pt={1} fontWeight="800">
+                    <UI.Text color="gray.500" pt={1} fontWeight="800">
                       {renderMetric}
-                    </Text>
+                    </UI.Text>
                   ) : renderMetric}
-                </ColumnFlex>
-              </Div>
-            </Flex>
+                </UI.ColumnFlex>
+              </UI.Div>
+            </UI.Flex>
             <CornerMetricContainer>
               {renderCornerMetric}
             </CornerMetricContainer>
-          </CardBody>
-          <CardFooter bg="gray.100">
-            <Text color="gray.500">
+          </UI.CardBody>
+          <UI.CardFooter bg="gray.100">
+            <UI.Text color="gray.500">
               {renderFooterText || t('view_all')}
-            </Text>
-          </CardFooter>
+            </UI.Text>
+          </UI.CardFooter>
         </>
       ) : (
         <FallbackContainer>
-          <Text color="gray.400" fontWeight="600" fontSize="1rem">{fallbackMetric}</Text>
-          <Div>
+          <UI.Text color="gray.400" fontWeight="600" fontSize="1rem">{fallbackMetric}</UI.Text>
+          <UI.Div>
             <Icon size="150px" color="gray.50" as={renderIcon} />
-          </Div>
+          </UI.Div>
         </FallbackContainer>
       )}
-    </Card>
+    </UI.NewCard>
   );
 };
 
