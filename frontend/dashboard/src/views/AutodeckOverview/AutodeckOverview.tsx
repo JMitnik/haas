@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import * as Modal from 'components/Common/Modal';
 import {
   CreateWorkspaceJobType,
   JobStatusType,
@@ -229,7 +230,7 @@ export const AutodeckOverview = () => {
           )}
         </UI.NewCard>
 
-        <UI.Modal isOpen={isOpenDetailModel} onClose={() => setActiveJob(null)}>
+        <Modal.Root open={isOpenDetailModel} onClose={() => setActiveJob(null)}>
           <UI.NewCard bg="white" width={600}>
             <UI.CardBody>
               <UI.FormSectionHeader>{t('details')}</UI.FormSectionHeader>
@@ -305,10 +306,10 @@ export const AutodeckOverview = () => {
               </UI.Stack>
             </UI.CardBody>
           </UI.NewCard>
-        </UI.Modal>
+        </Modal.Root>
 
-        <UI.Modal
-          isOpen={isOpenImportModal}
+        <Modal.Root
+          open={isOpenImportModal}
           onClose={() => {
             setIsOpenImportModal(false);
             setActiveJob(null);
@@ -327,7 +328,7 @@ export const AutodeckOverview = () => {
               />
             </UI.CardBody>
           </UI.NewCard>
-        </UI.Modal>
+        </Modal.Root>
       </UI.ViewContainer>
     </>
   );
