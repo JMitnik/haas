@@ -220,7 +220,7 @@ export const CampaignView = () => {
       <UI.ViewBody>
         <UI.Div>
           <UI.Flex mb={2}>
-            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={(<Plus />)}>
+            <PickerButton label={t('add_filter')} icon={(<Plus />)}>
               {() => (
                 <TabbedMenu
                   menuHeader={t('add_filter')}

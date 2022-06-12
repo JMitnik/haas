@@ -283,8 +283,7 @@ const UsersOverview = () => {
       <UI.ViewBody>
         <UI.Div>
           <UI.Flex mb={2} justifyContent="space-between">
-
-            <PickerButton arrowBg="gray.50" label={t('filter_users')} icon={(<Filter />)}>
+            <PickerButton label={t('filter_users')} icon={(<Filter />)}>
               {() => (
                 <TabbedMenu
                   menuHeader={t('filter_users')}
