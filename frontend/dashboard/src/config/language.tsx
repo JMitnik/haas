@@ -819,6 +819,14 @@ const language = {
       en: 'For generic long texts',
       de: 'Für generische Long-Texte',
     },
+    communicationUser: {
+      en: 'Communication User',
+      de: 'Kommunikationsbenutzer',
+    },
+    communicationUser_helper: {
+      en: 'Support for urgent matters',
+      de: 'Unterstützung bei dringenden Angelegenheiten',
+    },
     number: {
       en: 'Number',
       de: 'Nummer',

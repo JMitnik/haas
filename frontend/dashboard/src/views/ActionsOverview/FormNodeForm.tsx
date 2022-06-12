@@ -10,11 +10,13 @@ import {
   Hash,
   Link2,
   Phone,
+  PlusCircle,
   Type,
+  Users,
 } from 'react-feather';
 import { AnimatePresence, Variants, motion } from 'framer-motion';
 import { Button } from '@chakra-ui/core';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, UseFieldArrayMethods, useFieldArray, useForm } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
@@ -24,6 +26,9 @@ import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
 import { CTANodeFormProps } from './CTATypes';
+import { Customer, Maybe, RoleType, UserType } from 'types/generated-types';
+import { TargetTypeEnum, UserNodePicker } from 'components/NodePicker/UserNodePicker';
+import Dropdown from 'components/Dropdown/Dropdown';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -35,6 +40,7 @@ enum TempFieldType {
   SHORT_TEXT = 'shortText',
   LONG_TEXT = 'longText',
   NUMBER = 'number',
+  COMMUNICATION_USER = 'communicationUser',
 }
 
 interface FieldProps {
@@ -95,6 +101,14 @@ const fieldMap: FieldProps[] = [
       allowsRequired: true,
     },
   },
+  {
+    type: TempFieldType.COMMUNICATION_USER,
+    icon: Users,
+    color: '#7274f4',
+    constraints: {
+      allowsRequired: false,
+    },
+  },
 ];
 
 interface FormNodePreviewProps {
@@ -106,12 +120,53 @@ interface FormNodePreviewProps {
   nrFields: number;
 }
 
+interface TargetEntry {
+  label: string;
+  value: string;
+  type: TargetTypeEnum;
+}
+
+const mapToUserPickerEntries = (customer: Maybe<{
+  __typename?: 'Customer' | undefined;
+} & Pick<Customer, 'id'> & {
+  users?: Maybe<({
+    __typename?: 'UserType' | undefined;
+  } & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'email' | 'phone'> & {
+    role?: Maybe<{
+      __typename?: 'RoleType' | undefined;
+    } & Pick<RoleType, 'id' | 'name'>> | undefined;
+  })[]> | undefined;
+  roles?: Maybe<({
+    __typename?: 'RoleType' | undefined;
+  } & Pick<RoleType, 'id' | 'name'>)[]> | undefined;
+}> | undefined) => {
+  const userPickerEntries: TargetEntry[] = [];
+
+  customer?.roles?.forEach((role) => {
+    userPickerEntries.push({
+      label: role.name,
+      value: role.id,
+      type: TargetTypeEnum.Role,
+    });
+  });
+
+  customer?.users?.forEach((user) => {
+    userPickerEntries.push({
+      label: `${user.firstName} ${user.lastName}`,
+      value: user.id,
+      type: TargetTypeEnum.User,
+    });
+  });
+
+  return userPickerEntries;
+};
+
 const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps) => {
   const fieldCategory = fieldMap.find((fieldItem) => fieldItem.type === field.type);
 
   const FieldIcon = fieldCategory?.icon || Feather;
   const { t } = useTranslation();
-
+  console.log('Field category: ', fieldCategory?.constraints.allowsRequired);
   return (
     <UI.Card>
       <UI.CardBody>
@@ -191,6 +246,7 @@ const childPopUp: Variants = {
 };
 
 interface FormNodeFieldFragmentProps {
+  form: any;
   field: any;
   fieldIndex: number;
   onClose: () => void;
@@ -198,7 +254,127 @@ interface FormNodeFieldFragmentProps {
   onDelete: () => void;
 }
 
-const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeFieldFragmentProps) => {
+interface FormNodeCommunicationUserFragment {
+  targetFieldArray: UseFieldArrayMethods<Record<string, any>, 'arrayKey'>;
+  form: any;
+}
+
+const FormNodeCommunicationUserFragment = ({ targetFieldArray, form }: FormNodeCommunicationUserFragment) => {
+  const [state, setState] = useState('');
+  const { t } = useTranslation();
+  const { fields: targetFields, append, remove } = targetFieldArray;
+
+  return (
+    <UI.FormControl isRequired>
+      <UI.FormLabel htmlFor="activeDialogue">
+        {t('automation:targets')}
+      </UI.FormLabel>
+      <UI.InputHelper>
+        bla bla
+      </UI.InputHelper>
+      <UI.Div>
+        <UI.Flex>
+          <UI.Div
+            width="100%"
+            backgroundColor="#fbfcff"
+            border="1px solid #edf2f7"
+            borderRadius="10px"
+            padding={2}
+          >
+            <>
+              <UI.Grid m={2} ml={0} gridTemplateColumns="1fr">
+
+                <UI.Helper>{t('automation:target')}</UI.Helper>
+              </UI.Grid>
+              {targetFields.map((target, index) => (
+                <UI.Grid
+                  key={target.arrayKey}
+                  pt={2}
+                  pb={2}
+                  pl={0}
+                  pr={0}
+                  borderBottom="1px solid #edf2f7"
+                  gridTemplateColumns="1fr"
+                >
+                  <UI.Div alignItems="center" display="flex">
+                    <Controller
+                      name={`targets.${index}.target`}
+                      control={form.control}
+                      defaultValue={undefined}
+                      render={({ field: { value, onChange } }) => (
+                        <Dropdown
+                          isRelative
+                          renderOverlay={({ onClose: onDialoguePickerClose }) => (
+                            <UserNodePicker
+                              // Handle items (in this case dialogues)
+                              items={userPickerEntries}
+                              onClose={onDialoguePickerClose}
+                              onChange={onChange}
+                            />
+                          )}
+                        >
+                          {({ onOpen }) => (
+                            <UI.Div
+                              width="100%"
+                              justifyContent="center"
+                              display="flex"
+                              alignItems="center"
+                            >
+                              {value?.value ? (
+                                <TargetCell
+                                  onRemove={() => {
+                                    if (targetFields.length > 1) {
+                                      remove(index);
+                                    } else {
+                                      onChange(null);
+                                    }
+                                  }}
+                                  onClick={onOpen}
+                                  node={value}
+                                />
+                              ) : (
+                                <UI.Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={onOpen}
+                                  variantColor="altGray"
+                                >
+                                  <UI.Icon mr={1}>
+                                    <PlusCircle />
+                                  </UI.Icon>
+                                  {t('automation:add_target')}
+                                </UI.Button>
+                              )}
+                            </UI.Div>
+                          )}
+                        </Dropdown>
+                      )}
+                    />
+                  </UI.Div>
+                </UI.Grid>
+              ))}
+              <UI.Div mt={4}>
+                <UI.Button
+                  variantColor="gray"
+                  onClick={
+                    () => append({})
+                  }
+                >
+                  <UI.Icon mr={1}>
+                    <PlusCircle />
+                  </UI.Icon>
+                  {t('add_target')}
+                </UI.Button>
+              </UI.Div>
+            </>
+          </UI.Div>
+        </UI.Flex>
+      </UI.Div>
+    </UI.FormControl>
+  );
+};
+
+const FormNodeFieldFragment = ({ form, field, onClose, onSubmit, onDelete }: FormNodeFieldFragmentProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
 
@@ -206,6 +382,12 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
     mode: 'all',
     shouldUnregister: false,
     defaultValues: field,
+  });
+
+  const targetFieldArray = useFieldArray({
+    name: 'targets',
+    control: form.control,
+    keyName: 'arrayKey',
   });
 
   const formType = subform.watch('type');
@@ -223,6 +405,8 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
   useOnClickOutside(ref, () => {
     handleSaveValues();
   });
+
+  console.log('Type: ', formType);
 
   return (
     <motion.div style={{ zIndex: 300 }} variants={parentPopup} initial="initial" animate="animate" exit="exit">
@@ -286,6 +470,11 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                       )}
                     />
                   </UI.FormControl>
+
+                  {formType === TempFieldType.COMMUNICATION_USER && (
+                    <FormNodeCommunicationUserFragment form={form} targetFieldArray={targetFieldArray} />
+                  )}
+
                 </UI.InputGrid>
                 <UI.ButtonGroup justifySelf="flex-end" display="flex">
                   <UI.Button onClick={handleSaveValues} variantColor="teal">{t('finish_editing')}</UI.Button>
@@ -383,6 +572,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                               form.setValue(`formNode.fields[${index}]`, subForm, { shouldDirty: true, shouldValidate: true });
                               form.trigger();
                             }}
+                            form={form}
                             onClose={() => setOpenedField(null)}
                             onDelete={() => remove(index)}
                             field={formNodeFields[index]}
