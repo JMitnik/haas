@@ -16,6 +16,21 @@ class UserPrismaAdapter {
   }
 
   /**
+   * Upserts a user by checking if the email already exists or not
+   * @param input 
+   * @returns 
+   */
+  upsertUserByEmail = async (input: Prisma.UserCreateInput) => {
+    return this.prisma.user.upsert({
+      where: {
+        email: input.email,
+      },
+      create: { ...input, id: input.id },
+      update: { ...input, id: input.id },
+    })
+  }
+
+  /**
    * Finds the private dialogues assigned to an user
    * @param userId 
    */

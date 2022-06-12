@@ -108,6 +108,7 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
           },
         options: options?.map((option) => ({
           id: option.id,
+          position: option.position,
           value: option.value,
           publicValue: option.publicValue,
           overrideLeaf: option.overrideLeaf,

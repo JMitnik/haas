@@ -577,15 +577,25 @@ const language = {
       en: 'Upload deliveries',
       de: 'Lieferungen hochladen.',
     },
+    upload_user_csv: {
+      en: 'Upload top down user csv',
+      de: 'Laden Sie die Top-Down-Benutzer-CSV-Datei hoch',
+    },
+    upload_user_csv_helper: {
+      en:
+        'Upload a CSV file with details about your top down users. \n - The appropriate format is to use ";" as delimiter \n - Use email;first_name?;last_name?;phone_number? as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+      de:
+        'Laden Sie eine CSV-Datei mit Details zu Ihren Top-Down-Benutzern hoch. \n - Das geeignete Format ist ";" als Trennzeichen zu verwenden. \n - Verwenden Sie email;first_name?;last_name?;phone_number? als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820',
+    },
     upload_workspace_csv: {
       en: 'Upload workspace generation csv',
       de: 'CSV-Datei für die Arbeitsbereichsgenerierung hochladen.',
     },
     upload_workspace_csv_helper: {
       en:
-        'Upload a CSV file with details about your workspace. \n - The appropriate format is to use "," as delimiter \n - Use layer_0,layer_1,layer_etc,emailAssignee,phoneAssignee as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+        'Upload a CSV file with details about your workspace. \n - The appropriate format is to use ";" as delimiter \n - Use layer_0;layer_1;layer_etc;emailAssignee;phoneAssignee as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
       de:
-        'Laden Sie eine CSV-Datei mit Details zu Ihrem Arbeitsbereich hoch. \n - Das geeignete Format ist "," als Trennzeichen zu verwenden. \n - Verwenden Sie Layer_0, Layer_1, Layer_etc, EmailAssignee, PhoneAssignee als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820',
+        'Laden Sie eine CSV-Datei mit Details zu Ihrem Arbeitsbereich hoch. \n - Das geeignete Format ist ";" als Trennzeichen zu verwenden. \n - Verwenden Sie Layer_0;Layer_1;Layer_etc;emailAssignee;phoneAssignee als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820',
     },
     upload_deliveries_helper: {
       en:
@@ -1180,6 +1190,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     visit: {
       en: 'Visit',
       de: 'Besuchen',
+    },
+    delete_dialogue_complete: {
+      en: 'Dialogue deleted',
+      de: 'Dialog gelöscht',
+    },
+    delete_dialogue_complete_helper: {
+      en: 'The selected dialogue has been successfully removed',
+      de: 'Der ausgewählte Dialog wurde erfolgreich entfernt',
     },
     delete_dialogue_popover: {
       en:

@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
+import { Customer, Prisma, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 
 import templates from '../templates';
@@ -16,6 +16,7 @@ import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import UserService from '../../models/users/UserService';
+import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -122,21 +123,56 @@ class GenerateWorkspaceService {
   }
 
   /**
+   * Based on a top down user csv, upsert available users and assign all existing private dialogues to them
+   * @param managerCsv 
+   * @param workspace 
+   */
+  addManagersFromCSV = async (managerCsv: any, workspace: Workspace) => {
+    let records = await parseCsv(await managerCsv, { delimiter: ';' });
+
+    const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER) as Role;
+
+    for (let i = 0; i < records.length; i++) {
+      const record = records[i];
+      const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'email');
+      const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'phone_number?');
+      const userLastNameEntry = Object.entries(record).find((entry) => entry[0] === 'last_name?');
+      const userFirstNameEntry = Object.entries(record).find((entry) => entry[0] === 'first_name?');
+
+      const hasEmailAssignee = !!userEmailEntry?.[1];
+      const emailAssignee = userEmailEntry?.[1] as string;
+      const phoneAssignee = userPhoneEntry?.[1] as string | undefined;
+      const firstNameAssignee = userFirstNameEntry?.[1] as string | undefined;
+      const lastNameAssignee = userLastNameEntry?.[1] as string | undefined;
+
+      if (!hasEmailAssignee || !emailAssignee || !managerRole) continue;
+
+      const user = await this.userService.upsertUserByEmail({
+        email: emailAssignee,
+        phone: phoneAssignee,
+        firstName: firstNameAssignee,
+        lastName: lastNameAssignee,
+      });
+
+      const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
+        workspace.id,
+        user.id,
+        managerRole.id,
+      );
+
+      await this.userService.connectPrivateDialoguesToUser(user.id, workspace.id);
+
+      void this.userService.sendInvitationMail(invitedUser);
+    }
+  }
+
+  /**
    * Generates a workspace based on the content of a CSV
    * @param input
    * @returns the created workspace
    */
-  async generateWorkspaceFromCSV(input: NexusGenInputs['GenerateWorkspaceCSVInputType'], userId?: string) {
-    const { uploadedCsv, workspaceSlug, workspaceTitle, type } = input;
-
-    let records = await parseCsv(await uploadedCsv, { delimiter: ',' });
-
-    // If 'wrong' delimeter is used (;) => parse again based with that delimeter
-    if (records.find((record: string | {}) => {
-      return typeof record === 'object' && Object.keys(record).find((entry) => entry.includes(';'));
-    })) {
-      records = await parseCsv(await uploadedCsv, { delimiter: ';' });
-    }
+  async generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInput, userId?: string) {
+    const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv } = input;
 
     const template = this.getTemplate(type);
     const workspace = await this.customerPrismaAdapter.createWorkspace({
@@ -148,6 +184,8 @@ class GenerateWorkspaceService {
 
     if (input.generateDemoData) return this.generateDemoData(type, workspace, userId);
 
+    let records = await parseCsv(await uploadedCsv, { delimiter: ';' });
+
     const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
     await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
       workspace.id,
@@ -158,17 +196,17 @@ class GenerateWorkspaceService {
     // For every record generate dialogue, users + assign to dialogue
     for (let i = 0; i < records.length; i++) {
       const record = records[i];
-      const layers = Object.entries(record).filter((entry) => entry[0].includes('layer'));
-      const layersContent = layers.map((layer) => layer[1] as string);
-      const dialogueSlug = layersContent.join('-');
-      const dialogueTitle = `${layersContent.join(' - ')}`
+      const layers = Object.entries(record).filter((entry) => entry[0].includes('layer') && (entry[1] as string)?.length > 0);
+      const layersContent = layers.map((layer) => (layer[1] as string).replaceAll('-', ''));
+      const dialogueSlug = layersContent.join('-').replaceAll(/[^a-zA-Z0-9&]/g, '-').replaceAll(/[--]+/g, '-').toLowerCase();
+      const dialogueTitle = layersContent.join(' - ');
 
-      const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'emailAssignee');
-      const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'phoneAssignee');
+      const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_email?');
+      const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_phone?');
       const hasEmailAssignee = !!userEmailEntry?.[1];
       const emailAssignee = userEmailEntry?.[1] as string;
       const phoneAssignee = userPhoneEntry?.[1] as string | undefined;
-      const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER);
+      const userRole = workspace.roles.find((role) => role.type === RoleTypeEnum.USER);
 
       const dialogueInput: CreateDialogueInput = {
         slug: dialogueSlug,
@@ -191,7 +229,7 @@ class GenerateWorkspaceService {
       // Check if user already exists
       // If not create new user entry + userOfCustomer entry
       // If exists => connect existing user when creating new userOfCustomer entry
-      if (!hasEmailAssignee || !emailAssignee || !managerRole) continue;
+      if (!hasEmailAssignee || !emailAssignee || !userRole) continue;
 
       const user = await this.userOfCustomerPrismaAdapter.addUserToPrivateDialogue(
         emailAssignee,
@@ -202,12 +240,13 @@ class GenerateWorkspaceService {
       const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
         workspace.id,
         user.id,
-        user.id === userId ? adminRole?.id as string : managerRole.id, // If user generating is upserted => give admin role
+        user.id === userId ? adminRole?.id as string : userRole.id, // If user generating is upserted => give admin role
       );
 
       void this.userService.sendInvitationMail(invitedUser);
-
     };
+
+    if (managerCsv) await this.addManagersFromCSV(managerCsv, workspace);
 
     return workspace;
   };

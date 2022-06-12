@@ -1,5 +1,7 @@
 import { Div, Flex, H4 } from '@haas/ui';
 import { Plus } from 'react-feather';
+import { isPresent } from 'ts-is-present';
+import { orderBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -35,6 +37,17 @@ interface QuestionSectionProps {
   problems?: (QuestionNodeProblem | undefined)[];
 }
 
+const orderByOptions = (question: QuestionEntryProps) => {
+  const { options } = question;
+  const { children } = question;
+  const orderedOptions = orderBy(options, (option) => option.position, 'asc');
+  const mappedOptionChildren = orderedOptions.map((option) => {
+    const optionChild = children?.find((child) => child.conditions[0].matchValue === option.value);
+    return optionChild;
+  }).filter(isPresent);
+  return mappedOptionChildren;
+};
+
 const QuestionSection = ({
   index,
   activeQuestion,
@@ -60,22 +73,15 @@ const QuestionSection = ({
     setQuestionExpanded((prevExpanded) => !prevExpanded);
   };
 
-  const activeChildrenIds = question.children?.map((child) => child.childNode.id);
-  const children: QuestionEntryProps[] = questionsQ.filter((childQuestion) => (
-    activeChildrenIds?.includes(childQuestion.id)
-  ));
+  const orderedChildren = question.type === 'Slider'
+    ? orderBy(question.children, (child) => child.conditions[0].renderMin, 'asc')
+    : orderByOptions(question);
 
-  // const mappedOptions = options?.map((option) => ({
-  //   id: option.id,
-  //   position: option.position,
-  //   value: option.value,
-  //   publicValue: option.publicValue,
-  //   overrideLeaf: {
-  //     label: option.overrideLeaf?.title,
-  //     value: option.overrideLeaf?.id,
-  //     type: option.overrideLeaf?.type,
-  //   },
-  // })) || [];
+  const activeChildrenIds = orderedChildren?.map((child) => child.childNode.id);
+
+  const children = activeChildrenIds?.map(
+    (childId) => questionsQ.find((childQuestion) => childQuestion.id === childId) as QuestionEntryProps,
+  ) as QuestionEntryProps[];
 
   const parentOptions = question?.options?.map((option) => ({
     id: option.id,
@@ -133,7 +139,7 @@ const QuestionSection = ({
         onActiveQuestionChange={onActiveQuestionChange}
         onAddQuestion={onAddQuestion}
         onDeleteQuestion={onDeleteQuestion}
-        key={`entry-${question.id}-${question.updatedAt}`}
+        key={`entry-${question.id}`}
         index={0}
         questionsQ={questionsQ}
         question={question}
@@ -158,7 +164,7 @@ const QuestionSection = ({
           onActiveQuestionChange={onActiveQuestionChange}
           question={child}
           questionsQ={questionsQ}
-          key={`section-${child.id}-${child.updatedAt}`}
+          key={`section-${child.id}`}
           problems={childConditionsProblems[childIndex]}
           onAddQuestion={onAddQuestion}
           onDeleteQuestion={onDeleteQuestion}

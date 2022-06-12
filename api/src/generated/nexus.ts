@@ -385,6 +385,7 @@ export interface NexusGenInputs {
   }
   GenerateWorkspaceCSVInputType: { // input type
     generateDemoData?: boolean | null; // Boolean
+    managerCsv?: any | null; // Upload
     type: string; // String!
     uploadedCsv?: any | null; // Upload
     workspaceSlug: string; // String!
