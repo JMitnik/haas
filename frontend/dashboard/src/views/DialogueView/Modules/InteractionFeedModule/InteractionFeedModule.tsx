@@ -12,7 +12,7 @@ const InteractionFeedModule = ({ interactions }: { interactions: Session[] }) =>
   const { t } = useTranslation();
 
   return (
-    <UI.NewCard bg="white">
+    <UI.Card bg="white">
       <UI.CardBody useFlex height="100%" flexDirection="column">
         <UI.Text mb={2} fontSize="1.2rem" color="gray.400">{t('latest_interactions')}</UI.Text>
 
@@ -34,7 +34,7 @@ const InteractionFeedModule = ({ interactions }: { interactions: Session[] }) =>
           </UI.Flex>
         )}
       </UI.CardBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 

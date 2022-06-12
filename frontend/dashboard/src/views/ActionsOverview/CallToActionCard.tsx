@@ -111,7 +111,7 @@ const CallToActionCard = ({
 
   return (
     <Ani.FadeFromTop>
-      <UI.NewCard opacity={isMuted ? 0.5 : 1}>
+      <UI.Card opacity={isMuted ? 0.5 : 1}>
         <UI.CardBody>
           <UI.Flex justifyContent="space-between" flexDirection="row" width="100%">
             <UI.Flex>
@@ -167,7 +167,7 @@ const CallToActionCard = ({
             </motion.div>
           )}
         </UI.CardBody>
-      </UI.NewCard>
+      </UI.Card>
     </Ani.FadeFromTop>
   );
 };

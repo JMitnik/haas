@@ -113,7 +113,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
   const { t } = useTranslation();
 
   return (
-    <UI.NewCard>
+    <UI.Card>
       <UI.CardBody>
         <UI.Flex flexWrap="wrap" justifyContent="space-between">
           {field.type ? (
@@ -159,7 +159,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
           </UI.ButtonGroup>
         </UI.Flex>
       </UI.CardBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 
@@ -198,7 +198,7 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
   });
 
   return (
-    <UI.NewCard zIndex={300} ref={ref}>
+    <UI.Card zIndex={300} ref={ref}>
       <UI.CardForm dualPane>
         <UI.List>
           <UI.ListGroupHeader>{t('select_a_field_type')}</UI.ListGroupHeader>
@@ -282,7 +282,7 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
           </UI.CardBody>
         )}
       </UI.CardForm>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 

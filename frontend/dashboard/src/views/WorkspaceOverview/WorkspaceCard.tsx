@@ -66,7 +66,7 @@ const WorkspaceCard = ({ customer }: { customer: any }) => {
     : Color('white');
 
   return (
-    <UI.NewCard
+    <UI.Card
       height="100%"
       flexDirection="column"
       onClick={() => setCustomerSlug(customer.slug)}
@@ -138,7 +138,7 @@ const WorkspaceCard = ({ customer }: { customer: any }) => {
 
         {customer?.settings?.logoUrl && <WorkspaceCardImage src={customer?.settings?.logoUrl} />}
       </UI.CardBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 

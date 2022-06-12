@@ -19,7 +19,7 @@ export const WorkspaceCardImage = styled.img`
 `;
 
 export const WorkspaceOverviewContainer = styled.div`
-  ${UI.NewCard}:hover {
+  ${UI.Card}:hover {
     ${WorkspaceCardImage} {
       transition: all .3s cubic-bezier(.55,0,.1,1);
       filter: none;

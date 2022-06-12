@@ -71,7 +71,7 @@ const SummaryModule = ({
   const { t } = useTranslation();
 
   return (
-    <UI.NewCard onClick={onClick}>
+    <UI.Card onClick={onClick}>
       {!isInFallback ? (
         <>
           <UI.CardBody>
@@ -110,7 +110,7 @@ const SummaryModule = ({
           </UI.Div>
         </FallbackContainer>
       )}
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 

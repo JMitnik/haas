@@ -24,7 +24,7 @@ export const DeliveryModalCard = ({ id }: DeliveryModalCardProps) => {
   const delivery = data?.delivery;
 
   return (
-    <UI.NewCard maxWidth={1200} mx="auto">
+    <UI.Card maxWidth={1200} mx="auto">
       <UI.ModalHead>
         <UI.ModalTitle>{t('details')}</UI.ModalTitle>
       </UI.ModalHead>
@@ -64,6 +64,6 @@ export const DeliveryModalCard = ({ id }: DeliveryModalCardProps) => {
         )}
 
       </UI.ModalBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };

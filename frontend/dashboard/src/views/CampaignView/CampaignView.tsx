@@ -496,18 +496,18 @@ export const CampaignView = () => {
         </UI.Flex>
 
         <Modal.Root open={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
-          <UI.NewCard>
+          <UI.Card>
             <UI.CardBody>
               <ImportDeliveriesForm
                 onComplete={() => refetch()}
                 onClose={() => setIsOpenImportModal(false)}
               />
             </UI.CardBody>
-          </UI.NewCard>
+          </UI.Card>
         </Modal.Root>
 
         <Modal.Root open={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
-          <UI.NewCard>
+          <UI.Card>
             <UI.CardBody>
               {campaign && (
                 <CreateCampaignForm
@@ -518,7 +518,7 @@ export const CampaignView = () => {
                 />
               )}
             </UI.CardBody>
-          </UI.NewCard>
+          </UI.Card>
         </Modal.Root>
 
         <Modal.Root open={isOpenDeliveryModal} onClose={closeDeliveryModal}>

@@ -35,7 +35,7 @@ import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
 import { Flex, Grid } from './Container';
-import { NewCard } from './Cards';
+import { Card } from './Cards';
 import { Span } from './Span';
 import { Helper, Text } from './Type';
 
@@ -959,7 +959,7 @@ export const FieldLabel = styled(Span)`
   `}
 `;
 
-export const CheckBoxCardContainer = styled(NewCard) <{ isChecked?: boolean }>`
+export const CheckBoxCardContainer = styled(Card) <{ isChecked?: boolean }>`
   ${({ theme, isChecked }) => css`
     width: 100%;
     min-height: 100px;

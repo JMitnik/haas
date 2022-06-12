@@ -43,7 +43,7 @@ const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => {
 
   return (
     <ModuleContainer>
-      <UI.NewCard>
+      <UI.Card>
         <UI.CardBody display="flex" flexDirection="column">
           <UI.Text fontSize="1.3rem" color="teal.200">{t('dialogue:top_positive_paths')}</UI.Text>
           <UI.Flex marginTop="10px" flexGrow={1} flexDirection="column">
@@ -74,7 +74,7 @@ const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => {
             </UI.Div>
           </FallbackContainer>
         )}
-      </UI.NewCard>
+      </UI.Card>
     </ModuleContainer>
   );
 };

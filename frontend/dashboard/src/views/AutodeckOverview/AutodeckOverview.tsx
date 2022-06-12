@@ -141,7 +141,7 @@ export const AutodeckOverview = () => {
         </UI.Stack>
       </UI.ViewHead>
       <UI.ViewContainer>
-        <UI.NewCard>
+        <UI.Card>
           <UI.Div p={2}>
             <UI.Table width="100%">
               <UI.TableHeading>
@@ -228,10 +228,10 @@ export const AutodeckOverview = () => {
               </UI.Div>
             </UI.PaginationFooter>
           )}
-        </UI.NewCard>
+        </UI.Card>
 
         <Modal.Root open={isOpenDetailModel} onClose={() => setActiveJob(null)}>
-          <UI.NewCard bg="white" width={600}>
+          <UI.Card bg="white" width={600}>
             <UI.CardBody>
               <UI.FormSectionHeader>{t('details')}</UI.FormSectionHeader>
               <UI.Stack mb={4}>
@@ -305,7 +305,7 @@ export const AutodeckOverview = () => {
                 </UI.Div>
               </UI.Stack>
             </UI.CardBody>
-          </UI.NewCard>
+          </UI.Card>
         </Modal.Root>
 
         <Modal.Root
@@ -315,7 +315,7 @@ export const AutodeckOverview = () => {
             setActiveJob(null);
           }}
         >
-          <UI.NewCard bg="white" overflowY="scroll" height={800} width={1200}>
+          <UI.Card bg="white" overflowY="scroll" height={800} width={1200}>
             <UI.CardBody>
               <AutodeckForm
                 job={activeJob}
@@ -327,7 +327,7 @@ export const AutodeckOverview = () => {
                 onClose={() => setIsOpenImportModal(false)}
               />
             </UI.CardBody>
-          </UI.NewCard>
+          </UI.Card>
         </Modal.Root>
       </UI.ViewContainer>
     </>

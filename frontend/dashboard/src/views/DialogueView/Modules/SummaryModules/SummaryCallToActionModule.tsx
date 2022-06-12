@@ -7,7 +7,7 @@ const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: n
   const history = useHistory();
 
   return (
-    <UI.NewCard bg="white" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)}>
+    <UI.Card bg="white" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)}>
       <UI.CardBody useFlex flexDirection="column" justifyContent="space-between" height="100%">
         <UI.H3 color="tertiary">
           <UI.Flex justifyContent="space-between" alignItems="center">
@@ -32,7 +32,7 @@ const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: n
           )}
         </UI.Paragraph>
       </UI.CardBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 

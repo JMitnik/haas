@@ -103,7 +103,7 @@ const SliderNodeForm = ({ form }: { form: any }) => {
 
           <UI.Grid>
             {markers.fields.map((marker, index) => (
-              <UI.NewCard boxShadow="md" key={marker.fieldIndex}>
+              <UI.Card boxShadow="md" key={marker.fieldIndex}>
                 <input ref={form.register()} type="hidden" name={`sliderNode.markers[${index}].id`} defaultValue={marker.id} />
                 <UI.CardBody>
                   <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr', '1fr 2fr']}>
@@ -131,7 +131,7 @@ const SliderNodeForm = ({ form }: { form: any }) => {
                     </UI.Div>
                   </UI.Grid>
                 </UI.CardBody>
-              </UI.NewCard>
+              </UI.Card>
             ))}
           </UI.Grid>
         </UI.Div>

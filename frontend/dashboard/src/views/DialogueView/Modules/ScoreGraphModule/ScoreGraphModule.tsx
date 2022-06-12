@@ -23,7 +23,7 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
   ];
 
   return (
-    <UI.NewCard height="400px" bg="white">
+    <UI.Card height="400px" bg="white">
       <UI.CardBody height="100%">
         <UI.Span fontSize="1.2rem" color="gray.400">
           <UI.Flex justifyContent="space-between" alignItems="center">
@@ -53,7 +53,7 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
 
         />
       </UI.CardBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 

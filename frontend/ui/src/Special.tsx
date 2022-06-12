@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 import React from 'react';
 import { Skeleton as ChakraSkeleton } from '@chakra-ui/core';
 import { H4, Text } from './Type';
-import { BoxShadowSize, NewCard } from './Cards';
+import { BoxShadowSize, Card } from './Cards';
 import { Span } from './Span';
 import { CloseIcon } from './assets/icon-close';
 import { Div } from './Generics';
@@ -53,7 +53,7 @@ interface IllustrationCardProps {
 
 export const IllustrationCard = ({ svg, text, children, boxShadow }: IllustrationCardProps) => {
   return (
-    <NewCard boxShadow={boxShadow}>
+    <Card boxShadow={boxShadow}>
       <IllustrationCardWrapper>
         {svg}
         <Span>
@@ -61,7 +61,7 @@ export const IllustrationCard = ({ svg, text, children, boxShadow }: Illustratio
           {children}
         </Span>
       </IllustrationCardWrapper>
-    </NewCard>
+    </Card>
   );
 };
 

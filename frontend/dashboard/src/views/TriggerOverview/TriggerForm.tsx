@@ -228,7 +228,7 @@ const FormConditionFragment = ({
   ), [watchConditionQuestion, questions]);
 
   return (
-    <UI.NewCard
+    <UI.Card
       borderTop="3px solid"
       borderColor="primary"
       mt={2}
@@ -493,7 +493,7 @@ const FormConditionFragment = ({
         </FormControl>
       )}
       <FormControl />
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 
@@ -733,7 +733,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
         </Div>
         <UI.InputGrid>
           {activeRecipients.map((recipient, index) => (
-            <UI.NewCard
+            <UI.Card
               borderTop="3px solid"
               borderColor="tertiary"
               key={index}
@@ -775,7 +775,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
-            </UI.NewCard>
+            </UI.Card>
           ))}
 
           {activeRecipients.length === 0 ? (

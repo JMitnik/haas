@@ -40,7 +40,7 @@ const NegativePathsModule = ({ negativePaths }: { negativePaths: any }) => {
   const { t } = useTranslation();
   return (
     <ModuleContainer>
-      <UI.NewCard height="100%" bg="white">
+      <UI.Card height="100%" bg="white">
         <UI.CardBody display="flex" flexDirection="column" height="100%">
           <UI.Text fontSize="1.3rem" color="red.200">{t('dialogue:top_negative_paths')}</UI.Text>
           <UI.Flex marginTop="10px" flexGrow={1} flexDirection="column">
@@ -69,7 +69,7 @@ const NegativePathsModule = ({ negativePaths }: { negativePaths: any }) => {
             </UI.Div>
           </FallbackContainer>
         )}
-      </UI.NewCard>
+      </UI.Card>
     </ModuleContainer>
   );
 };

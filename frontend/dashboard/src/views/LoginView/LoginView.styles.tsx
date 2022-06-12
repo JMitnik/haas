@@ -30,7 +30,7 @@ export const LoginContentContainer = styled(Div)`
     margin: 0 auto;
     padding: ${theme.gutter}px;
 
-    ${UI.NewCard} {
+    ${UI.Card} {
       box-shadow: ${theme.boxShadows.md};
     }
   `}

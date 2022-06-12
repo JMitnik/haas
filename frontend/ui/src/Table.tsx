@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import React from "react";
 import styled, { css } from "styled-components";
-import { CardBody, NewCard } from "./Cards";
+import { CardBody, Card } from "./Cards";
 import { IconCheck } from "./assets/icon-check";
 
 interface TableRowProps {
@@ -176,9 +176,9 @@ export const TableActionBar = ({ children }: TableActionBarProps) => {
   return (
     <TableActionBarContainer>
       <motion.div animate={{ y: 0 }} initial={{ y: 50 }}>
-        <NewCard bg="white">
+        <Card bg="white">
           <CardBody>{children}</CardBody>
-        </NewCard>
+        </Card>
       </motion.div>
     </TableActionBarContainer>
   );

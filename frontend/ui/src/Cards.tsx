@@ -2,12 +2,11 @@ import styled, { css } from 'styled-components';
 import { get } from 'lodash';
 
 import { Div } from './Generics';
-import { Span } from './Span';
 import { Button } from './Buttons';
 
 export type BoxShadowSize = 'sm' | 'md' | 'lg';
 
-export const ButtonCard = styled(Button) <{ isActive: boolean }>`
+export const ButtonCard = styled(Button)<{ isActive: boolean }>`
   ${({ theme, isActive }) => css`
     border-radius: ${theme.borderRadiuses.md};
     box-shadow: ${theme.boxShadows.md};
@@ -66,34 +65,16 @@ export const CardFooter = styled(Div)`
   `}
 `;
 
-export const CardScore = styled(Span)`
-  ${({ theme }) => css`
-    text-align: center;
-    font-weight: 800;
-    padding: 4px 8px;
-    margin-bottom: 12px;
-    font-size: 9px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid ${theme.colors.gray['400']};
-    color: ${theme.colors.gray['400']};
-    border-radius: 30px;
-  `}
-`;
-
 /**
- * New card
- *
- * TODO: Deprecate old card and rename this to Card.
+ * Card component
  */
-interface NewCardProps {
+interface CardProps {
   hasHover?: boolean;
   boxShadow?: BoxShadowSize;
   hasBlur?: boolean;
 }
 
-export const NewCard = styled(Div)<NewCardProps>`
+export const Card = styled(Div)<CardProps>`
   ${({ theme, hasHover, boxShadow = 'md', bg = 'white', hasBlur = false }) => css`
     background: ${get(theme.colors, bg as string)};
     border-radius: ${theme.borderRadiuses.lg}px;

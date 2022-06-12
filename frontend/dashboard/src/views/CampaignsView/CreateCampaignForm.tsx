@@ -412,14 +412,14 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
         </UI.Stack>
 
         {(activeVariantIndex === 0 || activeVariantIndex) ? (
-          <UI.NewCard>
+          <UI.Card>
             <ActiveVariantForm
               isReadOnly={isReadOnly}
               variant={variants[activeVariantIndex]}
               activeVariantIndex={activeVariantIndex}
               form={form}
             />
-          </UI.NewCard>
+          </UI.Card>
         ) : (
           <UI.IllustrationCard
             svg={<DecideIll />}

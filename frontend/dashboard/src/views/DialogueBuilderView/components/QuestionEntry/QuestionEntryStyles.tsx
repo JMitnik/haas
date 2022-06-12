@@ -72,7 +72,7 @@ export const AddQuestionContainer = styled(UI.Flex)`
   `}
 `;
 
-export const QuestionEntryViewContainer = styled(UI.NewCard) <{ activeCTA: string | null, id: string }>`
+export const QuestionEntryViewContainer = styled(UI.Card) <{ activeCTA: string | null, id: string }>`
   ${({ id, activeCTA, theme }) => css`
     position: relative;
     flex-direction: row;
