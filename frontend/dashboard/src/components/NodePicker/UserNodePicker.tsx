@@ -4,10 +4,22 @@ import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
-import { AutomationConditionScopeType, ConditionPropertyAggregateType } from 'types/generated-types';
+import {
+  AutomationConditionScopeType,
+  ConditionPropertyAggregateType,
+  QuestionNodeTypeEnum,
+} from 'types/generated-types';
 import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 
 import { NodePickerHeader } from './NodePickerStyles';
+
+export type TwoDateArray = [Date, Date];
+
+export interface ActiveQuestion {
+  type?: QuestionNodeTypeEnum;
+  value?: string;
+  label?: string;
+}
 
 export interface ConditionEntry {
   scopeType: AutomationConditionScopeType;
