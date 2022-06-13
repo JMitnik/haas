@@ -1,4 +1,4 @@
-import { GREEN_LOWER_BOUND, ORANGE_LOWER_BOUND, ORANGE_UPPER_BOUND } from 'config/constants';
+import { GREEN_LOWER_BOUND, ORANGE_LOWER_BOUND } from 'config/constants';
 import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
 import { meanBy, orderBy, uniqBy } from 'lodash';
 
