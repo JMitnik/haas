@@ -369,7 +369,7 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
 
   const subform = useForm({
     mode: 'all',
-    shouldUnregister: true,
+    shouldUnregister: false,
     defaultValues: field,
   });
 
@@ -527,12 +527,6 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
 
   const formNodeFields = form.watch('formNode.fields', []);
 
-  // const contactsArray = useFieldArray({
-  //   control: form.control,
-  //   name: 'formNode.fields.contact.contacts',
-  //   keyName: 'fieldIndex',
-  // });
-
   console.log('Current saved values: ', formNodeFields);
 
   return (
@@ -569,14 +563,19 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                             onSubmit={(subForm: any) => {
                               // console.log('subForm before setting value:', subForm);
                               console.log('subForm.contact.contacts:', subForm.contact.contacts);
-                              update(index, { ...subForm, contact: { contacts: [...subForm.contact.contacts] } });
+                              // update(index, { ...subForm, contact: { contacts: [...subForm.contact.contacts] });
+                              form.setValue(
+                                `formNode.fields.${index}`,
+                                { ...subForm, contact: { contacts: [...subForm.contact.contacts] } },
+                                { shouldValidate: true, shouldDirty: true },
+                              );
                               // contactsArray.update(index, subForm.contact.contacts);
                               form.trigger();
                             }}
                             form={form}
                             onClose={() => setOpenedField(null)}
                             onDelete={() => remove(index)}
-                            field={formNodeFields[index]}
+                            field={formNodeFields[index]} // formNodeFields[index]
                             fieldIndex={index}
                             key={field.fieldIndex}
                           />
