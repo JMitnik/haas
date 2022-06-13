@@ -1,11 +1,12 @@
 import { DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, Session, SliderNodeEntry } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { groupBy, maxBy, mean, meanBy, orderBy } from 'lodash';
-import { addDays, differenceInHours, isEqual } from 'date-fns';
+import { addDays, differenceInHours } from 'date-fns';
 
 import { CustomerService } from '../customer/CustomerService';
 import SessionService from '../session/SessionService';
 import NodeService from '../QuestionNode/NodeService';
+import { PrismaCacheService } from '../general/cache/PrismaCacheService';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import DialogueService from './DialogueService';
@@ -13,6 +14,7 @@ import NodeEntryService from '../node-entry/NodeEntryService';
 import { TopicService } from '../Topic/TopicService';
 import { TopicFilterInput } from '../Topic/Topic.types';
 import { Topic } from './DialogueTypes';
+import { toUTC } from '../../utils/dateUtils';
 
 const THRESHOLD = 40;
 
@@ -20,6 +22,7 @@ type UrgentPath = NexusGenFieldTypes['UrgentPath'];
 type BasicStatistic = NexusGenFieldTypes['BasicStatistics'];
 
 class DialogueStatisticsService {
+  cacheService: PrismaCacheService;
   nodeEntryService: NodeEntryService
   dialogueService: DialogueService;
   workspaceService: CustomerService;
@@ -37,7 +40,12 @@ class DialogueStatisticsService {
     this.nodeService = new NodeService(prismaClient);
     this.sessionService = new SessionService(prismaClient);
     this.topicService = new TopicService(prismaClient);
+    this.cacheService = new PrismaCacheService(prismaClient);
     this.prisma = prismaClient;
+  }
+
+  buildCacheKey(dialogueId: string, type: DialogueImpactScore, startDateTime: Date, endDateTime?: Date): string {
+    return `${dialogueId}_${type}_${startDateTime.getTime()}_${endDateTime?.getTime() ?? 0}`;
   }
 
   /**
@@ -147,39 +155,33 @@ class DialogueStatisticsService {
     refresh: boolean = false
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
+    const key = this.buildCacheKey(dialogueId, type, startDateTime, endDateTimeSet);
 
-    const prevStatistics = await this.dialoguePrismaAdapter.findDialogueStatisticsSummaryByDialogueId(
-      dialogueId,
-      startDateTime,
-      endDateTimeSet,
-      type,
-    );
+    return await this.cacheService.getOrCreate<DialogueStatisticsSummaryCache>(
+      'dialogueStatisticsSummaryCache',
+      key,
+      async () => {
+        const scopedSessions = await this.sessionService.findSessionsBetweenDates(
+          dialogueId,
+          startDateTime,
+          endDateTimeSet
+        );
 
-    // Only if more than hour difference between last cache entry and now should we update cache
-    if (prevStatistics) {
-      if (differenceInHours(Date.now(), prevStatistics.updatedAt) == 0 && !refresh) return prevStatistics;
-    }
+        const impactScore = await this.calculateImpactScore(type, scopedSessions);
 
-    const scopedSessions = await this.sessionService.findSessionsBetweenDates(
-      dialogueId,
-      startDateTime,
-      endDateTimeSet
-    );
-
-    const impactScore = await this.calculateImpactScore(type, scopedSessions);
-
-    const statisticsSummary = await this.dialoguePrismaAdapter.upsertDialogueStatisticsSummary(
-      prevStatistics?.id || '-1',
-      {
-        dialogueId: dialogueId,
-        impactScore: impactScore || 0,
-        nrVotes: scopedSessions.length,
-        impactScoreType: type,
-        startDateTime: startDateTime,
-        endDateTime: endDateTimeSet,
-      });
-
-    return statisticsSummary;
+        return {
+          id: key,
+          dialogueId: dialogueId,
+          impactScore: impactScore || 0,
+          nrVotes: scopedSessions.length,
+          impactScoreType: type,
+          startDateTime: startDateTime,
+          endDateTime: endDateTimeSet,
+          updatedAt: toUTC(new Date()),
+        }
+      },
+      { ttl: 180, enabled: refresh }
+    )
   }
 
   /**
@@ -310,13 +312,18 @@ class DialogueStatisticsService {
     const dialogueIds = await this.dialogueService.findDialogueIdsByCustomerId(customerId);
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
+    const cacheKeys = dialogueIds.map(dialogueId => this.buildCacheKey(
+      dialogueId,
+      impactScoreType,
+      startDateTime,
+      endDateTimeSet
+    ));
+
     const cachedSummaries: DialogueStatisticsSummaryCache[] = [];
-    const caches = await this.dialoguePrismaAdapter.findDialogueStatisticsSummaries(
-      dialogueIds,
-      startDateTime as Date,
-      endDateTimeSet,
-      impactScoreType
-    )
+    const caches = await this.cacheService.getBatch<DialogueStatisticsSummaryCache>(
+      'dialogueStatisticsSummaryCache',
+      cacheKeys,
+    );
 
     if (!refresh) {
       caches.forEach((cache) => {
@@ -358,19 +365,12 @@ class DialogueStatisticsService {
         nodeEntries
       );
 
-      // Since we have a unique key based on dialogue id, impact score type, start/end date
-      // We can find a unique cache id based on these variables if there is already entry
-      const cacheId = caches.find((cache) => {
-        return cache.dialogueId === dialogueId &&
-          cache.impactScoreType === impactScoreType &&
-          isEqual(cache.startDateTime as Date, startDateTime) &&
-          isEqual(cache.endDateTime as Date, endDateTimeSet)
-      })?.id;
+      const nestedCacheId = this.buildCacheKey(dialogueId, impactScoreType, startDateTime, endDateTimeSet);
 
-      const res: DialogueStatisticsSummaryCache = {
-        id: cacheId || '-1',
+      const data: DialogueStatisticsSummaryCache = {
+        id: nestedCacheId,
         dialogueId,
-        updatedAt: new Date(Date.now()),
+        updatedAt: toUTC(new Date(Date.now())),
         impactScore: impactScore || 0,
         impactScoreType: impactScoreType,
         nrVotes: nodeEntries.length || 0,
@@ -378,22 +378,7 @@ class DialogueStatisticsService {
         endDateTime: endDateTimeSet,
       }
 
-      newCaches.push(res);
-
-      // Turn promise in a void to increase performance
-      // There is no need to wait for the updated data from DB because you already have the data you need
-      void this.dialogueService.upsertDialogueStatisticsSummary(
-        res.id,
-        {
-          dialogueId: res.dialogueId,
-          impactScore: res.impactScore || 0,
-          nrVotes: res.nrVotes || 0,
-          impactScoreType: res.impactScoreType,
-          startDateTime: res.startDateTime as Date,
-          endDateTime: res.endDateTime as Date,
-        }
-      );
-
+      void this.cacheService.createOrUpdate('dialogueStatisticsSummaryCache', nestedCacheId, data);
     });
 
     return [...cachedSummaries, ...newCaches];
