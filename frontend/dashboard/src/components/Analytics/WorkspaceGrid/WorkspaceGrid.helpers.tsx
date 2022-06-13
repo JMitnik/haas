@@ -233,7 +233,7 @@ export const orderNodesByScore = (nodes: HexagonNode[]): HexagonNode[] => orderB
 export const getHexagonSVGFill = (score?: number) => {
   if (!score) return 'url(#dots-gray)';
   if (score >= GREEN_LOWER_BOUND) return 'url(#dots-green)';
-  if (score <= ORANGE_UPPER_BOUND && score >= ORANGE_LOWER_BOUND) return 'url(#dots-orange)';
+  if (score < GREEN_LOWER_BOUND && score >= ORANGE_LOWER_BOUND) return 'url(#dots-orange)';
 
   return 'url(#dots-pink)';
 };
@@ -241,7 +241,7 @@ export const getHexagonSVGFill = (score?: number) => {
 export const getColorScoreBrandVariable = (score?: number, darker?: boolean) => {
   if (!score) return 'gray.500';
   if (score >= GREEN_LOWER_BOUND) return `green.${darker ? '500' : '500'}`;
-  if (score <= ORANGE_UPPER_BOUND && score >= ORANGE_LOWER_BOUND) return 'warning';
+  if (score < GREEN_LOWER_BOUND && score >= ORANGE_LOWER_BOUND) return 'warning';
   return `red.${darker ? '700' : '500'}`;
 };
 
@@ -249,7 +249,7 @@ export const getColorScoreState = (score?: number) => {
   if (!score) return 'gray';
 
   if (score >= GREEN_LOWER_BOUND) return 'green';
-  if (score <= ORANGE_UPPER_BOUND && score >= ORANGE_LOWER_BOUND) return 'orange';
+  if (score < GREEN_LOWER_BOUND && score >= ORANGE_LOWER_BOUND) return 'orange';
 
   return 'red';
 };
