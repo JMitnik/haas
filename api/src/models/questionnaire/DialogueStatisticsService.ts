@@ -180,7 +180,7 @@ class DialogueStatisticsService {
           updatedAt: toUTC(new Date()),
         }
       },
-      { ttl: 180, enabled: refresh }
+      { ttl: 180, enabled: !refresh }
     )
   }
 
