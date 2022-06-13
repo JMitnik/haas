@@ -45,6 +45,11 @@ export interface FormDataProps {
       type: string;
       isRequired: boolean;
       position: number;
+      targets?: {
+        label: string;
+        value: string;
+        type: string;
+      }[]
     }[];
   };
 }

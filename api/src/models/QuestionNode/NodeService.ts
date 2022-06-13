@@ -10,7 +10,7 @@ import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
-import templates from '../templates/index';
+import UserService from '../../models/users/UserService';
 
 export interface IdMapProps {
   [details: string]: string;
@@ -22,12 +22,14 @@ export class NodeService {
   edgeService: EdgeService;
   edgePrismaAdapter: EdgePrismaAdapter;
   dialoguePrismaAdapter: DialoguePrismaAdapter;
+  userService: UserService;
 
   constructor(prismaClient: PrismaClient) {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.edgeService = new EdgeService(prismaClient);
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
+    this.userService = new UserService(prismaClient);
     this.prisma = prismaClient;
   }
 
@@ -92,12 +94,15 @@ export class NodeService {
     const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(input.customerSlug, input.dialogueSlug);
     if (!dialogue?.id) throw 'No Dialogue found to add CTA to!'
 
+
+    const form = input.form ? await this.saveCreateFormNodeInput(input.form, input.customerSlug) : undefined;
+
     const callToAction = await this.questionNodePrismaAdapter.createCallToAction({
       dialogueId: dialogue.id,
       links: input.links,
       share: input.share,
       title: input.title,
-      form: input.form,
+      form: form,
       type: input.type,
     });
 
@@ -195,7 +200,7 @@ export class NodeService {
           helperText: input.form.helperText || '',
         })
       } else {
-        const fields = NodeService.saveCreateFormNodeInput(input.form);
+        const fields = await this.saveCreateFormNodeInput(input.form, input.customerSlug);
         await this.questionNodePrismaAdapter.createFieldsOfForm({
           questionId: input.id,
           fields,
@@ -364,18 +369,27 @@ export class NodeService {
   /**
    * Save FormNodeInput when `creating`
    */
-  static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Prisma.FormNodeCreateInput => ({
-    helperText: input.helperText,
-    fields: {
-      create: input.fields?.map((field) => ({
-        type: field.type || 'shortText',
-        label: field.label || '',
-        position: field.position || -1,
-        placeholder: field.placeholder || '',
-        isRequired: field.isRequired || false,
-      })),
-    },
-  });
+  saveCreateFormNodeInput = async (input: NexusGenInputs['FormNodeInputType'], workspaceSlug: string): Promise<Prisma.FormNodeCreateInput> => {
+    const communicationUser = input.fields?.find((field) => field.targets?.length);
+    const targetUsers = communicationUser?.targets?.length
+      ? await this.userService.findTargetUsersFromPicker(workspaceSlug, communicationUser?.targets)
+      : [];
+
+
+    return ({
+      helperText: input.helperText,
+      fields: {
+        create: input.fields?.map((field) => ({
+          type: field.type || 'shortText',
+          label: field.label || '',
+          position: field.position || -1,
+          placeholder: field.placeholder || '',
+          isRequired: field.isRequired || false,
+          // targets: 
+        })),
+      },
+    })
+  };
 
   /**
    * Get all links belonging to a particular node.

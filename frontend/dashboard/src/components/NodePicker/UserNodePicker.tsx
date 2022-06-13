@@ -78,12 +78,16 @@ interface NodePickerProps {
   onChange: (node: ConditionEntry) => void;
   items: UserEntry[];
   onClose?: () => void;
+  isMulti?: boolean;
+  currValues: ConditionEntry[];
 }
 
 export const UserNodePicker = ({
   onChange,
   onClose,
   items,
+  currValues,
+  isMulti,
 }: NodePickerProps) => {
   const [filteredState, setFilteredState] = useState<TargetTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
@@ -136,9 +140,13 @@ export const UserNodePicker = ({
           <UI.Div>
             <UI.Text>{t('search')}</UI.Text>
             <UI.Select
+              // @ts-ignore
+              isMulti={isMulti}
               menuIsOpen
               autoFocus
               options={filteredItems}
+              defaultValue={currValues}
+              isOptionDisabled={(e, selectedValues) => selectedValues.length >= 4}
               onChange={onChange}
               components={{
                 Option: DropdownOption,

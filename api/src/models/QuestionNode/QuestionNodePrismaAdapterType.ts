@@ -1,36 +1,36 @@
-import { Prisma, LinkTypeEnum } from "@prisma/client"
+import { Prisma, LinkTypeEnum } from '@prisma/client'
 
-import { NexusGenInputs } from "../../generated/nexus"
-import { CreateQuestionInput } from "../questionnaire/DialoguePrismaAdapterType"
+import { NexusGenInputs } from '../../generated/nexus'
+import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType'
 
-export type CreateCTAInput = {
-  title: string,
-  type?: "GENERIC" | "SLIDER" | "FORM" | "CHOICE" | "REGISTRATION" | "TEXTBOX" | "LINK" | "SHARE" | "VIDEO_EMBEDDED" | undefined,
-  form?: NexusGenInputs['FormNodeInputType'] | null, // FormNodeInputType
+export interface CreateCTAInput {
+  title: string;
+  type?: 'GENERIC' | 'SLIDER' | 'FORM' | 'CHOICE' | 'REGISTRATION' | 'TEXTBOX' | 'LINK' | 'SHARE' | 'VIDEO_EMBEDDED' | undefined;
+  form?: Prisma.FormNodeCreateInput | undefined; // FormNodeInputType
   links: {
     id: string | undefined;
     backgroundColor: string | undefined;
     iconUrl: string | undefined;
     title: string | undefined;
-    type: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP" | "SINGLE";
+    type: 'API' | 'FACEBOOK' | 'INSTAGRAM' | 'LINKEDIN' | 'SOCIAL' | 'TWITTER' | 'WHATSAPP' | 'SINGLE';
     url: string;
-  }[],
+  }[];
   share: {
     id: string | undefined;
     title: string;
     tooltip: string | undefined;
     url: string;
-  } | undefined,
-  dialogueId: string,
+  } | undefined;
+  dialogueId: string;
 }
 
-export type UpdateFormFieldsInput = {
+export interface UpdateFormFieldsInput {
   questionId: string;
   fields: Prisma.FormNodeFieldUpsertArgs[];
   helperText?: string;
 }
 
-export type CreateFormFieldsInput = {
+export interface CreateFormFieldsInput {
   questionId: string;
   fields: Prisma.FormNodeCreateInput;
   helperText?: string;
@@ -57,7 +57,7 @@ export interface CreateLinkInput extends UpdateLinkInput {
   questionId: string;
 }
 
-export type UpdateShareInput = {
+export interface UpdateShareInput {
   title: string;
   url: string;
   tooltip: string;

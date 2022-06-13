@@ -956,10 +956,12 @@ input FormNodeFieldInput {
   placeholder: String
   position: Int
   type: FormNodeFieldTypeEnum
+  userIds: [String!]
 }
 
 """The types a field can assume"""
 enum FormNodeFieldTypeEnum {
+  contacts
   email
   longText
   number
@@ -1428,6 +1430,12 @@ type PermssionType {
   description: String
   id: ID!
   name: String!
+}
+
+input PickerEntryInput {
+  label: String!
+  type: String!
+  value: String!
 }
 
 type PreviewDataType {
@@ -1972,6 +1980,7 @@ enum TriggerTypeEnum {
 
 input UpdateCTAInputType {
   customerId: ID
+  customerSlug: String!
   form: FormNodeInputType
   id: String
   links: CTALinksInputType

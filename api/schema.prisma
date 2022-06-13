@@ -170,6 +170,7 @@ model FormNodeField {
   type                   FormNodeFieldType        @default(shortText)
   isRequired             Boolean                  @default(false)
   position               Int
+  contacts               User[]
   formNodeId             String?
   FormNode               FormNode?                @relation(fields: [formNodeId], references: [id])
   FormNodeFieldEntryData FormNodeFieldEntryData[]
@@ -460,7 +461,9 @@ model User {
   customers          UserOfCustomer[]
   triggers           Trigger[]
 
-  isAssignedTo Dialogue[]
+  isAssignedTo    Dialogue[]
+  FormNodeField   FormNodeField? @relation(fields: [formNodeFieldId], references: [id])
+  formNodeFieldId String?
 }
 
 model UserOfCustomer {
@@ -851,6 +854,7 @@ enum FormNodeFieldType {
   shortText
   longText
   number
+  contacts
 }
 
 enum LinkTypeEnum {

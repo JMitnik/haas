@@ -163,6 +163,7 @@ const CTAForm = ({
           placeholder: field.placeholder,
           isRequired: boolToInt(field.isRequired),
           position: field.position,
+          contacts: field?.contacts || { contacts: [] },
         })) || [],
       },
     },
@@ -270,6 +271,7 @@ const CTAForm = ({
         variables: {
           input: {
             id,
+            customerSlug,
             customerId: activeCustomer?.id,
             title: formData.title,
             type: formData.ctaType.value || undefined,

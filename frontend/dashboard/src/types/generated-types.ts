@@ -1139,6 +1139,7 @@ export type FormNodeFieldInput = {
   type?: Maybe<FormNodeFieldTypeEnum>;
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
+  targets?: Maybe<Array<PickerEntryInput>>;
 };
 
 /** The types a field can assume */
@@ -1148,7 +1149,8 @@ export enum FormNodeFieldTypeEnum {
   Url = 'url',
   ShortText = 'shortText',
   LongText = 'longText',
-  Number = 'number'
+  Number = 'number',
+  CommunicationUser = 'communicationUser'
 }
 
 export type FormNodeInputType = {
@@ -1939,6 +1941,12 @@ export type PermssionType = {
   customer?: Maybe<Customer>;
 };
 
+export type PickerEntryInput = {
+  label: Scalars['String'];
+  value: Scalars['String'];
+  type: Scalars['String'];
+};
+
 export type PreviewDataType = {
   __typename?: 'PreviewDataType';
   colors: Array<Scalars['String']>;
@@ -2641,6 +2649,7 @@ export enum TriggerTypeEnum {
 export type UpdateCtaInputType = {
   id?: Maybe<Scalars['String']>;
   customerId?: Maybe<Scalars['ID']>;
+  customerSlug: Scalars['String'];
   title?: Maybe<Scalars['String']>;
   type?: Maybe<QuestionNodeTypeEnum>;
   links?: Maybe<CtaLinksInputType>;

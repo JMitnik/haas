@@ -1,5 +1,5 @@
 import { PrismaClient, NodeType } from '@prisma/client';
-import { enumType, extendType, inputObjectType, objectType, queryField } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, interfaceType, objectType, queryField } from '@nexus/schema';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 
 import { CTALinksInputType, LinkType } from '../link/Link';
@@ -94,7 +94,16 @@ export const FormNodeFieldTypeEnum = enumType({
   name: 'FormNodeFieldTypeEnum',
   description: 'The types a field can assume',
 
-  members: ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number'],
+  members: ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number', 'contacts'],
+});
+
+export const PickerEntryInput = inputObjectType({
+  name: 'PickerEntryInput',
+  definition(t) {
+    t.string('label', { required: true });
+    t.string('value', { required: true });
+    t.string('type', { required: true });
+  },
 });
 
 export const FormNodeFieldInput = inputObjectType({
@@ -107,6 +116,7 @@ export const FormNodeFieldInput = inputObjectType({
     t.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired', { default: false });
     t.int('position');
+    t.list.string('userIds');
   },
 });
 
@@ -688,6 +698,8 @@ export const QuestionNodeMutations = extendType({
           links: mappedLinks,
           questionId: args.input.questionId,
         }
+
+        console.log('create cta form: ', args.input.form);
 
         return ctx.services.nodeService.createCallToAction(createCTAInput);
       },

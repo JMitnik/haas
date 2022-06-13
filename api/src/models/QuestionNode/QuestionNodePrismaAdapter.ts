@@ -312,7 +312,7 @@ class QuestionNodePrismaAdapter {
           create: input.share,
         },
         form: {
-          create: input.form ? NodeService.saveCreateFormNodeInput(input.form) : undefined,
+          create: input.form,
         },
         questionDialogue: {
           connect: {
