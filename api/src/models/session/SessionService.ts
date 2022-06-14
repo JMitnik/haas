@@ -3,6 +3,7 @@ import {
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { sortBy, uniq } from 'lodash';
+import { addDays, differenceInHours } from 'date-fns';
 
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
@@ -16,17 +17,24 @@ import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 import AutomationService from '../automations/AutomationService';
-import { addDays, differenceInHours } from 'date-fns';
+import { CreateSessionInput } from './SessionPrismaAdapterType';
+import DialoguePrismaAdapter from '../../models/questionnaire/DialoguePrismaAdapter';
+import NodeEntryPrismaAdapter from '../../models/node-entry/NodeEntryPrismaAdapter';
+
 
 class SessionService {
   sessionPrismaAdapter: SessionPrismaAdapter;
   triggerService: TriggerService;
   automationService: AutomationService;
+  dialoguePrismaAdapter: DialoguePrismaAdapter;
+  nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.triggerService = new TriggerService(prismaClient);
     this.automationService = new AutomationService(prismaClient);
+    this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
+    this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
   };
 
   /**
@@ -206,7 +214,7 @@ class SessionService {
   * Create a user-session from the client.
   */
   async createSession(sessionInput: any) {
-    const { dialogueId, entries } = sessionInput;
+    const { dialogueId, entries }: { dialogueId: string; entries: CreateSessionInput['entries'] } = sessionInput;
     const sliderNode = entries.find((entry: any) => entry?.data?.slider && entry?.depth === 0);
     const mainScore = sliderNode?.data?.slider?.value;
     const session = await this.sessionPrismaAdapter.createSession({
@@ -216,7 +224,7 @@ class SessionService {
       entries,
       dialogueId,
       createdAt: sessionInput?.createdAt,
-      mainScore,
+      mainScore: mainScore || undefined,
     });
 
     try {

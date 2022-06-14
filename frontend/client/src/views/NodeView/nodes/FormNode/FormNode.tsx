@@ -69,13 +69,10 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
 
   const fields = node?.form?.fields;
 
-  console.log('Fields: ', fields);
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formEntry = getValues();
 
-    console.log('Form entry: ', formEntry);
     const entry: any = {
       form: {
         values: formEntry.fields.map((fieldEntry, index) => ({
@@ -85,12 +82,8 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
       },
     };
 
-    console.log('entry: ', entry);
-
-    // onEntryStore(entry, formEntry);
+    onEntryStore(entry, formEntry);
   };
-
-  console.log('Form watch: ', watch());
 
   return (
     <UI.Div>
@@ -132,13 +125,14 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                         <Controller
                           name={`fields.${index}.value`}
                           control={control}
-                          defaultValue=""
+                          defaultValue={undefined}
+                          rules={{ required: field.isRequired }}
                           render={({ value, onChange, onBlur }) => (
                             <RadioGroup.Root
                               defaultValue={value}
                               onValueChange={onChange}
                               onBlur={onBlur}
-                              variant="joined"
+                              variant="tight"
                             >
                               {field.contacts?.map((contact) => (
                                 <RadioGroup.Item
@@ -148,17 +142,12 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                                   contentVariant="twoLine"
                                   variant="boxed"
                                 >
-                                  <UI.Flex flexDirection="column" alignItems="flex-start">
-                                    <RadioGroup.Label>
+                                  <UI.Flex flexDirection="column" alignItems="flex-start" justifyContent="center">
+                                    <RadioGroup.Label style={{ marginBottom: 0, marginTop: '4px' }}>
                                       {contact?.firstName}
                                       {' '}
                                       {contact?.lastName}
                                     </RadioGroup.Label>
-                                    <RadioGroup.Subtitle>
-                                      A request for conversation will be sent to
-                                      {' '}
-                                      {contact.email}
-                                    </RadioGroup.Subtitle>
                                   </UI.Flex>
 
                                 </RadioGroup.Item>

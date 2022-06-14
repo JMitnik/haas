@@ -107,6 +107,7 @@ export const FormNodeEntryFieldInput = inputObjectType({
     t.string('url', { required: false });
     t.string('shortText', { required: false });
     t.string('longText', { required: false });
+    t.string('contacts', { required: false });
     t.int('number', { required: false });
   },
 });

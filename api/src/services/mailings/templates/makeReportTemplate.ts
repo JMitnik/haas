@@ -40,12 +40,12 @@ const makeReportMailTemplate = ({ recipientMail, reportUrl, bgColor = '#0059f8' 
             <mj-section background-color="#eef1f5">
             <mj-column width="100%">
             <mj-text>
-            Hi ${recipientMail}, a weekly report is ready for you.
+            Hi ${recipientMail}, a team member has a problem and requested to communicate with you.
             </mj-text>
 
             ${reportUrl && `
                 <mj-text>
-                To sign in, please click on the following link:
+                To open the report, please click on the following link:
                 </mj-text>
                 <mj-button href="${reportUrl}" background-color="#36d399">
                 📄 Report link

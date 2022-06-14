@@ -191,6 +191,7 @@ model FormNodeFieldEntryData {
   url             String?
   shortText       String?
   longText        String?
+  contacts        String?
   number          Int?
   relatedFieldId  String
   formNodeEntryId Int?

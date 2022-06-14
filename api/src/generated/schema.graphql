@@ -911,6 +911,7 @@ type FontSettings {
 
 """FormNodeEntryInput"""
 input FormNodeEntryFieldInput {
+  contacts: String
   email: String
   longText: String
   number: Int

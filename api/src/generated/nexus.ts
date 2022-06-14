@@ -351,6 +351,7 @@ export interface NexusGenInputs {
     userId?: string | null; // String
   }
   FormNodeEntryFieldInput: { // input type
+    contacts?: string | null; // String
     email?: string | null; // String
     longText?: string | null; // String
     number?: number | null; // Int
