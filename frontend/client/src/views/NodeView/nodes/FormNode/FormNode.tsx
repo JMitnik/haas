@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { AtSign, FileText, Hash, Link2, Phone, Type } from 'react-feather';
 import { ClientButton } from 'components/Buttons/Buttons';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { motion } from 'framer-motion';
@@ -60,7 +60,7 @@ const getFieldValue = (field: any, relatedField: any) => {
 
 const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
   const { t } = useTranslation();
-  const { register, getValues, formState, control, watch } = useForm<FormNodeFormProps>({
+  const { register, getValues, formState, control } = useForm<FormNodeFormProps>({
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
