@@ -113,6 +113,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                       <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
                       {field.type === 'longText' && (
                         <UI.Textarea
+                          key={`longText-${index}`}
                           id={`fields[${index}].value`}
                           variant="outline"
                           name={`fields.${index}.value`}
@@ -122,54 +123,45 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                         />
                       )}
                       {field.type === 'contacts' && (
-                        <UI.Div>
-                          Ik weet dat ik een contacts ben
-                          {field.contacts?.map((contact) => (
-                            <UI.Div>
-                              Contact
-                              {' '}
-                              {contact.email}
-                            </UI.Div>
-                          ))}
-                        </UI.Div>
+                        <Controller
+                          key="contactsradio"
+                          name={`fields.${index}.value`}
+                          control={control}
+                          defaultValue={undefined}
+                          rules={{ required: field.isRequired }}
+                          render={({ value, onChange, onBlur }) => (
+                            <RadioGroup.Root
+                              defaultValue={value}
+                              onValueChange={onChange}
+                              onBlur={onBlur}
+                              variant="tight"
+                            >
+                              {field.contacts?.map((contact) => (
+                                <RadioGroup.Item
+                                  isActive={value === contact.email}
+                                  value={contact.email}
+                                  key={contact.id}
+                                  contentVariant="twoLine"
+                                  variant="boxed"
+                                >
+                                  <UI.Flex flexDirection="column" alignItems="flex-start" justifyContent="center">
+                                    <RadioGroup.Label style={{ marginBottom: 0, marginTop: '4px' }}>
+                                      {contact?.firstName}
+                                      {' '}
+                                      {contact?.lastName}
+                                    </RadioGroup.Label>
+                                  </UI.Flex>
 
-                        // <Controller
-                        //   name={`fields.${index}.value`}
-                        //   control={control}
-                        //   defaultValue={undefined}
-                        //   rules={{ required: field.isRequired }}
-                        //   render={({ value, onChange, onBlur }) => (
-                        //     <RadioGroup.Root
-                        //       defaultValue={value}
-                        //       onValueChange={onChange}
-                        //       onBlur={onBlur}
-                        //       variant="tight"
-                        //     >
-                        //       {field.contacts?.map((contact) => (
-                        //         <RadioGroup.Item
-                        //           isActive={value === contact.email}
-                        //           value={contact.email}
-                        //           key={contact.id}
-                        //           contentVariant="twoLine"
-                        //           variant="boxed"
-                        //         >
-                        //           <UI.Flex flexDirection="column" alignItems="flex-start" justifyContent="center">
-                        //             <RadioGroup.Label style={{ marginBottom: 0, marginTop: '4px' }}>
-                        //               {contact?.firstName}
-                        //               {' '}
-                        //               {contact?.lastName}
-                        //             </RadioGroup.Label>
-                        //           </UI.Flex>
+                                </RadioGroup.Item>
+                              ))}
 
-                        //         </RadioGroup.Item>
-                        //       ))}
-
-                        //     </RadioGroup.Root>
-                        //   )}
-                        // />
+                            </RadioGroup.Root>
+                          )}
+                        />
                       )}
                       {field.type !== 'longText' && field.type !== 'contacts' && (
                         <UI.Input
+                          key={`input-${index}`}
                           id={`fields[${index}].value`}
                           variant="outline"
                           leftEl={mapIcon[field?.type] || <Type />}
