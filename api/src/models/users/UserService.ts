@@ -26,25 +26,6 @@ class UserService {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
   };
 
-  findTargetUsersFromPicker = async (workspaceSlug: string, targets: NexusGenInputs['PickerEntryInput'][]) => {
-    const roleIds: string[] = [];
-    const userIds: string[] = [];
-
-    targets.forEach((target) => {
-      if (target.type === 'ROLE') {
-        roleIds.push(target.value);
-      };
-
-      if (target.type === 'USER') {
-        userIds.push(target.value);
-      }
-    });
-
-    const targetIds = { roleIds, userIds };
-
-    return this.userOfCustomerPrismaAdapter.findTargetUsers(workspaceSlug, targetIds);
-  }
-
   /**
    * Finds all users based on a AutomationAction payload
    * @param workspaceSlug 

@@ -44,6 +44,12 @@ class NodeEntryService {
     )
   }
 
+  /**
+   * Builds the emergency email body and sends the email to the provided email address
+   * @param dialogueId 
+   * @param email 
+   * @param comment the text entered by a user in the comment (longText) field
+   */
   sendEmergencyMail = async (dialogueId: string, email: string, comment?: string) => {
     const dialogue = await this.dialoguePrismaAdapter.getDialogueById(dialogueId, true) as DialogueWithCustomer;
 
@@ -62,14 +68,12 @@ class NodeEntryService {
   }
 
   /**
-   * Create node-entries.
+   * Create node-entries. if node entry contains an emergency contact, send a email to the contact 
    * */
   handleNodeEntryAppend = async (sessionId: string, nodeEntryInput: NexusGenInputs['NodeEntryInput']): Promise<NodeEntry> => {
     const createNodeEntryFragment = NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput);
     const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value.contacts);
     const emergencyComment = nodeEntryInput.data?.form?.values?.find((value) => value.longText);
-    console.log('Emergency comment: ', emergencyComment);
-    console.log('Emergency contact: ', emergencyContact);
     const nodeEntry = await this.nodeEntryPrismaAdapter.create({
       session: { connect: { id: sessionId } },
       ...createNodeEntryFragment,
@@ -79,7 +83,6 @@ class NodeEntryService {
       try {
         const emailAddress = emergencyContact.contacts;
         const comment = emergencyComment?.longText;
-        console.log('EMAIL + COMMENT: ', emailAddress, comment);
         const session = await this.sessionPrismaAdapter.findSessionById(sessionId);
         await this.sendEmergencyMail(
           session?.dialogueId as string,
