@@ -50,6 +50,12 @@ const getDialogueFromSlug = gql`
               placeholder
               isRequired
               position
+              contacts {
+                id
+                email
+                firstName
+                lastName
+              }
             }
           }
         }

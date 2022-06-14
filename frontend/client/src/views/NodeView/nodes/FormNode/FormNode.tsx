@@ -67,6 +67,8 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
 
   const fields = node?.form?.fields;
 
+  console.log('Fields: ', fields);
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formEntry = getValues({ nest: true });

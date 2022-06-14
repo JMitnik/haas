@@ -36,32 +36,32 @@ interface TreeActionStartProps {
 }
 
 export type TreeAction =
-| {
-  type: 'startTree',
-  payload: TreeActionStartProps
-}
-| {
-  type: 'goToChild';
-  payload: TreeActionGotoChildProps;
-}
-| {
-  type: 'popTreeState';
-  payload: TreeActionGotoChildProps;
-}
-| {
-  type: 'finish';
-}
-| {
-  type: 'setDialogueAndCustomer';
-  dialogue: Dialogue;
-  customer: any;
-}
-| {
-  type: 'unsetDialogueAndCustomer'
-}
-| {
-  type: 'resetTree'
-};
+  | {
+    type: 'startTree',
+    payload: TreeActionStartProps
+  }
+  | {
+    type: 'goToChild';
+    payload: TreeActionGotoChildProps;
+  }
+  | {
+    type: 'popTreeState';
+    payload: TreeActionGotoChildProps;
+  }
+  | {
+    type: 'finish';
+  }
+  | {
+    type: 'setDialogueAndCustomer';
+    dialogue: Dialogue;
+    customer: any;
+  }
+  | {
+    type: 'unsetDialogueAndCustomer'
+  }
+  | {
+    type: 'resetTree'
+  };
 
 export interface TreeStateProps {
   historyStack: HAASEntry[];
