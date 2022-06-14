@@ -122,7 +122,17 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                         />
                       )}
                       {field.type === 'contacts' && (
-                        <UI.Div>Ik weet dat ik een contacts ben</UI.Div>
+                        <UI.Div>
+                          Ik weet dat ik een contacts ben
+                          {field.contacts?.map((contact) => (
+                            <UI.Div>
+                              Contact
+                              {' '}
+                              {contact.email}
+                            </UI.Div>
+                          ))}
+                        </UI.Div>
+
                         // <Controller
                         //   name={`fields.${index}.value`}
                         //   control={control}
