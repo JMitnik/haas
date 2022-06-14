@@ -43,8 +43,8 @@ export interface TargetEntry {
 
 export interface ActionEntry {
   type: AutomationActionType;
-  targets: {
-    target: TargetEntry;
+  targets?: {
+    target?: TargetEntry;
   }[];
 }
 

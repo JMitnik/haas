@@ -367,7 +367,7 @@ const AddDialogueView = () => {
                             />
                           )}
                         />
-                        <FormErrorMessage>{form.formState.errors.dialogueOption?.value?.message}</FormErrorMessage>
+                        <FormErrorMessage>{form.formState.errors.dialogueOption}</FormErrorMessage>
                       </FormControl>
                     ))}
                   </InputGrid>

@@ -79,7 +79,7 @@ interface NodePickerProps {
   items: UserEntry[];
   onClose?: () => void;
   isMulti?: boolean;
-  currValues: ConditionEntry[];
+  currValues?: ConditionEntry[];
 }
 
 export const UserNodePicker = ({

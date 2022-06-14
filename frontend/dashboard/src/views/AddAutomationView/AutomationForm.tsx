@@ -364,7 +364,8 @@ const AutomationForm = ({
 
   const history = useHistory();
   const form = useForm<FormDataProps>({
-    resolver: yupResolver(schema),
+    // TODO: Random introduction of typescript error see https://github.com/react-hook-form/react-hook-form/issues/6523
+    resolver: yupResolver(schema) as any,
     mode: 'onChange',
     defaultValues: {
       title: automation?.label,
@@ -505,7 +506,7 @@ const AutomationForm = ({
   return (
     <>
       <UI.FormContainer>
-        <Form onSubmit={form.handleSubmit(onSubmit)}>
+        <Form onSubmit={form.handleSubmit((formData) => onSubmit(formData as FormDataProps))}>
           <FormSection id="general">
             <Div>
               <H3 color="default.text" fontWeight={500} pb={2}>{t('automation:about')}</H3>
@@ -702,7 +703,7 @@ const AutomationForm = ({
                                   return (
                                     <Select
                                       options={[{ label: 'AND', value: 'AND' }, { label: 'OR', value: 'OR' }]}
-                                      value={field.value}
+                                      value={field.value as { label: string, value: string }}
                                       onChange={field.onChange}
                                     />
                                   );
@@ -1043,7 +1044,7 @@ const AutomationForm = ({
                                         onRemove={actionsFieldArray.fields.length > 1 ? () => {
                                           actionsFieldArray.remove(index);
                                         } : undefined}
-                                        action={value}
+                                        action={value as any}
                                         onClick={
                                           () => setCreateModalIsOpen({
                                             isOpen: true,

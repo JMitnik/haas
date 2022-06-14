@@ -1,19 +1,19 @@
 import * as UI from '@haas/ui';
 import React from 'react';
 
+import { AutomationActionType } from 'types/generated-types';
 import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 
 import { ActionEntry } from './CreateActionModalCard';
-import { AutomationActionType } from 'types/generated-types';
 
 interface NodeCellProps {
-  action: ActionEntry;
+  action?: ActionEntry;
   onClick?: () => void;
   onRemove?: () => void;
 }
 
 export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
-  if (!action.type) return null;
+  if (!action?.type) return null;
 
   const removeCTAFromOption = (e: any) => {
     e.stopPropagation();
@@ -30,7 +30,7 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
       )}
       <UI.Flex width="100%">
         <UI.Div>
-          {action.type === AutomationActionType.GenerateReport && (
+          {action?.type === AutomationActionType.GenerateReport && (
             <UI.Text paddingRight={2}>
               Sending a
               {' '}
@@ -38,7 +38,7 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
               {' '}
               report to:
               <ul>
-                {action.targets.map((target) => (
+                {action?.targets?.map((target) => (
                   <li key={`${target.target?.type}-${target.target?.label}`} style={{ marginLeft: '1em' }}>
                     {target.target?.type}
                     :
@@ -58,7 +58,7 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
               {' '}
               email to:
               <ul>
-                {action.targets.map((target) => (
+                {action?.targets?.map((target) => (
                   <li key={`${target.target?.type}-${target.target?.label}`} style={{ marginLeft: '1em' }}>
                     {target.target?.type}
                     :
