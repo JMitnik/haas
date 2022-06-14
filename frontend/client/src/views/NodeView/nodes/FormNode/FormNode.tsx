@@ -1,13 +1,15 @@
 import * as UI from '@haas/ui';
 import { AtSign, FileText, Hash, Link2, Phone, Type } from 'react-feather';
 import { ClientButton } from 'components/Buttons/Buttons';
+import { Controller, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled from 'styled-components';
+
+import * as RadioGroup from 'components/RadioGroup';
 
 import { GenericNodeProps } from '../types';
 
@@ -58,7 +60,7 @@ const getFieldValue = (field: any, relatedField: any) => {
 
 const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
   const { t } = useTranslation();
-  const { register, getValues, formState } = useForm<FormNodeFormProps>({
+  const { register, getValues, formState, control } = useForm<FormNodeFormProps>({
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
@@ -71,7 +73,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formEntry = getValues({ nest: true });
+    const formEntry = getValues();
 
     const entry: any = {
       form: {
@@ -108,7 +110,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                   <UI.Div key={index} gridColumn={field.type === 'longText' ? 'span 2' : '1fr'}>
                     <UI.FormControl isRequired={field.isRequired}>
                       <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
-                      {field.type === 'longText' ? (
+                      {field.type === 'longText' && (
                         <UI.Textarea
                           id={`fields[${index}].value`}
                           variant="outline"
@@ -116,7 +118,37 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                           minHeight="150px"
                           placeholder={field.placeholder || undefined}
                         />
-                      ) : (
+                      )}
+                      {field.type === 'contacts' && (
+                        <Controller
+                          name={`fields.${index}.value`}
+                          control={control}
+                          render={({ field: { value, onChange, onBlur } }) => (
+                            <RadioGroup.Root
+                              defaultValue={undefined} // value as string | undefined
+                              onValueChange={onChange}
+                              onBlur={onBlur}
+                              variant="spaced"
+                            >
+                              <RadioGroup.Item
+                                isActive={value === 'VALUE1'}
+                                value="VALUE1"
+                                key="VALUE1"
+                                contentVariant="twoLine"
+                                variant="boxed"
+                              >
+                                <RadioGroup.Label>
+                                  hi
+                                </RadioGroup.Label>
+                                <RadioGroup.Subtitle>
+                                  option.description
+                                </RadioGroup.Subtitle>
+                              </RadioGroup.Item>
+                            </RadioGroup.Root>
+                          )}
+                        />
+                      )}
+                      {field.type !== 'longText' && field.type !== 'contacts' && (
                         <UI.Input
                           id={`fields[${index}].value`}
                           variant="outline"
