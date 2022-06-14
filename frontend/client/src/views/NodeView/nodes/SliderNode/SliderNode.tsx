@@ -20,7 +20,7 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
   });
 
   const handleSubmit = async () => {
-    const validForm = await form.triggerValidation('slider');
+    const validForm = await form.trigger('slider');
 
     if (validForm) {
       const entry: SessionEntryDataProps = {

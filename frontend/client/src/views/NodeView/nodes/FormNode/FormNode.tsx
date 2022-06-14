@@ -123,9 +123,9 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                         <Controller
                           name={`fields.${index}.value`}
                           control={control}
-                          render={({ field: { value, onChange, onBlur } }) => (
+                          render={({ value, onChange, onBlur }) => (
                             <RadioGroup.Root
-                              defaultValue={undefined} // value as string | undefined
+                              defaultValue="VALUE1" // value as string | undefined
                               onValueChange={onChange}
                               onBlur={onBlur}
                               variant="spaced"

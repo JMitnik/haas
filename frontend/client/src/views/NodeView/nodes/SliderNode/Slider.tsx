@@ -145,7 +145,7 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
   // Hardcoded
   const timerProgress = useTransform(timerProgressAbs, [0, endTime], [151, 202]);
 
-  const sliderValue = Number(form.watch({ nest: true }).slider / 10);
+  const sliderValue = Number(form.watch('slider') / 10);
   const sliderColor = transform(sliderValue, [0, 5, 10], ['#E53E3E', '#F6AD55', '#38B2AC']);
 
   const [overlay, setOverlay] = useState<HTMLDivElement | null>(null);
@@ -240,7 +240,6 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
   };
 
   const adaptedColor = adaptColor(sliderColor);
-
   const adjustedScore = (Math.round(sliderValue * 2) / 2);
 
   return (
