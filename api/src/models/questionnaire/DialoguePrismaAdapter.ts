@@ -435,7 +435,11 @@ class DialoguePrismaAdapter {
       include: {
         form: {
           include: {
-            fields: true,
+            fields: {
+              include: {
+                contacts: true,
+              },
+            },
           },
         },
       },

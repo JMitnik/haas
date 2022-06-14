@@ -72,7 +72,7 @@ export const ContactsCell = ({ users, onClick, onRemove }: NodeCellProps) => {
       <UI.CloseButton onClose={removeCTAFromOption} top="5px" right="5px" />
       <UI.Flex width="100%" alignItems="center">
         {nodes.map(({ nodeProps, isUser, node }) => (
-          <>
+          <UI.Flex width="100%" alignItems="center" key={node.value}>
             <UI.Div
               display="flex"
               justifyContent="center"
@@ -113,7 +113,7 @@ export const ContactsCell = ({ users, onClick, onRemove }: NodeCellProps) => {
                 {node.type}
               </UI.MicroLabel>
             </UI.Div>
-          </>
+          </UI.Flex>
         ))}
 
       </UI.Flex>

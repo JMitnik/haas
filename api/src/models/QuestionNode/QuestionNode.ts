@@ -145,7 +145,11 @@ export const FormNodeField = objectType({
       resolve(root) {
         return root.placeholder;
       },
-    })
+    });
+    t.list.field('contacts', {
+      type: 'UserType',
+      nullable: true,
+    });
   },
 });
 
@@ -698,8 +702,6 @@ export const QuestionNodeMutations = extendType({
           links: mappedLinks,
           questionId: args.input.questionId,
         }
-
-        console.log('create cta form: ', args.input.form);
 
         return ctx.services.nodeService.createCallToAction(createCTAInput);
       },

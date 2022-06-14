@@ -1824,6 +1824,7 @@ export interface NexusGenFieldTypes {
     url: string | null; // String
   }
   FormNodeField: { // field return type
+    contacts: NexusGenRootTypes['UserType'][] | null; // [UserType!]
     id: string; // ID!
     isRequired: boolean; // Boolean!
     label: string; // String!

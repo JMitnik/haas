@@ -135,6 +135,8 @@ const CTACard = (
     return deleteEntry();
   };
 
+  console.log('Form: ', form);
+
   return (
     <Ani.FadeFromTop>
       <CTACardContainer noHover id={id} activeCTA={activeCTA}>

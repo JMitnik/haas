@@ -145,6 +145,8 @@ const CTAForm = ({
     customerSlug: string, dialogueSlug: string, questionId?: string
   }>();
 
+  console.log('Form node fields: ', formNode?.fields);
+
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -163,8 +165,8 @@ const CTAForm = ({
           placeholder: field.placeholder,
           isRequired: boolToInt(field.isRequired),
           position: field.position,
-          contacts: field?.contacts || { contacts: [] },
-        })) || [],
+          contact: field?.contact || { contact: { contacts: [] } },
+        })),
       },
     },
   });
@@ -257,7 +259,14 @@ const CTAForm = ({
             form: {
               ...formData.formNode,
               fields: formData.formNode?.fields?.map(
-                (field) => ({ ...field, isRequired: intToBool(field.isRequired) }),
+                (field) => {
+                  const { contact, ...rest } = field;
+                  return ({
+                    ...rest,
+                    userIds: contact?.contacts?.map((contact) => contact.value) || [],
+                    isRequired: intToBool(field.isRequired),
+                  });
+                },
               ) as any, // TODO: Fix typing
             },
           },
@@ -280,7 +289,14 @@ const CTAForm = ({
             form: {
               ...formData.formNode,
               fields: formData.formNode?.fields?.map(
-                (field) => ({ ...field, isRequired: intToBool(field.isRequired) }),
+                (field) => {
+                  const { contact, ...rest } = field;
+                  return ({
+                    ...rest,
+                    userIds: contact?.contacts?.map((contact) => contact.value) || [],
+                    isRequired: intToBool(field.isRequired),
+                  });
+                },
               ),
             },
           },

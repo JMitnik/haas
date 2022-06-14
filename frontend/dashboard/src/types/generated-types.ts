@@ -1130,6 +1130,7 @@ export type FormNodeField = {
   isRequired: Scalars['Boolean'];
   position: Scalars['Int'];
   placeholder?: Maybe<Scalars['String']>;
+  contacts?: Maybe<Array<UserType>>;
 };
 
 export type FormNodeFieldInput = {
@@ -1139,7 +1140,7 @@ export type FormNodeFieldInput = {
   type?: Maybe<FormNodeFieldTypeEnum>;
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
-  targets?: Maybe<Array<PickerEntryInput>>;
+  userIds?: Maybe<Array<Scalars['String']>>;
 };
 
 /** The types a field can assume */
@@ -1150,7 +1151,7 @@ export enum FormNodeFieldTypeEnum {
   ShortText = 'shortText',
   LongText = 'longText',
   Number = 'number',
-  CommunicationUser = 'communicationUser'
+  Contacts = 'contacts'
 }
 
 export type FormNodeInputType = {

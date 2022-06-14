@@ -941,6 +941,7 @@ type FormNodeEntryValueType {
 }
 
 type FormNodeField {
+  contacts: [UserType!]
   id: ID!
   isRequired: Boolean!
   label: String!

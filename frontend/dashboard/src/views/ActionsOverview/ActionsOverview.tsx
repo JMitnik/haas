@@ -60,7 +60,25 @@ const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
   }
 
   if (leaf.type === 'FORM') {
-    return { ...leaf, type: 'FORM', icon: RegisterIcon };
+    return {
+      ...leaf,
+      type: 'FORM',
+      icon: RegisterIcon,
+      form: {
+        fields: leaf.form.fields.map((field: any) => ({
+          ...field,
+          contact: {
+            contacts: field.contacts.map(
+              (contact: {
+                id: string,
+                lastName?: string,
+                firstName?: string
+              }) => ({ label: `${contact?.firstName} ${contact?.lastName}`, value: contact.id, type: 'USER' }),
+            ),
+          },
+        })),
+      },
+    };
   }
 
   return null;
@@ -134,6 +152,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
   const { t } = useTranslation();
 
   const activeLeafs = mapLeafs(data?.customer?.dialogue?.leafs);
+  console.log('Mapped leafs: ', activeLeafs, 'And leafs: ', leafs);
 
   return (
     <>

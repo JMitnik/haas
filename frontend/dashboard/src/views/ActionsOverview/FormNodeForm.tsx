@@ -499,7 +499,7 @@ interface TempFieldProps {
   position: number;
   type: TempFieldType | null;
   isRequired: number;
-  contacts: any[];
+  contact: { contacts: any[] };
 }
 
 const appendNewField = (index: number): TempFieldProps => ({
@@ -507,7 +507,7 @@ const appendNewField = (index: number): TempFieldProps => ({
   position: index,
   type: null,
   isRequired: 0,
-  contacts: [],
+  contact: { contacts: [] },
 });
 
 const FormNodeForm = ({ form }: FormNodeFormProps) => {
@@ -515,7 +515,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
 
   const [openedField, setOpenedField] = useState<number | null>(null);
 
-  const { fields, append, move, remove, update } = useFieldArray({
+  const { fields, append, move, remove } = useFieldArray({
     control: form.control,
     name: 'formNode.fields',
     keyName: 'fieldIndex',
@@ -562,11 +562,18 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                           <FormNodeFieldFragment
                             onSubmit={(subForm: any) => {
                               // console.log('subForm before setting value:', subForm);
-                              console.log('subForm.contact.contacts:', subForm.contact.contacts);
+                              console.log('subForm.contact.contacts:', subForm.contact?.contacts);
                               // update(index, { ...subForm, contact: { contacts: [...subForm.contact.contacts] });
                               form.setValue(
                                 `formNode.fields.${index}`,
-                                { ...subForm, contact: { contacts: [...subForm.contact.contacts] } },
+                                {
+                                  ...subForm,
+                                  contact: {
+                                    contacts: subForm.contact?.contacts
+                                      ? [...subForm.contact.contacts]
+                                      : [],
+                                  },
+                                },
                                 { shouldValidate: true, shouldDirty: true },
                               );
                               // contactsArray.update(index, subForm.contact.contacts);

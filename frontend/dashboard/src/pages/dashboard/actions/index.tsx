@@ -51,6 +51,29 @@ const ActionsPage = () => {
     if (leaf.type === 'SHARE') {
       return { ...leaf, type: 'SHARE', icon: ShareIcon };
     }
+
+    if (leaf.type === 'FORM') {
+      return {
+        ...leaf,
+        type: 'FORM',
+        icon: RegisterIcon,
+        form: {
+          fields: leaf.form.fields.map((field: any) => ({
+            ...field,
+            contact: {
+              contacts: field.contacts.map(
+                (contact: {
+                  id: string,
+                  lastName?: string,
+                  firstName?: string
+                }) => ({ label: `${contact?.firstName} ${contact?.lastName}`, value: contact.id, type: 'USER' }),
+              ),
+            },
+          })),
+        },
+      };
+    }
+
     return { ...leaf, icon: RegisterIcon };
   });
 
