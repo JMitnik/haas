@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { AtSign, FileText, Hash, Link2, Phone, Type } from 'react-feather';
 import { ClientButton } from 'components/Buttons/Buttons';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { motion } from 'framer-motion';
@@ -60,7 +60,7 @@ const getFieldValue = (field: any, relatedField: any) => {
 
 const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
   const { t } = useTranslation();
-  const { register, getValues, formState, control } = useForm<FormNodeFormProps>({
+  const { register, getValues, formState, control, watch } = useForm<FormNodeFormProps>({
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
@@ -75,6 +75,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
     event.preventDefault();
     const formEntry = getValues();
 
+    console.log('Form entry: ', formEntry);
     const entry: any = {
       form: {
         values: formEntry.fields.map((fieldEntry, index) => ({
@@ -84,8 +85,12 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
       },
     };
 
-    onEntryStore(entry, formEntry);
+    console.log('entry: ', entry);
+
+    // onEntryStore(entry, formEntry);
   };
+
+  console.log('Form watch: ', watch());
 
   return (
     <UI.Div>
@@ -107,14 +112,18 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
             <Div>
               <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 {fields?.map((field, index) => (
-                  <UI.Div key={index} gridColumn={field.type === 'longText' ? 'span 2' : '1fr'}>
+                  <UI.Div
+                    key={index}
+                    gridColumn={field.type === 'longText' || field.type === 'contacts' ? 'span 2' : '1fr'}
+                  >
                     <UI.FormControl isRequired={field.isRequired}>
                       <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
                       {field.type === 'longText' && (
                         <UI.Textarea
                           id={`fields[${index}].value`}
                           variant="outline"
-                          {...register(`fields.${index}.value`, { required: field.isRequired })}
+                          name={`fields.${index}.value`}
+                          ref={register({ required: field.isRequired })}
                           minHeight="150px"
                           placeholder={field.placeholder || undefined}
                         />
@@ -123,27 +132,38 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                         <Controller
                           name={`fields.${index}.value`}
                           control={control}
+                          defaultValue=""
                           render={({ value, onChange, onBlur }) => (
                             <RadioGroup.Root
-                              defaultValue="VALUE1" // value as string | undefined
+                              defaultValue={value}
                               onValueChange={onChange}
                               onBlur={onBlur}
-                              variant="spaced"
+                              variant="joined"
                             >
-                              <RadioGroup.Item
-                                isActive={value === 'VALUE1'}
-                                value="VALUE1"
-                                key="VALUE1"
-                                contentVariant="twoLine"
-                                variant="boxed"
-                              >
-                                <RadioGroup.Label>
-                                  hi
-                                </RadioGroup.Label>
-                                <RadioGroup.Subtitle>
-                                  option.description
-                                </RadioGroup.Subtitle>
-                              </RadioGroup.Item>
+                              {field.contacts?.map((contact) => (
+                                <RadioGroup.Item
+                                  isActive={value === contact.email}
+                                  value={contact.email}
+                                  key={contact.id}
+                                  contentVariant="twoLine"
+                                  variant="boxed"
+                                >
+                                  <UI.Flex flexDirection="column" alignItems="flex-start">
+                                    <RadioGroup.Label>
+                                      {contact?.firstName}
+                                      {' '}
+                                      {contact?.lastName}
+                                    </RadioGroup.Label>
+                                    <RadioGroup.Subtitle>
+                                      A request for conversation will be sent to
+                                      {' '}
+                                      {contact.email}
+                                    </RadioGroup.Subtitle>
+                                  </UI.Flex>
+
+                                </RadioGroup.Item>
+                              ))}
+
                             </RadioGroup.Root>
                           )}
                         />
@@ -154,7 +174,8 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                           variant="outline"
                           leftEl={mapIcon[field?.type] || <Type />}
                           type={mapFieldType[field?.type] || 'text'}
-                          {...register(`fields.${index}.value`, { required: field.isRequired })}
+                          name={`fields.${index}.value`}
+                          ref={register({ required: field.isRequired })}
                           placeholder={field.placeholder || undefined}
                           maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
                         />
