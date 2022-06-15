@@ -43,7 +43,6 @@ interface WorkspaceGridContainerProps {
 export const WorkspaceGridContainer = styled(UI.Div) <WorkspaceGridContainerProps>`
   ${({ theme, backgroundColor }) => css`
     background: ${backgroundColor};
-    /* border-radius: 20px; */
     position: relative;
     height: 100%;
     min-height: 100vh;
