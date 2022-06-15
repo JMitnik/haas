@@ -139,17 +139,19 @@ export class NodeService {
           label: field.label || 'Generic',
           position: field.position || -1,
           isRequired: field.isRequired || false,
-          contacts: {
+          contacts: field.type === 'contacts' ? {
             connect: allUserIds,
-          },
+          } : undefined,
         },
         update: {
           type: field.type || 'shortText',
           label: field.label || 'Generic',
           position: field.position || -1,
           isRequired: field.isRequired || false,
-          contacts: {
+          contacts: field.type === 'contacts' ? {
             set: allUserIds,
+          } : {
+            set: [],
           },
         },
         where: {
@@ -405,10 +407,9 @@ export class NodeService {
           position: field.position || -1,
           placeholder: field.placeholder || '',
           isRequired: field.isRequired || false,
-          contacts: {
+          contacts: field.type === 'contacts' ? {
             connect: allUserIds,
-          },
-          // targets: 
+          } : undefined,
         })),
       },
     })

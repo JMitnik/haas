@@ -108,7 +108,7 @@ const initializeCTAType = (type: string) => {
   return { label: 'None', value: '' };
 };
 
-const ActionOverview = ({ leafs }: ActionOverviewProps) => {
+const ActionOverview = () => {
   const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const [activeSearchTerm, setActiveSearchTerm] = useState('');
 
@@ -128,13 +128,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
     },
   });
 
-  const firstUpdate = useRef(true);
-
   useEffect(() => {
-    if (firstUpdate.current) {
-      firstUpdate.current = false;
-      return;
-    }
     fetchActions({
       variables: {
         customerSlug,
@@ -152,7 +146,6 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
   const { t } = useTranslation();
 
   const activeLeafs = mapLeafs(data?.customer?.dialogue?.leafs);
-  console.log('Mapped leafs: ', activeLeafs, 'And leafs: ', leafs);
 
   return (
     <>
@@ -193,24 +186,6 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
                 share={{ title: '', url: '', tooltip: '' }}
                 onNewCTAChange={setNewCTA}
               />
-            )}
-
-            {!activeLeafs && leafs && leafs.map(
-              (leaf: any, index: number) => (
-                <CTACard
-                  key={index}
-                  activeCTA={activeCTA}
-                  onActiveCTAChange={setActiveCTA}
-                  id={leaf.id}
-                  Icon={leaf.icon}
-                  title={leaf.title}
-                  type={initializeCTAType(leaf.type)}
-                  links={leaf.links}
-                  share={leaf?.share}
-                  form={leaf?.form}
-                  onNewCTAChange={setNewCTA}
-                />
-              ),
             )}
 
             {activeLeafs && activeLeafs?.map(

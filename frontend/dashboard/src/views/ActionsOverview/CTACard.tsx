@@ -83,7 +83,7 @@ const OverflowSpan = styled(Span)`
 `;
 
 const CTACard = (
-  { id, activeCTA, onActiveCTAChange, title, type, links, share, Icon, onNewCTAChange, form }: CTACardProps,
+  { id, activeCTA, onActiveCTAChange, title, type, links, share, Icon, onNewCTAChange, form: formNode }: CTACardProps,
 ) => {
   const toast = useToast();
   const { t } = useTranslation();
@@ -135,8 +135,6 @@ const CTACard = (
     return deleteEntry();
   };
 
-  console.log('Form: ', form);
-
   return (
     <Ani.FadeFromTop>
       <CTACardContainer noHover id={id} activeCTA={activeCTA}>
@@ -183,7 +181,7 @@ const CTACard = (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <CTAForm
               id={id}
-              form={form}
+              form={formNode}
               title={title}
               type={type}
               links={links}

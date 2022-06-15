@@ -561,9 +561,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                         >
                           <FormNodeFieldFragment
                             onSubmit={(subForm: any) => {
-                              // console.log('subForm before setting value:', subForm);
                               console.log('subForm.contact.contacts:', subForm.contact?.contacts);
-                              // update(index, { ...subForm, contact: { contacts: [...subForm.contact.contacts] });
                               form.setValue(
                                 `formNode.fields.${index}`,
                                 {

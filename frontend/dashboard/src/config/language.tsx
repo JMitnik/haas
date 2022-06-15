@@ -899,6 +899,10 @@ const language = {
       en: 'Finish editing',
       de: 'Bearbeitung beenden',
     },
+    contacts_type: {
+      en: 'Contact',
+      de: 'Kontakt',
+    },
     delete_field: {
       en: 'Delete field',
       de: 'Feld löschen',

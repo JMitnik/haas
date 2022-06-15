@@ -19,7 +19,7 @@ import Select from 'react-select';
 
 import { MappedCTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 // import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
-import { useCreateCtaMutation } from 'types/generated-types';
+import { FormNodeFieldTypeEnum, useCreateCtaMutation } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -241,6 +241,20 @@ const CTAForm = ({
   const watchType = form.watch('ctaType');
 
   const onSubmit = (formData: FormDataProps) => {
+    const formFields = formData.formNode?.fields?.map(
+      (field) => {
+        const { contact, type, ...rest } = field;
+        return ({
+          ...rest,
+          type: type as FormNodeFieldTypeEnum,
+          userIds: contact?.contacts?.map((user) => user.value) || [],
+          isRequired: intToBool(field.isRequired),
+        });
+      },
+    );
+
+    console.log('formFields: ', formFields);
+
     if (id === '-1') {
       const mappedLinks = {
         linkTypes: formData.links,
@@ -258,16 +272,7 @@ const CTAForm = ({
             share: formData.share,
             form: {
               ...formData.formNode,
-              fields: formData.formNode?.fields?.map(
-                (field) => {
-                  const { contact, ...rest } = field;
-                  return ({
-                    ...rest,
-                    userIds: contact?.contacts?.map((contact) => contact.value) || [],
-                    isRequired: intToBool(field.isRequired),
-                  });
-                },
-              ) as any, // TODO: Fix typing
+              fields: formFields,
             },
           },
         },
@@ -288,16 +293,7 @@ const CTAForm = ({
             share: formData.share,
             form: {
               ...formData.formNode,
-              fields: formData.formNode?.fields?.map(
-                (field) => {
-                  const { contact, ...rest } = field;
-                  return ({
-                    ...rest,
-                    userIds: contact?.contacts?.map((contact) => contact.value) || [],
-                    isRequired: intToBool(field.isRequired),
-                  });
-                },
-              ),
+              fields: formFields,
             },
           },
         },

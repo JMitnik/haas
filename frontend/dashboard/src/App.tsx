@@ -19,6 +19,7 @@ import { WorkspaceSettingsView } from 'views/WorkspaceSettingsView';
 import { fadeMotion } from 'components/animation/config';
 import { sub } from 'date-fns';
 import { useUser } from 'providers/UserProvider';
+import ActionOverview from 'views/ActionsOverview/ActionsOverview';
 import ActionsPage from 'pages/dashboard/actions';
 import AddAutomationView from 'views/AddAutomationView';
 import AddCustomerPage from 'pages/dashboard/customers/add';
@@ -83,7 +84,7 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       allowedPermission={SystemPermission.CanBuildDialogue}
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
-                      render={() => <ActionsPage />}
+                      render={() => <ActionOverview />}
                     />
 
                     <GuardedRoute
