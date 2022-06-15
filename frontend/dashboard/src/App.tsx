@@ -20,7 +20,6 @@ import { fadeMotion } from 'components/animation/config';
 import { sub } from 'date-fns';
 import { useUser } from 'providers/UserProvider';
 import ActionOverview from 'views/ActionsOverview/ActionsOverview';
-import ActionsPage from 'pages/dashboard/actions';
 import AddAutomationView from 'views/AddAutomationView';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';

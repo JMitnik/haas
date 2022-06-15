@@ -1097,6 +1097,7 @@ export type FormNodeEntryFieldInput = {
   url?: Maybe<Scalars['String']>;
   shortText?: Maybe<Scalars['String']>;
   longText?: Maybe<Scalars['String']>;
+  contacts?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
 };
 

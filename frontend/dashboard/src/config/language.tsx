@@ -899,6 +899,14 @@ const language = {
       en: 'Finish editing',
       de: 'Bearbeitung beenden',
     },
+    contacts: {
+      en: 'Contacts',
+      de: 'Kontakte',
+    },
+    contacts_helper: {
+      en: 'Who should a user be able to get in touch with?',
+      de: 'An wen soll sich ein Nutzer wenden können?',
+    },
     contacts_type: {
       en: 'Contact',
       de: 'Kontakt',

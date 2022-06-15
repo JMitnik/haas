@@ -16,7 +16,7 @@ import {
 } from 'react-feather';
 import { AnimatePresence, Variants, motion } from 'framer-motion';
 import { Button } from '@chakra-ui/core';
-import { Controller, FieldValues, UseFieldArrayReturn, useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
@@ -276,10 +276,10 @@ const FormNodeContactsFragment = ({ form, contacts }: FormNodeContactsFragmentPr
   return (
     <UI.FormControl isRequired style={{ overflowX: 'scroll' }}>
       <UI.FormLabel htmlFor="activeDialogue">
-        {t('automation:targets')}
+        {t('contacts')}
       </UI.FormLabel>
       <UI.InputHelper>
-        bla bla
+        {t('contacts_helper')}
       </UI.InputHelper>
       <UI.Div>
         <UI.Flex>
@@ -292,7 +292,7 @@ const FormNodeContactsFragment = ({ form, contacts }: FormNodeContactsFragmentPr
           >
             <>
               <UI.Grid m={2} ml={0} gridTemplateColumns="1fr">
-                <UI.Helper>{t('automation:target')}</UI.Helper>
+                <UI.Helper>{t('contact')}</UI.Helper>
               </UI.Grid>
               <UI.Grid
                 pt={2}
@@ -306,7 +306,6 @@ const FormNodeContactsFragment = ({ form, contacts }: FormNodeContactsFragmentPr
                   <Controller
                     name="contact.contacts"
                     control={form.control}
-                    shouldUnregister
                     render={({ field: { value, onChange } }) => (
                       <Dropdown
                         isRelative
@@ -394,8 +393,6 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
     control: subform.control,
   });
 
-  console.log('Contacts: ', contacts);
-
   return (
     <motion.div style={{ zIndex: 300 }} variants={parentPopup} initial="initial" animate="animate" exit="exit">
       <motion.div variants={childPopUp}>
@@ -462,12 +459,19 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                   {formType === TempFieldType.CONTACTS && (
                     <FormNodeContactsFragment contacts={contacts} form={subform} />
                   )}
+                  <UI.ButtonGroup justifySelf="flex-end" display="flex">
+                    <UI.Button onClick={handleSaveValues} variantColor="teal">{t('finish_editing')}</UI.Button>
+                    <UI.Button
+                      onClick={handleDelete}
+                      variantColor="red"
+                      variant="outline"
+                    >
+                      {t('delete_field')}
 
+                    </UI.Button>
+                  </UI.ButtonGroup>
                 </UI.InputGrid>
-                <UI.ButtonGroup justifySelf="flex-end" display="flex">
-                  <UI.Button onClick={handleSaveValues} variantColor="teal">{t('finish_editing')}</UI.Button>
-                  <UI.Button onClick={handleDelete} variantColor="red" variant="outline">{t('delete_field')}</UI.Button>
-                </UI.ButtonGroup>
+
               </UI.CardBody>
             ) : (
               <UI.CardBody>
@@ -561,7 +565,6 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                         >
                           <FormNodeFieldFragment
                             onSubmit={(subForm: any) => {
-                              console.log('subForm.contact.contacts:', subForm.contact?.contacts);
                               form.setValue(
                                 `formNode.fields.${index}`,
                                 {
