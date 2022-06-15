@@ -5,6 +5,7 @@ import {
 import { usePopper } from 'react-popper';
 import { useTimer } from 'use-timer';
 import { useTranslation } from 'react-i18next';
+import { useWatch } from 'react-hook-form';
 import Color from 'color';
 import Lottie from 'react-lottie';
 import React, { useEffect, useReducer, useState } from 'react';
@@ -17,7 +18,7 @@ import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
 import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
 import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
-import { SlideMeAnimation } from './SliderNodeAnimations';
+import { SlideMeAnimation, WiggleAnimation } from './SliderNodeAnimations';
 import { SliderNodeMarkersProps } from '../../../../models/Tree/SliderNodeMarkersModel';
 import { SliderText } from './SliderText';
 
@@ -76,10 +77,10 @@ const SliderSpeechWrapper = styled(Div)`
 `;
 
 const sliderValueAnimeVariants: Variants = {
-  initial: {
-    opacity: 0,
-    transform: 'scale(1)',
-  },
+  // initial: {
+  //   opacity: 0,
+  //   transform: 'scale(1)',
+  // },
   active: {
     opacity: 1,
     y: 0,
@@ -142,10 +143,15 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
     }
   }, [showIsEarly, setIsValid]);
 
+  const sliderValueWatch = useWatch({
+    control: form.control,
+    name: 'slider',
+  });
+
   // Hardcoded
   const timerProgress = useTransform(timerProgressAbs, [0, endTime], [151, 202]);
 
-  const sliderValue = Number(form.watch({ nest: true }).slider / 10);
+  const sliderValue = Number(sliderValueWatch as number / 10);
   const sliderColor = transform(sliderValue, [0, 5, 10], ['#E53E3E', '#F6AD55', '#38B2AC']);
 
   const [overlay, setOverlay] = useState<HTMLDivElement | null>(null);
@@ -240,12 +246,24 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
   };
 
   const adaptedColor = adaptColor(sliderColor);
-
   const adjustedScore = (Math.round(sliderValue * 2) / 2);
+
+  const variants: Variants = {
+    animate: {
+      // rotate: i % 2 === 0 ? [-1, 1.3, 0] : [1, -1.4, 0],
+      rotate: [-1, 1.3, 0, 1, -1.4, 0],
+      transition: {
+        loop: Infinity,
+        delay: 1,
+        repeatDelay: 3,
+        duration: 2.8,
+      },
+    },
+  };
 
   return (
     <>
-      {animationState.isStopped && (
+      {/* {animationState.isStopped && (
         <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
           <Flex
             data-testid="unhappy"
@@ -263,7 +281,7 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
             <HappyIcon />
           </Flex>
         </SlideHereContainer>
-      )}
+      )} */}
 
       <HAASRabbit
         style={{
@@ -283,69 +301,70 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
           }}
           {...attributes.popper}
         >
-          {!animationState.isStopped && (
-            <motion.div
-              initial={{ opacity: 0, y: 70, x: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ scale: 1.1 }}
+          {/* {!animationState.isStopped && ( */}
+          <motion.div
+            initial={{ opacity: 0, y: 70, x: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.1 }}
+          >
+            <SliderNodeValue
+              initial="initial"
+              variants={sliderValueAnimeVariants}
+              animate={animationControls}
             >
-              <SliderNodeValue
-                initial="initial"
-                variants={sliderValueAnimeVariants}
-                animate={animationControls}
-              >
-                <motion.svg viewBox="0 0 50 50">
-                  <motion.circle
-                    cx="25"
-                    cy="25"
-                    r="24"
-                    style={{
-                      strokeDashoffset: 453,
-                      strokeDasharray: timerProgress,
-                      fill: 'transparent',
-                      stroke: sliderColor,
-                      strokeWidth: '2px',
-                    }}
-                  />
-                </motion.svg>
+              <motion.svg viewBox="0 0 50 50">
+                <motion.circle
+                  cx="25"
+                  cy="25"
+                  r="24"
+                  style={{
+                    strokeDashoffset: 453,
+                    strokeDasharray: timerProgress,
+                    fill: 'transparent',
+                    stroke: sliderColor,
+                    strokeWidth: '2px',
+                  }}
+                />
+              </motion.svg>
 
-                <motion.span animate={{ color: sliderColor }} style={{ width: '100%' }}>
-                  <AnimatePresence exitBeforeEnter>
-                    {!isComplete ? (
-                      <motion.div key="score" initial={{ y: 0 }} exit={{ y: -30 }} style={{ width: '100%' }}>
-                        {adjustedScore.toFixed(1)}
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        style={{ background: sliderColor, color: adaptedColor }}
-                        className="signal"
-                        key="signal"
-                        initial={{ y: 30 }}
-                        animate={{ y: 0 }}
-                      >
-                        {sliderValue > 5 ? (
-                          <HappyIcon />
-                        ) : (
-                          <UnhappyIcon />
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.span>
-              </SliderNodeValue>
-              <SliderText
-                markers={markers}
-                color={sliderColor}
-                adaptedColor={adaptedColor}
-                score={adjustedScore}
-                isEarly={showIsEarly}
-              />
-            </motion.div>
-          )}
+              <motion.span animate={{ color: sliderColor }} style={{ width: '100%' }}>
+                <AnimatePresence exitBeforeEnter>
+                  {!isComplete ? (
+                    <motion.div key="score" initial={{ y: 0 }} exit={{ y: -30 }} style={{ width: '100%' }}>
+                      {adjustedScore.toFixed(1)}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      style={{ background: sliderColor, color: adaptedColor }}
+                      className="signal"
+                      key="signal"
+                      initial={{ y: 30 }}
+                      animate={{ y: 0 }}
+                    >
+                      {sliderValue > 5 ? (
+                        <HappyIcon />
+                      ) : (
+                        <UnhappyIcon />
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.span>
+            </SliderNodeValue>
+            <SliderText
+              markers={markers}
+              color={sliderColor}
+              adaptedColor={adaptedColor}
+              score={adjustedScore}
+              isEarly={showIsEarly}
+            />
+          </motion.div>
+          {/* )} */}
         </SliderSpeechWrapper>
         <div
           className="rabbit"
           style={{
+            position: 'relative',
             transform: `scaleX(${animationState.direction})`,
           }}
         >
@@ -357,6 +376,26 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
             }}
             speed={animationState.speed}
           />
+
+          {animationState.isStopped && (
+            <Div style={{
+              position: 'absolute', left: '50%', bottom: '20px', fontSize: '10px', transform: 'translateX(-50%)',
+            }}
+            >
+              <motion.div
+                variants={WiggleAnimation}
+                animate="animate"
+                initial="initial"
+                exit="exit"
+              >
+                <p style={{ fontSize: '0.7rem' }}>
+                  Drag
+                </p>
+
+              </motion.div>
+            </Div>
+          )}
+
         </div>
       </HAASRabbit>
       <form>
@@ -376,7 +415,7 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
         />
       </form>
 
-      {animationState.isStopped && (
+      {/* {animationState.isStopped && (
         <FingerPrintContainer
           animate={{
             marginLeft: ['0%', '30%', '0%', '-30%', '0%', '0%'],
@@ -392,7 +431,36 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
         >
           <FingerIcon />
         </FingerPrintContainer>
-      )}
+      )} */}
+
+      <Flex width="100%" position="absolute" bottom="-20px" justifyContent="space-between">
+        <Div>
+          0
+        </Div>
+        <Div style={{ transform: 'translateX(7.5px)' }}>
+          100
+        </Div>
+      </Flex>
+
+      {/* {animationState.isStopped && (
+        <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
+          <Flex
+            data-testid="unhappy"
+            alignItems="center"
+          >
+            <UnhappyIcon />
+            <Text fontSize="0.8rem">
+              {unhappyText || t('unhappy')}
+            </Text>
+          </Flex>
+          <Flex alignItems="center" data-testid="happy">
+            <Text mr={1} fontSize="0.8rem">
+              {happyText || t('happy')}
+            </Text>
+            <HappyIcon />
+          </Flex>
+        </SlideHereContainer>
+      )} */}
 
     </>
   );

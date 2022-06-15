@@ -13,3 +13,14 @@ export const SlideMeAnimation: Variants = {
     },
   },
 };
+
+export const WiggleAnimation: Variants = {
+  animate: {
+    rotate: ['0deg', '5deg', '-5deg', '0deg', '5deg', '-5deg', '0deg'],
+    transition: {
+      loop: Infinity,
+      repeatDelay: 2,
+      duration: 0.5,
+    },
+  },
+};
