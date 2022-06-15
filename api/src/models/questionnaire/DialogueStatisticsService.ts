@@ -180,7 +180,7 @@ class DialogueStatisticsService {
           updatedAt: toUTC(new Date()),
         }
       },
-      { ttl: 180, enabled: !refresh }
+      { ttl: 180, enabled: false } // TODO: Set back to !refresh wanneer we de refresh toggle kunnen aanpassen adhv de huidige intenties
     )
   }
 

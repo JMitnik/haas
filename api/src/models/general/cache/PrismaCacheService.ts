@@ -5,7 +5,7 @@ import { toUTC } from '../../../utils/dateUtils';
 import { GetOrCreateOptions, PrismaTableName } from './Cache.types';
 
 export class PrismaCacheService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaClient) { }
 
   /**
    * Gets a list of records from the cache.
@@ -44,7 +44,7 @@ export class PrismaCacheService {
     options: GetOrCreateOptions = { enabled: true, ttl: 60 },
   ): Promise<T> {
     // If the options are disabled, just return the result of the createFn
-    if (!options.enabled && !options.ttl) {
+    if (!options.enabled || !options.ttl) {
       return await createFn();
     }
 
