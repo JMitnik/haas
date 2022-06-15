@@ -17,7 +17,7 @@ const getCustomerFromSlug = gql`
 `;
 
 const CustomerPage = () => {
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const history = useHistory();
 
   if (!customerSlug) {

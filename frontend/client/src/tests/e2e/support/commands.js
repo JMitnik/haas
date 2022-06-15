@@ -1,4 +1,5 @@
-import '@testing-library/cypress/add-commands'
+// eslint-disable-next-line import/no-extraneous-dependencies
+import '@testing-library/cypress/add-commands';
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -26,7 +27,9 @@ import '@testing-library/cypress/add-commands'
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
+// eslint-disable-next-line no-undef
 Cypress.Commands.add('graphql', (operationName, callback, alias) => {
+  // eslint-disable-next-line no-undef
   cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
     if (req.body.operationName === operationName) {
       callback(req);

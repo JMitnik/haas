@@ -1,0 +1,18 @@
+query GetCustomer($slug: String!) {
+  customer(slug: $slug) {
+    id
+    name
+    slug
+    settings {
+      id
+      logoUrl
+      logoOpacity
+      colourSettings {
+        id
+        primary
+        primaryAlt
+        secondary
+      }
+    }
+  }
+}

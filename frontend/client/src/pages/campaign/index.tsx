@@ -48,7 +48,7 @@ export const CampaignRedirect = () => {
     );
   }
 
-  const url = `/${data?.delivery?.campaignVariant?.workspace.slug}/${data?.delivery?.campaignVariant?.dialogue.slug}`;
+  const url = `/${data?.delivery?.campaignVariant?.workspace?.slug}/${data?.delivery?.campaignVariant?.dialogue?.slug}`;
 
   if (redirect) {
     return (
