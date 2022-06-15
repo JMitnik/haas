@@ -9,6 +9,7 @@ import React from 'react';
 import { AppContainer } from 'styles/AppStyles';
 import { DefaultThemeProviders } from 'providers/ThemeProvider';
 import { GlobalErrorFallback } from 'components/Error/GlobalErrorFallback';
+import { ScrollToTop } from 'components/Utilities/ScrollToTop';
 import UserProvider from 'providers/UserProvider';
 
 import GlobalStyle from './global-styles';
@@ -21,6 +22,7 @@ import lang from './i18n-config';
 export const AppProviders = ({ children }: { children: React.ReactNode }) => (
   <I18nextProvider i18n={lang}>
     <Router>
+      <ScrollToTop />
       <ErrorBoundary fallback={GlobalErrorFallback}>
         <ApolloProvider client={client}>
           <DefaultThemeProviders>
