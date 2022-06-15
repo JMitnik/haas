@@ -13,6 +13,7 @@ import { PatternCircles } from '@visx/pattern';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import useMeasure from 'react-use-measure';
 
@@ -81,6 +82,7 @@ export const HexagonGrid = ({
   onGoBack,
   children,
 }: HexagonGridProps) => {
+  const { t } = useTranslation();
   const [ref, bounds] = useMeasure({
     debounce: {
       resize: 2,
@@ -249,7 +251,7 @@ export const HexagonGrid = ({
                 backgroundColor="white"
               />
               <UI.Card padding={1} backgroundColor="white">
-                <UI.Span color="off.600">Go up one layer</UI.Span>
+                <UI.Span color="off.600">{t('go_up_one_layer')}</UI.Span>
               </UI.Card>
             </UI.Div>
           </Tooltip.Content>
@@ -274,7 +276,7 @@ export const HexagonGrid = ({
                 backgroundColor="white"
               />
               <UI.Card padding={1} backgroundColor="white">
-                <UI.Span color="off.600">Center the hexagons</UI.Span>
+                <UI.Span color="off.600">{t('center_hexagons')}</UI.Span>
               </UI.Card>
             </UI.Div>
           </Tooltip.Content>

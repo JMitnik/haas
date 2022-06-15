@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    center_hexagons: {
+      en: 'Center the hexagons',
+      de: 'Zentrieren Sie die Sechsecke',
+    },
+    go_up_one_layer: {
+      en: 'Go up one layer',
+      de: 'Gehen Sie eine Ebene nach oben',
+    },
     individuals: {
       en: 'Individuals',
       de: 'Individuals',
