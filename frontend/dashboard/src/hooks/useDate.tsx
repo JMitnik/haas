@@ -25,6 +25,7 @@ export const useDate = () => ({
     }
   },
   getNow: () => new Date(),
+  getOneWeekAgo: () => sub(new Date(), { days: 7 }),
   getTomorrow: () => sub(new Date(), { days: -1 }),
   getStartOfWeek: (date = new Date()) => startOfWeek(date, {
     weekStartsOn: 1,
