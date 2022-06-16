@@ -1769,16 +1769,19 @@ export type OptionsInputType = {
 
 export type Organization = {
   __typename?: 'Organization';
+  id: Scalars['ID'];
   layers?: Maybe<Array<OrganizationLayer>>;
 };
 
 /** A layer of an organization */
 export type OrganizationLayer = {
   __typename?: 'OrganizationLayer';
+  id: Scalars['ID'];
+  depth: Scalars['Int'];
   type: OrganizationLayerType;
 };
 
-/** Type of an orginzational layer */
+/** Type of an organizational layer */
 export enum OrganizationLayerType {
   Group = 'GROUP',
   Dialogue = 'DIALOGUE',
@@ -2855,9 +2858,10 @@ export type GetWorkspaceDialogueStatisticsQuery = (
     { __typename?: 'Customer' }
     & { organization?: Maybe<(
       { __typename?: 'Organization' }
+      & Pick<Organization, 'id'>
       & { layers?: Maybe<Array<(
         { __typename?: 'OrganizationLayer' }
-        & Pick<OrganizationLayer, 'type'>
+        & Pick<OrganizationLayer, 'id' | 'depth' | 'type'>
       )>> }
     )>, dialogues?: Maybe<Array<(
       { __typename?: 'Dialogue' }
@@ -3953,7 +3957,10 @@ export const GetWorkspaceDialogueStatisticsDocument = gql`
     query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
     organization {
+      id
       layers {
+        id
+        depth
         type
       }
     }

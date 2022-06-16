@@ -1,7 +1,10 @@
 query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
     organization {
+      id
       layers {
+        id
+        depth
         type
       }
     }

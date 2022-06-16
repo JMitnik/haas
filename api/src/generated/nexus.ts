@@ -1056,6 +1056,8 @@ export interface NexusGenRootTypes {
   }
   Organization: {};
   OrganizationLayer: { // root type
+    depth: number; // Int!
+    id: string; // ID!
     type: NexusGenEnums['OrganizationLayerType']; // OrganizationLayerType!
   }
   PaginationPageInfo: { // root type
@@ -1919,9 +1921,12 @@ export interface NexusGenFieldTypes {
     videoNodeEntry: string | null; // String
   }
   Organization: { // field return type
+    id: string; // ID!
     layers: NexusGenRootTypes['OrganizationLayer'][] | null; // [OrganizationLayer!]
   }
   OrganizationLayer: { // field return type
+    depth: number; // Int!
+    id: string; // ID!
     type: NexusGenEnums['OrganizationLayerType']; // OrganizationLayerType!
   }
   PaginationPageInfo: { // field return type

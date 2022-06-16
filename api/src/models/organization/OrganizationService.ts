@@ -10,6 +10,8 @@ enum OrganizationLayerType {
   INTERACTION = 'INTERACTION',
 }
 
+interface OrganizationLayer { id: string; depth: number; type: NexusGenEnums['OrganizationLayerType'] }
+
 class OrganizationService {
   customerService: CustomerService;
 
@@ -19,11 +21,15 @@ class OrganizationService {
 
   getOrganizationLayers = async (workspaceId: string) => {
     // Every organization consits at least of a dialogue and interaction layer
-    const finalLayers: { type: NexusGenEnums['OrganizationLayerType'] }[] = [
+    const layers: OrganizationLayer[] = [
       {
+        id: `${workspaceId}-0-${OrganizationLayerType.DIALOGUE}`,
+        depth: 0,
         type: OrganizationLayerType.DIALOGUE,
       },
       {
+        id: `${workspaceId}-1-${OrganizationLayerType.INTERACTION}`,
+        depth: 1,
         type: OrganizationLayerType.INTERACTION,
       },
     ];
@@ -36,15 +42,23 @@ class OrganizationService {
     // Find the dialogue with the most amount of layers
     const deepestLayers = maxBy(dialogueTitles, (splittedTitle) => splittedTitle.length) as string[];
 
-    if (!deepestLayers.length) return finalLayers;
+    if (!deepestLayers.length) return layers;
 
     // Substract with 1 as the last entry of the dialogue title is considered a dialogue and not a group
-    const groupLayers: { type: NexusGenEnums['OrganizationLayerType'] }[] = [...Array(deepestLayers.length - 1)].map(
+    const groupLayers: OrganizationLayer[] = [...Array(deepestLayers.length - 1)].map(
       () => ({
+        id: '-1',
+        depth: -1,
         type: OrganizationLayerType.GROUP,
       }));
 
-    finalLayers.unshift(...groupLayers);
+    layers.unshift(...groupLayers);
+
+    const finalLayers: OrganizationLayer[] = layers.map((layer, index) => ({
+      id: `${workspaceId}-${index}-${layer.type}`,
+      depth: index,
+      type: layer.type,
+    }));
 
     return finalLayers;
   }

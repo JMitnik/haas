@@ -5,6 +5,11 @@ import { OrganizationLayer } from './OrganizationLayer';
 export const Organization = objectType({
   name: 'Organization',
   definition(t) {
+    t.id('id', {
+      resolve(parent, args, ctx, info) {
+        return `ORG-${info.variableValues.workspaceId}`
+      },
+    })
     t.list.field('layers', {
       type: OrganizationLayer,
       nullable: true,

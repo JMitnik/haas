@@ -1285,15 +1285,18 @@ input OptionsInputType {
 }
 
 type Organization {
+  id: ID!
   layers: [OrganizationLayer!]
 }
 
 """A layer of an organization"""
 type OrganizationLayer {
+  depth: Int!
+  id: ID!
   type: OrganizationLayerType!
 }
 
-"""Type of an orginzational layer"""
+"""Type of an organizational layer"""
 enum OrganizationLayerType {
   DIALOGUE
   GROUP
