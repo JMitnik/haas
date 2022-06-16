@@ -1,7 +1,7 @@
 module.exports = {
   clearMocks: true,
   preset: 'ts-jest',
-  // testEnvironment: 'jsdom',
+  testEnvironment: 'jsdom',
   roots: ['src',],
   moduleNameMapper: {
     '\\.(css|less)$': '<rootDir>/src/mocks/styleMock.js',
