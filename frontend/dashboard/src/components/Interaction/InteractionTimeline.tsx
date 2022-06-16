@@ -42,8 +42,14 @@ const TextboxNodeDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionPr
     {nodeEntry.value?.textboxNodeEntry ? (
       <>
         <UI.SectionHeader>
-          User wrote the following down:
+          When asked
+          &quot;
+          {nodeEntry.relatedNode?.title}
+          &quot;
         </UI.SectionHeader>
+        <UI.Span>
+          User wrote the following down:
+        </UI.Span>
         <UI.Div
           bg="white"
           borderRadius="10px"
@@ -51,12 +57,7 @@ const TextboxNodeDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionPr
         >
           {nodeEntry.value?.textboxNodeEntry}
         </UI.Div>
-        <UI.Span>
-          when asked
-          &quot;
-          {nodeEntry.relatedNode?.title}
-          &quot;
-        </UI.Span>
+
       </>
     ) : (
       <>
@@ -71,15 +72,15 @@ const MultiChoiceEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescript
     {nodeEntry.value?.choiceNodeEntry && (
       <>
         <UI.SectionHeader>
-          User selected:
+          When asked
           &quot;
-          {nodeEntry.value?.choiceNodeEntry}
+          {nodeEntry.relatedNode?.title}
           &quot;
         </UI.SectionHeader>
         <UI.Span>
-          when asked
+          User selected:
           &quot;
-          {nodeEntry.relatedNode?.title}
+          {nodeEntry.value?.choiceNodeEntry}
           &quot;
         </UI.Span>
       </>
@@ -92,15 +93,15 @@ const VideoEmbedEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescripti
     {nodeEntry.value?.videoNodeEntry && (
       <>
         <UI.SectionHeader>
-          User made choice:
-          {' '}
-          {nodeEntry.value?.videoNodeEntry}
-        </UI.SectionHeader>
-        <UI.Span>
-          when asked
+          When asked
           &quot;
           {nodeEntry.relatedNode?.title}
           &quot;
+        </UI.SectionHeader>
+        <UI.Span>
+          User made choice:
+          {' '}
+          {nodeEntry.value?.videoNodeEntry}
         </UI.Span>
       </>
     )}
@@ -112,15 +113,15 @@ const SliderEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionPr
     {nodeEntry.value?.sliderNodeEntry && (
       <>
         <UI.SectionHeader>
-          User slid the bunny to value:
-          {' '}
-          {formatSliderValue(nodeEntry.value?.sliderNodeEntry)}
-        </UI.SectionHeader>
-        <UI.Span>
-          when asked
+          When asked
           &quot;
           {nodeEntry.relatedNode?.title}
           &quot;
+        </UI.SectionHeader>
+        <UI.Span>
+          User slid the bunny to value:
+          {' '}
+          {formatSliderValue(nodeEntry.value?.sliderNodeEntry)}
         </UI.Span>
       </>
     )}

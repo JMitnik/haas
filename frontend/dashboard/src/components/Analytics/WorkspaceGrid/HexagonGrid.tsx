@@ -1,15 +1,23 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
-import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple, LinearGradient } from '@visx/gradient';
+import {
+  GradientLightgreenGreen,
+  GradientOrangeRed,
+  GradientPinkRed,
+  GradientSteelPurple,
+  LinearGradient,
+} from '@visx/gradient';
 import { Group } from '@visx/group';
 import { MapPin, Minus } from 'react-feather';
 import { PatternCircles } from '@visx/pattern';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
-import React from 'react';
-import useMeasure from 'react-use-measure';
-
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
+import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
+import useMeasure from 'react-use-measure';
+
+import * as Tooltip from 'components/Common/Tooltip/Tooltip';
 import theme from 'config/theme';
 
 import * as LS from './WorkspaceGrid.styles';
@@ -74,12 +82,16 @@ export const HexagonGrid = ({
   onGoBack,
   children,
 }: HexagonGridProps) => {
+  const { t } = useTranslation();
   const [ref, bounds] = useMeasure({
     debounce: {
       resize: 2,
       scroll: 1,
     },
   });
+
+  const [openGoBackTooltip, setOpenGoBackTooltip] = useState(false);
+  const [openCenterHexagonTooltip, setOpenCenterHexagonTooltip] = useState(false);
 
   const {
     tooltipData,
@@ -125,6 +137,7 @@ export const HexagonGrid = ({
         ref={zoom.containerRef}
       >
         <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
+        <GradientOrangeRed id="dots-orange" />
         <GradientPinkRed id="dots-pink" />
         <GradientSteelPurple id="dots-gray" />
         <LinearGradient id="grays" from="#757F9A" to="#939bb1" />
@@ -218,17 +231,57 @@ export const HexagonGrid = ({
 
       {children}
 
-      <UI.Div position="absolute" right={24} top="40%">
-        <LS.ControlButton onClick={onGoBack} aria-disabled={isAtRoot}>
-          <UI.Icon>
-            <Minus />
-          </UI.Icon>
-        </LS.ControlButton>
-        <LS.ControlButton onClick={() => zoom.reset()} mt={2}>
-          <UI.Icon>
-            <MapPin />
-          </UI.Icon>
-        </LS.ControlButton>
+      <UI.Div display="flex" flexDirection="column" position="absolute" right={24} top="40%">
+        <Tooltip.Root delayDuration={300} open={openGoBackTooltip} onOpenChange={setOpenGoBackTooltip}>
+          <Tooltip.Trigger>
+            <LS.ControlButton onClick={onGoBack} aria-disabled={isAtRoot}>
+              <UI.Icon>
+                <Minus />
+              </UI.Icon>
+            </LS.ControlButton>
+          </Tooltip.Trigger>
+          <Tooltip.Content isOpen={openGoBackTooltip}>
+            <UI.Div position="relative">
+              <UI.Div
+                position="absolute"
+                top="0"
+                left="50%"
+                padding="10px"
+                style={{ transform: 'translate(-50%, -10%) rotate(45deg)' }}
+                backgroundColor="white"
+              />
+              <UI.Card padding={1} backgroundColor="white">
+                <UI.Span color="off.600">{t('go_up_one_layer')}</UI.Span>
+              </UI.Card>
+            </UI.Div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+
+        <Tooltip.Root delayDuration={300} open={openCenterHexagonTooltip} onOpenChange={setOpenCenterHexagonTooltip}>
+          <Tooltip.Trigger>
+            <LS.ControlButton onClick={() => zoom.reset()} mt={2}>
+              <UI.Icon>
+                <MapPin />
+              </UI.Icon>
+            </LS.ControlButton>
+          </Tooltip.Trigger>
+          <Tooltip.Content isOpen={openCenterHexagonTooltip}>
+            <UI.Div position="relative">
+              <UI.Div
+                position="absolute"
+                top="0"
+                left="50%"
+                padding="10px"
+                style={{ transform: 'translate(-50%, -10%) rotate(45deg)' }}
+                backgroundColor="white"
+              />
+              <UI.Card padding={1} backgroundColor="white">
+                <UI.Span color="off.600">{t('center_hexagons')}</UI.Span>
+              </UI.Card>
+            </UI.Div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+
       </UI.Div>
 
       <AnimateSharedLayout>

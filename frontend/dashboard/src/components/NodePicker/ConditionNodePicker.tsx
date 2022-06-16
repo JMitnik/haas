@@ -5,6 +5,7 @@ import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
+import * as Modal from 'components/Common/Modal';
 import { AutomationConditionScopeType } from 'types/generated-types';
 import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
 
@@ -195,7 +196,7 @@ export const ConditionNodePicker = ({ onChange,
         </UI.Div>
       </UI.ListItem>
 
-      <UI.Modal willCloseOnOutsideClick={false} isOpen={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
+      <Modal.Root open={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
         <CreateConditionModalCard
           onClose={() => setCreateModalIsOpen(false)}
           onSuccess={(condition: any) => {
@@ -203,7 +204,7 @@ export const ConditionNodePicker = ({ onChange,
             onChange(condition);
           }}
         />
-      </UI.Modal>
+      </Modal.Root>
     </UI.List>
   );
 };

@@ -10,27 +10,23 @@ import {
   Hash,
   Link2,
   Phone,
-  PlusCircle,
   Type,
   Users,
 } from 'react-feather';
-import { AnimatePresence, Variants, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { Button } from '@chakra-ui/core';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
 
-import { Customer, Maybe, RoleType, UserType, useGetUsersAndRolesQuery } from 'types/generated-types';
+import * as Modal from 'components/Common/Modal';
 import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
-import { TargetTypeEnum, UserNodePicker } from 'components/NodePicker/UserNodePicker';
-import { useNavigator } from 'hooks/useNavigator';
-import Dropdown from 'components/Dropdown/Dropdown';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
 import { CTANodeFormProps } from './CTATypes';
-import { ContactsCell } from './ContactsCell';
+import FormNodeContactsFragment from './FormNodeContactFragment';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -122,47 +118,6 @@ interface FormNodePreviewProps {
   nrFields: number;
 }
 
-interface TargetEntry {
-  label: string;
-  value: string;
-  type: TargetTypeEnum;
-}
-
-const mapToUserPickerEntries = (customer: Maybe<{
-  __typename?: 'Customer' | undefined;
-} & Pick<Customer, 'id'> & {
-  users?: Maybe<({
-    __typename?: 'UserType' | undefined;
-  } & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'email' | 'phone'> & {
-    role?: Maybe<{
-      __typename?: 'RoleType' | undefined;
-    } & Pick<RoleType, 'id' | 'name'>> | undefined;
-  })[]> | undefined;
-  roles?: Maybe<({
-    __typename?: 'RoleType' | undefined;
-  } & Pick<RoleType, 'id' | 'name'>)[]> | undefined;
-}> | undefined) => {
-  const userPickerEntries: TargetEntry[] = [];
-
-  customer?.roles?.forEach((role) => {
-    userPickerEntries.push({
-      label: role.name,
-      value: role.id,
-      type: TargetTypeEnum.Role,
-    });
-  });
-
-  customer?.users?.forEach((user) => {
-    userPickerEntries.push({
-      label: `${user.firstName} ${user.lastName}`,
-      value: user.id,
-      type: TargetTypeEnum.User,
-    });
-  });
-
-  return userPickerEntries;
-};
-
 const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps) => {
   const fieldCategory = fieldMap.find((fieldItem) => fieldItem?.type === field?.type);
 
@@ -220,33 +175,6 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
   );
 };
 
-const parentPopup: Variants = {
-  initial: {
-    opacity: 0,
-  },
-  animate: {
-    opacity: 1,
-  },
-  exit: {
-    opacity: 0,
-  },
-};
-
-const childPopUp: Variants = {
-  initial: {
-    opacity: 0,
-    y: 100,
-  },
-  animate: {
-    opacity: 1,
-    y: 0,
-  },
-  exit: {
-    opacity: 0,
-    y: 100,
-  },
-};
-
 interface FormNodeFieldFragmentProps {
   form: any;
   field: any;
@@ -255,112 +183,6 @@ interface FormNodeFieldFragmentProps {
   onSubmit: (values: any) => void;
   onDelete: () => void;
 }
-
-interface FormNodeContactsFragmentProps {
-  form: any;
-  contacts: any;
-}
-
-const FormNodeContactsFragment = ({ form, contacts }: FormNodeContactsFragmentProps) => {
-  const { t } = useTranslation();
-  const { customerSlug } = useNavigator();
-
-  const { data } = useGetUsersAndRolesQuery({
-    variables: {
-      customerSlug,
-    },
-  });
-
-  const userPickerEntries = mapToUserPickerEntries(data?.customer);
-
-  return (
-    <UI.FormControl isRequired style={{ overflowX: 'scroll' }}>
-      <UI.FormLabel htmlFor="activeDialogue">
-        {t('contacts')}
-      </UI.FormLabel>
-      <UI.InputHelper>
-        {t('contacts_helper')}
-      </UI.InputHelper>
-      <UI.Div>
-        <UI.Flex>
-          <UI.Div
-            width="100%"
-            backgroundColor="#fbfcff"
-            border="1px solid #edf2f7"
-            borderRadius="10px"
-            padding={2}
-          >
-            <>
-              <UI.Grid m={2} ml={0} gridTemplateColumns="1fr">
-                <UI.Helper>{t('contact')}</UI.Helper>
-              </UI.Grid>
-              <UI.Grid
-                pt={2}
-                pb={2}
-                pl={0}
-                pr={0}
-                borderBottom="1px solid #edf2f7"
-                gridTemplateColumns="1fr"
-              >
-                <UI.Div alignItems="center" display="flex">
-                  <Controller
-                    name="contact.contacts"
-                    control={form.control}
-                    render={({ field: { value, onChange } }) => (
-                      <Dropdown
-                        isRelative
-                        renderOverlay={({ onClose: onUserPickerClose }) => (
-                          <UserNodePicker
-                            currValues={contacts}
-                            isMulti
-                            items={userPickerEntries}
-                            onClose={onUserPickerClose}
-                            onChange={onChange}
-                          />
-                        )}
-                      >
-                        {({ onOpen }) => (
-                          <UI.Div
-                            width="100%"
-                            justifyContent="center"
-                            display="flex"
-                            alignItems="center"
-                          >
-                            {value?.length ? (
-                              <ContactsCell
-                                onRemove={() => {
-                                  onChange(null);
-                                }}
-                                onClick={onOpen}
-                                users={value}
-                              />
-                            ) : (
-                              <UI.Button
-                                size="sm"
-                                variant="outline"
-                                onClick={onOpen}
-                                variantColor="altGray"
-                              >
-                                <UI.Icon mr={1}>
-                                  <PlusCircle />
-                                </UI.Icon>
-                                {t('automation:add_target')}
-                              </UI.Button>
-                            )}
-                          </UI.Div>
-                        )}
-                      </Dropdown>
-                    )}
-                  />
-                </UI.Div>
-              </UI.Grid>
-            </>
-          </UI.Div>
-        </UI.Flex>
-      </UI.Div>
-    </UI.FormControl>
-  );
-};
 
 const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeFieldFragmentProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -394,107 +216,95 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
   });
 
   return (
-    <motion.div style={{ zIndex: 300 }} variants={parentPopup} initial="initial" animate="animate" exit="exit">
-      <motion.div variants={childPopUp}>
-        <UI.Card bg="white" zIndex={300} noHover ref={ref}>
-          <UI.CardForm dualPane>
-            <UI.List>
-              <UI.ListGroupHeader>{t('select_a_field_type')}</UI.ListGroupHeader>
-              <UI.ListGroup>
-                {fieldMap.map((fieldCategory, index) => (
-                  <UI.ListItem
-                    key={index}
-                    accent={fieldCategory.color}
-                    isSelected={formType === fieldCategory.type}
-                    onClick={() => subform.setValue('type', fieldCategory.type)}
-                  >
-                    <UI.ListIcon bg={fieldCategory.color}><fieldCategory.icon /></UI.ListIcon>
-                    <UI.ListItemBody>
-                      <UI.Text color="gray.500" fontWeight={700}>{t(fieldCategory.type)}</UI.Text>
-                      <UI.Text color="gray.400">{t(`${fieldCategory.type}_helper`)}</UI.Text>
-                    </UI.ListItemBody>
-                    <UI.ListItemCaret />
-                  </UI.ListItem>
-                ))}
-              </UI.ListGroup>
-            </UI.List>
-            {formType ? (
-              <UI.CardBody display="flex" flexDirection="column" justifyContent="space-between">
-                <UI.InputGrid>
-                  <UI.FormControl>
-                    <UI.FormLabel htmlFor="label">{t('label')}</UI.FormLabel>
-                    <UI.Input {...subform.register('label')} key={field.fieldIndex} />
-                  </UI.FormControl>
-                  <UI.FormControl>
-                    <UI.FormLabel htmlFor="placeholder">{t('placeholder')}</UI.FormLabel>
-                    <UI.Input {...subform.register('placeholder')} key={field.fieldIndex} />
-                  </UI.FormControl>
-                  <UI.FormControl>
-                    <UI.FormLabel htmlFor="isRequired">{t('is_required')}</UI.FormLabel>
-                    <Controller
-                      control={subform.control}
-                      name="isRequired"
-                      defaultValue={field.isRequired}
-                      render={({ field: { value, onChange, onBlur } }) => (
-                        <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
-                          <UI.RadioButton
-                            icon={AlertCircle}
-                            value={1}
-                            mr={2}
-                            text={(t('required'))}
-                            description={t('required_helper')}
-                          />
-                          <UI.RadioButton
-                            icon={Circle}
-                            value={0}
-                            mr={2}
-                            text={(t('not_required'))}
-                            description={t('not_required_helper')}
-                          />
-                        </UI.RadioButtons>
-                      )}
-                    />
-                  </UI.FormControl>
-
-                  {formType === TempFieldType.CONTACTS && (
-                    <FormNodeContactsFragment contacts={contacts} form={subform} />
+    <UI.Card zIndex={300} ref={ref}>
+      <UI.CardForm dualPane>
+        <UI.List>
+          <UI.ListGroupHeader>{t('select_a_field_type')}</UI.ListGroupHeader>
+          <UI.ListGroup>
+            {fieldMap.map((fieldCategory, index) => (
+              <UI.ListItem
+                key={index}
+                accent={fieldCategory.color}
+                isSelected={formType === fieldCategory.type}
+                onClick={() => subform.setValue('type', fieldCategory.type)}
+              >
+                <UI.ListIcon bg={fieldCategory.color}><fieldCategory.icon /></UI.ListIcon>
+                <UI.ListItemBody>
+                  <UI.Text color="gray.500" fontWeight={700}>{t(fieldCategory.type)}</UI.Text>
+                  <UI.Text color="gray.400">{t(`${fieldCategory.type}_helper`)}</UI.Text>
+                </UI.ListItemBody>
+                <UI.ListItemCaret />
+              </UI.ListItem>
+            ))}
+          </UI.ListGroup>
+        </UI.List>
+        {formType ? (
+          <UI.CardBody display="flex" flexDirection="column" justifyContent="space-between">
+            <UI.InputGrid>
+              <UI.FormControl>
+                <UI.FormLabel htmlFor="label">{t('label')}</UI.FormLabel>
+                <UI.Input {...subform.register('label')} key={field.fieldIndex} />
+              </UI.FormControl>
+              <UI.FormControl>
+                <UI.FormLabel htmlFor="placeholder">{t('placeholder')}</UI.FormLabel>
+                <UI.Input {...subform.register('placeholder')} key={field.fieldIndex} />
+              </UI.FormControl>
+              <UI.FormControl>
+                <UI.FormLabel htmlFor="isRequired">{t('is_required')}</UI.FormLabel>
+                <Controller
+                  control={subform.control}
+                  name="isRequired"
+                  defaultValue={field.isRequired}
+                  render={({ onBlur, onChange, value }) => (
+                    <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
+                      <UI.RadioButton
+                        icon={AlertCircle}
+                        value={1}
+                        mr={2}
+                        text={(t('required'))}
+                        description={t('required_helper')}
+                      />
+                      <UI.RadioButton
+                        icon={Circle}
+                        value={0}
+                        mr={2}
+                        text={(t('not_required'))}
+                        description={t('not_required_helper')}
+                      />
+                    </UI.RadioButtons>
                   )}
-                  <UI.ButtonGroup justifySelf="flex-end" display="flex">
-                    <UI.Button onClick={handleSaveValues} variantColor="teal">{t('finish_editing')}</UI.Button>
-                    <UI.Button
-                      onClick={handleDelete}
-                      variantColor="red"
-                      variant="outline"
-                    >
-                      {t('delete_field')}
+                />
+              </UI.FormControl>
 
-                    </UI.Button>
-                  </UI.ButtonGroup>
-                </UI.InputGrid>
+              {formType === TempFieldType.CONTACTS && (
+                <FormNodeContactsFragment contacts={contacts} form={subform} />
+              )}
+            </UI.InputGrid>
+            <UI.ButtonGroup justifySelf="flex-end" display="flex">
+              <UI.Button onClick={handleSaveValues} variantColor="teal">{t('finish_editing')}</UI.Button>
+              <UI.Button onClick={handleDelete} variantColor="red" variant="outline">{t('delete_field')}</UI.Button>
+            </UI.ButtonGroup>
+          </UI.CardBody>
+        ) : (
+          <UI.CardBody>
+            <IllustrationCard text={t('select_a_field_type')} svg={<SelectIll />}>
+              <UI.Text fontWeight={200} pb={2}>or</UI.Text>
+              <UI.ButtonGroup justifySelf="flex-end">
+                <UI.Button
+                  size="sm"
+                  onClick={handleDelete}
+                  variantColor="red"
+                  variant="outline"
+                >
+                  {t('delete_field')}
 
-              </UI.CardBody>
-            ) : (
-              <UI.CardBody>
-                <IllustrationCard text={t('select_a_field_type')} svg={<SelectIll />}>
-                  <UI.Text fontWeight={200} pb={2}>or</UI.Text>
-                  <UI.ButtonGroup justifySelf="flex-end">
-                    <UI.Button
-                      size="sm"
-                      onClick={handleDelete}
-                      variantColor="red"
-                      variant="outline"
-                    >
-                      {t('delete_field')}
-
-                    </UI.Button>
-                  </UI.ButtonGroup>
-                </IllustrationCard>
-              </UI.CardBody>
-            )}
-          </UI.CardForm>
-        </UI.Card>
-      </motion.div>
-    </motion.div>
+                </UI.Button>
+              </UI.ButtonGroup>
+            </IllustrationCard>
+          </UI.CardBody>
+        )}
+      </UI.CardForm>
+    </UI.Card>
   );
 };
 
@@ -531,8 +341,6 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
 
   const formNodeFields = form.watch('formNode.fields', []);
 
-  console.log('Current saved values: ', formNodeFields);
-
   return (
     <UI.FormSection id="form-node-form">
       <UI.Div>
@@ -557,38 +365,35 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                 {fields.map((field, index) => (
                   <UI.Div position="relative" key={field.fieldIndex}>
                     <AnimatePresence>
-                      {openedField === index && (
-                        <UI.Modal
-                          isOpen={openedField === index}
-                          onClose={() => setOpenedField(null)}
-                          maxWidth={1000}
-                        >
-                          <FormNodeFieldFragment
-                            onSubmit={(subForm: any) => {
-                              form.setValue(
-                                `formNode.fields.${index}`,
-                                {
-                                  ...subForm,
-                                  contact: {
-                                    contacts: subForm.contact?.contacts
-                                      ? [...subForm.contact.contacts]
-                                      : [],
-                                  },
+                      <Modal.Root
+                        open={openedField === index}
+                        onClose={() => setOpenedField(null)}
+                        style={{ maxWidth: 1000 }}
+                      >
+                        <FormNodeFieldFragment
+                          onSubmit={(subForm: any) => {
+                            form.setValue(
+                              `formNode.fields.${index}`,
+                              {
+                                ...subForm,
+                                contact: {
+                                  contacts: subForm.contact?.contacts
+                                    ? [...subForm.contact.contacts]
+                                    : [],
                                 },
-                                { shouldValidate: true, shouldDirty: true },
-                              );
-                              // contactsArray.update(index, subForm.contact.contacts);
-                              form.trigger();
-                            }}
-                            form={form}
-                            onClose={() => setOpenedField(null)}
-                            onDelete={() => remove(index)}
-                            field={formNodeFields[index]} // formNodeFields[index]
-                            fieldIndex={index}
-                            key={field.fieldIndex}
-                          />
-                        </UI.Modal>
-                      )}
+                              },
+                              { shouldValidate: true, shouldDirty: true },
+                            );
+                            form.trigger();
+                          }}
+                          form={form}
+                          onClose={() => setOpenedField(null)}
+                          onDelete={() => remove(index)}
+                          field={formNodeFields[index]} // formNodeFields[index]
+                          fieldIndex={index}
+                          key={field.fieldIndex}
+                        />
+                      </Modal.Root>
                     </AnimatePresence>
 
                     <FormNodePreview

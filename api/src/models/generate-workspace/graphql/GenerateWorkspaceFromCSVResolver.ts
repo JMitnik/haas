@@ -13,6 +13,7 @@ export const GenerateWorkspaceCSVInputType = inputObjectType({
     t.string('workspaceSlug', { required: true });
     t.string('workspaceTitle', { required: true });
     t.upload('uploadedCsv', { required: false });
+    t.upload('managerCsv', { required: false });
     t.string('type', { required: true, default: 'DEFAULT' });
     t.boolean('generateDemoData', { required: false, default: false });
   },
@@ -25,6 +26,6 @@ export const GenerateWorkspaceFromCSVMutation = mutationField('generateWorkspace
   async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('No input object provided');
 
-    return ctx.services.generateWorkspaceService.generateWorkspace(args.input, ctx.session?.user?.id);
+    return ctx.services.generateWorkspaceService.generateWorkspaceFromCSV(args.input, ctx.session?.user?.id);
   },
 });

@@ -1,8 +1,0 @@
-query GetWorkspaceAdmins($customerSlug: String!) {
-  users(customerSlug: $customerSlug) {
-    id
-    firstName
-    lastName
-    globalPermissions
-  }
-}

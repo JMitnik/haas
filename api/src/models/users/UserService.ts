@@ -1,4 +1,4 @@
-import { UserOfCustomer, PrismaClient, Customer, Prisma, User, CustomerSettings } from '@prisma/client';
+import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
 import { UserInputError } from 'apollo-server';
 import _ from 'lodash';
 
@@ -10,7 +10,7 @@ import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUp
 import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
-import { DeletedUserOutput, GenerateReportPayload, TargetsPayload, UserWithWorkspaces } from './UserServiceTypes';
+import { DeletedUserOutput, GenerateReportPayload, UserWithWorkspaces } from './UserServiceTypes';
 import { offsetPaginate } from '../general/PaginationHelpers';
 
 class UserService {
@@ -52,6 +52,26 @@ class UserService {
 
     return this.userOfCustomerPrismaAdapter.findTargetUsers(workspaceSlug, targetIds);
   };
+
+  /*
+   * Finds all private dialogues of a workspace and connects them to a user
+   * @param userId 
+   * @param workspaceId 
+   */
+  connectPrivateDialoguesToUser = async (userId: string, workspaceId: string) => {
+    const customerWithDialogues = await this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(workspaceId);
+    const privateDialogueIds = customerWithDialogues?.dialogues.map((dialogue) => ({ id: dialogue.id })) || [];
+    await this.userOfCustomerPrismaAdapter.connectPrivateDialoguesToUser(userId, privateDialogueIds);
+  }
+
+  /**
+   * Upserts a user by checking if the email already exists or not
+   * @param input 
+   * @returns 
+   */
+  upsertUserByEmail = async (input: Prisma.UserCreateInput) => {
+    return this.userPrismaAdapter.upsertUserByEmail(input);
+  }
 
   /**
    * Finds the private dialogues of a user as well as all private dialogues within a workspace

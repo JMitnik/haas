@@ -198,7 +198,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
   }, [watchActiveQuestion]);
 
   return (
-    <UI.ModalCard maxWidth={1000} onClose={onClose}>
+    <>
       <UI.ModalHead>
         <UI.ViewTitle>{t('automation:add_condition')}</UI.ViewTitle>
       </UI.ModalHead>
@@ -614,6 +614,6 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
           </UI.Form>
         </UI.Div>
       </UI.ModalBody>
-    </UI.ModalCard>
+    </>
   );
 };

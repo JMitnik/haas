@@ -1202,6 +1202,7 @@ export type GenerateWorkspaceCsvInputType = {
   workspaceSlug: Scalars['String'];
   workspaceTitle: Scalars['String'];
   uploadedCsv?: Maybe<Scalars['Upload']>;
+  managerCsv?: Maybe<Scalars['Upload']>;
   type?: Scalars['String'];
   generateDemoData?: Maybe<Scalars['Boolean']>;
 };
@@ -3578,6 +3579,19 @@ export type GetDialogueLinksQuery = (
   )>> }
 );
 
+export type DeleteDialogueMutationVariables = Exact<{
+  input?: Maybe<DeleteDialogueInputType>;
+}>;
+
+
+export type DeleteDialogueMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteDialogue: (
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id' | 'slug'>
+  ) }
+);
+
 export type DialogueConnectionQueryVariables = Exact<{
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<DialogueConnectionFilterInput>;
@@ -5614,6 +5628,40 @@ export type GetDialogueLinksQueryResult = Apollo.QueryResult<GetDialogueLinksQue
 export function refetchGetDialogueLinksQuery(variables?: GetDialogueLinksQueryVariables) {
       return { query: GetDialogueLinksDocument, variables: variables }
     }
+export const DeleteDialogueDocument = gql`
+    mutation deleteDialogue($input: DeleteDialogueInputType) {
+  deleteDialogue(input: $input) {
+    id
+    slug
+  }
+}
+    `;
+export type DeleteDialogueMutationFn = Apollo.MutationFunction<DeleteDialogueMutation, DeleteDialogueMutationVariables>;
+
+/**
+ * __useDeleteDialogueMutation__
+ *
+ * To run a mutation, you first call `useDeleteDialogueMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteDialogueMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteDialogueMutation, { data, loading, error }] = useDeleteDialogueMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteDialogueMutation(baseOptions?: Apollo.MutationHookOptions<DeleteDialogueMutation, DeleteDialogueMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteDialogueMutation, DeleteDialogueMutationVariables>(DeleteDialogueDocument, options);
+      }
+export type DeleteDialogueMutationHookResult = ReturnType<typeof useDeleteDialogueMutation>;
+export type DeleteDialogueMutationResult = Apollo.MutationResult<DeleteDialogueMutation>;
+export type DeleteDialogueMutationOptions = Apollo.BaseMutationOptions<DeleteDialogueMutation, DeleteDialogueMutationVariables>;
 export const DialogueConnectionDocument = gql`
     query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilterInput) {
   customer(slug: $customerSlug) {
@@ -6861,6 +6909,13 @@ export namespace GetDialogueLinks {
   export type Query = GetDialogueLinksQuery;
   export type DialogueLinks = NonNullable<(NonNullable<GetDialogueLinksQuery['dialogueLinks']>)[number]>;
   export const Document = GetDialogueLinksDocument;
+}
+
+export namespace DeleteDialogue {
+  export type Variables = DeleteDialogueMutationVariables;
+  export type Mutation = DeleteDialogueMutation;
+  export type DeleteDialogue = (NonNullable<DeleteDialogueMutation['deleteDialogue']>);
+  export const Document = DeleteDialogueDocument;
 }
 
 export namespace DialogueConnection {

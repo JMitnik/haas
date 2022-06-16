@@ -19,8 +19,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
-import * as LS from 'views/GenerateWorkspaceView/GenerateWorkspaceView.styles';
 import * as Menu from 'components/Common/Menu';
+import * as Modal from 'components/Common/Modal';
+import * as RadioGroup from 'components/Common/RadioGroup';
 import {
   AutomationActionType,
   AutomationConditionBuilderType,
@@ -868,8 +869,10 @@ const AutomationForm = ({
                     control={form.control}
                     // defaultValue={automation?.schedule?.type as RecurringPeriodType}
                     render={({ field: { value, onChange, onBlur } }) => (
-                      <LS.RadioGroupRoot
+                      <RadioGroup.Root
                         defaultValue={value}
+                        onBlur={onBlur}
+                        variant="spaced"
                         onValueChange={(e: any) => {
                           const data = getCronByScheduleType(e);
                           if (data) {
@@ -881,31 +884,24 @@ const AutomationForm = ({
                           }
                           return onChange(e);
                         }}
-                        onBlur={onBlur}
-                        variant="spaced"
                       >
                         {SCHEDULE_TYPE_OPTIONS.map((option) => (
-                          <LS.RadioGroupBox
-                            htmlFor={option.value}
-                            key={option.value}
+                          <RadioGroup.Item
                             isActive={value === option.value}
+                            value={option.value}
+                            key={option.value}
                             contentVariant="twoLine"
                             variant="boxed"
                           >
-                            <LS.RadioGroupItem id={option.value} key={option.value} value={option.value}>
-                              <LS.RadioGroupIndicator />
-                            </LS.RadioGroupItem>
-                            <UI.Div>
-                              <LS.RadioGroupLabel>
-                                {option.label}
-                              </LS.RadioGroupLabel>
-                              <LS.RadioGroupSubtitle>
-                                {option.description}
-                              </LS.RadioGroupSubtitle>
-                            </UI.Div>
-                          </LS.RadioGroupBox>
+                            <RadioGroup.Label>
+                              {option.label}
+                            </RadioGroup.Label>
+                            <RadioGroup.Subtitle>
+                              {option.description}
+                            </RadioGroup.Subtitle>
+                          </RadioGroup.Item>
                         ))}
-                      </LS.RadioGroupRoot>
+                      </RadioGroup.Root>
                     )}
                   />
                 </UI.FormControl>
@@ -1121,9 +1117,8 @@ const AutomationForm = ({
         </Form>
       </UI.FormContainer>
 
-      <UI.Modal
-        willCloseOnOutsideClick={false}
-        isOpen={createModalIsOpen.isOpen && createModalIsOpen.modal === ModalType.CreateCondition}
+      <Modal.Root
+        open={createModalIsOpen.isOpen && createModalIsOpen.modal === ModalType.CreateCondition}
         onClose={() => setCreateModalIsOpen({ isOpen: false })}
       >
         <CreateConditionModalCard
@@ -1133,11 +1128,10 @@ const AutomationForm = ({
             setActiveConditions((oldConditions) => [...oldConditions, condition]);
           }}
         />
-      </UI.Modal>
+      </Modal.Root>
 
-      <UI.Modal
-        willCloseOnOutsideClick={false}
-        isOpen={createModalIsOpen.isOpen && createModalIsOpen.modal === ModalType.CreateAction}
+      <Modal.Root
+        open={createModalIsOpen.isOpen && createModalIsOpen.modal === ModalType.CreateAction}
         onClose={() => setCreateModalIsOpen({ isOpen: false })}
       >
         <CreateActionModalCard
@@ -1164,7 +1158,7 @@ const AutomationForm = ({
             return action;
           }}
         />
-      </UI.Modal>
+      </Modal.Root>
 
       <Menu.Base
         {...menuProps}

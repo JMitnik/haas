@@ -129,7 +129,7 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
   const userPickerEntries = mapToUserPickerEntries(data?.customer);
 
   return (
-    <UI.ModalCard maxWidth={1000} onClose={onClose}>
+    <>
       <UI.ModalHead>
         <UI.ViewTitle>{activeAction ? t('automation:edit_action') : t('automation:add_action')}</UI.ViewTitle>
       </UI.ModalHead>
@@ -317,6 +317,6 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
           </UI.Form>
         </UI.Div>
       </UI.ModalBody>
-    </UI.ModalCard>
+    </>
   );
 };

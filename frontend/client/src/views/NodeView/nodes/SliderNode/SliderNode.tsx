@@ -39,7 +39,7 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
       <Div>
         <NodeTitle>{node.title}</NodeTitle>
       </Div>
-      <Div>
+      <Div position="relative">
         <Slider
           happyText={node.sliderNode?.happyText}
           unhappyText={node.sliderNode?.unhappyText}

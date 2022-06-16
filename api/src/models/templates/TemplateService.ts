@@ -7,7 +7,7 @@ import templates from '.';
 import { CreateQuestionsInput } from '../questionnaire/DialoguePrismaAdapterType';
 import EdgeService from '../edge/EdgeService';
 import NodeService from '../QuestionNode/NodeService';
-import WorkspaceTemplate, { DemoWorkspaceTemplate } from './TemplateTypes';
+import WorkspaceTemplate from './TemplateTypes';
 
 const standardOptions = [
   { value: 'Facilities', position: 1 },

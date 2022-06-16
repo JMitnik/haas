@@ -28,7 +28,7 @@ export const TopbarHamburger = () => {
   return (
     <HamburgerContainer className="hamburger" px={4}>
       <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
-        <Popover.Trigger>
+        <Popover.Trigger asChild>
           <UI.Button variant="outline">
             <UI.Icon>
               <HamburgerIcon />
@@ -50,7 +50,7 @@ export const TopbarHamburger = () => {
               style={{ width: '100%', minWidth: '80%', zIndex: 10000 }}
             >
               <motion.div>
-                <UI.NewCard>
+                <UI.Card>
                   <UI.CardBody>
                     <WorkspaceNav customerSlug={activeCustomer?.slug || ''} />
 
@@ -59,7 +59,7 @@ export const TopbarHamburger = () => {
                     <WorkspaceSwitchContent />
 
                   </UI.CardBody>
-                </UI.NewCard>
+                </UI.Card>
               </motion.div>
             </Content>
           ) : null}

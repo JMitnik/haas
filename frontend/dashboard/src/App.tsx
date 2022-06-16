@@ -24,7 +24,6 @@ import AddAutomationView from 'views/AddAutomationView';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
-import AdminOverview from 'views/AdminOverview/AdminOverview';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
 import AutomationsPage from 'pages/dashboard/automations';
@@ -303,12 +302,6 @@ const AppRoutes = () => (
         allowedPermission={SystemPermission.CanAccessAdminPanel}
         path={ROUTES.AUTODECK_OVERVIEW}
         render={() => <AutodeckOverview />}
-      />
-
-      <GuardedRoute
-        allowedPermission={SystemPermission.CanAccessAdminPanel}
-        path={ROUTES.ADMIN_OVERVIEW}
-        render={() => <AdminOverview />}
       />
 
       <GuardedRoute

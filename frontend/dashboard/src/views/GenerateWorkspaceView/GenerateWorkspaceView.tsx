@@ -5,14 +5,13 @@ import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
+import * as RadioGroup from 'components/Common/RadioGroup';
 import { DialogueTemplateType, refetchMeQuery, useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
 import { View } from 'layouts/View';
 import { useLogger } from 'hooks/useLogger';
 import { useToast } from 'hooks/useToast';
 import FileDropInput from 'components/FileDropInput';
 import intToBool from 'utils/intToBool';
-
-import * as LS from './GenerateWorkspaceView.styles';
 
 const schema = yup.object({
   workspaceTitle: yup.string().required(),
@@ -59,6 +58,7 @@ export const GenerateWorkspaceView = () => {
   const toast = useToast();
 
   const [activeCSV, setActiveCSV] = useState<File | null>(null);
+  const [activeManagerCSV, setActiveManagerCSV] = useState<File | null>(null);
   const [importWorkspaceCSV, { loading }] = useGenerateWorkspaceFromCsvMutation({
     refetchQueries: [
       refetchMeQuery(),
@@ -83,6 +83,13 @@ export const GenerateWorkspaceView = () => {
     defaultValue: 0,
   });
 
+  const handleManagerDrop = (files: File[]) => {
+    if (!files.length) return;
+
+    const [file] = files;
+    setActiveManagerCSV(file);
+  };
+
   const handleDrop = (files: File[]) => {
     if (!files.length) return;
 
@@ -100,6 +107,7 @@ export const GenerateWorkspaceView = () => {
           workspaceTitle,
           workspaceSlug,
           uploadedCsv: activeCSV,
+          managerCsv: activeManagerCSV,
           type: dialogueType as DialogueTemplateType,
           generateDemoData: generateDemoDataCheck,
         },
@@ -143,35 +151,30 @@ export const GenerateWorkspaceView = () => {
               <Controller
                 name="dialogueType"
                 control={form.control}
-                render={({ field: { value, onChange, onBlur } }) => (
-                  <LS.RadioGroupRoot
+                render={({ value, onChange, onBlur }) => (
+                  <RadioGroup.Root
                     defaultValue={value}
                     onValueChange={onChange}
                     onBlur={onBlur}
                     variant="spaced"
                   >
                     {DIALOGUE_TYPE_OPTIONS.map((option) => (
-                      <LS.RadioGroupBox
-                        htmlFor={option.value}
-                        key={option.value}
+                      <RadioGroup.Item
                         isActive={value === option.value}
+                        value={option.value}
+                        key={option.value}
                         contentVariant="twoLine"
                         variant="boxed"
                       >
-                        <LS.RadioGroupItem id={option.value} key={option.value} value={option.value}>
-                          <LS.RadioGroupIndicator />
-                        </LS.RadioGroupItem>
-                        <UI.Div>
-                          <LS.RadioGroupLabel>
-                            {option.label}
-                          </LS.RadioGroupLabel>
-                          <LS.RadioGroupSubtitle>
-                            {option.description}
-                          </LS.RadioGroupSubtitle>
-                        </UI.Div>
-                      </LS.RadioGroupBox>
+                        <RadioGroup.Label>
+                          {option.label}
+                        </RadioGroup.Label>
+                        <RadioGroup.Subtitle>
+                          {option.description}
+                        </RadioGroup.Subtitle>
+                      </RadioGroup.Item>
                     ))}
-                  </LS.RadioGroupRoot>
+                  </RadioGroup.Root>
                 )}
               />
             </UI.FormControl>
@@ -201,6 +204,15 @@ export const GenerateWorkspaceView = () => {
 
               </UI.Flex>
 
+            </UI.FormControl>
+
+            <UI.FormControl opacity={usesGeneratedData ? 0.5 : 1}>
+              <UI.FormLabel>{t('upload_user_csv')}</UI.FormLabel>
+              <UI.FormLabelHelper>{t('upload_user_csv_helper')}</UI.FormLabelHelper>
+              <FileDropInput
+                isDisabled={!!usesGeneratedData}
+                onDrop={handleManagerDrop}
+              />
             </UI.FormControl>
 
             <UI.FormControl isRequired={usesGeneratedData === 0} opacity={usesGeneratedData ? 0.5 : 1}>

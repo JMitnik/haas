@@ -12,11 +12,13 @@ import { ShowMoreButton } from 'components/Common/ShowMoreButton';
 
 import { Avatar } from 'components/Common/Avatar';
 import { useCustomer } from 'providers/CustomerProvider';
+import {
+  useDeleteDialogueMutation,
+  useSetDialoguePrivacyMutation,
+} from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
-import { useSetDialoguePrivacyMutation } from 'types/generated-types';
 import { useToast } from 'hooks/useToast';
 import { useUser } from 'providers/UserProvider';
-import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
 
@@ -38,12 +40,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
         state: !dialogue.isPrivate,
       },
     },
-    refetchQueries: [{
-      query: getDialoguesOfCustomer,
-      variables: {
-        customerSlug: activeCustomer?.slug as string,
-      },
-    }],
+    refetchQueries: ['dialogueConnection'],
     onCompleted: (data) => {
       const state = data.setDialoguePrivacy?.isPrivate ? 'private' : 'public';
       toast.success({
@@ -54,6 +51,25 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
     onError: () => {
       toast.templates.error();
     },
+  });
+
+  const [deleteDialogue] = useDeleteDialogueMutation({
+    onCompleted: () => {
+      toast.success({
+        title: t('delete_dialogue_complete'),
+        description: t('delete_dialogue_complete_helper'),
+      });
+    },
+    variables: {
+      input: {
+        customerSlug,
+        id: dialogue.id,
+      },
+    },
+    onError: (serverError: any) => {
+      console.log(serverError);
+    },
+    refetchQueries: ['dialogueConnection'],
   });
 
   const renderFlag = (language: string): JSX.Element => {
@@ -78,7 +94,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
   const [openDropdown, setIsOpenDropdown] = useState(false);
 
   return (
-    <UI.NewCard
+    <UI.Card
       ref={ref}
       data-cy="DialogueCard"
       hasHover
@@ -116,6 +132,15 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
                       <Dropdown.CheckedItem isChecked={dialogue.isPrivate} onClick={() => setDialoguePrivacy()}>
                         {t('set_private')}
                       </Dropdown.CheckedItem>
+
+                      <UI.Hr />
+
+                      <Dropdown.Item
+                        onClick={() => deleteDialogue()}
+                      >
+                        {t('delete')}
+                      </Dropdown.Item>
+
                     </Dropdown.Content>
                   </Dropdown.Root>
                 </UI.Div>
@@ -165,7 +190,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
           </UI.Flex>
         </UI.ColumnFlex>
       </UI.CardBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 

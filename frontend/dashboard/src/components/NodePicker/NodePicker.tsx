@@ -5,6 +5,7 @@ import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
+import * as Modal from 'components/Common/Modal';
 import {
   CreateCallToActionModalCard,
 } from 'views/DialogueBuilderView/components/QuestionEntryForm/CreateCallToActionModalCard';
@@ -187,14 +188,14 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
         </UI.Div>
       </UI.ListItem>
 
-      <UI.Modal willCloseOnOutsideClick={false} isOpen={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
+      <Modal.Root open={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
         <CreateCallToActionModalCard
           onClose={() => setCreateModalIsOpen(false)}
           onSuccess={(callToAction: any) => {
             handleChange(callToAction);
           }}
         />
-      </UI.Modal>
+      </Modal.Root>
     </UI.List>
   );
 };

@@ -1,9 +1,8 @@
 import * as Dropdown from 'components/Common/Dropdown';
 import * as UI from '@haas/ui';
-import { Activity, Bell, Briefcase, Clock, Watch } from 'react-feather';
+import { Activity, Bell, Briefcase, Clock } from 'react-feather';
 import {
-  Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent,
-  PopoverFooter, PopoverHeader, PopoverTrigger, Switch, useToast,
+  Switch, useToast,
 } from '@chakra-ui/core';
 
 import { formatDistance } from 'date-fns';
@@ -27,51 +26,6 @@ import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
 
 import { TypeBadge } from './AutomationOverviewStyles';
-
-interface AutomationCardOptionsOverlayProps {
-  onDelete: (e: React.MouseEvent<HTMLElement>) => void;
-  onEdit: (e: React.MouseEvent<HTMLElement>) => void;
-}
-
-const AutomationCardOptionsOverlay = ({ onDelete, onEdit }: AutomationCardOptionsOverlayProps) => {
-  const { t } = useTranslation();
-
-  return (
-    <UI.List>
-      <UI.ListHeader>{t('edit_automation')}</UI.ListHeader>
-      <Popover>
-        {() => (
-          <>
-            <PopoverTrigger>
-              <UI.ListItem>
-                {t('delete')}
-              </UI.ListItem>
-            </PopoverTrigger>
-            <PopoverContent zIndex={4}>
-              <PopoverArrow />
-              <PopoverHeader>{t('delete')}</PopoverHeader>
-              <PopoverCloseButton />
-              <PopoverBody>
-                <UI.Text>{t('delete_automation_popover')}</UI.Text>
-              </PopoverBody>
-              <PopoverFooter>
-                <Button
-                  variantColor="red"
-                  onClick={onDelete}
-                >
-                  {t('delete')}
-                </Button>
-              </PopoverFooter>
-            </PopoverContent>
-          </>
-        )}
-      </Popover>
-      <UI.ListItem onClick={onEdit}>
-        {t('edit')}
-      </UI.ListItem>
-    </UI.List>
-  );
-};
 
 const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel, isCompact?: boolean }) => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
@@ -172,7 +126,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
   const lastUpdated = automation.updatedAt ? new Date(Number.parseInt(automation.updatedAt, 10)) : null;
 
   return (
-    <UI.NewCard
+    <UI.Card
       ref={ref}
       data-cy="AutomationCard"
       bg="white"
@@ -326,7 +280,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
         </UI.ColumnFlex>
 
       </UI.CardBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 

@@ -22,6 +22,7 @@ import {
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Span,
 } from '@haas/ui';
 import { SelectType } from 'types/generic';
+
 import { useTranslation } from 'react-i18next';
 import ServerError from 'components/ServerError';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
@@ -228,10 +229,8 @@ const FormConditionFragment = ({
 
   return (
     <UI.Card
-      noHover
       borderTop="3px solid"
       borderColor="primary"
-      outline
       mt={2}
       gridColumn="1 / -1"
       padding={4}
@@ -730,8 +729,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
         <UI.InputGrid>
           {activeRecipients.map((recipient, index) => (
             <UI.Card
-              noHover
-              outline
               borderTop="3px solid"
               borderColor="tertiary"
               key={index}

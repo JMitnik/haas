@@ -35,6 +35,12 @@ const Table = ({
     onPaginationChange((prevValues: any) => ({ ...prevValues, pageIndex: newPageIndex }));
   };
 
+  if (data.length === 0 && !loading) {
+    return (
+      <UI.IllustrationCard svg={<NoDataIll />} text={t('no_data')} />
+    );
+  }
+
   return (
     <TableContainer>
       <TableHeader
@@ -82,10 +88,6 @@ const Table = ({
             </UI.Div>
           ))}
         </>
-      )}
-
-      {data.length === 0 && !loading && (
-        <UI.IllustrationCard svg={<NoDataIll />} text={t('no_data')} />
       )}
 
       {!hidePagination && (
