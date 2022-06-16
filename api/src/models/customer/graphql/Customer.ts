@@ -17,7 +17,7 @@ import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
-import { Organization } from './Organization';
+import { Organization } from '../../organization/graphql/Organization';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;

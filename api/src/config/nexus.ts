@@ -21,8 +21,10 @@ import * as RoleAPI from '../models/role';
 import tagNexus from '../models/tag/Tag';
 import triggerNexus from '../models/trigger/Trigger';
 import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
+import * as organizationAPI from '../models/organization/graphql/index';
 
 const nexus = [
+  ...Array(organizationAPI),
   ...Array(GenerateWorkspaceAPI),
   ...Array(AutodeckAPI),
   ...linkNexus,

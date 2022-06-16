@@ -11,7 +11,7 @@ export const Organization = objectType({
       async resolve(parent, args, ctx, info) {
         if (!info.variableValues.workspaceId) throw new UserInputError('No workspaceId provided to get organization layers');
 
-        return ctx.services.customerService.getOrganizationLayers(info.variableValues.workspaceId);
+        return ctx.services.organizationService.getOrganizationLayers(info.variableValues.workspaceId);
       },
     });
   },
