@@ -2814,6 +2814,19 @@ export type UpdateDeliveryStatusMutation = (
   & Pick<Mutation, 'updateDeliveryStatus'>
 );
 
+export type AppendToInteractionMutationVariables = Exact<{
+  input?: Maybe<AppendToInteractionInput>;
+}>;
+
+
+export type AppendToInteractionMutation = (
+  { __typename?: 'Mutation' }
+  & { appendToInteraction: (
+    { __typename?: 'Session' }
+    & Pick<Session, 'id'>
+  ) }
+);
+
 export type CreateSessionMutationVariables = Exact<{
   input?: Maybe<SessionInput>;
 }>;
@@ -3123,6 +3136,39 @@ export function useUpdateDeliveryStatusMutation(baseOptions?: Apollo.MutationHoo
 export type UpdateDeliveryStatusMutationHookResult = ReturnType<typeof useUpdateDeliveryStatusMutation>;
 export type UpdateDeliveryStatusMutationResult = Apollo.MutationResult<UpdateDeliveryStatusMutation>;
 export type UpdateDeliveryStatusMutationOptions = Apollo.BaseMutationOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
+export const AppendToInteractionDocument = gql`
+    mutation appendToInteraction($input: AppendToInteractionInput) {
+  appendToInteraction(input: $input) {
+    id
+  }
+}
+    `;
+export type AppendToInteractionMutationFn = Apollo.MutationFunction<AppendToInteractionMutation, AppendToInteractionMutationVariables>;
+
+/**
+ * __useAppendToInteractionMutation__
+ *
+ * To run a mutation, you first call `useAppendToInteractionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAppendToInteractionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [appendToInteractionMutation, { data, loading, error }] = useAppendToInteractionMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAppendToInteractionMutation(baseOptions?: Apollo.MutationHookOptions<AppendToInteractionMutation, AppendToInteractionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AppendToInteractionMutation, AppendToInteractionMutationVariables>(AppendToInteractionDocument, options);
+      }
+export type AppendToInteractionMutationHookResult = ReturnType<typeof useAppendToInteractionMutation>;
+export type AppendToInteractionMutationResult = Apollo.MutationResult<AppendToInteractionMutation>;
+export type AppendToInteractionMutationOptions = Apollo.BaseMutationOptions<AppendToInteractionMutation, AppendToInteractionMutationVariables>;
 export const CreateSessionDocument = gql`
     mutation createSession($input: SessionInput) {
   createSession(input: $input) {

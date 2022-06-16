@@ -13,5 +13,10 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import '@4tw/cypress-drag-drop';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import '@testing-library/cypress/add-commands';
+
 // Import commands.js using ES2015 syntax:
 import './commands';

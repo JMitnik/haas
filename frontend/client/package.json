@@ -59,7 +59,7 @@
     }
   },
   "devDependencies": {
-    "@4tw/cypress-drag-drop": "^1.6.0",
+    "@4tw/cypress-drag-drop": "^2.1.0",
     "@graphql-codegen/cli": "^1.17.3",
     "@graphql-codegen/typescript-operations": "^1.17.13",
     "@graphql-codegen/typescript-react-apollo": "^2.2.1",

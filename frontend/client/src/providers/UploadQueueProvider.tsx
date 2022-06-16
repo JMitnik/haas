@@ -1,21 +1,11 @@
-import { useMutation } from '@apollo/client';
 import React, { useCallback, useContext, useRef } from 'react';
-import gql from 'graphql-tag';
 import qs from 'qs';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
-import { useCreateSessionMutation } from 'types/generated-types';
+import { useAppendToInteractionMutation, useCreateSessionMutation } from 'types/generated-types';
 import { useLocation } from 'react-router-dom';
 
 const UploadQueueContext = React.createContext({} as any);
-
-const appendToInteractionMutation = gql`
-  mutation appendToInteraction($input: AppendToInteractionInput) {
-    appendToInteraction(input: $input) {
-      id
-    }
-  }
-`;
 
 export const UploadQueueProvider = ({ children }: { children: React.ReactNode }) => {
   const willAppend = useRef(false);
@@ -24,7 +14,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
   const queue = useRef<any>([]);
   const { store, originUrl, device, startTime } = useDialogueTree();
   const [createInteraction, { data: interactionData }] = useCreateSessionMutation();
-  const [appendToInteraction] = useMutation(appendToInteractionMutation);
+  const [appendToInteraction] = useAppendToInteractionMutation();
   const ref = qs.parse(location.search, { ignoreQueryPrefix: true })?.ref?.toString() || '';
 
   /**
@@ -76,7 +66,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
         },
       },
     })
-      .catch((err) => console.error(err))
+      .catch((err: any) => console.error(err))
       .finally(() => {
         // eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
         const [_, ...tempQueue] = queue.current;
