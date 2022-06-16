@@ -5,7 +5,7 @@ import cuid from 'cuid';
 import { addDays, subDays } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 
-import { NexusGenInputs } from '../../generated/nexus';
+import { NexusGenEnums, NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
 import defaultWorkspaceTemplate, { defaultMassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
@@ -52,7 +52,7 @@ export class CustomerService {
 
   getOrganizationLayers = async (workspaceId: string) => {
     // Every organization consits at least of a dialogue and interaction layer
-    const finalLayers = [
+    const finalLayers: { type: NexusGenEnums['OrganizationLayerType'] }[] = [
       {
         type: OrganizationLayerType.DIALOGUE,
       },
@@ -72,9 +72,10 @@ export class CustomerService {
     if (!deepestLayers.length) return finalLayers;
 
     // Substract with 1 as the last entry of the dialogue title is considered a dialogue and not a group
-    const groupLayers = [...Array(deepestLayers.length - 1)].map(() => ({
-      type: OrganizationLayerType.GROUP,
-    }));
+    const groupLayers: { type: NexusGenEnums['OrganizationLayerType'] }[] = [...Array(deepestLayers.length - 1)].map(
+      () => ({
+        type: OrganizationLayerType.GROUP,
+      }));
 
     finalLayers.unshift(...groupLayers);
 
