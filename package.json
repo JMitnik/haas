@@ -77,7 +77,7 @@
         "test:watch:dashboard": "yarn workspace @haas/dashboard test:watch",
         "test:dashboard": "yarn workspace @haas/dashboard test",
         "test:cypress-dashboard": "yarn workspace @haas/dashboard cypress open",
-        "test:cypress-client": "yarn workspace @haas/client cypress open",
+        "test-e2e:client": "yarn workspace @haas/client cypress open",
         "restart:api": "yarn kill:api && yarn start:api",
         "types": "yarn types:api && yarn types:dashboard",
         "types:api": "yarn workspace @haas/api types",
