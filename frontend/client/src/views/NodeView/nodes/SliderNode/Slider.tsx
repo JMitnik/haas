@@ -9,16 +9,16 @@ import { useWatch } from 'react-hook-form';
 import Color from 'color';
 import Lottie from 'react-lottie';
 import React, { useEffect, useReducer, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { Div, Flex, Text, Slider as UISlider } from '@haas/ui';
-import { ReactComponent as FingerIcon } from 'assets/icons/icon-fingerprint.svg';
+import { Div, Flex, Slider as UISlider } from '@haas/ui';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
 import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
-import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
-import { SlideMeAnimation, WiggleAnimation } from './SliderNodeAnimations';
+import { ChevronsLeft, ChevronsRight } from 'react-feather';
+import { ExplainSlideLeftAnimation, ExplainSlideRightAnimation } from './SliderNodeAnimations';
+import { HAASRabbit, SliderNodeValue } from './SliderNodeStyles';
 import { SliderNodeMarkersProps } from '../../../../models/Tree/SliderNodeMarkersModel';
 import { SliderText } from './SliderText';
 
@@ -58,6 +58,17 @@ const adaptColor = (colorHex: string) => {
   return color.mix(Color('white'), 0.4).saturate(1).hex();
 };
 
+const AdjustedColourWrapper = styled(Div)`
+  font-weight: 600;
+  
+  ${({ theme }) => css`
+    color: ${Color(theme.colors.primary).isDark()
+      ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
+      : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+      
+    `}
+  `;
+
 const SliderSpeechWrapper = styled(Div)`
   > div {
     width: 100%;
@@ -65,7 +76,7 @@ const SliderSpeechWrapper = styled(Div)`
     align-items: center;
 
     border-radius: 30px;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(5px);
     padding: 12px;
     box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
@@ -99,8 +110,7 @@ interface SliderProps {
 const endTime = 40;
 const initialWindUpSec = 2;
 
-const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: SliderProps) => {
-  const { t } = useTranslation();
+const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
   const [isValid, setIsValid] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [showIsEarly, setShowIsEarly] = useState(false);
@@ -248,41 +258,8 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
   const adaptedColor = adaptColor(sliderColor);
   const adjustedScore = (Math.round(sliderValue * 2) / 2);
 
-  const variants: Variants = {
-    animate: {
-      // rotate: i % 2 === 0 ? [-1, 1.3, 0] : [1, -1.4, 0],
-      rotate: [-1, 1.3, 0, 1, -1.4, 0],
-      transition: {
-        loop: Infinity,
-        delay: 1,
-        repeatDelay: 3,
-        duration: 2.8,
-      },
-    },
-  };
-
   return (
     <>
-      {/* {animationState.isStopped && (
-        <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
-          <Flex
-            data-testid="unhappy"
-            alignItems="center"
-          >
-            <UnhappyIcon />
-            <Text fontSize="0.8rem">
-              {unhappyText || t('unhappy')}
-            </Text>
-          </Flex>
-          <Flex alignItems="center" data-testid="happy">
-            <Text mr={1} fontSize="0.8rem">
-              {happyText || t('happy')}
-            </Text>
-            <HappyIcon />
-          </Flex>
-        </SlideHereContainer>
-      )} */}
-
       <HAASRabbit
         style={{
           left: `${animationState.position}%`,
@@ -301,7 +278,6 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
           }}
           {...attributes.popper}
         >
-          {/* {!animationState.isStopped && ( */}
           <motion.div
             initial={{ opacity: 0, y: 70, x: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -359,7 +335,6 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
               isEarly={showIsEarly}
             />
           </motion.div>
-          {/* )} */}
         </SliderSpeechWrapper>
         <div
           className="rabbit"
@@ -368,6 +343,41 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
             transform: `scaleX(${animationState.direction})`,
           }}
         >
+          {animationState.isStopped && (
+            <>
+              <Flex
+                width="100%"
+                position="absolute"
+                bottom="20px"
+                left="50%"
+                justifyContent="space-between"
+                style={{ transform: 'translateX(-62.5px)' }}
+              >
+                <motion.div variants={ExplainSlideLeftAnimation} animate="animate" initial="initial" exit="exit">
+                  <AdjustedColourWrapper>
+                    <ChevronsLeft />
+                  </AdjustedColourWrapper>
+                </motion.div>
+
+              </Flex>
+
+              <Flex
+                width="100%"
+                position="absolute"
+                bottom="20px"
+                left="50%"
+                justifyContent="space-between"
+                style={{ transform: 'translateX(35px)' }}
+              >
+                <motion.div variants={ExplainSlideRightAnimation} animate="animate" initial="initial" exit="exit">
+                  <AdjustedColourWrapper>
+                    <ChevronsRight />
+                  </AdjustedColourWrapper>
+                </motion.div>
+              </Flex>
+
+            </>
+          )}
           <Lottie
             isStopped={animationState.isStopped}
             options={{
@@ -376,26 +386,6 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
             }}
             speed={animationState.speed}
           />
-
-          {animationState.isStopped && (
-            <Div style={{
-              position: 'absolute', left: '50%', bottom: '20px', fontSize: '10px', transform: 'translateX(-50%)',
-            }}
-            >
-              <motion.div
-                variants={WiggleAnimation}
-                animate="animate"
-                initial="initial"
-                exit="exit"
-              >
-                <p style={{ fontSize: '0.7rem' }}>
-                  Drag
-                </p>
-
-              </motion.div>
-            </Div>
-          )}
-
         </div>
       </HAASRabbit>
       <form>
@@ -414,54 +404,14 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
           ref={register}
         />
       </form>
-
-      {/* {animationState.isStopped && (
-        <FingerPrintContainer
-          animate={{
-            marginLeft: ['0%', '30%', '0%', '-30%', '0%', '0%'],
-            opacity: [0, 1, 1, 1, 0.5, 0],
-            transition: {
-              mass: 0.2,
-              loop: Infinity,
-              delay: 1,
-              repeatDelay: 3,
-              duration: 2.8,
-            },
-          }}
-        >
-          <FingerIcon />
-        </FingerPrintContainer>
-      )} */}
-
       <Flex width="100%" position="absolute" bottom="-20px" justifyContent="space-between">
-        <Div>
+        <AdjustedColourWrapper>
           0
-        </Div>
-        <Div style={{ transform: 'translateX(7.5px)' }}>
-          100
-        </Div>
+        </AdjustedColourWrapper>
+        <AdjustedColourWrapper style={{ transform: 'translateX(7.5px)' }}>
+          10
+        </AdjustedColourWrapper>
       </Flex>
-
-      {/* {animationState.isStopped && (
-        <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
-          <Flex
-            data-testid="unhappy"
-            alignItems="center"
-          >
-            <UnhappyIcon />
-            <Text fontSize="0.8rem">
-              {unhappyText || t('unhappy')}
-            </Text>
-          </Flex>
-          <Flex alignItems="center" data-testid="happy">
-            <Text mr={1} fontSize="0.8rem">
-              {happyText || t('happy')}
-            </Text>
-            <HappyIcon />
-          </Flex>
-        </SlideHereContainer>
-      )} */}
-
     </>
   );
 };
