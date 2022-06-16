@@ -122,11 +122,11 @@ export const ImportDeliveriesForm = ({ onClose, onComplete }: ImportDeliveriesFo
 
       </UI.InputGrid>
       <UI.Button
+        mt={4}
         type="submit"
         isDisabled={!form.formState.isValid}
       >
         {t('save')}
-
       </UI.Button>
     </UI.Form>
   );

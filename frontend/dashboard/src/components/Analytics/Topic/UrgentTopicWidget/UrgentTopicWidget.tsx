@@ -17,7 +17,7 @@ export const UrgentTopicWidget = ({
   onClick,
   dialogueLabel = 'Team',
 }: UrgentPathWidgetProps) => (
-  <UI.NewCard
+  <UI.Card
     hasHover
     height="100%"
     boxShadow="md"
@@ -65,5 +65,5 @@ export const UrgentTopicWidget = ({
         </UI.Span>
       </UI.Flex>
     </UI.CardFooter>
-  </UI.NewCard>
+  </UI.Card>
 );

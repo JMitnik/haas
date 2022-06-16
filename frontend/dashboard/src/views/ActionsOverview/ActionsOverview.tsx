@@ -1,14 +1,11 @@
 import * as UI from '@haas/ui';
 import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
-import { Button, Icon } from '@chakra-ui/core';
-import { DeprecatedViewTitle, Div, Flex } from '@haas/ui';
-import { Mail, Plus } from 'react-feather';
+import { Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
 
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -17,7 +14,7 @@ import SearchBar from 'components/Common/SearchBar/SearchBar';
 import ShareIcon from 'components/Icons/ShareIcon';
 import getCTANodesQuery from 'queries/getCTANodes';
 
-import CTACard from './CTACard';
+import CallToActionCard from './CallToActionCard';
 
 interface ActionOverviewProps {
   leafs: Array<any>;
@@ -35,11 +32,10 @@ const actionsAnimation: Variants = {
   },
 };
 
-const DialogueViewContainer = styled(Div)``;
-
 const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
   if (leaf.type === 'LINK') {
     const mappedLinks = leaf.links?.map((link: any) => {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       const { __typename, ...linkedData } = link;
       return { ...linkedData, type: { label: link.type, value: link.type } };
     });
@@ -140,13 +136,12 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
       <UI.ViewHead>
         <UI.Flex justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <DeprecatedViewTitle leftIcon={<Mail />}>
+            <UI.ViewTitle>
               {t('views:cta_view')}
-            </DeprecatedViewTitle>
+            </UI.ViewTitle>
 
             <UI.Button
               leftIcon={Plus}
-              variantColor="teal"
               ml={4}
               size="sm"
               onClick={() => handleAddCTA()}
@@ -162,23 +157,23 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
       <UI.ViewBody>
         <AnimateSharedLayout>
           <motion.div variants={actionsAnimation} initial="initial" animate="animate">
-            {newCTA && (
-              <CTACard
-                id="-1"
-                activeCTA={activeCTA}
-                onActiveCTAChange={setActiveCTA}
-                Icon={RegisterIcon}
-                title=""
-                type={initializeCTAType('REGISTER')}
-                links={[]}
-                share={{ title: '', url: '', tooltip: '' }}
-                onNewCTAChange={setNewCTA}
-              />
-            )}
+            <UI.Grid>
+              {newCTA && (
+                <CallToActionCard
+                  id="-1"
+                  activeCTA={activeCTA}
+                  onActiveCTAChange={setActiveCTA}
+                  Icon={RegisterIcon}
+                  title=""
+                  type={initializeCTAType('REGISTER')}
+                  links={[]}
+                  share={{ title: '', url: '', tooltip: '' }}
+                  onNewCTAChange={setNewCTA}
+                />
+              )}
 
-            {!activeLeafs && leafs && leafs.map(
-              (leaf: any, index: number) => (
-                <CTACard
+              {!activeLeafs && leafs && leafs.map((leaf: any, index: number) => (
+                <CallToActionCard
                   key={index}
                   activeCTA={activeCTA}
                   onActiveCTAChange={setActiveCTA}
@@ -191,12 +186,10 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
                   form={leaf?.form}
                   onNewCTAChange={setNewCTA}
                 />
-              ),
-            )}
+              ))}
 
-            {activeLeafs && activeLeafs?.map(
-              (leaf: any, index: number) => (
-                <CTACard
+              {activeLeafs && activeLeafs?.map((leaf: any, index: number) => (
+                <CallToActionCard
                   key={index}
                   activeCTA={activeCTA}
                   onActiveCTAChange={setActiveCTA}
@@ -209,12 +202,11 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
                   form={leaf?.form}
                   onNewCTAChange={setNewCTA}
                 />
-              ),
-            )}
+              ))}
+            </UI.Grid>
           </motion.div>
         </AnimateSharedLayout>
       </UI.ViewBody>
-
     </>
   );
 };

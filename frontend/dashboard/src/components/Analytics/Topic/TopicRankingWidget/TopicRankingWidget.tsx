@@ -18,7 +18,7 @@ export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingW
   const margin = 4;
 
   return (
-    <UI.NewCard>
+    <UI.Card>
       <UI.CardBodyLarge>
         <UI.Helper>
           Top topics
@@ -82,6 +82,6 @@ export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingW
           </svg>
         </UI.Div>
       </UI.CardBodyLarge>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
