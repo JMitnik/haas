@@ -523,6 +523,7 @@ type Customer {
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+  organization: Organization
   roles: [RoleType!]
   settings: CustomerSettings
   slug: String!
@@ -1281,6 +1282,22 @@ input OptionInputType {
 
 input OptionsInputType {
   options: [OptionInputType!]
+}
+
+type Organization {
+  layers: [OrganizationLayer!]
+}
+
+"""A layer of an organization"""
+type OrganizationLayer {
+  type: OrganizationLayerType!
+}
+
+"""Type of an orginzational layer"""
+enum OrganizationLayerType {
+  DIALOGUE
+  GROUP
+  INTERACTION
 }
 
 """Information with regards to current page."""

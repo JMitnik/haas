@@ -21,6 +21,12 @@ import NodeEntryService from '../node-entry/NodeEntryService';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import TemplateService from '../templates/TemplateService';
 
+enum OrganizationLayerType {
+  GROUP = 'GROUP',
+  DIALOGUE = 'DIALOGUE',
+  INTERACTION = 'INTERACTION',
+}
+
 export class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
   tagPrismaAdapter: TagPrismaAdapter;
@@ -42,6 +48,37 @@ export class CustomerService {
     this.nodeEntryService = new NodeEntryService(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.templateService = new TemplateService(prismaClient);
+  }
+
+  getOrganizationLayers = async (workspaceId: string) => {
+    // Every organization consits at least of a dialogue and interaction layer
+    const finalLayers = [
+      {
+        type: OrganizationLayerType.DIALOGUE,
+      },
+      {
+        type: OrganizationLayerType.INTERACTION,
+      },
+    ];
+
+    const dialogues = await this.getDialogues(workspaceId);
+    const dialogueTitles = dialogues.map((dialogue) => {
+      return dialogue.title.split('-');
+    });
+
+    // Find the dialogue with the most amount of layers
+    const deepestLayers = maxBy(dialogueTitles, (splittedTitle) => splittedTitle.length) as string[];
+
+    if (!deepestLayers.length) return finalLayers;
+
+    // Substract with 1 as the last entry of the dialogue title is considered a dialogue and not a group
+    const groupLayers = [...Array(deepestLayers.length - 1)].map(() => ({
+      type: OrganizationLayerType.GROUP,
+    }));
+
+    finalLayers.unshift(...groupLayers);
+
+    return finalLayers;
   }
 
   async getDialogues(workspaceId: string, dialogueFragments?: string[]) {
@@ -154,7 +191,7 @@ export class CustomerService {
           return previousValue;
         }
       }, {
-        prevData: [] as ({
+      prevData: [] as ({
         sessionId: string;
         dialogueId: string;
         mainScore: number;
@@ -171,7 +208,7 @@ export class CustomerService {
         }) | undefined;
         prev: boolean;
       })[],
-      });
+    });
 
     const prevDataGroupedOptions = groupBy(splittedSessions.prevData, (session) => {
       return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;
