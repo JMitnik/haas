@@ -3558,6 +3558,27 @@
     "@babel/runtime" "^7.13.10"
     "@radix-ui/react-compose-refs" "0.1.0"
 
+"@radix-ui/react-tooltip@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-tooltip/-/react-tooltip-0.1.7.tgz#6f8c00d6e489565d14abf209ce0fb8853c8c8ee3"
+  integrity sha512-eiBUsVOHenZ0JR16tl970bB0DafJBz6mFgSGfIGIVpflFj0LIsIDiLMsYyvYdx1KwwsIUDTEZtxcPm/sWjPzqA==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "0.1.0"
+    "@radix-ui/react-compose-refs" "0.1.0"
+    "@radix-ui/react-context" "0.1.1"
+    "@radix-ui/react-id" "0.1.5"
+    "@radix-ui/react-popper" "0.1.4"
+    "@radix-ui/react-portal" "0.1.4"
+    "@radix-ui/react-presence" "0.1.2"
+    "@radix-ui/react-primitive" "0.1.4"
+    "@radix-ui/react-slot" "0.1.2"
+    "@radix-ui/react-use-controllable-state" "0.1.0"
+    "@radix-ui/react-use-escape-keydown" "0.1.0"
+    "@radix-ui/react-use-previous" "0.1.1"
+    "@radix-ui/react-use-rect" "0.1.1"
+    "@radix-ui/react-visually-hidden" "0.1.4"
+
 "@radix-ui/react-use-body-pointer-events@0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-use-body-pointer-events/-/react-use-body-pointer-events-0.1.1.tgz#63e7fd81ca7ffd30841deb584cd2b7f460df2597"
@@ -3624,6 +3645,14 @@
   integrity sha512-pTgWM5qKBu6C7kfKxrKPoBI2zZYZmp2cSXzpUiGM3qEBQlMLtYhaY2JXdXUCxz+XmD1YEjc8oRwvyfsD4AG4WA==
   dependencies:
     "@babel/runtime" "^7.13.10"
+
+"@radix-ui/react-visually-hidden@0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-visually-hidden/-/react-visually-hidden-0.1.4.tgz#6c75eae34fb5d084b503506fbfc05587ced05f03"
+  integrity sha512-K/q6AEEzqeeEq/T0NPChvBqnwlp8Tl4NnQdrI/y8IOY7BRR+Ug0PEsVk6g48HJ7cA1//COugdxXXVVK/m0X1mA==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/react-primitive" "0.1.4"
 
 "@radix-ui/rect@0.1.1":
   version "0.1.1"
@@ -22652,10 +22681,10 @@ react-hook-form@6.12.1:
   resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-6.12.1.tgz#e20437276378b972f1bb6a25ba251e55d7e7ae3b"
   integrity sha512-zhaqdNvVkMnv+bJ1xsLfsbjvsoSPggDeZMKuNK2GoyERGdInNvrNjnihoV0qfIumseUZsGMIFC6ydnJo/+NeAQ==
 
-react-hook-form@^4.8.0:
-  version "4.10.2"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-4.10.2.tgz#fb56160c302a0e2b595ef78cc8946c9dc9cb776a"
-  integrity sha512-Ule/KqHBwUvuubqGC4WDvOARS6VjlULSS+WHspgQ5FhFKR4ytHDc4AMpjVfnv+Wbz2TEbMp9/ZHmuZsUksPCiA==
+react-hook-form@^6.15.4:
+  version "6.15.8"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-6.15.8.tgz#725c139d308c431c4611e4b9d85a49f01cfc0e7a"
+  integrity sha512-prq82ofMbnRyj5wqDe8hsTRcdR25jQ+B8KtCS7BLCzjFHAwNuCjRwzPuP4eYLsEBjEIeYd6try+pdLdw0kPkpg==
 
 react-hotkeys@2.0.0:
   version "2.0.0"

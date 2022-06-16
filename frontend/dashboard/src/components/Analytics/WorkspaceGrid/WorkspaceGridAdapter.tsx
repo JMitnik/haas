@@ -28,9 +28,9 @@ export const WorkspaceGridAdapter = ({
   width,
   backgroundColor,
 }: WorkspaceGridAdapterProps) => {
-  const { getStartOfWeek, format } = useDate();
+  const { getOneWeekAgo, format } = useDate();
   const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
-    const startDate = getStartOfWeek();
+    const startDate = getOneWeekAgo();
     const endDate = new Date();
 
     return [startDate, endDate];

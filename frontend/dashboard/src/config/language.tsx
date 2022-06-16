@@ -11,6 +11,26 @@ const language = {
     },
   },
   general: {
+    happy_people: {
+      en: 'Happy people',
+      de: 'Glückliche Leute',
+    },
+    unhappy_people: {
+      en: 'Unhappy people',
+      de: 'Unglückliche Menschen',
+    },
+    happiness_score: {
+      en: 'Happiness score',
+      de: 'Glückspunktzahl',
+    },
+    center_hexagons: {
+      en: 'Center the hexagons',
+      de: 'Zentrieren Sie die Sechsecke',
+    },
+    go_up_one_layer: {
+      en: 'Go up one layer',
+      de: 'Gehen Sie eine Ebene nach oben',
+    },
     individuals: {
       en: 'Individuals',
       de: 'Individuals',
