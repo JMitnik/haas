@@ -4,16 +4,15 @@ import ReactMarkdown from 'react-markdown';
 
 import { ButtonBody, ClientButton } from 'components/Buttons/Buttons';
 import { Div, H5 } from '@haas/ui';
+import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
-import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
+import { SessionActionType } from 'types/core-types';
 import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
-import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
-import useDialogueTree from 'providers/DialogueTreeProvider';
 
-import { GenericNodeProps } from '../types';
 import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
+import { findChoiceChildEdge } from './ChoiceNode.helpers';
 
-type MultiChoiceNodeProps = GenericNodeProps;
+type MultiChoiceNodeProps = GenericQuestionNodeProps;
 
 const multiChoiceContainerAnimation: Variants = {
   initial: {
@@ -38,17 +37,25 @@ const multiChoiceItemAnimation: Variants = {
   },
 };
 
-const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
-  useDialogueTree();
-  const handleSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
-    const entry: SessionEntryDataProps = {
-      choice: { value: multiChoiceOption.value },
-      register: undefined,
-      slider: undefined,
-      textbox: undefined,
-    };
+const MultiChoiceNode = ({ node, onRunAction }: MultiChoiceNodeProps) => {
+  const handleSubmit = async (multiChoiceOption: any) => {
+    const childEdge = findChoiceChildEdge(multiChoiceOption, node.children);
+    const childNode = childEdge?.childNode?.id;
 
-    onEntryStore(entry, multiChoiceOption.value, multiChoiceOption.overrideLeaf);
+    onRunAction({
+      startTimestamp: new Date(Date.now()),
+      action: {
+        type: SessionActionType.ChoiceAction,
+        choice: {
+          value: multiChoiceOption.value,
+        },
+      },
+      reward: {
+        overrideCallToActionId: multiChoiceOption.overrideLeaf?.id || node.overrideLeaf?.id,
+        toEdge: childEdge?.id,
+        toNode: childNode,
+      },
+    });
   };
 
   return (
@@ -61,7 +68,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
         initial="initial"
         animate="animate"
       >
-        {node.options?.map((multiChoiceOption: TreeNodeOptionProps, index: number) => (
+        {node.options?.map((multiChoiceOption: any, index: number) => (
           <motion.div key={index} variants={multiChoiceItemAnimation}>
             <Div key={index} flex={['100%', 1]}>
               <ClientButton

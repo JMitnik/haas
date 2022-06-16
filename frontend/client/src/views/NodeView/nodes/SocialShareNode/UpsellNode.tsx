@@ -2,19 +2,12 @@ import * as UI from '@haas/ui';
 import { ShoppingCart } from 'react-feather';
 import React from 'react';
 
+import { Link } from 'types/core-types';
+
 import * as LS from './UpsellNodeStyles';
 
 interface UpsellNodeProps {
-  link: {
-    imageUrl: string | null
-    header: string | null
-    subHeader: string | null
-    url: string | null
-    buttonText: string | null
-    title: string | null
-    backgroundColor: string | null
-    iconUrl: string | null
-  }
+  link: Link;
 }
 
 const UpsellNode = ({ link }: UpsellNodeProps) => (

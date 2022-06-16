@@ -5,6 +5,8 @@ import useDialogueTree from 'providers/DialogueTreeProvider';
 
 import { PostLeafNodeContainer } from './PostLeafNodeStyles';
 
+export const POSTLEAFNODE_ID = '-1';
+
 const PostLeafNode = () => {
   const { store } = useDialogueTree();
 

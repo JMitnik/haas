@@ -6,42 +6,25 @@ query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
       title
       slug
       publicTitle
+      language
       creationDate
       updatedAt
+      postLeafNode {
+        header
+        subtext
+      }
       leafs {
-        id
-        title
-        type
-        links {
-          url
-          type
-          title
-          iconUrl
-          backgroundColor
-          buttonText
-          header
-          subHeader
-          imageUrl
-        }
-        share {
-          id
-          title
-          url
-          tooltip
-        }
+        ...QuestionFragment
       }
       customerId
       rootQuestion {
-        ...QuestionFragment
+          ...QuestionFragment
       }
       questions {
         ...QuestionFragment
       }
       edges {
         ...EdgeFragment
-      }
-      customer {
-        ...CustomerFragment
       }
     }
   }

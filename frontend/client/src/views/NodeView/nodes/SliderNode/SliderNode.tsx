@@ -1,18 +1,18 @@
+import { Div } from '@haas/ui';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
-import { Div } from '@haas/ui';
+import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
-import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
-import { cleanInt } from 'utils/cleanInt';
+import { SessionActionType } from 'types/core-types';
 
-import { GenericNodeProps } from '../types';
 import { SliderNodeContainer } from './SliderNodeStyles';
+import { findSliderChildEdge } from './SliderNode.helpers';
 import Slider from './Slider';
 
-type SliderNodeProps = GenericNodeProps;
+type SliderNodeProps = GenericQuestionNodeProps;
 
-const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
+const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
   const form = useForm<{ slider: number }>({
     defaultValues: {
       slider: 50.01,
@@ -21,17 +21,25 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
 
   const handleSubmit = async () => {
     const validForm = await form.triggerValidation('slider');
+    if (!validForm) return;
 
-    if (validForm) {
-      const entry: SessionEntryDataProps = {
-        slider: { value: cleanInt(form.getValues().slider) },
-        choice: undefined,
-        register: undefined,
-        textbox: undefined,
-      };
+    const value = form.getValues().slider;
 
-      onEntryStore(entry, entry.slider?.value);
-    }
+    const childEdge = findSliderChildEdge(value, node.children);
+    const childNode = childEdge?.childNode?.id;
+
+    onRunAction({
+      startTimestamp: new Date(Date.now()),
+      action: {
+        type: SessionActionType.SliderAction,
+        slider: { value },
+      },
+      reward: {
+        toNode: childNode,
+        toEdge: childEdge.id,
+        overrideCallToActionId: node.overrideLeaf?.id,
+      },
+    });
   };
 
   return (

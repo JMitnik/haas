@@ -1,16 +1,17 @@
 import { Facebook, Globe, Instagram, Linkedin, Twitter } from 'react-feather';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Flex } from '@haas/ui';
+import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { ReactComponent as Whatsapp } from 'assets/icons/icon-whatsapp.svg';
+import { useDialogueState } from 'modules/Dialogue/DialogueState';
 import CustomIcon from 'components/Icons/CustomIcon';
 
-import { GenericNodeProps } from '../types';
 import { ShareItem, SocialShareNodeContainer } from './SocialShareNodeStyles';
 import UpsellNode from './UpsellNode';
 
-type SocialShareNodeProps = GenericNodeProps;
+type SocialShareNodeProps = GenericQuestionNodeProps;
 
 const DefaultSocialItems = (handleLinkClick: any) => (
   <>
@@ -61,6 +62,12 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   const handleLinkClick = (event: any) => {
     console.log(event);
   };
+
+  const finish = useDialogueState((state) => state.finish);
+
+  useEffect(() => {
+    finish(node.id);
+  }, [finish, node.id]);
 
   return (
     <SocialShareNodeContainer>

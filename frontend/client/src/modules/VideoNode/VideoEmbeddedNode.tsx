@@ -4,16 +4,16 @@ import ReactMarkdown from 'react-markdown';
 
 import { ButtonBody, ClientButton } from 'components/Buttons/Buttons';
 import { Div, H5 } from '@haas/ui';
+import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
-import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
+import { SessionActionType } from 'types/core-types';
 import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
-import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
+import { findChoiceChildEdge } from 'views/NodeView/nodes/MultiChoiceNode/ChoiceNode.helpers';
 
-import { GenericNodeProps } from '../types';
 import { MultiChoiceNodeGrid, VideoEmbeddedNodeContainer } from './VideoEmbeddedNodeStyles';
 import YoutubeEmbed from './YoutubeEmbed';
 
-type MultiChoiceNodeProps = GenericNodeProps;
+type MultiChoiceNodeProps = GenericQuestionNodeProps;
 
 const multiChoiceContainerAnimation: Variants = {
   initial: {
@@ -38,17 +38,25 @@ const multiChoiceItemAnimation: Variants = {
   },
 };
 
-const VideoEmbeddedNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
-  const handleSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
-    const entry: SessionEntryDataProps = {
-      choice: undefined,
-      video: { value: multiChoiceOption.value },
-      register: undefined,
-      slider: undefined,
-      textbox: undefined,
-    };
+export const VideoEmbeddedNode = ({ node, onRunAction }: MultiChoiceNodeProps) => {
+  const handleSubmit = async (multiChoiceOption: any) => {
+    const childEdge = findChoiceChildEdge(multiChoiceOption, node.children);
+    const childNode = childEdge?.childNode?.id;
 
-    onEntryStore(entry, multiChoiceOption.value, multiChoiceOption.overrideLeaf);
+    onRunAction({
+      startTimestamp: new Date(Date.now()),
+      action: {
+        type: SessionActionType.ChoiceAction,
+        choice: {
+          value: multiChoiceOption.value,
+        },
+      },
+      reward: {
+        overrideCallToActionId: multiChoiceOption.overrideLeaf?.id || node.overrideLeaf?.id,
+        toEdge: childEdge?.id,
+        toNode: childNode,
+      },
+    });
   };
 
   return (
@@ -57,9 +65,11 @@ const VideoEmbeddedNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
         <NodeTitle>{node.title}</NodeTitle>
       </Div>
 
-      <Div width="100%">
-        <YoutubeEmbed videoId={node.extraContent} />
-      </Div>
+      {node.extraContent && (
+        <Div width="100%">
+          <YoutubeEmbed videoId={node.extraContent} />
+        </Div>
+      )}
 
       <Div width="100%">
         <MultiChoiceNodeGrid
@@ -68,7 +78,7 @@ const VideoEmbeddedNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
           initial="initial"
           animate="animate"
         >
-          {node.options?.map((multiChoiceOption: TreeNodeOptionProps, index: number) => (
+          {node.options?.map((multiChoiceOption: any, index: number) => (
             <motion.div key={index} variants={multiChoiceItemAnimation}>
               <Div key={index} flex={['100%', 1]}>
                 <ClientButton

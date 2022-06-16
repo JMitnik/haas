@@ -2922,17 +2922,13 @@ export type GetDialogueQuery = (
     & Pick<Customer, 'id'>
     & { dialogue?: Maybe<(
       { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId'>
-      & { leafs: Array<(
+      & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'language' | 'creationDate' | 'updatedAt' | 'customerId'>
+      & { postLeafNode?: Maybe<(
+        { __typename?: 'DialogueFinisherObjectType' }
+        & Pick<DialogueFinisherObjectType, 'header' | 'subtext'>
+      )>, leafs: Array<(
         { __typename?: 'QuestionNode' }
-        & Pick<QuestionNode, 'id' | 'title' | 'type'>
-        & { links: Array<(
-          { __typename?: 'LinkType' }
-          & Pick<LinkType, 'url' | 'type' | 'title' | 'iconUrl' | 'backgroundColor' | 'buttonText' | 'header' | 'subHeader' | 'imageUrl'>
-        )>, share?: Maybe<(
-          { __typename?: 'ShareNodeType' }
-          & Pick<ShareNodeType, 'id' | 'title' | 'url' | 'tooltip'>
-        )> }
+        & QuestionFragmentFragment
       )>, rootQuestion: (
         { __typename?: 'QuestionNode' }
         & QuestionFragmentFragment
@@ -2942,9 +2938,6 @@ export type GetDialogueQuery = (
       )>, edges: Array<(
         { __typename?: 'Edge' }
         & EdgeFragmentFragment
-      )>, customer?: Maybe<(
-        { __typename?: 'Customer' }
-        & CustomerFragmentFragment
       )> }
     )> }
   )> }
@@ -2952,7 +2945,7 @@ export type GetDialogueQuery = (
 
 export type QuestionFragmentFragment = (
   { __typename?: 'QuestionNode' }
-  & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'isLeaf' | 'type'>
+  & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'isLeaf' | 'type' | 'extraContent'>
   & { children: Array<(
     { __typename?: 'Edge' }
     & { parentNode?: Maybe<(
@@ -2966,6 +2959,30 @@ export type QuestionFragmentFragment = (
   )>, overrideLeaf?: Maybe<(
     { __typename?: 'QuestionNode' }
     & Pick<QuestionNode, 'id' | 'title' | 'type'>
+  )>, share?: Maybe<(
+    { __typename?: 'ShareNodeType' }
+    & Pick<ShareNodeType, 'id' | 'title' | 'url' | 'tooltip'>
+  )>, form?: Maybe<(
+    { __typename?: 'FormNodeType' }
+    & Pick<FormNodeType, 'id' | 'helperText'>
+    & { fields: Array<(
+      { __typename?: 'FormNodeField' }
+      & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
+    )> }
+  )>, links: Array<(
+    { __typename?: 'LinkType' }
+    & Pick<LinkType, 'url' | 'type' | 'title' | 'iconUrl' | 'backgroundColor' | 'buttonText' | 'header' | 'subHeader' | 'imageUrl'>
+  )>, sliderNode?: Maybe<(
+    { __typename?: 'SliderNodeType' }
+    & Pick<SliderNodeType, 'id' | 'happyText' | 'unhappyText'>
+    & { markers?: Maybe<Array<(
+      { __typename?: 'SliderNodeMarkerType' }
+      & Pick<SliderNodeMarkerType, 'id' | 'label' | 'subLabel'>
+      & { range?: Maybe<(
+        { __typename?: 'SliderNodeRangeType' }
+        & Pick<SliderNodeRangeType, 'id' | 'start' | 'end'>
+      )> }
+    )>> }
   )>, options: Array<(
     { __typename?: 'QuestionOption' }
     & Pick<QuestionOption, 'id' | 'value' | 'publicValue'>
@@ -3033,6 +3050,7 @@ export const QuestionFragmentFragmentDoc = gql`
   isRoot
   isLeaf
   type
+  extraContent
   children {
     ...EdgeFragment
     parentNode {
@@ -3046,6 +3064,50 @@ export const QuestionFragmentFragmentDoc = gql`
     id
     title
     type
+  }
+  share {
+    id
+    title
+    url
+    tooltip
+  }
+  form {
+    id
+    helperText
+    fields {
+      id
+      label
+      type
+      placeholder
+      isRequired
+      position
+    }
+  }
+  links {
+    url
+    type
+    title
+    iconUrl
+    backgroundColor
+    buttonText
+    header
+    subHeader
+    imageUrl
+  }
+  sliderNode {
+    id
+    happyText
+    unhappyText
+    markers {
+      id
+      label
+      subLabel
+      range {
+        id
+        start
+        end
+      }
+    }
   }
   options {
     id
@@ -3300,29 +3362,15 @@ export const GetDialogueDocument = gql`
       title
       slug
       publicTitle
+      language
       creationDate
       updatedAt
+      postLeafNode {
+        header
+        subtext
+      }
       leafs {
-        id
-        title
-        type
-        links {
-          url
-          type
-          title
-          iconUrl
-          backgroundColor
-          buttonText
-          header
-          subHeader
-          imageUrl
-        }
-        share {
-          id
-          title
-          url
-          tooltip
-        }
+        ...QuestionFragment
       }
       customerId
       rootQuestion {
@@ -3334,15 +3382,11 @@ export const GetDialogueDocument = gql`
       edges {
         ...EdgeFragment
       }
-      customer {
-        ...CustomerFragment
-      }
     }
   }
 }
     ${QuestionFragmentFragmentDoc}
-${EdgeFragmentFragmentDoc}
-${CustomerFragmentFragmentDoc}`;
+${EdgeFragmentFragmentDoc}`;
 
 /**
  * __useGetDialogueQuery__
@@ -3375,3 +3419,114 @@ export type GetDialogueQueryResult = Apollo.QueryResult<GetDialogueQuery, GetDia
 export function refetchGetDialogueQuery(variables?: GetDialogueQueryVariables) {
       return { query: GetDialogueDocument, variables: variables }
     }
+export namespace GetDelivery {
+  export type Variables = GetDeliveryQueryVariables;
+  export type Query = GetDeliveryQuery;
+  export type Delivery = (NonNullable<GetDeliveryQuery['delivery']>);
+  export type CampaignVariant = (NonNullable<(NonNullable<GetDeliveryQuery['delivery']>)['campaignVariant']>);
+  export type Dialogue = (NonNullable<(NonNullable<(NonNullable<GetDeliveryQuery['delivery']>)['campaignVariant']>)['dialogue']>);
+  export type Workspace = (NonNullable<(NonNullable<(NonNullable<GetDeliveryQuery['delivery']>)['campaignVariant']>)['workspace']>);
+  export const Document = GetDeliveryDocument;
+  export type Props = GetDeliveryProps;
+  export const HOC = withGetDelivery;
+  export const Component = GetDeliveryComponent;
+}
+
+export namespace UpdateDeliveryStatus {
+  export type Variables = UpdateDeliveryStatusMutationVariables;
+  export type Mutation = UpdateDeliveryStatusMutation;
+  export const Document = UpdateDeliveryStatusDocument;
+  export type Props = UpdateDeliveryStatusProps;
+  export const HOC = withUpdateDeliveryStatus;
+  export const Component = UpdateDeliveryStatusComponent;
+}
+
+export namespace AppendToInteraction {
+  export type Variables = AppendToInteractionMutationVariables;
+  export type Mutation = AppendToInteractionMutation;
+  export type AppendToInteraction = (NonNullable<AppendToInteractionMutation['appendToInteraction']>);
+  export const Document = AppendToInteractionDocument;
+  export type Props = AppendToInteractionProps;
+  export const HOC = withAppendToInteraction;
+  export const Component = AppendToInteractionComponent;
+}
+
+export namespace CreateSession {
+  export type Variables = CreateSessionMutationVariables;
+  export type Mutation = CreateSessionMutation;
+  export type CreateSession = (NonNullable<CreateSessionMutation['createSession']>);
+  export const Document = CreateSessionDocument;
+  export type Props = CreateSessionProps;
+  export const HOC = withCreateSession;
+  export const Component = CreateSessionComponent;
+}
+
+export namespace CustomerFragment {
+  export type Fragment = CustomerFragmentFragment;
+  export type Settings = (NonNullable<CustomerFragmentFragment['settings']>);
+  export type ColourSettings = (NonNullable<(NonNullable<CustomerFragmentFragment['settings']>)['colourSettings']>);
+  export type Dialogues = NonNullable<(NonNullable<CustomerFragmentFragment['dialogues']>)[number]>;
+}
+
+export namespace EdgeFragment {
+  export type Fragment = EdgeFragmentFragment;
+  export type Conditions = NonNullable<(NonNullable<EdgeFragmentFragment['conditions']>)[number]>;
+  export type ParentNode = (NonNullable<EdgeFragmentFragment['parentNode']>);
+  export type ChildNode = (NonNullable<EdgeFragmentFragment['childNode']>);
+  export type Children = NonNullable<(NonNullable<(NonNullable<EdgeFragmentFragment['childNode']>)['children']>)[number]>;
+}
+
+export namespace GetCustomer {
+  export type Variables = GetCustomerQueryVariables;
+  export type Query = GetCustomerQuery;
+  export type Customer = (NonNullable<GetCustomerQuery['customer']>);
+  export type Settings = (NonNullable<(NonNullable<GetCustomerQuery['customer']>)['settings']>);
+  export type ColourSettings = (NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['settings']>)['colourSettings']>);
+  export const Document = GetCustomerDocument;
+  export type Props = GetCustomerProps;
+  export const HOC = withGetCustomer;
+  export const Component = GetCustomerComponent;
+}
+
+export namespace Customer {
+  export type Variables = CustomerQueryVariables;
+  export type Query = CustomerQuery;
+  export type Customer = (NonNullable<CustomerQuery['customer']>);
+  export const Document = CustomerDocument;
+  export type Props = CustomerProps;
+  export const HOC = withCustomer;
+  export const Component = CustomerComponent;
+}
+
+export namespace GetDialogue {
+  export type Variables = GetDialogueQueryVariables;
+  export type Query = GetDialogueQuery;
+  export type Customer = (NonNullable<GetDialogueQuery['customer']>);
+  export type Dialogue = (NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>);
+  export type PostLeafNode = (NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['postLeafNode']>);
+  export type Leafs = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['leafs']>)[number]>;
+  export type RootQuestion = (NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['rootQuestion']>);
+  export type Questions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['questions']>)[number]>;
+  export type Edges = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['edges']>)[number]>;
+  export const Document = GetDialogueDocument;
+  export type Props = GetDialogueProps;
+  export const HOC = withGetDialogue;
+  export const Component = GetDialogueComponent;
+}
+
+export namespace QuestionFragment {
+  export type Fragment = QuestionFragmentFragment;
+  export type Children = NonNullable<(NonNullable<QuestionFragmentFragment['children']>)[number]>;
+  export type ParentNode = (NonNullable<NonNullable<(NonNullable<QuestionFragmentFragment['children']>)[number]>['parentNode']>);
+  export type ChildNode = (NonNullable<NonNullable<(NonNullable<QuestionFragmentFragment['children']>)[number]>['childNode']>);
+  export type OverrideLeaf = (NonNullable<QuestionFragmentFragment['overrideLeaf']>);
+  export type Share = (NonNullable<QuestionFragmentFragment['share']>);
+  export type Form = (NonNullable<QuestionFragmentFragment['form']>);
+  export type Fields = NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['fields']>)[number]>;
+  export type Links = NonNullable<(NonNullable<QuestionFragmentFragment['links']>)[number]>;
+  export type SliderNode = (NonNullable<QuestionFragmentFragment['sliderNode']>);
+  export type Markers = NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['sliderNode']>)['markers']>)[number]>;
+  export type Range = (NonNullable<NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['sliderNode']>)['markers']>)[number]>['range']>);
+  export type Options = NonNullable<(NonNullable<QuestionFragmentFragment['options']>)[number]>;
+  export type _OverrideLeaf = (NonNullable<NonNullable<(NonNullable<QuestionFragmentFragment['options']>)[number]>['overrideLeaf']>);
+}

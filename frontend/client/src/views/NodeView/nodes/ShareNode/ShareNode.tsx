@@ -1,16 +1,17 @@
 import * as UI from '@haas/ui';
+import { Flex } from '@haas/ui';
 import { Share2 } from 'react-feather';
 import { useClipboard } from 'use-clipboard-copy';
-import React from 'react';
-
-import { Flex } from '@haas/ui';
-import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import React, { useEffect } from 'react';
 
 import { ClientButton } from 'components/Buttons/Buttons';
-import { GenericNodeProps } from '../types';
+import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
+import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import { useDialogueState } from 'modules/Dialogue/DialogueState';
+
 import { ShareButtonContainer, ShareNodeContainer, SuccesMessageContainer } from './ShareNodeStyles';
 
-type SocialShareNodeProps = GenericNodeProps;
+type SocialShareNodeProps = GenericQuestionNodeProps;
 
 const formatUrl = (url: string) => {
   if (url.startsWith('http')) return url;
@@ -40,6 +41,12 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
     }
     return '';
   };
+
+  const finish = useDialogueState((state) => state.finish);
+
+  useEffect(() => {
+    finish(node.id);
+  }, [finish, node.id]);
 
   return (
     <ShareNodeContainer>

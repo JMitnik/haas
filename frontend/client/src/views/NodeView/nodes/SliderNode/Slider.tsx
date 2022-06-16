@@ -18,6 +18,7 @@ import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
 import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
+import { SliderNodeMarkerType } from 'types/generated-types';
 import { SliderNodeMarkersProps } from '../../../../models/Tree/SliderNodeMarkersModel';
 import { SliderText } from './SliderText';
 
@@ -90,7 +91,7 @@ interface SliderProps {
   form: any;
   register: any;
   onSubmit: () => void;
-  markers: SliderNodeMarkersProps[];
+  markers: SliderNodeMarkerType[];
   unhappyText: string | null | undefined;
   happyText: string | null | undefined;
 }

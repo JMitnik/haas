@@ -1,17 +1,18 @@
 import * as UI from '@haas/ui';
 import { AtSign, FileText, Hash, Link2, Phone, Type } from 'react-feather';
-import { ClientButton } from 'components/Buttons/Buttons';
 import { Div } from '@haas/ui';
-import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled from 'styled-components';
 
-import { GenericNodeProps } from '../types';
+import { ClientButton } from 'components/Buttons/Buttons';
+import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
+import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import { SessionActionType } from 'types/core-types';
 
-type FormNodeProps = GenericNodeProps;
+type FormNodeProps = GenericQuestionNodeProps;
 
 interface FormNodeFormProps {
   fields: {
@@ -56,7 +57,7 @@ const getFieldValue = (field: any, relatedField: any) => {
   return field.value || undefined;
 };
 
-const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
+const FormNode = ({ node, onRunAction }: FormNodeProps) => {
   const { t } = useTranslation();
   const { register, getValues, formState } = useForm<FormNodeFormProps>({
     mode: 'onChange',
@@ -67,20 +68,31 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
 
   const fields = node?.form?.fields;
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>, ignoreFields = false) => {
     event.preventDefault();
-    const formEntry = getValues({ nest: true });
+    const formEntry = getValues();
 
-    const entry: any = {
-      form: {
-        values: formEntry.fields.map((fieldEntry, index) => ({
-          relatedFieldId: fields?.[index].id,
-          [fields?.[index]?.type || '']: getFieldValue(fieldEntry, fields?.[index]),
-        })),
+    const formFieldValues = formEntry.fields.map((fieldEntry, index) => ({
+      relatedFieldId: fields?.[index].id,
+      [fields?.[index]?.type || '']: getFieldValue(fieldEntry, fields?.[index]),
+    }));
+
+    // TODO: Think of some logic
+    const childEdge = undefined;
+    const childNode = undefined;
+
+    onRunAction({
+      startTimestamp: new Date(Date.now()),
+      action: {
+        type: SessionActionType.FormAction,
+        form: ignoreFields ? undefined : { values: formFieldValues },
       },
-    };
-
-    onEntryStore(entry, formEntry);
+      reward: {
+        overrideCallToActionId: node.overrideLeaf?.id,
+        toEdge: childEdge,
+        toNode: childNode,
+      },
+    });
   };
 
   return (
@@ -143,7 +155,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                   >
                     {t('submit')}
                   </ClientButton>
-                  <UI.Button size="sm" variant="ghost" onClick={(e) => handleSubmit(e)}>
+                  <UI.Button size="sm" variant="ghost" onClick={(e) => handleSubmit(e, true)}>
                     {t('do_not_share')}
                   </UI.Button>
                 </UI.Flex>

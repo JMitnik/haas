@@ -1,40 +1,17 @@
-import { TreeStoreModelProps } from 'models/TreeStoreModel';
-import { useQuery } from '@apollo/client';
 import { useRouteMatch } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
-import { Customer, Dialogue } from 'types/generic';
-import getCustomerFromSlug from 'queries/getCustomerFromSluqQuery';
-import getDialogueFromSlug from 'queries/getDialogueFromSlugQuery';
-
-import treeStore from './DialogueTreeStore';
-
-interface DialogueTreeContextType {
-  store: TreeStoreModelProps;
-  originUrl: string;
-  device: string;
-  getNode: any;
-  startTime: number;
-}
-
-const DialogueTreeContext = React.createContext({} as DialogueTreeContextType);
-
-interface CustomerDataProps {
-  customer: Customer;
-}
-
-interface DialogueDataProps {
-  customer: {
-    dialogue: Dialogue;
-  }
-}
+import { useDialogueState } from 'modules/Dialogue/DialogueState';
+import { useGetCustomerQuery, useGetDialogueQuery } from 'types/generated-types';
 
 export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [originUrl, setOriginUrl] = useState<string | null>(null);
-  const [device] = useState<string | null>(navigator.platform);
-  const [startTime] = useState(Date.now());
   const { i18n } = useTranslation();
+  const { initialize } = useDialogueState();
+
+  // const device = useMemo(() => navigator.platform, []);
+  // const originUrl = useMemo(() => window.location.origin, [window.location.origin]);
+  // const startTime = useMemo(() => Date.now(), []);
 
   const initLanguage = (language: string | undefined) => {
     switch (language) {
@@ -53,18 +30,12 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     }
   };
 
-  useEffect(() => {
-    if (!originUrl) {
-      setOriginUrl(window.location.href);
-    }
-  }, [setOriginUrl, originUrl]);
-
   const customerMatch = useRouteMatch<any>({
     path: '/:customerSlug',
     strict: true,
   });
 
-  const { data: customerData } = useQuery<CustomerDataProps>(getCustomerFromSlug, {
+  const { data: workspaceData } = useGetCustomerQuery({
     skip: !customerMatch,
     fetchPolicy: 'network-only',
     onError: (e) => {
@@ -74,10 +45,9 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
       slug: customerMatch?.params.customerSlug,
     },
   });
-
   const dialogueMatch = useRouteMatch<any>('/:customerSlug/:dialogueSlug');
 
-  const { data: dialogueData } = useQuery<DialogueDataProps>(getDialogueFromSlug, {
+  const { data: dialogueData } = useGetDialogueQuery({
     skip: !dialogueMatch,
     fetchPolicy: 'network-only',
     onError: (e) => {
@@ -91,49 +61,18 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
 
   // When dialogue changes, set initial nodes and initial edges
   useEffect(() => {
-    if (customerData?.customer) {
-      treeStore.initCustomer(customerData.customer);
-    }
-  }, [customerData]);
+    if (workspaceData?.customer && dialogueData?.customer?.dialogue) {
+      const { dialogue } = dialogueData.customer;
+      const workspace = workspaceData.customer;
 
-  // When dialogue changes, set initial nodes and initial edges
-  useEffect(() => {
-    if (dialogueData?.customer) {
-      treeStore.initTree(dialogueData?.customer?.dialogue);
-      initLanguage(dialogueData?.customer?.dialogue.language);
+      initialize(dialogue, workspace);
+      initLanguage(dialogue.language);
     }
-  }, [dialogueData]);
-
-  const getNode = (edgeId: string, nodeId: string) => {
-    if (!treeStore.tree?.rootNode) return null;
-    // Either we  from the 'root' (no edge) or we get the next node.
-    let node = treeStore.tree.rootNode;
-
-    if (edgeId) {
-      node = treeStore.tree.getChildNodeByEdge(edgeId) || treeStore.tree.rootNode;
-    } else if (!edgeId && nodeId) {
-      node = treeStore.tree.getNodeById(nodeId) || treeStore.tree.rootNode;
-    } else {
-      node = treeStore.tree.rootNode;
-    }
-    return node;
-  };
+  }, [workspaceData && dialogueData]);
 
   return (
-    <DialogueTreeContext.Provider value={{
-      store: treeStore,
-      getNode,
-      device: device || '',
-      startTime,
-      originUrl: originUrl || '',
-    }}
-    >
+    <>
       {children}
-    </DialogueTreeContext.Provider>
+    </>
   );
 };
-
-// Hook which extracts the context with the state variables
-const useDialogueTree = () => useContext(DialogueTreeContext);
-
-export default useDialogueTree;
