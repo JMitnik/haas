@@ -2,14 +2,14 @@ import * as UI from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-import { SliderNodeMarkersProps } from '../../../../models/Tree/SliderNodeMarkersModel';
+import { Marker } from 'types/core-types';
 
 interface SliderTextProps {
   color: string;
   adaptedColor: string;
   score: number;
   isEarly: boolean;
-  markers: SliderNodeMarkersProps[];
+  markers: Marker[];
 }
 
 /**
@@ -27,10 +27,8 @@ export const SliderText = ({ color, adaptedColor, score, isEarly, markers }: Sli
 
   if (!isEarly && markers.length) {
     const activeMarker = markers.find((marker) => {
-      const { start, end } = marker.range;
-
-      const lowerBound = start || 0.0;
-      const upperBound = end || 10.1;
+      const lowerBound = marker?.range?.start || 0.0;
+      const upperBound = marker?.range?.end || 10.1;
 
       if (lowerBound <= score && upperBound > score) {
         return true;

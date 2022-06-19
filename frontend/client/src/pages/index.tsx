@@ -4,13 +4,13 @@ import { I18nextProvider } from 'react-i18next';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import React, { useLayoutEffect } from 'react';
 
+import { Dialogue } from 'modules/Dialogue/Dialogue';
 import AppProviders from 'providers/AppProviders';
 import CustomerPage from 'pages/[customer]';
 import CustomersPage from 'pages/customers';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
 import { CampaignRedirect } from './campaign';
-import NodePage from './[customer]/[dialogue]/[node]';
 import lang from '../config/i18n-config';
 
 const ErrorPage = () => (
@@ -34,7 +34,7 @@ const AppRoutes = () => {
           '/:customerSlug/:dialogueSlug',
         ]}
         >
-          <NodePage />
+          <Dialogue />
         </Route>
         <Route path="/:customerSlug">
           <CustomerPage />

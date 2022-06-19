@@ -14,12 +14,11 @@ import { Div, Flex, Text, Slider as UISlider } from '@haas/ui';
 import { ReactComponent as FingerIcon } from 'assets/icons/icon-fingerprint.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
+import { Marker } from 'types/core-types';
 import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
 import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
-import { SliderNodeMarkerType } from 'types/generated-types';
-import { SliderNodeMarkersProps } from '../../../../models/Tree/SliderNodeMarkersModel';
 import { SliderText } from './SliderText';
 
 interface SliderAnimationStateProps {
@@ -91,7 +90,7 @@ interface SliderProps {
   form: any;
   register: any;
   onSubmit: () => void;
-  markers: SliderNodeMarkerType[];
+  markers: Marker[];
   unhappyText: string | null | undefined;
   happyText: string | null | undefined;
 }

@@ -1,6 +1,6 @@
 import { QuestionNodeTypeEnum } from 'types/core-types';
-import ChoiceNode from 'views/NodeView/nodes/MultiChoiceNode/MultiChoiceNode';
-import FormNode from 'views/NodeView/nodes/FormNode/FormNode';
+import ChoiceNode from 'modules/MultiChoiceNode/MultiChoiceNode';
+import FormNode from 'modules/FormNode/FormNode';
 import LinkNode from 'views/NodeView/nodes/SocialShareNode/SocialShareNode';
 import ShareNode from 'views/NodeView/nodes/ShareNode/ShareNode';
 import SliderNode from 'views/NodeView/nodes/SliderNode/SliderNode';

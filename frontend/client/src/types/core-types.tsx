@@ -62,3 +62,5 @@ export type Edge = GetDialogue.Edges;
 export type Choice = GeneratedQuestionOption;
 
 export type Link = QuestionFragment.Links;
+
+export type Marker = QuestionFragment.Markers;

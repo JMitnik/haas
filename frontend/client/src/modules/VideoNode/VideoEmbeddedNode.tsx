@@ -8,7 +8,7 @@ import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionActionType } from 'types/core-types';
 import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
-import { findChoiceChildEdge } from 'views/NodeView/nodes/MultiChoiceNode/ChoiceNode.helpers';
+import { findChoiceChildEdge } from 'modules/MultiChoiceNode/ChoiceNode.helpers';
 
 import { MultiChoiceNodeGrid, VideoEmbeddedNodeContainer } from './VideoEmbeddedNodeStyles';
 import YoutubeEmbed from './YoutubeEmbed';

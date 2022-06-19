@@ -6,9 +6,9 @@ import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { ReactNode } from 'react';
 
-import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
+import { QuestionNode } from 'types/core-types';
+import { useDialogueState } from 'modules/Dialogue/DialogueState';
 import WatermarkLogo from 'components/WatermarkLogo';
-import useDialogueTree from 'providers/DialogueTreeProvider';
 
 import { DialogueTreeContainer, GoBackButton, GoBackContainer, GoBackText } from './DialogueTreeStyles';
 
@@ -29,19 +29,23 @@ const routerNavigationAnimation: Variants = {
 
 interface DialogueTreeLayoutProps {
   children: ReactNode;
-  node: TreeNodeProps;
+  node: QuestionNode;
   isAtLeaf: boolean;
 }
 
 const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProps) => {
   const history = useHistory();
-  const { store } = useDialogueTree();
   const { t } = useTranslation();
+
+  const { workspace, isFinished } = useDialogueState((state) => ({
+    workspace: state.workspace,
+    isFinished: state.isFinished,
+  }));
 
   return (
     <DialogueTreeContainer>
       {/* TODO: Enable consistent animation */}
-      {!node.isRoot && !node.isPostLeaf && !isAtLeaf && (
+      {!node.isRoot && !isFinished && !isAtLeaf && (
         <GoBackContainer variants={routerNavigationAnimation} animate="animate" initial="initial" exit="exit">
           <GoBackButton onClick={() => history.goBack()}>
             <ChevronLeft />
@@ -54,21 +58,21 @@ const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProp
         {children}
       </Container>
 
-      {!!store.customer && (
+      {!!workspace && (
         <Helmet>
           <title>
             haas -
             {' '}
-            {store?.tree?.title || ''}
+            {workspace.name || ''}
           </title>
-          <meta name="description" content={store.tree?.title} />
+          <meta name="description" content={workspace.name} />
         </Helmet>
       )}
 
-      {!!store.customer && (
+      {!!workspace && (
         <WatermarkLogo
-          logoUrl={store.customer?.settings?.logoUrl}
-          opacity={store.customer?.settings?.logoOpacity ?? undefined}
+          logoUrl={workspace?.settings?.logoUrl || ''}
+          opacity={workspace?.settings?.logoOpacity ?? undefined}
         />
       )}
     </DialogueTreeContainer>

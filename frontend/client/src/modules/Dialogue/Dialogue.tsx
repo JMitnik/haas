@@ -5,14 +5,19 @@ import { MapNode } from 'modules/Node/MapNode';
 import { QuestionNode, SessionEvent } from 'types/core-types';
 import { useNavigator } from 'modules/Navigation/useNavigator';
 import { useTrackFinished } from 'modules/PostLeafNode/useTrackFinished';
+import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
+import NodeLayout from 'layouts/NodeLayout';
 
 import { useDialogueState } from './DialogueState';
+import { POSTLEAFNODE_ID } from 'modules/PostLeafNode/PostLeafNode';
+import useUploadQueue from 'modules/Upload/UploadQueueProvider';
 
 export const Dialogue = () => {
   const { transition, nodeId } = useNavigator();
   const location = useLocation();
   const history = useHistory();
   const { action } = history;
+  const { u } = useUploadQueue();
 
   // Get the current node from the store
   const getCurrentNode = useDialogueState((state) => state.getCurrentNode);
@@ -37,7 +42,15 @@ export const Dialogue = () => {
   // The main callback for handling an event (State + Action + Reward) and transition to the next event.
   const handleAction = useCallback((input: SessionEvent) => {
     const newEvent = applyEvent(input);
+
+    const goesToCallToAction = newEvent?.state?.nodeId === newEvent?.state?.activeCallToActionId;
+    const goesToPostLeaf = newEvent?.state?.nodeId === POSTLEAFNODE_ID;
+
+    if (goesToCallToAction || goesToPostLeaf) {
+    }
     transition(newEvent?.state?.nodeId);
+
+    if (newEvent?.state.)
   }, [applyEvent, transition]);
 
   if (!currentNode) return null;
@@ -45,7 +58,11 @@ export const Dialogue = () => {
   const SelectedQuestionNode = MapNode[currentNode.type];
 
   return (
-    // @ts-ignore
-    <SelectedQuestionNode node={currentNode} onRunAction={handleAction} />
+    <DialogueTreeLayout isAtLeaf={currentNode.isLeaf} node={currentNode}>
+      <NodeLayout>
+        {/* @ts-ignore */}
+        <SelectedQuestionNode node={currentNode} onRunAction={handleAction} />
+      </NodeLayout>
+    </DialogueTreeLayout>
   );
 };
