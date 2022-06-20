@@ -239,6 +239,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
    */
   getCurrentNode: () => {
     const { idToNode, activeEvent } = get();
+    console.log({ activeEvent });
 
     if (activeEvent?.state?.nodeId === POSTLEAFNODE_ID) {
       return defaultPostLeafNode;

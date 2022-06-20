@@ -27,8 +27,10 @@ export const DialogueInitializer = ({ children }: { children: React.ReactNode })
   };
 
   const customerMatch = useMatch({
-    path: '/:workspaceSlug/:dialogueSlug',
+    path: '/:workspaceSlug/:dialogueSlug/*',
   });
+
+  console.log(customerMatch);
 
   /**
    * Fetch the workspace and dialogue, and initialize the store based on these results.

@@ -22,16 +22,14 @@ const AppRoutes = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence exitBeforeEnter>
-      <Routes location={location} key={location.pathname}>
-        <Route path="/_r" element={<CampaignRedirectView />} />
-        <Route path="/:workspaceSlug/:dialogueSlug">
-          <Route index element={<DialogueRedirectView />} />
-          <Route path="n/:nodeId" element={<Dialogue />} />
-        </Route>
-        <Route element={<div />} />
-      </Routes>
-    </AnimatePresence>
+    <Routes location={location} key={location.pathname}>
+      <Route path="/_r" element={<CampaignRedirectView />} />
+      <Route path="/:workspaceSlug/:dialogueSlug">
+        <Route path="n/:nodeId" element={<Dialogue />} />
+        <Route index element={<DialogueRedirectView />} />
+      </Route>
+      <Route element={<div />} />
+    </Routes>
   );
 };
 

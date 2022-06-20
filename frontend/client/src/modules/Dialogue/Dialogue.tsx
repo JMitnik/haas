@@ -27,6 +27,7 @@ export const Dialogue = () => {
     getCurrentNode: state.getCurrentNode,
   }));
   const currentNode = getCurrentNode() as QuestionNode;
+  console.log({ currentNode });
 
   // Get the action handlers to apply an event, and detect BACK / FORWARD
   const { applyEvent, detectUndoRedo } = useDialogueState((state) => ({
