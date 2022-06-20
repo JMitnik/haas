@@ -4,12 +4,13 @@ import { useLocation } from 'react-router-dom';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import qs from 'qs';
 
-import { SessionEvent } from 'types/core-types';
+import { CreatedSession, SessionEvent } from 'types/core-types';
 import { useAppendToInteractionMutation, useCreateSessionMutation } from 'types/generated-types';
 import { useDialogueState } from 'modules/Dialogue/DialogueState';
 import useInterval from 'hooks/useInterval';
 
 interface UploadQueueContextProps {
+  session: CreatedSession | undefined;
   queueEvents: (events: SessionEvent[]) => void;
 }
 
@@ -102,9 +103,12 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
     }
   }, uploadQueue.length > 0 ? 300 : null);
 
+  const session = interactionData?.createSession;
+
   return (
     <UploadQueueContext.Provider value={{
       queueEvents,
+      session,
     }}
     >
       {children}

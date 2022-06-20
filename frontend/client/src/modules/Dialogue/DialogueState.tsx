@@ -33,7 +33,7 @@ interface DialogueState {
   futureEvents: SessionEvent[];
 
   /** Interact with our event queues */
-  applyEvent: (event: SessionEvent) => SessionEvent | undefined;
+  applyEvent: (event: SessionEvent, disableUploadQueue: boolean) => SessionEvent | undefined;
   detectUndoRedo: (nodeId: string) => void;
   undoEvent: () => void;
   redoEvent: () => void;
@@ -113,7 +113,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
    * - Updates the event queues (uploadEvents, pastEvents, and futureEvents).
    * - Update the globalStateType.
    */
-  applyEvent: (event: SessionEvent) => {
+  applyEvent: (event: SessionEvent, disableUploadQueue: boolean = false) => {
     // eslint-disable-next-line no-undef-init
     let nextEvent: SessionEvent | undefined = undefined;
 
@@ -144,9 +144,13 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
         action: undefined,
       };
 
+      const uploadEvents = disableUploadQueue
+        ? currentState.uploadEvents
+        : [...currentState.uploadEvents, updatedCurrentEvent];
+
       return {
         activeEvent: nextEvent,
-        uploadEvents: [...currentState.uploadEvents, updatedCurrentEvent],
+        uploadEvents,
         pastEvents: [...currentState.pastEvents, updatedCurrentEvent],
         futureEvents: [],
         globalStateType: stateType,

@@ -18,8 +18,7 @@ export const Dialogue = () => {
   const { action } = history;
 
   // Get the current event and state type
-  const { activeEvent, globalStateType } = useDialogueState((state) => ({
-    globalStateType: state.globalStateType,
+  const { activeEvent } = useDialogueState((state) => ({
     activeEvent: state.activeEvent,
   }));
 
@@ -41,7 +40,7 @@ export const Dialogue = () => {
 
   // Get the queue of events to upload
   const popEventQueue = useDialogueState((state) => state.popEventQueue);
-  const { queueEvents } = useUploadQueue();
+  const { queueEvents, session } = useUploadQueue();
 
   /**
    * Effect responsible for redirecting to root node if we detect no node-id.
@@ -59,10 +58,15 @@ export const Dialogue = () => {
     detectUndoRedo(nodeId);
   }, [location, nodeId, detectUndoRedo, action]);
 
+  /**
+   * Disable the upload queue if we already have created a session, and we are not in the final upload stages.
+   *
+   * The queue will be only enabled if:
+   * - No session has been created yet.
+   * - Or we are at a Call-to-Action, and are still able to execute.
+   */
   const isUploadDisabled = useMemo(() => {
-    const hasCreatedSession = (
-      globalStateType === DialogueStateType.CALL_TO_ACTION || globalStateType === DialogueStateType.POSTLEAF
-    );
+    const hasCreatedSession = !!session?.id;
 
     const isAtPreUploadStage = (
       activeEvent?.state?.stateType === DialogueStateType.ROOT
@@ -70,12 +74,10 @@ export const Dialogue = () => {
       || activeEvent?.state?.stateType === DialogueStateType.INITIALIZING
     );
 
-    console.log(isAtPreUploadStage, hasCreatedSession);
-
     if (hasCreatedSession && isAtPreUploadStage) return true;
 
     return false;
-  }, [globalStateType, activeEvent]);
+  }, [session?.id, activeEvent]);
 
   /**
    * The main callback for handling an event (State + Action + Reward), and transitioning to the next event.
@@ -86,7 +88,7 @@ export const Dialogue = () => {
    * 3. Upload the events to our server (batched or not) if we arrive at the CALL-to-ACTION or POST-LEAF.
    */
   const handleAction = useCallback((input: SessionEvent) => {
-    const newEvent = applyEvent(input);
+    const newEvent = applyEvent(input, isUploadDisabled);
     transition(newEvent?.state?.nodeId);
 
     const isAtUploadStage = (

@@ -1,4 +1,5 @@
 import {
+  CreateSession,
   CustomerSettings,
   QuestionOption as GeneratedQuestionOption,
   GetCustomer,
@@ -80,3 +81,5 @@ export interface Metadata {
   originUrl?: string;
   device?: string;
 }
+
+export type CreatedSession = CreateSession.CreateSession;
