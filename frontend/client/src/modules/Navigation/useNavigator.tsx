@@ -1,6 +1,6 @@
 import { POSTLEAFNODE_ID } from 'modules/PostLeafNode/PostLeafNode';
 import { useCallback } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface Params {
   nodeId: string;
@@ -9,15 +9,15 @@ interface Params {
 }
 
 export const useNavigator = () => {
-  const { nodeId, workspaceSlug, dialogueSlug } = useParams<Params>();
-  const history = useHistory();
+  const { nodeId, workspaceSlug, dialogueSlug } = useParams<keyof Params>();
+  const navigate = useNavigate();
 
   const transition = useCallback((toNodeId?: string) => {
     if (!workspaceSlug && !dialogueSlug) return;
 
     // / If we have a node-id in the state, go there (can be regular question-node, CTA or FINISHER)
     if (toNodeId) {
-      history.push(`/${workspaceSlug}/${dialogueSlug}/n/${toNodeId}`);
+      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${toNodeId}`);
       return;
     }
 
@@ -25,9 +25,9 @@ export const useNavigator = () => {
     // should ensure that a state.nodeID is always present, even if it is FINISHER.
     if (!toNodeId) {
       // logger.error('No nodeId in state, defaulting to FINISHER. This should not happen.');
-      history.push(`/${workspaceSlug}/${dialogueSlug}/n/${POSTLEAFNODE_ID}`);
+      navigate(`/${workspaceSlug}/${dialogueSlug}/n/${POSTLEAFNODE_ID}`);
     }
-  }, [workspaceSlug, dialogueSlug, history]);
+  }, [workspaceSlug, dialogueSlug, navigate]);
 
   return {
     nodeId,

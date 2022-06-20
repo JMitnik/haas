@@ -1,4 +1,4 @@
-import { useRouteMatch } from 'react-router-dom';
+import { useMatch } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
@@ -26,9 +26,8 @@ export const DialogueInitializer = ({ children }: { children: React.ReactNode })
     }
   };
 
-  const customerMatch = useRouteMatch<any>({
+  const customerMatch = useMatch({
     path: '/:workspaceSlug/:dialogueSlug',
-    strict: true,
   });
 
   /**
@@ -41,8 +40,8 @@ export const DialogueInitializer = ({ children }: { children: React.ReactNode })
       console.log(e.message);
     },
     variables: {
-      slug: customerMatch?.params.workspaceSlug,
-      dialogueSlug: customerMatch?.params.dialogueSlug,
+      slug: customerMatch?.params.workspaceSlug as string,
+      dialogueSlug: customerMatch?.params.dialogueSlug as string,
     },
     onCompleted: (data) => {
       const dialogue = data?.customer?.dialogue;

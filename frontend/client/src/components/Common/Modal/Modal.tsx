@@ -1,6 +1,6 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as UI from '@haas/ui';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion/dist/framer-motion';
 
 import { slideUpFadeMotion } from 'modules/Animation/config';
 import React from 'react';

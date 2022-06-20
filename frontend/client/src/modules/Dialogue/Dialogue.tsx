@@ -1,6 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
-
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation, useNavigationType } from 'react-router-dom';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
 import { DialogueStateType, QuestionNode, SessionEvent } from 'types/core-types';
@@ -11,14 +9,12 @@ import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
 import NodeLayout from 'layouts/NodeLayout';
 import useUploadQueue from 'modules/Session/UploadQueueProvider';
 
-import { MotionConfig, fadeMotion } from 'modules/Animation/config';
 import { useDialogueState } from './DialogueState';
 
 export const Dialogue = () => {
   const { transition, nodeId } = useNavigator();
-  const history = useHistory();
+  const action = useNavigationType();
   const location = useLocation();
-  const { action } = history;
 
   // Get the current event and state type
   const { activeEvent } = useDialogueState((state) => ({
@@ -55,7 +51,7 @@ export const Dialogue = () => {
   useEffect(() => {
     if (action !== 'POP') return;
 
-    detectUndoRedo(nodeId);
+    detectUndoRedo(nodeId || '');
   }, [location, nodeId, detectUndoRedo, action]);
 
   /**

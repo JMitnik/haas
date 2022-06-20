@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react';
-import { Redirect, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
@@ -44,7 +44,7 @@ export const CampaignRedirectView = () => {
   if (redirect) {
     return (
       <motion.div exit={{ opacity: 0 }}>
-        <Redirect to={{
+        <Navigate to={{
           pathname: url,
           search: location.search,
         }}

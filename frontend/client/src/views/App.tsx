@@ -1,7 +1,7 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider } from 'react-i18next';
-import { Route, Switch, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import React, { useLayoutEffect } from 'react';
 
 import { Dialogue } from 'modules/Dialogue/Dialogue';
@@ -9,6 +9,7 @@ import AppProviders from 'config/AppProviders';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
 import { CampaignRedirectView } from './CampaignRedirectView/CampaignRedirectView';
+import { DialogueRedirectView } from './DialogueRedirectView/DialogueRedirectView';
 import lang from '../config/i18n-config';
 
 const ErrorPage = () => (
@@ -22,21 +23,14 @@ const AppRoutes = () => {
 
   return (
     <AnimatePresence exitBeforeEnter>
-      <Switch location={location} key={location.pathname}>
-        <Route exact strict path="/_r">
-          <CampaignRedirectView />
+      <Routes location={location} key={location.pathname}>
+        <Route path="/_r" element={<CampaignRedirectView />} />
+        <Route path="/:workspaceSlug/:dialogueSlug">
+          <Route index element={<DialogueRedirectView />} />
+          <Route path="n/:nodeId" element={<Dialogue />} />
         </Route>
-        <Route path={[
-          '/:workspaceSlug/:dialogueSlug/n/:nodeId',
-          '/:workspaceSlug/:dialogueSlug',
-        ]}
-        >
-          <Dialogue />
-        </Route>
-        <Route exact path="/">
-          <div />
-        </Route>
-      </Switch>
+        <Route element={<div />} />
+      </Routes>
     </AnimatePresence>
   );
 };

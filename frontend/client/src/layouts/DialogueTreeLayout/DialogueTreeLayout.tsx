@@ -2,7 +2,7 @@ import { ChevronLeft } from 'react-feather';
 import { Container } from '@haas/ui';
 import { Helmet } from 'react-helmet';
 import { Variants } from 'framer-motion';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { ReactNode } from 'react';
 
@@ -34,7 +34,7 @@ interface DialogueTreeLayoutProps {
 }
 
 const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const { workspace, dialogue, getCurrentNode, isFinished } = useDialogueState((state) => ({
@@ -52,7 +52,7 @@ const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProp
       {/* TODO: Enable consistent animation */}
       {!node.isRoot && !isFinished && !isAtLeaf && (
         <GoBackContainer variants={routerNavigationAnimation} animate="animate" initial="initial" exit="exit">
-          <GoBackButton onClick={() => history.goBack()}>
+          <GoBackButton onClick={() => navigate(-1)}>
             <ChevronLeft />
           </GoBackButton>
           <GoBackText>{t('go_back') || 'Go back'}</GoBackText>
