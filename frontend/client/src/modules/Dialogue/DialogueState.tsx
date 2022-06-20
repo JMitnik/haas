@@ -12,6 +12,8 @@ import { calculateNewCallToAction, calculateNextState, makeNodeMap } from './Dia
 
 interface DialogueState {
   // Properties
+  /** GlobalStateType contains the dialogue type independent of forward/backward. */
+  globalStateType: DialogueStateType;
   isFinished: boolean;
   idToNode: Record<string, QuestionNode> | undefined;
   dialogue: Dialogue | undefined;
@@ -48,6 +50,7 @@ interface DialogueState {
 }
 
 export const useDialogueState = create<DialogueState>((set, get) => ({
+  globalStateType: DialogueStateType.INITIALIZING,
   sessionId: null,
   terminalNodeId: undefined,
   idToNode: undefined,
@@ -88,6 +91,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
     };
 
     set({
+      globalStateType: DialogueStateType.ROOT,
       idToNode,
       dialogue,
       workspace,
@@ -102,6 +106,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
    * - Completes the "current" event, by calculating what action was taken from the current event and observed reward.
    * - Prepare the next event, its call-to-action, and which node to transition to next.
    * - Updates the event queues (uploadEvents, pastEvents, and futureEvents).
+   * - Update the globalStateType.
    */
   applyEvent: (event: SessionEvent) => {
     // eslint-disable-next-line no-undef-init
@@ -138,6 +143,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
         uploadEvents: [...currentState.uploadEvents, updatedCurrentEvent],
         pastEvents: [...currentState.pastEvents, updatedCurrentEvent],
         futureEvents: [],
+        globalStateType: stateType,
       };
     });
 
@@ -155,9 +161,6 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
 
     const futureState = futureEvents.length > 0 ? futureEvents[futureEvents.length - 1]?.state?.nodeId : null;
     const pastState = pastEvents.length > 0 ? pastEvents[pastEvents.length - 1]?.state?.nodeId : null;
-    console.log(nextNodeId);
-    console.log({ futureState });
-    console.log({ pastState });
 
     if (nextNodeId === futureState) {
       get().redoEvent();

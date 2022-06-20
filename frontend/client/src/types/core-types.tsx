@@ -12,6 +12,7 @@ import {
 export { QuestionNodeTypeEnum } from './generated-types';
 
 export enum DialogueStateType {
+  INITIALIZING = 'INITIALIZING',
   ROOT = 'ROOT',
   INVESTIGATING = 'INVESTIGATING',
   CALL_TO_ACTION = 'CALL_TO_ACTION',
