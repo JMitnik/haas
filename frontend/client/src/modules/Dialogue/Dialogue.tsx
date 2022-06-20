@@ -1,8 +1,6 @@
-import * as UI from '@haas/ui';
 import { useHistory, useLocation } from 'react-router-dom';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
-import * as Modal from 'components/Common/Modal';
 import { DialogueStateType, QuestionNode, SessionEvent } from 'types/core-types';
 import { MapNode } from 'modules/Node/MapNode';
 import { useNavigator } from 'modules/Navigation/useNavigator';
@@ -43,7 +41,7 @@ export const Dialogue = () => {
 
   // Get the queue of events to upload
   const popEventQueue = useDialogueState((state) => state.popEventQueue);
-  const { queueEvents, session } = useUploadQueue();
+  const { queueEvents, session, resetSession } = useUploadQueue();
 
   /**
    * Effect responsible for redirecting to root node if we detect no node-id.
@@ -106,9 +104,30 @@ export const Dialogue = () => {
     }
   }, [applyEvent, popEventQueue, transition, queueEvents, isUploadDisabled]);
 
-  const restart = useDialogueState((state) => state.restart);
+  const { restart, redoAll } = useDialogueState((state) => ({
+    redoAll: state.redoAll,
+    restart: state.restart,
+  }));
 
+  /**
+   * Restarts the entire dialogue.
+   *
+   * - Restarts the session.
+   * - Restarts the event store as well.
+   */
+  const handleRedoAll = () => {
+    const newEvent = redoAll();
+    transition(newEvent?.state?.nodeId);
+  };
+
+  /**
+   * Restarts the entire dialogue.
+   *
+   * - Restarts the session.
+   * - Restarts the event store as well.
+   */
   const handleRestart = () => {
+    resetSession();
     const restartEvent = restart();
     transition(restartEvent.state?.nodeId);
   };
@@ -129,7 +148,7 @@ export const Dialogue = () => {
       <IllegalBackModal
         onRestart={handleRestart}
         open={isUploadDisabled}
-        // open
+        onRedo={handleRedoAll}
       />
 
       <NodeLayout>

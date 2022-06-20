@@ -12,6 +12,7 @@ import useInterval from 'hooks/useInterval';
 interface UploadQueueContextProps {
   session: CreatedSession | undefined;
   queueEvents: (events: SessionEvent[]) => void;
+  resetSession: () => void;
 }
 
 const UploadQueueContext = React.createContext({} as UploadQueueContextProps);
@@ -26,9 +27,27 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
 
   const [uploadQueue, setUploadQueue] = useState([] as SessionEvent[]);
 
-  const [createSession, { data: interactionData, loading: isCreatingSession }] = useCreateSessionMutation();
+  const [createSession, {
+    data: interactionData,
+    loading: isCreatingSession,
+    reset: resetSessionCache,
+  }] = useCreateSessionMutation();
   const [appendToInteraction] = useAppendToInteractionMutation();
   const ref = qs.parse(location.search, { ignoreQueryPrefix: true })?.ref?.toString() || '';
+
+  /**
+   * Resets the upload cache of the session.
+   *
+   * Resets:
+   * - The stored mutation result.
+   * - The upload queue.
+   * - The flag that will append.
+   */
+  const resetSession = () => {
+    resetSessionCache();
+    setUploadQueue([]);
+    willAppend.current = false;
+  };
 
   /**
    * Creates an initial session.
@@ -41,7 +60,6 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
       variables: {
         input: {
           dialogueId: dialogue?.id as string,
-          // TODO: Refactor
           deliveryId: ref,
           totalTimeInSec: differenceInSeconds(endTime, startTime),
           originUrl: metadata?.originUrl,
@@ -109,6 +127,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
     <UploadQueueContext.Provider value={{
       queueEvents,
       session,
+      resetSession,
     }}
     >
       {children}

@@ -1,4 +1,3 @@
-import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider } from 'react-i18next';
 import { Route, Switch, useLocation } from 'react-router-dom';
@@ -6,7 +5,6 @@ import React, { useLayoutEffect } from 'react';
 
 import { Dialogue } from 'modules/Dialogue/Dialogue';
 import AppProviders from 'providers/AppProviders';
-import CustomerPage from 'pages/[customer]';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
 import { CampaignRedirect } from './campaign';
@@ -33,9 +31,6 @@ const AppRoutes = () => {
       ]}
       >
         <Dialogue />
-      </Route>
-      <Route path="/:workspaceSlug">
-        <CustomerPage />
       </Route>
       <Route exact path="/">
         <div />

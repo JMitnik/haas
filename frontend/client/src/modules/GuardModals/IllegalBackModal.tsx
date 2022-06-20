@@ -7,9 +7,10 @@ import * as Modal from 'components/Common/Modal';
 interface IllegalBackModalProps {
   open: boolean;
   onRestart: () => void;
+  onRedo: () => void;
 }
 
-export const IllegalBackModal = ({ open, onRestart }: IllegalBackModalProps) => (
+export const IllegalBackModal = ({ open, onRestart, onRedo }: IllegalBackModalProps) => (
   <Modal.Root open={open} onClose={() => {}}>
     <UI.ModalBody style={{ minHeight: 'inherit' }}>
       <UI.H2 color="main.500" textAlign="left">
@@ -28,6 +29,7 @@ export const IllegalBackModal = ({ open, onRestart }: IllegalBackModalProps) => 
             variantColor="main"
             mr={4}
             mb={[2, 2, 0]}
+            onClick={onRedo}
           >
             Back to the last question
           </UI.Button>

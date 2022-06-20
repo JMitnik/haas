@@ -43,6 +43,7 @@ interface DialogueState {
 
   /** Restart the dialogue  */
   restart: () => SessionEvent;
+  redoAll: () => SessionEvent;
 
   /** Empty state-action-rewards. * */
   popEventQueue: () => SessionEvent[];
@@ -201,6 +202,9 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
       // Get all except the last event
       const uploadEvents = currentState.uploadEvents.slice(0, currentState.uploadEvents.length - 1);
 
+      console.log({ undoPast: currentState.pastEvents });
+      console.log({ undoFuture: futureEvents });
+
       return {
         pastEvents: currentState.pastEvents,
         uploadEvents,
@@ -275,6 +279,26 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
     });
 
     return initialEvent;
+  },
+
+  /**
+   * RedoAll
+   */
+  redoAll: () => {
+    set((currentState) => {
+      const currentEvent = (
+        currentState.futureEvents.length > 0 ? currentState.futureEvents[0] : currentState.activeEvent
+      );
+      const pastEvents = [...currentState.pastEvents, currentState.activeEvent as SessionEvent];
+
+      return {
+        pastEvents,
+        activeEvent: currentEvent,
+        futureEvents: [],
+      };
+    });
+
+    return get().activeEvent as SessionEvent;
   },
 
   /**
