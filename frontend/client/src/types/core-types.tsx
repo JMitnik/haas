@@ -11,6 +11,13 @@ import {
 
 export { QuestionNodeTypeEnum } from './generated-types';
 
+export enum DialogueStateType {
+  ROOT = 'ROOT',
+  INVESTIGATING = 'INVESTIGATING',
+  CALL_TO_ACTION = 'CALL_TO_ACTION',
+  POSTLEAF = 'POSTLEAF',
+}
+
 export enum SessionActionType {
   ChoiceAction = 'CHOICE_ACTION',
   FormAction = 'FORM_ACTION',
@@ -33,6 +40,7 @@ export interface SessionAction extends NodeEntryDataInput {
 }
 
 export interface SessionState {
+  stateType: DialogueStateType;
   nodeId?: string;
   activeCallToActionId?: string;
 }

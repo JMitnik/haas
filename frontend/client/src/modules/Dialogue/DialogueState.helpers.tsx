@@ -1,4 +1,4 @@
-import { QuestionNode, SessionReward, SessionState } from 'types/core-types';
+import { DialogueStateType, QuestionNode, SessionReward, SessionState } from 'types/core-types';
 
 /**
  * Maps a node ID to a node.
@@ -37,13 +37,26 @@ export const calculateNewCallToAction = (
   return newCallToActionId;
 };
 
+interface StateOutput {
+  nodeId: string;
+  stateType: DialogueStateType;
+}
+
 /**
- * Calculate the next node id based on the reward, call-to-action, or the post-leaf-node.
+ * Calculate the next state id based on the reward, call-to-action, or the post-leaf-node.
  */
-export const calculateNextNodeId = (
+export const calculateNextState = (
+  postLeafNodeId: string,
   reward?: SessionReward,
   callToActionId?: string,
-  postLeafNodeId?: string,
-) => (
-  reward?.toNode || callToActionId || postLeafNodeId
-);
+): StateOutput => {
+  if (reward?.toNode) {
+    return { nodeId: reward.toNode, stateType: DialogueStateType.INVESTIGATING };
+  }
+
+  if (callToActionId) {
+    return { nodeId: callToActionId, stateType: DialogueStateType.CALL_TO_ACTION };
+  }
+
+  return { nodeId: postLeafNodeId, stateType: DialogueStateType.POSTLEAF };
+};

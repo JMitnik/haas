@@ -2,13 +2,13 @@ import create from 'zustand';
 
 import {
   Dialogue,
+  DialogueStateType,
   QuestionNode,
-  QuestionNodeTypeEnum,
   SessionEvent,
   Workspace,
 } from '../../types/core-types';
-import { POSTLEAFNODE_ID } from '../PostLeafNode/PostLeafNode';
-import { calculateNewCallToAction, calculateNextNodeId, makeNodeMap } from './DialogueState.helpers';
+import { POSTLEAFNODE_ID, defaultPostLeafNode } from '../PostLeafNode/PostLeafNode';
+import { calculateNewCallToAction, calculateNextState, makeNodeMap } from './DialogueState.helpers';
 
 interface DialogueState {
   // Properties
@@ -79,6 +79,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
     const initialEvent: SessionEvent = {
       startTimestamp: new Date(Date.now()),
       state: {
+        stateType: DialogueStateType.ROOT,
         nodeId: dialogue.rootQuestion.id,
         activeCallToActionId: undefined,
       },
@@ -119,12 +120,14 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
       };
 
       const newCallToActionId = calculateNewCallToAction(event.reward, updatedCurrentEvent.state);
+      const { nodeId, stateType } = calculateNextState(POSTLEAFNODE_ID, event.reward, newCallToActionId);
 
       nextEvent = {
         startTimestamp: new Date(Date.now()),
         state: {
           activeCallToActionId: newCallToActionId,
-          nodeId: calculateNextNodeId(event.reward, newCallToActionId, POSTLEAFNODE_ID),
+          nodeId,
+          stateType,
         },
         reward: undefined,
         action: undefined,
@@ -212,24 +215,15 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
   getCurrentNode: () => {
     const { idToNode, activeEvent } = get();
 
-    if (activeEvent?.state?.nodeId === '-1') {
-      return {
-        id: POSTLEAFNODE_ID,
-        title: '',
-        type: QuestionNodeTypeEnum.Generic,
-        isLeaf: true,
-        isRoot: false,
-        links: [],
-        options: [],
-        children: [],
-      };
+    if (activeEvent?.state?.nodeId === POSTLEAFNODE_ID) {
+      return defaultPostLeafNode;
     }
 
     if (idToNode && activeEvent?.state?.nodeId) {
       return idToNode[activeEvent.state.nodeId];
     }
 
-    return undefined;
+    return defaultPostLeafNode;
   },
 
   /**
