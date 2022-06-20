@@ -456,20 +456,7 @@ class DialoguePrismaAdapter {
         creationDate: 'asc',
       },
       include: {
-        form: {
-          include: {
-            fields: true,
-          },
-        },
-        sliderNode: {
-          include: {
-            markers: {
-              include: {
-                range: true,
-              },
-            },
-          },
-        },
+        options: true,
       },
     });
   };

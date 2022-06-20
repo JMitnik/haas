@@ -434,11 +434,11 @@ export const WorkspaceMutations = Upload && extendType({
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
           },
-          (error, result: UploadApiResponse | undefined) => {
-            if (result) return resolve(result);
+            (error, result: UploadApiResponse | undefined) => {
+              if (result) return resolve(result);
 
-            return reject(error);
-          });
+              return reject(error);
+            });
 
           return createReadStream().pipe(cld_upload_stream);
         });
@@ -490,6 +490,25 @@ export const WorkspaceMutations = Upload && extendType({
         return ctx.services.customerService.editWorkspace(args.input);
       },
     });
+  },
+});
+
+export const DeselectTopicInput = inputObjectType({
+  name: 'DeselectTopicInput',
+  description: 'Deselects all question options as topic within workspace',
+  definition(t) {
+    t.id('workspaceId', { required: true });
+    t.string('topic', { required: true });
+  },
+})
+
+export const DeselectTopicMutation = mutationField('deselectTopic', {
+  type: 'Boolean',
+  nullable: true,
+  args: { input: DeselectTopicInput },
+  async resolve(parent, args, ctx) {
+    if (!args.input) throw new UserInputError('No input object!');
+    return ctx.services.topicService.deselectTopic(args.input) || null;
   },
 });
 

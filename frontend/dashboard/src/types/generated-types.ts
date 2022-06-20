@@ -772,6 +772,12 @@ export type DeprecatedPaginationPageInfo = {
   pageIndex: Scalars['Int'];
 };
 
+/** Deselects all question options as topic within workspace */
+export type DeselectTopicInput = {
+  workspaceId: Scalars['ID'];
+  topic: Scalars['String'];
+};
+
 export type Dialogue = {
   __typename?: 'Dialogue';
   id: Scalars['ID'];
@@ -1377,6 +1383,7 @@ export type Mutation = {
   singleUpload: ImageType;
   createWorkspace: Customer;
   editWorkspace: Customer;
+  deselectTopic?: Maybe<Scalars['Boolean']>;
   massSeed?: Maybe<Customer>;
   deleteCustomer?: Maybe<Customer>;
   handleUserStateInWorkspace: UserCustomer;
@@ -1560,6 +1567,11 @@ export type MutationCreateWorkspaceArgs = {
 
 export type MutationEditWorkspaceArgs = {
   input?: Maybe<EditWorkspaceInput>;
+};
+
+
+export type MutationDeselectTopicArgs = {
+  input?: Maybe<DeselectTopicInput>;
 };
 
 
@@ -1760,6 +1772,7 @@ export type OptionInputType = {
   publicValue?: Maybe<Scalars['String']>;
   overrideLeafId?: Maybe<Scalars['String']>;
   position: Scalars['Int'];
+  isTopic?: Maybe<Scalars['Boolean']>;
 };
 
 export type OptionsInputType = {
@@ -2126,6 +2139,7 @@ export type QuestionOption = {
   __typename?: 'QuestionOption';
   id: Scalars['Int'];
   value: Scalars['String'];
+  isTopic: Scalars['Boolean'];
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
@@ -2778,6 +2792,16 @@ export type WorkspaceStatisticsMostTrendingTopicArgs = {
 export type WorkspaceStatisticsMostPopularPathArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
+
+export type DeselectTopicMutationVariables = Exact<{
+  input?: Maybe<DeselectTopicInput>;
+}>;
+
+
+export type DeselectTopicMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deselectTopic'>
+);
 
 export type GetDialogueTopicsQueryVariables = Exact<{
   dialogueId: Scalars['ID'];
@@ -3811,6 +3835,37 @@ export const SessionFragmentFragmentDoc = gql`
 }
     ${NodeEntryFragmentFragmentDoc}
 ${DeliveryFragmentFragmentDoc}`;
+export const DeselectTopicDocument = gql`
+    mutation deselectTopic($input: DeselectTopicInput) {
+  deselectTopic(input: $input)
+}
+    `;
+export type DeselectTopicMutationFn = Apollo.MutationFunction<DeselectTopicMutation, DeselectTopicMutationVariables>;
+
+/**
+ * __useDeselectTopicMutation__
+ *
+ * To run a mutation, you first call `useDeselectTopicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeselectTopicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deselectTopicMutation, { data, loading, error }] = useDeselectTopicMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeselectTopicMutation(baseOptions?: Apollo.MutationHookOptions<DeselectTopicMutation, DeselectTopicMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeselectTopicMutation, DeselectTopicMutationVariables>(DeselectTopicDocument, options);
+      }
+export type DeselectTopicMutationHookResult = ReturnType<typeof useDeselectTopicMutation>;
+export type DeselectTopicMutationResult = Apollo.MutationResult<DeselectTopicMutation>;
+export type DeselectTopicMutationOptions = Apollo.BaseMutationOptions<DeselectTopicMutation, DeselectTopicMutationVariables>;
 export const GetDialogueTopicsDocument = gql`
     query GetDialogueTopics($dialogueId: ID!, $input: TopicInputType!) {
   dialogue(where: {id: $dialogueId}) {
@@ -5806,6 +5861,12 @@ export function useUpdatePermissionsMutation(baseOptions?: Apollo.MutationHookOp
 export type UpdatePermissionsMutationHookResult = ReturnType<typeof useUpdatePermissionsMutation>;
 export type UpdatePermissionsMutationResult = Apollo.MutationResult<UpdatePermissionsMutation>;
 export type UpdatePermissionsMutationOptions = Apollo.BaseMutationOptions<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>;
+export namespace DeselectTopic {
+  export type Variables = DeselectTopicMutationVariables;
+  export type Mutation = DeselectTopicMutation;
+  export const Document = DeselectTopicDocument;
+}
+
 export namespace GetDialogueTopics {
   export type Variables = GetDialogueTopicsQueryVariables;
   export type Query = GetDialogueTopicsQuery;
