@@ -2877,6 +2877,7 @@ export type EdgeFragmentFragment = (
 
 export type GetCustomerQueryVariables = Exact<{
   slug: Scalars['String'];
+  dialogueSlug: Scalars['String'];
 }>;
 
 
@@ -2885,7 +2886,26 @@ export type GetCustomerQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id' | 'name' | 'slug'>
-    & { settings?: Maybe<(
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'language' | 'creationDate' | 'updatedAt' | 'customerId'>
+      & { postLeafNode?: Maybe<(
+        { __typename?: 'DialogueFinisherObjectType' }
+        & Pick<DialogueFinisherObjectType, 'header' | 'subtext'>
+      )>, leafs: Array<(
+        { __typename?: 'QuestionNode' }
+        & QuestionFragmentFragment
+      )>, rootQuestion: (
+        { __typename?: 'QuestionNode' }
+        & QuestionFragmentFragment
+      ), questions: Array<(
+        { __typename?: 'QuestionNode' }
+        & QuestionFragmentFragment
+      )>, edges: Array<(
+        { __typename?: 'Edge' }
+        & EdgeFragmentFragment
+      )> }
+    )>, settings?: Maybe<(
       { __typename?: 'CustomerSettings' }
       & Pick<CustomerSettings, 'id' | 'logoUrl' | 'logoOpacity'>
       & { colourSettings?: Maybe<(
@@ -3265,11 +3285,37 @@ export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSession
 export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
 export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
 export const GetCustomerDocument = gql`
-    query GetCustomer($slug: String!) {
+    query GetCustomer($slug: String!, $dialogueSlug: String!) {
   customer(slug: $slug) {
     id
     name
     slug
+    dialogue(where: {slug: $dialogueSlug}) {
+      id
+      title
+      slug
+      publicTitle
+      language
+      creationDate
+      updatedAt
+      postLeafNode {
+        header
+        subtext
+      }
+      leafs {
+        ...QuestionFragment
+      }
+      customerId
+      rootQuestion {
+        ...QuestionFragment
+      }
+      questions {
+        ...QuestionFragment
+      }
+      edges {
+        ...EdgeFragment
+      }
+    }
     settings {
       id
       logoUrl
@@ -3283,7 +3329,8 @@ export const GetCustomerDocument = gql`
     }
   }
 }
-    `;
+    ${QuestionFragmentFragmentDoc}
+${EdgeFragmentFragmentDoc}`;
 
 /**
  * __useGetCustomerQuery__
@@ -3298,6 +3345,7 @@ export const GetCustomerDocument = gql`
  * const { data, loading, error } = useGetCustomerQuery({
  *   variables: {
  *      slug: // value for 'slug'
+ *      dialogueSlug: // value for 'dialogueSlug'
  *   },
  * });
  */
@@ -3468,6 +3516,12 @@ export namespace GetCustomer {
   export type Variables = GetCustomerQueryVariables;
   export type Query = GetCustomerQuery;
   export type Customer = (NonNullable<GetCustomerQuery['customer']>);
+  export type Dialogue = (NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogue']>);
+  export type PostLeafNode = (NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogue']>)['postLeafNode']>);
+  export type Leafs = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogue']>)['leafs']>)[number]>;
+  export type RootQuestion = (NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogue']>)['rootQuestion']>);
+  export type Questions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogue']>)['questions']>)[number]>;
+  export type Edges = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogue']>)['edges']>)[number]>;
   export type Settings = (NonNullable<(NonNullable<GetCustomerQuery['customer']>)['settings']>);
   export type ColourSettings = (NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['settings']>)['colourSettings']>);
   export const Document = GetCustomerDocument;

@@ -57,7 +57,7 @@ export const Dialogue = () => {
     if (action !== 'POP') return;
 
     detectUndoRedo(nodeId);
-  }, [location, nodeId, detectUndoRedo]);
+  }, [location, nodeId, detectUndoRedo, action]);
 
   const isUploadDisabled = useMemo(() => {
     const hasCreatedSession = (
@@ -108,7 +108,7 @@ export const Dialogue = () => {
     if (!currentNode?.type) return null;
 
     return MapNode[currentNode.type];
-  }, [currentNode?.type]);
+  }, [currentNode.type]);
   if (!SelectedQuestionNode) return null;
 
   return (

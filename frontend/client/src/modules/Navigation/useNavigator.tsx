@@ -15,7 +15,6 @@ export const useNavigator = () => {
   const transition = useCallback((toNodeId?: string) => {
     if (!workspaceSlug && !dialogueSlug) return;
 
-    console.log(workspaceSlug, dialogueSlug);
     // / If we have a node-id in the state, go there (can be regular question-node, CTA or FINISHER)
     if (toNodeId) {
       history.push(`/${workspaceSlug}/${dialogueSlug}/n/${toNodeId}`);

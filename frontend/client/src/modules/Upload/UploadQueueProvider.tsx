@@ -6,8 +6,8 @@ import qs from 'qs';
 
 import { SessionEvent } from 'types/core-types';
 import { useAppendToInteractionMutation, useCreateSessionMutation } from 'types/generated-types';
-import { useDebouncedEffect } from 'hooks/useDebouncedEffect';
 import { useDialogueState } from 'modules/Dialogue/DialogueState';
+import useInterval from 'hooks/useInterval';
 
 interface UploadQueueContextProps {
   queueEvents: (events: SessionEvent[]) => void;
@@ -56,7 +56,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
     }).then(() => {
       willAppend.current = true;
     });
-  }, [metadata, dialogue]);
+  }, [metadata, dialogue, createSession, ref]);
 
   /**
    * Queue a single event to be uploaded.
@@ -92,7 +92,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
   /**
    * Effect responsible for cleaning up the UploadQueue whenever a new event is appended to it.
    */
-  useDebouncedEffect(() => {
+  useInterval(() => {
     if (uploadQueue.length > 0) {
       const event = uploadQueue[0];
 
@@ -100,7 +100,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
         setUploadQueue((prev) => prev.slice(1));
       });
     }
-  }, [uploadQueue, handleAppendEventToSession, setUploadQueue], 300);
+  }, uploadQueue.length > 0 ? 300 : null);
 
   return (
     <UploadQueueContext.Provider value={{

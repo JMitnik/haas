@@ -1,8 +1,34 @@
-query GetCustomer($slug: String!) {
+query GetCustomer($slug: String!, $dialogueSlug: String!) {
   customer(slug: $slug) {
     id
     name
     slug
+    dialogue(where: { slug: $dialogueSlug }) {
+      id
+      title
+      slug
+      publicTitle
+      language
+      creationDate
+      updatedAt
+      postLeafNode {
+        header
+        subtext
+      }
+      leafs {
+        ...QuestionFragment
+      }
+      customerId
+      rootQuestion {
+          ...QuestionFragment
+      }
+      questions {
+        ...QuestionFragment
+      }
+      edges {
+        ...EdgeFragment
+      }
+    }
     settings {
       id
       logoUrl

@@ -1,17 +1,13 @@
 import { useRouteMatch } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useDialogueState } from 'modules/Dialogue/DialogueState';
-import { useGetCustomerQuery, useGetDialogueQuery } from 'types/generated-types';
+import { useGetCustomerQuery } from 'types/generated-types';
 
 export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }) => {
   const { i18n } = useTranslation();
   const { initialize } = useDialogueState();
-
-  // const device = useMemo(() => navigator.platform, []);
-  // const originUrl = useMemo(() => window.location.origin, [window.location.origin]);
-  // const startTime = useMemo(() => Date.now(), []);
 
   const initLanguage = (language: string | undefined) => {
     switch (language) {
@@ -31,11 +27,14 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
   };
 
   const customerMatch = useRouteMatch<any>({
-    path: '/:workspaceSlug',
+    path: '/:workspaceSlug/:dialogueSlug',
     strict: true,
   });
 
-  const { data: workspaceData } = useGetCustomerQuery({
+  /**
+   * Fetch the workspace and dialogue, and initialize the store based on these results.
+   */
+  useGetCustomerQuery({
     skip: !customerMatch,
     fetchPolicy: 'network-only',
     onError: (e) => {
@@ -43,35 +42,21 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     },
     variables: {
       slug: customerMatch?.params.workspaceSlug,
+      dialogueSlug: customerMatch?.params.dialogueSlug,
     },
-  });
-  const dialogueMatch = useRouteMatch<any>('/:workspaceSlug/:dialogueSlug');
+    onCompleted: (data) => {
+      const dialogue = data?.customer?.dialogue;
+      const workspace = data?.customer;
 
-  const { data: dialogueData } = useGetDialogueQuery({
-    skip: !dialogueMatch,
-    fetchPolicy: 'network-only',
-    onError: (e) => {
-      console.log(e.message);
-    },
-    variables: {
-      dialogueSlug: dialogueMatch?.params.dialogueSlug,
-      customerSlug: dialogueMatch?.params.workspaceSlug,
-    },
-  });
-
-  // When dialogue changes, set initial nodes and initial edges
-  useEffect(() => {
-    if (workspaceData?.customer && dialogueData?.customer?.dialogue) {
-      const { dialogue } = dialogueData.customer;
-      const workspace = workspaceData.customer;
+      if (!dialogue || !workspace) return;
 
       initialize(dialogue, workspace, {
         device: navigator.platform || 'unknown',
         originUrl: window.location.origin,
       });
       initLanguage(dialogue.language);
-    }
-  }, [workspaceData && dialogueData]);
+    },
+  });
 
   return (
     <>
