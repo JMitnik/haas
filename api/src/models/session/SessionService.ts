@@ -42,7 +42,7 @@ class SessionService {
           (option) => option.value === choiceValue && option.isTopic);
         return matchingOption?.value;
       }).filter(isPresent);
-      // const topics = session.nodeEntries.map(nodeEntry => nodeEntry.choiceNodeEntry?.value).filter(isPresent);
+
       topics.forEach((topic) => {
         let count = 1;
         let relatedTopics = topics;

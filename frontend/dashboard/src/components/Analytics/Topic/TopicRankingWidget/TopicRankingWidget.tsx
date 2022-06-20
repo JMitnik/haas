@@ -1,74 +1,24 @@
 import * as UI from '@haas/ui';
-import { EyeOff, MoreVertical } from 'react-feather';
+import { EyeOff } from 'react-feather';
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React from 'react';
 import theme from 'config/theme';
-import useMeasure, { RectReadOnly } from 'react-use-measure';
+import useMeasure from 'react-use-measure';
 
-import * as Popover from 'components/Common/Popover';
 import {
   GetWorkspaceSummaryDetails,
   useDeselectTopicMutation,
 } from 'types/generated-types';
-import { ItemStyles } from 'components/Common/Dropdownable/Dropdownable.styles';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from 'hooks/useToast';
+
+import { ClickableSvg, Item } from './TopicRankingWidgetStyles';
+import { ShowMoreButton } from './SVGShowMoreButton';
 
 interface TopicRankingWidgetProps {
   totalResponseCount: number;
   topics: GetWorkspaceSummaryDetails.RankedTopics[];
 }
-
-const Item = styled(UI.Div)`
-  ${ItemStyles}
-`;
-
-const ClickableSvg = styled.svg`
-  pointer-events: none;
-  svg {
-    cursor: pointer;
-    pointer-events: auto;
-  }
-`;
-
-interface ShowMoreButtonProps {
-  children?: (onClose: () => void) => React.ReactNode;
-  bounds: RectReadOnly;
-  index: number;
-  // topic: string;
-  margin: number;
-  // onDeselectTopic: (topic: string) => void;
-}
-
-/**
- * PickerButton that triggers a Popover.
- */
-export const ShowMoreButton = ({ children, bounds, index, margin }: ShowMoreButtonProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleClose = () => setIsOpen(false);
-
-  return (
-    <Popover.Root
-      open={isOpen}
-      onOpenChange={setIsOpen}
-    >
-      <Popover.Trigger asChild>
-        <MoreVertical
-          color="grey"
-          x={bounds.width - 15}
-          y={index * (16 + margin + 13.5)}
-        />
-      </Popover.Trigger>
-      <Popover.Content isOpen={isOpen}>
-        <UI.Card maxWidth={700}>
-          {children?.(handleClose)}
-        </UI.Card>
-      </Popover.Content>
-    </Popover.Root>
-  );
-};
 
 export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingWidgetProps) => {
   const [ref, bounds] = useMeasure();
