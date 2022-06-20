@@ -26,24 +26,22 @@ export const DialogueInitializer = ({ children }: { children: React.ReactNode })
     }
   };
 
-  const customerMatch = useMatch({
+  const workspaceMatch = useMatch({
     path: '/:workspaceSlug/:dialogueSlug/*',
   });
-
-  console.log(customerMatch);
 
   /**
    * Fetch the workspace and dialogue, and initialize the store based on these results.
    */
   useGetCustomerQuery({
-    skip: !customerMatch,
+    skip: !workspaceMatch,
     fetchPolicy: 'network-only',
     onError: (e) => {
       console.log(e.message);
     },
     variables: {
-      slug: customerMatch?.params.workspaceSlug as string,
-      dialogueSlug: customerMatch?.params.dialogueSlug as string,
+      slug: workspaceMatch?.params.workspaceSlug as string,
+      dialogueSlug: workspaceMatch?.params.dialogueSlug as string,
     },
     onCompleted: (data) => {
       const dialogue = data?.customer?.dialogue;
