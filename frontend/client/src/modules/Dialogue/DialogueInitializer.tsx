@@ -1,4 +1,4 @@
-import { useMatch } from 'react-router-dom';
+import { Navigate, useMatch } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
@@ -7,7 +7,7 @@ import { useGetCustomerQuery } from 'types/generated-types';
 
 export const DialogueInitializer = ({ children }: { children: React.ReactNode }) => {
   const { i18n } = useTranslation();
-  const { initialize } = useDialogueState();
+  const { initialize, isInitializing } = useDialogueState();
 
   const initLanguage = (language: string | undefined) => {
     switch (language) {
@@ -28,6 +28,10 @@ export const DialogueInitializer = ({ children }: { children: React.ReactNode })
 
   const workspaceMatch = useMatch({
     path: '/:workspaceSlug/:dialogueSlug/*',
+  });
+
+  const workspaceWithNodeMatch = useMatch({
+    path: '/:workspaceSlug/:dialogueSlug/n/:nodeId',
   });
 
   /**
@@ -56,6 +60,11 @@ export const DialogueInitializer = ({ children }: { children: React.ReactNode })
       initLanguage(dialogue.language);
     },
   });
+
+  // During initialization: if we are on any node page, redirect to the general dialogue page.
+  if (isInitializing && !!workspaceWithNodeMatch) {
+    return <Navigate to={`${workspaceMatch?.params.workspaceSlug}/${workspaceMatch?.params.dialogueSlug}`} />;
+  }
 
   return (
     <>

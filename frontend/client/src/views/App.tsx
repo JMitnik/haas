@@ -1,4 +1,3 @@
-import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider } from 'react-i18next';
 import { Route, Routes, useLocation } from 'react-router-dom';
