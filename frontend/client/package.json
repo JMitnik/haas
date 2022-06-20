@@ -17,7 +17,7 @@
     "chakra-ui": "^0.3.9",
     "color": "^3.1.2",
     "date-fns": "^2.16.1",
-    "framer-motion": "^1.9.1",
+    "framer-motion": "6.3.11",
     "graphql-tag": "^2.10.3",
     "i18next": "^19.6.3",
     "jest-canvas-mock": "^2.2.0",

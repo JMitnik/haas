@@ -1,7 +1,7 @@
 import { Transition, Variant } from 'framer-motion';
 import React from 'react';
 
-interface MotionConfig {
+export interface MotionConfig {
   variants: {
     initial: Variant;
     animate: Variant;

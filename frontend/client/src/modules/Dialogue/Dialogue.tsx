@@ -1,3 +1,5 @@
+import { AnimatePresence, motion } from 'framer-motion';
+
 import { useHistory, useLocation } from 'react-router-dom';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
@@ -9,6 +11,7 @@ import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
 import NodeLayout from 'layouts/NodeLayout';
 import useUploadQueue from 'modules/Session/UploadQueueProvider';
 
+import { MotionConfig, fadeMotion } from 'modules/Animation/config';
 import { useDialogueState } from './DialogueState';
 
 export const Dialogue = () => {
@@ -141,7 +144,6 @@ export const Dialogue = () => {
 
   return (
     <DialogueTreeLayout isAtLeaf={currentNode.isLeaf} node={currentNode}>
-
       <IllegalBackModal
         onRestart={handleRestart}
         open={isUploadDisabled}

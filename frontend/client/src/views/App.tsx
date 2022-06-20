@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider } from 'react-i18next';
 import { Route, Switch, useLocation } from 'react-router-dom';
@@ -20,22 +21,23 @@ const AppRoutes = () => {
   const location = useLocation();
 
   return (
-    <Switch key={location.pathname}>
-      <Route exact strict path="/_r">
-        <CampaignRedirectView />
-      </Route>
-      <Route path={[
-        '/:workspaceSlug/:dialogueSlug/n/:nodeId',
-        '/:workspaceSlug/:dialogueSlug/:edgeId',
-        '/:workspaceSlug/:dialogueSlug',
-      ]}
-      >
-        <Dialogue />
-      </Route>
-      <Route exact path="/">
-        <div />
-      </Route>
-    </Switch>
+    <AnimatePresence exitBeforeEnter>
+      <Switch location={location} key={location.pathname}>
+        <Route exact strict path="/_r">
+          <CampaignRedirectView />
+        </Route>
+        <Route path={[
+          '/:workspaceSlug/:dialogueSlug/n/:nodeId',
+          '/:workspaceSlug/:dialogueSlug',
+        ]}
+        >
+          <Dialogue />
+        </Route>
+        <Route exact path="/">
+          <div />
+        </Route>
+      </Switch>
+    </AnimatePresence>
   );
 };
 
