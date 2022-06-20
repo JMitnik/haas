@@ -37,10 +37,15 @@ const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProp
   const history = useHistory();
   const { t } = useTranslation();
 
-  const { workspace, isFinished } = useDialogueState((state) => ({
+  const { workspace, dialogue, getCurrentNode, isFinished } = useDialogueState((state) => ({
     workspace: state.workspace,
+    dialogue: state.dialogue,
+    getCurrentNode: state.getCurrentNode,
     isFinished: state.isFinished,
   }));
+  const currentNode = getCurrentNode();
+
+  const headName = `${dialogue?.title} - ${currentNode?.title}`;
 
   return (
     <DialogueTreeContainer>
@@ -61,9 +66,7 @@ const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProp
       {!!workspace && (
         <Helmet>
           <title>
-            haas -
-            {' '}
-            {workspace.name || ''}
+            {headName}
           </title>
           <meta name="description" content={workspace.name} />
         </Helmet>

@@ -6,7 +6,7 @@ import { DialogueTreeProvider } from 'providers/DialogueTreeProvider/DialogueTre
 import client from 'config/apollo';
 
 import { CampaignProvider } from './CampaignProvider';
-import { UploadQueueProvider } from './UploadQueueProvider';
+// import { UploadQueueProvider } from './UploadQueueProvider';
 import ThemeProviders from './ThemeProviders';
 
 const AppProviders = ({ children }: { children: ReactNode }) => (
@@ -14,9 +14,9 @@ const AppProviders = ({ children }: { children: ReactNode }) => (
     <BrowserRouter>
       <DialogueTreeProvider>
         <CampaignProvider>
-          <UploadQueueProvider>
-            <ThemeProviders>{children}</ThemeProviders>
-          </UploadQueueProvider>
+          {/* <UploadQueueProvider> */}
+          <ThemeProviders>{children}</ThemeProviders>
+          {/* </UploadQueueProvider> */}
         </CampaignProvider>
       </DialogueTreeProvider>
     </BrowserRouter>

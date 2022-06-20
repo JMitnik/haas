@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 
 import { DeliveryStatusEnum, useGetDeliveryQuery, useUpdateDeliveryStatusMutation } from 'types/generated-types';
 import { useGetUrlRef } from 'hooks/useGetUrlRef';
-import CustomerOverview from 'views/CustomerOverview/CustomerOverview';
 import Loader from 'components/Loader';
 
 export const CampaignRedirect = () => {
@@ -39,14 +38,6 @@ export const CampaignRedirect = () => {
       updateDelivery();
     }
   }, [ref, called, data, updateDelivery]);
-
-  if (!ref) {
-    return (
-      <motion.div exit={{ opacity: 0 }}>
-        <CustomerOverview />
-      </motion.div>
-    );
-  }
 
   const url = `/${data?.delivery?.campaignVariant?.workspace?.slug}/${data?.delivery?.campaignVariant?.dialogue?.slug}`;
 

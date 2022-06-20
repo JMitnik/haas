@@ -12,7 +12,7 @@ import Slider from './Slider';
 
 type SliderNodeProps = GenericQuestionNodeProps;
 
-const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
+export const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
   const form = useForm<{ slider: number }>({
     defaultValues: {
       slider: 50.01,
@@ -28,6 +28,8 @@ const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
     const childEdge = findSliderChildEdge(value, node.children);
     const childNode = childEdge?.childNode?.id;
 
+    console.log(node.children);
+
     onRunAction({
       startTimestamp: new Date(Date.now()),
       action: {
@@ -36,7 +38,7 @@ const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
       },
       reward: {
         toNode: childNode,
-        toEdge: childEdge.id,
+        toEdge: childEdge?.id,
         overrideCallToActionId: node.overrideLeaf?.id,
       },
     });

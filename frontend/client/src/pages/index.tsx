@@ -7,7 +7,6 @@ import React, { useLayoutEffect } from 'react';
 import { Dialogue } from 'modules/Dialogue/Dialogue';
 import AppProviders from 'providers/AppProviders';
 import CustomerPage from 'pages/[customer]';
-import CustomersPage from 'pages/customers';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
 import { CampaignRedirect } from './campaign';
@@ -23,27 +22,25 @@ const AppRoutes = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence exitBeforeEnter>
-      <Switch key={location.pathname} location={location}>
-        <Route exact strict path="/_r">
-          <CampaignRedirect />
-        </Route>
-        <Route path={[
-          '/:customerSlug/:dialogueSlug/n/:nodeId',
-          '/:customerSlug/:dialogueSlug/:edgeId',
-          '/:customerSlug/:dialogueSlug',
-        ]}
-        >
-          <Dialogue />
-        </Route>
-        <Route path="/:customerSlug">
-          <CustomerPage />
-        </Route>
-        <Route exact path="/">
-          <CustomersPage />
-        </Route>
-      </Switch>
-    </AnimatePresence>
+    <Switch key={location.pathname}>
+      <Route exact strict path="/_r">
+        <CampaignRedirect />
+      </Route>
+      <Route path={[
+        '/:workspaceSlug/:dialogueSlug/n/:nodeId',
+        '/:workspaceSlug/:dialogueSlug/:edgeId',
+        '/:workspaceSlug/:dialogueSlug',
+      ]}
+      >
+        <Dialogue />
+      </Route>
+      <Route path="/:workspaceSlug">
+        <CustomerPage />
+      </Route>
+      <Route exact path="/">
+        <div />
+      </Route>
+    </Switch>
   );
 };
 

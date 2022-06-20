@@ -70,9 +70,10 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>, ignoreFields = false) => {
     event.preventDefault();
-    const formEntry = getValues();
+    const formEntry = getValues({ nest: true });
+    console.log({ formEntry });
 
-    const formFieldValues = formEntry.fields.map((fieldEntry, index) => ({
+    const formFieldValues = formEntry.fields?.map((fieldEntry, index) => ({
       relatedFieldId: fields?.[index].id,
       [fields?.[index]?.type || '']: getFieldValue(fieldEntry, fields?.[index]),
     }));
@@ -123,7 +124,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           id={`fields[${index}].value`}
                           variant="outline"
                           ref={register({ required: field.isRequired })}
-                          name={`fields[${index}].value`}
+                          name={`fields.${index}.value`}
                           minHeight="150px"
                           placeholder={field.placeholder || undefined}
                         />
@@ -134,7 +135,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           leftEl={mapIcon[field?.type] || <Type />}
                           type={mapFieldType[field?.type] || 'text'}
                           ref={register({ required: field.isRequired })}
-                          name={`fields[${index}].value`}
+                          name={`fields.${index}.value`}
                           placeholder={field.placeholder || undefined}
                           maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
                         />
@@ -146,6 +147,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
               <UI.Div mt={4}>
                 <UI.Flex flexWrap="wrap" alignItems="center">
                   <ClientButton
+                    // @ts-ignore
                     flexBasis="200px"
                     mr={2}
                     width="auto"

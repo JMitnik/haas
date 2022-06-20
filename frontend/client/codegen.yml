@@ -13,3 +13,5 @@ generates:
       withRefetchFn: true
       withResultType: true
       strict: true
+      withHOC: false
+      withComponent: false

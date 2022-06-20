@@ -9,14 +9,25 @@ import { Edge } from 'types/core-types';
 export const findSliderChildEdge = (value: number, edges: Edge[]): Edge => {
   const releventEdges = edges.filter((edge) => {
     const relevantEdges = edge.conditions?.filter((condition) => {
+      // Check if we meet the minimum condition: if we fail, return early
       if (
-        (condition.renderMin && condition?.renderMin < value)
-        && (condition.renderMax && condition?.renderMax >= value)
+        condition.renderMin !== undefined
+        && condition.renderMin !== null
+        && condition.renderMin > value
       ) {
-        return true;
+        return false;
       }
 
-      return false;
+      // Check if we meet the maximum condition: if we fail, return early
+      if (
+        condition.renderMax !== undefined
+        && condition.renderMax !== null
+        && condition.renderMax <= value
+      ) {
+        return false;
+      }
+
+      return true;
     }) || [];
 
     return relevantEdges.length > 0;

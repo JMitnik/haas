@@ -3,6 +3,7 @@ import create from 'zustand';
 import {
   Dialogue,
   QuestionNode,
+  QuestionNodeTypeEnum,
   SessionEvent,
   Workspace,
 } from '../../types/core-types';
@@ -151,6 +152,9 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
 
     const futureState = futureEvents.length > 0 ? futureEvents[futureEvents.length - 1]?.state?.nodeId : null;
     const pastState = pastEvents.length > 0 ? pastEvents[pastEvents.length - 1]?.state?.nodeId : null;
+    console.log(nextNodeId);
+    console.log({ futureState });
+    console.log({ pastState });
 
     if (nextNodeId === futureState) {
       get().redoEvent();
@@ -173,6 +177,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
       const currentEvent = currentState.activeEvent;
       const futureEvents = currentEvent ? [...currentState.futureEvents, currentEvent] : [...currentState.futureEvents];
 
+      console.log(currentState.pastEvents);
       const previousEvent = currentState.pastEvents.pop();
 
       return {
@@ -206,6 +211,19 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
    */
   getCurrentNode: () => {
     const { idToNode, activeEvent } = get();
+
+    if (activeEvent?.state?.nodeId === '-1') {
+      return {
+        id: POSTLEAFNODE_ID,
+        title: '',
+        type: QuestionNodeTypeEnum.Generic,
+        isLeaf: true,
+        isRoot: false,
+        links: [],
+        options: [],
+        children: [],
+      };
+    }
 
     if (idToNode && activeEvent?.state?.nodeId) {
       return idToNode[activeEvent.state.nodeId];

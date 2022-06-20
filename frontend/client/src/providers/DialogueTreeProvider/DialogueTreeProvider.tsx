@@ -31,7 +31,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
   };
 
   const customerMatch = useRouteMatch<any>({
-    path: '/:customerSlug',
+    path: '/:workspaceSlug',
     strict: true,
   });
 
@@ -42,10 +42,10 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
       console.log(e.message);
     },
     variables: {
-      slug: customerMatch?.params.customerSlug,
+      slug: customerMatch?.params.workspaceSlug,
     },
   });
-  const dialogueMatch = useRouteMatch<any>('/:customerSlug/:dialogueSlug');
+  const dialogueMatch = useRouteMatch<any>('/:workspaceSlug/:dialogueSlug');
 
   const { data: dialogueData } = useGetDialogueQuery({
     skip: !dialogueMatch,
@@ -55,7 +55,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     },
     variables: {
       dialogueSlug: dialogueMatch?.params.dialogueSlug,
-      customerSlug: dialogueMatch?.params.customerSlug,
+      customerSlug: dialogueMatch?.params.workspaceSlug,
     },
   });
 

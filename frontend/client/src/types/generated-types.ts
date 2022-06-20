@@ -3427,18 +3427,12 @@ export namespace GetDelivery {
   export type Dialogue = (NonNullable<(NonNullable<(NonNullable<GetDeliveryQuery['delivery']>)['campaignVariant']>)['dialogue']>);
   export type Workspace = (NonNullable<(NonNullable<(NonNullable<GetDeliveryQuery['delivery']>)['campaignVariant']>)['workspace']>);
   export const Document = GetDeliveryDocument;
-  export type Props = GetDeliveryProps;
-  export const HOC = withGetDelivery;
-  export const Component = GetDeliveryComponent;
 }
 
 export namespace UpdateDeliveryStatus {
   export type Variables = UpdateDeliveryStatusMutationVariables;
   export type Mutation = UpdateDeliveryStatusMutation;
   export const Document = UpdateDeliveryStatusDocument;
-  export type Props = UpdateDeliveryStatusProps;
-  export const HOC = withUpdateDeliveryStatus;
-  export const Component = UpdateDeliveryStatusComponent;
 }
 
 export namespace AppendToInteraction {
@@ -3446,9 +3440,6 @@ export namespace AppendToInteraction {
   export type Mutation = AppendToInteractionMutation;
   export type AppendToInteraction = (NonNullable<AppendToInteractionMutation['appendToInteraction']>);
   export const Document = AppendToInteractionDocument;
-  export type Props = AppendToInteractionProps;
-  export const HOC = withAppendToInteraction;
-  export const Component = AppendToInteractionComponent;
 }
 
 export namespace CreateSession {
@@ -3456,9 +3447,6 @@ export namespace CreateSession {
   export type Mutation = CreateSessionMutation;
   export type CreateSession = (NonNullable<CreateSessionMutation['createSession']>);
   export const Document = CreateSessionDocument;
-  export type Props = CreateSessionProps;
-  export const HOC = withCreateSession;
-  export const Component = CreateSessionComponent;
 }
 
 export namespace CustomerFragment {
@@ -3483,9 +3471,6 @@ export namespace GetCustomer {
   export type Settings = (NonNullable<(NonNullable<GetCustomerQuery['customer']>)['settings']>);
   export type ColourSettings = (NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['settings']>)['colourSettings']>);
   export const Document = GetCustomerDocument;
-  export type Props = GetCustomerProps;
-  export const HOC = withGetCustomer;
-  export const Component = GetCustomerComponent;
 }
 
 export namespace Customer {
@@ -3493,9 +3478,6 @@ export namespace Customer {
   export type Query = CustomerQuery;
   export type Customer = (NonNullable<CustomerQuery['customer']>);
   export const Document = CustomerDocument;
-  export type Props = CustomerProps;
-  export const HOC = withCustomer;
-  export const Component = CustomerComponent;
 }
 
 export namespace GetDialogue {
@@ -3509,9 +3491,6 @@ export namespace GetDialogue {
   export type Questions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['questions']>)[number]>;
   export type Edges = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['edges']>)[number]>;
   export const Document = GetDialogueDocument;
-  export type Props = GetDialogueProps;
-  export const HOC = withGetDialogue;
-  export const Component = GetDialogueComponent;
 }
 
 export namespace QuestionFragment {

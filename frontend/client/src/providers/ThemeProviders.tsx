@@ -1,42 +1,41 @@
 import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
 import { ThemeProvider } from 'styled-components';
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 
-import { autorun } from 'mobx';
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
 import { motion } from 'framer-motion';
-import defaultTheme, { chakraDefaultTheme } from 'config/theme';
-import useDialogueTree from './DialogueTreeProvider';
+import { useDialogueState } from 'modules/Dialogue/DialogueState';
+import defaultTheme from 'config/theme';
 
 interface ThemeProvidersProps {
   children?: React.ReactNode;
 }
 
 const ThemeProviders = ({ children }: ThemeProvidersProps) => {
-  const [customTheme, setCustomTheme] = useState({});
-  const { store } = useDialogueTree();
+  const { workspace } = useDialogueState();
 
-  useEffect(() => autorun(() => {
-    if (store.customer) {
-      const customerTheme = { colors: store.customer.settings?.colourSettings };
-      setCustomTheme(customerTheme);
-    } else {
-      setCustomTheme({});
-    }
-  }), [store.customer]);
+  const workspaceTheme = useMemo(() => {
+    if (!workspace?.settings?.colourSettings?.primary) return {};
 
-  if (customTheme) {
+    return workspace?.settings?.colourSettings?.primary;
+  }, [workspace]);
+
+  const dialogueTheme = useMemo(() => {
+    if (!workspaceTheme) return defaultTheme;
+
+    return makeCustomTheme(defaultTheme, workspaceTheme);
+  }, [workspaceTheme]);
+
+  if (workspaceTheme) {
     return (
-      <ThemeProvider theme={defaultTheme}>
-        <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>
-          <ChakraThemeProvider theme={makeCustomTheme(chakraDefaultTheme, customTheme)}>
-            <CSSReset />
+      <ThemeProvider theme={dialogueTheme}>
+        <ChakraThemeProvider theme={dialogueTheme}>
+          <CSSReset />
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              {children}
-            </motion.div>
-          </ChakraThemeProvider>
-        </ThemeProvider>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {children}
+          </motion.div>
+        </ChakraThemeProvider>
       </ThemeProvider>
     );
   }

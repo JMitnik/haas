@@ -57,7 +57,7 @@ const DefaultSocialItems = (handleLinkClick: any) => (
   </>
 );
 
-const SocialShareNode = ({ node }: SocialShareNodeProps) => {
+export const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   // TODO: Use the social capabilities of this event to enqueue
   const handleLinkClick = (event: any) => {
     console.log(event);
