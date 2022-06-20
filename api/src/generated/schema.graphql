@@ -1273,6 +1273,7 @@ enum OperandType {
 
 input OptionInputType {
   id: Int
+  isTopic: Boolean
   overrideLeafId: String
   position: Int!
   publicValue: String
@@ -1497,6 +1498,7 @@ input QuestionNodeWhereUniqueInput {
 
 type QuestionOption {
   id: Int!
+  isTopic: Boolean!
   overrideLeaf: QuestionNode
   position: Int
   publicValue: String

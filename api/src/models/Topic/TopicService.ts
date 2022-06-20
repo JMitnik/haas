@@ -59,7 +59,23 @@ export class TopicService {
       startDate,
       endDate,
       this.buildSessionFilter(topicFilter),
-      { nodeEntries: { include: { choiceNodeEntry: true } } }
+      {
+        nodeEntries: {
+          include: {
+            choiceNodeEntry: true,
+            relatedNode: {
+              select: {
+                options: {
+                  select: {
+                    value: true,
+                    isTopic: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      }
     ) as unknown as SessionWithEntries[];
 
     // Calculate all the candidate topic-counts.

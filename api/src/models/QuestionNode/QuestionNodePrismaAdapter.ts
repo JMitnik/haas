@@ -363,6 +363,7 @@ class QuestionNodePrismaAdapter {
         publicValue: option.publicValue,
         overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
         position: option.position,
+        isTopic: option.isTopic,
       }
       const updatedQOption = await this.upsertQuestionOption(optionId, optionUpsertInput, optionUpsertInput);
 
@@ -440,12 +441,13 @@ class QuestionNodePrismaAdapter {
           create: question.links,
         } : undefined,
         options: question.options?.length ? {
-          create: question.options.map(({ value, overrideLeafId, publicValue, position }) => {
+          create: question.options.map(({ value, overrideLeafId, publicValue, position, isTopic }) => {
             return {
               value,
               publicValue,
               position,
               overrideLeaf: overrideLeafId ? { connect: { id: overrideLeafId } } : undefined,
+              isTopic,
             }
           }),
         } : undefined,

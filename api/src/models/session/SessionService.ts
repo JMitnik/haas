@@ -36,7 +36,13 @@ class SessionService {
    */
   countTopicsFromSessions(sessions: SessionWithEntries[]): Record<string, TopicCount> {
     const topicCount = sessions.reduce((acc, session) => {
-      const topics = session.nodeEntries.map(nodeEntry => nodeEntry.choiceNodeEntry?.value).filter(isPresent);
+      const topics = session.nodeEntries.map((nodeEntry) => {
+        const choiceValue = nodeEntry.choiceNodeEntry?.value;
+        const matchingOption = nodeEntry.relatedNode?.options.find(
+          (option) => option.value === choiceValue && option.isTopic);
+        return matchingOption?.value;
+      }).filter(isPresent);
+      // const topics = session.nodeEntries.map(nodeEntry => nodeEntry.choiceNodeEntry?.value).filter(isPresent);
       topics.forEach((topic) => {
         let count = 1;
         let relatedTopics = topics;

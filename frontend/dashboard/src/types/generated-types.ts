@@ -3046,19 +3046,6 @@ export type UploadUpsellImageMutation = (
   )> }
 );
 
-export type GetWorkspaceAdminsQueryVariables = Exact<{
-  customerSlug: Scalars['String'];
-}>;
-
-
-export type GetWorkspaceAdminsQuery = (
-  { __typename?: 'Query' }
-  & { users: Array<(
-    { __typename?: 'UserType' }
-    & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'globalPermissions'>
-  )> }
-);
-
 export type ConfirmWorkspaceJobMutationVariables = Exact<{
   input?: Maybe<GenerateAutodeckInput>;
 }>;
@@ -4266,47 +4253,6 @@ export function useUploadUpsellImageMutation(baseOptions?: Apollo.MutationHookOp
 export type UploadUpsellImageMutationHookResult = ReturnType<typeof useUploadUpsellImageMutation>;
 export type UploadUpsellImageMutationResult = Apollo.MutationResult<UploadUpsellImageMutation>;
 export type UploadUpsellImageMutationOptions = Apollo.BaseMutationOptions<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>;
-export const GetWorkspaceAdminsDocument = gql`
-    query GetWorkspaceAdmins($customerSlug: String!) {
-  users(customerSlug: $customerSlug) {
-    id
-    firstName
-    lastName
-    globalPermissions
-  }
-}
-    `;
-
-/**
- * __useGetWorkspaceAdminsQuery__
- *
- * To run a query within a React component, call `useGetWorkspaceAdminsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetWorkspaceAdminsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetWorkspaceAdminsQuery({
- *   variables: {
- *      customerSlug: // value for 'customerSlug'
- *   },
- * });
- */
-export function useGetWorkspaceAdminsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>(GetWorkspaceAdminsDocument, options);
-      }
-export function useGetWorkspaceAdminsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>(GetWorkspaceAdminsDocument, options);
-        }
-export type GetWorkspaceAdminsQueryHookResult = ReturnType<typeof useGetWorkspaceAdminsQuery>;
-export type GetWorkspaceAdminsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceAdminsLazyQuery>;
-export type GetWorkspaceAdminsQueryResult = Apollo.QueryResult<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>;
-export function refetchGetWorkspaceAdminsQuery(variables?: GetWorkspaceAdminsQueryVariables) {
-      return { query: GetWorkspaceAdminsDocument, variables: variables }
-    }
 export const ConfirmWorkspaceJobDocument = gql`
     mutation confirmWorkspaceJob($input: GenerateAutodeckInput) {
   confirmCreateWorkspaceJob(input: $input) {
@@ -5970,13 +5916,6 @@ export namespace UploadUpsellImage {
   export type Mutation = UploadUpsellImageMutation;
   export type UploadUpsellImage = (NonNullable<UploadUpsellImageMutation['uploadUpsellImage']>);
   export const Document = UploadUpsellImageDocument;
-}
-
-export namespace GetWorkspaceAdmins {
-  export type Variables = GetWorkspaceAdminsQueryVariables;
-  export type Query = GetWorkspaceAdminsQuery;
-  export type Users = NonNullable<(NonNullable<GetWorkspaceAdminsQuery['users']>)[number]>;
-  export const Document = GetWorkspaceAdminsDocument;
 }
 
 export namespace ConfirmWorkspaceJob {

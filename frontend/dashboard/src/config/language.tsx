@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    is_topic: {
+      en: 'Is a topic',
+      de: 'Ist ein Thema',
+    },
     happy_people: {
       en: 'Happy people',
       de: 'Glückliche Leute',

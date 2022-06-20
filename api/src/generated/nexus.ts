@@ -441,6 +441,7 @@ export interface NexusGenInputs {
   }
   OptionInputType: { // input type
     id?: number | null; // Int
+    isTopic?: boolean | null; // Boolean
     overrideLeafId?: string | null; // String
     position: number; // Int!
     publicValue?: string | null; // String
@@ -2011,6 +2012,7 @@ export interface NexusGenFieldTypes {
   }
   QuestionOption: { // field return type
     id: number; // Int!
+    isTopic: boolean; // Boolean!
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     position: number | null; // Int
     publicValue: string | null; // String

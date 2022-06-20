@@ -17,6 +17,7 @@ export interface QuestionOptionProps {
   publicValue?: string | null;
   overrideLeafId?: string;
   position: number | null;
+  isTopic: boolean;
 }
 export interface LinkGenericInputProps {
   type: LinkTypeEnum;
