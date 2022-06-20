@@ -7,7 +7,7 @@ import { DeliveryStatusEnum, useGetDeliveryQuery, useUpdateDeliveryStatusMutatio
 import { useGetUrlRef } from 'hooks/useGetUrlRef';
 import Loader from 'components/Loader';
 
-export const CampaignRedirect = () => {
+export const CampaignRedirectView = () => {
   const location = useLocation();
   const [redirect, setRedirect] = useState(false);
   const ref = useGetUrlRef();

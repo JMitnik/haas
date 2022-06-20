@@ -5,7 +5,7 @@ import React from 'react';
 import { useDialogueState } from 'modules/Dialogue/DialogueState';
 import { useGetCustomerQuery } from 'types/generated-types';
 
-export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }) => {
+export const DialogueInitializer = ({ children }: { children: React.ReactNode }) => {
   const { i18n } = useTranslation();
   const { initialize } = useDialogueState();
 

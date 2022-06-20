@@ -4,10 +4,10 @@ import { Route, Switch, useLocation } from 'react-router-dom';
 import React, { useLayoutEffect } from 'react';
 
 import { Dialogue } from 'modules/Dialogue/Dialogue';
-import AppProviders from 'providers/AppProviders';
+import AppProviders from 'config/AppProviders';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
-import { CampaignRedirect } from './campaign';
+import { CampaignRedirectView } from './CampaignRedirectView/CampaignRedirectView';
 import lang from '../config/i18n-config';
 
 const ErrorPage = () => (
@@ -22,7 +22,7 @@ const AppRoutes = () => {
   return (
     <Switch key={location.pathname}>
       <Route exact strict path="/_r">
-        <CampaignRedirect />
+        <CampaignRedirectView />
       </Route>
       <Route path={[
         '/:workspaceSlug/:dialogueSlug/n/:nodeId',

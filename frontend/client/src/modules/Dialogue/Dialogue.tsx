@@ -4,10 +4,9 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { DialogueStateType, QuestionNode, SessionEvent } from 'types/core-types';
 import { MapNode } from 'modules/Node/MapNode';
 import { useNavigator } from 'modules/Navigation/useNavigator';
-import { useTrackFinished } from 'modules/PostLeafNode/useTrackFinished';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
 import NodeLayout from 'layouts/NodeLayout';
-import useUploadQueue from 'modules/Upload/UploadQueueProvider';
+import useUploadQueue from 'modules/Session/UploadQueueProvider';
 
 import { IllegalBackModal } from 'modules/GuardModals/IllegalBackModal';
 import { useDialogueState } from './DialogueState';
@@ -29,9 +28,6 @@ export const Dialogue = () => {
     getCurrentNode: state.getCurrentNode,
   }));
   const currentNode = getCurrentNode() as QuestionNode;
-
-  // Track if we are finished, and show finished modal if so
-  useTrackFinished();
 
   // Get the action handlers to apply an event, and detect BACK / FORWARD
   const { applyEvent, detectUndoRedo } = useDialogueState((state) => ({
