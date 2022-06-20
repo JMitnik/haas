@@ -39,6 +39,7 @@ export const calculateNewCallToAction = (
 
 interface StateOutput {
   nodeId: string;
+  edgeId: string;
   stateType: DialogueStateType;
 }
 
@@ -51,12 +52,12 @@ export const calculateNextState = (
   callToActionId?: string,
 ): StateOutput => {
   if (reward?.toNode) {
-    return { nodeId: reward.toNode, stateType: DialogueStateType.INVESTIGATING };
+    return { nodeId: reward.toNode, edgeId: reward.toEdge || '-1', stateType: DialogueStateType.INVESTIGATING };
   }
 
   if (callToActionId) {
-    return { nodeId: callToActionId, stateType: DialogueStateType.CALL_TO_ACTION };
+    return { nodeId: callToActionId, edgeId: '-1', stateType: DialogueStateType.CALL_TO_ACTION };
   }
 
-  return { nodeId: postLeafNodeId, stateType: DialogueStateType.POSTLEAF };
+  return { nodeId: postLeafNodeId, edgeId: '-1', stateType: DialogueStateType.POSTLEAF };
 };

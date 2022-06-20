@@ -1,113 +1,117 @@
-// import React, { useCallback, useContext, useRef } from 'react';
-// import qs from 'qs';
-// import useDialogueTree from 'providers/DialogueTreeProvider';
+import { differenceInSeconds } from 'date-fns';
+import { first, last, omit } from 'lodash';
+import { useLocation } from 'react-router-dom';
+import React, { useCallback, useContext, useRef, useState } from 'react';
+import qs from 'qs';
 
-// import { useAppendToInteractionMutation, useCreateSessionMutation } from 'types/generated-types';
-// import { useLocation } from 'react-router-dom';
+import { SessionEvent } from 'types/core-types';
+import { useAppendToInteractionMutation, useCreateSessionMutation } from 'types/generated-types';
+import { useDebouncedEffect } from 'hooks/useDebouncedEffect';
+import { useDialogueState } from 'modules/Dialogue/DialogueState';
 
-// const UploadQueueContext = React.createContext({} as any);
+interface UploadQueueContextProps {
+  queueEvents: (events: SessionEvent[]) => void;
+}
 
-// export const UploadQueueProvider = ({ children }: { children: React.ReactNode }) => {
-//   const willAppend = useRef(false);
-//   const location = useLocation();
+const UploadQueueContext = React.createContext({} as UploadQueueContextProps);
 
-//   const queue = useRef<any>([]);
-//   const { store, originUrl, device, startTime } = useDialogueTree();
-//   const [createInteraction, { data: interactionData }] = useCreateSessionMutation();
-//   const [appendToInteraction] = useAppendToInteractionMutation();
-//   const ref = qs.parse(location.search, { ignoreQueryPrefix: true })?.ref?.toString() || '';
+export const UploadQueueProvider = ({ children }: { children: React.ReactNode }) => {
+  const willAppend = useRef(false);
+  const location = useLocation();
+  const { dialogue, metadata } = useDialogueState((state) => ({
+    dialogue: state.dialogue,
+    metadata: state.metadata,
+  }));
 
-//   /**
-//    * Upload the main interaction
-//   */
-//   const handleUploadInteraction = useCallback(() => {
-//     const uploadEntries = store.relevantSessionEntries;
+  const [uploadQueue, setUploadQueue] = useState([] as SessionEvent[]);
 
-//     // We only upload if we have not done so before, and also, as long as we have any entries to upload after all.
-//     if (!willAppend.current && uploadEntries.length) {
-//       createInteraction({
-//         variables: {
-//           input: {
-//             dialogueId: store.tree?.id || '',
-//             deliveryId: ref,
-//             totalTimeInSec: Math.min(600, Math.floor((Date.now() - startTime) / 1000)) || -1,
-//             originUrl,
-//             device,
-//             entries: uploadEntries.map((entry: any) => ({
-//               nodeId: entry.node.node.id,
-//               edgeId: entry.edge?.id,
-//               depth: entry.depth,
-//               data: entry.node?.data,
-//             })),
-//           },
-//         },
-//       }).then(() => {
-//         store.finalize();
-//         willAppend.current = true;
-//       });
-//     }
-//   }, [createInteraction, store, willAppend, ref, originUrl]);
+  const [createSession, { data: interactionData, loading: isCreatingSession }] = useCreateSessionMutation();
+  const [appendToInteraction] = useAppendToInteractionMutation();
+  const ref = qs.parse(location.search, { ignoreQueryPrefix: true })?.ref?.toString() || '';
 
-//   /**
-//    * Dequeue the first item in our queue.
-//    */
-//   const dequeueEntry = () => {
-//     if (!queue.current.length || !interactionData || !willAppend.current) return;
+  /**
+   * Creates an initial session.
+   */
+  const handleCreateInitialSession = useCallback((events: SessionEvent[]) => {
+    const startTime = first(events)?.startTimestamp || new Date();
+    const endTime = last(events)?.endTimestamp || new Date();
 
-//     const entry = queue.current[0];
+    createSession({
+      variables: {
+        input: {
+          dialogueId: dialogue?.id as string,
+          // TODO: Refactor
+          deliveryId: ref,
+          totalTimeInSec: differenceInSeconds(endTime, startTime),
+          originUrl: metadata?.originUrl,
+          device: metadata?.device,
+          entries: events.map((event) => ({
+            nodeId: event.state?.nodeId,
+            edgeId: event.state?.edgeId,
+            depth: event.state?.depth,
+            data: omit(event.action, ['type']),
+          })),
+        },
+      },
+    }).then(() => {
+      willAppend.current = true;
+    });
+  }, [metadata, dialogue]);
 
-//     appendToInteraction({
-//       variables: {
-//         input: {
-//           sessionId: interactionData?.createSession?.id,
-//           nodeId: entry.nodeId,
-//           edgeId: entry.edgeId,
-//           data: { ...entry.data },
-//         },
-//       },
-//     })
-//       .catch((err: any) => console.error(err))
-//       .finally(() => {
-//         // eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
-//         const [_, ...tempQueue] = queue.current;
-//         queue.current = tempQueue;
+  /**
+   * Queue a single event to be uploaded.
+   */
+  const handleAppendEventToSession = useCallback((event: SessionEvent) => appendToInteraction({
+    variables: {
+      input: {
+        data: omit(event.action, ['type']),
+        edgeId: event.state?.edgeId,
+        nodeId: event.state?.nodeId,
+        sessionId: interactionData?.createSession.id,
+      },
+    },
+  }), [interactionData]);
 
-//         if (queue.current.length) dequeueEntry();
-//       });
-//   };
+  /**
+   * Queue a list of events to be uploaded.
+   *
+   * We can be in one of three states:
+   * 1. We have not created a session yet, and are not uploading anything yet. => Upload immediately
+   * 2. We have not created a session yet, but we are in the midst of creating one => Queue everything
+   * 3. We have a session. => Queue everything.
+   */
+  const queueEvents = useCallback((events: SessionEvent[]) => {
+    // If we are not in APPEND mode yet, we need to create a session first.
+    if (!willAppend.current && !isCreatingSession) {
+      return handleCreateInitialSession(events);
+    }
 
-//   const reset = () => {
-//     if (willAppend.current) {
-//       queue.current = [];
-//       willAppend.current = false;
-//     }
-//   };
+    return setUploadQueue((prev) => [...prev, ...events]);
+  }, [setUploadQueue, handleCreateInitialSession, isCreatingSession]);
 
-//   /**
-//    * Queue an item to the end of our list, and instantly dequeue it.
-//    */
-//   const queueEntry = (entry: any) => {
-//     if (willAppend.current) {
-//       queue.current = [...queue.current, entry];
-//       dequeueEntry();
-//     }
-//   };
+  /**
+   * Effect responsible for cleaning up the UploadQueue whenever a new event is appended to it.
+   */
+  useDebouncedEffect(() => {
+    if (uploadQueue.length > 0) {
+      const event = uploadQueue[0];
 
-//   return (
-//     <UploadQueueContext.Provider value={{
-//       reset,
-//       queueEntry,
-//       dequeueEntry,
-//       uploadInteraction: handleUploadInteraction,
-//       appendToInteraction: null,
-//       willQueueEntry: willAppend,
-//     }}
-//     >
-//       {children}
-//     </UploadQueueContext.Provider>
-//   );
-// };
+      handleAppendEventToSession(event).then(() => {
+        setUploadQueue((prev) => prev.slice(1));
+      });
+    }
+  }, [uploadQueue, handleAppendEventToSession, setUploadQueue], 300);
 
-// const useUploadQueue = () => useContext(UploadQueueContext);
+  return (
+    <UploadQueueContext.Provider value={{
+      queueEvents,
+    }}
+    >
+      {children}
+    </UploadQueueContext.Provider>
+  );
+};
 
-// export default useUploadQueue;
+const useUploadQueue = () => useContext(UploadQueueContext);
+
+export default useUploadQueue;

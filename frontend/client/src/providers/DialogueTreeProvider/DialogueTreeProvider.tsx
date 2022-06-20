@@ -65,7 +65,10 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
       const { dialogue } = dialogueData.customer;
       const workspace = workspaceData.customer;
 
-      initialize(dialogue, workspace);
+      initialize(dialogue, workspace, {
+        device: navigator.platform || 'unknown',
+        originUrl: window.location.origin,
+      });
       initLanguage(dialogue.language);
     }
   }, [workspaceData && dialogueData]);

@@ -41,7 +41,9 @@ export interface SessionAction extends NodeEntryDataInput {
 }
 
 export interface SessionState {
+  depth: number;
   stateType: DialogueStateType;
+  edgeId?: string;
   nodeId?: string;
   activeCallToActionId?: string;
 }
@@ -73,3 +75,8 @@ export type Choice = GeneratedQuestionOption;
 export type Link = QuestionFragment.Links;
 
 export type Marker = QuestionFragment.Markers;
+
+export interface Metadata {
+  originUrl?: string;
+  device?: string;
+}

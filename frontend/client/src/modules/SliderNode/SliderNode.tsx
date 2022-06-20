@@ -24,6 +24,7 @@ export const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
     if (!validForm) return;
 
     const value = form.getValues().slider;
+    const sliderValue = parseInt(value as unknown as string, 10);
 
     const childEdge = findSliderChildEdge(value, node.children);
     const childNode = childEdge?.childNode?.id;
@@ -34,7 +35,7 @@ export const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
       startTimestamp: new Date(Date.now()),
       action: {
         type: SessionActionType.SliderAction,
-        slider: { value },
+        slider: { value: sliderValue },
       },
       reward: {
         toNode: childNode,

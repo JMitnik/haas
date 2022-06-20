@@ -3,6 +3,7 @@ import create from 'zustand';
 import {
   Dialogue,
   DialogueStateType,
+  Metadata,
   QuestionNode,
   SessionEvent,
   Workspace,
@@ -14,6 +15,7 @@ interface DialogueState {
   // Properties
   /** GlobalStateType contains the dialogue type independent of forward/backward. */
   globalStateType: DialogueStateType;
+  metadata: Metadata | undefined;
   isFinished: boolean;
   idToNode: Record<string, QuestionNode> | undefined;
   dialogue: Dialogue | undefined;
@@ -23,7 +25,7 @@ interface DialogueState {
   isInitializing: boolean;
 
   // Initialization function
-  initialize: (dialogue: Dialogue, workspace: Workspace) => void;
+  initialize: (dialogue: Dialogue, workspace: Workspace, metadata: Metadata) => void;
 
   /** Track past-present-future of state-action-rewards. * */
   activeEvent: SessionEvent | undefined;
@@ -58,6 +60,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
   // Global storage
   dialogue: undefined,
   workspace: undefined,
+  metadata: undefined,
 
   // Track the events.
   activeEvent: undefined,
@@ -76,12 +79,13 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
    * - Initializes the very first state.
    * - Sets the state.
    */
-  initialize: (dialogue: Dialogue, workspace: Workspace) => {
+  initialize: (dialogue: Dialogue, workspace: Workspace, metadata: Metadata) => {
     const idToNode = makeNodeMap([...dialogue.questions, ...dialogue.leafs]);
 
     const initialEvent: SessionEvent = {
       startTimestamp: new Date(Date.now()),
       state: {
+        depth: 0,
         stateType: DialogueStateType.ROOT,
         nodeId: dialogue.rootQuestion.id,
         activeCallToActionId: undefined,
@@ -97,6 +101,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
       workspace,
       activeEvent: initialEvent,
       isInitializing: false,
+      metadata,
     });
   },
 
@@ -130,6 +135,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
       nextEvent = {
         startTimestamp: new Date(Date.now()),
         state: {
+          depth: (updatedCurrentEvent?.state?.depth || 0) + 1,
           activeCallToActionId: newCallToActionId,
           nodeId,
           stateType,
@@ -183,11 +189,14 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
       const currentEvent = currentState.activeEvent;
       const futureEvents = currentEvent ? [...currentState.futureEvents, currentEvent] : [...currentState.futureEvents];
 
-      console.log(currentState.pastEvents);
       const previousEvent = currentState.pastEvents.pop();
+
+      // Get all except the last event
+      const uploadEvents = currentState.uploadEvents.slice(0, currentState.uploadEvents.length - 1);
 
       return {
         pastEvents: currentState.pastEvents,
+        uploadEvents,
         activeEvent: previousEvent,
         futureEvents,
       };
@@ -202,10 +211,12 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
     set((currentState) => {
       const currentEvent = currentState.activeEvent;
       const pastEvents = currentEvent ? [...currentState.pastEvents, currentEvent] : [...currentState.pastEvents];
+      const uploadEvents = currentEvent ? [...currentState.uploadEvents, currentEvent] : [...currentState.uploadEvents];
       const nextEvent = currentState.futureEvents.pop();
 
       return {
         pastEvents,
+        uploadEvents,
         activeEvent: nextEvent,
         futureEvents: [...currentState.futureEvents],
       };
