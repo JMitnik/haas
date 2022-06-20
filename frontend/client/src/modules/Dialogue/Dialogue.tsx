@@ -2,13 +2,13 @@ import { useHistory, useLocation } from 'react-router-dom';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
 import { DialogueStateType, QuestionNode, SessionEvent } from 'types/core-types';
+import { IllegalBackModal } from 'modules/GuardModals/IllegalBackModal';
 import { MapNode } from 'modules/Node/MapNode';
 import { useNavigator } from 'modules/Navigation/useNavigator';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
 import NodeLayout from 'layouts/NodeLayout';
 import useUploadQueue from 'modules/Session/UploadQueueProvider';
 
-import { IllegalBackModal } from 'modules/GuardModals/IllegalBackModal';
 import { useDialogueState } from './DialogueState';
 
 export const Dialogue = () => {
