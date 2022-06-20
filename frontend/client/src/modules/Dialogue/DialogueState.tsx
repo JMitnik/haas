@@ -41,6 +41,9 @@ interface DialogueState {
   /** State-action pairs that will get uploaded. * */
   uploadEvents: SessionEvent[];
 
+  /** Restart the dialogue  */
+  restart: () => SessionEvent;
+
   /** Empty state-action-rewards. * */
   popEventQueue: () => SessionEvent[];
 
@@ -242,6 +245,36 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
     }
 
     return defaultPostLeafNode;
+  },
+
+  /**
+   * Restart the entire flow, and returns the new event.
+   */
+  restart: () => {
+    const dialogue = get().dialogue as Dialogue;
+
+    const initialEvent: SessionEvent = {
+      startTimestamp: new Date(Date.now()),
+      state: {
+        depth: 0,
+        stateType: DialogueStateType.ROOT,
+        nodeId: dialogue.rootQuestion.id,
+        activeCallToActionId: undefined,
+      },
+      action: undefined,
+      reward: undefined,
+    };
+
+    set({
+      globalStateType: DialogueStateType.ROOT,
+      activeEvent: initialEvent,
+      pastEvents: [],
+      uploadEvents: [],
+      futureEvents: [],
+      isInitializing: false,
+    });
+
+    return initialEvent;
   },
 
   /**

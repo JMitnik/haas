@@ -1,6 +1,8 @@
+import * as UI from '@haas/ui';
 import { useHistory, useLocation } from 'react-router-dom';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
+import * as Modal from 'components/Common/Modal';
 import { DialogueStateType, QuestionNode, SessionEvent } from 'types/core-types';
 import { MapNode } from 'modules/Node/MapNode';
 import { useNavigator } from 'modules/Navigation/useNavigator';
@@ -9,6 +11,7 @@ import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
 import NodeLayout from 'layouts/NodeLayout';
 import useUploadQueue from 'modules/Upload/UploadQueueProvider';
 
+import { IllegalBackModal } from 'modules/GuardModals/IllegalBackModal';
 import { useDialogueState } from './DialogueState';
 
 export const Dialogue = () => {
@@ -103,6 +106,13 @@ export const Dialogue = () => {
     }
   }, [applyEvent, popEventQueue, transition, queueEvents, isUploadDisabled]);
 
+  const restart = useDialogueState((state) => state.restart);
+
+  const handleRestart = () => {
+    const restartEvent = restart();
+    transition(restartEvent.state?.nodeId);
+  };
+
   /**
    * Memoize the current active question-node component.
    */
@@ -115,6 +125,13 @@ export const Dialogue = () => {
 
   return (
     <DialogueTreeLayout isAtLeaf={currentNode.isLeaf} node={currentNode}>
+
+      <IllegalBackModal
+        onRestart={handleRestart}
+        open={isUploadDisabled}
+        // open
+      />
+
       <NodeLayout>
         <SelectedQuestionNode key={currentNode.id} node={currentNode} onRunAction={handleAction} />
       </NodeLayout>
