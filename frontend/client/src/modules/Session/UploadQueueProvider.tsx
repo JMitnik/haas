@@ -89,7 +89,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
         sessionId: interactionData?.createSession.id,
       },
     },
-  }), [interactionData]);
+  }), [interactionData, appendToInteraction]);
 
   /**
    * Queue a list of events to be uploaded.

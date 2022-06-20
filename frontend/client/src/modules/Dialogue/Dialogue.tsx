@@ -74,6 +74,7 @@ export const Dialogue = () => {
     if (hasCreatedSession && isAtPreUploadStage) return true;
 
     return false;
+  // eslint-disable-next-line
   }, [session?.id, activeEvent]);
 
   /**
