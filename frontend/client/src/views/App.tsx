@@ -22,7 +22,7 @@ const AppRoutes = () => {
   const location = useLocation();
 
   return (
-    <Routes location={location} key={location.pathname}>
+    <Routes location={location}>
       <Route path="/_r" element={<CampaignRedirectView />} />
       <Route path="/:workspaceSlug/:dialogueSlug">
         <Route path="n/:nodeId" element={<Dialogue />} />

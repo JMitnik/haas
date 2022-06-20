@@ -71,7 +71,6 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>, ignoreFields = false) => {
     event.preventDefault();
     const formEntry = getValues({ nest: true });
-    console.log({ formEntry });
 
     const formFieldValues = formEntry.fields?.map((fieldEntry, index) => ({
       relatedFieldId: fields?.[index].id,

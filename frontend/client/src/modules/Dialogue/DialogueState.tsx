@@ -202,9 +202,6 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
       // Get all except the last event
       const uploadEvents = currentState.uploadEvents.slice(0, currentState.uploadEvents.length - 1);
 
-      console.log({ undoPast: currentState.pastEvents });
-      console.log({ undoFuture: futureEvents });
-
       return {
         pastEvents: currentState.pastEvents,
         uploadEvents,
@@ -239,7 +236,6 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
    */
   getCurrentNode: () => {
     const { idToNode, activeEvent } = get();
-    console.log({ activeEvent });
 
     if (activeEvent?.state?.nodeId === POSTLEAFNODE_ID) {
       return defaultPostLeafNode;

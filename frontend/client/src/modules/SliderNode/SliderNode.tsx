@@ -29,8 +29,6 @@ export const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
     const childEdge = findSliderChildEdge(value, node.children);
     const childNode = childEdge?.childNode?.id;
 
-    console.log(node.children);
-
     onRunAction({
       startTimestamp: new Date(Date.now()),
       action: {
