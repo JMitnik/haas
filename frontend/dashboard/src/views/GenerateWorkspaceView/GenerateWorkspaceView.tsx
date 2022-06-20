@@ -151,7 +151,7 @@ export const GenerateWorkspaceView = () => {
               <Controller
                 name="dialogueType"
                 control={form.control}
-                render={({ value, onChange, onBlur }) => (
+                render={({ field: { value, onChange, onBlur } }) => (
                   <RadioGroup.Root
                     defaultValue={value}
                     onValueChange={onChange}

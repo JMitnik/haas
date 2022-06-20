@@ -255,7 +255,7 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                   control={subform.control}
                   name="isRequired"
                   defaultValue={field.isRequired}
-                  render={({ onBlur, onChange, value }) => (
+                  render={({ field: { onBlur, onChange, value } }) => (
                     <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                       <UI.RadioButton
                         icon={AlertCircle}
