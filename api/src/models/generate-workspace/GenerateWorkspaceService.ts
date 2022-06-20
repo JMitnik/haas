@@ -133,7 +133,7 @@ class GenerateWorkspaceService {
    * @param managerCsv 
    * @param workspace 
    */
-  addManagersFromCSV = async (managerCsv: any, workspace: Workspace) => {
+  addManagersToWorkspace = async (managerCsv: any, workspace: Workspace) => {
     let records = await parseCsv(await managerCsv, { delimiter: ';' });
 
     const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER) as Role;
@@ -177,7 +177,7 @@ class GenerateWorkspaceService {
    * @param input
    * @returns the created workspace
    */
-  async generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInput, userId?: string) {
+  async generateWorkspace(input: GenerateWorkspaceCSVInput, userId?: string) {
     const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv } = input;
 
     const template = this.getTemplate(type);
@@ -254,7 +254,7 @@ class GenerateWorkspaceService {
       void this.userService.sendInvitationMail(invitedUser);
     };
 
-    if (managerCsv) await this.addManagersFromCSV(managerCsv, workspace);
+    if (managerCsv) await this.addManagersToWorkspace(managerCsv, workspace);
 
     return workspace;
   }
