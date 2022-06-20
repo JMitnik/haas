@@ -1,11 +1,12 @@
 import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
 import { ThemeProvider } from 'styled-components';
+import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 
-import { makeCustomTheme } from 'utils/makeCustomerTheme';
-import { motion } from 'framer-motion';
 import { useDialogueState } from 'modules/Dialogue/DialogueState';
 import defaultTheme from 'config/theme';
+
+import { makeCustomTheme } from './ThemeProviders.helpers';
 
 interface ThemeProvidersProps {
   children?: React.ReactNode;
