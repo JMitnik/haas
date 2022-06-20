@@ -11,7 +11,7 @@ import {
 } from 'types/generated-types';
 import { mockMutationAppendToInteraction } from 'tests/__mocks__/AppendToInteraction.mock';
 import { mockMutationCreateSessionMock } from 'tests/__mocks__/CreateSession.mock';
-import { mockQueryGetCustomer, mockQueryGetSportsDialogue } from 'tests/__mocks__/GetSportsDialogue.mock';
+import { mockQueryGetCustomer } from 'tests/__mocks__/GetSportsDialogue.mock';
 import { server } from 'tests/setup/server';
 import { waitForRequest } from 'tests/utils/waitForRequests';
 
@@ -22,7 +22,6 @@ import { waitForRequest } from 'tests/utils/waitForRequests';
  * 3. Finish
  */
 it('dialogue is finished on a positive flow', async () => {
-  mockQueryGetSportsDialogue((res) => ({ ...res }));
   mockQueryGetCustomer((res) => ({ ...res }));
   mockMutationCreateSessionMock((res) => ({ ...res }));
 
@@ -81,7 +80,6 @@ it('dialogue is finished on a positive flow', async () => {
  * 6. Finish
  */
 it('dialogue follows negative flow, share details', async () => {
-  mockQueryGetSportsDialogue((res) => ({ ...res }));
   mockQueryGetCustomer((res) => ({ ...res }));
   mockMutationCreateSessionMock((res) => ({ ...res }));
 
@@ -175,7 +173,6 @@ it('dialogue follows negative flow, share details', async () => {
  * 6. Finish
  */
 it.only('dialogue follows negative flow, not share details, and goes back', async () => {
-  mockQueryGetSportsDialogue((res) => ({ ...res }));
   mockQueryGetCustomer((res) => ({ ...res }));
   mockMutationCreateSessionMock((res) => ({ ...res }));
 
