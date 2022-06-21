@@ -70,9 +70,9 @@ export const Root = ({ children, open, onClose, minWidth = 600, ...props }: Root
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
                 >
-                  <UI.NewCard minWidth={minWidth} minHeight={300}>
+                  <UI.Card minWidth={minWidth} minHeight={300}>
                     {children}
-                  </UI.NewCard>
+                  </UI.Card>
                 </motion.div>
               </ContentContainer>
             </motion.div>

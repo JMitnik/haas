@@ -20,7 +20,7 @@ export const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
   });
 
   const handleSubmit = async () => {
-    const validForm = await form.triggerValidation('slider');
+    const validForm = await form.trigger('slider');
     if (!validForm) return;
 
     const value = form.getValues().slider;
@@ -48,7 +48,7 @@ export const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
       <Div>
         <NodeTitle>{node.title}</NodeTitle>
       </Div>
-      <Div>
+      <Div position="relative">
         <Slider
           happyText={node.sliderNode?.happyText}
           unhappyText={node.sliderNode?.unhappyText}

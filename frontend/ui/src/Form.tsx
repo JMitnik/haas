@@ -11,7 +11,6 @@ import SimpleMDE from 'react-simplemde-editor';
 import {
   Checkbox as ChakraCheckbox,
   CheckboxProps as ChakraCheckboxProps,
-  ButtonProps as ChakraButtonProps,
   Button,
   FormControl as ChakraFormControl,
   FormLabel as ChakraFormLabel,
@@ -585,7 +584,7 @@ export const CardForm = styled(Div) <CardFormProps>`
     css`
       display: flex;
 
-      > *:first-child {
+      > *:first-of-type {
         border-right: 1px solid ${theme.colors.gray[200]};
       }
     `}

@@ -1,4 +1,4 @@
-import { Card } from '@haas/ui';
+import * as UI from '@haas/ui';
 import styled from 'styled-components';
 
 export const WorkspaceCardImage = styled.img`
@@ -19,7 +19,7 @@ export const WorkspaceCardImage = styled.img`
 `;
 
 export const WorkspaceOverviewContainer = styled.div`
-  ${Card}:hover {
+  ${UI.Card}:hover {
     ${WorkspaceCardImage} {
       transition: all .3s cubic-bezier(.55,0,.1,1);
       filter: none;

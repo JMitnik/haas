@@ -94,7 +94,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
   const [openDropdown, setIsOpenDropdown] = useState(false);
 
   return (
-    <UI.NewCard
+    <UI.Card
       ref={ref}
       data-cy="DialogueCard"
       hasHover
@@ -190,7 +190,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
           </UI.Flex>
         </UI.ColumnFlex>
       </UI.CardBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 

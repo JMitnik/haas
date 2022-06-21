@@ -7,6 +7,7 @@ const FallbackContainer = styled(Div)`
     height: 100%;
     display: flex;
     align-items: flex-end;
+    overflow: hidden;
 
     > ${Text} {
         padding: ${theme.gutter}px;

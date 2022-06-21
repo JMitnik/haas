@@ -89,7 +89,7 @@ const FirstTimeForm = () => {
   };
 
   return (
-    <UI.NewCard>
+    <UI.Card>
       <UI.CardBody>
 
         <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
@@ -161,7 +161,7 @@ const FirstTimeForm = () => {
           </UI.Flex>
         </UI.Form>
       </UI.CardBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 

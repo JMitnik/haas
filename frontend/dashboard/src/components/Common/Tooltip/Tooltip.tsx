@@ -1,19 +1,19 @@
-import * as RadixPopover from '@radix-ui/react-popover';
+import * as RadixTooltip from '@radix-ui/react-tooltip';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import styled from 'styled-components';
 
 import { slideUpFadeMotion } from 'components/animation/config';
 
-const ContentContainer = styled(RadixPopover.Content)`
+const ContentContainer = styled(RadixTooltip.Content)`
   transform-origin: top left;
   z-index: 10000;
   width: 100%;
 `;
 
-export const { Root } = RadixPopover;
+export const { Root } = RadixTooltip;
 
-export const { Trigger } = RadixPopover;
+export const { Trigger } = RadixTooltip;
 
 interface ContentProps {
   isOpen: boolean;
@@ -29,8 +29,9 @@ export const Content = ({ isOpen, children, portalled, style }: ContentProps) =>
         asChild
         forceMount
         forwardedAs={motion.div}
-        align="start"
-        alignOffset={12}
+        align="center"
+        alignOffset={0}
+        sideOffset={15}
         side="bottom"
         portalled={portalled}
         {...slideUpFadeMotion}

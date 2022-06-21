@@ -35,7 +35,7 @@
     "react-error-boundary": "^2.3.0",
     "react-feather": "^2.0.3",
     "react-helmet": "^6.1.0",
-    "react-hook-form": "^4.8.0",
+    "react-hook-form": "^6.15.4",
     "react-i18next": "11.7.0",
     "react-lottie": "^1.2.3",
     "react-markdown": "^5.0.2",
