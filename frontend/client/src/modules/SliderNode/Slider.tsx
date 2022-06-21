@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import {
   AnimatePresence, Variants, motion, transform,
   useAnimation, useMotionValue, useTransform,
@@ -10,14 +11,13 @@ import Lottie from 'react-lottie';
 import React, { useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 
-import { Div, Flex, Text, Slider as UISlider } from '@haas/ui';
 import { ReactComponent as FingerIcon } from 'assets/icons/icon-fingerprint.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
 import { Marker } from 'types/core-types';
 import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
-import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
+import * as LS from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
 import { SliderText } from './SliderText';
 
@@ -57,7 +57,7 @@ const adaptColor = (colorHex: string) => {
   return color.mix(Color('white'), 0.4).saturate(1).hex();
 };
 
-const SliderSpeechWrapper = styled(Div)`
+const SliderSpeechWrapper = styled(UI.Div)`
   > div {
     width: 100%;
     display: flex;
@@ -246,26 +246,26 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
   return (
     <>
       {animationState.isStopped && (
-        <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
-          <Flex
+        <LS.SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
+          <UI.Flex
             data-testid="unhappy"
             alignItems="center"
           >
             <UnhappyIcon />
-            <Text fontSize="0.8rem">
+            <UI.Text fontSize="0.8rem">
               {unhappyText || t('unhappy')}
-            </Text>
-          </Flex>
-          <Flex alignItems="center" data-testid="happy">
-            <Text mr={1} fontSize="0.8rem">
+            </UI.Text>
+          </UI.Flex>
+          <UI.Flex alignItems="center" data-testid="happy">
+            <UI.Text mr={1} fontSize="0.8rem">
               {happyText || t('happy')}
-            </Text>
+            </UI.Text>
             <HappyIcon />
-          </Flex>
-        </SlideHereContainer>
+          </UI.Flex>
+        </LS.SlideHereContainer>
       )}
 
-      <HAASRabbit
+      <LS.HAASRabbit
         style={{
           left: `${animationState.position}%`,
           bottom: '10px',
@@ -289,7 +289,7 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
               animate={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 1.1 }}
             >
-              <SliderNodeValue
+              <LS.SliderNodeValue
                 initial="initial"
                 variants={sliderValueAnimeVariants}
                 animate={animationControls}
@@ -332,7 +332,7 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
                     )}
                   </AnimatePresence>
                 </motion.span>
-              </SliderNodeValue>
+              </LS.SliderNodeValue>
               <SliderText
                 markers={markers}
                 color={sliderColor}
@@ -358,14 +358,15 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
             speed={animationState.speed}
           />
         </div>
-      </HAASRabbit>
-      <form>
-        <UISlider
+      </LS.HAASRabbit>
+
+      <UI.Div position="relative">
+        <UI.Slider
           data-testid="slider"
           data-cy="Slider"
           width={1}
           name="slider"
-          style={{ zIndex: 300 }}
+          style={{ zIndex: 300, height: 90, opacity: 0, cursor: 'pointer' }}
           onChange={(e) => moveBunny(e)}
           onMouseUp={() => handleSubmit()}
           onTouchEnd={() => handleSubmit()}
@@ -374,10 +375,15 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
           defaultValue={50}
           ref={register}
         />
-      </form>
+
+        <LS.PseudoSliderTrack style={{
+          height: 15, position: 'absolute', bottom: 0, left: 0, right: 0,
+        }}
+        />
+      </UI.Div>
 
       {animationState.isStopped && (
-        <FingerPrintContainer
+        <LS.FingerPrintContainer
           animate={{
             marginLeft: ['0%', '30%', '0%', '-30%', '0%', '0%'],
             opacity: [0, 1, 1, 1, 0.5, 0],
@@ -391,7 +397,7 @@ const Slider = ({ form, register, onSubmit, markers, happyText, unhappyText }: S
           }}
         >
           <FingerIcon />
-        </FingerPrintContainer>
+        </LS.FingerPrintContainer>
       )}
 
     </>

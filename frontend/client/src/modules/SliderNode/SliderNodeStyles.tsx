@@ -122,3 +122,12 @@ export const HAASRabbit = styled.div`
     border: none;
   }
 `;
+
+export const PseudoSliderTrack = styled.div`
+  ${({ theme }) => css`
+    width: 100%;
+    border-radius: 10px;
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.04));
+    box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px;
+  `}
+`;
