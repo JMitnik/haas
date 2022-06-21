@@ -71,7 +71,10 @@ class GenerateWorkspaceService {
     workspace: Customer & {
       roles: Role[];
     },
-    userId?: string) {
+    userId?: string,
+    sessionsPerDay: number = 1,
+    generateData: boolean = true,
+  ) {
     const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN);
     await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
       workspace.id,
@@ -116,7 +119,9 @@ class GenerateWorkspaceService {
       await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, templateType);
 
       // Generate data
-      await this.dialogueService.massGenerateFakeData(dialogue.id, template, 1, true, 5, 70, 80);
+      if (generateData) {
+        await this.dialogueService.massGenerateFakeData(dialogue.id, template, sessionsPerDay, true, 5, 70, 80);
+      }
     }
 
     return null;
