@@ -49,7 +49,6 @@ const argv = yargs
   .alias('help', 'h').argv;
 
 export const seedBusinessTemplate = async () => {
-  console.log(argv);
   const amtSessions = argv.sessions;
   const ownEmail = argv.email;
   const templateType = argv.templateType;
