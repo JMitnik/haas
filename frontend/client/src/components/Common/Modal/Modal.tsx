@@ -2,7 +2,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion/dist/framer-motion';
 
-import { slideUpFadeMotion } from 'modules/Animation/config';
+import { slideUpFadeMotion } from 'modules/animation/config';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -70,9 +70,9 @@ export const Root = ({ children, open, onClose, minWidth = 600, ...props }: Root
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
                 >
-                  <UI.NewCard minWidth={[300, 300, minWidth]} minHeight={300}>
+                  <UI.Card minWidth={[300, 300, minWidth]} minHeight={300}>
                     {children}
-                  </UI.NewCard>
+                  </UI.Card>
                 </motion.div>
               </ContentContainer>
             </motion.div>
