@@ -412,30 +412,28 @@ class TemplateService {
     );
 
     // Positive Sub child 1 (What did you like?)
-    const instagramNodeId = TemplateService.findLeafIdContainingText(leafs, 'Follow us on Instagram and stay');
+    const singleLinkCTAId = TemplateService.findLeafIdContainingText(leafs, 'Single link CTA');
     const rootToWhatDidYou = await this.nodeService.createQuestionNode(
       'What did you like?', dialogueId, NodeType.CHOICE, standardOptions, false,
-      instagramNodeId,
+      singleLinkCTAId,
     );
 
     // Positive Sub sub child 1 (Facilities)
-    const comeAndJoin1stAprilId = TemplateService.findLeafIdContainingText(leafs,
-      'Come and join us on 1st April for our great event');
     const whatDidYouToFacilities = await this.nodeService.createQuestionNode(
       'What exactly did you like about the facilities?', dialogueId,
-      NodeType.CHOICE, facilityOptions, false, comeAndJoin1stAprilId,
+      NodeType.CHOICE, facilityOptions, false, undefined,
     );
 
     // Positive Sub sub child 2 (Website)
     const whatDidYouToWebsite = await this.nodeService.createQuestionNode(
       'What exactly did you like about the website?', dialogueId,
-      NodeType.CHOICE, websiteOptions, false, instagramNodeId,
+      NodeType.CHOICE, websiteOptions, false, undefined,
     );
 
     // Positive Sub sub child 3 (Product/Services)
-    const weThinkYouMightLikeThis = TemplateService.findLeafIdContainingText(
+    const shareCTA = TemplateService.findLeafIdContainingText(
       leafs,
-      'We think you might like this as',
+      'Share CTA',
     );
 
     const whatDidYouToProduct = await this.nodeService.createQuestionNode(
@@ -444,15 +442,21 @@ class TemplateService {
       NodeType.CHOICE,
       productServicesOptions,
       false,
-      weThinkYouMightLikeThis,
+      shareCTA,
     );
 
     // Positive Sub sub child 4 (Customer Support)
-    const yourEmailBelowForNewsletter = TemplateService.findLeafIdContainingText(leafs,
-      'your email below to receive our newsletter');
+    const InstagramMultiLinkCTA = TemplateService.findLeafIdContainingText(leafs,
+      'Instagram');
     const whatDidYouToCustomerSupport = await this.nodeService.createQuestionNode(
       'What exactly did you like about the customer support?', dialogueId,
-      NodeType.CHOICE, customerSupportOptions, false, yourEmailBelowForNewsletter,
+      NodeType.CHOICE,
+      [
+        { value: 'Friendliness', position: 1 },
+        { value: 'Competence', position: 2 },
+        { value: 'Speed', position: 3 },
+        { value: 'Other', position: 4, overrideLeafId: InstagramMultiLinkCTA },
+      ], false, undefined,
     );
 
     // Neutral Sub child 2

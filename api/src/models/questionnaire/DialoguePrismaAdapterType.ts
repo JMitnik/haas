@@ -68,6 +68,11 @@ export interface CreateQuestionInput {
       position: number;
     }>;
   };
+  share?: {
+    url: string;
+    tooltip: string;
+    title: string;
+  };
   sliderNode?: {
     markers: Array<{
       label: string;
