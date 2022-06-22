@@ -4,7 +4,6 @@ import {
 } from 'framer-motion';
 import { usePopper } from 'react-popper';
 import { useTimer } from 'use-timer';
-import { useTranslation } from 'react-i18next';
 import { useWatch } from 'react-hook-form';
 import Color from 'color';
 import Lottie from 'react-lottie';
@@ -61,9 +60,7 @@ const adaptColor = (colorHex: string) => {
 const AdjustedColourWrapper = styled(Div)`
   ${({ theme }) => css`
     font-weight: 600;
-    color: ${Color(theme.colors.primary).isDark()
-      ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
-      : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
     `}
   `;
 

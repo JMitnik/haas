@@ -51,13 +51,10 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
       key: fs.readFileSync(key),
       cert: fs.readFileSync(certificate),
     }, app).listen(port, () => {
-      console.log('🏁\Listening on https server!');
-      console.log(`Listening on port ${port}!`);
     });
   }
 
   const serverInstance = app.listen(port);
-  console.log('🏁\Listening on standard server!');
   console.log('🏁\tStarted the server!');
 
   return serverInstance;
