@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 import App from './App';
 
-if (import.meta.env.VITE_IS_MSW === 'true') {
+if (process.env.VITE_IS_MSW === 'true') {
   // eslint-disable-next-line global-require
   const { worker } = require('./mocks/browser');
   worker.start();
