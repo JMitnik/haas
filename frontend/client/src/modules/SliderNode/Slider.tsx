@@ -9,10 +9,9 @@ import { useTimer } from 'use-timer';
 import { useWatch } from 'react-hook-form';
 import Color from 'color';
 import Lottie from 'react-lottie';
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
 import { Marker } from 'types/core-types';
 import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
@@ -20,32 +19,7 @@ import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 import * as LS from './SliderNodeStyles';
 import { ExplainSlideLeftAnimation, ExplainSlideRightAnimation } from './SliderNodeAnimations';
 import { SliderText } from './SliderText';
-
-interface SliderAnimationStateProps {
-  isStopped: boolean;
-  speed: number;
-  direction: number;
-  position: number;
-  animationJson: any;
-}
-
-interface AnimationPayload {
-  speed?: number;
-  position?: number
-}
-
-type SliderAnimationActionType =
-  | { type: 'idle', payload?: AnimationPayload }
-  | { type: 'run', payload: AnimationPayload }
-  | { type: 'stop', payload?: AnimationPayload };
-
-const defaultSliderAnimationState: SliderAnimationStateProps = {
-  isStopped: true,
-  speed: 2.0,
-  direction: 1.0,
-  position: 50,
-  animationJson: HAASIdle,
-};
+import { useSliderAnimation } from './useSliderAnimation';
 
 const adaptColor = (colorHex: string) => {
   const color = Color(colorHex);
@@ -56,6 +30,7 @@ const adaptColor = (colorHex: string) => {
 
   return color.mix(Color('white'), 0.4).saturate(1).hex();
 };
+
 const AdjustedColourWrapper = styled(UI.Div)`
   ${({ theme }) => css`
     font-weight: 600;
@@ -109,6 +84,9 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
   const animationControls = useAnimation();
   const timerProgressAbs = useMotionValue(0);
 
+  // Animation state handler
+  const [animationState, dispatchAnimationState] = useSliderAnimation();
+
   const { start, reset } = useTimer({
     endTime,
     interval: 10,
@@ -161,61 +139,13 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
   const { styles, attributes, update } = usePopper(sliderRef, overlay, {
     placement: 'top',
     modifiers: [{
-      name: 'offset',
+      name: 'preventOverflow',
       options: {
-        offset: [30, 0],
+        altAxis: true,
+        padding: 20,
       },
     }],
   });
-
-  const [animationState, dispatchAnimationState] = useReducer((
-    state: SliderAnimationStateProps,
-    action: SliderAnimationActionType,
-  ): SliderAnimationStateProps => {
-    switch (action.type) {
-      case 'idle': {
-        return {
-          speed: 2.0,
-          animationJson: HAASIdle,
-          isStopped: state.isStopped,
-          direction: state.direction,
-          position: state.position,
-        };
-      }
-
-      case 'run': {
-        let { direction } = state;
-        const { position } = action.payload;
-
-        if (position && position < state.position) {
-          direction = -1;
-        }
-
-        if (position && position > state.position) {
-          direction = 1;
-        }
-
-        return {
-          speed: 1.0,
-          animationJson: HAASRun,
-          isStopped: false,
-          direction,
-          position: position ?? state.position,
-        };
-      }
-      case 'stop': {
-        return {
-          speed: 0.0,
-          animationJson: HAASStopping,
-          isStopped: true,
-          direction: state.direction,
-          position: state.position,
-        };
-      }
-
-      default: return state;
-    }
-  }, defaultSliderAnimationState);
 
   /**
    * Event handler for synchronizing the bunny position with input entry.
@@ -243,6 +173,9 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
     if (update) update();
   };
 
+  /**
+   * If user lets go of bunny, check to make sure that we can start the countdown for dispatching the result.
+   */
   const handleSubmit = () => {
     dispatchAnimationState({ type: 'idle' });
 
@@ -283,7 +216,7 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
           {...attributes.popper}
         >
           <motion.div
-            initial={{ opacity: 0, y: 70, x: 10 }}
+            initial={{ opacity: 0, y: 70, x: 0 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.1 }}
           >
@@ -379,7 +312,6 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
                   </AdjustedColourWrapper>
                 </motion.div>
               </UI.Flex>
-
             </>
           )}
           <Lottie
