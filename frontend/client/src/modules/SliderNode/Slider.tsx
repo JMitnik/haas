@@ -217,7 +217,19 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
     }
   }, defaultSliderAnimationState);
 
+  /**
+   * Event handler for synchronizing the bunny position with input entry.
+   *
+   * Note: the bunny does not dictate the score, the slider itself does. The bunny simply synchronizes and follow the
+   * score coming from <UI.Slider />.
+   * @param event
+   * @returns
+   */
   const moveBunny = (event: React.FormEvent<HTMLInputElement>) => {
+    // Stop dragging bunny if done
+    if (isComplete) return;
+
+    // If the bunny is finished before the time is up
     if (isValid && showIsEarly) {
       setShowIsEarly(false);
     }
@@ -387,6 +399,7 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
           data-cy="Slider"
           width={1}
           name="slider"
+          disabled={isComplete}
           style={{ zIndex: 300, height: 90, opacity: 0, cursor: 'pointer' }}
           onChange={(e) => moveBunny(e)}
           onMouseUp={() => handleSubmit()}
