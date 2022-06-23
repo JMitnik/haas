@@ -6,6 +6,7 @@ import React, { useMemo } from 'react';
 import { useDialogueState } from 'modules/Dialogue/DialogueState';
 import defaultTheme from 'config/theme';
 
+import { ColorsTheme, ThemeEntry } from './ThemeProviders.types';
 import { makeCustomTheme } from './ThemeProviders.helpers';
 
 interface ThemeProvidersProps {
@@ -15,10 +16,10 @@ interface ThemeProvidersProps {
 const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   const { workspace } = useDialogueState();
 
-  const workspaceTheme = useMemo(() => {
-    if (!workspace?.settings?.colourSettings?.primary) return {};
+  const workspaceTheme: ColorsTheme | undefined = useMemo(() => {
+    if (!workspace?.settings?.colourSettings?.primary) return undefined;
 
-    return workspace?.settings?.colourSettings?.primary;
+    return { colors: workspace.settings.colourSettings as ThemeEntry };
   }, [workspace]);
 
   const dialogueTheme = useMemo(() => {
