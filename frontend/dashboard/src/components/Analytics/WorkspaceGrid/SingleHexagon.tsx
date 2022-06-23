@@ -1,10 +1,6 @@
 /* eslint-disable max-len */
 import React from 'react';
 
-/* -------------------------------------------------------------------------
- * SingleHexagon
- * -------------------------------------------------------------------------*/
-
 interface SingleHexagonProps {
   fill: string;
 }

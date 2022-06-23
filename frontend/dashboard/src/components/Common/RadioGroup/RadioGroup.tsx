@@ -1,7 +1,12 @@
 import * as RadixRadioGroup from '@radix-ui/react-radio-group';
+import * as UI from '@haas/ui';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
-export const RadioGroupIndicator = styled(RadixRadioGroup.Indicator)`
+/**
+ * Circular indicator of a radio group item
+ */
+export const Indicator = styled(RadixRadioGroup.Indicator)`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
@@ -21,7 +26,10 @@ export const RadioGroupIndicator = styled(RadixRadioGroup.Indicator)`
   `}
 `;
 
-export const RadioGroupItem = styled(RadixRadioGroup.Item)`
+/**
+ * Container of the circular indicator
+ */
+export const ItemContainer = styled(RadixRadioGroup.Item)`
   ${({ theme }) => css`
     width: 20px;
     height: 20px;
@@ -31,13 +39,23 @@ export const RadioGroupItem = styled(RadixRadioGroup.Item)`
   `}
 `;
 
-export const RadioGroupLabel = styled.span`
-  display: block;
-`;
-export const RadioGroupSubtitle = styled.span`
+/**
+ * Main radio label
+ */
+export const Label = styled.span`
   display: block;
 `;
 
+/**
+ * Main radio subtitle
+ */
+export const Subtitle = styled.span`
+  display: block;
+`;
+
+/**
+ * RadioGroup box
+ */
 type RadioGroupBoxType = 'boxed' | 'unboxed';
 type RadioGroupBoxContentType = 'oneLine' | 'twoLine';
 
@@ -47,7 +65,7 @@ interface RadioGroupBoxProps {
   variant?: RadioGroupBoxType;
 }
 
-export const RadioGroupBox = styled.label<RadioGroupBoxProps>`
+export const Box = styled.label<RadioGroupBoxProps>`
   ${({ theme, isActive, contentVariant = 'oneLine', variant = 'boxed' }) => css`
     display: flex;
     align-items: center;
@@ -71,7 +89,6 @@ export const RadioGroupBox = styled.label<RadioGroupBoxProps>`
       `}
     `}
 
-
     ${contentVariant === 'oneLine' && css``}
 
     ${contentVariant === 'twoLine' && css`
@@ -79,11 +96,11 @@ export const RadioGroupBox = styled.label<RadioGroupBoxProps>`
       align-items: flex-start;
       padding: ${theme.gutter / 1.5}px ${theme.gutter}px;
 
-      ${RadioGroupSubtitle}, ${RadioGroupLabel} {
+      ${Subtitle}, ${Label} {
         line-height: 1;
       }
 
-      ${RadioGroupLabel} {
+      ${Label} {
         font-size: 0.9rem;
         font-weight: 600;
         margin-bottom: ${theme.gutter / 4}px;
@@ -94,26 +111,50 @@ export const RadioGroupBox = styled.label<RadioGroupBoxProps>`
       padding: ${theme.gutter / 2}px 0;
     `}
 
-    ${RadioGroupItem} {
+    ${ItemContainer} {
       margin-right: ${theme.gutter}px;
     }
   `}
 `;
 
+interface RadioGroupBoxItemProps extends RadioGroupBoxProps {
+  children: React.ReactNode;
+  value: string;
+}
+
+export const Item = ({ children, isActive, contentVariant, variant, value }: RadioGroupBoxItemProps) => (
+  <Box
+    htmlFor={value}
+    key={value}
+    isActive={isActive}
+    contentVariant={contentVariant}
+    variant={variant}
+  >
+    <ItemContainer id={value} key={value} value={value}>
+      <Indicator />
+    </ItemContainer>
+    <UI.Div>
+      {children}
+    </UI.Div>
+  </Box>
+);
+
+/**
+ * Root of Radio group
+ */
 type RadioGroupType = 'tight' | 'joined' | 'spaced';
 
-interface RadioGroupProps {
+interface RadioGroupRootProps {
   variant?: RadioGroupType;
 }
 
-export const RadioGroupRoot = styled(RadixRadioGroup.Root) <RadioGroupProps>`
+export const Root = styled(RadixRadioGroup.Root)<RadioGroupRootProps>`
   ${({ theme, variant = 'tight' }) => css`
-
     ${variant === 'spaced' && css`
       display: grid;
       grid-gap: ${theme.gutter / 4}px;
 
-      ${RadioGroupBox} {
+      ${Box} {
         border-radius: ${theme.borderRadiuses.md}px;
       }
     `}
@@ -121,11 +162,11 @@ export const RadioGroupRoot = styled(RadixRadioGroup.Root) <RadioGroupProps>`
     ${variant === 'tight' && css`
       border-radius: ${theme.borderRadiuses.md}px;
 
-      ${RadioGroupBox}:first-of-type {
+      ${Box}:first-of-type {
         border-radius: ${theme.borderRadiuses.md}px ${theme.borderRadiuses.md}px 0 0;
       }
 
-      ${RadioGroupBox}:last-of-type {
+      ${Box}:last-of-type {
         border-radius: 0 0 ${theme.borderRadiuses.md}px ${theme.borderRadiuses.md}px;
       }
     `}

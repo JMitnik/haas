@@ -23,7 +23,7 @@ export const ContentContainer = styled(RadixDropdown.Content)`
     transform-origin: top left;
     width: 100%;
 
-    ${UI.NewCard} {
+    ${UI.Card} {
       padding: ${theme.gutter / 4}px;
     }
 
@@ -53,9 +53,9 @@ export const Content = ({ open, children }: ContentProps) => (
         style={{ minWidth: '200px' }}
       >
         <motion.div>
-          <UI.NewCard padding={1}>
+          <UI.Card padding={1}>
             {children}
-          </UI.NewCard>
+          </UI.Card>
         </motion.div>
       </ContentContainer>
     ) : null}

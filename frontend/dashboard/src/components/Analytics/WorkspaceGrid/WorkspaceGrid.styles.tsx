@@ -5,7 +5,6 @@ import styled, { css } from 'styled-components';
 export const WorkspaceGridAdapterContainer = styled(UI.Div)`
   ${({ theme }) => css`
     border: 1px solid ${theme.colors.gray[200]};
-    height: 100vh;
   `}
 `;
 
@@ -44,7 +43,6 @@ interface WorkspaceGridContainerProps {
 export const WorkspaceGridContainer = styled(UI.Div) <WorkspaceGridContainerProps>`
   ${({ theme, backgroundColor }) => css`
     background: ${backgroundColor};
-    /* border-radius: 20px; */
     position: relative;
     height: 100%;
     min-height: 100vh;

@@ -45,8 +45,6 @@ const handleError = (ctx: any, error: GraphQLError) => {
 
 
 export const makeApollo = async (prisma: PrismaClient) => {
-  console.log('💼\tBootstrapping Graphql Engine Apollo');
-
   const apollo: ApolloServer = new ApolloServer({
     uploads: false,
     schema: applyMiddleware(schema, authShield),
@@ -70,8 +68,6 @@ export const makeApollo = async (prisma: PrismaClient) => {
       },
     ],
   });
-
-  console.log('🏁\tFinished bootstrapping Graphql Engine Apollo');
 
   return apollo;
 };

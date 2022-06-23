@@ -1,16 +1,13 @@
 import * as UI from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Link } from 'react-router-dom';
 import { Plus } from 'react-feather';
 import { Skeleton } from '@chakra-ui/core';
-import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverview.styles';
 import { Variants, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { View } from 'layouts/View';
 import { useNavigator } from 'hooks/useNavigator';
-import SurveyIcon from 'components/Icons/SurveyIcon';
 import useAuth from 'hooks/useAuth';
 
 import * as LS from './WorkspaceOverview.styles';
@@ -43,7 +40,7 @@ const MotionGrid = motion.custom(UI.Grid);
 
 export const WorkspaceOverview = ({ customers, isLoading }: { customers: any[]; isLoading: boolean }) => {
   const { t } = useTranslation();
-  const { canCreateCustomers, canAccessAdmin, canGenerateWorkspaceFromCsv } = useAuth();
+  const { canGenerateWorkspaceFromCsv } = useAuth();
   const { goToGenerateWorkspaceOverview } = useNavigator();
 
   return (
@@ -63,7 +60,7 @@ export const WorkspaceOverview = ({ customers, isLoading }: { customers: any[]; 
 
               <UI.Div ml={4}>
                 {canGenerateWorkspaceFromCsv && (
-                  <UI.Button size="sm" onClick={() => goToGenerateWorkspaceOverview()}>
+                  <UI.Button size="sm" onClick={() => goToGenerateWorkspaceOverview()} leftIcon={Plus}>
                     {t('generate_workspace')}
                   </UI.Button>
                 )}
@@ -108,19 +105,6 @@ export const WorkspaceOverview = ({ customers, isLoading }: { customers: any[]; 
                     </ErrorBoundary>
                   </motion.div>
                 ))}
-
-                {(canCreateCustomers || canAccessAdmin) && (
-                  <UI.AddCard>
-                    <Link to="/dashboard/b/add" />
-                    <UI.Flex flexDirection="column" alignItems="center" justifyContent="center">
-                      <SurveyIcon />
-                      <TranslatedPlus>
-                        <Plus strokeWidth="3px" />
-                      </TranslatedPlus>
-                      <UI.H4 color="default.dark">{t('customer:create_customer')}</UI.H4>
-                    </UI.Flex>
-                  </UI.AddCard>
-                )}
               </MotionGrid>
             )}
           </UI.Container>

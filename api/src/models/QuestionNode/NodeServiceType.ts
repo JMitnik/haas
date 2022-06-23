@@ -15,6 +15,7 @@ export interface QuestionOptionProps {
   id?: number;
   value: string;
   publicValue?: string | null;
+  isTopic?: boolean;
   overrideLeafId?: string;
   position: number | null;
 }

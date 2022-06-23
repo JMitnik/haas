@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { render, screen } from 'test';
+import React from 'react';
 
 import { WorkspaceGridAdapter } from '../WorkspaceGridAdapter';
 import { mockGetWorkspaceDialogueStatistics, mockQueryDialogueConnection } from './helpers';
