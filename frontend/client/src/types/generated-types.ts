@@ -2916,53 +2916,6 @@ export type GetCustomerQuery = (
   )> }
 );
 
-export type CustomerQueryVariables = Exact<{
-  slug: Scalars['String'];
-}>;
-
-
-export type CustomerQuery = (
-  { __typename?: 'Query' }
-  & { customer?: Maybe<(
-    { __typename?: 'Customer' }
-    & CustomerFragmentFragment
-  )> }
-);
-
-export type GetDialogueQueryVariables = Exact<{
-  customerSlug: Scalars['String'];
-  dialogueSlug: Scalars['String'];
-}>;
-
-
-export type GetDialogueQuery = (
-  { __typename?: 'Query' }
-  & { customer?: Maybe<(
-    { __typename?: 'Customer' }
-    & Pick<Customer, 'id'>
-    & { dialogue?: Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'language' | 'creationDate' | 'updatedAt' | 'customerId'>
-      & { postLeafNode?: Maybe<(
-        { __typename?: 'DialogueFinisherObjectType' }
-        & Pick<DialogueFinisherObjectType, 'header' | 'subtext'>
-      )>, leafs: Array<(
-        { __typename?: 'QuestionNode' }
-        & QuestionFragmentFragment
-      )>, rootQuestion: (
-        { __typename?: 'QuestionNode' }
-        & QuestionFragmentFragment
-      ), questions: Array<(
-        { __typename?: 'QuestionNode' }
-        & QuestionFragmentFragment
-      )>, edges: Array<(
-        { __typename?: 'Edge' }
-        & EdgeFragmentFragment
-      )> }
-    )> }
-  )> }
-);
-
 export type QuestionFragmentFragment = (
   { __typename?: 'QuestionNode' }
   & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'isLeaf' | 'type' | 'extraContent'>
@@ -3363,110 +3316,6 @@ export type GetCustomerQueryResult = Apollo.QueryResult<GetCustomerQuery, GetCus
 export function refetchGetCustomerQuery(variables?: GetCustomerQueryVariables) {
       return { query: GetCustomerDocument, variables: variables }
     }
-export const CustomerDocument = gql`
-    query customer($slug: String!) {
-  customer(slug: $slug) {
-    ...CustomerFragment
-  }
-}
-    ${CustomerFragmentFragmentDoc}`;
-
-/**
- * __useCustomerQuery__
- *
- * To run a query within a React component, call `useCustomerQuery` and pass it any options that fit your needs.
- * When your component renders, `useCustomerQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useCustomerQuery({
- *   variables: {
- *      slug: // value for 'slug'
- *   },
- * });
- */
-export function useCustomerQuery(baseOptions: Apollo.QueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, options);
-      }
-export function useCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, options);
-        }
-export type CustomerQueryHookResult = ReturnType<typeof useCustomerQuery>;
-export type CustomerLazyQueryHookResult = ReturnType<typeof useCustomerLazyQuery>;
-export type CustomerQueryResult = Apollo.QueryResult<CustomerQuery, CustomerQueryVariables>;
-export function refetchCustomerQuery(variables?: CustomerQueryVariables) {
-      return { query: CustomerDocument, variables: variables }
-    }
-export const GetDialogueDocument = gql`
-    query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
-  customer(slug: $customerSlug) {
-    id
-    dialogue(where: {slug: $dialogueSlug}) {
-      id
-      title
-      slug
-      publicTitle
-      language
-      creationDate
-      updatedAt
-      postLeafNode {
-        header
-        subtext
-      }
-      leafs {
-        ...QuestionFragment
-      }
-      customerId
-      rootQuestion {
-        ...QuestionFragment
-      }
-      questions {
-        ...QuestionFragment
-      }
-      edges {
-        ...EdgeFragment
-      }
-    }
-  }
-}
-    ${QuestionFragmentFragmentDoc}
-${EdgeFragmentFragmentDoc}`;
-
-/**
- * __useGetDialogueQuery__
- *
- * To run a query within a React component, call `useGetDialogueQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetDialogueQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetDialogueQuery({
- *   variables: {
- *      customerSlug: // value for 'customerSlug'
- *      dialogueSlug: // value for 'dialogueSlug'
- *   },
- * });
- */
-export function useGetDialogueQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, options);
-      }
-export function useGetDialogueLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, options);
-        }
-export type GetDialogueQueryHookResult = ReturnType<typeof useGetDialogueQuery>;
-export type GetDialogueLazyQueryHookResult = ReturnType<typeof useGetDialogueLazyQuery>;
-export type GetDialogueQueryResult = Apollo.QueryResult<GetDialogueQuery, GetDialogueQueryVariables>;
-export function refetchGetDialogueQuery(variables?: GetDialogueQueryVariables) {
-      return { query: GetDialogueDocument, variables: variables }
-    }
 export namespace GetDelivery {
   export type Variables = GetDeliveryQueryVariables;
   export type Query = GetDeliveryQuery;
@@ -3525,26 +3374,6 @@ export namespace GetCustomer {
   export type Settings = (NonNullable<(NonNullable<GetCustomerQuery['customer']>)['settings']>);
   export type ColourSettings = (NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['settings']>)['colourSettings']>);
   export const Document = GetCustomerDocument;
-}
-
-export namespace Customer {
-  export type Variables = CustomerQueryVariables;
-  export type Query = CustomerQuery;
-  export type Customer = (NonNullable<CustomerQuery['customer']>);
-  export const Document = CustomerDocument;
-}
-
-export namespace GetDialogue {
-  export type Variables = GetDialogueQueryVariables;
-  export type Query = GetDialogueQuery;
-  export type Customer = (NonNullable<GetDialogueQuery['customer']>);
-  export type Dialogue = (NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>);
-  export type PostLeafNode = (NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['postLeafNode']>);
-  export type Leafs = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['leafs']>)[number]>;
-  export type RootQuestion = (NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['rootQuestion']>);
-  export type Questions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['questions']>)[number]>;
-  export type Edges = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueQuery['customer']>)['dialogue']>)['edges']>)[number]>;
-  export const Document = GetDialogueDocument;
 }
 
 export namespace QuestionFragment {

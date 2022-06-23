@@ -56,7 +56,6 @@ export const Root = ({ children, open, onClose, minWidth = 600, ...props }: Root
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }}
             >
-              {/* @ts-ignore */}
               <ContentContainer
                 forceMount
                 asChild

@@ -3,7 +3,6 @@ import {
   CustomerSettings,
   QuestionOption as GeneratedQuestionOption,
   GetCustomer,
-  GetDialogue,
   LinkType,
   NodeEntryDataInput,
   QuestionFragment,
@@ -61,7 +60,7 @@ export type WorkspaceSettings = CustomerSettings;
 
 export type LinkItemType = LinkType;
 
-export type Dialogue = GetDialogue.Dialogue;
+export type Dialogue = GetCustomer.Dialogue;
 
 export type Workspace = GetCustomer.Customer;
 
@@ -69,7 +68,7 @@ export interface QuestionNode extends QuestionFragmentFragment {
   postLeafBody?: string;
 }
 
-export type Edge = GetDialogue.Edges;
+export type Edge = GetCustomer.Edges;
 
 export type Choice = GeneratedQuestionOption;
 
