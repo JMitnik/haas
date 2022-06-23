@@ -402,7 +402,7 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
         }}
         />
 
-        <UI.Flex width="100%" position="absolute" bottom="-20px" justifyContent="space-between">
+        <UI.Flex width="100%" position="absolute" bottom="-30px" justifyContent="space-between">
           <AdjustedColourWrapper>
             0
           </AdjustedColourWrapper>
