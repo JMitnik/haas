@@ -393,6 +393,7 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
           onTouchEnd={() => handleSubmit()}
           min={1}
           max={100}
+          autoFocus
           defaultValue={50}
           ref={register}
         />

@@ -298,6 +298,9 @@ class DialoguePrismaAdapter {
                 videoUrl: question.videoEmbeddedNode.videoUrl,
               },
             } : undefined,
+            share: {
+              create: question.share,
+            },
             links: question.links?.length ? {
               create: question.links,
             } : undefined,
