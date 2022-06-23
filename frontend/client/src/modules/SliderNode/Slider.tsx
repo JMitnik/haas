@@ -297,11 +297,11 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
                   cx="25"
                   cy="25"
                   r="24"
+                  animate={{ stroke: sliderColor }}
                   style={{
                     strokeDashoffset: 453,
                     strokeDasharray: timerProgress,
                     fill: 'transparent',
-                    stroke: sliderColor,
                     strokeWidth: '2px',
                   }}
                 />
