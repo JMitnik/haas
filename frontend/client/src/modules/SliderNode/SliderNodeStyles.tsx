@@ -34,7 +34,7 @@ export const SlideHereContainer = styled(motion.div)`
 
 export const FingerPrintContainer = styled(motion.div)`
   ${({ theme }) => css`
-    position: absolute; 
+    position: absolute;
     bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
@@ -124,10 +124,8 @@ export const HAASRabbit = styled.div`
 `;
 
 export const PseudoSliderTrack = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    border-radius: 10px;
-    background: linear-gradient(45deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.04));
-    box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px;
-  `}
+  width: 100%;
+  border-radius: 10px;
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.04));
+  box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px;
 `;
