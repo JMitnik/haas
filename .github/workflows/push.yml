@@ -12,8 +12,9 @@ jobs:
       - name: Run ESLint
         run: yarn eslint
       - name: Run E2E (Client)
-        uses: actions/checkout@v2
+        uses: cypress-io/github-action@v4
         with:
+          browser: chrome
           start: yarn start
           wait-on: 'http://localhost:3000'
           working-directory: ./frontend/client
