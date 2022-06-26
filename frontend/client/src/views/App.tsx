@@ -8,7 +8,8 @@ import AppProviders from 'config/AppProviders';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
 import { CampaignRedirectView } from './CampaignRedirectView/CampaignRedirectView';
-import { DialogueRedirectView } from './DialogueRedirectView/DialogueRedirectView';
+import { DialogueNodelessView } from './DialogueNodelessView';
+import { LandingView } from './LandingView';
 import lang from '../config/i18n-config';
 
 const ErrorPage = () => (
@@ -25,9 +26,9 @@ const AppRoutes = () => {
       <Route path="/_r" element={<CampaignRedirectView />} />
       <Route path="/:workspaceSlug/:dialogueSlug">
         <Route path="n/:nodeId" element={<Dialogue />} />
-        <Route index element={<DialogueRedirectView />} />
+        <Route index element={<DialogueNodelessView />} />
       </Route>
-      <Route element={<div />} />
+      <Route index element={<LandingView />} />
     </Routes>
   );
 };

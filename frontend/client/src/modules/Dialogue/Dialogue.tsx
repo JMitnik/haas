@@ -18,8 +18,9 @@ export const Dialogue = () => {
   const location = useLocation();
 
   // Get the current event and state type
-  const { activeEvent } = useDialogueState((state) => ({
+  const { activeEvent, globalStateType } = useDialogueState((state) => ({
     activeEvent: state.activeEvent,
+    globalStateType: state.globalStateType,
   }));
 
   // Get the current dialogue and node retrieval callback
@@ -71,11 +72,13 @@ export const Dialogue = () => {
       || activeEvent?.state?.stateType === DialogueStateType.INITIALIZING
     );
 
+    console.log({ globalStateType });
+
     if (hasCreatedSession && isAtPreUploadStage) return true;
 
     return false;
   // eslint-disable-next-line
-  }, [session?.id, activeEvent]);
+  }, [session?.id, activeEvent, globalStateType]);
 
   /**
    * The main callback for handling an event (State + Action + Reward), and transitioning to the next event.
