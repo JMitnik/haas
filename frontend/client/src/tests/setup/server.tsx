@@ -2,4 +2,3 @@
 import { setupWorker } from 'msw';
 
 export const server = setupWorker();
-server.start({ onUnhandledRequest: 'bypass' });

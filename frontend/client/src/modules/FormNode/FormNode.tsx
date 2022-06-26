@@ -74,7 +74,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
 
     const formFieldValues = formEntry.fields?.map((fieldEntry, index) => ({
       relatedFieldId: fields?.[index].id,
-      [fields?.[index]?.type || '']: getFieldValue(fieldEntry, fields?.[index]),
+      [fields?.[index]?.type || '']: !ignoreFields ? getFieldValue(fieldEntry, fields?.[index]) : undefined,
     }));
 
     // TODO: Think of some logic
@@ -85,7 +85,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
       startTimestamp: new Date(Date.now()),
       action: {
         type: SessionActionType.FormAction,
-        form: ignoreFields ? undefined : { values: formFieldValues },
+        form: { values: formFieldValues },
       },
       reward: {
         overrideCallToActionId: node.overrideLeaf?.id,

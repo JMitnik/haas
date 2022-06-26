@@ -11,6 +11,12 @@ jobs:
         run: yarn types
       - name: Run ESLint
         run: yarn eslint
+      - name: Run E2E (Client)
+        uses: actions/checkout@v2
+        with:
+          start: yarn start
+          wait-on: 'http://localhost:3000'
+          working-directory: ./frontend/client
       - name: Start Testing Containers
         run: yarn dock:test:start-db
       - name: Generate required artifacts

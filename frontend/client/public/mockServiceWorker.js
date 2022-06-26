@@ -110,6 +110,11 @@ async function resolveMainClient(event) {
 
 async function handleRequest(event, requestId) {
   const client = await resolveMainClient(event)
+
+  if (client === undefined) {
+    return response;
+  }
+
   const response = await getResponse(event, client, requestId)
 
   // Send back the response clone for the "response:*" life-cycle events.
