@@ -18,6 +18,8 @@ jobs:
           start: yarn start
           wait-on: 'http://localhost:3000'
           working-directory: ./frontend/client
+        env:
+          SKIP_PREFLIGHT_CHECK: true
       - name: Start Testing Containers
         run: yarn dock:test:start-db
       - name: Generate required artifacts
