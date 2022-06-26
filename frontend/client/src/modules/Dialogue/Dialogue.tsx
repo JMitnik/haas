@@ -72,9 +72,13 @@ export const Dialogue = () => {
       || activeEvent?.state?.stateType === DialogueStateType.INITIALIZING
     );
 
-    console.log({ globalStateType });
+    // If user went back from post-leaf to call-to-action.
+    const postLeafToCallToAction = (
+      globalStateType === DialogueStateType.POSTLEAF
+      && activeEvent?.state?.stateType === DialogueStateType.CALL_TO_ACTION
+    );
 
-    if (hasCreatedSession && isAtPreUploadStage) return true;
+    if (hasCreatedSession && (isAtPreUploadStage || postLeafToCallToAction)) return true;
 
     return false;
   // eslint-disable-next-line
