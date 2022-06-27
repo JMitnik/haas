@@ -34,6 +34,10 @@ export interface CreateDialogueInput {
   isWithoutGenData?: boolean;
   endScreenText?: string | null;
   wasGeneratedWithGenData?: boolean;
+  postLeafText?: {
+    header?: string;
+    subHeader?: string;
+  };
   customer?: { id?: string; name?: string; slug?: string; create: boolean };
 }
 

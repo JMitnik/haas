@@ -23,7 +23,7 @@ const PostLeafNode = () => {
   const { dialogue } = useDialogueState();
 
   const header = dialogue?.postLeafNode?.header || 'Thank you for participating!';
-  const subHeader = dialogue?.postLeafNode?.subtext || 'We will strive towards making your happier';
+  const subHeader = dialogue?.postLeafNode?.subtext || 'We strive to make you happier';
 
   return (
     <PostLeafNodeContainer>
