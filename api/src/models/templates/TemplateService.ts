@@ -23,7 +23,13 @@ const businessOptions = [
   { value: 'Colleagues', position: 4 },
   { value: 'Performance', position: 5 },
   { value: 'Work Pressure', position: 6 },
+  { value: 'Company Leadership', position: 7 },
 ];
+
+const yesNoOptions = [
+  { value: 'Yes', position: 1 }, // TODO: Add isTopic: false to both entries so they won't be shown in top topics
+  { value: 'No', position: 2 },
+]
 
 const sportOptionsEng = [
   { value: 'Physical & Mental', position: 1 },
@@ -356,7 +362,7 @@ class TemplateService {
       });
     }
 
-    const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'from HR will contact you');
+    const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'will always remain anonymous');
 
     // Very Positive Sub child 1 (Great to hear! What are you most satisfied about?)
     const greatToHear = await this.nodeService.createQuestionNode(
@@ -372,11 +378,70 @@ class TemplateService {
       businessOptions, false, hrWillContactCTA,
     );
 
+    const mappedYesNoOptions = yesNoOptions.map((option) => ({ ...option, overrideLeafId: option.value === 'Yes' ? hrWillContactCTA : undefined }))
+
+    const negativeDiscussWith1 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const negativeDiscussWith2 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const negativeDiscussWith3 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const negativeDiscussWith4 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const negativeDiscussWith5 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const negativeDiscussWith6 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const negativeDiscussWith7 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
     // Very Negative Sub child 4
     const veryNegative = await this.nodeService.createQuestionNode(
       'That\'s unfortunate! What went wrong?', dialogueId,
       NodeType.CHOICE, businessOptions, false, hrWillContactCTA
     );
+
+    const veryNegativeDiscussWith1 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const veryNegativeDiscussWith2 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const veryNegativeDiscussWith3 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const veryNegativeDiscussWith4 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const veryNegativeDiscussWith5 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const veryNegativeDiscussWith6 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
+    const veryNegativeDiscussWith7 = await this.nodeService.createQuestionNode(
+      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+    );
+
 
     // ################################### EDGES ################################
 
@@ -392,8 +457,60 @@ class TemplateService {
     await this.edgeService.createEdge(rootQuestion, negative,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 25, renderMax: 55 });
 
+    // const businessOptions = [
+    //   { value: 'Physical & Mental', position: 1 },
+    //   { value: 'Management', position: 2 },
+    //   { value: 'Home Situation', position: 3 },
+    //   { value: 'Colleagues', position: 4 },
+    //   { value: 'Performance', position: 5 },
+    //   { value: 'Work Pressure', position: 6 },
+    //   { value: 'Company Leadership', position: 7 },
+    // ];  
+
+    await this.edgeService.createEdge(negative, negativeDiscussWith1,
+      { conditionType: 'match', matchValue: 'Physical & Mental', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(negative, negativeDiscussWith2,
+      { conditionType: 'match', matchValue: 'Management', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(negative, negativeDiscussWith3,
+      { conditionType: 'match', matchValue: 'Home Situation', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(negative, negativeDiscussWith4,
+      { conditionType: 'match', matchValue: 'Colleagues', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(negative, negativeDiscussWith5,
+      { conditionType: 'match', matchValue: 'Performance', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(negative, negativeDiscussWith6,
+      { conditionType: 'match', matchValue: 'Work Pressure', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(negative, negativeDiscussWith7,
+      { conditionType: 'match', matchValue: 'Company Leadership', renderMin: null, renderMax: null });
+
     await this.edgeService.createEdge(rootQuestion, veryNegative,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 25 });
+
+    await this.edgeService.createEdge(veryNegative, negativeDiscussWith1,
+      { conditionType: 'match', matchValue: 'Physical & Mental', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(veryNegative, negativeDiscussWith2,
+      { conditionType: 'match', matchValue: 'Management', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(veryNegative, negativeDiscussWith3,
+      { conditionType: 'match', matchValue: 'Home Situation', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(veryNegative, negativeDiscussWith4,
+      { conditionType: 'match', matchValue: 'Colleagues', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(veryNegative, negativeDiscussWith5,
+      { conditionType: 'match', matchValue: 'Performance', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(veryNegative, negativeDiscussWith6,
+      { conditionType: 'match', matchValue: 'Work Pressure', renderMin: null, renderMax: null });
+
+    await this.edgeService.createEdge(veryNegative, negativeDiscussWith7,
+      { conditionType: 'match', matchValue: 'Company Leadership', renderMin: null, renderMax: null });
 
   };
 
