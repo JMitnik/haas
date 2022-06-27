@@ -25,6 +25,7 @@
     "@swc/core": "^1.2.204",
     "@swc/jest": "^0.2.21",
     "@szhsin/react-menu": "^2.0.1",
+    "@visx/axis": "^2.10.0",
     "@visx/event": "^2.6.0",
     "@visx/gradient": "^2.1.0",
     "@visx/group": "^2.1.0",

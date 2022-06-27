@@ -9,6 +9,7 @@ import * as Modal from 'components/Common/Modal';
 import { DatePicker } from 'components/Common/DatePicker';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { Loader } from 'components/Common/Loader/Loader';
+import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 
 import * as LS from './WorkspaceGrid.styles';
@@ -350,6 +351,10 @@ export const WorkspaceGrid = ({
                     currentState={currentState}
                     historyQueue={historyQueue}
                   />
+                </UI.Div>
+
+                <UI.Div maxWidth={600}>
+                  <SimpleIssueTable />
                 </UI.Div>
 
               </UI.Container>
