@@ -49,7 +49,7 @@ export const defaultBusinessTextFieldForm: NexusGenInputs['FormNodeInputType'] =
   fields: [
     {
       isRequired: false,
-      label: 'Leave your name and  a senior leader will contact you ⇣',
+      label: 'Leave your name and a senior leader will contact you ⇣',
     },
   ],
 }
