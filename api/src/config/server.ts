@@ -55,7 +55,6 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   }
 
   const serverInstance = app.listen(port);
-  serverInstance.setTimeout(10 * 60 * 1000);
   console.log('🏁\tStarted the server!');
 
   return serverInstance;
