@@ -36,6 +36,24 @@ export interface DemoWorkspaceTemplate extends WorkspaceTemplate {
   subSubLayer: string[];
 }
 
+export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
+  fields: [
+    {
+      isRequired: false,
+      label: 'Leave your name and the \'category leader\' will contact you ⇣',
+    },
+  ],
+}
+
+export const defaultBusinessTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
+  fields: [
+    {
+      isRequired: false,
+      label: 'Leave your name and one of our leaders will contact you ⇣',
+    },
+  ],
+}
+
 export const defaultForm: NexusGenInputs['FormNodeInputType'] = {
   fields: [
     {

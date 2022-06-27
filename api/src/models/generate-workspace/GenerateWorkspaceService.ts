@@ -95,18 +95,19 @@ class GenerateWorkspaceService {
 
     for (let i = 0; i < mappedDialogueInputData.length; i++) {
       const { slug, title } = mappedDialogueInputData[i];
+      const template = this.templateService.findTemplate(templateType as NexusGenEnums['DialogueTemplateType']);
+
       const dialogueInput: CreateDialogueInput = {
         slug: slug,
         title: title,
         description: '',
         customer: { id: workspace.id, create: false },
         isPrivate: false,
+        postLeafText: template?.postLeafText,
       };
 
       // Create initial dialogue
       const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
-
-      const template = this.templateService.findTemplate(templateType as NexusGenEnums['DialogueTemplateType']);
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
       // Make post leaf node if data specified in template
@@ -222,6 +223,10 @@ class GenerateWorkspaceService {
         description: '',
         customer: { id: workspace.id, create: false },
         isPrivate: hasEmailAssignee,
+        postLeafText: {
+          header: template.postLeafText?.header,
+          subHeader: template.postLeafText?.subHeader,
+        },
       };
 
       // Create initial dialogue

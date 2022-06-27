@@ -18,7 +18,7 @@ const PostLeafNode = () => {
       )
         : (
           <H4 color="white" textAlign="center">
-            We will strive towards making you
+            We strive to make you
             {' '}
             <i>happier.</i>
           </H4>
