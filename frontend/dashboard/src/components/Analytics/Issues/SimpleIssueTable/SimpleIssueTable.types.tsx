@@ -6,6 +6,7 @@ export enum ActionType {
 
 export interface Issue {
   topic: string;
+  dialogueId: string;
   dialogueName: string;
   score: number;
   voteCount: number;

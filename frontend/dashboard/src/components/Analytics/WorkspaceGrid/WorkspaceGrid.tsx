@@ -8,6 +8,7 @@ import useMeasure from 'react-use-measure';
 import * as Modal from 'components/Common/Modal';
 import { DatePicker } from 'components/Common/DatePicker';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
+import { Issue } from 'components/Analytics/Issues/SimpleIssueTable/SimpleIssueTable.types';
 import { Loader } from 'components/Common/Loader/Loader';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -255,6 +256,10 @@ export const WorkspaceGrid = ({
     setCurrentState({ currentNode: clickedNode, childNodes: newNodes, viewMode: hexagonViewMode });
   };
 
+  const handleIssueClick = (issue: Issue) => {
+    jumpToDialogue(issue.dialogueId, [issue.topic]);
+  };
+
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       {isLoading && (
@@ -351,10 +356,11 @@ export const WorkspaceGrid = ({
                     currentState={currentState}
                     historyQueue={historyQueue}
                   />
-                </UI.Div>
-
-                <UI.Div maxWidth={600}>
-                  <SimpleIssueTable />
+                  <UI.Div mt={4} maxWidth={750}>
+                    <SimpleIssueTable
+                      onIssueClick={handleIssueClick}
+                    />
+                  </UI.Div>
                 </UI.Div>
 
               </UI.Container>

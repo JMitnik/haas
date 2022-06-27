@@ -80,7 +80,7 @@ export class CoreAPI extends Construct {
           BASE_URL: props.apiOptions.baseUrl,
           CLIENT_URL: props.apiOptions.clientUrL,
           DASHBOARD_URL: props.apiOptions.dashboardUrl,
-          CLOUDINARY_URL: '',
+          CLOUDINARY_URL: 'cloudinary://934926832132984:uwtZjMqTGKgJL-nFzS2gsG_pnUE@haas-storage',
           MAIL_SENDER: props.apiOptions.mailSenderMail,
           ENVIRONMENT: props.apiOptions.environment,
           test: 'test'
