@@ -198,8 +198,11 @@ class GenerateWorkspaceService {
       userId as string
     );
 
+    const startTime = performance.now();
+
     // For every record generate dialogue, users + assign to dialogue
     for (let i = 0; i < records.length; i++) {
+      console.log('Creating dialogue: ', i + 1, '/', records.length);
       const record = records[i];
       const layers = Object.entries(record).filter((entry) => entry[0].includes('layer') && (entry[1] as string)?.length > 0);
       const layersContent = layers.map((layer) => (layer[1] as string).replaceAll('-', ''));
@@ -250,6 +253,10 @@ class GenerateWorkspaceService {
 
       void this.userService.sendInvitationMail(invitedUser);
     };
+
+    const endTime = performance.now()
+
+    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
 
     if (managerCsv) await this.addManagersFromCSV(managerCsv, workspace);
 
