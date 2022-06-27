@@ -75,7 +75,7 @@ const WorkspaceCard = ({ customer }: { customer: any }) => {
       data-cy="CustomerCard"
       data-testid="CustomerCard"
     >
-      <UI.CardBody flex="100%">
+      <UI.CardBody height="100%" flex="100%">
         <UI.ColumnFlex justifyContent="space-between">
           <UI.H3
             color={primaryColor.isDark() ? 'white' : '#444'}

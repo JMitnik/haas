@@ -51,6 +51,7 @@ const CustomerUploadLogoInput = ({ onChange, value, logoOpacity, overrideColor }
 
   const [uploadFile, { loading }] = useMutation(uploadSingleImage, {
     onCompleted: (result) => {
+      console.log('Result upload: ', result);
       toast({
         title: 'Uploaded!',
         description: 'File has been uploaded.',
@@ -61,7 +62,8 @@ const CustomerUploadLogoInput = ({ onChange, value, logoOpacity, overrideColor }
 
       onChange(result.singleUpload.url);
     },
-    onError: () => {
+    onError: (err) => {
+      console.log('Err: ', err);
       toast({
         title: 'Something went wrong',
         description: 'We were unable to upload file. Try again',
