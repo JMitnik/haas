@@ -543,16 +543,6 @@ class TemplateService {
     await this.edgeService.createEdge(rootQuestion, negative,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 25, renderMax: 55 });
 
-    // const businessOptions = [
-    //   { value: 'Physical & Mental', position: 1 },
-    //   { value: 'Management', position: 2 },
-    //   { value: 'Home Situation', position: 3 },
-    //   { value: 'Colleagues', position: 4 },
-    //   { value: 'Performance', position: 5 },
-    //   { value: 'Work Pressure', position: 6 },
-    //   { value: 'Company Leadership', position: 7 },
-    // ];  
-
     await this.edgeService.createEdge(negative, negativeDiscussWith1,
       { conditionType: 'match', matchValue: 'Physical & Mental', renderMin: null, renderMax: null });
 
