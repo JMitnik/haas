@@ -1,3 +1,4 @@
 src/types/generated-types.ts
 **/mocks/**/*
 src/serviceWorker.ts
+generated-types.ts
