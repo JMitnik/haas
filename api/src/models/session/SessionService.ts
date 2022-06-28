@@ -40,10 +40,12 @@ class SessionService {
       topics.forEach((topic) => {
         let count = 1;
         let relatedTopics = topics;
+        let dates = [session.createdAt];
         let dialogueIds = [session.dialogueId];
         let score = session.mainScore;
 
         if (acc[topic]) {
+          dates = [...acc[topic].dates, session.createdAt];
           relatedTopics = acc[topic].relatedTopics;
           score = acc[topic].score + score;
           count = acc[topic].count + 1;
@@ -51,6 +53,7 @@ class SessionService {
         }
 
         acc[topic] = {
+          dates,
           relatedTopics,
           score,
           count,

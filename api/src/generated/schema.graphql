@@ -517,6 +517,7 @@ type Customer {
   dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
+  issues(filter: IssueFilterInput): [Issue!]
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!] @deprecated(reason: "Deprecated, see statistics")
   nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
@@ -560,6 +561,21 @@ type CustomFieldType {
 
 """Date custom scalar type"""
 scalar Date
+
+"""
+A histogram contains a list of entries sorted typically by date, along with their frequency.
+"""
+type DateHistogram {
+  id: ID!
+  items: [DateHistogramItem!]!
+}
+
+"""A histogram item contains a date"""
+type DateHistogramItem {
+  date: Date!
+  frequency: Int!
+  id: ID!
+}
 
 input DeleteDialogueInputType {
   customerSlug: String
@@ -1028,6 +1044,33 @@ input InviteUserInput {
 type InviteUserOutput {
   didAlreadyExist: Boolean!
   didInvite: Boolean!
+}
+
+"""
+
+    An issue is a problem that has been identified.
+
+    Typically, an issue is a combination of a particulat topic and a specific dialogue.
+  
+"""
+type Issue {
+  basicStats: BasicStatistics!
+  createdAt: Date!
+  dialogue: Dialogue
+  dialogueId: String!
+  history: DateHistogram!
+  id: ID!
+  status: StatusType!
+  topic: String!
+  updatedAt: Date!
+}
+
+"""Filter input for Issues"""
+input IssueFilterInput {
+  dialogueStrings: [String!]
+  endDate: String
+  startDate: String
+  topicStrings: [String!]
 }
 
 type JobObjectType {
@@ -1747,6 +1790,13 @@ type SliderNodeType {
 """Details regarding interaction with social node"""
 input SocialNodeEntryInput {
   visitedLink: String
+}
+
+"""A status is a label that indicates the current state of a process."""
+enum StatusType {
+  CLOSED
+  IN_PROGRESS
+  OPEN
 }
 
 enum SystemPermission {

@@ -6,9 +6,9 @@ import { CustomerService as WorkspaceService } from '../customer/CustomerService
 import { TopicFilterInput } from './Topic.types';
 
 export class TopicService {
-  prisma: PrismaClient;
-  sessionService: SessionService;
-  workspaceService: WorkspaceService;
+  private prisma: PrismaClient;
+  private sessionService: SessionService;
+  private workspaceService: WorkspaceService;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
@@ -16,7 +16,7 @@ export class TopicService {
     this.workspaceService = new WorkspaceService(prisma);
   }
 
-  buildSessionFilter(topicFilter?: TopicFilterInput): Prisma.SessionWhereInput {
+  private buildSessionFilter(topicFilter?: TopicFilterInput): Prisma.SessionWhereInput {
     let query: Prisma.SessionWhereInput = {};
 
     if (topicFilter?.topicStrings?.length) {

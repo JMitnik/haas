@@ -12,4 +12,5 @@ export interface TopicCount {
   relatedTopics: string[];
   count: number;
   dialogueIds: string[];
+  dates: Date[];
 }

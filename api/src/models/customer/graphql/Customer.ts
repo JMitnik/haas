@@ -17,6 +17,8 @@ import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
+import { Issue, IssueFilterInput } from '../../Issue/graphql';
+import { IssueValidator } from '../../Issue/IssueValidator';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -55,7 +57,21 @@ export const CustomerType = objectType({
       resolve: async (parent) => {
         return { id: parent.id }
       },
-    })
+    });
+
+    /**
+     * Issues
+     */
+    t.list.field('issues', {
+      type: Issue,
+      nullable: true,
+      args: { filter: IssueFilterInput },
+
+      resolve: async (parent, args, ctx) => {
+        const filter = IssueValidator.resolveFilter(args.filter);
+        return await ctx.services.issueService.getWorkspaceIssues(parent.id, filter);
+      },
+    });
 
 
     t.field('dialogueConnection', {
