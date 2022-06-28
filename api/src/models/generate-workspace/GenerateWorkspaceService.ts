@@ -199,6 +199,7 @@ class GenerateWorkspaceService {
       userId as string
     );
 
+    const startTime = performance.now();
     // For every record generate dialogue, users + assign to dialogue
     for (let i = 0; i < records.length; i++) {
       const record = records[i];
@@ -255,6 +256,10 @@ class GenerateWorkspaceService {
 
       void this.userService.sendInvitationMail(invitedUser);
     };
+
+    const endTime = performance.now();
+
+    console.log(`Time to run generate workspace: ${endTime - startTime}ms`)
 
     if (managerCsv) await this.addManagersFromCSV(managerCsv, workspace);
 
