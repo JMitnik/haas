@@ -14,26 +14,26 @@ query GetWorkspaceSummaryDetails($id: ID, $summaryInput: DialogueStatisticsSumma
       #   path
       #   nrVotes
       # }
-      mostChangedPath(input: $summaryInput) {
-        group
-        topNegativeChanged {
-          topic
-          percentageChanged
-          averageCurrent
-          averagePrevious
-          delta
-          group
-          nrVotes
-        }
-        topPositiveChanged {
-          topic
-          averageCurrent
-          averagePrevious
-          delta
-          group
-          percentageChanged
-        }
-      }
+      # mostChangedPath(input: $summaryInput) {
+      #   group
+      #   topNegativeChanged {
+      #     topic
+      #     percentageChanged
+      #     averageCurrent
+      #     averagePrevious
+      #     delta
+      #     group
+      #     nrVotes
+      #   }
+      #   topPositiveChanged {
+      #     topic
+      #     averageCurrent
+      #     averagePrevious
+      #     delta
+      #     group
+      #     percentageChanged
+      #   }
+      # }
       rankedTopics(input: $summaryInput) {
 				name
 				basicStats {
