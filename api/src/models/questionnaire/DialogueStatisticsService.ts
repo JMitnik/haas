@@ -311,12 +311,19 @@ class DialogueStatisticsService {
     return rankedTopics;
   }
 
-  newFindNestedDialogueStatisticsSummary = async (
+  /**
+   * Generates a statistics summary of all dialogues within a workspace
+   * @param customerId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns 
+   */
+  findWorkspaceStatisticsSummary = async (
     customerId: string,
     impactScoreType: DialogueImpactScore,
     startDateTime: Date,
     endDateTime?: Date,
-    refresh: boolean = false,
   ) => {
     // const dialogueIds = await this.dialogueService.findDialogueIdsByCustomerId(customerId);
     const dialogues = await this.dialogueService.findDialoguesByCustomerId(customerId);

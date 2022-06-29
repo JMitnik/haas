@@ -50,7 +50,7 @@ export const WorkspaceGridAdapter = ({
     fetchPolicy: 'no-cache',
     skip: !(!!selectedStartDate && !!selectedEndDate),
     onCompleted: (data) => {
-      setDialogues(data.customer?.statistics?.nestedDialogueStatisticsSummary || []);
+      setDialogues(data.customer?.statistics?.workspaceStatisticsSummary || []);
     },
   });
 

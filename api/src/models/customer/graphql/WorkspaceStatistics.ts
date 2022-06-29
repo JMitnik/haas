@@ -21,7 +21,7 @@ export const WorkspaceStatistics = objectType({
     // This ID is the same as the ID of the Customer / Workspace
     t.id('id');
 
-    t.list.field('nestedDialogueStatisticsSummary', {
+    t.list.field('workspaceStatisticsSummary', {
       type: DialogueStatisticsSummaryModel,
       args: {
         input: DialogueStatisticsSummaryFilterInput,
@@ -41,12 +41,11 @@ export const WorkspaceStatistics = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
         }
 
-        return ctx.services.dialogueStatisticsService.newFindNestedDialogueStatisticsSummary(
+        return ctx.services.dialogueStatisticsService.findWorkspaceStatisticsSummary(
           parent.id,
           DialogueImpactScore.AVERAGE,
           utcStartDateTime as Date,
           utcEndDateTime,
-          args.input.refresh || false,
         );
       },
     })

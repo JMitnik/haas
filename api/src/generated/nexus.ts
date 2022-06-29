@@ -2205,9 +2205,9 @@ export interface NexusGenFieldTypes {
     mostChangedPath: NexusGenRootTypes['MostChangedPath']; // MostChangedPath!
     mostPopularPath: NexusGenRootTypes['MostPopularPath'] | null; // MostPopularPath
     mostTrendingTopic: NexusGenRootTypes['MostTrendingTopic'] | null; // MostTrendingTopic
-    nestedDialogueStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][] | null; // [DialogueStatisticsSummaryModel!]
     rankedTopics: NexusGenRootTypes['TopicType'][]; // [TopicType!]!
     urgentPath: NexusGenRootTypes['UrgentPath'] | null; // UrgentPath
+    workspaceStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][] | null; // [DialogueStatisticsSummaryModel!]
   }
   lineChartDataType: { // field return type
     entryId: string | null; // String
@@ -2616,13 +2616,13 @@ export interface NexusGenArgTypes {
     mostTrendingTopic: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
-    nestedDialogueStatisticsSummary: { // args
-      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
-    }
     rankedTopics: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     urgentPath: { // args
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
+    workspaceStatisticsSummary: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
   }

@@ -2092,7 +2092,6 @@ type WorkspaceStatistics {
   mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath!
   mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
-  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
 
   """
   Topics of a workspace ranked by either impact score or number of responses
@@ -2103,4 +2102,5 @@ type WorkspaceStatistics {
   Returns potentially the most urgent path of the workspace (one at most)
   """
   urgentPath(input: DialogueStatisticsSummaryFilterInput): UrgentPath
+  workspaceStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
 }

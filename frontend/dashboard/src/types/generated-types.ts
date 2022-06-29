@@ -2731,7 +2731,7 @@ export type WorkspaceConditionScopeModel = {
 export type WorkspaceStatistics = {
   __typename?: 'WorkspaceStatistics';
   id: Scalars['ID'];
-  nestedDialogueStatisticsSummary?: Maybe<Array<DialogueStatisticsSummaryModel>>;
+  workspaceStatisticsSummary?: Maybe<Array<DialogueStatisticsSummaryModel>>;
   /** Basic statistics of a workspace (e.g. number of responses, average general score, etc) */
   basicStats: BasicStatistics;
   /** Topics of a workspace ranked by either impact score or number of responses */
@@ -2747,7 +2747,7 @@ export type WorkspaceStatistics = {
 };
 
 
-export type WorkspaceStatisticsNestedDialogueStatisticsSummaryArgs = {
+export type WorkspaceStatisticsWorkspaceStatisticsSummaryArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
@@ -2843,7 +2843,7 @@ export type GetWorkspaceDialogueStatisticsQuery = (
     { __typename?: 'Customer' }
     & { statistics?: Maybe<(
       { __typename?: 'WorkspaceStatistics' }
-      & { nestedDialogueStatisticsSummary?: Maybe<Array<(
+      & { workspaceStatisticsSummary?: Maybe<Array<(
         { __typename?: 'DialogueStatisticsSummaryModel' }
         & Pick<DialogueStatisticsSummaryModel, 'id' | 'nrVotes' | 'impactScore' | 'updatedAt' | 'title'>
         & { dialogue?: Maybe<(
@@ -3912,7 +3912,7 @@ export const GetWorkspaceDialogueStatisticsDocument = gql`
     query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
     statistics {
-      nestedDialogueStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true}) {
+      workspaceStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true}) {
         id
         nrVotes
         impactScore
@@ -5804,8 +5804,8 @@ export namespace GetWorkspaceDialogueStatistics {
   export type Query = GetWorkspaceDialogueStatisticsQuery;
   export type Customer = (NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>);
   export type Statistics = (NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>);
-  export type NestedDialogueStatisticsSummary = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>)['nestedDialogueStatisticsSummary']>)[number]>;
-  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>)['nestedDialogueStatisticsSummary']>)[number]>['dialogue']>);
+  export type WorkspaceStatisticsSummary = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>)['workspaceStatisticsSummary']>)[number]>;
+  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>)['workspaceStatisticsSummary']>)[number]>['dialogue']>);
   export const Document = GetWorkspaceDialogueStatisticsDocument;
 }
 
