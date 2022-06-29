@@ -3,19 +3,15 @@ import { Axis, Orientation } from '@visx/axis';
 import { Bar } from '@visx/shape';
 import { Group } from '@visx/group';
 import { defaultStyles, useTooltip, useTooltipInPortal } from '@visx/tooltip';
-import { eachDayOfInterval, format } from 'date-fns';
 import { localPoint } from '@visx/event';
 import { scaleBand, scaleLinear } from '@visx/scale';
 import React, { useMemo } from 'react';
 
-import { DateFormat } from 'hooks/useDate';
+import { DateFormat, useDate } from 'hooks/useDate';
 import mainTheme from 'config/theme';
-import styled, { css } from 'styled-components';
 
-export interface Event {
-  freq: number;
-  date: Date;
-}
+import { EventBarsContainer } from './EventBars.styles';
+import { calculateDateRange, Event } from './EventBars.helpers';
 
 interface EventBarsProps {
   width: number;
@@ -23,35 +19,11 @@ interface EventBarsProps {
   events: Event[];
 }
 
-const formatDate = (date: Date) => format(date, DateFormat.DayFormat);
-
-const calculateDateRange = (events: Event[]) => {
-  const startDate = events[0].date;
-  const endDate = events[events.length - 1].date;
-
-  const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
-
-  return dateRange.map((date) => format(date, DateFormat.DayFormat));
-};
-
-const EventBarsContainer = styled.div`
-  ${({ theme }) => css`
-    position: relative;
-    transition: all ${theme.transitions.normal};
-
-    .tooltip {
-      background: transparent !important;
-      padding: 0 !important;
-    }
-
-    .event-bar:hover {
-      cursor: pointer;
-      transition: all ${theme.transitions.normal};
-      fill: ${theme.colors.off[300]};
-    }
-  `}
-`;
 export const EventBars = ({ events, width, height }: EventBarsProps) => {
+  const { format } = useDate();
+
+  const formatDate = (date: Date) => format(date, DateFormat.DayFormat);
+
   const dateScale = useMemo(() => scaleBand<string>({
     domain: calculateDateRange(events),
     padding: 0.2,
@@ -60,7 +32,7 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
 
   const yMax = height - 2;
 
-  const maxFreq = useMemo(() => Math.max(...events.map((event) => event.freq)), [events]);
+  const maxFreq = useMemo(() => Math.max(...events.map((event) => event.frequency)), [events]);
 
   const freqScale = useMemo(() => scaleLinear<number>({
     domain: [0, maxFreq],
@@ -73,19 +45,21 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
     scroll: true,
   });
 
+  console.log(events);
+
   return (
     <EventBarsContainer>
       <svg ref={containerRef} width={width} height={height}>
         <Group>
           {events.map((event) => {
             const barWidth = dateScale.bandwidth();
-            const barHeight = (freqScale(event.freq) ?? 0);
+            const barHeight = (freqScale(event.frequency) ?? 0);
             const barX = dateScale(formatDate(event.date));
             const barY = yMax - barHeight;
 
             return (
               <Bar
-                key={event.date.toISOString()}
+                key={`${event.date}-${event.id}`}
                 className="event-bar"
                 x={barX}
                 y={barY}
@@ -127,7 +101,7 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
                   Responses
                 </UI.Span>
                 <UI.Span color="off.600">
-                  {tooltipData.freq}
+                  {tooltipData.frequency}
                 </UI.Span>
               </UI.Flex>
               <UI.Flex mt={2} justifyContent="space-between">

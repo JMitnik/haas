@@ -1058,6 +1058,7 @@ type Issue {
   createdAt: Date!
   dialogue: Dialogue
   dialogueId: String!
+  followUpAction: SessionActionType
   history: DateHistogram!
   id: ID!
   rankScore: Float!

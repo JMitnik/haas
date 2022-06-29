@@ -3,12 +3,11 @@ import { ChevronLeft, ChevronRight, Filter } from 'react-feather';
 import React from 'react';
 
 import { EventBars } from 'components/Analytics/Common/EventBars/EventBars';
+import { ControlButton } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.styles';
+import { Issue } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
 import { ScoreBox } from 'components/ScoreBox';
 
-import { ControlButton } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.styles';
-import { Issue } from './SimpleIssueTable.types';
 import { IssueActionLabels } from './IssueActionLabels';
-import { sampleIssues } from './__data__/sample';
 
 const columns = '40px 2fr 50px 2fr 80px';
 interface SimpleIssueTableProps {
@@ -16,7 +15,7 @@ interface SimpleIssueTableProps {
   onIssueClick: (issue: Issue) => void;
 }
 
-export const SimpleIssueTable = ({ issues = sampleIssues, onIssueClick }: SimpleIssueTableProps) => (
+export const SimpleIssueTable = ({ issues, onIssueClick }: SimpleIssueTableProps) => (
   <>
     <UI.Card border="1px solid" borderColor="off.100">
       <UI.Div bg="neutral.300" borderRadius="20px 20px 0 0" borderBottom="1px solid" borderColor="off.100">
@@ -46,7 +45,7 @@ export const SimpleIssueTable = ({ issues = sampleIssues, onIssueClick }: Simple
             >
               <UI.Flex alignItems="center">
                 <UI.Div>
-                  <ScoreBox score={issue.score} />
+                  <ScoreBox score={issue.basicStats.average} />
                 </UI.Div>
               </UI.Flex>
               <UI.Div>
@@ -59,10 +58,10 @@ export const SimpleIssueTable = ({ issues = sampleIssues, onIssueClick }: Simple
                   <UI.Span color="off.500" fontSize="0.8rem">
                     in
                     {' '}
-                    {issue.dialogueName}
+                    {issue.dialogue?.title}
                   </UI.Span>
                 </UI.Div>
-                {!!issue.action && (
+                {!!issue.followUpAction && (
                   <UI.Div mt={1}>
                     <IssueActionLabels issue={issue} />
                   </UI.Div>
@@ -70,7 +69,7 @@ export const SimpleIssueTable = ({ issues = sampleIssues, onIssueClick }: Simple
               </UI.Div>
               <UI.Flex mr={2} alignItems="center" color="off.500">
                 <UI.Span fontSize="1rem" fontWeight={500}>
-                  {issue.voteCount}
+                  {issue.basicStats.responseCount}
                 </UI.Span>
               </UI.Flex>
               <UI.Flex>
@@ -78,9 +77,9 @@ export const SimpleIssueTable = ({ issues = sampleIssues, onIssueClick }: Simple
                 <UI.Flex alignItems="center">
                   <UI.Div>
                     <EventBars
+                      events={issue.history.items}
                       width={200}
                       height={40}
-                      events={issue.events}
                     />
                   </UI.Div>
                 </UI.Flex>

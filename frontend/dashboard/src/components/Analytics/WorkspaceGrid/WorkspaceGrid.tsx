@@ -8,7 +8,6 @@ import useMeasure from 'react-use-measure';
 import * as Modal from 'components/Common/Modal';
 import { DatePicker } from 'components/Common/DatePicker';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
-import { Issue } from 'components/Analytics/Issues/SimpleIssueTable/SimpleIssueTable.types';
 import { Loader } from 'components/Common/Loader/Loader';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -23,6 +22,7 @@ import {
   HexagonTopicNode,
   HexagonViewMode,
   HexagonWorkspaceNode,
+  Issue,
 } from './WorkspaceGrid.types';
 import { HexagonGrid } from './HexagonGrid';
 import { Layers } from './Layers';
@@ -39,6 +39,7 @@ export interface DataLoadOptions {
 
 export interface WorkspaceGridProps {
   initialData: HexagonNode[];
+  issues: Issue[];
   width: number;
   height: number;
   backgroundColor: string;
@@ -52,6 +53,7 @@ export interface WorkspaceGridProps {
 
 export const WorkspaceGrid = ({
   initialData,
+  issues,
   backgroundColor,
   onLoadData,
   dateRange: [startDate, endDate],
@@ -257,7 +259,9 @@ export const WorkspaceGrid = ({
   };
 
   const handleIssueClick = (issue: Issue) => {
-    jumpToDialogue(issue.dialogueId, [issue.topic]);
+    if (issue.dialogue?.id) {
+      jumpToDialogue(issue.dialogue.id, [issue.topic]);
+    }
   };
 
   return (
@@ -358,6 +362,7 @@ export const WorkspaceGrid = ({
                   />
                   <UI.Div mt={4} maxWidth={750}>
                     <SimpleIssueTable
+                      issues={issues}
                       onIssueClick={handleIssueClick}
                     />
                   </UI.Div>

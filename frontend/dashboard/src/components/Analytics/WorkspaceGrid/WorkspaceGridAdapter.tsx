@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { useCustomer } from 'providers/CustomerProvider';
 import {
+  useGetIssuesQuery,
   useGetSessionPathsQuery,
   useGetWorkspaceDialogueStatisticsQuery,
 } from 'types/generated-types';
@@ -28,10 +29,10 @@ export const WorkspaceGridAdapter = ({
   width,
   backgroundColor,
 }: WorkspaceGridAdapterProps) => {
-  const { getOneWeekAgo, format } = useDate();
+  const { getOneWeekAgo, format, getTomorrow } = useDate();
   const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
     const startDate = getOneWeekAgo();
-    const endDate = new Date();
+    const endDate = getTomorrow();
 
     return [startDate, endDate];
   });
@@ -55,6 +56,18 @@ export const WorkspaceGridAdapter = ({
   });
 
   const { refetch: fetchGetSessions } = useGetSessionPathsQuery({ skip: true });
+
+  const { data, loading: loadingIssues } = useGetIssuesQuery({
+    variables: {
+      workspaceId: activeCustomer?.id || '',
+      filter: {
+        startDate: format(selectedStartDate, DateFormat.DayFormat),
+        endDate: format(selectedEndDate, DateFormat.DayFormat),
+      }
+    }
+  });
+
+  const issues = data?.customer?.issues || [];
 
   /**
    * Fetches the various loading data requirements for the underlying WorkspaceGrid.
@@ -107,6 +120,7 @@ export const WorkspaceGridAdapter = ({
     <LS.WorkspaceGridAdapterContainer>
       <WorkspaceGrid
         isServerLoading={isServerLoading}
+        issues={issues}
         dateRange={dateRange}
         setDateRange={setDateRange}
         backgroundColor={backgroundColor}

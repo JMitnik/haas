@@ -4,6 +4,7 @@ import { StatusType } from '../../Common/Status/graphql';
 import { DateHistogram } from '../../Common/Analytics/graphql/DateHistogram.graphql';
 import { BasicStatistics } from '../../customer';
 import { DialogueType as Dialogue } from '../../questionnaire/Dialogue';
+import { SessionActionType } from '../../session/graphql/SesssionActionType.graphql';
 
 export const Issue = objectType({
   name: 'Issue',
@@ -23,7 +24,11 @@ export const Issue = objectType({
 
     /** Each issue has an associated dialogue  */
     t.string('dialogueId');
-    t.field('dialogue', { type: Dialogue, nullable: true });
+    t.field('dialogue', {
+      type: Dialogue,
+      nullable: true,
+      resolve: async ({ dialogueId }, _, { services }) => services.dialogueService.getDialogueById(dialogueId),
+    });
 
     /** An issue might have a history over time (rising / falling) */
     t.field('history', { type: DateHistogram });
@@ -33,6 +38,8 @@ export const Issue = objectType({
 
     /** The status of the current issue. */
     t.field('status', { type: StatusType });
+
+    t.field('followUpAction', { type: SessionActionType, nullable: true });
 
     /** Timestamps */
     t.date('createdAt');

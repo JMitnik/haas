@@ -1018,8 +1018,8 @@ export interface NexusGenRootTypes {
   Issue: { // root type
     basicStats: NexusGenRootTypes['BasicStatistics']; // BasicStatistics!
     createdAt: any; // Date!
-    dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string; // String!
+    followUpAction?: NexusGenEnums['SessionActionType'] | null; // SessionActionType
     history: NexusGenRootTypes['DateHistogram']; // DateHistogram!
     id: string; // ID!
     rankScore: number; // Float!
@@ -1830,6 +1830,7 @@ export interface NexusGenFieldTypes {
     createdAt: any; // Date!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string; // String!
+    followUpAction: NexusGenEnums['SessionActionType'] | null; // SessionActionType
     history: NexusGenRootTypes['DateHistogram']; // DateHistogram!
     id: string; // ID!
     rankScore: number; // Float!

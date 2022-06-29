@@ -558,6 +558,11 @@ class SessionService {
     return dateRange;
   };
 
+  /**
+   * Get the action a Session requires.
+   * @param session Session with node-entries
+   * @returns Which type the session alludes to
+   */
   private getActionFromSession(session: SessionWithEntries): SessionActionType | null {
     const contactAction = session.nodeEntries.find((nodeEntry) => (
       nodeEntry.relatedNode?.type === 'FORM' && nodeEntry.formNodeEntry?.values.find(
@@ -570,6 +575,13 @@ class SessionService {
     return null;
   }
 
+  /**
+   * Converts a session with topic-string to TopicStatistics
+   * @param topicName
+   * @param relatedTopics
+   * @param session
+   * @returns
+   */
   private makeTopicStatistics(
     topicName: string,
     relatedTopics: string[],
