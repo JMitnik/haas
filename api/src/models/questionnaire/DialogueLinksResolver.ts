@@ -1,5 +1,8 @@
 import { inputObjectType, objectType, queryField } from '@nexus/schema';
 
+import { ConnectionInterface } from '../../models/general/Pagination';
+import { DialogueConnectionFilterInput } from './graphql/DialogueConnection';
+
 export const DialogueLinksInput = inputObjectType({
   name: 'DialogueLinksInput',
   definition(t) {
@@ -15,17 +18,27 @@ export const PublicDialogueInfo = objectType({
     t.string('description', { nullable: true });
     t.string('url');
   },
-})
+});
+
+export const PublicDialogueConnection = objectType({
+  name: 'PublicDialogueConnection',
+  definition(t) {
+    t.implements(ConnectionInterface);
+    t.list.field('dialogues', { type: PublicDialogueInfo });
+  },
+});
 
 export const DialogueLinksQuery = queryField('dialogueLinks', {
-  type: PublicDialogueInfo,
-  list: true,
+  type: PublicDialogueConnection,
   args: {
-    input: DialogueLinksInput,
+    workspaceId: 'String',
+    filter: DialogueConnectionFilterInput,
   },
   nullable: true,
   async resolve(parent, args, ctx) {
-    if (!args.input?.workspaceId) return [];
-    return ctx.services.dialogueService.findDialogueUrlsByWorkspaceId(args.input.workspaceId);
+    if (!args.workspaceId) return [];
+    const result = await ctx.services.dialogueService.findDialogueUrlsByWorkspaceId(args.workspaceId, args.filter);
+    console.log('Result: ', result);
+    return result;
   },
 });

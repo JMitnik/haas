@@ -42,11 +42,14 @@ class DialoguePrismaAdapter {
    * @param workspaceId
    * @returns
    */
-  findDialogueUrlsByWorkspaceId = async (workspaceId: string) => {
+  findDialogueUrlsByWorkspaceId = async (workspaceId: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 12;
+
     return this.prisma.dialogue.findMany({
-      where: {
-        customerId: workspaceId,
-      },
+      where: this.buildFindDialogueLinksQuery(workspaceId, filter),
+      skip: offset,
+      take: perPage,
       select: {
         id: true,
         title: true,
@@ -826,6 +829,54 @@ class DialoguePrismaAdapter {
       },
     });
   };
+
+  /**
+  * Build a dialogueConnection prisma query based on the filter parameters.
+  * @param customerSlug the slug of a workspace
+  * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
+  */
+  buildFindDialogueLinksQuery = (workspaceId: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null): Prisma.DialogueWhereInput => {
+    let dialogueWhereInput: Prisma.DialogueWhereInput = {
+      customer: {
+        id: workspaceId,
+      },
+    }
+
+    if (filter?.searchTerm) {
+      dialogueWhereInput = {
+        ...cloneDeep(dialogueWhereInput),
+        OR: [
+          { title: { contains: filter.searchTerm, mode: 'insensitive' } },
+          { description: { contains: filter.searchTerm, mode: 'insensitive' } },
+          {
+            tags: {
+              some: {
+                name: {
+                  contains: filter.searchTerm,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          },
+        ],
+      }
+    }
+
+    return dialogueWhereInput;
+  }
+
+  /**
+   * Counts the amount of automation within specific filter boundaries
+   * @param workspaceSlug the slug of a workspace
+   * @param filter an filter object to determine boundaries to look within
+   * @returns The amount of automations within a specific set of filter boundaries
+   */
+  countDialogueLinks = async (workspaceSlug: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null) => {
+    const totalAutomations = await this.prisma.dialogue.count({
+      where: this.buildFindDialogueLinksQuery(workspaceSlug, filter),
+    });
+    return totalAutomations;
+  }
 
   /**
   * Build a dialogueConnection prisma query based on the filter parameters.

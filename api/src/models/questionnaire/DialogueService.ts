@@ -64,15 +64,32 @@ class DialogueService {
    * @param workspaceId 
    * @returns a list of dialogues including a url to their client version
    */
-  findDialogueUrlsByWorkspaceId = async (workspaceId: string) => {
-    const strippedDialogues = await this.dialoguePrismaAdapter.findDialogueUrlsByWorkspaceId(workspaceId);
+  findDialogueUrlsByWorkspaceId = async (
+    workspaceId: string,
+    filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null,
+  ) => {
+    console.log('Filter: ', filter);
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 12;
+
+    const strippedDialogues = await this.dialoguePrismaAdapter.findDialogueUrlsByWorkspaceId(workspaceId, filter);
     const mappedStrippedDialogues = strippedDialogues.map((dialogue) => ({
       slug: dialogue.slug,
       title: dialogue.title,
       description: dialogue.description,
       url: config.env === 'local' ? `http://localhost:3000/${dialogue.customer.slug}/${dialogue.slug}` : `https://client.haas.live/${dialogue.customer.slug}/${dialogue.slug}`,
     }));
-    return mappedStrippedDialogues;
+
+    const totalDialogues = await this.dialoguePrismaAdapter.countDialogueLinks(workspaceId, filter);
+
+    const { totalPages, ...pageInfo } = offsetPaginate(totalDialogues, offset, perPage);
+
+    return {
+      dialogues: mappedStrippedDialogues,
+      totalPages,
+      pageInfo,
+    };
+
   }
 
   /**
