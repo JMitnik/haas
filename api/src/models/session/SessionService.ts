@@ -10,7 +10,8 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionWithEntries, TopicCount } from './SessionTypes';
+import { SessionWithEntries } from './SessionTypes';
+import { TopicStatistics } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
@@ -34,7 +35,7 @@ class SessionService {
    *
    * Note: this can be applied both within a workspace as well as outside.
    */
-  countTopicsFromSessions(sessions: SessionWithEntries[]): Record<string, TopicCount> {
+  countTopicsFromSessions(sessions: SessionWithEntries[]): Record<string, TopicStatistics> {
     const topicCount = sessions.reduce((acc, session) => {
       const topics = session.nodeEntries.map(nodeEntry => nodeEntry.choiceNodeEntry?.value).filter(isPresent);
       topics.forEach((topic) => {
@@ -63,7 +64,7 @@ class SessionService {
       });
 
       return acc;
-    }, {} as Record<string, TopicCount>);
+    }, {} as Record<string, TopicStatistics>);
 
     // Normalize the topic counts (by averaging the cumulative `score`)
     // And ensure unique dialogue-ids

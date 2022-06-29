@@ -10,7 +10,7 @@ export const IssueValidator = {
     return {
       ...filter,
       startDate: DateValidator.resolveFromString(filter.startDate as string),
-      endDate: DateValidator.resolveFromString(filter.startDate as string),
+      endDate: DateValidator.resolveFromString(filter.endDate as string),
     }
   },
 }

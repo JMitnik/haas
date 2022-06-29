@@ -1,9 +1,9 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
-import { SessionWithEntries, TopicCount } from '../session/SessionTypes';
+import { SessionWithEntries } from '../session/SessionTypes';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
-import { TopicFilterInput } from './Topic.types';
+import { TopicFilterInput, TopicStatistics, TopicByStatistics } from './Topic.types';
 
 export class TopicService {
   private prisma: PrismaClient;
@@ -48,7 +48,7 @@ export class TopicService {
     startDate: Date,
     endDate: Date,
     topicFilter?: TopicFilterInput
-  ): Promise<Record<string, TopicCount>> {
+  ): Promise<TopicByStatistics> {
     const dialogueIds = (
       await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
     ).map(dialogue => dialogue.id);
@@ -63,8 +63,8 @@ export class TopicService {
     ) as unknown as SessionWithEntries[];
 
     // Calculate all the candidate topic-counts.
-    const topicCounts = this.sessionService.countTopicsFromSessions(sessions);
+    const topicByStatistics = this.sessionService.countTopicsFromSessions(sessions);
 
-    return topicCounts;
+    return topicByStatistics;
   }
 }

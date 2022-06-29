@@ -67,9 +67,9 @@ export const CustomerType = objectType({
       nullable: true,
       args: { filter: IssueFilterInput },
 
-      resolve: async (parent, args, ctx) => {
+      resolve: async (parent, args, { services }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
-        return await ctx.services.issueService.getWorkspaceIssues(parent.id, filter);
+        return await services.issueService.getWorkspaceIssues(parent.id, filter);
       },
     });
 
