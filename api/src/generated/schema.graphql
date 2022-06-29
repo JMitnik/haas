@@ -786,6 +786,7 @@ type DialogueStatisticsSummaryModel {
   impactScore: Float
   nrVotes: Int
   startDateTime: Date
+  title: String!
   updatedAt: Date
 }
 
@@ -2091,6 +2092,7 @@ type WorkspaceStatistics {
   mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath!
   mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
 
   """
   Topics of a workspace ranked by either impact score or number of responses

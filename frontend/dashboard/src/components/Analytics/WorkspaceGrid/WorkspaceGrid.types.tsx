@@ -8,7 +8,7 @@ import {
 } from 'types/generated-types';
 
 export type Topic = GetDialogueTopics.Topic;
-export type Dialogue = GetWorkspaceDialogueStatistics.Dialogues;
+export type Dialogue = GetWorkspaceDialogueStatistics.NestedDialogueStatisticsSummary;
 export type Session = GetSessionPaths.PathedSessions;
 
 export type ZoomProps = ProvidedZoom<SVGElement> & {

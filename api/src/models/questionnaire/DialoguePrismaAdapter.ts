@@ -810,9 +810,6 @@ class DialoguePrismaAdapter {
 
     return this.prisma.dialogue.findMany({
       where: whereInput,
-      include: {
-        tags: true,
-      },
     });
   };
 

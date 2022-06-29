@@ -12,6 +12,7 @@ import {
 } from '../../questionnaire/DialogueStatisticsResolver';
 import { isValidDateTime } from '../../../utils/isValidDate';
 import { HealthScore, HealthScoreInput } from './HealthScore';
+import { DialogueStatisticsSummaryModel } from '../../../models/questionnaire';
 
 export const WorkspaceStatistics = objectType({
   name: 'WorkspaceStatistics',
@@ -19,6 +20,36 @@ export const WorkspaceStatistics = objectType({
   definition(t) {
     // This ID is the same as the ID of the Customer / Workspace
     t.id('id');
+
+    t.list.field('nestedDialogueStatisticsSummary', {
+      type: DialogueStatisticsSummaryModel,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      nullable: true,
+      resolve: async (parent, args, ctx) => {
+        if (!args.input) throw new UserInputError('Not input object!');
+        const { startDateTime, endDateTime } = args.input;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (startDateTime) {
+          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
+        }
+
+        if (endDateTime) {
+          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.newFindNestedDialogueStatisticsSummary(
+          parent.id,
+          DialogueImpactScore.AVERAGE,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
+      },
+    })
 
     /**
      * Basic stats about the workspace
