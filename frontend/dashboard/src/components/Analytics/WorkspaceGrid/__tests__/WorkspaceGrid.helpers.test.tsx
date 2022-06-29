@@ -5,6 +5,7 @@ import { dialogues } from './helpers';
 
 describe('groupsFromDialogues', () => {
   test('groups sub-groups appropriately without duplicate groups', () => {
+    console.log('Dialogues: ', dialogues);
     const topNode = groupsFromDialogues(dialogues);
     expect((topNode[0]).type).toBe('Group');
     expect((topNode[0] as HexagonGroupNode).label).toBe('Male');
