@@ -73,8 +73,10 @@
     "transpiler": "ts-node/transpilers/swc-experimental"
   },
   "include": [
+    "./src/**.ts",
     "./src/app.ts",
     "./src/**/*.test.ts",
-    "./src/scripts/*.ts"
+    "./src/scripts/*.ts",
+    "./src/cli/*.ts"
   ]
 }

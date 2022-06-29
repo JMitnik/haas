@@ -31,9 +31,23 @@ class UserService {
   };
 
   /**
+   * Creates a "root" user without any workspace associated.
+   */
+  public async createUser(email: string, firstName: string, lastName: string, isSuperAdmin: boolean) {
+    return this.userPrismaAdapter.upsertUserByEmail({
+      email,
+      firstName,
+      lastName,
+      globalPermissions: {
+        set: isSuperAdmin ? ['CAN_ACCESS_ADMIN_PANEL'] : [],
+      },
+    })
+  }
+
+  /**
    * Finds all private dialogues of a workspace and connects them to a user
-   * @param userId 
-   * @param workspaceId 
+   * @param userId
+   * @param workspaceId
    */
   connectPrivateDialoguesToUser = async (userId: string, workspaceId: string) => {
     const customerWithDialogues = await this.customerService.findPrivateDialoguesOfWorkspace(workspaceId);
@@ -43,8 +57,8 @@ class UserService {
 
   /**
    * Upserts a user by checking if the email already exists or not
-   * @param input 
-   * @returns 
+   * @param input
+   * @returns
    */
   upsertUserByEmail = async (input: Prisma.UserCreateInput) => {
     return this.userPrismaAdapter.upsertUserByEmail(input);
@@ -239,7 +253,7 @@ class UserService {
 
   /**
    * Send an invitation email to a user of a customer
-   * @param invitedUser 
+   * @param invitedUser
    */
   sendInvitationMail = async (
     invitedUser: UserOfCustomer & {
@@ -275,7 +289,7 @@ class UserService {
    * Invites a new user to a current customer, and mails them with a login-token.
    */
   async inviteNewUserToCustomer(email: string, customerId: string, roleId: string) {
-    const createdUser = await this.userPrismaAdapter.createNewUser(customerId, roleId, email)
+    const createdUser = await this.userPrismaAdapter.createWorkspaceUser(customerId, roleId, email)
 
     const inviteLoginToken = AuthService.createUserToken(createdUser.id);
 
