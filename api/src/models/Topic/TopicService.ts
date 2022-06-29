@@ -3,7 +3,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { SessionWithEntries } from '../session/SessionTypes';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
-import { TopicFilterInput, TopicStatistics, TopicByStatistics } from './Topic.types';
+import { TopicFilterInput, TopicByString } from './Topic.types';
 
 export class TopicService {
   private prisma: PrismaClient;
@@ -48,7 +48,7 @@ export class TopicService {
     startDate: Date,
     endDate: Date,
     topicFilter?: TopicFilterInput
-  ): Promise<TopicByStatistics> {
+  ): Promise<TopicByString> {
     const dialogueIds = (
       await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
     ).map(dialogue => dialogue.id);
@@ -59,11 +59,15 @@ export class TopicService {
       startDate,
       endDate,
       this.buildSessionFilter(topicFilter),
-      { nodeEntries: { include: { choiceNodeEntry: true } } }
+      { nodeEntries:
+        { include:
+          { choiceNodeEntry: true, formNodeEntry: { include: {  values: { include: { relatedField: true } }} } },
+        },
+      }
     ) as unknown as SessionWithEntries[];
 
     // Calculate all the candidate topic-counts.
-    const topicByStatistics = this.sessionService.countTopicsFromSessions(sessions);
+    const topicByStatistics = this.sessionService.extractTopics(sessions);
 
     return topicByStatistics;
   }

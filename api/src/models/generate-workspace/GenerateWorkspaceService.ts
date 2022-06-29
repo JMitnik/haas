@@ -1,9 +1,9 @@
-import { Customer, Prisma, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
+import { Customer, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 
 import templates from '../templates';
 import TemplateService from '../templates/TemplateService';
-import { NexusGenEnums, NexusGenInputs } from '../../generated/nexus';
+import { NexusGenEnums } from '../../generated/nexus';
 import { parseCsv } from '../../utils/parseCsv';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';

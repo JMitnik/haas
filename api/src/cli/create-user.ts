@@ -1,3 +1,6 @@
+/**
+ * This CLI command creates a user based on a few simple questions.
+ */
 import inquirer from 'inquirer';
 
 import prisma from '../config/prisma';

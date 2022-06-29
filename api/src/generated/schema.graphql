@@ -1060,6 +1060,7 @@ type Issue {
   dialogueId: String!
   history: DateHistogram!
   id: ID!
+  rankScore: Float!
   status: StatusType!
   topic: String!
   updatedAt: Date!
@@ -1664,6 +1665,11 @@ type Session {
   paths: Int!
   score: Float!
   totalTimeInSec: Int
+}
+
+"""Actions expected after session"""
+enum SessionActionType {
+  CONTACT
 }
 
 type SessionConnection implements ConnectionInterface {

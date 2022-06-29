@@ -16,6 +16,8 @@ export const Issue = objectType({
   definition(t) {
     t.id('id');
 
+    t.float('rankScore');
+
     /** An issue regards a particular topic.  */
     t.string('topic');
 

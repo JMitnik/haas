@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { format, sub } from 'date-fns';
+import { sub } from 'date-fns';
 
 import { toUTC } from '../../../utils/dateUtils';
 import { GetOrCreateOptions, PrismaTableName } from './Cache.types';
@@ -37,7 +37,7 @@ export class PrismaCacheService {
    * @param options Options that control the behavior of the cache.
    * @returns The record
    */
-  async getOrCreate<T>(
+  public async getOrCreate<T>(
     tableName: PrismaTableName,
     key: string,
     createFn: () => Promise<T>,

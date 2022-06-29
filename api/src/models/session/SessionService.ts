@@ -2,7 +2,7 @@ import {
   NodeEntry, Session, Prisma, PrismaClient, ChoiceNodeEntry, QuestionNode, SliderNodeEntry, VideoNodeEntry,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { sortBy, uniq } from 'lodash';
+import { sortBy } from 'lodash';
 
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
@@ -10,8 +10,8 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionWithEntries } from './SessionTypes';
-import { TopicStatistics } from '../Topic/Topic.types';
+import { SessionActionType, SessionWithEntries } from './SessionTypes';
+import { TopicByString, TopicStatistics } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
@@ -20,9 +20,9 @@ import AutomationService from '../automations/AutomationService';
 import { addDays, differenceInHours } from 'date-fns';
 
 class SessionService {
-  sessionPrismaAdapter: SessionPrismaAdapter;
-  triggerService: TriggerService;
-  automationService: AutomationService;
+  private sessionPrismaAdapter: SessionPrismaAdapter;
+  private triggerService: TriggerService;
+  private automationService: AutomationService;
 
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
@@ -34,46 +34,54 @@ class SessionService {
    * Given a list of sessions with node-entries, return an object which maps topics to their "frequency".
    *
    * Note: this can be applied both within a workspace as well as outside.
+   *
+   * Precondition: Sessions are sorted by createdAt.
    */
-  countTopicsFromSessions(sessions: SessionWithEntries[]): Record<string, TopicStatistics> {
-    const topicCount = sessions.reduce((acc, session) => {
+  public extractTopics(sessions: SessionWithEntries[]): TopicByString {
+    const topicsByString = sessions.reduce((acc, session) => {
       const topics = session.nodeEntries.map(nodeEntry => nodeEntry.choiceNodeEntry?.value).filter(isPresent);
-      topics.forEach((topic) => {
-        let count = 1;
-        let relatedTopics = topics;
-        let dates = [session.createdAt];
-        let dialogueIds = [session.dialogueId];
-        let score = session.mainScore;
 
-        if (acc[topic]) {
-          dates = [...acc[topic].dates, session.createdAt];
-          relatedTopics = acc[topic].relatedTopics;
-          score = acc[topic].score + score;
-          count = acc[topic].count + 1;
-          dialogueIds = [...acc[topic].dialogueIds, session.dialogueId];
+      topics.forEach((topic) => {
+        // Check if topic exists in acc.
+        // If not, create a unique entry for ${dialogueId}
+        if (!acc.hasOwnProperty(topic)) {
+          acc[topic] = {
+            [session.dialogueId]: this.makeTopicStatistics(topic, topics, session),
+          }
+
+          return;
         }
 
-        acc[topic] = {
-          dates,
-          relatedTopics,
-          score,
-          count,
-          topic,
-          dialogueIds,
-        };
+        // Check if topic also check if it exists for this dialogue
+        // If not, create a unique entry for dialogue
+        if (!acc[topic].hasOwnProperty(session.dialogueId)) {
+          acc[topic][session.dialogueId] = this.makeTopicStatistics(topic, topics, session);
+          return;
+        }
+
+        // Else, add it to the dialogue-topic combination.
+        acc[topic][session.dialogueId] = {
+          dates: [...acc[topic][session.dialogueId].dates, session.createdAt],
+          dialogueIds: [...acc[topic][session.dialogueId].dialogueIds, session.dialogueId],
+          count: acc[topic][session.dialogueId].count + 1,
+          score: acc[topic][session.dialogueId].score + session.mainScore,
+          relatedTopics: [...acc[topic][session.dialogueId].relatedTopics, ...topics],
+          topic: topic,
+          followUpActions: [...acc[topic][session.dialogueId].followUpActions, this.getActionFromSession(session)],
+        }
       });
 
       return acc;
-    }, {} as Record<string, TopicStatistics>);
+    }, {} as TopicByString);
 
     // Normalize the topic counts (by averaging the cumulative `score`)
-    // And ensure unique dialogue-ids
-    Object.entries(topicCount).forEach(([topic]) => {
-      topicCount[topic].score = topicCount[topic].score / topicCount[topic].count;
-      topicCount[topic].dialogueIds = uniq(topicCount[topic].dialogueIds);
+    Object.entries(topicsByString).forEach(([topic]) => {
+      Object.entries(topicsByString[topic]).forEach(([dialogueId, topicStatistics]) => {
+        topicsByString[topic][dialogueId].score = topicStatistics.score / topicStatistics.count;
+      });
     });
 
-    return topicCount;
+    return topicsByString;
   }
 
   /**
@@ -507,6 +515,13 @@ class SessionService {
         nodeEntries: {
           include: {
             choiceNodeEntry: true,
+            formNodeEntry: {
+              include: {
+                values: {
+                  include: { relatedField: true },
+                }
+              }
+            },
             linkNodeEntry: true,
             registrationNodeEntry: true,
             sliderNodeEntry: true,
@@ -542,6 +557,34 @@ class SessionService {
 
     return dateRange;
   };
+
+  private getActionFromSession(session: SessionWithEntries): SessionActionType | null {
+    const contactAction = session.nodeEntries.find((nodeEntry) => (
+      nodeEntry.relatedNode?.type === 'FORM' && nodeEntry.formNodeEntry?.values.find(
+        (val) => !!val.email || !!val.phoneNumber
+      )
+    ));
+
+    if (contactAction) return 'CONTACT';
+
+    return null;
+  }
+
+  private makeTopicStatistics(
+    topicName: string,
+    relatedTopics: string[],
+    session: SessionWithEntries
+  ): TopicStatistics {
+    return {
+      count: 1,
+      dates: [session.createdAt],
+      dialogueIds: [],
+      relatedTopics: relatedTopics,
+      score: session.mainScore,
+      topic: topicName,
+      followUpActions: [this.getActionFromSession(session)],
+    };
+  }
 };
 
 export default SessionService;
