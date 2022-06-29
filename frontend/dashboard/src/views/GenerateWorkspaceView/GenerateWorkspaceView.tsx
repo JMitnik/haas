@@ -84,6 +84,14 @@ export const GenerateWorkspaceView = () => {
     defaultValue: 0,
   });
 
+  const handleManagerCancel = () => {
+    setActiveManagerCSV(null);
+  };
+
+  const handleGroupsCancel = () => {
+    setActiveCSV(null);
+  };
+
   const handleManagerDrop = (files: File[]) => {
     if (!files.length) return;
 
@@ -215,6 +223,7 @@ export const GenerateWorkspaceView = () => {
               <FileDropInput
                 isDisabled={!!usesGeneratedData}
                 onDrop={handleManagerDrop}
+                onCancel={handleManagerCancel}
               />
             </UI.FormControl>
 
@@ -224,6 +233,7 @@ export const GenerateWorkspaceView = () => {
               <FileDropInput
                 isDisabled={!!usesGeneratedData}
                 onDrop={handleDrop}
+                onCancel={handleGroupsCancel}
               />
             </UI.FormControl>
           </UI.InputGrid>
