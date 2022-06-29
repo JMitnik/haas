@@ -54,7 +54,8 @@ export const WorkspaceSummaryPane = ({
   const urgentPath = summary?.urgentPath;
   const rankedTopics = summary?.rankedTopics || [];
 
-  const responseCount = 0; // summary?.basicStats?.responseCount || 0; // TODO: Put back
+  // TODO: Put back once this actually return data (always returns 0 at the moment)
+  const responseCount = 0; // summary?.basicStats?.responseCount || 0;
 
   return (
     <UI.Div>

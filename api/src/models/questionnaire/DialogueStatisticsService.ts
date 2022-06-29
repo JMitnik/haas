@@ -325,7 +325,6 @@ class DialogueStatisticsService {
     startDateTime: Date,
     endDateTime?: Date,
   ) => {
-    // const dialogueIds = await this.dialogueService.findDialogueIdsByCustomerId(customerId);
     const dialogues = await this.dialogueService.findDialoguesByCustomerId(customerId);
     const dialogueIds = dialogues.map((dialogue) => dialogue.id);
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;

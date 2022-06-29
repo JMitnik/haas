@@ -157,7 +157,7 @@ export const recursiveBuildGroup = (
 };
 
 export const dialogueToNode = (dialogue: Dialogue): HexagonNode => ({
-  id: dialogue.dialogue?.id as string,
+  id: dialogue?.id as string,
   type: HexagonNodeType.Dialogue,
   label: dialogue.title,
   score: dialogue?.impactScore ?? 0,
