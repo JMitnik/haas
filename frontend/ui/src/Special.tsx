@@ -57,7 +57,7 @@ export const IllustrationCard = ({ svg, text, children, boxShadow }: Illustratio
       <IllustrationCardWrapper>
         {svg}
         <Span>
-          <H4 color="off.400" pt={4} fontWeight={500} pb={2}>{text}</H4>
+          <H4 color="off.500" pt={4} fontWeight={500} pb={2}>{text}</H4>
           {children}
         </Span>
       </IllustrationCardWrapper>

@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    dashboard_no_data_with_filter: {
+      en: 'Currently there is no data available on this date-range and filter level.',
+      de: 'Currently there is no data available on this date-range and filter level.',
+    },
     zoom_in: {
       en: 'Zoom in',
       de: 'Zoom in'

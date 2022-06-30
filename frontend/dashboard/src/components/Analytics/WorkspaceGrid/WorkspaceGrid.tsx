@@ -9,6 +9,7 @@ import { DatePicker } from 'components/Common/DatePicker';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
+import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 
 import * as LS from './WorkspaceGrid.styles';
 import {
@@ -31,6 +32,7 @@ import { BreadCrumb } from './BreadCrumb';
 import { IssuesModal } from './IssuesModal';
 import { AlertTriangle, MessageCircle, User } from 'react-feather';
 import { Statistic } from './Statistic';
+import { useTranslation } from 'react-i18next';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -64,6 +66,7 @@ export const WorkspaceGrid = ({
   const { format } = useDate();
   const { activeCustomer } = useCustomer();
   const initialRef = React.useRef<HTMLDivElement>();
+  const { t } = useTranslation();
   // Local loading
   const [isLoading, setIsLoading] = useState(false);
 
@@ -269,7 +272,7 @@ export const WorkspaceGrid = ({
 
   const visitedDialogueFragments = useMemo(() => extractDialogueFragments(historyQueue), [historyQueue]);
 
-  const { data } = useGetWorkspaceSummaryDetailsQuery({
+  const { data, loading: summaryIsLoading } = useGetWorkspaceSummaryDetailsQuery({
     fetchPolicy: 'no-cache',
     variables: {
       id: activeCustomer?.id,
@@ -310,14 +313,16 @@ export const WorkspaceGrid = ({
   // Various stats fields
   const health = summary?.health;
 
+  const noData = !summaryIsLoading && health?.nrVotes === 0;
+
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       <UI.Container px={4}>
         <UI.Flex position="relative" zIndex={200} justifyContent="space-between" py={4} flexWrap="wrap">
           <UI.Div>
-            <UI.H1 lineHeight="1" textAlign="left" fontWeight="900" color="main.500">
+            <UI.H2 lineHeight="1" textAlign="left" fontWeight="900" color="main.500">
               {activeCustomer?.name}
-            </UI.H1>
+            </UI.H2>
           </UI.Div>
 
           <UI.Div>
@@ -334,57 +339,65 @@ export const WorkspaceGrid = ({
 
         <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "2fr 1fr"]}>
           <UI.Div>
-            <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "1fr 1fr"]}>
-              <UI.Grid gridTemplateColumns={["1fr 1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr", "1fr"]}>
-                <Statistic
-                  icon={<User height={40} width={40} />}
-                  themeBg="green.500"
-                  themeColor="white"
-                  name="Total feedback"
-                  value={health?.nrVotes || 0}
-                  isFilterEnabled={historyQueue.length > 0}
-                />
-                <Statistic
-                  icon={<AlertTriangle height={40} width={40} />}
-                  themeBg="red.500"
-                  themeColor="white"
-                  name="Total issues"
-                  value={issues.length}
-                  isFilterEnabled={historyQueue.length > 0}
-                />
-                <Statistic
-                  icon={<MessageCircle height={40} width={40} />}
-                  themeBg="main.500"
-                  themeColor="white"
-                  name="Total call-to-actions"
-                  value={issues.filter(issue => issue.followUpAction).length}
-                  isFilterEnabled={historyQueue.length > 0}
-                />
-              </UI.Grid>
-              <UI.Div>
-                {health && (
-                  <HealthCardWide
-                    key={health.score}
-                    score={health.score}
-                    onResetFilters={() => popToIndex(0)}
-                    isFilterEnabled={historyQueue.length > 0}
-                    negativeResponseCount={health.negativeResponseCount}
-                    positiveResponseCount={health.nrVotes - health.negativeResponseCount}
-                  />
-                )}
-              </UI.Div>
-            </UI.Grid>
+            {noData && (
+              <UI.IllustrationCard svg={<EmptyIll />} text={t('dashboard_no_data_with_filter')} />
+            )}
 
-            <UI.Div mt={4}>
-              <SimpleIssueTable
-                inPreview
-                onResetFilter={() => popToIndex(0)}
-                isFilterEnabled={historyQueue.length > 0}
-                issues={issues}
-                onIssueClick={handleIssueClick}
-                onOpenIssueModal={() => setIssuesModalIsOpen(true)}
-              />
-            </UI.Div>
+            {!!health?.nrVotes && health.nrVotes > 0 && (
+              <>
+                <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "1fr 1fr"]}>
+                  <UI.Grid gridTemplateColumns={["1fr 1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr", "1fr"]}>
+                    <Statistic
+                      icon={<User height={40} width={40} />}
+                      themeBg="green.500"
+                      themeColor="white"
+                      name="Total feedback"
+                      value={health?.nrVotes || 0}
+                      isFilterEnabled={historyQueue.length > 0}
+                    />
+                    <Statistic
+                      icon={<AlertTriangle height={40} width={40} />}
+                      themeBg="red.500"
+                      themeColor="white"
+                      name="Total issues"
+                      value={issues.length}
+                      isFilterEnabled={historyQueue.length > 0}
+                    />
+                    <Statistic
+                      icon={<MessageCircle height={40} width={40} />}
+                      themeBg="main.500"
+                      themeColor="white"
+                      name="Total call-to-actions"
+                      value={issues.filter(issue => issue.followUpAction).length}
+                      isFilterEnabled={historyQueue.length > 0}
+                    />
+                  </UI.Grid>
+                  <UI.Div>
+                    {health && (
+                      <HealthCardWide
+                        key={health.score}
+                        score={health.score}
+                        onResetFilters={() => popToIndex(0)}
+                        isFilterEnabled={historyQueue.length > 0}
+                        negativeResponseCount={health.negativeResponseCount}
+                        positiveResponseCount={health.nrVotes - health.negativeResponseCount}
+                      />
+                    )}
+                  </UI.Div>
+                </UI.Grid>
+                <UI.Div mt={4}>
+                  <SimpleIssueTable
+                    inPreview
+                    onResetFilter={() => popToIndex(0)}
+                    isFilterEnabled={historyQueue.length > 0}
+                    issues={issues}
+                    onIssueClick={handleIssueClick}
+                    onOpenIssueModal={() => setIssuesModalIsOpen(true)}
+                  />
+                </UI.Div>
+              </>
+            )}
+
           </UI.Div>
           <UI.Div width="100%" ref={ref}>
             <Zoom<SVGElement>

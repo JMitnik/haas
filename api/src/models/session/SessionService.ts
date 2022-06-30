@@ -565,7 +565,7 @@ class SessionService {
    */
   private getActionFromSession(session: SessionWithEntries): SessionActionType | null {
     const contactAction = session.nodeEntries.find((nodeEntry) => (
-      nodeEntry.relatedNode?.type === 'FORM' && nodeEntry.formNodeEntry?.values.find(
+      nodeEntry.formNodeEntry?.values.find(
         (val) => !!val.email || !!val.phoneNumber
       )
     ));

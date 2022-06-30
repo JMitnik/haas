@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { orderBy } from 'lodash';
 
 import { SessionActionType } from 'models/session/SessionTypes';
+import { isPresent } from 'ts-is-present';
 import { Nullable } from 'types/generic';
 
 import { convertDatesToHistogramItems } from '../Common/Analytics/Analytics.helpers';
@@ -99,7 +100,7 @@ export class IssueService {
             items: convertDatesToHistogramItems(topicStats.dates),
           },
           rankScore,
-          followUpAction: topicStats.followUpActions.length > 0 ? (topicStats.followUpActions[0] || null) : null,
+          followUpAction: topicStats.followUpActions.find(isPresent) || null,
         })
       });
     });
