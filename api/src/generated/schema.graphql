@@ -802,6 +802,7 @@ type DialogueStatisticsSummaryModel {
   impactScore: Float
   nrVotes: Int
   startDateTime: Date
+  title: String!
   updatedAt: Date
 }
 
@@ -2158,4 +2159,5 @@ type WorkspaceStatistics {
   Returns potentially the most urgent path of the workspace (one at most)
   """
   urgentPath(input: DialogueStatisticsSummaryFilterInput): UrgentPath
+  workspaceStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
 }

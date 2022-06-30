@@ -10,7 +10,7 @@ import {
 
 export type Issue = GetIssues.Issues;
 export type Topic = GetDialogueTopics.Topic;
-export type Dialogue = GetWorkspaceDialogueStatistics.Dialogues;
+export type Dialogue = GetWorkspaceDialogueStatistics.WorkspaceStatisticsSummary;
 export type Session = GetSessionPaths.PathedSessions;
 
 export type ZoomProps = ProvidedZoom<SVGElement> & {

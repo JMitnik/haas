@@ -1,15 +1,18 @@
 query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
-    dialogues {
-      id
-      title
-      dialogueStatisticsSummary(input: { startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true }) {
-        id
-        dialogueId
-        impactScore
-        nrVotes
-        updatedAt
-      }
-    }
+    statistics {
+			workspaceStatisticsSummary(input: { startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true 
+			}) {
+				id
+				nrVotes
+				impactScore
+				updatedAt
+        title
+				dialogue {
+					title
+					id
+				}
+			}
+		}
   }
 }
