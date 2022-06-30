@@ -609,6 +609,7 @@ class DialoguePrismaAdapter {
       data: {
         slug: input.slug,
         title: input.title,
+        language: input.language,
         isPrivate: input.isPrivate,
         description: input.description,
         postLeafNode: {

@@ -104,6 +104,7 @@ class GenerateWorkspaceService {
         customer: { id: workspace.id, create: false },
         isPrivate: false,
         postLeafText: template?.postLeafText,
+        language: template.language,
       };
 
       // Create initial dialogue
@@ -224,6 +225,7 @@ class GenerateWorkspaceService {
           header: template.postLeafText?.header,
           subHeader: template.postLeafText?.subHeader,
         },
+        language: template.language,
       };
 
       // Create initial dialogue

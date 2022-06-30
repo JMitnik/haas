@@ -5,8 +5,6 @@ import { QuestionNode, QuestionNodeTypeEnum } from 'types/core-types';
 import { useDialogueState } from 'modules/Dialogue/DialogueState';
 
 import { LanguageEnumType } from 'types/generated-types';
-import Color from 'color';
-import styled, { css } from 'styled-components';
 import { PostLeafNodeContainer } from './PostLeafNodeStyles';
 
 export const POSTLEAFNODE_ID = '-1';
@@ -34,15 +32,6 @@ const getCloseText = (language?: LanguageEnumType) => {
       return 'You may close this window now';
   }
 };
-
-const AdjustedColourWrapper = styled(UI.Div)`
-  ${({ theme }) => css`
-    font-weight: 600;
-    color: ${Color(theme.colors.primary).isDark()
-      ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
-      : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
-  `}
-`;
 
 const PostLeafNode = () => {
   const { dialogue } = useDialogueState();
