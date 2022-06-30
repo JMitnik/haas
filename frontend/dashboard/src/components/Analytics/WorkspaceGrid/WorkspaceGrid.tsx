@@ -27,7 +27,7 @@ import {
 import { HexagonGrid } from './HexagonGrid';
 import { WorkspaceGridHeader } from './WorkspaceGridHeader';
 import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
-import { DialogueImpactScoreType, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
+import { DialogueImpactScoreType, useGetWorkspaceSummaryDetailsQuery, useGetIssuesQuery } from 'types/generated-types';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { HealthCard } from '../Common/HealthCard/HealthCard';
 import { HealthCardWide } from '../Common/HealthCard/HealthCardWide';
@@ -43,7 +43,6 @@ export interface DataLoadOptions {
 
 export interface WorkspaceGridProps {
   initialData: HexagonNode[];
-  issues: Issue[];
   width: number;
   height: number;
   backgroundColor: string;
@@ -57,7 +56,6 @@ export interface WorkspaceGridProps {
 
 export const WorkspaceGrid = ({
   initialData,
-  issues,
   backgroundColor,
   onLoadData,
   dateRange: [startDate, endDate],
@@ -298,6 +296,19 @@ export const WorkspaceGrid = ({
 
   const summary = data?.customer?.statistics;
 
+  const { data: issuesData, loading: loadingIssues } = useGetIssuesQuery({
+    variables: {
+      workspaceId: activeCustomer?.id || '',
+      filter: {
+        startDate: format(startDate, DateFormat.DayFormat),
+        endDate: format(endDate, DateFormat.DayFormat),
+        dialogueStrings: visitedDialogueFragments,
+      }
+    }
+  });
+
+  const issues = issuesData?.customer?.issues || [];
+
   // Various stats fields
   const health = summary?.health;
 
@@ -390,6 +401,10 @@ export const WorkspaceGrid = ({
         <IssuesModal
           onResetFilters={() => popToIndex(0)}
           issues={issues}
+          onIssueClick={(issue) => {
+            handleIssueClick(issue);
+            setIssuesModalIsOpen(false);
+          }}
           isFiltersEnabled={historyQueue.length > 0}
         />
       </Modal.Root>

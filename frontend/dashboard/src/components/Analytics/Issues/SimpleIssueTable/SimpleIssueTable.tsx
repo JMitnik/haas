@@ -22,7 +22,7 @@ interface SimpleIssueTableProps {
 
 const CUTOFF = 3;
 
-export const SimpleIssueTable = ({ issues, onIssueClick,onResetFilter, onOpenIssueModal, isFilterEnabled = false, inPreview = true }: SimpleIssueTableProps) => {
+export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIssueModal, isFilterEnabled = false, inPreview = true }: SimpleIssueTableProps) => {
   const shownIssues = inPreview ? issues.slice(0, CUTOFF) : issues;
 
   return (
