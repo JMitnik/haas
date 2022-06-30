@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { ChevronLeft, ChevronRight, Filter } from 'react-feather';
+import { AlertTriangle, ChevronLeft, ChevronRight, Filter } from 'react-feather';
 import React from 'react';
 
 import { EventBars } from 'components/Analytics/Common/EventBars/EventBars';
@@ -9,7 +9,7 @@ import { ScoreBox } from 'components/ScoreBox';
 
 import { IssueActionLabels } from './IssueActionLabels';
 
-const columns = '40px 2fr 50px 2fr 80px';
+const columns = '60px 2fr 50px 2fr 80px';
 interface SimpleIssueTableProps {
   issues: Issue[];
   onIssueClick: (issue: Issue) => void;
@@ -18,19 +18,30 @@ interface SimpleIssueTableProps {
 export const SimpleIssueTable = ({ issues, onIssueClick }: SimpleIssueTableProps) => (
   <>
     <UI.Card border="1px solid" borderColor="off.100">
-      <UI.Div bg="neutral.300" borderRadius="20px 20px 0 0" borderBottom="1px solid" borderColor="off.100">
-        <UI.CardBody>
-          <UI.Grid gridTemplateColumns={columns}>
-            <UI.Div />
-            <UI.Helper>
-              Issue
-            </UI.Helper>
-            <UI.Helper>
-              Votes
-            </UI.Helper>
-          </UI.Grid>
-        </UI.CardBody>
-      </UI.Div>
+      <UI.CardHeader>
+        <UI.Div
+          borderBottom="1px solid"
+          borderColor="gray.200"
+        >
+          <UI.H4 pb={3} color="red.500" fontSize="1.2rem" fontWeight={600}>
+            <UI.Icon mr={2}>
+              <AlertTriangle />
+            </UI.Icon>
+            Issues
+          </UI.H4>
+        </UI.Div>
+        <UI.Grid pt={3} gridTemplateColumns={columns}>
+          <UI.Helper>
+            Score
+          </UI.Helper>
+          <UI.Helper>
+            Issue
+          </UI.Helper>
+          <UI.Helper>
+            Votes
+          </UI.Helper>
+        </UI.Grid>
+      </UI.CardHeader>
 
       <UI.Div>
         <UI.CardBody>

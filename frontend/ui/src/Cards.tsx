@@ -41,11 +41,50 @@ export const ButtonCard = styled(Button)<{ isActive: boolean }>`
   `}
 `;
 
-export const CardBody = styled(Div)`
-  ${({ theme }) => css`
-    padding: ${theme.gutter * 0.75}px;
+type Size = 'sm' | 'md' | 'lg';
+
+interface CardBodyProps {
+  _size?: Size;
+}
+
+export const CardHeader = styled(Div)<CardBodyProps>`
+  ${({ theme, _size = 'md' }) => css`
     flex-grow: 1;
     position: relative;
+    background-color: ${theme.colors.neutral[300]};
+    border-radius: ${theme.borderRadiuses.lg}px ${theme.borderRadiuses.lg}px 0 0;
+    border-bottom: 1px solid ${theme.colors.off[100]};
+
+    ${_size === 'sm' && css`
+      padding: ${theme.gutter * 0.5}px;
+    `}
+
+    ${_size === 'md' && css`
+      padding: ${theme.gutter * 0.75}px;
+    `}
+
+    ${_size === 'lg' && css`
+      padding: ${theme.gutter * 1.25}px;
+    `}
+  `}
+`;
+
+export const CardBody = styled(Div)<CardBodyProps>`
+  ${({ theme, _size = 'md' }) => css`
+    flex-grow: 1;
+    position: relative;
+
+    ${_size === 'sm' && css`
+      padding: ${theme.gutter * 0.5}px;
+    `}
+
+    ${_size === 'md' && css`
+      padding: ${theme.gutter * 0.75}px;
+    `}
+
+    ${_size === 'lg' && css`
+      padding: ${theme.gutter * 1.25}px;
+    `}
   `}
 `;
 

@@ -24,7 +24,7 @@ export const WorkspaceGridHeader = ({
 
   return (
     <UI.Div>
-      <UI.H1 textAlign="center" fontWeight="900" pt={4} color="off.500" lineHeight="1.2">
+      <UI.H1 textAlign="left" fontWeight="900" pt={4} color="off.500" lineHeight="1.2">
         {title}
       </UI.H1>
       {previousStateLabels.length > 0 ? (

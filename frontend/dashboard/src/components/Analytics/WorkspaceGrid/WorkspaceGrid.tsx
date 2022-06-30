@@ -25,10 +25,12 @@ import {
   Issue,
 } from './WorkspaceGrid.types';
 import { HexagonGrid } from './HexagonGrid';
-import { Layers } from './Layers';
 import { WorkspaceGridHeader } from './WorkspaceGridHeader';
-import { WorkspaceSummaryPane } from './SummaryPane/WorkspaceSummaryPane';
 import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
+import { DialogueImpactScoreType, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
+import { DateFormat, useDate } from 'hooks/useDate';
+import { HealthCard } from '../Common/HealthCard/HealthCard';
+import { HealthCardWide } from '../Common/HealthCard/HealthCardWide';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -61,6 +63,7 @@ export const WorkspaceGrid = ({
   initialViewMode = HexagonViewMode.Workspace,
   isServerLoading = false,
 }: WorkspaceGridProps) => {
+  const { format } = useDate();
   const { activeCustomer } = useCustomer();
   const initialRef = React.useRef<HTMLDivElement>();
   // Local loading
@@ -264,115 +267,111 @@ export const WorkspaceGrid = ({
     }
   };
 
+  const visitedDialogueFragments = useMemo(() => extractDialogueFragments(historyQueue), [historyQueue]);
+
+  const { data } = useGetWorkspaceSummaryDetailsQuery({
+    fetchPolicy: 'no-cache',
+    variables: {
+      id: activeCustomer?.id,
+      healthInput: {
+        startDateTime: format(startDate, DateFormat.DayFormat),
+        endDateTime: format(endDate, DateFormat.DayFormat),
+        topicFilter: {
+          dialogueStrings: visitedDialogueFragments,
+        },
+      },
+      summaryInput: {
+        impactType: DialogueImpactScoreType.Average,
+        startDateTime: format(startDate, DateFormat.DayFormat),
+        endDateTime: format(endDate, DateFormat.DayFormat),
+        topicsFilter: {
+          dialogueStrings: visitedDialogueFragments,
+        },
+        refresh: true,
+      },
+    },
+  });
+
+  const summary = data?.customer?.statistics;
+
+  // Various stats fields
+  const health = summary?.health;
+  const urgentPath = summary?.urgentPath;
+  const rankedTopics = summary?.rankedTopics || [];
+
+  const responseCount = summary?.basicStats?.responseCount || 0;
+
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
-      {isLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          exit={{ opacity: 0 }}
-          style={{
-            position: 'absolute',
-            top: '0',
-            left: '0',
-            right: '0',
-            bottom: '0',
-            zIndex: 1000,
-          }}
-        >
-          <UI.Div style={{ position: 'absolute', bottom: '0' }}>
-            <Loader testId="load" />
+      <UI.Container px={4}>
+        <UI.Flex zIndex={200} justifyContent="space-between" py={4} alignItems="center" flexWrap="wrap">
+          <UI.Div>
+            <WorkspaceGridHeader
+              previousStateLabels={previousLabels}
+              currentState={currentState}
+              workspaceName={activeCustomer?.name || ''}
+            />
           </UI.Div>
-        </motion.div>
-      )}
 
-      <UI.Div minHeight="calc(100vh - 30px)" borderRadius={20} position="relative">
-        <Zoom<SVGElement>
-          width={width}
-          height={height}
-          scaleYMax={1.5}
-          scaleYMin={0.5}
-        >
-          {(zoom) => (
-            <UI.ColumnFlex alignItems="center">
-              <WorkspaceGridHeader
-                previousStateLabels={previousLabels}
-                currentState={currentState}
-                workspaceName={activeCustomer?.name || ''}
+          <UI.Div>
+            <DatePicker
+              type="range"
+              startDate={startDate}
+              endDate={endDate}
+              onChange={setDateRange}
+            />
+          </UI.Div>
+        </UI.Flex>
+
+        <UI.Grid gridTemplateColumns="2fr 1fr">
+
+          <UI.Div>
+            {health && (
+              <HealthCardWide
+                key={health.score}
+                score={health.score}
+                negativeResponseCount={health.negativeResponseCount}
+                positiveResponseCount={health.nrVotes - health.negativeResponseCount}
               />
-              <UI.Div mb={4} zIndex={1000} position="relative">
-                <UI.Flex mt={2}>
-                  <DatePicker
-                    type="range"
-                    startDate={startDate}
-                    endDate={endDate}
-                    onChange={setDateRange}
-                  />
+            )}
 
-                  <UI.LoaderSlot
-                    mr={1}
-                    position="absolute"
-                    left={-36}
-                    top="50%"
-                    style={{ transform: 'translateY(-20%)' }}
-                  >
-                    {isServerLoading && (
-                      <UI.Div display="inline-block">
-                        <UI.Loader data-testId="load" />
-                      </UI.Div>
-                    )}
-                  </UI.LoaderSlot>
+            <UI.Div mt={4}>
+              <SimpleIssueTable
+                issues={issues}
+                onIssueClick={handleIssueClick}
+              />
+            </UI.Div>
+          </UI.Div>
+          <UI.Div width="100%" ref={ref}>
+            <Zoom<SVGElement>
+              width={width}
+              height={height}
+              scaleYMax={1.5}
+              scaleYMin={0.5}
+            >
+              {(zoom) => (
+                <HexagonGrid
+                  key={`${startDate.toISOString()} - ${endDate.toISOString()}`}
+                  width={width}
+                  height={height}
+                  backgroundColor="#ebf0ff"
+                  nodes={hexagonNodes}
+                  onHexClick={handleHexClick}
+                  stateKey={currentState.currentNode?.id || ''}
+                  zoom={zoom}
+                  useBackgroundPattern
+                  onGoBack={() => popToIndex(stateHistoryStack.length - 1)}
+                  isAtRoot={historyQueue.length === 0}
+                >
+                  <UI.Div position="absolute" bottom={24} right={24}>
 
-                </UI.Flex>
-              </UI.Div>
-
-              <UI.Container px={4} style={{ width: '100%', maxWidth: 1400 }} mt={2}>
-                <UI.Div ref={ref}>
-                  <HexagonGrid
-                    key={`${startDate.toISOString()} - ${endDate.toISOString()}`}
-                    width={width}
-                    height={height}
-                    backgroundColor="#ebf0ff"
-                    nodes={hexagonNodes}
-                    onHexClick={handleHexClick}
-                    stateKey={currentState.currentNode?.id || ''}
-                    zoom={zoom}
-                    useBackgroundPattern
-                    onGoBack={() => popToIndex(stateHistoryStack.length - 1)}
-                    isAtRoot={historyQueue.length === 0}
-                  >
-                    <UI.Div position="absolute" bottom={24} right={24}>
-                      <Layers
-                        currentState={currentState}
-                        onClick={(index) => popToIndex(index)}
-                        historyQueue={historyQueue}
-                      />
-                    </UI.Div>
-                  </HexagonGrid>
-
-                </UI.Div>
-                <UI.Div my={4}>
-                  <WorkspaceSummaryPane
-                    startDate={startDate}
-                    endDate={endDate}
-                    onDialogueChange={jumpToDialogue}
-                    currentState={currentState}
-                    historyQueue={historyQueue}
-                  />
-                  <UI.Div mt={4} maxWidth={750}>
-                    <SimpleIssueTable
-                      issues={issues}
-                      onIssueClick={handleIssueClick}
-                    />
                   </UI.Div>
-                </UI.Div>
-
-              </UI.Container>
-            </UI.ColumnFlex>
-          )}
-        </Zoom>
-      </UI.Div>
+                </HexagonGrid>
+              )}
+            </Zoom>
+          </UI.Div>
+        </UI.Grid>
+      </UI.Container>
 
       <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
         <InteractionModalCard

@@ -271,26 +271,32 @@ class DialogueStatisticsService {
     topicFilter?: TopicFilterInput,
     cutoff = 5
   ): Promise<Topic[]> {
-    const topicCounts = await this.topicService.countWorkspaceTopics(
-      workspaceId,
-      startDate,
-      endDate,
-      topicFilter,
-    );
+    // TODO: FIX
+    // const topicCounts = await this.topicService.countWorkspaceTopics(
+    //   workspaceId,
+    //   startDate,
+    //   endDate,
+    //   topicFilter,
+    // );
 
-    // Rank topics (without using index, not efficient)
-    const rankedTopics: Topic[] = orderBy(Object.values(topicCounts), 'count', 'desc').map(topicCount => ({
-      name: topicCount.topic,
-      impactScore: topicCount.score,
-      nrVotes: topicCount.count,
-      subTopics: [],
-      basicStats: {
-        average: topicCount.score,
-        responseCount: topicCount.count,
-      },
-    })).slice(0, cutoff);
+    // const test = Object.values(topicCounts).map((topicCount) => {
+    //   return Object.values(topicCount);
+    // }).flat();
 
-    return rankedTopics;
+    // // Rank topics (without using index, not efficient)
+    // const rankedTopics: Topic[] = orderBy(Object.values(topicCounts), 'count', 'desc').map(topicCount => ({
+    //   name: topicCount.topic,
+    //   impactScore: topicCount.score,
+    //   nrVotes: topicCount.count,
+    //   subTopics: [],
+    //   basicStats: {
+    //     average: topicCount.score,
+    //     responseCount: topicCount.count,
+    //   },
+    // })).slice(0, cutoff);
+
+    // return rankedTopics;
+    return [];
   }
 
   /**
