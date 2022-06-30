@@ -109,7 +109,6 @@ export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingW
                 >
                   {topic.basicStats?.responseCount}
                 </motion.text>
-
                 <ShowMoreButton bounds={bounds} index={index} margin={margin}>
                   {(handleClose) => (
                     <UI.Card style={{ borderRadius: '10px' }} padding="0.5em" minWidth={200}>

@@ -1,6 +1,7 @@
 import * as UI from '@haas/ui';
 import { MoreVertical } from 'react-feather';
 import { RectReadOnly } from 'react-use-measure';
+import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 
 import * as Popover from 'components/Common/Popover';
@@ -26,11 +27,19 @@ export const ShowMoreButton = ({ children, bounds, index, margin }: ShowMoreButt
       onOpenChange={setIsOpen}
     >
       <Popover.Trigger asChild>
-        <MoreVertical
-          color="grey"
-          x={bounds.width - 15}
-          y={index * (16 + margin + 13.5)}
-        />
+        <g transform={`translate(${bounds.width - 24},${index * (16 + margin + 13.5)})`}>
+          <motion.rect
+            transform="translate(4)"
+            width="16px"
+            height="24px"
+            cursor="pointer"
+            fillOpacity="0"
+          />
+          <MoreVertical
+            color="grey"
+          />
+        </g>
+
       </Popover.Trigger>
       <Popover.Content isOpen={isOpen}>
         <UI.Card maxWidth={700}>

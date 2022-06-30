@@ -13,4 +13,9 @@ export const ClickableSvg = styled.svg`
     cursor: pointer;
     pointer-events: auto;
   }
+
+  g {
+    cursor: pointer;
+    pointer-events: auto;
+  }
 `;
