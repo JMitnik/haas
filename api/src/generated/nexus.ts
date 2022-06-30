@@ -1710,6 +1710,7 @@ export interface NexusGenFieldTypes {
     impactScore: number | null; // Float
     nrVotes: number | null; // Int
     startDateTime: any | null; // Date
+    title: string; // String!
     updatedAt: any | null; // Date
   }
   Edge: { // field return type
@@ -2206,6 +2207,7 @@ export interface NexusGenFieldTypes {
     mostTrendingTopic: NexusGenRootTypes['MostTrendingTopic'] | null; // MostTrendingTopic
     rankedTopics: NexusGenRootTypes['TopicType'][]; // [TopicType!]!
     urgentPath: NexusGenRootTypes['UrgentPath'] | null; // UrgentPath
+    workspaceStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][] | null; // [DialogueStatisticsSummaryModel!]
   }
   lineChartDataType: { // field return type
     entryId: string | null; // String
@@ -2618,6 +2620,9 @@ export interface NexusGenArgTypes {
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     urgentPath: { // args
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
+    workspaceStatisticsSummary: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
   }
