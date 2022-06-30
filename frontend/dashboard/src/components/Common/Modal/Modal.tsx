@@ -1,9 +1,9 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
+import React from 'react';
 
 import { slideUpFadeMotion } from 'components/animation/config';
-import React from 'react';
 import styled from 'styled-components';
 
 interface RootProps extends DialogPrimitive.DialogContentProps {

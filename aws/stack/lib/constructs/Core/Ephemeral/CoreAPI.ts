@@ -11,12 +11,13 @@ import {
   Duration
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { IRepository } from "aws-cdk-lib/aws-ecr";
 
 import { APIOptions } from '../../../stacks/Core/CoreVariables';
 
 interface CoreApiProps {
   vpc: ec2.Vpc;
-  repo: ecr.Repository,
+  repo: IRepository,
   domainName: string;
   databaseEndpoint: string;
   databaseUserName: string;

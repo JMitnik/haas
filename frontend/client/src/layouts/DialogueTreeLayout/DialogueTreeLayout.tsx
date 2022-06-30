@@ -1,14 +1,14 @@
 import { ChevronLeft } from 'react-feather';
 import { Container } from '@haas/ui';
 import { Helmet } from 'react-helmet';
-import { Variants } from 'framer-motion';
-import { useHistory } from 'react-router-dom';
+import { Variants, motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { ReactNode } from 'react';
 
-import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
+import { QuestionNode } from 'types/core-types';
+import { useDialogueState } from 'modules/Dialogue/DialogueState';
 import WatermarkLogo from 'components/WatermarkLogo';
-import useDialogueTree from 'providers/DialogueTreeProvider';
 
 import { DialogueTreeContainer, GoBackButton, GoBackContainer, GoBackText } from './DialogueTreeStyles';
 
@@ -29,21 +29,30 @@ const routerNavigationAnimation: Variants = {
 
 interface DialogueTreeLayoutProps {
   children: ReactNode;
-  node: TreeNodeProps;
+  node: QuestionNode;
   isAtLeaf: boolean;
 }
 
 const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProps) => {
-  const history = useHistory();
-  const { store } = useDialogueTree();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const { workspace, dialogue, getCurrentNode, isFinished } = useDialogueState((state) => ({
+    workspace: state.workspace,
+    dialogue: state.dialogue,
+    getCurrentNode: state.getCurrentNode,
+    isFinished: state.isFinished,
+  }));
+  const currentNode = getCurrentNode();
+
+  const headName = `${dialogue?.title} - ${currentNode?.title}`;
+
   return (
-    <DialogueTreeContainer>
+    <DialogueTreeContainer as={motion.div} animate={{ opacity: 1 }} exit={{ opacity: 0 }} initial={{ opacity: 0 }}>
       {/* TODO: Enable consistent animation */}
-      {!node.isRoot && !node.isPostLeaf && !isAtLeaf && (
+      {!node.isRoot && !isFinished && !isAtLeaf && (
         <GoBackContainer variants={routerNavigationAnimation} animate="animate" initial="initial" exit="exit">
-          <GoBackButton onClick={() => history.goBack()}>
+          <GoBackButton onClick={() => navigate(-1)}>
             <ChevronLeft />
           </GoBackButton>
           <GoBackText>{t('go_back') || 'Go back'}</GoBackText>
@@ -54,21 +63,19 @@ const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProp
         {children}
       </Container>
 
-      {!!store.customer && (
+      {!!workspace && (
         <Helmet>
           <title>
-            haas -
-            {' '}
-            {store?.tree?.title || ''}
+            {headName}
           </title>
-          <meta name="description" content={store.tree?.title} />
+          <meta name="description" content={workspace.name} />
         </Helmet>
       )}
 
-      {!!store.customer && (
+      {!!workspace && (
         <WatermarkLogo
-          logoUrl={store.customer?.settings?.logoUrl}
-          opacity={store.customer?.settings?.logoOpacity ?? undefined}
+          logoUrl={workspace?.settings?.logoUrl || ''}
+          opacity={workspace?.settings?.logoOpacity ?? undefined}
         />
       )}
     </DialogueTreeContainer>
