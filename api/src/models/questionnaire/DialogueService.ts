@@ -68,7 +68,6 @@ class DialogueService {
     workspaceId: string,
     filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null,
   ) => {
-    console.log('Filter: ', filter);
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 12;
 
