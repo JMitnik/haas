@@ -51,73 +51,8 @@ export const HealthCardWide = ({
         </UI.Flex>
       </UI.CardHeader>
       <UI.CardBody>
-        <UI.ColumnFlex justifyContent="space-between">
-          <UI.Flex justifyContent="space-between">
-            <UI.ColumnFlex justifyContent="space-between" width="100%" pr={4}>
-              <UI.Div>
-                <UI.Flex alignItems="center">
-                  <UI.Flex alignItems="center" mr={4}>
-                    <UI.Span
-                      display="inline-block"
-                      width="10px"
-                      height="10px"
-                      bg="green.500"
-                      mr={1}
-                      style={{ borderRadius: '100%' }}
-                    />
-                    <UI.Span color="off.500" fontWeight={600}>
-                      Happy
-                    </UI.Span>
-                  </UI.Flex>
-
-                  <UI.Flex alignItems="center">
-                    <UI.Span
-                      display="inline-block"
-                      width="10px"
-                      height="10px"
-                      bg="red.500"
-                      mr={1}
-                      style={{ borderRadius: '100%' }}
-                    />
-                    <UI.Span color="off.500" fontWeight={600}>
-                      Unhappy
-                    </UI.Span>
-                  </UI.Flex>
-                </UI.Flex>
-              </UI.Div>
-
-              <UI.Flex width="60%">
-                <UI.Div width={`${positiveRate}%`}>
-                  <UI.Div bg="green.500" borderRadius={20} mr={1} height={3} />
-                  <UI.Div position="absolute">
-                    <UI.Span color="off.600" fontWeight={700}>
-                      {positiveRate.toFixed(0)}
-                      {'%  '}
-                      {'('}
-                      {positiveResponseCount}
-                      {')'}
-                    </UI.Span>
-                  </UI.Div>
-                </UI.Div>
-                <UI.Div width={`${negativeRate}%`}>
-                  <UI.Div bg="red.500" borderRadius={20} mr={1} height={3} />
-                    <UI.Div position="absolute">
-                    <UI.Span color="off.600" fontWeight={700}>
-                      {negativeRate.toFixed(0)}
-                      {'%  '}
-                      {'('}
-                      {negativeResponseCount}
-                      {')'}
-                    </UI.Span>
-                  </UI.Div>
-                </UI.Div>
-              </UI.Flex>
-
-              <UI.Flex width="60%">
-                <UI.Div width={`${positiveRate}%`}>
-                </UI.Div>
-              </UI.Flex>
-            </UI.ColumnFlex>
+        <UI.Flex justifyContent="space-between">
+          <UI.Div mr={4}>
             <ProgressCircle
               percentage={score}
               stroke={getHexagonSVGFill(score)}
@@ -130,8 +65,73 @@ export const HealthCardWide = ({
                 {formatFractionToPercentage(score / 100)}
               </UI.Text>
             </ProgressCircle>
-          </UI.Flex>
-        </UI.ColumnFlex>
+          </UI.Div>
+          <UI.ColumnFlex justifyContent="space-around" width="100%" pr={4}>
+            <UI.Div>
+              <UI.Flex alignItems="center">
+                <UI.Flex alignItems="center" mr={4}>
+                  <UI.Span
+                    display="inline-block"
+                    width="10px"
+                    height="10px"
+                    bg="green.500"
+                    mr={1}
+                    style={{ borderRadius: '100%' }}
+                  />
+                  <UI.Span color="off.500" fontWeight={600}>
+                    Happy
+                  </UI.Span>
+                </UI.Flex>
+
+                <UI.Flex alignItems="center">
+                  <UI.Span
+                    display="inline-block"
+                    width="10px"
+                    height="10px"
+                    bg="red.500"
+                    mr={1}
+                    style={{ borderRadius: '100%' }}
+                  />
+                  <UI.Span color="off.500" fontWeight={600}>
+                    Unhappy
+                  </UI.Span>
+                </UI.Flex>
+              </UI.Flex>
+            </UI.Div>
+
+            <UI.Flex width="60%">
+              <UI.Div width={`${positiveRate}%`}>
+                <UI.Div bg="green.500" borderRadius={20} mr={1} height={3} />
+                <UI.Div position="absolute">
+                  <UI.Span color="off.600" fontWeight={700}>
+                    {positiveRate.toFixed(0)}
+                    {'%  '}
+                    {'('}
+                    {positiveResponseCount}
+                    {')'}
+                  </UI.Span>
+                </UI.Div>
+              </UI.Div>
+              <UI.Div width={`${negativeRate}%`}>
+                <UI.Div bg="red.500" borderRadius={20} mr={1} height={3} />
+                <UI.Div position="absolute">
+                  <UI.Span color="off.600" fontWeight={700}>
+                    {negativeRate.toFixed(0)}
+                    {'%  '}
+                    {'('}
+                    {negativeResponseCount}
+                    {')'}
+                  </UI.Span>
+                </UI.Div>
+              </UI.Div>
+            </UI.Flex>
+
+            <UI.Flex width="60%">
+              <UI.Div width={`${positiveRate}%`}>
+              </UI.Div>
+            </UI.Flex>
+          </UI.ColumnFlex>
+        </UI.Flex>
       </UI.CardBody>
     </UI.Card>
   );

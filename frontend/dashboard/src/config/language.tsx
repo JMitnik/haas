@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    zoom_in: {
+      en: 'Zoom in',
+      de: 'Zoom in'
+    },
+    zoom_out: {
+      en: 'Zoom out',
+      de: 'Zoom out'
+    },
     issues: {
       en: 'Issues',
       de: 'Issues',

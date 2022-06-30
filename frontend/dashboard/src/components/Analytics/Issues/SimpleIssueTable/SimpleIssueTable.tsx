@@ -33,7 +33,7 @@ export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIs
           borderColor="gray.200"
         >
           <UI.Flex alignItems="center" justifyContent="space-between">
-            <UI.H4 pb={3} color="red.500" fontSize="1.2rem" fontWeight={600} style={{ display: 'flex', alignItems: 'center' }}>
+            <UI.H4 pb={3} color="off.500" fontSize="1.2rem" fontWeight={600} style={{ display: 'flex', alignItems: 'center' }}>
               <UI.Icon mr={2}>
                 <AlertTriangle />
               </UI.Icon>
