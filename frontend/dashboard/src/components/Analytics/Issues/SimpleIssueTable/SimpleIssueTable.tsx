@@ -8,14 +8,17 @@ import { Issue } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
 import { ScoreBox } from 'components/ScoreBox';
 
 import { IssueActionLabels } from './IssueActionLabels';
+import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEnabledLabel';
 
 const columns = '60px 2fr 50px 2fr 80px';
 interface SimpleIssueTableProps {
+  onResetFilter: () => void;
+  isFilterEnabled: boolean;
   issues: Issue[];
   onIssueClick: (issue: Issue) => void;
 }
 
-export const SimpleIssueTable = ({ issues, onIssueClick }: SimpleIssueTableProps) => {
+export const SimpleIssueTable = ({ issues, onIssueClick,onResetFilter, isFilterEnabled = false }: SimpleIssueTableProps) => {
   const shownIssues = issues.slice(0, 4);
 
   return (
@@ -25,12 +28,20 @@ export const SimpleIssueTable = ({ issues, onIssueClick }: SimpleIssueTableProps
           borderBottom="1px solid"
           borderColor="gray.200"
         >
-          <UI.H4 pb={3} color="red.500" fontSize="1.2rem" fontWeight={600} style={{ display: 'flex', alignItems: 'center' }}>
-            <UI.Icon mr={2}>
-              <AlertTriangle />
-            </UI.Icon>
-            Issues
-          </UI.H4>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.H4 pb={3} color="red.500" fontSize="1.2rem" fontWeight={600} style={{ display: 'flex', alignItems: 'center' }}>
+              <UI.Icon mr={2}>
+                <AlertTriangle />
+              </UI.Icon>
+              Issues
+            </UI.H4>
+
+            {isFilterEnabled && (
+              <UI.Div pb={3}>
+                <FilterEnabledLabel onResetFilter={onResetFilter} />
+              </UI.Div>
+            )}
+          </UI.Flex>
         </UI.Div>
         <UI.Grid pt={3} gridTemplateColumns={columns}>
           <UI.Helper>

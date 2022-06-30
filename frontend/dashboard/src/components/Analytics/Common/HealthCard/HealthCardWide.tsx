@@ -7,11 +7,14 @@ import { ProgressCircle } from '../../WorkspaceGrid/SummaryPane/ProgressCircle';
 import { getColorScoreBrandVariable, getHexagonSVGFill } from '../../WorkspaceGrid/WorkspaceGrid.helpers';
 import { useTranslation } from 'react-i18next';
 import { Heart } from 'react-feather';
+import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEnabledLabel';
 
 interface HealthCardProps {
   score: number;
   negativeResponseCount: number;
   positiveResponseCount: number;
+  isFilterEnabled: boolean;
+  onResetFilters: () => void;
   isPreview?: boolean;
 }
 
@@ -19,7 +22,8 @@ export const HealthCardWide = ({
   score,
   positiveResponseCount,
   negativeResponseCount,
-  isPreview,
+  onResetFilters,
+  isFilterEnabled,
 }: HealthCardProps) => {
   const { t } = useTranslation();
   const { formatFractionToPercentage, } = useFormatter();
@@ -31,12 +35,20 @@ export const HealthCardWide = ({
   return (
     <UI.Card boxShadow="md" hasBlur>
       <UI.CardHeader>
-        <UI.H4 color="off.500" fontWeight={600} style={{ display: 'flex', alignItems: 'center' }}>
-          <UI.Icon mr={2}>
-            <Heart />
-          </UI.Icon>
-          Response health
-        </UI.H4>
+        <UI.Flex justifyContent="space-between" alignItems="center">
+          <UI.H4 color="off.500" fontWeight={600} style={{ display: 'flex', alignItems: 'center' }}>
+            <UI.Icon mr={2}>
+              <Heart />
+            </UI.Icon>
+            Response health
+          </UI.H4>
+
+          {isFilterEnabled && (
+            <FilterEnabledLabel
+              onResetFilter={onResetFilters}
+            />
+          )}
+        </UI.Flex>
       </UI.CardHeader>
       <UI.CardBody>
         <UI.ColumnFlex justifyContent="space-between">

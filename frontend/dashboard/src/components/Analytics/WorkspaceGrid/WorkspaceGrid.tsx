@@ -330,6 +330,8 @@ export const WorkspaceGrid = ({
               <HealthCardWide
                 key={health.score}
                 score={health.score}
+                onResetFilters={() => popToIndex(0)}
+                isFilterEnabled={historyQueue.length > 0}
                 negativeResponseCount={health.negativeResponseCount}
                 positiveResponseCount={health.nrVotes - health.negativeResponseCount}
               />
@@ -337,6 +339,8 @@ export const WorkspaceGrid = ({
 
             <UI.Div mt={4}>
               <SimpleIssueTable
+                onResetFilter={() => popToIndex(0)}
+                isFilterEnabled={historyQueue.length > 0}
                 issues={issues}
                 onIssueClick={handleIssueClick}
               />
