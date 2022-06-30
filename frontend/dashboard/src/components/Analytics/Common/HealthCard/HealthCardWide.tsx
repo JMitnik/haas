@@ -29,8 +29,8 @@ export const HealthCardWide = ({
   const { formatFractionToPercentage, } = useFormatter();
 
   const totalCount = positiveResponseCount + negativeResponseCount;
-  const positiveRate = ((positiveResponseCount + 0.01) / totalCount) * 100
-  const negativeRate = ((negativeResponseCount + 0.01) / totalCount) * 100
+  const positiveRate = ((positiveResponseCount) / (totalCount + 0.1)) * 100
+  const negativeRate = ((negativeResponseCount) / (totalCount + 0.1)) * 100
 
   return (
     <UI.Card boxShadow="md" hasBlur>

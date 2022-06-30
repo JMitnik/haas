@@ -305,7 +305,7 @@ export const WorkspaceGrid = ({
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       <UI.Container px={4}>
-        <UI.Flex zIndex={200} justifyContent="space-between" py={4} alignItems="center" flexWrap="wrap">
+        <UI.Flex position="relative" zIndex={200} justifyContent="space-between" py={4} alignItems="center" flexWrap="wrap">
           <UI.Div>
             <WorkspaceGridHeader
               previousStateLabels={previousLabels}
