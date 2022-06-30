@@ -27,8 +27,8 @@ const businessOptions = [
 ];
 
 const yesNoOptions = [
-  { value: 'Yes', position: 1 }, // TODO: Add isTopic: false to both entries so they won't be shown in top topics
-  { value: 'No', position: 2 },
+  { value: 'Yes', position: 1, isTopic: false },
+  { value: 'No', position: 2, isTopic: false },
 ]
 
 const sportOptionsEng = [
