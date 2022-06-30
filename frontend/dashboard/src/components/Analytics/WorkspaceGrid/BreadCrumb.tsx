@@ -4,14 +4,15 @@ import * as UI from '@haas/ui';
 import { ChevronRight, Filter, Home } from 'react-feather';
 
 import * as LS from './WorkspaceGrid.styles';
-import { HexagonState } from './WorkspaceGrid.types';
+import { HexagonState, HexagonViewMode } from './WorkspaceGrid.types';
 
 interface BreadCrumbProps {
+  viewMode: HexagonViewMode;
   historyQueue: HexagonState[];
   onJumpToIndex: (index: number) => void;
 }
 
-export const BreadCrumb = ({ historyQueue, onJumpToIndex }: BreadCrumbProps) => {
+export const BreadCrumb = ({ historyQueue, viewMode, onJumpToIndex }: BreadCrumbProps) => {
   const { t } = useTranslation();
 
   return (
@@ -43,6 +44,42 @@ export const BreadCrumb = ({ historyQueue, onJumpToIndex }: BreadCrumbProps) => 
                 </UI.Button>
               </React.Fragment>
             ))}
+
+            {viewMode === HexagonViewMode.Dialogue && (
+              <>
+                <UI.Icon color="gray.500">
+                  <ChevronRight />
+                </UI.Icon>
+
+                <UI.Span color="gray.500" mx={2}>
+                  Select a team
+                </UI.Span>
+              </>
+            )}
+
+            {viewMode === HexagonViewMode.Group && (
+              <>
+                <UI.Icon color="gray.500">
+                  <ChevronRight />
+                </UI.Icon>
+
+                <UI.Span color="gray.500" mx={2}>
+                  Select a group
+                </UI.Span>
+              </>
+            )}
+
+            {viewMode === HexagonViewMode.Session && (
+              <>
+                <UI.Icon color="gray.500">
+                  <ChevronRight />
+                </UI.Icon>
+
+                <UI.Span color="gray.500" mx={2}>
+                  Select an individual
+                </UI.Span>
+              </>
+            )}
 
           </UI.Flex>
         </LS.ControlBody>
