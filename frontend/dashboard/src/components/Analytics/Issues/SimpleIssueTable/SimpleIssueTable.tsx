@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AlertTriangle, ChevronLeft, ChevronRight, Filter } from 'react-feather';
+import { AlertTriangle, Filter } from 'react-feather';
 import React from 'react';
 
 import { EventBars } from 'components/Analytics/Common/EventBars/EventBars';

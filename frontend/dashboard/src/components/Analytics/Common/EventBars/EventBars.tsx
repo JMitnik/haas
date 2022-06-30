@@ -11,7 +11,7 @@ import { DateFormat, useDate } from 'hooks/useDate';
 import mainTheme from 'config/theme';
 
 import { EventBarsContainer } from './EventBars.styles';
-import { calculateDateRange, Event } from './EventBars.helpers';
+import { calculateDateRange, Event, padEvents } from './EventBars.helpers';
 
 interface EventBarsProps {
   width: number;
@@ -20,15 +20,18 @@ interface EventBarsProps {
 }
 
 export const EventBars = ({ events, width, height }: EventBarsProps) => {
-  const { format } = useDate();
+  const { format, getNWeekAgo, getNow } = useDate();
 
   const formatDate = (date: Date) => format(date, DateFormat.DayFormat);
+  const dateRange = useMemo(() => calculateDateRange(getNWeekAgo(2), getNow()), [getNWeekAgo, getNow]);
 
   const dateScale = useMemo(() => scaleBand<string>({
-    domain: calculateDateRange(events),
+    domain: dateRange,
     padding: 0.2,
     range: [0, width],
-  }), [events, width]);
+  }), [dateRange, width]);
+
+  console.log(dateRange);
 
   const yMax = height - 2;
 
@@ -45,16 +48,20 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
     scroll: true,
   });
 
-  console.log(events);
+  const paddedEvents = padEvents(events, getNWeekAgo(2), getNow());
+  console.log(paddedEvents);
 
   return (
     <EventBarsContainer>
       <svg ref={containerRef} width={width} height={height}>
         <Group>
-          {events.map((event) => {
+          {paddedEvents.map((event) => {
+            console.log(formatDate(event.date));
             const barWidth = dateScale.bandwidth();
             const barHeight = (freqScale(event.frequency) ?? 0);
             const barX = dateScale(formatDate(event.date));
+            console.log(barX);
+
             const barY = yMax - barHeight;
 
             return (
@@ -101,7 +108,7 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
                   Responses
                 </UI.Span>
                 <UI.Span color="off.600">
-                  {tooltipData.frequency}
+                  {Math.floor(tooltipData.frequency)}
                 </UI.Span>
               </UI.Flex>
               <UI.Flex mt={2} justifyContent="space-between">
