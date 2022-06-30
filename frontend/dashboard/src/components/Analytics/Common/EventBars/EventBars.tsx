@@ -31,8 +31,6 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
     range: [0, width],
   }), [dateRange, width]);
 
-  console.log(dateRange);
-
   const yMax = height - 2;
 
   const maxFreq = useMemo(() => Math.max(...events.map((event) => event.frequency)), [events]);
@@ -49,18 +47,15 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
   });
 
   const paddedEvents = padEvents(events, getNWeekAgo(2), getNow());
-  console.log(paddedEvents);
 
   return (
     <EventBarsContainer>
       <svg ref={containerRef} width={width} height={height}>
         <Group>
           {paddedEvents.map((event) => {
-            console.log(formatDate(event.date));
             const barWidth = dateScale.bandwidth();
             const barHeight = (freqScale(event.frequency) ?? 0);
             const barX = dateScale(formatDate(event.date));
-            console.log(barX);
 
             const barY = yMax - barHeight;
 

@@ -31,6 +31,7 @@ import { DialogueImpactScoreType, useGetWorkspaceSummaryDetailsQuery } from 'typ
 import { DateFormat, useDate } from 'hooks/useDate';
 import { HealthCard } from '../Common/HealthCard/HealthCard';
 import { HealthCardWide } from '../Common/HealthCard/HealthCardWide';
+import { BreadCrumb } from './BreadCrumb';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -324,7 +325,6 @@ export const WorkspaceGrid = ({
         </UI.Flex>
 
         <UI.Grid gridTemplateColumns="2fr 1fr">
-
           <UI.Div>
             {health && (
               <HealthCardWide
@@ -363,8 +363,10 @@ export const WorkspaceGrid = ({
                   onGoBack={() => popToIndex(stateHistoryStack.length - 1)}
                   isAtRoot={historyQueue.length === 0}
                 >
-                  <UI.Div position="absolute" bottom={24} right={24}>
-
+                  <UI.Div position="absolute" left={12} top={12}>
+                    {historyQueue.length > 0 && (
+                      <BreadCrumb historyQueue={historyQueue} />
+                    )}
                   </UI.Div>
                 </HexagonGrid>
               )}
