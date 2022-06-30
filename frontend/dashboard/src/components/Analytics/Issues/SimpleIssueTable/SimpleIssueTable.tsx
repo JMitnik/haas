@@ -15,15 +15,17 @@ interface SimpleIssueTableProps {
   onIssueClick: (issue: Issue) => void;
 }
 
-export const SimpleIssueTable = ({ issues, onIssueClick }: SimpleIssueTableProps) => (
-  <>
+export const SimpleIssueTable = ({ issues, onIssueClick }: SimpleIssueTableProps) => {
+  const shownIssues = issues.slice(0, 4);
+
+  return (
     <UI.Card border="1px solid" borderColor="off.100">
       <UI.CardHeader>
         <UI.Div
           borderBottom="1px solid"
           borderColor="gray.200"
         >
-          <UI.H4 pb={3} color="red.500" fontSize="1.2rem" fontWeight={600}>
+          <UI.H4 pb={3} color="red.500" fontSize="1.2rem" fontWeight={600} style={{ display: 'flex', alignItems: 'center' }}>
             <UI.Icon mr={2}>
               <AlertTriangle />
             </UI.Icon>
@@ -45,7 +47,7 @@ export const SimpleIssueTable = ({ issues, onIssueClick }: SimpleIssueTableProps
 
       <UI.Div>
         <UI.CardBody>
-          {issues.map((issue, index) => (
+          {shownIssues.map((issue, index) => (
             <UI.Grid
               key={index}
               pt={index > 0 ? 2 : 0}
@@ -107,19 +109,16 @@ export const SimpleIssueTable = ({ issues, onIssueClick }: SimpleIssueTableProps
               </UI.Flex>
             </UI.Grid>
           ))}
+
+          {issues.length > 4 && (
+            <UI.Flex justifyContent="center" mt={2}>
+              <UI.Button variant="outline" variantColor="red">
+                Show more
+              </UI.Button>
+            </UI.Flex>
+          )}
         </UI.CardBody>
       </UI.Div>
     </UI.Card>
-
-    <UI.Div mt={2}>
-      <UI.Flex>
-        <ControlButton mr={2}>
-          <ChevronLeft />
-        </ControlButton>
-        <ControlButton>
-          <ChevronRight />
-        </ControlButton>
-      </UI.Flex>
-    </UI.Div>
-  </>
-);
+  );
+};
