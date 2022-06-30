@@ -40,7 +40,7 @@ export const HealthCardWide = ({
             <UI.Icon mr={2}>
               <Heart />
             </UI.Icon>
-            Response health
+            Health
           </UI.H4>
 
           {isFilterEnabled && (
@@ -51,87 +51,85 @@ export const HealthCardWide = ({
         </UI.Flex>
       </UI.CardHeader>
       <UI.CardBody>
-        <UI.Flex justifyContent="space-between">
-          <UI.Div mr={4}>
-            <ProgressCircle
-              percentage={score}
-              stroke={getHexagonSVGFill(score)}
-              backgroundStroke="rgba(0, 0, 0, 0.1)"
-              size={80}
-              radius={45}
-              strokeWidth={10}
-            >
-              <UI.Text fontSize="1.2rem" fontWeight={700} color={getColorScoreBrandVariable(score, true)}>
-                {formatFractionToPercentage(score / 100)}
-              </UI.Text>
-            </ProgressCircle>
-          </UI.Div>
-          <UI.ColumnFlex justifyContent="space-around" width="100%" pr={4}>
-            <UI.Div>
-              <UI.Flex alignItems="center">
-                <UI.Flex alignItems="center" mr={4}>
-                  <UI.Span
-                    display="inline-block"
-                    width="10px"
-                    height="10px"
-                    bg="green.500"
-                    mr={1}
-                    style={{ borderRadius: '100%' }}
-                  />
-                  <UI.Span color="off.500" fontWeight={600}>
-                    Happy
-                  </UI.Span>
-                </UI.Flex>
-
-                <UI.Flex alignItems="center">
-                  <UI.Span
-                    display="inline-block"
-                    width="10px"
-                    height="10px"
-                    bg="red.500"
-                    mr={1}
-                    style={{ borderRadius: '100%' }}
-                  />
-                  <UI.Span color="off.500" fontWeight={600}>
-                    Unhappy
-                  </UI.Span>
-                </UI.Flex>
-              </UI.Flex>
-            </UI.Div>
-
-            <UI.Flex width="60%">
-              <UI.Div width={`${positiveRate}%`}>
-                <UI.Div bg="green.500" borderRadius={20} mr={1} height={3} />
-                <UI.Div position="absolute">
-                  <UI.Span color="off.600" fontWeight={700}>
-                    {positiveRate.toFixed(0)}
-                    {'%  '}
-                    {'('}
-                    {positiveResponseCount}
-                    {')'}
-                  </UI.Span>
-                </UI.Div>
-              </UI.Div>
-              <UI.Div width={`${negativeRate}%`}>
-                <UI.Div bg="red.500" borderRadius={20} mr={1} height={3} />
-                <UI.Div position="absolute">
-                  <UI.Span color="off.600" fontWeight={700}>
-                    {negativeRate.toFixed(0)}
-                    {'%  '}
-                    {'('}
-                    {negativeResponseCount}
-                    {')'}
-                  </UI.Span>
-                </UI.Div>
-              </UI.Div>
-            </UI.Flex>
-
-            <UI.Flex width="60%">
-              <UI.Div width={`${positiveRate}%`}>
-              </UI.Div>
-            </UI.Flex>
-          </UI.ColumnFlex>
+        <UI.Flex justifyContent="center">
+          <ProgressCircle
+            percentage={score}
+            stroke={getHexagonSVGFill(score)}
+            backgroundStroke="rgba(0, 0, 0, 0.1)"
+            size={100}
+            radius={45}
+            strokeWidth={10}
+          >
+            <UI.Text fontSize="1.3rem" fontWeight={700} color={getColorScoreBrandVariable(score, true)}>
+              {formatFractionToPercentage(score / 100)}
+            </UI.Text>
+          </ProgressCircle>
         </UI.Flex>
+        <UI.Div my={2}>
+          <UI.Flex justifyContent="center" alignItems="center">
+            <UI.Flex alignItems="center" mr={4}>
+              <UI.Span
+                display="inline-block"
+                width="10px"
+                height="10px"
+                bg="green.500"
+                mr={1}
+                style={{ borderRadius: '100%' }}
+              />
+              <UI.Span color="off.500" fontWeight={600}>
+                Happy
+              </UI.Span>
+            </UI.Flex>
+
+            <UI.Flex alignItems="center">
+              <UI.Span
+                display="inline-block"
+                width="10px"
+                height="10px"
+                bg="red.500"
+                mr={1}
+                style={{ borderRadius: '100%' }}
+              />
+              <UI.Span color="off.500" fontWeight={600}>
+                Unhappy
+              </UI.Span>
+            </UI.Flex>
+          </UI.Flex>
+        </UI.Div>
+
+        <UI.Flex margin="0 auto" width="80%">
+          <UI.Div width={`${positiveRate}%`}>
+            <UI.Div bg="green.500" borderRadius={20} mr={1} height={3} />
+            <UI.Div position="absolute">
+              <UI.Span color="off.600" fontWeight={700}>
+                {positiveRate.toFixed(0)}
+                {'%  '}
+                {'('}
+                {positiveResponseCount}
+                {')'}
+              </UI.Span>
+            </UI.Div>
+          </UI.Div>
+          <UI.Div width={`${negativeRate}%`}>
+            <UI.Div bg="red.500" borderRadius={20} mr={1} height={3} />
+            <UI.Div position="absolute">
+              <UI.Span color="off.600" fontWeight={700}>
+                {negativeRate.toFixed(0)}
+                {'%  '}
+                {'('}
+                {negativeResponseCount}
+                {')'}
+              </UI.Span>
+            </UI.Div>
+          </UI.Div>
+        </UI.Flex>
+
+        <UI.Flex width="80%">
+          <UI.Div width={`${positiveRate}%`}>
+          </UI.Div>
+        </UI.Flex>
+
+        <UI.Div pb={4} />
       </UI.CardBody>
     </UI.Card>
   );

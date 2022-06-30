@@ -1,14 +1,12 @@
 import * as UI from '@haas/ui';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
-import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useMeasure from 'react-use-measure';
 
 import * as Modal from 'components/Common/Modal';
 import { DatePicker } from 'components/Common/DatePicker';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
-import { Loader } from 'components/Common/Loader/Loader';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 
@@ -25,14 +23,14 @@ import {
   Issue,
 } from './WorkspaceGrid.types';
 import { HexagonGrid } from './HexagonGrid';
-import { WorkspaceGridHeader } from './WorkspaceGridHeader';
 import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
 import { DialogueImpactScoreType, useGetWorkspaceSummaryDetailsQuery, useGetIssuesQuery } from 'types/generated-types';
 import { DateFormat, useDate } from 'hooks/useDate';
-import { HealthCard } from '../Common/HealthCard/HealthCard';
 import { HealthCardWide } from '../Common/HealthCard/HealthCardWide';
 import { BreadCrumb } from './BreadCrumb';
 import { IssuesModal } from './IssuesModal';
+import { AlertTriangle, MessageCircle, User } from 'react-feather';
+import { Statistic } from './Statistic';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -320,14 +318,6 @@ export const WorkspaceGrid = ({
             <UI.H1 textAlign="left" fontWeight="900" color="main.500" mb={4}>
               {activeCustomer?.name}
             </UI.H1>
-
-            <UI.Helper>
-              Responses
-            </UI.Helper>
-
-            <UI.H2 color="off.600">
-              2000
-            </UI.H2>
           </UI.Div>
 
           <UI.Div>
@@ -342,16 +332,46 @@ export const WorkspaceGrid = ({
 
         <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "2fr 1fr"]}>
           <UI.Div>
-            {health && (
-              <HealthCardWide
-                key={health.score}
-                score={health.score}
-                onResetFilters={() => popToIndex(0)}
-                isFilterEnabled={historyQueue.length > 0}
-                negativeResponseCount={health.negativeResponseCount}
-                positiveResponseCount={health.nrVotes - health.negativeResponseCount}
-              />
-            )}
+            <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "1fr 1fr"]}>
+              <UI.Grid gridTemplateColumns={["1fr 1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr", "1fr"]}>
+                <Statistic
+                  icon={<User height={40} width={40} />}
+                  themeBg="green.500"
+                  themeColor="white"
+                  name="Total feedback"
+                  value={health?.nrVotes || 0}
+                  isFilterEnabled={historyQueue.length > 0}
+                />
+                <Statistic
+                  icon={<AlertTriangle height={40} width={40} />}
+                  themeBg="red.500"
+                  themeColor="white"
+                  name="Total issues"
+                  value={issues.length}
+                  isFilterEnabled={historyQueue.length > 0}
+                />
+                <Statistic
+                  icon={<MessageCircle height={40} width={40} />}
+                  themeBg="main.500"
+                  themeColor="white"
+                  name="Total call-to-actions"
+                  value={issues.filter(issue => issue.followUpAction).length}
+                  isFilterEnabled={historyQueue.length > 0}
+                />
+              </UI.Grid>
+              <UI.Div>
+                {health && (
+                  <HealthCardWide
+                    key={health.score}
+                    score={health.score}
+                    onResetFilters={() => popToIndex(0)}
+                    isFilterEnabled={historyQueue.length > 0}
+                    negativeResponseCount={health.negativeResponseCount}
+                    positiveResponseCount={health.nrVotes - health.negativeResponseCount}
+                  />
+                )}
+              </UI.Div>
+            </UI.Grid>
 
             <UI.Div mt={4}>
               <SimpleIssueTable

@@ -20,7 +20,7 @@ export const FilterEnabledLabel = ({ onResetFilter }: FilterEnabledLabelProps) =
         <Dropdown.Trigger>
 
           <Tooltip.Trigger>
-            <UI.Button size="sm" variantColor="main" variant="solid">
+            <UI.Button size="sm" bg="gray.500" variant="solid">
               <UI.Icon>
                 <Filter />
               </UI.Icon>
