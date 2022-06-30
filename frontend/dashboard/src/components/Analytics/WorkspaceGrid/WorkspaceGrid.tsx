@@ -334,7 +334,7 @@ export const WorkspaceGrid = ({
           </UI.Div>
         </UI.Flex>
 
-        <UI.Grid gridTemplateColumns="2fr 1fr">
+        <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "2fr 1fr"]}>
           <UI.Div>
             {health && (
               <HealthCardWide
