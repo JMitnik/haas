@@ -52,7 +52,7 @@ const TextboxNodeDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionPr
         </UI.SectionHeader>
         <UI.SectionHeader
           bg="white"
-          borderRadius="10px"
+          style={{ borderRadius: '10px' }}
           padding={2}
         >
           {nodeEntry.value?.textboxNodeEntry}

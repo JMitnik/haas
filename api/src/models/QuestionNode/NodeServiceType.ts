@@ -18,7 +18,6 @@ export interface QuestionOptionProps {
   isTopic?: boolean;
   overrideLeafId?: string;
   position: number | null;
-  isTopic: boolean;
 }
 export interface LinkGenericInputProps {
   type: LinkTypeEnum;

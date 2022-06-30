@@ -1075,7 +1075,7 @@ class DialogueService {
     }));
 
     // Get the top paths
-    const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
+    const isPositiveEntries: any = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
     const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false || [], 3, 'negative') || [];
     const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true || [], 3, 'positive') || [];
 
