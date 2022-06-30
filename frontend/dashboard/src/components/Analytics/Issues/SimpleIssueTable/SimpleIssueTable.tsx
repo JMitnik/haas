@@ -12,14 +12,18 @@ import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEna
 
 const columns = '60px 2fr 50px 2fr 80px';
 interface SimpleIssueTableProps {
+  inPreview: boolean;
   onResetFilter: () => void;
   isFilterEnabled: boolean;
   issues: Issue[];
   onIssueClick: (issue: Issue) => void;
+  onOpenIssueModal?: () => void;
 }
 
-export const SimpleIssueTable = ({ issues, onIssueClick,onResetFilter, isFilterEnabled = false }: SimpleIssueTableProps) => {
-  const shownIssues = issues.slice(0, 4);
+const CUTOFF = 3;
+
+export const SimpleIssueTable = ({ issues, onIssueClick,onResetFilter, onOpenIssueModal, isFilterEnabled = false, inPreview = true }: SimpleIssueTableProps) => {
+  const shownIssues = inPreview ? issues.slice(0, CUTOFF) : issues;
 
   return (
     <UI.Card border="1px solid" borderColor="off.100">
@@ -121,9 +125,9 @@ export const SimpleIssueTable = ({ issues, onIssueClick,onResetFilter, isFilterE
             </UI.Grid>
           ))}
 
-          {issues.length > 4 && (
+          {issues.length > CUTOFF && inPreview && onOpenIssueModal && (
             <UI.Flex justifyContent="center" mt={2}>
-              <UI.Button variant="outline" variantColor="red">
+              <UI.Button onClick={onOpenIssueModal} variant="outline" variantColor="red">
                 Show more
               </UI.Button>
             </UI.Flex>

@@ -32,6 +32,7 @@ import { DateFormat, useDate } from 'hooks/useDate';
 import { HealthCard } from '../Common/HealthCard/HealthCard';
 import { HealthCardWide } from '../Common/HealthCard/HealthCardWide';
 import { BreadCrumb } from './BreadCrumb';
+import { IssuesModal } from './IssuesModal';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -69,6 +70,8 @@ export const WorkspaceGrid = ({
   const initialRef = React.useRef<HTMLDivElement>();
   // Local loading
   const [isLoading, setIsLoading] = useState(false);
+
+  const [issuesModalIsOpen, setIssuesModalIsOpen] = useState(false);
 
   // Session-id if currently being tracked.
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
@@ -339,10 +342,12 @@ export const WorkspaceGrid = ({
 
             <UI.Div mt={4}>
               <SimpleIssueTable
+                inPreview
                 onResetFilter={() => popToIndex(0)}
                 isFilterEnabled={historyQueue.length > 0}
                 issues={issues}
                 onIssueClick={handleIssueClick}
+                onOpenIssueModal={() => setIssuesModalIsOpen(true)}
               />
             </UI.Div>
           </UI.Div>
@@ -382,6 +387,14 @@ export const WorkspaceGrid = ({
       <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
         <InteractionModalCard
           sessionId={sessionId || ''}
+        />
+      </Modal.Root>
+
+      <Modal.Root open={issuesModalIsOpen} onClose={() => setIssuesModalIsOpen(false)}>
+        <IssuesModal
+          onResetFilters={() => popToIndex(0)}
+          issues={issues}
+          isFiltersEnabled={historyQueue.length > 0}
         />
       </Modal.Root>
     </LS.WorkspaceGridContainer>

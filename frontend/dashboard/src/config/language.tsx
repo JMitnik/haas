@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    issues: {
+      en: 'Issues',
+      de: 'Issues',
+    },
     happy_people: {
       en: 'Happy people',
       de: 'Glückliche Leute',

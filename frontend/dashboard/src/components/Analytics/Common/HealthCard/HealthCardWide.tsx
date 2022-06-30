@@ -132,28 +132,6 @@ export const HealthCardWide = ({
             </ProgressCircle>
           </UI.Flex>
         </UI.ColumnFlex>
-
-        {/* {!isPreview && (
-          <UI.Div>
-            <UI.Flex mt={2} justifyContent="space-between">
-              <UI.Span color="green.500" fontWeight={600}>
-                {t('happy_people')}
-              </UI.Span>
-              <UI.Span color="off.500">
-                {positiveResponseCount}
-              </UI.Span>
-            </UI.Flex>
-
-            <UI.Flex mt={1} justifyContent="space-between">
-              <UI.Span color="red.500" fontWeight={600}>
-                {t('unhappy_people')}
-              </UI.Span>
-              <UI.Span color="off.500">
-                {negativeResponseCount}
-              </UI.Span>
-            </UI.Flex>
-          </UI.Div>
-        )} */}
       </UI.CardBody>
     </UI.Card>
   );
