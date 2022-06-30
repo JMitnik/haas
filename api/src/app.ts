@@ -15,7 +15,6 @@ process.on('SIGTERM', async () => {
 });
 
 try {
-  console.log('App Lifecycle: Starting app');
   makeServer(config.port, prisma);
 } catch (e) {
   console.log(e);

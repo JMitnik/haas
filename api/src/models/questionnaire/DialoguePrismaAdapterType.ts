@@ -34,6 +34,10 @@ export interface CreateDialogueInput {
   isWithoutGenData?: boolean;
   endScreenText?: string | null;
   wasGeneratedWithGenData?: boolean;
+  postLeafText?: {
+    header?: string;
+    subHeader?: string;
+  };
   customer?: { id?: string; name?: string; slug?: string; create: boolean };
 }
 
@@ -68,6 +72,11 @@ export interface CreateQuestionInput {
       isRequired: boolean;
       position: number;
     }>;
+  };
+  share?: {
+    url: string;
+    tooltip: string;
+    title: string;
   };
   sliderNode?: {
     markers: Array<{

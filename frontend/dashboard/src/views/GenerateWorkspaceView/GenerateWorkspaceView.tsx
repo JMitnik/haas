@@ -70,6 +70,7 @@ export const GenerateWorkspaceView = () => {
       });
     },
     onError: (error) => {
+      console.log('ERROR: ', error);
       logger.logError(error, {
         tags: { section: 'campaign' },
       });

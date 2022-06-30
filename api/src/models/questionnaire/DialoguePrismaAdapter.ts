@@ -298,6 +298,9 @@ class DialoguePrismaAdapter {
                 videoUrl: question.videoEmbeddedNode.videoUrl,
               },
             } : undefined,
+            share: {
+              create: question.share,
+            },
             links: question.links?.length ? {
               create: question.links,
             } : undefined,
@@ -595,6 +598,12 @@ class DialoguePrismaAdapter {
         title: input.title,
         isPrivate: input.isPrivate,
         description: input.description,
+        postLeafNode: {
+          create: {
+            header: input.postLeafText?.header || '',
+            subtext: input.postLeafText?.subHeader || '',
+          },
+        },
         customer: customerType,
         questions: {
           create: [],

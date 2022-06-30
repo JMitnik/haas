@@ -71,7 +71,10 @@ class GenerateWorkspaceService {
     workspace: Customer & {
       roles: Role[];
     },
-    userId?: string) {
+    userId?: string,
+    sessionsPerDay: number = 1,
+    generateData: boolean = true,
+  ) {
     const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN);
     await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
       workspace.id,
@@ -92,18 +95,19 @@ class GenerateWorkspaceService {
 
     for (let i = 0; i < mappedDialogueInputData.length; i++) {
       const { slug, title } = mappedDialogueInputData[i];
+      const template = this.templateService.findTemplate(templateType as NexusGenEnums['DialogueTemplateType']);
+
       const dialogueInput: CreateDialogueInput = {
         slug: slug,
         title: title,
         description: '',
         customer: { id: workspace.id, create: false },
         isPrivate: false,
+        postLeafText: template?.postLeafText,
       };
 
       // Create initial dialogue
       const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
-
-      const template = this.templateService.findTemplate(templateType as NexusGenEnums['DialogueTemplateType']);
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
       // Make post leaf node if data specified in template
@@ -116,7 +120,9 @@ class GenerateWorkspaceService {
       await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, templateType);
 
       // Generate data
-      await this.dialogueService.massGenerateFakeData(dialogue.id, template, 1, true, 5, 70, 80);
+      if (generateData) {
+        await this.dialogueService.massGenerateFakeData(dialogue.id, template, sessionsPerDay, true, 5, 70, 80);
+      }
     }
 
     return null;
@@ -214,6 +220,10 @@ class GenerateWorkspaceService {
         description: '',
         customer: { id: workspace.id, create: false },
         isPrivate: hasEmailAssignee,
+        postLeafText: {
+          header: template.postLeafText?.header,
+          subHeader: template.postLeafText?.subHeader,
+        },
       };
 
       // Create initial dialogue
