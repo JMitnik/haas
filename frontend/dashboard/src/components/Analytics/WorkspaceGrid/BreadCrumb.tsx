@@ -8,9 +8,10 @@ import { HexagonState } from './WorkspaceGrid.types';
 
 interface BreadCrumbProps {
   historyQueue: HexagonState[];
+  onJumpToIndex: (index: number) => void;
 }
 
-export const BreadCrumb = ({ historyQueue }: BreadCrumbProps) => {
+export const BreadCrumb = ({ historyQueue, onJumpToIndex }: BreadCrumbProps) => {
   const { t } = useTranslation();
 
   return (
@@ -25,19 +26,19 @@ export const BreadCrumb = ({ historyQueue }: BreadCrumbProps) => {
         </UI.Span>
         <LS.ControlBody>
           <UI.Flex alignItems="center">
-            <UI.Button isDisabled={historyQueue.length === 0} variantColor='gray' variant='ghost' size="sm">
+            <UI.Button onClick={() => onJumpToIndex(0)} isDisabled={historyQueue.length === 0} variantColor='gray' variant='ghost' size="sm">
               <UI.Icon>
                 <Home />
               </UI.Icon>
             </UI.Button>
 
-            {historyQueue.map(state => (
+            {historyQueue.map((state, index) => (
               <React.Fragment key={state.selectedNode?.id}>
                 <UI.Icon>
                   <ChevronRight />
                 </UI.Icon>
 
-                <UI.Button variantColor='gray' variant='ghost' size="sm">
+                <UI.Button onClick={() => onJumpToIndex(index + 1)} variantColor='gray' variant='ghost' size="sm">
                   {state.selectedNode?.label}
                 </UI.Button>
               </React.Fragment>

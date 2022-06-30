@@ -369,7 +369,7 @@ export const WorkspaceGrid = ({
                 >
                   <UI.Div position="absolute" left={12} top={12}>
                     {historyQueue.length > 0 && (
-                      <BreadCrumb historyQueue={historyQueue} />
+                      <BreadCrumb historyQueue={historyQueue} onJumpToIndex={popToIndex} />
                     )}
                   </UI.Div>
                 </HexagonGrid>
