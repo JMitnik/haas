@@ -2154,10 +2154,5 @@ type WorkspaceStatistics {
   Topics of a workspace ranked by either impact score or number of responses
   """
   rankedTopics(input: DialogueStatisticsSummaryFilterInput): [TopicType!]!
-
-  """
-  Returns potentially the most urgent path of the workspace (one at most)
-  """
-  urgentPath(input: DialogueStatisticsSummaryFilterInput): UrgentPath
   workspaceStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
 }

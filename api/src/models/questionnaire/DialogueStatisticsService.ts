@@ -48,46 +48,6 @@ class DialogueStatisticsService {
     return `${dialogueId}_${type}_${startDateTime.getTime()}_${endDateTime?.getTime() ?? 0}`;
   }
 
-  /**
-   * Calculate potentially an urgent path for the workspace.
-   */
-  async calculateUrgentPath(
-    workspaceId: string,
-    startDate: Date,
-    endDate: Date,
-    topicFilter: TopicFilterInput = {},
-  ): Promise<UrgentPath | null> {
-    // An urgent path is a path which was considered urgent. This can be either one of the following:
-    // TODO: 1. A particular subject was triggered which was marked as "important" (this takes precedence)
-
-    const topicCounts = await this.topicService.countWorkspaceTopics(workspaceId, startDate, endDate, {
-      ...topicFilter,
-      relatedSessionScoreLowerThreshold: THRESHOLD,
-    });
-
-    // This is where the decision is made "what" is considered most urgent to report on.
-    const urgentTopic = maxBy(Object.values(topicCounts), 'count');
-
-    if (!urgentTopic) return null;
-
-    return {
-      id: `URGENT_PATH_${workspaceId}`,
-      path: {
-        id: `PATH_URGENT_PATH_${workspaceId}`,
-        topicStrings: urgentTopic.relatedTopics,
-      },
-      // This is resolved separately.
-      dialogue: null,
-      // TODO: Accept multiple dialogues as output, we only return the "first" one right now.
-      dialogueId: urgentTopic.dialogueIds[0],
-      // Basic stats
-      basicStats: {
-        average: urgentTopic.score,
-        responseCount: urgentTopic.count,
-      },
-    }
-  }
-
   findDialogueHealthScore = async (
     dialogueId: string,
     startDateTime: Date,
@@ -319,11 +279,11 @@ class DialogueStatisticsService {
 
   /**
    * Generates a statistics summary of all dialogues within a workspace
-   * @param customerId 
-   * @param impactScoreType 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @returns 
+   * @param customerId
+   * @param impactScoreType
+   * @param startDateTime
+   * @param endDateTime
+   * @returns
    */
   findWorkspaceStatisticsSummary = async (
     customerId: string,

@@ -2799,8 +2799,6 @@ export type WorkspaceStatistics = {
   rankedTopics: Array<TopicType>;
   /** Gets the health score of the workspace */
   health: HealthScore;
-  /** Returns potentially the most urgent path of the workspace (one at most) */
-  urgentPath?: Maybe<UrgentPath>;
   /** Get the path (sequence of topics) with the most changed impact score. */
   mostChangedPath: MostChangedPath;
   mostTrendingTopic?: Maybe<MostTrendingTopic>;
@@ -2825,11 +2823,6 @@ export type WorkspaceStatisticsRankedTopicsArgs = {
 
 export type WorkspaceStatisticsHealthArgs = {
   input?: Maybe<HealthScoreInput>;
-};
-
-
-export type WorkspaceStatisticsUrgentPathArgs = {
-  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
 
@@ -2973,19 +2966,6 @@ export type GetWorkspaceSummaryDetailsQuery = (
           { __typename?: 'BasicStatistics' }
           & Pick<BasicStatistics, 'average' | 'responseCount'>
         )> }
-      )>, urgentPath?: Maybe<(
-        { __typename?: 'UrgentPath' }
-        & Pick<UrgentPath, 'id'>
-        & { path: (
-          { __typename?: 'Path' }
-          & Pick<Path, 'id' | 'topicStrings'>
-        ), dialogue?: Maybe<(
-          { __typename?: 'Dialogue' }
-          & Pick<Dialogue, 'id' | 'title'>
-        )>, basicStats: (
-          { __typename?: 'BasicStatistics' }
-          & Pick<BasicStatistics, 'responseCount' | 'average'>
-        ) }
       )> }
     )> }
   )> }
@@ -4130,25 +4110,6 @@ export const GetWorkspaceSummaryDetailsDocument = gql`
         basicStats {
           average
           responseCount
-        }
-      }
-      urgentPath(input: $summaryInput) {
-        id
-        path {
-          id
-          topicStrings
-        }
-        dialogue {
-          id
-          title
-        }
-        path {
-          id
-          topicStrings
-        }
-        basicStats {
-          responseCount
-          average
         }
       }
     }
@@ -5983,11 +5944,6 @@ export namespace GetWorkspaceSummaryDetails {
   export type Health = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['health']>);
   export type RankedTopics = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['rankedTopics']>)[number]>;
   export type BasicStats = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['rankedTopics']>)[number]>['basicStats']>);
-  export type UrgentPath = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>);
-  export type Path = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>)['path']>);
-  export type Dialogue = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>)['dialogue']>);
-  export type _Path = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>)['path']>);
-  export type _BasicStats = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['urgentPath']>)['basicStats']>);
   export const Document = GetWorkspaceSummaryDetailsDocument;
 }
 

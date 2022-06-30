@@ -2261,7 +2261,6 @@ export interface NexusGenFieldTypes {
     mostPopularPath: NexusGenRootTypes['MostPopularPath'] | null; // MostPopularPath
     mostTrendingTopic: NexusGenRootTypes['MostTrendingTopic'] | null; // MostTrendingTopic
     rankedTopics: NexusGenRootTypes['TopicType'][]; // [TopicType!]!
-    urgentPath: NexusGenRootTypes['UrgentPath'] | null; // UrgentPath
     workspaceStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][] | null; // [DialogueStatisticsSummaryModel!]
   }
   lineChartDataType: { // field return type
@@ -2675,9 +2674,6 @@ export interface NexusGenArgTypes {
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     rankedTopics: { // args
-      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
-    }
-    urgentPath: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     workspaceStatisticsSummary: { // args
