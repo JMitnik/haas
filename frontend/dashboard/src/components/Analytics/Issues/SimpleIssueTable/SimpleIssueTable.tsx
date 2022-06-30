@@ -1,5 +1,6 @@
 import * as UI from '@haas/ui';
 import { AlertTriangle, Filter } from 'react-feather';
+import styled, { css } from 'styled-components';
 import React from 'react';
 
 import { EventBars } from 'components/Analytics/Common/EventBars/EventBars';
@@ -10,7 +11,7 @@ import { ScoreBox } from 'components/ScoreBox';
 import { IssueActionLabels } from './IssueActionLabels';
 import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEnabledLabel';
 
-const columns = '50px 3fr 50px 150px 80px';
+const columns = '50px 3fr 100px 200px';
 interface SimpleIssueTableProps {
   inPreview: boolean;
   onResetFilter: () => void;
@@ -21,6 +22,19 @@ interface SimpleIssueTableProps {
 }
 
 const CUTOFF = 3;
+
+const IssueBody = styled(UI.CardBody)`
+  ${({ theme }) => css`
+    transition: all ${theme.transitions.normal};
+    background-color: white;
+
+    &:hover {
+      cursor: pointer;
+      transition: all ${theme.transitions.normal};
+      background-color: ${theme.colors.neutral[500]};
+    }
+  `}
+`;
 
 export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIssueModal, isFilterEnabled = false, inPreview = true }: SimpleIssueTableProps) => {
   const shownIssues = inPreview ? issues.slice(0, CUTOFF) : issues;
@@ -57,18 +71,22 @@ export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIs
           <UI.Helper>
             Votes
           </UI.Helper>
+          <UI.Helper>
+            Pulse
+          </UI.Helper>
         </UI.Grid>
       </UI.CardHeader>
 
       <UI.Div>
-        <UI.CardBody>
-          {shownIssues.map((issue, index) => (
+        {shownIssues.map((issue, index) => (
+          <IssueBody
+            key={index}
+            borderBottom="1px solid"
+            borderColor="off.100"
+            onClick={() => onIssueClick(issue)}
+          >
             <UI.Grid
               key={index}
-              pt={index > 0 ? 2 : 0}
-              borderTop={index > 0 ? '1px solid' : '0'}
-              borderColor="off.100"
-              pb={2}
               gridTemplateColumns={columns}
             >
               <UI.Flex alignItems="center">
@@ -106,27 +124,19 @@ export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIs
                   <UI.Div>
                     <EventBars
                       events={issue.history.items}
-                      width={100}
+                      width={150}
                       height={40}
                     />
                   </UI.Div>
                 </UI.Flex>
               </UI.Flex>
-
-              <UI.Flex alignItems="center">
-                <ControlButton
-                  onClick={() => onIssueClick(issue)}
-                >
-                  <UI.Icon>
-                    <Filter />
-                  </UI.Icon>
-                </ControlButton>
-              </UI.Flex>
             </UI.Grid>
-          ))}
+          </IssueBody>
+        ))}
 
+        <UI.CardBody>
           {issues.length > CUTOFF && inPreview && onOpenIssueModal && (
-            <UI.Flex justifyContent="center" mt={2}>
+            <UI.Flex justifyContent="center">
               <UI.Button onClick={onOpenIssueModal} variant="outline" variantColor="red">
                 Show more
               </UI.Button>
