@@ -99,6 +99,7 @@ export class IssueService {
             items: convertDatesToHistogramItems(topicStats.dates),
           },
           rankScore,
+          followUpAction: topicStats.followUpActions.length > 0 ? (topicStats.followUpActions[0] || null) : null,
         })
       });
     });
