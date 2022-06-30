@@ -1,4 +1,4 @@
-import { Event } from 'components/Analytics/Common/EventBars/EventBars';
+import { Event } from 'components/Analytics/Common/EventBars/EventBars.helpers';
 
 export enum ActionType {
   Contact = 'contact',
