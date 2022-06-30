@@ -315,13 +315,19 @@ export const WorkspaceGrid = ({
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       <UI.Container px={4}>
-        <UI.Flex position="relative" zIndex={200} justifyContent="space-between" py={4} alignItems="center" flexWrap="wrap">
+        <UI.Flex position="relative" zIndex={200} justifyContent="space-between" py={4} flexWrap="wrap">
           <UI.Div>
-            <WorkspaceGridHeader
-              previousStateLabels={previousLabels}
-              currentState={currentState}
-              workspaceName={activeCustomer?.name || ''}
-            />
+            <UI.H1 textAlign="left" fontWeight="900" color="main.500" mb={4}>
+              {activeCustomer?.name}
+            </UI.H1>
+
+            <UI.Helper>
+              Responses
+            </UI.Helper>
+
+            <UI.H2 color="off.600">
+              2000
+            </UI.H2>
           </UI.Div>
 
           <UI.Div>
