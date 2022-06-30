@@ -29,22 +29,20 @@ export class TopicService {
    * @returns boolean 
    */
   deselectTopic = async (input: NexusGenInputs['DeselectTopicInput']) => {
-    const dialogues = await this.workspaceService.getDialogues(input.workspaceId);
+    const dialoguesIds = await this.dialogueService.findDialogueIdsByCustomerId(input.workspaceId);
 
-    for (const dialogue of dialogues) {
-      const questions = await this.dialogueService.getQuestionsByDialogueId(dialogue.id);
-      for (const question of questions) {
-        const option = question.options.find((option) => option.value === input.topic);
-        if (option) {
-          const newOption = {
-            ...option,
-            isTopic: false,
-            overrideLeafId: option.overrideLeafId || undefined,
-          };
-          await this.questionNodePrismaAdapter.updateQuestionOptions([newOption]);
-        }
-      }
-    }
+    const questionOptions = await this.questionNodePrismaAdapter.findQuestionOptionsBySelectedTopic(
+      dialoguesIds,
+      input.topic
+    );
+
+    const mappedOptions = questionOptions.map((option) => ({
+      ...option,
+      isTopic: false,
+      overrideLeafId: option.overrideLeafId || undefined,
+    }));
+
+    await this.questionNodePrismaAdapter.updateQuestionOptions(mappedOptions);
 
     return true;
   }

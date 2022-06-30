@@ -12,6 +12,27 @@ class QuestionNodePrismaAdapter {
     this.prisma = prismaClient;
   }
 
+  /**
+   * Finds all topic question options within a list of dialogues matching a string
+   * @param dialogueIds 
+   * @param topic 
+   * @returns 
+   */
+  findQuestionOptionsBySelectedTopic = async (dialogueIds: string[], topic: string) => {
+    const questionOptions = await this.prisma.questionOption.findMany({
+      where: {
+        value: topic,
+        isTopic: true,
+        QuestionNode: {
+          questionDialogueId: {
+            in: dialogueIds,
+          },
+        },
+      },
+    });
+    return questionOptions
+  }
+
 
   findSliderNodeByDialogueId = async (dialogueId: string) => {
     return this.prisma.questionNode.findFirst({
