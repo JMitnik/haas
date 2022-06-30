@@ -4,6 +4,9 @@ import React from 'react';
 import { QuestionNode, QuestionNodeTypeEnum } from 'types/core-types';
 import { useDialogueState } from 'modules/Dialogue/DialogueState';
 
+import { LanguageEnumType } from 'types/generated-types';
+import Color from 'color';
+import styled, { css } from 'styled-components';
 import { PostLeafNodeContainer } from './PostLeafNodeStyles';
 
 export const POSTLEAFNODE_ID = '-1';
@@ -19,6 +22,28 @@ export const defaultPostLeafNode: QuestionNode = {
   children: [],
 };
 
+const getCloseText = (language?: LanguageEnumType) => {
+  switch (language) {
+    case LanguageEnumType.Dutch:
+      return 'U kunt nu dit scherm sluiten';
+    case LanguageEnumType.English:
+      return 'You may close this window now';
+    case LanguageEnumType.German:
+      return 'Sie können dieses Fenster jetzt schließen';
+    default:
+      return 'You may close this window now';
+  }
+};
+
+const AdjustedColourWrapper = styled(UI.Div)`
+  ${({ theme }) => css`
+    font-weight: 600;
+    color: ${Color(theme.colors.primary).isDark()
+      ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
+      : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+  `}
+`;
+
 const PostLeafNode = () => {
   const { dialogue } = useDialogueState();
 
@@ -27,10 +52,13 @@ const PostLeafNode = () => {
 
   return (
     <PostLeafNodeContainer>
-      <UI.H2 color="white">{header}</UI.H2>
-      <UI.H4 color="white" textAlign="center">
-        {subHeader}
-      </UI.H4>
+      <UI.H2>{header}</UI.H2>
+      <UI.Div>
+        <UI.H4 textAlign="center">
+          {subHeader}
+        </UI.H4>
+        <UI.Div>{getCloseText(dialogue?.language)}</UI.Div>
+      </UI.Div>
     </PostLeafNodeContainer>
   );
 };
