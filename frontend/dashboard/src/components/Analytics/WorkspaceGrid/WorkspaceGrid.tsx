@@ -300,10 +300,6 @@ export const WorkspaceGrid = ({
 
   // Various stats fields
   const health = summary?.health;
-  const urgentPath = summary?.urgentPath;
-  const rankedTopics = summary?.rankedTopics || [];
-
-  const responseCount = summary?.basicStats?.responseCount || 0;
 
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>

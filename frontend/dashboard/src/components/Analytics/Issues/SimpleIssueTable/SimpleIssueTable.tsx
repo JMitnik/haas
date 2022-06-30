@@ -10,7 +10,7 @@ import { ScoreBox } from 'components/ScoreBox';
 import { IssueActionLabels } from './IssueActionLabels';
 import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEnabledLabel';
 
-const columns = '60px 2fr 50px 2fr 80px';
+const columns = '50px 3fr 50px 150px 80px';
 interface SimpleIssueTableProps {
   inPreview: boolean;
   onResetFilter: () => void;
@@ -106,7 +106,7 @@ export const SimpleIssueTable = ({ issues, onIssueClick,onResetFilter, onOpenIss
                   <UI.Div>
                     <EventBars
                       events={issue.history.items}
-                      width={200}
+                      width={100}
                       height={40}
                     />
                   </UI.Div>

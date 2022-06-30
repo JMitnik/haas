@@ -25,31 +25,8 @@ export const WorkspaceGridHeader = ({
   return (
     <UI.Div>
       <UI.H1 textAlign="left" fontWeight="900" pt={4} color="off.500" lineHeight="1.2">
-        {title}
+        {workspaceName}
       </UI.H1>
-      {previousStateLabels.length > 0 ? (
-        <UI.Span color="off.400" fontSize="1.1rem">
-          <UI.Flex justifyContent="center">
-            <UI.Span mr={1}>
-              in
-            </UI.Span>
-            {previousStateLabels.map((label, index) => (
-              <UI.Span key={`${label}-${index}`} color="off.400" fontSize="1.1rem">
-                {label}
-                <UI.Span mx={1}>
-                  {index < previousStateLabels.length - 1 && (
-                    <UI.Icon>
-                      <ChevronRight width={14} />
-                    </UI.Icon>
-                  )}
-                </UI.Span>
-              </UI.Span>
-            ))}
-          </UI.Flex>
-        </UI.Span>
-      ) : (
-        <UI.Div height="30px" />
-      )}
     </UI.Div>
   );
 };
