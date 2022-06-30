@@ -315,7 +315,7 @@ export const WorkspaceGrid = ({
       <UI.Container px={4}>
         <UI.Flex position="relative" zIndex={200} justifyContent="space-between" py={4} flexWrap="wrap">
           <UI.Div>
-            <UI.H1 textAlign="left" fontWeight="900" color="main.500" mb={4}>
+            <UI.H1 lineHeight="1" textAlign="left" fontWeight="900" color="main.500">
               {activeCustomer?.name}
             </UI.H1>
           </UI.Div>
@@ -329,6 +329,8 @@ export const WorkspaceGrid = ({
             />
           </UI.Div>
         </UI.Flex>
+
+        <UI.Hr />
 
         <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "2fr 1fr"]}>
           <UI.Div>
