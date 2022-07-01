@@ -21,7 +21,7 @@ export const OutlineButton = styled(Button)`
 
 type Size = 'sm' | 'md' | 'lg';
 
-export const ClientButton = styled(Button) <{ usePulse?: boolean, size?: Size }>`
+export const ClientButton = styled(Button)<{ usePulse?: boolean, size?: Size }>`
   ${({ isActive = true, theme, usePulse = false, size }) => css`
     width: 100%;
     grid-column: 1 / 2;

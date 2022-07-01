@@ -40,7 +40,7 @@ export const TooltipDialogueBody = ({ node }: { node: HexagonDialogueNode }) => 
                     <MessageCircle />
                   </UI.Icon>
                   <UI.Span ml={1}>
-                    {node.dialogue.dialogueStatisticsSummary?.nrVotes}
+                    {node.dialogue?.nrVotes}
                   </UI.Span>
                 </UI.Flex>
               </UI.Span>

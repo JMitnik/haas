@@ -7,3 +7,4 @@
 serviceWorker.ts
 src/serviceWorker.ts
 **/serviceWorker.ts
+generated-types.ts

@@ -611,6 +611,12 @@ class DialoguePrismaAdapter {
         title: input.title,
         isPrivate: input.isPrivate,
         description: input.description,
+        postLeafNode: {
+          create: {
+            header: input.postLeafText?.header || '',
+            subtext: input.postLeafText?.subHeader || '',
+          },
+        },
         customer: customerType,
         questions: {
           create: [],
@@ -804,9 +810,6 @@ class DialoguePrismaAdapter {
 
     return this.prisma.dialogue.findMany({
       where: whereInput,
-      include: {
-        tags: true,
-      },
     });
   };
 

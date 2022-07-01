@@ -190,6 +190,24 @@ class DialogueStatisticsService {
    * @param sessions a list of sessions
    * @returns an impact score or null if no sessions/type are provided
    */
+  calculateImpactScoreBySessions = (type: DialogueImpactScore, sessions: Session[]) => {
+    switch (type) {
+      case DialogueImpactScore.AVERAGE:
+        const sliderValues = sessions.map((session) => session.mainScore).filter(isPresent);
+        const average = mean(sliderValues);
+        return average;
+
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Calculates impact score of a list of sessions
+   * @param type an impact score type
+   * @param sessions a list of sessions
+   * @returns an impact score or null if no sessions/type are provided
+   */
   calculateImpactScore = async (type: DialogueImpactScore, sessions: Session[]) => {
     switch (type) {
       case DialogueImpactScore.AVERAGE:
@@ -291,6 +309,63 @@ class DialogueStatisticsService {
     })).slice(0, cutoff);
 
     return rankedTopics;
+  }
+
+  /**
+   * Generates a statistics summary of all dialogues within a workspace
+   * @param customerId 
+   * @param impactScoreType 
+   * @param startDateTime 
+   * @param endDateTime 
+   * @returns 
+   */
+  findWorkspaceStatisticsSummary = async (
+    customerId: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+  ) => {
+    const dialogues = await this.dialogueService.findDialoguesByCustomerId(customerId);
+    const dialogueIds = dialogues.map((dialogue) => dialogue.id);
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const sessions = await this.sessionService.findSessionsForDialogues(
+      dialogueIds,
+      startDateTime as Date,
+      endDateTimeSet,
+    );
+
+    // Group node entries by their dialogue ids so we can calculate impact score
+    const sessionContext = groupBy(sessions, (session) => session?.dialogueId);
+
+    // If no node entries/sessions exist for a dialogue return empty list so cache entry can still get created
+    dialogueIds.forEach((dialogueId) => {
+      if (!sessionContext[dialogueId]) {
+        sessionContext[dialogueId] = [];
+      }
+    });
+
+    const summaries = Object.entries(sessionContext).map((context) => {
+      const dialogueId = context[0];
+      const sessions = context[1];
+      const impactScore = this.calculateImpactScoreBySessions(
+        impactScoreType,
+        sessions
+      );
+
+      const data = {
+        id: dialogueId,
+        dialogueId,
+        updatedAt: toUTC(new Date(Date.now())),
+        impactScore: impactScore || 0,
+        nrVotes: sessions.length || 0,
+        dialogue: dialogues.find((dialogue) => dialogue.id === dialogueId) || null,
+      }
+
+      return data;
+    });
+
+    return summaries;
   }
 
   /**
