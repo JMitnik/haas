@@ -354,8 +354,8 @@ class SessionPrismaAdapter {
     // Optional: filter by date
     if (filter?.startDate || filter?.endDate) {
       query.createdAt = {
-        gte: filter?.startDate ? new Date(filter.startDate) : undefined,
-        lte: filter?.endDate ? new Date(filter.endDate) : undefined,
+        gte: filter?.startDate ? filter.startDate : undefined,
+        lte: filter?.endDate ? filter.endDate : undefined,
       }
     }
 
