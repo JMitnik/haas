@@ -30,7 +30,6 @@ export const SessionType = objectType({
         if (parent.score) return parent.score;
         if (parent.mainScore) return parent.mainScore;
 
-
         const score = await SessionService.findSessionScore(parent.id) || 0.0;
 
         return score;

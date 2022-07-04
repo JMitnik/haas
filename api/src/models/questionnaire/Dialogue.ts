@@ -399,14 +399,13 @@ export const DialogueType = objectType({
 
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
+
         const sessionConnection = await ctx.services.sessionService.getSessionConnection(
           parent.id,
           args.filter
         );
 
-        if (!sessionConnection) return null;
-
-        return sessionConnection;
+        return sessionConnection || null;
       },
     });
 

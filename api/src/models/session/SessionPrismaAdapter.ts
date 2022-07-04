@@ -15,78 +15,13 @@ class SessionPrismaAdapter {
     this.prisma = prismaClient;
   };
 
-
-  /**
-   * Builds a where query to filter the sessions in the DB with
-   * @param dialogueIds 
-   * @param filter 
-   * @returns Prisma.SessionWhereInput
-   */
-  buildFindWorkspaceSessionsQuery = (
-    dialogueIds: string[],
-    filter?: SessionConnectionFilterInput | null
-  ) => {
-    let query: Prisma.SessionWhereInput = {
-      dialogueId: {
-        in: dialogueIds,
-      },
-    };
-
-    // Optional: filter by score range.
-    if (filter?.scoreRange?.min || filter?.scoreRange?.max) {
-      query.mainScore = {
-        gte: filter?.scoreRange?.min || undefined,
-        lte: filter?.scoreRange.max || undefined,
-      }
-    }
-
-    // Optional: filter by date
-    if (filter?.startDate || filter?.endDate) {
-      query.createdAt = {
-        gte: filter?.startDate || undefined,
-        lte: filter?.endDate ? filter.endDate : addDays(filter?.startDate as Date, 7),
-      }
-    }
-
-    // Add search filter
-    if (filter?.search) {
-      query = {
-        ...cloneDeep(query),
-        nodeEntries: {
-          some: {
-            // Allow searching in choices and form entries
-            OR: [
-              {
-                choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } },
-              },
-              {
-                formNodeEntry: {
-                  values: {
-                    some: {
-                      OR: [
-                        { longText: { contains: filter.search, mode: 'insensitive' } },
-                        { shortText: { contains: filter.search, mode: 'insensitive' } },
-                      ],
-                    },
-                  },
-                },
-              },
-            ],
-          },
-        },
-      }
-    }
-
-    return query;
-  }
-
   /**
    * Finds sessions within a workspace based on a set of filters
-   * @param dialogueIds 
-   * @param filter 
-   * @returns 
+   * @param dialogueIds
+   * @param filter
+   * @returns
    */
-  findWorkspaceSessions = async (dialogueIds: string[], filter?: SessionConnectionFilterInput | null) => {
+  public async findWorkspaceSessions(dialogueIds: string[], filter?: SessionConnectionFilterInput | null) {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
 
@@ -110,9 +45,9 @@ class SessionPrismaAdapter {
 
   /**
    * Counts sessions within a workspace based on a set of filters
-   * @param dialogueIds 
-   * @param filter 
-   * @returns 
+   * @param dialogueIds
+   * @param filter
+   * @returns
    */
   countWorkspaceSessions = async (dialogueIds: string[], filter?: SessionConnectionFilterInput | null) => {
     return this.prisma.session.count({
@@ -122,10 +57,10 @@ class SessionPrismaAdapter {
 
   /**
    * Finds sessions by customer ID between two dates
-   * @param customerId 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @returns 
+   * @param customerId
+   * @param startDateTime
+   * @param endDateTime
+   * @returns
    */
   findCustomerSessions = async (
     customerId: string,
@@ -155,10 +90,10 @@ class SessionPrismaAdapter {
 
   /**
    * Finds sessions by dialogue ID between two dates
-   * @param dialogueId 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @returns 
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
+   * @returns
    */
   findDialogueSessions = async (
     dialogueId: string,
@@ -186,13 +121,13 @@ class SessionPrismaAdapter {
 
   /**
    * Upserts a pathed sessions cache
-   * @param cacheId 
-   * @param dialogueId 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @param path 
-   * @param pathedSessions 
-   * @returns 
+   * @param cacheId
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
+   * @param path
+   * @param pathedSessions
+   * @returns
    */
   upsertPathedSessionCache = async (
     cacheId: string,
@@ -232,11 +167,11 @@ class SessionPrismaAdapter {
 
   /**
    * Finds a cache for a pathed sessions entry
-   * @param dialogueId 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @param path 
-   * @returns 
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
+   * @param path
+   * @returns
    */
   findPathedSessionsCache = async (
     dialogueId: string,
@@ -746,6 +681,69 @@ class SessionPrismaAdapter {
     return session;
   };
 
+  /**
+   * Builds a where query to filter the sessions in the DB with
+   * @param dialogueIds
+   * @param filter
+   * @returns Prisma.SessionWhereInput
+   */
+  private buildFindWorkspaceSessionsQuery(
+    dialogueIds: string[],
+    filter?: SessionConnectionFilterInput | null
+  ) {
+    let query: Prisma.SessionWhereInput = {
+      dialogueId: {
+        in: dialogueIds,
+      },
+    };
+
+    // Optional: filter by score range.
+    if (filter?.scoreRange?.min || filter?.scoreRange?.max) {
+      query.mainScore = {
+        gte: filter?.scoreRange?.min || undefined,
+        lte: filter?.scoreRange.max || undefined,
+      }
+    }
+
+    // Optional: filter by date
+    if (filter?.startDate || filter?.endDate) {
+      query.createdAt = {
+        gte: filter?.startDate || undefined,
+        lte: filter?.endDate ? filter.endDate : addDays(filter?.startDate as Date, 7),
+      }
+    }
+
+    // Add search filter
+    if (filter?.search) {
+      query = {
+        ...cloneDeep(query),
+        nodeEntries: {
+          some: {
+            // Allow searching in choices and form entries
+            OR: [
+              {
+                choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } },
+              },
+              {
+                formNodeEntry: {
+                  values: {
+                    some: {
+                      OR: [
+                        { longText: { contains: filter.search, mode: 'insensitive' } },
+                        { shortText: { contains: filter.search, mode: 'insensitive' } },
+                      ],
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      }
+    }
+
+    return query;
+  }
 };
 
 

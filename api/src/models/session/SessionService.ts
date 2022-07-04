@@ -11,7 +11,7 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionActionType, SessionConnectionFilterInput, SessionWithEntries } from './SessionTypes';
+import { SessionActionType, SessionConnection, SessionConnectionFilterInput, SessionWithEntries } from './SessionTypes';
 import { TopicByString, TopicStatistics } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
@@ -487,7 +487,7 @@ class SessionService {
   getWorkspaceSessionConnection = async (
     workspaceId: string,
     filter?: SessionConnectionFilterInput | null
-  ): Promise<NexusGenFieldTypes['SessionConnection'] | null> => {
+  ): Promise<SessionConnection | null> => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
     let dialogueIds = filter?.dialogueIds;

@@ -469,12 +469,10 @@ export const WorkspaceMutations = Upload && extendType({
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
-          },
-            (error, result: UploadApiResponse | undefined) => {
-              if (result) return resolve(result);
-
-              return reject(error);
-            });
+          }, (error, result: UploadApiResponse | undefined) => {
+            if (result) return resolve(result);
+            return reject(error);
+          });
 
           return createReadStream().pipe(cld_upload_stream);
         });
