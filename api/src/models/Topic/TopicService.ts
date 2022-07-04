@@ -43,6 +43,41 @@ export class TopicService {
   /**
    * Count topics and their frequencies for a given topic.
    */
+  async countWorkspaceTopicsByDialogue(
+    workspaceId: string,
+    startDate: Date,
+    endDate: Date,
+    topicFilter?: TopicFilterInput
+  ): Promise<TopicByString> {
+    const dialogueIds = (
+      await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
+    ).map(dialogue => dialogue.id);
+
+    // Fetch all sessions for the dialogues.
+    const sessions = await this.sessionService.findSessionsForDialogues(
+      dialogueIds,
+      startDate,
+      endDate,
+      this.buildSessionFilter(topicFilter),
+      {
+        nodeEntries:
+        {
+          include:
+            { choiceNodeEntry: true, formNodeEntry: { include: { values: { include: { relatedField: true } } } } },
+        },
+      }
+    ) as unknown as SessionWithEntries[];
+
+    // Calculate all the candidate topic-counts.
+    const dialogueTopicStatistics = this.sessionService.extractTopicsByDialogue(sessions);
+    console.dir(dialogueTopicStatistics, { depth: 10 });
+
+    return dialogueTopicStatistics;
+  }
+
+  /**
+   * Count topics and their frequencies for a given topic.
+   */
   async countWorkspaceTopics(
     workspaceId: string,
     startDate: Date,
@@ -59,9 +94,11 @@ export class TopicService {
       startDate,
       endDate,
       this.buildSessionFilter(topicFilter),
-      { nodeEntries:
-        { include:
-          { choiceNodeEntry: true, formNodeEntry: { include: {  values: { include: { relatedField: true } }} } },
+      {
+        nodeEntries:
+        {
+          include:
+            { choiceNodeEntry: true, formNodeEntry: { include: { values: { include: { relatedField: true } } } } },
         },
       }
     ) as unknown as SessionWithEntries[];

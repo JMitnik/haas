@@ -23,6 +23,20 @@ export class IssueService {
    * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
    * @param workspaceId Workspace ID
    */
+  public async getWorkspaceIssuesByDialogue(workspaceId: string, filter: IssueFilterInput): Promise<Issue[]> {
+    const dialogues = await this.topicService.countWorkspaceTopicsByDialogue(
+      workspaceId, filter.startDate, filter.endDate, filter
+    );
+    const issues = orderBy(this.extractIssuesByDialogue(dialogues), (topic) => topic.rankScore, 'desc');
+
+    // Filter out topics that are candidate issues.
+    return issues;
+  }
+
+  /**
+   * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
+   * @param workspaceId Workspace ID
+   */
   public async getWorkspaceIssues(workspaceId: string, filter: IssueFilterInput): Promise<Issue[]> {
     const topics = await this.topicService.countWorkspaceTopics(workspaceId, filter.startDate, filter.endDate, filter);
     const issues = orderBy(this.extractIssues(topics), (topic) => topic.rankScore, 'desc');
@@ -66,6 +80,48 @@ export class IssueService {
     }, 0);
 
     return score;
+  }
+
+  /**
+   * Extracts all issues from a topic-by-string map.
+   *
+   * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
+   */
+  private extractIssuesByDialogue(dialogues: TopicByString): Issue[] {
+    let issues: Issue[] = [];
+
+    // Split each topic based on the dialogues.
+    Object.entries(dialogues).forEach(([dialogueId, dialogueTopics]) => {
+      // DO SOMETHING HERE WITH ALL TOPICS (MERGE OR SOMETHING)
+
+      Object.entries(dialogueTopics).forEach(([topicName, topicStats]) => {
+        if (topicStats.score > 50) return false;
+
+        const rankScore = this.calculateScore(topicStats);
+
+        issues.push({
+          id: `${topicName}-${dialogueId}`,
+          topic: topicName,
+          basicStats: {
+            average: topicStats.score,
+            responseCount: topicStats.count,
+          },
+          dialogue: null,
+          dialogueId,
+          createdAt: topicStats.dates[0],
+          updatedAt: topicStats.dates[topicStats.dates.length - 1],
+          status: 'OPEN',
+          history: {
+            id: `${topicName}-${dialogueId}-hist`,
+            items: convertDatesToHistogramItems(topicStats.dates),
+          },
+          rankScore,
+          followUpAction: topicStats.followUpActions.find(isPresent) || null,
+        })
+      });
+    });
+
+    return issues;
   }
 
   /**
