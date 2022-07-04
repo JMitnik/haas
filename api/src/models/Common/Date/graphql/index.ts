@@ -1,1 +1,1 @@
-export * from './DateStringScalar';
+export * from './DateStringScalar.graphql';
