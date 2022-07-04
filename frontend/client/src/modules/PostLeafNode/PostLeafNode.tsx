@@ -6,6 +6,7 @@ import { useDialogueState } from 'modules/Dialogue/DialogueState';
 
 import { LanguageEnumType } from 'types/generated-types';
 import { PostLeafNodeContainer } from './PostLeafNodeStyles';
+import { MainHeader, SubHeader, Text } from 'components/Type/Headers';
 
 export const POSTLEAFNODE_ID = '-1';
 
@@ -41,12 +42,12 @@ const PostLeafNode = () => {
 
   return (
     <PostLeafNodeContainer>
-      <UI.H2>{header}</UI.H2>
+      <MainHeader>{header}</MainHeader>
       <UI.Div>
-        <UI.H4 textAlign="center">
+        <SubHeader textAlign="center">
           {subHeader}
-        </UI.H4>
-        <UI.Div>{getCloseText(dialogue?.language)}</UI.Div>
+        </SubHeader>
+        <Text>{getCloseText(dialogue?.language)}</Text>
       </UI.Div>
     </PostLeafNodeContainer>
   );

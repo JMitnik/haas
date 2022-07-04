@@ -86,7 +86,6 @@ export const H1 = styled(GenericType).attrs({ as: 'h1' })`
 
 export const H2 = styled(GenericType).attrs({ as: 'h2' })`
   ${({ theme, fontWeight = 800 }) => css`
-    color: inherit;
     font-weight: ${fontWeight?.toString() || 800};
     font-size: ${theme.fontSizes[4]}px;
   `}
@@ -108,7 +107,6 @@ export const H3 = styled(GenericType).attrs({ as: 'h3' })`
 
 export const H4 = styled(GenericType).attrs({ as: 'h4' })`
   ${({ theme, fontWeight }) => css`
-    color: inherit;
     font-size: ${theme.fontSizes[2]}px;
     font-weight: ${fontWeight?.toString() || 800};
   `}
