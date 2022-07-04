@@ -29,7 +29,7 @@ class SessionPrismaAdapter {
       where: this.buildFindWorkspaceSessionsQuery(dialogueIds, filter),
       skip: offset,
       take: perPage,
-      orderBy: this.buildOrderByQuery(filter as NexusGenInputs['SessionConnectionFilterInput']),
+      orderBy: this.buildOrderByQuery(filter),
       include: {
         dialogue: true,
         nodeEntries: {
