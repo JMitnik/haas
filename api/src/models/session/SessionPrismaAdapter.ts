@@ -5,7 +5,7 @@ import { NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { CreateSessionInput } from './SessionPrismaAdapterType';
 import { generateTimeSpent } from './SessionHelpers';
-import { SessionConnectionFilterInput } from './SessionService';
+import { SessionConnectionFilterInput } from './SessionTypes';
 import { addDays } from 'date-fns';
 
 class SessionPrismaAdapter {
@@ -15,6 +15,13 @@ class SessionPrismaAdapter {
     this.prisma = prismaClient;
   };
 
+
+  /**
+   * Builds a where query to filter the sessions in the DB with
+   * @param dialogueIds 
+   * @param filter 
+   * @returns Prisma.SessionWhereInput
+   */
   buildFindWorkspaceSessionsQuery = (
     dialogueIds: string[],
     filter?: SessionConnectionFilterInput | null
@@ -45,36 +52,40 @@ class SessionPrismaAdapter {
     if (filter?.search) {
       query = {
         ...cloneDeep(query),
-        OR: [{
-          nodeEntries: {
-            some: {
-              // Allow searching in choices and form entries
-              OR: [
-                {
-                  choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } },
-                },
-                {
-                  formNodeEntry: {
-                    values: {
-                      some: {
-                        OR: [
-                          { longText: { contains: filter.search, mode: 'insensitive' } },
-                          { shortText: { contains: filter.search, mode: 'insensitive' } },
-                        ],
-                      },
+        nodeEntries: {
+          some: {
+            // Allow searching in choices and form entries
+            OR: [
+              {
+                choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } },
+              },
+              {
+                formNodeEntry: {
+                  values: {
+                    some: {
+                      OR: [
+                        { longText: { contains: filter.search, mode: 'insensitive' } },
+                        { shortText: { contains: filter.search, mode: 'insensitive' } },
+                      ],
                     },
                   },
                 },
-              ],
-            },
+              },
+            ],
           },
-        }],
+        },
       }
     }
 
     return query;
   }
 
+  /**
+   * Finds sessions within a workspace based on a set of filters
+   * @param dialogueIds 
+   * @param filter 
+   * @returns 
+   */
   findWorkspaceSessions = async (dialogueIds: string[], filter?: SessionConnectionFilterInput | null) => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
@@ -97,6 +108,12 @@ class SessionPrismaAdapter {
     return sessions;
   }
 
+  /**
+   * Counts sessions within a workspace based on a set of filters
+   * @param dialogueIds 
+   * @param filter 
+   * @returns 
+   */
   countWorkspaceSessions = async (dialogueIds: string[], filter?: SessionConnectionFilterInput | null) => {
     return this.prisma.session.count({
       where: this.buildFindWorkspaceSessionsQuery(dialogueIds, filter),

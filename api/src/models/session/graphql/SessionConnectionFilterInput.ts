@@ -52,5 +52,7 @@ export const SessionConnectionFilterInput = inputObjectType({
     // Paginate
     t.int('offset', { nullable: true });
     t.int('perPage', { required: false, default: 10 });
+
+    t.list.string('dialogueIds', { nullable: true });
   },
 })

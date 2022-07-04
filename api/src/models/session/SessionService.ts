@@ -7,11 +7,11 @@ import { addDays, differenceInHours } from 'date-fns';
 
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
-import { NexusGenEnums, NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
+import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionActionType, SessionWithEntries } from './SessionTypes';
+import { SessionActionType, SessionConnectionFilterInput, SessionWithEntries } from './SessionTypes';
 import { TopicByString, TopicStatistics } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
@@ -19,18 +19,6 @@ import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 import AutomationService from '../automations/AutomationService';
 import { CustomerService } from '../customer/CustomerService';
-
-export interface SessionConnectionFilterInput {
-  campaignVariantId?: string | null; // String
-  deliveryType?: NexusGenEnums['SessionDeliveryType'] | null; // SessionDeliveryType
-  endDate?: Date | null; // String
-  offset?: number | null; // Int
-  orderBy?: NexusGenInputs['SessionConnectionOrderByInput'] | null; // SessionConnectionOrderByInput
-  perPage?: number | null; // Int
-  scoreRange?: NexusGenInputs['SessionScoreRangeFilter'] | null; // SessionScoreRangeFilter
-  search?: string | null; // String
-  startDate?: Date | null; // String
-}
 
 class SessionService {
   private sessionPrismaAdapter: SessionPrismaAdapter;
@@ -180,8 +168,8 @@ class SessionService {
    */
   findSessionsForDialogues = async (
     dialogueIds: string[],
-    startDateTime?: Date,
-    endDateTime?: Date,
+    startDateTime: Date,
+    endDateTime: Date,
     where?: Prisma.SessionWhereInput,
     include?: Prisma.SessionInclude
   ) => {
@@ -502,12 +490,15 @@ class SessionService {
   ): Promise<NexusGenFieldTypes['SessionConnection'] | null> => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
+    let dialogueIds = filter?.dialogueIds;
 
-    const dialogues = await this.workspaceService.getDialogues(workspaceId);
-    const mappedDialogueIds = dialogues.map((dialogue) => dialogue.id);
+    if (!dialogueIds?.length) {
+      const dialogues = await this.workspaceService.getDialogues(workspaceId);
+      dialogueIds = dialogues.map((dialogue) => dialogue.id);
+    }
 
-    const sessions = await this.sessionPrismaAdapter.findWorkspaceSessions(mappedDialogueIds, filter);
-    const totalSessions = await this.sessionPrismaAdapter.countWorkspaceSessions(mappedDialogueIds, filter);
+    const sessions = await this.sessionPrismaAdapter.findWorkspaceSessions(dialogueIds, filter);
+    const totalSessions = await this.sessionPrismaAdapter.countWorkspaceSessions(dialogueIds, filter);
 
     const {
       totalPages, hasPrevPage, hasNextPage, nextPageOffset, pageIndex, prevPageOffset,

@@ -1685,6 +1685,7 @@ type SessionConnection implements ConnectionInterface {
 input SessionConnectionFilterInput {
   campaignVariantId: String
   deliveryType: SessionDeliveryType
+  dialogueIds: [String!]
   endDate: String
   offset: Int
   orderBy: SessionConnectionOrderByInput

@@ -539,6 +539,7 @@ export interface NexusGenInputs {
   SessionConnectionFilterInput: { // input type
     campaignVariantId?: string | null; // String
     deliveryType?: NexusGenEnums['SessionDeliveryType'] | null; // SessionDeliveryType
+    dialogueIds?: string[] | null; // [String!]
     endDate?: string | null; // String
     offset?: number | null; // Int
     orderBy?: NexusGenInputs['SessionConnectionOrderByInput'] | null; // SessionConnectionOrderByInput
