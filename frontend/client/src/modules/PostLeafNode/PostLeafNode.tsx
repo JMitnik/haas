@@ -1,12 +1,12 @@
 import * as UI from '@haas/ui';
 import React from 'react';
 
+import { MainHeader, SubHeader, Text } from 'components/Type/Headers';
 import { QuestionNode, QuestionNodeTypeEnum } from 'types/core-types';
 import { useDialogueState } from 'modules/Dialogue/DialogueState';
 
 import { LanguageEnumType } from 'types/generated-types';
 import { PostLeafNodeContainer } from './PostLeafNodeStyles';
-import { MainHeader, SubHeader, Text } from 'components/Type/Headers';
 
 export const POSTLEAFNODE_ID = '-1';
 
