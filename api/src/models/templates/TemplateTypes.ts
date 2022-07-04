@@ -1,4 +1,4 @@
-import { Link, Prisma, TagEnum } from '@prisma/client';
+import { LanguageEnum, Link, Prisma, TagEnum } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 
 export interface Tag {
@@ -13,6 +13,7 @@ export interface RootSliderOptions {
 export interface WorkspaceTemplate {
   title: string;
   slug: string;
+  language?: LanguageEnum;
   topics: { [K in any]: string[] };
   description: string;
   primaryColor: string;
@@ -34,6 +35,7 @@ export interface DemoWorkspaceTemplate extends WorkspaceTemplate {
   rootLayer: string[];
   subLayer: string[];
   subSubLayer: string[];
+  language: LanguageEnum;
 }
 
 export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {

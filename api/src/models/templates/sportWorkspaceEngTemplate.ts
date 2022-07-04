@@ -1,9 +1,10 @@
-import { NodeType } from '@prisma/client';
+import { LanguageEnum, NodeType } from '@prisma/client';
 import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultSportTextFieldForm, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
 const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
   title: 'How do you feel about us?',
   slug: 'sport',
+  language: LanguageEnum.ENGLISH,
   rootLayer: ['Male', 'Female'],
   subLayer: ['U8', 'U12', 'U16', 'U18'],
   subSubLayer: ['Team1', 'Team2', 'Team3'],

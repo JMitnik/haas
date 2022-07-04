@@ -1,4 +1,4 @@
-import { NodeType, Prisma } from '@prisma/client';
+import { LanguageEnum, NodeType, Prisma } from '@prisma/client';
 import WorkspaceTemplate, { Tag, defaultAdminRole, defaultBotRole, defaultForm, defaultLinks, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate, singleLink } from './TemplateTypes';
 
 export type rootTopics = 'Facilities' | 'Website/Mobile app' | 'Product/Services' | 'Customer Support'
@@ -24,6 +24,7 @@ export interface MassSeedTemplate extends WorkspaceTemplate {
 const defaultWorkspaceTemplate: DemoWorkspaceTemplate = {
   title: 'How do you feel about us?',
   slug: 'default',
+  language: LanguageEnum.ENGLISH,
   rootLayer: ['default'],
   subLayer: [''],
   subSubLayer: [''],
@@ -200,6 +201,7 @@ const defaultWorkspaceTemplate: DemoWorkspaceTemplate = {
 export const defaultMassSeedTemplate: DemoWorkspaceTemplate = {
   title: 'How do you feel about us?',
   slug: 'default',
+  language: LanguageEnum.ENGLISH,
   topics: {
     'Facilities': ['Cleanliness', 'Atmosphere', 'Location'],
     'Website/Mobile app': ['Design', 'Functionality', 'Informative'],
